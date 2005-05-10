@@ -5,6 +5,7 @@
         name="JNode FileSystem Service"
         version="@VERSION@"
         provider-name="JNode.org"
+        license-name="lgpl"
         class="org.jnode.fs.service.def.FileSystemPlugin">
         
   <requires>

@@ -36,9 +36,9 @@ import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Jar;
 import org.apache.tools.ant.types.ZipFileSet;
 import org.jnode.plugin.Library;
+import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
-import org.jnode.plugin.model.FragmentDescriptorModel;
-import org.jnode.plugin.model.PluginDescriptorModel;
+import org.jnode.plugin.model.Factory;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -62,9 +62,9 @@ public abstract class AbstractPluginTask extends Task {
 		targetArch = string;
 	}
 
-    protected PluginDescriptorModel readDescriptor(File descriptor)
+    protected PluginDescriptor readDescriptor(File descriptor)
     {
-        final PluginDescriptorModel descr;
+        final PluginDescriptor descr;
         try {
             final XMLElement root = new XMLElement(new Hashtable(), true, false);
             try {
@@ -79,13 +79,7 @@ public abstract class AbstractPluginTask extends Task {
             } catch (XMLParseException ex) {
                 throw new BuildException("Building " + descriptor + " failed", ex);
             }
-            if (root.getName().equals("plugin")) {
-                descr = new PluginDescriptorModel(root);
-            } else if (root.getName().equals("fragment")) {
-                descr = new FragmentDescriptorModel(root);                
-            } else {
-                throw new BuildException("Unknown root tag " + root.getName());
-            }
+            descr = Factory.parseDescriptor(root);
         } catch (PluginException ex) {
             ex.printStackTrace();
             throw new BuildException("Building " + descriptor + " failed", ex);

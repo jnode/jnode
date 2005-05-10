@@ -5,6 +5,7 @@
         name="JNode initial Ramdisk"
         version="@VERSION@"
         provider-name="JNode.org"
+        license-name="lgpl"
         class="org.jnode.fs.initrd.InitRamdisk">
         
   <requires>

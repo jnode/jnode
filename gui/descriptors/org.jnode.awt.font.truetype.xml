@@ -5,6 +5,7 @@
         name="JNode AWT TrueType Font Provider"
         version="@VERSION@"
         provider-name="JNode.org"
+        license-name="lgpl"
         class="org.jnode.awt.font.truetype.TTFPlugin">
         
   <requires>

@@ -26,7 +26,7 @@ import org.jnode.plugin.PluginDescriptor;
 /**
  * @author epr
  */
-public abstract class PluginModelObject extends AbstractModelObject {
+abstract class PluginModelObject extends AbstractModelObject {
 
 	private final PluginDescriptorModel plugin;
 	

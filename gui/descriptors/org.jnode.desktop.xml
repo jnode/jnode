@@ -5,6 +5,7 @@
         name="JNode Desktop Implementation"
         version="@VERSION@"
         provider-name="JNode.org"
+        license-name="lgpl"
         class="org.jnode.desktop.DesktopPlugin">
         
   <requires>

@@ -4,8 +4,8 @@
 <plugin id="org.jnode.fs.jifs.command" 
         name="Jnode Information FileSystem"
         version="@VERSION@"
-        provider-name="JNode.org">
-        <!--class="org.jnode.fs.jifs.def.JIFSPlugin"-->
+        provider-name="JNode.org"
+        license-name="lgpl">
         
   <requires>
 	<import plugin="org.jnode.fs.jifs"/>

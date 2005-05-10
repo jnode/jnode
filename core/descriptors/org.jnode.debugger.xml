@@ -5,6 +5,7 @@
         name="JNode Debugger"
         version="@VERSION@"
         provider-name="JNode.org"
+        license-name="lgpl"
         class="org.jnode.debugger.DebuggerPlugin">
         
   <requires>

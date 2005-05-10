@@ -28,7 +28,7 @@ import org.jnode.plugin.PluginException;
 /**
  * @author epr
  */
-public class EmptyPlugin extends Plugin {
+final class EmptyPlugin extends Plugin {
 
 	/**
 	 * Initialize a new instance

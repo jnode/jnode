@@ -4,6 +4,7 @@
 <plugin id="org.jnode.driver.net.ne2k-pci" 
         name="JNode NE2000 PCI driver(s)"
         version="@VERSION@"
+        license-name="lgpl"
         provider-name="JNode.org">
         
   <requires>

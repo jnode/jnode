@@ -29,7 +29,7 @@ import org.jnode.vm.VmSystemObject;
 /**
  * @author epr
  */
-public abstract class AbstractModelObject extends VmSystemObject {
+abstract class AbstractModelObject extends VmSystemObject {
 
 	/**
 	 * Utility method to get an attribute from and element and test for its presence if it is required.

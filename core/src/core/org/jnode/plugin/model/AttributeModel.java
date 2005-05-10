@@ -26,7 +26,7 @@ import org.jnode.vm.BootableObject;
 /**
  * @author epr
  */
-public class AttributeModel implements BootableObject {
+final class AttributeModel implements BootableObject {
 
 	private final String name;
 	private final String value;

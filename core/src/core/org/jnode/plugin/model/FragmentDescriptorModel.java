@@ -21,7 +21,6 @@
  
 package org.jnode.plugin.model;
 
-import java.io.InputStream;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -36,7 +35,7 @@ import org.jnode.vm.ResourceLoader;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class FragmentDescriptorModel extends PluginDescriptorModel implements
+final class FragmentDescriptorModel extends PluginDescriptorModel implements
         FragmentDescriptor, ResourceLoader {
 
     private final String pluginId;

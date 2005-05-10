@@ -4,6 +4,7 @@
 <plugin id="org.jnode.shell.command"
   name="JNode System Commands"
   version="@VERSION@"
+        license-name="lgpl"
   provider-name="JNode.org">
 
   <requires>

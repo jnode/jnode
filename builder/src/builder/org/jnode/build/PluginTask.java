@@ -34,8 +34,8 @@ import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.ZipFileSet;
 import org.apache.tools.ant.util.FileUtils;
 import org.jnode.plugin.Library;
+import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.Runtime;
-import org.jnode.plugin.model.PluginDescriptorModel;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -90,7 +90,7 @@ public class PluginTask extends AbstractPluginTask {
      * @throws BuildException
      */
 	protected void buildPlugin(Map<String, File> descriptors, File descriptor) throws BuildException {
-		final PluginDescriptorModel descr = readDescriptor(descriptor);
+		final PluginDescriptor descr = readDescriptor(descriptor);
 
 		final String fullId = descr.getId() + "_" + descr.getVersion();
         if(descriptors.containsKey(fullId))

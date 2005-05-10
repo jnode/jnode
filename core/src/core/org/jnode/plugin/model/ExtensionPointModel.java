@@ -34,7 +34,7 @@ import org.jnode.plugin.PluginException;
 /**
  * @author epr
  */
-public class ExtensionPointModel extends PluginModelObject implements
+final class ExtensionPointModel extends PluginModelObject implements
         ExtensionPoint {
 
     private final String id;

@@ -5,6 +5,7 @@
   name="JNode IPv4 Configuration Service"
   version="@VERSION@"
   provider-name="JNode.org"
+        license-name="lgpl"
   class="org.jnode.net.ipv4.config.impl.IPv4ConfigurationPlugin">
 
   <requires>

@@ -53,67 +53,67 @@ import org.jnode.vm.VmSystem;
 public class PluginDescriptorModel extends AbstractModelObject implements
         PluginDescriptor {
 
-    private final String id;
-
-    private final String providerName;
-
-    private final String name;
-
-    private final String version;
-
-    private final String className;
-
     private final boolean autoStart;
-
-    private final boolean system;
-
-    private final PluginPrerequisiteModel[] requires;
-
-    private final ExtensionModel[] extensions;
-
-    private final ExtensionPointModel[] extensionPoints;
-
-    private final RuntimeModel runtime;
-
-    private PluginRegistryModel registry;
-
-    private Plugin plugin;
-
-    private final PluginJar jarFile;
 
     private transient ClassLoader classLoader;
 
+    private final String className;
+
+    private final ExtensionPointModel[] extensionPoints;
+
+    private final ExtensionModel[] extensions;
+
+    private final List<FragmentDescriptorModel> fragments;
+
+    private final String id;
+
+    private final PluginJar jarFile;
+
+    private final String licenseName;
+
+    private final String licenseUrl;
+
+    private List<PluginDescriptorListener> listeners;
+
+    private final String name;
+
+    private Plugin plugin;
+
+    private final String providerName;
+
+    private final String providerUrl;
+
+    private PluginRegistryModel registry;
+
+    private final PluginPrerequisiteModel[] requires;
+
     private boolean resolved;
+
+    private final RuntimeModel runtime;
 
     private boolean started = false;
 
     private boolean starting = false;
 
-    private List<PluginDescriptorListener> listeners;
+    private final boolean system;
 
-    private final List<FragmentDescriptorModel> fragments;
-
-    /**
-     * Load a plugin-descriptor without a registry.
-     * 
-     * @param e
-     */
-    public PluginDescriptorModel(XMLElement e) throws PluginException {
-        this(null, e);
-    }
+    private final String version;
 
     /**
      * Create a new instance
      * 
      * @param e
      */
-    public PluginDescriptorModel(PluginJar jarFile, XMLElement e)
+    PluginDescriptorModel(PluginJar jarFile, XMLElement e)
             throws PluginException {
         this.jarFile = jarFile;
         this.fragments = new BootableArrayList<FragmentDescriptorModel>();
         id = getAttribute(e, "id", true);
         name = getAttribute(e, "name", true);
         providerName = getAttribute(e, "provider-name", false);
+        providerUrl = getAttribute(e, "provider-url", false);
+        licenseName = getAttribute(e, "license-name", false);
+        licenseUrl = getAttribute(e, "license-url", false);
         version = getAttribute(e, "version", true);
         className = getAttribute(e, "class", false);
         system = getBooleanAttribute(e, "system", false);
@@ -188,220 +188,37 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     }
 
     /**
-     * Resolve all references to (elements of) other plugin descriptors
+     * Load a plugin-descriptor without a registry.
      * 
-     * @throws PluginException
+     * @param e
      */
-    public void resolve(PluginRegistryModel registry) throws PluginException {
-        if ((this.registry != null) && (this.registry != registry)) {
-            throw new SecurityException("Cannot overwrite the registry");
-        }
-        if (!resolved) {
-            // BootLog.info("Resolve " + id);
-            this.registry = registry;
-            registry.registerPlugin(this);
-            for (int i = 0; i < extensionPoints.length; i++) {
-                extensionPoints[i].resolve(registry);
-            }
-            for (int i = 0; i < requires.length; i++) {
-                requires[i].resolve(registry);
-            }
-            if (runtime != null) {
-                runtime.resolve(registry);
-            }
-            resolved = true;
-            for (int i = 0; i < extensions.length; i++) {
-                extensions[i].resolve(registry);
-            }
+    PluginDescriptorModel(XMLElement e) throws PluginException {
+        this(null, e);
+    }
+
+    /**
+     * Add a fragment to this plugin. This method is called only by
+     * {@link FragmentDescriptorModel#resolve }.
+     * 
+     * @param fragment
+     */
+    final void add(FragmentDescriptorModel fragment) {
+        fragments.add(fragment);
+        if (isSystemPlugin()) {
+            VmSystem.getSystemClassLoader().add(fragment);
         }
     }
 
     /**
-     * Remove all references to (elements of) other plugin descriptors
+     * Add a listener to this descriptor.
      * 
-     * @throws PluginException
+     * @param listener
      */
-    protected void unresolve(PluginRegistryModel registry)
-            throws PluginException {
-        if (plugin != null) {
-            plugin.stop();
+    public synchronized void addListener(PluginDescriptorListener listener) {
+        if (listeners == null) {
+            listeners = new ArrayList<PluginDescriptorListener>();
         }
-        if (runtime != null) {
-            runtime.unresolve(registry);
-        }
-        for (int i = 0; i < requires.length; i++) {
-            requires[i].unresolve(registry);
-        }
-        for (int i = 0; i < extensionPoints.length; i++) {
-            extensionPoints[i].unresolve(registry);
-        }
-        for (int i = 0; i < extensions.length; i++) {
-            extensions[i].unresolve(registry);
-        }
-        registry.unregisterPlugin(this);
-        resolved = false;
-    }
-
-    /**
-     * Gets the unique identifier of this plugin
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * Gets the human readable name of this plugin
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Gets the name of the provider of this plugin
-     */
-    public String getProviderName() {
-        return providerName;
-    }
-
-    /**
-     * Gets the version of this plugin
-     */
-    public String getVersion() {
-        return version;
-    }
-
-    /**
-     * Gets the required imports
-     * 
-     * @return List&lt;ImportConfig&gt;
-     */
-    public PluginPrerequisite[] getPrerequisites() {
-        return requires;
-    }
-
-    /**
-     * Gets all extension-points provided by this plugin
-     * 
-     * @return List&lt;ExtensionPointConfig&gt;
-     */
-    public ExtensionPoint[] getExtensionPoints() {
-        return extensionPoints;
-    }
-
-    /**
-     * Returns the extension point with the given simple identifier declared in
-     * this plug-in, or null if there is no such extension point.
-     * 
-     * @param extensionPointId
-     *            the simple identifier of the extension point (e.g. "wizard").
-     * @return the extension point, or null
-     */
-    public ExtensionPoint getExtensionPoint(String extensionPointId) {
-        final int max = extensionPoints.length;
-        for (int i = 0; i < max; i++) {
-            final ExtensionPoint ep = extensionPoints[i];
-            if (ep.getSimpleIdentifier().equals(extensionPointId)) {
-                return ep;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Gets all extensions provided by this plugin
-     * 
-     * @return List&lt;ExtensionConfig&gt;
-     */
-    public Extension[] getExtensions() {
-        return extensions;
-    }
-
-    /**
-     * Gets the runtime information of this descriptor.
-     * 
-     * @return The runtime, or null if no runtime information is provided.
-     */
-    public Runtime getRuntime() {
-        return runtime;
-    }
-
-    /**
-     * Gets the registry this plugin is declared in.
-     */
-    /*
-     * public PluginRegistry getPluginRegistry() { return registry; }
-     */
-
-    /**
-     * Gets the plugin that is described by this descriptor. If no plugin class
-     * is given in the descriptor, an empty plugin is returned. This method will
-     * always returns the same plugin instance for a given descriptor.
-     */
-    public Plugin getPlugin() throws PluginException {
-        if (plugin == null) {
-            plugin = createPlugin();
-        }
-        return plugin;
-    }
-
-    public String toString() {
-        return getId();
-    }
-
-    /**
-     * Is this a descriptor of a system plugin. System plugins are not
-     * reloadable.
-     * 
-     * @return boolean
-     */
-    public boolean isSystemPlugin() {
-        return system;
-    }
-
-    /**
-     * Does this plugin have a custom plugin class specified?
-     * 
-     * @return
-     */
-    public boolean hasCustomPluginClass() {
-        return (className != null);
-    }
-
-    /**
-     * Gets the name of the custom plugin class of this plugin.
-     * @return Null if no custom plugin class
-     */
-    public String getCustomPluginClassName() {
-        return className;
-    }
-    
-    /**
-     * Has this plugin the auto-start flag set. If true, the plugin will be
-     * started automatically at boot/load time.
-     * 
-     * @return
-     */
-    public boolean isAutoStart() {
-        return autoStart;
-    }
-
-    /**
-     * Does the plugin described by this descriptor directly depends on the
-     * given plugin id.
-     * 
-     * @param id
-     * @return True if id is in the list of required plugins of this descriptor,
-     *         false otherwise.
-     */
-    public boolean depends(String id) {
-        final PluginPrerequisite[] req = this.requires;
-        final int max = req.length;
-        for (int i = 0; i < max; i++) {
-            if (req[i].getPluginId().equals(id)) {
-                return true;
-            }
-        }
-        return false;
+        listeners.add(listener);
     }
 
     /**
@@ -435,10 +252,167 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     }
 
     /**
+     * Does the plugin described by this descriptor directly depends on the
+     * given plugin id.
+     * 
+     * @param id
+     * @return True if id is in the list of required plugins of this descriptor,
+     *         false otherwise.
+     */
+    public boolean depends(String id) {
+        final PluginPrerequisite[] req = this.requires;
+        final int max = req.length;
+        for (int i = 0; i < max; i++) {
+            if (req[i].getPluginId().equals(id)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Fire the pluginStarted event to my listeners.
+     */
+    public final void firePluginStarted() {
+        final List<PluginDescriptorListener> listeners;
+        synchronized (this) {
+            if (this.listeners != null) {
+                listeners = new ArrayList<PluginDescriptorListener>(
+                        this.listeners);
+            } else {
+                return;
+            }
+        }
+        for (PluginDescriptorListener l : listeners) {
+            l.pluginStarted(this);
+        }
+    }
+
+    /**
+     * Fire the pluginStop event to my listeners.
+     */
+    public final void firePluginStop() {
+        final List<PluginDescriptorListener> listeners;
+        synchronized (this) {
+            if (this.listeners != null) {
+                listeners = new ArrayList<PluginDescriptorListener>(
+                        this.listeners);
+            } else {
+                return;
+            }
+        }
+        for (PluginDescriptorListener l : listeners) {
+            l.pluginStop(this);
+        }
+    }
+
+    /**
+     * Gets all fragments attached to this plugin.
+     * 
+     * @return
+     */
+    final List<FragmentDescriptorModel> fragments() {
+        return fragments;
+    }
+
+    /**
+     * Gets the name of the custom plugin class of this plugin.
+     * 
+     * @return Null if no custom plugin class
+     */
+    public String getCustomPluginClassName() {
+        return className;
+    }
+
+    /**
+     * Returns the extension point with the given simple identifier declared in
+     * this plug-in, or null if there is no such extension point.
+     * 
+     * @param extensionPointId
+     *            the simple identifier of the extension point (e.g. "wizard").
+     * @return the extension point, or null
+     */
+    public ExtensionPoint getExtensionPoint(String extensionPointId) {
+        final int max = extensionPoints.length;
+        for (int i = 0; i < max; i++) {
+            final ExtensionPoint ep = extensionPoints[i];
+            if (ep.getSimpleIdentifier().equals(extensionPointId)) {
+                return ep;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Gets all extension-points provided by this plugin
+     * 
+     * @return List&lt;ExtensionPointConfig&gt;
+     */
+    public ExtensionPoint[] getExtensionPoints() {
+        return extensionPoints;
+    }
+
+    /**
+     * Gets all extensions provided by this plugin
+     * 
+     * @return List&lt;ExtensionConfig&gt;
+     */
+    public Extension[] getExtensions() {
+        return extensions;
+    }
+
+    /**
+     * Gets the registry this plugin is declared in.
+     */
+    /*
+     * public PluginRegistry getPluginRegistry() { return registry; }
+     */
+
+    /**
+     * Gets the unique identifier of this plugin
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
      * @return Returns the jarFile.
      */
     public final PluginJar getJarFile() {
         return this.jarFile;
+    }
+
+    /**
+     * @see org.jnode.plugin.PluginDescriptor#getLicenseName()
+     */
+    public String getLicenseName() {
+        return licenseName;
+    }
+
+    /**
+     * @see org.jnode.plugin.PluginDescriptor#getLicenseUrl()
+     */
+    public String getLicenseUrl() {
+        return licenseUrl;
+    }
+
+    /**
+     * Gets the human readable name of this plugin
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Gets the plugin that is described by this descriptor. If no plugin class
+     * is given in the descriptor, an empty plugin is returned. This method will
+     * always returns the same plugin instance for a given descriptor.
+     */
+    public Plugin getPlugin() throws PluginException {
+        if (plugin == null) {
+            plugin = createPlugin();
+        }
+        return plugin;
     }
 
     /**
@@ -481,6 +455,144 @@ public class PluginDescriptorModel extends AbstractModelObject implements
             }
         }
         return classLoader;
+    }
+
+    /**
+     * Gets the required imports
+     * 
+     * @return List&lt;ImportConfig&gt;
+     */
+    public PluginPrerequisite[] getPrerequisites() {
+        return requires;
+    }
+
+    /**
+     * Gets the name of the provider of this plugin
+     */
+    public String getProviderName() {
+        return providerName;
+    }
+
+    /**
+     * @see org.jnode.plugin.PluginDescriptor#getProviderUrl()
+     */
+    public String getProviderUrl() {
+        return providerUrl;
+    }
+
+    /**
+     * Gets the runtime information of this descriptor.
+     * 
+     * @return The runtime, or null if no runtime information is provided.
+     */
+    public Runtime getRuntime() {
+        return runtime;
+    }
+
+    /**
+     * Gets the version of this plugin
+     */
+    public String getVersion() {
+        return version;
+    }
+
+    /**
+     * Does this plugin have a custom plugin class specified?
+     * 
+     * @return
+     */
+    public boolean hasCustomPluginClass() {
+        return (className != null);
+    }
+
+    /**
+     * Initialize the list of plugin requirements.
+     */
+    protected void initializeRequiresList(List<PluginPrerequisiteModel> list,
+            XMLElement e) throws PluginException {
+        // Nothing here
+    }
+
+    /**
+     * Has this plugin the auto-start flag set. If true, the plugin will be
+     * started automatically at boot/load time.
+     * 
+     * @return
+     */
+    public boolean isAutoStart() {
+        return autoStart;
+    }
+
+    /**
+     * Is this a descriptor of a fragment.
+     * 
+     * @return boolean True for a fragment, false for a plugin
+     */
+    public boolean isFragment() {
+        return false;
+    }
+
+    /**
+     * Is this a descriptor of a system plugin. System plugins are not
+     * reloadable.
+     * 
+     * @return boolean
+     */
+    public boolean isSystemPlugin() {
+        return system;
+    }
+
+    /**
+     * Remove a fragment from this plugin. This method is called only by
+     * {@link FragmentDescriptorModel#unresolve(PluginRegistryModel)}.
+     * 
+     * @param fragment
+     */
+    final void remove(FragmentDescriptorModel fragment) {
+        if (isSystemPlugin()) {
+            VmSystem.getSystemClassLoader().remove(fragment);
+        }
+        fragments.remove(fragment);
+    }
+
+    /**
+     * Remove a listener from this descriptor.
+     * 
+     * @param listener
+     */
+    public synchronized void removeListener(PluginDescriptorListener listener) {
+        if (listeners != null) {
+            listeners.remove(listener);
+        }
+    }
+
+    /**
+     * Resolve all references to (elements of) other plugin descriptors
+     * 
+     * @throws PluginException
+     */
+    public void resolve(PluginRegistryModel registry) throws PluginException {
+        if ((this.registry != null) && (this.registry != registry)) {
+            throw new SecurityException("Cannot overwrite the registry");
+        }
+        if (!resolved) {
+            // BootLog.info("Resolve " + id);
+            this.registry = registry;
+            registry.registerPlugin(this);
+            for (int i = 0; i < extensionPoints.length; i++) {
+                extensionPoints[i].resolve(registry);
+            }
+            for (int i = 0; i < requires.length; i++) {
+                requires[i].resolve(registry);
+            }
+            if (runtime != null) {
+                runtime.resolve(registry);
+            }
+            resolved = true;
+            for (int i = 0; i < extensions.length; i++) {
+                extensions[i].resolve(registry);
+            }
+        }
     }
 
     /**
@@ -528,113 +640,33 @@ public class PluginDescriptorModel extends AbstractModelObject implements
         }
     }
 
+    public String toString() {
+        return getId();
+    }
+
     /**
-     * Add a listener to this descriptor.
+     * Remove all references to (elements of) other plugin descriptors
      * 
-     * @param listener
+     * @throws PluginException
      */
-    public synchronized void addListener(PluginDescriptorListener listener) {
-        if (listeners == null) {
-            listeners = new ArrayList<PluginDescriptorListener>();
+    protected void unresolve(PluginRegistryModel registry)
+            throws PluginException {
+        if (plugin != null) {
+            plugin.stop();
         }
-        listeners.add(listener);
-    }
-
-    /**
-     * Remove a listener from this descriptor.
-     * 
-     * @param listener
-     */
-    public synchronized void removeListener(PluginDescriptorListener listener) {
-        if (listeners != null) {
-            listeners.remove(listener);
+        if (runtime != null) {
+            runtime.unresolve(registry);
         }
-    }
-
-    /**
-     * Fire the pluginStarted event to my listeners.
-     */
-    public final void firePluginStarted() {
-        final List<PluginDescriptorListener> listeners;
-        synchronized (this) {
-            if (this.listeners != null) {
-                listeners = new ArrayList<PluginDescriptorListener>(
-                        this.listeners);
-            } else {
-                return;
-            }
+        for (int i = 0; i < requires.length; i++) {
+            requires[i].unresolve(registry);
         }
-        for (PluginDescriptorListener l : listeners) {
-            l.pluginStarted(this);
+        for (int i = 0; i < extensionPoints.length; i++) {
+            extensionPoints[i].unresolve(registry);
         }
-    }
-
-    /**
-     * Fire the pluginStop event to my listeners.
-     */
-    public final void firePluginStop() {
-        final List<PluginDescriptorListener> listeners;
-        synchronized (this) {
-            if (this.listeners != null) {
-                listeners = new ArrayList<PluginDescriptorListener>(
-                        this.listeners);
-            } else {
-                return;
-            }
+        for (int i = 0; i < extensions.length; i++) {
+            extensions[i].unresolve(registry);
         }
-        for (PluginDescriptorListener l : listeners) {
-            l.pluginStop(this);
-        }
-    }
-
-    /**
-     * Initialize the list of plugin requirements.
-     */
-    protected void initializeRequiresList(List<PluginPrerequisiteModel> list,
-            XMLElement e) throws PluginException {
-        // Nothing here
-    }
-
-    /**
-     * Add a fragment to this plugin. This method is called only by
-     * {@link FragmentDescriptorModel#resolve }.
-     * 
-     * @param fragment
-     */
-    final void add(FragmentDescriptorModel fragment) {
-        fragments.add(fragment);
-        if (isSystemPlugin()) {
-            VmSystem.getSystemClassLoader().add(fragment);
-        }
-    }
-
-    /**
-     * Remove a fragment from this plugin. This method is called only by
-     * {@link FragmentDescriptorModel#unresolve(PluginRegistryModel)}.
-     * 
-     * @param fragment
-     */
-    final void remove(FragmentDescriptorModel fragment) {
-        if (isSystemPlugin()) {
-            VmSystem.getSystemClassLoader().remove(fragment);
-        }
-        fragments.remove(fragment);
-    }
-
-    /**
-     * Is this a descriptor of a fragment.
-     * 
-     * @return boolean True for a fragment, false for a plugin
-     */
-    public boolean isFragment() {
-        return false;
-    }
-    
-    /**
-     * Gets all fragments attached to this plugin.
-     * @return
-     */
-    final List<FragmentDescriptorModel> fragments() {
-        return fragments;
+        registry.unregisterPlugin(this);
+        resolved = false;
     }
 }

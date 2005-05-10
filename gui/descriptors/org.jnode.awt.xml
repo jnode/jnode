@@ -5,6 +5,7 @@
         name="JNode AWT Implementation"
         version="@VERSION@"
         provider-name="JNode.org"
+        license-name="lgpl"
         class="org.jnode.awt.AWTPlugin">
         
   <requires>

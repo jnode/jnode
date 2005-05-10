@@ -4,6 +4,7 @@
 <plugin id="org.jnode.driver.video.ati.mach64" 
         name="JNode Video ATI Mach64 SVGA Driver"
         version="@VERSION@"
+        license-name="lgpl"
         provider-name="JNode.org">
         
   <requires>

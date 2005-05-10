@@ -5,6 +5,7 @@
         name="JNode default memory manager"
         version="@VERSION@"
         system="true"
+        license-name="lgpl"
         provider-name="JNode.org">
         
   <requires>

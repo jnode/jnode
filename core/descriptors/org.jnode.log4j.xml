@@ -5,6 +5,7 @@
         name="JNode Log4j setup"
         version="@VERSION@"
         provider-name="JNode.org"
+        license-name="lgpl"
         class="org.jnode.log4j.config.Log4jConfigurePlugin">
         
   <requires>
