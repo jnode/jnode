@@ -4,7 +4,8 @@
 <plugin id="com.jcraft.jsch"
   name="JSch"
   version="@VERSION@"
-  provider-name="www.jcraft.com">
+  provider-name="www.jcraft.com"
+  license-url="http://www.jcraft.com/jsch/LICENSE.txt">
 
   <requires>
     <import plugin="crypto-security"/>
