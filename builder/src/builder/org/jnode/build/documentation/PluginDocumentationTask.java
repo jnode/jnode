@@ -53,6 +53,8 @@ public class PluginDocumentationTask extends AbstractPluginTask {
     private final LinkedList<FileSet> descriptorSets = new LinkedList<FileSet>();
 
     private File destdir;
+    
+    private boolean tree = false;
 
     private final SortedMap<String, PluginData> descriptors = new TreeMap<String, PluginData>();
 
@@ -77,6 +79,12 @@ public class PluginDocumentationTask extends AbstractPluginTask {
     private static final String OVERVIEW_LICENSE_FILE = "overview-license"
             + EXT;
 
+    private static final String OVERVIEW_TREE_FILE = "overview-tree"
+        + EXT;
+
+    private static final String OVERVIEW_TREE_DOTFILE = "overview-tree.dot";
+    private static final String OVERVIEW_TREE_PNGFILE = "overview-tree.png";
+
     private static final String CSS_FILE = "index.css";
 
     private static final String INDEX = "index" + EXT;
@@ -84,7 +92,8 @@ public class PluginDocumentationTask extends AbstractPluginTask {
     private static final ToolbarEntry[] TOOLBAR_ENTRIES = {
             new ToolbarEntry("Overview", OVERVIEW_SUMMARY_FILE),
             new ToolbarEntry("Java packages", OVERVIEW_PACKAGE_FILE),
-            new ToolbarEntry("Licenses", OVERVIEW_LICENSE_FILE), };
+            new ToolbarEntry("Licenses", OVERVIEW_LICENSE_FILE), 
+            new ToolbarEntry("Tree", OVERVIEW_TREE_FILE), };
 
     private static final LicenseEntry[] KNOWN_LICENSES = {
             new LicenseEntry("gpl",
@@ -162,6 +171,9 @@ public class PluginDocumentationTask extends AbstractPluginTask {
             writeOverviewSummary(descriptors, DOCHEADER);
             writeOverviewPackage(descriptors, DOCHEADER);
             writeOverviewLicense(descriptors, DOCHEADER);
+            if (isTree()) {
+                writeOverviewTree(descriptors, DOCHEADER);
+            }
             writeIndex(descriptors, DOCHEADER);
         } catch (IOException ex) {
             throw new BuildException(ex);
@@ -327,6 +339,47 @@ public class PluginDocumentationTask extends AbstractPluginTask {
                 }
                 addTableRow(out, entry.getKey().toHtmlString(), sb.toString());
             }
+            endSummaryTableHdr(out);
+            addFooter(out);
+
+            out.println("</body></html>");
+        } finally {
+            out.close();
+        }
+    }
+
+    /**
+     * Generate an overview package that list all license and the plugins that
+     * use that.
+     * 
+     * @param descriptors
+     * @param title
+     * @throws IOException
+     */
+    private void writeOverviewTree(Map<String, PluginData> descriptors,
+            String title) throws IOException {
+        final File file = new File(getDestdir(), OVERVIEW_TREE_FILE);
+        final File dotFile = new File(getDestdir(), OVERVIEW_TREE_DOTFILE);
+        final File pngFile = new File(getDestdir(), OVERVIEW_TREE_PNGFILE);
+        final PrintWriter out = new PrintWriter(new FileWriter(file));
+        try {
+            out.println("<html><head>");
+            out.println("<title>" + title + "</title>");
+            out.println("<link rel='stylesheet' TYPE='text/css' href='"
+                    + CSS_FILE + "'>");
+            out.println("</head><body>");
+
+            addToolbar(out, "");
+
+            // Build dot file
+            final DotBuilder dot = new DotBuilder(dotFile, pngFile);
+            for (PluginData data : descriptors.values()) {
+                dot.add(data);
+            }
+            dot.close();
+
+            addSummaryTableHdr(out, "Tree");
+            addTableRow(out, "<img src='" + OVERVIEW_TREE_PNGFILE + "'>");
             endSummaryTableHdr(out);
             addFooter(out);
 
@@ -619,11 +672,13 @@ public class PluginDocumentationTask extends AbstractPluginTask {
                 .println("<table class='toolbar' border='0' cellpadding='3' cellspacing='0' width='100%'>");
         out.println("<tr>");
         for (ToolbarEntry tbe : TOOLBAR_ENTRIES) {
-            out.print("<td nowrap>");
-            out.print("<a href='" + base + tbe.getHref()
-                    + "' class='toolbarItem'>");
-            out.print(tbe.getTitle());
-            out.println("</a></td>");
+            if (!tbe.getHref().equals(OVERVIEW_TREE_FILE) || isTree()) {
+                out.print("<td nowrap>");
+                out.print("<a href='" + base + tbe.getHref()
+                        + "' class='toolbarItem'>");
+                out.print(tbe.getTitle());
+                out.println("</a></td>");
+            }
         }
         out.println("</td></tr></table>");
         out.println("<p/>");
@@ -699,5 +754,20 @@ public class PluginDocumentationTask extends AbstractPluginTask {
             }
         }
         return list;
+    }
+
+    /**
+     * @return Returns the tree.
+     */
+    public final boolean isTree() {
+        return tree;
+    }
+
+    /**
+     * @param tree The tree to set.
+     */
+    public final void setTree(boolean tree) {
+        System.out.println("setTree " + tree);
+        this.tree = tree;
     }
 }

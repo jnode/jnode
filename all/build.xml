@@ -570,7 +570,8 @@ clean          Remove all intermediate build results.
 
     <plugindocumentation 
     	destdir="${reports.dir}/plugins" 
-    	pluginDir="${descriptors.dir}">
+    	pluginDir="${descriptors.dir}"
+    	tree="${jnode.plugin.doc.tree}">
       <descriptors dir="${descriptors.dir}/">
         <include name="*.xml" />
         <exclude name="*plugin-list.xml" />
