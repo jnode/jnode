@@ -31,3 +31,9 @@
 # Uncomment to enable future MMTk based memory manager (does not work yet)
 # jnode.memmgr.plugin.id=org.mmtk
 
+# -----------------------------------------------
+# Settings for the document-plugins task
+
+# Uncomment this if you want the document-plugins task to include a tree page.
+# You must have dot installed for this, see http://www.graphviz.org/
+# jnode.plugin.doc.tree = true
