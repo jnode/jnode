@@ -41,6 +41,7 @@ import org.jnode.vm.classmgr.VmField;
 import org.jnode.vm.classmgr.VmInstanceField;
 import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
+import org.vmmagic.unboxed.UnboxedObject;
 
 public class ObjectEmitter {
 
@@ -427,6 +428,16 @@ public class ObjectEmitter {
                         throw new BuildException("Unknown primitive class "
                                 + fType.getName());
                     }
+                } else if (jnodeField.getDeclaringClass().isMagicType()) {
+                    final Object value = jdkField.get(obj);
+                    if (value == null) {
+                        os.writeWord(0);
+                    } else if (value instanceof UnboxedObject) {
+                        final UnboxedObject uobj = (UnboxedObject)value;
+                        os.writeWord(uobj.toLong());
+                    } else {
+                        throw new BuildException("Cannot handle magic type " + value.getClass().getName());
+                    }                    
                 } else {
                     Object value = jdkField.get(obj);
                     try {

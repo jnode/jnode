@@ -27,7 +27,7 @@ package org.vmmagic.unboxed;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Daniel Frampton
  */
-public final class Offset {
+public final class Offset implements UnboxedObject {
 
     final long v;
     
