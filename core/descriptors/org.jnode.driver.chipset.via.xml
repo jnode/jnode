@@ -8,7 +8,6 @@
         provider-name="jnode.org">
 
   <requires>
-    <import plugin="org.jnode.driver"/>
     <import plugin="org.jnode.driver.pci"/>
   </requires>
 
