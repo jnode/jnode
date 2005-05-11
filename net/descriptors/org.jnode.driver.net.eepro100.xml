@@ -8,10 +8,9 @@
         provider-name="JNode.org">
         
   <requires>
-    <import plugin="org.jnode.driver"/>
     <import plugin="org.jnode.driver.net.ethernet"/>
-    <import plugin="org.jnode.net"/>
 	<import plugin="org.jnode.driver.pci"/> 
+    <import plugin="org.jnode.net"/>
   </requires>
         
   <runtime>
