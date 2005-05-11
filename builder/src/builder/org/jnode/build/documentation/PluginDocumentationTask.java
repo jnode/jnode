@@ -767,7 +767,6 @@ public class PluginDocumentationTask extends AbstractPluginTask {
      * @param tree The tree to set.
      */
     public final void setTree(boolean tree) {
-        System.out.println("setTree " + tree);
         this.tree = tree;
     }
 }
