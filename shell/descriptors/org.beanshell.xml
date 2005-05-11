@@ -4,7 +4,9 @@
 <plugin id="org.beanshell"
     name="Beanshell classes"
     version="1.0"
-    provider-name="beanshell.org">
+    provider-name="beanshell.org"
+    provider-url="http://www.beanshell.org"
+    license-name="lgpl">
 
     <runtime>
         <library name="beanshell.jar">
