@@ -23,6 +23,7 @@ package org.jnode.driver.net.eepro100;
 
 import org.apache.log4j.Logger;
 import org.jnode.driver.net.NetworkException;
+import org.jnode.net.HardwareAddress;
 import org.jnode.net.SocketBuffer;
 import org.jnode.net.ethernet.EthernetHeader;
 import org.jnode.system.ResourceManager;
@@ -114,7 +115,7 @@ public class EEPRO100Buffer implements EEPRO100Constants {
 		rxPacket = new EEPRO100RxFD(rm);
 		rxPacket.setStatus(0x0001);
 		rxPacket.setCommand(0x0000);
-		rxPacket.setLink(rxPacket.getBufferAddress());
+		rxPacket.setLink(rxPacket.getStatus());
 		// TODO Set correct value
 		rxPacket.setRxBufferAddress(0);
 		// ---------------------------------
@@ -132,231 +133,19 @@ public class EEPRO100Buffer implements EEPRO100Constants {
 
 		regs.setReg32(SCBPointer, rxPacket.getBufferAddress());
 		regs.setReg16(SCBCmd, SCBMaskAll | RxStart);
-		EEPRO100Utils.waitForCmdDone(regs);
-
 	}
 	/**
 	 * 
 	 *
 	 */
 	public final void initSingleTxRing() {
+		EEPRO100Utils.waitForCmdDone(regs);
 		log.debug("Set TX base addr.");
 		txFD = new EEPRO100TxFD(rm);
 		txFD.setCommand(CmdIASetup);
 		txFD.setStatus(0x0000);
-	}
-
-	/* Initialize the Rx and Tx rings, along with various 'dev' bits. */
-	public final void initRxRing() {
-		EEPRO100RxFD rxf = null;
-		int i;
-
-		curRx = 0;
-		rxPacketIndex = 0;
-
-		for (i = 0; i < rxPackets.length; i++)
-			rxPackets[i] = new EEPRO100RxFD(this.rm);
-
-		log.debug("rxPacket 0: "
-				+ Integer.toHexString(rxPackets[0].getBufferAddress()));
-
-		for (i = 0; i < RX_RING_SIZE; i++) {
-			rxf = rxPackets[rxPacketIndex++];
-			rxPacketIndex &= (rxPackets.length - 1);
-			rxRing[i] = rxf;
-			if (last_rxf != null)
-				last_rxf.setLink(rxf.getBufferAddress());
-			last_rxf = rxf;
-			rxf.setStatus(1); /* '1' is flag value only. */
-			rxf.setLink(0); /* None yet. */
-			/* This field unused by i82557, we use it as a consistency check. */
-			rxf.setRxBufferAddress(0xffffffff);
-			rxf.setCount(DATA_BUFFER_SIZE << 16);
-			rxf.cleanHeader();
-		}
-		dirtyRx = i - RX_RING_SIZE;
-		/* Mark the last entry as end-of-list. */
-		last_rxf.setStatus(0xC0000002); /* '2' is flag value only. */
-		// last_rxf.cleanHeader();
-		int rxRingSize = rxRing.length;
-	}
-
-	
-
-	public final void initTxRing() {
-		for (int i = 0; i < txRing.length; i++) {
-			txRing[i] = new EEPRO100TxFD(rm);
-		}
-	}
-
-	/**
-	 * @return
-	 */
-	public final int rx(EEPRO100Driver driver) throws NetworkException {
-		log.debug("*** Init Rx ***");
-		int entry = curRx & RX_RING_SIZE - 1;
-		int status;
-		int rxWorkLimit = dirtyRx + RX_RING_SIZE - curRx;
-		EEPRO100RxFD rxf;
-
-		rxRing[entry].flushHeader();
-		int count;
-		while (rxRing[entry] != null
-				&& ((count = rxRing[entry].getCount()) & PacketReceived) == PacketReceived) {
-			int pkt_len = count & 0x07ff;
-
-			if (--rxWorkLimit < 0)
-				break;
-			status = rxRing[entry].getStatus();
-			log.debug(" rx() status " + Integer.toHexString(status) + " len "
-					+ pkt_len);
-
-			if ((status & (RxErrTooBig | RxOK | 0x0f90)) != RxOK) {
-				if ((status & RxErrTooBig) != 0)
-					log.debug(": Ethernet frame overran the Rx buffer, status "
-							+ Integer.toHexString(status));
-				else if (!((status & RxOK) != 0)) {
-					/* There was a fatal error. This *should* be impossible. */
-					rxErrors++;
-					log.debug("Anomalous event in rx(), status "
-							+ Integer.toHexString(status));
-				}
-			} else {
-				/*
-				 * if ((drv_flags & HasChksum)!=0) pkt_len -= 2;
-				 */
-				/* Pass up the already-filled skbuff. */
-				byte[] buf = rxRing[entry].getDataBuffer();
-				SocketBuffer skbuf = new SocketBuffer(buf, 0, buf.length);
-				driver.onReceive(skbuf);
-				rxRing[entry] = null;
-
-				rx_packets++;
-			}
-			entry = (++curRx) & RX_RING_SIZE - 1;
-			rxRing[entry].flushHeader();
-		}
-
-		for (; curRx - dirtyRx > 0; dirtyRx++) {
-			entry = dirtyRx & RX_RING_SIZE - 1;
-
-			rxRing[entry] = rxPackets[rxPacketIndex];
-			rxf = rxRing[entry];
-			rxPacketIndex++;
-			rxPacketIndex &= (rxPackets.length - 1);
-
-			rxf.setStatus(0xc0000001);
-			rxf.setCount(PKT_BUF_SZ << 16);
-			rxf.setLink(0);
-
-			last_rxf.setLink(rxf.getBufferAddress());
-			last_rxf.setStatus(last_rxf.getStatus() & ~0xc0000000);
-			last_rxf.cleanHeader();
-			last_rxf = rxf;
-			rxf.cleanHeader();
-		}
-
-		lastRxTime = jiffies;
-		log.debug("*** End Rx ***");
-		return 0;
-	}
-
-	/*
-	 * Set or clear the multicast filter for this adaptor. This is very ugly
-	 * with Intel chips -- we usually have to execute an entire configuration
-	 * command, plus process a multicast command. This is complicated. We must
-	 * put a large configuration command and an arbitrarily-sized multicast
-	 * command in the transmit list. To minimize the disruption -- the previous
-	 * command might have already loaded the link -- we convert the current
-	 * command block, normally a Tx command, into a no-op and link it to the new
-	 * command.
-	 */
-	final void setRxMode() {
-		EEPRO100TxFD lastCmd0;
-		byte newRxMode = 0;
-		int flags;
-		int entry;
-		byte[] configData = new byte[22];
-
-		// if (flags & IFF_PROMISC) { /* Set promiscuous. */
-		// new_rx_mode = 3;
-		// } else if ((flags & IFF_ALLMULTI) ||
-		// >mc_count > multicast_filter_limit) {
-		// new_rx_mode = 1;
-		// } else
-		// new_rx_mode = 0;
-
-		if (curTx - dirtyTx >= TX_RING_SIZE - 1) {
-			/*
-			 * The Tx ring is full -- don't add anything! Presumably the new
-			 * mode is in config_cmd_data and will be added anyway, otherwise we
-			 * wait for a timer tick or the mode to change again.
-			 */
-			rxMode = -1;
-			return;
-		}
-
-		// if (new_rx_mode != rx_mode) {
-		// int mask=CpuControl.maskCPUInterrupts();
-		entry = curTx & TX_RING_SIZE - 1;
-		lastCmd0 = lastCmd;
-		lastCmd = txRing[entry];
-
-		txRing[entry].setStatus(CmdSuspend | CmdConfigure);
-		curTx++;
-		txRing[entry].setLink(txRing[(entry + 1) & TX_RING_SIZE - 1]
-				.getBufferAddress());
-
-		/* Construct a full CmdConfig frame. */
-		System.arraycopy(i82558ConfigCmd, 0, configData, 0, configData.length);
-		// configData[1] = (byte)((txfifo << 4) | rxfifo);
-		// configData[4] = rxdmacount;
-		// configData[5] = (byte)(txdmacount + 0x80);
-		/*
-		 * if ((drv_flags & HasChksum)!=0) configData[9] |= 1;
-		 */
-		// configData[15] |= (new_rx_mode & 2)!=0 ? 1 : 0;
-		// configData[19] = (byte)(flow_ctrl ? 0xBD : 0x80);
-		// configData[19] |= full_duplex ? 0x40 : 0;
-		// configData[21] = (byte)((new_rx_mode & 1)!=0 ? 0x0D : 0x05);
-		/* if ((phy[0] & 0x8000)!=0) { /* Use the AUI port instead. */
-		/*
-		 * configData[15] |= 0x80; configData[8] = 0; }
-		 */
-		for (int i = 0; i < configData.length; i++) {
-			log.debug(i + ':' + Integer.toHexString(configData[i]) + ' ');
-		}
-		txRing[entry].setParams(configData);
-		/* Trigger the command unit resume. */
-		EEPRO100Utils.waitForCmdDone(regs);
-		// lastCmd0.clearSuspend();
-		regs.setReg8(SCBCmd, CUResume);
-		// CpuControl.umaskCPUInterrupts(mask);
-		lastCmdTime = jiffies;
-		// }
-
-		rxMode = newRxMode;
-
-		// set up multicast
-		// mask = CpuControl.maskCPUInterrupts();
-		// entry = cur_tx & TX_RING_SIZE-1;
-		// lastCmd0 = lastCmd;
-		// lastCmd = txRing[entry];
-		// cur_tx++;
-		// txRing[entry].status(CmdSuspend | CmdMulticastList);
-		// txRing[entry].descriptorAddress(0);
-		// txRing[entry].link(txRing[entry+1 & TX_RING_SIZE-1].bufferAddress);
-		// waitForCmdDone();
-		// lastCmd0.clearSuspend();
-		// csr.write8(SCBCmd, CUResume);
-		// CpuControl.umaskCPUInterrupts(mask);
-		lastCmdTime = jiffies;
-	}
-
-	/**
-	 * Start the chip hardware after a full reset.
-	 */
-	final void resume() {
+		//txFD.setLink();
+		//txFD.setDescriptorAddress();
 	}
 
 	/**
@@ -367,8 +156,6 @@ public class EEPRO100Buffer implements EEPRO100Constants {
 		EthernetHeader hdr = (EthernetHeader) buf.getLinkLayerHeader();
 
 		log.debug("HDR =" + hdr);
-		
-		
 
 		int status;
 		int s1;
@@ -384,7 +171,7 @@ public class EEPRO100Buffer implements EEPRO100Constants {
 
 		txRing[0].setStatus(0);
 		txRing[0].setCommand(CmdSuspend | CmdTx | CmdTxFlex);
-		txRing[0].setLink(txRing[0].getBufferAddress());
+		txRing[0].setLink(txFD.getBufferAddress());
 		txRing[0].setCount(0x02208000);
 
 		regs.setReg16(SCBPointer, txRing[0].getBufferAddress());
@@ -406,7 +193,6 @@ public class EEPRO100Buffer implements EEPRO100Constants {
 	 * @param driver
 	 */
 	public void poll(EEPRO100Driver driver) throws NetworkException {
-
 		if (rxPacket.getStatus() != 0) {
 			// Got a packet, restart the receiver
 			rxPacket.setStatus(0);
