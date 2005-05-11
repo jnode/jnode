@@ -3,8 +3,9 @@
 
 <plugin id="org.xbill.dns"
   name="DNSJava"
-  version="@VERSION@"
-  provider-name="www.dnsjava.org">
+  version="1.5.0"
+  provider-name="xbill.org"
+  license-url="http://www.dnsjava.org/README">
 
 
   <runtime>
