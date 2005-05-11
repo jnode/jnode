@@ -9,7 +9,7 @@
         
   <requires>
     <import plugin="org.jnode.awt"/>
-    <import plugin="org.jnode.driver"/>
+    <!-- import plugin="org.jnode.driver"/ -->
     <import plugin="org.jnode.driver.pci"/>
     <import plugin="org.jnode.driver.video"/>
   </requires>
