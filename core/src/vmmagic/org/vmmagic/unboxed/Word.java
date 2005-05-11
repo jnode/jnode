@@ -28,7 +28,7 @@ package org.vmmagic.unboxed;
  * @author Daniel Frampton
  * @see Address
  */
-public final class Word {
+public final class Word implements UnboxedObject {
 
     final long v;
     

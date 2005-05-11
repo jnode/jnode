@@ -28,7 +28,7 @@ import org.jnode.vm.VmAddress;
  * 
  * @author Daniel Frampton
  */
-public final class Address {
+public final class Address implements UnboxedObject {
     
     final long v;
     

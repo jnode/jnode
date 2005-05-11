@@ -26,7 +26,7 @@ package org.vmmagic.unboxed;
  * 
  * @author Daniel Frampton
  */
-public final class Extent {
+public final class Extent implements UnboxedObject {
 
     final long v;
     
