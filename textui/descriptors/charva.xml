@@ -4,7 +4,9 @@
 <plugin id="charva"
         name="Text mode widgets for JNode"
         version="1.0.1"
-        provider-name="Rob Pitman">
+        provider-name="Rob Pitman"
+        provider-url="http://www.pitman.co.za/projects/charva/"
+        license-name="lgpl">
         
   <requires>
     <import plugin="org.jnode.driver.console.core"/>
