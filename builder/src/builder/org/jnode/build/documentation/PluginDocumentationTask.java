@@ -102,7 +102,9 @@ public class PluginDocumentationTask extends AbstractPluginTask {
                     "http://opensource.org/licenses/lgpl-license.php"),
             new LicenseEntry("cpl", "http://opensource.org/licenses/cpl1.0.php"),
             new LicenseEntry("classpath",
-                    "http://www.gnu.org/software/classpath/license.html"), };
+                    "http://www.gnu.org/software/classpath/license.html"),
+            new LicenseEntry("apache2.0",
+                    "http://www.apache.org/licenses/LICENSE-2.0"), };
 
     public FileSet createDescriptors() {
         final FileSet fs = new FileSet();
@@ -440,14 +442,9 @@ public class PluginDocumentationTask extends AbstractPluginTask {
     }
 
     /**
-     * Vuild the documentation for the plugin
+     * Build the documentation for the plugin
      * 
-     * @param descriptors
-     *            a map of all the descriptors
-     * @param descrFile
-     *            the descriptor
-     * @param index
-     *            index file
+     * @param data the plugin's data
      * @throws BuildException
      * @throws IOException
      * @throws SecurityException
