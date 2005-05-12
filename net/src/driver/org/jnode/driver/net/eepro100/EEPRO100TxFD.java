@@ -21,6 +21,8 @@
  
 package org.jnode.driver.net.eepro100;
 
+import org.jnode.net.SocketBuffer;
+import org.jnode.net.ethernet.EthernetConstants;
 import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
 import org.vmmagic.unboxed.Address;
@@ -38,12 +40,8 @@ public class EEPRO100TxFD {
     private final MemoryResource mem;
     /** Offset within mem of first DPD */
     private final int firstDPDOffset;
-    /** Offset within mem of first ethernet frame */
-    //private final int firstFrameOffset;
     /** 32-bit address first DPD */
     private final Address firstDPDAddress;
-    /** 32-bit address of first ethernet frame */
-    //private final Address firstFrameAddress;
     /** */
     private int bufferAddress;
 
@@ -51,25 +49,34 @@ public class EEPRO100TxFD {
      *  
      */
     public EEPRO100TxFD(ResourceManager rm) {
-        //      Create a large enough buffer
-        final int size = (TxFDSize + DataBufferSize) + 16;
-        this.data = new byte[size];
-        this.mem = rm.asMemoryResource(data);
+//		 Create a large enough buffer
+		final int size = (TxFDSize + DataBufferSize) + 16 /* alignment */;
+		this.data = new byte[size];
+		this.mem = rm.asMemoryResource(data);
 
-        final Address memAddr = mem.getAddress();
-        this.bufferAddress = memAddr.toInt();
-        int offset = 0;
-        // Align on 16-byte boundary
-        while ((bufferAddress & 15) != 0) {
-            bufferAddress++;
-            offset++;
-        }
+		final Address memAddr = mem.getAddress();
+		// int addr = Address.as32bit(memAddr);
+		int offset = 0;
 
-        this.firstDPDOffset = offset;
-        this.firstDPDAddress = memAddr.add(firstDPDOffset);
-        //this.firstFrameOffset = firstDPDOffset + TxFDSize;
-        //this.firstFrameAddress = Address.add(memAddr, firstFrameOffset);
+		this.firstDPDOffset = offset;
+		this.firstDPDAddress = memAddr.add(firstDPDOffset);
     }
+	
+	/**
+	 * Initialize this ring to its default (empty) state
+	 */
+	public void initialize(SocketBuffer src) throws IllegalArgumentException {
+		// Setup the DPD
+
+		// Copy the data from the buffer
+		final int len = src.getSize();
+		if (len > EthernetConstants.ETH_FRAME_LEN) {
+			throw new IllegalArgumentException(
+					"Length must be <= ETH_FRAME_LEN");
+		}
+
+		src.get(data, firstDPDOffset, 0, len);
+	}
 
     /**
      * Gets the address of the first DPD in this buffer.
@@ -132,5 +139,9 @@ public class EEPRO100TxFD {
            mem.setShort(i + 8, p[i]);
         }
     }
+
+	public int getFirstDPDOffset() {
+		return firstDPDOffset;
+	}
 
 }

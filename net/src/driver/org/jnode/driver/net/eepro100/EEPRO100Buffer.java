@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.jnode.driver.net.NetworkException;
 import org.jnode.net.HardwareAddress;
 import org.jnode.net.SocketBuffer;
+import org.jnode.net.ethernet.EthernetConstants;
 import org.jnode.net.ethernet.EthernetHeader;
 import org.jnode.system.ResourceManager;
 import org.jnode.util.NumberUtils;
@@ -35,6 +36,8 @@ import org.jnode.util.NumberUtils;
 public class EEPRO100Buffer implements EEPRO100Constants {
 
 	// --- Constants
+	private static final int FRAME_SIZE = EthernetConstants.ETH_FRAME_LEN;
+	
 	private final static int PKT_BUF_SZ = 1536;
 
 	// static final public int RX_NR_FRAME = 32;
@@ -111,7 +114,6 @@ public class EEPRO100Buffer implements EEPRO100Constants {
 	 */
 	public final void initSingleRxRing() {
 		log.debug("Set RX base addr.");
-		
 		rxPacket = new EEPRO100RxFD(rm);
 		rxPacket.setStatus(0x0001);
 		rxPacket.setCommand(0x0000);
@@ -152,11 +154,6 @@ public class EEPRO100Buffer implements EEPRO100Constants {
 	 * @param buf
 	 */
 	public void transmit(SocketBuffer buf) {
-
-		EthernetHeader hdr = (EthernetHeader) buf.getLinkLayerHeader();
-
-		log.debug("HDR =" + hdr);
-
 		int status;
 		int s1;
 		int s2;
@@ -164,24 +161,16 @@ public class EEPRO100Buffer implements EEPRO100Constants {
 		status = regs.getReg16(SCBStatus);
 		regs.setReg16(SCBStatus, status & IntrAllNormal);
 
-		/*log.debug("Transmitting type " + NumberUtils.hex(hdr.getLengthType())
-				+ " packet(" + NumberUtils.hex(hdr.getLength())
-				+ " bytes). Status=" + NumberUtils.hex(status) + " cmd="
-				+ regs.getReg16(SCBCmd));*/
+		txFD.initialize(buf);
 
-		txRing[0].setStatus(0);
-		txRing[0].setCommand(CmdSuspend | CmdTx | CmdTxFlex);
-		txRing[0].setLink(txFD.getBufferAddress());
-		txRing[0].setCount(0x02208000);
-
-		regs.setReg16(SCBPointer, txRing[0].getBufferAddress());
+		regs.setReg16(SCBPointer, txFD.getBufferAddress());
 		regs.setReg16(SCBCmd, SCBMaskAll | CUStart);
 		EEPRO100Utils.waitForCmdDone(regs);
 
 		s1 = regs.getReg16(SCBStatus);
 		// TODO wait 10 ms for transmiting;
 		long start =  System.currentTimeMillis();
-		while((System.currentTimeMillis() <= start + 10) && (txRing[0].getStatus() != 0)){
+		while((System.currentTimeMillis() <= start + 10) && (txFD.getStatus() != 0)){
 		}
 		s2 = regs.getReg16(SCBStatus);
 
