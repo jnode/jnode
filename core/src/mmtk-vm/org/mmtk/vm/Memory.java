@@ -21,6 +21,8 @@
 
 package org.mmtk.vm;
 
+import org.jnode.vm.Vm;
+import org.jnode.vm.VmArchitecture;
 import org.mmtk.policy.ImmortalSpace;
 import org.vmmagic.pragma.InlinePragma;
 import org.vmmagic.unboxed.Address;
@@ -36,35 +38,41 @@ import org.vmmagic.unboxed.Extent;
 public class Memory {
 
     /**
-     * TODO Understand me
-     * @return
+     * Gets the start of the virtual address space where object may be found.
+     * 
+     * @return the start address.
      */
     public static Address HEAP_START() {
-        return Address.zero();
+        return Vm.getVm().getArch().getStart(VmArchitecture.Space.HEAP);
     }
 
     /**
-     * TODO Understand me
-     * @return
+     * Gets the end of the virtual address space where object may be found.
+     * 
+     * @return the end address.
      */
     public static Address HEAP_END() {
-        return Address.zero();
+        return Vm.getVm().getArch().getEnd(VmArchitecture.Space.HEAP);
     }
 
     /**
-     * TODO Understand me
-     * @return
+     * Gets the start of the virtual address space available to MMTk for
+     * allocating objects.
+     * 
+     * @return the start address.
      */
     public static Address AVAILABLE_START() {
-        return Address.zero();
+        return Vm.getVm().getArch().getStart(VmArchitecture.Space.AVAILABLE);
     }
 
     /**
-     * TODO Understand me
-     * @return
+     * Gets the end of the virtual address space available to MMTk for
+     * allocating objects.
+     * 
+     * @return the end address.
      */
     public static Address AVAILABLE_END() {
-        return Address.zero();
+        return Vm.getVm().getArch().getEnd(VmArchitecture.Space.AVAILABLE);
     }
 
     /**
