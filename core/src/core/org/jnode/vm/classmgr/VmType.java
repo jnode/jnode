@@ -119,6 +119,9 @@ public abstract class VmType<T> extends VmSystemObject implements VmSharedStatic
 
 	/** The protection domain of this class */
 	private final ProtectionDomain protectionDomain;
+    
+    /** Type information managed and required by the memory manager */
+    private Object mmType;
 
 	private static VmNormalClass<Object> ObjectClass;
 
@@ -1398,6 +1401,7 @@ public abstract class VmType<T> extends VmSystemObject implements VmSharedStatic
 		if (arrayClass != null) {
 			//arrayClass.link();
 		}
+        Vm.getVm().notifyClassResolved(this);
 		return this;
 	}
 
@@ -2136,4 +2140,20 @@ public abstract class VmType<T> extends VmSystemObject implements VmSharedStatic
 	public int getJvmType() {
 		return JvmType.REFERENCE;
 	}
+
+    /**
+     * Gets the type information required and managed by the memory manager.
+     * @return Returns the mmType.
+     */
+    public final Object getMmType() {
+        return mmType;
+    }
+
+    /**
+     * Sets the type information required and managed by the memory manager.
+     * @param mmType The mmType to set.
+     */
+    public final void setMmType(Object mmType) {
+        this.mmType = mmType;
+    }
 }

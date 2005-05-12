@@ -21,6 +21,7 @@
 
 package org.mmtk.vm;
 
+import org.jnode.vm.VmMagic;
 import org.mmtk.utility.scan.MMType;
 
 import org.vmmagic.unboxed.*;
@@ -255,6 +256,6 @@ public class ObjectModel {
      * @return The type object for <code>object</code>
      */
     public static MMType getObjectType(ObjectReference object) {
-        return null;
+        return (MMType)VmMagic.getObjectType(object).getMmType();
     }
 }

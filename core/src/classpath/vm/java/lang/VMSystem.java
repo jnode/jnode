@@ -94,7 +94,7 @@ public final class VMSystem {
 	 * @return true if the system is big-endian.
 	 */
 	static boolean isWordsBigEndian() {
-		return (Vm.getVm().getArch().getByteOrder() == ByteOrder.BIG_ENDIAN);
+		return (Vm.getArch().getByteOrder() == ByteOrder.BIG_ENDIAN);
 	}
 
 	/**

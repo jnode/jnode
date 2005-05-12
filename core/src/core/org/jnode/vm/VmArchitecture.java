@@ -44,7 +44,11 @@ public abstract class VmArchitecture extends VmSystemObject {
         /** Space available to the memory manager */
         AVAILABLE,
         /** Space available to devices */
-        DEVICE
+        DEVICE,
+        /** Space the contains the bootimage */
+        BOOTIMAGE,
+        /** Space the contains the initial jar */
+        INITJAR        
     }
     
 	/**
@@ -75,6 +79,20 @@ public abstract class VmArchitecture extends VmSystemObject {
 	 * @return Reference size
 	 */
 	public abstract int getReferenceSize();
+    
+    /**
+     * Gets the log base two of the size of an OS page
+     * @return
+     */
+    public abstract byte getLogPageSize();
+    
+    /**
+     * Gets the log base two of the size of an OS page
+     * @return
+     */
+    public final int getPageSize() {
+        return 1 << getLogPageSize();
+    }
     
     /**
      * Gets the type size information of this architecture.
@@ -138,11 +156,23 @@ public abstract class VmArchitecture extends VmSystemObject {
      * Gets the start address of the given space.
      * @return
      */
-    public abstract Address getStart(Space space);
+    public Address getStart(Space space) {
+        switch (space) {
+        case BOOTIMAGE: return Unsafe.getKernelStart();
+        case INITJAR: return Unsafe.getInitJarStart();
+        default: throw new IllegalArgumentException("Unknown space " + space);
+        }
+    }
 
     /**
      * Gets the start address of the given space.
      * @return
      */
-    public abstract Address getEnd(Space space);
+    public Address getEnd(Space space) {
+        switch (space) {
+        case BOOTIMAGE: return Unsafe.getBootHeapEnd();
+        case INITJAR: return Unsafe.getInitJarEnd();
+        default: throw new IllegalArgumentException("Unknown space " + space);
+        }
+    }
 }

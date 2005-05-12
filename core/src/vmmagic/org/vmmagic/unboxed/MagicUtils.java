@@ -87,7 +87,7 @@ public final class MagicUtils {
     
     private static final int getRefSize() {
         if (refSize == 0) {
-            refSize = Vm.getVm().getArch().getReferenceSize();
+            refSize = Vm.getArch().getReferenceSize();
         }
         return refSize;
     }

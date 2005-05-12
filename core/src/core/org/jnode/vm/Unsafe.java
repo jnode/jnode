@@ -687,7 +687,7 @@ public final class Unsafe {
 		if (sm != null) {
 			sm.checkPermission(GET_JUMP_TABLE_PERM);
 		}
-        final int offset = index * Vm.getVm().getArch().getReferenceSize();
+        final int offset = index * Vm.getArch().getReferenceSize();
 		return getJumpTable0().loadAddress(Offset.fromIntSignExtend(offset));
 	}
 

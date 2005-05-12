@@ -18,62 +18,60 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.mmtk.vm;
 
-
 /**
- * $Id$ 
- *
+ * $Id$
+ * 
  * @author <a href="http://cs.anu.edu.au/~Steve.Blackburn">Steve Blackburn</a>
  * @author Perry Cheng
- *
  * @version $Revision$
  * @date $Date$
  */
 public class Statistics {
-  /**
-   * Returns the number of collections that have occured.
-   *
-   * @return The number of collections that have occured.
-   */
-  public static final int getCollectionCount()
-    {
-    return 0;
-  }
+    
+    /**
+     * Returns the number of collections that have occured.
+     * 
+     * @return The number of collections that have occured.
+     */
+    public static final int getCollectionCount() {
+        return 0;
+    }
 
-  /**
-   * Read cycle counter
-   */
-  public static long cycles() {
-    return 0L;
-  }
+    /**
+     * Read cycle counter
+     */
+    public static long cycles() {
+        return 0L;
+    }
 
-  /**
-   * Convert cycles to milliseconds
-   */
-  public static double cyclesToMillis(long c) {
-    return (double)0;
-  }
+    /**
+     * Convert cycles to milliseconds
+     */
+    public static double cyclesToMillis(long c) {
+        return (double) 0;
+    }
 
-  /**
-   * Convert cycles to seconds
-   */
-  public static double cyclesToSecs(long c) {
-    return (double)0;
-  }
+    /**
+     * Convert cycles to seconds
+     */
+    public static double cyclesToSecs(long c) {
+        return (double) 0;
+    }
 
-  /**
-   * Convert milliseconds to cycles
-   */
-  public static long millisToCycles(double t) {
-    return 0L;
-  }
+    /**
+     * Convert milliseconds to cycles
+     */
+    public static long millisToCycles(double t) {
+        return 0L;
+    }
 
-  /**
-   * Convert seconds to cycles
-   */
-  public static long secsToCycles(double t) {
-    return 0L;
-  }
+    /**
+     * Convert seconds to cycles
+     */
+    public static long secsToCycles(double t) {
+        return 0L;
+    }
 }

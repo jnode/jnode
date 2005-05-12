@@ -90,4 +90,11 @@ public final class VmX86Architecture64 extends VmX86Architecture {
     public final TypeSizeInfo getTypeSizeInfo() {
         return typeSizeInfo;
     }
+
+    /**
+     * @see org.jnode.vm.VmArchitecture#getLogPageSize()
+     */
+    public final byte getLogPageSize() {
+        return 22; // 4Mb
+    }
 }

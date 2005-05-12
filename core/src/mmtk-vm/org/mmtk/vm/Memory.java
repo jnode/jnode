@@ -43,7 +43,7 @@ public class Memory {
      * @return the start address.
      */
     public static Address HEAP_START() {
-        return Vm.getVm().getArch().getStart(VmArchitecture.Space.HEAP);
+        return Vm.getArch().getStart(VmArchitecture.Space.HEAP);
     }
 
     /**
@@ -52,7 +52,7 @@ public class Memory {
      * @return the end address.
      */
     public static Address HEAP_END() {
-        return Vm.getVm().getArch().getEnd(VmArchitecture.Space.HEAP);
+        return Vm.getArch().getEnd(VmArchitecture.Space.HEAP);
     }
 
     /**
@@ -62,7 +62,7 @@ public class Memory {
      * @return the start address.
      */
     public static Address AVAILABLE_START() {
-        return Vm.getVm().getArch().getStart(VmArchitecture.Space.AVAILABLE);
+        return Vm.getArch().getStart(VmArchitecture.Space.AVAILABLE);
     }
 
     /**
@@ -72,7 +72,7 @@ public class Memory {
      * @return the end address.
      */
     public static Address AVAILABLE_END() {
-        return Vm.getVm().getArch().getEnd(VmArchitecture.Space.AVAILABLE);
+        return Vm.getArch().getEnd(VmArchitecture.Space.AVAILABLE);
     }
 
     /**
