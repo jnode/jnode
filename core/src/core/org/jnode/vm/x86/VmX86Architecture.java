@@ -39,7 +39,7 @@ import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 import org.jnode.vm.x86.compiler.l1a.X86Level1ACompiler;
 import org.jnode.vm.x86.compiler.stub.X86StubCompiler;
-
+import org.vmmagic.unboxed.Address;
 
 /**
  * Architecture descriptor for the Intel X86 architecture.
@@ -48,6 +48,17 @@ import org.jnode.vm.x86.compiler.stub.X86StubCompiler;
  */
 public abstract class VmX86Architecture extends VmArchitecture {
 
+    /** Start address of the boot image (1Mb) */
+    public static final int BOOT_IMAGE_START = 0x00100000;
+    /** Start address of the space available to devices (3Gb) */
+    public static final int DEVICE_START = 0xC0000000;
+    /** End address of the space available to devices (4Gb-4Mb) */
+    public static final int DEVICE_END = 0xFFC00000;
+    /** Start address of the space available to the memory manager (256Mb) */
+    public static final int AVAILABLE_START = 0x10000000;
+    /** End address of the space available to the memory manager */
+    public static final int AVAILABLE_END = DEVICE_START;
+    
     /** The compilers */
     private final NativeCodeCompiler[] compilers;
 
@@ -93,7 +104,7 @@ public abstract class VmX86Architecture extends VmArchitecture {
         return "x86";
     }
 
-	/**
+    /**
 	 * Gets the full name of this architecture, including operating mode.
 	 * 
 	 * @return Name
@@ -265,5 +276,29 @@ public abstract class VmX86Architecture extends VmArchitecture {
     final void initX86Processor(VmX86Processor cpu) {
         cpu.setApic(localAPIC);
         super.addProcessor(cpu);
+    }
+    
+    /**
+     * @see org.jnode.vm.VmArchitecture#getEnd(org.jnode.vm.VmArchitecture.Space)
+     */
+    public Address getEnd(Space space) {
+        switch (space) {
+        case HEAP: return Address.fromIntZeroExtend(AVAILABLE_END);
+        case AVAILABLE: return Address.fromIntSignExtend(AVAILABLE_END);
+        case DEVICE: return Address.fromIntZeroExtend(DEVICE_END);
+        default: throw new IllegalArgumentException("Unknown space " + space);
+        }
+    }
+
+    /**
+     * @see org.jnode.vm.VmArchitecture#getStart(org.jnode.vm.VmArchitecture.Space)
+     */
+    public Address getStart(Space space) {
+        switch (space) {
+        case HEAP: return Address.fromIntZeroExtend(BOOT_IMAGE_START);
+        case AVAILABLE: return Address.fromIntSignExtend(AVAILABLE_START);
+        case DEVICE: return Address.fromIntZeroExtend(DEVICE_START);
+        default: throw new IllegalArgumentException("Unknown space " + space);
+        }
     }
 }
