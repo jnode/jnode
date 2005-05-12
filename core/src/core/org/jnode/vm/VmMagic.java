@@ -40,7 +40,7 @@ public final class VmMagic {
 	 * 
 	 * @param object
 	 */
-	public static VmClassType getObjectType(Object object) {
+	public static VmClassType<?> getObjectType(Object object) {
 		return null;
 	}
 

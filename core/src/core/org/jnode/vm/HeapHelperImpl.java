@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.vm;
 
 import org.jnode.vm.classmgr.ObjectFlags;
@@ -30,13 +30,32 @@ import org.vmmagic.pragma.Uninterruptible;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.ObjectReference;
+import org.vmmagic.unboxed.Word;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 final class HeapHelperImpl extends HeapHelper implements Uninterruptible {
 
+    private static final class ThreadRootVisitor extends VmThreadVisitor {
+
+        private VmHeapManager heapManager;
+
+        private ObjectVisitor visitor;
+
+        public final void initialize(ObjectVisitor visitor,
+                VmHeapManager heapManager) {
+            this.visitor = visitor;
+            this.heapManager = heapManager;
+        }
+
+        public boolean visit(VmThread thread) {
+            return thread.visit(visitor, heapManager);
+        }
+    }
+
     private final int flagsOffset;
+
     private final ThreadRootVisitor threadRootVisitor;
 
     /**
@@ -45,8 +64,10 @@ final class HeapHelperImpl extends HeapHelper implements Uninterruptible {
      * @param arch
      */
     public HeapHelperImpl(VmArchitecture arch) {
-        if (Vm.getVm() != null) { throw new SecurityException(
-                "Cannot instantiate HeapHelpImpl at runtime"); }
+        if (Vm.getVm() != null) {
+            throw new SecurityException(
+                    "Cannot instantiate HeapHelpImpl at runtime");
+        }
         final int refSize = arch.getReferenceSize();
         flagsOffset = ObjectLayout.FLAGS_SLOT * refSize;
         this.threadRootVisitor = new ThreadRootVisitor();
@@ -57,6 +78,31 @@ final class HeapHelperImpl extends HeapHelper implements Uninterruptible {
      */
     public final Address allocateBlock(Extent size) {
         return MemoryBlockManager.allocateBlock(size);
+    }
+
+    /**
+     * Change the color of the given object from oldColor to newColor.
+     * 
+     * @param dst
+     * @param oldColor
+     * @param newColor
+     * @return True if the color was changed, false if the current color of the
+     *         object was not equal to oldColor.
+     */
+    public boolean atomicChangeObjectColor(Object dst, int oldColor,
+            int newColor) {
+        final Address addr = ObjectReference.fromObject(dst).toAddress().add(
+                flagsOffset);
+        int oldValue;
+        int newValue;
+        do {
+            oldValue = addr.prepareInt();
+            if ((oldValue & ObjectFlags.GC_COLOUR_MASK) != oldColor) {
+                return false;
+            }
+            newValue = (oldValue & ~ObjectFlags.GC_COLOUR_MASK) | newColor;
+        } while (!addr.attempt(oldValue, newValue));
+        return true;
     }
 
     /**
@@ -74,6 +120,18 @@ final class HeapHelperImpl extends HeapHelper implements Uninterruptible {
     }
 
     /**
+     * @see org.jnode.vm.memmgr.HeapHelper#die(java.lang.String)
+     */
+    public final void die(String msg) {
+        try {
+            Unsafe.getCurrentProcessor().getArchitecture().getStackReader()
+                    .debugStackTrace();
+        } finally {
+            Unsafe.die(msg);
+        }
+    }
+
+    /**
      * @see org.jnode.vm.memmgr.HeapHelper#getBootHeapEnd()
      */
     public final Address getBootHeapEnd() {
@@ -88,42 +146,20 @@ final class HeapHelperImpl extends HeapHelper implements Uninterruptible {
     }
 
     /**
-     * Mark the given object as finalized.
-     * 
-     * @param dst
+     * @see org.jnode.vm.memmgr.HeapHelper#getHeapSize()
      */
-    public final void setFinalized(Object dst) {
-    	final Address addr = ObjectReference.fromObject(dst).toAddress().add(flagsOffset);
-        int oldValue;
-        int newValue;
-        do {
-            oldValue = addr.prepareInt();
-            if ((oldValue & ObjectFlags.STATUS_FINALIZED) != 0) { return; }
-            newValue = oldValue | ObjectFlags.STATUS_FINALIZED;
-        } while (!addr.attempt(oldValue, newValue)); 
-        //} while (!Unsafe.atomicCompareAndSwap(addr, oldValue, newValue));
+    public Extent getHeapSize() {
+        final Word end = Unsafe.getMemoryEnd().toWord();
+        final Word start = Unsafe.getMemoryStart().toWord();
+        return end.sub(start).toExtent();
     }
 
     /**
-     * Change the color of the given object from oldColor to newColor.
-     * 
-     * @param dst
-     * @param oldColor
-     * @param newColor
-     * @return True if the color was changed, false if the current color of the
-     *         object was not equal to oldColor.
+     * @see org.jnode.vm.memmgr.HeapHelper#getInflatedMonitor(java.lang.Object,
+     *      org.jnode.vm.VmArchitecture)
      */
-    public boolean atomicChangeObjectColor(Object dst, int oldColor,
-            int newColor) {
-    	final Address addr = ObjectReference.fromObject(dst).toAddress().add(flagsOffset);
-        int oldValue;
-        int newValue;
-        do {
-            oldValue = addr.prepareInt();
-            if ((oldValue & ObjectFlags.GC_COLOUR_MASK) != oldColor) { return false; }
-            newValue = (oldValue & ~ObjectFlags.GC_COLOUR_MASK) | newColor;
-        } while (!addr.attempt(oldValue, newValue));
-        return true;
+    public final Monitor getInflatedMonitor(Object object, VmArchitecture arch) {
+        return MonitorManager.getInflatedMonitor(object, arch);
     }
 
     /**
@@ -136,23 +172,31 @@ final class HeapHelperImpl extends HeapHelper implements Uninterruptible {
     }
 
     /**
-     * @see org.jnode.vm.memmgr.HeapHelper#getInflatedMonitor(java.lang.Object,
-     *      org.jnode.vm.VmArchitecture)
+     * Unblock all threads (on all processors). This method is called after a
+     * call a call to {@link #stopThreadsAtSafePoint()}.
      */
-    public final Monitor getInflatedMonitor(Object object, VmArchitecture arch) {
-        return MonitorManager.getInflatedMonitor(object, arch);
+    public void restartThreads() {
+        Unsafe.getCurrentProcessor().enableReschedule();
     }
 
     /**
-     * @see org.jnode.vm.memmgr.HeapHelper#die(java.lang.String)
+     * Mark the given object as finalized.
+     * 
+     * @param dst
      */
-    public final void die(String msg) {
-        try {
-            Unsafe.getCurrentProcessor().getArchitecture().getStackReader()
-                    .debugStackTrace();
-        } finally {
-            Unsafe.die(msg);
-        }
+    public final void setFinalized(Object dst) {
+        final Address addr = ObjectReference.fromObject(dst).toAddress().add(
+                flagsOffset);
+        int oldValue;
+        int newValue;
+        do {
+            oldValue = addr.prepareInt();
+            if ((oldValue & ObjectFlags.STATUS_FINALIZED) != 0) {
+                return;
+            }
+            newValue = oldValue | ObjectFlags.STATUS_FINALIZED;
+        } while (!addr.attempt(oldValue, newValue));
+        // } while (!Unsafe.atomicCompareAndSwap(addr, oldValue, newValue));
     }
 
     /**
@@ -164,15 +208,8 @@ final class HeapHelperImpl extends HeapHelper implements Uninterruptible {
     }
 
     /**
-     * Unblock all threads (on all processors). This method is called after a
-     * call a call to {@link #stopThreadsAtSafePoint()}.
-     */
-    public void restartThreads() {
-        Unsafe.getCurrentProcessor().enableReschedule();
-    }
-    
-    /**
      * Visit all roots of the object tree.
+     * 
      * @param visitor
      */
     public void visitAllRoots(ObjectVisitor visitor, VmHeapManager heapManager) {
@@ -185,20 +222,5 @@ final class HeapHelperImpl extends HeapHelper implements Uninterruptible {
         }
         threadRootVisitor.initialize(visitor, heapManager);
         Vm.visitAllThreads(threadRootVisitor);
-    }
-    
-    private static final class ThreadRootVisitor extends VmThreadVisitor {
- 
-        private ObjectVisitor visitor;
-        private VmHeapManager heapManager;
-        
-        public final void initialize(ObjectVisitor visitor, VmHeapManager heapManager) {
-            this.visitor = visitor;
-            this.heapManager = heapManager;
-        }
-        
-        public boolean visit(VmThread thread) {
-            return thread.visit(visitor, heapManager);
-        }
     }
 }

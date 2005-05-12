@@ -286,7 +286,7 @@ public abstract class VmX86Architecture extends VmArchitecture {
         case HEAP: return Address.fromIntZeroExtend(AVAILABLE_END);
         case AVAILABLE: return Address.fromIntSignExtend(AVAILABLE_END);
         case DEVICE: return Address.fromIntZeroExtend(DEVICE_END);
-        default: throw new IllegalArgumentException("Unknown space " + space);
+        default: return super.getEnd(space);
         }
     }
 
@@ -298,7 +298,7 @@ public abstract class VmX86Architecture extends VmArchitecture {
         case HEAP: return Address.fromIntZeroExtend(BOOT_IMAGE_START);
         case AVAILABLE: return Address.fromIntSignExtend(AVAILABLE_START);
         case DEVICE: return Address.fromIntZeroExtend(DEVICE_START);
-        default: throw new IllegalArgumentException("Unknown space " + space);
+        default: return super.getStart(space);
         }
     }
 }

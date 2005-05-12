@@ -34,6 +34,7 @@ import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmNormalClass;
+import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.memmgr.GCStatistics;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.HeapStatistics;
@@ -475,5 +476,12 @@ public final class DefaultHeapManager extends VmHeapManager {
     public Object createProcessorHeapData(VmProcessor cpu) {
         // No need here, so return null.
         return null;
+    }
+
+    /**
+     * @see org.jnode.vm.memmgr.VmHeapManager#notifyClassResolved(org.jnode.vm.classmgr.VmType)
+     */
+    public void notifyClassResolved(VmType< ? > vmType) {
+        // Do nothing        
     }
 }

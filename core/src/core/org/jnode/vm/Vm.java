@@ -39,8 +39,10 @@ import org.jnode.util.Statistics;
 import org.jnode.vm.classmgr.CompiledCodeList;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmSharedStatics;
+import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmHeapManager;
+import org.vmmagic.pragma.InlinePragma;
 import org.vmmagic.pragma.NoInlinePragma;
 
 /**
@@ -92,8 +94,9 @@ public class Vm extends VmSystemObject implements Statistics, SharedStatics {
 		this.debugMode = debugMode;
 		this.bootstrap = true;
 		this.arch = arch;
-        this.heapManager = createHeapManager(arch, loader, pluginReg);        
+        final HeapHelper helper = new HeapHelperImpl(arch);
         instance = this;
+        this.heapManager = createHeapManager(helper, arch, loader, pluginReg);        
 		this.statics = statics;
 		this.processors = new BootableArrayList<VmProcessor>();
         this.allThreadsLock = new SpinLock();
@@ -110,7 +113,7 @@ public class Vm extends VmSystemObject implements Statistics, SharedStatics {
      * @return
      * @throws InstantiationException
      */
-    private static VmHeapManager createHeapManager(VmArchitecture arch,
+    private static VmHeapManager createHeapManager(HeapHelper helper, VmArchitecture arch,
             VmClassLoader loader, PluginRegistry pluginReg)
             throws InstantiationException {
         if (pluginReg == null) {
@@ -137,7 +140,6 @@ public class Vm extends VmSystemObject implements Statistics, SharedStatics {
         try {
             Constructor cons = Class.forName(memMgrClassName).getConstructor(
                     consArgTypes);
-            final HeapHelper helper = new HeapHelperImpl(arch);
             return (VmHeapManager) cons.newInstance(new Object[] { loader,
                     helper });
         } catch (ClassNotFoundException ex) {
@@ -191,8 +193,8 @@ public class Vm extends VmSystemObject implements Statistics, SharedStatics {
 	/**
 	 * @return Returns the arch.
 	 */
-	public final VmArchitecture getArch() {
-		return this.arch;
+	public static final VmArchitecture getArch() {
+		return instance.arch;
 	}
 
 	/**
@@ -461,5 +463,19 @@ public class Vm extends VmSystemObject implements Statistics, SharedStatics {
      */
     public static final CompiledCodeList getCompiledMethods() {
         return instance.compiledMethods;
+    }
+
+    /**
+     * A new type has been resolved by the VM. Create a new MM type to reflect
+     * the VM type, and associate the MM type with the VM type.
+     * 
+     * @param vmType
+     *            The newly resolved type
+     */
+    public void notifyClassResolved(VmType< ? > vmType)    
+    throws InlinePragma {
+        if (heapManager != null) {
+            heapManager.notifyClassResolved(vmType);
+        }
     }
 }

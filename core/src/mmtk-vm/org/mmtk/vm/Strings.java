@@ -37,7 +37,7 @@ public final class Strings {
      * Primitive parsing facilities for strings
      */
     public static int parseInt(String value) {
-        return 0;
+        return Integer.parseInt(value);
     }
 
     public static float parseFloat(String value) {

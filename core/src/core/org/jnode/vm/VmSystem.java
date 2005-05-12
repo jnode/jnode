@@ -211,7 +211,7 @@ public final class VmSystem implements SharedStatics {
     public static void insertSystemProperties(Properties res) {
 
         final Vm vm = Vm.getVm();
-        final VmArchitecture arch = vm.getArch();
+        final VmArchitecture arch = Vm.getArch();
 
         // Java properties
         res.put("java.version", "1.1.0");

@@ -233,7 +233,7 @@ public abstract class VmHeapManager extends VmSystemObject {
      * @param size
      * @return Object
      */
-    protected abstract Object allocObject(VmClassType<?> vmClass, int size);
+    protected abstract Object allocObject(VmClassType< ? > vmClass, int size);
 
     /**
      * Create a new instance of an array with a given class, no constructor will
@@ -300,11 +300,21 @@ public abstract class VmHeapManager extends VmSystemObject {
     public abstract GCStatistics getStatistics();
 
     public abstract HeapStatistics getHeapStatistics();
-    
+
     /**
      * Create a per processor data structure for use by the heap manager.
+     * 
      * @param cpu
      * @return
      */
     public abstract Object createProcessorHeapData(VmProcessor cpu);
+
+    /**
+     * A new type has been resolved by the VM. Create a new MM type to reflect
+     * the VM type, and associate the MM type with the VM type.
+     * 
+     * @param vmType
+     *            The newly resolved type
+     */
+    public abstract void notifyClassResolved(VmType< ? > vmType);
 }
