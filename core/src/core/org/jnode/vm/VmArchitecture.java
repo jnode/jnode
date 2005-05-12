@@ -29,6 +29,7 @@ import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.compiler.IMTCompiler;
 import org.jnode.vm.compiler.NativeCodeCompiler;
+import org.vmmagic.unboxed.Address;
 
 /**
  * Class describing a specific system architecture.
@@ -37,6 +38,15 @@ import org.jnode.vm.compiler.NativeCodeCompiler;
  */
 public abstract class VmArchitecture extends VmSystemObject {
 
+    public enum Space {
+        /** Total space that can contain objects */
+        HEAP,
+        /** Space available to the memory manager */
+        AVAILABLE,
+        /** Space available to devices */
+        DEVICE
+    }
+    
 	/**
 	 * Gets the name of this architecture.
 	 * This name is the programmers name used to identify packages,
@@ -124,4 +134,15 @@ public abstract class VmArchitecture extends VmSystemObject {
 	 */
 	protected abstract VmProcessor createProcessor(int id, VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics);
 
+    /**
+     * Gets the start address of the given space.
+     * @return
+     */
+    public abstract Address getStart(Space space);
+
+    /**
+     * Gets the start address of the given space.
+     * @return
+     */
+    public abstract Address getEnd(Space space);
 }
