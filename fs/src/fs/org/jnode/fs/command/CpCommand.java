@@ -176,7 +176,7 @@ public class CpCommand {
     /**
      * Copy
      * 
-     * @return Return the number of file copyed
+     * @return Return the number of file copied
      */
     public int copy() throws Exception {
         if (!_argsOk) {
@@ -391,7 +391,7 @@ public class CpCommand {
     /**
      * Copy the file src to the dst file
      * 
-     * @return number of copyed file
+     * @return number of copied file
      */
     private int copyFile() {
         InputStream is;
@@ -441,7 +441,7 @@ public class CpCommand {
     /**
      * Copy the url src to the dst file
      * 
-     * @return number of copyed file
+     * @return number of copied file
      */
     private int copyURL() {
         InputStream is;
@@ -535,7 +535,7 @@ public class CpCommand {
     public static void main(String[] args) throws Exception {
         CpCommand cpCommand = new CpCommand(args);
         int nbCopyedFile = cpCommand.copy();
-        System.out.println(nbCopyedFile + " file(s) copyed");
+        System.out.println(nbCopyedFile + " file(s) copied");
     }
 
     /**
