@@ -225,7 +225,7 @@ class Line {
             }
             console.setCursor(posCurX, posCurY);
         } catch (Exception e) {
+            //todo: why is it ignored?
         }
     }
 }
-
