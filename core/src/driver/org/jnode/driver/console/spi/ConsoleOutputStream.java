@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.driver.console.spi;
 
 import java.io.IOException;
@@ -28,44 +28,69 @@ import org.jnode.driver.console.TextConsole;
 
 /**
  * @author epr
+ * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
 public class ConsoleOutputStream extends OutputStream {
 
-	private TextConsole console;
-	private int fgColor;
+    private static final int BUFFER_SIZE = 160;
+    private final char[] buffer = new char[BUFFER_SIZE];
+    private TextConsole console;
+    private int fgColor;
 
-	/**
-	 * Create a new instance
-	 * @param console
-	 * @param fgColor
-	 */
-	public ConsoleOutputStream(TextConsole console, int fgColor) {
-		this.console = console;
-		this.fgColor = fgColor;
-	}
 
-	/**
-	 * @param b
-	 * @see java.io.OutputStream#write(int)
-	 * @throws IOException
-	 */
-	public void write(int b) throws IOException {
-		console.putChar((char)b, fgColor);
-	}
-	
-	/**
-	 * @return int
-	 */
-	public int getFgColor() {
-		return fgColor;
-	}
 
-	/**
-	 * Sets the fgColor.
-	 * @param fgColor The fgColor to set
-	 */
-	public void setFgColor(int fgColor) {
-		this.fgColor = fgColor;
-	}
+    /**
+     * Create a new instance
+     *
+     * @param console
+     * @param fgColor
+     */
+    public ConsoleOutputStream(TextConsole console, int fgColor) {
+        this.console = console;
+        this.fgColor = fgColor;
+    }
+
+    /**
+     * @param b
+     * @throws IOException
+     * @see java.io.OutputStream#write(int)
+     */
+    public void write(int b) throws IOException {
+        console.putChar((char) b, fgColor);
+    }
+
+    public void write(byte[] b, int off, int len)
+            throws IOException, NullPointerException, IndexOutOfBoundsException {
+        if (off < 0 || len < 0 || off + len > b.length)
+            throw new ArrayIndexOutOfBoundsException();
+
+        int bi = 0;
+        for (int i = 0; i < len; ++i) {
+            if (bi >= BUFFER_SIZE) {
+                console.putChar(buffer, 0, BUFFER_SIZE, fgColor);
+                bi = 0;
+            }
+            buffer[bi++] = (char) b[off + i];
+        }
+
+        console.putChar(buffer, 0, bi, fgColor);
+    }
+
+
+    /**
+     * @return int
+     */
+    public int getFgColor() {
+        return fgColor;
+    }
+
+    /**
+     * Sets the fgColor.
+     *
+     * @param fgColor The fgColor to set
+     */
+    public void setFgColor(int fgColor) {
+        this.fgColor = fgColor;
+    }
 
 }
