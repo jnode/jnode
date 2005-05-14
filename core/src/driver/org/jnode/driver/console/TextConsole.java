@@ -25,6 +25,7 @@ import java.io.PrintStream;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
+ * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net) 
  */
 public interface TextConsole extends Console {
 
@@ -128,6 +129,15 @@ public interface TextConsole extends Console {
 	 * @param color
 	 */
 	public void putChar(char v, int color);
+
+    /**
+     * Append characters to the current line.
+     * @param v
+     * @param offset
+     * @param lenght
+     * @param color
+     */
+    public void putChar(char v[], int offset, int lenght, int color);
 
 	/**
 	 * @return Returns the tabSize.

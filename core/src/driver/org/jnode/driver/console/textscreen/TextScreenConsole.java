@@ -34,6 +34,7 @@ import org.jnode.system.event.FocusEvent;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
+ * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
 class TextScreenConsole extends AbstractConsole implements TextConsole {
 
@@ -105,6 +106,31 @@ class TextScreenConsole extends AbstractConsole implements TextConsole {
 		syncScreen();
 	}
 
+    /**
+	 * Append characters to the current line.
+	 *
+	 * @param v
+     * @param offset
+     * @param lenght
+	 * @param color
+	 */
+    public void putChar(char v[], int offset, int lenght, int color) {
+        int mark = 0;
+        for(int i = 0; i < lenght; i++){
+            char c = v[i + offset];
+            if(c == '\n' || c =='\b' || c == '\t' ||
+                    curX + i == scrWidth - 1 || i == lenght - 1){
+                final int ln = i - mark;
+                if(ln > 0){
+                    screen.set(screen.getOffset(curX, curY), v, offset + mark, ln, color);
+                    curX += ln;
+                }
+                mark = i + 1;
+                putChar(c, color);
+            }
+        }
+    }
+
 	/**
 	 * Append a character to the current line.
 	 * 
@@ -115,9 +141,7 @@ class TextScreenConsole extends AbstractConsole implements TextConsole {
 		if (v == '\n') {
 			// Goto next line
 			// Clear till eol
-			for (int i = curX; i < scrWidth; i++) {
-				setChar(i, curY, ' ', color);
-			}
+            screen.set(screen.getOffset(curX, curY), ' ', scrWidth - curX, color);
 			curX = 0;
 			curY++;
 		} else if (v == '\b') {
