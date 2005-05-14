@@ -203,7 +203,6 @@ public class CpCommand {
      * 
      * @param args
      * 
-     * @author Yves Galante
      * @since 30 mars 04
      */
     private boolean parseOption(String[] args) {
@@ -417,7 +416,7 @@ public class CpCommand {
         final File dstDir = new File(_fileDst.getAbsoluteFile()
                 + File.separator);//+_fileSrc.getName()+File.separator);
         final File[] subFile = _fileSrc.listFiles();
-        int numberFileCopyed = 0;
+        int numberFileCopied = 0;
 
         if (!dstDir.exists()) {
             if (!dstDir.mkdir()) {
@@ -433,9 +432,9 @@ public class CpCommand {
                     + name);
             CpCommand cp = new CpCommand(subFile[ i], subDstDir, _mode,
                     _recursive, _verbose);
-            numberFileCopyed += cp.copy();
+            numberFileCopied += cp.copy();
         }
-        return numberFileCopyed;
+        return numberFileCopied;
     }
 
     /**
@@ -534,8 +533,8 @@ public class CpCommand {
 
     public static void main(String[] args) throws Exception {
         CpCommand cpCommand = new CpCommand(args);
-        int nbCopyedFile = cpCommand.copy();
-        System.out.println(nbCopyedFile + " file(s) copied");
+        int nbCopiedFile = cpCommand.copy();
+        System.out.println(nbCopiedFile + " file(s) copied");
     }
 
     /**
