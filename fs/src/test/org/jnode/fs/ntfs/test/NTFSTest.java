@@ -91,7 +91,7 @@ public class NTFSTest {
 			throw new IOException("Cannot list on non-directories " + directory);
 		}
 		final ArrayList<String> list = new ArrayList<String>();
-		for (Iterator<FSEntry> i = entry.getDirectory().iterator(); i.hasNext();) {
+		for (Iterator<? extends FSEntry> i = entry.getDirectory().iterator(); i.hasNext();) {
 			final FSEntry child = i.next();
 			final String name = child.getName();
 			if ((filter == null) || (filter.accept(directory, name))) {
@@ -116,7 +116,7 @@ public class NTFSTest {
 	public void iterateRoot(FSDirectory root)
 	{
 		try {
-            Iterator<FSEntry> rootIterator;
+            Iterator<? extends FSEntry> rootIterator;
 			rootIterator = root.iterator();
 			while(rootIterator.hasNext()) {
 				FSEntry entry=rootIterator.next();
