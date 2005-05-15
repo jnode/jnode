@@ -30,12 +30,38 @@ import org.apache.log4j.Logger;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSFile;
+import org.jnode.fs.jarfs.JarFSEntry;
 
 /**
  * 
  * @author Fabien DUMINY
  */
-public class FSUtils {
+public class FSUtils {    
+    static public String getName(String path, char separator)
+    {
+        int idx = path.lastIndexOf(separator);
+        if(idx >= 0)
+        {
+            path = path.substring(idx+1);
+        }        
+        return path;
+    }
+
+    static public String getParentName(String path, char separator)
+    {
+        int idx = path.lastIndexOf(separator);
+        if(idx < 0)
+        {
+            path = "";
+        }        
+        else
+        {
+            path = path.substring(0, idx);            
+        }
+        
+        return path;
+    }
+    
 	static public String toString(FSEntry entry, boolean deep)
 	{
 		if(entry == null)

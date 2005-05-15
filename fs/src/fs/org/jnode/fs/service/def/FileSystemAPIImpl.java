@@ -223,7 +223,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
             throw new IOException("Cannot list on non-directories " + directory);
         }
         final ArrayList<String> list = new ArrayList<String>();
-        for (Iterator<FSEntry> i = entry.getDirectory().iterator(); i.hasNext();) {
+        for (Iterator<? extends FSEntry> i = entry.getDirectory().iterator(); i.hasNext();) {
             final FSEntry child = i.next();
             final String name = child.getName();
             list.add(name);
