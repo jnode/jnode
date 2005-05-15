@@ -348,7 +348,7 @@ public class SoftByteCodes implements Uninterruptible {
     /**
      * Throw a classcast exception.
      */
-    public static void classCastFailed(Object object) {
+    public static void classCastFailed(Object object, VmType<?> expected) {
         if (object == null) {
             throw new ClassCastException("Object is null");
         } else if (true) {
@@ -365,6 +365,9 @@ public class SoftByteCodes implements Uninterruptible {
             for (Object sc : superClasses) {
                 sb.append(',');
                 sb.append(sc);
+                if (sc == expected) {
+                    sb.append(" FOUND IT !!!! ");
+                }
             }
             throw new ClassCastException(sb.toString());
         } else {
@@ -425,9 +428,12 @@ public class SoftByteCodes implements Uninterruptible {
             return new AbstractMethodError("Abstract method at " + hexAddress
                     + state);
         case EX_STACKOVERFLOW:
-            if (false) {
+            if (true) {
                 Unsafe.debug("Stack overflow in ");
                 Unsafe.debug(current.asThread().getName());
+                Unsafe.debug('\n');
+                Unsafe.getCurrentProcessor().getArchitecture().getStackReader().debugStackTrace(50);
+                Unsafe.debug('\n');
             }
             return new StackOverflowError();
         // case EX_CLASSCAST:

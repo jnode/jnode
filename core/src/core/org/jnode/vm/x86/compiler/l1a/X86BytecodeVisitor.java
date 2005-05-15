@@ -1200,13 +1200,13 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			instanceOf(refr, classr, tmpr, cntr, okLabel, true);
 			/* Not instanceof */
 
-			// Release temp registers here, so invokeJavaMethod can use it
-			L1AHelper.releaseRegister(eContext, cntr);
-			L1AHelper.releaseRegister(eContext, classr);
-			L1AHelper.releaseRegister(eContext, tmpr);
-
 			// Call classCastFailed
 			os.writePUSH(refr);
+            os.writePUSH(classr);
+            // Release temp registers here, so invokeJavaMethod can use it
+            L1AHelper.releaseRegister(eContext, cntr);
+            L1AHelper.releaseRegister(eContext, tmpr);
+            L1AHelper.releaseRegister(eContext, classr);
 			invokeJavaMethod(context.getClassCastFailedMethod());
 
 			/* Normal exit */
