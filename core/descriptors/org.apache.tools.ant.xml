@@ -3,7 +3,7 @@
 
 <plugin id="org.apache.tools.ant" 
         name="Ant classes"
-        version="1.6.1"
+        version="1.6.3"
         provider-name="jakarta.apache.org">
         
   <runtime>
@@ -19,6 +19,5 @@
       <export name="org.apache.tools.ant.types.*"/>
       <export name="org.apache.tools.ant.util.*"/>            
     </library>
-  </runtime>
-        
+  </runtime>  
 </plugin>
