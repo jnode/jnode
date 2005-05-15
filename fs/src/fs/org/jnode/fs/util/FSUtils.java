@@ -30,7 +30,6 @@ import org.apache.log4j.Logger;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSFile;
-import org.jnode.fs.jarfs.JarFSEntry;
 
 /**
  * 
