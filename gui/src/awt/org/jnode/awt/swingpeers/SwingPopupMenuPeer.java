@@ -59,6 +59,7 @@ class SwingPopupMenuPeer extends SwingMenuPeer implements PopupMenuPeer {
         //TODO implement it
     }
 
+    @SuppressWarnings("deprecation")
     public void show(Component component, int x, int y) {
         ((JPopupMenu)jComponent).show(((SwingComponentPeer)((Component)component.getParent()).getPeer()).jComponent, x, y);
     }

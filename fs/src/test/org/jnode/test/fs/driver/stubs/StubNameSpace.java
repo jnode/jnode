@@ -50,6 +50,7 @@ public class StubNameSpace extends DefaultNameSpace {
         return super.lookup(name);
     }
 
+    @SuppressWarnings("unchecked")
     protected void createAndBindMockService(Class name) {
         try {
             bind(name, MockUtils.createMockObject(name));

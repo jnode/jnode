@@ -54,7 +54,7 @@ public class NetAPIImpl implements VMNetAPI {
     /**
      * @see java.net.VMNetAPI#getInetAddresses(VMNetDevice)
      */
-    public List getInetAddresses(VMNetDevice netDevice) {
+    public List<InetAddress> getInetAddresses(VMNetDevice netDevice) {
         final ArrayList<InetAddress> list = new ArrayList<InetAddress>();
         final SecurityManager sm = System.getSecurityManager();
         try {
@@ -126,7 +126,7 @@ public class NetAPIImpl implements VMNetAPI {
      * 
      * @return A list of Device instances.
      */
-    public Collection getNetDevices() {
+    public Collection<VMNetDevice> getNetDevices() {
         final ArrayList<VMNetDevice> list = new ArrayList<VMNetDevice>();
         final Collection<Device> devs = DeviceUtils
                 .getDevicesByAPI(NetDeviceAPI.class);

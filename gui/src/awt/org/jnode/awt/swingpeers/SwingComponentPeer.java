@@ -265,6 +265,7 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
     /**
      * @see java.awt.peer.ComponentPeer#isFocusTraversable()
      */
+    @SuppressWarnings("deprecation")
     public boolean isFocusTraversable() {
         return jComponent.isFocusTraversable();
     }
@@ -306,6 +307,7 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
     /**
      * @see java.awt.peer.ComponentPeer#requestFocus()
      */
+    @SuppressWarnings("deprecation")
     public final void requestFocus() {
         jComponent.requestFocus();
         // save old focus component
@@ -339,7 +341,7 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
         final int oldWidth = jComponent.getWidth();
     	final int oldHeight = jComponent.getHeight();
         isReshapeInProgress = true;
-        jComponent.reshape(x, y, width, height);
+        jComponent.setBounds(x, y, width, height);
         isReshapeInProgress = false;
         fireComponentEvent(oldWidth, width, oldHeight, height);
     }

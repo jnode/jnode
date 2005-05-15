@@ -140,6 +140,7 @@ public class MockIDEDeviceFactory extends AbstractMockDeviceFactory implements
             return buffer.append("get partition entry");
         }
 
+        @SuppressWarnings("unchecked")
         public Object invoke(Invocation invocation) throws Throwable {
             int index = ((Integer) invocation.parameterValues.get(0))
                     .intValue();

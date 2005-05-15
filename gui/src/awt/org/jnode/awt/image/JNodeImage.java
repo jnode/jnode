@@ -377,6 +377,7 @@ public class JNodeImage extends Image {
 		public void setHints(int hints) {
 		}
 
+        @SuppressWarnings("unchecked")
 		public void setProperties(Hashtable props) {
 			JNodeImage.this.properties = props;
 			JNodeImage.this.availableInfo |= ImageObserver.PROPERTIES;

@@ -121,6 +121,7 @@ public final class SwingToolkit extends JNodeToolkit {
 		}
 	}
 
+    @SuppressWarnings("deprecation")
 	private static ISwingContainerPeer getContainerPeer(Component component) {
 		final Component parent = component.getParent();
 		if (parent == null) {
