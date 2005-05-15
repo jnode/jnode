@@ -209,23 +209,16 @@ public class SoftByteCodes implements Uninterruptible {
      */
     public static Object allocObject(VmType<?> vmClass, int size)
             throws UninterruptiblePragma {
-        vmClass.link();
-
-        // Screen.debug("ao cls{");
-        // Screen.debug(vmClass.getName());
-
         VmHeapManager hm = heapManager;
         if (hm == null) {
             heapManager = hm = Vm.getHeapManager();
         }
-        Object result;
+        final Object result;
         if (size < 0) {
             result = hm.newInstance(vmClass);
         } else {
             result = hm.newInstance(vmClass, size);
         }
-        // Screen.debug("}");
-
         return result;
     }
 
