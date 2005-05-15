@@ -15,8 +15,11 @@
     <import plugin="org.jnode.fs.iso9660"/>
     <import plugin="org.jnode.shell"/>
     <import plugin="org.jnode.driver.ide"/>
+    <import plugin="org.jnode.driver.ide.disk"/> 
     <import plugin="org.jnode.driver.scsi"/> 
-    
+    <import plugin="org.jnode.driver.scsi.cdrom"/> 
+    <import plugin="org.jnode.driver.usb.storage"/> 
+        
 	<import plugin="org.junit" version="3.8"/>
 	<import plugin="org.objectweb.asm" version="1"/>
 	<import plugin="net.sf.cglib" version="2.1"/>	
@@ -68,5 +71,9 @@
 	<permission class="java.io.FilePermission" name="/junit.properties" actions="read"/>    
 	<permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write,delete"/>
 	<permission class="java.lang.reflect.ReflectPermission" name="*" actions="suppressAccessChecks"/>	
+	
+    <permission class="java.net.SocketPermission" name="*" actions="resolve,listen,connect"/>    
+    <permission class="java.util.PropertyPermission" name="jnode.cmdline" actions="read,write"/>
+    <permission class="java.util.PropertyPermission" name="jnode.prompt" actions="read,write"/>
   </extension>
 </plugin>
