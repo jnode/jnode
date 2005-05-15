@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import org.jnode.fs.FSEntry;
 import org.jnode.fs.util.FSUtils;
 
 public class FSTreeBuilder
