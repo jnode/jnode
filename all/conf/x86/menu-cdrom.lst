@@ -68,3 +68,8 @@ kernel /jnode64.gz mp=no
 module /full.jgz
 
 
+# ---------------------------
+title JNode tests (all plugins + tests)
+kernel /jnode32.gz
+module /tests.jgz
+
