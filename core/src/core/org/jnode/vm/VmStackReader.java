@@ -173,29 +173,36 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * Show the current stacktrace using Screen.debug.
 	 */	
 	public final void debugStackTrace() {
-		Address f = VmMagic.getCurrentFrame();
-		Unsafe.debug("Debug stacktrace: ");
-		boolean first = true;
-		int max = 20;
-		while (isValid(f) && (max > 0)) {
-			if (first) {
-				first = false;
-			} else {
-				Unsafe.debug(", ");
-			}
-			final VmMethod method = getMethod(f);
-			final VmType vmClass = method.getDeclaringClass();
-			Unsafe.debug(vmClass.getName());
-			Unsafe.debug("::");
-			Unsafe.debug(method.getName()); 
-			f = getPrevious(f);
-			max--;
-		}
-		if (isValid(f)) {
-		    Unsafe.debug("...");
-		}
+        debugStackTrace(20);
 	}
 	
+    /**
+     * Show the current stacktrace using Screen.debug.
+     */ 
+    public final void debugStackTrace(int max) {
+        Address f = VmMagic.getCurrentFrame();
+        Unsafe.debug("Debug stacktrace: ");
+        boolean first = true;
+        while (isValid(f) && (max > 0)) {
+            if (first) {
+                first = false;
+            } else {
+                Unsafe.debug(", ");
+            }
+            final VmMethod method = getMethod(f);
+            final VmType<?> vmClass = method.getDeclaringClass();
+            Unsafe.debug(vmClass.getName());
+            Unsafe.debug("::");
+            Unsafe.debug(method.getName()); 
+            Unsafe.debug('\n');
+            f = getPrevious(f);
+            max--;
+        }
+        if (isValid(f)) {
+            Unsafe.debug("...");
+        }
+    }
+    
 	/**
 	 * Show the stacktrace of the given thread using Screen.debug.
 	 */	

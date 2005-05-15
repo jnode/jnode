@@ -172,7 +172,7 @@ public class EntryPoints extends VmSystemObject {
             systemExceptionMethod = testMethod(vmSoftByteCodesClass.getMethod(
                     "systemException", "(II)Ljava/lang/Throwable;"));
             classCastFailedMethod = testMethod(vmSoftByteCodesClass.getMethod(
-                    "classCastFailed", "(Ljava/lang/Object;)V"));
+                    "classCastFailed", "(Ljava/lang/Object;Lorg/jnode/vm/classmgr/VmType;)V"));
             throwArrayOutOfBounds = testMethod(vmSoftByteCodesClass.getMethod(
                     "throwArrayOutOfBounds", "(Ljava/lang/Object;I)V"));
             getClassForVmTypeMethod = testMethod(vmSoftByteCodesClass
