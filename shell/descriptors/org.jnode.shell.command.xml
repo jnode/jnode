@@ -9,6 +9,8 @@
 
   <requires>
     <import plugin="org.jnode.shell.help"/>
+    <import plugin="org.apache.tools.ant"/>
+    <import plugin="org.apache.tools.ant-launcher"/>        
   </requires>
 
   <runtime>
@@ -19,6 +21,7 @@
 
   <extension point="org.jnode.shell.aliases">
     <alias name="alias" class="org.jnode.shell.command.AliasCommand"/>
+    <alias name="ant" class="org.jnode.shell.command.AntCommand"/>
     <alias name="class" class="org.jnode.shell.command.ClassCommand"/>
     <alias name="classpath" class="org.jnode.shell.command.ClasspathCommand" internal="yes"/>
     <alias name="compile" class="org.jnode.shell.command.CompileCommand"/>
