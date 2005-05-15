@@ -31,7 +31,7 @@ import org.jnode.driver.net.NetworkException;
 import org.jnode.driver.net.spi.AbstractDeviceCore;
 import org.jnode.driver.pci.PCIBaseAddress;
 import org.jnode.driver.pci.PCIDevice;
-import org.jnode.driver.pci.PCIDeviceConfig;
+import org.jnode.driver.pci.PCIHeaderType0;
 import org.jnode.naming.InitialNaming;
 import org.jnode.net.HardwareAddress;
 import org.jnode.net.SocketBuffer;
@@ -40,7 +40,6 @@ import org.jnode.net.ethernet.EthernetConstants;
 import org.jnode.system.IOResource;
 import org.jnode.system.IRQHandler;
 import org.jnode.system.IRQResource;
-import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
@@ -317,7 +316,7 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler,
 	 */
 	protected int getIOBase(Device device, EEPRO100Flags flags)
 			throws DriverException {
-		final PCIDeviceConfig config = ((PCIDevice) device).getConfig();
+        final PCIHeaderType0 config = ((PCIDevice)device).getConfig().asHeaderType0();
 		final PCIBaseAddress[] addrs = config.getBaseAddresses();
 		for (int i = 0; i < addrs.length; i++) {
 			long addr;
@@ -347,7 +346,7 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler,
 	 */
 	protected int getIOLength(Device device, EEPRO100Flags flags)
 			throws DriverException {
-		final PCIDeviceConfig config = ((PCIDevice) device).getConfig();
+        final PCIHeaderType0 config = ((PCIDevice)device).getConfig().asHeaderType0();
 		final PCIBaseAddress[] addrs = config.getBaseAddresses();
 		if (addrs.length < 1) {
 			throw new DriverException("Cannot find iobase: not base addresses");
@@ -367,7 +366,7 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler,
 	 */
 	protected int getIRQ(Device device, EEPRO100Flags flags)
 			throws DriverException {
-		final PCIDeviceConfig config = ((PCIDevice) device).getConfig();
+        final PCIHeaderType0 config = ((PCIDevice)device).getConfig().asHeaderType0();
 		return config.getInterruptLine();
 	}
 

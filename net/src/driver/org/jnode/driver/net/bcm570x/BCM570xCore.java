@@ -32,7 +32,7 @@ import org.jnode.driver.net.ethernet.spi.Flags;
 import org.jnode.driver.net.spi.AbstractDeviceCore;
 import org.jnode.driver.pci.PCIBaseAddress;
 import org.jnode.driver.pci.PCIDevice;
-import org.jnode.driver.pci.PCIDeviceConfig;
+import org.jnode.driver.pci.PCIHeaderType0;
 import org.jnode.naming.InitialNaming;
 import org.jnode.net.HardwareAddress;
 import org.jnode.net.SocketBuffer;
@@ -610,7 +610,7 @@ public class BCM570xCore extends AbstractDeviceCore implements BCM570xConstants,
 	 */
 
 	protected int getIOBase(Device device, Flags flags) throws DriverException {
-		final PCIDeviceConfig config = ((PCIDevice) device).getConfig();
+        final PCIHeaderType0 config = ((PCIDevice)device).getConfig().asHeaderType0();
 		final PCIBaseAddress[] addrs = config.getBaseAddresses();
 
 		if (addrs.length < 1) {
@@ -629,7 +629,7 @@ public class BCM570xCore extends AbstractDeviceCore implements BCM570xConstants,
 	 * @param flags
 	 */
 	protected int getIOLength(Device device, Flags flags) throws DriverException {
-		final PCIDeviceConfig config = ((PCIDevice) device).getConfig();
+        final PCIHeaderType0 config = ((PCIDevice)device).getConfig().asHeaderType0();
 		final PCIBaseAddress[] addrs = config.getBaseAddresses();
 
 		if (addrs.length < 1) {
@@ -651,8 +651,7 @@ public class BCM570xCore extends AbstractDeviceCore implements BCM570xConstants,
 	 */
 
 	protected int getIRQ(Device device, Flags flags) throws DriverException {
-		final PCIDeviceConfig config = ((PCIDevice) device).getConfig();
-
+        final PCIHeaderType0 config = ((PCIDevice)device).getConfig().asHeaderType0();
 		return config.getInterruptLine();
 	}
 

@@ -27,7 +27,7 @@ import org.jnode.driver.net.ne2000.Ne2000Core;
 import org.jnode.driver.net.ne2000.Ne2000Flags;
 import org.jnode.driver.pci.PCIBaseAddress;
 import org.jnode.driver.pci.PCIDevice;
-import org.jnode.driver.pci.PCIDeviceConfig;
+import org.jnode.driver.pci.PCIHeaderType0;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 
@@ -53,7 +53,7 @@ public class Ne2000PCI extends Ne2000Core {
 	 */
 	protected int getIOBase(Device device, Ne2000Flags flags) 
 	throws DriverException {
-		final PCIDeviceConfig config = ((PCIDevice)device).getConfig();
+        final PCIHeaderType0 config = ((PCIDevice)device).getConfig().asHeaderType0();
 		final PCIBaseAddress[] addrs = config.getBaseAddresses();
 		if (addrs.length < 1) {
 			throw new DriverException("Cannot find iobase: not base addresses");
@@ -71,7 +71,7 @@ public class Ne2000PCI extends Ne2000Core {
 	 */
 	protected int getIOLength(Device device, Ne2000Flags flags)
 	throws DriverException {
-		final PCIDeviceConfig config = ((PCIDevice)device).getConfig();
+        final PCIHeaderType0 config = ((PCIDevice)device).getConfig().asHeaderType0();
 		final PCIBaseAddress[] addrs = config.getBaseAddresses();
 		if (addrs.length < 1) {
 			throw new DriverException("Cannot find iobase: not base addresses");
@@ -89,7 +89,7 @@ public class Ne2000PCI extends Ne2000Core {
 	 */
 	protected int getIRQ(Device device, Ne2000Flags flags) 
 	throws DriverException {
-		final PCIDeviceConfig config = ((PCIDevice)device).getConfig();
+        final PCIHeaderType0 config = ((PCIDevice)device).getConfig().asHeaderType0();
 		return config.getInterruptLine();
 	}
 

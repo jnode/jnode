@@ -31,7 +31,7 @@ import org.jnode.awt.util.BitmapGraphics;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.pci.PCIBaseAddress;
 import org.jnode.driver.pci.PCIDevice;
-import org.jnode.driver.pci.PCIDeviceConfig;
+import org.jnode.driver.pci.PCIHeaderType0;
 import org.jnode.driver.pci.PCIRomAddress;
 import org.jnode.driver.video.HardwareCursorAPI;
 import org.jnode.driver.video.spi.DpmsState;
@@ -94,7 +94,7 @@ final class RadeonCore implements RadeonConstants {
 		this.driver = driver;
 		this.fbinfo = new FBInfo(architecture);
 
-		final PCIDeviceConfig pciCfg = device.getConfig();
+		final PCIHeaderType0 pciCfg = device.getConfig().asHeaderType0();
 		final PCIBaseAddress ioAddr = pciCfg.getBaseAddresses()[2];
 		final PCIBaseAddress fbAddr = pciCfg.getBaseAddresses()[0];
 		final PCIRomAddress romAddr = pciCfg.getRomAddress();

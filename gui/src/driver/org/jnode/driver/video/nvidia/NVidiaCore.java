@@ -33,7 +33,7 @@ import org.jnode.awt.util.BitmapGraphics;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.pci.PCIBaseAddress;
 import org.jnode.driver.pci.PCIDevice;
-import org.jnode.driver.pci.PCIDeviceConfig;
+import org.jnode.driver.pci.PCIHeaderType0;
 import org.jnode.driver.video.FrameBufferConfiguration;
 import org.jnode.driver.video.ddc.DisplayDataChannelAPI;
 import org.jnode.driver.video.spi.DpmsState;
@@ -84,7 +84,7 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 		super(640, 480);
 		this.driver = driver;
 		this.architecture = architecture;
-		final PCIDeviceConfig pciCfg = device.getConfig();
+		final PCIHeaderType0 pciCfg = device.getConfig().asHeaderType0();
 		final PCIBaseAddress ioAddr = pciCfg.getBaseAddresses()[0];
 		final PCIBaseAddress fbAddr = pciCfg.getBaseAddresses()[1];
 		log.info("Found NVidia " + model + ", chipset 0x" + NumberUtils.hex(pciCfg.getRevision()));

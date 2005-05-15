@@ -103,7 +103,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 			this.indexPort = SVGA_LEGACY_BASE_PORT + SVGA_INDEX_PORT * 4;
 			this.valuePort = SVGA_LEGACY_BASE_PORT + SVGA_VALUE_PORT * 4;
 		} else {
-			basePort = device.getConfig().getBaseAddresses()[0].getIOBase();
+			basePort = device.getConfig().asHeaderType0().getBaseAddresses()[0].getIOBase();
 			this.indexPort = basePort + SVGA_INDEX_PORT;
 			this.valuePort = basePort + SVGA_VALUE_PORT;
 		}

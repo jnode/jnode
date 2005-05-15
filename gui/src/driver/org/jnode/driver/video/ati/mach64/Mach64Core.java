@@ -86,7 +86,7 @@ final class Mach64Core implements Mach64Constants  {
 		cmd |= PCIConstants.PCI_COMMAND_MEMORY;
 		pciCfg.setCommand(cmd);
 		
-		final PCIBaseAddress fbAddr = pciCfg.getBaseAddresses()[0];
+		final PCIBaseAddress fbAddr = pciCfg.asHeaderType0().getBaseAddresses()[0];
 
 		log.info("Found ATI " + model + ", pci " + pciCfg);
 		

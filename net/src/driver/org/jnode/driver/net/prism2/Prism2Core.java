@@ -21,11 +21,12 @@
  
 package org.jnode.driver.net.prism2;
 
-import static org.jnode.driver.net.prism2.Prism2Constants.Command.*;
+import static org.jnode.driver.net.prism2.Prism2Constants.Command.ACCESS;
 import static org.jnode.driver.net.prism2.Prism2Constants.Command.ALLOC;
 import static org.jnode.driver.net.prism2.Prism2Constants.Command.DISABLE;
 import static org.jnode.driver.net.prism2.Prism2Constants.Command.ENABLE;
 import static org.jnode.driver.net.prism2.Prism2Constants.Command.INIT;
+import static org.jnode.driver.net.prism2.Prism2Constants.Command.TX;
 import static org.jnode.driver.net.prism2.Prism2Constants.LinkStatus.CONNECTED;
 import static org.jnode.driver.net.prism2.Prism2Constants.LinkStatus.NOTCONNECTED;
 import static org.jnode.driver.net.prism2.Prism2Constants.RecordID.CNFAUTHENTICATION;
@@ -52,7 +53,7 @@ import org.jnode.driver.net.event.LinkStatusEvent;
 import org.jnode.driver.net.wireless.spi.WirelessDeviceCore;
 import org.jnode.driver.pci.PCIBaseAddress;
 import org.jnode.driver.pci.PCIDevice;
-import org.jnode.driver.pci.PCIDeviceConfig;
+import org.jnode.driver.pci.PCIHeaderType0;
 import org.jnode.naming.InitialNaming;
 import org.jnode.net.HardwareAddress;
 import org.jnode.net.SocketBuffer;
@@ -134,7 +135,7 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
             throw new DriverException("Cannot find ResourceManager");
         }
 
-        final PCIDeviceConfig pciCfg = device.getConfig();
+        final PCIHeaderType0 pciCfg = device.getConfig().asHeaderType0();
         final PCIBaseAddress[] baseAddrs = pciCfg.getBaseAddresses();
         if (baseAddrs.length < 1) {
             throw new DriverException(
