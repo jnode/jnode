@@ -21,9 +21,8 @@
  
 package org.jnode.fs.jifs.files;
 
-import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSDirectory;
-import org.jnode.fs.jifs.*;
+import org.jnode.fs.jifs.JIFSFile;
 import org.jnode.vm.VmSystem;
 
 /**

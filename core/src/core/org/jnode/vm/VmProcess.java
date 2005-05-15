@@ -213,7 +213,7 @@ public class VmProcess extends Process {
 		 */
 		public void run() {
 			try {
-				final Class mainClass = Class.forName(mainClassName);
+				final Class<?> mainClass = Class.forName(mainClassName);
 				final Method mainMethod = mainClass.getMethod("main", new Class[] { String[].class });
 		
 				try {		

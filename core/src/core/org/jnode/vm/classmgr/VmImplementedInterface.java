@@ -84,7 +84,7 @@ public final class VmImplementedInterface extends VmSystemObject {
             final String className = (String)data;
 			final VmType<?> type = clc.loadClass(className, true);
 			if (type instanceof VmInterfaceClass) {
-				this.data = (VmInterfaceClass)type;
+				this.data = (VmInterfaceClass<?>)type;
 			} else {
 				throw new ClassNotFoundException("Class " + className + " is not an interface");
 			}

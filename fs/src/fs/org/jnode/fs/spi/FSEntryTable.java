@@ -65,8 +65,8 @@ public class FSEntryTable extends AbstractFSObject {
      * Private constuctor for EMPTY_TABLE
      */
     private FSEntryTable() {
-        entries = Collections.EMPTY_MAP;
-        entryNames = Collections.EMPTY_LIST;
+        entries = Collections.emptyMap();
+        entryNames = Collections.emptyList();
     }
 
     /**
@@ -361,14 +361,15 @@ public class FSEntryTable extends AbstractFSObject {
      * @param compacted
      * @return
      */
-    public List/* <FSEntry> */toList(boolean compacted) {
-        ArrayList entryList = new ArrayList();
+    public List<FSEntry> toList(boolean compacted) {
+        ArrayList<FSEntry> entryList = new ArrayList<FSEntry>();
 
         int nbEntries = entryNames.size();
         for (int i = 0; i < nbEntries; i++) {
             FSEntry entry = get(i);
-            if (!compacted || (compacted && (entry != null)))
+            if (!compacted || (compacted && (entry != null))) {
                 entryList.add(entry);
+            }
         }
 
         return entryList;

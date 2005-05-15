@@ -641,7 +641,7 @@ public final class ClassDecoder {
 
             cls.setFieldTable(ftable);
             if (objectSize > 0) {
-                ((VmNormalClass) cls).setObjectSize(objectSize);
+                ((VmNormalClass<?>) cls).setObjectSize(objectSize);
             }
         }
     }

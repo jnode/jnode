@@ -21,6 +21,7 @@
  
 package org.jnode.fs.ntfs;
 
+import java.text.DateFormat;
 import java.util.Date;
 
 /**
@@ -34,7 +35,7 @@ public class NTFSUTIL {
 
         System.out.println("hours" + ((Math.abs(time) / 1000) / 60) / 60);
         Date date = new Date(time);
-        System.out.println(date.toLocaleString());
+        System.out.println(DateFormat.getInstance().format(date));
         return date;
     }
 }

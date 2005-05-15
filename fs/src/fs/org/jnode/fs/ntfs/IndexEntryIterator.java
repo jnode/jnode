@@ -31,7 +31,7 @@ import java.util.NoSuchElementException;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final class IndexEntryIterator implements Iterator {
+final class IndexEntryIterator implements Iterator<IndexEntry> {
     
     //private final Logger log = Logger.getLogger(getClass());
     private int offset;
@@ -62,7 +62,7 @@ final class IndexEntryIterator implements Iterator {
     /**
      * @see java.util.Iterator#next()
      */
-    public Object next() {
+    public IndexEntry next() {
         //log.debug("next: offset=" + offset);
         if (nextEntry == null) {
             //log.debug("next: islast");

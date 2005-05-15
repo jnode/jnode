@@ -23,7 +23,6 @@ package org.jnode.fs.ntfs;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -37,7 +36,7 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
 
     private int numberOfVCNs = 0;
 
-    private final List dataRuns = new ArrayList();
+    private final List<DataRun> dataRuns = new ArrayList<DataRun>();
 
     /**
      * @param fileRecord
@@ -100,7 +99,7 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
         int offset = parentoffset;
 
         long previousLCN = 0;
-        final List dataruns = getDataRuns();
+        final List<DataRun> dataruns = getDataRuns();
         long vcn = 0;
 
         while (getUInt8(offset) != 0x0) {
@@ -127,7 +126,7 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
     /**
      * @return Returns the dataRuns.
      */
-    public List getDataRuns() {
+    public List<DataRun> getDataRuns() {
         return dataRuns;
     }
 
@@ -146,8 +145,7 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
         final int clusterSize = volume.getClusterSize();
 
         int readClusters = 0;
-        for (Iterator it = this.getDataRuns().iterator(); it.hasNext();) {
-            final DataRun dataRun = (DataRun) it.next();
+        for (DataRun dataRun : this.getDataRuns()) {
             readClusters += dataRun.readClusters(vcn, dst, dstOffset, nrClusters, clusterSize, volume);
             if (readClusters == nrClusters) {
                 break;
