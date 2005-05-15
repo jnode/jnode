@@ -7,11 +7,15 @@
 
   <include file="default-plugin-list.xml"/>
 
+  <plugin id="org.apache.tools.ant-launcher"/>
+
   <plugin id="charva"/>
   <plugin id="org.jnode.apps.edit"/>
   <plugin id="org.jnode.apps.charvabsh"/>
   <plugin id="org.jnode.apps.debug"/>
   <plugin id="org.jnode.apps.httpd"/>
+
+  <plugin id="org.jnode.shell.command.ant"/>
     
   <plugin id="com.jcraft.jsch"/>
   <plugin id="crypto-security"/>
