@@ -27,8 +27,6 @@ import java.nio.ByteBuffer;
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.ReadOnlyFileSystemException;
-import org.jnode.util.ByteBufferUtils;
-
 
 /**
  * A File instance is the in-memory representation of a single file (chain of
