@@ -21,7 +21,6 @@
  
 package org.jnode.fs.jarfs;
 
-import java.io.InputStream;
 import java.util.Map;
 import java.util.jar.JarFile;
 

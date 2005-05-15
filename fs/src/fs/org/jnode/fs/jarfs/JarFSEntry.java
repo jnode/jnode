@@ -30,7 +30,6 @@ import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.ReadOnlyFileSystemException;
-import org.jnode.fs.util.FSUtils;
 
 /**
  * 

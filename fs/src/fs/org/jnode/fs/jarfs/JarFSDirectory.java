@@ -23,16 +23,12 @@ package org.jnode.fs.jarfs;
 
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.jar.JarEntry;
 
-import org.apache.tools.ant.taskdefs.Jar;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.ReadOnlyFileSystemException;
-import org.jnode.fs.spi.AbstractFSDirectory;
 
 /**
  * 
