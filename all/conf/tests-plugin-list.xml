@@ -16,7 +16,6 @@
   
   <plugin id="org.jnode.test"/>
   <plugin id="org.jnode.test.fs"/>
-  <plugin id="org.jnode.test.gui"/>
   <plugin id="org.jnode.test.net"/>
 
 </plugin-list>
