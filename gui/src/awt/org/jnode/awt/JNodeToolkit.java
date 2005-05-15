@@ -399,6 +399,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	 * @see java.awt.Toolkit#getFontList()
 	 * @return The fonts
 	 */
+    @SuppressWarnings("deprecation")
 	public String[] getFontList() {
 		Font[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment()
 				.getAllFonts();
@@ -427,6 +428,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	 * @see java.awt.Toolkit#getFontMetrics(java.awt.Font)
 	 * @return The metrics
 	 */
+    @SuppressWarnings("deprecation")
 	public FontMetrics getFontMetrics(Font font) {
 		final FontManager fm = getFontManager();
 		if (fm != null) {
