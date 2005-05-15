@@ -5513,4 +5513,19 @@ public class Collections
       return new UnmodifiableSortedSet<T>(ss.tailSet(fromElement));
     }
   } // class UnmodifiableSortedSet
+
+  // @classpath-bugfix Added missing method
+  public static final <T> List<T> emptyList() {
+      return EMPTY_LIST;
+  }
+
+  // @classpath-bugfix Added missing method
+  public static final <K,V> Map<K,V> emptyMap() {
+      return EMPTY_MAP;
+  }
+  
+  // @classpath-bugfix Added missing method
+  public static final <T> Set<T> emptySet() {
+      return EMPTY_SET;
+  }
 } // class Collections
