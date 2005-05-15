@@ -63,7 +63,7 @@ final class SwingPanelPeer extends SwingContainerPeer implements PanelPeer, ISwi
 
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
-            awtComponent.update(g);
+            //awtComponent.update(g);
         }
 
 		/**
