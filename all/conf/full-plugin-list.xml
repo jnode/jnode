@@ -11,6 +11,7 @@
   <plugin id="org.jnode.apps.edit"/>
   <plugin id="org.jnode.apps.charvabsh"/>
   <plugin id="org.jnode.apps.debug"/>
+  <plugin id="org.jnode.apps.httpd"/>
 
   <plugin id="org.junit"/>
   <plugin id="org.objectweb.asm"/>    
