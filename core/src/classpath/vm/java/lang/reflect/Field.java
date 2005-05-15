@@ -135,7 +135,8 @@ public final class Field extends AccessibleObject implements Member {
 	 * @return the hash code for the object.
 	 */
 	public int hashCode() {
-		return getDeclaringClass().getName().hashCode() ^ getName().hashCode();
+        final Class<?> declClass = getDeclaringClass();
+		return declClass.getName().hashCode() ^ getName().hashCode();
 	}
 
 	/**
@@ -150,8 +151,10 @@ public final class Field extends AccessibleObject implements Member {
 		// 64 is a reasonable buffer initial size for field
 		StringBuffer sb = new StringBuffer(64);
 		Modifier.toString(getModifiers(), sb).append(' ');
-		sb.append(getType().getName()).append(' ');
-		sb.append(getDeclaringClass().getName()).append('.');
+        final Class<?> type = getType();
+        final Class<?> declClass = getDeclaringClass();
+		sb.append(type.getName()).append(' ');
+		sb.append(declClass.getName()).append('.');
 		sb.append(getName());
 		return sb.toString();
 	}

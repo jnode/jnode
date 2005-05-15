@@ -503,7 +503,7 @@ public abstract class VmType<T> extends VmSystemObject implements VmSharedStatic
 	 * @param type
 	 * @return VmClass
 	 */
-	public final static VmNormalClass getPrimitiveClass(char type) {
+	public final static VmNormalClass<?> getPrimitiveClass(char type) {
 		switch (type) {
 		case 'Z':
 			return BooleanClass;

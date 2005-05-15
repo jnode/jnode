@@ -194,6 +194,7 @@ final class ItemFactory {
      * 
      * @param item
      */
+    @SuppressWarnings("unchecked")
     final <T extends Item> void release(T item) {
         if (Vm.VerifyAssertions)
             Vm._assert(item.kind == 0, "Item is not yet released");

@@ -61,8 +61,8 @@ import org.jnode.vm.classmgr.VmMethod;
 public final class Method extends AccessibleObject implements Member {
 	
 	private VmMethod vmMethod;
-	private ArrayList parameterTypes;
-	private ArrayList exceptionTypes;	
+	private ArrayList<Class> parameterTypes;
+	private ArrayList<Class> exceptionTypes;	
 
 	/**
 	 * This class is uninstantiable.
@@ -118,7 +118,7 @@ public final class Method extends AccessibleObject implements Member {
 	public Class[] getParameterTypes() {
 		if (parameterTypes == null) {
 			int cnt = vmMethod.getNoArguments();
-			ArrayList list = new ArrayList(cnt);
+			ArrayList<Class> list = new ArrayList<Class>(cnt);
 			for (int i = 0; i < cnt; i++) {
 				list.add(vmMethod.getArgumentType(i).asClass());
 			}
@@ -138,7 +138,7 @@ public final class Method extends AccessibleObject implements Member {
 		if (exceptionTypes == null) {
 			final VmExceptions exceptions = vmMethod.getExceptions();
 			final int cnt = exceptions.getLength();
-			final ArrayList list = new ArrayList(cnt);
+			final ArrayList<Class> list = new ArrayList<Class>(cnt);
 			for (int i = 0; i < cnt; i++) {
         try
         {
@@ -177,7 +177,8 @@ public final class Method extends AccessibleObject implements Member {
 	 * @return the hash code for the object
 	 */
 	public int hashCode() {
-		return getDeclaringClass().getName().hashCode() ^ getName().hashCode();
+        final Class<?> declClass = getDeclaringClass();
+		return declClass.getName().hashCode() ^ getName().hashCode();
 	}
 
 	/**
@@ -193,10 +194,12 @@ public final class Method extends AccessibleObject implements Member {
 		// 128 is a reasonable buffer initial size for constructor
 		StringBuffer sb = new StringBuffer(128);
 		Modifier.toString(getModifiers(), sb).append(' ');
-		sb.append(getReturnType().getName()).append(' ');
-		sb.append(getDeclaringClass().getName()).append('.');
+        final Class<?> retType = getReturnType();
+        final Class<?> declClass = getDeclaringClass();
+		sb.append(retType.getName()).append(' ');
+		sb.append(declClass.getName()).append('.');
 		sb.append(getName()).append('(');
-		Class[] c = getParameterTypes();
+		Class<?>[] c = getParameterTypes();
 		if (c.length > 0) {
 			sb.append(c[0].getName());
 			for (int i = 1; i < c.length; i++)
