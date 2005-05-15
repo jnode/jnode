@@ -73,6 +73,7 @@ public class TFTPClient extends org.apache.commons.net.tftp.TFTPClient {
 		}
 	}
 	
+    @SuppressWarnings("deprecation")
 	private void run() {
 		System.out.println("JNode TFTP Client");
 		do {
