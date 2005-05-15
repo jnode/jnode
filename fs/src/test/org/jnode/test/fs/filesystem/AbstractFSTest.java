@@ -125,7 +125,7 @@ public abstract class AbstractFSTest extends AbstractTest {
         return (FSContext) ContextManager.getInstance().getContext();
     }
     
-    protected void assertContainsOnly(String errorMessage, Iterator<FSEntry> it, String[] requiredNames)
+    protected void assertContainsOnly(String errorMessage, Iterator<? extends FSEntry> it, String[] requiredNames)
     {
         boolean ok = true;
         List<String> reqNames = (requiredNames == null) ? new ArrayList<String>() : new ArrayList<String>(Arrays.asList(requiredNames));

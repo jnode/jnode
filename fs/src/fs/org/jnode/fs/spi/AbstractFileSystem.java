@@ -68,7 +68,7 @@ public abstract class AbstractFileSystem implements FileSystem {
         this.device = device;
 
         try {
-            api = (BlockDeviceAPI) device.getAPI(BlockDeviceAPI.class);
+            api = device.getAPI(BlockDeviceAPI.class);
         } catch (ApiNotFoundException e) {
             throw new FileSystemException("Device is not a partition!", e);
         }
@@ -89,7 +89,6 @@ public abstract class AbstractFileSystem implements FileSystem {
      */
     public FSEntry getRootEntry() throws IOException
 	{
-    	log.debug("<<< BEGIN getRootEntry >>>");
     	if(isClosed())
     		throw new IOException("FileSystem is closed");
     		    	
@@ -97,7 +96,6 @@ public abstract class AbstractFileSystem implements FileSystem {
     	{
    			rootEntry = createRootEntry();
     	}
-    	log.debug("<<< END getRootEntry >>>");
     	return rootEntry;
 	}
 
@@ -134,10 +132,8 @@ public abstract class AbstractFileSystem implements FileSystem {
      */
     public void flush() throws IOException
 	{
-    	log.debug("<<< BEGIN flush >>>");
     	flushFiles();
     	flushDirectories();    	
-    	log.debug("<<< END flush >>>");
 	}
 
     /**
@@ -151,7 +147,7 @@ public abstract class AbstractFileSystem implements FileSystem {
      * @return Returns the FSApi.
      */
     final public FSBlockDeviceAPI getFSApi() throws ApiNotFoundException {
-    	return (FSBlockDeviceAPI) device.getAPI(FSBlockDeviceAPI.class);
+    	return device.getAPI(FSBlockDeviceAPI.class);
     }
 
     /**
@@ -181,7 +177,7 @@ public abstract class AbstractFileSystem implements FileSystem {
     	if(isClosed())
     		throw new IOException("FileSystem is closed");
     		
-		FSFile file = (FSFile)files.get(entry);
+		FSFile file = files.get(entry);
 		if (file == null) {
 			file = createFile(entry);
 			files.put(entry, file);
@@ -205,7 +201,11 @@ public abstract class AbstractFileSystem implements FileSystem {
 	{
 		log.info("flushing files ...");
 		for (FSFile f : files.values()) {
-			log.debug("flush: flushing file "+f);			
+            if(log.isDebugEnabled())
+            {
+                log.debug("flush: flushing file "+f);
+            }
+            
 			f.flush();
 		}		
 	}
@@ -219,7 +219,7 @@ public abstract class AbstractFileSystem implements FileSystem {
     	if(isClosed())
     		throw new IOException("FileSystem is closed");
     		
-		FSDirectory dir = (FSDirectory)directories.get(entry);
+		FSDirectory dir = directories.get(entry);
 		if (dir == null) {
 			dir = createDirectory(entry);
 			directories.put(entry, dir);
@@ -239,11 +239,14 @@ public abstract class AbstractFileSystem implements FileSystem {
 	 * Flush all unsaved FSDirectory in our cache
 	 * @throws IOException
 	 */
-	final private void flushDirectories() throws IOException
+	final private void flushDirectories()
 	{
 		log.info("flushing directories ...");
 		for (FSDirectory d : directories.values()) {
-			log.debug("flush: flushing directory "+d);
+            if(log.isDebugEnabled())
+            {
+                log.debug("flush: flushing directory "+d);
+            }
 			
 			//TODO: uncomment this line
 			//d.flush();

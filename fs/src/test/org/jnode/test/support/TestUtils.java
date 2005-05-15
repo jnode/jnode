@@ -145,7 +145,7 @@ public class TestUtils {
                 + " is unsupported");
     }
 
-    static public void listEntries(Iterator<FSEntry> iterator) throws Exception {
+    static public void listEntries(Iterator<? extends FSEntry> iterator) throws Exception {
         log.debug("<<< BEGIN listEntries >>>");
         int i = 0;
         log.debug("------- entries ------");
@@ -158,7 +158,7 @@ public class TestUtils {
         log.debug("<<< END listEntries >>>");
     }
 
-    static public List<String> getEntryNames(Iterator<FSEntry> it) {
+    static public List<String> getEntryNames(Iterator<? extends FSEntry> it) {
         List<String> names = new ArrayList<String>();
         while (it.hasNext()) {
             FSEntry entry = it.next();

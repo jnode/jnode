@@ -34,7 +34,7 @@ public interface FSDirectory extends FSObject {
 	 * directory.
 	 * All elements returned by the iterator must be instanceof FSEntry.
 	 */
-	public Iterator<FSEntry> iterator()
+	public Iterator<? extends FSEntry> iterator()
 	throws IOException;
 	
 	/**
