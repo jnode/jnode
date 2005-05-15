@@ -261,6 +261,7 @@ public abstract class VmType<T> extends VmSystemObject implements VmSharedStatic
 	 * @return VmClass[]
 	 * @throws ClassNotFoundException
 	 */
+    @SuppressWarnings("unchecked")
 	public final static VmType[] initializeForBootImage(VmSystemClassLoader clc)
 			throws ClassNotFoundException {
 		ObjectClass = (VmNormalClass) clc.loadClass("java.lang.Object", false);
@@ -337,6 +338,7 @@ public abstract class VmType<T> extends VmSystemObject implements VmSharedStatic
 	 * 
 	 * @param bootClasses
 	 */
+    @SuppressWarnings("unchecked")
 	protected static void loadFromBootClassArray(VmType[] bootClasses)
 			throws LoadStaticsPragma {
 		Unsafe.debug("loadFromBootClassArray");
@@ -623,6 +625,7 @@ public abstract class VmType<T> extends VmSystemObject implements VmSharedStatic
 	 * @param isBuildEnv
 	 * @return The class
 	 */
+    @SuppressWarnings("unchecked")
 	private final Class<T> asClass(boolean isBuildEnv) {
 		if (javaClass == null) {
 			if (isBuildEnv) {

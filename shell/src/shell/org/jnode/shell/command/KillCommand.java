@@ -65,6 +65,7 @@ public class KillCommand implements Command{
 	    
 	}
 	
+    @SuppressWarnings("deprecation")
 	private void kill(ThreadGroup grp,int id,PrintStream out){
 		final int max = grp.activeCount() * 2;
 		final Thread[] ts = new Thread[max];

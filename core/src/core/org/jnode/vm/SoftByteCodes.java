@@ -351,7 +351,7 @@ public class SoftByteCodes implements Uninterruptible {
     public static void classCastFailed(Object object) {
         if (object == null) {
             throw new ClassCastException("Object is null");
-        } else if (false) {
+        } else if (true) {
             final Object[] tib = VmMagic.getTIB(object);
             if (tib == null) {
                 throw new ClassCastException(object.getClass().getName() + " tib==null");                

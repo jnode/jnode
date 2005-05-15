@@ -92,7 +92,7 @@ public class JavaCommand {
         final ClassLoader parent_cl = Thread.currentThread().getContextClassLoader();
         JCClassLoader cl = new JCClassLoader(parent_cl, new String[]{"./"});
 
-		Class cls = cl.loadClass(ARG_CLASS.getValue(cmdLine));
+		Class<?> cls = cl.loadClass(ARG_CLASS.getValue(cmdLine));
 
 		Method mainMethod = cls.getMethod("main", new Class[] { String[].class });
 

@@ -250,6 +250,7 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
       unblock();
     }
 
+    @SuppressWarnings("deprecation")
     private void doCtrlC()
     {
       System.err.println("ctrl-c: Returning focus to console. (" + cmdName + " has been killed)");

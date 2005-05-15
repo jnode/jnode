@@ -340,7 +340,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	 * design claims Font should now be peerless, we do not agree with this
 	 * model, hence "ClasspathFontPeer".
 	 */
-
+    @SuppressWarnings("unchecked")
 	public ClasspathFontPeer getClasspathFontPeer(String name, Map attrs) {
 		final Map<String, String> keyMap = new HashMap<String, String>(attrs);
 		// We don't know what kind of "name" the user requested (logical, face,

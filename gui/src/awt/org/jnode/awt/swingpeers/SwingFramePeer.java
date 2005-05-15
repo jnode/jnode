@@ -289,6 +289,7 @@ final class SwingFramePeer extends SwingWindowPeer implements FramePeer, ISwingC
 			super.validate();
 		}
 
+        @SuppressWarnings("deprecation")
         public void reshape(int x, int y, int width, int height) {
             super.reshape(x, y, width, height);
             //TODO fix it
