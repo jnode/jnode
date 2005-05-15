@@ -79,8 +79,6 @@ public abstract class VmHeapManager extends VmSystemObject {
      * @return The new instance
      */
     public final Object newInstance(VmType< ? > cls) {
-        // cls.link();
-        cls.initialize();
         return newInstance(cls, ((VmNormalClass< ? >) cls).getObjectSize());
     }
 
@@ -94,6 +92,7 @@ public abstract class VmHeapManager extends VmSystemObject {
      */
     public final Object newInstance(VmType< ? > cls, int size) {
         testInited();
+        cls.initialize();
         if (cls.isArray()) {
             throw new IllegalArgumentException(
                     "Cannot instantiate an array like this");
@@ -103,7 +102,7 @@ public abstract class VmHeapManager extends VmSystemObject {
                     "Cannot instantiate an interface");
         }
 
-        final Object obj = allocObject((VmNormalClass) cls, size);
+        final Object obj = allocObject((VmNormalClass<?>) cls, size);
         if (obj == null) {
             Unsafe.debug("Out of memory");
             throw OOME;
@@ -201,7 +200,7 @@ public abstract class VmHeapManager extends VmSystemObject {
             final int elemSize = arrayClass.getComponentType().getTypeSize();
             size = (VmArray.DATA_OFFSET * slotSize) * (length * elemSize);
         } else {
-            final VmNormalClass< ? > normalClass = (VmNormalClass) objectClass;
+            final VmNormalClass< ? > normalClass = (VmNormalClass<?>) objectClass;
             size = normalClass.getObjectSize();
         }
         final Object newObj = allocObject(objectClass, size);
