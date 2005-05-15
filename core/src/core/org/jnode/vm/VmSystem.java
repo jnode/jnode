@@ -407,6 +407,7 @@ public final class VmSystem implements SharedStatics {
     public static Object[] getStackTrace(VmThread current) {
         if (current.inException) {
             Unsafe.debug("Exception in getStackTrace");
+            Unsafe.getCurrentProcessor().getArchitecture().getStackReader().debugStackTrace();
             Unsafe.die("getStackTrace");
             return null;
         } else {
