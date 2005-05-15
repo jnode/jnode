@@ -91,7 +91,7 @@ public abstract class Reference<T>
    * (not to null, that value is used to mark a not enqueued
    * reference).  
    */
-  Reference<T> nextOnQueue;
+  Reference nextOnQueue; // @classpath-bugfix Did not compile using eclipse 3.1M7
 
   /**
    * This lock should be taken by the garbage collector, before
