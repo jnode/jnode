@@ -80,6 +80,7 @@ public class PcBufferTextScreen extends AbstractPcTextScreen implements TextScre
      */
     public void set(int offset, char ch, int count, int color) {
         final char v = (char)((ch & 0xFF) | ((color & 0xFF) << 8));
+        count = Math.min(count, buffer.length - offset);
         for (int i = 0; i < count; i++) {
             buffer[offset+i] = v;
         }
@@ -90,6 +91,7 @@ public class PcBufferTextScreen extends AbstractPcTextScreen implements TextScre
      */
     public void set(int offset, char[] ch, int chOfs, int length, int color) {
         color = (color & 0xFF) << 8;
+        length = Math.min(length, buffer.length - offset);
         for (int i = 0; i < length; i++) {
             final char v = (char)((ch[chOfs+i] & 0xFF) | color);
             buffer[offset+i] = v;
@@ -101,6 +103,7 @@ public class PcBufferTextScreen extends AbstractPcTextScreen implements TextScre
      */
     public void set(int offset, char[] ch, int chOfs, int length, int[] colors,
             int colorsOfs) {
+        length = Math.min(length, buffer.length - offset);
         for (int i = 0; i < length; i++) {
             final char v = (char)((ch[chOfs+i] & 0xFF) | (colors[colorsOfs+i] & 0xFF) << 8);
             buffer[offset+i] = v;
