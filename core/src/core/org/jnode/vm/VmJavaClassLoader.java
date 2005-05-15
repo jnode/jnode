@@ -125,7 +125,8 @@ public final class VmJavaClassLoader extends VmAbstractClassLoader {
             cls = loadArrayClass(className, resolve);
             addLoadedClass(className, cls);
         } else {
-            cls = loader.loadClass(className).getVmClass();
+            final Class<?> javaType = loader.loadClass(className);
+            cls = javaType.getVmClass();
         }
         if (resolve) {
             cls.link();

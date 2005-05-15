@@ -152,7 +152,7 @@ public final class VmByteCode extends AbstractCode {
 	 */
 	public List<VmInterpretedExceptionHandler> getExceptionHandlers() {
 		if (eTable == null) {
-			return Collections.EMPTY_LIST;
+			return Collections.emptyList();
 		} else {
 			return Arrays.asList(eTable);
 		}

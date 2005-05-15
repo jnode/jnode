@@ -25,7 +25,6 @@ import java.util.TreeMap;
 
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceManager;
-import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.jifs.JIFSFile;
 import org.jnode.naming.InitialNaming;

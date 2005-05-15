@@ -23,7 +23,6 @@ package org.jnode.fs.jifs.files;
 
 import javax.naming.NameNotFoundException;
 
-import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FileSystemType;
 import org.jnode.fs.jifs.JIFSFile;

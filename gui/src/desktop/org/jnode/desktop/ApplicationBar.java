@@ -57,7 +57,7 @@ public class ApplicationBar extends JPanel {
 				public void run() {
 					try {
 						final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-						final Class cls = cl.loadClass(className);
+						final Class<?> cls = cl.loadClass(className);
 						final Method main = cls.getMethod("main", mainTypes);
 						final Object[] args = { new String[0] };
 						main.invoke(null, args);					

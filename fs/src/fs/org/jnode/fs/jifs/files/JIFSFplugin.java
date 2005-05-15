@@ -21,15 +21,15 @@
  
 package org.jnode.fs.jifs.files;
 
-import org.jnode.fs.jifs.*;
-import org.jnode.fs.FSEntry;
+import javax.naming.NameNotFoundException;
+
 import org.jnode.fs.FSDirectory;
+import org.jnode.fs.jifs.JIFSFile;
 import org.jnode.naming.InitialNaming;
-import org.jnode.plugin.PluginManager;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
+import org.jnode.plugin.PluginManager;
 import org.jnode.plugin.PluginPrerequisite;
-import javax.naming.NameNotFoundException;
 
 /**
  * File, which contains information about the plugin with the same name.

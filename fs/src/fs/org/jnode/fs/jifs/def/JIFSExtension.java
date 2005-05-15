@@ -22,30 +22,25 @@
 package org.jnode.fs.jifs.def;
 
 import java.io.IOException;
+
 import javax.naming.NameNotFoundException;
 
 import org.apache.log4j.Logger;
-
-import org.jnode.fs.jifs.*;
-
 import org.jnode.driver.DeviceManager;
-import org.jnode.driver.DeviceUtils;
-import org.jnode.driver.DriverException;
 import org.jnode.driver.DeviceNotFoundException;
-import org.jnode.driver.DeviceAlreadyRegisteredException;
-
+import org.jnode.driver.DeviceUtils;
 import org.jnode.fs.FSEntry;
-import org.jnode.fs.FileSystemException;
-import org.jnode.fs.FileSystemType;
-import org.jnode.fs.FileSystem;
+import org.jnode.fs.jifs.ExtFSEntry;
+import org.jnode.fs.jifs.JIFSDevice;
+import org.jnode.fs.jifs.JIFSDirectory;
 import org.jnode.fs.service.FileSystemService;
-
+import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.ConfigurationElement;
 import org.jnode.plugin.Extension;
 import org.jnode.plugin.ExtensionPoint;
 import org.jnode.plugin.ExtensionPointListener;
 
-import org.jnode.naming.InitialNaming;
+
 /**
  * @author Andreas H\u00e4nel
  */
@@ -118,7 +113,7 @@ final class JIFSExtension implements ExtensionPointListener {
 		if (className != null) { 
 			try {
 				final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-				Class c = cl.loadClass(className);
+				Class<?> c = cl.loadClass(className);
 				Object o = c.newInstance();
 				ExtFSEntry entry = (ExtFSEntry)o;
 				if (entry.getName()==null){
