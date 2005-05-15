@@ -1235,7 +1235,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			os.writeTEST(refr, refr);
 			os.writeJCC(okLabel, X86Constants.JZ);
 			// Is instanceof?
-			instanceOfClass(refr, (VmClassType) resolvedType, tmpr, null,
+			instanceOfClass(refr, (VmClassType<?>) resolvedType, tmpr, null,
 					okLabel, true);
 			// Not instanceof
 
@@ -2449,7 +2449,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 					eContext, JvmType.INT, false);
 
 			// Is instanceof
-			instanceOfClass(refr, (VmClassType) classRef.getResolvedVmClass(),
+			instanceOfClass(refr, (VmClassType<?>) classRef.getResolvedVmClass(),
 					tmpr, result.getRegister(), null, false);
 
 			// Push result
