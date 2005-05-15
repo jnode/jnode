@@ -96,7 +96,7 @@ public class DeviceUtils {
 		try {
 			return getDeviceManager().getDevicesByAPI(apiClass);
 		} catch (NameNotFoundException ex) {
-			return Collections.EMPTY_LIST;
+			return Collections.emptyList();
 		}
 	}
 }
