@@ -6,6 +6,9 @@
   </manifest>
 
   <plugin id="org.classpath.ext"/>
+
+  <plugin id="org.apache.tools.ant"/>
+  <plugin id="org.apache.tools.ant-launcher"/>
   
   <plugin id="org.apache.jakarta.commons.net"/>
   <plugin id="org.xbill.dns"/>

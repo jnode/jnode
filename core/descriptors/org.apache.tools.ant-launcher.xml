@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.apache.tools.ant-launcher" 
+        name="Ant classes"
+        version="1.6.3"
+        provider-name="jakarta.apache.org">
+        
+  <runtime>
+    <library name="ant-launcher.jar">
+      <export name="org.apache.tools.ant.launch.*"/>
+    </library>
+  </runtime>
+  
+  <extension point="org.jnode.security.permissions">
+	<permission class="java.util.PropertyPermission" name="ant.home" actions="read"/>    
+  </extension>  
+</plugin>
