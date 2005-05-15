@@ -778,6 +778,7 @@ public abstract class AbstractGraphics extends Graphics2D {
 	 * @see java.awt.Graphics#getFontMetrics(java.awt.Font)
 	 * @return The metrics
 	 */
+    @SuppressWarnings("deprecation")
 	public FontMetrics getFontMetrics(Font font) {
 		return Toolkit.getDefaultToolkit().getFontMetrics(font);
 	}
