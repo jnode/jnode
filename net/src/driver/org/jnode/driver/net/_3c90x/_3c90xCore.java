@@ -32,7 +32,7 @@ import org.jnode.driver.net.NetworkException;
 import org.jnode.driver.net.spi.AbstractDeviceCore;
 import org.jnode.driver.pci.PCIBaseAddress;
 import org.jnode.driver.pci.PCIDevice;
-import org.jnode.driver.pci.PCIDeviceConfig;
+import org.jnode.driver.pci.PCIHeaderType0;
 import org.jnode.naming.InitialNaming;
 import org.jnode.net.HardwareAddress;
 import org.jnode.net.SocketBuffer;
@@ -439,7 +439,7 @@ public class _3c90xCore extends AbstractDeviceCore implements _3c90xConstants, I
 	 */
 	protected int getIOBase(Device device, _3c90xFlags flags) 
 	throws DriverException {
-		final PCIDeviceConfig config = ((PCIDevice)device).getConfig();
+		final PCIHeaderType0 config = ((PCIDevice)device).getConfig().asHeaderType0();
 		final PCIBaseAddress[] addrs = config.getBaseAddresses();
 		if (addrs.length < 1) {
 			throw new DriverException("Cannot find iobase: not base addresses");
@@ -457,7 +457,7 @@ public class _3c90xCore extends AbstractDeviceCore implements _3c90xConstants, I
 	 */
 	protected int getIOLength(Device device, _3c90xFlags flags)
 	throws DriverException {
-		final PCIDeviceConfig config = ((PCIDevice)device).getConfig();
+		final PCIHeaderType0 config = ((PCIDevice)device).getConfig().asHeaderType0();
 		final PCIBaseAddress[] addrs = config.getBaseAddresses();
 		if (addrs.length < 1) {
 			throw new DriverException("Cannot find iobase: not base addresses");
@@ -475,7 +475,7 @@ public class _3c90xCore extends AbstractDeviceCore implements _3c90xConstants, I
 	 */
 	protected int getIRQ(Device device, _3c90xFlags flags) 
 	throws DriverException {
-		final PCIDeviceConfig config = ((PCIDevice)device).getConfig();
+        final PCIHeaderType0 config = ((PCIDevice)device).getConfig().asHeaderType0();
 		return config.getInterruptLine();
 	}
 	

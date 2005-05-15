@@ -32,7 +32,7 @@ import org.jnode.driver.net.spi.AbstractDeviceCore;
 import org.jnode.driver.pci.PCIBaseAddress;
 import org.jnode.driver.pci.PCIConstants;
 import org.jnode.driver.pci.PCIDevice;
-import org.jnode.driver.pci.PCIDeviceConfig;
+import org.jnode.driver.pci.PCIHeaderType0;
 import org.jnode.naming.InitialNaming;
 import org.jnode.net.HardwareAddress;
 import org.jnode.net.SocketBuffer;
@@ -104,7 +104,7 @@ public class LanceCore
 		this.driver = driver;
 		this.flags = (LanceFlags) flags;
 
-		final PCIDeviceConfig config = device.getConfig();
+        final PCIHeaderType0 config = device.getConfig().asHeaderType0();
 		final int irq = config.getInterruptLine();
 
 		final PCIBaseAddress[] addrs = config.getBaseAddresses();
@@ -167,10 +167,7 @@ public class LanceCore
 				owner);
 
 		// Enable device to become a bus master on the PCI bus.
-		device.writeConfigByte(
-			PCIConstants.PCI_COMMAND,
-			device.readConfigByte(PCIConstants.PCI_COMMAND)
-				| PCIConstants.PCI_COMMAND_MASTER);
+        config.setCommand(config.getCommand() | PCIConstants.PCI_COMMAND_MASTER);
 	}
 
 	private IOAccess getIOAccess() {
