@@ -22,13 +22,9 @@
 package org.jnode.vm.memmgr.def;
 
 import java.util.TreeMap;
-import java.util.Collection;
-import java.util.Iterator;
 
 import org.jnode.util.Counter;
 import org.jnode.vm.memmgr.HeapStatistics;
-import org.jnode.vm.classmgr.VmType;
-import org.jnode.vm.classmgr.VmNormalClass;
 
 /**
  * @author Martin Husted Hartvig (hagar@jnode.org)
