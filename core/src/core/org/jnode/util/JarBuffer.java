@@ -74,6 +74,7 @@ public class JarBuffer implements JarConstants {
         return manifest;
     }
 
+    @SuppressWarnings("deprecation")
     private Map<String, ByteBuffer> readEntries() throws ZipException,
             IOException {
 

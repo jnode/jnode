@@ -43,7 +43,7 @@ public interface VMNetAPI {
      * @param netDevice
      * @return List of InetAddress instances.
      */
-    public List getInetAddresses(VMNetDevice netDevice);
+    public List<InetAddress> getInetAddresses(VMNetDevice netDevice);
 
     /**
      * Return a network device by its address
@@ -64,7 +64,7 @@ public interface VMNetAPI {
      * 
      * @return A list of VMNetDevice instances.
      */
-    public Collection getNetDevices();
+    public Collection<VMNetDevice> getNetDevices();
 
     /**
      * Gets the default local address.

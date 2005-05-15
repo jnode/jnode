@@ -24,9 +24,7 @@ package gnu.java.security.util;
 import java.security.Permission;
 import java.security.PermissionCollection;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.Vector;
-
 
 /**
  * A PermissionCollection that stores all added permissions in a list and implies
@@ -37,7 +35,7 @@ import java.util.Vector;
  */
 public class SimplePermissionCollection extends PermissionCollection {
 
-    private final Vector list = new Vector();
+    private final Vector<Permission> list = new Vector<Permission>();
     
     /**
      * @see java.security.PermissionCollection#add(java.security.Permission)
@@ -60,8 +58,7 @@ public class SimplePermissionCollection extends PermissionCollection {
      * @see java.security.PermissionCollection#implies(java.security.Permission)
      */
     public boolean implies(Permission perm) {
-        for (Iterator i = list.iterator(); i.hasNext(); ) {
-            final Permission p = (Permission)i.next();
+        for (Permission p : list) {
             if (p.implies(perm)) {
                 return true;
             }

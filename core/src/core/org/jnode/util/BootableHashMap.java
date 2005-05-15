@@ -232,6 +232,7 @@ public class BootableHashMap<K, V> extends VmSystemObject implements Map<K, V> {
 	/**
 	 * @see org.jnode.vm.VmSystemObject#verifyBeforeEmit()
 	 */
+    @SuppressWarnings("unchecked")
 	public void verifyBeforeEmit() {
 		super.verifyBeforeEmit();
 		

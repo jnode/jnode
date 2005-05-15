@@ -755,6 +755,7 @@ public final class Class<T> implements Serializable {
      * @return an array of <code>Enum</code> constants associated with this
      *         class, or null if this class is not an <code>enum</code>.
      */
+    @SuppressWarnings("unchecked")
     public T[] getEnumConstants() {
         if (isEnum()) {
             try {
@@ -790,6 +791,7 @@ public final class Class<T> implements Serializable {
      *             if obj is not an instance of this class
      * @since 1.5
      */
+    @SuppressWarnings("unchecked")
     public T cast(Object obj) {
         if ((obj != null) && !isInstance(obj)) {
             throw new ClassCastException();

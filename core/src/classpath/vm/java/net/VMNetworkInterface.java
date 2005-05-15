@@ -22,7 +22,6 @@
 package java.net;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
@@ -39,11 +38,10 @@ import java.util.Vector;
 final class VMNetworkInterface {
     public static Vector getInterfaces() throws SocketException {
         final VMNetAPI api = VMNetUtils.getAPI();
-        final Collection devs = api.getNetDevices();
-        final Vector intfs = new Vector();
-        for (Iterator i = devs.iterator(); i.hasNext(); ) {
-            final VMNetDevice dev = (VMNetDevice)i.next();
-            final List addrs = api.getInetAddresses(dev);
+        final Collection<VMNetDevice> devs = api.getNetDevices();
+        final Vector<NetworkInterface> intfs = new Vector<NetworkInterface>();
+        for (VMNetDevice dev : devs) {
+            final List<InetAddress> addrs = api.getInetAddresses(dev);
             final InetAddress[] addrArr = (InetAddress[])addrs.toArray(new InetAddress[addrs.size()]);
             // TODO re-insert next line
 //            intfs.add(new NetworkInterface(dev.getId(), addrArr));

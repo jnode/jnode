@@ -129,7 +129,7 @@ public abstract class VmField extends VmMember {
 	 * Returns the type.
 	 * @return VmClass
 	 */
-	public VmType getType() {
+	public VmType<?> getType() {
 		return type;
 	}
 	

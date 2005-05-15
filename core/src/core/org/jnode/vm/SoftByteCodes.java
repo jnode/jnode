@@ -22,6 +22,7 @@
 package org.jnode.vm;
 
 import org.jnode.util.NumberUtils;
+import org.jnode.vm.classmgr.TIBLayout;
 import org.jnode.vm.classmgr.VmArrayClass;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmConstClass;
@@ -350,8 +351,24 @@ public class SoftByteCodes implements Uninterruptible {
     public static void classCastFailed(Object object) {
         if (object == null) {
             throw new ClassCastException("Object is null");
+        } else if (false) {
+            final Object[] tib = VmMagic.getTIB(object);
+            if (tib == null) {
+                throw new ClassCastException(object.getClass().getName() + " tib==null");                
+            }
+            final Object[] superClasses = (Object[])tib[TIBLayout.SUPERCLASSES_INDEX];
+            if (superClasses == null) {
+                throw new ClassCastException(object.getClass().getName() + " superClasses==null");                                
+            }
+            final StringBuilder sb = new StringBuilder();
+            sb.append(object.getClass().getName());
+            for (Object sc : superClasses) {
+                sb.append(',');
+                sb.append(sc);
+            }
+            throw new ClassCastException(sb.toString());
         } else {
-            throw new ClassCastException(object.getClass().getName());
+            throw new ClassCastException(object.getClass().getName());              
         }
     }
     

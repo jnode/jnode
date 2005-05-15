@@ -340,6 +340,7 @@ public class BootableArrayList<T> extends VmSystemObject implements List<T>, Ran
 	/**
 	 * @see org.jnode.vm.VmSystemObject#verifyBeforeEmit()
 	 */
+    @SuppressWarnings("unchecked")
 	public void verifyBeforeEmit() {
 		super.verifyBeforeEmit();
 		if (listCache != null) {
