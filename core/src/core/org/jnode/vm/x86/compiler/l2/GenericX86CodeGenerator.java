@@ -125,7 +125,7 @@ public class GenericX86CodeGenerator<T extends X86Register> extends CodeGenerato
         for (int i = 0; i < nArgs; i += 1) {
             // TODO this might not be right, check with Ewout
             displacement = vars[i].getIndex() * 4;
-            vars[i].setLocation(new StackLocation(displacement));
+            vars[i].setLocation(new StackLocation<T>(displacement));
         }
         // not sure how big the last arg is...
         displacement += 8;
