@@ -7,8 +7,6 @@
 
   <include file="default-plugin-list.xml"/>
 
-  <plugin id="org.apache.tools.ant-launcher"/>
-
   <plugin id="charva"/>
   <plugin id="org.jnode.apps.edit"/>
   <plugin id="org.jnode.apps.charvabsh"/>
