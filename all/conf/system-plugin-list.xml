@@ -2,10 +2,11 @@
 
 <plugin-list name="system">
 
- 	<plugin id="org.apache.jakarta.log4j"/>
+    <plugin id="org.apache.jakarta.log4j"/>
     <plugin id="nanoxml"/>
+    <plugin id="mx4j"/>
     <plugin id="org.classpath.core"/>
- 
+
     <plugin id="org.jnode.runtime"/>
     <plugin id="org.jnode.runtime.core"/>
     <plugin id="org.jnode.security"/>
