@@ -134,7 +134,9 @@ class XSLURIResolver
                   }
               }
           }
-        if (in == null && url != null)
+        if (in == null)
+          {
+            if (url != null)
           {
             systemId = url.toString();
             node = (Node) nodeCache.get(systemId);
@@ -161,6 +163,12 @@ class XSLURIResolver
                 in = conn.getInputStream();
                 nodeCache.put(systemId, node);
                 lastModifiedCache.put(systemId, new Long(lastModified));
+              }
+          }
+            else
+              {
+                throw new TransformerException("can't resolve URL: " +
+                                               systemId);
               }
           }
         InputSource input = new InputSource(in);
@@ -206,6 +214,11 @@ class XSLURIResolver
             else if (href != null)
               {
                 url = new URL(href);
+              }
+            else
+              {
+                // See below
+                throw new MalformedURLException(systemId);
               }
           }
         return url;
