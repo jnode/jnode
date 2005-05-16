@@ -1,216 +1,223 @@
 <project name="JNode" default="help" basedir=".">
 
-	<!-- Include antlib -->
+    <!-- Include antlib -->
     <typedef file="${basedir}/lib/jnode.xml"/>
-			
-	<!-- JNode version -->
-	<property name="jnode-ver" value="0.2.1-dev" />
 
-	<!-- Java target and source version -->
-	<property name="java.target" value="1.5" />
-	<property name="java.source" value="1.5" />
-	<property name="java.encoding" value="US-ASCII" />
+    <!-- JNode version -->
+    <property name="jnode-ver" value="0.2.1-dev"/>
 
-	<property name="root.dir" value="${basedir}/.." />
-	<property name="build.dir" value="${basedir}/build" />
-	<property name="reports.dir" value="${build.dir}/reports" />	
-	<property name="cdroms.dir" value="${build.dir}/cdroms" />
-	<property name="descriptors.dir" value="${build.dir}/descriptors" />
-	<property name="plugins.dir" value="${build.dir}/plugins" />
-	<property name="initjars.dir" value="${build.dir}/initjars" />
-	<property name="backup.dir" value="${build.dir}/backup" />
+    <!-- Java target and source version -->
+    <property name="java.target" value="1.5"/>
+    <property name="java.source" value="1.5"/>
+    <property name="java.encoding" value="US-ASCII"/>
 
-	<property name="jnode-builder.jar" value="${build.dir}/descriptors/jnode-builder.jar" />
-	<property name="jnode-core.jar" value="${root.dir}/core/build/classes" />
-	<property name="jnode-distr.jar" value="${root.dir}/distr/build/classes" />
-	<property name="jnode-fs.jar" value="${root.dir}/fs/build/classes" />
-	<property name="jnode-gui.jar" value="${root.dir}/gui/build/classes" />
-	<property name="thinlet.jar" value="${root.dir}/gui/build/classes" />
-	<property name="jnode-textui.jar" value="${root.dir}/textui/build/classes" />
-	<property name="jnode-net.jar" value="${root.dir}/net/build/classes" />
-	<property name="jnode-shell.jar" value="${root.dir}/shell/build/classes" />
-	<property name="jnode-fonts.jar" value="${build.dir}/descriptors/jnode-fonts.jar" />
+    <property name="root.dir" value="${basedir}/.."/>
+    <property name="build.dir" value="${basedir}/build"/>
+    <property name="reports.dir" value="${build.dir}/reports"/>
+    <property name="cdroms.dir" value="${build.dir}/cdroms"/>
+    <property name="descriptors.dir" value="${build.dir}/descriptors"/>
+    <property name="plugins.dir" value="${build.dir}/plugins"/>
+    <property name="initjars.dir" value="${build.dir}/initjars"/>
+    <property name="backup.dir" value="${build.dir}/backup"/>
 
-	<property name="ant.jar" value="${root.dir}/core/lib/ant.jar" />
-	<property name="ant-launcher.jar" value="${root.dir}/core/lib/ant-launcher.jar" />	
-	<property name="commons-net.jar" value="${root.dir}/net/lib/commons-net-1.1.0.jar" />
-	<property name="dnsjava.jar" value="${root.dir}/net/lib/dnsjava-1.5.0.jar" />
-	<property name="jsch.jar" value="${root.dir}/net/lib/jsch-0.1.15.jar" />
-	<property name="junit.jar" value="${root.dir}/core/lib/junit.jar" />
+    <property name="jnode-builder.jar" value="${build.dir}/descriptors/jnode-builder.jar"/>
+    <property name="jnode-core.jar" value="${root.dir}/core/build/classes"/>
+    <property name="jnode-distr.jar" value="${root.dir}/distr/build/classes"/>
+    <property name="jnode-fs.jar" value="${root.dir}/fs/build/classes"/>
+    <property name="jnode-gui.jar" value="${root.dir}/gui/build/classes"/>
+    <property name="thinlet.jar" value="${root.dir}/gui/build/classes"/>
+    <property name="jnode-textui.jar" value="${root.dir}/textui/build/classes"/>
+    <property name="jnode-net.jar" value="${root.dir}/net/build/classes"/>
+    <property name="jnode-shell.jar" value="${root.dir}/shell/build/classes"/>
+    <property name="jnode-fonts.jar" value="${build.dir}/descriptors/jnode-fonts.jar"/>
 
-	<!-- libraries needed to run tests -->
-	<property name="jmock-cglib.jar" value="${root.dir}/core/lib/jmock-cglib-1.0.1.jar" />
-	<property name="jmock.jar" value="${root.dir}/core/lib/jmock-1.0.1.jar" />
-	<property name="cglib.jar" value="${root.dir}/core/lib/cglib-2.1.jar" />	
-	<property name="asm.jar" value="${root.dir}/core/lib/asm.jar" />	
-	
-	<property name="log4j.jar" value="${root.dir}/core/lib/log4j-1.2.8.jar" />
-	<property name="nanoxml.jar" value="${root.dir}/core/lib/nanoxml-lite-2.2.3.jar" />
-	<property name="gnu-crypto.jar" value="${root.dir}/core/lib/gnu-crypto.jar" />
-	<property name="javax-crypto.jar" value="${root.dir}/core/lib/javax-crypto.jar" />
-	<!-- property name="javax-security.jar" value="${root.dir}/core/lib/javax-security.jar" / -->
-	<property name="beanshell.jar" value="${root.dir}/shell/lib/bsh-2.0b1.jar" />
+    <property name="mx4j.jar" value="${root.dir}/core/lib/mx4j.jar"/>
+    <property name="mx4j-remote.jar" value="${root.dir}/core/lib/mx4j-remote.jar"/>
 
-	<!-- libraries needed to check plugin dependencies -->
-	<property name="classycle.jar" value="${root.dir}/builder/lib/classycle.jar" />	
+    <property name="ant.jar" value="${root.dir}/core/lib/ant.jar"/>
+    <property name="ant-launcher.jar" value="${root.dir}/core/lib/ant-launcher.jar"/>
+    <property name="commons-net.jar" value="${root.dir}/net/lib/commons-net-1.1.0.jar"/>
+    <property name="dnsjava.jar" value="${root.dir}/net/lib/dnsjava-1.5.0.jar"/>
+    <property name="jsch.jar" value="${root.dir}/net/lib/jsch-0.1.15.jar"/>
+    <property name="junit.jar" value="${root.dir}/core/lib/junit.jar"/>
 
-	<!-- libraries needed to check rules in source code -->	
-	<property name="pmd.jar" value="${root.dir}/builder/lib/pmd/pmd-3.0.jar" />		
-	<property name="jaxen.jar" value="${root.dir}/builder/lib/pmd/jaxen-core-1.0-fcs.jar" />
-	<property name="saxpath.jar" value="${root.dir}/builder/lib/pmd/saxpath-1.0-fcs.jar" />
-	<property name="xerces.jar" value="${root.dir}/builder/lib/pmd/xercesImpl-2.6.2.jar" />
-	<property name="xmlParserAPIs.jar" value="${root.dir}/builder/pmd/lib/xmlParserAPIs-2.6.2.jar" />
+    <!-- libraries needed to run tests -->
+    <property name="jmock-cglib.jar" value="${root.dir}/core/lib/jmock-cglib-1.0.1.jar"/>
+    <property name="jmock.jar" value="${root.dir}/core/lib/jmock-1.0.1.jar"/>
+    <property name="cglib.jar" value="${root.dir}/core/lib/cglib-2.1.jar"/>
+    <property name="asm.jar" value="${root.dir}/core/lib/asm.jar"/>
 
-	<!-- lists of plugins to use while booting -->
-	<property name="default-plugin-list" value="${basedir}/conf/default-plugin-list.xml" />
-	<property name="full-plugin-list" value="${basedir}/conf/full-plugin-list.xml" />
-	<property name="install-plugin-list" value="${basedir}/conf/install-plugin-list.xml" />
-	<property name="system-plugin-list" value="${basedir}/conf/system-plugin-list.xml" />
-	<property name="sources.dist.tar.gz" value="${build.dir}/jnodesources-${jnode-ver}.tar.gz" />
-	<property name="jnode-x86.iso" value="${cdroms.dir}/jnode-x86.iso" />
-	<property name="jnode-x86-lite.iso" value="${cdroms.dir}/jnode-x86-lite.iso" />
-	
-	<path id="cp">
-		<pathelement location="${ant.jar}" />
-		<pathelement location="${junit.jar}" />
-		<pathelement location="${jmock.jar}" />
-		<pathelement location="${jmock-cglib.jar}" />
-		<pathelement location="${asm.jar}" />
-		<pathelement location="${cglib.jar}" />		
-		<pathelement location="${log4j.jar}" />
-		<pathelement location="${nanoxml.jar}" />
-		<pathelement location="${gnu-crypto.jar}" />
-		<pathelement location="${javax-crypto.jar}" />
-		<pathelement location="${basedir}/conf" />
-		<pathelement location="${beanshell.jar}" />
-	</path>
+    <property name="log4j.jar" value="${root.dir}/core/lib/log4j-1.2.8.jar"/>
+    <property name="nanoxml.jar" value="${root.dir}/core/lib/nanoxml-lite-2.2.3.jar"/>
+    <property name="gnu-crypto.jar" value="${root.dir}/core/lib/gnu-crypto.jar"/>
+    <property name="javax-crypto.jar" value="${root.dir}/core/lib/javax-crypto.jar"/>
+    <!-- property name="javax-security.jar" value="${root.dir}/core/lib/javax-security.jar" / -->
+    <property name="beanshell.jar" value="${root.dir}/shell/lib/bsh-2.0b1.jar"/>
 
-	<path id="cp-jnode">
-		<pathelement location="${jnode-builder.jar}" />
-		<pathelement location="${jnode-core.jar}" />
-		<pathelement location="${jnode-distr.jar}" />
-		<pathelement location="${jnode-fs.jar}" />
-		<pathelement location="${jnode-shell.jar}" />
-		<pathelement location="${jnode-net.jar}" />
-		<pathelement location="${jnode-gui.jar}" />
-		<pathelement location="${thinlet.jar}" />
-		<pathelement location="${jnode-textui.jar}" />
-		<pathelement location="${classycle.jar}" />
-		<path refid="cp" />
-	</path>
+    <!-- libraries needed to check plugin dependencies -->
+    <property name="classycle.jar" value="${root.dir}/builder/lib/classycle.jar"/>
+
+    <!-- libraries needed to check rules in source code -->
+    <property name="pmd.jar" value="${root.dir}/builder/lib/pmd/pmd-3.0.jar"/>
+    <property name="jaxen.jar" value="${root.dir}/builder/lib/pmd/jaxen-core-1.0-fcs.jar"/>
+    <property name="saxpath.jar" value="${root.dir}/builder/lib/pmd/saxpath-1.0-fcs.jar"/>
+    <property name="xerces.jar" value="${root.dir}/builder/lib/pmd/xercesImpl-2.6.2.jar"/>
+    <property name="xmlParserAPIs.jar" value="${root.dir}/builder/pmd/lib/xmlParserAPIs-2.6.2.jar"/>
+
+    <!-- lists of plugins to use while booting -->
+    <property name="default-plugin-list" value="${basedir}/conf/default-plugin-list.xml"/>
+    <property name="full-plugin-list" value="${basedir}/conf/full-plugin-list.xml"/>
+    <property name="install-plugin-list" value="${basedir}/conf/install-plugin-list.xml"/>
+    <property name="system-plugin-list" value="${basedir}/conf/system-plugin-list.xml"/>
+    <property name="sources.dist.tar.gz" value="${build.dir}/jnodesources-${jnode-ver}.tar.gz"/>
+    <property name="jnode-x86.iso" value="${cdroms.dir}/jnode-x86.iso"/>
+    <property name="jnode-x86-lite.iso" value="${cdroms.dir}/jnode-x86-lite.iso"/>
+
+    <path id="cp">
+        <pathelement location="${ant.jar}"/>
+        <pathelement location="${junit.jar}"/>
+        <pathelement location="${jmock.jar}"/>
+        <pathelement location="${jmock-cglib.jar}"/>
+        <pathelement location="${asm.jar}"/>
+        <pathelement location="${cglib.jar}"/>
+        <pathelement location="${log4j.jar}"/>
+        <pathelement location="${nanoxml.jar}"/>
+        <pathelement location="${gnu-crypto.jar}"/>
+        <pathelement location="${javax-crypto.jar}"/>
+        <pathelement location="${basedir}/conf"/>
+        <pathelement location="${beanshell.jar}"/>
+    </path>
+
+    <path id="cp-jnode">
+        <pathelement location="${jnode-builder.jar}"/>
+        <pathelement location="${jnode-core.jar}"/>
+        <pathelement location="${jnode-distr.jar}"/>
+        <pathelement location="${jnode-fs.jar}"/>
+        <pathelement location="${jnode-shell.jar}"/>
+        <pathelement location="${jnode-net.jar}"/>
+        <pathelement location="${jnode-gui.jar}"/>
+        <pathelement location="${thinlet.jar}"/>
+        <pathelement location="${jnode-textui.jar}"/>
+        <pathelement location="${classycle.jar}"/>
+        <pathelement location="${mx4j.jar}"/>
+        <pathelement location="${mx4j-remote.jar}"/>
+        <path refid="cp"/>
+    </path>
 
 
-	<filterset id="descriptors-filter">
-		<filter token="PROVIDER" value="JNode.org" />
-		<filter token="VERSION" value="${jnode-ver}" />
-	</filterset>
+    <filterset id="descriptors-filter">
+        <filter token="PROVIDER" value="JNode.org"/>
+        <filter token="VERSION" value="${jnode-ver}"/>
+    </filterset>
 
-	<patternset id="exts">
-		<include name="**/*.dat" />
-		<include name="**/*.ids" />
-		<include name="**/*.properties" />
-		<include name="**/*.xml" />
-	</patternset>
-	
-	<target name="prepare">
-     	<!-- Initialize all project directories -->
-		<property file="${root.dir}/jnode.properties" />
-		<!-- Set overwritable properties -->
-		<property name="jnode.memmgr.plugin.id" value="org.jnode.vm.memmgr.def"/>		
-		<property name="compilerarg" value="-nowarn" />
-		
-		<!-- Initialize timestamp -->
-		<tstamp />
-		
-		<!-- Create basic build directories -->
-		<mkdir dir="${build.dir}" />
-		<mkdir dir="${reports.dir}" />
-		<mkdir dir="${cdroms.dir}" />
-		<mkdir dir="${descriptors.dir}" />
-		<mkdir dir="${plugins.dir}" />
-		<mkdir dir="${initjars.dir}" />
-	</target>
+    <patternset id="exts">
+        <include name="**/*.dat"/>
+        <include name="**/*.ids"/>
+        <include name="**/*.properties"/>
+        <include name="**/*.xml"/>
+    </patternset>
 
-	<!-- Call the assemble target of all subprojects -->
-	<target name="assemble-projects" depends="prepare">
-		<jnode.antall target="assemble"/>
-	</target>
-	
-	<!-- Assemble all plugins -->
-	<target name="assemble-plugins" depends="assemble-projects">
-		<!-- Now assemble all plugins -->
-		<taskdef name="plugin" classname="org.jnode.build.PluginTask" classpathref="cp-jnode" />
-		<plugin todir="${plugins.dir}" tmpdir="${build.dir}/tmp/plugins" pluginDir="${descriptors.dir}">
-			<libalias name="jnode-core.jar" alias="${jnode-core.jar}" />
-			<libalias name="jnode-distr.jar" alias="${jnode-distr.jar}" />
-			<libalias name="jnode-fs.jar" alias="${jnode-fs.jar}" />
-			<libalias name="jnode-gui.jar" alias="${jnode-gui.jar}" />
-			<libalias name="thinlet.jar" alias="${thinlet.jar}" />
-			<libalias name="jnode-textui.jar" alias="${jnode-textui.jar}" />
-			<libalias name="jnode-net.jar" alias="${jnode-net.jar}" />
-			<libalias name="jnode-shell.jar" alias="${jnode-shell.jar}" />
+    <target name="prepare">
+        <!-- Initialize all project directories -->
+        <property file="${root.dir}/jnode.properties"/>
+        <!-- Set overwritable properties -->
+        <property name="jnode.memmgr.plugin.id" value="org.jnode.vm.memmgr.def"/>
+        <property name="compilerarg" value="-nowarn"/>
 
-			<libalias name="commons-net-1.1.0.jar" alias="${commons-net.jar}" />
-			<libalias name="dnsjava-1.5.0.jar" alias="${dnsjava.jar}" />
-			<libalias name="jsch-0.1.15.jar" alias="${jsch.jar}" />
-			<libalias name="nanoxml.jar" alias="${nanoxml.jar}" />
-			<libalias name="gnu-crypto.jar" alias="${gnu-crypto.jar}" />
-			<libalias name="javax-crypto.jar" alias="${javax-crypto.jar}" />
-			<libalias name="log4j.jar" alias="${log4j.jar}" />
-			<libalias name="beanshell.jar" alias="${beanshell.jar}" />
-			<libalias name="lw.jar" alias="${lw.jar}" />
-			
-			<libalias name="junit.jar" alias="${junit.jar}" />
-			<libalias name="jmock-1.0.1.jar" alias="${jmock.jar}" />
-			<libalias name="jmock-cglib-1.0.1.jar" alias="${jmock-cglib.jar}" />
-			<libalias name="asm.jar" alias="${asm.jar}" />
-			<libalias name="cglib.jar" alias="${cglib.jar}" />		
-			
-			<libalias name="ant.jar" alias="${ant.jar}" />
-			<libalias name="ant-commons-net.jar" alias="${ant-commons-net.jar}" />
-			<libalias name="ant-launcher.jar" alias="${ant-launcher.jar}" />
-			<libalias name="ant-trax.jar" alias="${ant-trax.jar}" />
-			<descriptors dir="${descriptors.dir}/">
-				<include name="*.xml" />
-				<exclude name="*plugin-list.xml" />
-			</descriptors>
-		</plugin>
-	</target>
+        <!-- Initialize timestamp -->
+        <tstamp/>
 
-	<!-- Assemble all default initjars -->
-	<target name="assemble-default-initjars" depends="assemble-plugins" unless="no.default.initjars">
-		<!-- Build all default initjar's -->
-		<taskdef name="initjars" classname="org.jnode.build.InitJarsBuilder" classpathref="cp-jnode" />
-		<initjars destdir="${initjars.dir}" 
-			      pluginDir="${plugins.dir}"
-				  systemPluginList="${basedir}/conf/system-plugin-list.xml">
-			<fileset dir="${basedir}/conf">
-				<exclude name="system-plugin-list.xml"/>
-				<include name="*plugin-list.xml"/>
-			</fileset>
-		</initjars>
-	</target>
-	
-	<!-- Assemble all custom initjars -->
-	<target name="assemble-custom-initjars" depends="assemble-plugins" if="custom.plugin-list.dir">
-		<!-- Build all custom initjar's -->
-		<taskdef name="initjars" classname="org.jnode.build.InitJarsBuilder" classpathref="cp-jnode" />
-		<initjars destdir="${initjars.dir}" 
-			      pluginDir="${plugins.dir}"
-     			  systemPluginList="${basedir}/conf/system-plugin-list.xml">
-			<fileset dir="${custom.plugin-list.dir}">
-				<include name="*plugin-list.xml"/>
-			</fileset>
-		</initjars>
-	</target>
-	
-	<!-- Assemble all subprojects, plugins and initjars -->
-	<target name="assemble" depends="assemble-default-initjars, assemble-custom-initjars">
-	</target>
+        <!-- Create basic build directories -->
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${reports.dir}"/>
+        <mkdir dir="${cdroms.dir}"/>
+        <mkdir dir="${descriptors.dir}"/>
+        <mkdir dir="${plugins.dir}"/>
+        <mkdir dir="${initjars.dir}"/>
+    </target>
 
-	<!-- Give help on possible targets -->
-	<target name="help">
-		<echo>
+    <!-- Call the assemble target of all subprojects -->
+    <target name="assemble-projects" depends="prepare">
+        <jnode.antall target="assemble"/>
+    </target>
+
+    <!-- Assemble all plugins -->
+    <target name="assemble-plugins" depends="assemble-projects">
+        <!-- Now assemble all plugins -->
+        <taskdef name="plugin" classname="org.jnode.build.PluginTask" classpathref="cp-jnode"/>
+        <plugin todir="${plugins.dir}" tmpdir="${build.dir}/tmp/plugins" pluginDir="${descriptors.dir}">
+            <libalias name="jnode-core.jar" alias="${jnode-core.jar}"/>
+            <libalias name="jnode-distr.jar" alias="${jnode-distr.jar}"/>
+            <libalias name="jnode-fs.jar" alias="${jnode-fs.jar}"/>
+            <libalias name="jnode-gui.jar" alias="${jnode-gui.jar}"/>
+            <libalias name="thinlet.jar" alias="${thinlet.jar}"/>
+            <libalias name="jnode-textui.jar" alias="${jnode-textui.jar}"/>
+            <libalias name="jnode-net.jar" alias="${jnode-net.jar}"/>
+            <libalias name="jnode-shell.jar" alias="${jnode-shell.jar}"/>
+            <libalias name="mx4j.jar" alias="${mx4j.jar}"/>
+            <libalias name="mx4j-remote.jar" alias="${mx4j-remote.jar}"/>
+
+            <libalias name="commons-net-1.1.0.jar" alias="${commons-net.jar}"/>
+            <libalias name="dnsjava-1.5.0.jar" alias="${dnsjava.jar}"/>
+            <libalias name="jsch-0.1.15.jar" alias="${jsch.jar}"/>
+            <libalias name="nanoxml.jar" alias="${nanoxml.jar}"/>
+            <libalias name="gnu-crypto.jar" alias="${gnu-crypto.jar}"/>
+            <libalias name="javax-crypto.jar" alias="${javax-crypto.jar}"/>
+            <libalias name="log4j.jar" alias="${log4j.jar}"/>
+            <libalias name="beanshell.jar" alias="${beanshell.jar}"/>
+            <libalias name="lw.jar" alias="${lw.jar}"/>
+
+            <libalias name="junit.jar" alias="${junit.jar}"/>
+            <libalias name="jmock-1.0.1.jar" alias="${jmock.jar}"/>
+            <libalias name="jmock-cglib-1.0.1.jar" alias="${jmock-cglib.jar}"/>
+            <libalias name="asm.jar" alias="${asm.jar}"/>
+            <libalias name="cglib.jar" alias="${cglib.jar}"/>
+
+            <libalias name="ant.jar" alias="${ant.jar}"/>
+            <libalias name="ant-commons-net.jar" alias="${ant-commons-net.jar}"/>
+            <libalias name="ant-launcher.jar" alias="${ant-launcher.jar}"/>
+            <libalias name="ant-trax.jar" alias="${ant-trax.jar}"/>
+            <descriptors dir="${descriptors.dir}/">
+                <include name="*.xml"/>
+                <exclude name="*plugin-list.xml"/>
+            </descriptors>
+        </plugin>
+    </target>
+
+    <!-- Assemble all default initjars -->
+    <target name="assemble-default-initjars" depends="assemble-plugins" unless="no.default.initjars">
+        <!-- Build all default initjar's -->
+        <taskdef name="initjars" classname="org.jnode.build.InitJarsBuilder" classpathref="cp-jnode"/>
+        <initjars destdir="${initjars.dir}"
+            pluginDir="${plugins.dir}"
+            systemPluginList="${basedir}/conf/system-plugin-list.xml">
+            <fileset dir="${basedir}/conf">
+                <exclude name="system-plugin-list.xml"/>
+                <include name="*plugin-list.xml"/>
+            </fileset>
+        </initjars>
+    </target>
+
+    <!-- Assemble all custom initjars -->
+    <target name="assemble-custom-initjars" depends="assemble-plugins" if="custom.plugin-list.dir">
+        <!-- Build all custom initjar's -->
+        <taskdef name="initjars" classname="org.jnode.build.InitJarsBuilder" classpathref="cp-jnode"/>
+        <initjars destdir="${initjars.dir}"
+            pluginDir="${plugins.dir}"
+            systemPluginList="${basedir}/conf/system-plugin-list.xml">
+            <fileset dir="${custom.plugin-list.dir}">
+                <include name="*plugin-list.xml"/>
+            </fileset>
+        </initjars>
+    </target>
+
+    <!-- Assemble all subprojects, plugins and initjars -->
+    <target name="assemble" depends="assemble-default-initjars, assemble-custom-initjars">
+    </target>
+
+    <!-- Give help on possible targets -->
+    <target name="help">
+        <echo>
 Welcome to the JNode build system.
 			
 You can use this build system to perform various tasks, 
@@ -236,349 +243,349 @@ encoding-fix   Correct the file encoding of all java source files.
 javadoc        Generate documentation of all java source files.
 javadoc-small  Generate documentation of the basic JNode api's.
 			
-clean          Remove all intermediate build results.			
-		</echo>
-	</target>
+clean          Remove all intermediate build results.
+        </echo>
+    </target>
 
-	<!-- Macro used to call the x86 build script -->
-	<macrodef name="x86-build">
-		<attribute name="bits"/>
-		<attribute name="target" default="all"/>
-		<sequential>
-			<ant antfile="build-x86.xml" inheritall="on" inheritrefs="on" target="@{target}">
-				<property name="jnode.bits" value="@{bits}"/>
-			</ant>
-		</sequential>
-	</macrodef>
-	
-	<!-- Create the X86 32-bit boot image -->
-	<target name="x86" depends="assemble">
-		<x86-build bits="32"/>
-	</target>
+    <!-- Macro used to call the x86 build script -->
+    <macrodef name="x86-build">
+        <attribute name="bits"/>
+        <attribute name="target" default="all"/>
+        <sequential>
+            <ant antfile="build-x86.xml" inheritall="on" inheritrefs="on" target="@{target}">
+                <property name="jnode.bits" value="@{bits}"/>
+            </ant>
+        </sequential>
+    </macrodef>
 
-	<!-- Create the X86 64-bit boot image-->
-	<target name="x86_64" depends="assemble">
-		<x86-build bits="64"/>
-	</target>
+    <!-- Create the X86 32-bit boot image -->
+    <target name="x86" depends="assemble">
+        <x86-build bits="32"/>
+    </target>
 
-	<!-- Build the boot files for windows NT/2K/XP (with NTLDR) -->
-	<target name="boot-files-winNT" depends="assemble">
-		<x86-build bits="32" target="boot-files-winNT"/>
-	</target>
+    <!-- Create the X86 64-bit boot image-->
+    <target name="x86_64" depends="assemble">
+        <x86-build bits="64"/>
+    </target>
 
-	<!-- Create a bootable CDROM image containing all x86 bootable images and the sources -->
-	<target name="cd-x86" depends="assemble">
-		<tar destfile="${sources.dist.tar.gz}" compression="gzip" basedir="${root.dir}" excludes="*/build/**" />
-		<x86-build bits="32" target="java-image"/>
-		<x86-build bits="64" target="java-image"/>
-		<ant antfile="build-x86.xml" inheritall="true" inheritrefs="true" target="cdrom" />
-	</target>
+    <!-- Build the boot files for windows NT/2K/XP (with NTLDR) -->
+    <target name="boot-files-winNT" depends="assemble">
+        <x86-build bits="32" target="boot-files-winNT"/>
+    </target>
 
-	<!-- Create a bootable CDROM image for x86 32-bits -->
-	<target name="cd-x86-lite" depends="assemble">
-		<x86-build bits="32" target="java-image"/>
-		<ant antfile="build-x86.xml" inheritall="true" inheritrefs="true" target="cdrom-lite" />
-	</target>
+    <!-- Create a bootable CDROM image containing all x86 bootable images and the sources -->
+    <target name="cd-x86" depends="assemble">
+        <tar destfile="${sources.dist.tar.gz}" compression="gzip" basedir="${root.dir}" excludes="*/build/**"/>
+        <x86-build bits="32" target="java-image"/>
+        <x86-build bits="64" target="java-image"/>
+        <ant antfile="build-x86.xml" inheritall="true" inheritrefs="true" target="cdrom"/>
+    </target>
 
-	<!-- Create a bootable CDROM image for x86 64-bits -->
-	<target name="cd-x86_64-lite" depends="assemble">
-		<x86-build bits="64" target="java-image"/>
-		<ant antfile="build-x86.xml" inheritall="true" inheritrefs="true" target="cdrom-lite" />
-	</target>
+    <!-- Create a bootable CDROM image for x86 32-bits -->
+    <target name="cd-x86-lite" depends="assemble">
+        <x86-build bits="32" target="java-image"/>
+        <ant antfile="build-x86.xml" inheritall="true" inheritrefs="true" target="cdrom-lite"/>
+    </target>
 
-	<!-- Upload a distribution -->
-	<target name="upload">
-		<property name="upload.dir" value="${build.dir}/upload" />
-		<mkdir dir="${upload.dir}" />
-		<gzip src="${jnode-x86.iso}" destfile="${upload.dir}/jnode-x86-${jnode-ver}.iso.gz" />
-		<copy todir="${upload.dir}" file="${sources.dist.tar.gz}" />
-		<ftp server="upload.sourceforge.net" remotedir="incoming" passive="yes" newer="yes" verbose="yes" userid="ftp" password="ftp">
-			<fileset dir="${upload.dir}" />
-		</ftp>
-	</target>
+    <!-- Create a bootable CDROM image for x86 64-bits -->
+    <target name="cd-x86_64-lite" depends="assemble">
+        <x86-build bits="64" target="java-image"/>
+        <ant antfile="build-x86.xml" inheritall="true" inheritrefs="true" target="cdrom-lite"/>
+    </target>
 
-	<!-- Clean everything files -->
-	<target name="clean">
-		<jnode.antall target="clean"/>
-		<delete dir="${build.dir}" quiet="on" />
-	</target>
+    <!-- Upload a distribution -->
+    <target name="upload">
+        <property name="upload.dir" value="${build.dir}/upload"/>
+        <mkdir dir="${upload.dir}"/>
+        <gzip src="${jnode-x86.iso}" destfile="${upload.dir}/jnode-x86-${jnode-ver}.iso.gz"/>
+        <copy todir="${upload.dir}" file="${sources.dist.tar.gz}"/>
+        <ftp server="upload.sourceforge.net" remotedir="incoming" passive="yes" newer="yes" verbose="yes" userid="ftp" password="ftp">
+            <fileset dir="${upload.dir}"/>
+        </ftp>
+    </target>
 
-	<!-- Generate only the basic api javadoc files -->
-	<target name="javadoc-small">
-		<jnode.javadoc destdir="${build.dir}/javadoc/small">
-			<sourcepath>
-				<pathelement location="${root.dir}/core/src/classpath/gnu" />
-				<pathelement location="${root.dir}/core/src/classpath/java" />
-				<pathelement location="${root.dir}/core/src/classpath/javax" />
-				<pathelement location="${root.dir}/core/src/classpath/org" />
-				<pathelement location="${root.dir}/core/src/classpath/5.0" />
-				<pathelement location="${root.dir}/core/src/classpath/ext" />
-				<pathelement location="${root.dir}/core/src/classpath/vm" />
-				<pathelement location="${root.dir}/core/src/core" />
-				<pathelement location="${root.dir}/core/src/driver" />
-			</sourcepath>
-			<package name="org.jnode.driver" />
-			<package name="org.jnode.naming" />
-			<package name="org.jnode.plugin" />
-			<package name="org.jnode.system" />
-			<bootclasspath refid="cp" />
-		</jnode.javadoc>
-	</target>
+    <!-- Clean everything files -->
+    <target name="clean">
+        <jnode.antall target="clean"/>
+        <delete dir="${build.dir}" quiet="on"/>
+    </target>
 
-	<!-- Generate only the MMTk api javadoc files -->
-	<target name="javadoc-mmtk">
-		<jnode.javadoc destdir="${build.dir}/javadoc/mmtk">
-			<sourcepath>
-				<pathelement location="${root.dir}/core/src/vmmagic" />
-				<pathelement location="${root.dir}/core/src/mmtk" />
-				<pathelement location="${root.dir}/core/src/mmtk-vm" />
-			</sourcepath>
-			<package name="org.mmtk.*" />
-			<package name="org.jnode.vm.memmgr.mmtk.*" />
-			<package name="org.vmmagic.*" />
-			<classpath refid="cp" />
-		</jnode.javadoc>
-	</target>
+    <!-- Generate only the basic api javadoc files -->
+    <target name="javadoc-small">
+        <jnode.javadoc destdir="${build.dir}/javadoc/small">
+            <sourcepath>
+                <pathelement location="${root.dir}/core/src/classpath/gnu"/>
+                <pathelement location="${root.dir}/core/src/classpath/java"/>
+                <pathelement location="${root.dir}/core/src/classpath/javax"/>
+                <pathelement location="${root.dir}/core/src/classpath/org"/>
+                <pathelement location="${root.dir}/core/src/classpath/5.0"/>
+                <pathelement location="${root.dir}/core/src/classpath/ext"/>
+                <pathelement location="${root.dir}/core/src/classpath/vm"/>
+                <pathelement location="${root.dir}/core/src/core"/>
+                <pathelement location="${root.dir}/core/src/driver"/>
+            </sourcepath>
+            <package name="org.jnode.driver"/>
+            <package name="org.jnode.naming"/>
+            <package name="org.jnode.plugin"/>
+            <package name="org.jnode.system"/>
+            <bootclasspath refid="cp"/>
+        </jnode.javadoc>
+    </target>
 
-	<!-- Generate all javadoc files -->
-	<target name="javadoc">
-		<jnode.javadoc destdir="${build.dir}/javadoc/full">
-			<sourcepath>
-				<pathelement location="${root.dir}/core/src/classpath/gnu" />
-				<pathelement location="${root.dir}/core/src/classpath/java" />
-				<pathelement location="${root.dir}/core/src/classpath/javax" />
-				<pathelement location="${root.dir}/core/src/classpath/org" />
-				<pathelement location="${root.dir}/core/src/classpath/5.0" />
-				<pathelement location="${root.dir}/core/src/classpath/ext" />
-				<pathelement location="${root.dir}/core/src/classpath/vm" />
-				<pathelement location="${root.dir}/core/src/core" />
-				<pathelement location="${root.dir}/core/src/driver" />
-				<pathelement location="${root.dir}/core/src/mmtk" />
-				<pathelement location="${root.dir}/core/src/mmtk-vm" />
-				<pathelement location="${root.dir}/core/src/vmmagic" />
-				<pathelement location="${root.dir}/distr/src/install" />
-				<pathelement location="${root.dir}/fs/src/fs" />
-				<pathelement location="${root.dir}/fs/src/fs" />
-				<pathelement location="${root.dir}/fs/src/driver" />
-				<pathelement location="${root.dir}/gui/src/awt" />
-				<pathelement location="${root.dir}/gui/src/driver" />
-				<pathelement location="${root.dir}/net/src/net" />
-				<pathelement location="${root.dir}/net/src/driver" />
-				<pathelement location="${root.dir}/shell/src/shell" />
-			</sourcepath>
-			<package name="org.jnode.*" />
-			<package name="org.mmtk.*" />
-			<package name="org.vmmagic.*" />
-			<bootclasspath refid="cp" />
-		</jnode.javadoc>
-	</target>
+    <!-- Generate only the MMTk api javadoc files -->
+    <target name="javadoc-mmtk">
+        <jnode.javadoc destdir="${build.dir}/javadoc/mmtk">
+            <sourcepath>
+                <pathelement location="${root.dir}/core/src/vmmagic"/>
+                <pathelement location="${root.dir}/core/src/mmtk"/>
+                <pathelement location="${root.dir}/core/src/mmtk-vm"/>
+            </sourcepath>
+            <package name="org.mmtk.*"/>
+            <package name="org.jnode.vm.memmgr.mmtk.*"/>
+            <package name="org.vmmagic.*"/>
+            <classpath refid="cp"/>
+        </jnode.javadoc>
+    </target>
 
-	<!-- Backup CVS files -->
-	<target name="backup">
-		<mkdir dir="${backup.dir}" />
-		<tstamp>
-			<format property="date" pattern="dd-MM-yyyy" />
-		</tstamp>
-		<get src="http://cvs.sourceforge.net/cvstarballs/jnode-cvsroot.tar.bz2" dest="${backup.dir}/jnode-cvsroot-${date}.tar.bz2" usetimestamp="true" verbose="true" />
-	</target>
+    <!-- Generate all javadoc files -->
+    <target name="javadoc">
+        <jnode.javadoc destdir="${build.dir}/javadoc/full">
+            <sourcepath>
+                <pathelement location="${root.dir}/core/src/classpath/gnu"/>
+                <pathelement location="${root.dir}/core/src/classpath/java"/>
+                <pathelement location="${root.dir}/core/src/classpath/javax"/>
+                <pathelement location="${root.dir}/core/src/classpath/org"/>
+                <pathelement location="${root.dir}/core/src/classpath/5.0"/>
+                <pathelement location="${root.dir}/core/src/classpath/ext"/>
+                <pathelement location="${root.dir}/core/src/classpath/vm"/>
+                <pathelement location="${root.dir}/core/src/core"/>
+                <pathelement location="${root.dir}/core/src/driver"/>
+                <pathelement location="${root.dir}/core/src/mmtk"/>
+                <pathelement location="${root.dir}/core/src/mmtk-vm"/>
+                <pathelement location="${root.dir}/core/src/vmmagic"/>
+                <pathelement location="${root.dir}/distr/src/install"/>
+                <pathelement location="${root.dir}/fs/src/fs"/>
+                <pathelement location="${root.dir}/fs/src/fs"/>
+                <pathelement location="${root.dir}/fs/src/driver"/>
+                <pathelement location="${root.dir}/gui/src/awt"/>
+                <pathelement location="${root.dir}/gui/src/driver"/>
+                <pathelement location="${root.dir}/net/src/net"/>
+                <pathelement location="${root.dir}/net/src/driver"/>
+                <pathelement location="${root.dir}/shell/src/shell"/>
+            </sourcepath>
+            <package name="org.jnode.*"/>
+            <package name="org.mmtk.*"/>
+            <package name="org.vmmagic.*"/>
+            <bootclasspath refid="cp"/>
+        </jnode.javadoc>
+    </target>
 
-	<!-- Compare classpath version of jnode with real classpath version -->
-	<target name="cp-compare" depends="assemble">
-		<taskdef name="cp-compare" classname="org.jnode.ant.taskdefs.classpath.CompareTask" classpathref="cp-jnode" />
+    <!-- Backup CVS files -->
+    <target name="backup">
+        <mkdir dir="${backup.dir}"/>
+        <tstamp>
+            <format property="date" pattern="dd-MM-yyyy"/>
+        </tstamp>
+        <get src="http://cvs.sourceforge.net/cvstarballs/jnode-cvsroot.tar.bz2" dest="${backup.dir}/jnode-cvsroot-${date}.tar.bz2" usetimestamp="true" verbose="true"/>
+    </target>
 
-		<patternset id="cp-sources-pattern">
-			<exclude name="compat/**/*" />
-			<exclude name="examples/**/*" />
-			<exclude name="external/**/*" />
-			<exclude name="gnu/java/awt/peer/gtk/**/*" />
-			<exclude name="gnu/javax/swing/plaf/gtk/**/*" />
-			<exclude name="gnu/test/**/*" />
-			<exclude name="gnu/xml/libxmlj/**/*" />
-			<exclude name="test/**/*" />
-			<exclude name="testsuite/**/*" />
-			<exclude name="vm/reference/**/*" />
-		</patternset>
-		
-		<delete dir="${build.dir}/classpath-compare" />
-		<cp-compare destdir="${build.dir}/classpath-compare">
-			<vmsources>
-				<fileset dir="${root.dir}/core/src/classpath/gnu" includes="**/*.java" />
-				<fileset dir="${root.dir}/core/src/classpath/java" includes="**/*.java" />
-				<fileset dir="${root.dir}/core/src/classpath/javax" includes="**/*.java" />
-				<fileset dir="${root.dir}/core/src/classpath/org" includes="**/*.java" />
-				<fileset dir="${root.dir}/core/src/classpath/5.0" includes="**/*.java" target="1.5"/>
-			</vmsources>
-			<vmspecificsources>
-				<fileset dir="${root.dir}/core/src/classpath/vm" includes="**/*.java" />
-			</vmspecificsources>
-			<classpathsources>
-				<fileset dir="${root.dir}/../classpath" includes="**/*.java">
-					<patternset refid="cp-sources-pattern"/>
-				</fileset>
-				<fileset dir="${root.dir}/../classpath-5.0" 
-					     includes="**/*.java" 
-					 	 target="1.5"
-						 ignoremissing="on">
-					<patternset refid="cp-sources-pattern"/>
-				</fileset>
-				<fileset dir="${root.dir}/../classpath/external/w3c_dom" includes="**/*.java">
-				</fileset>
-				<fileset dir="${root.dir}/../classpath/external/sax" includes="**/*.java">
-				</fileset>
-			</classpathsources>
-		</cp-compare>
-	</target>
+    <!-- Compare classpath version of jnode with real classpath version -->
+    <target name="cp-compare" depends="assemble">
+        <taskdef name="cp-compare" classname="org.jnode.ant.taskdefs.classpath.CompareTask" classpathref="cp-jnode"/>
 
-	<!-- Compare classpath version of jnode with real classpath version -->
-	<target name="header-fix" depends="assemble">
-		<taskdef name="header" classname="org.jnode.ant.taskdefs.HeaderTask" classpathref="cp-jnode" />
+        <patternset id="cp-sources-pattern">
+            <exclude name="compat/**/*"/>
+            <exclude name="examples/**/*"/>
+            <exclude name="external/**/*"/>
+            <exclude name="gnu/java/awt/peer/gtk/**/*"/>
+            <exclude name="gnu/javax/swing/plaf/gtk/**/*"/>
+            <exclude name="gnu/test/**/*"/>
+            <exclude name="gnu/xml/libxmlj/**/*"/>
+            <exclude name="test/**/*"/>
+            <exclude name="testsuite/**/*"/>
+            <exclude name="vm/reference/**/*"/>
+        </patternset>
 
-		<header update="on" headerFile="${root.dir}/all/template/header.txt">
-			<fileset dir="${root.dir}/builder/src/builder" includes="**/*.java" />
-			<fileset dir="${root.dir}/core/src/classpath/ext" includes="**/*.java" />
-			<fileset dir="${root.dir}/core/src/classpath/vm" includes="**/*.java" />
-			<fileset dir="${root.dir}/core/src/core" includes="**/*.java" />
-			<fileset dir="${root.dir}/core/src/vmmagic" includes="**/*.java" />
-			<fileset dir="${root.dir}/core/src/mmtk-vm" includes="**/*.java" />
-			<fileset dir="${root.dir}/core/src/driver" includes="**/*.java" />
-			<fileset dir="${root.dir}/core/src/test" includes="**/*.java" />
-			<fileset dir="${root.dir}/distr/src/install" includes="**/*.java" />
-			<fileset dir="${root.dir}/distr/src/apps" includes="**/*.java" />
-			<fileset dir="${root.dir}/fs/src/fs" includes="**/*.java" />
-			<fileset dir="${root.dir}/fs/src/driver" includes="**/*.java" />
-			<fileset dir="${root.dir}/fs/src/test" includes="**/*.java" />
-			<fileset dir="${root.dir}/gui/src/awt" includes="**/*.java" />
-			<fileset dir="${root.dir}/gui/src/desktop" includes="**/*.java" />
-			<fileset dir="${root.dir}/gui/src/driver" includes="**/*.java" />
-			<fileset dir="${root.dir}/gui/src/test" includes="**/*.java" />
-			<fileset dir="${root.dir}/net/src/net" includes="**/*.java" />
-			<fileset dir="${root.dir}/net/src/driver" includes="**/*.java" />
-			<fileset dir="${root.dir}/net/src/test" includes="**/*.java" />
-			<fileset dir="${root.dir}/shell/src/shell" includes="**/*.java" />
-		</header>
-	</target>
+        <delete dir="${build.dir}/classpath-compare"/>
+        <cp-compare destdir="${build.dir}/classpath-compare">
+            <vmsources>
+                <fileset dir="${root.dir}/core/src/classpath/gnu" includes="**/*.java"/>
+                <fileset dir="${root.dir}/core/src/classpath/java" includes="**/*.java"/>
+                <fileset dir="${root.dir}/core/src/classpath/javax" includes="**/*.java"/>
+                <fileset dir="${root.dir}/core/src/classpath/org" includes="**/*.java"/>
+                <fileset dir="${root.dir}/core/src/classpath/5.0" includes="**/*.java" target="1.5"/>
+            </vmsources>
+            <vmspecificsources>
+                <fileset dir="${root.dir}/core/src/classpath/vm" includes="**/*.java"/>
+            </vmspecificsources>
+            <classpathsources>
+                <fileset dir="${root.dir}/../classpath" includes="**/*.java">
+                    <patternset refid="cp-sources-pattern"/>
+                </fileset>
+                <fileset dir="${root.dir}/../classpath-5.0"
+                    includes="**/*.java"
+                    target="1.5"
+                    ignoremissing="on">
+                    <patternset refid="cp-sources-pattern"/>
+                </fileset>
+                <fileset dir="${root.dir}/../classpath/external/w3c_dom" includes="**/*.java">
+                </fileset>
+                <fileset dir="${root.dir}/../classpath/external/sax" includes="**/*.java">
+                </fileset>
+            </classpathsources>
+        </cp-compare>
+    </target>
 
-	<!-- Run all tests -->
-	<target name="tests" depends="assemble">
-		<ant target="tests" dir="${root.dir}/fs" inheritall="on" inheritrefs="on" />
-	</target>
+    <!-- Compare classpath version of jnode with real classpath version -->
+    <target name="header-fix" depends="assemble">
+        <taskdef name="header" classname="org.jnode.ant.taskdefs.HeaderTask" classpathref="cp-jnode"/>
 
-	<!-- Check the encoding of all files -->
-	<target name="encoding-test" depends="assemble">
-		<taskdef name="n2a" classname="org.jnode.ant.taskdefs.Native2AsciiTask" classpathref="cp-jnode" />
+        <header update="on" headerFile="${root.dir}/all/template/header.txt">
+            <fileset dir="${root.dir}/builder/src/builder" includes="**/*.java"/>
+            <fileset dir="${root.dir}/core/src/classpath/ext" includes="**/*.java"/>
+            <fileset dir="${root.dir}/core/src/classpath/vm" includes="**/*.java"/>
+            <fileset dir="${root.dir}/core/src/core" includes="**/*.java"/>
+            <fileset dir="${root.dir}/core/src/vmmagic" includes="**/*.java"/>
+            <fileset dir="${root.dir}/core/src/mmtk-vm" includes="**/*.java"/>
+            <fileset dir="${root.dir}/core/src/driver" includes="**/*.java"/>
+            <fileset dir="${root.dir}/core/src/test" includes="**/*.java"/>
+            <fileset dir="${root.dir}/distr/src/install" includes="**/*.java"/>
+            <fileset dir="${root.dir}/distr/src/apps" includes="**/*.java"/>
+            <fileset dir="${root.dir}/fs/src/fs" includes="**/*.java"/>
+            <fileset dir="${root.dir}/fs/src/driver" includes="**/*.java"/>
+            <fileset dir="${root.dir}/fs/src/test" includes="**/*.java"/>
+            <fileset dir="${root.dir}/gui/src/awt" includes="**/*.java"/>
+            <fileset dir="${root.dir}/gui/src/desktop" includes="**/*.java"/>
+            <fileset dir="${root.dir}/gui/src/driver" includes="**/*.java"/>
+            <fileset dir="${root.dir}/gui/src/test" includes="**/*.java"/>
+            <fileset dir="${root.dir}/net/src/net" includes="**/*.java"/>
+            <fileset dir="${root.dir}/net/src/driver" includes="**/*.java"/>
+            <fileset dir="${root.dir}/net/src/test" includes="**/*.java"/>
+            <fileset dir="${root.dir}/shell/src/shell" includes="**/*.java"/>
+        </header>
+    </target>
 
-		<n2a update="off">
-			<fileset dir="${root.dir}" includes="**/*.java" />
-		</n2a>
-	</target>
+    <!-- Run all tests -->
+    <target name="tests" depends="assemble">
+        <ant target="tests" dir="${root.dir}/fs" inheritall="on" inheritrefs="on"/>
+    </target>
 
-	<!-- Check and fix the encoding of all files -->
-	<target name="encoding-fix" depends="assemble">
-		<taskdef name="n2a" classname="org.jnode.ant.taskdefs.Native2AsciiTask" classpathref="cp-jnode" />
+    <!-- Check the encoding of all files -->
+    <target name="encoding-test" depends="assemble">
+        <taskdef name="n2a" classname="org.jnode.ant.taskdefs.Native2AsciiTask" classpathref="cp-jnode"/>
 
-		<n2a update="on">
-			<fileset dir="${root.dir}" includes="**/*.java" />
-		</n2a>
-	</target>
-	
-	<!-- check dependencies -->
-	  <taskdef name="classycleDependencyCheck" 
-	           classname="classycle.ant.DependencyCheckingTask"
-	  	       classpathref="cp-jnode"/>
-	
-	  <target name="checkDepends">
-	    <classycleDependencyCheck failOnUnwantedDependencies="true"
-	                              excludingClasses="*Test,*.All*Tests">
-	    	
-	    	<fileset dir="${root.dir}">
-				<include name="**/*.class"/>
-				<include name="**/*.jar"/>
-			</fileset>	      
+        <n2a update="off">
+            <fileset dir="${root.dir}" includes="**/*.java"/>
+        </n2a>
+    </target>
+
+    <!-- Check and fix the encoding of all files -->
+    <target name="encoding-fix" depends="assemble">
+        <taskdef name="n2a" classname="org.jnode.ant.taskdefs.Native2AsciiTask" classpathref="cp-jnode"/>
+
+        <n2a update="on">
+            <fileset dir="${root.dir}" includes="**/*.java"/>
+        </n2a>
+    </target>
+
+    <!-- check dependencies -->
+    <taskdef name="classycleDependencyCheck"
+        classname="classycle.ant.DependencyCheckingTask"
+        classpathref="cp-jnode"/>
+
+    <target name="checkDepends">
+        <classycleDependencyCheck failOnUnwantedDependencies="true"
+            excludingClasses="*Test,*.All*Tests">
+
+            <fileset dir="${root.dir}">
+                <include name="**/*.class"/>
+                <include name="**/*.jar"/>
+            </fileset>
 	      show allResults
 	      [util] = org.jnode.test.fs_0.1.11-dev.jar
 	      [notUtil] = org.jnode.driver.* excluding [util]
 	      check [util] independentOf [notUtil]
 	      check [notUtil] independentOf [util]
-	    </classycleDependencyCheck>
-	  </target>		 
-	<!-- check dependencies V2 -->
-	<target name="checksDependV2" depends="assemble-plugins">
-		<!-- Check all plugins -->
-		<taskdef name="checksDep" classname="org.jnode.build.dependencies.DependencyChecker" 
-			classpathref="cp-jnode" />
-		<checksDep maxPluginsToProcess="3" output="${plugins.dir}/checks.txt">			
-			<plugins dir="${plugins.dir}/">
-				<include name="*.jar" />
-			</plugins>
-			
-			<descriptors dir="${descriptors.dir}/">
-				<include name="*.xml" />
-				<exclude name="*plugin-list.xml" />
-			</descriptors>
-		</checksDep>
-	</target>	
+        </classycleDependencyCheck>
+    </target>
+    <!-- check dependencies V2 -->
+    <target name="checksDependV2" depends="assemble-plugins">
+        <!-- Check all plugins -->
+        <taskdef name="checksDep" classname="org.jnode.build.dependencies.DependencyChecker"
+            classpathref="cp-jnode"/>
+        <checksDep maxPluginsToProcess="3" output="${plugins.dir}/checks.txt">
+            <plugins dir="${plugins.dir}/">
+                <include name="*.jar"/>
+            </plugins>
 
-	<!-- Define the task that check the rules -->
+            <descriptors dir="${descriptors.dir}/">
+                <include name="*.xml"/>
+                <exclude name="*plugin-list.xml"/>
+            </descriptors>
+        </checksDep>
+    </target>
+
+    <!-- Define the task that check the rules -->
     <taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask"
-    	classpathref="cp-jnode">
-		<classpath>
-			<pathelement location="${pmd.jar}" />
-			<pathelement location="${jaxen.jar}" />
-			<pathelement location="${saxpath.jar}" />
-			<pathelement location="${xerces.jar}" />
-			<pathelement location="${xmlParserAPIs.jar}" />
-		</classpath>
+        classpathref="cp-jnode">
+        <classpath>
+            <pathelement location="${pmd.jar}"/>
+            <pathelement location="${jaxen.jar}"/>
+            <pathelement location="${saxpath.jar}"/>
+            <pathelement location="${xerces.jar}"/>
+            <pathelement location="${xmlParserAPIs.jar}"/>
+        </classpath>
     </taskdef>
-	
-	
-	<!-- Macro used to check that the rules are applied in the source code -->
-	<macrodef name="checkProjectRules">
-		<attribute name="projectName"/>
-		<attribute name="webSrcUrl"/>
-		<attribute name="projectSrc"/>
-		<sequential>
-			<property name="nbFailures" value="0" />
-			<echo message="Scanning @{projectName}."/>
-			<property name="tmp" value="../@{projectSrc}"/>
-		    <pmd failuresPropertyName="nbFailures">
-		        <formatter type="html" toFile="${reports.dir}/pmd_report-@{projectName}.html" />
-		    	
-		        <ruleset>rulesets/favorites.xml</ruleset>
-		        <ruleset>rulesets/basic.xml</ruleset>	    	
 
-				<fileset dir="../@{projectSrc}" includes="**/*.java" />
-		    </pmd>
-			<echo message="There was ${nbFailures} failures in @{projectName}."/>
-		</sequential>
-	</macrodef>
-	
-	<target name="checkJNodeRules" depends="prepare">
-		<parallel>
-		    <checkProjectRules projectName="distr" webSrcUrl="distr" projectSrc="distr" />
-			<checkProjectRules projectName="JNode-Builder" webSrcUrl="builder" projectSrc="builder" />
-		    <checkProjectRules projectName="JNode-Core" webSrcUrl="core" projectSrc="core" />	    	
-		    <checkProjectRules projectName="JNode-FS" webSrcUrl="fs" projectSrc="fs" />	    	
-		    <checkProjectRules projectName="JNode-GUI" webSrcUrl="gui" projectSrc="gui" />	    	
-		    <checkProjectRules projectName="JNode-Net" webSrcUrl="net" projectSrc="net" />
-		    <checkProjectRules projectName="JNode-Shell" webSrcUrl="shell" projectSrc="shell" />
-			<checkProjectRules projectName="JNode-TestUI" webSrcUrl="textui" projectSrc="textui" />		
-		</parallel>
-	</target>
 
-  <!-- Document all plugins -->
-  <target name="document-plugins" depends="assemble-projects">
-    <taskdef name="plugindocumentation" classname="org.jnode.build.documentation.PluginDocumentationTask" classpathref="cp-jnode" />
+    <!-- Macro used to check that the rules are applied in the source code -->
+    <macrodef name="checkProjectRules">
+        <attribute name="projectName"/>
+        <attribute name="webSrcUrl"/>
+        <attribute name="projectSrc"/>
+        <sequential>
+            <property name="nbFailures" value="0"/>
+            <echo message="Scanning @{projectName}."/>
+            <property name="tmp" value="../@{projectSrc}"/>
+            <pmd failuresPropertyName="nbFailures">
+                <formatter type="html" toFile="${reports.dir}/pmd_report-@{projectName}.html"/>
 
-    <plugindocumentation 
-    	destdir="${reports.dir}/plugins" 
-    	pluginDir="${descriptors.dir}"
-    	tree="${jnode.plugin.doc.tree}">
-      <descriptors dir="${descriptors.dir}/">
-        <include name="*.xml" />
-        <exclude name="*plugin-list.xml" />
-      </descriptors>
-    </plugindocumentation>
+                <ruleset>rulesets/favorites.xml</ruleset>
+                <ruleset>rulesets/basic.xml</ruleset>
 
-  </target>
+                <fileset dir="../@{projectSrc}" includes="**/*.java"/>
+            </pmd>
+            <echo message="There was ${nbFailures} failures in @{projectName}."/>
+        </sequential>
+    </macrodef>
+
+    <target name="checkJNodeRules" depends="prepare">
+        <parallel>
+            <checkProjectRules projectName="distr" webSrcUrl="distr" projectSrc="distr"/>
+            <checkProjectRules projectName="JNode-Builder" webSrcUrl="builder" projectSrc="builder"/>
+            <checkProjectRules projectName="JNode-Core" webSrcUrl="core" projectSrc="core"/>
+            <checkProjectRules projectName="JNode-FS" webSrcUrl="fs" projectSrc="fs"/>
+            <checkProjectRules projectName="JNode-GUI" webSrcUrl="gui" projectSrc="gui"/>
+            <checkProjectRules projectName="JNode-Net" webSrcUrl="net" projectSrc="net"/>
+            <checkProjectRules projectName="JNode-Shell" webSrcUrl="shell" projectSrc="shell"/>
+            <checkProjectRules projectName="JNode-TestUI" webSrcUrl="textui" projectSrc="textui"/>
+        </parallel>
+    </target>
+
+    <!-- Document all plugins -->
+    <target name="document-plugins" depends="assemble-projects">
+        <taskdef name="plugindocumentation" classname="org.jnode.build.documentation.PluginDocumentationTask" classpathref="cp-jnode"/>
+
+        <plugindocumentation
+            destdir="${reports.dir}/plugins"
+            pluginDir="${descriptors.dir}"
+            tree="${jnode.plugin.doc.tree}">
+            <descriptors dir="${descriptors.dir}/">
+                <include name="*.xml"/>
+                <exclude name="*plugin-list.xml"/>
+            </descriptors>
+        </plugindocumentation>
+
+    </target>
 
 </project>
