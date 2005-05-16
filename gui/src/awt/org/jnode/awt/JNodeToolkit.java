@@ -33,6 +33,7 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Frame;
+import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
@@ -43,21 +44,21 @@ import java.awt.font.FontRenderContext;
 import java.awt.im.InputMethodHighlight;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
+import java.awt.image.ImageConsumer;
 import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
 import java.awt.image.VolatileImage;
 import java.awt.peer.FontPeer;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.text.AttributedString;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 
@@ -192,18 +193,28 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	 */
 	public int checkImage(Image image, int width, int height,
 			ImageObserver observer) {
-		// TODO Auto-generated method stub
-		return 0;
+        int status = ImageObserver.ALLBITS | ImageObserver.WIDTH
+                | ImageObserver.HEIGHT;
+
+        if (image instanceof JNodeImage) {
+            status = ((JNodeImage) image).checkImage();
+        }
+
+        if (observer != null)
+            observer.imageUpdate(image, status, -1, -1, image
+                    .getWidth(observer), image.getHeight(observer));
+
+        return status;
 	}
 
 	/**
-	 * JNode specific method. Create a buffered image compatible with the
-	 * graphics configuration.
-	 * 
-	 * @param width
-	 * @param height
-	 * @return The compatible image
-	 */
+     * JNode specific method. Create a buffered image compatible with the
+     * graphics configuration.
+     * 
+     * @param width
+     * @param height
+     * @return The compatible image
+     */
 	public BufferedImage createCompatibleImage(int width, int height) {
 		return config.createCompatibleImage(width, height);
 	}
@@ -233,7 +244,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 			} // let it fall through to default code
 		}
 
-		return null;
+		return new ErrorImage();
 	}
 
 	/**
@@ -472,6 +483,17 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	public GraphicsConfiguration getGraphicsConfiguration() {
 		return config;
 	}
+    
+    /**
+     * Test if the image is valid (!= null), otherwise return an error image.
+     */
+    private Image testErrorImage(Image img) {
+        if (img == null) {
+            return new ErrorImage();
+        } else {
+            return img;
+        }
+    }
 
 	/**
 	 * @param filename
@@ -480,7 +502,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	 */
 	public Image getImage(final String filename) {
 		log.debug("getImage(" + filename + ")");
-		return (Image) AccessController.doPrivileged(new PrivilegedAction() {
+		return testErrorImage((Image) AccessController.doPrivileged(new PrivilegedAction() {
 
 			public Object run() {
 				try {
@@ -490,14 +512,12 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 							+ new File(userDir, filename)));
 					return image != null ? image : getImage(new URL("file:"
 							+ new File(filename).getAbsolutePath()));
-				} catch (MalformedURLException e) {
-					e.printStackTrace();
-					// Ignore
+				} catch (Exception ex) {
+                    log.debug("Error loading image", ex);
 				}
-				log.debug("Image not found");
 				return null;
 			}
-		});
+		}));
 	}
 
 	/**
@@ -506,7 +526,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	 * @return The image
 	 */
 	public Image getImage(final URL url) {
-		return (Image) AccessController.doPrivileged(new PrivilegedAction() {
+		return testErrorImage((Image) AccessController.doPrivileged(new PrivilegedAction() {
 
 			public Object run() {
 				try {
@@ -524,12 +544,12 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 						}
 					} else
 						return createImage((ImageProducer) (conn.getContent()));
-				} catch (IOException ex) {
-					log.debug("IOException during getImage", ex);
+				} catch (Exception ex) {
+					log.debug("Exception during getImage", ex);
 				}
 				return null;
 			}
-		});
+		}));
 	}
 
 	/**
@@ -705,9 +725,13 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	 * @return boolean
 	 */
 	public boolean prepareImage(Image image, int width, int height,
-			ImageObserver observer) {
-		// TODO Auto-generated method stub
-		return false;
+            ImageObserver observer) {
+        if (image instanceof JNodeImage) {
+            final JNodeImage i = (JNodeImage) image;
+            return i.prepare(observer);
+        } else {
+            return true;
+        }
 	}
 
 	protected void setTop(Frame frame) {
@@ -730,4 +754,67 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
             }
         }
 	}
+
+    /** 
+     * A helper class to return to clients in cases where a BufferedImage is
+     * desired but its construction fails.
+     */
+    private class ErrorImage extends Image {
+        public ErrorImage() {
+        }
+
+        public int getWidth(ImageObserver observer) {
+            return -1;
+        }
+
+        public int getHeight(ImageObserver observer) {
+            return -1;
+        }
+
+        public ImageProducer getSource() {
+
+            return new ImageProducer() {
+                HashSet<ImageConsumer> consumers = new HashSet<ImageConsumer>();
+
+                public void addConsumer(ImageConsumer ic) {
+                    consumers.add(ic);
+                }
+
+                public boolean isConsumer(ImageConsumer ic) {
+                    return consumers.contains(ic);
+                }
+
+                public void removeConsumer(ImageConsumer ic) {
+                    consumers.remove(ic);
+                }
+
+                public void startProduction(ImageConsumer ic) {
+                    consumers.add(ic);
+                    for (ImageConsumer c : consumers) {
+                        c.imageComplete(ImageConsumer.IMAGEERROR);
+                    }
+                }
+
+                public void requestTopDownLeftRightResend(ImageConsumer ic) {
+                    startProduction(ic);
+                }
+            };
+        }
+
+        public Graphics getGraphics() {
+            return null;
+        }
+
+        public Object getProperty(String name, ImageObserver observer) {
+            return null;
+        }
+
+        public Image getScaledInstance(int width, int height, int flags) {
+            return new ErrorImage();
+        }
+
+        public void flush() {
+        }
+    }
+
 }

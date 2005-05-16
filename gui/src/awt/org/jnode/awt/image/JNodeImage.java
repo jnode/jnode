@@ -139,15 +139,20 @@ public class JNodeImage extends Image {
 		return width;
 	}
 
+	public int checkImage() {
+        return availableInfo;
+    }
+
 	/**
-	 * Synchronizes the image loading.
-	 * @since  PJA2.0
-	 */
+     * Synchronizes the image loading.
+     * 
+     * @since PJA2.0
+     */
 	public void sync() {
 		loadInitImage(true, null);
 	}
 
-	protected boolean prepare(ImageObserver observer) {
+	public boolean prepare(ImageObserver observer) {
 		if (!productionStarted) {
 			loadInitImage(false, observer);
 		} else if ((availableInfo & ImageObserver.ERROR) != 0) {
