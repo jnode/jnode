@@ -1,5 +1,5 @@
-/* ImageCapabilities.java -- the capabilities of an image buffer
-   Copyright (C) 2002, 2005 Free Software Foundation, Inc.
+/* DefaultMenuLayout.java
+   Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,73 +35,44 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+package javax.swing.plaf.basic;
 
-package java.awt;
+import java.awt.Container;
+import java.awt.Dimension;
+
+import javax.swing.BoxLayout;
+import javax.swing.plaf.UIResource;
 
 /**
- * This class represents the capabilities of an image buffer.  An
- * image buffer may be backed by accelerated graphics resources.
- * Those resources may or may not be volatile.  This class is used to
- * describe these image buffer characteristics.
+ * The LayoutManager that is used in PopupMenus. This is a derived from
+ * {@link BoxLayout}.
+ *
+ * @author Roman Kennke (roman@kennke.org)
  */
-public class ImageCapabilities implements Cloneable
+public class DefaultMenuLayout
+  extends BoxLayout
+  implements UIResource
 {
-  /**
-   * Whether or not this the image buffer uses accelerated graphics
-   * resources.
-   */
-  private final boolean accelerated;
 
   /**
-   * Create a new image capability descriptor.
+   * Creates a new instance of DefaultMenuLayout.
    *
-   * @param accelerated true if the image buffer uses accelerated
-   * graphics resources
+   * @param target the component that is laid out
+   * @param axis the axis along which the component is laid out
    */
-  public ImageCapabilities(boolean accelerated)
+  public DefaultMenuLayout(Container target, int axis)
   {
-    this.accelerated = accelerated;
+    super(target, axis);
   }
 
   /**
-   * Returns whether or not the image buffer uses accelerated graphics
-   * resources.
+   * Returns the preferred size for the layout of the menu.
    *
-   * @return true if the image buffer uses accelerated graphics
-   * resources; false otherwise
+   * @param target the Container which's preferred size we calculate
    */
-  public boolean isAccelerated()
+  public Dimension preferredLayoutSize(Container target)
   {
-    return accelerated;
+    return super.preferredLayoutSize(target);
   }
 
-  /**
-   * Returns whether or not the image buffer's resources are volatile,
-   * meaning that they can be reclaimed by the graphics system at any
-   * time.
-   *
-   * @return true if the image buffer's resources are volatile; false
-   * otherwise
-   */
-  public boolean isTrueVolatile()
-  {
-    return true;
-  }
-
-  /**
-   * Clone this image capability descriptor.
-   *
-   * @return a clone of this image capability descriptor
-   */
-  public Object clone()
-  {
-    try
-      {
-        return super.clone();
-      }
-    catch (CloneNotSupportedException e)
-      {
-        throw (Error) new InternalError().initCause(e);
-      }
-  }
 }

@@ -56,6 +56,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
@@ -854,6 +855,7 @@ public class BasicOptionPaneUI extends OptionPaneUI
     addIcon(messageArea);
 
     JPanel rightSide = new JPanel();
+    rightSide.setBorder(BorderFactory.createEmptyBorder(0, 11, 17, 0));
     rightSide.setLayout(new GridBagLayout());
     GridBagConstraints con = createConstraints();
 
@@ -864,19 +866,16 @@ public class BasicOptionPaneUI extends OptionPaneUI
       {
 	Object[] selection = optionPane.getSelectionValues();
 
-//	if (selection == null)
-//	  inputComponent = new JTextField();
-//	else if (selection.length < 20)
-//	  inputComponent = new JComboBox(selection);
-	// FIXME: Uncomment when the widgets are done.
 	if (selection == null)
-	  inputComponent = null;
+          inputComponent = new JTextField(15);
+	else if (selection.length < 20)
+          inputComponent = new JComboBox(selection);
 	else
 	  inputComponent = new JList(selection);
 	if (inputComponent != null)
 	  {
 	    addMessageComponents(rightSide, con, inputComponent,
-	                         getMaxCharactersPerLineCount(), true);
+                                 getMaxCharactersPerLineCount(), false);
 	    resetSelectedValue();
 	    selectInitialValue(optionPane);
 	  }
@@ -906,7 +905,7 @@ public class BasicOptionPaneUI extends OptionPaneUI
    */
   protected Container createSeparator()
   {
-    return null;
+    return (Container) Box.createVerticalStrut(17);
   }
 
   /**
@@ -1123,6 +1122,7 @@ public class BasicOptionPaneUI extends OptionPaneUI
 	optionPane.add(button);
     }
 
+    optionPane.setBorder(BorderFactory.createEmptyBorder(12, 12, 11, 11));
     optionPane.invalidate();
   }
 
