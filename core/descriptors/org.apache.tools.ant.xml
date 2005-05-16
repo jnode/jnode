@@ -5,6 +5,10 @@
         name="Ant classes"
         version="1.6.3"
         provider-name="jakarta.apache.org">
+                
+  <requires>
+    <import plugin="org.apache.tools.ant-launcher"/>
+  </requires>
         
   <runtime>
     <library name="ant.jar">
@@ -20,4 +24,12 @@
       <export name="org.apache.tools.ant.util.*"/>            
     </library>
   </runtime>  
+  
+  <extension point="org.jnode.security.permissions">
+<!--      <permission class="java.io.FilePermission" name="build.xml" actions="read"/>
+-->
+      <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write,delete"/>      
+      <permission class="java.lang.RuntimePermission" name="setSecurityManager" actions="*" />
+      <permission class="java.lang.RuntimePermission" name="setIO" actions="*" />
+  </extension>     
 </plugin>
