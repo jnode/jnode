@@ -23,22 +23,9 @@ package org.jnode.shell.command.ant;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.net.JarURLConnection;
-import java.net.URL;
-import java.security.Permission;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.jar.JarFile;
 
 import org.apache.tools.ant.Main;
-import org.apache.tools.ant.launch.Locator;
-import org.jnode.security.JNodeSecurityManager;
-import org.jnode.security.JNodeSecurityManager.SecurityManagerListener;
-import org.jnode.shell.help.ParsedArguments;
 
 /**
  * @author Fabien DUMINY (fduminy at users.sourceforge.net)
