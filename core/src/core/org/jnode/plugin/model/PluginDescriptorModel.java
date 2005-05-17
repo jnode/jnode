@@ -112,7 +112,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
         name = getAttribute(e, "name", true);
         providerName = getAttribute(e, "provider-name", false);
         providerUrl = getAttribute(e, "provider-url", false);
-        licenseName = getAttribute(e, "license-name", false);
+        licenseName = getAttribute(e, "license-name", true);
         licenseUrl = getAttribute(e, "license-url", false);
         version = getAttribute(e, "version", true);
         className = getAttribute(e, "class", false);
