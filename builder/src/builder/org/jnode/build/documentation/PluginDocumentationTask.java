@@ -96,6 +96,8 @@ public class PluginDocumentationTask extends AbstractPluginTask {
             new ToolbarEntry("Tree", OVERVIEW_TREE_FILE), };
 
     private static final LicenseEntry[] KNOWN_LICENSES = {
+            new LicenseEntry("bsd",
+                    "http://opensource.org/licenses/bsd-license.php"),
             new LicenseEntry("gpl",
                     "http://opensource.org/licenses/gpl-license.php"),
             new LicenseEntry("lgpl",
@@ -103,8 +105,12 @@ public class PluginDocumentationTask extends AbstractPluginTask {
             new LicenseEntry("cpl", "http://opensource.org/licenses/cpl1.0.php"),
             new LicenseEntry("classpath",
                     "http://www.gnu.org/software/classpath/license.html"),
+            new LicenseEntry("apache",
+                    "http://opensource.org/licenses/apachepl.php"),
             new LicenseEntry("apache2.0",
-                    "http://www.apache.org/licenses/LICENSE-2.0"), };
+                    "http://www.apache.org/licenses/LICENSE-2.0"),
+            new LicenseEntry("zlib",
+                    "http://www.opensource.org/licenses/zlib-license.html"), };
 
     public FileSet createDescriptors() {
         final FileSet fs = new FileSet();
