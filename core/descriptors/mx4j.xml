@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
-<plugin id="mx4j"
+<fragment id="mx4j"
     name="MX4J Management Extensions"
     version="3.0.1"
-    system="true"
+    plugin-id="org.classpath.core"
+    plugin-version="@VERSION@"
     provider-name="mx4j.org">
 
     <runtime>
@@ -46,4 +47,4 @@
         </library>
     </runtime>
 
-</plugin>
+</fragment>
