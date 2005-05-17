@@ -4,7 +4,9 @@
 <plugin id="thinlet"
         name="Lightweigth GUI widgets"
         version="@VERSION@"
-        provider-name="Robert Bajzat (www.thinlet.com)">
+        provider-name="Robert Bajzat"
+        provider-url="http://thinlet.sourceforge.net/"
+        license-name="lgpl">
         
   <requires>
       <import plugin="org.jnode.awt"/>

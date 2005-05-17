@@ -2,10 +2,10 @@
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
 <plugin id="org.jnode.apps.httpd"
-  name="JNode HTTPD Commands"
-  version="@VERSION@"
-        license-name="lgpl"
-  provider-name="JNode.org">
+       name="JNode HTTPD Commands"
+       version="@VERSION@"
+       license-name="lgpl"
+       provider-name="JNode.org">
 
   <requires>
     <import plugin="org.jnode.net"/>

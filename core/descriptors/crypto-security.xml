@@ -4,7 +4,9 @@
 <plugin id="crypto-security"
   name="GNU-Crypto classes"
   version="2.0.1"
-  provider-name="www.gnu.org/software/gnu-crypto">
+  provider-name="http://www.gnu.org/software/gnu-crypto"
+  license-name="GPL + Library Exception"
+  license-url="http://www.gnu.org/software/gnu-crypto/">
 
   <runtime>
     <library name="gnu-crypto.jar">

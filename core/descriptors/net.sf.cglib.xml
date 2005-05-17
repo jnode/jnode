@@ -4,7 +4,8 @@
 <plugin id="net.sf.cglib" 
         name="cglib classes"
         version="2.1"
-        provider-name="cglib.sf.net">
+        provider-name="cglib.sf.net"
+        license-name="apache2.0">
         
   <runtime>
     <library name="cglib.jar">

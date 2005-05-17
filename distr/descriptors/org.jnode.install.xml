@@ -4,7 +4,8 @@
 <plugin id="org.jnode.install" 
         name="JNode Installation Program"
         version="@VERSION@"
-        provider-name="JNode.org">
+        provider-name="JNode.org"
+        license-name="lgpl">
         
   <requires>
     <import plugin="org.jnode.fs"/>

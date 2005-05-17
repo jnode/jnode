@@ -4,7 +4,8 @@
 <plugin id="org.jnode.apps.edit"
         name="A simple editor for JNode OS"
         version="@VERSION@"
-        provider-name="Levente Santha">
+        provider-name="JNode.org"
+        license-name="lgpl">
 	
   <runtime>
     <library name="jnode-distr.jar">

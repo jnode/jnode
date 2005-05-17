@@ -4,7 +4,9 @@
 <plugin id="org.junit" 
         name="JUnit classes"
         version="3.8"
-        provider-name="junit.org">
+        provider-name="JUnit"
+        provider-url="http://junit.org"
+        license-name="cpl">
         
   <runtime>
     <library name="junit.jar">

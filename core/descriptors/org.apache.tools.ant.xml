@@ -4,7 +4,9 @@
 <plugin id="org.apache.tools.ant" 
         name="Ant classes"
         version="1.6.3"
-        provider-name="jakarta.apache.org">
+        provider-name="Apache Ant"
+        provider-url="http://ant.apache.org"
+        license-name="apache2.0">
                 
   <requires>
     <import plugin="org.apache.tools.ant-launcher"/>

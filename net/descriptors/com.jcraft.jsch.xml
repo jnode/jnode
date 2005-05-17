@@ -6,6 +6,7 @@
   version="@VERSION@"
   provider-name="JCraft, Inc"
   provider-url="http://www.jcraft.com"
+  license-name="BSD-Style"
   license-url="http://www.jcraft.com/jsch/LICENSE.txt">
 
   <requires>

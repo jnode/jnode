@@ -5,7 +5,8 @@
         name="NamoXML Lite classes"
         version="1.4"
         system="true"
-        provider-name="nanoxml.org">
+        provider-name="nanoxml.org"
+        license-name="zlib">
         
   <runtime>
     <library name="nanoxml.jar">
