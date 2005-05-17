@@ -1,76 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src/classpath/gnu">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" path="src/classpath/java">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" path="src/classpath/javax">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" path="src/classpath/org">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" path="src/classpath/5.0">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" path="src/classpath/ext">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" path="src/classpath/vm">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" path="src/core">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" path="src/vmmagic">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" path="src/mmtk">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" path="src/mmtk-vm">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" path="src/driver">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" path="src/test">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" path="src/native/x86">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/ant.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/nanoxml-lite-2.2.3.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/log4j-1.2.8.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/junit.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
+	<classpathentry kind="src" path="src/classpath/gnu"/>
+	<classpathentry kind="src" path="src/classpath/java"/>
+	<classpathentry kind="src" path="src/classpath/javax"/>
+	<classpathentry kind="src" path="src/classpath/org"/>
+	<classpathentry kind="src" path="src/classpath/5.0"/>
+	<classpathentry kind="src" path="src/classpath/ext"/>
+	<classpathentry kind="src" path="src/classpath/vm"/>
+	<classpathentry kind="src" path="src/core"/>
+	<classpathentry kind="src" path="src/vmmagic"/>
+	<classpathentry kind="src" path="src/mmtk"/>
+	<classpathentry kind="src" path="src/mmtk-vm"/>
+	<classpathentry kind="src" path="src/driver"/>
+	<classpathentry kind="src" path="src/test"/>
+	<classpathentry kind="src" path="src/native/x86"/>
+	<classpathentry kind="lib" path="lib/ant.jar"/>
+	<classpathentry kind="lib" path="lib/nanoxml-lite-2.2.3.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.8.jar"/>
+	<classpathentry kind="lib" path="lib/junit.jar"/>
+	<classpathentry kind="lib" path="lib/mx4j.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
