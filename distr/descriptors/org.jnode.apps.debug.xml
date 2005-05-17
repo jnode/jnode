@@ -2,9 +2,10 @@
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
 <plugin id="org.jnode.apps.debug"
-        name="JNode Test Client"
+        name="JNode Debugger"
         version="@VERSION@"
-        provider-name="Andras Nagy">
+        provider-name="JNode.org"
+        license-name="lgpl">
 	
   <runtime>
     <library name="jnode-distr.jar">

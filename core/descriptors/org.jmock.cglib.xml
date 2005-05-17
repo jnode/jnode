@@ -4,7 +4,10 @@
 <plugin id="org.jmock.cglib" 
         name="JMock classes"
         version="1.0.1"
-        provider-name="jmock.org">
+        provider-name="JMock"
+        provider-url="http://jmock.org"
+        license-name="JMock"
+        license-url="http://jmock.org/license.html">
         
   <requires>        
 	<import plugin="org.jmock" version="1.0.1"/>

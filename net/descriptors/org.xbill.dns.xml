@@ -6,6 +6,7 @@
   version="1.5.0"
   provider-name="XBill.org"
   provider-url="http://www.dnsjava.org"
+  license-name="BSD like"
   license-url="http://www.dnsjava.org/README">
 
 

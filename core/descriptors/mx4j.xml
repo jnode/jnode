@@ -6,7 +6,9 @@
     version="3.0.1"
     plugin-id="org.classpath.core"
     plugin-version="@VERSION@"
-    provider-name="mx4j.org">
+    provider-name="mx4j.org"
+    provider-url="http://mx4j.org"
+    license-name="apache">
 
     <runtime>
         <library name="mx4j.jar">
