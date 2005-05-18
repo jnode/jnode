@@ -29,6 +29,7 @@ import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmArrayClass;
+import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
@@ -316,4 +317,11 @@ public abstract class VmHeapManager extends VmSystemObject {
      *            The newly resolved type
      */
     public abstract void notifyClassResolved(VmType< ? > vmType);
+    
+    /**
+     * Load classes required by this memory manager at build time.
+     * @param loader
+     */
+    public abstract void loadClasses(VmClassLoader loader)
+    throws ClassNotFoundException;
 }

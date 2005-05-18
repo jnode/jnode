@@ -486,8 +486,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             loadClass(VmSystemClassLoader.class);
             loadClass(VmType[].class);
             loadClass(Vm.class);
-            loadClass("org.jnode.vm.memmgr.def.VmBootHeap");
-            loadClass("org.jnode.vm.memmgr.def.VmDefaultHeap");
+            Vm.getHeapManager().loadClasses(clsMgr);
             loadClass(VmHeapManager.class);
             loadClass(VmSharedStatics.class);
             loadClass(VmIsolatedStatics.class);

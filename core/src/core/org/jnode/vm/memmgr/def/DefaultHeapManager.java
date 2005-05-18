@@ -484,4 +484,12 @@ public final class DefaultHeapManager extends VmHeapManager {
     public void notifyClassResolved(VmType< ? > vmType) {
         // Do nothing        
     }
+
+    /**
+     * @see org.jnode.vm.memmgr.VmHeapManager#loadClasses(org.jnode.vm.classmgr.VmClassLoader)
+     */
+    public void loadClasses(VmClassLoader loader) throws ClassNotFoundException {
+        loader.loadClass("org.jnode.vm.memmgr.def.VmBootHeap", true);
+        loader.loadClass("org.jnode.vm.memmgr.def.VmDefaultHeap", true);
+    }
 }
