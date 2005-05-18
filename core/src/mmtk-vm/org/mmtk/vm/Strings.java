@@ -22,6 +22,8 @@
 package org.mmtk.vm;
 
 import org.jnode.vm.Unsafe;
+import org.jnode.vm.Vm;
+import org.vmmagic.pragma.UninterruptiblePragma;
 
 /**
  * 
@@ -53,8 +55,14 @@ public final class Strings {
      *            number of characters in message
      */
     public static void write(char[] c, int len) {
-        for (int i = 0; i < len; i++) {
-            Unsafe.debug(c[i]);
+        if (Vm.isRunningVm()) {
+            for (int i = 0; i < len; i++) {
+                Unsafe.debug(c[i]);
+            }
+        } else {
+            for (int i = 0; i < len; i++) {
+                System.out.print(c[i]);
+            }            
         }
     }
 
@@ -67,9 +75,15 @@ public final class Strings {
      *            number of characters in message
      */
     public static void writeThreadId(char[] c, int len) {
-        Unsafe.debug("Thread "); 
-        Unsafe.debug(Thread.currentThread().getId());
-        Unsafe.debug(": ");
+        if (Vm.isRunningVm()) {
+            Unsafe.debug("Thread "); 
+            Unsafe.debug(Thread.currentThread().getId());
+            Unsafe.debug(": ");
+        } else {
+            System.out.print("Thread "); 
+            System.out.print(Thread.currentThread().getId());
+            System.out.print(": ");            
+        }
         write(c, len);
     }
 
@@ -92,10 +106,12 @@ public final class Strings {
      * @return the number of characters copied.
      */
     public static int copyStringToChars(String src, char[] dst, int dstBegin,
-            int dstEnd) {
-        
-        // TODO Understand me and implement me
-
-        return 0;
+            int dstEnd) throws UninterruptiblePragma {
+        final int maxLen = dstEnd - dstBegin;
+        final int length = Math.min(maxLen, src.length());
+        for (int i = 0; i < length; i++) {
+            dst[i + dstBegin] = src.charAt(i);
+        }
+        return length;
     }
 }

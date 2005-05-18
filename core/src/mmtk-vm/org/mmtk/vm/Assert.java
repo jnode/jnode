@@ -49,6 +49,11 @@ public class Assert {
      */
     public static void fail(String message) {
         BootLog.fatal(message);
+        if (Vm.isRunningVm()) {
+            Unsafe.die(message);
+        } else {
+            throw new Error(message);
+        }
     }
 
     /**
