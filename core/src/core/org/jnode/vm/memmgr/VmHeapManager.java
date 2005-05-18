@@ -229,9 +229,9 @@ public abstract class VmHeapManager extends VmSystemObject {
      * be synchronized, since obtaining a monitor might require creating one,
      * which in turn needs this method.
      * 
-     * @param vmClass
-     * @param size
-     * @return Object
+     * @param vmClass The class to allocate
+     * @param size The size of the class data, without any header
+     * @return The allocated object
      */
     protected abstract Object allocObject(VmClassType< ? > vmClass, int size);
 
