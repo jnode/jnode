@@ -1326,6 +1326,21 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         addCompileHighOptLevel("org.jnode.vm.compiler.ir.quad");
         addCompileHighOptLevel("org.jnode.vm.memmgr");
         addCompileHighOptLevel("org.jnode.vm.memmgr.def");
+        addCompileHighOptLevel("org.jnode.vm.memmgr.mmtk");
+        
+        addCompileHighOptLevel("org.mmtk.plan");
+        addCompileHighOptLevel("org.mmtk.policy");
+        addCompileHighOptLevel("org.mmtk.utility");
+        addCompileHighOptLevel("org.mmtk.utility.alloc");
+        addCompileHighOptLevel("org.mmtk.utility.deque");
+        addCompileHighOptLevel("org.mmtk.utility.gcspy");
+        addCompileHighOptLevel("org.mmtk.utility.gcspy.drivers");
+        addCompileHighOptLevel("org.mmtk.utility.heap");
+        addCompileHighOptLevel("org.mmtk.utility.options");
+        addCompileHighOptLevel("org.mmtk.utility.scan");
+        addCompileHighOptLevel("org.mmtk.utility.statistics");
+        addCompileHighOptLevel("org.mmtk.vm");
+        addCompileHighOptLevel("org.mmtk.vm.gcspy");
 
         if (false) {
             addCompileHighOptLevel("java.awt");
