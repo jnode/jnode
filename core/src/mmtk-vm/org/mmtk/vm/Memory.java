@@ -38,6 +38,9 @@ import org.vmmagic.unboxed.Extent;
  */
 public class Memory {
 
+    /** Space reserved by the bootimage */
+    private static ImmortalSpace bootSpace;
+    
     /**
      * Gets the start of the virtual address space where object may be found.
      * 
@@ -92,7 +95,14 @@ public class Memory {
      *         image space is returned.
      */
     public static ImmortalSpace getVMSpace() {
-        return null;
+        if (bootSpace == null) {
+            final VmArchitecture arch = Vm.getArch();
+            final long bootSize = AVAILABLE_START().sub(HEAP_START().toWord()).toLong();
+            final int bootSizeMb = (int)(bootSize >>> 20);
+            bootSpace = new ImmortalSpace("boot", Plan.DEFAULT_POLL_FREQUENCY, 
+                    bootSizeMb, false);
+        }
+        return bootSpace;
     }
 
     /**
