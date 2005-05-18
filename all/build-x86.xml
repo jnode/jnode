@@ -189,7 +189,11 @@
 		<copy file="${jnode.kernel}" todir="${bootdisk.dir}" />
 		<copy file="${grub.menu}" todir="${bootdisk.dir}/boot/grub" />
 		<copy todir="${bootdisk.dir}">
-			<fileset dir="${initjars.dir}" />
+			<fileset dir="${initjars.dir}">
+				<!-- Limit the size of the bootdisk -->
+				<exclude name="fullgui.jgz"/>
+				<exclude name="install.jgz"/>
+			</fileset>	
 		</copy>
 
 		<bootdisk destfile="${jnode.disk}" stage1ResourceName="${grub.stage1.name}" stage2ResourceName="${grub.stage2.name}" plnfile="${jnode.disk.pln}" geometry="${jnode.disk.geometry}">
