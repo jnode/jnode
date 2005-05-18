@@ -115,6 +115,7 @@ public class BaseMagicHelper {
         EQUALS("equals"),
         ISZERO("isZero"),
         ISMAX("isMax"),
+        ISNULL("isNull"),
         EQ("EQ"),
         NE("NE"),
         GT("GT"),
@@ -209,6 +210,8 @@ public class BaseMagicHelper {
         LONGBITSTODOUBLE("longBitsToDouble"),
         DOUBLETORAWLONGBITS("doubleToRawLongBits"),
         BREAKPOINT("breakPoint"),
+        DIFF("diff"),
+        NULLREFERENCE("nullReference"),
         // Array classes
         ARR_CREATE("create"),
         ARR_GET("get"),

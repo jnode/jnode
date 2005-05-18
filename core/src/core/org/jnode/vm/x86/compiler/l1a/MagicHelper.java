@@ -130,7 +130,8 @@ final class MagicHelper extends BaseX86MagicHelper {
             vstack.push(addr);
         }
             break;
-        case SUB: {
+        case SUB: 
+        case DIFF: {
             // addr - ofs
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final WordItem ofs = (WordItem) vstack.pop();
@@ -246,7 +247,8 @@ final class MagicHelper extends BaseX86MagicHelper {
             vstack.push(result);
         }
             break;
-        case ZERO: {
+        case ZERO: 
+        case NULLREFERENCE: {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final RefItem result = ifac.createAConst(ec, null);
             vstack.push(result);
@@ -266,7 +268,8 @@ final class MagicHelper extends BaseX86MagicHelper {
             vstack.push(result);
         }
             break;
-        case ISZERO: {
+        case ISZERO: 
+        case ISNULL: {
             // Just convert to int
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final WordItem addr = vstack.popRef();
