@@ -284,7 +284,7 @@ public abstract class VmX86Architecture extends VmArchitecture {
     public Address getEnd(Space space) {
         switch (space) {
         case HEAP: return Address.fromIntZeroExtend(AVAILABLE_END);
-        case AVAILABLE: return Address.fromIntSignExtend(AVAILABLE_END);
+        case AVAILABLE: return Address.fromIntZeroExtend(AVAILABLE_END);
         case DEVICE: return Address.fromIntZeroExtend(DEVICE_END);
         default: return super.getEnd(space);
         }
@@ -296,7 +296,7 @@ public abstract class VmX86Architecture extends VmArchitecture {
     public Address getStart(Space space) {
         switch (space) {
         case HEAP: return Address.fromIntZeroExtend(BOOT_IMAGE_START);
-        case AVAILABLE: return Address.fromIntSignExtend(AVAILABLE_START);
+        case AVAILABLE: return Address.fromIntZeroExtend(AVAILABLE_START);
         case DEVICE: return Address.fromIntZeroExtend(DEVICE_START);
         default: return super.getStart(space);
         }

@@ -27,6 +27,9 @@ import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.compiler.IMTCompiler;
 import org.jnode.vm.x86.compiler.X86IMTCompiler32;
+import org.vmmagic.pragma.UninterruptiblePragma;
+import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.Extent;
 
 /**
  * Architecture description for the x86 (32-bit) architecture.
@@ -103,5 +106,24 @@ public final class VmX86Architecture32 extends VmX86Architecture {
      */
     public final byte getLogPageSize() {
         return 22; // 4Mb
+    }
+    
+    /**
+     * Map a region of the heap space. 
+     * Note that you cannot allocate memory in this memory, because
+     * it is used very early in the boot process.
+     * 
+     * @param space
+     * @param start
+     * @param size
+     * @return true for success, false otherwise.
+     */
+    public final boolean mmap(Space space, Address start, Extent size)
+    throws UninterruptiblePragma {
+        if (space != Space.HEAP) {
+            return false;
+        }
+        
+        return false;
     }
 }

@@ -113,6 +113,13 @@ final class HeapHelperImpl extends HeapHelper implements Uninterruptible {
     }
 
     /**
+     * @see org.jnode.vm.memmgr.HeapHelper#clear(Address, Extent)
+     */
+    public final void clear(Address dst, Extent size) {
+        Unsafe.clear(dst, size);
+    }
+
+    /**
      * @see org.jnode.vm.memmgr.HeapHelper#copy(Address, Address, int)
      */
     public final void copy(Address src, Address dst, Extent size) {
