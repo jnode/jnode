@@ -106,17 +106,17 @@ final class HeapHelperImpl extends HeapHelper implements Uninterruptible {
     }
 
     /**
-     * @see org.jnode.vm.memmgr.HeapHelper#clear(Address, int)
-     */
-    public final void clear(Address dst, int size) {
-        Unsafe.clear(dst, Extent.fromIntSignExtend(size));
-    }
-
-    /**
      * @see org.jnode.vm.memmgr.HeapHelper#clear(Address, Extent)
      */
     public final void clear(Address dst, Extent size) {
         Unsafe.clear(dst, size);
+    }
+
+    /**
+     * @see org.jnode.vm.memmgr.HeapHelper#clear(Address, int)
+     */
+    public final void clear(Address dst, int size) {
+        Unsafe.clear(dst, Extent.fromIntSignExtend(size));
     }
 
     /**
@@ -150,6 +150,20 @@ final class HeapHelperImpl extends HeapHelper implements Uninterruptible {
      */
     public final Address getBootHeapStart() {
         return Unsafe.getBootHeapStart();
+    }
+
+    /**
+     * @see org.jnode.vm.memmgr.HeapHelper#getBootImageEnd()
+     */
+    public final Address getBootImageEnd() {
+        return Unsafe.getBootHeapEnd();
+    }
+
+    /**
+     * @see org.jnode.vm.memmgr.HeapHelper#getBootImageStart()
+     */
+    public final Address getBootImageStart() {
+        return Unsafe.getKernelStart();
     }
 
     /**

@@ -56,11 +56,17 @@ public abstract class HeapHelper {
 
 	public abstract Address allocateBlock(Extent size);
 
+    /** Gets the start address of the boot image */
+	public abstract Address getBootImageStart();
+
+    /** End the end address of the boot image */
+	public abstract Address getBootImageEnd();
+    
     /** Gets the start address of the boot heap */
-	public abstract Address getBootHeapStart();
+    public abstract Address getBootHeapStart();
 
     /** End the end address of the boot heap */
-	public abstract Address getBootHeapEnd();
+    public abstract Address getBootHeapEnd();
     
     /** Gets the amount of memory available to the memory manager */
     public abstract Extent getHeapSize();

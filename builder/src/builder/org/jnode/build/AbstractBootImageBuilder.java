@@ -486,6 +486,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             loadClass(VmSystemClassLoader.class);
             loadClass(VmType[].class);
             loadClass(Vm.class);
+            loadClass(VmArchitecture.Space.class).link();
             Vm.getHeapManager().loadClasses(clsMgr);
             loadClass(VmHeapManager.class);
             loadClass(VmSharedStatics.class);
@@ -938,7 +939,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * @return The loaded class
      * @throws ClassNotFoundException
      */
-    public final VmType loadClass(Class< ? > c) throws ClassNotFoundException {
+    public final VmType<?> loadClass(Class< ? > c) throws ClassNotFoundException {
         String name = c.getName();
         VmType cls = clsMgr.findLoadedClass(name);
         if (cls != null) {
@@ -1431,6 +1432,9 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                                 }
                             }
                         }
+                    }
+                    if (name.startsWith("org.mmtk.")) {
+                        type.setInitialized();
                     }
                 } catch (JNodeClassNotFoundException ex) {
                     log("JNode class not found" + ex.getMessage());

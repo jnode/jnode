@@ -1404,7 +1404,9 @@ public abstract class VmType<T> extends VmSystemObject implements VmSharedStatic
 		if (arrayClass != null) {
 			//arrayClass.link();
 		}
-        Vm.getVm().notifyClassResolved(this);
+        if (mmType == null) {
+            Vm.getVm().notifyClassResolved(this);
+        }
 		return this;
 	}
 
