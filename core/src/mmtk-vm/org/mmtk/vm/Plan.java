@@ -22,6 +22,7 @@
 package org.mmtk.vm;
 
 import org.jnode.vm.Unsafe;
+import org.jnode.vm.memmgr.HeapHelper;
 import org.mmtk.plan.NoGC;
 
 /**
@@ -35,15 +36,22 @@ import org.mmtk.plan.NoGC;
  */
 public class Plan extends NoGC {
 
-    /***************************************************************************
-     * Class variables
-     */
-
     /**
      * <code>true</code> if built with GCSpy
      */
     public static final boolean WITH_GCSPY = false;
 
+    /** The heap helper */
+    private final HeapHelper heapHelper;
+    
+    /**
+     * Initialize this instance.
+     * @param helper
+     */
+    public Plan(HeapHelper helper) {
+        this.heapHelper = helper;
+    }
+    
     /**
      * Gets the plan instance associated with the current processor.
      * 
@@ -52,4 +60,11 @@ public class Plan extends NoGC {
     public static Plan getInstance() {
         return (Plan)Unsafe.getCurrentProcessor().getHeapData();
     }
+
+    /**
+     * @return Returns the heapHelper.
+     */
+    public final HeapHelper getHeapHelper() {
+        return heapHelper;
+    }    
 }

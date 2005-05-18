@@ -29,7 +29,9 @@ import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.compiler.IMTCompiler;
 import org.jnode.vm.compiler.NativeCodeCompiler;
+import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.Extent;
 
 /**
  * Class describing a specific system architecture.
@@ -175,4 +177,17 @@ public abstract class VmArchitecture extends VmSystemObject {
         default: throw new IllegalArgumentException("Unknown space " + space);
         }
     }
+    
+    /**
+     * Map a region of the heap space. 
+     * Note that you cannot allocate memory in this memory, because
+     * it is used very early in the boot process.
+     * 
+     * @param space
+     * @param start
+     * @param size
+     * @return true for success, false otherwise.
+     */
+    public abstract boolean mmap(Space space, Address start, Extent size)
+    throws UninterruptiblePragma;
 }

@@ -52,6 +52,8 @@ public abstract class HeapHelper {
 
 	public abstract void clear(Address dst, int size);
 
+    public abstract void clear(Address dst, Extent size);
+
 	public abstract Address allocateBlock(Extent size);
 
     /** Gets the start address of the boot heap */

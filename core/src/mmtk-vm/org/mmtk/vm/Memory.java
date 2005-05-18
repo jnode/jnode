@@ -142,7 +142,11 @@ public class Memory {
      * @return 0 if successful, otherwise the system errno
      */
     public static int mmap(Address start, int size) {
-        return 0;
+        if (Vm.getArch().mmap(VmArchitecture.Space.HEAP, start, Extent.fromIntZeroExtend(size))) {
+            return 0;
+        } else {
+            return 1;
+        }
     }
 
     /**
@@ -155,6 +159,7 @@ public class Memory {
      * @return <code>true</code> if successful, otherwise <code>false</code>
      */
     public static boolean mprotect(Address start, int size) {
+        // Unimplemented for now
         return false;
     }
 
@@ -168,6 +173,7 @@ public class Memory {
      * @return <code>true</code> if successful, otherwise <code>false</code>
      */
     public static boolean munprotect(Address start, int size) {
+        // Unimplemented for now
         return false;
     }
 
@@ -180,6 +186,7 @@ public class Memory {
      *            Length in bytes of range to zero Returned: nothing
      */
     public static void zero(Address start, Extent len) {
+        Plan.getInstance().getHeapHelper().clear(start, len);
     }
 
     /**
@@ -191,6 +198,7 @@ public class Memory {
      *            Length in bytes of range (must be multiple of page size)
      */
     public static void zeroPages(Address start, int len) {
+        Plan.getInstance().getHeapHelper().clear(start, len);
     }
 
     /**
