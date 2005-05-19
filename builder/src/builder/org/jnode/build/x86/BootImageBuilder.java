@@ -23,8 +23,8 @@ package org.jnode.build.x86;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.tools.ant.Project;
 import org.jnode.assembler.Label;
@@ -37,13 +37,13 @@ import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.boot.Main;
 import org.jnode.build.AbstractBootImageBuilder;
-import org.jnode.build.BuildException;
 import org.jnode.build.AsmSourceInfo;
+import org.jnode.build.BuildException;
+import org.jnode.jnasm.JNAsm;
 import org.jnode.linker.Elf;
 import org.jnode.linker.ElfLinker;
 import org.jnode.plugin.PluginRegistry;
 import org.jnode.util.NumberUtils;
-import org.jnode.vm.MathSupport;
 import org.jnode.vm.MonitorManager;
 import org.jnode.vm.SoftByteCodes;
 import org.jnode.vm.Vm;
@@ -71,7 +71,6 @@ import org.jnode.vm.x86.VmX86Processor64;
 import org.jnode.vm.x86.X86CpuID;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
 import org.jnode.vm.x86.compiler.X86JumpTable;
-import org.jnode.jnasm.JNAsm;
 
 /**
  * @author epr
@@ -268,7 +267,6 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 			// The loading of class can emit object in between, so first load
 			// all required classes here.
 			loadClass(Main.class);
-			loadClass(MathSupport.class);
 			loadClass(MonitorManager.class);
 			loadClass(SoftByteCodes.class);
 			loadClass(Vm.class);
