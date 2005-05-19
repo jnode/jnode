@@ -26,7 +26,7 @@ import org.vmmagic.pragma.Uninterruptible;
 /**
  * @author epr
  */
-final class MathSupport implements Uninterruptible {
+public final class MathSupport implements Uninterruptible {
 
     private final char[] v = new char[5];
     private final char[] u = new char[5];
