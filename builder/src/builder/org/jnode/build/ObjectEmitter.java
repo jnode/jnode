@@ -144,7 +144,7 @@ public class ObjectEmitter {
         } else if (cls.equals(Class.class)) {
             emitClass((Class) obj);
         } else if (cls.isArray()) {
-            emitArray(cls, obj, (VmArrayClass) vmClass);
+            emitArray(cls, obj, (VmArrayClass<?>) vmClass);
         } else {
             try {
                 emitObject(cls, obj, (VmNormalClass< ? >) vmClass);
