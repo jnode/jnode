@@ -33,6 +33,7 @@ import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmSystemObject;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.ObjectReference;
+import org.vmmagic.unboxed.UnboxedObject;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -186,6 +187,20 @@ public abstract class VmStatics extends VmSystemObject {
 	}
 
     public final void setAddress(int idx, Label value) {
+        if (!Vm.isWritingImage()) {
+            throw new IllegalStateException("Only allowed during bootimage creation.");
+        }
+        if (types[idx] != TYPE_ADDRESS) {
+            throw new IllegalArgumentException("Type error " + types[idx]);
+        }
+        if (setRawObject(idx, value)) {
+            if (locked) {
+                throw new RuntimeException("Locked");
+            }           
+        }
+    }
+
+    public final void setAddress(int idx, UnboxedObject value) {
         if (!Vm.isWritingImage()) {
             throw new IllegalStateException("Only allowed during bootimage creation.");
         }
@@ -388,12 +403,12 @@ public abstract class VmStatics extends VmSystemObject {
 				count++;
 				if (slotLength == 1) {
 					statics[i] = resolver.addressOf32(value);
-					if (statics[i] == 0) {
+					if ((statics[i] == 0) && (types[i] != TYPE_ADDRESS)) {
 						throw new RuntimeException("addressof32(" + value + ") is null");
 					}
 				} else {
 					final long lvalue = resolver.addressOf64(value);
-					if (lvalue == 0L) {
+					if ((lvalue == 0L) && (types[i] != TYPE_ADDRESS)) {
 						throw new RuntimeException("addressof64(" + value + ") is null");
 					}
 					if (lsbFirst) {
