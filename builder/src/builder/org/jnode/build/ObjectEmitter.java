@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.Set;
 
 import org.jnode.assembler.BootImageNativeStream;
+import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.system.BootLog;
@@ -428,13 +429,16 @@ public class ObjectEmitter {
                         throw new BuildException("Unknown primitive class "
                                 + fType.getName());
                     }
-                } else if (jnodeField.getDeclaringClass().isMagicType()) {
+                } else if (jnodeField.isAddressType()) {
                     final Object value = jdkField.get(obj);
                     if (value == null) {
-                        os.writeWord(0);
+                        os.setWord(fldOffset, 0);
                     } else if (value instanceof UnboxedObject) {
                         final UnboxedObject uobj = (UnboxedObject)value;
-                        os.writeWord(uobj.toLong());
+                        os.setWord(fldOffset, uobj.toLong());
+                    } else if (value instanceof Label) {
+                        final Label lbl = (Label)value;
+                        bis.setObjectRef(fldOffset, lbl);
                     } else {
                         throw new BuildException("Cannot handle magic type " + value.getClass().getName());
                     }                    
