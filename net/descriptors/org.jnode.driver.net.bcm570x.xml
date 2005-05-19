@@ -21,8 +21,34 @@
 
   <extension point="org.jnode.driver.mappers">
     <!-- mapper class="org.jnode.driver.net.bcm570x.BCM570xDeviceToDriverMapper"/ -->
+    <mapper id="14E4:1644" name="Broadcom BCM5700" driver-class="org.jnode.driver.net.bcm570x.BCM570xDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="14E4:1645" name="Broadcom BCM5701" driver-class="org.jnode.driver.net.bcm570x.BCM570xDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="14E4:1646" name="Broadcom BCM5702 1000Base-T" driver-class="org.jnode.driver.net.bcm570x.BCM570xDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="14E4:1647" name="Broadcom BCM5703" driver-class="org.jnode.driver.net.bcm570x.BCM570xDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="14E4:1648" name="Broadcom BCM5704" driver-class="org.jnode.driver.net.bcm570x.BCM570xDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="14E4:1649" name="Broadcom BCM5704 1000Base-SX" driver-class="org.jnode.driver.net.bcm570x.BCM570xDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="14E4:1653" name="Broadcom BCM5705 1000Base-T" driver-class="org.jnode.driver.net.bcm570x.BCM570xDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="14E4:1654" name="HP NC7761 Gigabit Server Adapter" driver-class="org.jnode.driver.net.bcm570x.BCM570xDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="14E4:1658" name="Broadcom BCM5720 1000Base-T PCI" driver-class="org.jnode.driver.net.bcm570x.BCM570xDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="14E4:1659" name="Broadcom BCM5721 1000Base-T PCI Express" driver-class="org.jnode.driver.net.bcm570x.BCM570xDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
     <mapper id="14E4:165D" name="Broadcom Corp NetXtreme Gigabit Ethernet" driver-class="org.jnode.driver.net.bcm570x.BCM570xDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
-
+    <mapper id="14E4:165E" name="Broadcom Corp NetXtreme Gigabit Ethernet" driver-class="org.jnode.driver.net.bcm570x.BCM570xDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="14E4:166E" name="Broadcom NetXtreme Gigabit Ethernet for hp" driver-class="org.jnode.driver.net.bcm570x.BCM570xDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="14E4:0x1676" name="Broadcom BCM5750 1000Base-T PCI" driver-class="org.jnode.driver.net.bcm570x.BCM570xDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="14E4:0x1677" name="Broadcom BCM5751 1000Base-T PCI Express" driver-class="org.jnode.driver.net.bcm570x.BCM570xDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="14E4:0x167C" name="Broadcom BCM5750M 1000Base-T PCI" driver-class="org.jnode.driver.net.bcm570x.BCM570xDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="14E4:0x167D" name="Broadcom BCM5751M 1000Base-T PCI Express" driver-class="org.jnode.driver.net.bcm570x.BCM570xDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="14E4:0x167E" name="Broadcom BCM5751F 100Base-TX PCI Express" driver-class="org.jnode.driver.net.bcm570x.BCM570xDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="14E4:1696" name="Broadcom Corp NetXtreme Gigabit Ethernet" driver-class="org.jnode.driver.net.bcm570x.BCM570xDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="14E4:169C" name="Broadcom BCM5788 NetLink 1000Base-T" driver-class="org.jnode.driver.net.bcm570x.BCM570xDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="14E4:169D" name="Broadcom BCM5789 NetLink 1000Base-T PCI Express" driver-class="org.jnode.driver.net.bcm570x.BCM570xDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="14E4:170D" name="Broadcom BCM5901 100Base-TX" driver-class="org.jnode.driver.net.bcm570x.BCM570xDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="14E4:170E" name="Broadcom BCM5901 100Base-TX" driver-class="org.jnode.driver.net.bcm570x.BCM570xDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="14E4:16A6" name="Broadcom BCM5702 1000Base-T" driver-class="org.jnode.driver.net.bcm570x.BCM570xDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="14E4:16A7" name="Broadcom BCM5703" driver-class="org.jnode.driver.net.bcm570x.BCM570xDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="14E4:16A8" name="Broadcom BCM5704 1000Base-SX" driver-class="org.jnode.driver.net.bcm570x.BCM570xDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="14E4:16C6" name="Broadcom BCM5702 1000Base-T" driver-class="org.jnode.driver.net.bcm570x.BCM570xDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="14E4:16C7" name="Broadcom B5703" driver-class="org.jnode.driver.net.bcm570x.BCM570xDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
   </extension>
 
   <extension point="org.jnode.security.permissions">
