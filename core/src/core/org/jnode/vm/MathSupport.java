@@ -21,11 +21,17 @@
 
 package org.jnode.vm;
 
+import org.vmmagic.pragma.Uninterruptible;
+
 /**
  * @author epr
  */
-public class MathSupport {
+final class MathSupport implements Uninterruptible {
 
+    private final char[] v = new char[5];
+    private final char[] u = new char[5];
+    private final char[] q = new char[5];
+    
     public static boolean ucmp(/*unsigned*/
             final int a, /*unsigned*/
             final int b) {
@@ -292,13 +298,14 @@ public class MathSupport {
         char u2 = LHALF(HHALFQ(uq));
         char u3 = HHALF(LHALFQ(uq));
         char u4 = LHALF(LHALFQ(uq));
-        final char[] v = new char[]{
-            0,
-            HHALF(HHALFQ(vq)),
-            LHALF(HHALFQ(vq)),
-            HHALF(LHALFQ(vq)),
-            LHALF(LHALFQ(vq))
-        };
+        
+        final MathSupport mathSupport = Unsafe.getCurrentProcessor().getMathSupport();
+        final char[] v = mathSupport.v; 
+        v[0] = 0;
+        v[1] = HHALF(HHALFQ(vq));
+        v[2] = LHALF(HHALFQ(vq));
+        v[3] = HHALF(LHALFQ(vq));
+        v[4] = LHALF(LHALFQ(vq));
         int vi = 0;
         int n;
         for (n = 4; v[vi + 1] == 0; vi++) {
@@ -334,12 +341,18 @@ public class MathSupport {
          * there is a complete four-digit quotient at &qspace[1] when
          * we finally stop.
          */
-        final char[] u = new char[]{0, u1, u2, u3, u4};
+        final char[] u = mathSupport.u;
+        u[0] = 0;
+        u[1] = u1;
+        u[2] = u2;
+        u[3] = u3;
+        u[4] = u4;
+        
         int ui = 0;
         int m;
         for (m = 4 - n; u[ui + 1] == 0; ++ui)
             m--;
-        final char[] q = new char[5];
+        final char[] q = mathSupport.q;
         /*
          * In Java, q is already initialized to contain 0s.
          * Therefore, the following code is unnecessary.
