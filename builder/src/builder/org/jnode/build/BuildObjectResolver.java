@@ -24,6 +24,7 @@ package org.jnode.build;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.assembler.UnresolvedObjectRefException;
+import org.vmmagic.unboxed.UnboxedObject;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -42,6 +43,9 @@ public class BuildObjectResolver extends ObjectResolver {
 	 * @see org.jnode.assembler.ObjectResolver#addressOf32(java.lang.Object)
 	 */
 	public int addressOf32(Object object) {
+        if (object instanceof UnboxedObject) {
+            return ((UnboxedObject) object).toInt();
+        }
 		final NativeStream.ObjectRef ref = os.getObjectRef(object);
 		try {
 			if (!ref.isResolved()) {
@@ -61,6 +65,9 @@ public class BuildObjectResolver extends ObjectResolver {
 	 * @see org.jnode.assembler.ObjectResolver#addressOf64(java.lang.Object)
 	 */
 	public long addressOf64(Object object) {
+        if (object instanceof UnboxedObject) {
+            return ((UnboxedObject) object).toLong();
+        }
 		final NativeStream.ObjectRef ref = os.getObjectRef(object);
 		try {
 			if (!ref.isResolved()) {

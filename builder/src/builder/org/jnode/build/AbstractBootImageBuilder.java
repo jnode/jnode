@@ -56,6 +56,7 @@ import org.jnode.plugin.model.Factory;
 import org.jnode.plugin.model.PluginDescriptorModel;
 import org.jnode.plugin.model.PluginJar;
 import org.jnode.plugin.model.PluginRegistryModel;
+import org.jnode.system.BootLog;
 import org.jnode.util.BootableHashMap;
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.JvmType;
@@ -83,6 +84,7 @@ import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmHeapManager;
+import org.vmmagic.unboxed.UnboxedObject;
 
 /**
  * Build the boot image from an assembler compiled bootstrap (in ELF format)
@@ -1498,6 +1500,18 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                 }
                 statics.setInt(idx, ival);
             }
+        } else if (f.isAddressType()) {
+            if (val == null) {
+                // Just do nothing
+            } else if (val instanceof UnboxedObject) {
+                final UnboxedObject uobj = (UnboxedObject)val;
+                statics.setAddress(idx, uobj);
+            } else if (val instanceof Label) {
+                final Label lbl = (Label)val;
+                statics.setAddress(idx, lbl);
+            } else {
+                throw new BuildException("Cannot handle magic type " + val.getClass().getName());
+            }                    
         } else {
             if (!Modifier.isAddressType(f.getSignature())) {
                 if (val != null) {
