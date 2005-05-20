@@ -153,11 +153,12 @@ public class Memory {
      * @return 0 if successful, otherwise the system errno
      */
     public static int mmap(Address start, int size) {
-        Unsafe.debug("mmap ");
-        Unsafe.debug(start);
-        Unsafe.debug(" sz ");
-        Unsafe.debug(size);
-        Unsafe.debug('\n');
+        if (false) {
+            Unsafe.debug("mmap ");
+            Unsafe.debug(start);
+            Unsafe.debug(" sz ");
+            Unsafe.debug(size);
+        }
         
         if (Vm.getArch().mmap(VmArchitecture.Space.HEAP, start, Extent.fromIntZeroExtend(size))) {
             return 0;

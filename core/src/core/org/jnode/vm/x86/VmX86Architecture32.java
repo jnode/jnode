@@ -21,6 +21,7 @@
  
 package org.jnode.vm.x86;
 
+import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.classmgr.TypeSizeInfo;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
@@ -30,6 +31,7 @@ import org.jnode.vm.x86.compiler.X86IMTCompiler32;
 import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
+import org.vmmagic.unboxed.Word;
 
 /**
  * Architecture description for the x86 (32-bit) architecture.
@@ -47,6 +49,12 @@ public final class VmX86Architecture32 extends VmX86Architecture {
     /** The type size information */
     private final TypeSizeInfo typeSizeInfo;
 
+    /** The next physical page address to be mmaped */
+    private Word pageCursor;
+    
+    /** Default page entry flags */
+    private final static int PF_DEFAULT = PF_PRESENT | PF_WRITE | PF_USER | PF_PSE;
+    
     /**
      * Initialize this instance.
      */
@@ -124,6 +132,61 @@ public final class VmX86Architecture32 extends VmX86Architecture {
             return false;
         }
         
-        return false;
+        start = pageAlign(start.toWord(), false).toAddress();
+        size = pageAlign(size.toWord(), true).toExtent();
+        
+        if (pageCursor.isZero()) {
+            Unsafe.debug("pageCursor is zero");
+        }
+        
+        final Word pageSize = Word.fromIntZeroExtend(getPageSize());
+        while (!size.isZero()) {
+            mapPage(start);
+            start = start.add(pageSize);
+            size = size.sub(pageSize);
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Map a page at the given virtual address.
+     * @param vmAddress
+     */
+    private final void mapPage(Address vmAddress) {        
+        // Setup the pdir structures
+        final Word pdirIdx = vmAddress.toWord().rshl(22);
+        final Address pdirEntryPtr = UnsafeX86.getCR3().add(pdirIdx.lsh(2));
+        Word entry = pdirEntryPtr.loadWord();
+        if (entry.and(Word.fromIntZeroExtend(PF_PRESENT)).isZero()) {
+            // Get a free page
+            final Word pagePtr = pageCursor;
+            pageCursor = pageCursor.add(getPageSize());
+
+            // There is currently no present page, so do the mapping
+            entry = pagePtr.or(Word.fromIntZeroExtend(PF_DEFAULT));
+            pdirEntryPtr.store(entry);                
+        }
+    }
+
+    /**
+     * @see org.jnode.vm.VmArchitecture#boot()
+     */
+    protected void boot(boolean emptyMMap) {
+        Unsafe.debug("VmArchitecture32#boot\n");
+        pageCursor = getFirstAvailableHeapPage();
+        
+        if (emptyMMap) {
+            // Remove all page mappings between AVAILABLE_START-END
+            final Word psize = Word.fromIntZeroExtend(getPageSize());
+            final Word start = Word.fromIntZeroExtend(AVAILABLE_START);
+            final Word end = Word.fromIntZeroExtend(AVAILABLE_END);
+            final Address pdir = UnsafeX86.getCR3();
+            
+            for (Word ptr = start; ptr.LT(end); ptr = ptr.add(psize)) {
+                final Word pdirIdx = ptr.rshl(22);
+                pdir.add(pdirIdx.lsh(2)).store(Word.zero());            
+            }               
+        }
     }
 }

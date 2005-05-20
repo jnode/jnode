@@ -57,4 +57,10 @@ final class UnsafeX86 {
      * @param gdt
      */
     static final native void setupBootCode(Address memory, int[] gdt, int[] tss);
+    
+    /**
+     * Gets the CR3 register.
+     * @return
+     */
+    static final native Address getCR3();
 }

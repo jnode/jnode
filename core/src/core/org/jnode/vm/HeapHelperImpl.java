@@ -27,6 +27,7 @@ import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmHeapManager;
 import org.vmmagic.pragma.Uninterruptible;
+import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.ObjectReference;
@@ -243,5 +244,13 @@ final class HeapHelperImpl extends HeapHelper implements Uninterruptible {
         }
         threadRootVisitor.initialize(visitor, heapManager);
         Vm.visitAllThreads(threadRootVisitor);
+    }
+
+    /**
+     * @see org.jnode.vm.memmgr.HeapHelper#bootArchitecture(boolean)
+     */
+    public final void bootArchitecture(boolean emptyMMap) 
+    throws UninterruptiblePragma {
+        Vm.getArch().boot(emptyMMap);
     }
 }

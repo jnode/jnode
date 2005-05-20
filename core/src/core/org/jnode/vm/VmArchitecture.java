@@ -32,6 +32,7 @@ import org.jnode.vm.compiler.NativeCodeCompiler;
 import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
+import org.vmmagic.unboxed.Word;
 
 /**
  * Class describing a specific system architecture.
@@ -86,13 +87,15 @@ public abstract class VmArchitecture extends VmSystemObject {
      * Gets the log base two of the size of an OS page
      * @return
      */
-    public abstract byte getLogPageSize();
+    public abstract byte getLogPageSize()
+    throws UninterruptiblePragma;
     
     /**
      * Gets the log base two of the size of an OS page
      * @return
      */
-    public final int getPageSize() {
+    public final int getPageSize() 
+    throws UninterruptiblePragma {
         return 1 << getLogPageSize();
     }
     
@@ -132,6 +135,15 @@ public abstract class VmArchitecture extends VmSystemObject {
 	 */
 	public abstract IMTCompiler getIMTCompiler();
 	
+    /** 
+     * Called early on in the boot process (before the initializating of 
+     * the memory manager) to initialize any architecture specific variables.
+     * Do not allocate memory here.
+     * @param emptyMmap If true, all page mappings in the AVAILABLE region
+     * are removed.
+     */
+    protected abstract void boot(boolean emptyMmap);
+    
 	/**
 	 * Find and start all processors in the system.
 	 * All all discovered processors to the given list.
@@ -176,6 +188,29 @@ public abstract class VmArchitecture extends VmSystemObject {
         case INITJAR: return Unsafe.getInitJarEnd();
         default: throw new IllegalArgumentException("Unknown space " + space);
         }
+    }
+    
+    /**
+     * Gets the physical address of the first page available
+     * for mmap.
+     * @return
+     */
+    protected final Word getFirstAvailableHeapPage() {
+        return pageAlign(Unsafe.getMemoryStart().toWord(), true);
+    }
+    
+    /**
+     * Page align a given value.
+     * @param v
+     * @param up If true, the value will be rounded up, otherwise rounded down.
+     * @return
+     */
+    protected final Word pageAlign(Word v, boolean up) {
+        final int logPageSize = getLogPageSize();
+        if (up) {
+            v = v.add((1 << logPageSize) - 1);
+        }
+        return v.rshl(logPageSize).lsh(logPageSize);
     }
     
     /**

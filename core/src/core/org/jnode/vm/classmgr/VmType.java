@@ -2159,6 +2159,10 @@ public abstract class VmType<T> extends VmSystemObject implements VmSharedStatic
      * @param mmType The mmType to set.
      */
     public final void setMmType(Object mmType) {
-        this.mmType = mmType;
+        if (this.mmType != null) {
+            Unsafe.debug("Cannot override mmType\n");
+        } else {
+            this.mmType = mmType;
+        }
     }
 }

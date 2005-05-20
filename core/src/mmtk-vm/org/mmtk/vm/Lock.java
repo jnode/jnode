@@ -21,7 +21,7 @@
 
 package org.mmtk.vm;
 
-import org.jnode.vm.SpinLock;
+import org.jnode.vm.ProcessorLock;
 
 /**
  * Simple, fair locks with deadlock detection. The implementation mimics a
@@ -35,7 +35,7 @@ import org.jnode.vm.SpinLock;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Perry Cheng
  */
-public final class Lock extends SpinLock {
+public final class Lock extends ProcessorLock {
 
     public static int verbose = 0; // show who is acquiring and releasing the
                                     // locks

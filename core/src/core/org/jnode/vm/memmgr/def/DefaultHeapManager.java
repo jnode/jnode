@@ -234,6 +234,7 @@ public final class DefaultHeapManager extends VmHeapManager {
 
     protected void initialize() {
         // Set the basic fields
+        helper.bootArchitecture(false);
         final VmArchitecture arch = Unsafe.getCurrentProcessor()
                 .getArchitecture();
         final int slotSize = arch.getReferenceSize();

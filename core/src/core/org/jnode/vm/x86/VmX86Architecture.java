@@ -50,14 +50,41 @@ public abstract class VmX86Architecture extends VmArchitecture {
 
     /** Start address of the boot image (1Mb) */
     public static final int BOOT_IMAGE_START = 0x00100000;
+
     /** Start address of the space available to devices (3Gb) */
     public static final int DEVICE_START = 0xC0000000;
+
     /** End address of the space available to devices (4Gb-4Mb) */
     public static final int DEVICE_END = 0xFFC00000;
-    /** Start address of the space available to the memory manager (256Mb) */
+
+    /** 
+     * Start address of the space available to the memory manager (256Mb).
+     * This address must be 4Mb aligned.
+     */
     public static final int AVAILABLE_START = 0x10000000;
-    /** End address of the space available to the memory manager */
+
+    /** 
+     * End address of the space available to the memory manager.
+     * This address must be 4Mb aligned.
+     */
     public static final int AVAILABLE_END = DEVICE_START;
+    
+    // Page entry flags
+    protected static final int PF_PRESENT = 0x00000001;
+
+    protected static final int PF_WRITE = 0x00000002;
+
+    protected static final int PF_USER = 0x00000004;
+
+    protected static final int PF_PWT = 0x00000008;
+
+    protected static final int PF_PCD = 0x00000010;
+
+    protected static final int PF_ACCESSED = 0x00000020;
+
+    protected static final int PF_DIRTY = 0x00000040;
+
+    protected static final int PF_PSE = 0x00000080;
     
     /** The compilers */
     private final NativeCodeCompiler[] compilers;
