@@ -62,6 +62,11 @@ getTSS_ret:
 GLABEL Q53org5jnode2vm3x869UnsafeX8623getAPBootCodeSize2e2829I
 	mov eax,ap_boot_end-ap_boot
 	ret
+	
+; Address getCR3();
+GLABEL Q53org5jnode2vm3x869UnsafeX8623getCR32e2829Lorg2fvmmagic2funboxed2fAddress3b
+	mov AAX,pd_paddr
+	ret
 
 ; void setupBootCode(Address memory, int[] gdtBase, int[] tss);
 GLABEL Q53org5jnode2vm3x869UnsafeX8623setupBootCode2e28Lorg2fvmmagic2funboxed2fAddress3b5bI5bI29V

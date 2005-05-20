@@ -25,13 +25,14 @@ import org.jnode.vm.Monitor;
 import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.classmgr.VmMethod;
+import org.vmmagic.pragma.Uninterruptible;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public abstract class HeapHelper {
+public abstract class HeapHelper implements Uninterruptible {
 
 	/**
 	 * Mark the given object as finalized.
@@ -101,5 +102,12 @@ public abstract class HeapHelper {
      * Visit all roots of the object tree.
      * @param visitor
      */
-    public abstract void visitAllRoots(ObjectVisitor visitor, VmHeapManager heapManager); 
+    public abstract void visitAllRoots(ObjectVisitor visitor, VmHeapManager heapManager);
+    
+    /**
+     * Boot the architecture object.
+     * @param emptyMMap If true all page mappings in the AVAILABLE region
+     * are removed.
+     */
+    public abstract void bootArchitecture(boolean emptyMMap);
 }
