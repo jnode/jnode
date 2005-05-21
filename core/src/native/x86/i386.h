@@ -146,13 +146,28 @@ MBI_BOOTDEVICE	equ 0x0C
 MBI_CMDLINE		equ 0x10
 MBI_MODSCOUNT	equ 0x14
 MBI_MODSADDR	equ 0x18
+MBI_MMAPLENGTH	equ 0x2C
+MBI_MMAPADDR	equ 0x30
 
-MBI_SIZE		equ 0x20
+MBI_SIZE		equ 0x58
 MBI_CMDLINE_MAX	equ 0x400
+MBI_MMAP_MAX	equ 64
 
 MBMOD_START		equ 0x00
 MBMOD_END		equ 0x04
 MBMOD_CMDLINE	equ 0x08
 MBMOD_PAD		equ 0x10
+
+MBMMAP_SIZE		equ -4
+MBMMAP_BASEADDR	equ 0		; 64-bit base address
+MBMMAP_LENGTH	equ 8		; 64-bit length
+MBMMAP_TYPE		equ 16		; 32-bit type
+MBMMAP_ESIZE	equ 20
+
+MBF_MEM			equ (1 << 0)
+MBF_BOOTDEVICE	equ (1 << 1)
+MBF_CMDLINE		equ (1 << 2)
+MBF_MODS		equ (1 << 3)
+MBF_MMAP		equ (1 << 6)
 
 %include "i386_bits.h"

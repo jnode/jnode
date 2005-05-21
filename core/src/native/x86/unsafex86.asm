@@ -72,6 +72,16 @@ GLABEL Q53org5jnode2vm3x869UnsafeX8623getCR32e2829Lorg2fvmmagic2funboxed2fAddres
 %endif
 	ret
 
+; Address getMultibootMMap();
+GLABEL Q53org5jnode2vm3x869UnsafeX8623getMultibootMMap2e2829Lorg2fvmmagic2funboxed2fAddress3b
+	mov AAX,multiboot_mmap+4
+	ret
+
+; int getMultibootMMapLength();
+GLABEL Q53org5jnode2vm3x869UnsafeX8623getMultibootMMapLength2e2829I
+	mov eax,[multiboot_mmap]
+	ret
+
 ; void setupBootCode(Address memory, int[] gdtBase, int[] tss);
 GLABEL Q53org5jnode2vm3x869UnsafeX8623setupBootCode2e28Lorg2fvmmagic2funboxed2fAddress3b5bI5bI29V
 	push ABX

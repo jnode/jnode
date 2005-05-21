@@ -40,6 +40,7 @@ import org.jnode.vm.compiler.NativeCodeCompiler;
 import org.jnode.vm.x86.compiler.l1a.X86Level1ACompiler;
 import org.jnode.vm.x86.compiler.stub.X86StubCompiler;
 import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.Offset;
 
 /**
  * Architecture descriptor for the Intel X86 architecture.
@@ -85,6 +86,12 @@ public abstract class VmX86Architecture extends VmArchitecture {
     protected static final int PF_DIRTY = 0x00000040;
 
     protected static final int PF_PSE = 0x00000080;
+    
+    protected static final int MBMMAP_BASEADDR = 0;  // 64-bit base address
+    protected static final int MBMMAP_LENGTH   = 8;  // 64-bit length
+    protected static final int MBMMAP_TYPE     = 16; // 32-bit type
+    protected static final int MBMMAP_ESIZE    = 20;
+
     
     /** The compilers */
     private final NativeCodeCompiler[] compilers;
@@ -327,5 +334,31 @@ public abstract class VmX86Architecture extends VmArchitecture {
         case DEVICE: return Address.fromIntZeroExtend(DEVICE_START);
         default: return super.getStart(space);
         }
+    }
+    
+    /**
+     * Print the multiboot memory map to Unsafe.debug.
+     */
+    protected final void dumpMultibootMMap() {
+        final int cnt = UnsafeX86.getMultibootMMapLength();
+        Address mmap = UnsafeX86.getMultibootMMap();
+        
+        Unsafe.debug("Memory map\n");
+        for (int i = 0; i < cnt; i++) {
+            long base = mmap.loadLong(Offset.fromIntZeroExtend(MBMMAP_BASEADDR));
+            long length = mmap.loadLong(Offset.fromIntZeroExtend(MBMMAP_LENGTH));
+            int type = mmap.loadInt(Offset.fromIntZeroExtend(MBMMAP_TYPE));
+            mmap = mmap.add(MBMMAP_ESIZE);
+            
+            if (type == 0x01) {
+                Unsafe.debug("Available ");
+            } else {
+                Unsafe.debug("Reserved  ");
+            }
+            Unsafe.debug(base);
+            Unsafe.debug(" - ");
+            Unsafe.debug(base + length - 1);
+            Unsafe.debug('\n');
+        }        
     }
 }

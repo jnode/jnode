@@ -142,6 +142,7 @@ SPINLOCK		console_lock
 jnodeFinished:	DA 0
 kdb_enabled		dd 0
 kdb_port		dd 0x3f8
+newline_msg:	db 0xa,0
   
 		align 4096
 	global vm_start

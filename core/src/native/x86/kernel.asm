@@ -60,6 +60,38 @@ skip_multiboot_cmdline:
 	shl ebx,10			; Convert KB -> bytes
 	add ebx,0x100000	; MB upper mem starts at 1Mb
 
+	; Copy memmap (if any)
+	test dword [multiboot_info+MBI_FLAGS],MBF_MMAP
+	jz multiboot_mmap_done
+	; Get start address
+	mov esi,[multiboot_info+MBI_MMAPADDR]
+	; Get destination address
+	mov edi,multiboot_mmap+4
+	; Get end address
+	mov edx,esi
+	add edx,[multiboot_info+MBI_MMAPLENGTH]
+	; Skip size of first entry
+	lea esi,[esi+4]	
+multiboot_mmap_copy:
+	; Get entry size
+	mov eax,[esi+MBMMAP_SIZE]
+	; Copy the 20 bytes
+	mov ecx,MBMMAP_ESIZE
+	push esi
+	rep movsb
+	pop esi
+	; Increment entry count
+	inc dword [multiboot_mmap]
+	; Move to next entry
+	lea esi,[esi+eax+4]		; Source address += entrysize + 4
+	; edi is already incremented by rep movsb
+	; #Entries > MBI_MMAP_MAX
+	cmp dword [multiboot_mmap],MBI_MMAP_MAX
+	jge multiboot_mmap_done
+	cmp esi,edx				; source >= end?
+	jb multiboot_mmap_copy
+multiboot_mmap_done:
+
 	; Initialize initial jarfile
 	mov esi,[multiboot_info+MBI_MODSCOUNT]
 	test esi,esi
@@ -97,7 +129,13 @@ check_a20:
 	; Initialize kernel debugger communication
 	call kdb_init
 
+	; Print version
 	PRINT_STR sys_version
+	
+	; Print Multiboot flags
+	PRINT_STR mbflags_msg
+	PRINT_INT [multiboot_info+MBI_FLAGS]
+	NEWLINE
 
 	; Test for a valid cpu
 	call test_cpuid
@@ -228,6 +266,7 @@ no_multiboot_loader_msg: db 'No multiboot loader. halt...',0;
 before_start_vm_msg:     db 'Before start_vm',0xd,0xa,0
 after_vm_msg:  			 db 'VM returned with EAX ',0
 cpu_ok_msg:			     db 'CPU tested ok',0xd,0xa,0
+mbflags_msg:		     db 'Multiboot flags ',0
 
 multiboot_info:
 	times MBI_SIZE db  0
@@ -235,3 +274,6 @@ multiboot_info:
 multiboot_cmdline:
 	times (MBI_CMDLINE_MAX+4) db 0
 
+multiboot_mmap:
+	dd 0				; Entries
+	times (MBI_MMAP_MAX * MBMMAP_ESIZE) db 0

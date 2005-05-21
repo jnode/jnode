@@ -63,4 +63,16 @@ final class UnsafeX86 {
      * @return
      */
     static final native Address getCR3();
+    
+    /**
+     * Gets the address of first entry in the multiboot mmap table.
+     * @return
+     */
+    static final native Address getMultibootMMap();
+    
+    /**
+     * Gets the number of entries in the multiboot mmap table.
+     * @return
+     */
+    static final native int getMultibootMMapLength();
 }
