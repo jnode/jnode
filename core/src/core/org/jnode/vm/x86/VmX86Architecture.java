@@ -92,6 +92,12 @@ public abstract class VmX86Architecture extends VmArchitecture {
     protected static final int MBMMAP_TYPE     = 16; // 32-bit type
     protected static final int MBMMAP_ESIZE    = 20;
 
+    // Values for MBMMAP_TYPE field
+    protected static final int MMAP_TYPE_MEMORY = 1; // Available memory
+    protected static final int MMAP_TYPE_RESERVED = 2; // Reserved memory
+    protected static final int MMAP_TYPE_ACPI = 3; // ACPI reclaim memory
+    protected static final int MMAP_TYPE_NVS = 4; // ACPI NVS memory
+    protected static final int MMAP_TYPE_UNUSABLE = 5; // Memory with errors found in it
     
     /** The compilers */
     private final NativeCodeCompiler[] compilers;
@@ -350,15 +356,33 @@ public abstract class VmX86Architecture extends VmArchitecture {
             int type = mmap.loadInt(Offset.fromIntZeroExtend(MBMMAP_TYPE));
             mmap = mmap.add(MBMMAP_ESIZE);
             
-            if (type == 0x01) {
-                Unsafe.debug("Available ");
-            } else {
-                Unsafe.debug("Reserved  ");
-            }
+            Unsafe.debug(mmapTypeToString(type));
             Unsafe.debug(base);
             Unsafe.debug(" - ");
             Unsafe.debug(base + length - 1);
             Unsafe.debug('\n');
         }        
+    }
+    
+    /**
+     * Convert an mmap type into a human readable string.
+     * @param type
+     * @return
+     */
+    private final String mmapTypeToString(int type) {
+        switch (type) {
+        case MMAP_TYPE_MEMORY:
+            return "Available    ";
+        case MMAP_TYPE_RESERVED:
+            return "Reserved     ";
+        case MMAP_TYPE_ACPI:
+            return "ACPI reclaim ";
+        case MMAP_TYPE_NVS:
+            return "ACPI NVS     ";
+        case MMAP_TYPE_UNUSABLE:
+            return "Unusable     ";
+        default:
+            return "Undefined    ";
+        }
     }
 }
