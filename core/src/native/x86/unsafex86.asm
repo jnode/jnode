@@ -65,7 +65,11 @@ GLABEL Q53org5jnode2vm3x869UnsafeX8623getAPBootCodeSize2e2829I
 	
 ; Address getCR3();
 GLABEL Q53org5jnode2vm3x869UnsafeX8623getCR32e2829Lorg2fvmmagic2funboxed2fAddress3b
-	mov AAX,pd_paddr
+%ifdef BITS32
+	mov eax,pd_paddr
+%else
+	mov rax,pml4_addr
+%endif
 	ret
 
 ; void setupBootCode(Address memory, int[] gdtBase, int[] tss);
