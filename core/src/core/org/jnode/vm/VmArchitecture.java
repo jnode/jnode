@@ -21,8 +21,11 @@
  
 package org.jnode.vm;
 
+import static org.jnode.vm.VirtualMemoryRegion.HEAP;
+
 import java.nio.ByteOrder;
 
+import org.jnode.security.JNodePermission;
 import org.jnode.system.ResourceManager;
 import org.jnode.vm.classmgr.TypeSizeInfo;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
@@ -41,20 +44,10 @@ import org.vmmagic.unboxed.Word;
  */
 public abstract class VmArchitecture extends VmSystemObject {
 
-    public enum Space {
-        /** Total space that can contain objects */
-        HEAP,
-        /** Space available to the memory manager */
-        AVAILABLE,
-        /** Space available to devices */
-        DEVICE,
-        /** Space the contains the bootimage */
-        BOOTIMAGE,
-        /** Space the contains the initial jar */
-        INITJAR        
-    }
+    private final JNodePermission MMAP_PERM = new JNodePermission("getMemoryMap");
+    private transient MemoryMapEntry[] memoryMap;
     
-	/**
+    /**
 	 * Gets the name of this architecture.
 	 * This name is the programmers name used to identify packages,
 	 * class name extensions etc.
@@ -87,16 +80,16 @@ public abstract class VmArchitecture extends VmSystemObject {
      * Gets the log base two of the size of an OS page
      * @return
      */
-    public abstract byte getLogPageSize()
+    public abstract byte getLogPageSize(VirtualMemoryRegion region)
     throws UninterruptiblePragma;
     
     /**
      * Gets the log base two of the size of an OS page
      * @return
      */
-    public final int getPageSize() 
+    public final Extent getPageSize(VirtualMemoryRegion region) 
     throws UninterruptiblePragma {
-        return 1 << getLogPageSize();
+        return Extent.fromIntZeroExtend(1 << getLogPageSize(region));
     }
     
     /**
@@ -170,7 +163,7 @@ public abstract class VmArchitecture extends VmSystemObject {
      * Gets the start address of the given space.
      * @return
      */
-    public Address getStart(Space space) {
+    public Address getStart(VirtualMemoryRegion space) {
         switch (space) {
         case BOOTIMAGE: return Unsafe.getKernelStart();
         case INITJAR: return Unsafe.getInitJarStart();
@@ -182,7 +175,7 @@ public abstract class VmArchitecture extends VmSystemObject {
      * Gets the start address of the given space.
      * @return
      */
-    public Address getEnd(Space space) {
+    public Address getEnd(VirtualMemoryRegion space) {
         switch (space) {
         case BOOTIMAGE: return Unsafe.getBootHeapEnd();
         case INITJAR: return Unsafe.getInitJarEnd();
@@ -195,8 +188,8 @@ public abstract class VmArchitecture extends VmSystemObject {
      * for mmap.
      * @return
      */
-    protected final Word getFirstAvailableHeapPage() {
-        return pageAlign(Unsafe.getMemoryStart().toWord(), true);
+    protected final Word getFirstAvailableHeapPage() { 
+        return pageAlign(HEAP, Unsafe.getMemoryStart().toWord(), true);
     }
     
     /**
@@ -205,8 +198,8 @@ public abstract class VmArchitecture extends VmSystemObject {
      * @param up If true, the value will be rounded up, otherwise rounded down.
      * @return
      */
-    protected final Word pageAlign(Word v, boolean up) {
-        final int logPageSize = getLogPageSize();
+    public final Word pageAlign(VirtualMemoryRegion region, Word v, boolean up) {
+        final int logPageSize = getLogPageSize(region);
         if (up) {
             v = v.add((1 << logPageSize) - 1);
         }
@@ -214,15 +207,68 @@ public abstract class VmArchitecture extends VmSystemObject {
     }
     
     /**
-     * Map a region of the heap space. 
-     * Note that you cannot allocate memory in this memory, because
-     * it is used very early in the boot process.
+     * Page align a given value.
+     * @param v
+     * @param up If true, the value will be rounded up, otherwise rounded down.
+     * @return
+     */
+    public final Address pageAlign(VirtualMemoryRegion region, Address v, boolean up) {
+        return pageAlign(region, v.toWord(), up).toAddress();
+    }
+    
+    /**
+     * Map a region of the virtual memory space. Note that you cannot allocate
+     * memory in this memory, because it is used very early in the boot process.
      * 
-     * @param space
+     * @param region
+     *            Memory region
      * @param start
+     *            The start of the virtual memory region to map
      * @param size
+     *            The size of the virtual memory region to map
+     * @param physAddr
+     *            The physical address to map the virtual address to. If this is
+     *            Address.max(), free pages are used instead.
      * @return true for success, false otherwise.
      */
-    public abstract boolean mmap(Space space, Address start, Extent size)
+    public abstract boolean mmap(VirtualMemoryRegion region, Address start, Extent size, Address physAddr)
     throws UninterruptiblePragma;
+    
+    /**
+     * Unmap a region of the virtual memory space. Note that you cannot allocate
+     * memory in this memory, because it is used very early in the boot process.
+     * 
+     * @param region
+     *            Memory region
+     * @param start
+     *            The start of the virtual memory region to unmap. This value is
+     *            aligned down on pagesize.
+     * @param size
+     *            The size of the virtual memory region to unmap. This value is
+     *            aligned up on pagesize.
+     * @return true for success, false otherwise.
+     */
+    public abstract boolean munmap(VirtualMemoryRegion region, Address start, Extent size)
+    throws UninterruptiblePragma;
+    
+    /**
+     * Gets the memory map of the current system.
+     * @return
+     */
+    public final MemoryMapEntry[] getMemoryMap() {
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            sm.checkPermission(MMAP_PERM);
+        }
+        if (memoryMap == null) {
+            memoryMap = createMemoryMap();
+        }
+        return memoryMap; 
+    }
+    
+    /**
+     * Create the memory map of the current system.
+     * @return
+     */
+    protected abstract MemoryMapEntry[] createMemoryMap();
 }

@@ -21,7 +21,10 @@
  
 package org.jnode.vm.x86;
 
+import static org.jnode.vm.VirtualMemoryRegion.ACPI;
+
 import org.jnode.vm.Unsafe;
+import org.jnode.vm.VirtualMemoryRegion;
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.classmgr.TypeSizeInfo;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
@@ -40,6 +43,43 @@ import org.vmmagic.unboxed.Word;
  */
 public final class VmX86Architecture32 extends VmX86Architecture {
 
+    /** Start address of the virtual memory region  available to devices (3Gb) */
+    public static final int DEVICE_START = 0xC0000000;
+
+    /** End address of the virtual memory region  available to devices (4Gb-4Mb) */
+    public static final int DEVICE_END = 0xFFC00000;
+
+    /** Start address of the virtual memory region available to ACPI (3Gb - 4Mb) */
+    public static final int ACPI_START = DEVICE_START - 0x400000;
+    
+    /** Start address of the virtual memory region available to ACPI (3Gb) */
+    public static final int ACPI_END = DEVICE_START;
+    
+    /** 
+     * Start address of the virtual memory region available to the memory manager (256Mb).
+     * This address must be 4Mb aligned.
+     */
+    public static final int AVAILABLE_START = 0x10000000;
+
+    /** 
+     * End address of the virtual memory region  available to the memory manager.
+     * This address must be 4Mb aligned.
+     */
+    public static final int AVAILABLE_END = ACPI_START;
+    
+    // Log of page size per region
+    private static final byte LOG_DEFAULT_PAGE_SIZE = 22;
+    private static final byte LOG_AVAILABLE_PAGE_SIZE = LOG_DEFAULT_PAGE_SIZE;
+    private static final byte LOG_HEAP_PAGE_SIZE = LOG_AVAILABLE_PAGE_SIZE;
+    private static final byte LOG_ACPI_PAGE_SIZE = 22;
+    private static final byte LOG_DEVICE_PAGE_SIZE = LOG_DEFAULT_PAGE_SIZE;
+    
+    // Page sizes per region
+    private static final int AVAILABLE_PAGE_SIZE = 1 << LOG_AVAILABLE_PAGE_SIZE;
+    private static final int HEAP_PAGE_SIZE = 1 << LOG_HEAP_PAGE_SIZE;
+    private static final int ACPI_PAGE_SIZE = 1 << LOG_ACPI_PAGE_SIZE;
+    private static final int DEVICE_PAGE_SIZE = 1 << LOG_DEVICE_PAGE_SIZE;
+    
     /** Size of an object reference */
     public static final int SLOT_SIZE = 4;
 
@@ -112,40 +152,138 @@ public final class VmX86Architecture32 extends VmX86Architecture {
     /**
      * @see org.jnode.vm.VmArchitecture#getLogPageSize()
      */
-    public final byte getLogPageSize() {
-        return 22; // 4Mb
+    public final byte getLogPageSize(VirtualMemoryRegion region) {
+        switch (region) {
+        case AVAILABLE: return LOG_AVAILABLE_PAGE_SIZE;
+        case HEAP: return LOG_HEAP_PAGE_SIZE;
+        case ACPI: return LOG_ACPI_PAGE_SIZE;
+        case DEVICE: return LOG_DEVICE_PAGE_SIZE;
+        default: return LOG_DEFAULT_PAGE_SIZE;
+        }
     }
     
     /**
-     * Map a region of the heap space. 
-     * Note that you cannot allocate memory in this memory, because
-     * it is used very early in the boot process.
+     * @see org.jnode.vm.VmArchitecture#getEnd(org.jnode.vm.VmArchitecture.VirtualMemoryRegion)
+     */
+    public Address getEnd(VirtualMemoryRegion space) {
+        switch (space) {
+        case HEAP: return Address.fromIntZeroExtend(AVAILABLE_END);
+        case AVAILABLE: return Address.fromIntZeroExtend(AVAILABLE_END);
+        case DEVICE: return Address.fromIntZeroExtend(DEVICE_END);
+        case ACPI: return Address.fromIntZeroExtend(ACPI_END);        
+        default: return super.getEnd(space);
+        }
+    }
+
+    /**
+     * @see org.jnode.vm.VmArchitecture#getStart(org.jnode.vm.VmArchitecture.VirtualMemoryRegion)
+     */
+    public Address getStart(VirtualMemoryRegion space) {
+        switch (space) {
+        case HEAP: return Address.fromIntZeroExtend(BOOT_IMAGE_START);
+        case AVAILABLE: return Address.fromIntZeroExtend(AVAILABLE_START);
+        case DEVICE: return Address.fromIntZeroExtend(DEVICE_START);
+        case ACPI: return Address.fromIntZeroExtend(ACPI_START);        
+        default: return super.getStart(space);
+        }
+    }
+    
+    /**
+     * Map a region of the virtual memory space. Note that you cannot allocate
+     * memory in this memory, because it is used very early in the boot process.
      * 
-     * @param space
+     * @param region
+     *            Memory region
      * @param start
+     *            The start of the virtual memory region to map
      * @param size
+     *            The size of the virtual memory region to map
+     * @param physAddr
+     *            The physical address to map the virtual address to. If this is
+     *            Address.max(), free pages are used instead.
      * @return true for success, false otherwise.
      */
-    public final boolean mmap(Space space, Address start, Extent size)
-    throws UninterruptiblePragma {
-        if (space != Space.HEAP) {
+    public final boolean mmap(VirtualMemoryRegion region, Address start,
+            Extent size, Address physAddr) throws UninterruptiblePragma {
+        switch (region) {
+        case HEAP:
+            if (!physAddr.isMax()) {
+                return false;
+            }
+            break;
+        case ACPI:
+            if (physAddr.isMax()) {
+                return false;
+            }
+            break;
+        default:
             return false;
         }
         
-        start = pageAlign(start.toWord(), false).toAddress();
-        size = pageAlign(size.toWord(), true).toExtent();
+        final Word alignedStart = pageAlign(region, start.toWord(), false);
+        if (!alignedStart.EQ(start.toWord())) {
+            // Make adjustments on size & physAddr
+            final Word diff = start.sub(alignedStart).toWord();
+            start = alignedStart.toAddress();
+            size = size.add(diff);
+            if (!physAddr.isMax()) {
+                physAddr = physAddr.sub(diff);
+            }
+        }
+        size = pageAlign(region, size.toWord(), true).toExtent();
         
         if (pageCursor.isZero()) {
             Unsafe.debug("pageCursor is zero");
         }
         
-        final Word pageSize = Word.fromIntZeroExtend(getPageSize());
+        final Extent pageSize = getPageSize(region);
         while (!size.isZero()) {
-            mapPage(start);
+            mapPage(start, physAddr, pageSize, (region == ACPI));
             start = start.add(pageSize);
             size = size.sub(pageSize);
+            if (!physAddr.isMax()) {
+                physAddr = physAddr.add(pageSize);
+            }
         }
         
+        return true;
+    }
+    
+    /**
+     * Unmap a region of the virtual memory space. Note that you cannot allocate
+     * memory in this memory, because it is used very early in the boot process.
+     * 
+     * @param region
+     *            Memory region
+     * @param start
+     *            The start of the virtual memory region to unmap. This value is
+     *            aligned down on pagesize.
+     * @param size
+     *            The size of the virtual memory region to unmap. This value is
+     *            aligned up on pagesize.
+     * @return true for success, false otherwise.
+     */
+    public boolean munmap(VirtualMemoryRegion region, Address start, Extent size)
+    throws UninterruptiblePragma {
+        switch (region) {
+        case HEAP:
+        case ACPI:
+            break;
+        default:
+            return false;
+        }
+
+        final Word alignedStart = pageAlign(region, start.toWord(), false);
+        if (!alignedStart.EQ(start.toWord())) {
+            // Make adjustments on size & physAddr
+            final Word diff = start.sub(alignedStart).toWord();
+            start = alignedStart.toAddress();
+            size = size.add(diff);
+        }
+        size = pageAlign(region, size.toWord(), true).toExtent();
+        final Extent pageSize = getPageSize(region);
+        
+        removeVirtualMMap(start.toWord(), start.add(size).toWord(), pageSize);
         return true;
     }
     
@@ -153,20 +291,34 @@ public final class VmX86Architecture32 extends VmX86Architecture {
      * Map a page at the given virtual address.
      * @param vmAddress
      */
-    private final void mapPage(Address vmAddress) {        
+    private final void mapPage(Address vmAddress, Address physAddr, Extent pageSize, boolean debug) {        
         // Setup the pdir structures
         final Word pdirIdx = vmAddress.toWord().rshl(22);
         final Address pdirEntryPtr = UnsafeX86.getCR3().add(pdirIdx.lsh(2));
         Word entry = pdirEntryPtr.loadWord();
         if (entry.and(Word.fromIntZeroExtend(PF_PRESENT)).isZero()) {
-            // Get a free page
-            final Word pagePtr = pageCursor;
-            pageCursor = pageCursor.add(getPageSize());
+            final Word pagePtr;
+            if (physAddr.isMax()) {
+                // Get a free page
+                pagePtr = pageCursor;
+                pageCursor = pageCursor.add(pageSize);
+            } else {
+                pagePtr = physAddr.toWord();
+            }
 
             // There is currently no present page, so do the mapping
             entry = pagePtr.or(Word.fromIntZeroExtend(PF_DEFAULT));
-            pdirEntryPtr.store(entry);                
+            pdirEntryPtr.store(entry);
+            
+            if (debug) {
+                Unsafe.debug("mapPage "); Unsafe.debug(entry); Unsafe.debug('\n');
+            }
+        } else {
+            if (debug) {
+                Unsafe.debug("mapPage: page present\n");
+            }            
         }
+             
     }
 
     /**
@@ -179,15 +331,24 @@ public final class VmX86Architecture32 extends VmX86Architecture {
         
         if (emptyMMap) {
             // Remove all page mappings between AVAILABLE_START-END
-            final Word psize = Word.fromIntZeroExtend(getPageSize());
             final Word start = Word.fromIntZeroExtend(AVAILABLE_START);
             final Word end = Word.fromIntZeroExtend(AVAILABLE_END);
-            final Address pdir = UnsafeX86.getCR3();
-            
-            for (Word ptr = start; ptr.LT(end); ptr = ptr.add(psize)) {
-                final Word pdirIdx = ptr.rshl(22);
-                pdir.add(pdirIdx.lsh(2)).store(Word.zero());            
-            }               
+            final Extent pageSize = Extent.fromIntZeroExtend(AVAILABLE_PAGE_SIZE);
+            removeVirtualMMap(start, end, pageSize);
         }
+    }
+    
+    /**
+     * Remove all virtual memory mappings in a given address range.
+     * @param start
+     * @param end
+     */
+    private final void removeVirtualMMap(Word start, Word end, Extent pageSize) {
+        final Address pdir = UnsafeX86.getCR3();
+        
+        for (Word ptr = start; ptr.LT(end); ptr = ptr.add(pageSize)) {
+            final Word pdirIdx = ptr.rshl(22);
+            pdir.add(pdirIdx.lsh(2)).store(Word.zero());            
+        }                       
     }
 }

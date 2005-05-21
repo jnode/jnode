@@ -28,6 +28,7 @@ import org.jnode.system.BootLog;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
+import org.jnode.vm.MemoryMapEntry;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmArchitecture;
@@ -40,6 +41,7 @@ import org.jnode.vm.compiler.NativeCodeCompiler;
 import org.jnode.vm.x86.compiler.l1a.X86Level1ACompiler;
 import org.jnode.vm.x86.compiler.stub.X86StubCompiler;
 import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.Offset;
 
 /**
@@ -51,24 +53,6 @@ public abstract class VmX86Architecture extends VmArchitecture {
 
     /** Start address of the boot image (1Mb) */
     public static final int BOOT_IMAGE_START = 0x00100000;
-
-    /** Start address of the space available to devices (3Gb) */
-    public static final int DEVICE_START = 0xC0000000;
-
-    /** End address of the space available to devices (4Gb-4Mb) */
-    public static final int DEVICE_END = 0xFFC00000;
-
-    /** 
-     * Start address of the space available to the memory manager (256Mb).
-     * This address must be 4Mb aligned.
-     */
-    public static final int AVAILABLE_START = 0x10000000;
-
-    /** 
-     * End address of the space available to the memory manager.
-     * This address must be 4Mb aligned.
-     */
-    public static final int AVAILABLE_END = DEVICE_START;
     
     // Page entry flags
     protected static final int PF_PRESENT = 0x00000001;
@@ -319,30 +303,6 @@ public abstract class VmX86Architecture extends VmArchitecture {
     }
     
     /**
-     * @see org.jnode.vm.VmArchitecture#getEnd(org.jnode.vm.VmArchitecture.Space)
-     */
-    public Address getEnd(Space space) {
-        switch (space) {
-        case HEAP: return Address.fromIntZeroExtend(AVAILABLE_END);
-        case AVAILABLE: return Address.fromIntZeroExtend(AVAILABLE_END);
-        case DEVICE: return Address.fromIntZeroExtend(DEVICE_END);
-        default: return super.getEnd(space);
-        }
-    }
-
-    /**
-     * @see org.jnode.vm.VmArchitecture#getStart(org.jnode.vm.VmArchitecture.Space)
-     */
-    public Address getStart(Space space) {
-        switch (space) {
-        case HEAP: return Address.fromIntZeroExtend(BOOT_IMAGE_START);
-        case AVAILABLE: return Address.fromIntZeroExtend(AVAILABLE_START);
-        case DEVICE: return Address.fromIntZeroExtend(DEVICE_START);
-        default: return super.getStart(space);
-        }
-    }
-    
-    /**
      * Print the multiboot memory map to Unsafe.debug.
      */
     protected final void dumpMultibootMMap() {
@@ -385,4 +345,24 @@ public abstract class VmX86Architecture extends VmArchitecture {
             return "Undefined    ";
         }
     }
+
+    /**
+     * @see org.jnode.vm.VmArchitecture#createMemoryMap()
+     */
+    protected MemoryMapEntry[] createMemoryMap() {
+        final int cnt = UnsafeX86.getMultibootMMapLength();
+        final MemoryMapEntry[] map = new MemoryMapEntry[cnt];
+        Address mmap = UnsafeX86.getMultibootMMap();
+        
+        for (int i = 0; i < cnt; i++) {
+            long base = mmap.loadLong(Offset.fromIntZeroExtend(MBMMAP_BASEADDR));
+            long length = mmap.loadLong(Offset.fromIntZeroExtend(MBMMAP_LENGTH));
+            int type = mmap.loadInt(Offset.fromIntZeroExtend(MBMMAP_TYPE));
+            mmap = mmap.add(MBMMAP_ESIZE);
+
+            map[i] = new X86MemoryMapEntry(Address.fromLong(base), Extent.fromLong(length), type);
+        }
+        
+        return map;
+    }        
 }

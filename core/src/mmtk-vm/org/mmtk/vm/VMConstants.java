@@ -21,6 +21,8 @@
 
 package org.mmtk.vm;
 
+import static org.jnode.vm.VirtualMemoryRegion.AVAILABLE;
+
 import org.jnode.vm.Vm;
 
 /**
@@ -69,7 +71,7 @@ public class VMConstants {
 
     /** @return The log base two of the size of an OS page */
     public static final byte LOG_BYTES_IN_PAGE() {
-        return Vm.getArch().getLogPageSize();
+        return Vm.getArch().getLogPageSize(AVAILABLE);
     }
 
     /** @return The log base two of the minimum allocation alignment */
