@@ -234,7 +234,7 @@ public class ObjectModel {
      * @return an address inside the object
      */
     public static Address refToAddress(ObjectReference object) {
-        return null;
+        return object.toAddress();
     }
 
     /**
