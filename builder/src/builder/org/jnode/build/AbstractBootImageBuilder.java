@@ -60,6 +60,7 @@ import org.jnode.system.BootLog;
 import org.jnode.util.BootableHashMap;
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.JvmType;
+import org.jnode.vm.VirtualMemoryRegion;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmArchitecture;
@@ -488,7 +489,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             loadClass(VmSystemClassLoader.class);
             loadClass(VmType[].class);
             loadClass(Vm.class);
-            loadClass(VmArchitecture.Space.class).link();
+            loadClass(VirtualMemoryRegion.class).link();
             Vm.getHeapManager().loadClasses(clsMgr);
             loadClass(VmHeapManager.class);
             loadClass(VmSharedStatics.class);
@@ -1435,7 +1436,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                             }
                         }
                     }
-                    if (name.startsWith("org.mmtk.")) {
+                    if (name.startsWith("org.mmtk.") || type.isEnum()) {
                         type.setInitialized();
                     }
                 } catch (JNodeClassNotFoundException ex) {
