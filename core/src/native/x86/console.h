@@ -72,3 +72,6 @@
 %endif		
 %endmacro
 
+%macro NEWLINE 0
+	PRINT_STR newline_msg	
+%endmacro

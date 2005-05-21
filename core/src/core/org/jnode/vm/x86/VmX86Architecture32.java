@@ -174,6 +174,7 @@ public final class VmX86Architecture32 extends VmX86Architecture {
      */
     protected void boot(boolean emptyMMap) {
         Unsafe.debug("VmArchitecture32#boot\n");
+        dumpMultibootMMap();
         pageCursor = getFirstAvailableHeapPage();
         
         if (emptyMMap) {

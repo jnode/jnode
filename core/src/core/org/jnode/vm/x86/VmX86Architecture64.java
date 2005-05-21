@@ -124,6 +124,6 @@ public final class VmX86Architecture64 extends VmX86Architecture {
      * @see org.jnode.vm.VmArchitecture#boot()
      */
     protected void boot(boolean emptyMMap) {
-        
+        dumpMultibootMMap();
     }
 }
