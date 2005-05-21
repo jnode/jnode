@@ -21,6 +21,7 @@
  
 package org.jnode.vm.x86;
 
+import org.jnode.vm.VirtualMemoryRegion;
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.classmgr.TypeSizeInfo;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
@@ -36,6 +37,30 @@ import org.vmmagic.unboxed.Extent;
  */
 public final class VmX86Architecture64 extends VmX86Architecture {
 
+    /** Start address of the virtual memory region  available to devices (3Gb) */
+    public static final int DEVICE_START = 0xC0000000;
+
+    /** End address of the virtual memory region  available to devices (4Gb-4Mb) */
+    public static final int DEVICE_END = 0xFFC00000;
+
+    /** Start address of the virtual memory region available to ACPI (3Gb - 4Mb) */
+    public static final int ACPI_START = DEVICE_START - 0x400000;
+    
+    /** Start address of the virtual memory region available to ACPI (3Gb) */
+    public static final int ACPI_END = DEVICE_START;
+    
+    /** 
+     * Start address of the virtual memory region available to the memory manager (4Gb).
+     * This address must be 4Mb aligned.
+     */
+    public static final long AVAILABLE_START = 0x0000000100000000L;
+
+    /** 
+     * End address of the virtual memory region  available to the memory manager (8Gb)
+     * This address must be 4Mb aligned.
+     */
+    public static final long AVAILABLE_END = 0x0000000200000000L;
+    
 	/** Size of an object reference */
 	public static final int SLOT_SIZE = 8;
 
@@ -97,29 +122,79 @@ public final class VmX86Architecture64 extends VmX86Architecture {
     /**
      * @see org.jnode.vm.VmArchitecture#getLogPageSize()
      */
-    public final byte getLogPageSize() {
+    public final byte getLogPageSize(VirtualMemoryRegion region) {
         return 22; // 4Mb
     }
     
     /**
-     * Map a region of the heap space. 
-     * Note that you cannot allocate memory in this memory, because
-     * it is used very early in the boot process.
+     * @see org.jnode.vm.VmArchitecture#getEnd(org.jnode.vm.VmArchitecture.VirtualMemoryRegion)
+     */
+    public Address getEnd(VirtualMemoryRegion space) {
+        switch (space) {
+        case HEAP: return Address.fromLong(AVAILABLE_END);
+        case AVAILABLE: return Address.fromLong(AVAILABLE_END);
+        case DEVICE: return Address.fromIntZeroExtend(DEVICE_END);
+        case ACPI: return Address.fromIntZeroExtend(ACPI_END);        
+        default: return super.getEnd(space);
+        }
+    }
+
+    /**
+     * @see org.jnode.vm.VmArchitecture#getStart(org.jnode.vm.VmArchitecture.VirtualMemoryRegion)
+     */
+    public Address getStart(VirtualMemoryRegion space) {
+        switch (space) {
+        case HEAP: return Address.fromIntZeroExtend(BOOT_IMAGE_START);
+        case AVAILABLE: return Address.fromLong(AVAILABLE_START);
+        case DEVICE: return Address.fromIntZeroExtend(DEVICE_START);
+        case ACPI: return Address.fromIntZeroExtend(ACPI_START);        
+        default: return super.getStart(space);
+        }
+    }
+    
+    /**
+     * Map a region of the virtual memory space. Note that you cannot allocate
+     * memory in this memory, because it is used very early in the boot process.
      * 
-     * @param space
+     * @param region
+     *            Memory region
      * @param start
+     *            The start of the virtual memory region to map
      * @param size
+     *            The size of the virtual memory region to map
+     * @param physAddr
+     *            The physical address to map the virtual address to. If this is
+     *            Address.max(), free pages are used instead.
      * @return true for success, false otherwise.
      */
-    public final boolean mmap(Space space, Address start, Extent size)
+    public final boolean mmap(VirtualMemoryRegion space, Address start, Extent size, Address physAddr)
     throws UninterruptiblePragma {
-        if (space != Space.HEAP) {
+        if (space != VirtualMemoryRegion.HEAP) {
             return false;
         }
         
         return false;
     }
 
+    /**
+     * Unmap a region of the virtual memory space. Note that you cannot allocate
+     * memory in this memory, because it is used very early in the boot process.
+     * 
+     * @param region
+     *            Memory region
+     * @param start
+     *            The start of the virtual memory region to unmap. This value is
+     *            aligned down on pagesize.
+     * @param size
+     *            The size of the virtual memory region to unmap. This value is
+     *            aligned up on pagesize.
+     * @return true for success, false otherwise.
+     */
+    public boolean munmap(VirtualMemoryRegion region, Address start, Extent size)
+    throws UninterruptiblePragma {
+        return false;
+    }
+    
     /**
      * @see org.jnode.vm.VmArchitecture#boot()
      */

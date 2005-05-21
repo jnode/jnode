@@ -21,6 +21,7 @@
 
 package org.mmtk.vm;
 
+import org.jnode.vm.VirtualMemoryRegion;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmArchitecture;
@@ -47,7 +48,7 @@ public class Memory {
      * @return the start address.
      */
     public static Address HEAP_START() {
-        return Vm.getArch().getStart(VmArchitecture.Space.HEAP);
+        return Vm.getArch().getStart(VirtualMemoryRegion.HEAP);
     }
 
     /**
@@ -56,7 +57,7 @@ public class Memory {
      * @return the end address.
      */
     public static Address HEAP_END() {
-        return Vm.getArch().getEnd(VmArchitecture.Space.HEAP);
+        return Vm.getArch().getEnd(VirtualMemoryRegion.HEAP);
     }
 
     /**
@@ -66,7 +67,7 @@ public class Memory {
      * @return the start address.
      */
     public static Address AVAILABLE_START() {
-        return Vm.getArch().getStart(VmArchitecture.Space.AVAILABLE);
+        return Vm.getArch().getStart(VirtualMemoryRegion.AVAILABLE);
     }
 
     /**
@@ -76,7 +77,7 @@ public class Memory {
      * @return the end address.
      */
     public static Address AVAILABLE_END() {
-        return Vm.getArch().getEnd(VmArchitecture.Space.AVAILABLE);
+        return Vm.getArch().getEnd(VirtualMemoryRegion.AVAILABLE);
     }
 
     /**
@@ -160,7 +161,7 @@ public class Memory {
             Unsafe.debug(size);
         }
         
-        if (Vm.getArch().mmap(VmArchitecture.Space.HEAP, start, Extent.fromIntZeroExtend(size))) {
+        if (Vm.getArch().mmap(VirtualMemoryRegion.HEAP, start, Extent.fromIntZeroExtend(size), Address.max())) {
             return 0;
         } else {
             return 1;
