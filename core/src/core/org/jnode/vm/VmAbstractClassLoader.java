@@ -45,8 +45,11 @@ abstract class VmAbstractClassLoader extends VmClassLoader {
     /**
      * @see org.jnode.vm.classmgr.VmClassLoader#defineClass(java.lang.String, ByteBuffer, java.security.ProtectionDomain)
      */
-    public final VmType defineClass(String name, ByteBuffer data, ProtectionDomain protDomain) {
-        final VmType<?> vmClass;
+    public synchronized final VmType defineClass(String name, ByteBuffer data, ProtectionDomain protDomain) {
+        VmType<?> vmClass = findLoadedClass(name);
+        if (vmClass != null) {
+            return vmClass;
+        }
         vmClass = ClassDecoder.defineClass(name, data, true, this, protDomain);
         name = vmClass.getName();
         if (!isSystemClassLoader()) {
@@ -89,5 +92,5 @@ abstract class VmAbstractClassLoader extends VmClassLoader {
 	 * @param name
 	 * @param cls
 	 */
-	public abstract void addLoadedClass(String name, VmType cls);
+	protected abstract void addLoadedClass(String name, VmType cls);
 }
