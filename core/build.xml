@@ -54,6 +54,7 @@
         <pathelement location="${my-src.dir}/classpath/5.0"/>
         <pathelement location="${my-src.dir}/classpath/ext"/>
         <pathelement location="${my-src.dir}/classpath/vm"/>
+		<pathelement location="${mx4j.jar}"/>
       </bootclasspath>
       <src path="${my-src.dir}/classpath/gnu"/>
       <src path="${my-src.dir}/classpath/java"/>
