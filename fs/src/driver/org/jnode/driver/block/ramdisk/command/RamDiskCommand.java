@@ -64,7 +64,7 @@ public class RamDiskCommand {
 	throws Exception {
 		final ParsedArguments cmdLine = HELP_INFO.parse(args);
 		
-		final DeviceManager dm = (DeviceManager)InitialNaming.lookup(DeviceManager.NAME);
+		final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
 		if (PARAM_ACTION.isSet(cmdLine)) {
 			// Create
 			final int size;

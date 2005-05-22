@@ -155,7 +155,7 @@ public class HeaderTask extends Task {
 			while ((line = in.readLine()) != null) {
 				lines.add(line);
 			}
-			return (String[]) lines.toArray(new String[lines.size()]);
+			return lines.toArray(new String[lines.size()]);
 		} finally {
 			in.close();
 		}

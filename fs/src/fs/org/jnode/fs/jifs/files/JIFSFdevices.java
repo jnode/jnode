@@ -50,7 +50,7 @@ public class JIFSFdevices extends JIFSFile{
 		super.refresh();
 		final TreeMap<String, Device> tm = new TreeMap<String, Device>();
 		try{
-			final DeviceManager dm = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
+			final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
 			for (Device dev : dm.getDevices()) {
 				tm.put(dev.getId(), dev);
 			}

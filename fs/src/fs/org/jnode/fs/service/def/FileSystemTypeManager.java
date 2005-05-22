@@ -70,7 +70,7 @@ final class FileSystemTypeManager implements ExtensionPointListener {
      * @return null if it doesn't exists
      */
     public FileSystemType getSystemType(String name) {
-        return (FileSystemType) types.get(name);
+        return types.get(name);
     }
     
 

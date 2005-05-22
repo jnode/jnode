@@ -54,7 +54,7 @@ public class JIFSDirIterator implements Iterator<FSEntry> {
      */
     public FSEntry next() throws NoSuchElementException {
         if (hasNext()) {
-            FSEntry current = (FSEntry) it.next();
+            FSEntry current = it.next();
             if (current instanceof JIFSFile)
                 ((JIFSFile) current).refresh();
             if (current instanceof JIFSDirectory)

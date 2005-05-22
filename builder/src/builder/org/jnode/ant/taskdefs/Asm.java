@@ -170,7 +170,7 @@ public class Asm extends MatchingTask {
 
         log("cmdLine=" + cmdLine, Project.MSG_VERBOSE);
 
-        exec.setCommandline((String[]) cmdLine.toArray(new String[cmdLine
+        exec.setCommandline(cmdLine.toArray(new String[cmdLine
                 .size()]));
 
         dstFile.getParentFile().mkdirs();

@@ -117,7 +117,7 @@ public class FormatCommand {
 
             DeviceManager dm;
 
-            dm = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
+            dm = InitialNaming.lookup(DeviceManager.NAME);
 
             Device dev = dm.getDevice(device);
             FileSystemService fileSystemService = InitialNaming

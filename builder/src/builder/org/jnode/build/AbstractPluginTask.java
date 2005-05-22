@@ -102,7 +102,7 @@ public abstract class AbstractPluginTask extends Task {
 			f = libAlias.getAlias();
 		}
 
-		ZipFileSet fs = (ZipFileSet) fileSets.get(f);
+		ZipFileSet fs = fileSets.get(f);
 		if (fs == null) {
 			fs = new ZipFileSet();
 			if (f.isFile()) {

@@ -46,7 +46,7 @@ public final class BaseDirs {
             final String[] fNames = ds.getIncludedFiles();
             for (int j = 0; j < fNames.length; j++) {
                 final String fName = fNames[j];
-                final JavaFile existingFile = (JavaFile)map.get(fName);
+                final JavaFile existingFile = map.get(fName);
                 final JavaFile jf = new JavaFile(ds.getBasedir(), fName, fs.getTarget(), fs.isIgnoremissing());
                 if (existingFile != null) {
                     if (existingFile.getTarget().equals(fs.getTarget())) {

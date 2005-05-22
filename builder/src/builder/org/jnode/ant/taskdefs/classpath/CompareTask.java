@@ -105,9 +105,9 @@ public class CompareTask extends Task {
             int vmSpecific = 0;
 
             for (String name : allFiles) {
-                JavaFile cpFile = (JavaFile) classpathFiles.get(name);
-                final JavaFile vmFile = (JavaFile) vmFiles.get(name);
-                final JavaFile vmSpecificFile = (JavaFile) vmSpecificFiles
+                JavaFile cpFile = classpathFiles.get(name);
+                final JavaFile vmFile = vmFiles.get(name);
+                final JavaFile vmSpecificFile = vmSpecificFiles
                         .get(name);
 
                 if (vmSpecificFile != null) {
@@ -249,7 +249,7 @@ public class CompareTask extends Task {
                 final String pkg = vmFile.getPackageName();
                 String pkgDiff;
                 if (packageDiffs.containsKey(pkg)) {
-                    pkgDiff = (String) packageDiffs.get(pkg);
+                    pkgDiff = packageDiffs.get(pkg);
                     pkgDiff = pkgDiff + "diff\n" + diffStr;
                 } else {
                     pkgDiff = diffStr;

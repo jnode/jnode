@@ -59,7 +59,7 @@ final class JIFSExtension implements ExtensionPointListener {
 		}
 		this.infoEP = infoEP;
 		try {
-         	FileSystemService fSS = (FileSystemService) InitialNaming.lookup(FileSystemService.NAME);
+         	FileSystemService fSS = InitialNaming.lookup(FileSystemService.NAME);
          	final DeviceManager dm = DeviceUtils.getDeviceManager();
     		JIFSDevice dev = (JIFSDevice)dm.getDevice("jifs");
     		JIFSDirectory rootdir = (JIFSDirectory)fSS.getFileSystem(dev).getRootEntry();
@@ -124,7 +124,7 @@ final class JIFSExtension implements ExtensionPointListener {
 					}
 				}
 				entry.setParent(extdir);
-				FSEntry add = (FSEntry)entry; 
+				FSEntry add = entry; 
 				extdir.addFSE(add);
 			} catch (ClassCastException ex) {
 				log.error(

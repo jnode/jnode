@@ -117,7 +117,7 @@ public class FSEntryTable extends AbstractFSObject {
         int size = entryNames.size();
         int freeIndex = -1;
         for (int i = 0; i < size; i++) {
-            String n = (String) entryNames.get(i);
+            String n = entryNames.get(i);
             if (n == null) {
                 freeIndex = i;
             }
@@ -137,7 +137,7 @@ public class FSEntryTable extends AbstractFSObject {
      * @return
      */
     final public FSEntry get(int index) {
-        return get((String) entryNames.get(index));
+        return get(entryNames.get(index));
     }
 
     /**
@@ -153,7 +153,7 @@ public class FSEntryTable extends AbstractFSObject {
 
         name = normalizeName(name);
         log.debug("get(" + name + ")");
-        return (FSEntry) entries.get(name);
+        return entries.get(name);
     }
 
     /**
@@ -175,7 +175,7 @@ public class FSEntryTable extends AbstractFSObject {
         ArrayList<FSEntry> used = new ArrayList<FSEntry>(nbEntries / 2);
 
         for (int i = 0; i < nbEntries; i++) {
-            String name = (String) entryNames.get(i);
+            String name = entryNames.get(i);
             if (name != null) {
                 used.add(entries.get(name));
             }
@@ -300,7 +300,7 @@ public class FSEntryTable extends AbstractFSObject {
 
         entryNames.set(index, newName);
 
-        FSEntry entry = (FSEntry) entries.remove(oldName);
+        FSEntry entry = entries.remove(oldName);
         entries.put(newName, entry);
 
         log.debug("<<< END rename return true >>>");

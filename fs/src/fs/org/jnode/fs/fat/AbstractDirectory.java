@@ -86,7 +86,7 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
 		final FatDirEntry newEntry = new FatDirEntry(this, splitName(nameExt), splitExt(nameExt));
 		int size = entries.size();
 		for (int i = 0; i < size; i++) {
-			FatBasicDirEntry e = (FatBasicDirEntry)entries.get(i);
+			FatBasicDirEntry e = entries.get(i);
 			if (e == null) {
 				entries.set(i, newEntry);
 				setDirty();
@@ -184,7 +184,7 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
 		final String ext = splitExt(nameExt);
 		int size = entries.size();
 		for (int i = 0; i < size; i++) {
-			final FatBasicDirEntry entry = (FatBasicDirEntry)entries.get(i);
+			final FatBasicDirEntry entry = entries.get(i);
 			if (entry != null && entry instanceof FatDirEntry) {
 				if (name.equalsIgnoreCase(((FatDirEntry)entry).getNameOnly())
 					&& ext.equalsIgnoreCase(((FatDirEntry)entry).getExt())) {
@@ -240,7 +240,7 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
 		int freeCount = 0;
 		int size = entries.size();
 		for (int i = 0; i < size; i++) {
-			FatBasicDirEntry entry = (FatBasicDirEntry)entries.get(i);
+			FatBasicDirEntry entry = entries.get(i);
 			if (entry != null) {
 				out.println("0x" + Integer.toHexString(i) + " " + entries.get(i));
 			} else {
@@ -260,7 +260,7 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
 		public boolean hasNext() {
 			int size = entries.size();
 			while (offset < size) {
-				FatBasicDirEntry e = (FatBasicDirEntry)entries.get(offset);
+				FatBasicDirEntry e = entries.get(offset);
 				if ((e != null) && e instanceof FatDirEntry && !((FatDirEntry)e).isDeleted()) {
 					return true;
 				} else {
@@ -276,7 +276,7 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
 		public FSEntry next() {
 			int size = entries.size();
 			while (offset < size) {
-				FatBasicDirEntry e = (FatBasicDirEntry)entries.get(offset);
+				FatBasicDirEntry e = entries.get(offset);
 				if ((e != null) && (e instanceof FatDirEntry) && !((FatDirEntry)e).isDeleted()) {
 					offset++;
 					return (FSEntry) e;
@@ -306,7 +306,7 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
 		}
 		int size = entries.size();
 		for (int i = 0; i < size; i++) {
-			FatBasicDirEntry entry = (FatBasicDirEntry)entries.get(i);
+			FatBasicDirEntry entry = entries.get(i);
 			if ((entry != null) && (entry instanceof FatDirEntry)) {
 				if (((FatDirEntry)entry).isDirty()) {
 					return true;
@@ -411,7 +411,7 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
 		int size = entries.size();
 		byte[] empty = new byte[32];
 		for (int i = 0; i < size; i++) {
-			FatBasicDirEntry entry = (FatBasicDirEntry)entries.get(i);
+			FatBasicDirEntry entry = entries.get(i);
 			if (entry != null) {
 				//System.out.println("Write entry : " + entry);
 				entry.write(dest, i * 32);

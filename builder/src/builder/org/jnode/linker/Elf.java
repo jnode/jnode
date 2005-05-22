@@ -456,7 +456,7 @@ public class Elf {
 			// Load the sections
 			for (i = 0; i < e_shnum; i++) {
 				// System.out.println("Read section body " + i);
-				Section s = (Section) sections.elementAt(i);
+				Section s = sections.elementAt(i);
 				s.loadBody(in);
 				if (i == e_shstrndx)
 					shstrSection = s;

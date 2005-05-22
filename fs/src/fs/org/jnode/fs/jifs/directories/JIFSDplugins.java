@@ -61,7 +61,7 @@ public class JIFSDplugins extends JIFSDirectory {
 		super.clear();
 		final ArrayList<String> rows = new ArrayList<String>();
 		try {
-			final PluginManager mgr = (PluginManager) InitialNaming.lookup(PluginManager.NAME);
+			final PluginManager mgr = InitialNaming.lookup(PluginManager.NAME);
 	        for (PluginDescriptor descr : mgr.getRegistry()) {
 	            rows.add(descr.getId());
 	        }

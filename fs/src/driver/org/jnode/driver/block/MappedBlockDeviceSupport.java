@@ -41,7 +41,7 @@ public class MappedBlockDeviceSupport extends Device implements BlockDeviceAPI {
 		super(parent.getBus(), "mapped-" + parent.getId());
 		this.parent = parent;
 		try {
-			this.parentApi = (BlockDeviceAPI)parent.getAPI(BlockDeviceAPI.class);
+			this.parentApi = parent.getAPI(BlockDeviceAPI.class);
 		} catch (ApiNotFoundException ex) {
 			final IOException ioe = new IOException("BlockDeviceAPI not found on device");
 			ioe.initCause(ex);

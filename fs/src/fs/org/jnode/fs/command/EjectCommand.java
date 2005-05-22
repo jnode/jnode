@@ -41,7 +41,7 @@ public class EjectCommand {
 		ParsedArguments cmdLine = HELP_INFO.parse(args);
 
 		final Device dev = ARG_DEVICE.getDevice(cmdLine);
-		final RemovableDeviceAPI api = (RemovableDeviceAPI)dev.getAPI(RemovableDeviceAPI.class);
+		final RemovableDeviceAPI api = dev.getAPI(RemovableDeviceAPI.class);
 		api.eject();
 	}
 }

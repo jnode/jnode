@@ -253,7 +253,7 @@ public class TestUtils {
     static public File copyDeviceToFile(Device imageDevice, String destFile)
             throws SecurityException, IOException, ApiNotFoundException {
         File dest = new File(destFile);
-        BlockDeviceAPI imgApi = (BlockDeviceAPI) imageDevice
+        BlockDeviceAPI imgApi = imageDevice
                 .getAPI(BlockDeviceAPI.class);
 
         if (dest.exists())
@@ -306,7 +306,7 @@ public class TestUtils {
     public static void copyInputStreamToDevice(InputStream imageStream,
             Device workDevice) throws ApiNotFoundException,
             NameNotFoundException, IOException, FileSystemException {
-        BlockDeviceAPI wrkApi = (BlockDeviceAPI) workDevice
+        BlockDeviceAPI wrkApi = workDevice
                 .getAPI(BlockDeviceAPI.class);
 
         int sectorSize = 512;
@@ -326,9 +326,9 @@ public class TestUtils {
 
     public static void copyDevice(Device imageDevice, Device workDevice)
             throws ApiNotFoundException, IOException {
-        BlockDeviceAPI imgApi = (BlockDeviceAPI) imageDevice
+        BlockDeviceAPI imgApi = imageDevice
                 .getAPI(BlockDeviceAPI.class);
-        BlockDeviceAPI wrkApi = (BlockDeviceAPI) workDevice
+        BlockDeviceAPI wrkApi = workDevice
                 .getAPI(BlockDeviceAPI.class);
 
         if (imgApi.getLength() != wrkApi.getLength())
@@ -435,7 +435,7 @@ public class TestUtils {
     static public RamDiskDevice createRamDisk(int size) {
         RamDiskDevice dev = null;
         try {
-            final DeviceManager dm = (DeviceManager) InitialNaming
+            final DeviceManager dm = InitialNaming
                     .lookup(DeviceManager.NAME);
             dev = new RamDiskDevice(null, "dummy", size);
             dev.setDriver(new RamDiskDriver(null));

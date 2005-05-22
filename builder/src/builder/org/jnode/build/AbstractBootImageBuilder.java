@@ -687,7 +687,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                 // following
                 // loop
                 for (Iterator<ObjectRef> i = objectRefs.iterator(); i.hasNext();) {
-                    X86BinaryAssembler.ObjectRef ref = (X86BinaryAssembler.ObjectRef) i
+                    X86BinaryAssembler.ObjectRef ref = i
                             .next();
                     if (!ref.isResolved()) {
                         final Object obj = ref.getObject();

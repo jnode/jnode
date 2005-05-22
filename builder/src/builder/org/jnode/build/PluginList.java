@@ -115,8 +115,8 @@ public final class PluginList {
                 throw new PluginException("Unknown element " + e.getName());
             }
         }
-        this.descrList = (URL[]) descrList.toArray(new URL[descrList.size()]);
-        this.pluginList = (URL[]) pluginList
+        this.descrList = descrList.toArray(new URL[descrList.size()]);
+        this.pluginList = pluginList
                 .toArray(new URL[pluginList.size()]);
     }
 

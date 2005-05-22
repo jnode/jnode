@@ -43,11 +43,11 @@ public class IDETest {
 	public static void main(String[] args) 
 	throws NamingException, ApiNotFoundException, IOException, DeviceNotFoundException {
 		
-		final DeviceManager dm = (DeviceManager)InitialNaming.lookup(DeviceManager.NAME);
+		final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
 		final String name = (args.length > 0) ? args[0] : "hda";
 		
 		IDEDevice dev = (IDEDevice)dm.getDevice(name);
-		IDEDeviceAPI api = (IDEDeviceAPI)dev.getAPI(IDEDeviceAPI.class);
+		IDEDeviceAPI api = dev.getAPI(IDEDeviceAPI.class);
 		IDEDriveDescriptor descr = dev.getDescriptor();
 		
 		System.out.println("LBA support   : " + descr.supportsLBA());

@@ -45,7 +45,7 @@ public class MappedFSBlockDeviceSupport extends MappedBlockDeviceSupport impleme
             throws IOException {
         super(parent, offset, length);
         try {
-            this.parentApi = (FSBlockDeviceAPI) parent.getAPI(FSBlockDeviceAPI.class);
+            this.parentApi = parent.getAPI(FSBlockDeviceAPI.class);
         } catch (ApiNotFoundException ex) {
 			final IOException ioe = new IOException("BlockDeviceAPI not found on device");
 			ioe.initCause(ex);

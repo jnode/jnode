@@ -95,7 +95,7 @@ public class PluginTask extends AbstractPluginTask {
 		final String fullId = descr.getId() + "_" + descr.getVersion();
         if(descriptors.containsKey(fullId))
         {
-            File otherDesc = (File) descriptors.get(fullId);
+            File otherDesc = descriptors.get(fullId);
             throw new BuildException("Same id("+fullId+") for 2 plugins: "+otherDesc+", "+descriptor);
         }        
         descriptors.put(fullId, descriptor);

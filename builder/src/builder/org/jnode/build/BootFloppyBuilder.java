@@ -96,7 +96,7 @@ public class BootFloppyBuilder extends Task {
             newFd.setLength(getDeviceLength());
             formatDevice(newFd);
             final Device sysDev = getSystemDevice(newFd);
-            final BlockDeviceAPI sysDevApi = (BlockDeviceAPI) sysDev
+            final BlockDeviceAPI sysDevApi = sysDev
                     .getAPI(BlockDeviceAPI.class);
             copySystemFiles(sysDev);
             sysDevApi.flush();
@@ -118,7 +118,7 @@ public class BootFloppyBuilder extends Task {
     protected void formatDevice(Device dev) throws IOException {
         GrubFatFormatter ff = createFormatter();
         try {
-            ff.format((BlockDeviceAPI) dev.getAPI(BlockDeviceAPI.class));
+            ff.format(dev.getAPI(BlockDeviceAPI.class));
         } catch (ApiNotFoundException ex) {
 			final IOException ioe = new IOException("BlockDeviceAPI not found on device");
 			ioe.initCause(ex);

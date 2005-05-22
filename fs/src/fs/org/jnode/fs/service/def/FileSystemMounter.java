@@ -78,7 +78,7 @@ final class FileSystemMounter implements DeviceListener {
             // Create the /devices
             fileSystemService.getApi().mkDir(MOUNT_ROOT);
             
-            devMan = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
+            devMan = InitialNaming.lookup(DeviceManager.NAME);
             devMan.addListener(this);
         } catch (NameNotFoundException ex) {
             throw new PluginException("Cannot find DeviceManager", ex);
@@ -188,7 +188,7 @@ final class FileSystemMounter implements DeviceListener {
     final void asyncDeviceStarted(Device device) {
         try {
             if (device.isStarted()) {
-                final FSBlockDeviceAPI api = (FSBlockDeviceAPI) device
+                final FSBlockDeviceAPI api = device
                         .getAPI(FSBlockDeviceAPI.class);
                 final boolean readOnly = false; // TODO: read from config
                 if (device.implementsAPI(RemovableDeviceAPI.class)) {

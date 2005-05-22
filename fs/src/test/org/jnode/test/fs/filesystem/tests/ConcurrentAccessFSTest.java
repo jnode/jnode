@@ -143,7 +143,7 @@ class Monitor {
     public void waitAll() throws Throwable {
         runningWorkers = workers.size();
         for (int i = 0; i < workers.size(); i++)
-            new Thread((Worker) workers.get(i)).start();
+            new Thread(workers.get(i)).start();
 
         // System.out.println("Monitor is waiting for "+workers.size()+"
         // workers");

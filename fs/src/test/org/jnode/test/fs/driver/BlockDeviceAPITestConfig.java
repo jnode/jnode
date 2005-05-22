@@ -53,7 +53,7 @@ public class BlockDeviceAPITestConfig implements TestConfig {
     }
 
     public Partition[] getPartitions() {
-        return (Partition[]) partitions
+        return partitions
                 .toArray(new Partition[partitions.size()]);
     }
 

@@ -343,7 +343,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
         synchronized (blockCache) {
             //check if the block has already been retrieved
             if (blockCache.containsKey(key)) {
-                result = (Block) blockCache.get(key);
+                result = blockCache.get(key);
                 return result.getData();
             }
         }
@@ -373,7 +373,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
             } else {
                 //it is important to ALWAYS return the block that is in
                 //the cache (it is used in synchronization)
-                result = (Block) blockCache.get(key);
+                result = blockCache.get(key);
                 return result.getData();
             }
         }
@@ -408,7 +408,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
         //check if the block is in the cache
         synchronized (blockCache) {
             if (blockCache.containsKey(key)) {
-                block = (Block) blockCache.get(key);
+                block = blockCache.get(key);
                 //update the data in the cache
                 block.setData(data);
                 if (forceWrite || SYNC_WRITE) {
@@ -498,7 +498,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
         synchronized (inodeCache) {
             //check if the inode is already in the cache
             if (inodeCache.containsKey(key))
-                return (INode) inodeCache.get(key);
+                return inodeCache.get(key);
         }
 
         //move the time consuming disk read out of the synchronized block
@@ -519,7 +519,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
                 inodeCache.put(key, result);
                 return result;
             } else
-                return (INode) inodeCache.get(key);
+                return inodeCache.get(key);
         }
     }
 

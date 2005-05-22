@@ -134,7 +134,7 @@ public class FatFileSystem extends AbstractFileSystem {
 	 */
 	public synchronized FatFile getFile(FatDirEntry entry) {
 
-		FatFile file = (FatFile)files.get(entry);
+		FatFile file = files.get(entry);
 		if (file == null) {
 			file = new FatFile(this, entry, entry.getStartCluster(), entry.getLength(), entry.isDirectory());
 			files.put(entry, file);

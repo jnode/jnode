@@ -117,7 +117,7 @@ public class MockFloppyDeviceFactory extends AbstractMockDeviceFactory
             }
         };
         
-        return (FDC) MockUtils.createMockObject(FDC.class, initializer);
+        return MockUtils.createMockObject(FDC.class, initializer);
     }
     ////////////////////////////////////////////////////
     

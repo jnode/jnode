@@ -55,7 +55,7 @@ public class FloppyDriverContext extends BlockDeviceAPIContext
         } catch (NamingException ex) {
             throw (IOException)new IOException().initCause(ex);
         }
-        factory.setTestCase((MockObjectTestCase) testCase);
+        factory.setTestCase(testCase);
         
         DeviceFinder deviceFinder = new FloppyControllerFinder();
         

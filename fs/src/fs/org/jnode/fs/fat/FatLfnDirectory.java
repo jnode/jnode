@@ -117,9 +117,9 @@ public class FatLfnDirectory extends FatDirectory {
 		name = name.trim();
 		FSEntry entry;
 		// try first as a long file name
-		entry = (LfnEntry)longFileNameIndex.get(name);
+		entry = longFileNameIndex.get(name);
 		if (entry == null)
-			return (LfnEntry)shortNameIndex.get(name.toUpperCase());
+			return shortNameIndex.get(name.toUpperCase());
 		else
 			return entry;
 
@@ -334,7 +334,7 @@ public class FatLfnDirectory extends FatDirectory {
 	 */
 	public void remove(String name) throws IOException {
 		name = name.trim();
-		LfnEntry byLongName = (LfnEntry)longFileNameIndex.get(name);
+		LfnEntry byLongName = longFileNameIndex.get(name);
 
 		if (byLongName != null) {
 			longFileNameIndex.remove(name);
@@ -343,7 +343,7 @@ public class FatLfnDirectory extends FatDirectory {
 		}
 
 		String uppedName = name.toUpperCase();
-		LfnEntry byShortName = (LfnEntry)shortNameIndex.get(uppedName);
+		LfnEntry byShortName = shortNameIndex.get(uppedName);
 
 		if (byShortName != null) {
 			longFileNameIndex.remove(byShortName.getName());

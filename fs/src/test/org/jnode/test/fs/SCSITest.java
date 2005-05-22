@@ -65,10 +65,10 @@ public class SCSITest {
     public SCSITest(String[] args) throws ApiNotFoundException,
             NameNotFoundException, DeviceNotFoundException {
         processArgs(args);
-        final DeviceManager dm = (DeviceManager) InitialNaming
+        final DeviceManager dm = InitialNaming
                 .lookup(DeviceManager.NAME);
         final Device dev = dm.getDevice(name);
-        api = (SCSIDeviceAPI) dev.getAPI(SCSIDeviceAPI.class);
+        api = dev.getAPI(SCSIDeviceAPI.class);
     }
 
     public void run() throws SCSIException, TimeoutException,

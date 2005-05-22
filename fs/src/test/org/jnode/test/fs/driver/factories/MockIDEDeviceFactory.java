@@ -54,7 +54,7 @@ public class MockIDEDeviceFactory extends AbstractMockDeviceFactory implements
             }
         };
 
-        return (IDEDevice) MockUtils.createMockObject(IDEDevice.class,
+        return MockUtils.createMockObject(IDEDevice.class,
                 initializer);
     }
 
@@ -95,7 +95,7 @@ public class MockIDEDeviceFactory extends AbstractMockDeviceFactory implements
 
         // return (IDEIO) MockUtils.createMockObject(IDEIO.class, initializer,
         // argCls, args);
-        return (IDEIO) MockUtils.createMockObject(IDEIO.class, initializer);
+        return MockUtils.createMockObject(IDEIO.class, initializer);
     }
 
     private IBMPartitionTableEntry createEntry(int partNum,
