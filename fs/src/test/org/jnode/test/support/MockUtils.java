@@ -44,7 +44,7 @@ public class MockUtils
             initializer.init(mock);
         }
                                 
-        return (T) mock.proxy();
+        return name.cast(mock.proxy());
     }
 
     static public Object createMockObject(Class name, Class[] clsArgs, Object[] args)
@@ -67,7 +67,7 @@ public class MockUtils
         return cglibMock.createProxy(clsArgs, args);        
     }
 
-    static public String getShortName(Class clazz)
+    static public String getShortName(Class<?> clazz)
     {
         String name = clazz.getName();
         int idx = name.lastIndexOf('.');
