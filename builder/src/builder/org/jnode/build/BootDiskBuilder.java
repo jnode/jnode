@@ -127,7 +127,7 @@ public class BootDiskBuilder extends BootFloppyBuilder {
         /* Fixup stage2 sector in MBR */
         mbr.setStage2Sector(pte.getStartLba() + part0bs.getStage2Sector());
         try {
-            mbr.write((BlockDeviceAPI) device.getAPI(BlockDeviceAPI.class));
+            mbr.write(device.getAPI(BlockDeviceAPI.class));
         } catch (ApiNotFoundException ex) {
 			final IOException ioe = new IOException("BlockDeviceAPI not found on device");
 			ioe.initCause(ex);

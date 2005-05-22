@@ -87,7 +87,7 @@ final class DirectoryEntryIterator implements Iterator<FSEntry> {
                 return;
             }
 
-            final IndexEntry indexEntry = (IndexEntry) indexIterator.next();
+            final IndexEntry indexEntry = indexIterator.next();
             if (indexEntry.getNameSpace() != FileNameAttribute.NameSpace.DOS) {
                 // Skip DOS filename entries.
                 nextEntry = new NTFSEntry(fs, indexEntry);

@@ -475,7 +475,7 @@ public class ObjectEmitter {
     public FieldInfo getFieldInfo(Class< ? > jdkType)
             throws ClassNotFoundException, JNodeClassNotFoundException {
         final String cname = jdkType.getName();
-        FieldInfo info = (FieldInfo) fieldInfos.get(cname);
+        FieldInfo info = fieldInfos.get(cname);
         if (info == null) {
             VmType jnodeType = null;
             try {

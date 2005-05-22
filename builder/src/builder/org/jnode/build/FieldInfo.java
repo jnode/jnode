@@ -94,7 +94,7 @@ public final class FieldInfo {
      * @param index
      */
     public VmField getJNodeInstanceField(int index) {
-        return (VmField)jnodeInstanceFields.get(index);
+        return jnodeInstanceFields.get(index);
     }
     
     /**
@@ -102,7 +102,7 @@ public final class FieldInfo {
      * @param index
      */
     public VmField getJNodeStaticField(int index) {
-        return (VmField)jnodeStaticFields.get(index);
+        return jnodeStaticFields.get(index);
     }
     
     /**
@@ -115,7 +115,7 @@ public final class FieldInfo {
         final int cnt = jnodeFields.size();
         final Field[] jdkFields = new Field[cnt];
         for (int i = 0; i < cnt; i++) {
-            final VmField f = (VmField)jnodeFields.get(i);
+            final VmField f = jnodeFields.get(i);
             try {
                 jdkFields[i] = jdkType.getDeclaredField(f.getName());
                 jdkFields[i].setAccessible(true);

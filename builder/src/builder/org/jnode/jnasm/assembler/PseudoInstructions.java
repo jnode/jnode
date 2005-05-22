@@ -98,7 +98,7 @@ public class PseudoInstructions extends AssemblerModule {
     private void emitDB() {
         int ln = operands.size();
         for (int i = 0; i < ln; i++) {
-            Object o = (Object) operands.get(i);
+            Object o = operands.get(i);
             if (o instanceof Integer) {
                 stream.write8(((Integer) o).intValue());
             } else if (o instanceof String) {
@@ -116,7 +116,7 @@ public class PseudoInstructions extends AssemblerModule {
     private void emitDW() {
         int ln = operands.size();
         for (int i = 0; i < ln; i++) {
-            Object o = (Object) operands.get(i);
+            Object o = operands.get(i);
             if (o instanceof Integer) {
                 stream.write16(((Integer) o).intValue());
             } else if (o instanceof String) {
@@ -136,7 +136,7 @@ public class PseudoInstructions extends AssemblerModule {
     private void emitDD() {
         int ln = operands.size();
         for (int i = 0; i < ln; i++) {
-            Object o = (Object) operands.get(i);
+            Object o = operands.get(i);
             if (o instanceof Integer) {
                 stream.write32(((Integer) o).intValue());
             } else if (o instanceof String) {

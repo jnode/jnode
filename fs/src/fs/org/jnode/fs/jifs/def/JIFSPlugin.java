@@ -113,7 +113,7 @@ public class JIFSPlugin extends Plugin{
     protected void stopPlugin() {
     	log.info("stop jifs");
 		try {
-         	FileSystemService fSS = (FileSystemService) InitialNaming.lookup(FileSystemService.NAME);
+         	FileSystemService fSS = InitialNaming.lookup(FileSystemService.NAME);
     		final DeviceManager dm = DeviceUtils.getDeviceManager();
     		JIFSDevice dev = (JIFSDevice)dm.getDevice("jifs");
     		fSS.unregisterFileSystem(dev);

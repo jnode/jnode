@@ -45,9 +45,9 @@ public class FloppyTest {
 	public static void main(String[] args) { 
 		
 		try {
-			final DeviceManager dm = (DeviceManager)InitialNaming.lookup(DeviceManager.NAME);
+			final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
 			final Device fd0 = dm.getDevice ("fd0");
-			final BlockDeviceAPI api = (BlockDeviceAPI)fd0.getAPI(BlockDeviceAPI.class);
+			final BlockDeviceAPI api = fd0.getAPI(BlockDeviceAPI.class);
 			try {
 				
 				final ByteBuffer buf = ByteBuffer.allocate(512);

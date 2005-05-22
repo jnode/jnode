@@ -138,7 +138,7 @@ final class NTFSIndex {
             while (true) {
                 if (currentIterator.hasNext()) {
                     // Read it
-                    nextEntry = (IndexEntry) currentIterator.next();
+                    nextEntry = currentIterator.next();
                     if (nextEntry.hasSubNodes()) {
                         log.debug("next has subnode");
                         subNodeEntries.add(nextEntry);
@@ -155,7 +155,7 @@ final class NTFSIndex {
                 }
 
                 log.debug("hasNext: read next indexblock");
-                final IndexEntry entry = (IndexEntry) subNodeEntries.get();
+                final IndexEntry entry = subNodeEntries.get();
                 final IndexRoot indexRoot = getIndexRootAttribute().getRoot();
                 final IndexBlock indexBlock;
                 try {

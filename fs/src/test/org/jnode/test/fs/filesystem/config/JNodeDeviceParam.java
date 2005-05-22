@@ -66,7 +66,7 @@ public class JNodeDeviceParam extends DeviceParam {
     protected Device lookupDevice() throws IOException {
         Device device = null;
         try {
-            device = ((DeviceManager) InitialNaming.lookup(DeviceManager.NAME))
+            device = InitialNaming.lookup(DeviceManager.NAME)
                     .getDevice(deviceName);
         } catch (DeviceNotFoundException ex) {
             final IOException ioe = new IOException();

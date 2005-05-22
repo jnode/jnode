@@ -58,7 +58,7 @@ public class JIFSFplugin extends JIFSFile{
 	public void refresh(){
 		super.refresh();
 		try{
-			final PluginManager mgr = (PluginManager) InitialNaming.lookup(PluginManager.NAME);
+			final PluginManager mgr = InitialNaming.lookup(PluginManager.NAME);
 			final PluginDescriptor descr = mgr.getRegistry().getPluginDescriptor(name);
 			if (descr != null) {     
 				addStringln("Name:");

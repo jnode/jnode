@@ -47,7 +47,7 @@ final class FileHandleManager {
 	 */
 	public synchronized FileHandleImpl open(FSFile file, VMOpenMode mode) 
 	throws IOException {
-		FileData fd = (FileData)openFiles.get(file);
+		FileData fd = openFiles.get(file);
 		if (fd == null) {
 			fd = new FileData(file);
 			final FileHandleImpl handle = fd.open(mode);
@@ -64,7 +64,7 @@ final class FileHandleManager {
 	 */
 	public synchronized void close(FileHandleImpl handle) {
 		final FSFile file = handle.getFile();
-		final FileData fd = (FileData)openFiles.get(file);
+		final FileData fd = openFiles.get(file);
 		if (fd != null) {
 			fd.close(handle);
 			if (!fd.hasHandles()) {
@@ -82,7 +82,7 @@ final class FileHandleManager {
 	public synchronized FileHandleImpl dup(FileHandleImpl handle, VMOpenMode newMode) 
 	throws IOException {
 		final FSFile file = handle.getFile();
-		final FileData fd = (FileData)openFiles.get(file);
+		final FileData fd = openFiles.get(file);
 		if (fd != null) {
 			return fd.dup(handle, newMode);
 		} else {

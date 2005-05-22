@@ -66,7 +66,7 @@ public class createJIFS implements Command{
 		String Act = ACTION.getValue(cmdLine);
 		
 		try{
-			final PluginManager mgr = (PluginManager) InitialNaming.lookup(PluginManager.NAME);
+			final PluginManager mgr = InitialNaming.lookup(PluginManager.NAME);
 			final Plugin p = mgr.getRegistry().getPluginDescriptor("org.jnode.fs.jifs.def").getPlugin();
 			if (new String("start").equals(Act)){
 				p.start();

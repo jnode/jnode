@@ -116,7 +116,7 @@ public class MockObjectFactory
                 mockResMgr.expects(mockTestCase.atLeastOnce()).method("claimIRQ").withAnyArguments();
             }                    
         };
-        ResourceManager resMgr = (ResourceManager) MockUtils.createMockObject(ResourceManager.class, initializer);
+        ResourceManager resMgr = MockUtils.createMockObject(ResourceManager.class, initializer);
         InitialNaming.bind(ResourceManager.NAME, resMgr);            
     }
     
