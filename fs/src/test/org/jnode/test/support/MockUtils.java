@@ -28,12 +28,12 @@ public class MockUtils
 {
     private static final Logger log = Logger.getLogger(MockUtils.class);    
     
-    static public Object createMockObject(Class name)
+    static public <T> T createMockObject(Class<T> name)
     {
         return createMockObject(name, null);
     }
     
-    static public Object createMockObject(Class name, MockInitializer initializer)
+    static public <T> T createMockObject(Class<T> name, MockInitializer initializer)
     {
         String shortName = getShortName(name);
         Mock mock = new Mock(name, shortName);
@@ -44,7 +44,7 @@ public class MockUtils
             initializer.init(mock);
         }
                                 
-        return mock.proxy();
+        return (T) mock.proxy();
     }
 
     static public Object createMockObject(Class name, Class[] clsArgs, Object[] args)

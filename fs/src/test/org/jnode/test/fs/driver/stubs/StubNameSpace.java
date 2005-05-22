@@ -51,7 +51,7 @@ public class StubNameSpace extends DefaultNameSpace {
     }
 
     @SuppressWarnings("unchecked")
-    protected void createAndBindMockService(Class name) {
+    protected <T> void createAndBindMockService(Class<T> name) {
         try {
             bind(name, MockUtils.createMockObject(name));
         } catch (NameAlreadyBoundException e) {
