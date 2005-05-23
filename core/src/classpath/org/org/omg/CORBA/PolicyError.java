@@ -1,4 +1,4 @@
-/* ApplicationException.java --
+/* PolicyError.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,62 +36,67 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package org.omg.CORBA.portable;
+package org.omg.CORBA;
 
 import java.io.Serializable;
 
 /**
- * This expection is thrown if the application throws an exception,
- * defined as a part of its remote method definition.
+ * The exception is thrown when a policy error occurs.
+ * A PolicyError exception may include one of the following error reason codes:
+ * {@link BAD_POLICY}, {@link BAD_POLICY_TYPE},
+ * {@link BAD_POLICY_VALUE}, {@link UNSUPPORTED_POLICY},
+ * {@link UNSUPPORTED_POLICY_VALUE}.
  *
- * @author Audrius Meskauskas (AudriusA@Bioinformatics.org)
+ * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public class ApplicationException
-  extends Exception
-  implements Serializable
+public class PolicyError
+  extends UserException
+  implements IDLEntity, Serializable
 {
+  /**
+   * Holds the exception reason code, one of
+   * {@link BAD_POLICY}, {@link BAD_POLICY_TYPE},
+   * {@link BAD_POLICY_VALUE}, {@link UNSUPPORTED_POLICY},
+   * {@link UNSUPPORTED_POLICY_VALUE}.
+  */
+  public short reason;
+
   /**
    * Use serialVersionUID (v1.4) for interoperability.
    */
-  private static final long serialVersionUID = -2088103024111528125L;
+  private static final long serialVersionUID = -9196809779974700103L;
 
   /**
-   * The input from where the exception parameters can be read.
+   * Constructs an unitialised instance of the policy error.
    */
-  private final org.omg.CORBA.portable.InputStream m_input;
-
-  /**
-   * The CORBA repository Id of the exception.
-   */
-  private final String m_id;
-
-  /**
-   * Creates an exception.
-   *
-   * @param id the CORBA repository Id of the exception.
-   * @param input the input from where the exception parameters can be read.
-   */
-  public ApplicationException(String id,
-                              org.omg.CORBA.portable.InputStream input
-                             )
+  public PolicyError()
   {
-    m_id = id;
-    m_input = input;
   }
 
   /**
-   * Get the CORBA repository Id of the exception.
+   * Constructs the policy error with the given reason code.
+   * @param reason a reason code, one of
+   * {@link BAD_POLICY}, {@link BAD_POLICY_TYPE},
+   * {@link BAD_POLICY_VALUE}, {@link UNSUPPORTED_POLICY},
+   * {@link UNSUPPORTED_POLICY_VALUE}.
    */
-  public String getId()
+  public PolicyError(short a_reason)
   {
-    return m_id;
+    reason = a_reason;
   }
 
   /**
-   * Get the input stream from where the exception parameters can be read.
+   * Constructs the policy error with the given reason code and the
+   * detailed message.
+   * @param reason a reason code, one of
+   * {@link BAD_POLICY}, {@link BAD_POLICY_TYPE},
+   * {@link BAD_POLICY_VALUE}, {@link UNSUPPORTED_POLICY},
+   * {@link UNSUPPORTED_POLICY_VALUE}.
+   * @param details the detailed message.
    */
-  public org.omg.CORBA.portable.InputStream getInputStream()
+  public PolicyError(String a_details, short a_reason)
   {
-    return m_input;
+    super(a_details);
+    reason = a_reason;
   }
 }

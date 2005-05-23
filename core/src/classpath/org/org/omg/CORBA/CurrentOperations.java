@@ -1,4 +1,4 @@
-/* ApplicationException.java --
+/* CurrentOperations.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,62 +36,17 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package org.omg.CORBA.portable;
+package org.omg.CORBA;
 
-import java.io.Serializable;
 
 /**
- * This expection is thrown if the application throws an exception,
- * defined as a part of its remote method definition.
+ * The interfaces, derived from this class, define operations that provide
+ * information, associated with a particular thread of execution.
  *
- * @author Audrius Meskauskas (AudriusA@Bioinformatics.org)
+ * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
+ *
+ * @see Current
  */
-public class ApplicationException
-  extends Exception
-  implements Serializable
+public interface CurrentOperations
 {
-  /**
-   * Use serialVersionUID (v1.4) for interoperability.
-   */
-  private static final long serialVersionUID = -2088103024111528125L;
-
-  /**
-   * The input from where the exception parameters can be read.
-   */
-  private final org.omg.CORBA.portable.InputStream m_input;
-
-  /**
-   * The CORBA repository Id of the exception.
-   */
-  private final String m_id;
-
-  /**
-   * Creates an exception.
-   *
-   * @param id the CORBA repository Id of the exception.
-   * @param input the input from where the exception parameters can be read.
-   */
-  public ApplicationException(String id,
-                              org.omg.CORBA.portable.InputStream input
-                             )
-  {
-    m_id = id;
-    m_input = input;
-  }
-
-  /**
-   * Get the CORBA repository Id of the exception.
-   */
-  public String getId()
-  {
-    return m_id;
-  }
-
-  /**
-   * Get the input stream from where the exception parameters can be read.
-   */
-  public org.omg.CORBA.portable.InputStream getInputStream()
-  {
-    return m_input;
-  }
 }

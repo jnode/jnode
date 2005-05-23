@@ -1,4 +1,4 @@
-/* ApplicationException.java --
+/* DynFixed.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,62 +36,40 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package org.omg.CORBA.portable;
+package org.omg.CORBA;
 
-import java.io.Serializable;
 
 /**
- * This expection is thrown if the application throws an exception,
- * defined as a part of its remote method definition.
+ * Represents a CORBA <code>fixed</code>, allowing to get and set its value
+ * in the form of the binary representation.
  *
- * @author Audrius Meskauskas (AudriusA@Bioinformatics.org)
+ * The format, described in CORBA specification, requires to store
+ * data in hexadecimal format, two digits per byte (oceted), most
+ * significant digit first. The last half-byte in the representation
+ * stores the sign, being 0xD for negative numbers and 0xC for
+ * zero and positive numbers. To have the even number of half bytes,
+ * 0x0 is appended to the beginning, if required. The position of the
+ * decimal point is not stored.
+ *
+ * @see gnu.CORBA.BigDecimalHelper
+ *
+ * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public class ApplicationException
-  extends Exception
-  implements Serializable
+public interface DynFixed
+  extends DynAny
 {
   /**
-   * Use serialVersionUID (v1.4) for interoperability.
-   */
-  private static final long serialVersionUID = -2088103024111528125L;
-
-  /**
-   * The input from where the exception parameters can be read.
-   */
-  private final org.omg.CORBA.portable.InputStream m_input;
-
-  /**
-   * The CORBA repository Id of the exception.
-   */
-  private final String m_id;
-
-  /**
-   * Creates an exception.
+   * Get the value of this DynFixed in the binary form.
    *
-   * @param id the CORBA repository Id of the exception.
-   * @param input the input from where the exception parameters can be read.
+   * @return the binary representation, defined in the header comment.
    */
-  public ApplicationException(String id,
-                              org.omg.CORBA.portable.InputStream input
-                             )
-  {
-    m_id = id;
-    m_input = input;
-  }
+  byte[] get_value();
 
   /**
-   * Get the CORBA repository Id of the exception.
+   * Sets the value of this DynFixed from the binary representation.
+   *
+   * @param a_value the byte array, representing a CORBA <code>fixed</code>,
+   * as defined in the header comment.
    */
-  public String getId()
-  {
-    return m_id;
-  }
-
-  /**
-   * Get the input stream from where the exception parameters can be read.
-   */
-  public org.omg.CORBA.portable.InputStream getInputStream()
-  {
-    return m_input;
-  }
+  void set_value(byte[] a_value);
 }

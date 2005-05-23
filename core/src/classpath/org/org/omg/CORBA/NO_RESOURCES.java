@@ -1,4 +1,4 @@
-/* ApplicationException.java --
+/* NO_RESOURCES.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,62 +36,62 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package org.omg.CORBA.portable;
+package org.omg.CORBA;
 
 import java.io.Serializable;
 
 /**
- * This expection is thrown if the application throws an exception,
- * defined as a part of its remote method definition.
+ * Means that the ORB has reached some general resource limitation like
+ * maximal number of the opened connections.
  *
- * @author Audrius Meskauskas (AudriusA@Bioinformatics.org)
+ * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public class ApplicationException
-  extends Exception
+public class NO_RESOURCES
+  extends SystemException
   implements Serializable
 {
   /**
    * Use serialVersionUID (v1.4) for interoperability.
    */
-  private static final long serialVersionUID = -2088103024111528125L;
+  private static final long serialVersionUID = 8129246118235803597L;
 
   /**
-   * The input from where the exception parameters can be read.
+   * Creates a NO_RESOURCES with the default minor code of 0,
+   * completion state COMPLETED_NO and the given explaining message.
+   * @param reasom the explaining message.
    */
-  private final org.omg.CORBA.portable.InputStream m_input;
-
-  /**
-   * The CORBA repository Id of the exception.
-   */
-  private final String m_id;
-
-  /**
-   * Creates an exception.
-   *
-   * @param id the CORBA repository Id of the exception.
-   * @param input the input from where the exception parameters can be read.
-   */
-  public ApplicationException(String id,
-                              org.omg.CORBA.portable.InputStream input
-                             )
+  public NO_RESOURCES(String message)
   {
-    m_id = id;
-    m_input = input;
+    super(message, 0, CompletionStatus.COMPLETED_NO);
   }
 
   /**
-   * Get the CORBA repository Id of the exception.
+   * Creates NO_RESOURCES with the default minor code of 0 and a
+   * completion state COMPLETED_NO.
    */
-  public String getId()
+  public NO_RESOURCES()
   {
-    return m_id;
+    super("", 0, CompletionStatus.COMPLETED_NO);
+  }
+
+  /** Creates a NO_RESOURCES exception with the specified minor
+   * code and completion status.
+   * @param minor additional error code.
+   * @param completed the method completion status.
+   */
+  public NO_RESOURCES(int minor, CompletionStatus completed)
+  {
+    super("", minor, completed);
   }
 
   /**
-   * Get the input stream from where the exception parameters can be read.
+   * Created NO_RESOURCES exception, providing full information.
+   * @param reason explaining message.
+   * @param minor additional error code (the "minor").
+   * @param completed the method completion status.
    */
-  public org.omg.CORBA.portable.InputStream getInputStream()
+  public NO_RESOURCES(String reason, int minor, CompletionStatus completed)
   {
-    return m_input;
+    super(reason, minor, completed);
   }
 }

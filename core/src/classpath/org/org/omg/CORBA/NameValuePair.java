@@ -1,4 +1,4 @@
-/* ApplicationException.java --
+/* NameValuePair.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,62 +36,46 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package org.omg.CORBA.portable;
+package org.omg.CORBA;
 
-import java.io.Serializable;
 
 /**
- * This expection is thrown if the application throws an exception,
- * defined as a part of its remote method definition.
+ * Holds the value, having the given name(id). This class is used by
+ * with {@link DynStruct} to name the fields of the record (structure).
  *
- * @author Audrius Meskauskas (AudriusA@Bioinformatics.org)
+ * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public class ApplicationException
-  extends Exception
-  implements Serializable
+public final class NameValuePair
 {
   /**
-   * Use serialVersionUID (v1.4) for interoperability.
+   * The value of the structure record.
    */
-  private static final long serialVersionUID = -2088103024111528125L;
+  public Any value;
 
   /**
-   * The input from where the exception parameters can be read.
+   * The name of the structure record.
    */
-  private final org.omg.CORBA.portable.InputStream m_input;
+  public String id;
 
   /**
-   * The CORBA repository Id of the exception.
+   * Cretes an unitialised instance of the name-value pair.
    */
-  private final String m_id;
+  public NameValuePair()
+  {
+  }
 
   /**
-   * Creates an exception.
+   * Creates the name-value pair, initialising the fields to the passed
+   * values.
    *
-   * @param id the CORBA repository Id of the exception.
-   * @param input the input from where the exception parameters can be read.
+   * @param an_id the name (also called id) of the name-value pair, normally
+   * the name of the structure field.
+   *
+   * @param a_value the value of the name-value pair.
    */
-  public ApplicationException(String id,
-                              org.omg.CORBA.portable.InputStream input
-                             )
+  public NameValuePair(String an_id, Any a_value)
   {
-    m_id = id;
-    m_input = input;
-  }
-
-  /**
-   * Get the CORBA repository Id of the exception.
-   */
-  public String getId()
-  {
-    return m_id;
-  }
-
-  /**
-   * Get the input stream from where the exception parameters can be read.
-   */
-  public org.omg.CORBA.portable.InputStream getInputStream()
-  {
-    return m_input;
+    id = an_id;
+    value = a_value;
   }
 }

@@ -51,5 +51,5 @@ public interface PRIVATE_MEMBER
   /**
    * The flag, specifying that the value member is private.
    */
-  int value = 0;
+  short value = 0;
 }

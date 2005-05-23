@@ -1,4 +1,4 @@
-/* ApplicationException.java --
+/* ServiceInformation.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,62 +36,53 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package org.omg.CORBA.portable;
+package org.omg.CORBA;
 
-import java.io.Serializable;
+import org.omg.CORBA.portable.IDLEntity;
 
 /**
- * This expection is thrown if the application throws an exception,
- * defined as a part of its remote method definition.
+ * Stores information about the CORBA service, available from some ORB.
  *
- * @author Audrius Meskauskas (AudriusA@Bioinformatics.org)
+ * This class is part of the service information support, but the
+ * 1.4 API specification states that this support should be not implemented.
+ *
+ * @see ORB#get_service_information
+ *
+ * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public class ApplicationException
-  extends Exception
-  implements Serializable
+public final class ServiceInformation
+  implements IDLEntity
 {
   /**
-   * Use serialVersionUID (v1.4) for interoperability.
+   * The array of service details, defining the various aspects of this
+   * service.
    */
-  private static final long serialVersionUID = -2088103024111528125L;
+  public ServiceDetail[] service_details;
 
   /**
-   * The input from where the exception parameters can be read.
+   * The array, defining various options of this service.
    */
-  private final org.omg.CORBA.portable.InputStream m_input;
+  public int[] service_options;
 
   /**
-   * The CORBA repository Id of the exception.
+   * Create an unitialised instance of the service information.
    */
-  private final String m_id;
+  public ServiceInformation()
+  {
+  }
 
   /**
-   * Creates an exception.
+   * Create an instance of the service information, intialised with
+   * the passed values.
    *
-   * @param id the CORBA repository Id of the exception.
-   * @param input the input from where the exception parameters can be read.
+   * @param _service_options the service options.
+   * @param _service_details the service details.
    */
-  public ApplicationException(String id,
-                              org.omg.CORBA.portable.InputStream input
-                             )
+  public ServiceInformation(int[] _service_options,
+                            ServiceDetail[] _service_details
+                           )
   {
-    m_id = id;
-    m_input = input;
-  }
-
-  /**
-   * Get the CORBA repository Id of the exception.
-   */
-  public String getId()
-  {
-    return m_id;
-  }
-
-  /**
-   * Get the input stream from where the exception parameters can be read.
-   */
-  public org.omg.CORBA.portable.InputStream getInputStream()
-  {
-    return m_input;
+    service_options = _service_options;
+    service_details = _service_details;
   }
 }

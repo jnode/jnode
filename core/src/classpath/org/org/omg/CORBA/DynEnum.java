@@ -1,4 +1,4 @@
-/* ApplicationException.java --
+/* DynEnum.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,62 +36,49 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package org.omg.CORBA.portable;
+package org.omg.CORBA;
 
-import java.io.Serializable;
 
 /**
- * This expection is thrown if the application throws an exception,
- * defined as a part of its remote method definition.
+ * Represents the dynamic enumeration, allowing to get/set the value by
+ * name or by position in the enumeration list. The CORBA enumeration
+ * can obtain one of the named values from the specified enumeration list.
  *
- * @author Audrius Meskauskas (AudriusA@Bioinformatics.org)
+ * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public class ApplicationException
-  extends Exception
-  implements Serializable
+public interface DynEnum
+  extends DynAny
 {
   /**
-   * Use serialVersionUID (v1.4) for interoperability.
+   * Get the value of this object.
+   * @return the currently set value, one of the allowed values
+   * for this enumeration.
    */
-  private static final long serialVersionUID = -2088103024111528125L;
+  String value_as_string();
 
   /**
-   * The input from where the exception parameters can be read.
-   */
-  private final org.omg.CORBA.portable.InputStream m_input;
-
-  /**
-   * The CORBA repository Id of the exception.
-   */
-  private final String m_id;
-
-  /**
-   * Creates an exception.
+   * Set the value of this object.
    *
-   * @param id the CORBA repository Id of the exception.
-   * @param input the input from where the exception parameters can be read.
+   * @param member the value to set, must be one of the allowed values for
+   * this enumeration. Otherwise the {@link SystemException} may be thrown.
    */
-  public ApplicationException(String id,
-                              org.omg.CORBA.portable.InputStream input
-                             )
-  {
-    m_id = id;
-    m_input = input;
-  }
+  void value_as_string(String member);
 
   /**
-   * Get the CORBA repository Id of the exception.
+   * Set the value of this object as the position inside the list of this
+   * enumeration.
+   *
+   * @param member the position of the enumeration value inside
+   * the enumeration list. Otherwise the {@link SystemException} may be thrown.
    */
-  public String getId()
-  {
-    return m_id;
-  }
+  void value_as_ulong(int member);
 
   /**
-   * Get the input stream from where the exception parameters can be read.
+   * Get the value of this object as the position inside the list of this
+   * enumeration.
+   *
+   * @return member the position of the currently set enumeration value inside
+   * the enumeration list.
    */
-  public org.omg.CORBA.portable.InputStream getInputStream()
-  {
-    return m_input;
-  }
+  int value_as_ulong();
 }

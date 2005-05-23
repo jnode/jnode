@@ -60,12 +60,12 @@ public class SetOverrideType
   /**
    * Add the new policies to the existing policies.
    */
-  static final int _ADD_OVERRIDE = 1;
+  public static final int _ADD_OVERRIDE = 1;
 
   /**
    * Replace the new existing policies by the new policies.
    */
-  static final int _SET_OVERRIDE = 0;
+  public static final int _SET_OVERRIDE = 0;
 
   /**
    * Add the new policies to the existing policies.

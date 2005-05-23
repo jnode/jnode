@@ -1,4 +1,4 @@
-/* ApplicationException.java --
+/* NameValuePairHolder.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,62 +36,60 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package org.omg.CORBA.portable;
+package gnu.CORBA.DynAn;
 
-import java.io.Serializable;
+import org.omg.CORBA.NameValuePair;
+import org.omg.CORBA.NameValuePairHelper;
+import org.omg.CORBA.TypeCode;
+import org.omg.CORBA.portable.InputStream;
+import org.omg.CORBA.portable.OutputStream;
+import org.omg.CORBA.portable.Streamable;
 
 /**
- * This expection is thrown if the application throws an exception,
- * defined as a part of its remote method definition.
+ * The name-value pair holder. The {@link NameValuePair} has no standard
+ * holder defined, but it is needed to store the {@link NameValuePair} into
+ * {@link Any}.
  *
- * @author Audrius Meskauskas (AudriusA@Bioinformatics.org)
+ * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public class ApplicationException
-  extends Exception
-  implements Serializable
+public class NameValuePairHolder
+  implements Streamable
 {
   /**
-   * Use serialVersionUID (v1.4) for interoperability.
+   * The stored value of the name value pair.
    */
-  private static final long serialVersionUID = -2088103024111528125L;
+  public NameValuePair value;
 
-  /**
-   * The input from where the exception parameters can be read.
-   */
-  private final org.omg.CORBA.portable.InputStream m_input;
-
-  /**
-   * The CORBA repository Id of the exception.
-   */
-  private final String m_id;
-
-  /**
-   * Creates an exception.
-   *
-   * @param id the CORBA repository Id of the exception.
-   * @param input the input from where the exception parameters can be read.
-   */
-  public ApplicationException(String id,
-                              org.omg.CORBA.portable.InputStream input
-                             )
+  public NameValuePairHolder()
   {
-    m_id = id;
-    m_input = input;
+  }
+
+  public NameValuePairHolder(NameValuePair a_value)
+  {
+    value = a_value;
   }
 
   /**
-   * Get the CORBA repository Id of the exception.
+   * Read the name value pair.
    */
-  public String getId()
+  public void _read(InputStream input)
   {
-    return m_id;
+    value = NameValuePairHelper.read(input);
   }
 
   /**
-   * Get the input stream from where the exception parameters can be read.
+   * Return the typecode of the name value pair.
    */
-  public org.omg.CORBA.portable.InputStream getInputStream()
+  public TypeCode _type()
   {
-    return m_input;
+    return NameValuePairHelper.type();
+  }
+
+  /**
+   * Write the name value pair.
+   */
+  public void _write(OutputStream output)
+  {
+    NameValuePairHelper.write(output, value);
   }
 }
