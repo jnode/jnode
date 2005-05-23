@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.driver;
 
 import java.lang.reflect.Constructor;
@@ -40,30 +40,37 @@ import org.jnode.work.WorkUtils;
 
 /**
  * Default device manager.
- * 
+ *
  * @author epr
  */
 public final class DefaultDeviceManager extends AbstractDeviceManager
         implements ExtensionPointListener {
 
-    /** finder extension-point */
+    /**
+     * finder extension-point
+     */
     private final ExtensionPoint findersEP;
 
-    /** mappers extension-point */
+    /**
+     * mappers extension-point
+     */
     private final ExtensionPoint mappersEP;
+
     /**
      * Create a new instance
-     * 
+     *
      * @param findersEP
      * @param mappersEP
      */
     public DefaultDeviceManager(ExtensionPoint findersEP,
-            ExtensionPoint mappersEP) {
+                                ExtensionPoint mappersEP) {
         super();
-        if (findersEP == null) { throw new IllegalArgumentException(
-                "finders extension-point cannot be null"); }
-        if (mappersEP == null) { throw new IllegalArgumentException(
-                "mappers extension-point cannot be null"); }
+        if (findersEP == null) {
+            throw new IllegalArgumentException("finders extension-point cannot be null");
+        }
+        if (mappersEP == null) {
+            throw new IllegalArgumentException("mappers extension-point cannot be null");
+        }
         this.findersEP = findersEP;
         this.mappersEP = mappersEP;
         findersEP.addListener(this);
@@ -72,7 +79,7 @@ public final class DefaultDeviceManager extends AbstractDeviceManager
 
     /**
      * Start this manager
-     * 
+     *
      * @throws PluginException
      */
     public void start() throws PluginException {
@@ -82,7 +89,7 @@ public final class DefaultDeviceManager extends AbstractDeviceManager
                 public void execute() {
                     loadExtensions();
                 }
-                });
+            });
         } catch (NamingException ex) {
             throw new PluginException(ex);
         }
@@ -107,6 +114,7 @@ public final class DefaultDeviceManager extends AbstractDeviceManager
 
     /**
      * Refresh the list of finders, based on the mappers extension-point.
+     *
      * @param finders
      */
     protected final void refreshFinders(List<DeviceFinder> finders) {
@@ -115,17 +123,18 @@ public final class DefaultDeviceManager extends AbstractDeviceManager
         BootLog.debug("Found " + extensions.length + " device finders");
 
         for (int i = 0; i < extensions.length; i++) {
-            final Extension ext = extensions[ i];
+            final Extension ext = extensions[i];
             final ConfigurationElement[] elements = ext
                     .getConfigurationElements();
             for (int j = 0; j < elements.length; j++) {
-                configureFinder(finders, elements[ j]);
+                configureFinder(finders, elements[j]);
             }
         }
     }
 
     /**
      * Refresh the list of mappers, based on the mappers extension-point.
+     *
      * @param mappers
      */
     protected final void refreshMappers(List<DeviceToDriverMapper> mappers) {
@@ -135,11 +144,11 @@ public final class DefaultDeviceManager extends AbstractDeviceManager
 
         // First load all mappers
         for (int i = 0; i < extensions.length; i++) {
-            final Extension ext = extensions[ i];
+            final Extension ext = extensions[i];
             final ConfigurationElement[] elements = ext
                     .getConfigurationElements();
             for (int j = 0; j < elements.length; j++) {
-                configureMapper(mappers, elements[ j]);
+                configureMapper(mappers, elements[j]);
             }
         }
 
@@ -150,13 +159,20 @@ public final class DefaultDeviceManager extends AbstractDeviceManager
     /**
      * Configure a finder for a single finder configuration element and add the
      * new finder to the given list.
-     * 
+     *
      * @param finders
      * @param element
      */
     private void configureFinder(List<DeviceFinder> finders, ConfigurationElement element) {
+        BootLog.debug("Configure finder: " + element);
+
+        final String elementName = element.getName();
+        if (!elementName.equals("finder")) {
+            BootLog.warn("Ignoring unrecognised descriptor element: " + elementName);
+            return;
+        }
+
         final String className = element.getAttribute("class");
-        BootLog.debug("Configure finder: class=" + className);
         if (className != null) {
             try {
                 final Class cls = Thread.currentThread()
@@ -179,13 +195,20 @@ public final class DefaultDeviceManager extends AbstractDeviceManager
     /**
      * Configure a mapper for a single mapper configuration element and add the
      * new mapper to the given list.
-     * 
+     *
      * @param mappers
      * @param element
      */
     private void configureMapper(List<DeviceToDriverMapper> mappers, ConfigurationElement element) {
+        BootLog.debug("Configure mapper: " + element);
+
+        final String elementName = element.getName();
+        if (!elementName.equals("mapper")) {
+            BootLog.warn("Ignoring unrecognised descriptor element: " + elementName);
+            return;
+        }
+
         final String className = element.getAttribute("class");
-        BootLog.debug("Configure mapper: class=" + className);
         if (className != null) {
             try {
                 final Class cls = Thread.currentThread()
@@ -201,19 +224,19 @@ public final class DefaultDeviceManager extends AbstractDeviceManager
             } catch (ClassCastException ex) {
                 BootLog
                         .error("Mapper class "
-                                + className
-                                + " does not implement the DeviceToDriverMapper interface");
+                        + className
+                        + " does not implement the DeviceToDriverMapper interface");
             }
         } else {
             BootLog.error("class attribute required in mapper");
         }
     }
-    
+
     /**
      * Instantiate the device to driver mapper.
      * First look for a constructor with a ConfigurationElement parameter,
      * if not found, use the default constructor.
-     * 
+     *
      * @param cls
      * @param element
      * @return
@@ -222,9 +245,9 @@ public final class DefaultDeviceManager extends AbstractDeviceManager
      */
     private DeviceToDriverMapper newMapperInstance(Class cls, ConfigurationElement element) throws InstantiationException, IllegalAccessException {
         try {
-            final Constructor c = cls.getConstructor(new Class[] { ConfigurationElement.class });
+            final Constructor c = cls.getConstructor(new Class[]{ConfigurationElement.class});
             try {
-                return (DeviceToDriverMapper)c.newInstance(new Object[] { element });
+                return (DeviceToDriverMapper) c.newInstance(new Object[]{element});
             } catch (InvocationTargetException ex1) {
                 final InstantiationException ie = new InstantiationException();
                 ie.initCause(ex1.getTargetException());
