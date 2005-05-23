@@ -467,6 +467,19 @@ public abstract class BasicTextUI extends TextUI
     return new Dimension((int) w, (int) h);
     }
     
+  /**
+   * Returns the maximum size for text components that use this UI.
+   *
+   * This returns (Integer.MAX_VALUE, Integer.MAX_VALUE).
+   *
+   * @return the maximum size for text components that use this UI
+   */
+  public Dimension getMaximumSize(JComponent c)
+  {
+    // that's what Suns implementation does
+    return new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
+  }
+
   public final void paint(Graphics g, JComponent c)
     {      
     paintSafely(g);

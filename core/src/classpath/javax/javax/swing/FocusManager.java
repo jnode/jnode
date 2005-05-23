@@ -47,121 +47,105 @@ import java.awt.event.KeyEvent;
  * @author	Andrew Selkirk
  * @version	1.0
  */
-public abstract class FocusManager extends DefaultKeyboardFocusManager
+public abstract class FocusManager
+  extends DefaultKeyboardFocusManager
 {
-
-	//-------------------------------------------------------------
-	// Classes ----------------------------------------------------
-	//-------------------------------------------------------------
 
 	/**
 	 * DisabledFocusManager
 	 */
-	static class DisabledFocusManager extends FocusManager {
-
-		//-------------------------------------------------------------
-		// Initialization ---------------------------------------------
-		//-------------------------------------------------------------
+  static class DisabledFocusManager
+    extends FocusManager
+  {
 
 		/**
 		 * Constructor DisabledFocusManager
 		 */
-		DisabledFocusManager() {
+    DisabledFocusManager()
+    {
 			// TODO
-		} // DisabledFocusManager()
-
-
-		//-------------------------------------------------------------
-		// Methods ----------------------------------------------------
-		//-------------------------------------------------------------
+    }
 
 		/**
 		 * processKeyEvent
 		 * @param component TODO
 		 * @param event TODO
 		 */
-		public void processKeyEvent(Component component, KeyEvent event) {
+    public void processKeyEvent(Component component, KeyEvent event)
+    {
 			// TODO
-		} // processKeyEvent()
+    }
 
 		/**
 		 * focusNextComponent
 		 * @param component TODO
 		 */
-		public void focusNextComponent(Component component) {
+    public void focusNextComponent(Component component)
+    {
 			// TODO
-		} // focusNextComponent()
+    }
 
 		/**
 		 * focusPreviousComponent
 		 * @param value0 TODO
 		 */
-		public void focusPreviousComponent(Component value0) {
+    public void focusPreviousComponent(Component value0)
+    {
 			// TODO
-		} // focusPreviousComponent()
+    }
+  }
 
-
-	} // DisabledFocusManager
-
-
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
 
 	/**
 	 * FOCUS_MANAGER_CLASS_PROPERTY
 	 */
-	public static final String FOCUS_MANAGER_CLASS_PROPERTY = "FocusManagerClassName";
-
-
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
+  public static final String FOCUS_MANAGER_CLASS_PROPERTY =
+    "FocusManagerClassName";
 
 	/**
 	 * Constructor FocusManager
 	 */
-	public FocusManager() {
+  public FocusManager()
+  {
 		// TODO
-	} // FocusManager()
-
-
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
+  }
 
 	/**
 	 * getCurrentManager
 	 * @returns FocusManager
 	 */
-	public static FocusManager getCurrentManager() {
+  public static FocusManager getCurrentManager()
+  {
 		return null; // TODO
-	} // getCurrentManager()
+  }
 
 	/**
 	 * setCurrentManager
 	 * @param manager TODO
 	 */
-	public static void setCurrentManager(FocusManager manager) {
+  public static void setCurrentManager(FocusManager manager)
+  {
 		// TODO
-	} // setCurrentManager()
+  }
 
 	/**
 	 * disableSwingFocusManager
 	 * @deprecated 1.4
 	 */
-	public static void disableSwingFocusManager() {
+  public static void disableSwingFocusManager()
+  {
 		// TODO
-	} // disableSwingFocusManager()
+  }
 
 	/**
 	 * isFocusManagerEnabled
 	 * @return boolean
 	 * @deprecated 1.4
 	 */
-	public static boolean isFocusManagerEnabled() {
+  public static boolean isFocusManagerEnabled()
+  {
 		return false; // TODO
-	} // isFocusManagerEnabled()
+  }
 
 	/**
 	 * processKeyEvent
@@ -182,5 +166,4 @@ public abstract class FocusManager extends DefaultKeyboardFocusManager
 	 */
 	public abstract void focusPreviousComponent(Component component);
 
-
-} // FocusManager
+}

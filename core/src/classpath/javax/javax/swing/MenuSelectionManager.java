@@ -277,6 +277,11 @@ public class MenuSelectionManager
       }
 	*/
       }
+    else
+      {
+	if (event.getID() == MouseEvent.MOUSE_RELEASED)
+	  clearSelectedPath();
+      }
   }
 
   /**

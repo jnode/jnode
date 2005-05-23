@@ -791,8 +791,11 @@ public class BasicInternalFrameTitlePane extends JComponent
    */
   protected void setButtonIcons()
   {
+    if (closeButton != null)
     closeButton.setIcon(closeIcon);
+    if (iconButton != null)
     iconButton.setIcon(iconIcon);
+    if (maxButton != null)
     maxButton.setIcon(maxIcon);
   }
 
