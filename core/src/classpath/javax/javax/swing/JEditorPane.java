@@ -61,7 +61,6 @@ public class JEditorPane extends JTextComponent
   private EditorKit editorKit;
   
     boolean focus_root;
-    boolean manages_focus;
 
     public JEditorPane()
     {
@@ -177,30 +176,10 @@ public class JEditorPane extends JTextComponent
     return focus_root;
   }
 
-    public boolean isManagingFocus()
-  {
-    return manages_focus;
-  }
-
   protected  String paramString()
   {
     return "JEditorPane";
   }
-    
-  /**
-   * Overridden to handle processing of tab/shift tab. 
-   */
-  protected  void processComponentKeyEvent(KeyEvent e)
-    {
-    }
-    
-  /**
-   * Make sure that TAB and Shift-TAB events get consumed,
-   * so that awt doesn't attempt focus traversal.  
-   */
-  protected void processKeyEvent(KeyEvent e)
-    {
-    }
     
   /**
    * This method initializes from a stream. 
