@@ -393,6 +393,12 @@ clean          Remove all intermediate build results.
     <target name="cp-compare" depends="assemble">
         <taskdef name="cp-compare" classname="org.jnode.ant.taskdefs.classpath.CompareTask" classpathref="cp-jnode"/>
 
+        <patternset id="cp-includes-pattern">
+            <include name="**/*.java"/>
+            <include name="**/*.properties"/>
+            <include name="**/package.html"/>
+        </patternset>
+
         <patternset id="cp-sources-pattern">
             <exclude name="compat/**/*"/>
             <exclude name="examples/**/*"/>
@@ -401,6 +407,7 @@ clean          Remove all intermediate build results.
             <exclude name="gnu/javax/swing/plaf/gtk/**/*"/>
             <exclude name="gnu/test/**/*"/>
             <exclude name="gnu/xml/libxmlj/**/*"/>
+            <exclude name="resource/**/*"/>
             <exclude name="test/**/*"/>
             <exclude name="testsuite/**/*"/>
             <exclude name="vm/reference/**/*"/>
@@ -409,28 +416,44 @@ clean          Remove all intermediate build results.
         <delete dir="${build.dir}/classpath-compare"/>
         <cp-compare destdir="${build.dir}/classpath-compare">
             <vmsources>
-                <fileset dir="${root.dir}/core/src/classpath/gnu" includes="**/*.java"/>
-                <fileset dir="${root.dir}/core/src/classpath/java" includes="**/*.java"/>
-                <fileset dir="${root.dir}/core/src/classpath/javax" includes="**/*.java"/>
-                <fileset dir="${root.dir}/core/src/classpath/org" includes="**/*.java"/>
-                <fileset dir="${root.dir}/core/src/classpath/5.0" includes="**/*.java" target="1.5"/>
+                <fileset dir="${root.dir}/core/src/classpath/gnu">
+                    <patternset refid="cp-includes-pattern"/>
+                </fileset>
+                <fileset dir="${root.dir}/core/src/classpath/java">
+                    <patternset refid="cp-includes-pattern"/>
+                </fileset>
+                <fileset dir="${root.dir}/core/src/classpath/javax">
+	                <patternset refid="cp-includes-pattern"/>
+				</fileset>
+                <fileset dir="${root.dir}/core/src/classpath/org">
+                    <patternset refid="cp-includes-pattern"/>
+               	</fileset>
+                <fileset dir="${root.dir}/core/src/classpath/5.0" target="1.5">
+                    <patternset refid="cp-includes-pattern"/>
+                </fileset>
             </vmsources>
             <vmspecificsources>
-                <fileset dir="${root.dir}/core/src/classpath/vm" includes="**/*.java"/>
+                <fileset dir="${root.dir}/core/src/classpath/vm">
+                    <patternset refid="cp-includes-pattern"/>
+               	</fileset>
             </vmspecificsources>
             <classpathsources>
-                <fileset dir="${root.dir}/../classpath" includes="**/*.java">
+                <fileset dir="${root.dir}/../classpath">
+                    <patternset refid="cp-includes-pattern"/>
                     <patternset refid="cp-sources-pattern"/>
                 </fileset>
-                <fileset dir="${root.dir}/../classpath-5.0"
-                    includes="**/*.java"
-                    target="1.5"
-                    ignoremissing="on">
+                <fileset dir="${root.dir}/../classpath-5.0" target="1.5" ignoremissing="on">
+                    <patternset refid="cp-includes-pattern"/>
                     <patternset refid="cp-sources-pattern"/>
                 </fileset>
-                <fileset dir="${root.dir}/../classpath/external/w3c_dom" includes="**/*.java">
+                <fileset dir="${root.dir}/../classpath/resource">
+	                <patternset refid="cp-includes-pattern"/>
                 </fileset>
-                <fileset dir="${root.dir}/../classpath/external/sax" includes="**/*.java">
+                <fileset dir="${root.dir}/../classpath/external/w3c_dom">
+                    <patternset refid="cp-includes-pattern"/>
+                </fileset>
+                <fileset dir="${root.dir}/../classpath/external/sax">
+                <patternset refid="cp-includes-pattern"/>
                 </fileset>
             </classpathsources>
         </cp-compare>
