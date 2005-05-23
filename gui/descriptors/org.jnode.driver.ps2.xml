@@ -2,27 +2,27 @@
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
 <plugin id="org.jnode.driver.ps2"
-        name="JNode PS2 Keyboard and Mouse driver interface"
-        version="@VERSION@"
-        license-name="lgpl"
-        provider-name="JNode.org">
+    name="JNode PS2 Keyboard and Mouse driver interface"
+    version="@VERSION@"
+    license-name="lgpl"
+    provider-name="JNode.org">
 
-  <requires>
-    <import plugin="org.jnode.driver.input"/>
-  </requires>
+    <requires>
+        <import plugin="org.jnode.driver.input"/>
+    </requires>
 
-  <runtime>
-    <library name="jnode-gui.jar">
-      <export name="org.jnode.driver.ps2.*"/>
-    </library>
-  </runtime>
+    <runtime>
+        <library name="jnode-gui.jar">
+            <export name="org.jnode.driver.ps2.*"/>
+        </library>
+    </runtime>
 
-  <extension point="org.jnode.driver.finders">
-    <mapper class="org.jnode.driver.ps2.PS2Finder"/>
-  </extension>
+    <extension point="org.jnode.driver.finders">
+        <finder class="org.jnode.driver.ps2.PS2Finder"/>
+    </extension>
 
-  <extension point="org.jnode.security.permissions">
-    <permission class="org.jnode.system.ResourcePermission" name="ioports"/>
-  </extension>
-        
+    <extension point="org.jnode.security.permissions">
+        <permission class="org.jnode.system.ResourcePermission" name="ioports"/>
+    </extension>
+
 </plugin>

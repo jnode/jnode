@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
-<plugin id="org.jnode.driver.net.loopback" 
-        name="JNode Loopback Device and Driver"
-        version="@VERSION@"
-        license-name="lgpl"
-        provider-name="JNode.org">
-        
-  <requires>
-    <import plugin="org.jnode.driver.net.ethernet"/>
-    <import plugin="org.jnode.net"/>
-  </requires>
-        
-  <runtime>
-    <library name="jnode-net.jar">
-      <export name="org.jnode.driver.net.loopback.*"/>
-    </library>
-  </runtime>
-  
-  <extension point="org.jnode.driver.finders">
-    <mapper class="org.jnode.driver.net.loopback.LoopbackFinder"/>
-  </extension>
-        
+<plugin id="org.jnode.driver.net.loopback"
+    name="JNode Loopback Device and Driver"
+    version="@VERSION@"
+    license-name="lgpl"
+    provider-name="JNode.org">
+
+    <requires>
+        <import plugin="org.jnode.driver.net.ethernet"/>
+        <import plugin="org.jnode.net"/>
+    </requires>
+
+    <runtime>
+        <library name="jnode-net.jar">
+            <export name="org.jnode.driver.net.loopback.*"/>
+        </library>
+    </runtime>
+
+    <extension point="org.jnode.driver.finders">
+        <finder class="org.jnode.driver.net.loopback.LoopbackFinder"/>
+    </extension>
+
 </plugin>
