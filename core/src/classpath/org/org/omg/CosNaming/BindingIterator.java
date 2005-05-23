@@ -38,6 +38,9 @@ exception statement from your version. */
 
 package org.omg.CosNaming;
 
+import org.omg.CORBA.portable.IDLEntity;
+
+import java.io.Serializable;
 
 /**
  * The iterator for seing the available bindings.
@@ -45,6 +48,7 @@ package org.omg.CosNaming;
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
 public interface BindingIterator
+  extends org.omg.CORBA.Object, Serializable, IDLEntity
 {
   /**
    * Destroy the iterator on the server side. This must always be

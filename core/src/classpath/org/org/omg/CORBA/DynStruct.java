@@ -1,4 +1,4 @@
-/* ApplicationException.java --
+/* DynStruct.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,62 +36,54 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package org.omg.CORBA.portable;
+package org.omg.CORBA;
 
-import java.io.Serializable;
+import org.omg.CORBA.DynAnyPackage.InvalidSeq;
 
 /**
- * This expection is thrown if the application throws an exception,
- * defined as a part of its remote method definition.
+ * Represents the {@link DynAny}, holding the CORBA structure (record
+ * with the named fields). The internal reference, described in
+ * {@link DynAny#current_component()}, iterates over the fields of the
+ * structure.
  *
- * @author Audrius Meskauskas (AudriusA@Bioinformatics.org)
+ * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public class ApplicationException
-  extends Exception
-  implements Serializable
+public interface DynStruct
+  extends DynAny
 {
-  /**
-   * Use serialVersionUID (v1.4) for interoperability.
-   */
-  private static final long serialVersionUID = -2088103024111528125L;
+/**
+ * Get the kind of the structure field that would be returned by
+ * {@link DynAny#current_component()}.
+ *
+ * @return the kind of the structure field.
+ */
+  TCKind current_member_kind();
 
   /**
-   * The input from where the exception parameters can be read.
-   */
-  private final org.omg.CORBA.portable.InputStream m_input;
-
-  /**
-   * The CORBA repository Id of the exception.
-   */
-  private final String m_id;
-
-  /**
-   * Creates an exception.
+   * Get the name of the structure field that would be returned by
+   * {@link DynAny#current_component()}.
    *
-   * @param id the CORBA repository Id of the exception.
-   * @param input the input from where the exception parameters can be read.
+   * @return the name of the structure field.
    */
-  public ApplicationException(String id,
-                              org.omg.CORBA.portable.InputStream input
-                             )
-  {
-    m_id = id;
-    m_input = input;
-  }
+  String current_member_name();
 
   /**
-   * Get the CORBA repository Id of the exception.
+   * Get all fields of the structure in the array of the named values,
+   * holding name, repository id and value of the associated field.
+   *
+   * @return members the array of the named values,
+   * representing the structure fields.
    */
-  public String getId()
-  {
-    return m_id;
-  }
+  NameValuePair[] get_members();
 
   /**
-   * Get the input stream from where the exception parameters can be read.
+   * Set all fields of this structure by name.
+   *
+   * @param members the array of the named values,
+   * representing the structure fields.
+   *
+   * @throws InvalidSeq if the passed argument is invalid.
    */
-  public org.omg.CORBA.portable.InputStream getInputStream()
-  {
-    return m_input;
-  }
+  void set_members(NameValuePair[] members)
+            throws InvalidSeq;
 }

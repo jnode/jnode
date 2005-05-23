@@ -1,4 +1,4 @@
-/* ApplicationException.java --
+/* DynUnion.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,62 +36,64 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package org.omg.CORBA.portable;
+package org.omg.CORBA;
 
-import java.io.Serializable;
 
 /**
- * This expection is thrown if the application throws an exception,
- * defined as a part of its remote method definition.
+ * Represents the {@link DynAny}, holding the CORBA structure (variant record
+ * with the named fields). The internal reference, described in
+ * {@link DynAny#current_component()}, iterates over the fields of the
+ * member, stored in the union. The union always holds only one member;
+ * which one, depends from the value of the discriminator.
  *
- * @author Audrius Meskauskas (AudriusA@Bioinformatics.org)
+ * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public class ApplicationException
-  extends Exception
-  implements Serializable
+public interface DynUnion
+  extends DynAny
 {
   /**
-   * Use serialVersionUID (v1.4) for interoperability.
+   * Returns the discriminator, defining, which set of fields is stored.
+   * @return the discriminator.
    */
-  private static final long serialVersionUID = -2088103024111528125L;
+  DynAny discriminator();
 
   /**
-   * The input from where the exception parameters can be read.
+   * Returns the discriminator kind.
    */
-  private final org.omg.CORBA.portable.InputStream m_input;
+  TCKind discriminator_kind();
 
   /**
-   * The CORBA repository Id of the exception.
+   * Returns the member, stored in this union.
    */
-  private final String m_id;
+  DynAny member();
 
   /**
-   * Creates an exception.
+   * Returns the kind of the member, stored in this union.
+   */
+  TCKind member_kind();
+
+  /**
+   * Returns the name of the currently focused member.
+   */
+  String member_name();
+
+  /**
+   * Renames the currently focused member.
    *
-   * @param id the CORBA repository Id of the exception.
-   * @param input the input from where the exception parameters can be read.
+   * @param new_name the new name of the currently focused member.
    */
-  public ApplicationException(String id,
-                              org.omg.CORBA.portable.InputStream input
-                             )
-  {
-    m_id = id;
-    m_input = input;
-  }
+  void member_name(String new_name);
 
   /**
-   * Get the CORBA repository Id of the exception.
+   * Checks if the discriminator of this union has been assigned a valid
+   * default value.
    */
-  public String getId()
-  {
-    return m_id;
-  }
+  boolean set_as_default();
 
   /**
-   * Get the input stream from where the exception parameters can be read.
+   * Determines if the discriminator of this union gets assigned a valid
+   * default value.
+   * @param assign_default
    */
-  public org.omg.CORBA.portable.InputStream getInputStream()
-  {
-    return m_input;
-  }
+  void set_as_default(boolean assign_default);
 }

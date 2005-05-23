@@ -1,4 +1,4 @@
-/* ApplicationException.java --
+/* ServiceDetailHolder.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,62 +36,56 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package org.omg.CORBA.portable;
+package gnu.CORBA;
 
-import java.io.Serializable;
+import org.omg.CORBA.ServiceDetail;
+import org.omg.CORBA.ServiceDetailHelper;
+
 
 /**
- * This expection is thrown if the application throws an exception,
- * defined as a part of its remote method definition.
+ * The service detail holder. This class is not included in the original
+ * API specification, so we place it outside the org.omg namespace.
  *
  * @author Audrius Meskauskas (AudriusA@Bioinformatics.org)
  */
-public class ApplicationException
-  extends Exception
-  implements Serializable
+public class ServiceDetailHolder
+  implements org.omg.CORBA.portable.Streamable
 {
   /**
-   * Use serialVersionUID (v1.4) for interoperability.
+   * The stored value.
    */
-  private static final long serialVersionUID = -2088103024111528125L;
+  public ServiceDetail value;
 
   /**
-   * The input from where the exception parameters can be read.
+   * Create the initialised instance.
+   * @param initialValue
    */
-  private final org.omg.CORBA.portable.InputStream m_input;
-
-  /**
-   * The CORBA repository Id of the exception.
-   */
-  private final String m_id;
-
-  /**
-   * Creates an exception.
-   *
-   * @param id the CORBA repository Id of the exception.
-   * @param input the input from where the exception parameters can be read.
-   */
-  public ApplicationException(String id,
-                              org.omg.CORBA.portable.InputStream input
-                             )
+  public ServiceDetailHolder(ServiceDetail initialValue)
   {
-    m_id = id;
-    m_input = input;
+    value = initialValue;
   }
 
   /**
-   * Get the CORBA repository Id of the exception.
+   * Read from the CDR stream.
    */
-  public String getId()
+  public void _read(org.omg.CORBA.portable.InputStream in)
   {
-    return m_id;
+    value = ServiceDetailHelper.read(in);
   }
 
   /**
-   * Get the input stream from where the exception parameters can be read.
+   * Get the typecode.
    */
-  public org.omg.CORBA.portable.InputStream getInputStream()
+  public org.omg.CORBA.TypeCode _type()
   {
-    return m_input;
+    return ServiceDetailHelper.type();
+  }
+
+  /**
+   * Write into the CDR stream.
+   */
+  public void _write(org.omg.CORBA.portable.OutputStream out)
+  {
+    ServiceDetailHelper.write(out, value);
   }
 }

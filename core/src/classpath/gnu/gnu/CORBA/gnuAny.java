@@ -148,12 +148,21 @@ public class gnuAny
    */
   public org.omg.CORBA.portable.InputStream create_input_stream()
   {
+    if (has instanceof universalHolder)
+      {
+        universalHolder u = (universalHolder) has;
+        return u.getInputStream();
+      }
+    else
+      {
     cdrBufOutput out = new cdrBufOutput();
     out.setOrb(orb);
     write_value(out);
+
     cdrBufInput in = new cdrBufInput(out.buffer.toByteArray());
     in.setOrb(orb);
     return in;
+  }
   }
 
   /**
@@ -701,9 +710,14 @@ public class gnuAny
           {
             has = holderFactory.createHolder(a_type);
             if (has == null)
-              throw new NO_IMPLEMENT("Not implemented for " +
-                                     typeNamer.nameIt(a_type)
-                                    );
+            {
+              // Use the Universal Holder that reads till the end of stream.
+              // This works with the extract/insert pair of the typical
+              // Helper.
+              cdrBufOutput buffer = new cdrBufOutput();
+              buffer.setOrb(orb);
+              has = new universalHolder(buffer);
+            }
           }
         type(a_type);
         has._read(input);

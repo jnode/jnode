@@ -1,4 +1,4 @@
-/* ApplicationException.java --
+/* DynSequence.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,62 +36,43 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package org.omg.CORBA.portable;
+package org.omg.CORBA;
 
-import java.io.Serializable;
+import org.omg.CORBA.DynAnyPackage.InvalidSeq;
 
 /**
- * This expection is thrown if the application throws an exception,
- * defined as a part of its remote method definition.
+ * Represents the {@link DynAny}, holding the CORBA sequence
+ * (an array with the flexible length).
  *
- * @author Audrius Meskauskas (AudriusA@Bioinformatics.org)
+ * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public class ApplicationException
-  extends Exception
-  implements Serializable
+public interface DynSequence
+  extends DynAny
 {
   /**
-   * Use serialVersionUID (v1.4) for interoperability.
+   * Get the elements of the enclosed sequence.
    */
-  private static final long serialVersionUID = -2088103024111528125L;
+  Any[] get_elements();
 
   /**
-   * The input from where the exception parameters can be read.
+   * Returns the number of elements, stored in the sequence.
+   * @return
    */
-  private final org.omg.CORBA.portable.InputStream m_input;
+  int length();
 
   /**
-   * The CORBA repository Id of the exception.
-   */
-  private final String m_id;
-
-  /**
-   * Creates an exception.
+   * Sets the length of this sequence to the given value.
    *
-   * @param id the CORBA repository Id of the exception.
-   * @param input the input from where the exception parameters can be read.
+   * @param l the new length of the sequence.
    */
-  public ApplicationException(String id,
-                              org.omg.CORBA.portable.InputStream input
-                             )
-  {
-    m_id = id;
-    m_input = input;
-  }
+  void length(int l);
 
   /**
-   * Get the CORBA repository Id of the exception.
+   * Set the elements from of the enclosed array of Anys.
+   *
+   * @throws InvalidSeq if the passed array contains the
+   * elements of the different type.
    */
-  public String getId()
-  {
-    return m_id;
-  }
-
-  /**
-   * Get the input stream from where the exception parameters can be read.
-   */
-  public org.omg.CORBA.portable.InputStream getInputStream()
-  {
-    return m_input;
-  }
+  void set_elements(Any[] an_array)
+             throws InvalidSeq;
 }

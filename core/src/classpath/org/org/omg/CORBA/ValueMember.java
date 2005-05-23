@@ -38,13 +38,23 @@ exception statement from your version. */
 
 package org.omg.CORBA;
 
+import org.omg.CORBA.portable.IDLEntity;
+
+import java.io.Serializable;
+
 /**
  * The class, defining properties of the value member.
  * 
  * @author Audrius Meskauskas (AudriusA@Bioinformatics.org)
  */
 public class ValueMember
+  implements Serializable, IDLEntity
 {
+  /**
+   * Use serialVersionUID (v1.4) for interoperability.
+   */
+  private static final long serialVersionUID = -2507594168537449114L;
+
   /**
    * The typedef that represents the IDL type of the value member.
    */
