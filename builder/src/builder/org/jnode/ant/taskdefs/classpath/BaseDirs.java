@@ -39,15 +39,15 @@ public final class BaseDirs {
         return fs;
     }
     
-    public Map<String, JavaFile> scanJavaFiles(Project project) {
-        final TreeMap<String, JavaFile> map = new TreeMap<String, JavaFile>();
+    public Map<String, SourceFile> scanJavaFiles(Project project) {
+        final TreeMap<String, SourceFile> map = new TreeMap<String, SourceFile>();
         for (TargetedFileSet fs : fileSets) {
             final DirectoryScanner ds = fs.getDirectoryScanner(project);
             final String[] fNames = ds.getIncludedFiles();
             for (int j = 0; j < fNames.length; j++) {
                 final String fName = fNames[j];
-                final JavaFile existingFile = map.get(fName);
-                final JavaFile jf = new JavaFile(ds.getBasedir(), fName, fs.getTarget(), fs.isIgnoremissing());
+                final SourceFile existingFile = map.get(fName);
+                final SourceFile jf = new SourceFile(ds.getBasedir(), fName, fs.getTarget(), fs.isIgnoremissing());
                 if (existingFile != null) {
                     if (existingFile.getTarget().equals(fs.getTarget())) {
                         throw new BuildException("File " + fName + " already exists");

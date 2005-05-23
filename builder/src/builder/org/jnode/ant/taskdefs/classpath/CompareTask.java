@@ -79,11 +79,11 @@ public class CompareTask extends Task {
         if (destDir == null) {
             throw new BuildException("The destdir attribute must be set");
         }
-        final Map<String, JavaFile> vmFiles = vmDirs
+        final Map<String, SourceFile> vmFiles = vmDirs
                 .scanJavaFiles(getProject());
-        final Map<String, JavaFile> classpathFiles = classpathDirs
+        final Map<String, SourceFile> classpathFiles = classpathDirs
                 .scanJavaFiles(getProject());
-        final Map<String, JavaFile> vmSpecificFiles = vmSpecificDirs
+        final Map<String, SourceFile> vmSpecificFiles = vmSpecificDirs
                 .scanJavaFiles(getProject());
         final TreeSet<String> allFiles = new TreeSet<String>();
         final Map<String, String> packageDiffs = new TreeMap<String, String>();
@@ -105,38 +105,38 @@ public class CompareTask extends Task {
             int vmSpecific = 0;
 
             for (String name : allFiles) {
-                JavaFile cpFile = classpathFiles.get(name);
-                final JavaFile vmFile = vmFiles.get(name);
-                final JavaFile vmSpecificFile = vmSpecificFiles
+                SourceFile cpFile = classpathFiles.get(name);
+                final SourceFile vmFile = vmFiles.get(name);
+                final SourceFile vmSpecificFile = vmSpecificFiles
                         .get(name);
 
                 if (vmSpecificFile != null) {
                     // File is found as vm specific source
-                    reportVmSpecific(out, vmSpecificFile.getClassName(),
+                    reportVmSpecific(out, vmSpecificFile.getReportName(),
                             "vm-specific");
                     vmSpecific++;
                 } else if (vmFile == null) {
                     // file is not found as vmspecific source, nor as vm source
                     if (!cpFile.isIgnoreMissing()) {
-                        reportMissing(out, cpFile.getClassName(), "classpath",
+                        reportMissing(out, cpFile.getReportName(), "classpath",
                                 getFlags(cpFile));
                         missingInCp++;
                     }
                 } else if (cpFile == null) {
                     // File is not found in classpath sources
-                    reportMissing(out, vmFile.getClassName(), "vm", 0);
+                    reportMissing(out, vmFile.getReportName(), "vm", 0);
                     missingInVm++;
                 } else {
                     // We have both the classpath version and the vm version.
                     cpFile = cpFile.getBestFileForTarget(vmFile.getTarget());
 
-                    final String diffFileName = vmFile.getClassName() + ".diff";
+                    final String diffFileName = vmFile.getReportName() + ".diff";
                     int rc = runDiff(vmFile, cpFile, diffFileName, packageDiffs);
                     switch (rc & ~FLAGS_MASK) {
                     case NO_CHANGE:
                         break;
                     case NEEDS_MERGE:
-                        reportNeedsMerge(out, vmFile.getClassName(), vmFile
+                        reportNeedsMerge(out, vmFile.getReportName(), vmFile
                                 .getTarget(), diffFileName, rc & FLAGS_MASK);
                         needsMerge++;
                         break;
@@ -223,7 +223,7 @@ public class CompareTask extends Task {
         }
     }
 
-    protected int runDiff(JavaFile vmFile, JavaFile cpFile,
+    protected int runDiff(SourceFile vmFile, SourceFile cpFile,
             String diffFileName, Map<String, String> packageDiffs)
             throws IOException, InterruptedException {
         final String[] cmd = { "diff", "-b", // Ignore white space change
@@ -426,7 +426,7 @@ public class CompareTask extends Task {
         return flags;
     }
 
-    protected int getFlags(JavaFile file) throws IOException {
+    protected int getFlags(SourceFile file) throws IOException {
         final FileReader fr = new FileReader(file.getFile());
         try {
             final BufferedReader in = new BufferedReader(fr);
