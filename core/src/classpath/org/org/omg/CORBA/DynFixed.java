@@ -38,6 +38,7 @@ exception statement from your version. */
 
 package org.omg.CORBA;
 
+import org.omg.CORBA.DynAnyPackage.InvalidValue;
 
 /**
  * Represents a CORBA <code>fixed</code>, allowing to get and set its value
@@ -71,5 +72,6 @@ public interface DynFixed
    * @param a_value the byte array, representing a CORBA <code>fixed</code>,
    * as defined in the header comment.
    */
-  void set_value(byte[] a_value);
+  void set_value(byte[] a_value)
+          throws InvalidValue;
 }

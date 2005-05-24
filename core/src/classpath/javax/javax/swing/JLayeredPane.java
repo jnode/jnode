@@ -130,6 +130,26 @@ public class JLayeredPane extends JComponent implements Accessible
   }
 
   /**
+   * Looks up the layer of <code>comp</code> in the component's nearest
+   * JLayeredPane ancestor. If <code>comp</code> is not contained
+   * in a JLayeredPane, the value 0 (default layer) is returned.
+   *
+   * @param comp the component for which the layer is looked up
+   *
+   * @return the layer of <code>comp</code> in its nearest JLayeredPane
+   *     ancestor
+   */
+  public static int getLayer(JComponent comp)
+  {
+    JLayeredPane lp = (JLayeredPane) SwingUtilities.getAncestorOfClass
+      (JLayeredPane.class, comp);
+    if (lp == null)
+      return 0;
+    else
+      return lp.getLayer(comp);
+  }
+
+  /**
    * <p>Returns a pair of ints representing a half-open interval 
    * <code>[top, bottom)</code>, which is the range of component indices 
    * the provided layer number corresponds to.</p>

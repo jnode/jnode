@@ -1,6 +1,5 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
-<!-- package.html - describes classes in java.awt.dnd package.
-   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
+/* IRObject.java --
+   Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -34,13 +33,16 @@ module.  An independent module is a module which is not derived from
 or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
-exception statement from your version. -->
+exception statement from your version. */
 
-<html>
-<head><title>GNU Classpath - java.awt.dnd</title></head>
 
-<body>
-<p>Events and listeners for drag and drop sources and targets.</p>
+package org.omg.CORBA;
 
-</body>
-</html>
+/**
+ * Represents the interface repository object.
+ *
+ * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
+ */
+public interface IRObject extends IRObjectOperations
+{
+}
