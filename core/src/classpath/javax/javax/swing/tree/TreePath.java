@@ -51,51 +51,41 @@ public class TreePath implements Serializable
 {
   static final long serialVersionUID = 4380036194768077479L;
 
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
-
 	/**
 	 * path
 	 */
 	private Object[]	path	= null;
 
 
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
-
 	/**
 	 * Constructor TreePath
 	 * @param path TODO
 	 */
-	public TreePath(Object[] path) {
-
+  public TreePath(Object[] path)
+  {
 		// Create Path
 		this.path = new Object[path.length];
 		System.arraycopy(path, 0, this.path, 0, path.length);
-
-	} // TreePath()
+  }
 
 	/**
 	 * Constructor TreePath
 	 * @param element TODO
 	 */
-	public TreePath(Object element) {
-
+  public TreePath(Object element)
+  {
 		// Create Path
 		path = new Object[1];
 		path[0] = element;
-
-	} // TreePath()
+  }
 
 	/**
 	 * Constructor TreePath
 	 * @param path TODO
 	 * @param element TODO
 	 */
-	protected TreePath(TreePath path, Object element) {
-
+  protected TreePath(TreePath path, Object element)
+  {
 		// Variables
 		Object[]	treepath;
 
@@ -106,97 +96,93 @@ public class TreePath implements Serializable
 		this.path = new Object[treepath.length + 1];
 		System.arraycopy(treepath, 0, this.path, 0, treepath.length);
 		this.path[treepath.length] = element;
-
-	} // TreePath()
+  }
 
 	/**
 	 * Constructor TreePath
 	 * @param path TODO
 	 * @param length TODO
 	 */
-	protected TreePath(Object[] path, int length) {
-
+  protected TreePath(Object[] path, int length)
+  {
 		// Create Path
 		this.path = new Object[length];
 		System.arraycopy(path, 0, this.path, 0, length);
-
-	} // TreePath()
+  }
 
 	/**
 	 * Constructor TreePath
 	 */
-	protected TreePath() {
+  protected TreePath()
+  {
 		path = new Object[0];
-	} // TreePath()
+  }
 
-
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
 
 	/**
 	 * hashCode
 	 * @returns int
 	 */
-	public int hashCode() {
+  public int hashCode()
+  {
 		return getLastPathComponent().hashCode();
-	} // hashCode()
+  }
 
 	/**
 	 * equals
 	 * @param object TODO
 	 * @returns boolean
 	 */
-	public boolean equals(Object object) {
-
+  public boolean equals(Object object)
+  {
 		// Variables
 		Object[]	treepath;
 		int			index;
 
 		// Check for TreePath
-		if (object instanceof TreePath) {
-
+    if (object instanceof TreePath)
+      {
 			// Get Path Elements
 			treepath = ((TreePath) object).getPath();
 
 			// Check length
-			if (treepath.length != path.length) {
+        if (treepath.length != path.length)
 				return false;
-			} // if
 
 			// Check Elements
-			for (index = 0; index < path.length; index++) {
-				if (treepath[index] != path[index]) {
+        for (index = 0; index < path.length; index++)
+          {
+            if (treepath[index] != path[index])
 					return false;
-				} // if
-			} // for
+          }
 
 			// Tree Path's are equals
 			return true;
-
-		} // if
+      }
 
 		// Unequal
 		return false;
-
-	} // equals()
+  }
 
 	/**
 	 * toString
 	 * @returns String
 	 */
-	public String toString() {
+  public String toString()
+  {
 		return null; // TODO
-	} // toString()
+  }
 
 	/**
 	 * writeObject
 	 * @param value0 TODO
 	 * @exception IOException TODO
 	 */
-	private void writeObject(ObjectOutputStream value0) throws IOException {
+  private void writeObject(ObjectOutputStream value0)
+    throws IOException
+  {
 		// TODO
-	} // writeObject()
+  }
 
 	/**
 	 * readObject
@@ -204,49 +190,56 @@ public class TreePath implements Serializable
 	 * @exception IOException TODO
 	 * @exception ClassNotFoundException TODO
 	 */
-	private void readObject(ObjectInputStream value0) throws IOException, ClassNotFoundException {
+  private void readObject(ObjectInputStream value0)
+    throws IOException, ClassNotFoundException
+  {
 		// TODO
-	} // readObject()
+  }
 
 	/**
 	 * getPath
 	 * @returns Object[]
 	 */
-	public Object[] getPath() {
+  public Object[] getPath()
+  {
 		return path;
-	} // getPath()
+  }
 
 	/**
 	 * getLastPathComponent
 	 * @returns Object
 	 */
-	public Object getLastPathComponent() {
+  public Object getLastPathComponent()
+  {
 		return path[path.length - 1];
-	} // getLastPathComponent()
+  }
 
 	/**
 	 * getPathCount
 	 * @returns int
 	 */
-	public int getPathCount() {
+  public int getPathCount()
+  {
 		return path.length;
-	} // getPathCount()
+  }
 
 	/**
 	 * getPathComponent
 	 * @param position TODO
 	 * @returns Object
 	 */
-	public Object getPathComponent(int position) {
+  public Object getPathComponent(int position)
+  {
 		return path[position];
-	} // getPathComponent()
+  }
 
 	/**
 	 * isDescendant
 	 * @param path TODO
 	 * @returns boolean
 	 */
-	public boolean isDescendant(TreePath path) {
+  public boolean isDescendant(TreePath path)
+  {
 
 		// Variables
 		Object[]	treepath;
@@ -259,42 +252,46 @@ public class TreePath implements Serializable
 		// Locate Start Index
 		index = 0;
 		index2 = 0;
-		while (treepath[index] != this.path[index2]) {
+    while (treepath[index] != this.path[index2])
 			index++;
-		} // while
 
 		// Verify Paths
-		while (treepath[index] == this.path[index2]) {
+    while (treepath[index] == this.path[index2])
+      {
 			index++;
 			index2++;
-		} // while
+      }
 
 		// Check for descendant
-		if (index2 != this.path.length) {
+    if (index2 != this.path.length)
 			return false;
-		} // if
 
 		// Is Descendant
 		return true;
 
-	} // isDescendant()
+  }
 
 	/**
 	 * pathByAddingChild
 	 * @param element TODO
 	 * @returns TreePath
 	 */
-	public TreePath pathByAddingChild(Object element) {
+  public TreePath pathByAddingChild(Object element)
+  {
 		return new TreePath(this, element);
-	} // pathByAddingChild()
+  }
 
 	/**
 	 * getParentPath
 	 * @returns TreePath
 	 */
-	public TreePath getParentPath() {
-		return new TreePath(this.getPath(), path.length - 1);
-	} // getParentPath()
+  public TreePath getParentPath()
+  {
+    // If this path has only one element, then we return null. That
+    // is what the JDK does.
+    if (path.length <= 1)
+      return null;
 
-
-} // TreePath
+    return new TreePath(this.getPath(), path.length - 1);
+  }
+}

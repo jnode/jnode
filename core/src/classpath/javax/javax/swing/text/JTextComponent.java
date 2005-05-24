@@ -50,6 +50,7 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.InputMethodListener;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
@@ -68,6 +69,8 @@ import javax.swing.JComponent;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.Scrollable;
+import javax.swing.SwingConstants;
+import javax.swing.Timer;
 import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.event.CaretEvent;
@@ -295,6 +298,44 @@ public abstract class JTextComponent extends JComponent
       this.actionName = actionName;
     }
     }
+
+  /**
+   * The timer that lets the caret blink.
+   */
+  private class CaretBlinkTimer
+    extends Timer
+    implements ActionListener
+  {
+    /**
+     * Creates a new CaretBlinkTimer object with a default delay of 1 second.
+     */
+    public CaretBlinkTimer()
+    {
+      super(1000, null);
+      addActionListener(this);
+    }
+
+    /**
+     * Lets the caret blink.
+     */
+    public void actionPerformed(ActionEvent ev)
+    {
+      caret.setVisible(!caret.isVisible());
+    }
+
+    /**
+     * Updates the blink delay according to the current caret.
+     */
+    public void update()
+    {
+      stop();
+      setDelay(caret.getBlinkRate());
+      if (editable)
+        start();
+      else
+        caret.setVisible(false);
+    }
+  }
 
   /**
    * According to <a
@@ -653,6 +694,8 @@ public abstract class JTextComponent extends JComponent
   private char focusAccelerator = '\0';
   private NavigationFilter navigationFilter;
   
+  private CaretBlinkTimer caretBlinkTimer;
+
   /**
    * Get a Keymap from the global keymap table, by name.
    *
@@ -909,7 +952,10 @@ public abstract class JTextComponent extends JComponent
         creatingKeymap = true;
       }
 
+    caretBlinkTimer = new CaretBlinkTimer();
+
     setFocusable(true);
+    setEditable(true);
         enableEvents(AWTEvent.KEY_EVENT_MASK);
         updateUI();
 
@@ -1085,19 +1131,39 @@ public abstract class JTextComponent extends JComponent
 
   public Dimension getPreferredScrollableViewportSize()
     {
-    return null;
+    return getPreferredSize();
     }
 
   public int getScrollableUnitIncrement(Rectangle visible, int orientation,
                                         int direction)
     {
-	return 0;
+    // We return 1/10 of the visible area as documented in Sun's API docs.
+    if (orientation == SwingConstants.HORIZONTAL)
+      return visible.width / 10;
+    else if (orientation == SwingConstants.VERTICAL)
+      return visible.height / 10;
+    else
+      throw new IllegalArgumentException("orientation must be either "
+                                      + "javax.swing.SwingConstants.VERTICAL "
+                                      + "or "
+                                      + "javax.swing.SwingConstants.HORIZONTAL"
+                                         );
     }
 
   public int getScrollableBlockIncrement(Rectangle visible, int orientation,
                                          int direction)
     {
-	return 0;
+    // We return the whole visible area as documented in Sun's API docs.
+    if (orientation == SwingConstants.HORIZONTAL)
+      return visible.width;
+    else if (orientation == SwingConstants.VERTICAL)
+      return visible.height;
+    else
+      throw new IllegalArgumentException("orientation must be either "
+                                      + "javax.swing.SwingConstants.VERTICAL "
+                                      + "or "
+                                      + "javax.swing.SwingConstants.HORIZONTAL"
+                                         );
     }
 
   /**
@@ -1119,6 +1185,14 @@ public abstract class JTextComponent extends JComponent
     {
     if (editable == newValue)
       return;
+
+    if (newValue == true)
+      caretBlinkTimer.start();
+    else
+      {
+        caretBlinkTimer.stop();
+        caret.setVisible(false);
+      }
 
     boolean oldValue = editable;
     editable = newValue;
@@ -1147,6 +1221,8 @@ public abstract class JTextComponent extends JComponent
     
     Caret oldCaret = caret;
     caret = newCaret;
+
+    caretBlinkTimer.update();
 
     if (caret != null)
       caret.install(this);

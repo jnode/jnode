@@ -476,7 +476,7 @@ public abstract class BasicTextUI extends TextUI
    */
   public Dimension getMaximumSize(JComponent c)
   {
-    // that's what Suns implementation does
+    // Sun's implementation returns Integer.MAX_VALUE here, so do we.
     return new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
   }
 
