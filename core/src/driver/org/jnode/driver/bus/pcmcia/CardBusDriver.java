@@ -29,15 +29,17 @@ import org.jnode.driver.DeviceAlreadyRegisteredException;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.Driver;
 import org.jnode.driver.DriverException;
+import org.jnode.driver.bus.pci.PCIDevice;
+import org.jnode.driver.bus.pci.PCIHeaderType2;
 import org.jnode.naming.InitialNaming;
 
 /**
- * Driver for a CardBus controller.
+ * Driver for a CardBus controller (PCI-to-CardBus bridge).
+ * It is based on the TI PCI4451, ymmv with other controllers.
  *
  * @author markhale
  */
 public class CardBusDriver extends Driver {
-
     /**
      * My logger
      */
@@ -59,7 +61,8 @@ public class CardBusDriver extends Driver {
         } catch (NameNotFoundException ex) {
             throw new DriverException("Cannot find DeviceManager", ex);
         }
-        bus = new CardBusBus(this);
+        PCIHeaderType2 header = ((PCIDevice) device).getConfig().asHeaderType2();
+        this.bus = new CardBusBus(this, header.getCardBus());
     }
 
     protected void stopDevice() throws DriverException {

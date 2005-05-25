@@ -32,13 +32,24 @@ import org.jnode.driver.DeviceInfoAPI;
 public class CardBusDevice extends Device implements DeviceInfoAPI {
 
     /**
+     * The bus this device is on
+     */
+    private final int bus;
+    /**
+     * The function number of this device
+     */
+    private final int function;
+
+    /**
      * Create a new instance
      *
      * @param bus
+     * @param function
      */
-    public CardBusDevice(CardBusBus bus) {
-// for the time being, we will use the hashCode for the bus id
-        super(bus, "cardbus(" + bus.hashCode() + ")");
+    public CardBusDevice(CardBusBus bus, int function) {
+        super(bus, "cardbus(" + bus.getBus() + "," + function + ")");
+        this.bus = bus.getBus();
+        this.function = function;
     }
 
     /**
