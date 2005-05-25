@@ -27,10 +27,10 @@ import javax.naming.NamingException;
 
 import org.jmock.MockObjectTestCase;
 import org.jnode.driver.DeviceFinder;
-import org.jnode.driver.floppy.FloppyControllerFinder;
-import org.jnode.driver.floppy.FloppyDeviceToDriverMapper;
-import org.jnode.driver.floppy.FloppyDriver;
-import org.jnode.driver.floppy.support.FloppyDriverUtils;
+import org.jnode.driver.block.floppy.FloppyControllerFinder;
+import org.jnode.driver.block.floppy.FloppyDeviceToDriverMapper;
+import org.jnode.driver.block.floppy.FloppyDriver;
+import org.jnode.driver.block.floppy.support.FloppyDriverUtils;
 import org.jnode.test.fs.driver.BlockDeviceAPIContext;
 import org.jnode.test.fs.driver.factories.MockFloppyDeviceFactory;
 import org.jnode.test.fs.driver.stubs.StubDeviceManager;
