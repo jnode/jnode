@@ -9,7 +9,7 @@
 
   <requires>
     <import plugin="org.jnode.driver.system.pnp"/>
-    <import plugin="org.jnode.driver.firmware"/>
+    <import plugin="org.jnode.driver.system.firmware"/>
   </requires>
 
   <runtime>

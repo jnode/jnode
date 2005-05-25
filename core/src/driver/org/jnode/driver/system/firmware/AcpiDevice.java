@@ -19,36 +19,34 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
  
-package org.jnode.driver.system.acpi;
+package org.jnode.driver.system.firmware;
 
+import org.jnode.driver.Bus;
 import org.jnode.driver.Device;
-import org.jnode.driver.DeviceToDriverMapper;
-import org.jnode.driver.Driver;
-import org.jnode.driver.system.firmware.AcpiDevice;
 
 /**
+ * Device class for an ACPI device.
+ * This device gives access to a
+ * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public final class AcpiDeviceToDriverMapper implements DeviceToDriverMapper {
+public class AcpiDevice extends Device {
 
+    private final AcpiRSDPInfo rsdpInfo;
     /**
-     * Find a driver for the given device, or return null if not found.
-     * @see org.jnode.driver.DeviceToDriverMapper#findDriver(org.jnode.driver.Device)
+     * @param bus
+     * @param id
      */
-    public Driver findDriver(Device device) {
-        if (device instanceof AcpiDevice) {
-            return new AcpiDriver();
-        }
-        
-        // No driver found
-        return null;
+    public AcpiDevice(Bus bus, String id, AcpiRSDPInfo rsdpInfo) {
+        super(bus, id);
+        this.rsdpInfo = rsdpInfo;
     }
     
     /**
-     * Gets the matching level for this mapper.
-     * @see org.jnode.driver.DeviceToDriverMapper#getMatchLevel()
+     * Gets the information of the ACPI root descriptor table.
+     * @return
      */
-    public int getMatchLevel() {
-        return DeviceToDriverMapper.MATCH_DEVCLASS;
+    public final AcpiRSDPInfo getRsdpInfo() {
+        return rsdpInfo;
     }
 }

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.driver.system.firmware"
+        name="JNode firmware support"
+        version="@VERSION@"
+        license-name="lgpl"
+        provider-name="JNode.org">
+
+  <requires>
+    <import plugin="org.jnode.driver"/>
+  </requires>
+
+  <runtime>
+    <library name="jnode-core.jar">
+      <export name="org.jnode.driver.system.firmware.*"/>
+    </library>
+  </runtime>
+
+</plugin>
