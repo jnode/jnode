@@ -24,7 +24,7 @@ package org.jnode.driver.system.acpi.vm;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jnode.driver.pnp.PnP;
+import org.jnode.driver.system.pnp.PnP;
 
 /**
  * Device.
