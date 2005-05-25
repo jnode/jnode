@@ -22,7 +22,7 @@
 package org.jnode.driver.chipset.i440BX;
 
 import org.jnode.driver.Driver;
-import org.jnode.driver.pci.PCIDevice;
+import org.jnode.driver.bus.pci.PCIDevice;
 import org.jnode.driver.smbus.SMBus;
 import org.jnode.driver.smbus.SMBusControler;
 

@@ -24,9 +24,9 @@ package org.jnode.driver.chipset.i440BX;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceToDriverMapper;
 import org.jnode.driver.Driver;
-import org.jnode.driver.pci.PCIDevice;
-import org.jnode.driver.pci.PCIDeviceConfig;
-import org.jnode.driver.pci.PCI_IDs;
+import org.jnode.driver.bus.pci.PCIDevice;
+import org.jnode.driver.bus.pci.PCIDeviceConfig;
+import org.jnode.driver.bus.pci.PCI_IDs;
 
 /**
  * i440BX device to driver mapper.

@@ -8,7 +8,7 @@
         provider-name="jnode.org">
 
   <requires>
-    <import plugin="org.jnode.driver.pci"/>
+    <import plugin="org.jnode.driver.bus.pci"/>
   </requires>
 
   <runtime>

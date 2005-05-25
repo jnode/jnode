@@ -10,7 +10,7 @@
   <requires>
     <import plugin="org.jnode.awt"/>
     <!-- import plugin="org.jnode.driver"/ -->
-    <import plugin="org.jnode.driver.pci"/>
+    <import plugin="org.jnode.driver.bus.pci"/>
     <!-- import plugin="org.jnode.driver.video"/ -->
     <import plugin="org.jnode.driver.video.vgahw"/>
   </requires>
@@ -23,15 +23,15 @@
 
   <extension point="org.jnode.driver.mappers">
     <!-- mapper class="org.jnode.driver.video.nvidia.NVidiaDeviceToDriverMapper"/ -->
-    <mapper id="10de:0020" architecture="NV04A" name="Riva TNT" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
-    <mapper id="10de:0028" architecture="NV04A" name="RIVA TNT2/TNT2 Pro" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
-    <mapper id="10de:0029" architecture="NV04A" name="RIVA TNT2 Ultra" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
-    <mapper id="10de:002c" architecture="NV04A" name="Vanta/Vanta LT" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
-    <mapper id="10de:002d" architecture="NV04A" name="RIVA TNT2 Model 64/Model 64 Pro" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
-    <mapper id="10de:00a0" architecture="NV04A" name="Aladdin TNT2" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
-    <mapper id="10de:0100" architecture="NV10A" name="GeForce 256" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
-    <mapper id="10de:0101" architecture="NV10A" name="GeForce DDR" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
-    <mapper id="10de:0202" architecture="NV10A" name="GeForce 3Ti500" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="10de:0020" architecture="NV04A" name="Riva TNT" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="10de:0028" architecture="NV04A" name="RIVA TNT2/TNT2 Pro" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="10de:0029" architecture="NV04A" name="RIVA TNT2 Ultra" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="10de:002c" architecture="NV04A" name="Vanta/Vanta LT" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="10de:002d" architecture="NV04A" name="RIVA TNT2 Model 64/Model 64 Pro" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="10de:00a0" architecture="NV04A" name="Aladdin TNT2" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="10de:0100" architecture="NV10A" name="GeForce 256" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="10de:0101" architecture="NV10A" name="GeForce DDR" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="10de:0202" architecture="NV10A" name="GeForce 3Ti500" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
   </extension>
         
 </plugin>
