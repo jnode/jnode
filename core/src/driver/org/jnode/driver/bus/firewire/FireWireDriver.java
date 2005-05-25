@@ -59,7 +59,8 @@ public class FireWireDriver extends Driver {
         } catch (NameNotFoundException ex) {
             throw new DriverException("Cannot find DeviceManager", ex);
         }
-        bus = new FireWireBus(this);
+        int busId = 0; // fix to handle multiple firewire controllers
+        bus = new FireWireBus(this, busId);
     }
 
     protected void stopDevice() throws DriverException {
