@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.shell.command.driver.system.acpi"
+        name="JNode ACPI commands"
+        version="@VERSION@"
+        license-name="lgpl"
+        provider-name="JNode.org">
+
+  <requires>
+    <import plugin="org.jnode.driver.system.acpi"/>
+    <import plugin="org.jnode.driver.bus.smbus"/>
+    <import plugin="org.jnode.shell.help"/>
+  </requires>
+
+  <runtime>
+    <library name="jnode-shell.jar">
+      <export name="org.jnode.shell.command.driver.system.acpi.*"/>
+    </library>
+  </runtime>
+
+  <extension point="org.jnode.shell.aliases">
+    <alias name="acpi" class="org.jnode.shell.command.driver.system.acpi.AcpiCommand"/>
+    <alias name="smbus" class="org.jnode.shell.command.driver.system.acpi.SMBusCommand"/>
+  </extension>
+
+</plugin>
