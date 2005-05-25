@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.driver.bus.ide.atapi" 
+        name="JNode IDE ATAPI drivers"
+        version="@VERSION@"
+        license-name="lgpl"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.driver.bus.ide"/>
+    <import plugin="org.jnode.driver.scsi"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-fs.jar">
+      <export name="org.jnode.driver.bus.ide.atapi.*"/>
+    </library>
+  </runtime>
+
+  <extension point="org.jnode.driver.mappers">
+    <mapper class="org.jnode.driver.bus.ide.atapi.ATAPIDeviceToDriverMapper"/>
+  </extension>
+        
+</plugin>

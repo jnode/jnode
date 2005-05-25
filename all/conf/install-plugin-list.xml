@@ -17,14 +17,14 @@
   <plugin id="org.jnode.driver"/>
   <plugin id="org.jnode.driver.character"/>
   <plugin id="org.jnode.driver.block"/>
+  <plugin id="org.jnode.driver.block.ide.disk"/>
   <plugin id="org.jnode.driver.block.ramdisk"/>
+  <plugin id="org.jnode.driver.bus.ide"/>
+  <plugin id="org.jnode.driver.bus.ide.atapi"/>
   <plugin id="org.jnode.driver.bus.pci"/>
   <plugin id="org.jnode.driver.chipset.via"/>
   <plugin id="org.jnode.driver.finder"/>
   <!-- plugin id="org.jnode.driver.floppy"/ -->
-  <plugin id="org.jnode.driver.ide"/>
-  <plugin id="org.jnode.driver.ide.atapi"/>
-  <plugin id="org.jnode.driver.ide.disk"/>
   <plugin id="org.jnode.driver.input"/>
   <plugin id="org.jnode.driver.input.l10n"/>
   <plugin id="org.jnode.driver.net.3c90x"/>

@@ -29,9 +29,9 @@ import javax.naming.NamingException;
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceNotFoundException;
-import org.jnode.driver.ide.IDEDevice;
-import org.jnode.driver.ide.IDEDeviceAPI;
-import org.jnode.driver.ide.IDEDriveDescriptor;
+import org.jnode.driver.bus.ide.IDEDevice;
+import org.jnode.driver.bus.ide.IDEDeviceAPI;
+import org.jnode.driver.bus.ide.IDEDriveDescriptor;
 import org.jnode.naming.InitialNaming;
 import org.jnode.util.NumberUtils;
 
