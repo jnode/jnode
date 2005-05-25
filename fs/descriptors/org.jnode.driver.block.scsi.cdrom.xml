@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
-<plugin id="org.jnode.driver.bus.ide.atapi" 
-        name="JNode IDE ATAPI drivers"
+<plugin id="org.jnode.driver.block.scsi.cdrom" 
+        name="JNode SCSI CDROM Drivers"
         version="@VERSION@"
         license-name="lgpl"
         provider-name="JNode.org">
         
   <requires>
-    <import plugin="org.jnode.driver.bus.ide"/>
+    <import plugin="org.jnode.driver.block"/>
     <import plugin="org.jnode.driver.bus.scsi"/>
   </requires>
         
   <runtime>
     <library name="jnode-fs.jar">
-      <export name="org.jnode.driver.bus.ide.atapi.*"/>
+      <export name="org.jnode.driver.block.scsi.cdrom.*"/>
     </library>
   </runtime>
 
   <extension point="org.jnode.driver.mappers">
-    <mapper class="org.jnode.driver.bus.ide.atapi.ATAPIDeviceToDriverMapper"/>
+    <mapper class="org.jnode.driver.block.scsi.cdrom.CDROMDeviceToDriverMapper"/>
   </extension>
         
 </plugin>

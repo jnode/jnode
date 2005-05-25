@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.driver.bus.scsi" 
+        name="JNode SCSI core classes"
+        version="@VERSION@"
+        license-name="lgpl"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.driver"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-fs.jar">
+      <export name="org.jnode.driver.bus.scsi.*"/>
+      <export name="org.jnode.driver.bus.scsi.cdb.spc.*"/>
+      <export name="org.jnode.driver.bus.scsi.cdb.mmc.*"/>
+    </library>
+  </runtime>
+
+</plugin>
