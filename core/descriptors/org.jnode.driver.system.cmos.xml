@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.driver.system.cmos"
+    name="JNode CMOS driver classes"
+    version="@VERSION@"
+    provider-name="JNode.org"
+    license-name="lgpl"
+    class="org.jnode.driver.system.cmos.def.CMOSPlugin">
+
+    <requires>
+        <import plugin="org.jnode.driver"/>
+    </requires>
+
+    <runtime>
+        <library name="jnode-core.jar">
+            <export name="org.jnode.driver.system.cmos.*"/>
+            <export name="org.jnode.driver.system.cmos.def.*"/>
+        </library>
+    </runtime>
+
+    <extension point="org.jnode.security.permissions">
+        <permission class="org.jnode.system.ResourcePermission" name="ioports"/>
+    </extension>
+
+</plugin>

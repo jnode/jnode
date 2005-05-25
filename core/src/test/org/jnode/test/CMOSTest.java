@@ -23,8 +23,8 @@ package org.jnode.test;
 
 import javax.naming.NamingException;
 
-import org.jnode.driver.cmos.CMOSService;
-import org.jnode.driver.cmos.def.RTC;
+import org.jnode.driver.system.cmos.CMOSService;
+import org.jnode.driver.system.cmos.def.RTC;
 import org.jnode.naming.InitialNaming;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.util.BCDUtils;
