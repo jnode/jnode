@@ -19,12 +19,29 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
  
-package org.jnode.driver.block.usb.storage;
+package org.jnode.driver.bus.usb;
 
-import org.jnode.driver.bus.scsi.CDB;
-import org.jnode.driver.bus.usb.USBException;
+/**
+ * @author Ewout Prangsma (epr@users.sourceforge.net)
+ */
+public abstract class AbstractDeviceItem implements USBConstants {
 
-public interface ITransport {
-	public void transport(CDB cdb);
-	public void reset()throws USBException;
+	/** The device I belong to */
+	private final USBDevice device;
+	
+	/**
+	 * Initialize this instance.
+	 * @param device
+	 */
+	public AbstractDeviceItem(USBDevice device) {
+		this.device = device;
+	}
+
+	/**
+	 * @return Returns the device.
+	 */
+	public final USBDevice getDevice() {
+		return this.device;
+	}
+
 }

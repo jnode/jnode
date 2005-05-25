@@ -25,11 +25,11 @@ import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceToDriverMapper;
 import org.jnode.driver.Driver;
-import org.jnode.driver.usb.InterfaceDescriptor;
-import org.jnode.driver.usb.USBConfiguration;
-import org.jnode.driver.usb.USBConstants;
-import org.jnode.driver.usb.USBDevice;
-import org.jnode.driver.usb.USBInterface;
+import org.jnode.driver.bus.usb.InterfaceDescriptor;
+import org.jnode.driver.bus.usb.USBConfiguration;
+import org.jnode.driver.bus.usb.USBConstants;
+import org.jnode.driver.bus.usb.USBDevice;
+import org.jnode.driver.bus.usb.USBInterface;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

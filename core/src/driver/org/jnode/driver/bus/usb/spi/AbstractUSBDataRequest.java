@@ -19,12 +19,29 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
  
-package org.jnode.driver.block.usb.storage;
+package org.jnode.driver.bus.usb.spi;
 
-import org.jnode.driver.bus.scsi.CDB;
-import org.jnode.driver.bus.usb.USBException;
+import org.jnode.driver.bus.usb.USBPacket;
 
-public interface ITransport {
-	public void transport(CDB cdb);
-	public void reset()throws USBException;
+/**
+ * @author Ewout Prangsma (epr@users.sourceforge.net)
+ */
+public class AbstractUSBDataRequest extends AbstractUSBRequest {
+
+	private final USBPacket dataPacket;
+	
+	/**
+	 * Initialize this instance
+	 * @param dataPacket
+	 */
+	public AbstractUSBDataRequest(USBPacket dataPacket) {
+		this.dataPacket = dataPacket;
+	}
+	
+	/**
+	 * @return Returns the dataPacket.
+	 */
+	public USBPacket getDataPacket() {
+		return this.dataPacket;
+	}
 }

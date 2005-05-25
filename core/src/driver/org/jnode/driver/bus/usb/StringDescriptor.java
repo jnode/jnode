@@ -19,12 +19,44 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
  
-package org.jnode.driver.block.usb.storage;
+package org.jnode.driver.bus.usb;
 
-import org.jnode.driver.bus.scsi.CDB;
-import org.jnode.driver.bus.usb.USBException;
+/**
+ * @author Ewout Prangsma (epr@users.sourceforge.net)
+ */
+public class StringDescriptor extends AbstractDescriptor {
 
-public interface ITransport {
-	public void transport(CDB cdb);
-	public void reset()throws USBException;
+	/** The cached string */
+	private String cachedString;
+	
+	/**
+	 * @param data
+	 * @param ofs
+	 * @param len
+	 */
+	public StringDescriptor(byte[] data, int ofs, int len) {
+		super(data, ofs, len);
+	}
+
+	/**
+	 * @param size
+	 */
+	public StringDescriptor(int size) {
+		super(size);
+	}
+	
+	/**
+	 * Gets the actual string.
+	 */
+	public final String getString() {
+		if (cachedString == null) {
+			final int strLen = (getLength() - 2) >> 1;
+			final char[] str = new char[strLen];
+			for (int i = 0; i < strLen; i++) {
+				str[i] = getChar(2 + (i << 1));
+			}
+			cachedString = new String(str);
+		}
+		return cachedString;
+	}	
 }

@@ -26,6 +26,9 @@
   <plugin id="org.jnode.driver.bus.ide.atapi"/>
   <plugin id="org.jnode.driver.bus.pci"/>
   <plugin id="org.jnode.driver.bus.scsi"/>
+  <plugin id="org.jnode.driver.bus.usb"/>
+  <plugin id="org.jnode.driver.bus.usb.hub"/>
+  <plugin id="org.jnode.driver.bus.usb.uhci"/>
   <plugin id="org.jnode.driver.chipset.via"/>
   <plugin id="org.jnode.driver.finder"/>
   <plugin id="org.jnode.driver.input"/>
@@ -47,10 +50,7 @@
   <plugin id="org.jnode.driver.system.pnp"/>
   <plugin id="org.jnode.driver.ps2"/>
   <plugin id="org.jnode.driver.serial"/>
-  <plugin id="org.jnode.driver.usb"/>
-  <plugin id="org.jnode.driver.usb.hub"/>
   <plugin id="org.jnode.driver.usb.input"/>
-  <plugin id="org.jnode.driver.usb.uhci"/>
 
   <plugin id="org.jnode.fs"/>
   <plugin id="org.jnode.fs.ext2"/>

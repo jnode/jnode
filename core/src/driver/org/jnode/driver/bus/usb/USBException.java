@@ -19,12 +19,40 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
  
-package org.jnode.driver.block.usb.storage;
+package org.jnode.driver.bus.usb;
 
-import org.jnode.driver.bus.scsi.CDB;
-import org.jnode.driver.bus.usb.USBException;
+/**
+ * @author Ewout Prangsma (epr@users.sourceforge.net)
+ */
+public class USBException extends Exception {
 
-public interface ITransport {
-	public void transport(CDB cdb);
-	public void reset()throws USBException;
+	/**
+	 * 
+	 */
+	public USBException() {
+		super();
+	}
+
+	/**
+	 * @param message
+	 * @param cause
+	 */
+	public USBException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	/**
+	 * @param cause
+	 */
+	public USBException(Throwable cause) {
+		super(cause);
+	}
+
+	/**
+	 * @param s
+	 */
+	public USBException(String s) {
+		super(s);
+	}
+
 }
