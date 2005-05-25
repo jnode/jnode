@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.shell.help;
 
 import java.util.HashMap;
@@ -43,29 +43,29 @@ public class Syntax {
     }
 
     public Syntax(String description) {
-        this(description, new Parameter[ 0]);
+        this(description, new Parameter[0]);
     }
 
     public Syntax(String description, Parameter p1) {
-        this(description, new Parameter[] { p1});
+        this(description, new Parameter[]{p1});
     }
 
     public Syntax(String description, Parameter p1, Parameter p2) {
-        this(description, new Parameter[] { p1, p2});
+        this(description, new Parameter[]{p1, p2});
     }
 
     public Syntax(String description, Parameter p1, Parameter p2, Parameter p3) {
-        this(description, new Parameter[] { p1, p2, p3});
+        this(description, new Parameter[]{p1, p2, p3});
     }
 
     public Syntax(String description, Parameter p1, Parameter p2, Parameter p3,
-            Parameter p4) {
-        this(description, new Parameter[] { p1, p2, p3, p4});
+                  Parameter p4) {
+        this(description, new Parameter[]{p1, p2, p3, p4});
     }
 
     public Syntax(String description, Parameter p1, Parameter p2, Parameter p3,
-            Parameter p4, Parameter p5) {
-        this(description, new Parameter[] { p1, p2, p3, p4, p5});
+                  Parameter p4, Parameter p5) {
+        this(description, new Parameter[]{p1, p2, p3, p4, p5});
     }
 
     /**
@@ -94,7 +94,9 @@ public class Syntax {
 
     synchronized ParsedArguments parse(String[] args) throws SyntaxErrorException {
         if (params.length == 0) {
-            if (args.length == 0) { return new ParsedArguments(new HashMap<CommandLineElement, String[]>()); }
+            if (args.length == 0) {
+                return new ParsedArguments(new HashMap<CommandLineElement, String[]>());
+            }
             throw new SyntaxErrorException("Syntax takes no parameter");
         }
 
@@ -106,17 +108,18 @@ public class Syntax {
 
         // check if all mandatory parameters are set
         for (int i = 0; i < params.length; i++) {
-            final Parameter p = params[ i];
+            final Parameter p = params[i];
             if (!p.isOptional()) {
-                if (!p.isSet(result)) { throw new SyntaxErrorException(
-                        "Mandatory parameter " + p.getName() + " not set"); }
+                if (!p.isSet(result)) {
+                    throw new SyntaxErrorException("Mandatory parameter " + p.getName() + " not set");
+                }
             }
         }
         return result;
     }
 
     private synchronized void visitCommandLine(CommandLine cmdLine,
-            CommandLineVisitor visitor) throws SyntaxErrorException {
+                                               CommandLineVisitor visitor) throws SyntaxErrorException {
         clearArguments();
         Parameter param = null;
         final AnonymousIterator anonIterator = new AnonymousIterator();
@@ -165,11 +168,12 @@ public class Syntax {
 
     final void clearArguments() {
         for (int i = 0; i < params.length; i++)
-            if (params[ i].hasArgument()) params[ i].getArgument().clear();
+            if (params[i].hasArgument()) params[i].getArgument().clear();
     }
 
     /**
      * Visitor for command line elements.
+     *
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
     private interface CommandLineVisitor {
@@ -177,20 +181,20 @@ public class Syntax {
         public void visitParameter(Parameter p);
 
         public String visitValue(String s, boolean last, int tokenType);
-        
+
         public boolean isValueValid(Argument arg, String value, boolean last);
     }
 
     private class CompletionVisitor implements CommandLineVisitor {
 
-        String line = "";
+        StringBuilder line = new StringBuilder();
 
         Parameter param = null;
 
         public void visitParameter(Parameter p) {
             this.param = p;
             if (!p.isAnonymous()) {
-                line += "-" + p.getName() + " ";
+                line.append('-').append(p.getName()).append(' ');
             }
         }
 
@@ -199,19 +203,19 @@ public class Syntax {
             if (last) { // we're not yet at the end of the command line
                 // token to be completed
                 result = param.complete(s);
-                line += result;
+                line.append(result);
             } else {
                 result = ((tokenType & CommandLine.STRING) != 0 ? CommandLine
                         .escape(s, true) : s);
-                line += result + " ";
+                line.append(result).append(' ');
             }
             return result;
         }
 
         String getCompletedLine() {
-            return line;
+            return line.toString();
         }
-        
+
         public boolean isValueValid(Argument arg, String value, boolean last) {
             return last || arg.isValidValue(value);
         }
@@ -255,7 +259,7 @@ public class Syntax {
             param = null;
             valued = false;
         }
-        
+
         public boolean isValueValid(Argument arg, String value, boolean last) {
             return arg.isValidValue(value);
         }
@@ -285,7 +289,7 @@ public class Syntax {
             final Parameter[] params = Syntax.this.params;
             final int length = params.length;
             if (nextParamsIdx < length) {
-                final Parameter result = params[ nextParamsIdx++];
+                final Parameter result = params[nextParamsIdx++];
                 findNext();
                 return result;
             } else {
@@ -304,7 +308,7 @@ public class Syntax {
             final Parameter[] params = Syntax.this.params;
             final int length = params.length;
             while (nextParamsIdx < length) {
-                if (params[ nextParamsIdx].isAnonymous()) {
+                if (params[nextParamsIdx].isAnonymous()) {
                     break;
                 } else {
                     nextParamsIdx++;
