@@ -33,6 +33,7 @@
   <plugin id="org.jnode.driver.finder"/>
   <plugin id="org.jnode.driver.input"/>
   <plugin id="org.jnode.driver.input.l10n"/>
+  <plugin id="org.jnode.driver.input.usb"/>
   <plugin id="org.jnode.driver.net.3c90x"/>
   <plugin id="org.jnode.driver.net.ethernet"/>
   <plugin id="org.jnode.driver.net.eepro100"/>
@@ -50,7 +51,6 @@
   <plugin id="org.jnode.driver.system.pnp"/>
   <plugin id="org.jnode.driver.ps2"/>
   <plugin id="org.jnode.driver.serial"/>
-  <plugin id="org.jnode.driver.usb.input"/>
 
   <plugin id="org.jnode.fs"/>
   <plugin id="org.jnode.fs.ext2"/>
