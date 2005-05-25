@@ -30,12 +30,12 @@ import org.jnode.driver.DriverException;
 import org.jnode.driver.bus.ide.IDEBus;
 import org.jnode.driver.bus.ide.IDEDevice;
 import org.jnode.driver.bus.ide.command.IDEPacketCommand;
-import org.jnode.driver.scsi.CDB;
-import org.jnode.driver.scsi.SCSIDevice;
-import org.jnode.driver.scsi.SCSIException;
-import org.jnode.driver.scsi.SCSIHostControllerAPI;
-import org.jnode.driver.scsi.cdb.spc.CDBInquiry;
-import org.jnode.driver.scsi.cdb.spc.InquiryData;
+import org.jnode.driver.bus.scsi.CDB;
+import org.jnode.driver.bus.scsi.SCSIDevice;
+import org.jnode.driver.bus.scsi.SCSIException;
+import org.jnode.driver.bus.scsi.SCSIHostControllerAPI;
+import org.jnode.driver.bus.scsi.cdb.spc.CDBInquiry;
+import org.jnode.driver.bus.scsi.cdb.spc.InquiryData;
 import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeoutException;
 
@@ -132,7 +132,7 @@ public class ATAPIDriver extends Driver implements SCSIHostControllerAPI {
         }
 
         /**
-         * @see org.jnode.driver.scsi.SCSIDeviceAPI#executeCommand(CDB, byte[],
+         * @see org.jnode.driver.bus.scsi.SCSIDeviceAPI#executeCommand(CDB, byte[],
          *      int, long)
          */
         public final int executeCommand(CDB cdb, byte[] data,
@@ -171,7 +171,7 @@ public class ATAPIDriver extends Driver implements SCSIHostControllerAPI {
         }
 
         /**
-         * @see org.jnode.driver.scsi.SCSIDeviceAPI#getDescriptor()
+         * @see org.jnode.driver.bus.scsi.SCSIDeviceAPI#getDescriptor()
          */
         public final InquiryData getDescriptor() {
             return inquiryResult;
