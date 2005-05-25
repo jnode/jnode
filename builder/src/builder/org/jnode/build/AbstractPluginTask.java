@@ -113,6 +113,7 @@ public abstract class AbstractPluginTask extends Task {
 			fileSets.put(f, fs);
 			jarTask.addFileset(fs);
 		}
+        fs.createExclude().setName("**/package.html");
 
 		final String[] exports = lib.getExports();
 		for (int i = 0; i < exports.length; i++) {
