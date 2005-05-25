@@ -18,7 +18,7 @@
     <import plugin="org.jnode.driver.bus.scsi"/> 
     <import plugin="org.jnode.driver.block.ide.disk"/> 
     <import plugin="org.jnode.driver.block.scsi.cdrom"/> 
-    <import plugin="org.jnode.driver.usb.storage"/> 
+    <import plugin="org.jnode.driver.block.usb.storage"/> 
         
 	<import plugin="org.junit" version="3.8"/>
 	<import plugin="org.objectweb.asm" version="1"/>
