@@ -25,9 +25,9 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.jnode.driver.block.BlockDeviceAPI;
+import org.jnode.driver.block.floppy.FloppyDriver;
 import org.jnode.driver.block.ide.disk.IDEDiskDriver;
 import org.jnode.driver.bus.ide.IDEConstants;
-import org.jnode.driver.floppy.FloppyDriver;
 import org.jnode.test.fs.driver.BlockDeviceAPITestConfig;
 import org.jnode.test.support.AbstractTest;
 
