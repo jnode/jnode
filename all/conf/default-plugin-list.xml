@@ -36,12 +36,12 @@
     <plugin id="org.jnode.driver.block.ramdisk"/>
     <plugin id="org.jnode.driver.block.ramdisk.command"/>
     <plugin id="org.jnode.driver.bus.pci"/>
+    <plugin id="org.jnode.driver.bus.firewire"/>
     <plugin id="org.jnode.driver.chipset"/>
     <plugin id="org.jnode.driver.chipset.i440BX"/>
     <plugin id="org.jnode.driver.chipset.via"/>
     <plugin id="org.jnode.driver.cmos"/>
     <plugin id="org.jnode.driver.finder"/>
-    <plugin id="org.jnode.driver.firewire"/>
     <plugin id="org.jnode.driver.firmware"/>
     <plugin id="org.jnode.driver.firmware.bios"/>
     <!-- plugin id="org.jnode.driver.floppy"/ -->
