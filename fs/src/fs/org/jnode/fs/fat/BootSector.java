@@ -48,16 +48,18 @@ public class BootSector {
 
 	public BootSector(byte[] src) {
 		data = new byte[src.length];
-		System.arraycopy(src, 0, data, 0, src.length);
-		dirty = false;
-		partitions = new IBMPartitionTableEntry[4];
-	}
-    
-    
-   public boolean isaValidBootSector()
-   {
-   	return (data[510] & 0xFF) == 0x55 && (data[511] & 0xFF) == 0xAA;
-   }
+        System.arraycopy(src, 0, data, 0, src.length);
+        dirty = false;
+        partitions = new IBMPartitionTableEntry[4];
+    }
+
+    public boolean isaValidBootSector() {
+        if (data.length >= 512) {
+            return (data[510] & 0xFF) == 0x55 && (data[511] & 0xFF) == 0xAA;
+        } else {
+            return false;
+        }
+    }
 
 	/**
 	 * Read the contents of this bootsector from the given device.
