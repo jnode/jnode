@@ -9,7 +9,7 @@
 
   <requires>
     <import plugin="org.jnode.driver.chipset"/>
-	<import plugin="org.jnode.driver.smbus"/>    
+	<import plugin="org.jnode.driver.bus.smbus"/>    
   </requires>
 
   <runtime>
