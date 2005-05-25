@@ -1,0 +1,101 @@
+/*
+ * $Id$
+ *
+ * JNode.org
+ * Copyright (C) 2005 JNode.org
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License 
+ * along with this library; if not, write to the Free Software Foundation, 
+ * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
+ */
+ 
+package org.jnode.driver.block.usb.storage;
+
+import org.apache.log4j.Logger;
+import org.jnode.driver.bus.scsi.CDB;
+import org.jnode.driver.usb.SetupPacket;
+import org.jnode.driver.usb.USBConstants;
+import org.jnode.driver.usb.USBControlPipe;
+import org.jnode.driver.usb.USBDataPipe;
+import org.jnode.driver.usb.USBException;
+import org.jnode.driver.usb.USBPacket;
+import org.jnode.driver.usb.USBPipeListener;
+import org.jnode.driver.usb.USBRequest;
+
+public class USBStorageBulkTransport implements ITransport, USBPipeListener, USBStorageConstants, USBConstants {
+
+	/** My logger */
+	private static final Logger log = Logger.getLogger(USBStorageBulkTransport.class);
+	/* */
+	private USBStorageDevice dev;
+	
+	USBDataPipe pipe;
+	/**
+	 * 
+	 *
+	 */
+	public USBStorageBulkTransport() {
+		super();
+	}
+	/**
+	 * 
+	 * @param dev
+	 */
+	public USBStorageBulkTransport( USBStorageDevice dev) {
+		this.dev=dev;
+	}
+	/**
+	 *  
+	 */
+	public void transport(CDB cdb) {
+		try {
+			byte[] scsiCmd = cdb.toByteArray();
+			
+			BulkCommandBlockWrapper bcb = new BulkCommandBlockWrapper();
+			bcb.setSignature(US_BULK_CB_SIGN);
+			bcb.setDataTransferLength(scsiCmd.length);
+			bcb.setFlags((byte)0);
+			bcb.setCdb(scsiCmd);
+			// Sent CBW to device
+			USBPacket data  = new USBPacket(bcb.getCBW());
+			pipe=(USBDataPipe)dev.getBulkOutEndPoint().getPipe();
+			USBRequest req = pipe.createRequest(data);
+			pipe.addListener(this);
+			pipe.asyncSubmit(req);
+		} catch (USBException e) {
+			// TODO throws exception
+			e.printStackTrace();
+		}
+	}
+	/**
+	 * Bulk-Only mass storage reset.
+	 */
+	public void reset() throws USBException {
+		final USBControlPipe pipe = dev.getDefaultControlPipe();
+		final USBRequest req = pipe.createRequest(new SetupPacket(0x01 | USB_TYPE_CLASS | USB_RECIP_INTERFACE,0xFF,0,0,0), null);
+		pipe.syncSubmit(req, GET_TIMEOUT);
+	}
+
+	public void requestCompleted(USBRequest request) {
+		// TODO Auto-generated method stub
+		request.getStatus();
+	}
+
+	public void requestFailed(USBRequest request) {
+		log.debug("USBStorageBulkTransport status:" + request.getStatus());
+		pipe.close();
+	}
+
+	
+
+}

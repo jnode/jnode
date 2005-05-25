@@ -37,6 +37,7 @@
     <plugin id="org.jnode.driver.block.ramdisk"/>
     <plugin id="org.jnode.driver.block.ramdisk.command"/>
     <plugin id="org.jnode.driver.block.scsi.cdrom"/>
+    <plugin id="org.jnode.driver.block.usb.storage"/>
     <plugin id="org.jnode.driver.bus.firewire"/>
     <plugin id="org.jnode.driver.bus.ide"/>
     <plugin id="org.jnode.driver.bus.ide.atapi"/>
@@ -80,7 +81,6 @@
     <plugin id="org.jnode.driver.usb"/>
     <plugin id="org.jnode.driver.usb.hub"/>
     <plugin id="org.jnode.driver.usb.input"/>
-    <plugin id="org.jnode.driver.usb.storage"/>
     <plugin id="org.jnode.driver.usb.uhci"/>
 
     <plugin id="org.jnode.fs"/>
