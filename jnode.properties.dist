@@ -37,3 +37,21 @@
 # Uncomment this if you want the document-plugins task to include a tree page.
 # You must have dot installed for this, see http://www.graphviz.org/
 # jnode.plugin.doc.tree = true
+
+# -----------------------------------------------
+# Settings for use of NT bootloader (NT/Me/XP)
+
+# Changes these values to match the disk/partition where windows is installed.
+# the value is of the form (hdx,y) where :
+# - x is the disk number (starting from 0)
+# - y is the partition number (starting from 0)
+partition-nt=(hd0,1)
+
+# Path to install jnode. The drive must be where is installed windows
+jnode.install-nt.dir=C:\jnode
+
+# -----------------------------------------------
+# Settings for the compiler
+
+# Uncomment this if you want use custom compiler arguments
+#compilerarg=-Xlint:unchecked
