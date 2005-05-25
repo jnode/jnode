@@ -36,12 +36,24 @@ public class FireWireBus extends Bus {
      * The FireWire controller
      */
     private final FireWireDriver controller;
+    /**
+     * My numeric index
+     */
+    private final int bus;
 
     /**
      * @param controller
      */
-    public FireWireBus(FireWireDriver controller) {
+    public FireWireBus(FireWireDriver controller, int bus) {
         super(controller.getDevice());
         this.controller = controller;
+        this.bus = bus;
+    }
+
+    /**
+     * Gets the numeric index of this bus.
+     */
+    public final int getBus() {
+        return bus;
     }
 }
