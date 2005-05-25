@@ -5,7 +5,7 @@ package org.jnode.driver.bus.pci;
 
 /**
  * PCI device configuration header for header type 1: PCI-PCI bridge.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public final class PCIHeaderType1 extends PCIDeviceConfig {
@@ -151,12 +151,17 @@ public final class PCIHeaderType1 extends PCIDeviceConfig {
         return device.readConfigByte(PCI_SECONDARY_BUS);
     }
 
+    public final int getSubordinateBus() {
+        return device.readConfigByte(PCI_SUBORDINATE_BUS);
+    }
+
     /**
-     * @see org.jnode.driver.bus.pci.PCIDeviceConfig#toString()
+     * @see org.jnode.driver.pci.PCIDeviceConfig#toString()
      */
     public String toString() {
         return super.toString() + ", " + "primary-bus=" + getPrimaryBus()
-                + ", " + "secondary-bus=" + getSecondaryBus();
+                + ", " + "secondary-bus=" + getSecondaryBus()
+                + ", " + "subordinate-bus=" + getSubordinateBus();
     }
 
 }

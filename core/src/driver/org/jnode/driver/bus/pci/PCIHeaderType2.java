@@ -4,8 +4,8 @@
 package org.jnode.driver.bus.pci;
 
 /**
- * PCI device configuration header for header type 1: Cardbus bridges.
- * 
+ * PCI device configuration header for header type 2: Cardbus bridges.
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public final class PCIHeaderType2 extends PCIDeviceConfig {
@@ -66,4 +66,24 @@ public final class PCIHeaderType2 extends PCIDeviceConfig {
         super(device);
     }
 
+    public final int getPrimaryBus() {
+        return device.readConfigByte(PCI_CB_PRIMARY_BUS);
+    }
+
+    public final int getCardBus() {
+        return device.readConfigByte(PCI_CB_CARD_BUS);
+    }
+
+    public final int getSubordinateBus() {
+        return device.readConfigByte(PCI_CB_SUBORDINATE_BUS);
+    }
+
+    /**
+     * @see org.jnode.driver.pci.PCIDeviceConfig#toString()
+     */
+    public String toString() {
+        return super.toString() + ", " + "primary-bus=" + getPrimaryBus()
+                + ", " + "card-bus=" + getCardBus()
+                + ", " + "subordinate-bus=" + getSubordinateBus();
+    }
 }
