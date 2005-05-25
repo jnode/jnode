@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.driver.input.usb" 
+        name="JNode USB HID drivers"
+        version="@VERSION@"
+        license-name="lgpl"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.driver.input"/>
+    <import plugin="org.jnode.driver.bus.usb"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-gui.jar">
+      <export name="org.jnode.driver.input.usb.*"/>
+    </library>
+  </runtime>
+
+  <extension point="org.jnode.driver.mappers">
+    <mapper class="org.jnode.driver.input.usb.USBInputDeviceToDriverMapper"/>
+  </extension>
+        
+</plugin>
