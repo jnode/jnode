@@ -13,6 +13,14 @@
   <runtime>
     <library name="jnode-core.jar">
       <export name="gnu.java.locale.*"/>
+      <export name="gnu.xml.aelfred2.*"/>
+      <export name="gnu.xml.dom.*"/>
+      <export name="gnu.xml.dom.html2.*"/>
+      <export name="gnu.xml.dom.ls.*"/>
+      <export name="gnu.xml.pipeline.*"/>
+      <export name="gnu.xml.transform.*"/>
+      <export name="gnu.xml.util.*"/>
+      <export name="gnu.xml.xpath.*"/>
 
       <export name="javax.net.*"/>
       <export name="javax.net.ssl.*"/>
