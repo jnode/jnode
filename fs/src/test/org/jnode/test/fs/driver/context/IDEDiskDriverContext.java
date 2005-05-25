@@ -23,9 +23,9 @@ package org.jnode.test.fs.driver.context;
 
 import org.jmock.MockObjectTestCase;
 import org.jnode.driver.Device;
-import org.jnode.driver.ide.IDEDevice;
-import org.jnode.driver.ide.IDEDriverUtils;
-import org.jnode.driver.ide.disk.IDEDiskDriver;
+import org.jnode.driver.block.ide.disk.IDEDiskDriver;
+import org.jnode.driver.bus.ide.IDEDevice;
+import org.jnode.driver.bus.ide.IDEDriverUtils;
 import org.jnode.naming.InitialNaming;
 import org.jnode.system.ResourceManager;
 import org.jnode.test.fs.driver.BlockDeviceAPIContext;

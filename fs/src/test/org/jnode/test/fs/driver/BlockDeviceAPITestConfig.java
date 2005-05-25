@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jnode.driver.block.BlockDeviceAPI;
-import org.jnode.driver.ide.IDEConstants;
+import org.jnode.driver.bus.ide.IDEConstants;
 import org.jnode.test.support.ContextManager;
 import org.jnode.test.support.TestConfig;
 import org.jnode.util.NumberUtils;

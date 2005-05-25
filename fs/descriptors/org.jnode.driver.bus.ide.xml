@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.driver.bus.ide" 
+        name="JNode IDE drivers"
+        version="@VERSION@"
+        license-name="lgpl"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.driver.block"/>
+    <import plugin="org.jnode.driver.bus.pci"/>
+    <import plugin="org.jnode.fs"/>
+    <import plugin="org.jnode.fs.partitions.ibm"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-fs.jar">
+      <export name="org.jnode.driver.bus.ide.*"/>
+      <export name="org.jnode.driver.bus.ide.command.*"/>
+    </library>
+  </runtime>
+
+  <extension point="org.jnode.security.permissions">
+    <permission class="org.jnode.system.ResourcePermission" name="ioports"/>
+  </extension>
+        
+  <extension point="org.jnode.driver.mappers">
+    <mapper class="org.jnode.driver.bus.pci.PCIClassToDriverMapper"
+            id="01:01"
+            driver-class="org.jnode.driver.bus.ide.DefaultIDEControllerDriver"/>
+  </extension>
+        
+</plugin>

@@ -25,7 +25,7 @@ import java.nio.ByteBuffer;
 
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.block.BlockDeviceAPI;
-import org.jnode.driver.ide.IDEDevice;
+import org.jnode.driver.bus.ide.IDEDevice;
 import org.jnode.naming.InitialNaming;
 
 /**
