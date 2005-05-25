@@ -329,15 +329,13 @@ public abstract class Charset implements Comparable
 		return true;
 	}
 
-  public final ByteBuffer encode (CharBuffer cb)
-  {
-    try
-      {
         // NB: This implementation serializes different threads calling
         // Charset.encode(), a potential performance problem.  It might
         // be better to remove the cache, or use ThreadLocal to cache on
         // a per-thread basis.
-        synchronized (Charset.class)
+  public final synchronized ByteBuffer encode (CharBuffer cb)
+  {
+    try
           {
             if (cachedEncoder == null)
               {
@@ -348,7 +346,6 @@ public abstract class Charset implements Comparable
  	        cachedEncoder.reset();
             return cachedEncoder.encode (cb);
           }
-      }
     catch (CharacterCodingException e)
       {
         throw new AssertionError (e);
@@ -360,15 +357,13 @@ public abstract class Charset implements Comparable
     return encode (CharBuffer.wrap (str));
 	}
 
-  public final CharBuffer decode (ByteBuffer bb)
-  {
-    try
-      {
         // NB: This implementation serializes different threads calling
         // Charset.decode(), a potential performance problem.  It might
         // be better to remove the cache, or use ThreadLocal to cache on
         // a per-thread basis.
-        synchronized (Charset.class)
+  public final synchronized CharBuffer decode (ByteBuffer bb)
+  {
+    try
           {
             if (cachedDecoder == null)
               {
@@ -380,7 +375,6 @@ public abstract class Charset implements Comparable
 
             return cachedDecoder.decode (bb);
           }
-			}
     catch (CharacterCodingException e)
       {
         throw new AssertionError (e);
