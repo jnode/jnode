@@ -110,14 +110,6 @@
       <export name="javax.security.auth.x500.*"/>
 
       <export name="org.xml.sax.*"/>
-      <export name="gnu.xml.aelfred2.*"/>
-      <export name="gnu.xml.dom.*"/>
-      <export name="gnu.xml.dom.html2.*"/>
-      <export name="gnu.xml.dom.ls.*"/>
-      <export name="gnu.xml.pipeline.*"/>
-      <export name="gnu.xml.transform.*"/>
-      <export name="gnu.xml.util.*"/>
-      <export name="gnu.xml.xpath.*"/>
       
       <export name="org.jnode.java.io.*"/>
     </library>
