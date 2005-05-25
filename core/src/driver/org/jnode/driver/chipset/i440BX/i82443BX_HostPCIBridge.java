@@ -26,8 +26,8 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.jnode.driver.Driver;
 import org.jnode.driver.bus.pci.PCIDevice;
-import org.jnode.driver.ram.RAMControler;
-import org.jnode.driver.ram.RAMModuleCollection;
+import org.jnode.driver.system.ram.RAMControler;
+import org.jnode.driver.system.ram.RAMModuleCollection;
 
 /**
  * i82443BX_HostPCIBridge.
