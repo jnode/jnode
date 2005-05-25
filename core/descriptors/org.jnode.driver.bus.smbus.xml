@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.driver.bus.smbus"
+        name="JNode SMBus Controller"
+        version="@VERSION@"
+        license-name="lgpl"
+        provider-name="JNode.org">
+
+  <requires>
+    <import plugin="org.jnode.driver.bus.pci"/>
+  </requires>
+
+  <runtime>
+    <library name="jnode-core.jar">
+      <export name="org.jnode.driver.bus.smbus.*"/>
+    </library>
+  </runtime>
+
+
+</plugin>
