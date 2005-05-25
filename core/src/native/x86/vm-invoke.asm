@@ -10,13 +10,6 @@
 	extern VmMethod_Class
 
 GLABEL vm_invoke_abstract
-	%if TRACE_ABSTRACT
-	    PRINT_STR vm_invoke_abstract_msg1
-	    PRINT_WORD AAX
-    %endif
-	%if FAIL_ON_ABSTRACT
-	    int 0x50
-    %endif
 	push dword SoftByteCodes_EX_ABSTRACTMETHOD ; Exception number
 	push AAX ; Address
 	mov AAX,SoftByteCodes_systemException
