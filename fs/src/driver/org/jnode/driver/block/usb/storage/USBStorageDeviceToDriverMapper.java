@@ -77,7 +77,7 @@ public class USBStorageDeviceToDriverMapper implements DeviceToDriverMapper, USB
 				log.info("Driver for subclass" + descr.getInterfaceSubClass() + "Not yet implemented");
 				return null;
 			case US_SC_SCSI :
-				return new USBStorageSCSIDriver();
+				return new USBStorageSCSIHostDriver();
 			case US_SC_ISD200 :
 				//				TODO Implement driver.
 				log.info("Driver for subclass" + descr.getInterfaceSubClass() + "Not yet implemented");
