@@ -4,13 +4,18 @@
 package org.jnode.driver.block.usb.storage;
 
 import org.apache.log4j.Logger;
+import org.jnode.driver.Bus;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceAlreadyRegisteredException;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.Driver;
 import org.jnode.driver.DriverException;
+import org.jnode.driver.bus.scsi.CDB;
+import org.jnode.driver.bus.scsi.SCSIDevice;
 import org.jnode.driver.bus.scsi.SCSIException;
 import org.jnode.driver.bus.scsi.SCSIHostControllerAPI;
+import org.jnode.driver.bus.scsi.cdb.spc.CDBInquiry;
+import org.jnode.driver.bus.scsi.cdb.spc.InquiryData;
 import org.jnode.driver.bus.usb.USBConfiguration;
 import org.jnode.driver.bus.usb.USBConstants;
 import org.jnode.driver.bus.usb.USBDevice;
@@ -66,7 +71,8 @@ public class USBStorageSCSIHostDriver extends Driver implements SCSIHostControll
             }
 
             usbDev.registerAPI(SCSIHostControllerAPI.class, this);
-            scsiDevice = new USBStorageSCSIDevice(usbDev.getUSBBus(), "_sg");
+            final Bus hostBus = new USBStorageSCSIHostBus(getDevice());
+            scsiDevice = new USBStorageSCSIDevice(hostBus, "_sg");
             scsiDevice.setDriver(new USBStorageSCSIDriver());
 
             // Execute INQUIRY
@@ -110,6 +116,54 @@ public class USBStorageSCSIHostDriver extends Driver implements SCSIHostControll
 
     public void requestFailed(USBRequest request) {
         // TODO Auto-generated method stub
+
+    }
+    
+    private final class USBStorageSCSIHostBus extends Bus {
+
+        /**
+         * @param parent
+         */
+        public USBStorageSCSIHostBus(Device parent) {
+            super(parent);
+        }        
+    }
+    
+    private final class USBStorageSCSIDevice extends SCSIDevice {
+
+        private InquiryData inquiryResult;
+
+        public USBStorageSCSIDevice(Bus bus, String id) {
+            super(bus, id);
+        }
+
+        @Override
+        public int executeCommand(CDB cdb, byte[] data, int dataOffset, long timeout)
+                throws SCSIException, TimeoutException, InterruptedException {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        /**
+         * Execute an INQUUIRY command.
+         * 
+         * @throws SCSIException
+         * @throws TimeoutException
+         * @throws InterruptedException
+         */
+        protected final void inquiry() throws SCSIException, TimeoutException,
+                InterruptedException {
+            final byte[] inqData = new byte[96];
+            this.executeCommand(new CDBInquiry(inqData.length), inqData, 0, 5000);
+            inquiryResult = new InquiryData(inqData);
+        }
+
+        /**
+         * @see org.jnode.driver.bus.scsi.SCSIDeviceAPI#getDescriptor()
+         */
+        public final InquiryData getDescriptor() {
+            return inquiryResult;
+        }
 
     }
 }
