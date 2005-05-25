@@ -39,7 +39,6 @@
     <plugin id="org.jnode.driver.chipset"/>
     <plugin id="org.jnode.driver.chipset.i440BX"/>
     <plugin id="org.jnode.driver.chipset.via"/>
-    <plugin id="org.jnode.driver.cmos"/>
     <plugin id="org.jnode.driver.finder"/>
     <plugin id="org.jnode.driver.firmware"/>
     <plugin id="org.jnode.driver.firmware.bios"/>
@@ -66,6 +65,7 @@
     <plugin id="org.jnode.driver.serial"/>
     <plugin id="org.jnode.driver.smbus"/>
     <plugin id="org.jnode.driver.system.acpi"/>
+    <plugin id="org.jnode.driver.system.cmos"/>
     <plugin id="org.jnode.driver.system.pnp"/>
     <plugin id="org.jnode.driver.sound.speaker"/>
     <plugin id="org.jnode.driver.sound.speaker.pc"/>

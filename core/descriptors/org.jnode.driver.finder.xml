@@ -11,7 +11,7 @@
         
   <requires>
     <import plugin="org.jnode.driver"/>
-    <import plugin="org.jnode.driver.cmos"/>
+    <import plugin="org.jnode.driver.system.cmos"/>
     <import plugin="org.jnode.driver.console"/>
     <import plugin="org.jnode.log4j"/>
   </requires>
