@@ -24,7 +24,7 @@ package org.jnode.driver.video.vmware;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceException;
 import org.jnode.driver.DriverException;
-import org.jnode.driver.pci.PCIDevice;
+import org.jnode.driver.bus.pci.PCIDevice;
 import org.jnode.driver.video.AbstractFrameBufferDriver;
 import org.jnode.driver.video.AlreadyOpenException;
 import org.jnode.driver.video.FrameBufferConfiguration;

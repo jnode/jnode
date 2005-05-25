@@ -10,7 +10,7 @@
   <requires>
     <import plugin="org.jnode.awt"/>
     <!-- import plugin="org.jnode.driver"/ -->
-    <import plugin="org.jnode.driver.pci"/>
+    <import plugin="org.jnode.driver.bus.pci"/>
     <import plugin="org.jnode.driver.video"/>
   </requires>
         
@@ -22,8 +22,8 @@
 
   <extension point="org.jnode.driver.mappers">
     <!--  mapper class="org.jnode.driver.video.vmware.VMWareDeviceToDriverMapper"/ -->
-    <mapper id="15ad:0710" name="VMWare SVGA" driver-class="org.jnode.driver.video.vmware.VMWareDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
-    <mapper id="15ad:0405" name="VMWare SVGA1" driver-class="org.jnode.driver.video.vmware.VMWareDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="15ad:0710" name="VMWare SVGA" driver-class="org.jnode.driver.video.vmware.VMWareDriver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="15ad:0405" name="VMWare SVGA1" driver-class="org.jnode.driver.video.vmware.VMWareDriver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
   </extension>
         
   <extension point="org.jnode.security.permissions">

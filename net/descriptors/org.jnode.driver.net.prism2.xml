@@ -8,7 +8,7 @@
         provider-name="JNode.org">
         
   <requires>
-    <import plugin="org.jnode.driver.pci"/>
+    <import plugin="org.jnode.driver.bus.pci"/>
     <import plugin="org.jnode.driver.net.wireless"/>
     <import plugin="org.jnode.net"/>
   </requires>
@@ -20,7 +20,7 @@
   </runtime>
   
   <extension point="org.jnode.driver.mappers">
-    <mapper id="1260:3873" name="Prism 2.5" driver-class="org.jnode.driver.net.prism2.Prism2Driver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>    
+    <mapper id="1260:3873" name="Prism 2.5" driver-class="org.jnode.driver.net.prism2.Prism2Driver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>    
   </extension>
         
   <extension point="org.jnode.security.permissions">

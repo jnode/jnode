@@ -23,11 +23,11 @@ package org.jnode.driver.net.ne2000.pci;
 
 import org.jnode.driver.Device;
 import org.jnode.driver.DriverException;
+import org.jnode.driver.bus.pci.PCIBaseAddress;
+import org.jnode.driver.bus.pci.PCIDevice;
+import org.jnode.driver.bus.pci.PCIHeaderType0;
 import org.jnode.driver.net.ne2000.Ne2000Core;
 import org.jnode.driver.net.ne2000.Ne2000Flags;
-import org.jnode.driver.pci.PCIBaseAddress;
-import org.jnode.driver.pci.PCIDevice;
-import org.jnode.driver.pci.PCIHeaderType0;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 

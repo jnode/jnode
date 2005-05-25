@@ -28,7 +28,7 @@ import javax.naming.NameNotFoundException;
 import org.apache.log4j.Logger;
 import org.jnode.driver.DeviceUtils;
 import org.jnode.driver.DriverException;
-import org.jnode.driver.pci.PCIDevice;
+import org.jnode.driver.bus.pci.PCIDevice;
 import org.jnode.driver.smbus.DIMM;
 import org.jnode.driver.smbus.DIMMDriver;
 import org.jnode.driver.smbus.SMBus;

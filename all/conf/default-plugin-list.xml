@@ -35,6 +35,7 @@
     <plugin id="org.jnode.driver.block"/>
     <plugin id="org.jnode.driver.block.ramdisk"/>
     <plugin id="org.jnode.driver.block.ramdisk.command"/>
+    <plugin id="org.jnode.driver.bus.pci"/>
     <plugin id="org.jnode.driver.chipset"/>
     <plugin id="org.jnode.driver.chipset.i440BX"/>
     <plugin id="org.jnode.driver.chipset.via"/>
@@ -59,7 +60,6 @@
     <plugin id="org.jnode.driver.net.rtl8139"/>
     <plugin id="org.jnode.driver.net.bcm570x"/>
     <plugin id="org.jnode.driver.net.wireless"/>
-    <plugin id="org.jnode.driver.pci"/>
     <plugin id="org.jnode.driver.pcmcia"/>
     <plugin id="org.jnode.driver.pnp"/>
     <plugin id="org.jnode.driver.ps2"/>

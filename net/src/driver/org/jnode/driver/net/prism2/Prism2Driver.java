@@ -23,10 +23,10 @@ package org.jnode.driver.net.prism2;
 
 import org.jnode.driver.Device;
 import org.jnode.driver.DriverException;
+import org.jnode.driver.bus.pci.PCIDevice;
 import org.jnode.driver.net.ethernet.spi.Flags;
 import org.jnode.driver.net.wireless.spi.WirelessDeviceCore;
 import org.jnode.driver.net.wireless.spi.WirelessEthernetDriver;
-import org.jnode.driver.pci.PCIDevice;
 import org.jnode.plugin.ConfigurationElement;
 import org.jnode.system.ResourceNotFreeException;
 

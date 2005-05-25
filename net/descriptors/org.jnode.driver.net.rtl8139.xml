@@ -8,7 +8,7 @@
         provider-name="JNode.org">
         
   <requires>
-    <import plugin="org.jnode.driver.pci"/>
+    <import plugin="org.jnode.driver.bus.pci"/>
     <import plugin="org.jnode.driver.net.ethernet"/>
     <import plugin="org.jnode.net"/>
   </requires>
@@ -21,29 +21,29 @@
   
   <extension point="org.jnode.driver.mappers">
     <!-- mapper class="org.jnode.driver.net.rtl8139.RTL8139DeviceToDriverMapper"/ -->
-    <mapper id="1025:8920" name="Realtek 8139" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
-    <mapper id="1025:8921" name="ALN-325" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
-    <mapper id="10bd:0320" name="EP-320X-R" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
-    <mapper id="10ec:8139" name="RT8139" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
-    <mapper id="1113:1211" name="SMC_1211" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
-    <mapper id="1186:1300" name="DFE-538TX" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
-    <mapper id="1186:1320" name="SN5200" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
-    <mapper id="1186:8139" name="DRN-32TX" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
-    <mapper id="11f6:8139" name="FN22-3(A) LinxPRO Ethernet Adapter" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
-    <mapper id="1259:2500" name="AT-2500TX" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
-    <mapper id="1259:2503" name="AT-2500TX/ACPI" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
-    <mapper id="1429:d010" name="ND010" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
-    <mapper id="1432:9130" name="EN-9130TX" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
-    <mapper id="1436:8139" name="RT8139" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
-    <mapper id="146c:1439" name="FE-1439TX" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
-    <mapper id="1489:6001" name="GF100TXRII" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
-    <mapper id="1489:6002" name="GF100TXRA" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
-    <mapper id="149c:139a" name="LFE-8139ATX" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
-    <mapper id="149c:8139" name="LFE-8139TX" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
-    <mapper id="2646:0001" name="EtheRx" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
-    <mapper id="8e2e:7000" name="KF-230TX" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
-    <mapper id="8e2e:7100" name="KF-230TX/2" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
-    <mapper id="a0a0:0007" name="ALN-325C" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="1025:8920" name="Realtek 8139" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="1025:8921" name="ALN-325" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="10bd:0320" name="EP-320X-R" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="10ec:8139" name="RT8139" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="1113:1211" name="SMC_1211" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="1186:1300" name="DFE-538TX" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="1186:1320" name="SN5200" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="1186:8139" name="DRN-32TX" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="11f6:8139" name="FN22-3(A) LinxPRO Ethernet Adapter" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="1259:2500" name="AT-2500TX" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="1259:2503" name="AT-2500TX/ACPI" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="1429:d010" name="ND010" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="1432:9130" name="EN-9130TX" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="1436:8139" name="RT8139" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="146c:1439" name="FE-1439TX" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="1489:6001" name="GF100TXRII" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="1489:6002" name="GF100TXRA" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="149c:139a" name="LFE-8139ATX" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="149c:8139" name="LFE-8139TX" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="2646:0001" name="EtheRx" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="8e2e:7000" name="KF-230TX" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="8e2e:7100" name="KF-230TX/2" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="a0a0:0007" name="ALN-325C" driver-class="org.jnode.driver.net.rtl8139.RTL8139Driver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
     
   </extension>
         

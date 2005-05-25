@@ -25,7 +25,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.jnode.driver.Driver;
-import org.jnode.driver.pci.PCIDevice;
+import org.jnode.driver.bus.pci.PCIDevice;
 import org.jnode.driver.ram.RAMControler;
 import org.jnode.driver.ram.RAMModuleCollection;
 

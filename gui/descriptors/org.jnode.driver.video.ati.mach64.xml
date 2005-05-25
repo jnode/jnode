@@ -10,7 +10,7 @@
   <requires>
     <import plugin="org.jnode.awt"/>
     <!-- import plugin="org.jnode.driver"/ -->
-    <import plugin="org.jnode.driver.pci"/>
+    <import plugin="org.jnode.driver.bus.pci"/>
     <!-- import plugin="org.jnode.driver.video"/ -->
     <import plugin="org.jnode.driver.video.vgahw"/>
   </requires>
@@ -25,7 +25,7 @@
     <permission class="org.jnode.system.ResourcePermission" name="memoryScanner"/>
   </extension>
   <extension point="org.jnode.driver.mappers">
-    <mapper id="1002:4755" name="3D RAGE II+ (GTB)" driver-class="org.jnode.driver.video.ati.mach64.Mach64Driver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="1002:4755" name="3D RAGE II+ (GTB)" driver-class="org.jnode.driver.video.ati.mach64.Mach64Driver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
   </extension>
         
 </plugin>
