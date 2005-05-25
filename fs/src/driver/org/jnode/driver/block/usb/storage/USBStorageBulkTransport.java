@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.driver.block.usb.storage;
 
 import org.apache.log4j.Logger;
@@ -27,75 +27,78 @@ import org.jnode.driver.bus.usb.SetupPacket;
 import org.jnode.driver.bus.usb.USBConstants;
 import org.jnode.driver.bus.usb.USBControlPipe;
 import org.jnode.driver.bus.usb.USBDataPipe;
+import org.jnode.driver.bus.usb.USBDevice;
 import org.jnode.driver.bus.usb.USBException;
 import org.jnode.driver.bus.usb.USBPacket;
 import org.jnode.driver.bus.usb.USBPipeListener;
 import org.jnode.driver.bus.usb.USBRequest;
 
-public class USBStorageBulkTransport implements ITransport, USBPipeListener, USBStorageConstants, USBConstants {
+final class USBStorageBulkTransport implements ITransport, USBPipeListener,
+        USBStorageConstants, USBConstants {
 
-	/** My logger */
-	private static final Logger log = Logger.getLogger(USBStorageBulkTransport.class);
-	/* */
-	private USBStorageDevice dev;
-	
-	USBDataPipe pipe;
-	/**
-	 * 
-	 *
-	 */
-	public USBStorageBulkTransport() {
-		super();
-	}
-	/**
-	 * 
-	 * @param dev
-	 */
-	public USBStorageBulkTransport( USBStorageDevice dev) {
-		this.dev=dev;
-	}
-	/**
-	 *  
-	 */
-	public void transport(CDB cdb) {
-		try {
-			byte[] scsiCmd = cdb.toByteArray();
-			
-			BulkCommandBlockWrapper bcb = new BulkCommandBlockWrapper();
-			bcb.setSignature(US_BULK_CB_SIGN);
-			bcb.setDataTransferLength(scsiCmd.length);
-			bcb.setFlags((byte)0);
-			bcb.setCdb(scsiCmd);
-			// Sent CBW to device
-			USBPacket data  = new USBPacket(bcb.getCBW());
-			pipe=(USBDataPipe)dev.getBulkOutEndPoint().getPipe();
-			USBRequest req = pipe.createRequest(data);
-			pipe.addListener(this);
-			pipe.asyncSubmit(req);
-		} catch (USBException e) {
-			// TODO throws exception
-			e.printStackTrace();
-		}
-	}
-	/**
-	 * Bulk-Only mass storage reset.
-	 */
-	public void reset() throws USBException {
-		final USBControlPipe pipe = dev.getDefaultControlPipe();
-		final USBRequest req = pipe.createRequest(new SetupPacket(0x01 | USB_TYPE_CLASS | USB_RECIP_INTERFACE,0xFF,0,0,0), null);
-		pipe.syncSubmit(req, GET_TIMEOUT);
-	}
+    /** My logger */
+    private static final Logger log = Logger
+            .getLogger(USBStorageBulkTransport.class);
 
-	public void requestCompleted(USBRequest request) {
-		// TODO Auto-generated method stub
-		request.getStatus();
-	}
+    /** The device */
+    private final USBDevice device;
+    
+    /* */
+    private final USBStorageDeviceData devData;
 
-	public void requestFailed(USBRequest request) {
-		log.debug("USBStorageBulkTransport status:" + request.getStatus());
-		pipe.close();
-	}
+    USBDataPipe pipe;
 
-	
+    /**
+     * 
+     * @param dev
+     */
+    public USBStorageBulkTransport(USBDevice device, USBStorageDeviceData devData) {
+        this.device = device;
+        this.devData = devData;
+    }
+
+    /**
+     * 
+     */
+    public void transport(CDB cdb) {
+        try {
+            byte[] scsiCmd = cdb.toByteArray();
+
+            BulkCommandBlockWrapper bcb = new BulkCommandBlockWrapper();
+            bcb.setSignature(US_BULK_CB_SIGN);
+            bcb.setDataTransferLength(scsiCmd.length);
+            bcb.setFlags((byte) 0);
+            bcb.setCdb(scsiCmd);
+            // Sent CBW to device
+            USBPacket data = new USBPacket(bcb.getCBW());
+            pipe = (USBDataPipe) devData.getBulkOutEndPoint().getPipe();
+            USBRequest req = pipe.createRequest(data);
+            pipe.addListener(this);
+            pipe.asyncSubmit(req);
+        } catch (USBException e) {
+            // TODO throws exception
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Bulk-Only mass storage reset.
+     */
+    public void reset() throws USBException {
+        final USBControlPipe pipe = device.getDefaultControlPipe();
+        final USBRequest req = pipe.createRequest(new SetupPacket(0x01
+                | USB_TYPE_CLASS | USB_RECIP_INTERFACE, 0xFF, 0, 0, 0), null);
+        pipe.syncSubmit(req, GET_TIMEOUT);
+    }
+
+    public void requestCompleted(USBRequest request) {
+        // TODO Auto-generated method stub
+        request.getStatus();
+    }
+
+    public void requestFailed(USBRequest request) {
+        log.debug("USBStorageBulkTransport status:" + request.getStatus());
+        pipe.close();
+    }
 
 }
