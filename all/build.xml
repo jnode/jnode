@@ -237,6 +237,9 @@ cd-x86-lite    Build the JNode bootable CD-ROM for the X86 32-bit
 cd-x86_64-lite Build the JNode bootable CD-ROM for the X86 32-bit
                architecture. 
 			
+create-patch   Create a patch file containing the differences
+        	   between the local sources and the cvs HEAD branch.
+        	
 encoding-test  Verify the file encoding of all java source files.
 encoding-fix   Correct the file encoding of all java source files.
 			
@@ -611,4 +614,15 @@ clean          Remove all intermediate build results.
 
     </target>
 
+	<!-- Create a patch -->
+	<target name="create-patch">
+        <property name="patch.file" value="${root.dir}/patch.txt"/>             
+		<echo>Creating patch in ${patch.file}</echo>
+		<cvs output="${patch.file}">
+		    <commandline>
+		        <argument line="-q diff -u -N"/>
+		    </commandline>
+		</cvs>
+	</target>
+	
 </project>
