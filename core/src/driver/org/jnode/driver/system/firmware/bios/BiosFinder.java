@@ -19,36 +19,38 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
  
-package org.jnode.driver.system.acpi;
+package org.jnode.driver.system.firmware.bios;
 
+import org.apache.log4j.Logger;
+import org.jnode.driver.Bus;
 import org.jnode.driver.Device;
-import org.jnode.driver.DeviceToDriverMapper;
-import org.jnode.driver.Driver;
-import org.jnode.driver.system.firmware.AcpiDevice;
+import org.jnode.driver.DeviceException;
+import org.jnode.driver.DeviceFinder;
+import org.jnode.driver.DeviceManager;
+import org.jnode.driver.DriverException;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public final class AcpiDeviceToDriverMapper implements DeviceToDriverMapper {
+public final class BiosFinder implements DeviceFinder {
 
-    /**
-     * Find a driver for the given device, or return null if not found.
-     * @see org.jnode.driver.DeviceToDriverMapper#findDriver(org.jnode.driver.Device)
-     */
-    public Driver findDriver(Device device) {
-        if (device instanceof AcpiDevice) {
-            return new AcpiDriver();
-        }
-        
-        // No driver found
-        return null;
-    }
-    
-    /**
-     * Gets the matching level for this mapper.
-     * @see org.jnode.driver.DeviceToDriverMapper#getMatchLevel()
-     */
-    public int getMatchLevel() {
-        return DeviceToDriverMapper.MATCH_DEVCLASS;
-    }
+	/** My logger */
+	private static final Logger log = Logger.getLogger(BiosFinder.class);
+	
+	/**
+	 * @param devMan
+	 * @param bus
+	 * @see org.jnode.driver.DeviceFinder#findDevices(org.jnode.driver.DeviceManager, org.jnode.driver.Bus)
+	 * @throws DeviceException
+	 */
+	public void findDevices(DeviceManager devMan, Bus bus) throws DeviceException {
+		try {
+			final Device bios = new Device(bus, "bios");
+			bios.setDriver(new BiosDriver());
+			devMan.register(bios);
+		} catch (DriverException ex) {
+			throw new DeviceException(ex);
+		}
+	}
+
 }
