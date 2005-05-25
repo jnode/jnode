@@ -45,6 +45,9 @@
     <plugin id="org.jnode.driver.bus.pcmcia"/>
     <plugin id="org.jnode.driver.bus.scsi"/>
     <plugin id="org.jnode.driver.bus.smbus"/>
+    <plugin id="org.jnode.driver.bus.usb"/>
+    <plugin id="org.jnode.driver.bus.usb.hub"/>
+    <plugin id="org.jnode.driver.bus.usb.uhci"/>
     <plugin id="org.jnode.driver.chipset"/>
     <plugin id="org.jnode.driver.chipset.i440BX"/>
     <plugin id="org.jnode.driver.chipset.via"/>
@@ -78,10 +81,7 @@
     <plugin id="org.jnode.driver.video.vga"/>
     <plugin id="org.jnode.driver.video.vgahw"/>
     <plugin id="org.jnode.driver.video.vmware"/>
-    <plugin id="org.jnode.driver.usb"/>
-    <plugin id="org.jnode.driver.usb.hub"/>
     <plugin id="org.jnode.driver.usb.input"/>
-    <plugin id="org.jnode.driver.usb.uhci"/>
 
     <plugin id="org.jnode.fs"/>
     <plugin id="org.jnode.fs.command"/>

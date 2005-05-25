@@ -19,12 +19,52 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
  
-package org.jnode.driver.block.usb.storage;
+package org.jnode.driver.bus.usb;
 
-import org.jnode.driver.bus.scsi.CDB;
-import org.jnode.driver.bus.usb.USBException;
 
-public interface ITransport {
-	public void transport(CDB cdb);
-	public void reset()throws USBException;
+/**
+ * @author Ewout Prangsma (epr@users.sourceforge.net)
+ */
+public abstract class AbstractDescriptor extends USBPacket {
+
+	/**
+	 * Initialize this instance
+	 * 
+	 * @param size
+	 */
+	public AbstractDescriptor(int size) {
+		super(size);
+	}
+
+	/**
+	 * @param data
+	 * @param ofs
+	 * @param len
+	 */
+	public AbstractDescriptor(byte[] data, int ofs, int len) {
+		super(data, ofs, len);
+	}
+
+	/**
+	 * Gets the length of the descriptor
+	 */
+	public final int getLength() {
+		return getByte(0);
+	}
+
+	/**
+	 * Gets the type of the descriptor
+	 */
+	public final int getType() {
+		return getByte(1);
+	}
+
+	/**
+	 * Load all strings with the default Language ID.
+	 * 
+	 * @param dev
+	 */
+	void loadStrings(USBDevice dev) throws USBException {
+		// Do nothing
+	}
 }

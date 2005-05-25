@@ -19,12 +19,32 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
  
-package org.jnode.driver.block.usb.storage;
+package org.jnode.driver.bus.usb;
 
-import org.jnode.driver.bus.scsi.CDB;
-import org.jnode.driver.bus.usb.USBException;
+/**
+ * @author Ewout Prangsma (epr@users.sourceforge.net)
+ */
+public interface USBRequest {
 
-public interface ITransport {
-	public void transport(CDB cdb);
-	public void reset()throws USBException;
+	/**
+	 * Gets the actual transfered data length.
+	 * @return Returns the actualLength.
+	 */
+	public int getActualLength();
+	
+	/**
+	 * Has this request bee completed.
+	 */
+	public boolean isCompleted();
+	
+	/**
+	 * Gets the status of as this request.
+	 */
+	public int getStatus();
+	
+	/**
+	 * Wait for this request to complete, or until a timeout occurs.
+	 * @param timeout
+	 */
+	public void waitUntilComplete(long timeout);
 }

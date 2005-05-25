@@ -19,12 +19,23 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
  
-package org.jnode.driver.block.usb.storage;
+package org.jnode.driver.bus.usb;
 
-import org.jnode.driver.bus.scsi.CDB;
-import org.jnode.driver.bus.usb.USBException;
+/**
+ * @author Ewout Prangsma (epr@users.sourceforge.net)
+ */
+public interface USBPipeListener {
+	
+	/** 
+	 * The given request completed without errors.
+	 * @param request
+	 */
+	public void requestCompleted(USBRequest request);
 
-public interface ITransport {
-	public void transport(CDB cdb);
-	public void reset()throws USBException;
+	/** 
+	 * The given request completed with errors.
+	 * @param request
+	 */
+	public void requestFailed(USBRequest request);
+
 }

@@ -23,14 +23,14 @@ package org.jnode.driver.block.usb.storage;
 
 import org.apache.log4j.Logger;
 import org.jnode.driver.bus.scsi.CDB;
-import org.jnode.driver.usb.SetupPacket;
-import org.jnode.driver.usb.USBConstants;
-import org.jnode.driver.usb.USBControlPipe;
-import org.jnode.driver.usb.USBDataPipe;
-import org.jnode.driver.usb.USBException;
-import org.jnode.driver.usb.USBPacket;
-import org.jnode.driver.usb.USBPipeListener;
-import org.jnode.driver.usb.USBRequest;
+import org.jnode.driver.bus.usb.SetupPacket;
+import org.jnode.driver.bus.usb.USBConstants;
+import org.jnode.driver.bus.usb.USBControlPipe;
+import org.jnode.driver.bus.usb.USBDataPipe;
+import org.jnode.driver.bus.usb.USBException;
+import org.jnode.driver.bus.usb.USBPacket;
+import org.jnode.driver.bus.usb.USBPipeListener;
+import org.jnode.driver.bus.usb.USBRequest;
 
 public class USBStorageBulkTransport implements ITransport, USBPipeListener, USBStorageConstants, USBConstants {
 

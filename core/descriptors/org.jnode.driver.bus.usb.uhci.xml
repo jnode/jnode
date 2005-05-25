@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.driver.bus.usb.uhci" 
+        name="JNode USB UHCI HostController driver"
+        version="@VERSION@"
+        license-name="lgpl"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.driver.bus.pci"/>
+    <import plugin="org.jnode.driver.bus.usb"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-core.jar">
+      <export name="org.jnode.driver.bus.usb.uhci.*"/>
+    </library>
+  </runtime>
+
+  <extension point="org.jnode.driver.mappers">
+    <mapper class="org.jnode.driver.bus.pci.PCIClassToDriverMapper"
+            id="0c:03:00"
+            driver-class="org.jnode.driver.bus.usb.uhci.UHCIDriver"/>
+  </extension>
+        
+  <extension point="org.jnode.security.permissions">
+    <permission class="org.jnode.system.ResourcePermission" name="ioports"/>
+  </extension>
+        
+</plugin>

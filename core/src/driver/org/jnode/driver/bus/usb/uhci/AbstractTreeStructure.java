@@ -19,12 +19,21 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
  
-package org.jnode.driver.block.usb.storage;
+package org.jnode.driver.bus.usb.uhci;
 
-import org.jnode.driver.bus.scsi.CDB;
-import org.jnode.driver.bus.usb.USBException;
+import org.jnode.system.ResourceManager;
 
-public interface ITransport {
-	public void transport(CDB cdb);
-	public void reset()throws USBException;
+/**
+ * @author Ewout Prangsma (epr@users.sourceforge.net)
+ */
+public abstract class AbstractTreeStructure extends AbstractStructure {
+
+	/**
+	 * @param rm
+	 * @param size
+	 * @param alignment
+	 */
+	public AbstractTreeStructure(ResourceManager rm, int size, int alignment) {
+		super(rm, size, alignment);
+	}
 }

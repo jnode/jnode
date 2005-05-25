@@ -1,26 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
-<plugin id="org.jnode.driver.block.usb.storage" 
-        name="JNode USB Mass Storage drivers"
+<plugin id="org.jnode.driver.bus.usb.hub" 
+        name="JNode USB HUB driver"
         version="@VERSION@"
         license-name="lgpl"
         provider-name="JNode.org">
         
   <requires>
     <import plugin="org.jnode.driver.bus.usb"/>
-    <import plugin="org.jnode.driver.block"/>
-    <import plugin="org.jnode.driver.bus.scsi"/>
   </requires>
         
   <runtime>
-    <library name="jnode-fs.jar">
-      <export name="org.jnode.driver.block.usb.storage.*"/>
+    <library name="jnode-core.jar">
+      <export name="org.jnode.driver.bus.usb.hub.*"/>
     </library>
   </runtime>
 
   <extension point="org.jnode.driver.mappers">
-    <mapper class="org.jnode.driver.block.usb.storage.USBStorageDeviceToDriverMapper"/>
+    <mapper class="org.jnode.driver.bus.usb.hub.USBHubDeviceToDriverMapper"/>
   </extension>
         
 </plugin>

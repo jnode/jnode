@@ -19,12 +19,20 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
  
-package org.jnode.driver.block.usb.storage;
+package org.jnode.driver.bus.usb.uhci;
 
-import org.jnode.driver.bus.scsi.CDB;
 import org.jnode.driver.bus.usb.USBException;
+import org.jnode.driver.bus.usb.USBRequest;
 
-public interface ITransport {
-	public void transport(CDB cdb);
-	public void reset()throws USBException;
+
+/**
+ * @author Ewout Prangsma (epr@users.sourceforge.net)
+ */
+public interface UHCIRequest extends USBRequest {
+	
+	public void createTDs(UHCIPipe pipe)
+	throws USBException;
+	
+	public TransferDescriptor getFirstTD();
+
 }
