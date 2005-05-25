@@ -21,9 +21,11 @@
  
 package org.jnode.driver.input.l10n;
 
-import org.jnode.driver.input.*;
-
 import java.awt.event.KeyEvent;
+
+import org.jnode.driver.input.Key;
+import org.jnode.driver.input.KeyboardInterpreter;
+import org.jnode.driver.input.Keys;
 
 
 /**

@@ -20,13 +20,13 @@
  */
  
 package org.jnode.driver.input.l10n;
-import org.jnode.driver.input.KeyboardInterpreter;
-import org.jnode.driver.input.UnsupportedKeyException;
-import org.jnode.driver.input.DeadKeyException;
-import org.jnode.driver.input.Keys;
-import org.jnode.driver.input.Key;
-
 import java.awt.event.KeyEvent;
+
+import org.jnode.driver.input.DeadKeyException;
+import org.jnode.driver.input.Key;
+import org.jnode.driver.input.KeyboardInterpreter;
+import org.jnode.driver.input.Keys;
+import org.jnode.driver.input.UnsupportedKeyException;
 
 
 /**
