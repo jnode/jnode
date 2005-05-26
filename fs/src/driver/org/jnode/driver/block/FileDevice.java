@@ -28,7 +28,7 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 
 import org.jnode.driver.Device;
-import org.jnode.fs.partitions.PartitionTableEntry;
+import org.jnode.partitions.PartitionTableEntry;
 import org.jnode.util.ByteBufferUtils;
 
 /**

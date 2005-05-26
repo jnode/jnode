@@ -21,11 +21,11 @@
  
 package org.jnode.driver.bus.ide;
 
-import org.jnode.driver.block.BlockDeviceAPI;
+import org.jnode.driver.block.PartitionableBlockDeviceAPI;
 
 /**
  * @author epr
  */
-public interface IDEDeviceAPI extends BlockDeviceAPI {
+public interface IDEDeviceAPI extends PartitionableBlockDeviceAPI {
 	// nothing different
 }

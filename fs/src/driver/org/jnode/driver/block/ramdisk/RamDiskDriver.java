@@ -28,7 +28,7 @@ import org.jnode.driver.Driver;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.driver.block.FSBlockDeviceAPI;
-import org.jnode.fs.partitions.PartitionTableEntry;
+import org.jnode.partitions.PartitionTableEntry;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

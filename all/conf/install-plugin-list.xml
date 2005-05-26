@@ -57,11 +57,13 @@
   <plugin id="org.jnode.fs.fat"/>
   <plugin id="org.jnode.fs.iso9660"/>
   <plugin id="org.jnode.fs.ntfs"/>
-  <plugin id="org.jnode.fs.partitions.ibm"/>
   <plugin id="org.jnode.fs.service"/>
   <plugin id="org.jnode.fs.initrd"/>
   <plugin id="org.jnode.fs.jifs"/>
   <plugin id="org.jnode.fs.jifs.def"/>  
+
+  <plugin id="org.jnode.partitions"/>
+  <plugin id="org.jnode.partitions.ibm"/>
 
   <plugin id="org.jnode.install"/>
 

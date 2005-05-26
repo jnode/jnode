@@ -38,9 +38,10 @@ import org.jnode.driver.DeviceAlreadyRegisteredException;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.Driver;
 import org.jnode.driver.DriverException;
-import org.jnode.driver.block.BlockAlignmentSupport;
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.driver.block.BlockDeviceAPIHelper;
+import org.jnode.driver.block.PartitionableBlockAlignmentSupport;
+import org.jnode.driver.block.PartitionableBlockDeviceAPI;
 import org.jnode.driver.bus.ide.IDEBus;
 import org.jnode.driver.bus.ide.IDEConstants;
 import org.jnode.driver.bus.ide.IDEDevice;
@@ -50,9 +51,9 @@ import org.jnode.driver.bus.ide.IDEDriveDescriptor;
 import org.jnode.driver.bus.ide.IDEDriverUtils;
 import org.jnode.driver.bus.ide.command.IDEReadSectorsCommand;
 import org.jnode.driver.bus.ide.command.IDEWriteSectorsCommand;
-import org.jnode.fs.partitions.ibm.IBMPartitionTable;
-import org.jnode.fs.partitions.ibm.IBMPartitionTableEntry;
 import org.jnode.naming.InitialNaming;
+import org.jnode.partitions.ibm.IBMPartitionTable;
+import org.jnode.partitions.ibm.IBMPartitionTableEntry;
 import org.jnode.system.BootLog;
 import org.jnode.util.ByteBufferUtils;
 import org.jnode.util.TimeoutException;
@@ -83,7 +84,7 @@ public class IDEDiskDriver extends Driver implements IDEDeviceAPI, IDEConstants 
 		final IDEDevice dev = (IDEDevice)getDevice();
 		diskBus = new IDEDiskBus(dev);
 		/* Register the IDEDevice API */
-		dev.registerAPI(BlockDeviceAPI.class, new BlockAlignmentSupport(this, SECTOR_SIZE));
+		dev.registerAPI(PartitionableBlockDeviceAPI.class, new PartitionableBlockAlignmentSupport(this, SECTOR_SIZE));
 		/* Get basic configuration */
 		final IDEDriveDescriptor descr = dev.getDescriptor();
 		//lba = descr.supportsLBA();
@@ -318,4 +319,11 @@ public class IDEDiskDriver extends Driver implements IDEDeviceAPI, IDEConstants 
 		pdev.setDriver(new IDEDiskPartitionDriver());
 		devMan.register(pdev);
 	}
+
+    /**
+     * @see org.jnode.driver.block.PartitionableBlockDeviceAPI#getSectorSize()
+     */
+    public int getSectorSize() throws IOException {
+        return SECTOR_SIZE;
+    }
 }

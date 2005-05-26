@@ -23,7 +23,7 @@ package org.jnode.fs;
 
 import org.jnode.driver.Device;
 import org.jnode.driver.block.FSBlockDeviceAPI;
-import org.jnode.fs.partitions.PartitionTableEntry;
+import org.jnode.partitions.PartitionTableEntry;
 
 /**
  * Descriptor and entry point for a class of filesystems. Samples of

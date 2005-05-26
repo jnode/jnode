@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.partitions.command" 
+        name="JNode partitioning commands"
+        version="@VERSION@"
+        license-name="lgpl"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.driver.bus.ide"/>
+    <import plugin="org.jnode.fs.fat"/>
+    <import plugin="org.jnode.partitions.ibm"/>
+    <import plugin="org.jnode.shell.help"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-fs.jar">
+      <export name="org.jnode.partitions.command.*"/>
+    </library>
+  </runtime>
+        
+  <extension point="org.jnode.shell.aliases">
+    <alias name="fdisk" class="org.jnode.partitions.command.FdiskCommand"/>
+  </extension>
+
+</plugin>

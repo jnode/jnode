@@ -19,28 +19,16 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
  
-package org.jnode.driver.block;
-
-import java.io.IOException;
-
-import org.jnode.partitions.PartitionTableEntry;
+package org.jnode.partitions;
 
 /**
- * An FSBlockDeviceAPI is an API for blockdevices that (may) contain a filesystem.
  * @author epr
  */
-public interface FSBlockDeviceAPI extends BlockDeviceAPI {
+public interface PartitionTableEntry {
 	
 	/**
-	 * Gets the sector size for this device.
- 	 * @return The sector size in bytes
+	 * Is this a valid entry, if not it must be ignored.
 	 */
-	public int getSectorSize() throws IOException;
-	
-	/**
-	 * Gets the partition table entry specifying this device.
-	 * @return A PartitionTableEntry or null if no partition table entry exists.
-	 */
-	public PartitionTableEntry getPartitionTableEntry();
+	public boolean isValid();
 
 }

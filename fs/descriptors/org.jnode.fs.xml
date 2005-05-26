@@ -12,12 +12,12 @@
     <import plugin="org.jnode.driver.block"/>
     <import plugin="org.jnode.fs.service"/>
     <import plugin="org.jnode.log4j"/>
+    <import plugin="org.jnode.partitions"/>
   </requires>
         
   <runtime>
     <library name="jnode-fs.jar">
       <export name="org.jnode.fs.*"/>
-      <export name="org.jnode.fs.partitions.*"/>
       <export name="org.jnode.fs.service.def.*"/>
       <export name="org.jnode.fs.spi.*"/>
       <export name="org.jnode.fs.util.*"/>

@@ -30,7 +30,7 @@ import org.jnode.driver.DriverException;
 import org.jnode.driver.block.FSBlockDeviceAPI;
 import org.jnode.driver.block.MappedBlockDeviceSupport;
 import org.jnode.driver.bus.ide.IDEConstants;
-import org.jnode.fs.partitions.PartitionTableEntry;
+import org.jnode.partitions.PartitionTableEntry;
 
 /**
  * @author epr
