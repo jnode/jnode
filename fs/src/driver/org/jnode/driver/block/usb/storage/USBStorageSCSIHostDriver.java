@@ -140,7 +140,9 @@ public class USBStorageSCSIHostDriver extends Driver implements SCSIHostControll
         @Override
         public int executeCommand(CDB cdb, byte[] data, int dataOffset, long timeout)
                 throws SCSIException, TimeoutException, InterruptedException {
-            // TODO Auto-generated method stub
+			log.debug("*** execute command ***");
+            ITransport t = usbDevData.getTransport();
+			t.transport(cdb);
             return 0;
         }
 
