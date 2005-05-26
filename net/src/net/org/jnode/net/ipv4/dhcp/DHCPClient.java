@@ -18,24 +18,26 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.net.ipv4.dhcp;
 
 import org.apache.log4j.Logger;
+import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.net.NetDeviceAPI;
 import org.jnode.driver.net.NetworkException;
 import org.jnode.naming.InitialNaming;
+import org.jnode.net.NetPermission;
 import org.jnode.net.ipv4.IPv4Address;
-import org.jnode.net.ipv4.bootp.BOOTPClient;
 import org.jnode.net.ipv4.bootp.BOOTPHeader;
 import org.jnode.net.ipv4.config.IPv4ConfigurationService;
 import org.jnode.net.ipv4.util.ResolverImpl;
 
 import javax.naming.NameNotFoundException;
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 
 /**
  * Console DHCP client.
@@ -43,128 +45,100 @@ import java.net.InetAddress;
  * @author markhale
  * @author Martin Husted Hartvig (hagar@jnode.org)
  */
-public class DHCPClient extends BOOTPClient
-{
+public class DHCPClient extends AbstractDHCPClient {
 
-  private static final Logger log = Logger.getLogger(DHCPClient.class);
+    private static final Logger log = Logger.getLogger(DHCPClient.class);
 
-  /**
-   * Create a DHCP discovery packet
-   */
-  protected DatagramPacket createRequestPacket(BOOTPHeader hdr)
-      throws IOException
-  {
-    DHCPMessage msg = new DHCPMessage(hdr, DHCPMessage.DHCPDISCOVER);
-    return msg.toDatagramPacket();
-  }
+    private Device device;
+    private NetDeviceAPI api;
 
-  protected boolean processResponse(Device device, NetDeviceAPI api,
-                                    int transactionID, DatagramPacket packet) throws IOException
-  {
-    DHCPMessage msg = new DHCPMessage(packet);
-    BOOTPHeader hdr = msg.getHeader();
-    if (hdr.getOpcode() != BOOTPHeader.BOOTREPLY)
-    {
-      // Not a response
-      return false;
-    }
-    if (hdr.getTransactionID() != transactionID)
-    {
-      // Not for me
-      return false;
-    }
+    /**
+     * Configure the given device using BOOTP
+     *
+     * @param device
+     */
+    public final void configureDevice(final Device device) throws IOException {
+        this.device = device;
 
-    // debug the DHCP message
-    if (log.isDebugEnabled())
-    {
-      log.debug("Got Client IP address  : " + hdr.getClientIPAddress());
-      log.debug("Got Your IP address    : " + hdr.getYourIPAddress());
-      log.debug("Got Server IP address  : " + hdr.getServerIPAddress());
-      log.debug("Got Gateway IP address : " + hdr.getGatewayIPAddress());
-      for (int n = 1; n < 255; n++)
-      {
-        byte[] value = msg.getOption(n);
-        if (value != null)
-        {
-          if (value.length == 1)
-            log.debug("Option " + n + " : " + (int) (value[0]));
-          else if (value.length == 2)
-            log.debug("Option " + n + " : "
-                + ((value[0] << 8) | value[1]));
-          else if (value.length == 4)
-            log.debug("Option " + n + " : "
-                + InetAddress.getByAddress(value).toString());
-          else
-            log.debug("Option " + n + " : " + new String(value));
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            sm.checkPermission(new NetPermission("dhcpClient"));
         }
-      }
+
+        try {
+            AccessController.doPrivileged(new PrivilegedExceptionAction() {
+                public Object run() throws IOException {
+                    // Get the API.
+                    try {
+                        api = (NetDeviceAPI) device.getAPI(NetDeviceAPI.class);
+                    } catch (ApiNotFoundException ex) {
+                        throw new NetworkException("Device is not a network device", ex);
+                    }
+
+                    configureDevice(device.getId(), api.getAddress());
+
+                    return null;
+                }
+            });
+        } catch (PrivilegedActionException ex) {
+            throw (IOException) ex.getException();
+        }
+
+        this.api = null;
+        this.device = null;
     }
 
-    switch (msg.getMessageType())
-    {
-      case DHCPMessage.DHCPOFFER:
-        byte[] serverID = msg
-            .getOption(DHCPMessage.SERVER_IDENTIFIER_OPTION);
-        byte[] requestedIP = hdr.getYourIPAddress().getAddress();
-        hdr = new BOOTPHeader(BOOTPHeader.BOOTREQUEST, transactionID, 0,
-            hdr.getClientIPAddress(), hdr.getClientHwAddress());
-        msg = new DHCPMessage(hdr, DHCPMessage.DHCPREQUEST);
-        msg.setOption(DHCPMessage.REQUESTED_IP_ADDRESS_OPTION, requestedIP);
-        msg.setOption(DHCPMessage.SERVER_IDENTIFIER_OPTION, serverID);
-        packet = msg.toDatagramPacket();
-        packet.setAddress(IPv4Address.BROADCAST_ADDRESS);
-        packet.setPort(SERVER_PORT);
-        socket.send(packet);
-        break;
-      case DHCPMessage.DHCPACK:
-        configureNetwork(device, msg);
-        return true;
-      case DHCPMessage.DHCPNAK:
-        break;
+    /**
+     * Performs the actual configuration of a network device based on the
+     * settings in a DHCP message.
+     */
+    protected void doConfigure(DHCPMessage msg) throws IOException {
+        super.doConfigure(msg);
+
+        final IPv4ConfigurationService cfg;
+        try {
+            cfg = InitialNaming.lookup(IPv4ConfigurationService.NAME);
+        } catch (NameNotFoundException ex) {
+            throw new NetworkException(ex);
+        }
+        BOOTPHeader hdr = msg.getHeader();
+        cfg.configureDeviceStatic(device, new IPv4Address(hdr
+                .getYourIPAddress()), null, false);
+
+        final IPv4Address serverAddr = new IPv4Address(hdr.getServerIPAddress());
+        final IPv4Address networkAddress = serverAddr.and(serverAddr.getDefaultSubnetmask());
+
+        if (hdr.getGatewayIPAddress().isAnyLocalAddress()) {
+            // cfg.addRoute(new IPv4Address(hdr.getServerIPAddress()), null,
+            // device, false);
+            cfg.addRoute(serverAddr, null, device, false);
+            cfg.addRoute(networkAddress, null, device, false);
+        } else {
+            // cfg.addRoute(new IPv4Address(hdr.getServerIPAddress()),
+            // new IPv4Address(hdr.getGatewayIPAddress()), device, false);
+            cfg.addRoute(networkAddress, new IPv4Address(hdr
+                    .getGatewayIPAddress()), device, false);
+        }
+
+        byte[] routerValue = msg.getOption(DHCPMessage.ROUTER_OPTION);
+        if (routerValue != null && routerValue.length >= 4) {
+            IPv4Address routerIP = new IPv4Address(routerValue, 0);
+            log.info("Got Router IP address : " + routerIP);
+            cfg.addRoute(IPv4Address.ANY, routerIP, device, false);
+        }
+
+
+        // find the dns servers and add to the resolver
+        byte[] dnsValue = msg.getOption(DHCPMessage.DNS_OPTION);
+        IPv4Address dnsIP;
+
+        if (dnsValue != null) {
+            for (int i = 0; i < dnsValue.length; i += 4) {
+                dnsIP = new IPv4Address(dnsValue, i);
+
+                log.info("Got Dns IP address    : " + dnsIP);
+                ResolverImpl.addDnsServer(dnsIP);
+            }
+        }
     }
-    return false;
-  }
-
-  /**
-   * Performs the actual configuration of a network device based on the
-   * settings in a DHCP message.
-   */
-  protected void configureNetwork(Device device, DHCPMessage msg)
-      throws NetworkException
-  {
-    configureNetwork(device, msg.getHeader());
-    byte[] routerValue = msg.getOption(DHCPMessage.ROUTER_OPTION);
-    if (routerValue != null && routerValue.length >= 4)
-    {
-      IPv4Address routerIP = new IPv4Address(routerValue, 0);
-      log.info("Got Router IP address : " + routerIP);
-      final IPv4ConfigurationService cfg;
-      try
-      {
-        cfg = (IPv4ConfigurationService) InitialNaming
-            .lookup(IPv4ConfigurationService.NAME);
-      }
-      catch (NameNotFoundException ex)
-      {
-        throw new NetworkException(ex);
-      }
-      cfg.addRoute(IPv4Address.ANY, routerIP, device, false);
-    }
-
-
-    // find the dns servers and add to the resolver
-    byte[] dnsValue = msg.getOption(DHCPMessage.DNS_OPTION);
-    IPv4Address dnsIP;
-
-    if (dnsValue != null)
-    {
-      for (int i = 0; i < dnsValue.length; i += 4)
-      {
-        dnsIP = new IPv4Address(dnsValue, i);
-
-        log.info("Got Dns IP address    : " + dnsIP);
-        ResolverImpl.addDnsServer(dnsIP);
-      }
-    }
-  }
 }
