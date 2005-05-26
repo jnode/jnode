@@ -92,12 +92,11 @@ final class USBStorageBulkTransport implements ITransport, USBPipeListener,
     }
 
     public void requestCompleted(USBRequest request) {
-        // TODO Auto-generated method stub
-        request.getStatus();
+		log.debug("USBStorageBulkTransport completed with status:" + request.getStatus());
     }
 
     public void requestFailed(USBRequest request) {
-        log.debug("USBStorageBulkTransport status:" + request.getStatus());
+        log.debug("USBStorageBulkTransport failed with status:" + request.getStatus());
         pipe.close();
     }
 
