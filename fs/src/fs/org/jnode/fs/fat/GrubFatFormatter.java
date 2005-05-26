@@ -29,8 +29,8 @@ import java.nio.ByteBuffer;
 
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.driver.block.Geometry;
-import org.jnode.fs.util.*;
 import org.jnode.util.FileUtils;
+import org.jnode.util.LittleEndian;
 
 /**
  * @author epr
@@ -144,10 +144,10 @@ public class GrubFatFormatter {
 		formatter.format(api);
 		GrubBootSector bs = (GrubBootSector)formatter.getBootSector();
 		/* Fixup the blocklist end the end of the first sector of stage2 */
-		DosUtils.set32(stage2, 512 - 8, bootSectorOffset + 2);
+		LittleEndian.setInt32(stage2, 512 - 8, bootSectorOffset + 2);
 
 		/* Fixup the install partition */
-		DosUtils.set32(stage2, 512 + 0x08, installPartition);
+        LittleEndian.setInt32(stage2, 512 + 0x08, installPartition);
 
 		/* Fixup the config file */
 		if (configFile != null) {

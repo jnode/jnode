@@ -28,7 +28,8 @@ import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSFile;
-import org.jnode.fs.util.*;
+import org.jnode.fs.util.DosUtils;
+import org.jnode.util.LittleEndian;
 import org.jnode.util.NumberUtils;
 
 /**
@@ -58,7 +59,7 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry {
 	private final AbstractDirectory parent;
 
 	public static FatBasicDirEntry fatDirEntryFactory(AbstractDirectory dir, byte[] src, int offset) {
-		int flags = DosUtils.get8(src, offset + 0x0b);
+		int flags = LittleEndian.getUInt8(src, offset + 0x0b);
 		boolean r = (flags & F_READONLY) != 0;
 		boolean h = (flags & F_HIDDEN) != 0;
 		boolean s = (flags & F_SYSTEM) != 0;
@@ -111,28 +112,28 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry {
 
 		this.parent = dir;
 		unused = (src[offset] == 0);
-		deleted = (DosUtils.get8(src, offset) == 0xe5);
+		deleted = (LittleEndian.getUInt8(src, offset) == 0xe5);
 
 		char[] nameArr = new char[8];
 		for (int i = 0; i < nameArr.length; i++) {
-			nameArr[i] = (char)DosUtils.get8(src, offset + i);
+			nameArr[i] = (char)LittleEndian.getUInt8(src, offset + i);
 		}
-		if (DosUtils.get8(src, offset) == 0x05) {
+		if (LittleEndian.getUInt8(src, offset) == 0x05) {
 			nameArr[0] = (char)0xe5;
 		}
 		setName(new String(nameArr).trim());
 
 		char[] extArr = new char[3];
 		for (int i = 0; i < extArr.length; i++) {
-			extArr[i] = (char)DosUtils.get8(src, offset + 0x08 + i);
+			extArr[i] = (char)LittleEndian.getUInt8(src, offset + 0x08 + i);
 		}
 		setExt(new String(extArr).trim());
 
-		this.flags = DosUtils.get8(src, offset + 0x0b);
+		this.flags = LittleEndian.getUInt8(src, offset + 0x0b);
 		this.lastModified =
-			DosUtils.decodeDateTime(DosUtils.get16(src, offset + 0x18), DosUtils.get16(src, offset + 0x16));
-		this.startCluster = DosUtils.get16(src, offset + 0x1a);
-		this.length = DosUtils.get32(src, offset + 0x1c);
+			DosUtils.decodeDateTime(LittleEndian.getUInt16(src, offset + 0x18), LittleEndian.getUInt16(src, offset + 0x16));
+		this.startCluster = LittleEndian.getUInt16(src, offset + 0x1a);
+		this.length = LittleEndian.getUInt32(src, offset + 0x1c);
 		this._dirty = false;
 	}
 
@@ -441,11 +442,11 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry {
 			dest[offset + 0x08 + i] = (byte)ch;
 		}
 
-		DosUtils.set8(dest, offset + 0x0b, flags);
-		DosUtils.set16(dest, offset + 0x16, DosUtils.encodeTime(lastModified));
-		DosUtils.set16(dest, offset + 0x18, DosUtils.encodeDate(lastModified));
-		DosUtils.set16(dest, offset + 0x1a, startCluster);
-		DosUtils.set32(dest, offset + 0x1c, length);
+        LittleEndian.setInt8(dest, offset + 0x0b, flags);
+        LittleEndian.setInt16(dest, offset + 0x16, DosUtils.encodeTime(lastModified));
+        LittleEndian.setInt16(dest, offset + 0x18, DosUtils.encodeDate(lastModified));
+        LittleEndian.setInt16(dest, offset + 0x1a, startCluster);
+        LittleEndian.setInt32(dest, offset + 0x1c, (int)length);
 		this._dirty = false;
 	}
 
