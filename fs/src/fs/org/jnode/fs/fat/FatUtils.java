@@ -22,7 +22,7 @@
 package org.jnode.fs.fat;
 
 import org.apache.log4j.Logger;
-import org.jnode.fs.util.DosUtils;
+import org.jnode.util.LittleEndian;
 
 /**
  * <description>
@@ -183,31 +183,31 @@ public class FatUtils {
         }
         
 		if (isLast) {
-			DosUtils.set8(dest, destOffset, ordinal + (1 << 6)); // set the 6th
+			LittleEndian.setInt8(dest, destOffset, ordinal + (1 << 6)); // set the 6th
 			// security ending
 			// bit
 		} else {
-			DosUtils.set8(dest, destOffset, ordinal);
+			LittleEndian.setInt8(dest, destOffset, ordinal);
 		}
 
-		DosUtils.set16(dest, destOffset + 1, src[srcOffset+0]);
-		DosUtils.set16(dest, destOffset + 3, src[srcOffset+1]);
-		DosUtils.set16(dest, destOffset + 5, src[srcOffset+2]);
-		DosUtils.set16(dest, destOffset + 7, src[srcOffset+3]);
-		DosUtils.set16(dest, destOffset + 9, src[srcOffset+4]);
-		DosUtils.set8(dest, destOffset + 11, 0x0f); // this is the hidden attribute tag for
+		LittleEndian.setInt16(dest, destOffset + 1, src[srcOffset+0]);
+		LittleEndian.setInt16(dest, destOffset + 3, src[srcOffset+1]);
+		LittleEndian.setInt16(dest, destOffset + 5, src[srcOffset+2]);
+		LittleEndian.setInt16(dest, destOffset + 7, src[srcOffset+3]);
+		LittleEndian.setInt16(dest, destOffset + 9, src[srcOffset+4]);
+		LittleEndian.setInt8(dest, destOffset + 11, 0x0f); // this is the hidden attribute tag for
 		// lfn
-		DosUtils.set8(dest, destOffset + 12, 0); // reserved
-		DosUtils.set8(dest, destOffset + 13, checkSum); // checksum
-		DosUtils.set16(dest, destOffset + 14, src[srcOffset+5]);
-		DosUtils.set16(dest, destOffset + 16, src[srcOffset+6]);
-		DosUtils.set16(dest, destOffset + 18, src[srcOffset+7]);
-		DosUtils.set16(dest, destOffset + 20, src[srcOffset+8]);
-		DosUtils.set16(dest, destOffset + 22, src[srcOffset+9]);
-		DosUtils.set16(dest, destOffset + 24, src[srcOffset+10]);
-		DosUtils.set16(dest, destOffset + 26, 0); // sector... unused
-		DosUtils.set16(dest, destOffset + 28, src[srcOffset+11]);
-		DosUtils.set16(dest, destOffset + 30, src[srcOffset+12]);
+		LittleEndian.setInt8(dest, destOffset + 12, 0); // reserved
+		LittleEndian.setInt8(dest, destOffset + 13, checkSum); // checksum
+		LittleEndian.setInt16(dest, destOffset + 14, src[srcOffset+5]);
+		LittleEndian.setInt16(dest, destOffset + 16, src[srcOffset+6]);
+		LittleEndian.setInt16(dest, destOffset + 18, src[srcOffset+7]);
+		LittleEndian.setInt16(dest, destOffset + 20, src[srcOffset+8]);
+		LittleEndian.setInt16(dest, destOffset + 22, src[srcOffset+9]);
+		LittleEndian.setInt16(dest, destOffset + 24, src[srcOffset+10]);
+		LittleEndian.setInt16(dest, destOffset + 26, 0); // sector... unused
+		LittleEndian.setInt16(dest, destOffset + 28, src[srcOffset+11]);
+		LittleEndian.setInt16(dest, destOffset + 30, src[srcOffset+12]);
 		
         if(log.isDebugEnabled())
         {        
@@ -216,11 +216,11 @@ public class FatUtils {
 	}
 
 	static public byte getOrdinal(byte[] rawData, int offset) {
-		return (byte)DosUtils.get8(rawData, offset);
+		return (byte)LittleEndian.getUInt8(rawData, offset);
 	}
 
 	static public byte getCheckSum(byte[] rawData, int offset) {
-		return (byte)DosUtils.get8(rawData, offset + 13);
+		return (byte)LittleEndian.getUInt8(rawData, offset + 13);
 	}
 
 	/**
@@ -287,19 +287,19 @@ public class FatUtils {
 	static char[] getUnicodeChars(byte[] rawData, int offset)
 	{
 		char[] unicodechar = new char[SUBNAME_SIZE];
-		unicodechar[0] = (char)DosUtils.get16(rawData, offset + 1);
-		unicodechar[1] = (char)DosUtils.get16(rawData, offset + 3);
-		unicodechar[2] = (char)DosUtils.get16(rawData, offset + 5);
-		unicodechar[3] = (char)DosUtils.get16(rawData, offset + 7);
-		unicodechar[4] = (char)DosUtils.get16(rawData, offset + 9);
-		unicodechar[5] = (char)DosUtils.get16(rawData, offset + 14);
-		unicodechar[6] = (char)DosUtils.get16(rawData, offset + 16);
-		unicodechar[7] = (char)DosUtils.get16(rawData, offset + 18);
-		unicodechar[8] = (char)DosUtils.get16(rawData, offset + 20);
-		unicodechar[9] = (char)DosUtils.get16(rawData, offset + 22);
-		unicodechar[10] = (char)DosUtils.get16(rawData, offset + 24);
-		unicodechar[11] = (char)DosUtils.get16(rawData, offset + 28);
-		unicodechar[12] = (char)DosUtils.get16(rawData, offset + 30);
+		unicodechar[0] = (char)LittleEndian.getUInt16(rawData, offset + 1);
+		unicodechar[1] = (char)LittleEndian.getUInt16(rawData, offset + 3);
+		unicodechar[2] = (char)LittleEndian.getUInt16(rawData, offset + 5);
+		unicodechar[3] = (char)LittleEndian.getUInt16(rawData, offset + 7);
+		unicodechar[4] = (char)LittleEndian.getUInt16(rawData, offset + 9);
+		unicodechar[5] = (char)LittleEndian.getUInt16(rawData, offset + 14);
+		unicodechar[6] = (char)LittleEndian.getUInt16(rawData, offset + 16);
+		unicodechar[7] = (char)LittleEndian.getUInt16(rawData, offset + 18);
+		unicodechar[8] = (char)LittleEndian.getUInt16(rawData, offset + 20);
+		unicodechar[9] = (char)LittleEndian.getUInt16(rawData, offset + 22);
+		unicodechar[10] = (char)LittleEndian.getUInt16(rawData, offset + 24);
+		unicodechar[11] = (char)LittleEndian.getUInt16(rawData, offset + 28);
+		unicodechar[12] = (char)LittleEndian.getUInt16(rawData, offset + 30);
 		return unicodechar;
 	}
 	

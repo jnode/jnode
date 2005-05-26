@@ -25,8 +25,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.jnode.driver.block.BlockDeviceAPI;
-import org.jnode.fs.util.*;
 import org.jnode.partitions.ibm.IBMPartitionTableEntry;
+import org.jnode.util.LittleEndian;
 import org.jnode.util.NumberUtils;
 
 /**
@@ -294,7 +294,7 @@ public class BootSector {
 	 * @return int
 	 */
 	protected int get8(int offset) {
-		return DosUtils.get8(data, offset);
+		return LittleEndian.getUInt8(data, offset);
 	}
 
 	/**
@@ -303,7 +303,7 @@ public class BootSector {
 	 * @param offset
 	 */
 	protected void set8(int offset, int value) {
-		DosUtils.set8(data, offset, value);
+		LittleEndian.setInt8(data, offset, value);
 		dirty = true;
 	}
 
@@ -314,7 +314,7 @@ public class BootSector {
 	 * @return int
 	 */
 	protected int get16(int offset) {
-		return DosUtils.get16(data, offset);
+		return LittleEndian.getUInt16(data, offset);
 	}
 
 	/**
@@ -323,7 +323,7 @@ public class BootSector {
 	 * @param offset
 	 */
 	protected void set16(int offset, int value) {
-		DosUtils.set16(data, offset, value);
+        LittleEndian.setInt16(data, offset, value);
 		dirty = true;
 	}
 
@@ -334,7 +334,7 @@ public class BootSector {
 	 * @return int
 	 */
 	protected long get32(int offset) {
-		return DosUtils.get32(data, offset);
+		return LittleEndian.getUInt32(data, offset);
 	}
 
 	/**
@@ -343,7 +343,7 @@ public class BootSector {
 	 * @param offset
 	 */
 	protected void set32(int offset, long value) {
-		DosUtils.set32(data, offset, value);
+        LittleEndian.setInt32(data, offset, (int)value);
 		dirty = true;
 	}
 
