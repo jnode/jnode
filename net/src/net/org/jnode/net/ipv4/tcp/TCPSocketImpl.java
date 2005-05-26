@@ -61,7 +61,7 @@ public class TCPSocketImpl extends SocketImpl {
 
     /**
      * Initialize a new instance
-     * 
+     *
      * @param protocol
      */
     public TCPSocketImpl(TCPProtocol protocol) {
@@ -70,9 +70,8 @@ public class TCPSocketImpl extends SocketImpl {
 
     /**
      * Accepts a connection on this socket.
-     * 
-     * @param s
-     *            The implementation object for the accepted connection.
+     *
+     * @param s The implementation object for the accepted connection.
      * @see java.net.SocketImpl#accept(java.net.SocketImpl)
      */
     protected void accept(SocketImpl s) throws IOException {
@@ -180,8 +179,16 @@ public class TCPSocketImpl extends SocketImpl {
      * @see java.net.SocketOptions#getOption(int)
      */
     public Object getOption(int option_id) throws SocketException {
-        // TODO Auto-generated method stub
-        return null;
+        switch (option_id) {
+            case SocketOptions.SO_BINDADDR:
+                return controlBlock.getLocalAddress().toInetAddress();
+            case SocketOptions.SO_RCVBUF:
+                return controlBlock.getReceiveBufferSize();
+            case SocketOptions.SO_SNDBUF:
+                return controlBlock.getSendBufferSize();
+            default:
+                throw new SocketException("Option " + option_id + " is not recognised or not implemented");
+        }
     }
 
     /**
@@ -202,11 +209,9 @@ public class TCPSocketImpl extends SocketImpl {
      * how many pending connections will queue up waiting to be serviced before
      * being accept'ed. If the queue of pending requests exceeds this number,
      * additional connections will be refused.
-     * 
-     * @param backlog
-     *            The length of the pending connection queue
-     * @throws IOException
-     *             If an error occurs
+     *
+     * @param backlog The length of the pending connection queue
+     * @throws IOException If an error occurs
      * @see java.net.SocketImpl#listen(int)
      */
     protected void listen(int backlog) throws IOException {
