@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
-<plugin id="org.jnode.fs.fat" 
-        name="JNode FAT FileSystem"
+<plugin id="org.jnode.partitions.ibm" 
+        name="JNode IBM partition table classes"
         version="@VERSION@"
         license-name="lgpl"
         provider-name="JNode.org">
         
   <requires>
-    <import plugin="org.jnode.fs"/>
-    <import plugin="org.jnode.partitions.ibm"/>
+    <import plugin="org.jnode.partitions"/>
   </requires>
         
   <runtime>
     <library name="jnode-fs.jar">
-      <export name="org.jnode.fs.fat.*"/>
+      <export name="org.jnode.partitions.ibm.*"/>
     </library>
   </runtime>
         
-  <extension point="org.jnode.fs.types">
-    <type class="org.jnode.fs.fat.FatFileSystemType"/>
+  <extension point="org.jnode.partitions.types">
+    <type class="org.jnode.partitions.ibm.IBMPartitionTableType"/>
   </extension>
         
 </plugin>

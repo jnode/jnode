@@ -26,9 +26,9 @@ import org.jnode.driver.block.FSBlockDeviceAPI;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
-import org.jnode.fs.partitions.PartitionTableEntry;
-import org.jnode.fs.partitions.ibm.IBMPartitionTableEntry;
-import org.jnode.fs.partitions.ibm.IBMPartitionTypes;
+import org.jnode.partitions.PartitionTableEntry;
+import org.jnode.partitions.ibm.IBMPartitionTableEntry;
+import org.jnode.partitions.ibm.IBMPartitionTypes;
 
 /**
  * @author Chira

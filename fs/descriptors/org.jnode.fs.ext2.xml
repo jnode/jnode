@@ -9,7 +9,7 @@
         
   <requires>
     <import plugin="org.jnode.fs"/>
-    <import plugin="org.jnode.fs.partitions.ibm"/>
+    <import plugin="org.jnode.partitions.ibm"/>
   </requires>
         
   <runtime>

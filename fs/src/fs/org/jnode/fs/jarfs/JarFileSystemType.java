@@ -27,7 +27,7 @@ import org.jnode.driver.block.JarFileDevice;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
-import org.jnode.fs.partitions.PartitionTableEntry;
+import org.jnode.partitions.PartitionTableEntry;
 
 /**
  * 

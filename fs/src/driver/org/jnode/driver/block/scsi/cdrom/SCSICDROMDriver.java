@@ -36,7 +36,7 @@ import org.jnode.driver.bus.scsi.SCSIException;
 import org.jnode.driver.bus.scsi.cdb.mmc.CDBStartStopUnit;
 import org.jnode.driver.bus.scsi.cdb.mmc.CapacityData;
 import org.jnode.driver.bus.scsi.cdb.mmc.MMCUtils;
-import org.jnode.fs.partitions.PartitionTableEntry;
+import org.jnode.partitions.PartitionTableEntry;
 import org.jnode.util.ByteBufferUtils;
 import org.jnode.util.TimeoutException;
 

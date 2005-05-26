@@ -38,8 +38,8 @@ import org.jnode.fs.FileSystemException;
 import org.jnode.fs.fat.Fat;
 import org.jnode.fs.fat.GrubBootSector;
 import org.jnode.fs.fat.GrubFatFormatter;
-import org.jnode.fs.partitions.ibm.IBMPartitionTableEntry;
-import org.jnode.fs.partitions.ibm.IBMPartitionTypes;
+import org.jnode.partitions.ibm.IBMPartitionTableEntry;
+import org.jnode.partitions.ibm.IBMPartitionTypes;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

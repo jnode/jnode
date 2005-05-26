@@ -23,7 +23,7 @@ package org.jnode.driver.block;
 
 import java.io.IOException;
 
-import org.jnode.fs.partitions.PartitionTableEntry;
+import org.jnode.partitions.PartitionTableEntry;
 
 /**
  * Alignment support class implementing the FSBlockDeviceAPI.

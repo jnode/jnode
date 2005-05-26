@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.partitions" 
+        name="JNode Partition Service"
+        version="@VERSION@"
+        provider-name="JNode.org"
+        license-name="lgpl">
+        
+  <requires>
+    <import plugin="org.jnode.driver.block"/>
+    <import plugin="org.jnode.log4j"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-fs.jar">
+      <export name="org.jnode.partitions.*"/>
+    </library>
+  </runtime>
+        
+  <extension-point id="types" name="PartitionTypes"/>
+        
+</plugin>

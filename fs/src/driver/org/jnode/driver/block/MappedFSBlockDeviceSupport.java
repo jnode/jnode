@@ -25,7 +25,7 @@ import java.io.IOException;
 
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
-import org.jnode.fs.partitions.PartitionTableEntry;
+import org.jnode.partitions.PartitionTableEntry;
 
 
 /**
