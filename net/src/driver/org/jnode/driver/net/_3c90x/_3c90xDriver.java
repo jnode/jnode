@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.driver.net._3c90x;
 
 import java.security.PrivilegedExceptionAction;
@@ -41,13 +41,21 @@ import org.jnode.util.AccessControllerUtils;
  */
 public class _3c90xDriver extends AbstractEthernetDriver {
 
-    /** My logger */
+    private static final long TRANSMIT_TIMEOUT = 5000;
+
+    /**
+     * My logger
+     */
     private static final Logger log = Logger.getLogger(_3c90xDriver.class);
 
-    /** The actual device driver */
+    /**
+     * The actual device driver
+     */
     private _3c90xCore dd;
 
-    /** The device flags */
+    /**
+     * The device flags
+     */
     private final _3c90xFlags flags;
 
     /**
@@ -59,7 +67,7 @@ public class _3c90xDriver extends AbstractEthernetDriver {
 
     /**
      * Create a new instance
-     * 
+     *
      * @param flags
      */
     public _3c90xDriver(_3c90xFlags flags) {
@@ -75,7 +83,7 @@ public class _3c90xDriver extends AbstractEthernetDriver {
 
     /**
      * @see org.jnode.driver.net.spi.AbstractNetDriver#doTransmit(SocketBuffer,
-     *      HardwareAddress)
+            *      HardwareAddress)
      */
     protected void doTransmitEthernet(SocketBuffer skbuf, HardwareAddress destination)
             throws NetworkException {
@@ -85,7 +93,7 @@ public class _3c90xDriver extends AbstractEthernetDriver {
                 skbuf.append(ETH_ZLEN - skbuf.getSize());
             }
 
-            dd.transmit(skbuf, destination, 5000);
+            dd.transmit(skbuf, destination, TRANSMIT_TIMEOUT);
         } catch (InterruptedException ex) {
             throw new NetworkException("Interrupted", ex);
         } catch (TimeoutException ex) {
