@@ -54,7 +54,13 @@ public class USBStorageSCSIHostDriver extends Driver implements SCSIHostControll
 //           Set configuration 0
             final USBConfiguration conf = usbDev.getConfiguration(0);
             usbDev.setConfiguration(conf);
+			// Set transport protocol
+			if(conf.getInterface(0).getDescriptor().getInterfaceProtocol() == US_PR_BULK){
+				usbDevData.setTransport(new USBStorageBulkTransport(usbDev, usbDevData));
+			} 
+			
             USBEndPoint ep;
+			
             for (int i = 0; i < conf.getInterface(0).getDescriptor().getNumEndPoints(); i++) {
                 ep = conf.getInterface(0).getEndPoint(i);
                 // Is it a bulk endpoint ?
