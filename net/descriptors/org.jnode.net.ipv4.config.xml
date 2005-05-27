@@ -2,24 +2,25 @@
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
 <plugin id="org.jnode.net.ipv4.config"
-  name="JNode IPv4 Configuration Service"
-  version="@VERSION@"
-  provider-name="JNode.org"
-        license-name="lgpl"
-  class="org.jnode.net.ipv4.config.impl.IPv4ConfigurationPlugin">
+    name="JNode IPv4 Configuration Service"
+    version="@VERSION@"
+    provider-name="JNode.org"
+    license-name="lgpl"
+    class="org.jnode.net.ipv4.config.impl.IPv4ConfigurationPlugin">
 
-  <requires>
-    <import plugin="org.jnode.net.ipv4"/>
-  </requires>
+    <requires>
+        <import plugin="org.jnode.net.ipv4"/>
+    </requires>
 
-  <runtime>
-    <library name="jnode-net.jar">
-      <export name="org.jnode.net.ipv4.config.impl.*"/>
-    </library>
-  </runtime>
+    <runtime>
+        <library name="jnode-net.jar">
+            <export name="org.jnode.net.ipv4.config.impl.*"/>
+        </library>
+    </runtime>
 
-  <extension point="org.jnode.security.permissions">
-    <permission class="org.jnode.net.NetPermission" name="bootpClient"/>
-  </extension>
+    <extension point="org.jnode.security.permissions">
+        <permission class="org.jnode.net.NetPermission" name="bootpClient"/>
+        <permission class="org.jnode.net.NetPermission" name="dhcpClient"/>
+    </extension>
 
 </plugin>
