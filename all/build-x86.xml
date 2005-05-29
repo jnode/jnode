@@ -45,6 +45,7 @@
 		<pathelement location="${grub.dir}" />
 		<pathelement location="${descriptors.dir}" />
 		<pathelement location="${dom4j.jar}" />
+		<pathelement location="${mmtk.jar}" />
 	</path>
 
 	<target name="test-properties">
