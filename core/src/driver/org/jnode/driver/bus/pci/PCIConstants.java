@@ -204,7 +204,6 @@ public interface PCIConstants {
 
     /* Header type 0 (normal devices) */
 
-    public static final int PCI_CAPABILITY_LIST = 0x34; /* Offset of first capability list entry */
 
     /* = 0x35-= 0x3b are reserved */
 
@@ -212,16 +211,6 @@ public interface PCIConstants {
 
     /* Capability lists */
 
-    public static final int PCI_CAP_LIST_ID = 0; /* Capability ID */
-    public static final int PCI_CAP_ID_PM = 0x01; /* Power Management */
-    public static final int PCI_CAP_ID_AGP = 0x02; /* Accelerated Graphics Port */
-    public static final int PCI_CAP_ID_VPD = 0x03; /* Vital Product Data */
-    public static final int PCI_CAP_ID_SLOTID = 0x04; /* Slot Identification */
-    public static final int PCI_CAP_ID_MSI = 0x05; /* Message Signalled Interrupts */
-    public static final int PCI_CAP_ID_CHSWP = 0x06; /* CompactPCI HotSwap */
-    public static final int PCI_CAP_LIST_NEXT = 1; /* Next capability in the list */
-    public static final int PCI_CAP_FLAGS = 2; /* Capability defined flags (16 bits) */
-    public static final int PCI_CAP_SIZEOF = 4;
 
     /* Power Management Registers */
 

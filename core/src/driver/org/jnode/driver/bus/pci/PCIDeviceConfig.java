@@ -21,6 +21,11 @@
  
 package org.jnode.driver.bus.pci;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.jnode.util.NumberUtils;
 
 /**
@@ -40,6 +45,7 @@ public abstract class PCIDeviceConfig implements PCIConstants {
     private static final int PCI_LATENCY_TIMER = 0x0d; /* 8 bits */
     private static final int PCI_HEADER_TYPE = 0x0e; /* 8 bits */
     private static final int PCI_BIST = 0x0f; /* 8 bits */
+    private static final int PCI_CAPABILITY_LIST = 0x34; /* Offset of first capability list entry */
 
     /** My device */
 	protected final PCIDevice device;
@@ -57,6 +63,8 @@ public abstract class PCIDeviceConfig implements PCIConstants {
 	private final int revision;
 	/** The header type */
 	private final int headerTypeRaw;
+    /** The list of capabilities */
+    private Map<Integer, Capability> capabilities;
 	
 	/**
 	 * Create a new instance
@@ -254,7 +262,29 @@ public abstract class PCIDeviceConfig implements PCIConstants {
 	public int getCacheLineSize() {
 	    return device.readConfigByte(PCI_CACHE_LINE_SIZE);
 	}
+    
+    /**
+     * Gets a capability with a given id.
+     * @return Null if not found, otherwise the capability with the given id.
+     */
+    public final Capability getCapability(int id) {
+        if (capabilities == null) {
+            capabilities = Collections.unmodifiableMap(readCapabilities());
+        }
+        return capabilities.get(id);
+    }
 	
+    /**
+     * Gets all capabilities.
+     * @return
+     */
+    public final Collection<Capability> getCapabilities() {
+        if (capabilities == null) {
+            capabilities = Collections.unmodifiableMap(readCapabilities());
+        }
+        return capabilities.values();
+    }
+    
     /**
      * Is this a header type 0 configuration.
      * @return
@@ -311,12 +341,40 @@ public abstract class PCIDeviceConfig implements PCIConstants {
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		String str = "device=0x" + NumberUtils.hex(getDeviceID(), 4) + ", " +
-		    "vendor=0x" + NumberUtils.hex(getVendorID(), 4) + ", " +
-		    "class=" + NumberUtils.hex(getBaseClass(), 2) + ":" + NumberUtils.hex(getSubClass(), 2) + ":" + NumberUtils.hex(getMinorClass(), 2) + ", " +
-		    "revision=" + getRevision() + ", " + 
-		    "headertype=" + getHeaderType();
-		return str;
+        final StringBuilder sb = new StringBuilder();
+		sb.append("device=0x");
+        sb.append(NumberUtils.hex(getDeviceID(), 4));
+        
+        sb.append(", vendor=0x");
+        sb.append(NumberUtils.hex(getVendorID(), 4));
+        sb.append(", ");
+        
+        sb.append(", class=");
+        sb.append(NumberUtils.hex(getBaseClass(), 2));
+        sb.append(':');
+        sb.append(NumberUtils.hex(getSubClass(), 2));
+        sb.append(':');
+        sb.append(NumberUtils.hex(getMinorClass(), 2));
+        
+        sb.append(", revision=");
+        sb.append(getRevision());
+        
+        sb.append(", headertype=");
+        sb.append(getHeaderType());
+        
+        final Collection<Capability> caps = getCapabilities();
+        if (!caps.isEmpty()) {
+            sb.append(", capabilities [");
+            boolean first = true;
+            for (Capability c : caps) {
+                if (first) { first = false; }
+                else { sb.append(", "); }
+                sb.append(c);
+            }
+            sb.append(']');
+        }
+        
+		return sb.toString();
 	}
 	
 	/** 
@@ -327,4 +385,25 @@ public abstract class PCIDeviceConfig implements PCIConstants {
 	public int getDWord(int offset) {
 		return device.readConfigDword(offset);
 	}
+    
+    /**
+     * Read the capability list.
+     * @return
+     */
+    private Map<Integer, Capability> readCapabilities() {
+        if ((getStatus() & PCI_STATUS_CAP_LIST) == 0) {
+            return Collections.emptyMap();
+        }
+        int ptr = device.readConfigByte(PCI_CAPABILITY_LIST) & ~0x03;
+        if (ptr == 0) {
+            return Collections.emptyMap();            
+        }
+        final TreeMap<Integer, Capability> map = new TreeMap<Integer, Capability>();
+        while (ptr != 0) {
+            final Capability c = Capability.createCapability(device, ptr);
+            map.put(c.getId(), c);
+            ptr = device.readConfigByte(ptr + 1) & ~0x03;
+        }
+        return map;
+    }
 }
