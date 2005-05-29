@@ -138,8 +138,8 @@ public class Vm extends VmSystemObject implements Statistics, SharedStatics {
                 .getAttribute("class");
         Class[] consArgTypes = { VmClassLoader.class, HeapHelper.class };
         try {
-            Constructor cons = Class.forName(memMgrClassName).getConstructor(
-                    consArgTypes);
+            Class cls = Class.forName(memMgrClassName);
+            Constructor cons = cls.getConstructor(consArgTypes);
             return (VmHeapManager) cons.newInstance(new Object[] { loader,
                     helper });
         } catch (ClassNotFoundException ex) {

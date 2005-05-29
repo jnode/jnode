@@ -21,11 +21,11 @@
  
 package org.mmtk.vm;
 
-import org.mmtk.utility.deque.*;
-import org.mmtk.utility.scan.*;
 import org.mmtk.utility.Constants;
-
-import org.vmmagic.unboxed.*;
+import org.mmtk.utility.deque.AddressDeque;
+import org.mmtk.utility.deque.AddressPairDeque;
+import org.mmtk.utility.scan.Enumerator;
+import org.vmmagic.unboxed.ObjectReference;
 
 /**
  * $Id$
@@ -67,7 +67,7 @@ public class Scanning implements Constants {
      * @param enum
      *            the Enumerate object through which the callback is made
      */
-    public static void enumeratePointers(ObjectReference object, Enumerate e) {
+    public static void enumeratePointers(ObjectReference object, Enumerator e) {
     }
 
     /**

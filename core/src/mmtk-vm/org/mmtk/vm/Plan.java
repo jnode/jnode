@@ -24,6 +24,7 @@ package org.mmtk.vm;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.mmtk.plan.NoGC;
+import org.vmmagic.pragma.Uninterruptible;
 
 /**
  * $Id$
@@ -34,7 +35,7 @@ import org.mmtk.plan.NoGC;
  * @version $Revision$
  * @date $Date$
  */
-public class Plan extends NoGC {
+public class Plan extends NoGC implements Uninterruptible {
 
     /**
      * <code>true</code> if built with GCSpy

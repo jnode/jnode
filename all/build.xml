@@ -40,6 +40,7 @@
     <property name="dnsjava.jar" value="${root.dir}/net/lib/dnsjava-1.5.0.jar"/>
     <property name="jsch.jar" value="${root.dir}/net/lib/jsch-0.1.15.jar"/>
     <property name="junit.jar" value="${root.dir}/core/lib/junit.jar"/>
+    <property name="mmtk.jar" value="${root.dir}/core/lib/mmtk/mmtk.jar"/>
 
     <!-- libraries needed to run tests -->
     <property name="jmock-cglib.jar" value="${root.dir}/core/lib/jmock-cglib-1.0.1.jar"/>
@@ -154,6 +155,7 @@
             <libalias name="jnode-textui.jar" alias="${jnode-textui.jar}"/>
             <libalias name="jnode-net.jar" alias="${jnode-net.jar}"/>
             <libalias name="jnode-shell.jar" alias="${jnode-shell.jar}"/>
+            <libalias name="mmtk.jar" alias="${mmtk.jar}"/>
             <libalias name="mx4j.jar" alias="${mx4j.jar}"/>
             <libalias name="mx4j-remote.jar" alias="${mx4j-remote.jar}"/>
 
@@ -340,7 +342,6 @@ clean          Remove all intermediate build results.
         <jnode.javadoc destdir="${build.dir}/javadoc/mmtk">
             <sourcepath>
                 <pathelement location="${root.dir}/core/src/vmmagic"/>
-                <pathelement location="${root.dir}/core/src/mmtk"/>
                 <pathelement location="${root.dir}/core/src/mmtk-vm"/>
             </sourcepath>
             <package name="org.mmtk.*"/>

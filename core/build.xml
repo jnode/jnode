@@ -10,6 +10,7 @@
   <!-- Subproject specific classpath -->
   <path id="my-cp">
     <path refid="cp"/>
+  	<pathelement location="${mmtk.jar}"/>
   </path>
 
   <macrodef name="ExpandTest">
@@ -65,7 +66,6 @@
       <src path="${my-src.dir}/classpath/vm"/>
       <src path="${my-src.dir}/core"/>
       <src path="${my-src.dir}/vmmagic"/>
-      <src path="${my-src.dir}/mmtk"/>
       <src path="${my-src.dir}/mmtk-vm"/>
       <src path="${my-src.dir}/driver"/>
       <src path="${my-src.dir}/test"/>

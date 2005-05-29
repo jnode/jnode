@@ -15,11 +15,34 @@
   <runtime>
     <library name="jnode-core.jar">
       <export name="org.jnode.vm.memmgr.mmtk.*"/>
-      <export name="org.mmtk.plan.BasePlan"/>
-      <export name="org.mmtk.plan.NoGC"/>
-      <export name="org.mmtk.plan.StopTheWorldGC"/>
-      <export name="org.mmtk.policy.*"/>
-      <export name="org.mmtk.utility.*"/>
+      <export name="org.mmtk.vm.*"/>
+      <export name="org.mmtk.vm.gcspy.*"/>
+    </library>
+    <library name="mmtk.jar">
+      <export name="org.mmtk.plan.BasePlan*"/>
+      <export name="org.mmtk.plan.NoGC*"/>
+      <export name="org.mmtk.plan.StopTheWorldGC*"/>
+      <export name="org.mmtk.policy.Immortal*"/>
+      <export name="org.mmtk.policy.LargeObject*"/>
+      <export name="org.mmtk.policy.RawPageSpace*"/>
+      <export name="org.mmtk.policy.Space*"/>
+      <export name="org.mmtk.utility.Barrier"/>
+      <export name="org.mmtk.utility.BaseGenericFreeList"/>
+      <export name="org.mmtk.utility.CallSite"/>
+      <export name="org.mmtk.utility.Constants"/>
+      <export name="org.mmtk.utility.Conversions"/>
+      <export name="org.mmtk.utility.CycleDetector"/>
+      <export name="org.mmtk.utility.DoublyLinkedList"/>
+      <export name="org.mmtk.utility.Finalizer"/>
+      <export name="org.mmtk.utility.GenericFreeList"/>
+      <export name="org.mmtk.utility.Log"/>
+      <export name="org.mmtk.utility.Memory"/>
+      <export name="org.mmtk.utility.ReferenceProcessor"/>
+      <export name="org.mmtk.utility.SmallGenericFreeList"/>
+      <export name="org.mmtk.utility.Synchronize"/>
+      <export name="org.mmtk.utility.TraceGenerator"/>
+      <export name="org.mmtk.utility.TracingConstants"/>
+      <export name="org.mmtk.utility.Treadmill"/>
       <export name="org.mmtk.utility.alloc.*"/>
       <export name="org.mmtk.utility.deque.*"/>
       <export name="org.mmtk.utility.gcspy.*"/>
@@ -27,10 +50,12 @@
       <export name="org.mmtk.utility.gcspy.drivers.TreadmillDriver*"/>
       <export name="org.mmtk.utility.heap.*"/>
       <export name="org.mmtk.utility.options.*"/>
-      <export name="org.mmtk.utility.scan.*"/>
+      <export name="org.mmtk.utility.scan.Enumerate"/>
+      <export name="org.mmtk.utility.scan.Enumerator"/>
+      <export name="org.mmtk.utility.scan.MMType"/>
+      <export name="org.mmtk.utility.scan.PreCopyEnumerator"/>
+      <export name="org.mmtk.utility.scan.Scan"/>
       <export name="org.mmtk.utility.statistics.*"/>
-      <export name="org.mmtk.vm.*"/>
-      <export name="org.mmtk.vm.gcspy.*"/>
     </library>
   </runtime>
         

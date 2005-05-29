@@ -9,7 +9,6 @@
 	<classpathentry kind="src" path="src/classpath/vm"/>
 	<classpathentry kind="src" path="src/core"/>
 	<classpathentry kind="src" path="src/vmmagic"/>
-	<classpathentry kind="src" path="src/mmtk"/>
 	<classpathentry kind="src" path="src/mmtk-vm"/>
 	<classpathentry kind="src" path="src/driver"/>
 	<classpathentry kind="src" path="src/test"/>
@@ -19,5 +18,6 @@
 	<classpathentry kind="lib" path="lib/log4j-1.2.8.jar"/>
 	<classpathentry kind="lib" path="lib/junit.jar"/>
 	<classpathentry kind="lib" path="lib/mx4j.jar"/>
+	<classpathentry sourcepath="D:/epr/cvswork/MMTk/src" kind="lib" path="lib/mmtk/mmtk.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
