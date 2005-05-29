@@ -21,15 +21,31 @@
 
 package org.mmtk.vm;
 
-import org.mmtk.plan.NoGC;
+import org.jnode.vm.Unsafe;
+import org.jnode.vm.memmgr.HeapHelper;
+import org.vmmagic.pragma.InlinePragma;
 import org.vmmagic.pragma.Uninterruptible;
 
 /**
- * Stub implementation of Plan.
- * 
- * The build process will replace this class with 
- * the actual implementation.
+ * Auto generated Plan class.
  */
-public final class Plan extends NoGC implements Uninterruptible {
+public final class Plan extends @PKG@.Plan implements Uninterruptible {
 
+    /**
+     * Initialize this instance.
+     * @param helper
+     */
+    public Plan(HeapHelper helper) {
+        super(helper);
+    }
+    
+    /**
+     * Gets the plan instance associated with the current processor.
+     * 
+     * @return the plan instance for the current processor
+     */
+    public static Plan getInstance() 
+    throws InlinePragma {
+        return (Plan)Unsafe.getCurrentProcessor().getHeapData();
+    }
 }

@@ -152,12 +152,12 @@ public final class VmX86Architecture32 extends VmX86Architecture {
     /**
      * @see org.jnode.vm.VmArchitecture#getLogPageSize()
      */
-    public final byte getLogPageSize(VirtualMemoryRegion region) {
+    public final byte getLogPageSize(int region) {
         switch (region) {
-        case AVAILABLE: return LOG_AVAILABLE_PAGE_SIZE;
-        case HEAP: return LOG_HEAP_PAGE_SIZE;
-        case ACPI: return LOG_ACPI_PAGE_SIZE;
-        case DEVICE: return LOG_DEVICE_PAGE_SIZE;
+        case VirtualMemoryRegion.AVAILABLE: return LOG_AVAILABLE_PAGE_SIZE;
+        case VirtualMemoryRegion.HEAP: return LOG_HEAP_PAGE_SIZE;
+        case VirtualMemoryRegion.ACPI: return LOG_ACPI_PAGE_SIZE;
+        case VirtualMemoryRegion.DEVICE: return LOG_DEVICE_PAGE_SIZE;
         default: return LOG_DEFAULT_PAGE_SIZE;
         }
     }
@@ -165,12 +165,12 @@ public final class VmX86Architecture32 extends VmX86Architecture {
     /**
      * @see org.jnode.vm.VmArchitecture#getEnd(org.jnode.vm.VmArchitecture.VirtualMemoryRegion)
      */
-    public Address getEnd(VirtualMemoryRegion space) {
+    public Address getEnd(int space) {
         switch (space) {
-        case HEAP: return Address.fromIntZeroExtend(AVAILABLE_END);
-        case AVAILABLE: return Address.fromIntZeroExtend(AVAILABLE_END);
-        case DEVICE: return Address.fromIntZeroExtend(DEVICE_END);
-        case ACPI: return Address.fromIntZeroExtend(ACPI_END);        
+        case VirtualMemoryRegion.HEAP: return Address.fromIntZeroExtend(AVAILABLE_END);
+        case VirtualMemoryRegion.AVAILABLE: return Address.fromIntZeroExtend(AVAILABLE_END);
+        case VirtualMemoryRegion.DEVICE: return Address.fromIntZeroExtend(DEVICE_END);
+        case VirtualMemoryRegion.ACPI: return Address.fromIntZeroExtend(ACPI_END);        
         default: return super.getEnd(space);
         }
     }
@@ -178,12 +178,12 @@ public final class VmX86Architecture32 extends VmX86Architecture {
     /**
      * @see org.jnode.vm.VmArchitecture#getStart(org.jnode.vm.VmArchitecture.VirtualMemoryRegion)
      */
-    public Address getStart(VirtualMemoryRegion space) {
+    public Address getStart(int space) {
         switch (space) {
-        case HEAP: return Address.fromIntZeroExtend(BOOT_IMAGE_START);
-        case AVAILABLE: return Address.fromIntZeroExtend(AVAILABLE_START);
-        case DEVICE: return Address.fromIntZeroExtend(DEVICE_START);
-        case ACPI: return Address.fromIntZeroExtend(ACPI_START);        
+        case VirtualMemoryRegion.HEAP: return Address.fromIntZeroExtend(BOOT_IMAGE_START);
+        case VirtualMemoryRegion.AVAILABLE: return Address.fromIntZeroExtend(AVAILABLE_START);
+        case VirtualMemoryRegion.DEVICE: return Address.fromIntZeroExtend(DEVICE_START);
+        case VirtualMemoryRegion.ACPI: return Address.fromIntZeroExtend(ACPI_START);        
         default: return super.getStart(space);
         }
     }
@@ -203,15 +203,15 @@ public final class VmX86Architecture32 extends VmX86Architecture {
      *            Address.max(), free pages are used instead.
      * @return true for success, false otherwise.
      */
-    public final boolean mmap(VirtualMemoryRegion region, Address start,
+    public final boolean mmap(int region, Address start,
             Extent size, Address physAddr) throws UninterruptiblePragma {
         switch (region) {
-        case HEAP:
+        case VirtualMemoryRegion.HEAP:
             if (!physAddr.isMax()) {
                 return false;
             }
             break;
-        case ACPI:
+        case VirtualMemoryRegion.ACPI:
             if (physAddr.isMax()) {
                 return false;
             }
@@ -263,11 +263,11 @@ public final class VmX86Architecture32 extends VmX86Architecture {
      *            aligned up on pagesize.
      * @return true for success, false otherwise.
      */
-    public boolean munmap(VirtualMemoryRegion region, Address start, Extent size)
+    public boolean munmap(int region, Address start, Extent size)
     throws UninterruptiblePragma {
         switch (region) {
-        case HEAP:
-        case ACPI:
+        case VirtualMemoryRegion.HEAP:
+        case VirtualMemoryRegion.ACPI:
             break;
         default:
             return false;

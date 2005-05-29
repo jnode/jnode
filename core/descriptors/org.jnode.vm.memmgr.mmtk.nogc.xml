@@ -15,8 +15,25 @@
   <runtime>
     <library name="jnode-core.jar">
       <export name="org.jnode.vm.memmgr.mmtk.*"/>
-      <export name="org.mmtk.vm.*"/>
+      <export name="org.jnode.vm.memmgr.mmtk.nogc.*"/>
+      <export name="org.mmtk.vm.Assert"/>
+      <export name="org.mmtk.vm.Barriers"/>
+      <export name="org.mmtk.vm.Collection"/>
+      <export name="org.mmtk.vm.Lock"/>
+      <export name="org.mmtk.vm.Memory"/>
+      <export name="org.mmtk.vm.ObjectModel"/>
+      <export name="org.mmtk.vm.Options"/>
+      <export name="org.mmtk.vm.ReferenceGlue"/>
+      <export name="org.mmtk.vm.Scanning"/>
+      <export name="org.mmtk.vm.Statistics"/>
+      <export name="org.mmtk.vm.Strings"/>
+      <export name="org.mmtk.vm.SynchronizedCounter"/>
+      <export name="org.mmtk.vm.TraceInterface"/>
+      <export name="org.mmtk.vm.VMConstants"/>
       <export name="org.mmtk.vm.gcspy.*"/>
+    </library>
+    <library name="jnode-mmtk-nogc.jar">
+      <export name="org.mmtk.vm.*"/>
     </library>
     <library name="mmtk.jar">
       <export name="org.mmtk.plan.BasePlan*"/>
@@ -60,7 +77,7 @@
   </runtime>
         
   <extension point="org.jnode.vm.core.memmgr">
-    <mapper class="org.jnode.vm.memmgr.mmtk.MmtkHeapManager"/>
+    <mapper class="org.jnode.vm.memmgr.mmtk.nogc.HeapManager"/>
   </extension>
 
 </plugin>

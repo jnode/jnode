@@ -34,6 +34,7 @@
 	<!-- end of Properties for building the boot files for windows NT/2K/XP -->
 
 	<path id="cp-x86">
+		<pathelement location="${jnode-mmtk-nogc.jar}" />
 		<pathelement location="${jnode-builder.jar}" />
 		<pathelement location="${jnode-core.jar}" />
 		<pathelement location="${jnode-fs.jar}" />

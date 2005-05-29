@@ -21,10 +21,12 @@
 
 package org.mmtk.vm;
 
-import org.jnode.vm.VirtualMemoryRegion;
 import org.jnode.vm.Unsafe;
+import org.jnode.vm.VirtualMemoryRegion;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmArchitecture;
+import org.jnode.vm.memmgr.mmtk.nogc.Plan;
+import org.mmtk.plan.BasePlan;
 import org.mmtk.policy.ImmortalSpace;
 import org.vmmagic.pragma.InlinePragma;
 import org.vmmagic.unboxed.Address;
@@ -100,7 +102,7 @@ public class Memory {
             final VmArchitecture arch = Vm.getArch();
             final long bootSize = AVAILABLE_START().sub(HEAP_START().toWord()).toLong();
             final int bootSizeMb = (int)(bootSize >>> 20);
-            bootSpace = new ImmortalSpace("boot", Plan.DEFAULT_POLL_FREQUENCY, 
+            bootSpace = new ImmortalSpace("boot", BasePlan.DEFAULT_POLL_FREQUENCY, 
                     bootSizeMb, false);
         }
         return bootSpace;
