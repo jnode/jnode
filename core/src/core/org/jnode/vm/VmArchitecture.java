@@ -21,8 +21,6 @@
  
 package org.jnode.vm;
 
-import static org.jnode.vm.VirtualMemoryRegion.HEAP;
-
 import java.nio.ByteOrder;
 
 import org.jnode.security.JNodePermission;
@@ -80,14 +78,14 @@ public abstract class VmArchitecture extends VmSystemObject {
      * Gets the log base two of the size of an OS page
      * @return
      */
-    public abstract byte getLogPageSize(VirtualMemoryRegion region)
+    public abstract byte getLogPageSize(int region)
     throws UninterruptiblePragma;
     
     /**
      * Gets the log base two of the size of an OS page
      * @return
      */
-    public final Extent getPageSize(VirtualMemoryRegion region) 
+    public final Extent getPageSize(int region) 
     throws UninterruptiblePragma {
         return Extent.fromIntZeroExtend(1 << getLogPageSize(region));
     }
@@ -163,10 +161,10 @@ public abstract class VmArchitecture extends VmSystemObject {
      * Gets the start address of the given space.
      * @return
      */
-    public Address getStart(VirtualMemoryRegion space) {
+    public Address getStart(int space) {
         switch (space) {
-        case BOOTIMAGE: return Unsafe.getKernelStart();
-        case INITJAR: return Unsafe.getInitJarStart();
+        case VirtualMemoryRegion.BOOTIMAGE: return Unsafe.getKernelStart();
+        case VirtualMemoryRegion.INITJAR: return Unsafe.getInitJarStart();
         default: throw new IllegalArgumentException("Unknown space " + space);
         }
     }
@@ -175,10 +173,10 @@ public abstract class VmArchitecture extends VmSystemObject {
      * Gets the start address of the given space.
      * @return
      */
-    public Address getEnd(VirtualMemoryRegion space) {
+    public Address getEnd(int space) {
         switch (space) {
-        case BOOTIMAGE: return Unsafe.getBootHeapEnd();
-        case INITJAR: return Unsafe.getInitJarEnd();
+        case VirtualMemoryRegion.BOOTIMAGE: return Unsafe.getBootHeapEnd();
+        case VirtualMemoryRegion.INITJAR: return Unsafe.getInitJarEnd();
         default: throw new IllegalArgumentException("Unknown space " + space);
         }
     }
@@ -189,7 +187,7 @@ public abstract class VmArchitecture extends VmSystemObject {
      * @return
      */
     protected final Word getFirstAvailableHeapPage() { 
-        return pageAlign(HEAP, Unsafe.getMemoryStart().toWord(), true);
+        return pageAlign(VirtualMemoryRegion.HEAP, Unsafe.getMemoryStart().toWord(), true);
     }
     
     /**
@@ -198,7 +196,7 @@ public abstract class VmArchitecture extends VmSystemObject {
      * @param up If true, the value will be rounded up, otherwise rounded down.
      * @return
      */
-    public final Word pageAlign(VirtualMemoryRegion region, Word v, boolean up) {
+    public final Word pageAlign(int region, Word v, boolean up) {
         final int logPageSize = getLogPageSize(region);
         if (up) {
             v = v.add((1 << logPageSize) - 1);
@@ -212,7 +210,7 @@ public abstract class VmArchitecture extends VmSystemObject {
      * @param up If true, the value will be rounded up, otherwise rounded down.
      * @return
      */
-    public final Address pageAlign(VirtualMemoryRegion region, Address v, boolean up) {
+    public final Address pageAlign(int region, Address v, boolean up) {
         return pageAlign(region, v.toWord(), up).toAddress();
     }
     
@@ -231,7 +229,7 @@ public abstract class VmArchitecture extends VmSystemObject {
      *            Address.max(), free pages are used instead.
      * @return true for success, false otherwise.
      */
-    public abstract boolean mmap(VirtualMemoryRegion region, Address start, Extent size, Address physAddr)
+    public abstract boolean mmap(int region, Address start, Extent size, Address physAddr)
     throws UninterruptiblePragma;
     
     /**
@@ -248,7 +246,7 @@ public abstract class VmArchitecture extends VmSystemObject {
      *            aligned up on pagesize.
      * @return true for success, false otherwise.
      */
-    public abstract boolean munmap(VirtualMemoryRegion region, Address start, Extent size)
+    public abstract boolean munmap(int region, Address start, Extent size)
     throws UninterruptiblePragma;
     
     /**

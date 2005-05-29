@@ -122,19 +122,19 @@ public final class VmX86Architecture64 extends VmX86Architecture {
     /**
      * @see org.jnode.vm.VmArchitecture#getLogPageSize()
      */
-    public final byte getLogPageSize(VirtualMemoryRegion region) {
+    public final byte getLogPageSize(int region) {
         return 22; // 4Mb
     }
     
     /**
      * @see org.jnode.vm.VmArchitecture#getEnd(org.jnode.vm.VmArchitecture.VirtualMemoryRegion)
      */
-    public Address getEnd(VirtualMemoryRegion space) {
+    public Address getEnd(int space) {
         switch (space) {
-        case HEAP: return Address.fromLong(AVAILABLE_END);
-        case AVAILABLE: return Address.fromLong(AVAILABLE_END);
-        case DEVICE: return Address.fromIntZeroExtend(DEVICE_END);
-        case ACPI: return Address.fromIntZeroExtend(ACPI_END);        
+        case VirtualMemoryRegion.HEAP: return Address.fromLong(AVAILABLE_END);
+        case VirtualMemoryRegion.AVAILABLE: return Address.fromLong(AVAILABLE_END);
+        case VirtualMemoryRegion.DEVICE: return Address.fromIntZeroExtend(DEVICE_END);
+        case VirtualMemoryRegion.ACPI: return Address.fromIntZeroExtend(ACPI_END);        
         default: return super.getEnd(space);
         }
     }
@@ -142,12 +142,12 @@ public final class VmX86Architecture64 extends VmX86Architecture {
     /**
      * @see org.jnode.vm.VmArchitecture#getStart(org.jnode.vm.VmArchitecture.VirtualMemoryRegion)
      */
-    public Address getStart(VirtualMemoryRegion space) {
+    public Address getStart(int space) {
         switch (space) {
-        case HEAP: return Address.fromIntZeroExtend(BOOT_IMAGE_START);
-        case AVAILABLE: return Address.fromLong(AVAILABLE_START);
-        case DEVICE: return Address.fromIntZeroExtend(DEVICE_START);
-        case ACPI: return Address.fromIntZeroExtend(ACPI_START);        
+        case VirtualMemoryRegion.HEAP: return Address.fromIntZeroExtend(BOOT_IMAGE_START);
+        case VirtualMemoryRegion.AVAILABLE: return Address.fromLong(AVAILABLE_START);
+        case VirtualMemoryRegion.DEVICE: return Address.fromIntZeroExtend(DEVICE_START);
+        case VirtualMemoryRegion.ACPI: return Address.fromIntZeroExtend(ACPI_START);        
         default: return super.getStart(space);
         }
     }
@@ -167,7 +167,7 @@ public final class VmX86Architecture64 extends VmX86Architecture {
      *            Address.max(), free pages are used instead.
      * @return true for success, false otherwise.
      */
-    public final boolean mmap(VirtualMemoryRegion space, Address start, Extent size, Address physAddr)
+    public final boolean mmap(int space, Address start, Extent size, Address physAddr)
     throws UninterruptiblePragma {
         if (space != VirtualMemoryRegion.HEAP) {
             return false;
@@ -190,7 +190,7 @@ public final class VmX86Architecture64 extends VmX86Architecture {
      *            aligned up on pagesize.
      * @return true for success, false otherwise.
      */
-    public boolean munmap(VirtualMemoryRegion region, Address start, Extent size)
+    public boolean munmap(int region, Address start, Extent size)
     throws UninterruptiblePragma {
         return false;
     }

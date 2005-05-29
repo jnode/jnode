@@ -1,10 +1,12 @@
-<project name="JNode-Builder" default="all" basedir=".">
+<project name="JNode-Core" default="all" basedir=".">
 
   <typedef file="${basedir}/../all/lib/jnode.xml"/>
 		
   <property name="my-build.dir" value="${basedir}/build"/>
   <property name="my-gen.dir" value="${my-build.dir}/gen"/>
+  <property name="my-gen-plan.dir" value="${my-build.dir}/gen-plan"/>
   <property name="my-classes.dir" value="${my-build.dir}/classes"/>
+  <property name="my-classes-plan.dir" value="${my-build.dir}/classes-plan"/>
   <property name="my-src.dir" value="${basedir}/src"/>
 
   <!-- Subproject specific classpath -->
@@ -24,6 +26,32 @@
           <filter token="type" value="@{type}"/>
         </filterset>
       </copy>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="CreatePlan">
+    <attribute name="package"/>
+    <sequential>
+      <copy tofile="${my-gen-plan.dir}/@{package}/org/mmtk/vm/Plan.java" 
+      	    file="${my-src.dir}/mmtk-vm/org/mmtk/vm/Plan.template">
+        <filterset>
+          <filter token="PKG" value="@{package}"/>
+        </filterset>
+      </copy>
+      <copy tofile="${my-gen-plan.dir}/@{package}/org/mmtk/vm/PlanConstants.java" 
+      	    file="${my-src.dir}/mmtk-vm/org/mmtk/vm/PlanConstants.template">
+        <filterset>
+          <filter token="PKG" value="@{package}"/>
+        </filterset>
+      </copy>
+      <mkdir dir="${my-classes-plan.dir}/@{package}/"/>
+      <jnode.compile destdir="${my-classes-plan.dir}/@{package}/">
+        <src path="${my-gen-plan.dir}/@{package}/"/>
+      	<classpath>
+     		<pathelement location="${jnode-code.jar}"/>
+     		<pathelement location="${mmtk.jar}"/>
+      	</classpath>
+      </jnode.compile>
     </sequential>
   </macrodef>
 
@@ -77,8 +105,11 @@
       <fileset dir="${my-src.dir}/core" excludes="**/*.java,**/package.html"/>
       <fileset dir="${my-src.dir}/driver" excludes="**/*.java,**/package.html"/>
     </copy>
+  	
+  	<!-- Create & compile plan classes -->
+	<CreatePlan package="org.jnode.vm.memmgr.mmtk.nogc"/>
   </target>
-
+	
   <!-- Assemble the jarfile -->
   <target name="assemble" depends="compile">
   </target>
