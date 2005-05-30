@@ -25,7 +25,6 @@ import org.jnode.vm.Unsafe;
 import org.jnode.vm.VirtualMemoryRegion;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmArchitecture;
-import org.jnode.vm.memmgr.mmtk.nogc.Plan;
 import org.mmtk.plan.BasePlan;
 import org.mmtk.policy.ImmortalSpace;
 import org.vmmagic.pragma.InlinePragma;

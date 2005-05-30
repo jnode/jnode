@@ -30,7 +30,9 @@
     <property name="jnode-net.jar" value="${root.dir}/net/build/classes"/>
     <property name="jnode-shell.jar" value="${root.dir}/shell/build/classes"/>
     <property name="jnode-fonts.jar" value="${build.dir}/descriptors/jnode-fonts.jar"/>
-    <property name="jnode-mmtk-nogc.jar" value="${root.dir}/core/build/classes-plan/org.jnode.vm.memmgr.mmtk.nogc"/>
+
+	<property name="jnode-mmtk-genrc.jar" value="${root.dir}/core/build/classes-plan/org.jnode.vm.memmgr.mmtk.genrc"/>
+	<property name="jnode-mmtk-nogc.jar" value="${root.dir}/core/build/classes-plan/org.jnode.vm.memmgr.mmtk.nogc"/>
 
     <property name="mx4j.jar" value="${root.dir}/core/lib/mx4j.jar"/>
     <property name="mx4j-remote.jar" value="${root.dir}/core/lib/mx4j-remote.jar"/>
@@ -126,7 +128,10 @@
         <property name="jnode.memmgr.plugin.id" value="org.jnode.vm.memmgr.def"/>
         <property name="compilerarg" value="-nowarn"/>
 
-        <!-- Initialize timestamp -->
+        <!-- Derive properties -->
+    	<property name="jnode-mmtk.jar" value="${root.dir}/core/build/classes-plan/${jnode.memmgr.plugin.id}"/>
+
+    	<!-- Initialize timestamp -->
         <tstamp/>
 
         <!-- Create basic build directories -->
@@ -155,7 +160,9 @@
             <libalias name="jnode-textui.jar" alias="${jnode-textui.jar}"/>
             <libalias name="jnode-net.jar" alias="${jnode-net.jar}"/>
             <libalias name="jnode-shell.jar" alias="${jnode-shell.jar}"/>
-            <libalias name="jnode-mmtk-nogc.jar" alias="${jnode-mmtk-nogc.jar}"/>
+
+        	<libalias name="jnode-mmtk-genrc.jar" alias="${jnode-mmtk-genrc.jar}"/>
+        	<libalias name="jnode-mmtk-nogc.jar" alias="${jnode-mmtk-nogc.jar}"/>
 
         	<libalias name="mmtk.jar" alias="${mmtk.jar}"/>
             <libalias name="mx4j.jar" alias="${mx4j.jar}"/>

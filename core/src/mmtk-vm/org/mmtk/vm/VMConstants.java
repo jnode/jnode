@@ -46,7 +46,7 @@ import org.jnode.vm.Vm;
  * @version $Revision$
  * @date $Date$
  */
-public class VMConstants {
+public final class VMConstants {
     
     /** 
      * @return The log base two of the size of an address 

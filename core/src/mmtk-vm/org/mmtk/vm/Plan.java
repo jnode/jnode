@@ -21,7 +21,9 @@
 
 package org.mmtk.vm;
 
+import org.jnode.vm.memmgr.HeapHelper;
 import org.mmtk.plan.NoGC;
+import org.vmmagic.pragma.InlinePragma;
 import org.vmmagic.pragma.Uninterruptible;
 
 /**
@@ -31,5 +33,21 @@ import org.vmmagic.pragma.Uninterruptible;
  * the actual implementation.
  */
 public final class Plan extends NoGC implements Uninterruptible {
+    
+    /**
+     * Gets the plan instance associated with the current processor.
+     * 
+     * @return the plan instance for the current processor
+     */
+    public static Plan getInstance() 
+    throws InlinePragma {
+        return null;
+    }
 
+    /**
+     * @return Returns the heapHelper.
+     */
+    public final HeapHelper getHeapHelper() {
+        return null;
+    }    
 }
