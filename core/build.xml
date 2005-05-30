@@ -107,6 +107,7 @@
     </copy>
   	
   	<!-- Create & compile plan classes -->
+	<CreatePlan package="org.jnode.vm.memmgr.mmtk.genrc"/>
 	<CreatePlan package="org.jnode.vm.memmgr.mmtk.nogc"/>
   </target>
 	

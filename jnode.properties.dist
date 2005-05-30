@@ -28,8 +28,14 @@
 # -----------------------------------------------
 # Settings for the memory manager
 
-# Uncomment to enable future MMTk based memory manager (does not work yet)
-# jnode.memmgr.plugin.id=org.mmtk
+# Default memory manager (selected when no other memory manager is selected)
+# jnode.memmgr.plugin.id=org.jnode.vm.memmgr.def
+
+# Uncomment to enable MMTk NoGC based memory manager (still very beta)
+# jnode.memmgr.plugin.id=org.jnode.vm.memmgr.mmtk.nogc
+
+# Uncomment to enable MMTk GenRC based memory manager (still very alpha)
+# jnode.memmgr.plugin.id=org.jnode.vm.memmgr.mmtk.genrc
 
 # -----------------------------------------------
 # Settings for the document-plugins task
