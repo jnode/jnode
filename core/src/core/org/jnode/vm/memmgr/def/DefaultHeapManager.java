@@ -456,8 +456,8 @@ public final class DefaultHeapManager extends VmHeapManager {
     }
 
     public HeapStatistics getHeapStatistics() {
-        HeapStatistics heapStatistics = new DefHeapStatistics();
-        HeapStatisticsVisitor heapStatisticsVisitor = new HeapStatisticsVisitor(
+        final DefHeapStatistics heapStatistics = new DefHeapStatistics();
+        final HeapStatisticsVisitor heapStatisticsVisitor = new HeapStatisticsVisitor(
                 heapStatistics);
 
         VmAbstractHeap heap = firstNormalHeap;

@@ -22,47 +22,39 @@
 package org.jnode.vm.memmgr.def;
 
 import org.jnode.vm.ObjectVisitor;
-import org.jnode.vm.classmgr.ObjectFlags;
-import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.classmgr.VmNormalClass;
-import org.jnode.vm.memmgr.HeapStatistics;
+import org.jnode.vm.classmgr.VmType;
 import org.vmmagic.pragma.Uninterruptible;
 
 /**
  * @author Martin Husted Hartvig (hagar@jnode.org)
  */
-final class HeapStatisticsVisitor extends ObjectVisitor implements ObjectFlags,
-    Uninterruptible
-{
+final class HeapStatisticsVisitor extends ObjectVisitor implements
+        Uninterruptible {
 
-  private HeapStatistics heapStatistics;
+    private final DefHeapStatistics heapStatistics;
 
-  public HeapStatisticsVisitor(HeapStatistics heapStatistics)
-  {
-    this.heapStatistics = heapStatistics;
-  }
-
-
-  /**
-   * Count the visited object.
-   *
-   * @param object
-   * @return boolean
-   */
-
-  public final boolean visit(Object object)
-  {
-    int size = 0;
-    if (!heapStatistics.contains(object.getClass().getName()))
-    {
-      VmType type = object.getClass().getVmClass();
-
-      size = (type instanceof VmNormalClass?((VmNormalClass)type).getObjectSize():0);
-      type = null;
+    public HeapStatisticsVisitor(DefHeapStatistics heapStatistics) {
+        this.heapStatistics = heapStatistics;
     }
 
-    heapStatistics.add(object.getClass().getName(), size);
+    /**
+     * Count the visited object.
+     * 
+     * @param object
+     * @return boolean
+     */
 
-    return true;
-  }
+    public final boolean visit(Object object) {
+        int size = 0;
+        if (!heapStatistics.contains(object.getClass().getName())) {
+            final VmType< ? > type = object.getClass().getVmClass();
+            size = (type instanceof VmNormalClass ? ((VmNormalClass< ? >) type)
+                    .getObjectSize() : 0);
+        }
+
+        heapStatistics.add(object.getClass().getName(), size);
+
+        return true;
+    }
 }
