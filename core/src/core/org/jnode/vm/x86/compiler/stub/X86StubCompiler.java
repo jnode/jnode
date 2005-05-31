@@ -32,6 +32,7 @@ import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.compiler.CompiledMethod;
 import org.jnode.vm.compiler.CompilerBytecodeVisitor;
 import org.jnode.vm.compiler.EntryPoints;
+import org.jnode.vm.compiler.GCMapIterator;
 import org.jnode.vm.x86.X86CpuID;
 import org.jnode.vm.x86.compiler.AbstractX86Compiler;
 import org.jnode.vm.x86.compiler.X86CompilerHelper;
@@ -40,7 +41,7 @@ import org.jnode.vm.x86.compiler.X86CompilerHelper;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class X86StubCompiler extends AbstractX86Compiler {
+public final class X86StubCompiler extends AbstractX86Compiler {
 
 	/**
 	 * Compile the given method into the given stream.
@@ -131,5 +132,13 @@ public class X86StubCompiler extends AbstractX86Compiler {
      */
     public String getName() {
         return "X86-Stub";
+    }
+
+    /**
+     * @see org.jnode.vm.compiler.NativeCodeCompiler#createGCMapIterator()
+     */
+    @Override
+    public GCMapIterator createGCMapIterator() {
+        return new EmptyGCMapIterator();
     }
 }

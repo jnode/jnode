@@ -29,6 +29,7 @@ import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.compiler.CompiledMethod;
 import org.jnode.vm.compiler.CompilerBytecodeVisitor;
+import org.jnode.vm.compiler.GCMapIterator;
 import org.jnode.vm.compiler.InlineBytecodeVisitor;
 import org.jnode.vm.compiler.InliningBytecodeVisitor;
 import org.jnode.vm.x86.X86CpuID;
@@ -74,7 +75,7 @@ import org.jnode.vm.x86.compiler.AbstractX86Compiler;
  *  
  * </pre>
  */
-public class X86Level1ACompiler extends AbstractX86Compiler {
+public final class X86Level1ACompiler extends AbstractX86Compiler {
 
     /** Should this compiler try to inline methods? */
     private final boolean inlineMethods = true;
@@ -135,5 +136,13 @@ public class X86Level1ACompiler extends AbstractX86Compiler {
      */
     public String getName() {
         return "X86-L1A";
+    }
+
+    /**
+     * @see org.jnode.vm.compiler.NativeCodeCompiler#createGCMapIterator()
+     */
+    @Override
+    public GCMapIterator createGCMapIterator() {
+        return new X86GCMapIterator();
     }
 }
