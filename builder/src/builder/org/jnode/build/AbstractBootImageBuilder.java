@@ -1332,6 +1332,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         addCompileHighOptLevel("org.jnode.vm.memmgr.mmtk");
         addCompileHighOptLevel("org.jnode.vm.memmgr.mmtk.genrc");
         addCompileHighOptLevel("org.jnode.vm.memmgr.mmtk.nogc");
+        addCompileHighOptLevel("org.jnode.vm.memmgr.mmtk.ms");
         
         addCompileHighOptLevel("org.mmtk.plan");
         addCompileHighOptLevel("org.mmtk.policy");

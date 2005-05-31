@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.vm.memmgr.mmtk.ms" 
+        name="MMTk MarkSweep based heap manager"
+        version="@VERSION@"
+        system="true"
+        license-name="cpl"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.vm.core"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-core.jar">
+      <export name="org.jnode.vm.memmgr.mmtk.*"/>
+      <export name="org.jnode.vm.memmgr.mmtk.ms.*"/>
+      <export name="org.mmtk.vm.Assert"/>
+      <export name="org.mmtk.vm.Barriers"/>
+      <export name="org.mmtk.vm.Collection"/>
+      <export name="org.mmtk.vm.Lock"/>
+      <export name="org.mmtk.vm.Memory"/>
+      <export name="org.mmtk.vm.ObjectModel"/>
+      <export name="org.mmtk.vm.Options"/>
+      <export name="org.mmtk.vm.ReferenceGlue"/>
+      <export name="org.mmtk.vm.Scanning"/>
+      <export name="org.mmtk.vm.Statistics"/>
+      <export name="org.mmtk.vm.Strings"/>
+      <export name="org.mmtk.vm.SynchronizedCounter"/>
+      <export name="org.mmtk.vm.TraceInterface"/>
+      <export name="org.mmtk.vm.VMConstants"/>
+      <export name="org.mmtk.vm.gcspy.*"/>
+    </library>
+    <library name="jnode-mmtk-ms.jar">
+      <export name="org.mmtk.vm.*"/>
+    </library>
+    <library name="mmtk.jar">
+      <export name="org.mmtk.plan.BasePlan*"/>
+      <export name="org.mmtk.plan.MarkSweep*"/>
+      <export name="org.mmtk.plan.StopTheWorldGC*"/>
+      <export name="org.mmtk.policy.Immortal*"/>
+      <export name="org.mmtk.policy.LargeObject*"/>
+      <export name="org.mmtk.policy.RawPageSpace*"/>
+      <export name="org.mmtk.policy.MarkSweep*"/>
+      <export name="org.mmtk.policy.Space*"/>
+      <export name="org.mmtk.utility.Barrier"/>
+      <export name="org.mmtk.utility.BaseGenericFreeList"/>
+      <export name="org.mmtk.utility.CallSite"/>
+      <export name="org.mmtk.utility.Constants"/>
+      <export name="org.mmtk.utility.Conversions"/>
+      <export name="org.mmtk.utility.CycleDetector"/>
+      <export name="org.mmtk.utility.DoublyLinkedList"/>
+      <export name="org.mmtk.utility.Finalizer"/>
+      <export name="org.mmtk.utility.GenericFreeList"/>
+      <export name="org.mmtk.utility.Log"/>
+      <export name="org.mmtk.utility.Memory"/>
+      <export name="org.mmtk.utility.ReferenceProcessor"/>
+      <export name="org.mmtk.utility.SmallGenericFreeList"/>
+      <export name="org.mmtk.utility.Synchronize"/>
+      <export name="org.mmtk.utility.TraceGenerator"/>
+      <export name="org.mmtk.utility.TracingConstants"/>
+      <export name="org.mmtk.utility.Treadmill"/>
+      <export name="org.mmtk.utility.alloc.*"/>
+      <export name="org.mmtk.utility.deque.*"/>
+      <export name="org.mmtk.utility.gcspy.*"/>
+      <export name="org.mmtk.utility.gcspy.drivers.AbstractDriver"/>
+      <export name="org.mmtk.utility.gcspy.drivers.TreadmillDriver*"/>
+      <export name="org.mmtk.utility.heap.*"/>
+      <export name="org.mmtk.utility.options.*"/>
+      <export name="org.mmtk.utility.scan.Enumerate"/>
+      <export name="org.mmtk.utility.scan.Enumerator"/>
+      <export name="org.mmtk.utility.scan.MMType"/>
+      <export name="org.mmtk.utility.scan.PreCopyEnumerator"/>
+      <export name="org.mmtk.utility.scan.Scan"/>
+      <export name="org.mmtk.utility.statistics.*"/>
+    </library>
+  </runtime>
+        
+  <extension point="org.jnode.vm.core.memmgr">
+    <mapper class="org.jnode.vm.memmgr.mmtk.ms.HeapManager"/>
+  </extension>
+
+</plugin>
