@@ -32,6 +32,7 @@
     <property name="jnode-fonts.jar" value="${build.dir}/descriptors/jnode-fonts.jar"/>
 
 	<property name="jnode-mmtk-genrc.jar" value="${root.dir}/core/build/classes-plan/org.jnode.vm.memmgr.mmtk.genrc"/>
+	<property name="jnode-mmtk-ms.jar" value="${root.dir}/core/build/classes-plan/org.jnode.vm.memmgr.mmtk.ms"/>
 	<property name="jnode-mmtk-nogc.jar" value="${root.dir}/core/build/classes-plan/org.jnode.vm.memmgr.mmtk.nogc"/>
 
     <property name="mx4j.jar" value="${root.dir}/core/lib/mx4j.jar"/>
@@ -162,7 +163,8 @@
             <libalias name="jnode-shell.jar" alias="${jnode-shell.jar}"/>
 
         	<libalias name="jnode-mmtk-genrc.jar" alias="${jnode-mmtk-genrc.jar}"/>
-        	<libalias name="jnode-mmtk-nogc.jar" alias="${jnode-mmtk-nogc.jar}"/>
+        	<libalias name="jnode-mmtk-ms.jar" alias="${jnode-mmtk-ms.jar}"/>
+           	<libalias name="jnode-mmtk-nogc.jar" alias="${jnode-mmtk-nogc.jar}"/>
 
         	<libalias name="mmtk.jar" alias="${mmtk.jar}"/>
             <libalias name="mx4j.jar" alias="${mx4j.jar}"/>
