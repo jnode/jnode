@@ -21,10 +21,15 @@
  
 package org.mmtk.vm;
 
+import org.jnode.vm.Vm;
 import org.mmtk.utility.Constants;
 import org.mmtk.utility.deque.AddressDeque;
 import org.mmtk.utility.deque.AddressPairDeque;
 import org.mmtk.utility.scan.Enumerator;
+import org.mmtk.utility.scan.PreCopyEnumerator;
+import org.mmtk.utility.scan.Scan;
+import org.vmmagic.pragma.InlinePragma;
+import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.ObjectReference;
 
 /**
@@ -35,7 +40,10 @@ import org.vmmagic.unboxed.ObjectReference;
  * @version $Revision$
  * @date $Date$
  */
-public class Scanning implements Constants {
+public final class Scanning implements Constants {
+
+    /** An enumerator used to forward root objects */
+    private static PreCopyEnumerator preCopyEnum;
 
     /**
      * Initialization that occurs at <i>build</i> time. The values of statics
@@ -44,7 +52,7 @@ public class Scanning implements Constants {
      * the boot image. This is called from MM_Interface.
      */
     public static final void init() {
-
+        preCopyEnum = new PreCopyEnumerator();
     }
 
     /**
@@ -55,6 +63,8 @@ public class Scanning implements Constants {
      *            The object to be scanned.
      */
     public static void scanObject(ObjectReference object) {
+        // Should never be reached
+        Vm._assert(false);
     }
 
     /**
@@ -68,6 +78,8 @@ public class Scanning implements Constants {
      *            the Enumerate object through which the callback is made
      */
     public static void enumeratePointers(ObjectReference object, Enumerator e) {
+        // Should never be reached
+        Vm._assert(false);
     }
 
     /**
@@ -101,9 +113,13 @@ public class Scanning implements Constants {
      * 
      * @param object
      *            The object to be scanned.
-     * @param enum
+     * @param e
      *            the Enumerate object through which the callback is made
      */
+    private static void enumeratePointers(Object object, Enumerator e)
+            throws UninterruptiblePragma, InlinePragma {
+        Scan.enumeratePointers(ObjectReference.fromObject(object), e);
+    }
 
     /**
      * Computes all roots. This method establishes all roots for collection and
