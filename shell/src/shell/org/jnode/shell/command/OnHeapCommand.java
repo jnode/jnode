@@ -27,35 +27,56 @@ import java.io.PrintStream;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
+import org.jnode.shell.help.IntegerArgument;
+import org.jnode.shell.help.LongArgument;
+import org.jnode.shell.help.Parameter;
+import org.jnode.shell.help.ParsedArguments;
 import org.jnode.vm.Vm;
 import org.jnode.vm.memmgr.HeapStatistics;
 
 /**
  * @author Martin Husted Hartvig (hagar@jnode.org)
  */
-public class OnHeapCommand implements Command
-{
+public class OnHeapCommand implements Command {
 
-  public static Help.Info HELP_INFO = new Help.Info("onheap", "show the number of instances on the heap with memory usage");
+    private static final IntegerArgument ARG_MININSTANCECOUNT = new IntegerArgument(
+            "mic", "the minimum instance count to show");
 
-  public static void main(String[] args)
-      throws Exception
-  {
-    new OnHeapCommand().execute(null, System.in, System.out, System.err);
-  }
+    private static final LongArgument ARG_MINTOTALSIZE = new LongArgument(
+            "mts", "the minimum total size to show");
 
-  /**
-   * Execute this command
-   */
-  public void execute(CommandLine commandLine,
-                      InputStream in,
-                      PrintStream out,
-                      PrintStream err)
-      throws Exception
-  {
-    HeapStatistics stats = Vm.getHeapManager().getHeapStatistics();
+    private static final Parameter PARAM_MININSTANCECOUNT = new Parameter(
+            ARG_MININSTANCECOUNT, Parameter.OPTIONAL);
 
-    out.println("on heap      :\n" + stats.toString());
-  }
+    private static final Parameter PARAM_MINTOTALSIZE = new Parameter(
+            ARG_MINTOTALSIZE, Parameter.OPTIONAL);
+
+    public static Help.Info HELP_INFO = new Help.Info("onheap",
+            "show the number of instances on the heap with memory usage",
+            new Parameter[] { PARAM_MININSTANCECOUNT , PARAM_MINTOTALSIZE });
+
+    public static void main(String[] args) throws Exception {
+        new OnHeapCommand().execute(null, System.in, System.out, System.err);
+    }
+
+    /**
+     * Execute this command
+     */
+    public void execute(CommandLine commandLine, InputStream in,
+            PrintStream out, PrintStream err) throws Exception {
+        final ParsedArguments args = HELP_INFO.parse(commandLine.toStringArray());
+
+        out.println("on heap:");
+        final HeapStatistics stats = Vm.getHeapManager().getHeapStatistics();
+        
+        if (PARAM_MININSTANCECOUNT.isSet(args)) {
+            stats.setMinimumInstanceCount(ARG_MININSTANCECOUNT.getInteger(args));
+        }
+        if (PARAM_MINTOTALSIZE.isSet(args)) {
+            stats.setMinimumTotalSize(ARG_MINTOTALSIZE.getLong(args));
+        }
+
+        out.println(stats.toString());
+    }
 
 }

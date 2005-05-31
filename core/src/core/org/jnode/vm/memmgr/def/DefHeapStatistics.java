@@ -23,94 +23,112 @@ package org.jnode.vm.memmgr.def;
 
 import java.util.TreeMap;
 
-import org.jnode.util.Counter;
 import org.jnode.vm.memmgr.HeapStatistics;
 
 /**
  * @author Martin Husted Hartvig (hagar@jnode.org)
  */
 
-final class DefHeapStatistics extends HeapStatistics
-{
-  private TreeMap<String, HeapCounter> countData = new TreeMap<String, HeapCounter>();
-  private static final char newline = '\n';
+final class DefHeapStatistics extends HeapStatistics {
 
+    private int minInstanceCount = 0;
+    private long minTotalSize = 0;
+    private final TreeMap<String, HeapCounter> countData = new TreeMap<String, HeapCounter>();
 
-  public boolean contains(String classname)
-  {
-    return countData.containsKey(classname);
-  }
+    private static final char newline = '\n';
 
-  public void add(String className, int size)
-  {
-    HeapCounter count = (HeapCounter) countData.get(className);
-
-    if (count == null)
-    {
-      count = new HeapCounter(className, size);
-      countData.put(className, count);
+    public boolean contains(String classname) {
+        return countData.containsKey(classname);
     }
 
-    count.inc();
+    public void add(String className, int size) {
+        HeapCounter count = (HeapCounter) countData.get(className);
 
-    count = null;
-  }
+        if (count == null) {
+            count = new HeapCounter(className, size);
+            countData.put(className, count);
+        }
 
-  public String toString()
-  {
-    final StringBuilder stringBuilder = new StringBuilder();
-    boolean first = true;
+        count.inc();
 
-    for (HeapCounter c : countData.values())
-    {
-      if (first)
-      {
-        first = false;
-      }
-      else
-      {
-        stringBuilder.append(newline);
-      }
-      stringBuilder.append(c.toStringBuilder());
+        count = null;
     }
 
-    return stringBuilder.toString();
-  }
+    /**
+     * Sets the minimum number of instances a class must have before
+     * it is listed in toString.
+     * @param count
+     */
+    public void setMinimumInstanceCount(int count) {
+        this.minInstanceCount = count;
+    }
+    
+    /**
+     * Sets the minimum bytes of occupied memory by all instances of a class 
+     * before it is listed in toString.
+     * @param bytes
+     */
+    public void setMinimumTotalSize(long bytes) {
+        this.minTotalSize = bytes;
+    }
+    
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        boolean first = true;
 
-  final class HeapCounter
-  {
-    private Counter counter;
-    private int objectSize = 0;
-    private final static String usage = " memory usage=";
+        for (HeapCounter c : countData.values()) {
+            if ((c.getInstanceCount() >= minInstanceCount) && (c.getTotalSize() >= minTotalSize)) {
+                if (first) {
+                    first = false;
+                } else {
+                    sb.append(newline);
+                }            
+                c.append(sb);
+            }
+        }
 
-    public HeapCounter(String objectName, int objectSize)
-    {
-      this.objectSize = objectSize;
-      counter = new Counter(objectName);
+        return sb.toString();
     }
 
-    public void inc()
-    {
-      counter.inc();
+    static final class HeapCounter {
+
+        private final String name;
+        private int instanceCount;
+        private int objectSize = 0;
+
+        private final static String usage = " memory usage=";
+
+        public HeapCounter(String objectName, int objectSize) {
+            this.name = objectName;
+            this.objectSize = objectSize;
+            this.instanceCount = 0;
+        }
+
+        public void inc() {
+            instanceCount++;
+        }
+        
+        public int getInstanceCount() {
+            return instanceCount;
+        }
+
+        public int getObjectSize() {
+            return objectSize;
+        }
+        
+        public long getTotalSize() {
+            return objectSize * (long)instanceCount;
+        }
+
+        public void append(StringBuilder sb) {
+            sb.append(name);
+            sb.append("  #");
+            sb.append(instanceCount);
+
+            if (objectSize != 0) {
+                sb.append(usage);
+                sb.append(getTotalSize());
+            }
+        }
     }
-
-    public int getObjectSize()
-    {
-      return objectSize;
-    }
-
-
-    public StringBuilder toStringBuilder()
-    {
-      StringBuilder stringBuilder = new StringBuilder(counter.toString());
-
-      if (objectSize != 0)
-      {
-        stringBuilder.append(usage);
-        stringBuilder.append(objectSize * counter.get());
-      }
-
-      return stringBuilder;
-    }
-  }
 }
