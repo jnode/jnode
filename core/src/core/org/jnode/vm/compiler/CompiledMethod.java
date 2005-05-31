@@ -29,7 +29,7 @@ import org.jnode.vm.classmgr.VmMethod;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class CompiledMethod {
+public final class CompiledMethod {
 	
 	private NativeStream.ObjectRef codeStart;
 	private NativeStream.ObjectRef codeEnd;
