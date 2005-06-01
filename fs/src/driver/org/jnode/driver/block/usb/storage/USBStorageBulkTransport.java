@@ -72,6 +72,7 @@ final class USBStorageBulkTransport implements ITransport, USBPipeListener,
             // Sent CBW to device
             USBPacket data = new USBPacket(bcb.getCBW());
             pipe = (USBDataPipe) devData.getBulkOutEndPoint().getPipe();
+			pipe.open();
             USBRequest req = pipe.createRequest(data);
             pipe.addListener(this);
             pipe.asyncSubmit(req);
