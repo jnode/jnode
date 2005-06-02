@@ -21,13 +21,13 @@
  
 package org.jnode.awt.swingpeers;
 
-import javax.swing.AbstractListModel;
-import javax.swing.JList;
-import javax.swing.ListModel;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.List;
 import java.awt.peer.ListPeer;
+
+import javax.swing.AbstractListModel;
+import javax.swing.JList;
+import javax.swing.ListModel;
 
 /**
  * AWT list peer implemented as a {@link javax.swing.JList}.
@@ -118,7 +118,7 @@ final class SwingListPeer extends SwingComponentPeer<List, SwingList> implements
 
 }
 
-final class SwingList extends JList implements ISwingPeer {
+final class SwingList extends JList implements ISwingPeer<List> {
     private final List awtComponent;
 
     public SwingList(List awtComponent) {
@@ -128,7 +128,7 @@ final class SwingList extends JList implements ISwingPeer {
     /**
      * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
      */
-    public Component getAWTComponent() {
+    public List getAWTComponent() {
         return awtComponent;
     }
 }

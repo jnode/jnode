@@ -21,11 +21,11 @@
  
 package org.jnode.awt.swingpeers;
 
-import javax.swing.JCheckBox;
 import java.awt.Checkbox;
 import java.awt.CheckboxGroup;
-import java.awt.Component;
 import java.awt.peer.CheckboxPeer;
+
+import javax.swing.JCheckBox;
 
 /**
  * AWT checkbox peer implemented as a {@link javax.swing.JCheckBox}.
@@ -58,7 +58,7 @@ final class SwingCheckboxPeer extends SwingComponentPeer<Checkbox, SwingCheckBox
 	}
 }
 
-final class SwingCheckBox extends JCheckBox implements ISwingPeer {
+final class SwingCheckBox extends JCheckBox implements ISwingPeer<Checkbox> {
     private final Checkbox awtComponent;
 
     public SwingCheckBox(Checkbox awtComponent) {
@@ -68,7 +68,7 @@ final class SwingCheckBox extends JCheckBox implements ISwingPeer {
     /**
      * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
      */
-    public Component getAWTComponent() {
+    public Checkbox getAWTComponent() {
         return awtComponent;
     }
 }

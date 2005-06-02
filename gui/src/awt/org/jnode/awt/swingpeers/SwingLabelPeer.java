@@ -21,10 +21,10 @@
  
 package org.jnode.awt.swingpeers;
 
-import javax.swing.JLabel;
-import java.awt.Component;
 import java.awt.Label;
 import java.awt.peer.LabelPeer;
+
+import javax.swing.JLabel;
 
 /**
  * AWT label peer implemented as a {@link javax.swing.JLabel}.
@@ -54,7 +54,7 @@ final class SwingLabelPeer extends SwingComponentPeer<Label, SwingLabel> impleme
 
 }
 
-final class SwingLabel extends JLabel implements ISwingPeer {
+final class SwingLabel extends JLabel implements ISwingPeer<Label> {
     private final Label awtComponent;
 
     public SwingLabel(Label awtComponent) {
@@ -64,7 +64,7 @@ final class SwingLabel extends JLabel implements ISwingPeer {
     /**
      * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
      */
-    public Component getAWTComponent() {
+    public Label getAWTComponent() {
         return awtComponent;
     }
 }

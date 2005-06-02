@@ -21,7 +21,6 @@
  
 package org.jnode.awt.swingpeers;
 
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Insets;
 import java.awt.peer.LightweightPeer;
@@ -32,16 +31,12 @@ import javax.swing.JComponent;
  * @author Levente S\u00e1ntha
  */
 final class SwingLightweightContainerPeer extends
-        SwingContainerPeer<Container, JLightweightContainer> implements
-        LightweightPeer, ISwingPeer {
+        SwingContainerPeer<Container, SwingLightweightContainer> implements
+        LightweightPeer {
     private Insets containerInsets;
 
     public SwingLightweightContainerPeer(SwingToolkit toolkit, Container component) {
-        super(toolkit, component, new JLightweightContainer());
-    }
-
-    public Component getAWTComponent() {
-        return (Component) component;
+        super(toolkit, component, new SwingLightweightContainer(component));
     }
 
     /**
@@ -56,6 +51,19 @@ final class SwingLightweightContainerPeer extends
 
 }
 
-final class JLightweightContainer extends JComponent {
+final class SwingLightweightContainer extends JComponent implements ISwingPeer<Container> {
+
+    private final Container awtComponent;
+    
+    public SwingLightweightContainer(Container awtComponent) {
+        this.awtComponent = awtComponent;
+    }
+    
+    /**
+     * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
+     */
+    public Container getAWTComponent() {
+        return awtComponent;
+    }
 
 }

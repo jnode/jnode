@@ -21,11 +21,11 @@
  
 package org.jnode.awt.swingpeers;
 
+import java.awt.Choice;
+import java.awt.peer.ChoicePeer;
+
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
-import java.awt.Choice;
-import java.awt.Component;
-import java.awt.peer.ChoicePeer;
 
 /**
  * AWT choice peer implemented as a {@link javax.swing.JButton}.
@@ -83,7 +83,7 @@ final class SwingChoicePeer extends SwingComponentPeer<Choice, SwingChoice> impl
 
 }
 
-final class SwingChoice extends JComboBox implements ISwingPeer {
+final class SwingChoice extends JComboBox implements ISwingPeer<Choice> {
     private final Choice awtComponent;
 
     public SwingChoice(Choice awtComponent) {
@@ -93,7 +93,7 @@ final class SwingChoice extends JComboBox implements ISwingPeer {
     /**
      * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
      */
-    public Component getAWTComponent() {
+    public Choice getAWTComponent() {
         return awtComponent;
     }
 }
