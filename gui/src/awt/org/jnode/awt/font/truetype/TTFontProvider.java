@@ -21,10 +21,13 @@
  
 package org.jnode.awt.font.truetype;
 
+import gnu.java.security.action.GetPropertyAction;
+
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.io.IOException;
 import java.net.URL;
+import java.security.AccessController;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -92,7 +95,8 @@ public class TTFontProvider implements FontProvider {
 	public TextRenderer getTextRenderer(Font font) {
 		TextRenderer r = (TextRenderer) renderers.get(font);
 		if (r == null) {
-            if (System.getProperty("jnode.font.renderer", "simple").equals("new")) {
+            final String renderer = (String)AccessController.doPrivileged(new GetPropertyAction("jnode.font.renderer", "simple"));
+            if (renderer.equals("new")) {
                 r = new TTFTextRenderer(renderCache, getFontData(font), font.getSize());
             } else {
                 r = new TTFSimpleTextRenderer(getFontData(font), font.getSize());                
