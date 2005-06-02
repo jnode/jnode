@@ -21,6 +21,7 @@
  
 package org.jnode.awt.swingpeers;
 
+import java.awt.AWTEvent;
 import java.awt.Component;
 
 /**
@@ -29,4 +30,10 @@ import java.awt.Component;
 public interface ISwingPeer<T extends Component> {
 
 	public T getAWTComponent();
+    
+    /**
+     * Process an event within this swingpeer
+     * @param event
+     */
+    public void processAWTEvent(AWTEvent event);
 }

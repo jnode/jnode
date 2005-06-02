@@ -21,12 +21,11 @@
  
 package org.jnode.awt.swingpeers;
 
+import java.awt.AWTEvent;
 import java.awt.Button;
 import java.awt.peer.ButtonPeer;
 
 import javax.swing.JButton;
-
-import org.jnode.awt.swingpeers.event.ActionListenerDelegate;
 
 /**
  * AWT button peer implemented as a {@link javax.swing.JButton}.
@@ -43,7 +42,6 @@ final class SwingButtonPeer extends SwingComponentPeer<Button, SwingButton> impl
 		SwingToolkit.add(button, jButton);
 		SwingToolkit.copyAwtProperties(button, jButton);
 		jButton.setText(button.getLabel());
-		jButton.addActionListener(new ActionListenerDelegate(button));
 	}
 
     public void setLabel(String label) {
@@ -64,4 +62,20 @@ final class SwingButton extends JButton implements ISwingPeer<Button> {
     public Button getAWTComponent() {
         return awtComponent;
     }       
+    
+    /**
+     * Pass an event onto the AWT component.
+     * @see java.awt.Component#processEvent(java.awt.AWTEvent)
+     */
+    protected final void processEvent(AWTEvent event) {
+        awtComponent.dispatchEvent(event);
+    }
+    
+    /**
+     * Process an event within this swingpeer
+     * @param event
+     */
+    public final void processAWTEvent(AWTEvent event) {
+        super.processEvent(event);
+    }
 }

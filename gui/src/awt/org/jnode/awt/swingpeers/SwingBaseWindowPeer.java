@@ -3,7 +3,6 @@
  */
 package org.jnode.awt.swingpeers;
 
-import java.awt.AWTEvent;
 import java.awt.Window;
 import java.awt.peer.WindowPeer;
 
@@ -19,12 +18,9 @@ abstract class SwingBaseWindowPeer<awtT extends Window, peerT extends JInternalF
         super(toolkit, window, jComponent);
     }
 
-    public void handleEvent(AWTEvent e) {
-    }
-
     public void dispose() {
         jComponent.dispose();
-        ((SwingToolkit)toolkit).onDisposeFrame();
+        toolkit.onDisposeFrame();
     }
 
     public void toBack() {

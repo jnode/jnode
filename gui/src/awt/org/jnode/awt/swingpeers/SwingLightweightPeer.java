@@ -22,6 +22,8 @@
 package org.jnode.awt.swingpeers;
 
 import javax.swing.JComponent;
+
+import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.peer.LightweightPeer;
 
@@ -53,5 +55,20 @@ final class SwingLightweightComponent extends JComponent implements ISwingPeer<C
     public Component getAWTComponent() {
         return awtComponent;
     }
-
+    
+    /**
+     * Pass an event onto the AWT component.
+     * @see java.awt.Component#processEvent(java.awt.AWTEvent)
+     */
+    protected final void processEvent(AWTEvent event) {
+        awtComponent.dispatchEvent(event);
+    }
+    
+    /**
+     * Process an event within this swingpeer
+     * @param event
+     */
+    public final void processAWTEvent(AWTEvent event) {
+        super.processEvent(event);
+    }
 }

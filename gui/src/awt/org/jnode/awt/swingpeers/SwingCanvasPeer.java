@@ -21,6 +21,7 @@
  
 package org.jnode.awt.swingpeers;
 
+import java.awt.AWTEvent;
 import java.awt.Canvas;
 import java.awt.peer.CanvasPeer;
 
@@ -52,5 +53,21 @@ final class SwingCanvas extends JComponent implements ISwingPeer<Canvas> {
      */
     public Canvas getAWTComponent() {
         return awtComponent;
+    }
+    
+    /**
+     * Pass an event onto the AWT component.
+     * @see java.awt.Component#processEvent(java.awt.AWTEvent)
+     */
+    protected final void processEvent(AWTEvent event) {
+        awtComponent.dispatchEvent(event);
+    }
+    
+    /**
+     * Process an event within this swingpeer
+     * @param event
+     */
+    public final void processAWTEvent(AWTEvent event) {
+        super.processEvent(event);
     }
 }

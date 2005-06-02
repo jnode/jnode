@@ -21,6 +21,7 @@
  
 package org.jnode.awt.swingpeers;
 
+import java.awt.AWTEvent;
 import java.awt.Choice;
 import java.awt.peer.ChoicePeer;
 
@@ -95,6 +96,22 @@ final class SwingChoice extends JComboBox implements ISwingPeer<Choice> {
      */
     public Choice getAWTComponent() {
         return awtComponent;
+    }
+    
+    /**
+     * Pass an event onto the AWT component.
+     * @see java.awt.Component#processEvent(java.awt.AWTEvent)
+     */
+    protected final void processEvent(AWTEvent event) {
+        awtComponent.dispatchEvent(event);
+    }
+    
+    /**
+     * Process an event within this swingpeer
+     * @param event
+     */
+    public final void processAWTEvent(AWTEvent event) {
+        super.processEvent(event);
     }
 }
 
