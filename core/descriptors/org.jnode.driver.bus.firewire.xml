@@ -20,7 +20,7 @@
     <extension point="org.jnode.driver.mappers">
         <mapper class="org.jnode.driver.bus.pci.PCIClassToDriverMapper"
             id="0c:00"
-            driver-class="org.jnode.driver.bus.firewire.FireWireController"/>
+            driver-class="org.jnode.driver.bus.firewire.FireWireDriver"/>
     </extension>
 
 </plugin>
