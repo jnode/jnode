@@ -21,15 +21,15 @@
  
 package org.jnode.awt.swingpeers;
 
+import java.awt.Dimension;
+import java.awt.TextArea;
+import java.awt.peer.TextAreaPeer;
+
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.TextArea;
-import java.awt.peer.TextAreaPeer;
 
 /**
  * AWT text area peer implemented as a {@link javax.swing.JTextArea}.
@@ -142,7 +142,7 @@ final class SwingTextAreaPeer extends
 
 }
 
-final class SwingTextArea extends JTextArea implements ISwingPeer {
+final class SwingTextArea extends JTextArea implements ISwingPeer<TextArea> {
     private final TextArea awtComponent;
 
     public SwingTextArea(TextArea awtComponent) {
@@ -152,7 +152,7 @@ final class SwingTextArea extends JTextArea implements ISwingPeer {
     /**
      * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
      */
-    public Component getAWTComponent() {
+    public TextArea getAWTComponent() {
         return awtComponent;
     }
 }

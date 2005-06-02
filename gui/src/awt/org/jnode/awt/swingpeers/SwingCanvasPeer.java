@@ -21,10 +21,10 @@
  
 package org.jnode.awt.swingpeers;
 
-import javax.swing.JComponent;
 import java.awt.Canvas;
-import java.awt.Component;
 import java.awt.peer.CanvasPeer;
+
+import javax.swing.JComponent;
 
 /**
  * AWT canvas peer implemented as a {@link javax.swing.JComponent}.
@@ -40,7 +40,7 @@ final class SwingCanvasPeer extends SwingComponentPeer<Canvas, SwingCanvas> impl
 
 }
 
-final class SwingCanvas extends JComponent implements ISwingPeer {
+final class SwingCanvas extends JComponent implements ISwingPeer<Canvas> {
     private final Canvas awtComponent;
 
     public SwingCanvas(Canvas awtComponent) {
@@ -50,7 +50,7 @@ final class SwingCanvas extends JComponent implements ISwingPeer {
     /**
      * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
      */
-    public Component getAWTComponent() {
+    public Canvas getAWTComponent() {
         return awtComponent;
     }
 }

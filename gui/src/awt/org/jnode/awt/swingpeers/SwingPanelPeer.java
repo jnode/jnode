@@ -21,11 +21,11 @@
  
 package org.jnode.awt.swingpeers;
 
-import javax.swing.JPanel;
-import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Panel;
 import java.awt.peer.PanelPeer;
+
+import javax.swing.JPanel;
 
 /**
  * AWT panel peer implemented as a {@link javax.swing.JPanel}.
@@ -48,7 +48,7 @@ final class SwingPanelPeer extends SwingContainerPeer<Panel, SwingPanel>
 
 }
 
-final class SwingPanel extends JPanel implements ISwingPeer {
+final class SwingPanel extends JPanel implements ISwingPeer<Panel> {
     private final Panel awtComponent;
 
     public SwingPanel(Panel awtComponent) {
@@ -58,7 +58,7 @@ final class SwingPanel extends JPanel implements ISwingPeer {
     /**
      * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
      */
-    public Component getAWTComponent() {
+    public Panel getAWTComponent() {
         return awtComponent;
     }
 

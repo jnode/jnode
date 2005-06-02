@@ -30,22 +30,28 @@ import java.awt.peer.LightweightPeer;
  */
 
 final class SwingLightweightPeer extends
-        SwingComponentPeer<Component, JLightweightComponent> implements
-        LightweightPeer, ISwingPeer {
+        SwingComponentPeer<Component, SwingLightweightComponent> implements
+        LightweightPeer {
     
 	public SwingLightweightPeer(SwingToolkit toolkit, Component component) {
-		super(toolkit, component, new JLightweightComponent());
-	}
-
-	/**
-	 * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
-	 */
-	public Component getAWTComponent() {
-		return (Component) component;
+		super(toolkit, component, new SwingLightweightComponent(component));
 	}
 
 }
 
-final class JLightweightComponent extends JComponent {
+final class SwingLightweightComponent extends JComponent implements ISwingPeer<Component> {
+
+    private final Component awtComponent;
     
+    public SwingLightweightComponent(Component awtComponent) {
+        this.awtComponent = awtComponent;
+    }
+    
+    /**
+     * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
+     */
+    public Component getAWTComponent() {
+        return awtComponent;
+    }
+
 }

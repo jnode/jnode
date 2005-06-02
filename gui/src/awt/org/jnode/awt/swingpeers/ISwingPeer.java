@@ -26,7 +26,7 @@ import java.awt.Component;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public interface ISwingPeer {
+public interface ISwingPeer<T extends Component> {
 
-	public Component getAWTComponent();
+	public T getAWTComponent();
 }

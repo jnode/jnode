@@ -21,12 +21,12 @@
  
 package org.jnode.awt.swingpeers;
 
-import org.jnode.awt.swingpeers.event.ActionListenerDelegate;
+import java.awt.Button;
+import java.awt.peer.ButtonPeer;
 
 import javax.swing.JButton;
-import java.awt.Button;
-import java.awt.Component;
-import java.awt.peer.ButtonPeer;
+
+import org.jnode.awt.swingpeers.event.ActionListenerDelegate;
 
 /**
  * AWT button peer implemented as a {@link javax.swing.JButton}.
@@ -52,7 +52,7 @@ final class SwingButtonPeer extends SwingComponentPeer<Button, SwingButton> impl
 }
 
 
-final class SwingButton extends JButton implements ISwingPeer {
+final class SwingButton extends JButton implements ISwingPeer<Button> {
     private final Button awtComponent;
 
     public SwingButton(Button awtComponent) {
@@ -61,7 +61,7 @@ final class SwingButton extends JButton implements ISwingPeer {
     /**
      * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
      */
-    public Component getAWTComponent() {
+    public Button getAWTComponent() {
         return awtComponent;
     }       
 }
