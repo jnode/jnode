@@ -21,10 +21,7 @@
  
 package org.jnode.awt;
 
-import gnu.java.security.action.SetPropertyAction;
-
 import java.awt.image.VMImageUtils;
-import java.security.AccessController;
 
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
@@ -33,11 +30,8 @@ import org.jnode.plugin.PluginException;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class AWTPlugin extends Plugin {
+public final class AWTPlugin extends Plugin {
 
-//    private static final String TOOLKIT = "org.jnode.awt.peer.RawJNodeToolkit";
-    private static final String TOOLKIT = "org.jnode.awt.swingpeers.SwingToolkit";
-    
 	/**
 	 * @param descriptor
 	 */
@@ -50,7 +44,6 @@ public class AWTPlugin extends Plugin {
 	 * @throws PluginException
 	 */
 	protected void startPlugin() throws PluginException {
-	    AccessController.doPrivileged(new SetPropertyAction("awt.toolkit", TOOLKIT));
 		VMImageUtils.setAPI(new VMImageAPIImpl(), this);
 	}
 

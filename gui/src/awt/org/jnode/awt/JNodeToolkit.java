@@ -136,6 +136,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 			throw new AWTError("Toolkit is not a JNodeToolkit");
 		}
 		((JNodeToolkit) tk).decRefCount(true);
+        clearDefaultToolkit();
 	}
 
     public static void refreshGui() {
