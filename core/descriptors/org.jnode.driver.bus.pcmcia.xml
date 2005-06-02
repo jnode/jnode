@@ -20,7 +20,7 @@
     <extension point="org.jnode.driver.mappers">
         <mapper class="org.jnode.driver.bus.pci.PCIClassToDriverMapper"
             id="06:07"
-            driver-class="org.jnode.driver.bus.pcmcia.CardBusController"/>
+            driver-class="org.jnode.driver.bus.pcmcia.CardBusDriver"/>
     </extension>
 
 </plugin>
