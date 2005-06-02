@@ -21,26 +21,27 @@
  
 package org.jnode.awt.swingpeers;
 
-import org.jnode.awt.JNodeToolkit;
-
-import javax.swing.JComponent;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Insets;
 import java.awt.peer.ContainerPeer;
 
+import javax.swing.JComponent;
+
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-class SwingContainerPeer extends SwingComponentPeer implements ContainerPeer, ISwingContainerPeer {
+abstract class SwingContainerPeer<awtT extends Container, peerT extends JComponent>
+        extends SwingComponentPeer<awtT, peerT> implements ContainerPeer,
+        ISwingContainerPeer {
 
 	/**
 	 * @param toolkit
 	 * @param component
 	 * @param peer
 	 */
-	public SwingContainerPeer(JNodeToolkit toolkit, Container component,
-			JComponent peer) {
+	public SwingContainerPeer(SwingToolkit toolkit, awtT component,
+			peerT peer) {
 		super(toolkit, component, peer);
 	}
 

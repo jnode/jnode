@@ -30,7 +30,7 @@ import java.awt.peer.ScrollbarPeer;
  * AWT scrollbar peer implemented as a {@link javax.swing.JScrollBar}.
  */
 
-final class SwingScrollbarPeer extends SwingComponentPeer implements
+final class SwingScrollbarPeer extends SwingComponentPeer<Scrollbar, SwingScrollbar> implements
 		ScrollbarPeer {
 
 	//
@@ -70,18 +70,19 @@ final class SwingScrollbarPeer extends SwingComponentPeer implements
 		((JScrollBar)jComponent).setValues(value, visible, min, max);
 	}
 
-	private static class SwingScrollbar extends JScrollBar implements ISwingPeer {
-		private final Scrollbar awtComponent;
+}
 
-		public SwingScrollbar(Scrollbar awtComponent) {
-			this.awtComponent = awtComponent;
-		}
+final class SwingScrollbar extends JScrollBar implements ISwingPeer {
+    private final Scrollbar awtComponent;
 
-		/**
-		 * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
-		 */
-		public Component getAWTComponent() {
-			return awtComponent;
-		}
-	}
+    public SwingScrollbar(Scrollbar awtComponent) {
+        this.awtComponent = awtComponent;
+    }
+
+    /**
+     * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
+     */
+    public Component getAWTComponent() {
+        return awtComponent;
+    }
 }

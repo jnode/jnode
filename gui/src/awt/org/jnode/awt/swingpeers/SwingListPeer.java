@@ -34,7 +34,7 @@ import java.awt.peer.ListPeer;
  * @author Levente S\u00e1ntha
  */
 
-class SwingListPeer extends SwingComponentPeer implements ListPeer {
+final class SwingListPeer extends SwingComponentPeer<List, SwingList> implements ListPeer {
 
 	//
 	// Construction
@@ -116,19 +116,20 @@ class SwingListPeer extends SwingComponentPeer implements ListPeer {
     }
     
 
-	private static class SwingList extends JList implements ISwingPeer {
-		private final List awtComponent;
-
-		public SwingList(List awtComponent) {
-			this.awtComponent = awtComponent;
-		}
-
-		/**
-		 * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
-		 */
-		public Component getAWTComponent() {
-			return awtComponent;
-		}
-	}
-
 }
+
+final class SwingList extends JList implements ISwingPeer {
+    private final List awtComponent;
+
+    public SwingList(List awtComponent) {
+        this.awtComponent = awtComponent;
+    }
+
+    /**
+     * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
+     */
+    public Component getAWTComponent() {
+        return awtComponent;
+    }
+}
+

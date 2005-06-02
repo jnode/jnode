@@ -32,7 +32,7 @@ import java.awt.peer.ChoicePeer;
  * @author Levente S\u00e1ntha
  */
 
-final class SwingChoicePeer extends SwingComponentPeer implements ChoicePeer {
+final class SwingChoicePeer extends SwingComponentPeer<Choice, SwingChoice> implements ChoicePeer {
 
 	//
 	// Construction
@@ -81,19 +81,20 @@ final class SwingChoicePeer extends SwingComponentPeer implements ChoicePeer {
 		((JComboBox) jComponent).setSelectedIndex(index);
 	}
 
-	private static class SwingChoice extends JComboBox implements ISwingPeer {
-		private final Choice awtComponent;
-
-		public SwingChoice(Choice awtComponent) {
-			this.awtComponent = awtComponent;
-		}
-
-		/**
-		 * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
-		 */
-		public Component getAWTComponent() {
-			return awtComponent;
-		}
-	}
-
 }
+
+final class SwingChoice extends JComboBox implements ISwingPeer {
+    private final Choice awtComponent;
+
+    public SwingChoice(Choice awtComponent) {
+        this.awtComponent = awtComponent;
+    }
+
+    /**
+     * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
+     */
+    public Component getAWTComponent() {
+        return awtComponent;
+    }
+}
+

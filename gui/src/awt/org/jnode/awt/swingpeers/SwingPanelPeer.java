@@ -32,7 +32,8 @@ import java.awt.peer.PanelPeer;
  * @author Levente S\u00e1ntha
  */
 
-final class SwingPanelPeer extends SwingContainerPeer implements PanelPeer, ISwingContainerPeer {
+final class SwingPanelPeer extends SwingContainerPeer<Panel, SwingPanel>
+        implements PanelPeer, ISwingContainerPeer {
 
 	//
 	// Construction
@@ -41,37 +42,31 @@ final class SwingPanelPeer extends SwingContainerPeer implements PanelPeer, ISwi
 	public SwingPanelPeer(SwingToolkit toolkit, Panel panel) {
 		super(toolkit, panel, new SwingPanel(panel));
 		final SwingPanel jPanel = (SwingPanel) jComponent;
-        jPanel.swingPeer = this;
 		SwingToolkit.add(panel, jPanel);
 		SwingToolkit.copyAwtProperties(panel, jPanel);
 	}
 
-	private static class SwingPanel extends JPanel implements ISwingPeer {
-		private final Panel awtComponent;
-        private SwingPanelPeer swingPeer;
+}
 
-		public SwingPanel(Panel awtComponent) {
-			this.awtComponent = awtComponent;
-		}
+final class SwingPanel extends JPanel implements ISwingPeer {
+    private final Panel awtComponent;
 
-		/**
-		 * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
-		 */
-		public Component getAWTComponent() {
-			return awtComponent;
-		}
+    public SwingPanel(Panel awtComponent) {
+        this.awtComponent = awtComponent;
+    }
 
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            //awtComponent.update(g);
-        }
+    /**
+     * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
+     */
+    public Component getAWTComponent() {
+        return awtComponent;
+    }
 
-		/**
-		 * @see javax.swing.JComponent#paintChildren(java.awt.Graphics)
-		 */
-		protected void paintChildren(Graphics g) {
-			super.paintChildren(g);
-			SwingToolkit.paintLightWeightChildren(awtComponent, g, 0, 0);
-		}
-	}
+    /**
+     * @see javax.swing.JComponent#paintChildren(java.awt.Graphics)
+     */
+    protected void paintChildren(Graphics g) {
+        super.paintChildren(g);
+        SwingToolkit.paintLightWeightChildren(awtComponent, g, 0, 0);
+    }
 }

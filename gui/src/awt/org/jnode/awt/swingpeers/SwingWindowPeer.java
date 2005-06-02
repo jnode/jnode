@@ -31,7 +31,8 @@ import java.awt.peer.WindowPeer;
  * @author Levente S\u00e1ntha
  */
 
-class SwingWindowPeer extends SwingContainerPeer implements WindowPeer {
+final class SwingWindowPeer extends SwingContainerPeer<Window, JInternalFrame>
+        implements WindowPeer {
 
     public SwingWindowPeer(SwingToolkit toolkit, Window window) {
         super(toolkit, window, new JInternalFrame());

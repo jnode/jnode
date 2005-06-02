@@ -33,8 +33,8 @@ import java.awt.peer.DialogPeer;
  * @author Levente S\u00e1ntha
  */
 
-class SwingDialogPeer extends SwingWindowPeer implements DialogPeer,
-		ISwingContainerPeer {
+final class SwingDialogPeer extends SwingBaseWindowPeer<Dialog, JInternalFrame>
+        implements DialogPeer, ISwingContainerPeer {
 
 	public SwingDialogPeer(SwingToolkit toolkit, Dialog dialog) {
         super(toolkit, dialog, new JInternalFrame());

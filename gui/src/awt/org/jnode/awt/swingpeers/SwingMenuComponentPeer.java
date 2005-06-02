@@ -21,18 +21,22 @@
  
 package org.jnode.awt.swingpeers;
 
-import org.jnode.awt.JNodeGenericPeer;
-import org.jnode.awt.JNodeToolkit;
+import java.awt.peer.MenuComponentPeer;
 
 import javax.swing.JComponent;
-import java.awt.peer.MenuComponentPeer;
+
+import org.jnode.awt.JNodeGenericPeer;
 
 /**
  * @author Levente S\u00e1ntha
  */
-public abstract class SwingMenuComponentPeer extends JNodeGenericPeer implements MenuComponentPeer{
-    protected JComponent jComponent;
-    public SwingMenuComponentPeer(JNodeToolkit toolkit, Object component, JComponent peer) {
+abstract class SwingMenuComponentPeer<awtT extends Object, peerT extends JComponent>
+        extends JNodeGenericPeer<SwingToolkit, awtT> implements MenuComponentPeer {
+    
+    protected final peerT jComponent;
+
+    public SwingMenuComponentPeer(SwingToolkit toolkit, awtT component,
+            peerT peer) {
         super(toolkit, component);
         this.jComponent = peer;
     }

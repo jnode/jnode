@@ -37,10 +37,8 @@ import java.awt.peer.PopupMenuPeer;
  * @author Levente S\u00e1ntha
  */
 
-class SwingPopupMenuPeer extends SwingMenuPeer implements PopupMenuPeer {
-    //
-    // Construction
-    //
+final class SwingPopupMenuPeer extends SwingBaseMenuPeer<PopupMenu, JPopupMenu>
+        implements PopupMenuPeer {
 
     public SwingPopupMenuPeer(SwingToolkit toolkit, PopupMenu popupMenu) {
         super(toolkit, popupMenu, new JPopupMenu());

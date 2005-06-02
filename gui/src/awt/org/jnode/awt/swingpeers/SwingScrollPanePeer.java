@@ -31,8 +31,9 @@ import java.awt.peer.ScrollPanePeer;
  * AWT scroll pane peer implemented as a {@link javax.swing.JScrollPane}.
  */
 
-final class SwingScrollPanePeer extends SwingContainerPeer implements
-		ScrollPanePeer {
+final class SwingScrollPanePeer extends
+        SwingContainerPeer<ScrollPane, SwingScrollPane> implements
+        ScrollPanePeer {
 
 	//
 	// Construction
@@ -94,19 +95,19 @@ final class SwingScrollPanePeer extends SwingContainerPeer implements
 
 	}
 
-	private static class SwingScrollPane extends JScrollPane implements
-			ISwingPeer {
-		private final ScrollPane awtComponent;
+}
 
-		public SwingScrollPane(ScrollPane awtComponent) {
-			this.awtComponent = awtComponent;
-		}
+final class SwingScrollPane extends JScrollPane implements ISwingPeer {
+    private final ScrollPane awtComponent;
 
-		/**
-		 * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
-		 */
-		public Component getAWTComponent() {
-			return awtComponent;
-		}
-	}
+    public SwingScrollPane(ScrollPane awtComponent) {
+        this.awtComponent = awtComponent;
+    }
+
+    /**
+     * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
+     */
+    public Component getAWTComponent() {
+        return awtComponent;
+    }
 }

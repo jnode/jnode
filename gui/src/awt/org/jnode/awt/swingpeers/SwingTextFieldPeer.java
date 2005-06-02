@@ -31,8 +31,9 @@ import java.awt.peer.TextFieldPeer;
  * AWT text field peer implemented as a {@link javax.swing.JTextField}.
  */
 
-final class SwingTextFieldPeer extends SwingTextComponentPeer implements
-		TextFieldPeer {
+final class SwingTextFieldPeer extends
+        SwingTextComponentPeer<TextField, SwingTextField> implements
+        TextFieldPeer {
 
 	//
 	// Construction
@@ -90,18 +91,19 @@ final class SwingTextFieldPeer extends SwingTextComponentPeer implements
 
 	}
 
-	private static class SwingTextField extends JTextField implements ISwingPeer {
-		private final TextField awtComponent;
+}
 
-		public SwingTextField(TextField awtComponent) {
-			this.awtComponent = awtComponent;
-		}
+final class SwingTextField extends JTextField implements ISwingPeer {
+    private final TextField awtComponent;
 
-		/**
-		 * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
-		 */
-		public Component getAWTComponent() {
-			return awtComponent;
-		}
-	}
+    public SwingTextField(TextField awtComponent) {
+        this.awtComponent = awtComponent;
+    }
+
+    /**
+     * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
+     */
+    public Component getAWTComponent() {
+        return awtComponent;
+    }
 }

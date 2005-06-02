@@ -35,8 +35,8 @@ import java.awt.peer.TextAreaPeer;
  * AWT text area peer implemented as a {@link javax.swing.JTextArea}.
  */
 
-final class SwingTextAreaPeer extends SwingTextComponentPeer implements
-		TextAreaPeer {
+final class SwingTextAreaPeer extends
+        SwingTextComponentPeer<TextArea, SwingTextArea> implements TextAreaPeer {
 
 	//
 	// Construction
@@ -140,18 +140,19 @@ final class SwingTextAreaPeer extends SwingTextComponentPeer implements
 		}
 	}
 
-	private static class SwingTextArea extends JTextArea implements ISwingPeer {
-		private final TextArea awtComponent;
+}
 
-		public SwingTextArea(TextArea awtComponent) {
-			this.awtComponent = awtComponent;
-		}
+final class SwingTextArea extends JTextArea implements ISwingPeer {
+    private final TextArea awtComponent;
 
-		/**
-		 * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
-		 */
-		public Component getAWTComponent() {
-			return awtComponent;
-		}
-	}
+    public SwingTextArea(TextArea awtComponent) {
+        this.awtComponent = awtComponent;
+    }
+
+    /**
+     * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
+     */
+    public Component getAWTComponent() {
+        return awtComponent;
+    }
 }

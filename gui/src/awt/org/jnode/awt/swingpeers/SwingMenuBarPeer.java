@@ -31,7 +31,8 @@ import java.awt.peer.MenuBarPeer;
  * @author Levente S\u00e1ntha
  */
 
-class SwingMenuBarPeer extends SwingMenuComponentPeer implements MenuBarPeer {
+final class SwingMenuBarPeer extends SwingMenuComponentPeer<MenuBar, JMenuBar>
+        implements MenuBarPeer {
 
     public SwingMenuBarPeer(SwingToolkit toolkit, MenuBar menuBar) {
         super(toolkit, menuBar, new JMenuBar());

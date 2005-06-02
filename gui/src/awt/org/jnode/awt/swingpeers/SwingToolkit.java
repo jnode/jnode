@@ -230,7 +230,7 @@ public final class SwingToolkit extends JNodeToolkit {
 			setTop(target);
 			log.debug("createFrame:desktopFramePeer(" + target + ")");
 			// Only desktop is real frame
-			return new DesktopFramePeer(this, target);
+			return new DesktopFramePeer(this, (DesktopFrame)target);
 		} else {
 			if (!isGuiActive()) {
 				throw new AWTError("Gui is not active");
@@ -318,8 +318,8 @@ public final class SwingToolkit extends JNodeToolkit {
 
     public Component getTopComponentAt(int x, int y) {
 		Component comp = super.getTopComponentAt(x, y);
-		SwingFramePeer.SwingFrame sfp = (SwingFramePeer.SwingFrame) SwingUtilities
-				.getAncestorOfClass(SwingFramePeer.SwingFrame.class, comp);
+		SwingFrame sfp = (SwingFrame) SwingUtilities.getAncestorOfClass(
+                SwingFrame.class, comp);
 		if (sfp != null) {
 			Rectangle r = sfp.getBounds();
 			Insets ins = sfp.getSwingPeer().getInsets();
