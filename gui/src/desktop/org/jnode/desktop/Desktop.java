@@ -34,6 +34,7 @@ import javax.swing.DefaultDesktopManager;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
+import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
 import org.jnode.awt.JNodeAwtContext;
@@ -102,9 +103,13 @@ public class Desktop implements Runnable {
 		desktop.setDesktopManager(new DesktopManagerImpl());
 		desktop.addContainerListener(new DesktopContainerListener());
 
-		Frame test = new Frame("Test");
-		test.setSize(100, 200);
-		test.show();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                Frame test = new Frame("Test");
+                test.setSize(100, 200);
+                test.show();                
+            }
+        });
 
 		log.info("dm=" + desktop.getDesktopManager());
 		// TODO Auto-generated method stub
@@ -120,7 +125,9 @@ public class Desktop implements Runnable {
 			final Component c = event.getChild();
 			if (c instanceof JInternalFrame) {
 				controlBar.getWindowBar().addFrame((JInternalFrame) c);
-			}
+			} else {
+			    log.info("componentAdded: " + c.getClass().getName());         
+            }
 		}
 
 		/**
@@ -130,6 +137,8 @@ public class Desktop implements Runnable {
 			final Component c = event.getChild();
 			if (c instanceof JInternalFrame) {
 				controlBar.getWindowBar().removeFrame((JInternalFrame) c);
+            } else {
+                log.info("componentRemoved: " + c.getClass().getName());         
 			}
 		}
 	}
