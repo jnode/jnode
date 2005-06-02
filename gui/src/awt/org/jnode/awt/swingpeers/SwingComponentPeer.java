@@ -73,12 +73,11 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
     public SwingComponentPeer(SwingToolkit toolkit, awtT component, peerT peer) {
         super(toolkit, component);
         this.jComponent = peer;
+        if (!(peer instanceof ISwingPeer)) {
+            throw new IllegalArgumentException("peer must implement ISwingPeer");
+        }
         setBounds(component.getX(), component.getY(), component.getWidth(),
                 component.getHeight());
-
-        // Disable double-buffering for Swing components
-        //javax.swing.RepaintManager.currentManager( component
-        // ).setDoubleBufferingEnabled( false );
     }
 
     public boolean canDetermineObscurity() {
@@ -123,20 +122,20 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
 
     }
 
-    public void enable() {
+    public final void enable() {
         setEnabled(true);
     }
 
-    public void flip(BufferCapabilities.FlipContents flipContents) {
+    public final void flip(BufferCapabilities.FlipContents flipContents) {
     }
 
-    public Image getBackBuffer() {
+    public final Image getBackBuffer() {
         return null;
     }
 
     // Color
 
-    public ColorModel getColorModel() {
+    public final ColorModel getColorModel() {
         return toolkit.getColorModel();
     }
 
@@ -387,8 +386,6 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
      * @see java.awt.peer.ComponentPeer#setEventMask(long)
      */
     public final void setEventMask(long mask) {
-        // TODO Auto-generated method stub
-
     }
 
     public final void setFont(Font f) {
@@ -396,24 +393,13 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
         postPaintEvent();
     }
 
-    public void setForeground(Color c) {
+    public final void setForeground(Color c) {
         jComponent.setForeground(c);
         postPaintEvent();
     }
 
-    // State
-
-    boolean isSetVisibleInProgress = false;
     public final void setVisible(boolean b) {
-        isSetVisibleInProgress = true;
         jComponent.setVisible(b);
-        isSetVisibleInProgress = false;
-        postPaintEvent();
-        if(b){
-            fireComponentEvent(ComponentEvent.COMPONENT_SHOWN);
-        }else{
-            fireComponentEvent(ComponentEvent.COMPONENT_HIDDEN);
-        }
     }
 
     public final void show() {
@@ -422,7 +408,7 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
 
     // Cursor
 
-    public void updateCursorImmediately() {
+    public final void updateCursorImmediately() {
     }
 
     /**
@@ -431,6 +417,6 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
      */
     protected final void fireComponentEvent(int what) {
         final EventQueue queue = toolkit.getSystemEventQueue();
-        queue.postEvent(new ComponentEvent((Component) component, what));
+        queue.postEvent(new ComponentEvent(component, what));
     }
 }
