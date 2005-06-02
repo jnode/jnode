@@ -30,7 +30,7 @@ import java.awt.peer.CanvasPeer;
  * AWT canvas peer implemented as a {@link javax.swing.JComponent}.
  */
 
-class SwingCanvasPeer extends SwingComponentPeer implements CanvasPeer {
+final class SwingCanvasPeer extends SwingComponentPeer<Canvas, SwingCanvas> implements CanvasPeer {
 
 	public SwingCanvasPeer(SwingToolkit toolkit, Canvas canvas) {
         super(toolkit, canvas, new SwingCanvas(canvas));
@@ -38,18 +38,19 @@ class SwingCanvasPeer extends SwingComponentPeer implements CanvasPeer {
 		SwingToolkit.copyAwtProperties(canvas, jComponent);
 	}
 
-	private static class SwingCanvas extends JComponent implements ISwingPeer {
-		private final Canvas awtComponent;
+}
 
-		public SwingCanvas(Canvas awtComponent) {
-			this.awtComponent = awtComponent;
-		}
+final class SwingCanvas extends JComponent implements ISwingPeer {
+    private final Canvas awtComponent;
 
-		/**
-		 * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
-		 */
-		public Component getAWTComponent() {
-			return awtComponent;
-		}
-	}
+    public SwingCanvas(Canvas awtComponent) {
+        this.awtComponent = awtComponent;
+    }
+
+    /**
+     * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
+     */
+    public Component getAWTComponent() {
+        return awtComponent;
+    }
 }

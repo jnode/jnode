@@ -32,7 +32,7 @@ import java.awt.peer.ButtonPeer;
  * AWT button peer implemented as a {@link javax.swing.JButton}.
  */
 
-class SwingButtonPeer extends SwingComponentPeer implements ButtonPeer {
+final class SwingButtonPeer extends SwingComponentPeer<Button, SwingButton> implements ButtonPeer {
 
 	// Construction
 	//
@@ -49,18 +49,19 @@ class SwingButtonPeer extends SwingComponentPeer implements ButtonPeer {
     public void setLabel(String label) {
         ((JButton)jComponent).setText(label);
     }
+}
 
-    private static class SwingButton extends JButton implements ISwingPeer {
-    	private final Button awtComponent;
 
-    	public SwingButton(Button awtComponent) {
-    		this.awtComponent = awtComponent;
-    	}
-    	/**
-    	 * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
-    	 */
-    	public Component getAWTComponent() {
-    		return awtComponent;
-    	}    	
+final class SwingButton extends JButton implements ISwingPeer {
+    private final Button awtComponent;
+
+    public SwingButton(Button awtComponent) {
+        this.awtComponent = awtComponent;
     }
+    /**
+     * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
+     */
+    public Component getAWTComponent() {
+        return awtComponent;
+    }       
 }

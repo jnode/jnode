@@ -45,7 +45,8 @@ import java.beans.PropertyVetoException;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Levente S\u00e1ntha
  */
-final class SwingFramePeer extends SwingWindowPeer implements FramePeer, ISwingContainerPeer {
+final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame> implements FramePeer,
+        ISwingContainerPeer {
 
 	private static final Logger log = Logger.getLogger(SwingFramePeer.class);
 	private final SwingFrame frame;
@@ -192,102 +193,103 @@ final class SwingFramePeer extends SwingWindowPeer implements FramePeer, ISwingC
         super.handleEvent(event);
     }
 
-	static final class SwingFrame extends JInternalFrame {
-		private Frame awtFrame;
+}
+
+final class SwingFrame extends JInternalFrame {
+    private Frame awtFrame;
+    private SwingFramePeer swingPeer;
+
+    void initialize(Frame awtFrame, SwingFramePeer peer) {
+        this.awtFrame = awtFrame;
+        this.swingPeer = peer;
+        ((SwingFrameContentPane) getContentPane()).initialize(awtFrame, peer);
+    }
+
+    /**
+     * @see javax.swing.JInternalFrame#createRootPane()
+     */
+    protected JRootPane createRootPane() {
+        return new SwingFrameRootPane();
+    }
+
+    /**
+     * @see java.awt.Component#invalidate()
+     */
+    public void invalidate() {
+        super.invalidate();
+        if (awtFrame != null) {
+            awtFrame.invalidate();
+        }
+    }
+
+    /**
+     * @see java.awt.Component#validate()
+     */
+    public void validate() {
+        if (awtFrame != null) {
+            awtFrame.validate();
+        }
+        super.validate();
+    }
+
+    Frame getAwtFrame() {
+        return awtFrame;
+    }
+
+    SwingFramePeer getSwingPeer() {
+        return swingPeer;
+    }
+
+    private static final class SwingFrameRootPane extends JRootPane {
+
+        /**
+         * @see javax.swing.JRootPane#createContentPane()
+         */
+        protected Container createContentPane() {
+            return new SwingFrameContentPane();
+        }
+    }
+
+    private static final class SwingFrameContentPane extends JComponent {
+
+        private Frame awtFrame;
         private SwingFramePeer swingPeer;
 
-        private void initialize(Frame awtFrame, SwingFramePeer peer) {
-            this.awtFrame = awtFrame;
+        public void initialize(Frame awtComponent, SwingFramePeer peer) {
+            this.awtFrame = awtComponent;
             this.swingPeer = peer;
-			((SwingFrameContentPane) getContentPane()).initialize(awtFrame, peer);
+            awtComponent.invalidate();
         }
 
-		/**
-		 * @see javax.swing.JInternalFrame#createRootPane()
-		 */
-		protected JRootPane createRootPane() {
-			return new SwingFrameRootPane();
-		}
-
-		/**
-		 * @see java.awt.Component#invalidate()
-		 */
-		public void invalidate() {
-			super.invalidate();
-			if (awtFrame != null) {
-				awtFrame.invalidate();
-			}
-		}
-
-		/**
-		 * @see java.awt.Component#validate()
-		 */
-		public void validate() {
-			if (awtFrame != null) {
-				awtFrame.validate();
-			}
-			super.validate();
-		}
-
-        Frame getAwtFrame() {
-            return awtFrame;
+        /**
+         * @see java.awt.Component#invalidate()
+         */
+        public void invalidate() {
+            super.invalidate();
+            if (awtFrame != null) {
+                awtFrame.invalidate();
+            }
         }
 
-        SwingFramePeer getSwingPeer() {
-            return swingPeer;
+        /**
+         * @see java.awt.Component#doLayout()
+         */
+        public void doLayout() {
+            if (awtFrame != null) {
+                awtFrame.doLayout();
+            }
+            super.doLayout();
         }
-	}
 
-	private static final class SwingFrameRootPane extends JRootPane {
-
-		/**
-		 * @see javax.swing.JRootPane#createContentPane()
-		 */
-		protected Container createContentPane() {
-			return new SwingFrameContentPane();
-		}
-	}
-
-	private static final class SwingFrameContentPane extends JComponent {
-
-		private Frame awtFrame;
-		private SwingFramePeer swingPeer;
-
-		public void initialize(Frame awtComponent, SwingFramePeer peer) {
-			this.awtFrame = awtComponent;
-			this.swingPeer = peer;
-			awtComponent.invalidate();
-		}
-
-		/**
-		 * @see java.awt.Component#invalidate()
-		 */
-		public void invalidate() {
-			super.invalidate();
-			if (awtFrame != null) {
-				awtFrame.invalidate();
-			}
-		}
-
-		/**
-		 * @see java.awt.Component#doLayout()
-		 */
-		public void doLayout() {
-			if (awtFrame != null) {
-				awtFrame.doLayout();
-			}
-			super.doLayout();
-		}
-
-		/**
-		 * @see java.awt.Component#validate()
-		 */
-		public void validate() {
-			if (awtFrame != null) {
-				awtFrame.validate();
-			}
-			super.validate();
-		}
+        /**
+         * @see java.awt.Component#validate()
+         */
+        public void validate() {
+            if (awtFrame != null) {
+                awtFrame.validate();
+            }
+            super.validate();
+        }
 
         @SuppressWarnings("deprecation")
         public void reshape(int x, int y, int width, int height) {
@@ -295,13 +297,13 @@ final class SwingFramePeer extends SwingWindowPeer implements FramePeer, ISwingC
             //TODO fix it
             /*
             if (awtFrame.isVisible()) {
-            	Point p = awtFrame.getLocationOnScreen();
-            	Insets ins = swingPeer.getInsets();
-            	awtFrame.reshape(p.x + x, p.y + y, width + ins.left + ins.right, height + ins.top + ins.bottom);
+                Point p = awtFrame.getLocationOnScreen();
+                Insets ins = swingPeer.getInsets();
+                awtFrame.reshape(p.x + x, p.y + y, width + ins.left + ins.right, height + ins.top + ins.bottom);
             }*/
             if (!swingPeer.isReshapeInProgress) {
-            	Insets ins = swingPeer.getInsets();
-            	awtFrame.reshape(x + x, y + y, width + ins.left + ins.right, height + ins.top + ins.bottom);
+                Insets ins = swingPeer.getInsets();
+                awtFrame.reshape(x + x, y + y, width + ins.left + ins.right, height + ins.top + ins.bottom);
             }
         }
 
@@ -312,13 +314,14 @@ final class SwingFramePeer extends SwingWindowPeer implements FramePeer, ISwingC
         }
 
 
-		/**
-		 * @see javax.swing.JComponent#paintChildren(java.awt.Graphics)
-		 */
-		protected void paintChildren(Graphics g) {
-			super.paintChildren(g);
-			final Insets insets = swingPeer.getInsets();
-			SwingToolkit.paintLightWeightChildren(awtFrame, g, insets.left, insets.top);
-		}
-	}
+        /**
+         * @see javax.swing.JComponent#paintChildren(java.awt.Graphics)
+         */
+        protected void paintChildren(Graphics g) {
+            super.paintChildren(g);
+            final Insets insets = swingPeer.getInsets();
+            SwingToolkit.paintLightWeightChildren(awtFrame, g, insets.left, insets.top);
+        }
+    }
 }
+

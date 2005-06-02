@@ -29,8 +29,9 @@ import java.awt.peer.LightweightPeer;
  * AWT lightweight component peers that does nothing.
  */
 
-final class SwingLightweightPeer extends SwingComponentPeer implements
-		LightweightPeer, ISwingPeer {
+final class SwingLightweightPeer extends
+        SwingComponentPeer<Component, JLightweightComponent> implements
+        LightweightPeer, ISwingPeer {
     
 	public SwingLightweightPeer(SwingToolkit toolkit, Component component) {
 		super(toolkit, component, new JLightweightComponent());
@@ -43,7 +44,8 @@ final class SwingLightweightPeer extends SwingComponentPeer implements
 		return (Component) component;
 	}
 
-	private static class JLightweightComponent extends JComponent {
-		
-	}
+}
+
+final class JLightweightComponent extends JComponent {
+    
 }

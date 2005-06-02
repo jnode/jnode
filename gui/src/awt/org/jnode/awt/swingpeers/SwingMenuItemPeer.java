@@ -21,19 +21,18 @@
  
 package org.jnode.awt.swingpeers;
 
-import javax.swing.JComponent;
-import javax.swing.JMenuItem;
-import java.awt.AWTEvent;
 import java.awt.MenuItem;
-import java.awt.event.PaintEvent;
 import java.awt.peer.MenuItemPeer;
+
+import javax.swing.JMenuItem;
 
 /**
  * AWT menu item peer implemented as a {@link javax.swing.JMenuItem}.
  * @author Levente S\u00e1ntha
  */
 
-class SwingMenuItemPeer extends SwingMenuComponentPeer implements MenuItemPeer {
+final class SwingMenuItemPeer extends
+        SwingBaseMenuItemPeer<MenuItem, JMenuItem> implements MenuItemPeer {
 
     //
     // Construction
@@ -42,45 +41,4 @@ class SwingMenuItemPeer extends SwingMenuComponentPeer implements MenuItemPeer {
     public SwingMenuItemPeer(SwingToolkit toolkit, MenuItem menuItem) {
         super(toolkit, menuItem, new JMenuItem());
     }
-
-    public SwingMenuItemPeer(SwingToolkit toolkit, MenuItem menuItem, JComponent jComponent) {
-        super(toolkit, menuItem, jComponent);
-    }
-
-    //
-    // ComponentPeer
-    //
-
-    // Events
-
-    public void handleEvent(AWTEvent e) {
-        //System.err.println(e);
-    }
-
-    public void coalescePaintEvent(PaintEvent e) {
-        System.err.println(e);
-    }
-
-    // Misc
-
-    public void dispose() {
-    }
-
-    public void disable() {
-        jComponent.setEnabled(false);
-    }
-
-    public void enable() {
-        jComponent.setEnabled(true);
-    }
-
-    public void setEnabled(boolean enabled) {
-        jComponent.setEnabled(enabled);
-    }
-
-    public void setLabel(String text) {
-        ((JMenuItem)jComponent).setText(text);
-    }
-    ///////////////////////////////////////////////////////////////////////////////////////
-    // Private
 }

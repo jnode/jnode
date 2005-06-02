@@ -54,7 +54,8 @@ import org.jnode.vm.Unsafe;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final class DesktopFramePeer extends JNodeGenericPeer implements FramePeer {
+final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame> implements
+        FramePeer {
 
     private final SwingToolkit toolkit;
 
@@ -72,7 +73,7 @@ final class DesktopFramePeer extends JNodeGenericPeer implements FramePeer {
      * @param toolkit
      * @param frame
      */
-    public DesktopFramePeer(SwingToolkit toolkit, Frame frame) {
+    public DesktopFramePeer(SwingToolkit toolkit, DesktopFrame frame) {
         super(toolkit, frame);
         this.toolkit = toolkit;
         this.awtFrame = frame;

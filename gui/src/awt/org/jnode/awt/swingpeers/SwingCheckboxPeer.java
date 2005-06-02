@@ -30,7 +30,7 @@ import java.awt.peer.CheckboxPeer;
 /**
  * AWT checkbox peer implemented as a {@link javax.swing.JCheckBox}.
  */
-class SwingCheckboxPeer extends SwingComponentPeer implements CheckboxPeer {
+final class SwingCheckboxPeer extends SwingComponentPeer<Checkbox, SwingCheckBox> implements CheckboxPeer {
 
 	//
 	// Construction
@@ -56,19 +56,19 @@ class SwingCheckboxPeer extends SwingComponentPeer implements CheckboxPeer {
 	public void setLabel(String label) {
 		((JCheckBox) jComponent).setText(label);
 	}
+}
 
-	private static class SwingCheckBox extends JCheckBox implements ISwingPeer {
-		private final Checkbox awtComponent;
+final class SwingCheckBox extends JCheckBox implements ISwingPeer {
+    private final Checkbox awtComponent;
 
-		public SwingCheckBox(Checkbox awtComponent) {
-			this.awtComponent = awtComponent;
-		}
+    public SwingCheckBox(Checkbox awtComponent) {
+        this.awtComponent = awtComponent;
+    }
 
-		/**
-		 * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
-		 */
-		public Component getAWTComponent() {
-			return awtComponent;
-		}
-	}
+    /**
+     * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
+     */
+    public Component getAWTComponent() {
+        return awtComponent;
+    }
 }

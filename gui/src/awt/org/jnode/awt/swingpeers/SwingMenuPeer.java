@@ -21,28 +21,24 @@
  
 package org.jnode.awt.swingpeers;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JComponent;
-import javax.swing.JMenu;
 import java.awt.Menu;
 import java.awt.MenuItem;
 import java.awt.event.ActionEvent;
 import java.awt.peer.MenuPeer;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JMenu;
 
 /**
  * AWT menu peer implemented as a {@link javax.swing.JMenu}.
  * @author Levente S\u00e1ntha
  */
 
-class SwingMenuPeer extends SwingMenuItemPeer implements MenuPeer {
+final class SwingMenuPeer extends SwingBaseMenuPeer<Menu, JMenu> implements MenuPeer {
 
     public SwingMenuPeer(SwingToolkit toolkit, Menu menu) {
         super(toolkit, menu, new JMenu());
-    }
-
-    public SwingMenuPeer(SwingToolkit toolkit, Menu menu, JComponent jComponent) {
-        super(toolkit, menu, jComponent);
     }
 
     public void addItem(MenuItem item) {
@@ -52,10 +48,10 @@ class SwingMenuPeer extends SwingMenuItemPeer implements MenuPeer {
             }
         };
         action.putValue(Action.NAME, item.getLabel());
-        ((JMenu)jComponent).add(action);
+        jComponent.add(action);
     }
 
     public void delItem(int index) {
-        ((JMenu)jComponent).remove(index);
+        jComponent.remove(index);
     }
 }

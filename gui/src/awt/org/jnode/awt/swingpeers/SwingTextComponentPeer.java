@@ -29,11 +29,11 @@ import java.awt.peer.TextComponentPeer;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class SwingTextComponentPeer extends SwingComponentPeer implements
-		TextComponentPeer {
+abstract class SwingTextComponentPeer<awtT extends TextComponent, peerT extends JTextComponent>
+        extends SwingComponentPeer<awtT, peerT> implements TextComponentPeer {
 
 	public SwingTextComponentPeer(SwingToolkit toolkit,
-			TextComponent textComponent, JTextComponent peer) {
+			awtT textComponent, peerT peer) {
 		super(toolkit, textComponent, peer);
 
 		SwingToolkit.add(textComponent, jComponent);

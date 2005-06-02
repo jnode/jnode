@@ -21,15 +21,6 @@
  
 package org.jnode.awt.swingpeers;
 
-import org.apache.log4j.Logger;
-import org.jnode.awt.JNodeGenericPeer;
-import org.jnode.awt.JNodeToolkit;
-import org.jnode.awt.swingpeers.event.ComponentListenerDelegate;
-import org.jnode.awt.swingpeers.event.KeyListenerDelegate;
-import org.jnode.awt.swingpeers.event.MouseListenerDelegate;
-import org.jnode.awt.swingpeers.event.MouseMotionListenerDelegate;
-
-import javax.swing.JComponent;
 import java.awt.AWTEvent;
 import java.awt.BufferCapabilities;
 import java.awt.Color;
@@ -45,13 +36,22 @@ import java.awt.GraphicsConfiguration;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.ComponentEvent;
-import java.awt.event.PaintEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.PaintEvent;
 import java.awt.image.ColorModel;
 import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
 import java.awt.image.VolatileImage;
 import java.awt.peer.ComponentPeer;
+
+import javax.swing.JComponent;
+
+import org.apache.log4j.Logger;
+import org.jnode.awt.JNodeGenericPeer;
+import org.jnode.awt.swingpeers.event.ComponentListenerDelegate;
+import org.jnode.awt.swingpeers.event.KeyListenerDelegate;
+import org.jnode.awt.swingpeers.event.MouseListenerDelegate;
+import org.jnode.awt.swingpeers.event.MouseMotionListenerDelegate;
 
 /**
  * Base class for virtual component peers. Satisfies the requirements for AWT
@@ -61,12 +61,13 @@ import java.awt.peer.ComponentPeer;
  * @author Levente S\u00e1ntha
  */
 
-class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
+abstract class SwingComponentPeer<awtT extends Component, peerT extends JComponent>
+        extends JNodeGenericPeer<SwingToolkit, awtT> implements ComponentPeer {
 
     ///////////////////////////////////////////////////////////////////////////////////////
     // Private
     protected final Logger log = Logger.getLogger(getClass());
-    protected final JComponent jComponent;
+    protected final peerT jComponent;
 
     /**
      * Initialize this instance.
@@ -74,7 +75,7 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
      * @param toolkit
      * @param component
      */
-    public SwingComponentPeer(JNodeToolkit toolkit, Component component, JComponent peer) {
+    public SwingComponentPeer(SwingToolkit toolkit, awtT component, peerT peer) {
         super(toolkit, component);
         this.jComponent = peer;
         setBounds(component.getX(), component.getY(), component.getWidth(),

@@ -27,15 +27,15 @@ import java.awt.Toolkit;
 /**
  * @author epr
  */
-public class JNodeGenericPeer {
+public abstract class JNodeGenericPeer<toolkitT extends JNodeToolkit, compT> {
 
-	protected final JNodeToolkit toolkit;
-	protected final Object component;
+	protected final toolkitT toolkit;
+	protected final compT component;
 
 	// Global event queue.
 	protected static EventQueue eventQueue;
 
-	public JNodeGenericPeer(JNodeToolkit toolkit, Object component) {
+	public JNodeGenericPeer(toolkitT toolkit, compT component) {
 		this.toolkit = toolkit;
 		this.component = component;
 	}
@@ -49,7 +49,7 @@ public class JNodeGenericPeer {
 	/**
 	 * @return
 	 */
-	public final Object getComponent() {
+	public final compT getComponent() {
 		return this.component;
 	}
 
@@ -65,7 +65,7 @@ public class JNodeGenericPeer {
 	 * Gets the implementation toolkit
 	 * @return The toolkit
 	 */
-	public final JNodeToolkit getToolkitImpl() {
+	public final toolkitT getToolkitImpl() {
 		return toolkit;
 	}
 
