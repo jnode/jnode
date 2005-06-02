@@ -29,6 +29,7 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -40,6 +41,7 @@ import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginLoader;
 import org.jnode.plugin.PluginPrerequisite;
+import org.jnode.plugin.PluginReference;
 import org.jnode.plugin.PluginRegistry;
 import org.jnode.plugin.PluginSecurityConstants;
 import org.jnode.util.BootableHashMap;
@@ -358,12 +360,25 @@ public final class PluginRegistryModel extends VmSystemObject implements
      * @param pluginId
      * @throws PluginException
      */
-    public synchronized void unloadPlugin(String pluginId)
+    public synchronized List<PluginReference> unloadPlugin(String pluginId)
             throws PluginException {
 	    final SecurityManager sm = System.getSecurityManager();
 	    if (sm != null) {
 	        sm.checkPermission(PluginSecurityConstants.UNLOAD_PERM);
 	    }
+        final List<PluginReference> unloadedIds = new ArrayList<PluginReference>();
+        doUnloadPlugin(pluginId, unloadedIds);
+        Collections.reverse(unloadedIds);
+        return unloadedIds;
+    }
+    
+    /**
+     * Unload the given plugin and all plugins that depends on it.
+     * @param pluginId
+     * @param unloadedIds
+     * @throws PluginException
+     */
+    private final void doUnloadPlugin(String pluginId, List<PluginReference> unloadedIds) throws PluginException {
         final PluginDescriptorModel descr = (PluginDescriptorModel)getPluginDescriptor(pluginId);
         if (descr != null) {
             if (descr.isSystemPlugin()) { throw new PluginException(
@@ -373,13 +388,14 @@ public final class PluginRegistryModel extends VmSystemObject implements
             final ArrayList<PluginDescriptor> descriptors = new ArrayList<PluginDescriptor>(descriptorMap.values());
             for (PluginDescriptor dep : descriptors) {
                 if (dep.depends(pluginId)) {
-                	unloadPlugin(dep.getId());
+                    doUnloadPlugin(dep.getId(), unloadedIds);
                 }
             }
 
             // Now remove it
+            unloadedIds.add(new PluginReference(descr.getId(), descr.getVersion()));
             descr.unresolve(this);
-        }
+        }        
     }
 
     /**

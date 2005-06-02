@@ -22,6 +22,7 @@
 package org.jnode.plugin;
 
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Registry of all plugins in the system.
@@ -63,11 +64,13 @@ public interface PluginRegistry extends Iterable<PluginDescriptor> {
 
 	/**
 	 * Remove the plugin with the given id from this registry.
+     * All plugins that depend on the given plugin will also be unloaded.
 	 * 
 	 * @param pluginId
 	 * @throws PluginException
+     * @return The references of the plugins that have been unloaded in order of loading.
 	 */
-	public void unloadPlugin(String pluginId) throws PluginException;
+	public List<PluginReference> unloadPlugin(String pluginId) throws PluginException;
 	
 	/**
 	 * Gets the classloader that loads classes from all loaded plugins.

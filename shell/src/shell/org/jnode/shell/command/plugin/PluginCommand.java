@@ -29,11 +29,14 @@ import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginManager;
+import org.jnode.plugin.PluginReference;
+import org.jnode.plugin.PluginRegistry;
 import org.jnode.plugin.URLPluginLoader;
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.Help;
@@ -133,8 +136,7 @@ public class PluginCommand {
                         version = Vm.getVm().getVersion();
                     }
                     final String id = ARG_ACTION_ID.getValue(cmdLine);
-                    unloadPlugin(out, mgr, id);
-                    loadPlugin(out, mgr, id, version);
+                    reloadPlugin(out, mgr, id, version);
             } else if (action.equals("unload")) {
             	unloadPlugin(out, mgr, ARG_ACTION_ID.getValue(cmdLine));
             } else {
@@ -161,6 +163,21 @@ public class PluginCommand {
             throws PluginException {
         out.println("Loading " + id);
         mgr.getRegistry().loadPlugin(mgr.getLoaderManager(), id, version);
+    }
+
+    private void reloadPlugin(PrintStream out, PluginManager mgr, String id,
+            String version) throws PluginException {
+        out.println("Reloading " + id);
+        final PluginRegistry reg = mgr.getRegistry();
+        final List<PluginReference> refs = reg.unloadPlugin(id);
+        for (PluginReference ref : refs) {
+            if (reg.getPluginDescriptor(ref.getId()) == null) {
+                reg.loadPlugin(mgr.getLoaderManager(), ref.getId(), ref.getVersion());
+            }
+        }
+        if (reg.getPluginDescriptor(id) == null) {
+            reg.loadPlugin(mgr.getLoaderManager(), id, version);
+        }
     }
 
     private void unloadPlugin(PrintStream out, PluginManager mgr, String id)
