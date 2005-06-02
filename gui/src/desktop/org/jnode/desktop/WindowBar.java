@@ -21,8 +21,8 @@
  
 package org.jnode.desktop;
 
-import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.GridLayout;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,6 +30,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JInternalFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.border.BevelBorder;
 
 import org.apache.log4j.Logger;
 
@@ -50,7 +51,9 @@ public class WindowBar extends JPanel {
         this.wrappers = new HashMap<JInternalFrame, FrameWrapper>();
 		list.setModel(model);
 
-		add(list, BorderLayout.CENTER);
+        setLayout(new GridLayout(1, 1));
+        list.setBorder(new BevelBorder(BevelBorder.LOWERED));
+		add(list);
 	}
 
 	public void addFrame(JInternalFrame frame) {
