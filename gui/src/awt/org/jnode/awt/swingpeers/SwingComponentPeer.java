@@ -36,7 +36,6 @@ import java.awt.GraphicsConfiguration;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.ComponentEvent;
-import java.awt.event.MouseEvent;
 import java.awt.event.PaintEvent;
 import java.awt.image.ColorModel;
 import java.awt.image.ImageObserver;
@@ -48,10 +47,6 @@ import javax.swing.JComponent;
 
 import org.apache.log4j.Logger;
 import org.jnode.awt.JNodeGenericPeer;
-import org.jnode.awt.swingpeers.event.ComponentListenerDelegate;
-import org.jnode.awt.swingpeers.event.KeyListenerDelegate;
-import org.jnode.awt.swingpeers.event.MouseListenerDelegate;
-import org.jnode.awt.swingpeers.event.MouseMotionListenerDelegate;
 
 /**
  * Base class for virtual component peers. Satisfies the requirements for AWT
@@ -80,10 +75,6 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
         this.jComponent = peer;
         setBounds(component.getX(), component.getY(), component.getWidth(),
                 component.getHeight());
-        jComponent.addMouseListener(new MouseListenerDelegate(component));
-		jComponent.addMouseMotionListener(new MouseMotionListenerDelegate(component));
-        jComponent.addKeyListener(new KeyListenerDelegate(component));
-        jComponent.addComponentListener(new ComponentListenerDelegate(component));
 
         // Disable double-buffering for Swing components
         //javax.swing.RepaintManager.currentManager( component
@@ -186,67 +177,80 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
 //            return component.getLocationOnScreen();
 
         Container parent = component.getParent();
-        if(parent == null)
+        if (parent == null)
             return component.getLocation();
-        else{
+        else {
             Point p = computeLocationOnScreen(parent);
             p.translate(component.getX(), component.getY());
             return p;
         }
     }
 
-    public Dimension getMinimumSize() {
+    public final Dimension getMinimumSize() {
         return jComponent.getMinimumSize();
     }
 
-    public Dimension getPreferredSize() {
+    public final Dimension getPreferredSize() {
         return jComponent.getPreferredSize();
     }
+    
+    /**
+     * Response on paint events.
+     */
+    private void processPaintEvent(PaintEvent event) {
+        final Graphics g = jComponent.getGraphics();
+        if (g != null) {
+            //Point p = component.getLocationOnScreen();
+            //g.translate(p.x, p.y);
+            if (event.getID() == PaintEvent.PAINT) {
+                component.paint(g);
+            } else {
+                component.update(g);                        
+            }
+            //g.translate(-p.x, -p.y);
+            g.dispose();
+        }    
+    }
 
-    // Events
-    public void handleEvent(AWTEvent event) {
+    /**
+     * Event handling.
+     */
+    public final void handleEvent(AWTEvent event) {
         final int id = event.getID();
         switch (id) {
             case PaintEvent.PAINT: 
             case PaintEvent.UPDATE: {
-                final Graphics g = jComponent.getGraphics();
-                if (g != null) {
-                	//Point p = component.getLocationOnScreen();
-                	//g.translate(p.x, p.y);
-                    if (id == PaintEvent.PAINT) {
-                        ((Component)component).paint(g);
-                    } else {
-                        ((Component)component).update(g);                        
-                    }
-                	//g.translate(-p.x, -p.y);
-                    g.dispose();
-                }
+                processPaintEvent((PaintEvent)event);
             } break;
-            case MouseEvent.MOUSE_MOVED:
-            case MouseEvent.MOUSE_DRAGGED:
-            case MouseEvent.MOUSE_WHEEL:
-            case MouseEvent.MOUSE_PRESSED:
-            case MouseEvent.MOUSE_RELEASED:
-            case MouseEvent.MOUSE_CLICKED: {
-                    MouseEvent me = new MouseEvent(
-                            jComponent,
-                            event.getID(),
-                            ((MouseEvent)event).getWhen(),
-                            ((MouseEvent)event).getModifiers(),
-                            ((MouseEvent)event).getX(),
-                            ((MouseEvent)event).getY(),
-                            ((MouseEvent)event).getClickCount(),
-                            ((MouseEvent)event).isPopupTrigger(),
-                            ((MouseEvent)event).getButton()
-                    );
-                    jComponent.dispatchEvent(me);
-                } break;
+            default: {
+                ((ISwingPeer<awtT>)jComponent).processAWTEvent(event);
+            } break;
+//            case MouseEvent.MOUSE_MOVED:
+//            case MouseEvent.MOUSE_DRAGGED:
+//            case MouseEvent.MOUSE_WHEEL:
+//            case MouseEvent.MOUSE_PRESSED:
+//            case MouseEvent.MOUSE_RELEASED:
+//            case MouseEvent.MOUSE_CLICKED: {
+//                    MouseEvent me = new MouseEvent(
+//                            jComponent,
+//                            event.getID(),
+//                            ((MouseEvent)event).getWhen(),
+//                            ((MouseEvent)event).getModifiers(),
+//                            ((MouseEvent)event).getX(),
+//                            ((MouseEvent)event).getY(),
+//                            ((MouseEvent)event).getClickCount(),
+//                            ((MouseEvent)event).isPopupTrigger(),
+//                            ((MouseEvent)event).getButton()
+//                    );
+//                    jComponent.dispatchEvent(me);
+//                } break;
         }
     }
 
-    protected final void paintAWTComponent(){
-        if(component != null)
-        eventQueue.postEvent(new PaintEvent((Component) component, PaintEvent.PAINT, ((Component)component).getBounds()));
+    protected final void postPaintEvent(){
+        if(component != null) {
+            eventQueue.postEvent(new PaintEvent(component, PaintEvent.PAINT, component.getBounds()));
+        }
     }
 
     public boolean handlesWheelScrolling() {
@@ -281,9 +285,9 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
         return jComponent.getMinimumSize();
     }
 
-    public void paint(Graphics g) {
+    public final void paint(Graphics g) {
         jComponent.paint(g);
-        paintAWTComponent();
+//        postPaintEvent();
     }
 
     // Deprecated
@@ -302,7 +306,7 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
 
     public final void repaint(long tm, int x, int y, int width, int height) {
         jComponent.repaint(tm, x, y, width, height);
-        paintAWTComponent();
+        postPaintEvent();
     }
 
     /**
@@ -349,7 +353,7 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
 
     public final void setBackground(Color c) {
         jComponent.setBackground(c);
-        paintAWTComponent();
+        postPaintEvent();
     }
 
     // Bounds
@@ -389,12 +393,12 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
 
     public final void setFont(Font f) {
         jComponent.setFont(f);
-        paintAWTComponent();
+        postPaintEvent();
     }
 
     public void setForeground(Color c) {
         jComponent.setForeground(c);
-        paintAWTComponent();
+        postPaintEvent();
     }
 
     // State
@@ -404,7 +408,7 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
         isSetVisibleInProgress = true;
         jComponent.setVisible(b);
         isSetVisibleInProgress = false;
-        paintAWTComponent();
+        postPaintEvent();
         if(b){
             fireComponentEvent(ComponentEvent.COMPONENT_SHOWN);
         }else{

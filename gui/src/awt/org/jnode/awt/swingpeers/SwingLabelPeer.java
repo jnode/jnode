@@ -21,6 +21,7 @@
  
 package org.jnode.awt.swingpeers;
 
+import java.awt.AWTEvent;
 import java.awt.Label;
 import java.awt.peer.LabelPeer;
 
@@ -66,6 +67,22 @@ final class SwingLabel extends JLabel implements ISwingPeer<Label> {
      */
     public Label getAWTComponent() {
         return awtComponent;
+    }
+    
+    /**
+     * Pass an event onto the AWT component.
+     * @see java.awt.Component#processEvent(java.awt.AWTEvent)
+     */
+    protected final void processEvent(AWTEvent event) {
+        awtComponent.dispatchEvent(event);
+    }
+    
+    /**
+     * Process an event within this swingpeer
+     * @param event
+     */
+    public final void processAWTEvent(AWTEvent event) {
+        super.processEvent(event);
     }
 }
 

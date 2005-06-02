@@ -21,6 +21,7 @@
  
 package org.jnode.awt.swingpeers;
 
+import java.awt.AWTEvent;
 import java.awt.Graphics;
 import java.awt.Panel;
 import java.awt.peer.PanelPeer;
@@ -68,5 +69,21 @@ final class SwingPanel extends JPanel implements ISwingPeer<Panel> {
     protected void paintChildren(Graphics g) {
         super.paintChildren(g);
         SwingToolkit.paintLightWeightChildren(awtComponent, g, 0, 0);
+    }
+    
+    /**
+     * Pass an event onto the AWT component.
+     * @see java.awt.Component#processEvent(java.awt.AWTEvent)
+     */
+    protected final void processEvent(AWTEvent event) {
+        awtComponent.dispatchEvent(event);
+    }
+    
+    /**
+     * Process an event within this swingpeer
+     * @param event
+     */
+    public final void processAWTEvent(AWTEvent event) {
+        super.processEvent(event);
     }
 }

@@ -21,25 +21,26 @@
  
 package org.jnode.awt.swingpeers;
 
-import javax.swing.JComponent;
-import javax.swing.JInternalFrame;
 import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.peer.DialogPeer;
+
+import javax.swing.JComponent;
+import javax.swing.JInternalFrame;
 
 /**
  * AWT dialog peer implemented as a {@link javax.swing.JInternalFrame}.
  * @author Levente S\u00e1ntha
  */
 
-final class SwingDialogPeer extends SwingBaseWindowPeer<Dialog, JInternalFrame>
+final class SwingDialogPeer extends SwingBaseWindowPeer<Dialog, SwingDialog>
         implements DialogPeer, ISwingContainerPeer {
 
 	public SwingDialogPeer(SwingToolkit toolkit, Dialog dialog) {
-        super(toolkit, dialog, new JInternalFrame());
-		((JInternalFrame)jComponent).setTitle(dialog.getTitle());
-		((JInternalFrame)jComponent).getContentPane().setLayout(null);
+        super(toolkit, dialog, new SwingDialog(dialog));
+		jComponent.setTitle(dialog.getTitle());
+		jComponent.getContentPane().setLayout(null);
 	}
 
 	/**
@@ -47,22 +48,52 @@ final class SwingDialogPeer extends SwingBaseWindowPeer<Dialog, JInternalFrame>
 	 *      javax.swing.JComponent)
 	 */
 	public void addAWTComponent(Component awtComponent, JComponent peer) {
-		((JInternalFrame)jComponent).getContentPane().add(peer);
+		jComponent.getContentPane().add(peer);
 	}
 
 	public void dispose() {
-        ((JInternalFrame)jComponent).dispose();
-		((SwingToolkit)toolkit).onDisposeFrame();
-	}
-
-	public void handleEvent(AWTEvent e) {
+        jComponent.dispose();
+		toolkit.onDisposeFrame();
 	}
 
     public void setResizable(boolean resizeable) {
-        ((JInternalFrame)jComponent).setResizable(resizeable);
+        jComponent.setResizable(resizeable);
     }
 
     public void setTitle(String title) {
-        ((JInternalFrame)jComponent).setTitle(title);
+        jComponent.setTitle(title);
     }
 }
+
+final class SwingDialog extends JInternalFrame implements ISwingPeer<Dialog> {
+    
+    private final Dialog awtComponent;
+    
+    public SwingDialog(Dialog awtComponent) {
+        this.awtComponent = awtComponent;
+    }
+    
+    /**
+     * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
+     */
+    public Dialog getAWTComponent() {
+        return awtComponent;
+    }
+    
+    /**
+     * Pass an event onto the AWT component.
+     * @see java.awt.Component#processEvent(java.awt.AWTEvent)
+     */
+    protected final void processEvent(AWTEvent event) {
+        awtComponent.dispatchEvent(event);
+    }
+    
+    /**
+     * Process an event within this swingpeer
+     * @param event
+     */
+    public final void processAWTEvent(AWTEvent event) {
+        super.processEvent(event);
+    }
+}
+

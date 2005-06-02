@@ -21,40 +21,55 @@
  
 package org.jnode.awt.swingpeers;
 
-import javax.swing.JInternalFrame;
 import java.awt.AWTEvent;
 import java.awt.Window;
 import java.awt.peer.WindowPeer;
+
+import javax.swing.JInternalFrame;
 
 /**
  * AWT window peer implemented as a {@link javax.swing.JInternalFrame}.
  * @author Levente S\u00e1ntha
  */
 
-final class SwingWindowPeer extends SwingContainerPeer<Window, JInternalFrame>
+final class SwingWindowPeer extends SwingBaseWindowPeer<Window, SwingWindow>
         implements WindowPeer {
 
     public SwingWindowPeer(SwingToolkit toolkit, Window window) {
-        super(toolkit, window, new JInternalFrame());
+        super(toolkit, window, new SwingWindow(window));
         SwingToolkit.copyAwtProperties(window, jComponent);
     }
-    public SwingWindowPeer(SwingToolkit toolkit, Window window, JInternalFrame jComponent) {
-        super(toolkit, window, jComponent);
-    }
+}
 
-    public void handleEvent(AWTEvent e) {
+final class SwingWindow extends JInternalFrame implements ISwingPeer<Window> {
+    
+    private final Window awtComponent;
+    
+    public SwingWindow(Window awtComponent) {
+        this.awtComponent = awtComponent;
     }
-
-    public void dispose() {
-        ((JInternalFrame)jComponent).dispose();
-		((SwingToolkit)toolkit).onDisposeFrame();
+    
+    /**
+     * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
+     */
+    public Window getAWTComponent() {
+        return awtComponent;
     }
-
-    public void toBack() {
-        ((JInternalFrame)jComponent).toBack();
+    
+    /**
+     * Pass an event onto the AWT component.
+     * @see java.awt.Component#processEvent(java.awt.AWTEvent)
+     */
+    protected final void processEvent(AWTEvent event) {
+        awtComponent.dispatchEvent(event);
     }
-
-    public void toFront() {
-        ((JInternalFrame)jComponent).toFront();
+    
+    /**
+     * Process an event within this swingpeer
+     * @param event
+     */
+    public final void processAWTEvent(AWTEvent event) {
+        super.processEvent(event);
     }
 }
+
