@@ -313,13 +313,6 @@ final class SwingFrame extends JInternalFrame implements ISwingPeer<Frame> {
             }
         }
 
-        public void setVisible(boolean v) {
-            super.setVisible(v);
-            if(!swingPeer.isSetVisibleInProgress)
-                awtFrame.setVisible(v);
-        }
-
-
         /**
          * @see javax.swing.JComponent#paintChildren(java.awt.Graphics)
          */
