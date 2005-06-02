@@ -22,6 +22,7 @@
 package org.jnode.awt.swingpeers;
 
 import java.awt.AWTEvent;
+import java.awt.Graphics;
 import java.awt.Window;
 import java.awt.peer.WindowPeer;
 
@@ -38,6 +39,7 @@ final class SwingWindowPeer extends SwingBaseWindowPeer<Window, SwingWindow>
     public SwingWindowPeer(SwingToolkit toolkit, Window window) {
         super(toolkit, window, new SwingWindow(window));
         SwingToolkit.copyAwtProperties(window, jComponent);
+        jComponent.getContentPane().setLayout(new SwingContainerLayout(this));
     }
 }
 
@@ -54,6 +56,14 @@ final class SwingWindow extends JInternalFrame implements ISwingPeer<Window> {
      */
     public Window getAWTComponent() {
         return awtComponent;
+    }
+    
+    /**
+     * @see javax.swing.JComponent#paintChildren(java.awt.Graphics)
+     */
+    protected void paintChildren(Graphics g) {
+        super.paintChildren(g);
+        SwingToolkit.paintLightWeightChildren(awtComponent, g, 0, 0);
     }
     
     /**

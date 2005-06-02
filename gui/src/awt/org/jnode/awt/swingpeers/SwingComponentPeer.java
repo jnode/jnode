@@ -84,17 +84,20 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
         return false;
     }
 
-    public int checkImage(Image img, int width, int height, ImageObserver o) {
+    public final int checkImage(Image img, int width, int height, ImageObserver o) {
         return toolkit.checkImage(img, width, height, o);
     }
 
-    public void coalescePaintEvent(PaintEvent e) {
+    public final void coalescePaintEvent(PaintEvent e) {
         //System.err.println( "coalescePaintEvent: " + e );
     }
 
     // Buffer
 
-    public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
+    public final void createBuffers(int x, BufferCapabilities bufferCapabilities) {
+    }
+
+    public final void destroyBuffers() {
     }
 
     // Image
@@ -111,15 +114,11 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
     	return toolkit.createVolatileImage(width, height);
     }
 
-    public void destroyBuffers() {
-    }
-
-    public void disable() {
+    public final void disable() {
         setEnabled(false);
     }
 
     public void dispose() {
-
     }
 
     public final void enable() {
@@ -141,13 +140,12 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
 
     // Fonts
 
-    public FontMetrics getFontMetrics(Font font) {
+    public final FontMetrics getFontMetrics(Font font) {
         return toolkit.getFontMetrics(font);
     }
 
     public Graphics getGraphics() {
-    	//log.debug("getGraphics");
-        final Component parent = ((Component)component).getParent();
+        final Component parent = component.getParent();
         if (parent != null) {
         	final int x = jComponent.getX();
         	final int y = jComponent.getY();
@@ -159,7 +157,7 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
         }
     }
 
-    public GraphicsConfiguration getGraphicsConfiguration() {
+    public final GraphicsConfiguration getGraphicsConfiguration() {
         return toolkit.getGraphicsConfiguration();
     }
 
@@ -168,7 +166,7 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
 	 * @return The location on screen
 	 */
 	public Point getLocationOnScreen() {
-		return computeLocationOnScreen(((Component)component));
+		return computeLocationOnScreen(component);
 	}
 
     private Point computeLocationOnScreen(Component component) {
@@ -224,31 +222,16 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
             default: {
                 ((ISwingPeer<awtT>)jComponent).processAWTEvent(event);
             } break;
-//            case MouseEvent.MOUSE_MOVED:
-//            case MouseEvent.MOUSE_DRAGGED:
-//            case MouseEvent.MOUSE_WHEEL:
-//            case MouseEvent.MOUSE_PRESSED:
-//            case MouseEvent.MOUSE_RELEASED:
-//            case MouseEvent.MOUSE_CLICKED: {
-//                    MouseEvent me = new MouseEvent(
-//                            jComponent,
-//                            event.getID(),
-//                            ((MouseEvent)event).getWhen(),
-//                            ((MouseEvent)event).getModifiers(),
-//                            ((MouseEvent)event).getX(),
-//                            ((MouseEvent)event).getY(),
-//                            ((MouseEvent)event).getClickCount(),
-//                            ((MouseEvent)event).isPopupTrigger(),
-//                            ((MouseEvent)event).getButton()
-//                    );
-//                    jComponent.dispatchEvent(me);
-//                } break;
         }
     }
 
-    protected final void postPaintEvent(){
-        if(component != null) {
-            eventQueue.postEvent(new PaintEvent(component, PaintEvent.PAINT, component.getBounds()));
+    /**
+     * Post a paint event for the AWT component on the event queue.
+     */
+    protected final void postPaintEvent() {
+        if (component != null) {
+            eventQueue.postEvent(new PaintEvent(component, PaintEvent.PAINT,
+                    component.getBounds()));
         }
     }
 
@@ -262,7 +245,7 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
 
     // Focus
 
-    public boolean isFocusable() {
+    public final boolean isFocusable() {
         return jComponent.isFocusable();
     }
 
@@ -270,7 +253,7 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
      * @see java.awt.peer.ComponentPeer#isFocusTraversable()
      */
     @SuppressWarnings("deprecation")
-    public boolean isFocusTraversable() {
+    public final boolean isFocusTraversable() {
         return jComponent.isFocusTraversable();
     }
 
@@ -286,7 +269,6 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
 
     public final void paint(Graphics g) {
         jComponent.paint(g);
-//        postPaintEvent();
     }
 
     // Deprecated
@@ -295,7 +277,7 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
         return jComponent.getPreferredSize();
     }
 
-    public boolean prepareImage(Image img, int width, int height, ImageObserver o) {
+    public final boolean prepareImage(Image img, int width, int height, ImageObserver o) {
         return toolkit.prepareImage(img, width, height, o);
     }
 
@@ -361,7 +343,7 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
     	reshape(x, y, width, height);
     }
 
-    void fireComponentEvent(final int oldWidth, int width, final int oldHeight, int height) {
+    final void fireComponentEvent(final int oldWidth, int width, final int oldHeight, int height) {
         if ((oldWidth != width) || (oldHeight != height)) {
             fireComponentEvent(ComponentEvent.COMPONENT_RESIZED);
         } else {

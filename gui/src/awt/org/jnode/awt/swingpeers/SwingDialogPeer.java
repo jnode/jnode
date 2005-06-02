@@ -24,6 +24,7 @@ package org.jnode.awt.swingpeers;
 import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.Dialog;
+import java.awt.Graphics;
 import java.awt.peer.DialogPeer;
 
 import javax.swing.JComponent;
@@ -40,7 +41,7 @@ final class SwingDialogPeer extends SwingBaseWindowPeer<Dialog, SwingDialog>
 	public SwingDialogPeer(SwingToolkit toolkit, Dialog dialog) {
         super(toolkit, dialog, new SwingDialog(dialog));
 		jComponent.setTitle(dialog.getTitle());
-		jComponent.getContentPane().setLayout(null);
+        jComponent.getContentPane().setLayout(new SwingContainerLayout(this));
 	}
 
 	/**
@@ -78,6 +79,14 @@ final class SwingDialog extends JInternalFrame implements ISwingPeer<Dialog> {
      */
     public Dialog getAWTComponent() {
         return awtComponent;
+    }
+    
+    /**
+     * @see javax.swing.JComponent#paintChildren(java.awt.Graphics)
+     */
+    protected void paintChildren(Graphics g) {
+        super.paintChildren(g);
+        SwingToolkit.paintLightWeightChildren(awtComponent, g, 0, 0);
     }
     
     /**

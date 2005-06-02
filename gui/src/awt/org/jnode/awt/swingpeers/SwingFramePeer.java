@@ -50,7 +50,7 @@ final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame> implem
         super(toolkit, awtFrame, new SwingFrame(awtFrame));
         jComponent.initialize(this);
 		SwingToolkit.copyAwtProperties(awtFrame, this.jComponent);
-        jComponent.getContentPane().setLayout(new SwingFrameLayout(this));
+        jComponent.getContentPane().setLayout(new SwingContainerLayout(this));
         jComponent.setLocation(awtFrame.getLocation());
         jComponent.setSize(awtFrame.getSize());
 		setResizable(awtFrame.isResizable());
@@ -228,6 +228,14 @@ final class SwingFrame extends JInternalFrame implements ISwingPeer<Frame> {
 
     SwingFramePeer getSwingPeer() {
         return swingPeer;
+    }
+    
+    /**
+     * @see javax.swing.JComponent#paintChildren(java.awt.Graphics)
+     */
+    protected void paintChildren(Graphics g) {
+        super.paintChildren(g);
+        SwingToolkit.paintLightWeightChildren(awtComponent, g, 0, 0);
     }
     
     /**
