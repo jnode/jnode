@@ -300,16 +300,10 @@ final class SwingFrame extends JInternalFrame implements ISwingPeer<Frame> {
         @SuppressWarnings("deprecation")
         public void reshape(int x, int y, int width, int height) {
             super.reshape(x, y, width, height);
-            //TODO fix it
-            /*
-            if (awtFrame.isVisible()) {
+            if (!swingPeer.isReshapeInProgress) {
                 Point p = awtFrame.getLocationOnScreen();
                 Insets ins = swingPeer.getInsets();
-                awtFrame.reshape(p.x + x, p.y + y, width + ins.left + ins.right, height + ins.top + ins.bottom);
-            }*/
-            if (!swingPeer.isReshapeInProgress) {
-                Insets ins = swingPeer.getInsets();
-                awtFrame.reshape(x + x, y + y, width + ins.left + ins.right, height + ins.top + ins.bottom);
+                awtFrame.reshape(p.x + x, p.y, width + ins.left + ins.right, height + ins.bottom + ins.top);
             }
         }
 
