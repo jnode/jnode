@@ -92,7 +92,7 @@ final class SwingScrollbar extends JScrollBar implements ISwingPeer<Scrollbar> {
      * @see java.awt.Component#processEvent(java.awt.AWTEvent)
      */
     protected final void processEvent(AWTEvent event) {
-        awtComponent.dispatchEvent(event);
+        awtComponent.dispatchEvent(SwingToolkit.convertEvent(event, awtComponent));
     }
     
     /**
