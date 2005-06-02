@@ -297,8 +297,26 @@ public final class SwingToolkit extends JNodeToolkit {
 	public JNodeAwtContext getAwtContext() {
 		return desktopFrame;
 	}
+    
+	/**
+     * @see org.jnode.awt.JNodeToolkit#refresh()
+     */
+    protected void refresh() {
+        log.info("Refresh");
+        final JNodeAwtContext ctx = getAwtContext();
+        if (ctx == null) {
+            log.info("Refresh: no AWT context");
+            return;
+        }
+        final Container root = ctx.getAwtRoot();
+        if (root != null) {            
+            root.repaint();
+        } else {
+            log.info("Refresh: no AWT root");
+        }
+    }
 
-	public Component getTopComponentAt(int x, int y) {
+    public Component getTopComponentAt(int x, int y) {
 		Component comp = super.getTopComponentAt(x, y);
 		SwingFramePeer.SwingFrame sfp = (SwingFramePeer.SwingFrame) SwingUtilities
 				.getAncestorOfClass(SwingFramePeer.SwingFrame.class, comp);

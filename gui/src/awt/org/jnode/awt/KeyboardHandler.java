@@ -59,11 +59,15 @@ public class KeyboardHandler implements KeyboardListener {
      */
     public void keyPressed(KeyboardEvent event) {
         final int key_code = event.getKeyCode();
-        if(event.isAltDown() &&  key_code == KeyEvent.VK_F12){
+        if (event.isAltDown() && key_code == KeyEvent.VK_F12) {
             event.consume();
             JNodeToolkit.stopGui();
-        }else{
-            postEvent(KeyEvent.KEY_PRESSED, event.getTime(), event.getModifiers(), key_code, event.getKeyChar());
+        } else if (event.isControlDown() && event.isAltDown() && key_code == KeyEvent.VK_F5) {
+                event.consume();
+                JNodeToolkit.refreshGui();
+        } else {
+            postEvent(KeyEvent.KEY_PRESSED, event.getTime(), event
+                    .getModifiers(), key_code, event.getKeyChar());
         }
     }
 

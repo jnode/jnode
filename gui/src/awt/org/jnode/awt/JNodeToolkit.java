@@ -138,6 +138,18 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 		((JNodeToolkit) tk).decRefCount(true);
 	}
 
+    public static void refreshGui() {
+        final Toolkit tk = getDefaultToolkit();
+        if (!(tk instanceof JNodeToolkit)) {
+            throw new AWTError("Toolkit is not a JNodeToolkit");
+        }
+        ((JNodeToolkit) tk).refresh();
+    }
+    
+    protected void refresh() {
+        // Override me
+    }
+
 	public static void waitUntilStopped() {
 		final Toolkit tk = getDefaultToolkit();
 		if (!(tk instanceof JNodeToolkit)) {
