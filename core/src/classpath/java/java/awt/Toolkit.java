@@ -518,7 +518,9 @@ public abstract class Toolkit
                                              default_toolkit_name);
     try
       {
-        Class cls = Class.forName(toolkit_name);
+        // @classpath-bugfix   Replace Class.forName
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        Class cls = cl.loadClass(toolkit_name);
 			Object obj = cls.newInstance();
 			if (!(obj instanceof Toolkit))
           throw new AWTError(toolkit_name + " is not a subclass of " +
@@ -537,6 +539,14 @@ public abstract class Toolkit
 		}
 	}
 
+  /**
+   * Flush a previously instantiate toolkit.
+   * @classpath-bugfix
+   */
+  protected static void clearDefaultToolkit() {
+      toolkit = null;
+  }
+  
 	/**
    * Returns an image from the specified file, which must be in a
    * recognized format.  Supported formats vary from toolkit to toolkit.
