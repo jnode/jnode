@@ -24,6 +24,7 @@
     <plugin id="org.jnode.awt.command"/>
     <plugin id="org.jnode.awt.font"/>
     <plugin id="org.jnode.awt.font.truetype"/>
+    <plugin id="org.jnode.awt.swingpeers"/>
     <plugin id="org.jnode.debug"/>
     <plugin id="org.jnode.debugger"/>
 
