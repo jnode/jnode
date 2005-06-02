@@ -248,9 +248,9 @@ public class MouseHandler implements PointerListener
 
       if (id == MouseEvent.MOUSE_CLICKED)
       {
-        log.info("MouseClicked to " + source + " at " + ex + "," + ey
-            + " (" + x + "," + y + ")(" + p.x + "," + p.y + ")("
-            + pw.x + "," + pw.y + ")(" + pwo.x + "," + pwo.y + ")");
+//        log.info("MouseClicked to " + source + " at " + ex + "," + ey
+//            + " (" + x + "," + y + ")(" + p.x + "," + p.y + ")("
+//            + pw.x + "," + pw.y + ")(" + pwo.x + "," + pwo.y + ")");
       }
 
       JNodeGenericPeer.eventQueue.postEvent(me);
