@@ -22,6 +22,7 @@
 package org.jnode.awt.swingpeers;
 
 import java.awt.AWTError;
+import java.awt.AWTEvent;
 import java.awt.AWTException;
 import java.awt.Button;
 import java.awt.Canvas;
@@ -364,4 +365,12 @@ public final class SwingToolkit extends JNodeToolkit {
 		desktopFrame.show();
         Unsafe.debug("desktop-frame shown\n");
 	}
+    
+    /**
+     * Sets the source of the event to the given component.
+     */
+    static <T extends AWTEvent> T convertEvent(T event, Component awtComponent) {
+        event.setSource(awtComponent);
+        return event;
+    }
 }

@@ -61,7 +61,7 @@ final class SwingLightweightComponent extends JComponent implements ISwingPeer<C
      * @see java.awt.Component#processEvent(java.awt.AWTEvent)
      */
     protected final void processEvent(AWTEvent event) {
-        awtComponent.dispatchEvent(event);
+        awtComponent.dispatchEvent(SwingToolkit.convertEvent(event, awtComponent));
     }
     
     /**
