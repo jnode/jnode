@@ -220,6 +220,9 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
                 processPaintEvent((PaintEvent)event);
             } break;
             default: {
+                if (event.getSource() == component) {
+                    event.setSource(jComponent);
+                }
                 ((ISwingPeer<awtT>)jComponent).processAWTEvent(event);
             } break;
         }
