@@ -23,6 +23,8 @@ package org.jnode.awt.swingpeers;
 
 import java.awt.AWTEvent;
 import java.awt.Button;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.peer.ButtonPeer;
 
 import javax.swing.JButton;
@@ -50,12 +52,27 @@ final class SwingButtonPeer extends SwingComponentPeer<Button, SwingButton> impl
 }
 
 
-final class SwingButton extends JButton implements ISwingPeer<Button> {
+final class SwingButton extends JButton implements ISwingPeer<Button>,
+        ActionListener {
     private final Button awtComponent;
 
+    /**
+     * Initialize this instance.
+     * @param awtComponent
+     */
     public SwingButton(Button awtComponent) {
         this.awtComponent = awtComponent;
+        addActionListener(this);
     }
+    
+    /**
+     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+     */
+    public void actionPerformed(ActionEvent event) {        
+        awtComponent.dispatchEvent(new ActionEvent(awtComponent,
+                ActionEvent.ACTION_PERFORMED, awtComponent.getActionCommand()));
+    }
+
     /**
      * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
      */
