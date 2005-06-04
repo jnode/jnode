@@ -18,9 +18,9 @@ abstract class SwingBaseWindowPeer<awtT extends Window, peerT extends JInternalF
         super(toolkit, window, jComponent);
     }
 
-    public void dispose() {
+    public final void dispose() {
         jComponent.dispose();
-        toolkit.onDisposeFrame();
+        toolkit.onDisposeFrame(this);
     }
 
     public void toBack() {

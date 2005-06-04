@@ -462,7 +462,7 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
             return;
         }
 
-        eventQueue.postEvent(
+        toolkit.postEvent(
                 new PaintEvent(awtFrame, PaintEvent.UPDATE, new Rectangle(x,
                         y, width, height)));
     }
@@ -576,7 +576,7 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
 
     protected final void paintAWTComponent() {
         if (component != null) {
-            eventQueue.postEvent(new PaintEvent((Component) component,
+            toolkit.postEvent(new PaintEvent((Component) component,
                     PaintEvent.PAINT, ((Component) component).getBounds()));
         }
     }

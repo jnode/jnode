@@ -233,7 +233,7 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
      */
     protected final void postPaintEvent() {
         if (component != null) {
-            eventQueue.postEvent(new PaintEvent(component, PaintEvent.PAINT,
+            toolkit.postEvent(new PaintEvent(component, PaintEvent.PAINT,
                     component.getBounds()));
         }
     }

@@ -30,6 +30,7 @@ import java.awt.AWTError;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.VMEventQueue;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Frame;
@@ -163,7 +164,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 
 	private JNodeGraphicsConfiguration config;
 
-	private final EventQueue eventQueue = new EventQueue();
+	private EventQueue _eventQueue;
 
 	private final FocusHandler focusHandler;
 
@@ -187,7 +188,6 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	public JNodeToolkit() {
 		refCount = 0;
 		this.focusHandler = new FocusHandler(this);
-		JNodeGenericPeer.enableQueue(eventQueue);
 	}
 
 	/**
@@ -324,6 +324,13 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 			if (graphics != null) {
 				graphics.close();
 			}
+            
+            // Shutdown the eventqueue
+            final EventQueue eventQueue = this._eventQueue;
+            if (eventQueue != null) {
+                this._eventQueue = null;
+                VMEventQueue.shutdown(eventQueue);
+            }
             
 			this.api = null;
 			this.graphics = null;
@@ -475,6 +482,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	/**
 	 * Private method that allows size to be set at initialization time.
 	 */
+    @SuppressWarnings("unchecked")
 	private FontPeer getFontPeer(String name, int style, int size) {
 		Map attrs = new HashMap();
 		ClasspathFontPeer.copyStyleToAttrs(style, attrs);
@@ -493,7 +501,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	 * @see java.awt.peer.ComponentPeer#getGraphicsConfiguration()
 	 * @return The configuration
 	 */
-	public GraphicsConfiguration getGraphicsConfiguration() {
+	public final GraphicsConfiguration getGraphicsConfiguration() {
 		return config;
 	}
     
@@ -614,8 +622,15 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	/**
 	 * @return The event queue
 	 */
-	protected EventQueue getSystemEventQueueImpl() {
-		return eventQueue;
+	protected final EventQueue getSystemEventQueueImpl() {
+        if (_eventQueue == null) {
+            synchronized (this) {
+                if (_eventQueue == null) {
+                    _eventQueue = new EventQueue();
+                }
+            }
+        }
+		return _eventQueue;
 	}
 
 	public Frame getTop() {
@@ -670,9 +685,10 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 
 				screenSize.width = config.getConfig().getScreenWidth();
 				screenSize.height = config.getConfig().getScreenHeight();
-				this.keyboardHandler = new KeyboardHandler();
+                final EventQueue eventQueue = getSystemEventQueueImpl();
+				this.keyboardHandler = new KeyboardHandler(eventQueue);
 				this.mouseHandler = new MouseHandler(dev.getDevice(),
-						screenSize);
+						screenSize, eventQueue);
 
 				onInitialize();
 				this.refCount = rc;

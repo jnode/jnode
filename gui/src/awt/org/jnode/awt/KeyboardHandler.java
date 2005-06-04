@@ -22,6 +22,7 @@
 package org.jnode.awt;
 
 import java.awt.Component;
+import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.util.Collection;
@@ -38,10 +39,22 @@ import org.jnode.driver.input.KeyboardListener;
  * @author Levente S\u00e1ntha
  */
 public class KeyboardHandler implements KeyboardListener {
+   
+    /** My logger */
     private static final Logger log = Logger.getLogger(KeyboardHandler.class);
+    
+    /** The queue where to post the events */
+    private final EventQueue eventQueue;
+    
+    /** The API of the actual keyboard */
     private KeyboardAPI keyboardAPI;
 
-    public KeyboardHandler() {
+    /** 
+     * Initialize this instance.
+     * @param eventQueue
+     */
+    public KeyboardHandler(EventQueue eventQueue) {
+        this.eventQueue = eventQueue;
         try {
             final Collection<Device> keyboards = DeviceUtils.getDevicesByAPI(KeyboardAPI.class);
             if (!keyboards.isEmpty()) {
@@ -93,7 +106,7 @@ public class KeyboardHandler implements KeyboardListener {
         Component source = tk.getFocusHandler().getFocusedComponent();
         if (source == null) source = tk.getTop();
         KeyEvent me = new KeyEvent(source, id, time, modifiers, keyCode, keyChar);
-        JNodeGenericPeer.eventQueue.postEvent(me);
+        eventQueue.postEvent(me);
     }
 
     /**

@@ -52,11 +52,6 @@ final class SwingDialogPeer extends SwingBaseWindowPeer<Dialog, SwingDialog>
 		jComponent.getContentPane().add(peer);
 	}
 
-	public void dispose() {
-        jComponent.dispose();
-		toolkit.onDisposeFrame();
-	}
-
     public void setResizable(boolean resizeable) {
         jComponent.setResizable(resizeable);
     }
