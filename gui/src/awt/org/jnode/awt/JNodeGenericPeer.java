@@ -21,7 +21,6 @@
  
 package org.jnode.awt;
 
-import java.awt.EventQueue;
 import java.awt.Toolkit;
 
 /**
@@ -32,20 +31,11 @@ public abstract class JNodeGenericPeer<toolkitT extends JNodeToolkit, compT> {
 	protected final toolkitT toolkit;
 	protected final compT component;
 
-	// Global event queue.
-	protected static EventQueue eventQueue;
-
 	public JNodeGenericPeer(toolkitT toolkit, compT component) {
 		this.toolkit = toolkit;
 		this.component = component;
 	}
 
-	static void enableQueue(EventQueue sq) {
-		if (eventQueue == null) {
-			eventQueue = sq;
-		}
-	}
-	
 	/**
 	 * @return
 	 */

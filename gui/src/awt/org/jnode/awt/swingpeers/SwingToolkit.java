@@ -79,11 +79,11 @@ import java.awt.peer.TextFieldPeer;
 import java.awt.peer.WindowPeer;
 
 import javax.swing.JComponent;
+import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 
 import org.jnode.awt.JNodeAwtContext;
 import org.jnode.awt.JNodeToolkit;
-import org.jnode.vm.Unsafe;
 
 /**
  * AWT toolkit implemented entirely with JFC peers, thus allowing a lightweight
@@ -93,6 +93,9 @@ import org.jnode.vm.Unsafe;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public final class SwingToolkit extends JNodeToolkit {
+
+    /** My repaint manager.  Only valid between onInitialize and onClose */
+    private SwingRepaintManager repaintManager;
 
 	public static void add(Component component, JComponent peer) {
 		final ISwingContainerPeer containerPeer = getContainerPeer(component);
@@ -137,6 +140,13 @@ public final class SwingToolkit extends JNodeToolkit {
 		}
 	}
 
+    /** 
+     * Post the given event on the system eventqueue.
+     */
+    public final void postEvent(AWTEvent event) {
+        getSystemEventQueueImpl().postEvent(event);
+    }
+    
 	/**
 	 * Paint all the lightweight children of the given container.
 	 * 
@@ -343,6 +353,13 @@ public final class SwingToolkit extends JNodeToolkit {
 	 */
 	protected void onClose() {
 		log.debug("onClose");
+        // Stop the repaint manager
+        if (repaintManager != null) {
+            repaintManager.shutdown();
+            repaintManager = null;
+        }
+        
+        // Close the desktop
 		desktopFrame.dispose();
 		desktopFrame = null;
 	}
@@ -350,7 +367,7 @@ public final class SwingToolkit extends JNodeToolkit {
 	// /////////////////////////////////////////////////////////////////////////////////////
 	// Private
 
-	final void onDisposeFrame() {
+	final void onDisposeFrame(SwingBaseWindowPeer windowPeer) {
 		// Nothing to do
 	}
 
@@ -359,11 +376,13 @@ public final class SwingToolkit extends JNodeToolkit {
 	 */
 	protected void onInitialize() {
 		log.debug("onInitialize");
-        Unsafe.debug("onInitialize\n");
+        
+        // Set the repaint manager
+        RepaintManager.setCurrentManager(repaintManager = new SwingRepaintManager());        
+
+        // Create the desktop
 		desktopFrame = new DesktopFrame(getScreenSize());
-        Unsafe.debug("desktop-frame created\n");
 		desktopFrame.show();
-        Unsafe.debug("desktop-frame shown\n");
 	}
     
     /**

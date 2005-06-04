@@ -38,6 +38,7 @@ import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JRootPane;
+import javax.swing.SwingUtilities;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -46,7 +47,11 @@ import javax.swing.JRootPane;
 final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame> implements FramePeer,
         ISwingContainerPeer {
 
-	public SwingFramePeer(SwingToolkit toolkit, JDesktopPane desktopPane, Frame awtFrame) {
+    /**
+     * Initialize this instance.
+     */
+	public SwingFramePeer(SwingToolkit toolkit, final JDesktopPane desktopPane,
+            Frame awtFrame) {
         super(toolkit, awtFrame, new SwingFrame(awtFrame));
         jComponent.initialize(this);
 		SwingToolkit.copyAwtProperties(awtFrame, this.jComponent);
@@ -65,10 +70,15 @@ final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame> implem
         jComponent.setTitle(awtFrame.getTitle());
 		//frame.setIconImage(awtFrame.getIconImage());
 		setMenuBar(awtFrame.getMenuBar());
-        desktopPane.add(jComponent);
-        desktopPane.setSelectedFrame(jComponent);
-        jComponent.toFront();
-        desktopPane.doLayout();
+        
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                desktopPane.add(jComponent);
+                desktopPane.setSelectedFrame(jComponent);
+                jComponent.toFront();
+                desktopPane.doLayout();
+            }            
+        });
 	}
 
 	/**
@@ -155,14 +165,6 @@ final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame> implem
     public Point getLocationOnScreen() {
         return jComponent.getLocation();
     }
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#dispose()
-	 */
-	public void dispose() {
-        jComponent.dispose();
-		toolkit.onDisposeFrame();
-	}
 
 	/**
 	 * @see java.awt.peer.ComponentPeer#getGraphics()

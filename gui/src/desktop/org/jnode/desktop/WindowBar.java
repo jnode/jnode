@@ -21,7 +21,6 @@
  
 package org.jnode.desktop;
 
-import java.awt.Container;
 import java.awt.GridLayout;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +29,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JInternalFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 
 import org.apache.log4j.Logger;
@@ -56,31 +56,34 @@ public class WindowBar extends JPanel {
 		add(list);
 	}
 
-	public void addFrame(JInternalFrame frame) {
+	public void addFrame(final JInternalFrame frame) {
 		log.debug("addFrame " + frame.getTitle());
         final FrameWrapper wrapper = new FrameWrapper(frame);
-        wrappers.put(frame, wrapper);
-        model.addElement(wrapper);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                wrappers.put(frame, wrapper);
+                model.addElement(wrapper);
+                repaint();
+            }            
+        });
 	}
 
-	public void removeFrame(JInternalFrame frame) {
+    public void removeFrame(final JInternalFrame frame) {
 		log.debug("removeFrame " + frame.getTitle());
         final FrameWrapper wrapper = wrappers.get(frame);
         if (wrapper != null) {
-            model.removeElement(wrapper);
-            wrappers.remove(frame);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    model.removeElement(wrapper);
+                    wrappers.remove(frame);
+                    repaint();
+                }            
+            });
         }
 	}
 
 	public void setActiveFrame(JInternalFrame frame) {
 		log.debug("setActiveFrame " + frame.getTitle());
-	}
-
-	private void forceRepaint() {
-		final Container p = getParent();
-		if (p != null) {
-			p.repaint();
-		}
 	}
     
     private static class FrameWrapper {
