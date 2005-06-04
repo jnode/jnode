@@ -23,6 +23,7 @@ final class SwingRepaintManager extends RepaintManager {
      */
     final void shutdown() {
         this.shutdown = true;
+        log.debug("shutdown");
     }
     
     /**
