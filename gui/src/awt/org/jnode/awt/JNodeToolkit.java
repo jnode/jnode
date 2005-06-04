@@ -30,7 +30,6 @@ import java.awt.AWTError;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.VMEventQueue;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Frame;
@@ -124,6 +123,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	}
 
 	public static void startGui() {
+        clearDefaultToolkit();
 		final Toolkit tk = getDefaultToolkit();
 		if (!(tk instanceof JNodeToolkit)) {
 			throw new AWTError("Toolkit is not a JNodeToolkit");
@@ -137,7 +137,6 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 			throw new AWTError("Toolkit is not a JNodeToolkit");
 		}
 		((JNodeToolkit) tk).decRefCount(true);
-        clearDefaultToolkit();
 	}
 
     public static void refreshGui() {
@@ -164,7 +163,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 
 	private JNodeGraphicsConfiguration config;
 
-	private EventQueue _eventQueue;
+	private JNodeEventQueue _eventQueue;
 
 	private final FocusHandler focusHandler;
 
@@ -325,17 +324,16 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 				graphics.close();
 			}
             
-            // Shutdown the eventqueue
-            final EventQueue eventQueue = this._eventQueue;
-            if (eventQueue != null) {
-                this._eventQueue = null;
-                VMEventQueue.shutdown(eventQueue);
-            }
+            this.api = null;
+            this.graphics = null;
+            this.keyboardHandler = null;
+            this.mouseHandler = null;
             
-			this.api = null;
-			this.graphics = null;
-			this.keyboardHandler = null;
-			this.mouseHandler = null;
+            // Shutdown the eventqueue
+            final JNodeEventQueue eventQueue = this._eventQueue;
+            if (eventQueue != null) {
+                eventQueue.shutdown();
+            }
             
             synchronized (initCloseLock) {
                 this.refCount = 0;
@@ -623,10 +621,11 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	 * @return The event queue
 	 */
 	protected final EventQueue getSystemEventQueueImpl() {
-        if (_eventQueue == null) {
+        if ((_eventQueue == null) || (!_eventQueue.isLive() && isGuiActive())) {
             synchronized (this) {
-                if (_eventQueue == null) {
-                    _eventQueue = new EventQueue();
+                if ((_eventQueue == null) || (!_eventQueue.isLive() && isGuiActive())) {
+                    log.debug("create EventQueue", new Exception("Stacktrace"));
+                    _eventQueue = new JNodeEventQueue();
                 }
             }
         }
@@ -685,6 +684,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 
 				screenSize.width = config.getConfig().getScreenWidth();
 				screenSize.height = config.getConfig().getScreenHeight();
+                
                 final EventQueue eventQueue = getSystemEventQueueImpl();
 				this.keyboardHandler = new KeyboardHandler(eventQueue);
 				this.mouseHandler = new MouseHandler(dev.getDevice(),
