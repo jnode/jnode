@@ -6,8 +6,8 @@
 
 	<property name="src.native.dir" value="${root.dir}/core/src/native" />
 	<property name="build.netboot.dir" value="${my-build.dir}/netboot" />
-	<property name="jnode.disk" value="${my-build.dir}/jnodedisk.dat" />
-	<property name="jnode.disk.pln" value="${my-build.dir}/jnodedisk.pln" />
+	<property name="jnode.disk" value="${my-build.dir}/jnodedisk${jnode.bits}.dat" />
+	<property name="jnode.disk.pln" value="${my-build.dir}/jnodedisk${jnode.bits}.pln" />
 	<property name="jnode.disk.geometry" value="64/16/63" />
 
 	<property name="grub-ver" value="grub-0.93-i386-pc" />
@@ -179,7 +179,7 @@
 	<target name="boot-disk" depends="java-image" unless="no.bootdisk">
 		<taskdef name="bootdisk" classname="org.jnode.build.BootDiskBuilder" classpathref="cp-x86" />
 
-		<property name="bootdisk.dir" value="${my-build.dir}/bootdisk" />
+		<property name="bootdisk.dir" value="${my-build.dir}/${jnode.bits}bits/bootdisk" />
 
 		<mkdir dir="${bootdisk.dir}" />
 		<mkdir dir="${bootdisk.dir}/boot/grub" />
