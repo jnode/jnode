@@ -198,17 +198,16 @@ public class AWTDemo {
 
             if (source == closeButton) {
                 dispose();
-                System.exit(0);
-            }
-
-            Window w = (Window) windows.get(source);
-            if (w.isVisible())
-                w.dispose();
-            else {
-                if (w instanceof Dialog) {
-                    w.show();
-                } else {
-                    w.setVisible(true);
+            } else {
+                Window w = (Window) windows.get(source);
+                if (w.isVisible())
+                    w.dispose();
+                else {
+                    if (w instanceof Dialog) {
+                        w.show();
+                    } else {
+                        w.setVisible(true);
+                    }
                 }
             }
         }
