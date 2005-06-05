@@ -151,7 +151,8 @@ public abstract class JTextComponent extends JComponent
 		 */
     public AccessibleStateSet getAccessibleStateSet()
     {
-			return null; // TODO
+            return new AccessibleStateSet( );
+//			return null; // TODO
     }
 
 		/**
@@ -215,7 +216,8 @@ public abstract class JTextComponent extends JComponent
 		 */
     Rectangle getRootEditorRect()
     {
-      return null;
+            return new Rectangle( );//todo fix
+//      return null;
     }
 
 		/**
@@ -225,7 +227,8 @@ public abstract class JTextComponent extends JComponent
 		 */
     public Rectangle getCharacterBounds(int value0)
     {
-			return null; // TODO
+            return new Rectangle( );
+//			return null; // TODO
     }
 
 		/**
@@ -244,7 +247,8 @@ public abstract class JTextComponent extends JComponent
 		 */
     public AttributeSet getCharacterAttribute(int value0)
     {
-			return null; // TODO
+            return new SimpleAttributeSet( );
+//			return null; // TODO
     }
 
 		/**
@@ -255,7 +259,8 @@ public abstract class JTextComponent extends JComponent
 		 */
     public String getAtIndex(int value0, int value1)
     {
-			return null; // TODO
+            return "";
+//			return null; // TODO
     }
 
 		/**
@@ -266,7 +271,8 @@ public abstract class JTextComponent extends JComponent
 		 */
     public String getAfterIndex(int value0, int value1)
     {
-			return null; // TODO
+            return "";
+//			return null; // TODO
     }
 
 		/**
@@ -277,7 +283,8 @@ public abstract class JTextComponent extends JComponent
 		 */
     public String getBeforeIndex(int value0, int value1)
     {
-			return null; // TODO
+            return "";
+//			return null; // TODO
     }
   }
 
@@ -318,22 +325,26 @@ public abstract class JTextComponent extends JComponent
     /**
      * Lets the caret blink.
      */
-    public void actionPerformed(ActionEvent ev)
-    {
-      caret.setVisible(!caret.isVisible());
+    public void actionPerformed( ActionEvent ev ) {
+        if( caret != null ) {
+            caret.setVisible( !caret.isVisible() );
+        }
     }
 
     /**
      * Updates the blink delay according to the current caret.
      */
-    public void update()
-    {
-      stop();
-      setDelay(caret.getBlinkRate());
-      if (editable)
-        start();
-      else
-        caret.setVisible(false);
+    public void update() {
+        if( caret != null ) {
+            stop();
+            setDelay( caret.getBlinkRate() );
+            if( editable ) {
+                start();
+            }
+            else {
+                caret.setVisible( false );
+            }
+        }
     }
   }
 
