@@ -169,18 +169,18 @@ final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame> implem
 	/**
 	 * @see java.awt.peer.ComponentPeer#getGraphics()
 	 */
-	public Graphics getGraphics() {
+    public Graphics getGraphics() {
         Insets ins = getInsets();
-        if (ins==null){
-            new RuntimeException( "Null insets").printStackTrace( );
-            ins=new Insets( 0,0,0,0);
+        if( ins == null ) {
+            new RuntimeException( "Null insets" ).printStackTrace();
+            ins = new Insets( 0, 0, 0, 0 );
         }
         Graphics g = jComponent.getGraphics();
-        if (g!=null){
-        g.translate(ins.left, ins.top);
+        if( g != null ) {
+            g.translate( ins.left, ins.top );
         }
-		return g;
-	}
+        return g;
+    }
 }
 
 final class SwingFrame extends JInternalFrame implements ISwingPeer<Frame> {
