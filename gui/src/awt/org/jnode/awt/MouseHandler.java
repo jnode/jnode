@@ -203,7 +203,7 @@ public class MouseHandler implements PointerListener {
                     Window.class, source);
             Point pw = new Point(-1, -1);
             Point pwo = pw;
-            if (w != null) {
+            if( w != null && w.isShowing() ) {
                 // pw = w.getLocation();
                 pwo = w.getLocationOnScreen();
             }
