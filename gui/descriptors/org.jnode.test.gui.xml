@@ -27,7 +27,12 @@
     <application name="BoxWorld"     class="org.jnode.test.gui.BoxWorld"/>      
     <application name="Tetris"       class="org.jnode.test.gui.Tetris"/>
     <application name="SwingTest"    class="org.jnode.test.gui.SwingTest"/>
+    <application name="ConsoleTest"    class="org.jnode.test.gui.ConsoleTest"/>
   </extension>
+
+    <extension point="org.jnode.security.permissions">
+        <permission class="java.lang.RuntimePermission" name="setIO"/>
+    </extension>
 
   <extension point="org.jnode.shell.aliases">
     <alias name="AWTTest"      class="org.jnode.test.gui.AWTTest"/>
