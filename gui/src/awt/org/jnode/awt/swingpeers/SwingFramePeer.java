@@ -171,8 +171,14 @@ final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame> implem
 	 */
 	public Graphics getGraphics() {
         Insets ins = getInsets();
+        if (ins==null){
+            new RuntimeException( "Null insets").printStackTrace( );
+            ins=new Insets( 0,0,0,0);
+        }
         Graphics g = jComponent.getGraphics();
+        if (g!=null){
         g.translate(ins.left, ins.top);
+        }
 		return g;
 	}
 }
@@ -311,7 +317,8 @@ final class SwingFrame extends JInternalFrame implements ISwingPeer<Frame> {
         public void reshape(int x, int y, int width, int height) {
             super.reshape(x, y, width, height);
             if (!swingPeer.isReshapeInProgress) {
-                Point p = awtFrame.getLocationOnScreen();
+                Point p=awtFrame.isShowing()?awtFrame.getLocationOnScreen():new Point( );
+//                Point p = awtFrame.getLocationOnScreen();
                 Insets ins = swingPeer.getInsets();
                 awtFrame.reshape(p.x + x, p.y, width + ins.left + ins.right, height + ins.bottom + ins.top);
             }
