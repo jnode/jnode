@@ -17,7 +17,7 @@
     <pathelement location="${jnode-core.jar}"/>
     <pathelement location="${jnode-fs.jar}"/>
     <pathelement location="${basedir}/lib/xml-apis.jar"/>
-  	<pathelement location="${classycle.jar}"/>
+    <pathelement location="${bcel-5.1.jar}"/>
     <path refid="cp"/>
   </path>
 
