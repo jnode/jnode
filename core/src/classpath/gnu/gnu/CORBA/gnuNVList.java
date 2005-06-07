@@ -74,13 +74,13 @@ public class gnuNVList
   /** {@inheritDoc} */
   public NamedValue add(int a_flags)
   {
-    return add_value(null, null, a_flags);
+    return add_value(null, new gnuAny(), a_flags);
   }
 
   /** {@inheritDoc} */
   public NamedValue add_item(String a_name, int a_flags)
   {
-    return add_value(a_name, null, a_flags);
+    return add_value(a_name, new gnuAny(), a_flags);
   }
 
   /** {@inheritDoc} */
