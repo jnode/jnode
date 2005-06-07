@@ -60,7 +60,7 @@
     <property name="beanshell.jar" value="${root.dir}/shell/lib/bsh-2.0b1.jar"/>
 
     <!-- libraries needed to check plugin dependencies -->
-    <property name="classycle.jar" value="${root.dir}/builder/lib/classycle.jar"/>
+    <property name="bcel-5.1.jar" value="${root.dir}/builder/lib/bcel-5.1.jar" />	
 
     <!-- libraries needed to check rules in source code -->
     <property name="pmd.jar" value="${root.dir}/builder/lib/pmd/pmd-3.0.jar"/>
@@ -103,7 +103,7 @@
         <pathelement location="${jnode-gui.jar}"/>
         <pathelement location="${thinlet.jar}"/>
         <pathelement location="${jnode-textui.jar}"/>
-        <pathelement location="${classycle.jar}"/>
+	    <pathelement location="${bcel-5.1.jar}"/>
         <pathelement location="${mx4j.jar}"/>
         <pathelement location="${mx4j-remote.jar}"/>
         <path refid="cp"/>
@@ -259,7 +259,9 @@ encoding-fix   Correct the file encoding of all java source files.
 			
 javadoc        Generate documentation of all java source files.
 javadoc-small  Generate documentation of the basic JNode api's.
-			
+
+check-plugins  Run tests to check plugin dependencies.
+
 clean          Remove all intermediate build results.
         </echo>
     </target>
@@ -527,42 +529,22 @@ clean          Remove all intermediate build results.
         </n2a>
     </target>
 
-    <!-- check dependencies -->
-    <taskdef name="classycleDependencyCheck"
-        classname="classycle.ant.DependencyCheckingTask"
-        classpathref="cp-jnode"/>
-
-    <target name="checkDepends">
-        <classycleDependencyCheck failOnUnwantedDependencies="true"
-            excludingClasses="*Test,*.All*Tests">
-
-            <fileset dir="${root.dir}">
-                <include name="**/*.class"/>
-                <include name="**/*.jar"/>
-            </fileset>
-	      show allResults
-	      [util] = org.jnode.test.fs_0.1.11-dev.jar
-	      [notUtil] = org.jnode.driver.* excluding [util]
-	      check [util] independentOf [notUtil]
-	      check [notUtil] independentOf [util]
-        </classycleDependencyCheck>
-    </target>
-    <!-- check dependencies V2 -->
-    <target name="checksDependV2" depends="assemble-plugins">
-        <!-- Check all plugins -->
-        <taskdef name="checksDep" classname="org.jnode.build.dependencies.DependencyChecker"
-            classpathref="cp-jnode"/>
-        <checksDep maxPluginsToProcess="3" output="${plugins.dir}/checks.txt">
-            <plugins dir="${plugins.dir}/">
-                <include name="*.jar"/>
-            </plugins>
-
-            <descriptors dir="${descriptors.dir}/">
-                <include name="*.xml"/>
-                <exclude name="*plugin-list.xml"/>
-            </descriptors>
-        </checksDep>
-    </target>
+	<!-- check plugin dependencies -->
+	<target name="check-plugins" depends="assemble-plugins">
+		<!-- Check all plugins -->
+		<taskdef name="checkDeps" classname="org.jnode.build.dependencies.BCELDependencyChecker" 
+			classpathref="cp-jnode" />
+		<checkDeps>
+			<plugins dir="${plugins.dir}/">
+				<include name="*.jar" />
+			</plugins>
+			
+			<descriptors dir="${descriptors.dir}/">
+				<include name="*.xml" />
+				<exclude name="*plugin-list.xml" />
+			</descriptors>
+		</checkDeps>
+	</target>
 
     <!-- Define the task that check the rules -->
     <taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask"
