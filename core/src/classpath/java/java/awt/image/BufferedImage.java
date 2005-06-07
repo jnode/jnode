@@ -448,10 +448,11 @@ public class BufferedImage extends Image
   {
     return new ImageProducer() {
         
-        HashSet consumers = new HashSet();
+	Vector consumers = new Vector();
 
         public void addConsumer(ImageConsumer ic)
         {
+	  if(!consumers.contains(ic))
           consumers.add(ic);
         }
 
@@ -480,10 +481,9 @@ public class BufferedImage extends Image
 
           consumers.add(ic);
 
-          Iterator i = consumers.iterator();
-          while(i.hasNext())
+	  for(int i=0;i<consumers.size();i++)
             {
-              ImageConsumer c = (ImageConsumer) i.next();
+              ImageConsumer c = (ImageConsumer) consumers.elementAt(i);
               c.setHints(ImageConsumer.SINGLEPASS);
               c.setDimensions(getWidth(), getHeight());
               c.setPixels(x, y, width, height, model, pixels, offset, stride);

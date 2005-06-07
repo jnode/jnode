@@ -73,6 +73,7 @@ import java.util.Locale;
 
 import javax.accessibility.Accessible;
 import javax.accessibility.AccessibleContext;
+import javax.accessibility.AccessibleExtendedComponent;
 import javax.accessibility.AccessibleKeyBinding;
 import javax.accessibility.AccessibleRole;
 import javax.accessibility.AccessibleStateSet;
@@ -104,6 +105,7 @@ public abstract class JComponent extends Container implements Serializable
   
   public abstract class AccessibleJComponent 
     extends AccessibleAWTContainer
+    implements AccessibleExtendedComponent
   {
     protected class AccessibleFocusHandler 
       implements FocusListener
@@ -1786,6 +1788,8 @@ public abstract class JComponent extends Container implements Serializable
    */
   protected void processKeyEvent(KeyEvent e)
   {
+    // let the AWT event processing send KeyEvents to registered listeners
+    super.processKeyEvent(e);
     processComponentKeyEvent(e);
 
     // FIXME: this needs to be elaborated significantly, to do all the
