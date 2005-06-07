@@ -147,11 +147,13 @@ public abstract class RGBImageFilter extends ImageFilter
     public void filterRGBPixels(int x, int y, int w, int h, int[] pixels,
 				int offset, int scansize)
     {
-      for (int xp = x; xp < (x + w); xp++)
-	for (int yp = y; yp < (y + h); yp++)
+      for (int yp = 0; yp < h; yp++)
 	    {
-	    pixels[offset] = filterRGB(xp, yp, pixels[offset]);
-	    offset++;
+	  for (int xp = 0; xp < w; xp++)
+	    {
+	      pixels[offset + xp] = filterRGB(xp + x, yp + y, pixels[offset + xp]);
+	    }
+	  offset += scansize;
 		}
 	}
 

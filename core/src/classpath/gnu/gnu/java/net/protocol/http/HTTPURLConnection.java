@@ -233,6 +233,8 @@ public class HTTPURLConnection
           {
             // Follow redirect
             String location = response.getHeader("Location");
+	    if (location != null)
+	      {
             String connectionUri = connection.getURI();
             int start = connectionUri.length();
             if (location.startsWith(connectionUri) &&
@@ -300,6 +302,7 @@ public class HTTPURLConnection
 		  }
 		retry = true;
 	      }
+          }
           }
         else
           {

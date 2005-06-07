@@ -858,8 +858,10 @@ public abstract class Component
 	 */
   public void enableInputMethods(boolean enable)
   {
-		// XXX Implement.
-		throw new Error("not implemented");
+    if (enable)
+      eventMask |= AWTEvent.INPUT_ENABLED_EVENT_MASK;
+    else
+      eventMask &= ~AWTEvent.INPUT_ENABLED_EVENT_MASK;
 	}
 
 	/**
@@ -1003,6 +1005,10 @@ public abstract class Component
 	 */
   public void setBackground(Color c)
   {
+    // return if the background is already set to that color.
+    if (background != null && c != null)
+      if (background.equals(c))
+	return;
     // If c is null, inherit from closest ancestor whose bg is set.
     if (c == null && parent != null)
       c = parent.getBackground();

@@ -59,6 +59,7 @@ import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.plaf.ActionMapUIResource;
 import javax.swing.plaf.TextUI;
 import javax.swing.plaf.UIResource;
 import javax.swing.text.BadLocationException;
@@ -351,9 +352,21 @@ public abstract class BasicTextUI extends TextUI
       doc.addDocumentListener(documentHandler);
   }
 
+  /**
+   * Returns the name of the keymap for this type of TextUI.
+   * 
+   * This is implemented so that the classname of this TextUI
+   * without the package prefix is returned. This way subclasses
+   * don't have to override this method.
+   * 
+   * @return the name of the keymap for this TextUI
+   */
   protected String getKeymapName()
   {
-    return "BasicTextUI";
+    String fullClassName = getClass().getName();
+    int index = fullClassName.lastIndexOf('.');
+    String className = fullClassName.substring(index + 1);
+    return className;
   }
 
   protected Keymap createKeymap()
@@ -416,7 +429,7 @@ public abstract class BasicTextUI extends TextUI
   ActionMap createActionMap()
   {
     Action[] actions = textComponent.getActions();
-    ActionMap am = new ActionMap();
+    ActionMap am = new ActionMapUIResource();
     for (int i = 0; i < actions.length; ++i)
       {
         String name = (String) actions[i].getValue(Action.NAME);

@@ -80,6 +80,8 @@ public class LayoutFocusTraversalPolicy
     }
   }
   
+  private static final long serialVersionUID = 4312146927238881442L;
+  
   public LayoutFocusTraversalPolicy()
   {
     super(new LayoutComparator());

@@ -133,6 +133,7 @@ public class ActionMap
 	 */
   public void setParent(ActionMap parentMap)
   {
+    if (parentMap != this)
 		parent = parentMap;
   }
 
