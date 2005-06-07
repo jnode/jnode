@@ -46,6 +46,5 @@ public class ThinTest extends Thinlet {
         f.add(test, BorderLayout.CENTER);
         f.setVisible(true);
         test.requestFocus();
-        Thread.sleep(30000);
 	}
 }
