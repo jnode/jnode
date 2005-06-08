@@ -158,9 +158,18 @@ public class EEPRO100Buffer implements EEPRO100Constants {
 		int s2;
 
 		status = regs.getReg16(SCBStatus);
+		/* Acknowledge all of the current interrupt sources ASAP. */
 		regs.setReg16(SCBStatus, status & IntrAllNormal);
 
+		log.debug ("transmitting status = "+ NumberUtils.hex(status) + ", cmd=" + NumberUtils.hex(regs.getReg16(SCBStatus))+ "\n");
+		
+		txFD.setStatus(0);
+		txFD.setCommand(CmdSuspend | CmdTx | CmdTxFlex);
+		txFD.setLink(txFD.getFirstDPDAddress().toInt());
+		txFD.setCount(0x02208000);
+		log.debug("Tx FD :\n" + txFD.toString());
 		txFD.initialize(buf);
+		log.debug("Tx FD 2:\n" + txFD.toString());
 
 		regs.setReg16(SCBPointer, txFD.getBufferAddress());
 		regs.setReg16(SCBCmd, SCBMaskAll | CUStart);
