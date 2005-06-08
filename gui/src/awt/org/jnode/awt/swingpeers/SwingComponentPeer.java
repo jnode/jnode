@@ -21,6 +21,10 @@
  
 package org.jnode.awt.swingpeers;
 
+import org.apache.log4j.Logger;
+import org.jnode.awt.JNodeGenericPeer;
+
+import javax.swing.JComponent;
 import java.awt.AWTEvent;
 import java.awt.BufferCapabilities;
 import java.awt.Color;
@@ -42,11 +46,6 @@ import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
 import java.awt.image.VolatileImage;
 import java.awt.peer.ComponentPeer;
-
-import javax.swing.JComponent;
-
-import org.apache.log4j.Logger;
-import org.jnode.awt.JNodeGenericPeer;
 
 /**
  * Base class for virtual component peers. Satisfies the requirements for AWT
@@ -383,7 +382,7 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
         postPaintEvent();
     }
 
-    public final void setVisible(boolean b) {
+    public void setVisible(boolean b) {
         jComponent.setVisible(b);
     }
 
