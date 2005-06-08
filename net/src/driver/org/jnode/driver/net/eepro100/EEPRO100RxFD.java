@@ -22,8 +22,10 @@
 package org.jnode.driver.net.eepro100;
 
 import org.jnode.net.SocketBuffer;
+import org.jnode.net.ethernet.EthernetConstants;
 import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
+import org.vmmagic.unboxed.Address;
 
 /**
  * This class provide access to Receive Descriptor.
@@ -35,21 +37,67 @@ public class EEPRO100RxFD {
 
     private int RxFDSize = 16;
     private int DataBufferSize = 1518;
+	private static final int FRAME_SIZE = EthernetConstants.ETH_FRAME_LEN;
 
     private int bufferAddress;
     private byte[] data;
     private MemoryResource mem;
+	
+	/** Offset within mem of first UDP */
+	private final int firstUPDOffset;
+	/** Offset within mem of first ethernet frame */
+	private final int firstFrameOffset;
+	/** 32-bit address first UDP */
+	private final Address firstUPDAddress;
+	/** 32-bit address of first ethernet frame */
+	private final Address firstFrameAddress;
+	
+	private int nrFrames = 1;
 
     /**
      *  
      */
     public EEPRO100RxFD(ResourceManager rm) {
-        final int size = (RxFDSize + DataBufferSize) + 16;
+        final int size = (nrFrames * (RxFDSize + FRAME_SIZE)) + 16;
 		this.data = new byte[size];
 		this.mem = rm.asMemoryResource(data);
+		
+		final Address memAddr = mem.getAddress();
+		int addr = memAddr.toInt();
+		int offset = 0;
+		// Align on 16-byte boundary
+		while ((addr & 15) != 0) {
+			addr++;
+			offset++;
+		}
+		
+		this.firstUPDOffset = offset;
+		this.firstUPDAddress = memAddr.add(firstUPDOffset);
+		this.firstFrameOffset = firstUPDOffset + (nrFrames * RxFDSize);
+		this.firstFrameAddress = memAddr.add(firstFrameOffset);
+		
 		this.bufferAddress = mem.getAddress().toInt();
 		setRxBufferAddress(0xffffffff);
     }
+	
+	public void initialize() {
+		// Setup each UPD
+		for (int i = 0; i < nrFrames; i++) {
+			final int updOffset = firstUPDOffset + (i * RxFDSize);
+			// Set next UPD ptr
+			if (i+1 < nrFrames) {
+				mem.setInt(updOffset+0, firstUPDAddress.toInt() + ((i+1) * RxFDSize));
+			} else {
+				mem.setInt(updOffset+0, firstUPDAddress.toInt());
+			}
+			// Set pkt status
+			mem.setInt(updOffset+4, 0);
+			// Set fragment address
+			mem.setInt(updOffset+8, firstFrameAddress.toInt() + (i * FRAME_SIZE));
+			// Set fragment size
+			mem.setInt(updOffset+12, FRAME_SIZE | (1<<31));
+		}
+	}
 
     public final int getStatus() {
         return mem.getInt(0);
