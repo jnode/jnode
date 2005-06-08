@@ -25,6 +25,7 @@ import org.jnode.net.SocketBuffer;
 import org.jnode.net.ethernet.EthernetConstants;
 import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
+import org.jnode.util.NumberUtils;
 import org.vmmagic.unboxed.Address;
 
 /**
@@ -143,5 +144,21 @@ public class EEPRO100TxFD {
 	public int getFirstDPDOffset() {
 		return firstDPDOffset;
 	}
-
+	
+	public String toString(){
+		StringBuffer str = new StringBuffer();
+		str.append("Status  : ");
+		str.append(NumberUtils.hex(this.getStatus()));
+		str.append("\n");
+		str.append("Command : ");
+		str.append(NumberUtils.hex(this.getCommand()));
+		str.append("\n");
+		str.append("Link    : ");
+		str.append(NumberUtils.hex(this.getLink()));
+		str.append("\n");
+		str.append("Count   : ");
+		str.append(NumberUtils.hex(this.getCount()));
+		str.append("\n");
+		return str.toString();
+	}
 }

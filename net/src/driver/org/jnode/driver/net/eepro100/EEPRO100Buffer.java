@@ -121,6 +121,7 @@ public class EEPRO100Buffer implements EEPRO100Constants {
 		// ---------------------------------
 		rxPacket.setCount(0);
 		rxPacket.setSize(1528);
+		rxPacket.initialize();
 		// Start the receiver.
 		regs.setReg32(SCBPointer, rxPacket.getBufferAddress());
 		regs.setReg16(SCBCmd, SCBMaskAll | RxStart);
@@ -171,7 +172,8 @@ public class EEPRO100Buffer implements EEPRO100Constants {
 		while((System.currentTimeMillis() <= start + 10) && (txFD.getStatus() != 0)){
 		}
 		s2 = regs.getReg16(SCBStatus);
-
+		log.debug("Tx FD :");
+		log.debug(txFD.toString());
 		log.debug("s1=" + NumberUtils.hex(s1) + " s2=" + NumberUtils.hex(s2));
 
 	}
@@ -180,6 +182,7 @@ public class EEPRO100Buffer implements EEPRO100Constants {
 	 * @param driver
 	 */
 	public void poll(EEPRO100Driver driver) throws NetworkException {
+		log.debug("*** RX packet status : " + rxPacket.getStatus());
 		if (rxPacket.getStatus() != 0) {
 			// Got a packet, restart the receiver
 			rxPacket.setStatus(0);
