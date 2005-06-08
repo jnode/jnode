@@ -21,6 +21,7 @@
  
 package org.jnode.awt.swingpeers;
 
+import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import java.awt.Menu;
 import java.awt.MenuBar;
@@ -36,10 +37,22 @@ final class SwingMenuBarPeer extends SwingMenuComponentPeer<MenuBar, JMenuBar>
 
     public SwingMenuBarPeer(SwingToolkit toolkit, MenuBar menuBar) {
         super(toolkit, menuBar, new JMenuBar());
+        int mc = menuBar.getMenuCount();
+        for(int i = 0; i < mc; i++){
+            try{
+                Menu m = menuBar.getMenu(i);
+                JMenu jm = new JMenu(m.getLabel());
+                jComponent.add(jm);
+            }catch(Exception e){
+                System.out.println("menu count: " + mc);
+                System.out.println("menu index: " + i);
+                e.printStackTrace();
+            }
+        }
     }
 
     public void delMenu(int index) {
-        ((JMenuBar)jComponent).remove(index);
+        jComponent.remove(index);
     }
 
     public void addHelpMenu(Menu m) {

@@ -21,6 +21,12 @@
  
 package org.jnode.awt.swingpeers;
 
+import javax.swing.JComponent;
+import javax.swing.JDesktopPane;
+import javax.swing.JInternalFrame;
+import javax.swing.JRootPane;
+import javax.swing.SwingUtilities;
+import javax.swing.event.InternalFrameEvent;
 import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.Container;
@@ -31,14 +37,10 @@ import java.awt.Insets;
 import java.awt.MenuBar;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.awt.peer.FramePeer;
 import java.beans.PropertyVetoException;
-
-import javax.swing.JComponent;
-import javax.swing.JDesktopPane;
-import javax.swing.JInternalFrame;
-import javax.swing.JRootPane;
-import javax.swing.SwingUtilities;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -69,7 +71,8 @@ final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame> implem
 		setState(awtFrame.getState());
         jComponent.setTitle(awtFrame.getTitle());
 		//frame.setIconImage(awtFrame.getIconImage());
-		setMenuBar(awtFrame.getMenuBar());
+        MenuBar mb = awtFrame.getMenuBar();
+        if(mb != null) setMenuBar(mb);
         
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -120,6 +123,11 @@ final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame> implem
 	 */
 	public void setState(int state) {
 	}
+
+   public void setVisible(boolean b){
+       super.setVisible(b);
+       toolkit.getAwtContext().getDesktop().repaint();
+   }
 
 	/**
 	 * @see java.awt.peer.FramePeer#setTitle(java.lang.String)
@@ -183,12 +191,13 @@ final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame> implem
     }
 }
 
-final class SwingFrame extends JInternalFrame implements ISwingPeer<Frame> {
+final class SwingFrame extends JInternalFrame implements ISwingPeer<Frame>, WindowListener {
     private final Frame awtComponent;
     private SwingFramePeer swingPeer;
     
     public SwingFrame(Frame awtFrame) {
         this.awtComponent = awtFrame;
+        awtFrame.addWindowListener(this);
     }
 
     /**
@@ -332,6 +341,43 @@ final class SwingFrame extends JInternalFrame implements ISwingPeer<Frame> {
             final Insets insets = swingPeer.getInsets();
             SwingToolkit.paintLightWeightChildren(awtFrame, g, insets.left, insets.top);
         }
+    }
+
+    /* WindowListener implementation */
+
+    public void windowOpened(WindowEvent e) {
+        dispatchEvent(new InternalFrameEvent(this, InternalFrameEvent.INTERNAL_FRAME_OPENED));
+        swingPeer.getToolkitImpl().getAwtContext().getDesktop().repaint();
+    }
+
+    public void windowClosing(WindowEvent e) {
+        dispatchEvent(new InternalFrameEvent(this, InternalFrameEvent.INTERNAL_FRAME_CLOSING));
+        swingPeer.getToolkitImpl().getAwtContext().getDesktop().repaint();
+    }
+
+    public void windowClosed(WindowEvent e) {
+        dispatchEvent(new InternalFrameEvent(this, InternalFrameEvent.INTERNAL_FRAME_CLOSED));
+        swingPeer.getToolkitImpl().getAwtContext().getDesktop().repaint();
+    }
+
+    public void windowIconified(WindowEvent e) {
+        dispatchEvent(new InternalFrameEvent(this, InternalFrameEvent.INTERNAL_FRAME_ICONIFIED));
+        swingPeer.getToolkitImpl().getAwtContext().getDesktop().repaint();
+    }
+
+    public void windowDeiconified(WindowEvent e) {
+        dispatchEvent(new InternalFrameEvent(this, InternalFrameEvent.INTERNAL_FRAME_DEICONIFIED));
+        swingPeer.getToolkitImpl().getAwtContext().getDesktop().repaint();
+    }
+
+    public void windowActivated(WindowEvent e) {
+        dispatchEvent(new InternalFrameEvent(this, InternalFrameEvent.INTERNAL_FRAME_ACTIVATED));
+        swingPeer.getToolkitImpl().getAwtContext().getDesktop().repaint();
+    }
+
+    public void windowDeactivated(WindowEvent e) {
+        dispatchEvent(new InternalFrameEvent(this, InternalFrameEvent.INTERNAL_FRAME_DEACTIVATED));
+        swingPeer.getToolkitImpl().getAwtContext().getDesktop().repaint();
     }
 }
 
