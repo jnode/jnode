@@ -23,11 +23,8 @@ package org.jnode.awt.swingpeers;
 
 import java.awt.Menu;
 import java.awt.MenuItem;
-import java.awt.event.ActionEvent;
 import java.awt.peer.MenuPeer;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.JMenu;
 
 /**
@@ -39,16 +36,17 @@ final class SwingMenuPeer extends SwingBaseMenuPeer<Menu, JMenu> implements Menu
 
     public SwingMenuPeer(SwingToolkit toolkit, Menu menu) {
         super(toolkit, menu, new JMenu());
+        int item_count = menu.getItemCount();
+        for(int i = 0; i < item_count; i++){
+            MenuItem menu_item = menu.getItem(i);
+            menu_item.addNotify();
+            jComponent.add(((SwingMenuComponentPeer)menu_item.getPeer()).jComponent);
+        }
     }
 
     public void addItem(MenuItem item) {
-        Action action = new AbstractAction(){
-            public void actionPerformed(ActionEvent e) {
-                //TODO implement it
-            }
-        };
-        action.putValue(Action.NAME, item.getLabel());
-        jComponent.add(action);
+        item.addNotify();
+        jComponent.add(((SwingMenuItemPeer)item.getPeer()).jComponent);
     }
 
     public void delItem(int index) {

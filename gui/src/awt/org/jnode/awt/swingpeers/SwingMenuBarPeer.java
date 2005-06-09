@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.awt.swingpeers;
 
 import javax.swing.JMenu;
@@ -29,6 +29,7 @@ import java.awt.peer.MenuBarPeer;
 
 /**
  * AWT menu bar peer implemented as a {@link javax.swing.JMenuBar}.
+ *
  * @author Levente S\u00e1ntha
  */
 
@@ -38,16 +39,16 @@ final class SwingMenuBarPeer extends SwingMenuComponentPeer<MenuBar, JMenuBar>
     public SwingMenuBarPeer(SwingToolkit toolkit, MenuBar menuBar) {
         super(toolkit, menuBar, new JMenuBar());
         int mc = menuBar.getMenuCount();
-        for(int i = 0; i < mc; i++){
-            try{
-                Menu m = menuBar.getMenu(i);
-                JMenu jm = new JMenu(m.getLabel());
-                jComponent.add(jm);
-            }catch(Exception e){
-                System.out.println("menu count: " + mc);
-                System.out.println("menu index: " + i);
-                e.printStackTrace();
-            }
+        Menu help_menu = menuBar.getHelpMenu();
+        if (help_menu != null) {
+            mc--;
+            help_menu.addNotify();
+            jComponent.setHelpMenu(((SwingMenuPeer) help_menu.getPeer()).jComponent);
+        }
+        for (int i = 0; i < mc; i++) {
+            Menu menu = menuBar.getMenu(i);
+            menu.addNotify();
+            jComponent.add(((SwingMenuPeer) menu.getPeer()).jComponent);
         }
     }
 
@@ -55,7 +56,8 @@ final class SwingMenuBarPeer extends SwingMenuComponentPeer<MenuBar, JMenuBar>
         jComponent.remove(index);
     }
 
-    public void addHelpMenu(Menu m) {
-        //TODO implement it
+    public void addHelpMenu(Menu helpMenu) {
+        helpMenu.addNotify();
+        jComponent.add(((SwingMenuPeer) helpMenu.getPeer()).jComponent);
     }
 }

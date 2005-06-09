@@ -3,6 +3,9 @@ package org.jnode.test.gui;
 import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.Button;
+import java.awt.MenuBar;
+import java.awt.Menu;
+import java.awt.MenuItem;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -28,28 +31,61 @@ public class AWTFrameTest {
                 f2.setVisible(true);
             }
         });
-        f.add(show);
+        //f.add(show);
         Button hide = new Button("hide");
         hide.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 f2.setVisible(false);
             }
         });
-        f.add(hide);
+        //f.add(hide);
         Button back = new Button("back");
         back.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 f2.toBack();
             }
         });
-        f.add(back);
+        //f.add(back);
         Button front = new Button("front");
         front.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 f2.toFront();
             }
         });
-        f.add(front);
+        //f.add(front);
+
+        MenuBar mb = new MenuBar();
+        Menu window = new Menu("Window");
+        mb.add(window);
+        MenuItem show_mi = new MenuItem("show");
+        show_mi.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                f2.setVisible(true);
+            }
+        });
+        window.add(show_mi);
+        MenuItem hide_mi = new MenuItem("hide");
+        hide_mi.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                f2.setVisible(false);
+            }
+        });
+        window.add(hide_mi);
+        MenuItem back_mi = new MenuItem("back");
+        back_mi.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                f2.toBack();
+            }
+        });
+        window.add(back_mi);
+        MenuItem front_mi = new MenuItem("front");
+        front_mi.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                f2.toFront();
+            }
+        });
+        window.add(front_mi);
+        f.setMenuBar(mb);
         f.validate();
         f.setVisible(true);
     }
