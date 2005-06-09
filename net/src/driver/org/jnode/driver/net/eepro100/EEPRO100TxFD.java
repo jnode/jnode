@@ -75,7 +75,6 @@ public class EEPRO100TxFD {
 			throw new IllegalArgumentException(
 					"Length must be <= ETH_FRAME_LEN");
 		}
-
 		src.get(data, firstDPDOffset, 0, len);
 	}
 
