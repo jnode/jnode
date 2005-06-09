@@ -38,6 +38,9 @@ exception statement from your version. */
 
 package org.omg.CORBA;
 
+import org.omg.CORBA.portable.IDLEntity;
+
+import java.io.Serializable;
 
 /**
  * This class indicates the kind of the definition, stored in the interface
@@ -46,39 +49,45 @@ package org.omg.CORBA;
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
 public class DefinitionKind
+  implements IDLEntity, Serializable
 {
+  /**
+   * Use v1.4 serialVersionUID for interoperability.
+   */
+  private static final long serialVersionUID = -8601167576704143376L;
+
   /**
    * Indicates that the current definition defines has no definition kind.
    */
-  public static int _dk_none = 0;
+  public static final int _dk_none = 0;
 
   /**
    * This is a "wildcard '*'", used in cases where any definition kind
    * is appropriate .
    */
-  public static int _dk_all = 1;
+  public static final int _dk_all = 1;
 
   /**
    * Indicates that the current definition defines an attribute.
    */
-  public static int _dk_Attribute = 2;
+  public static final int _dk_Attribute = 2;
 
   /**
    * Indicates that the current definition defines a constant.
    */
-  public static int _dk_Constant = 3;
+  public static final int _dk_Constant = 3;
 
   /**
    * Indicates that the current definition defines an exception.
    */
-  public static int _dk_Exception = 4;
+  public static final int _dk_Exception = 4;
 
   /**
    * Indicates that the current definition defines an interface.
    * The interface definition can contain constants, types,
    * exceptions, operations, and attributes.
    */
-  public static int _dk_Interface = 5;
+  public static final int _dk_Interface = 5;
 
   /**
    * Indicates that the current definition defines a Module.
@@ -86,13 +95,13 @@ public class DefinitionKind
    * interface, component, home, value or event type definitions.
    * The module can also enclose other (nested) modules.
    */
-  public static int _dk_Module = 6;
+  public static final int _dk_Module = 6;
 
   /**
    * Indicates that the current definition defines an operation, including
    * the lists of parameters and exceptions raised by this operation.
    */
-  public static int _dk_Operation = 7;
+  public static final int _dk_Operation = 7;
 
   /**
    * Indicates that the current definition defines a named type that is not
@@ -100,122 +109,122 @@ public class DefinitionKind
    * a definition of component, home and event, but these three kinds are
    * not listed in this class.
    */
-  public static int _dk_Typedef = 8;
+  public static final int _dk_Typedef = 8;
 
   /**
    * Indicates that the current definition defines an alias.
    */
-  public static int _dk_Alias = 9;
+  public static final int _dk_Alias = 9;
 
   /**
    * Indicates that the current definition defines a structure.
    */
-  public static int _dk_Struct = 10;
+  public static final int _dk_Struct = 10;
 
   /**
    * Indicates that the current definition defines a union.
    */
-  public static int _dk_Union = 11;
+  public static final int _dk_Union = 11;
 
   /**
    * Indicates that the current definition defines an enumeration.
    */
-  public static int _dk_Enum = 12;
+  public static final int _dk_Enum = 12;
 
   /**
    * Indicates that the current definition defines a primitive type.
    */
-  public static int _dk_Primitive = 13;
+  public static final int _dk_Primitive = 13;
 
   /**
    * Indicates that the current definition defines a string.
    */
-  public static int _dk_String = 14;
+  public static final int _dk_String = 14;
 
   /**
    * Indicates that the current definition defines a sequence.
    */
-  public static int _dk_Sequence = 15;
+  public static final int _dk_Sequence = 15;
 
   /**
    * Indicates that the current definition defines an array.
    */
-  public static int _dk_Array = 16;
+  public static final int _dk_Array = 16;
 
   /**
    * Indicates that the current definition defines an another interface
    * repository.
    */
-  public static int _dk_Repository = 17;
+  public static final int _dk_Repository = 17;
 
   /**
    * Indicates that the current definition defines a wide (usually 16-bit
    * per character) string.
    */
-  public static int _dk_Wstring = 18;
+  public static final int _dk_Wstring = 18;
 
   /**
    * Indicates that the current definition defines a CORBA <code>fixed</code>.
    */
-  public static int _dk_Fixed = 19;
+  public static final int _dk_Fixed = 19;
 
   /**
    * Indicates that the current definition defines a value.
    */
-  public static int _dk_Value = 20;
+  public static final int _dk_Value = 20;
 
   /**
    * Indicates that the current definition defines a value box.
    */
-  public static int _dk_ValueBox = 21;
+  public static final int _dk_ValueBox = 21;
 
   /**
    * Indicates that the current definition defines value member.
    */
-  public static int _dk_ValueMember = 22;
+  public static final int _dk_ValueMember = 22;
 
   /**
    * Indicates that the current definition defines a Native.
    */
-  public static int _dk_Native = 23;
+  public static final int _dk_Native = 23;
 
   /**
    * Indicates that the current definition defines an abstract interface.
    */
-  public static int _dk_AbstractInterface = 24;
+  public static final int _dk_AbstractInterface = 24;
 
   /**
    * Indicates that the current definition defines has no definition kind.
    */
-  public static DefinitionKind dk_none = new DefinitionKind(_dk_none);
+  public static final DefinitionKind dk_none = new DefinitionKind(_dk_none);
 
   /**
    * This is a "wildcard '*'", used in cases where any definition kind
    * is appropriate .
    */
-  public static DefinitionKind dk_all = new DefinitionKind(_dk_all);
+  public static final DefinitionKind dk_all = new DefinitionKind(_dk_all);
 
   /**
    * Indicates that the current definition defines an attribute.
    */
-  public static DefinitionKind dk_Attribute = new DefinitionKind(_dk_Attribute);
+  public static final DefinitionKind dk_Attribute = new DefinitionKind(_dk_Attribute);
 
   /**
    * Indicates that the current definition defines a constant.
    */
-  public static DefinitionKind dk_Constant = new DefinitionKind(_dk_Constant);
+  public static final DefinitionKind dk_Constant = new DefinitionKind(_dk_Constant);
 
   /**
    * Indicates that the current definition defines an exception.
    */
-  public static DefinitionKind dk_Exception = new DefinitionKind(_dk_Exception);
+  public static final DefinitionKind dk_Exception = new DefinitionKind(_dk_Exception);
 
   /**
    * Indicates that the current definition defines an interface.
    * The interface definition can contain constants, types,
    * exceptions, operations, and attributes.
    */
-  public static DefinitionKind dk_Interface = new DefinitionKind(_dk_Interface);
+  public static final DefinitionKind dk_Interface = new DefinitionKind(_dk_Interface);
 
   /**
    * Indicates that the current definition defines a Module.
@@ -223,13 +232,13 @@ public class DefinitionKind
    * interface, component, home, value or event type definitions.
    * The module can also enclose other (nested) modules.
    */
-  public static DefinitionKind dk_Module = new DefinitionKind(_dk_Module);
+  public static final DefinitionKind dk_Module = new DefinitionKind(_dk_Module);
 
   /**
    * Indicates that the current definition defines an operation, including
    * the lists of parameters and exceptions raised by this operation.
    */
-  public static DefinitionKind dk_Operation = new DefinitionKind(_dk_Operation);
+  public static final DefinitionKind dk_Operation = new DefinitionKind(_dk_Operation);
 
   /**
    * Indicates that the current definition defines a named type that is not
@@ -237,91 +246,91 @@ public class DefinitionKind
    * a definition of component, home and event, but these three kinds are
    * not listed in this class.
    */
-  public static DefinitionKind dk_Typedef = new DefinitionKind(_dk_Typedef);
+  public static final DefinitionKind dk_Typedef = new DefinitionKind(_dk_Typedef);
 
   /**
    * Indicates that the current definition defines an alias.
    */
-  public static DefinitionKind dk_Alias = new DefinitionKind(_dk_Alias);
+  public static final DefinitionKind dk_Alias = new DefinitionKind(_dk_Alias);
 
   /**
    * Indicates that the current definition defines a structure.
    */
-  public static DefinitionKind dk_Struct = new DefinitionKind(_dk_Struct);
+  public static final DefinitionKind dk_Struct = new DefinitionKind(_dk_Struct);
 
   /**
    * Indicates that the current definition defines a union.
    */
-  public static DefinitionKind dk_Union = new DefinitionKind(_dk_Union);
+  public static final DefinitionKind dk_Union = new DefinitionKind(_dk_Union);
 
   /**
    * Indicates that the current definition defines an enumeration.
    */
-  public static DefinitionKind dk_Enum = new DefinitionKind(_dk_Enum);
+  public static final DefinitionKind dk_Enum = new DefinitionKind(_dk_Enum);
 
   /**
    * Indicates that the current definition defines a primitive type.
    */
-  public static DefinitionKind dk_Primitive = new DefinitionKind(_dk_Primitive);
+  public static final DefinitionKind dk_Primitive = new DefinitionKind(_dk_Primitive);
 
   /**
    * Indicates that the current definition defines a string.
    */
-  public static DefinitionKind dk_String = new DefinitionKind(_dk_String);
+  public static final DefinitionKind dk_String = new DefinitionKind(_dk_String);
 
   /**
    * Indicates that the current definition defines a sequence.
    */
-  public static DefinitionKind dk_Sequence = new DefinitionKind(_dk_Sequence);
+  public static final DefinitionKind dk_Sequence = new DefinitionKind(_dk_Sequence);
 
   /**
    * Indicates that the current definition defines an array.
    */
-  public static DefinitionKind dk_Array = new DefinitionKind(_dk_Array);
+  public static final DefinitionKind dk_Array = new DefinitionKind(_dk_Array);
 
   /**
    * Indicates that the current definition defines an another interface
    * repository.
    */
-  public static DefinitionKind dk_Repository =
+  public static final DefinitionKind dk_Repository =
     new DefinitionKind(_dk_Repository);
 
   /**
    * Indicates that the current definition defines a wide (usually 16-bit
    * per character) string.
    */
-  public static DefinitionKind dk_Wstring = new DefinitionKind(_dk_Wstring);
+  public static final DefinitionKind dk_Wstring = new DefinitionKind(_dk_Wstring);
 
   /**
    * Indicates that the current definition defines a CORBA <code>fixed</code>.
    */
-  public static DefinitionKind dk_Fixed = new DefinitionKind(_dk_Fixed);
+  public static final DefinitionKind dk_Fixed = new DefinitionKind(_dk_Fixed);
 
   /**
    * Indicates that the current definition defines a value.
    */
-  public static DefinitionKind dk_Value = new DefinitionKind(_dk_Value);
+  public static final DefinitionKind dk_Value = new DefinitionKind(_dk_Value);
 
   /**
    * Indicates that the current definition defines a value box.
    */
-  public static DefinitionKind dk_ValueBox = new DefinitionKind(_dk_ValueBox);
+  public static final DefinitionKind dk_ValueBox = new DefinitionKind(_dk_ValueBox);
 
   /**
    * Indicates that the current definition defines value member.
    */
-  public static DefinitionKind dk_ValueMember =
+  public static final DefinitionKind dk_ValueMember =
     new DefinitionKind(_dk_ValueMember);
 
   /**
    * Indicates that the current definition defines a Native.
    */
-  public static DefinitionKind dk_Native = new DefinitionKind(_dk_Native);
+  public static final DefinitionKind dk_Native = new DefinitionKind(_dk_Native);
 
   /**
    * Indicates that the current definition defines .
    */
-  public static DefinitionKind dk_AbstractInterface =
+  public static final DefinitionKind dk_AbstractInterface =
     new DefinitionKind(_dk_AbstractInterface);
 
   /**

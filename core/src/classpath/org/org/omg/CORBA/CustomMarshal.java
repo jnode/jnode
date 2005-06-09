@@ -1,5 +1,5 @@
-/* TRANSIENT.java --
-    Copyright (C) 2005 Free Software Foundation, Inc.
+/* CustomMarshal.java --
+   Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -38,60 +38,31 @@ exception statement from your version. */
 
 package org.omg.CORBA;
 
-import java.io.Serializable;
 
 /**
- * Means that the ORB cannot <i>reach</i> the object. It is not an 
- * indication that this object does not exist.
- * 
- * @author Audrius Meskauskas (AudriusA@Bioinformatics.org)
+ * This interface indicates that the object can provide its own methods
+ * for reading and writing its content. This interface is typically used
+ * by the CORBA implementation only. The user application should use the
+ * {@link CustomValue} that is a descendant of this interface.
+ *
+ * @see DataInputStream
+ * @see DataOutputStream
+ *
+ * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public class TRANSIENT
-  extends SystemException
-  implements Serializable
+public interface CustomMarshal
 {
   /**
-   * Creates a TRANSIENT with the default minor code of 0,
-   * completion state COMPLETED_NO and the given explaining message.
-   * @param reasom the explaining message.
+   * Read (unmarshal) the content of this object from the given input stream.
+   *
+   * @param into_stream a stream to read from.
    */
-  public TRANSIENT(String message)
-  {
-    super(message, 0, CompletionStatus.COMPLETED_NO);
-  }
+  public void marshal(DataOutputStream into_stream);
 
   /**
-   * Use serialVersionUID (v1.4) for interoperability.
+   * Write (marshal) the content of this object to the given input stream.
+   *
+   * @param from_stream a stream to write into.
    */
-  private static final long serialVersionUID = 8168539547719791425L;
-
-  /**
-   * Creates TRANSIENT with the default minor code of 0 and a
-   * completion state COMPLETED_NO.
-   */
-  public TRANSIENT()
-  {
-    super("", 0, CompletionStatus.COMPLETED_NO);
-  }
-
-  /** Creates a TRANSIENT exception with the specified minor
-   * code and completion status.
-   * @param minor additional error code.
-   * @param completed the method completion status.
-   */
-  public TRANSIENT(int minor, CompletionStatus completed)
-  {
-    super("", minor, completed);
-  }
-
-  /**
-   * Created TRANSIENT exception, providing full information.
-   * @param reason explaining message.
-   * @param minor additional error code (the "minor").
-   * @param completed the method completion status.
-   */
-  public TRANSIENT(String reason, int minor, CompletionStatus completed)
-  {
-    super(reason, minor, completed);
-  }
+  public void unmarshal(DataInputStream from_stream);
 }
