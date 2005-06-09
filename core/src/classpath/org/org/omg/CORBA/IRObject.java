@@ -38,11 +38,16 @@ exception statement from your version. */
 
 package org.omg.CORBA;
 
+import org.omg.CORBA.portable.IDLEntity;
+
+import java.io.Serializable;
+
 /**
  * Represents the interface repository object.
  *
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public interface IRObject extends IRObjectOperations
+public interface IRObject
+  extends IRObjectOperations, org.omg.CORBA.Object, Serializable, IDLEntity
 {
 }

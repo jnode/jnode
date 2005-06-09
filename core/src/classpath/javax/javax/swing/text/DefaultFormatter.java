@@ -87,6 +87,7 @@ public class DefaultFormatter
       throws BadLocationException
     {
       super.remove(bypass, offset, length);
+      checkValidInput();
       commitIfAllowed();
     }
     
@@ -105,7 +106,11 @@ public class DefaultFormatter
                               String text, AttributeSet attributes)
       throws BadLocationException
     {
+      if (overwriteMode == true)
+        replace(bypass, offset, text.length(), text, attributes);
+      else
       super.insertString(bypass, offset, text, attributes);
+      checkValidInput();
       commitIfAllowed();
     }
 
@@ -126,6 +131,7 @@ public class DefaultFormatter
       throws BadLocationException
     {
       super.replace(bypass, offset, length, text, attributes);
+      checkValidInput();
       commitIfAllowed();
     }
 
@@ -144,6 +150,39 @@ public class DefaultFormatter
           {
             // ignore invalid edits
           }
+    }
+
+    /**
+     * Checks if the value in the input field is valid. If the
+     * property allowsInvalid is set to <code>false</code>, then
+     * the string in the input field is not allowed to be entered.
+     *
+     * @param doc the document of the input field
+     * @param value the current (old) value of the input field
+     */
+    private void checkValidInput()
+    {
+      JFormattedTextField ftf = getFormattedTextField();
+      try
+        {
+          Object newval = stringToValue(ftf.getText());
+        }
+      catch (ParseException ex)
+        {
+          if (!allowsInvalid)
+            {
+              // roll back the input if invalid edits are not allowed
+              try
+                {
+                  ftf.setText(valueToString(ftf.getValue()));
+                }
+              catch (ParseException pe)
+                {
+                  // if that happens, something serious must be wrong
+                  throw new AssertionError("values must be parseable");
+                }
+            }
+        }
     }
   }
 

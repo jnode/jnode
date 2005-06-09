@@ -1,5 +1,5 @@
-/* TRANSIENT.java --
-    Copyright (C) 2005 Free Software Foundation, Inc.
+/* CustomValue.java --
+   Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -38,60 +38,20 @@ exception statement from your version. */
 
 package org.omg.CORBA;
 
-import java.io.Serializable;
+import org.omg.CORBA.portable.ValueBase;
 
 /**
- * Means that the ORB cannot <i>reach</i> the object. It is not an 
- * indication that this object does not exist.
- * 
- * @author Audrius Meskauskas (AudriusA@Bioinformatics.org)
+ * A Custom Value is a {@link ValueBase} implementing its own methods for
+ * reading and writing (unmarshaling and marshaling) the content. These methods
+ * are defined in superinterface {@link CustomMarshal}.
+ *
+ * Custom value types can never be safely truncated to the more general
+ * base type. They and always require an exact match for their RepositoryId
+ * in the receiving context.
+ *
+ * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public class TRANSIENT
-  extends SystemException
-  implements Serializable
+public interface CustomValue
+  extends ValueBase, CustomMarshal
 {
-  /**
-   * Creates a TRANSIENT with the default minor code of 0,
-   * completion state COMPLETED_NO and the given explaining message.
-   * @param reasom the explaining message.
-   */
-  public TRANSIENT(String message)
-  {
-    super(message, 0, CompletionStatus.COMPLETED_NO);
-  }
-
-  /**
-   * Use serialVersionUID (v1.4) for interoperability.
-   */
-  private static final long serialVersionUID = 8168539547719791425L;
-
-  /**
-   * Creates TRANSIENT with the default minor code of 0 and a
-   * completion state COMPLETED_NO.
-   */
-  public TRANSIENT()
-  {
-    super("", 0, CompletionStatus.COMPLETED_NO);
-  }
-
-  /** Creates a TRANSIENT exception with the specified minor
-   * code and completion status.
-   * @param minor additional error code.
-   * @param completed the method completion status.
-   */
-  public TRANSIENT(int minor, CompletionStatus completed)
-  {
-    super("", minor, completed);
-  }
-
-  /**
-   * Created TRANSIENT exception, providing full information.
-   * @param reason explaining message.
-   * @param minor additional error code (the "minor").
-   * @param completed the method completion status.
-   */
-  public TRANSIENT(String reason, int minor, CompletionStatus completed)
-  {
-    super(reason, minor, completed);
-  }
 }
