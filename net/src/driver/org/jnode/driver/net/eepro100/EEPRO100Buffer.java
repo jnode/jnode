@@ -111,6 +111,10 @@ public class EEPRO100Buffer implements EEPRO100Constants {
 	 *
 	 */
 	public final void initSingleRxRing() {
+		/* Base = 0 */
+		regs.setReg32(SCBPointer, 0);
+		regs.setReg16(SCBCmd, SCBMaskAll | RxAddrLoad);
+		EEPRO100Utils.waitForCmdDone(regs);
 		log.debug("Set RX base addr.");
 		rxPacket = new EEPRO100RxFD(rm);
 		rxPacket.setStatus(0x0001);
@@ -122,13 +126,11 @@ public class EEPRO100Buffer implements EEPRO100Constants {
 		rxPacket.setCount(0);
 		rxPacket.setSize(1528);
 		rxPacket.initialize();
-		// Start the receiver.
 		regs.setReg32(SCBPointer, rxPacket.getBufferAddress());
 		regs.setReg16(SCBCmd, SCBMaskAll | RxStart);
 		EEPRO100Utils.waitForCmdDone(regs);
-
 		log.debug("Started rx process.");
-
+		// Start the receiver.
 		rxPacket.setStatus(0);
 		rxPacket.setCommand(0xC000);
 
