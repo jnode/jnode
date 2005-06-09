@@ -37,6 +37,7 @@ import org.jnode.net.HardwareAddress;
 import org.jnode.net.SocketBuffer;
 import org.jnode.net.ethernet.EthernetAddress;
 import org.jnode.net.ethernet.EthernetConstants;
+import org.jnode.net.ethernet.EthernetHeader;
 import org.jnode.system.IOResource;
 import org.jnode.system.IRQHandler;
 import org.jnode.system.IRQResource;
@@ -289,6 +290,8 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler,
 		log.debug(flags.getName() + " : Init transmit with TIMEOUT=" + timeout);
 		// Set the source address
 		hwAddress.writeTo(buf, 6);
+		log.debug("Source      : " +((EthernetHeader)buf.getLinkLayerHeader()).getSource().toString());
+		log.debug("Destination : " + ((EthernetHeader)buf.getLinkLayerHeader()).getDestination().toString());
 		buffers.transmit(buf);
 		log.debug(flags.getName() + " : End transmit");
 	}
