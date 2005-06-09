@@ -22,6 +22,8 @@
 package org.jnode.awt.swingpeers;
 
 import java.awt.MenuItem;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 import java.awt.peer.MenuItemPeer;
 
 import javax.swing.JMenuItem;
@@ -38,7 +40,13 @@ final class SwingMenuItemPeer extends
     // Construction
     //
 
-    public SwingMenuItemPeer(SwingToolkit toolkit, MenuItem menuItem) {
+    public SwingMenuItemPeer(SwingToolkit toolkit, final MenuItem menuItem) {
         super(toolkit, menuItem, new JMenuItem());
+        jComponent.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                event.setSource(menuItem);
+                menuItem.dispatchEvent(event);
+            }
+        });
     }
 }

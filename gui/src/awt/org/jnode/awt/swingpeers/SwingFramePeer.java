@@ -107,8 +107,8 @@ final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame> implem
 	 * @see java.awt.peer.FramePeer#setMenuBar(java.awt.MenuBar)
 	 */
 	public void setMenuBar(MenuBar mb) {
-        SwingMenuBarPeer mb_peer = new SwingMenuBarPeer(toolkit, mb);
-        jComponent.setJMenuBar(mb_peer.jComponent);
+        mb.addNotify();
+        jComponent.setJMenuBar(((SwingMenuBarPeer)mb.getPeer()).jComponent);
 	}
 
 	/**

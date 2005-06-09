@@ -24,16 +24,8 @@ abstract class SwingBaseMenuItemPeer<awtT extends MenuItem, peerT extends JCompo
 
     public SwingBaseMenuItemPeer(SwingToolkit toolkit, awtT menuItem, peerT peer) {
         super(toolkit, menuItem, peer);
+        setLabel(menuItem.getLabel());
     }
-
-    // public SwingMenuItemPeer(SwingToolkit toolkit, MenuItem menuItem,
-    // JComponent jComponent) {
-    // super(toolkit, menuItem, jComponent);
-    // }
-    //
-    //
-    // ComponentPeer
-    //
 
     // Events
 
