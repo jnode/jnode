@@ -62,8 +62,9 @@ public class RouteCommand implements EthernetConstants {
 					new Parameter[] {
 						new Parameter(ARG_FUNCTION, Parameter.MANDATORY),
 						new Parameter(ARG_TARGET, Parameter.MANDATORY),
-						new Parameter("gw", "the gateway to access the target network", ARG_GATEWAY, Parameter.OPTIONAL),
-						new Parameter(ARG_DEVICE, Parameter.MANDATORY)})
+						//new Parameter("gw", "the gateway to access the target network", ARG_GATEWAY, Parameter.OPTIONAL),
+						new Parameter(ARG_DEVICE, Parameter.MANDATORY),
+                        new Parameter(ARG_GATEWAY, Parameter.OPTIONAL)})
 	});
 
 	public static void main(String[] args) throws Exception {
