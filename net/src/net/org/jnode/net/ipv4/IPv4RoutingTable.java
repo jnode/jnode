@@ -99,12 +99,19 @@ public class IPv4RoutingTable {
 						}
 					}
 				}
-				// Not direct host found, search through the networks
+				// No direct host found, search through the networks
 				for (IPv4Route r : entries) {
 					if (r.isNetwork() && r.isUp()) {
 						if (r.getDestination().matches(destination, r.getSubnetmask())) {
 							return r;
 						}
+					}
+				}
+
+                // No network found, search for the default gateway
+				for (IPv4Route r : entries) {
+					if (r.isGateway() && r.isUp()) {
+                        return r;
 					}
 				}
 				// No route found
