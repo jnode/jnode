@@ -21,12 +21,6 @@
  
 package org.jnode.awt;
 
-import java.awt.Component;
-import java.awt.EventQueue;
-import java.awt.Toolkit;
-import java.awt.event.KeyEvent;
-import java.util.Collection;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
@@ -34,6 +28,14 @@ import org.jnode.driver.DeviceUtils;
 import org.jnode.driver.input.KeyboardAPI;
 import org.jnode.driver.input.KeyboardEvent;
 import org.jnode.driver.input.KeyboardListener;
+
+import java.awt.Component;
+import java.awt.EventQueue;
+import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.Collection;
 
 /**
  * @author Levente S\u00e1ntha
@@ -61,6 +63,12 @@ public class KeyboardHandler implements KeyboardListener {
                 Device keyboardDevice = (Device) keyboards.iterator().next();
                 keyboardAPI = (KeyboardAPI) keyboardDevice.getAPI(KeyboardAPI.class);
                 keyboardAPI.addKeyboardListener(this);
+                AccessController.doPrivileged(new PrivilegedAction(){
+                    public Object run() {
+                        keyboardAPI.setPreferredListener(KeyboardHandler.this);
+                        return null;
+                    }
+                });
             }
         } catch (ApiNotFoundException ex) {
             log.error("Strange...", ex);
@@ -81,6 +89,7 @@ public class KeyboardHandler implements KeyboardListener {
         } else {
             postEvent(KeyEvent.KEY_PRESSED, event.getTime(), event
                     .getModifiers(), key_code, event.getKeyChar());
+            event.consume();
         }
     }
 

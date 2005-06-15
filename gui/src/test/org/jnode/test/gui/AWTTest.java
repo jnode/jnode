@@ -21,6 +21,7 @@
  
 package org.jnode.test.gui;
 
+import javax.swing.JCheckBox;
 import java.awt.BorderLayout;
 import java.awt.Button;
 import java.awt.Color;
@@ -38,8 +39,6 @@ import java.awt.event.ActionListener;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
-
-import javax.swing.JCheckBox;
 
 //import org.apache.log4j.Logger;
 
@@ -254,9 +253,9 @@ public class AWTTest {
             tf.setText("Let's type here");
             wnd.add(tf, BorderLayout.SOUTH);
             
-            System.out.println(wnd.getFont().getName());
-            System.out.println(wnd.getFont().getClass().getName());
-            System.out.println(wnd.getFontMetrics(wnd.getFont()).getClass().getName());
+//            System.out.println(wnd.getFont().getName());
+//            System.out.println(wnd.getFont().getClass().getName());
+//            System.out.println(wnd.getFontMetrics(wnd.getFont()).getClass().getName());
             
             wnd.show();
 

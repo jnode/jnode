@@ -25,7 +25,20 @@ import gnu.java.awt.ClasspathToolkit;
 import gnu.java.awt.peer.ClasspathFontPeer;
 import gnu.java.awt.peer.ClasspathTextLayoutPeer;
 import gnu.java.security.action.GetPropertyAction;
+import org.apache.log4j.Logger;
+import org.jnode.awt.font.FontManager;
+import org.jnode.awt.font.JNodeFontPeer;
+import org.jnode.awt.image.GIFDecoder;
+import org.jnode.awt.image.JNodeImage;
+import org.jnode.driver.DeviceException;
+import org.jnode.driver.sound.speaker.SpeakerUtils;
+import org.jnode.driver.video.AlreadyOpenException;
+import org.jnode.driver.video.FrameBufferAPI;
+import org.jnode.driver.video.Surface;
+import org.jnode.driver.video.UnknownConfigurationException;
+import org.jnode.naming.InitialNaming;
 
+import javax.naming.NamingException;
 import java.awt.AWTError;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -61,21 +74,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
-
-import javax.naming.NamingException;
-
-import org.apache.log4j.Logger;
-import org.jnode.awt.font.FontManager;
-import org.jnode.awt.font.JNodeFontPeer;
-import org.jnode.awt.image.GIFDecoder;
-import org.jnode.awt.image.JNodeImage;
-import org.jnode.driver.DeviceException;
-import org.jnode.driver.sound.speaker.SpeakerUtils;
-import org.jnode.driver.video.AlreadyOpenException;
-import org.jnode.driver.video.FrameBufferAPI;
-import org.jnode.driver.video.Surface;
-import org.jnode.driver.video.UnknownConfigurationException;
-import org.jnode.naming.InitialNaming;
 
 /**
  * @author epr
@@ -124,6 +122,14 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 
 	public static void startGui() {
         clearDefaultToolkit();
+		final Toolkit tk = getDefaultToolkit();
+		if (!(tk instanceof JNodeToolkit)) {
+			throw new AWTError("Toolkit is not a JNodeToolkit");
+		}
+		((JNodeToolkit) tk).incRefCount();
+	}
+
+    public static void initGui() {
 		final Toolkit tk = getDefaultToolkit();
 		if (!(tk instanceof JNodeToolkit)) {
 			throw new AWTError("Toolkit is not a JNodeToolkit");

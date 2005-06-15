@@ -1,13 +1,16 @@
 package org.jnode.test.gui;
 
+import java.awt.Button;
 import java.awt.Frame;
 import java.awt.GridLayout;
-import java.awt.Button;
-import java.awt.MenuBar;
 import java.awt.Menu;
+import java.awt.MenuBar;
 import java.awt.MenuItem;
-import java.awt.event.ActionListener;
+import java.awt.PopupMenu;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
  * Created by IntelliJ IDEA.
@@ -18,7 +21,7 @@ import java.awt.event.ActionEvent;
  */
 public class AWTFrameTest {
     public static void main(String[] argv){
-        Frame f = new Frame("Frame test");
+        final Frame f = new Frame("Frame test");
         f.setSize(200,200);
         f.setLocation(50,50);
         final Frame f2 = new Frame("Test");
@@ -85,6 +88,47 @@ public class AWTFrameTest {
             }
         });
         window.add(front_mi);
+
+        //popup menu
+        final PopupMenu p_window = new PopupMenu("Window");
+        MenuItem p_show_mi = new MenuItem("show");
+        p_show_mi.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                f2.setVisible(true);
+            }
+        });
+        p_window.add(p_show_mi);
+        MenuItem p_hide_mi = new MenuItem("hide");
+        p_hide_mi.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                f2.setVisible(false);
+            }
+        });
+        p_window.add(p_hide_mi);
+        MenuItem p_back_mi = new MenuItem("back");
+        p_back_mi.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                f2.toBack();
+            }
+        });
+        p_window.add(p_back_mi);
+        MenuItem p_front_mi = new MenuItem("front");
+        p_front_mi.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                f2.toFront();
+            }
+        });
+        p_window.add(p_front_mi);
+
+        f.add(p_window);
+        f.addMouseListener(new MouseAdapter(){
+            public void mousePressed(MouseEvent event) {
+                if(event.isPopupTrigger()){
+                    p_window.show(f, event.getX(), event.getY());
+                }
+            }
+        });
+
         f.setMenuBar(mb);
         f.validate();
         f.setVisible(true);
