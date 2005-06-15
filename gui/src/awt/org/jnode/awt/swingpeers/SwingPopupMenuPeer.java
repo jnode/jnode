@@ -21,15 +21,11 @@
  
 package org.jnode.awt.swingpeers;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import java.awt.Component;
 import java.awt.Event;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
-import java.awt.event.ActionEvent;
 import java.awt.peer.PopupMenuPeer;
 
 /**
@@ -40,13 +36,19 @@ import java.awt.peer.PopupMenuPeer;
 final class SwingPopupMenuPeer extends SwingBaseMenuPeer<PopupMenu, JPopupMenu>
         implements PopupMenuPeer {
 
+    @SuppressWarnings("deprecation")
     public SwingPopupMenuPeer(SwingToolkit toolkit, PopupMenu popupMenu) {
         super(toolkit, popupMenu, new JPopupMenu());
-        int ic = popupMenu.getItemCount();
-        for(int i = 0; i < ic ; i++){
-            MenuItem mi = popupMenu.getItem(i);
-            JMenuItem jmi = new JMenuItem(mi.getLabel());
+        int item_count = popupMenu.getItemCount();
+        for(int i = 0; i < item_count; i++){
+            MenuItem menu_item = popupMenu.getItem(i);
+            menu_item.addNotify();
+            jComponent.add(((SwingMenuComponentPeer)menu_item.getPeer()).jComponent);
         }
+    }
+
+    public void setLabel(String text) {
+        ((JPopupMenu) jComponent).setLabel(text);
     }
 
     //
@@ -59,29 +61,17 @@ final class SwingPopupMenuPeer extends SwingBaseMenuPeer<PopupMenu, JPopupMenu>
 
     @SuppressWarnings("deprecation")
     public void show(Component component, int x, int y) {
-        ((JPopupMenu)jComponent).show(((SwingComponentPeer)((Component)component.getParent()).getPeer()).jComponent, x, y);
+        ((JPopupMenu)jComponent).show(((SwingComponentPeer) component.getPeer()).jComponent, x, y);
     }
 
-    //
-    // PopupMenuPeer
-    //
-
+    @SuppressWarnings("deprecation")
     public void addItem(MenuItem item) {
-        Action action = new AbstractAction(){
-            public void actionPerformed(ActionEvent e) {
-                //todo implement it
-            }
-        };
-        action.putValue(Action.NAME, item.getLabel());
-        ((JPopupMenu)jComponent).add(action);
+        item.addNotify();
+        jComponent.add(((SwingMenuItemPeer)item.getPeer()).jComponent);
     }
 
     public void delItem(int index) {
         ((JPopupMenu)jComponent).remove(index);
-    }
-
-    public void setLabel(String text) {
-        ((JPopupMenu)jComponent).setLabel(text);
     }
 
     //

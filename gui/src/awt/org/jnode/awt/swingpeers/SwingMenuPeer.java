@@ -21,11 +21,10 @@
  
 package org.jnode.awt.swingpeers;
 
+import javax.swing.JMenu;
 import java.awt.Menu;
 import java.awt.MenuItem;
 import java.awt.peer.MenuPeer;
-
-import javax.swing.JMenu;
 
 /**
  * AWT menu peer implemented as a {@link javax.swing.JMenu}.
@@ -34,6 +33,7 @@ import javax.swing.JMenu;
 
 final class SwingMenuPeer extends SwingBaseMenuPeer<Menu, JMenu> implements MenuPeer {
 
+    @SuppressWarnings("deprecation")
     public SwingMenuPeer(SwingToolkit toolkit, Menu menu) {
         super(toolkit, menu, new JMenu());
         int item_count = menu.getItemCount();
@@ -44,6 +44,7 @@ final class SwingMenuPeer extends SwingBaseMenuPeer<Menu, JMenu> implements Menu
         }
     }
 
+    @SuppressWarnings("deprecation")
     public void addItem(MenuItem item) {
         item.addNotify();
         jComponent.add(((SwingMenuItemPeer)item.getPeer()).jComponent);
