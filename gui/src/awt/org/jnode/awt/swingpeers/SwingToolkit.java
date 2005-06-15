@@ -21,6 +21,12 @@
 
 package org.jnode.awt.swingpeers;
 
+import org.jnode.awt.JNodeAwtContext;
+import org.jnode.awt.JNodeToolkit;
+
+import javax.swing.JComponent;
+import javax.swing.RepaintManager;
+import javax.swing.SwingUtilities;
 import java.awt.AWTError;
 import java.awt.AWTEvent;
 import java.awt.AWTException;
@@ -77,13 +83,6 @@ import java.awt.peer.ScrollbarPeer;
 import java.awt.peer.TextAreaPeer;
 import java.awt.peer.TextFieldPeer;
 import java.awt.peer.WindowPeer;
-
-import javax.swing.JComponent;
-import javax.swing.RepaintManager;
-import javax.swing.SwingUtilities;
-
-import org.jnode.awt.JNodeAwtContext;
-import org.jnode.awt.JNodeToolkit;
 
 /**
  * AWT toolkit implemented entirely with JFC peers, thus allowing a lightweight
@@ -235,7 +234,8 @@ public final class SwingToolkit extends JNodeToolkit {
 
 	protected FramePeer createFrame(Frame target) {
 		if (!isGuiActive()) {
-			throw new AWTError("AWT is currently not available");
+			//throw new AWTError("AWT is currently not available");
+            initGui();
 		}
 		if (target instanceof DesktopFrame) {
 			setTop(target);

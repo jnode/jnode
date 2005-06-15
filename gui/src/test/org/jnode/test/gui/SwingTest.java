@@ -21,13 +21,12 @@
  
 package org.jnode.test.gui;
 
-import java.awt.BorderLayout;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JMenuBar;
 import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import java.awt.BorderLayout;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
