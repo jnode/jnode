@@ -83,4 +83,19 @@ public final class NotFound
     why = _why;
     rest_of_name = _rest_of_name;
   }
+
+  /**
+   * Creates the exception, intialising the fields to the given values and
+   * also providing the explaining string.
+   *
+   * @since 1.4
+   */
+  public NotFound(String explanation, NotFoundReason _why,
+                  NameComponent[] _rest_of_name
+                 )
+  {
+    super(explanation);
+    why = _why;
+    rest_of_name = _rest_of_name;
+  }
 }

@@ -267,6 +267,7 @@ public class gnuRequest
     m_parameter_buffer.setVersion(ior.Internet.version);
     m_parameter_buffer.setCodeSet(cxCodeSet.negotiate(ior.CodeSets));
     m_parameter_buffer.setOrb(orb);
+    m_parameter_buffer.setBigEndian(Big_endian);
     return m_parameter_buffer;
   }
 
@@ -621,6 +622,8 @@ public class gnuRequest
   {
     gnu.CORBA.GIOP.MessageHeader header = new gnu.CORBA.GIOP.MessageHeader();
 
+    header.setBigEndian(Big_endian);
+
     // The byte order will be Big Endian by default.
     header.message_type = gnu.CORBA.GIOP.MessageHeader.REQUEST;
     header.version = useVersion(ior.Internet.version);
@@ -637,6 +640,7 @@ public class gnuRequest
     request_part.setVersion(header.version);
     request_part.setCodeSet(cxCodeSet.negotiate(ior.CodeSets));
     request_part.setOrb(orb);
+    request_part.setBigEndian(header.isBigEndian());
 
     // This also sets the stream encoding to the encoding, specified
     // in the header.

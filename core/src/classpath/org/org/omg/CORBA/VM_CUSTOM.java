@@ -38,8 +38,8 @@ exception statement from your version. */
 package org.omg.CORBA;
 
 /**
- * Holds a single constant, specifying, that
- * the code used to represent a custom marshalled value type in a typecode.
+ * Indicates a custom marshalled value type. One of the possible
+ * values, returned by {@link TypeCode#type_modifier()}.
  * 
  * @author Audrius Meskauskas (AudriusA@Bioinformatics.org)
  */

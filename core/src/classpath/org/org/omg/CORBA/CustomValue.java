@@ -49,6 +49,9 @@ import org.omg.CORBA.portable.ValueBase;
  * base type. They and always require an exact match for their RepositoryId
  * in the receiving context.
  *
+ * If the value base does not implement this interface, it normally implements
+ * {@link org.omg.CORBA.portable.StremableValue} instead.
+ *
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
 public interface CustomValue

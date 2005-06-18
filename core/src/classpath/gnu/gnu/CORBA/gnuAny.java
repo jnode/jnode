@@ -68,6 +68,8 @@ import org.omg.CORBA.portable.Streamable;
 import java.io.IOException;
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
+
 import java.math.BigDecimal;
 
 import java.util.Arrays;
@@ -279,9 +281,19 @@ public class gnuAny
   {
     try
       {
+        if (has instanceof ValueBaseHolder)
         return ((ValueBaseHolder) has).value;
+        else
+          {
+            // Normally, ValueBase holder must be an instance of the
+            // ValueBaseHolder. However some IDL compilers probably
+            // have a bug, do not deriving this way. The the only
+            // way to access the wrapped value is via reflection.
+            Field f = has.getClass().getField("value");
+            return (Serializable) f.get(has);
       }
-    catch (ClassCastException ex)
+      }
+    catch (Exception ex)
       {
         return new BAD_OPERATION("Value type expected");
       }

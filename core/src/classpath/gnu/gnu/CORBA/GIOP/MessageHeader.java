@@ -39,6 +39,7 @@ exception statement from your version. */
 package gnu.CORBA.GIOP;
 
 import gnu.CORBA.CDR.BigEndianOutputStream;
+import gnu.CORBA.CDR.LittleEndianInputStream;
 import gnu.CORBA.CDR.LittleEndianOutputStream;
 import gnu.CORBA.CDR.abstractDataOutputStream;
 import gnu.CORBA.Version;
@@ -51,6 +52,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import java.util.Arrays;
+import gnu.CORBA.CDR.BigEndianInputStream;
+import gnu.CORBA.CDR.abstractDataInputStream;
 import java.io.InputStream;
 
 /**
@@ -268,27 +271,32 @@ public class MessageHeader
   {
     try
       {
-        DataInputStream din = new DataInputStream(istream);
-
         byte[] xMagic = new byte[ MAGIC.length ];
-        din.read(xMagic);
+        istream.read(xMagic);
         if (!Arrays.equals(xMagic, MAGIC))
           throw new MARSHAL("Not a GIOP message");
 
-        version = Version.read_version(din);
+        version = Version.read_version(istream);
 
-        flags = (byte) din.read();
+        abstractDataInputStream din;
 
-        /** TODO implement support for the little endian. */
-        if (!isBigEndian())
-          throw new MARSHAL("Little endian unsupported.");
+        flags = (byte) istream.read();
+
+        // This checks the bit in the byte we have just received.
+        if (isBigEndian())
+          din = new BigEndianInputStream(istream);
+        else
+          din = new LittleEndianInputStream(istream);
 
         message_type = (byte) din.read();
+
         message_size = din.readInt();
       }
     catch (IOException ex)
       {
-        throw new MARSHAL(ex.toString());
+        MARSHAL t = new MARSHAL();
+        t.initCause(ex);
+        throw t;
       }
   }
 

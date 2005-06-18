@@ -41,6 +41,8 @@ package org.omg.CosNaming.NamingContextExtPackage;
 import org.omg.CORBA.UserException;
 import org.omg.CORBA.portable.IDLEntity;
 
+import java.io.Serializable;
+
 /**
  * The exception is thrown if the passed address is empty or otherwise invalid.
  *
@@ -48,6 +50,27 @@ import org.omg.CORBA.portable.IDLEntity;
  */
 public final class InvalidAddress
   extends UserException
-  implements IDLEntity
+  implements IDLEntity, Serializable
 {
+  /**
+   * Use serialVersionUID (v1.4) for interoperability.
+   */
+  private static final long serialVersionUID = -3775583235364760385L;
+
+  /**
+   * Create an exception with no message.
+   */
+  public InvalidAddress()
+  {
+  }
+
+  /**
+   * Create an exception with explaining message.
+   *
+   * @since 1.4
+   */
+  public InvalidAddress(String why)
+  {
+    super(why);
+  }
 }

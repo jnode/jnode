@@ -84,4 +84,19 @@ public final class CannotProceed
     cxt = _cxt;
     rest_of_name = _rest_of_name;
   }
+
+  /**
+   * Create an exception with the initialised fields and explaining
+   * message.
+   *
+   * @since 1.4
+   */
+  public CannotProceed(String why, NamingContext _cxt,
+                       NameComponent[] _rest_of_name
+                      )
+  {
+    super(why);
+    cxt = _cxt;
+    rest_of_name = _rest_of_name;
+  }
 }

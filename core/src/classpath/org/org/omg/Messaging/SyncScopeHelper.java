@@ -114,7 +114,7 @@ public class SyncScopeHelper
   /**
    * Delegates call to {@link OutputStream.write_short()}.
    */
-  static void write(OutputStream ostream, short value)
+  public static void write(OutputStream ostream, short value)
   {
     ostream.write_short(value);
   }
