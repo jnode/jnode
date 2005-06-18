@@ -1,5 +1,5 @@
-/* MetalSplitPaneUI.java
-   Copyright (C) 2005 Free Software Foundation, Inc.
+/* Metaltils.java
+Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,72 +35,53 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-
 package javax.swing.plaf.metal;
 
 import java.awt.Color;
-import java.util.HashMap;
+import java.awt.Graphics;
 
-import javax.swing.JComponent;
-import javax.swing.UIDefaults;
-import javax.swing.UIManager;
-import javax.swing.plaf.ComponentUI;
-import javax.swing.plaf.basic.BasicSplitPaneUI;
-import javax.swing.plaf.basic.BasicSplitPaneDivider;
-
-public class MetalSplitPaneUI
-  extends BasicSplitPaneUI
+/**
+ * Some utility and helper methods for the Metal Look &amp; Feel.
+ *
+ * @author Roman Kennke (roman@kennke.org)
+ */
+class MetalUtils
 {
 
-  /** The UI instances for MetalSplitPaneUIs */
-  private static HashMap instances;
-
   /**
-   * Constructs a new instance of MetalSplitPaneUI.
-   */
-  public MetalSplitPaneUI()
-  {
-    super();
-  }
-
-  /**
-   * Returns an instance of MetalSplitPaneUI.
+   * Fills a rectangle with the typical Metal pattern.
    *
-   * @param component the component for which we return an UI instance
-   *
-   * @return an instance of MetalSplitPaneUI
+   * @param g the <code>Graphics</code> context to use
+   * @param x the X coordinate of the upper left corner of the rectangle to
+   *     fill
+   * @param y the Y coordinate of the upper left corner of the rectangle to
+   *     fill
+   * @param w the width of the rectangle to fill
+   * @param w the height of the rectangle to fill
+   * @param light the light color to use
+   * @param dark the dark color to use
    */
-  public static ComponentUI createUI(JComponent component)
+  static void fillMetalPattern(Graphics g, int x, int y, int w, int h,
+                                Color light, Color dark)
   {
-    if (instances == null)
-      instances = new HashMap();
-
-    Object o = instances.get(component);
-    MetalSplitPaneUI instance;
-    if (o == null)
+    int xOff = 0;
+    for (int mY = y; mY < (y + h); mY++)
       {
-      instance = new MetalSplitPaneUI();
-	instances.put(component, instance);
+        // set color alternating with every line
+        if ((mY % 2) == 0)
+          g.setColor(light);
+        else
+          g.setColor(dark);
+
+        for (int mX = x + (xOff); mX < (x + w); mX += 4)
+          {
+            g.drawLine(mX, mY, mX, mY);
+          }
+
+        // increase x offset
+        xOff++;
+        if (xOff > 3)
+          xOff = 0;
       }
-    else
-      instance = (MetalSplitPaneUI) o;
-
-    return instance;
-  }
-
-  /**
-   * Returns the divider that is used by the <code>JSplitPane</code>.
-   *
-   * The divider returned by this method is a {@link BasicSplitPaneDivider}
-   * that is drawn using the Metal look.
-   *
-   * @return the default divider to use for <code>JSplitPane</code>s. 
-   */
-  public BasicSplitPaneDivider createDefaultDivider()
-  {
-    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-    Color light = defaults.getColor("SplitPane.highlight");
-    Color dark = defaults.getColor("SplitPane.darkShadow");
-    return new MetalSplitPaneDivider(this, light, dark);
   }
 }

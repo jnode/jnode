@@ -1,5 +1,5 @@
-/* MetalSplitPaneUI.java
-   Copyright (C) 2005 Free Software Foundation, Inc.
+/* MetalSplitPaneDivider.java
+Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,72 +35,50 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-
 package javax.swing.plaf.metal;
 
 import java.awt.Color;
-import java.util.HashMap;
+import java.awt.Dimension;
+import java.awt.Graphics;
 
-import javax.swing.JComponent;
-import javax.swing.UIDefaults;
-import javax.swing.UIManager;
-import javax.swing.plaf.ComponentUI;
-import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 
-public class MetalSplitPaneUI
-  extends BasicSplitPaneUI
+/**
+ * The divider that is used by the MetalSplitPaneUI.
+ *
+ * @author Roman Kennke (roman@kennke.org)
+ *
+ */
+class MetalSplitPaneDivider extends BasicSplitPaneDivider
 {
+  /** The dark color in the pattern. */
+  Color dark;
 
-  /** The UI instances for MetalSplitPaneUIs */
-  private static HashMap instances;
+  /** The light color in the pattern. */
+  Color light;
 
   /**
-   * Constructs a new instance of MetalSplitPaneUI.
+   * Creates a new instance of MetalSplitPaneDivider.
+   *
+   * @param ui the <code>MetalSplitPaneUI</code> that uses this divider
    */
-  public MetalSplitPaneUI()
+  public MetalSplitPaneDivider(MetalSplitPaneUI ui, Color light, Color dark)
   {
-    super();
+    super(ui);
+    this.light = light;
+    this.dark = dark;
   }
 
   /**
-   * Returns an instance of MetalSplitPaneUI.
+   * Paints the divider.
    *
-   * @param component the component for which we return an UI instance
-   *
-   * @return an instance of MetalSplitPaneUI
+   * @param g the <code>Graphics</code> context to use for painting
    */
-  public static ComponentUI createUI(JComponent component)
+  public void paint(Graphics g)
   {
-    if (instances == null)
-      instances = new HashMap();
-
-    Object o = instances.get(component);
-    MetalSplitPaneUI instance;
-    if (o == null)
-      {
-      instance = new MetalSplitPaneUI();
-	instances.put(component, instance);
-      }
-    else
-      instance = (MetalSplitPaneUI) o;
-
-    return instance;
-  }
-
-  /**
-   * Returns the divider that is used by the <code>JSplitPane</code>.
-   *
-   * The divider returned by this method is a {@link BasicSplitPaneDivider}
-   * that is drawn using the Metal look.
-   *
-   * @return the default divider to use for <code>JSplitPane</code>s. 
-   */
-  public BasicSplitPaneDivider createDefaultDivider()
-  {
-    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-    Color light = defaults.getColor("SplitPane.highlight");
-    Color dark = defaults.getColor("SplitPane.darkShadow");
-    return new MetalSplitPaneDivider(this, light, dark);
+    //super.paint(g);
+    Dimension s = getSize();
+    MetalUtils.fillMetalPattern(g, 2, 2, s.width - 4, s.height - 4,
+                                light, dark);
   }
 }

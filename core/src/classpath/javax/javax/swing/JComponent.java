@@ -2065,15 +2065,21 @@ public abstract class JComponent extends Container implements Serializable
 		repaint();
 
     // adjust preferred and maximum size accordingly
+    if (preferredSize != null)
+      {
     Dimension prefSize = getPreferredSize();
     prefSize.width = Math.max(prefSize.width, minimumSize.width);
     prefSize.height = Math.max(prefSize.height, minimumSize.height);
     setPreferredSize(prefSize);
+      }
+    if (maximumSize != null)
+      {
     Dimension maxSize = getMaximumSize();
     maxSize.width = Math.max(maxSize.width, minimumSize.width);
     maxSize.height = Math.max(maxSize.height, minimumSize.height);
     setMaximumSize(maxSize);
 	}
+  }
 
   /**
    * Set the value of the {@link #preferredSize} property, revalidate
