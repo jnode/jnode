@@ -521,6 +521,10 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
                 + "],0x" + NumberUtils.hex(imm32));
     }
 
+    public void writeADD_MEM(X86Register.GPR reg, int memPtr32) {
+        println("\tadd " + reg + ",[0x"  + NumberUtils.hex(memPtr32) + "]");
+    }
+
     /**
      * @see org.jnode.assembler.x86.X86Assembler#writeADD(GPR, int, GPR)
      */
