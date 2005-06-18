@@ -358,9 +358,10 @@ public class IOR
 
     endian = c.read_long();
     if (endian != 0)
-      throw new BAD_PARAM("Little endian is not yet supported", FAILED,
-                          CompletionStatus.COMPLETED_NO
-                         );
+      {
+        Big_Endian = false;
+        c.setBigEndian(false);
+      }
     _read_no_endian(c);
   }
 
@@ -369,6 +370,13 @@ public class IOR
    * the endian data at the beginning of the stream. The IOR is
    * thansferred in this form in
    * {@link write_Object(org.omg.CORBA.Object)}.
+   *
+   * If the stream contains a null value, the Id and Internet fields become
+   * equal to null. Otherwise Id contains some string (possibly
+   * empty).
+   *
+   * Id is checked for null in cdrInput that then returns
+   * null instead of object.
    *
    * @param c a stream to read from.
    * @throws IOException if the stream throws it.
@@ -379,6 +387,13 @@ public class IOR
     Id = c.read_string();
 
     int n_profiles = c.read_long();
+
+    if (n_profiles == 0)
+      {
+        Id = null;
+        Internet = null;
+        return;
+      }
 
     for (int i = 0; i < n_profiles; i++)
       {
@@ -431,6 +446,21 @@ public class IOR
     // Always use Big Endian.
     out.write(0);
     _write_no_endian(out);
+  }
+
+  /**
+   * Write a null value to the CDR output stream.
+   *
+   * The null value is written as defined in OMG specification
+   * (zero length string, followed by an empty set of profiles).
+   */
+  public static void write_null(cdrOutput out)
+  {
+    // Empty Id string.
+    out.write_string("");
+
+    // Empty set of profiles.
+    out.write_long(0);
   }
 
   /**

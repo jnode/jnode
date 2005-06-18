@@ -38,9 +38,7 @@ exception statement from your version. */
 package org.omg.CORBA;
 
 /**
- * Holds a single constant, specifying, that
- * the code used to represent the one of the values 
- * of a value type in a typecode.
+ * One of the possible values, returned by {@link TypeCode#type_modifier()}.
  * 
  * @author Audrius Meskauskas (AudriusA@Bioinformatics.org)
  */

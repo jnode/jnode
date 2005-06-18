@@ -54,4 +54,21 @@ public final class NotEmpty
    * Use serialVersionUID (v1.4) for interoperability.
    */
   private static final long serialVersionUID = 7120362687417045881L;
+
+  /**
+   * Create an exception with no message.
+   */
+  public NotEmpty()
+  {
+  }
+
+  /**
+   * Create an exception with explaining message.
+   *
+   * @since 1.4
+   */
+  public NotEmpty(String why)
+  {
+    super(why);
+  }
 }

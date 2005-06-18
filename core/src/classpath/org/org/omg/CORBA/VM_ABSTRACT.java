@@ -38,8 +38,8 @@ exception statement from your version. */
 package org.omg.CORBA;
 
 /**
- * Holds a single constant, specifying, the
- * abstract interface in a typecode.
+ * Specifies that the object is an abstract interface. One of the possible
+ * values, returned by {@link TypeCode#type_modifier()}.
  * 
  * @author Audrius Meskauskas (AudriusA@Bioinformatics.org)
  */
