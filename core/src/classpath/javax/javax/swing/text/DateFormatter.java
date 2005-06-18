@@ -1,5 +1,5 @@
-/* MetalSplitPaneUI.java
-   Copyright (C) 2005 Free Software Foundation, Inc.
+/* DateFormatter.java --
+Copyright (C) 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,72 +35,51 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+package javax.swing.text;
 
-package javax.swing.plaf.metal;
+import java.text.DateFormat;
 
-import java.awt.Color;
-import java.util.HashMap;
-
-import javax.swing.JComponent;
-import javax.swing.UIDefaults;
-import javax.swing.UIManager;
-import javax.swing.plaf.ComponentUI;
-import javax.swing.plaf.basic.BasicSplitPaneUI;
-import javax.swing.plaf.basic.BasicSplitPaneDivider;
-
-public class MetalSplitPaneUI
-  extends BasicSplitPaneUI
+/**
+ * <code>DateFormatter</code> is an {@link InternationalFormatter}
+ * that implements value to string and string to value conversion via
+ * an instance of {@link DateFormat}.
+ *
+ * @author Roman Kennke (roman@kennke.org)
+ */
+public class DateFormatter extends InternationalFormatter
 {
 
-  /** The UI instances for MetalSplitPaneUIs */
-  private static HashMap instances;
+  /** The serialVersoinUID. */
+  private static final long serialVersionUID = 5423279572591848797L;
 
   /**
-   * Constructs a new instance of MetalSplitPaneUI.
+   * Creates a new instance using the default {@link DateFormat} object
+   * returned by {@link DateFormat#getDateInstance}.
    */
-  public MetalSplitPaneUI()
+  public DateFormatter()
+  {
+    this(DateFormat.getDateInstance());
+  }
+
+  /**
+   * Creates a new instance of <code>DateFormatter</code> using the
+   * specified <code>DateFormat</code>
+   *
+   * @param format the <code>DateFormat</code> to use
+   */
+  public DateFormatter(DateFormat format)
   {
     super();
+    setFormat(format);
   }
 
   /**
-   * Returns an instance of MetalSplitPaneUI.
+   * Sets the format that is used by this <code>DateFormatter</code>.
    *
-   * @param component the component for which we return an UI instance
-   *
-   * @return an instance of MetalSplitPaneUI
+   * @param format the <code>DateFormat</code> to use
    */
-  public static ComponentUI createUI(JComponent component)
+  public void setFormat(DateFormat format)
   {
-    if (instances == null)
-      instances = new HashMap();
-
-    Object o = instances.get(component);
-    MetalSplitPaneUI instance;
-    if (o == null)
-      {
-      instance = new MetalSplitPaneUI();
-	instances.put(component, instance);
-      }
-    else
-      instance = (MetalSplitPaneUI) o;
-
-    return instance;
-  }
-
-  /**
-   * Returns the divider that is used by the <code>JSplitPane</code>.
-   *
-   * The divider returned by this method is a {@link BasicSplitPaneDivider}
-   * that is drawn using the Metal look.
-   *
-   * @return the default divider to use for <code>JSplitPane</code>s. 
-   */
-  public BasicSplitPaneDivider createDefaultDivider()
-  {
-    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-    Color light = defaults.getColor("SplitPane.highlight");
-    Color dark = defaults.getColor("SplitPane.darkShadow");
-    return new MetalSplitPaneDivider(this, light, dark);
+    super.setFormat(format);
   }
 }
