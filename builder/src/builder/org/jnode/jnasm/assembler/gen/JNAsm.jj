@@ -276,7 +276,8 @@ try {
                         (
                             "*" scale=arithmeticOperand() {addr.scale = scale;}
                             [ "+" disp=arithmeticOperand() { addr.disp = disp;} ]
-                        |   "-" disp=arithmeticExpression() {addr.scale = 1; addr.disp = -disp;}
+                        |   "+" disp=arithmeticOperand() { addr.scale = 1; addr.disp = disp;}
+                        |   "-" disp=arithmeticExpression() { addr.scale = 1; addr.disp = -disp;}
                         )
                     |   disp=arithmeticExpression()     { addr.disp = disp; }
                     )

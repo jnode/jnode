@@ -169,7 +169,8 @@ public class X86Core extends AssemblerModule {
     public static final int JAE_ISN = JA_ISN + 1;
     public static final int JB_ISN = JAE_ISN + 1;
     public static final int JE_ISN = JB_ISN + 1;
-    public static final int JL_ISN = JE_ISN + 1;
+    public static final int JGE_ISN = JE_ISN + 1;
+    public static final int JL_ISN = JGE_ISN + 1;
     public static final int JLE_ISN = JL_ISN + 1;
     public static final int JMP_ISN = JLE_ISN + 1;
     public static final int JNE_ISN = JMP_ISN + 1;
@@ -331,6 +332,9 @@ public class X86Core extends AssemblerModule {
                 break;
             case JECXZ_ISN:
                 emitJECXZ();
+                break;
+            case JGE_ISN:
+                emitJCC(X86Assembler.JGE);
                 break;
             case JL_ISN:
                 emitJCC(X86Assembler.JL);
@@ -503,6 +507,10 @@ public class X86Core extends AssemblerModule {
             case RE_ADDR:
                 Address ind = getAddress(1);
                 stream.writeADD(getReg(0), getRegister(ind.getImg()), ind.disp);
+                break;
+            case RA_ADDR:
+                ind = getAddress(1);
+                stream.writeADD_MEM(getReg(0), ind.disp);
                 break;
             case ER_ADDR:
                 ind = getAddress(0);

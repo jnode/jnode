@@ -924,6 +924,16 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		}
 	}
 
+    public void writeADD_MEM(X86Register.GPR reg, int memPtr) {
+        testSize(reg, mode.getSize());
+		if (code64) {
+			throw new InvalidOpcodeException("Not implemented");
+		}
+		write8(0x03); // opcode
+		write8((reg.getNr() << 3) | 5); // disp32
+		write32(memPtr);
+    }
+
     /**
 	 * Create a ADD [dstDisp], imm32
 	 *
