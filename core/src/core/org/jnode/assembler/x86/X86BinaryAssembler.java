@@ -4326,7 +4326,6 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
      *
      */
     public void writeSTOSD() {
-        write8(OSIZE_PREFIX);
         write8(0xAB);
     }
 
@@ -4334,6 +4333,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
      *
      */
     public void writeSTOSW() {
+        write8(OSIZE_PREFIX);
         write8(0xAB);
     }
 
