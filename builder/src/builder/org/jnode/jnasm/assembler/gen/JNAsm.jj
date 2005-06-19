@@ -196,8 +196,8 @@ Object dxOperand() :
 try {
 (
     LOOKAHEAD(2)
-    i=arithmeticExpression() { o = new Integer(i);}
-|   t=<STRING> {o=t.image.substring(1, t.image.length() - 1);}
+    t=<STRING> {o=t.image.substring(1, t.image.length() - 1);}
+|   i=arithmeticExpression() { o = new Integer(i);}
 )
 } catch(UndefinedConstantException udefconste) {
     return new Identifier(udefconste.getConstant());
