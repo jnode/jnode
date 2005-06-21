@@ -27,6 +27,7 @@ import org.jnode.driver.Device;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceNotFoundException;
 import org.jnode.driver.DriverException;
+import org.jnode.driver.block.FSBlockDeviceAPI;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
 import org.jnode.fs.ext2.Ext2FileSystemType;
@@ -120,6 +121,11 @@ public class FormatCommand {
             dm = InitialNaming.lookup(DeviceManager.NAME);
 
             Device dev = dm.getDevice(device);
+			if(!(dev.getDriver() instanceof FSBlockDeviceAPI)){
+				throw new FileSystemException(
+                	"Unsupported device by format command");
+
+			}
             FileSystemService fileSystemService = InitialNaming
                     .lookup(FileSystemService.NAME);
             FileSystemType type = fileSystemService
