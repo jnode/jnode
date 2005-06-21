@@ -88,6 +88,8 @@ public class DirCommand implements Command{
 				if (f.isDirectory()) {
 					out.print("[" + f.getName() + "]");
 				} else {
+					if(!f.exists())
+						continue;
 					out.print(f.getName() + " " + f.length());
 				}
 				out.println();
