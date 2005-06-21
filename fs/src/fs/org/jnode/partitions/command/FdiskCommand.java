@@ -33,6 +33,7 @@ import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceNotFoundException;
+import org.jnode.driver.DriverException;
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.driver.bus.ide.IDEConstants;
 import org.jnode.driver.bus.ide.IDEDevice;
@@ -155,7 +156,7 @@ public class FdiskCommand {
 			BootSector bs = new BootSector(mbr.array());
 
 			if (ACTION.getValue(cmdLine).intern() == "-m") {
-				modifyPartition(PARTITION.getValue(cmdLine), api, bs);
+				modifyPartition(PARTITION.getValue(cmdLine), api, bs, current);
 				bs.write(api);
 				return;
 			}
@@ -212,7 +213,7 @@ public class FdiskCommand {
 		bs.getPartition(partNumber).setSystemIndicator(IBMPartitionTypes.PARTTYPE_EMPTY);
 	}
 
-	private static void modifyPartition(String description, BlockDeviceAPI api, BootSector bs) throws IOException {
+	private static void modifyPartition(String description, BlockDeviceAPI api, BootSector bs, Device dev) throws IOException {
 		// arg 1 should be in the form id:start:size:fs
 		StringTokenizer st = new StringTokenizer(description, ":");
 		int id = Integer.parseInt(st.nextToken());
@@ -230,6 +231,27 @@ public class FdiskCommand {
 		entry.setStartLba(start);
 		entry.setNrSectors(size);
 		bs.write(api);
+		
+//		 restart the device
+	     DeviceManager dm = null;
+		 
+        try {
+			dm = InitialNaming.lookup(DeviceManager.NAME);
+			dm.stop(dev);
+	        dm.start(dev);
+			
+		} catch (NameNotFoundException e) {
+			
+			e.printStackTrace();
+		} catch (DeviceNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (DriverException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+		
 		return;
 	}
 
