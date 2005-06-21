@@ -53,6 +53,11 @@ public class AnnotationTypeMismatchException extends RuntimeException
 {
 
   /**
+   * For compatability with Sun's JDK
+   */
+  private static final long serialVersionUID = 8125925355765570191L;
+
+  /**
    * Constructs an <code>AnnotationTypeMismatchException</code>
    * which is due to a mismatched type in the annotation
    * element, <code>m</code>. The erroneous type used for the
