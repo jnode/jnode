@@ -215,21 +215,21 @@ public class X86Core extends AssemblerModule {
     public static final int XOR_ISN = XCHG_ISN + 1;
 
 
-    protected static final Map INSTRUCTION_MAP;
+    protected static final Map<String, Integer> INSTRUCTION_MAP;
     private static final String[] MNEMONICS;
 
     static {
-        Map map = InstructionUtils.getInstructionMap(X86Core.class);
+        Map<String, Integer> map = InstructionUtils.getInstructionMap(X86Core.class);
         String[] mnemonics = InstructionUtils.getMnemonicArray(map);
         INSTRUCTION_MAP = map;
         MNEMONICS = mnemonics;
     }
 
-    private List operands;
+    private List<Object> operands;
     private int operandSize;
     private X86Assembler stream;
 
-    public X86Core(final Map labels, final Map constants) {
+    public X86Core(Map<String, Label> labels, Map<String, Integer> constants) {
         super(labels, constants);
     }
 
@@ -237,7 +237,7 @@ public class X86Core extends AssemblerModule {
         this.stream = (X86Assembler) stream;
     }
 
-    public boolean emit(String mnemonic, List operands, int operandSize) {
+    public boolean emit(String mnemonic, List<Object> operands, int operandSize) {
         this.operands = operands;
         this.operandSize = operandSize;
 

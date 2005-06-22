@@ -21,22 +21,23 @@
  
 package org.jnode.jnasm.assembler;
 
-import org.jnode.jnasm.assembler.x86.X86Support;
-import org.jnode.assembler.NativeStream;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.jnode.assembler.Label;
+import org.jnode.assembler.NativeStream;
+import org.jnode.jnasm.assembler.x86.X86Support;
 
 /**
  * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
@@ -46,9 +47,9 @@ public abstract class Assembler {
     private static final String PARSER_CLASS = "org.jnode.jnasm.assembler.gen.JNAsm";
     public static final boolean THROW = false;
     protected static final Object UNDEFINED = new String("UNDEFIEND");
-    protected final List instructions = new ArrayList();
-    private final Map constants = new HashMap();
-    private final Map labels = new HashMap();
+    protected final List<Instruction> instructions = new ArrayList<Instruction>();
+    private final Map<String, Integer> constants = new HashMap<String, Integer>();
+    private final Map<String, Label> labels = new HashMap<String, Label>();
     private int pass = 0;
     protected final HardwareSupport hwSupport;
     private final PseudoInstructions pseudo;

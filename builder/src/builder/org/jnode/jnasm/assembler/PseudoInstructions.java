@@ -31,7 +31,7 @@ import java.util.Map;
  * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
 public class PseudoInstructions extends AssemblerModule {
-    protected static final Map INSTRUCTION_MAP;
+    protected static final Map<String, Integer> INSTRUCTION_MAP;
     private static final String[] MNEMONICS;
     public static final int BITS_ISN = 0;
     public static final int DB_ISN = BITS_ISN + 1;
@@ -41,16 +41,16 @@ public class PseudoInstructions extends AssemblerModule {
     public static final int RESD_ISN = RESB_ISN + 1;
 
     static {
-        Map map = InstructionUtils.getInstructionMap(PseudoInstructions.class);
+        Map<String, Integer> map = InstructionUtils.getInstructionMap(PseudoInstructions.class);
         String[] mnemonics = InstructionUtils.getMnemonicArray(map);
         INSTRUCTION_MAP = map;
         MNEMONICS = mnemonics;
     }
 
-    private List operands;
+    private List<Object> operands;
     private NativeStream stream;
 
-    public PseudoInstructions(final Map labels, final Map constants) {
+    public PseudoInstructions(Map<String, Label> labels, Map<String, Integer> constants) {
         super(labels, constants);
     }
 
@@ -58,7 +58,7 @@ public class PseudoInstructions extends AssemblerModule {
         this.stream = stream;
     }
 
-    public boolean emit(String mnemonic, List operands, int operandSize) {
+    public boolean emit(String mnemonic, List<Object> operands, int operandSize) {
         this.operands = operands;
 
         Integer key = (Integer) INSTRUCTION_MAP.get(mnemonic);
