@@ -21,6 +21,13 @@
 
 package org.jnode.assembler.x86;
 
+import static org.jnode.assembler.x86.X86Register.CS;
+import static org.jnode.assembler.x86.X86Register.DS;
+import static org.jnode.assembler.x86.X86Register.ES;
+import static org.jnode.assembler.x86.X86Register.FS;
+import static org.jnode.assembler.x86.X86Register.GS;
+import static org.jnode.assembler.x86.X86Register.SS;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
@@ -44,8 +51,6 @@ import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.x86.X86CpuID;
-
-import static org.jnode.assembler.x86.X86Register.*;
 
 /**
  * Implementation of AbstractX86Stream.
@@ -4705,4 +4710,20 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		write1bOpcodeModRM(0x33, dstReg.getSize(), srcReg, srcDisp, dstReg
 				.getNr());
 	}
+    
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeRDMSR()
+     */
+    public void writeRDMSR() {
+        write8(0x0F);
+        write8(0x32);
+    }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeWRMSR()
+     */
+    public void writeWRMSR() {
+        write8(0x0F);
+        write8(0x30);
+    }
 }

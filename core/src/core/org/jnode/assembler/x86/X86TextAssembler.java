@@ -2437,4 +2437,18 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     public void writeObjectRef(Object object) {
         
     }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeRDMSR()
+     */
+    public void writeRDMSR() {
+        println("\trdmsr");
+    }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeWRMSR()
+     */
+    public void writeWRMSR() {
+        println("\twrmsr");
+    }
 }

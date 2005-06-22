@@ -1997,6 +1997,11 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writeRDTSC();
 
+    /**
+     * Create a RDMSR (get model specific register pointed to by ecx into edx:eax)
+     */
+    public abstract void writeRDMSR();
+
 	/**
 	 * Create 32-bit offset relative to the current (after this offset) offset.
 	 * 
@@ -2452,6 +2457,11 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public abstract void writeTEST_EAX(int operandSize, int value);
 
     public abstract void writeTEST(int operandSize, int destDisp, int imm32);
+
+    /**
+     * Create a WRMSR (set model specific register pointed to by ecx from edx:eax)
+     */
+    public abstract void writeWRMSR();
 
 	/**
 	 * Write my contents to the given stream.
