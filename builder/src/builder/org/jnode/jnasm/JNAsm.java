@@ -21,24 +21,29 @@
  
 package org.jnode.jnasm;
 
-import org.jnode.jnasm.preprocessor.Preprocessor;
-import org.jnode.jnasm.preprocessor.FileResolver;
-import org.jnode.jnasm.assembler.Assembler;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.Map;
+
 import org.jnode.assembler.NativeStream;
 import org.jnode.build.AsmSourceInfo;
-
-import java.io.StringWriter;
-import java.io.StringReader;
-import java.io.FileOutputStream;
-import java.util.HashMap;
-import java.util.Map;
+import org.jnode.jnasm.assembler.Assembler;
+import org.jnode.jnasm.preprocessor.FileResolver;
+import org.jnode.jnasm.preprocessor.Preprocessor;
 
 /**
  * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
 public class JNAsm {
     public static void main(String[] argv) throws Exception{
-        Preprocessor preprocessor = Preprocessor.newInstance(System.in);
+        InputStream in = System.in;
+        if (argv.length > 0) {
+            in = new FileInputStream(argv[0]);
+        }
+        Preprocessor preprocessor = Preprocessor.newInstance(in);
         preprocessor.defineSymbol("BITS32","");
         preprocessor.setFileResolver(new FileResolver(null));
         StringWriter sw = new StringWriter();
