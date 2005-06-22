@@ -200,7 +200,8 @@ public class X86Core extends AssemblerModule {
     public static final int PUSH_ISN = POPF_ISN + 1;
     public static final int PUSHA_ISN = PUSH_ISN + 1;
     public static final int PUSHF_ISN = PUSHA_ISN + 1;
-    public static final int RET_ISN = PUSHF_ISN + 1;
+    public static final int RDMSR_ISN = PUSHF_ISN + 1;
+    public static final int RET_ISN = RDMSR_ISN + 1;
     public static final int SHL_ISN = RET_ISN + 1;
     public static final int SHR_ISN = SHL_ISN + 1;
     public static final int STD_ISN = SHR_ISN + 1;
@@ -211,7 +212,8 @@ public class X86Core extends AssemblerModule {
     public static final int STOSW_ISN = STOSD_ISN + 1;
     public static final int SUB_ISN = STOSW_ISN + 1;
     public static final int TEST_ISN = SUB_ISN + 1;
-    public static final int XCHG_ISN = TEST_ISN + 1;
+    public static final int WRMSR_ISN = TEST_ISN + 1;
+    public static final int XCHG_ISN = WRMSR_ISN + 1;
     public static final int XOR_ISN = XCHG_ISN + 1;
 
 
@@ -423,6 +425,9 @@ public class X86Core extends AssemblerModule {
             case PUSHF_ISN:
                 emitPUSHF();
                 break;
+            case RDMSR_ISN:
+                emitRDMSR();
+                break;
             case RET_ISN:
                 emitRET();
                 break;
@@ -455,6 +460,9 @@ public class X86Core extends AssemblerModule {
                 break;
             case TEST_ISN:
                 emitTEST();
+                break;
+            case WRMSR_ISN:
+                emitWRMSR();
                 break;
             case XCHG_ISN:
                 emitXCHG();
@@ -1246,6 +1254,10 @@ public class X86Core extends AssemblerModule {
         stream.writePUSHF();
     }
 
+    private final void emitRDMSR() {
+        stream.writeRDMSR();
+    }
+
     private final void emitRET() {
         int addr = getAddressingMode(1);
         switch (addr) {
@@ -1374,6 +1386,10 @@ public class X86Core extends AssemblerModule {
             default:
                 reportAddressingError(TEST_ISN, addr);
         }
+    }
+
+    private final void emitWRMSR() {
+        stream.writeWRMSR();
     }
 
     private final void emitXCHG() {
