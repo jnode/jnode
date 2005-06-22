@@ -69,6 +69,10 @@ public abstract class VmX86Thread extends VmThread {
 	volatile Address exEsp;
 	volatile Address exEbp;
 	volatile Word exCr2;
+    
+    // MSR's
+    volatile MSR[] readWriteMSRs;
+    volatile MSR[] writeOnlyMSRs;
 	
 	/**
 	 * Initialize this instance 

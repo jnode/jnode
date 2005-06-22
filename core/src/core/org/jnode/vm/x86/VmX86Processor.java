@@ -35,6 +35,7 @@ import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmThread;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmSharedStatics;
+import org.jnode.vm.performance.PerformanceCounters;
 import org.vmmagic.pragma.LoadStaticsPragma;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Word;
@@ -84,6 +85,9 @@ public abstract class VmX86Processor extends VmProcessor {
 
     /** Kernel variable (vm-inst.asm) */
     volatile int deviceNaCounter;
+    
+    /** My performance counter accessor */
+    transient X86PerformanceCounters perfCounters;
 
     /**
      * @param id
@@ -289,6 +293,22 @@ public abstract class VmX86Processor extends VmProcessor {
         }
     }
 
+    
+    /**
+     * Gets the performance counter accessor of this processor.
+     * @return
+     */
+    public final PerformanceCounters getPerformanceCounters() {
+        if (perfCounters == null) {
+            synchronized (this) {
+                if (perfCounters == null) {                
+                    perfCounters = X86PerformanceCounters.create(this, (X86CpuID)getCPUID());
+                }
+            }
+        }
+        return perfCounters;
+    }
+    
     public void dumpStatistics(PrintStream out) {
         out.println(getCPUID());
         out.println("fxSave/Restore " + fxSaveCounter + "/" + fxRestoreCounter

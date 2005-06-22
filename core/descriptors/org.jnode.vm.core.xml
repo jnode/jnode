@@ -26,6 +26,7 @@
       <export name="org.jnode.vm.compiler.ir.*"/>
       <export name="org.jnode.vm.compiler.ir.quad.*"/>
       <export name="org.jnode.vm.memmgr.*"/>
+      <export name="org.jnode.vm.performance.*"/>
     </library>
   </runtime>
   
