@@ -188,6 +188,7 @@ public class LinkedHashMap<K,V> extends HashMap<K,V>
               succ = null;
               pred = root.pred;
               pred.succ = this;
+	      root.pred = this;
             }
         }
     }
