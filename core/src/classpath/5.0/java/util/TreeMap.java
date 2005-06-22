@@ -462,7 +462,7 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
    */
   public SortedMap<K, V> headMap(K toKey)
   {
-    return new SubMap(nil, toKey);
+    return new SubMap((K)(Object)nil, toKey);
   }
 
   /**
@@ -681,7 +681,7 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
    */
   public SortedMap<K, V> tailMap(K fromKey)
   {
-    return new SubMap(fromKey, nil);
+    return new SubMap(fromKey, (K)(Object)nil);
   }
 
   /**
