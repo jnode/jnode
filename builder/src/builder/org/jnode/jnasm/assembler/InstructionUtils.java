@@ -21,12 +21,10 @@
  
 package org.jnode.jnasm.assembler;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.Iterator;
-import java.util.HashMap;
-import java.util.Collections;
 import java.lang.reflect.Field;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
@@ -34,20 +32,18 @@ import java.lang.reflect.Field;
 public class InstructionUtils {
     private static final String INSTRUCTION_ID_SUFFIX = "_ISN";
 
-    public static String[] getMnemonicArray(Map map) {
-        Set entries = map.entrySet();
-        String[] mnemonics = new String[entries.size()];
-        for (Iterator it = entries.iterator(); it.hasNext();) {
-            Map.Entry entry = (Map.Entry) it.next();
-            mnemonics[((Integer) entry.getValue()).intValue()] = (String) entry.getKey();
+    public static String[] getMnemonicArray(Map<String, Integer> map) {
+        final String[] mnemonics = new String[map.size()];
+        for (Map.Entry<String, Integer> entry : map.entrySet()) {
+            mnemonics[entry.getValue()] = entry.getKey();
         }
         return mnemonics;
     }
 
-    public static Map getInstructionMap(Class clazz) {
-        Map map = new HashMap();
+    public static Map<String, Integer> getInstructionMap(Class<?> clazz) {
+        final Map<String, Integer> map = new HashMap<String, Integer>();
         try {
-            Field[] fields = clazz.getDeclaredFields();
+            final Field[] fields = clazz.getDeclaredFields();
             for (int i = fields.length; i-- > 0;) {
                 Field f = fields[i];
                 String fn = f.getName();

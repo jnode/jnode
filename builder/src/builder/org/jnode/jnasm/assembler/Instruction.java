@@ -35,17 +35,17 @@ public class Instruction {
     private String sizeInfo;
     private String label;
     private String mnemonic;
-    private List operands;
+    private List<Object> operands;
 
     public Instruction(String label) {
         this(label, null, null);
     }
 
-    public Instruction(String mnemonic, List operands) {
+    public Instruction(String mnemonic, List<Object> operands) {
         this(null, mnemonic, operands);
     }
 
-    public Instruction(String label, String mnemonic, List operands) {
+    public Instruction(String label, String mnemonic, List<Object> operands) {
         this.label = label;
         this.mnemonic = mnemonic;
         this.operands = operands;
@@ -55,11 +55,11 @@ public class Instruction {
         return mnemonic;
     }
 
-    public List getOperands() {
+    public List<Object> getOperands() {
         return operands;
     }
 
-    public void setOperands(List operands) {
+    public void setOperands(List<Object> operands) {
         this.operands = operands;
     }
 

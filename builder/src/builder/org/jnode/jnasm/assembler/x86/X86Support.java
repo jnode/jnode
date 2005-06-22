@@ -21,38 +21,38 @@
  
 package org.jnode.jnasm.assembler.x86;
 
-import org.jnode.jnasm.assembler.HardwareSupport;
-import org.jnode.jnasm.assembler.AssemblerModule;
-import org.jnode.jnasm.assembler.Instruction;
-import org.jnode.jnasm.assembler.Assembler;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.jnode.assembler.Label;
+import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Register;
-import org.jnode.assembler.Label;
-import org.jnode.assembler.NativeStream;
+import org.jnode.jnasm.assembler.Assembler;
+import org.jnode.jnasm.assembler.AssemblerModule;
+import org.jnode.jnasm.assembler.HardwareSupport;
+import org.jnode.jnasm.assembler.Instruction;
 import org.jnode.vm.x86.X86CpuID;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.io.OutputStream;
-import java.io.IOException;
 
 /**
  * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
 public class X86Support extends HardwareSupport {
-    private final List modules;
-    private final List instructions;
-    private final Map labels;
+    private final List<AssemblerModule> modules;
+    private final List<Instruction> instructions;
+    private final Map<String, Label> labels;
     private int pass;
     private final Assembler assembler;
     private X86Assembler nativeStream;
 
-    public X86Support(Assembler assembler, List instructions, Map labels, Map constants) {
-        this.modules = new ArrayList();
+    public X86Support(Assembler assembler, List<Instruction> instructions,
+            Map<String, Label> labels, Map<String, Integer> constants) {
+        this.modules = new ArrayList<AssemblerModule>();
         this.assembler = assembler;
         this.instructions = instructions;
         this.labels = labels;
@@ -72,12 +72,11 @@ public class X86Support extends HardwareSupport {
     }
 
     private void doAssembly() {
-        for (int i = 0; i < modules.size(); i++) {
-            ((AssemblerModule) modules.get(i)).setNativeStream(nativeStream);
+        for (AssemblerModule asmMod : modules) {
+            asmMod.setNativeStream(nativeStream);
         }
 
-        for (Iterator it = instructions.iterator(); it.hasNext();) {
-            Instruction ins = (Instruction) it.next();
+        for (Instruction ins : instructions) {
             //handle prefixes
             int prefix = ins.getPrefix();
             if((prefix & Instruction.LOCK_PREFIX) != 0){
@@ -132,9 +131,9 @@ public class X86Support extends HardwareSupport {
         }
     }
 
-    private void emit(String mnemonic, List operands, int operandSize) {
-        for (int i = 0; i < modules.size(); i++) {
-            if (((AssemblerModule) modules.get(i)).emit(mnemonic, operands, operandSize)) {
+    private void emit(String mnemonic, List<Object> operands, int operandSize) {
+        for (AssemblerModule module : modules) {
+            if (module.emit(mnemonic, operands, operandSize)) {
                 return;
             }
         }

@@ -18,26 +18,32 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.jnasm.assembler;
 
-import org.jnode.assembler.NativeStream;
-
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
+
+import org.jnode.assembler.Label;
+import org.jnode.assembler.NativeStream;
 
 /**
  * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
 public abstract class AssemblerModule {
-    protected final Map labels;
-    protected final Map constants;
+    
+    protected final Map<String, Label> labels;
 
-    protected AssemblerModule(final Map labels, final Map constants) {
+    protected final Map<String, Integer> constants;
+
+    protected AssemblerModule(Map<String, Label> labels,
+            Map<String, Integer> constants) {
         this.labels = labels;
         this.constants = constants;
     }
 
-    public abstract boolean emit(String mnemonic, List operands, int oprandSize);
+    public abstract boolean emit(String mnemonic, List<Object> operands,
+            int oprandSize);
+
     public abstract void setNativeStream(NativeStream stream);
 }
