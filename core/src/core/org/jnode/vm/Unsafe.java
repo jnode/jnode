@@ -652,7 +652,7 @@ public final class Unsafe {
 	/**
 	 * Trigger a yieldpoint
 	 */
-	static native void yieldPoint();
+	public static native void yieldPoint();
 
 	/**
 	 * Gets the address of the system dependent jump table used for native
