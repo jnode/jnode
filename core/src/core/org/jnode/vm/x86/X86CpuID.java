@@ -65,10 +65,6 @@ public class X86CpuID extends CpuID {
 	public static final long FEAT_TM2 = (1L << 40);
 	public static final long FEAT_CNXTID = (1L << 42);
 
-    // Name codes
-    public static final String NAME_INTEL = "GenuineIntel";
-    public static final String NAME_AMD = "AuthenticAMD";
-    
     // Family codes
     public static final int FAM_486 = 0x04;
     public static final int FAM_PENTIUM = 0x05;
@@ -77,8 +73,8 @@ public class X86CpuID extends CpuID {
     
 	/** The cpu id data */
 	private final int[] data;
-	/** Name of the processor */
-	private String name;
+	/** Vendor of the processor */
+	private String vendor;
 	private final int steppingID;
 	private final int model;
 	private final int family;
@@ -141,28 +137,32 @@ public class X86CpuID extends CpuID {
 		this.exFeatures = features | (((long) data[6]) << 32);
 	}
 
-	/**
-	 * Gets the processor name.
-	 * 
-	 * @return The processor name
-	 */
-	public String getName() {
-		if (name == null) {
-			final StringBuffer buf = new StringBuffer();
-			intToString(buf, data[1]);
-			intToString(buf, data[3]);
-			intToString(buf, data[2]);
-			name = buf.toString();
-		}
-		return name;
-	}
+    public String getName() {
+        return getVendor();
+    }
+    
+    /**
+     * Gets the processor name.
+     * 
+     * @return The processor name
+     */
+    public String getVendor() {
+        if (vendor == null) {
+            final StringBuffer buf = new StringBuffer();
+            intToString(buf, data[1]);
+            intToString(buf, data[3]);
+            intToString(buf, data[2]);
+            vendor = buf.toString();
+        }
+        return vendor;
+    }
 
     /**
      * Is this the id of an Intel CPU.
      * @return
      */
     public boolean isIntel() {
-        return getName().equals(NAME_INTEL);
+        return getVendor().equals(X86Vendor.INTEL.getId());
     }
 
     /**
@@ -170,7 +170,7 @@ public class X86CpuID extends CpuID {
      * @return
      */
     public boolean isAMD() {
-        return getName().equals(NAME_AMD);
+        return getVendor().equals(X86Vendor.AMD.getId());
     }
 
 	private final void intToString(StringBuffer buf, int value) {
