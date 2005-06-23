@@ -121,10 +121,11 @@ public class JCheckBoxMenuItem extends JMenuItem implements SwingConstants,
 
 	/**
    * Creates a new JCheckBoxMenuItem object using specified label and
-   * marked as checked if given 'state' is true
+   * marked as checked if given 'state' is true.
    *
    * @param text Label for this menu item
-   * @param state True if this item should be in checked state and false otherwise
+   * @param state <code>true</code> if this item should be in checked state and
+   *     <code>false</code> otherwise
 	 */
   public JCheckBoxMenuItem(String text, boolean state)
   {
@@ -133,11 +134,12 @@ public class JCheckBoxMenuItem extends JMenuItem implements SwingConstants,
 
 	/**
    * Creates a new JCheckBoxMenuItem object with given label, icon,
-   * and marked as checked if given 'state' is true
+   * and marked as checked if given 'state' is true.
    *
    * @param text Label for this menu item
    * @param icon icon for this menu item
-   * @param state  True if this item should be in checked state and false otherwise
+   * @param state <code>true</code> if this item should be in checked state and
+   *     false otherwise
 	 */
   public JCheckBoxMenuItem(String text, Icon icon, boolean state)
   {
@@ -178,7 +180,6 @@ public class JCheckBoxMenuItem extends JMenuItem implements SwingConstants,
    * and uncheck this menu item otherwise.
    *
    * @param state new state for this menu item
-   *
 	 */
   public synchronized void setState(boolean state)
   {

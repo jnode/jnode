@@ -49,107 +49,118 @@ import java.util.Stack;
  */
 public class DefaultFocusManager extends FocusManager {
 
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
-
 	/**
 	 * historyStack
 	 */
 	private Stack historyStack;
 
-
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
-
 	/**
 	 * Constructor DefaultFocusManager
 	 */
-	public DefaultFocusManager() {
+  public DefaultFocusManager()
+  {
 		// TODO
 	} // DefaultFocusManager()
 
-
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
-
 	/**
 	 * processKeyEvent
-	 * @param component TODO
-	 * @param event TODO
+   * 
+   * @param component
+   *          TODO
+   * @param event
+   *          TODO
 	 */
-	public void processKeyEvent(Component component, KeyEvent event) {
+  public void processKeyEvent(Component component, KeyEvent event)
+  {
 		// TODO
 	} // processKeyEvent()
 
 	/**
 	 * focusNextComponent
-	 * @param component TODO
+   * 
+   * @param component
+   *          TODO
 	 */
-	public void focusNextComponent(Component component) {
+  public void focusNextComponent(Component component)
+  {
 		// TODO
 	} // focusNextComponent()
 
 	/**
 	 * focusPreviousComponent
-	 * @param component TODO
+   * 
+   * @param component
+   *          TODO
 	 */
-	public void focusPreviousComponent(Component component) {
+  public void focusPreviousComponent(Component component)
+  {
 		// TODO
 	} // focusPreviousComponent()
 
 	/**
 	 * getFirstComponent
-	 * @param container TODO
+   * 
+   * @param container
+   *          TODO
 	 * @returns Component
 	 */
-	public Component getFirstComponent(Container container) {
+  public Component getFirstComponent(Container container)
+  {
 		return null; // TODO
 	} // getFirstComponent()
 
 	/**
 	 * getLastComponent
-	 * @param container TODO
+   * 
+   * @param container
+   *          TODO
 	 * @returns Component
 	 */
-	public Component getLastComponent(Container container) {
+  public Component getLastComponent(Container container)
+  {
 		return null; // TODO
 	} // getLastComponent()
 
 	/**
 	 * getComponentBefore
-	 * @param container TODO
-	 * @param component TODO
+   * 
+   * @param container
+   *          TODO
+   * @param component
+   *          TODO
 	 * @returns Component
 	 */
-	public Component getComponentBefore(Container container,
-			Component component) {
+  public Component getComponentBefore(Container container, Component component)
+  {
 		return null; // TODO
 	} // getComponentBefore()
 
 	/**
 	 * getComponentAfter
-	 * @param container TODO
-	 * @param component TODO
+   * 
+   * @param container
+   *          TODO
+   * @param component
+   *          TODO
 	 * @returns Component
 	 */
-	public Component getComponentAfter(Container container, 
-			Component component) {
+  public Component getComponentAfter(Container container, Component component)
+  {
 		return null; // TODO
 	} // getComponentAfter()
 
 	/**
 	 * compareTabOrder
-	 * @param component1 TODO
-	 * @param component2 TODO
+   * 
+   * @param component1
+   *          TODO
+   * @param component2
+   *          TODO
 	 * @returns boolean
 	 */
-	public boolean compareTabOrder(Component component1,
-			Component component2) {
+  public boolean compareTabOrder(Component component1, Component component2)
+  {
 		return false; // TODO
 	} // compareTabOrder()
-
 
 } // DefaultFocusManager

@@ -147,7 +147,7 @@ public class ButtonGroup implements Serializable
 	if (button != null)
 	  button.repaint();
 		    }
-    else if (! b && sel == m)
+    else if (!b && sel == m)
       m.setSelected(true);
     }
     

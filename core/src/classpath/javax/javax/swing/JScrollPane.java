@@ -590,7 +590,9 @@ public class JScrollPane
     setHorizontalScrollBar(createHorizontalScrollBar());
     viewport = createViewport();
     if (view != null)
-      viewport.setView(view);
+      getViewport().setView(view);
+    viewport.addChangeListener(scrollListener);
+    add(viewport);
     setLayout(new ScrollPaneLayout());
     setOpaque(false);
     updateUI();

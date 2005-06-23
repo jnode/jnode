@@ -482,7 +482,7 @@ public class DefaultListModel extends AbstractListModel
    *
    * @throws ArrayIndexOutOfBoundsException if either index is outside the
    * valid range of indices for this list <code>[0, size())</code>
-   * @throws IllegalArgumentException if <code>startIndex > endIndex</code>
+   * @throws IllegalArgumentException if <code>startIndex &gt; endIndex</code>
    */
   public void removeRange(int startIndex, int endIndex)
   {

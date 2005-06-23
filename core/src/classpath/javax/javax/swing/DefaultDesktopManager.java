@@ -228,7 +228,7 @@ public class DefaultDesktopManager implements DesktopManager, Serializable
 
     Container c = frame.getParent();
 
-    if (! wasIcon(frame))
+    if (!wasIcon(frame))
       {
 	Rectangle r = getBoundsForIconOf(frame);
 	icon.setBounds(r);
@@ -261,7 +261,7 @@ public class DefaultDesktopManager implements DesktopManager, Serializable
     c.add(frame);
     frame.setVisible(true);
 
-    if (! frame.isSelected())
+    if (!frame.isSelected())
       {
 	JDesktopPane p = frame.getDesktopPane();
 	if (p != null)
@@ -361,6 +361,7 @@ public class DefaultDesktopManager implements DesktopManager, Serializable
    * This method is called to drag the JInternalFrame to a new location.
    *
    * @param component The JComponent to drag, usually a JInternalFrame.
+   *
    * @param newX The new x coordinate.
    * @param newY The new y coordinate.
    */
@@ -391,8 +392,8 @@ public class DefaultDesktopManager implements DesktopManager, Serializable
   {
     if (currentDragMode == JDesktopPane.OUTLINE_DRAG_MODE)
       {
-	setBoundsForFrame((JInternalFrame) component, dragCache.x,
-	                  dragCache.y, dragCache.width, dragCache.height);
+        setBoundsForFrame((JInternalFrame) component, dragCache.x, dragCache.y,
+                          dragCache.width, dragCache.height);
 	pane = null;
 	dragCache = null;
       }
@@ -454,8 +455,8 @@ public class DefaultDesktopManager implements DesktopManager, Serializable
   {
     if (currentDragMode == JDesktopPane.OUTLINE_DRAG_MODE)
       {
-	setBoundsForFrame((JInternalFrame) component, dragCache.x,
-	                  dragCache.y, dragCache.width, dragCache.height);
+        setBoundsForFrame((JInternalFrame) component, dragCache.x, dragCache.y,
+                          dragCache.width, dragCache.height);
 	pane = null;
 	dragCache = null;
       }
@@ -516,12 +517,13 @@ public class DefaultDesktopManager implements DesktopManager, Serializable
     // The icon also must not be placed where another icon is placed 
     // (regardless whether that frame is an icon currently or not)
     JDesktopPane desktopPane = frame.getDesktopPane();
-    Rectangle paneBounds = desktopPane.getBounds();
-    Insets insets = desktopPane.getInsets();
-    Dimension pref = frame.getDesktopIcon().getPreferredSize();
 
     if (desktopPane == null)
       return frame.getDesktopIcon().getBounds();
+
+    Rectangle paneBounds = desktopPane.getBounds();
+    Insets insets = desktopPane.getInsets();
+    Dimension pref = frame.getDesktopIcon().getPreferredSize();
 
     Component[] frames = desktopPane.getComponents();
 
@@ -538,8 +540,8 @@ public class DefaultDesktopManager implements DesktopManager, Serializable
       else if (frames[i] instanceof JInternalFrame
                && ((JInternalFrame) frames[i]).getWasIcon()
                && frames[i] != frame)
-	iconRects[--count] = ((JInternalFrame) frames[i]).getDesktopIcon()
-	                      .getBounds();
+        iconRects[--count] = ((JInternalFrame) frames[i])
+                                                 .getDesktopIcon().getBounds();
 
     int startingX = insets.left;
     int startingY = paneBounds.height - insets.bottom - pref.height;
