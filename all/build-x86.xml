@@ -119,6 +119,7 @@
 			<class classname="org.jnode.vm.classmgr.VmMethod" />
 			<class classname="org.jnode.vm.classmgr.VmStatics" /> 
 			<class classname="org.jnode.vm.classmgr.VmType" /> 
+			<class classname="org.jnode.vm.x86.MSR" />
 			<class classname="org.jnode.vm.x86.VmX86Processor" />
 			<class classname="org.jnode.vm.x86.VmX86StackReader" static="on" /> 
 			<class classname="org.jnode.vm.x86.VmX86Thread" />

@@ -46,6 +46,59 @@ stub_yieldPointHandler:
 	mov [ABP+%2],ACX
 %endmacro
 
+; Save an array of MSR's
+; Usage: SAVE_MSR_ARRAY array-ref
+;   array-ref a reference to an MSR[]. Can be null.
+%macro SAVE_MSR_ARRAY 1
+	mov ASI,%1
+	test ASI,ASI
+	jnz %%save			; Arranged this way to optimize branch prediction
+	jmp %%end			; Usually there is no restore.
+%%save:	
+	mov ebx,[ASI+VmArray_LENGTH_OFFSET*SLOT_SIZE]
+	test ebx,ebx
+	jz %%end
+	lea ASI,[ASI+VmArray_DATA_OFFSET*SLOT_SIZE]
+%%loop:
+	mov ADX,[ASI]
+	mov ecx,[ADX+MSR_ID_OFS]
+	rdmsr
+	mov ACX,[ASI]
+	mov [ACX+MSR_VALUE_OFS+0],eax	; Save LSB value
+	mov [ACX+MSR_VALUE_OFS+4],edx	; Save MSB value
+	; Go to next position
+	lea ASI,[ASI+SLOT_SIZE]
+	dec ebx
+	jnz %%loop		
+%%end:	
+%endmacro
+
+; Restore an array of MSR's
+; Usage: RESTORE_MSR_ARRAY array-ref
+;   array-ref a reference to an MSR[]. Can be null.
+%macro RESTORE_MSR_ARRAY 1
+	mov ASI,%1
+	test ASI,ASI
+	jnz %%restore		; Arranged this way to optimize branch prediction
+	jmp %%end			; Usually there is no restore.
+%%restore:	
+	mov ebx,[ASI+VmArray_LENGTH_OFFSET*SLOT_SIZE]
+	test ebx,ebx
+	jz %%end
+	lea ASI,[ASI+VmArray_DATA_OFFSET*SLOT_SIZE]
+%%loop:
+	mov ADX,[ASI]
+	mov ecx,[ADX+MSR_ID_OFS]		; Get MSR index
+	mov eax,[ADX+MSR_VALUE_OFS+0]	; Get LSB value
+	mov edx,[ADX+MSR_VALUE_OFS+4]	; Get MSB value
+	wrmsr
+	; Go to next position
+	lea ASI,[ASI+SLOT_SIZE]
+	dec ebx
+	jnz %%loop		
+%%end:	
+%endmacro
+
 yieldPointHandler_kernelCode:
 	PRINT_STR yp_kernel_msg
 	jmp int_die
@@ -93,6 +146,10 @@ yieldPointHandler_reschedule:
 	SAVEREG VmX86Thread64_R14_OFS, OLD_R14
 	SAVEREG VmX86Thread64_R15_OFS, OLD_R15
 %endif	
+
+	; Save Read/Write MSR's
+yieldPointHandler_SaveMSRs:
+	SAVE_MSR_ARRAY [ADI+VmX86Thread_READWRITEMSRS_OFS]
 	
 	; Save FPU / XMM state
 yieldPointHandler_fxSave:
@@ -150,6 +207,11 @@ yieldPointHandler_restore:
 	mov AAX,cr0
 	or AAX,CR0_TS
 	mov cr0,AAX
+	
+	; Restore MSR's
+yieldPointHandler_RestoreMSRs:
+	RESTORE_MSR_ARRAY [ADI+VmX86Thread_READWRITEMSRS_OFS]
+	RESTORE_MSR_ARRAY [ADI+VmX86Thread_WRITEONLYMSRS_OFS]
 	
 	; Fix old stack overflows
 yieldPointHandler_fixOldStackOverflow:
