@@ -20,6 +20,9 @@
 	<property name="grub.menu.cdrom" value="${my-conf.dir}/menu-cdrom.lst" />
 
 	<!-- Properties for building the boot files for windows NT/2K/XP -->
+  <property name="partition-nt" value="C:" />
+  <property name="jnode.install-nt.dir" value="C:\jnode" />
+
 	<property name="bin-nt.dir" value="${basedir}\bin-nt" />
 	<property name="conf-nt.dir" value="${basedir}\conf\x86-nt" />
 	<property name="lib-nt.dir" value="${basedir}\lib\x86-nt" />
@@ -202,16 +205,16 @@
 	<!-- Build the boot files for windows NT/2K/XP (with NTLDR) -->
 	<target name="boot-files-winNT" depends="java-image">
 		<mkdir dir="${jnode.install-nt.dir}" />
-		
+
 		<copy file="${jnode.kernel}" todir="${jnode.install-nt.dir}" />
 		<copy file="${grub.menu}" todir="${jnode.install-nt.dir}" />
 		<copy todir="${jnode.install-nt.dir}">
 			<fileset dir="${initjars.dir}" />
 		</copy>
 		<copy file="${grub.stage1-nt}" todir="${jnode.install-nt.dir}" />
-		<copy file="${grub.stage2-nt}" todir="${jnode.install-nt.dir}" />		
-		
-		<replace file="${jnode.install-nt.dir}/menu.lst" 
+		<copy file="${grub.stage2-nt}" todir="${jnode.install-nt.dir}" />
+
+		<replace file="${jnode.install-nt.dir}/menu.lst"
 			token="(hd0,0)" value="${partition-nt}"/>
 		<echo message="${grub.install-nt.exe} -d ${partition-nt} -1 ${jnode.install-nt.dir}\${grub.stage1-nt.name} -2 ${jnode.install-nt.dir}\${grub.stage2-nt.name} -m ${jnode.install-nt.dir}\menu.lst" />
 
