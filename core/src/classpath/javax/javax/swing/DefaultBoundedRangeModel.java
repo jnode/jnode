@@ -61,7 +61,6 @@ public class DefaultBoundedRangeModel
    */
   private static final long serialVersionUID = 5034068491295259790L;
 
-
   /**
    * An event that is sent to all registered {@link ChangeListener}s
    * when the state of this range model has changed.
@@ -73,12 +72,10 @@ public class DefaultBoundedRangeModel
    */
   protected transient ChangeEvent changeEvent;
 
-
   /**
    * The list of the currently registered EventListeners.
    */
   protected EventListenerList listenerList = new EventListenerList();
-
 
   /**
    * The current value of the range model, which is always between
@@ -88,7 +85,6 @@ public class DefaultBoundedRangeModel
    */
   private int value;
 
-
   /**
    * The current extent of the range model, which is a number greater
    * than or equal to zero. In a scroll bar visualization of a {@link
@@ -97,13 +93,11 @@ public class DefaultBoundedRangeModel
    */
   private int extent;
 
-
   /**
    * The current minimum value of the range model, which is always
    * less than or equal to {@link #maximum}.
    */
   private int minimum;
-
 
   /**
    * The current maximum value of the range model, which is always
@@ -111,13 +105,11 @@ public class DefaultBoundedRangeModel
    */
   private int maximum;
 
-
   /**
    * A property that indicates whether the value of this {@link
    * BoundedRangeModel} is going to change in the immediate future.
    */
   private boolean isAdjusting;
-
 
   /**
    * Constructs a <code>DefaultBoundedRangeModel</code> with default
@@ -134,7 +126,6 @@ public class DefaultBoundedRangeModel
     maximum = 100;
   }
 
-
   /**
    * Constructs a <code>DefaultBoundedRangeModel</code> with the
    * specified values for some properties.
@@ -144,14 +135,11 @@ public class DefaultBoundedRangeModel
    * extent)</code>. In a scroll bar visualization of a {@link
    * BoundedRangeModel}, the <code>value</code> is displayed as the
    * position of the thumb.
-   *
    * @param extent the initial extent of the range model, which is a
    * number greater than or equal to zero. In a scroll bar
    * visualization of a {@link BoundedRangeModel}, the
    * <code>extent</code> is displayed as the size of the thumb.
-   *
    * @param minimum the initial minimal value of the range model.
-   *
    * @param maximum the initial maximal value of the range model.
    *
    * @throws IllegalArgumentException if the following condition is
@@ -172,7 +160,6 @@ public class DefaultBoundedRangeModel
     // The isAdjusting field already has a false value by default.
   }
 
-
   /**
    * Returns a string with all relevant properties of this range
    * model.
@@ -190,7 +177,6 @@ public class DefaultBoundedRangeModel
       + ']';
   }
 
-
   /**
    * Returns the current value of this bounded range model.  In a
    * scroll bar visualization of a {@link BoundedRangeModel}, the
@@ -202,7 +188,6 @@ public class DefaultBoundedRangeModel
   {
     return value;
   }
-
 
   /**
    * Changes the current value of this bounded range model. In a
@@ -226,7 +211,6 @@ public class DefaultBoundedRangeModel
       }
   }
 
-
   /**
    * Returns the current extent of this bounded range model, which is
    * a number greater than or equal to zero. In a scroll bar
@@ -239,7 +223,6 @@ public class DefaultBoundedRangeModel
   {
     return extent;
   }
-
 
   /**
    * Changes the current extent of this bounded range model. In a
@@ -262,7 +245,6 @@ public class DefaultBoundedRangeModel
       }
   }
 
-
   /**
    * Returns the current minimal value of this bounded range model.
    */
@@ -270,7 +252,6 @@ public class DefaultBoundedRangeModel
   {
     return minimum;
   }
-
 
   /**
    * Changes the current minimal value of this bounded range model.
@@ -287,7 +268,6 @@ public class DefaultBoundedRangeModel
     setRangeProperties(value, extent, minimum, maximum, isAdjusting);
   }
 
-
   /**
    * Returns the current maximal value of this bounded range model.
    *
@@ -297,7 +277,6 @@ public class DefaultBoundedRangeModel
   {
     return maximum;
   }
-
 
   /**
    * Changes the current maximal value of this bounded range model.
@@ -315,7 +294,6 @@ public class DefaultBoundedRangeModel
     setRangeProperties(value, extent, minimum, maximum, isAdjusting);
   }
 
-
   /**
    * Returns whether or not the value of this bounded range model is
    * going to change in the immediate future. Scroll bars set this
@@ -330,7 +308,6 @@ public class DefaultBoundedRangeModel
   {
     return isAdjusting;
   }
-
 
   /**
    * Specifies whether or not the value of this bounded range model is
@@ -352,23 +329,18 @@ public class DefaultBoundedRangeModel
     fireStateChanged();
   }
 
-
   /**
    * Sets all properties.
    *
    * @param value the new value of the range model.  In a scroll bar
    * visualization of a {@link BoundedRangeModel}, the
    * <code>value</code> is displayed as the position of the thumb.
-   *
    * @param extent the new extent of the range model, which is a
    * number greater than or equal to zero. In a scroll bar
    * visualization of a {@link BoundedRangeModel}, the
    * <code>extent</code> is displayed as the size of the thumb.
-   *
    * @param minimum the new minimal value of the range model.
-   *
    * @param maximum the new maximal value of the range model.
-
    * @param isAdjusting whether or not the value of this bounded range
    * model is going to change in the immediate future. Scroll bars set
    * this property to <code>true</code> while the thumb is being
@@ -400,7 +372,6 @@ public class DefaultBoundedRangeModel
     fireStateChanged();
   }
 
-
   /**
    * Subscribes a ChangeListener to state changes.
    *
@@ -411,7 +382,6 @@ public class DefaultBoundedRangeModel
     listenerList.add(ChangeListener.class, listener);
   }
 
-
   /**
    * Cancels the subscription of a ChangeListener.
    *
@@ -421,7 +391,6 @@ public class DefaultBoundedRangeModel
   {
     listenerList.remove(ChangeListener.class, listener);
   }
-
 
   /**
    * Sends a {@link ChangeEvent} to any registered {@link
@@ -441,7 +410,6 @@ public class DefaultBoundedRangeModel
       listeners[i].stateChanged(changeEvent);
   }
 
-
   /**
    * Retrieves the current listeners of the specified class.
    *
@@ -457,7 +425,6 @@ public class DefaultBoundedRangeModel
   {
     return listenerList.getListeners(listenerType);
   }
-
 
   /**
    * Returns all <code>ChangeListeners</code> that are currently

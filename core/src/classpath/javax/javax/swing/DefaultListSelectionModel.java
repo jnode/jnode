@@ -78,7 +78,6 @@ public class DefaultListSelectionModel implements Cloneable,
    */
   int selectionMode = MULTIPLE_INTERVAL_SELECTION;
 
-
   /**
    * The index of the "lead" of the most recent selection. The lead is the
    * second argument in any call to {@link #setSelectionInterval}, {@link
@@ -87,7 +86,6 @@ public class DefaultListSelectionModel implements Cloneable,
    * over.
    */
   int leadSelectionIndex = -1;
-
 
   /**
    * The index of the "anchor" of the most recent selection. The anchor is
@@ -101,7 +99,6 @@ public class DefaultListSelectionModel implements Cloneable,
    * @see #setAnchorSelectionIndex
    */
   int anchorSelectionIndex = -1;
-
 
   /**
    * controls the range of indices provided in any {@link
@@ -119,7 +116,6 @@ public class DefaultListSelectionModel implements Cloneable,
    * @see #setLeadAnchorNotificationEnabled
    */
   protected boolean leadAnchorNotificationEnabled = true;
-
 
   /**
    * Whether the selection is currently "adjusting". Any {@link
@@ -139,7 +135,6 @@ public class DefaultListSelectionModel implements Cloneable,
    * cleared bit indicates a non-selected index.
    */
   BitSet sel = new BitSet();
-
 
   /**
    * Gets the value of the {@link #selectionMode} property.
@@ -290,7 +285,6 @@ public class DefaultListSelectionModel implements Cloneable,
     leadAnchorNotificationEnabled = l;
   }
 
-
   /**
    * Gets the value of the {@link #valueIsAdjusting} property.
    *
@@ -325,7 +319,6 @@ public class DefaultListSelectionModel implements Cloneable,
   {
     return sel.isEmpty();
   }
-
 
   /**
    * Gets the smallest index which is currently a member of a selection

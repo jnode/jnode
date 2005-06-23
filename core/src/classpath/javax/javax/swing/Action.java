@@ -47,10 +47,6 @@ import java.beans.PropertyChangeListener;
  */
 public interface Action extends ActionListener {
 
-	//-------------------------------------------------------------
-	// Constants --------------------------------------------------
-	//-------------------------------------------------------------
-
 	/**
 	 * DEFAULT
 	 */
@@ -91,48 +87,54 @@ public interface Action extends ActionListener {
 	 */
 	String MNEMONIC_KEY = "MnemonicKey";
 
-
-	//-------------------------------------------------------------
-	// Interface: Action ------------------------------------------
-	//-------------------------------------------------------------
-
 	/**
 	 * getValue
-	 * @param key TODO
+   * 
+   * @param key
+   *          TODO
 	 * @returns TODO
 	 */
 	Object getValue(String key);
 
 	/**
 	 * setValue
-	 * @param key TODO
-	 * @param value TODO
+   * 
+   * @param key
+   *          TODO
+   * @param value
+   *          TODO
 	 */
 	void putValue(String key, Object value);
 
 	/**
 	 * isEnabled
+   * 
 	 * @returns TODO
 	 */
 	boolean isEnabled();
 
 	/**
 	 * setEnabled
-	 * @param b TODO
+   * 
+   * @param b
+   *          TODO
 	 */
 	void setEnabled(boolean b);
 
 	/**
 	 * addPropertyChangeListener
-	 * @param listener TODO
+   * 
+   * @param listener
+   *          TODO
 	 */
 	void addPropertyChangeListener(PropertyChangeListener listener);
 
 	/**
 	 * removePropertyChangeListener
-	 * @param listener TODO
+   * 
+   * @param listener
+   *          TODO
 	 */
 	void removePropertyChangeListener(PropertyChangeListener listener);
-
 
 } // Action

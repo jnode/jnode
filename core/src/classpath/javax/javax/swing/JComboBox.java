@@ -95,7 +95,7 @@ public class JComboBox extends JComponent implements ItemSelectable,
   private static final int DEFAULT_MAXIMUM_ROW_COUNT = 8;
 
 	/**
-   * dataModel used by JComboBox to keep track of its list data and currently
+   * Data model used by JComboBox to keep track of its list data and currently
    * selected element in the list.
 	 */
 	protected ComboBoxModel dataModel;
@@ -290,9 +290,9 @@ public class JComboBox extends JComponent implements ItemSelectable,
 	 */
   public void setModel(ComboBoxModel newDataModel)
   {
-
     // dataModel is null if it this method is called from inside the constructors.
-    if(dataModel != null) {
+    if (dataModel != null)
+      {
 	// Prevents unneccessary updates.
 	if (dataModel == newDataModel)
       return;
@@ -367,7 +367,7 @@ public class JComboBox extends JComponent implements ItemSelectable,
     if (isEditable != editable)
       {
 	isEditable = editable;
-	firePropertyChange("editable", ! isEditable, isEditable);
+        firePropertyChange("editable", !isEditable, isEditable);
       }
   }
 
@@ -385,8 +385,8 @@ public class JComboBox extends JComponent implements ItemSelectable,
       {
 	int oldMaximumRowCount = maximumRowCount;
 	maximumRowCount = rowCount;
-	firePropertyChange("maximumRowCount",
-	                   oldMaximumRowCount, maximumRowCount);
+        firePropertyChange("maximumRowCount", oldMaximumRowCount,
+                           maximumRowCount);
       }
   }
 
@@ -417,8 +417,7 @@ public class JComboBox extends JComponent implements ItemSelectable,
       {
 	ListCellRenderer oldRenderer = renderer;
 	renderer = aRenderer;
-	firePropertyChange("renderer", oldRenderer,
-	                   renderer);
+        firePropertyChange("renderer", oldRenderer, renderer);
       }
   }
 
@@ -501,52 +500,52 @@ public class JComboBox extends JComponent implements ItemSelectable,
 	 */
   public void setSelectedIndex(int index)
   {
-  	if(index < -1 || index >= dataModel.getSize()) {
+  	if (index < -1 || index >= dataModel.getSize())
   		// Fails because index is out of bounds. 
   		throw new IllegalArgumentException("illegal index: " + index);
-  	} else {
-  		/* Selects the item at the given index or clears the selection if the
-  		 * index value is -1.
-  		 */
+    else
+       // Selects the item at the given index or clears the selection if the
+       // index value is -1.
 		setSelectedItem((index == -1) ? null : dataModel.getElementAt(index));
   	}
-  }
 
 	/**
-   * Returns index of the item that is currently selected  in the combo box.
-   * If no item is currently selected, then -1 is returned.
-   *
-   * <p>Note: For performance reasons you should minimize invocation of this
+   * Returns index of the item that is currently selected in the combo box. If
+   * no item is currently selected, then -1 is returned.
+   * <p>
+   * Note: For performance reasons you should minimize invocation of this
    * method. If the data model is not an instance of
-   * <code>DefaultComboBoxModel</code> the complexity is O(n) where
-   * n is the number of elements in the combo box.</p>
+   * <code>DefaultComboBoxModel</code> the complexity is O(n) where n is the
+   * number of elements in the combo box.
+   * </p>
    *
-   * @return int Index specifying location of the currently selected item in
-   *         the combo box or -1 if nothing is selected in the combo box.
+   * @return int Index specifying location of the currently selected item in the
+   *         combo box or -1 if nothing is selected in the combo box.
 	 */
   public int getSelectedIndex()
   {
     Object selectedItem = getSelectedItem();
     
-    if (selectedItem != null) {
-	
-		if(dataModel instanceof DefaultComboBoxModel) {
+    if (selectedItem != null)
+      {
+        if (dataModel instanceof DefaultComboBoxModel)
 			// Uses special method of DefaultComboBoxModel to retrieve the index.
       return ((DefaultComboBoxModel) dataModel).getIndexOf(selectedItem);
-		} else {
+        else
+          {
 			// Iterates over all items to retrieve the index.
 			int size = dataModel.getSize();
 			
-	  		for(int i=0; i < size; i++) {
+            for (int i = 0; i < size; i++)
+              {
 	  			Object o = dataModel.getElementAt(i);
 	  			
 				// XXX: Is special handling of ComparableS neccessary?
-	  			if((selectedItem != null) ? selectedItem.equals(o) : o == null) {
+                if ((selectedItem != null) ? selectedItem.equals(o) : o == null)
 	  				return i;
 	  			}
 	  		}
 		}
-    }
 
     // returns that no item is currently selected
     return -1;
@@ -571,11 +570,12 @@ public class JComboBox extends JComponent implements ItemSelectable,
 	 */
   public void addItem(Object element)
   {
-  	if(dataModel instanceof MutableComboBoxModel) {
+  	if (dataModel instanceof MutableComboBoxModel)
     ((MutableComboBoxModel) dataModel).addElement(element);
-  	} else {
-  		throw new RuntimeException("Unable to add the item because the data model it is not an instance of MutableComboBoxModel.");
-  	}
+    else
+      throw new RuntimeException("Unable to add the item because the data "
+                                 + "model it is not an instance of "
+                                 + "MutableComboBoxModel.");
   }
 
 	/**
@@ -588,11 +588,12 @@ public class JComboBox extends JComponent implements ItemSelectable,
 	 */
   public void insertItemAt(Object element, int index)
   {
-	if(dataModel instanceof MutableComboBoxModel) {
+	if (dataModel instanceof MutableComboBoxModel)
     ((MutableComboBoxModel) dataModel).insertElementAt(element, index);
-	} else {
-		throw new RuntimeException("Unable to insert the item because the data model it is not an instance of MutableComboBoxModel.");
-	}
+    else
+      throw new RuntimeException("Unable to insert the item because the data "
+                                 + "model it is not an instance of "
+                                 + "MutableComboBoxModel.");
   }
 
 	/**
@@ -604,11 +605,12 @@ public class JComboBox extends JComponent implements ItemSelectable,
 	 */
   public void removeItem(Object element)
   {
-	if(dataModel instanceof MutableComboBoxModel) {
+	if (dataModel instanceof MutableComboBoxModel)
     ((MutableComboBoxModel) dataModel).removeElement(element);
-	} else {
-		throw new RuntimeException("Unable to remove the item because the data model it is not an instance of MutableComboBoxModel.");
-	}
+    else
+      throw new RuntimeException("Unable to remove the item because the data "
+                                 + "model it is not an instance of "
+                                 + "MutableComboBoxModel.");
   }
 
 	/**
@@ -621,40 +623,40 @@ public class JComboBox extends JComponent implements ItemSelectable,
 	 */
   public void removeItemAt(int index)
   {
-	if(dataModel instanceof MutableComboBoxModel) {
+    if (dataModel instanceof MutableComboBoxModel)
     ((MutableComboBoxModel) dataModel).removeElementAt(index);
-	} else {
-		throw new RuntimeException("Unable to remove the item because the data model it is not an instance of MutableComboBoxModel.");
-	}
+    else
+      throw new RuntimeException("Unable to remove the item because the data "
+                                 + "model it is not an instance of "
+                                 + "MutableComboBoxModel.");
   }
 
 	/**
    * This method removes all elements from this JComboBox.
-   * <p>A <code>RuntimeException</code> is thrown if the data model is not
-   * an instance of {@link MutableComboBoxModel}.</p>
-   * 
+   * <p>
+   * A <code>RuntimeException</code> is thrown if the data model is not an
+   * instance of {@link MutableComboBoxModel}.
+   * </p>
 	 */
   public void removeAllItems()
   {
-    if (dataModel instanceof DefaultComboBoxModel) {
+    if (dataModel instanceof DefaultComboBoxModel)
     	// Uses special method if we have a DefaultComboBoxModel.
       ((DefaultComboBoxModel) dataModel).removeAllElements();
-    } else if(dataModel instanceof MutableComboBoxModel){
+    else if (dataModel instanceof MutableComboBoxModel)
+      {
     	// Iterates over all items and removes each.
     	MutableComboBoxModel mcbm = (MutableComboBoxModel) dataModel;
 
-	/* We intentionally remove the items backwards to support
-	 * models which shift their content to the beginning (e.g.
-	 * linked lists) 
-	 */     	
-    	for(int i=mcbm.getSize()-1; i >= 0; i--) {
+         // We intentionally remove the items backwards to support models which
+         // shift their content to the beginning (e.g. linked lists)
+        for (int i = mcbm.getSize() - 1; i >= 0; i--)
     		mcbm.removeElementAt(i);
     	}
-    	
-    } else {
-	throw new RuntimeException("Unable to remove the items because the data model it is not an instance of MutableComboBoxModel.");
-    }
-      
+    else
+      throw new RuntimeException("Unable to remove the items because the data "
+                                 +"model it is not an instance of "
+                                 + "MutableComboBoxModel.");
   }
 	
 	/**
@@ -771,7 +773,7 @@ public class JComboBox extends JComponent implements ItemSelectable,
    *
    * @param action action to listen to for property changes
    *
-   * @return $PropertyChangeListener$ Listener that listens to changes in
+   * @return a PropertyChangeListener that listens to changes in
    *         action properties.
 	 */
   protected PropertyChangeListener createActionPropertyChangeListener(Action action)
