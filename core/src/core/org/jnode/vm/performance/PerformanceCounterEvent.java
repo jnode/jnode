@@ -11,6 +11,16 @@ public abstract class PerformanceCounterEvent implements
 
     /** Identifier of this event */
     private final String id;
+    private final String description;
+
+    /**
+     * Initialize this instance.
+     * 
+     * @param id
+     */
+    protected PerformanceCounterEvent(PresetEvent preset) {
+        this(preset.name(), preset.getDescription());
+    }
 
     /**
      * Initialize this instance.
@@ -18,7 +28,17 @@ public abstract class PerformanceCounterEvent implements
      * @param id
      */
     protected PerformanceCounterEvent(String id) {
+        this(id, id);
+    }
+
+    /**
+     * Initialize this instance.
+     * 
+     * @param id
+     */
+    protected PerformanceCounterEvent(String id, String description) {
         this.id = id;
+        this.description = description;
     }
 
     /**
