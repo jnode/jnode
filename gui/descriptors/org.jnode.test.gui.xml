@@ -23,6 +23,7 @@
         
   <extension point="org.jnode.desktop.apps">
     <application name="AWTTest"      class="org.jnode.test.gui.AWTTest"/>
+    <application name="AWTMenuTest"      class="org.jnode.test.gui.AWTMenuTest"/>
     <application name="AWTFrameTest"      class="org.jnode.test.gui.AWTFrameTest"/>
     <application name="AWTDemo"      class="org.jnode.test.gui.AWTDemo"/>
     <application name="BoxWorld"     class="org.jnode.test.gui.BoxWorld"/>      
