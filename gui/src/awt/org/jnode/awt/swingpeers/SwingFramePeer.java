@@ -21,12 +21,6 @@
  
 package org.jnode.awt.swingpeers;
 
-import javax.swing.JComponent;
-import javax.swing.JDesktopPane;
-import javax.swing.JInternalFrame;
-import javax.swing.JRootPane;
-import javax.swing.SwingUtilities;
-import javax.swing.event.InternalFrameEvent;
 import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.Container;
@@ -41,6 +35,13 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.peer.FramePeer;
 import java.beans.PropertyVetoException;
+
+import javax.swing.JComponent;
+import javax.swing.JDesktopPane;
+import javax.swing.JInternalFrame;
+import javax.swing.JRootPane;
+import javax.swing.SwingUtilities;
+import javax.swing.event.InternalFrameEvent;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -106,9 +107,11 @@ final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame> implem
 	/**
 	 * @see java.awt.peer.FramePeer#setMenuBar(java.awt.MenuBar)
 	 */
+    @SuppressWarnings("deprecation")
 	public void setMenuBar(MenuBar mb) {
         mb.addNotify();
         jComponent.setJMenuBar(((SwingMenuBarPeer)mb.getPeer()).jComponent);
+        component.invalidate();
 	}
 
 	/**
