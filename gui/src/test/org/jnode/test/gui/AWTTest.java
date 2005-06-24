@@ -45,7 +45,7 @@ import java.awt.geom.PathIterator;
 /**
  * @author epr
  */
-public class AWTTest {
+public class AWTTest extends Frame {
 
     static class TestComponent extends Component {
 
@@ -180,111 +180,83 @@ public class AWTTest {
         }
 
     }
+    
+    public AWTTest(String title) {
+        super(title);
+        //wnd.setSize(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().getSize());
+        setSize(600, 400);
+        setLayout(new BorderLayout());
+        //wnd.setLocation(75, 50);
+        setBackground(Color.GREEN);
+        
+        final List l = new List();
+        l.add("Item 1");
+        l.add("Item 2");
+        l.add("Item 3");
+        //wnd.add(l, BorderLayout.NORTH);
+        
+        final Button b = new Button("Hello world");
+        b.addActionListener(new ActionListener() {
+            int i =0;
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Action performed " + e);
+                switch(i){
+                case 0:{
+                    add(new Button(String.valueOf(i)), BorderLayout.WEST);
+                    break;
+                }
+                case 1:{
+                    add(new Button(String.valueOf(i)), BorderLayout.SOUTH);
+                    break;
+                }
+                case 2:{
+                    add(new Button(String.valueOf(i)), BorderLayout.EAST);
+                    break;
+                }
+                default:
+                    b.setLabel(String.valueOf(i));
+                    setVisible(false);
+                }
+                i++;
+                invalidate();
+            }
+        });
+        add(b, BorderLayout.CENTER);
+        b.setBackground(Color.YELLOW);
+        
+        final Button b2 = new Button("Left");
+        final Scrollbar sb = new Scrollbar(Scrollbar.HORIZONTAL);
+        final JCheckBox cb1 = new JCheckBox("Right");
+
+        add(b2, BorderLayout.WEST);
+        b2.setBackground(Color.RED);
+        b2.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Action on b2");
+                if (sb.getValue() + sb.getBlockIncrement() <= sb.getMaximum()) {
+                    sb.setValue(sb.getValue() + sb.getBlockIncrement());
+                } else {
+                    Frame f2 = new Frame("New frame");
+                    f2.setSize(200, 100);
+                    f2.show();
+                }
+            }
+        });
+        
+        add(cb1, BorderLayout.EAST);
+        cb1.setBackground(Color.WHITE);
+                
+        final TextField tf = new TextField();
+        tf.setText("Let's type here");
+        add(tf, BorderLayout.SOUTH);
+    }
 
     public static void main(String[] args) throws InterruptedException {
         boolean useDoubleBuffer = (args.length > 0) && args[0].equals("buffer");
         
-        final Frame wnd = new Frame("AWTTest");
         try {
-        	//wnd.setSize(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().getSize());
-            wnd.setSize(600, 400);
-            wnd.setLayout(new BorderLayout());
-            //wnd.setLocation(75, 50);
-            wnd.setBackground(Color.GREEN);
-            
-            final List l = new List();
-            l.add("Item 1");
-            l.add("Item 2");
-            l.add("Item 3");
-            //wnd.add(l, BorderLayout.NORTH);
-            
-            final Button b = new Button("Hello world");
-            b.addActionListener(new ActionListener() {
-                int i =0;
-                public void actionPerformed(ActionEvent e) {
-                    System.out.println("Action performed " + e);
-                    switch(i){
-                    case 0:{
-                        wnd.add(new Button(String.valueOf(i)), BorderLayout.WEST);
-                        break;
-                    }
-                    case 1:{
-                        wnd.add(new Button(String.valueOf(i)), BorderLayout.SOUTH);
-                        break;
-                    }
-                    case 2:{
-                        wnd.add(new Button(String.valueOf(i)), BorderLayout.EAST);
-                        break;
-                    }
-                    default:
-                        b.setLabel(String.valueOf(i));
-                    	wnd.setVisible(false);
-                    }
-                    i++;
-                    wnd.validate();
-                }
-            });
-            wnd.add(b, BorderLayout.CENTER);
-            b.setBackground(Color.YELLOW);
-            
-            final Button b2 = new Button("Left");
-            final Scrollbar sb = new Scrollbar(Scrollbar.HORIZONTAL);
-            final JCheckBox cb1 = new JCheckBox("Right");
-
-            wnd.add(b2, BorderLayout.WEST);
-            b2.setBackground(Color.RED);
-            b2.addActionListener(new ActionListener() {
-            	public void actionPerformed(ActionEvent e) {
-            		System.out.println("Action on b2");
-            		if (sb.getValue() + sb.getBlockIncrement() <= sb.getMaximum()) {
-            			sb.setValue(sb.getValue() + sb.getBlockIncrement());
-            		} else {
-            			Frame f2 = new Frame("New frame");
-            			f2.setSize(200, 100);
-            			f2.show();
-            		}
-            	}
-            });
-            
-            wnd.add(cb1, BorderLayout.EAST);
-            cb1.setBackground(Color.WHITE);
-                    
-            final TextField tf = new TextField();
-            tf.setText("Let's type here");
-            wnd.add(tf, BorderLayout.SOUTH);
-            
-//            System.out.println(wnd.getFont().getName());
-//            System.out.println(wnd.getFont().getClass().getName());
-//            System.out.println(wnd.getFontMetrics(wnd.getFont()).getClass().getName());
-            
+            final AWTTest wnd = new AWTTest("AWTTest");
             wnd.show();
-
-//            while (wnd.isVisible()) {
-//            	Thread.sleep(500);
-//            }
-            
-
-//            Font f = wnd.getFont();
-//            System.out.println(f.getName());
-//            wnd.getFontMetrics(f);
-
-//            for (int i = 0; i < 30; i++) {
-//            	wnd.setLocation(wnd.getX() + 5, wnd.getY() + 4);
-//            	if ((i % 10) == 0) {
-//            		cb1.setState(!cb1.getState());
-//            		Thread.sleep(2500);
-//            	} else {
-//            		if ((i % 5) == 0) {
-//            			// Intended mixing of width & height, just for the fun of the test
-//            			wnd.setSize(wnd.getHeight(), wnd.getWidth());
-//            		}
-//            		Thread.sleep(100);
-//            	}
-//            }
-            
-//            Thread.sleep(5000);
-
-//            wnd.hide();
         }catch(Throwable t){
             t.printStackTrace();
         } finally {
