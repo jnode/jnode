@@ -50,7 +50,6 @@ public class TTFURLInput extends TTFMemoryInput {
 			os.write(buf, 0, len);
 		}
 		is.close();
-		System.out.println("Got " + os.size() + " bytes");
 		return os.toByteArray();
 	}
 }
