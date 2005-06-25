@@ -24,6 +24,7 @@ package org.jnode.awt.font;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 
 import org.jnode.driver.video.Surface;
@@ -72,6 +73,6 @@ public interface FontManager {
 	 * @param x
 	 * @param y
 	 */
-	public void drawText(Surface g, AffineTransform tx, String text, Font font, int x, int y, Color color);
+	public void drawText(Surface g, Shape clip, AffineTransform tx, String text, Font font, int x, int y, Color color);
 
 }

@@ -22,6 +22,7 @@
 package org.jnode.awt.font.truetype;
 
 import java.awt.Color;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.image.Raster;
 
@@ -59,7 +60,7 @@ public class TTFTextRenderer implements TextRenderer {
 	 * @param x
 	 * @param y
 	 */
-	public void render(Surface surface, AffineTransform tx, String text, int x, int y, Color color) {
+	public void render(Surface surface, Shape clip, AffineTransform tx, String text, int x, int y, Color color) {
 		try {
 			final TTFGlyphTable glyphTable = fontData.getGlyphTable();
 			final TTFCMapTable cmapTable = fontData.getCMapTable();
