@@ -39,7 +39,7 @@ final class SwingWindowPeer extends SwingBaseWindowPeer<Window, SwingWindow>
     public SwingWindowPeer(SwingToolkit toolkit, Window window) {
         super(toolkit, window, new SwingWindow(window));
         SwingToolkit.copyAwtProperties(window, jComponent);
-        jComponent.getContentPane().setLayout(new SwingContainerLayout(this));
+        jComponent.getContentPane().setLayout(new SwingContainerLayout(window, this));
     }
 }
 

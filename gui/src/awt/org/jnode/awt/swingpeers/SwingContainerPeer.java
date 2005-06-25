@@ -48,33 +48,28 @@ abstract class SwingContainerPeer<awtT extends Container, peerT extends JCompone
 	/**
 	 * @see java.awt.peer.ContainerPeer#beginLayout()
 	 */
-	public void beginLayout() {
-		// TODO Auto-generated method stub
-
+	public final void beginLayout() {
+		// Ignore
 	}
+
+    /**
+     * @see java.awt.peer.ContainerPeer#endLayout()
+     */
+    public final void endLayout() {
+        // Ignore
+    }
 
 	/**
 	 * @see java.awt.peer.ContainerPeer#beginValidate()
 	 */
 	public void beginValidate() {
-		// TODO Auto-generated method stub
-
-	}
-
-	/**
-	 * @see java.awt.peer.ContainerPeer#endLayout()
-	 */
-	public void endLayout() {
-		// TODO Auto-generated method stub
-
+        jComponent.doLayout();
 	}
 
 	/**
 	 * @see java.awt.peer.ContainerPeer#endValidate()
 	 */
 	public void endValidate() {
-		// TODO Auto-generated method stub
-
 	}
 
 	/**
@@ -87,7 +82,7 @@ abstract class SwingContainerPeer<awtT extends Container, peerT extends JCompone
 	/**
 	 * @see java.awt.peer.ContainerPeer#insets()
 	 */
-	public Insets insets() {
+	public final Insets insets() {
 		return getInsets();
 	}
 

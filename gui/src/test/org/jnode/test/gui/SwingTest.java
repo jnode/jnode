@@ -21,39 +21,38 @@
  
 package org.jnode.test.gui;
 
+import java.awt.BorderLayout;
+import java.awt.peer.FramePeer;
+
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JTextArea;
-
-import java.awt.BorderLayout;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class SwingTest extends JFrame {
+    
+    private final JButton north;
+    private final JButton south;
 
     public SwingTest(String title) {
         super(title);
         getRootPane().setDoubleBuffered(false);
         setLocation(100, 100);
         setSize(400, 400);
-        getContentPane().add(new JButton("JButton north"), BorderLayout.NORTH);
+        getContentPane().add(north = new JButton("JButton north"), BorderLayout.NORTH);
         getContentPane().add(new JTextArea("JTextArea test"), BorderLayout.CENTER);
-        getContentPane().add(new JButton("JButton south"), BorderLayout.SOUTH);
-        //JTabbedPane tabs = new JTabbedPane();
-        //tabs.add("Tab1", new JButton("JButton1"));
-        //tabs.add("Tab2", new JButton("JButton2"));
-        //tabs.add("Tab3", new JButton("JButton3"));
-        //getContentPane().add(tabs, BorderLayout.CENTER);
-        JMenuBar mb = new JMenuBar();
-        JMenu menu = new JMenu("JMenu test");
-        JMenuItem mi = new JMenuItem("JMenuItem test");
-        mb.add(menu);
-        menu.add(mi);
-        setJMenuBar(mb);
+        getContentPane().add(south = new JButton("JButton south"), BorderLayout.SOUTH);
+    }
+    
+    public void dumpInfo() {
+        System.out.println("frame.size:        " + getSize());
+        System.out.println("frame.insets:      " + getInsets());
+        System.out.println("frame.peer.insets: " + ((FramePeer)getPeer()).getInsets());
+        System.out.println("frame.cp.bounds:   " + getContentPane().getBounds());
+        System.out.println("north.bounds       " + north.getBounds());
+        System.out.println("south.bounds       " + south.getBounds());        
     }
     
 	public static void main(String[] args) {
@@ -61,6 +60,9 @@ public class SwingTest extends JFrame {
             SwingTest frame = new SwingTest("JFrame test");
             frame.validate();
             frame.show();
+            frame.dumpInfo();
+            Thread.sleep(10000);
+            frame.dumpInfo();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
