@@ -41,7 +41,7 @@ final class SwingDialogPeer extends SwingBaseWindowPeer<Dialog, SwingDialog>
 	public SwingDialogPeer(SwingToolkit toolkit, Dialog dialog) {
         super(toolkit, dialog, new SwingDialog(dialog));
 		jComponent.setTitle(dialog.getTitle());
-        jComponent.getContentPane().setLayout(new SwingContainerLayout(this));
+        jComponent.getContentPane().setLayout(new SwingContainerLayout(dialog, this));
 	}
 
 	/**

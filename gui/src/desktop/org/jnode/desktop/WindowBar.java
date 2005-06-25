@@ -63,6 +63,7 @@ public class WindowBar extends JPanel {
             public void run() {
                 wrappers.put(frame, wrapper);
                 model.addElement(wrapper);
+                revalidate();
                 repaint();
             }            
         });
@@ -76,6 +77,7 @@ public class WindowBar extends JPanel {
                 public void run() {
                     model.removeElement(wrapper);
                     wrappers.remove(frame);
+                    revalidate();
                     repaint();
                 }            
             });

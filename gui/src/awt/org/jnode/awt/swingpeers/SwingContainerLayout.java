@@ -32,9 +32,11 @@ import java.awt.LayoutManager;
  */
 final class SwingContainerLayout implements LayoutManager {
 
+    private final Container awtContainer;
 	private final SwingContainerPeer<?, ?> containerPeer;
 
-	public SwingContainerLayout(SwingContainerPeer containerPeer) {
+	public SwingContainerLayout(Container awtContainer, SwingContainerPeer containerPeer) {
+        this.awtContainer = awtContainer;
 		this.containerPeer = containerPeer;
 	}
 
@@ -49,6 +51,8 @@ final class SwingContainerLayout implements LayoutManager {
 	 * @see java.awt.LayoutManager#layoutContainer(java.awt.Container)
 	 */
 	public void layoutContainer(Container parent) {
+        awtContainer.doLayout();
+        
 		final int cnt = parent.getComponentCount();
 		final Insets insets = containerPeer.getInsets();
 		final int dx = insets.left;

@@ -45,7 +45,7 @@ final class SwingPanelPeer extends SwingContainerPeer<Panel, SwingPanel>
 		final SwingPanel jPanel = (SwingPanel) jComponent;
 		SwingToolkit.add(panel, jPanel);
 		SwingToolkit.copyAwtProperties(panel, jPanel);
-        jComponent.setLayout(new SwingContainerLayout(this));
+        jComponent.setLayout(new SwingContainerLayout(panel, this));
 	}
 
 }

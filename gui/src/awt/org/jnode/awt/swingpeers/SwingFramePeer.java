@@ -31,8 +31,8 @@ import java.awt.Insets;
 import java.awt.MenuBar;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.VMContainer;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.awt.peer.FramePeer;
 import java.beans.PropertyVetoException;
 
@@ -42,6 +42,210 @@ import javax.swing.JInternalFrame;
 import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.InternalFrameEvent;
+import javax.swing.event.InternalFrameListener;
+
+final class SwingFrame extends JInternalFrame implements ISwingPeer<Frame>,
+        InternalFrameListener {
+    
+    private static final class SwingFrameContentPane extends JComponent {
+
+        private Frame awtFrame;
+        private SwingFramePeer swingPeer;
+
+        public void initialize(Frame awtComponent, SwingFramePeer peer) {
+            this.awtFrame = awtComponent;
+            this.swingPeer = peer;
+            awtFrame.invalidate();
+        }
+
+/**
+         * @see javax.swing.JComponent#paintChildren(java.awt.Graphics)
+         */
+        protected void paintChildren(Graphics g) {
+            super.paintChildren(g);
+            final Insets insets = swingPeer.getInsets();
+            SwingToolkit.paintLightWeightChildren(awtFrame, g, insets.left, insets.top);
+        }
+
+        //        /**
+//         * @see java.awt.Component#invalidate()
+//         */
+//        public void invalidate() {
+//            super.invalidate();
+//            if (awtFrame != null) {
+//                awtFrame.invalidate();
+//            }
+//        }
+//
+//        /**
+//         * @see java.awt.Component#doLayout()
+//         */
+//        public void doLayout() {
+//            if (awtFrame != null) {
+//                awtFrame.doLayout();
+//            }
+//            super.doLayout();
+//        }
+//
+//        /**
+//         * @see java.awt.Component#validate()
+//         */
+//        public void validate() {
+//            super.validate();
+//            if (awtFrame != null) {
+//                awtFrame.validate();
+//            }
+//        }
+//
+        @SuppressWarnings("deprecation")
+        public void reshape(int x, int y, int width, int height) {
+            super.reshape(x, y, width, height);
+            if (!swingPeer.isReshapeInProgress) {
+                Point p=awtFrame.isShowing()?awtFrame.getLocationOnScreen():new Point( );
+//                Point p = awtFrame.getLocationOnScreen();
+                Insets ins = swingPeer.getInsets();
+                awtFrame.reshape(p.x + x, p.y, width + ins.left + ins.right, height + ins.bottom + ins.top);
+            }
+        }
+    }
+    private static final class SwingFrameRootPane extends JRootPane {
+
+        /**
+         * @see javax.swing.JRootPane#createContentPane()
+         */
+        protected Container createContentPane() {
+            return new SwingFrameContentPane();
+        }
+    }
+    
+    private final Frame awtComponent;
+
+    private SwingFramePeer swingPeer;
+
+    public SwingFrame(Frame awtFrame) {
+        this.awtComponent = awtFrame;
+        addInternalFrameListener(this);
+    }
+
+    /**
+     * @see javax.swing.JInternalFrame#createRootPane()
+     */
+    protected JRootPane createRootPane() {
+        return new SwingFrameRootPane();
+    }
+
+    /**
+     * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
+     */
+    public Frame getAWTComponent() {
+        return awtComponent;
+    }
+
+    Frame getAwtFrame() {
+        return awtComponent;
+    }
+
+    SwingFramePeer getSwingPeer() {
+        return swingPeer;
+    }
+
+    void initialize(SwingFramePeer peer) {
+        this.swingPeer = peer;
+        ((SwingFrameContentPane) getContentPane()).initialize(awtComponent, peer);
+    }
+
+    /**
+     * Fire a WindowEvent with a given id to the awtComponent.
+     */
+    private final void fireWindowEvent(int id) {
+        awtComponent.dispatchEvent(new WindowEvent(awtComponent, id));        
+    }
+    
+    /**
+     * @see javax.swing.event.InternalFrameListener#internalFrameActivated(javax.swing.event.InternalFrameEvent)
+     */
+    public void internalFrameActivated(InternalFrameEvent event) {
+        fireWindowEvent(WindowEvent.WINDOW_ACTIVATED);
+    }
+
+    /**
+     * @see javax.swing.event.InternalFrameListener#internalFrameClosed(javax.swing.event.InternalFrameEvent)
+     */
+    public void internalFrameClosed(InternalFrameEvent event) {
+        fireWindowEvent(WindowEvent.WINDOW_CLOSED);
+    }
+
+    /**
+     * @see javax.swing.event.InternalFrameListener#internalFrameClosing(javax.swing.event.InternalFrameEvent)
+     */
+    public void internalFrameClosing(InternalFrameEvent event) {
+        fireWindowEvent(WindowEvent.WINDOW_CLOSING);
+    }
+
+    /**
+     * @see javax.swing.event.InternalFrameListener#internalFrameDeactivated(javax.swing.event.InternalFrameEvent)
+     */
+    public void internalFrameDeactivated(InternalFrameEvent event) {
+        fireWindowEvent(WindowEvent.WINDOW_DEACTIVATED);
+    }
+
+    /**
+     * @see javax.swing.event.InternalFrameListener#internalFrameDeiconified(javax.swing.event.InternalFrameEvent)
+     */
+    public void internalFrameDeiconified(InternalFrameEvent event) {
+        fireWindowEvent(WindowEvent.WINDOW_DEICONIFIED);
+    }
+
+    /**
+     * @see javax.swing.event.InternalFrameListener#internalFrameIconified(javax.swing.event.InternalFrameEvent)
+     */
+    public void internalFrameIconified(InternalFrameEvent event) {
+        fireWindowEvent(WindowEvent.WINDOW_ICONIFIED);
+    }
+
+    /**
+     * @see javax.swing.event.InternalFrameListener#internalFrameOpened(javax.swing.event.InternalFrameEvent)
+     */
+    public void internalFrameOpened(InternalFrameEvent event) {
+        fireWindowEvent(WindowEvent.WINDOW_OPENED);
+    }
+    
+    /**
+     * @see java.awt.Component#invalidate()
+     */
+    public void invalidate() {
+        super.invalidate();
+        if (awtComponent != null) {
+            awtComponent.invalidate();
+        }
+    }
+    
+    /**
+     * Process an event within this swingpeer
+     * @param event
+     */
+    public final void processAWTEvent(AWTEvent event) {
+        super.processEvent(event);
+    }
+
+    /**
+     * Pass an event onto the AWT component.
+     * @see java.awt.Component#processEvent(java.awt.AWTEvent)
+     */
+    protected final void processEvent(AWTEvent event) {
+        awtComponent.dispatchEvent(SwingToolkit.convertEvent(event, awtComponent));
+    }
+
+    /**
+     * @see java.awt.Component#validate()
+     */
+    public void validate() {
+        super.validate();
+        if (awtComponent != null) {
+            awtComponent.validate();
+        }
+    }
+}
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -58,7 +262,7 @@ final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame> implem
         super(toolkit, awtFrame, new SwingFrame(awtFrame));
         jComponent.initialize(this);
 		SwingToolkit.copyAwtProperties(awtFrame, this.jComponent);
-        jComponent.getContentPane().setLayout(new SwingContainerLayout(this));
+        jComponent.getContentPane().setLayout(new SwingContainerLayout(awtFrame, this));
         jComponent.setLocation(awtFrame.getLocation());
         jComponent.setSize(awtFrame.getSize());
 		setResizable(awtFrame.isResizable());
@@ -86,6 +290,56 @@ final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame> implem
 	}
 
 	/**
+	 * @see org.jnode.awt.swingpeers.ISwingContainerPeer#addAWTComponent(java.awt.Component,
+	 *      javax.swing.JComponent)
+	 */
+	public void addAWTComponent(Component awtComponent, JComponent peer) {
+        jComponent.getContentPane().add(peer);
+	}
+
+	/**
+	 * @see java.awt.peer.ComponentPeer#getGraphics()
+	 */
+    public Graphics getGraphics() {
+        return jComponent.getGraphics();
+    }
+
+	/**
+	 * @see java.awt.peer.ContainerPeer#getInsets()
+	 */
+	public Insets getInsets() {
+		final Container contentPane = jComponent.getContentPane();
+        if ((contentPane.getWidth() == 0) || (contentPane.getHeight() == 0)) {
+            jComponent.doLayout();
+            jComponent.getRootPane().doLayout();
+        }
+		final int cpWidth = contentPane.getWidth();
+		final int cpHeight = contentPane.getHeight();
+		final Insets insets;
+		if ((cpWidth > 0) && (cpHeight > 0)) {
+			insets = new Insets(0, 0, 0, 0);
+			Component c = contentPane;
+			while (c != jComponent) {
+				insets.left += c.getX();
+				insets.top += c.getY();
+				c = c.getParent();
+			}
+			final int dw = jComponent.getWidth() - contentPane.getWidth();
+			final int dh = jComponent.getHeight() - contentPane.getHeight();
+			insets.right = dw - insets.left;
+			insets.bottom = dh - insets.top;
+		} else {
+			insets = jComponent.getInsets();
+            System.out.println("cp.bounds: " + contentPane.getBounds());
+		}
+		return insets;
+	}
+
+	public Point getLocationOnScreen() {
+        return jComponent.getLocation();
+    }
+
+	/**
 	 * @see java.awt.peer.FramePeer#getState()
 	 */
 	public int getState() {
@@ -98,11 +352,11 @@ final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame> implem
 	public void setIconImage(Image image) {
 	}
 
-	/**
-	 * @see java.awt.peer.FramePeer#setMaximizedBounds(java.awt.Rectangle)
-	 */
-	public void setMaximizedBounds(Rectangle r) {
-	}
+   /**
+ * @see java.awt.peer.FramePeer#setMaximizedBounds(java.awt.Rectangle)
+ */
+public void setMaximizedBounds(Rectangle r) {
+}
 
 	/**
 	 * @see java.awt.peer.FramePeer#setMenuBar(java.awt.MenuBar)
@@ -127,243 +381,24 @@ final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame> implem
 	public void setState(int state) {
 	}
 
-   public void setVisible(boolean b){
-       super.setVisible(b);
-       toolkit.getAwtContext().getDesktop().repaint();
-   }
-
-	/**
+    /**
 	 * @see java.awt.peer.FramePeer#setTitle(java.lang.String)
 	 */
 	public void setTitle(String title) {
         jComponent.setTitle(title);
 	}
 
-	/**
-	 * @see org.jnode.awt.swingpeers.ISwingContainerPeer#addAWTComponent(java.awt.Component,
-	 *      javax.swing.JComponent)
-	 */
-	public void addAWTComponent(Component awtComponent, JComponent peer) {
-        jComponent.getContentPane().add(peer);
-	}
-
-	/**
-	 * @see java.awt.peer.ContainerPeer#getInsets()
-	 */
-	public Insets getInsets() {
-		final Container contentPane = jComponent.getContentPane();
-		final int cpWidth = contentPane.getWidth();
-		final int cpHeight = contentPane.getHeight();
-		final Insets insets;
-		if ((cpWidth > 0) && (cpHeight > 0)) {
-			insets = new Insets(0, 0, 0, 0);
-			Component c = contentPane;
-			while (c != jComponent) {
-				insets.left += c.getX();
-				insets.top += c.getY();
-				c = c.getParent();
-			}
-			final int dw = jComponent.getWidth() - contentPane.getWidth();
-			final int dh = jComponent.getHeight() - contentPane.getHeight();
-			insets.right = dw - insets.left;
-			insets.bottom = dh - insets.top;
-		} else {
-			insets = jComponent.getInsets();
-		}
-		return insets;
-	}
-
-    public Point getLocationOnScreen() {
-        return jComponent.getLocation();
-    }
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#getGraphics()
-	 */
-    public Graphics getGraphics() {
-        return jComponent.getGraphics();
-    }
-}
-
-final class SwingFrame extends JInternalFrame implements ISwingPeer<Frame>, WindowListener {
-    private final Frame awtComponent;
-    private SwingFramePeer swingPeer;
-    
-    public SwingFrame(Frame awtFrame) {
-        this.awtComponent = awtFrame;
-        awtFrame.addWindowListener(this);
-    }
-
-    /**
-     * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
-     */
-    public Frame getAWTComponent() {
-        return awtComponent;
-    }
-
-    void initialize(SwingFramePeer peer) {
-        this.swingPeer = peer;
-        ((SwingFrameContentPane) getContentPane()).initialize(awtComponent, peer);
-    }
-
-    /**
-     * @see javax.swing.JInternalFrame#createRootPane()
-     */
-    protected JRootPane createRootPane() {
-        return new SwingFrameRootPane();
-    }
-
-    /**
-     * @see java.awt.Component#invalidate()
-     */
-    public void invalidate() {
-        super.invalidate();
-        if (awtComponent != null) {
-            awtComponent.invalidate();
-        }
-    }
-
-    /**
-     * @see java.awt.Component#validate()
-     */
-    public void validate() {
-        if (awtComponent != null) {
-            awtComponent.validate();
-        }
-        super.validate();
-    }
-
-    Frame getAwtFrame() {
-        return awtComponent;
-    }
-
-    SwingFramePeer getSwingPeer() {
-        return swingPeer;
-    }
-    
-    /**
-     * Pass an event onto the AWT component.
-     * @see java.awt.Component#processEvent(java.awt.AWTEvent)
-     */
-    protected final void processEvent(AWTEvent event) {
-        awtComponent.dispatchEvent(SwingToolkit.convertEvent(event, awtComponent));
-    }
-    
-    /**
-     * Process an event within this swingpeer
-     * @param event
-     */
-    public final void processAWTEvent(AWTEvent event) {
-        super.processEvent(event);
-    }
-
-    private static final class SwingFrameRootPane extends JRootPane {
-
-        /**
-         * @see javax.swing.JRootPane#createContentPane()
-         */
-        protected Container createContentPane() {
-            return new SwingFrameContentPane();
-        }
-    }
-
-    private static final class SwingFrameContentPane extends JComponent {
-
-        private Frame awtFrame;
-        private SwingFramePeer swingPeer;
-
-        public void initialize(Frame awtComponent, SwingFramePeer peer) {
-            this.awtFrame = awtComponent;
-            this.swingPeer = peer;
-            awtComponent.invalidate();
-        }
-
-        /**
-         * @see java.awt.Component#invalidate()
-         */
-        public void invalidate() {
-            super.invalidate();
-            if (awtFrame != null) {
-                awtFrame.invalidate();
-            }
-        }
-
-        /**
-         * @see java.awt.Component#doLayout()
-         */
-        public void doLayout() {
-            if (awtFrame != null) {
-                awtFrame.doLayout();
-            }
-            super.doLayout();
-        }
-
-        /**
-         * @see java.awt.Component#validate()
-         */
-        public void validate() {
-            if (awtFrame != null) {
-                awtFrame.validate();
-            }
-            super.validate();
-        }
-
-        @SuppressWarnings("deprecation")
-        public void reshape(int x, int y, int width, int height) {
-            super.reshape(x, y, width, height);
-            if (!swingPeer.isReshapeInProgress) {
-                Point p=awtFrame.isShowing()?awtFrame.getLocationOnScreen():new Point( );
-//                Point p = awtFrame.getLocationOnScreen();
-                Insets ins = swingPeer.getInsets();
-                awtFrame.reshape(p.x + x, p.y, width + ins.left + ins.right, height + ins.bottom + ins.top);
-            }
-        }
-
-        /**
-         * @see javax.swing.JComponent#paintChildren(java.awt.Graphics)
-         */
-        protected void paintChildren(Graphics g) {
-            super.paintChildren(g);
-            final Insets insets = swingPeer.getInsets();
-            SwingToolkit.paintLightWeightChildren(awtFrame, g, insets.left, insets.top);
-        }
-    }
-
-    /* WindowListener implementation */
-
-    public void windowOpened(WindowEvent e) {
-        dispatchEvent(new InternalFrameEvent(this, InternalFrameEvent.INTERNAL_FRAME_OPENED));
-        swingPeer.getToolkitImpl().getAwtContext().getDesktop().repaint();
-    }
-
-    public void windowClosing(WindowEvent e) {
-        dispatchEvent(new InternalFrameEvent(this, InternalFrameEvent.INTERNAL_FRAME_CLOSING));
-        swingPeer.getToolkitImpl().getAwtContext().getDesktop().repaint();
-    }
-
-    public void windowClosed(WindowEvent e) {
-        dispatchEvent(new InternalFrameEvent(this, InternalFrameEvent.INTERNAL_FRAME_CLOSED));
-        swingPeer.getToolkitImpl().getAwtContext().getDesktop().repaint();
-    }
-
-    public void windowIconified(WindowEvent e) {
-        dispatchEvent(new InternalFrameEvent(this, InternalFrameEvent.INTERNAL_FRAME_ICONIFIED));
-        swingPeer.getToolkitImpl().getAwtContext().getDesktop().repaint();
-    }
-
-    public void windowDeiconified(WindowEvent e) {
-        dispatchEvent(new InternalFrameEvent(this, InternalFrameEvent.INTERNAL_FRAME_DEICONIFIED));
-        swingPeer.getToolkitImpl().getAwtContext().getDesktop().repaint();
-    }
-
-    public void windowActivated(WindowEvent e) {
-        dispatchEvent(new InternalFrameEvent(this, InternalFrameEvent.INTERNAL_FRAME_ACTIVATED));
-        swingPeer.getToolkitImpl().getAwtContext().getDesktop().repaint();
-    }
-
-    public void windowDeactivated(WindowEvent e) {
-        dispatchEvent(new InternalFrameEvent(this, InternalFrameEvent.INTERNAL_FRAME_DEACTIVATED));
-        swingPeer.getToolkitImpl().getAwtContext().getDesktop().repaint();
-    }
+	public void setVisible(boolean b) {
+           if (b) {
+               jComponent.invalidate();
+               VMContainer.invalidateTree(component);
+               VMContainer.invalidateTree(jComponent);
+               jComponent.validate();
+           }
+           
+           jComponent.setVisible(b);
+           jComponent.repaint();
+           toolkit.getAwtContext().getDesktop().repaint();
+       }
 }
 
