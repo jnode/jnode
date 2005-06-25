@@ -26,31 +26,39 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JTextArea;
+
 import java.awt.BorderLayout;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class SwingTest {
+public class SwingTest extends JFrame {
 
+    public SwingTest(String title) {
+        super(title);
+        getRootPane().setDoubleBuffered(false);
+        setLocation(100, 100);
+        setSize(400, 400);
+        getContentPane().add(new JButton("JButton north"), BorderLayout.NORTH);
+        getContentPane().add(new JTextArea("JTextArea test"), BorderLayout.CENTER);
+        getContentPane().add(new JButton("JButton south"), BorderLayout.SOUTH);
+        //JTabbedPane tabs = new JTabbedPane();
+        //tabs.add("Tab1", new JButton("JButton1"));
+        //tabs.add("Tab2", new JButton("JButton2"));
+        //tabs.add("Tab3", new JButton("JButton3"));
+        //getContentPane().add(tabs, BorderLayout.CENTER);
+        JMenuBar mb = new JMenuBar();
+        JMenu menu = new JMenu("JMenu test");
+        JMenuItem mi = new JMenuItem("JMenuItem test");
+        mb.add(menu);
+        menu.add(mi);
+        setJMenuBar(mb);
+    }
+    
 	public static void main(String[] args) {
 		try {
-            JFrame frame = new JFrame("JFrame test");
-            frame.getRootPane().setDoubleBuffered(false);
-            frame.setLocation(100, 100);
-            frame.setSize(400, 400);
-            frame.getContentPane().add(new JButton("JButton test"), BorderLayout.NORTH);
-            //JTabbedPane tabs = new JTabbedPane();
-            //tabs.add("Tab1", new JButton("JButton1"));
-            //tabs.add("Tab2", new JButton("JButton2"));
-            //tabs.add("Tab3", new JButton("JButton3"));
-            //frame.getContentPane().add(tabs, BorderLayout.CENTER);
-            JMenuBar mb = new JMenuBar();
-            JMenu menu = new JMenu("JMenu test");
-            JMenuItem mi = new JMenuItem("JMenuItem test");
-            mb.add(menu);
-            menu.add(mi);
-            frame.setJMenuBar(mb);
+            SwingTest frame = new SwingTest("JFrame test");
             frame.validate();
             frame.show();
 		} catch (Exception ex) {
