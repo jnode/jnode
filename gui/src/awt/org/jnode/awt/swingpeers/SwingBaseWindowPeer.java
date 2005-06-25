@@ -24,10 +24,18 @@ abstract class SwingBaseWindowPeer<awtT extends Window, peerT extends JInternalF
     }
 
     public void toBack() {
-        jComponent.toBack();
+        SwingToolkit.invokeNowOrLater(new Runnable() {
+            public void run() {
+                jComponent.toBack();                
+            }
+        });
     }
 
     public void toFront() {
-        jComponent.toFront();
+        SwingToolkit.invokeNowOrLater(new Runnable() {
+            public void run() {
+                jComponent.toFront();                
+            }
+        });
     }
 }

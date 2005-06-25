@@ -21,8 +21,7 @@
  
 package org.jnode.awt;
 
-import java.awt.Container;
-
+import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 
 /**
@@ -40,5 +39,5 @@ public interface JNodeAwtContext {
 	 * Gets the root container of the screen, that holds the desktop.
 	 * @return
 	 */
-	public Container getAwtRoot();
+	public JComponent getAwtRoot();
 }
