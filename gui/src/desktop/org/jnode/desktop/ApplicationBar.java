@@ -85,19 +85,19 @@ public class ApplicationBar extends JPanel {
 		removeAll();
 		final Extension[] exts = ep.getExtensions();
 		final int cnt = exts.length;
-		log.info("Found " + cnt + " extensions");
+		log.debug("Found " + cnt + " extensions");
 		for (int i = 0; i < cnt; i++) {
 			final Extension ext = exts[i];
 
 			final ConfigurationElement[] elems = ext.getConfigurationElements();
-			log.info("Found " + elems.length + "ce's");
+			log.debug("Found " + elems.length + "ce's");
 			for (int k = 0; k < elems.length; k++) {
 				final ConfigurationElement ce = elems[k];
 				if (ce.getName().equals("application")) {
 					final String name = ce.getAttribute("name");
 					final String className = ce.getAttribute("class");
 					if ((name != null) && (className != null)) {
-						log.info("Adding app " + name);
+						log.debug("Adding app " + name);
 						final JButton b = new JButton(name);
 						b.addActionListener(new ActionListener() {
 							public void actionPerformed(ActionEvent e) {

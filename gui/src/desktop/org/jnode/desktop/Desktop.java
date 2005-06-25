@@ -111,7 +111,7 @@ public class Desktop implements Runnable {
             }
         });
 
-		log.info("dm=" + desktop.getDesktopManager());
+		log.debug("dm=" + desktop.getDesktopManager());
 		// TODO Auto-generated method stub
 
 	}
