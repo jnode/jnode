@@ -323,7 +323,7 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 
 			if ((strapinfo & 0x00000100) != 0) {
 				/* Unified memory architecture used */
-				log.info("INFO: NV4 architecture chip with UMA detected");
+				log.debug("INFO: NV4 architecture chip with UMA detected");
 				size = ((((strapinfo & 0x0000f000) >> 12) * 2) + 2);
 
 			} else {
@@ -567,7 +567,7 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 		final int n = best[1];
 		final int p = best[2];
 		final int freq = best[3];
-		log.info("Programming PLL to M" + NumberUtils.hex(m, 2) + " N" + NumberUtils.hex(n, 2) + " P" + NumberUtils.hex(p, 2) + " at " + freq + "KHz");
+		log.debug("Programming PLL to M" + NumberUtils.hex(m, 2) + " N" + NumberUtils.hex(n, 2) + " P" + NumberUtils.hex(p, 2) + " at " + freq + "KHz");
 
 		// select pixelPLL registerset C
 		vgaIO.setReg32(NVDAC_PLLSEL, 0x10000700);
@@ -577,7 +577,7 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 	}
 
 	private void setTiming(DisplayMode mode) {
-		log.info("Setting timing to " + mode);
+		log.debug("Setting timing to " + mode);
 		// Modify parameters as required by standard VGA
 		final int htotal = ((mode.getHTotal() >> 3) - 5);
 		final int hdisp_e = ((mode.getWidth() >> 3) - 1);
@@ -593,8 +593,8 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 		final int vsync_s = mode.getVsyncStart(); //-1;
 		final int vsync_e = mode.getVsyncEnd(); //-1;
 
-		log.info("HOR:" + htotal + " " + hdisp_e + " " + hblnk_s + " " + hblnk_e + " " + hsync_s + " " + hsync_e);
-		log.info("VER:" + vtotal + " " + vdisp_e + " " + vblnk_s + " " + vblnk_e + " " + vsync_s + " " + vsync_e);
+		log.debug("HOR:" + htotal + " " + hdisp_e + " " + hblnk_s + " " + hblnk_e + " " + hsync_s + " " + hsync_e);
+		log.debug("VER:" + vtotal + " " + vdisp_e + " " + vblnk_s + " " + vblnk_e + " " + vsync_s + " " + vsync_e);
 
 		/*
 		 * prevent memory adress counter from being reset (linecomp may not occur)
