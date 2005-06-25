@@ -24,6 +24,7 @@ package org.jnode.awt.swingpeers;
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.DefaultFocusTraversalPolicy;
 import java.awt.Dimension;
 
 import javax.swing.JComponent;
@@ -59,6 +60,8 @@ final class DesktopFrame extends JFrame implements JNodeAwtContext {
 	public DesktopFrame(Dimension screenSize) {
 		super("");
 		setSize(screenSize);
+        setFocusCycleRoot(true);
+        setFocusTraversalPolicy(new DefaultFocusTraversalPolicy());
         desktop = new JDesktopPane();
         desktop.setBackground(DESKTOP_BACKGROUND_COLOR);
         getContentPane().add(desktop);
