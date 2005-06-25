@@ -411,6 +411,6 @@ public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
         final Font font = getFont();
     	if (font != null)
     		((JNodeToolkit) Toolkit.getDefaultToolkit()).getFontManager()
-    				.drawText(surface, this.transform, text, font, x, y, getColor());
+    				.drawText(surface, this.clip, this.transform, text, font, x, y, getColor());
     }
 }

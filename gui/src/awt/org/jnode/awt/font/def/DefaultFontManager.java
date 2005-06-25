@@ -24,6 +24,7 @@ package org.jnode.awt.font.def;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -138,7 +139,7 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
      * @param x
      * @param y
      */
-    public void drawText(Surface g, AffineTransform tx, String text, Font font, int x, int y, Color color) {
+    public void drawText(Surface g, Shape clip, AffineTransform tx, String text, Font font, int x, int y, Color color) {
         FontProvider prv = getProvider(font);
         Font txFont = font;
         if (prv == null) {
@@ -147,7 +148,7 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
         }
         if (prv != null) {
         	final TextRenderer renderer = prv.getTextRenderer(txFont);
-        	renderer.render(g, tx, text, x, y, color);
+        	renderer.render(g, clip, tx, text, x, y, color);
         } else {
         	log.error("No provider found for font " + txFont);
         }

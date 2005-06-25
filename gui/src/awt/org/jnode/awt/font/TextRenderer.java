@@ -22,6 +22,7 @@
 package org.jnode.awt.font;
 
 import java.awt.Color;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 
 import org.jnode.driver.video.Surface;
@@ -38,6 +39,6 @@ public interface TextRenderer {
 	 * @param x
 	 * @param y
 	 */
-	public void render(Surface g, AffineTransform tx, String text, int x, int y, Color color);
+	public void render(Surface g, Shape clip, AffineTransform tx, String text, int x, int y, Color color);
 
 }

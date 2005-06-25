@@ -62,7 +62,7 @@ public class TTFSimpleTextRenderer implements TextRenderer {
      * @param x
      * @param y
      */
-    public void render(Surface sf, AffineTransform tx2, String text, int x, int y, Color c) {
+    public void render(Surface sf, Shape clip, AffineTransform tx2, String text, int x, int y, Color c) {
         try {
             final GeneralPath gp = new GeneralPath();
             gp.moveTo(x, y);
@@ -100,7 +100,7 @@ public class TTFSimpleTextRenderer implements TextRenderer {
                     gp.append(shape.getPathIterator(tx), false);
                 tx.translate(hmTable.getAdvanceWidth(index), 0);
             }
-            sf.draw(gp, null, tx2, c, Surface.PAINT_MODE);
+            sf.draw(gp, clip, tx2, c, Surface.PAINT_MODE);
         } catch (IOException ex) {
             log.error("Error drawing text", ex);
         }
