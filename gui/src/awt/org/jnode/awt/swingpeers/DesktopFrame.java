@@ -24,9 +24,9 @@ package org.jnode.awt.swingpeers;
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
 
+import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 
@@ -42,6 +42,17 @@ final class DesktopFrame extends JFrame implements JNodeAwtContext {
 	private static final Logger log = Logger.getLogger(DesktopFrame.class);
 	
 	/**
+     * @see java.awt.Component#repaint(long, int, int, int, int)
+     */
+    @Override
+    public void repaint(long tm, int x, int y, int width, int height) {
+        // TODO Auto-generated method stub
+        log.info("repaint (" + tm + ", " + x + ", " + y + ", " + width + ", "
+                + height);
+        super.repaint(tm, x, y, width, height);
+    }
+
+    /**
 	 * Initialize this instance.
 	 *
 	 */
@@ -60,8 +71,8 @@ final class DesktopFrame extends JFrame implements JNodeAwtContext {
 		return desktop;
 	}
 	
-	public final Container getAwtRoot() {
-		return getContentPane();
+	public final JComponent getAwtRoot() {
+		return (JComponent)getContentPane();
 	}
 
 	/**

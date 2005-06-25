@@ -25,6 +25,7 @@ import org.jnode.awt.JNodeAwtContext;
 import org.jnode.awt.JNodeToolkit;
 
 import javax.swing.JComponent;
+import javax.swing.JDesktopPane;
 import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 import java.awt.AWTError;
@@ -378,7 +379,24 @@ public final class SwingToolkit extends JNodeToolkit {
 		log.debug("onInitialize");
         
         // Set the repaint manager
-        RepaintManager.setCurrentManager(repaintManager = new SwingRepaintManager());        
+        RepaintManager.setCurrentManager(repaintManager = new SwingRepaintManager(new JNodeAwtContext() {
+
+            /**
+             * @see org.jnode.awt.JNodeAwtContext#getAwtRoot()
+             */
+            public JComponent getAwtRoot() {
+                final JNodeAwtContext ctx = getAwtContext();
+                return (ctx == null) ? null : getAwtContext().getAwtRoot();
+            }
+
+            /**
+             * @see org.jnode.awt.JNodeAwtContext#getDesktop()
+             */
+            public JDesktopPane getDesktop() {
+                final JNodeAwtContext ctx = getAwtContext();
+                return (ctx == null) ? null : getAwtContext().getDesktop();
+            }            
+        }));        
 
         // Create the desktop
 		desktopFrame = new DesktopFrame(getScreenSize());
@@ -392,4 +410,17 @@ public final class SwingToolkit extends JNodeToolkit {
         event.setSource(awtComponent);
         return event;
     }
+    
+    /**
+     * Run the runnable now, if the current thread is the event dispatch thread,
+     * otherwise invoke it on the event thread.
+     */
+    public static void invokeNowOrLater(final Runnable runnable) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            runnable.run();
+        } else {
+            SwingUtilities.invokeLater(runnable);
+        }
+    }
+
 }
