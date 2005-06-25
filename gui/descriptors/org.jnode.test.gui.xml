@@ -40,14 +40,16 @@
     </extension>
 
   <extension point="org.jnode.shell.aliases">
-    <alias name="AWTTest"      class="org.jnode.test.gui.AWTTest"/>
-    <alias name="AWTDemo"      class="org.jnode.test.gui.AWTDemo"/>
-    <alias name="BoxWorld"     class="org.jnode.test.gui.BoxWorld"/>      
-    <alias name="FBTest"       class="org.jnode.test.gui.FBTest"/>
-    <alias name="Tetris"       class="org.jnode.test.gui.Tetris"/>
-    <alias name="SwingTest"    class="org.jnode.test.gui.SwingTest"/>
-    <alias name="ThinTest"     class="thinlet.ThinTest"/>
-    <alias name="GlyphTest"    class="org.jnode.test.gui.GlyphTest"/>
+    <alias name="AWTTest"       class="org.jnode.test.gui.AWTTest"/>
+    <alias name="AWTMenuTest"   class="org.jnode.test.gui.AWTMenuTest"/>
+    <alias name="AWTDemo"       class="org.jnode.test.gui.AWTDemo"/>
+    <alias name="BoxWorld"      class="org.jnode.test.gui.BoxWorld"/>      
+    <alias name="FBTest"        class="org.jnode.test.gui.FBTest"/>
+    <alias name="Tetris"        class="org.jnode.test.gui.Tetris"/>
+    <alias name="SwingTest"     class="org.jnode.test.gui.SwingTest"/>
+    <alias name="SwingMenuTest" class="org.jnode.test.gui.SwingMenuTest"/>
+    <alias name="ThinTest"      class="thinlet.ThinTest"/>
+    <alias name="GlyphTest"     class="org.jnode.test.gui.GlyphTest"/>
   </extension>
 
 </plugin>

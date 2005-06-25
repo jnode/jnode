@@ -22,7 +22,6 @@
 package org.jnode.test.gui;
 
 import java.awt.BorderLayout;
-import java.awt.peer.FramePeer;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -44,15 +43,16 @@ public class SwingTest extends JFrame {
         getContentPane().add(north = new JButton("JButton north"), BorderLayout.NORTH);
         getContentPane().add(new JTextArea("JTextArea test"), BorderLayout.CENTER);
         getContentPane().add(south = new JButton("JButton south"), BorderLayout.SOUTH);
+        north.requestFocus();
     }
     
     public void dumpInfo() {
-        System.out.println("frame.size:        " + getSize());
-        System.out.println("frame.insets:      " + getInsets());
-        System.out.println("frame.peer.insets: " + ((FramePeer)getPeer()).getInsets());
-        System.out.println("frame.cp.bounds:   " + getContentPane().getBounds());
-        System.out.println("north.bounds       " + north.getBounds());
-        System.out.println("south.bounds       " + south.getBounds());        
+//        System.out.println("frame.size:        " + getSize());
+//        System.out.println("frame.insets:      " + getInsets());
+//        System.out.println("frame.peer.insets: " + ((FramePeer)getPeer()).getInsets());
+//        System.out.println("frame.cp.bounds:   " + getContentPane().getBounds());
+//        System.out.println("north.bounds       " + north.getBounds());
+//        System.out.println("south.bounds       " + south.getBounds());        
     }
     
 	public static void main(String[] args) {
