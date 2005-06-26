@@ -21,9 +21,7 @@
 
 package org.jnode.awt;
 
-import java.awt.Component;
 import java.awt.EventQueue;
-import java.awt.KeyboardFocusManager;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.security.AccessController;
@@ -121,11 +119,7 @@ public class KeyboardHandler implements
     private void postEvent(int id, long time, int modifiers, int keyCode,
             char keyChar) {
         JNodeToolkit tk = (JNodeToolkit) Toolkit.getDefaultToolkit();
-        KeyboardFocusManager kfm = KeyboardFocusManager.getCurrentKeyboardFocusManager();
-        Component source = kfm.getFocusOwner(); // TODO get the global focus owner
-        if (source == null)
-            source = tk.getTop();
-        KeyEvent me = new KeyEvent(source, id, time, modifiers, keyCode,
+        KeyEvent me = new KeyEvent(tk.getTop(), id, time, modifiers, keyCode,
                 keyChar);
         eventQueue.postEvent(me);
     }
