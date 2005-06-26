@@ -21,11 +21,16 @@
  
 package org.jnode.jnasm.assembler;
 
+import org.jnode.assembler.Label;
+import org.jnode.assembler.NativeStream;
+import org.jnode.jnasm.assembler.x86.X86Support;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -34,10 +39,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.jnode.assembler.Label;
-import org.jnode.assembler.NativeStream;
-import org.jnode.jnasm.assembler.x86.X86Support;
 
 /**
  * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
@@ -121,6 +122,9 @@ public abstract class Assembler {
         sw.flush();
         sw.close();
         String data = sw.toString();
+
+        new RandomAccessFile("jnode.lst","rw").write(data.getBytes());
+
         //1st pass
         ReInit(new StringReader(data));
         setPass(1);
@@ -133,6 +137,8 @@ public abstract class Assembler {
         ReInit(new StringReader(data));
         jnasmInput();
         emit(asm);
+        
+        asm.writeTo(new FileOutputStream("jnode.out"));
     }
 
     public void assemble(int baseAddress) {
@@ -182,7 +188,7 @@ public abstract class Assembler {
                     System.out.println(x.getMessage());
                     throw new UndefinedConstantException(name);
                 }
-                return 0;
+                return Integer.MAX_VALUE;
             }
         }
         return i.intValue();

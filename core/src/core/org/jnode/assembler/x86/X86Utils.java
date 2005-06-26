@@ -27,8 +27,8 @@ package org.jnode.assembler.x86;
  * @author epr
  */
 public class X86Utils {
-	
-	/**
+
+    /**
 	 * Does the given value fit in an 8-bit signed byte?
 	 * @param value
 	 * @return boolean
@@ -37,7 +37,7 @@ public class X86Utils {
 		return ((value >= Byte.MIN_VALUE) && (value <= Byte.MAX_VALUE));
 	}
 
-	/**
+    /**
 	 * Does the given value fit in an 16-bit signed byte?
 	 * @param value
 	 * @return boolean
