@@ -171,8 +171,6 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 
 	private JNodeEventQueue _eventQueue;
 
-	private final FocusHandler focusHandler;
-
 	private LRUCache<Map, ClasspathFontPeer> fontCache = new LRUCache<Map, ClasspathFontPeer>(50);
 
 	private Surface graphics;
@@ -192,7 +190,6 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 
 	public JNodeToolkit() {
 		refCount = 0;
-		this.focusHandler = new FocusHandler(this);
 	}
 
 	/**
@@ -410,15 +407,6 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	public ColorModel getColorModel() {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	/**
-	 * Gets the focus handler
-	 * 
-	 * @return The focus handler
-	 */
-	public final FocusHandler getFocusHandler() {
-		return this.focusHandler;
 	}
 
 	/**
@@ -695,6 +683,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 				this.keyboardHandler = new KeyboardHandler(eventQueue);
 				this.mouseHandler = new MouseHandler(dev.getDevice(),
 						screenSize, eventQueue);
+                keyboardHandler.install();
 
 				onInitialize();
 				this.refCount = rc;

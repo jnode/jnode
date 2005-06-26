@@ -295,28 +295,8 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
     /**
      * @see java.awt.peer.ComponentPeer#requestFocus()
      */
-    @SuppressWarnings("deprecation")
     public final void requestFocus() {
         jComponent.requestFocus();
-        // save old focus component
-		SwingComponentPeer oldFocusPeer;
-		Component fc = toolkit.getFocusHandler().getFocusedComponent();
-		if (fc != null) {
-			oldFocusPeer = (SwingComponentPeer) fc.getPeer();
-		} else {
-			oldFocusPeer = null;
-		}
-		// set new focus
-		toolkit.getFocusHandler().setFocusedComponent((Component) component);
-		// redraw new and (if necessary) old focus component
-		// Note that Window derived classes can also request
-		// focus, but are not traversable to focus.
-		if (oldFocusPeer != null && oldFocusPeer.isFocusTraversable()) {
-//			oldFocusPeer.paintAWTComponent();
-		}
-		if (isFocusTraversable()) {
-//			paintAWTComponent();
-		}
     }
 
     public final boolean requestFocus(Component lightweightChild, boolean temporary,
