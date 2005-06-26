@@ -129,6 +129,10 @@ final class SwingFrame extends JInternalFrame implements ISwingPeer<Frame>,
 
     public SwingFrame(Frame awtFrame) {
         this.awtComponent = awtFrame;
+//        setFocusCycleRoot(true);
+//        final KeyboardFocusManager manager = KeyboardFocusManager
+//                .getCurrentKeyboardFocusManager();
+//        setFocusTraversalPolicy(manager.getDefaultFocusTraversalPolicy());
         addInternalFrameListener(this);
     }
 
@@ -164,7 +168,8 @@ final class SwingFrame extends JInternalFrame implements ISwingPeer<Frame>,
      * Fire a WindowEvent with a given id to the awtComponent.
      */
     private final void fireWindowEvent(int id) {
-        awtComponent.dispatchEvent(new WindowEvent(awtComponent, id));
+        //awtComponent.dispatchEvent(new WindowEvent(awtComponent, id));
+        swingPeer.getToolkitImpl().postEvent(new WindowEvent(awtComponent, id));
     }
 
     /**
