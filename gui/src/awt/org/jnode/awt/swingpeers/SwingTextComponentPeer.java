@@ -54,7 +54,7 @@ abstract class SwingTextComponentPeer<awtT extends TextComponent, peerT extends 
 	 * @see java.awt.peer.TextComponentPeer#getCaretPosition()
 	 */
 	public int getCaretPosition() {
-		return ((JTextComponent) jComponent).getCaretPosition();
+		return jComponent.getCaretPosition();
 	}
 
 	/**
@@ -77,48 +77,48 @@ abstract class SwingTextComponentPeer<awtT extends TextComponent, peerT extends 
 	 * @see java.awt.peer.TextComponentPeer#getSelectionEnd()
 	 */
 	public int getSelectionEnd() {
-		return ((JTextComponent) jComponent).getSelectionEnd();
+		return jComponent.getSelectionEnd();
 	}
 
 	/**
 	 * @see java.awt.peer.TextComponentPeer#getSelectionStart()
 	 */
 	public int getSelectionStart() {
-		return ((JTextComponent) jComponent).getSelectionStart();
+		return jComponent.getSelectionStart();
 	}
 
 	/**
 	 * @see java.awt.peer.TextComponentPeer#getText()
 	 */
 	public String getText() {
-		return ((JTextComponent) jComponent).getText();
+		return jComponent.getText();
 	}
 
 	/**
 	 * @see java.awt.peer.TextComponentPeer#select(int, int)
 	 */
 	public void select(int start_pos, int end_pos) {
-		((JTextComponent) jComponent).select(start_pos, end_pos);
+		jComponent.select(start_pos, end_pos);
 	}
 
 	/**
 	 * @see java.awt.peer.TextComponentPeer#setCaretPosition(int)
 	 */
 	public void setCaretPosition(int pos) {
-		((JTextComponent) jComponent).setCaretPosition(pos);
+		jComponent.setCaretPosition(pos);
 	}
 
 	/**
 	 * @see java.awt.peer.TextComponentPeer#setEditable(boolean)
 	 */
 	public void setEditable(boolean editable) {
-		((JTextComponent) jComponent).setEditable(editable);
+		jComponent.setEditable(editable);
 	}
 
 	/**
 	 * @see java.awt.peer.TextComponentPeer#setText(java.lang.String)
 	 */
 	public void setText(String text) {
-		((JTextComponent) jComponent).setText(text);
+		jComponent.setText(text);
 	}
 }
