@@ -118,6 +118,9 @@ public class ConsoleTest {
 
         public void write( int b ) throws IOException {
             textArea.append( "" + (char)b );
+            if (b == '\n') {
+                textArea.repaint();
+            }
         }
     }
 
