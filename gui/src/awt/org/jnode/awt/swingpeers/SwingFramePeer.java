@@ -32,7 +32,6 @@ import java.awt.MenuBar;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.VMContainer;
-import java.awt.event.WindowEvent;
 import java.awt.peer.FramePeer;
 import java.beans.PropertyVetoException;
 
@@ -41,11 +40,8 @@ import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
-import javax.swing.event.InternalFrameEvent;
-import javax.swing.event.InternalFrameListener;
 
-final class SwingFrame extends JInternalFrame implements ISwingPeer<Frame>,
-        InternalFrameListener {
+final class SwingFrame extends JInternalFrame implements ISwingPeer<Frame> {
 
     private static final class SwingFrameContentPane extends JComponent {
 
@@ -129,11 +125,6 @@ final class SwingFrame extends JInternalFrame implements ISwingPeer<Frame>,
 
     public SwingFrame(Frame awtFrame) {
         this.awtComponent = awtFrame;
-//        setFocusCycleRoot(true);
-//        final KeyboardFocusManager manager = KeyboardFocusManager
-//                .getCurrentKeyboardFocusManager();
-//        setFocusTraversalPolicy(manager.getDefaultFocusTraversalPolicy());
-        addInternalFrameListener(this);
     }
 
     /**
@@ -162,63 +153,6 @@ final class SwingFrame extends JInternalFrame implements ISwingPeer<Frame>,
         this.swingPeer = peer;
         ((SwingFrameContentPane) getContentPane()).initialize(awtComponent,
                 peer);
-    }
-
-    /**
-     * Fire a WindowEvent with a given id to the awtComponent.
-     */
-    private final void fireWindowEvent(int id) {
-        //awtComponent.dispatchEvent(new WindowEvent(awtComponent, id));
-        swingPeer.getToolkitImpl().postEvent(new WindowEvent(awtComponent, id));
-    }
-
-    /**
-     * @see javax.swing.event.InternalFrameListener#internalFrameActivated(javax.swing.event.InternalFrameEvent)
-     */
-    public void internalFrameActivated(InternalFrameEvent event) {
-        fireWindowEvent(WindowEvent.WINDOW_ACTIVATED);
-    }
-
-    /**
-     * @see javax.swing.event.InternalFrameListener#internalFrameClosed(javax.swing.event.InternalFrameEvent)
-     */
-    public void internalFrameClosed(InternalFrameEvent event) {
-        fireWindowEvent(WindowEvent.WINDOW_CLOSED);
-    }
-
-    /**
-     * @see javax.swing.event.InternalFrameListener#internalFrameClosing(javax.swing.event.InternalFrameEvent)
-     */
-    public void internalFrameClosing(InternalFrameEvent event) {
-        fireWindowEvent(WindowEvent.WINDOW_CLOSING);
-    }
-
-    /**
-     * @see javax.swing.event.InternalFrameListener#internalFrameDeactivated(javax.swing.event.InternalFrameEvent)
-     */
-    public void internalFrameDeactivated(InternalFrameEvent event) {
-        fireWindowEvent(WindowEvent.WINDOW_DEACTIVATED);
-    }
-
-    /**
-     * @see javax.swing.event.InternalFrameListener#internalFrameDeiconified(javax.swing.event.InternalFrameEvent)
-     */
-    public void internalFrameDeiconified(InternalFrameEvent event) {
-        fireWindowEvent(WindowEvent.WINDOW_DEICONIFIED);
-    }
-
-    /**
-     * @see javax.swing.event.InternalFrameListener#internalFrameIconified(javax.swing.event.InternalFrameEvent)
-     */
-    public void internalFrameIconified(InternalFrameEvent event) {
-        fireWindowEvent(WindowEvent.WINDOW_ICONIFIED);
-    }
-
-    /**
-     * @see javax.swing.event.InternalFrameListener#internalFrameOpened(javax.swing.event.InternalFrameEvent)
-     */
-    public void internalFrameOpened(InternalFrameEvent event) {
-        fireWindowEvent(WindowEvent.WINDOW_OPENED);
     }
 
     /**
