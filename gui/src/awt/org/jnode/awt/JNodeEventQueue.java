@@ -4,7 +4,7 @@
 package org.jnode.awt;
 
 import java.awt.EventQueue;
-import java.awt.VMEventQueue;
+import java.awt.VMAwtAPI;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -18,7 +18,7 @@ final class JNodeEventQueue extends EventQueue {
      */
     final void shutdown() {
         this.shutdown = true;
-        VMEventQueue.shutdown(this);
+        VMAwtAPI.shutdown(this);
     }
     
     /**
