@@ -47,6 +47,7 @@
     <alias name="FBTest"        class="org.jnode.test.gui.FBTest"/>
     <alias name="Tetris"        class="org.jnode.test.gui.Tetris"/>
     <alias name="SwingTest"     class="org.jnode.test.gui.SwingTest"/>
+    <alias name="MouseEventTest" class="org.jnode.test.gui.MouseEventTest"/>
     <alias name="SwingMenuTest" class="org.jnode.test.gui.SwingMenuTest"/>
     <alias name="ThinTest"      class="thinlet.ThinTest"/>
     <alias name="GlyphTest"     class="org.jnode.test.gui.GlyphTest"/>
