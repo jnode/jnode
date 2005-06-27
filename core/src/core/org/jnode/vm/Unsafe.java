@@ -25,6 +25,7 @@ import org.jnode.assembler.ObjectResolver;
 import org.jnode.security.JNodePermission;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
+import org.vmmagic.pragma.InlinePragma;
 import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
@@ -702,4 +703,13 @@ public final class Unsafe {
 	 * @return The required length of id.
 	 */
 	static native int getCPUID(int[] id);
+
+    /**
+     * List the current stacktrace on the kernel debug output.
+     * @throws UninterruptiblePragma
+     * @throws InlinePragma
+     */
+    public static final void debugStackTrace() throws UninterruptiblePragma, InlinePragma {
+        getCurrentProcessor().getArchitecture().getStackReader().debugStackTrace();
+    }
 }
