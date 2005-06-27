@@ -340,7 +340,7 @@ public final class SwingToolkit extends JNodeToolkit {
 			r.width = r.width - ins.left - ins.right;
 			r.height = r.height - ins.top - ins.bottom;
 			if (r.contains(x, y)) {
-				Component c = sfp.getAwtFrame().findComponentAt(x, y);
+				Component c = sfp.getAWTComponent().findComponentAt(x, y);
 				if (c != null) {
 					comp = c;
 				}
