@@ -21,12 +21,9 @@
  
 package org.jnode.awt.swingpeers;
 
-import java.awt.AWTEvent;
 import java.awt.Graphics;
 import java.awt.Window;
 import java.awt.peer.WindowPeer;
-
-import javax.swing.JInternalFrame;
 
 /**
  * AWT window peer implemented as a {@link javax.swing.JInternalFrame}.
@@ -43,19 +40,10 @@ final class SwingWindowPeer extends SwingBaseWindowPeer<Window, SwingWindow>
     }
 }
 
-final class SwingWindow extends JInternalFrame implements ISwingPeer<Window> {
-    
-    private final Window awtComponent;
+final class SwingWindow extends SwingBaseWindow<Window> {
     
     public SwingWindow(Window awtComponent) {
-        this.awtComponent = awtComponent;
-    }
-    
-    /**
-     * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
-     */
-    public Window getAWTComponent() {
-        return awtComponent;
+        super(awtComponent);
     }
     
     /**
@@ -64,22 +52,6 @@ final class SwingWindow extends JInternalFrame implements ISwingPeer<Window> {
     protected void paintChildren(Graphics g) {
         super.paintChildren(g);
         SwingToolkit.paintLightWeightChildren(awtComponent, g, 0, 0);
-    }
-    
-    /**
-     * Pass an event onto the AWT component.
-     * @see java.awt.Component#processEvent(java.awt.AWTEvent)
-     */
-    protected final void processEvent(AWTEvent event) {
-        awtComponent.dispatchEvent(SwingToolkit.convertEvent(event, awtComponent));
-    }
-    
-    /**
-     * Process an event within this swingpeer
-     * @param event
-     */
-    public final void processAWTEvent(AWTEvent event) {
-        super.processEvent(event);
     }
 }
 

@@ -7,20 +7,22 @@ import java.awt.Window;
 import java.awt.event.WindowEvent;
 import java.awt.peer.WindowPeer;
 
-import javax.swing.JInternalFrame;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-abstract class SwingBaseWindowPeer<awtT extends Window, peerT extends JInternalFrame>
+abstract class SwingBaseWindowPeer<awtT extends Window, peerT extends SwingBaseWindow>
         extends SwingContainerPeer<awtT, peerT> implements WindowPeer {
 
+            private final WindowEventDispatcher eventDispatcher;
+            
     public SwingBaseWindowPeer(SwingToolkit toolkit, awtT window,
             peerT jComponent) {
         super(toolkit, window, jComponent);
-        jComponent.addInternalFrameListener(new WindowEventDispatcher());
+        this.eventDispatcher = new WindowEventDispatcher();
+        jComponent.addInternalFrameListener(eventDispatcher);
     }
 
     public final void dispose() {
@@ -52,6 +54,7 @@ abstract class SwingBaseWindowPeer<awtT extends Window, peerT extends JInternalF
     }
 
     private class WindowEventDispatcher implements InternalFrameListener {
+
         /**
          * @see javax.swing.event.InternalFrameListener#internalFrameActivated(javax.swing.event.InternalFrameEvent)
          */

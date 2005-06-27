@@ -21,7 +21,6 @@
 
 package org.jnode.awt.swingpeers;
 
-import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Frame;
@@ -31,17 +30,16 @@ import java.awt.Insets;
 import java.awt.MenuBar;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.VMContainer;
+import java.awt.VMAwtAPI;
 import java.awt.peer.FramePeer;
 import java.beans.PropertyVetoException;
 
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
-import javax.swing.JInternalFrame;
 import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
 
-final class SwingFrame extends JInternalFrame implements ISwingPeer<Frame> {
+final class SwingFrame extends SwingBaseWindow<Frame> {
 
     private static final class SwingFrameContentPane extends JComponent {
 
@@ -119,12 +117,10 @@ final class SwingFrame extends JInternalFrame implements ISwingPeer<Frame> {
         }
     }
 
-    private final Frame awtComponent;
-
     private SwingFramePeer swingPeer;
 
     public SwingFrame(Frame awtFrame) {
-        this.awtComponent = awtFrame;
+        super(awtFrame);
     }
 
     /**
@@ -132,17 +128,6 @@ final class SwingFrame extends JInternalFrame implements ISwingPeer<Frame> {
      */
     protected JRootPane createRootPane() {
         return new SwingFrameRootPane();
-    }
-
-    /**
-     * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
-     */
-    public Frame getAWTComponent() {
-        return awtComponent;
-    }
-
-    Frame getAwtFrame() {
-        return awtComponent;
     }
 
     SwingFramePeer getSwingPeer() {
@@ -163,25 +148,6 @@ final class SwingFrame extends JInternalFrame implements ISwingPeer<Frame> {
         if (awtComponent != null) {
             awtComponent.invalidate();
         }
-    }
-
-    /**
-     * Process an event within this swingpeer
-     * 
-     * @param event
-     */
-    public final void processAWTEvent(AWTEvent event) {
-        super.processEvent(event);
-    }
-
-    /**
-     * Pass an event onto the AWT component.
-     * 
-     * @see java.awt.Component#processEvent(java.awt.AWTEvent)
-     */
-    protected final void processEvent(AWTEvent event) {
-        awtComponent.dispatchEvent(SwingToolkit.convertEvent(event,
-                awtComponent));
     }
 
     /**
@@ -348,8 +314,8 @@ final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame>
             public void run() {
                 if (b) {
                     jComponent.invalidate();
-                    VMContainer.invalidateTree(component);
-                    VMContainer.invalidateTree(jComponent);
+                    VMAwtAPI.invalidateTree(component);
+                    VMAwtAPI.invalidateTree(jComponent);
                     jComponent.validate();
                 }
 
