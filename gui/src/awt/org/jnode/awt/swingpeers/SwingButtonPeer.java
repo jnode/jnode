@@ -35,19 +35,18 @@ import javax.swing.JButton;
 
 final class SwingButtonPeer extends SwingComponentPeer<Button, SwingButton> implements ButtonPeer {
 
-	// Construction
-	//
-
+    /**
+     * Initialize this instance.
+     */
 	public SwingButtonPeer(SwingToolkit toolkit, Button button) {
         super(toolkit, button, new SwingButton(button));
-        final JButton jButton = (JButton)jComponent;
-		SwingToolkit.add(button, jButton);
-		SwingToolkit.copyAwtProperties(button, jButton);
-		jButton.setText(button.getLabel());
+		SwingToolkit.add(button, jComponent);
+		SwingToolkit.copyAwtProperties(button, jComponent);
+        jComponent.setText(button.getLabel());
 	}
 
     public void setLabel(String label) {
-        ((JButton)jComponent).setText(label);
+        jComponent.setText(label);
     }
 }
 
