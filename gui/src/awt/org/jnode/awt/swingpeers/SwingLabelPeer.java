@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.awt.swingpeers;
 
 import java.awt.AWTEvent;
@@ -26,33 +26,55 @@ import java.awt.Label;
 import java.awt.peer.LabelPeer;
 
 import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 
 /**
  * AWT label peer implemented as a {@link javax.swing.JLabel}.
  */
+final class SwingLabelPeer extends SwingComponentPeer<Label, SwingLabel>
+        implements LabelPeer {
 
-final class SwingLabelPeer extends SwingComponentPeer<Label, SwingLabel> implements LabelPeer {
+    /**
+     * Initialize this instance.
+     * 
+     * @param toolkit
+     * @param label
+     */
+    public SwingLabelPeer(SwingToolkit toolkit, Label label) {
+        super(toolkit, label, new SwingLabel(label));
+        SwingToolkit.add(label, jComponent);
+        SwingToolkit.copyAwtProperties(label, jComponent);
+        setText(label.getText());
+        setAlignment(label.getAlignment());
+    }
 
-	//
-	// Construction
-	//
+    /**
+     * Sets the text.
+     * 
+     * @see java.awt.peer.LabelPeer#setText(java.lang.String)
+     */
+    public void setText(String text) {
+        jComponent.setText(text);
+    }
 
-	public SwingLabelPeer(SwingToolkit toolkit, Label label) {
-		super(toolkit, label, new SwingLabel(label));
-		final JLabel jLabel = (JLabel) jComponent;
-		SwingToolkit.add(label, jLabel);
-		SwingToolkit.copyAwtProperties(label, jLabel);
-		setText(label.getText());
-	}
-
-	public void setText(String text) {
-		((JLabel) jComponent).setText(text);
-	}
-
-	public void setAlignment(int alignment) {
-		//TODO implement it
-	}
-
+    /**
+     * Sets the text alignment.
+     * 
+     * @see java.awt.peer.LabelPeer#setAlignment(int)
+     */
+    public void setAlignment(int alignment) {
+        switch (alignment) {
+        case Label.LEFT:
+            jComponent.setHorizontalAlignment(SwingConstants.LEFT);
+            break;
+        case Label.CENTER:
+            jComponent.setHorizontalAlignment(SwingConstants.CENTER);
+            break;
+        case Label.RIGHT:
+            jComponent.setHorizontalAlignment(SwingConstants.RIGHT);
+            break;
+        }
+    }
 }
 
 final class SwingLabel extends JLabel implements ISwingPeer<Label> {
@@ -60,6 +82,7 @@ final class SwingLabel extends JLabel implements ISwingPeer<Label> {
 
     public SwingLabel(Label awtComponent) {
         this.awtComponent = awtComponent;
+        setOpaque(true);
     }
 
     /**
@@ -68,21 +91,23 @@ final class SwingLabel extends JLabel implements ISwingPeer<Label> {
     public Label getAWTComponent() {
         return awtComponent;
     }
-    
+
     /**
      * Pass an event onto the AWT component.
+     * 
      * @see java.awt.Component#processEvent(java.awt.AWTEvent)
      */
     protected final void processEvent(AWTEvent event) {
-        awtComponent.dispatchEvent(SwingToolkit.convertEvent(event, awtComponent));
+        awtComponent.dispatchEvent(SwingToolkit.convertEvent(event,
+                awtComponent));
     }
-    
+
     /**
      * Process an event within this swingpeer
+     * 
      * @param event
      */
     public final void processAWTEvent(AWTEvent event) {
         super.processEvent(event);
     }
 }
-
