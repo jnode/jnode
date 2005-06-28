@@ -1,4 +1,4 @@
-/* CurrentOperations.java --
+/* gnuCodecFactory.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,22 +36,60 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package org.omg.CORBA;
+package gnu.CORBA;
 
+import org.omg.CORBA.*;
+import org.omg.CORBA.LocalObject;
+import org.omg.IOP.*;
+import org.omg.IOP.Codec;
+import org.omg.IOP.CodecFactory;
+import org.omg.IOP.CodecFactoryPackage.UnknownEncoding;
+import org.omg.IOP.Encoding;
 
 /**
- * <p>
- * The interfaces, derived from this class, define operations that provide
- * information, associated with a particular thread of execution.
- * </p><p>
- * There are no operations for the general "Current". Instead, the operations
- * are defined for various subinterfaces that were derived from the
- * Current.
- * </p>
- * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
+ * A simple implementation of the Codec factory, able to return the
+ * standard Codec's. Only ENCODING_CDR_ENCAPS encoding is supported.
  *
- * @see Current
+ * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public interface CurrentOperations
+public class gnuCodecFactory
+  extends LocalObject
+  implements CodecFactory
 {
+  /**
+   * The associated ORB.
+   */
+  private final ORB orb;
+
+  /**
+   * Create a new instance of the this factory, associated with the given ORB.
+   */
+  public gnuCodecFactory(ORB an_orb)
+  {
+    orb = an_orb;
+  }
+
+  /**
+   * Creates the Codec for the given encoding.
+   *
+   * @param for_encoding the encoding for that the Codec must be created.
+   *
+   * @return the suitable Codec.
+   *
+   * @throws UnknownEncoding if the encoding is not a ENCODING_CDR_ENCAPS.
+   */
+  public Codec create_codec(Encoding for_encoding)
+                     throws UnknownEncoding
+  {
+    if (for_encoding.format != ENCODING_CDR_ENCAPS.value)
+      throw new UnknownEncoding("Only ENCODING_CDR_ENCAPS is " +
+                                "supported by this factory."
+                               );
+
+    return new cdrEncapsCodec(orb,
+                              new Version(for_encoding.major_version,
+                                          for_encoding.minor_version
+                                         )
+                             );
+  }
 }

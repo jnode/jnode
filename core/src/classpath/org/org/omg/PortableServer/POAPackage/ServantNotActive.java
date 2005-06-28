@@ -1,4 +1,4 @@
-/* CurrentOperations.java --
+/* ServantNotActive.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,22 +36,44 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package org.omg.CORBA;
+package org.omg.PortableServer.POAPackage;
 
+import org.omg.CORBA.UserException;
+import org.omg.CORBA.portable.IDLEntity;
+
+import java.io.Serializable;
 
 /**
- * <p>
- * The interfaces, derived from this class, define operations that provide
- * information, associated with a particular thread of execution.
- * </p><p>
- * There are no operations for the general "Current". Instead, the operations
- * are defined for various subinterfaces that were derived from the
- * Current.
- * </p>
- * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
+ * Raised in several cases when the operation would be applicable to the
+ * activated servant, but the current object is not active.
  *
- * @see Current
+ * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public interface CurrentOperations
+public class ServantNotActive
+  extends UserException
+  implements IDLEntity, Serializable
 {
+  /**
+   * Use serialVersionUID (v1.4) for interoperability.
+   */
+  private static final long serialVersionUID = -7806868032412803953L;
+
+  /**
+   * Create ServantNotActive with no explaining
+   * message.
+   */
+  public ServantNotActive()
+  {
+  }
+
+  /**
+   * Create the ServantNotActive with explaining
+   * message.
+   *
+   * @param why a string, explaining, why this exception has been thrown.
+   */
+  public ServantNotActive(String why)
+  {
+    super(why);
+  }
 }

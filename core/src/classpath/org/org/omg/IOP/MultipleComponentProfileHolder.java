@@ -1,4 +1,4 @@
-/* CurrentOperations.java --
+/* MultipleComponentProfileHolder.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,22 +36,70 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package org.omg.CORBA;
+package org.omg.IOP;
 
+import org.omg.CORBA.portable.Streamable;
+import org.omg.CORBA.portable.InputStream;
+import org.omg.CORBA.portable.OutputStream;
 
+ 
 /**
- * <p>
- * The interfaces, derived from this class, define operations that provide
- * information, associated with a particular thread of execution.
- * </p><p>
- * There are no operations for the general "Current". Instead, the operations
- * are defined for various subinterfaces that were derived from the
- * Current.
- * </p>
- * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
+ * A holder for the sequence of {@link TaggedComponent}
+ * ({@link MultipleComponentProfile}).
  *
- * @see Current
+* @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public interface CurrentOperations
+public class MultipleComponentProfileHolder
+  implements Streamable
 {
+  /**
+   * The stored array of <code>TaggedComponent</code>.
+   */
+  public TaggedComponent[] value;
+
+  /**
+   * Create the unitialised instance, leaving the value array
+   * with default <code>null</code> value.
+   */
+  public MultipleComponentProfileHolder()
+  {
+  }  
+  
+  /**
+   * Create the initialised instance.
+   * @param initialValue the array that will be assigned to
+   * the <code>value</code> array.
+   */
+  public MultipleComponentProfileHolder(TaggedComponent[] initialValue)
+  {
+    value = initialValue;
+  }
+
+  /**
+   * Read the {@link value} array from the CDR stream.
+   *
+   * @param input the org.omg.CORBA.portable stream to read. 
+   */
+  public void _read(InputStream input)
+  {
+    value = MultipleComponentProfileHelper.read(input);
+  }
+
+  /**
+   * Write the stored value into the CDR stream.
+   * 
+   * @param output the org.omg.CORBA.portable stream to write. 
+   */
+  public void _write(OutputStream output)
+  {
+    MultipleComponentProfileHelper.write(output, value);
+  }
+  
+  /**
+   * Get the typecode of the TaggedComponent.
+   */
+  public org.omg.CORBA.TypeCode _type()
+  {
+    return MultipleComponentProfileHelper.type();
+  }
 }

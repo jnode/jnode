@@ -1,4 +1,4 @@
-/* CurrentOperations.java --
+/* ServantAlreadyActive.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,22 +36,48 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package org.omg.CORBA;
+package org.omg.PortableServer.POAPackage;
 
+import org.omg.CORBA.UserException;
+import org.omg.CORBA.portable.IDLEntity;
+
+import java.io.Serializable;
 
 /**
- * <p>
- * The interfaces, derived from this class, define operations that provide
- * information, associated with a particular thread of execution.
- * </p><p>
- * There are no operations for the general "Current". Instead, the operations
- * are defined for various subinterfaces that were derived from the
- * Current.
- * </p>
- * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
+ * Raised in response to activate the already active object when
+ * the UNIQUE_ID (single ID per object, default) policy is active. If the
+ * UNIQUE_ID policy is inactive, the object can be activated several
+ * times, each time obtaining a newly generated Id to the same object.
  *
- * @see Current
+ * @see org.omg.PortableServer.IdUniquenessPolicyValue
+ *
+ * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public interface CurrentOperations
+public class ServantAlreadyActive
+  extends UserException
+  implements IDLEntity, Serializable
 {
+  /**
+   * Use serialVersionUID (v1.4) for interoperability.
+   */
+  private static final long serialVersionUID = 780130793809887260L;
+
+  /**
+   * Create ServantAlreadyActive with no explaining
+   * message.
+   */
+  public ServantAlreadyActive()
+  {
+  }
+
+  /**
+   * Create the ServantAlreadyActive with explaining
+   * message.
+   *
+   * @param why a string, explaining, why this exception has been thrown.
+   */
+  public ServantAlreadyActive(String why)
+  {
+    super(why);
+  }
 }

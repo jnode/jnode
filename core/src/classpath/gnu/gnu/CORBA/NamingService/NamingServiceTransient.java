@@ -102,10 +102,12 @@ public class NamingServiceTransient
     String iorf = null;
     try
       {
+        Functional_ORB.setPort(PORT);
+
         // Create and initialize the ORB
         final Functional_ORB orb = new Functional_ORB();
-        orb.setPort(PORT);
-        orb.init(args, null);
+
+        Functional_ORB.setPort(Functional_ORB.DEFAULT_INITIAL_PORT);
 
         // Create the servant and register it with the ORB
         NamingContextExt namer = new Ext(new TransientContext());

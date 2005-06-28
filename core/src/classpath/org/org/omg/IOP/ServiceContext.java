@@ -1,4 +1,4 @@
-/* CurrentOperations.java --
+/* ServiceContext.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,22 +36,60 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package org.omg.CORBA;
+package org.omg.IOP;
 
+import org.omg.CORBA.portable.IDLEntity;
+
+import java.io.Serializable;
 
 /**
- * <p>
- * The interfaces, derived from this class, define operations that provide
- * information, associated with a particular thread of execution.
- * </p><p>
- * There are no operations for the general "Current". Instead, the operations
- * are defined for various subinterfaces that were derived from the
- * Current.
- * </p>
- * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
+ * The ServiceContext structure contains the service data, being passed in the
+ * CORBA message. For instance, then passing the wide characters, it is
+ * mandatory to include the service context, defining the used encoding.
+ * The contexts are recognised by they integer indentifier.
+ * In this class, the content of the context is represented as an abstract
+ * array of bytes.
  *
- * @see Current
+ * @see ServiceContextHolder
+ * @see ServiceContextHelper
+ *
+ * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public interface CurrentOperations
+public class ServiceContext
+  implements IDLEntity, Serializable
 {
+  /**
+   * Use serialVersionUID (v1.4) for interoperability.
+   */
+  private static final long serialVersionUID = -2232391417465261379L;
+
+  /**
+   * The context id (for instance, 0x1 for code sets context).
+   * At the moment of writing, the OMG defines 16 standard values and
+   * provides rules to register the vendor specific context ids.
+   * The range 0-4095 is reserved for the future standard OMG contexts.
+   */
+  public int context_id;
+
+  /**
+   * The context_data.
+   */
+  public byte[] context_data;
+
+  /**
+   * Create the unitialised instance, assigning to
+   * the all fields java default values.
+   */
+  public ServiceContext()
+  {
+  }
+
+  /**
+   * Create the instance, initialising the fields to the given values.
+   */
+  public ServiceContext(int a_context_id, byte[] a_context_data)
+  {
+    this.context_id = a_context_id;
+    this.context_data = a_context_data;
+  }
 }
