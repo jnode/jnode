@@ -16,6 +16,7 @@ public final class VMAwtAPI {
      * @param c
      */
     public static void invalidateTree(Container c) {
+        c.invalidate();
         c.invalidateTree();
     }
 
