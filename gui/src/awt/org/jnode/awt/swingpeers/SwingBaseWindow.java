@@ -64,4 +64,13 @@ abstract class SwingBaseWindow<awtT extends Window> extends JInternalFrame
     public final void processAWTEvent(AWTEvent event) {
         super.processEvent(event);
     }
+
+    /**
+     * @see org.jnode.awt.swingpeers.ISwingPeer#validatePeerOnly()
+     */
+    public final void validatePeerOnly() {
+        super.validate();
+        doLayout();
+        getRootPane().doLayout();
+    }    
 }

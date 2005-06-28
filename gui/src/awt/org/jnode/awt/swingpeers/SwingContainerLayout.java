@@ -34,6 +34,7 @@ final class SwingContainerLayout implements LayoutManager {
 
     private final Container awtContainer;
 	private final SwingContainerPeer<?, ?> containerPeer;
+    private boolean layoutBusy = false;
 
 	public SwingContainerLayout(Container awtContainer, SwingContainerPeer containerPeer) {
         this.awtContainer = awtContainer;
@@ -51,21 +52,33 @@ final class SwingContainerLayout implements LayoutManager {
 	 * @see java.awt.LayoutManager#layoutContainer(java.awt.Container)
 	 */
 	public void layoutContainer(Container parent) {
-        awtContainer.doLayout();
-        
-		final int cnt = parent.getComponentCount();
-		final Insets insets = containerPeer.getInsets();
-		final int dx = insets.left;
-		final int dy = insets.top;
-		for (int i = 0; i < cnt; i++) {
-			final Component child = parent.getComponent(i);
-			if (child instanceof ISwingPeer) {
-				final Component awtComp = ((ISwingPeer<?>) child).getAWTComponent();
-				child.setLocation(awtComp.getX() - dx, awtComp.getY() - dy);
-			}
-		}
+        if (!layoutBusy) {
+            layoutBusy = true;
+            try {
+                doLayout(parent);
+            } finally {
+                layoutBusy = false;
+            }
+        }
 	}
 
+    private final void doLayout(Container parent) {
+        awtContainer.doLayout();
+
+        final int cnt = parent.getComponentCount();
+        final Insets insets = containerPeer.getInsets();
+        final int dx = insets.left;
+        final int dy = insets.top;
+        for (int i = 0; i < cnt; i++) {
+            final Component child = parent.getComponent(i);
+            if (child instanceof ISwingPeer) {
+                final Component awtComp = ((ISwingPeer< ? >) child)
+                        .getAWTComponent();
+                child.setLocation(awtComp.getX() - dx, awtComp.getY() - dy);
+            }
+        }
+    }
+    
 	/**
 	 * @see java.awt.LayoutManager#minimumLayoutSize(java.awt.Container)
 	 */

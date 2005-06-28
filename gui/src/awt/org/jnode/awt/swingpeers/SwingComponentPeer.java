@@ -306,6 +306,9 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
 
     boolean isReshapeInProgress = false;
     public final void reshape(int x, int y, int width, int height) {
+        if (isReshapeInProgress) {
+            return;
+        }
         final int oldWidth = jComponent.getWidth();
     	final int oldHeight = jComponent.getHeight();
         isReshapeInProgress = true;

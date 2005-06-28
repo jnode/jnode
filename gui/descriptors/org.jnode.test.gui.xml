@@ -49,6 +49,7 @@
     <alias name="SwingTest"     class="org.jnode.test.gui.SwingTest"/>
     <alias name="MouseEventTest" class="org.jnode.test.gui.MouseEventTest"/>
     <alias name="SwingMenuTest" class="org.jnode.test.gui.SwingMenuTest"/>
+    <alias name="TextFieldTest" class="org.jnode.test.gui.TextFieldTest"/>
     <alias name="ThinTest"      class="thinlet.ThinTest"/>
     <alias name="GlyphTest"     class="org.jnode.test.gui.GlyphTest"/>
   </extension>

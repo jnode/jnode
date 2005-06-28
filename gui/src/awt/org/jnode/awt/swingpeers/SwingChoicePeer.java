@@ -113,5 +113,12 @@ final class SwingChoice extends JComboBox implements ISwingPeer<Choice> {
     public final void processAWTEvent(AWTEvent event) {
         super.processEvent(event);
     }
+
+    /**
+     * @see org.jnode.awt.swingpeers.ISwingPeer#validatePeerOnly()
+     */
+    public final void validatePeerOnly() {
+        super.validate();
+    }    
 }
 
