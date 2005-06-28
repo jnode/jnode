@@ -165,21 +165,13 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
 	 * @return The location on screen
 	 */
 	public Point getLocationOnScreen() {
-		return computeLocationOnScreen(component);
-	}
-
-    private Point computeLocationOnScreen(Component component) {
-//        if(component instanceof Frame)
-//            return component.getLocationOnScreen();
-
+        Point p = component.getLocation();
         Container parent = component.getParent();
-        if (parent == null)
-            return component.getLocation();
-        else {
-            Point p = computeLocationOnScreen(parent);
-            p.translate(component.getX(), component.getY());
-            return p;
+        while (parent != null) {
+            p.translate(parent.getX(), parent.getY());
+            parent = parent.getParent();
         }
+        return p;
     }
 
     public final Dimension getMinimumSize() {

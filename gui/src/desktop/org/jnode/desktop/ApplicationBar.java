@@ -21,6 +21,11 @@
  
 package org.jnode.desktop;
 
+import java.awt.AWTError;
+import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
@@ -47,6 +52,7 @@ public class ApplicationBar extends JPanel {
 
 	public ApplicationBar(ExtensionPoint ep) {
 		this.ep = ep;
+        setLayout(new GridBagLayout());
 		
 		reloadApps();
 	}
@@ -98,16 +104,33 @@ public class ApplicationBar extends JPanel {
 					final String className = ce.getAttribute("class");
 					if ((name != null) && (className != null)) {
 						log.debug("Adding app " + name);
-						final JButton b = new JButton(name);
-						b.addActionListener(new ActionListener() {
+                        addApp(name, new ActionListener() {
 							public void actionPerformed(ActionEvent e) {
 								startApp(name, className);
 							}
 						});
-						add(b);
 					}
 				}
 			}
 		}
 	}
+    
+    /**
+     * @deprecated
+     * @see java.awt.Container#add(java.awt.Component)
+     */
+    public Component add(Component c) {
+        throw new AWTError("Use addApp instead");
+    }
+    
+    public void addApp(String label, ActionListener action) {
+        final JButton b = new JButton(label);
+        b.addActionListener(action);
+        final GridBagConstraints constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = GridBagConstraints.RELATIVE;
+        constraints.insets = new Insets(2, 5, 2, 5);
+        constraints.fill = GridBagConstraints.BOTH;
+        super.add(b, constraints);
+    }
 }

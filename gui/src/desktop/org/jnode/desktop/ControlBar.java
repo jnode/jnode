@@ -21,6 +21,7 @@
  
 package org.jnode.desktop;
 
+import java.awt.Color;
 import java.awt.GridLayout;
 
 import javax.swing.JPanel;
@@ -40,6 +41,7 @@ public class ControlBar extends JPanel {
 		setLayout(new GridLayout(2, 1));
 		add(appsBar);
 		add(windowBar);
+        setBackground(Color.BLUE);
 	}
 	
 	public ApplicationBar getApplicationBar() {
