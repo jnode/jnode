@@ -1,5 +1,5 @@
-/* SocketChannelSelectionKey.java -- 
-   Copyright (C) 2003 Free Software Foundation, Inc.
+/* AWTUtilities.java -- Common utility methods for AWT and Swing.
+   Copyright (C) 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,24 +35,35 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+package gnu.java.awt;
 
-package gnu.java.nio;
+import java.awt.Component;
+import java.awt.Container;
+import java.util.Vector;
 
-import java.nio.channels.spi.AbstractSelectableChannel;
-
-public final class SocketChannelSelectionKey
-  extends SelectionKeyImpl
+/**
+ * This class provides utility methods that are commonly used in AWT
+ * (and Swing).
+ */
+public class AWTUtilities
 {
-  public SocketChannelSelectionKey (AbstractSelectableChannel channel,
-                                    SelectorImpl selector)
+
+  /**
+   * Returns the visible children of a {@link Container}. This method is
+   * commonly needed in LayoutManagers, because they only have to layout
+   * the visible children of a Container.
+   *
+   * @param c the Container from which to extract the visible children
+   *
+   * @return the visible children of <code>c</code>
+   */
+  public static Component[] getVisibleChildren(Container c)
   {
-    super (channel, selector);
-  }
-    
-  public int getNativeFD()
-  {
-    NIOSocket socket =
-        (NIOSocket) ((SocketChannelImpl) ch).socket();
-    return socket.getPlainSocketImpl().getNativeFD();
+    Component[] children = c.getComponents();
+    Vector visible = new Vector();
+    for (int i = 0; i < children.length; i++)
+      if (children[i].isVisible())
+        visible.add(children[i]);
+    return (Component[]) visible.toArray(new Container[visible.size()]);
   }
 }

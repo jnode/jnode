@@ -46,6 +46,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
@@ -871,10 +872,19 @@ public abstract class JComponent extends Container implements Serializable
    */
 	protected  Graphics getComponentGraphics(Graphics g)
   {    
-    Graphics g2 = g.create();
-    g2.setFont(this.getFont());
-    g2.setColor(this.getForeground());
+    if (g instanceof Graphics2D)
+      {
+       g.setFont (this.getFont());
+       g.setColor (this.getForeground());
+       return g;
+      }
+    else
+      {
+        Graphics g2 = g.create ();
+        g2.setFont (this.getFont());
+        g2.setColor (this.getForeground());
     return g2;
+  }
   }
 
   /**
@@ -1022,12 +1032,13 @@ public abstract class JComponent extends Container implements Serializable
     if (preferredSize != null)
       prefSize = preferredSize;
 
-		if (ui != null)
+    else if (ui != null)
 		{
 			Dimension s = ui.getPreferredSize(this);
 			if (s != null)
           prefSize = s;
 			}
+
     if (prefSize == null)
       prefSize = super.getPreferredSize();
     // make sure that prefSize is not smaller than minSize
