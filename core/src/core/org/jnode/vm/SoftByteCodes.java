@@ -396,8 +396,20 @@ public class SoftByteCodes implements Uninterruptible {
             throws UninterruptiblePragma, LoadStaticsPragma,
             PrivilegedActionPragma {
         // if (VmSystem.debug > 0) {
-        // Unsafe.getCurrentProcessor().getArchitecture().getStackReader().debugStackTrace();
+        // Unsafe.debugStackTrace();
         // }
+        
+        // Do stack overflows without anything that is not
+        // absolutely needed
+        if (nr == EX_STACKOVERFLOW) {
+            if (true) {
+                Unsafe.debug("Stack overflow:\n");
+                Unsafe.debugStackTrace(50);
+                Unsafe.debug('\n');
+            }
+            throw new StackOverflowError();
+        }
+        
         if (false) {
             Unsafe.debug(nr);
             Unsafe.debug(address);
@@ -428,20 +440,7 @@ public class SoftByteCodes implements Uninterruptible {
             return new AbstractMethodError("Abstract method at " + hexAddress
                     + state);
         case EX_STACKOVERFLOW:
-            if (true) {
-                Unsafe.debug("Stack overflow in ");
-                Unsafe.debug(current.asThread().getName());
-                Unsafe.debug('\n');
-                Unsafe.getCurrentProcessor().getArchitecture().getStackReader().debugStackTrace(50);
-                Unsafe.debug('\n');
-            }
             return new StackOverflowError();
-        // case EX_CLASSCAST:
-        // if (false) {
-        // Unsafe.getCurrentProcessor().getArchitecture().getStackReader().debugStackTrace();
-        // Unsafe.die("Classcast failed");
-        // }
-        // return new ClassCastException();
         case EX_COPRO_OR:
             throw new ArithmeticException("Coprocessor overrun");
         case EX_COPRO_ERR:
