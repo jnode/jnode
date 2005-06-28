@@ -24,7 +24,7 @@ public class TextFieldTest extends Frame {
     public static void main(String[] args) {
         try {
             final TextFieldTest wnd = new TextFieldTest();
-            wnd.pack();
+            wnd.setSize(200, 100);
             wnd.show();
         } catch (Throwable t) {
             t.printStackTrace();
