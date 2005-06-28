@@ -712,4 +712,13 @@ public final class Unsafe {
     public static final void debugStackTrace() throws UninterruptiblePragma, InlinePragma {
         getCurrentProcessor().getArchitecture().getStackReader().debugStackTrace();
     }
+
+    /**
+     * List the current stacktrace on the kernel debug output.
+     * @throws UninterruptiblePragma
+     * @throws InlinePragma
+     */
+    public static final void debugStackTrace(int max) throws UninterruptiblePragma, InlinePragma {
+        getCurrentProcessor().getArchitecture().getStackReader().debugStackTrace(max);
+    }
 }
