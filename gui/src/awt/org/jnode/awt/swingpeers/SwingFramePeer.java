@@ -30,7 +30,6 @@ import java.awt.Insets;
 import java.awt.MenuBar;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.VMAwtAPI;
 import java.awt.peer.FramePeer;
 import java.beans.PropertyVetoException;
 
