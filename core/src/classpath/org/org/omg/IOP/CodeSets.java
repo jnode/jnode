@@ -1,4 +1,4 @@
-/* CurrentOperations.java --
+/* CodeSets.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,22 +36,27 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package org.omg.CORBA;
+package org.omg.IOP;
 
-
-/**
- * <p>
- * The interfaces, derived from this class, define operations that provide
- * information, associated with a particular thread of execution.
- * </p><p>
- * There are no operations for the general "Current". Instead, the operations
- * are defined for various subinterfaces that were derived from the
- * Current.
- * </p>
- * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
+ /**
+ * Holds the integer identifier of the CodeSets context. This context
+ * consist of this identifier, followed by two standard codes, first for
+ * narrow and second for wide character sets. The charset codes are
+ * integer (CORBA long) constants. Usually "narrow" means 8 bit and
+ * "wide" means 16 bit, but under specific circumstances these two
+ * charsets may be identical. The context is optional for "narrow"
+ * characters (assuming the charset code 0x00010001 = ISO 8859-1).
+ * It is required if the "wide" characters are transferred.
  *
- * @see Current
+ * They standard charset values are managed in
+ * {@link gnu.CORBA.GIOP.CharSets_OSF}.
+ *
+ * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public interface CurrentOperations
+public interface CodeSets
 {
+  /**
+   * Specifies the CodeSets value, 1.
+   */
+  int value = 1;
 }

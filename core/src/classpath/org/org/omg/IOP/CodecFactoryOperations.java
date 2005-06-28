@@ -1,4 +1,4 @@
-/* CurrentOperations.java --
+/* CodecFactoryOperations.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,22 +36,28 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package org.omg.CORBA;
+package org.omg.IOP;
 
+import org.omg.IOP.CodecFactoryPackage.UnknownEncoding;
 
 /**
- * <p>
- * The interfaces, derived from this class, define operations that provide
- * information, associated with a particular thread of execution.
- * </p><p>
- * There are no operations for the general "Current". Instead, the operations
- * are defined for various subinterfaces that were derived from the
- * Current.
- * </p>
- * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
+ * Defines the operations, applicable to
+ * the CodecFactory.
  *
- * @see Current
+ * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public interface CurrentOperations
+public interface CodecFactoryOperations
 {
+  /**
+   * Create Codec for the given encoding.
+   *
+   * @param for_encoding the encoding, for that the codec must be created.
+   *
+   * @return the appropriate Codec.
+   *
+   * @throws UnknownEncoding if there are not Codec that would support the
+   * required encoding.
+   */
+  Codec create_codec(Encoding for_encoding)
+              throws UnknownEncoding;
 }

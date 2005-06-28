@@ -1,4 +1,4 @@
-/* CurrentOperations.java --
+/* Encoding.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,22 +36,56 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package org.omg.CORBA;
+package org.omg.IOP;
 
+import org.omg.CORBA.portable.IDLEntity;
 
 /**
- * <p>
- * The interfaces, derived from this class, define operations that provide
- * information, associated with a particular thread of execution.
- * </p><p>
- * There are no operations for the general "Current". Instead, the operations
- * are defined for various subinterfaces that were derived from the
- * Current.
- * </p>
- * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
+ * Defines the encoding format of the {@link Codec}, including the major
+ * and minor version numbers. The only currently supported encodings are
+ * ENCODING_CDR_ENCAPS versions 1.1 - 1.2. Vendors can implement additional
+ * encodings.
  *
- * @see Current
+ * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public interface CurrentOperations
+public class Encoding
+  implements IDLEntity
 {
+  /**
+   * The format of encoding. For instance, {@link ENCODING_CDR_ENCAPS#value}.
+   */
+  public short format;
+
+  /**
+   * The major version number of this encoding format.
+   */
+  public byte major_version;
+
+  /**
+   * The minor version number of this encoding format.
+   */
+  public byte minor_version;
+
+  /**
+   * Create the unitialised instance.
+   */
+  public Encoding()
+  {
+  }
+
+  /**
+   * Create the instance, initialising field to the passed values.
+   *
+   * @param _format the format of encoding, like
+   *  {@link ENCODING_CDR_ENCAPS#value}.
+   *
+   * @param _major_version the major format version.
+   * @param _minor_version the minor format version.
+   */
+  public Encoding(short _format, byte _major_version, byte _minor_version)
+  {
+    format = _format;
+    major_version = _major_version;
+    minor_version = _minor_version;
+  }
 }

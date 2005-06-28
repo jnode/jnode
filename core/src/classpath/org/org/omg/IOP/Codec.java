@@ -1,4 +1,4 @@
-/* CurrentOperations.java --
+/* Codec.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,22 +36,36 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package org.omg.CORBA;
+package org.omg.IOP;
 
+import org.omg.CORBA.portable.IDLEntity;
 
 /**
  * <p>
- * The interfaces, derived from this class, define operations that provide
- * information, associated with a particular thread of execution.
- * </p><p>
- * There are no operations for the general "Current". Instead, the operations
- * are defined for various subinterfaces that were derived from the
- * Current.
+ * Codec provides means to encode IDL data types into the byte arrays.
+ * Some parts of the CORBA message may contain such abstracted (encapsulated)
+ * byte arrays, holding arbitrary information. The encoding and decoding
+ * operations are defined separately in {@link CodecOperations}.
+ * The Codec for {@link ENCODING_CDR_ENCAPS} v 1.0 - 1.2 is required by OMG.
+ * Vendors can implement additional Codec's, driven by alternative algorithms.
  * </p>
- * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
+ * <p>
+ * The {@link ENCODING_CDR_ENCAPS} Codec, returned by the {@link CodecFactory},
+ * is a local object. It is not possible to get its stringified reference,
+ * to send it over CDR streams or invoke the methods remotely.
+ * </p>
+ * <p>
+ * Codec is obtained from {@link CodecFactory}. CodecFactory is returned by
+ * <code>ORB.resolve_initial_references("CodecFactory")</code>.
+ * </p>
+ * @specnote The ENCODING_CDR_ENCAPS Codec is local in both Suns
+ * (at least till 1.4 inclusive) an this implementation.
  *
- * @see Current
+ *
+ *
+ * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public interface CurrentOperations
+public interface Codec
+  extends CodecOperations, IDLEntity, org.omg.CORBA.Object
 {
 }

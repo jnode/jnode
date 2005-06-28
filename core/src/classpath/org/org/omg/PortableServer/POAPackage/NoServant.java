@@ -1,4 +1,4 @@
-/* CurrentOperations.java --
+/* NoServant.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,22 +36,44 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package org.omg.CORBA;
+package org.omg.PortableServer.POAPackage;
 
+import org.omg.CORBA.UserException;
+import org.omg.CORBA.portable.IDLEntity;
+
+import java.io.Serializable;
 
 /**
- * <p>
- * The interfaces, derived from this class, define operations that provide
- * information, associated with a particular thread of execution.
- * </p><p>
- * There are no operations for the general "Current". Instead, the operations
- * are defined for various subinterfaces that were derived from the
- * Current.
- * </p>
- * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
+ * Raised when trying to get the default servant, when no default servant
+ * has been associated with POA.
  *
- * @see Current
+ * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public interface CurrentOperations
+public class NoServant
+  extends UserException
+  implements IDLEntity, Serializable
 {
+  /**
+   * Use serialVersionUID (v1.4) for interoperability.
+   */
+  private static final long serialVersionUID = -5893773687270266061L;
+
+  /**
+   * Create NoServant with no explaining
+   * message.
+   */
+  public NoServant()
+  {
+  }
+
+  /**
+   * Create the NoServant with explaining
+   * message.
+   *
+   * @param why a string, explaining, why this exception has been thrown.
+   */
+  public NoServant(String why)
+  {
+    super(why);
+  }
 }

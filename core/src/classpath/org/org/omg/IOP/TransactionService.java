@@ -1,4 +1,4 @@
-/* CurrentOperations.java --
+/* TransactionService.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,22 +36,21 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package org.omg.CORBA;
+package org.omg.IOP;
 
 
 /**
- * <p>
- * The interfaces, derived from this class, define operations that provide
- * information, associated with a particular thread of execution.
- * </p><p>
- * There are no operations for the general "Current". Instead, the operations
- * are defined for various subinterfaces that were derived from the
- * Current.
- * </p>
- * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
- *
- * @see Current
- */
-public interface CurrentOperations
+* Holds the integer identifier of the TransactionService context.
+* The content of that data structure is defined by OMG as
+* CosTransactions::PropogationContext in the Object Transaction
+* Service specification (formal/00-06-28).
+*
+* @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
+*/
+public interface TransactionService
 {
+  /**
+   * Specifies the TransactionService value, 0.
+   */
+  int value = 0;
 }

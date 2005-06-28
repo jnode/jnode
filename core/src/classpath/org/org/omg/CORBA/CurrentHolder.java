@@ -1,4 +1,4 @@
-/* CurrentOperations.java --
+/* CurrentHolder.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -38,20 +38,66 @@ exception statement from your version. */
 
 package org.omg.CORBA;
 
+import org.omg.CORBA.portable.InputStream;
+import org.omg.CORBA.portable.OutputStream;
+import org.omg.CORBA.portable.Streamable;
 
 /**
- * <p>
- * The interfaces, derived from this class, define operations that provide
- * information, associated with a particular thread of execution.
- * </p><p>
- * There are no operations for the general "Current". Instead, the operations
- * are defined for various subinterfaces that were derived from the
- * Current.
- * </p>
- * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
- *
- * @see Current
- */
-public interface CurrentOperations
+* A holder for the object {@link Current}.
+*
+* @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
+*/
+public class CurrentHolder
+  implements Streamable
 {
+  /**
+   * The stored Current value.
+   */
+  public Current value;
+
+  /**
+   * Create the unitialised instance, leaving the value field
+   * with default <code>null</code> value.
+   */
+  public CurrentHolder()
+  {
+  }
+
+  /**
+   * Create the initialised instance.
+   * @param initialValue the value that will be assigned to
+   * the <code>value</code> field.
+   */
+  public CurrentHolder(Current initialValue)
+  {
+    value = initialValue;
+  }
+
+  /**
+   * Fill in the {@link value} by data from the CDR stream.
+   *
+   * @param input the org.omg.CORBA.portable stream to read.
+   */
+  public void _read(InputStream input)
+  {
+    value = CurrentHelper.read(input);
+  }
+
+  /**
+   * Write the stored value into the CDR stream.
+   *
+   * @param output the org.omg.CORBA.portable stream to write.
+   */
+  public void _write(OutputStream output)
+  {
+    CurrentHelper.write(output, value);
+  }
+
+  /**
+   * Get the typecode of the Current.
+   */
+  public org.omg.CORBA.TypeCode _type()
+  {
+    return CurrentHelper.type();
+  }
 }
