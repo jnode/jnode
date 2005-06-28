@@ -28,7 +28,6 @@ import java.awt.peer.ListPeer;
 
 import javax.swing.AbstractListModel;
 import javax.swing.JList;
-import javax.swing.ListModel;
 
 /**
  * AWT list peer implemented as a {@link javax.swing.JList}.
@@ -43,10 +42,9 @@ final class SwingListPeer extends SwingComponentPeer<List, SwingList> implements
 
 	public SwingListPeer(SwingToolkit toolkit, final List list) {
         super(toolkit, list, new SwingList(list));
-        final JList jList = (JList)jComponent;
-		SwingToolkit.add(list, jList);
-		SwingToolkit.copyAwtProperties(list, jList);
-		final ListModel model = new AbstractListModel() {
+		SwingToolkit.add(list, jComponent);
+		SwingToolkit.copyAwtProperties(list, jComponent);
+		jComponent.setModel(new AbstractListModel() {
 			public Object getElementAt(int idx) {
 				return list.getItem(idx);
 			}
@@ -54,7 +52,7 @@ final class SwingListPeer extends SwingComponentPeer<List, SwingList> implements
 			public int getSize() {
 				return list.getItemCount();
 			}
-		};
+		});
 	}
 
 	public void add(String item, int index) {
@@ -148,5 +146,12 @@ final class SwingList extends JList implements ISwingPeer<List> {
     public final void processAWTEvent(AWTEvent event) {
         super.processEvent(event);
     }
+
+    /**
+     * @see org.jnode.awt.swingpeers.ISwingPeer#validatePeerOnly()
+     */
+    public final void validatePeerOnly() {
+        super.validate();
+    }    
 }
 

@@ -127,4 +127,11 @@ final class SwingScrollPane extends JScrollPane implements ISwingPeer<ScrollPane
     public final void processAWTEvent(AWTEvent event) {
         super.processEvent(event);
     }
+
+    /**
+     * @see org.jnode.awt.swingpeers.ISwingPeer#validatePeerOnly()
+     */
+    public final void validatePeerOnly() {
+        super.validate();
+    }    
 }

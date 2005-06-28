@@ -63,36 +63,6 @@ final class SwingFrame extends SwingBaseWindow<Frame> {
                     insets.top);
         }
 
-        // /**
-        // * @see java.awt.Component#invalidate()
-        // */
-        // public void invalidate() {
-        // super.invalidate();
-        // if (awtFrame != null) {
-        // awtFrame.invalidate();
-        // }
-        // }
-        //
-        // /**
-        // * @see java.awt.Component#doLayout()
-        // */
-        // public void doLayout() {
-        // if (awtFrame != null) {
-        // awtFrame.doLayout();
-        // }
-        // super.doLayout();
-        // }
-        //
-        // /**
-        // * @see java.awt.Component#validate()
-        // */
-        // public void validate() {
-        // super.validate();
-        // if (awtFrame != null) {
-        // awtFrame.validate();
-        // }
-        // }
-        //
         @SuppressWarnings("deprecation")
         public void reshape(int x, int y, int width, int height) {
             super.reshape(x, y, width, height);
@@ -225,10 +195,10 @@ final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame>
      */
     public Insets getInsets() {
         final Container contentPane = jComponent.getContentPane();
-        if ((contentPane.getWidth() == 0) || (contentPane.getHeight() == 0)) {
-            jComponent.doLayout();
-            jComponent.getRootPane().doLayout();
-        }
+//        if ((contentPane.getWidth() == 0) || (contentPane.getHeight() == 0)) {
+//            jComponent.doLayout();
+//            jComponent.getRootPane().doLayout();
+//        }
         final int cpWidth = contentPane.getWidth();
         final int cpHeight = contentPane.getHeight();
         final Insets insets;
@@ -246,7 +216,6 @@ final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame>
             insets.bottom = dh - insets.top;
         } else {
             insets = jComponent.getInsets();
-            System.out.println("cp.bounds: " + contentPane.getBounds());
         }
         return insets;
     }
@@ -310,19 +279,14 @@ final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame>
     }
 
     public void setVisible(final boolean b) {
-        SwingToolkit.invokeNowOrLater(new Runnable() {
-            public void run() {
-                if (b) {
-                    jComponent.invalidate();
-                    VMAwtAPI.invalidateTree(component);
-                    VMAwtAPI.invalidateTree(jComponent);
-                    jComponent.validate();
-                }
-
-                jComponent.setVisible(b);
-                jComponent.repaint();
-                toolkit.getAwtContext().getDesktop().repaint();
-            }
-        });
+        if (b) {
+            VMAwtAPI.invalidateTree(component);
+            VMAwtAPI.invalidateTree(jComponent);
+            jComponent.validate();
+        }
+        
+        jComponent.setVisible(b);
+        jComponent.repaint();
+        toolkit.getAwtContext().getDesktop().repaint();
     }
 }

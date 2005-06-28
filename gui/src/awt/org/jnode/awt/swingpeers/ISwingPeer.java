@@ -36,4 +36,9 @@ public interface ISwingPeer<T extends Component> {
      * @param event
      */
     public void processAWTEvent(AWTEvent event);
+    
+    /**
+     * Validate only this peer, do not validate the AWT component.
+     */
+    public void validatePeerOnly();
 }

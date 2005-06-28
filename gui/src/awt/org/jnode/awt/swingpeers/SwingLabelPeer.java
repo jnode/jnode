@@ -110,4 +110,11 @@ final class SwingLabel extends JLabel implements ISwingPeer<Label> {
     public final void processAWTEvent(AWTEvent event) {
         super.processEvent(event);
     }
+
+    /**
+     * @see org.jnode.awt.swingpeers.ISwingPeer#validatePeerOnly()
+     */
+    public final void validatePeerOnly() {
+        super.validate();
+    }    
 }
