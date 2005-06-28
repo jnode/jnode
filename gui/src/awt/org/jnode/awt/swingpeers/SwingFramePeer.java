@@ -278,15 +278,10 @@ final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame>
         jComponent.setTitle(title);
     }
 
+    /**
+     * Hide/show the frame.
+     */
     public void setVisible(final boolean b) {
-        if (b) {
-            VMAwtAPI.invalidateTree(component);
-            VMAwtAPI.invalidateTree(jComponent);
-            jComponent.validate();
-        }
-        
         jComponent.setVisible(b);
-        jComponent.repaint();
-        toolkit.getAwtContext().getDesktop().repaint();
     }
 }
