@@ -24,13 +24,13 @@ package org.jnode.desktop;
 import java.awt.AWTError;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
 
 import javax.swing.DefaultDesktopManager;
-import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 
@@ -68,22 +68,18 @@ public class Desktop implements Runnable {
 		final JDesktopPane desktop = ctx.getDesktop();
 		final Container awtRoot = ctx.getAwtRoot();
 
-		final JButton haltCmd = new JButton("Halt2");
-		haltCmd.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				JNodeToolkit.stopGui();
-			}
-		});
-		controlBar.getApplicationBar().add(haltCmd);
+		controlBar.getApplicationBar().addApp("Halt", new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JNodeToolkit.stopGui();
+            }
+        });
 
-		final JButton rebootCmd = new JButton("Reboot");
-		rebootCmd.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				JNodeToolkit.stopGui();
-				VmSystem.halt(true);
-			}
-		});
-		controlBar.getApplicationBar().add(rebootCmd);
+		controlBar.getApplicationBar().addApp("Reboot", new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        JNodeToolkit.stopGui();
+                        VmSystem.halt(true);
+                    }
+                });
 
 		awtRoot.removeAll();
 		awtRoot.setLayout(null);
@@ -96,10 +92,19 @@ public class Desktop implements Runnable {
 		controlBar.setBounds(w - controlBarWidth, 0, controlBarWidth, h);
 		
 		awtRoot.invalidate();
+        awtRoot.repaint();
+        System.out.println("controlBar.bounds=" + controlBar.getBounds());
+        System.out.println("desktop.bounds=" + desktop.getBounds());
 
 		// Update desktopmanager
 		desktop.setDesktopManager(new DesktopManagerImpl());
 		desktop.addContainerListener(new DesktopContainerListener());
+        
+        Frame f = new Frame("Test");
+        f.setSize(100, 100);
+        f.show();
+        desktop.doLayout();
+        desktop.repaint();
 	}
 
 	private class DesktopContainerListener implements ContainerListener {
