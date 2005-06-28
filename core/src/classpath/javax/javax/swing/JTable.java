@@ -616,7 +616,7 @@ public class JTable extends JComponent
    */
   public JTable (TableModel dm, TableColumnModel cm, ListSelectionModel sm)
   {
-    this.dataModel = dm == null ? createDefaultDataModel() : dm;
+    setModel(dm == null ? createDefaultDataModel() : dm);
     setSelectionModel(sm == null ? createDefaultSelectionModel() : sm);
 
     this.columnModel = cm;
@@ -626,6 +626,7 @@ public class JTable extends JComponent
 
   protected void initializeLocalVars()
   {
+    setTableHeader(createDefaultTableHeader());
     this.autoCreateColumnsFromModel = false;
     if (columnModel == null)
       {
@@ -653,7 +654,6 @@ public class JTable extends JComponent
     this.editingColumn = -1;
     this.editingRow = -1;
     setIntercellSpacing(new Dimension(1,1));
-    setTableHeader(createDefaultTableHeader());
   }
 
   /**
@@ -778,6 +778,13 @@ public class JTable extends JComponent
 
   public void tableChanged (TableModelEvent event)
   {
+    // update the column model from the table model if the structure has
+    // changed and the flag autoCreateColumnsFromModel is set
+    if ((event.getFirstRow() ==TableModelEvent.HEADER_ROW)
+        && autoCreateColumnsFromModel)
+
+        createColumnsFromModel();
+
     repaint();
   }
   
@@ -1557,6 +1564,12 @@ public class JTable extends JComponent
         for (int i = 0; i < ncols; ++i)
           columnModel.getColumn(i).setHeaderValue(dataModel.getColumnName(i));
       }
+
+    // according to Sun's spec we also have to set the tableHeader's
+    // column model here
+    if (tableHeader != null)
+      tableHeader.setColumnModel(c);
+
     revalidate();
     repaint();
   }
