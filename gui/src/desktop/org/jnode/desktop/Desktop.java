@@ -24,7 +24,6 @@ package org.jnode.desktop;
 import java.awt.AWTError;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ContainerEvent;
@@ -34,7 +33,6 @@ import javax.swing.DefaultDesktopManager;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
-import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
 import org.jnode.awt.JNodeAwtContext;
@@ -102,18 +100,6 @@ public class Desktop implements Runnable {
 		// Update desktopmanager
 		desktop.setDesktopManager(new DesktopManagerImpl());
 		desktop.addContainerListener(new DesktopContainerListener());
-
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                Frame test = new Frame("Test");
-                test.setSize(100, 200);
-                test.show();                
-            }
-        });
-
-		log.debug("dm=" + desktop.getDesktopManager());
-		// TODO Auto-generated method stub
-
 	}
 
 	private class DesktopContainerListener implements ContainerListener {
