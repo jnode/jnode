@@ -84,12 +84,12 @@ public class Desktop implements Runnable {
 		awtRoot.removeAll();
 		awtRoot.setLayout(null);
 		awtRoot.add(desktop);
-		final int w = awtRoot.getWidth();
-		final int controlBarWidth = w / 8;
 		final int h = awtRoot.getHeight();
-		desktop.setBounds(0, 0, w - controlBarWidth, h);
+		final int controlBarHeight = h / 8;
+		final int w = awtRoot.getWidth();
+		desktop.setBounds(0, 0, w, h - controlBarHeight);
 		awtRoot.add(controlBar);
-		controlBar.setBounds(w - controlBarWidth, 0, controlBarWidth, h);
+		controlBar.setBounds(0, h - controlBarHeight, w, controlBarHeight);
 		
 		awtRoot.invalidate();
         awtRoot.repaint();
