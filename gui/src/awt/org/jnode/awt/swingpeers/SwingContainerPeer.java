@@ -31,18 +31,18 @@ import javax.swing.JComponent;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-abstract class SwingContainerPeer<awtT extends Container, peerT extends JComponent>
-        extends SwingComponentPeer<awtT, peerT> implements ContainerPeer,
+abstract class SwingContainerPeer<awtT extends Container, swingPeerT extends JComponent>
+        extends SwingComponentPeer<awtT, swingPeerT> implements ContainerPeer,
         ISwingContainerPeer {
 
 	/**
 	 * @param toolkit
 	 * @param component
-	 * @param peer
+	 * @param swingPeer
 	 */
 	public SwingContainerPeer(SwingToolkit toolkit, awtT component,
-			peerT peer) {
-		super(toolkit, component, peer);
+			swingPeerT swingPeer) {
+		super(toolkit, component, swingPeer);
 	}
 
 	/**

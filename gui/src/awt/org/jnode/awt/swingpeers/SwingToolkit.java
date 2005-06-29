@@ -249,7 +249,7 @@ public final class SwingToolkit extends JNodeToolkit {
 			}
 			log.debug("createFrame:normal(" + target + ")");
 			// Other frames are emulated
-			return new SwingFramePeer(this, desktopFrame.getDesktop(), target);
+			return new SwingFramePeer(this, target);
 		}
 	}
 

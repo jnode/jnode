@@ -21,56 +21,27 @@
  
 package org.jnode.awt.swingpeers;
 
-import java.awt.Component;
 import java.awt.Dialog;
-import java.awt.Graphics;
 import java.awt.peer.DialogPeer;
-
-import javax.swing.JComponent;
 
 /**
  * AWT dialog peer implemented as a {@link javax.swing.JInternalFrame}.
  * @author Levente S\u00e1ntha
+ * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-
 final class SwingDialogPeer extends SwingBaseWindowPeer<Dialog, SwingDialog>
         implements DialogPeer, ISwingContainerPeer {
 
-	public SwingDialogPeer(SwingToolkit toolkit, Dialog dialog) {
-        super(toolkit, dialog, new SwingDialog(dialog));
-		jComponent.setTitle(dialog.getTitle());
-        jComponent.getContentPane().setLayout(new SwingContainerLayout(dialog, this));
+	public SwingDialogPeer(SwingToolkit toolkit, Dialog target) {
+        super(toolkit, target, new SwingDialog(target));
+		jComponent.setTitle(target.getTitle());
 	}
-
-	/**
-	 * @see org.jnode.awt.swingpeers.ISwingContainerPeer#addAWTComponent(java.awt.Component,
-	 *      javax.swing.JComponent)
-	 */
-	public void addAWTComponent(Component awtComponent, JComponent peer) {
-		jComponent.getContentPane().add(peer);
-	}
-
-    public void setResizable(boolean resizeable) {
-        jComponent.setResizable(resizeable);
-    }
-
-    public void setTitle(String title) {
-        jComponent.setTitle(title);
-    }
 }
 
-final class SwingDialog extends SwingBaseWindow<Dialog> {
+final class SwingDialog extends SwingBaseWindow<Dialog, SwingDialog> {
     
-    public SwingDialog(Dialog awtComponent) {
-        super(awtComponent);
-    }
-    
-    /**
-     * @see javax.swing.JComponent#paintChildren(java.awt.Graphics)
-     */
-    protected void paintChildren(Graphics g) {
-        super.paintChildren(g);
-        SwingToolkit.paintLightWeightChildren(awtComponent, g, 0, 0);
+    public SwingDialog(Dialog target) {
+        super(target);
     }
 }
 
