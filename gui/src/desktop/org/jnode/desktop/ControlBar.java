@@ -21,8 +21,9 @@
  
 package org.jnode.desktop;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.GridLayout;
+import java.awt.Dimension;
 
 import javax.swing.JPanel;
 
@@ -38,10 +39,11 @@ public class ControlBar extends JPanel {
 	
 	public ControlBar(ExtensionPoint appsExtensionPoint) {
 		this.appsBar = new ApplicationBar(appsExtensionPoint);
-		setLayout(new GridLayout(2, 1));
-		add(appsBar);
-		add(windowBar);
-        setBackground(Color.BLUE);
+		setLayout(new BorderLayout());
+        windowBar.setMinimumSize(new Dimension(200, 10));
+		add(appsBar, BorderLayout.CENTER);
+		add(windowBar, BorderLayout.EAST);
+        setBackground(new Color(130, 255, 180));
 	}
 	
 	public ApplicationBar getApplicationBar() {

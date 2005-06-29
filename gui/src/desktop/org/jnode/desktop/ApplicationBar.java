@@ -124,11 +124,15 @@ public class ApplicationBar extends JPanel {
     }
     
     public void addApp(String label, ActionListener action) {
+        final int cnt = getComponentCount();
         final JButton b = new JButton(label);
         b.addActionListener(action);
         final GridBagConstraints constraints = new GridBagConstraints();
-        constraints.gridx = 0;
-        constraints.gridy = GridBagConstraints.RELATIVE;
+        final int rowCount = 6; // TODO calculate on the fly
+        constraints.gridx = cnt % rowCount;
+        constraints.gridy = cnt / rowCount;
+        constraints.ipadx = 5;
+        constraints.ipadx = 5;
         constraints.insets = new Insets(2, 5, 2, 5);
         constraints.fill = GridBagConstraints.BOTH;
         super.add(b, constraints);
