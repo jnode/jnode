@@ -4,37 +4,46 @@
 package org.jnode.awt.swingpeers;
 
 import java.awt.AWTEvent;
+import java.awt.Container;
+import java.awt.Graphics;
+import java.awt.Insets;
+import java.awt.Point;
 import java.awt.VMAwtAPI;
 import java.awt.Window;
 
+import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
+import javax.swing.JRootPane;
 
 /**
  * Base class for peer implementation that subclass {@link java.awt.Window}.
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-abstract class SwingBaseWindow<awtT extends Window> extends JInternalFrame
-        implements ISwingPeer<awtT> {
+abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBaseWindow<awtT, swingPeerT>>
+        extends JInternalFrame implements ISwingPeer<awtT> {
 
     /** The AWT component this is a peer for */
-    protected final awtT awtComponent;
+    protected final awtT target;
+
+    /** The swing peer implementation */
+    private SwingBaseWindowPeer<awtT, swingPeerT> swingPeer;
 
     /**
      * Initialize this instance.
      * 
-     * @param awtComponent
+     * @param target
      */
-    public SwingBaseWindow(awtT awtComponent) {
-        this.awtComponent = awtComponent;
+    public SwingBaseWindow(awtT target) {
+        this.target = target;
     }
 
     /**
      * @see javax.swing.JInternalFrame#reshape(int, int, int, int)
      */
     public void reshape(int x, int y, int width, int height) {
-        VMAwtAPI.setBoundsCallback(awtComponent, x, y, width, height);
-        VMAwtAPI.invalidateTree(awtComponent);
+        VMAwtAPI.setBoundsCallback(target, x, y, width, height);
+        VMAwtAPI.invalidateTree(target);
         super.reshape(x, y, width, height);
         validate();
     }
@@ -43,7 +52,7 @@ abstract class SwingBaseWindow<awtT extends Window> extends JInternalFrame
      * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
      */
     public final awtT getAWTComponent() {
-        return awtComponent;
+        return target;
     }
 
     /**
@@ -52,8 +61,8 @@ abstract class SwingBaseWindow<awtT extends Window> extends JInternalFrame
      * @see java.awt.Component#processEvent(java.awt.AWTEvent)
      */
     protected final void processEvent(AWTEvent event) {
-        awtComponent.dispatchEvent(SwingToolkit.convertEvent(event,
-                awtComponent));
+        target.dispatchEvent(SwingToolkit.convertEvent(event,
+                target));
     }
 
     /**
@@ -72,5 +81,91 @@ abstract class SwingBaseWindow<awtT extends Window> extends JInternalFrame
         super.validate();
         doLayout();
         getRootPane().doLayout();
-    }    
+    }
+
+    /**
+     * @see javax.swing.JInternalFrame#createRootPane()
+     */
+    protected final JRootPane createRootPane() {
+        return new RootPane();
+    }
+
+    /**
+     * Gets the peer implementation.
+     */
+    final SwingBaseWindowPeer<awtT, swingPeerT> getSwingPeer() {
+        return swingPeer;
+    }
+
+    final void initialize(SwingBaseWindowPeer<awtT, swingPeerT> swingPeer) {
+        this.swingPeer = swingPeer;
+        ((ContentPane) getContentPane()).initialize(target,
+                swingPeer);
+    }
+
+    /**
+     * @see java.awt.Component#invalidate()
+     */
+    public final void invalidate() {
+        super.invalidate();
+        if (target != null) {
+            target.invalidate();
+        }
+    }
+
+    /**
+     * @see java.awt.Component#validate()
+     */
+    public final void validate() {
+        super.validate();
+        if (target != null) {
+            target.validate();
+        }
+    }
+
+    private final class ContentPane extends JComponent {
+
+        private awtT target;
+
+        private SwingBaseWindowPeer swingPeer;
+
+        public void initialize(awtT target, SwingBaseWindowPeer<awtT, swingPeerT> swingPeer) {
+            this.target = target;
+            this.swingPeer = swingPeer;
+            target.invalidate();
+        }
+
+        /**
+         * @see javax.swing.JComponent#paintChildren(java.awt.Graphics)
+         */
+        protected void paintChildren(Graphics g) {
+            super.paintChildren(g);
+            final Insets insets = swingPeer.getInsets();
+            SwingToolkit.paintLightWeightChildren(target, g, insets.left,
+                    insets.top);
+        }
+
+        @SuppressWarnings("deprecation")
+        public void reshape(int x, int y, int width, int height) {
+            super.reshape(x, y, width, height);
+            if (!swingPeer.isReshapeInProgress) {
+                Point p = target.isShowing() ? target.getLocationOnScreen()
+                        : new Point();
+                // Point p = awtFrame.getLocationOnScreen();
+                Insets ins = swingPeer.getInsets();
+                target.reshape(p.x + x, p.y, width + ins.left + ins.right,
+                        height + ins.bottom + ins.top);
+            }
+        }
+    }
+
+    private final class RootPane extends JRootPane {
+
+        /**
+         * @see javax.swing.JRootPane#createContentPane()
+         */
+        protected Container createContentPane() {
+            return new ContentPane();
+        }
+    }
 }

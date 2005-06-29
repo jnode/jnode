@@ -55,28 +55,29 @@ import java.awt.peer.ComponentPeer;
  * @author Levente S\u00e1ntha
  */
 
-abstract class SwingComponentPeer<awtT extends Component, peerT extends JComponent>
+abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends JComponent>
         extends JNodeGenericPeer<SwingToolkit, awtT> implements ComponentPeer {
 
     ///////////////////////////////////////////////////////////////////////////////////////
     // Private
     protected final Logger log = Logger.getLogger(getClass());
-    protected final peerT jComponent;
+    protected final swingPeerT jComponent;
 
     /**
      * Initialize this instance.
      * 
      * @param toolkit
-     * @param component
+     * @param target
      */
-    public SwingComponentPeer(SwingToolkit toolkit, awtT component, peerT peer) {
-        super(toolkit, component);
-        this.jComponent = peer;
-        if (!(peer instanceof ISwingPeer)) {
+    public SwingComponentPeer(SwingToolkit toolkit, awtT target, swingPeerT swingPeer) {
+        super(toolkit, target);
+        this.jComponent = swingPeer;
+        if (!(swingPeer instanceof ISwingPeer)) {
             throw new IllegalArgumentException("peer must implement ISwingPeer");
         }
-        setBounds(component.getX(), component.getY(), component.getWidth(),
-                component.getHeight());
+        SwingToolkit.copyAwtProperties(target, swingPeer);
+        setBounds(target.getX(), target.getY(), target.getWidth(),
+                target.getHeight());
     }
 
     public boolean canDetermineObscurity() {
@@ -144,7 +145,7 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
     }
 
     public Graphics getGraphics() {
-        final Component parent = component.getParent();
+        final Component parent = target.getParent();
         if (parent != null) {
         	final int x = jComponent.getX();
         	final int y = jComponent.getY();
@@ -165,8 +166,8 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
 	 * @return The location on screen
 	 */
 	public Point getLocationOnScreen() {
-        Point p = component.getLocation();
-        Container parent = component.getParent();
+        Point p = target.getLocation();
+        Container parent = target.getParent();
         while (parent != null) {
             p.translate(parent.getX(), parent.getY());
             parent = parent.getParent();
@@ -191,9 +192,9 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
             //Point p = component.getLocationOnScreen();
             //g.translate(p.x, p.y);
             if (event.getID() == PaintEvent.PAINT) {
-                component.paint(g);
+                target.paint(g);
             } else {
-                component.update(g);                        
+                target.update(g);                        
             }
             //g.translate(-p.x, -p.y);
             g.dispose();
@@ -211,7 +212,7 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
                 processPaintEvent((PaintEvent)event);
             } break;
             default: {
-                if (event.getSource() == component) {
+                if (event.getSource() == target) {
                     event.setSource(jComponent);
                 }
                 ((ISwingPeer<awtT>)jComponent).processAWTEvent(event);
@@ -223,9 +224,9 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
      * Post a paint event for the AWT component on the event queue.
      */
     protected final void postPaintEvent() {
-        if (component != null) {
-            toolkit.postEvent(new PaintEvent(component, PaintEvent.PAINT,
-                    component.getBounds()));
+        if (target != null) {
+            toolkit.postEvent(new PaintEvent(target, PaintEvent.PAINT,
+                    target.getBounds()));
         }
     }
 
@@ -376,6 +377,6 @@ abstract class SwingComponentPeer<awtT extends Component, peerT extends JCompone
      */
     protected final void fireComponentEvent(int what) {
         final EventQueue queue = toolkit.getSystemEventQueue();
-        queue.postEvent(new ComponentEvent(component, what));
+        queue.postEvent(new ComponentEvent(target, what));
     }
 }

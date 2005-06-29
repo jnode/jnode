@@ -353,9 +353,9 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
         final Graphics g = getGraphics();
         if (g != null) {
             if (event.getID() == PaintEvent.PAINT) {
-                component.paint(g);
+                target.paint(g);
             } else {
-                component.update(g);                        
+                target.update(g);                        
             }
             g.dispose();
         }    
@@ -575,9 +575,9 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
     }
 
     protected final void paintAWTComponent() {
-        if (component != null) {
-            toolkit.postEvent(new PaintEvent((Component) component,
-                    PaintEvent.PAINT, ((Component) component).getBounds()));
+        if (target != null) {
+            toolkit.postEvent(new PaintEvent(target, PaintEvent.PAINT, target
+                    .getBounds()));
         }
     }
 }
