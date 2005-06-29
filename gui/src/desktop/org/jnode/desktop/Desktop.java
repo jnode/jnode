@@ -33,6 +33,7 @@ import java.awt.event.ContainerListener;
 import javax.swing.DefaultDesktopManager;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
 
 import org.apache.log4j.Logger;
 import org.jnode.awt.JNodeAwtContext;
@@ -100,9 +101,11 @@ public class Desktop implements Runnable {
 		desktop.setDesktopManager(new DesktopManagerImpl());
 		desktop.addContainerListener(new DesktopContainerListener());
         
-        Frame f = new Frame("Test");
-        f.setSize(100, 100);
+        Frame f = new Frame("JNode");
+        f.add(new JLabel("Welcome to JNode", JLabel.CENTER));
+        f.setSize(200, 70);
         f.show();
+        f.setLocation((desktop.getWidth() - f.getWidth()) / 2, (desktop.getHeight() - f.getHeight()) / 2);
         desktop.doLayout();
         desktop.repaint();
 	}
