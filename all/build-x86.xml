@@ -20,8 +20,10 @@
 	<property name="grub.menu.cdrom" value="${my-conf.dir}/menu-cdrom.lst" />
 
 	<!-- Properties for building the boot files for windows NT/2K/XP -->
-  <property name="partition-nt" value="C:" />
   <property name="jnode.install-nt.dir" value="C:\jnode" />
+  <!-- (hd0,0) stands for harddisk 0, partition 0 -->
+  <property name="partition-nt.grub.menu" value="(hd0,0)/jnode" />
+  <property name="partition-nt" value="C:" />
 
 	<property name="bin-nt.dir" value="${basedir}\bin-nt" />
 	<property name="conf-nt.dir" value="${basedir}\conf\x86-nt" />
@@ -215,7 +217,7 @@
 		<copy file="${grub.stage2-nt}" todir="${jnode.install-nt.dir}" />
 
 		<replace file="${jnode.install-nt.dir}/menu.lst"
-			token="(hd0,0)" value="${partition-nt}"/>
+			token="(hd0,0)" value="${partition-nt.grub.menu}"/>
 		<echo message="${grub.install-nt.exe} -d ${partition-nt} -1 ${jnode.install-nt.dir}\${grub.stage1-nt.name} -2 ${jnode.install-nt.dir}\${grub.stage2-nt.name} -m ${jnode.install-nt.dir}\menu.lst" />
 
 		<!-- the following wait is needed else grubinstall will fail finding stage2 -->
