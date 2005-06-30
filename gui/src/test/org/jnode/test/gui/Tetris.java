@@ -21,21 +21,22 @@
  
 package org.jnode.test.gui;
 
-import java.awt.event.KeyListener;
-import java.awt.event.KeyEvent;
-import java.awt.Color;
-import java.awt.Image;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.Graphics;
 import java.awt.BorderLayout;
-import java.awt.Panel;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.Random;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 /**
  * @author Levente S\u00e1ntha
  */
-public class Tetris extends Panel implements KeyListener {
+public class Tetris extends JPanel implements KeyListener {
 	private static final int[][][][] BLOCKS = {
 			{ { { 0, 0 }, { 1, 0 }, { 2, 0 }, { 1, 1 } }, // * * *
 					{ { 1, 0 }, { 0, 1 }, { 1, 1 }, { 1, 2 } }, // *
@@ -119,6 +120,7 @@ public class Tetris extends Panel implements KeyListener {
 	private long delay = 500;
 
 	public Tetris() {
+        setOpaque(false);
 		for (int i = 0; i < WIDTH_C + 2; i++) {
 			for (int j = 0; j < HEIGHT_C + 2; j++) {
 				if (i == 0 || j == 0 || i == WIDTH_C + 1 || j == HEIGHT_C + 1)
@@ -436,7 +438,7 @@ public class Tetris extends Panel implements KeyListener {
 		} catch (Exception e) {
 			// ignore
 		}
-		Frame wnd = new Frame();
+		JFrame wnd = new JFrame();
 		try {
 
 			Tetris tetris = new Tetris();
