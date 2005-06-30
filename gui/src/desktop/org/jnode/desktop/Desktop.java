@@ -34,6 +34,7 @@ import javax.swing.DefaultDesktopManager;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 
 import org.apache.log4j.Logger;
 import org.jnode.awt.JNodeAwtContext;
@@ -110,14 +111,14 @@ public class Desktop implements Runnable {
         welcomeLbl.setLocation(dx, dy);
         welcomeLbl.setFont(welcomeLbl.getFont().deriveFont(20.0f));
         welcomeLbl.setSize(welcomeLbl.getPreferredSize());
-        desktop.add(welcomeLbl);
+        desktop.add(welcomeLbl, (Integer)(JLayeredPane.DEFAULT_LAYER - 1));
         
         final JLabel versionLbl = new JLabel("version " + Vm.getVm().getVersion());
         versionLbl.setForeground(Color.WHITE);
         versionLbl.setFont(versionLbl.getFont().deriveFont(14.0f));
         versionLbl.setSize(versionLbl.getPreferredSize());
         versionLbl.setLocation(desktop.getWidth() - versionLbl.getWidth() - dy, desktop.getHeight() - versionLbl.getHeight() - dy);
-        desktop.add(versionLbl);
+        desktop.add(versionLbl, (Integer)(JLayeredPane.DEFAULT_LAYER - 1));
 
         // Update 
         desktop.doLayout();
