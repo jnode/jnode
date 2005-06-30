@@ -22,9 +22,9 @@
 package org.jnode.desktop;
 
 import java.awt.AWTError;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ContainerEvent;
@@ -40,6 +40,7 @@ import org.jnode.awt.JNodeAwtContext;
 import org.jnode.awt.JNodeToolkit;
 import org.jnode.plugin.ExtensionPoint;
 import org.jnode.plugin.PluginClassLoader;
+import org.jnode.vm.Vm;
 import org.jnode.vm.VmSystem;
 
 /**
@@ -101,11 +102,24 @@ public class Desktop implements Runnable {
 		desktop.setDesktopManager(new DesktopManagerImpl());
 		desktop.addContainerListener(new DesktopContainerListener());
         
-        Frame f = new Frame("JNode");
-        f.add(new JLabel("Welcome to JNode", JLabel.CENTER));
-        f.setSize(200, 70);
-        f.show();
-        f.setLocation((desktop.getWidth() - f.getWidth()) / 2, (desktop.getHeight() - f.getHeight()) / 2);
+        // Set background info
+        final int dx = 30;
+        final int dy = dx;
+        final JLabel welcomeLbl = new JLabel("Welcome to JNode");
+        welcomeLbl.setForeground(Color.WHITE);
+        welcomeLbl.setLocation(dx, dy);
+        welcomeLbl.setFont(welcomeLbl.getFont().deriveFont(20.0f));
+        welcomeLbl.setSize(welcomeLbl.getPreferredSize());
+        desktop.add(welcomeLbl);
+        
+        final JLabel versionLbl = new JLabel("version " + Vm.getVm().getVersion());
+        versionLbl.setForeground(Color.WHITE);
+        versionLbl.setFont(versionLbl.getFont().deriveFont(14.0f));
+        versionLbl.setSize(versionLbl.getPreferredSize());
+        versionLbl.setLocation(desktop.getWidth() - versionLbl.getWidth() - dy, desktop.getHeight() - versionLbl.getHeight() - dy);
+        desktop.add(versionLbl);
+
+        // Update 
         desktop.doLayout();
         desktop.repaint();
 	}
