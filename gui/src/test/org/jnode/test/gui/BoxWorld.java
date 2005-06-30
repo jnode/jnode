@@ -21,14 +21,14 @@
 
 package org.jnode.test.gui;
 
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 import java.awt.CheckboxMenuItem;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.MenuItem;
-import java.awt.Panel;
 import java.awt.Point;
 import java.awt.PopupMenu;
 import java.awt.event.ActionEvent;
@@ -53,7 +53,7 @@ import java.util.Stack;
  * 
  * @author Levente S\u00e1ntha
  */
-public class BoxWorld extends Panel implements WindowListener, KeyListener,
+public class BoxWorld extends JPanel implements WindowListener, KeyListener,
         MouseListener, MouseMotionListener, ActionListener, ItemListener {
 
     // ***************** WORLD DATA ****************************
@@ -289,7 +289,7 @@ public class BoxWorld extends Panel implements WindowListener, KeyListener,
         addMouseMotionListener(this);
 
         requestFocus();
-
+        /*
         // building the popup menu
         menu = new PopupMenu();
         MenuItem start = new MenuItem("Start");
@@ -324,6 +324,7 @@ public class BoxWorld extends Panel implements WindowListener, KeyListener,
         menu.add(beep);
 
         add(menu);
+        */
     }
 
     // start applet
@@ -417,7 +418,7 @@ public class BoxWorld extends Panel implements WindowListener, KeyListener,
             changeMode();
         } else {
             if (e.isPopupTrigger()) {
-                menu.show(this, e.getX(), e.getY());
+//                menu.show(this, e.getX(), e.getY());
                 return;
             }
 
@@ -442,7 +443,7 @@ public class BoxWorld extends Panel implements WindowListener, KeyListener,
 
     public void mouseReleased(MouseEvent e) {
         if (e.isPopupTrigger()) {
-            menu.show(this, e.getX(), e.getY());
+//            menu.show(this, e.getX(), e.getY());
         }
     }
 
@@ -813,7 +814,7 @@ public class BoxWorld extends Panel implements WindowListener, KeyListener,
 
     private void toggleBeep() {
         beepOn = !beepOn;
-        beep.setState(beepOn);
+//        beep.setState(beepOn);
     }
 
     private void help() {
@@ -1323,7 +1324,7 @@ public class BoxWorld extends Panel implements WindowListener, KeyListener,
     public static void main(String[] argv) {
         BoxWorld bw = new BoxWorld();
         bw.init();
-        Frame frame = new Frame("Boxworld");
+        Frame frame = new JFrame("Boxworld");
         frame.setResizable(false);
         frame.add(bw);
         frame.addWindowListener(bw);
