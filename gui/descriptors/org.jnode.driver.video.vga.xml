@@ -22,6 +22,7 @@
 
   <extension point="org.jnode.driver.mappers">
     <mapper id="03:00" driver-class="org.jnode.driver.video.vga.VGADriver" class="org.jnode.driver.bus.pci.PCIClassToDriverMapper"/>
+    <mapper id="8086:7800" driver-class="org.jnode.driver.video.vga.VGADriver" class="org.jnode.driver.bus.pci.PCIClassToDriverMapper"/>
   </extension>
 
   <!-- extension point="org.jnode.driver....finders...">
