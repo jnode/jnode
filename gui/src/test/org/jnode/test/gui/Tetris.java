@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.test.gui;
 
 import java.awt.BorderLayout;
@@ -221,15 +221,14 @@ public class Tetris extends JPanel implements KeyListener {
 		int t = (bi + i) % 4;
 		if (hasRoom(t, x, y)) {
 			bi = t;
-		}// bi = (x + DIMS[4*si + t][0]) > WIDTH_C + 1 ? bi : t;
+		}
 	}
 
 	private void trans(int i) {
 		int t = x + i;
 		if (hasRoom(bi, t, y)) {
 			x = t;
-		}// x = t < 1 ? 1 : (t + DIMS[4*si + bi][0]) > WIDTH_C + 1? WIDTH_C +
-		// 1 - DIMS[4*si + bi][0] : t;
+		}
 	}
 
 	private void fall() {
@@ -429,30 +428,22 @@ public class Tetris extends JPanel implements KeyListener {
 	public void keyTyped(KeyEvent e) {
 	}
 
-	public static void main(String[] argv) throws InterruptedException {
-		int sleep = 5;
+	public static void main(String[] argv) {
 		int delay = 500;
+
 		try {
-			sleep = Integer.parseInt(argv[0]);
-			delay = Integer.parseInt(argv[1]);
+			if(argv.length > 0) delay = Integer.parseInt(argv[0]);
 		} catch (Exception e) {
 			// ignore
 		}
-		JFrame wnd = new JFrame();
-		try {
+		JFrame wnd = new JFrame("JNode Tetris");
 
-			Tetris tetris = new Tetris();
-			tetris.delay = delay;
-			wnd.add(tetris, BorderLayout.CENTER);
-			wnd.setSize(DIM.width + 7, DIM.height + 2 * CELL);
-			wnd.show();
-			tetris.requestFocus();
-			tetris.newGame();
-//			Thread.sleep(sleep * 1000);
-
-//			wnd.hide();
-		} finally {
-//			wnd.dispose();
-		}
+    	Tetris tetris = new Tetris();
+	    tetris.delay = delay;
+		wnd.add(tetris, BorderLayout.CENTER);
+		wnd.setSize(DIM.width + 7, DIM.height + CELL + CELL /2);
+		wnd.show();
+		tetris.requestFocus();
+		tetris.newGame();
 	}
 }
