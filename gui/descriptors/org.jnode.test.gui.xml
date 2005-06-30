@@ -22,17 +22,17 @@
   </runtime>
         
   <extension point="org.jnode.desktop.apps">
-    <application name="AWTTest"      class="org.jnode.test.gui.AWTTest"/>
-    <application name="AWTMenuTest"      class="org.jnode.test.gui.AWTMenuTest"/>
-    <application name="AWTFrameTest"      class="org.jnode.test.gui.AWTFrameTest"/>
-    <application name="AWTDemo"      class="org.jnode.test.gui.AWTDemo"/>
-    <application name="BoxWorld"     class="org.jnode.test.gui.BoxWorld"/>      
-    <application name="Tetris"       class="org.jnode.test.gui.Tetris"/>
-    <application name="SwingTest"    class="org.jnode.test.gui.SwingTest"/>
-    <application name="SwingMenuTest"    class="org.jnode.test.gui.SwingMenuTest"/>
-    <application name="ConsoleTest"  class="org.jnode.test.gui.ConsoleTest"/>
-    <application name="Thinlet"     class="thinlet.ThinTest"/>
-    <application name="GlyphTest"    class="org.jnode.test.gui.GlyphTest"/>
+    <application name="AWT test"       class="org.jnode.test.gui.AWTTest"/>
+    <application name="AWT menu test"  class="org.jnode.test.gui.AWTMenuTest"/>
+    <application name="AWT frame test" class="org.jnode.test.gui.AWTFrameTest"/>
+    <application name="AWT demo"       class="org.jnode.test.gui.AWTDemo"/>
+    <application name="Swing test"     class="org.jnode.test.gui.SwingTest"/>
+    <application name="Swing menu test" class="org.jnode.test.gui.SwingMenuTest"/>
+    <application name="Tetris"         class="org.jnode.test.gui.Tetris"/>
+    <application name="Console"        class="org.jnode.test.gui.ConsoleTest"/>
+    <!-- application name="BoxWorld"       class="org.jnode.test.gui.BoxWorld"/ -->  
+    <!-- application name="Thinlet"        class="thinlet.ThinTest"/ -->
+    <!-- application name="GlyphTest"      class="org.jnode.test.gui.GlyphTest"/ -->
   </extension>
 
     <extension point="org.jnode.security.permissions">
