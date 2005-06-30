@@ -21,13 +21,6 @@
 
 package org.jnode.awt.swingpeers;
 
-import org.jnode.awt.JNodeAwtContext;
-import org.jnode.awt.JNodeToolkit;
-
-import javax.swing.JComponent;
-import javax.swing.JDesktopPane;
-import javax.swing.RepaintManager;
-import javax.swing.SwingUtilities;
 import java.awt.AWTError;
 import java.awt.AWTEvent;
 import java.awt.AWTException;
@@ -85,6 +78,16 @@ import java.awt.peer.TextAreaPeer;
 import java.awt.peer.TextFieldPeer;
 import java.awt.peer.WindowPeer;
 
+import javax.swing.JComponent;
+import javax.swing.JDesktopPane;
+import javax.swing.RepaintManager;
+import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
+
+import org.jnode.awt.JNodeAwtContext;
+import org.jnode.awt.JNodeToolkit;
+
 /**
  * AWT toolkit implemented entirely with JFC peers, thus allowing a lightweight
  * simulation of the operating system desktop.
@@ -93,6 +96,9 @@ import java.awt.peer.WindowPeer;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public final class SwingToolkit extends JNodeToolkit {
+
+    /** An empty border */
+    static final Border EMPTY_BORDER = new EmptyBorder(0, 0, 0, 0);
 
     /** My repaint manager.  Only valid between onInitialize and onClose */
     private SwingRepaintManager repaintManager;

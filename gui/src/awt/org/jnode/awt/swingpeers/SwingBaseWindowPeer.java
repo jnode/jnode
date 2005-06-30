@@ -102,13 +102,22 @@ abstract class SwingBaseWindowPeer<awtT extends Window, swingPeerT extends Swing
         return insets;
     }
 
+    /**
+     * Sets the resizable flag of this window.
+     * @param resizeable
+     */
     public final void setResizable(boolean resizeable) {
         jComponent.setResizable(resizeable);
     }
 
-    public final void setTitle(String title) {
+    /**
+     * Sets the title of this window
+     * @param title
+     */
+    public void setTitle(String title) {
         jComponent.setTitle(title);
     }
+    
     public final void dispose() {
         jComponent.dispose();
         toolkit.onDisposeFrame(this);

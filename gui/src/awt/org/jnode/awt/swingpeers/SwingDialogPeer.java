@@ -34,8 +34,17 @@ final class SwingDialogPeer extends SwingBaseWindowPeer<Dialog, SwingDialog>
 
 	public SwingDialogPeer(SwingToolkit toolkit, Dialog target) {
         super(toolkit, target, new SwingDialog(target));
-		jComponent.setTitle(target.getTitle());
+        setTitle(target.getTitle());
 	}
+
+    /**
+     * @see org.jnode.awt.swingpeers.SwingBaseWindowPeer#setTitle(java.lang.String)
+     */
+    public void setTitle(String title) {
+        if (!target.isUndecorated()) {
+            super.setTitle(title);
+        }
+    }
 }
 
 final class SwingDialog extends SwingBaseWindow<Dialog, SwingDialog> {

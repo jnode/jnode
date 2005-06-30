@@ -18,14 +18,18 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.awt.swingpeers;
 
+import java.awt.BorderLayout;
 import java.awt.Window;
 import java.awt.peer.WindowPeer;
 
+import javax.swing.JComponent;
+
 /**
  * AWT window peer implemented as a {@link javax.swing.JInternalFrame}.
+ * 
  * @author Levente S\u00e1ntha
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
@@ -39,9 +43,33 @@ final class SwingWindowPeer extends SwingBaseWindowPeer<Window, SwingWindow>
 }
 
 final class SwingWindow extends SwingBaseWindow<Window, SwingWindow> {
-    
+
     public SwingWindow(Window target) {
         super(target);
+        setResizable(false);
+        setIconifiable(false);
+        setMaximizable(false);
+        setClosable(false);
+    }
+
+    /**
+     * @see javax.swing.JComponent#updateUI()
+     */
+    public void updateUI() {
+        setMinimumSize(null);
+        setBorder(null);
+        super.updateUI();
+        setMinimumSize(null);
+
+        final JComponent rootpane = getRootPane();
+        setBorder(SwingToolkit.EMPTY_BORDER);
+        removeAll();
+        setLayout(new BorderLayout());
+        add(rootpane, BorderLayout.CENTER);
+        getLayout().layoutContainer(this);
+
+        this.setOpaque(false);
+        rootpane.setOpaque(false);
+        getLayeredPane().setOpaque(false);
     }
 }
-
