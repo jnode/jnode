@@ -21,6 +21,8 @@
  
 package org.jnode.awt;
 
+import org.jnode.driver.video.FrameBufferConfiguration;
+
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.Rectangle;
@@ -29,8 +31,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.VolatileImage;
-
-import org.jnode.driver.video.FrameBufferConfiguration;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -140,4 +140,7 @@ public class JNodeGraphicsConfiguration extends GraphicsConfiguration {
 		return this.config;
 	}
 
+    public String toString() {
+        return bounds.width + "x" + bounds.height + "/" + colorModel.getPixelSize();
+    }
 }

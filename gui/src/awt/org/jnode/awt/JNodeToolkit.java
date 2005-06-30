@@ -25,7 +25,20 @@ import gnu.java.awt.ClasspathToolkit;
 import gnu.java.awt.peer.ClasspathFontPeer;
 import gnu.java.awt.peer.ClasspathTextLayoutPeer;
 import gnu.java.security.action.GetPropertyAction;
+import org.apache.log4j.Logger;
+import org.jnode.awt.font.FontManager;
+import org.jnode.awt.font.JNodeFontPeer;
+import org.jnode.awt.image.GIFDecoder;
+import org.jnode.awt.image.JNodeImage;
+import org.jnode.driver.DeviceException;
+import org.jnode.driver.sound.speaker.SpeakerUtils;
+import org.jnode.driver.video.AlreadyOpenException;
+import org.jnode.driver.video.FrameBufferAPI;
+import org.jnode.driver.video.Surface;
+import org.jnode.driver.video.UnknownConfigurationException;
+import org.jnode.naming.InitialNaming;
 
+import javax.naming.NamingException;
 import java.awt.AWTError;
 import java.awt.AWTException;
 import java.awt.Component;
@@ -64,21 +77,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
-
-import javax.naming.NamingException;
-
-import org.apache.log4j.Logger;
-import org.jnode.awt.font.FontManager;
-import org.jnode.awt.font.JNodeFontPeer;
-import org.jnode.awt.image.GIFDecoder;
-import org.jnode.awt.image.JNodeImage;
-import org.jnode.driver.DeviceException;
-import org.jnode.driver.sound.speaker.SpeakerUtils;
-import org.jnode.driver.video.AlreadyOpenException;
-import org.jnode.driver.video.FrameBufferAPI;
-import org.jnode.driver.video.Surface;
-import org.jnode.driver.video.UnknownConfigurationException;
-import org.jnode.naming.InitialNaming;
 
 /**
  * @author epr
@@ -679,7 +677,28 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 			if (dev == null) {
 				throw new AWTError("No framebuffer device found");
 			}
-			config = (JNodeGraphicsConfiguration) dev.getDefaultConfiguration();
+            log.info("Supported graphics configurations: ");
+            GraphicsConfiguration[] configurations = dev.getConfigurations();
+            for(GraphicsConfiguration g_conf : configurations){
+                log.info(g_conf);
+            }
+            String screen_size = (String)AccessController.doPrivileged(new GetPropertyAction("jnode.awt.screensize", "none"));
+            if("none".equals(screen_size)) {
+			    config = (JNodeGraphicsConfiguration) dev.getDefaultConfiguration();
+            } else {
+                boolean found = false;
+                for(GraphicsConfiguration g_conf : configurations){
+                    if(screen_size.equals(g_conf.toString())){
+                        config = (JNodeGraphicsConfiguration) g_conf;
+                        found = true;
+                        break;
+                    }
+                }
+                if(!found){
+                    config = (JNodeGraphicsConfiguration) dev.getDefaultConfiguration();
+                }
+            }
+            log.info("Using: " + config);
 			this.api = dev.getAPI();
 			try {
 				log.debug("Opening AWT: Using device " + dev.getIDstring());
