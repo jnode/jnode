@@ -25,21 +25,9 @@ import gnu.java.awt.ClasspathToolkit;
 import gnu.java.awt.peer.ClasspathFontPeer;
 import gnu.java.awt.peer.ClasspathTextLayoutPeer;
 import gnu.java.security.action.GetPropertyAction;
-import org.apache.log4j.Logger;
-import org.jnode.awt.font.FontManager;
-import org.jnode.awt.font.JNodeFontPeer;
-import org.jnode.awt.image.GIFDecoder;
-import org.jnode.awt.image.JNodeImage;
-import org.jnode.driver.DeviceException;
-import org.jnode.driver.sound.speaker.SpeakerUtils;
-import org.jnode.driver.video.AlreadyOpenException;
-import org.jnode.driver.video.FrameBufferAPI;
-import org.jnode.driver.video.Surface;
-import org.jnode.driver.video.UnknownConfigurationException;
-import org.jnode.naming.InitialNaming;
 
-import javax.naming.NamingException;
 import java.awt.AWTError;
+import java.awt.AWTException;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -48,6 +36,7 @@ import java.awt.FontMetrics;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.PrintJob;
@@ -62,6 +51,7 @@ import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
 import java.awt.image.VolatileImage;
 import java.awt.peer.FontPeer;
+import java.awt.peer.RobotPeer;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
@@ -74,6 +64,21 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
+
+import javax.naming.NamingException;
+
+import org.apache.log4j.Logger;
+import org.jnode.awt.font.FontManager;
+import org.jnode.awt.font.JNodeFontPeer;
+import org.jnode.awt.image.GIFDecoder;
+import org.jnode.awt.image.JNodeImage;
+import org.jnode.driver.DeviceException;
+import org.jnode.driver.sound.speaker.SpeakerUtils;
+import org.jnode.driver.video.AlreadyOpenException;
+import org.jnode.driver.video.FrameBufferAPI;
+import org.jnode.driver.video.Surface;
+import org.jnode.driver.video.UnknownConfigurationException;
+import org.jnode.naming.InitialNaming;
 
 /**
  * @author epr
@@ -235,6 +240,13 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	}
 
 	/**
+     * @see gnu.java.awt.ClasspathToolkit#createRobot(java.awt.GraphicsDevice)
+     */
+    public RobotPeer createRobot(GraphicsDevice screen) throws AWTException {
+        return new JNodeRobotPeer<JNodeToolkit>(this, screen);
+    }
+
+    /**
 	 * @see gnu.java.awt.ClasspathToolkit#createFont(int, java.io.InputStream)
 	 */
 	public Font createFont(int format, InputStream stream) {
