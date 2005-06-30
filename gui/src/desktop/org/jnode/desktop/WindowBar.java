@@ -26,11 +26,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.DefaultListModel;
+import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import org.apache.log4j.Logger;
 
@@ -50,6 +53,7 @@ public class WindowBar extends JPanel {
         this.model = new DefaultListModel();
         this.wrappers = new HashMap<JInternalFrame, FrameWrapper>();
 		list.setModel(model);
+        list.addListSelectionListener(new SelectionListener());
 
         setLayout(new GridLayout(1, 1));
         list.setBorder(new BevelBorder(BevelBorder.LOWERED));
@@ -85,8 +89,27 @@ public class WindowBar extends JPanel {
 	}
 
 	public void setActiveFrame(JInternalFrame frame) {
-		log.debug("setActiveFrame " + frame.getTitle());
+        FrameWrapper w = wrappers.get(frame);
+        if (w != null) {
+            list.setSelectedValue(w, true);
+        }
+        
 	}
+    
+    private class SelectionListener implements ListSelectionListener {
+
+        /**
+         * @see javax.swing.event.ListSelectionListener#valueChanged(javax.swing.event.ListSelectionEvent)
+         */
+        public void valueChanged(ListSelectionEvent event) {
+            final FrameWrapper sel = (FrameWrapper)list.getSelectedValue();
+            if ((sel != null) && !sel.getFrame().isSelected()) {
+                final JInternalFrame frame = sel.getFrame();
+                final JDesktopPane desktop = frame.getDesktopPane();
+                desktop.setSelectedFrame(frame);
+            }
+        }        
+    }
     
     private static class FrameWrapper {
         private final JInternalFrame frame;
@@ -96,6 +119,10 @@ public class WindowBar extends JPanel {
          */
         public FrameWrapper(JInternalFrame frame) {
             this.frame = frame;
+        }
+        
+        public final JInternalFrame getFrame() {
+            return frame;
         }
         
         public String toString() {
