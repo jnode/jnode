@@ -18,48 +18,41 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.awt.font.truetype;
 
 import java.awt.font.OpenType;
 import java.io.IOException;
 
 /**
- * Conrete implementation of a TrueType font, attached to a JavaFont which implements
- * the OpenType interface.
- *
- *  FIXME: Test as soon as some Java Fonts implements OpenType.
- *  Probably TTFMemoryInput won't work. Tag names may be different for OpenType and TrueType.
- *
- *  @author Simon Fischer
- *  @version $Id$
+ * Conrete implementation of a TrueType font, attached to a JavaFont which
+ * implements the OpenType interface.
+ * 
+ * FIXME: Test as soon as some Java Fonts implements OpenType. Probably
+ * TTFMemoryInput won't work. Tag names may be different for OpenType and
+ * TrueType.
+ * 
+ * @author Simon Fischer
+ * @version $Id$
  */
-public class TTFOpenType extends TTFFontData
-{
+public class TTFOpenType extends TTFFontData {
 
-	private OpenType openType;
+    private OpenType openType;
 
-	public TTFOpenType(OpenType openType) throws IOException
-	{
-		this.openType = openType;
+    public TTFOpenType(OpenType openType) throws IOException {
+        this.openType = openType;
+        for (TableClass tc : TableClass.values()) {
+            byte[] data = openType.getFontTable(tc.getTag());
+            if (data != null) {
+                newTable(tc, new TTFMemoryInput(data));
+            } else {
+                System.err.println("No table found for '" + tc.getTag() + "'.");
+            }
 
-		for (int i = 0; i < TTFTable.TT_TAGS.length; i++)
-		{
-			byte[] data = openType.getFontTable(TTFTable.TT_TAGS[i]);
-			if (data != null)
-			{
-				newTable(TTFTable.TT_TAGS[i], new TTFMemoryInput(data));
-			}
-			else
-			{
-				System.err.println("No table found for '" + TTFTable.TT_TAGS[i] + "'.");
-			}
-		}
+        }
+    }
 
-	}
-
-	public int getFontVersion()
-	{
-		return openType.getVersion();
-	}
+    public int getFontVersion() {
+        return openType.getVersion();
+    }
 }

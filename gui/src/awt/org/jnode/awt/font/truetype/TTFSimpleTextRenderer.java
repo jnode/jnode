@@ -29,6 +29,10 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.jnode.awt.font.TextRenderer;
+import org.jnode.awt.font.truetype.tables.CMapTable;
+import org.jnode.awt.font.truetype.tables.GlyphTable;
+import org.jnode.awt.font.truetype.tables.HorizontalHeaderTable;
+import org.jnode.awt.font.truetype.tables.HorizontalMetricsTable;
 import org.jnode.driver.video.Surface;
 
 /**
@@ -67,17 +71,17 @@ public class TTFSimpleTextRenderer implements TextRenderer {
             final GeneralPath gp = new GeneralPath();
             gp.moveTo(x, y);
 
-            final TTFGlyphTable glyphTable = fontData.getGlyphTable();
-            final TTFCMapTable cmapTable = fontData.getCMapTable();
-            final TTFHorizontalHeaderTable hheadTable = fontData
+            final GlyphTable glyphTable = fontData.getGlyphTable();
+            final CMapTable cmapTable = fontData.getCMapTable();
+            final HorizontalHeaderTable hheadTable = fontData
                     .getHorizontalHeaderTable();
-            final TTFHorizontalMetricsTable hmTable = fontData
+            final HorizontalMetricsTable hmTable = fontData
                     .getHorizontalMetricsTable();
 
             if (!(cmapTable.getNrEncodingTables() > 0)) {
                 throw new RuntimeException("No Encoding is found!");
             }
-            final TTFCMapTable.EncodingTable encTable = cmapTable
+            final CMapTable.EncodingTable encTable = cmapTable
                     .getEncodingTable(0);
             if (encTable.getTableFormat() == null) {
                 throw new RuntimeException("The table is NUll!!");

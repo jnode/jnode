@@ -26,6 +26,17 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jnode.awt.font.truetype.tables.CMapTable;
+import org.jnode.awt.font.truetype.tables.GlyphTable;
+import org.jnode.awt.font.truetype.tables.HeadTable;
+import org.jnode.awt.font.truetype.tables.HorizontalHeaderTable;
+import org.jnode.awt.font.truetype.tables.HorizontalMetricsTable;
+import org.jnode.awt.font.truetype.tables.LocationsTable;
+import org.jnode.awt.font.truetype.tables.MaxPTable;
+import org.jnode.awt.font.truetype.tables.NameTable;
+import org.jnode.awt.font.truetype.tables.OS2Table;
+import org.jnode.awt.font.truetype.tables.TTFTable;
+
 /**
  * TrueType Font with all its tables.
  * 
@@ -34,51 +45,40 @@ import java.util.Map;
  */
 public abstract class TTFFontData {
 
-    // this map contains the table entrys mapped on their tag
+    /** Tables indexed by tag */
+    private final Map<TableClass, TTFTable> tables = new HashMap<TableClass, TTFTable>();
 
-    private static final String CharToGlyphTable = "cmap";
-
-    private static final String GlyphTable = "glyf";
-
-    private static final String FontHeaderTable = "head";
-
-    private static final String HorizHeaderTable = "hhea";
-
-    /*
-     * Required Tables Tag Name ----------- Cmap character to glyph mapping Glyf
-     * glyph data Head font header Hhea horizontal header Hmtx horizontal
-     * metrics Loca index to location Maxp maximum profile Name naming table
-     * Post PostScript information OS/2 OS/2 and Windows specific metrics
+    /**
+     * Initialize this instance.
+     * @param input
      */
-    private Map<String, TTFTable> entry = new HashMap<String, TTFTable>();
-
+    protected TTFFontData() {
+    }
+    
+    /**
+     * Gets the version of this font data.
+     * @return
+     */
     public abstract int getFontVersion();
 
-    void newTable(String tag, TTFInput input) throws IOException {
-        entry.put(tag, initTable(tag, input));
+    
+    /**
+     * Create a new table with a given table.
+     * @param tag
+     * @param input
+     * @throws IOException
+     */
+    protected final void newTable(TableClass tc, TTFInput input) throws IOException {
+        final TTFTable tbl = tc.create(this, input);
+        tables.put(tc, tbl);
     }
 
-    private TTFTable initTable(String name, TTFInput input) throws IOException {
-        for (int i = 0; i < TTFTable.TT_TAGS.length; i++) {
-            if (name.equals(TTFTable.TT_TAGS[i])) {
-                try {
-                    final TTFTable table;
-                    table = (TTFTable) TTFTable.TABLE_CLASSES[i].newInstance();
-                    table.init(this, input);
-                    return table;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-        }
-        // System.err.println("Table '" + name + "' ignored.");
-        return null;
-    }
-
+    /**
+     * Show the contents of this font data.
+     */
     public void show() {
         System.out.println("Tables:");
-        for (Object v : entry.values()) {
+        for (Object v : tables.values()) {
             System.out.println(v);
         }
     }
@@ -90,11 +90,9 @@ public abstract class TTFFontData {
      * @return The table
      * @throws IOException
      */
-    private final TTFTable getTable(String tag) throws IOException {
-        final TTFTable table = (TTFTable) entry.get(tag);
-        if (!table.isRead()) {
-            table.read();
-        }
+    private final TTFTable getTable(TableClass tag) throws IOException {
+        final TTFTable table = tables.get(tag);
+        table.read();
         return table;
     }
 
@@ -104,8 +102,8 @@ public abstract class TTFFontData {
      * @return The glyph table
      * @throws IOException
      */
-    public TTFGlyphTable getGlyphTable() throws IOException {
-        return (TTFGlyphTable) getTable(GlyphTable);
+    public GlyphTable getGlyphTable() throws IOException {
+        return (GlyphTable) getTable(TableClass.GLYF);
     }
 
     /**
@@ -114,8 +112,8 @@ public abstract class TTFFontData {
      * @return The maximum profile table
      * @throws IOException
      */
-    public TTFMaxPTable getMaxPTable() throws IOException {
-        return (TTFMaxPTable) getTable("maxp");
+    public MaxPTable getMaxPTable() throws IOException {
+        return (MaxPTable) getTable(TableClass.MAXP);
     }
 
     /**
@@ -124,8 +122,8 @@ public abstract class TTFFontData {
      * @return The name table
      * @throws IOException
      */
-    public TTFNameTable getNameTable() throws IOException {
-        return (TTFNameTable) getTable("name");
+    public NameTable getNameTable() throws IOException {
+        return (NameTable) getTable(TableClass.NAME);
     }
 
     /**
@@ -134,9 +132,9 @@ public abstract class TTFFontData {
      * @return The horizontal header table
      * @throws IOException
      */
-    public TTFHorizontalHeaderTable getHorizontalHeaderTable()
+    public HorizontalHeaderTable getHorizontalHeaderTable()
             throws IOException {
-        return (TTFHorizontalHeaderTable) getTable(HorizHeaderTable);
+        return (HorizontalHeaderTable) getTable(TableClass.HHEA);
     }
 
     /**
@@ -145,9 +143,9 @@ public abstract class TTFFontData {
      * @return The horizontal metrics table
      * @throws IOException
      */
-    public TTFHorizontalMetricsTable getHorizontalMetricsTable()
+    public HorizontalMetricsTable getHorizontalMetricsTable()
             throws IOException {
-        return (TTFHorizontalMetricsTable) getTable("hmtx");
+        return (HorizontalMetricsTable) getTable(TableClass.HMTX);
     }
 
     /**
@@ -156,8 +154,8 @@ public abstract class TTFFontData {
      * @return The header table
      * @throws IOException
      */
-    public TTFHeadTable getHeaderTable() throws IOException {
-        return (TTFHeadTable) getTable(FontHeaderTable);
+    public HeadTable getHeaderTable() throws IOException {
+        return (HeadTable) getTable(TableClass.HEAD);
     }
 
     /**
@@ -166,8 +164,8 @@ public abstract class TTFFontData {
      * @return The OS/2 / Windows metrics table
      * @throws IOException
      */
-    public TTFOS_2Table getOS2Table() throws IOException {
-        return (TTFOS_2Table) getTable("OS/2");
+    public OS2Table getOS2Table() throws IOException {
+        return (OS2Table) getTable(TableClass.OS2);
     }
 
     /**
@@ -176,8 +174,8 @@ public abstract class TTFFontData {
      * @return The location table
      * @throws IOException
      */
-    public TTFLocationsTable getLocationsTable() throws IOException {
-        return (TTFLocationsTable) getTable("loca");
+    public LocationsTable getLocationsTable() throws IOException {
+        return (LocationsTable) getTable(TableClass.LOCA);
     }
 
     /**
@@ -186,8 +184,8 @@ public abstract class TTFFontData {
      * @return The CMap table
      * @throws IOException
      */
-    public TTFCMapTable getCMapTable() throws IOException {
-        return (TTFCMapTable) getTable(CharToGlyphTable);
+    public CMapTable getCMapTable() throws IOException {
+        return (CMapTable) getTable(TableClass.CMAP);
     }
 
     /**
@@ -198,8 +196,8 @@ public abstract class TTFFontData {
      * @throws IOException
      */
     public void readAll() throws IOException {
-        for (TTFTable table : entry.values()) {
-            if ((table != null) && (!table.isRead())) {
+        for (TTFTable table : tables.values()) {
+            if (table != null) {
                 table.read();
             }
         }
@@ -218,7 +216,7 @@ public abstract class TTFFontData {
      * @throws IOException
      */
     public int getStyle() throws IOException {
-        final TTFOS_2Table t = getOS2Table();
+        final OS2Table t = getOS2Table();
         if (t != null) {
             final int fsSel;
             fsSel = t.getFsSelection();

@@ -25,6 +25,9 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.io.IOException;
 
+import org.jnode.awt.font.truetype.tables.CMapTable;
+import org.jnode.awt.font.truetype.tables.HorizontalMetricsTable;
+
 /**
  * @author epr
  */
@@ -62,9 +65,9 @@ public class TTFFontMetrics extends FontMetrics {
 	 */
 	public int charWidth(char ch) {
 		try {
-			final TTFCMapTable cmapTable = fontData.getCMapTable();
-			final TTFCMapTable.EncodingTable encTable = cmapTable.getEncodingTable(0);
-			final TTFHorizontalMetricsTable hmTable = fontData.getHorizontalMetricsTable();
+			final CMapTable cmapTable = fontData.getCMapTable();
+			final CMapTable.EncodingTable encTable = cmapTable.getEncodingTable(0);
+			final HorizontalMetricsTable hmTable = fontData.getHorizontalMetricsTable();
 			final int index = encTable.getTableFormat().getGlyphIndex(ch);
 			return (int)(hmTable.getAdvanceWidth(index) * scale);
 		} catch (IOException ex) {

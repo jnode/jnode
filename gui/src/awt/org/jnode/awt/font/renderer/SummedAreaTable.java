@@ -68,10 +68,10 @@ public class SummedAreaTable {
 	 */
 	public final int getSum(int x, int y) {
 		if ((x < 0) || (x >= width)) {
-			throw new IllegalArgumentException("x");
+			throw new IllegalArgumentException("x " + x + " " + width);
 		}
 		if ((y < 0) || (y >= height)) {
-			throw new IllegalArgumentException("y");
+			throw new IllegalArgumentException("y " + y + " " + height);
 		}
 		return table[y * width + x];
 	}
@@ -104,8 +104,8 @@ public class SummedAreaTable {
 		if ((w <= 0) || (h <= 0)) {
 			return 0.0f;
 		}
-		final int x2 = x + w;
-		final int y2 = y + h;
+		final int x2 = x + w - 1;
+		final int y2 = y + h - 1;
 		
 		final int sum_xy = getSum(x, y);
 		final int sum_x2y2 = getSum(x2, y2);
