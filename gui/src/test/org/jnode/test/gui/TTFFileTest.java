@@ -21,12 +21,12 @@
  
 package org.jnode.test.gui;
 
-import org.jnode.awt.font.truetype.TTFCMapTable;
 import org.jnode.awt.font.truetype.TTFFontData;
 import org.jnode.awt.font.truetype.TTFFontDataFile;
-import org.jnode.awt.font.truetype.TTFGlyphTable;
-import org.jnode.awt.font.truetype.TTFHorizontalHeaderTable;
-import org.jnode.awt.font.truetype.TTFHorizontalMetricsTable;
+import org.jnode.awt.font.truetype.tables.CMapTable;
+import org.jnode.awt.font.truetype.tables.GlyphTable;
+import org.jnode.awt.font.truetype.tables.HorizontalHeaderTable;
+import org.jnode.awt.font.truetype.tables.HorizontalMetricsTable;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -110,15 +110,15 @@ public class TTFFileTest {
 
     public static void drawString(Graphics g, String s, int x, int y, double fontSize) throws IOException {
 
-        final TTFGlyphTable glyphTable = ttf.getGlyphTable();
-        final TTFCMapTable cmapTable = ttf.getCMapTable();
-        final TTFHorizontalHeaderTable hheadTable = ttf.getHorizontalHeaderTable();
-        final TTFHorizontalMetricsTable hmTable = ttf.getHorizontalMetricsTable();
+        final GlyphTable glyphTable = ttf.getGlyphTable();
+        final CMapTable cmapTable = ttf.getCMapTable();
+        final HorizontalHeaderTable hheadTable = ttf.getHorizontalHeaderTable();
+        final HorizontalMetricsTable hmTable = ttf.getHorizontalMetricsTable();
 
         if (!(cmapTable.getNrEncodingTables() > 0)) {
             throw new RuntimeException("No Encoding is found!");
         }
-        final TTFCMapTable.EncodingTable encTable = cmapTable.getEncodingTable(0);
+        final CMapTable.EncodingTable encTable = cmapTable.getEncodingTable(0);
         if (encTable.getTableFormat() == null) {
             throw new RuntimeException("The table is NUll!!");
         }
@@ -154,14 +154,14 @@ public class TTFFileTest {
 
     public static void testGetGlyph(String s, int x, int y, int fontSize) throws IOException {
 
-        final TTFGlyphTable glyphTable = ttf.getGlyphTable();
-        final TTFCMapTable cmapTable = ttf.getCMapTable();
-        final TTFHorizontalHeaderTable hheadTable = ttf.getHorizontalHeaderTable();
+        final GlyphTable glyphTable = ttf.getGlyphTable();
+        final CMapTable cmapTable = ttf.getCMapTable();
+        final HorizontalHeaderTable hheadTable = ttf.getHorizontalHeaderTable();
 
         if (!(cmapTable.getNrEncodingTables() > 0)) {
             throw new RuntimeException("No Encoding is found!");
         }
-        final TTFCMapTable.EncodingTable encTable = cmapTable.getEncodingTable(0);
+        final CMapTable.EncodingTable encTable = cmapTable.getEncodingTable(0);
         if (encTable.getTableFormat() == null) {
             throw new RuntimeException("The table is NUll!!");
         }

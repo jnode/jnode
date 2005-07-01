@@ -98,7 +98,10 @@ public class TTFFontDataFile extends TTFFontData {
 			// create a table directoryEntry entry 
 			TTFInput tableInput = ttf.createSubInput(offset, len);
 			// insert this table as a new table
-			newTable(tag, tableInput);
+            final TableClass tc = TableClass.getByTag(tag);
+            if (tc != null) {
+                newTable(tc, tableInput);
+            }
 		}
 		readAll();
 	}
