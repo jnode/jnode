@@ -37,7 +37,6 @@ import org.jnode.driver.video.Surface;
 import org.jnode.naming.InitialNaming;
 import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
-import org.jnode.util.NumberUtils;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -242,25 +241,25 @@ public abstract class BitmapGraphics {
                         + (dstX << 2);
                 raster.getDataElements(srcX, srcY + row, width, 1, buf);
                 mem.getInts(ofs, pixels, 0, width);
-//                System.out.print(" w" + width + " ");
+                boolean modified = false;
                 for (int i = 0; i < width; i++) {
-                    final int dst = pixels[i];
                     final int alpha = (buf[i] & 0xFF);
-//                    System.out.print(NumberUtils.hex(alpha, 2));
-                    final int d1 = (dst & 0xFF);
-                    final int d2 = (dst >> 8) & 0xFF;
-                    final int d3 = (dst >> 16) & 0xFF;
                     
-                    final int r1 = ((alpha * (c1 - d1)) >> 8) + d1;
-                    final int r2 = ((alpha * (c2 - d2)) >> 8) + d2;
-                    final int r3 = ((alpha * (c3 - d3)) >> 8) + d3;
-                    
-                    pixels[i] = (r1 & 0xFF) + ((r2 & 0xFF) << 8) + ((r3 & 0xFF) << 16); 
-//                    pixels[i] = (alpha & 0xFF) + ((alpha & 0xFF) << 8) + ((alpha & 0xFF) << 16);
-//                    pixels[i] = (alpha > 128) ? color : dst;
+                    if (alpha != 0) {
+                        final int dst = pixels[i];
+                        final int d1 = dst & 0xFF;
+                        final int d2 = (dst >> 8) & 0xFF;
+                        final int d3 = (dst >> 16) & 0xFF;
+                        final int r1 = (((alpha * (c1 - d1)) >> 8) + d1) & 0xFF;
+                        final int r2 = (((alpha * (c2 - d2)) >> 8) + d2) & 0xFF;
+                        final int r3 = (((alpha * (c3 - d3)) >> 8) + d3) & 0xFF;
+                        pixels[i] = r1 | (r2 << 8) | (r3 << 16);
+                        modified = true;
+                    }
                 }
-//                System.out.println();
-                mem.setInts(pixels, 0, ofs, width);
+                if (modified) {
+                    mem.setInts(pixels, 0, ofs, width);
+                }
             }
         }
 
