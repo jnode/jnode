@@ -282,7 +282,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 		}
 		testMemPtr(memPtr, length * 4);
 		final Address dstPtr = VmMagic.getArrayData(dst).add(dstOfs * 4);
-        final Extent size = Extent.fromIntZeroExtend(length);
+        final Extent size = Extent.fromIntZeroExtend(length * 4);
 		Unsafe.copy(start.add(Offset.fromIntZeroExtend(memPtr)), dstPtr, size);
 	}
 
