@@ -92,32 +92,31 @@ public class TTFTextRenderer implements TextRenderer {
             final HorizontalMetricsTable hmTable = fontData
                     .getHorizontalMetricsTable();
             final double scale = fontSize / ascent;
-//            System.out.println("scale=" + scale);
 
-            for (int i = 0; i < text.length(); i++) {
+            final int textLength = text.length();
+            for (int i = 0; i < textLength; i++) {
                 // get the index for the needed glyph
-                final int index = encTable.getTableFormat().getGlyphIndex(
-                        text.charAt(i));
-                final Glyph g = glyphTable.getGlyph(index);
-                final GlyphRenderer renderer = renderCache.getRenderer(g,
-                        ascent);
-                final Raster alphaRaster = renderer
-                        .createGlyphRaster((int) fontSize);
-                final int w = alphaRaster.getWidth();
-                final int h = alphaRaster.getHeight();
+                final char ch = text.charAt(i);
+                final int index = encTable.getTableFormat().getGlyphIndex(ch);
+                if (ch != ' ') {
+                    final Glyph g = glyphTable.getGlyph(index);
+                    final GlyphRenderer renderer = renderCache.getRenderer(g,
+                            ascent);
+                    final Raster alphaRaster = renderer
+                            .createGlyphRaster(fontSize);
+                    final int w = alphaRaster.getWidth();
+                    final int h = alphaRaster.getHeight();
 
-                final Point2D minLoc = renderer.getMinLocation((int) fontSize);
-                final double dstX = x + minLoc.getX();
-                final double dstY = y - fontSize + minLoc.getY();
+                    final Point2D minLoc = renderer.getMinLocation(fontSize);
+                    final double dstX = x + minLoc.getX();
+                    final double dstY = y - alphaRaster.getHeight()
+                            + minLoc.getY();
 
-                surface.drawAlphaRaster(alphaRaster, tx, 0, 0, (int) dstX,
-                        (int) dstY, w, h, color);
-                final double aw = hmTable.getAdvanceWidth(index);
-//                System.out.println("idx=" + index + " x=" + x + " w=" + w
-//                        + " aw=" + aw + " aw*sc=" + (aw * scale));
-                x += (aw * scale);
-//                x += alphaRaster.getWidth();
-                System.out.println("aw*sc=" + (aw * scale) + " ar.w=" + alphaRaster.getWidth());
+                    surface.drawAlphaRaster(alphaRaster, tx, 0, 0, (int) dstX,
+                            (int) dstY, w, h, color);
+                    // x += minLoc.getX();
+                }
+                x += (scale * (double) hmTable.getAdvanceWidth(index));
             }
         } catch (Exception ex) {
             log.error("Error drawing text", ex);
