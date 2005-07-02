@@ -80,9 +80,11 @@ public class GlyphTest {
 
         frm = new JFrame("GlyphTest - SumAreaTable");
         frm.getContentPane().setBackground(Color.RED);
-        frm.getContentPane().setLayout(new GridLayout(1, 2));
+        frm.getContentPane().setLayout(new GridLayout(1, 3));
         frm.getContentPane().add(new MasterViewer(gr.getMaster()));
-        frm.getContentPane().add(new RasterViewer(4.0, gr.createGlyphRaster(10)));
+        final Raster r = gr.createGlyphRaster(16);
+        frm.getContentPane().add(new RasterViewer(1.0, r));
+        frm.getContentPane().add(new RasterViewer(4.0, r));
         // frm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frm.setSize(600, 400);
         frm.show();
@@ -240,10 +242,12 @@ public class GlyphTest {
             final int h = src.getHeight();
             System.out.println("image size " + w + "x" + h);
             final BufferedImage img = new BufferedImage(w, h,
-                    BufferedImage.TYPE_INT_RGB);
+                    BufferedImage.TYPE_INT_ARGB);
+            final int c = Color.WHITE.getRGB() & 0xFFFFFF;
             for (int y = 0; y < h; y++) {
                 for (int x = 0; x < w; x++) {
-                    img.setRGB(x, y, src.getSample(x, y, 0));
+                    final int v = src.getSample(x, y, 0) & 0xFF;
+                    img.setRGB(x, y, (v << 24) | c);
                 }
             }
             return img;
