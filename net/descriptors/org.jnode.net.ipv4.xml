@@ -36,6 +36,9 @@
     <permission class="java.net.SocketPermission" name="*:67" actions="connect,resolve"/>
     <permission class="java.net.SocketPermission" name="localhost:68" actions="listen"/>
     <permission class="org.jnode.net.NetPermission" name="*"/>
+    
+    <!-- dhcp -->
+    <permission class="org.jnode.security.JNodePermission" name="createPluginLoader"/>
 
 	<!-- DNS -->
     <permission class="java.net.SocketPermission" name="*" actions="resolve"/>

@@ -21,6 +21,15 @@
 
 package org.jnode.net.ipv4.dhcp;
 
+import java.io.IOException;
+import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
+
+import javax.naming.NameNotFoundException;
+
 import org.apache.log4j.Logger;
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
@@ -32,12 +41,8 @@ import org.jnode.net.ipv4.IPv4Address;
 import org.jnode.net.ipv4.bootp.BOOTPHeader;
 import org.jnode.net.ipv4.config.IPv4ConfigurationService;
 import org.jnode.net.ipv4.util.ResolverImpl;
-
-import javax.naming.NameNotFoundException;
-import java.io.IOException;
-import java.security.AccessController;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
+import org.jnode.plugin.PluginManager;
+import org.jnode.plugin.URLPluginLoader;
 
 /**
  * Console DHCP client.
@@ -129,16 +134,38 @@ public class DHCPClient extends AbstractDHCPClient {
 
 
         // find the dns servers and add to the resolver
-        byte[] dnsValue = msg.getOption(DHCPMessage.DNS_OPTION);
-        IPv4Address dnsIP;
-
+        final byte[] dnsValue = msg.getOption(DHCPMessage.DNS_OPTION);
         if (dnsValue != null) {
             for (int i = 0; i < dnsValue.length; i += 4) {
-                dnsIP = new IPv4Address(dnsValue, i);
-
+                final IPv4Address dnsIP = new IPv4Address(dnsValue, i);
+                
                 log.info("Got Dns IP address    : " + dnsIP);
-                ResolverImpl.addDnsServer(dnsIP);
+                try {
+                    ResolverImpl.addDnsServer(dnsIP);
+                } catch (Throwable ex) {
+                    log.error("Failed to configure DNS server");
+                    log.debug("Failed to configure DNS server", ex);
+                }
             }
+        }
+        
+        // Find the plugin loader option
+        final byte[] pluginLoaderValue = msg.getOption(DHCPMessage.PLUGIN_LOADER_OPTION);
+        if (pluginLoaderValue != null) {
+            final String pluginLoaderURL = new String(pluginLoaderValue, "UTF8");
+            log.info("Got plugin loader url : " + pluginLoaderURL);
+            AccessController.doPrivileged(new PrivilegedAction() {
+                public Object run() {
+                    try {
+                        final PluginManager pm = InitialNaming.lookup(PluginManager.class);
+                        pm.getLoaderManager().addPluginLoader(new URLPluginLoader(new URL(pluginLoaderURL)));
+                    } catch (Throwable ex) {
+                        log.error("Failed to configure plugin loader");
+                        log.debug("Failed to configure plugin loader", ex);
+                    }
+                    return null;
+                }
+            });
         }
     }
 }
