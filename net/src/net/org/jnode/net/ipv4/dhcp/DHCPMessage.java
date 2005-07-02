@@ -137,6 +137,9 @@ public class DHCPMessage {
     /** IP address */
     public static final int IRC_SERVER_OPTION = 74;
 
+    /** String URL: JNode specific option */
+    public static final int PLUGIN_LOADER_OPTION = 130;
+    
     public static final int END_OPTION = 255;
 
     // message types
