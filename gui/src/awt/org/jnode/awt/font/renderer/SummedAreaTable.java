@@ -133,7 +133,7 @@ public class SummedAreaTable {
 				}
 				// Add the sum of the values left of me
 				for (int i = 0; i <= x; i++) {
-				    if (master.get(y * width + i)) {
+				    if (master.get(yOfs + i)) {
 				        sum += 1;
 				    }
 				}

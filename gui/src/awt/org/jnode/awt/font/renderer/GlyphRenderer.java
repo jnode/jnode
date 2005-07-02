@@ -39,7 +39,7 @@ import java.util.BitSet;
  */
 public class GlyphRenderer {
 
-    private final double MASTER_HEIGHT = 64.0;
+    private final double MASTER_HEIGHT = 128.0;
 	private final SummedAreaTable sumAreaTable;
     private final Master master;
     private final double minX;
@@ -62,12 +62,10 @@ public class GlyphRenderer {
 	 * @param fontSize
 	 * @return
 	 */
-	public Raster createGlyphRaster(int fontSize) {
-		final double scale = (double)sumAreaTable.getHeight() / (double)fontSize;
+	public Raster createGlyphRaster(double fontSize) {
+	    final double scale = MASTER_HEIGHT / fontSize;
         final int height = (int)(sumAreaTable.getHeight() / scale);
 		final int width = (int)(sumAreaTable.getWidth() / scale);
-        
-        System.out.println("createGlyphRaster   wxh " + width + 'x' + height);
 
 		final ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_GRAY);
 		final int[] nBits = { 8 };
@@ -81,12 +79,9 @@ public class GlyphRenderer {
 			for (int x = 0; x < width; x++) {
 				final int xpos = (int)(x * scale);
 				final float v = sumAreaTable.getIntensity(xpos, ypos, si, si) * 255;
-				
-//				System.out.println("(" + x + "," + y + ") " + v + ", si " + si);
 				raster.setSample(x, y, 0, v);
 			}
 		}
-        System.out.println("createGlyphRaster r.wxh " + raster.getWidth() + 'x' + raster.getHeight());
 		return raster;			
 	}
     
@@ -96,8 +91,8 @@ public class GlyphRenderer {
      * @param fontSize
      * @return
      */
-    public Point2D getMinLocation(int fontSize) {
-        final double scale = (double)sumAreaTable.getHeight() / (double)fontSize;
+    public Point2D getMinLocation(double fontSize) {
+        final double scale = MASTER_HEIGHT / fontSize;
         return new Point2D.Double(minX / scale, -minY / scale);
     }
 	
@@ -112,7 +107,7 @@ public class GlyphRenderer {
 
 		area.transform(AffineTransform.getScaleInstance(scale, scale));
 		Rectangle bounds = area.getBounds();
-        System.out.println("createMaster bounds " + bounds);
+//        System.out.println("createMaster bounds " + bounds);
 		//area.transform(AffineTransform.getTranslateInstance(-bounds.getMinX(), -bounds.getMinY()));
 		//bounds = area.getBounds();
 		
@@ -123,7 +118,7 @@ public class GlyphRenderer {
 		final int width = maxX - minX;
 		final int height = maxY - minY;
 		
-        System.out.println("createMaster wxh " + width + 'x' + height);
+//        System.out.println("createMaster wxh " + width + 'x' + height);
 
 //        System.out.println("min/max X " + minX + "/" + maxX);
 //        System.out.println("min/max Y " + minY + "/" + maxY);
