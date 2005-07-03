@@ -32,6 +32,7 @@ import org.jnode.vm.MemoryMapEntry;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmArchitecture;
+import org.jnode.vm.VmMultiMediaSupport;
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmStackReader;
 import org.jnode.vm.VmSystem;
@@ -364,5 +365,17 @@ public abstract class VmX86Architecture extends VmArchitecture {
         }
         
         return map;
+    }
+
+    /**
+     * @see org.jnode.vm.VmArchitecture#createMultiMediaSupport()
+     */
+    protected VmMultiMediaSupport createMultiMediaSupport() {
+        final X86CpuID id = (X86CpuID)Unsafe.getCurrentProcessor().getCPUID();
+        if (id.hasMMX()) {
+            return new MMXMultiMediaSupport();
+        } else {
+            return super.createMultiMediaSupport();
+        }
     }        
 }

@@ -75,4 +75,12 @@ final class UnsafeX86 {
      * @return
      */
     static final native int getMultibootMMapLength();
+    
+    /**
+     * Merge 32-bit ARGB values at the given memory address.
+     * @param src The source address (points to 32-bit ARGB int's)
+     * @param dst The destination address (points to 32-bit RGB int's)
+     * @param length The number of 32-bit int's to merge.
+     */
+    static final native void setARGB32bppMMX(Address src, Address dst, int length);
 }
