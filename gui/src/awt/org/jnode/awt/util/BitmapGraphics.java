@@ -36,6 +36,7 @@ import org.apache.log4j.Logger;
 import org.jnode.driver.video.Surface;
 import org.jnode.naming.InitialNaming;
 import org.jnode.system.MemoryResource;
+import org.jnode.system.MultiMediaMemoryResource;
 import org.jnode.system.ResourceManager;
 
 /**
@@ -235,34 +236,17 @@ public abstract class BitmapGraphics {
             final byte[] buf = getAlphaBuffer(width);
             final int[] pixels = getPixelBuffer(width);
             
-            final int c1 = color & 0xFF;
-            final int c2 = (color >> 8) & 0xFF;
-            final int c3 = (color >> 16) & 0xFF;
+            color &= 0x00FFFFFF;
             
             for (int row = 0; row < height; row++) {
                 final int ofs = offset + ((dstY + row) * bytesPerLine)
                         + (dstX << 2);
                 raster.getDataElements(srcX, srcY + row, width, 1, buf);
-                mem.getInts(ofs, pixels, 0, width);
-                boolean modified = false;
                 for (int i = 0; i < width; i++) {
                     final int alpha = (buf[i] & 0xFF);
-                    
-                    if (alpha != 0) {
-                        final int dst = pixels[i];
-                        final int d1 = dst & 0xFF;
-                        final int d2 = (dst >> 8) & 0xFF;
-                        final int d3 = (dst >> 16) & 0xFF;
-                        final int r1 = (((alpha * (c1 - d1)) >> 8) + d1) & 0xFF;
-                        final int r2 = (((alpha * (c2 - d2)) >> 8) + d2) & 0xFF;
-                        final int r3 = (((alpha * (c3 - d3)) >> 8) + d3) & 0xFF;
-                        pixels[i] = r1 | (r2 << 8) | (r3 << 16);
-                        modified = true;
-                    }
+                    pixels[i] = (alpha << 24) | color;
                 }
-                if (modified) {
-                    mem.setInts(pixels, 0, ofs, width);
-                }
+                mem.setARGB32bpp(pixels, 0, ofs, width);
             }
         }
 
@@ -481,7 +465,7 @@ public abstract class BitmapGraphics {
     /** My logger */
     protected final Logger log = Logger.getLogger(getClass());
 
-    protected final MemoryResource mem;
+    protected final MultiMediaMemoryResource mem;
 
     /** Offset of first pixel in mem (in bytes) */
     protected final int offset;
@@ -499,7 +483,7 @@ public abstract class BitmapGraphics {
      */
     protected BitmapGraphics(MemoryResource mem, int width, int height,
             int offset, int bytesPerLine) {
-        this.mem = mem;
+        this.mem = mem.asMultiMediaMemoryResource();
         this.offset = offset;
         this.bytesPerLine = bytesPerLine;
         this.width = width;
