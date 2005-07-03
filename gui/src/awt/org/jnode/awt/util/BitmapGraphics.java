@@ -174,6 +174,9 @@ public abstract class BitmapGraphics {
 
     static final class BitmapGraphics32bpp extends BitmapGraphics {
 
+        private int[] pixelBuffer;
+        private byte[] alphaBuffer;
+        
         /**
          * @param mem
          * @param width
@@ -229,8 +232,8 @@ public abstract class BitmapGraphics {
          */
         protected void doDrawAlphaRaster(Raster raster, int srcX, int srcY,
                 int dstX, int dstY, int width, int height, int color) {
-            final byte[] buf = new byte[width];
-            final int[] pixels = new int[width];
+            final byte[] buf = getAlphaBuffer(width);
+            final int[] pixels = getPixelBuffer(width);
             
             final int c1 = color & 0xFF;
             final int c2 = (color >> 8) & 0xFF;
@@ -283,6 +286,20 @@ public abstract class BitmapGraphics {
             } else {
                 mem.xorInt(ofs, color, count);
             }
+        }
+        
+        private final int[] getPixelBuffer(int width) {
+            if ((pixelBuffer == null) || (pixelBuffer.length < width)) {
+                pixelBuffer = new int[width];                
+            }
+            return pixelBuffer;
+        }
+        
+        private final byte[] getAlphaBuffer(int width) {
+            if ((alphaBuffer == null) || (alphaBuffer.length < width)) {
+                alphaBuffer = new byte[width];                
+            }
+            return alphaBuffer;
         }
     }
 

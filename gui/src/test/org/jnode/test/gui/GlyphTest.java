@@ -28,17 +28,18 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Shape;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import java.awt.image.Kernel;
 import java.awt.image.Raster;
+import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.net.URL;
 
 import javax.swing.JFrame;
 
 import org.jnode.awt.font.renderer.GlyphRenderer;
+import org.jnode.awt.font.renderer.RenderContext;
 import org.jnode.awt.font.truetype.TTFFontData;
 import org.jnode.awt.font.truetype.TTFFontDataFile;
 import org.jnode.awt.font.truetype.glyph.Glyph;
@@ -61,28 +62,29 @@ public class GlyphTest {
         final int idx = fdata.getCMapTable().getEncodingTable(0).getTableFormat().getGlyphIndex('e');
         Glyph g = fdata.getGlyphTable().getGlyph(idx);
         Shape shape = g.getShape();
-        System.out.println("shape.bounds " + shape.getBounds());
+//        System.out.println("shape.bounds " + shape.getBounds());
         final HorizontalHeaderTable hheadTable = fdata
                 .getHorizontalHeaderTable();
         final double ascent = hheadTable.getAscent();
 
         Area area = new Area(shape);
-        System.out.println("area.bounds " + area.getBounds());
-        final double scale = 5.0;
-        area.transform(AffineTransform.getScaleInstance(scale, scale));
-        System.out.println("area1.bounds " + area.getBounds());
+//        System.out.println("area.bounds " + area.getBounds());
+//        final double scale = 5.0;
+//        area.transform(AffineTransform.getScaleInstance(scale, scale));
+//        System.out.println("area1.bounds " + area.getBounds());
 //        area.transform(AffineTransform.getScaleInstance(1.0, -1.0));
 //        System.out.println("area2.bounds " + area.getBounds());
 
-        GlyphRenderer gr = new GlyphRenderer(area, ascent);
+        GlyphRenderer gr = new GlyphRenderer(new RenderContext(), area, ascent);
 
         JFrame frm;
 
         frm = new JFrame("GlyphTest - SumAreaTable");
         frm.getContentPane().setBackground(Color.RED);
         frm.getContentPane().setLayout(new GridLayout(1, 3));
-        frm.getContentPane().add(new MasterViewer(gr.getMaster()));
-        final Raster r = gr.createGlyphRaster(16);
+//        frm.getContentPane().add(new MasterViewer(gr.getMaster()));
+        final WritableRaster r = GlyphRenderer.createRaster(32, 32);
+        gr.createGlyphRaster(r, 16);
         frm.getContentPane().add(new RasterViewer(1.0, r));
         frm.getContentPane().add(new RasterViewer(4.0, r));
         // frm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

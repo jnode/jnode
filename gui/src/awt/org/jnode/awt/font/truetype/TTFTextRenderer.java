@@ -22,14 +22,16 @@
 package org.jnode.awt.font.truetype;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-import java.awt.image.Raster;
+import java.awt.image.WritableRaster;
 
 import org.apache.log4j.Logger;
 import org.jnode.awt.font.TextRenderer;
 import org.jnode.awt.font.renderer.GlyphRenderer;
+import org.jnode.awt.font.renderer.RenderContext;
 import org.jnode.awt.font.truetype.glyph.Glyph;
 import org.jnode.awt.font.truetype.tables.CMapTable;
 import org.jnode.awt.font.truetype.tables.GlyphTable;
@@ -50,6 +52,9 @@ public class TTFTextRenderer implements TextRenderer {
     private final double fontSize;
 
     private final RenderCache renderCache;
+    
+    /** Key of the alpha raster in the render context */
+    private static final String ALPHA_RASTER = TTFTextRenderer.class.getName() + "AR";
 
     /**
      * Create a new instance
@@ -62,6 +67,22 @@ public class TTFTextRenderer implements TextRenderer {
         this.renderCache = renderCache;
         this.fontData = fontData;
         this.fontSize = fontSize;
+    }
+
+    /**
+     * Create/get the alpha raster used for rendering.
+     * 
+     * @return
+     */
+    private WritableRaster createAlphaRaster() {
+        final RenderContext ctx = renderCache.getContext();
+        WritableRaster r = (WritableRaster)ctx.getObject(ALPHA_RASTER);
+        final int fontSizeUp = (int) (fontSize + 0.5);
+        if ((r == null) || (r.getWidth() < fontSizeUp) || (r.getHeight() < fontSizeUp)) {
+            r = GlyphRenderer.createRaster(fontSizeUp, fontSizeUp);
+            ctx.setObject(ALPHA_RASTER, r);
+        }
+        return r;
     }
 
     /**
@@ -94,6 +115,7 @@ public class TTFTextRenderer implements TextRenderer {
             final double scale = fontSize / ascent;
 
             final int textLength = text.length();
+            final WritableRaster alphaRaster = createAlphaRaster();
             for (int i = 0; i < textLength; i++) {
                 // get the index for the needed glyph
                 final char ch = text.charAt(i);
@@ -102,18 +124,15 @@ public class TTFTextRenderer implements TextRenderer {
                     final Glyph g = glyphTable.getGlyph(index);
                     final GlyphRenderer renderer = renderCache.getRenderer(g,
                             ascent);
-                    final Raster alphaRaster = renderer
-                            .createGlyphRaster(fontSize);
-                    final int w = alphaRaster.getWidth();
-                    final int h = alphaRaster.getHeight();
+                    final Dimension d;
+                    d = renderer.createGlyphRaster(alphaRaster, fontSize);
 
                     final Point2D minLoc = renderer.getMinLocation(fontSize);
                     final double dstX = x + minLoc.getX();
-                    final double dstY = y - alphaRaster.getHeight()
-                            + minLoc.getY();
+                    final double dstY = y - d.height + minLoc.getY();
 
                     surface.drawAlphaRaster(alphaRaster, tx, 0, 0, (int) dstX,
-                            (int) dstY, w, h, color);
+                            (int) dstY, d.width, d.height, color);
                     // x += minLoc.getX();
                 }
                 x += (scale * (double) hmTable.getAdvanceWidth(index));
