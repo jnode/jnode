@@ -603,6 +603,13 @@ public interface MemoryResource extends Resource {
 	public abstract MemoryResource claimChildResource(int offset, int size, boolean allowOverlaps)
 	throws IndexOutOfBoundsException, ResourceNotFreeException;
 	
+    
+    /**
+     * Gets a multi media memory resource wrapping this given memory resource.
+     * @return The created instance. This will never be null.
+     */
+    public abstract MultiMediaMemoryResource asMultiMediaMemoryResource();
+    
 	/**
 	 * Gets the offset relative to my parent.
 	 * If this resource has no parent, the address of this buffer is returned.
