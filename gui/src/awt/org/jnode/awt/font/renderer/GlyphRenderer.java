@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.awt.font.renderer;
 
 import java.awt.Dimension;
@@ -40,24 +40,32 @@ import java.util.BitSet;
 public class GlyphRenderer {
 
     private final double MASTER_HEIGHT = 128.0;
-	private final SummedAreaTable sumAreaTable;
+
+    private final SummedAreaTable sumAreaTable;
+
     private final double minX;
+
     private final double minY;
-    private static final String BITS_NAME = GlyphRenderer.class.getName() + "#BITS";
-	
-	/**
-	 * Initialize this instance.
-	 * @param shape
-	 */
-	public GlyphRenderer(RenderContext ctx, Shape shape, double ascent) {
-		final Master master = createMaster(ctx, shape, ascent);
+
+    private static final String BITS_NAME = GlyphRenderer.class.getName()
+            + "#BITS";
+
+    /**
+     * Initialize this instance.
+     * 
+     * @param shape
+     */
+    public GlyphRenderer(RenderContext ctx, Shape shape, double ascent) {
+        final Master master = createMaster(ctx, shape, ascent);
         this.minX = master.minX;
         this.minY = master.minY;
-		this.sumAreaTable = SummedAreaTable.create(master.bits, master.width, master.height);		
-	}
-    
+        this.sumAreaTable = SummedAreaTable.create(master.bits, master.width,
+                master.height);
+    }
+
     /**
      * Create a raster that can be used in {@link #createGlyphRaster(double)}.
+     * 
      * @param width
      * @param height
      * @return
@@ -65,45 +73,52 @@ public class GlyphRenderer {
     public static final WritableRaster createRaster(int width, int height) {
         final ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_GRAY);
         final int[] nBits = { 8 };
-        final ComponentColorModel cm = new ComponentColorModel(cs, nBits, false, true, Transparency.OPAQUE,
-                DataBuffer.TYPE_BYTE);
-        return cm.createCompatibleWritableRaster(width, height);        
+        final ComponentColorModel cm = new ComponentColorModel(cs, nBits,
+                false, true, Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
+        return cm.createCompatibleWritableRaster(width, height);
     }
-	
-	/**
-	 * Create a raster for the given at a given font-size.
-	 * @param fontSize
-	 * @return The size of the created raster.
-	 */
-	public final Dimension createGlyphRaster(WritableRaster dst, double fontSize) {
-	    final double scale = MASTER_HEIGHT / fontSize;
-        final int height = (int)(sumAreaTable.getHeight() / scale);
-		final int width = (int)(sumAreaTable.getWidth() / scale);
 
-//        System.out.println("sat.w=" + sumAreaTable.getWidth() + " sat.h=" + sumAreaTable.getHeight());
-        
+    /**
+     * Create a raster for the given at a given font-size.
+     * 
+     * @param fontSize
+     * @return The size of the created raster.
+     */
+    public final Dimension createGlyphRaster(WritableRaster dst, double fontSize) {
+        final double scale = MASTER_HEIGHT / fontSize;
+        final int height = (int) ((((double)sumAreaTable.getHeight()) / scale) + 0.5);
+        final int width = (int) ((((double)sumAreaTable.getWidth()) / scale) + 0.5);
+
         if (dst.getWidth() < width) {
-            throw new IllegalArgumentException("Raster width (" + dst.getWidth() + ") is too small (" + width + ")");
+            throw new IllegalArgumentException("Raster width ("
+                    + dst.getWidth() + ") is too small (" + width + ")");
         }
         if (dst.getHeight() < height) {
-            throw new IllegalArgumentException("Raster height (" + dst.getHeight() + ") is too small (" + height + ")");
+            throw new IllegalArgumentException("Raster height ("
+                    + dst.getHeight() + ") is too small (" + height + ")");
         }
-		
-		final int si = (int)scale;
-		for (int y = 0; y < height; y++) {
-			final int ypos = (int)(y * scale);
-			for (int x = 0; x < width; x++) {
-				final int xpos = (int)(x * scale);
-				final float v = sumAreaTable.getIntensity(xpos, ypos, si, si) * 255;
-				dst.setSample(x, y, 0, v);
-			}
-		}
+
+        final int si = (int) (scale + 0.5);
+
+//        System.out.println("sat.w=" + sumAreaTable.getWidth() + " sat.h="
+//                + sumAreaTable.getHeight() + " w=" + width + " h=" + height
+//                + " si=" + si + " sc=" + scale);
+
+        for (int y = 0; y < height; y++) {
+            final int ypos = (int) (y * scale);
+            for (int x = 0; x < width; x++) {
+                final int xpos = (int) (x * scale);
+                final float v = sumAreaTable.getIntensity(xpos, ypos, si, si) * 255;
+                dst.setSample(x, y, 0, v);
+            }
+        }
         return new Dimension(width, height);
-	}
-    
+    }
+
     /**
-     * Gets the minX, minY location that was removed when the
-     * glyph was rendered into the raster.
+     * Gets the minX, minY location that was removed when the glyph was rendered
+     * into the raster.
+     * 
      * @param fontSize
      * @return
      */
@@ -111,30 +126,33 @@ public class GlyphRenderer {
         final double scale = MASTER_HEIGHT / fontSize;
         return new Point2D.Double(minX / scale, -minY / scale);
     }
-	
-	/**
-	 * Creates a master shape of the letter.
-	 * @param shape
-	 * @return
-	 */
-	private final Master createMaster(RenderContext ctx, Shape shape, double ascent) {
-		final Area area = new Area(shape);
-		final double scale = MASTER_HEIGHT / ascent;
 
-		area.transform(AffineTransform.getScaleInstance(scale, scale));
-		final Rectangle bounds = area.getBounds();
-//        System.out.println("createMaster bounds " + bounds);
-		//area.transform(AffineTransform.getTranslateInstance(-bounds.getMinX(), -bounds.getMinY()));
-		//bounds = area.getBounds();
-		
-        final int minX = (int)(bounds.getMinX() - 0.5);
-        final int maxX = (int)(bounds.getMaxX() + 0.5);
-        final int minY = (int)(bounds.getMinY() - 0.5);
-        final int maxY = (int)(bounds.getMaxY() + 0.5);
-		final int width = maxX - minX;
-		final int height = maxY - minY;
-		
-        BitSet bits = (BitSet)ctx.getObject(BITS_NAME);
+    /**
+     * Creates a master shape of the letter.
+     * 
+     * @param shape
+     * @return
+     */
+    private final Master createMaster(RenderContext ctx, Shape shape,
+            double ascent) {
+        final Area area = new Area(shape);
+        final double scale = MASTER_HEIGHT / ascent;
+
+        area.transform(AffineTransform.getScaleInstance(scale, scale));
+        final Rectangle bounds = area.getBounds();
+        // System.out.println("createMaster bounds " + bounds);
+        // area.transform(AffineTransform.getTranslateInstance(-bounds.getMinX(),
+        // -bounds.getMinY()));
+        // bounds = area.getBounds();
+
+        final int minX = (int) (bounds.getMinX() - 0.5);
+        final int maxX = (int) (bounds.getMaxX() + 0.5);
+        final int minY = (int) (bounds.getMinY() - 0.5);
+        final int maxY = (int) (bounds.getMaxY() + 0.5);
+        final int width = maxX - minX;
+        final int height = maxY - minY;
+
+        BitSet bits = (BitSet) ctx.getObject(BITS_NAME);
         if (bits == null) {
             bits = new BitSet(width * height);
             ctx.setObject(BITS_NAME, bits);
@@ -142,26 +160,29 @@ public class GlyphRenderer {
             bits.clear();
         }
         int ofs = 0;
-		for (int y = maxY; y > minY; y--) {            
-			for (int x = minX; x < maxX; x++) {
-				if (area.contains(x, y)) {
-					bits.set(ofs);
-				}
+        for (int y = maxY; y > minY; y--) {
+            for (int x = minX; x < maxX; x++) {
+                if (area.contains(x, y)) {
+                    bits.set(ofs);
+                }
                 ofs++;
-			}
-		}
+            }
+        }
 
-		return new Master(bits, width, height, minX, minY);
-	}
-	
-	public static class Master {
-	    public final BitSet bits;
-	    public final int width;
-	    public final int height;
+        return new Master(bits, width, height, minX, minY);
+    }
+
+    public static class Master {
+        public final BitSet bits;
+
+        public final int width;
+
+        public final int height;
+
         public final int minX;
+
         public final int minY;
-	    
-	    
+
         /**
          * @param bits
          * @param width
@@ -175,5 +196,5 @@ public class GlyphRenderer {
             this.minX = minX;
             this.minY = minY;
         }
-	}
+    }
 }
