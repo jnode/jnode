@@ -26,11 +26,9 @@ import java.util.BitSet;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class SummedAreaTable {
+public abstract class SummedAreaTable {
 
 	private final int height;
-
-	private final int[] table;
 
 	private final int width;
 
@@ -38,13 +36,26 @@ public class SummedAreaTable {
 	 * Initialize this instance from a given 1 banded raster.
 	 * @param src
 	 */
-	public SummedAreaTable(BitSet master, int width, int height) {
+	protected SummedAreaTable(int width, int height) {
 		this.width = width;
 		this.height = height;
-		this.table = new int[width * height];
-
-		createTable(master);
 	}
+
+    /**
+     * Initialize this instance from a given 1 banded raster.
+     * @param src
+     */
+    public static SummedAreaTable create(BitSet master, int width, int height) {
+        final int size = width * height;
+        final SummedAreaTable tbl;
+        if (size <= Character.MAX_VALUE) {
+            tbl = new Char(width, height);
+        } else {
+            tbl = new Int(width, height);
+        }
+        tbl.createTable(master);
+        return tbl;
+    }
 
 	/**
 	 * @return Returns the height.
@@ -59,6 +70,19 @@ public class SummedAreaTable {
 	public final int getWidth() {
 		return width;
 	}
+    
+    /** 
+     * Gets a value out of the table at a given offset.
+     * @param offset
+     * @return
+     */
+    protected abstract int get(int offset);
+
+    /** 
+     * Sets a value in the table at a given offset.
+     * @param offset
+     */
+    protected abstract void set(int offset, int value);
 
 	/**
 	 * Gets the sum at the given position.
@@ -73,7 +97,7 @@ public class SummedAreaTable {
 		if ((y < 0) || (y >= height)) {
 			throw new IllegalArgumentException("y " + y + " " + height);
 		}
-		return table[y * width + x];
+		return get(y * width + x);
 	}
 	
 	/**
@@ -127,7 +151,7 @@ public class SummedAreaTable {
 				int sum;
 				// Start with the sum directly above me
 				if (y > 0) {
-					sum = table[(y - 1) * width + x];
+					sum = get((y - 1) * width + x);
 				} else {
 					sum = 0;
 				}
@@ -137,8 +161,68 @@ public class SummedAreaTable {
 				        sum += 1;
 				    }
 				}
-				table[yOfs + x] = sum;
+				set(yOfs + x, sum);
 			}
 		}
 	}
+    
+    /**
+     * Implementation of the summed area table using a char[] table.
+     * @author Ewout Prangsma (epr@users.sourceforge.net)
+     */
+    private static final class Char extends SummedAreaTable {
+
+        private final char[] table;
+        
+        public Char(int width, int height) {
+            super(width, height);
+            this.table = new char[width * height];
+        }
+        
+        /**
+         * @see org.jnode.awt.font.renderer.SummedAreaTable#get(int)
+         */
+        @Override
+        protected final int get(int offset) {
+            return table[offset];
+        }
+
+        /**
+         * @see org.jnode.awt.font.renderer.SummedAreaTable#set(int, int)
+         */
+        @Override
+        protected final void set(int offset, int value) {
+            table[offset] = (char)value;
+        }        
+    }
+    
+    /**
+     * Implementation of the summed area table using an int[] table.
+     * @author Ewout Prangsma (epr@users.sourceforge.net)
+     */
+    private static final class Int extends SummedAreaTable {
+
+        private final int[] table;
+        
+        public Int(int width, int height) {
+            super(width, height);
+            this.table = new int[width * height];
+        }
+        
+        /**
+         * @see org.jnode.awt.font.renderer.SummedAreaTable#get(int)
+         */
+        @Override
+        protected final int get(int offset) {
+            return table[offset];
+        }
+
+        /**
+         * @see org.jnode.awt.font.renderer.SummedAreaTable#set(int, int)
+         */
+        @Override
+        protected final void set(int offset, int value) {
+            table[offset] = value;
+        }        
+    }
 }

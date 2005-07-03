@@ -35,6 +35,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.jnode.awt.font.FontProvider;
 import org.jnode.awt.font.TextRenderer;
+import org.jnode.awt.font.renderer.RenderContext;
 
 /**
  * @author epr
@@ -53,8 +54,9 @@ public class TTFontProvider implements FontProvider {
 	private boolean fontsLoaded = false;
 	/** All system fonts */
 	private static final String SYSTEM_FONTS[] = { "bhm.ttf", "bhmbd.ttf", "bhmbi.ttf", "bhmi.ttf", "luxisr.ttf", "roman.ttf", "times.ttf", "velehrad.ttf" };
+    private final RenderContext context = new RenderContext();
 	/** The render cache */
-	private final RenderCache renderCache = new RenderCache();
+	private final RenderCache renderCache = new RenderCache(context);
 
 	/**
 	 * Does this provides provide the given font?
