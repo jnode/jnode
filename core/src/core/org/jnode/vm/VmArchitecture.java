@@ -44,6 +44,7 @@ public abstract class VmArchitecture extends VmSystemObject {
 
     private final JNodePermission MMAP_PERM = new JNodePermission("getMemoryMap");
     private transient MemoryMapEntry[] memoryMap;
+    private transient VmMultiMediaSupport multiMediaSupport;
     
     /**
 	 * Gets the name of this architecture.
@@ -269,4 +270,24 @@ public abstract class VmArchitecture extends VmSystemObject {
      * @return
      */
     protected abstract MemoryMapEntry[] createMemoryMap();
+    
+    /**
+     * Creates a multi media memory resource wrapping the given memory resource.
+     * @param res
+     * @return The created instance, which is never null.
+     */
+    final MultiMediaMemoryResourceImpl createMultiMediaMemoryResource(MemoryResourceImpl res) {
+        if (multiMediaSupport == null) {
+            multiMediaSupport = createMultiMediaSupport();
+        }
+        return new MultiMediaMemoryResourceImpl((MemoryResourceImpl)res, multiMediaSupport);
+    }
+    
+    /**
+     * Creates a multi media support instance optimized for this architecture.
+     * Override this to allow architecture optimized implementations.
+     */
+    protected VmMultiMediaSupport createMultiMediaSupport() {
+        return new VmJavaMultiMediaSupport();
+    }
 }

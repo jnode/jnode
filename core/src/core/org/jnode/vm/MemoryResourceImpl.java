@@ -25,6 +25,7 @@ import java.nio.ByteBuffer;
 import java.nio.VMDirectByteBuffer;
 
 import org.jnode.system.MemoryResource;
+import org.jnode.system.MultiMediaMemoryResource;
 import org.jnode.system.Resource;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
@@ -41,12 +42,12 @@ import org.vmmagic.unboxed.Word;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final class MemoryResourceImpl extends Region implements MemoryResource {
+class MemoryResourceImpl extends Region implements MemoryResource {
 
     /** My parent */
     private final MemoryResourceImpl parent;
 	/** Start address */
-	private final Address start;
+	protected final Address start;
 	/** Exclusive end address */
 	private final Address end;
 	/** Size in bytes */
@@ -73,7 +74,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 	 * @param start
 	 * @param size
 	 */
-	private MemoryResourceImpl(MemoryResourceImpl parent, ResourceOwner owner, Address start, Extent size) {
+	protected MemoryResourceImpl(MemoryResourceImpl parent, ResourceOwner owner, Address start, Extent size) {
 		super(owner);
 		this.parent = parent;
 		this.start = start;
@@ -722,7 +723,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 	    }
 	}
 
-	private void testMemPtr(int memPtr, int size) {
+	protected final void testMemPtr(int memPtr, int size) {
 		if (released) {
 			throw new IndexOutOfBoundsException("MemoryResource is released");
 		}
@@ -1201,6 +1202,17 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 		return claimChildResource(Offset.fromIntZeroExtend(offset), Extent.fromIntZeroExtend(size), allowOverlaps);
 	}
 	
+    /**
+     * Creates a multi media memory resource wrapping this given memory resource.
+     * @return The created instance. This will never be null.
+     */
+    public final MultiMediaMemoryResource asMultiMediaMemoryResource() {
+        final MultiMediaMemoryResourceImpl child;
+        child = Vm.getArch().createMultiMediaMemoryResource(this);
+        this.children = (MemoryResourceImpl)add(this.children, child);
+        return child;
+    }
+    
 	/**
 	 * Gets the parent resource if any.
 	 * @return The parent resource, or null if this resource has no parent.
