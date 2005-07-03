@@ -24,6 +24,7 @@ package org.jnode.test.gui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
@@ -37,6 +38,7 @@ import java.io.IOException;
 import java.net.URL;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import org.jnode.awt.font.renderer.GlyphRenderer;
 import org.jnode.awt.font.renderer.RenderContext;
@@ -54,12 +56,34 @@ public class GlyphTest {
         // Font f = new Font("Verdana", Font.PLAIN, 64);
 
         TTFFontData fdata = loadFont("luxisr.ttf");
-        // FontRenderContext ctx = new FontRenderContext(null, false, false);
-        // GlyphVector gv = f.createGlyphVector(ctx, "Hoi");
-        // Rectangle2D bounds = gv.getVisualBounds();
-        // Shape shape = gv.getOutline(0.0f, (float) bounds.getHeight());
 
-        final int idx = fdata.getCMapTable().getEncodingTable(0).getTableFormat().getGlyphIndex('e');
+        JFrame frm;
+
+        frm = new JFrame("GlyphTest - SumAreaTable");
+        frm.getContentPane().setBackground(Color.LIGHT_GRAY);
+        
+        final String text = "Hello world";
+        final RenderContext ctx = new RenderContext(); 
+        final JPanel scale1 = new JPanel(new FlowLayout());
+        final JPanel scale3 = new JPanel(new FlowLayout());
+        scale1.setOpaque(false);
+        scale3.setOpaque(false);
+        frm.getContentPane().setLayout(new GridLayout(2, 1));
+        frm.getContentPane().add(scale1);
+        frm.getContentPane().add(scale3);
+        for (int i = 0; i < text.length(); i++) {
+            Raster r = renderChar(text.charAt(i), fdata, ctx);
+            scale1.add(new RasterViewer(1.0, r));
+            scale3.add(new RasterViewer(3.0, r));
+        }
+        // frm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frm.setSize(600, 400);
+        frm.show();
+    }
+    
+    private static Raster renderChar(char ch, TTFFontData fdata, RenderContext ctx)
+    throws IOException {
+        final int idx = fdata.getCMapTable().getEncodingTable(0).getTableFormat().getGlyphIndex(ch);
         Glyph g = fdata.getGlyphTable().getGlyph(idx);
         Shape shape = g.getShape();
 //        System.out.println("shape.bounds " + shape.getBounds());
@@ -68,28 +92,10 @@ public class GlyphTest {
         final double ascent = hheadTable.getAscent();
 
         Area area = new Area(shape);
-//        System.out.println("area.bounds " + area.getBounds());
-//        final double scale = 5.0;
-//        area.transform(AffineTransform.getScaleInstance(scale, scale));
-//        System.out.println("area1.bounds " + area.getBounds());
-//        area.transform(AffineTransform.getScaleInstance(1.0, -1.0));
-//        System.out.println("area2.bounds " + area.getBounds());
-
         GlyphRenderer gr = new GlyphRenderer(new RenderContext(), area, ascent);
-
-        JFrame frm;
-
-        frm = new JFrame("GlyphTest - SumAreaTable");
-        frm.getContentPane().setBackground(Color.RED);
-        frm.getContentPane().setLayout(new GridLayout(1, 3));
-//        frm.getContentPane().add(new MasterViewer(gr.getMaster()));
         final WritableRaster r = GlyphRenderer.createRaster(32, 32);
         gr.createGlyphRaster(r, 16);
-        frm.getContentPane().add(new RasterViewer(1.0, r));
-        frm.getContentPane().add(new RasterViewer(4.0, r));
-        // frm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frm.setSize(600, 400);
-        frm.show();
+        return r;
     }
 
     private static TTFFontData loadFont(String name) {
@@ -181,8 +187,9 @@ public class GlyphTest {
             Graphics2D g = (Graphics2D) g1;
             int dx = getWidth() / images.length;
             g.scale(scale, scale);
+            final Color bgColor = getBackground();
             for (int i = 0; i < images.length; i++) {
-                g1.drawImage(images[i], (int) (dx * i / scale), 0, null);
+                g1.drawImage(images[i], (int) (dx * i / scale), 0, bgColor, null);
             }
         }
 
@@ -242,10 +249,10 @@ public class GlyphTest {
         private static BufferedImage toImage(Raster src) {
             final int w = src.getWidth();
             final int h = src.getHeight();
-            System.out.println("image size " + w + "x" + h);
+//            System.out.println("image size " + w + "x" + h);
             final BufferedImage img = new BufferedImage(w, h,
                     BufferedImage.TYPE_INT_ARGB);
-            final int c = Color.WHITE.getRGB() & 0xFFFFFF;
+            final int c = Color.BLACK.getRGB() & 0xFFFFFF;
             for (int y = 0; y < h; y++) {
                 for (int x = 0; x < w; x++) {
                     final int v = src.getSample(x, y, 0) & 0xFF;
