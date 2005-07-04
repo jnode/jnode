@@ -64,6 +64,14 @@ public final class Counter extends Statistic
   }
 
   /**
+   * Reset the counter to 0.
+   */
+  public void reset()
+  {
+    counter = 0;
+  }
+
+  /**
    * Add <i>increment</i> to the counter of this statistic.
    */
   public void add(int increment) {
