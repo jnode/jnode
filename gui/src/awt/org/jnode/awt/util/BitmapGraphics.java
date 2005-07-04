@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.awt.util;
 
 import java.awt.geom.AffineTransform;
@@ -176,8 +176,9 @@ public abstract class BitmapGraphics {
     static final class BitmapGraphics32bpp extends BitmapGraphics {
 
         private int[] pixelBuffer;
+
         private byte[] alphaBuffer;
-        
+
         /**
          * @param mem
          * @param width
@@ -235,14 +236,14 @@ public abstract class BitmapGraphics {
                 int dstX, int dstY, int width, int height, int color) {
             final byte[] buf = getAlphaBuffer(width);
             final int[] pixels = getPixelBuffer(width);
-            
+
             color &= 0x00FFFFFF;
-            
-            for (int row = 0; row < height; row++) {
-                final int ofs = offset + ((dstY + row) * bytesPerLine)
-                        + (dstX << 2);
+            final int ofsX = dstX << 2;
+
+            for (int row = height - 1; row >= 0; row--) {
+                final int ofs = offset + ((dstY + row) * bytesPerLine) + ofsX;
                 raster.getDataElements(srcX, srcY + row, width, 1, buf);
-                for (int i = 0; i < width; i++) {
+                for (int i = width - 1; i >= 0; i--) {
                     final int alpha = (buf[i] & 0xFF);
                     pixels[i] = (alpha << 24) | color;
                 }
@@ -251,7 +252,7 @@ public abstract class BitmapGraphics {
         }
 
         protected void doDrawLine(int x, int y, int w, int color, int mode) {
-            //System.out.println("doDrawLine" + x + "," + y + "," + w + "," +
+            // System.out.println("doDrawLine" + x + "," + y + "," + w + "," +
             // color + "," + mode);
             final int ofs = offset + (y * bytesPerLine) + (x << 2);
             if (mode == Surface.PAINT_MODE) {
@@ -264,24 +265,24 @@ public abstract class BitmapGraphics {
         protected final void doDrawPixels(int x, int y, int count, int color,
                 int mode) {
             final int ofs = offset + (y * bytesPerLine) + (x << 2);
-            //System.out.println("ofs=" + ofs);
+            // System.out.println("ofs=" + ofs);
             if (mode == Surface.PAINT_MODE) {
                 mem.setInt(ofs, color, count);
             } else {
                 mem.xorInt(ofs, color, count);
             }
         }
-        
+
         private final int[] getPixelBuffer(int width) {
             if ((pixelBuffer == null) || (pixelBuffer.length < width)) {
-                pixelBuffer = new int[width];                
+                pixelBuffer = new int[width];
             }
             return pixelBuffer;
         }
-        
+
         private final byte[] getAlphaBuffer(int width) {
             if ((alphaBuffer == null) || (alphaBuffer.length < width)) {
-                alphaBuffer = new byte[width];                
+                alphaBuffer = new byte[width];
             }
             return alphaBuffer;
         }
@@ -681,12 +682,12 @@ public abstract class BitmapGraphics {
      * @param color
      *            The color to use.
      */
-    public void drawAlphaRaster(Raster raster, AffineTransform tx, int srcX, int srcY, int dstX,
-            int dstY, int w, int h, int color) {
+    public void drawAlphaRaster(Raster raster, AffineTransform tx, int srcX,
+            int srcY, int dstX, int dstY, int w, int h, int color) {
         if (tx != null) {
-            Point2D dst = tx.transform(new Point2D.Float(dstX, dstY), null); 
-            dstX = (int)dst.getX();
-            dstY = (int)dst.getY();
+            Point2D dst = tx.transform(new Point2D.Float(dstX, dstY), null);
+            dstX = (int) dst.getX();
+            dstY = (int) dst.getY();
         }
         if ((dstY < this.height) && (dstX < this.width)) {
             if (dstX < 0) {

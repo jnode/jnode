@@ -38,6 +38,7 @@ import org.jnode.awt.font.truetype.tables.GlyphTable;
 import org.jnode.awt.font.truetype.tables.HorizontalHeaderTable;
 import org.jnode.awt.font.truetype.tables.HorizontalMetricsTable;
 import org.jnode.driver.video.Surface;
+import org.jnode.vm.Vm;
 
 /**
  * @author epr
@@ -52,9 +53,10 @@ public class TTFTextRenderer implements TextRenderer {
     private final double fontSize;
 
     private final RenderCache renderCache;
-    
+
     /** Key of the alpha raster in the render context */
-    private static final String ALPHA_RASTER = TTFTextRenderer.class.getName() + "AR";
+    private static final String ALPHA_RASTER = TTFTextRenderer.class.getName()
+            + "AR";
 
     /**
      * Create a new instance
@@ -76,11 +78,13 @@ public class TTFTextRenderer implements TextRenderer {
      */
     private WritableRaster createAlphaRaster() {
         final RenderContext ctx = renderCache.getContext();
-        WritableRaster r = (WritableRaster)ctx.getObject(ALPHA_RASTER);
+        WritableRaster r = (WritableRaster) ctx.getObject(ALPHA_RASTER);
         final int fontSizeUp = (int) (fontSize + 0.5);
-        if ((r == null) || (r.getWidth() < fontSizeUp) || (r.getHeight() < fontSizeUp)) {
+        if ((r == null) || (r.getWidth() < fontSizeUp)
+                || (r.getHeight() < fontSizeUp)) {
             r = GlyphRenderer.createRaster(fontSizeUp, fontSizeUp);
             ctx.setObject(ALPHA_RASTER, r);
+            Vm.getVm().getCounter(ALPHA_RASTER).inc();
         }
         return r;
     }
@@ -128,12 +132,11 @@ public class TTFTextRenderer implements TextRenderer {
                     d = renderer.createGlyphRaster(alphaRaster, fontSize);
 
                     final Point2D minLoc = renderer.getMinLocation(fontSize);
-                    final double dstX = x + minLoc.getX();
-                    final double dstY = y - d.height + minLoc.getY();
+                    final int dstX = x + (int) minLoc.getX();
+                    final int dstY = y - d.height + (int) minLoc.getY();
 
-                    surface.drawAlphaRaster(alphaRaster, tx, 0, 0, (int) dstX,
-                            (int) dstY, d.width, d.height, color);
-                    // x += minLoc.getX();
+                    surface.drawAlphaRaster(alphaRaster, tx, 0, 0, dstX, dstY,
+                            d.width, d.height, color);
                 }
                 x += (scale * (double) hmTable.getAdvanceWidth(index));
             }

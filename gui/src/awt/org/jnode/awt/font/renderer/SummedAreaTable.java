@@ -23,6 +23,9 @@ package org.jnode.awt.font.renderer;
 
 import java.util.BitSet;
 
+import org.jnode.vm.Vm;
+import org.vmmagic.pragma.InlinePragma;
+
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
@@ -39,6 +42,7 @@ public abstract class SummedAreaTable {
 	protected SummedAreaTable(int width, int height) {
 		this.width = width;
 		this.height = height;
+        Vm.getVm().getCounter(getClass().getName()).inc();
 	}
 
     /**
@@ -90,7 +94,8 @@ public abstract class SummedAreaTable {
 	 * @param y
 	 * @return
 	 */
-	public final int getSum(int x, int y) {
+	public final int getSum(int x, int y) 
+    throws InlinePragma {
 		if ((x < 0) || (x >= width)) {
 			throw new IllegalArgumentException("x " + x + " " + width);
 		}
@@ -138,6 +143,46 @@ public abstract class SummedAreaTable {
 		
 		return ((float)(sum_x2y2 + sum_xy - (sum_xy2 + sum_x2y))) / ((float)(w * h));		
 	}
+
+    /**
+     * Gets the intensity of the area described by the parameters.
+     * The intensity if the sum of the given area, divided by the number of 
+     * elements in the area. 
+     * @param x
+     * @param y
+     * @param w
+     * @param h
+     * @return The intensity as a value between 0 and 0xFF
+     */
+    public final int getIntensity8b(int x, int y, int w, int h) {
+        if (x < 0) {
+            w += x;
+            x = 0;
+        }
+        if (y < 0) {
+            h += y;
+            y = 0;
+        }
+        if (x + w > width) {
+            w = Math.max(0, width - x);
+        }
+        if (y + h > height) {
+            h = Math.max(0, height - y);
+        }
+        if ((w <= 0) || (h <= 0)) {
+            return 0;
+        }
+        final int x2 = x + w - 1;
+        final int y2 = y + h - 1;
+        
+        final int sum_xy = getSum(x, y);
+        final int sum_x2y2 = getSum(x2, y2);
+        final int sum_xy2 = getSum(x, y2);
+        final int sum_x2y = getSum(x2, y);
+        
+        final int sum = (sum_x2y2 + sum_xy - (sum_xy2 + sum_x2y));
+        return ((sum << 8) / (w * h)) & 0xFF;
+    }
 
 	/**
 	 * Create the summed area table from the given source.
