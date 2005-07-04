@@ -99,18 +99,15 @@ public class GlyphRenderer {
         }
 
         final int si = (int) (scale + 0.5);
-
-//        System.out.println("sat.w=" + sumAreaTable.getWidth() + " sat.h="
-//                + sumAreaTable.getHeight() + " w=" + width + " h=" + height
-//                + " si=" + si + " sc=" + scale);
-
-        for (int y = 0; y < height; y++) {
-            final int ypos = (int) (y * scale);
-            for (int x = 0; x < width; x++) {
-                final int xpos = (int) (x * scale);
-                final float v = sumAreaTable.getIntensity(xpos, ypos, si, si) * 255;
+        int ypos = (height - 1) * si;
+        for (int y = height - 1; y >= 0; y--) {
+            int xpos = (width - 1) * si;
+            for (int x = width - 1; x >= 0; x--) {
+                final int v = sumAreaTable.getIntensity8b(xpos, ypos, si, si);
                 dst.setSample(x, y, 0, v);
+                xpos -= si;
             }
+            ypos -= si;
         }
         return new Dimension(width, height);
     }
