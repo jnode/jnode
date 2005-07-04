@@ -138,33 +138,29 @@ public final class JvmType {
 	}
 
 	/**
-	 * Gets the argument type of a method signature.
+	 * Gets the number of arguments of a method signature.
 	 * 
 	 * @param signature
-	 * @return
+	 * @return The number of arguments.
 	 */
-	public static int[] getArgumentTypes(String signature) {
+	public static int getArgumentCount(String signature) {
 		final int len = signature.length();
-		int[] types = new int[len - 3]; // '(, ')', return are skipped
 		int cnt = 0;
 		for (int i = 1; i < len; i++) {
-			final int t;
 			switch (signature.charAt(i)) {
 			case 'Z':
 			case 'B':
 			case 'C':
 			case 'S':
 			case 'I':
-				t = JvmType.INT;
-				break;
 			case 'F':
-				t = JvmType.FLOAT;
-				break;
+            case 'J':
+            case 'D':
+                break;
 			case 'L':
 				while (signature.charAt(i) != ';') {
 					i++;
 				}
-				t = JvmType.REFERENCE;
 				break;
 			// Object
 			case '[':
@@ -176,31 +172,84 @@ public final class JvmType {
 						i++;
 					}
 				}
-				t = JvmType.REFERENCE;
-				break;
-			case 'J':
-				t = JvmType.LONG;
-				break;
-			case 'D':
-				t = JvmType.DOUBLE;
 				break;
 			case ')':
 				// the end
 				i = len;
-				t = JvmType.VOID;
 				break;
 			default:
 				throw new IllegalArgumentException("Unknown type"
 						+ signature.substring(i));
 			}
-			if (t != VOID) {
-				types[cnt++] = t;
+			if (i != len) {
+				cnt++;
 			}
 		}
-		final int[] result = new int[cnt];
-		System.arraycopy(types, 0, result, 0, cnt);
-		return result;
+		return cnt;
 	}
+
+    /**
+     * Gets the argument type of a method signature.
+     * 
+     * @param signature
+     * @return
+     */
+    public static int[] getArgumentTypes(String signature) {
+        final int len = signature.length();
+        final int[] types = new int[getArgumentCount(signature)];
+        int cnt = 0;
+        for (int i = 1; i < len; i++) {
+            final int t;
+            switch (signature.charAt(i)) {
+            case 'Z':
+            case 'B':
+            case 'C':
+            case 'S':
+            case 'I':
+                t = JvmType.INT;
+                break;
+            case 'F':
+                t = JvmType.FLOAT;
+                break;
+            case 'L':
+                while (signature.charAt(i) != ';') {
+                    i++;
+                }
+                t = JvmType.REFERENCE;
+                break;
+            // Object
+            case '[':
+                while (signature.charAt(i) == '[') {
+                    i++;
+                }
+                if (signature.charAt(i) == 'L') {
+                    while (signature.charAt(i) != ';') {
+                        i++;
+                    }
+                }
+                t = JvmType.REFERENCE;
+                break;
+            case 'J':
+                t = JvmType.LONG;
+                break;
+            case 'D':
+                t = JvmType.DOUBLE;
+                break;
+            case ')':
+                // the end
+                i = len;
+                t = JvmType.VOID;
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown type"
+                        + signature.substring(i));
+            }
+            if (t != VOID) {
+                types[cnt++] = t;
+            }
+        }
+        return types;
+    }
 
 	/**
 	 * Gets the return type of a method signature.
