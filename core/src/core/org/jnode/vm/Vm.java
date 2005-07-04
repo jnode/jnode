@@ -241,6 +241,9 @@ public class Vm extends VmSystemObject implements Statistics, SharedStatics {
 				out.println("Processor " + vm.processors.indexOf(cpu));
 				cpu.dumpStatistics(out);
 			}
+            if ((args.length > 0) && args[0].equals("reset")) {
+                vm.resetCounters();
+            }
 		}
 	}
 	
@@ -339,6 +342,18 @@ public class Vm extends VmSystemObject implements Statistics, SharedStatics {
                 out.println(stats[i]);
             }        
         }
+    }
+    
+    protected final void resetCounters() {
+        if (statistics != null) {
+            final Statistic[] stats = getStatistics();
+            for (int i = 0; i < stats.length; i++) {
+                final Statistic s = stats[i];
+                if (s instanceof Counter) {
+                    ((Counter)s).reset();
+                }
+            }        
+        }        
     }
 
     /**
