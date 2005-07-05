@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -130,10 +130,12 @@ public abstract class PolicyHelper
       return null;
     else if (obj instanceof Policy)
       return (Policy) obj;
-    else if (!obj._is_a(id()))
-      throw new BAD_PARAM("Not a Policy");
     else
       {
+        // Check for the policy id cannot be performed because
+        // this helper must read various subclasses of the Policy,
+        // and the IOR profile currently supports only one id.
+
         Delegate delegate = ((ObjectImpl) obj)._get_delegate();
         return new _PolicyStub(delegate);
       }

@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -40,6 +40,8 @@ package org.omg.IOP;
 
 import org.omg.CORBA.portable.IDLEntity;
 
+import java.io.Serializable;
+
 /**
 * The tagged component in a part of the {@link TaggedProfile}.
 * The examples of the possible components inside the tag are
@@ -55,8 +57,13 @@ import org.omg.CORBA.portable.IDLEntity;
 * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
 */
 public class TaggedComponent
-  implements IDLEntity
+  implements IDLEntity, Serializable
 {
+  /**
+   * Use serialVersionUID (v1.4) for interoperability.
+   */
+  private static final long serialVersionUID = -2084695346022761692L;
+
   /**
    * The integer tag identifier, for instance, TAG_CODE_SETS.value.
    */
