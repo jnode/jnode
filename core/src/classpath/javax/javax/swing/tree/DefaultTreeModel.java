@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -47,6 +47,7 @@ import java.util.EventListener;
 import javax.swing.event.EventListenerList;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
  * DefaultTreeModel
@@ -78,6 +79,8 @@ public class DefaultTreeModel
 	 */
   public DefaultTreeModel(TreeNode root)
   {
+		if (root == null)
+			root = new DefaultMutableTreeNode();
 		setRoot(root);
   }
 
@@ -108,8 +111,8 @@ public class DefaultTreeModel
 	 * @exception IOException TODO
 	 * @exception ClassNotFoundException TODO
 	 */
-  private void readObject(ObjectInputStream value0)
-    throws IOException, ClassNotFoundException
+	private void readObject(ObjectInputStream value0) throws IOException,
+			ClassNotFoundException
   {
 		// TODO
   }
@@ -178,7 +181,7 @@ public class DefaultTreeModel
   public Object getChild(Object node, int idx)
   {
     if (node instanceof TreeNode)
-      return ((TreeNode)node).getChildAt(idx);
+			return ((TreeNode) node).getChildAt(idx);
     else
       return null;
   }
@@ -191,7 +194,7 @@ public class DefaultTreeModel
   public int getChildCount(Object node)
   {
     if (node instanceof TreeNode)
-      return ((TreeNode)node).getChildCount();
+			return ((TreeNode) node).getChildCount();
     else
       return 0;
   }
@@ -204,7 +207,7 @@ public class DefaultTreeModel
   public boolean isLeaf(Object node)
   {
     if (node instanceof TreeNode)
-      return ((TreeNode)node).isLeaf();
+			return ((TreeNode) node).isLeaf();
     else
       return true;
   }
@@ -356,7 +359,8 @@ public class DefaultTreeModel
    */
   public TreeModelListener[] getTreeModelListeners()
   {
-    return (TreeModelListener[]) listenerList.getListeners(TreeModelListener.class);
+		return (TreeModelListener[]) listenerList
+				.getListeners(TreeModelListener.class);
   }
 
 	/**
@@ -370,8 +374,8 @@ public class DefaultTreeModel
   protected void fireTreeNodesChanged(Object source, Object[] path,
                                       int[] childIndices, Object[] children)
   {
-    TreeModelEvent event =
-      new TreeModelEvent(source, path, childIndices, children);
+		TreeModelEvent event = new TreeModelEvent(source, path, childIndices,
+				children);
     TreeModelListener[] listeners = getTreeModelListeners();
 
     for (int i = listeners.length - 1; i >= 0; --i)
@@ -389,8 +393,8 @@ public class DefaultTreeModel
   protected void fireTreeNodesInserted(Object source, Object[] path,
                                        int[] childIndices, Object[] children)
   {
-    TreeModelEvent event =
-      new TreeModelEvent(source, path, childIndices, children);
+		TreeModelEvent event = new TreeModelEvent(source, path, childIndices,
+				children);
     TreeModelListener[] listeners = getTreeModelListeners();
 
     for (int i = listeners.length - 1; i >= 0; --i)
@@ -408,8 +412,8 @@ public class DefaultTreeModel
   protected void fireTreeNodesRemoved(Object source, Object[] path,
                                       int[] childIndices, Object[] children)
   {
-    TreeModelEvent event =
-      new TreeModelEvent(source, path, childIndices, children);
+		TreeModelEvent event = new TreeModelEvent(source, path, childIndices,
+				children);
     TreeModelListener[] listeners = getTreeModelListeners();
 
     for (int i = listeners.length - 1; i >= 0; --i)
@@ -427,8 +431,8 @@ public class DefaultTreeModel
   protected void fireTreeStructureChanged(Object source, Object[] path,
                                           int[] childIndices, Object[] children)
   {
-    TreeModelEvent event =
-      new TreeModelEvent(source, path, childIndices, children);
+		TreeModelEvent event = new TreeModelEvent(source, path, childIndices,
+				children);
     TreeModelListener[] listeners = getTreeModelListeners();
 
     for (int i = listeners.length - 1; i >= 0; --i)

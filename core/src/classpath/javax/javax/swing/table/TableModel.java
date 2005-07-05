@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -42,8 +42,8 @@ import javax.swing.event.TableModelListener;
 /**
  * A <code>TableModel</code> is a two dimensional data structure that 
  * can store arbitrary <code>Object</code> instances, usually for the
- * purpose of display in a {@link JTable} component.  Individual objects
- * can be accessed by specifying the row index and column index for 
+ * purpose of display in a {@link javax.swing.JTable} component.  Individual 
+ * objects can be accessed by specifying the row index and column index for 
  * the object.  Each column in the model has a name associated with it.
  * <p>
  * The {@link DefaultTableModel} class provides one implementation of

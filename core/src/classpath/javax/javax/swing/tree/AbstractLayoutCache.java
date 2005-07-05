@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -48,7 +48,8 @@ import javax.swing.event.TreeModelEvent;
  * 
  * @author Andrew Selkirk
  */
-public abstract class AbstractLayoutCache implements RowMapper
+public abstract class AbstractLayoutCache
+		implements RowMapper
 {
 	/**
 	 * class NodeDimensions
@@ -74,8 +75,7 @@ public abstract class AbstractLayoutCache implements RowMapper
 		 * @return Rectangle
 		 */
 		public abstract Rectangle getNodeDimensions(Object value0, int value1,
-		                                            int value2, boolean value3,
-		                                            Rectangle value4);
+				int value2, boolean value3, Rectangle value4);
 	}
 
 	/**
@@ -142,9 +142,13 @@ public abstract class AbstractLayoutCache implements RowMapper
 	 * 
 	 * @return Rectangle
 	 */
-	protected Rectangle getNodeDimensions(Object value0, int value1, int value2, boolean value3, Rectangle value4)
+	protected Rectangle getNodeDimensions(Object value, int row, int depth,
+			boolean expanded, Rectangle bounds)
 	{
-		return null; // TODO
+		if (bounds == null)
+			return new Rectangle();
+		return null;
+		// TODO		
 	}
 
 	/**

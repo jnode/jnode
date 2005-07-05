@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -187,7 +187,7 @@ public class UndoableEditSupport
 
 
   /**
-   * If {@link #beginEdit} has been called (so that the current
+   * If {@link #beginUpdate} has been called (so that the current
    * update level is greater than zero), adds the specified edit
    * to {@link #compoundEdit}. Otherwise, notify listeners of the
    * edit by calling {@link #_postEdit(UndoableEdit)}.
@@ -233,12 +233,12 @@ public class UndoableEditSupport
 
 
   /**
-   * Creates a new instance of {@link #CompoundEdit}. Called by {@link
+   * Creates a new instance of {@link CompoundEdit}. Called by {@link
    * #beginUpdate}. If a subclass wants {@link #beginUpdate} to work
    * on a specific {@link #compoundEdit}, it should override this
    * method.
    *
-   * @returns a newly created instance of {@link #CompoundEdit}.
+   * @returns a newly created instance of {@link CompoundEdit}.
    */
   protected CompoundEdit createCompoundEdit()
   {
