@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -67,10 +67,9 @@ final class ElementNode
   final Node source;
   final Collection elementExcludeResultPrefixes;
   
-  ElementNode(TemplateNode children, TemplateNode next, TemplateNode name,
+  ElementNode(TemplateNode name,
               TemplateNode namespace, String uas, Node source)
   {
-    super(children, next);
     this.name = name;
     this.namespace = namespace;
     this.uas = uas;
@@ -95,14 +94,19 @@ final class ElementNode
 
   TemplateNode clone(Stylesheet stylesheet)
   {
-    return new ElementNode((children == null) ? null :
-                           children.clone(stylesheet),
-                           (next == null) ? null :
-                           next.clone(stylesheet),
-                           name.clone(stylesheet),
+    TemplateNode ret = new ElementNode(name.clone(stylesheet),
                            (namespace == null) ? null :
                            namespace.clone(stylesheet),
                            uas, source);
+    if (children != null)
+      {
+        ret.children = children.clone(stylesheet);
+      }
+    if (next != null)
+      {
+        ret.next = next.clone(stylesheet);
+      }
+    return ret;
   }
 
   void doApply(Stylesheet stylesheet, QName mode,

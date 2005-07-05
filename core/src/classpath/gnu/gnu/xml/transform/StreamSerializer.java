@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -48,6 +48,7 @@ import java.nio.charset.CharsetEncoder;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import javax.xml.XMLConstants;
 import org.w3c.dom.Attr;
@@ -71,6 +72,82 @@ public class StreamSerializer
   static final int BRA = 0x3c; // <
   static final int KET = 0x3e; // >
   static final int EQ = 0x3d; // =
+
+  /**
+   * HTML 4.01 boolean attributes
+   */
+  static final Map HTML_BOOLEAN_ATTRIBUTES = new HashMap();
+  static
+  {
+    HashSet set;
+    
+    set = new HashSet();
+    set.add("nohref");
+    HTML_BOOLEAN_ATTRIBUTES.put("area", set);
+
+    set = new HashSet();
+    set.add("ismap");
+    HTML_BOOLEAN_ATTRIBUTES.put("img", set);
+
+    set = new HashSet();
+    set.add("declare");
+    HTML_BOOLEAN_ATTRIBUTES.put("object", set);
+    
+    set = new HashSet();
+    set.add("noshade");
+    HTML_BOOLEAN_ATTRIBUTES.put("hr", set);
+    
+    set = new HashSet();
+    set.add("compact");
+    HTML_BOOLEAN_ATTRIBUTES.put("dl", set);
+    HTML_BOOLEAN_ATTRIBUTES.put("ol", set);
+    HTML_BOOLEAN_ATTRIBUTES.put("ul", set);
+    HTML_BOOLEAN_ATTRIBUTES.put("dir", set);
+    HTML_BOOLEAN_ATTRIBUTES.put("menu", set);
+    
+    set = new HashSet();
+    set.add("checked");
+    set.add("disabled");
+    set.add("readonly");
+    set.add("ismap");
+    HTML_BOOLEAN_ATTRIBUTES.put("input", set);
+    
+    set = new HashSet();
+    set.add("multiple");
+    set.add("disabled");
+    HTML_BOOLEAN_ATTRIBUTES.put("select", set);
+    
+    set = new HashSet();
+    set.add("disabled");
+    HTML_BOOLEAN_ATTRIBUTES.put("optgroup", set);
+    
+    set = new HashSet();
+    set.add("selected");
+    set.add("disabled");
+    HTML_BOOLEAN_ATTRIBUTES.put("option", set);
+    
+    set = new HashSet();
+    set.add("disabled");
+    set.add("readonly");
+    HTML_BOOLEAN_ATTRIBUTES.put("textarea", set);
+    
+    set = new HashSet();
+    set.add("disabled");
+    HTML_BOOLEAN_ATTRIBUTES.put("button", set);
+    
+    set = new HashSet();
+    set.add("nowrap");
+    HTML_BOOLEAN_ATTRIBUTES.put("th", set);
+    HTML_BOOLEAN_ATTRIBUTES.put("td", set);
+    
+    set = new HashSet();
+    set.add("noresize");
+    HTML_BOOLEAN_ATTRIBUTES.put("frame", set);
+    
+    set = new HashSet();
+    set.add("defer");
+    HTML_BOOLEAN_ATTRIBUTES.put("script", set);
+  }
 
   protected final String encoding;
   final Charset charset;
@@ -118,7 +195,19 @@ public class StreamSerializer
     serialize(node, out, false);
   }
   
-  void serialize(final Node node, final OutputStream out,
+  void serialize(Node node, final OutputStream out,
+                 boolean convertToCdata)
+    throws IOException
+  {
+    while (node != null)
+      {
+        Node next = node.getNextSibling();
+        doSerialize(node, out, convertToCdata);
+        node = next;
+      }
+  }
+
+  private void doSerialize(final Node node, final OutputStream out,
                  boolean convertToCdata)
     throws IOException
   {
@@ -128,7 +217,6 @@ public class StreamSerializer
       }
     String value, prefix;
     Node children;
-    Node next = node.getNextSibling();
     String uri = node.getNamespaceURI();
     boolean defined = false;
     short nt = node.getNodeType();
@@ -149,7 +237,12 @@ public class StreamSerializer
               {
                 break;
               }
-            define(nsuri, node.getLocalName());
+            String name = node.getLocalName();
+            if (name == null)
+              {
+                name = node.getNodeName();
+              }
+            define(nsuri, name);
           }
         else if (uri != null && !isDefined(uri))
           {
@@ -167,7 +260,8 @@ public class StreamSerializer
         out.write(encodeText(a_nodeName));
         String a_nodeValue = node.getNodeValue();
         if (mode == Stylesheet.OUTPUT_HTML &&
-            a_nodeName.equals(a_nodeValue))
+            a_nodeName.equals(a_nodeValue) &&
+            isHTMLBoolean((Attr) node, a_nodeName))
           {
             break;
           }
@@ -324,12 +418,19 @@ public class StreamSerializer
             for (Node ctx = html.getFirstChild(); ctx != null;
                  ctx = ctx.getNextSibling())
               {
-                if (ctx.getNodeType() == Node.ELEMENT_NODE &&
-                    "head".equalsIgnoreCase(ctx.getLocalName()))
+                if (ctx.getNodeType() == Node.ELEMENT_NODE)
+                  {
+                    String name = ctx.getLocalName();
+                    if (name == null)
+                      {
+                        name = ctx.getNodeName();
+                      }
+                    if ("head".equalsIgnoreCase(name))
                   {
                     head = ctx;
                     break;
                   }
+              }
               }
             if (head == null)
               {
@@ -358,8 +459,14 @@ public class StreamSerializer
             for (Node ctx = head.getFirstChild(); ctx != null;
                  ctx = ctx.getNextSibling())
               {
-                if (ctx.getNodeType() == Node.ELEMENT_NODE &&
-                    "meta".equalsIgnoreCase(ctx.getLocalName()))
+                if (ctx.getNodeType() == Node.ELEMENT_NODE)
+                  {
+                    String name = ctx.getLocalName();
+                    if (name == null)
+                      {
+                        name = ctx.getNodeName();
+                      }
+                    if ("meta".equalsIgnoreCase(name))
                   {
                     NamedNodeMap metaAttrs = ctx.getAttributes();
                     int len = metaAttrs.getLength();
@@ -385,6 +492,7 @@ public class StreamSerializer
                         break;
                       }
                   }
+              }
               }
             if (meta == null)
               {
@@ -465,10 +573,6 @@ public class StreamSerializer
     if (defined)
       {
         undefine(uri);
-      }
-    if (next != null)
-      {
-        serialize(next, out, convertToCdata);
       }
   }
 
@@ -632,4 +736,19 @@ public class StreamSerializer
       }
   }
   
+  boolean isHTMLBoolean(Attr attr, String attrName)
+  {
+    attrName = attrName.toLowerCase();
+    Node element = attr.getOwnerElement();
+    String elementName = element.getLocalName();
+    if (elementName == null)
+      {
+        elementName = element.getNodeName();
+      }
+    elementName = elementName.toLowerCase();
+    Collection attributes =
+      (Collection) HTML_BOOLEAN_ATTRIBUTES.get(elementName);
+    return (attributes != null && attributes.contains(attrName));
+  }
+
 }

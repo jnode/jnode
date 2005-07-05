@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -1159,7 +1159,8 @@ public class DomDocument
 
   public Node adoptNode(Node source)
   {
-    switch (source.getNodeType())
+    int sourceNodeType = source.getNodeType();
+    switch (sourceNodeType)
       {
       case DOCUMENT_NODE:
       case DOCUMENT_TYPE_NODE:
@@ -1170,6 +1171,7 @@ public class DomDocument
       }
     if (source instanceof DomNode)
       {
+        // GNU native
         DomNode src = (DomNode) source;
         DomNode dst = src;
         if (dst.parent != null)
@@ -1180,7 +1182,110 @@ public class DomDocument
         src.notifyUserDataHandlers(UserDataHandler.NODE_ADOPTED, src, dst);
         return dst;
       }
-    return null;
+    else
+      {
+        // Some other implementation
+        Node dst = null;
+        switch (sourceNodeType)
+          {
+          case Node.ATTRIBUTE_NODE:
+              {
+                Attr src = (Attr) source;
+                String nodeName = src.getNodeName();
+                String localName = src.getLocalName();
+                String namespaceUri = src.getNamespaceURI();
+                dst = (localName == null) ?
+                  createAttribute(nodeName) :
+                  createAttributeNS(namespaceUri, nodeName);
+                adoptChildren(src, dst);
+                break;
+              }
+          case Node.CDATA_SECTION_NODE:
+              {
+                CDATASection src = (CDATASection) source;
+                dst = createCDATASection(src.getData());
+                break;
+              }
+          case Node.COMMENT_NODE:
+              {
+                Comment src = (Comment) source;
+                dst = createComment(src.getData());
+                break;
+              }
+          case Node.DOCUMENT_FRAGMENT_NODE:
+              {
+                DocumentFragment src = (DocumentFragment) source;
+                dst = createDocumentFragment();
+                adoptChildren(src, dst);
+                break;
+              }
+          case Node.ELEMENT_NODE:
+              {
+                Element src = (Element) source;
+                String nodeName = src.getNodeName();
+                String localName = src.getLocalName();
+                String namespaceUri = src.getNamespaceURI();
+                dst = (localName == null) ?
+                  createElement(nodeName) :
+                  createElementNS(namespaceUri, nodeName);
+                adoptAttributes(src, dst);
+                adoptChildren(src, dst);
+                break;
+              }
+          case Node.ENTITY_REFERENCE_NODE:
+              {
+                EntityReference src = (EntityReference) source;
+                dst = createEntityReference(src.getNodeName());
+                adoptChildren(src, dst);
+                break;
+              }
+          case Node.PROCESSING_INSTRUCTION_NODE:
+              {
+                ProcessingInstruction src = (ProcessingInstruction) source;
+                dst = createProcessingInstruction(src.getTarget(),
+                                                  src.getData());
+                break;
+              }
+          case Node.TEXT_NODE:
+              {
+                Text src = (Text) source;
+                dst = createTextNode(src.getData());
+                break;
+              }
+          }
+        return dst;
+      }
+  }
+
+  void adoptChildren(Node src, Node dst)
+  {
+    Node node = src.getFirstChild();
+    while (node != null)
+      {
+        Node next = node.getNextSibling();
+        dst.appendChild(adoptNode(node));
+        node = next;
+      }
+  }
+
+  void adoptAttributes(Node src, Node dst)
+  {
+    NamedNodeMap srcAttrs = src.getAttributes();
+    NamedNodeMap dstAttrs = dst.getAttributes();
+    int len = srcAttrs.getLength();
+    for (int i = 0; i < len; i++)
+      {
+        Node node = srcAttrs.item(i);
+        String localName = node.getLocalName();
+        if (localName == null)
+          {
+            dstAttrs.setNamedItem(adoptNode(node));
+          }
+        else
+          {
+            dstAttrs.setNamedItemNS(adoptNode(node));
+          }
+      }
   }
 
   public DOMConfiguration getDomConfig()

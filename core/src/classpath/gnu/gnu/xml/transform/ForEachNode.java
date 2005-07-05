@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -59,10 +59,8 @@ final class ForEachNode
   final Expr select;
   final List sortKeys;
 
-  ForEachNode(TemplateNode children, TemplateNode next, Expr select,
-              List sortKeys)
+  ForEachNode(Expr select, List sortKeys)
   {
-    super(children, next);
     this.select = select;
     this.sortKeys = sortKeys;
   }
@@ -75,12 +73,17 @@ final class ForEachNode
       {
         sortKeys2.add(((Key) sortKeys.get(i)).clone(stylesheet));
       }
-    return new ForEachNode((children == null) ? null :
-                           children.clone(stylesheet),
-                           (next == null) ? null :
-                           next.clone(stylesheet),
-                           select.clone(stylesheet),
+    TemplateNode ret = new ForEachNode(select.clone(stylesheet),
                            sortKeys2);
+    if (children != null)
+      {
+        ret.children = children.clone(stylesheet);
+      }
+    if (next != null)
+      {
+        ret.next = next.clone(stylesheet);
+      }
+    return ret;
   }
 
   void doApply(Stylesheet stylesheet, QName mode,

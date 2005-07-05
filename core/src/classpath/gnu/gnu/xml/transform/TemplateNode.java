@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -55,14 +55,8 @@ abstract class TemplateNode
   static final Comparator documentOrderComparator =
     new DocumentOrderComparator();
 
-  final TemplateNode children;
-  final TemplateNode next;
-
-  TemplateNode(TemplateNode children, TemplateNode next)
-  {
-    this.children = children;
-    this.next = next;
-  }
+  TemplateNode children;
+  TemplateNode next;
 
   final void apply(Stylesheet stylesheet, QName mode,
                    Node context, int pos, int len,
@@ -81,6 +75,8 @@ abstract class TemplateNode
     if (stylesheet.debug)
       {
         System.err.println("Applying " + toString());
+        System.err.println("\twith context=" + context + ", pos=" + pos +
+                           ", len=" + len);
       }
     doApply(stylesheet, mode, context, pos, len, parent, nextSibling);
   }

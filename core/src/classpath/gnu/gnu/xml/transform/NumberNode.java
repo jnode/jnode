@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -53,24 +53,27 @@ final class NumberNode
 
   final Expr value;
 
-  NumberNode(TemplateNode children, TemplateNode next,
-             Expr value, TemplateNode format, String lang,
+  NumberNode(Expr value, TemplateNode format, String lang,
              int letterValue, String groupingSeparator, int groupingSize)
   {
-    super(children, next, format, lang, letterValue, groupingSeparator,
-          groupingSize);
+    super(format, lang, letterValue, groupingSeparator, groupingSize);
     this.value = value;
   }
 
   TemplateNode clone(Stylesheet stylesheet)
   {
-    return new NumberNode((children == null) ? null :
-                          children.clone(stylesheet),
-                          (next == null) ? null :
-                          next.clone(stylesheet),
-                          value.clone(stylesheet),
+    TemplateNode ret = new NumberNode(value.clone(stylesheet),
                           format, lang, letterValue,
                           groupingSeparator, groupingSize);
+    if (children != null)
+      {
+        ret.children = children.clone(stylesheet);
+      }
+    if (next != null)
+      {
+        ret.next = next.clone(stylesheet);
+      }
+    return ret;
   }
 
   int[] compute(Stylesheet stylesheet, Node context, int pos, int len)

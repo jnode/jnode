@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -99,7 +99,12 @@ class DomHTMLCollection
       {
         return NodeFilter.FILTER_SKIP;
       }
-    if (nodeNames != null && !acceptName(n.getLocalName()))
+    String localName = n.getLocalName();
+    if (localName == null)
+      {
+        localName = n.getNodeName();
+      }
+    if (nodeNames != null && !acceptName(localName))
       {
         return NodeFilter.FILTER_SKIP;
       }
@@ -152,6 +157,10 @@ class DomHTMLCollection
       {
         Node attr = attrs.item(i);
         String attrName = attr.getLocalName();
+        if (attrName == null)
+          {
+            attrName = attr.getNodeName();
+          }
         if (name.equalsIgnoreCase(attrName))
           {
             return attr;
