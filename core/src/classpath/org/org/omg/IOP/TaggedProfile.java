@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -39,6 +39,8 @@ exception statement from your version. */
 package org.omg.IOP;
 
 import org.omg.CORBA.portable.IDLEntity;
+
+import java.io.Serializable;
 
 /**
 * The TaggedProfile if part of the {@link IOR}, defining a single specific
@@ -71,8 +73,13 @@ import org.omg.CORBA.portable.IDLEntity;
 * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
 */
 public class TaggedProfile
-  implements IDLEntity
+  implements IDLEntity, Serializable
 {
+  /**
+   * Use serialVersionUID (v1.4) for interoperability.
+   */
+  private static final long serialVersionUID = -461232684387903343L;
+
   /**
    * The integer tag identifier, typically one of TAG_INTERNET_IOP.value or
    * TAG_MULTIPLE_COMPONENTS.value.
