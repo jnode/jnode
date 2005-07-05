@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -356,11 +356,21 @@ public class JTableHeader extends JComponent
 
   TableCellRenderer cellRenderer; 
 
+  /**
+   * Creates a new default instance.
+   */
   public JTableHeader()
   {
     this(null);
   }
 
+  /**
+   * Creates a new header.  If <code>cm</code> is <code>null</code>, a new
+   * table column model is created by calling 
+   * {@link #createDefaultColumnModel()}.
+   * 
+   * @param cm  the table column model (<code>null</code> permitted).
+   */
   public JTableHeader(TableColumnModel cm)
   {
     accessibleContext = new AccessibleJTableHeader();
@@ -377,6 +387,11 @@ public class JTableHeader extends JComponent
     updateUI();
   }
 
+  /**
+   * Creates a default table column model.
+   * 
+   * @return A default table column model.
+   */
   protected TableColumnModel createDefaultColumnModel()
   {
     return new DefaultTableColumnModel();
@@ -572,16 +587,31 @@ public class JTableHeader extends JComponent
     updateTableInRealTime = u;
   }
 
+  /**
+   * Creates a default renderer.
+   * 
+   * @return A default renderer.
+   */
   protected TableCellRenderer createDefaultRenderer()
   {
     return new DefaultTableCellRenderer();
   }
 
+  /**
+   * Returns the default table cell renderer.
+   * 
+   * @return The default table cell renderer.
+   */
   public TableCellRenderer getDefaultRenderer()
   {
     return cellRenderer;
   }
 
+  /**
+   * Sets the default table cell renderer.
+   * 
+   * @param cellRenderer  the renderer.
+   */
   public void setDefaultRenderer(TableCellRenderer cellRenderer)
   {
     this.cellRenderer = cellRenderer;
@@ -621,6 +651,13 @@ public class JTableHeader extends JComponent
     setUI((TableHeaderUI) UIManager.getUI(this));
   }
 
+  /**
+   * Returns the index of the column at the specified point.
+   * 
+   * @param point  the point.
+   * 
+   * @return The column index, or -1.
+   */
   public int columnAtPoint(Point point)
   {
     if (getBounds().contains(point))

@@ -1,40 +1,37 @@
-/* DefaultTreeSelectionModel.java --
-   Copyright (C) 2002, 2004, 2005  Free Software Foundation, Inc.
-
-This file is part of GNU Classpath.
-
-GNU Classpath is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2, or (at your option)
-any later version.
-
-GNU Classpath is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
-
-Linking this library statically or dynamically with other modules is
-making a combined work based on this library.  Thus, the terms and
-conditions of the GNU General Public License cover the whole
-combination.
-
-As a special exception, the copyright holders of this library give you
-permission to link this library with independent modules to produce an
-executable, regardless of the license terms of these independent
-modules, and to copy and distribute the resulting executable under
-terms of your choice, provided that you also meet, for each linked
-independent module, the terms and conditions of the license of that
-module.  An independent module is a module which is not derived from
-or based on this library.  If you modify this library, you may extend
-this exception to your version of the library, but you are not
-obligated to do so.  If you do not wish to do so, delete this
-exception statement from your version. */
-
+/*
+ * DefaultTreeSelectionModel.java -- Copyright (C) 2002, 2004 Free Software
+ * Foundation, Inc.
+ * 
+ * This file is part of GNU Classpath.
+ * 
+ * GNU Classpath is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2, or (at your option) any later version.
+ * 
+ * GNU Classpath is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * GNU Classpath; see the file COPYING. If not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Linking this library statically or dynamically with other modules is making a
+ * combined work based on this library. Thus, the terms and conditions of the
+ * GNU General Public License cover the whole combination.
+ * 
+ * As a special exception, the copyright holders of this library give you
+ * permission to link this library with independent modules to produce an
+ * executable, regardless of the license terms of these independent modules, and
+ * to copy and distribute the resulting executable under terms of your choice,
+ * provided that you also meet, for each linked independent module, the terms
+ * and conditions of the license of that module. An independent module is a
+ * module which is not derived from or based on this library. If you modify this
+ * library, you may extend this exception to your version of the library, but
+ * you are not obligated to do so. If you do not wish to do so, delete this
+ * exception statement from your version.
+ */
 
 package javax.swing.tree;
 
@@ -54,6 +51,7 @@ import javax.swing.event.TreeSelectionListener;
 
 /**
  * DefaultTreeSelectionModel
+ * 
  * @author Andrew Selkirk
  */
 public class DefaultTreeSelectionModel
@@ -145,6 +143,7 @@ public class DefaultTreeSelectionModel
 
 	/**
 	 * writeObject
+	 * 
 	 * @param value0 TODO
 	 * @exception IOException TODO
 	 */
@@ -155,12 +154,13 @@ public class DefaultTreeSelectionModel
 
 	/**
 	 * readObject
+	 * 
 	 * @param value0 TODO
 	 * @exception IOException TODO
 	 * @exception ClassNotFoundException TODO
 	 */
-  private void readObject(ObjectInputStream value0)
-    throws IOException, ClassNotFoundException
+	private void readObject(ObjectInputStream value0) throws IOException,
+			ClassNotFoundException
   {
 		// TODO
   }
@@ -193,8 +193,8 @@ public class DefaultTreeSelectionModel
 
 	/**
    * Sets the current selection mode. Possible values are
-   * {@link #SINGLE_TREE_SELECTION}, {@link CONTIGUOUS_TREE_SELECTION}
-   * and {@link #DISCONTIGUOUS_TREE_SELECTION}.
+	 * {@link #SINGLE_TREE_SELECTION}, {@link CONTIGUOUS_TREE_SELECTION} and
+	 * {@link #DISCONTIGUOUS_TREE_SELECTION}.
    *
    * @param mode the selection mode to be set
    *
@@ -226,22 +226,23 @@ public class DefaultTreeSelectionModel
 	/**
    * Sets this path as the only selection.
    *
-   * If this changes the selection the registered TreeSelectionListeners
-   * are notified.
+	 * If this changes the selection the registered TreeSelectionListeners are
+	 * notified.
    *
    * @param path the path to set as selection
 	 */
   public void setSelectionPath(TreePath path)
   {
-    selection = new TreePath[] { path };
+		selection = new TreePath[] {
+			path };
   }
 
 	/**
    * Sets the paths as selection. This method checks for duplicates and
    * removes them.
    *
-   * If this changes the selection the registered TreeSelectionListeners
-   * are notified.
+	 * If this changes the selection the registered TreeSelectionListeners are
+	 * notified.
    *
    * @param paths the paths to set as selection
 	 */
@@ -251,62 +252,149 @@ public class DefaultTreeSelectionModel
   }
 
 	/**
-   * Adds a path to the list of selected paths. This method checks if the
-   * path is already selected and doesn't add the same path twice.
+	 * Adds a path to the list of selected paths. This method checks if the path
+	 * is already selected and doesn't add the same path twice.
    *
-   * If this changes the selection the registered TreeSelectionListeners
-   * are notified.
+	 * If this changes the selection the registered TreeSelectionListeners are
+	 * notified.
    *
    * @param path the path to add to the selection
 	 */
   public void addSelectionPath(TreePath value0)
   {
-		// TODO
+		if (!isPathSelected(value0))
+		{
+			if (isSelectionEmpty())
+				setSelectionPath(value0);
+			else
+			{
+				TreePath[] temp = new TreePath[selection.length + 1];
+				System.arraycopy(selection, 0, temp, 0, selection.length);
+				temp[temp.length - 1] = value0;
+				selection = new TreePath[temp.length];
+				System.arraycopy(temp, 0, selection, 0, temp.length);
+			}
+			leadPath = value0;
+			fireValueChanged(new TreeSelectionEvent(this, value0, true,
+					leadPath, value0));
+		}
   }
 
 	/**
    * Adds the paths to the list of selected paths. This method checks if the
    * paths are already selected and doesn't add the same path twice.
    *
-   * If this changes the selection the registered TreeSelectionListeners
-   * are notified.
+	 * If this changes the selection the registered TreeSelectionListeners are
+	 * notified.
    *
    * @param paths the paths to add to the selection
 	 */
   public void addSelectionPaths(TreePath[] value0)
   {
-		// TODO
+		if (value0 != null)
+		{
+			TreePath v0 = null;
+			for (int i = 0; i < value0.length; i++)
+			{
+				v0 = value0[i];
+				if (!isPathSelected(v0))
+				{
+					if (isSelectionEmpty())
+						setSelectionPath(v0);
+					else
+					{
+						TreePath[] temp = new TreePath[selection.length + 1];
+						System.arraycopy(selection, 0, temp, 0,
+								selection.length);
+						temp[temp.length - 1] = v0;
+						selection = new TreePath[temp.length];
+						System.arraycopy(temp, 0, selection, 0, temp.length);
+					}
+					leadPath = value0[value0.length - 1];
+					fireValueChanged(new TreeSelectionEvent(this, v0, true,
+							leadPath, value0[0]));
+				}
+			}
+		}
   }
 
 	/**
    * Removes the path from the selection.
    *
-   * If this changes the selection the registered TreeSelectionListeners
-   * are notified.
+	 * If this changes the selection the registered TreeSelectionListeners are
+	 * notified.
    *
    * @param path the path to remove
 	 */
   public void removeSelectionPath(TreePath value0)
   {
-		// TODO
+		int index = -1;
+		if (isPathSelected(value0))
+		{
+			for (int i = 0; i < selection.length; i++)
+			{
+				if (selection[i].equals(value0))
+				{
+					index = i;
+					break;
+				}
+			}
+			TreePath[] temp = new TreePath[selection.length - 1];
+			System.arraycopy(selection, 0, temp, 0, index);
+			System.arraycopy(selection, index + 1, temp, index,
+					selection.length - index - 1);
+			selection = new TreePath[temp.length];
+			System.arraycopy(temp, 0, selection, 0, temp.length);
+
+			fireValueChanged(new TreeSelectionEvent(this, value0, false,
+					leadPath, value0));
+		}
   }
 
 	/**
    * Removes the paths from the selection.
    *
-   * If this changes the selection the registered TreeSelectionListeners
-   * are notified.
+	 * If this changes the selection the registered TreeSelectionListeners are
+	 * notified.
    *
    * @param paths the path to remove
 	 */
   public void removeSelectionPaths(TreePath[] value0)
   {
-		// TODO
+		if (value0 != null)
+		{
+			int index = -1;
+			TreePath v0 = null;
+			for (int i = 0; i < value0.length; i++)
+			{
+				v0 = value0[i];
+				if (isPathSelected(v0))
+				{
+					for (int x = 0; x < selection.length; x++)
+					{
+						if (selection[i].equals(v0))
+						{
+							index = x;
+							break;
+						}
+					}
+					TreePath[] temp = new TreePath[selection.length - 1];
+					System.arraycopy(selection, 0, temp, 0, index);
+					System.arraycopy(selection, index + 1, temp, index,
+							selection.length - index - 1);
+					selection = new TreePath[temp.length];
+					System.arraycopy(temp, 0, selection, 0, temp.length);
+
+					fireValueChanged(new TreeSelectionEvent(this, v0, false,
+							leadPath, value0[0]));
+				}
+			}
+		}
   }
 
 	/**
-   * Returns the first path in the selection. This is especially useful
-   * when the selectionMode is {@link #SINGLE_TREE_SELECTION}.
+	 * Returns the first path in the selection. This is especially useful when
+	 * the selectionMode is {@link #SINGLE_TREE_SELECTION}.
    *
    * @return the first path in the selection
 	 */
@@ -351,14 +439,22 @@ public class DefaultTreeSelectionModel
 	 */
   public boolean isPathSelected(TreePath value0)
   {
-		return false; // TODO
+		if (selection == null)
+			return false;
+
+		for (int i = 0; i < selection.length; i++)
+		{
+			if (selection[i].equals(value0))
+				return true;
+		}
+		return false;
   }
 
 	/**
    * Checks if the selection is empty.
    *
-   * @return <code>true</code> if the selection is empty,
-   *         <code>false</code> otherwise
+	 * @return <code>true</code> if the selection is empty, <code>false</code>
+	 *         otherwise
 	 */
   public boolean isSelectionEmpty()
   {
@@ -370,7 +466,7 @@ public class DefaultTreeSelectionModel
 	 */
   public void clearSelection()
   {
-		// TODO
+		selection = null;
   }
 
 	/**
@@ -402,7 +498,8 @@ public class DefaultTreeSelectionModel
 	 */
   public TreeSelectionListener[] getTreeSelectionListeners()
   {
-    return (TreeSelectionListener[]) listenerList.getListeners(TreeSelectionListener.class);
+		return (TreeSelectionListener[]) 
+				getListeners(TreeSelectionListener.class);
   }
 
 	/**
@@ -414,7 +511,7 @@ public class DefaultTreeSelectionModel
   {
     TreeSelectionListener[] listeners = getTreeSelectionListeners();
 
-    for (int i = listeners.length - 1; i >= 0; --i)
+		for (int i = 0; i < listeners.length; ++i)
       listeners[i].valueChanged(event);
   }
 
@@ -452,9 +549,11 @@ public class DefaultTreeSelectionModel
 	 */
   public int getMinSelectionRow()
   {
-    if ((rowMapper == null) || (selection == null) || (selection.length == 0))
+		if ((rowMapper == null) || (selection == null)
+				|| (selection.length == 0))
       return -1;
-    else {
+		else
+		{
       int[] rows = rowMapper.getRowsForPaths(selection);
       int minRow = Integer.MAX_VALUE;
       for (int index = 0; index < rows.length; index++)
@@ -470,9 +569,11 @@ public class DefaultTreeSelectionModel
 	 */
   public int getMaxSelectionRow()
   {
-    if ((rowMapper == null) || (selection == null) || (selection.length == 0))
+		if ((rowMapper == null) || (selection == null)
+				|| (selection.length == 0))
       return -1;
-    else {
+		else
+		{
       int[] rows = rowMapper.getRowsForPaths(selection);
       int maxRow = -1;
       for (int index = 0; index < rows.length; index++)
@@ -504,6 +605,7 @@ public class DefaultTreeSelectionModel
 
 	/**
 	 * getLeadSelectionRow
+	 * 
    * @return int
 	 */
   public int getLeadSelectionRow()
@@ -511,11 +613,13 @@ public class DefaultTreeSelectionModel
     if ((rowMapper == null) || (leadPath == null))
       return -1;
     else
-      return rowMapper.getRowsForPaths(new TreePath[]{ leadPath })[0];
+			return rowMapper.getRowsForPaths(new TreePath[] {
+				leadPath })[0];
   }
 
 	/**
 	 * getLeadSelectionPath
+	 * 
    * @return TreePath
 	 */
   public TreePath getLeadSelectionPath()
@@ -559,13 +663,13 @@ public class DefaultTreeSelectionModel
    * Makes sure the currently selected paths are valid according to the
    * current selectionMode.
    *
-   * If the selectionMode is set to {@link CONTIGUOUS_TREE_SELECTION}
-   * and the selection isn't contiguous then the selection is reset to
-   * the first set of contguous paths.
-   *
-   * If the selectionMode is set to {@link SINGLE_TREE_SELECTION}
-   * and the selection has more than one path, the selection is reset to
-   * the contain only the first path.
+	 * If the selectionMode is set to {@link CONTIGUOUS_TREE_SELECTION} and the
+	 * selection isn't contiguous then the selection is reset to the first set
+	 * of contguous paths.
+	 * 
+	 * If the selectionMode is set to {@link SINGLE_TREE_SELECTION} and the
+	 * selection has more than one path, the selection is reset to the contain
+	 * only the first path.
 	 */
   protected void insureRowContinuity()
   {
@@ -573,12 +677,12 @@ public class DefaultTreeSelectionModel
   }
 
 	/**
-   * Returns <code>true</code> if the paths are contiguous or we
-   * have no RowMapper assigned.
+	 * Returns <code>true</code> if the paths are contiguous or we have no
+	 * RowMapper assigned.
    *
    * @param paths the paths to check for continuity
-   * @return <code>true</code> if the paths are contiguous or we
-   *         have no RowMapper assigned
+	 * @return <code>true</code> if the paths are contiguous or we have no
+	 *         RowMapper assigned
 	 */
   protected boolean arePathsContiguous(TreePath[] value0)
   {
@@ -606,12 +710,12 @@ public class DefaultTreeSelectionModel
   }
 
 	/**
-   * Checks if the paths can be removed without breaking the continuity of
-   * the selection according to selectionMode.
+	 * Checks if the paths can be removed without breaking the continuity of the
+	 * selection according to selectionMode.
    *
    * @param paths the paths to check
-   * @return  <code>true</code> if the paths can be removed with respect to the
-   *         selectionMode
+	 * @return <code>true</code> if the paths can be removed with respect to
+	 *         the selectionMode
 	 */
   protected boolean canPathsBeRemoved(TreePath[] value0)
   {
@@ -620,6 +724,7 @@ public class DefaultTreeSelectionModel
 
 	/**
 	 * notifyPathChange
+	 * 
 	 * @param value0 TODO
 	 * @param value1 TODO
 	 */
