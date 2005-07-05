@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -64,9 +64,8 @@ final class LiteralNode
 
   final Collection elementExcludeResultPrefixes;
 
-  LiteralNode(TemplateNode children, TemplateNode next, Node source)
+  LiteralNode(Node source)
   {
-    super(children, next);
     this.source = source;
     if (source.getNodeType() == Node.ELEMENT_NODE)
       {
@@ -95,11 +94,16 @@ final class LiteralNode
 
   TemplateNode clone(Stylesheet stylesheet)
   {
-    return new LiteralNode((children == null) ? null :
-                           children.clone(stylesheet),
-                           (next == null) ? null :
-                           next.clone(stylesheet),
-                           source);
+    TemplateNode ret = new LiteralNode(source);
+    if (children != null)
+      {
+        ret.children = children.clone(stylesheet);
+      }
+    if (next != null)
+      {
+        ret.next = next.clone(stylesheet);
+      }
+    return ret;
   }
 
   void doApply(Stylesheet stylesheet, QName mode,
@@ -174,13 +178,15 @@ final class LiteralNode
                       }
                   }
               }
-            result = doc.adoptNode(result);
-            if (result == null)
+            Node result2 = doc.adoptNode(result);
+            if (result2 == null)
               {
-                String msg = "Error adopting node to result tree";
+                String msg = "Error adopting node to result tree: " +
+                  result + " (" + result.getClass().getName() + ")";
                 DOMSourceLocator l = new DOMSourceLocator(context);
                 throw new TransformerException(msg, l);
               }
+            result = result2;
           }
         if (nextSibling != null)
           {

@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -76,6 +76,10 @@ public abstract class DomHTMLElement
           {
             Node attr = attrs.item(i);
             String attrName = attr.getLocalName();
+            if (attrName == null)
+              {
+                attrName = attr.getNodeName();
+              }
             if (attrName.equalsIgnoreCase(name))
               {
                 return attr.getNodeValue();
@@ -121,6 +125,10 @@ public abstract class DomHTMLElement
       {
         attr = attrs.item(i);
         String attrName = attr.getLocalName();
+        if (attrName == null)
+          {
+            attrName = attr.getNodeName();
+          }
         if (attrName.equalsIgnoreCase(name))
           {
             if (value != null)
@@ -162,7 +170,12 @@ public abstract class DomHTMLElement
     for (Node parent = getParentNode(); parent != null;
          parent = parent.getParentNode())
       {
-        if (name.equalsIgnoreCase(parent.getLocalName()))
+        String parentName = parent.getLocalName();
+        if (parentName == null)
+          {
+              parentName = parent.getNodeName();
+          }
+        if (name.equalsIgnoreCase(parentName))
           {
             return parent;
           }
@@ -178,7 +191,12 @@ public abstract class DomHTMLElement
     for (Node child = getFirstChild(); child != null;
          child = child.getNextSibling())
       {
-        if (name.equalsIgnoreCase(child.getLocalName()))
+        String childName = child.getLocalName();
+        if (childName == null)
+          {
+            childName = child.getLocalName();
+          }
+        if (name.equalsIgnoreCase(childName))
           {
             return child;
           }
