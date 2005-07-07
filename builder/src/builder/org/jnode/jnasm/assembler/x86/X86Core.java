@@ -21,7 +21,6 @@
  
 package org.jnode.jnasm.assembler.x86;
 
-import org.jnode.jnasm.assembler.AssemblerModule;
 import org.jnode.jnasm.assembler.Address;
 import org.jnode.jnasm.assembler.InstructionUtils;
 import org.jnode.jnasm.assembler.Register;
@@ -33,7 +32,6 @@ import org.jnode.assembler.x86.X86Register.CRX;
 import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.x86.X86Register.SR;
 import org.jnode.assembler.Label;
-import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.UnresolvedObjectRefException;
 
 import java.util.Map;
@@ -42,105 +40,7 @@ import java.util.List;
 /**
  * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
-public class X86Core extends AssemblerModule {
-    private static final int NUL_ARG = 0;
-    private static final int CON_ARG = 1;
-    private static final int REG_ARG = 2;
-    private static final int REL_ARG = 3;
-    private static final int ABS_ARG = 4;
-    private static final int SCL_ARG = 5;
-    private static final int ZSC_ARG = 6;
-    private static final int SEG_ARG = 7;
-
-    private static final String[] ARG_TYPES = {"noargument", "constant", "register", "relative", "absolute", "scaled", "simplescaled", "segment"};
-
-    private static final int DISP = 3;
-    private static final int DISP_MASK = ((2 << (DISP - 1)) - 1);
-
-    private static final int N_ADDR = NUL_ARG;
-    private static final int C_ADDR = CON_ARG;
-    private static final int R_ADDR = REG_ARG;
-    private static final int RR_ADDR = REG_ARG | REG_ARG << DISP;
-    private static final int RC_ADDR = REG_ARG | CON_ARG << DISP;
-    private static final int RE_ADDR = REG_ARG | REL_ARG << DISP;
-    private static final int RA_ADDR = REG_ARG | ABS_ARG << DISP;
-    private static final int RS_ADDR = REG_ARG | SCL_ARG << DISP;
-    private static final int RZ_ADDR = REG_ARG | ZSC_ARG << DISP;
-    private static final int CR_ADDR = CON_ARG | REG_ARG << DISP;
-    private static final int E_ADDR = REL_ARG;
-    private static final int ER_ADDR = REL_ARG | REG_ARG << DISP;
-    private static final int EC_ADDR = REL_ARG | CON_ARG << DISP;
-    private static final int A_ADDR = ABS_ARG;
-    private static final int AC_ADDR = ABS_ARG | CON_ARG << DISP;
-    private static final int AR_ADDR = ABS_ARG | REG_ARG << DISP;
-    private static final int S_ADDR = SCL_ARG;
-    private static final int SR_ADDR = SCL_ARG | REG_ARG << DISP;
-    private static final int G_ADDR = SEG_ARG;
-    private static final int GR_ADDR = SEG_ARG | REG_ARG << DISP;
-    private static final int GC_ADDR = SEG_ARG | CON_ARG << DISP;
-    private static final int RG_ADDR = REG_ARG | SEG_ARG << DISP;
-
-    private final Object[] args = new Object[3];
-
-
-    private int getAddressingMode(int maxArgs) {
-        int ret = N_ADDR;
-        if (maxArgs > 3) {
-            throw new Error("Invalid number of arguments: " + maxArgs);
-        }
-
-        for (int i = 0; i < maxArgs; i++) {
-            try {
-                if (operands == null) break;
-
-                Object o = operands.get(i);
-                if (o == null) break;
-
-                if (o instanceof Integer) {
-                    ret |= CON_ARG << DISP * i;
-                } else if (o instanceof Register) {
-                    ret |= REG_ARG << DISP * i;
-                } else if (o instanceof Address) {
-                    Address ind = (Address) o;
-                    if (ind.segment){
-                        ret |= SEG_ARG << DISP * i;
-                    } else if (ind.reg != null && ind.sreg != null) {
-                        ret |= SCL_ARG << DISP * i;
-                    } else if (ind.reg != null && ind.sreg == null) {
-                        ret |= REL_ARG << DISP * i;
-                    } else if (ind.reg == null && ind.sreg != null) {
-                        ret |= ZSC_ARG << DISP * i;
-                    } else if (ind.reg == null && ind.sreg == null) {
-                        ret |= ABS_ARG << DISP * i;
-                    } else {
-                        throw new IllegalArgumentException("Unknown indirect: " + ind);
-                    }
-                } else {
-                    throw new IllegalArgumentException("Unknown operand: " + o + " " + o.getClass().getName());
-                }
-
-                args[i] = o;
-
-            } catch (IndexOutOfBoundsException x) {
-                break;
-            }
-        }
-        return ret;
-    }
-
-    private final int getInt(int i) {
-        return ((Integer) args[i]).intValue();
-    }
-
-    private final X86Register.GPR getReg(int i) {
-        return getRegister(((Register) args[i]).name);
-    }
-
-    private final Address getAddress(int i) {
-        return (Address) args[i];
-    }
-
-
+public class X86Core extends AbstractX86Module {
     public static final int ADC_ISN = 0;
     public static final int ADD_ISN = ADC_ISN + 1;
     public static final int ALIGN_ISN = ADD_ISN + 1;
@@ -227,16 +127,12 @@ public class X86Core extends AssemblerModule {
         MNEMONICS = mnemonics;
     }
 
-    private List<Object> operands;
-    private int operandSize;
-    private X86Assembler stream;
-
-    public X86Core(Map<String, Label> labels, Map<String, Integer> constants) {
+    X86Core(Map<String, Label> labels, Map<String, Integer> constants) {
         super(labels, constants);
     }
 
-    public void setNativeStream(NativeStream stream) {
-        this.stream = (X86Assembler) stream;
+    String[] getMnemonics() {
+        return MNEMONICS;
     }
 
     public boolean emit(String mnemonic, List<Object> operands, int operandSize) {
@@ -1449,20 +1345,5 @@ public class X86Core extends AssemblerModule {
             default:
                 reportAddressingError(XOR_ISN, addr);
         }
-    }
-
-    private final void reportAddressingError(int instruction, int addressing) {
-        String err = "";
-        int ad = addressing;
-        do {
-            err += " " + ARG_TYPES[ad & DISP_MASK];
-            ad >>= DISP;
-        } while (ad != 0);
-
-        throw new IllegalArgumentException("Unknown addressing mode " + addressing + " (" + err + " ) for " + MNEMONICS[instruction]);
-    }
-
-    static final X86Register.GPR getRegister(String name) {
-        return X86Register.getGPR(name);
     }
 }

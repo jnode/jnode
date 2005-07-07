@@ -57,6 +57,7 @@ public class X86Support extends HardwareSupport {
         this.instructions = instructions;
         this.labels = labels;
         modules.add(new X86Core(labels, constants));
+        modules.add(new MMX(labels, constants));
         modules.add(assembler.getPseudo());
     }
 
