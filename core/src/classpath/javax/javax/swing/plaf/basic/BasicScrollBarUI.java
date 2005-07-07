@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -124,7 +124,6 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
     {
       //       System.err.println(this + ".stateChanged()");
       calculatePreferredSize();
-      layoutContainer(scrollbar);		  
       getThumbBounds();
       scrollbar.repaint();
     }
@@ -167,9 +166,7 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
           incrButton.addMouseListener(buttonListener);
           decrButton.addMouseListener(buttonListener);	  
           calculatePreferredSize();
-          layoutContainer(scrollbar);		  
 	}
-      layoutContainer(scrollbar);
       scrollbar.repaint();
     }
   }
@@ -820,6 +817,7 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
     scrollbar.setBackground(defaults.getColor("ScrollBar.background"));
     scrollbar.setBorder(defaults.getBorder("ScrollBar.border"));
     scrollbar.setOpaque(true);
+    scrollbar.setLayout(this);
 
     thumbColor = defaults.getColor("ScrollBar.thumb");
     thumbDarkShadowColor = defaults.getColor("ScrollBar.thumbDarkShadow");
@@ -888,7 +886,6 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
 	installListeners();
 
 	calculatePreferredSize();
-        layoutContainer(scrollbar);	
       }
   }
 
@@ -973,7 +970,6 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
    */
   public void paint(Graphics g, JComponent c)
   {
-    layoutContainer(scrollbar);
     paintTrack(g, c, getTrackBounds());
     paintThumb(g, c, getThumbBounds());
 

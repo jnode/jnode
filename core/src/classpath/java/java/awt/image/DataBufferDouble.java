@@ -1,4 +1,4 @@
-/* Copyright (C) 2004  Free Software Foundation
+/* Copyright (C) 2004, 2005  Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -14,8 +14,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -47,6 +47,9 @@ package java.awt.image;
    code is a maintenance nightmare.  */
 
 /**
+ * A {@link DataBuffer} that uses an array of <code>double</code> primitives
+ * to represent each of its banks. 
+ * 
  * @since 1.4
  *
  * @author Rolf W. Rasmussen (rolfwr@ii.uib.no)
@@ -226,7 +229,7 @@ public final class DataBufferDouble
    */
   public void setElem(int i, int val)
   {
-    data[i+offset] = (double) val;
+    data[i+offset] = val;
   }
 
   /**
@@ -240,7 +243,7 @@ public final class DataBufferDouble
    */
   public void setElem(int bank, int i, int val)
   {
-    bankData[bank][i+offsets[bank]] = (double) val;
+    bankData[bank][i+offsets[bank]] = val;
   }
 
   public float getElemFloat(int i)
