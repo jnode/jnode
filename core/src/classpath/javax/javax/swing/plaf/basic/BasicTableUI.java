@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -104,7 +104,7 @@ public class BasicTableUI
   {
     Point begin, curr;
 
-    private void updateSelection()
+    private void updateSelection(boolean controlPressed)
     {
       if (table.getRowSelectionAllowed())
         {
@@ -112,7 +112,12 @@ public class BasicTableUI
           int hi_row  = table.rowAtPoint(curr);
           ListSelectionModel rowModel = table.getSelectionModel();
           if (lo_row != -1 && hi_row != -1)
+            {
+              if (controlPressed && rowModel.getSelectionMode() != ListSelectionModel.SINGLE_SELECTION)
+                rowModel.addSelectionInterval(lo_row, hi_row);
+              else
             rowModel.setSelectionInterval(lo_row, hi_row);
+        }
         }
 
       if (table.getColumnSelectionAllowed())
@@ -121,8 +126,13 @@ public class BasicTableUI
           int hi_col = table.columnAtPoint(curr);
           ListSelectionModel colModel = table.getColumnModel().getSelectionModel();
           if (lo_col != -1 && hi_col != -1)
+            {
+              if (controlPressed && colModel.getSelectionMode() != ListSelectionModel.SINGLE_SELECTION)
+                colModel.addSelectionInterval(lo_col, hi_col);
+              else
             colModel.setSelectionInterval(lo_col, hi_col);
         }
+    }
     }
 
     public void mouseClicked(MouseEvent e) 
@@ -131,7 +141,7 @@ public class BasicTableUI
     public void mouseDragged(MouseEvent e) 
     {
       curr = new Point(e.getX(), e.getY());
-      updateSelection();      
+      updateSelection(e.isControlDown());      
     }
     public void mouseEntered(MouseEvent e) 
     {
@@ -146,7 +156,8 @@ public class BasicTableUI
     {
       begin = new Point(e.getX(), e.getY());
       curr = new Point(e.getX(), e.getY());
-      updateSelection();
+      updateSelection(e.isControlDown());
+      
     }
     public void mouseReleased(MouseEvent e) 
     {
@@ -205,6 +216,7 @@ public class BasicTableUI
     table.addFocusListener(focusListener);  
     table.addKeyListener(keyListener);
     table.addMouseListener(mouseInputListener);    
+    table.addMouseMotionListener(mouseInputListener);
   }
 
   protected void uninstallDefaults() 
@@ -236,6 +248,7 @@ public class BasicTableUI
     table.removeFocusListener(focusListener);  
     table.removeKeyListener(keyListener);
     table.removeMouseListener(mouseInputListener);    
+    table.removeMouseMotionListener(mouseInputListener);
   }
 
   public void installUI(JComponent comp) 
