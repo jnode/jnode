@@ -123,6 +123,13 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 					MaxVClockFreqKHz = 350000;
 				}
 				break;
+			case NV28M :
+				{
+					final int bootInfo = vgaIO.getReg32(NV32_NVSTRAPINFO2);
+					CrystalFreqKHz = ((bootInfo & 0x00000040) != 0) ? 14318 : 13500;
+					MaxVClockFreqKHz = 200000;
+				}
+				break;
 			default :
 				throw new DriverException("Unknown architecture " + architecture);
 		}
@@ -358,6 +365,7 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 			//	size = (((CFGR(GF4MXIGPU) & 0x000007f0) >> 4) + 1);
 			//remove this line if det. is OK: int amt = pciReadLong(pciTag(0, 0, 1), 0x84);
 			//	break;
+      log.info("strapinfo "+strapinfo);
 			switch ((strapinfo & 0x0ff00000) >> 20) {
 				case 2 :
 					size = 2;

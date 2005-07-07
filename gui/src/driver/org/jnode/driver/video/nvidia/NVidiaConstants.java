@@ -31,6 +31,7 @@ public interface NVidiaConstants {
 	public static final int NV10A = 2;
 	public static final int NV20A = 3;
 	public static final int NV30A = 4;
+	public static final int NV28M = 5;
 
 	/* NV registers definitions and macros for access to */
 

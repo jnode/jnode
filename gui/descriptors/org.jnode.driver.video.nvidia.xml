@@ -32,6 +32,7 @@
     <mapper id="10de:0100" architecture="NV10A" name="GeForce 256" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
     <mapper id="10de:0101" architecture="NV10A" name="GeForce DDR" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
     <mapper id="10de:0202" architecture="NV10A" name="GeForce 3Ti500" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="10de:0286" architecture="NV28M" name="GeForce4 4200 Go" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
   </extension>
         
 </plugin>
