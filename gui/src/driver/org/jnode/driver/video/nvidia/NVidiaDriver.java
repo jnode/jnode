@@ -141,6 +141,8 @@ public class NVidiaDriver extends AbstractFrameBufferDriver implements NVidiaCon
 	        return NV10A;
 	    } else if (arch.equals("NV20A")) {
 	        return NV20A;
+	    } else if (arch.equals("NV28M")) {
+	        return NV28M;
 	    } else if (arch.equals("NV30A")) {
 	        return NV30A;
 	    } else {
