@@ -928,6 +928,10 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
     public abstract void writeDIV_EAX(GPR srcReg);
 
 
+    /**
+     * Create a emms
+     */
+    public abstract void writeEMMS();
 	/**
 	 * Create a fadd dword [srcReg+srcDisp]
 	 * 

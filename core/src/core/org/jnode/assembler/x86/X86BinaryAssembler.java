@@ -1572,8 +1572,13 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         write1bOpcodeModRR(0xF7, srcReg.getSize(), srcReg, 6);
     }
 
+    public void writeEMMS() {
+        write8(0x0F);
+        write8(0x77);
+    }
 
-	/**
+
+    /**
 	 * Create a fadd dword [srcReg+srcDisp]
 	 *
 	 * @param srcReg

@@ -900,6 +900,10 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
         println("\tdiv " + srcReg);
     }
 
+    public void writeEMMS() {
+        println("\temms");
+    }
+
     /**
      * @see org.jnode.assembler.x86.X86Assembler#writeFADD32(GPR, int)
      */
