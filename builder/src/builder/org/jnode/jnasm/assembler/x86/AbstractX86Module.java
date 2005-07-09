@@ -33,6 +33,7 @@ public abstract class AbstractX86Module extends AssemblerModule{
     static final int C_ADDR = CON_ARG;
     static final int R_ADDR = REG_ARG;
     static final int RR_ADDR = REG_ARG | REG_ARG << DISP;
+    static final int RRC_ADDR = REG_ARG | REG_ARG << DISP | CON_ARG << 2 * DISP;
     static final int RC_ADDR = REG_ARG | CON_ARG << DISP;
     static final int RE_ADDR = REG_ARG | REL_ARG << DISP;
     static final int RA_ADDR = REG_ARG | ABS_ARG << DISP;
@@ -136,5 +137,9 @@ public abstract class AbstractX86Module extends AssemblerModule{
 
     static final X86Register.GPR getRegister(String name) {
         return X86Register.getGPR(name);
+    }
+
+    static final X86Register.MMX getRegisterMMX(String name) {
+        return (X86Register.MMX) X86Register.getRegister(name);
     }
 }

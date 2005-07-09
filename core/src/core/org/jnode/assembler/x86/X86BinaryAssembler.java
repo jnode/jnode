@@ -32,6 +32,7 @@ import org.jnode.assembler.x86.X86Register.GPR32;
 import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.assembler.x86.X86Register.SR;
 import org.jnode.assembler.x86.X86Register.XMM;
+import org.jnode.assembler.x86.X86Register.MMX;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmClassType;
@@ -2821,6 +2822,12 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		writeModRR(rm.getNr() & 7, reg & 7);
 	}
 
+    private void writeModRR_MMX(int opcode, X86Register.MMX dstMmx, X86Register.MMX srcMmx) {
+        write8(0x0F);
+        write8(opcode);
+        writeModRR(srcMmx.getNr() & 7, dstMmx.getNr() & 7);
+    }
+
     /**
      * Create a mov [dstReg:dstDisp], <srcReg>
      *
@@ -3269,6 +3276,112 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 				dstIdxReg);
 		write32(imm32);
 	}
+
+    //todo 64 bits support
+    /**
+     *
+     * @param operandSize
+     * @param dstMmx
+     * @param srcReg
+     * @param srcDisp
+     */
+    public void writeMOVD(int operandSize, MMX dstMmx, GPR srcReg, int srcDisp) {
+        testSize(srcReg, mode.getSize());
+		final int opcode;
+		switch (operandSize) {
+		case X86Constants.BITS32:
+//		case X86Constants.BITS64:
+			opcode = 0x6E;
+			break;
+		default:
+			throw new IllegalArgumentException("Invalid operandSize "
+					+ operandSize);
+		}
+		write2bOpcodeModRM(0x0F, opcode, operandSize, srcReg, srcDisp, dstMmx.getNr());
+    }
+
+    //todo 64 bits support
+    /**
+     *
+     * @param operandSize
+     * @param dstReg
+     * @param dstDisp
+     * @param srcMmx
+     */
+    public void writeMOVD(int operandSize, X86Register.GPR dstReg, int dstDisp, X86Register.MMX srcMmx) {
+        testSize(dstReg, mode.getSize());
+		final int opcode;
+		switch (operandSize) {
+		case X86Constants.BITS32:
+//		case X86Constants.BITS64:
+			opcode = 0x7E;
+			break;
+		default:
+			throw new IllegalArgumentException("Invalid operandSize "
+					+ operandSize);
+		}
+		write2bOpcodeModRM(0x0F, opcode, operandSize, dstReg, dstDisp, srcMmx.getNr());
+    }
+
+    //todo 64 bits support
+    /**
+     *
+     * @param dstMmx
+     * @param srcMmx
+     */
+    public void writeMOVQ(X86Register.MMX dstMmx, X86Register.MMX srcMmx) {
+        writeModRR_MMX(0x6F, dstMmx, srcMmx);
+    }
+
+    //todo 64 bits support
+    /**
+     *
+     * @param operandSize
+     * @param dstMmx
+     * @param srcReg
+     * @param srcDisp
+     */
+    public void writeMOVQ(int operandSize, X86Register.MMX dstMmx, X86Register.GPR srcReg, int srcDisp) {
+        testSize(srcReg, mode.getSize());
+		final int opcode;
+		switch (operandSize) {
+//		case X86Constants.BITS32:
+		case X86Constants.BITS64:
+			opcode = 0x6F;
+			break;
+		default:
+			throw new IllegalArgumentException("Invalid operandSize "
+					+ operandSize);
+		}
+        write8(0x0F);
+		write8(opcode);
+		writeModRM(srcReg.getNr() & 7, srcDisp, dstMmx.getNr() & 7);
+    }
+
+    //todo 64 bits support
+    /**
+     *
+     * @param operandSize
+     * @param dstMmx
+     * @param srcDisp
+     */
+    public void writeMOVQ(int operandSize, X86Register.MMX dstMmx, int srcDisp) {
+        testOperandSize(mode.getSize(), X86Constants.BITS32);
+		final int opcode;
+		switch (operandSize) {
+//		case X86Constants.BITS32:
+		case X86Constants.BITS64:
+			opcode = 0x6F;
+			break;
+		default:
+			throw new IllegalArgumentException("Invalid operandSize "
+					+ operandSize);
+		}
+        write8(0x0F);
+		write8(opcode);
+        write8(dstMmx.getNr() << 3 | 5);
+        write32(srcDisp);
+    }
 
     /**
 	 * Create a movsb
@@ -3760,7 +3873,27 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         }
     }
 
-	/**
+    public void writePACKUSWB(MMX dstMmx, MMX srcMmx) {
+        writeModRR_MMX(0x67, dstMmx, srcMmx);
+    }
+
+    public void writePADDW(X86Register.MMX dstMmx, X86Register.MMX srcMmx) {
+        writeModRR_MMX(0xFD, dstMmx, srcMmx);
+    }
+
+    public void writePAND(X86Register.MMX dstMmx, X86Register.MMX srcMmx) {
+        writeModRR_MMX(0xDB, dstMmx, srcMmx);
+    }
+
+    public void writePCMPGTW(X86Register.MMX dstMmx, X86Register.MMX srcMmx) {
+        writeModRR_MMX(0x65, dstMmx, srcMmx);
+    }
+
+    public void writePMULLW(X86Register.MMX dstMmx, X86Register.MMX srcMmx) {
+        writeModRR_MMX(0xD5, dstMmx, srcMmx);
+    }
+
+    /**
 	 * Create a pop reg32
 	 *
 	 * @param dstReg
@@ -3832,7 +3965,39 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		write8(prefix);
 	}
 
-	/**
+    /**
+	 * @see org.jnode.assembler.x86.X86Assembler#writePSHUFW(MMX,MMX,int)
+	 */
+    public void writePSHUFW(MMX dstMmx, MMX srcMmx, int imm8) {
+        writeModRR_MMX(0x70, dstMmx, srcMmx);
+        write8(imm8);
+    }
+
+    /**
+	 * @see org.jnode.assembler.x86.X86Assembler#writePSRLW(MMX,int)
+	 */
+    public void writePSRLW(X86Register.MMX mmx, int imm8) {
+        write8(0x0F);
+        write8(0x71);
+        writeModRR(mmx.getNr() & 7, 2);
+        write8(imm8);
+    }
+
+    /**
+	 * @see org.jnode.assembler.x86.X86Assembler#writePSUBW(MMX,MMX)
+	 */
+    public void writePSUBW(MMX dstMmx, MMX srcMmx) {
+        writeModRR_MMX(0xF9, dstMmx, srcMmx);
+    }
+
+    /**
+	 * @see org.jnode.assembler.x86.X86Assembler#writePUNPCKLBW(MMX,MMX)
+	 */
+    public void writePUNPCKLBW(MMX dstMmx, MMX srcMmx) {
+        writeModRR_MMX(0x60, dstMmx, srcMmx);
+    }
+
+    /**
 	 * Create a push dword imm32
 	 *
 	 * @param imm32
@@ -3961,7 +4126,14 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         write8(0x9C);
     }
 
-	public void writeRDTSC() {
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writePXOR(MMX,MMX)
+     */
+    public void writePXOR(MMX dstMmx, MMX srcMmx) {
+        writeModRR_MMX(0xEF, dstMmx, srcMmx);
+    }
+
+    public void writeRDTSC() {
 		write8(0x0F);
 		write8(0x31);
 	}

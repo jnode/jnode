@@ -34,6 +34,7 @@ import org.jnode.assembler.x86.X86Register.GPR32;
 import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.assembler.x86.X86Register.CRX;
 import org.jnode.assembler.x86.X86Register.SR;
+import org.jnode.assembler.x86.X86Register.MMX;
 import org.jnode.vm.CpuID;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.x86.X86CpuID;
@@ -1663,8 +1664,6 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public abstract void writeMOV_Const(GPR dstReg, Object label);
 
 	/**
-<<<<<<< X86Assembler.java
-=======
 	 * Create a mov size [destReg+dstIdxReg*scale+destDisp], imm32
 	 * 
 	 * @param dstReg
@@ -1673,6 +1672,48 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writeMOV_Const(int operandSize, GPR dstReg, GPR dstIdxReg, int scale,
 			int dstDisp, int imm32);
+
+    /**
+     * Create a movd mm,[reg + disp]
+     * @param operandSize
+     * @param mmx
+     * @param reg
+     * @param disp
+     */
+    public abstract void writeMOVD(int operandSize, MMX mmx, GPR reg, int disp);
+
+    /**
+     * Create a movd [reg + disp],mm
+     * @param operandSize
+     * @param dstReg
+     * @param dstDisp
+     * @param srcMmx
+     */
+    public abstract void writeMOVD(int operandSize, GPR dstReg, int dstDisp, MMX srcMmx);
+
+    /**
+     * Create a movq mm,mm
+     * @param dstMmx
+     * @param srcMmx
+     */
+    public abstract void writeMOVQ(MMX dstMmx, MMX srcMmx);
+
+    /**
+     * Create a movq mm,[reg + disp]
+     * @param operandSize
+     * @param dstMmx
+     * @param srcGpr
+     * @param srcDisp
+     */
+    public abstract void writeMOVQ(int operandSize, MMX dstMmx, GPR srcGpr, int srcDisp);
+
+    /**
+     * Create a movq mm,[disp]
+     * @param operandSize
+     * @param dstMmx
+     * @param srcDisp
+     */
+    public abstract void writeMOVQ(int operandSize, MMX dstMmx, int srcDisp);
 
     /**
      * Create a movsb
@@ -1889,6 +1930,41 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writeOR(int operandSize, GPR dstReg, int dstDisp, int imm32);
 
+    /**
+     * Create a packuswb mm,mm
+     * @param dstMmx
+     * @param srcMmx
+     */
+    public abstract void writePACKUSWB(MMX dstMmx, MMX srcMmx);
+
+    /**
+     * Create a paddw mm,mm
+     * @param dstMmx
+     * @param srcMmx
+     */
+    public abstract void writePADDW(MMX dstMmx, MMX srcMmx);
+
+    /**
+     * Create a pand mm,mm
+     * @param dstMmx
+     * @param srcMmx
+     */
+    public abstract void writePAND(MMX dstMmx, MMX srcMmx);
+
+    /**
+     * Create a pcmpgtw mm,mm
+     * @param dstMmx
+     * @param srcMmx
+     */
+    public abstract void writePCMPGTW(MMX dstMmx, MMX srcMmx);
+
+    /**
+     * Create a pmullw mm,mm
+     * @param dstMmx
+     * @param srcMmx
+     */
+    public abstract void writePMULLW(MMX dstMmx, MMX srcMmx);
+
 	/**
 	 * Create a pop reg32
 	 * 
@@ -1929,6 +2005,35 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 * @param prefix
 	 */
 	public abstract void writePrefix(int prefix);
+
+    /**
+     * Create a pshufw mm,mm,imm8
+     * @param dstMmx
+     * @param srcMmx
+     * @param imm8
+     */
+    public abstract void writePSHUFW(MMX dstMmx, MMX srcMmx, int imm8);
+
+    /**
+     * Create a psrlw mm,imm8
+     * @param mmx
+     * @param imm8
+     */
+    public abstract void writePSRLW(MMX mmx, int imm8);
+
+    /**
+     * Create a psubw mm,mm
+     * @param dstMmx
+     * @param srcMmx
+     */
+    public abstract void writePSUBW(MMX dstMmx, MMX srcMmx);
+
+    /**
+     * Create punpcklbw mm,mm
+     * @param dstMmx
+     * @param srcMmx
+     */
+    public abstract void writePUNPCKLBW(MMX dstMmx, MMX srcMmx);
 
 	/**
 	 * Create a push reg32
@@ -1995,6 +2100,13 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 * Create a pushf.
 	 */
 	public abstract void writePUSHF();
+
+    /**
+     * Create a pxor mm,mm
+     * @param dstMmx
+     * @param srcMmx
+     */
+    public abstract void writePXOR(MMX dstMmx, MMX srcMmx);
 
 	/**
 	 * Create a RDTSC (get timestamp into edx:eax

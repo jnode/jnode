@@ -35,6 +35,7 @@ import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.x86.X86Register.GPR32;
 import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.assembler.x86.X86Register.CRX;
+import org.jnode.assembler.x86.X86Register.MMX;
 import org.jnode.assembler.x86.X86Register.XMM;
 import org.jnode.assembler.x86.X86Register.SR;
 import org.jnode.util.NumberUtils;
@@ -693,7 +694,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     /**
-     * @see org.jnode.assembler.x86.X86Assembler#writeCDQ()
+     * @see org.jnode.assembler.x86.X86Assembler#writeCDQ(int)
      */
     public void writeCDQ(int operandSize) {
         testOperandSize(operandSize, BITS32 | BITS64);
@@ -1636,6 +1637,41 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
                 + "*" + scale + disp(dstDisp) + "],0x" + NumberUtils.hex(imm32));
     }
 
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeMOVD(int, MMX, GPR, int)
+     */
+    public void writeMOVD(int operandSize, X86Register.MMX mmx, X86Register.GPR reg, int disp) {
+        println("\tmovd " + mmx + "," + size(operandSize) + "[" + reg + disp(disp) + "]");
+    }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeMOVD(int, GPR, int, MMX)
+     */
+    public void writeMOVD(int operandSize, X86Register.GPR dstReg, int dstDisp, X86Register.MMX srcMmx) {
+        println("\tmovd " + size(operandSize) + "[" + dstReg + disp(dstDisp) + "]," + srcMmx);
+    }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeMOVQ(MMX, MMX)
+     */
+    public void writeMOVQ(X86Register.MMX dstMmx, X86Register.MMX srcMmx) {
+        println("\tmovd " + dstMmx + "," + srcMmx);
+    }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeMOVQ(int, MMX, GPR, int)
+     */
+    public void writeMOVQ(int operandSize, X86Register.MMX dstMmx, X86Register.GPR srcGpr, int srcDisp) {
+        println("\tmovq " + dstMmx + "," + size(operandSize) + "[" + srcGpr + disp(srcDisp) + "]");
+    }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeMOVQ(int, MMX, int)
+     */
+    public void writeMOVQ(int operandSize, X86Register.MMX dstMmx, int srcDisp) {
+        println("\tmovq " + dstMmx + "," + size(operandSize) + "[" + disp(srcDisp) + "]");
+    }
+
     public void writeMOVSB() {
         println("\tmovsb");
     }
@@ -1823,6 +1859,9 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
         println("\tor " + dstReg + ",[" + srcReg + disp(srcDisp) + "]");
     }
 
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeOUT(int)
+     */
     public void writeOUT(int operandSize) {
         if(operandSize == X86Constants.BITS8){
             println("\tout " + X86Register.DX + "," + X86Register.AL);
@@ -1835,6 +1874,9 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
         }
     }
 
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeOUT(int, int)
+     */
     public void writeOUT(int operandSize, int imm8) {
         if(operandSize == X86Constants.BITS8){
             println("\tout " + imm8 + "," + X86Register.AL);
@@ -1845,6 +1887,41 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
         } else {
             throw new IllegalArgumentException("Invalid operand size for OUT: " + operandSize);
         }
+    }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writePACKUSWB(MMX, MMX)
+     */
+    public void writePACKUSWB(X86Register.MMX dstMmx, X86Register.MMX srcMmx) {
+        println("\tpackuswb " + dstMmx + "," + srcMmx);
+    }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writePADDW(MMX, MMX)
+     */
+    public void writePADDW(X86Register.MMX dstMmx, X86Register.MMX srcMmx) {
+        println("\tpaddw " + dstMmx + "," + srcMmx);
+    }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writePAND(MMX, MMX)
+     */
+    public void writePAND(X86Register.MMX dstMmx, X86Register.MMX srcMmx) {
+        println("\tpand " + dstMmx + "," + srcMmx);
+    }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writePCMPGTW(MMX, MMX)
+     */
+    public void writePCMPGTW(X86Register.MMX dstMmx, X86Register.MMX srcMmx) {
+        println("\tpcmpgtw " + dstMmx + "," + srcMmx);
+    }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writePMULLW(MMX, MMX)
+     */
+    public void writePMULLW(X86Register.MMX dstMmx, X86Register.MMX srcMmx) {
+        println("\tpmullw " + dstMmx + "," + srcMmx);
     }
 
     /**
@@ -1898,6 +1975,34 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
             throw new IllegalArgumentException("Unknown prefix " + prefix);
         }
         println("\tprefix " + str);
+    }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writePSHUFW(MMX,MMX,int)
+     */
+    public void writePSHUFW(X86Register.MMX dstMmx, X86Register.MMX srcMmx, int imm8) {
+        println("\tpshufw " + dstMmx + "," + srcMmx + ",0x" + NumberUtils.hex(imm8));
+    }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writePSRLW(MMX,int)
+     */
+    public void writePSRLW(X86Register.MMX mmx, int imm8) {
+        println("\tpsrlw " + mmx + ",0x" + NumberUtils.hex(imm8));
+    }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writePSUBW(MMX,MMX)
+     */
+    public void writePSUBW(X86Register.MMX dstMmx, X86Register.MMX srcMmx) {
+        println("\tpsubw " + dstMmx + "," + srcMmx);
+    }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writePUNPCKLBW(MMX,MMX)
+     */
+    public void writePUNPCKLBW(X86Register.MMX dstMmx, X86Register.MMX srcMmx) {
+        println("\tpsunpcklbw " + dstMmx + "," + srcMmx);
     }
 
     /**
@@ -1963,6 +2068,13 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      */
     public void writePUSHF() {
         println("\tpushf");
+    }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writePXOR(MMX,MMX)
+     */
+    public void writePXOR(X86Register.MMX dstMmx, X86Register.MMX srcMmx) {
+        println("\tpxor " + dstMmx + "," + srcMmx);
     }
 
     public void writeRDTSC() {
