@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -94,7 +94,7 @@ public abstract class Image
 	 * Constant indicating that the area averaging scaling algorithm should be
 	 * used.
 	 *
-	 * @see AreaAveragingScaleFilter
+   * @see java.awt.image.AreaAveragingScaleFilter
 	 * @since 1.1
 	 */
 	public static final int SCALE_AREA_AVERAGING = 16;
@@ -141,7 +141,7 @@ public abstract class Image
 	 * This method is only valid for off-screen objects.
 	 *
 	 * @return a graphics context object for an off-screen object
-	 * @see Graphics#createImage(int, int)
+   * @see Graphics#getcreateImage(int, int)
 	 */
 	public abstract Graphics getGraphics();
 

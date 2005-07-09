@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -38,8 +38,10 @@ exception statement from your version. */
 
 package java.awt;
 
+import java.applet.Applet;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.beans.PropertyVetoException;
@@ -285,12 +287,52 @@ public abstract class KeyboardFocusManager
     KeyboardFocusManager manager;
 
     if (m == null)
-      manager = new DefaultKeyboardFocusManager ();
+      manager = createFocusManager();
     else
       manager = m;
 
     currentKeyboardFocusManagers.put (currentGroup, manager);
       }
+
+  /**
+   * Creates a KeyboardFocusManager. The exact class is determined by the
+   * system property 'gnu.java.awt.FocusManager'. If this is not set,
+   * we default to DefaultKeyboardFocusManager.
+   */
+  private static KeyboardFocusManager createFocusManager()
+  {
+    String fmClassName = System.getProperty("gnu.java.awt.FocusManager",
+                                       "java.awt.DefaultKeyboardFocusManager");
+    try
+      {
+        Class fmClass = Class.forName(fmClassName);
+        KeyboardFocusManager fm = (KeyboardFocusManager) fmClass.newInstance();
+        return fm;
+      }
+    catch (ClassNotFoundException ex)
+      {
+        System.err.println("The class " + fmClassName + " cannot be found.");
+        System.err.println("Check the setting of the system property");
+        System.err.println("gnu.java.awt.FocusManager");
+        return null;
+      }
+    catch (InstantiationException ex)
+      {
+        System.err.println("The class " + fmClassName + " cannot be");
+        System.err.println("instantiated.");
+        System.err.println("Check the setting of the system property");
+        System.err.println("gnu.java.awt.FocusManager");
+        return null;
+      }
+    catch (IllegalAccessException ex)
+      {
+        System.err.println("The class " + fmClassName + " cannot be");
+        System.err.println("accessed.");
+        System.err.println("Check the setting of the system property");
+        System.err.println("gnu.java.awt.FocusManager");
+        return null;
+      }
+  }
 
   /**
    * Retrieve the {@link Component} that has the keyboard focus, or
@@ -335,8 +377,8 @@ public abstract class KeyboardFocusManager
    * @param owner the Component to return from getFocusOwner and
    * getGlobalFocusOwner
    *
-   * @see Component.requestFocus ()
-   * @see Component.requestFocusInWindow ()
+   * @see Component#requestFocus()
+   * @see Component#requestFocusInWindow()
    */
   protected void setGlobalFocusOwner (Component owner)
   {
@@ -419,8 +461,8 @@ public abstract class KeyboardFocusManager
    * @param focusOwner the Component to return from
    * getPermanentFocusOwner and getGlobalPermanentFocusOwner
    *
-   * @see Component.requestFocus ()
-   * @see Component.requestFocusInWindow ()
+   * @see Component#requestFocus()
+   * @see Component#requestFocusInWindow()
    */
   protected void setGlobalPermanentFocusOwner (Component focusOwner)
       {
