@@ -1,5 +1,5 @@
 /* RenderingHints.java --
-   Copyright (C) 2000, 2001, 2002, 2004  Free Software Foundation
+   Copyright (C) 2000, 2001, 2002, 2004, 2005  Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -592,14 +592,18 @@ public class RenderingHints implements Map, Cloneable
    * Returns <code>true</code> if the collection of hints contains the
    * specified key, and <code>false</code> otherwise.
    * 
-   * @param key  the key.
+   * @param key  the key (<code>null</code> not permitted).
    * 
    * @return A boolean.
+   * 
+   * @throws NullPointerException if <code>key</code> is <code>null</code>.
+   * @throws ClassCastException if <code>key</code> is not a {@link Key}.
    */
   public boolean containsKey(Object key)
   {
     if (key == null)
       throw new NullPointerException();
+    // don't remove the cast, it is necessary to throw the required exception
     return hintMap.containsKey((Key) key);
   }
 
@@ -617,14 +621,20 @@ public class RenderingHints implements Map, Cloneable
   }
 
   /**
-   * Returns the value associated with the specified key.
+   * Returns the value associated with the specified key, or <code>null</code>
+   * if there is no value defined for the key.
    * 
-   * @param key  the key.
+   * @param key  the key (<code>null</code> permitted).
    * 
-   * @return The value.
+   * @return The value (possibly <code>null</code>).
+   * 
+   * @throws ClassCastException if <code>key</code> is not a {@link Key}.
+   * 
+   * @see #containsKey(Object)
    */
   public Object get(Object key)
   {
+    // don't remove the cast, it is necessary to throw the required exception
     return hintMap.get((Key) key);
   }
 

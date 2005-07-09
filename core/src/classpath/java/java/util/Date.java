@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -41,6 +41,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 /**
  * <p>
@@ -240,8 +242,8 @@ public class Date
    *             <code>TimeZone</code> instead.
    * @param year the difference between the required year and 1900.
    * @param month the month as a value between 0 and 11.
-   * @param day the day as a value between 0 and 31.
-   * @param hour the hour as a value between 0 and 23, in 24-hour
+   * @param date the day as a value between 0 and 31.
+   * @param hrs the hour as a value between 0 and 23, in 24-hour
    *        clock notation.
    * @param min the minute as a value between 0 and 59.
    * @param sec the second as a value between 0 and 61 (with 60
@@ -718,7 +720,7 @@ public class Date
    * </li>
    * </ul>
    *
-   * @param s The String to parse.
+   * @param string The String to parse.
    * @return The time in milliseconds since the epoch.
    * @throws IllegalArgumentException if the string fails to parse.
    * @deprecated Use DateFormat.parse(String)

@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -3502,9 +3502,9 @@ public abstract class Component
 	/**
    * Sets the focus traversal keys for one of the three focus
    * traversal directions supported by Components:
-   * {@link #KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS},
-   * {@link #KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS}, or
-   * {@link #KeyboardFocusManager.UP_CYCLE_TRAVERSAL_KEYS}. Normally, the
+   * {@link KeyboardFocusManager#FORWARD_TRAVERSAL_KEYS},
+   * {@link KeyboardFocusManager#BACKWARD_TRAVERSAL_KEYS}, or
+   * {@link KeyboardFocusManager#UP_CYCLE_TRAVERSAL_KEYS}. Normally, the
    * default values should match the operating system's native
    * choices. To disable a given traversal, use
    * <code>Collections.EMPTY_SET</code>. The event dispatcher will
