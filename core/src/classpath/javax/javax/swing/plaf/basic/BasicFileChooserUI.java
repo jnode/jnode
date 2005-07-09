@@ -152,7 +152,8 @@ public class BasicFileChooserUI extends FileChooserUI
         {
 	  File f = filechooser.getFileSystemView().createFileObject(obj
 	                                                            .toString());
-	  if (filechooser.isTraversable(f))
+	  if (filechooser.isTraversable(f) && 
+              filechooser.getFileSelectionMode() == JFileChooser.FILES_ONLY)
 	    filechooser.setCurrentDirectory(f);
 	  else
 	    {

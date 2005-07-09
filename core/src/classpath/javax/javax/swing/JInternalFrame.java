@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -430,8 +430,19 @@ public class JInternalFrame extends JComponent implements Accessible,
   /** Whether the JInternalFrame can be maximized. */
   protected boolean maximizable;
 
-  /** Whether the JInternalFrame has rootPaneChecking enabled. */
-  protected boolean rootPaneCheckingEnabled = true;
+  /**
+   * Whether the JInternalFrame has rootPaneChecking enabled.
+   *
+   * @specnote Should be false to comply with J2SE 5.0
+   */
+  protected boolean rootPaneCheckingEnabled = false;
+
+  /**
+   * Tells us if we're in the initialization stage.
+   * If so, adds go to top-level Container, otherwise they go
+   * to the content pane for this container.
+   */
+  private boolean initStageDone = false;
 
   /** Whether the JInternalFrame is resizable. */
   protected boolean resizable;
