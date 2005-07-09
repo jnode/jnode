@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -339,17 +339,23 @@ public class JMenu extends JMenuItem implements Accessible, MenuElement
 	 */
   public void setSelected(boolean selected)
   {
-    // if this menu selection is true, then activate this menu and 
-    // display popup associated with this menu	
-    if (selected)
+    // If menu is selected and enabled, activates the menu and 
+    // displays associated popup.	
+    if (selected && isEnabled())
       {
     super.setArmed(true);
 	super.setSelected(true);
 
+	// FIXME: The reference implementation behaves different here. When
+	// calling setSelected(true) it will *not* open the popup but appear
+	// selected. This is even true when the menu is disabled. Our
+	// implementation will always open the popup (when enabled) and 
+	// will not appear selected when disabled.
+
 	// FIXME: The popup menu should be shown on the screen after certain
 	// number of seconds pass. The 'delay' property of this menu indicates
 	// this amount of seconds. 'delay' property is 0 by default.
-	if (this.isShowing())
+	if (isShowing())
 	  {
     fireMenuSelected();
 
@@ -893,4 +899,5 @@ public class JMenu extends JMenuItem implements Accessible, MenuElement
       // FIXME: Need to implement
     }
   }
+
 }

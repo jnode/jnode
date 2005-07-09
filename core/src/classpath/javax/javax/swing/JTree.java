@@ -1,40 +1,36 @@
-/* JTree.java -- 
-   Copyright (C) 2002, 2004, 2005  Free Software Foundation, Inc.
-
-This file is part of GNU Classpath.
-
-GNU Classpath is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2, or (at your option)
-any later version.
-
-GNU Classpath is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
-
-Linking this library statically or dynamically with other modules is
-making a combined work based on this library.  Thus, the terms and
-conditions of the GNU General Public License cover the whole
-combination.
-
-As a special exception, the copyright holders of this library give you
-permission to link this library with independent modules to produce an
-executable, regardless of the license terms of these independent
-modules, and to copy and distribute the resulting executable under
-terms of your choice, provided that you also meet, for each linked
-independent module, the terms and conditions of the license of that
-module.  An independent module is a module which is not derived from
-or based on this library.  If you modify this library, you may extend
-this exception to your version of the library, but you are not
-obligated to do so.  If you do not wish to do so, delete this
-exception statement from your version. */
-
+/*
+ * JTree.java -- Copyright (C) 2002, 2004, 2005 Free Software Foundation, Inc.
+ * 
+ * This file is part of GNU Classpath.
+ * 
+ * GNU Classpath is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2, or (at your option) any later version.
+ * 
+ * GNU Classpath is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * GNU Classpath; see the file COPYING. If not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Linking this library statically or dynamically with other modules is making a
+ * combined work based on this library. Thus, the terms and conditions of the
+ * GNU General Public License cover the whole combination.
+ * 
+ * As a special exception, the copyright holders of this library give you
+ * permission to link this library with independent modules to produce an
+ * executable, regardless of the license terms of these independent modules, and
+ * to copy and distribute the resulting executable under terms of your choice,
+ * provided that you also meet, for each linked independent module, the terms
+ * and conditions of the license of that module. An independent module is a
+ * module which is not derived from or based on this library. If you modify this
+ * library, you may extend this exception to your version of the library, but
+ * you are not obligated to do so. If you do not wish to do so, delete this
+ * exception statement from your version.
+ */
 
 package javax.swing;
 
@@ -69,8 +65,8 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-
-public class JTree extends JComponent
+public class JTree
+		extends	JComponent
   implements Scrollable, Accessible
 {
   /**
@@ -78,7 +74,8 @@ public class JTree extends JComponent
    * <code>expandedState</code> if nodes are removed or changed.
    */
   protected class TreeModelHandler
-    implements TreeModelListener
+			implements
+			TreeModelListener
   {
 
     /**
@@ -144,13 +141,15 @@ public class JTree extends JComponent
   } // TreeModelHandler
 
   /**
-   * This redirects TreeSelectionEvents and rewrites the source of it
-   * to be this JTree. This is typically done when the tree model
-   * generates an event, but the JTree object associated with that model
-   * should be listed as the actual source of the event.
+	 * This redirects TreeSelectionEvents and rewrites the source of it to be
+	 * this JTree. This is typically done when the tree model generates an
+	 * event, but the JTree object associated with that model should be listed
+	 * as the actual source of the event.
    */
   protected class TreeSelectionRedirector
-    implements TreeSelectionListener, Serializable
+			implements
+			TreeSelectionListener,
+			Serializable
   {
     /** The serial version UID. */
     private static final long serialVersionUID = -3505069663646241664L;
@@ -169,9 +168,10 @@ public class JTree extends JComponent
      */
     public void valueChanged(TreeSelectionEvent ev)
     {
-      TreeSelectionEvent rewritten =
-        (TreeSelectionEvent) ev.cloneWithSource(JTree.this);
+			TreeSelectionEvent rewritten = (TreeSelectionEvent) ev
+					.cloneWithSource(JTree.this);
       fireValueChanged(rewritten);
+			JTree.this.repaint();
     }
   } // TreeSelectionRedirector
 
@@ -179,7 +179,8 @@ public class JTree extends JComponent
    * A TreeModel that does not allow anything to be selected.
    */
   protected static class EmptySelectionModel
-    extends DefaultTreeSelectionModel
+			extends
+				DefaultTreeSelectionModel
   {
     /** The serial version UID. */
     private static final long serialVersionUID = -5815023306225701477L;
@@ -187,8 +188,7 @@ public class JTree extends JComponent
     /**
      * The shared instance of this model.
      */
-    protected static final EmptySelectionModel sharedInstance =
-    new EmptySelectionModel();
+		protected static final EmptySelectionModel sharedInstance = new EmptySelectionModel();
 
     /**
      * Creates a new instance of EmptySelectionModel.
@@ -208,8 +208,7 @@ public class JTree extends JComponent
     }
 
     /**
-     * This catches attempts to set a selection and sets nothing
-     * instead.
+		 * This catches attempts to set a selection and sets nothing instead.
      *
      * @param paths not used here
      */
@@ -240,7 +239,6 @@ public class JTree extends JComponent
   }// EmptySelectionModel
 
   private static final long serialVersionUID = 7559816092864483649L;
-
   public static final String CELL_EDITOR_PROPERTY = "cellEditor";
   public static final String CELL_RENDERER_PROPERTY = "cellRenderer";
   public static final String EDITABLE_PROPERTY = "editable";
@@ -257,14 +255,14 @@ public class JTree extends JComponent
 
   /** @since 1.3 */
   public static final String ANCHOR_SELECTION_PATH_PROPERTY = "anchorSelectionPath";
+
   /** @since 1.3 */
   public static final String LEAD_SELECTION_PATH_PROPERTY = "leadSelectionPath";
+
   /** @since 1.3 */
   public static final String EXPANDS_SELECTED_PATHS_PROPERTY = "expandsSelectedPaths";
-
   private static final Object EXPANDED = new Object();
   private static final Object COLLAPSED = new Object();
-  
   private boolean dragEnabled;
   private boolean expandsSelectedPaths;
   private TreePath anchorSelectionPath;
@@ -275,8 +273,7 @@ public class JTree extends JComponent
    * TreePath of a note to to its state. Valid states are EXPANDED and
    * COLLAPSED.  Nodes not in this Hashtable are assumed state COLLAPSED.
    */
-  private Hashtable nodeStates;
-
+	private Hashtable nodeStates = new Hashtable();
   protected transient TreeCellEditor cellEditor;
   protected transient TreeCellRenderer cellRenderer;
   protected boolean editable;
@@ -358,8 +355,9 @@ public class JTree extends JComponent
    * Creates a new <code>JTree</code> object.
    *
    * @param root the root node
-   * @param asksAllowChildren if false, all nodes without children are leaf nodes.
-   * If true, only nodes that do not allow children are leaf nodes.
+	 * @param asksAllowChildren if false, all nodes without children are leaf
+	 *        nodes. If true, only nodes that do not allow children are leaf
+	 *        nodes.
    */
   public JTree(TreeNode root, boolean asksAllowChildren)
   {
@@ -377,19 +375,19 @@ public class JTree extends JComponent
   }
 
   public static class DynamicUtilTreeNode 
-    extends DefaultMutableTreeNode
+			extends
+				DefaultMutableTreeNode
   {
     protected Object childValue;
     protected boolean loadedChildren;
 
     /**
-     * Currently not set or used by this class.
-     * It might be set and used in later versions of this class.
+		 * Currently not set or used by this class. It might be set and used in
+		 * later versions of this class.
      */
     protected boolean hasChildren;
     
-    public DynamicUtilTreeNode(Object value,
-                               Object children) 
+		public DynamicUtilTreeNode(Object value, Object children)
     {
       super(value);
       childValue = children;
@@ -418,8 +416,8 @@ public class JTree extends JComponent
     }
 
     /**
-     * Returns the child node at position <code>pos</code>. Subclassed here
-     * to load the children if necessary.
+		 * Returns the child node at position <code>pos</code>. Subclassed
+		 * here to load the children if necessary.
      *
      * @param pos the position of the child node to fetch
      *
@@ -433,10 +431,9 @@ public class JTree extends JComponent
 
     public boolean isLeaf() 
     {
-      return (childValue == null || 
-              !(childValue instanceof Hashtable
-               || childValue instanceof Vector
-               || childValue.getClass().isArray()));
+			return (childValue == null || !(childValue instanceof Hashtable
+					|| childValue instanceof Vector || childValue.getClass()
+					.isArray()));
     }
 
     public static void createChildren(DefaultMutableTreeNode parent,
@@ -452,17 +449,15 @@ public class JTree extends JComponent
               Object val = tab.get(key);
               parent.add(new DynamicUtilTreeNode(key, val));
             }
-        }
-      else if (children instanceof Vector)
+			} else if (children instanceof Vector)
         {
-          Iterator i = ((Vector)children).iterator();
+				Iterator i = ((Vector) children).iterator();
           while (i.hasNext())
             {
               Object n = i.next();
-              parent.add(new DynamicUtilTreeNode(n,n));
+					parent.add(new DynamicUtilTreeNode(n, n));
             }
-        }
-      else if (children.getClass().isArray())
+			} else if (children != null && children.getClass().isArray())
         {
           Object[] arr = (Object[]) children;
           for (int i = 0; i < arr.length; ++i)
@@ -555,7 +550,8 @@ public class JTree extends JComponent
     }
 
   /**
-   * Gets the AccessibleContext associated with this <code>JToggleButton</code>.
+	 * Gets the AccessibleContext associated with this
+	 * <code>JToggleButton</code>.
    *
    * @return the associated context
    */
@@ -681,7 +677,8 @@ public class JTree extends JComponent
    */
   public TreeSelectionListener[] getTreeSelectionListeners()
   {
-    return (TreeSelectionListener[]) getListeners(TreeSelectionListener.class);
+		return (TreeSelectionListener[]) 
+					getListeners(TreeSelectionListener.class);
   }
 
   /**
@@ -724,7 +721,8 @@ public class JTree extends JComponent
    */
   public TreeWillExpandListener[] getTreeWillExpandListeners()
   {
-    return (TreeWillExpandListener[]) getListeners(TreeWillExpandListener.class);
+		return (TreeWillExpandListener[]) 
+					getListeners(TreeWillExpandListener.class);
   }
 
   /**
@@ -732,8 +730,7 @@ public class JTree extends JComponent
    *
    * @param path the path to the node that will collapse
    */
-  public void fireTreeWillCollapse(TreePath path)
-    throws ExpandVetoException
+	public void fireTreeWillCollapse(TreePath path) throws ExpandVetoException
   {
     TreeExpansionEvent event = new TreeExpansionEvent(this, path);
     TreeWillExpandListener[] listeners = getTreeWillExpandListeners();
@@ -747,8 +744,7 @@ public class JTree extends JComponent
    *
    * @param path the path to the node that will expand
    */
-  public void fireTreeWillExpand(TreePath path)
-    throws ExpandVetoException
+	public void fireTreeWillExpand(TreePath path) throws ExpandVetoException
   {
     TreeExpansionEvent event = new TreeExpansionEvent(this, path);
     TreeWillExpandListener[] listeners = getTreeWillExpandListeners();
@@ -779,6 +775,7 @@ public class JTree extends JComponent
 
     TreeModel oldValue = treeModel;
     treeModel = model;
+
     firePropertyChange(TREE_MODEL_PROPERTY, oldValue, model);
 
     // add treeModelListener to the new model
@@ -852,6 +849,7 @@ public class JTree extends JComponent
 
   public TreeCellEditor getCellEditor()
   {
+
     return cellEditor;
   }
 
@@ -890,9 +888,18 @@ public class JTree extends JComponent
     if (selectionModel == model)
       return;
     
+		if (selectionModel != null)
+			selectionModel.removeTreeSelectionListener(selectionRedirector);
+
     TreeSelectionModel oldValue = selectionModel;
     selectionModel = model;
+
+		if (selectionModel != null)
+			selectionModel.addTreeSelectionListener(selectionRedirector);
+
     firePropertyChange(SELECTION_MODEL_PROPERTY, oldValue, model);
+		revalidate();
+		repaint();
   }
 
   public int getVisibleRowCount()
@@ -927,6 +934,7 @@ public class JTree extends JComponent
 
   public int getRowHeight()
   {
+
     return rowHeight;
   }
 
@@ -957,7 +965,8 @@ public class JTree extends JComponent
 
     boolean oldValue = invokesStopCellEditing;
     invokesStopCellEditing = invoke;
-    firePropertyChange(INVOKES_STOP_CELL_EDITING_PROPERTY, oldValue, invoke);
+		firePropertyChange(INVOKES_STOP_CELL_EDITING_PROPERTY, 
+												oldValue, invoke);
   }
 
   /**
@@ -1114,7 +1123,6 @@ public class JTree extends JComponent
 
   public void removeSelectionRows(int[] rows)
   {
-    // Make sure we have an UI so getPathForRow() does not return null.
     if (rows == null || getUI() == null)
       return;
 
@@ -1220,7 +1228,7 @@ public class JTree extends JComponent
 
   public boolean isRowSelected(int row)
   {
-    return selectionModel.isRowSelected(row);
+		return selectionModel.isPathSelected(getPathForRow(row));
   }
 
   public boolean isSelectionEmpty()
@@ -1249,6 +1257,7 @@ public class JTree extends JComponent
    */
   public void setDragEnabled(boolean enabled)
   {
+
     dragEnabled = enabled;
   }
 
@@ -1281,8 +1290,7 @@ public class JTree extends JComponent
   public void expandPath(TreePath path)
   {
     // Don't expand if last path component is a leaf node.
-    if ((path == null)
-        || (treeModel.isLeaf(path.getLastPathComponent())))
+		if ((path == null) || (treeModel.isLeaf(path.getLastPathComponent())))
       return;
 
     setExpandedState(path, true);
@@ -1301,7 +1309,7 @@ public class JTree extends JComponent
 
   public boolean isCollapsed(TreePath path)
   {
-    return ! isExpanded(path);
+		return !isExpanded(path);
   }
 
   public boolean isCollapsed(int row)
@@ -1490,9 +1498,9 @@ public class JTree extends JComponent
     return null;
   }
 
-  private void checkExpandParents(TreePath path)
-    throws ExpandVetoException
+	private void checkExpandParents(TreePath path) throws ExpandVetoException
   {
+
     TreePath parent = path.getParentPath();
 
     if (parent != null)
@@ -1506,7 +1514,10 @@ public class JTree extends JComponent
     TreePath parent = path.getParentPath();
 
     if (isExpanded(parent))
+		{
+			nodeStates.put(path, state ? EXPANDED : COLLAPSED);
       return;
+		}
     
     if (parent != null)
       doExpandParents(parent, false);
@@ -1523,7 +1534,7 @@ public class JTree extends JComponent
 
     try
       {
-	while (parent != null)
+			if (parent != null)
 	  checkExpandParents(parent);
       }
     catch (ExpandVetoException e)
@@ -1604,32 +1615,35 @@ public class JTree extends JComponent
   }
 
   /**
-   * Returns a sample TreeModel that can be used in a JTree. This can
-   * be used in Bean- or GUI-Builders to show something interesting.
+	 * Returns a sample TreeModel that can be used in a JTree. This can be used
+	 * in Bean- or GUI-Builders to show something interesting.
    *
    * @return a sample TreeModel that can be used in a JTree
    */
   protected static TreeModel getDefaultTreeModel()
   {
     DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root node");
-    DefaultMutableTreeNode child1 = new DefaultMutableTreeNode("Child node 1");
-    DefaultMutableTreeNode child11 =
-      new DefaultMutableTreeNode("Child node 1.1");
-    DefaultMutableTreeNode child12 =
-      new DefaultMutableTreeNode("Child node 1.2");
-    DefaultMutableTreeNode child13 =
-      new DefaultMutableTreeNode("Child node 1.3");
-    DefaultMutableTreeNode child2 = new DefaultMutableTreeNode("Child node 2");
-    DefaultMutableTreeNode child21 =
-      new DefaultMutableTreeNode("Child node 2.1");
-    DefaultMutableTreeNode child22 =
-      new DefaultMutableTreeNode("Child node 2.2");
-    DefaultMutableTreeNode child23 =
-      new DefaultMutableTreeNode("Child node 2.3");
-    DefaultMutableTreeNode child24 =
-      new DefaultMutableTreeNode("Child node 2.4");
+		DefaultMutableTreeNode child1 = new DefaultMutableTreeNode(
+				"Child node 1");
+		DefaultMutableTreeNode child11 = new DefaultMutableTreeNode(
+				"Child node 1.1");
+		DefaultMutableTreeNode child12 = new DefaultMutableTreeNode(
+				"Child node 1.2");
+		DefaultMutableTreeNode child13 = new DefaultMutableTreeNode(
+				"Child node 1.3");
+		DefaultMutableTreeNode child2 = new DefaultMutableTreeNode(
+				"Child node 2");
+		DefaultMutableTreeNode child21 = new DefaultMutableTreeNode(
+				"Child node 2.1");
+		DefaultMutableTreeNode child22 = new DefaultMutableTreeNode(
+				"Child node 2.2");
+		DefaultMutableTreeNode child23 = new DefaultMutableTreeNode(
+				"Child node 2.3");
+		DefaultMutableTreeNode child24 = new DefaultMutableTreeNode(
+				"Child node 2.4");
 
-    DefaultMutableTreeNode child3 = new DefaultMutableTreeNode("Child node 3");
+		DefaultMutableTreeNode child3 = new DefaultMutableTreeNode(
+				"Child node 3");
     root.add(child1);
     root.add(child2);
     root.add(child3);
@@ -1644,12 +1658,12 @@ public class JTree extends JComponent
   }
 
   /**
-   * Converts the specified value to a String. This is used by the
-   * renderers of this JTree and its nodes.
+	 * Converts the specified value to a String. This is used by the renderers
+	 * of this JTree and its nodes.
    *
    * This implementation simply returns <code>value.toString()</code> and
-   * ignores all other parameters.
-   * Subclass this method to control the conversion.
+	 * ignores all other parameters. Subclass this method to control the
+	 * conversion.
    *
    * @param value the value that is converted to a String
    * @param selected indicates if that value is selected or not
@@ -1659,15 +1673,14 @@ public class JTree extends JComponent
    * @param hasFocus indicates if that node has focus or not
    */
   public String convertValueToText(Object value, boolean selected,
-                                   boolean expanded, boolean leaf, int row,
-                                   boolean hasFocus)
+			boolean expanded, boolean leaf, int row, boolean hasFocus)
   {
     return value.toString();
   }
 
   /**
-   * A String representation of this JTree. This is intended to be used
-   * for debugging. The returned string may be empty but may not be
+	 * A String representation of this JTree. This is intended to be used for
+	 * debugging. The returned string may be empty but may not be
    * <code>null</code>.
    *
    * @return a String representation of this JTree
@@ -1681,10 +1694,9 @@ public class JTree extends JComponent
   }
 
   /**
-   * Returns all TreePath objects which are a descendants of 
-   * the given path and are exapanded at the moment of the
-   * execution of this method. If the state of any node 
-   * is beeing toggled while this method is executing this 
+	 * Returns all TreePath objects which are a descendants of the given path
+	 * and are exapanded at the moment of the execution of this method. If the
+	 * state of any node is beeing toggled while this method is executing this
    * change may be left unaccounted.
    *  
    * @param path The parent of this request
@@ -1694,11 +1706,11 @@ public class JTree extends JComponent
   {
     Enumeration paths = nodeStates.keys();
     Vector relevantPaths = new Vector();
-    while(paths.hasMoreElements())
+		while (paths.hasMoreElements())
       {
         TreePath nextPath = (TreePath) paths.nextElement();
-        if(nodeStates.get(nextPath) == EXPANDED && 
-           path.isDescendant(nextPath)) 
+			if (nodeStates.get(nextPath) == EXPANDED
+					&& path.isDescendant(nextPath))
           {
             relevantPaths.add(nextPath);
           }
@@ -1708,17 +1720,16 @@ public class JTree extends JComponent
 
   /**
    * Returns the next table element (beginning from the row
-   * <code>startingRow</code>
-   * that starts with <code>prefix</code>. Searching is done in the direction
-   * specified by <code>bias</code>.
+	 * <code>startingRow</code> that starts with <code>prefix</code>.
+	 * Searching is done in the direction specified by <code>bias</code>.
    *
    * @param prefix the prefix to search for in the cell values
    * @param startingRow the index of the row where to start searching from
-   * @param bias the search direction, either {@link Position.Bias.Forward}
-   *     or {@link Position.Bias.Backward}
+	 * @param bias the search direction, either {@link Position.Bias.Forward} or
+	 *        {@link Position.Bias.Backward}
    *
-   * @return the path to the found element or -1 if no such element has
-   *     been found
+	 * @return the path to the found element or -1 if no such element has been
+	 *         found
    *
    * @throws IllegalArgumentException if prefix is <code>null</code> or
    *     startingRow is not valid
@@ -1729,15 +1740,17 @@ public class JTree extends JComponent
                                Position.Bias bias)
   {
     if (prefix == null)
-      throw new IllegalArgumentException("The argument 'prefix' must not be"
-                                         + " null.");
+			throw new IllegalArgumentException(
+					"The argument 'prefix' must not be" + " null.");
     if (startingRow < 0)
-      throw new IllegalArgumentException("The argument 'startingRow' must not"
+			throw new IllegalArgumentException(
+					"The argument 'startingRow' must not"
                                          + " be less than zero.");
 
     int size = getRowCount();
     if (startingRow > size)
-      throw new IllegalArgumentException("The argument 'startingRow' must not"
+			throw new IllegalArgumentException(
+					"The argument 'startingRow' must not"
                                          + " be greater than the number of"
                                          + " elements in the TreeModel.");
 
@@ -1751,16 +1764,14 @@ public class JTree extends JComponent
             // FIXME: in the following call to convertValueToText the
             // last argument (hasFocus) should be done right.
             String item = convertValueToText(o, isRowSelected(i),
-                                             isExpanded(i),
-                                             treeModel.isLeaf(o), i, false);
+						isExpanded(i), treeModel.isLeaf(o), i, false);
             if (item.startsWith(prefix))
               {
                 foundPath = path;
                 break;
               }
           }
-      }
-    else
+		} else
       {
         for (int i = startingRow; i >= 0; i--)
           {
@@ -1769,8 +1780,7 @@ public class JTree extends JComponent
             // FIXME: in the following call to convertValueToText the
             // last argument (hasFocus) should be done right.
             String item = convertValueToText(o, isRowSelected(i),
-                                             isExpanded(i),
-                                             treeModel.isLeaf(o), i, false);
+						isExpanded(i), treeModel.isLeaf(o), i, false);
             if (item.startsWith(prefix))
               {
                 foundPath = path;
@@ -1783,14 +1793,13 @@ public class JTree extends JComponent
 
   /**
    * Removes any paths in the current set of selected paths that are
-   * descendants of <code>path</code>. If <code>includePath</code> is
-   * set to <code>true</code> and <code>path</code> itself is selected,
-   * then it will be removed too.
-   *
-   * @param path the path from which selected descendants are to be
-   *     removed
-   * @param includePath if <code>true</code> then <code>path</code>
-   *     itself will also be remove if it's selected
+	 * descendants of <code>path</code>. If <code>includePath</code> is set
+	 * to <code>true</code> and <code>path</code> itself is selected, then
+	 * it will be removed too.
+	 * 
+	 * @param path the path from which selected descendants are to be removed
+	 * @param includePath if <code>true</code> then <code>path</code> itself
+	 *        will also be remove if it's selected
    *
    * @return <code>true</code> if something has been removed,
    *     <code>false</code> otherwise

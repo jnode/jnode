@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -47,6 +47,7 @@ import java.awt.LayoutManager2;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 
 import gnu.java.awt.AWTUtilities;
@@ -404,16 +405,16 @@ public class BoxLayout implements LayoutManager2, Serializable
     int x = 0;
     int y = 0;
 
-    Component[] children = AWTUtilities.getVisibleChildren(parent);
+    List children = AWTUtilities.getVisibleChildren(parent);
 
     if (isHorizontalIn(parent))
       {        
         x = insets.left + insets.right;
         // sum up preferred widths of components, find maximum of preferred
         // heights
-        for (int index = 0; index < children.length; index++)
+        for (Iterator i = children.iterator(); i.hasNext();)
           {
-            Component comp = children[index];
+            Component comp = (Component) i.next();
             Dimension sz = comp.getPreferredSize();
             x += sz.width;
             y = Math.max(y, sz.height);
@@ -425,9 +426,9 @@ public class BoxLayout implements LayoutManager2, Serializable
         y = insets.top + insets.bottom;
         // sum up preferred heights of components, find maximum of
         //  preferred widths
-        for (int index = 0; index < children.length; index++)
+        for (Iterator i = children.iterator(); i.hasNext();)
           {
-            Component comp = children[index];
+            Component comp = (Component) i.next();
             Dimension sz = comp.getPreferredSize();
             y += sz.height;
             x = Math.max(x, sz.width);
@@ -454,15 +455,15 @@ public class BoxLayout implements LayoutManager2, Serializable
     int x = insets.left + insets.right;
     int y = insets.bottom + insets.top;
 
-    Component[] children = AWTUtilities.getVisibleChildren(parent);
+    List children = AWTUtilities.getVisibleChildren(parent);
 
     if (isHorizontalIn(parent))
       {
         // sum up preferred widths of components, find maximum of preferred
         // heights
-        for (int index = 0; index < children.length; index++)
+        for (Iterator i = children.iterator(); i.hasNext();)
           {
-            Component comp = children[index];
+	    Component comp = (Component) i.next();
             Dimension sz = comp.getMinimumSize();
             x += sz.width;
             y = Math.max(y, sz.height);
@@ -472,9 +473,9 @@ public class BoxLayout implements LayoutManager2, Serializable
       {
         // sum up preferred heights of components, find maximum of
         //  preferred widths
-        for (int index = 0; index < children.length; index++)
+        for (Iterator i = children.iterator(); i.hasNext();)
           {
-            Component comp = children[index];
+	    Component comp = (Component) i.next();
             Dimension sz = comp.getMinimumSize();
             y += sz.height;
             x = Math.max(x, sz.width);
@@ -565,16 +566,16 @@ public class BoxLayout implements LayoutManager2, Serializable
     int x = insets.left + insets.right;
     int y = insets.top + insets.bottom;
 
-    Component[] children = AWTUtilities.getVisibleChildren(parent);
+    List children = AWTUtilities.getVisibleChildren(parent);
 
     if (isHorizontalIn(parent))
       {
         
         // sum up preferred widths of components, find maximum of preferred
         // heights
-        for (int index = 0; index < children.length; index++)
+        for (Iterator i = children.iterator(); i.hasNext();)
           {
-            Component comp = children[index];
+            Component comp = (Component) i.next();
             Dimension sz = comp.getMaximumSize();
             x += sz.width;
             // Check for overflow.
@@ -587,9 +588,9 @@ public class BoxLayout implements LayoutManager2, Serializable
       {
         // sum up preferred heights of components, find maximum of
         //  preferred widths
-        for (int index = 0; index < children.length; index++)
+        for (Iterator i = children.iterator(); i.hasNext();)
           {
-            Component comp = children[index];
+            Component comp = (Component) i.next();
             Dimension sz = comp.getMaximumSize();
             y += sz.height;
             // Check for overflow
@@ -624,12 +625,12 @@ public class BoxLayout implements LayoutManager2, Serializable
     // Set all components to their preferredSizes and sum up the allocated
     // space. Create SizeReqs for each component and store them in
     // sizeReqs. Find the maximum size in the crossing direction.
-    Component[] children = AWTUtilities.getVisibleChildren(parent);
+    List children = AWTUtilities.getVisibleChildren(parent);
     Vector sizeReqs = new Vector();
     int allocated = 0;
-    for (int i = 0; i < children.length; i++)
+    for (Iterator i = children.iterator(); i.hasNext();)
       {
-	Component c = children[i];
+	Component c = (Component) i.next();
 	SizeReq sizeReq = new SizeReq(c, layoutDir);
 	int preferred = layoutDir.size(c.getPreferredSize());
 	sizeReq.size = preferred;

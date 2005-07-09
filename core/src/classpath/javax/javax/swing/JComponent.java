@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -807,8 +807,7 @@ public abstract class JComponent extends Container implements Serializable
 	}
 
   /**
-   * Set the value of the {@link #border} property, revalidate
-   * and repaint this component.
+   * Set the value of the {@link #border} property.
    *   
    * @param newBorder The new value of the property
    *
@@ -819,8 +818,6 @@ public abstract class JComponent extends Container implements Serializable
     Border oldBorder = border;
     border = newBorder;
     firePropertyChange("border", oldBorder, newBorder);
-		revalidate();
-		repaint();
 	}
 
   /**
@@ -872,20 +869,10 @@ public abstract class JComponent extends Container implements Serializable
    */
 	protected  Graphics getComponentGraphics(Graphics g)
   {    
-    if (g instanceof Graphics2D)
-      {
        g.setFont (this.getFont());
        g.setColor (this.getForeground());
        return g;
       }
-    else
-      {
-        Graphics g2 = g.create ();
-        g2.setFont (this.getFont());
-        g2.setColor (this.getForeground());
-    return g2;
-  }
-  }
 
   /**
    * Get the value of the {@link #debugGraphicsOptions} property.
@@ -1510,7 +1497,14 @@ public abstract class JComponent extends Container implements Serializable
 	protected  void paintComponent(Graphics g)
 	{
 		if (ui != null)
-      ui.update(g, this);
+      {
+        Graphics g2 = g;
+        if (!(g instanceof Graphics2D))
+          g2 = g.create();
+        ui.update(getComponentGraphics(g2), this);
+        if (!(g instanceof Graphics2D))
+          g2.dispose();
+      }
 	}
     
     /**
@@ -1992,8 +1986,7 @@ public abstract class JComponent extends Container implements Serializable
 	}
 
   /**
-   * Set the value of the {@link #enabled} property, revalidate
-   * and repaint this component.
+   * Set the value of the {@link #enabled} property.
    *
    * @param enable The new value of the property
    */
@@ -2001,53 +1994,41 @@ public abstract class JComponent extends Container implements Serializable
 	{
     boolean oldEnabled = isEnabled();
     super.setEnabled(enable);
-    firePropertyChange("enabeld", oldEnabled, enable);
-    revalidate();
-		repaint();
+    firePropertyChange("enabled", oldEnabled, enable);
 	}
 
   /**
-   * Set the value of the {@link #font} property, revalidate
-   * and repaint this component.
+   * Set the value of the {@link #font} property.
    *
    * @param f The new value of the property
    */
   public void setFont(Font f)
 	{
     super.setFont(f);
-		revalidate();
-		repaint();
 	}
 
   /**
-   * Set the value of the {@link #background} property, revalidate
-   * and repaint this component.
+   * Set the value of the {@link #background} property.
    *
    * @param bg The new value of the property
    */
 	public void setBackground(Color bg)
 	{
 		super.setBackground(bg);
-		revalidate();
-		repaint();
 	}
 
   /**
-   * Set the value of the {@link #foreground} property, revalidate
-   * and repaint this component.
+   * Set the value of the {@link #foreground} property.
    *
    * @param fg The new value of the property
    */
 	public void setForeground(Color fg)
 	{
 		super.setForeground(fg);
-		revalidate();
-		repaint();
 	}
 
   /**
-   * Set the value of the {@link #maximumSize} property, revalidate
-   * and repaint this component.
+   * Set the value of the {@link #maximumSize} property.
    *
    * @param max The new value of the property
    */
@@ -2056,13 +2037,10 @@ public abstract class JComponent extends Container implements Serializable
     Dimension oldMaximumSize = maximumSize;
     maximumSize = max;
     firePropertyChange("maximumSize", oldMaximumSize, maximumSize);
-    revalidate();
-    repaint();
 	}
 
   /**
-   * Set the value of the {@link #minimumSize} property, revalidate
-   * and repaint this component.
+   * Set the value of the {@link #minimumSize} property.
    *
    * @param min The new value of the property
    */
@@ -2071,13 +2049,10 @@ public abstract class JComponent extends Container implements Serializable
     Dimension oldMinimumSize = minimumSize;
     minimumSize = min;
     firePropertyChange("minimumSize", oldMinimumSize, minimumSize);
-		revalidate();
-		repaint();
   }
 
   /**
-   * Set the value of the {@link #preferredSize} property, revalidate
-   * and repaint this component.
+   * Set the value of the {@link #preferredSize} property.
    *
    * @param pref The new value of the property
    */
@@ -2143,8 +2118,7 @@ public abstract class JComponent extends Container implements Serializable
   }
 
   /**
-   * Set the value of the {@link #opaque} property, revalidate and repaint
-   * this component.
+   * Set the value of the {@link #opaque} property.
    *
    * @param isOpaque The new value of the property
    *
@@ -2158,16 +2132,13 @@ public abstract class JComponent extends Container implements Serializable
 	}
 
   /**
-   * Set the value of the visible property, and revalidate / repaint the
-   * component.
+   * Set the value of the visible property.
    *
    * @param v The new value of the property
    */
   public void setVisible(boolean v)
   {
     super.setVisible(v);
-    revalidate();
-    repaint();
   }
 
   /**
@@ -2221,8 +2192,6 @@ public abstract class JComponent extends Container implements Serializable
 
     firePropertyChange("UI", oldUI, newUI);
     
-		revalidate();
-		repaint();
 	}
 
   /**

@@ -22,8 +22,10 @@
 package org.jnode.awt;
 
 import gnu.java.awt.ClasspathToolkit;
+import gnu.java.awt.EmbeddedWindow;
 import gnu.java.awt.peer.ClasspathFontPeer;
 import gnu.java.awt.peer.ClasspathTextLayoutPeer;
+import gnu.java.awt.peer.EmbeddedWindowPeer;
 import gnu.java.security.action.GetPropertyAction;
 import org.apache.log4j.Logger;
 import org.jnode.awt.font.FontManager;
@@ -100,6 +102,15 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	}
 
 	/**
+     * @see gnu.java.awt.ClasspathToolkit#createEmbeddedWindow(gnu.java.awt.EmbeddedWindow)
+     */
+    @Override
+    public EmbeddedWindowPeer createEmbeddedWindow(EmbeddedWindow w) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /**
 	 * Gets the default toolkit casted to JNodeToolkit.
 	 * 
 	 * @throws AWTError
