@@ -298,19 +298,27 @@ class X86StackFrame implements X86CompilerConstants {
 	 * @param index
 	 * @return int
 	 */
-	public final int getEbpOffset(TypeSizeInfo typeSizeInfo, int index) {
+	public final short getEbpOffset(TypeSizeInfo typeSizeInfo, int index) {
 		final int noArgs = method.getArgSlotCount();
 		final int stackSlot = index;
 //        final int stackSlot = Signature.getStackSlotForJavaArgNumber(typeSizeInfo, method, index);
 		if (stackSlot < noArgs) {
 			// Index refers to a method argument
-			return ((noArgs - stackSlot + 1) * slotSize) + EbpFrameRefOffset
-					+ SAVED_REGISTERSPACE;
+			return toShort(((noArgs - stackSlot + 1) * slotSize) + EbpFrameRefOffset
+					+ SAVED_REGISTERSPACE);
 		} else {
 			// Index refers to a local variable
-			return (stackSlot - noArgs + 1) * -slotSize;
+			return toShort((stackSlot - noArgs + 1) * -slotSize);
 		}
 	}
+    
+    private final short toShort(int v) {
+        if ((v >= Short.MIN_VALUE) && (v <= Short.MAX_VALUE)) {
+            return (short)v;
+        } else {
+            throw new IllegalArgumentException("Given value does not fit in a short " + v);
+        }
+    }
 
 	/**
 	 * Gets the offset to EBP (current stack frame) for the wide local with the
@@ -319,7 +327,7 @@ class X86StackFrame implements X86CompilerConstants {
 	 * @param index
 	 * @return int
 	 */
-	public final int getWideEbpOffset(TypeSizeInfo typeSizeInfo, int index) {
+	public final short getWideEbpOffset(TypeSizeInfo typeSizeInfo, int index) {
       return getEbpOffset(typeSizeInfo, index + 1);
 //        if (os.isCode32()) {
 //            return getEbpOffset(typeSizeInfo, index + 1);

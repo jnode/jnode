@@ -30,7 +30,7 @@ import org.jnode.vm.classmgr.VmMethod;
  */
 public class InlinedMethodInfo {
 
-	private final VmMethod inlinedMethod;
+//	private final VmMethod inlinedMethod;
 
 	private TypeStack exitStack;
 
@@ -44,7 +44,7 @@ public class InlinedMethodInfo {
 	 * @param inlinedMethod
 	 */
 	public InlinedMethodInfo(VmMethod inlinedMethod, Label endOfInlineLabel) {
-		this.inlinedMethod = inlinedMethod;
+//		this.inlinedMethod = inlinedMethod;
 		this.endOfInlineLabel = endOfInlineLabel;
 	}
 

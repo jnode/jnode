@@ -321,19 +321,19 @@ final class VirtualStack {
 	// }
 	// return cnt;
 	// }
-	/**
-	 * Find the largest index that contains a volatile register.
-	 * 
-	 * @return
-	 */
-	private final int findTopVolatileRegisterIndex(X86RegisterPool pool) {
-		for (int i = tos - 1; i >= 0; i--) {
-			if (stack[i].usesVolatileRegister(pool)) {
-				return i;
-			}
-		}
-		return -1;
-	}
+//	/**
+//	 * Find the largest index that contains a volatile register.
+//	 * 
+//	 * @return
+//	 */
+//	private final int findTopVolatileRegisterIndex(X86RegisterPool pool) {
+//		for (int i = tos - 1; i >= 0; i--) {
+//			if (stack[i].usesVolatileRegister(pool)) {
+//				return i;
+//			}
+//		}
+//		return -1;
+//	}
 
 	// private void prependToOperandStack(Item item) {
 	// os.log("prepend");

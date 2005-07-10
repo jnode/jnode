@@ -48,22 +48,22 @@ abstract class Item {
 	static class Kind {
 
 		/** Item is on the stack */
-		static final int STACK = 0x01;
+		static final byte STACK = 0x01;
 
 		/** Item is in a general purpose register */
-		static final int GPR = 0x02;
+		static final byte GPR = 0x02;
 		
 		/** Item is in a SSE register */
-		static final int XMM = 0x04;
+		static final byte XMM = 0x04;
 
 		/** Item is on the FPU stack */
-		static final int FPUSTACK = 0x08;
+		static final byte FPUSTACK = 0x08;
 
 		/** Item is a local variable (EBP relative) */
-		static final int LOCAL = 0x10;
+		static final byte LOCAL = 0x10;
 
 		/** Item is constant */
-		static final int CONSTANT = 0x20;
+		static final byte CONSTANT = 0x20;
 
 		public static final String toString(int kind) {
 			switch (kind) {
@@ -88,10 +88,10 @@ abstract class Item {
 	/*
 	 * Virtual Stack Item
 	 */
-	protected int kind; // entry kind
+	private byte kind; // entry kind
 
 	/** Only valid for (kind == local) */
-	protected int offsetToFP; 
+	private short offsetToFP; 
 	
 	/** Only valid for (kind == xmm) */
 	protected X86Register.XMM xmm;
@@ -119,7 +119,7 @@ abstract class Item {
 	 * @param offsetToFP
 	 * @param xmm
 	 */
-	protected final void initialize(int kind, int offsetToFP, X86Register.XMM xmm) {
+	protected final void initialize(byte kind, short offsetToFP, X86Register.XMM xmm) {
 	    if (Vm.VerifyAssertions) Vm._assert(kind > 0, "Invalid kind");
 		this.kind = kind;
 		this.offsetToFP = offsetToFP;		
@@ -145,9 +145,17 @@ abstract class Item {
 	 * 
 	 * @return the item kind
 	 */
-	final int getKind() {
+	final byte getKind() {
 		return kind;
 	}
+    
+    /**
+     * Sets the kind of this item.
+     * @param kind
+     */
+    protected final void setKind(byte kind) {
+        this.kind = kind;
+    }
 
 	/** Is this item on the stack */
 	final boolean isStack() {
@@ -196,8 +204,10 @@ abstract class Item {
 	 * 
 	 * @return
 	 */
-	int getOffsetToFP(EmitterContext ec) {
-	    if (Vm.VerifyAssertions) Vm._assert(kind == Kind.LOCAL, "kind == Kind.LOCAL");
+	short getOffsetToFP(EmitterContext ec) {
+	    if (Vm.VerifyAssertions) {
+            Vm._assert(isLocal(), "kind == Kind.LOCAL");
+        }
 		return offsetToFP;
 	}
 	
@@ -207,7 +217,9 @@ abstract class Item {
 	 * @return
 	 */
 	final X86Register.XMM getXMM() {
-	    if (Vm.VerifyAssertions) Vm._assert(isXMM(), "kind == Kind.XMM");
+	    if (Vm.VerifyAssertions) {
+            Vm._assert(isXMM(), "kind == Kind.XMM");
+        }
 		return xmm;		
 	}
 

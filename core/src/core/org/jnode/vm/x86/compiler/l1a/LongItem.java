@@ -52,7 +52,7 @@ final class LongItem extends DoubleWordItem implements X86CompilerConstants {
 	 * @param msb
 	 * @param val
 	 */
-	final void initialize(EmitterContext ec, int kind, int offsetToFP, X86Register.GPR lsb,
+	final void initialize(EmitterContext ec, byte kind, short offsetToFP, X86Register.GPR lsb,
 			X86Register.GPR msb, X86Register.GPR64 reg, X86Register.XMM xmm,
 			long val) {
 		super.initialize(ec, kind, offsetToFP, lsb, msb, reg, xmm);
@@ -139,8 +139,9 @@ final class LongItem extends DoubleWordItem implements X86CompilerConstants {
 	 * @return
 	 */
 	final int getLsbValue() {
-		if (Vm.VerifyAssertions)
-			Vm._assert(kind == Kind.CONSTANT, "kind == Kind.CONSTANT");
+		if (Vm.VerifyAssertions) {
+			Vm._assert(isConstant(), "kind == Kind.CONSTANT");
+        }
 		return (int) (value & 0xFFFFFFFFL);
 	}
 
@@ -150,8 +151,9 @@ final class LongItem extends DoubleWordItem implements X86CompilerConstants {
 	 * @return
 	 */
 	final int getMsbValue() {
-		if (Vm.VerifyAssertions)
-			Vm._assert(kind == Kind.CONSTANT, "kind == Kind.CONSTANT");
+		if (Vm.VerifyAssertions) {
+			Vm._assert(isConstant(), "kind == Kind.CONSTANT");
+        }
 		return (int) ((value >>> 32) & 0xFFFFFFFFL);
 	}
 
@@ -170,8 +172,9 @@ final class LongItem extends DoubleWordItem implements X86CompilerConstants {
 	 * @return
 	 */
 	final long getValue() {
-		if (Vm.VerifyAssertions)
-			Vm._assert(kind == Kind.CONSTANT, "kind == Kind.CONSTANT");
+		if (Vm.VerifyAssertions) {
+			Vm._assert(isConstant(), "kind == Kind.CONSTANT");
+        }
 		return value;
 	}
 

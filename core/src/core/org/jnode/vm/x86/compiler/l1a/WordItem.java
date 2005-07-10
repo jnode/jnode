@@ -42,7 +42,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 		super(factory);
 	}
 
-	protected final void initialize(EmitterContext ec, int kind, X86Register reg, int local) {
+	protected final void initialize(EmitterContext ec, byte kind, X86Register reg, short local) {
 		super.initialize(kind, local,
 				((reg instanceof X86Register.XMM) ? (X86Register.XMM) reg
 						: null));
@@ -118,7 +118,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 	 */
 	final X86Register.GPR getRegister() {
 		if (Vm.VerifyAssertions)
-			Vm._assert(kind == Kind.GPR, "Must be register");
+			Vm._assert(isGPR(), "Must be register");
 		return gpr;
 	}
 
@@ -126,7 +126,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#load(EmitterContext)
 	 */
 	final void load(EmitterContext ec) {
-		if (kind != Kind.GPR) {
+		if (!isGPR()) {
 			final X86RegisterPool pool = ec.getGPRPool();
 			X86Register r = pool.request(getType(), this);
 			if (r == null) {
@@ -162,7 +162,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 			Vm._assert(!pool.isFree(reg), "reg not free");
 		}
 
-		switch (kind) {
+		switch (getKind()) {
 		case Kind.GPR:
 			if (this.gpr != reg) {
 				os.writeMOV(reg.getSize(), reg, this.gpr);
@@ -199,7 +199,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 		default:
 			throw new IllegalArgumentException("Invalid item kind");
 		}
-		kind = Kind.GPR;
+		setKind(Kind.GPR);
 		this.gpr = reg;
 	}
 
@@ -218,7 +218,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 	 * @param ec
 	 */
 	final void loadToGPR(EmitterContext ec) {
-		if (kind != Kind.GPR) {
+		if (!isGPR()) {
 			X86Register r = ec.getGPRPool().request(JvmType.INT);
 			if (r == null) {
 				ec.getVStack().push(ec);
@@ -293,7 +293,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 			break;
 
 		case Kind.LOCAL:
-			os.writePUSH(helper.BP, offsetToFP);
+			os.writePUSH(helper.BP, getOffsetToFP(ec));
 			break;
 
 		case Kind.CONSTANT:
@@ -324,7 +324,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 			throw new IllegalArgumentException("Invalid item kind");
 		}
 		cleanup(ec);
-		kind = Kind.STACK;
+		setKind(Kind.STACK);
 
 		if (VirtualStack.checkOperandStack) {
 			stack.operandStack.push(this);
@@ -363,7 +363,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 			break;
 
 		case Kind.LOCAL:
-			pushToFPU(os, helper.BP, offsetToFP);
+			pushToFPU(os, helper.BP, getOffsetToFP(ec));
 			break;
 
 		case Kind.CONSTANT:
@@ -392,7 +392,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 		}
 
 		cleanup(ec);
-		kind = Kind.FPUSTACK;
+		setKind(Kind.FPUSTACK);
 		stack.fpuStack.push(this);
 	}
 
@@ -440,7 +440,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 		}
 
 		this.gpr = null;
-		this.kind = 0;
+		setKind((byte)0);
 	}
 
 	/**
@@ -453,13 +453,11 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 		final X86RegisterPool pool = ec.getGPRPool();
 		X86Register r = pool.request(getType());
 		if (r == null) {
-			int cnt = ec.getVStack().push(ec);
+			ec.getVStack().push(ec);
 			if (getKind() == Kind.STACK) {
 				return;
 			}
 			r = pool.request(getType());
-			// System.out.println("Pool state after push of " + cnt + ":\n" +
-			// pool);
 			if (Vm.VerifyAssertions)
 				Vm._assert(r != null, "r != null");
 		}
@@ -474,7 +472,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#uses(org.jnode.assembler.x86.Register)
 	 */
 	final boolean uses(X86Register reg) {
-		return ((kind == Kind.GPR) && this.gpr.equals(reg));
+		return (isGPR() && this.gpr.equals(reg));
 	}
 
 	/**
@@ -484,7 +482,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 	 * @return true, when this item uses a volatile register.
 	 */
 	final boolean usesVolatileRegister(X86RegisterPool pool) {
-		return ((kind == Kind.GPR) && !pool.isCallerSaved(gpr));
+		return (isGPR() && !pool.isCallerSaved(gpr));
 	}
 
 	/**
@@ -492,7 +490,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 	 * Throw an exception is the state is inconsistent.
 	 */
 	protected void verifyState(EmitterContext ec) {
-		switch (kind) {
+		switch (getKind()) {
 		case Kind.GPR:
 			if (gpr == null) {
 				throw new IllegalStateException("gpr cannot not be null");

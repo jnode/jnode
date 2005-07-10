@@ -14,7 +14,7 @@ import org.vmmagic.unboxed.Offset;
 final class X86GCMapIterator extends GCMapIterator {
 
     /** Address of the current stack frame */
-    private Address framePtr;
+//    private Address framePtr;
     
     /**
      * @see org.jnode.vm.compiler.GCMapIterator#getNextReferenceAddress()
@@ -30,7 +30,7 @@ final class X86GCMapIterator extends GCMapIterator {
      */
     @Override
     public void iterationComplete() {
-        this.framePtr = null;        
+//        this.framePtr = null;        
     }
 
     /**
@@ -38,7 +38,7 @@ final class X86GCMapIterator extends GCMapIterator {
      */
     @Override
     public void setupIteration(VmCompiledCode method, Offset instructionOffset, Address framePtr) {
-        this.framePtr = framePtr;
+//        this.framePtr = framePtr;
         // TODO Implement me
         
     }

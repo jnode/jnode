@@ -38,7 +38,7 @@ final class IntItem extends WordItem implements X86CompilerConstants {
 
 	private int value;
 
-	final void initialize(EmitterContext ec, int kind, int offsetToFP, X86Register reg, int value) {
+	final void initialize(EmitterContext ec, byte kind, short offsetToFP, X86Register reg, int value) {
 		super.initialize(ec, kind, reg, offsetToFP);
 		this.value = value;
 	}
@@ -59,13 +59,15 @@ final class IntItem extends WordItem implements X86CompilerConstants {
 	 * 
 	 * @return the JVM type
 	 */
-	int getType() {
+	final int getType() {
 		return JvmType.INT;
 	}
 
-	int getValue() {
-	    if (Vm.VerifyAssertions) Vm._assert(kind == Kind.CONSTANT, "kind == Kind.CONSTANT");
-		return value;
+	final int getValue() {
+	    if (Vm.VerifyAssertions) {
+            Vm._assert(isConstant(), "kind == Kind.CONSTANT");
+        }
+        return value;
 	}
 
 	/**

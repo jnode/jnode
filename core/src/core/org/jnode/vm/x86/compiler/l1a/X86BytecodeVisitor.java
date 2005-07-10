@@ -556,7 +556,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	private final void generic_pop(int size) {
 		final Item v = vstack.pop();
 		assertCondition(v.getCategory() == (size / helper.SLOTSIZE), "category mismatch");
-		if (v.getKind() == Item.Kind.STACK) {
+		if (v.isStack()) {
 			// sanity check
 			if (VirtualStack.checkOperandStack) {
 				vstack.operandStack.pop(v);
@@ -3162,7 +3162,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	public final void visit_lshr() {
 		final IntItem cnt = vstack.popInt();
 		final LongItem val = vstack.popLong();
-		final X86RegisterPool pool = eContext.getGPRPool();
+//		final X86RegisterPool pool = eContext.getGPRPool();
 
 		// Get cnt into ECX
 		if (!cnt.uses(X86Register.ECX)) {
@@ -3226,7 +3226,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	public final void visit_lushr() {
 		final IntItem cnt = vstack.popInt();
 		final LongItem val = vstack.popLong();
-		final X86RegisterPool pool = eContext.getGPRPool();
+//		final X86RegisterPool pool = eContext.getGPRPool();
 
 		// Get cnt into ECX
 		if (!cnt.uses(X86Register.ECX)) {
