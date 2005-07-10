@@ -46,7 +46,7 @@ final class FloatItem extends WordItem {
 	 * @param offsetToFP
 	 * @param value
 	 */
-	final void initialize(EmitterContext ec, int kind, int offsetToFP, X86Register.GPR reg,
+	final void initialize(EmitterContext ec, byte kind, short offsetToFP, X86Register.GPR reg,
 			float value) {
 		super.initialize(ec, kind, reg, offsetToFP);
 		this.value = value;
@@ -73,9 +73,10 @@ final class FloatItem extends WordItem {
 	 * 
 	 * @return
 	 */
-	float getValue() {
-		if (Vm.VerifyAssertions)
-			Vm._assert(kind == Kind.CONSTANT, "kind == Kind.CONSTANT");
+	final float getValue() {
+		if (Vm.VerifyAssertions) {
+			Vm._assert(isConstant(), "kind == Kind.CONSTANT");
+        }
 		return value;
 	}
 

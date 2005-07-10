@@ -56,7 +56,7 @@ final class ItemFactory {
      */
     final IntItem createIConst(EmitterContext ec, int val) {
         final IntItem item = (IntItem) getOrCreate(JvmType.INT);
-        item.initialize(ec, Item.Kind.CONSTANT, 0, null, val);
+        item.initialize(ec, Item.Kind.CONSTANT, (short)0, null, val);
         return item;
     }
 
@@ -67,7 +67,7 @@ final class ItemFactory {
      */
     final FloatItem createFConst(EmitterContext ec, float val) {
         final FloatItem item = (FloatItem) getOrCreate(JvmType.FLOAT);
-        item.initialize(ec, Item.Kind.CONSTANT, 0, null, val);
+        item.initialize(ec, Item.Kind.CONSTANT, (short)0, null, val);
         return item;
     }
 
@@ -78,7 +78,7 @@ final class ItemFactory {
      */
     final RefItem createAConst(EmitterContext ec, VmConstString val) {
         final RefItem item = (RefItem) getOrCreate(JvmType.REFERENCE);
-        item.initialize(ec, Item.Kind.CONSTANT, 0, null, val);
+        item.initialize(ec, Item.Kind.CONSTANT, (short)0, null, val);
         return item;
     }
 
@@ -89,7 +89,7 @@ final class ItemFactory {
      */
     final LongItem createLConst(EmitterContext ec, long val) {
         final LongItem item = (LongItem) getOrCreate(JvmType.LONG);
-        item.initialize(ec, Item.Kind.CONSTANT, 0, null, null, null, null, val);
+        item.initialize(ec, Item.Kind.CONSTANT, (short)0, null, null, null, null, val);
         return item;
     }
 
@@ -100,7 +100,7 @@ final class ItemFactory {
      */
     final DoubleItem createDConst(EmitterContext ec, double val) {
         final DoubleItem item = (DoubleItem) getOrCreate(JvmType.DOUBLE);
-        item.initialize(ec, Item.Kind.CONSTANT, 0, null, null, null, null, val);
+        item.initialize(ec, Item.Kind.CONSTANT, (short)0, null, null, null, null, val);
         return item;
     }
 
@@ -111,7 +111,7 @@ final class ItemFactory {
      */
     public Item createStack(int jvmType) {
         final Item item = getOrCreate(jvmType);
-        item.initialize(Item.Kind.STACK, 0, null);
+        item.initialize(Item.Kind.STACK, (short)0, null);
         return item;
     }
 
@@ -122,7 +122,7 @@ final class ItemFactory {
      */
     public Item createFPUStack(int jvmType) {
         final Item item = getOrCreate(jvmType);
-        item.initialize(Item.Kind.FPUSTACK, 0, null);
+        item.initialize(Item.Kind.FPUSTACK, (short)0, null);
         return item;
     }
 
@@ -131,7 +131,7 @@ final class ItemFactory {
      * 
      * @param jvmType
      */
-    public Item createLocal(int jvmType, int ebpOffset) {
+    public Item createLocal(int jvmType, short ebpOffset) {
         final Item item = getOrCreate(jvmType);
         item.initialize(Item.Kind.LOCAL, ebpOffset, null);
         return item;
@@ -144,7 +144,7 @@ final class ItemFactory {
      */
     public Item createLocal(int jvmType, X86Register.XMM xmm) {
         final Item item = getOrCreate(jvmType);
-        item.initialize(Item.Kind.XMM, 0, xmm);
+        item.initialize(Item.Kind.XMM, (short)0, xmm);
         return item;
     }
 
@@ -156,7 +156,7 @@ final class ItemFactory {
      */
     public WordItem createReg(EmitterContext ec, int jvmType, X86Register reg) {
         final WordItem item = (WordItem) getOrCreate(jvmType);
-        item.initialize(ec, Item.Kind.GPR, reg, 0);
+        item.initialize(ec, Item.Kind.GPR, reg, (short)0);
         return item;
     }
 
@@ -172,7 +172,7 @@ final class ItemFactory {
     		throw new IllegalModeException("Only supported in 32-bit mode");
     	}
         final DoubleWordItem item = (DoubleWordItem) getOrCreate(jvmType);
-        item.initialize(ec, Item.Kind.GPR, 0, lsb, msb, null, null);
+        item.initialize(ec, Item.Kind.GPR, (short)0, lsb, msb, null, null);
         return item;
     }
 
@@ -185,7 +185,7 @@ final class ItemFactory {
      */
     public DoubleWordItem createReg(EmitterContext ec, int jvmType, X86Register.GPR64 reg) {
         final DoubleWordItem item = (DoubleWordItem) getOrCreate(jvmType);
-        item.initialize(ec, Item.Kind.GPR, 0, null, null, reg, null);
+        item.initialize(ec, Item.Kind.GPR, (short)0, null, null, reg, null);
         return item;
     }
 
@@ -197,7 +197,7 @@ final class ItemFactory {
     @SuppressWarnings("unchecked")
     final <T extends Item> void release(T item) {
         if (Vm.VerifyAssertions)
-            Vm._assert(item.kind == 0, "Item is not yet released");
+            Vm._assert(item.getKind() == 0, "Item is not yet released");
         final ArrayList<T> list = (ArrayList<T>)getList(item.getType());
         if (Vm.VerifyAssertions)
             Vm._assert(!list.contains(item), "Item already released");
@@ -222,7 +222,7 @@ final class ItemFactory {
         } else {
             item = (Item) list.remove(list.size() - 1);
             if (Vm.VerifyAssertions)
-                Vm._assert(item.kind == 0, "kind == 0, but " + item.kind);
+                Vm._assert(item.getKind() == 0, "kind == 0, but " + item.getKind());
         }
         return item;
     }

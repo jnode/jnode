@@ -50,7 +50,7 @@ final class RefItem extends WordItem implements X86CompilerConstants {
 	    super(factory);
 	}
 
-	final void initialize(EmitterContext ec, int kind, int offsetToFP, X86Register reg, VmConstString val) {
+	final void initialize(EmitterContext ec, byte kind, short offsetToFP, X86Register reg, VmConstString val) {
 		super.initialize(ec, kind, reg, offsetToFP);
 		this.value = val;
 	}

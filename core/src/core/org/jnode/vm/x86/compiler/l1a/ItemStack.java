@@ -52,20 +52,20 @@ class ItemStack {
         reset();
     }
 
-    /**
-     * Does this stack contain the given item.
-     * 
-     * @param item
-     * @return
-     */
-    final boolean contains(Item item) {
-        for (int i = 0; i < tos; i++) {
-            if (stack[i] == item)
-                return true;
-        }
-        return false;
-    }
-
+//    /**
+//     * Does this stack contain the given item.
+//     * 
+//     * @param item
+//     * @return
+//     */
+//    final boolean contains(Item item) {
+//        for (int i = 0; i < tos; i++) {
+//            if (stack[i] == item)
+//                return true;
+//        }
+//        return false;
+//    }
+//
     /**
      * Grow the stack capacity.
      */
@@ -89,20 +89,20 @@ class ItemStack {
         return (tos + items <= maxSize);
     }
 
-    /**
-     * Is the item at the offset relative to the top of stack equal to the given
-     * item.
-     * 
-     * @param item
-     * @return
-     */
-    final boolean isAt(Item item, int offset) {
-        if (tos <= 0) {
-            throw new StackException("Stack is empty");
-        }
-        return (stack[(tos - 1) - offset] == item);
-    }
-
+//    /**
+//     * Is the item at the offset relative to the top of stack equal to the given
+//     * item.
+//     * 
+//     * @param item
+//     * @return
+//     */
+//    final boolean isAt(Item item, int offset) {
+//        if (tos <= 0) {
+//            throw new StackException("Stack is empty");
+//        }
+//        return (stack[(tos - 1) - offset] == item);
+//    }
+//
     /**
      * Is the top of stack equal to the given item
      * 

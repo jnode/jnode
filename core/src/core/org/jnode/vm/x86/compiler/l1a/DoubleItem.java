@@ -48,7 +48,7 @@ final class DoubleItem extends DoubleWordItem {
 	 * @param offsetToFP
 	 * @param value
 	 */
-	final void initialize(EmitterContext ec, int kind, int offsetToFP, X86Register.GPR lsb,
+	final void initialize(EmitterContext ec, byte kind, short offsetToFP, X86Register.GPR lsb,
 			X86Register.GPR msb, X86Register.GPR64 reg, X86Register.XMM xmm,
 			double value) {
 		super.initialize(ec, kind, offsetToFP, lsb, msb, reg, xmm);
@@ -76,9 +76,10 @@ final class DoubleItem extends DoubleWordItem {
 	 * 
 	 * @return
 	 */
-	double getValue() {
-		if (Vm.VerifyAssertions)
-			Vm._assert(kind == Kind.CONSTANT, "kind == Kind.CONSTANT");
+	final double getValue() {
+		if (Vm.VerifyAssertions) {
+			Vm._assert(isConstant(), "kind == Kind.CONSTANT");
+        }
 		return value;
 	}
 
