@@ -16,8 +16,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -76,9 +76,9 @@ public class ServerSocket
   private SocketImpl impl;
 
   /**
-   * True if socket is bound.
+   * We need to retain the local address even after the socket is closed.
    */
-  private boolean bound;
+  private InetSocketAddress local;
 
   /*
    * This constructor is only used by java.nio.
@@ -238,7 +238,9 @@ public class ServerSocket
       {
 	impl.bind(addr, tmp.getPort());
     impl.listen(backlog);
-	bound = true;
+	local = new InetSocketAddress(
+            (InetAddress) impl.getOption(SocketOptions.SO_BINDADDR),
+            impl.getLocalPort());
       }
     catch (IOException exception)
       {
@@ -264,18 +266,10 @@ public class ServerSocket
    */
   public InetAddress getInetAddress()
   {
-    if (! isBound())
+    if (local == null)
       return null;
 
-    try
-      {
-	return (InetAddress) impl.getOption(SocketOptions.SO_BINDADDR);
-      }
-    catch (SocketException e)
-      {
-	// This never happens as we are bound.
-        return null;
-      }
+    return local.getAddress();
   }
 
   /**
@@ -285,10 +279,10 @@ public class ServerSocket
    */
   public int getLocalPort()
   {
-    if (! isBound())
+    if (local == null)
       return -1;
 
-    return impl.getLocalPort();
+    return local.getPort();
   }
 
   /**
@@ -300,10 +294,7 @@ public class ServerSocket
    */
   public SocketAddress getLocalSocketAddress()
   {
-    if (! isBound())
-    return null;
-
-    return new InetSocketAddress(getInetAddress(), getLocalPort());
+    return local;
   }
 
   /**
@@ -392,18 +383,17 @@ public class ServerSocket
 
     impl.close();
     impl = null;
-    bound = false;
     
     if (getChannel() != null)
       getChannel().close();
   }
 
   /**
-   * Returns the unique ServerSocketChannel object
+   * Returns the unique <code>ServerSocketChannel</code> object
    * associated with this socket, if any.
    *
-   * The socket only has a ServerSocketChannel if its created
-   * by ServerSocketChannel.open.
+   * <p>The socket only has a <code>ServerSocketChannel</code> if its created
+   * by <code>ServerSocketChannel.open()</code>.</p>
    * 
    * @return the associated socket channel, null if none exists
    * 
@@ -423,7 +413,7 @@ public class ServerSocket
    */
   public boolean isBound()
   {
-    return bound;
+    return local != null;
   }
 
   /**
