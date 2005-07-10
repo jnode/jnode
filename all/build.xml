@@ -421,6 +421,7 @@ clean          Remove all intermediate build results.
             <exclude name="compat/**/*"/>
             <exclude name="examples/**/*"/>
             <exclude name="external/**/*"/>
+        	<exclude name="gnu/classpath/jdwp/**/*"/>
             <exclude name="gnu/java/awt/peer/gtk/**/*"/>
             <exclude name="gnu/javax/swing/plaf/gtk/**/*"/>
             <exclude name="gnu/test/**/*"/>
