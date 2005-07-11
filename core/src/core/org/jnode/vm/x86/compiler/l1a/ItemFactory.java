@@ -24,7 +24,6 @@ package org.jnode.vm.x86.compiler.l1a;
 import java.util.ArrayList;
 
 import org.jnode.assembler.x86.X86Register;
-import org.jnode.util.Counter;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
 import org.jnode.vm.classmgr.VmConstString;
@@ -48,6 +47,8 @@ final class ItemFactory {
     private final ArrayList<RefItem> refItems = new ArrayList<RefItem>();
 
     private int createCount = 0;
+    
+    protected int releaseCount = 0;
 
     /**
      * Create a constant item
@@ -196,17 +197,20 @@ final class ItemFactory {
      */
     @SuppressWarnings("unchecked")
     final <T extends Item> void release(T item) {
-        if (Vm.VerifyAssertions)
+        releaseCount++;
+        if (Vm.VerifyAssertions) {
             Vm._assert(item.getKind() == 0, "Item is not yet released");
+        }
         final ArrayList<T> list = (ArrayList<T>)getList(item.getType());
-        if (Vm.VerifyAssertions)
+        if (Vm.VerifyAssertions) {
             Vm._assert(!list.contains(item), "Item already released");
+        }
         list.add(item);
 
-        final String name = getClass().getName();
-        final Counter cnt = Vm.getVm().getCounter(name);
-        cnt.inc();
-
+        if (false) {
+            final String name = item.getClass().getName();
+            Vm.getVm().getCounterGroup(name).getCounter("release").inc();
+        }
     }
 
     /**

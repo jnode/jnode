@@ -64,6 +64,8 @@ final class FPCompilerFPU extends FPCompiler {
 			final double fpv1 = getFPValue(v1);
 			final double fpv2 = getFPValue(v2);
 			vstack.push(createConst(ifac, type, fpv1 + fpv2));
+            v1.release(ec);
+            v2.release(ec);
 		} else {
 			// Prepare stack
 			final FPUStack fpuStack = vstack.fpuStack;
@@ -173,9 +175,11 @@ final class FPCompilerFPU extends FPCompiler {
 		final Item v = vstack.pop(fromType);
 		if (v.isConstant()) {
 			vstack.push(createConst(ifac, toType, getFPValue(v)));
+            v.release(ec);
 		} else {
 			v.pushToFPU(ec);
 			vstack.fpuStack.pop(v);
+            v.release(ec);
 			final Item result = ifac.createFPUStack(toType);
 			vstack.push(result);
 			vstack.fpuStack.push(result);
@@ -198,6 +202,8 @@ final class FPCompilerFPU extends FPCompiler {
 			final double fpv1 = getFPValue(v1);
 			final double fpv2 = getFPValue(v2);
 			vstack.push(createConst(ifac, type, fpv1 / fpv2));
+            v1.release(ec);
+            v2.release(ec);
 		} else {
 			// Prepare stack
 			final FPUStack fpuStack = vstack.fpuStack;
@@ -268,6 +274,8 @@ final class FPCompilerFPU extends FPCompiler {
 			final double fpv1 = getFPValue(v1);
 			final double fpv2 = getFPValue(v2);
 			vstack.push(createConst(ifac, type, fpv1 * fpv2));
+            v1.release(ec);
+            v2.release(ec);
 		} else {
 			// Prepare stack
 			final FPUStack fpuStack = vstack.fpuStack;
@@ -296,6 +304,7 @@ final class FPCompilerFPU extends FPCompiler {
 		if (v.isConstant()) {
 			final double fpv = getFPValue(v);
 			vstack.push(createConst(ifac, type, -fpv));
+            v.release(ec);
 		} else {
 			// Prepare
 			final FPUStack fpuStack = vstack.fpuStack;
@@ -425,6 +434,8 @@ final class FPCompilerFPU extends FPCompiler {
 			final double fpv1 = getFPValue(v1);
 			final double fpv2 = getFPValue(v2);
 			vstack.push(createConst(ifac, type, fpv1 % fpv2));
+            v1.release(ec);
+            v2.release(ec);
 		} else {
 			// Prepare stack
 			final FPUStack fpuStack = vstack.fpuStack;
@@ -461,6 +472,8 @@ final class FPCompilerFPU extends FPCompiler {
 			final double fpv1 = getFPValue(v1);
 			final double fpv2 = getFPValue(v2);
 			vstack.push(createConst(ifac, type, fpv1 - fpv2));
+            v1.release(ec);
+            v2.release(ec);
 		} else {
 			// Prepare stack
 			final FPUStack fpuStack = vstack.fpuStack;

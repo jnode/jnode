@@ -22,7 +22,6 @@
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.X86Register;
-import org.jnode.util.Counter;
 import org.jnode.vm.Vm;
 
 /**
@@ -107,8 +106,7 @@ abstract class Item {
 		if (false) {
 		    final Vm vm = Vm.getVm();
 		    final String name = getClass().getName();
-		    final Counter cnt = vm.getCounter(name);
-		    cnt.inc();
+		    vm.getCounterGroup(name).getCounter("new").inc();
 		}
 	}
 
