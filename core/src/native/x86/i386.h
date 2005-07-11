@@ -148,6 +148,9 @@ MBI_MODSCOUNT	equ 0x14
 MBI_MODSADDR	equ 0x18
 MBI_MMAPLENGTH	equ 0x2C
 MBI_MMAPADDR	equ 0x30
+MBI_VBECTRLINFO	equ 72
+MBI_VBEMODEINFO	equ 76
+MBI_VBE_MODE	equ 80
 
 MBI_SIZE		equ 0x58
 MBI_CMDLINE_MAX	equ 0x400
@@ -169,5 +172,6 @@ MBF_BOOTDEVICE	equ (1 << 1)
 MBF_CMDLINE		equ (1 << 2)
 MBF_MODS		equ (1 << 3)
 MBF_MMAP		equ (1 << 6)
+MBF_VBE			equ (1 << 11)
 
 %include "i386_bits.h"
