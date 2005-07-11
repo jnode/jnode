@@ -34,6 +34,7 @@ import org.jnode.plugin.PluginRegistry;
 import org.jnode.system.ResourceManager;
 import org.jnode.util.BootableArrayList;
 import org.jnode.util.Counter;
+import org.jnode.util.CounterGroup;
 import org.jnode.util.Statistic;
 import org.jnode.util.Statistics;
 import org.jnode.vm.classmgr.CompiledCodeList;
@@ -300,18 +301,42 @@ public class Vm extends VmSystemObject implements Statistics, SharedStatics {
      * @param name
      * @return The counter
      */
-    public synchronized Counter getCounter(String name) {
+    public final Counter getCounter(String name) {
         Counter cnt = (Counter)getStatistic(name);
         if (cnt == null) {
-            cnt = new Counter(name, name);
-            addStatistic(name, cnt);
+            synchronized (this) {
+                cnt = (Counter)getStatistic(name);
+                if (cnt == null) {
+                    cnt = new Counter(name, name);
+                    addStatistic(name, cnt);
+                }
+            }
+        }
+        return cnt;
+    }
+    
+    /**
+     * Gets of create a counter group with a given name.
+     * @param name
+     * @return The counter group
+     */
+    public final CounterGroup getCounterGroup(String name) {
+        CounterGroup cnt = (CounterGroup)getStatistic(name);
+        if (cnt == null) {
+            synchronized (this) {
+                cnt = (CounterGroup)getStatistic(name);
+                if (cnt == null) {
+                    cnt = new CounterGroup(name, name);
+                    addStatistic(name, cnt);
+                }
+            }
         }
         return cnt;
     }
     
     private Statistic getStatistic(String name) {        
         if (statistics != null) {
-            return (Statistic)statistics.get(name);
+            return statistics.get(name);
         } else {
             return null;
         }
