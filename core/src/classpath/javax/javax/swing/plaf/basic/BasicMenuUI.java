@@ -292,19 +292,39 @@ public class BasicMenuUI extends BasicMenuItemUI
       manager.processMouseEvent(e);
     }
 
+    private boolean popupVisible()
+    {
+      JMenuBar mb = (JMenuBar) ((JMenu)menuItem).getParent();
+      // check if mb.isSelected because if no menus are selected
+      // we don't have to look through the list for popup menus
+      if (!mb.isSelected())
+        return false;
+      for (int i=0;i<mb.getMenuCount();i++)
+        if (((JMenu)mb.getComponent(i)).isPopupMenuVisible())
+          return true;
+      return false;
+    }
+
     public void mouseEntered(MouseEvent e)
     {
       /* When mouse enters menu item, it should be considered selected
 
        if (i) if this menu is a submenu in some other menu
-          (ii) or if this menu is in a menu bar and some other menu in a menu bar was just
-               selected. (If nothing was selected, menu should be pressed before
+          (ii) or if this menu is in a menu bar and some other menu in a 
+          menu bar was just selected and has its popup menu visible. 
+               (If nothing was selected, menu should be pressed before
                it will be selected)      
       */
       JMenu menu = (JMenu) menuItem;
-      if (! menu.isTopLevelMenu()
-          || (menu.isTopLevelMenu()
-          && (((JMenuBar) menu.getParent()).isSelected() && ! menu.isArmed())))
+
+      // NOTE: the following if used to require !menu.isArmed but I could find
+      // no reason for this and it was preventing some JDK-compatible behaviour.
+      // Specifically, if a menu is selected but its popup menu not visible,
+      // and then another menu is selected whose popup menu IS visible, when
+      // the mouse is moved over the first menu, its popup menu should become
+      // visible.
+
+      if (! menu.isTopLevelMenu() || popupVisible())
         {
 	  // set new selection and forward this event to MenuSelectionManager
 	  MenuSelectionManager manager = MenuSelectionManager.defaultManager();

@@ -37,8 +37,6 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package gnu.java.text;
 
-import gnu.classpath.Configuration;
-
 import java.text.AttributedCharacterIterator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -65,6 +63,7 @@ public class FormatCharacterIterator implements AttributedCharacterIterator
   private int attributeIndex;
   private int[] ranges;
   private HashMap[] attributes;
+  private static final boolean DEBUG = false;
   
   /**
    * This constructor builds an empty iterated strings. The attributes
@@ -496,7 +495,7 @@ public class FormatCharacterIterator implements AttributedCharacterIterator
 
   private void debug(String s)
   {
-    if (Configuration.DEBUG)
+    if (DEBUG)
       System.out.println(s);
   }
 
@@ -504,7 +503,7 @@ public class FormatCharacterIterator implements AttributedCharacterIterator
   {
     int start_range = 0;
     
-    if (!Configuration.DEBUG)
+    if (!DEBUG)
       return;
 
     System.out.println("Dumping internal table:");

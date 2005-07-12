@@ -39,6 +39,7 @@ package gnu.xml.transform;
 
 import java.util.Collections;
 import java.util.List;
+import javax.xml.namespace.QName;
 import javax.xml.xpath.XPathFunction;
 import javax.xml.xpath.XPathFunctionException;
 import org.w3c.dom.Node;
@@ -87,6 +88,11 @@ final class CurrentFunction
         s = (Stylesheet) context;
       }
     return new CurrentFunction(s);
+  }
+
+  public boolean references(QName var)
+  {
+    return false;
   }
 
   public String toString()
