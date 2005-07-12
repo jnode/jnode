@@ -26,11 +26,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 
 import org.jnode.driver.Device;
 import org.jnode.driver.Driver;
 import org.jnode.driver.DriverException;
+import org.jnode.util.EmptyInputStream;
 import org.jnode.util.Queue;
 import org.jnode.util.QueueProcessor;
 import org.jnode.util.QueueProcessorThread;
@@ -130,7 +133,7 @@ public abstract class AbstractKeyboardDriver extends Driver implements
         dev.registerAPI(SystemTriggerAPI.class, this);
 
         // If no inputstream has been defined, create and set one.
-        if (System.in == null) {
+        if ((System.in == null) || (System.in instanceof EmptyInputStream)) {
             if (channel == null) {
                 // even for keyboardless operation, we do need a System.in
                 kis = new InputStream() {
@@ -142,7 +145,12 @@ public abstract class AbstractKeyboardDriver extends Driver implements
             } else {
                 kis = new KeyboardInputStream(this);
             }
-            System.setIn(kis);
+            AccessController.doPrivileged(new PrivilegedAction() {
+                public Object run() {
+                    System.setIn(kis);
+                    return null;
+                }                
+            });
         }
     }
 
@@ -171,7 +179,12 @@ public abstract class AbstractKeyboardDriver extends Driver implements
         dev.unregisterAPI(SystemTriggerAPI.class);
         KeyboardDaemon daemon = this.daemon;
         if (System.in == kis) {
-            System.setIn(null);
+            AccessController.doPrivileged(new PrivilegedAction() {
+                public Object run() {
+                    System.setIn(new EmptyInputStream());
+                    return null;
+                }                
+            });
         }
         if (eventQueueThread != null) {
             eventQueueThread.stopProcessor();

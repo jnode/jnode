@@ -929,7 +929,8 @@ public final class VmSystem implements SharedStatics {
     }
 
     private static void setStaticField(Class<?> clazz, String fieldName,
-            Object value) {
+            Object value)
+    throws PrivilegedActionPragma {
         final VmStaticField f = (VmStaticField) clazz.getVmClass().getField(
                 fieldName);
         final Vm vm = Vm.getVm();
