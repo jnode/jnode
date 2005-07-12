@@ -47,6 +47,7 @@ import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.ResourceBundle;
 
+import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 import javax.swing.LookAndFeel;
 import javax.swing.UIDefaults;
@@ -54,6 +55,7 @@ import javax.swing.plaf.BorderUIResource;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.DimensionUIResource;
 import javax.swing.plaf.FontUIResource;
+import javax.swing.plaf.IconUIResource;
 import javax.swing.plaf.InsetsUIResource;
 import javax.swing.text.JTextComponent;
 
@@ -455,10 +457,10 @@ public abstract class BasicLookAndFeel extends LookAndFeel
       "InternalFrame.border",
       new BorderUIResource.CompoundBorderUIResource(null, null),
       "InternalFrame.borderColor", new ColorUIResource(light),
-      "InternalFrame.borderDarkShadow", new ColorUIResource(shadow),
-      "InternalFrame.borderHighlight", new ColorUIResource(highLight),
-      "InternalFrame.borderLight", new ColorUIResource(light),
-      "InternalFrame.borderShadow", new ColorUIResource(shadow),
+      "InternalFrame.borderDarkShadow", new ColorUIResource(Color.BLACK),
+      "InternalFrame.borderHighlight", new ColorUIResource(Color.WHITE),
+      "InternalFrame.borderLight", new ColorUIResource(Color.LIGHT_GRAY),
+      "InternalFrame.borderShadow", new ColorUIResource(Color.GRAY),
       "InternalFrame.closeIcon", BasicIconFactory.createEmptyFrameIcon(),
       // XXX Don't use gif
 //      "InternalFrame.icon", new IconUIResource(new ImageIcon("icons/JavaCup.gif")),
@@ -1017,14 +1019,20 @@ public abstract class BasicLookAndFeel extends LookAndFeel
         "ctrl PAGE_DOWN", "scrollDownChangeLead"
       }),
       "Tree.font", new FontUIResource("Dialog", Font.PLAIN, 12),
-//      "Tree.expandedIcon", new IconUIResource(new ImageIcon("icons/TreeExpanded.png")),
+      "Tree.closedIcon",
+         new IconUIResource(new ImageIcon(getClass().getResource(
+            "/gnu/javax/swing/plaf/gtk/icons/TreeClosed.png"))),
       "Tree.foreground", new ColorUIResource(Color.black),
       "Tree.hash", new ColorUIResource(Color.gray),
-//      "Tree.leafIcon", new IconUIResource(new ImageIcon("icons/TreeLeaf.png")),
+      "Tree.leafIcon", 
+         new IconUIResource(new ImageIcon(getClass().getResource(
+            "/gnu/javax/swing/plaf/gtk/icons/TreeLeaf.png"))),
       "Tree.leftChildIndent", new Integer(7),
-//      "Tree.openIcon", new IconUIResource(new ImageIcon("icons/TreeOpen.png")),
+      "Tree.openIcon", 
+         new IconUIResource(new ImageIcon(getClass().getResource(
+            "/gnu/javax/swing/plaf/gtk/icons/TreeOpen.png"))),
       "Tree.rightChildIndent", new Integer(13),
-      "Tree.rowHeight", new Integer(16),
+      "Tree.rowHeight", new Integer(19),
       "Tree.scrollsOnExpand", Boolean.TRUE,
       "Tree.selectionBackground", new ColorUIResource(Color.black),
       "Tree.selectionBorderColor", new ColorUIResource(Color.black),

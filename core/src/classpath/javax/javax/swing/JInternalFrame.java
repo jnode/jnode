@@ -565,12 +565,9 @@ public class JInternalFrame extends JComponent implements Accessible,
     this.maximizable = maximizable;
     this.iconable = iconifiable;
     storedBounds = new Rectangle();
-
-    setRootPaneCheckingEnabled(false);
     setRootPane(createRootPane());
-
     updateUI();
-    setRootPaneCheckingEnabled(true);
+    initStageDone = true; // Done the init stage, now adds go to content pane.
   }
 
   /**
@@ -587,10 +584,18 @@ public class JInternalFrame extends JComponent implements Accessible,
    */
   protected void addImpl(Component comp, Object constraints, int index)
   {
+    // If we're in the initialization stage use super.add. Here we add the
+    // rootPane as well as the title bar and other stuff.
+    // Otherwise pass the add onto the content pane.
+    if (!initStageDone)
+      super.addImpl(comp,constraints, index);
+    else
+      {
     if (isRootPaneCheckingEnabled())
-      throw new Error("Do not use add() on JInternalPane directly. Use getContentPane().add() instead");
-
-    super.addImpl(comp, constraints, index);
+          throw new Error("Do not use add() on JInternalFrame directly. Use "
+                           + "getContentPane().add() instead");
+        getContentPane().add(comp, constraints, index);
+      }
   }
 
   /**
@@ -1161,7 +1166,7 @@ public class JInternalFrame extends JComponent implements Accessible,
       {
 	// Do nothing if they don't want to be restored first.
       }
-    doLayout();
+    setSize(getPreferredSize());
   }
 
   /**
@@ -1192,7 +1197,12 @@ public class JInternalFrame extends JComponent implements Accessible,
    */
   public void remove(Component comp)
   {
+    // If we're removing the root pane, use super.remove.  Otherwise
+    // pass it on to the content pane instead.
+    if (comp==rootPane)
     super.remove(comp);
+    else
+      getContentPane().remove(comp);
   }
 
   /**
@@ -1296,10 +1306,10 @@ public class JInternalFrame extends JComponent implements Accessible,
    */
   public void setDefaultCloseOperation(int operation)
   {
-    if (operation != DO_NOTHING_ON_CLOSE
-	&& operation != HIDE_ON_CLOSE
-        && operation != DISPOSE_ON_CLOSE)
-      throw new Error("Close operation must be one of DO_NOTHING_ON_CLOSE, HIDE_ON_CLOSE, or DISPOSE_ON_CLOSE");
+    /* Reference implementation allows invalid operations to be specified.
+       In that case, behaviour defaults to DO_NOTHING_ON_CLOSE.
+       processWindowEvent handles the behaviour. getDefaultCloseOperation
+       must return the invalid operator code. */
     defaultCloseOperation = operation;
   }
 
@@ -1477,8 +1487,16 @@ public class JInternalFrame extends JComponent implements Accessible,
    */
   public void setLayout(LayoutManager manager)
   {
+    // Check if we're in initialization stage.  If so, call super.setLayout
+    // otherwise, valid calls go to the content pane.
+    if (initStageDone)
+      {
     if (isRootPaneCheckingEnabled())
-      throw new Error("Cannot set layout. Use getContentPane().setLayout() instead.");
+          throw new Error("Cannot set layout. Use getContentPane().setLayout()"
+                           + " instead.");
+        getContentPane().setLayout(manager);
+      }
+    else
     super.setLayout(manager);
   }
 
