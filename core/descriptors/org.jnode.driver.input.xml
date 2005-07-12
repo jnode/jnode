@@ -20,7 +20,6 @@
   <extension point="org.jnode.security.permissions">
     <permission class="org.jnode.driver.DriverPermission" name="setPreferredListener"/>
     <permission class="java.lang.RuntimePermission" name="setIO"/>
-    <permission class="org.jnode.security.JNodePermission" name="getVmClass"/>      
   </extension>
         
 </plugin>

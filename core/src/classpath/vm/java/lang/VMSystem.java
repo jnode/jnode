@@ -21,11 +21,11 @@
  
 package java.lang;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.ByteOrder;
 
+import org.jnode.util.EmptyInputStream;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmSystem;
 
@@ -159,7 +159,7 @@ public final class VMSystem {
 	 */
 
 	static InputStream makeStandardInputStream() {
-		return new ByteArrayInputStream(new byte[0]);
+		return new EmptyInputStream();
 	}
 
 	/**
