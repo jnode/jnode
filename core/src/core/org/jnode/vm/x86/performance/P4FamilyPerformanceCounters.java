@@ -31,6 +31,8 @@ abstract class P4FamilyPerformanceCounters extends X86PerformanceCounters {
     public static final int BPU_ESCR1 = 0x3B3;
     public static final int BSU_ESCR0 = 0x3A0;
     public static final int BSU_ESCR1 = 0x3A1;
+    public static final int CR_ESCR0 = 0;
+    public static final int CR_ESCR1 = 0;
     public static final int CRU_ESCR0 = 0x3B8;
     public static final int CRU_ESCR1 = 0x3B9;
     public static final int CRU_ESCR2 = 0x3CC;
