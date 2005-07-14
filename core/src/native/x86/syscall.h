@@ -19,4 +19,6 @@ SYSCALL_INT		equ 0x32
 ; Passed in register EAX
 SC_DISABLE_PAGING	equ 0x01
 SC_ENABLE_PAGING	equ 0x02
+SC_SYNC_MSRS		equ 0x03
+
 

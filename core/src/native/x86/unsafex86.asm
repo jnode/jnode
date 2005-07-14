@@ -140,5 +140,9 @@ GLABEL Q53org5jnode2vm3x869UnsafeX8623setupBootCode2e28Lorg2fvmmagic2funboxed2fA
 
 	ret SLOT_SIZE*3
 
+; static final native void syncMSRs();
+GLABEL Q53org5jnode2vm3x869UnsafeX8623syncMSRs2e2829V
+	SYSCALL SC_SYNC_MSRS
+	ret
 
 	

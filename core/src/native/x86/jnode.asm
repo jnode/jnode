@@ -83,7 +83,6 @@ TSS_DS		equ 0x38
 %include "kdb.asm"
 %include "ints.asm"
 %include "version.asm"
-%include "syscall.asm" 
 
 %ifdef BITS32
 	%define THREADSWITCHINDICATOR	dword[fs:VmProcessor_THREADSWITCHINDICATOR_OFS]
@@ -130,6 +129,7 @@ TSS_DS		equ 0x38
 %include "vm-invoke.asm"
 %include "vm-ints.asm"
 %include "vm-jumptable.asm"
+%include "syscall.asm" 
 %include "ap-boot.asm"
 
 		align 4096
