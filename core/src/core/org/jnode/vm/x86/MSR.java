@@ -34,4 +34,11 @@ final class MSR implements Uninterruptible {
     public final long getValue() {
         return value;
     }
+
+    /**
+     * Sets the value of this MSR.
+     */
+    final void setValue(long value) {
+        this.value = value;
+    }
 }

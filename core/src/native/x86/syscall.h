@@ -17,8 +17,12 @@ SYSCALL_INT		equ 0x32
 
 ; System call commands
 ; Passed in register EAX
-SC_DISABLE_PAGING	equ 0x01
-SC_ENABLE_PAGING	equ 0x02
-SC_SYNC_MSRS		equ 0x03
+SC_DISABLE_PAGING	equ 0x00
+SC_ENABLE_PAGING	equ 0x01
+SC_SYNC_MSRS		equ 0x02
+SC_SAVE_MSRS		equ 0x03
+SC_RESTORE_MSRS		equ 0x04
+
+SC_MAX				equ SC_RESTORE_MSRS
 
 

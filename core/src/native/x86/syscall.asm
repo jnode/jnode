@@ -12,21 +12,35 @@ stub_syscallHandler:
 	push dword 0		; Handler (not relevant)
 	int_entry
 	mov ABP,ASP
-	call syscallHandler
+	mov AAX,GET_OLD_EAX
+	cmp AAX,SC_MAX
+	ja stub_syscallHandler_ret
+	call WORD [syscalls + AAX*SLOT_SIZE]
+stub_syscallHandler_ret:	
 	int_exit
 
-syscallHandler:
-	cmp GET_OLD_EAX,SC_DISABLE_PAGING
-	je disable_paging
-	cmp GET_OLD_EAX,SC_ENABLE_PAGING
-	je enable_paging
-	cmp GET_OLD_EAX,SC_SYNC_MSRS
-	je sc_SyncMSRs
-	ret
-	
+syscalls:
+	DA	disable_paging
+	DA	enable_paging
+	DA	sc_SyncMSRs
+	DA	sc_SaveMSRs
+	DA	sc_RestoreMSRs
+
 sc_SyncMSRs:
 	mov ADI,CURRENTTHREAD
 	SAVE_MSR_ARRAY [ADI+VmX86Thread_READWRITEMSRS_OFS]
 	RESTORE_MSR_ARRAY [ADI+VmX86Thread_READWRITEMSRS_OFS]
 	RESTORE_MSR_ARRAY [ADI+VmX86Thread_WRITEONLYMSRS_OFS]
 	ret
+	
+sc_SaveMSRs:
+	mov ADI,CURRENTTHREAD
+	SAVE_MSR_ARRAY [ADI+VmX86Thread_READWRITEMSRS_OFS]
+	ret
+	
+sc_RestoreMSRs:
+	mov ADI,CURRENTTHREAD
+	RESTORE_MSR_ARRAY [ADI+VmX86Thread_READWRITEMSRS_OFS]
+	RESTORE_MSR_ARRAY [ADI+VmX86Thread_WRITEONLYMSRS_OFS]
+	ret	
+	
