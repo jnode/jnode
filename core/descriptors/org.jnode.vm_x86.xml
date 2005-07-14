@@ -21,6 +21,7 @@
       <!-- export name="org.jnode.vm.x86.compiler.l1.*"/ -->
       <export name="org.jnode.vm.x86.compiler.l1a.*"/>
       <export name="org.jnode.vm.x86.compiler.l2.*"/>
+      <export name="org.jnode.vm.x86.performance.*"/>
     </library>
   </runtime>
         

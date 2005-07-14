@@ -10,7 +10,7 @@ import org.vmmagic.pragma.Uninterruptible;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final class MSR implements Uninterruptible {
+public final class MSR implements Uninterruptible {
 
     /** Number of the MSR */
     private final int id;
@@ -38,7 +38,7 @@ final class MSR implements Uninterruptible {
     /**
      * Sets the value of this MSR.
      */
-    final void setValue(long value) {
+    public final void setValue(long value) {
         this.value = value;
     }
 }
