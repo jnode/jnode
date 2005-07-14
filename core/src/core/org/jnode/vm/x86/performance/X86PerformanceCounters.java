@@ -35,6 +35,8 @@ public class X86PerformanceCounters extends PerformanceCounters implements Unint
                 switch (id.getFamily()) {
                 case 0x06:
                     return new P6PerformanceCouters(processor);
+                case 0x0F:
+                    return new Pentium4PerformanceCounters(processor);
                 }
             } else if (id.isAMD()) {
                 switch (id.getFamily()) {
