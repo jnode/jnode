@@ -10,6 +10,9 @@ public enum PresetEvent {
     BR_MIS("Branches mispredicted"),
     BR_TAKEN("Branches taken"),
     BR_TAKEN_MIS("Branches taken mispredicted"),
+    FP_INS("Total floating point instructions"),
+    TOT_CYC("Total cycles"),
+    TOT_INS("Total instructions"),
     
     ;
     
