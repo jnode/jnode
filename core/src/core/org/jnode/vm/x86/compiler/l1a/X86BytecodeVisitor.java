@@ -59,6 +59,7 @@ import org.jnode.vm.classmgr.VmStaticField;
 import org.jnode.vm.classmgr.VmStaticMethod;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.classmgr.VmTypeState;
+import org.jnode.vm.compiler.CompileError;
 import org.jnode.vm.compiler.CompiledMethod;
 import org.jnode.vm.compiler.EntryPoints;
 import org.jnode.vm.compiler.InlineBytecodeVisitor;
@@ -724,28 +725,59 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	private final void ioperation(int operation, boolean commutative) {
 		IntItem v2 = vstack.popInt();
 		IntItem v1 = vstack.popInt();
-		if (prepareForOperation(v1, v2, commutative)) {
-			// Swap
-			final IntItem tmp = v2;
-			v2 = v1;
-			v1 = tmp;
-		}
+        
+        if (v2.isConstant() && v1.isConstant()) {
+            counters.getCounter("ioperation-const").inc();
+            
+            final int v;
+            switch (operation) {
+            case X86Operation.ADD: 
+                v = v1.getValue() + v2.getValue();
+                break;
+            case X86Operation.AND: 
+                v = v1.getValue() & v2.getValue();
+                break;
+            case X86Operation.OR: 
+                v = v1.getValue() | v2.getValue();
+                break;
+            case X86Operation.SUB: 
+                v = v1.getValue() - v2.getValue();
+                break;
+            case X86Operation.XOR: 
+                v = v1.getValue() ^ v2.getValue();
+                break;
+            default:
+                throw new RuntimeException("Invalid operation " + operation);
+            }
+            v1.release(eContext);
+            v2.release(eContext);
+            vstack.push(ifac.createIConst(eContext, v));
+        } else {           
+            counters.getCounter("ioperation-nonconst").inc();
 
-		final X86Register.GPR r1 = (X86Register.GPR) v1.getRegister();
-		switch (v2.getKind()) {
-		case Item.Kind.GPR:
-			os.writeArithOp(operation, r1, (X86Register.GPR) v2.getRegister());
-			break;
-		case Item.Kind.LOCAL:
-			os.writeArithOp(operation, r1, helper.BP, v2
-					.getOffsetToFP(eContext));
-			break;
-		case Item.Kind.CONSTANT:
-			os.writeArithOp(operation, r1, v2.getValue());
-			break;
-		}
-		v2.release(eContext);
-		vstack.push(v1);
+            if (prepareForOperation(v1, v2, commutative)) {
+                // Swap
+                final IntItem tmp = v2;
+                v2 = v1;
+                v1 = tmp;
+            }
+            
+            final X86Register.GPR r1 = (X86Register.GPR) v1.getRegister();
+            switch (v2.getKind()) {
+            case Item.Kind.GPR:
+                os.writeArithOp(operation, r1, (X86Register.GPR) v2.getRegister());
+                break;
+            case Item.Kind.LOCAL:
+                os.writeArithOp(operation, r1, helper.BP, v2
+                        .getOffsetToFP(eContext));
+                break;
+            case Item.Kind.CONSTANT:
+                os.writeArithOp(operation, r1, v2.getValue());
+                break;
+            }
+            v2.release(eContext);
+            vstack.push(v1);
+        }
 	}
 
 	/**
@@ -3669,17 +3701,83 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		// IMPROVE: check Jaos implementation
 		final IntItem val = vstack.popInt();
 		val.load(eContext);
-		final GPR valr = val.getRegister();
+		GPR valr = val.getRegister();
 		vstack.push(eContext);
 
 		final int n = addresses.length;
-		// TODO: port optimized version of L1
-		// Space wasting, but simple implementation
-		for (int i = 0; i < n; i++) {
-			os.writeCMP_Const(valr, lowValue + i);
-			os.writeJCC(helper.getInstrLabel(addresses[i]), X86Constants.JE); // JE
-		}
-		os.writeJMP(helper.getInstrLabel(defAddress));
+        if ((n > 4) && os.isCode32()) {
+            // Optimized version.  Needs some overhead, so only useful for
+            // larger tables.
+            counters.getCounter("tableswitch-opt").inc();
+            
+            final GPR tmp = (GPR)L1AHelper.requestRegister(eContext, JvmType.REFERENCE, false);
+            if (os.isCode64()) {
+                GPR64 valr64 = L1AHelper.get64BitReg(eContext, valr);
+                os.writeMOVSXD(valr64, (GPR32)valr);
+                valr = valr64;
+            }
+            if (lowValue != 0) {
+                os.writeSUB(valr, lowValue);
+            }
+            // If outsite low-high range, jump to default
+            os.writeCMP_Const(valr, n);
+            os.writeJCC(helper.getInstrLabel(defAddress), X86Constants.JAE);
+
+            final Label l1 = new Label(curInstrLabel + "$$l1");
+            final Label l2 = new Label(curInstrLabel + "$$l2");
+            final int l12distance = os.isCode32() ? 12 : 23;
+
+            // Get absolute address of l1 into S0. (do not use
+            // stackMgr.writePOP!)
+            os.writeCALL(l1);
+            os.setObjectRef(l1);
+            final int l1Ofs = os.getLength();
+            os.writePOP(tmp);
+
+            // Calculate absolute address of jumptable entry into S1
+            os.writeLEA(tmp, tmp, valr, helper.ADDRSIZE, l12distance);
+
+            // Calculate absolute address of jump target
+            if (os.isCode32()) {
+                os.writeADD(tmp, tmp, 0);
+            } else {
+                final GPR32 tmp2 = (GPR32)L1AHelper.requestRegister(eContext, JvmType.INT, false);
+                os.writeMOV(BITS32, tmp2, tmp, 0);
+                final GPR64 tmp2_64 = L1AHelper.get64BitReg(eContext, tmp2); 
+                os.writeMOVSXD(tmp2_64, tmp2);
+                os.writeADD(tmp, tmp2_64);     
+                L1AHelper.releaseRegister(eContext, tmp2);
+            }
+            os.writeLEA(tmp, tmp, 4); // Compensate for writeRelativeObject
+            // difference
+
+            // Jump to the calculated address
+            os.writeJMP(tmp);
+
+            // Emit offsets relative to where they are emitted
+            os.setObjectRef(l2);
+            final int l2Ofs = os.getLength();
+            for (int i = 0; i < n; i++) {
+                os.writeRelativeObjectRef(helper.getInstrLabel(addresses[i]));
+            }
+
+            if ((l2Ofs - l1Ofs) != l12distance) {
+                if (!os.isTextStream()) {
+                    throw new CompileError("l12distance must be "
+                            + (l2Ofs - l1Ofs));
+                }
+            }
+            L1AHelper.releaseRegister(eContext, tmp);
+        } else {
+            // Space wasting, but simple implementation
+
+            counters.getCounter("tableswitch-nonopt").inc();
+            for (int i = 0; i < n; i++) {
+                os.writeCMP_Const(valr, lowValue + i);
+                os.writeJCC(helper.getInstrLabel(addresses[i]), X86Constants.JE); // JE
+            }
+            os.writeJMP(helper.getInstrLabel(defAddress));
+        }
 
 		val.release(eContext);
 	}
