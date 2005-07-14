@@ -36,6 +36,7 @@ import org.jnode.vm.VmThread;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.performance.PerformanceCounters;
+import org.jnode.vm.x86.performance.X86PerformanceCounters;
 import org.vmmagic.pragma.LoadStaticsPragma;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Word;

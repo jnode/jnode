@@ -26,6 +26,7 @@ import org.jnode.vm.VmMagic;
 import org.jnode.vm.VmThread;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.memmgr.VmHeapManager;
+import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.ObjectReference;
 import org.vmmagic.unboxed.Word;
@@ -71,8 +72,8 @@ public abstract class VmX86Thread extends VmThread {
 	volatile Word exCr2;
     
     // MSR's
-    volatile MSR[] readWriteMSRs;
-    volatile MSR[] writeOnlyMSRs;
+    private volatile MSR[] readWriteMSRs;
+    private volatile MSR[] writeOnlyMSRs;
 	
 	/**
 	 * Initialize this instance 
@@ -227,5 +228,31 @@ public abstract class VmX86Thread extends VmThread {
             }
         }
         return true;
+    }
+    
+    /**
+     * Sets the MSR arrays.
+     * @param readWriteMSRs
+     * @param writeOnlyMSRs
+     * @throws UninterruptiblePragma
+     */
+    public final void setMSRs(MSR[] readWriteMSRs, MSR[] writeOnlyMSRs) 
+    throws UninterruptiblePragma {
+        this.readWriteMSRs = readWriteMSRs;
+        this.writeOnlyMSRs = writeOnlyMSRs;
+    }
+
+    /**
+     * @return Returns the readWriteMSRs.
+     */
+    public final MSR[] getReadWriteMSRs() {
+        return readWriteMSRs;
+    }
+
+    /**
+     * @return Returns the writeOnlyMSRs.
+     */
+    public final MSR[] getWriteOnlyMSRs() {
+        return writeOnlyMSRs;
     }
 }
