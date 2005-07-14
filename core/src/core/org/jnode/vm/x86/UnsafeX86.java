@@ -83,4 +83,9 @@ final class UnsafeX86 {
      * @param length The number of 32-bit int's to merge.
      */
     static final native void setARGB32bppMMX(Address src, Address dst, int length);
+    
+    /**
+     * Save and restore the MSR's arrays of the current thread.
+     */
+    static final native void syncMSRs();
 }
