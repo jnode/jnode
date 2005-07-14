@@ -88,4 +88,14 @@ final class UnsafeX86 {
      * Save and restore the MSR's arrays of the current thread.
      */
     static final native void syncMSRs();
+    
+    /**
+     * Restore the MSR's arrays of the current thread.
+     */
+    static final native void restoreMSRs();
+    
+    /**
+     * Save the MSR's arrays of the current thread.
+     */
+    static final native void saveMSRs();
 }

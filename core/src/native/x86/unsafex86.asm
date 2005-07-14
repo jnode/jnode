@@ -145,4 +145,13 @@ GLABEL Q53org5jnode2vm3x869UnsafeX8623syncMSRs2e2829V
 	SYSCALL SC_SYNC_MSRS
 	ret
 
+; static final native void saveMSRs();
+GLABEL Q53org5jnode2vm3x869UnsafeX8623saveMSRs2e2829V	
+	SYSCALL SC_SAVE_MSRS
+	ret
+
+; static final native void restoreMSRs();
+GLABEL Q53org5jnode2vm3x869UnsafeX8623restoreMSRs2e2829V	
+	SYSCALL SC_RESTORE_MSRS
+	ret
 	
