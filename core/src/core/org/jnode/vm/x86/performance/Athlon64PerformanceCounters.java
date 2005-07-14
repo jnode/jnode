@@ -24,10 +24,10 @@ final class Athlon64PerformanceCounters extends DualMSRPerformanceCounters {
             0xC0010006, 0xC0010007 };
 
     private static final DualMSREvent[] EVENTS = {
-            new DualMSREvent(BR, 0xC2, 0x00),
+            new DualMSREvent(BR_INS, 0xC2, 0x00),
             new DualMSREvent(BR_MIS, 0xC3, 0x00),
-            new DualMSREvent(BR_TAKEN, 0xC4, 0x00),
-            new DualMSREvent(BR_TAKEN_MIS, 0xC5, 0x00), 
+            new DualMSREvent(BR_TKN, 0xC4, 0x00),
+            new DualMSREvent(BR_TKN_MIS, 0xC5, 0x00), 
             new DualMSREvent(FP_INS, 0xCB, 0x01),
             new DualMSREvent(TOT_CYC, 0xC1, 0x00),
             new DualMSREvent(TOT_INS, 0xC0, 0x00),
