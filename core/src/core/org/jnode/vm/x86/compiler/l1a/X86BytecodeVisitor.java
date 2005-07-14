@@ -31,6 +31,7 @@ import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.x86.X86Register.GPR32;
 import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.system.BootLog;
+import org.jnode.util.CounterGroup;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
 import org.jnode.vm.bytecode.BasicBlock;
@@ -167,6 +168,9 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 	 * reason, array and field operations are not delayed.
 	 */
 	private final VirtualStack vstack;
+
+    /** My counters */
+    private final CounterGroup counters = Vm.getVm().getCounterGroup(getClass().getName());
 
 	/**
 	 * Create a new instance
@@ -2560,27 +2564,39 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			vstack.push(eContext);
 
 			dropParameters(mts, true);
-
-			final int tibIndex = method.getTibOffset();
-			final int argSlotCount = Signature.getArgSlotCount(typeSizeInfo, methodRef
-					.getSignature());
-
-            final int slotSize = helper.SLOTSIZE;
-            final int asize = helper.ADDRSIZE;
             
-			/* Get objectref -> EAX */
-			os.writeMOV(asize, helper.AAX, helper.SP, argSlotCount
-					* slotSize);
-			/* Get VMT of objectef -> EAX */
-			os.writeMOV(asize, helper.AAX, helper.AAX, tibOffset);
-			/* Get entry in VMT -> EAX */
-			os.writeMOV(asize, helper.AAX, helper.AAX,
-					arrayDataOffset + (tibIndex * slotSize));
-            
-			/* Now invoke the method */
-            os.writeCALL(helper.AAX, context.getVmMethodNativeCodeField().getOffset());
-            helper.pushReturnValue(methodRef.getSignature());
-			// Result is already on the stack.
+            if (method.isFinal()) {
+                // Do a fast invocation
+                counters.getCounter("virtual-final").inc();
+                
+                // Call the methods native code from the statics table
+                helper.invokeJavaMethod(method);
+                // Result is already on the stack.
+            } else {
+                // Do a virtual method table invocation
+                counters.getCounter("virtual-vmt").inc();
+
+                final int tibIndex = method.getTibOffset();
+                final int argSlotCount = Signature.getArgSlotCount(typeSizeInfo, methodRef
+                        .getSignature());
+                
+                final int slotSize = helper.SLOTSIZE;
+                final int asize = helper.ADDRSIZE;
+                
+                /* Get objectref -> EAX */
+                os.writeMOV(asize, helper.AAX, helper.SP, argSlotCount
+                        * slotSize);
+                /* Get VMT of objectef -> EAX */
+                os.writeMOV(asize, helper.AAX, helper.AAX, tibOffset);
+                /* Get entry in VMT -> EAX */
+                os.writeMOV(asize, helper.AAX, helper.AAX,
+                        arrayDataOffset + (tibIndex * slotSize));
+                
+                /* Now invoke the method */
+                os.writeCALL(helper.AAX, context.getVmMethodNativeCodeField().getOffset());
+                helper.pushReturnValue(methodRef.getSignature());
+                // Result is already on the stack.
+            }
 		}
 	}
 
