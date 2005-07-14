@@ -28,6 +28,7 @@ import org.jnode.driver.DriverException;
 import org.jnode.driver.video.AbstractFrameBufferDriver;
 import org.jnode.driver.video.AlreadyOpenException;
 import org.jnode.driver.video.FrameBufferConfiguration;
+import org.jnode.driver.video.NotOpenException;
 import org.jnode.driver.video.Surface;
 import org.jnode.driver.video.UnknownConfigurationException;
 import org.jnode.driver.video.vgahw.VgaConstants;
@@ -90,6 +91,24 @@ public class VGADriver extends AbstractFrameBufferDriver implements VgaConstants
 			throw new UnknownConfigurationException();
 		}
 	}
+
+    /**
+     * @see org.jnode.driver.video.FrameBufferAPI#getCurrentSurface()
+     */
+    public synchronized Surface getCurrentSurface() throws NotOpenException {
+        if (currentConfig != null) {
+            return vga;
+        } else {
+            throw new NotOpenException();
+        }
+    }
+
+    /**
+     * @see org.jnode.driver.video.FrameBufferAPI#isOpen()
+     */
+    public synchronized final boolean isOpen() {
+        return (currentConfig != null);
+    }
 
 	/**
 	 * The given surface is closed.

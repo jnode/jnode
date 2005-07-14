@@ -29,6 +29,7 @@ import org.jnode.driver.video.AbstractFrameBufferDriver;
 import org.jnode.driver.video.AlreadyOpenException;
 import org.jnode.driver.video.FrameBufferConfiguration;
 import org.jnode.driver.video.HardwareCursorAPI;
+import org.jnode.driver.video.NotOpenException;
 import org.jnode.driver.video.Surface;
 import org.jnode.driver.video.UnknownConfigurationException;
 import org.jnode.system.ResourceNotFreeException;
@@ -77,6 +78,24 @@ public class VMWareDriver extends AbstractFrameBufferDriver implements VMWareCon
 		throw new UnknownConfigurationException();
 	}
 	
+    /**
+     * @see org.jnode.driver.video.FrameBufferAPI#getCurrentSurface()
+     */
+    public synchronized Surface getCurrentSurface() throws NotOpenException {
+        if (currentConfig != null) {
+            return kernel;
+        } else {
+            throw new NotOpenException();
+        }
+    }
+
+    /**
+     * @see org.jnode.driver.video.FrameBufferAPI#isOpen()
+     */
+    public synchronized final boolean isOpen() {
+        return (currentConfig != null);
+    }
+
 	/**
 	 * Notify of a close of the graphics object
 	 * @param graphics

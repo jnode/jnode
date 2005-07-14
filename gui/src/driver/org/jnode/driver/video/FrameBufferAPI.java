@@ -50,4 +50,17 @@ public interface FrameBufferAPI extends DeviceAPI {
 	 */
 	public Surface open(FrameBufferConfiguration config)
 	throws UnknownConfigurationException, AlreadyOpenException, DeviceException;
+    
+    /**
+     * Is there an open framebuffer configuration.
+     * @return
+     */
+    public boolean isOpen();
+    
+    /**
+     * Gets the currently opened framebuffer configuration.
+     * @return
+     */
+    public Surface getCurrentSurface()
+    throws NotOpenException;
 }

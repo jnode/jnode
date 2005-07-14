@@ -29,6 +29,7 @@ import org.jnode.driver.video.AbstractFrameBufferDriver;
 import org.jnode.driver.video.AlreadyOpenException;
 import org.jnode.driver.video.FrameBufferConfiguration;
 import org.jnode.driver.video.HardwareCursorAPI;
+import org.jnode.driver.video.NotOpenException;
 import org.jnode.driver.video.Surface;
 import org.jnode.driver.video.UnknownConfigurationException;
 import org.jnode.plugin.ConfigurationElement;
@@ -42,6 +43,7 @@ public class RadeonDriver extends AbstractFrameBufferDriver implements RadeonCon
 
     private FrameBufferConfiguration currentConfig;
     private RadeonCore kernel;
+    private RadeonSurface surface;
 	private final int architecture;
 	private final String model;
     
@@ -79,8 +81,7 @@ public class RadeonDriver extends AbstractFrameBufferDriver implements RadeonCon
 		for (int i = 0; i < CONFIGS.length; i++) {
 			if (config.equals(CONFIGS[i])) {
 				try {
-					final RadeonSurface surface;
-                    surface = kernel.open((RadeonConfiguration) config);
+                    this.surface = kernel.open((RadeonConfiguration) config);
     				this.currentConfig = config;
     				return surface;
                 } catch (ResourceNotFreeException ex) {
@@ -91,12 +92,31 @@ public class RadeonDriver extends AbstractFrameBufferDriver implements RadeonCon
 		throw new UnknownConfigurationException();
     }
 
+    /**
+     * @see org.jnode.driver.video.FrameBufferAPI#getCurrentSurface()
+     */
+    public synchronized Surface getCurrentSurface() throws NotOpenException {
+        if (currentConfig != null) {
+            return surface;
+        } else {
+            throw new NotOpenException();
+        }
+    }
+
+    /**
+     * @see org.jnode.driver.video.FrameBufferAPI#isOpen()
+     */
+    public synchronized final boolean isOpen() {
+        return (currentConfig != null);
+    }
+
 	/**
 	 * Notify of a close of the graphics object
 	 * @param graphics
 	 */
 	final synchronized void close(RadeonCore graphics) {
 		this.currentConfig = null;
+        this.surface = null;
 	}
 	
 	/**
