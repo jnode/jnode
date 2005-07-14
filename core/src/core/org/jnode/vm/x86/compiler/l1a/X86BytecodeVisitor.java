@@ -2556,8 +2556,10 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			throw new IncompatibleClassChangeError(
 					"Static method in invokevirtual");
 		}
+        
 		final VmInstanceMethod method = (VmInstanceMethod) mts;
-		if (method.getDeclaringClass().isMagicType()) {
+        final VmType<?> declClass = method.getDeclaringClass();
+		if (declClass.isMagicType()) {
 			magicHelper.emitMagic(eContext, method, false, this);
 		} else {
 			// TODO: port to orp-style
@@ -2565,7 +2567,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 
 			dropParameters(mts, true);
             
-            if (method.isFinal()) {
+            if (method.isFinal() || method.isPrivate() || declClass.isFinal()) {
                 // Do a fast invocation
                 counters.getCounter("virtual-final").inc();
                 
