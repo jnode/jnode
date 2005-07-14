@@ -19,6 +19,24 @@ public abstract class PerformanceCounters {
     public abstract Set<PerformanceCounterEvent> getAvailableEvents();
     
     /**
+     * Gets the performance counter event with the given id, if that is 
+     * available on thecurrent processor.
+     * 
+     * @return The event, or null if not found.
+     */
+    public abstract PerformanceCounterEvent getAvailableEvent(String id);
+    
+    /**
+     * Gets the performance counter event with the given id, if that is 
+     * available on thecurrent processor.
+     * 
+     * @return The event, or null if not found.
+     */
+    public final PerformanceCounterEvent getAvailableEvent(PresetEvent preset) {
+        return getAvailableEvent(preset.name());
+    }
+    
+    /**
      * Gets the number of performance counters that are available on the
      * current processor.
      * @return
