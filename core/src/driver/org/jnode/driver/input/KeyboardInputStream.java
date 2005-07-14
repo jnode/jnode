@@ -50,7 +50,7 @@ public class KeyboardInputStream extends InputStream implements KeyboardListener
 	 * @see java.io.InputStream#available()
 	 */
 	public int available() throws IOException {
-		return queue.size();
+	    return 0;      
 	}
 
 	/**
