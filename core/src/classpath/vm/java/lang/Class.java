@@ -25,6 +25,7 @@ import gnu.java.lang.VMClassHelper;
 
 import java.io.InputStream;
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -209,6 +210,13 @@ public final class Class<T> implements Serializable {
         return getLinkedVmClass().isAssignableFrom(c.getLinkedVmClass());
     }
 
+    /**
+     * Gets the runtime visible annotations of this class.
+     */
+    public Annotation[] getAnnotations() {
+        return vmClass.getRuntimeVisibleAnnotations();
+    }
+    
     /**
      * Gets the classloader used to load this class.
      * 

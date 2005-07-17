@@ -41,6 +41,8 @@ abstract class VmMember extends VmSystemObject implements Uninterruptible {
 	protected final VmType<?> declaringClass;
 	/** Hashcode of name+signature */
 	private final int cachedHashCode;
+    /** The runtime annotations */
+    private VmAnnotation[] runtimeAnnotations;
 
 	/**
 	 * Create a new instance
@@ -208,6 +210,24 @@ abstract class VmMember extends VmSystemObject implements Uninterruptible {
         super.verifyBeforeEmit();
         if (!declaringClass.isCompiled()) {
             throw new RuntimeException("emit before compile in " + this);
+        }
+    }
+
+    /**
+     * @return Returns the runtimeAnnotations.
+     */
+    public final VmAnnotation[] getRuntimeAnnotations() {
+        return runtimeAnnotations;
+    }
+
+    /**
+     * @param runtimeAnnotations The runtimeAnnotations to set.
+     */
+    final void setRuntimeAnnotations(VmAnnotation[] runtimeAnnotations) {
+        if (this.runtimeAnnotations == null) {
+            this.runtimeAnnotations = runtimeAnnotations;
+        } else {
+            throw new SecurityException("Cannot override runtime annotations");
         }
     }
 }
