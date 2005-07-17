@@ -25,6 +25,7 @@ import gnu.java.lang.VMClassHelper;
 
 import java.io.Serializable;
 import java.io.Writer;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.security.ProtectionDomain;
 import java.util.Arrays;
@@ -122,6 +123,9 @@ public abstract class VmType<T> extends VmSystemObject implements VmSharedStatic
     
     /** Type information managed and required by the memory manager */
     private Object mmType;
+    
+    /** Runtime annotations */
+    private VmAnnotation[] runtimeAnnotations;
 
 	private static VmNormalClass<Object> ObjectClass;
 
@@ -2163,6 +2167,50 @@ public abstract class VmType<T> extends VmSystemObject implements VmSharedStatic
             Unsafe.debug("Cannot override mmType\n");
         } else {
             this.mmType = mmType;
+        }
+    }
+
+    /**
+     * @return Returns the runtimeAnnotations.
+     */
+    public final VmAnnotation[] getRuntimeAnnotations() {
+        return runtimeAnnotations;
+    }
+    
+    /**
+     * Gets the runtime visible annotations.
+     */
+    public final Annotation[] getRuntimeVisibleAnnotations() {
+        final int max = runtimeAnnotations.length;
+        // Count the runtime visible annotations
+        int cnt = 0;
+        for (int i = 0; i < max; i++) {
+            if (runtimeAnnotations[i].isRuntimeVisible()) {
+                cnt++;
+            }
+        }
+        final Annotation[] arr = new Annotation[cnt];
+        cnt = 0;
+        for (int i = 0; i < max; i++) {
+            if (runtimeAnnotations[i].isRuntimeVisible()) {
+                try {
+                    arr[cnt++] = runtimeAnnotations[i].getValue(loader);
+                } catch (ClassNotFoundException e) {
+                    throw new NoClassDefFoundError(e.getMessage());
+                }
+            }
+        }
+        return arr;
+    }
+
+    /**
+     * @param runtimeAnnotations The runtimeAnnotations to set.
+     */
+    final void setRuntimeAnnotations(VmAnnotation[] runtimeAnnotations) {
+        if (this.runtimeAnnotations == null) {
+            this.runtimeAnnotations = runtimeAnnotations;
+        } else {
+            throw new SecurityException("Cannot override runtime annotations");
         }
     }
 }

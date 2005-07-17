@@ -48,6 +48,14 @@ public final class ClassDecoder {
     private static char[] ExceptionsAttrName;
 
     private static char[] LineNrTableAttrName;
+    
+    private static char[] RuntimeVisibleAnnotationsAttrName;
+
+    private static char[] RuntimeInvisibleAnnotationsAttrName;
+
+    private static char[] RuntimeVisibleParameterAnnotationsAttrName;
+
+    private static char[] RuntimeInvisibleParameterAnnotationsAttrName;
 
     private static final int NO_FIELD_ALIGNMENT = 0x0001;
 
@@ -120,15 +128,13 @@ public final class ClassDecoder {
     private static final void cl_init() {
         if (ConstantValueAttrName == null) {
             ConstantValueAttrName = "ConstantValue".toCharArray();
-        }
-        if (CodeAttrName == null) {
             CodeAttrName = "Code".toCharArray();
-        }
-        if (ExceptionsAttrName == null) {
             ExceptionsAttrName = "Exceptions".toCharArray();
-        }
-        if (LineNrTableAttrName == null) {
             LineNrTableAttrName = "LineNumberTable".toCharArray();
+            RuntimeVisibleAnnotationsAttrName = "RuntimeVisibleAnnotations".toCharArray();
+            RuntimeInvisibleAnnotationsAttrName = "RuntimeInvisibleAnnotations".toCharArray();
+            RuntimeVisibleParameterAnnotationsAttrName = "RuntimeVisibleParameterAnnotations".toCharArray();
+            RuntimeInvisibleParameterAnnotationsAttrName = "RuntimeInvisibleParameterAnnotations".toCharArray();
         }
     }
 
@@ -330,6 +336,23 @@ public final class ClassDecoder {
 
         // Method Table
         readMethods(data, rejectNatives, cls, cp, sharedStatics, clc);
+
+        // Read class attributes
+        final int acount = data.getChar();
+        VmAnnotation[] rVisAnn = null;
+        VmAnnotation[] rInvisAnn = null;
+        for (int a = 0; a < acount; a++) {
+            final String attrName = cp.getUTF8(data.getChar());
+            final int length = data.getInt();
+            if (VmArray.equals(RuntimeVisibleAnnotationsAttrName, attrName)) {
+                rVisAnn = readRuntimeAnnotations(data, cp, true);
+            } else if (VmArray.equals(RuntimeInvisibleAnnotationsAttrName, attrName)) {
+                rInvisAnn = readRuntimeAnnotations(data, cp, false);
+            } else {
+                skip(data, length);
+            }
+        }
+        cls.setRuntimeAnnotations(merge(rVisAnn, rInvisAnn));
 
         return cls;
     }
@@ -585,6 +608,8 @@ public final class ClassDecoder {
 
                 // Read field attributes
                 final int acount = data.getChar();
+                VmAnnotation[] rVisAnn = null;
+                VmAnnotation[] rInvisAnn = null;
                 for (int a = 0; a < acount; a++) {
                     final String attrName = cp.getUTF8(data.getChar());
                     final int length = data.getInt();
@@ -626,10 +651,15 @@ public final class ClassDecoder {
                             statics.setObject(staticsIdx, cp.getString(idx));
                             break;
                         }
+                    } else if (VmArray.equals(RuntimeVisibleAnnotationsAttrName, attrName)) {
+                        rVisAnn = readRuntimeAnnotations(data, cp, true);
+                    } else if (VmArray.equals(RuntimeInvisibleAnnotationsAttrName, attrName)) {
+                        rInvisAnn = readRuntimeAnnotations(data, cp, false);
                     } else {
                         skip(data, length);
                     }
                 }
+                fs.setRuntimeAnnotations(merge(rVisAnn, rInvisAnn));
             }
 
             // Align the instance fields for minimal object size.
@@ -732,6 +762,8 @@ public final class ClassDecoder {
 
                 // Read methods attributes
                 final int acount = data.getChar();
+                VmAnnotation[] rVisAnn = null;
+                VmAnnotation[] rInvisAnn = null;
                 for (int a = 0; a < acount; a++) {
                     String attrName = cp.getUTF8(data.getChar());
                     int length = data.getInt();
@@ -739,10 +771,19 @@ public final class ClassDecoder {
                         mts.setBytecode(readCode(data, cls, cp, mts));
                     } else if (VmArray.equals(ExceptionsAttrName, attrName)) {
                         mts.setExceptions(readExceptions(data, cls, cp));
+                    } else if (VmArray.equals(RuntimeVisibleAnnotationsAttrName, attrName)) {
+                        rVisAnn = readRuntimeAnnotations(data, cp, true);
+                    } else if (VmArray.equals(RuntimeInvisibleAnnotationsAttrName, attrName)) {
+                        rInvisAnn = readRuntimeAnnotations(data, cp, false);
+                    } else if (VmArray.equals(RuntimeVisibleParameterAnnotationsAttrName, attrName)) {
+                        readRuntimeParameterAnnotations(data, cp, true);
+                    } else if (VmArray.equals(RuntimeInvisibleParameterAnnotationsAttrName, attrName)) {
+                        readRuntimeParameterAnnotations(data, cp, false);
                     } else {
                         skip(data, length);
                     }
                 }
+                mts.setRuntimeAnnotations(merge(rVisAnn, rInvisAnn));
                 if ((modifiers & Modifier.ACC_NATIVE) != 0) {
                     final VmByteCode bc = getNativeCodeReplacement(mts, cl,
                             rejectNatives);
@@ -757,6 +798,126 @@ public final class ClassDecoder {
                 }
             }
             cls.setMethodTable(mtable);
+        }
+    }
+    
+    /**
+     * Read a runtime parameter annotations attributes.
+     * @param data
+     * @param cp
+     */
+    private static VmAnnotation[][] readRuntimeParameterAnnotations(ByteBuffer data, VmCP cp, boolean visible) {
+        final int numParams = data.get();
+        final VmAnnotation[][] arr = new VmAnnotation[numParams][];
+        for (int i = 0; i < numParams; i++) {
+            arr[i] = readRuntimeAnnotations(data, cp, visible);
+        }
+        return arr;
+    }
+    
+    /**
+     * Read a runtime annotations attributes.
+     * @param data
+     * @param cp
+     */
+    private static VmAnnotation[] readRuntimeAnnotations(ByteBuffer data, VmCP cp, boolean visible) {
+        final int numAnn = data.getChar();
+        final VmAnnotation[] arr = new VmAnnotation[numAnn];
+        for (int i = 0; i < numAnn; i++) {
+            arr[i] = readAnnotation(data, cp, visible);
+        }
+        return arr;
+    }
+    
+    /**
+     * Read a single annotation structure.
+     * @param data
+     * @param cp
+     */
+    private static VmAnnotation readAnnotation(ByteBuffer data, VmCP cp, boolean visible) {        
+        final String typeDescr = cp.getUTF8(data.getChar());
+        System.out.println("ann-type: " + typeDescr);
+        final int numElemValuePairs = data.getChar();
+        final VmAnnotation.ElementValue[] values;
+        if (numElemValuePairs == 0) {
+            values = VmAnnotation.ElementValue.EMPTY_ARR;
+        } else {
+            values = new VmAnnotation.ElementValue[numElemValuePairs];
+            for (int i = 0; i < numElemValuePairs; i++) {
+                final String elemName = cp.getUTF8(data.getChar());
+                System.out.println("  ann-elem-name: " + elemName);
+                final Object value = readElementValue(data, cp);
+                System.out.println("  ann-elem: " + elemName + "=" + value);
+                values[i] = new VmAnnotation.ElementValue(elemName, value);
+            }
+        }
+        return new VmAnnotation(visible, typeDescr, values);
+    }
+    
+    /**
+     * Read a single element_value structure.
+     * @param data
+     * @param cp
+     */
+    private static Object readElementValue(ByteBuffer data, VmCP cp) {
+        final int tag = data.get() & 0xFF;
+        switch (tag) {
+        case 'B': return Byte.valueOf((byte)cp.getInt(data.getChar()));
+        case 'C': return Character.valueOf((char)cp.getInt(data.getChar()));
+        case 'D': return cp.getDouble(data.getChar());
+        case 'F': return cp.getFloat(data.getChar());
+        case 'I': return cp.getInt(data.getChar());
+        case 'J': return cp.getLong(data.getChar());
+        case 'S': return Short.valueOf((short)cp.getInt(data.getChar()));
+        case 'Z': return Boolean.valueOf(cp.getInt(data.getChar()) != 0);
+        case 's': return cp.getAny(data.getChar());
+        case 'e': // enum
+        {
+            final String typeDescr = cp.getUTF8(data.getChar());
+            final String constName = cp.getUTF8(data.getChar());
+            return new VmAnnotation.EnumValue(typeDescr, constName);
+        }
+        case 'c': // class
+        {
+            final String classDescr = cp.getUTF8(data.getChar());
+            return new VmAnnotation.ClassInfo(classDescr);
+        }
+        case '@': // annotation
+            return readAnnotation(data, cp, true);
+        case '[': // array
+        {
+            final int numValues = data.getChar();
+            final Object[] arr = new Object[numValues];
+            for (int i = 0; i < numValues; i++) {
+                arr[i] = readElementValue(data, cp);
+            }
+            return arr;
+        }
+        default:
+            throw new ClassFormatError("Unknown element_value tag '" + (char)tag + "'");    
+        }
+    }
+    
+    /** 
+     * Merge the two given arrays.
+     * @param arr1 Can be null
+     * @param arr2 Can be null
+     * @return
+     */
+    private static final VmAnnotation[] merge(VmAnnotation[] arr1, VmAnnotation[] arr2) {
+        if ((arr1 == null) && (arr2 == null)) {
+            return VmAnnotation.EMPTY_ARR;
+        } else if (arr2 == null) {
+            return arr1; 
+        } else if (arr1 == null) {
+            return arr2;
+        } else {
+            final int l1 = arr1.length;
+            final int l2 = arr2.length;
+            final VmAnnotation[] res = new VmAnnotation[l1 + l2];
+            System.arraycopy(arr1, 0, res, 0, l1);
+            System.arraycopy(arr2, 0, res, l1, l2);
+            return res;
         }
     }
     
