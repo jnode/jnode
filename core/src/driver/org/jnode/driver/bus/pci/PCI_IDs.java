@@ -110,4 +110,8 @@ public interface PCI_IDs {
   public static final int PCI_VENDOR_ID_SMC_1211 = 0x1113; // pciids.sf.net
   // http://www.etherboot.org/db/nics.php?show=tech_data&chip_manufacturer=Realtek
   public static final int PCI_DEVICE_ID_SMC_1211 = 0x1211;
+  
+  public static final int PCI_VENDOR_ID_CIRRUS=0x1013;
+  public static final int PCI_DEVICE_ID_5446=0x00D8; // emulate by qemu
+  
 }
