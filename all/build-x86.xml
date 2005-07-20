@@ -220,6 +220,12 @@
 
 		<replace file="${jnode.install-nt.dir}/menu.lst"
 			token="(hd0,0)" value="${partition-nt.grub.menu}"/>
+
+    <!-- patch -->
+		<replace file="${jnode.install-nt.dir}/menu.lst"
+			token="${partition-nt.grub.menu}" value="${partition-nt.grub.menu.final}"/>
+
+
 		<echo message="${grub.install-nt.exe} -d ${partition-nt} -1 ${jnode.install-nt.dir}\${grub.stage1-nt.name} -2 ${jnode.install-nt.dir}\${grub.stage2-nt.name} -m ${jnode.install-nt.dir}\menu.lst" />
 
 		<!-- the following wait is needed else grubinstall will fail finding stage2 -->
@@ -229,9 +235,10 @@
 			<arg line="-d ${partition-nt} -1 ${jnode.install-nt.dir}\${grub.stage1-nt.name} -2 ${jnode.install-nt.dir}\${grub.stage2-nt.name} -m ${jnode.install-nt.dir}\menu.lst" />
 		</exec>
 
-    <!-- patch -->
+    <!-- patch
 		<replace file="${jnode.install-nt.dir}/menu.lst"
 			token="${partition-nt.grub.menu}" value="${partition-nt.grub.menu.final}"/>
+			 -->
 	</target>
 
 	<macrodef name="create-cdrom">
