@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<fragment id="org.classpath.ext.corba"
+  name="Classpath org.omg.CORBA classes"
+  version="@VERSION@"
+  plugin-id="org.classpath.core"
+  plugin-version="@VERSION@"
+  provider-name="Classpath"
+  provider-url="http://classpath.org"
+  license-name="classpath">
+
+  <runtime>
+    <library name="jnode-core.jar">
+      <export name="javax.rmi.*"/>
+      <export name="javax.rmi.CORBA.*"/>
+      
+      <export name="org.omg.CORBA.*"/>
+      <export name="org.omg.CORBA_2_3.*"/>
+      <export name="org.omg.CORBA_2_3.portable.*"/>
+      <export name="org.omg.CORBA.DynAnyPackage.*"/>
+      <export name="org.omg.CORBA.ORBPackage.*"/>
+      <export name="org.omg.CORBA.portable.*"/>
+      <export name="org.omg.CORBA.TypeCodePackage.*"/>
+      <export name="org.omg.CosNaming.*"/>
+      <export name="org.omg.CosNaming.NamingContextExtPackage.*"/>
+      <export name="org.omg.CosNaming.NamingContextPackage.*"/>
+      <export name="org.omg.Dynamic.*"/>
+      <export name="org.omg.DynamicAny.DynAnyFactoryPackage.*"/>
+      <export name="org.omg.DynamicAny.DynAnyPackage.*"/>
+      <export name="org.omg.IOP.*"/>
+      <export name="org.omg.IOP.CodecFactoryPackage.*"/>
+      <export name="org.omg.IOP.CodecPackage.*"/>
+      <export name="org.omg.Messaging.*"/>
+      <export name="org.omg.PortableInterceptor.*"/>
+      <export name="org.omg.PortableInterceptor.ORBInitInfoPackage.*"/>
+      <export name="org.omg.PortableServer.*"/>
+      <export name="org.omg.PortableServer.CurrentPackage.*"/>
+      <export name="org.omg.PortableServer.POAManagerPackage.*"/>
+      <export name="org.omg.PortableServer.POAPackage.*"/>
+      <export name="org.omg.SendingContext.*"/>
+      <export name="org.omg.stub.java.rmi.*"/>
+    </library>
+  </runtime>
+  
+</fragment>
