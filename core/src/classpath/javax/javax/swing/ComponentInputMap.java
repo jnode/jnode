@@ -70,7 +70,7 @@ public class ComponentInputMap extends InputMap
    * If actionMapKey is null an existing entry will be removed.
    *
    * @param keystroke the keystroke for the entry
-   * @param actionMapKey the action.
+   * @param value the action.
    */
   public void put(KeyStroke keystroke, Object value)
   {
@@ -90,7 +90,7 @@ public class ComponentInputMap extends InputMap
   /**
    * Remove an entry from the <code>InputMap</code>.
    *
-   * @param key the key of the entry to remove
+   * @param keystroke the key of the entry to remove
    */
   public void remove(KeyStroke keystroke)
   {
@@ -103,7 +103,7 @@ public class ComponentInputMap extends InputMap
    *
    * @param parentMap the new parent
    *
-   * @exception IllegalArgument if parentMap is not a
+   * @exception IllegalArgumentException if parentMap is not a
    * <code>ComponentInputMap</code> or not associated with the same component
    */
   public void setParent(InputMap parentMap)

@@ -150,7 +150,8 @@ public class BoxLayout implements LayoutManager2, Serializable
      * direction. This will be <code>insets.top</code> for vertical direction
      * and <code>insets.left</code> for horizontal direction.
      *
-     * @param the {@link Insets} object from which to return the lower bounds
+     * @param insets the {@link Insets} object from which to return the lower 
+     *               bounds
      *
      * @return the lower bounds of the {@link Insets} object according to this
      *     direction
@@ -226,7 +227,8 @@ public class BoxLayout implements LayoutManager2, Serializable
      * direction. This will be <code>insets.top</code> for vertical direction
      * and <code>insets.left</code> for horizontal direction.
      *
-     * @param the {@link Insets} object from which to return the lower bounds
+     * @param insets the {@link Insets} object from which to return the lower 
+     *        bounds
      *
      * @return the lower bounds of the {@link Insets} object according to this
      *     direction

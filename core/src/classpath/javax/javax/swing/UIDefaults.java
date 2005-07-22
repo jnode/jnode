@@ -74,6 +74,13 @@ public class UIDefaults extends Hashtable
   /** We use this for firing PropertyChangeEvents. */
   private PropertyChangeSupport propertyChangeSupport;
 
+  /**
+   * Used for lazy instantiation of UIDefaults values so that they are not
+   * all loaded when a Swing application starts up, but only the values that
+   * are really needed. An <code>ActiveValue</code> is newly instantiated
+   * every time when the value is requested, as opposed to the normal
+   * {@link LazyValue} that is only instantiated once.
+   */
   public static interface ActiveValue
   {
     Object createValue(UIDefaults table);
@@ -98,6 +105,13 @@ public class UIDefaults extends Hashtable
     }
   }
 
+  /**
+   * Used for lazy instantiation of UIDefaults values so that they are not
+   * all loaded when a Swing application starts up, but only the values that
+   * are really needed. A <code>LazyValue</code> is only instantiated once,
+   * as opposed to the {@link ActiveValue} that is newly created every time
+   * it is requested.
+   */
   public static interface LazyValue
   {
     Object createValue(UIDefaults table);
@@ -407,9 +421,9 @@ public class UIDefaults extends Hashtable
    * @return the font entry for <code>key</code> or null if no such entry
    *     exists
    */
-  public Font getFont(Object key, Locale l)
+  public Font getFont(Object key, Locale locale)
   {
-    Object o = get(key, l);
+    Object o = get(key, locale);
     return o instanceof Font ? (Font) o : null;
   }
 
@@ -436,9 +450,9 @@ public class UIDefaults extends Hashtable
    * @return the color entry for <code>key</code> or null if no such entry
    *     exists
    */
-  public Color getColor(Object key, Locale l)
+  public Color getColor(Object key, Locale locale)
   {
-    Object o = get(key, l);
+    Object o = get(key, locale);
     return o instanceof Color ? (Color) o : null;
   }
 
@@ -465,9 +479,9 @@ public class UIDefaults extends Hashtable
    * @return the icon entry for <code>key</code> or null if no such entry
    *     exists
    */
-  public Icon getIcon(Object key, Locale l)
+  public Icon getIcon(Object key, Locale locale)
   {
-    Object o = get(key, l);
+    Object o = get(key, locale);
     return o instanceof Icon ? (Icon) o : null;
   }
 
@@ -494,9 +508,9 @@ public class UIDefaults extends Hashtable
    * @return the border entry for <code>key</code> or null if no such entry
    *     exists
    */
-  public Border getBorder(Object key, Locale l)
+  public Border getBorder(Object key, Locale locale)
   {
-    Object o = get(key, l);
+    Object o = get(key, locale);
     return o instanceof Border ? (Border) o : null;
   }
 
@@ -523,9 +537,9 @@ public class UIDefaults extends Hashtable
    * @return the string entry for <code>key</code> or null if no such entry
    *     exists
    */
-  public String getString(Object key, Locale l)
+  public String getString(Object key, Locale locale)
   {
-    Object o = get(key, l);
+    Object o = get(key, locale);
     return o instanceof String ? (String) o : null;
   }
 
@@ -552,9 +566,9 @@ public class UIDefaults extends Hashtable
    * @return the integer entry for <code>key</code> or null if no such entry
    *     exists
    */
-  public int getInt(Object key, Locale l)
+  public int getInt(Object key, Locale locale)
   {
-    Object o = get(key, l);
+    Object o = get(key, locale);
     return o instanceof Integer ? ((Integer) o).intValue() : 0;
   }
 
@@ -580,9 +594,9 @@ public class UIDefaults extends Hashtable
    * @return the boolean entry for <code>key</code> or null if no such entry
    *     exists
    */
-  public boolean getBoolean(Object key, Locale l)
+  public boolean getBoolean(Object key, Locale locale)
   {
-    return Boolean.TRUE.equals(get(key, l));
+    return Boolean.TRUE.equals(get(key, locale));
   }
 
   /**
@@ -608,9 +622,9 @@ public class UIDefaults extends Hashtable
    * @return the boolean entry for <code>key</code> or null if no such entry
    *     exists
    */
-  public Insets getInsets(Object key, Locale l) 
+  public Insets getInsets(Object key, Locale locale) 
   {
-    Object o = get(key, l);
+    Object o = get(key, locale);
     return o instanceof Insets ? (Insets) o : null;
   }
 
@@ -637,9 +651,9 @@ public class UIDefaults extends Hashtable
    * @return the boolean entry for <code>key</code> or null if no such entry
    *     exists
    */
-  public Dimension getDimension(Object key, Locale l) 
+  public Dimension getDimension(Object key, Locale locale) 
   {
-    Object o = get(key, l);
+    Object o = get(key, locale);
     return o instanceof Dimension ? (Dimension) o : null;
   }
 

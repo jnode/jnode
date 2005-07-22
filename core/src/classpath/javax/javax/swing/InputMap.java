@@ -80,7 +80,7 @@ public class InputMap
 	/**
    * Returns the binding for keystroke.
    *
-   * @param key the key of the enty
+   * @param keystroke the key of the enty
    *
    * @return the binding associated with keystroke may be null
 	 */
@@ -111,7 +111,7 @@ public class InputMap
 	/**
    * Remove an entry from the <code>InputMap</code>.
    *
-   * @param key the key of the entry to remove
+   * @param keystroke the key of the entry to remove
 	 */
   public void remove(KeyStroke keystroke)
   {

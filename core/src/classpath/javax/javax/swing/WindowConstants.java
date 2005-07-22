@@ -38,9 +38,10 @@ exception statement from your version. */
 package javax.swing;
 
 /**
- * WindowConstants
+ * Defines some constants that are used in Swing's top-level
+ * containers.
+ *
  * @author	Andrew Selkirk
- * @version	1.0
  */
 public interface WindowConstants {
 
