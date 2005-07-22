@@ -57,6 +57,8 @@ import org.jnode.vm.classmgr.VmType;
  */
 public final class Class<T> implements AnnotatedElement, Serializable, Type {
 
+    private static final JNodePermission GETVMCLASS = new JNodePermission("getVmClass");
+    
     private final VmType<T> vmClass;
 
     private Constructor[] declaredConstructors;
@@ -763,7 +765,7 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type {
     public final VmType<T> getVmClass() {
         final SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
-            sm.checkPermission(new JNodePermission("getVmClass"));
+            sm.checkPermission(GETVMCLASS);
         }
         return vmClass;
     }
