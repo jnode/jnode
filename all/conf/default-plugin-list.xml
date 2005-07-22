@@ -6,6 +6,7 @@
     </manifest>
 
     <plugin id="org.classpath.ext"/>
+    <plugin id="org.classpath.ext.xml"/>
     <plugin id="mx4j"/>
 
     <plugin id="org.apache.tools.ant-launcher"/>

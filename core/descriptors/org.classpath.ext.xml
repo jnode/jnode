@@ -13,14 +13,6 @@
   <runtime>
     <library name="jnode-core.jar">
       <export name="gnu.java.locale.*"/>
-      <export name="gnu.xml.aelfred2.*"/>
-      <export name="gnu.xml.dom.*"/>
-      <export name="gnu.xml.dom.html2.*"/>
-      <export name="gnu.xml.dom.ls.*"/>
-      <export name="gnu.xml.pipeline.*"/>
-      <export name="gnu.xml.transform.*"/>
-      <export name="gnu.xml.util.*"/>
-      <export name="gnu.xml.xpath.*"/>
 
       <export name="javax.net.*"/>
       <export name="javax.net.ssl.*"/>
@@ -45,14 +37,9 @@
       <export name="javax.swing.text.*"/>
       <export name="javax.swing.text.html.*"/>
       <export name="javax.swing.text.html.parser.*"/>
+      <export name="javax.swing.text.rtf.*"/>
       <export name="javax.swing.tree.*"/>
       <export name="javax.swing.undo.*"/>
-
-      <export name="javax.xml.parsers.*"/>
-
-      <export name="org.w3c.dom.*"/>
-      <export name="org.xml.sax.ext.*"/>
-      <export name="org.xml.sax.helpers.*"/>
     </library>
   </runtime>
   
