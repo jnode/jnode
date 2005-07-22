@@ -74,7 +74,8 @@ public interface AttributedCharacterIterator extends CharacterIterator
   * This is the attribute for the reading form of text.  This is used
   * for storing pronunciation along with the written text for languages
   * which need it.  The value of attributes of this key type are
-  * instances of <code>Annotation</code> which wrappers a <code>String</code>.
+     * instances of <code>Annotation</code> which wrappers a 
+     * <code>String</code>.
   */
     public static final Attribute READING = new Attribute ("READING");
 
@@ -114,14 +115,16 @@ public interface AttributedCharacterIterator extends CharacterIterator
     }
 
     /**
-  * This method resolves an instance of <code>AttributedCharacterIterator.Attribute</code>
+     * This method resolves an instance of 
+     * <code>AttributedCharacterIterator.Attribute</code>
   * that is being deserialized to one of the three pre-defined attribute
   * constants.  It does this by comparing the names of the attributes.  The
   * constant that the deserialized object resolves to is returned.
   *
   * @return The resolved contant value
   *
-  * @exception InvalidObjectException If the object being deserialized cannot be resolved.
+     * @exception InvalidObjectException If the object being deserialized 
+     *            cannot be resolved.
   */
     protected Object readResolve() throws InvalidObjectException
     {
@@ -134,7 +137,8 @@ public interface AttributedCharacterIterator extends CharacterIterator
       if (this.equals (INPUT_METHOD_SEGMENT))
         return INPUT_METHOD_SEGMENT;
 
-      throw new InvalidObjectException ("Can't resolve Attribute: " + getName());
+      throw new InvalidObjectException ("Can't resolve Attribute: " 
+              + getName());
     }
 
     /**
@@ -142,13 +146,16 @@ public interface AttributedCharacterIterator extends CharacterIterator
   * The two objects will be considered equal if and only if:
   * <ul>
   * <li>The specified object is not <code>null</code>.
-  * <li>The specified object is an instance of <code>AttributedCharacterIterator.Attribute</code>.
+     * <li>The specified object is an instance of 
+     * <code>AttributedCharacterIterator.Attribute</code>.
   * <li>The specified object has the same attribute name as this object.
   * </ul>
   *
-  * @param The <code>Object</code> to test for equality against this object.
+     * @param obj  the <code>Object</code> to test for equality against this 
+     *             object.
   *
-  * @return <code>true</code> if the specified object is equal to this one, <code>false</code> otherwise.
+     * @return <code>true</code> if the specified object is equal to this one, 
+     *         <code>false</code> otherwise.
   */
     public final boolean equals (Object obj)
     {
