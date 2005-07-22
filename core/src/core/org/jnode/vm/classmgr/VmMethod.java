@@ -60,7 +60,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
     private int selector;
 
     /** This field will be used to mask the thread switch indicator */
-    private int threadSwitchIndicatorMask = 0xFFFFFFFF;
+    private boolean uninterruptible = false;
 
     /** Optimization level of native code */
     private short nativeCodeOptLevel = -1;
@@ -462,17 +462,18 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
     }
 
     /**
-     * @return Returns the threadSwitchIndicatorMask.
+     * Is this method uninterruptible.
+     * @return True | false.
      */
-    public final int getThreadSwitchIndicatorMask() {
-        return this.threadSwitchIndicatorMask;
+    public final boolean isUninterruptible() {
+        return this.uninterruptible;
     }
 
     /**
      * Mark this method as uninterruptable.
      */
     final void setUninterruptible() {
-        this.threadSwitchIndicatorMask = 0;
+        this.uninterruptible = true;
     }
 
     /**
