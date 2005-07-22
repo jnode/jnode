@@ -38,6 +38,8 @@ exception statement from your version. */
 package java.lang;
 
 import java.io.Serializable;
+import java.io.ObjectInputStream.GetField;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * @since 1.5
@@ -60,12 +62,19 @@ public abstract class Enum<T extends Enum<T>>
     this.ordinal = ordinal;
   }
 
-  public static <S extends Enum<S>> Enum valueOf(Class<S> etype, String s)
-  {
-    if (etype == null || s == null)
-      throw new NullPointerException();
-    return null;		// FIXME
-  }
+  // @classpath-bugfix   Implemented this method
+  @SuppressWarnings("unchecked")
+  public static <S extends Enum<S>> Enum valueOf(Class<S> etype, String s) {
+        if (etype == null || s == null)
+            throw new NullPointerException();
+        try {
+            return (S) etype.getDeclaredField(s).get(null);
+        } catch (NoSuchFieldException exception) {
+            throw new IllegalArgumentException(s);
+        } catch (IllegalAccessException exception) {
+            throw new Error("Unable to access Enum class");
+        }
+    }
 
   public final boolean equals(Object o)
   {
