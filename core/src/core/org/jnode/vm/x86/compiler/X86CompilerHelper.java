@@ -86,8 +86,6 @@ public class X86CompilerHelper implements X86CompilerConstants {
 
     private String instrLabelPrefix;
 
-    private final boolean isBootstrap;
-
     private final boolean haveCMOV;
 
     private Label[] addressLabels;
@@ -130,7 +128,6 @@ public class X86CompilerHelper implements X86CompilerConstants {
         }
         this.entryPoints = entryPoints;
         this.stackMgr = stackMgr;
-        this.isBootstrap = isBootstrap;
         final X86CpuID cpuId = (X86CpuID) os.getCPUID();
         haveCMOV = cpuId.hasFeature(X86CpuID.FEAT_CMOV);
     }
@@ -268,7 +265,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
      * Insert a yieldpoint into the code
      */
     public final void writeYieldPoint(Object curInstrLabel) {
-        if (method.getThreadSwitchIndicatorMask() != 0) {
+        if (!method.isUninterruptible()) {
             final Label doneLabel = new Label(curInstrLabel + "noYP");
             final int offset = entryPoints.getVmThreadSwitchIndicatorOffset();
             final int flag = VmProcessor.TSI_SWITCH_REQUESTED;
@@ -297,7 +294,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
         // Only for static methods (non <clinit>)
         if (method.isStatic() && !method.isInitializer()) {
             // Only when class is not initialize
-            final VmType cls = method.getDeclaringClass();
+            final VmType<?> cls = method.getDeclaringClass();
             if (!cls.isInitialized()) {
                 final GPR aax = this.AAX;
                 final int size = os.getMode().getSize();
@@ -328,7 +325,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
     }
 
     public final void writeClassInitialize(Label curInstrLabel, GPR classReg,
-            VmType cls) {
+            VmType<?> cls) {
         if (!cls.isInitialized()) {
             // Test declaringClass.modifiers
             os.writeTEST(BITS32, classReg, entryPoints.getVmTypeState()
@@ -464,7 +461,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
         // Only for static methods (non <clinit>)
         if (method.isStatic() && !method.isInitializer()) {
             // Only when class is not initialize
-            final VmType cls = method.getDeclaringClass();
+            final VmType<?> cls = method.getDeclaringClass();
             if (!cls.isInitialized()) {
                 return true;
             }
