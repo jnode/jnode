@@ -90,6 +90,10 @@ public final class FileChannelImpl extends FileChannel
   {
   }
 
+  public static FileChannelImpl create(File file, int mode) throws FileNotFoundException {
+      return new FileChannelImpl(file, mode);
+  }
+
   /* Open a file.  MODE is a combination of the above mode flags. */
   public FileChannelImpl (File file, int mode) throws FileNotFoundException
   {
