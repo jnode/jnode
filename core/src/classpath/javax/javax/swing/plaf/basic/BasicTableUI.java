@@ -97,12 +97,243 @@ public class BasicTableUI
 
   class KeyHandler implements KeyListener
   {
-    public void keyPressed(KeyEvent e) 
+    public void keyPressed(KeyEvent evt) 
     {
+      ListSelectionModel rowModel = table.getSelectionModel();
+      ListSelectionModel colModel = table.getColumnModel().getSelectionModel();
+
+      int rowLead = rowModel.getLeadSelectionIndex();
+      int rowMax = table.getModel().getRowCount() - 1;
+
+      int colLead = colModel.getLeadSelectionIndex();
+      int colMax = table.getModel().getColumnCount() - 1;
+
+      if ((evt.getKeyCode() == KeyEvent.VK_DOWN)
+          || (evt.getKeyCode() == KeyEvent.VK_KP_DOWN))
+        {
+          if (!evt.isShiftDown())
+            {
+              
+              table.clearSelection();
+              rowModel.setSelectionInterval(Math.min(rowLead + 1, rowMax),
+                                            Math.min(rowLead + 1, rowMax));
+              colModel.setSelectionInterval(colLead,colLead);
+            }
+          else 
+            {
+              rowModel.setLeadSelectionIndex(Math.min(rowLead + 1, rowMax));
+              colModel.setLeadSelectionIndex(colLead);
+            }
+        }
+      else if ((evt.getKeyCode() == KeyEvent.VK_UP)
+               || (evt.getKeyCode() == KeyEvent.VK_KP_UP))
+        {
+          if (!evt.isShiftDown())
+            {
+              table.clearSelection();
+              rowModel.setSelectionInterval(Math.max(rowLead - 1, 0),
+                                            Math.max(rowLead - 1, 0));
+              colModel.setSelectionInterval(colLead,colLead);
+            }
+          else
+            {
+              rowModel.setLeadSelectionIndex(Math.max(rowLead - 1, 0));
+              colModel.setLeadSelectionIndex(colLead);
+            }
+        }
+      else if ((evt.getKeyCode() == KeyEvent.VK_LEFT)
+               || (evt.getKeyCode() == KeyEvent.VK_KP_LEFT))
+        {
+          if (evt.isShiftDown())
+            {
+              colModel.setLeadSelectionIndex(Math.max(colLead - 1, 0));
+              rowModel.setLeadSelectionIndex(rowLead);
+            }
+          else
+            {
+              table.clearSelection();
+              rowModel.setSelectionInterval(rowLead,rowLead);
+              colModel.setSelectionInterval(Math.max(colLead - 1, 0),
+                                            Math.max(colLead - 1, 0));
+            }
+        }
+      else if ((evt.getKeyCode() == KeyEvent.VK_RIGHT)
+               || (evt.getKeyCode() == KeyEvent.VK_KP_RIGHT))
+        {
+          if (evt.isShiftDown())
+            {
+              colModel.setLeadSelectionIndex(Math.min(colLead + 1, colMax));
+              rowModel.setLeadSelectionIndex(rowLead);
+            }
+          else
+            {
+              table.clearSelection();
+              rowModel.setSelectionInterval(rowLead,rowLead);
+              colModel.setSelectionInterval(Math.min(colLead + 1, colMax),
+                                            Math.min(colLead + 1, colMax));
+            }
+        }
+      else if (evt.getKeyCode() == KeyEvent.VK_END)
+        {
+          if (evt.isControlDown() && evt.isShiftDown())
+            {
+              rowModel.setLeadSelectionIndex(rowMax);
+              colModel.setLeadSelectionIndex(colLead);
+            }
+          else if (evt.isControlDown())
+            {
+              table.clearSelection();
+              rowModel.setSelectionInterval(rowMax,rowMax);
+              colModel.setSelectionInterval(colLead, colLead);
+            }
+          else if (evt.isShiftDown())
+            {
+              colModel.setLeadSelectionIndex(colMax);
+              rowModel.setLeadSelectionIndex(rowLead);
+            }
+          else
+            {
+              table.clearSelection();
+              rowModel.setSelectionInterval(rowLead, rowLead);
+              colModel.setSelectionInterval(colMax, colMax);
+            }
+         }
+      else if (evt.getKeyCode() == KeyEvent.VK_HOME)
+        {
+          if (evt.isControlDown() && evt.isShiftDown())
+            {
+              rowModel.setLeadSelectionIndex(0);
+              colModel.setLeadSelectionIndex(colLead);
+            }
+          else if (evt.isControlDown())
+            {
+              table.clearSelection();
+              rowModel.setSelectionInterval(0,0);
+              colModel.setSelectionInterval(colLead, colLead);
     }
+          else if (evt.isShiftDown())
+            {
+              colModel.setLeadSelectionIndex(0);
+              rowModel.setLeadSelectionIndex(rowLead);
+            }
+          else
+            {
+              table.clearSelection();
+              rowModel.setSelectionInterval(rowLead, rowLead);
+              colModel.setSelectionInterval(0, 0);
+            }
+        }
+      else if (evt.getKeyCode() == KeyEvent.VK_F2)
+        {
+          // FIXME: Implement "start editing"
+        }
+      else if (evt.getKeyCode() == KeyEvent.VK_PAGE_UP)
+        {
+          // FIXME: implement, need JList.ensureIndexIsVisible to work
+        }
+      else if (evt.getKeyCode() == KeyEvent.VK_PAGE_DOWN)
+        {
+          // FIXME: implement, need JList.ensureIndexIsVisible to work
+        }
+      else if (evt.getKeyCode() == KeyEvent.VK_TAB)
+        {
+          // FIXME: Implement select next column
+          // NOTE: TAB doesn't get recognized by this KeyHandler
+          // something must be intercepting it and using it to change
+          // focus
+        }
+      else if (evt.getKeyCode() == KeyEvent.VK_ENTER)
+        {
+          // If nothing is selected, select the first cell in the table
+          if (table.getSelectedRowCount() == 0 && table.getSelectedColumnCount() == 0)
+            {
+              rowModel.setSelectionInterval(0, 0);
+              colModel.setSelectionInterval(0, 0);
+              return;
+            }
+          
+          // If the lead selection index isn't selected (ie a remove operation
+          // happened, then set the lead to the first selected cell in the
+          // table
+          if (!table.isCellSelected(rowLead, colLead))
+            {
+              rowModel.addSelectionInterval(rowModel.getMinSelectionIndex(), rowModel.getMinSelectionIndex());
+              colModel.addSelectionInterval(colModel.getMinSelectionIndex(), colModel.getMinSelectionIndex());
+              return;
+            }
+
+          // If there is just one cell selected, select the next row, and wrap
+          // when you get to the edges of the table.
+          if ((table.getSelectedRowCount() <= 1 && table.getSelectedColumnCount() <= 1)
+              || (table.getRowSelectionAllowed() == false && table.getColumnSelectionAllowed() == false))
+            {
+              rowModel.setSelectionInterval((rowLead + 1)%(rowMax + 1), (rowLead + 1)%(rowMax + 1));
+              if (rowLead == rowMax)
+                colModel.setSelectionInterval((colLead + 1)%(colMax + 1), (colLead + 1)%(colMax + 1));
+              else
+                colModel.setSelectionInterval(colLead, colLead);
+              return;
+            }
+
+          // Otherwise select the next row and wrap when you get to the edges
+          // of the selection.  So you only move the lead indices around
+          // amongst the already selected cells.
+
+          // If the row lead index is at the end of the selection, wrap it around
+          if (rowLead == rowModel.getMaxSelectionIndex())
+            {
+              rowModel.addSelectionInterval(rowModel.getMinSelectionIndex(), rowModel.getMinSelectionIndex());
+              
+              // And select the next column (from within the selection)
+              if (colLead == colModel.getMaxSelectionIndex())
+                colModel.addSelectionInterval(colModel.getMinSelectionIndex(), colModel.getMinSelectionIndex());
+              else
+                {
+                  int[] colsSelected = table.getSelectedColumns();
+                  int colIndex = 0;
+                  while (colsSelected[colIndex] <= colLead)
+                    colIndex++;
+                  colModel.addSelectionInterval(colsSelected[colIndex], colsSelected[colIndex]);
+                }
+            }
+          // If the row lead index isn't at the end, just advance it
+          // and you don't have to update the column index
+          else
+            {
+              int[] rowsSelected = table.getSelectedRows();
+              int rowIndex = 0;
+              while (rowsSelected[rowIndex] <= rowLead)
+                rowIndex++;
+              rowModel.addSelectionInterval(rowsSelected[rowIndex], rowsSelected[rowIndex]);
+              colModel.addSelectionInterval(colLead, colLead);
+            }
+        }
+      else if (evt.getKeyCode() == KeyEvent.VK_ESCAPE)
+        {
+          // FIXME: implement "cancel"
+        }
+      else if ((evt.getKeyCode() == KeyEvent.VK_A || evt.getKeyCode()
+                == KeyEvent.VK_SLASH) && evt.isControlDown())
+        {
+          rowModel.setSelectionInterval(0, rowMax);
+          colModel.setSelectionInterval(0, colMax);
+          // the next two lines are to restore the lead selection indices to 
+          // their previous values, because select-all operations shouldn't 
+          // change them
+          rowModel.addSelectionInterval(rowLead, rowLead);
+          colModel.addSelectionInterval(colLead, colLead);
+        }
+      else if (evt.getKeyCode() == KeyEvent.VK_BACK_SLASH
+               && evt.isControlDown())
+        {
+          table.clearSelection();
+        }
+    }
+
     public void keyReleased(KeyEvent e) 
     {
     }
+
     public void keyTyped(KeyEvent e) 
     {
     }
@@ -114,8 +345,7 @@ public class BasicTableUI
 
     private void updateSelection(boolean controlPressed)
     {
-      if (table.getRowSelectionAllowed())
-        {
+      // Update the rows
           int lo_row = table.rowAtPoint(begin);
           int hi_row  = table.rowAtPoint(curr);
           ListSelectionModel rowModel = table.getSelectionModel();
@@ -127,10 +357,8 @@ public class BasicTableUI
               else
             rowModel.setSelectionInterval(lo_row, hi_row);
         }
-        }
 
-      if (table.getColumnSelectionAllowed())
-        {
+      // Update the columns
           int lo_col = table.columnAtPoint(begin);
           int hi_col = table.columnAtPoint(curr);
           ListSelectionModel colModel = table.getColumnModel().
@@ -143,7 +371,6 @@ public class BasicTableUI
               else
             colModel.setSelectionInterval(lo_col, hi_col);
         }
-    }
     }
 
     public void mouseClicked(MouseEvent e) 

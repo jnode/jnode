@@ -78,7 +78,7 @@ public class MetalBorders
   /**
    * The border that is drawn around Swing buttons.
    */
-  public static class MetalButtonBorder
+  public static class ButtonBorder
     extends AbstractBorder
     implements UIResource
   {
@@ -88,7 +88,7 @@ public class MetalBorders
     /**
      * Creates a new instance of ButtonBorder.
      */
-    public MetalButtonBorder()
+    public ButtonBorder()
     {
     }
 
@@ -404,7 +404,7 @@ public class MetalBorders
   {
     if (buttonBorder == null)
       {
-    Border outer = new MetalButtonBorder();
+        Border outer = new ButtonBorder();
     Border inner = getMarginBorder();
         buttonBorder = new BorderUIResource.CompoundBorderUIResource
             (outer, inner);
@@ -421,7 +421,7 @@ public class MetalBorders
   {
     if (toolbarButtonBorder == null)
       {
-        Border outer = new MetalButtonBorder();
+        Border outer = new ButtonBorder();
         Border inner = new RolloverMarginBorder();
         toolbarButtonBorder = new BorderUIResource.CompoundBorderUIResource
           (outer, inner);

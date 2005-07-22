@@ -1,4 +1,4 @@
-/* MetalTreeUI.java
+/* MetalComboBoxButton.java
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -38,49 +38,63 @@ exception statement from your version. */
 
 package javax.swing.plaf.metal;
 
-import java.util.HashMap;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.io.Serializable;
 
-import javax.swing.JComponent;
-import javax.swing.plaf.ComponentUI;
-import javax.swing.plaf.basic.BasicTreeUI;
+import javax.swing.Icon;
 
-public class MetalTreeUI
-  extends BasicTreeUI
-{
-
-  /** The UI instances for MetalTreeUIs */
-  private static HashMap instances = null;
-
+/**
+ * An icon used by the {@link MetalComboBoxUI} class.
+ */
+public class MetalComboBoxIcon implements Icon, Serializable {
+  
   /**
-   * Constructs a new instance of MetalTreeUI.
+   * Creates a new icon.
    */
-  public MetalTreeUI()
+  public MetalComboBoxIcon() 
   {
-    super();
+    // nothing required.
+  }
+  
+  /**
+   * Returns the icon width, which for this icon is 10 pixels.
+   * 
+   * @return <code>10</code>.
+   */
+  public int getIconWidth()
+  {
+    return 10;
   }
 
   /**
-   * Returns an instance of MetalTreeUI.
-   *
-   * @param component the component for which we return an UI instance
-   *
-   * @return an instance of MetalTreeUI
+   * Returns the icon height, which for this icon is 5 pixels.
+   * 
+   * @return <code>5</code>.
    */
-  public static ComponentUI createUI(JComponent component)
+  public int getIconHeight()
   {
-    if (instances == null)
-      instances = new HashMap();
-
-    Object o = instances.get(component);
-    MetalTreeUI instance;
-    if (o == null)
-      {
-      instance = new MetalTreeUI();
-	instances.put(component, instance);
-      }
-    else
-      instance = (MetalTreeUI) o;
-
-    return instance;
+    return 5;
   }
+
+  /**
+   * Paints the icon at the location (x, y).
+   * 
+   * @param c  the combo box (ignored here).
+   * @param g  the graphics device.
+   * @param x  the x coordinate.
+   * @param y  the y coordinate.
+   */
+  public void paintIcon(Component c, Graphics g, int x, int y)
+  {
+    // TODO: work out whether/how the icon changes with different component
+    //       states (and also different metal themes)
+    Color savedColor = g.getColor();
+    g.setColor(Color.black);
+    for (int i = 0; i < 5; i++)
+      g.drawLine(x + i, y + i, x + 9 - i, y + i);
+    g.setColor(savedColor);
+  }
+
 }
