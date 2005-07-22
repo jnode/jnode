@@ -4,6 +4,7 @@
 package org.jnode.vm.classmgr;
 
 import java.lang.annotation.Annotation;
+import java.lang.annotation.Inherited;
 import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 
@@ -369,6 +370,9 @@ public final class VmAnnotation extends VmSystemObject {
         
         /** The loaded name+value pairs */
         private ElementValue[] elemValues;
+        
+        /** Should this annotation be inherited */
+        private boolean inheritable;
 
         /**
          * Initialize this annotation implementation.
@@ -388,6 +392,7 @@ public final class VmAnnotation extends VmSystemObject {
             for (ElementValue v : values) {
                 this.values[i++] = v.getValue(loader, getReturnType(type, v.getName()));
             }
+            this.inheritable = type.isAnnotationPresent(Inherited.class);
         }
         
         private final VmType getReturnType(VmType<?> type, String elemName) {
@@ -397,6 +402,13 @@ public final class VmAnnotation extends VmSystemObject {
                     return m.getReturnType(); 
                 }
             }
+        }
+        
+        /**
+         * Should this annotation be inherited.
+         */
+        public final boolean isInheritable() {
+            return inheritable;
         }
 
         /**

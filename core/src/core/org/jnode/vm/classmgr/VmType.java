@@ -2165,4 +2165,12 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
         }
     }
 
+    /**
+     * @see org.jnode.vm.classmgr.VmAnnotatedElement#getSuperElement()
+     */
+    @Override
+    protected final VmAnnotatedElement getSuperElement() {
+        return superClass;
+    }
+
 }
