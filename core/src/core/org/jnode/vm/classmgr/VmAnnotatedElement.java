@@ -53,9 +53,31 @@ abstract class VmAnnotatedElement extends VmSystemObject implements AnnotatedEle
     /**
      * @see java.lang.reflect.AnnotatedElement#getAnnotations()
      */
-    public Annotation[] getAnnotations() {
-        // TODO Auto-generated method stub
-        return getDeclaredAnnotations();
+    public final Annotation[] getAnnotations() {
+        final Annotation[] ann = getDeclaredAnnotations();
+        final VmAnnotatedElement parent = getSuperElement();
+        if (parent != null) {
+            final Annotation[] parentAnn = parent.getAnnotations();
+            int cnt = 0;
+            for (Annotation a : parentAnn) {
+                if (((VmAnnotation.ImplBase)a).isInheritable()) {
+                    cnt++;
+                }
+            }
+            if (cnt > 0) {
+                int j = ann.length;
+                final Annotation[] result = new Annotation[j + cnt];
+                System.arraycopy(ann, 0, result, 0, j);
+                for (Annotation a : parentAnn) {
+                    if (((VmAnnotation.ImplBase)a).isInheritable()) {
+                        result[j++] = a;
+                    }
+                }
+                return result;
+            }
+        }
+        
+        return ann;
     }
 
     /**
@@ -110,4 +132,10 @@ abstract class VmAnnotatedElement extends VmSystemObject implements AnnotatedEle
      * @return The loader
      */
     protected abstract VmClassLoader getLoader();
+    
+    /**
+     * Gets the parent of this element.
+     * @return
+     */
+    protected abstract VmAnnotatedElement getSuperElement();
 }

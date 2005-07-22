@@ -216,4 +216,12 @@ abstract class VmMember extends VmAnnotatedElement implements Uninterruptible {
     protected final VmClassLoader getLoader() {
         return declaringClass.getLoader();
     }
+
+    /**
+     * @see org.jnode.vm.classmgr.VmAnnotatedElement#getSuperElement()
+     */
+    @Override
+    protected final VmAnnotatedElement getSuperElement() {
+        return null;
+    }
 }

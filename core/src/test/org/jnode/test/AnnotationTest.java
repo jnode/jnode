@@ -19,12 +19,12 @@ public class AnnotationTest {
      */
     public static void main(String[] args) {
         show("Annotations for class A", A.class.getAnnotations());
-        //show("Annotations for class B", B.class.getAnnotations());
-        show("Annotations for class Test", Test.class.getAnnotations());
-        show("Annotations for class Test2", Test2.class.getAnnotations());
-        show("Annotations for class Test3", Test3.class.getAnnotations());
-        show("Annotations for class Test4", Test4.class.getAnnotations());
-        show("Declared annotations for class A", A.class.getDeclaredAnnotations());
+        show("Annotations for class B", B.class.getAnnotations());
+//        show("Annotations for class Test", Test.class.getAnnotations());
+//        show("Annotations for class Test2", Test2.class.getAnnotations());
+//        show("Annotations for class Test3", Test3.class.getAnnotations());
+//        show("Annotations for class Test4", Test4.class.getAnnotations());
+//        show("Declared annotations for class A", A.class.getDeclaredAnnotations());
 //        show("Declared annotations for class B", B.class.getDeclaredAnnotations());
     }
     
