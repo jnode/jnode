@@ -21,6 +21,8 @@
  
 package java.lang.reflect;
 
+import java.lang.annotation.Annotation;
+
 import org.jnode.vm.VmReflection;
 import org.jnode.vm.classmgr.VmField;
 
@@ -61,7 +63,7 @@ import org.jnode.vm.classmgr.VmField;
  * @since 1.1
  * @status updated to 1.4
  */
-public final class Field extends AccessibleObject implements Member {
+public final class Field extends AccessibleObject implements Member, AnnotatedElement {
 
 	private VmField vmField;
 
@@ -740,4 +742,32 @@ public final class Field extends AccessibleObject implements Member {
 	public void setDouble(Object o, double value) throws IllegalAccessException {
 		VmReflection.setDouble(vmField, o, value);
 	}
+
+    /**
+     * @see java.lang.reflect.AnnotatedElement#getAnnotation(java.lang.Class)
+     */
+    public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
+        return vmField.getAnnotation(annotationClass);
+    }
+
+    /**
+     * @see java.lang.reflect.AnnotatedElement#getAnnotations()
+     */
+    public Annotation[] getAnnotations() {
+        return vmField.getAnnotations();
+    }
+
+    /**
+     * @see java.lang.reflect.AnnotatedElement#getDeclaredAnnotations()
+     */
+    public Annotation[] getDeclaredAnnotations() {
+        return vmField.getDeclaredAnnotations();
+    }
+
+    /**
+     * @see java.lang.reflect.AnnotatedElement#isAnnotationPresent(java.lang.Class)
+     */
+    public boolean isAnnotationPresent(Class< ? extends Annotation> annotationClass) {
+        return vmField.isAnnotationPresent(annotationClass);
+    }       
 }

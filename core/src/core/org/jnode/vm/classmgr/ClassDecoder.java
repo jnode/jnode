@@ -836,7 +836,6 @@ public final class ClassDecoder {
      */
     private static VmAnnotation readAnnotation(ByteBuffer data, VmCP cp, boolean visible) {        
         final String typeDescr = cp.getUTF8(data.getChar());
-        System.out.println("ann-type: " + typeDescr);
         final int numElemValuePairs = data.getChar();
         final VmAnnotation.ElementValue[] values;
         if (numElemValuePairs == 0) {
@@ -845,9 +844,7 @@ public final class ClassDecoder {
             values = new VmAnnotation.ElementValue[numElemValuePairs];
             for (int i = 0; i < numElemValuePairs; i++) {
                 final String elemName = cp.getUTF8(data.getChar());
-                System.out.println("  ann-elem-name: " + elemName);
                 final Object value = readElementValue(data, cp);
-                System.out.println("  ann-elem: " + elemName + "=" + value);
                 values[i] = new VmAnnotation.ElementValue(elemName, value);
             }
         }

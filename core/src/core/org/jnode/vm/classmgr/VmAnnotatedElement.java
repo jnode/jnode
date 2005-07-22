@@ -1,0 +1,113 @@
+/*
+ * $Id$
+ */
+package org.jnode.vm.classmgr;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
+
+import org.jnode.vm.VmSystemObject;
+import org.vmmagic.pragma.PrivilegedActionPragma;
+
+/**
+ * Base class for annoted elements.
+ * @author Ewout Prangsma (epr@users.sourceforge.net)
+ */
+abstract class VmAnnotatedElement extends VmSystemObject implements AnnotatedElement {
+
+    /** Runtime annotations */
+    private VmAnnotation[] runtimeAnnotations;
+
+    /**
+     * @param runtimeAnnotations The runtimeAnnotations to set.
+     */
+    final void setRuntimeAnnotations(VmAnnotation[] runtimeAnnotations) {
+        if (this.runtimeAnnotations == null) {
+            this.runtimeAnnotations = runtimeAnnotations;
+        } else {
+            throw new SecurityException("Cannot override runtime annotations");
+        }
+    }
+    
+    /**
+     * @see java.lang.reflect.AnnotatedElement#getAnnotation(java.lang.Class)
+     */
+    public final <T extends Annotation> T getAnnotation(Class<T> annotationClass) 
+    throws PrivilegedActionPragma {
+        if (runtimeAnnotations.length > 0) {
+            final VmClassLoader loader = getLoader();
+            final VmType<T> reqType = annotationClass.getVmClass();
+            for (VmAnnotation ann : runtimeAnnotations) {
+                if (ann.annotationType(loader) == reqType) {
+                    try {
+                        return annotationClass.cast(ann.getValue(loader));
+                    } catch (ClassNotFoundException ex) {
+                        throw new NoClassDefFoundError(ex.getMessage());
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @see java.lang.reflect.AnnotatedElement#getAnnotations()
+     */
+    public Annotation[] getAnnotations() {
+        // TODO Auto-generated method stub
+        return getDeclaredAnnotations();
+    }
+
+    /**
+     * @see java.lang.reflect.AnnotatedElement#getDeclaredAnnotations()
+     */
+    public final Annotation[] getDeclaredAnnotations() {
+        final int max = runtimeAnnotations.length;
+        // Count the runtime visible annotations
+        int cnt = 0;
+        for (int i = 0; i < max; i++) {
+            if (runtimeAnnotations[i].isRuntimeVisible()) {
+                cnt++;
+            }
+        }
+        final Annotation[] arr = new Annotation[cnt];
+        if (cnt > 0) {
+            final VmClassLoader loader = getLoader();
+            cnt = 0;
+            for (int i = 0; i < max; i++) {
+                if (runtimeAnnotations[i].isRuntimeVisible()) {
+                    try {
+                        arr[cnt++] = runtimeAnnotations[i].getValue(loader);
+                    } catch (ClassNotFoundException e) {
+                        throw new NoClassDefFoundError(e.getMessage());
+                    }
+                }
+            }
+        }
+        return arr;
+    }
+
+    /**
+     * @see java.lang.reflect.AnnotatedElement#isAnnotationPresent(java.lang.Class)
+     */
+    public final boolean isAnnotationPresent(Class< ? extends Annotation> annotationClass) 
+    throws PrivilegedActionPragma {
+        if (runtimeAnnotations.length > 0) {
+            final VmClassLoader loader = getLoader();
+            final VmType<?> reqType = annotationClass.getVmClass();
+            for (VmAnnotation ann : runtimeAnnotations) {
+                if (ann.annotationType(loader) == reqType) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Return the loader of this class
+     * 
+     * @return The loader
+     */
+    protected abstract VmClassLoader getLoader();
+}

@@ -21,7 +21,6 @@
  
 package org.jnode.vm.classmgr;
 
-import org.jnode.vm.VmSystemObject;
 import org.vmmagic.pragma.Uninterruptible;
 
 /**
@@ -29,7 +28,7 @@ import org.vmmagic.pragma.Uninterruptible;
  * 
  * @author epr
  */
-abstract class VmMember extends VmSystemObject implements Uninterruptible {
+abstract class VmMember extends VmAnnotatedElement implements Uninterruptible {
 
 	/** Name of this member */
 	protected final String name;
@@ -41,8 +40,6 @@ abstract class VmMember extends VmSystemObject implements Uninterruptible {
 	protected final VmType<?> declaringClass;
 	/** Hashcode of name+signature */
 	private final int cachedHashCode;
-    /** The runtime annotations */
-    private VmAnnotation[] runtimeAnnotations;
 
 	/**
 	 * Create a new instance
@@ -214,20 +211,9 @@ abstract class VmMember extends VmSystemObject implements Uninterruptible {
     }
 
     /**
-     * @return Returns the runtimeAnnotations.
+     * @see org.jnode.vm.classmgr.VmAnnotatedElement#getLoader()
      */
-    public final VmAnnotation[] getRuntimeAnnotations() {
-        return runtimeAnnotations;
-    }
-
-    /**
-     * @param runtimeAnnotations The runtimeAnnotations to set.
-     */
-    final void setRuntimeAnnotations(VmAnnotation[] runtimeAnnotations) {
-        if (this.runtimeAnnotations == null) {
-            this.runtimeAnnotations = runtimeAnnotations;
-        } else {
-            throw new SecurityException("Cannot override runtime annotations");
-        }
+    protected final VmClassLoader getLoader() {
+        return declaringClass.getLoader();
     }
 }

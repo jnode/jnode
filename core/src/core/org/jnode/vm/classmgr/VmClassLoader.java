@@ -74,6 +74,14 @@ public abstract class VmClassLoader extends VmSystemObject {
      */
     public abstract VmType defineClass(String name, ByteBuffer data, ProtectionDomain protDomain);
     
+    /**
+     * Define a class that is created in memory.
+     * 
+     * @param createdType
+     * @return VmClass
+     */
+    public abstract VmType<?> defineClass(VmType<?> createdType);
+    
 	/**
 	 * Gets the ClassLoader belonging to this loader.
 	 * 
