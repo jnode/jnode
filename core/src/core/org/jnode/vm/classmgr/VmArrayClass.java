@@ -99,8 +99,16 @@ public final class VmArrayClass<T> extends VmClassType<T> {
 	 */
 	protected VmType<?>[] createSuperClassesArray(HashSet<VmInterfaceClass<?>> allInterfaces) {
 
-		final VmType[] compSuperClasses = componentType.getSuperClassesArray();
-		final int compLength = compSuperClasses.length;
+		final VmType[] compSuperClasses;
+		final int compLength;
+        
+        if (componentType.isPrimitive()) {
+            compSuperClasses = null;
+            compLength = 0;            
+        } else {
+            compSuperClasses = componentType.getSuperClassesArray();
+            compLength = compSuperClasses.length;
+        }
 
 		final int length = compLength + 2 + allInterfaces.size();
 		final VmType<?>[] array = new VmType[length];
