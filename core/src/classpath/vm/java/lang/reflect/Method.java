@@ -21,6 +21,7 @@
  
 package java.lang.reflect;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 
 import org.jnode.vm.VmReflection;
@@ -58,7 +59,7 @@ import org.jnode.vm.classmgr.VmMethod;
  * @since 1.1
  * @status updated to 1.4
  */
-public final class Method extends AccessibleObject implements Member {
+public final class Method extends AccessibleObject implements Member, AnnotatedElement {
 	
 	private VmMethod vmMethod;
 	private ArrayList<Class> parameterTypes;
@@ -260,4 +261,32 @@ public final class Method extends AccessibleObject implements Member {
 		throws IllegalAccessException, InvocationTargetException {
 		return VmReflection.invoke(vmMethod, o, args);
 	}
+
+    /**
+     * @see java.lang.reflect.AnnotatedElement#getAnnotation(java.lang.Class)
+     */
+    public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
+        return vmMethod.getAnnotation(annotationClass);
+    }
+
+    /**
+     * @see java.lang.reflect.AnnotatedElement#getAnnotations()
+     */
+    public Annotation[] getAnnotations() {
+        return vmMethod.getAnnotations();
+    }
+
+    /**
+     * @see java.lang.reflect.AnnotatedElement#getDeclaredAnnotations()
+     */
+    public Annotation[] getDeclaredAnnotations() {
+        return vmMethod.getDeclaredAnnotations();
+    }
+
+    /**
+     * @see java.lang.reflect.AnnotatedElement#isAnnotationPresent(java.lang.Class)
+     */
+    public boolean isAnnotationPresent(Class< ? extends Annotation> annotationClass) {
+        return vmMethod.isAnnotationPresent(annotationClass);
+    }       
 }

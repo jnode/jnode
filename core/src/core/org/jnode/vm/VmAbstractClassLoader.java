@@ -61,6 +61,25 @@ abstract class VmAbstractClassLoader extends VmClassLoader {
         return vmClass;
     }
     
+    /**
+     * Define a class that is created in memory.
+     * 
+     * @param createdType
+     * @return VmClass
+     */
+    public synchronized final VmType<?> defineClass(VmType<?> createdType) {
+        if (createdType.getLoader() != this) {
+            throw new SecurityException("Created type not for this loader");
+        }
+        final String name = createdType.getName();
+        final VmType<?> vmClass = findLoadedClass(name);
+        if (vmClass != null) {
+            return vmClass;
+        }
+        addLoadedClass(name, createdType);
+        return createdType;        
+    }
+    
 	/**
 	 * Load an array class with a given name
 	 * 

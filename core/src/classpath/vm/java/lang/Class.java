@@ -26,11 +26,13 @@ import gnu.java.lang.VMClassHelper;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.security.AllPermission;
 import java.security.Permissions;
@@ -53,7 +55,7 @@ import org.jnode.vm.classmgr.VmType;
  * 
  * @author epr
  */
-public final class Class<T> implements Serializable {
+public final class Class<T> implements AnnotatedElement, Serializable, Type {
 
     private final VmType<T> vmClass;
 
@@ -214,9 +216,30 @@ public final class Class<T> implements Serializable {
      * Gets the runtime visible annotations of this class.
      */
     public Annotation[] getAnnotations() {
-        return vmClass.getRuntimeVisibleAnnotations();
+        return vmClass.getAnnotations();
     }
     
+    /**
+     * @see java.lang.reflect.AnnotatedElement#getAnnotation(java.lang.Class)
+     */
+    public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
+        return vmClass.getAnnotation(annotationClass);
+    }
+
+    /**
+     * @see java.lang.reflect.AnnotatedElement#getDeclaredAnnotations()
+     */
+    public Annotation[] getDeclaredAnnotations() {
+        return vmClass.getDeclaredAnnotations();
+    }
+
+    /**
+     * @see java.lang.reflect.AnnotatedElement#isAnnotationPresent(java.lang.Class)
+     */
+    public boolean isAnnotationPresent(Class< ? extends Annotation> annotationClass) {
+        return vmClass.isAnnotationPresent(annotationClass);
+    }
+
     /**
      * Gets the classloader used to load this class.
      * 
