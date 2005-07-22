@@ -328,7 +328,7 @@ public class JMenu extends JMenuItem implements Accessible, MenuElement
 	 */
   public boolean isSelected()
   {
-    return super.isArmed();
+    return super.isSelected();
   }
 
 	/**

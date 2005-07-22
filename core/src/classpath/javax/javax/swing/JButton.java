@@ -1,5 +1,5 @@
 /* JButton.java --
-   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -39,21 +39,45 @@ package javax.swing;
 
 import javax.accessibility.Accessible;
 import javax.accessibility.AccessibleContext;
+import javax.accessibility.AccessibleRole;
 import javax.swing.plaf.ButtonUI;
 
 
 /**
- * An instance of JButton can be added to a panel, frame etc
+ * A general purpose push button. <code>JButton</code>s can display a label,
+ * an {@link Icon} or both.
  *
  * @author Ronald Veldema (rveldema@cs.vu.nl)
  */
 public class JButton extends AbstractButton
   implements Accessible
 {
+
+  /**
+   * Accessibility support for JButtons.
+   */
+  protected class AccessibleJButton
+    extends AbstractButton.AccessibleAbstractButton
+  {
+    /**
+     * Returns the accessible role that this component represents.
+     * This is {@link AccessibleRole#PUSH_BUTTON} for <code>JButton</code>s.
+     *
+     * @return the accessible role that this component represents
+     */
+    public AccessibleRole getAccessibleRole()
+    {
+      return AccessibleRole.PUSH_BUTTON;
+    }
+  }
+
   private static final long serialVersionUID = -1907255238954382202L;
   boolean def;
   boolean is_def;
     
+  /** The AccessibleContext for this JButton. */
+  AccessibleJButton accessibleContext;
+
     public JButton()
     {
 	this(null, null);
@@ -77,9 +101,9 @@ public class JButton extends AbstractButton
       
     public JButton(String text, Icon icon)
     {
-	super(text, icon);
+    super();
+    init(text, icon);
     setModel(new DefaultButtonModel());
-    setActionCommand(text);
     }
 
     public Object[] getSelectedObjects()
@@ -96,8 +120,9 @@ public class JButton extends AbstractButton
     
     public AccessibleContext getAccessibleContext()
     {
-    // Gets the AccessibleContext associated with this JButton. 
-	return null;
+    if (accessibleContext == null)
+      accessibleContext = new AccessibleJButton();
+    return accessibleContext;
     }
   
     public String getUIClassID()
@@ -123,7 +148,14 @@ public class JButton extends AbstractButton
 
     protected  String paramString()
     {
-	return "JButton";
+    String superParam = super.paramString();
+
+    // 41 is the maximum number of chars which may be needed.
+    StringBuffer sb = new StringBuffer(41);
+    sb.append(",defaultButton=").append(is_def);
+    sb.append(",defaultCapable=").append(def);
+
+    return superParam + sb.toString();
     }
     
   /**

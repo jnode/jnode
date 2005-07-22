@@ -70,7 +70,6 @@ public class CellRendererPane
 
 		/**
 		 * Constructor AccessibleCellRendererPane
-		 * @param component TODO
 		 */
     protected AccessibleCellRendererPane()
     {

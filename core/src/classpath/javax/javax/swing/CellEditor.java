@@ -43,9 +43,10 @@ import java.util.EventObject;
 import javax.swing.event.CellEditorListener;
 
 /**
- * CellEditor
+ * Provides edit capabilities for components that display cells like
+ * {@link JTable}, {@link JList} and {@link JTree}.
+ *
  * @author	Andrew Selkirk
- * @version	1.0
  */
 public interface CellEditor
 {

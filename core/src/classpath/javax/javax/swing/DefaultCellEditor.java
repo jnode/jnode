@@ -75,8 +75,6 @@ public class DefaultCellEditor
 
 		/**
 		 * Constructor EditorDelegate
-     *
-		 * @param value0 TODO
 		 */
     protected EditorDelegate()
     {

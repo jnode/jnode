@@ -1,37 +1,39 @@
-/*
- * DefaultTreeCellRenderer.java -- Copyright (C) 2002, 2004 Free Software
- * Foundation, Inc.
- * 
- * This file is part of GNU Classpath.
- * 
- * GNU Classpath is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation; either version 2, or (at your option) any later version.
- * 
- * GNU Classpath is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- * 
- * You should have received a copy of the GNU General Public License along with
- * GNU Classpath; see the file COPYING. If not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Linking this library statically or dynamically with other modules is making a
- * combined work based on this library. Thus, the terms and conditions of the
- * GNU General Public License cover the whole combination.
- * 
- * As a special exception, the copyright holders of this library give you
- * permission to link this library with independent modules to produce an
- * executable, regardless of the license terms of these independent modules, and
- * to copy and distribute the resulting executable under terms of your choice,
- * provided that you also meet, for each linked independent module, the terms
- * and conditions of the license of that module. An independent module is a
- * module which is not derived from or based on this library. If you modify this
- * library, you may extend this exception to your version of the library, but
- * you are not obligated to do so. If you do not wish to do so, delete this
- * exception statement from your version.
- */
+/* DefaultTreeCellRenderer.java 
+   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
+ 
+This file is part of GNU Classpath.
+
+GNU Classpath is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+GNU Classpath is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with GNU Classpath; see the file COPYING.  If not, write to the
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
+
+Linking this library statically or dynamically with other modules is
+making a combined work based on this library.  Thus, the terms and
+conditions of the GNU General Public License cover the whole
+combination.
+
+As a special exception, the copyright holders of this library give you
+permission to link this library with independent modules to produce an
+executable, regardless of the license terms of these independent
+modules, and to copy and distribute the resulting executable under
+terms of your choice, provided that you also meet, for each linked
+independent module, the terms and conditions of the license of that
+module.  An independent module is a module which is not derived from
+or based on this library.  If you modify this library, you may extend
+this exception to your version of the library, but you are not
+obligated to do so.  If you do not wish to do so, delete this
+exception statement from your version. */
 
 package javax.swing.tree;
 
@@ -136,7 +138,7 @@ public class DefaultTreeCellRenderer
           setTextNonSelectionColor(defaults.getColor("Tree.textForeground"));
           setTextSelectionColor(defaults.getColor("Tree.selectionForeground"));
 		setBackgroundNonSelectionColor(defaults
-				.getColor("Tree.textBackground"));
+				.getColor("Tree.nonSelectionBackground"));
 		setBackgroundSelectionColor(defaults
 				.getColor("Tree.selectionBackground"));
 		setBorderSelectionColor(defaults
@@ -180,7 +182,7 @@ public class DefaultTreeCellRenderer
 	/**
 	 * setOpenIcon
 	 * 
-	 * @param value0 TODO
+	 * @param i the icon.
 	 */
 	public void setOpenIcon(Icon i)
 	{
@@ -200,7 +202,7 @@ public class DefaultTreeCellRenderer
 	/**
 	 * setClosedIcon
 	 * 
-	 * @param value0 TODO
+	 * @param i the icon.
 	 */
 	public void setClosedIcon(Icon i)
 	{
@@ -220,7 +222,7 @@ public class DefaultTreeCellRenderer
 	/**
 	 * setLeafIcon
 	 * 
-	 * @param value0 TODO
+	 * @param i the icon.
 	 */
 	public void setLeafIcon(Icon i)
 	{
@@ -240,7 +242,7 @@ public class DefaultTreeCellRenderer
 	/**
 	 * setTextSelectionColor
 	 * 
-	 * @param value0 TODO
+	 * @param c the color.
 	 */
 	public void setTextSelectionColor(Color c)
 	{
@@ -260,7 +262,7 @@ public class DefaultTreeCellRenderer
 	/**
 	 * setTextNonSelectionColor
 	 * 
-	 * @param value0 TODO
+	 * @param c the color.
 	 */
 	public void setTextNonSelectionColor(Color c)
 	{
@@ -280,7 +282,7 @@ public class DefaultTreeCellRenderer
 	/**
 	 * setBackgroundSelectionColor
 	 * 
-	 * @param value0 TODO
+	 * @param c the color.
 	 */
 	public void setBackgroundSelectionColor(Color c)
 	{
@@ -300,7 +302,7 @@ public class DefaultTreeCellRenderer
 	/**
 	 * setBackgroundNonSelectionColor
 	 * 
-	 * @param value0 TODO
+	 * @param c the color.
 	 */
 	public void setBackgroundNonSelectionColor(Color c)
 	{
@@ -320,7 +322,7 @@ public class DefaultTreeCellRenderer
 	/**
 	 * setBorderSelectionColor
 	 * 
-	 * @param value0 TODO
+	 * @param c the color.
 	 */
 	public void setBorderSelectionColor(Color c)
 	{
@@ -340,7 +342,7 @@ public class DefaultTreeCellRenderer
 	/**
 	 * setFont
 	 * 
-	 * @param value0 TODO
+	 * @param f the font.
 	 */
 	public void setFont(Font f)
 	{
@@ -352,7 +354,7 @@ public class DefaultTreeCellRenderer
 	/**
 	 * setBackground
 	 * 
-	 * @param value0 TODO
+	 * @param c the color.
 	 */
 	public void setBackground(Color c)
 	{
@@ -364,35 +366,34 @@ public class DefaultTreeCellRenderer
 	/**
 	 * getTreeCellRendererComponent
 	 * 
-	 * @param value0 TODO
-	 * @param value1 TODO
-	 * @param value2 TODO
-	 * @param value3 TODO
-	 * @param value4 TODO
-	 * @param value5 TODO
-	 * @param value6 TODO
+	 * @param tree TODO
+	 * @param val TODO
+	 * @param selected TODO
+	 * @param expanded TODO
+	 * @param leaf TODO
+	 * @param row TODO
+	 * @param hasFocus TODO
 	 * @returns Component
 	 */
 	public Component getTreeCellRendererComponent(JTree tree, Object val,
 			boolean selected, boolean expanded, boolean leaf, int row,
 			boolean hasFocus)
 	{
-          this.selected = selected;
-          this.hasFocus = hasFocus;
-
-          setText(val.toString());
-          setHorizontalAlignment(LEFT);
-		setOpaque(true);
-          setVerticalAlignment(TOP);
-		setEnabled(true);
-		setFont(getFont());
-
 		if (leaf)
 			setIcon(getLeafIcon());
 		else if (expanded)
 			setIcon(getOpenIcon());
 		else
 			setIcon(getClosedIcon());
+
+      setText(val.toString());
+      this.selected = selected;
+      this.hasFocus = hasFocus;
+      setHorizontalAlignment(LEFT);
+      setOpaque(true);
+      setVerticalAlignment(TOP);
+      setEnabled(true);
+      super.setFont(UIManager.getLookAndFeelDefaults().getFont("Tree.font"));
 
 		if (selected) 
 		{
@@ -401,7 +402,7 @@ public class DefaultTreeCellRenderer
 		}
 		else
 		{
-			super.setBackground((tree.getParent()).getBackground());
+			super.setBackground(getBackgroundNonSelectionColor());
 			setForeground(getTextNonSelectionColor());
 		}
 		
@@ -421,7 +422,7 @@ public class DefaultTreeCellRenderer
 	/**
 	 * paint
 	 * 
-	 * @param value0 TODO
+	 * @param g the graphics device.
 	 */
 	public void paint(Graphics g)
 	{
@@ -579,11 +580,11 @@ public class DefaultTreeCellRenderer
 	/**
 	 * firePropertyChange
 	 * 
-	 * @param value0 TODO
-	 * @param value1 TODO
-	 * @param value2 TODO
+	 * @param name the property name.
+	 * @param v1 the old value.
+	 * @param v2 the new value.
 	 */
-	public void firePropertyChange(String value0, boolean v1, boolean v2)
+	public void firePropertyChange(String name, boolean v1, boolean v2)
 	{
 		//  Overridden for performance reasons.
 	} // firePropertyChange()

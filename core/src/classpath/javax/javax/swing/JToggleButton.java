@@ -38,6 +38,7 @@ exception statement from your version. */
 
 package javax.swing;
 
+import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
@@ -133,19 +134,47 @@ public class JToggleButton extends AbstractButton implements Accessible
      * Sets the pressed state of the button.  The selected state
      * of the button also changes follwing the button being pressed.
      *
-     * @param b true if the button is pressed down.
+     * @param p true if the button is pressed down.
      */
-    public void setPressed(boolean b)  
+    public void setPressed(boolean p)  
     {
+      // cannot change PRESSED state unless button is enabled
       if (! isEnabled())
         return;
       
-      super.setPressed(b);
+      // if this call does not represent a CHANGE in state, then return
+      if ((p && isPressed()) || (!p && !isPressed()))
+        return;
+
+      // The JDK first fires events in the following order:
+      // 1. ChangeEvent for selected
+      // 2. ChangeEvent for pressed
+      // 3. ActionEvent
+      // So do we.
       
       // setPressed(false) == mouse release on us,
       // if we were armed, we flip the selected state.
-      if (!b && isArmed())
+      if (!p && isArmed())
+        {
         setSelected(! isSelected());
+    }
+
+      // make the change
+      if (p)
+        stateMask = stateMask | PRESSED;
+      else
+        stateMask = stateMask & (~PRESSED);
+      
+      // notify interested ChangeListeners
+      fireStateChanged();
+
+      if (!p && isArmed())
+        {
+          fireActionPerformed(new ActionEvent(this,
+                                              ActionEvent.ACTION_PERFORMED,
+                                              actionCommand));
+        }
+
     }
   }
 
@@ -242,11 +271,11 @@ public class JToggleButton extends AbstractButton implements Accessible
    */
   public JToggleButton (String text, Icon icon, boolean selected) 
   {
-    super(text, icon);
+    super();
+    init(text, icon);
 
     setModel(new ToggleButtonModel());	
     model.setSelected(selected);
-    model.setActionCommand("");
   }
 
   /**
@@ -287,7 +316,7 @@ public class JToggleButton extends AbstractButton implements Accessible
    */
   protected  String paramString()
   {
-    return "JToggleButton";
+    return super.paramString();
   }
   
   /**

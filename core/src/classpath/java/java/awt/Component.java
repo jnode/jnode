@@ -897,9 +897,21 @@ public abstract class Component
     if(!isVisible())
       {
         this.visible = true;
-        if (peer != null)
-          peer.setVisible(true);
-        invalidate();
+        // Avoid NullPointerExceptions by creating a local reference.
+        ComponentPeer currentPeer=peer;
+        if (currentPeer != null)
+            currentPeer.setVisible(true);
+
+        // Invalidate the parent if we have one. The component itself must
+        // not be invalidated. We also avoid NullPointerException with
+        // a local reference here.
+        Container currentParent = parent;
+        if (currentParent != null)
+          {
+            currentParent.invalidate();
+            currentParent.repaint();
+          }
+
         ComponentEvent ce =
           new ComponentEvent(this,ComponentEvent.COMPONENT_SHOWN);
         getToolkit().getSystemEventQueue().postEvent(ce);
@@ -930,10 +942,23 @@ public abstract class Component
   {
     if (isVisible())
       {
-        if (peer != null)
-          peer.setVisible(false);
+        // Avoid NullPointerExceptions by creating a local reference.
+        ComponentPeer currentPeer=peer;
+        if (currentPeer != null)
+            currentPeer.setVisible(false);
+        
         this.visible = false;
-        invalidate();
+        
+        // Invalidate the parent if we have one. The component itself must
+        // not be invalidated. We also avoid NullPointerException with
+        // a local reference here.
+        Container currentParent = parent;
+        if (currentParent != null)
+          {
+            currentParent.invalidate();
+            currentParent.repaint();
+          }
+
         ComponentEvent ce =
           new ComponentEvent(this,ComponentEvent.COMPONENT_HIDDEN);
         getToolkit().getSystemEventQueue().postEvent(ce);

@@ -413,7 +413,7 @@ public class DefaultBoundedRangeModel
   /**
    * Retrieves the current listeners of the specified class.
    *
-   * @param c the class of listeners; usually {@link
+   * @param listenerType the class of listeners; usually {@link
    * ChangeListener}<code>.class</code>.
    *
    * @return an array with the currently subscribed listeners, or

@@ -40,9 +40,11 @@ package javax.swing;
 import javax.swing.event.ChangeListener;
 
 /**
- * SingleSelectionModel
+ * A data model that is used in components that support at most one
+ * selected element, like {@link JTabbedPane}, {@link JMenu} and
+ * {@link JPopupMenu}.
+ *
  * @author	Andrew Selkirk
- * @version	1.0
  */
 public interface SingleSelectionModel {
 

@@ -353,4 +353,28 @@ public class GapContent
   {
     return buffer;
     }
+
+  /**
+   * Replaces a portion of the storage with the specified items.
+   *
+   * @param position the position at which to remove items
+   * @param rmSize the number of items to remove
+   * @param addItems the items to add at location
+   * @param addSize the number of items to add
+   */
+  protected void replace(int position, int rmSize, Object addItems,
+                         int addSize)
+  {
+    // Remove content
+    shiftGap(position);
+    gapEnd += rmSize;
+
+    // If gap is too small, enlarge the gap.
+    if ((gapEnd - gapStart) < addSize)
+      shiftEnd(addSize);
+
+    // Add new items to the buffer.
+    System.arraycopy(addItems, 0, buffer, gapStart, addSize);
+    gapStart += addSize;
+  }
 }

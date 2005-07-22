@@ -42,9 +42,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
 /**
- * MenuElement
+ * Defines the methods that any menu element in a {@link JMenu} must
+ * implement.
+ *
  * @author	Andrew Selkirk
- * @version	1.0
  */
 public interface MenuElement {
 
