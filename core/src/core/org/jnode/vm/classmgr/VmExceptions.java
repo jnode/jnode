@@ -96,7 +96,7 @@ public final class VmExceptions extends VmSystemObject {
 	 * @param cls
 	 * @return boolean
 	 */
-	public final boolean contains(Class cls) {
+	public final boolean contains(Class<? extends Throwable> cls) {
 		return contains(cls.getName());
 	}
 }

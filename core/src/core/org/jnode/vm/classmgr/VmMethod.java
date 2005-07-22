@@ -390,7 +390,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
      * @param exceptionClass
      * @return
      */
-    public final boolean canThrow(Class exceptionClass) {
+    public final boolean canThrow(Class<? extends Throwable> exceptionClass) {
         if (exceptions == null) {
             return false;
         } else {
