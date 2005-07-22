@@ -337,8 +337,8 @@ public class BasicButtonUI extends ButtonUI
 
   /**
    * Paints the background area of an {@link AbstractButton} in the pressed
-   * state.  This means filling the supplied area with the {@link
-   * pressedBackgroundColor}.
+   * state.  This means filling the supplied area with the 
+   * <code>pressedBackgroundColor</code>.
    *
    * @param g The graphics context to paint with
    * @param b The button to paint the state of
@@ -374,7 +374,7 @@ public class BasicButtonUI extends ButtonUI
     
   /**
    * Paints the "text" property of an {@link AbstractButton}, using the
-   * {@link textColor} color.
+   * <code>textColor</code> color.
    *
    * @param g The graphics context to paint with
    * @param c The component to paint the state of
@@ -389,7 +389,7 @@ public class BasicButtonUI extends ButtonUI
 
   /**
    * Paints the "text" property of an {@link AbstractButton}, using the
-   * {@link textColor} color.
+   * <code>textColor</code> color.
    *
    * @param g The graphics context to paint with
    * @param b The button to paint the state of

@@ -46,6 +46,7 @@ import java.beans.PropertyChangeListener;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.MenuSelectionManager;
 import javax.swing.UIDefaults;
@@ -179,6 +180,12 @@ public class BasicMenuUI extends BasicMenuItemUI
    */
   public Dimension getMaximumSize(JComponent c)
   {
+    // If this menu is in a popup menu, treat it like a regular JMenuItem
+    if (!((JMenu)c).isTopLevelMenu())
+      {
+        JMenuItem menuItem = new JMenuItem(((JMenu)c).getText(), ((JMenu)c).getIcon());
+        return menuItem.getMaximumSize();
+      }
     return c.getPreferredSize();
   }
 

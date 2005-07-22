@@ -47,10 +47,12 @@ import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.ResourceBundle;
 
-import javax.swing.ImageIcon;
+import javax.swing.BorderFactory;
 import javax.swing.KeyStroke;
 import javax.swing.LookAndFeel;
 import javax.swing.UIDefaults;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
 import javax.swing.plaf.BorderUIResource;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.DimensionUIResource;
@@ -253,7 +255,7 @@ public abstract class BasicLookAndFeel extends LookAndFeel
 
       "AbstractUndoableEdit.undoText", "Undo",
       "AbstractUndoableEdit.redoText", "Redo",
-      "Button.background", new ColorUIResource(light),
+      "Button.background", new ColorUIResource(Color.LIGHT_GRAY),
       "Button.border",
       new UIDefaults.LazyValue() 
       {
@@ -262,17 +264,17 @@ public abstract class BasicLookAndFeel extends LookAndFeel
           return BasicBorders.getButtonBorder();
         }
       },
-      "Button.darkShadow", new ColorUIResource(shadow),
+      "Button.darkShadow", new ColorUIResource(Color.BLACK),
       "Button.focusInputMap", new UIDefaults.LazyInputMap(new Object[] {
         "SPACE",  "pressed",
         "released SPACE", "released"
       }),
       "Button.font", new FontUIResource("Dialog", Font.PLAIN, 12),
-      "Button.foreground", new ColorUIResource(darkShadow),
-      "Button.highlight", new ColorUIResource(highLight),
-      "Button.light", new ColorUIResource(highLight),
+      "Button.foreground", new ColorUIResource(Color.BLACK),
+      "Button.highlight", new ColorUIResource(Color.WHITE),
+      "Button.light", new ColorUIResource(Color.LIGHT_GRAY),
       "Button.margin", new InsetsUIResource(2, 2, 2, 2),
-      "Button.shadow", new ColorUIResource(shadow),
+      "Button.shadow", new ColorUIResource(Color.GRAY),
       "Button.textIconGap", new Integer(4),
       "Button.textShiftOffset", new Integer(0),
       "CheckBox.background", new ColorUIResource(light),
@@ -284,7 +286,14 @@ public abstract class BasicLookAndFeel extends LookAndFeel
       }),
       "CheckBox.font", new FontUIResource("Dialog", Font.PLAIN, 12),
       "CheckBox.foreground", new ColorUIResource(darkShadow),
-      "CheckBox.icon", BasicIconFactory.getCheckBoxIcon(),
+      "CheckBox.icon",
+      new UIDefaults.LazyValue()
+      {
+        public Object createValue(UIDefaults def)
+        {
+          return BasicIconFactory.getCheckBoxIcon();
+        }
+      },
       "CheckBox.margin",new InsetsUIResource(2, 2, 2, 2),
       "CheckBox.textIconGap", new Integer(4),
       "CheckBox.textShiftOffset", new Integer(0),
@@ -455,15 +464,39 @@ public abstract class BasicLookAndFeel extends LookAndFeel
       "InternalFrame.activeTitleBackground", new ColorUIResource(0, 0, 128),
       "InternalFrame.activeTitleForeground", new ColorUIResource(Color.white),
       "InternalFrame.border",
-      new BorderUIResource.CompoundBorderUIResource(null, null),
+      new UIDefaults.LazyValue()
+      {
+	public Object createValue(UIDefaults table)
+	{
+	  Color lineColor = new Color(238, 238, 238);
+	  Border inner = BorderFactory.createLineBorder(lineColor, 1);
+	  Color shadowInner = new Color(184, 207, 229);
+	  Color shadowOuter = new Color(122, 138, 153);
+	  Border outer = BorderFactory.createBevelBorder(BevelBorder.RAISED,
+							 Color.WHITE,
+							 Color.WHITE,
+							 shadowOuter,
+							 shadowInner);
+	  Border border = new BorderUIResource.CompoundBorderUIResource(outer,
+									inner);
+	  return border;
+	}
+      },
       "InternalFrame.borderColor", new ColorUIResource(light),
       "InternalFrame.borderDarkShadow", new ColorUIResource(Color.BLACK),
       "InternalFrame.borderHighlight", new ColorUIResource(Color.WHITE),
       "InternalFrame.borderLight", new ColorUIResource(Color.LIGHT_GRAY),
       "InternalFrame.borderShadow", new ColorUIResource(Color.GRAY),
       "InternalFrame.closeIcon", BasicIconFactory.createEmptyFrameIcon(),
-      // XXX Don't use gif
-//      "InternalFrame.icon", new IconUIResource(new ImageIcon("icons/JavaCup.gif")),
+      // FIXME: Set a nice icon for InternalFrames here.
+      "InternalFrame.icon",
+      new UIDefaults.LazyValue()
+      {
+        public Object createValue(UIDefaults def)
+        {
+          return new IconUIResource(BasicIconFactory.createEmptyFrameIcon());
+        }
+      },
       "InternalFrame.iconifyIcon", BasicIconFactory.createEmptyFrameIcon(),
       "InternalFrame.inactiveTitleBackground", new ColorUIResource(Color.gray),
       "InternalFrame.inactiveTitleForeground",
@@ -631,7 +664,14 @@ public abstract class BasicLookAndFeel extends LookAndFeel
       "RadioButton.font", new FontUIResource("Dialog", Font.PLAIN, 12),
       "RadioButton.foreground", new ColorUIResource(darkShadow),
       "RadioButton.highlight", new ColorUIResource(highLight),
-      "RadioButton.icon", BasicIconFactory.getRadioButtonIcon(),
+      "RadioButton.icon",
+      new UIDefaults.LazyValue()
+      {
+        public Object createValue(UIDefaults def)
+        {
+          return BasicIconFactory.getRadioButtonIcon();
+        }
+      },
       "RadioButton.light", new ColorUIResource(highLight),
       "RadioButton.margin", new InsetsUIResource(2, 2, 2, 2),
       "RadioButton.shadow", new ColorUIResource(shadow),
@@ -730,7 +770,7 @@ public abstract class BasicLookAndFeel extends LookAndFeel
       "Slider.highlight", new ColorUIResource(highLight),
       "Slider.shadow", new ColorUIResource(shadow),
       "Slider.thumbHeight", new Integer(20),
-      "Slider.thumbWidth", new Integer(10),
+      "Slider.thumbWidth", new Integer(11),
       "Slider.tickHeight", new Integer(12),
       "Spinner.background", new ColorUIResource(light),
       "Spinner.foreground", new ColorUIResource(light),
@@ -1018,26 +1058,18 @@ public abstract class BasicLookAndFeel extends LookAndFeel
         "PAGE_UP",  "scrollUpChangeSelection",
         "ctrl PAGE_DOWN", "scrollDownChangeLead"
       }),
-      "Tree.font", new FontUIResource("Dialog", Font.PLAIN, 12),
-      "Tree.closedIcon",
-         new IconUIResource(new ImageIcon(getClass().getResource(
-            "/gnu/javax/swing/plaf/gtk/icons/TreeClosed.png"))),
+      "Tree.font", new FontUIResource(new Font("Helvetica", Font.PLAIN, 12)),
       "Tree.foreground", new ColorUIResource(Color.black),
-      "Tree.hash", new ColorUIResource(Color.gray),
-      "Tree.leafIcon", 
-         new IconUIResource(new ImageIcon(getClass().getResource(
-            "/gnu/javax/swing/plaf/gtk/icons/TreeLeaf.png"))),
+      "Tree.hash", new ColorUIResource(new Color(128, 128, 128)),
       "Tree.leftChildIndent", new Integer(7),
-      "Tree.openIcon", 
-         new IconUIResource(new ImageIcon(getClass().getResource(
-            "/gnu/javax/swing/plaf/gtk/icons/TreeOpen.png"))),
       "Tree.rightChildIndent", new Integer(13),
-      "Tree.rowHeight", new Integer(19),
+      "Tree.rowHeight", new Integer(20), // FIXME
       "Tree.scrollsOnExpand", Boolean.TRUE,
       "Tree.selectionBackground", new ColorUIResource(Color.black),
+      "Tree.nonSelectionBackground", new ColorUIResource(new Color(239, 235, 231)),
       "Tree.selectionBorderColor", new ColorUIResource(Color.black),
-      "Tree.selectionForeground", new ColorUIResource(Color.white),
-      "Tree.textBackground", new ColorUIResource(Color.white),
+      "Tree.selectionForeground", new ColorUIResource(new Color(255, 255, 255)),
+      "Tree.textBackground", new ColorUIResource(new Color(255, 255, 255)),
       "Tree.textForeground", new ColorUIResource(Color.black),
       "Viewport.background", new ColorUIResource(light),
       "Viewport.foreground", new ColorUIResource(Color.black),

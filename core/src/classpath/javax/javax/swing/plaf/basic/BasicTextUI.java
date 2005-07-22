@@ -253,7 +253,7 @@ public abstract class BasicTextUI extends TextUI
                             BasicTextUI.this);
       int caretPos = textComponent.getCaretPosition();
       if (caretPos >= ev.getOffset())
-        textComponent.setCaretPosition(caretPos - ev.getLength());
+        textComponent.setCaretPosition(ev.getOffset());
     }
   }
 

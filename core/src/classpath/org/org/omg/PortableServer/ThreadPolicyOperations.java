@@ -1,4 +1,4 @@
-/* MetalTreeUI.java
+/* ThreadPolicyOperations.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,51 +36,18 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package javax.swing.plaf.metal;
+package org.omg.PortableServer;
 
-import java.util.HashMap;
 
-import javax.swing.JComponent;
-import javax.swing.plaf.ComponentUI;
-import javax.swing.plaf.basic.BasicTreeUI;
-
-public class MetalTreeUI
-  extends BasicTreeUI
+/**
+ * Defines the operations, applicable to the ThreadPolicy.
+ *
+ * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
+ */
+public interface ThreadPolicyOperations
 {
-
-  /** The UI instances for MetalTreeUIs */
-  private static HashMap instances = null;
-
   /**
-   * Constructs a new instance of MetalTreeUI.
+   * Return the value of this policy type, stated by the current instance.
    */
-  public MetalTreeUI()
-  {
-    super();
-  }
-
-  /**
-   * Returns an instance of MetalTreeUI.
-   *
-   * @param component the component for which we return an UI instance
-   *
-   * @return an instance of MetalTreeUI
-   */
-  public static ComponentUI createUI(JComponent component)
-  {
-    if (instances == null)
-      instances = new HashMap();
-
-    Object o = instances.get(component);
-    MetalTreeUI instance;
-    if (o == null)
-      {
-      instance = new MetalTreeUI();
-	instances.put(component, instance);
-      }
-    else
-      instance = (MetalTreeUI) o;
-
-    return instance;
-  }
+  ThreadPolicyValue value();
 }
