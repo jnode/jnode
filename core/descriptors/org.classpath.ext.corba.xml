@@ -39,6 +39,8 @@
       <export name="org.omg.PortableServer.CurrentPackage.*"/>
       <export name="org.omg.PortableServer.POAManagerPackage.*"/>
       <export name="org.omg.PortableServer.POAPackage.*"/>
+      <export name="org.omg.PortableServer.portable.*"/>
+      <export name="org.omg.PortableServer.ServantLocatorPackage.*"/>
       <export name="org.omg.SendingContext.*"/>
       <export name="org.omg.stub.java.rmi.*"/>
     </library>

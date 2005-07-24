@@ -1,4 +1,4 @@
-/* LifespanPolicyOperations.java --
+/* ServantManagerOperations.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -38,18 +38,17 @@ exception statement from your version. */
 
 package org.omg.PortableServer;
 
-import org.omg.CORBA.PolicyOperations;
-
 /**
- * Defines the operations, applicable to the LifespanPolicy.
+ * This interface would define the operations, applicable to
+ * the ServantManager. A servant manager interface itself
+ * is empty, but it is inherited by other two interfaces,
+ * {@link ServantActivator} and {@link ServantLocator}.
+ *
+ * @see ServantActivatorOperations
+ * @see ServantLocatorOperations
  *
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public interface LifespanPolicyOperations
-  extends PolicyOperations
+public interface ServantManagerOperations
 {
-  /**
-   * Return the value of this policy type, stated by the current instance.
-   */
-  LifespanPolicyValue value();
 }

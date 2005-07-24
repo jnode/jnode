@@ -1,4 +1,4 @@
-/* LifespanPolicyOperations.java --
+/* gnuIdUniquenessPolicy.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,20 +36,45 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package org.omg.PortableServer;
+package gnu.CORBA.Poa;
 
-import org.omg.CORBA.PolicyOperations;
+import gnu.CORBA._PolicyImplBase;
+
+import org.omg.PortableServer.ID_UNIQUENESS_POLICY_ID;
+import org.omg.PortableServer.IdUniquenessPolicy;
+import org.omg.PortableServer.IdUniquenessPolicyValue;
 
 /**
- * Defines the operations, applicable to the LifespanPolicy.
+ * Implementation of the id uniqueness policy.
  *
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public interface LifespanPolicyOperations
-  extends PolicyOperations
+public class gnuIdUniquenessPolicy
+  extends _PolicyImplBase
+  implements IdUniquenessPolicy, vPolicy
 {
   /**
-   * Return the value of this policy type, stated by the current instance.
+   * Use serialVersionUID for interoperability.
    */
-  LifespanPolicyValue value();
+  private static final long serialVersionUID = 1L;
+
+  /**
+   * Create the policy.
+   *
+   * @param v a value for the policy.
+   */
+  public gnuIdUniquenessPolicy(IdUniquenessPolicyValue v)
+  {
+    super(ID_UNIQUENESS_POLICY_ID.value, v, v.value(),
+          "IDL:org.omg/PortableServer/IdUniquenessPolicy:1.0"
+         );
+  }
+
+  /**
+   * Get the value for the policy that was passed in a constructor.
+   */
+  public IdUniquenessPolicyValue value()
+  {
+    return (IdUniquenessPolicyValue) getValue();
+  }
 }

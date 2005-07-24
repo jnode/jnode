@@ -1,4 +1,4 @@
-/* LifespanPolicyOperations.java --
+/* ServantActivator.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -38,18 +38,22 @@ exception statement from your version. */
 
 package org.omg.PortableServer;
 
-import org.omg.CORBA.PolicyOperations;
+import org.omg.CORBA.portable.IDLEntity;
 
 /**
- * Defines the operations, applicable to the LifespanPolicy.
+ * The POA, that has the RETAIN policy uses servant managers that are
+ * ServantActivators. The operations, that must be supported by these
+ * managers, are defined separately in {@link ServantActivatorOperations}.
+ *
+ * @see ServantLocator
+ * @see ServantRetentionPolicyValue
+ * @see ServantManager
+ * @see POAOperations#set_servant_manager
  *
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public interface LifespanPolicyOperations
-  extends PolicyOperations
+public interface ServantActivator
+  extends ServantManager, ServantActivatorOperations, IDLEntity,
+          org.omg.CORBA.Object
 {
-  /**
-   * Return the value of this policy type, stated by the current instance.
-   */
-  LifespanPolicyValue value();
 }

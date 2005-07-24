@@ -1,4 +1,4 @@
-/* LifespanPolicyOperations.java --
+/* gnuIdAssignmentPolicy.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,20 +36,45 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package org.omg.PortableServer;
+package gnu.CORBA.Poa;
 
-import org.omg.CORBA.PolicyOperations;
+import gnu.CORBA._PolicyImplBase;
+
+import org.omg.PortableServer.ID_ASSIGNMENT_POLICY_ID;
+import org.omg.PortableServer.IdAssignmentPolicy;
+import org.omg.PortableServer.IdAssignmentPolicyValue;
 
 /**
- * Defines the operations, applicable to the LifespanPolicy.
+ * Implementation of the id assignment policy.
  *
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public interface LifespanPolicyOperations
-  extends PolicyOperations
+public class gnuIdAssignmentPolicy
+  extends _PolicyImplBase
+  implements IdAssignmentPolicy, vPolicy
 {
   /**
-   * Return the value of this policy type, stated by the current instance.
+   * Use serialVersionUID for interoperability.
    */
-  LifespanPolicyValue value();
+  private static final long serialVersionUID = 1L;
+
+  /**
+   * Create the policy.
+   *
+   * @param v a value for the policy.
+   */
+  public gnuIdAssignmentPolicy(IdAssignmentPolicyValue v)
+  {
+    super(ID_ASSIGNMENT_POLICY_ID.value, v, v.value(),
+          "IDL:org.omg/PortableServer/IdAssignmentPolicy:1.0"
+         );
+  }
+
+  /**
+   * Get the value for the policy that was passed in a constructor.
+   */
+  public IdAssignmentPolicyValue value()
+  {
+    return (IdAssignmentPolicyValue) getValue();
+  }
 }

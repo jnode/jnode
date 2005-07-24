@@ -1,4 +1,4 @@
-/* LifespanPolicyOperations.java --
+/* ForwardRequestHolder.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,20 +36,72 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package org.omg.PortableServer;
+package gnu.CORBA.Poa;
 
-import org.omg.CORBA.PolicyOperations;
+import gnu.CORBA.ForwardRequestHelper;
+
+import org.omg.CORBA.TypeCode;
+import org.omg.CORBA.portable.InputStream;
+import org.omg.CORBA.portable.OutputStream;
+import org.omg.CORBA.portable.Streamable;
+import org.omg.PortableServer.ForwardRequest;
 
 /**
- * Defines the operations, applicable to the LifespanPolicy.
- *
- * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
- */
-public interface LifespanPolicyOperations
-  extends PolicyOperations
+* A holder for the exception {@link ForwardRequest}.
+
+* @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
+*/
+public class ForwardRequestHolder
+  implements Streamable
 {
   /**
-   * Return the value of this policy type, stated by the current instance.
+   * The stored ForwardRequest value.
    */
-  LifespanPolicyValue value();
+  public ForwardRequest value;
+
+  /**
+   * Create the unitialised instance, leaving the value field
+   * with default <code>null</code> value.
+   */
+  public ForwardRequestHolder()
+  {
+  }
+
+  /**
+   * Create the initialised instance.
+   * @param initialValue the value that will be assigned to
+   * the <code>value</code> field.
+   */
+  public ForwardRequestHolder(ForwardRequest initialValue)
+  {
+    value = initialValue;
+  }
+
+  /**
+   * Fill in the {@link value} by data from the CDR stream.
+   *
+   * @param input the org.omg.CORBA.portable stream to read.
+   */
+  public void _read(InputStream input)
+  {
+    value = ForwardRequestHelper.read(input);
+  }
+
+  /**
+   * Get the typecode of the ForwardRequest.
+   */
+  public TypeCode _type()
+  {
+    return ForwardRequestHelper.type();
+  }
+
+  /**
+   * Write the stored value into the CDR stream.
+   *
+   * @param output the org.omg.CORBA.portable stream to write.
+   */
+  public void _write(OutputStream output)
+  {
+    ForwardRequestHelper.write(output, value);
+  }
 }

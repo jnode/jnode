@@ -1,4 +1,4 @@
-/* LifespanPolicyOperations.java --
+/* DynamicImplementation.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -38,18 +38,21 @@ exception statement from your version. */
 
 package org.omg.PortableServer;
 
-import org.omg.CORBA.PolicyOperations;
+import org.omg.CORBA.ServerRequest;
 
 /**
- * Defines the operations, applicable to the LifespanPolicy.
+ * This class is used for servants that support calling via server request.
  *
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public interface LifespanPolicyOperations
-  extends PolicyOperations
+public abstract class DynamicImplementation
+  extends Servant
 {
   /**
-   * Return the value of this policy type, stated by the current instance.
+   * Handle the invocation via passed request.
+   *
+   * @param request the data structure, used both to pass parameters
+   * and return results of the invocation.
    */
-  LifespanPolicyValue value();
+  public abstract void invoke(ServerRequest request);
 }

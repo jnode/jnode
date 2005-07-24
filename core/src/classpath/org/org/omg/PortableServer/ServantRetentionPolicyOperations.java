@@ -38,6 +38,7 @@ exception statement from your version. */
 
 package org.omg.PortableServer;
 
+import org.omg.CORBA.PolicyOperations;
 
 /**
  * Defines the operations, applicable to the ServantRetentionPolicy.
@@ -45,6 +46,7 @@ package org.omg.PortableServer;
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
 public interface ServantRetentionPolicyOperations
+  extends PolicyOperations
 {
   /**
    * Return the value of this policy type, stated by the current instance.

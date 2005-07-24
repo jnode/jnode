@@ -1,4 +1,4 @@
-/* LifespanPolicyOperations.java --
+/* gnuAdapterActivator.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,20 +36,46 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package org.omg.PortableServer;
+package gnu.CORBA.Poa;
 
-import org.omg.CORBA.PolicyOperations;
+import org.omg.CORBA.LocalObject;
+import org.omg.PortableServer.AdapterActivator;
+import org.omg.PortableServer.POA;
 
 /**
- * Defines the operations, applicable to the LifespanPolicy.
+ * Defines a simple adapter activator.
  *
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public interface LifespanPolicyOperations
-  extends PolicyOperations
+public class gnuAdapterActivator
+  extends LocalObject
+  implements AdapterActivator
 {
   /**
-   * Return the value of this policy type, stated by the current instance.
+   * Create a new POA on the parent, using the parent policy set
+   * from the suitable parent of grandparend and with independent
+   * POA manager (passing null to the createPOA).
+   *
+   * @param parent a parent. Either this parent or one of its
+   * grandparents must be gnuAbstractPOA, able to provide a
+   * policy set.
+   *
+   * @param child_name the name of the child being created.
+   *
+   * @return true on success or false if no gnuAbstractPOA
+   * found till the root poa.
    */
-  LifespanPolicyValue value();
+  public boolean unknown_adapter(POA parent, String child_name)
+  {
+    try
+      {
+        POA n = parent.create_POA(child_name, null, policySets.rootPoa());
+        n.the_POAManager().activate();
+      }
+    catch (Exception ex)
+      {
+        return false;
+      }
+    return true;
+  }
 }
