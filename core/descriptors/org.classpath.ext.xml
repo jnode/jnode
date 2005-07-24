@@ -40,6 +40,8 @@
       <export name="javax.swing.text.rtf.*"/>
       <export name="javax.swing.tree.*"/>
       <export name="javax.swing.undo.*"/>
+      
+      <export name="org.ietf.jgss.*"/>
     </library>
   </runtime>
   

@@ -26,6 +26,7 @@
       <export name="org.omg.CosNaming.NamingContextExtPackage.*"/>
       <export name="org.omg.CosNaming.NamingContextPackage.*"/>
       <export name="org.omg.Dynamic.*"/>
+      <export name="org.omg.DynamicAny.*"/>
       <export name="org.omg.DynamicAny.DynAnyFactoryPackage.*"/>
       <export name="org.omg.DynamicAny.DynAnyPackage.*"/>
       <export name="org.omg.IOP.*"/>
