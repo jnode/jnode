@@ -245,7 +245,8 @@ public class BasicTableUI
       else if (evt.getKeyCode() == KeyEvent.VK_ENTER)
         {
           // If nothing is selected, select the first cell in the table
-          if (table.getSelectedRowCount() == 0 && table.getSelectedColumnCount() == 0)
+          if (table.getSelectedRowCount() == 0 && 
+              table.getSelectedColumnCount() == 0)
             {
               rowModel.setSelectionInterval(0, 0);
               colModel.setSelectionInterval(0, 0);
@@ -257,19 +258,25 @@ public class BasicTableUI
           // table
           if (!table.isCellSelected(rowLead, colLead))
             {
-              rowModel.addSelectionInterval(rowModel.getMinSelectionIndex(), rowModel.getMinSelectionIndex());
-              colModel.addSelectionInterval(colModel.getMinSelectionIndex(), colModel.getMinSelectionIndex());
+              rowModel.addSelectionInterval(rowModel.getMinSelectionIndex(), 
+                                            rowModel.getMinSelectionIndex());
+              colModel.addSelectionInterval(colModel.getMinSelectionIndex(), 
+                                            colModel.getMinSelectionIndex());
               return;
             }
 
           // If there is just one cell selected, select the next row, and wrap
           // when you get to the edges of the table.
-          if ((table.getSelectedRowCount() <= 1 && table.getSelectedColumnCount() <= 1)
-              || (table.getRowSelectionAllowed() == false && table.getColumnSelectionAllowed() == false))
+          if ((table.getSelectedRowCount() <= 1 && 
+               table.getSelectedColumnCount() <= 1)
+              || (table.getRowSelectionAllowed() == false && 
+                  table.getColumnSelectionAllowed() == false))
             {
-              rowModel.setSelectionInterval((rowLead + 1)%(rowMax + 1), (rowLead + 1)%(rowMax + 1));
+              rowModel.setSelectionInterval((rowLead + 1)%(rowMax + 1), 
+                                            (rowLead + 1)%(rowMax + 1));
               if (rowLead == rowMax)
-                colModel.setSelectionInterval((colLead + 1)%(colMax + 1), (colLead + 1)%(colMax + 1));
+                colModel.setSelectionInterval((colLead + 1)%(colMax + 1), 
+                                              (colLead + 1)%(colMax + 1));
               else
                 colModel.setSelectionInterval(colLead, colLead);
               return;
@@ -280,33 +287,61 @@ public class BasicTableUI
           // amongst the already selected cells.
 
           // If the row lead index is at the end of the selection, wrap it around
-          if (rowLead == rowModel.getMaxSelectionIndex())
+          int rowMaxSelected = table.getRowSelectionAllowed() ? 
+            rowModel.getMaxSelectionIndex() : table.getModel().getRowCount() - 1;
+          int rowMinSelected = table.getRowSelectionAllowed() ? 
+            rowModel.getMinSelectionIndex() : 0; 
+          int colMaxSelected = table.getColumnSelectionAllowed() ? 
+            colModel.getMaxSelectionIndex() : 
+            table.getModel().getColumnCount() - 1;
+          int colMinSelected = table.getColumnSelectionAllowed() ? 
+            colModel.getMinSelectionIndex() : 0;
+          if (rowLead == rowMaxSelected)
             {
-              rowModel.addSelectionInterval(rowModel.getMinSelectionIndex(), rowModel.getMinSelectionIndex());
+              rowModel.addSelectionInterval(rowMinSelected, rowMinSelected);
               
               // And select the next column (from within the selection)
-              if (colLead == colModel.getMaxSelectionIndex())
-                colModel.addSelectionInterval(colModel.getMinSelectionIndex(), colModel.getMinSelectionIndex());
+              if (colLead == colMaxSelected)
+                colModel.addSelectionInterval(colMinSelected, colMinSelected);
               else
                 {
-                  int[] colsSelected = table.getSelectedColumns();
+                  int[] colsSelected;
+                  if (table.getColumnSelectionAllowed())
+                    colsSelected = table.getSelectedColumns();
+                  else
+                    {
+                      colsSelected = new int[table.getModel().getColumnCount()];
+                      for (int i = 0; i < table.getModel().getColumnCount(); i++)
+                        colsSelected[i] = i;
+                    }
                   int colIndex = 0;
                   while (colsSelected[colIndex] <= colLead)
                     colIndex++;
-                  colModel.addSelectionInterval(colsSelected[colIndex], colsSelected[colIndex]);
+                  colModel.addSelectionInterval(colsSelected[colIndex], 
+                                                colsSelected[colIndex]);
                 }
             }
           // If the row lead index isn't at the end, just advance it
           // and you don't have to update the column index
           else
             {
-              int[] rowsSelected = table.getSelectedRows();
+              int[] rowsSelected;
+              if (table.getRowSelectionAllowed())
+                rowsSelected = table.getSelectedRows();
+              else
+                {
+                  rowsSelected = new int[table.getModel().getRowCount()];
+                  for (int i = 0; i < table.getModel().getRowCount(); i++)
+                    rowsSelected[i] = i;
+                }
               int rowIndex = 0;
               while (rowsSelected[rowIndex] <= rowLead)
                 rowIndex++;
-              rowModel.addSelectionInterval(rowsSelected[rowIndex], rowsSelected[rowIndex]);
+              rowModel.addSelectionInterval(rowsSelected[rowIndex], 
+                                            rowsSelected[rowIndex]);
               colModel.addSelectionInterval(colLead, colLead);
             }
+          table.repaint();
         }
       else if (evt.getKeyCode() == KeyEvent.VK_ESCAPE)
         {
@@ -559,9 +594,12 @@ public class BasicTableUI
                 gfx.translate(x, y);
                 comp.setBounds(new Rectangle(0, 0, width, height));
                 // Set correct border on cell renderer.
+                // Only the lead selection cell gets a border
                 if (comp instanceof JComponent)
                   {
-                    if (table.isCellSelected(r, c))
+                    if (table.getSelectionModel().getLeadSelectionIndex() == r
+                        && table.getColumnModel().getSelectionModel().
+                        getLeadSelectionIndex() == c)
                       ((JComponent) comp).setBorder(highlightCellBorder);
                     else
                       ((JComponent) comp).setBorder(cellBorder);

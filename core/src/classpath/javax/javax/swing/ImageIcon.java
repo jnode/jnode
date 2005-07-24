@@ -338,9 +338,9 @@ public class ImageIcon
    *
    * @return the load status of the icon image
    *
-   * @see {@link MediaTracker.COMPLETE}
-   * @see {@link MediaTracker.ABORTED}
-   * @see {@link MediaTracker.ERRORED}
+   * @see MediaTracker#COMPLETE
+   * @see MediaTracker#ABORTED
+   * @see MediaTracker#ERRORED
    */
   public int getImageLoadStatus()
   {

@@ -442,9 +442,9 @@ public abstract class DateFormat extends Format implements Cloneable
    * thrown.
    *
    * @param obj The <code>Object</code> to format.
-   * @param toAppendTo The <code>StringBuffer</code> to append the resultant
+   * @param buf The <code>StringBuffer</code> to append the resultant
    * <code>String</code> to.
-   * @param fieldPosition Is updated to the start and end index of the
+   * @param pos Is updated to the start and end index of the
    * specified field.
    *
    * @return The <code>StringBuffer</code> supplied on input, with the
@@ -479,9 +479,9 @@ public abstract class DateFormat extends Format implements Cloneable
    * to the specified <code>StringBuffer</code>.
    *
    * @param date The <code>Date</code> value to format.
-   * @param toAppendTo The <code>StringBuffer</code> to append the resultant
+   * @param buf The <code>StringBuffer</code> to append the resultant
    * <code>String</code> to.
-   * @param fieldPosition Is updated to the start and end index of the
+   * @param pos Is updated to the start and end index of the
    * specified field.
    *
    * @return The <code>StringBuffer</code> supplied on input, with the
@@ -643,7 +643,7 @@ public abstract class DateFormat extends Format implements Cloneable
    * localed will be used in place of the default.
    *
    * @param style The type of formatting to perform. 
-   * @param aLocale The desired locale.
+   * @param loc The desired locale.
    * 
    * @return A new <code>DateFormat</code> instance.
    */
@@ -744,7 +744,7 @@ public abstract class DateFormat extends Format implements Cloneable
    * localed will be used in place of the default.
    *
    * @param style The type of formatting to perform. 
-   * @param aLocale The desired locale.
+   * @param loc The desired locale.
    * 
    * @return A new <code>DateFormat</code> instance.
    */
@@ -818,7 +818,7 @@ public abstract class DateFormat extends Format implements Cloneable
    * starting parse position on method entry and the ending parse
    * position on method exit.
    *
-   * @param text The string to parse.
+   * @param source The string to parse.
    * @param pos The starting parse position in entry, the ending parse
    * position on exit.
    *
@@ -848,7 +848,7 @@ public abstract class DateFormat extends Format implements Cloneable
    * This method specified the <code>Calendar</code> that should be used 
    * by this object to parse/format datetimes.
    *
-   * @param The new <code>Calendar</code> for this object.
+   * @param calendar The new <code>Calendar</code> for this object.
    *
    * @see java.util.Calendar
    */
@@ -873,7 +873,7 @@ public abstract class DateFormat extends Format implements Cloneable
    * This method specifies the <code>NumberFormat</code> object that should
    * be used by this object to parse/format times.
    *
-   * @param The <code>NumberFormat</code> in use by this object.
+   * @param numberFormat The <code>NumberFormat</code> in use by this object.
    */
   public void setNumberFormat (NumberFormat numberFormat)
   {
@@ -883,7 +883,7 @@ public abstract class DateFormat extends Format implements Cloneable
   /**
    * This method sets the time zone that should be used by this object.
    *
-   * @param The new time zone.
+   * @param timeZone The new time zone.
    */
   public void setTimeZone (TimeZone timeZone)
   {

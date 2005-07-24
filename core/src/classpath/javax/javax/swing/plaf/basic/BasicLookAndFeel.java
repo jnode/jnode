@@ -539,6 +539,9 @@ public abstract class BasicLookAndFeel extends LookAndFeel
       "List.foreground", new ColorUIResource(darkShadow),
       "List.selectionBackground", new ColorUIResource(Color.black),
       "List.selectionForeground", new ColorUIResource(Color.white),
+      "List.focusCellHighlightBorder",
+      new BorderUIResource.
+      LineBorderUIResource(new ColorUIResource(Color.yellow)),
       "Menu.acceleratorFont", new FontUIResource("Dialog", Font.PLAIN, 12),
       "Menu.acceleratorForeground", new ColorUIResource(darkShadow),
       "Menu.acceleratorSelectionForeground", new ColorUIResource(Color.white),

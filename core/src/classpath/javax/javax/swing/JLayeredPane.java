@@ -39,6 +39,7 @@ exception statement from your version. */
 package javax.swing;
 
 import java.awt.Component;
+import java.awt.Container;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
@@ -57,13 +58,13 @@ import javax.accessibility.Accessible;
  *    <dd>The layer where most of the normal components are placed. This
  *      is the bottommost layer.</dd>
  *
- *    <dt>{@link #PALETTE_LAYER</dt>
+ *    <dt>{@link #PALETTE_LAYER}</dt>
  *    <dd>Palette windows are placed in this layer.</dd>
  *
  *    <dt>{@link #MODAL_LAYER}</dt>
  *    <dd>The layer where internal modal dialog windows are placed.</dd>
  *
- *    <dt>{@link #POPUP_LAYER</dt>
+ *    <dt>{@link #POPUP_LAYER}</dt>
  *    <dd>The layer for popup menus</dd>
  *
  *    <dt>{@link #DRAG_LAYER}</dt>
@@ -81,7 +82,8 @@ import javax.accessibility.Accessible;
  * </p>
  *
  * <p>To change the layer of a component that is already a child of
- * a <code>JLayeredPane</code>, use the {@link #setLayer} method.</p>
+ * a <code>JLayeredPane</code>, use the {@link #setLayer(Component, int)} 
+ * method.</p>
  *
  * <p>The purpose of this class is to translate this view of "layers" into a
  * contiguous array of components: the one held in our ancestor,
@@ -304,7 +306,7 @@ public class JLayeredPane extends JComponent implements Accessible
    * @param c the component to move to the front of its layer.
    * @throws IllegalArgumentException if the component is not a child of
    * this container.
-   * @see #moveToBack()
+   * @see #moveToBack
    */
   public void moveToFront(Component c)
   {
@@ -323,7 +325,7 @@ public class JLayeredPane extends JComponent implements Accessible
    * @param c the component to move to the back of its layer.
    * @throws IllegalArgumentException if the component is not a child of
    * this container.
-   * @see #moveToFront()
+   * @see #moveToFront
    */
   public void moveToBack(Component c)
   {
@@ -338,7 +340,7 @@ public class JLayeredPane extends JComponent implements Accessible
    * @param c the component to get the position of.
    * @throws IllegalArgumentException if the component is not a child of
    * this container.
-   * @see #setPosition()
+   * @see #setPosition
    */
   public int getPosition(Component c)
   {
@@ -365,7 +367,7 @@ public class JLayeredPane extends JComponent implements Accessible
    * @param position the position to assign the component to.
    * @throws IllegalArgumentException if the component is not a child of
    * this container.
-   * @see #getPosition()
+   * @see #getPosition
    */
   public void setPosition(Component c, int position)
   {

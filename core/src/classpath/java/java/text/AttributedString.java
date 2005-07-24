@@ -342,7 +342,8 @@ addAttribute(AttributedCharacterIterator.Attribute attrib, Object value,
   * @param begin_index The beginning index.
   * @param end_index The ending index
   *
-  * @param IllegalArgumentException If the list is <code>null</code> or the subrange is not valid.
+  * @throws IllegalArgumentException If the list is <code>null</code> or the 
+  * subrange is not valid.
   */
 public void
 addAttributes(Map attributes, int begin_index, int end_index)
