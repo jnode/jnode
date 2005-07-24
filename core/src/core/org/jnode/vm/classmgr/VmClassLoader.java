@@ -43,14 +43,14 @@ public abstract class VmClassLoader extends VmSystemObject {
 	 * @return The loaded class
 	 * @throws ClassNotFoundException
 	 */
-	public abstract VmType loadClass(String className, boolean resolve) throws ClassNotFoundException;
+	public abstract VmType<?> loadClass(String className, boolean resolve) throws ClassNotFoundException;
 
 	/**
 	 * Find a loaded class with the given name.
 	 * @param className
 	 * @return The loaded class, or null if not found.
 	 */
-	public abstract VmType findLoadedClass(String className);
+	public abstract VmType<?> findLoadedClass(String className);
 	
 	/**
 	 * Define a byte-array of class data into a loaded class.
@@ -62,7 +62,7 @@ public abstract class VmClassLoader extends VmSystemObject {
 	 * @param protDomain
 	 * @return VmClass
 	 */
-	public abstract VmType defineClass(String name, byte[] data, int offset, int length, ProtectionDomain protDomain);
+	public abstract VmType<?> defineClass(String name, byte[] data, int offset, int length, ProtectionDomain protDomain);
 	
     /**
      * Define a bytebuffer of class data into a loaded class.
@@ -72,7 +72,7 @@ public abstract class VmClassLoader extends VmSystemObject {
      * @param protDomain
      * @return VmClass
      */
-    public abstract VmType defineClass(String name, ByteBuffer data, ProtectionDomain protDomain);
+    public abstract VmType<?> defineClass(String name, ByteBuffer data, ProtectionDomain protDomain);
     
     /**
      * Define a class that is created in memory.

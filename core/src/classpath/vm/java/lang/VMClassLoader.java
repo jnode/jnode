@@ -21,6 +21,9 @@
 
 package java.lang;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.jnode.vm.VmSystem;
 import org.jnode.vm.classmgr.VmType;
 
@@ -76,4 +79,39 @@ final class VMClassLoader {
 	final static ClassLoader getSystemClassLoader() {
 		return VmSystem.getSystemClassLoader().asClassLoader();
 	}
+    
+    /**
+     * Gets the default assertion status of classes and packages.
+     * @return
+     */
+    final static boolean defaultAssertionStatus() {
+        return false;
+    }
+
+    /**
+     * The system default for package assertion status. This is used for all
+     * ClassLoader's packageAssertionStatus defaults. It must be a map of
+     * package names to Boolean.TRUE or Boolean.FALSE, with the unnamed package
+     * represented as a null key.
+     *
+     * XXX - Not implemented yet; this requires native help.
+     *
+     * @return a (read-only) map for the default packageAssertionStatus
+     */
+    static final Map<String, Boolean> packageAssertionStatus() {
+        return new HashMap<String, Boolean>();
+    }
+
+    /**
+     * The system default for class assertion status. This is used for all
+     * ClassLoader's classAssertionStatus defaults. It must be a map of
+     * class names to Boolean.TRUE or Boolean.FALSE
+     *
+     * XXX - Not implemented yet; this requires native help.
+     *
+     * @return a (read-only) map for the default classAssertionStatus
+     */
+    static final Map<String, Boolean> classAssertionStatus() {
+        return new HashMap<String, Boolean>();
+    }
 }
