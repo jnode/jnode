@@ -190,7 +190,7 @@ public final class CollationKey implements Comparable
   /**
    * This method returns the collation bit sequence as a byte array.
    *
-   * @param A byte array containing the collation bit sequence.
+   * @return A byte array containing the collation bit sequence.
    */
   public byte[] toByteArray()
   {

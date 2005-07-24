@@ -89,7 +89,7 @@ import javax.swing.plaf.ViewportUI;
  *
  * <p>But in terms of drawing its child, the viewport thinks of itself as
  * covering a particular position <em>of the view's coordinate space</em>.
- * For example, the {@link javax.JViewPort.getViewPosition} method returns
+ * For example, the {@link #getViewPosition} method returns
  * the position <code>(VX,VY)</code> shown above, which is an position in
  * "view space", even though this is <em>implemented</em> by positioning
  * the underlying child at position <code>(-VX,-VY)</code></p>
