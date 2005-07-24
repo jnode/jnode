@@ -1,4 +1,4 @@
-/* LifespanPolicyOperations.java --
+/* gnuForwardRequest.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,20 +36,55 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package org.omg.PortableServer;
+package gnu.CORBA.Poa;
 
-import org.omg.CORBA.PolicyOperations;
+import gnu.CORBA.GIOP.ReplyHeader;
+
+import org.omg.CORBA.BAD_PARAM;
+import org.omg.CORBA.portable.ObjectImpl;
 
 /**
- * Defines the operations, applicable to the LifespanPolicy.
+ * The class, indicating that the request should be forwarded to another
+ * target. We cannot use ForwardRequest because the exception is throws
+ * from methods that does not declare throwing it. Hence must be
+ * RuntimeException.
  *
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public interface LifespanPolicyOperations
-  extends PolicyOperations
+public class gnuForwardRequest
+  extends RuntimeException
 {
   /**
-   * Return the value of this policy type, stated by the current instance.
+   * Use serialVersionUID (v1.4) for interoperability.
    */
-  LifespanPolicyValue value();
+  private static final long serialVersionUID = -1L;
+
+  /**
+   * The object reference, indicating the new location of the invocation target.
+   */
+  public ObjectImpl forward_reference;
+
+  /**
+   * This information shows if we use LOCATION_FORWARD or
+   * LOCATION_FORWARD_PERM in request. By defalult, LOCATION_FORWARD
+   * is always used. To use LOCATION_FORWARD_PERM, this exception should
+   * be thrown from the servant manager instead of ForwardRequest,
+   * with this field set to  ReplyHeader.LOCATION_FORWARD_PERM.
+   */
+  public byte forwarding_code = ReplyHeader.LOCATION_FORWARD;
+
+  /**
+   * Create the ForwardRequest with explaining message and
+   * initialising the object reference to the given value.
+   *
+   * @param why a string, explaining, why this exception has been thrown.
+   * @param a_forward_reference a value for forward_reference.
+   */
+  public gnuForwardRequest(org.omg.CORBA.Object a_forward_reference)
+  {
+    if (a_forward_reference instanceof ObjectImpl)
+      this.forward_reference = (ObjectImpl) a_forward_reference;
+    else
+      throw new BAD_PARAM("ObjectImpl expected");
+  }
 }

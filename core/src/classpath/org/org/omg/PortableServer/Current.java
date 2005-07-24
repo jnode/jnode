@@ -1,4 +1,4 @@
-/* LifespanPolicyOperations.java --
+/* Current.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -38,18 +38,26 @@ exception statement from your version. */
 
 package org.omg.PortableServer;
 
-import org.omg.CORBA.PolicyOperations;
+import org.omg.CORBA.portable.IDLEntity;
 
 /**
- * Defines the operations, applicable to the LifespanPolicy.
+ * <p>Provides the Id of the object currently being served and POA
+ * to that this object is connected. Both Id and POA can be
+ * simpler obtained from the servant by {@link Servant#_object_id() }
+ * and {@link Servant#_poa()} that use POA Current indirectly.
+ * The operations on Current for obtaining
+ * these data are defined in {@link CurrentOperations}.
+ * </p><p>
+ * As long as the ORB reference is still available, the current information
+ * is available via {@link Current} that is returned by
+ * ORB.resolve_initial_references("POACurrent"). To support this call,
+ * the ORB maintains the thread to invocation data map for all calls that
+ * are currently being processed.
+ * </p>
  *
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public interface LifespanPolicyOperations
-  extends PolicyOperations
+public interface Current
+  extends CurrentOperations, org.omg.CORBA.Current, IDLEntity
 {
-  /**
-   * Return the value of this policy type, stated by the current instance.
-   */
-  LifespanPolicyValue value();
 }

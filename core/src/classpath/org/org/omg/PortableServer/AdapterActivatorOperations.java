@@ -1,4 +1,4 @@
-/* LifespanPolicyOperations.java --
+/* AdapterActivatorOperations.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -38,18 +38,29 @@ exception statement from your version. */
 
 package org.omg.PortableServer;
 
-import org.omg.CORBA.PolicyOperations;
 
 /**
- * Defines the operations, applicable to the LifespanPolicy.
+ * Defines the operations, applicable to the AdapterActivator.
  *
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public interface LifespanPolicyOperations
-  extends PolicyOperations
+public interface AdapterActivatorOperations
 {
   /**
-   * Return the value of this policy type, stated by the current instance.
-   */
-  LifespanPolicyValue value();
+  * This method is invoked when the ORB receives a request for an object
+  * reference that identifies a non-existing target POA, to create it.
+  * The ORB invokes this operation once for each POA that must be created
+  * in order for the target POA to exist. The process remebers creating a
+  * nested folder structure, starting from the ancestor POA closest to the
+  * root POA. The operation is invoked on the adapter activator of
+  * POA that is the parent of the POA that needs to be created.
+  *
+  * @param parent the parent POA, for that the child POA must be created.
+  * @param child_name the name of the child POA that must be created.
+  *
+  * @return true if the operation has successfully created the needed POA,
+  * false that POA cannot be created. In this case, the client will receive
+  * the remote exception ({@link OBJECT_NOT_EXIST}, minor code 2).
+  */
+  boolean unknown_adapter(POA parent, String child_name);
 }

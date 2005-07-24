@@ -1,4 +1,4 @@
-/* LifespanPolicyOperations.java --
+/* POAManager.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -38,18 +38,26 @@ exception statement from your version. */
 
 package org.omg.PortableServer;
 
-import org.omg.CORBA.PolicyOperations;
+import org.omg.CORBA.portable.IDLEntity;
 
 /**
- * Defines the operations, applicable to the LifespanPolicy.
+ * <p>
+ * A POA manager is associated with one or more POAs and provides means
+ * to regulate they activity. Using manage, it is possible to force
+ * requests for those POAs to be queued or discarded or have those POAs
+ * deactivated. The manager can turn POAs to and from holding,
+ * active and discarding states, but the incative state is irreversible.
+ * </p>
+ * <p>
+ * The manager of the ORBs root POA can be obtained by resolving initial
+ * reference "RootPOAManager".
+ * </p>
+ *
+ * @see POAManagerOperations
  *
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public interface LifespanPolicyOperations
-  extends PolicyOperations
+public interface POAManager
+  extends POAManagerOperations, IDLEntity, org.omg.CORBA.Object
 {
-  /**
-   * Return the value of this policy type, stated by the current instance.
-   */
-  LifespanPolicyValue value();
 }

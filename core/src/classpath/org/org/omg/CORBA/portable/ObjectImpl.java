@@ -185,7 +185,6 @@ public abstract class ObjectImpl
   /**
    * Invoke the operation.
    *
-   * @param target the invocation target.
    * @param output the stream, containing the written arguments.
    *
    * @return the stream, from where the input parameters could be read.
@@ -286,6 +285,7 @@ public abstract class ObjectImpl
    */
   public void _releaseReply(InputStream stream)
   {
+    if (delegate != null)
     delegate.releaseReply(this, stream);
   }
 
@@ -387,6 +387,9 @@ public abstract class ObjectImpl
    */
   public boolean equals(java.lang.Object other)
   {
+    if (delegate == null)
+      return this == other;
+    else
     return delegate.equals(this, other);
   }
 

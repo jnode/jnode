@@ -1,4 +1,4 @@
-/* LifespanPolicyOperations.java --
+/* AdapterActivator.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -38,18 +38,25 @@ exception statement from your version. */
 
 package org.omg.PortableServer;
 
-import org.omg.CORBA.PolicyOperations;
+import org.omg.CORBA.portable.IDLEntity;
 
 /**
- * Defines the operations, applicable to the LifespanPolicy.
+ * Adapter activators are associated with POAs and supply the
+ * the ability to create child POAs on demand. The new POA can be created
+ * <ul>
+ * <li>As a side-effect of receiving a request that names the child POA
+ * (or one of its children).</li>
+ * <li>When calling
+ * {@link POAOperations}.find_POA(name, true) if the parameter
+ * <code>name</code> refers a non existing POA.
+ * </li></ul>
+ * An AdapterActivator is always a local object.
+ *
+ * @see AdapterActivatorOperations#unknown_adapter
  *
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public interface LifespanPolicyOperations
-  extends PolicyOperations
+public interface AdapterActivator
+  extends AdapterActivatorOperations, IDLEntity, org.omg.CORBA.Object
 {
-  /**
-   * Return the value of this policy type, stated by the current instance.
-   */
-  LifespanPolicyValue value();
 }

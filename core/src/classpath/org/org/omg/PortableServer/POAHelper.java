@@ -1,4 +1,4 @@
-/* LifespanPolicyOperations.java --
+/* POAHelper.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -38,18 +38,32 @@ exception statement from your version. */
 
 package org.omg.PortableServer;
 
-import org.omg.CORBA.PolicyOperations;
+import org.omg.CORBA.BAD_PARAM;
 
 /**
- * Defines the operations, applicable to the LifespanPolicy.
+ * The helper operations for the CORBA object {@link POA}.
  *
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public interface LifespanPolicyOperations
-  extends PolicyOperations
+public abstract class POAHelper
 {
   /**
-   * Return the value of this policy type, stated by the current instance.
+   * Cast the passed object into the POA. As POA is a local
+   * object, the method just uses java type cast.
+   *
+   * @param obj the object to narrow.
+   * @return narrowed instance.
+   * @throws BAD_PARAM if the passed object is not a POA.
    */
-  LifespanPolicyValue value();
+  public static POA narrow(org.omg.CORBA.Object obj)
+  {
+    try
+      {
+        return (POA) obj;
+      }
+    catch (ClassCastException cex)
+      {
+        throw new BAD_PARAM(obj.getClass().getName() + " is not a POA");
+      }
+  }
 }
