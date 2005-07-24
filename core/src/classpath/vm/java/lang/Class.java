@@ -29,10 +29,12 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.GenericDeclaration;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.net.URL;
 import java.security.AllPermission;
 import java.security.Permissions;
@@ -55,8 +57,16 @@ import org.jnode.vm.classmgr.VmType;
  * 
  * @author epr
  */
-public final class Class<T> implements AnnotatedElement, Serializable, Type {
+public final class Class<T> implements AnnotatedElement, Serializable, Type, GenericDeclaration {
 
+    /**
+     * Compatible with JDK 1.0+.
+     */
+    private static final long serialVersionUID = 3206093459760846163L;
+
+    /**
+     * Permission used in {@link #getVmClass()}
+     */
     private static final JNodePermission GETVMCLASS = new JNodePermission("getVmClass");
     
     private final VmType<T> vmClass;
@@ -115,8 +125,67 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type {
         return (isInterface() ? "interface " : "class ") + getName();
     }
 
+    /**
+     * Returns the desired assertion status of this class, if it were to be
+     * initialized at this moment. The class assertion status, if set, is
+     * returned; the backup is the default package status; then if there is a
+     * class loader, that default is returned; and finally the system default is
+     * returned. This method seldom needs calling in user code, but exists for
+     * compilers to implement the assert statement. Note that there is no
+     * guarantee that the result of this method matches the class's actual
+     * assertion status.
+     * 
+     * @return the desired assertion status
+     * @see ClassLoader#setClassAssertionStatus(String, boolean)
+     * @see ClassLoader#setPackageAssertionStatus(String, boolean)
+     * @see ClassLoader#setDefaultAssertionStatus(boolean)
+     * @since 1.4
+     */
     public boolean desiredAssertionStatus() {
-        return true;
+        ClassLoader c = getClassLoader();
+        Object status;
+        if (c == null)
+            return VMClassLoader.defaultAssertionStatus();
+        if (c.classAssertionStatus != null)
+            synchronized (c) {
+                status = c.classAssertionStatus.get(getName());
+                if (status != null)
+                    return status.equals(Boolean.TRUE);
+            }
+        else {
+            status = ClassLoader.StaticData.systemClassAssertionStatus
+                    .get(getName());
+            if (status != null)
+                return status.equals(Boolean.TRUE);
+        }
+        if (c.packageAssertionStatus != null)
+            synchronized (c) {
+                String name = getPackagePortion(getName());
+                if ("".equals(name))
+                    status = c.packageAssertionStatus.get(null);
+                else
+                    do {
+                        status = c.packageAssertionStatus.get(name);
+                        name = getPackagePortion(name);
+                    } while (!"".equals(name) && status == null);
+                if (status != null)
+                    return status.equals(Boolean.TRUE);
+            }
+        else {
+            String name = getPackagePortion(getName());
+            if ("".equals(name))
+                status = ClassLoader.StaticData.systemPackageAssertionStatus
+                        .get(null);
+            else
+                do {
+                    status = ClassLoader.StaticData.systemPackageAssertionStatus
+                            .get(name);
+                    name = getPackagePortion(name);
+                } while (!"".equals(name) && status == null);
+            if (status != null)
+                return status.equals(Boolean.TRUE);
+        }
+        return c.defaultAssertionStatus;
     }
 
     /**
@@ -840,5 +909,63 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type {
     private final VmType<T> getLinkedVmClass() {
         vmClass.link();
         return vmClass;
+    }
+
+    /**
+     * @see java.lang.reflect.GenericDeclaration#getTypeParameters()
+     */
+    public TypeVariable< ? >[] getTypeParameters() {
+        return new TypeVariable[0];
+    }
+
+    /**
+     * <p>
+     * Casts this class to represent a subclass of the specified class. This
+     * method is useful for `narrowing' the type of a class so that the class
+     * object, and instances of that class, can match the contract of a more
+     * restrictive method. For example, if this class has the static type of
+     * <code>Class&lt;Object&gt;</code>, and a dynamic type of
+     * <code>Class&lt;Rectangle&gt;</code>, then, assuming <code>Shape</code>
+     * is a superclass of <code>Rectangle</code>, this method can be used on
+     * this class with the parameter, <code>Class&lt;Shape&gt;</code>, to
+     * retain the same instance but with the type
+     * <code>Class&lt;? extends Shape&gt;</code>.
+     * </p>
+     * <p>
+     * If this class can be converted to an instance which is parameterised over
+     * a subtype of the supplied type, <code>U</code>, then this method
+     * returns an appropriately cast reference to this object. Otherwise, a
+     * <code>ClassCastException</code> is thrown.
+     * </p>
+     * 
+     * @param klass
+     *            the class object, the parameterized type (<code>U</code>)
+     *            of which should be a superclass of the parameterized type of
+     *            this instance.
+     * @return a reference to this object, appropriately cast.
+     * @throws ClassCastException
+     *             if this class can not be converted to one which represents a
+     *             subclass of the specified type, <code>U</code>.
+     * @since 1.5
+     */
+    @SuppressWarnings("unchecked")
+    public <U> Class< ? extends U> asSubclass(Class<U> klass) {
+        if (!klass.isAssignableFrom(this))
+            throw new ClassCastException();
+        return (Class< ? extends U>) this;
+    }
+
+    /**
+     * Strip the last portion of the name (after the last dot).
+     * 
+     * @param name
+     *            the name to get package of
+     * @return the package name, or "" if no package
+     */
+    private static String getPackagePortion(String name) {
+        int lastInd = name.lastIndexOf('.');
+        if (lastInd == -1)
+            return "";
+        return name.substring(0, lastInd);
     }
 }

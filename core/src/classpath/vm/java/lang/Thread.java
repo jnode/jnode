@@ -279,8 +279,9 @@ public class Thread implements Runnable {
     }
 
     /**
-     * Destroys this thread, without any cleanup. Any monitors it has locked
-     * remain locked. (This method is not implemented.)
+     * Originally intended to destroy this thread, this method was never
+     * implemented by Sun, and is hence a no-op.
+     * @deprecated
      */
     public void destroy() {
         vmThread.destroy();
