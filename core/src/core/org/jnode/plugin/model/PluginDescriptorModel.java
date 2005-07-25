@@ -234,9 +234,15 @@ public class PluginDescriptorModel extends AbstractModelObject implements
                 final ClassLoader cl = getPluginClassLoader();
                 // System.out.println("cl=" + cl.getClass().getName());
                 final Class cls = cl.loadClass(className);
-                final Constructor cons = cls
-                        .getConstructor(new Class[] { PluginDescriptor.class });
-                return (Plugin) cons.newInstance(new Object[] { this });
+                // Loading the class may have triggered the creation of the
+                // plugin already.
+                if (plugin != null) {
+                    return plugin;
+                } else {
+                    final Constructor cons = cls
+                            .getConstructor(new Class[] { PluginDescriptor.class });
+                    return (Plugin) cons.newInstance(new Object[] { this });
+                }
             } catch (ClassNotFoundException ex) {
                 throw new PluginException(ex);
             } catch (IllegalAccessException ex) {
@@ -609,34 +615,34 @@ public class PluginDescriptorModel extends AbstractModelObject implements
                 return;
             }
             starting = true;
-            // BootLog.info("Resolve on plugin " + getId());
-            try {
-                AccessController.doPrivileged(new PrivilegedExceptionAction() {
-                    public Object run() throws PluginException {
-                        resolve(registry);
-                        final int reqMax = requires.length;
-                        for (int i = 0; i < reqMax; i++) {
-                            final String reqId = requires[i].getPluginId();
-                            // BootLog.info("Start dependency " + reqId);
-                            final PluginDescriptorModel reqDescr = (PluginDescriptorModel) registry
-                                    .getPluginDescriptor(reqId);
-                            reqDescr.startPlugin(registry);
-                        }
-                        // BootLog.info("Start myself " + getId());
-                        getPlugin().start();
-                        return null;
+        }
+        // BootLog.info("Resolve on plugin " + getId());
+        try {
+            AccessController.doPrivileged(new PrivilegedExceptionAction() {
+                public Object run() throws PluginException {
+                    resolve(registry);
+                    final int reqMax = requires.length;
+                    for (int i = 0; i < reqMax; i++) {
+                        final String reqId = requires[i].getPluginId();
+                        // BootLog.info("Start dependency " + reqId);
+                        final PluginDescriptorModel reqDescr = (PluginDescriptorModel) registry
+                        .getPluginDescriptor(reqId);
+                        reqDescr.startPlugin(registry);
                     }
-                });
-            } catch (PrivilegedActionException ex) {
-                BootLog.error("Error starting plugin", ex);
-                try {
-                    Thread.sleep(10000);
-                } catch (InterruptedException ex1) {
-                    // Ignore
+                    // BootLog.info("Start myself " + getId());
+                    getPlugin().start();
+                    return null;
                 }
-            } finally {
-                started = true;
+            });
+        } catch (PrivilegedActionException ex) {
+            BootLog.error("Error starting plugin", ex);
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException ex1) {
+                // Ignore
             }
+        } finally {
+            started = true;
         }
     }
 

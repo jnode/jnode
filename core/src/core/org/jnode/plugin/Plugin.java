@@ -97,9 +97,9 @@ public abstract class Plugin {
 		    if (descriptor.hasCustomPluginClass()) {
 		        BootLog.debug("__Starting " + descriptor.getId());
 		    }
+            started = true;
 		    startPlugin();
 		    ((PluginDescriptorModel)descriptor).firePluginStarted();
-		    started = true;
 		}
 	}
 
@@ -115,9 +115,9 @@ public abstract class Plugin {
 	        sm.checkPermission(PluginSecurityConstants.STOP_PERM);
 	    }
 		if (started) {
+            started = false;
 		    ((PluginDescriptorModel)descriptor).firePluginStop();
 			stopPlugin();
-			started = false;
 		}
 	}
 
