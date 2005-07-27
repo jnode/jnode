@@ -13,7 +13,7 @@
     <library name="jnode-core.jar">
       <export name="org.jnode.system.repository.*"/>
       <export name="org.jnode.system.repository.plugins.*"/>
-      <export name="org.jnode.system.repository.plugins.spi.*"/>
+      <export name="org.jnode.system.repository.spi.*"/>
     </library>
   </runtime>
         
