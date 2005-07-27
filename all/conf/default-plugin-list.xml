@@ -127,6 +127,7 @@
     <plugin id="org.jnode.shell.command.system"/>
     <plugin id="org.beanshell"/>
 
+    <plugin id="org.jnode.system.repository"/>
     <plugin id="org.jnode.work"/>
 
 </plugin-list>
