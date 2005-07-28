@@ -512,10 +512,14 @@ public class Vm extends VmSystemObject implements Statistics, SharedStatics {
      * @param vmType
      *            The newly resolved type
      */
-    public void notifyClassResolved(VmType< ? > vmType)    
+    public static void notifyClassResolved(VmType< ? > vmType)    
     throws InlinePragma {
-        if (heapManager != null) {
-            heapManager.notifyClassResolved(vmType);
+        final Vm instance = Vm.instance;
+        if (instance != null) {
+            final VmHeapManager hm = instance.heapManager;
+            if (hm != null) {
+                hm.notifyClassResolved(vmType);
+            }
         }
     }
 }
