@@ -46,23 +46,23 @@ abstract class Item {
 	 */
 	static class Kind {
 
-		/** Item is on the stack */
-		static final byte STACK = 0x01;
+        /** Item is constant */
+        static final byte CONSTANT = 0x01;
 
-		/** Item is in a general purpose register */
-		static final byte GPR = 0x02;
-		
+        /** Item is in a general purpose register */
+        static final byte GPR = 0x02;
+        
 		/** Item is in a SSE register */
 		static final byte XMM = 0x04;
 
 		/** Item is on the FPU stack */
 		static final byte FPUSTACK = 0x08;
 
-		/** Item is a local variable (EBP relative) */
-		static final byte LOCAL = 0x10;
+        /** Item is on the stack */
+        static final byte STACK = 0x10;
 
-		/** Item is constant */
-		static final byte CONSTANT = 0x20;
+		/** Item is a local variable (EBP relative) */
+		static final byte LOCAL = 0x20;
 
 		public static final String toString(int kind) {
 			switch (kind) {
@@ -146,6 +146,16 @@ abstract class Item {
 	final byte getKind() {
 		return kind;
 	}
+    
+    /**
+     * Gets the weight of the item kind (STACK, GPR, ....).
+     * Kind weight is sorted from constant, gpr, xmm, fp, stack to local.
+     * 
+     * @return the item kind weight
+     */
+    final int getKindWeight() {
+        return kind;
+    }
     
     /**
      * Sets the kind of this item.
