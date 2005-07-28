@@ -21,6 +21,9 @@
 
 package org.jnode.vm.x86.compiler;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.jnode.assembler.Label;
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Constants;
@@ -88,7 +91,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 
     private final boolean haveCMOV;
 
-    private Label[] addressLabels;
+    private final Map<Integer, Label> addressLabels = new HashMap<Integer, Label>();
 
     private final boolean debug = Vm.getVm().isDebugMode();
 
@@ -150,7 +153,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
         this.method = method;
         this.labelPrefix = method.toString() + "_";
         this.instrLabelPrefix = labelPrefix + "_bci_";
-        this.addressLabels = new Label[method.getBytecodeSize()];
+        this.addressLabels.clear();
     }
 
     /**
@@ -158,7 +161,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
     public void startInlinedMethod(VmMethod inlinedMethod, Label curInstrLabel) {
         this.labelPrefix = curInstrLabel + "_" + inlinedMethod + "_";
         this.instrLabelPrefix = labelPrefix + "_bci_";
-        this.addressLabels = new Label[inlinedMethod.getBytecodeSize()];
+        this.addressLabels.clear();
     }
 
     /**
@@ -168,10 +171,10 @@ public class X86CompilerHelper implements X86CompilerConstants {
      * @return The created label
      */
     public final Label getInstrLabel(int address) {
-        Label l = addressLabels[address];
+        Label l = addressLabels.get(address);
         if (l == null) {
             l = new Label(instrLabelPrefix + address);
-            addressLabels[address] = l;
+            addressLabels.put(address, l);
         }
         return l;
     }
