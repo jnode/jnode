@@ -22,10 +22,16 @@
 package org.jnode.build;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+
+import nanoxml.XMLElement;
+import nanoxml.XMLParseException;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
@@ -136,6 +142,17 @@ public class PluginTask extends AbstractPluginTask {
 
 		jarTask.execute();
 	}
+    
+    protected void addResourceList(File pluginDescr, Collection<ZipFileSet> resources) throws XMLParseException, FileNotFoundException, IOException {
+        final XMLElement xml = new XMLElement();
+        xml.parseFromReader(new FileReader(pluginDescr));
+        
+//        XMLElement runtime = xml.g
+        
+    }
+    
+//    private final XMLElement getRuntimeElement(XMLElement xml) {
+//    }
 
 	/**
 	 * @return The destination directory

@@ -93,6 +93,7 @@
       <src path="${my-src.dir}/classpath/ext"/>        
       <src path="${my-src.dir}/classpath/vm"/>
       <src path="${my-src.dir}/core"/>
+      <src path="${my-src.dir}/nanoxml"/>
       <src path="${my-src.dir}/vmmagic"/>
       <src path="${my-src.dir}/mmtk-vm"/>
       <src path="${my-src.dir}/driver"/>
