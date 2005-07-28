@@ -1404,7 +1404,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 			//arrayClass.link();
 		}
         if (mmType == null) {
-            Vm.getVm().notifyClassResolved(this);
+            Vm.notifyClassResolved(this);
         }
 		return this;
 	}
