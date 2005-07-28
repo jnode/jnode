@@ -2007,32 +2007,60 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		// Pop the arguments of the vstack
 		final IntItem v2 = vstack.popInt();
 		final IntItem v1 = vstack.popInt();
+		
+        final int shift;
+		if (v1.isConstant() && v2.isConstant()) {
+            // Update counter
+            counters.getCounter("idiv-const").inc();
+            
+		    vstack.push(ifac.createIConst(eContext, v1.getValue() / v2.getValue()));
+            v1.release(eContext);
+            v2.release(eContext);
+        } else if (v2.isConstant() && ((shift = getShiftForMultiplier(v2.getValue())) > 0)) {
+            // Update counter
+            counters.getCounter("idiv-const-shift").inc();
 
-		// We need v1 in EAX, so if that is not the case,
-		// spill those item using EAX
-		L1AHelper.requestRegister(eContext, X86Register.EAX, v1);
+            // Load v1
+            v1.load(eContext);
+            
+            // Divide by shifting
+            os.writeSAR(v1.getRegister(), shift);
 
-		// We need to use EDX, so spill those items using it.
-		v1.spillIfUsing(eContext, X86Register.EDX);
-		v2.spillIfUsing(eContext, X86Register.EDX);
-		L1AHelper.requestRegister(eContext, X86Register.EDX);
+            // Release
+            v2.release(eContext);
+            
+            // And push the result on the vstack.
+            vstack.push(v1);            
+		} else {		    
+            // Update counter
+            counters.getCounter("idiv-nonconst").inc();
 
-		// Load v2, v1 into a register
-		v2.load(eContext);
-		v1.loadTo(eContext, X86Register.EAX);
-
-		// EAX -> sign extend EDX:EAX
-		os.writeCDQ(BITS32);
-
-		// EAX = EDX:EAX / v2.reg
-		os.writeIDIV_EAX(v2.getRegister());
-
-		// Free unused registers
-		pool.release(X86Register.EDX);
-		v2.release(eContext);
-
-		// And push the result on the vstack.
-		vstack.push(v1);
+            // We need v1 in EAX, so if that is not the case,
+		    // spill those item using EAX
+		    L1AHelper.requestRegister(eContext, X86Register.EAX, v1);
+		    
+		    // We need to use EDX, so spill those items using it.
+		    v1.spillIfUsing(eContext, X86Register.EDX);
+		    v2.spillIfUsing(eContext, X86Register.EDX);
+		    L1AHelper.requestRegister(eContext, X86Register.EDX);
+		    
+		    // Load v2, v1 into a register
+		    v2.load(eContext);
+		    v1.loadTo(eContext, X86Register.EAX);
+		    
+		    // EAX -> sign extend EDX:EAX
+		    os.writeCDQ(BITS32);
+		    
+		    // EAX = EDX:EAX / v2.reg
+		    os.writeIDIV_EAX(v2.getRegister());
+		    
+		    // Free unused registers
+		    pool.release(X86Register.EDX);
+		    v2.release(eContext);
+		    
+		    // And push the result on the vstack.
+		    vstack.push(v1);
+		}
 	}
 
 	/**
