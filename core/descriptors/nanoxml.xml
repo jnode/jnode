@@ -9,8 +9,8 @@
         license-name="zlib">
         
   <runtime>
-    <library name="nanoxml.jar">
-      <export name="*"/>
+    <library name="jnode-core.jar">
+      <export name="nanoxml.*"/>
     </library>
   </runtime>
         

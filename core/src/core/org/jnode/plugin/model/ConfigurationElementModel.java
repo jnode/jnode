@@ -22,7 +22,6 @@
 package org.jnode.plugin.model;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -51,11 +50,10 @@ final class ConfigurationElementModel extends PluginModelObject implements Confi
         super(plugin);
         name = e.getName();
 
-        final Enumeration<?> aI = e.enumerateAttributeNames();
-        if (aI.hasMoreElements()) {
+        final Set<String> aI = e.attributeNames();
+        if (!aI.isEmpty()) {
             final ArrayList<AttributeModel> list = new ArrayList<AttributeModel>();
-            while (aI.hasMoreElements()) {
-                final String name = (String) aI.nextElement();
+            for (String name : aI) {
                 final String value = e.getStringAttribute(name);
                 list.add(new AttributeModel(name, value));
                 if (value == null) {

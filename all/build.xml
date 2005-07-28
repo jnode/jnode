@@ -53,7 +53,6 @@
     <property name="asm.jar" value="${root.dir}/core/lib/asm.jar"/>
 
     <property name="log4j.jar" value="${root.dir}/core/lib/log4j-1.2.8.jar"/>
-    <property name="nanoxml.jar" value="${root.dir}/core/lib/nanoxml-lite-2.2.3.jar"/>
     <property name="gnu-crypto.jar" value="${root.dir}/core/lib/gnu-crypto.jar"/>
     <property name="javax-crypto.jar" value="${root.dir}/core/lib/javax-crypto.jar"/>
     <!-- property name="javax-security.jar" value="${root.dir}/core/lib/javax-security.jar" / -->
@@ -86,7 +85,6 @@
         <pathelement location="${asm.jar}"/>
         <pathelement location="${cglib.jar}"/>
         <pathelement location="${log4j.jar}"/>
-        <pathelement location="${nanoxml.jar}"/>
         <pathelement location="${gnu-crypto.jar}"/>
         <pathelement location="${javax-crypto.jar}"/>
         <pathelement location="${basedir}/conf"/>
@@ -173,7 +171,6 @@
             <libalias name="commons-net-1.1.0.jar" alias="${commons-net.jar}"/>
             <libalias name="dnsjava-1.5.0.jar" alias="${dnsjava.jar}"/>
             <libalias name="jsch-0.1.15.jar" alias="${jsch.jar}"/>
-            <libalias name="nanoxml.jar" alias="${nanoxml.jar}"/>
             <libalias name="gnu-crypto.jar" alias="${gnu-crypto.jar}"/>
             <libalias name="javax-crypto.jar" alias="${javax-crypto.jar}"/>
             <libalias name="log4j.jar" alias="${log4j.jar}"/>

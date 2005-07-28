@@ -25,16 +25,17 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.Map;
 import java.util.HashMap;
-import java.util.Vector;
+import java.util.List;
+import java.util.Map;
+
+import nanoxml.XMLElement;
 
 import org.apache.log4j.Logger;
-import nanoxml.XMLElement;
 import org.jnode.net.ipv4.IPv4Address;
 
 /**
@@ -81,7 +82,7 @@ public class BOOTPServer {
 		try {
 			XMLElement xml = new XMLElement();
 			xml.parseFromReader(reader);
-			Vector<?> children = xml.getChildren();
+			List<XMLElement> children = xml.getChildren();
 			for(int i=0; i<children.size(); i++) {
 				XMLElement child = (XMLElement) children.get(i);
 				try {
