@@ -924,6 +924,16 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		// destAndSource)
 		// x86 can only deal with one complex argument
 		// destAndSource must be a register
+        
+        if (commutative) {
+            if (destAndSource.getKindWeight() < source.getKindWeight()) {
+                // We should swap
+                source.load(eContext);
+                destAndSource.loadIf(eContext, (Item.Kind.STACK | Item.Kind.FPUSTACK));
+                return true;
+            }
+        }
+        
 		source.loadIf(eContext, (Item.Kind.STACK | Item.Kind.FPUSTACK));
 		destAndSource.load(eContext);
 		return false;
