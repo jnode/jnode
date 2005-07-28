@@ -75,6 +75,13 @@ public interface ConsoleManager extends KeyboardListener, PointerListener {
     public Console getFocus();
 
     /**
+     * Gets the console that "hosts" the current thread.
+     * 
+     * @return Console
+     */
+    public Console getContextConsole();
+
+    /**
      * Focus the given console
      * 
      * @param console

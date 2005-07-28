@@ -71,6 +71,9 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
 
     /** The device manager i'm using */
     private final DeviceManager devMan;
+    
+    /** The holder for the context console */
+    private static final InheritableThreadLocal contextConsole = new InheritableThreadLocal();
 
     /**
      * Initialize a new instance
@@ -150,6 +153,20 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
     }
 
     /**
+     * Gets the console that "hosts" the current thread.
+     * 
+     * @return Console
+     */
+    public Console getContextConsole() {
+        Console c = (Console)contextConsole.get();
+        if (c == null) {
+            c = getFocus();
+            contextConsole.set(c);
+        }
+        return c;            
+    }
+
+    /**
      * Gets the currently focused console.
      * 
      * @return Console
@@ -194,6 +211,9 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
      */
     public void unregisterConsole(Console console) {
         log.debug("unregisterConsole(" + console.getConsoleName() + ")");
+        if (contextConsole.get() == console) {
+            contextConsole.set(null);
+        }
         if (current == console) {
             console.focusLost(new FocusEvent(FocusEvent.FOCUS_LOST));
         }
@@ -212,6 +232,9 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
         if (current == null) {
             current = console;
             current.focusGained(new FocusEvent(FocusEvent.FOCUS_GAINED));
+        }
+        if (contextConsole.get() == null) {
+            contextConsole.set(console);
         }
     }
 
