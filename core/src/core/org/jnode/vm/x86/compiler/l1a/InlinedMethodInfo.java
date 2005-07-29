@@ -29,8 +29,10 @@ import org.jnode.vm.x86.compiler.X86CompilerHelper;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class InlinedMethodInfo {
+final class InlinedMethodInfo {
 
+    private final InlinedMethodInfo previous;
+    
 	private final VmMethod inlinedMethod;
 
 	private TypeStack exitStack;
@@ -44,7 +46,8 @@ public class InlinedMethodInfo {
 	 * 
 	 * @param inlinedMethod
 	 */
-	public InlinedMethodInfo(VmMethod inlinedMethod, Label endOfInlineLabel) {
+	public InlinedMethodInfo(InlinedMethodInfo previous, VmMethod inlinedMethod, Label endOfInlineLabel) {
+        this.previous = previous;
 		this.inlinedMethod = inlinedMethod;
 		this.endOfInlineLabel = endOfInlineLabel;
 	}
@@ -95,5 +98,12 @@ public class InlinedMethodInfo {
      */
     final void pushReturnValue(X86CompilerHelper helper) {
         helper.pushReturnValue(inlinedMethod.getSignature());
+    }
+
+    /**
+     * @return Returns the previous.
+     */
+    final InlinedMethodInfo getPrevious() {
+        return previous;
     }
 }

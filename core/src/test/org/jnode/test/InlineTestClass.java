@@ -46,6 +46,14 @@ public class InlineTestClass {
     public long foo4() {
         return currentTime();
     }
+    
+    public Object foo5() {
+        return staticGetObject();
+    }
+    
+    public static Object staticGetObject() {
+        return System.out;
+    }
 
     public void foo() {
         int y = virtualFinalGetX();
