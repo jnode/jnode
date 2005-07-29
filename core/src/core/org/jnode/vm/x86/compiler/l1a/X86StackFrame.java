@@ -46,7 +46,7 @@ import org.vmmagic.pragma.LoadStaticsPragma;
  * 
  * @author epr
  */
-class X86StackFrame implements X86CompilerConstants {
+final class X86StackFrame implements X86CompilerConstants {
 
 	private final VmMethod method;
 
