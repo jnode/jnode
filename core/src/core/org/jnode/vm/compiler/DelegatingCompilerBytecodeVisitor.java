@@ -34,15 +34,16 @@ import org.jnode.vm.classmgr.VmMethod;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class DelegatingCompilerBytecodeVisitor extends CompilerBytecodeVisitor {
+public class DelegatingCompilerBytecodeVisitor<T extends CompilerBytecodeVisitor>
+        extends CompilerBytecodeVisitor {
 
-    private final CompilerBytecodeVisitor delegate;
+    private final T delegate;
     
-    public DelegatingCompilerBytecodeVisitor(CompilerBytecodeVisitor delegate) {
+    public DelegatingCompilerBytecodeVisitor(T delegate) {
         this.delegate = delegate;
     }
     
-    public final CompilerBytecodeVisitor getDelegate() {
+    public final T getDelegate() {
         return delegate;
     }
     

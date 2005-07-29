@@ -115,7 +115,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 	private final X86CompilerHelper helper;
 
 	/** The method currently being inline (or null for none) */
-	private InlinedMethodInfo inlinedMethod;
+	private InlinedMethodInfo inlinedMethodInfo;
 
 	/** Class loader */
 	private VmClassLoader loader;
@@ -442,17 +442,17 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
         }
         // Do some housekeeping
 		helper.setMethod(previousMethod);
-		os.setObjectRef(inlinedMethod.getEndOfInlineLabel());
+		os.setObjectRef(inlinedMethodInfo.getEndOfInlineLabel());
 		this.currentMethod = previousMethod;
         
         // Push the types on the vstack
-		inlinedMethod.pushExitStack(ifac, vstack);
+		inlinedMethodInfo.pushExitStack(ifac, vstack);
         
         // Push the return value
-        inlinedMethod.pushReturnValue(helper);
+        inlinedMethodInfo.pushReturnValue(helper);
         
         // Cleanup
-		this.inlinedMethod = null;
+		this.inlinedMethodInfo = inlinedMethodInfo.getPrevious();
 		if (debug) {
 			BootLog.debug("endInlinedMethod");
 		}
@@ -975,8 +975,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		this.vstack.reset();
 		eContext.getGPRPool().reset(os);
 		// Push the result from the outer method stack on the vstack
-		if (inlinedMethod != null) {
-			inlinedMethod.pushOuterMethodStack(ifac, vstack);
+		if (inlinedMethodInfo != null) {
+			inlinedMethodInfo.pushOuterMethodStack(ifac, vstack);
 		}
 		// Push the items on the vstack the result from a previous basic block.
 		final TypeStack tstack = bb.getStartStack();
@@ -1002,7 +1002,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		// For now yes, because a new basic block resets the registerpool
 		// and that fails if not all registers are freed.
 		vstack.push(eContext);
-		this.inlinedMethod.setOuterMethodStack(vstack.asTypeStack());
+		this.inlinedMethodInfo.setOuterMethodStack(vstack.asTypeStack());
 	}
 
 	/**
@@ -1019,8 +1019,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		}
 		maxLocals = newMaxLocals;
         final Label curInstrLabel = getCurInstrLabel();
-		this.inlinedMethod = new InlinedMethodInfo(inlinedMethod, new Label(
-				curInstrLabel + "_end_of_inline"));
+		this.inlinedMethodInfo = new InlinedMethodInfo(inlinedMethodInfo,
+                inlinedMethod, new Label(curInstrLabel + "_end_of_inline"));
 		helper.startInlinedMethod(inlinedMethod, curInstrLabel);
 		this.currentMethod = inlinedMethod;
 	}
@@ -2488,8 +2488,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
         // Push the remaining vstack items to the stack
 		vstack.push(eContext);
         
-		inlinedMethod.setExitStack(vstack);
-		os.writeJMP(inlinedMethod.getEndOfInlineLabel());
+		inlinedMethodInfo.setExitStack(vstack);
+		os.writeJMP(inlinedMethodInfo.getEndOfInlineLabel());
 	}
 
 	/**
@@ -3022,6 +3022,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ldiv()
 	 */
 	public final void visit_ldiv() {
+        // Maintain counter
+        counters.getCounter("ldiv").inc();
+        
 		if (os.isCode32()) {
 			// TODO: port to orp-style
 			vstack.push(eContext);
@@ -3076,7 +3079,10 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lmul()
 	 */
 	public final void visit_lmul() {
-		if (os.isCode32()) {
+        // Maintain counter
+        counters.getCounter("lmul").inc();
+
+        if (os.isCode32()) {
             final Label curInstrLabel = getCurInstrLabel();
 
             // TODO: port to orp-style
@@ -3095,23 +3101,25 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			
 			final Label tmp1 = new Label(curInstrLabel + "$tmp1");
 			final Label tmp2 = new Label(curInstrLabel + "$tmp2");
+            final GPR EAX = X86Register.EAX;
+            final GPR EDX = X86Register.EDX;
 			
-			os.writeMOV(INTSIZE, X86Register.EAX, v1_msb); // hi2
-			os.writeOR(X86Register.EAX, v2_msb); // hi1 | hi2
+			os.writeMOV(INTSIZE, EAX, v1_msb); // hi2
+			os.writeOR(EAX, v2_msb); // hi1 | hi2
 			os.writeJCC(tmp1, X86Constants.JNZ);
-			os.writeMOV(INTSIZE, X86Register.EAX, v1_lsb); // lo2
+			os.writeMOV(INTSIZE, EAX, v1_lsb); // lo2
 			os.writeMUL_EAX(v2_lsb); // lo1*lo2
 			os.writeJMP(tmp2);
 			os.setObjectRef(tmp1);
-			os.writeMOV(INTSIZE, X86Register.EAX, v1_lsb); // lo2
+			os.writeMOV(INTSIZE, EAX, v1_lsb); // lo2
 			os.writeMUL_EAX(v2_msb); // hi1*lo2
-			os.writeMOV(INTSIZE, v2_msb, X86Register.EAX);
-			os.writeMOV(INTSIZE, X86Register.EAX, v1_msb); // hi2
+			os.writeMOV(INTSIZE, v2_msb, EAX);
+			os.writeMOV(INTSIZE, EAX, v1_msb); // hi2
 			os.writeMUL_EAX(v2_lsb); // hi2*lo1
-			os.writeADD(v2_msb, X86Register.EAX); // hi2*lo1 + hi1*lo2
-			os.writeMOV(INTSIZE, X86Register.EAX, v1_lsb); // lo2
+			os.writeADD(v2_msb, EAX); // hi2*lo1 + hi1*lo2
+			os.writeMOV(INTSIZE, EAX, v1_lsb); // lo2
 			os.writeMUL_EAX(v2_lsb); // lo1*lo2
-			os.writeADD(X86Register.EDX, v2_msb); // hi2*lo1 + hi1*lo2 +
+			os.writeADD(EDX, v2_msb); // hi2*lo1 + hi1*lo2 +
 			// hi(lo1*lo2)
 			os.setObjectRef(tmp2);
 			// Reload the statics table, since it was destroyed here
@@ -3119,8 +3127,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			
 			// Push
 			final LongItem result = (LongItem) L1AHelper
-			.requestDoubleWordRegisters(eContext, JvmType.LONG,
-					X86Register.EAX, X86Register.EDX);
+                    .requestDoubleWordRegisters(eContext, JvmType.LONG, EAX,
+                            EDX);
 			vstack.push(result);
 		} else {
 			final LongItem v2 = vstack.popLong();
