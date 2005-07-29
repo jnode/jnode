@@ -159,7 +159,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
     /**
      */
     public void startInlinedMethod(VmMethod inlinedMethod, Label curInstrLabel) {
-        this.labelPrefix = curInstrLabel + "_" + inlinedMethod + "_";
+        this.labelPrefix = curInstrLabel + "_" + inlinedMethod.getName() + "_";
         this.instrLabelPrefix = labelPrefix + "_bci_";
         this.addressLabels.clear();
     }
