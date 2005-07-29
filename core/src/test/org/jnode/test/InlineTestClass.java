@@ -43,8 +43,8 @@ public class InlineTestClass {
         }
     }
     
-    public void foo4() {
-        currentTime();
+    public long foo4() {
+        return currentTime();
     }
 
     public void foo() {

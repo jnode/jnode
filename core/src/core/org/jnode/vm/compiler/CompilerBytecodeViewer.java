@@ -1034,7 +1034,7 @@ public class CompilerBytecodeViewer extends InlineBytecodeVisitor {
     /**
      * @see org.jnode.vm.compiler.InlineBytecodeVisitor#visit_inlinedReturn()
      */
-    public void visit_inlinedReturn() {
-        viewer.out("inlinedReturn");
+    public void visit_inlinedReturn(int jvmType) {
+        viewer.out("inlinedReturn [type " + jvmType + "]");
     }
 }
