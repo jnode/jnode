@@ -24,13 +24,14 @@ package org.jnode.vm.x86.compiler.l1a;
 import org.jnode.assembler.Label;
 import org.jnode.vm.bytecode.TypeStack;
 import org.jnode.vm.classmgr.VmMethod;
+import org.jnode.vm.x86.compiler.X86CompilerHelper;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class InlinedMethodInfo {
 
-//	private final VmMethod inlinedMethod;
+	private final VmMethod inlinedMethod;
 
 	private TypeStack exitStack;
 
@@ -44,7 +45,7 @@ public class InlinedMethodInfo {
 	 * @param inlinedMethod
 	 */
 	public InlinedMethodInfo(VmMethod inlinedMethod, Label endOfInlineLabel) {
-//		this.inlinedMethod = inlinedMethod;
+		this.inlinedMethod = inlinedMethod;
 		this.endOfInlineLabel = endOfInlineLabel;
 	}
 
@@ -86,4 +87,13 @@ public class InlinedMethodInfo {
 	final void setOuterMethodStack(TypeStack outerMethodStack) {
 		this.outerMethodStack = outerMethodStack;
 	}
+    
+    /**
+     * Push the return value of the inlined method on the current
+     * vstack.
+     * @param helper
+     */
+    final void pushReturnValue(X86CompilerHelper helper) {
+        helper.pushReturnValue(inlinedMethod.getSignature());
+    }
 }

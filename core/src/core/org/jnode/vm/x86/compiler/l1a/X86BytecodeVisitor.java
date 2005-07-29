@@ -324,7 +324,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * 
 	 * @param JvmType
 	 */
-	private final void dwreturn(int jvmType) {
+	private final void dwreturn(int jvmType, boolean callVisitReturn) {
 		final DoubleWordItem val = (DoubleWordItem) vstack.pop(jvmType);
 
 		if (os.isCode32()) {
@@ -349,7 +349,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		val.release(eContext);
 
 		// Do actual return
-		visit_return();
+        if (callVisitReturn) {
+            visit_return();
+        }
 	}
 
 	/**
@@ -438,10 +440,18 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
         if (log) {
             os.log("End of inlined method");
         }
+        // Do some housekeeping
 		helper.setMethod(previousMethod);
 		os.setObjectRef(inlinedMethod.getEndOfInlineLabel());
 		this.currentMethod = previousMethod;
+        
+        // Push the types on the vstack
 		inlinedMethod.pushExitStack(ifac, vstack);
+        
+        // Push the return value
+        inlinedMethod.pushReturnValue(helper);
+        
+        // Cleanup
 		this.inlinedMethod = null;
 		if (debug) {
 			BootLog.debug("endInlinedMethod");
@@ -1136,7 +1146,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_areturn()
 	 */
 	public final void visit_areturn() {
-		wreturn(JvmType.REFERENCE);
+		wreturn(JvmType.REFERENCE, true);
 	}
 
 	/**
@@ -1419,7 +1429,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dreturn()
 	 */
 	public final void visit_dreturn() {
-		dwreturn(JvmType.DOUBLE);
+		dwreturn(JvmType.DOUBLE, true);
 	}
 
 	/**
@@ -1699,7 +1709,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_freturn()
 	 */
 	public final void visit_freturn() {
-		wreturn(JvmType.FLOAT);
+		wreturn(JvmType.FLOAT, true);
 	}
 
 	/**
@@ -2453,11 +2463,31 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	/**
 	 * @see org.jnode.vm.compiler.InlineBytecodeVisitor#visit_inlinedReturn()
 	 */
-	public void visit_inlinedReturn() {
+	public void visit_inlinedReturn(int jvmType) {
 		if (debug) {
-			BootLog.debug("inlinedReturn");
+			BootLog.debug("inlinedReturn [type " + jvmType + "]");
 		}
+        
+        // Pop the return value
+        switch (jvmType) {
+        case JvmType.INT:
+        case JvmType.FLOAT:
+        case JvmType.REFERENCE:
+            wreturn(jvmType, false);
+            break;
+        case JvmType.LONG:
+        case JvmType.DOUBLE:
+            dwreturn(jvmType, false);
+            break;
+        case JvmType.VOID:
+            break;
+        default:
+            throw new CompileError("Unknown return type " + jvmType);    
+        }
+        
+        // Push the remaining vstack items to the stack
 		vstack.push(eContext);
+        
 		inlinedMethod.setExitStack(vstack);
 		os.writeJMP(inlinedMethod.getEndOfInlineLabel());
 	}
@@ -2733,7 +2763,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ireturn()
 	 */
 	public final void visit_ireturn() {
-		wreturn(JvmType.INT);
+		wreturn(JvmType.INT, true);
 	}
 
 	/**
@@ -3218,7 +3248,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lreturn()
 	 */
 	public final void visit_lreturn() {
-		dwreturn(JvmType.LONG);
+		dwreturn(JvmType.LONG, true);
 	}
 
 	/**
@@ -4045,7 +4075,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * 
 	 * @param JvmType
 	 */
-	private final void wreturn(int jvmType) {
+	private final void wreturn(int jvmType, boolean callVisitReturn) {
 		final WordItem val = (WordItem) vstack.pop(jvmType);
 		final GPR reg;
         if (os.isCode32() || (jvmType != JvmType.REFERENCE)) {
@@ -4064,7 +4094,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		val.release(eContext);
 
 		// Do actual return
-		visit_return();
+        if (callVisitReturn) {
+            visit_return();
+        }
 	}
 
 	/**
