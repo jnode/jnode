@@ -78,7 +78,7 @@ import org.jnode.vm.x86.compiler.X86JumpTable;
  * @author Patrik Reali
  * 
  */
-class X86BytecodeVisitor extends InlineBytecodeVisitor implements
+final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 		X86CompilerConstants {
 
 	/** Debug this visitor, logs extra info */
@@ -103,7 +103,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 	private int curAddress;
 
 	/** Label of current instruction */
-	private Label curInstrLabel;
+	private Label _curInstrLabel;
 
 	/** The method currently being compiled */
 	private VmMethod currentMethod;
@@ -235,6 +235,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param index
 	 */
 	final void checkBounds(RefItem ref, IntItem index) {
+        final Label curInstrLabel = getCurInstrLabel();
 		final Label test = new Label(curInstrLabel + "$$cbtest");
 		final Label failed = new Label(curInstrLabel + "$$cbfailed");
 
@@ -434,6 +435,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.compiler.InlineBytecodeVisitor#endInlinedMethod(org.jnode.vm.classmgr.VmMethod)
 	 */
 	public void endInlinedMethod(VmMethod previousMethod) {
+        if (log) {
+            os.log("End of inlined method");
+        }
 		helper.setMethod(previousMethod);
 		os.setObjectRef(inlinedMethod.getEndOfInlineLabel());
 		this.currentMethod = previousMethod;
@@ -586,8 +590,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 
 		final int depth = type.getSuperClassDepth();
 		final int staticsOfs = helper.getSharedStaticsOffset(type);
-		final Label notInstanceOfLabel = new Label(this.curInstrLabel
-				+ "notInstanceOf");
+        final Label curInstrLabel = getCurInstrLabel();
+		final Label notInstanceOfLabel = new Label(curInstrLabel
+                + "notInstanceOf");
 
 		if (!type.isInitialized()) {
             if (os.isCode32()) {
@@ -649,8 +654,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 */
 	private final void instanceOf(GPR objectr, GPR typer, GPR tmpr, GPR cntr,
 			Label trueLabel, boolean skipNullTest) {
-		final Label loopLabel = new Label(this.curInstrLabel + "loop");
-		final Label notInstanceOfLabel = new Label(this.curInstrLabel
+        final Label curInstrLabel = getCurInstrLabel();
+		final Label loopLabel = new Label(curInstrLabel + "loop");
+		final Label notInstanceOfLabel = new Label(curInstrLabel
 				+ "notInstanceOf");
 
         if (Vm.VerifyAssertions) {
@@ -712,7 +718,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		}
 		helper.invokeJavaMethod(method);
         // Test the stack alignment
-        stackFrame.writeStackAlignmentTest(curInstrLabel);
+        stackFrame.writeStackAlignmentTest(getCurInstrLabel());
 	}
 
 	/**
@@ -860,16 +866,14 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		}
 
 		if (os.isCode32()) {
-			final X86Register.GPR r1_lsb = (X86Register.GPR) v1
-					.getLsbRegister(eContext);
-			final X86Register.GPR r1_msb = (X86Register.GPR) v1
-					.getMsbRegister(eContext);
+		    final GPR r1_lsb = v1.getLsbRegister(eContext);
+			final GPR r1_msb = v1.getMsbRegister(eContext);
 			switch (v2.getKind()) {
 			case Item.Kind.GPR:
-				os.writeArithOp(operationLsb, r1_lsb, (X86Register.GPR) v2
-						.getLsbRegister(eContext));
-				os.writeArithOp(operationMsb, r1_msb, (X86Register.GPR) v2
-						.getMsbRegister(eContext));
+				os.writeArithOp(operationLsb, r1_lsb, v2
+                        .getLsbRegister(eContext));
+                os.writeArithOp(operationMsb, r1_msb, v2
+                        .getMsbRegister(eContext));
 				break;
 			case Item.Kind.LOCAL:
 				os.writeArithOp(operationLsb, r1_lsb, helper.BP, v2
@@ -978,6 +982,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 *      int)
 	 */
 	public void startInlinedMethodCode(VmMethod inlinedMethod, int newMaxLocals) {
+        if (log) {
+            os.log("Start of inlined method code");
+        }
 		if (debug) {
 			BootLog.debug("startInlinedMethodCode(" + inlinedMethod + ")");
 		}
@@ -994,10 +1001,14 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 */
 	public void startInlinedMethodHeader(VmMethod inlinedMethod,
 			int newMaxLocals) {
+        if (log) {
+            os.log("Start of inlined method header " + inlinedMethod.getName());
+        }
 		if (debug) {
 			BootLog.debug("startInlinedMethodHeader(" + inlinedMethod + ")");
 		}
 		maxLocals = newMaxLocals;
+        final Label curInstrLabel = getCurInstrLabel();
 		this.inlinedMethod = new InlinedMethodInfo(inlinedMethod, new Label(
 				curInstrLabel + "_end_of_inline"));
 		helper.startInlinedMethod(inlinedMethod, curInstrLabel);
@@ -1020,9 +1031,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			}
 		}
 		this.curAddress = address;
-		this.curInstrLabel = helper.getInstrLabel(address);
+		this._curInstrLabel = null;
 		if (startOfBB || setCurInstrLabel) {
-			os.setObjectRef(curInstrLabel);
+			os.setObjectRef(getCurInstrLabel());
 			startOfBB = false;
 			setCurInstrLabel = false;
 		}
@@ -1214,6 +1225,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		// Resolve classRef
 		classRef.resolve(loader);
 		final VmType<?> resolvedType = classRef.getResolvedVmClass();
+        final Label curInstrLabel = getCurInstrLabel();
 
 		if (resolvedType.isInterface() || resolvedType.isArray()) {
 			// ClassRef is an interface or array, do the slow test
@@ -1237,7 +1249,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			writeResolveAndLoadClassToReg(classRef, classr);
 			helper.writeClassInitialize(curInstrLabel, classr, resolvedType);
 
-			final Label okLabel = new Label(this.curInstrLabel + "cc-ok");
+			final Label okLabel = new Label(curInstrLabel + "cc-ok");
 
 			/* Is objectref null? */
 			os.writeTEST(refr, refr);
@@ -1275,7 +1287,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			final GPR tmpr = (GPR) L1AHelper.requestRegister(eContext,
 					JvmType.REFERENCE, false);
 
-			final Label okLabel = new Label(this.curInstrLabel + "cc-ok");
+			final Label okLabel = new Label(curInstrLabel + "cc-ok");
 
 			// Is objectref null?
 			os.writeTEST(refr, refr);
@@ -1348,14 +1360,14 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dcmpg()
 	 */
 	public final void visit_dcmpg() {
-		fpCompiler.compare(true, JvmType.DOUBLE, curInstrLabel);
+		fpCompiler.compare(true, JvmType.DOUBLE, getCurInstrLabel());
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dcmpl()
 	 */
 	public final void visit_dcmpl() {
-		fpCompiler.compare(false, JvmType.DOUBLE, curInstrLabel);
+		fpCompiler.compare(false, JvmType.DOUBLE, getCurInstrLabel());
 	}
 
 	/**
@@ -1628,14 +1640,14 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fcmpg()
 	 */
 	public final void visit_fcmpg() {
-		fpCompiler.compare(true, JvmType.FLOAT, curInstrLabel);
+		fpCompiler.compare(true, JvmType.FLOAT, getCurInstrLabel());
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fcmpl()
 	 */
 	public final void visit_fcmpl() {
-		fpCompiler.compare(false, JvmType.FLOAT, curInstrLabel);
+		fpCompiler.compare(false, JvmType.FLOAT, getCurInstrLabel());
 	}
 
 	/**
@@ -1794,6 +1806,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_getstatic(org.jnode.vm.classmgr.VmConstFieldRef)
 	 */
 	public final void visit_getstatic(VmConstFieldRef fieldRef) {
+        final Label curInstrLabel = getCurInstrLabel();
 		fieldRef.resolve(loader);
 		final int type = JvmType.SignatureToType(fieldRef.getSignature());
 		final VmStaticField sf = (VmStaticField) fieldRef.getResolvedVmField();
@@ -2454,7 +2467,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_instanceof(org.jnode.vm.classmgr.VmConstClass)
 	 */
 	public final void visit_instanceof(VmConstClass classRef) {
-		// Resolve the classRef
+        // Resolve the classRef
 		classRef.resolve(loader);
 
 		// Prepare
@@ -2476,13 +2489,14 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 					JvmType.INT, false);
 			final GPR tmpr = (GPR) L1AHelper.requestRegister(eContext,
 					JvmType.REFERENCE, false);
+            final Label curInstrLabel = getCurInstrLabel();
 
 			/* Objectref is already on the stack */
 			writeResolveAndLoadClassToReg(classRef, classr);
 			helper.writeClassInitialize(curInstrLabel, classr, resolvedType);
 
-			final Label trueLabel = new Label(this.curInstrLabel + "io-true");
-			final Label endLabel = new Label(this.curInstrLabel + "io-end");
+			final Label trueLabel = new Label(curInstrLabel + "io-true");
+			final Label endLabel = new Label(curInstrLabel + "io-end");
 
 			/* Is instanceof? */
 			instanceOf(refr, classr, tmpr, cntr, trueLabel, false);
@@ -2562,7 +2576,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			X86IMTCompiler64.emitInvokeInterface(os, method);
 		}
         // Test the stack alignment
-        stackFrame.writeStackAlignmentTest(curInstrLabel);
+        stackFrame.writeStackAlignmentTest(getCurInstrLabel());
 		// Write the push result
 		helper.pushReturnValue(method.getSignature());
 	}
@@ -2894,6 +2908,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 				eContext, JvmType.INT, false);
 		final GPR resr = result.getRegister();
 
+        final Label curInstrLabel = getCurInstrLabel();
 		final Label ltLabel = new Label(curInstrLabel + "lt");
 		final Label endLabel = new Label(curInstrLabel + "end");
 
@@ -3032,7 +3047,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 */
 	public final void visit_lmul() {
 		if (os.isCode32()) {
-			// TODO: port to orp-style
+            final Label curInstrLabel = getCurInstrLabel();
+
+            // TODO: port to orp-style
 			vstack.push(eContext);
 			final LongItem v2 = vstack.popLong();
 			final LongItem v1 = vstack.popLong();
@@ -3218,6 +3235,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		if (os.isCode32()) {
 			final GPR v1_lsb = v1.getLsbRegister(eContext);
 			final GPR v1_msb = v1.getMsbRegister(eContext);
+            final Label curInstrLabel = getCurInstrLabel();
 
 			os.writeAND(X86Register.ECX, 63);
 			os.writeCMP_Const(X86Register.ECX, 32);
@@ -3265,6 +3283,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		if (os.isCode32()) {
 			final X86Register.GPR lsb = val.getLsbRegister(eContext);
 			final X86Register.GPR msb = val.getMsbRegister(eContext);
+            final Label curInstrLabel = getCurInstrLabel();
 
 			// Calculate
 			os.writeAND(X86Register.ECX, 63);
@@ -3329,6 +3348,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		if (os.isCode32()) {
 			final X86Register.GPR lsb = val.getLsbRegister(eContext);
 			final X86Register.GPR msb = val.getMsbRegister(eContext);
+            final Label curInstrLabel = getCurInstrLabel();
 
 			// Calculate
 			os.writeAND(X86Register.ECX, 63);
@@ -3401,7 +3421,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		vstack.push(eContext);
 
 		// Create the dimensions array
-        helper.writePushStaticsEntry(curInstrLabel, helper.getMethod().getDeclaringClass()); /* currentClass */
+        helper.writePushStaticsEntry(getCurInstrLabel(), helper.getMethod().getDeclaringClass()); /* currentClass */
 		os.writePUSH(10); /* type=int */
 		os.writePUSH(dimensions); /* elements */
 		invokeJavaMethod(context.getAllocPrimitiveArrayMethod());
@@ -3474,7 +3494,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		vstack.push(eContext);
 
 		// Setup a call to SoftByteCodes.allocArray
-        helper.writePushStaticsEntry(curInstrLabel, helper.getMethod().getDeclaringClass()); /* currentClass */
+        helper.writePushStaticsEntry(getCurInstrLabel(), helper.getMethod().getDeclaringClass()); /* currentClass */
 		os.writePUSH(type); /* type */
 		count.push(eContext); /* count */
 		count.release1(eContext); // release and remove parameter from stack
@@ -3585,6 +3605,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_putstatic(org.jnode.vm.classmgr.VmConstFieldRef)
 	 */
 	public final void visit_putstatic(VmConstFieldRef fieldRef) {
+        final Label curInstrLabel = getCurInstrLabel();
 		fieldRef.resolve(loader);
 		final VmStaticField sf = (VmStaticField) fieldRef.getResolvedVmField();
 
@@ -3761,6 +3782,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
             os.writeCMP_Const(valr, n);
             os.writeJCC(helper.getInstrLabel(defAddress), X86Constants.JAE);
 
+            final Label curInstrLabel = getCurInstrLabel();
             final Label l1 = new Label(curInstrLabel + "$$l1");
             final Label l2 = new Label(curInstrLabel + "$$l2");
             final int l12distance = os.isCode32() ? 12 : 23;
@@ -4059,6 +4081,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		final VmType<?> declClass = fieldRef.getResolvedVmField()
 				.getDeclaringClass();
 		if (!declClass.isInitialized()) {
+            final Label curInstrLabel = getCurInstrLabel();
 
 			// Push all
 			vstack.push(eContext);
@@ -4105,6 +4128,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		// Resolve the class
 		classRef.resolve(loader);
 		final VmType type = classRef.getResolvedVmClass();
+        final Label curInstrLabel = getCurInstrLabel();
 
 		// Load the class from the statics table
         if (os.isCode32()) {
@@ -4169,6 +4193,15 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * Insert a yieldpoint into the code
 	 */
 	public final void yieldPoint() {
-		helper.writeYieldPoint(curInstrLabel);
+		helper.writeYieldPoint(getCurInstrLabel());
 	}
+    /**
+     * @return Returns the curInstrLabel.
+     */
+    private final Label getCurInstrLabel() {
+        if (_curInstrLabel == null) {
+            _curInstrLabel = helper.getInstrLabel(this.curAddress);
+        }
+        return _curInstrLabel;
+    }
 }
