@@ -42,6 +42,10 @@ public class InlineTestClass {
             System.out.println("finally");
         }
     }
+    
+    public void foo4() {
+        currentTime();
+    }
 
     public void foo() {
         int y = virtualFinalGetX();
@@ -65,6 +69,10 @@ public class InlineTestClass {
 
     public static int staticGetXai(Object dummy, int i) {
         return i;
+    }
+    
+    public static long currentTime() {
+        return System.currentTimeMillis();
     }
 
     public static int staticRecursiveGetXai(Object dummy, int i) {
