@@ -151,17 +151,28 @@ public class X86CompilerHelper implements X86CompilerConstants {
      */
     public final void setMethod(VmMethod method) {
         this.method = method;
-        this.labelPrefix = method.toString() + "_";
+        setLabelPrefix(method.toString() + "_");
+    }
+
+    /**
+     * Sets the current label prefix.
+     * 
+     * @param method
+     */
+    public final void setLabelPrefix(String prefix) {
+        this.labelPrefix = prefix;
         this.instrLabelPrefix = labelPrefix + "_bci_";
         this.addressLabels.clear();
+    }
+    
+    public final String getLabelPrefix() {
+        return labelPrefix;
     }
 
     /**
      */
     public void startInlinedMethod(VmMethod inlinedMethod, Label curInstrLabel) {
-        this.labelPrefix = curInstrLabel + "_" + inlinedMethod.getName() + "_";
-        this.instrLabelPrefix = labelPrefix + "_bci_";
-        this.addressLabels.clear();
+        setLabelPrefix(curInstrLabel + "_" + inlinedMethod.getName() + "_");
     }
 
     /**

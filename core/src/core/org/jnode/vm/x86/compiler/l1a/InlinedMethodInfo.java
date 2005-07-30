@@ -40,16 +40,19 @@ final class InlinedMethodInfo {
 	private final Label endOfInlineLabel;
 
 	private TypeStack outerMethodStack;
+    
+    private final String previousLabelPrefix;
 
 	/**
 	 * Initialize this instance.
 	 * 
 	 * @param inlinedMethod
 	 */
-	public InlinedMethodInfo(InlinedMethodInfo previous, VmMethod inlinedMethod, Label endOfInlineLabel) {
+	public InlinedMethodInfo(InlinedMethodInfo previous, VmMethod inlinedMethod, Label endOfInlineLabel, String previousLabelPrefix) {
         this.previous = previous;
 		this.inlinedMethod = inlinedMethod;
 		this.endOfInlineLabel = endOfInlineLabel;
+        this.previousLabelPrefix = previousLabelPrefix;
 	}
 
 	final void setExitStack(VirtualStack vstack) {
@@ -105,5 +108,12 @@ final class InlinedMethodInfo {
      */
     final InlinedMethodInfo getPrevious() {
         return previous;
+    }
+
+    /**
+     * @return Returns the labelPrefix.
+     */
+    final String getPreviousLabelPrefix() {
+        return previousLabelPrefix;
     }
 }

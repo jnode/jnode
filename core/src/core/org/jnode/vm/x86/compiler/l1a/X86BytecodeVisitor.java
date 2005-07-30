@@ -452,6 +452,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
         inlinedMethodInfo.pushReturnValue(helper);
         
         // Cleanup
+        helper.setLabelPrefix(inlinedMethodInfo.getPreviousLabelPrefix());
 		this.inlinedMethodInfo = inlinedMethodInfo.getPrevious();
 		if (debug) {
 			BootLog.debug("endInlinedMethod");
@@ -1019,9 +1020,12 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		}
 		maxLocals = newMaxLocals;
         final Label curInstrLabel = getCurInstrLabel();
-		this.inlinedMethodInfo = new InlinedMethodInfo(inlinedMethodInfo,
-                inlinedMethod, new Label(curInstrLabel + "_end_of_inline"));
-		helper.startInlinedMethod(inlinedMethod, curInstrLabel);
+        final String prefix = curInstrLabel + "_" + inlinedMethod.getName()
+                + '_';
+        this.inlinedMethodInfo = new InlinedMethodInfo(inlinedMethodInfo,
+                inlinedMethod, new Label(curInstrLabel + "_end_of_inline"),
+                helper.getLabelPrefix());
+		helper.setLabelPrefix(prefix);
 		this.currentMethod = inlinedMethod;
 	}
 
