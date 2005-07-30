@@ -67,10 +67,10 @@ public final class VmAccessController {
 			int recursionCount = 0;
 			while (reader.isValid(sf)) {
 				final VmMethod method = reader.getMethod(sf);
-				if (method.canThrow(PragmaDoPrivileged.class)) {
+				if (method.hasDoPrivilegedPragma()) {
 					// Stop here with the current thread's stacktrace.
 					break;
-				} else if (method.canThrow(PragmaCheckPermission.class)) {
+				} else if (method.hasCheckPermissionPragma()) {
 					// Be paranoia for now, let's check for recursive
 					// checkPermission calls.
 					recursionCount++;
@@ -91,7 +91,7 @@ public final class VmAccessController {
 						}
 					}
 				}
-				if (method.canThrow(PrivilegedActionPragma.class)) {
+				if (method.hasPrivilegedActionPragma()) {
 					// Break here, do not include inherited thread context
 					return;
 				}
@@ -124,10 +124,10 @@ public final class VmAccessController {
 
 		for (int i = 0; i < count; i++) {
 			final VmMethod method = stack[i].getMethod();
-			if (method.canThrow(PragmaDoPrivileged.class)) {
+			if (method.hasDoPrivilegedPragma()) {
 				// Stop here
 				break;
-			} else if (method.canThrow(PrivilegedActionPragma.class)) {
+			} else if (method.hasPrivilegedActionPragma()) {
 				// Break here, do not include inherited thread context
 				return new VmAccessControlContext(domains, null);
 			} else {

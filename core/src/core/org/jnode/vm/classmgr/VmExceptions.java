@@ -32,20 +32,23 @@ import org.jnode.vm.VmSystemObject;
 public final class VmExceptions extends VmSystemObject {
 	
 	private final VmConstClass[] exceptions;
+    private final char pragmaFlags;
 	
 	/**
 	 * Create a new, empty instance
 	 */
 	public VmExceptions() {
 		this.exceptions = null;
+        this.pragmaFlags = 0;
 	}
 	
 	/**
 	 * Create a new instance
 	 * @param exceptions
 	 */
-	public VmExceptions(VmConstClass[] exceptions) {
+	public VmExceptions(VmConstClass[] exceptions, char pragmaFlags) {
 		this.exceptions = exceptions;
+        this.pragmaFlags = pragmaFlags;
 	}
 	
 	/**
@@ -73,30 +76,10 @@ public final class VmExceptions extends VmSystemObject {
 		}
 	}
 	
-	/**
-	 * Does this list contain a class with the given name?
-	 * @param className
-	 * @return boolean
-	 */
-	public final boolean contains(String className) {
-		if (exceptions != null) {
-			final int length = exceptions.length;
-			for (int i = 0; i < length; i++) {
-				final String name = exceptions[i].getClassName();
-				if (name.equals(className)) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-	
-	/**
-	 * Does this list contain a class with the name of the given class?
-	 * @param cls
-	 * @return boolean
-	 */
-	public final boolean contains(Class<? extends Throwable> cls) {
-		return contains(cls.getName());
-	}
+    /**
+     * @return Returns the pragmaFlags.
+     */
+    final int getPragmaFlags() {
+        return pragmaFlags;
+    }
 }

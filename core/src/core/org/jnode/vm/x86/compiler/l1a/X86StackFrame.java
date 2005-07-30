@@ -193,7 +193,7 @@ final class X86StackFrame implements X86CompilerConstants {
         os.writeJCC(stackOverflowLabel, X86Constants.JLE);
         
         // Load the statics table reference
-        if (method.canThrow(LoadStaticsPragma.class)) {
+        if (method.hasLoadStaticsPragma()) {
             helper.writeLoadSTATICS(helper.genLabel("$$edi"), "init", false);
         }
 
