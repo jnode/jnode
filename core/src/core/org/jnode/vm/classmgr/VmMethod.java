@@ -27,7 +27,6 @@ import java.lang.reflect.Method;
 
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmAddress;
-import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.Address;
 
 public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry {
@@ -59,9 +58,6 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
     /** The selector of this method name&type */
     private int selector;
 
-    /** This field will be used to mask the thread switch indicator */
-    private boolean uninterruptible = false;
-
     /** Optimization level of native code */
     private short nativeCodeOptLevel = -1;
 
@@ -70,6 +66,9 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
 
     /** The mangled name of this method */
     private String mangledName;
+    
+    /** Flags of variour pragma's set to this method */
+    private char pragmaFlags;
 
     /**
      * Constructor for VmMethod.
@@ -375,26 +374,10 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
     final void setExceptions(VmExceptions exceptions) throws ClassFormatError {
         if (this.exceptions == null) {
             this.exceptions = exceptions;
-            if (exceptions.contains(UninterruptiblePragma.class)) {
-                setUninterruptible();
-            }
+            this.pragmaFlags |= exceptions.getPragmaFlags();
         } else {
             throw new ClassFormatError(
                     "Cannot have more then 1 Exceptions attribute");
-        }
-    }
-
-    /**
-     * Can this method throw the given exception type.
-     * 
-     * @param exceptionClass
-     * @return
-     */
-    public final boolean canThrow(Class<? extends Throwable> exceptionClass) {
-        if (exceptions == null) {
-            return false;
-        } else {
-            return exceptions.contains(exceptionClass);
         }
     }
 
@@ -466,14 +449,62 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
      * @return True | false.
      */
     public final boolean isUninterruptible() {
-        return this.uninterruptible;
+        return ((pragmaFlags & MethodPragmaFlags.UNINTERRUPTIBLE) != 0);
+    }
+    
+    /**
+     * Is the checkpermission pragma set for this method.
+     * @return
+     */
+    public final boolean hasCheckPermissionPragma() {
+        return ((pragmaFlags & MethodPragmaFlags.CHECKPERMISSION) != 0);        
+    }
+
+    /**
+     * Is the doprivileged pragma set for this method.
+     * @return
+     */
+    public final boolean hasDoPrivilegedPragma() {
+        return ((pragmaFlags & MethodPragmaFlags.DOPRIVILEGED) != 0);        
+    }
+
+    /**
+     * Is the inline pragma set for this method.
+     * @return
+     */
+    public final boolean hasInlinePragma() {
+        return ((pragmaFlags & MethodPragmaFlags.INLINE) != 0);        
+    }
+
+    /**
+     * Is the loadstatics pragma set for this method.
+     * @return
+     */
+    public final boolean hasLoadStaticsPragma() {
+        return ((pragmaFlags & MethodPragmaFlags.LOADSTATICS) != 0);        
+    }
+
+    /**
+     * Is the noinline pragma set for this method.
+     * @return
+     */
+    public final boolean hasNoInlinePragma() {
+        return ((pragmaFlags & MethodPragmaFlags.NOINLINE) != 0);        
+    }
+
+    /**
+     * Is the privilegedaction pragma set for this method.
+     * @return
+     */
+    public final boolean hasPrivilegedActionPragma() {
+        return ((pragmaFlags & MethodPragmaFlags.PRIVILEGEDACTION) != 0);        
     }
 
     /**
      * Mark this method as uninterruptable.
      */
     final void setUninterruptible() {
-        this.uninterruptible = true;
+        pragmaFlags |= MethodPragmaFlags.UNINTERRUPTIBLE;
     }
 
     /**

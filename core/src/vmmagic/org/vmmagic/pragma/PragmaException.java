@@ -27,6 +27,6 @@ package org.vmmagic.pragma;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class PragmaException extends RuntimeException {
+public abstract class PragmaException extends RuntimeException {
 
 }

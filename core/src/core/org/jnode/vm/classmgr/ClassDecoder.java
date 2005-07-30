@@ -29,6 +29,14 @@ import java.security.ProtectionDomain;
 
 import org.jnode.system.BootLog;
 import org.jnode.vm.NoFieldAlignments;
+import org.jnode.vm.PragmaCheckPermission;
+import org.jnode.vm.PragmaDoPrivileged;
+import org.vmmagic.pragma.InlinePragma;
+import org.vmmagic.pragma.LoadStaticsPragma;
+import org.vmmagic.pragma.NoInlinePragma;
+import org.vmmagic.pragma.PragmaException;
+import org.vmmagic.pragma.PrivilegedActionPragma;
+import org.vmmagic.pragma.UninterruptiblePragma;
 
 /**
  * Decoder of .class files into VmType instances.
@@ -56,6 +64,16 @@ public final class ClassDecoder {
     private static char[] RuntimeVisibleParameterAnnotationsAttrName;
 
     private static char[] RuntimeInvisibleParameterAnnotationsAttrName;
+    
+    private static final MethodPragma[] METHOD_PRAGMAs = new MethodPragma[] {
+        new MethodPragma(UninterruptiblePragma.class, MethodPragmaFlags.UNINTERRUPTIBLE),
+        new MethodPragma(InlinePragma.class, MethodPragmaFlags.INLINE),
+        new MethodPragma(NoInlinePragma.class, MethodPragmaFlags.NOINLINE),
+        new MethodPragma(LoadStaticsPragma.class, MethodPragmaFlags.LOADSTATICS),
+        new MethodPragma(PragmaDoPrivileged.class, MethodPragmaFlags.DOPRIVILEGED),
+        new MethodPragma(PrivilegedActionPragma.class, MethodPragmaFlags.PRIVILEGEDACTION),
+        new MethodPragma(PragmaCheckPermission.class, MethodPragmaFlags.CHECKPERMISSION),
+    };
 
     private static final int NO_FIELD_ALIGNMENT = 0x0001;
 
@@ -493,14 +511,41 @@ public final class ClassDecoder {
             VmType cls, VmCP cp) {
 
         // Read the exceptions
+        char pragmaFlags = 0;
+        int pragmas = 0;
         final int ecount = data.getChar();
         final VmConstClass[] list = new VmConstClass[ecount];
         for (int i = 0; i < ecount; i++) {
             final int idx = data.getChar();
-            list[i] = cp.getConstClass(idx);
+            final VmConstClass ccls = cp.getConstClass(idx);
+            list[i] = ccls;
+            for (MethodPragma mp : METHOD_PRAGMAs) {
+                if (ccls.getClassName().equals(mp.className)) {
+                    pragmaFlags |= mp.flags;
+                    pragmas++;
+                    list[i] = null;
+                    break;
+                }
+            }
         }
-
-        return new VmExceptions(list);
+        if (pragmas > 0) {
+            final int newCnt = ecount - pragmas;
+            if (newCnt == 0) {
+                return new VmExceptions(null, pragmaFlags);
+            } else {
+                final VmConstClass[] newList = new VmConstClass[newCnt];
+                int k = 0;
+                for (int i = 0; i < ecount; i++) {
+                    final VmConstClass ccls = list[i];
+                    if (ccls != null) {
+                        newList[k++] = ccls;
+                    }
+                }
+                return new VmExceptions(newList, pragmaFlags);
+            }
+        } else {
+            return new VmExceptions(list, pragmaFlags);
+        }
     }
 
     /**
@@ -956,5 +1001,15 @@ public final class ClassDecoder {
         }
         
         return buffer;
+    }
+    
+    private static final class MethodPragma {
+        public final char flags;
+        public final String className;
+        
+        public MethodPragma(Class<? extends PragmaException> cls, char flags) {
+            this.className = cls.getName();
+            this.flags = flags;
+        }
     }
 }
