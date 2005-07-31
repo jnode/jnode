@@ -611,7 +611,7 @@ clean          Remove all intermediate build results.
 	<target name="create-patch">
         <property name="patch.file" value="${root.dir}/patch.txt"/>             
 		<echo>Creating patch in ${patch.file}</echo>
-		<cvs output="${patch.file}">
+		<cvs output="${patch.file}" dest="${root.dir}">
 		    <commandline>
 		        <argument line="-q diff -u -N"/>
 		    </commandline>
