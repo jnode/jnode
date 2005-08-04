@@ -39,6 +39,12 @@ exception statement from your version. */
 package org.omg.PortableServer;
 
 import org.omg.CORBA.BAD_PARAM;
+import org.omg.CORBA.TypeCode;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.Any;
+import org.omg.CORBA.portable.InputStream;
+import org.omg.CORBA.MARSHAL;
+import org.omg.CORBA.portable.OutputStream;
 
 /**
  * The helper operations for the CORBA object {@link POA}.
@@ -48,8 +54,8 @@ import org.omg.CORBA.BAD_PARAM;
 public abstract class POAHelper
 {
   /**
-   * Cast the passed object into the POA. As POA is a local
-   * object, the method just uses java type cast.
+   * Cast the passed object into the POA. As POA is a local object, the method
+   * just uses java type cast.
    *
    * @param obj the object to narrow.
    * @return narrowed instance.
@@ -65,5 +71,77 @@ public abstract class POAHelper
       {
         throw new BAD_PARAM(obj.getClass().getName() + " is not a POA");
       }
+  }
+
+  /**
+   * Get the type code of the {@link POA}.
+   */
+  public static TypeCode type()
+  {
+    return ORB.init().create_interface_tc(id(), "POA");
+  }
+
+  /**
+   * Insert the POA into the given Any.
+   *
+   * @param any the Any to insert into.
+   *
+   * @param that the POA to insert.
+   */
+  public static void insert(Any any, POA that)
+  {
+    any.insert_Object(that);
+  }
+
+  /**
+   * Extract the POA from given Any.
+   *
+   * @throws BAD_OPERATION if the passed Any does not contain POA.
+   */
+  public static POA extract(Any any)
+  {
+    return narrow(any.extract_Object());
+  }
+
+  /**
+   * Get the POA repository id.
+   *
+   * @return "IDL:omg.org/PortableServer/POA:2.3", always.
+   */
+  public static String id()
+  {
+    return "IDL:omg.org/PortableServer/POA:2.3";
+  }
+
+  /**
+   * This should read POA from the CDR input stream, but, following the specs,
+   * it doesnot. The jdk 1.5 API specification defines that POA cannot be
+   * exported.
+   *
+   * @param input a org.omg.CORBA.portable stream to read from.
+   *
+   * @specenote Sun throws the same exception.
+   *
+   * @throws MARSHAL, always.
+   */
+  public static POA read(InputStream input)
+  {
+    throw new MARSHAL("Not applicable");
+  }
+
+  /**
+   * This should read POA from the CDR input stream, but, following the specs,
+   * it doesnot. The jdk 1.5 API specification defines that POA cannot be
+   * exported.
+   *
+   * @param input a org.omg.CORBA.portable stream to read from.
+   *
+   * @specenote Sun throws the same exception.
+   *
+   * @throws MARSHAL, always.
+   */
+  public static void write(OutputStream output, POA value)
+  {
+    throw new MARSHAL("Not applicable");
   }
 }

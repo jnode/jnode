@@ -55,126 +55,99 @@ import java.util.Set;
 class AttributedStringIterator implements AttributedCharacterIterator
 {
 
-/*************************************************************************/
+  /*************************************************************************/
 
-/**
-  * Instance Variables
-  */
+  /** The character iterator containing the text */
+  private CharacterIterator ci;
 
-/**
-  * The character iterator containing the text
-  */
-private CharacterIterator ci;
+  /** The list of attributes and ranges */
+  private AttributedString.AttributeRange[] attribs;
 
-/**
-  * The list of attributes and ranges
-  */
-private AttributedString.AttributeRange[] attribs;
-
-/**
+  /**
   * The list of attributes that the user is interested in.  We may,
   * at our option, not return any other attributes.
   */
-private AttributedCharacterIterator.Attribute[] restricts;
+  private AttributedCharacterIterator.Attribute[] restricts;
 
-/*************************************************************************/
+  /*************************************************************************/
 
-/*
- * Constructors
- */
-
-AttributedStringIterator(StringCharacterIterator sci, 
+  AttributedStringIterator(StringCharacterIterator sci, 
                          AttributedString.AttributeRange[] attribs,
                          int begin_index, int end_index,
                          AttributedCharacterIterator.Attribute[] restricts)
-{
+  {
   this.ci = new StringCharacterIterator(sci, begin_index, end_index);
   this.attribs = attribs;
   this.restricts = restricts;
-}
+  }
 
-/*************************************************************************/
+  /*************************************************************************/
 
-/*
- * Instance Methods
- */
+  // First we have a bunch of stupid redirects.  If StringCharacterIterator
+  // weren't final, I just would have extended that for this class.  Alas, no.
 
-// First we have a bunch of stupid redirects.  If StringCharacterIterator
-// weren't final, I just would have extended that for this class.  Alas, no.
-
-public Object
-clone()
-{
+  public Object clone()
+  {
   return(ci.clone());
-}
+  }
 
-public char
-current()
-{
+  public char current()
+  {
   return(ci.current());
-}
+  }
 
-public char
-next()
-{
+  public char next()
+  {
   return(ci.next());
-}
+  }
 
-public char
-previous()
-{
+  public char previous()
+  {
   return(ci.previous());
-}
+  }
 
-public char
-first()
-{
+  public char first()
+  {
   return(ci.first());
-}
+  }
 
-public char
-last()
-{
+  public char last()
+  {
   return(ci.last());
-}
+  }
 
-public int
-getIndex()
-{
+  public int getIndex()
+  {
   return(ci.getIndex());
-}
+  }
 
-public char
-setIndex(int index)
-{
+  public char setIndex(int index)
+  {
   return(ci.setIndex(index));
-}
+  }
 
-public int
-getBeginIndex()
-{
+  public int getBeginIndex()
+  {
   return(ci.getBeginIndex());
-}
+  }
 
-public int
-getEndIndex()
-{
+  public int getEndIndex()
+  {
   return(ci.getEndIndex());
-}
+  }
 
-/*
+  /*
  * Here is where the AttributedCharacterIterator methods start.
  */ 
 
-/*************************************************************************/
+  /*************************************************************************/
 
-/**
+  /**
   * Returns a list of all the attribute keys that are defined anywhere
   * on this string.
   */
-public Set
-getAllAttributeKeys()
-{
+  public Set getAllAttributeKeys()
+  {
   HashSet s = new HashSet();
   if (attribs == null)
     return(s);
@@ -194,33 +167,29 @@ getAllAttributeKeys()
     }
 
   return(s);
-}
+  }
 
-/*************************************************************************/
+  /*************************************************************************/
 
-/**
+  /**
   * Various methods that determine how far the run extends for various
   * attribute combinations.
   */
 
-public int
-getRunLimit()
-{
+  public int getRunLimit()
+  {
   return(getRunLimit(getAttributes().keySet()));
-}
+  }
 
-public int
-getRunLimit(AttributedCharacterIterator.Attribute attrib)
-{
+  public int getRunLimit(AttributedCharacterIterator.Attribute attrib)
+  {
   HashSet s = new HashSet();
   s.add(attrib);
-
   return(getRunLimit(s));
-}
+  }
 
-public synchronized int
-getRunLimit(Set attribute_set)
-{
+  public synchronized int getRunLimit(Set attribute_set)
+  {
   boolean hit = false;
   int runLimit = ci.getEndIndex ();
   int pos = ci.getIndex ();
@@ -243,36 +212,33 @@ getRunLimit(Set attribute_set)
     return runLimit;
   else
     return ci.getEndIndex();
-}
+  }
 
-/*************************************************************************/
+  /*************************************************************************/
 
-/**
+  /**
   * Various methods that determine where the run begins for various
   * attribute combinations.
   */
 
-public int
-getRunStart()
-{
+  public int getRunStart()
+  {
   return(getRunStart(getAttributes().keySet()));
-}
+  }
 
-public int
-getRunStart(AttributedCharacterIterator.Attribute attrib)
-{
+  public int getRunStart(AttributedCharacterIterator.Attribute attrib)
+  {
   HashSet s = new HashSet();
   s.add(attrib);
 
   return(getRunStart(s));
-}
+  }
 
-public int
-getRunStart(Set attribute_set)
-{
+  public int getRunStart(Set attribute_set)
+  {
   boolean hit = false;
   int runBegin = 0;
-  int pos = ci.getIndex ();
+    int pos = ci.getIndex();
 
   for (int i = 0; i < attribs.length; ++i)
     {
@@ -292,13 +258,12 @@ getRunStart(Set attribute_set)
     return runBegin;
   else
     return -1;
-}
+  }
 
-/*************************************************************************/
+  /*************************************************************************/
 
-public Object
-getAttribute(AttributedCharacterIterator.Attribute attrib)
-{
+  public Object getAttribute(AttributedCharacterIterator.Attribute attrib)
+  {
   if (attribs == null)
     return(null);
 
@@ -319,17 +284,16 @@ getAttribute(AttributedCharacterIterator.Attribute attrib)
     }
 
   return(null);
-}
+  }
 
-/*************************************************************************/
+  /*************************************************************************/
 
-/**
+  /**
   * Return a list of all the attributes and values defined for this
   * character
   */
-public Map
-getAttributes()
-{
+  public Map getAttributes()
+  {
   HashMap m = new HashMap();
   if (attribs == null)
     return(m);
@@ -342,7 +306,6 @@ getAttributes()
     }
 
   return(m);
-}
+  }
 
 } // class AttributedStringIterator
-
