@@ -1,0 +1,123 @@
+<project name="JNode-jop" default="all" basedir=".">
+
+	<property name="my-build.dir" value="${build.dir}/jop" />
+	<property name="my-lib.dir" value="${basedir}/lib/jop" />
+	<property name="my-conf.dir" value="${basedir}/conf/jop" />
+
+	<property name="build.netboot.dir" value="${my-build.dir}/netboot" />
+
+	<!-- Properties for building the boot files for Spartan-3/JOP -->
+	<property name="bin-jop.dir" value="${basedir}\bin-jop" />
+	<property name="conf-jop.dir" value="${basedir}\conf\jop" />
+	<property name="lib-jop.dir" value="${basedir}\lib\jop" />
+	<!-- end of Properties for building the boot files for Spartan-3/JOP -->
+
+	<path id="cp-jop">
+		<pathelement location="${jnode-mmtk.jar}" />
+		<pathelement location="${jnode-builder.jar}" />
+		<pathelement location="${jnode-core.jar}" />
+		<pathelement location="${jnode-fs.jar}" />
+		<pathelement location="${jnode-shell.jar}" />
+		<pathelement location="${jnode-net.jar}" />
+		<pathelement location="${jnode-gui.jar}" />
+		<path refid="cp" />
+		<pathelement location="${my-conf.dir}" />
+		<pathelement location="${grub.dir}" />
+		<pathelement location="${descriptors.dir}" />
+		<pathelement location="${dom4j.jar}" />
+		<pathelement location="${mmtk.jar}" />
+	</path>
+
+	<target name="test-properties">
+		<condition property="jop-properties.exists">
+			<available file="build-jop.properties" />
+		</condition>
+	</target>
+	<target name="load-properties" if="jop-properties.exists">
+		<property file="build-jop.properties" />
+	</target>
+	<target name="default-properties" unless="jop-properties.exists">
+		<property name="jnodedrive.dir" value="${my-build.dir}" />
+	</target>
+
+	<target name="prepare-props" depends="test-properties,load-properties,default-properties">
+		<property name="jnode.kernel.dir" value="${jnodedrive.dir}" />
+		<property name="jnode.kernel" value="${jnode.kernel.dir}/jnodejop.gz" />
+		<property name="jnode.compiler" value="default" />
+
+		<property name="build.bootimage.dir" value="${my-build.dir}/bootimage" />
+	</target>
+
+	<!-- Initialize all project directories -->
+	<target name="prepare-dirs" depends="prepare-props">
+		<mkdir dir="${build.bootimage.dir}" />
+		<mkdir dir="${build.netboot.dir}" />
+	</target>
+
+	<!-- Initialize all project properties -->
+	<target name="prepare" depends="prepare-dirs">
+	</target>
+
+	<!-- Build the java object file  -->
+	<target name="java-image" depends="prepare">
+	</target>
+
+	<macrodef name="create-cdrom">
+		<attribute name="dir" />
+		<attribute name="destfile" />
+		<sequential>
+			<mkdir dir="@{dir}/boot/grub" />
+			<copy todir="@{dir}">
+				<fileset dir="${jnode.kernel.dir}" includes="jnode*.gz"/>
+			</copy>
+			<copy todir="@{dir}">
+				<fileset dir="${initjars.dir}" />
+			</copy>
+			<copy file="${my-lib.dir}/stage2_eltorito" todir="@{dir}/boot/grub" />
+			<copy file="${grub.menu.cdrom}" tofile="@{dir}/boot/grub/menu.lst" />
+			<exec executable="mkisofs">
+				<arg line="-o @{destfile} -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -boot-info-table @{dir}" />
+			</exec>
+		</sequential>
+	</macrodef>
+
+	<!-- Create a full distributable bootable CDROM image -->
+	<target name="cdrom" depends="prepare">
+		<copy file="${sources.dist.tar.gz}" todir="${my-build.dir}/cdrom-full" />
+		<create-cdrom destfile="${jnode-jop.iso}" dir="${my-build.dir}/cdrom-full" />
+	</target>
+
+	<!-- Create a bootable CDROM image -->
+	<target name="cdrom-lite" depends="prepare">
+		<create-cdrom destfile="${jnode-jop-lite.iso}" dir="${my-build.dir}/cdrom-lite" />
+	</target>
+
+	<!-- Prepare for netboot -->
+	<target name="netboot" depends="java-image" unless="no.netboot">
+		<copy file="${jnode.kernel}" todir="${build.netboot.dir}" />
+		<copy todir="${build.netboot.dir}">
+			<fileset dir="${initjars.dir}" />
+		</copy>
+		<copy todir="${build.netboot.dir}">
+			<fileset dir="${my-lib.dir}">
+				<include name="nbgrub-*" />
+				<include name="pxegrub-*" />
+			</fileset>
+			<fileset dir="${my-conf.dir}">
+				<include name="menu-nb.lst" />
+				<include name="menu-pxe.lst*" />
+			</fileset>
+		</copy>
+		<mkdir dir="${build.netboot.dir}/plugins" />
+		<copy todir="${build.netboot.dir}/plugins">
+			<fileset dir="${plugins.dir}" />
+		</copy>
+	</target>
+
+	<!-- Run all required targets -->
+	<target name="all" depends="java-image">
+	</target>
+
+</project>
+
+
