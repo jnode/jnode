@@ -47,10 +47,10 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 /**
- * <p>This class provides a default implementation of {@link
- * ListSelectionModel}, which is used by {@link javax.swing.JList} and
+ * The default implementation of {@link ListSelectionModel},
+ * which is used by {@link javax.swing.JList} and
  * similar classes to manage the selection status of a number of data
- * elements. </p>
+ * elements.
  *
  * <p>The class is organized <em>abstractly</em> as a set of intervals of
  * integers. Each interval indicates an inclusive range of indices in a

@@ -216,7 +216,8 @@ public class MenuSelectionManager
 	subElements = ((MenuElement) selectedPath.get(i)).getSubElements();
         for (int j = 0; j < subElements.length; j++)
           {
-	    if ((subElements[j].getComponent()).equals(c))
+            MenuElement me = subElements[j]; 
+            if (me != null && (me.getComponent()).equals(c))
               return true;
           }
       }

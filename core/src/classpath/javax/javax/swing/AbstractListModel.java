@@ -46,11 +46,10 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
 /**
- * AbstractListModel
+ * Provides standard implementations of some methods in {@link ListModel}.
  *
  * @author Ronald Veldema
  * @author Andrew Selkirk
- * @version 1.0
  */
 public abstract class AbstractListModel implements ListModel, Serializable
 {

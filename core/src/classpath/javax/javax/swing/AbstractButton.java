@@ -65,18 +65,13 @@ import javax.swing.text.AttributeSet;
 
 
 /**
- * <p>The purpose of this class is to serve as a facade over a number of
- * classes which collectively represent the semantics of a button: the
- * button's model, its listeners, its action, and its look and feel. Some
- * parts of a button's state are stored explicitly in this class, other
- * parts are delegates to the model. Some methods related to buttons are
- * implemented in this class, other methods pass through to the current 
- * model or look and feel.</p>
+ * Provides an abstract implementation of common button behaviour,
+ * data model and look &amp; feel.
  *
- * <p>Furthermore this class is supposed to serve as a base class for
+ * <p>This class is supposed to serve as a base class for
  * several kinds of buttons with similar but non-identical semantics:
- * toggle buttons (radio buttons and checkboxes), simple "push" buttons,
- * menu items.</p>
+ * toggle buttons (radio buttons and checkboxes), simple push buttons,
+ * menu items, etc.</p>
  *
  * <p>Buttons have many properties, some of which are stored in this class
  * while others are delegated to the button's model. The following properties

@@ -1,5 +1,5 @@
-/* BadLocationException.java -- 
-   Copyright (C) 2002, 2004, 2005  Free Software Foundation, Inc.
+/* FlowView.java -- A composite View
+   Copyright (C) 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,44 +35,22 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.swing.text;
 
-/**
- * Indicates that an invalid location within a <code>Document</code> has been
- * accessed.
- *
- * @author original author unknown
- * @author Roman Kennke (roman@kennke.org)
- */
-public class BadLocationException extends Exception
-{    
-  /** The serial version UID for BadLocationException. */
-  private static final long serialVersionUID = -7712259886815656766L;
-  
-  /**
-   * The invalid location.
-   */
-  int offset;
-  
-  /**
-   * Constructs a <code>BadLocationException</code>
-   *
-   * @param str a string indicating what was wrong with the arguments
-   * @param offset offset within the document that was requested &gt;= 0
-   */
-  public BadLocationException(String str, int offset)
-  {
-    super(str);
-    this.offset = offset;
-  }
+// TODO: Implement this class.
+public class FlowView
+  extends BoxView
+{
 
   /**
-   * Returns the offset into the document that was not legal.
+   * Creates a new <code>FlowView</code> for the given
+   * <code>Element</code>.
    *
-   * @return the offset into the document that was not legal
+   * @param element the element that is rendered by this FlowView
    */
-  public int offsetRequested()
+  public FlowView(Element element)
   {
-    return offset;
+    super(element);
   }
 }

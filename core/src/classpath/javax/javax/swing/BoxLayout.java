@@ -53,7 +53,8 @@ import java.util.Vector;
 import gnu.java.awt.AWTUtilities;
 
 /**
- * A layout for swing components.
+ * A layout that stacks the children of a container in a Box, either
+ * horizontally or vertically.
  *
  * @author Ronald Veldema (rveldema@cs.vu.nl)
  * @author Roman Kennke (roman@kennke.org)

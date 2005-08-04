@@ -88,7 +88,7 @@ import javax.swing.event.SwingPropertyChangeSupport;
 import javax.swing.plaf.ComponentUI;
 
 /**
- * Every component in swing inherits from this class (JLabel, JButton, etc).
+ * The base class of all Swing components.
  * It contains generic methods to manage events, properties and sizes. Actual
  * drawing of the component is channeled to a look-and-feel class that is
  * implemented elsewhere.
@@ -105,10 +105,17 @@ public abstract class JComponent extends Container implements Serializable
    */
   protected AccessibleContext accessibleContext;
   
+  /**
+   * Basic accessibility support for <code>JComponent</code> derived
+   * widgets.
+   */
   public abstract class AccessibleJComponent 
     extends AccessibleAWTContainer
     implements AccessibleExtendedComponent
   {
+    /**
+     * Accessibility support for <code>JComponent</code>'s focus handler.
+     */
     protected class AccessibleFocusHandler 
       implements FocusListener
     {
@@ -117,6 +124,9 @@ public abstract class JComponent extends Container implements Serializable
       public void focusLost(FocusEvent valevent){}
     }
   
+    /**
+     * Accessibility support for <code>JComponent</code>'s container handler.
+     */
     protected class AccessibleContainerHandler 
       implements ContainerListener
     {

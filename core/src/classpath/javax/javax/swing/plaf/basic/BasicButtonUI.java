@@ -285,6 +285,7 @@ public class BasicButtonUI extends ButtonUI
     paintIcon(g, c, ir);
     if (text != null)
       paintText(g, b, tr, text);
+    if (b.isFocusOwner())
     paintFocus(g, b, vr, tr, ir);
   }
 
@@ -306,15 +307,8 @@ public class BasicButtonUI extends ButtonUI
   protected void paintFocus(Graphics g, AbstractButton b, Rectangle vr,
                             Rectangle tr, Rectangle ir)
   {
-    if (b.hasFocus() && b.isFocusPainted())
-      {
-        Color saved_color = g.getColor();
-        g.setColor(focusColor);
-        Rectangle focusRect = ir.union(tr);
-        g.drawRect(focusRect.x, focusRect.y,
-                   focusRect.width, focusRect.height);
-        g.setColor(saved_color);
-      }
+    // In the BasicLookAndFeel no focus border is drawn. This can be
+    // overridden in subclasses to implement such behaviour.
   }
 
   /**
@@ -337,8 +331,8 @@ public class BasicButtonUI extends ButtonUI
 
   /**
    * Paints the background area of an {@link AbstractButton} in the pressed
-   * state.  This means filling the supplied area with the 
-   * <code>pressedBackgroundColor</code>.
+   * state.  This means filling the supplied area with the {@link
+   * pressedBackgroundColor}.
    *
    * @param g The graphics context to paint with
    * @param b The button to paint the state of
@@ -374,7 +368,7 @@ public class BasicButtonUI extends ButtonUI
     
   /**
    * Paints the "text" property of an {@link AbstractButton}, using the
-   * <code>textColor</code> color.
+   * {@link textColor} color.
    *
    * @param g The graphics context to paint with
    * @param c The component to paint the state of
@@ -389,7 +383,7 @@ public class BasicButtonUI extends ButtonUI
 
   /**
    * Paints the "text" property of an {@link AbstractButton}, using the
-   * <code>textColor</code> color.
+   * {@link textColor} color.
    *
    * @param g The graphics context to paint with
    * @param b The button to paint the state of

@@ -47,7 +47,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 
 /**
- * A default implementation of <code>BoundedRangeModel</code>.
+ * The default implementation of <code>BoundedRangeModel</code>.
  *
  * @author Andrew Selkirk (aselkirk@sympatico.ca)
  * @author Sascha Brawer (brawer@dandelis.ch)

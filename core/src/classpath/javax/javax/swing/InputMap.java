@@ -49,6 +49,14 @@ import java.util.Set;
 
 
 /**
+ * Maps {@link KeyStroke}s to arbitrary objects, usually Strings. This
+ * is used in combination with {@link ActionMap}s.
+ *
+ * If a component receives an input event, this is looked up in
+ * the component's <code>InputMap</code>. The result is an object which
+ * serves as a key to the components <code>ActionMap</code>. Finally
+ * the <code>Action</code> that is stored is executed.
+ *
  * @author	Andrew Selkirk
  * @author Michael Koch
  *

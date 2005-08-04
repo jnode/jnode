@@ -48,12 +48,11 @@ import javax.accessibility.AccessibleContext;
 import javax.accessibility.AccessibleRole;
 
 /**
- * The CellRendererPane's purpose is to paint the cells of JList, JTable and
- * JTree. It intercepts the usual paint tree, so that we don't walk up and
+ * Paints the cells of JList, JTable and JTree.
+ * It intercepts the usual paint tree, so that we don't walk up and
  * repaint everything.
  *
  * @author	Andrew Selkirk
- * @version	1.0
  */
 public class CellRendererPane
   extends Container
@@ -62,7 +61,7 @@ public class CellRendererPane
   private static final long serialVersionUID = -7642183829532984273L;
 
 	/**
-	 * AccessibleCellRendererPane
+   * Provides accessibility support for CellRendererPanes.
 	 */
   protected class AccessibleCellRendererPane extends AccessibleAWTContainer
   {

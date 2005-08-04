@@ -1,5 +1,5 @@
-/* ComponentView.java -- 
-   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
+/* IconView.java -- A view to render icons
+   Copyright (C) 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,71 +35,78 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.swing.text;
 
-import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Shape;
 
-public class ComponentView extends View
+// TODO: Implement this class.
+public class IconView
+  extends View
 {
-    public ComponentView(Element elem)
-    {
-	super(elem);
-    }
- 
-    protected  Component createComponent()
-    {
-	return null;
-    }
-    
-    public float getAlignment(int axis)
-    {
-	return 0;
-    }
 
-    public final Component getComponent()
-    {
-	return null;
-    }
-    
-    public float getMaximumSpan(int axis)
-    {
-	return 0;
-    }
+  /**
+   * Creates a new <code>IconView</code> for the given <code>Element</code>.
+   *
+   * @param element the element that is rendered by this IconView
+   */
+  public IconView(Element element)
+  {
+    super(element);
+  }
 
-    public float getMinimumSpan(int axis)
-    {
-	return 0;
-    }
+  /**
+   * Renders the <code>Element</code> that is associated with this
+   * <code>View</code>.
+   *
+   * @param g the <code>Graphics</code> context to render to
+   * @param a the allocated region for the <code>Element</code>
+   */
+  public void paint(Graphics g, Shape a)
+  {
+    // TODO: Implement me.
+  }
 
-    public float getPreferredSpan(int axis)
-    {
-	return 0;
-    }
+  /**
+   * Returns the preferred span of the content managed by this
+   * <code>View</code> along the specified <code>axis</code>.
+   *
+   * @param axis the axis
+   *
+   * @return the preferred span of this <code>View</code>.
+   */
+  public float getPreferredSpan(int axis)
+  {
+    // TODO: Implement me.
+    return 0F;
+  }
 
-    public Shape modelToView(int pos, Shape a, Position.Bias b)
-      throws BadLocationException
-    {
-	return null;
-    }
-    
-    public void paint(Graphics g, Shape a)
-    {
-    }
-    
-    public void setParent(View p)
-    {
-    }
-    
-    public void setSize(float width, float height)
-    {
-    }
-    
-    public int viewToModel(float x, float y, Shape a, Position.Bias[] bias)
-    {
-	return 0;
-    }
+  /**
+   * Maps a position in the document into the coordinate space of the View.
+   * The output rectangle usually reflects the font height but has a width
+   * of zero.
+   *
+   * @param pos the position of the character in the model
+   * @param a the area that is occupied by the view
+   * @param bias either {@link Position.Bias.Forward} or
+   *        {@link Position.Bias.Backward} depending on the preferred
+   *        direction bias. If <code>null</code> this defaults to
+   *        <code>Position.Bias.Forward</code>
+   *
+   * @return a rectangle that gives the location of the document position
+   *         inside the view coordinate space
+   *
+   * @throws BadLocationException if <code>pos</code> is invalid
+   * @throws IllegalArgumentException if b is not one of the above listed
+   *         valid values
+   */
+  public Shape modelToView(int pos, Shape a, Position.Bias b)
+    throws BadLocationException
+  {
+    // Implement me.
+    return null;
+  }
 
   /**
    * Maps coordinates from the <code>View</code>'s space into a position

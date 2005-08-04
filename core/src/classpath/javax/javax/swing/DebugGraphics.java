@@ -50,9 +50,11 @@ import java.text.AttributedCharacterIterator;
 
 
 /**
- * DebugGraphics
+ * An extension of {@link Graphics} that can be used for debugging
+ * custom Swing widgets. <code>DebugGraphics</code> has the ability to
+ * draw slowly and can log drawing actions.
+ *
  * @author	Andrew Selkirk
- * @version	1.0
  */
 public class DebugGraphics extends Graphics
 {
