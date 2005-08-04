@@ -284,6 +284,11 @@ clean          Remove all intermediate build results.
         <x86-build bits="64"/>
     </target>
 
+    <!-- Create the JOP boot image -->
+    <target name="jop" depends="assemble">
+        <ant antfile="build-jop.xml" inheritall="on" inheritrefs="on"/>
+    </target>
+
     <!-- Build the boot files for windows NT/2K/XP (with NTLDR) -->
     <target name="boot-files-winNT" depends="assemble">
         <x86-build bits="32" target="boot-files-winNT"/>
