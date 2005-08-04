@@ -38,6 +38,8 @@ exception statement from your version. */
 
 package java.text;
 
+import java.util.Arrays;
+
 /* Written using "Java Class Libraries", 2nd edition, plus online
  * API docs for JDK 1.2 from http://www.javasoft.com.
  * Status: Believed complete and correct.
@@ -154,7 +156,7 @@ public final class CollationKey implements Comparable
     if (!ck.getSourceString ().equals (getSourceString ()))
       return false;
 
-    if (!ck.toByteArray ().equals (toByteArray ()))
+    if (! Arrays.equals (ck.toByteArray (), toByteArray ()))
       return false;
 
     return true;

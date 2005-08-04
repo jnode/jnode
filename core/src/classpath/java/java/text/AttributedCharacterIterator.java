@@ -58,7 +58,7 @@ import java.util.Set;
 public interface AttributedCharacterIterator extends CharacterIterator
 {
   /**
-  * This class defines attribute keys that are used as text attributes.
+   * Defines attribute keys that are used as text attributes.
   */
   public static class Attribute implements Serializable
   {
@@ -88,14 +88,13 @@ public interface AttributedCharacterIterator extends CharacterIterator
       new Attribute ("INPUT_METHOD_SEGMENT");
 
     /**
-  * This is the name of the attribute key
+     * The name of the attribute key
   * @serial
   */
     private String name;
 
     /**
-  * This method initializes a new instance of this class with the specified
-  * name.
+     * Initializes a new instance of this class with the specified name.
   *
   * @param name The name of this attribute key.
   */
@@ -105,7 +104,7 @@ public interface AttributedCharacterIterator extends CharacterIterator
     }
 
     /**
-  * This method returns the name of this attribute.
+     * Returns the name of this attribute.
   *
   * @return The attribute name
   */
@@ -115,7 +114,7 @@ public interface AttributedCharacterIterator extends CharacterIterator
     }
 
     /**
-     * This method resolves an instance of 
+     * Resolves an instance of 
      * <code>AttributedCharacterIterator.Attribute</code>
   * that is being deserialized to one of the three pre-defined attribute
   * constants.  It does this by comparing the names of the attributes.  The
@@ -142,7 +141,7 @@ public interface AttributedCharacterIterator extends CharacterIterator
     }
 
     /**
-  * This method tests this object for equality against the specified object.
+     * Tests this object for equality against the specified object.
   * The two objects will be considered equal if and only if:
   * <ul>
   * <li>The specified object is not <code>null</code>.
@@ -166,7 +165,7 @@ public interface AttributedCharacterIterator extends CharacterIterator
     }
 
     /**
-  * This method returns a hash value for this object.
+     * Returns a hash value for this object.
   *
   * @return A hash value for this object.
   */
@@ -176,7 +175,7 @@ public interface AttributedCharacterIterator extends CharacterIterator
     }
 
     /**
-  * This method returns a <code>String</code> representation of this object.
+     * Returns a <code>String</code> representation of this object.
   *
   * @return A <code>String</code> representation of this object.
   */
@@ -188,7 +187,7 @@ public interface AttributedCharacterIterator extends CharacterIterator
   } // Inner class Attribute
 
   /**
-  * This method returns a list of all keys that are defined for the 
+   * Returns a list of all keys that are defined for the 
   * text range.  This can be an empty list if no attributes are defined.
   *
   * @return A list of keys 
@@ -196,15 +195,15 @@ public interface AttributedCharacterIterator extends CharacterIterator
   Set getAllAttributeKeys();
 
   /**
-  * This method returns a <code>Map</code> of the attributed defined for
-  * the current character.
+   * Returns a <code>Map</code> of the attributes defined for the current 
+   * character.
   *
   * @return A <code>Map</code> of the attributes for the current character.
   */
   Map getAttributes();
 
   /**
-  * This method returns the value of the specified attribute for the
+   * Returns the value of the specified attribute for the
   * current character.  If the attribute is not defined for the current
   * character, <code>null</code> is returned.
   *
@@ -215,7 +214,7 @@ public interface AttributedCharacterIterator extends CharacterIterator
   Object getAttribute (AttributedCharacterIterator.Attribute attrib);
 
   /**
-  * This method returns the index of the first character in the run that
+   * Returns the index of the first character in the run that
   * contains all attributes defined for the current character.
   *
   * @return The start index of the run
@@ -223,7 +222,7 @@ public interface AttributedCharacterIterator extends CharacterIterator
   int getRunStart();
 
   /**
-  * This method returns the index of the first character in the run that
+   * Returns the index of the first character in the run that
   * contains all attributes in the specified <code>Set</code> defined for
   * the current character.
   *
@@ -234,7 +233,7 @@ public interface AttributedCharacterIterator extends CharacterIterator
   int getRunStart (Set attribs);
 
   /**
-  * This method returns the index of the first character in the run that
+   * Returns the index of the first character in the run that
   * contains the specified attribute defined for the current character.
   *
   * @param attrib The attribute.
@@ -244,15 +243,15 @@ public interface AttributedCharacterIterator extends CharacterIterator
   int getRunStart (AttributedCharacterIterator.Attribute attrib);
 
   /**
-  * This method returns the index of the character after the end of the run
-  * that contains all attributed defined for the current character.
+   * Returns the index of the character after the end of the run
+   * that contains all attributes defined for the current character.
   *
   * @return The end index of the run.
   */
   int getRunLimit();
 
   /**
-  * This method returns the index of the character after the end of the run
+   * Returns the index of the character after the end of the run
   * that contains all attributes in the specified <code>Set</code> defined
   * for the current character.
   *
@@ -263,7 +262,7 @@ public interface AttributedCharacterIterator extends CharacterIterator
   int getRunLimit (Set attribs);
 
   /**
-  * This methods returns the index of the character after the end of the run
+   * Returns the index of the character after the end of the run
   * that contains the specified attribute defined for the current character.
   *
   * @param attrib The attribute.

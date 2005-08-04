@@ -405,8 +405,18 @@ public abstract class DateFormat extends Format implements Cloneable
    * <ul>
    * <li>Is not <code>null</code>.</li>
    * <li>Is an instance of <code>DateFormat</code>.</li>
-   * <li>Has the same numberFormat field value as this object.</li>
+   * <li>Has equal numberFormat field as this object.</li>
+   * <li>Has equal (Calendar) TimeZone rules as this object.</li>
+   * <li>Has equal (Calendar) isLenient results.</li> 
+   * <li>Has equal Calendar first day of week and minimal days in week
+   * values.</li>
    * </ul>
+   * Note that not all properties of the Calendar are relevant for a
+   * DateFormat. For formatting only the fact whether or not the
+   * TimeZone has the same rules and whether the calendar is lenient
+   * and has the same week rules is compared for this implementation
+   * of equals. Other properties of the Calendar (such as the time)
+   * are not taken into account.
    *
    * @param obj The object to test for equality against.
    * 
@@ -419,8 +429,24 @@ public abstract class DateFormat extends Format implements Cloneable
       return false;
 
     DateFormat d = (DateFormat) obj;
+    TimeZone tz = getTimeZone();
+    TimeZone tzd = d.getTimeZone();
+    if (tz.hasSameRules(tzd))
+      if (isLenient() == d.isLenient())
+	{
+	  Calendar c = getCalendar();
+	  Calendar cd = d.getCalendar();
+	  if ((c == null && cd == null)
+	      ||
+	      (c.getFirstDayOfWeek() == cd.getFirstDayOfWeek()
+	       &&
+	       c.getMinimalDaysInFirstWeek()
+	       == cd.getMinimalDaysInFirstWeek()))
+	    return ((numberFormat == null && d.numberFormat == null)
+		    || numberFormat.equals(d.numberFormat));
+	}
 
-    return numberFormat.equals(d.numberFormat);
+    return false;
   }
 
   /**
