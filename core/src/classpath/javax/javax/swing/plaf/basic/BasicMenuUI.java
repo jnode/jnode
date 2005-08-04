@@ -301,14 +301,17 @@ public class BasicMenuUI extends BasicMenuItemUI
 
     private boolean popupVisible()
     {
-      JMenuBar mb = (JMenuBar) ((JMenu)menuItem).getParent();
+      JMenuBar mb = (JMenuBar) ((JMenu) menuItem).getParent();
       // check if mb.isSelected because if no menus are selected
       // we don't have to look through the list for popup menus
       if (!mb.isSelected())
         return false;
-      for (int i=0;i<mb.getMenuCount();i++)
-        if (((JMenu)mb.getComponent(i)).isPopupMenuVisible())
+      for (int i = 0; i < mb.getMenuCount(); i++)
+      {
+         JMenu m = mb.getMenu(i);
+        if (m != null && m.isPopupMenuVisible())
           return true;
+      }
       return false;
     }
 

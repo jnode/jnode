@@ -39,6 +39,9 @@ package javax.swing;
 
 
 /**
+ * An {@link InputMap} that is associated with a particular {@link JComponent}.
+ * The component is notified when its <code>ComponentInputMap</code> changes.
+ *
  * @author	Andrew Selkirk
  * @author Michael Koch
  */

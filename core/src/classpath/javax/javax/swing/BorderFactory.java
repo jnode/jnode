@@ -50,6 +50,11 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
 import javax.swing.border.TitledBorder;
 
+/**
+ * A factory for commonly used borders.
+ *
+ * @author original author unknown
+ */
 public class BorderFactory
 {
   private BorderFactory()

@@ -44,9 +44,11 @@ import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
 
 /**
- * FocusManager
+ * This class has been obsoleted by the new
+ * {@link java.awt.KeyboardFocusManager} and
+ * {@link java.awt.DefaultKeyboardFocusManager} API.
+ *
  * @author	Andrew Selkirk
- * @version	1.0
  */
 public abstract class FocusManager
   extends DefaultKeyboardFocusManager

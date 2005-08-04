@@ -52,7 +52,8 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 
 /**
- * The pUrpose of this class is to model the dynamic state of an abstract
+ * The default implementation of {@link ButtonModel}.
+ * The purpose of this class is to model the dynamic state of an abstract
  * button. The concrete button type holding this state may be a a "toggle"
  * button (checkbox, radio button) or a "push" button (menu button, button).
  * If the model is disabled, only the "selected" property can be changed. An

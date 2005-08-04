@@ -872,7 +872,7 @@ public class JTable extends JComponent
                                int column,
                                boolean includeSpacing)
   {
-    int height = getHeight();
+    int height = getRowHeight(row);
     int width = columnModel.getColumn(column).getWidth();
     int x_gap = columnModel.getColumnMargin();
     int y_gap = rowMargin;
@@ -1098,6 +1098,19 @@ public class JTable extends JComponent
   {
     return rowHeight;
   }
+
+  /**
+   * Get the height of the specified row.
+   *
+   * @param row the row whose height to return
+   */
+  public int getRowHeight(int row)
+  {
+    // FIXME: return the height of the specified row
+    // which may be different from the general rowHeight
+    return rowHeight;
+  }
+
 
   /**
    * Get the value of the {@link #rowMargin} property.
@@ -1470,6 +1483,19 @@ public class JTable extends JComponent
     repaint();
   }
 
+  /**
+   * Sets the value of the rowHeight property for the specified
+   * row.
+   * 
+   * @param rh is the new rowHeight
+   * @param row is the row to change the rowHeight of
+   */
+  public void setRowHeight(int rh, int row)
+  {
+     setRowHeight(rh);
+     // FIXME: not implemented
+  }
+  
   /**
    * Set the value of the {@link #rowMargin} property.
    *
@@ -2070,8 +2096,17 @@ public class JTable extends JComponent
   
   public void selectAll()
   {
+    // rowLead and colLead store the current lead selection indices
+    int rowLead = selectionModel.getLeadSelectionIndex();
+    int colLead = getColumnModel().getSelectionModel().getLeadSelectionIndex();
+    // the following calls to setSelectionInterval change the lead selection
+    // indices
     setColumnSelectionInterval(0, getColumnCount() - 1);
     setRowSelectionInterval(0, getRowCount() - 1);
+    // the following addSelectionInterval calls restore the lead selection
+    // indices to their previous values
+    addColumnSelectionInterval(colLead,colLead);
+    addRowSelectionInterval(rowLead, rowLead);
   }
 
   public Object getValueAt(int row, int column)

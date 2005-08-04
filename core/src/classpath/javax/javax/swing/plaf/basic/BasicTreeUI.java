@@ -107,10 +107,8 @@ import javax.swing.tree.TreeSelectionModel;
  * @author Sascha Brawer (brawer@dandelis.ch)
  * @author Lillian Angel (langel@redhat.com)
  */
-public class BasicTreeUI
-		extends TreeUI
+public class BasicTreeUI extends TreeUI
 {
-
 	/** Collapse Icon for the tree. */
 	protected transient Icon collapsedIcon;
 
@@ -328,7 +326,7 @@ public class BasicTreeUI
 	 * 
 	 * @return the indent value for the right child.
 	 */
-	public int getRightChildIndent(int newAmount)
+  public int getRightChildIndent()
 	{
 		return rightChildIndent;
 	}
@@ -588,8 +586,7 @@ public class BasicTreeUI
          TreeModel mod = tree.getModel();
          DefaultMutableTreeNode root = (DefaultMutableTreeNode) mod.getRoot();
          if (!tree.isRootVisible()
-               && tree.isExpanded(new TreePath(((DefaultMutableTreeNode) root)
-                     .getPath())))
+            && tree.isExpanded(new TreePath(root)))
             root = root.getNextNode();
 
          Point loc = getCellLocation(0, 0, tree, mod, cell, root);
@@ -973,9 +970,14 @@ public class BasicTreeUI
 		tree.removeKeyListener(keyListener);
 		tree.removePropertyChangeListener(selectionModelPropertyChangeListener);
 		tree.removeComponentListener(componentListener);
-		tree.getCellEditor().removeCellEditorListener(cellEditorListener);
 		tree.removeTreeExpansionListener(treeExpansionListener);
-		tree.getModel().removeTreeModelListener(treeModelListener);
+    
+    TreeCellEditor tce = tree.getCellEditor();
+    if (tce != null)
+      tce.removeCellEditorListener(cellEditorListener);
+    TreeModel tm = tree.getModel();
+    if (tm != null)
+      tm.removeTreeModelListener(treeModelListener);
 	}
 
 	/**
@@ -1179,8 +1181,7 @@ public class BasicTreeUI
 		tree = (JTree) c;
 		setModel(tree.getModel());
       tree.setRootVisible(true);
-      tree.expandPath(new TreePath(((DefaultMutableTreeNode) 
-            (tree.getModel()).getRoot()).getPath()));
+    tree.expandPath(new TreePath(tree.getModel().getRoot()));
 		treeSelectionModel = tree.getSelectionModel();
 		installListeners();
 		installKeyboardActions();
@@ -1233,23 +1234,12 @@ public class BasicTreeUI
       Object root = mod.getRoot();
       
       if (!tree.isRootVisible())
-         tree.expandPath(new TreePath(((DefaultMutableTreeNode) root)
-               .getPath()));
+      tree.expandPath(new TreePath(root));
       
       paintRecursive(g, 0, 0, 0, 0, tree, mod, root);
       
       if (hasControlIcons())
          paintControlIcons(g, 0, 0, 0, 0, tree, mod, root);
-      
-      TreePath lead = tree.getLeadSelectionPath();
-      if (lead != null && tree.isPathSelected(lead))
-      {
-         Rectangle cell = getPathBounds(tree, lead);  
-         g.setColor(UIManager.getLookAndFeelDefaults().getColor(
-               "Tree.selectionBorderColor"));
-         g.drawRect(cell.x + rightChildIndent - 4, cell.y, 
-               cell.width + 4, cell.height);
-      }
 	}
 
 	/**
@@ -1309,7 +1299,7 @@ public class BasicTreeUI
 	public Dimension getPreferredSize(JComponent c, boolean checkConsistancy)
 	{
       // FIXME: checkConsistancy not implemented, c not used
-      DefaultMutableTreeNode node = ((DefaultMutableTreeNode) (tree.getModel())
+    TreeNode node = ((TreeNode) (tree.getModel())
             .getRoot());
       int maxWidth = 0;
       int count = 0;
@@ -1319,14 +1309,14 @@ public class BasicTreeUI
          while (node != null)
          {
             count++;
-            DefaultMutableTreeNode nextNode = getNextVisibleNode(node);
+            DefaultMutableTreeNode nextNode = getNextVisibleNode(
+                                                                 new DefaultMutableTreeNode(node));
             if (nextNode != null)
                maxWidth = Math.max(maxWidth, (int) (getCellBounds(0, 0, nextNode)
                      .getWidth()));
             node = nextNode;
          }
       }
-      
       return new Dimension(maxWidth, (getRowHeight() * count));
 	}
 
@@ -1928,7 +1918,7 @@ public class BasicTreeUI
             boolean cntlClick = false;
             Rectangle bounds = BasicTreeUI.this.getPathBounds(
                   BasicTreeUI.this.tree, path);
-            // include icon
+          
             bounds.x -= rightChildIndent - 4;
             bounds.width += rightChildIndent + 4;
 
@@ -2517,10 +2507,11 @@ public class BasicTreeUI
 		Font f = tree.getFont();
 		FontMetrics fm = tree.getToolkit().getFontMetrics(tree.getFont());
 
-         return new Rectangle(x, y, SwingUtilities.computeStringWidth(fm, s),
+        if (s != null)
+          return new Rectangle(x, y, SwingUtilities.computeStringWidth(fm, s) + 4,
                fm.getHeight());
       }
-      return null;
+    return new Rectangle(x, y, 0, 0);
   }
 
 	/**
@@ -2543,8 +2534,7 @@ public class BasicTreeUI
       int rowHeight = getRowHeight();
       if (startNode == null || startNode.equals(node))
   {
-         if (!tree.isRootVisible() && tree.isExpanded(new TreePath((
-               (DefaultMutableTreeNode) mod.getRoot()).getPath())))
+        if (!tree.isRootVisible() && tree.isExpanded(new TreePath(mod.getRoot())))
             return new Point(x + ((((DefaultMutableTreeNode) node).getLevel())
                   * rightChildIndent), y);
          
@@ -2581,6 +2571,7 @@ public class BasicTreeUI
       TreePath curr = new TreePath(((DefaultMutableTreeNode) node).getPath());
       boolean selected = tree.isPathSelected(curr);
       boolean expanded = false;
+    boolean hasIcons = false;
 
       if (tree.isVisible(curr))
       {
@@ -2590,21 +2581,46 @@ public class BasicTreeUI
          if (!isLeaf)
             expanded = tree.isExpanded(curr);
 
+        Icon icon = null;
+        if (!isLeaf && expanded)
+          icon = dtcr.getOpenIcon();
+        else if (!isLeaf && !expanded)
+          icon = dtcr.getClosedIcon();
+        else
+          icon = dtcr.getLeafIcon();
+        
+        if (icon.getIconHeight() > -1 && icon.getIconWidth() > -1)
+          hasIcons = true;
+        
          Component c = dtcr.getTreeCellRendererComponent(tree, node, selected,
                expanded, isLeaf, 0, false);
 
+        if (hasIcons)
+          {
 		if (selected)
 		{
             Rectangle cell = getPathBounds(tree, curr);
             g.setColor(dtcr.getBackgroundSelectionColor());
-            g.fillRect(cell.x + rightChildIndent - 4, cell.y, cell.width + 4,
+                g.fillRect(cell.x + icon.getIconWidth()/2, cell.y, cell.width,
                   cell.height);
+                
+                if (curr.equals(tree.getLeadSelectionPath()))
+                  {
+                    g.setColor(UIManager.getLookAndFeelDefaults().getColor(
+                    "Tree.selectionBorderColor"));
+                    g.drawRect(cell.x + icon.getIconWidth()/2, cell.y, 
+                               cell.width, cell.height);
+                  }
 		}
 			
     g.translate(x, y);
     c.paint(g);
     g.translate(-x, -y);
   }
+        else 
+          rendererPane.paintComponent(g, c, c.getParent(), 
+                                      getCellBounds(x, y, node));
+      }
 	}
 
 	/**
@@ -2864,4 +2880,47 @@ public class BasicTreeUI
          }
       }
    }
+  
+  /**
+   * Draws a vertical line using the given graphic context
+   * 
+   * @param g is the graphic context
+   * @param c is the component the new line will belong to
+   * @param x is the horizonal position
+   * @param top specifies the top of the line
+   * @param bottom specifies the bottom of the line
+   */
+  protected void paintVerticalLine(Graphics g, JComponent c, int x, int top, int bottom) {
+    g.drawLine(x, top, x, bottom);
+  }
+  
+  /**
+   * Draws a horizontal line using the given graphic context
+   * 
+   * @param g is the graphic context
+   * @param c is the component the new line will belong to
+   * @param y is the vertical position
+   * @param left specifies the left point of the line
+   * @param right specifies the right point of the line
+   */
+  protected void paintHorizontalLine(Graphics g, JComponent c, int y, int left, int right) {
+    g.drawLine(left, y, right, y);
+  }
+  
+  /**
+   * Draws an icon at around a specific position
+   * 
+   * @param c is the component the new line will belong to
+   * @param g is the graphic context
+   * @param icon is the icon which will be drawn
+   * @param x is the center position in x-direction
+   * @param y is the center position in y-direction
+   * 
+   * FIXME what to do if x < (icon.width / 2). Same with y
+   */
+  protected void drawCentered(JComponent c, Graphics g, Icon icon, int x, int y) {
+    int beginPositionX = x - icon.getIconWidth() / 2;
+    int beginPositionY = y - icon.getIconHeight() / 2;
+    icon.paintIcon(c, g, beginPositionX, beginPositionY);
+  }
 } // BasicTreeUI

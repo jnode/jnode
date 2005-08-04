@@ -53,6 +53,11 @@ import javax.accessibility.AccessibleIcon;
 import javax.accessibility.AccessibleRole;
 import javax.accessibility.AccessibleStateSet;
 
+/**
+ * An {@link Icon} implementation that is backed by an {@link Image}.
+ *
+ * @author original author unknown
+ */
 public class ImageIcon
   implements Icon, Serializable, Accessible
 {
