@@ -53,6 +53,7 @@ public class ApplicationBar extends JPanel {
 	public ApplicationBar(ExtensionPoint ep) {
 		this.ep = ep;
         setLayout(new GridBagLayout());
+        setOpaque(false);
 		
 		reloadApps();
 	}
