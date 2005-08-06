@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -173,7 +173,7 @@ weekdays: Sunday,Monday,Tuesday,Wednesday,\\
 # The safest way to include a space at the end of a value:
 label   = Name:\\u0020</pre>
    *
-   * @param in the input stream
+   * @param inStream the input stream
    * @throws IOException if an error occurred when reading the input
    * @throws NullPointerException if in is null
    */
@@ -209,8 +209,12 @@ label   = Name:\\u0020</pre>
               {
                 if (pos == line.length())
                   {
-                    // The line continues on the next line.
+                    // The line continues on the next line.  If there
+                    // is no next line, just treat it as a key with an
+                    // empty value.
                     line = reader.readLine();
+		    if (line == null)
+		      line = "";
                     pos = 0;
                     while (pos < line.length()
                            && Character.isWhitespace(c = line.charAt(pos)))
@@ -411,7 +415,17 @@ label   = Name:\\u0020</pre>
    */
   public String getProperty(String key)
   {
-    return getProperty(key, null);
+    Properties prop = this;
+    // Eliminate tail recursion.
+    do
+      {
+        String value = (String) prop.get(key);
+        if (value != null)
+          return value;
+        prop = prop.defaults;
+      }
+    while (prop != null);
+    return null;
   }
 
   /**
@@ -430,17 +444,10 @@ label   = Name:\\u0020</pre>
    */
   public String getProperty(String key, String defaultValue)
   {
-    Properties prop = this;
-    // Eliminate tail recursion.
-    do
-      {
-        String value = (String) prop.get(key);
-        if (value != null)
-          return value;
-        prop = prop.defaults;
-      }
-    while (prop != null);
-    return defaultValue;
+    String prop = getProperty(key);
+    if (prop == null)
+      prop = defaultValue;
+    return prop;
   }
 
   /**

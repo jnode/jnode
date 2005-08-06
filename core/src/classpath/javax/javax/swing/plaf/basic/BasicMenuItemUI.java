@@ -355,7 +355,8 @@ public class BasicMenuItemUI extends MenuItemUI
    */
   public Dimension getPreferredSize(JComponent c)
   {
-    return getPreferredMenuItemSize(c, checkIcon, arrowIcon, defaultTextIconGap);
+    return getPreferredMenuItemSize(c, checkIcon, arrowIcon, 
+        defaultTextIconGap);
   }
 
   protected String getPropertyPrefix()
@@ -534,6 +535,9 @@ public class BasicMenuItemUI extends MenuItemUI
 	                                   vr, cr, tr, defaultTextIconGap);
   if (m.isSelected())
 	checkIcon.paintIcon(m, g, cr.x, cr.y);
+  UIDefaults defaults = UIManager.getLookAndFeelDefaults();
+  defaults.getBorder("CheckBox.border").paintBorder(m, g, cr.x, cr.y, 
+      cr.width, cr.height);
 
 	// We need to calculate position of the menu text and position of
 	// user menu icon if there exists one relative to the check icon.

@@ -633,7 +633,7 @@ public class BasicGraphicsUtils
 
     return new Dimension(insets.left
 			 + contentRect.width 
-			 + insets.right,
+			 + insets.right + b.getHorizontalAlignment(),
                          insets.top
 			 + contentRect.height 
 			 + insets.bottom);
