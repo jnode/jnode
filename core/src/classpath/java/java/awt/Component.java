@@ -988,10 +988,12 @@ public abstract class Component
 	 */
   public void setForeground(Color c)
   {
-		firePropertyChange("foreground", foreground, c);
 		if (peer != null)
 			peer.setForeground(c);
+    
+    Color previous = foreground;
 		foreground = c;
+    firePropertyChange("foreground", previous, c);
 	}
 
 	/**
@@ -1017,7 +1019,7 @@ public abstract class Component
   {
 		if (background != null)
 			return background;
-    return parent == null ? SystemColor.window : parent.getBackground();
+    return parent == null ? null : parent.getBackground();
 	}
 
 	/**
@@ -1031,16 +1033,18 @@ public abstract class Component
   public void setBackground(Color c)
   {
     // return if the background is already set to that color.
-    if (background != null && c != null)
-      if (background.equals(c))
+    if ((c != null) && c.equals(background))
 	return;
+
     // If c is null, inherit from closest ancestor whose bg is set.
     if (c == null && parent != null)
       c = parent.getBackground();
-		firePropertyChange("background", background, c);
     if (peer != null && c != null)
 			peer.setBackground(c);
+    
+    Color previous = background;
 		background = c;
+    firePropertyChange("background", previous, c);
 	}
 
 	/**
@@ -1064,13 +1068,15 @@ public abstract class Component
 	 */
   public Font getFont()
   {
-		if (font != null)
-			return font;
+    Font f = font;
+    if (f != null)
+      return f;
 
-    if (parent != null)
-      return parent.getFont ();
+    Component p = parent;
+    if (p != null)
+      return p.getFont();
     else
-      return new Font ("Dialog", Font.PLAIN, 12);
+      return new Font("Dialog", Font.PLAIN, 12);
 	}
 
 	/**
@@ -1083,9 +1089,9 @@ public abstract class Component
 	 */
   public void setFont(Font newFont)
   {
-    if (font == newFont)
-      return;
-    
+    if((newFont != null && (font == null || !font.equals(newFont)))
+       || newFont == null)
+      {
     Font oldFont = font;
     font = newFont;
 		if (peer != null)
@@ -1093,6 +1099,7 @@ public abstract class Component
     firePropertyChange("font", oldFont, newFont);
     invalidate();
 	}
+  }
 
 	/**
 	 * Tests if the font was explicitly set, or just inherited from the parent.
@@ -1841,10 +1848,19 @@ public abstract class Component
    *
 	 * @see #paint(Graphics)
 	 * @see #repaint()
+   *
+   * @specnote In contrast to what the spec says, tests show that the exact
+   *           behaviour is to clear the background on lightweight and
+   *           top-level components only. Heavyweight components are not
+   *           affected by this method and only call paint().
 	 */
   public void update(Graphics g)
   {
-    if (!isLightweight())
+    // Tests show that the clearing of the background is only done in
+    // two cases:
+    // - If the component is lightwight (yes this is in contrast to the spec).
+    // - If the component is a toplevel container.
+    if (isLightweight() || getParent() == null)
       {
         Rectangle clip = g.getClipBounds();
         if (clip == null)
@@ -1852,7 +1868,6 @@ public abstract class Component
         else
           g.clearRect(clip.x, clip.y, clip.width, clip.height);
       }
-
 		paint(g);
 	}
 
@@ -4208,6 +4223,10 @@ public abstract class Component
 			param.append(",translucent");
 		if (isDoubleBuffered())
 			param.append(",doublebuffered");
+    if (parent == null)
+      param.append(",parent==null");
+    else
+      param.append(",parent==").append(parent.getName());
 		return param.toString();
 	}
 
