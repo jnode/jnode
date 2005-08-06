@@ -16,8 +16,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -298,7 +298,7 @@ public class Collections
      *
      * @param index The index of the element to retrieve.
      * @return the object at the specified index.
-     * @throws IndexOutofBoundsException as any given index
+     * @throws IndexOutOfBoundsException as any given index
      *         is outside the bounds of an empty array.
      */
     public T get(int index)
@@ -2150,7 +2150,7 @@ public class Collections
      * within the underlying collection, first obtaining
      * a lock on the mutex.
      *
-     * @param cl the collection to test for.
+     * @param c1 the collection to test for.
      * @return <code>true</code> if for every element o in c, contains(o)
      *         would return <code>true</code>.
      * @throws ClassCastException if the type of any element in cl is not a valid
@@ -3412,7 +3412,7 @@ public class Collections
      * operation). If the map already contains a key, its value is replaced.
      * A lock is obtained on the mutex before the operation proceeds.
      *
-     * @param m the mapping to load into this map
+     * @param map the mapping to load into this map
      * @throws UnsupportedOperationException if the operation is not supported
      * @throws ClassCastException if a key or value is of the wrong type
      * @throws IllegalArgumentException if something about a key or value
@@ -3436,7 +3436,7 @@ public class Collections
      * <code>containsKey()</code> check is required to avoid this ambiguity.
      * Before the mapping is removed, a lock is obtained on the mutex.
      *
-     * @param key the key to remove
+     * @param o the key to remove
      * @return the value the key mapped to, or null if not present
      * @throws UnsupportedOperationException if deletion is unsupported
      * @throws NullPointerException if the key is null and this map doesn't
@@ -4129,7 +4129,7 @@ public class Collections
      * Test whether the underlying collection contains every element in a given
      * collection.
      *
-     * @param c the collection to test for.
+     * @param c1 the collection to test for.
      * @return <code>true</code> if for every element o in c, contains(o) would
      *         return <code>true</code>.
      * @throws ClassCastException if the type of any element in c is not a valid

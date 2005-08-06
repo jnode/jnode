@@ -291,6 +291,14 @@ public abstract class BasicLookAndFeel extends LookAndFeel
       {
         public Object createValue(UIDefaults def)
         {
+          return BasicIconFactory.getCheckBoxIcon();
+        }
+      },
+      "CheckBox.checkIcon", 
+      new UIDefaults.LazyValue()
+      {
+        public Object createValue(UIDefaults def)
+        {
           return BasicIconFactory.getMenuItemCheckIcon();
         }
       },

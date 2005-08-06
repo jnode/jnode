@@ -88,7 +88,6 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.TreeUI;
 import javax.swing.tree.AbstractLayoutCache;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.FixedHeightLayoutCache;
@@ -584,10 +583,10 @@ public class BasicTreeUI extends TreeUI
       {
          Object cell = path.getLastPathComponent();
          TreeModel mod = tree.getModel();
-         DefaultMutableTreeNode root = (DefaultMutableTreeNode) mod.getRoot();
+        TreeNode root = (TreeNode) mod.getRoot();
          if (!tree.isRootVisible()
             && tree.isExpanded(new TreePath(root)))
-            root = root.getNextNode();
+          root = getNextNode(root);
 
          Point loc = getCellLocation(0, 0, tree, mod, cell, root);
          return getCellBounds(loc.x, loc.y, cell);
@@ -606,12 +605,10 @@ public class BasicTreeUI extends TreeUI
 	 */
 	public TreePath getPathForRow(JTree tree, int row)
 	{
-      DefaultMutableTreeNode node = ((DefaultMutableTreeNode) (tree.getModel())
-            .getRoot());
+    TreeNode node = ((TreeNode) (tree.getModel()).getRoot());
       if (!tree.isRootVisible()
-            && tree.isExpanded(new TreePath(((DefaultMutableTreeNode) node)
-                  .getPath())))
-         node = node.getNextNode();
+        && tree.isExpanded(new TreePath(getPathToRoot(node, 0))))
+      node = getNextNode(node);
 
 		for (int i = 0; i < row; i++)
          node = getNextVisibleNode(node);
@@ -621,7 +618,7 @@ public class BasicTreeUI extends TreeUI
          return null;
 
       // something was found
-      return new TreePath(node.getPath());
+    return new TreePath(getPathToRoot(node, 0));
    }
 
    /**
@@ -650,12 +647,11 @@ public class BasicTreeUI extends TreeUI
 	 */
 	public int getRowCount(JTree tree)
 	{
-      DefaultMutableTreeNode node = ((DefaultMutableTreeNode) (tree.getModel())
+    TreeNode node = ((TreeNode) (tree.getModel())
             .getRoot());
       if (!tree.isRootVisible()
-            && tree.isExpanded(new TreePath(((DefaultMutableTreeNode) node)
-                  .getPath())))
-         node = node.getNextNode();
+        && tree.isExpanded(new TreePath((getPathToRoot(node, 0)))))
+      node = getNextNode(node);
       
       int count = 0;
       
@@ -1309,8 +1305,7 @@ public class BasicTreeUI extends TreeUI
          while (node != null)
          {
             count++;
-            DefaultMutableTreeNode nextNode = getNextVisibleNode(
-                                                                 new DefaultMutableTreeNode(node));
+            TreeNode nextNode = getNextVisibleNode(node);
             if (nextNode != null)
                maxWidth = Math.max(maxWidth, (int) (getCellBounds(0, 0, nextNode)
                      .getWidth()));
@@ -1695,9 +1690,9 @@ public class BasicTreeUI extends TreeUI
 		public void keyPressed(KeyEvent e)
 		{
          TreePath start = BasicTreeUI.this.tree.getLeadSelectionPath();
-         DefaultMutableTreeNode last = null;
+      TreeNode last = null;
          if (start != null)
-            last = (DefaultMutableTreeNode) start.getLastPathComponent();
+        last = (TreeNode) start.getLastPathComponent();
 
          if (last != null)
          {
@@ -1705,11 +1700,11 @@ public class BasicTreeUI extends TreeUI
             if (e.getKeyCode() == KeyEvent.VK_DOWN
                   || e.getKeyCode() == KeyEvent.VK_KP_DOWN)
             {
-               DefaultMutableTreeNode next = (DefaultMutableTreeNode) 
-                  BasicTreeUI.this.getNextVisibleNode(last);
+              TreeNode next = (TreeNode) BasicTreeUI.this.
+              getNextVisibleNode(last);
                if (next != null)
                {
-                  TreePath newPath = new TreePath(next.getPath());
+                  TreePath newPath = new TreePath(getPathToRoot(next, 0));
                   BasicTreeUI.this.selectPath(BasicTreeUI.this.tree, newPath);
                   if (e.isControlDown())
                      tree.setLeadSelectionPath(newPath);
@@ -1724,14 +1719,14 @@ public class BasicTreeUI extends TreeUI
             else if (e.getKeyCode() == KeyEvent.VK_UP
                   || e.getKeyCode() == KeyEvent.VK_KP_UP)
             {
-               DefaultMutableTreeNode prev = (DefaultMutableTreeNode) 
-               BasicTreeUI.this.getPreviousVisibleNode(last);
+              TreeNode prev = (TreeNode) BasicTreeUI.this.
+              getPreviousVisibleNode(last);
             
             if (prev != null)
                {
-                  TreePath newPath = new TreePath(prev.getPath());
+                  TreePath newPath = new TreePath(getPathToRoot(prev, 0));
                BasicTreeUI.this.selectPath(BasicTreeUI.this.tree,
-                     new TreePath(prev.getPath()));
+                                              new TreePath(getPathToRoot(prev, 0)));
                   if (e.isControlDown())
                      tree.setLeadSelectionPath(newPath);
                   else if (!prev.isLeaf() && e.isShiftDown())
@@ -1745,9 +1740,8 @@ public class BasicTreeUI extends TreeUI
             else if (e.getKeyCode() == KeyEvent.VK_LEFT
                   || e.getKeyCode() == KeyEvent.VK_KP_LEFT)
             {
-               TreePath path = new TreePath(last.getPath());
-               DefaultMutableTreeNode p = (DefaultMutableTreeNode) last
-                     .getParent();
+              TreePath path = new TreePath(getPathToRoot(last, 0));
+              TreeNode p = last.getParent();
                
                if (!last.isLeaf() && BasicTreeUI.this.tree.isExpanded(path))
                {
@@ -1756,13 +1750,13 @@ public class BasicTreeUI extends TreeUI
                }
                else if (p != null)
                   BasicTreeUI.this.selectPath(BasicTreeUI.this.tree,
-                        new TreePath(p.getPath()));
+                                            new TreePath(getPathToRoot(p, 0)));
             }
             // RIGHT, KP_RIGHT
             else if (e.getKeyCode() == KeyEvent.VK_RIGHT
                   || e.getKeyCode() == KeyEvent.VK_KP_RIGHT)
             {
-               TreePath path = new TreePath(last.getPath());
+              TreePath path = new TreePath(getPathToRoot(last, 0));
    
                if (!last.isLeaf() && BasicTreeUI.this.tree.isCollapsed(path))
                {
@@ -1771,18 +1765,18 @@ public class BasicTreeUI extends TreeUI
                }
                else
                {
-                  DefaultMutableTreeNode next = (DefaultMutableTreeNode) 
-                     BasicTreeUI.this.getNextVisibleNode(last);
+                  TreeNode next = (TreeNode) BasicTreeUI.this.
+                  getNextVisibleNode(last);
 
                   if (next != null)
                      BasicTreeUI.this.selectPath(BasicTreeUI.this.tree,
-                           new TreePath(next.getPath()));
+                                                new TreePath(getPathToRoot(next, 0)));
                }
             }
             // Enter
             else if (e.getKeyCode() == KeyEvent.VK_ENTER)
             {
-               TreePath path = new TreePath(last.getPath());
+              TreePath path = new TreePath(getPathToRoot(last, 0));
                if (!last.isLeaf())
                {
                   if (BasicTreeUI.this.tree.isExpanded(path))
@@ -2535,16 +2529,16 @@ public class BasicTreeUI extends TreeUI
       if (startNode == null || startNode.equals(node))
   {
         if (!tree.isRootVisible() && tree.isExpanded(new TreePath(mod.getRoot())))
-            return new Point(x + ((((DefaultMutableTreeNode) node).getLevel())
-                  * rightChildIndent), y);
+          return new Point(x + ((getLevel((TreeNode) node)) * 
+              rightChildIndent), y);
          
-         return new Point(x + ((((DefaultMutableTreeNode) node).getLevel() + 1)
+        return new Point(x + ((getLevel((TreeNode) node) + 1)
                * rightChildIndent), y);
   }
 			
       if (!mod.isLeaf(startNode)
-            && tree.isExpanded(new TreePath(
-                  ((DefaultMutableTreeNode) startNode).getPath())))
+        && tree.isExpanded(new TreePath(getPathToRoot(((TreeNode) startNode), 
+            0))))
       {
          Object child = mod.getChild(startNode, 0);
          if (child != null)
@@ -2553,7 +2547,7 @@ public class BasicTreeUI extends TreeUI
   }
       
          return getCellLocation(x, y + rowHeight, tree, mod, node,
-               getNextVisibleNode((DefaultMutableTreeNode) startNode));
+                           getNextVisibleNode((TreeNode) startNode));
 	}
 
 	/**
@@ -2568,15 +2562,15 @@ public class BasicTreeUI extends TreeUI
    void paintNode(Graphics g, int x, int y, JTree tree, Object node,
          boolean isLeaf)
 	{
-      TreePath curr = new TreePath(((DefaultMutableTreeNode) node).getPath());
+    TreePath curr = new TreePath(getPathToRoot(((TreeNode) node), 0));
       boolean selected = tree.isPathSelected(curr);
       boolean expanded = false;
     boolean hasIcons = false;
 
       if (tree.isVisible(curr))
       {
-         DefaultTreeCellRenderer dtcr = (DefaultTreeCellRenderer) tree
-               .getCellRenderer();
+        DefaultTreeCellRenderer dtcr = (DefaultTreeCellRenderer) 
+                createDefaultCellRenderer();
 
          if (!isLeaf)
             expanded = tree.isExpanded(curr);
@@ -2667,8 +2661,7 @@ public class BasicTreeUI extends TreeUI
           }
 
         int max = mod.getChildCount(curr);
-         if (tree.isExpanded(new TreePath(((DefaultMutableTreeNode) curr)
-               .getPath())))
+        if (tree.isExpanded(new TreePath(getPathToRoot(((TreeNode) curr), 0))))
          {
         for (int i = 0; i < max; ++i)
           {
@@ -2685,13 +2678,13 @@ public class BasicTreeUI extends TreeUI
                }
                   
                descent = paintRecursive(g, indent,
-						descent, i, depth + 1, tree, mod, mod.getChild(curr, i));
+                                         descent, i, depth + 1, tree, mod, 
+                                         mod.getChild(curr, i));
           }
       }
       }
 
-      if (tree.isExpanded(new TreePath(((DefaultMutableTreeNode) curr)
-            .getPath())))
+    if (tree.isExpanded(new TreePath(getPathToRoot(((TreeNode) curr), 0))))
          if (y0 != heightOfLine)
       {
 			g.setColor(getHashColor());
@@ -2739,11 +2732,10 @@ public class BasicTreeUI extends TreeUI
             descent += rowHeight;
          
          int max = mod.getChildCount(node);
-         if (tree.isExpanded(new TreePath(((DefaultMutableTreeNode) node)
-               .getPath())))
+        if (tree.isExpanded(new TreePath(getPathToRoot(((TreeNode) node), 0))))
          {
             if (!node.equals(mod.getRoot()))
-               ei.paintIcon(tree, g, indentation - rightChildIndent - 3, h);
+              drawCentered(tree, g, ei, indentation - rightChildIndent - 3, h);
             
             for (int i = 0; i < max; ++i)
             {
@@ -2752,11 +2744,12 @@ public class BasicTreeUI extends TreeUI
                   indent = -1;
                
                descent = paintControlIcons(g, indent,
-                     descent, i, depth + 1, tree, mod, mod.getChild(node, i));
+                                            descent, i, depth + 1, tree, mod, 
+                                            mod.getChild(node, i));
             }
          }
          else if (!node.equals(mod.getRoot()))
-            ci.paintIcon(tree, g, indentation - rightChildIndent - 3, 
+          drawCentered(tree, g, ei, indentation - rightChildIndent - 3, 
                   descent - getRowHeight());
       }
       
@@ -2787,26 +2780,26 @@ public class BasicTreeUI extends TreeUI
     * @return the next visible node in the JTree. Return null if there are no
     *         more.
     */
-   DefaultMutableTreeNode getNextVisibleNode(DefaultMutableTreeNode node)
+  TreeNode getNextVisibleNode(TreeNode node)
    {
-      DefaultMutableTreeNode next = null;
+    TreeNode next = null;
       TreePath current = null;
 
       if (node != null)
-         next = node.getNextNode();
+      next = getNextNode(node);
 
       if (next != null)
       {
-         current = new TreePath(next.getPath());
+        current = new TreePath(getPathToRoot(next, 0));
          if (tree.isVisible(current))
             return next;
 
          while (next != null && !tree.isVisible(current))
          {
-            next = next.getNextNode();
+            next = getNextNode(next);
 
             if (next != null)
-               current = new TreePath(next.getPath());
+              current = new TreePath(getPathToRoot(next, 0));
          }
       }
       return next;
@@ -2820,33 +2813,124 @@ public class BasicTreeUI extends TreeUI
     * @return the next visible node in the JTree. Return null if there are no
     *         more.
     */
-   DefaultMutableTreeNode getPreviousVisibleNode
-                                             (DefaultMutableTreeNode node)
+  TreeNode getPreviousVisibleNode(TreeNode node)
    {
-      DefaultMutableTreeNode prev = null;
+    TreeNode prev = null;
       TreePath current = null;
 
       if (node != null)
-         prev = node.getPreviousNode();
+      prev = getPreviousNode(node);
 
       if (prev != null)
       {
-         current = new TreePath(prev.getPath());
+        current = new TreePath(getPathToRoot(prev, 0));
          if (tree.isVisible(current))
             return prev;
 
          while (prev != null && !tree.isVisible(current))
          {
-            prev = prev.getPreviousNode();
+            prev = getPreviousNode(prev);
 
             if (prev != null)
-               current = new TreePath(prev.getPath());
+              current = new TreePath(getPathToRoot(prev, 0));
          }
       }
       return prev;
    }
    
    /**
+   * Returns the next node in the tree
+   * Package private for use in inner classes.
+   *
+   * @return TreeNode, the next node in the tree
+   */
+  TreeNode getNextNode(TreeNode curr)
+  {
+    if (curr.getChildCount() != 0)
+      return curr.getChildAt(0);
+
+    TreeNode node = curr;
+    TreeNode sibling;
+    
+    do
+      {
+        sibling = getNextSibling(node);
+        node = node.getParent();
+      }
+    while (sibling == null &&
+           node != null);
+    
+    return sibling;
+  }
+
+  /**
+   * Returns the previous node in the tree
+   * Package private for use in inner classes.
+   *
+   * @return TreeNode, the previous node in the tree
+   */
+  TreeNode getPreviousNode(TreeNode node)
+  {
+    TreeNode parent = node.getParent();
+    if (parent == null)
+      return null;
+    
+    TreeNode sibling = getPreviousSibling(node);
+
+    if (sibling == null)
+      return parent;
+
+    int size = sibling.getChildCount();
+    while (size > 0)
+    {
+      sibling = sibling.getChildAt(size - 1);
+      size = sibling.getChildCount();
+    }
+      
+    return sibling;
+  }
+  
+  /**
+   * Returns the next sibling in the tree
+   * Package private for use in inner classes.
+   *
+   * @return TreeNode, the next sibling in the tree
+   */
+  TreeNode getNextSibling(TreeNode node)
+  {
+    TreeNode parent = node.getParent();
+    if (parent == null)
+      return null;
+
+    int index = parent.getIndex(node) + 1;
+    
+    if (index == parent.getChildCount())
+      return null;
+
+    return parent.getChildAt(index);
+  }
+
+  /**
+   * Returns the previous sibling in the tree
+   * Package private for use in inner classes.
+   *
+   * @return TreeNode, the previous sibling in the tree
+   */
+  TreeNode getPreviousSibling(TreeNode node)
+  {
+    TreeNode parent = node.getParent();
+    if (parent == null)
+      return null;
+
+    int index = parent.getIndex(node) - 1;
+
+    if (index < 0)
+      return null;
+
+    return parent.getChildAt(index);
+  }
+  
+  /**
     * Selects the specified path in the tree depending on modes.
     * Package private for use in inner classes.
     * 
@@ -2880,6 +2964,50 @@ public class BasicTreeUI extends TreeUI
          }
       }
    }
+  
+  /**
+   * Returns the path from node to the root.
+   * Package private for use in inner classes.
+   *
+   * @param node the node to get the path to
+   * @param depth the depth of the tree to return a path for
+   *
+   * @return an array of tree nodes that represent the path to node.
+   */
+  TreeNode[] getPathToRoot(TreeNode node, int depth)
+  {
+    if (node == null)
+      {
+        if (depth == 0)
+          return null;
+        
+        return new TreeNode[depth];
+      }
+
+    TreeNode[] path = getPathToRoot(node.getParent(), depth + 1);
+    path[path.length - depth - 1] = node;
+    return path;
+  }
+  
+  /**
+   * Returns the level of the node in the tree.
+   *
+   * @return the number of the level
+   */
+  public int getLevel(TreeNode node)
+  {
+    int count = -1;
+    TreeNode current = node;
+
+    do
+      {
+        current = current.getParent();
+        count++;
+      }
+    while (current != null);
+
+    return count;
+  }
   
   /**
    * Draws a vertical line using the given graphic context
