@@ -48,34 +48,30 @@ package java.awt;
 public class BorderLayout implements LayoutManager2, java.io.Serializable
 {
 
-/*
- * Static Variables
- */
-
-/**
+  /**
   * Constant indicating the top of the container
   */
-public static final String NORTH = "North";
+  public static final String NORTH = "North";
 
-/**
+  /**
   * Constant indicating the bottom of the container
   */
-public static final String SOUTH = "South";
+  public static final String SOUTH = "South";
 
-/**
+  /**
   * Constant indicating the right side of the container
   */
-public static final String EAST = "East";
+  public static final String EAST = "East";
 
-/**
+  /**
   * Constant indicating the left side of the container
   */
-public static final String WEST = "West";
+  public static final String WEST = "West";
 
-/**
+  /**
   * Constant indicating the center of the container
   */
-public static final String CENTER = "Center";
+  public static final String CENTER = "Center";
 
 
   /**
@@ -91,7 +87,6 @@ public static final String CENTER = "Center";
    */
   public static final String BEFORE_FIRST_LINE = "First";
 
-
   /**
    * The constant indicating the position after the last line of the
    * layout.  The exact position depends on the writing system: For a
@@ -104,7 +99,6 @@ public static final String CENTER = "Center";
    * @since 1.2
    */
   public static final String AFTER_LAST_LINE = "Last";
-
 
   /**
    * The constant indicating the position before the first item of the
@@ -119,7 +113,6 @@ public static final String CENTER = "Center";
    */
   public static final String BEFORE_LINE_BEGINS = "Before";
 
-
   /**
    * The constant indicating the position after the last item of the
    * layout.  The exact position depends on the writing system: For a
@@ -133,7 +126,6 @@ public static final String CENTER = "Center";
    */
   public static final String AFTER_LINE_ENDS = "After";
 
-
   /**
    * The constant indicating the position before the first line of the
    * layout.  The exact position depends on the writing system: For a
@@ -143,7 +135,6 @@ public static final String CENTER = "Center";
    * @since 1.4
    */
   public static final String PAGE_START = BEFORE_FIRST_LINE;
-
 
   /**
    * The constant indicating the position after the last line of the
@@ -155,7 +146,6 @@ public static final String CENTER = "Center";
    */
   public static final String PAGE_END = AFTER_LAST_LINE;
 
-
   /**
    * The constant indicating the position before the first item of the
    * layout.  The exact position depends on the writing system: For a
@@ -165,7 +155,6 @@ public static final String CENTER = "Center";
    * @since 1.4
    */
   public static final String LINE_START = BEFORE_LINE_BEGINS;
-
 
   /**
    * The constant indicating the position after the last item of the
@@ -178,162 +167,131 @@ public static final String CENTER = "Center";
   public static final String LINE_END = AFTER_LINE_ENDS;
 
 
-
-// Serialization constant
-private static final long serialVersionUID = -8658291919501921765L;
-
-/*************************************************************************/
-
-/*
- * Instance Variables
+  /**
+   * Serialization constant.
  */
+  private static final long serialVersionUID = -8658291919501921765L;
 
-/**
+
+  /**
   * @serial
   */
-private Component north;
+  private Component north;
 
-/**
+  /**
   * @serial
   */
-private Component south;
+  private Component south;
 
-/**
+  /**
   * @serial
   */
-private Component east;
+  private Component east;
 
-/**
+  /**
   * @serial
   */
-private Component west;
+  private Component west;
 
-/**
+  /**
   * @serial
   */
-private Component center;
+  private Component center;
 
-/**
+  /**
   * @serial
   */
-private Component firstLine;
+  private Component firstLine;
 
-/**
+  /**
   * @serial
   */
-private Component lastLine;
+  private Component lastLine;
 
-/**
+  /**
   * @serial
   */
-private Component firstItem;
+  private Component firstItem;
 
-/**
+  /**
   * @serial
   */
-private Component lastItem;
+  private Component lastItem;
 
-/**
+  /**
   * @serial The horizontal gap between components
   */
-private int hgap;
+  private int hgap;
 
-/**
+  /**
   * @serial The vertical gap between components
   */
-private int vgap;
+  private int vgap;
 
-/*************************************************************************/
 
-/*
- * Constructors
- */
-
-/**
+  /**
   * Initializes a new instance of <code>BorderLayout</code> with no
   * horiztonal or vertical gaps between components.
   */
-public
-BorderLayout()
-{
+  public BorderLayout()
+  {
   this(0,0);
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Initializes a new instance of <code>BorderLayout</code> with the
   * specified horiztonal and vertical gaps between components.
   *
   * @param hgap The horizontal gap between components.
   * @param vgap The vertical gap between components.
   */
-public
-BorderLayout(int hgap, int vgap)
-{
+  public BorderLayout(int hgap, int vgap)
+  {
   this.hgap = hgap;
   this.vgap = vgap;
-}
+  }
 
-/*************************************************************************/
-
-/*
- * Instance Variables
- */
-
-/**
+  /**
   * Returns the horitzontal gap value.
   *
   * @return The horitzontal gap value.
   */
-public int
-getHgap()
-{
+  public int getHgap()
+  {
   return(hgap);
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Sets the horizontal gap to the specified value.
   *
   * @param hgap The new horizontal gap.
   */
-public void
-setHgap(int hgap)
-{
+  public void setHgap(int hgap)
+  {
   this.hgap = hgap;
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Returns the vertical gap value.
   *
   * @return The vertical gap value.
   */
-public int
-getVgap()
-{
+  public int getVgap()
+  {
   return(vgap);
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Sets the vertical gap to the specified value.
   *
   * @param vgap The new vertical gap value.
   */
-public void
-setVgap(int vgap)
-{
+  public void setVgap(int vgap)
+  {
   this.vgap = vgap;
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Adds a component to the layout in the specified constraint position, 
   * which must be one of the string constants defined in this class.
   *
@@ -343,18 +301,15 @@ setVgap(int vgap)
   * @exception IllegalArgumentException If the constraint object is not
   * a string, or is not one of the specified constants in this class.
   */
-public void
-addLayoutComponent(Component component, Object constraints)
-{
+  public void addLayoutComponent(Component component, Object constraints)
+  {
   if (constraints != null && ! (constraints instanceof String))
     throw new IllegalArgumentException("Constraint must be a string");
 
   addLayoutComponent((String) constraints, component);
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Adds a component to the layout in the specified constraint position, 
   * which must be one of the string constants defined in this class.
   *
@@ -367,9 +322,8 @@ addLayoutComponent(Component component, Object constraints)
   * @deprecated This method is deprecated in favor of
   * <code>addLayoutComponent(Component, Object)</code>.
   */
-public void
-addLayoutComponent(String constraints, Component component)
-{
+  public void addLayoutComponent(String constraints, Component component)
+  {
   String str = constraints;
 
   if (str == null || str.equals(CENTER))
@@ -392,18 +346,15 @@ addLayoutComponent(String constraints, Component component)
     lastItem = component;
   else
     throw new IllegalArgumentException("Constraint value not valid: " + str);
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Removes the specified component from the layout.
   *
   * @param component The component to remove from the layout.
   */
-public void
-removeLayoutComponent(Component component)
-{
+  public void removeLayoutComponent(Component component)
+  {
   if (north == component)
     north = null;
   if (south == component)
@@ -422,56 +373,45 @@ removeLayoutComponent(Component component)
     firstLine = null;
   if (lastLine == component)
     lastLine = null;
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Returns the minimum size of the specified container using this layout.
   *
   * @param target The container to calculate the minimum size for.
   *
   * @return The minimum size of the container
   */
-public Dimension 
-minimumLayoutSize(Container target)
-{
+  public Dimension minimumLayoutSize(Container target)
+  {
   return calcSize(target, MIN);
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Returns the preferred size of the specified container using this layout.
   *
   * @param target The container to calculate the preferred size for.
   *
   * @return The preferred size of the container
   */
-public Dimension 
-preferredLayoutSize(Container target)
-{
+  public Dimension preferredLayoutSize(Container target)
+  {
   return calcSize(target, PREF);
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Returns the maximum size of the specified container using this layout.
   *
   * @param target The container to calculate the maximum size for.
   *
   * @return The maximum size of the container
   */
-public Dimension 
-maximumLayoutSize(Container target)
-{
+  public Dimension maximumLayoutSize(Container target)
+  {
   return calcSize(target, MAX);
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Returns the X axis alignment, which is a <code>float</code> indicating
   * where along the X axis this container wishs to position its layout.
   * 0 indicates align to the left, 1 indicates align to the right, and 0.5
@@ -481,15 +421,12 @@ maximumLayoutSize(Container target)
   *
   * @return The X alignment value.
   */
-public float
-getLayoutAlignmentX(Container parent)
-{
+  public float getLayoutAlignmentX(Container parent)
+  {
   return(parent.getAlignmentX());
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Returns the Y axis alignment, which is a <code>float</code> indicating
   * where along the Y axis this container wishs to position its layout.
   * 0 indicates align to the top, 1 indicates align to the bottom, and 0.5
@@ -499,36 +436,30 @@ getLayoutAlignmentX(Container parent)
   *
   * @return The Y alignment value.
   */
-public float
-getLayoutAlignmentY(Container parent)
-{
+  public float getLayoutAlignmentY(Container parent)
+  {
   return(parent.getAlignmentY());
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Instructs this object to discard any layout information it might
   * have cached.
   *
   * @param parent The parent container.
   */
-public void
-invalidateLayout(Container parent)
-{
-}
+  public void invalidateLayout(Container parent)
+  {
+    // FIXME: Implement this properly!
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Lays out the specified container according to the constraints
   * in this object.
   *
   * @param target The container to lay out.
   */
-public void
-layoutContainer(Container target)
-{
+  public void layoutContainer(Container target)
+  {
   synchronized (target.getTreeLock ())
     {
       Insets i = target.getInsets();
@@ -567,7 +498,8 @@ layoutContainer(Container target)
       Dimension s = calcCompSize(my_south, PREF);
       Dimension e = calcCompSize(my_east, PREF);
       Dimension w = calcCompSize(my_west, PREF);
-      Dimension t = target.getSize();
+        int targetWidth = target.getWidth();
+        int targetHeight = target.getHeight();
 
       /*
 	<-> hgap     <-> hgap
@@ -593,20 +525,20 @@ layoutContainer(Container target)
       int x1 = i.left;
       int x2 = x1 + w.width + (w.width == 0 ? 0 : hgap);
       int x3;
-      if (t.width <= i.right + e.width)
+        if (targetWidth <= i.right + e.width)
         x3 = x2 + w.width + (w.width == 0 ? 0 : hgap);
       else
-        x3 = t.width - i.right - e.width;
-      int ww = t.width - i.right - i.left;
+          x3 = targetWidth - i.right - e.width;
+        int ww = targetWidth - i.right - i.left;
 
       int y1 = i.top;
       int y2 = y1 + n.height + (n.height == 0 ? 0 : vgap);
       int midh = Math.max(e.height, Math.max(w.height, c.height));
       int y3;
-      if (t.height <= i.bottom + s.height)
+        if (targetHeight <= i.bottom + s.height)
         y3 = y2 + midh + vgap;
       else
-        y3 = t.height - i.bottom - s.height;
+          y3 = targetHeight - i.bottom - s.height;
       int hh = y3-y2-(s.height == 0 ? 0 : vgap);
 
       setBounds(center, x2, y2, x3-x2-(w.width == 0 ? 0 : hgap), hh);
@@ -615,37 +547,36 @@ layoutContainer(Container target)
       setBounds(my_west, x1, y2, w.width, hh);
       setBounds(my_east, x3, y2, e.width, hh);
     }
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Returns a string representation of this layout manager.
   *
   * @return A string representation of this object.
   */
-public String
-toString()
-{
+  public String toString()
+  {
   return getClass().getName() + "[hgap=" + hgap + ",vgap=" + vgap + "]";
-}
+  }
 
-private void
-setBounds(Component comp, int x, int y, int w, int h)
-{
+  /**
+   * FIXME: Document me!
+   */
+  private void setBounds(Component comp, int x, int y, int w, int h)
+  {
   if (comp == null)
     return;
   comp.setBounds(x, y, w, h);
-}
+  }
 
-// Some constants for use with calcSize().
-private static final int MIN = 0;
-private static final int MAX = 1;
-private static final int PREF = 2;
+  // FIXME: Maybe move to top of file.
+  // Some constants for use with calcSize().
+  private static final int MIN = 0;
+  private static final int MAX = 1;
+  private static final int PREF = 2;
 
-private Dimension
-calcCompSize(Component comp, int what)
-{
+  private Dimension calcCompSize(Component comp, int what)
+  {
   if (comp == null || !comp.isVisible())
     return new Dimension(0, 0);
   if (what == MIN)
@@ -653,13 +584,14 @@ calcCompSize(Component comp, int what)
   else if (what == MAX)
     return comp.getMaximumSize();
   return comp.getPreferredSize();
-}
+  }
 
-// This is a helper function used to compute the various sizes for
-// this layout.
-private Dimension
-calcSize(Container target, int what)
-{
+  /**
+   * This is a helper function used to compute the various sizes for
+   * this layout.
+   */
+  private Dimension calcSize(Container target, int what)
+  {
   synchronized (target.getTreeLock ())
     {
       Insets ins = target.getInsets();
@@ -700,7 +632,7 @@ calcSize(Container target, int what)
       Dimension cdim = calcCompSize(center, what);
 
       int width = edim.width + cdim.width + wdim.width + (hgap * 2);
-      // check for overflow
+        // Check for overflow.
       if (width < edim.width || width < cdim.width || width < cdim.width)
           width = Integer.MAX_VALUE;
 
@@ -719,7 +651,7 @@ calcSize(Container target, int what)
 
       int addedHeight = height + (ndim.height + sdim.height + (vgap * 2)
                                   + ins.top + ins.bottom);
-      // check for overflow
+        // Check for overflow.
       if (addedHeight < height)
           height = Integer.MAX_VALUE;
       else
@@ -727,5 +659,5 @@ calcSize(Container target, int what)
 
       return(new Dimension(width, height));
     }
+  }
 }
-} // class BorderLayout 
