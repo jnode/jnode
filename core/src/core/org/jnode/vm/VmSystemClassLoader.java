@@ -39,6 +39,7 @@ import java.util.TreeMap;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.util.BootableArrayList;
 import org.jnode.util.ByteBufferInputStream;
+import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.jnode.vm.classmgr.ClassDecoder;
 import org.jnode.vm.classmgr.IMTBuilder;
 import org.jnode.vm.classmgr.SelectorMap;
@@ -49,7 +50,6 @@ import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.compiler.CompiledIMT;
 import org.jnode.vm.compiler.IMTCompiler;
 import org.jnode.vm.compiler.NativeCodeCompiler;
-import org.vmmagic.pragma.PrivilegedActionPragma;
 
 /**
  * Default classloader.
@@ -285,8 +285,9 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      * @return The loaded class
      * @throws ClassNotFoundException
      */
+    @PrivilegedActionPragma
     public VmType< ? > loadClass(String name, boolean resolve)
-            throws ClassNotFoundException, PrivilegedActionPragma {
+            throws ClassNotFoundException {
 
         // Also implement the java.lang.ClassLoader principals here
         // otherwise they cannot work in java.lang.ClassLoader.

@@ -32,4 +32,10 @@ public interface MethodPragmaFlags {
     /** Method will behave like a Privileged action */
     public static final char PRIVILEGEDACTION = 0x0040;
     
+    /** No read barriers will be emitted */
+    public static final char NOREADBARRIER = 0x0080;
+    
+    /** No write barriers will be emitted */
+    public static final char NOWRITEBARRIER = 0x0100;
+    
 }

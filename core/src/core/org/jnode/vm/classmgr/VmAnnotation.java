@@ -454,4 +454,11 @@ public final class VmAnnotation extends VmSystemObject {
             return sb.toString();
         }
     }
+
+    /**
+     * @return Returns the typeDescr.
+     */
+    final String getTypeDescriptor() {
+        return typeDescr;
+    }
 }

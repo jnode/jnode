@@ -24,6 +24,7 @@ package org.jnode.vm;
 import java.io.Writer;
 import java.util.HashMap;
 
+import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.jnode.vm.classmgr.IMTBuilder;
 import org.jnode.vm.classmgr.SelectorMap;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
@@ -31,7 +32,6 @@ import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.compiler.CompiledIMT;
-import org.vmmagic.pragma.PrivilegedActionPragma;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -118,8 +118,9 @@ public final class VmJavaClassLoader extends VmAbstractClassLoader {
      * @see org.jnode.vm.classmgr.VmClassLoader#loadClass(java.lang.String,
      *      boolean)
      */
-    public final VmType loadClass(String className, boolean resolve)
-            throws ClassNotFoundException, PrivilegedActionPragma {
+    @PrivilegedActionPragma
+    public final VmType<?> loadClass(String className, boolean resolve)
+            throws ClassNotFoundException {
         final VmType<?> cls;
         if (className.charAt(0) == '[') {
             cls = loadArrayClass(className, resolve);

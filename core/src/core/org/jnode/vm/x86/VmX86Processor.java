@@ -33,11 +33,11 @@ import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmThread;
+import org.jnode.vm.annotation.LoadStatics;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.performance.PerformanceCounters;
 import org.jnode.vm.x86.performance.X86PerformanceCounters;
-import org.vmmagic.pragma.LoadStaticsPragma;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Word;
 
@@ -244,7 +244,8 @@ public abstract class VmX86Processor extends VmProcessor {
     /**
      * Entry point for starting Application processors.
      */
-    static final void applicationProcessorMain() throws LoadStaticsPragma {
+    @LoadStatics
+    static final void applicationProcessorMain() {
         final VmX86Processor cpu = (VmX86Processor) Unsafe
                 .getCurrentProcessor();
         BootLog.info("Starting Application Processor " + cpu.getId());
