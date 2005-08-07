@@ -727,7 +727,12 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 						screenSize, eventQueue);
                 keyboardHandler.install();
 
-				onInitialize();
+                AccessController.doPrivileged(new PrivilegedAction() {
+                    public Object run() {
+                        onInitialize();
+                        return null;
+                    }
+                });
 				this.refCount = rc;
 			} catch (DeviceException ex) {
 				decRefCount(true);
