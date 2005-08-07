@@ -142,17 +142,15 @@ public final class VmCompiledCode extends AbstractCode {
     }
 
     /**
-     * Gets the linenumber and optional method info (for inlined methods) of a
-     * given address.
+     * Gets address map index for the given instruction pointer.
      * 
-     * @param address
-     * @return The linenumber for the given pc, or -1 is not found.
+     * @param instrPtr
+     * @return The index, or -1 is not found.
      */
-    public String getLocationInfo(VmMethod expectedMethod, Address address) {
+    public final int getAddressMapIndex(Address instrPtr) {
         final Address codeAddr = Address.fromAddress(nativeCode);
-        final int offset = (int) address.toWord().sub(codeAddr.toWord())
-                .toInt();
-        return addressTable.getLocationInfo(expectedMethod, offset);
+        final int offset = instrPtr.toWord().sub(codeAddr.toWord()).toInt();
+        return addressTable.getIndexForOffset(offset);
     }
 
     /**
@@ -245,5 +243,13 @@ public final class VmCompiledCode extends AbstractCode {
      */
     public final VmMethod getMethod() {
         return method;
+    }
+
+    /**
+     * @return Returns the addressTable.
+     * Can be null.
+     */
+    public final VmAddressMap getAddressMap() {
+        return addressTable;
     }
 }

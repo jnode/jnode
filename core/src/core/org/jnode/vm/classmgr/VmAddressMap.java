@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.vm.classmgr;
 
 import java.io.PrintStream;
@@ -40,8 +40,15 @@ public final class VmAddressMap extends VmSystemObject {
     private VmMethod[] methodTable;
 
     private int[] offsetTable;
+
+    /** Program counter at a given index */
     private char[] pcTable;
+
+    /** Index in the methodTable at a index (null is methodTable.length == 1) */
     private byte[] methodIndexTable;
+
+    /** Inline depth at a given index (0..) (null is methodTable.length == 1) */
+    private byte[] inlineDepthTable;
 
     /**
      * Create a new instance
@@ -56,10 +63,11 @@ public final class VmAddressMap extends VmSystemObject {
      *            Offset from the start of the method
      * @param pc
      */
-    public void add(VmMethod method, int pc, int offset) {
-        if (offsetTable != null) { throw new RuntimeException(
-                "Address table is locked"); }
-        final AddressPcEntry entry = new AddressPcEntry(method, pc, offset);
+    public void add(VmMethod method, int pc, int offset, int inlineDepth) {
+        if (offsetTable != null) {
+            throw new RuntimeException("Address table is locked");
+        }
+        final AddressPcEntry entry = new AddressPcEntry(method, pc, offset, inlineDepth);
         if (list == null) {
             list = entry;
         } else {
@@ -79,52 +87,75 @@ public final class VmAddressMap extends VmSystemObject {
     }
 
     /**
-     * Gets the linenumber of a given code offset.
+     * Gets the last known address index that corresponds to the given code offset.
      * 
      * @param offset
-     * @return The linenumber for the given pc, or -1 is not found.
+     * @return -1 of not found.
      */
-    public String getLocationInfo(VmMethod expectedMethod, int offset) {
+    public final int getIndexForOffset(int offset) {
         final int[] offsetTable = this.offsetTable;
-        final char[] pcTable = this.pcTable;
-        final byte[] methodIndexTable = this.methodIndexTable;
         if (offsetTable != null) {
             final int length = offsetTable.length;
-            char lastPC = 0;
-            int lastMethodIdx = 0;
-            char lastExpMethPC = 0;
-            for (int i = 0; i < length; i++) {
-                final int o = offsetTable[i];
-                if (o > offset) {
-                    break;
-                } else {
-                    lastMethodIdx = methodIndexTable[i];
-                    lastPC = pcTable[i];
-                    if (methodTable[lastMethodIdx] == expectedMethod) {
-                        lastExpMethPC = lastPC;
-                    }
-                }
-            }
-            final VmMethod m = methodTable[ lastMethodIdx];
-            final VmByteCode bc = m.getBytecode();
-            if (bc != null) { 
-                final int line = bc.getLineNr(lastPC);
-                if (m != expectedMethod) {
-                    // This is an inlined method
-                    final int expMethLine = expectedMethod.getBytecode().getLineNr(lastExpMethPC);
-                    final VmType mClass = m.getDeclaringClass();
-                    if (mClass != expectedMethod.getDeclaringClass()) {
-                        return expMethLine + " [" + m.getDeclaringClass().getName() + "#" + m.getName() + " " + line + "]";
-                    } else {
-                        return expMethLine + " [#" + m.getName() + " " + line + "]";
-                    }
-                } else {
-                    // This is a non-inlined method
-                    return String.valueOf(line);
+            for (int i = 1; i < length; i++) {
+                if (offsetTable[i] > offset) {
+                    return i - 1;
                 }
             }
         }
-        return "?";
+        return -1;
+    }
+    
+    /**
+     * Gets the method at the given index.
+     * @param index
+     * @return
+     */
+    public final VmMethod getMethodAtIndex(int index) {
+        if (index < 0) {
+            return null;
+        } else if (methodIndexTable == null) {
+            return methodTable[0];
+        } else {
+            return methodTable[methodIndexTable[index] & 0xFF];
+        }
+    }
+
+    /**
+     * Gets the program counter at the given index.
+     * @param index
+     * @return
+     */
+    public final int getProgramCounterAtIndex(int index) {
+        if (index < 0) {
+            return 0;
+        } else {
+            return pcTable[index];
+        }
+    }
+
+    /**
+     * Gets the index that contains the call to the (inlined) method that is
+     * identified by the given index.
+     * 
+     * @param offset
+     * @return The callsite index, or -1 if there is no callsite within this
+     *         address map.
+     */
+    public final int getCallSiteIndex(int index) {
+        final byte[] inlineDepthTable = this.inlineDepthTable;
+        if ((index >= 0) && (inlineDepthTable != null)) {
+            final int tableLength = inlineDepthTable.length;
+            index = Math.min(index, tableLength - 1);
+            final int depth = inlineDepthTable[index--];
+            while (index >= 0) {
+                if (inlineDepthTable[index] == depth - 1) {
+                    return index;
+                } else {
+                    index--;
+                }
+            }
+        }
+        return -1;
     }
 
     /**
@@ -134,9 +165,11 @@ public final class VmAddressMap extends VmSystemObject {
     final void lock() {
         AddressPcEntry p = list;
         int count = 0;
+        int maxInlineDepth = 0;
         final ArrayList<VmMethod> methods = new ArrayList<VmMethod>();
         while (p != null) {
             count++;
+            maxInlineDepth = Math.max(maxInlineDepth, p.inlineDepth & 0xFF);
             final VmMethod m = p.method;
             if (!methods.contains(m)) {
                 methods.add(m);
@@ -144,20 +177,28 @@ public final class VmAddressMap extends VmSystemObject {
             p = p.next;
         }
 
-        final int[] offsetTable = new int[ count];
+        final int methodCount = methods.size();
+        final int[] offsetTable = new int[count];
         final char[] pcTable = new char[count];
-        final byte[] methodIndexTable = new byte[count];
-        this.methodTable = (VmMethod[]) methods.toArray(new VmMethod[ methods
-                                                                      .size()]);
+        final byte[] methodIndexTable = (methodCount > 1) ? new byte[count] : null;
+        final byte[] inlineDepthTable = (maxInlineDepth == 0) ? null : new byte[count];
+        this.methodTable = (VmMethod[]) methods.toArray(new VmMethod[methodCount]);
+        
         p = list;
         int i = 0;
         int lastOffset = -1;
         while (p != null) {
-            methodIndexTable[i] = (byte)methods.indexOf(p.method);
+            if (methodIndexTable != null) {
+                methodIndexTable[i] = (byte) methods.indexOf(p.method);
+            }
             pcTable[i] = p.pc;
             offsetTable[i] = p.offset;
-            if (p.offset < lastOffset) { throw new InternalError(
-                    "unordered offset found"); }
+            if (inlineDepthTable != null) {
+                inlineDepthTable[i] = p.inlineDepth;
+            }
+            if (p.offset < lastOffset) {
+                throw new InternalError("unordered offset found");
+            }
             lastOffset = p.offset;
             i++;
             p = p.next;
@@ -165,16 +206,17 @@ public final class VmAddressMap extends VmSystemObject {
         this.offsetTable = offsetTable;
         this.pcTable = pcTable;
         this.methodIndexTable = methodIndexTable;
+        this.inlineDepthTable = inlineDepthTable;
         this.list = null;
     }
 
     public void writeTo(PrintStream out) {
         for (int i = 0; i < offsetTable.length; i++) {
-            final int methodIdx = methodIndexTable[i];
+            final int methodIdx = (methodIndexTable != null) ? methodIndexTable[i] : 0;
             final int pc = pcTable[i];
             final int offset = offsetTable[i];
 
-            out.println(methodTable[ methodIdx].getName() + ", pc[" + pc
+            out.println(methodTable[methodIdx].getName() + ", pc[" + pc
                     + "]\t0x" + NumberUtils.hex(offset));
         }
     }
@@ -187,12 +229,15 @@ public final class VmAddressMap extends VmSystemObject {
 
         final int offset;
 
+        final byte inlineDepth;
+
         AddressPcEntry next;
 
-        public AddressPcEntry(VmMethod method, int pc, int offset) {
+        public AddressPcEntry(VmMethod method, int pc, int offset, int inlineDepth) {
             this.method = method;
-            this.pc = (char)pc;
+            this.pc = (char) pc;
             this.offset = offset;
+            this.inlineDepth = (byte)inlineDepth;
         }
     }
 }

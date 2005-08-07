@@ -113,8 +113,8 @@ public final class CompiledMethod {
 	 * @param pc
 	 * @param offset
 	 */
-	public final void add(VmMethod method, int pc, int offset) {
-		addressTable.add(method, pc, offset);
+	public final void add(VmMethod method, int pc, int offset, int inlineDepth) {
+	    addressTable.add(method, pc, offset, inlineDepth);
 	}
 	
 	/**
