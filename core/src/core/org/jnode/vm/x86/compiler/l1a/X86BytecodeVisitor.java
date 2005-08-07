@@ -156,6 +156,9 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     /** Type size information */
     private final TypeSizeInfo typeSizeInfo;
     
+    /** Current inline depth (starting at 0) */
+    private byte inlineDepth;
+    
 	/**
 	 * Virtual Stack: this stack contains values that have been computed but not
 	 * emitted yet; emission is delayed to allow for optimizations, in
@@ -444,7 +447,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		helper.setMethod(previousMethod);
 		os.setObjectRef(inlinedMethodInfo.getEndOfInlineLabel());
 		this.currentMethod = previousMethod;
-        
+        this.inlineDepth--;
+
         // Push the types on the vstack
 		inlinedMethodInfo.pushExitStack(ifac, vstack);
         
@@ -1004,6 +1008,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		// and that fails if not all registers are freed.
 		vstack.push(eContext);
 		this.inlinedMethodInfo.setOuterMethodStack(vstack.asTypeStack());
+        this.inlineDepth++;
 	}
 
 	/**
@@ -1052,7 +1057,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			setCurInstrLabel = false;
 		}
 		final int offset = os.getLength() - startOffset;
-		cm.add(currentMethod, address, offset);
+		cm.add(currentMethod, address, offset, inlineDepth);
 	}
 
 	/**

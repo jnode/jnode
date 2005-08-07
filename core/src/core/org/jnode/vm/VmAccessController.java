@@ -32,7 +32,6 @@ import org.jnode.vm.annotation.CheckPermission;
 import org.jnode.vm.annotation.DoPrivileged;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
-import org.vmmagic.unboxed.Address;
 
 /**
  * JNode VM implementation of the java AccessControl system.
@@ -65,10 +64,10 @@ public final class VmAccessController {
             // that does not require any memory allocations.
             final VmStackReader reader = Unsafe.getCurrentProcessor()
                     .getArchitecture().getStackReader();
-            Address sf = VmMagic.getCurrentFrame();
+            final VmStackFrameEnumerator sfEnum = new VmStackFrameEnumerator(reader);
             int recursionCount = 0;
-            while (reader.isValid(sf)) {
-                final VmMethod method = reader.getMethod(sf);
+            while (sfEnum.isValid()) {
+                final VmMethod method = sfEnum.getMethod();
                 if (method.hasDoPrivilegedPragma()) {
                     // Stop here with the current thread's stacktrace.
                     break;
@@ -97,7 +96,7 @@ public final class VmAccessController {
                     // Break here, do not include inherited thread context
                     return;
                 }
-                sf = reader.getPrevious(sf);
+                sfEnum.next();
             }
 
             final VmThread thread = VmThread.currentThread();

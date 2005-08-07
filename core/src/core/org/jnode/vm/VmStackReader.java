@@ -126,30 +126,26 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @param limit Maximum length of returned array.
 	 * @return VmStackFrame[]
 	 */
-	final VmStackFrame[] getVmStackTrace(Address argFrame, Address ip, int limit) {
+	final VmStackFrame[] getVmStackTrace(Address frame, Address ip, int limit) {
 
-		final Address frame = argFrame;
-		Address f = frame;
+        final VmStackFrameEnumerator sfEnum = new VmStackFrameEnumerator(this, frame, ip);
 		int count = 0;
-		while (isValid(f) && (count < limit)) {
+        while (sfEnum.isValid() && (count < limit)) {
 			count++;
-			f = getPrevious(f);
+            sfEnum.next();
 		}
-		if ((f != null) && !isStackBottom(f) && (count < limit)) {
-			Unsafe.debug("Corrupted stack!, st.length=");
-			Unsafe.debug(count);
-			Unsafe.debug(" f.magic=");
-			//Unsafe.die();
-		}
+//		if ((f != null) && !isStackBottom(f) && (count < limit)) {
+//			Unsafe.debug("Corrupted stack!, st.length=");
+//			Unsafe.debug(count);
+//			Unsafe.debug(" f.magic=");
+//			//Unsafe.die();
+//		}
 
 		final VmStackFrame[] stack = new VmStackFrame[count];
-		f = frame;
+        sfEnum.reset(frame, ip);
 		for (int i = 0; i < count; i++) {
-			stack[i] = new VmStackFrame(f, this, ip);
-			// Subtract 1, because the return address is directly after
-			// the location where the previous frame was executing.
-			ip = stack[i].getReturnAddress().add(-1);
-			f = getPrevious(f);
+			stack[i] = new VmStackFrame(sfEnum.getMethod(), sfEnum.getProgramCounter());
+            sfEnum.next();
 		}
 
 		return stack;

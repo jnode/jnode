@@ -21,10 +21,9 @@
  
 package org.jnode.vm;
 
-import org.jnode.vm.classmgr.VmCompiledCode;
+import org.jnode.vm.classmgr.VmByteCode;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
-import org.vmmagic.unboxed.Address;
 
 /**
  * A VmFrame is the execution frame (locals & stack) for a method during
@@ -41,23 +40,16 @@ public final class VmStackFrame extends VmSystemObject {
 
 	/** The method executing in this frame */
 	private final VmMethod sfMethod;
-	/** A magic value used to detect stack errors */
-	private final VmCompiledCode sfCompiledCode;
-	/** A reference to the return address */
-	private final Address sfReturnAddress;
-	/** A reference to instruction pointer of this frame */
-	private final Address sfInstructionPointer;
+    private final int programCounter;
 	
 	/**
 	 * Initialize this instance.
 	 * @param src
 	 * @param reader
 	 */
-	VmStackFrame(Address src, VmStackReader reader, Address ip) {
-		this.sfMethod = reader.getMethod(src);
-		this.sfCompiledCode = reader.getCompiledCode(src);
-		this.sfReturnAddress = reader.getReturnAddress(src);
-		this.sfInstructionPointer = ip;
+	VmStackFrame(VmMethod method, int programCounter) {
+		this.sfMethod = method;
+        this.programCounter = programCounter;
 	}
 
 	/**
@@ -68,23 +60,22 @@ public final class VmStackFrame extends VmSystemObject {
 	}
 
 	/**
-	 * @return Returns the returnAddress.
-	 */
-	public final Address getReturnAddress() {
-		return this.sfReturnAddress;
-	}
-	
-	/**
 	 * Gets the line number of the current instruction of this frame.
 	 * @return The line number, or -1 if not found.
 	 */
 	public final String getLocationInfo() {
-	    final VmCompiledCode cc = sfCompiledCode;
-	    if ((cc != null) && (sfInstructionPointer != null)) {
-	        return cc.getLocationInfo(sfMethod, sfInstructionPointer);
-	    } else {
-	        return "?";
-	    }
+        int lineNo = -1;
+        if (sfMethod != null) {
+            final VmByteCode bc = sfMethod.getBytecode();
+            if (bc != null) {
+                lineNo = bc.getLineNr(programCounter);
+            }
+        }
+        if (lineNo >= 0) {
+            return String.valueOf(lineNo);
+        } else {
+            return "?";
+        }
 	}
 
 	/**
@@ -93,7 +84,7 @@ public final class VmStackFrame extends VmSystemObject {
 	 */
 	public String toString() {
 		final VmMethod method = sfMethod;
-		final VmType vmClass = (method == null) ? null : method.getDeclaringClass();
+		final VmType<?> vmClass = (method == null) ? null : method.getDeclaringClass();
 		final String cname = (vmClass == null) ? "<unknown class>" : vmClass.getName();
 		final String mname = (method == null) ? "<unknown method>" : method.getName();
 		final String location = getLocationInfo();
