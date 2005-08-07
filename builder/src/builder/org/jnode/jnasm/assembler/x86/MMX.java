@@ -58,43 +58,43 @@ public class MMX extends AbstractX86Module {
 
         switch (key.intValue()) {
             case EMMS_ISN:
-                emmitEMMS();
+                emitEMMS();
                 break;
             case MOVD_ISN:
-                emmitMOVD();
+                emitMOVD();
                 break;
             case MOVQ_ISN:
-                emmitMOVQ();
+                emitMOVQ();
                 break;
             case PACKUSWB_ISN:
-                emmitPACKUSWB();
+                emitPACKUSWB();
                 break;
             case PADDW_ISN:
-                emmitPADDW();
+                emitPADDW();
                 break;
             case PAND_ISN:
-                emmitPAND();
+                emitPAND();
                 break;
             case PCMPGTW_ISN:
-                emmitPCMPGTW();
+                emitPCMPGTW();
                 break;
             case PMULLW_ISN:
-                emmitPMULLW();
+                emitPMULLW();
                 break;
             case PSHUFW_ISN:
-                emmitPSHUFW();
+                emitPSHUFW();
                 break;
             case PSRLW_ISN:
-                emmitPSRLW();
+                emitPSRLW();
                 break;
             case PSUBW_ISN:
-                emmitPSUBW();
+                emitPSUBW();
                 break;
             case PUNPCKLBW_ISN:
-                emmitPUNPCKLBW();
+                emitPUNPCKLBW();
                 break;
             case PXOR_ISN:
-                emmitPXOR();
+                emitPXOR();
                 break;
             default:
                 throw new Error("Invalid instruction binding " + key.intValue() + " for " + mnemonic);
@@ -103,11 +103,11 @@ public class MMX extends AbstractX86Module {
         return true;
     }
 
-    private void emmitEMMS() {
+    private void emitEMMS() {
             stream.writeEMMS();
     }
 
-    private void emmitMOVD() {
+    private void emitMOVD() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RE_ADDR:
@@ -125,7 +125,7 @@ public class MMX extends AbstractX86Module {
         }
     }
 
-    private void emmitMOVQ() {
+    private void emitMOVQ() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
@@ -148,7 +148,7 @@ public class MMX extends AbstractX86Module {
         }
     }
 
-    private void emmitPACKUSWB() {
+    private void emitPACKUSWB() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
@@ -161,7 +161,7 @@ public class MMX extends AbstractX86Module {
         }
     }
 
-    private void emmitPADDW() {
+    private void emitPADDW() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
@@ -174,7 +174,7 @@ public class MMX extends AbstractX86Module {
         }
     }
 
-    private void emmitPAND() {
+    private void emitPAND() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
@@ -187,7 +187,7 @@ public class MMX extends AbstractX86Module {
         }
     }
 
-    private void emmitPCMPGTW() {
+    private void emitPCMPGTW() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
@@ -200,7 +200,7 @@ public class MMX extends AbstractX86Module {
         }
     }
 
-    private void emmitPMULLW() {
+    private void emitPMULLW() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
@@ -213,7 +213,7 @@ public class MMX extends AbstractX86Module {
         }
     }
 
-    private void emmitPSHUFW() {
+    private void emitPSHUFW() {
         int addr = getAddressingMode(3);
         switch (addr) {
             case RRC_ADDR:
@@ -226,7 +226,7 @@ public class MMX extends AbstractX86Module {
         }
     }
 
-    private void emmitPSRLW() {
+    private void emitPSRLW() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RC_ADDR:
@@ -238,7 +238,7 @@ public class MMX extends AbstractX86Module {
         }
     }
 
-    private void emmitPSUBW() {
+    private void emitPSUBW() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
@@ -251,7 +251,7 @@ public class MMX extends AbstractX86Module {
         }
     }
 
-    private void emmitPUNPCKLBW() {
+    private void emitPUNPCKLBW() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
@@ -264,7 +264,7 @@ public class MMX extends AbstractX86Module {
         }
     }
 
-    private void emmitPXOR() {
+    private void emitPXOR() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
