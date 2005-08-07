@@ -28,6 +28,30 @@ public class InlineTestClass {
 
     private int x;
 
+    public static int f1() {
+        int r;
+        r = f2();
+        return r;
+    }
+    
+    public static int f2() {
+        int r;
+        r = f3();
+        return r;
+    }
+    
+    public static int f3() {
+        int r;
+        r = f4();
+        return r;
+    }
+    
+    public static int f4() {
+        int r;
+        r = (int)currentTime();
+        return r;
+    }
+    
     public void foo2() {
         int i = 5;
         int j = -7;
