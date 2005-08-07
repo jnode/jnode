@@ -382,6 +382,13 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
     }
 
     /**
+     * Add the given pragma flags to my flags.
+     */
+    final void addPragmaFlags(int flags) {
+        this.pragmaFlags |= flags;
+    }
+
+    /**
      * Gets the compiled code information of this method (if any)
      * 
      * @return The compiled code, or null if no compiled code has been set.
@@ -490,6 +497,22 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
      */
     public final boolean hasNoInlinePragma() {
         return ((pragmaFlags & MethodPragmaFlags.NOINLINE) != 0);        
+    }
+
+    /**
+     * Is the noreadbarrier pragma set for this method.
+     * @return
+     */
+    public final boolean hasNoReadBarrierPragma() {
+        return ((pragmaFlags & MethodPragmaFlags.NOREADBARRIER) != 0);        
+    }
+
+    /**
+     * Is the nowritebarrier pragma set for this method.
+     * @return
+     */
+    public final boolean hasNoWriteBarrierPragma() {
+        return ((pragmaFlags & MethodPragmaFlags.NOWRITEBARRIER) != 0);        
     }
 
     /**

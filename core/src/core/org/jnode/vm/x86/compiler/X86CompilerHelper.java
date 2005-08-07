@@ -33,6 +33,7 @@ import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmProcessor;
+import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmInstanceField;
 import org.jnode.vm.classmgr.VmIsolatedStaticsEntry;
@@ -44,7 +45,6 @@ import org.jnode.vm.classmgr.VmTypeState;
 import org.jnode.vm.compiler.EntryPoints;
 import org.jnode.vm.memmgr.VmWriteBarrier;
 import org.jnode.vm.x86.X86CpuID;
-import org.vmmagic.pragma.PrivilegedActionPragma;
 
 /**
  * Helpers class used by the X86 compilers.
@@ -104,9 +104,9 @@ public class X86CompilerHelper implements X86CompilerConstants {
      * 
      * @param entryPoints
      */
+    @PrivilegedActionPragma
     public X86CompilerHelper(X86Assembler os, AbstractX86StackManager stackMgr,
-            EntryPoints entryPoints, boolean isBootstrap)
-            throws PrivilegedActionPragma {
+            EntryPoints entryPoints, boolean isBootstrap) {
         this.os = os;
         if (os.isCode32()) {
             this.AAX = X86Register.EAX;
@@ -164,7 +164,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
         this.instrLabelPrefix = labelPrefix + "_bci_";
         this.addressLabels.clear();
     }
-    
+
     public final String getLabelPrefix() {
         return labelPrefix;
     }
@@ -308,7 +308,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
         // Only for static methods (non <clinit>)
         if (method.isStatic() && !method.isInitializer()) {
             // Only when class is not initialize
-            final VmType<?> cls = method.getDeclaringClass();
+            final VmType< ? > cls = method.getDeclaringClass();
             if (!cls.isInitialized()) {
                 final GPR aax = this.AAX;
                 final int size = os.getMode().getSize();
@@ -339,7 +339,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
     }
 
     public final void writeClassInitialize(Label curInstrLabel, GPR classReg,
-            VmType<?> cls) {
+            VmType< ? > cls) {
         if (!cls.isInitialized()) {
             // Test declaringClass.modifiers
             os.writeTEST(BITS32, classReg, entryPoints.getVmTypeState()
@@ -475,7 +475,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
         // Only for static methods (non <clinit>)
         if (method.isStatic() && !method.isInitializer()) {
             // Only when class is not initialize
-            final VmType<?> cls = method.getDeclaringClass();
+            final VmType< ? > cls = method.getDeclaringClass();
             if (!cls.isInitialized()) {
                 return true;
             }
@@ -599,7 +599,8 @@ public class X86CompilerHelper implements X86CompilerConstants {
      * @param curInstrLabel
      * @param dst
      * @param entry
-     * @param tmp A temporary REFERENCE register
+     * @param tmp
+     *            A temporary REFERENCE register
      */
     public final void writeGetStaticsEntry(Label curInstrLabel, GPR dst,
             VmIsolatedStaticsEntry entry, GPR tmp) {

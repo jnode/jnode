@@ -21,8 +21,8 @@
 
 package org.mmtk.vm;
 
-import org.jnode.vm.PragmaNoReadBarrier;
-import org.jnode.vm.PragmaNoWriteBarrier;
+import org.jnode.vm.annotation.NoReadBarrier;
+import org.jnode.vm.annotation.NoWriteBarrier;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.ObjectReference;
 import org.vmmagic.unboxed.Offset;
@@ -50,8 +50,8 @@ public class Barriers {
      * @param value
      *            the new value for the element
      */
-    public static void setArrayNoBarrier(char[] dst, int index, char value)
-            throws PragmaNoWriteBarrier {
+    @NoWriteBarrier
+    public static void setArrayNoBarrier(char[] dst, int index, char value) {
         dst[index] = value;
     }
 
@@ -110,8 +110,8 @@ public class Barriers {
      *            the natural array index of the element to get
      * @return the new value of element
      */
-    public static char getArrayNoBarrier(char[] src, int index)
-            throws PragmaNoReadBarrier {
+    @NoReadBarrier
+    public static char getArrayNoBarrier(char[] src, int index) {
         return src[index];
     }
 
@@ -125,8 +125,8 @@ public class Barriers {
      *            the natural array index of the element to get
      * @return the new value of element
      */
-    public static byte getArrayNoBarrier(byte[] src, int index)
-            throws PragmaNoReadBarrier {
+    @NoReadBarrier
+    public static byte getArrayNoBarrier(byte[] src, int index) {
         return src[index];
     }
 
@@ -140,8 +140,8 @@ public class Barriers {
      *            the natural array index of the element to get
      * @return the new value of element
      */
-    public static int getArrayNoBarrier(int[] src, int index)
-            throws PragmaNoReadBarrier {
+    @NoReadBarrier
+    public static int getArrayNoBarrier(int[] src, int index) {
         return src[index];
     }
 
@@ -155,8 +155,8 @@ public class Barriers {
      *            the natural array index of the element to get
      * @return the new value of element
      */
-    public static Object getArrayNoBarrier(Object[] src, int index)
-            throws PragmaNoReadBarrier {
+    @NoReadBarrier
+    public static Object getArrayNoBarrier(Object[] src, int index) {
         return src[index];
     }
 
@@ -170,8 +170,8 @@ public class Barriers {
      *            the index of the element to get
      * @return the new value of element
      */
-    public static byte[] getArrayNoBarrier(byte[][] src, int index)
-            throws PragmaNoReadBarrier {
+    @NoReadBarrier
+    public static byte[] getArrayNoBarrier(byte[][] src, int index) {
         return src[index];
     }
 }

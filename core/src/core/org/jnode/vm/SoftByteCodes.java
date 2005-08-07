@@ -22,6 +22,8 @@
 package org.jnode.vm;
 
 import org.jnode.util.NumberUtils;
+import org.jnode.vm.annotation.LoadStatics;
+import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.jnode.vm.classmgr.TIBLayout;
 import org.jnode.vm.classmgr.VmArrayClass;
 import org.jnode.vm.classmgr.VmClassLoader;
@@ -32,8 +34,6 @@ import org.jnode.vm.classmgr.VmField;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.memmgr.VmHeapManager;
-import org.vmmagic.pragma.LoadStaticsPragma;
-import org.vmmagic.pragma.PrivilegedActionPragma;
 import org.vmmagic.pragma.Uninterruptible;
 import org.vmmagic.pragma.UninterruptiblePragma;
 
@@ -107,7 +107,7 @@ public class SoftByteCodes implements Uninterruptible {
         if (fieldRef.isResolved()) {
             result = fieldRef.getResolvedVmField();
         } else {
-            VmType<?> vmClass = fieldRef.getConstClass().getResolvedVmClass();
+            VmType< ? > vmClass = fieldRef.getConstClass().getResolvedVmClass();
             vmClass.link();
             VmField field = vmClass.getField(fieldRef);
             if (field == null) {
@@ -117,7 +117,7 @@ public class SoftByteCodes implements Uninterruptible {
             fieldRef.setResolvedVmField(field);
             result = field;
         }
-        VmType<?> declClass = result.getDeclaringClass();
+        VmType< ? > declClass = result.getDeclaringClass();
         if ((isStatic) && (!declClass.isInitialized())) {
             if (!(result.isPrimitive() && result.isFinal())) {
                 declClass.initialize();
@@ -143,7 +143,8 @@ public class SoftByteCodes implements Uninterruptible {
         if (methodRef.isResolved()) {
             return methodRef.getResolvedVmMethod();
         } else {
-            VmType<?> vmClass = methodRef.getConstClass().getResolvedVmClass();
+            VmType< ? > vmClass = methodRef.getConstClass()
+                    .getResolvedVmClass();
             vmClass.link();
 
             // NEW
@@ -172,16 +173,17 @@ public class SoftByteCodes implements Uninterruptible {
      * @return VmClass
      * @throws UninterruptiblePragma
      */
+    @PrivilegedActionPragma
     public static VmType resolveClass(VmConstClass classRef)
-            throws UninterruptiblePragma, PrivilegedActionPragma {
+            throws UninterruptiblePragma {
         if (classRef.isResolved()) {
             return classRef.getResolvedVmClass();
         } else {
             VmClassLoader curLoader = VmSystem.getContextClassLoader();
             String cname = classRef.getClassName();
             try {
-                Class<?> cls = curLoader.asClassLoader().loadClass(cname);
-                VmType<?> vmClass = cls.getVmClass();
+                Class< ? > cls = curLoader.asClassLoader().loadClass(cname);
+                VmType< ? > vmClass = cls.getVmClass();
 
                 /*
                  * VmClass vmClass = curLoader.loadClass(cname, true); //VmClass
@@ -208,7 +210,7 @@ public class SoftByteCodes implements Uninterruptible {
      * @return Object The new object
      * @throws UninterruptiblePragma
      */
-    public static Object allocObject(VmType<?> vmClass, int size)
+    public static Object allocObject(VmType< ? > vmClass, int size)
             throws UninterruptiblePragma {
         VmHeapManager hm = heapManager;
         if (hm == null) {
@@ -257,7 +259,7 @@ public class SoftByteCodes implements Uninterruptible {
      * @throws UninterruptiblePragma
      */
     public static Object multinewarray_helper(int[] dims, int ind,
-            VmArrayClass<?> a) throws OutOfMemoryError,
+            VmArrayClass< ? > a) throws OutOfMemoryError,
             NegativeArraySizeException, UninterruptiblePragma {
         // Syslog.debug("multinewarray_helper "); //+ " cls=" + a);
         a.initialize();
@@ -267,7 +269,7 @@ public class SoftByteCodes implements Uninterruptible {
             return o;
         }
         final Object[] o2 = (Object[]) o;
-        final VmArrayClass<?> a2 = (VmArrayClass<?>) a.getComponentType();
+        final VmArrayClass< ? > a2 = (VmArrayClass< ? >) a.getComponentType();
         a2.initialize();
         for (int i = 0; i < length; ++i) {
             o2[i] = multinewarray_helper(dims, ind - 1, a2);
@@ -285,10 +287,10 @@ public class SoftByteCodes implements Uninterruptible {
      * @return Object The new array
      * @throws UninterruptiblePragma
      */
-    public static Object anewarray(VmType<?> vmClass, int elements)
+    public static Object anewarray(VmType< ? > vmClass, int elements)
             throws UninterruptiblePragma {
 
-        final VmArrayClass<?> arrCls = vmClass.getArrayClass();
+        final VmArrayClass< ? > arrCls = vmClass.getArrayClass();
         VmHeapManager hm = heapManager;
         if (hm == null) {
             heapManager = hm = Vm.getHeapManager();
@@ -308,8 +310,8 @@ public class SoftByteCodes implements Uninterruptible {
      * @return Object The new array
      * @throws UninterruptiblePragma
      */
-    public static Object allocPrimitiveArray(VmType<?> currentClass, int atype, int elements)
-            throws UninterruptiblePragma {
+    public static Object allocPrimitiveArray(VmType< ? > currentClass,
+            int atype, int elements) throws UninterruptiblePragma {
         VmHeapManager hm = heapManager;
         if (hm == null) {
             heapManager = hm = Vm.getHeapManager();
@@ -348,17 +350,19 @@ public class SoftByteCodes implements Uninterruptible {
     /**
      * Throw a classcast exception.
      */
-    public static void classCastFailed(Object object, VmType<?> expected) {
+    public static void classCastFailed(Object object, VmType< ? > expected) {
         if (object == null) {
             throw new ClassCastException("Object is null");
         } else if (true) {
             final Object[] tib = VmMagic.getTIB(object);
             if (tib == null) {
-                throw new ClassCastException(object.getClass().getName() + " tib==null");                
+                throw new ClassCastException(object.getClass().getName()
+                        + " tib==null");
             }
-            final Object[] superClasses = (Object[])tib[TIBLayout.SUPERCLASSES_INDEX];
+            final Object[] superClasses = (Object[]) tib[TIBLayout.SUPERCLASSES_INDEX];
             if (superClasses == null) {
-                throw new ClassCastException(object.getClass().getName() + " superClasses==null");                                
+                throw new ClassCastException(object.getClass().getName()
+                        + " superClasses==null");
             }
             final StringBuilder sb = new StringBuilder();
             sb.append(object.getClass().getName());
@@ -371,12 +375,13 @@ public class SoftByteCodes implements Uninterruptible {
             }
             throw new ClassCastException(sb.toString());
         } else {
-            throw new ClassCastException(object.getClass().getName());              
+            throw new ClassCastException(object.getClass().getName());
         }
     }
-    
+
     /**
      * Gets the Class that corresponds to the given VmType.
+     * 
      * @param type
      * @return
      */
@@ -392,13 +397,13 @@ public class SoftByteCodes implements Uninterruptible {
      * @return Throwable
      * @throws UninterruptiblePragma
      */
+    @LoadStatics @PrivilegedActionPragma
     public static Throwable systemException(int nr, int address)
-            throws UninterruptiblePragma, LoadStaticsPragma,
-            PrivilegedActionPragma {
+            throws UninterruptiblePragma {
         // if (VmSystem.debug > 0) {
         // Unsafe.debugStackTrace();
         // }
-        
+
         // Do stack overflows without anything that is not
         // absolutely needed
         if (nr == EX_STACKOVERFLOW) {
@@ -409,7 +414,7 @@ public class SoftByteCodes implements Uninterruptible {
             }
             throw new StackOverflowError();
         }
-        
+
         if (false) {
             Unsafe.debug(nr);
             Unsafe.debug(address);
@@ -462,9 +467,17 @@ public class SoftByteCodes implements Uninterruptible {
         throw new ArrayIndexOutOfBoundsException(index);
     }
 
+    /**
+     * An unknown CPU opcode is execute.
+     * 
+     * @param opcode
+     * @param pc
+     * @throws UninterruptiblePragma
+     * @throws PrivilegedActionPragma
+     */
+    @LoadStatics @PrivilegedActionPragma
     public static void unknownOpcode(int opcode, int pc)
-            throws UninterruptiblePragma, LoadStaticsPragma,
-            PrivilegedActionPragma {
+            throws UninterruptiblePragma {
         throw new Error("Unknown opcode " + opcode + " at pc " + pc);
     }
 }

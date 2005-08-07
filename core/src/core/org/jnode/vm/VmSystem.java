@@ -43,6 +43,7 @@ import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.system.SimpleResourceOwner;
+import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.jnode.vm.classmgr.AbstractExceptionHandler;
 import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmByteCode;
@@ -54,7 +55,6 @@ import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmStaticField;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.memmgr.VmWriteBarrier;
-import org.vmmagic.pragma.PrivilegedActionPragma;
 import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
@@ -158,7 +158,7 @@ public final class VmSystem implements SharedStatics {
             root.addAppender(infoApp);
         }
     }
-    
+
     final static boolean isInitialized() {
         return inited;
     }
@@ -281,7 +281,7 @@ public final class VmSystem implements SharedStatics {
      * @param obj
      * @return The class
      */
-    public static Class<?> getClass(Object obj) {
+    public static Class< ? > getClass(Object obj) {
         return getVmClass(obj).asClass();
     }
 
@@ -291,7 +291,7 @@ public final class VmSystem implements SharedStatics {
      * @param obj
      * @return VmClass
      */
-    public static VmType<?> getVmClass(Object obj) {
+    public static VmType< ? > getVmClass(Object obj) {
         if (obj == null) {
             throw new NullPointerException();
         } else {
@@ -407,7 +407,8 @@ public final class VmSystem implements SharedStatics {
     public static Object[] getStackTrace(VmThread current) {
         if (current.inException) {
             Unsafe.debug("Exception in getStackTrace");
-            Unsafe.getCurrentProcessor().getArchitecture().getStackReader().debugStackTrace();
+            Unsafe.getCurrentProcessor().getArchitecture().getStackReader()
+                    .debugStackTrace();
             Unsafe.die("getStackTrace");
             return null;
         } else {
@@ -460,11 +461,11 @@ public final class VmSystem implements SharedStatics {
             if (method == null) {
                 break;
             }
-            final VmType<?> vmClass = method.getDeclaringClass();
+            final VmType< ? > vmClass = method.getDeclaringClass();
             if (vmClass == null) {
                 break;
             }
-            final VmType<?> sClass = vmClass.getSuperClass();
+            final VmType< ? > sClass = vmClass.getSuperClass();
             if ((lastClass != null) && (sClass != lastClass)
                     && (vmClass != lastClass)) {
                 break;
@@ -500,8 +501,9 @@ public final class VmSystem implements SharedStatics {
      * @param address
      * @return Object
      */
+    @PrivilegedActionPragma
     public static Address findThrowableHandler(Throwable ex, Address frame,
-            Address address) throws PrivilegedActionPragma {
+            Address address) {
 
         try {
             debug++;
@@ -596,10 +598,11 @@ public final class VmSystem implements SharedStatics {
     // java.lang.System support
     // ------------------------------------------
 
+    @PrivilegedActionPragma
     public static void arrayCopy(Object src, int srcPos, Object dst,
-            int dstPos, int length) throws PrivilegedActionPragma {
-        Class<?> src_class = src.getClass();
-        Class<?> dst_class = dst.getClass();
+            int dstPos, int length) {
+        Class< ? > src_class = src.getClass();
+        Class< ? > dst_class = dst.getClass();
 
         if (!src_class.isArray()) {
             Unsafe.debug('!');
@@ -879,7 +882,8 @@ public final class VmSystem implements SharedStatics {
      * 
      * @param reset
      */
-    public static void halt(boolean reset) throws PrivilegedActionPragma {
+    @PrivilegedActionPragma
+    public static void halt(boolean reset) {
         final SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             sm.checkPermission(new JNodePermission("halt"));
@@ -913,7 +917,8 @@ public final class VmSystem implements SharedStatics {
      *            the new PrintStream
      * @see #setOut(PrintStream)
      */
-    public static void setOut(PrintStream out) throws PrivilegedActionPragma {
+    @PrivilegedActionPragma
+    public static void setOut(PrintStream out) {
         setStaticField(System.class, "out", out);
     }
 
@@ -924,24 +929,25 @@ public final class VmSystem implements SharedStatics {
      *            the new PrintStream
      * @see #setErr(PrintStream)
      */
-    public static void setErr(PrintStream err) throws PrivilegedActionPragma {
+    @PrivilegedActionPragma
+    public static void setErr(PrintStream err) {
         setStaticField(System.class, "err", err);
     }
 
-    private static void setStaticField(Class<?> clazz, String fieldName,
-            Object value)
-    throws PrivilegedActionPragma {
+    @PrivilegedActionPragma
+    private static void setStaticField(Class< ? > clazz, String fieldName,
+            Object value) {
         final VmStaticField f = (VmStaticField) clazz.getVmClass().getField(
                 fieldName);
-        final Vm vm = Vm.getVm();
         final Object staticsTable;
         final Offset offset;
         if (f.isShared()) {
             staticsTable = Unsafe.getCurrentProcessor().getSharedStaticsTable();
             offset = Offset.fromIntZeroExtend(f.getSharedStaticsIndex() << 2);
         } else {
-            staticsTable = Unsafe.getCurrentProcessor().getIsolatedStaticsTable();
-            offset = Offset.fromIntZeroExtend(f.getIsolatedStaticsIndex() << 2);            
+            staticsTable = Unsafe.getCurrentProcessor()
+                    .getIsolatedStaticsTable();
+            offset = Offset.fromIntZeroExtend(f.getIsolatedStaticsIndex() << 2);
         }
         final Address ptr = VmMagic.getArrayData(staticsTable);
         ptr.store(ObjectReference.fromObject(value), offset);

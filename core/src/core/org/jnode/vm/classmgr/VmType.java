@@ -38,10 +38,10 @@ import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmReflection;
 import org.jnode.vm.VmSystemClassLoader;
+import org.jnode.vm.annotation.LoadStatics;
 import org.jnode.vm.compiler.CompileError;
 import org.jnode.vm.compiler.CompiledIMT;
 import org.jnode.vm.compiler.NativeCodeCompiler;
-import org.vmmagic.pragma.LoadStaticsPragma;
 import org.vmmagic.pragma.Uninterruptible;
 
 public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedStaticsEntry,
@@ -337,9 +337,8 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 	 * 
 	 * @param bootClasses
 	 */
-    @SuppressWarnings("unchecked")
-	protected static void loadFromBootClassArray(VmType[] bootClasses)
-			throws LoadStaticsPragma {
+    @SuppressWarnings("unchecked") @LoadStatics
+	protected static void loadFromBootClassArray(VmType[] bootClasses) {
 		Unsafe.debug("loadFromBootClassArray");
 		final int count = bootClasses.length;
 		for (int i = 0; i < count; i++) {

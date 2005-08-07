@@ -24,18 +24,21 @@ package org.jnode.vm.classmgr;
 import gnu.java.lang.VMClassHelper;
 
 import java.io.UTFDataFormatException;
+import java.lang.annotation.Annotation;
 import java.nio.ByteBuffer;
 import java.security.ProtectionDomain;
 
 import org.jnode.system.BootLog;
-import org.jnode.vm.NoFieldAlignments;
-import org.jnode.vm.PragmaCheckPermission;
-import org.jnode.vm.PragmaDoPrivileged;
+import org.jnode.vm.annotation.LoadStatics;
+import org.jnode.vm.annotation.NoFieldAlignments;
+import org.jnode.vm.annotation.CheckPermission;
+import org.jnode.vm.annotation.DoPrivileged;
+import org.jnode.vm.annotation.NoReadBarrier;
+import org.jnode.vm.annotation.NoWriteBarrier;
+import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.vmmagic.pragma.InlinePragma;
-import org.vmmagic.pragma.LoadStaticsPragma;
 import org.vmmagic.pragma.NoInlinePragma;
 import org.vmmagic.pragma.PragmaException;
-import org.vmmagic.pragma.PrivilegedActionPragma;
 import org.vmmagic.pragma.UninterruptiblePragma;
 
 /**
@@ -56,7 +59,7 @@ public final class ClassDecoder {
     private static char[] ExceptionsAttrName;
 
     private static char[] LineNrTableAttrName;
-    
+
     private static char[] RuntimeVisibleAnnotationsAttrName;
 
     private static char[] RuntimeInvisibleAnnotationsAttrName;
@@ -64,16 +67,28 @@ public final class ClassDecoder {
     private static char[] RuntimeVisibleParameterAnnotationsAttrName;
 
     private static char[] RuntimeInvisibleParameterAnnotationsAttrName;
-    
-    private static final MethodPragma[] METHOD_PRAGMAs = new MethodPragma[] {
-        new MethodPragma(UninterruptiblePragma.class, MethodPragmaFlags.UNINTERRUPTIBLE),
-        new MethodPragma(InlinePragma.class, MethodPragmaFlags.INLINE),
-        new MethodPragma(NoInlinePragma.class, MethodPragmaFlags.NOINLINE),
-        new MethodPragma(LoadStaticsPragma.class, MethodPragmaFlags.LOADSTATICS),
-        new MethodPragma(PragmaDoPrivileged.class, MethodPragmaFlags.DOPRIVILEGED),
-        new MethodPragma(PrivilegedActionPragma.class, MethodPragmaFlags.PRIVILEGEDACTION),
-        new MethodPragma(PragmaCheckPermission.class, MethodPragmaFlags.CHECKPERMISSION),
-    };
+
+    private static final MethodPragmaException[] METHOD_PRAGMA_EXCEPTIONS = new MethodPragmaException[] {
+            new MethodPragmaException(UninterruptiblePragma.class,
+                    MethodPragmaFlags.UNINTERRUPTIBLE),
+            new MethodPragmaException(InlinePragma.class,
+                    MethodPragmaFlags.INLINE),
+            new MethodPragmaException(NoInlinePragma.class,
+                    MethodPragmaFlags.NOINLINE), };
+
+    private static final MethodAnnotation[] METHOD_ANNOTATIONS = new MethodAnnotation[] {
+            new MethodAnnotation(CheckPermission.class,
+                    MethodPragmaFlags.CHECKPERMISSION),
+            new MethodAnnotation(DoPrivileged.class,
+                    MethodPragmaFlags.DOPRIVILEGED),
+            new MethodAnnotation(LoadStatics.class,
+                    MethodPragmaFlags.LOADSTATICS),
+            new MethodAnnotation(NoReadBarrier.class,
+                    MethodPragmaFlags.NOREADBARRIER),
+            new MethodAnnotation(NoWriteBarrier.class,
+                    MethodPragmaFlags.NOWRITEBARRIER),
+            new MethodAnnotation(PrivilegedActionPragma.class,
+                    MethodPragmaFlags.PRIVILEGEDACTION), };
 
     private static final int NO_FIELD_ALIGNMENT = 0x0001;
 
@@ -149,10 +164,14 @@ public final class ClassDecoder {
             CodeAttrName = "Code".toCharArray();
             ExceptionsAttrName = "Exceptions".toCharArray();
             LineNrTableAttrName = "LineNumberTable".toCharArray();
-            RuntimeVisibleAnnotationsAttrName = "RuntimeVisibleAnnotations".toCharArray();
-            RuntimeInvisibleAnnotationsAttrName = "RuntimeInvisibleAnnotations".toCharArray();
-            RuntimeVisibleParameterAnnotationsAttrName = "RuntimeVisibleParameterAnnotations".toCharArray();
-            RuntimeInvisibleParameterAnnotationsAttrName = "RuntimeInvisibleParameterAnnotations".toCharArray();
+            RuntimeVisibleAnnotationsAttrName = "RuntimeVisibleAnnotations"
+                    .toCharArray();
+            RuntimeInvisibleAnnotationsAttrName = "RuntimeInvisibleAnnotations"
+                    .toCharArray();
+            RuntimeVisibleParameterAnnotationsAttrName = "RuntimeVisibleParameterAnnotations"
+                    .toCharArray();
+            RuntimeInvisibleParameterAnnotationsAttrName = "RuntimeInvisibleParameterAnnotations"
+                    .toCharArray();
         }
     }
 
@@ -364,7 +383,8 @@ public final class ClassDecoder {
             final int length = data.getInt();
             if (VmArray.equals(RuntimeVisibleAnnotationsAttrName, attrName)) {
                 rVisAnn = readRuntimeAnnotations(data, cp, true);
-            } else if (VmArray.equals(RuntimeInvisibleAnnotationsAttrName, attrName)) {
+            } else if (VmArray.equals(RuntimeInvisibleAnnotationsAttrName,
+                    attrName)) {
                 rInvisAnn = readRuntimeAnnotations(data, cp, false);
             } else {
                 skip(data, length);
@@ -519,7 +539,7 @@ public final class ClassDecoder {
             final int idx = data.getChar();
             final VmConstClass ccls = cp.getConstClass(idx);
             list[i] = ccls;
-            for (MethodPragma mp : METHOD_PRAGMAs) {
+            for (MethodPragmaException mp : METHOD_PRAGMA_EXCEPTIONS) {
                 if (ccls.getClassName().equals(mp.className)) {
                     pragmaFlags |= mp.flags;
                     pragmas++;
@@ -696,9 +716,11 @@ public final class ClassDecoder {
                             statics.setObject(staticsIdx, cp.getString(idx));
                             break;
                         }
-                    } else if (VmArray.equals(RuntimeVisibleAnnotationsAttrName, attrName)) {
+                    } else if (VmArray.equals(
+                            RuntimeVisibleAnnotationsAttrName, attrName)) {
                         rVisAnn = readRuntimeAnnotations(data, cp, true);
-                    } else if (VmArray.equals(RuntimeInvisibleAnnotationsAttrName, attrName)) {
+                    } else if (VmArray.equals(
+                            RuntimeInvisibleAnnotationsAttrName, attrName)) {
                         rInvisAnn = readRuntimeAnnotations(data, cp, false);
                     } else {
                         skip(data, length);
@@ -716,7 +738,7 @@ public final class ClassDecoder {
 
             cls.setFieldTable(ftable);
             if (objectSize > 0) {
-                ((VmNormalClass<?>) cls).setObjectSize(objectSize);
+                ((VmNormalClass< ? >) cls).setObjectSize(objectSize);
             }
         }
     }
@@ -816,19 +838,31 @@ public final class ClassDecoder {
                         mts.setBytecode(readCode(data, cls, cp, mts));
                     } else if (VmArray.equals(ExceptionsAttrName, attrName)) {
                         mts.setExceptions(readExceptions(data, cls, cp));
-                    } else if (VmArray.equals(RuntimeVisibleAnnotationsAttrName, attrName)) {
+                    } else if (VmArray.equals(
+                            RuntimeVisibleAnnotationsAttrName, attrName)) {
                         rVisAnn = readRuntimeAnnotations(data, cp, true);
-                    } else if (VmArray.equals(RuntimeInvisibleAnnotationsAttrName, attrName)) {
+                    } else if (VmArray.equals(
+                            RuntimeInvisibleAnnotationsAttrName, attrName)) {
                         rInvisAnn = readRuntimeAnnotations(data, cp, false);
-                    } else if (VmArray.equals(RuntimeVisibleParameterAnnotationsAttrName, attrName)) {
+                    } else if (VmArray.equals(
+                            RuntimeVisibleParameterAnnotationsAttrName,
+                            attrName)) {
                         readRuntimeParameterAnnotations(data, cp, true);
-                    } else if (VmArray.equals(RuntimeInvisibleParameterAnnotationsAttrName, attrName)) {
+                    } else if (VmArray.equals(
+                            RuntimeInvisibleParameterAnnotationsAttrName,
+                            attrName)) {
                         readRuntimeParameterAnnotations(data, cp, false);
                     } else {
                         skip(data, length);
                     }
                 }
                 mts.setRuntimeAnnotations(merge(rVisAnn, rInvisAnn));
+                if (rVisAnn != null) {
+                    mts.addPragmaFlags(getMethodPragmaFlags(rVisAnn));
+                }
+                if (rInvisAnn != null) {
+                    mts.addPragmaFlags(getMethodPragmaFlags(rInvisAnn));
+                }
                 if ((modifiers & Modifier.ACC_NATIVE) != 0) {
                     final VmByteCode bc = getNativeCodeReplacement(mts, cl,
                             rejectNatives);
@@ -845,13 +879,15 @@ public final class ClassDecoder {
             cls.setMethodTable(mtable);
         }
     }
-    
+
     /**
      * Read a runtime parameter annotations attributes.
+     * 
      * @param data
      * @param cp
      */
-    private static VmAnnotation[][] readRuntimeParameterAnnotations(ByteBuffer data, VmCP cp, boolean visible) {
+    private static VmAnnotation[][] readRuntimeParameterAnnotations(
+            ByteBuffer data, VmCP cp, boolean visible) {
         final int numParams = data.get();
         final VmAnnotation[][] arr = new VmAnnotation[numParams][];
         for (int i = 0; i < numParams; i++) {
@@ -859,13 +895,15 @@ public final class ClassDecoder {
         }
         return arr;
     }
-    
+
     /**
      * Read a runtime annotations attributes.
+     * 
      * @param data
      * @param cp
      */
-    private static VmAnnotation[] readRuntimeAnnotations(ByteBuffer data, VmCP cp, boolean visible) {
+    private static VmAnnotation[] readRuntimeAnnotations(ByteBuffer data,
+            VmCP cp, boolean visible) {
         final int numAnn = data.getChar();
         final VmAnnotation[] arr = new VmAnnotation[numAnn];
         for (int i = 0; i < numAnn; i++) {
@@ -873,13 +911,34 @@ public final class ClassDecoder {
         }
         return arr;
     }
-    
+
     /**
-     * Read a single annotation structure.
+     * Combine the pragma flags for a given list of annotations.
+     * 
      * @param data
      * @param cp
      */
-    private static VmAnnotation readAnnotation(ByteBuffer data, VmCP cp, boolean visible) {        
+    private static int getMethodPragmaFlags(VmAnnotation[] annotations) {
+        int flags = 0;
+        for (VmAnnotation a : annotations) {
+            final String typeDescr = a.getTypeDescriptor();
+            for (MethodAnnotation ma : METHOD_ANNOTATIONS) {
+                if (ma.typeDescr.equals(typeDescr)) {
+                    flags |= ma.flags;
+                }
+            }
+        }
+        return flags;
+    }
+
+    /**
+     * Read a single annotation structure.
+     * 
+     * @param data
+     * @param cp
+     */
+    private static VmAnnotation readAnnotation(ByteBuffer data, VmCP cp,
+            boolean visible) {
         final String typeDescr = cp.getUTF8(data.getChar());
         final int numElemValuePairs = data.getChar();
         final VmAnnotation.ElementValue[] values;
@@ -895,24 +954,34 @@ public final class ClassDecoder {
         }
         return new VmAnnotation(visible, typeDescr, values);
     }
-    
+
     /**
      * Read a single element_value structure.
+     * 
      * @param data
      * @param cp
      */
     private static Object readElementValue(ByteBuffer data, VmCP cp) {
         final int tag = data.get() & 0xFF;
         switch (tag) {
-        case 'B': return Byte.valueOf((byte)cp.getInt(data.getChar()));
-        case 'C': return Character.valueOf((char)cp.getInt(data.getChar()));
-        case 'D': return cp.getDouble(data.getChar());
-        case 'F': return cp.getFloat(data.getChar());
-        case 'I': return cp.getInt(data.getChar());
-        case 'J': return cp.getLong(data.getChar());
-        case 'S': return Short.valueOf((short)cp.getInt(data.getChar()));
-        case 'Z': return Boolean.valueOf(cp.getInt(data.getChar()) != 0);
-        case 's': return cp.getAny(data.getChar());
+        case 'B':
+            return Byte.valueOf((byte) cp.getInt(data.getChar()));
+        case 'C':
+            return Character.valueOf((char) cp.getInt(data.getChar()));
+        case 'D':
+            return cp.getDouble(data.getChar());
+        case 'F':
+            return cp.getFloat(data.getChar());
+        case 'I':
+            return cp.getInt(data.getChar());
+        case 'J':
+            return cp.getLong(data.getChar());
+        case 'S':
+            return Short.valueOf((short) cp.getInt(data.getChar()));
+        case 'Z':
+            return Boolean.valueOf(cp.getInt(data.getChar()) != 0);
+        case 's':
+            return cp.getAny(data.getChar());
         case 'e': // enum
         {
             final String typeDescr = cp.getUTF8(data.getChar());
@@ -936,21 +1005,26 @@ public final class ClassDecoder {
             return arr;
         }
         default:
-            throw new ClassFormatError("Unknown element_value tag '" + (char)tag + "'");    
+            throw new ClassFormatError("Unknown element_value tag '"
+                    + (char) tag + "'");
         }
     }
-    
-    /** 
+
+    /**
      * Merge the two given arrays.
-     * @param arr1 Can be null
-     * @param arr2 Can be null
+     * 
+     * @param arr1
+     *            Can be null
+     * @param arr2
+     *            Can be null
      * @return
      */
-    private static final VmAnnotation[] merge(VmAnnotation[] arr1, VmAnnotation[] arr2) {
+    private static final VmAnnotation[] merge(VmAnnotation[] arr1,
+            VmAnnotation[] arr2) {
         if ((arr1 == null) && (arr2 == null)) {
             return VmAnnotation.EMPTY_ARR;
         } else if (arr2 == null) {
-            return arr1; 
+            return arr1;
         } else if (arr1 == null) {
             return arr2;
         } else {
@@ -962,13 +1036,13 @@ public final class ClassDecoder {
             return res;
         }
     }
-    
+
     private static final void skip(ByteBuffer data, int delta) {
         data.position(data.position() + delta);
     }
 
     private static final ByteBuffer readBytes(ByteBuffer data, int length) {
-        final ByteBuffer result = (ByteBuffer)data.slice().limit(length);
+        final ByteBuffer result = (ByteBuffer) data.slice().limit(length);
         data.position(data.position() + length);
         return result;
     }
@@ -977,15 +1051,17 @@ public final class ClassDecoder {
         final int utflen = data.getChar();
         final String result;
         try {
-            result = VmUTF8Convert.fromUTF8(data, getUtfConversionBuffer(utflen), utflen);
+            result = VmUTF8Convert.fromUTF8(data,
+                    getUtfConversionBuffer(utflen), utflen);
         } catch (UTFDataFormatException ex) {
             throw (ClassFormatError) new ClassFormatError(
                     "Invalid UTF sequence").initCause(ex);
         }
         return result;
     }
-    
+
     private transient static ThreadLocal utfConversionBuffer;
+
     private static final char[] getUtfConversionBuffer(int utfLength) {
         if (utfConversionBuffer == null) {
             synchronized (ClassDecoder.class) {
@@ -994,21 +1070,34 @@ public final class ClassDecoder {
                 }
             }
         }
-        char[] buffer = (char[])utfConversionBuffer.get();
+        char[] buffer = (char[]) utfConversionBuffer.get();
         if ((buffer == null) || (buffer.length < utfLength)) {
             buffer = new char[Math.max(64, utfLength)];
             utfConversionBuffer.set(buffer);
         }
-        
+
         return buffer;
     }
-    
-    private static final class MethodPragma {
+
+    private static final class MethodPragmaException {
         public final char flags;
+
         public final String className;
-        
-        public MethodPragma(Class<? extends PragmaException> cls, char flags) {
+
+        public MethodPragmaException(Class< ? extends PragmaException> cls,
+                char flags) {
             this.className = cls.getName();
+            this.flags = flags;
+        }
+    }
+
+    private static final class MethodAnnotation {
+        public final char flags;
+
+        public final String typeDescr;
+
+        public MethodAnnotation(Class< ? extends Annotation> cls, char flags) {
+            this.typeDescr = "L" + cls.getName().replace('.', '/') + ";";
             this.flags = flags;
         }
     }

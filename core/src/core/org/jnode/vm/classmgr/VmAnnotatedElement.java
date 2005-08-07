@@ -7,19 +7,22 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 
 import org.jnode.vm.VmSystemObject;
-import org.vmmagic.pragma.PrivilegedActionPragma;
+import org.jnode.vm.annotation.PrivilegedActionPragma;
 
 /**
  * Base class for annoted elements.
+ * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-abstract class VmAnnotatedElement extends VmSystemObject implements AnnotatedElement {
+abstract class VmAnnotatedElement extends VmSystemObject implements
+        AnnotatedElement {
 
     /** Runtime annotations */
     private VmAnnotation[] runtimeAnnotations;
 
     /**
-     * @param runtimeAnnotations The runtimeAnnotations to set.
+     * @param runtimeAnnotations
+     *            The runtimeAnnotations to set.
      */
     final void setRuntimeAnnotations(VmAnnotation[] runtimeAnnotations) {
         if (this.runtimeAnnotations == null) {
@@ -28,12 +31,12 @@ abstract class VmAnnotatedElement extends VmSystemObject implements AnnotatedEle
             throw new SecurityException("Cannot override runtime annotations");
         }
     }
-    
+
     /**
      * @see java.lang.reflect.AnnotatedElement#getAnnotation(java.lang.Class)
      */
-    public final <T extends Annotation> T getAnnotation(Class<T> annotationClass) 
-    throws PrivilegedActionPragma {
+    @PrivilegedActionPragma
+    public final <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
         if (runtimeAnnotations.length > 0) {
             final VmClassLoader loader = getLoader();
             final VmType<T> reqType = annotationClass.getVmClass();
@@ -60,7 +63,7 @@ abstract class VmAnnotatedElement extends VmSystemObject implements AnnotatedEle
             final Annotation[] parentAnn = parent.getAnnotations();
             int cnt = 0;
             for (Annotation a : parentAnn) {
-                if (((VmAnnotation.ImplBase)a).isInheritable()) {
+                if (((VmAnnotation.ImplBase) a).isInheritable()) {
                     cnt++;
                 }
             }
@@ -69,14 +72,14 @@ abstract class VmAnnotatedElement extends VmSystemObject implements AnnotatedEle
                 final Annotation[] result = new Annotation[j + cnt];
                 System.arraycopy(ann, 0, result, 0, j);
                 for (Annotation a : parentAnn) {
-                    if (((VmAnnotation.ImplBase)a).isInheritable()) {
+                    if (((VmAnnotation.ImplBase) a).isInheritable()) {
                         result[j++] = a;
                     }
                 }
                 return result;
             }
         }
-        
+
         return ann;
     }
 
@@ -112,11 +115,12 @@ abstract class VmAnnotatedElement extends VmSystemObject implements AnnotatedEle
     /**
      * @see java.lang.reflect.AnnotatedElement#isAnnotationPresent(java.lang.Class)
      */
-    public final boolean isAnnotationPresent(Class< ? extends Annotation> annotationClass) 
-    throws PrivilegedActionPragma {
+    @PrivilegedActionPragma
+    public final boolean isAnnotationPresent(
+            Class< ? extends Annotation> annotationClass) {
         if (runtimeAnnotations.length > 0) {
             final VmClassLoader loader = getLoader();
-            final VmType<?> reqType = annotationClass.getVmClass();
+            final VmType< ? > reqType = annotationClass.getVmClass();
             for (VmAnnotation ann : runtimeAnnotations) {
                 if (ann.annotationType(loader) == reqType) {
                     return true;
@@ -132,9 +136,10 @@ abstract class VmAnnotatedElement extends VmSystemObject implements AnnotatedEle
      * @return The loader
      */
     protected abstract VmClassLoader getLoader();
-    
+
     /**
      * Gets the parent of this element.
+     * 
      * @return
      */
     protected abstract VmAnnotatedElement getSuperElement();

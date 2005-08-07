@@ -28,6 +28,7 @@ import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Register.GPR;
+import org.jnode.vm.annotation.LoadStatics;
 import org.jnode.vm.classmgr.TypeSizeInfo;
 import org.jnode.vm.classmgr.VmByteCode;
 import org.jnode.vm.classmgr.VmInterpretedExceptionHandler;
@@ -39,7 +40,6 @@ import org.jnode.vm.compiler.EntryPoints;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
 import org.jnode.vm.x86.compiler.X86CompilerHelper;
 import org.jnode.vm.x86.compiler.X86JumpTable;
-import org.vmmagic.pragma.LoadStaticsPragma;
 
 /**
  * Utility class for generating the X86 method stack frame

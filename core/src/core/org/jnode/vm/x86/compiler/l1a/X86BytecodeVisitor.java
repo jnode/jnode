@@ -3431,6 +3431,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_monitorenter()
 	 */
 	public final void visit_monitorenter() {
+        counters.getCounter("monitor-enter").inc();
+        
 		vstack.push(eContext);
 		final RefItem v = vstack.popRef();
 		v.release1(eContext);
@@ -3443,7 +3445,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_monitorexit()
 	 */
 	public final void visit_monitorexit() {
-		vstack.push(eContext);
+        counters.getCounter("monitor-exit").inc();
+
+        vstack.push(eContext);
 		final RefItem v = vstack.popRef();
 		v.release1(eContext);
 
