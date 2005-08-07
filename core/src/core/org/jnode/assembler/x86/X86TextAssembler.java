@@ -693,6 +693,10 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
                 + disp(disp) + "]");
     }
 
+    public void writeCALL(GPR regIndex, int scale, int disp) {
+        println("\tcall [" + regIndex + "*" + scale + disp(disp) + "]");
+    }
+
     /**
      * @see org.jnode.assembler.x86.X86Assembler#writeCDQ(int)
      */
@@ -704,7 +708,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
             if (!code64) {
                 throw new InvalidOpcodeException();
             }
-            println("\tcqo");            
+            println("\tcqo");
         }
     }
 
