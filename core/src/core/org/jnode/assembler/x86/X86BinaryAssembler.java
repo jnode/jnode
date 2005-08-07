@@ -1279,8 +1279,34 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		write1bOpcodeModRMSib(0xFF, 0, regBase, disp, 2, scale, regIndex);
 	}
 
-	/**
-	 * Create a cdq
+    public void writeCALL(GPR regIndex, int scale, int disp) {
+        testOperandSize(BITS32, mode.getSize());
+        switch (scale) {
+		case 1:
+			scale = 0;
+			break;
+		case 2:
+			scale = 1;
+			break;
+		case 4:
+			scale = 2;
+			break;
+		case 8:
+			scale = 3;
+			break;
+		default:
+			throw new IllegalArgumentException("scale");
+		}
+
+        //TODO review
+        write8(0xFF);
+        write8(0x14);
+        write8(0x05 | regIndex.getNr() << 3 | scale << 6);
+		write32(disp);
+    }
+
+    /**
+     * Create a cdq
      * Sign extend EAX to EDX:EAX in 32-bit operand size.
      * Sign extend RAX to RDX:RAX in 64-bit operand size.
 	 */
@@ -2402,10 +2428,27 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	public final void writeLEA(GPR dstReg, GPR srcIdxReg,int scale, int disp) {
         testSize(dstReg, mode.getSize());
         testSize(srcIdxReg, mode.getSize());
+        switch (scale) {
+		case 1:
+			scale = 0;
+			break;
+		case 2:
+			scale = 1;
+			break;
+		case 4:
+			scale = 2;
+			break;
+		case 8:
+			scale = 3;
+			break;
+		default:
+			throw new IllegalArgumentException("scale");
+		}
+
         //TODO review
         write8(0x8d);
         write8(0x04 | dstReg.getNr() << 3);
-        write8(0x85 | srcIdxReg.getNr() << 3);
+        write8(0x05 | srcIdxReg.getNr() << 3 | scale << 6);
 		write32(disp);
 	}
 

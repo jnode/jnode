@@ -21,23 +21,23 @@
 
 package org.jnode.assembler.x86;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Collection;
-
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.assembler.UnresolvedObjectRefException;
+import org.jnode.assembler.x86.X86Register.CRX;
 import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.x86.X86Register.GPR32;
 import org.jnode.assembler.x86.X86Register.GPR64;
-import org.jnode.assembler.x86.X86Register.CRX;
-import org.jnode.assembler.x86.X86Register.SR;
 import org.jnode.assembler.x86.X86Register.MMX;
+import org.jnode.assembler.x86.X86Register.SR;
 import org.jnode.vm.CpuID;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.x86.X86CpuID;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Collection;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -727,7 +727,17 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public abstract void writeCALL(GPR regBase, GPR regIndex, int scale,
 			int disp);
 
-	/**
+    /**
+     * Create a call to address stored at the given
+     * [regIndex*scale+disp].
+     *
+     * @param regIndex
+     * @param scale
+     * @param disp
+     */
+    public abstract void writeCALL(GPR regIndex, int scale, int disp);
+
+    /**
 	 * Create a call to address stored at the given [reg+offset].
 	 * 
 	 * @param reg

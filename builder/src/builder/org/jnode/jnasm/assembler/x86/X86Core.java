@@ -491,7 +491,7 @@ public class X86Core extends AbstractX86Module {
             } else if (ind.reg != null && ind.sreg == null) {
                 stream.writeCALL(getRegister(ind.getImg()), ind.disp);
             } else if (ind.reg == null && ind.sreg != null) {
-                throw new IllegalArgumentException("Simple scaled is not supported for call ");
+                stream.writeCALL(getRegister(ind.sreg), ind.scale, ind.disp);
             } else if (ind.reg == null && ind.sreg == null) {
                 throw new IllegalArgumentException("Absolute is not supported for call ");
             } else {
