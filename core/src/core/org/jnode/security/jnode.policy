@@ -43,6 +43,7 @@ grant {
 	
 	// GNU specific standard properties
 	permission java.util.PropertyPermission "gnu.classpath.version", "read";
+	permission java.util.PropertyPermission "gnu.java.awt.*", "read";
 	permission java.util.PropertyPermission "gnu.java.io.*", "read";
 	permission java.util.PropertyPermission "gnu.java.net.*", "read";
 	permission java.util.PropertyPermission "swing.defaultlaf", "read";
