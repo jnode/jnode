@@ -15,7 +15,7 @@ stub_syscallHandler:
 	mov AAX,GET_OLD_EAX
 	cmp AAX,SC_MAX
 	ja stub_syscallHandler_ret
-	call WORD [syscalls + AAX*SLOT_SIZE]
+	call WORD [AAX*SLOT_SIZE + syscalls]
 stub_syscallHandler_ret:	
 	int_exit
 
