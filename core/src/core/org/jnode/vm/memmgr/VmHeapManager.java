@@ -93,7 +93,7 @@ public abstract class VmHeapManager extends VmSystemObject {
      * @return The new instance
      */
     public final Object newInstance(VmType< ? > cls, int size)
-    throws NoInlinePragma {
+            throws NoInlinePragma {
         testInited();
         cls.initialize();
         if (cls.isArray()) {
@@ -105,7 +105,7 @@ public abstract class VmHeapManager extends VmSystemObject {
                     "Cannot instantiate an interface");
         }
 
-        final Object obj = allocObject((VmNormalClass<?>) cls, size);
+        final Object obj = allocObject((VmNormalClass< ? >) cls, size);
         if (obj == null) {
             Unsafe.debug("Out of memory");
             throw OOME;
@@ -132,7 +132,7 @@ public abstract class VmHeapManager extends VmSystemObject {
                             + arrayCls.getName() + "]");
         }
 
-        final int slotSize = Unsafe.getCurrentProcessor().getArchitecture()
+        final int slotSize = VmProcessor.current().getArchitecture()
                 .getReferenceSize();
         final int elemSize;
         if (arrayCls.isPrimitiveArray()) {
@@ -195,7 +195,7 @@ public abstract class VmHeapManager extends VmSystemObject {
                 .toAddress();
         final int size;
         if (objectClass.isArray()) {
-            final int slotSize = Unsafe.getCurrentProcessor().getArchitecture()
+            final int slotSize = VmProcessor.current().getArchitecture()
                     .getReferenceSize();
             final VmArrayClass< ? > arrayClass = (VmArrayClass< ? >) objectClass;
             final int length = objectPtr.loadInt(Offset
@@ -203,7 +203,7 @@ public abstract class VmHeapManager extends VmSystemObject {
             final int elemSize = arrayClass.getComponentType().getTypeSize();
             size = (VmArray.DATA_OFFSET * slotSize) * (length * elemSize);
         } else {
-            final VmNormalClass< ? > normalClass = (VmNormalClass<?>) objectClass;
+            final VmNormalClass< ? > normalClass = (VmNormalClass< ? >) objectClass;
             size = normalClass.getObjectSize();
         }
         final Object newObj = allocObject(objectClass, size);
@@ -231,8 +231,10 @@ public abstract class VmHeapManager extends VmSystemObject {
      * be synchronized, since obtaining a monitor might require creating one,
      * which in turn needs this method.
      * 
-     * @param vmClass The class to allocate
-     * @param size The size of the class data, without any header
+     * @param vmClass
+     *            The class to allocate
+     * @param size
+     *            The size of the class data, without any header
      * @return The allocated object
      */
     protected abstract Object allocObject(VmClassType< ? > vmClass, int size);
@@ -319,11 +321,12 @@ public abstract class VmHeapManager extends VmSystemObject {
      *            The newly resolved type
      */
     public abstract void notifyClassResolved(VmType< ? > vmType);
-    
+
     /**
      * Load classes required by this memory manager at build time.
+     * 
      * @param loader
      */
     public abstract void loadClasses(VmClassLoader loader)
-    throws ClassNotFoundException;
+            throws ClassNotFoundException;
 }

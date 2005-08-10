@@ -9,7 +9,7 @@ import java.util.WeakHashMap;
 
 import org.jnode.security.JNodePermission;
 import org.jnode.vm.MonitorManager;
-import org.jnode.vm.Unsafe;
+import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmSystem;
 import org.jnode.vm.VmThread;
 
@@ -223,7 +223,7 @@ public class Thread implements Runnable {
 
         this.daemon = current.isDaemon();
 
-        this.vmThread = Unsafe.getCurrentProcessor().createThread(this);
+        this.vmThread = VmProcessor.current().createThread(this);
         this.vmThread.setPriority(current.getPriority());
     }
 

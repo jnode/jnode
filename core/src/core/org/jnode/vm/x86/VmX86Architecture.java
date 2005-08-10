@@ -233,8 +233,7 @@ public abstract class VmX86Architecture extends VmArchitecture {
         }
 
         // Set the APIC reference of the current (bootstrap) processor
-        final VmX86Processor cpu = (VmX86Processor) Unsafe
-                .getCurrentProcessor();
+        final VmX86Processor cpu = (VmX86Processor) VmProcessor.current();
         cpu.setApic(localAPIC);
         cpu.loadAndSetApicID();
 
@@ -371,7 +370,7 @@ public abstract class VmX86Architecture extends VmArchitecture {
      * @see org.jnode.vm.VmArchitecture#createMultiMediaSupport()
      */
     protected VmMultiMediaSupport createMultiMediaSupport() {
-        final X86CpuID id = (X86CpuID)Unsafe.getCurrentProcessor().getCPUID();
+        final X86CpuID id = (X86CpuID)VmProcessor.current().getCPUID();
         if (id.hasMMX()) {
             return new MMXMultiMediaSupport();
         } else {

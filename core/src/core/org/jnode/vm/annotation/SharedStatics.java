@@ -29,14 +29,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * This marker interface signals the VM that instance fields in the
- * class that implements this interface must not be re-ordered.
+ * This marker interface signals the VM that statics fields in the
+ * class that implements this interface must be shared.
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @Documented
 @Retention(CLASS)
 @Target(TYPE)
-public @interface NoFieldAlignments {
+public @interface SharedStatics {
 
 }

@@ -93,7 +93,7 @@ public final class MemoryBlockManager extends VmSystemObject implements
 				// Unsafe.debug("allocated blocks");
 				// Unsafe.debug(allocatedBlocks);
 				// Unsafe.debug("total blocks"); Unsafe.debug(blockCount);
-				 Unsafe.getCurrentProcessor().getArchitecture().getStackReader().debugStackTrace();
+                VmProcessor.current().getArchitecture().getStackReader().debugStackTrace();
 				// Unsafe.die("allocateBlock");
 				return null;
 			}

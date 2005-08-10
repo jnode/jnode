@@ -825,11 +825,11 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      * 
      * @return The statics table
      */
-    public VmIsolatedStatics getIsolatedStatics() {
+    public final VmIsolatedStatics getIsolatedStatics() {
         if (isolatedStatics != null) {
             return isolatedStatics;
         } else {
-            return Unsafe.getCurrentProcessor().getIsolatedStatics();
+            return VmProcessor.current().getIsolatedStatics();
         }
     }
 

@@ -852,6 +852,18 @@ final class MagicHelper extends BaseX86MagicHelper {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             os.writeINT(3);
         } break;
+        case CURRENTPROCESSOR: {
+            if (Vm.VerifyAssertions) Vm._assert(isstatic);
+            final RefItem item = (RefItem)L1AHelper.requestWordRegister(ec, JvmType.REFERENCE, false);
+            final int offset = ec.getContext().getVmProcessorMeField().getOffset();
+            if (os.isCode32()) {
+                os.writePrefix(X86Constants.FS_PREFIX);
+                os.writeMOV(item.getRegister(), offset);
+            } else {
+                os.writeMOV(BITS64, item.getRegister(), X86Register.R12, offset);
+            }            
+            vstack.push(item);
+        } break;
          
         // xyzArray classes
         case ARR_CREATE: {

@@ -644,15 +644,6 @@ public final class Unsafe {
     protected static native int getCmdLine(byte[] destination);
 
     /**
-     * Gets the processor that currently runs the active thread.
-     * 
-     * @return The current processor.
-     * @throws UninterruptiblePragma
-     */
-    public static native VmProcessor getCurrentProcessor()
-            throws UninterruptiblePragma;
-
-    /**
      * Trigger a yieldpoint
      */
     public static native void yieldPoint();
@@ -713,7 +704,7 @@ public final class Unsafe {
      */
     @Inline
     public static final void debugStackTrace() throws UninterruptiblePragma {
-        getCurrentProcessor().getArchitecture().getStackReader()
+        VmProcessor.current().getArchitecture().getStackReader()
                 .debugStackTrace();
     }
 
@@ -725,7 +716,7 @@ public final class Unsafe {
     @Inline
     public static final void debugStackTrace(int max)
             throws UninterruptiblePragma {
-        getCurrentProcessor().getArchitecture().getStackReader()
+        VmProcessor.current().getArchitecture().getStackReader()
                 .debugStackTrace(max);
     }
 }

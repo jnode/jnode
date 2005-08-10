@@ -40,7 +40,7 @@ public abstract class VmAddress extends VmSystemObject {
 	 * @return
 	 */
 	public static String toString(VmAddress addr) {
-	    final int refsize = Unsafe.getCurrentProcessor().getArchitecture().getReferenceSize();
+	    final int refsize = VmProcessor.current().getArchitecture().getReferenceSize();
 	    if (refsize == 4) {
 	        return NumberUtils.hex(Address.fromAddress(addr).toInt());
 	    } else {

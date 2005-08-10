@@ -87,7 +87,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
 		this.size = size;
 		this.released = false;
 		this.data = null;
-		this.slotSize = Unsafe.getCurrentProcessor().getArchitecture().getReferenceSize();
+		this.slotSize = VmProcessor.current().getArchitecture().getReferenceSize();
 	}
 
 	public MemoryResourceImpl(Object arrayData, int length, int elementSize) {
@@ -99,7 +99,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
 		this.offset = start.toWord().toOffset();
 		this.end = start.add(length * elementSize);
 		this.released = false;
-		this.slotSize = Unsafe.getCurrentProcessor().getArchitecture().getReferenceSize();
+		this.slotSize = VmProcessor.current().getArchitecture().getReferenceSize();
 	}
 
     /**

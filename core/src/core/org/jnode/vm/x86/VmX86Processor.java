@@ -29,7 +29,6 @@ import org.jnode.system.ResourceNotFreeException;
 import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeUtils;
 import org.jnode.vm.CpuID;
-import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmThread;
@@ -151,7 +150,7 @@ public abstract class VmX86Processor extends VmProcessor {
         // Save resource manager, so when this processor starts, it can be
         // used right away.
         this.rm = rm;
-        final VmProcessor me = Unsafe.getCurrentProcessor();
+        final VmProcessor me = current();
         BootLog.info("Startup of 0x" + NumberUtils.hex(getId(), 2) + " from "
                 + NumberUtils.hex(me.getId(), 2));
 
@@ -246,8 +245,7 @@ public abstract class VmX86Processor extends VmProcessor {
      */
     @LoadStatics
     static final void applicationProcessorMain() {
-        final VmX86Processor cpu = (VmX86Processor) Unsafe
-                .getCurrentProcessor();
+        final VmX86Processor cpu = (VmX86Processor) current();
         BootLog.info("Starting Application Processor " + cpu.getId());
 
         // First force a load of CPUID
@@ -269,8 +267,7 @@ public abstract class VmX86Processor extends VmProcessor {
      */
     static final void detectAndstartLogicalProcessors(ResourceManager rm)
             throws ResourceNotFreeException {
-        final VmX86Processor cpu = (VmX86Processor) Unsafe
-                .getCurrentProcessor();
+        final VmX86Processor cpu = (VmX86Processor) current();
         if (cpu.logical) {
             return;
         }

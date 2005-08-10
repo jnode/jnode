@@ -33,19 +33,20 @@ import java.util.HashSet;
 
 import org.jnode.assembler.NativeStream;
 import org.jnode.vm.JvmType;
-import org.jnode.vm.SharedStatics;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmReflection;
 import org.jnode.vm.VmSystemClassLoader;
 import org.jnode.vm.annotation.LoadStatics;
+import org.jnode.vm.annotation.SharedStatics;
 import org.jnode.vm.compiler.CompileError;
 import org.jnode.vm.compiler.CompiledIMT;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 import org.vmmagic.pragma.Uninterruptible;
 
+@SharedStatics
 public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedStaticsEntry,
-		Uninterruptible, SharedStatics {
+		Uninterruptible {
 
 	/**
 	 * The parent of this class. Normally VmClass instance, during loading
@@ -70,6 +71,9 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 
 	/** My modifiers */
 	private int modifiers = -1;
+    
+    /** Pragma flags, see {@link TypePragmaFlags} */
+    private char pragmaFlags;
 
 	/** State of this type see {@link VmTypeState}. */
 	private char state;
@@ -807,7 +811,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
      * @return boolean
      */
     public final boolean isSharedStatics() {
-        return Modifier.isSharedStatics(modifiers);
+        return ((pragmaFlags & TypePragmaFlags.SHAREDSTATICS) != 0);
     }
 
 	/**
@@ -1475,6 +1479,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 			if (superClass != null) {
 				superClass.prepare();
 				superClassDepth = superClass.getSuperClassDepth() + 1;
+                addPragmaFlags(superClass.getPragmaFlags() & TypePragmaFlags.INHERITABLE_FLAGS_MASK);
 			}
 
 			/**
@@ -1520,19 +1525,14 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 				final CompiledIMT cimt = loader.compileIMT(imtBuilder);
 				tib[TIBLayout.COMPILED_IMT_INDEX] = cimt.getIMTAddress();
 			}
-
-			// Look for Uninterruptible
-			final int length = all.size();
-			final String uninterruptibleName = Uninterruptible.class.getName();
-			for (int i = 0; i < length; i++) {
-				if (allInterfaceTable[i].getName().equals(uninterruptibleName)) {
-					final int mCount = getNoDeclaredMethods();
-					for (int m = 0; m < mCount; m++) {
-						getDeclaredMethod(m).setUninterruptible();
-					}
-					break;
-				}
-			}
+		}
+        
+        // Process uninterruptible
+		if ((pragmaFlags & TypePragmaFlags.UNINTERRUPTIBLE) != 0) {
+		    final int mCount = getNoDeclaredMethods();
+		    for (int m = 0; m < mCount; m++) {
+		        getDeclaredMethod(m).setUninterruptible();
+		    }
 		}
 
 		/* Build the super classes array */
@@ -1923,18 +1923,9 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 	 * @param interfaceTable
 	 *            The interfaceTable to set
 	 */
-	protected void setInterfaceTable(VmImplementedInterface[] interfaceTable) {
+	protected final void setInterfaceTable(VmImplementedInterface[] interfaceTable) {
 		if (this.interfaceTable == null) {
 			this.interfaceTable = interfaceTable;
-            
-            // Do we directly implement SharedStatics?
-            final String sharedStaticsName = SharedStatics.class.getName();
-            for (VmImplementedInterface intf : interfaceTable) {
-                if (intf.getClassName().equals(sharedStaticsName)) {
-                    modifiers |= Modifier.ACC_SHAREDSTATICS;
-                    break;
-                }
-            }
 		} else {
 			throw new IllegalArgumentException(
 					"Cannot overwrite interface table");
@@ -2172,4 +2163,17 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
         return superClass;
     }
 
+    /**
+     * Add the given pragma flags to my flags.
+     */
+    final void addPragmaFlags(int flags) {
+        this.pragmaFlags |= flags;
+    }
+    
+    /**
+     * Gets the pragma flags of this type.
+     */
+    final char getPragmaFlags() {
+        return this.pragmaFlags;
+    }
 }

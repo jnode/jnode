@@ -235,8 +235,7 @@ public final class DefaultHeapManager extends VmHeapManager {
     protected void initialize() {
         // Set the basic fields
         helper.bootArchitecture(false);
-        final VmArchitecture arch = Unsafe.getCurrentProcessor()
-                .getArchitecture();
+        final VmArchitecture arch = VmProcessor.current().getArchitecture();
         final int slotSize = arch.getReferenceSize();
 
         // Initialize the boot heap.
@@ -259,8 +258,7 @@ public final class DefaultHeapManager extends VmHeapManager {
     public void start() {
         // Create a Heap monitor
         heapMonitor = new Monitor();
-        final VmArchitecture arch = Unsafe.getCurrentProcessor()
-                .getArchitecture();
+        final VmArchitecture arch = VmProcessor.current().getArchitecture();
         this.gcManager = new GCManager(this, arch);
         this.gcThread = new GCThread(gcManager, heapMonitor);
         this.finalizerThread = new FinalizerThread(this);
@@ -400,7 +398,7 @@ public final class DefaultHeapManager extends VmHeapManager {
             return null;
         }
         final Address end = start.add(size);
-        final int slotSize = Unsafe.getCurrentProcessor().getArchitecture()
+        final int slotSize = VmProcessor.current().getArchitecture()
                 .getReferenceSize();
         final VmAbstractHeap heap = VmDefaultHeap.setupHeap(helper, start,
                 defaultHeapClass, slotSize);
@@ -483,7 +481,7 @@ public final class DefaultHeapManager extends VmHeapManager {
      * @see org.jnode.vm.memmgr.VmHeapManager#notifyClassResolved(org.jnode.vm.classmgr.VmType)
      */
     public void notifyClassResolved(VmType< ? > vmType) {
-        // Do nothing        
+        // Do nothing
     }
 
     /**

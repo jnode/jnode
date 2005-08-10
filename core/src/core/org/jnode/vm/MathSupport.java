@@ -299,7 +299,7 @@ final class MathSupport implements Uninterruptible {
         char u3 = HHALF(LHALFQ(uq));
         char u4 = LHALF(LHALFQ(uq));
         
-        final MathSupport mathSupport = Unsafe.getCurrentProcessor().getMathSupport();
+        final MathSupport mathSupport = VmProcessor.current().getMathSupport();
         final char[] v = mathSupport.v; 
         v[0] = 0;
         v[1] = HHALF(HHALFQ(vq));

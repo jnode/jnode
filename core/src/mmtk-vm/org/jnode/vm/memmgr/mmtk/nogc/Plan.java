@@ -3,7 +3,7 @@
  */
 package org.jnode.vm.memmgr.mmtk.nogc;
 
-import org.jnode.vm.Unsafe;
+import org.jnode.vm.VmProcessor;
 import org.jnode.vm.annotation.Inline;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.mmtk.plan.NoGC;
@@ -38,7 +38,7 @@ public abstract class Plan extends NoGC implements Uninterruptible {
      */
     @Inline
     public static Plan getInstance() {
-        return (Plan) Unsafe.getCurrentProcessor().getHeapData();
+        return (Plan) VmProcessor.current().getHeapData();
     }
 
     /**

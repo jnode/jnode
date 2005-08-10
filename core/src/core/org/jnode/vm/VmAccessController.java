@@ -56,13 +56,13 @@ public final class VmAccessController {
     @CheckPermission
     public static void checkPermission(Permission perm)
             throws AccessControlException {
-        if (!Unsafe.getCurrentProcessor().isThreadSwitchActive()) {
+        if (!VmProcessor.current().isThreadSwitchActive()) {
             // getContext().checkPermission(perm);
 
             // This is an optimized version of
             // getContext().checkPermission()
             // that does not require any memory allocations.
-            final VmStackReader reader = Unsafe.getCurrentProcessor()
+            final VmStackReader reader = VmProcessor.current()
                     .getArchitecture().getStackReader();
             final VmStackFrameEnumerator sfEnum = new VmStackFrameEnumerator(reader);
             int recursionCount = 0;
@@ -116,7 +116,7 @@ public final class VmAccessController {
      * @return the AccessControlContext based on the current context.
      */
     public static VmAccessControlContext getContext() {
-        final VmStackReader reader = Unsafe.getCurrentProcessor()
+        final VmStackReader reader = VmProcessor.current()
                 .getArchitecture().getStackReader();
         final VmStackFrame[] stack = reader.getVmStackTrace(VmMagic
                 .getCurrentFrame(), null, Integer.MAX_VALUE);

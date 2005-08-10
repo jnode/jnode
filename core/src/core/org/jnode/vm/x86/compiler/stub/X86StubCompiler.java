@@ -27,6 +27,7 @@ import org.jnode.assembler.ObjectResolver;
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.vm.Unsafe;
+import org.jnode.vm.VmProcessor;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.compiler.CompiledMethod;
@@ -114,7 +115,7 @@ public final class X86StubCompiler extends AbstractX86Compiler {
 	 * @return NativeStream
 	 */
 	public NativeStream createNativeStream(ObjectResolver resolver) {
-		X86BinaryAssembler os = new X86BinaryAssembler((X86CpuID)Unsafe.getCurrentProcessor().getCPUID(), getMode(), 0, 16, 64, 8);
+		X86BinaryAssembler os = new X86BinaryAssembler((X86CpuID)VmProcessor.current().getCPUID(), getMode(), 0, 16, 64, 8);
 		os.setResolver(resolver);
 		return os;
 	}

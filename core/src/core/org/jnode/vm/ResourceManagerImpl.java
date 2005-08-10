@@ -135,7 +135,7 @@ final class ResourceManagerImpl implements ResourceManager {
 	 */
 	public IRQResource claimIRQ(ResourceOwner owner, int irq, IRQHandler handler, boolean shared) 
 	throws ResourceNotFreeException {
-		return Unsafe.getCurrentProcessor().getIRQManager().claimIRQ(owner, irq, handler, shared);
+		return VmProcessor.current().getIRQManager().claimIRQ(owner, irq, handler, shared);
 	}
 	
 	/**

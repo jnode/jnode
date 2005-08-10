@@ -38,6 +38,8 @@ import org.jnode.vm.annotation.NoInline;
 import org.jnode.vm.annotation.NoReadBarrier;
 import org.jnode.vm.annotation.NoWriteBarrier;
 import org.jnode.vm.annotation.PrivilegedActionPragma;
+import org.jnode.vm.annotation.SharedStatics;
+import org.jnode.vm.annotation.Uninterruptible;
 import org.vmmagic.pragma.PragmaException;
 import org.vmmagic.pragma.UninterruptiblePragma;
 
@@ -77,25 +79,35 @@ public final class ClassDecoder {
             new MethodPragmaException(org.vmmagic.pragma.NoInlinePragma.class,
                     MethodPragmaFlags.NOINLINE), };
 
-    private static final MethodAnnotation[] METHOD_ANNOTATIONS = new MethodAnnotation[] {
-            new MethodAnnotation(CheckPermission.class,
+    private static final PragmaInterface[] INTERFACE_PRAGMAS = new PragmaInterface[] { new PragmaInterface(
+            org.vmmagic.pragma.Uninterruptible.class,
+            TypePragmaFlags.UNINTERRUPTIBLE), };
+
+    private static final PragmaAnnotation[] CLASS_ANNOTATIONS = new PragmaAnnotation[] {
+            new PragmaAnnotation(NoFieldAlignments.class,
+                    TypePragmaFlags.NO_FIELD_ALIGNMENT),
+            new PragmaAnnotation(SharedStatics.class,
+                    TypePragmaFlags.SHAREDSTATICS),
+            new PragmaAnnotation(Uninterruptible.class,
+                    TypePragmaFlags.UNINTERRUPTIBLE), };
+
+    private static final PragmaAnnotation[] METHOD_ANNOTATIONS = new PragmaAnnotation[] {
+            new PragmaAnnotation(CheckPermission.class,
                     MethodPragmaFlags.CHECKPERMISSION),
-            new MethodAnnotation(DoPrivileged.class,
+            new PragmaAnnotation(DoPrivileged.class,
                     MethodPragmaFlags.DOPRIVILEGED),
-            new MethodAnnotation(Inline.class, MethodPragmaFlags.INLINE),
-            new MethodAnnotation(LoadStatics.class,
+            new PragmaAnnotation(Inline.class, MethodPragmaFlags.INLINE),
+            new PragmaAnnotation(LoadStatics.class,
                     MethodPragmaFlags.LOADSTATICS),
-            new MethodAnnotation(NoInline.class, MethodPragmaFlags.NOINLINE),
-            new MethodAnnotation(NoReadBarrier.class,
+            new PragmaAnnotation(NoInline.class, MethodPragmaFlags.NOINLINE),
+            new PragmaAnnotation(NoReadBarrier.class,
                     MethodPragmaFlags.NOREADBARRIER),
-            new MethodAnnotation(NoWriteBarrier.class,
+            new PragmaAnnotation(NoWriteBarrier.class,
                     MethodPragmaFlags.NOWRITEBARRIER),
-            new MethodAnnotation(PrivilegedActionPragma.class,
-                    MethodPragmaFlags.PRIVILEGEDACTION), };
-
-    private static final int NO_FIELD_ALIGNMENT = 0x0001;
-
-    // private static final Logger log = Logger.getLogger(ClassDecoder.class);
+            new PragmaAnnotation(PrivilegedActionPragma.class,
+                    MethodPragmaFlags.PRIVILEGEDACTION),
+            new PragmaAnnotation(Uninterruptible.class,
+                    MethodPragmaFlags.UNINTERRUPTIBLE), };
 
     private static final byte[] TYPE_SIZES = { 1, 2, 4, 8 };
 
@@ -362,17 +374,18 @@ public final class ClassDecoder {
         cls.setCp(cp);
 
         // Determine if we can safely align the fields
-        int flags = 0;
+        int pragmaFlags = 0;
         if (isBootType(cls)) {
-            flags |= NO_FIELD_ALIGNMENT;
+            pragmaFlags |= TypePragmaFlags.NO_FIELD_ALIGNMENT;
         }
 
         // Interface table
-        flags |= readInterfaces(data, cls, cp);
+        pragmaFlags |= readInterfaces(data, cls, cp);
+        cls.addPragmaFlags(pragmaFlags);
 
         // Field table
-        readFields(data, cls, cp, sharedStatics, isolatedStatics, slotSize,
-                flags);
+        final FieldData[] fieldData = readFields(data, cp, slotSize,
+                pragmaFlags);
 
         // Method Table
         readMethods(data, rejectNatives, cls, cp, sharedStatics, clc);
@@ -394,6 +407,18 @@ public final class ClassDecoder {
             }
         }
         cls.setRuntimeAnnotations(merge(rVisAnn, rInvisAnn));
+        if (rInvisAnn != null) {
+            cls.addPragmaFlags(getClassPragmaFlags(rInvisAnn));
+        }
+        if (rVisAnn != null) {
+            cls.addPragmaFlags(getClassPragmaFlags(rVisAnn));
+        }
+
+        // Create the fields
+        if (fieldData != null) {
+            createFields(cls, fieldData, sharedStatics, isolatedStatics,
+                    slotSize, pragmaFlags);
+        }
 
         return cls;
     }
@@ -579,146 +604,29 @@ public final class ClassDecoder {
      * @param cp
      * @param slotSize
      */
-    private static void readFields(ByteBuffer data, VmType< ? > cls, VmCP cp,
-            VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics,
-            int slotSize, int flags) {
+    private static FieldData[] readFields(ByteBuffer data, VmCP cp,
+            int slotSize, int pragmaFlags) {
         final int fcount = data.getChar();
         if (fcount > 0) {
-            final VmField[] ftable = new VmField[fcount];
+            final FieldData[] ftable = new FieldData[fcount];
 
-            int objectSize = 0;
             for (int i = 0; i < fcount; i++) {
-                final boolean wide;
                 int modifiers = data.getChar();
                 final String name = cp.getUTF8(data.getChar());
                 final String signature = cp.getUTF8(data.getChar());
-                switch (signature.charAt(0)) {
-                case 'J':
-                case 'D':
-                    modifiers = modifiers | Modifier.ACC_WIDE;
-                    wide = true;
-                    break;
-                default:
-                    wide = false;
-                }
-                final boolean isstatic = (modifiers & Modifier.ACC_STATIC) != 0;
-                final int staticsIdx;
-                final VmField fs;
-                final VmStatics statics;
-                if (isstatic) {
-                    // Determine if the static field should be shared.
-                    final boolean shared = cls.isSharedStatics();
-                    if (shared) {
-                        statics = sharedStatics;
-                    } else {
-                        statics = isolatedStatics;
-                    }
-
-                    // If static allocate space for it.
-                    switch (signature.charAt(0)) {
-                    case 'B':
-                        staticsIdx = statics.allocIntField();
-                        break;
-                    case 'C':
-                        staticsIdx = statics.allocIntField();
-                        break;
-                    case 'D':
-                        staticsIdx = statics.allocLongField();
-                        break;
-                    case 'F':
-                        staticsIdx = statics.allocIntField();
-                        break;
-                    case 'I':
-                        staticsIdx = statics.allocIntField();
-                        break;
-                    case 'J':
-                        staticsIdx = statics.allocLongField();
-                        break;
-                    case 'S':
-                        staticsIdx = statics.allocIntField();
-                        break;
-                    case 'Z':
-                        staticsIdx = statics.allocIntField();
-                        break;
-                    default: {
-                        if (Modifier.isAddressType(signature)) {
-                            staticsIdx = statics.allocAddressField();
-                        } else {
-                            staticsIdx = statics.allocObjectField();
-                            // System.out.println(NumberUtils.hex(staticsIdx)
-                            // + "\t" + cls.getName() + "." + name);
-                        }
-                    }
-                        break;
-                    }
-                    fs = new VmStaticField(name, signature, modifiers,
-                            staticsIdx, cls, slotSize, shared);
-                } else {
-                    staticsIdx = -1;
-                    statics = null;
-                    final int fieldOffset;
-                    // Set the offset (keep in mind that this will be fixed
-                    // by ClassResolver with respect to the objectsize of the
-                    // super-class.
-                    fieldOffset = objectSize;
-                    // Increment the objectSize
-                    if (wide)
-                        objectSize += 8;
-                    else if (Modifier.isPrimitive(signature)) {
-                        objectSize += 4;
-                    } else {
-                        objectSize += slotSize;
-                    }
-                    fs = new VmInstanceField(name, signature, modifiers,
-                            fieldOffset, cls, slotSize);
-                }
-                ftable[i] = fs;
+                final boolean isstatic = ((modifiers & Modifier.ACC_STATIC) != 0);
 
                 // Read field attributes
                 final int acount = data.getChar();
                 VmAnnotation[] rVisAnn = null;
                 VmAnnotation[] rInvisAnn = null;
+                Object constantValue = null;
                 for (int a = 0; a < acount; a++) {
                     final String attrName = cp.getUTF8(data.getChar());
                     final int length = data.getInt();
                     if (isstatic
                             && VmArray.equals(ConstantValueAttrName, attrName)) {
-                        final int idx = data.getChar();
-                        switch (signature.charAt(0)) {
-                        case 'B':
-                            statics.setInt(staticsIdx, cp.getInt(idx));
-                            break;
-                        case 'C':
-                            statics.setInt(staticsIdx, cp.getInt(idx));
-                            break;
-                        case 'D':
-                            final long lval = Double.doubleToRawLongBits(cp
-                                    .getDouble(idx));
-                            statics.setLong(staticsIdx, lval);
-                            break;
-                        case 'F':
-                            final int ival = Float.floatToRawIntBits(cp
-                                    .getFloat(idx));
-                            statics.setInt(staticsIdx, ival);
-                            break;
-                        case 'I':
-                            statics.setInt(staticsIdx, cp.getInt(idx));
-                            break;
-                        case 'J':
-                            statics.setLong(staticsIdx, cp.getLong(idx));
-                            break;
-                        case 'S':
-                            statics.setInt(staticsIdx, cp.getInt(idx));
-                            break;
-                        case 'Z':
-                            statics.setInt(staticsIdx, cp.getInt(idx));
-                            break;
-                        default:
-                            // throw new IllegalArgumentException("signature "
-                            // + signature);
-                            statics.setObject(staticsIdx, cp.getString(idx));
-                            break;
-                        }
+                        constantValue = cp.getAny(data.getChar());
                     } else if (VmArray.equals(
                             RuntimeVisibleAnnotationsAttrName, attrName)) {
                         rVisAnn = readRuntimeAnnotations(data, cp, true);
@@ -729,20 +637,168 @@ public final class ClassDecoder {
                         skip(data, length);
                     }
                 }
-                fs.setRuntimeAnnotations(merge(rVisAnn, rInvisAnn));
-            }
 
-            // Align the instance fields for minimal object size.
-            if ((flags & NO_FIELD_ALIGNMENT) == 0) {
-                final int alignedObjectSize = alignInstanceFields(ftable,
-                        slotSize);
-                objectSize = alignedObjectSize;
+                ftable[i] = new FieldData(name, signature, modifiers,
+                        constantValue, rVisAnn, rInvisAnn);
             }
+            return ftable;
+        } else {
+            return null;
+        }
+    }
 
-            cls.setFieldTable(ftable);
-            if (objectSize > 0) {
-                ((VmNormalClass< ? >) cls).setObjectSize(objectSize);
+    /**
+     * Read the fields table
+     * 
+     * @param reader
+     * @param cls
+     * @param cp
+     * @param slotSize
+     */
+    private static void createFields(VmType< ? > cls, FieldData[] fieldDatas,
+            VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics,
+            int slotSize, int pragmaFlags) {
+        final int fcount = fieldDatas.length;
+        final VmField[] ftable = new VmField[fcount];
+
+        int objectSize = 0;
+        for (int i = 0; i < fcount; i++) {
+            final FieldData fd = fieldDatas[i];
+            final boolean wide;
+            int modifiers = fd.modifiers;
+            final String name = fd.name;
+            final String signature = fd.signature;
+            switch (signature.charAt(0)) {
+            case 'J':
+            case 'D':
+                modifiers = modifiers | Modifier.ACC_WIDE;
+                wide = true;
+                break;
+            default:
+                wide = false;
             }
+            final boolean isstatic = (modifiers & Modifier.ACC_STATIC) != 0;
+            final int staticsIdx;
+            final VmField fs;
+            final VmStatics statics;
+            if (isstatic) {
+                // Determine if the static field should be shared.
+                final boolean shared = cls.isSharedStatics();
+                if (shared) {
+                    statics = sharedStatics;
+                } else {
+                    statics = isolatedStatics;
+                }
+
+                // If static allocate space for it.
+                switch (signature.charAt(0)) {
+                case 'B':
+                    staticsIdx = statics.allocIntField();
+                    break;
+                case 'C':
+                    staticsIdx = statics.allocIntField();
+                    break;
+                case 'D':
+                    staticsIdx = statics.allocLongField();
+                    break;
+                case 'F':
+                    staticsIdx = statics.allocIntField();
+                    break;
+                case 'I':
+                    staticsIdx = statics.allocIntField();
+                    break;
+                case 'J':
+                    staticsIdx = statics.allocLongField();
+                    break;
+                case 'S':
+                    staticsIdx = statics.allocIntField();
+                    break;
+                case 'Z':
+                    staticsIdx = statics.allocIntField();
+                    break;
+                default: {
+                    if (Modifier.isAddressType(signature)) {
+                        staticsIdx = statics.allocAddressField();
+                    } else {
+                        staticsIdx = statics.allocObjectField();
+                        // System.out.println(NumberUtils.hex(staticsIdx)
+                        // + "\t" + cls.getName() + "." + name);
+                    }
+                }
+                    break;
+                }
+                fs = new VmStaticField(name, signature, modifiers, staticsIdx,
+                        cls, slotSize, shared);
+            } else {
+                staticsIdx = -1;
+                statics = null;
+                final int fieldOffset;
+                // Set the offset (keep in mind that this will be fixed
+                // by ClassResolver with respect to the objectsize of the
+                // super-class.
+                fieldOffset = objectSize;
+                // Increment the objectSize
+                if (wide)
+                    objectSize += 8;
+                else if (Modifier.isPrimitive(signature)) {
+                    objectSize += 4;
+                } else {
+                    objectSize += slotSize;
+                }
+                fs = new VmInstanceField(name, signature, modifiers,
+                        fieldOffset, cls, slotSize);
+            }
+            ftable[i] = fs;
+
+            // Read field attributes
+            final VmAnnotation[] rVisAnn = fd.rVisAnn;
+            final VmAnnotation[] rInvisAnn = fd.rInvisAnn;
+            if (isstatic && (fd.constantValue != null)) {
+                switch (signature.charAt(0)) {
+                case 'B':
+                case 'C':
+                case 'I':
+                case 'S':
+                case 'Z':
+                    statics.setInt(staticsIdx, ((VmConstInt) fd.constantValue)
+                            .intValue());
+                    break;
+                case 'D':
+                    final long lval = Double
+                            .doubleToRawLongBits(((VmConstDouble) fd.constantValue)
+                                    .doubleValue());
+                    statics.setLong(staticsIdx, lval);
+                    break;
+                case 'F':
+                    final int ival = Float
+                            .floatToRawIntBits(((VmConstFloat) fd.constantValue)
+                                    .floatValue());
+                    statics.setInt(staticsIdx, ival);
+                    break;
+                case 'J':
+                    statics.setLong(staticsIdx,
+                            ((VmConstLong) fd.constantValue).longValue());
+                    break;
+                default:
+                    // throw new IllegalArgumentException("signature "
+                    // + signature);
+                    statics.setObject(staticsIdx,
+                            (VmConstString) fd.constantValue);
+                    break;
+                }
+            }
+            fs.setRuntimeAnnotations(merge(rVisAnn, rInvisAnn));
+        }
+
+        // Align the instance fields for minimal object size.
+        if ((pragmaFlags & TypePragmaFlags.NO_FIELD_ALIGNMENT) == 0) {
+            final int alignedObjectSize = alignInstanceFields(ftable, slotSize);
+            objectSize = alignedObjectSize;
+        }
+
+        cls.setFieldTable(ftable);
+        if (objectSize > 0) {
+            ((VmNormalClass< ? >) cls).setObjectSize(objectSize);
         }
     }
 
@@ -758,15 +814,16 @@ public final class ClassDecoder {
         int flags = 0;
         final int icount = data.getChar();
         if (icount > 0) {
-            final String noFieldAlignmentsName = NoFieldAlignments.class
-                    .getName();
             final VmImplementedInterface[] itable = new VmImplementedInterface[icount];
             for (int i = 0; i < icount; i++) {
                 final VmConstClass icls = cp.getConstClass(data.getChar());
                 final String iclsName = icls.getClassName();
                 itable[i] = new VmImplementedInterface(iclsName);
-                if (iclsName.equals(noFieldAlignmentsName)) {
-                    flags |= NO_FIELD_ALIGNMENT;
+
+                for (PragmaInterface pi : INTERFACE_PRAGMAS) {
+                    if (iclsName.equals(pi.className)) {
+                        flags |= pi.flags;
+                    }
                 }
             }
             cls.setInterfaceTable(itable);
@@ -925,7 +982,26 @@ public final class ClassDecoder {
         int flags = 0;
         for (VmAnnotation a : annotations) {
             final String typeDescr = a.getTypeDescriptor();
-            for (MethodAnnotation ma : METHOD_ANNOTATIONS) {
+            for (PragmaAnnotation ma : METHOD_ANNOTATIONS) {
+                if (ma.typeDescr.equals(typeDescr)) {
+                    flags |= ma.flags;
+                }
+            }
+        }
+        return flags;
+    }
+
+    /**
+     * Combine the pragma flags for a given list of annotations.
+     * 
+     * @param data
+     * @param cp
+     */
+    private static int getClassPragmaFlags(VmAnnotation[] annotations) {
+        int flags = 0;
+        for (VmAnnotation a : annotations) {
+            final String typeDescr = a.getTypeDescriptor();
+            for (PragmaAnnotation ma : CLASS_ANNOTATIONS) {
                 if (ma.typeDescr.equals(typeDescr)) {
                     flags |= ma.flags;
                 }
@@ -1094,14 +1170,58 @@ public final class ClassDecoder {
         }
     }
 
-    private static final class MethodAnnotation {
+    private static final class PragmaInterface {
+        public final char flags;
+
+        public final String className;
+
+        public PragmaInterface(Class< ? > cls, char flags) {
+            this.className = cls.getName();
+            this.flags = flags;
+        }
+    }
+
+    private static final class PragmaAnnotation {
         public final char flags;
 
         public final String typeDescr;
 
-        public MethodAnnotation(Class< ? extends Annotation> cls, char flags) {
+        public PragmaAnnotation(Class< ? extends Annotation> cls, char flags) {
             this.typeDescr = "L" + cls.getName().replace('.', '/') + ";";
             this.flags = flags;
         }
+    }
+
+    private static final class FieldData {
+        public final String name;
+
+        public final String signature;
+
+        public final int modifiers;
+
+        public final Object constantValue;
+
+        public final VmAnnotation[] rVisAnn;
+
+        public final VmAnnotation[] rInvisAnn;
+
+        /**
+         * @param name
+         * @param signature
+         * @param modifiers
+         * @param value
+         * @param rInvisAnn
+         * @param rVisAnn
+         */
+        public FieldData(String name, String signature, int modifiers,
+                Object value, VmAnnotation[] rVisAnn, VmAnnotation[] rInvisAnn) {
+            this.name = name;
+            this.signature = signature;
+            this.modifiers = modifiers;
+            this.constantValue = value;
+            this.rVisAnn = rVisAnn;
+            this.rInvisAnn = rInvisAnn;
+        }
+
     }
 }

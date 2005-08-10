@@ -142,6 +142,14 @@ public final class VmMagic {
 	 */
 	public static void breakPoint() {}
 
+    /**
+     * Gets the processor executing the current thread.
+     * @return
+     */
+    final static VmProcessor currentProcessor() {
+        return null;
+    }
+    
 	/**
 	 * Do not instantiate this class.
 	 */

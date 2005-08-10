@@ -54,9 +54,6 @@ public class Modifier {
 	/** Is this a magic class */
 	public static final int ACC_MAGIC = 0x10000000; // C
 
-    /** Are the statics of this class shared */
-	public static final int ACC_SHAREDSTATICS = 0x20000000; // C
-    
     /** Is this a special method (init, clinit) */
 	public static final int ACC_SPECIAL     = 0x80000000;
 	
@@ -199,17 +196,6 @@ public class Modifier {
 		int mask = ACC_INITIALIZING;
 		return ((modifier & mask) == mask);
 	}*/
-
-	/**
-	 * Does this class have shared statics.
-	 * 
-	 * @param modifier
-	 * @return boolean
-	 */
-	public static boolean isSharedStatics(int modifier) {
-		int mask = ACC_SHAREDSTATICS;
-		return ((modifier & mask) == mask);
-	}
 
 	public static boolean isWide(String signature) {
 		final int len = signature.length();
@@ -367,9 +353,6 @@ public class Modifier {
 		/*if ((modifiers & ACC_INVALID) != 0) {
 			b.append("invalid ");
 		}*/
-		if ((modifiers & ACC_SHAREDSTATICS) != 0) {
-			b.append("sharedstatics ");
-		}
 
 		return b.toString().trim();
 	}
