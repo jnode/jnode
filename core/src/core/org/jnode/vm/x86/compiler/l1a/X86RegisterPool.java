@@ -67,7 +67,7 @@ abstract class X86RegisterPool {
      *            the register owner
      * @return the allocated register or null
      */
-    public final X86Register request(int type, Object owner) {
+    public final X86Register request(int type, Item owner) {
         return request(type, owner, false);
     }
 
@@ -80,7 +80,7 @@ abstract class X86RegisterPool {
      *            the register owner
      * @return the allocated register or null
      */
-    public final X86Register request(int type, Object owner,
+    public final X86Register request(int type, Item owner,
             boolean supportBits8) {
         for (int i = regCount - 1; i >= 0; i--) {
             final RegisterGroupUsage ru = registers[i];
@@ -132,7 +132,7 @@ abstract class X86RegisterPool {
      * @param register
      * @return false, if the register is already in use
      */
-    public final boolean request(X86Register register, Object owner) {
+    public final boolean request(X86Register register, Item owner) {
         final RegisterGroupUsage ru = get(register);
         final boolean free = ru.isFree();
         if (free) {
@@ -169,7 +169,7 @@ abstract class X86RegisterPool {
      * @param newOwner
      *            the register's new owner
      */
-    public final void transferOwnerTo(X86Register register, Object newOwner) {
+    public final void transferOwnerTo(X86Register register, Item newOwner) {
         get(register).setOwner(newOwner);
     }
 
@@ -532,7 +532,7 @@ abstract class X86RegisterPool {
         /** The registers in this group */
         private final RegisterEntry[] regs;
 
-        private Object owner;
+        private Item owner;
 
         private boolean inuse;
 
@@ -620,7 +620,7 @@ abstract class X86RegisterPool {
          * @return The register if request succeeds, null if this register group
          *         is already used.
          */
-        public X86Register request(Object owner, int jvmType,
+        public X86Register request(Item owner, int jvmType,
                 boolean supportBits8) {
             final int cnt = regs.length;
             for (int i = 0; i < cnt; i++) {
@@ -641,7 +641,7 @@ abstract class X86RegisterPool {
          * @return The register if request succeeds, null if this register group
          *         is already used.
          */
-        public X86Register request(Object owner, X86Register reg) {
+        public X86Register request(Item owner, X86Register reg) {
             if (this.inuse) {
                 return null;
             } else {
@@ -682,7 +682,7 @@ abstract class X86RegisterPool {
         /**
          * Sets the current owner of this register.
          */
-        public void setOwner(Object owner) {
+        public void setOwner(Item owner) {
             if (!this.inuse) {
                 throw new IllegalStateException("Must be inuse");
             }

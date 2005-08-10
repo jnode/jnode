@@ -23,6 +23,7 @@ package org.jnode.vm.compiler;
 
 import org.jnode.vm.bytecode.BasicBlock;
 import org.jnode.vm.bytecode.BytecodeVisitor;
+import org.jnode.vm.classmgr.VmType;
 
 
 /**
@@ -54,4 +55,9 @@ public abstract class CompilerBytecodeVisitor extends BytecodeVisitor {
 	 * Emit a yieldpoint.
 	 */
 	public abstract void yieldPoint();
+    
+    /**
+     * Push the given VmType on the stack.
+     */
+    public abstract void visit_ldc(VmType<?> value);
 }

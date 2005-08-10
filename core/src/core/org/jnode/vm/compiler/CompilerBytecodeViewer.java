@@ -30,6 +30,7 @@ import org.jnode.vm.classmgr.VmConstIMethodRef;
 import org.jnode.vm.classmgr.VmConstMethodRef;
 import org.jnode.vm.classmgr.VmConstString;
 import org.jnode.vm.classmgr.VmMethod;
+import org.jnode.vm.classmgr.VmType;
 
 
 /**
@@ -842,6 +843,14 @@ public class CompilerBytecodeViewer extends InlineBytecodeVisitor {
     public void visit_ldc(VmConstClass value) {
         viewer.visit_ldc(value);
     }
+    
+    /**
+     * Push the given VmType on the stack.
+     */
+    public void visit_ldc(VmType<?> value) {
+        viewer.visit_ldc(value);        
+    }
+    
     /**
      * 
      */

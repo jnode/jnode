@@ -29,6 +29,7 @@ import org.jnode.vm.classmgr.VmConstIMethodRef;
 import org.jnode.vm.classmgr.VmConstMethodRef;
 import org.jnode.vm.classmgr.VmConstString;
 import org.jnode.vm.classmgr.VmMethod;
+import org.jnode.vm.classmgr.VmType;
 
 
 /**
@@ -811,6 +812,13 @@ public class DelegatingCompilerBytecodeVisitor<T extends CompilerBytecodeVisitor
      * @param value
      */
     public void visit_ldc(VmConstClass value) {
+        delegate.visit_ldc(value);
+    }
+    
+    /**
+     * Push the given VmType on the stack.
+     */
+    public void visit_ldc(VmType<?> value) {
         delegate.visit_ldc(value);
     }
     /**
