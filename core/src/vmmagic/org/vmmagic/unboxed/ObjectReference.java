@@ -21,7 +21,6 @@
  
 package org.vmmagic.unboxed;
 
-import org.vmmagic.pragma.InlinePragma;
 import org.vmmagic.pragma.Uninterruptible;
 
 /**
@@ -63,7 +62,7 @@ public final class ObjectReference implements Uninterruptible {
 	/**
 	 * Return a null reference
 	 */
-	public static final ObjectReference nullReference() throws InlinePragma {
+	public static final ObjectReference nullReference() {
 		return null;
 	}
 

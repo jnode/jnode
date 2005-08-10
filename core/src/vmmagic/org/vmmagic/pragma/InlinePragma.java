@@ -26,6 +26,7 @@ package org.vmmagic.pragma;
  * the optimizing compiler.
  * 
  * @author Stephen Fink
+ * @deprecated Use Inline annotation instead.
  */
 public class InlinePragma extends PragmaException {
 }

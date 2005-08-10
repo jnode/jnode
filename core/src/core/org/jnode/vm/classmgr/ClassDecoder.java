@@ -29,15 +29,15 @@ import java.nio.ByteBuffer;
 import java.security.ProtectionDomain;
 
 import org.jnode.system.BootLog;
-import org.jnode.vm.annotation.LoadStatics;
-import org.jnode.vm.annotation.NoFieldAlignments;
 import org.jnode.vm.annotation.CheckPermission;
 import org.jnode.vm.annotation.DoPrivileged;
+import org.jnode.vm.annotation.Inline;
+import org.jnode.vm.annotation.LoadStatics;
+import org.jnode.vm.annotation.NoFieldAlignments;
+import org.jnode.vm.annotation.NoInline;
 import org.jnode.vm.annotation.NoReadBarrier;
 import org.jnode.vm.annotation.NoWriteBarrier;
 import org.jnode.vm.annotation.PrivilegedActionPragma;
-import org.vmmagic.pragma.InlinePragma;
-import org.vmmagic.pragma.NoInlinePragma;
 import org.vmmagic.pragma.PragmaException;
 import org.vmmagic.pragma.UninterruptiblePragma;
 
@@ -68,12 +68,13 @@ public final class ClassDecoder {
 
     private static char[] RuntimeInvisibleParameterAnnotationsAttrName;
 
+    @SuppressWarnings("deprecation")
     private static final MethodPragmaException[] METHOD_PRAGMA_EXCEPTIONS = new MethodPragmaException[] {
             new MethodPragmaException(UninterruptiblePragma.class,
                     MethodPragmaFlags.UNINTERRUPTIBLE),
-            new MethodPragmaException(InlinePragma.class,
+            new MethodPragmaException(org.vmmagic.pragma.InlinePragma.class,
                     MethodPragmaFlags.INLINE),
-            new MethodPragmaException(NoInlinePragma.class,
+            new MethodPragmaException(org.vmmagic.pragma.NoInlinePragma.class,
                     MethodPragmaFlags.NOINLINE), };
 
     private static final MethodAnnotation[] METHOD_ANNOTATIONS = new MethodAnnotation[] {
@@ -81,8 +82,10 @@ public final class ClassDecoder {
                     MethodPragmaFlags.CHECKPERMISSION),
             new MethodAnnotation(DoPrivileged.class,
                     MethodPragmaFlags.DOPRIVILEGED),
+            new MethodAnnotation(Inline.class, MethodPragmaFlags.INLINE),
             new MethodAnnotation(LoadStatics.class,
                     MethodPragmaFlags.LOADSTATICS),
+            new MethodAnnotation(NoInline.class, MethodPragmaFlags.NOINLINE),
             new MethodAnnotation(NoReadBarrier.class,
                     MethodPragmaFlags.NOREADBARRIER),
             new MethodAnnotation(NoWriteBarrier.class,

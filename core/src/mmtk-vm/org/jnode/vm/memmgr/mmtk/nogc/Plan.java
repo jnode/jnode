@@ -4,9 +4,9 @@
 package org.jnode.vm.memmgr.mmtk.nogc;
 
 import org.jnode.vm.Unsafe;
+import org.jnode.vm.annotation.Inline;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.mmtk.plan.NoGC;
-import org.vmmagic.pragma.InlinePragma;
 import org.vmmagic.pragma.Uninterruptible;
 
 /**
@@ -21,29 +21,31 @@ public abstract class Plan extends NoGC implements Uninterruptible {
 
     /** The heap helper */
     private final HeapHelper heapHelper;
-    
+
     /**
      * Initialize this instance.
+     * 
      * @param helper
      */
     public Plan(HeapHelper helper) {
         this.heapHelper = helper;
     }
-    
+
     /**
      * Gets the plan instance associated with the current processor.
      * 
      * @return the plan instance for the current processor
      */
-    public static Plan getInstance() 
-    throws InlinePragma {
-        return (Plan)Unsafe.getCurrentProcessor().getHeapData();
+    @Inline
+    public static Plan getInstance() {
+        return (Plan) Unsafe.getCurrentProcessor().getHeapData();
     }
 
     /**
      * @return Returns the heapHelper.
      */
+    @Inline
     public final HeapHelper getHeapHelper() {
         return heapHelper;
-    }    
+    }
 }

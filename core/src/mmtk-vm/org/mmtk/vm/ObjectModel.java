@@ -22,10 +22,12 @@
 package org.mmtk.vm;
 
 import org.jnode.vm.VmMagic;
+import org.jnode.vm.annotation.Inline;
 import org.mmtk.utility.scan.MMType;
-
-import org.vmmagic.unboxed.*;
-import org.vmmagic.pragma.*;
+import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.ObjectReference;
+import org.vmmagic.unboxed.Offset;
+import org.vmmagic.unboxed.Word;
 
 /**
  * $Id$
@@ -116,8 +118,14 @@ public class ObjectModel {
         return null;
     }
 
-    public static int getArrayLength(ObjectReference object)
-            throws InlinePragma {
+    /**
+     * Gets the length of the given array.
+     * 
+     * @param object
+     * @return
+     */
+    @Inline
+    public static int getArrayLength(ObjectReference object) {
         return 0;
     }
 
@@ -256,6 +264,6 @@ public class ObjectModel {
      * @return The type object for <code>object</code>
      */
     public static MMType getObjectType(ObjectReference object) {
-        return (MMType)VmMagic.getObjectType(object).getMmType();
+        return (MMType) VmMagic.getObjectType(object).getMmType();
     }
 }

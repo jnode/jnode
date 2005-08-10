@@ -22,13 +22,13 @@
 package org.mmtk.vm;
 
 import org.jnode.vm.Vm;
+import org.jnode.vm.annotation.Inline;
 import org.mmtk.utility.Constants;
 import org.mmtk.utility.deque.AddressDeque;
 import org.mmtk.utility.deque.AddressPairDeque;
 import org.mmtk.utility.scan.Enumerator;
 import org.mmtk.utility.scan.PreCopyEnumerator;
 import org.mmtk.utility.scan.Scan;
-import org.vmmagic.pragma.InlinePragma;
 import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.ObjectReference;
 
@@ -116,8 +116,9 @@ public final class Scanning implements Constants {
      * @param e
      *            the Enumerate object through which the callback is made
      */
+    @Inline
     private static void enumeratePointers(Object object, Enumerator e)
-            throws UninterruptiblePragma, InlinePragma {
+            throws UninterruptiblePragma {
         Scan.enumeratePointers(ObjectReference.fromObject(object), e);
     }
 
