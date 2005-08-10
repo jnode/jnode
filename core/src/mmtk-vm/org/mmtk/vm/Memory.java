@@ -25,9 +25,9 @@ import org.jnode.vm.Unsafe;
 import org.jnode.vm.VirtualMemoryRegion;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmArchitecture;
+import org.jnode.vm.annotation.Inline;
 import org.mmtk.plan.BasePlan;
 import org.mmtk.policy.ImmortalSpace;
-import org.vmmagic.pragma.InlinePragma;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 
@@ -42,7 +42,7 @@ public class Memory {
 
     /** Space reserved by the bootimage */
     private static ImmortalSpace bootSpace;
-    
+
     /**
      * Gets the start of the virtual address space where object may be found.
      * 
@@ -99,10 +99,11 @@ public class Memory {
     public static ImmortalSpace getVMSpace() {
         if (bootSpace == null) {
             final VmArchitecture arch = Vm.getArch();
-            final long bootSize = AVAILABLE_START().sub(HEAP_START().toWord()).toLong();
-            final int bootSizeMb = (int)(bootSize >>> 20);
-            bootSpace = new ImmortalSpace("boot", BasePlan.DEFAULT_POLL_FREQUENCY, 
-                    bootSizeMb, false);
+            final long bootSize = AVAILABLE_START().sub(HEAP_START().toWord())
+                    .toLong();
+            final int bootSizeMb = (int) (bootSize >>> 20);
+            bootSpace = new ImmortalSpace("boot",
+                    BasePlan.DEFAULT_POLL_FREQUENCY, bootSizeMb, false);
         }
         return bootSpace;
     }
@@ -161,8 +162,9 @@ public class Memory {
             Unsafe.debug(" sz ");
             Unsafe.debug(size);
         }
-        
-        if (Vm.getArch().mmap(VirtualMemoryRegion.HEAP, start, Extent.fromIntZeroExtend(size), Address.max())) {
+
+        if (Vm.getArch().mmap(VirtualMemoryRegion.HEAP, start,
+                Extent.fromIntZeroExtend(size), Address.max())) {
             return 0;
         } else {
             return 1;
@@ -239,11 +241,13 @@ public class Memory {
      * Utilities from the VM class
      */
 
-    public static void sync() throws InlinePragma {
+    @Inline
+    public static void sync() {
         // TODO Understand me
     }
 
-    public static void isync() throws InlinePragma {
+    @Inline
+    public static void isync() {
         // TODO Understand me
     }
 }

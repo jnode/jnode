@@ -3,11 +3,11 @@
  */
 package org.jnode.vm.memmgr.mmtk.nogc;
 
+import org.jnode.vm.annotation.Inline;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.memmgr.GCStatistics;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.mmtk.BaseMmtkHeapManager;
-import org.vmmagic.pragma.InlinePragma;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.ObjectReference;
 
@@ -40,7 +40,8 @@ public final class HeapManager extends BaseMmtkHeapManager {
     /**
      * @see org.jnode.vm.memmgr.mmtk.BaseMmtkHeapManager#bootPlan()
      */
-    protected final void bootPlan() throws InlinePragma {
+    @Inline
+    protected final void bootPlan() {
         Plan.boot();
     }
 
@@ -48,8 +49,9 @@ public final class HeapManager extends BaseMmtkHeapManager {
      * @see org.jnode.vm.memmgr.mmtk.BaseMmtkHeapManager#alloc(int, int, int,
      *      int)
      */
+    @Inline
     protected final Address alloc(int bytes, int align, int offset,
-            int allocator) throws InlinePragma {
+            int allocator) {
         return Plan.getInstance().alloc(bytes, align, offset, allocator);
     }
 
@@ -57,9 +59,9 @@ public final class HeapManager extends BaseMmtkHeapManager {
      * @see org.jnode.vm.memmgr.mmtk.BaseMmtkHeapManager#postAlloc(org.vmmagic.unboxed.ObjectReference,
      *      org.vmmagic.unboxed.ObjectReference, int, int)
      */
+    @Inline
     protected final void postAlloc(ObjectReference object,
-            ObjectReference typeRef, int bytes, int allocator)
-            throws InlinePragma {
+            ObjectReference typeRef, int bytes, int allocator) {
         Plan.getInstance().postAlloc(object, typeRef, bytes, allocator);
     }
 
@@ -67,8 +69,8 @@ public final class HeapManager extends BaseMmtkHeapManager {
      * @see org.jnode.vm.memmgr.mmtk.BaseMmtkHeapManager#checkAllocator(int,
      *      int, int)
      */
-    protected final int checkAllocator(int bytes, int align, int allocator)
-            throws InlinePragma {
+    @Inline
+    protected final int checkAllocator(int bytes, int align, int allocator) {
         return Plan.checkAllocator(bytes, align, allocator);
     }
 }

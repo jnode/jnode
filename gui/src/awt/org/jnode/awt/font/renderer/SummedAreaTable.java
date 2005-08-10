@@ -24,7 +24,7 @@ package org.jnode.awt.font.renderer;
 import java.util.BitSet;
 
 import org.jnode.vm.Vm;
-import org.vmmagic.pragma.InlinePragma;
+import org.jnode.vm.annotation.Inline;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -94,8 +94,8 @@ public abstract class SummedAreaTable {
 	 * @param y
 	 * @return
 	 */
-	public final int getSum(int x, int y) 
-    throws InlinePragma {
+    @Inline
+	public final int getSum(int x, int y) { 
 		if ((x < 0) || (x >= width)) {
 			throw new IllegalArgumentException("x " + x + " " + width);
 		}

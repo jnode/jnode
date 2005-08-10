@@ -36,7 +36,6 @@ import org.mmtk.utility.heap.LazyMmapper;
 import org.mmtk.utility.scan.MMType;
 import org.mmtk.vm.Memory;
 import org.mmtk.vm.SynchronizedCounter;
-import org.vmmagic.pragma.InlinePragma;
 import org.vmmagic.pragma.Uninterruptible;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
@@ -55,18 +54,23 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
 
     /** Used by mmtypes for arrays */
     private final int[] EMPY_INT_ARRAY = new int[0];
-    
+
     /** Offset in bytes of the flags from the object reference */
     private final int flagsOffset;
+
     /** Offset in bytes of the TIB reference from the object reference */
     private final int tibOffset;
+
     /** Size of the java header in bytes */
     private final int headerSize;
-    
-    /** Resource used to claim the memory region occupied by the available heap */ 
+
+    /** Resource used to claim the memory region occupied by the available heap */
     private MemoryResource heapResource;
-    
-    /** Is this heapmanager busy initializing (used to detect recursion in initialize) */
+
+    /**
+     * Is this heapmanager busy initializing (used to detect recursion in
+     * initialize)
+     */
     private boolean initializing;
 
     /**
@@ -115,15 +119,16 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
             Unsafe.debug('\n');
         }
         if (false) {
-            Unsafe.getCurrentProcessor().getArchitecture().getStackReader().debugStackTrace();
+            Unsafe.getCurrentProcessor().getArchitecture().getStackReader()
+                    .debugStackTrace();
         }
-         
+
         final int align = ObjectLayout.OBJECT_ALIGN;
         final Word headerSize = Word.fromIntZeroExtend(this.headerSize);
         final Offset tibOffset = Offset.fromIntSignExtend(this.tibOffset);
         final Offset flagsOffset = Offset.fromIntSignExtend(this.flagsOffset);
         int allocator = BasePlan.ALLOC_DEFAULT;
-        
+
         final int refSize = Vm.getArch().getReferenceSize();
         allocator = checkAllocator(size, align, allocator);
 
@@ -133,18 +138,21 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
 
         // Initialize the header
         final Address objPtr = ptr.add(headerSize);
-        final ObjectReference tibRef = ObjectReference.fromObject(vmClass.getTIB());
+        final ObjectReference tibRef = ObjectReference.fromObject(vmClass
+                .getTIB());
         objPtr.store(tibRef, tibOffset);
-        objPtr.store((int)0, flagsOffset);
+        objPtr.store((int) 0, flagsOffset);
 
         // Post allocation
         final Object result = objPtr.toObjectReference().toObject();
         if (false) {
-            Unsafe.debug("result="); Unsafe.debug(objPtr); Unsafe.debug('\n');
+            Unsafe.debug("result=");
+            Unsafe.debug(objPtr);
+            Unsafe.debug('\n');
         }
         postAlloc(ObjectReference.fromObject(result), ObjectReference
                 .fromObject(vmClass), size, allocator);
-        
+
         return result;
     }
 
@@ -198,25 +206,26 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
     protected void initialize() {
         Unsafe.debug("MmtkHeapManager#initialize\n");
         if (initializing) {
-            Unsafe.getCurrentProcessor().getArchitecture().getStackReader().debugStackTrace();
+            Unsafe.getCurrentProcessor().getArchitecture().getStackReader()
+                    .debugStackTrace();
             Unsafe.die("Recursive initialize");
         }
         initializing = true;
         final VmArchitecture arch = Vm.getArch();
         helper.bootArchitecture(true);
-                
+
         final Address bootImgStart = helper.getBootImageStart();
         final Address bootImgEnd = helper.getBootImageEnd();
-        final int bootImgSize = bootImgEnd.sub(bootImgStart.toWord()).toInt();        
+        final int bootImgSize = bootImgEnd.sub(bootImgStart.toWord()).toInt();
         LazyMmapper.boot(bootImgStart, bootImgSize);
-        
+
         final Extent heapSize = helper.getHeapSize();
         HeapGrowthManager.boot(heapSize, heapSize);
         bootPlan();
         SynchronizedCounter.boot();
         initializing = false;
         Unsafe.debug("MmtkHeapManager#initialize done\n");
-        
+
         Space.printVMMap();
     }
 
@@ -243,16 +252,19 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
 
         // Claim the available heap region as resource.
         try {
-            final ResourceManager rm = InitialNaming.lookup(ResourceManager.NAME);
+            final ResourceManager rm = InitialNaming
+                    .lookup(ResourceManager.NAME);
             final Address start = Memory.AVAILABLE_START();
-            final Extent size = Memory.AVAILABLE_END().toWord().sub(start.toWord()).toExtent();
-            heapResource = rm.claimMemoryResource(ResourceOwner.SYSTEM, start, size,  ResourceManager.MEMMODE_NORMAL);
+            final Extent size = Memory.AVAILABLE_END().toWord().sub(
+                    start.toWord()).toExtent();
+            heapResource = rm.claimMemoryResource(ResourceOwner.SYSTEM, start,
+                    size, ResourceManager.MEMMODE_NORMAL);
         } catch (NameNotFoundException ex) {
             BootLog.fatal("Cannot find resource manager", ex);
         } catch (ResourceNotFreeException ex) {
             BootLog.fatal("Cannot claim available heap region", ex);
         }
-        
+
     }
 
     /**
@@ -262,11 +274,11 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
         final MMType type;
         final boolean acyclic = false; // TODO understand me
         if (vmType.isArray()) {
-            final VmArrayClass< ? > arrType = (VmArrayClass<?>) vmType;
+            final VmArrayClass< ? > arrType = (VmArrayClass< ? >) vmType;
             type = new MMType(false, !arrType.isPrimitiveArray(), acyclic,
                     pickAllocatorForType(vmType), EMPY_INT_ARRAY);
         } else if (!vmType.isInterface()) {
-            final VmNormalClass< ? > clsType = (VmNormalClass<?>) vmType;
+            final VmNormalClass< ? > clsType = (VmNormalClass< ? >) vmType;
             type = new MMType(false, false, acyclic,
                     pickAllocatorForType(vmType), clsType.getReferenceOffsets());
         } else {
@@ -315,41 +327,40 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
         super.verifyBeforeEmit();
         Space.printVMMap();
     }
-    
+
     /**
      * Call plan.alloc
+     * 
      * @param bytes
      * @param align
      * @param offset
      * @param allocator
      * @return
-     * @throws InlinePragma
      */
-    protected abstract Address alloc(int bytes, int align, int offset, int allocator)
-    throws InlinePragma;
-  
+    protected abstract Address alloc(int bytes, int align, int offset,
+            int allocator);
+
     /**
      * Call plan.postAlloc.
+     * 
      * @param object
      * @param typeRef
      * @param bytes
      * @param allocator
-     * @throws InlinePragma
      */
-    protected abstract void postAlloc(ObjectReference object, ObjectReference typeRef, 
-            int bytes, int allocator) throws InlinePragma;
+    protected abstract void postAlloc(ObjectReference object,
+            ObjectReference typeRef, int bytes, int allocator);
 
     /**
      * Call Plan.checkAllocator.
+     * 
      * @param bytes
      * @param align
      * @param allocator
      * @return
-     * @throws InlinePragma
      */
-    protected abstract int checkAllocator(int bytes, int align,
-            int allocator) throws InlinePragma;
-  
+    protected abstract int checkAllocator(int bytes, int align, int allocator);
+
     /**
      * Call the boot method of the current plan.
      */
