@@ -7,7 +7,6 @@
 	<classpathentry kind="lib" path="/JNode-Core/lib/log4j-1.2.8.jar"/>
 	<classpathentry kind="src" path="/JNode-Shell"/>
 	<classpathentry kind="lib" path="/JNode-Core/lib/junit.jar"/>
-	<classpathentry kind="lib" path="/JNode-Core/lib/nanoxml-lite-2.2.3.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/JNode-Core/lib/ant.jar"/>
 	<classpathentry kind="lib" path="/JNode-Core/lib/jmock-1.0.1.jar"/>
