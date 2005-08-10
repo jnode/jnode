@@ -619,7 +619,6 @@ public final class ClassDecoder {
                 // Read field attributes
                 final int acount = data.getChar();
                 VmAnnotation[] rVisAnn = null;
-                VmAnnotation[] rInvisAnn = null;
                 Object constantValue = null;
                 for (int a = 0; a < acount; a++) {
                     final String attrName = cp.getUTF8(data.getChar());
@@ -632,14 +631,14 @@ public final class ClassDecoder {
                         rVisAnn = readRuntimeAnnotations(data, cp, true);
                     } else if (VmArray.equals(
                             RuntimeInvisibleAnnotationsAttrName, attrName)) {
-                        rInvisAnn = readRuntimeAnnotations(data, cp, false);
+                        readRuntimeAnnotations(data, cp, false);
                     } else {
                         skip(data, length);
                     }
                 }
 
                 ftable[i] = new FieldData(name, signature, modifiers,
-                        constantValue, rVisAnn, rInvisAnn);
+                        constantValue, rVisAnn);
             }
             return ftable;
         } else {
@@ -752,7 +751,6 @@ public final class ClassDecoder {
 
             // Read field attributes
             final VmAnnotation[] rVisAnn = fd.rVisAnn;
-            final VmAnnotation[] rInvisAnn = fd.rInvisAnn;
             if (isstatic && (fd.constantValue != null)) {
                 switch (signature.charAt(0)) {
                 case 'B':
@@ -1226,24 +1224,20 @@ public final class ClassDecoder {
 
         public final VmAnnotation[] rVisAnn;
 
-        public final VmAnnotation[] rInvisAnn;
-
         /**
          * @param name
          * @param signature
          * @param modifiers
          * @param value
-         * @param rInvisAnn
          * @param rVisAnn
          */
         public FieldData(String name, String signature, int modifiers,
-                Object value, VmAnnotation[] rVisAnn, VmAnnotation[] rInvisAnn) {
+                Object value, VmAnnotation[] rVisAnn) {
             this.name = name;
             this.signature = signature;
             this.modifiers = modifiers;
             this.constantValue = value;
             this.rVisAnn = rVisAnn;
-            this.rInvisAnn = rInvisAnn;
         }
 
     }
