@@ -20,9 +20,6 @@ public final class VmAnnotation extends VmSystemObject {
     /** An empty array of annotations */
     final static VmAnnotation[] EMPTY_ARR = new VmAnnotation[0];
 
-    /** Is this annotation runtime visible */
-    private final boolean runtimeVisible;
-
     /** The descriptor of the annotation type */
     private final String typeDescr;
 
@@ -38,18 +35,10 @@ public final class VmAnnotation extends VmSystemObject {
     /**
      * @param runtimeVisible
      */
-    public VmAnnotation(boolean runtimeVisible, String typeDescr,
+    public VmAnnotation(String typeDescr,
             ElementValue[] values) {
-        this.runtimeVisible = runtimeVisible;
         this.typeDescr = typeDescr;
         this.values = values;
-    }
-
-    /**
-     * @return Returns the runtimeVisible.
-     */
-    public final boolean isRuntimeVisible() {
-        return runtimeVisible;
     }
 
     /**

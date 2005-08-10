@@ -26,7 +26,11 @@ abstract class VmAnnotatedElement extends VmSystemObject implements
      */
     final void setRuntimeAnnotations(VmAnnotation[] runtimeAnnotations) {
         if (this.runtimeAnnotations == null) {
-            this.runtimeAnnotations = runtimeAnnotations;
+            if (runtimeAnnotations == null) {
+                this.runtimeAnnotations = VmAnnotation.EMPTY_ARR;
+            } else {
+                this.runtimeAnnotations = runtimeAnnotations;
+            }
         } else {
             throw new SecurityException("Cannot override runtime annotations");
         }
@@ -88,24 +92,14 @@ abstract class VmAnnotatedElement extends VmSystemObject implements
      */
     public final Annotation[] getDeclaredAnnotations() {
         final int max = runtimeAnnotations.length;
-        // Count the runtime visible annotations
-        int cnt = 0;
-        for (int i = 0; i < max; i++) {
-            if (runtimeAnnotations[i].isRuntimeVisible()) {
-                cnt++;
-            }
-        }
-        final Annotation[] arr = new Annotation[cnt];
-        if (cnt > 0) {
+        final Annotation[] arr = new Annotation[max];
+        if (max > 0) {
             final VmClassLoader loader = getLoader();
-            cnt = 0;
             for (int i = 0; i < max; i++) {
-                if (runtimeAnnotations[i].isRuntimeVisible()) {
-                    try {
-                        arr[cnt++] = runtimeAnnotations[i].getValue(loader);
-                    } catch (ClassNotFoundException e) {
-                        throw new NoClassDefFoundError(e.getMessage());
-                    }
+                try {
+                    arr[i] = runtimeAnnotations[i].getValue(loader);
+                } catch (ClassNotFoundException e) {
+                    throw new NoClassDefFoundError(e.getMessage());
                 }
             }
         }

@@ -406,7 +406,7 @@ public final class ClassDecoder {
                 skip(data, length);
             }
         }
-        cls.setRuntimeAnnotations(merge(rVisAnn, rInvisAnn));
+        cls.setRuntimeAnnotations(rVisAnn);
         if (rInvisAnn != null) {
             cls.addPragmaFlags(getClassPragmaFlags(rInvisAnn));
         }
@@ -787,7 +787,7 @@ public final class ClassDecoder {
                     break;
                 }
             }
-            fs.setRuntimeAnnotations(merge(rVisAnn, rInvisAnn));
+            fs.setRuntimeAnnotations(rVisAnn);
         }
 
         // Align the instance fields for minimal object size.
@@ -916,7 +916,7 @@ public final class ClassDecoder {
                         skip(data, length);
                     }
                 }
-                mts.setRuntimeAnnotations(merge(rVisAnn, rInvisAnn));
+                mts.setRuntimeAnnotations(rVisAnn);
                 if (rVisAnn != null) {
                     mts.addPragmaFlags(getMethodPragmaFlags(rVisAnn));
                 }
@@ -1023,15 +1023,21 @@ public final class ClassDecoder {
         final VmAnnotation.ElementValue[] values;
         if (numElemValuePairs == 0) {
             values = VmAnnotation.ElementValue.EMPTY_ARR;
-        } else {
+        } else if (visible) {
             values = new VmAnnotation.ElementValue[numElemValuePairs];
             for (int i = 0; i < numElemValuePairs; i++) {
                 final String elemName = cp.getUTF8(data.getChar());
                 final Object value = readElementValue(data, cp);
                 values[i] = new VmAnnotation.ElementValue(elemName, value);
             }
+        } else {
+            values = VmAnnotation.ElementValue.EMPTY_ARR;
+            for (int i = 0; i < numElemValuePairs; i++) {
+                data.getChar(); // Skip name ref
+                skipElementValue(data, cp);
+            }            
         }
-        return new VmAnnotation(visible, typeDescr, values);
+        return new VmAnnotation(typeDescr, values);
     }
 
     /**
@@ -1090,29 +1096,46 @@ public final class ClassDecoder {
     }
 
     /**
-     * Merge the two given arrays.
+     * Skip over a single element_value structure.
      * 
-     * @param arr1
-     *            Can be null
-     * @param arr2
-     *            Can be null
-     * @return
+     * @param data
+     * @param cp
      */
-    private static final VmAnnotation[] merge(VmAnnotation[] arr1,
-            VmAnnotation[] arr2) {
-        if ((arr1 == null) && (arr2 == null)) {
-            return VmAnnotation.EMPTY_ARR;
-        } else if (arr2 == null) {
-            return arr1;
-        } else if (arr1 == null) {
-            return arr2;
-        } else {
-            final int l1 = arr1.length;
-            final int l2 = arr2.length;
-            final VmAnnotation[] res = new VmAnnotation[l1 + l2];
-            System.arraycopy(arr1, 0, res, 0, l1);
-            System.arraycopy(arr2, 0, res, l1, l2);
-            return res;
+    private static void skipElementValue(ByteBuffer data, VmCP cp) {
+        final int tag = data.get() & 0xFF;
+        switch (tag) {
+        case 'B':
+        case 'C':
+        case 'D':
+        case 'F':
+        case 'I':
+        case 'J':
+        case 'S':
+        case 'Z':
+        case 's':
+            data.getChar();
+            break;
+        case 'e': // enum
+            data.getChar(); // typedescr
+            data.getChar(); // constname
+            break;
+        case 'c': // class
+            data.getChar(); // classdescr
+            break;
+        case '@': // annotation
+            readAnnotation(data, cp, false);
+            break;
+        case '[': // array
+        {
+            final int numValues = data.getChar();
+            for (int i = 0; i < numValues; i++) {
+                skipElementValue(data, cp);
+            }
+        }
+        break;
+        default:
+            throw new ClassFormatError("Unknown element_value tag '"
+                    + (char) tag + "'");
         }
     }
 
