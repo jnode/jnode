@@ -161,8 +161,8 @@ public final class VmJavaClassLoader extends VmAbstractClassLoader {
      * 
      * @return The statics table
      */
-    public VmIsolatedStatics getIsolatedStatics() {
-        return Unsafe.getCurrentProcessor().getIsolatedStatics();
+    public final VmIsolatedStatics getIsolatedStatics() {
+        return VmProcessor.current().getIsolatedStatics();
     }
     
     /**

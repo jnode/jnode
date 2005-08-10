@@ -38,18 +38,20 @@ import org.jnode.util.CounterGroup;
 import org.jnode.util.Statistic;
 import org.jnode.util.Statistics;
 import org.jnode.vm.annotation.Inline;
+import org.jnode.vm.annotation.NoInline;
+import org.jnode.vm.annotation.SharedStatics;
 import org.jnode.vm.classmgr.CompiledCodeList;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmHeapManager;
-import org.vmmagic.pragma.NoInlinePragma;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class Vm extends VmSystemObject implements Statistics, SharedStatics {
+@SharedStatics
+public class Vm extends VmSystemObject implements Statistics {
 
     /** The single instance */
     private static Vm instance;
@@ -64,7 +66,7 @@ public class Vm extends VmSystemObject implements Statistics, SharedStatics {
     private final VmHeapManager heapManager;
 
     /** Set this boolean to turn the hot method manager on/off */
-    private final boolean runHotMethodManager = false;
+//    private final boolean runHotMethodManager = false;
 
     /** Should this VM run in debug mode? */
     private final boolean debugMode;
@@ -296,7 +298,7 @@ public class Vm extends VmSystemObject implements Statistics, SharedStatics {
      */
     final void initializeProcessors(ResourceManager rm) {
         // Add the current (bootstrap) processor
-        addProcessor(Unsafe.getCurrentProcessor());
+        addProcessor(VmProcessor.current());
         // Let the architecture find the processors
         arch.initializeProcessors(rm);
         // Show some info
@@ -445,8 +447,8 @@ public class Vm extends VmSystemObject implements Statistics, SharedStatics {
      * @param msg2
      * @throws NoInlinePragma
      */
-    private static void assertionFailed(String msg, String msg2)
-            throws NoInlinePragma {
+    @NoInline
+    private static void assertionFailed(String msg, String msg2) {
         if ((msg == null) && (msg2 == null)) {
             msg = "Assertion failed";
         } else if (msg2 != null) {
@@ -517,7 +519,7 @@ public class Vm extends VmSystemObject implements Statistics, SharedStatics {
      */
     static final VmThread getThreadById(int id) {
         final Vm vm = getVm();
-        final SpinLock lock = vm.allThreadsLock;
+//        final SpinLock lock = vm.allThreadsLock;
         final VmThreadQueue.AllThreadsQueue q = vm.allThreads;
         VmThreadQueueEntry e = q.first;
         while (e != null) {

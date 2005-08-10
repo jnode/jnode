@@ -119,7 +119,7 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
             Unsafe.debug('\n');
         }
         if (false) {
-            Unsafe.getCurrentProcessor().getArchitecture().getStackReader()
+            VmProcessor.current().getArchitecture().getStackReader()
                     .debugStackTrace();
         }
 
@@ -206,7 +206,7 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
     protected void initialize() {
         Unsafe.debug("MmtkHeapManager#initialize\n");
         if (initializing) {
-            Unsafe.getCurrentProcessor().getArchitecture().getStackReader()
+            VmProcessor.current().getArchitecture().getStackReader()
                     .debugStackTrace();
             Unsafe.die("Recursive initialize");
         }

@@ -26,7 +26,6 @@ import java.io.PrintStream;
 
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
-import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmProcessor;
 
 /**
@@ -45,7 +44,7 @@ public class CpuIDCommand {
 	 */
 	public void execute(CommandLine cmdLine, InputStream in, PrintStream out, PrintStream err) {
 
-        final VmProcessor cpu = Unsafe.getCurrentProcessor();
+        final VmProcessor cpu = VmProcessor.current();
 		out.println(cpu.getCPUID());
         out.println(cpu.getPerformanceCounters());
 	}

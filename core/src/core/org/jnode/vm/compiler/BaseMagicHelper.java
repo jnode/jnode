@@ -212,6 +212,7 @@ public class BaseMagicHelper {
         BREAKPOINT("breakPoint"),
         DIFF("diff"),
         NULLREFERENCE("nullReference"),
+        CURRENTPROCESSOR("currentProcessor", 0, "()Lorg/jnode/vm/VmProcessor;"),
         // Array classes
         ARR_CREATE("create"),
         ARR_GET("get"),

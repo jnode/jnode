@@ -132,7 +132,7 @@ final class HeapHelperImpl extends HeapHelper implements Uninterruptible {
      */
     public final void die(String msg) {
         try {
-            Unsafe.getCurrentProcessor().getArchitecture().getStackReader()
+            VmProcessor.current().getArchitecture().getStackReader()
                     .debugStackTrace();
         } finally {
             Unsafe.die(msg);
@@ -198,7 +198,7 @@ final class HeapHelperImpl extends HeapHelper implements Uninterruptible {
      * call a call to {@link #stopThreadsAtSafePoint()}.
      */
     public void restartThreads() {
-        Unsafe.getCurrentProcessor().enableReschedule();
+        VmProcessor.current().enableReschedule();
     }
 
     /**
@@ -226,7 +226,7 @@ final class HeapHelperImpl extends HeapHelper implements Uninterruptible {
      * the calling thread (the GC thread) will continue.
      */
     public final void stopThreadsAtSafePoint() {
-        Unsafe.getCurrentProcessor().disableReschedule();
+        VmProcessor.current().disableReschedule();
     }
 
     /**
@@ -239,7 +239,7 @@ final class HeapHelperImpl extends HeapHelper implements Uninterruptible {
         if (!vm.getSharedStatics().walk(visitor)) {
             return;
         }
-        if (!Unsafe.getCurrentProcessor().getIsolatedStatics().walk(visitor)) {
+        if (!VmProcessor.current().getIsolatedStatics().walk(visitor)) {
             return;
         }
         threadRootVisitor.initialize(visitor, heapManager);

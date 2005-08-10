@@ -57,6 +57,8 @@ public class EntryPoints extends VmSystemObject {
 
     private final VmInstanceField vmConstIMethodRefSelectorField;
 
+    private final VmInstanceField vmProcessorMeField;
+
     private final int vmThreadSwitchIndicatorOffset;
 
     private final VmType vmSoftByteCodesClass;
@@ -251,6 +253,7 @@ public class EntryPoints extends VmSystemObject {
             vmThreadSwitchIndicatorOffset = ((VmInstanceField) testField(procClass
                     .getField("threadSwitchIndicator"))).getOffset();
             yieldPoint = testMethod(procClass.getMethod("yieldPoint", "()V"));
+            vmProcessorMeField = (VmInstanceField)testField(procClass.getField("me"));
 
             // VmType
             final VmType typeClass = loader.loadClass(
@@ -661,5 +664,12 @@ public class EntryPoints extends VmSystemObject {
      */
     public final VmInstanceField getVmProcessorIsolatedStaticsTable() {
         return vmProcessorIsolatedStaticsTable;
+    }
+
+    /**
+     * @return Returns the vmProcessorMeField.
+     */
+    public final VmInstanceField getVmProcessorMeField() {
+        return vmProcessorMeField;
     }
 }

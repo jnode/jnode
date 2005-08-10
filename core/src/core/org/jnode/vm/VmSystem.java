@@ -44,6 +44,7 @@ import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.system.SimpleResourceOwner;
 import org.jnode.vm.annotation.PrivilegedActionPragma;
+import org.jnode.vm.annotation.SharedStatics;
 import org.jnode.vm.classmgr.AbstractExceptionHandler;
 import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmByteCode;
@@ -66,7 +67,8 @@ import org.vmmagic.unboxed.Offset;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public final class VmSystem implements SharedStatics {
+@SharedStatics
+public final class VmSystem {
 
     public static final int RC_HANDLER = 0xFFFFFFFB;
 
@@ -113,8 +115,7 @@ public final class VmSystem implements SharedStatics {
             VmSystem.out = getSystemOut();
 
             /* Initialize the system classloader */
-            VmSystemClassLoader loader = (VmSystemClassLoader) (getVmClass(Unsafe
-                    .getCurrentProcessor()).getLoader());
+            VmSystemClassLoader loader = (VmSystemClassLoader) (getVmClass(VmProcessor.current()).getLoader());
             systemLoader = loader;
             loader.initialize();
 
@@ -134,7 +135,7 @@ public final class VmSystem implements SharedStatics {
 
             /* We're done initializing */
             inited = true;
-            Unsafe.getCurrentProcessor().systemReadyForThreadSwitch();
+            VmProcessor.current().systemReadyForThreadSwitch();
 
             // Load the command line
             final Properties props = System.getProperties();
@@ -146,7 +147,7 @@ public final class VmSystem implements SharedStatics {
             Locale.getDefault();
 
             // Calibrate the processors
-            Unsafe.getCurrentProcessor().calibrate();
+            VmProcessor.current().calibrate();
 
             // Load the initial jarfile
             initJar = loadInitJar(rm);
@@ -339,7 +340,7 @@ public final class VmSystem implements SharedStatics {
      * @return The classloader
      */
     protected static VmClassLoader getContextClassLoader() {
-        final VmStackReader reader = Unsafe.getCurrentProcessor()
+        final VmStackReader reader = VmProcessor.current()
                 .getArchitecture().getStackReader();
         final VmSystemClassLoader systemLoader = VmSystem.systemLoader;
         Address f = VmMagic.getCurrentFrame();
@@ -365,7 +366,7 @@ public final class VmSystem implements SharedStatics {
      * @return Class[]
      */
     public static Class[] getClassContext() {
-        final VmStackReader reader = Unsafe.getCurrentProcessor()
+        final VmStackReader reader = VmProcessor.current()
                 .getArchitecture().getStackReader();
         final VmStackFrame[] stack = reader.getVmStackTrace(VmMagic
                 .getCurrentFrame(), null, STACKTRACE_LIMIT);
@@ -407,7 +408,7 @@ public final class VmSystem implements SharedStatics {
     public static Object[] getStackTrace(VmThread current) {
         if (current.inException) {
             Unsafe.debug("Exception in getStackTrace");
-            Unsafe.getCurrentProcessor().getArchitecture().getStackReader()
+            VmProcessor.current().getArchitecture().getStackReader()
                     .debugStackTrace();
             Unsafe.die("getStackTrace");
             return null;
@@ -419,7 +420,7 @@ public final class VmSystem implements SharedStatics {
             return null;
         }
 
-        final VmProcessor proc = Unsafe.getCurrentProcessor();
+        final VmProcessor proc = VmProcessor.current();
         final VmStackReader reader = proc.getArchitecture().getStackReader();
         final VmStackFrame[] mt;
         // Address lastIP = null;
@@ -516,7 +517,7 @@ public final class VmSystem implements SharedStatics {
                 Unsafe.debug("frame==null");
                 return null;
             }
-            final VmProcessor proc = Unsafe.getCurrentProcessor();
+            final VmProcessor proc = VmProcessor.current();
             final VmStackReader reader = proc.getArchitecture()
                     .getStackReader();
 
@@ -645,7 +646,7 @@ public final class VmSystem implements SharedStatics {
             throw new IndexOutOfBoundsException("length < 0");
         }
 
-        final int slotSize = Unsafe.getCurrentProcessor().getArchitecture()
+        final int slotSize = VmProcessor.current().getArchitecture()
                 .getReferenceSize();
         final Offset lengthOffset = Offset
                 .fromIntSignExtend(VmArray.LENGTH_OFFSET * slotSize);
@@ -942,10 +943,10 @@ public final class VmSystem implements SharedStatics {
         final Object staticsTable;
         final Offset offset;
         if (f.isShared()) {
-            staticsTable = Unsafe.getCurrentProcessor().getSharedStaticsTable();
+            staticsTable = VmProcessor.current().getSharedStaticsTable();
             offset = Offset.fromIntZeroExtend(f.getSharedStaticsIndex() << 2);
         } else {
-            staticsTable = Unsafe.getCurrentProcessor()
+            staticsTable = VmProcessor.current()
                     .getIsolatedStaticsTable();
             offset = Offset.fromIntZeroExtend(f.getIsolatedStaticsIndex() << 2);
         }

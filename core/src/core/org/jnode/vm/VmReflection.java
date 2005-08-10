@@ -258,7 +258,7 @@ public class VmReflection {
 	 * @return The address of the static field data
 	 */
 	private static final Address getStaticFieldAddress(VmStaticField sf) {
-		final VmProcessor proc = Unsafe.getCurrentProcessor();
+		final VmProcessor proc = VmProcessor.current();
 		final Address tablePtr;
 		final int offset;
         if (sf.isShared()) {

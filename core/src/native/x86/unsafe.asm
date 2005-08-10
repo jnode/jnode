@@ -265,11 +265,6 @@ after_copyCmdLine:
 	mov eax,MBI_CMDLINE_MAX
 	ret SLOT_SIZE
 	
-; Gets the current processor
-GLABEL Q43org5jnode2vm6Unsafe23getCurrentProcessor2e2829Lorg2fjnode2fvm2fVmProcessor3b
-	mov AAX,CURRENTPROCESSOR
-	ret	
-
 ; Force a yieldpoint
 GLABEL Q43org5jnode2vm6Unsafe23yieldPoint2e2829V
 	; Is a switch required?

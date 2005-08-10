@@ -15,6 +15,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 
 import org.jnode.vm.Unsafe;
+import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmSystem;
 
 public class Throwable implements Serializable {
@@ -38,7 +39,7 @@ public class Throwable implements Serializable {
 	}
 
 	public Throwable fillInStackTrace() {
-		backtrace = VmSystem.getStackTrace(Unsafe.getCurrentProcessor().getCurrentThread());
+		backtrace = VmSystem.getStackTrace(VmProcessor.current().getCurrentThread());
 		return this;
 	}
 

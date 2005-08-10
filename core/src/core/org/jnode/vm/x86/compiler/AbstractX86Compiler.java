@@ -32,6 +32,7 @@ import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86TextAssembler;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
+import org.jnode.vm.VmProcessor;
 import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.jnode.vm.classmgr.TypeSizeInfo;
 import org.jnode.vm.classmgr.VmClassLoader;
@@ -80,7 +81,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements
         X86BinaryAssembler os;
         os = (X86BinaryAssembler) nativeStreamHolder.get();
         if (os == null) {
-            os = new X86BinaryAssembler((X86CpuID) Unsafe.getCurrentProcessor()
+            os = new X86BinaryAssembler((X86CpuID) VmProcessor.current()
                     .getCPUID(), mode, 0);
             os.setResolver(resolver);
             nativeStreamHolder.set(os);
@@ -158,8 +159,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements
             return;
         }
 
-        X86TextAssembler tos = new X86TextAssembler(writer, (X86CpuID) Unsafe
-                .getCurrentProcessor().getCPUID(), mode);
+        X86TextAssembler tos = new X86TextAssembler(writer, (X86CpuID) VmProcessor.current().getCPUID(), mode);
 
         doCompile(method, tos, level, false);
         try {
