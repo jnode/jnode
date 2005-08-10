@@ -29,6 +29,7 @@ import org.jnode.vm.classmgr.VmConstIMethodRef;
 import org.jnode.vm.classmgr.VmConstMethodRef;
 import org.jnode.vm.classmgr.VmConstString;
 import org.jnode.vm.classmgr.VmMethod;
+import org.jnode.vm.classmgr.VmType;
 
 /**
  * <description>
@@ -178,6 +179,14 @@ public class BytecodeViewer extends BytecodeVisitor {
 	public void visit_ldc(VmConstClass value) {
 		out("ldc " + value);
 	}
+
+    /**
+     * @param value
+     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ldc(VmConstClass)
+     */
+    public void visit_ldc(VmType<?> value) {
+        out("ldc-type " + value.getName());
+    }
 
 	/**
 	 * @param index

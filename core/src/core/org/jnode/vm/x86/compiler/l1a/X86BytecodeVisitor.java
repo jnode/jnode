@@ -237,7 +237,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param ref
 	 * @param index
 	 */
-	final void checkBounds(RefItem ref, IntItem index) {
+	final void checkBounds(RefItem ref, IntItem index) { 
+	    counters.getCounter("checkbounds").inc();
         final Label curInstrLabel = getCurInstrLabel();
 		final Label test = new Label(curInstrLabel + "$$cbtest");
 		final Label failed = new Label(curInstrLabel + "$$cbfailed");
@@ -1119,7 +1120,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_anewarray(org.jnode.vm.classmgr.VmConstClass)
 	 */
 	public final void visit_anewarray(VmConstClass classRef) {
-		// Push all, since we're going to call other methods
+        counters.getCounter("anewarray").inc();
+
+        // Push all, since we're going to call other methods
 		vstack.push(eContext);
 
 		// Claim EAX/RAX, we're going to use it later
@@ -2998,6 +3001,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ldc(VmConstClass)
 	 */
 	public final void visit_ldc(VmConstClass classRef) {
+        counters.getCounter("ldc-class").inc();
         // Push all, since we're going to call other methods
         vstack.push(eContext);
 
@@ -3019,6 +3023,24 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
         L1AHelper.releaseRegister(eContext, classr);
 	}
 
+    
+    /**
+     * Push the given VmType on the stack.
+     */
+    public final void visit_ldc(VmType<?> value) {
+        final WordItem item = L1AHelper.requestWordRegister(eContext, JvmType.REFERENCE, false);
+        final Label curInstrLabel = getCurInstrLabel();
+        final GPR reg = item.getRegister();
+
+        // Load the class from the statics table
+        if (os.isCode32()) {
+            helper.writeGetStaticsEntry(curInstrLabel, reg, value);
+        } else {
+            helper.writeGetStaticsEntry64(curInstrLabel, (GPR64)reg, value);            
+        }
+        vstack.push(item);
+    }
+    
 	/**
 	 * @param value
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ldc(VmConstString)
@@ -3467,7 +3489,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 *      int)
 	 */
 	public final void visit_multianewarray(VmConstClass clazz, int dimensions) {
-		// flush all vstack items to the stack
+        counters.getCounter("multianewarray").inc();
+
+        // flush all vstack items to the stack
 		// all registers are freed
 		vstack.push(eContext);
 
@@ -3514,7 +3538,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_new(org.jnode.vm.classmgr.VmConstClass)
 	 */
 	public final void visit_new(VmConstClass classRef) {
-		// Push all
+        counters.getCounter("new").inc();
+
+        // Push all
 		vstack.push(eContext);
 
 		// Allocate tmp register
@@ -3537,6 +3563,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_newarray(int)
 	 */
 	public final void visit_newarray(int type) {
+        counters.getCounter("newarray").inc();
+        
 		// Load count
 		final IntItem count = vstack.popInt();
 		count.loadIf(eContext, Item.Kind.STACK);

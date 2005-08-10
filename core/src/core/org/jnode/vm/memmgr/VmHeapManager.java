@@ -33,6 +33,7 @@ import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
+import org.vmmagic.pragma.NoInlinePragma;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.ObjectReference;
@@ -91,7 +92,8 @@ public abstract class VmHeapManager extends VmSystemObject {
      * @param size
      * @return The new instance
      */
-    public final Object newInstance(VmType< ? > cls, int size) {
+    public final Object newInstance(VmType< ? > cls, int size)
+    throws NoInlinePragma {
         testInited();
         cls.initialize();
         if (cls.isArray()) {
