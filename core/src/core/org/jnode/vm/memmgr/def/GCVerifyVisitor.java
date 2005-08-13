@@ -26,6 +26,7 @@ import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmMagic;
+import org.jnode.vm.annotation.Inline;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
@@ -82,6 +83,7 @@ final class GCVerifyVisitor extends ObjectVisitor {
         return (errorCount == 0);
     }
     
+    @Inline
     private final void verifyArray(Object object) {
         final Object[] arr = (Object[]) object;
         final int length = arr.length;
@@ -94,6 +96,7 @@ final class GCVerifyVisitor extends ObjectVisitor {
     
     }
     
+    @Inline
     private final void verifyObject(Object object, VmNormalClass vmClass) {
         final int[] referenceOffsets = vmClass.getReferenceOffsets();
         final int cnt = referenceOffsets.length;
@@ -114,6 +117,7 @@ final class GCVerifyVisitor extends ObjectVisitor {
         }
     }
     
+    @Inline
     private final void verifyChild(Object child, Object parent, String where) {
         if (child != null) {
             final ObjectReference childRef = ObjectReference.fromObject(child);

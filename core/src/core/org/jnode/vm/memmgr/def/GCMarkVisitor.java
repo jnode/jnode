@@ -26,6 +26,8 @@ import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmMagic;
+import org.jnode.vm.annotation.Inline;
+import org.jnode.vm.annotation.NoInline;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
@@ -134,6 +136,7 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
     /**
      * Reset this visitor to its original state.
      */
+    @Inline
     public void reset() {
         this.markedObjects = 0;
     }
@@ -141,6 +144,7 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
     /**
      * Process all objects on the markstack, until the markstack is empty.
      */
+    @NoInline
     protected void mark() {
         while (!stack.isEmpty()) {
             final Object object = stack.pop();
@@ -174,6 +178,7 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
      * 
      * @param object
      */
+    @Inline
     private void markArray(Object object) {
         try {
             final Object[] arr = (Object[]) object;
@@ -196,6 +201,7 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
      * @param object
      * @param vmClass
      */
+    @Inline
     private void markObject(Object object, VmNormalClass vmClass) {
         final int[] referenceOffsets = vmClass.getReferenceOffsets();
         final int cnt = referenceOffsets.length;
@@ -226,6 +232,7 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
      * 
      * @param child
      */
+    @Inline
     final void processChild(Object child) {
         final int gcColor = VmMagic.getObjectColor(child);
         if (gcColor <= GC_WHITE) {
@@ -249,6 +256,7 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
      * 
      * @return int
      */
+    @Inline
     public int getMarkedObjects() {
         return markedObjects;
     }
@@ -258,6 +266,7 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
      * 
      * @return boolean
      */
+    @Inline
     public boolean isRootSet() {
         return rootSet;
     }
@@ -269,6 +278,7 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
      *            If true, all white and grey objects will be marked, otherwise
      *            only the grey objects will be marked.
      */
+    @Inline
     public void setRootSet(boolean b) {
         rootSet = b;
     }
