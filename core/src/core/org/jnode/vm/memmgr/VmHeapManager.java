@@ -27,13 +27,14 @@ import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmSystemObject;
+import org.jnode.vm.annotation.Inline;
+import org.jnode.vm.annotation.NoInline;
 import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmArrayClass;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
-import org.vmmagic.pragma.NoInlinePragma;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.ObjectReference;
@@ -55,6 +56,9 @@ public abstract class VmHeapManager extends VmSystemObject {
      * The memory access helper
      */
     protected final HeapHelper helper;
+    
+    /** Write barrier used */
+    private VmWriteBarrier writeBarrier;
 
     /**
      * Initialize this instance
@@ -80,6 +84,7 @@ public abstract class VmHeapManager extends VmSystemObject {
      * @param cls
      * @return The new instance
      */
+    @Inline
     public final Object newInstance(VmType< ? > cls) {
         return newInstance(cls, ((VmNormalClass< ? >) cls).getObjectSize());
     }
@@ -92,8 +97,8 @@ public abstract class VmHeapManager extends VmSystemObject {
      * @param size
      * @return The new instance
      */
-    public final Object newInstance(VmType< ? > cls, int size)
-            throws NoInlinePragma {
+    @NoInline
+    public final Object newInstance(VmType< ? > cls, int size) {
         testInited();
         cls.initialize();
         if (cls.isArray()) {
@@ -251,6 +256,7 @@ public abstract class VmHeapManager extends VmSystemObject {
      * @param slotSize
      * @return The new instance
      */
+    @Inline
     private final Object newArray0(VmClassType vmClass, int elemSize,
             int elements, int slotSize) {
         final int size = (VmArray.DATA_OFFSET * slotSize)
@@ -272,6 +278,7 @@ public abstract class VmHeapManager extends VmSystemObject {
      */
     public abstract boolean isObject(Address ptr);
 
+    @Inline
     private final void testInited() {
         if (!inited) {
             // Unsafe.debug("testInitid.initialize");
@@ -294,7 +301,18 @@ public abstract class VmHeapManager extends VmSystemObject {
      * 
      * @return The write barrier, or null if no write barrier is used.
      */
-    public abstract VmWriteBarrier getWriteBarrier();
+    public final VmWriteBarrier getWriteBarrier() {
+        return writeBarrier;
+    }
+    
+    /**
+     * Sets the write barrier.
+     * Call this method in the constructor.
+     * @param barrier
+     */
+    protected final void setWriteBarrier(VmWriteBarrier barrier) {
+        this.writeBarrier = barrier;
+    }
 
     /**
      * Print the statics on this object on out.

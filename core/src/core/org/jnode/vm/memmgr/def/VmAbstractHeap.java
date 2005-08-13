@@ -23,6 +23,7 @@ package org.jnode.vm.memmgr.def;
 
 import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.SpinLock;
+import org.jnode.vm.annotation.Inline;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.memmgr.HeapHelper;
@@ -86,6 +87,7 @@ abstract class VmAbstractHeap extends SpinLock implements Uninterruptible {
 	 * Gets the size in bytes of this heap.
 	 * @return int
 	 */
+    @Inline
 	public final int getSize() {
 		return size;
 	}
@@ -95,6 +97,7 @@ abstract class VmAbstractHeap extends SpinLock implements Uninterruptible {
 	 * @param addr
 	 * @return boolean
 	 */
+    @Inline
 	protected final boolean isObject(Address addr) {
 		if (addr.LT(start) || addr.GE(end)) {
 			// The object if not within this heap
@@ -116,6 +119,7 @@ abstract class VmAbstractHeap extends SpinLock implements Uninterruptible {
 	 * @param addr
 	 * @return boolean
 	 */
+    @Inline
 	protected final boolean inHeap(Address addr) {
 		return (addr.GE(start) && addr.LT(end));
 	}
@@ -125,6 +129,7 @@ abstract class VmAbstractHeap extends SpinLock implements Uninterruptible {
 	 * @param object
 	 * @param on
 	 */	
+    @Inline
 	protected final void setAllocationBit(Object object, boolean on) {
 		final Address addr = ObjectReference.fromObject(object).toAddress();
 		if (addr.LT(start) || addr.GE(end)) {
@@ -149,7 +154,7 @@ abstract class VmAbstractHeap extends SpinLock implements Uninterruptible {
 	 * Append a new heap to the end of the linked list of heaps.
 	 * @param newHeap
 	 */	
-	protected void append(VmAbstractHeap newHeap) {
+	protected final void append(VmAbstractHeap newHeap) {
 		VmAbstractHeap heap = this;
 		while (heap.next != null) {
 			heap = heap.next;
@@ -161,6 +166,7 @@ abstract class VmAbstractHeap extends SpinLock implements Uninterruptible {
 	 * Gets the next heap in the linked list of heaps.
 	 * @return Next heap
 	 */
+    @Inline
 	public final VmAbstractHeap getNext() {
 		return next;
 	}
