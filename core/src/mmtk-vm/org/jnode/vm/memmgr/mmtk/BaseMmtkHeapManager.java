@@ -82,6 +82,7 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
         this.flagsOffset = ObjectLayout.FLAGS_SLOT * refSize;
         this.tibOffset = ObjectLayout.TIB_SLOT * refSize;
         this.headerSize = ObjectLayout.HEADER_SLOTS * refSize;
+        setWriteBarrier(null);
     }
 
     /**
@@ -191,13 +192,6 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
      */
     public long getTotalMemory() {
         return BasePlan.totalMemory().toLong();
-    }
-
-    /**
-     * @see org.jnode.vm.memmgr.VmHeapManager#getWriteBarrier()
-     */
-    public VmWriteBarrier getWriteBarrier() {
-        return null;
     }
 
     /**

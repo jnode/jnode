@@ -26,7 +26,6 @@ import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86BinaryAssembler;
-import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
@@ -37,7 +36,6 @@ import org.jnode.vm.compiler.GCMapIterator;
 import org.jnode.vm.x86.X86CpuID;
 import org.jnode.vm.x86.compiler.AbstractX86Compiler;
 import org.jnode.vm.x86.compiler.X86CompilerHelper;
-
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

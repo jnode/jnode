@@ -37,6 +37,7 @@ public interface VmTypeState {
 	public static final char ST_COMPILING    = 0x0080;
 	public static final char ST_INITIALIZED  = 0x0100;
 	public static final char ST_INITIALIZING = 0x0200;
+    public static final char ST_LINKED       = 0x2000;
 	public static final char ST_INVALID      = 0x8000;
 
 }

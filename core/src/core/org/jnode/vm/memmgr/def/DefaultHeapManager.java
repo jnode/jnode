@@ -39,7 +39,6 @@ import org.jnode.vm.memmgr.GCStatistics;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.HeapStatistics;
 import org.jnode.vm.memmgr.VmHeapManager;
-import org.jnode.vm.memmgr.VmWriteBarrier;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.Word;
@@ -81,11 +80,6 @@ public final class DefaultHeapManager extends VmHeapManager {
      * Are we low on memory
      */
     private boolean lowOnMemory;
-
-    /**
-     * The used write barrier
-     */
-    private final VmWriteBarrier writeBarrier;
 
     /**
      * Linked list of all heaps.
@@ -131,11 +125,11 @@ public final class DefaultHeapManager extends VmHeapManager {
         super(helper);
         this.bootHeap = new VmBootHeap(helper);
         // this.writeBarrier = new DefaultWriteBarrier(helper);
-        this.writeBarrier = null;
+        setWriteBarrier(null);
         this.firstNormalHeap = new VmDefaultHeap(this);
         this.currentHeap = firstNormalHeap;
         this.heapList = firstNormalHeap;
-        this.defaultHeapClass = (VmNormalClass) loader.loadClass(
+        this.defaultHeapClass = (VmNormalClass<?>) loader.loadClass(
                 VmDefaultHeap.class.getName(), true);
     }
 
@@ -270,15 +264,6 @@ public final class DefaultHeapManager extends VmHeapManager {
     }
 
     /**
-     * Gets the write barrier used by this heap manager (if any).
-     * 
-     * @return The write barrier, or null if no write barrier is used.
-     */
-    public final VmWriteBarrier getWriteBarrier() {
-        return writeBarrier;
-    }
-
-    /**
      * Allocate a new instance for the given class. Not that this method cannot
      * be synchronized, since obtaining a monitor might require creating one,
      * which in turn needs this method.
@@ -287,7 +272,7 @@ public final class DefaultHeapManager extends VmHeapManager {
      * @param size
      * @return Object
      */
-    protected Object allocObject(VmClassType vmClass, int size) {
+    protected Object allocObject(VmClassType<?> vmClass, int size) {
         // Make sure the class is initialized
         vmClass.initialize();
 
@@ -414,7 +399,7 @@ public final class DefaultHeapManager extends VmHeapManager {
      * Print the statics on this object on out.
      */
     public void dumpStatistics(PrintStream out) {
-        out.println("WriteBarrier: " + writeBarrier);
+        out.println("WriteBarrier: " + getWriteBarrier());
     }
 
     /**

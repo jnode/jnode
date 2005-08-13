@@ -21,6 +21,8 @@
  
 package org.jnode.vm.classmgr;
 
+import org.jnode.vm.annotation.Inline;
+
 /**
  * <description>
  * 
@@ -62,6 +64,7 @@ public class ObjectLayout {
 	 * @param value
 	 * @return int
 	 */
+    @Inline
 	public static int objectAlign(int value) {
 		return (value + OBJECT_ALIGN - 1) & ~(OBJECT_ALIGN - 1);
 	}

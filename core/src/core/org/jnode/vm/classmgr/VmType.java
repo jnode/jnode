@@ -37,7 +37,9 @@ import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmReflection;
 import org.jnode.vm.VmSystemClassLoader;
+import org.jnode.vm.annotation.Inline;
 import org.jnode.vm.annotation.LoadStatics;
+import org.jnode.vm.annotation.NoInline;
 import org.jnode.vm.annotation.SharedStatics;
 import org.jnode.vm.compiler.CompileError;
 import org.jnode.vm.compiler.CompiledIMT;
@@ -864,6 +866,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 	 * 
 	 * @return boolean
 	 */
+    @Inline
 	final boolean isLoaded() {
 		return ((state & VmTypeState.ST_LOADED) != 0);
 	}
@@ -873,6 +876,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 	 * 
 	 * @return boolean
 	 */
+    @Inline
 	public final boolean isInvalid() {
 		return ((state & VmTypeState.ST_INVALID) != 0);
 	}
@@ -891,6 +895,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 	 * 
 	 * @return boolean
 	 */
+    @Inline
 	public final boolean isVerified() {
 		return ((state & VmTypeState.ST_VERIFIED) != 0);
 	}
@@ -909,6 +914,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 	 * 
 	 * @return boolean
 	 */
+    @Inline
 	final boolean isPrepared() {
 		return ((state & VmTypeState.ST_PREPARED) != 0);
 	}
@@ -927,6 +933,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 	 * 
 	 * @return boolean
 	 */
+    @Inline
 	public final boolean isCompiled() {
 		return ((state & VmTypeState.ST_COMPILED) != 0);
 	}
@@ -936,6 +943,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 	 * 
 	 * @return boolean
 	 */
+    @Inline
 	final boolean isInitializing() {
 		return ((state & VmTypeState.ST_INITIALIZING) != 0);
 	}
@@ -945,6 +953,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 	 * 
 	 * @return boolean
 	 */
+    @Inline
 	public final boolean isInitialized() {
 		return ((state & VmTypeState.ST_INITIALIZED) != 0);
 	}
@@ -957,6 +966,16 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 	    Vm._assert(!Vm.isRunningVm());
 		state |= VmTypeState.ST_INITIALIZED;
 	}
+
+    /**
+     * Is this type linked.
+     * 
+     * @return boolean
+     */
+    @Inline
+    final boolean isLinked() {
+        return ((state & VmTypeState.ST_LINKED) != 0);
+    }
 
 	/**
 	 * Is this type an array.
@@ -1393,22 +1412,25 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 	 * @return VmClass This class
 	 */
 	public final VmType link() {
-		prepare();
-		verify();
-		compile();
-		if (isInvalid()) {
-			if (errorMsg != null) {
-				throw new LinkageError(errorMsg);
-			} else {
-				throw new LinkageError("Class invalid");
-			}
-		}
-		if (arrayClass != null) {
-			//arrayClass.link();
-		}
-        if (mmType == null) {
-            Vm.notifyClassResolved(this);
-        }
+	    if (!isLinked()) {
+	        prepare();
+	        verify();
+	        compile();
+	        if (isInvalid()) {
+	            if (errorMsg != null) {
+	                throw new LinkageError(errorMsg);
+	            } else {
+	                throw new LinkageError("Class invalid");
+	            }
+	        }
+	        if (arrayClass != null) {
+	            //arrayClass.link();
+	        }
+	        if (mmType == null) {
+	            Vm.notifyClassResolved(this);
+	        }
+	        this.state |= VmTypeState.ST_LINKED;
+	    }
 		return this;
 	}
 
@@ -1985,16 +2007,27 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 	 * if the class has already been initialized, if not a synchronized helper
 	 * method is called to do the actual initialization.
 	 */
+    @Inline
 	public final void initialize() {
-		link();
-		if ((superClass != null) && !isArray()) {
-			/* The direct super-class must be initialized first $2.17.4 */
-			superClass.initialize();
-		}
-		if (!isInitialized()) {
-			doInitialize();
+	    if (!isInitialized()) {
+            linkAndInitialize();
 		}
 	}
+    
+    /**
+     * Link and initialize this type.
+     * This is a seperate method in order to control the inlining
+     * path of the native code compiler.
+     */
+    @NoInline
+    private final void linkAndInitialize() {
+        link();
+        if ((superClass != null) && !isArray()) {
+            /* The direct super-class must be initialized first $2.17.4 */
+            superClass.initialize();
+        }
+        doInitialize();        
+    }
 
 	/**
 	 * Invoke the static initializer of this class.
