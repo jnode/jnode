@@ -577,6 +577,7 @@ public class Logger
 
   public void log(Level level, String message)
   {
+    if (isLoggable(level))
     log(level, message, (Object[]) null);
   }
 
@@ -585,6 +586,8 @@ public class Logger
 			       String message,
 			       Object param)
   {
+    if (isLoggable(level))
+      {
   	StackTraceElement caller = getCallerStackFrame();
     logp(level,
 	 caller != null ? caller.getClassName() : "<unknown>",
@@ -592,12 +595,15 @@ public class Logger
 	 message,
 	 param);
   }
+  }
 
 
   public synchronized void log(Level level,
 			       String message,
 			       Object[] params)
   {
+    if (isLoggable(level))
+      {
     StackTraceElement caller = getCallerStackFrame();
     logp(level,
 	 caller != null ? caller.getClassName() : "<unknown>",
@@ -605,18 +611,22 @@ public class Logger
 	 message,
 	 params);
   }
+  }
 
 
   public synchronized void log(Level level,
 			       String message,
 			       Throwable thrown)
   {
+    if (isLoggable(level))
+      {
 	StackTraceElement caller = getCallerStackFrame();    
     logp(level,
 	 caller != null ? caller.getClassName() : "<unknown>",
 	 caller != null ? caller.getMethodName() : "<unknown>",
 	 message,
 	 thrown);
+  }
   }
 
 

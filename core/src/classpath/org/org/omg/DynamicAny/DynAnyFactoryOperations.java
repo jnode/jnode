@@ -118,6 +118,11 @@ public interface DynAnyFactoryOperations
    * <td>null</td>
    * <td>{@link DynValue}, {@link DynValueBox}</td>
    * </tr>
+   * <tr>
+   * <td>TypeCode</td>
+   * <td>Typecode of kind <code>TCKind.tk_null</code></td>
+   * <td>{@link DynValue}, {@link DynValueBox}</td>
+   * </tr>
    *
    * </table>
    *

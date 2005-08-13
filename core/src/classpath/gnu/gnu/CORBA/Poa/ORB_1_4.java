@@ -39,6 +39,7 @@ exception statement from your version. */
 package gnu.CORBA.Poa;
 
 import gnu.CORBA.Functional_ORB;
+import gnu.CORBA.DynAn.gnuDynAnyFactory;
 
 import org.omg.CORBA.BAD_PARAM;
 import org.omg.CORBA.OBJECT_NOT_EXIST;
@@ -64,8 +65,13 @@ public class ORB_1_4
   public gnuPoaCurrent currents = new gnuPoaCurrent();
 
   /**
-   * Calls the parent constructor and additionally puts the "RootPOA" and
-   * "RootPOAManager" into initial references.
+   * Creates dynamic anys.
+   */
+  public gnuDynAnyFactory factory = new gnuDynAnyFactory(this);
+
+  /**
+   * Calls the parent constructor and additionally puts the "RootPOA",
+   * "RootPOAManager", "POACurrent" and "DynAnyFactory" into initial references.
    */
   public ORB_1_4()
   {
@@ -84,6 +90,7 @@ public class ORB_1_4
     initial_references.put("RootPOA", rootPOA);
     initial_references.put("RootPOAManager", rootPOA.the_POAManager());
     initial_references.put("POACurrent", currents);
+    initial_references.put("DynAnyFactory", factory);
   }
 
   /**
