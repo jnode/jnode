@@ -53,4 +53,8 @@ final class SwingMenuPeer extends SwingBaseMenuPeer<Menu, JMenu> implements Menu
     public void delItem(int index) {
         jComponent.remove(index);
     }
+
+    public void addSeparator() {
+        //TODO implement it
+    }
 }
