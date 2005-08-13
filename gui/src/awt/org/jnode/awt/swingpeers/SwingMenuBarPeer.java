@@ -61,4 +61,8 @@ final class SwingMenuBarPeer extends SwingMenuComponentPeer<MenuBar, JMenuBar>
         helpMenu.addNotify();
         jComponent.add(((SwingMenuPeer) helpMenu.getPeer()).jComponent);
     }
+
+    public void addMenu(Menu m) {
+        //TODO impelemnt it
+    }
 }
