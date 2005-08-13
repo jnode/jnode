@@ -19,6 +19,7 @@ import java.lang.annotation.Target;
 @Documented
 @Retention(CLASS)
 @Target(METHOD)
+@AllowedPackages({"org.mmtk.vm"})
 public @interface NoWriteBarrier {
 
 }

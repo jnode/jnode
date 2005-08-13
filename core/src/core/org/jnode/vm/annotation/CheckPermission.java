@@ -24,15 +24,14 @@ package org.jnode.vm.annotation;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.CLASS;
 
-import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-@Documented
 @Retention(CLASS)
 @Target(METHOD)
+@AllowedPackages({"org.jnode.vm"})
 public @interface CheckPermission {
 }

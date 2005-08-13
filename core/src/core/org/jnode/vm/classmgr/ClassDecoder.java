@@ -29,6 +29,7 @@ import java.nio.ByteBuffer;
 import java.security.ProtectionDomain;
 
 import org.jnode.system.BootLog;
+import org.jnode.vm.annotation.AllowedPackages;
 import org.jnode.vm.annotation.CheckPermission;
 import org.jnode.vm.annotation.DoPrivileged;
 import org.jnode.vm.annotation.Inline;
@@ -408,10 +409,10 @@ public final class ClassDecoder {
         }
         cls.setRuntimeAnnotations(rVisAnn);
         if (rInvisAnn != null) {
-            cls.addPragmaFlags(getClassPragmaFlags(rInvisAnn));
+            cls.addPragmaFlags(getClassPragmaFlags(rInvisAnn, clsName));
         }
         if (rVisAnn != null) {
-            cls.addPragmaFlags(getClassPragmaFlags(rVisAnn));
+            cls.addPragmaFlags(getClassPragmaFlags(rVisAnn, clsName));
         }
 
         // Create the fields
@@ -916,10 +917,10 @@ public final class ClassDecoder {
                 }
                 mts.setRuntimeAnnotations(rVisAnn);
                 if (rVisAnn != null) {
-                    mts.addPragmaFlags(getMethodPragmaFlags(rVisAnn));
+                    mts.addPragmaFlags(getMethodPragmaFlags(rVisAnn, cls.getName()));
                 }
                 if (rInvisAnn != null) {
-                    mts.addPragmaFlags(getMethodPragmaFlags(rInvisAnn));
+                    mts.addPragmaFlags(getMethodPragmaFlags(rInvisAnn, cls.getName()));
                 }
                 if ((modifiers & Modifier.ACC_NATIVE) != 0) {
                     final VmByteCode bc = getNativeCodeReplacement(mts, cl,
@@ -976,12 +977,13 @@ public final class ClassDecoder {
      * @param data
      * @param cp
      */
-    private static int getMethodPragmaFlags(VmAnnotation[] annotations) {
+    private static int getMethodPragmaFlags(VmAnnotation[] annotations, String className) {
         int flags = 0;
         for (VmAnnotation a : annotations) {
             final String typeDescr = a.getTypeDescriptor();
             for (PragmaAnnotation ma : METHOD_ANNOTATIONS) {
                 if (ma.typeDescr.equals(typeDescr)) {
+                    ma.checkPragmaAllowed(className);
                     flags |= ma.flags;
                 }
             }
@@ -995,12 +997,13 @@ public final class ClassDecoder {
      * @param data
      * @param cp
      */
-    private static int getClassPragmaFlags(VmAnnotation[] annotations) {
+    private static int getClassPragmaFlags(VmAnnotation[] annotations, String className) {
         int flags = 0;
         for (VmAnnotation a : annotations) {
             final String typeDescr = a.getTypeDescriptor();
             for (PragmaAnnotation ma : CLASS_ANNOTATIONS) {
                 if (ma.typeDescr.equals(typeDescr)) {
+                    ma.checkPragmaAllowed(className);
                     flags |= ma.flags;
                 }
             }
@@ -1206,10 +1209,33 @@ public final class ClassDecoder {
         public final char flags;
 
         public final String typeDescr;
+        
+        private final String[] allowedPackages;
 
         public PragmaAnnotation(Class< ? extends Annotation> cls, char flags) {
             this.typeDescr = "L" + cls.getName().replace('.', '/') + ";";
             this.flags = flags;
+            final AllowedPackages ann = cls.getAnnotation(AllowedPackages.class);
+            if (ann != null) {
+                allowedPackages = ann.value();
+            } else {
+                allowedPackages = null;
+            }
+        }
+        
+        /**
+         * Is this annotation allowed for the given classname.
+         */
+        public final void checkPragmaAllowed(String className) {
+            if (allowedPackages != null) {
+                final String pkg = className.substring(0, className.lastIndexOf('.'));
+                for (String allowedPkg : allowedPackages) {
+                    if (pkg.equals(allowedPkg)) {
+                        return;
+                    }
+                }
+                throw new SecurityException("Pragma " + typeDescr + " is not allowed in class " + className);
+            }
         }
     }
 
