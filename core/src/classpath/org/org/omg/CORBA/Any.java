@@ -312,12 +312,18 @@ public abstract class Any
   public abstract void insert_TypeCode(TypeCode typecode);
 
   /**
-   * Insert the CORBA <code>Value</code> into this <code>Any</code>
+   * Insert the CORBA <code>Value</code> into this <code>Any</code>.
+   *
+   * The type of the Any should be set (by {@link #type(TypeCode)})
+   * before inserting the value.
    */
   public abstract void insert_Value(Serializable x, TypeCode typecode);
 
   /**
-   * Insert the CORBA <code>Value</code> into this <code>Any</code>
+   * Insert the CORBA <code>Value</code> into this <code>Any</code>.
+   *
+   * The type of the Any should be set (by {@link #type(TypeCode)})
+   * before inserting the value.
    */
   public abstract void insert_Value(Serializable x);
 

@@ -49,7 +49,7 @@ import java.io.Serializable;
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
 public interface DynValueBox
-  extends DynValueBoxOperations, DynAny, IDLEntity, org.omg.CORBA.Object,
-  Serializable
+  extends DynValueBoxOperations, DynValueCommon, DynAny, IDLEntity,
+    org.omg.CORBA.Object, Serializable
 {
 }

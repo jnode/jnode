@@ -1,5 +1,5 @@
 /* DefaultTreeModel.java --
-   Copyright (C) 2002, 2004  Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,7 +35,6 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-
 package javax.swing.tree;
 
 import java.io.IOException;
@@ -51,6 +50,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
  * DefaultTreeModel
+ * 
  * @author Andrew Selkirk
  */
 public class DefaultTreeModel
@@ -75,6 +75,7 @@ public class DefaultTreeModel
 
 	/**
 	 * Constructor DefaultTreeModel
+   * 
 	 * @param root the tree root.
 	 */
   public DefaultTreeModel(TreeNode root)
@@ -86,6 +87,7 @@ public class DefaultTreeModel
 
 	/**
 	 * Constructor DefaultTreeModel
+   * 
 	 * @param root the tree root.
 	 * @param asksAllowsChildren TODO
 	 */
@@ -97,6 +99,7 @@ public class DefaultTreeModel
 
 	/**
 	 * writeObject
+   * 
 	 * @param obj the object.
 	 * @exception IOException TODO
 	 */
@@ -107,6 +110,7 @@ public class DefaultTreeModel
 
 	/**
 	 * readObject
+   * 
 	 * @param value0 TODO
 	 * @exception IOException TODO
 	 * @exception ClassNotFoundException TODO
@@ -119,6 +123,7 @@ public class DefaultTreeModel
 
 	/**
 	 * asksAllowsChildren
+   * 
    * @return boolean
 	 */
   public boolean asksAllowsChildren()
@@ -128,6 +133,7 @@ public class DefaultTreeModel
 
 	/**
 	 * setAsksAllowsChildren
+   * 
 	 * @param value TODO
 	 */
   public void setAsksAllowsChildren(boolean value)
@@ -137,6 +143,7 @@ public class DefaultTreeModel
 
 	/**
 	 * setRoot
+   * 
 	 * @param root the root node.
 	 */
   public void setRoot(TreeNode root)
@@ -154,6 +161,7 @@ public class DefaultTreeModel
 
 	/**
 	 * getRoot
+   * 
    * @return Object
 	 */
   public Object getRoot()
@@ -163,17 +171,24 @@ public class DefaultTreeModel
 
 	/**
 	 * getIndexOfChild
+   * 
 	 * @param parent TODO
 	 * @param child TODO
    * @return int
 	 */
   public int getIndexOfChild(Object parent, Object child)
   {
-		return 0; // TODO
+    for (int i = 0; i < getChildCount(parent); i++)
+    {
+      if (getChild(parent, i).equals(child))
+	return i;
+    }
+    return -1;
   }
 
 	/**
 	 * getChild
+   * 
 	 * @param node TODO
 	 * @param idx TODO
    * @return Object
@@ -188,6 +203,7 @@ public class DefaultTreeModel
 
 	/**
 	 * getChildCount
+   * 
 	 * @param node TODO
    * @return int
 	 */
@@ -201,6 +217,7 @@ public class DefaultTreeModel
 
 	/**
 	 * isLeaf
+   * 
 	 * @param node TODO
    * @return boolean
 	 */
@@ -222,6 +239,7 @@ public class DefaultTreeModel
 
 	/**
 	 * reload
+   * 
 	 * @param value0 TODO
 	 */
   public void reload(TreeNode value0)
@@ -231,6 +249,7 @@ public class DefaultTreeModel
 
 	/**
 	 * valueForPathChanged
+   * 
 	 * @param value0 TODO
 	 * @param value1 TODO
 	 */
@@ -241,6 +260,7 @@ public class DefaultTreeModel
 
 	/**
 	 * insertNodeInto
+   * 
 	 * @param value0 TODO
 	 * @param value1 TODO
 	 * @param value2 TODO
@@ -253,6 +273,7 @@ public class DefaultTreeModel
 
 	/**
 	 * removeNodeFromParent
+   * 
 	 * @param value0 TODO
 	 */
   public void removeNodeFromParent(MutableTreeNode value0)
@@ -262,6 +283,7 @@ public class DefaultTreeModel
 
 	/**
 	 * nodeChanged
+   * 
 	 * @param value0 TODO
 	 */
   public void nodeChanged(TreeNode value0)
@@ -271,6 +293,7 @@ public class DefaultTreeModel
 
 	/**
 	 * nodesWereInserted
+   * 
 	 * @param value0 TODO
 	 * @param value1 TODO
 	 */
@@ -281,6 +304,7 @@ public class DefaultTreeModel
 
 	/**
 	 * nodesWereRemoved
+   * 
 	 * @param value0 TODO
 	 * @param value1 TODO
 	 * @param value2 TODO
@@ -292,6 +316,7 @@ public class DefaultTreeModel
 
 	/**
 	 * nodesChanged
+   * 
 	 * @param value0 TODO
 	 * @param value1 TODO
 	 */
@@ -302,6 +327,7 @@ public class DefaultTreeModel
 
 	/**
 	 * nodeStructureChanged
+   * 
 	 * @param value0 TODO
 	 */
   public void nodeStructureChanged(TreeNode value0)
@@ -311,6 +337,7 @@ public class DefaultTreeModel
 
 	/**
 	 * getPathToRoot
+   * 
 	 * @param value0 TODO
    * @return TreeNode[]
 	 */
@@ -321,6 +348,7 @@ public class DefaultTreeModel
 
 	/**
 	 * getPathToRoot
+   * 
 	 * @param value0 TODO
 	 * @param value1 TODO
    * @return TreeNode[]

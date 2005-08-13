@@ -51,7 +51,7 @@ import java.io.Serializable;
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
 public interface DynValueCommon
-  extends DynValueOperations, DynAny, IDLEntity, org.omg.CORBA.Object,
+  extends DynValueCommonOperations, DynAny, IDLEntity, org.omg.CORBA.Object,
   Serializable
 {
   /**

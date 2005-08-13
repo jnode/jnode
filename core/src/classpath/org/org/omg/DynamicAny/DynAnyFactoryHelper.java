@@ -62,7 +62,7 @@ public abstract class DynAnyFactoryHelper
 {
   /**
    * Cast the passed object into the DynAnyFactory. As DynAnyFactory is a local
-   * object, the method just uses java type cast.
+   * object, the method just uses java final_type cast.
    * 
    * @param obj the object to narrow.
    * @return narrowed instance.
@@ -82,7 +82,7 @@ public abstract class DynAnyFactoryHelper
   }
 
   /**
-   * Get the type code of the {@link DynAnyFactory}.
+   * Get the final_type code of the {@link DynAnyFactory}.
    */
   public static TypeCode type()
   {
