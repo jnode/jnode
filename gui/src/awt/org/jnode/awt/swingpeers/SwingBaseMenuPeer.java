@@ -36,4 +36,8 @@ abstract class SwingBaseMenuPeer<awtT extends Menu, peerT extends JComponent>
     public void delItem(int index) {
         ((JMenu)jComponent).remove(index);
     }
+
+    public void addSeparator() {
+        //TODO implement it
+    }
 }
