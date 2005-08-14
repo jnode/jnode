@@ -384,7 +384,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	/**
 	 * Gets the AWT context.
 	 * 
-	 * @return
+	 * @return the AWT context
 	 */
 	public abstract JNodeAwtContext getAwtContext();
 
@@ -656,7 +656,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	 * 
 	 * @param x
 	 * @param y
-	 * @return
+	 * @return the component
 	 */
 	public Component getTopComponentAt(int x, int y) {
 		final Frame f = getTop();
@@ -724,7 +724,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
                 final EventQueue eventQueue = getSystemEventQueueImpl();
 				this.keyboardHandler = new KeyboardHandler(eventQueue);
 				this.mouseHandler = new MouseHandler(dev.getDevice(),
-						screenSize, eventQueue);
+						screenSize, eventQueue, keyboardHandler);
                 keyboardHandler.install();
 
                 AccessController.doPrivileged(new PrivilegedAction() {

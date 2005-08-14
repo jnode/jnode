@@ -51,6 +51,8 @@ public class KeyboardHandler implements
     /** The API of the actual keyboard */
     private KeyboardAPI keyboardAPI;
 
+    private int modifiers;
+
     /**
      * Initialize this instance.
      * 
@@ -91,8 +93,10 @@ public class KeyboardHandler implements
             event.consume();
             JNodeToolkit.refreshGui();
         } else {
-            postEvent(KeyEvent.KEY_PRESSED, event.getTime(), event
-                    .getModifiers(), key_code, event.getKeyChar());
+
+            int modifiers = event.getModifiers();
+            setModifiers(modifiers);
+            postEvent(KeyEvent.KEY_PRESSED, event.getTime(), modifiers, key_code, event.getKeyChar());
             event.consume();
         }
     }
@@ -101,7 +105,9 @@ public class KeyboardHandler implements
      * @param event
      */
     public void keyReleased(KeyboardEvent event) {
-        postEvent(KeyEvent.KEY_RELEASED, event.getTime(), event.getModifiers(),
+        int modifiers = event.getModifiers();
+        setModifiers(modifiers);
+        postEvent(KeyEvent.KEY_RELEASED, event.getTime(), modifiers,
                 event.getKeyCode(), event.getKeyChar());
         char ch = event.getKeyChar();
         if (ch != KeyEvent.CHAR_UNDEFINED) {
@@ -122,6 +128,14 @@ public class KeyboardHandler implements
         KeyEvent me = new KeyEvent(tk.getTop(), id, time, modifiers, keyCode,
                 keyChar);
         eventQueue.postEvent(me);
+    }
+
+    synchronized int getModifiers() {
+        return modifiers;
+    }
+
+    private synchronized void setModifiers(int modifiers) {
+        this.modifiers = modifiers;
     }
 
     /**

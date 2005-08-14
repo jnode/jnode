@@ -67,6 +67,7 @@ public class MouseHandler implements PointerListener {
     private int x;
 
     private int y;
+    private AWTMouseEventGenerator mouseEventGenerator;
 
     /**
      * Create a new instance
@@ -75,7 +76,7 @@ public class MouseHandler implements PointerListener {
      * @param screenSize
      */
     public MouseHandler(Device fbDevice, Dimension screenSize,
-            EventQueue eventQueue) {
+                        EventQueue eventQueue, KeyboardHandler keyboardHandler) {
         this.eventQueue = eventQueue;
         HardwareCursorAPI hwCursor = null;
         Device pointerDevice = null;
@@ -107,7 +108,9 @@ public class MouseHandler implements PointerListener {
             hwCursor.setCursorImage(JNodeCursors.ARROW);
             hwCursor.setCursorVisible(true);
             hwCursor.setCursorPosition(0, 0);
-            pointerAPI.addPointerListener(this);
+            //pointerAPI.addPointerListener(this);
+            mouseEventGenerator = new AWTMouseEventGenerator(eventQueue, screenSize, hwCursor, keyboardHandler);
+            pointerAPI.addPointerListener(mouseEventGenerator);
         }
     }
 
@@ -116,9 +119,13 @@ public class MouseHandler implements PointerListener {
      */
     public void close() {
         if (pointerAPI != null) {
-            pointerAPI.removePointerListener(this);
+            //pointerAPI.removePointerListener(this);
+            if(mouseEventGenerator != null){
+                pointerAPI.removePointerListener(mouseEventGenerator);
+            }
         }
     }
+
 
     /**
      * @param event
