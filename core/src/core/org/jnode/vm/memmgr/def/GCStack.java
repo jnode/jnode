@@ -22,6 +22,7 @@
 package org.jnode.vm.memmgr.def;
 
 import org.jnode.vm.VmSystemObject;
+import org.jnode.vm.annotation.Inline;
 import org.vmmagic.pragma.Uninterruptible;
 
 /**
@@ -53,7 +54,8 @@ final class GCStack extends VmSystemObject implements Uninterruptible {
 	 * the overflow and do not push the object.
 	 * @param object
 	 */
-	public void push(Object object) {
+    @Inline
+	public final void push(Object object) {
 		if (object == null) {
 			throw new IllegalArgumentException("Cannot push null object");
 		}
@@ -68,7 +70,8 @@ final class GCStack extends VmSystemObject implements Uninterruptible {
 	 * Gets the last pushed object of the stack and remove it from the stack.
 	 * @return The object
 	 */
-	public Object pop() {
+    @Inline
+	public final Object pop() {
 		if (stackPtr == 0) {
 			return null;
 		} else {
@@ -94,6 +97,7 @@ final class GCStack extends VmSystemObject implements Uninterruptible {
 	 * Has a stackoverflow occurred?
 	 * @return boolean
 	 */
+    @Inline
 	public final boolean isOverflow() {
 		return overflow;
 	}
