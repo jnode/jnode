@@ -58,144 +58,80 @@ public class Modifier {
 	public static final int ACC_SPECIAL     = 0x80000000;
 	
 	public static boolean isPublic(int modifier) {
-		int mask = ACC_PUBLIC;
-		return ((modifier & mask) == mask);
+		return ((modifier & ACC_PUBLIC) != 0);
 	}
 
 	public static boolean isPrivate(int modifier) {
-		int mask = ACC_PRIVATE;
-		return ((modifier & mask) == mask);
+		return ((modifier & ACC_PRIVATE) != 0);
 	}
 
 	public static boolean isProtected(int modifier) {
-		int mask = ACC_PROTECTED;
-		return ((modifier & mask) == mask);
+		return ((modifier & ACC_PROTECTED) != 0);
 	}
 
 	public static boolean isStatic(int modifier) {
-		int mask = ACC_STATIC;
-		return ((modifier & mask) == mask);
+		return ((modifier & ACC_STATIC) != 0);
 	}
 
 	public static boolean isFinal(int modifier) {
-		int mask = ACC_FINAL;
-		return ((modifier & mask) == mask);
+		return ((modifier & ACC_FINAL) != 0);
 	}
 
 	public static boolean isObjectRef(int modifier) {
-		int mask = ACC_OBJECTREF;
-		return ((modifier & mask) == mask);
+		return ((modifier & ACC_OBJECTREF) != 0);
 	}
 
 	public static boolean isSpecial(int modifier) {
-		int mask = ACC_SPECIAL;
-		return ((modifier & mask) == mask);
+		return ((modifier & ACC_SPECIAL) != 0);
 	}
 
 	public static boolean isSynchronized(int modifier) {
-		int mask = ACC_SYNCHRONIZED;
-		return ((modifier & mask) == mask);
+		return ((modifier & ACC_SYNCHRONIZED) != 0);
 	}
 
 	public static boolean isSuper(int modifier) {
-		int mask = ACC_SUPER;
-		return ((modifier & mask) == mask);
+		return ((modifier & ACC_SUPER) != 0);
 	}
 
 	public static boolean isVolatile(int modifier) {
-		int mask = ACC_VOLATILE;
-		return ((modifier & mask) == mask);
+		return ((modifier & ACC_VOLATILE) != 0);
 	}
 
 	public static boolean isTransient(int modifier) {
-		int mask = ACC_TRANSIENT;
-		return ((modifier & mask) == mask);
+		return ((modifier & ACC_TRANSIENT) != 0);
 	}
 
 	public static boolean isNative(int modifier) {
-		int mask = ACC_NATIVE;
-		return ((modifier & mask) == mask);
+		return ((modifier & ACC_NATIVE) != 0);
 	}
 
 	public static boolean isInterface(int modifier) {
-		int mask = ACC_INTERFACE;
-		return ((modifier & mask) == mask);
+		return ((modifier & ACC_INTERFACE) != 0);
 	}
 
     public static boolean isEnum(int modifier) {
-        int mask = ACC_ENUM;
-        return ((modifier & mask) == mask);
+        return ((modifier & ACC_ENUM) != 0);
     }
 
 	public static boolean isAbstract(int modifier) {
-		int mask = ACC_ABSTRACT;
-		return ((modifier & mask) == mask);
+		return ((modifier & ACC_ABSTRACT) != 0);
 	}
 
 	public static boolean isStrict(int modifier) {
-		int mask = ACC_STRICT;
-		return ((modifier & mask) == mask);
+		return ((modifier & ACC_STRICT) != 0);
 	}
 
-	/*public static boolean isCompiled(int modifier) {
-		int mask = ACC_COMPILED;
-		return ((modifier & mask) == mask);
-	}*/
-
 	public static boolean isInitializer(int modifier) {
-		int mask = ACC_INITIALIZER;
-		return ((modifier & mask) == mask);
+		return ((modifier & ACC_INITIALIZER) != 0);
 	}
 
 	public static boolean isConstructor(int modifier) {
-		int mask = ACC_CONSTRUCTOR;
-		return ((modifier & mask) == mask);
+		return ((modifier & ACC_CONSTRUCTOR) != 0);
 	}
 
 	public static boolean isMagic(int modifier) {
-		int mask = ACC_MAGIC;
-		return ((modifier & mask) == mask);
+		return ((modifier & ACC_MAGIC) != 0);
 	}
-
-/*	public static boolean isLoaded(int modifier) {
-		int mask = ACC_LOADED;
-		return ((modifier & mask) == mask);
-	}
-
-	public static boolean isDefined(int modifier) {
-		int mask = ACC_DEFINED;
-		return ((modifier & mask) == mask);
-	}
-
-	public static boolean isVerifying(int modifier) {
-		int mask = ACC_VERIFYING;
-		return ((modifier & mask) == mask);
-	}
-
-	public static boolean isVerified(int modifier) {
-		int mask = ACC_VERIFIED;
-		return ((modifier & mask) == mask);
-	}
-
-	public static boolean isPreparing(int modifier) {
-		int mask = ACC_PREPARING;
-		return ((modifier & mask) == mask);
-	}
-
-	public static boolean isPrepared(int modifier) {
-		int mask = ACC_PREPARED;
-		return ((modifier & mask) == mask);
-	}
-
-	public static boolean isInitialized(int modifier) {
-		int mask = ACC_INITIALIZED;
-		return ((modifier & mask) == mask);
-	}
-
-	public static boolean isInitializing(int modifier) {
-		int mask = ACC_INITIALIZING;
-		return ((modifier & mask) == mask);
-	}*/
 
 	public static boolean isWide(String signature) {
 		final int len = signature.length();
@@ -209,7 +145,7 @@ public class Modifier {
 	}
 
 	public static boolean isPrimitive(String signature) {
-		char ch = signature.charAt(0);
+		final char ch = signature.charAt(0);
 		return ((ch != 'L') && (ch != '['));
 	}
 
