@@ -24,9 +24,7 @@ package org.jnode.vm.memmgr.def;
 import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.classmgr.ObjectLayout;
-import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.memmgr.HeapHelper;
-import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.Offset;
@@ -49,25 +47,6 @@ final class VmBootHeap extends VmAbstractHeap {
      */
     public VmBootHeap(HeapHelper helper) {
         super(helper);
-    }
-
-    /**
-     * @param vmClass
-     * @param size
-     * @see VmAbstractHeap#alloc(VmClassType, int)
-     * @return The new object
-     */
-    protected Object alloc(VmClassType vmClass, int size) {
-        return null;
-    }
-
-    /**
-     * Mark the given object as free space.
-     * 
-     * @param object
-     */
-    protected final void free(Object object) {
-        // This heap does not free memory.
     }
 
     /**
@@ -111,23 +90,6 @@ final class VmBootHeap extends VmAbstractHeap {
         //Unsafe.debug("end of bootheap.initialize");
     }
 
-    /**
-     * @see VmAbstractHeap#getFreeSize()
-     * @return the free size
-     */
-    protected Extent getFreeSize() {
-        return Extent.zero();
-    }
-
-    /**
-     * Join all adjacent free spaces.
-     * 
-     * @throws UninterruptiblePragma
-     */
-    protected final void defragment() throws UninterruptiblePragma {
-        // Do nothing, since the bootheap is never changed.
-    }
-    
     /**
      * Let all objects in this heap make a visit to the given visitor.
      * 

@@ -97,7 +97,7 @@ final class GCVerifyVisitor extends ObjectVisitor {
     }
     
     @Inline
-    private final void verifyObject(Object object, VmNormalClass vmClass) {
+    private final void verifyObject(Object object, VmNormalClass<?> vmClass) {
         final int[] referenceOffsets = vmClass.getReferenceOffsets();
         final int cnt = referenceOffsets.length;
         final int size = vmClass.getObjectSize();

@@ -88,7 +88,7 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
     final void gc() {
         // Prepare
         final VmBootHeap bootHeap = heapManager.getBootHeap();
-        final VmAbstractHeap firstHeap = heapManager.getHeapList();
+        final VmDefaultHeap firstHeap = heapManager.getHeapList();
         stats.lastGCTime = System.currentTimeMillis();
 
         final boolean locking = (writeBarrier != null);
@@ -126,7 +126,10 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
                 if (verbose) {
                     Unsafe.debug("<verify/>");
                 }
-                verify(bootHeap, firstHeap);
+                if (false) {
+                    // Turn back to true in case of problems in the GC.
+                    verify(bootHeap, firstHeap);
+                }
             }
         } finally {
             heapManager.setGcActive(false);
@@ -144,7 +147,7 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
      * @param bootHeap
      * @param firstHeap
      */
-    private final void markHeap(VmBootHeap bootHeap, VmAbstractHeap firstHeap,             boolean locking) {
+    private final void markHeap(VmBootHeap bootHeap, VmDefaultHeap firstHeap,             boolean locking) {
 
         if (writeBarrier != null) {
             writeBarrier.setActive(true);
@@ -176,11 +179,10 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
                 // all grey objects, since we must still mark
                 // their children.
                 markVisitor.setRootSet(false);
-                final Word zero = Word.zero();
-                bootHeap.walk(markVisitor, locking, zero, zero);
-                VmAbstractHeap heap = firstHeap;
+                bootHeap.walk(markVisitor, locking, Word.zero(), Word.zero());
+                VmDefaultHeap heap = firstHeap;
                 while ((heap != null) && (!markStack.isOverflow())) {
-                    heap.walk(markVisitor, locking, zero, zero);
+                    heap.walk(markVisitor, locking, Word.zero(), Word.zero());
                     heap = heap.getNext();
                 }
             }
@@ -211,14 +213,14 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
      * 
      * @param firstHeap
      */
-    private void sweep(VmAbstractHeap firstHeap) {
+    private void sweep(VmDefaultHeap firstHeap) {
         final long startTime = VmSystem.currentKernelMillis();
-        VmAbstractHeap heap = firstHeap;
-        final Word zero = Word.zero();
+        VmDefaultHeap heap = firstHeap;
         while (heap != null) {
-            //freedBytes += heap.collect();
+            heap.lock();
             sweepVisitor.setCurrentHeap(heap);
-            heap.walk(sweepVisitor, true, zero, zero);
+            heap.walk(sweepVisitor, false, Word.zero(), Word.zero());
+            heap.unlock();
             heap = heap.getNext();
         }
         final long endTime = VmSystem.currentKernelMillis();
@@ -231,11 +233,10 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
      * @param bootHeap
      * @param firstHeap
      */
-    private void cleanup(VmBootHeap bootHeap, VmAbstractHeap firstHeap) {
+    private void cleanup(VmBootHeap bootHeap, VmDefaultHeap firstHeap) {
         final long startTime = VmSystem.currentKernelMillis();
-        final Word zero = Word.zero();
-        bootHeap.walk(setWhiteVisitor, true, zero, zero);
-        VmAbstractHeap heap = firstHeap;
+        bootHeap.walk(setWhiteVisitor, true, Word.zero(), Word.zero());
+        VmDefaultHeap heap = firstHeap;
         while (heap != null) {
             heap.defragment();
             //heap.walk(setWhiteVisitor, locking);
@@ -251,12 +252,12 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
      * @param bootHeap
      * @param firstHeap
      */
-    private void verify(VmBootHeap bootHeap, VmAbstractHeap firstHeap) {
+    private void verify(VmBootHeap bootHeap, VmDefaultHeap firstHeap) {
         final long startTime = VmSystem.currentKernelMillis();
         final Word zero = Word.zero();
         verifyVisitor.reset();
         bootHeap.walk(verifyVisitor, true, zero, zero);
-        VmAbstractHeap heap = firstHeap;
+        VmDefaultHeap heap = firstHeap;
         while (heap != null) {
             heap.walk(verifyVisitor, true, zero, zero);
             heap = heap.getNext();
