@@ -23,21 +23,9 @@ abstract class SwingBaseMenuPeer<awtT extends Menu, peerT extends JComponent>
         super(toolkit, menu, jComponent);
     }
 
-    public void addItem(MenuItem item) {
-        Action action = new AbstractAction(){
-            public void actionPerformed(ActionEvent e) {
-                //TODO implement it
-            }
-        };
-        action.putValue(Action.NAME, item.getLabel());
-        ((JMenu)jComponent).add(action);
-    }
+    public abstract void addItem(MenuItem item);
 
-    public void delItem(int index) {
-        ((JMenu)jComponent).remove(index);
-    }
+    public abstract void delItem(int index);
 
-    public void addSeparator() {
-        //TODO implement it
-    }
+    public abstract void addSeparator();
 }

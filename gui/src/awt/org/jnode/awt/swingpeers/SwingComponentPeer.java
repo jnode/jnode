@@ -118,9 +118,6 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends JCo
         setEnabled(false);
     }
 
-    public void dispose() {
-    }
-
     public final void enable() {
         setEnabled(true);
     }

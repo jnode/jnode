@@ -36,10 +36,6 @@ import javax.swing.JMenuItem;
 final class SwingMenuItemPeer extends
         SwingBaseMenuItemPeer<MenuItem, JMenuItem> implements MenuItemPeer {
 
-    //
-    // Construction
-    //
-
     public SwingMenuItemPeer(SwingToolkit toolkit, final MenuItem menuItem) {
         super(toolkit, menuItem, new JMenuItem());
         jComponent.addActionListener(new ActionListener() {

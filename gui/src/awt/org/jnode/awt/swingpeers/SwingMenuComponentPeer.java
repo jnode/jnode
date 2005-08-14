@@ -40,8 +40,4 @@ abstract class SwingMenuComponentPeer<awtT extends Object, peerT extends JCompon
         super(toolkit, component);
         this.jComponent = peer;
     }
-
-    public void dispose() {
-        super.dispose();
-    }
 }
