@@ -145,7 +145,7 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
      * Process all objects on the markstack, until the markstack is empty.
      */
     @NoInline
-    protected void mark() {
+    protected final void mark() {
         while (!stack.isEmpty()) {
             final Object object = stack.pop();
             markedObjects++;
