@@ -120,7 +120,7 @@ final class FinalizerThread extends Thread {
      * are unreachable and still need finalization.
      */
     private final void runFinalization() {
-        VmAbstractHeap heap = heapManager.getHeapList();
+        VmDefaultHeap heap = heapManager.getHeapList();
         final Word colorMask = Word.fromIntZeroExtend(ObjectFlags.GC_COLOUR_MASK);
         final Word yellow = Word.fromIntZeroExtend(ObjectFlags.GC_YELLOW);
         while (heap != null) {

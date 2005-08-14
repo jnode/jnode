@@ -37,7 +37,7 @@ final class GCSweepVisitor extends ObjectVisitor implements ObjectFlags,
     private final HeapHelper helper;
 
     /** The heap that is currently being visited */
-    private VmAbstractHeap currentHeap;
+    private VmDefaultHeap currentHeap;
 
     public GCSweepVisitor(DefaultHeapManager heapMgr) {
         this.helper = heapMgr.getHelper();
@@ -76,7 +76,7 @@ final class GCSweepVisitor extends ObjectVisitor implements ObjectFlags,
     /**
      * @return Returns the currentHeap.
      */
-    public final VmAbstractHeap getCurrentHeap() {
+    public final VmDefaultHeap getCurrentHeap() {
         return this.currentHeap;
     }
 
@@ -84,7 +84,7 @@ final class GCSweepVisitor extends ObjectVisitor implements ObjectFlags,
      * @param currentHeap
      *            The currentHeap to set.
      */
-    public final void setCurrentHeap(VmAbstractHeap currentHeap) {
+    public final void setCurrentHeap(VmDefaultHeap currentHeap) {
         this.currentHeap = currentHeap;
     }
 }

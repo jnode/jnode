@@ -29,6 +29,7 @@ import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.VmProcessor;
+import org.jnode.vm.annotation.Inline;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmClassLoader;
@@ -84,27 +85,27 @@ public final class DefaultHeapManager extends VmHeapManager {
     /**
      * Linked list of all heaps.
      */
-    private VmAbstractHeap heapList;
+    private VmDefaultHeap heapList;
 
     /**
      * The first heap.
      */
-    private final VmAbstractHeap firstNormalHeap;
+    private final VmDefaultHeap firstNormalHeap;
 
     /**
      * The heap currently used for allocation
      */
-    private VmAbstractHeap currentHeap;
+    private VmDefaultHeap currentHeap;
 
     /**
      * The heap used for allocations during a GC
      */
-    private VmAbstractHeap gcHeap;
+    private VmDefaultHeap gcHeap;
 
     /**
      * The class of the default heap type. Set by initialize
      */
-    private final VmNormalClass defaultHeapClass;
+    private final VmNormalClass<VmDefaultHeap> defaultHeapClass;
 
     /**
      * The number of allocated bytes since the last GC trigger
@@ -120,6 +121,7 @@ public final class DefaultHeapManager extends VmHeapManager {
     /**
      * Make this private, so we cannot be instantiated
      */
+    @SuppressWarnings("unchecked")
     public DefaultHeapManager(VmClassLoader loader, HeapHelper helper)
             throws ClassNotFoundException {
         super(helper);
@@ -129,7 +131,7 @@ public final class DefaultHeapManager extends VmHeapManager {
         this.firstNormalHeap = new VmDefaultHeap(this);
         this.currentHeap = firstNormalHeap;
         this.heapList = firstNormalHeap;
-        this.defaultHeapClass = (VmNormalClass<?>) loader.loadClass(
+        this.defaultHeapClass = (VmNormalClass<VmDefaultHeap>) loader.loadClass(
                 VmDefaultHeap.class.getName(), true);
     }
 
@@ -141,16 +143,16 @@ public final class DefaultHeapManager extends VmHeapManager {
      * @return True if the given address if a valid starting address of an
      *         object, false otherwise.
      */
+    @Inline
     public final boolean isObject(Address ptr) {
-        long addrL = ptr.toLong();
-        if ((addrL & (ObjectLayout.OBJECT_ALIGN - 1)) != 0) {
+        if (!ptr.toWord().and(Word.fromIntZeroExtend(ObjectLayout.OBJECT_ALIGN - 1)).isZero()) {
             // The object is not at an object aligned boundary
             return false;
         }
         if (bootHeap.isObject(ptr)) {
             return true;
         }
-        VmAbstractHeap heap = heapList;
+        VmDefaultHeap heap = heapList;
         while (heap != null) {
             if (heap.isObject(ptr)) {
                 return true;
@@ -182,8 +184,8 @@ public final class DefaultHeapManager extends VmHeapManager {
      * @return long
      */
     public long getFreeMemory() {
-        Extent size = bootHeap.getFreeSize();
-        VmAbstractHeap h = firstNormalHeap;
+        Extent size = Extent.zero();
+        VmDefaultHeap h = firstNormalHeap;
         while (h != null) {
             size = size.add(h.getFreeSize());
             h = h.getNext();
@@ -201,7 +203,7 @@ public final class DefaultHeapManager extends VmHeapManager {
      */
     public long getTotalMemory() {
         long size = bootHeap.getSize();
-        VmAbstractHeap h = firstNormalHeap;
+        VmDefaultHeap h = firstNormalHeap;
         while (h != null) {
             size += h.getSize();
             h = h.getNext();
@@ -218,7 +220,7 @@ public final class DefaultHeapManager extends VmHeapManager {
      * 
      * @return the first heap
      */
-    public final VmAbstractHeap getHeapList() {
+    public final VmDefaultHeap getHeapList() {
         return heapList;
     }
 
@@ -279,7 +281,7 @@ public final class DefaultHeapManager extends VmHeapManager {
         final int alignedSize = ObjectLayout.objectAlign(size);
         // final Monitor mon = heapMonitor;
 
-        VmAbstractHeap heap = currentHeap;
+        VmDefaultHeap heap = currentHeap;
         Object result = null;
         int oomCount = 0;
 
@@ -341,7 +343,7 @@ public final class DefaultHeapManager extends VmHeapManager {
                     result = heap.alloc(vmClass, alignedSize);
 
                     if (result == null) {
-                        heap = heap.getNext();
+                        heap = (VmDefaultHeap)heap.getNext();
                     }
                 }
                 lowOnMemory = false;
@@ -375,7 +377,7 @@ public final class DefaultHeapManager extends VmHeapManager {
      * @param size
      * @return The heap
      */
-    private VmAbstractHeap allocHeap(Extent size, boolean addToHeapList) {
+    private VmDefaultHeap allocHeap(Extent size, boolean addToHeapList) {
         // Unsafe.debug("allocHeap");
         final Address start = helper.allocateBlock(size);
         // final Address start = MemoryBlockManager.allocateBlock(size);
@@ -385,7 +387,7 @@ public final class DefaultHeapManager extends VmHeapManager {
         final Address end = start.add(size);
         final int slotSize = VmProcessor.current().getArchitecture()
                 .getReferenceSize();
-        final VmAbstractHeap heap = VmDefaultHeap.setupHeap(helper, start,
+        final VmDefaultHeap heap = VmDefaultHeap.setupHeap(helper, start,
                 defaultHeapClass, slotSize);
         heap.initialize(start, end, slotSize);
 
@@ -443,7 +445,7 @@ public final class DefaultHeapManager extends VmHeapManager {
         final HeapStatisticsVisitor heapStatisticsVisitor = new HeapStatisticsVisitor(
                 heapStatistics);
 
-        VmAbstractHeap heap = firstNormalHeap;
+        VmDefaultHeap heap = firstNormalHeap;
         final Word zero = Word.zero();
 
         while (heap != null) {

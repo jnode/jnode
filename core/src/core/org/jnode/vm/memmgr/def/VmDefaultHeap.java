@@ -23,6 +23,7 @@ package org.jnode.vm.memmgr.def;
 
 import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.VmMagic;
+import org.jnode.vm.annotation.Inline;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmClassType;
@@ -53,6 +54,9 @@ final class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
     /** Offset (in bytes) from the start of an object to the size of an object */
     private Offset sizeOffset;
 
+    /** The next heap (linked list) */
+    private VmDefaultHeap next;
+
     /**
      * Initialize this instance
      * 
@@ -70,8 +74,8 @@ final class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
      * @param slotSize
      * @return the heap
      */
-    protected static VmAbstractHeap setupHeap(HeapHelper helper, Address start,
-            VmNormalClass<?> heapClass, int slotSize) {
+    protected static VmDefaultHeap setupHeap(HeapHelper helper, Address start,
+            VmNormalClass<VmDefaultHeap> heapClass, int slotSize) {
         final int headerSize = ObjectLayout
                 .objectAlign((ObjectLayout.HEADER_SLOTS + 1) * slotSize);
         final Offset vmtOffset = Offset.fromIntSignExtend(ObjectLayout.TIB_SLOT * slotSize);
@@ -93,6 +97,27 @@ final class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
         return heap;
     }
 
+    /**
+     * Append a new heap to the end of the linked list of heaps.
+     * @param newHeap
+     */ 
+    protected final void append(VmDefaultHeap newHeap) {
+        VmDefaultHeap heap = this;
+        while (heap.next != null) {
+            heap = heap.next;
+        }
+        heap.next = newHeap;
+    }
+    
+    /**
+     * Gets the next heap in the linked list of heaps.
+     * @return Next heap
+     */
+    @Inline
+    public final VmDefaultHeap getNext() {
+        return next;
+    }
+    
     /**
      * Initialize this heap
      * 
@@ -250,17 +275,13 @@ final class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
      * 
      * @param object
      */
-    protected final void free(Object object) {
-        lock();
-        try {
-        	final Address ptr = ObjectReference.fromObject(object).toAddress();
-            final Word objSize = ptr.loadWord(sizeOffset);
-            ptr.store(ObjectReference.fromObject(FREE), tibOffset);
-            setAllocationBit(object, false);
-            freeSize = freeSize.add(objSize);
-        } finally {
-            unlock();
-        }
+    @Inline
+    final void free(Object object) {
+        final Address ptr = ObjectReference.fromObject(object).toAddress();
+        final Word objSize = ptr.loadWord(sizeOffset);
+        ptr.store(ObjectReference.fromObject(FREE), tibOffset);
+        setAllocationBit(object, false);
+        freeSize = freeSize.add(objSize);
     } 
 
     /**

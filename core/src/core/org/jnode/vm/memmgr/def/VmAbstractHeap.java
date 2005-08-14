@@ -25,12 +25,10 @@ import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.SpinLock;
 import org.jnode.vm.annotation.Inline;
 import org.jnode.vm.classmgr.ObjectLayout;
-import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.vmmagic.pragma.Uninterruptible;
 import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.Address;
-import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.ObjectReference;
 import org.vmmagic.unboxed.Offset;
 import org.vmmagic.unboxed.Word;
@@ -59,8 +57,6 @@ abstract class VmAbstractHeap extends SpinLock implements Uninterruptible {
 	protected Offset tibOffset;
 	/** Start address of allocation bitmap */
 	protected Address allocationBitmapPtr;
-	/** The next heap (linked list) */
-	private VmAbstractHeap next;
 	
 	/** Default marker for free object space (marker in VMT field) */
 	protected Object FREE = null;
@@ -151,56 +147,12 @@ abstract class VmAbstractHeap extends SpinLock implements Uninterruptible {
 	}
 	
 	/**
-	 * Append a new heap to the end of the linked list of heaps.
-	 * @param newHeap
-	 */	
-	protected final void append(VmAbstractHeap newHeap) {
-		VmAbstractHeap heap = this;
-		while (heap.next != null) {
-			heap = heap.next;
-		}
-		heap.next = newHeap;
-	}
-	
-	/**
-	 * Gets the next heap in the linked list of heaps.
-	 * @return Next heap
-	 */
-    @Inline
-	public final VmAbstractHeap getNext() {
-		return next;
-	}
-	
-	/**
 	 * Initialize this heap
 	 * @param start Start address of this heap
 	 * @param end End address of this heap (first address after this heap)
 	 * @param slotSize
 	 */
 	protected abstract void initialize(Address start, Address end, int slotSize);
-	
-	/**
-	 * Allocate a new instance for the given class.
-	 * Not that this method cannot be synchronized, since the synchronization
-	 * is handled in VmHeap.
-	 * @param vmClass
-	 * @param alignedSize
-	 * @return Object Null if no space is left.
-	 */
-	protected abstract Object alloc(VmClassType<?> vmClass, int alignedSize);
-	
-	/**
-	 * Gets the size of free memory in this heap in bytes
-	 * @return size
-	 */
-	protected abstract Extent getFreeSize();
-	
-	/**
-	 * Join all adjacent free spaces.
-	 * @throws UninterruptiblePragma
-	 */
-	protected abstract void defragment()
-	throws UninterruptiblePragma;
 	
 	/**
 	 * Let a selected set of objects in this heap make a visit to the given visitor.
@@ -216,10 +168,4 @@ abstract class VmAbstractHeap extends SpinLock implements Uninterruptible {
 	 */
 	protected abstract void walk(ObjectVisitor visitor, boolean locking, Word flagsMask, Word flagsValue)
 	throws UninterruptiblePragma;
-	
-	/**
-	 * Mark the given object as free space.
-	 * @param object
-	 */
-	protected abstract void free(Object object);
 }
