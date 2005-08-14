@@ -37,11 +37,6 @@ abstract class SwingBaseMenuItemPeer<awtT extends MenuItem, peerT extends JCompo
         System.err.println(e);
     }
 
-    // Misc
-
-    public void dispose() {
-    }
-
     public void disable() {
         jComponent.setEnabled(false);
     }

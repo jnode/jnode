@@ -51,10 +51,6 @@ final class SwingPopupMenuPeer extends SwingBaseMenuPeer<PopupMenu, JPopupMenu>
         ((JPopupMenu) jComponent).setLabel(text);
     }
 
-    //
-    // PopupMenuPeer
-    //
-
     public void show(Event e) {
         //TODO implement it
     }
@@ -71,12 +67,10 @@ final class SwingPopupMenuPeer extends SwingBaseMenuPeer<PopupMenu, JPopupMenu>
     }
 
     public void delItem(int index) {
-        ((JPopupMenu)jComponent).remove(index);
+        jComponent.remove(index);
     }
 
-    //
-    // ComponentPeer
-    //
-
-    // Events
+    public void addSeparator() {
+        jComponent.addSeparator();
+    }
 }
