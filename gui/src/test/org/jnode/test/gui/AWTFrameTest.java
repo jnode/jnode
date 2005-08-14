@@ -13,12 +13,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 /**
- * Created by IntelliJ IDEA.
- * User: root
- * Date: Jun 8, 2005
- * Time: 10:19:20 PM
- * To change this template use File | Settings | File Templates.
+ * @author Levente S\u00e1ntha
  */
+
 public class AWTFrameTest {
     public static void main(String[] argv){
         final Frame f = new Frame("Frame test");

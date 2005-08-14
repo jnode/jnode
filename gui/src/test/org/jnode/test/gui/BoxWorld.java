@@ -49,8 +49,6 @@ import java.util.List;
 import java.util.Stack;
 
 /**
- * *
- * 
  * @author Levente S\u00e1ntha
  */
 public class BoxWorld extends JPanel implements WindowListener, KeyListener,
