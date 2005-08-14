@@ -43,6 +43,8 @@
     <alias name="AWTTest"       class="org.jnode.test.gui.AWTTest"/>
     <alias name="AWTMenuTest"   class="org.jnode.test.gui.AWTMenuTest"/>
     <alias name="AWTDemo"       class="org.jnode.test.gui.AWTDemo"/>
+    <alias name="JTableTest"       class="org.jnode.test.gui.JTableTest"/>
+    <alias name="JTreeTest"       class="org.jnode.test.gui.JTreeTest"/>      
     <alias name="BoxWorld"      class="org.jnode.test.gui.BoxWorld"/>      
     <alias name="DialogTest"    class="org.jnode.test.gui.DialogTest"/>      
     <alias name="FBTest"        class="org.jnode.test.gui.FBTest"/>
