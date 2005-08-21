@@ -98,6 +98,8 @@ public class X86CompilerHelper implements X86CompilerConstants {
     private final AbstractX86StackManager stackMgr;
 
     private final X86Assembler os;
+    
+    private final Map<VmType<?>, Label> classInitLabels = new HashMap<VmType<?>, Label>();
 
     /**
      * Create a new instance
@@ -133,6 +135,13 @@ public class X86CompilerHelper implements X86CompilerConstants {
         this.stackMgr = stackMgr;
         final X86CpuID cpuId = (X86CpuID) os.getCPUID();
         haveCMOV = cpuId.hasFeature(X86CpuID.FEAT_CMOV);
+    }
+    
+    /**
+     * Reset the state of this helper.
+     */
+    public final void reset() {
+        classInitLabels.clear();
     }
 
     /**
@@ -357,6 +366,31 @@ public class X86CompilerHelper implements X86CompilerConstants {
             
             // Start initialize code
             os.setObjectRef(doInit);
+            
+            // Get label for class initialize code
+            Label initializer = classInitLabels.get(cls);
+            if (initializer == null) {
+                // create one
+                initializer = genLabel("$$init-" + cls.getName());
+                classInitLabels.put(cls, initializer);
+            }
+            // Setup call to class initializer code
+            os.writeCALL(initializer);
+            
+            // Set the done label
+            os.setObjectRef(done);
+        }
+    }
+    
+    /**
+     * Write the class initializer code.
+     */
+    public final void writeClassInitializers() {
+        for (Map.Entry<VmType<?>, Label> entry : classInitLabels.entrySet()) {
+            final Label label = entry.getValue();
+            // Set label
+            os.setObjectRef(label);
+            // Save registers
             if (os.isCode32()) {
                 os.writePUSHA();
             } else {
@@ -374,8 +408,10 @@ public class X86CompilerHelper implements X86CompilerConstants {
                 os.writePUSH(X86Register.R14);
                 os.writePUSH(X86Register.R15);
             }
+            // Load cls
+            writeGetStaticsEntry(label, AAX, entry.getKey());
             // Call cls.initialize
-            os.writePUSH(classReg);
+            os.writePUSH(AAX); // cls
             invokeJavaMethod(entryPoints.getVmTypeInitialize());
             if (os.isCode32()) {
                 os.writePOPA();
@@ -394,8 +430,8 @@ public class X86CompilerHelper implements X86CompilerConstants {
                 os.writePOP(X86Register.RBX);
                 os.writePOP(X86Register.RAX);
             }
-            // Set the done label
-            os.setObjectRef(done);
+            // Return
+            os.writeRET(); 
         }
     }
 
@@ -412,13 +448,18 @@ public class X86CompilerHelper implements X86CompilerConstants {
         // vm_invoke_testStackOverflowDone:
         final int offset = entryPoints.getVmProcessorStackEnd().getOffset();
         final Label doneLabel = new Label(labelPrefix + "$$stackof-done");
+        final Label intLabel = new Label(labelPrefix + "$$stovf");
         if (os.isCode32()) {
             os.writePrefix(X86Constants.FS_PREFIX);
             os.writeCMP_MEM(X86Register.ESP, offset);
         } else {
             os.writeCMP(X86Register.RSP, PROCESSOR64, offset);
         }
-        os.writeJCC(doneLabel, X86Constants.JG);
+        // We expect no stack overflow, so optimize jumps for static
+        // branch prediction.
+        os.writeJCC(intLabel, X86Constants.JNG);
+        os.writeJMP(doneLabel);
+        os.setObjectRef(intLabel);
         os.writeINT(0x31);
         os.setObjectRef(doneLabel);
     }

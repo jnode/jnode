@@ -1076,6 +1076,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		this.currentMethod = method;
 		this.maxLocals = method.getBytecode().getNoLocals();
 		this.loader = method.getDeclaringClass().getLoader();
+        helper.reset();
 		helper.setMethod(method);
 		// this.startOffset = os.getLength();
 		this.stackFrame = new X86StackFrame(os, helper, method, context, cm);
