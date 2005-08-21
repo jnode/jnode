@@ -43,12 +43,23 @@ abstract class X86RegisterPool {
     /** Length of registers */
     private final int regCount;
 
+    private final boolean lastFirst;
+
+    /** Minimum index of the register that can be requested if !lastFirst */
+    private final int minimumRequestIndex;
+
+    /** Index of the last requested register */
+    private int lastRequestIndex;
+
     /**
      * Initialize this instance.
      */
-    public X86RegisterPool() {
+    public X86RegisterPool(boolean lastFirst, int minimumRequestIndex) {
+        this.lastFirst = lastFirst;
+        this.minimumRequestIndex = minimumRequestIndex;
         this.registers = initialize();
         this.regCount = registers.length;
+        this.lastRequestIndex = regCount;
     }
 
     /**
@@ -80,8 +91,20 @@ abstract class X86RegisterPool {
      *            the register owner
      * @return the allocated register or null
      */
-    public final X86Register request(int type, Item owner,
-            boolean supportBits8) {
+    public final X86Register request(int type, Item owner, boolean supportBits8) {
+//         if (!lastFirst) {
+//            for (int i = regCount - 1 - minimumRequestIndex; i >= 0; i--) {
+//                lastRequestIndex--;
+//                if (lastRequestIndex < minimumRequestIndex) {
+//                    lastRequestIndex = regCount - 1;
+//                }
+//                final RegisterGroupUsage ru = registers[lastRequestIndex];
+//                final X86Register reg = ru.request(owner, type, supportBits8);
+//                if (reg != null) {
+//                    return reg;
+//                }
+//            }
+//        }
         for (int i = regCount - 1; i >= 0; i--) {
             final RegisterGroupUsage ru = registers[i];
             final X86Register reg = ru.request(owner, type, supportBits8);
@@ -195,6 +218,7 @@ abstract class X86RegisterPool {
                 inuse = true;
             }
         }
+        this.lastRequestIndex = regCount;
         if (inuse) {
             throw new Error("Register(s) in use");
         }
@@ -266,6 +290,13 @@ abstract class X86RegisterPool {
     public static final class GPRs32 extends X86RegisterPool {
 
         /**
+         * Initialize this instance.
+         */
+        public GPRs32() {
+            super(false, 2);
+        }
+
+        /**
          * Initialize register pool
          */
         protected RegisterGroupUsage[] initialize() {
@@ -286,14 +317,15 @@ abstract class X86RegisterPool {
                             JvmType.INT), new RegisterEntry(X86Register.ECX,
                             JvmType.REFERENCE), new RegisterEntry(
                             X86Register.ECX, JvmType.FLOAT), false),
+                    new RegisterGroupUsage(new RegisterEntry(X86Register.ESI,
+                            JvmType.INT), new RegisterEntry(X86Register.ESI,
+                            JvmType.REFERENCE), new RegisterEntry(
+                            X86Register.ESI, JvmType.FLOAT), false),
                     new RegisterGroupUsage(new RegisterEntry(X86Register.EBX,
                             JvmType.INT), new RegisterEntry(X86Register.EBX,
                             JvmType.REFERENCE), new RegisterEntry(
                             X86Register.EBX, JvmType.FLOAT), false),
-                    new RegisterGroupUsage(new RegisterEntry(X86Register.ESI,
-                            JvmType.INT), new RegisterEntry(X86Register.ESI,
-                            JvmType.REFERENCE), new RegisterEntry(
-                            X86Register.ESI, JvmType.FLOAT), false) };
+                            };
             // EDI always points to the statics, do not use
         }
 
@@ -305,6 +337,13 @@ abstract class X86RegisterPool {
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
     public static final class GPRs64 extends X86RegisterPool {
+
+        /**
+         * Initialize this instance.
+         */
+        public GPRs64() {
+            super(false, 2);
+        }
 
         /**
          * Initialize register pool
@@ -401,6 +440,13 @@ abstract class X86RegisterPool {
     public static final class XMMs32 extends X86RegisterPool {
 
         /**
+         * Initialize this instance.
+         */
+        public XMMs32() {
+            super(false, 0);
+        }
+
+        /**
          * Initialize register pool
          */
         protected RegisterGroupUsage[] initialize() {
@@ -442,6 +488,13 @@ abstract class X86RegisterPool {
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
     public static final class XMMs64 extends X86RegisterPool {
+
+        /**
+         * Initialize this instance.
+         */
+        public XMMs64() {
+            super(false, 0);
+        }
 
         /**
          * Initialize register pool
@@ -620,8 +673,7 @@ abstract class X86RegisterPool {
          * @return The register if request succeeds, null if this register group
          *         is already used.
          */
-        public X86Register request(Item owner, int jvmType,
-                boolean supportBits8) {
+        public X86Register request(Item owner, int jvmType, boolean supportBits8) {
             final int cnt = regs.length;
             for (int i = 0; i < cnt; i++) {
                 final RegisterEntry re = regs[i];

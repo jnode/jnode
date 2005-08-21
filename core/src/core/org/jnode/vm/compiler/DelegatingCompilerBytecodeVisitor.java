@@ -1015,4 +1015,39 @@ public class DelegatingCompilerBytecodeVisitor<T extends CompilerBytecodeVisitor
     public void yieldPoint() {
         delegate.yieldPoint();
     }
+
+    /**
+     * @see org.jnode.vm.compiler.CompilerBytecodeVisitor#visit_aloadStored(int)
+     */
+    public void visit_aloadStored(int index) {
+        delegate.visit_aloadStored(index);
+    }
+
+    /**
+     * @see org.jnode.vm.compiler.CompilerBytecodeVisitor#visit_dloadStored(int)
+     */
+    public void visit_dloadStored(int index) {
+        delegate.visit_dloadStored(index);
+    }
+
+    /**
+     * @see org.jnode.vm.compiler.CompilerBytecodeVisitor#visit_floadStored(int)
+     */
+    public void visit_floadStored(int index) {
+        delegate.visit_floadStored(index);
+    }
+
+    /**
+     * @see org.jnode.vm.compiler.CompilerBytecodeVisitor#visit_iloadStored(int)
+     */
+    public void visit_iloadStored(int index) {
+        delegate.visit_iloadStored(index);
+    }
+
+    /**
+     * @see org.jnode.vm.compiler.CompilerBytecodeVisitor#visit_lloadStored(int)
+     */
+    public void visit_lloadStored(int index) {
+        delegate.visit_lloadStored(index);
+    }
 }

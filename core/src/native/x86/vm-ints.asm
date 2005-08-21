@@ -296,17 +296,17 @@ timer_handler:
 	mov AAX,[currentTimeMillisStaticsIdx]
 	lea ADI,[ADI+AAX*4+(VmArray_DATA_OFFSET*SLOT_SIZE)]
 %ifdef BITS32	
-	inc dword [edi+0]
+	add dword [edi+0],1
 	adc dword [edi+4],0
 	test dword [edi+0],0x07
 %else
-	inc qword [rdi+0]
+	add qword [rdi+0],1
 	test qword [rdi+0],0x07
 %endif	
 	jnz timer_ret
 	; Set a thread switch needed indicator
 	or THREADSWITCHINDICATOR, VmProcessor_TSI_SWITCH_NEEDED
-	inc DEADLOCKCOUNTER
+	add DEADLOCKCOUNTER, 1
 	test DEADLOCKCOUNTER, 0x4000
 	jnz timer_deadlock
 timer_ret:

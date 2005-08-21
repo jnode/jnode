@@ -17,19 +17,18 @@ int_die_halted:	dd 0
 ; Stack for inthandler & irqhandler
 ; -------------------------------------
 
-OLD_SS      equ 76
-OLD_ESP     equ 72
-OLD_EFLAGS  equ 68
-OLD_CS      equ 64
-OLD_EIP     equ 60
-ERROR       equ 56
-INTNO   	equ 52
-HANDLER     equ 48 
-OLD_EAX     equ 44
-OLD_ECX     equ 40
-OLD_EDX     equ 36
-OLD_EBX     equ 32
-;OLD_ESP     equ 28
+OLD_SS      equ 72
+OLD_ESP     equ 68
+OLD_EFLAGS  equ 64
+OLD_CS      equ 60
+OLD_EIP     equ 56
+ERROR       equ 52
+INTNO   	equ 48
+HANDLER     equ 44 
+OLD_EAX     equ 40
+OLD_ECX     equ 36
+OLD_EDX     equ 32
+OLD_EBX     equ 28
 OLD_EBP     equ 24
 OLD_ESI     equ 20
 OLD_EDI     equ 16
@@ -48,7 +47,13 @@ OLD_GS      equ 0
 %define GET_OLD_EDX		dword [ebp+OLD_EDX]
 
 %macro int_entry 0
-    pusha 
+	push eax
+	push ecx
+	push edx
+	push ebx
+	push ebp
+	push esi
+	push edi
     push ds
     push es
     push fs
@@ -74,7 +79,13 @@ OLD_GS      equ 0
     pop fs
     pop es
     pop ds
-    popa
+    pop edi
+    pop esi
+    pop ebp
+    pop ebx
+    pop edx
+    pop ecx
+    pop eax
     add esp,12 ; Remove HANDLER & INTNO & ERRORCODE 
     iret
 %endmacro

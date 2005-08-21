@@ -2903,6 +2903,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		final int opcode;
 		switch (operandSize) {
 		case X86Constants.BITS8:
+            testSuitableForBits8(srcReg);
 			opcode = 0x88;
 			break;
 		case X86Constants.BITS16:
@@ -2989,6 +2990,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		switch (operandSize) {
 		case X86Constants.BITS8:
 			testSuitableForBits8(dstReg);
+			testSuitableForBits8(srcReg);
 			opcode = 0x88;
 			break;
 		case X86Constants.BITS16:
@@ -3073,6 +3075,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		final int opcode;
 		switch (operandSize) {
 		case X86Constants.BITS8:
+            testSuitableForBits8(srcReg);
 			opcode = 0x88;
 			break;
 		case X86Constants.BITS16:

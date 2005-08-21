@@ -39,8 +39,9 @@ final class L1AHelper {
 	}
 
 	static final void assertCondition(boolean cond, String message, Object param) {
-		if (!cond)
+		if (!cond) {
 			throw new Error("assert failed: " + message + param);
+        }
 	}
     
     /**
@@ -135,7 +136,7 @@ final class L1AHelper {
 			assertCondition(pool.isFree(reg),
 					"register is not free after spill");
 		}
-		pool.request(reg);
+		assertCondition(pool.request(reg), "Request of register failed: ", reg);
 	}
 
 	/**
@@ -177,7 +178,7 @@ final class L1AHelper {
 				assertCondition(pool.isFree(reg),
 						"register is not free after spill");
 			}
-			pool.request(reg, it);
+			assertCondition(pool.request(reg, it), "Request of register failed: ", reg);
 		}
 	}
 
@@ -202,7 +203,7 @@ final class L1AHelper {
 			int jvmType, X86Register reg) {
 		final X86RegisterPool pool = eContext.getGPRPool();
 		final ItemFactory ifac = eContext.getItemFactory();
-		pool.request(reg);
+		assertCondition(pool.request(reg), "Request of register failed: ", reg);
 		final WordItem result = ifac.createReg(eContext, jvmType, reg);
 		pool.transferOwnerTo(reg, result);
 		return result;

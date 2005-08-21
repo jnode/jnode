@@ -362,11 +362,13 @@ final class MagicHelper extends BaseX86MagicHelper {
         {
             // addr shift cnt
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
+            final GPR ECX = X86Register.ECX;
             final IntItem cnt = vstack.popInt();
             final RefItem addr = vstack.popRef();
-            if (!cnt.isConstant()) {
-                L1AHelper.requestRegister(ec, X86Register.ECX);
-                cnt.loadTo(ec, X86Register.ECX);
+            if (!cnt.isConstant() && !cnt.uses(ECX)) {
+                addr.spillIfUsing(ec, ECX);
+                L1AHelper.requestRegister(ec, ECX);
+                cnt.loadTo(ec, ECX);
             }
             addr.load(ec);
             final int shift = methodToShift(mcode);
@@ -652,7 +654,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             val.release(ec);
             old.release(ec);
             addr.release(ec);
-            vstack.push(L1AHelper.requestWordRegister(ec, JvmType.INT, resultr));
+            vstack.push(result);
         } break;
 
         case ATTEMPTINT_OFS:
