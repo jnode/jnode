@@ -281,6 +281,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
     public final void writeYieldPoint(Object curInstrLabel) {
         if (!method.isUninterruptible()) {
             final Label doneLabel = new Label(curInstrLabel + "noYP");
+            final Label ypLabel = new Label(curInstrLabel + "$$yp");
             final int offset = entryPoints.getVmThreadSwitchIndicatorOffset();
             final int flag = VmProcessor.TSI_SWITCH_REQUESTED;
             if (os.isCode32()) {
@@ -289,8 +290,16 @@ public class X86CompilerHelper implements X86CompilerConstants {
             } else {
                 os.writeCMP_Const(BITS32, PROCESSOR64, offset, flag);
             }
-            os.writeJCC(doneLabel, X86Constants.JNE);
+            // Jump to the yieldpoint interrupt, when flags are set
+            // We do NOT predict this to happen (in most cases),
+            // so we optimize for that (wrt. branch prediction)
+            os.writeJCC(ypLabel, X86Constants.JE);
+            // Jump over INT is most cases
+            os.writeJMP(doneLabel);
+            // Trigger yieldpoint
+            os.setObjectRef(ypLabel);
             os.writeINT(X86CompilerConstants.YIELDPOINT_INTNO);
+            // Done
             os.setObjectRef(doneLabel);
         }
     }
@@ -330,12 +339,24 @@ public class X86CompilerHelper implements X86CompilerConstants {
     public final void writeClassInitialize(Label curInstrLabel, GPR classReg,
             VmType< ? > cls) {
         if (!cls.isInitialized()) {
+            // Create jump labels
+            final Label doInit = new Label(curInstrLabel + "$$do-cinit-ex");
+            final Label done = new Label(curInstrLabel + "$$done-cinit-ex");
+
             // Test declaringClass.modifiers
             os.writeTEST(BITS32, classReg, entryPoints.getVmTypeState()
                     .getOffset(), VmTypeState.ST_INITIALIZED);
-            final Label afterInit = new Label(curInstrLabel
-                    + "$$after-classinit-ex");
-            os.writeJCC(afterInit, X86Constants.JNZ);
+            
+            // Jump when not initialized to diInit.
+            // Branch predication expects this forward jump NOT
+            // to be taken.
+            os.writeJCC(doInit, X86Constants.JZ);
+
+            // We don't have to initialize, so jump over the init-code.
+            os.writeJMP(done);
+            
+            // Start initialize code
+            os.setObjectRef(doInit);
             if (os.isCode32()) {
                 os.writePUSHA();
             } else {
@@ -373,8 +394,8 @@ public class X86CompilerHelper implements X86CompilerConstants {
                 os.writePOP(X86Register.RBX);
                 os.writePOP(X86Register.RAX);
             }
-            // Set label
-            os.setObjectRef(afterInit);
+            // Set the done label
+            os.setObjectRef(done);
         }
     }
 
