@@ -58,7 +58,6 @@ import org.jnode.vm.classmgr.VmSharedStaticsEntry;
 import org.jnode.vm.classmgr.VmStaticField;
 import org.jnode.vm.classmgr.VmStaticMethod;
 import org.jnode.vm.classmgr.VmType;
-import org.jnode.vm.classmgr.VmTypeState;
 import org.jnode.vm.compiler.CompileError;
 import org.jnode.vm.compiler.CompiledMethod;
 import org.jnode.vm.compiler.EntryPoints;
@@ -1850,11 +1849,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 
 		// Initialize if needed
 		if (!sf.getDeclaringClass().isInitialized()) {
-			final X86RegisterPool pool = eContext.getGPRPool();
-			final GPR tmp = (GPR) L1AHelper.requestRegister(eContext,
-					JvmType.INT, false);
-			writeInitializeClass(fieldRef, tmp);
-			pool.release(tmp);
+			writeInitializeClass(fieldRef);
 		}
 
 		// Get static field object
@@ -3723,10 +3718,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 
 		// Initialize class if needed
 		if (!sf.getDeclaringClass().isInitialized()) {
-			final GPR tmp = (GPR) L1AHelper.requestRegister(eContext,
-					JvmType.INT, false);
-			writeInitializeClass(fieldRef, tmp);
-			L1AHelper.releaseRegister(eContext, tmp);
+			writeInitializeClass(fieldRef);
 		}
 
 		// Get value
@@ -4187,8 +4179,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param fieldRef
 	 * @param scratch
 	 */
-	private final void writeInitializeClass(VmConstFieldRef fieldRef,
-			GPR scratch) {
+	private final void writeInitializeClass(VmConstFieldRef fieldRef) {
 		// Get fieldRef via constantpool to avoid direct object references in
 		// the native code
 
@@ -4196,26 +4187,20 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 				.getDeclaringClass();
 		if (!declClass.isInitialized()) {
             final Label curInstrLabel = getCurInstrLabel();
+            
+            // Allocate a register to hold the class
+            final GPR classReg = (GPR)L1AHelper.requestRegister(eContext, JvmType.REFERENCE, false);
 
-			// Push all
-			vstack.push(eContext);
-
-			// Now look for class initialization
-			// Load classRef into EAX
+			// Load classRef into the register
 			// Load the class from the statics table
 			helper.writeGetStaticsEntry(new Label(curInstrLabel + "$$ic"),
-					scratch, declClass);
+                    classReg, declClass);
 
-			// Load declaringClass.typeState into scratch
-			// Test for initialized
-			final int offset = context.getVmTypeState().getOffset();
-			os.writeTEST(BITS32, scratch, offset, VmTypeState.ST_INITIALIZED);
-			final Label afterInit = new Label(curInstrLabel + "$$aci");
-			os.writeJCC(afterInit, X86Constants.JNZ);
-			// Call cls.initialize
-			os.writePUSH(scratch);
-			invokeJavaMethod(context.getVmTypeInitialize());
-			os.setObjectRef(afterInit);
+            // Write class initialization code
+            helper.writeClassInitialize(curInstrLabel, classReg, declClass);
+            
+            // Free class
+            L1AHelper.releaseRegister(eContext, classReg);
 		}
 
 	}
