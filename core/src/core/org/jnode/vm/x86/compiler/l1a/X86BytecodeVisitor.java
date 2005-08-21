@@ -21,6 +21,9 @@
 
 package org.jnode.vm.x86.compiler.l1a;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.x86.X86Assembler;
@@ -160,7 +163,9 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     
     /** Register used by wstore (see xloadStored methods) */
     private GPR wstoreReg;
-    private int wstoreOffset;
+
+    /** Constant values that are stored in local variables */
+    private Map<Integer, Item> constLocals = new HashMap<Integer, Item>();
     
 	/**
 	 * Virtual Stack: this stack contains values that have been computed but not
@@ -990,6 +995,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		// Push the items on the vstack the result from a previous basic block.
 		final TypeStack tstack = bb.getStartStack();
 		vstack.pushAll(ifac, tstack);
+        // Clear all constant locals
+        constLocals.clear();
 
 		if (debug) {
 			BootLog.debug("-- VStack: " + vstack.toString());
@@ -2431,46 +2438,54 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	public final void visit_imul() {
 		IntItem v2 = vstack.popInt();
 		IntItem v1 = vstack.popInt();
-		if (prepareForOperation(v1, v2, true)) {
-			// Swap
-			final IntItem tmp = v2;
-			v2 = v1;
-			v1 = tmp;
-		}
 
-		final GPR r1 = v1.getRegister();
-		switch (v2.getKind()) {
-		case Item.Kind.GPR:
-			os.writeIMUL(r1, v2.getRegister());
-			break;
-		case Item.Kind.CONSTANT:
-			final int val = v2.getValue();
-			if (val == 0) {
-				os.writeXOR(r1, r1); // * 0
-			} else if (val == 1) {
-				// Do nothing
-			} else if (val == -1) {
-				os.writeNEG(r1); // * -1
-			} else {
-				final int shift = getShiftForMultiplier(Math.abs(val));
-				if (shift > 0) {
-					// abs(val) is multiple of 2 && val=2^shift where shift <=
-					// 31
-					os.writeSAL(r1, shift);
-					if (val < 0) {
-						os.writeNEG(r1);
-					}
-				} else {
-					os.writeIMUL_3(r1, r1, val);
-				}
-			}
-			break;
-		case Item.Kind.LOCAL:
-			os.writeIMUL(r1, helper.BP, v2.getOffsetToFP(eContext));
-			break;
-		}
-		v2.release(eContext);
-		vstack.push(v1);
+        if (v2.isConstant() && v1.isConstant()) {
+            vstack.push(ifac.createIConst(eContext, v1.getValue() * v2.getValue()));
+            v1.release(eContext);
+            v2.release(eContext);
+        } else {
+            if (prepareForOperation(v1, v2, true)) {
+                // Swap
+                final IntItem tmp = v2;
+                v2 = v1;
+                v1 = tmp;
+            }
+
+            final GPR r1 = v1.getRegister();
+            switch (v2.getKind()) {
+            case Item.Kind.GPR:
+                os.writeIMUL(r1, v2.getRegister());
+                break;
+            case Item.Kind.CONSTANT:
+                final int val = v2.getValue();
+                if (val == 0) {
+                    os.writeXOR(r1, r1); // * 0
+                } else if (val == 1) {
+                    // Do nothing
+                } else if (val == -1) {
+                    os.writeNEG(r1); // * -1
+                } else {
+                    final int shift = getShiftForMultiplier(Math.abs(val));
+                    if (shift > 0) {
+                        // abs(val) is multiple of 2 && val=2^shift where shift
+                        // <=
+                        // 31
+                        os.writeSAL(r1, shift);
+                        if (val < 0) {
+                            os.writeNEG(r1);
+                        }
+                    } else {
+                        os.writeIMUL_3(r1, r1, val);
+                    }
+                }
+                break;
+            case Item.Kind.LOCAL:
+                os.writeIMUL(r1, helper.BP, v2.getOffsetToFP(eContext));
+                break;
+            }
+            v2.release(eContext);
+            vstack.push(v1);
+        }
 	}
 
 	/**
@@ -4243,11 +4258,11 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
      * @param index
      */
     private final void wload(int jvmType, int index, boolean useStored) {
-        if (false && useStored && (wstoreReg != null)) {
-            if (wstoreOffset != os.getLength()) {
-                throw new Error("Code in between wstore/wload at " + curAddress);
-            }
-//            os.writeNOP();
+        Item constValue = constLocals.get(index);
+        if (constValue != null) {
+            counters.getCounter("const-local").inc();            
+            vstack.push(constValue.clone(eContext));
+        } else if (false && useStored && (wstoreReg != null)) {
             vstack.push(L1AHelper.requestWordRegister(eContext, jvmType, wstoreReg));
         } else {
             vstack.push(ifac.createLocal(jvmType, stackFrame
@@ -4271,6 +4286,13 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		// Load
 		final WordItem val = (WordItem) vstack.pop(jvmType);
 		final boolean vconst = val.isConstant();
+        if (vconst) {
+            // Store constant locals
+            constLocals.put(index, val.clone(eContext));
+        } else {
+            // Not constant anymore, remove it
+            constLocals.remove(index);
+        }
 		if (vconst && (jvmType == JvmType.INT)) {
 			// Store constant int
 			final int ival = ((IntItem) val).getValue();
@@ -4306,8 +4328,6 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 
 		// Release
 		val.release(eContext);
-        
-        wstoreOffset = os.getLength();
 	}
 
 	/**
