@@ -32,7 +32,7 @@ import org.jnode.vm.compiler.CompilerBytecodeVisitor;
 import org.jnode.vm.compiler.EntryPoints;
 import org.jnode.vm.compiler.GCMapIterator;
 import org.jnode.vm.compiler.InlineBytecodeVisitor;
-import org.jnode.vm.compiler.InliningBytecodeVisitor;
+import org.jnode.vm.compiler.OptimizingBytecodeVisitor;
 import org.jnode.vm.x86.X86CpuID;
 import org.jnode.vm.x86.compiler.AbstractX86Compiler;
 
@@ -105,7 +105,7 @@ public final class X86Level1ACompiler extends AbstractX86Compiler {
         cbv = new X86BytecodeVisitor(os, cm, isBootstrap, entryPoints, magicHelper, getTypeSizeInfo());
         if (inlineMethods /*&& ((X86Assembler)os).isCode32()*/) {
             final VmClassLoader loader = method.getDeclaringClass().getLoader();
-            return new InliningBytecodeVisitor(entryPoints, cbv, loader);
+            return new OptimizingBytecodeVisitor(entryPoints, cbv, loader);
         } else {
             return cbv;
         }

@@ -26,6 +26,37 @@ package org.jnode.test;
  */
 public class ArrayTest {
 
+    public static int simpleByte(byte[] arr, int i) {
+        arr[i+4] = arr[i];
+        return arr[i];
+    }
+    
+    public static char simpleChar(char[] arr, int i) {
+        arr[i+4] = arr[i];
+        return arr[i];
+    }
+    
+    public static int simpleInt(int[] arr, int i) {
+        arr[i+4] = arr[i];
+        return arr[i];
+    }
+    
+    public static int mulTest(int a, int b) {
+        return a * b;
+    }
+    
+    public static int shlTest(int a, int b) {
+        return a << b;
+    }
+    
+    public static int shrTest(int a, int b) {
+        return a >> b;
+    }
+    
+    public static int sarTest(int a, int b) {
+        return a >>> b;
+    }
+    
     public static void main(String[] args) {
 
         int[][] array;

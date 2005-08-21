@@ -60,4 +60,49 @@ public abstract class CompilerBytecodeVisitor extends BytecodeVisitor {
      * Push the given VmType on the stack.
      */
     public abstract void visit_ldc(VmType<?> value);
+
+    /**
+     * Load an array from a given local index that is just stored
+     * at the same index.
+     * @param index
+     */
+    public void visit_aloadStored(int index) {
+        visit_aload(index);
+    }
+
+    /**
+     * Load an int from a given local index that is just stored
+     * at the same index.
+     * @param index
+     */
+    public void visit_iloadStored(int index) {
+        visit_iload(index);
+    }
+
+    /**
+     * Load a long from a given local index that is just stored
+     * at the same index.
+     * @param index
+     */
+    public void visit_lloadStored(int index) {
+        visit_lload(index);
+    }
+
+    /**
+     * Load a float from a given local index that is just stored
+     * at the same index.
+     * @param index
+     */
+    public void visit_floadStored(int index) {
+        visit_fload(index);
+    }
+
+    /**
+     * Load a double from a given local index that is just stored
+     * at the same index.
+     * @param index
+     */
+    public void visit_dloadStored(int index) {
+        visit_dload(index);
+    }
 }

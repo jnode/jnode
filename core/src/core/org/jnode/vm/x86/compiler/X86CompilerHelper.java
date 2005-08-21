@@ -309,27 +309,16 @@ public class X86CompilerHelper implements X86CompilerConstants {
         if (method.isStatic() && !method.isInitializer()) {
             // Only when class is not initialize
             final VmType< ? > cls = method.getDeclaringClass();
-            if (!cls.isInitialized()) {
+            if (!cls.isInitialized()) {                
                 final GPR aax = this.AAX;
-                final int size = os.getMode().getSize();
+                final Label label = genLabel("$$class-init");
 
                 // Save eax
                 os.writePUSH(aax);
-                // Do the is initialized test
-                // Move method.declaringClass -> EAX
-                final int typeOfs = getSharedStaticsOffset(method
-                        .getDeclaringClass());
-                os.writeMOV(size, aax, STATICS, typeOfs);
-                // Test declaringClass.modifiers
-                os.writeTEST(BITS32, aax, entryPoints.getVmTypeState()
-                        .getOffset(), VmTypeState.ST_INITIALIZED);
-                final Label afterInit = new Label(method.getMangledName()
-                        + "$$after-classinit");
-                os.writeJCC(afterInit, X86Constants.JNZ);
-                // Call cls.initialize
-                os.writePUSH(aax);
-                invokeJavaMethod(entryPoints.getVmTypeInitialize());
-                os.setObjectRef(afterInit);
+                // Get class into aax
+                writeGetStaticsEntry(label, aax, cls);
+                // Write code to initialize
+                writeClassInitialize(label, aax, cls);
                 // Restore eax
                 os.writePOP(aax);
                 return true;
@@ -457,9 +446,11 @@ public class X86CompilerHelper implements X86CompilerConstants {
         final int offset = entryPoints.getVmProcessorIsolatedStaticsTable()
                 .getOffset();
         if (os.isCode32()) {
-            os.writeXOR(dst, dst);
+            Vm.getVm().getCounter("### load " + dst.getName()).inc();
+//            os.writeXOR(dst, dst);
             os.writePrefix(X86Constants.FS_PREFIX);
-            os.writeMOV(INTSIZE, dst, dst, offset);
+//            os.writeMOV(INTSIZE, dst, dst, offset);
+            os.writeMOV(dst, offset);
         } else {
             os.writeMOV(BITS64, dst, PROCESSOR64, offset);
         }

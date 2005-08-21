@@ -30,6 +30,7 @@ import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Operation;
 import org.jnode.assembler.x86.X86Register;
+import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.vm.x86.X86CpuID;
 
 /**
@@ -102,6 +103,14 @@ public class X86StreamTest implements X86Constants {
 	}
 	
 	private final static void testCode32(X86Assembler os) throws UnresolvedObjectRefException {
+        GPR regs[] = { X86Register.EAX, X86Register.EBX, X86Register.ECX, X86Register.EDX, X86Register.ESI };
+        for (GPR reg1 : regs) {
+            os.writeIDIV_EAX(reg1);
+        }
+        if (true) {
+            return;
+        }
+        
 		final Label label = new Label("label");
 		os.writeADD(X86Register.EDX, X86Register.EAX);
 		os.setObjectRef(label);

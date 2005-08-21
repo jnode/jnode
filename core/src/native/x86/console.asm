@@ -119,7 +119,7 @@ sys_print_char%1:
 	jne %%pc_ok
 	; Scroll up
 	push ADI
-	push ADI
+	push ASI
 	push ACX
 	mov ADI,scr_addr
 	mov ASI,ADI

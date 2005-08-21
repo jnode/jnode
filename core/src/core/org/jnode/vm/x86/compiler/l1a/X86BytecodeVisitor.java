@@ -159,6 +159,10 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     /** Current inline depth (starting at 0) */
     private byte inlineDepth;
     
+    /** Register used by wstore (see xloadStored methods) */
+    private GPR wstoreReg;
+    private int wstoreOffset;
+    
 	/**
 	 * Virtual Stack: this stack contains values that have been computed but not
 	 * emitted yet; emission is delayed to allow for optimizations, in
@@ -1111,11 +1115,16 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_aload(int)
 	 */
 	public final void visit_aload(int index) {
-		vstack.push(ifac.createLocal(JvmType.REFERENCE, stackFrame
-				.getEbpOffset(typeSizeInfo, index)));
+        wload(JvmType.REFERENCE, index, false);
 	}
 
 	/**
+     * @see org.jnode.vm.compiler.CompilerBytecodeVisitor#visit_aloadStored(int)
+     */
+    public void visit_aloadStored(int index) {
+        wload(JvmType.REFERENCE, index, true);
+    }
+    /**
 	 * @param classRef
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_anewarray(org.jnode.vm.classmgr.VmConstClass)
 	 */
@@ -1692,11 +1701,16 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fload(int)
 	 */
 	public final void visit_fload(int index) {
-		vstack.push(ifac.createLocal(JvmType.FLOAT, stackFrame
-				.getEbpOffset(typeSizeInfo, index)));
+        wload(JvmType.FLOAT, index, false);
 	}
 
 	/**
+     * @see org.jnode.vm.compiler.CompilerBytecodeVisitor#visit_floadStored(int)
+     */
+    public void visit_floadStored(int index) {
+        wload(JvmType.FLOAT, index, true);
+    }
+    /**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fmul()
 	 */
 	public final void visit_fmul() {
@@ -2389,11 +2403,16 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iload(int)
 	 */
 	public final void visit_iload(int index) {
-		vstack.push(ifac.createLocal(JvmType.INT, stackFrame
-				.getEbpOffset(typeSizeInfo, index)));
+        wload(JvmType.INT, index, false);
 	}
 
 	/**
+     * @see org.jnode.vm.compiler.CompilerBytecodeVisitor#visit_iloadStored(int)
+     */
+    public void visit_iloadStored(int index) {
+        wload(JvmType.INT, index, true);
+    }
+    /**
 	 * Convert the given multiplier to a shift number.
 	 * 
 	 * @param val
@@ -3122,6 +3141,12 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			final LongItem v1 = vstack.popLong();
 			v2.release1(eContext);
 			v1.release1(eContext);
+            
+            assertCondition(eContext.getGPRPool().isFree(X86Register.EAX), "EAX not free");
+            assertCondition(eContext.getGPRPool().isFree(X86Register.EBX), "EBX not free");
+            assertCondition(eContext.getGPRPool().isFree(X86Register.ECX), "ECX not free");
+            assertCondition(eContext.getGPRPool().isFree(X86Register.EDX), "EDX not free");
+            assertCondition(eContext.getGPRPool().isFree(X86Register.ESI), "ESI not free");
 			
 			writePOP64(X86Register.EBX, X86Register.ECX); // Value 2
 			final GPR v2_lsb = X86Register.EBX;
@@ -3294,20 +3319,25 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lshl()
 	 */
 	public final void visit_lshl() {
-		final IntItem v2 = vstack.popInt();
-		final LongItem v1 = vstack.popLong();
+        final GPR ECX = X86Register.ECX;
+        
+		final IntItem cnt = vstack.popInt();
+		final LongItem val = vstack.popLong();
 
-		L1AHelper.requestRegister(eContext, X86Register.ECX, v2);
-		v2.loadTo(eContext, X86Register.ECX);
-		v1.load(eContext);
+        if (!cnt.uses(ECX)) {
+            val.spillIfUsing(eContext, ECX);
+            L1AHelper.requestRegister(eContext, ECX, cnt);
+            cnt.loadTo(eContext, ECX);
+        }
+		val.load(eContext);
 
 		if (os.isCode32()) {
-			final GPR v1_lsb = v1.getLsbRegister(eContext);
-			final GPR v1_msb = v1.getMsbRegister(eContext);
+			final GPR v1_lsb = val.getLsbRegister(eContext);
+			final GPR v1_msb = val.getMsbRegister(eContext);
             final Label curInstrLabel = getCurInstrLabel();
 
-			os.writeAND(X86Register.ECX, 63);
-			os.writeCMP_Const(X86Register.ECX, 32);
+			os.writeAND(ECX, 63);
+			os.writeCMP_Const(ECX, 32);
 			final Label gt32Label = new Label(curInstrLabel + "gt32");
 			final Label endLabel = new Label(curInstrLabel + "end");
 			os.writeJCC(gt32Label, X86Constants.JAE); // JAE
@@ -3322,28 +3352,29 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			os.writeSHL_CL(v1_msb);
 			os.setObjectRef(endLabel);
 		} else {
-			final GPR64 v1r = v1.getRegister(eContext);
+			final GPR64 v1r = val.getRegister(eContext);
 			os.writeSHL_CL(v1r);
 		}
 
 		// Release
-		v2.release(eContext);
-		vstack.push(v1);
+		cnt.release(eContext);
+		vstack.push(val);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lshr()
 	 */
 	public final void visit_lshr() {
+        final GPR ECX = X86Register.ECX;
+        
 		final IntItem cnt = vstack.popInt();
 		final LongItem val = vstack.popLong();
-//		final X86RegisterPool pool = eContext.getGPRPool();
 
 		// Get cnt into ECX
-		if (!cnt.uses(X86Register.ECX)) {
-			val.spillIfUsing(eContext, X86Register.ECX);
-			L1AHelper.requestRegister(eContext, X86Register.ECX, cnt);
-			cnt.loadTo(eContext, X86Register.ECX);
+		if (!cnt.uses(ECX)) {
+			val.spillIfUsing(eContext, ECX);
+			L1AHelper.requestRegister(eContext, ECX, cnt);
+			cnt.loadTo(eContext, ECX);
 		}
 
 		// Load val
@@ -3355,8 +3386,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
             final Label curInstrLabel = getCurInstrLabel();
 
 			// Calculate
-			os.writeAND(X86Register.ECX, 63);
-			os.writeCMP_Const(X86Register.ECX, 32);
+			os.writeAND(ECX, 63);
+			os.writeCMP_Const(ECX, 32);
 			final Label gt32Label = new Label(curInstrLabel + "gt32");
 			final Label endLabel = new Label(curInstrLabel + "end");
 			os.writeJCC(gt32Label, X86Constants.JAE); // JAE
@@ -3400,15 +3431,16 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lushr()
 	 */
 	public final void visit_lushr() {
+        final GPR ECX = X86Register.ECX;
+        
 		final IntItem cnt = vstack.popInt();
 		final LongItem val = vstack.popLong();
-//		final X86RegisterPool pool = eContext.getGPRPool();
 
 		// Get cnt into ECX
-		if (!cnt.uses(X86Register.ECX)) {
-			val.spillIfUsing(eContext, X86Register.ECX);
-			L1AHelper.requestRegister(eContext, X86Register.ECX, cnt);
-			cnt.loadTo(eContext, X86Register.ECX);
+		if (!cnt.uses(ECX)) {
+			val.spillIfUsing(eContext, ECX);
+			L1AHelper.requestRegister(eContext, ECX, cnt);
+			cnt.loadTo(eContext, ECX);
 		}
 
 		// Load val
@@ -3420,8 +3452,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
             final Label curInstrLabel = getCurInstrLabel();
 
 			// Calculate
-			os.writeAND(X86Register.ECX, 63);
-			os.writeCMP_Const(X86Register.ECX, 32);
+			os.writeAND(ECX, 63);
+			os.writeCMP_Const(ECX, 32);
 			final Label gt32Label = new Label(curInstrLabel + "gt32");
 			final Label endLabel = new Label(curInstrLabel + "end");
 			os.writeJCC(gt32Label, X86Constants.JAE); // JAE
@@ -4218,6 +4250,24 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
             helper.writeGetStaticsEntry64(curInstrLabel, (GPR64)dst, type);            
         }
 	}
+    
+    /**
+     * Generate code for a word load local instruction.
+     * @param jvmType
+     * @param index
+     */
+    private final void wload(int jvmType, int index, boolean useStored) {
+        if (false && useStored && (wstoreReg != null)) {
+            if (wstoreOffset != os.getLength()) {
+                throw new Error("Code in between wstore/wload at " + curAddress);
+            }
+//            os.writeNOP();
+            vstack.push(L1AHelper.requestWordRegister(eContext, jvmType, wstoreReg));
+        } else {
+            vstack.push(ifac.createLocal(jvmType, stackFrame
+                    .getEbpOffset(typeSizeInfo, index)));
+        }
+    }
 
 	/**
 	 * Store a word item into a local variable
@@ -4227,6 +4277,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 */
 	private final void wstore(int jvmType, int index) {
 		final int disp = stackFrame.getEbpOffset(typeSizeInfo, index);
+        wstoreReg = null;
 
 		// Pin down (load) other references to this local
 		vstack.loadLocal(eContext, disp);
@@ -4264,10 +4315,13 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			final GPR valr = val.getRegister();
 			// Store
 			os.writeMOV(valr.getSize(), helper.BP, disp, valr);
+            wstoreReg = valr;
 		}
 
 		// Release
 		val.release(eContext);
+        
+        wstoreOffset = os.getLength();
 	}
 
 	/**

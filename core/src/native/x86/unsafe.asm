@@ -252,15 +252,17 @@ GLABEL Q43org5jnode2vm6Unsafe23getCmdLine2e285bB29I
 	mov AAX,[ASP+SLOT_SIZE]		; destination
 	test AAX,AAX				; Is null?
 	jz after_copyCmdLine
-	mov ecx,[AAX+(VmArray_LENGTH_OFFSET*SLOT_SIZE)]
+	push ACX
 	push ASI
 	push ADI
 	mov ASI,multiboot_cmdline
 	lea ADI,[AAX+(VmArray_DATA_OFFSET*SLOT_SIZE)]
+	mov ecx,[AAX+(VmArray_LENGTH_OFFSET*SLOT_SIZE)]
 	cld
 	rep	movsb
 	pop ADI
 	pop ASI
+	pop ACX
 after_copyCmdLine:
 	mov eax,MBI_CMDLINE_MAX
 	ret SLOT_SIZE

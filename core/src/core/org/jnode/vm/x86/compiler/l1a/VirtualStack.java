@@ -444,8 +444,9 @@ final class VirtualStack {
 		 */
 		public void writePUSH(int jvmType, X86Register.GPR reg) {
 			final Item item = ifac.createReg(ec, jvmType, reg);
+            final boolean ok = pool.request(reg, item);
 			if (Vm.VerifyAssertions)
-				Vm._assert(pool.request(reg, item), "request");
+				Vm._assert(ok, "request");
 			push(item);
 		}
 
@@ -457,9 +458,11 @@ final class VirtualStack {
 		public void writePUSH64(int jvmType, X86Register.GPR lsbReg,
 				X86Register.GPR msbReg) {
 			final Item item = ifac.createReg(ec, jvmType, lsbReg, msbReg);
+            final boolean lsbOk = pool.request(lsbReg, item);
+            final boolean msbOk = pool.request(msbReg, item);
 			if (Vm.VerifyAssertions) {
-				Vm._assert(pool.request(lsbReg, item), "request-lsb");
-				Vm._assert(pool.request(msbReg, item), "request-msb");
+				Vm._assert(lsbOk, "request-lsb");
+				Vm._assert(msbOk, "request-msb");
 			}
 			push(item);
 		}
@@ -470,8 +473,9 @@ final class VirtualStack {
 		 */
 		public void writePUSH64(int jvmType, X86Register.GPR64 reg) {
 			final Item item = ifac.createReg(ec, jvmType, reg);
+            final boolean ok = pool.request(reg, item); 
 			if (Vm.VerifyAssertions)
-				Vm._assert(pool.request(reg, item), "request");
+				Vm._assert(ok, "request");
 			push(item);
 		}
 
