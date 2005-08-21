@@ -28,7 +28,7 @@ import org.jnode.vm.VmSystemObject;
  * array in the interval [startPC, startPC + length].
  * @author epr
  */
-public class VmLocalVariable extends VmSystemObject {
+public final class VmLocalVariable extends VmSystemObject {
 	
 	/** Start of the value value range. */
 	private final char startPC;
