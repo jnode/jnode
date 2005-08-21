@@ -189,6 +189,8 @@ final class X86StackFrame implements X86CompilerConstants {
         } else {
             os.writeCMP(X86Register.RSP, PROCESSOR64, stackEndOffset);
         }
+        // This forward jump is not predicted by branch prediction.
+        // Which is good, because we do not predict a stack overflow
         os.writeJCC(stackOverflowLabel, X86Constants.JLE);
         
         // Load the statics table reference
@@ -231,6 +233,9 @@ final class X86StackFrame implements X86CompilerConstants {
 		os.setObjectRef(stackOverflowLabel);
         os.writeINT(0x31);
 
+        // Write class initializers
+        helper.writeClassInitializers();
+        
         // End header       
 
 		// No set the exception start&endPtr's
