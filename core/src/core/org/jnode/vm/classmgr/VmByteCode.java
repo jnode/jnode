@@ -47,7 +47,9 @@ public final class VmByteCode extends AbstractCode {
 	private VmInterpretedExceptionHandler[] eTable;
 	/** Line number table */
 	private VmLineNumberMap lnTable;
-	/** Data used by the native code compilers */
+    /** Local variable table */
+    private final VmLocalVariableTable lvTable;
+    /** Data used by the native code compilers */
 	private transient Object compilerData;
 	
 	/**
@@ -59,7 +61,7 @@ public final class VmByteCode extends AbstractCode {
 	 * @param eTable
 	 * @param lnTable
 	 */
-	public VmByteCode(VmMethod method, ByteBuffer bytecode, int noLocals, int maxStack, VmInterpretedExceptionHandler[] eTable, VmLineNumberMap lnTable) {
+	public VmByteCode(VmMethod method, ByteBuffer bytecode, int noLocals, int maxStack, VmInterpretedExceptionHandler[] eTable, VmLineNumberMap lnTable, VmLocalVariableTable lvTable) {
 		this.method = method;
 		this.cp = method.getDeclaringClass().getCP();
         if (Vm.isWritingImage()) {
@@ -74,6 +76,7 @@ public final class VmByteCode extends AbstractCode {
 		this.maxStack = (char)maxStack;
 		this.eTable = eTable;
 		this.lnTable = lnTable;
+        this.lvTable = lvTable;
 		//this.locked = false;
 	}
 

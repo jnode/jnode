@@ -143,7 +143,7 @@ public final class VmAnnotation extends VmSystemObject {
         cbytes[3] = (byte) 0x01;
         cbytes[4] = (byte) 0xb1; // return
         cons.setBytecode(new VmByteCode(cons, ByteBuffer.wrap(cbytes), 1,
-                2, null, null));
+                2, null, null, null));
 
         // Add the methods
         final int maccFlags = Modifier.ACC_FINAL | Modifier.ACC_PUBLIC;
@@ -165,7 +165,7 @@ public final class VmAnnotation extends VmSystemObject {
             bytes[7] = (byte) 0xB0; // areturn
 
             m.setBytecode(new VmByteCode(m, ByteBuffer.wrap(bytes), noLocals,
-                    maxStack, null, null));
+                    maxStack, null, null, null));
             methods[i + 1] = m;
         }
         implType.setMethodTable(methods);

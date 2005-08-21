@@ -26,7 +26,7 @@ import org.jnode.vm.VmSystemObject;
 /**
  * @author epr
  */
-public class VmLocalVariableTable extends VmSystemObject {
+public final class VmLocalVariableTable extends VmSystemObject {
 	
 	private final VmLocalVariable[] table;
 	
