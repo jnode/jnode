@@ -1343,12 +1343,19 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 					okLabel, true);
 			// Not instanceof
 
-			// Release temp registers here, so invokeJavaMethod can use it
-			L1AHelper.releaseRegister(eContext, helper.AAX);
-			L1AHelper.releaseRegister(eContext, tmpr);
+            // Load class into tmpr
+            if (os.isCode32()) {
+                helper.writeGetStaticsEntry(curInstrLabel, tmpr, resolvedType);
+            } else {
+                helper.writeGetStaticsEntry64(curInstrLabel, (GPR64)tmpr, resolvedType);                
+            }
 
-			// Call SoftByteCodes.systemException
+			// Call SoftByteCodes.classCastFailed(Object, VmType)
 			os.writePUSH(refr);
+			os.writePUSH(tmpr);
+            // Release temp registers here, so invokeJavaMethod can use it
+            L1AHelper.releaseRegister(eContext, helper.AAX);
+            L1AHelper.releaseRegister(eContext, tmpr);
 			invokeJavaMethod(context.getClassCastFailedMethod());
 
 			/* Normal exit */
