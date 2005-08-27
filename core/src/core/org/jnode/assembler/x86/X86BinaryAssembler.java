@@ -934,14 +934,26 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		}
 	}
 
+    /**
+     * @see @see org.jnode.assembler.x86.X86Assembler#writeADD(int, SR, int, int)
+     */
+    public void writeADD(int operandSize, SR dstReg, int dstDisp, int imm32) {
+        testOperandSize(operandSize, BITS32);
+		writeSegPrefix(dstReg);
+        write8(0x81);
+		write8(0x05);
+        write32(dstDisp);
+		write32(imm32);
+    }
+
     public void writeADD_MEM(X86Register.GPR reg, int memPtr) {
         testSize(reg, mode.getSize());
-		if (code64) {
-			throw new InvalidOpcodeException("Not implemented");
-		}
-		write8(0x03); // opcode
-		write8((reg.getNr() << 3) | 5); // disp32
-		write32(memPtr);
+        if (code64) {
+            throw new InvalidOpcodeException("Not implemented");
+        }
+        write8(0x03); // opcode
+        write8((reg.getNr() << 3) | 5); // disp32
+        write32(memPtr);
     }
 
     /**
