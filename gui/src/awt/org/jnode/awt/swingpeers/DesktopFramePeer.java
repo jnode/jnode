@@ -45,6 +45,7 @@ import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
 import java.awt.image.VolatileImage;
 import java.awt.peer.FramePeer;
+import java.awt.peer.ContainerPeer;
 
 import org.apache.log4j.Logger;
 import org.jnode.awt.JNodeGenericPeer;
@@ -572,6 +573,50 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
     public void updateCursorImmediately() {
         // TODO Auto-generated method stub
 
+    }
+
+    public boolean isRestackSupported() {
+        return false;  //TODO implement it
+    }
+
+    public void setBoundsPrivate(int x, int y, int width, int height) {
+        //TODO implement it
+    }
+
+    public void updateAlwaysOnTop() {
+        //TODO implement it
+    }
+
+    public boolean requestWindowFocus() {
+        return false;  //TODO implement it
+    }
+
+    public void cancelPendingPaint(int x, int y, int width, int height) {
+        //TODO implement it
+    }
+
+    public void restack() {
+        //TODO implement it
+    }
+
+    public Rectangle getBounds() {
+        return null;  //TODO implement it
+    }
+
+    public void reparent(ContainerPeer parent) {
+        //TODO implement it
+    }
+
+    public void setBounds(int x, int y, int width, int height, int z) {
+        //TODO implement it
+    }
+
+    public boolean isReparentSupported() {
+        return false;  //TODO implement it
+    }
+
+    public void layout() {
+        //TODO implement it
     }
 
     protected final void paintAWTComponent() {

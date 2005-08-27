@@ -104,5 +104,10 @@ final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame>
      * @see java.awt.peer.FramePeer#setState(int)
      */
     public void setState(int state) {
+        //TODO implement it
+    }
+
+    public void setBoundsPrivate(int x, int y, int width, int height) {
+        //TODO implement it
     }
 }

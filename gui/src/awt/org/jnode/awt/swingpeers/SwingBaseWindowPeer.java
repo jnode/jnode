@@ -146,6 +146,15 @@ abstract class SwingBaseWindowPeer<awtT extends Window, swingPeerT extends Swing
         getToolkitImpl().postEvent(new WindowEvent(target, id));
     }
 
+    public void updateAlwaysOnTop() {
+        //TODO implement it
+    }
+
+    public boolean requestWindowFocus() {
+        //TODO implement it
+        return false;
+    }
+
     private class WindowEventDispatcher implements InternalFrameListener {
 
         /**

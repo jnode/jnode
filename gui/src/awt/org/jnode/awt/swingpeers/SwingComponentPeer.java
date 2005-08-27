@@ -39,6 +39,7 @@ import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
 import java.awt.event.PaintEvent;
 import java.awt.image.ColorModel;
@@ -46,6 +47,7 @@ import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
 import java.awt.image.VolatileImage;
 import java.awt.peer.ComponentPeer;
+import java.awt.peer.ContainerPeer;
 
 /**
  * Base class for virtual component peers. Satisfies the requirements for AWT
@@ -107,11 +109,11 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends JCo
     }
 
     public final Image createImage(int width, int height) {
-    	return toolkit.createCompatibleImage(width, height);
+        return toolkit.createCompatibleImage(width, height);
     }
 
     public final VolatileImage createVolatileImage(int width, int height) {
-    	return toolkit.createVolatileImage(width, height);
+        return toolkit.createVolatileImage(width, height);
     }
 
     public final void disable() {
@@ -144,10 +146,10 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends JCo
     public Graphics getGraphics() {
         final Component parent = target.getParent();
         if (parent != null) {
-        	final int x = jComponent.getX();
-        	final int y = jComponent.getY();
-        	final int width = jComponent.getWidth();
-        	final int height = jComponent.getHeight();
+            final int x = jComponent.getX();
+            final int y = jComponent.getY();
+            final int width = jComponent.getWidth();
+            final int height = jComponent.getHeight();
             return parent.getGraphics().create(x, y, width, height);
         } else {
             throw new Error();
@@ -158,11 +160,11 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends JCo
         return toolkit.getGraphicsConfiguration();
     }
 
-	/**
-	 * @see java.awt.peer.ComponentPeer#getLocationOnScreen()
-	 * @return The location on screen
-	 */
-	public Point getLocationOnScreen() {
+    /**
+     * @see java.awt.peer.ComponentPeer#getLocationOnScreen()
+     * @return The location on screen
+     */
+    public Point getLocationOnScreen() {
         Point p = target.getLocation();
         Container parent = target.getParent();
         while (parent != null) {
@@ -179,7 +181,7 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends JCo
     public final Dimension getPreferredSize() {
         return jComponent.getPreferredSize();
     }
-    
+
     /**
      * Response on paint events.
      */
@@ -191,11 +193,11 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends JCo
             if (event.getID() == PaintEvent.PAINT) {
                 target.paint(g);
             } else {
-                target.update(g);                        
+                target.update(g);
             }
             //g.translate(-p.x, -p.y);
             g.dispose();
-        }    
+        }
     }
 
     /**
@@ -204,7 +206,7 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends JCo
     public final void handleEvent(AWTEvent event) {
         final int id = event.getID();
         switch (id) {
-            case PaintEvent.PAINT: 
+            case PaintEvent.PAINT:
             case PaintEvent.UPDATE: {
                 processPaintEvent((PaintEvent)event);
             } break;
@@ -290,7 +292,7 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends JCo
     }
 
     public final boolean requestFocus(Component lightweightChild, boolean temporary,
-            boolean focusedWindowChangeAllowed, long time) {
+                                      boolean focusedWindowChangeAllowed, long time) {
         return true;
     }
 
@@ -300,7 +302,7 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends JCo
             return;
         }
         final int oldWidth = jComponent.getWidth();
-    	final int oldHeight = jComponent.getHeight();
+        final int oldHeight = jComponent.getHeight();
         isReshapeInProgress = true;
         jComponent.setBounds(x, y, width, height);
         isReshapeInProgress = false;
@@ -315,7 +317,7 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends JCo
     // Bounds
 
     public final void setBounds(int x, int y, int width, int height) {
-    	reshape(x, y, width, height);
+        reshape(x, y, width, height);
     }
 
     final void fireComponentEvent(final int oldWidth, int width, final int oldHeight, int height) {
@@ -375,5 +377,26 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends JCo
     protected final void fireComponentEvent(int what) {
         final EventQueue queue = toolkit.getSystemEventQueue();
         queue.postEvent(new ComponentEvent(target, what));
+    }
+
+    public void layout() {
+        jComponent.doLayout();
+    }
+
+    public Rectangle getBounds() {
+        return jComponent.getBounds();
+    }
+
+    public void setBounds(int x, int y, int width, int height, int z) {
+        jComponent.setBounds(x, y, width, height);
+    }
+
+    public boolean isReparentSupported() {
+        //TODO implement it
+        return false;
+    }
+
+    public void reparent(ContainerPeer parent) {
+        //TODO implement it
     }
 }

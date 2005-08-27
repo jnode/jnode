@@ -24,6 +24,7 @@ package org.jnode.awt.swingpeers;
 import javax.swing.text.JTextComponent;
 import java.awt.Rectangle;
 import java.awt.TextComponent;
+import java.awt.im.InputMethodRequests;
 import java.awt.peer.TextComponentPeer;
 
 /**
@@ -121,4 +122,8 @@ abstract class SwingTextComponentPeer<awtT extends TextComponent, peerT extends 
 	public void setText(String text) {
 		jComponent.setText(text);
 	}
+
+    public InputMethodRequests getInputMethodRequests() {
+        return null;  //TODO implement it
+    }
 }

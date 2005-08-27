@@ -100,4 +100,17 @@ abstract class SwingContainerPeer<awtT extends Container, swingPeerT extends JCo
 	public void addAWTComponent(Component awtComponent, JComponent peer) {
 		jComponent.add(peer);
 	}
+
+    public boolean isRestackSupported() {
+        //TODO implement it
+        return false;
+    }
+
+    public void restack() {
+        //TODO implement it
+    }
+
+    public void cancelPendingPaint(int x, int y, int width, int height) {
+        //TODO implement it
+    }
 }
