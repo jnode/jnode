@@ -349,6 +349,19 @@ public abstract class KeyboardInterpreter
   }
 
   /**
+   * 
+   * @param keycode
+   * @return
+   * @throws UnsupportedKeyException
+   */
+  public KeyboardEvent interpretKeycode(int keycode)
+  {
+      final int scancode = keys.getScanCode(keycode);
+      if(scancode < 0) return null;
+      return interpretScancode(scancode);
+  }
+
+  /**
    * @return Returns the flags.
    */
   protected final int getFlags()
@@ -358,7 +371,6 @@ public abstract class KeyboardInterpreter
 
 
   protected abstract void initKeys(Keys keys);
-
 }
 
 
