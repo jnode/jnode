@@ -244,7 +244,7 @@ public class Device implements ResourceOwner {
 	 * Gets the implementation of a given API.
 	 * 
 	 * @param apiInterface
-	 * @return The api implementation
+	 * @return The api implementation (guaranteed not null)
 	 * @throws ApiNotFoundException
 	 *             The given api has not been found
 	 */
