@@ -48,6 +48,27 @@ public class Keys
     }
     return key;
   }
+  
+  /**
+   * 
+   * @param keycode
+   * @return -1 if keycode has no scancode, otherwise return the scancode
+   */
+  public int getScanCode(int keycode)
+  {
+      for(int scancode = 0 ; scancode < keys.length ; scancode++)
+      {
+          final Key key = keys[scancode];
+          if((key.getLowerVirtuelKey() == keycode) ||
+             (key.getUpperVirtuelKey() == keycode) ||
+             (key.getAltGrVirtuelKey() == keycode))
+          {
+              return scancode;
+          }
+      }
+      
+      return -1; // bad keycode
+  }
 
 
   public void setKey(int _scancode, Key key)
