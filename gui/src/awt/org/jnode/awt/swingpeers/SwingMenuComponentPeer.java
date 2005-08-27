@@ -22,6 +22,7 @@
 package org.jnode.awt.swingpeers;
 
 import java.awt.peer.MenuComponentPeer;
+import java.awt.Font;
 
 import javax.swing.JComponent;
 
@@ -39,5 +40,9 @@ abstract class SwingMenuComponentPeer<awtT extends Object, peerT extends JCompon
             peerT peer) {
         super(toolkit, component);
         this.jComponent = peer;
+    }
+
+    public void setFont(Font font) {
+        jComponent.setFont(font);
     }
 }
