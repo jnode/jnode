@@ -28,6 +28,10 @@ import org.jnode.vm.VmSystemObject;
  */
 public final class VmLocalVariableTable extends VmSystemObject {
 	
+    /** Empty table */
+    final static VmLocalVariableTable EMPTY = new VmLocalVariableTable(VmLocalVariable.EMPTY);
+    
+    /** Local variables */
 	private final VmLocalVariable[] table;
 	
 	/**
@@ -45,4 +49,29 @@ public final class VmLocalVariableTable extends VmSystemObject {
 	public int getLength() {
 		return table.length;
 	}
+    
+    /**
+     * Find the local variable at the given program counter (index
+     * in bytecode) and the given index.
+     * @param pc
+     * @param index
+     * @return The variable or null if not found.
+     */
+    public final VmLocalVariable getVariable(int pc, int index) {
+        for (VmLocalVariable var : table) {
+            if (var.matches(pc, index)) {
+                return var;
+            }
+        }
+        return null;
+    }
+    
+    public final String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (VmLocalVariable var : table) {
+            sb.append(var);
+            sb.append(" ");
+        }
+        return sb.toString();
+    }
 }

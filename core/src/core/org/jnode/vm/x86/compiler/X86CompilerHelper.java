@@ -334,7 +334,11 @@ public class X86CompilerHelper implements X86CompilerConstants {
                 // Save eax
                 os.writePUSH(aax);
                 // Get class into aax
-                writeGetStaticsEntry(label, aax, cls);
+                if (os.isCode32()) {
+                    writeGetStaticsEntry(label, aax, cls);
+                } else {
+                    writeGetStaticsEntry64(label, (GPR64)aax, cls);            
+                }
                 // Write code to initialize
                 writeClassInitialize(label, aax, cls);
                 // Restore eax
@@ -409,7 +413,11 @@ public class X86CompilerHelper implements X86CompilerConstants {
                 os.writePUSH(X86Register.R15);
             }
             // Load cls
-            writeGetStaticsEntry(label, AAX, entry.getKey());
+            if (os.isCode32()) {
+                writeGetStaticsEntry(label, AAX, entry.getKey());
+            } else {
+                writeGetStaticsEntry64(label, (GPR64)AAX, entry.getKey());            
+            }
             // Call cls.initialize
             os.writePUSH(AAX); // cls
             invokeJavaMethod(entryPoints.getVmTypeInitialize());
