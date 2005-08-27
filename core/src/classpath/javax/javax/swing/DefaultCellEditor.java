@@ -121,7 +121,7 @@ public class DefaultCellEditor
 		 */
     public boolean isCellEditable(EventObject event)
     {
-      if (!(event instanceof MouseEvent))
+      if (event == null || !(event instanceof MouseEvent))
         return true;
 
       //Todo: if the right number of clicks has occured, return true;
@@ -340,23 +340,49 @@ public class DefaultCellEditor
 	} // cancelCellEditing()
 
 	/**
-	 * getTreeCellEditorComponent
+   * Sets an initial value for the editor. 
+   * This will cause the editor to stopEditing and lose any partially 
+   * edited value if the editor is editing when this method is called.
+   * Returns the component that should be added to the client's Component 
+   * hierarchy. Once installed in the client's hierarchy this component will 
+   * then be able to draw and receive user input. 
    * 
-	 * @param tree TODO
-	 * @param value TODO
-	 * @param isSelected TODO
-	 * @param expanded TODO
-	 * @param leaf TODO
-	 * @param row TODO
-   *
-	 * @returns Component
+   * @param tree - the JTree that is asking the editor to edit; this 
+   * parameter can be null
+   * @param value - the value of the cell to be edited
+   * @param isSelected - true is the cell is to be renderer with selection
+   * highlighting
+   * @param expanded - true if the node is expanded
+   * @param leaf - true if the node is a leaf node
+   * @param row - the row index of the node being edited
+   * 
+   * @returns Component the component for editing
 	 */
   public Component getTreeCellEditorComponent(JTree tree, Object value,
                                               boolean isSelected,
                                               boolean expanded, boolean leaf,
                                               int row)
   {
-		return null; // TODO
+    if (editorComponent instanceof JTextField)
+      {
+        ((JTextField)editorComponent).setText(value.toString());
+        delegate = new EditorDelegate();
+        ((JTextField)editorComponent).addActionListener(delegate);
+      }
+    else if (editorComponent instanceof JCheckBox)
+      {
+        ((JCheckBox)editorComponent).setText(value.toString());
+        delegate = new EditorDelegate();
+        ((JCheckBox)editorComponent).addActionListener(delegate);
+      }
+    else if (editorComponent instanceof JComboBox)
+      {
+        ((JComboBox)editorComponent).setSelectedItem(value.toString());
+        delegate = new EditorDelegate();
+        ((JComboBox)editorComponent).addActionListener(delegate);
+      }
+
+    return editorComponent;
 	} // getTreeCellEditorComponent()
 
 	/**

@@ -44,9 +44,13 @@ import java.awt.Graphics;
 import java.io.Serializable;
 
 import javax.swing.Icon;
+import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JInternalFrame;
 import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 import javax.swing.plaf.UIResource;
+
 
 /**
  * Creates icons for the {@link MetalLookAndFeel}.
@@ -60,6 +64,77 @@ public class MetalIconFactory implements Serializable
   /** A constant representing "light". */
   public static final boolean LIGHT = true;
     
+  /**
+   * An icon displayed for {@link JCheckBoxMenuItem} components.
+   */
+  private static class CheckBoxMenuItemIcon implements Icon, Serializable 
+  {
+    /**
+     * Creates a new icon instance.
+     */
+    public CheckBoxMenuItemIcon() 
+    {
+    }
+      
+    /**
+     * Returns the width of the icon, in pixels.
+     * 
+     * @return The width of the icon (10 pixels).
+     */
+    public int getIconWidth() 
+    {
+      return 10;
+    }
+    
+    /**
+     * Returns the height of the icon, in pixels.
+     * 
+     * @return The height of the icon (10 pixels).
+     */
+    public int getIconHeight() 
+    {
+      return 10;
+    }
+    
+    /**
+     * Paints the icon.
+     * 
+     * @param c  the component.
+     * @param g  the graphics device.
+     * @param x  the x-coordinate.
+     * @param y  the y-coordinate.
+     */
+    public void paintIcon(Component c, Graphics g, int x, int y) 
+    {
+      JCheckBoxMenuItem item = (JCheckBoxMenuItem) c;
+        
+      if (item.isArmed())
+        g.setColor(MetalLookAndFeel.getBlack());
+      else
+        g.setColor(MetalLookAndFeel.getControlDarkShadow());
+      g.drawLine(x, y, x + 8, y);
+      g.drawLine(x, y + 1, x, y + 8);
+      g.drawLine(x + 2, y + 8, x + 8, y + 8);
+      g.drawLine(x + 8, y + 2, x + 8, y + 7);
+      
+      g.setColor(MetalLookAndFeel.getWhite());
+      g.drawLine(x + 1, y + 1, x + 7, y + 1);
+      g.drawLine(x + 1, y + 2, x + 1, y + 7);
+      g.drawLine(x + 1, y + 9, x + 9, y + 9);
+      g.drawLine(x + 9, y + 1, x + 9, y + 8);
+
+      // if the item is selected, we should draw a tick
+      if (item.isSelected())
+      {
+        g.setColor(MetalLookAndFeel.getBlack());
+        g.fillRect(x + 2, y + 2, 2, 5);
+        for (int i = 0; i < 6; i++)
+          g.drawLine(x + 8 - i, y + i, x + 9 - i, y + i);
+      }
+
+    }        
+  }
+
   /**
    * An icon representing a file (drawn as a piece of paper with the top-right
    * corner turned down).
@@ -408,6 +483,447 @@ public class MetalIconFactory implements Serializable
   }
   
   /**
+   * An icon used for the 'close' button in the title frame of a 
+   * {@link JInternalFrame}.
+   */
+  private static class InternalFrameCloseIcon implements Icon, Serializable 
+  {
+    /** The icon size in pixels. */
+    private int size;
+    
+    /**
+     * Creates a new icon.
+     * 
+     * @param size  the icon size (width and height) in pixels.
+     */
+    public InternalFrameCloseIcon(int size) 
+    {
+      this.size = size;
+    }
+    
+    /**
+     * Returns the width of the icon, in pixels.
+     * 
+     * @return The width of the icon.
+     */
+    public int getIconWidth() 
+    {
+      return size;
+    }
+    
+    /**
+     * Returns the height of the icon, in pixels.
+     * 
+     * @return The height of the icon.
+     */
+    public int getIconHeight() 
+    {
+      return size;
+    }
+    
+    /**
+     * Paints the icon.
+     * 
+     * @param c  the component.
+     * @param g  the graphics device.
+     * @param x  the x-coordinate.
+     * @param y  the y-coordinate.
+     */
+    public void paintIcon(Component c, Graphics g, int x, int y) 
+    {
+      // draw the gray areas first
+      g.setColor(MetalLookAndFeel.getPrimaryControlDarkShadow());
+      g.drawLine(x + 1, y + 1, x + 13, y + 1);
+      g.drawLine(x + 1, y + 2, x + 1, y + 12);
+      g.drawLine(x + 1, y + 13, x + 13, y + 13);
+      g.drawLine(x + 13, y + 2, x + 13, y + 12);
+      
+      g.fillRect(x + 4, y + 4, 2, 2);
+      g.fillRect(x + 4, y + 9, 2, 2);
+      g.fillRect(x + 9, y + 4, 2, 2);
+      g.fillRect(x + 9, y + 9, 2, 2);
+      g.fillRect(x + 5, y + 5, 5, 5);
+      
+      g.setColor(MetalLookAndFeel.getBlack());
+      g.drawLine(x, y, x + 13, y);
+      g.drawLine(x, y + 1, x, y + 13);
+      g.drawLine(x + 3, y + 4, x + 4, y + 3);
+      g.drawLine(x + 3, y + 9, x + 5, y + 7);
+      g.drawLine(x + 7, y + 5, x + 9, y + 3);
+      
+      g.drawLine(x + 12, y + 3, x + 12, y + 11);
+      g.drawLine(x + 3, y + 12, x + 12, y + 12);
+      
+      g.setColor(MetalLookAndFeel.getWhite());
+      g.drawLine(x + 1, y + 14, x + 14, y + 14);
+      g.drawLine(x + 14, y + 1, x + 14, y + 14);
+      
+      g.drawLine(x + 5, y + 10, x + 5, y + 10);
+      g.drawLine(x + 6, y + 9, x + 7, y + 9);
+      g.drawLine(x + 10, y + 5, x + 10, y + 5);
+      g.drawLine(x + 9, y + 6, x + 9, y + 7);
+      g.drawLine(x + 10, y + 10, x + 11, y + 10);
+      g.drawLine(x + 10, y + 11, x + 10, y + 11);
+    }        
+  }
+
+  /**
+   * The icon displayed at the top-left corner of a {@link JInternalFrame}.
+   */
+  private static class InternalFrameDefaultMenuIcon 
+      implements Icon, Serializable 
+  {
+       
+    /**
+     * Creates a new instance.
+     */
+    public InternalFrameDefaultMenuIcon() 
+    {
+    }
+    
+    /**
+     * Returns the width of the icon, in pixels.
+     * 
+     * @return The width of the icon.
+     */
+    public int getIconWidth() 
+    {
+      return 16;
+    }
+    
+    /**
+     * Returns the height of the icon, in pixels.
+     * 
+     * @return The height of the icon.
+     */
+    public int getIconHeight() 
+    {
+      return 16;
+    }
+    
+    /**
+     * Paints the icon at the specified location.
+     * 
+     * @param c  the component.
+     * @param g  the graphics device.
+     * @param x  the x coordinate.
+     * @param y  the y coordinate.
+     */
+    public void paintIcon(Component c, Graphics g, int x, int y) 
+    {
+      g.setColor(new Color(102, 102, 153));
+      g.fillRect(x + 1, y, 14, 2);
+      g.fillRect(x, y + 1, 2, 14);
+      g.fillRect(x + 1, y + 14, 14, 2);
+      g.fillRect(x + 14, y + 1, 2, 14);
+      g.drawLine(x + 2, y + 5, x + 14, y + 5);
+      
+      g.setColor(new Color(204, 204, 255));
+      g.fillRect(x + 2, y + 2, 12, 3);
+      
+      g.setColor(new Color(102, 102, 153));
+      g.drawLine(x + 3, y + 3, x + 3, y + 3);
+      g.drawLine(x + 6, y + 3, x + 6, y + 3);
+      g.drawLine(x + 9, y + 3, x + 9, y + 3);
+      g.drawLine(x + 12, y + 3, x + 12, y + 3);
+
+      g.setColor(Color.white);
+      g.fillRect(x + 2, y + 6, 12, 8);
+      g.drawLine(x + 2, y + 2, x + 2, y + 2);
+      g.drawLine(x + 5, y + 2, x + 5, y + 2);
+      g.drawLine(x + 8, y + 2, x + 8, y + 2);
+      g.drawLine(x + 11, y + 2, x + 11, y + 2);
+    }        
+  }
+
+  /**
+   * An icon used in the title frame of a {@link JInternalFrame}.  When you 
+   * maximise an internal frame, this icon will replace the 'maximise' icon to
+   * provide a 'restore' option.
+   */
+  private static class InternalFrameAltMaximizeIcon 
+      implements Icon, Serializable 
+  {
+    /** The icon size in pixels. */
+    private int size;
+    
+    /**
+     * Creates a new icon.
+     * 
+     * @param size  the icon size in pixels.
+     */
+    public InternalFrameAltMaximizeIcon(int size) 
+    {
+      this.size = size;
+    }
+    
+    /**
+     * Returns the width of the icon, in pixels.
+     * 
+     * @return The width of the icon.
+     */
+    public int getIconWidth() 
+    {
+      return size;
+    }
+    
+    /**
+     * Returns the height of the icon, in pixels.
+     * 
+     * @return The height of the icon.
+     */
+    public int getIconHeight() 
+    {
+      return size;
+    }
+    
+    /**
+     * Paints the icon at the specified location.
+     * 
+     * @param c  the component.
+     * @param g  the graphics device.
+     * @param x  the x coordinate.
+     * @param y  the y coordinate.
+     */
+    public void paintIcon(Component c, Graphics g, int x, int y) 
+    {
+      Color color = MetalLookAndFeel.getControlDarkShadow();
+      if (c instanceof JInternalFrame)
+        {
+          JInternalFrame f = (JInternalFrame) c;
+          if (f.isSelected())
+            color = MetalLookAndFeel.getPrimaryControlShadow();
+        }
+      g.setColor(color);
+      g.drawLine(x + 12, y + 1, x + 13, y + 1);
+      g.drawLine(x + 11, y + 2, x + 12, y + 2);
+      g.drawLine(x + 10, y + 3, x + 11, y + 3);
+      g.drawLine(x + 8, y + 2, x + 8, y + 3);
+      g.fillRect(x + 8, y + 4, 3, 3);
+      g.drawLine(x + 11, y + 6, x + 12, y + 6);
+      
+      g.drawLine(x + 1, y + 5, x + 5, y + 5);
+      g.drawLine(x + 1, y + 6, x + 1, y + 12);
+      g.drawLine(x + 9, y + 9, x + 9, y + 12);
+      g.drawLine(x + 1, y + 13, x + 9, y + 13);
+      
+      g.drawLine(x + 2, y + 12, x + 2, y + 12);
+      
+      g.setColor(MetalLookAndFeel.getBlack());
+      g.drawLine(x + 12, y, x + 9, y + 3);
+      g.drawLine(x + 7, y + 1, x + 8, y + 1);
+      g.drawLine(x + 7, y + 2, x + 7, y + 6);
+      g.drawLine(x + 11, y + 5, x + 12, y + 5);
+      g.drawLine(x, y + 4, x + 5, y + 4);
+      g.drawLine(x, y + 5, x, y + 13);
+      g.drawLine(x + 3, y + 12, x + 8, y + 12);
+      g.drawLine(x + 8, y + 8, x + 8, y + 11);
+      g.drawLine(x + 9, y + 8, x + 9, y + 8);
+      
+      g.setColor(MetalLookAndFeel.getWhite());
+      g.drawLine(x + 9, y + 2, x + 9, y + 2);
+      g.drawLine(x + 11, y + 4, x + 13, y + 2);
+      g.drawLine(x + 13, y + 6, x + 13, y + 6);
+      g.drawLine(x + 8, y + 7, x + 13, y + 7);
+      g.drawLine(x + 6, y + 5, x + 6, y + 5);
+      g.drawLine(x + 2, y + 6, x + 6, y + 6);
+      g.drawLine(x + 2, y + 6, x + 2, y + 11);
+      g.drawLine(x + 10, y + 8, x + 10, y + 13);
+      g.drawLine(x + 1, y + 14, x + 10, y + 14);
+    }        
+  }
+  
+  /**
+   * An icon used for the 'maximize' button in the title frame of a 
+   * {@link JInternalFrame}.
+   */
+  private static class InternalFrameMaximizeIcon 
+      implements Icon, Serializable 
+  {
+    
+    /**
+     * Creates a new instance.
+     */
+    public InternalFrameMaximizeIcon() 
+    {
+    }
+    
+    /**
+     * Returns the width of the icon, in pixels.
+     * 
+     * @return The width of the icon.
+     */
+    public int getIconWidth() 
+    {
+      return 16;
+    }
+    
+    /**
+     * Returns the height of the icon, in pixels.
+     * 
+     * @return The height of the icon.
+     */
+    public int getIconHeight() 
+    {
+      return 16;
+    }
+    
+    /**
+     * Paints the icon at the specified location.
+     * 
+     * @param c  the component.
+     * @param g  the graphics device.
+     * @param x  the x coordinate.
+     * @param y  the y coordinate.
+     */
+    public void paintIcon(Component c, Graphics g, int x, int y) 
+    {
+      Color color = MetalLookAndFeel.getControlDarkShadow();
+      if (c instanceof JInternalFrame)
+        {
+          JInternalFrame f = (JInternalFrame) c;
+          if (f.isSelected())
+            color = MetalLookAndFeel.getPrimaryControlShadow();
+        }
+      g.setColor(color);
+      g.drawLine(x + 9, y + 1, x + 10, y + 1);
+      g.fillRect(x + 11, y + 1, 3, 3);
+      g.fillRect(x + 12, y + 4, 2, 2);
+      g.drawLine(x + 10, y + 3, x + 10, y + 3);
+      g.drawLine(x + 9, y + 4, x + 10, y + 4);
+      g.drawLine(x + 1, y + 5, x + 9, y + 5);
+      g.drawLine(x + 1, y + 6, x + 1, y + 12);
+      g.drawLine(x + 9, y + 6, x + 9, y + 12);
+      g.drawLine(x + 1, y + 13, x + 9, y + 13);
+      
+      // fill
+      g.drawLine(x + 7, y + 6, x + 8, y + 6);
+      g.drawLine(x + 6, y + 7, x + 8, y + 7);
+      g.drawLine(x + 5, y + 8, x + 6, y + 8);
+      g.drawLine(x + 4, y + 9, x + 5, y + 9);
+      g.drawLine(x + 3, y + 10, x + 4, y + 10);
+      g.drawLine(x + 2, y + 11, x + 3, y + 11);
+      g.drawLine(x + 2, y + 12, x + 4, y + 12);
+      g.drawLine(x + 8, y + 8, x + 8, y + 8);
+      
+      // draw black
+      g.setColor(MetalLookAndFeel.getBlack());
+      g.drawLine(x + 8, y, x + 13, y);
+      g.drawLine(x + 8, y + 1, x + 8, y + 1);
+      g.drawLine(x + 10, y + 2, x + 9, y + 3);
+      g.drawLine(x, y + 4, x + 8, y + 4);
+      g.drawLine(x, y + 5, x, y + 13);
+      
+      g.drawLine(x + 2, y + 10, x + 6, y + 6);
+      g.drawLine(x + 8, y + 9, x + 8, y + 11);
+      g.drawLine(x + 5, y + 12, x + 8, y + 12);
+      
+      // draw white
+      g.setColor(MetalLookAndFeel.getWhite());
+      g.drawLine(x + 2, y + 6, x + 5, y + 6);
+      g.drawLine(x + 2, y + 7, x + 2, y + 9);
+      g.drawLine(x + 4, y + 11, x + 7, y + 8);
+      
+      g.drawLine(x + 1, y + 14, x + 10, y + 14);
+      g.drawLine(x + 10, y + 5, x + 10, y + 13);
+      
+      g.drawLine(x + 9, y + 2, x + 9, y + 2);
+      g.drawLine(x + 11, y + 4, x + 11, y + 5);
+      g.drawLine(x + 13, y + 6, x + 14, y + 6);
+      g.drawLine(x + 14, y + 1, x + 14, y + 5);
+    }        
+  }
+
+  /**
+   * An icon used in the title frame of a {@link JInternalFrame}.
+   */
+  private static class InternalFrameMinimizeIcon 
+      implements Icon, Serializable 
+  {
+  
+    /**
+     * Creates a new instance.
+     */
+    public InternalFrameMinimizeIcon() 
+    {
+    }
+    
+    /**
+     * Returns the width of the icon, in pixels.
+     * 
+     * @return The width of the icon.
+     */
+    public int getIconWidth() 
+    {
+      return 16;
+    }
+    
+    /**
+     * Returns the height of the icon, in pixels.
+     * 
+     * @return The height of the icon.
+     */
+    public int getIconHeight() 
+    {
+      return 16;
+    }
+    
+    /**
+     * Paints the icon at the specified location.
+     * 
+     * @param c  the component.
+     * @param g  the graphics device.
+     * @param x  the x coordinate.
+     * @param y  the y coordinate.
+     */
+    public void paintIcon(Component c, Graphics g, int x, int y) 
+    {
+      Color color = MetalLookAndFeel.getControlDarkShadow();
+      if (c instanceof JInternalFrame)
+        {
+          JInternalFrame f = (JInternalFrame) c;
+          if (f.isSelected())
+            color = MetalLookAndFeel.getPrimaryControlShadow();
+        }
+      g.setColor(color);
+      g.drawLine(x + 12, y + 1, x + 13, y + 1);
+      g.drawLine(x + 11, y + 2, x + 12, y + 2);
+      g.drawLine(x + 10, y + 3, x + 11, y + 3);
+      g.drawLine(x + 8, y + 2, x + 8, y + 3);
+      g.fillRect(x + 8, y + 4, 3, 3);
+      g.drawLine(x + 11, y + 6, x + 12, y + 6);
+      
+      g.drawLine(x + 1, y + 8, x + 6, y + 8);
+      g.drawLine(x + 1, y + 9, x + 1, y + 12);
+      g.drawLine(x + 6, y + 9, x + 6, y + 12);
+      g.drawLine(x + 1, y + 13, x + 6, y + 13);
+      
+      g.drawLine(x + 5, y + 9, x + 5, y + 9);
+      g.drawLine(x + 2, y + 12, x + 2, y + 12);
+      
+      g.setColor(MetalLookAndFeel.getBlack());
+      g.drawLine(x + 12, y, x + 9, y + 3);
+      g.drawLine(x + 7, y + 1, x + 8, y + 1);
+      g.drawLine(x + 7, y + 2, x + 7, y + 6);
+      g.drawLine(x, y + 7, x + 6, y + 7);
+      g.drawLine(x, y + 8, x, y + 13);
+      g.drawLine(x + 3, y + 12, x + 5, y + 12);
+      g.drawLine(x + 5, y + 10, x + 5, y + 11);
+      g.drawLine(x + 11, y + 5, x + 12, y + 5);
+      
+      g.setColor(MetalLookAndFeel.getWhite());
+      g.drawLine(x + 9, y + 2, x + 9, y + 2);
+      g.drawLine(x + 11, y + 4, x + 13, y + 2);
+      g.drawLine(x + 13, y + 6, x + 13, y + 6);
+      g.drawLine(x + 8, y + 7, x + 13, y + 7);
+      g.drawLine(x + 2, y + 9, x + 4, y + 9);
+      g.drawLine(x + 2, y + 10, x + 2, y + 11);
+      g.drawLine(x + 7, y + 9, x + 7, y + 13);
+      g.drawLine(x + 1, y + 14, x + 7, y + 14);
+    }        
+  }
+
+  /**
    * The icon used to display the thumb control on a horizontally oriented
    * {@link JSlider} component.
    */
@@ -717,6 +1233,29 @@ public class MetalIconFactory implements Serializable
   }
   
   /**
+   * Returns an icon for use when rendering the {@link JCheckBox} component.
+   * 
+   * @return A check box icon.
+   * 
+   * @since 1.3
+   */
+  public static Icon getCheckBoxIcon() 
+  {
+    return new MetalCheckBoxIcon();
+  }
+  
+  /**
+   * Returns an icon for use when rendering the {@link JCheckBoxMenuItem} 
+   * component.
+   * 
+   * @return An icon.
+   */
+  public static Icon getCheckBoxMenuItemIcon() 
+  {
+    return new CheckBoxMenuItemIcon();
+  }
+
+  /**
    * Returns an icon for RadioButtons in the Metal L&amp;F.
    *
    * @return an icon for RadioButtons in the Metal L&amp;F
@@ -739,6 +1278,72 @@ public class MetalIconFactory implements Serializable
     return new HorizontalSliderThumbIcon();
   }
     
+  /**
+   * Creates a new icon used to represent the 'close' button in the title
+   * pane of a {@link JInternalFrame}.
+   * 
+   * @param size  the icon size.
+   * 
+   * @return A close icon.
+   */
+  public static Icon getInternalFrameCloseIcon(int size) 
+  {
+    return new InternalFrameCloseIcon(size);
+  }
+
+  /**
+   * Creates a new icon for the menu in a {@link JInternalFrame}.  This is the
+   * icon displayed at the top left of the frame.
+   * 
+   * @return A menu icon.
+   */
+  public static Icon getInternalFrameDefaultMenuIcon() 
+  {
+    return new InternalFrameDefaultMenuIcon();
+  }
+  
+  /**
+   * Creates a new icon for the 'maximize' button in a {@link JInternalFrame}.
+   * 
+   * @param size  the icon size in pixels.
+   * 
+   * @return The icon.
+   * 
+   * @see #getInternalFrameAltMaximizeIcon(int)
+   */
+  public static Icon getInternalFrameMaximizeIcon(int size) 
+  {
+    return new InternalFrameMaximizeIcon();
+  }
+    
+  /**
+   * Returns the icon used for the minimize button in the frame title for a
+   * {@link JInternalFrame}.
+   * 
+   * @param size  the icon size in pixels (ignored by this implementation).
+   * 
+   * @return The icon.
+   */
+  public static Icon getInternalFrameMinimizeIcon(int size) 
+  {
+    return new InternalFrameMinimizeIcon();
+  }
+
+  /**
+   * Creates a new icon for the 'restore' button in a {@link JInternalFrame}
+   * that has been maximised.
+   * 
+   * @param size  the icon size in pixels.
+   * 
+   * @return The icon.
+   * 
+   * @see #getInternalFrameMaximizeIcon(int)
+   */
+  public static Icon getInternalFrameAltMaximizeIcon(int size) 
+  {
+    return new InternalFrameAltMaximizeIcon(size);
+  }
+  
   /**
    * Returns the icon used to display the thumb for a vertically oriented
    * {@link JSlider}.

@@ -274,9 +274,24 @@ public class GapContent
     public String getString(int where, int len) throws BadLocationException
     {
     Segment seg = new Segment();
+    try
+      {
     getChars(where, len, seg);
     return new String(seg.array, seg.offset, seg.count);
     }
+    catch (StringIndexOutOfBoundsException ex)
+      {
+        int invalid = 0;
+        if (seg.offset < 0 || seg.offset >= seg.array.length)
+          invalid = seg.offset;
+        else
+          invalid = seg.offset + seg.count;
+        throw new BadLocationException("Illegal location: array.length = "
+                                       + seg.array.length + ", offset = "
+                                       + seg.offset + ", count = "
+                                       + seg.count, invalid);
+      }
+  }
 
   /**
    * Fetches a piece of content and stores it in a {@link Segment} object.

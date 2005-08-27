@@ -305,14 +305,6 @@ public abstract class BasicLookAndFeel extends LookAndFeel
       "CheckBox.margin",new InsetsUIResource(2, 2, 2, 2),
       "CheckBox.textIconGap", new Integer(4),
       "CheckBox.textShiftOffset", new Integer(0),
-      "CheckBoxMenuItem.icon", 
-      new UIDefaults.LazyValue()
-      {
-        public Object createValue(UIDefaults def)
-        {
-          return BasicIconFactory.getCheckBoxIcon();
-        }
-      },
       "CheckBoxMenuItem.acceleratorFont", new FontUIResource("Dialog",
                                                              Font.PLAIN, 12),
       "CheckBoxMenuItem.acceleratorForeground",
@@ -328,7 +320,7 @@ public abstract class BasicLookAndFeel extends LookAndFeel
       {
         public Object createValue(UIDefaults def)
         {
-          return BasicIconFactory.getMenuItemCheckIcon();
+          return BasicIconFactory.getCheckBoxMenuItemIcon();
         }
       },
       "CheckBoxMenuItem.font", new FontUIResource("Dialog", Font.PLAIN, 12),
@@ -402,7 +394,6 @@ public abstract class BasicLookAndFeel extends LookAndFeel
         "ctrl F10", "maximize",
         "ctrl alt shift F6","selectPreviousFrame"
       }),
-      "Desktop.background", new ColorUIResource(0, 92, 92),
       "DesktopIcon.border", new BorderUIResource.CompoundBorderUIResource(null,
                                                                           null),
       "EditorPane.background", new ColorUIResource(Color.white),
@@ -654,7 +645,7 @@ public abstract class BasicLookAndFeel extends LookAndFeel
                                                            null, null),
       "PasswordField.caretBlinkRate", new Integer(500),
       "PasswordField.caretForeground", new ColorUIResource(Color.black),
-      "PasswordField.font", new FontUIResource("MonoSpaced", Font.PLAIN, 12),
+      "PasswordField.font", new FontUIResource("Dialog", Font.PLAIN, 12),
       "PasswordField.foreground", new ColorUIResource(Color.black),
       "PasswordField.inactiveBackground", new ColorUIResource(light),
       "PasswordField.inactiveForeground", new ColorUIResource(Color.gray),
@@ -887,7 +878,7 @@ public abstract class BasicLookAndFeel extends LookAndFeel
         "shift KP_LEFT", "selectPreviousColumnExtendSelection",
         "ESCAPE",  "cancel",
         "ctrl shift PAGE_UP", "scrollLeftExtendSelection",
-        "shift KP_RIGHT", " selectNextColumnExtendSelection",
+        "shift KP_RIGHT", "selectNextColumnExtendSelection",
         "ctrl PAGE_UP",  "scrollLeftChangeSelection",
         "shift PAGE_UP", "scrollUpExtendSelection",
         "ctrl shift PAGE_DOWN", "scrollRightExtendSelection",
@@ -1105,6 +1096,7 @@ public abstract class BasicLookAndFeel extends LookAndFeel
       "Tree.selectionBackground", new ColorUIResource(Color.black),
       "Tree.nonSelectionBackground", new ColorUIResource(new Color(239, 235, 231)),
       "Tree.selectionBorderColor", new ColorUIResource(Color.black),
+      "Tree.selectionBorder", new BorderUIResource.LineBorderUIResource(Color.black),
       "Tree.selectionForeground", new ColorUIResource(new Color(255, 255, 255)),
       "Tree.textBackground", new ColorUIResource(new Color(255, 255, 255)),
       "Tree.textForeground", new ColorUIResource(Color.black),

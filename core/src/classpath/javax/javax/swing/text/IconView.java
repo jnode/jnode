@@ -89,8 +89,8 @@ public class IconView
    *
    * @param pos the position of the character in the model
    * @param a the area that is occupied by the view
-   * @param bias either {@link Position.Bias.Forward} or
-   *        {@link Position.Bias.Backward} depending on the preferred
+   * @param b either {@link Position.Bias#Forward} or
+   *        {@link Position.Bias#Backward} depending on the preferred
    *        direction bias. If <code>null</code> this defaults to
    *        <code>Position.Bias.Forward</code>
    *
@@ -120,9 +120,9 @@ public class IconView
    * @return the position in the document that corresponds to the screen
    *         coordinates <code>x, y</code>
    */
-  public int viewToModel(float x, float y, Shape a, Position.Bias b)
+  public int viewToModel(float x, float y, Shape a, Position.Bias[] b)
   {
-    // FIXME: Implement this properly.
+    // FIXME: not implemented
     return 0;
   }
 }
