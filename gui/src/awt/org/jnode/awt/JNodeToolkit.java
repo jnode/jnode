@@ -207,6 +207,24 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	}
 
 	/**
+     * This method need only accessed from JNodeRobotPeer in the same package
+     * @return Returns the keyboardHandler.
+     */
+    final KeyboardHandler getKeyboardHandler()
+    {
+        return keyboardHandler;
+    }
+
+    /**
+     * This method need only accessed from JNodeRobotPeer in the same package
+     * @return Returns the mouseHandler.
+     */
+    final MouseHandler getMouseHandler()
+    {
+        return mouseHandler;
+    }
+
+    /**
 	 * @see java.awt.Toolkit#beep()
 	 */
 	public void beep() {
