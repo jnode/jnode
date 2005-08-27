@@ -130,6 +130,14 @@ public class KeyboardHandler implements
         eventQueue.postEvent(me);
     }
 
+    /**
+     * @return Returns the keyboardAPI.
+     */
+    final KeyboardAPI getKeyboardAPI()
+    {
+        return keyboardAPI;
+    }
+
     synchronized int getModifiers() {
         return modifiers;
     }
