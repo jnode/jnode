@@ -408,6 +408,15 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public abstract void writeADD(int operandSize, GPR dstReg, int dstDisp, int imm32);
 
     /**
+	 * Create a ADD [dstReg:dstDisp], imm32
+	 *
+	 * @param dstReg
+	 * @param dstDisp
+	 * @param imm32
+	 */
+    public abstract void writeADD(int operandSize, SR dstReg, int dstDisp, int imm32);
+
+    /**
      * Create ADD reg, memPtr32
      * @param reg
      * @param memPtr32

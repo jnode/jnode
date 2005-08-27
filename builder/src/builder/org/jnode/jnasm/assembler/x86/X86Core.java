@@ -427,6 +427,10 @@ public class X86Core extends AbstractX86Module {
             case AC_ADDR:
                 stream.writeADD(operandSize, getAddress(0).disp, getInt(1));
                 break;
+            case GC_ADDR:
+                ind = getAddress(0);
+                stream.writeADD(operandSize, (SR) X86Register.getRegister(ind.getImg()), ind.disp, getInt(1));
+                break;
             default:
                 reportAddressingError(ADD_ISN, addr);
         }
