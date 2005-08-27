@@ -56,6 +56,7 @@ import org.jnode.vm.classmgr.VmField;
 import org.jnode.vm.classmgr.VmInstanceField;
 import org.jnode.vm.classmgr.VmInstanceMethod;
 import org.jnode.vm.classmgr.VmIsolatedStaticsEntry;
+import org.jnode.vm.classmgr.VmLocalVariable;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmSharedStaticsEntry;
 import org.jnode.vm.classmgr.VmStaticField;
@@ -166,6 +167,12 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 
     /** Constant values that are stored in local variables */
     private Map<Integer, Item> constLocals = new HashMap<Integer, Item>();
+    
+    /** The current basic block */
+    private BasicBlock currentBasicBlock;
+    
+    /** The parser that is parsing the bytecode we're compiling */
+    private BytecodeParser parser;
     
 	/**
 	 * Virtual Stack: this stack contains values that have been computed but not
@@ -972,13 +979,14 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#setParser(org.jnode.vm.bytecode.BytecodeParser)
 	 */
 	public void setParser(BytecodeParser parser) {
-		// Nothing to do here
+        this.parser = parser;
 	}
 
 	/**
 	 * The given basic block is about to start.
 	 */
 	public void startBasicBlock(BasicBlock bb) {
+        this.currentBasicBlock = bb;
 		if (log) {
 			os.log("Start of basic block " + bb);
 		}
@@ -4208,8 +4216,13 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 
 			// Load classRef into the register
 			// Load the class from the statics table
-			helper.writeGetStaticsEntry(new Label(curInstrLabel + "$$ic"),
-                    classReg, declClass);
+            if (os.isCode32()) {
+                helper.writeGetStaticsEntry(new Label(curInstrLabel + "$$ic"),
+                        classReg, declClass);
+            } else {
+                helper.writeGetStaticsEntry64(new Label(curInstrLabel + "$$ic"),
+                        (GPR64)classReg, declClass);                
+            }
 
             // Write class initialization code
             helper.writeClassInitialize(curInstrLabel, classReg, declClass);
@@ -4269,6 +4282,31 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
                     .getEbpOffset(typeSizeInfo, index)));
         }
     }
+    
+    /**
+     * Does the local variable with the given index and current
+     * program counter escape the current basic block?
+     * @param index
+     * @return
+     */
+    private final boolean localEscapesBasicBlock(int index) {
+        if (true) { 
+            return true;
+        }
+        VmLocalVariable var;
+        var = currentMethod.getBytecode().getVariable(curAddress, index);
+        if (var == null) {
+            var = currentMethod.getBytecode().getVariable(parser.getNextAddress(), index);        
+        }
+        if (var != null) {
+            final int varBegin = var.getStartPC();
+            final int varEnd = var.getEndPC();
+            return ((varBegin < currentBasicBlock.getStartPC())
+                    || (varEnd > currentBasicBlock.getEndPC()));
+        } else {
+            return true;
+        }
+    }
 
 	/**
 	 * Store a word item into a local variable
@@ -4294,14 +4332,18 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
             constLocals.remove(index);
         }
 		if (vconst && (jvmType == JvmType.INT)) {
-			// Store constant int
-			final int ival = ((IntItem) val).getValue();
-			os.writeMOV_Const(BITS32, helper.BP, disp, ival);
+		    if (localEscapesBasicBlock(index)) {
+		        // Store constant int            
+		        final int ival = ((IntItem) val).getValue();
+		        os.writeMOV_Const(BITS32, helper.BP, disp, ival);
+            }
 		} else if (vconst && (jvmType == JvmType.FLOAT)) {
-			// Store constant float
-			final int ival = Float.floatToRawIntBits(((FloatItem) val)
-					.getValue());
-			os.writeMOV_Const(BITS32, helper.BP, disp, ival);
+		    if (localEscapesBasicBlock(index)) {
+		        // Store constant float
+		        final int ival = Float.floatToRawIntBits(((FloatItem) val)
+		                .getValue());
+		        os.writeMOV_Const(BITS32, helper.BP, disp, ival);
+		    }
 		} else if (val.isFPUStack()) {
 			// Ensure item is on top of fpu stack
 			FPUHelper.fxch(os, vstack.fpuStack, val);

@@ -537,15 +537,15 @@ public final class ClassDecoder {
 
         // Read the attributes
         VmLineNumberMap lnTable = null;
-        VmLocalVariableTable lvTable = null;
+        VmLocalVariableTable lvTable = VmLocalVariableTable.EMPTY;
         final int acount = data.getChar();
         for (int i = 0; i < acount; i++) {
             final String attrName = cp.getUTF8(data.getChar());
             final int len = data.getInt();
             if (VmArray.equals(LineNrTableAttrName, attrName)) {
                 lnTable = readLineNrTable(data);
-//            } else if (VmArray.equals(LocalVariableTableAttrName, attrName)) {
-//                lvTable = readLocalVariableTable(data, cp);
+            } else if (VmArray.equals(LocalVariableTableAttrName, attrName)) {
+                lvTable = readLocalVariableTable(data, cp);
             } else {
                 skip(data, len);
             }
@@ -863,19 +863,23 @@ public final class ClassDecoder {
      */
     private static final VmLocalVariableTable readLocalVariableTable(ByteBuffer data, VmCP cp) {
         final int len = data.getChar();
-        final VmLocalVariable[] table = new VmLocalVariable[len];
-
-        for (int i = 0; i < len; i++) {
-            final char startPc = data.getChar();
-            final char length = data.getChar();
-            final String name = cp.getUTF8(data.getChar()).toString();
-            final String descr = cp.getUTF8(data.getChar()).toString();
-            final char index = data.getChar();
-                                 
-            table[i] = new VmLocalVariable(startPc, length, name, descr, index);
+        if (len == 0) {
+            return VmLocalVariableTable.EMPTY;
+        } else {
+            final VmLocalVariable[] table = new VmLocalVariable[len];
+            
+            for (int i = 0; i < len; i++) {
+                final char startPc = data.getChar();
+                final char length = data.getChar();
+                final char nameIdx = data.getChar();
+                final char descrIdx = data.getChar();
+                final char index = data.getChar();
+                
+                table[i] = new VmLocalVariable(startPc, length, nameIdx, descrIdx, index);
+            }
+            
+            return new VmLocalVariableTable(table);
         }
-
-        return new VmLocalVariableTable(table);
     }
 
     /**

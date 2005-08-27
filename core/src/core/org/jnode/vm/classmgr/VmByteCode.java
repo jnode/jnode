@@ -76,7 +76,7 @@ public final class VmByteCode extends AbstractCode {
 		this.maxStack = (char)maxStack;
 		this.eTable = eTable;
 		this.lnTable = lnTable;
-        this.lvTable = lvTable;
+        this.lvTable = (lvTable != null) ? lvTable : VmLocalVariableTable.EMPTY;
 		//this.locked = false;
 	}
 
@@ -221,5 +221,19 @@ public final class VmByteCode extends AbstractCode {
 	public final void setCompilerData(Object compilerData) {
 		this.compilerData = compilerData;
 	}
-
+    
+    /**
+     * Find the local variable at the given program counter (index
+     * in bytecode) and the given index.
+     * @param pc
+     * @param index
+     * @return The variable or null if not found.
+     */
+    public final VmLocalVariable getVariable(int pc, int index) {
+        return lvTable.getVariable(pc, index);
+    }
+    
+    public final VmLocalVariableTable getLocalVariableTable() {
+        return lvTable;
+    }
 }
