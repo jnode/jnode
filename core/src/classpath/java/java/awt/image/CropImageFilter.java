@@ -79,6 +79,7 @@ public class CropImageFilter extends ImageFilter
      */
     public void setDimensions(int width, int height)
     {
+      if (consumer != null)
 	consumer.setDimensions(this.width, this.height);
     }
 
@@ -93,6 +94,7 @@ public class CropImageFilter extends ImageFilter
     public void setProperties(Hashtable props)
     {
   	props.put("filters", "CropImageFilter");
+	if (consumer != null)
 	consumer.setProperties(props);
     }
 
@@ -130,6 +132,7 @@ public class CropImageFilter extends ImageFilter
 		    cropped[i * bounds.width + j] = pixels[start + bounds.x + j];
 	    }
 	    
+	    if (consumer != null)
 	    consumer.setPixels(bounds.x, bounds.y,
 	                       bounds.width, bounds.height,
 	                       model, cropped, 0, bounds.width);
@@ -170,6 +173,7 @@ public class CropImageFilter extends ImageFilter
 		    cropped[i * bounds.width + j] = pixels[start + bounds.x + j];
 	    }
 	    
+	    if (consumer != null)
 	    consumer.setPixels(bounds.x, bounds.y,
 	                       bounds.width, bounds.height,
 	                       model, cropped, 0, bounds.width);

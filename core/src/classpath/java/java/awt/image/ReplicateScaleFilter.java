@@ -124,6 +124,7 @@ public class ReplicateScaleFilter extends ImageFilter
 	    destHeight = (int) (height * ((double) destWidth / srcWidth));
 	}
 
+	if (consumer != null)
 	consumer.setDimensions(destWidth, destHeight);
     }
 
@@ -136,6 +137,7 @@ public class ReplicateScaleFilter extends ImageFilter
     public void setProperties(Hashtable props)
     {
 	props.put("filters", "ReplicateScaleFilter");
+	if (consumer != null)
 	consumer.setProperties(props);
     }
 
@@ -165,6 +167,7 @@ public class ReplicateScaleFilter extends ImageFilter
                                            model, pixels, offset, scansize,
 	                                   rx, ry, destScansize);
 
+	if (consumer != null)
 	consumer.setPixels((int) Math.floor(x/rx), (int) Math.floor(y/ry),
                            (int) Math.ceil(w/rx), (int) Math.ceil(h/ry),
                            model, destPixels, 0, destScansize);
@@ -196,6 +199,7 @@ public class ReplicateScaleFilter extends ImageFilter
                                            model, pixels, offset, scansize,
 	                                   rx, ry, destScansize);
 
+	if (consumer != null)
 	consumer.setPixels((int) Math.floor(x/rx), (int) Math.floor(y/ry),
                            (int) Math.ceil(w/rx), (int) Math.ceil(h/ry),
                            model, destPixels, 0, destScansize);
