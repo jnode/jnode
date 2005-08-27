@@ -245,10 +245,7 @@ public class BasicTreeUI
 	public BasicTreeUI()
 	{
 		drawingCache = new Hashtable();
-		cellEditor = createDefaultCellEditor();
-		currentCellRenderer = createDefaultCellRenderer();
 		nodeDimensions = createNodeDimensions();
-		rendererPane = createCellRendererPane();
 		configureLayoutCache();
 
 		propertyChangeListener = createPropertyChangeListener();
@@ -262,8 +259,6 @@ public class BasicTreeUI
 		treeExpansionListener = createTreeExpansionListener();
 		treeModelListener = createTreeModelListener();
 
-		createdRenderer = true;
-		createdCellEditor = true;
 		editingRow = -1;
 		lastSelectedRow = -1;
 	}
@@ -297,8 +292,8 @@ public class BasicTreeUI
 	 */
 	protected void setHashColor(Color color)
 	{
-		// FIXME: not implemented
-
+    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
+    defaults.put("Tree.hash", color);
 	}
 
 	/**
@@ -650,16 +645,24 @@ public class BasicTreeUI
 	 */
 	public int getRowForPath(JTree tree, TreePath path)
 	{
-		// FIXME: check visibility
-		// right now, just returns last element because
-		// expand/collapse is not implemented
-		return path.getPathCount() - 1;
+    int row = path.getPathCount();
+    if (tree.isVisible(path))
+      return row;
+    
+    path = path.getParentPath();
+    while (row > 0 && !tree.isVisible(path))
+      {
+        path = path.getParentPath();
+        row--;
+      }
+    return row;
 	}
 
 	/**
 	 * Returns the number of rows that are being displayed.
 	 * 
-	 * @param tree is the current tree to return the number of rows for.
+   * @param tree
+   *          is the current tree to return the number of rows for.
 	 * @return the number of rows being displayed.
 	 */
 	public int getRowCount(JTree tree)
@@ -720,8 +723,7 @@ public class BasicTreeUI
 	 */
 	public boolean isEditing(JTree tree)
 	{
-		// FIXME: not implemented
-		return false;
+    return getCellEditor() != null;
 	}
 
 	/**
@@ -734,8 +736,12 @@ public class BasicTreeUI
 	 */
 	public boolean stopEditing(JTree tree)
 	{
-		// FIXME: not implemented
-		return false;
+    if (isEditing(tree))
+      {
+        completeEditing();
+        return getCellEditor().stopCellEditing();
+      }
+    return true;
 	}
 
 	/**
@@ -745,7 +751,8 @@ public class BasicTreeUI
 	 */
 	public void cancelEditing(JTree tree)
 	{
-		// FIXME: not implemented
+    if (isEditing(tree))
+        completeEditing(false, true, false);
 	}
 
 	/**
@@ -757,7 +764,7 @@ public class BasicTreeUI
 	 */
 	public void startEditingAtPath(JTree tree, TreePath path)
 	{
-		// FIXME: not implemented
+    startEditing(path, null);
 	}
 
 	/**
@@ -768,8 +775,7 @@ public class BasicTreeUI
 	 */
 	public TreePath getEditingPath(JTree tree)
 	{
-		// FIXME: not implemented
-		return null;
+    return editingPath;
 	}
 
 	/**
@@ -946,8 +952,10 @@ public class BasicTreeUI
 	 */
 	protected TreeCellEditor createDefaultCellEditor()
 	{
-    return new DefaultTreeCellEditor(
-                                     tree,
+    if (currentCellRenderer != null)
+      return new DefaultTreeCellEditor(tree, (DefaultTreeCellRenderer) 
+                                       currentCellRenderer, cellEditor);
+    return new DefaultTreeCellEditor(tree,
                                      (DefaultTreeCellRenderer) createDefaultCellRenderer(),
                                      cellEditor);
 	}
@@ -1078,12 +1086,13 @@ public class BasicTreeUI
 
 	/**
 	 * Updates the cellEditor based on editability of the JTree that we're
-	 * contained in. Ig the tree is editable but doesn't have a cellEditor, a
+   * contained in. If the tree is editable but doesn't have a cellEditor, a
 	 * basic one will be used.
 	 */
 	protected void updateCellEditor()
 	{
-		// FIXME: not implemented
+    if (tree.isEditable() && cellEditor == null)
+      cellEditor = createDefaultCellEditor();
 	}
 
 	/**
@@ -1196,6 +1205,14 @@ public class BasicTreeUI
 		super.installUI(c);
 		installDefaults((JTree) c);
 		tree = (JTree) c;
+    
+    cellEditor = createDefaultCellEditor();
+    currentCellRenderer = createDefaultCellRenderer();
+    rendererPane = createCellRendererPane();
+    
+    createdRenderer = true;
+    createdCellEditor = true;
+    
     TreeModel mod = tree.getModel();
     setModel(mod);
       tree.setRootVisible(true);
@@ -1270,13 +1287,14 @@ public class BasicTreeUI
 	 */
 	protected void ensureRowsAreVisible(int beginRow, int endRow)
 	{
-		// FIXME: not implemented
+    //FIXME: not implemented
 	}
 
 	/**
 	 * Sets the preferred minimum size.
 	 * 
-	 * @param newSize is the new preferred minimum size.
+   * @param newSize
+   *          is the new preferred minimum size.
 	 */
 	public void setPreferredMinSize(Dimension newSize)
 	{
@@ -1378,7 +1396,7 @@ public class BasicTreeUI
 	 */
 	protected void completeEditing()
 	{
-		// FIXME: not implemented
+    completeEditing(false, true, false);
 	}
 
 	/**
@@ -1394,7 +1412,19 @@ public class BasicTreeUI
 	protected void completeEditing(boolean messageStop, boolean messageCancel,
 			boolean messageTree)
 	{
-		// FIXME: not implemented
+    if (messageStop)
+      {
+        getCellEditor().stopCellEditing();
+        stopEditingInCompleteEditing = true;
+      }
+    else if (messageCancel)
+      {
+        stopEditingInCompleteEditing = true;
+        getCellEditor().cancelCellEditing();
+      }
+    else if (messageTree)
+        tree.getModel().valueForPathChanged(tree.getLeadSelectionPath(),
+                                            editingPath);
 	}
 
 	/**
@@ -1407,7 +1437,36 @@ public class BasicTreeUI
 	 */
 	protected boolean startEditing(TreePath path, MouseEvent event)
 	{
-		// FIXME: not implemented
+    int x;
+    int y;
+    if (event == null)
+      {
+        Rectangle bounds = getPathBounds(tree, path);
+        x = bounds.x;
+        y = bounds.y;
+      }
+    else
+      {
+        x = event.getX();
+        y = event.getY();
+      }
+    
+    TreeCellEditor ed = getCellEditor();
+    if (ed == null)
+      updateCellEditor();
+    if(ed != null && ed.isCellEditable(event) && ed.shouldSelectCell(event))
+      {
+        editingPath = path;
+        editingRow = tree.getRowForPath(editingPath);
+        Object val = editingPath.getLastPathComponent();
+        boolean isLeaf = tree.getModel().isLeaf(val);
+        boolean expanded = tree.isExpanded(editingPath);
+        editingComponent = ed.getTreeCellEditorComponent(
+                     tree, val, true, expanded, isLeaf, editingRow);
+        cellEditor.addCellEditorListener(cellEditorListener);
+        stopEditingInCompleteEditing = false;
+        return true;
+      }
 		return false;
 	}
 
@@ -1627,6 +1686,11 @@ public class BasicTreeUI
 		 */
 		public void editingStopped(ChangeEvent e)
 		{
+      BasicTreeUI.this.editingPath = null;
+      BasicTreeUI.this.editingRow = -1;
+      BasicTreeUI.this.editingComponent = null;
+      BasicTreeUI.this.cellEditor = null;
+      BasicTreeUI.this.tree.repaint();
 		}
 
 		/**
@@ -1637,6 +1701,11 @@ public class BasicTreeUI
 		 */
 		public void editingCanceled(ChangeEvent e)
 		{
+      BasicTreeUI.this.editingPath = null;
+      BasicTreeUI.this.editingRow = -1;
+      BasicTreeUI.this.editingComponent = null;
+      BasicTreeUI.this.cellEditor = null;
+      BasicTreeUI.this.tree.repaint();
 		}
 	}// CellEditorHandler
 
@@ -1733,17 +1802,7 @@ public class BasicTreeUI
                   if (e.isControlDown())
                      tree.setLeadSelectionPath(newPath);
                   else if (!mod.isLeaf(next) && e.isShiftDown())
-                  {
                      BasicTreeUI.this.tree.expandPath(newPath);
-                      try
-                        {
-                          BasicTreeUI.this.tree.fireTreeWillExpand(newPath);
-                        }
-                      catch (ExpandVetoException ev)
-                        {
-                        }
-                     BasicTreeUI.this.tree.fireTreeExpanded(newPath);
-                  }
                }
             }
             // UP, KP_UP
@@ -1761,17 +1820,7 @@ public class BasicTreeUI
                   if (e.isControlDown())
                      tree.setLeadSelectionPath(newPath);
                   else if (!mod.isLeaf(prev) && e.isShiftDown())
-                  {
                      BasicTreeUI.this.tree.expandPath(newPath);
-                      try
-                        {
-                          BasicTreeUI.this.tree.fireTreeWillExpand(newPath);
-                        }
-                      catch (ExpandVetoException ev)
-                        {
-                        }
-                     BasicTreeUI.this.tree.fireTreeExpanded(newPath);
-                  }
             }
             }
             // LEFT, KP_LEFT
@@ -1782,17 +1831,7 @@ public class BasicTreeUI
               Object p = getParent(mod.getRoot(), last);
                
               if (!mod.isLeaf(last) && BasicTreeUI.this.tree.isExpanded(path))
-               {
                   BasicTreeUI.this.tree.collapsePath(path);
-                  try
-                    {
-                      BasicTreeUI.this.tree.fireTreeWillCollapse(path);
-                    }
-                  catch (ExpandVetoException ev)
-                    {
-                    }
-                  BasicTreeUI.this.tree.fireTreeCollapsed(path);
-               }
                else if (p != null)
                   BasicTreeUI.this.selectPath(BasicTreeUI.this.tree,
                                             new TreePath(getPathToRoot(p, 0)));
@@ -1804,17 +1843,7 @@ public class BasicTreeUI
               TreePath path = new TreePath(getPathToRoot(last, 0));
    
               if (!mod.isLeaf(last) && BasicTreeUI.this.tree.isCollapsed(path))
-               {
                   BasicTreeUI.this.tree.expandPath(path);
-                  try
-                    {
-                      BasicTreeUI.this.tree.fireTreeWillExpand(path);
-                    }
-                  catch (ExpandVetoException ev)
-                    {
-                    }
-                  BasicTreeUI.this.tree.fireTreeExpanded(path);
-               }
                else
                {
                   Object next = BasicTreeUI.this.getNextVisibleNode(last);
@@ -1835,29 +1864,9 @@ public class BasicTreeUI
               if (!mod.isLeaf(last))
                {
                   if (BasicTreeUI.this.tree.isExpanded(path))
-                  {
                      BasicTreeUI.this.tree.collapsePath(path);
-                      try
-                        {
-                          BasicTreeUI.this.tree.fireTreeWillCollapse(path);
-                        }
-                      catch (ExpandVetoException ev)
-                        {
-                        }
-                     BasicTreeUI.this.tree.fireTreeCollapsed(path);
-                  }
                   else
-                  {
                      BasicTreeUI.this.tree.expandPath(path);
-                      try
-                        {
-                          BasicTreeUI.this.tree.fireTreeWillExpand(path);
-                        }
-                      catch (ExpandVetoException ev)
-                        {
-                        }
-                     BasicTreeUI.this.tree.fireTreeExpanded(path);
-                  }
                }
             }
          }
@@ -1970,6 +1979,15 @@ public class BasicTreeUI
 		 */
 		public void mouseClicked(MouseEvent e)
 		{
+    }
+
+    /**
+     * Invoked when a mouse button has been pressed on a component.
+     * 
+     * @param e mouse event that occured
+     */
+    public void mousePressed(MouseEvent e)
+    {
 			Point click = e.getPoint();
          int row = Math.round(click.y / BasicTreeUI.this.getRowHeight());
       TreePath path = BasicTreeUI.this.getClosestPathForLocation(tree, click.x,
@@ -1989,8 +2007,8 @@ public class BasicTreeUI
             if (bounds.contains(click.x, click.y))
                inBounds = true;
             else if (BasicTreeUI.this.hasControlIcons()
-                   && (click.x < (bounds.x - rightChildIndent + 5) && click.x > (bounds.x
-                                                                                 - rightChildIndent - 5)))
+                   && (click.x < (bounds.x - rightChildIndent + 5) 
+                       && click.x > (bounds.x - rightChildIndent - 5)))
                cntlClick = true;
 
           if ((inBounds || cntlClick) && BasicTreeUI.this.tree.isVisible(path))
@@ -2013,44 +2031,20 @@ public class BasicTreeUI
                   lastClicked = null;
                   BasicTreeUI.this.tree.getSelectionModel().clearSelection();
             if (BasicTreeUI.this.tree.isExpanded(path))
-            {
                BasicTreeUI.this.tree.collapsePath(path);
-                      try
-                        {
-                          BasicTreeUI.this.tree.fireTreeWillCollapse(path);
-                        }
-                      catch (ExpandVetoException ev)
-                        {
-                        }
-               BasicTreeUI.this.tree.fireTreeCollapsed(path);
-            }
             else
-            {
                BasicTreeUI.this.tree.expandPath(path);
-                      try
-                        {
-                          BasicTreeUI.this.tree.fireTreeWillExpand(path);
-                        }
-                      catch (ExpandVetoException ev)
-                        {
-                        }
-               BasicTreeUI.this.tree.fireTreeExpanded(path);
-            }
 			}
             
             BasicTreeUI.this.selectPath(BasicTreeUI.this.tree, path);
+              
+              // If editing, but the moved to another cell then stop editing
+              if (!path.equals(BasicTreeUI.this.tree.getLeadSelectionPath()))
+                if (BasicTreeUI.this.tree.isEditing())
+                  BasicTreeUI.this.tree.stopEditing();
 		}
       }
       }
-
-		/**
-		 * Invoked when a mouse button has been pressed on a component.
-		 * 
-		 * @param e mouse event that occured
-		 */
-		public void mousePressed(MouseEvent e)
-		{
-		}
 
 		/**
 		 * Invoked when a mouse button has been released on a component.
@@ -2485,6 +2479,7 @@ public class BasicTreeUI
 		 */
 		public void valueChanged(TreeSelectionEvent event)
 		{
+      // FIXME: not implemented
 		}
 	}// TreeSelectionHandler
 
@@ -2582,7 +2577,7 @@ public class BasicTreeUI
       {
 		String s = cell.toString();
 		Font f = tree.getFont();
-		FontMetrics fm = tree.getToolkit().getFontMetrics(tree.getFont());
+        FontMetrics fm = tree.getToolkit().getFontMetrics(f);
 
         if (s != null)
           return new Rectangle(x, y,
@@ -2621,7 +2616,7 @@ public class BasicTreeUI
 			
       if (!mod.isLeaf(startNode)
         && tree.isExpanded(new TreePath(getPathToRoot(startNode, 0))) 
-        && mod.getChildCount(startNode) > 0)
+        && !mod.isLeaf(startNode) && mod.getChildCount(startNode) > 0)
       {
          Object child = mod.getChild(startNode, 0);
          if (child != null)
@@ -2709,7 +2704,9 @@ public class BasicTreeUI
             y0 += halfHeight;
           }
 
-        int max = mod.getChildCount(curr);
+        int max = 0;
+        if (!mod.isLeaf(curr))
+          max = mod.getChildCount(curr);
         if (tree.isExpanded(new TreePath(getPathToRoot(curr, 0))))
          {
             for (int i = 0; i < max; i++)
@@ -2733,7 +2730,7 @@ public class BasicTreeUI
       }
 
     if (tree.isExpanded(new TreePath(getPathToRoot(curr, 0))))
-      if (y0 != heightOfLine && mod.getChildCount(curr) > 0)
+      if (y0 != heightOfLine && !mod.isLeaf(curr) && mod.getChildCount(curr) > 0)
       {
 			g.setColor(getHashColor());
             g.drawLine(indentation + halfWidth, y0, indentation + halfWidth,
@@ -2778,7 +2775,9 @@ public class BasicTreeUI
          if (depth > 0 || tree.isRootVisible())
             descent += rowHeight;
          
-         int max = mod.getChildCount(node);
+        int max = 0;
+        if (!mod.isLeaf(node))
+          max = mod.getChildCount(node);
         if (tree.isExpanded(new TreePath(getPathToRoot(node, 0))))
          {
             if (!node.equals(mod.getRoot()))
@@ -2843,7 +2842,10 @@ public class BasicTreeUI
   private Object findNode(Object root, Object node)
   {
     TreeModel mod = tree.getModel();
-    for (int i = 0; i < mod.getChildCount(root); i++)
+    int size = 0;
+    if (!mod.isLeaf(root))
+      size = mod.getChildCount(root);
+    for (int i = 0; i < size; i++)
       {
         if (mod.getIndexOfChild(root, node) != -1)
           return root;
@@ -2931,7 +2933,7 @@ public class BasicTreeUI
   Object getNextNode(Object curr)
   {
     TreeModel mod = tree.getModel();
-    if (mod.getChildCount(curr) > 0)
+    if (!mod.isLeaf(curr) && mod.getChildCount(curr) > 0)
       return mod.getChild(curr, 0);
 
     Object node = curr;
@@ -2966,11 +2968,16 @@ public class BasicTreeUI
     if (sibling == null)
       return parent;
 
-    int size = mod.getChildCount(sibling);
+    int size = 0;
+    if (!mod.isLeaf(sibling))
+      size = mod.getChildCount(sibling);
     while (size > 0)
     {
         sibling = mod.getChild(sibling, size - 1);
+        if (!mod.isLeaf(sibling))
         size = mod.getChildCount(sibling);
+        else
+          size = 0;
     }
       
     return sibling;
@@ -2992,7 +2999,10 @@ public class BasicTreeUI
 
     int index = mod.getIndexOfChild(parent, node) + 1;
     
-    if (index == 0 || index >= mod.getChildCount(parent))
+    int size = 0;
+    if (!mod.isLeaf(parent))
+      size = mod.getChildCount(parent);
+    if (index == 0 || index >= size)
       return null;
 
     return mod.getChild(parent, index);
@@ -3014,7 +3024,10 @@ public class BasicTreeUI
 
     int index = mod.getIndexOfChild(parent, node) - 1;
 
-    if (index < 0 || index >= mod.getChildCount(parent))
+    int size = 0;
+    if (!mod.isLeaf(parent))
+      size = mod.getChildCount(parent);
+    if (index < 0 || index >= size)
       return null;
 
     return mod.getChild(parent, index);
@@ -3033,20 +3046,22 @@ public class BasicTreeUI
       {
          if (tree.isPathSelected(path))
             tree.removeSelectionPath(path);
-        else if (tree.getSelectionModel().getSelectionMode() == TreeSelectionModel.SINGLE_TREE_SELECTION)
+        else if (tree.getSelectionModel().getSelectionMode() == TreeSelectionModel.
+            DISCONTIGUOUS_TREE_SELECTION)
          {
-            tree.getSelectionModel().clearSelection();
             tree.addSelectionPath(path);
             tree.setLeadSelectionPath(path);
          }
-        else if (tree.getSelectionModel().getSelectionMode() == TreeSelectionModel.CONTIGUOUS_TREE_SELECTION)
+        else if (tree.getSelectionModel().getSelectionMode() == TreeSelectionModel.
+            CONTIGUOUS_TREE_SELECTION)
          {
             // TODO
          }
          else
          {
-            tree.getSelectionModel().setSelectionMode(
-                  TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
+            tree.getSelectionModel().setSelectionMode(TreeSelectionModel.
+                                                      SINGLE_TREE_SELECTION);
+              tree.getSelectionModel().clearSelection();
             tree.addSelectionPath(path);
             tree.setLeadSelectionPath(path);
          }
