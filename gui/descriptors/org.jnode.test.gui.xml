@@ -56,6 +56,7 @@
     <alias name="TextFieldTest" class="org.jnode.test.gui.TextFieldTest"/>
     <alias name="ThinTest"      class="thinlet.ThinTest"/>
     <alias name="GlyphTest"     class="org.jnode.test.gui.GlyphTest"/>
+    <alias name="RobotTest"     class="org.jnode.test.gui.RobotTest"/>
   </extension>
 
 </plugin>
