@@ -43,10 +43,13 @@ final class Mach64Surface extends AbstractSurface {
 
 	private final MemoryResource screen;
 
-	/**
-	 * @param width
-	 * @param height
-	 */
+    /**
+     *
+     * @param kernel
+     * @param config
+     * @param bitmapGraphics
+     * @param screen
+     */
 	public Mach64Surface(Mach64Core kernel, Mach64Configuration config,
 			BitmapGraphics bitmapGraphics, MemoryResource screen) {
 		super(config.getScreenWidth(), config.getScreenHeight());

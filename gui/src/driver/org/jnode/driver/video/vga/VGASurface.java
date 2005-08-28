@@ -32,7 +32,6 @@ import org.jnode.awt.util.AwtUtils;
 import org.jnode.awt.util.BitmapGraphics;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.video.FrameBufferConfiguration;
-import org.jnode.driver.video.Surface;
 import org.jnode.driver.video.util.AbstractSurface;
 import org.jnode.driver.video.vgahw.*;
 import org.jnode.system.ResourceNotFreeException;
@@ -147,7 +146,7 @@ public class VGASurface extends AbstractSurface implements VgaConstants {
 	}
 
     /**
-     * @see org.jnode.driver.video.Surface#drawAlphaRaster(java.awt.image.Raster, int, int, int, int, int, int, java.awt.Color)
+     * @see org.jnode.driver.video.Surface#drawAlphaRaster(java.awt.image.Raster, java.awt.geom.AffineTransform, int, int, int, int, int, int, java.awt.Color)
      */
     public void drawAlphaRaster(Raster raster, AffineTransform tx, int srcX, int srcY, int dstX,
             int dstY, int width, int height, Color color) {
