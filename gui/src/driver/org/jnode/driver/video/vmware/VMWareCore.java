@@ -919,7 +919,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	}
 	
     /**
-     * @see org.jnode.driver.video.Surface#drawAlphaRaster(java.awt.image.Raster, int, int, int, int, int, int, java.awt.Color)
+     * @see org.jnode.driver.video.Surface#drawAlphaRaster(java.awt.image.Raster, java.awt.geom.AffineTransform, int, int, int, int, int, int, java.awt.Color)
      */
     public void drawAlphaRaster(Raster raster, AffineTransform tx, int srcX, int srcY, int dstX,
             int dstY, int width, int height, Color color) {
