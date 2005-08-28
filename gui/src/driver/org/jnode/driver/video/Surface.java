@@ -23,6 +23,7 @@ package org.jnode.driver.video;
 
 import java.awt.Color;
 import java.awt.Shape;
+import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.ColorModel;
 import java.awt.image.Raster;
@@ -32,6 +33,7 @@ import java.awt.image.Raster;
  * be painted on.
  * 
  * @author epr
+ * @author Levente S\u00e1ntha
  */
 public interface Surface {
 
@@ -106,7 +108,22 @@ public interface Surface {
 	 */
 	public ColorModel getColorModel();
 
-	/**
+    /**
+     * Gets the color or the pixel at the specified screen coordinates.
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @return the RGB color value of the pixel
+     */
+    int getRGBPixel (int x, int y);
+
+    /**
+     * Gets the pixels from the specifed region region.
+     * @param region a rectangular region of the screen in screen coordinates
+     * @return the array of RGB pixel values
+     */
+    int[] getRGBPixels (Rectangle region);
+
+    /**
 	 * Close this surface
 	 */
 	public void close();

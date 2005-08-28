@@ -40,7 +40,7 @@ import org.jnode.system.ResourceNotFreeException;
 /**
  * @author epr
  */
-public class VGASurface extends AbstractSurface implements Surface, VgaConstants {
+public class VGASurface extends AbstractSurface implements VgaConstants {
 
 	private final VGADriver driver;
 	private final StandardVGA vga;

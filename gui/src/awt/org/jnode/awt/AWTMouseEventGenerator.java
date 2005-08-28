@@ -18,6 +18,7 @@ import java.awt.event.MouseEvent;
  * @author Levente S\u00e1ntha
  */
 public class AWTMouseEventGenerator implements PointerListener {
+    private static final Logger log = Logger.getLogger(AWTMouseEventGenerator.class);
 
     private static final int[] BUTTON_MASK = {
             PointerEvent.BUTTON_LEFT, PointerEvent.BUTTON_RIGHT, PointerEvent.BUTTON_MIDDLE
@@ -38,11 +39,6 @@ public class AWTMouseEventGenerator implements PointerListener {
     private int[] buttonClickCount = new int[3];
     private long[] buttonClickTime = new long[3];
     private boolean postClicked = false;
-
-    /**
-     * My logger
-     */
-    private static final Logger log = Logger.getLogger(MouseHandler.class);
 
     private Component lastSource;
     private Component dragSource;

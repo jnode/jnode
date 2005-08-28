@@ -35,6 +35,7 @@ import org.jnode.driver.video.Surface;
  * Abstract and generic implementation of a Surface.
  * 
  * @author epr
+ * @author Levente S\u00e1ntha
  */
 public abstract class AbstractSurface implements Surface {
 
@@ -355,7 +356,21 @@ public abstract class AbstractSurface implements Surface {
 	 */
 	protected abstract int convertColor(Color color);
 
-	protected void setSize(int width, int height) {
+    /**
+     * @see org.jnode.driver.video.Surface#getRGBPixel(int, int)
+     */
+    public int getRGBPixel(int x, int y) {
+        throw new RuntimeException("getRGBPixel(int,int) is not implemented for this video driver");
+    }
+
+    /**
+     * @see org.jnode.driver.video.Surface#getRGBPixels(java.awt.Rectangle)
+     */
+    public int[] getRGBPixels(Rectangle region) {
+        throw new RuntimeException("getRGBPixels(Rectangle) is not implemented for this video driver");
+    }
+
+    protected void setSize(int width, int height) {
 		this.width = width;
 		this.height = height;
 	}
