@@ -287,11 +287,6 @@ public final class SwingToolkit extends JNodeToolkit {
 		return new SwingPopupMenuPeer(this, target);
 	}
 
-	public RobotPeer createRobot(GraphicsDevice screen) throws AWTException {
-		// TODO implement me
-		throw new AWTException("Not implemented");
-	}
-
 	protected ScrollbarPeer createScrollbar(Scrollbar target) {
 		return new SwingScrollbarPeer(this, target);
 	}
