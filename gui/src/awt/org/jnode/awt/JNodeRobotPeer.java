@@ -23,6 +23,9 @@ import org.jnode.driver.input.PointerAPI;
 import org.jnode.driver.input.PointerEvent;
 import org.jnode.shell.help.ParsedArguments;
 
+/**
+ * @author Levente S\u00e1ntha
+ */
 public class JNodeRobotPeer<toolkitT extends JNodeToolkit> extends
         JNodeGenericPeer<toolkitT, GraphicsDevice> implements RobotPeer {
 
@@ -44,6 +47,8 @@ public class JNodeRobotPeer<toolkitT extends JNodeToolkit> extends
      * @see java.awt.peer.RobotPeer#getRGBPixel(int, int)
      */    
     public int getRGBPixel(int x, int y) {
+        return toolkit.getGraphics().getRGBPixel(x,y);
+        /*
         //JNodeToolkit.createImage -> JNodeImage.getPixelColor
         //getToolkitImpl().getAwtContext().getAwtRoot().getGraphics().copyArea(x, y, width, height, dx, dy)setColor(null);
         final JNodeImage screen = null; //TODO get screen image
@@ -56,6 +61,7 @@ public class JNodeRobotPeer<toolkitT extends JNodeToolkit> extends
         catch (InterruptedException e)  { }
         
         return pixel[0];
+        */
     }
 
     /**
@@ -69,12 +75,15 @@ public class JNodeRobotPeer<toolkitT extends JNodeToolkit> extends
      *
      * @see java.awt.peer.RobotPeer#getRGBPixels(java.awt.Rectangle)
      */
-    public int[] getRGBPixels(Rectangle screen) {
+    public int[] getRGBPixels(Rectangle screenRect) {
+        return toolkit.getGraphics().getRGBPixels(screenRect);
+        /*
         final int w = (int)screen.getWidth();
         final int h = (int)screen.getHeight();
         final int[] pixels = new int[w * h];
         // TODO fill the array
         return pixels;
+        */
     }
 
     /**

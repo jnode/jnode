@@ -55,6 +55,7 @@ import org.vmmagic.unboxed.Address;
 
 /**
  * @author epr
+ * @author Levente S\u00e1ntha
  */
 public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_IDs, HardwareCursorAPI {
 
@@ -924,5 +925,13 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
     public void drawAlphaRaster(Raster raster, AffineTransform tx, int srcX, int srcY, int dstX,
             int dstY, int width, int height, Color color) {
         bitmapGraphics.drawAlphaRaster(raster, tx, srcX, srcY, dstX, dstY, width, height, convertColor(color));
+    }
+
+    public int getRGBPixel(int x, int y) {
+        return bitmapGraphics.doGetPixel(x, y);
+    }
+
+    public int[] getRGBPixels(Rectangle region) {
+        return bitmapGraphics.doGetPixels(region);
     }
 }

@@ -29,6 +29,7 @@ import java.awt.image.DataBufferInt;
 import java.awt.image.DataBufferShort;
 import java.awt.image.DataBufferUShort;
 import java.awt.image.Raster;
+import java.awt.Rectangle;
 
 import javax.naming.NamingException;
 
@@ -41,6 +42,7 @@ import org.jnode.system.ResourceManager;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
+ * @author Levente S\u00e1ntha
  */
 public abstract class BitmapGraphics {
 
@@ -87,6 +89,18 @@ public abstract class BitmapGraphics {
                 int dstX, int dstY, int width, int height, int bgColor) {
             // TODO Implement me
             log.error("Not implemented");
+        }
+
+        public int doGetPixel(int x, int y) {
+            // TODO Implement me
+            log.error("Not implemented");
+            return 0;
+        }
+
+        public int[] doGetPixels(Rectangle r) {
+            // TODO Implement me
+            log.error("Not implemented");
+            return new int[0];
         }
 
         protected final void doDrawLine(int x, int y, int w, int color, int mode) {
@@ -152,6 +166,25 @@ public abstract class BitmapGraphics {
                 int dstX, int dstY, int width, int height, int color) {
             // TODO Implement me
             log.error("Not implemented");
+        }
+
+        public int doGetPixel(int x, int y) {
+            final int ofs = offset + (y * bytesPerLine) + (x * 3);
+            return mem.getInt(ofs);
+        }
+
+        public int[] doGetPixels(Rectangle r) {
+            int x = r.x;
+            int y = r.y;
+            int w = r.width;
+            int h = r.height;
+            int[] ret = new int[w*h];
+            for(int i = 0; i < w; i++)
+                for(int j = 0; j < h; j++){
+                    final int ofs = offset + ((j + y) * bytesPerLine) + ((i + x) * 3);
+                    ret[j*w + i] = mem.getInt(ofs);
+                }
+            return ret;
         }
 
         protected void doDrawLine(int x, int y, int w, int color, int mode) {
@@ -273,6 +306,22 @@ public abstract class BitmapGraphics {
             }
         }
 
+        public final int doGetPixel(int x, int y) {
+            return mem.getInt(offset + (y * bytesPerLine) + (x << 2));
+        }
+
+        public final int[] doGetPixels(Rectangle r) {
+            int x = r.x;
+            int y = r.y;
+            int w = r.width;
+            int h = r.height;
+            int[] ret = new int[w*h];
+            for(int j = 0; j < h; j++) {
+                mem.getInts(offset + ((j + y) * bytesPerLine) + ( x << 2), ret, j*w, w);
+            }
+            return ret;
+        }
+
         private final int[] getPixelBuffer(int width) {
             if ((pixelBuffer == null) || (pixelBuffer.length < width)) {
                 pixelBuffer = new int[width];
@@ -332,6 +381,18 @@ public abstract class BitmapGraphics {
                 int dstX, int dstY, int width, int height, int color) {
             // TODO Implement me
             log.error("Not implemented");
+        }
+
+        public int doGetPixel(int x, int y) {
+            // TODO Implement me
+            log.error("Not implemented");
+            return 0;
+        }
+
+        public int[] doGetPixels(Rectangle r) {
+            // TODO Implement me
+            log.error("Not implemented");
+            return new int[0];
         }
 
         protected void doDrawLine(int x, int y, int w, int color, int mode) {
@@ -589,6 +650,23 @@ public abstract class BitmapGraphics {
      */
     protected abstract void doDrawPixels(int x, int y, int count, int color,
             int mode);
+
+    /**
+     * Return the pixel value at the specified location.
+     *
+     * @param x x coordinate
+     * @param y y coordinate
+     * @return the pixel value
+     */
+    public abstract int doGetPixel(int x, int y);
+
+    /**
+     * Return the pixels value from the specified region.
+     *
+     * @param r a rectangular region
+     * @return the pixel values
+     */
+    public abstract int[] doGetPixels(Rectangle r);
 
     /**
      * Draw an image to this surface
