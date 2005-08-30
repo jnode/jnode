@@ -22,6 +22,7 @@
 package org.jnode.driver.video.vga;
 
 import java.awt.image.Raster;
+import java.awt.Rectangle;
 
 import org.jnode.awt.util.BitmapGraphics;
 
@@ -185,5 +186,15 @@ public class VGABitmapGraphics extends BitmapGraphics {
     protected void doDrawAlphaRaster(Raster raster, int srcX, int srcY,
             int dstX, int dstY, int width, int height, int color) {
         // TODO Implement me
+    }
+
+    public int doGetPixel(int x, int y) {
+        // TODO Implement me
+        return 0;
+    }
+
+    public int[] doGetPixels(Rectangle r) {
+        // TODO Implement me
+        return new int[0];
     }
 }
