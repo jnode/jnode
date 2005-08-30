@@ -10,20 +10,26 @@ import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Robot;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JButton;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.JPanel;
+import javax.swing.JFrame;
 
 /**
  * @author Levente S\u00e1ntha
  */
-public class RobotTest extends Canvas {
+public class RobotTest extends JPanel {
     private static BufferedImage image;
+    private static Color crtColor = Color.BLACK;
     public RobotTest(){
         setBackground(Color.BLACK);
     }
@@ -48,10 +54,12 @@ public class RobotTest extends Canvas {
         if(image != null){
             g.drawImage(image, 200,200, this);
         }
+        g.setColor(crtColor);
+        g.fillRect(25,225, 50,50);
     }
 
-    public static void main(String[] argv) throws AWTException {        
-        final Frame f = new Frame();
+    public static void main(String[] argv) throws AWTException {
+        final JFrame f = new JFrame();
         final JButton b = new JButton("Click me");
         final JTextField tf = new JTextField();
         final RobotTest t = new RobotTest();
@@ -61,11 +69,11 @@ public class RobotTest extends Canvas {
         f.pack();
         f.setLocation(0,0);
         f.setVisible(true);
-        
-        Robot r = new Robot();
+
+        final Robot r = new Robot();
         r.setAutoDelay(50);
         r.delay(1000);
-//        image = r.createScreenCapture(new Rectangle(0,0,200,200));
+        image = r.createScreenCapture(new Rectangle(0,0,200,200));
         t.repaint();
 //        for(int i = 0; i < 400; i++){
 //            r.mouseMove(i, i);
@@ -76,13 +84,13 @@ public class RobotTest extends Canvas {
                     public void actionPerformed(ActionEvent event)
                     {
                         tf.setText("Clicked !");
-                    }                    
+                    }
                 });
-        
+
         moveToCenterOfComponent(r, b);
         r.mousePress(InputEvent.BUTTON1_MASK);
         r.mouseRelease(InputEvent.BUTTON1_MASK);
-                
+
         Point p = f.getLocationOnScreen();
         p.translate(f.getWidth()/2, 5);
         r.mouseMove((int) p.getX(), (int) p.getY());
@@ -92,12 +100,24 @@ public class RobotTest extends Canvas {
             r.mouseMove((int) p.getX()+i, (int) p.getY()+i);
         }
         r.mouseRelease(InputEvent.BUTTON1_MASK);
+        t.addMouseMotionListener(new MouseMotionAdapter() {
+            public void mouseMoved(MouseEvent event) {
+                Point p = event.getPoint();
+                SwingUtilities.convertPointToScreen(p, t);
+                crtColor = r.getPixelColor(p.x, p.y);
+                //Graphics g = t.getGraphics();
+                //g.setColor(crtColor);
+                //g.fillRect(25,225, 50,50);
+                t.repaint();
+
+            }
+        });
     }
-    
+
     private static final void moveToCenterOfComponent(Robot r, Component c)
     {
         Point p = c.getLocationOnScreen();
         p.translate(c.getWidth()/2, c.getHeight()/2);
-        r.mouseMove((int) p.getX(), (int) p.getY());        
+        r.mouseMove((int) p.getX(), (int) p.getY());
     }
 }
