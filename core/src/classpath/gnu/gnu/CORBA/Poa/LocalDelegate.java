@@ -59,21 +59,19 @@ import org.omg.CORBA.portable.InputStream;
 import org.omg.CORBA.portable.InvokeHandler;
 import org.omg.CORBA.portable.ObjectImpl;
 import org.omg.CORBA.portable.OutputStream;
-import org.omg.CORBA_2_3.portable.Delegate;
+import org.omg.CORBA.portable.RemarshalException;
 import org.omg.PortableServer.ServantLocatorPackage.CookieHolder;
 
 import java.util.Arrays;
 
 /**
- * A local delegate, transferring all object requests to the locally
- * available servant. This class is involved in handling the method
- * invocations on the local object, obtained by
- * POA.create_reference_with_id.
+ * A local delegate, transferring all object requests to the locally available
+ * servant. This class is involved in handling the method invocations on the
+ * local object, obtained by POA.create_reference_with_id.
  *
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public class LocalDelegate
-  extends org.omg.CORBA_2_3.portable.Delegate
+public class LocalDelegate extends org.omg.CORBA_2_3.portable.Delegate
 {
   /**
    * The same servant as an invocation handler.
@@ -84,8 +82,8 @@ public class LocalDelegate
   final byte[] Id;
 
   /**
-   * Create a local delegate, forwarding requests to the
-   * servant that must also be an invocation handler.
+   * Create a local delegate, forwarding requests to the servant that must also
+   * be an invocation handler.
    */
   public LocalDelegate(gnuServantObject an_object, gnuPOA a_poa, byte[] an_id)
   {
@@ -159,10 +157,10 @@ public class LocalDelegate
 
   /**
    * Check if this object could be named by the given repository id.
+   *
    * @param idl_id the repository id to check.
    *
-   * @return true if it is one of the possible repository ids of this
-   * object.
+   * @return true if it is one of the possible repository ids of this object.
    */
   public boolean is_a(org.omg.CORBA.Object a_servant, String idl_id)
   {
@@ -187,9 +185,8 @@ public class LocalDelegate
    * Create request for using with DII.
    */
   public Request create_request(org.omg.CORBA.Object target, Context context,
-                                String method, NVList parameters,
-                                NamedValue returns, ExceptionList exceptions,
-                                ContextList ctx_list
+    String method, NVList parameters, NamedValue returns,
+    ExceptionList exceptions, ContextList ctx_list
                                )
   {
     operation = method;
@@ -207,8 +204,7 @@ public class LocalDelegate
    * Create request for using with DII.
    */
   public Request create_request(org.omg.CORBA.Object target, Context context,
-                                String method, NVList parameters,
-                                NamedValue returns
+    String method, NVList parameters, NamedValue returns
                                )
   {
     operation = method;
@@ -237,7 +233,8 @@ public class LocalDelegate
    *
    * @return the stream where the method arguments should be written.
    */
-  public org.omg.CORBA.portable.OutputStream request(org.omg.CORBA.Object target,
+  public org.omg.CORBA.portable.OutputStream request(
+    org.omg.CORBA.Object target,
                                                      String method,
                                                      boolean response_expected
                                                     )
@@ -285,18 +282,21 @@ public class LocalDelegate
    * Make an invocation.
    *
    * @param target not in use.
-   * @param output the stream request that should be returned by {@link #request}
-   * in this method.
-   * @throws ApplicationException if the use exception is thrown by
-   * the servant method.
+   * @param output the stream request that should be returned by
+   * {@link #m_request} in this method.
+   * @throws ApplicationException if the use exception is thrown by the servant
+   * method.
    */
   public InputStream invoke(org.omg.CORBA.Object target, OutputStream output)
                      throws ApplicationException
   {
+    try
+      {
     streamRequest sr = (streamRequest) output;
 
     LocalRequest lr = (LocalRequest) sr.request;
-    InvokeHandler handler = lr.object.getHandler(lr.operation(), lr.cookie, false);
+        InvokeHandler handler =
+          lr.object.getHandler(lr.operation(), lr.cookie, false);
 
     if (handler instanceof dynImpHandler)
       {
@@ -352,7 +352,27 @@ public class LocalDelegate
         return buf.create_input_stream();
       }
     else
-      return ((LocalRequest) sr.request).s_invoke(handler);
+          {
+            LocalRequest lrq = (LocalRequest) sr.request;
+            return lrq.s_invoke(handler);
+          }
+      }
+    catch (gnuForwardRequest f)
+      {
+        try
+          {
+            return ((ObjectImpl) f.forward_reference)._invoke(f.forward_reference._request(
+                operation,
+                true
+              )
+            );
+          }
+        catch (RemarshalException e)
+          {
+            // Never thrown in this place by Classpath implementation.
+            throw new NO_IMPLEMENT();
+          }
+      }
   }
 
   public void releaseReply(org.omg.CORBA.Object target, InputStream input)

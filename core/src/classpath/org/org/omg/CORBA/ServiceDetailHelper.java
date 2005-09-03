@@ -38,9 +38,10 @@ exception statement from your version. */
 
 package org.omg.CORBA;
 
+import gnu.CORBA.ServiceDetailHolder;
+
 import org.omg.CORBA.portable.InputStream;
 import org.omg.CORBA.portable.OutputStream;
-import gnu.CORBA.*;
 
 /**
  * The helper operations on the Service Detail.

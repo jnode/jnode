@@ -49,11 +49,13 @@ import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JTextField;
 import javax.swing.border.AbstractBorder;
 import javax.swing.border.Border;
 import javax.swing.plaf.BorderUIResource;
 import javax.swing.plaf.UIResource;
 import javax.swing.plaf.basic.BasicBorders;
+
 
 /**
  * This factory class creates borders for the different Swing components
@@ -69,6 +71,9 @@ public class MetalBorders
 
   /** The shared instance for getRolloverButtonBorder(). */
   private static Border toolbarButtonBorder;
+
+  /** The shared instance for getTextFieldBorder(). */
+  private static Border textFieldBorder;
 
   /**
    * A MarginBorder that gets shared by multiple components.
@@ -183,6 +188,116 @@ public class MetalBorders
       newInsets.top = borderInsets.top;
       return newInsets;
     }
+  }
+
+  /**
+   * A simple 3D border.
+   */
+  public static class Flush3DBorder extends AbstractBorder
+    implements UIResource
+  {
+    /**
+     * Creates a new border instance.
+     */
+    public Flush3DBorder()
+    {
+    }
+    
+    /**
+     * Returns the border insets.
+     * 
+     * @param c  the component (ignored).
+     * 
+     * @return The border insets.
+     */
+    public Insets getBorderInsets(Component c)
+    {
+      return getBorderInsets(c, null);
+    }
+    
+    /**
+     * Returns the border insets.
+     * 
+     * @param c  the component (ignored).
+     * @return The border insets.
+     */
+    public Insets getBorderInsets(Component c, Insets newInsets)
+    {
+      if (newInsets == null)
+        newInsets = new Insets(2, 2, 2, 2);
+      else
+        {
+          newInsets.top = 2;
+          newInsets.left = 2;
+          newInsets.bottom = 2;
+          newInsets.right = 2;
+        }
+      return newInsets;  
+    }
+    
+    /**
+     * Paints the border for the specified component.
+     * 
+     * @param c  the component (ignored).
+     * @param g  the graphics device.
+     * @param x  the x-coordinate.
+     * @param y  the y-coordinate.
+     * @param w  the width.
+     * @param h  the height.
+     */
+    public void paintBorder(Component c, Graphics g, int x, int y, int w, 
+        int h)
+    {              
+      Color savedColor = g.getColor();
+      g.setColor(MetalLookAndFeel.getControlDarkShadow());
+      g.drawRect(x, y, w - 2, h - 2);
+      g.setColor(MetalLookAndFeel.getControlHighlight());
+      g.drawRect(x + 1, y + 1, w - 2, h - 2);
+      g.setColor(MetalLookAndFeel.getControl());
+      g.drawLine(x + 1, y + h - 2, x + 1, y + h - 2);
+      g.drawLine(x + w - 2, y + 1, x + w - 2, y + 1);
+      g.setColor(savedColor);
+    }
+    
+  }
+    
+  /**
+   * A border used for the {@link JTextField} component.
+   */
+  public static class TextFieldBorder extends Flush3DBorder
+    implements UIResource
+  {
+    /**
+     * Creates a new border instance.
+     */
+    public TextFieldBorder()
+    {
+    }
+    
+    /**
+     * Paints the border for the specified component.
+     * 
+     * @param c  the component (ignored).
+     * @param g  the graphics device.
+     * @param x  the x-coordinate.
+     * @param y  the y-coordinate.
+     * @param w  the width.
+     * @param h  the height.
+     */
+    public void paintBorder(Component c, Graphics g, int x, int y, int w, 
+        int h)
+    {        
+      if (c.isEnabled())
+        super.paintBorder(c, g, x, y, w, h);
+      else
+        {
+          Color savedColor = g.getColor();
+          g.setColor(MetalLookAndFeel.getControlShadow());
+          g.drawRect(x, y, w - 1, h - 1);
+          g.setColor(savedColor);
+        }
+    }
+    
   }
 
   /**
@@ -669,6 +784,20 @@ public class MetalBorders
             (outer, inner);
       }
     return buttonBorder;
+  }
+
+  /**
+   * Returns a border for use by the {@link JTextField} component.
+   * 
+   * @return A border.
+   * 
+   * @since 1.3
+   */
+  public static Border getTextFieldBorder()
+  {
+    if (textFieldBorder == null)
+      textFieldBorder = new TextFieldBorder();
+    return textFieldBorder;
   }
 
   /**

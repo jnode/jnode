@@ -46,7 +46,7 @@ import org.omg.CORBA.DataOutputStream;
 import org.omg.CORBA.MARSHAL;
 import org.omg.CORBA.NO_IMPLEMENT;
 import org.omg.CORBA.StringSeqHelper;
-import org.omg.CORBA.portable.*;
+import org.omg.CORBA.portable.BoxedValueHelper;
 import org.omg.CORBA.portable.InputStream;
 import org.omg.CORBA.portable.OutputStream;
 import org.omg.CORBA.portable.Streamable;
@@ -686,8 +686,7 @@ public abstract class Vio
               helperClass.getMethod("write",
                                     new Class[]
                                     {
-                                      org.omg.CORBA.portable.OutputStream.class,
-                                      value.getClass()
+                  org.omg.CORBA.portable.OutputStream.class, value.getClass()
                                     }
                                    );
             write.invoke(null, new Object[] { outObj, value });
@@ -701,8 +700,7 @@ public abstract class Vio
       // Stating the interfaces that the USER should use.
         if (!ok)
       throw new MARSHAL("The " + value.getClass().getName() +
-                            " must implement either StreamableValue" +
-                            " or CustomValue."
+            " must implement either StreamableValue" + " or CustomValue."
                        );
       }
 
@@ -731,8 +729,7 @@ public abstract class Vio
    *
    * @throws NO_IMPLEMENT, always.
    */
-  static void incorrect_plug_in(Throwable ex)
-                                 throws NO_IMPLEMENT
+  static void incorrect_plug_in(Throwable ex) throws NO_IMPLEMENT
   {
     NO_IMPLEMENT no = new NO_IMPLEMENT("Incorrect CORBA plug-in");
     no.initCause(ex);
@@ -749,7 +746,8 @@ public abstract class Vio
   private static final void checkTag(int value_tag)
   {
     if ((value_tag < 0x7fffff00 || value_tag > 0x7fffffff) &&
-        value_tag != vt_NULL && value_tag != vt_INDIRECTION
+      value_tag != vt_NULL &&
+      value_tag != vt_INDIRECTION
        )
       throw new MARSHAL("Invalid value record, unsupported header tag: " +
                         value_tag

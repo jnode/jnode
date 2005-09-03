@@ -49,6 +49,7 @@ import javax.swing.plaf.FontUIResource;
 import javax.swing.plaf.InsetsUIResource;
 import javax.swing.plaf.basic.BasicLookAndFeel;
 
+
 /**
  * A custom look and feel that is designed to look similar across different
  * operating systems.
@@ -797,8 +798,8 @@ public class MetalLookAndFeel extends BasicLookAndFeel
         MetalIconFactory.getInternalFrameMinimizeIcon(16),
       "Label.background", new ColorUIResource(getControl()),
       "Label.font", getControlTextFont(),
-      "Label.disabledForeground", new ColorUIResource(getControlDisabled()),
-      "Label.foreground", new ColorUIResource(getSystemTextColor()),
+      "Label.disabledForeground", new ColorUIResource(getInactiveControlTextColor()),
+      "Label.foreground", new ColorUIResource(getControlTextColor()),
       "Menu.background", new ColorUIResource(getControl()),
       "Menu.border", new MetalBorders.MenuItemBorder(),
       "Menu.borderPainted", Boolean.TRUE,
@@ -822,6 +823,18 @@ public class MetalLookAndFeel extends BasicLookAndFeel
             return MetalIconFactory.getRadioButtonIcon();
           }
       },
+
+      "RadioButtonMenuItem.border", new MetalBorders.MenuItemBorder(),
+      "RadioButtonMenuItem.borderPainted", Boolean.TRUE,
+      "RadioButtonMenuItem.checkIcon", 
+        MetalIconFactory.getRadioButtonMenuItemIcon(),
+      "RadioButtonMenuItem.font", MetalLookAndFeel.getControlTextFont(),
+      "RadioButtonMenuItem.margin", new InsetsUIResource(2, 2, 2, 2),
+      "RadioButtonMenuItem.selectionBackground", 
+        MetalLookAndFeel.getMenuSelectedBackground(),
+      "RadioButtonMenuItem.selectionForeground", 
+        MetalLookAndFeel.getMenuSelectedForeground(),
+
       "ScrollBar.background", new ColorUIResource(getControl()),
       "ScrollBar.shadow", new ColorUIResource(getControlShadow()),
       "ScrollBar.thumb", new ColorUIResource(getPrimaryControlShadow()),
@@ -843,6 +856,11 @@ public class MetalLookAndFeel extends BasicLookAndFeel
       "Slider.trackWidth", new Integer(7),
       "Slider.majorTickLength", new Integer(6),
       
+      "TabbedPane.font", new FontUIResource("Dialog", Font.BOLD, 12),
+      "TabbedPane.tabInsets", new InsetsUIResource(0, 9, 1, 9),
+      "TabbedPane.selectedTabPadInsets", new InsetsUIResource(2, 2, 2, 1),
+      "TabbedPane.tabAreaInsets", new InsetsUIResource(4, 2, 0, 6),
+
       "ToggleButton.background", new ColorUIResource(getControl()),
       "ToggleButton.border", MetalBorders.getButtonBorder(),
       "ToggleButton.darkShadow", new ColorUIResource(getControlDarkShadow()),

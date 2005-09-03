@@ -38,6 +38,8 @@ exception statement from your version. */
 
 package org.omg.PortableInterceptor.ORBInitInfoPackage;
 
+import gnu.CORBA.*;
+
 import org.omg.CORBA.Any;
 import org.omg.CORBA.BAD_OPERATION;
 import org.omg.CORBA.ORB;
@@ -46,13 +48,12 @@ import org.omg.CORBA.TCKind;
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.portable.InputStream;
 import org.omg.CORBA.portable.OutputStream;
-import gnu.CORBA.*;
 
 /**
-* The helper operations for the exception {@link DuplicateName}.
-*
-* @author Audrius Meskauskas, Lithiania (AudriusA@Bioinformatics.org)
-*/
+ * The helper operations for the exception {@link DuplicateName}.
+ *
+ * @author Audrius Meskauskas, Lithiania (AudriusA@Bioinformatics.org)
+ */
 public abstract class DuplicateNameHelper
 {
   /**

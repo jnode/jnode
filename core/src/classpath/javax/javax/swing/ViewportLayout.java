@@ -69,7 +69,11 @@ public class ViewportLayout implements LayoutManager, Serializable
     JViewport vp = (JViewport)parent;
     Component view = vp.getView();
     if (view != null)
+      {
+        if (view instanceof Scrollable)
+          return ((Scrollable)view).getPreferredScrollableViewportSize();
       return view.getPreferredSize();
+      }
     else
       return new Dimension();
 	}
@@ -139,6 +143,7 @@ public class ViewportLayout implements LayoutManager, Serializable
     if (portBounds.height >= viewMinimum.height)
       {
         portBounds.y = 0;
+        if ( !(view instanceof Scrollable) || ((Scrollable)view).getScrollableTracksViewportHeight())
         viewPref.height = portBounds.height;
       }
     else
@@ -153,6 +158,7 @@ public class ViewportLayout implements LayoutManager, Serializable
     if (portBounds.width >= viewMinimum.width)
       {
         portBounds.x = 0;
+        if ( !(view instanceof Scrollable) || ((Scrollable)view).getScrollableTracksViewportWidth())
         viewPref.width = portBounds.width;
       }
     else

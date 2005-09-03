@@ -48,6 +48,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JInternalFrame;
 import javax.swing.JRadioButton;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSlider;
 import javax.swing.plaf.UIResource;
 
@@ -383,6 +384,82 @@ public class MetalIconFactory implements Serializable
   }
 
     /**
+   * An icon displayed for {@link JRadioButtonMenuItem} components.
+   */
+  private static class RadioButtonMenuItemIcon 
+      implements Icon, Serializable 
+  {
+    /**
+     * Creates a new icon instance.
+     */
+    public RadioButtonMenuItemIcon() 
+    {  
+    }
+
+    /**
+     * Returns the width of the icon, in pixels.
+     * 
+     * @return The width of the icon.
+     */
+    public int getIconWidth() 
+    {
+      return 10;
+    }
+
+    /**
+     * Returns the height of the icon, in pixels.
+     * 
+     * @return The height of the icon.
+     */
+    public int getIconHeight()   
+    {
+      return 10;
+    }
+
+    /**
+     * Paints the icon.
+     * 
+     * @param c  the component.
+     * @param g  the graphics device.
+     * @param x  the x-coordinate.
+     * @param y  the y-coordinate.
+     */
+    public void paintIcon(Component c, Graphics g, int x, int y) 
+    {
+      Color savedColor = g.getColor();
+      JRadioButtonMenuItem item = (JRadioButtonMenuItem) c;
+      g.setColor(MetalLookAndFeel.getBlack());
+      g.drawLine(x + 2, y, x + 6, y);
+      g.drawLine(x + 7, y + 1, x + 7, y + 1);
+      g.drawLine(x + 8, y + 2, x + 8, y + 6);
+      g.drawLine(x + 7, y + 7, x + 7, y + 7);
+      g.drawLine(x + 2, y + 8, x + 6, y + 8);
+      g.drawLine(x + 1, y + 7, x + 1, y + 7);
+      g.drawLine(x, y + 2, x, y + 6);
+      g.drawLine(x + 1, y + 1, x + 1, y + 1);
+      
+      if (item.isSelected())
+        {
+          g.drawLine(x + 3, y + 2, x + 5, y + 2);
+          g.fillRect(x + 2, y + 3, 5, 3);
+          g.drawLine(x + 3, y + 6, x + 5, y + 6);
+        }
+
+      // highlight
+      g.setColor(MetalLookAndFeel.getControlHighlight());
+      g.drawLine(x + 3, y + 1, x + 6, y + 1);
+      g.drawLine(x + 8, y + 1, x + 8, y + 1);
+      g.drawLine(x + 9, y + 2, x + 9, y + 7);
+      g.drawLine(x + 8, y + 8, x + 8, y + 8);
+      g.drawLine(x + 2, y + 9, x + 7, y + 9);
+      g.drawLine(x + 1, y + 8, x + 1, y + 8);
+      g.drawLine(x + 1, y + 3, x + 1, y + 6);
+      g.drawLine(x + 2, y + 2, x + 2, y + 2);
+      g.setColor(savedColor);
+    }        
+  }
+
+  /**
    * The icon used to display the thumb control on a horizontally oriented
    * {@link JSlider} component.
    */
@@ -1265,6 +1342,16 @@ public class MetalIconFactory implements Serializable
     if (radioButtonIcon == null)
       radioButtonIcon = new RadioButtonIcon();
     return radioButtonIcon;
+  }
+
+  /**
+   * Creates a new instance of the icon used in a {@link JRadioButtonMenuItem}.
+   * 
+   * @return A new icon instance.
+   */
+  public static Icon getRadioButtonMenuItemIcon() 
+  {
+    return new RadioButtonMenuItemIcon();
   }
 
   /**

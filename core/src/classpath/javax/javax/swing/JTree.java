@@ -339,7 +339,6 @@ public class JTree
   {
     setModel(model);
     setSelectionModel(EmptySelectionModel.sharedInstance());
-    selectionModel.addTreeSelectionListener(selectionRedirector);
     setCellRenderer(new DefaultTreeCellRenderer());
     updateUI();
   }
@@ -564,13 +563,13 @@ public class JTree
     }
 
   /**
-   * Returns the preferred viewport size..
+	 * Returns the preferred viewport size.
    *
    * @return the preferred size
    */
     public Dimension getPreferredScrollableViewportSize()
     {
-	return null;
+	  return new Dimension (getPreferredSize().width, getVisibleRowCount()*getRowHeight());
     }
 
     public int getScrollableUnitIncrement(Rectangle visibleRect,
@@ -587,11 +586,15 @@ public class JTree
 
     public boolean getScrollableTracksViewportWidth()
     {
+    if (getParent() instanceof JViewport)
+      return ((JViewport) getParent()).getHeight() > getPreferredSize().height;
 	return false;
     }
 
     public boolean getScrollableTracksViewportHeight()
     {
+    if (getParent() instanceof JViewport)
+      return ((JViewport) getParent()).getWidth() > getPreferredSize().width;
 	return false;
     }
 

@@ -43,7 +43,6 @@ import org.omg.CORBA.BAD_OPERATION;
 import org.omg.CORBA.BAD_PARAM;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.TypeCode;
-import org.omg.CORBA.TypeCodePackage.*;
 import org.omg.DynamicAny.DynAny;
 import org.omg.DynamicAny.DynAnyPackage.InvalidValue;
 import org.omg.DynamicAny.DynAnyPackage.TypeMismatch;
@@ -58,9 +57,7 @@ import java.math.BigDecimal;
  *
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public class gnuDynFixed
-  extends anyUndivideable
-  implements DynFixed
+public class gnuDynFixed extends anyUndivideable implements DynFixed
 {
   /**
    * Use serialVersionUID for interoperability.
@@ -90,8 +87,8 @@ public class gnuDynFixed
   /**
    * Create a new instance of the dyn fixed.
    */
-  public gnuDynFixed(TypeCode oType, TypeCode aType, gnuDynAnyFactory aFactory,
-                     ORB anOrb
+  public gnuDynFixed(TypeCode oType, TypeCode aType,
+    gnuDynAnyFactory aFactory, ORB anOrb
                     )
   {
     super(oType, aType, aFactory, anOrb);
@@ -177,8 +174,7 @@ public class gnuDynFixed
   /**
    * Assign the value from another BigDecimal.
    */
-  public void assign(DynAny from)
-              throws TypeMismatch
+  public void assign(DynAny from) throws TypeMismatch
   {
     checkType(official_type, from.type());
 
@@ -227,8 +223,7 @@ public class gnuDynFixed
    * Set the value from Any (must hold <code>fixed</code> with the matching
    * typecode.).
    */
-  public void from_any(Any an_any)
-                throws TypeMismatch, InvalidValue
+  public void from_any(Any an_any) throws TypeMismatch, InvalidValue
   {
     try
       {

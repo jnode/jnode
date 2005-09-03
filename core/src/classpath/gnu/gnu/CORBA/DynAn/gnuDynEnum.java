@@ -51,7 +51,7 @@ import org.omg.DynamicAny.DynAnyPackage.InvalidValue;
 import org.omg.DynamicAny.DynAnyPackage.TypeMismatch;
 import org.omg.DynamicAny.DynEnum;
 
-import java.io.*;
+import java.io.IOException;
 
 import java.util.Arrays;
 
@@ -60,9 +60,7 @@ import java.util.Arrays;
  *
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public class gnuDynEnum
-  extends anyUndivideable
-  implements DynEnum
+public class gnuDynEnum extends anyUndivideable implements DynEnum
 {
   /**
    * Use serialVersionUID for interoperability.
@@ -117,8 +115,7 @@ public class gnuDynEnum
    * Assign the Enum from the passed value. The passed DynAny must hold the
    * enumeration of exactly the same final_type.
    */
-  public void assign(DynAny from)
-              throws TypeMismatch
+  public void assign(DynAny from) throws TypeMismatch
   {
     checkType(official_type, from.type());
     if (!(from instanceof DynEnum))
@@ -168,8 +165,7 @@ public class gnuDynEnum
   /**
    * Set value from any that must contain enumeration.
    */
-  public void from_any(Any an_any)
-                throws TypeMismatch, InvalidValue
+  public void from_any(Any an_any) throws TypeMismatch, InvalidValue
   {
     checkType(official_type, an_any.type());
     try
@@ -207,8 +203,7 @@ public class gnuDynEnum
   /**
    * Set the value of this enumeration as string.
    */
-  public void set_as_string(String value)
-                     throws InvalidValue
+  public void set_as_string(String value) throws InvalidValue
   {
     for (int i = 0; i < values.length; i++)
       {
@@ -225,8 +220,7 @@ public class gnuDynEnum
   /**
    * Set the value of this enumeration as int.
    */
-  public void set_as_ulong(int value)
-                    throws InvalidValue
+  public void set_as_ulong(int value) throws InvalidValue
   {
     if (value < 0 || value >= values.length)
       throw new InvalidValue(value + " not in [0.." + values.length);

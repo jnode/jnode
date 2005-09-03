@@ -359,9 +359,14 @@ public class BasicMenuItemUI extends MenuItemUI
         defaultTextIconGap);
   }
 
+  /**
+   * Returns the prefix for entries in the {@link UIDefaults} table.
+   *
+   * @return "MenuItem"
+   */
   protected String getPropertyPrefix()
   {
-    return null;
+    return "MenuItem";
   }
 
   /**
