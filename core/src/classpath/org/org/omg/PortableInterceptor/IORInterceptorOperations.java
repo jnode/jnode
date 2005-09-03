@@ -44,8 +44,7 @@ package org.omg.PortableInterceptor;
  *
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public interface IORInterceptorOperations
-  extends InterceptorOperations
+public interface IORInterceptorOperations extends InterceptorOperations
 {
   /**
    * A server side ORB calls this method on all registered IORInterceptor's when
