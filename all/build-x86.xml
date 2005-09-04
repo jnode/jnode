@@ -168,7 +168,7 @@
 			targetArch="x86" 
 			memMgrPluginId="${jnode.memmgr.plugin.id}" 
 			cpu="${cpu}" 
-			version="${jnode-ver}" 
+			version="${jnode-ver} ${TODAY}" 
 			jnodeCompiler="${jnode.compiler}" 
 			bits="${jnode.bits}"
 			enableJNasm="${jnode.enable.jnasm}">
