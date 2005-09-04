@@ -245,11 +245,12 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 
 	public FrameBufferConfiguration[] getConfigs() {
 		final ColorModel cm = new DirectColorModel(bitsPerPixel, redMask, greenMask, blueMask);
-		return new FrameBufferConfiguration[] { 
-				//new VMWareConfiguration(640, 480, cm),
-				new VMWareConfiguration(800, 600, cm),
+		return new FrameBufferConfiguration[] {
+                new VMWareConfiguration(800, 600, cm),
 				new VMWareConfiguration(1024, 768, cm),
-		};
+                new VMWareConfiguration(1280, 1024, cm),
+                new VMWareConfiguration(640, 480, cm),
+        };
 	}
 
 	/**
