@@ -49,7 +49,7 @@ public final class DefaultHeapManager extends VmHeapManager {
     /**
      * Default size in bytes of a new heap
      */
-    public static final int DEFAULT_HEAP_SIZE = 4 * 1024 * 1024;
+    public static final int DEFAULT_HEAP_SIZE = 16 * 1024 * 1024;
 
     /**
      * When this percentage of the free memory has been allocated, a GC is
