@@ -109,14 +109,24 @@ public interface XMLStreamConstants
   static final int NAMESPACE = 13;
 
   /**
+   * A start-entity event.
+   */
+  static final int START_ENTITY = 14;
+
+  /**
+   * An end-entity event.
+   */
+  static final int END_ENTITY = 15;
+  
+  /**
    * A notation declaration event.
    */
-  static final int NOTATION_DECLARATION = 14;
+  static final int NOTATION_DECLARATION = 16;
 
   /**
    * An entity declaration event.
    */
-  static final int ENTITY_DECLARATION = 15;
+  static final int ENTITY_DECLARATION = 17;
   
 }
 

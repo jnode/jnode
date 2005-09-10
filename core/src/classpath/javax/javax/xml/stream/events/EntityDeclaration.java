@@ -67,12 +67,12 @@ public interface EntityDeclaration
   /**
    * Returns the replacement text for the entity.
    */
-  String getReplacementText();
+  //String getReplacementText();
 
   /**
    * Returns the base URI for the entity.
    */
-  String getBaseURI();
+  //String getBaseURI();
 
 }
 

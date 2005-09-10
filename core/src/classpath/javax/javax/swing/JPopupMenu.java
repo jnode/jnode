@@ -561,6 +561,7 @@ public class JPopupMenu extends JComponent implements Accessible, MenuElement
       {
 	    firePopupMenuWillBecomeVisible();
 	Container rootContainer = (Container) SwingUtilities.getRoot(invoker);
+            Dimension screenSize = getToolkit().getScreenSize();
 
 	boolean fit = true;
 	Dimension size;
@@ -587,10 +588,15 @@ public class JPopupMenu extends JComponent implements Accessible, MenuElement
             || popup instanceof MediumWeightPopup)
           {
             JLayeredPane layeredPane;
-		layeredPane = SwingUtilities.getRootPane(invoker)
-		                            .getLayeredPane();
+                layeredPane = SwingUtilities.getRootPane(invoker).getLayeredPane();
 		Point p = new Point(popupLocation.x, popupLocation.y);
 		SwingUtilities.convertPointFromScreen(p, layeredPane);
+                
+                if (size.width + popupLocation.x > screenSize.width)
+                  popupLocation.x -= size.width;
+                if (size.height + popupLocation.y > screenSize.height)
+                  popupLocation.y -= size.height;
+                
 		popup.show(p.x, p.y, size.width, size.height);
 	      }
 	    else
@@ -598,9 +604,15 @@ public class JPopupMenu extends JComponent implements Accessible, MenuElement
 		// Subtract insets of the top-level container if popup menu's
 		// top-left corner is inside it.
 		    Insets insets = rootContainer.getInsets();
+
+                if (size.width + popupLocation.x > screenSize.width)
+                  popupLocation.x -= size.width;
+                if (size.height + popupLocation.y > screenSize.height)
+                  popupLocation.y -= size.height;
+                  
 		    popup.show(popupLocation.x - insets.left,
-		               popupLocation.y - insets.top, size.width,
-		               size.height);
+                           popupLocation.y - insets.top,
+                           size.width, size.height);
           } 
       }
     else
@@ -1004,7 +1016,7 @@ public class JPopupMenu extends JComponent implements Accessible, MenuElement
    * HeavyWeightPopup is JWindow that is used to display JPopupMenu menu item's
    * on the screen
 	 */
-  private class HeavyWeightPopup extends JWindow implements Popup
+  private class HeavyWeightPopup extends JDialog implements Popup
   {
 	/**
      * Creates a new HeavyWeightPopup object.
@@ -1014,6 +1026,8 @@ public class JPopupMenu extends JComponent implements Accessible, MenuElement
     public HeavyWeightPopup(Container c)
     {
       this.setContentPane(c);
+      this.setUndecorated(true);
+      this.getRootPane().setWindowDecorationStyle(JRootPane.PLAIN_DIALOG);
     }
 
 	/**

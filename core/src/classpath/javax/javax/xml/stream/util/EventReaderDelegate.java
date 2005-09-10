@@ -74,6 +74,14 @@ public class EventReaderDelegate
     parent = reader;
   }
 
+  /**
+   * Returns the parent.
+   */
+  public XMLEventReader getParent()
+  {
+    return parent;
+  }
+
   public XMLEvent next()
     throws XMLStreamException
   {

@@ -246,8 +246,7 @@ public abstract class XMLInputFactory
           }
       }
     while (className == null && count < 3);
-    //return new gnu.xml.stream.XMLInputFactoryImpl();
-    throw new FactoryConfigurationError();
+    return new gnu.xml.stream.XMLInputFactoryImpl();
   }
 
   private static String getFactoryClassName(ClassLoader loader, int attempt)
@@ -444,6 +443,16 @@ public abstract class XMLInputFactory
    * Returns the event allocator.
    */
   public abstract XMLEventAllocator getEventAllocator();
+  
+  /**
+   * Sets whether text will be coalesced.
+   */
+  public abstract void setCoalescing(boolean coalescing);
+
+  /**
+   * Indicates whether text will be coalesced.
+   */
+  public abstract boolean isCoalescing();
   
 }
 

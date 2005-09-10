@@ -1864,16 +1864,30 @@ public abstract class AbstractDocument
                        int end)
     {
       super(parent, attributes);
+	{
       try
 	{
+	      if (parent != null)
+		{
 	  startPos = parent.getDocument().createPosition(start);
 	  endPos = parent.getDocument().createPosition(end);
 	}
+	      else
+		{
+		  startPos = createPosition(start);
+		  endPos = createPosition(end);
+		}
+	    }
       catch (BadLocationException ex)
 	{
-	  throw new AssertionError("BadLocationException must not be thrown "
-				   + "here. start=" + start + ", end=" + end
+	      AssertionError as;
+	      as = new AssertionError("BadLocationException thrown "
+				      + "here. start=" + start
+				      + ", end=" + end
 				   + ", length=" + getLength());
+	      as.initCause(ex);
+	      throw as;
+	    }
 	}
     }
 

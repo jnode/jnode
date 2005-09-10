@@ -1,5 +1,5 @@
 /* DocumentEvent.java --
-   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -45,21 +45,13 @@ import javax.swing.text.Element;
  * @author Andrew Selkirk
  * @author Ronald Veldema
  */
-public interface DocumentEvent {
-
-	//-------------------------------------------------------------
-	// Classes ----------------------------------------------------
-	//-------------------------------------------------------------
-
+public interface DocumentEvent
+{
 	/**
 	 * ElementChange public interface
 	 */
-	public interface ElementChange {
-
-		//-------------------------------------------------------------
-		// Methods ----------------------------------------------------
-		//-------------------------------------------------------------
-
+  public static interface ElementChange
+  {
 		/**
 		 * getIndex
 		 * @returns int
@@ -84,8 +76,7 @@ public interface DocumentEvent {
 		 */
 		Element[] getChildrenAdded();
 
-
-	} // ElementChange
+  }
 
 	/**
 	 * EventType
@@ -162,5 +153,4 @@ public interface DocumentEvent {
 	 */
 	ElementChange getChange(Element element);
 
-
-} // DocumentEvent
+}

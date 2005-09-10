@@ -395,37 +395,30 @@ public class SpringLayout implements LayoutManager2
   public SpringLayout.Constraints getConstraints(Component c)
   {
     Constraints constraints = (Constraints) constraintsMap.get(c);
+
     if (constraints == null)
       {
         Container parent = c.getParent();
         constraints = new Constraints();
+
         if (parent != null)
           {
-            constraints.setX
-              (Spring.constant(parent.getInsets().left));
-            constraints.setY
-              (Spring.constant(parent.getInsets().top));
+            constraints.setX(Spring.constant(parent.getInsets().left));
+            constraints.setY(Spring.constant(parent.getInsets().top));
           }
         else
           {
-            constraints.setX
-              (Spring.constant(0));
-            constraints.setY
-              (Spring.constant(0));
-
+            constraints.setX(Spring.constant(0));
+            constraints.setY(Spring.constant(0));
           }
-        constraints.setWidth
-          (Spring.constant(c.getMinimumSize().width,
+      }
+    constraints.setWidth(Spring.constant(c.getMinimumSize().width,
                            c.getPreferredSize().width,
                            c.getMaximumSize().width));
-        constraints.setHeight
-          (Spring.constant(c.getMinimumSize().height,
+    constraints.setHeight(Spring.constant(c.getMinimumSize().height,
                            c.getPreferredSize().height,
                            c.getMaximumSize().height));
-
         constraintsMap.put(c, constraints);
-
-      }
 
     return constraints;
   }
@@ -433,7 +426,8 @@ public class SpringLayout implements LayoutManager2
   /**
    * Returns the X alignment of the Container <code>p</code>.
    *
-   * @param p the {@link java.awt.Container} for which to determine the X
+   * @param p
+   *          the {@link java.awt.Container} for which to determine the X
    *     alignment.
    * @return always 0.0
    */
@@ -480,6 +474,7 @@ public class SpringLayout implements LayoutManager2
     for (int index = 0; index < components.length; index++)
       {
         Component c = components[index];
+
         Constraints constraints = getConstraints(c);
         int x = constraints.getX().getValue();
         int y = constraints.getY().getValue();
@@ -597,7 +592,6 @@ public class SpringLayout implements LayoutManager2
         if (bottomEdge > maxY)
           maxY = bottomEdge;
       }
-
     return new Dimension(maxX, maxY);
   }
 
@@ -621,7 +615,6 @@ public class SpringLayout implements LayoutManager2
     Spring strut = Spring.constant(pad);
     Spring otherEdge = constraints2.getConstraint(e2);
     constraints1.setConstraint(e1, Spring.sum(strut, otherEdge));
-
   }
 
   /**

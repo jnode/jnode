@@ -39,11 +39,13 @@ package javax.xml.stream;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.events.XMLEvent;
+import javax.xml.stream.util.XMLEventConsumer;
 
 /**
  * Interface for writing XML documents from a series of events.
  */
 public interface XMLEventWriter
+  extends XMLEventConsumer
 {
 
   /**

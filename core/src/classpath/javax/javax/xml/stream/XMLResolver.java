@@ -37,6 +37,8 @@ exception statement from your version. */
 
 package javax.xml.stream;
 
+import java.io.InputStream;
+
 /**
  * Interface used to resolve XML external entities during parsing.
  */
@@ -57,9 +59,27 @@ public interface XMLResolver
    * @param systemID the system ID of the external entity
    * @param baseURI the absolute base URI of the referring entity
    * @param namespace the namespace of the external entity
-   */
+   *
   Object resolveEntity(String publicID, String systemID,
                        String baseURI, String namespace)
+    throws XMLStreamException;*/
+
+  /**
+   * Retrieves a resource from the specified URI.
+   */
+  XMLEventReader resolveAsXMLEventReader(String uri)
+    throws XMLStreamException;
+
+  /**
+   * Retrieves a resource from the specified URI.
+   */
+  XMLStreamReader resolveAsXMLStreamReader(String uri)
+    throws XMLStreamException;
+  
+  /**
+   * Retrieves a resource from the specified URI.
+   */
+  InputStream resolve(String uri)
     throws XMLStreamException;
   
 }

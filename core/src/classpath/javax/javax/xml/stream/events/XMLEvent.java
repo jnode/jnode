@@ -106,6 +106,16 @@ public interface XMLEvent
   boolean isEndDocument();
 
   /**
+   * Indicates whether this event is a start-entity event.
+   */
+  boolean isStartEntity();
+
+  /**
+   * Indicates whether this event is an end-entity event.
+   */
+  boolean isEndEntity();
+
+  /**
    * Returns this event as a start-element event.
    */
   StartElement asStartElement();
