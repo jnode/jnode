@@ -143,17 +143,18 @@ public class BasicFileChooserUI extends FileChooserUI
     /**
      * DOCUMENT ME!
      *
-     * @param e DOCUMENT ME!
+     * @param e
+     *          DOCUMENT ME!
      */
     public void actionPerformed(ActionEvent e)
     {
-      Object obj = filelist.getSelectedValue();
+      Object obj = new String(parentPath + entry.getText());
       if (obj != null)
         {
-	  File f = filechooser.getFileSystemView().createFileObject(obj
-	                                                            .toString());
-	  if (filechooser.isTraversable(f) && 
-              filechooser.getFileSelectionMode() == JFileChooser.FILES_ONLY)
+          File f = filechooser.getFileSystemView().createFileObject(
+                                                                    obj.toString());
+          if (filechooser.isTraversable(f)
+              && filechooser.isDirectorySelectionEnabled())
 	    filechooser.setCurrentDirectory(f);
 	  else
 	    {
@@ -360,7 +361,8 @@ public class BasicFileChooserUI extends FileChooserUI
     /**
      * DOCUMENT ME!
      *
-     * @param e DOCUMENT ME!
+     * @param e
+     *          DOCUMENT ME!
      */
     public void mouseClicked(MouseEvent e)
     {
@@ -386,7 +388,8 @@ public class BasicFileChooserUI extends FileChooserUI
         }
       else
         {
-	  File f = fsv.createFileObject(list.getSelectedValue().toString());
+          String path = list.getSelectedValue().toString();
+          File f = fsv.createFileObject(path);
 	  if (filechooser.isTraversable(f))
 	    {
 	      setDirectorySelected(true);
@@ -397,7 +400,9 @@ public class BasicFileChooserUI extends FileChooserUI
 	      setDirectorySelected(false);
 	      setDirectory(null);
 	    }
-	  lastSelected = list.getSelectedValue().toString();
+          lastSelected = path;
+          parentPath = path.substring(0, path.lastIndexOf("/") + 1);
+          entry.setText(path.substring(path.lastIndexOf("/") + 1));
 	  timer.restart();
         }
     }
@@ -405,7 +410,8 @@ public class BasicFileChooserUI extends FileChooserUI
     /**
      * DOCUMENT ME!
      *
-     * @param e DOCUMENT ME!
+     * @param e
+     *          DOCUMENT ME!
      */
     public void mouseEntered(MouseEvent e)
     {
@@ -943,10 +949,14 @@ public class BasicFileChooserUI extends FileChooserUI
   /** DOCUMENT ME! */
   JPanel closePanel;
 
+  /** Text box that displays file name */
+  JTextField entry;
+    
+  /** Current parent path */
+  String parentPath;
+  
   // -- end private --
-  private class ListLabelRenderer
-    extends JLabel
-    implements ListCellRenderer
+  private class ListLabelRenderer extends JLabel implements ListCellRenderer
   {
     /** DOCUMENT ME! */
     final Color selected = new Color(153, 204, 255);
@@ -1059,7 +1069,8 @@ public class BasicFileChooserUI extends FileChooserUI
   /**
    * DOCUMENT ME!
    *
-   * @param c DOCUMENT ME!
+   * @param c
+   *          DOCUMENT ME!
    */
   public void installUI(JComponent c)
   {
@@ -1072,13 +1083,18 @@ public class BasicFileChooserUI extends FileChooserUI
 	installDefaults(fc);
 	installComponents(fc);
 	installListeners(fc);
+        
+        Object path = filechooser.getCurrentDirectory();
+        if (path != null)
+          parentPath = path.toString().substring(path.toString().lastIndexOf("/"));
       }
   }
 
   /**
    * DOCUMENT ME!
    *
-   * @param c DOCUMENT ME!
+   * @param c
+   *          DOCUMENT ME!
    */
   public void uninstallUI(JComponent c)
   {
@@ -1260,7 +1276,7 @@ public class BasicFileChooserUI extends FileChooserUI
     JLabel fileNameLabel = new JLabel("File Name:");
     JLabel fileTypesLabel = new JLabel("Files of Type:");
 
-    JTextField entry = new JTextField();
+    entry = new JTextField();
     filters = new JComboBox();
     filterEntries();
 
@@ -1480,8 +1496,8 @@ public class BasicFileChooserUI extends FileChooserUI
   /**
    * DOCUMENT ME!
    *
-   * @param fc DOCUMENT ME!
-   *
+   * @param fc
+   *          DOCUMENT ME!
    * @return DOCUMENT ME!
    */
   public PropertyChangeListener createPropertyChangeListener(JFileChooser fc)
@@ -1490,8 +1506,10 @@ public class BasicFileChooserUI extends FileChooserUI
       {
 	public void propertyChange(PropertyChangeEvent e)
 	{
-	  // FIXME: Multiple file selection waiting on JList multiple selection bug.
-	  if (e.getPropertyName().equals(JFileChooser.SELECTED_FILE_CHANGED_PROPERTY))
+        // FIXME: Multiple file selection waiting on JList multiple selection
+        // bug.
+        if (e.getPropertyName().equals(
+                                       JFileChooser.SELECTED_FILE_CHANGED_PROPERTY))
 	    {
 	      if (filechooser.getSelectedFile() == null)
 		setFileName(null);
@@ -1509,7 +1527,8 @@ public class BasicFileChooserUI extends FileChooserUI
 	      filelist.revalidate();
 	      filelist.repaint();
 	    }
-	  else if (e.getPropertyName().equals(JFileChooser.DIRECTORY_CHANGED_PROPERTY))
+        else if (e.getPropertyName().equals(
+                                            JFileChooser.DIRECTORY_CHANGED_PROPERTY))
 	    {
 	      filelist.clearSelection();
 	      filelist.revalidate();
@@ -1518,11 +1537,15 @@ public class BasicFileChooserUI extends FileChooserUI
 	      setDirectory(filechooser.getCurrentDirectory());
 	      boxEntries();
 	    }
-	  else if (e.getPropertyName().equals(JFileChooser.CHOOSABLE_FILE_FILTER_CHANGED_PROPERTY)
-	           || e.getPropertyName().equals(JFileChooser.FILE_FILTER_CHANGED_PROPERTY))
+        else if (e.getPropertyName().equals(
+                                            JFileChooser.CHOOSABLE_FILE_FILTER_CHANGED_PROPERTY)
+                 || e.getPropertyName().equals(
+                                               JFileChooser.FILE_FILTER_CHANGED_PROPERTY))
 	    filterEntries();
-	  else if (e.getPropertyName().equals(JFileChooser.DIALOG_TYPE_CHANGED_PROPERTY)
-	           || e.getPropertyName().equals(JFileChooser.DIALOG_TITLE_CHANGED_PROPERTY))
+        else if (e.getPropertyName().equals(
+                                            JFileChooser.DIALOG_TYPE_CHANGED_PROPERTY)
+                 || e.getPropertyName().equals(
+                                               JFileChooser.DIALOG_TITLE_CHANGED_PROPERTY))
 	    {
 	      Window owner = SwingUtilities.windowForComponent(filechooser);
 	      if (owner instanceof JDialog)
@@ -1531,13 +1554,17 @@ public class BasicFileChooserUI extends FileChooserUI
 	      accept.setToolTipText(getApproveButtonToolTipText(filechooser));
 	      accept.setMnemonic(getApproveButtonMnemonic(filechooser));
 	    }
-	  else if (e.getPropertyName().equals(JFileChooser.APPROVE_BUTTON_TEXT_CHANGED_PROPERTY))
+        else if (e.getPropertyName().equals(
+                                            JFileChooser.APPROVE_BUTTON_TEXT_CHANGED_PROPERTY))
 	    accept.setText(getApproveButtonText(filechooser));
-	  else if (e.getPropertyName().equals(JFileChooser.APPROVE_BUTTON_TOOL_TIP_TEXT_CHANGED_PROPERTY))
+        else if (e.getPropertyName().equals(
+                                            JFileChooser.APPROVE_BUTTON_TOOL_TIP_TEXT_CHANGED_PROPERTY))
 	    accept.setToolTipText(getApproveButtonToolTipText(filechooser));
-	  else if (e.getPropertyName().equals(JFileChooser.APPROVE_BUTTON_MNEMONIC_CHANGED_PROPERTY))
+        else if (e.getPropertyName().equals(
+                                            JFileChooser.APPROVE_BUTTON_MNEMONIC_CHANGED_PROPERTY))
 	    accept.setMnemonic(getApproveButtonMnemonic(filechooser));
-	  else if (e.getPropertyName().equals(JFileChooser.CONTROL_BUTTONS_ARE_SHOWN_CHANGED_PROPERTY))
+        else if (e.getPropertyName().equals(
+                                            JFileChooser.CONTROL_BUTTONS_ARE_SHOWN_CHANGED_PROPERTY))
 	    {
 	      if (filechooser.getControlButtonsAreShown())
 	        {
@@ -1556,14 +1583,16 @@ public class BasicFileChooserUI extends FileChooserUI
 	      else
 		bottomPanel.remove(closePanel);
 	    }
-	  else if (e.getPropertyName().equals(JFileChooser.ACCEPT_ALL_FILE_FILTER_USED_CHANGED_PROPERTY))
+        else if (e.getPropertyName().equals(
+                                            JFileChooser.ACCEPT_ALL_FILE_FILTER_USED_CHANGED_PROPERTY))
 	    {
 	      if (filechooser.isAcceptAllFileFilterUsed())
 		filechooser.addChoosableFileFilter(getAcceptAllFileFilter(filechooser));
 	      else
 		filechooser.removeChoosableFileFilter(getAcceptAllFileFilter(filechooser));
 	    }
-	  else if (e.getPropertyName().equals(JFileChooser.ACCESSORY_CHANGED_PROPERTY))
+        else if (e.getPropertyName().equals(
+                                            JFileChooser.ACCESSORY_CHANGED_PROPERTY))
 	    {
 	      JComponent old = (JComponent) e.getOldValue();
 	      if (old != null)
@@ -1573,8 +1602,10 @@ public class BasicFileChooserUI extends FileChooserUI
 		getAccessoryPanel().add(newval);
 	    }
 	  if (e.getPropertyName().equals(JFileChooser.DIRECTORY_CHANGED_PROPERTY)
-	      || e.getPropertyName().equals(JFileChooser.FILE_FILTER_CHANGED_PROPERTY)
-	      || e.getPropertyName().equals(JFileChooser.FILE_HIDING_CHANGED_PROPERTY))
+            || e.getPropertyName().equals(
+                                          JFileChooser.FILE_FILTER_CHANGED_PROPERTY)
+            || e.getPropertyName().equals(
+                                          JFileChooser.FILE_HIDING_CHANGED_PROPERTY))
 	    rescanCurrentDirectory(filechooser);
 
 	  filechooser.revalidate();

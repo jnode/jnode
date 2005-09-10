@@ -1206,7 +1206,7 @@ public class BasicTreeUI
    * @param tree
    *          is the JTree to install defaults for
 	 */
-	protected void installDefaults(JTree tree)
+  protected void installDefaults()
 	{
 		UIDefaults defaults = UIManager.getLookAndFeelDefaults();
 
@@ -1326,8 +1326,8 @@ public class BasicTreeUI
 	public void installUI(JComponent c)
 	{
 		super.installUI(c);
-		installDefaults((JTree) c);
 		tree = (JTree) c;
+    installDefaults();
     
     currentCellRenderer = createDefaultCellRenderer();
     rendererPane = createCellRendererPane();
@@ -1355,7 +1355,7 @@ public class BasicTreeUI
    * @param tree
    *          to uninstall defaults for
 	 */
-	protected void uninstallDefaults(JTree tree)
+  protected void uninstallDefaults()
 	{
 		tree.setFont(null);
 		tree.setForeground(null);
@@ -1370,7 +1370,7 @@ public class BasicTreeUI
 	 */
 	public void uninstallUI(JComponent c)
 	{
-		uninstallDefaults((JTree) c);
+    uninstallDefaults();
 		uninstallKeyboardActions();
 		uninstallListeners();
 		tree = null;

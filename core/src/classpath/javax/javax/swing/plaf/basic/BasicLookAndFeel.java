@@ -742,6 +742,7 @@ public abstract class BasicLookAndFeel extends LookAndFeel
       "ScrollBar.thumbShadow", new ColorUIResource(shadow),
       "ScrollBar.track", new ColorUIResource(light),
       "ScrollBar.trackHighlight", new ColorUIResource(shadow),
+      "ScrollBar.width", new Integer(16),
       "ScrollPane.ancestorInputMap", new UIDefaults.LazyInputMap(new Object[] {
         "PAGE_UP", "scrollUp",
         "KP_LEFT", "unitScrollLeft",
@@ -917,7 +918,7 @@ public abstract class BasicLookAndFeel extends LookAndFeel
       "TextArea.border", new BasicBorders.MarginBorder(),
       "TextArea.caretBlinkRate", new Integer(500),
       "TextArea.caretForeground", new ColorUIResource(Color.black),
-      "TextArea.font", new FontUIResource("MonoSpaced", Font.PLAIN, 12),
+      "TextArea.font", new FontUIResource("Monospaced", Font.PLAIN, 12),
       "TextArea.foreground", new ColorUIResource(Color.black),
       "TextArea.inactiveForeground", new ColorUIResource(Color.gray),
       "TextArea.keyBindings", new JTextComponent.KeyBinding[] {
@@ -945,8 +946,8 @@ public abstract class BasicLookAndFeel extends LookAndFeel
       "TextField.font", new FontUIResource("SansSerif", Font.PLAIN, 12),
       "TextField.foreground", new ColorUIResource(Color.black),
       "TextField.highlight", new ColorUIResource(highLight),
-      "TextField.inactiveBackground", new ColorUIResource(light),
-      "TextField.inactiveForeground", new ColorUIResource(Color.gray),
+      "TextField.inactiveBackground", new ColorUIResource(Color.LIGHT_GRAY),
+      "TextField.inactiveForeground", new ColorUIResource(Color.GRAY),
       "TextField.light", new ColorUIResource(highLight),
       "TextField.highlight", new ColorUIResource(light),
       "TextField.keyBindings", new JTextComponent.KeyBinding[] {

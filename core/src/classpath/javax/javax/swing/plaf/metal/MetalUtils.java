@@ -1,4 +1,4 @@
-/* Metaltils.java
+/* MetalUtils.java
 Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -57,7 +57,7 @@ class MetalUtils
    * @param y the Y coordinate of the upper left corner of the rectangle to
    *     fill
    * @param w the width of the rectangle to fill
-   * @param w the height of the rectangle to fill
+   * @param h the height of the rectangle to fill
    * @param light the light color to use
    * @param dark the dark color to use
    */
@@ -68,7 +68,7 @@ class MetalUtils
     for (int mY = y; mY < (y + h); mY++)
       {
         // set color alternating with every line
-        if ((mY % 2) == 0)
+        if (((mY - y) % 2) == 0)
           g.setColor(light);
         else
           g.setColor(dark);
