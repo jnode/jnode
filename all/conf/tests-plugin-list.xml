@@ -17,5 +17,5 @@
   <plugin id="org.jnode.test"/>
   <plugin id="org.jnode.test.fs"/>
   <plugin id="org.jnode.test.net"/>
-
+  <plugin id="org.jnode.shell.command.test"/>
 </plugin-list>
