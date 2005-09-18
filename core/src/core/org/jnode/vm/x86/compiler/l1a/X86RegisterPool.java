@@ -92,19 +92,19 @@ abstract class X86RegisterPool {
      * @return the allocated register or null
      */
     public final X86Register request(int type, Item owner, boolean supportBits8) {
-//         if (!lastFirst) {
-//            for (int i = regCount - 1 - minimumRequestIndex; i >= 0; i--) {
-//                lastRequestIndex--;
-//                if (lastRequestIndex < minimumRequestIndex) {
-//                    lastRequestIndex = regCount - 1;
-//                }
-//                final RegisterGroupUsage ru = registers[lastRequestIndex];
-//                final X86Register reg = ru.request(owner, type, supportBits8);
-//                if (reg != null) {
-//                    return reg;
-//                }
-//            }
-//        }
+         if (!lastFirst) {
+            for (int i = regCount - 1 - minimumRequestIndex; i >= 0; i--) {
+                lastRequestIndex--;
+                if (lastRequestIndex < minimumRequestIndex) {
+                    lastRequestIndex = regCount - 1;
+                }
+                final RegisterGroupUsage ru = registers[lastRequestIndex];
+                final X86Register reg = ru.request(owner, type, supportBits8);
+                if (reg != null) {
+                    return reg;
+                }
+            }
+        }
         for (int i = regCount - 1; i >= 0; i--) {
             final RegisterGroupUsage ru = registers[i];
             final X86Register reg = ru.request(owner, type, supportBits8);
