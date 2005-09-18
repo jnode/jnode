@@ -37,6 +37,12 @@ public abstract class ClassLoader {
     private ProtectionDomain defaultProtectionDomain;
 
     /**
+     * All packages defined by this classloader. It is not private in order to
+     * allow native code (and trusted subclasses) access to this field.
+     */
+    final HashMap<String, Package> definedPackages = new HashMap<String, Package>();
+
+    /**
      * The desired assertion status of classes loaded by this loader, if not
      * overridden by package or class instructions.
      */
@@ -263,25 +269,55 @@ public abstract class ClassLoader {
     }
 
     /**
-     * Defines a package by name in this ClassLoader. This allows class loaders
-     * to define the packages for their classes. Packages must be created before
-     * the class is defined, and package names must be unique within a class
-     * loader and cannot be redefined or changed once created.
+     * Defines a new package and creates a Package object. The package should be
+     * defined before any class in the package is defined with
+     * <code>defineClass()</code>. The package should not yet be defined
+     * before in this classloader or in one of its parents (which means that
+     * <code>getPackage()</code> should return <code>null</code>). All
+     * parameters except the <code>name</code> of the package may be
+     * <code>null</code>.
+     * 
+     * <p>
+     * Subclasses should call this method from their <code>findClass()</code>
+     * implementation before calling <code>defineClass()</code> on a Class in
+     * a not yet defined Package (which can be checked by calling
+     * <code>getPackage()</code>).
      * 
      * @param name
+     *            the name of the Package
      * @param specTitle
-     * @param specVersion
+     *            the name of the specification
      * @param specVendor
+     *            the name of the specification designer
+     * @param specVersion
+     *            the version of this specification
      * @param implTitle
-     * @param implVersion
+     *            the name of the implementation
      * @param implVendor
-     * @param url
-     * @return Package
+     *            the vendor that wrote this implementation
+     * @param implVersion
+     *            the version of this implementation
+     * @param sealed
+     *            if sealed the origin of the package classes
+     * @return the Package object for the specified package
+     * @throws IllegalArgumentException
+     *             if the package name is null or it was already defined by this
+     *             classloader or one of its parents
+     * @see Package
+     * @since 1.2
      */
     protected Package definePackage(String name, String specTitle,
-            String specVersion, String specVendor, String implTitle,
-            String implVersion, String implVendor, URL url) {
-        return null;
+            String specVendor, String specVersion, String implTitle,
+            String implVendor, String implVersion, URL sealed) {
+        if (getPackage(name) != null)
+            throw new IllegalArgumentException("Package " + name
+                    + " already defined");
+        Package p = new Package(name, specTitle, specVendor, specVersion,
+                implTitle, implVendor, implVersion, sealed);
+        synchronized (definedPackages) {
+            definedPackages.put(name, p);
+        }
+        return p;
     }
 
     /**
@@ -511,12 +547,60 @@ public abstract class ClassLoader {
         return null;
     }
 
+    /**
+     * Returns the Package object for the requested package name. It returns
+     * null when the package is not defined by this classloader or one of its
+     * parents.
+     * 
+     * @param name
+     *            the package name to find
+     * @return the package, if defined
+     * @since 1.2
+     */
     protected Package getPackage(String name) {
-        return null;
+        Package p;
+        if (parent == null) {
+            p = VMClassLoader.getPackage(name);
+        } else {
+            p = parent.getPackage(name);
+        }
+
+        if (p == null) {
+            synchronized (definedPackages) {
+                p = definedPackages.get(name);
+            }
+        }
+        return p;
     }
 
+    /**
+     * Returns all Package objects defined by this classloader and its parents.
+     * 
+     * @return an array of all defined packages
+     * @since 1.2
+     */
     protected Package[] getPackages() {
-        return new Package[0];
+        // Get all our packages.
+        Package[] packages;
+        synchronized (definedPackages) {
+            packages = new Package[definedPackages.size()];
+            definedPackages.values().toArray(packages);
+        }
+
+        // If we have a parent get all packages defined by our parents.
+        Package[] parentPackages;
+        if (parent == null)
+            parentPackages = VMClassLoader.getPackages();
+        else
+            parentPackages = parent.getPackages();
+
+        Package[] allPackages = new Package[parentPackages.length
+                + packages.length];
+        System.arraycopy(parentPackages, 0, allPackages, 0,
+                parentPackages.length);
+        System.arraycopy(packages, 0, allPackages, parentPackages.length,
+                packages.length);
+        return allPackages;
     }
 
     /**
