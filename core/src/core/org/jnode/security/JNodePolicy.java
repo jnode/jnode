@@ -182,7 +182,7 @@ final class JNodePolicy extends Policy {
                     } catch (NoSuchMethodException ex) {
                         BootLog
                                 .error("Constructor not found on permission class "
-                                        + type);
+                                        + type + " in plugin " + id);
                     } catch (InvocationTargetException ex) {
                         BootLog.error("Error constructing permission class "
                                 + type, ex);
