@@ -2414,6 +2414,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		} else {
 			os.writeADD(BITS32, helper.BP, ebpOfs, incValue);
 		}
+        
+        // Local no longer constant
+        constLocals.remove(index);
 	}
 
 	/**
@@ -2611,6 +2614,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			pool.release(cntr);
 		} else {
 			// It is a class, do the fast way
+            //vstack.push(eContext); // just a (slow) test
 
 			// Load reference
 			final RefItem ref = vstack.popRef();
@@ -2621,7 +2625,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			final GPR tmpr = (GPR) L1AHelper.requestRegister(eContext,
 					JvmType.REFERENCE, false);
 			final IntItem result = (IntItem) L1AHelper.requestWordRegister(
-					eContext, JvmType.INT, false);
+					eContext, JvmType.INT, true);
 
 			// Is instanceof
 			instanceOfClass(refr, (VmClassType<?>) classRef.getResolvedVmClass(),
