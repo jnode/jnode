@@ -4415,6 +4415,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param cc
 	 */
 	public void writeSETCC(GPR dstReg, int cc) {
+        testSuitableForBits8(dstReg);
 		// No change in 64-bit encoding, so give operand size 0 to
 		// avoid a REX prefix.
 		write2bOpcodeModRR(0x0F, 0x90 + (cc & 0x0f), 0, dstReg, 0);
