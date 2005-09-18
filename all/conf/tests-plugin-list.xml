@@ -8,6 +8,7 @@
   <include file="full-plugin-list.xml"/>
 
   <plugin id="org.junit"/>
+  <plugin id="gnu.mauve"/>  
   
   <plugin id="org.objectweb.asm"/>    
   <plugin id="net.sf.cglib"/>  
