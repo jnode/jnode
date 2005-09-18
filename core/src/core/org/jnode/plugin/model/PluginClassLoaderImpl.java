@@ -133,6 +133,25 @@ final class PluginClassLoaderImpl extends PluginClassLoader {
 	        } catch (PluginException ex) {
 	            BootLog.error("Error starting plugin", ex);
 	        }
+            
+            // Define package (if needed)
+            final int lastDotIndex = name.lastIndexOf('.');
+            if (lastDotIndex > 0) {
+                String packageName = name.substring(0, lastDotIndex);
+                if (getPackage(packageName) == null) {
+                    String specTitle = null;
+                    String specVendor = null;
+                    String specVersion = null;
+                    String implTitle = descriptor.getName();
+                    String implVendor = descriptor.getProviderName();
+                    String implVersion = descriptor.getVersion();
+                    URL sealed = null;
+                    definePackage(packageName, specTitle, specVendor,
+                            specVersion, implTitle, implVendor, implVersion,
+                            sealed);
+                }
+            }
+            
 		    final URL sourceUrl = jar.getResource(name.replace('.', '/') + ".class");
 		    final CodeSource cs = new CodeSource(sourceUrl, null);
 		    final Policy policy = (Policy)AccessController.doPrivileged(GetPolicyAction.getInstance());
