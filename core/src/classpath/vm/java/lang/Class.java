@@ -632,19 +632,18 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type, Gen
     }
 
     /**
-     * Gets the package for this class. The class loader of this class is used
-     * to find the package. If the class was loaded by the bootstrap class
-     * loader the set of packages loaded from CLASSPATH is searched to find the
-     * package of the class. Null is returned if no package object was created
-     * by the class loader of this class. Packages have attributes for versions
-     * and specifications only if the information was defined in the manifests
-     * that accompany the classes, and if the class loader created the package
-     * instance with the attributes from the manifest.
+     * Returns the <code>Package</code> in which this class is defined Returns
+     * null when this information is not available from the classloader of this
+     * class or when the classloader of this class is null.
      * 
-     * @return the package of the class, or null if no package information is
-     *         available from the archive or codebase.
+     * @return the package for this class, if it is available
+     * @since 1.2
      */
     public Package getPackage() {
+        ClassLoader cl = getClassLoader();
+        if (cl != null) {
+            return cl.getPackage(getPackagePortion(getName()));
+        }
         return null;
     }
 
