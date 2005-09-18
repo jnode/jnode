@@ -31,6 +31,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericDeclaration;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
@@ -715,8 +716,12 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type, Gen
      */
     public Constructor getConstructor(Class[] argTypes)
             throws NoSuchMethodException {
+        // Check security
+        memberAccessCheck(Member.PUBLIC);
+        
+        // Create signature
         String signature = Signature.toSignature(null, argTypes);
-        final VmMethod vmMethod = getLinkedVmClass().getMethod("<init>",
+        final VmMethod vmMethod = getLinkedVmClass().getDeclaredMethod("<init>",
                 signature);
         if (vmMethod != null) {
             return (Constructor) vmMethod.asMember();
@@ -954,6 +959,21 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type, Gen
         return (Class< ? extends U>) this;
     }
 
+    /**
+     * Perform security checks common to all of the methods that get members of
+     * this Class.
+     */
+    private void memberAccessCheck(int which) {
+        SecurityManager sm = SecurityManager.current;
+        if (sm != null) {
+            sm.checkMemberAccess(this, which);
+            Package pkg = getPackage();
+            if (pkg != null) {
+                sm.checkPackageAccess(pkg.getName());
+            }
+        }
+    }
+    
     /**
      * Strip the last portion of the name (after the last dot).
      * 
