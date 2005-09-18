@@ -21,6 +21,9 @@
  
 package org.jnode.test;
 
+import java.util.List;
+import java.util.Vector;
+
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
@@ -30,6 +33,15 @@ public class CastTest {
 		test(args);
 		test2("Hello world");
 	}
+    
+    private StaticClass field;
+    public void test1(Vector<?> entries, int i) {
+        field = (StaticClass)entries.get(i);
+    }
+    
+    static class StaticClass {
+        static { System.out.println(1); }
+    }
 
 	public static void test(Object args) {
 		System.out.println("args.class=" + args.getClass().getName());
