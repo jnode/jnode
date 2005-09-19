@@ -27,7 +27,7 @@ package org.jnode.system.event;
 public class SystemEvent {
 
 	protected final int id;
-	private long time;
+	private final long time;
 	private boolean consumed;
 
 	/**
@@ -58,21 +58,21 @@ public class SystemEvent {
 	/**
 	 * @return int
 	 */
-	public int getId() {
+	final public int getId() {
 		return id;
 	}
 
 	/**
 	 * @return long
 	 */
-	public long getTime() {
+    final public long getTime() {
 		return time;
 	}
 	
 	/**
 	 * Mark this event as being consumed.
 	 */
-	public void consume() {
+    final public void consume() {
 		consumed = true;
 	}
 	
@@ -80,7 +80,7 @@ public class SystemEvent {
 	 * Has this event been consumed.
 	 * @return boolean
 	 */
-	public boolean isConsumed() {
+    final public boolean isConsumed() {
 		return consumed;
 	}
 }
