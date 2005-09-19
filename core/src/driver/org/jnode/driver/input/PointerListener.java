@@ -24,6 +24,6 @@ package org.jnode.driver.input;
 /**
  * @author qades
  */
-public interface PointerListener {
+public interface PointerListener extends SystemListener {
 	void pointerStateChanged(PointerEvent event);
 }

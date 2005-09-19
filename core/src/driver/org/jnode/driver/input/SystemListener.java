@@ -18,23 +18,12 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.driver.input;
 
-/**
- * @author epr
- */
-public interface KeyboardListener extends SystemListener{
-	
-	/**
-	 * A key has been pressed.
-	 * @param event
-	 */
-	public void keyPressed(KeyboardEvent event);
-	
-	/**
-	 * A key has been released.
-	 * @param event
-	 */
-	public void keyReleased(KeyboardEvent event);
+import org.jnode.system.event.SystemEvent;
+
+public interface SystemListener<E extends SystemEvent>
+{
+
 }
