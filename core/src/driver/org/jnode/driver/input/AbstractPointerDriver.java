@@ -35,39 +35,31 @@ import org.jnode.driver.DriverException;
 /**
  * @author qades
  */
-public abstract class AbstractPointerDriver extends Driver implements PointerAPI {
+public abstract class AbstractPointerDriver extends AbstractInputDriver<PointerEvent> implements PointerAPI {
 
 	/** My logger */
 	private static final Logger log = Logger.getLogger(AbstractPointerDriver.class);
 	private ByteChannel channel;
 	private PointerInterpreter interpreter;
-	private PointerDaemon daemon;
-	private final ArrayList<PointerListener> listeners = new ArrayList<PointerListener>();
 
-	/**
-	 * Add a pointer listener
-	 * 
-	 * @param l
-	 */
-	public synchronized void addPointerListener(PointerListener l) {
-		listeners.add(l);
-	}
 
-	/**
-	 * Remove a pointer listener
-	 * 
-	 * @param l
-	 */
-	public synchronized void removePointerListener(PointerListener l) {
-		listeners.remove(l);
-	}
+    public void addPointerListener(PointerListener l)
+    {
+        super.addListener(l);        
+    }
 
+    public void removePointerListener(PointerListener l)
+    {
+        super.removeListener(l);
+    }
+    
 	/**
 	 * Start the pointer device.
 	 */
 	protected synchronized void startDevice() throws DriverException {
 		final Device dev = getDevice();
-		log.debug("Starting " + dev.getId());
+        final String id = dev.getId();
+		log.debug("Starting " + id);
 		this.channel = getChannel();
 		this.interpreter = createInterpreter();
 		try {
@@ -77,11 +69,19 @@ public abstract class AbstractPointerDriver extends Driver implements PointerAPI
 		}
 
 		// start the deamon anyway, so we can register a mouse later
-		daemon = new PointerDaemon(dev.getId() + "-daemon");
-		daemon.start();
+        startDispatcher(id);
 		dev.registerAPI(PointerAPI.class, this);
 	}
 
+    protected PointerEvent handleScancode(byte scancode)
+    {
+        PointerEvent event = null;
+        if (interpreter != null) {
+            event = interpreter.handleScancode(scancode & 0xff);
+        }
+        return event;
+    }
+    
 	protected PointerInterpreter createInterpreter() {
 	    log.debug("createInterpreter");
 		try {
@@ -110,11 +110,7 @@ public abstract class AbstractPointerDriver extends Driver implements PointerAPI
 	 */
 	protected synchronized void stopDevice() throws DriverException {
 		getDevice().unregisterAPI(PointerAPI.class);
-		PointerDaemon daemon = this.daemon;
-		this.daemon = null;
-		if (daemon != null) {
-			daemon.interrupt();
-		}
+        stopDispatcher();
 
 		try {
 			channel.close();
@@ -124,60 +120,20 @@ public abstract class AbstractPointerDriver extends Driver implements PointerAPI
 		}
 	}
 
-	/**
-	 * Dispatch a given pointer event to all known listeners.
-	 * 
-	 * @param event
-	 */
-	protected void dispatchEvent(PointerEvent event) {
-		for (PointerListener l : listeners) {
-			l.pointerStateChanged(event);
-			if (event.isConsumed()) {
-				break;
-			}
-		}
-	}
+    /**
+     * Send a given keyboard event to the given listener.
+     * 
+     * @param l
+     * @param event
+     */
+    @Override
+    protected void sendEvent(SystemListener l, PointerEvent event)    
+    {            
+        PointerListener ml = (PointerListener) l;
+        ml.pointerStateChanged(event);
+    }
 
-	/**
-	 * Read scancodes from the input channel and dispatch them as events.
-	 */
-	final void processChannel() {
-		final ByteBuffer buf = ByteBuffer.allocate(1);
-		while ((channel != null) && channel.isOpen()) {
-			try {
-				buf.rewind();
-				if (channel.read(buf) != 1) {
-					continue;
-				}
-				final byte scancode = buf.get(0);
-				if (interpreter != null) {
-					final PointerEvent event = interpreter.handleScancode(scancode & 0xff);
-					if (event != null) {
-						//log.debug(event);
-						dispatchEvent(event);
-					}
-				}
-			} catch (Throwable ex) {
-				ex.printStackTrace();
-			}
-		}
-	}
-	
-	/**
-	 * PointerDaemon that translates scancodes to MouseEvents and dispatches those events.
-	 */
-	class PointerDaemon extends Thread {
-	
-		public PointerDaemon(String name) {
-			super(name);
-		}
-
-		public void run() {
-			processChannel();
-		}
-	}
-
-	/**
+    /**
 	 * @return PointerInterpreter
 	 */
 	public PointerInterpreter getPointerInterpreter() {
@@ -196,12 +152,6 @@ public abstract class AbstractPointerDriver extends Driver implements PointerAPI
 		this.interpreter = interpreter;
 	}
 
-	/**
-	 * Gets the byte channel. This is implementation specific
-	 * 
-	 * @return The byte channel
-	 */
-	protected abstract ByteChannel getChannel();
 	protected abstract int getPointerId() throws DriverException;
 	protected abstract boolean initPointer() throws DeviceException;
 	protected abstract boolean enablePointer() throws DeviceException;

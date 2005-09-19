@@ -21,13 +21,15 @@
  
 package org.jnode.driver.input;
 
+import org.jnode.system.event.SystemEvent;
+
 /**
  * Event used by pointer devices.
  * 
  * @author qades
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class PointerEvent {
+public class PointerEvent extends SystemEvent {
 
 	/** Left button bit-pattern */
 	public static final int BUTTON_LEFT = 1;
@@ -41,8 +43,6 @@ public class PointerEvent {
 	/** The x, y, z elements are relative displacement values */
 	public static final boolean RELATIVE = false;
 
-	/** The state of the buttons */
-	private final int buttons;
 	/** The X value */
 	private final int x;
 	/** The Y value */
@@ -51,8 +51,6 @@ public class PointerEvent {
 	private final int z;
 	/** Is this an absolute position, or relative displacement */
 	private final boolean absolute;
-	/** Has this even been consumed. */
-	private boolean consumed = false;
 
 	/**
 	 * Initialize this instance.
@@ -64,7 +62,7 @@ public class PointerEvent {
 	 * @param absolute
 	 */
 	public PointerEvent(int buttons, int x, int y, int z, boolean absolute) {
-		this.buttons = buttons;
+		super(buttons);
 		this.x = x;
 		this.y = y;
 		this.z = z;
@@ -84,28 +82,12 @@ public class PointerEvent {
 	}
 
 	/**
-	 * Mark this event as consumed.
-	 */
-	public void consume() {
-		consumed = true;
-	}
-
-	/**
-	 * Has this event been marked as consumed.
-	 * 
-	 * @return True if this event has been consumed, false otherwise.
-	 */
-	public boolean isConsumed() {
-		return consumed;
-	}
-
-	/**
 	 * Convert to a String representation
 	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		String btn = ((buttons & BUTTON_LEFT) != 0 ? "L" : "l") + ((buttons & BUTTON_MIDDLE) != 0 ? "M" : "m") + ((buttons & BUTTON_RIGHT) != 0 ? "R" : "r");
+		String btn = ((getButtons() & BUTTON_LEFT) != 0 ? "L" : "l") + ((getButtons() & BUTTON_MIDDLE) != 0 ? "M" : "m") + ((getButtons() & BUTTON_RIGHT) != 0 ? "R" : "r");
 
 		String pos = x + " " + y + " " + z + (absolute ? " ABS" : " REL");
 
@@ -141,28 +123,28 @@ public class PointerEvent {
 	 * @return Returns the buttons.
 	 */
 	public final int getButtons() {
-		return this.buttons;
+		return getId();
 	}
 
 	/**
 	 * Is the left button pressed.
 	 */
 	public final boolean isLeftButtonPressed() {
-		return ((this.buttons & BUTTON_LEFT) != 0);
+		return ((getButtons() & BUTTON_LEFT) != 0);
 	}
 
 	/**
 	 * Is the right button pressed.
 	 */
 	public final boolean isRightButtonPressed() {
-		return ((this.buttons & BUTTON_RIGHT) != 0);
+		return ((getButtons() & BUTTON_RIGHT) != 0);
 	}
 
 	/**
 	 * Is the middle button pressed.
 	 */
 	public final boolean isMiddleButtonPressed() {
-		return ((this.buttons & BUTTON_MIDDLE) != 0);
+		return ((getButtons() & BUTTON_MIDDLE) != 0);
 	}
 
 	/**
