@@ -24,19 +24,16 @@ package org.jnode.driver.input;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 
 import org.jnode.driver.Device;
-import org.jnode.driver.Driver;
 import org.jnode.driver.DriverException;
+import org.jnode.system.BootLog;
 import org.jnode.util.EmptyInputStream;
-import org.jnode.util.Queue;
-import org.jnode.util.QueueProcessor;
-import org.jnode.util.QueueProcessorThread;
+import org.jnode.util.SystemInputStream;
 
 /**
  * @author epr
@@ -109,25 +106,17 @@ public abstract class AbstractKeyboardDriver extends AbstractInputDriver<Keyboar
         dev.registerAPI(SystemTriggerAPI.class, this);
 
         // If no inputstream has been defined, create and set one.
-        if ((System.in == null) || (System.in instanceof EmptyInputStream)) {
-            if (channel == null) {
-                // even for keyboardless operation, we do need a System.in
-                kis = new InputStream() {
-
-                    public int read() {
-                        return -1;
-                    }
-                };
-            } else {
-                kis = new KeyboardInputStream(this);
-            }
-            AccessController.doPrivileged(new PrivilegedAction() {
-                public Object run() {
-                    System.setIn(kis);
-                    return null;
-                }                
-            });
+        kis = null;
+        if (channel != null) {
+            kis = new KeyboardInputStream(this);
         }
+        final InputStream systemIn = kis;
+        AccessController.doPrivileged(new PrivilegedAction() {
+            public Object run() {
+                SystemInputStream.getInstance().initialize(systemIn);
+                return null;
+            }                
+        });
     }
 
     /**
@@ -156,7 +145,7 @@ public abstract class AbstractKeyboardDriver extends AbstractInputDriver<Keyboar
         if (System.in == kis) {
             AccessController.doPrivileged(new PrivilegedAction() {
                 public Object run() {
-                    System.setIn(new EmptyInputStream());
+                    SystemInputStream.getInstance().releaseSystemIn();
                     return null;
                 }                
             });

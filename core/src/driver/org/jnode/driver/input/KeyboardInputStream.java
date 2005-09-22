@@ -35,7 +35,7 @@ public class KeyboardInputStream extends InputStream implements KeyboardListener
 	/** The queue of keyboard events */
 	private final Queue<KeyboardEvent> queue = new Queue<KeyboardEvent>();
 	/** Should we echo keys on the System.out? */
-	private boolean echo = false;
+	private boolean echo = true;
 
 	/**
 	 * Create a new instance

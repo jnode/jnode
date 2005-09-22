@@ -261,7 +261,6 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
         public void run() {
             try {
                 // System.err.println("Registering shell in new thread.");
-                ShellUtils.getShellManager().registerShell(commandShell);// workaround
                 // to
                 // ensure
                 // access

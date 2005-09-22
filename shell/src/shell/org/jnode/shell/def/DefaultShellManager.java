@@ -23,6 +23,7 @@ package org.jnode.shell.def;
 
 import org.jnode.shell.Shell;
 import org.jnode.shell.ShellManager;
+import org.jnode.util.SystemInputStream;
 
 /**
  * @author epr
@@ -43,6 +44,7 @@ public class DefaultShellManager implements ShellManager {
 	 * @param currentShell
 	 */
 	public void registerShell(Shell currentShell) {
+        SystemInputStream.getInstance().claimSystemIn();
 		this.currentShell.set(currentShell);
 	}
 }

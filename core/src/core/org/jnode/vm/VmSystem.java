@@ -43,6 +43,7 @@ import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.system.SimpleResourceOwner;
+import org.jnode.util.SystemInputStream;
 import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.jnode.vm.annotation.SharedStatics;
 import org.jnode.vm.classmgr.AbstractExceptionHandler;
@@ -908,7 +909,7 @@ public final class VmSystem {
      * @see #setIn(InputStream)
      */
     public static void setIn(InputStream in) {
-        setStaticField(System.class, "in", in);
+        SystemInputStream.getInstance().setIn(in);
     }
 
     /**

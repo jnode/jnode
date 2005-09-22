@@ -26,6 +26,7 @@ import java.io.PrintStream;
 import java.nio.ByteOrder;
 
 import org.jnode.util.EmptyInputStream;
+import org.jnode.util.SystemInputStream;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmSystem;
 
@@ -158,8 +159,8 @@ public final class VMSystem {
 	 * sequence.
 	 */
 
-	static InputStream makeStandardInputStream() {
-		return new EmptyInputStream();
+	static InputStream makeStandardInputStream() {        
+		return SystemInputStream.getInstance(); // JNode specific
 	}
 
 	/**
