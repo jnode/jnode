@@ -23,6 +23,18 @@ package org.jnode.shell;
 
 import gnu.java.security.action.GetPropertyAction;
 import gnu.java.security.action.SetPropertyAction;
+
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.PrintStream;
+import java.io.StringReader;
+import java.security.AccessController;
+import java.text.DateFormat;
+import java.util.Date;
+import java.util.StringTokenizer;
+
+import javax.naming.NameNotFoundException;
+
 import org.apache.log4j.Logger;
 import org.jnode.driver.console.Console;
 import org.jnode.driver.console.ConsoleManager;
@@ -32,18 +44,12 @@ import org.jnode.driver.input.KeyboardListener;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.alias.NoSuchAliasException;
-import org.jnode.shell.help.*;
+import org.jnode.shell.help.AliasArgument;
+import org.jnode.shell.help.Argument;
+import org.jnode.shell.help.CompletionException;
+import org.jnode.shell.help.Help;
+import org.jnode.shell.help.HelpException;
 import org.jnode.vm.VmSystem;
-
-import javax.naming.NameNotFoundException;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.PrintStream;
-import java.io.StringReader;
-import java.security.AccessController;
-import java.text.DateFormat;
-import java.util.Date;
-import java.util.StringTokenizer;
 
 /**
  * @author epr
@@ -162,7 +168,7 @@ public class CommandShell implements Runnable, Shell, KeyboardListener
       aliasMgr = ((AliasManager) InitialNaming.lookup(AliasManager.NAME))
           .createAliasManager();
       AccessController.doPrivileged(new SetPropertyAction(PROMPT_PROPERTY_NAME, DEFAULT_PROMPT));
-      ShellUtils.getShellManager().registerShell(this);
+//      ShellUtils.getShellManager().registerShell(this);
     }
     catch (NameNotFoundException ex)
     {
@@ -177,6 +183,18 @@ public class CommandShell implements Runnable, Shell, KeyboardListener
    */
   public void run()
   {
+      // Here, we are running in the CommandShell (main) Thread
+      // so, we can register ourself as the current shell
+      // (it will also be the current shell for all children Thread)
+    try
+    {
+        ShellUtils.getShellManager().registerShell(this);
+    }
+    catch (NameNotFoundException e1)
+    {
+        e1.printStackTrace();
+    }
+      
     // Run commands from the JNode commandline first
     final String cmdLine = (String) AccessController
         .doPrivileged(new GetPropertyAction("jnode.cmdline", ""));
