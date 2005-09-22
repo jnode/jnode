@@ -83,7 +83,6 @@ public class ConsoleCommand {
                 CommandShell commandShell = new CommandShell(console);
                 new Thread(commandShell).start();
 
-                ShellUtils.getShellManager().registerShell(commandShell);
                 System.out.println("Console created with name:"
                         + console.getConsoleName());
             }

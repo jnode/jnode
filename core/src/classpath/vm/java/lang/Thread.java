@@ -225,6 +225,8 @@ public class Thread implements Runnable {
 
         this.vmThread = VmProcessor.current().createThread(this);
         this.vmThread.setPriority(current.getPriority());
+        
+        InheritableThreadLocal.newChildThread(this); // FDy : CLASSPATH patch ?
     }
 
     /**
