@@ -720,8 +720,9 @@ public abstract class Component
 
 	/**
 	 * Tests if the component is displayable. It must be connected to a native
-	 * screen resource, and all its ancestors must be displayable. A containment
-	 * hierarchy is made displayable when a window is packed or made visible.
+   * screen resource.  This reduces to checking that peer is not null.  A 
+   * containment  hierarchy is made displayable when a window is packed or 
+   * made visible.
 	 *
 	 * @return true if the component is displayable
 	 * @see Container#add(Component)
@@ -733,9 +734,7 @@ public abstract class Component
 	 */
   public boolean isDisplayable()
   {
-		if (parent != null)
-			return parent.isDisplayable();
-		return false;
+    return peer != null;
 	}
 
 	/**
@@ -1404,9 +1403,6 @@ public abstract class Component
     // Erase old bounds and repaint new bounds for lightweights.
     if (isLightweight() && isShowing ())
       {
-        boolean shouldRepaintParent = false;
-        boolean shouldRepaintSelf = false;
-
         if (parent != null)
           {
             Rectangle parentBounds = parent.getBounds();
@@ -1416,14 +1412,11 @@ public abstract class Component
             Rectangle newBounds = new Rectangle(parent.getX() + x,
                                                 parent.getY() + y,
                                                 width, height);
-            shouldRepaintParent = parentBounds.intersects(oldBounds);
-            shouldRepaintSelf = parentBounds.intersects(newBounds);
+            Rectangle destroyed = oldBounds.union(newBounds);
+            if (!destroyed.isEmpty())
+              parent.repaint(0, destroyed.x, destroyed.y, destroyed.width,
+                             destroyed.height);
           }
-
-        if (shouldRepaintParent && parent != null)
-          parent.repaint(oldx, oldy, oldwidth, oldheight);
-        if (shouldRepaintSelf)
-          repaint();
       }
 
     // Only post event if this component is visible and has changed size.
@@ -1830,9 +1823,8 @@ public abstract class Component
 	 */
   public void paint(Graphics g)
   {
-    // Paint the heavyweight peer
-    if (!isLightweight() && peer != null)
-      peer.paint(g);
+    // This is a callback method and is meant to be overridden by subclasses
+    // that want to perform custom painting.
 	}
 
 	/**
@@ -1858,7 +1850,8 @@ public abstract class Component
   {
     // Tests show that the clearing of the background is only done in
     // two cases:
-    // - If the component is lightwight (yes this is in contrast to the spec).
+    // - If the component is lightweight (yes this is in contrast to the spec).
+    // or
     // - If the component is a toplevel container.
     if (isLightweight() || getParent() == null)
       {
@@ -1894,6 +1887,13 @@ public abstract class Component
 	 */
   public void repaint()
   {
+    if(!isShowing())
+      {
+        Component p = parent;
+        if (p != null)
+          p.repaint(0, getX(), getY(), width, height);
+      }
+    else
 		repaint(0, 0, 0, width, height);
 	}
 
@@ -1908,6 +1908,13 @@ public abstract class Component
 	 */
   public void repaint(long tm)
   {
+    if(!isShowing())
+      {
+        Component p = parent;
+        if (p != null)
+          p.repaint(tm, getX(), getY(), width, height);
+      }
+    else
 		repaint(tm, 0, 0, width, height);
 	}
 
@@ -1925,6 +1932,13 @@ public abstract class Component
 	 */
   public void repaint(int x, int y, int w, int h)
   {
+    if(!isShowing())
+      {
+        Component p = parent;
+        if (p != null)
+          p.repaint(0, x + getX(), y + getY(), width, height);
+      }
+    else
 		repaint(0, x, y, w, h);
 	}
 
@@ -1943,14 +1957,18 @@ public abstract class Component
 	 */
   public void repaint(long tm, int x, int y, int width, int height)
   {
-		// Handle lightweight repainting by forwarding to native parent
-    if (isLightweight() && parent != null)
+    if(!isShowing())
       {
-			if (parent != null)
-				parent.repaint(tm, x + getX(), y + getY(), width, height);
+        Component p = parent;
+        if (p != null)
+          p.repaint(tm, x + getX(), y + getY(), width, height);
       }
-    else if (peer != null)
-			peer.repaint(tm, x, y, width, height);
+    else
+      {
+        ComponentPeer p = peer;
+        if (p != null)
+          p.repaint(tm, x, y, width, height);
+      }
 	}
 
 	/**
@@ -2011,7 +2029,7 @@ public abstract class Component
   public boolean imageUpdate(Image img, int flags, int x, int y, int w, int h)
   {
     if ((flags & (FRAMEBITS | ALLBITS)) != 0)
-      repaint ();
+      repaint();
     else if ((flags & SOMEBITS) != 0)
       {
 	if (incrementalDraw)
@@ -2021,10 +2039,10 @@ public abstract class Component
 		long tm = redrawRate.longValue();
 		if (tm < 0)
 		  tm = 0;
-		repaint (tm);
+                repaint(tm);
 		}
 	    else
-	      repaint (100);
+              repaint(100);
 		}
       }
     return (flags & (ALLBITS | ABORT | ERROR)) == 0;
@@ -2322,8 +2340,6 @@ public abstract class Component
 		// Some subclasses in the AWT package need to override this behavior,
 		// hence the use of dispatchEventImpl().
 		dispatchEventImpl(e);
-    if (peer != null && ! e.consumed)
-			peer.handleEvent(e);
 	}
 
 	/**
@@ -4224,9 +4240,9 @@ public abstract class Component
 		if (isDoubleBuffered())
 			param.append(",doublebuffered");
     if (parent == null)
-      param.append(",parent==null");
+      param.append(",parent=null");
     else
-      param.append(",parent==").append(parent.getName());
+      param.append(",parent=").append(parent.getName());
 		return param.toString();
 	}
 
@@ -4786,7 +4802,7 @@ p   * <li>the set of backward traversal keys
    * @param e the event to dispatch
    */
 
-  void dispatchEventImpl (AWTEvent e)
+  void dispatchEventImpl(AWTEvent e)
   {
     Event oldEvent = translateEvent (e);
 
@@ -4820,8 +4836,12 @@ p   * <li>the set of backward traversal keys
                 break;
               }
           }
-        processEvent (e);
+        if (e.id != PaintEvent.PAINT && e.id != PaintEvent.UPDATE)
+          processEvent(e);
       }
+
+    if (peer != null)
+      peer.handleEvent(e);
   }
 
   /**
