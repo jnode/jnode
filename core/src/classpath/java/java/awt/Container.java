@@ -38,10 +38,12 @@ exception statement from your version. */
 
 package java.awt;
 
+import java.awt.event.ComponentListener;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.peer.ComponentPeer;
 import java.awt.peer.ContainerPeer;
 import java.awt.peer.LightweightPeer;
 import java.beans.PropertyChangeListener;
@@ -59,7 +61,8 @@ import java.util.Iterator;
 import java.util.Set;
 
 import javax.accessibility.Accessible;
-import javax.swing.SwingUtilities;
+
+import gnu.java.awt.AWTUtilities;
 
 /**
  * A generic window toolkit object that acts as a container for other objects.
@@ -338,8 +341,12 @@ public class Container extends Component
         if (comp.parent != null)
           comp.parent.remove(comp);
         comp.parent = this;
+
         if (peer != null)
           {
+	    // Notify the component that it has a new parent.
+	    comp.addNotify();
+
             if (comp.isLightweight ())
 	      {
 		enableEvents (comp.eventMask);
@@ -348,7 +355,8 @@ public class Container extends Component
 	      }
           }
 
-        invalidate();
+        // Invalidate the layout of the added component and its ancestors.
+        comp.invalidate();
 
         if (component == null)
           component = new Component[4]; // FIXME, better initial size?
@@ -394,6 +402,9 @@ public class Container extends Component
                                                ContainerEvent.COMPONENT_ADDED,
                                                comp);
         getToolkit().getSystemEventQueue().postEvent(ce);
+
+            // Repaint this container.
+            repaint();
       }
   }
   }
@@ -409,6 +420,10 @@ public class Container extends Component
       {
         Component r = component[index];
 
+        ComponentListener[] list = r.getComponentListeners();
+        for (int j = 0; j < list.length; j++)
+              r.removeComponentListener(list[j]);
+        
         r.removeNotify();
 
         System.arraycopy(component, index + 1, component, index,
@@ -429,6 +444,9 @@ public class Container extends Component
                                                ContainerEvent.COMPONENT_REMOVED,
                                                r);
         getToolkit().getSystemEventQueue().postEvent(ce);
+
+            // Repaint this container.
+            repaint();
       }
   }
   }
@@ -513,6 +531,11 @@ public class Container extends Component
   public void invalidate()
   {
     super.invalidate();
+    if (layoutMgr != null && layoutMgr instanceof LayoutManager2)
+      {
+        LayoutManager2 lm2 = (LayoutManager2) layoutMgr;
+        lm2.invalidateLayout(this);
+      }
   }
 
   /**
@@ -534,12 +557,19 @@ public class Container extends Component
    */
   void invalidateTree()
   {
+    super.invalidate();  // Clean cached layout state.
     for (int i = 0; i < ncomponents; i++)
       {
         Component comp = component[i];
         comp.invalidate();
         if (comp instanceof Container)
           ((Container) comp).invalidateTree();
+      }
+
+    if (layoutMgr != null && layoutMgr instanceof LayoutManager2)
+      {
+        LayoutManager2 lm2 = (LayoutManager2) layoutMgr;
+        lm2.invalidateLayout(this);
       }
   }
 
@@ -596,11 +626,15 @@ public class Container extends Component
 
   public void setFont(Font f)
   {
+    if( (f != null && (font == null || !font.equals(f)))
+        || f == null)
+      {
     super.setFont(f);
     // FIXME: Although it might make more sense to invalidate only
     // those children whose font == null, Sun invalidates all children.
     // So we'll do the same.
     invalidateTree();
+  }
   }
 
   /**
@@ -622,10 +656,21 @@ public class Container extends Component
    */
   public Dimension preferredSize()
   {
-    if (layoutMgr != null)
-      return layoutMgr.preferredLayoutSize (this);
+    synchronized(treeLock)
+      {  
+        if(valid && prefSize != null)
+          return new Dimension(prefSize);
+        LayoutManager layout = getLayout();
+        if (layout != null)
+          {
+            Dimension layoutSize = layout.preferredLayoutSize(this);
+            if(valid)
+              prefSize = layoutSize;
+            return new Dimension(layoutSize);
+          }
     else
       return super.preferredSize ();
+  }
   }
 
   /**
@@ -647,8 +692,15 @@ public class Container extends Component
    */
   public Dimension minimumSize()
   {
-    if (layoutMgr != null)
-      return layoutMgr.minimumLayoutSize (this);
+    if(valid && minSize != null)
+      return new Dimension(minSize);
+
+    LayoutManager layout = getLayout();
+    if (layout != null)
+      {
+        minSize = layout.minimumLayoutSize (this);
+        return minSize;
+      }    
     else
       return super.minimumSize ();
   }
@@ -660,10 +712,15 @@ public class Container extends Component
    */
   public Dimension getMaximumSize()
   {
-    if (layoutMgr != null && layoutMgr instanceof LayoutManager2)
+    if (valid && maxSize != null)
+      return new Dimension(maxSize);
+
+    LayoutManager layout = getLayout();
+    if (layout != null && layout instanceof LayoutManager2)
       {
-        LayoutManager2 lm2 = (LayoutManager2) layoutMgr;
-        return lm2.maximumLayoutSize(this);
+        LayoutManager2 lm2 = (LayoutManager2) layout;
+        maxSize = lm2.maximumLayoutSize(this);
+        return maxSize;
       }
     else
       return super.getMaximumSize();
@@ -678,12 +735,6 @@ public class Container extends Component
    */
   public float getAlignmentX()
   {
-    if (layoutMgr instanceof LayoutManager2)
-      {
-        LayoutManager2 lm2 = (LayoutManager2) layoutMgr;
-        return lm2.getLayoutAlignmentX(this);
-      }
-    else
       return super.getAlignmentX();
   }
 
@@ -696,12 +747,6 @@ public class Container extends Component
    */
   public float getAlignmentY()
   {
-    if (layoutMgr instanceof LayoutManager2)
-      {
-        LayoutManager2 lm2 = (LayoutManager2) layoutMgr;
-        return lm2.getLayoutAlignmentY(this);
-      }
-    else
       return super.getAlignmentY();
   }
 
@@ -718,8 +763,7 @@ public class Container extends Component
   {
     if (!isShowing())
       return;
-    // Paint self first.
-    super.paint(g);
+
     // Visit heavyweights as well, in case they were
     // erased when we cleared the background for this container.
     visitChildren(g, GfxPaintVisitor.INSTANCE, false);
@@ -733,10 +777,30 @@ public class Container extends Component
    * drawn.
    *
    * @param g The graphics context for this update.
+   *
+   * @specnote The specification suggests that this method forwards the
+   *           update() call to all its lightweight children. Tests show
+   *           that this is not done either in the JDK. The exact behaviour
+   *           seems to be that the background is cleared in heavyweight
+   *           Containers, and all other containers
+   *           directly call paint(), causing the (lightweight) children to
+   *           be painted.
    */
   public void update(Graphics g)
   {
-    super.update(g);
+    // It seems that the JDK clears the background of containers like Panel
+    // and Window (within this method) but not of 'plain' Containers or
+    // JComponents. This could
+    // lead to the assumption that it only clears heavyweight containers.
+    // However that is not quite true. In a test with a custom Container
+    // that overrides isLightweight() to return false, the background is
+    // also not cleared. So we do a check on !(peer instanceof LightweightPeer)
+    // instead.
+    ComponentPeer p = peer;
+    if (p != null && !(p instanceof LightweightPeer))
+      g.clearRect(0, 0, getWidth(), getHeight());
+
+    paint(g);
   }
 
   /**
@@ -989,6 +1053,53 @@ public class Container extends Component
       }
   }
 
+  /**
+   * Finds the visible child component that contains the specified position.
+   * The top-most child is returned in the case where there is overlap.
+   * If the top-most child is transparent and has no MouseListeners attached,
+   * we discard it and return the next top-most component containing the
+   * specified position.
+   * @param x the x coordinate
+   * @param y the y coordinate
+   * @return null if the <code>this</code> does not contain the position,
+   * otherwise the top-most component (out of this container itself and 
+   * its descendants) meeting the criteria above.
+   */
+  Component findComponentForMouseEventAt(int x, int y)
+  {
+    synchronized (getTreeLock())
+      {
+        if (!contains(x, y))
+          return null;
+
+        for (int i = 0; i < ncomponents; ++i)
+          {
+            // Ignore invisible children...
+            if (!component[i].isVisible())
+              continue;
+
+            int x2 = x - component[i].x;
+            int y2 = y - component[i].y;
+            // We don't do the contains() check right away because
+            // findComponentAt would redundantly do it first thing.
+            if (component[i] instanceof Container)
+              {
+                Container k = (Container) component[i];
+                Component r = k.findComponentForMouseEventAt(x2, y2);
+                if (r != null)
+                  return r;
+              }
+            else if (component[i].contains(x2, y2))
+              return component[i];
+          }
+
+        //don't return transparent components with no MouseListeners
+        if (this.getMouseListeners().length == 0)
+          return null;
+        return this;
+      }
+  }
+
   public Component findComponentAt(Point p)
   {
     return findComponentAt(p.x, p.y);
@@ -1198,7 +1309,7 @@ public class Container extends Component
       }
 
     if (focusTraversalKeys == null)
-      focusTraversalKeys = new Set[3];
+      focusTraversalKeys = new Set[4];
 
     keystrokes = Collections.unmodifiableSet (new HashSet (keystrokes));
     firePropertyChange (name, focusTraversalKeys[id], keystrokes);
@@ -1465,12 +1576,8 @@ public class Container extends Component
         for (int i = ncomponents - 1; i >= 0; --i)
           {
             Component comp = component[i];
-            // If we're visiting heavyweights as well,
-            // don't recurse into Containers here. This avoids
-            // painting the same nested child multiple times.
             boolean applicable = comp.isVisible()
-              && (comp.isLightweight()
-                  || !lightweightOnly && ! (comp instanceof Container));
+              && (comp.isLightweight() || !lightweightOnly);
 
             if (applicable)
               visitChild(gfx, visitor, comp);
@@ -1525,9 +1632,7 @@ public class Container extends Component
   void dispatchEventImpl(AWTEvent e)
   {
     // Give lightweight dispatcher a chance to handle it.
-    if (eventTypeEnabled (e.id)
-        && dispatcher != null 
-        && dispatcher.handleEvent (e))
+    if (dispatcher != null && dispatcher.handleEvent (e))
       return;
 
     if ((e.id <= ContainerEvent.CONTAINER_LAST
@@ -1537,6 +1642,26 @@ public class Container extends Component
       processEvent(e);
     else
       super.dispatchEventImpl(e);
+  }
+
+  /**
+   * Tests if this container has an interest in the given event id.
+   *
+   * @param eventId The event id to check.
+   *
+   * @return <code>true</code> if a listener for the event id exists or
+   *         if the eventMask is set for the event id.
+   *
+   * @see java.awt.Component#eventTypeEnabled(int)
+   */
+  boolean eventTypeEnabled(int eventId)
+  {
+    if(eventId <= ContainerEvent.CONTAINER_LAST 
+       && eventId >= ContainerEvent.CONTAINER_FIRST)
+      return containerListener != null
+        || (eventMask & AWTEvent.CONTAINER_EVENT_MASK) != 0;
+      else 
+        return super.eventTypeEnabled(eventId);
   }
 
   // This is used to implement Component.transferFocus.
@@ -1603,12 +1728,11 @@ public class Container extends Component
 
                 // If we're not lightweight, and we just got a lightweight
                 // child, we need a lightweight dispatcher to feed it events.
-                if (! this.isLightweight()) 
-                  {
-                    if (dispatcher == null)
+                if (!this.isLightweight() && dispatcher == null) 
                     dispatcher = new LightweightDispatcher (this);
-                  }	
 	  
+                if (dispatcher != null)
+                  dispatcher.enableEvents(component[i].eventMask);
 
 		enableEvents(component[i].eventMask);
 		if (peer != null && !isLightweight ())
@@ -1862,7 +1986,6 @@ public class Container extends Component
  * rather than mimic it exactly we write something which does "roughly
  * the same thing".
  */
-
 class LightweightDispatcher implements Serializable
 {
   private static final long serialVersionUID = 5184291520170872969L;
@@ -1870,10 +1993,8 @@ class LightweightDispatcher implements Serializable
   private Cursor nativeCursor;
   private long eventMask;
   
-  private transient Component mouseEventTarget;
   private transient Component pressedComponent;
   private transient Component lastComponentEntered;
-  private transient Component tempComponent;
   private transient int pressCount;
   
   LightweightDispatcher(Container c)
@@ -1881,11 +2002,41 @@ class LightweightDispatcher implements Serializable
     nativeContainer = c;
   }
 
-  void acquireComponentForMouseEvent(MouseEvent me)
+  void enableEvents(long l)
+  {
+    eventMask |= l;
+  }
+
+  /**
+   * Returns the deepest visible descendent of parent that contains the 
+   * specified location and that is not transparent and MouseListener-less.
+   * @param parent the root component to begin the search
+   * @param x the x coordinate
+   * @param y the y coordinate
+   * @return null if <code>parent</code> doesn't contain the location, 
+   * parent if parent is not a container or has no child that contains the
+   * location, otherwise the appropriate component from the conditions
+   * above.
+   */
+  Component getDeepestComponentForMouseEventAt (
+                                                              Component parent, int x, int y)
+  {
+    if (parent == null || (! parent.contains(x, y)))
+      return null;
+
+    if (! (parent instanceof Container))
+      return parent;
+
+    Container c = (Container) parent;
+    return c.findComponentForMouseEventAt(x, y);
+  }
+  
+  Component acquireComponentForMouseEvent(MouseEvent me)
   {
     int x = me.getX ();
     int y = me.getY ();
     
+    Component mouseEventTarget = null;
     // Find the candidate which should receive this event.
     Component parent = nativeContainer;
     Component candidate = null;
@@ -1893,11 +2044,11 @@ class LightweightDispatcher implements Serializable
     while (candidate == null && parent != null)
       {
         candidate =
-          SwingUtilities.getDeepestComponentAt(parent, p.x, p.y);
+          getDeepestComponentForMouseEventAt(parent, p.x, p.y);
         if (candidate == null || (candidate.eventMask & me.getID()) == 0)
       {
           candidate = null;
-          p = SwingUtilities.convertPoint(parent, p.x, p.y, parent.parent);
+            p = AWTUtilities.convertPoint(parent, p.x, p.y, parent.parent);
           parent = parent.parent;
         }
       }
@@ -1915,10 +2066,10 @@ class LightweightDispatcher implements Serializable
       {
         // Old candidate could have been removed from 
         // the nativeContainer so we check first.
-        if (SwingUtilities.isDescendingFrom(lastComponentEntered, nativeContainer))
+        if (AWTUtilities.isDescendingFrom(lastComponentEntered,
+                                          nativeContainer))
         {
-        Point tp = 
-          SwingUtilities.convertPoint(nativeContainer, 
+            Point tp = AWTUtilities.convertPoint(nativeContainer, 
                                       x, y, lastComponentEntered);
         MouseEvent exited = new MouseEvent (lastComponentEntered, 
                                             MouseEvent.MOUSE_EXITED,
@@ -1928,12 +2079,11 @@ class LightweightDispatcher implements Serializable
                                             me.getClickCount (),
                                             me.isPopupTrigger (),
                                             me.getButton ());
-          tempComponent = lastComponentEntered;
-          lastComponentEntered = null;
-          tempComponent.dispatchEvent(exited);
+            lastComponentEntered.dispatchEvent (exited); 
         }
         lastComponentEntered = null;
       }
+
     // If we have a candidate, maybe enter it.
     if (candidate != null)
       {
@@ -1944,7 +2094,7 @@ class LightweightDispatcher implements Serializable
             && candidate != lastComponentEntered)
 	  {			
             lastComponentEntered = mouseEventTarget;
-            Point cp = SwingUtilities.convertPoint(nativeContainer, 
+            Point cp = AWTUtilities.convertPoint(nativeContainer, 
                                                    x, y, lastComponentEntered);
             MouseEvent entered = new MouseEvent (lastComponentEntered, 
                                                  MouseEvent.MOUSE_ENTERED,
@@ -1958,17 +2108,38 @@ class LightweightDispatcher implements Serializable
           }
       }
 
+    // Check which buttons where pressed except the last button that
+    // changed state.
+    int modifiers = me.getModifiersEx() & (MouseEvent.BUTTON1_DOWN_MASK
+                                           | MouseEvent.BUTTON2_DOWN_MASK
+                                           | MouseEvent.BUTTON3_DOWN_MASK);
+    switch(me.getButton())
+      {
+      case MouseEvent.BUTTON1:
+        modifiers &= ~MouseEvent.BUTTON1_DOWN_MASK;
+        break;
+      case MouseEvent.BUTTON2:
+        modifiers &= ~MouseEvent.BUTTON2_DOWN_MASK;
+        break;
+      case MouseEvent.BUTTON3:
+        modifiers &= ~MouseEvent.BUTTON3_DOWN_MASK;
+        break;
+      }
+
     if (me.getID() == MouseEvent.MOUSE_RELEASED
-        || me.getID() == MouseEvent.MOUSE_PRESSED && pressCount > 0
+        || me.getID() == MouseEvent.MOUSE_PRESSED && modifiers > 0
         || me.getID() == MouseEvent.MOUSE_DRAGGED)
+      {
       // If any of the following events occur while a button is held down,
       // they should be dispatched to the same component to which the
       // original MOUSE_PRESSED event was dispatched:
       //   - MOUSE_RELEASED
-      //   - MOUSE_PRESSED: another button pressed while the first is held down
+        //   - MOUSE_PRESSED: another button pressed while the first is held
+        //     down
       //   - MOUSE_DRAGGED
-      if (SwingUtilities.isDescendingFrom(pressedComponent, nativeContainer))
+        if (AWTUtilities.isDescendingFrom(pressedComponent, nativeContainer))
       mouseEventTarget = pressedComponent;
+      }
     else if (me.getID() == MouseEvent.MOUSE_CLICKED)
       {
         // Don't dispatch CLICKED events whose target is not the same as the
@@ -1978,6 +2149,7 @@ class LightweightDispatcher implements Serializable
         else if (pressCount == 0)
           pressedComponent = null;
       }
+    return mouseEventTarget;
   }
 
   boolean handleEvent(AWTEvent e)
@@ -1986,7 +2158,9 @@ class LightweightDispatcher implements Serializable
       {
         MouseEvent me = (MouseEvent) e;
 
-        acquireComponentForMouseEvent(me);
+        // Make the LightWeightDispatcher reentrant. This is necessary when
+        // a lightweight component does its own modal event queue.
+        Component mouseEventTarget = acquireComponentForMouseEvent(me);
 
         // Avoid dispatching ENTERED and EXITED events twice.
         if (mouseEventTarget != null
@@ -1994,18 +2168,12 @@ class LightweightDispatcher implements Serializable
             && e.getID() != MouseEvent.MOUSE_ENTERED
             && e.getID() != MouseEvent.MOUSE_EXITED)
           {
-            MouseEvent newEvt = 
-              SwingUtilities.convertMouseEvent(nativeContainer, me, 
-                                               mouseEventTarget);
-            mouseEventTarget.dispatchEvent(newEvt);
-
             switch (e.getID())
               {
                 case MouseEvent.MOUSE_PRESSED:
                   if (pressCount++ == 0)
                     pressedComponent = mouseEventTarget;
                   break;
-
                 case MouseEvent.MOUSE_RELEASED:
                   // Clear our memory of the original PRESSED event, only if
                   // we're not expecting a CLICKED event after this. If
@@ -2015,6 +2183,12 @@ class LightweightDispatcher implements Serializable
                     pressedComponent = null;
                   break;
               }
+
+            MouseEvent newEvt =
+              AWTUtilities.convertMouseEvent(nativeContainer, me,
+                                             mouseEventTarget);
+            mouseEventTarget.dispatchEvent(newEvt);
+
               if (newEvt.isConsumed())
                 e.consume();
           }
@@ -2022,5 +2196,4 @@ class LightweightDispatcher implements Serializable
     
     return e.isConsumed();
   }
-
-} // class LightweightDispatcher
+}
