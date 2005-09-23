@@ -143,4 +143,11 @@ public class JNodeGraphicsConfiguration extends GraphicsConfiguration {
     public String toString() {
         return bounds.width + "x" + bounds.height + "/" + colorModel.getPixelSize();
     }
+
+    @Override
+    public VolatileImage createCompatibleVolatileImage(int width, int height, int transparency)
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }
