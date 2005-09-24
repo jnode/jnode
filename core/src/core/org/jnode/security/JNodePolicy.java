@@ -64,8 +64,10 @@ final class JNodePolicy extends Policy {
      * Initialize this instance.
      */
     public JNodePolicy(ExtensionPoint permissionsEp) {
-        this.policyFile = new PolicyFile(ClassLoader
-                .getSystemResource("/org/jnode/security/jnode.policy"));
+        this.policyFile = new PolicyFile();
+        //TODO SECURITY DISABLED !!! (need Classpath and/or JNode workaround)
+//        this.policyFile.parse(ClassLoader
+//                .getSystemResource("/org/jnode/security/jnode.policy"));
         this.codeSource2Permissions = new HashMap<CodeSource, PermissionCollection>();
         this.permissionsEp = permissionsEp;
         loadExtensions();
