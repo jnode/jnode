@@ -1,4 +1,4 @@
-/* Timer.java -- 
+/* Timer.java --
    Copyright (C) 2002, 2004, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -66,37 +66,38 @@ public class Timer
     public void run()
     {
       running = true;
-      try 
+      try
         {
           sleep(initialDelay);
-		
+
           queueEvent();
 
-	while (running)
-	  {
-	      try
-	        {
-              sleep(delay);
-	        }
-	      catch (InterruptedException e)
-	        {
-		  return;
-	        }
-              queueEvent();
+          if (repeats)
+            while (running)
+              {
+                try
+                  {
+                    sleep(delay);
+                  }
+                catch (InterruptedException e)
+                  {
+                    return;
+                  }
+                queueEvent();
 
-              if (logTimers)
-		System.out.println("javax.swing.Timer -> clocktick");
-  
-              if ( ! repeats)
-	      break;
-	  }
-	running = false;
-      } 
-      catch (Exception e) 
+                if (logTimers)
+                  System.out.println("javax.swing.Timer -> clocktick");
+
+                if ( ! repeats)
+                  break;
+              }
+          running = false;
+        }
+      catch (Exception e)
         {
           // The timer is no longer running.
           running = false;
-      }
+        }
     }
   }
 
@@ -110,11 +111,11 @@ public class Timer
    * to invoke the {@link #drainEvents()}.
    */
   private Runnable drainer = new Runnable()
-  {
+    {
       public void run()
       {
         drainEvents();
-  }
+      }
     };
 
   /**
@@ -127,7 +128,7 @@ public class Timer
    * A field to store all listeners who are listening to this timer.
    */
   protected EventListenerList listenerList = new EventListenerList();
-  
+
   /**
    * <code>true</code> if the timer coalesces events.
    */
@@ -198,7 +199,7 @@ public class Timer
     if (listener != null)
       addActionListener(listener);
   }
-  
+
   /**
    * Get the array of action listeners.
    *
@@ -225,7 +226,7 @@ public class Timer
   {
     coalesce = c;
   }
-    
+
   /**
    * Checks if the Timer coalesces multiple pending event firings.
    * If the coalescing is enabled, the multiple events that have not been
@@ -279,7 +280,7 @@ public class Timer
   {
     return logTimers;
   }
-    
+
   /**
    * Set the delay between firing the subsequent events.
    * This parameter does not change the value of the initial delay before
@@ -411,10 +412,10 @@ public class Timer
   {
     running = false;
     if (waker != null)
-    waker.interrupt();
+      waker.interrupt();
     synchronized (queueLock)
       {
-	queue = 0;
+        queue = 0;
       }
   }
 

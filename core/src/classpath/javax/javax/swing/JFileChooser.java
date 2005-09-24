@@ -65,43 +65,43 @@ import javax.swing.plaf.FileChooserUI;
  * behaviour of the file chooser.
  *
  * @author Kim Ho (kho@luxsci.net)
-	 */
+ */
 public class JFileChooser extends JComponent implements Accessible
 {
   private static final long serialVersionUID = 3162921138695327837L;
 
   /** DOCUMENT ME! */
-	public static final int OPEN_DIALOG = 0;
+  public static final int OPEN_DIALOG = 0;
 
   /** DOCUMENT ME! */
-	public static final int SAVE_DIALOG = 1;
+  public static final int SAVE_DIALOG = 1;
 
   /** DOCUMENT ME! */
-	public static final int CUSTOM_DIALOG = 2;
+  public static final int CUSTOM_DIALOG = 2;
 
   /** DOCUMENT ME! */
-	public static final int CANCEL_OPTION = 1;
+  public static final int CANCEL_OPTION = 1;
 
   /** DOCUMENT ME! */
-	public static final int APPROVE_OPTION = 0;
+  public static final int APPROVE_OPTION = 0;
 
   /** DOCUMENT ME! */
-	public static final int ERROR_OPTION = -1;
+  public static final int ERROR_OPTION = -1;
 
   /** DOCUMENT ME! */
-	public static final int FILES_ONLY = 0;
+  public static final int FILES_ONLY = 0;
 
   /** DOCUMENT ME! */
-	public static final int DIRECTORIES_ONLY = 1;
+  public static final int DIRECTORIES_ONLY = 1;
 
   /** DOCUMENT ME! */
-	public static final int FILES_AND_DIRECTORIES = 2;
+  public static final int FILES_AND_DIRECTORIES = 2;
 
   /** DOCUMENT ME! */
-	public static final String CANCEL_SELECTION = "CancelSelection";
+  public static final String CANCEL_SELECTION = "CancelSelection";
 
   /** DOCUMENT ME! */
-	public static final String APPROVE_SELECTION = "ApproveSelection";
+  public static final String APPROVE_SELECTION = "ApproveSelection";
 
   /** DOCUMENT ME! */
   public static final String APPROVE_BUTTON_TEXT_CHANGED_PROPERTY =
@@ -186,10 +186,10 @@ public class JFileChooser extends JComponent implements Accessible
   private int approveButtonMnemonic = 0;
 
   /** DOCUMENT ME! */
-	private String approveButtonText;
+  private String approveButtonText;
 
   /** DOCUMENT ME! */
-	private String approveButtonToolTipText;
+  private String approveButtonToolTipText;
 
   /** DOCUMENT ME! */
   private ArrayList choosableFilters = new ArrayList();
@@ -233,27 +233,27 @@ public class JFileChooser extends JComponent implements Accessible
   /** DOCUMENT ME! */
   private File selectedFile;
 
-	/**
+  /**
    * Creates a new JFileChooser object.
-	 */
+   */
   public JFileChooser()
   {
     setup(null);
     setCurrentDirectory(null);
   }
 
-	/**
+  /**
    * Creates a new JFileChooser object.
    *
    * @param currentDirectoryPath DOCUMENT ME!
-	 */
+   */
   public JFileChooser(String currentDirectoryPath)
   {
     setup(null);
     setCurrentDirectory(fsv.createFileObject(currentDirectoryPath));
   }
 
-	/**
+  /**
    * Creates a new JFileChooser object with the specified directory and
    * FileSystemView.
    *
@@ -271,41 +271,41 @@ public class JFileChooser extends JComponent implements Accessible
    * Creates a new JFileChooser object.
    *
    * @param currentDirectory DOCUMENT ME!
-	 */
+   */
   public JFileChooser(File currentDirectory)
   {
     setup(null);
     setCurrentDirectory(currentDirectory);
   }
 
-	/**
+  /**
    * Creates a new JFileChooser object.
    *
    * @param fsv DOCUMENT ME!
-	 */
+   */
   public JFileChooser(FileSystemView fsv)
   {
     setup(fsv);
     setCurrentDirectory(null);
   }
 
-	/**
+  /**
    * Creates a new JFileChooser object.
    *
    * @param currentDirectory DOCUMENT ME!
    * @param fsv DOCUMENT ME!
-	 */
+   */
   public JFileChooser(File currentDirectory, FileSystemView fsv)
   {
     setup(fsv);
     setCurrentDirectory(currentDirectory);
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param view DOCUMENT ME!
-	 */
+   */
   protected void setup(FileSystemView view)
   {
     if (view == null)
@@ -314,42 +314,42 @@ public class JFileChooser extends JComponent implements Accessible
     updateUI();
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param b DOCUMENT ME!
-	 */
+   */
   public void setDragEnabled(boolean b)
   {
     // FIXME: Implement
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   public boolean getDragEnabled()
   {
     // FIXME: Implement
     return false;
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   public File getSelectedFile()
   {
     return selectedFile;
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param file DOCUMENT ME!
-	 */
+   */
   public void setSelectedFile(File file)
   {
     if (selectedFile != file)
@@ -360,25 +360,25 @@ public class JFileChooser extends JComponent implements Accessible
       }
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   public File[] getSelectedFiles()
   {
     if (selectedFiles != null)
-    return selectedFiles;
+      return selectedFiles;
     if (selectedFile != null)
       return new File[] { selectedFile };
     return null;
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param selectedFiles DOCUMENT ME!
-	 */
+   */
   public void setSelectedFiles(File[] selectedFiles)
   {
     if (this.selectedFiles != selectedFiles)
@@ -392,21 +392,21 @@ public class JFileChooser extends JComponent implements Accessible
       setSelectedFile(selectedFiles[0]);
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   public File getCurrentDirectory()
   {
     return currentDir;
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param dir DOCUMENT ME!
-	 */
+   */
   public void setCurrentDirectory(File dir)
   {
     if (currentDir != dir || dir == null)
@@ -420,34 +420,34 @@ public class JFileChooser extends JComponent implements Accessible
       }
   }
 
-	/**
+  /**
    * DOCUMENT ME!
-	 */
+   */
   public void changeToParentDirectory()
   {
     if (fsv.getParentDirectory(currentDir) != null)
-    setCurrentDirectory(fsv.getParentDirectory(currentDir));
+      setCurrentDirectory(fsv.getParentDirectory(currentDir));
   }
 
-	/**
+  /**
    * DOCUMENT ME!
-	 */
+   */
   public void rescanCurrentDirectory()
   {
     getUI().rescanCurrentDirectory(this);
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param f DOCUMENT ME!
-	 */
+   */
   public void ensureFileIsVisible(File f)
   {
     getUI().ensureFileIsVisible(this, f);
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param parent DOCUMENT ME!
@@ -455,7 +455,7 @@ public class JFileChooser extends JComponent implements Accessible
    * @return DOCUMENT ME!
    *
    * @throws HeadlessException DOCUMENT ME!
-	 */
+   */
   public int showOpenDialog(Component parent) throws HeadlessException
   {
     JDialog d = createDialog(parent);
@@ -471,7 +471,7 @@ public class JFileChooser extends JComponent implements Accessible
     return retval;
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param parent DOCUMENT ME!
@@ -479,7 +479,7 @@ public class JFileChooser extends JComponent implements Accessible
    * @return DOCUMENT ME!
    *
    * @throws HeadlessException DOCUMENT ME!
-	 */
+   */
   public int showSaveDialog(Component parent) throws HeadlessException
   {
     JDialog d = createDialog(parent);
@@ -492,7 +492,7 @@ public class JFileChooser extends JComponent implements Accessible
     return retval;
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param parent DOCUMENT ME!
@@ -501,7 +501,7 @@ public class JFileChooser extends JComponent implements Accessible
    * @return DOCUMENT ME!
    *
    * @throws HeadlessException DOCUMENT ME!
-	 */
+   */
   public int showDialog(Component parent, String approveButtonText)
                  throws HeadlessException
   {
@@ -516,7 +516,7 @@ public class JFileChooser extends JComponent implements Accessible
     return retval;
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param parent DOCUMENT ME!
@@ -524,7 +524,7 @@ public class JFileChooser extends JComponent implements Accessible
    * @return DOCUMENT ME!
    *
    * @throws HeadlessException DOCUMENT ME!
-	 */
+   */
   protected JDialog createDialog(Component parent) throws HeadlessException
   {
     Frame toUse = (Frame) SwingUtilities.getAncestorOfClass(Frame.class, parent);
@@ -541,21 +541,21 @@ public class JFileChooser extends JComponent implements Accessible
     return dialog;
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   public boolean getControlButtonsAreShown()
   {
     return controlButtonsShown;
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param b DOCUMENT ME!
-	 */
+   */
   public void setControlButtonsAreShown(boolean b)
   {
     if (controlButtonsShown != b)
@@ -566,21 +566,21 @@ public class JFileChooser extends JComponent implements Accessible
       }
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   public int getDialogType()
   {
     return dialogType;
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param dialogType DOCUMENT ME!
-	 */
+   */
   public void setDialogType(int dialogType)
   {
     if (dialogType != OPEN_DIALOG && dialogType != SAVE_DIALOG
@@ -595,11 +595,11 @@ public class JFileChooser extends JComponent implements Accessible
       }
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param dialogTitle DOCUMENT ME!
-	 */
+   */
   public void setDialogTitle(String dialogTitle)
   {
     if (this.dialogTitle != dialogTitle)
@@ -610,21 +610,21 @@ public class JFileChooser extends JComponent implements Accessible
       }
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   public String getDialogTitle()
   {
     return dialogTitle;
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param toolTipText DOCUMENT ME!
-	 */
+   */
   public void setApproveButtonToolTipText(String toolTipText)
   {
     if (approveButtonToolTipText != toolTipText)
@@ -636,31 +636,31 @@ public class JFileChooser extends JComponent implements Accessible
       }
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   public String getApproveButtonToolTipText()
   {
     return approveButtonToolTipText;
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   public int getApproveButtonMnemonic()
   {
     return approveButtonMnemonic;
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param mnemonic DOCUMENT ME!
-	 */
+   */
   public void setApproveButtonMnemonic(int mnemonic)
   {
     if (approveButtonMnemonic != mnemonic)
@@ -672,21 +672,21 @@ public class JFileChooser extends JComponent implements Accessible
       }
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param mnemonic DOCUMENT ME!
-	 */
+   */
   public void setApproveButtonMnemonic(char mnemonic)
   {
     setApproveButtonMnemonic((int) Character.toUpperCase(mnemonic));
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param approveButtonText DOCUMENT ME!
-	 */
+   */
   public void setApproveButtonText(String approveButtonText)
   {
     if (this.approveButtonText != approveButtonText)
@@ -698,31 +698,31 @@ public class JFileChooser extends JComponent implements Accessible
       }
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   public String getApproveButtonText()
   {
     return approveButtonText;
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   public FileFilter[] getChoosableFileFilters()
   {
-    return (FileFilter[]) choosableFilters.toArray(new FileFilter[0]);
+    return (FileFilter[]) choosableFilters.toArray(new FileFilter[choosableFilters.size()]);
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param filter DOCUMENT ME!
-	 */
+   */
   public void addChoosableFileFilter(FileFilter filter)
   {
     FileFilter[] old = getChoosableFileFilters();
@@ -731,13 +731,13 @@ public class JFileChooser extends JComponent implements Accessible
     firePropertyChange(CHOOSABLE_FILE_FILTER_CHANGED_PROPERTY, old, newFilters);
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param f DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   public boolean removeChoosableFileFilter(FileFilter f)
   {
     FileFilter[] old = getChoosableFileFilters();
@@ -748,9 +748,9 @@ public class JFileChooser extends JComponent implements Accessible
     return true;
   }
 
-	/**
+  /**
    * DOCUMENT ME!
-	 */
+   */
   public void resetChoosableFileFilters()
   {
     choosableFilters.clear();
@@ -758,31 +758,31 @@ public class JFileChooser extends JComponent implements Accessible
     setFileFilter((FileFilter) choosableFilters.get(0));
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   public FileFilter getAcceptAllFileFilter()
   {
     return getUI().getAcceptAllFileFilter(this);
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   public boolean isAcceptAllFileFilterUsed()
   {
     return isAcceptAll;
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param b DOCUMENT ME!
-	 */
+   */
   public void setAcceptAllFileFilterUsed(boolean b)
   {
     if (isAcceptAll != b)
@@ -793,21 +793,21 @@ public class JFileChooser extends JComponent implements Accessible
       }
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   public JComponent getAccessory()
   {
     return accessory;
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param newAccessory DOCUMENT ME!
-	 */
+   */
   public void setAccessory(JComponent newAccessory)
   {
     if (accessory != newAccessory)
@@ -818,11 +818,11 @@ public class JFileChooser extends JComponent implements Accessible
       }
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param mode DOCUMENT ME!
-	 */
+   */
   public void setFileSelectionMode(int mode)
   {
     if (mode != FILES_ONLY && mode != DIRECTORIES_ONLY
@@ -837,43 +837,43 @@ public class JFileChooser extends JComponent implements Accessible
       }
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   public int getFileSelectionMode()
   {
     return fileSelectionMode;
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   public boolean isFileSelectionEnabled()
   {
     return (fileSelectionMode == FILES_ONLY
            || fileSelectionMode == FILES_AND_DIRECTORIES);
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   public boolean isDirectorySelectionEnabled()
   {
     return (fileSelectionMode == DIRECTORIES_ONLY
            || fileSelectionMode == FILES_AND_DIRECTORIES);
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param b DOCUMENT ME!
-	 */
+   */
   public void setMultiSelectionEnabled(boolean b)
   {
     if (multiSelection != b)
@@ -884,31 +884,31 @@ public class JFileChooser extends JComponent implements Accessible
       }
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   public boolean isMultiSelectionEnabled()
   {
     return multiSelection;
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   public boolean isFileHidingEnabled()
   {
     return fileHiding;
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param b DOCUMENT ME!
-	 */
+   */
   public void setFileHidingEnabled(boolean b)
   {
     if (fileHiding != b)
@@ -919,11 +919,11 @@ public class JFileChooser extends JComponent implements Accessible
       }
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param filter DOCUMENT ME!
-	 */
+   */
   public void setFileFilter(FileFilter filter)
   {
     if (currentFilter != filter)
@@ -934,21 +934,21 @@ public class JFileChooser extends JComponent implements Accessible
       }
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   public FileFilter getFileFilter()
   {
     return currentFilter;
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param fileView DOCUMENT ME!
-	 */
+   */
   public void setFileView(FileView fileView)
   {
     if (fv != fileView)
@@ -959,21 +959,21 @@ public class JFileChooser extends JComponent implements Accessible
       }
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   public FileView getFileView()
   {
     return fv;
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   private FileView getInternalFileView()
   {
     if (fv == null)
@@ -981,73 +981,73 @@ public class JFileChooser extends JComponent implements Accessible
     return fv;
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param f DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   public String getName(File f)
   {
     return getInternalFileView().getName(f);
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param f DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   public String getDescription(File f)
   {
     return getInternalFileView().getDescription(f);
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param f DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   public String getTypeDescription(File f)
   {
     return getInternalFileView().getTypeDescription(f);
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param f DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   public Icon getIcon(File f)
   {
     return getInternalFileView().getIcon(f);
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param f DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   public boolean isTraversable(File f)
   {
     return getFileSystemView().isTraversable(f).booleanValue();
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param f DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   public boolean accept(File f)
   {
     if (f == null)
@@ -1055,11 +1055,11 @@ public class JFileChooser extends JComponent implements Accessible
     return getFileFilter().accept(f);
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param fsv DOCUMENT ME!
-	 */
+   */
   public void setFileSystemView(FileSystemView fsv)
   {
     if (this.fsv != fsv)
@@ -1070,49 +1070,49 @@ public class JFileChooser extends JComponent implements Accessible
       }
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   public FileSystemView getFileSystemView()
   {
     return fsv;
   }
 
-	/**
+  /**
    * DOCUMENT ME!
-	 */
+   */
   public void approveSelection()
   {
     retval = APPROVE_OPTION;
     fireActionPerformed(APPROVE_SELECTION);
   }
 
-	/**
+  /**
    * DOCUMENT ME!
-	 */
+   */
   public void cancelSelection()
   {
     retval = CANCEL_OPTION;
     fireActionPerformed(CANCEL_SELECTION);
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param l DOCUMENT ME!
-	 */
+   */
   public void addActionListener(ActionListener l)
-	{
+  {
     listenerList.add(ActionListener.class, l);
-	}
+  }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param l DOCUMENT ME!
-	 */
+   */
   public void removeActionListener(ActionListener l)
   {
     try
@@ -1120,26 +1120,26 @@ public class JFileChooser extends JComponent implements Accessible
 	listenerList.remove(ActionListener.class, l);
       }
     catch (IllegalArgumentException e)
-	{
+      {
 	e.printStackTrace();
       }
-	}
+  }
 
   /**
    * DOCUMENT ME!
    *
    * @return DOCUMENT ME!
    */
-	public ActionListener[] getActionListeners()
-	{
+  public ActionListener[] getActionListeners()
+  {
     return (ActionListener[]) getListeners(ActionListener.class);
-	}
+  }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param command DOCUMENT ME!
-	 */
+   */
   protected void fireActionPerformed(String command)
   {
     ActionListener[] list = getActionListeners();
@@ -1150,50 +1150,50 @@ public class JFileChooser extends JComponent implements Accessible
       list[i].actionPerformed(event);
   }
 
-	/**
+  /**
    * DOCUMENT ME!
-	 */
+   */
   public void updateUI()
   {
     setUI((FileChooserUI) UIManager.getUI(this));
     revalidate();
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   public String getUIClassID()
   {
     return "FileChooserUI";
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   public FileChooserUI getUI()
   {
-		return (FileChooserUI) ui;
+    return (FileChooserUI) ui;
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   protected String paramString()
   {
     return "JFileChooser";
   }
 
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @return DOCUMENT ME!
-	 */
+   */
   public AccessibleContext getAccessibleContext()
   {
     return null;

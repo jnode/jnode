@@ -47,6 +47,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.Date;
@@ -80,6 +82,33 @@ public class JTable extends JComponent
   implements TableModelListener, Scrollable, TableColumnModelListener,
              ListSelectionListener, CellEditorListener, Accessible
 {
+  /**
+   * Handles property changes from the <code>TableColumn</code>s of this
+   * <code>JTable</code>.
+   *
+   * More specifically, this triggers a {@link #revalidate} call if the
+   * preferredWidth of one of the observed columns changes.
+   */
+  class TableColumnPropertyChangeHandler implements PropertyChangeListener
+  {
+    /**
+     * Receives notification that a property of the observed TableColumns
+     * has changed.
+     *
+     * @param ev the property change event
+     */
+    public void propertyChange(PropertyChangeEvent ev)
+    {
+      if (ev.getPropertyName().equals("preferredWidth"))
+        {
+          JTableHeader header = getTableHeader();
+          TableColumn col = (TableColumn) ev.getSource();
+          header.setResizingColumn(col);
+          doLayout();
+          header.setResizingColumn(null);
+        }
+    }
+  }
 
   /**
    * A cell renderer for boolean values.
@@ -287,7 +316,7 @@ public class JTable extends JComponent
   }
 
   private static final long serialVersionUID = 3876025080382781659L;
-  
+
 
   /**
    * When resizing columns, do not automatically change any columns. In this
@@ -424,7 +453,7 @@ public class JTable extends JComponent
   protected boolean rowSelectionAllowed;
 
   /**
-   * @deprecated Use {@link #rowSelectionAllowed}, {@link
+   * @deprecated Use {@link #rowSelectionAllowed}, {@link 
    * #getColumnSelectionAllowed}, or the combined methods {@link
    * #getCellSelectionEnabled} and {@link #setCellSelectionEnabled(boolean)}.
    */
@@ -561,7 +590,7 @@ public class JTable extends JComponent
    * The tableHeader property.
    */
   protected JTableHeader tableHeader;
-  
+
   /**
    * The row of the cell being edited.
    */
@@ -582,7 +611,13 @@ public class JTable extends JComponent
    * editing is cancelled
    */
   Object oldCellValue;
-  
+
+  /**
+   * The property handler for this table's columns.
+   */
+  TableColumnPropertyChangeHandler tableColumnPropertyChangeHandler =
+    new TableColumnPropertyChangeHandler();
+
   /**
    * Creates a new <code>JTable</code> instance.
    */
@@ -646,7 +681,16 @@ public class JTable extends JComponent
     setModel(dm == null ? createDefaultDataModel() : dm);
     setSelectionModel(sm == null ? createDefaultSelectionModel() : sm);
 
-    this.columnModel = cm;
+    if (cm != null)
+      {
+        setColumnModel(cm);
+        setAutoCreateColumnsFromModel(false);
+      }
+    else 
+      {
+        setColumnModel(createDefaultColumnModel());
+        setAutoCreateColumnsFromModel(true);
+      }
     initializeLocalVars();
     // The next two lines are for compliance with the JDK which starts
     // the JLists associated with a JTable  with both lead selection 
@@ -659,12 +703,8 @@ public class JTable extends JComponent
   protected void initializeLocalVars()
   {
     setTableHeader(createDefaultTableHeader());
-    this.autoCreateColumnsFromModel = false;
-    if (columnModel == null)
-      {
-        this.autoCreateColumnsFromModel = true;
-        createColumnsFromModel();
-      }
+    if (autoCreateColumnsFromModel)
+      createDefaultColumnsFromModel();
     this.columnModel.addColumnModelListener(this);
     
     this.defaultRenderersByColumnClass = new Hashtable();
@@ -750,10 +790,11 @@ public class JTable extends JComponent
     if (column.getHeaderValue() == null)
       {
         String name = dataModel.getColumnName(column.getModelIndex());
-	column.setHeaderValue(name);
+        column.setHeaderValue(name);
       }
     
     columnModel.addColumn(column);
+    column.addPropertyChangeListener(tableColumnPropertyChangeHandler);
   }
 
   protected void createDefaultEditors()
@@ -793,26 +834,12 @@ public class JTable extends JComponent
   {
     return new DefaultListSelectionModel();
   }
-  
+
   protected JTableHeader createDefaultTableHeader()
   {
     return new JTableHeader(columnModel);
   }
  
-  private void createColumnsFromModel()
-  {
-    if (dataModel == null)
-      return;
-
-    TableColumnModel cm = createDefaultColumnModel();
-
-    for (int i = 0; i < dataModel.getColumnCount(); ++i)
-  {
-        cm.addColumn(new TableColumn(i));
-      }
-    this.setColumnModel(cm);
-  }
-  
   // listener support 
 
   public void columnAdded (TableColumnModelEvent event)
@@ -820,13 +847,13 @@ public class JTable extends JComponent
     revalidate();
     repaint();
   }
-  
+
   public void columnMarginChanged (ChangeEvent event)
   {
     revalidate();
     repaint();
   }
- 
+
   public void columnMoved (TableColumnModelEvent event)
   {
     revalidate();
@@ -838,7 +865,7 @@ public class JTable extends JComponent
     revalidate();
     repaint();
   }
-
+  
   public void columnSelectionChanged (ListSelectionEvent event)
   {
     repaint();
@@ -890,16 +917,16 @@ public class JTable extends JComponent
     if ((event.getFirstRow() ==TableModelEvent.HEADER_ROW)
         && autoCreateColumnsFromModel)
 
-        createColumnsFromModel();
+        createDefaultColumnsFromModel();
 
     repaint();
   }
-  
+
   public void valueChanged (ListSelectionEvent event)
   {
     repaint();
   }
-  
+
  /**
    * Returns index of the column that contains specified point 
    * or -1 if this table doesn't contain this point.
@@ -912,20 +939,20 @@ public class JTable extends JComponent
   {
     if (point != null)
       {
-    int x0 = getLocation().x;
-    int ncols = getColumnCount();
-    Dimension gap = getIntercellSpacing();
-    TableColumnModel cols = getColumnModel();
-    int x = point.x;
-    
-    for (int i = 0; i < ncols; ++i)
-      {
+        int x0 = getLocation().x;
+        int ncols = getColumnCount();
+        Dimension gap = getIntercellSpacing();
+        TableColumnModel cols = getColumnModel();
+        int x = point.x;
+
+        for (int i = 0; i < ncols; ++i)
+          {
             int width = cols.getColumn(i).getWidth()
                         + (gap == null ? 0 : gap.width);
-        if (0 <= x && x < width)
-          return i;
-        x -= width;  
-      }
+            if (0 <= x && x < width)
+              return i;
+            x -= width;
+          }
       }
     return -1;
   }
@@ -942,18 +969,18 @@ public class JTable extends JComponent
   {
     if (point != null)
       {
-    int y0 = getLocation().y;
-    int nrows = getRowCount();
-    Dimension gap = getIntercellSpacing();
-    int height = getRowHeight() + (gap == null ? 0 : gap.height);
-    int y = point.y;
-    
-    for (int i = 0; i < nrows; ++i)
-      {
-        if (0 <= y && y < height)
-          return i;
-        y -= height;
-      }
+        int y0 = getLocation().y;
+        int nrows = getRowCount();
+        Dimension gap = getIntercellSpacing();
+        int height = getRowHeight() + (gap == null ? 0 : gap.height);
+        int y = point.y;
+
+        for (int i = 0; i < nrows; ++i)
+          {
+            if (0 <= y && y < height)
+              return i;
+            y -= height;
+          }
       }
     return -1;
   }
@@ -990,11 +1017,8 @@ public class JTable extends JComponent
     int y = (height + y_gap) * row;
 
     for (int i = 0; i < column; ++i)
-  {
-        x += columnModel.getColumn(i).getWidth();
-        x += x_gap;
-  }
-  
+      x += columnModel.getColumn(i).getWidth();
+
     if (includeSpacing)
       return new Rectangle(x, y, width, height);
     else
@@ -1029,7 +1053,7 @@ public class JTable extends JComponent
     //Neither Sun nor IBM returns null if rowSelection not allowed
     return selectionModel;
   }
-
+  
   public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction)
   {
     if (orientation == SwingConstants.VERTICAL)
@@ -1047,7 +1071,7 @@ public class JTable extends JComponent
   {
     return false;
   }
-
+  
   /**
    * Get the value of the <code>scrollableTracksViewportWidth</code> property.
    *
@@ -1071,7 +1095,7 @@ public class JTable extends JComponent
     if (orientation == SwingConstants.VERTICAL)
       return rowHeight;
     else
-  {
+      {
         int sum = 0;
         for (int i = 0; i < getColumnCount(); ++i)
           sum += columnModel.getColumn(0).getWidth();
@@ -1095,7 +1119,7 @@ public class JTable extends JComponent
     if (defaultEditorsByColumnClass.containsKey(columnClass))
       return (TableCellEditor) defaultEditorsByColumnClass.get(columnClass);
     else
-  {
+      {
 	// FIXME: We have at least an editor for Object.class in our defaults.
         TableCellEditor r = new DefaultCellEditor(new JTextField());
         defaultEditorsByColumnClass.put(columnClass, r);
@@ -1126,7 +1150,7 @@ public class JTable extends JComponent
     if (defaultRenderersByColumnClass.containsKey(columnClass))
       return (TableCellRenderer) defaultRenderersByColumnClass.get(columnClass);
     else
-  {
+      {
         TableCellRenderer r = new DefaultTableCellRenderer();
         defaultRenderersByColumnClass.put(columnClass, r);
         return r;
@@ -1140,7 +1164,7 @@ public class JTable extends JComponent
     else
       return columnModel.getColumn(vc).getModelIndex();
   }
-  
+
   public int convertColumnIndexToView(int mc)
   {
     if (mc < 0)
@@ -1173,7 +1197,7 @@ public class JTable extends JComponent
                                                   false, // hasFocus
                                                   row, column);
   }
-  
+
 
   /**
    * Get the value of the {@link #autoCreateColumnsFromModel} property.
@@ -1555,7 +1579,7 @@ public class JTable extends JComponent
   public void setAutoCreateColumnsFromModel(boolean autoCreate)
   {
     if (autoCreateColumnsFromModel != autoCreate)
-  {
+    {
       autoCreateColumnsFromModel = autoCreate;
       if (autoCreate)
         createDefaultColumnsFromModel();
@@ -1588,7 +1612,7 @@ public class JTable extends JComponent
     revalidate();
     repaint();
   }
-
+  
   /**
    * Sets the value of the rowHeight property for the specified
    * row.
@@ -1663,15 +1687,15 @@ public class JTable extends JComponent
     
     if (m != null)
       {
-	// Set property.
+        // Set property.
         dataModel = m;
 
-	// Add table as TableModelListener to new model.
-	dataModel.addTableModelListener(this);
+        // Add table as TableModelListener to new model.
+        dataModel.addTableModelListener(this);
 
-	// Automatically create columns.
-	if (autoCreateColumnsFromModel)
-	  createColumnsFromModel();
+        // Automatically create columns.
+        if (autoCreateColumnsFromModel)
+          createDefaultColumnsFromModel();
       }
     
     // Repaint table.
@@ -1754,8 +1778,8 @@ public class JTable extends JComponent
    * @param s The new value of the property
    */ 
   public void setSelectionMode(int s)
-  {
-    selectionModel.setSelectionMode(s);
+  { 
+    selectionModel.setSelectionMode(s);    
     columnModel.getSelectionModel().setSelectionMode(s);
     
     repaint();
@@ -1959,10 +1983,11 @@ public class JTable extends JComponent
     int average = spill / cols.length;
     for (int i = 0; i < cols.length; i++)
       {
-        cols[i].setWidth(cols[i].getWidth() + average);
-      }    
+        if (cols[i] != null)
+          cols[i].setWidth(cols[i].getWidth() + average);
+      }
   }
-  
+
   public void doLayout()
   {
     TableColumn resizingColumn = null;
@@ -2023,6 +2048,8 @@ public class JTable extends JComponent
 
           case AUTO_RESIZE_OFF:
           default:
+            int prefWidth = resizingColumn.getPreferredWidth();
+            resizingColumn.setWidth(prefWidth);
           }
       }
     else
@@ -2258,6 +2285,8 @@ public class JTable extends JComponent
    */
   public void createDefaultColumnsFromModel()
   {
+    assert columnModel != null : "The columnModel must not be null.";
+
     // remove existing columns
     int columnIndex = columnModel.getColumnCount() - 1;
     while (columnIndex >= 0)
@@ -2272,7 +2301,9 @@ public class JTable extends JComponent
     {
       TableColumn column = new TableColumn(c);
       column.setIdentifier(dataModel.getColumnName(c));
+      column.setHeaderValue(dataModel.getColumnName(c));
       columnModel.addColumn(column);
+      column.addPropertyChangeListener(tableColumnPropertyChangeHandler);
     }
   }
 
@@ -2371,5 +2402,14 @@ public class JTable extends JComponent
   {
     return editor.getTableCellEditorComponent
       (this, getValueAt(row, column), isCellSelected(row, column), row, column);
+  }
+
+  /**
+   * This revalidates the <code>JTable</code> and queues a repaint.
+   */
+  protected void resizeAndRepaint()
+  {
+    revalidate();
+    repaint();
   }
 }

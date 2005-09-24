@@ -42,7 +42,9 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Insets;
 
+import javax.swing.LookAndFeel;
 import javax.swing.UIDefaults;
+import javax.swing.UIManager;
 import javax.swing.plaf.BorderUIResource;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.FontUIResource;
@@ -70,7 +72,7 @@ public class MetalLookAndFeel extends BasicLookAndFeel
   public MetalLookAndFeel()
   {
     if (theme == null)
-    createDefaultTheme();
+      createDefaultTheme();
   }
 
   /**
@@ -80,7 +82,7 @@ public class MetalLookAndFeel extends BasicLookAndFeel
   {
     setCurrentTheme(new OceanTheme());
   }
-  
+
   /**
    * Returns <code>false</code> to indicate that this look and feel does not
    * attempt to emulate the look and feel of native applications on the host
@@ -92,7 +94,7 @@ public class MetalLookAndFeel extends BasicLookAndFeel
   {
     return false;
   }
-     
+
   /**
    * Returns <code>true</code> to indicate that this look and feel is supported
    * on all platforms.
@@ -103,7 +105,7 @@ public class MetalLookAndFeel extends BasicLookAndFeel
   {
     return true;
   }
-     
+
   /**
    * Returns a string describing the look and feel.  In this case, the method
    * returns "Metal look and feel".
@@ -114,7 +116,7 @@ public class MetalLookAndFeel extends BasicLookAndFeel
   {
     return "Metal look and feel";
   }
-     
+
   /**
    * Returns the look and feel identifier.
    * 
@@ -131,23 +133,23 @@ public class MetalLookAndFeel extends BasicLookAndFeel
    * @return "MetalLookAndFeel".
    */
   public String getName()
-     {
+  {
     return "MetalLookAndFeel";
-     }
+  }
 
-     public UIDefaults getDefaults()
-	 {
-	   if (LAF_defaults == null)
+  public UIDefaults getDefaults()
+  {
+    if (LAF_defaults == null)
       {
-	     LAF_defaults = super.getDefaults();
-	     
-    // add custom theme entries to the table
-    theme.addCustomEntriesToTable(LAF_defaults);
+        LAF_defaults = super.getDefaults();
+
+        // add custom theme entries to the table
+        theme.addCustomEntriesToTable(LAF_defaults);
       }
     
-	     //      Returns the default values for this look and feel. 
-	     return LAF_defaults;
-	 }
+    // Returns the default values for this look and feel. 
+    return LAF_defaults;
+  }
 
   /**
    * Returns the accelerator foreground color from the installed theme.
@@ -602,14 +604,23 @@ public class MetalLookAndFeel extends BasicLookAndFeel
   }
 
   /**
-   * Sets the current theme for the look and feel.
+   * Sets the current theme for the look and feel.  Note that the theme must be 
+   * set <em>before</em> the look and feel is installed.  To change the theme 
+   * for an already running application that is using the 
+   * {@link MetalLookAndFeel}, first set the theme with this method, then 
+   * create a new instance of {@link MetalLookAndFeel} and install it in the 
+   * usual way (see {@link UIManager#setLookAndFeel(LookAndFeel)}).
    * 
-   * @param theme  the theme.
+   * @param theme  the theme (<code>null</code> not permitted).
+   * 
+   * @throws NullPointerException if <code>theme</code> is <code>null</code>.
    */
   public static void setCurrentTheme(MetalTheme theme)
   {
+    if (theme == null)
+      throw new NullPointerException("Null 'theme' not permitted.");
     MetalLookAndFeel.theme = theme;
- }
+  }
 
   /**
    * Sets the ComponentUI classes for all Swing components to the Metal
@@ -824,6 +835,7 @@ public class MetalLookAndFeel extends BasicLookAndFeel
       "DesktopIcon.background", getControl(),
       "DesktopIcon.foreground", getControlTextColor(),
       "DesktopIcon.width", new Integer(160),
+      "DesktopIcon.border", MetalBorders.getDesktopIconBorder(),
 
       "EditorPane.background", getWindowBackground(),
       "EditorPane.caretForeground", getUserTextColor(),
@@ -834,6 +846,8 @@ public class MetalLookAndFeel extends BasicLookAndFeel
       "EditorPane.selectionForeground", getHighlightedTextColor(),
       
       "FormattedTextField.background", getWindowBackground(),
+      "FormattedTextField.border",
+      new BorderUIResource(MetalBorders.getTextFieldBorder()),
       "FormattedTextField.caretForeground", getUserTextColor(),
       "FormattedTextField.font", new FontUIResource("Dialog", Font.PLAIN, 12),
       "FormattedTextField.foreground",  getUserTextColor(),
@@ -860,6 +874,9 @@ public class MetalLookAndFeel extends BasicLookAndFeel
         MetalIconFactory.getInternalFrameMaximizeIcon(16),
       "InternalFrame.iconifyIcon", 
         MetalIconFactory.getInternalFrameMinimizeIcon(16),
+      "InternalFrame.paletteBorder", new MetalBorders.PaletteBorder(),
+      "InternalFrame.paletteCloseIcon", new MetalIconFactory.PaletteCloseIcon(),
+      "InternalFrame.paletteTitleHeight", new Integer(11),
 
       "Label.background", getControl(),
       "Label.disabledForeground", getInactiveSystemTextColor(),
@@ -922,6 +939,8 @@ public class MetalLookAndFeel extends BasicLookAndFeel
       "Panel.foreground", getUserTextColor(),
 
       "PasswordField.background", getWindowBackground(),
+      "PasswordField.border",
+      new BorderUIResource(MetalBorders.getTextFieldBorder()),
       "PasswordField.caretForeground", getUserTextColor(),
       "PasswordField.foreground", getUserTextColor(),
       "PasswordField.inactiveBackground", getControl(),
@@ -1010,7 +1029,7 @@ public class MetalLookAndFeel extends BasicLookAndFeel
       "Slider.trackWidth", new Integer(7),
       "Slider.verticalThumbIcon", 
       MetalIconFactory.getVerticalSliderThumbIcon(),
-      
+
       "Spinner.background", getControl(),
       "Spinner.font", new FontUIResource("Dialog", Font.BOLD, 12),
       "Spinner.foreground", getControl(),
@@ -1037,16 +1056,19 @@ public class MetalLookAndFeel extends BasicLookAndFeel
       "TabbedPane.tabAreaBackground", getControl(),
       "TabbedPane.tabAreaInsets", new InsetsUIResource(4, 2, 0, 6),
       "TabbedPane.tabInsets", new InsetsUIResource(0, 9, 1, 9),
-
+      
       "Table.background", getWindowBackground(),
       "Table.focusCellBackground", getWindowBackground(),
       "Table.focusCellForeground", getControlTextColor(),
       "Table.foreground", getControlTextColor(),
       "Table.focusCellHighlightBorder", getControlShadow(),
       "Table.focusCellBackground", getWindowBackground(),
-      "Table.gridColor", getControlShadow(),
+      "Table.gridColor", getControlDarkShadow(),
+      "Table.selectionBackground", new ColorUIResource(204, 204, 255),
+      "Table.selectionForeground", new ColorUIResource(0, 0, 0),
 
       "TableHeader.background", getControl(),
+      "TableHeader.cellBorder", new MetalBorders.TableHeaderBorder(),
       "TableHeader.foreground", getControlTextColor(),
 
       "TextArea.background", getWindowBackground(),
@@ -1058,7 +1080,8 @@ public class MetalLookAndFeel extends BasicLookAndFeel
       "TextArea.selectionForeground", getHighlightedTextColor(),
 
       "TextField.background", getWindowBackground(),
-      "TextField.border", MetalBorders.getTextFieldBorder(),
+      "TextField.border",
+      new BorderUIResource(MetalBorders.getTextFieldBorder()),
       "TextField.caretForeground", getUserTextColor(),
       "TextField.darkShadow", getControlDarkShadow(),
       "TextField.font", new FontUIResource("Dialog", Font.PLAIN, 12),
@@ -1083,15 +1106,15 @@ public class MetalLookAndFeel extends BasicLookAndFeel
       "TitledBorder.titleColor", getSystemTextColor(),
 
       "ToggleButton.background", getControl(),
-      "ToggleButton.border", MetalBorders.getButtonBorder(),
+      "ToggleButton.border", MetalBorders.getToggleButtonBorder(),
       "ToggleButton.darkShadow", getControlDarkShadow(),
       "ToggleButton.disabledText", getInactiveControlTextColor(),
-      "ToggleButton.focus", new ColorUIResource(getFocusColor()),
+      "ToggleButton.focus", getFocusColor(),
       "ToggleButton.font", getControlTextFont(),
       "ToggleButton.foreground", getControlTextColor(),
       "ToggleButton.highlight", getControlHighlight(),
       "ToggleButton.light", getControlHighlight(),
-      "ToggleButton.margin", new Insets(2, 14, 2, 14),
+      "ToggleButton.margin", new InsetsUIResource(2, 14, 2, 14),
       "ToggleButton.select", getControlShadow(),
       "ToggleButton.shadow", getControlShadow(),
 

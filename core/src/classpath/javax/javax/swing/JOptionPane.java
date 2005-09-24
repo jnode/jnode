@@ -1,5 +1,5 @@
 /* JOptionPane.java
-   Copyright (C) 2004 Free Software Foundation, Inc.
+   Copyright (C) 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -64,7 +64,7 @@ public class JOptionPane extends JComponent implements Accessible
   {
     /** DOCUMENT ME! */
     private static final long serialVersionUID = 686071432213084821L;
-  
+
     /**
      * Creates a new AccessibleJOptionPane object.
      */
@@ -85,7 +85,7 @@ public class JOptionPane extends JComponent implements Accessible
 
   /** DOCUMENT ME! */
   private static final long serialVersionUID = 5231143276678566796L;
-  
+
   /** The value returned when cancel option is selected. */
   public static final int CANCEL_OPTION = 2;
 
@@ -114,20 +114,20 @@ public class JOptionPane extends JComponent implements Accessible
   public static final int YES_OPTION = 0;
 
   /** Identifier for the error message type. */
-    public static final int ERROR_MESSAGE         = 0;
+  public static final int ERROR_MESSAGE = 0;
 
   /** Identifier for the information message type. */
-    public static final int INFORMATION_MESSAGE   = 1;
+  public static final int INFORMATION_MESSAGE = 1;
 
   /** Identifier for the plain message type. */
   public static final int PLAIN_MESSAGE = -1;
 
   /** Identifier for the question message type. */
-    public static final int QUESTION_MESSAGE      = 3;
+  public static final int QUESTION_MESSAGE = 3;
 
   /** Identifier for the warning message type. */
   public static final int WARNING_MESSAGE = 2;
-    
+
   /**
    * The identifier for the propertyChangeEvent when the icon property
    * changes.
@@ -284,7 +284,7 @@ public class JOptionPane extends JComponent implements Accessible
   /**
    * Creates a new JOptionPane object using the given message, messageType,
    * optionType and icon.
-     *
+   *
    * @param message The message to display.
    * @param messageType The type of message.
    * @param optionType The type of options.
@@ -298,7 +298,7 @@ public class JOptionPane extends JComponent implements Accessible
   /**
    * Creates a new JOptionPane object using the given message, messageType,
    * optionType, icon and options.
-     *
+   *
    * @param message The message to display.
    * @param messageType The type of message.
    * @param optionType The type of options.
@@ -315,14 +315,14 @@ public class JOptionPane extends JComponent implements Accessible
    * Creates a new JOptionPane object using the given message, messageType,
    * optionType, icon, options and initialValue. The initialValue will be
    * focused initially.
-     *
+   *
    * @param message The message to display.
    * @param messageType The type of message.
    * @param optionType The type of options.
    * @param icon The icon to display.
    * @param options The options given.
    * @param initialValue The component to focus on initially.
-     *
+   *
    * @throws IllegalArgumentException If the messageType or optionType are not
    *         legal values.
    */
@@ -406,7 +406,7 @@ public class JOptionPane extends JComponent implements Accessible
   public JInternalFrame createInternalFrame(Component parentComponent,
                                             String title)
                                      throws RuntimeException
-    {
+  {
     // Try to find a JDesktopPane.
     JLayeredPane toUse = getDesktopPaneForComponent(parentComponent);
     // If we don't have a JDesktopPane, we try to find a JLayeredPane.
@@ -432,20 +432,20 @@ public class JOptionPane extends JComponent implements Accessible
     frame.setVisible(true);
 
     return frame;
-    }
-    
+  }
+
   /**
    * DOCUMENT ME!
    *
    * @return DOCUMENT ME!
    */
   public AccessibleContext getAccessibleContext()
-    {
+  {
     if (accessibleContext == null)
       accessibleContext = new AccessibleJOptionPane();
     return accessibleContext;
-    }
-    
+  }
+
   /**
    * This method returns the JDesktopPane for the given parentComponent or
    * null if none can be found.
@@ -456,10 +456,10 @@ public class JOptionPane extends JComponent implements Accessible
    *         found.
    */
   public static JDesktopPane getDesktopPaneForComponent(Component parentComponent)
-    {
+  {
     return (JDesktopPane) SwingUtilities.getAncestorOfClass(JDesktopPane.class,
                                                             parentComponent);
-    }
+  }
 
   /**
    * This method returns the Frame for the given parentComponent or null if
@@ -473,17 +473,17 @@ public class JOptionPane extends JComponent implements Accessible
   {
     return (Frame) SwingUtilities.getAncestorOfClass(Frame.class,
                                                      parentComponent);
-    }
- 
+  }
+
   /**
    * This method returns the icon displayed.
    *
    * @return The icon displayed.
    */
   public Icon getIcon()
-    {
+  {
     return icon;
-    }
+  }
 
   /**
    * This method returns the value initially selected from the list of values
@@ -492,9 +492,9 @@ public class JOptionPane extends JComponent implements Accessible
    * @return The initial selection value.
    */
   public Object getInitialSelectionValue()
-    {
+  {
     return initialSelectionValue;
-    }
+  }
 
   /**
    * This method returns the value that is focused from the list of options.
@@ -502,10 +502,10 @@ public class JOptionPane extends JComponent implements Accessible
    * @return The initial value from options.
    */
   public Object getInitialValue()
-    {
+  {
     return initialValue;
   }
-	
+
   /**
    * This method returns the value that the user input.
    *
@@ -514,7 +514,7 @@ public class JOptionPane extends JComponent implements Accessible
   public Object getInputValue()
   {
     return inputValue;
-    }
+  }
 
   /**
    * This method returns the maximum characters per line. By default, this is
@@ -529,7 +529,7 @@ public class JOptionPane extends JComponent implements Accessible
 
   /**
    * This method returns the message displayed.
-     *
+   *
    * @return The message displayed.
    */
   public Object getMessage()
@@ -539,7 +539,7 @@ public class JOptionPane extends JComponent implements Accessible
 
   /**
    * This method returns the message type.
-     *
+   *
    * @return The message type.
    */
   public int getMessageType()
@@ -549,7 +549,7 @@ public class JOptionPane extends JComponent implements Accessible
 
   /**
    * This method returns the options.
-     *
+   *
    * @return The options.
    */
   public Object[] getOptions()
@@ -559,7 +559,7 @@ public class JOptionPane extends JComponent implements Accessible
 
   /**
    * This method returns the option type.
-     *
+   *
    * @return The option type.
    */
   public int getOptionType()
@@ -570,7 +570,7 @@ public class JOptionPane extends JComponent implements Accessible
   /**
    * This method returns the Frame used by JOptionPane dialog's that have no
    * parent.
-     *
+   *
    * @return The Frame used by dialogs that have no parent.
    */
   public static Frame getRootFrame()
@@ -617,8 +617,8 @@ public class JOptionPane extends JComponent implements Accessible
   public Object getValue()
   {
     return value;
-    }
-    
+  }
+
   /**
    * This method returns whether this JOptionPane wants input.
    *
@@ -627,8 +627,8 @@ public class JOptionPane extends JComponent implements Accessible
   public boolean getWantsInput()
   {
     return wantsInput;
-    }
-    
+  }
+
   /**
    * This method returns a String that describes this JOptionPane.
    *
@@ -637,7 +637,7 @@ public class JOptionPane extends JComponent implements Accessible
   protected String paramString()
   {
     return "JOptionPane";
-    }
+  }
 
   /**
    * This method requests focus for the initial value.
@@ -654,22 +654,22 @@ public class JOptionPane extends JComponent implements Accessible
    * @param newIcon The new icon to use.
    */
   public void setIcon(Icon newIcon)
-    {
+  {
     if (icon != newIcon)
       {
 	Icon old = icon;
 	icon = newIcon;
 	firePropertyChange(ICON_PROPERTY, old, icon);
       }
-    }
-    
+  }
+
   /**
    * This method changes the initial selection property.
    *
    * @param newValue The new initial selection.
    */
   public void setInitialSelectionValue(Object newValue)
-    {
+  {
     if (initialSelectionValue != newValue)
       {
 	Object old = initialSelectionValue;
@@ -677,8 +677,8 @@ public class JOptionPane extends JComponent implements Accessible
 	firePropertyChange(INITIAL_SELECTION_VALUE_PROPERTY, old,
 	                   initialSelectionValue);
       }
-    }
-    
+  }
+
   /**
    * This method changes the initial value property.
    *
@@ -687,12 +687,12 @@ public class JOptionPane extends JComponent implements Accessible
   public void setInitialValue(Object newValue)
   {
     if (initialValue != newValue)
-    {
+      {
 	Object old = initialValue;
 	initialValue = newValue;
 	firePropertyChange(INITIAL_VALUE_PROPERTY, old, initialValue);
       }
-    }
+  }
 
   /**
    * This method changes the inputValue property.
@@ -700,15 +700,15 @@ public class JOptionPane extends JComponent implements Accessible
    * @param newValue The new inputValue.
    */
   public void setInputValue(Object newValue)
-    {
+  {
     if (inputValue != newValue)
       {
 	Object old = inputValue;
 	inputValue = newValue;
 	firePropertyChange(INPUT_VALUE_PROPERTY, old, inputValue);
       }
-    }
-    
+  }
+
   /**
    * This method changes the message property.
    *
@@ -736,12 +736,12 @@ public class JOptionPane extends JComponent implements Accessible
     if (! validMessageType(newType))
       throw new IllegalArgumentException("Message Type not legal value.");
     if (newType != messageType)
-    {	
+      {
 	int old = messageType;
 	messageType = newType;
 	firePropertyChange(MESSAGE_TYPE_PROPERTY, old, messageType);
       }
-    }
+  }
 
   /**
    * This method changes the options property.
@@ -749,14 +749,14 @@ public class JOptionPane extends JComponent implements Accessible
    * @param newOptions The new options.
    */
   public void setOptions(Object[] newOptions)
-    {
+  {
     if (options != newOptions)
       {
 	Object[] old = options;
 	options = newOptions;
 	firePropertyChange(OPTIONS_PROPERTY, old, options);
       }
-    }
+  }
 
   /**
    * This method changes the optionType property.
@@ -776,7 +776,7 @@ public class JOptionPane extends JComponent implements Accessible
 	firePropertyChange(OPTION_TYPE_PROPERTY, old, optionType);
       }
   }
-	
+
   /**
    * This method changes the Frame used for JOptionPane dialogs that have no
    * parent.
@@ -787,7 +787,7 @@ public class JOptionPane extends JComponent implements Accessible
   {
     privFrame = newRootFrame;
   }
-	
+
   /**
    * This method changes the selectionValues property.
    *
@@ -829,7 +829,7 @@ public class JOptionPane extends JComponent implements Accessible
 	firePropertyChange(VALUE_PROPERTY, old, value);
       }
   }
-	
+
   /**
    * This method changes the wantsInput property.
    *
@@ -843,7 +843,7 @@ public class JOptionPane extends JComponent implements Accessible
 	wantsInput = newValue;
 	firePropertyChange(WANTS_INPUT_PROPERTY, old, wantsInput);
       }
-    }
+  }
 
   /**
    * This method shows a confirmation dialog with the title "Select an Option"
@@ -858,13 +858,15 @@ public class JOptionPane extends JComponent implements Accessible
    */
   public static int showConfirmDialog(Component parentComponent, Object message)
   {
-    JOptionPane pane = new JOptionPane(message);
+    JOptionPane pane = new JOptionPane(message, QUESTION_MESSAGE);
     JDialog dialog = pane.createDialog(parentComponent, "Select an Option");
 
     dialog.pack();
     dialog.show();
-
-    return ((Integer) pane.getValue()).intValue();
+    
+    if (pane.getValue() instanceof Integer)
+      return ((Integer) pane.getValue()).intValue();
+    return -1;
   }
 
   /**
@@ -889,7 +891,9 @@ public class JOptionPane extends JComponent implements Accessible
     dialog.pack();
     dialog.show();
 
-    return ((Integer) pane.getValue()).intValue();
+    if (pane.getValue() instanceof Integer)
+      return ((Integer) pane.getValue()).intValue();
+    return -1;
   }
 
   /**
@@ -915,7 +919,9 @@ public class JOptionPane extends JComponent implements Accessible
     dialog.pack();
     dialog.show();
 
-    return ((Integer) pane.getValue()).intValue();
+    if (pane.getValue() instanceof Integer)
+      return ((Integer) pane.getValue()).intValue();
+    return -1;
   }
 
   /**
@@ -943,7 +949,9 @@ public class JOptionPane extends JComponent implements Accessible
     dialog.pack();
     dialog.show();
 
-    return ((Integer) pane.getValue()).intValue();
+    if (pane.getValue() instanceof Integer)
+      return ((Integer) pane.getValue()).intValue();
+    return -1;
   }
 
   /**

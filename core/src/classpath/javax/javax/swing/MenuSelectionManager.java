@@ -1,4 +1,4 @@
-/* MenuSelectionManager.java -- 
+/* MenuSelectionManager.java --
    Copyright (C) 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -62,16 +62,16 @@ public class MenuSelectionManager
 {
   /** ChangeEvent fired when selected path changes*/
   protected ChangeEvent changeEvent = new ChangeEvent(this);
-  
+
   /** List of listeners for this MenuSelectionManager */
   protected EventListenerList listenerList = new EventListenerList();
 
   /** Default manager for the current menu hierarchy*/
   private static final MenuSelectionManager manager = new MenuSelectionManager();
-  
+
   /** Path to the currently selected menu */
   private Vector selectedPath = new Vector();
-  
+
   /**
    * Fires StateChange event to registered listeners
    */
@@ -113,9 +113,9 @@ public class MenuSelectionManager
   {
     return (ChangeListener[]) listenerList.getListeners(ChangeListener.class);
   }
-  
+
   /**
-   * Unselects all the menu elements on the selection path 
+   * Unselects all the menu elements on the selection path
    */
   public void clearSelectedPath()
   {
@@ -130,7 +130,7 @@ public class MenuSelectionManager
     // notify all listeners that the selected path was changed    
     fireStateChanged();
   }
-  
+
   /**
    * This method returns menu element on the selected path that contains
    * given source point. If no menu element on the selected path contains this
@@ -146,7 +146,9 @@ public class MenuSelectionManager
   {
     // Convert sourcePoint to screen coordinates.
     Point sourcePointOnScreen = sourcePoint;
-    SwingUtilities.convertPointToScreen(sourcePointOnScreen, source);
+    
+    if (source.isShowing())
+      SwingUtilities.convertPointToScreen(sourcePointOnScreen, source);
 
     Point compPointOnScreen;
     Component resultComp = null;
@@ -157,7 +159,7 @@ public class MenuSelectionManager
     for (int i = 0; i < selectedPath.size(); i++)
       {
 	Component comp = ((Component) selectedPath.get(i));
-        Dimension size = comp.getSize();
+	Dimension size = comp.getSize();
 
 	// convert location of this menu item to screen coordinates
 	compPointOnScreen = comp.getLocationOnScreen();
@@ -168,7 +170,10 @@ public class MenuSelectionManager
 	    && sourcePointOnScreen.y < compPointOnScreen.y + size.height)
 	  {
 	    Point p = sourcePointOnScreen;
-	    SwingUtilities.convertPointFromScreen(p, comp);
+        
+        if (comp.isShowing())
+          SwingUtilities.convertPointFromScreen(p, comp);
+        
 	    resultComp = SwingUtilities.getDeepestComponentAt(comp, p.x, p.y);
 	    break;
 	  }
@@ -211,18 +216,18 @@ public class MenuSelectionManager
   public boolean isComponentPartOfCurrentMenu(Component c)
   {
     MenuElement[] subElements;
-    for (int i = 0; i < selectedPath.size(); i++)
+      for (int i = 0; i < selectedPath.size(); i++)
       {
-	subElements = ((MenuElement) selectedPath.get(i)).getSubElements();
-        for (int j = 0; j < subElements.length; j++)
-          {
+         subElements = ((MenuElement) selectedPath.get(i)).getSubElements();
+         for (int j = 0; j < subElements.length; j++)
+         {
             MenuElement me = subElements[j]; 
             if (me != null && (me.getComponent()).equals(c))
-              return true;
-          }
+               return true;
+         }
       }
 
-    return false;
+      return false;
   }
 
   /**
@@ -243,7 +248,7 @@ public class MenuSelectionManager
   public void processMouseEvent(MouseEvent event)
   {
     Component source = ((Component) event.getSource());
-    
+
     // In the case of drag event, event.getSource() returns component
     // where drag event originated. However menu element processing this 
     // event should be the one over which mouse is currently located, 
@@ -272,10 +277,10 @@ public class MenuSelectionManager
 	MenuElement[] subComponents = ((MenuElement) mouseOverMenuComp)
 	                              .getSubElements();
 
-    for (int i = 0; i < subComponents.length; i++)
-      {
-	  subComponents[i].processMouseEvent(event, path, manager);
-      }
+	for (int i = 0; i < subComponents.length; i++)
+	 {
+	      subComponents[i].processMouseEvent(event, path, manager);
+	 }
 	*/
       }
     else
@@ -295,7 +300,7 @@ public class MenuSelectionManager
     if (path == null)
       {
 	clearSelectedPath();
-        return;
+	return;
       }
 
     int i;
@@ -305,28 +310,28 @@ public class MenuSelectionManager
       {
 	minSize = selectedPath.size();
 
-        // if new selected path contains more elements then current
-        // selection then first add all elements at 
+	// if new selected path contains more elements then current
+	// selection then first add all elements at 
 	// the indexes > selectedPath.size 
 	for (i = selectedPath.size(); i < path.length; i++)
-          {
+	  {
 	    selectedPath.add(path[i]);
 	    path[i].menuSelectionChanged(true);
-          }
+	  }
       }
 
     else if (path.length < selectedPath.size())
       {
-        // if new selected path contains less elements then current 
-        // selection then first remove all elements from the selection
-        // at the indexes > path.length
+	// if new selected path contains less elements then current 
+	// selection then first remove all elements from the selection
+	// at the indexes > path.length
 	for (i = selectedPath.size() - 1; i >= path.length; i--)
-          {
+	  {
 	    ((MenuElement) selectedPath.get(i)).menuSelectionChanged(false);
 	    selectedPath.remove(i);
-          }
+	  }
 
-        minSize = path.length;
+	minSize = path.length;
       }
 
     // Now compare elements in new and current selection path at the 
@@ -340,7 +345,7 @@ public class MenuSelectionManager
 	oldSelectedItem = (MenuElement) selectedPath.get(i);
 
 	if (path[i].equals(oldSelectedItem))
-          break;
+	  break;
 
 	oldSelectedItem.menuSelectionChanged(false);
 	path[i].menuSelectionChanged(true);
@@ -379,8 +384,8 @@ public class MenuSelectionManager
 	  c = ((JPopupMenu) c).getInvoker();
 	else
 	  c = c.getParent();
-  }
-  
+      }
+
     MenuElement[] pathArray = new MenuElement[path.size()];
     path.toArray(pathArray);
     return pathArray;

@@ -80,6 +80,7 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
    */
   protected class ArrowButtonListener extends MouseAdapter
   {
+   
     /**
      * Move the thumb in the direction specified by the  button's arrow. If
      * this button is held down, then it should keep moving the thumb.
@@ -91,9 +92,10 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
       scrollTimer.stop();
       scrollListener.setScrollByBlock(false);
       if (e.getSource() == incrButton)
-	scrollListener.setDirection(POSITIVE_SCROLL);
-      else
-	scrollListener.setDirection(NEGATIVE_SCROLL);
+          scrollListener.setDirection(POSITIVE_SCROLL);
+      else if (e.getSource() == decrButton)
+          scrollListener.setDirection(NEGATIVE_SCROLL);
+      scrollTimer.setDelay(100);
       scrollTimer.start();
     }
 
@@ -105,6 +107,11 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
     public void mouseReleased(MouseEvent e)
     {
       scrollTimer.stop();
+      scrollTimer.setDelay(300);
+      if (e.getSource() == incrButton)
+          scrollByUnit(POSITIVE_SCROLL);
+      else if (e.getSource() == decrButton)
+        scrollByUnit(NEGATIVE_SCROLL);
     }
   }
 
@@ -161,10 +168,10 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
               decrButton = createDecreaseButton(NORTH);
               break;
             }
-          incrButton.addMouseListener(buttonListener);
-          decrButton.addMouseListener(buttonListener);	  
-          calculatePreferredSize();
-	}
+	  incrButton.addMouseListener(buttonListener);
+	  decrButton.addMouseListener(buttonListener);
+	  calculatePreferredSize();
+        }
       scrollbar.repaint();
     }
   }
@@ -233,19 +240,19 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
     {
       if (block)
         {
-	  // Only need to check it if it's block scrolling
-	  // We only block scroll if the click occurs
-	  // in the track.
+          // Only need to check it if it's block scrolling
+          // We only block scroll if the click occurs
+          // in the track.
           if (!trackListener.shouldScroll(direction))
-	    {
-	      trackHighlight = NO_HIGHLIGHT;
-	      scrollbar.repaint();
-	      return;
-	    }
-	  scrollByBlock(direction);
+            {
+              trackHighlight = NO_HIGHLIGHT;
+              scrollbar.repaint();
+              return;
+            }
+            scrollByBlock(direction);
         }
       else
-	scrollByUnit(direction);
+        scrollByUnit(direction);
     }
   }
 
@@ -277,15 +284,15 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
       currentMouseX = e.getX();
       currentMouseY = e.getY();
       if (scrollbar.getValueIsAdjusting())
-      {
-        int value;
-        if (scrollbar.getOrientation() == SwingConstants.HORIZONTAL)
-	  value = valueForXPosition(currentMouseX) - offset;
-	else
-	  value = valueForYPosition(currentMouseY) - offset;
-	
-	scrollbar.setValue(value);
-      }
+        {
+	  int value;
+	  if (scrollbar.getOrientation() == SwingConstants.HORIZONTAL)
+	    value = valueForXPosition(currentMouseX) - offset;
+	  else
+	    value = valueForYPosition(currentMouseY) - offset;
+
+	  scrollbar.setValue(value);
+        }
     }
 
     /**
@@ -316,9 +323,6 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
       else
 	value = valueForYPosition(currentMouseY);
 
-      if (value == scrollbar.getValue())
-	return;
-
       if (! thumbRect.contains(e.getPoint()))
         {
 	  scrollTimer.stop();
@@ -333,6 +337,7 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
 	      trackHighlight = DECREASE_HIGHLIGHT;
 	      scrollListener.setDirection(NEGATIVE_SCROLL);
 	    }
+      scrollTimer.setDelay(100);
 	  scrollTimer.start();
         }
       else
@@ -343,10 +348,12 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
 	  // "lower" edge of the thumb. The value at which
 	  // the cursor is at must be greater or equal
 	  // to that value.
+
+      scrollListener.setScrollByBlock(false);
 	  scrollbar.setValueIsAdjusting(true);
-	  offset = value - scrollbar.getValue();
-	}
-      scrollbar.repaint();      
+      offset = value - scrollbar.getValue();
+        }
+      scrollbar.repaint();
     }
 
     /**
@@ -357,14 +364,27 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
      */
     public void mouseReleased(MouseEvent e)
     {
-      trackHighlight = NO_HIGHLIGHT;
       scrollTimer.stop();
+      scrollTimer.setDelay(300);
+      currentMouseX = e.getX();
+      currentMouseY = e.getY();
       
-      if (scrollbar.getValueIsAdjusting())
-        scrollbar.setValueIsAdjusting(false);
+      int value;
+      if (scrollbar.getOrientation() == SwingConstants.HORIZONTAL)
+        value = valueForXPosition(currentMouseX);
+      else
+        value = valueForYPosition(currentMouseY);
+      if (shouldScroll(POSITIVE_SCROLL))
+        scrollByBlock(POSITIVE_SCROLL);
+      else if (shouldScroll(NEGATIVE_SCROLL))
+        scrollByBlock(NEGATIVE_SCROLL);
+      
+      trackHighlight = NO_HIGHLIGHT;
+      scrollListener.setScrollByBlock(false);
+      scrollbar.setValueIsAdjusting(true);
       scrollbar.repaint();
     }
-    
+
     /**
      * A helper method that decides whether we should keep scrolling in the
      * given direction.
@@ -377,14 +397,17 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
     {
       int value;
       if (scrollbar.getOrientation() == HORIZONTAL)
-        value = valueForXPosition(currentMouseX);
+	value = valueForXPosition(currentMouseX);
       else
-        value = valueForYPosition(currentMouseY);
+	value = valueForYPosition(currentMouseY);
 
+      if (thumbRect.contains(currentMouseX, currentMouseY))
+        return false;
+      
       if (direction == POSITIVE_SCROLL)
-        return (value > scrollbar.getValue());
+	return (value > scrollbar.getValue());
       else
-        return (value < scrollbar.getValue());
+	return (value < scrollbar.getValue());
     }
   }
 
@@ -488,7 +511,7 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
   protected void configureScrollBarColors()
   {
     UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-  
+
     trackColor = defaults.getColor("ScrollBar.track");
     trackHighlightColor = defaults.getColor("ScrollBar.trackHighlight");
     thumbColor = defaults.getColor("ScrollBar.thumb");
@@ -507,7 +530,7 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
     return new ArrowButtonListener();
   }
 
-  /** 
+  /**
    * This method creates a new JButton with the appropriate icon for the
    * orientation.
    *
@@ -714,22 +737,22 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
 
     // System.err.println(this + ".getThumbBounds()");
     if (max == min)
-    {
-      thumbRect.x = trackRect.x;
-      thumbRect.y = trackRect.y;
-      if (scrollbar.getOrientation() == HORIZONTAL)
       {
-	thumbRect.width = getMinimumThumbSize().width;
-	thumbRect.height = trackRect.height;
+	thumbRect.x = trackRect.x;
+	thumbRect.y = trackRect.y;
+	if (scrollbar.getOrientation() == HORIZONTAL)
+	  {
+	    thumbRect.width = getMinimumThumbSize().width;
+	    thumbRect.height = trackRect.height;
+	  }
+	else
+	  {
+	    thumbRect.width = trackRect.width;
+	    thumbRect.height = getMinimumThumbSize().height;
+	  }
+	return thumbRect;
       }
-      else
-      {
-        thumbRect.width = trackRect.width;
-	thumbRect.height = getMinimumThumbSize().height;
-      }
-      return thumbRect;
-    }
-               
+
     if (scrollbar.getOrientation() == HORIZONTAL)
       {
 	thumbRect.x = trackRect.x;
@@ -873,8 +896,7 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
 	trackRect = new Rectangle();
 	thumbRect = new Rectangle();
 
-	scrollTimer = new Timer(50, null);
-	scrollTimer.setRepeats(true);
+	scrollTimer = new Timer(300, null);
 
 	installComponents();
 	installDefaults();
@@ -991,7 +1013,7 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
       g.fillRect(trackRect.x, trackRect.y, thumbRect.x - trackRect.x,
                  trackRect.height);
     else
-      g.fillRect(trackRect.x, trackRect.y, trackRect.width, 
+      g.fillRect(trackRect.x, trackRect.y, trackRect.width,
                  thumbRect.y - trackRect.y);
     g.setColor(saved);
   }
@@ -1012,7 +1034,7 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
       g.fillRect(thumbRect.x + thumbRect.width, trackRect.y,
                  trackRect.x + trackRect.width - thumbRect.x - thumbRect.width,
                  trackRect.height);
-    else   
+    else
       g.fillRect(trackRect.x, thumbRect.y + thumbRect.height, trackRect.width,
                  trackRect.y + trackRect.height - thumbRect.y
                  - thumbRect.height);
@@ -1156,16 +1178,16 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
   protected void uninstallListeners()
   {
     scrollTimer.removeActionListener(scrollListener);
-    
+
     scrollbar.getModel().removeChangeListener(modelListener);
     scrollbar.removePropertyChangeListener(propertyChangeListener);
-    
+
     decrButton.removeMouseListener(buttonListener);
     incrButton.removeMouseListener(buttonListener);
-    
+
     scrollbar.removeMouseListener(trackListener);
     scrollbar.removeMouseMotionListener(trackListener);
-    
+
     propertyChangeListener = null;
     modelListener = null;
     buttonListener = null;
@@ -1185,19 +1207,19 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
     uninstallDefaults();
     uninstallListeners();
     uninstallComponents();
-    
+
     scrollTimer = null;
-    
+
     thumbRect = null;
     trackRect = null;
-    
+
     trackColor = null;
     trackHighlightColor = null;
     thumbColor = null;
     thumbHighlightColor = null;
     thumbDarkShadowColor = null;
     thumbLightShadowColor = null;
-    
+
     scrollbar = null;
   }
 

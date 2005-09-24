@@ -78,18 +78,18 @@ public class BasicArrowButton extends JButton implements SwingConstants
   /** The direction to point in. */
   protected int direction;
 
-    /**
+  /**
    * The color the arrow is painted in if disabled and the bottom and right
    * edges of the button.
    * This is package-private to avoid an accessor method.
-     */
+   */
   transient Color shadow = Color.GRAY;
 
-    /**
+  /**
    * The color the arrow is painted in if enabled and the bottom and right
    * edges of the button.
    * This is package-private to avoid an accessor method.
-     */
+   */
   transient Color darkShadow = Color.DARK_GRAY;
 
   /**
@@ -100,21 +100,21 @@ public class BasicArrowButton extends JButton implements SwingConstants
 
   /** The border around the ArrowButton. */
   private transient Border buttonBorder = new Border()
-  {
-    public Insets getBorderInsets(Component c)
     {
+      public Insets getBorderInsets(Component c)
+      {
 	return new Insets(2, 2, 2, 2);
-    }
-    
-    public boolean isBorderOpaque()
-    {
+      }
+
+      public boolean isBorderOpaque()
+      {
 	return true;
-    }
-    
+      }
+
       public void paintBorder(Component c, Graphics g, int x, int y, int w,
                               int h)
-    {
-      Color saved = g.getColor();
+      {
+        Color saved = g.getColor();
         AbstractButton b = (AbstractButton) c;
         if (b.getModel().isPressed())
           {
@@ -123,22 +123,22 @@ public class BasicArrowButton extends JButton implements SwingConstants
           }
         else
           {
-      g.setColor(highlight);
+            g.setColor(highlight);
             g.drawLine(x + 1, y + 1, x + w - 3, y + 1);
             g.drawLine(x + 1, y + 1, x + 1, y + h - 2);
 
-      g.setColor(shadow);
+            g.setColor(shadow);
             g.drawLine(x + 1, y + h - 2, x + w - 1, y + h - 2);
             g.drawLine(x + w - 2, y + 1, x + w - 2, y + h - 2);
 
-      g.setColor(darkShadow);
+            g.setColor(darkShadow);
             g.drawLine(x, y + h - 1, x + w - 1, y + h - 1);
             g.drawLine(x + w - 1, y, x + w - 1, y + h - 1);
 
-      g.setColor(saved);
-    }
+            g.setColor(saved);
+          }
       }
-  };
+    };
 
   /**
    * Creates a new BasicArrowButton object.
@@ -153,7 +153,7 @@ public class BasicArrowButton extends JButton implements SwingConstants
   }
 
   /**
-   * Creates a new BasicArrowButton object with the given colors and 
+   * Creates a new BasicArrowButton object with the given colors and
    * direction.
    *
    * @param direction The direction to point in.
@@ -322,8 +322,8 @@ public class BasicArrowButton extends JButton implements SwingConstants
 	break;
       case SOUTH:
 	x1 = xPoints[1];
-	y1 = yPoints[1] + 1;
-	x2 = xPoints[2] - 1;
+	y1 = yPoints[1];
+	x2 = xPoints[2];
 	y2 = yPoints[2];
 	break;
       case LEFT:

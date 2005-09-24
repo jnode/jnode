@@ -54,6 +54,8 @@ public class DocFlavor implements Cloneable, Serializable
   public static class BYTE_ARRAY
     extends DocFlavor
   {
+    private static final long serialVersionUID = -9065578006593857475L;
+
     public static final BYTE_ARRAY AUTOSENSE = new BYTE_ARRAY("application/octet-stream");
     public static final BYTE_ARRAY GIF = new BYTE_ARRAY("image/gif");
     public static final BYTE_ARRAY JPEG = new BYTE_ARRAY("image/jpeg");
@@ -103,6 +105,8 @@ public class DocFlavor implements Cloneable, Serializable
   public static class INPUT_STREAM
     extends DocFlavor
   {
+    private static final long serialVersionUID = -7045842700749194127L;
+
     public static final INPUT_STREAM AUTOSENSE = new INPUT_STREAM("application/octet-stream");
     public static final INPUT_STREAM GIF = new INPUT_STREAM("image/gif");
     public static final INPUT_STREAM JPEG = new INPUT_STREAM("image/jpeg");
@@ -136,7 +140,7 @@ public class DocFlavor implements Cloneable, Serializable
     extends DocFlavor
   {
     private static final long serialVersionUID = 7100295812579351567L;
-    
+
     public static final DocFlavor.READER TEXT_HTML = new READER("text/html; charset=utf-16");
     public static final DocFlavor.READER TEXT_PLAIN = new READER("text/plain; charset=utf-16");
     
@@ -153,7 +157,7 @@ public class DocFlavor implements Cloneable, Serializable
     extends DocFlavor
   {
     private static final long serialVersionUID = 6181337766266637256L;
-    
+
     public static final DocFlavor.SERVICE_FORMATTED PAGEABLE = new SERVICE_FORMATTED("java.awt.print.Pageable");
     public static final DocFlavor.SERVICE_FORMATTED PRINTABLE = new SERVICE_FORMATTED("java.awt.print.Printable");
     public static final DocFlavor.SERVICE_FORMATTED RENDERABLE_IMAGE = new SERVICE_FORMATTED("java.awt.image.renderable.RenderableImage");
@@ -171,7 +175,7 @@ public class DocFlavor implements Cloneable, Serializable
     extends DocFlavor
   {
     private static final long serialVersionUID = 4414407504887034035L;
-    
+
     public static final DocFlavor.STRING TEXT_HTML = new STRING("text/html; charset=utf-16");
     public static final DocFlavor.STRING TEXT_PLAIN = new STRING("text/plain; charset=utf-16");
     

@@ -1,4 +1,4 @@
-/* AbstractDocument.java -- 
+/* AbstractDocument.java --
    Copyright (C) 2002, 2004, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -65,17 +65,16 @@ import javax.swing.undo.UndoableEdit;
  * @author original author unknown
  * @author Roman Kennke (roman@kennke.org)
  */
-public abstract class AbstractDocument
-  implements Document, Serializable
+public abstract class AbstractDocument implements Document, Serializable
 {
-  /** The serial version UID for this class as of JDK1.4. */
-  private static final long serialVersionUID = -116069779446114664L;
-  
+  /** The serialization UID (compatible with JDK1.5). */
+  private static final long serialVersionUID = 6842927725919637215L;
+
   /**
    * Standard error message to indicate a bad location.
    */
   protected static final String BAD_LOCATION = "document location failure";
-  
+
   /**
    * Standard name for unidirectional <code>Element</code>s.
    */
@@ -118,7 +117,7 @@ public abstract class AbstractDocument
    * The currently installed <code>DocumentFilter</code>.
    */
   DocumentFilter documentFilter;
-  
+
   /**
    * The documents properties.
    */
@@ -197,10 +196,10 @@ public abstract class AbstractDocument
    */
   protected Element createBranchElement(Element parent,
 					AttributeSet attributes)
-    {	
+  {
     return new BranchElement(parent, attributes);
-    }
- 
+  }
+
   /**
    * Creates and returns a leaf element with the specified
    * <code>parent</code> and <code>attributes</code>. Note that the new
@@ -217,9 +216,9 @@ public abstract class AbstractDocument
    */
   protected Element createLeafElement(Element parent, AttributeSet attributes,
 				      int start, int end)
-    {
+  {
     return new LeafElement(parent, attributes, start, end);
-    }
+  }
 
   /**
    * Creates a {@link Position} that keeps track of the location at the
@@ -234,23 +233,23 @@ public abstract class AbstractDocument
    *         location in the documents content model
    */
   public Position createPosition(final int offset) throws BadLocationException
-    {
+  {
     return content.createPosition(offset);
-    }
-  
+  }
+
   /**
    * Notifies all registered listeners when the document model changes.
    *
    * @param event the <code>DocumentEvent</code> to be fired
    */
   protected void fireChangedUpdate(DocumentEvent event)
-    {
+  {
     DocumentListener[] listeners = getDocumentListeners();
 
     for (int index = 0; index < listeners.length; ++index)
       listeners[index].changedUpdate(event);
-    }
- 
+  }
+
   /**
    * Notifies all registered listeners when content is inserted in the document
    * model.
@@ -258,13 +257,13 @@ public abstract class AbstractDocument
    * @param event the <code>DocumentEvent</code> to be fired
    */
   protected void fireInsertUpdate(DocumentEvent event)
-    {
+  {
     DocumentListener[] listeners = getDocumentListeners();
 
     for (int index = 0; index < listeners.length; ++index)
       listeners[index].insertUpdate(event);
-    }
- 
+  }
+
   /**
    * Notifies all registered listeners when content is removed from the
    * document model.
@@ -272,13 +271,13 @@ public abstract class AbstractDocument
    * @param event the <code>DocumentEvent</code> to be fired
    */
   protected void fireRemoveUpdate(DocumentEvent event)
-    {
+  {
     DocumentListener[] listeners = getDocumentListeners();
 
     for (int index = 0; index < listeners.length; ++index)
       listeners[index].removeUpdate(event);
-    }
- 
+  }
+
   /**
    * Notifies all registered listeners when an <code>UndoableEdit</code> has
    * been performed on this <code>Document</code>.
@@ -286,12 +285,12 @@ public abstract class AbstractDocument
    * @param event the <code>UndoableEditEvent</code> to be fired
    */
   protected void fireUndoableEditUpdate(UndoableEditEvent event)
-    {
+  {
     UndoableEditListener[] listeners = getUndoableEditListeners();
-    
+
     for (int index = 0; index < listeners.length; ++index)
       listeners[index].undoableEditHappened(event);
-    }
+  }
 
   /**
    * Returns the asynchronous loading priority. Returns <code>-1</code> if this
@@ -300,30 +299,30 @@ public abstract class AbstractDocument
    * @return the asynchronous loading priority
    */
   public int getAsynchronousLoadPriority()
-    {
-	return 0;
-    }
- 
+  {
+    return 0;
+  }
+
   /**
    * Returns the {@link AttributeContext} used in this <code>Document</code>.
    *
    * @return the {@link AttributeContext} used in this <code>Document</code>
    */
-    protected  AttributeContext getAttributeContext()
-    {
+  protected AttributeContext getAttributeContext()
+  {
     return context;
-    }
-    
+  }
+
   /**
    * Returns the root element for bidirectional content.
    *
    * @return the root element for bidirectional content
    */
   public Element getBidiRootElement()
-    {
-	return null;
-    }
- 
+  {
+    return null;
+  }
+
   /**
    * Returns the {@link Content} model for this <code>Document</code>
    *
@@ -332,11 +331,11 @@ public abstract class AbstractDocument
    * @see GapContent
    * @see StringContent
    */
-    protected Content getContent()
-    {
-	return content;
-    }
- 
+  protected final Content getContent()
+  {
+    return content;
+  }
+
   /**
    * Returns the thread that currently modifies this <code>Document</code>
    * if there is one, otherwise <code>null</code>. This can be used to
@@ -346,25 +345,25 @@ public abstract class AbstractDocument
    * @return the thread that currently modifies this <code>Document</code>
    *         if there is one, otherwise <code>null</code>
    */
-    protected  Thread getCurrentWriter()
-    {
+  protected Thread getCurrentWriter()
+  {
     // FIXME: Implement locking!
-	return null;
-    }
+    return null;
+  }
 
   /**
    * Returns the properties of this <code>Document</code>.
    *
    * @return the properties of this <code>Document</code>
    */
-    public Dictionary getDocumentProperties()
-    {
+  public Dictionary getDocumentProperties()
+  {
     // FIXME: make me thread-safe
     if (properties == null)
       properties = new Hashtable();
 
     return properties;
-    }
+  }
 
   /**
    * Returns a {@link Position} which will always mark the end of the
@@ -373,8 +372,8 @@ public abstract class AbstractDocument
    * @return a {@link Position} which will always mark the end of the
    *         <code>Document</code>
    */
-    public Position getEndPosition()
-    {
+  public Position getEndPosition()
+  {
     // FIXME: Properly implement this by calling Content.createPosition().
     return new Position() 
       {        
@@ -383,21 +382,21 @@ public abstract class AbstractDocument
           return getLength(); 
         } 
       };
-    }
+  }
 
   /**
    * Returns the length of this <code>Document</code>'s content.
    *
    * @return the length of this <code>Document</code>'s content
    */
-    public int getLength()
-    {
+  public int getLength()
+  {
     // We return Content.getLength() -1 here because there is always an
     // implicit \n at the end of the Content which does count in Content
     // but not in Document.
     return content.length() - 1;
-    }
-    
+  }
+
   /**
    * Returns all registered listeners of a given listener type.
    *
@@ -405,11 +404,11 @@ public abstract class AbstractDocument
    *
    * @return all registered listeners of the specified type
    */
-    public EventListener[] getListeners(Class listenerType)
-    {
+  public EventListener[] getListeners(Class listenerType)
+  {
     return listenerList.getListeners(listenerType);
-    }
-    
+  }
+
   /**
    * Returns a property from this <code>Document</code>'s property list.
    *
@@ -418,15 +417,15 @@ public abstract class AbstractDocument
    * @return the property for <code>key</code> or <code>null</code> if there
    *         is no such property stored
    */
-    public Object getProperty(Object key)
-    {
+  public Object getProperty(Object key)
+  {
     // FIXME: make me thread-safe
     Object value = null;
     if (properties != null)
       value = properties.get(key);
 
     return value;
-    }
+  }
 
   /**
    * Returns all root elements of this <code>Document</code>. By default
@@ -437,13 +436,13 @@ public abstract class AbstractDocument
    *
    * @return all root elements of this <code>Document</code>
    */
-    public Element[] getRootElements()
-    {
+  public Element[] getRootElements()
+  {
     Element[] elements = new Element[1];
     elements[0] = getDefaultRootElement();
     return elements;
-    }
-    
+  }
+
   /**
    * Returns a {@link Position} which will always mark the beginning of the
    * <code>Document</code>.
@@ -451,8 +450,8 @@ public abstract class AbstractDocument
    * @return a {@link Position} which will always mark the beginning of the
    *         <code>Document</code>
    */
-    public Position getStartPosition()
-    {
+  public Position getStartPosition()
+  {
     // FIXME: Properly implement this using Content.createPosition().
     return new Position() 
       {        
@@ -461,7 +460,7 @@ public abstract class AbstractDocument
           return 0; 
         } 
       };
-    }
+  }
 
   /**
    * Returns a piece of this <code>Document</code>'s content.
@@ -477,10 +476,10 @@ public abstract class AbstractDocument
    *         <code>Document</code>
    */
   public String getText(int offset, int length) throws BadLocationException
-      {
-	    return content.getString(offset, length);
-      }
-  
+  {
+    return content.getString(offset, length);
+  }
+
   /**
    * Fetches a piece of this <code>Document</code>'s content and stores
    * it in the given {@link Segment}.
@@ -495,9 +494,9 @@ public abstract class AbstractDocument
    */
   public void getText(int offset, int length, Segment segment)
     throws BadLocationException
-    {
+  {
     content.getChars(offset, length, segment);
-	    }
+  }
 
   /**
    * Inserts a String into this <code>Document</code> at the specified
@@ -512,7 +511,7 @@ public abstract class AbstractDocument
    */
   public void insertString(int offset, String text, AttributeSet attributes)
     throws BadLocationException
-    {
+  {
     // Just return when no text to insert was given.
     if (text == null || text.length() == 0)
       return;
@@ -523,8 +522,8 @@ public abstract class AbstractDocument
     content.insertString(offset, text);
     insertUpdate(event, attributes);
     fireInsertUpdate(event);
-    }
- 
+  }
+
   /**
    * Called to indicate that text has been inserted into this
    * <code>Document</code>. The default implementation does nothing.
@@ -533,11 +532,11 @@ public abstract class AbstractDocument
    * @param chng the <code>DefaultDocumentEvent</code> describing the change
    * @param attr the attributes of the changed content
    */
-    protected void insertUpdate(DefaultDocumentEvent chng, AttributeSet attr)
-    {
+  protected void insertUpdate(DefaultDocumentEvent chng, AttributeSet attr)
+  {
     // Do nothing here. Subclasses may want to override this.
-    }
- 
+  }
+
   /**
    * Called after some content has been removed from this
    * <code>Document</code>. The default implementation does nothing.
@@ -545,41 +544,41 @@ public abstract class AbstractDocument
    *
    * @param chng the <code>DefaultDocumentEvent</code> describing the change
    */
-    protected  void postRemoveUpdate(DefaultDocumentEvent chng)
-    {
+  protected void postRemoveUpdate(DefaultDocumentEvent chng)
+  {
     // Do nothing here. Subclasses may want to override this.
-    }
-  
+  }
+
   /**
    * Stores a property in this <code>Document</code>'s property list.
    *
    * @param key the key of the property to be stored
    * @param value the value of the property to be stored
    */
-    public void putProperty(Object key, Object value)
-    {
+  public void putProperty(Object key, Object value)
+  {
     // FIXME: make me thread-safe
     if (properties == null)
       properties = new Hashtable();
 
     properties.put(key, value);
-    }
-  
+  }
+
   /**
    * Blocks until a read lock can be obtained.
    */
-    public void readLock()
-    {
-    }
-  
+  public void readLock()
+  {
+  }
+
   /**
    * Releases the read lock. If this was the only reader on this
    * <code>Document</code>, writing may begin now.
    */
-    public void readUnlock()
-    {
-    }
-  
+  public void readUnlock()
+  {
+  }
+
   /**
    * Removes a piece of content from this <code>Document</code>.
    *
@@ -591,7 +590,7 @@ public abstract class AbstractDocument
    *         document
    */
   public void remove(int offset, int length) throws BadLocationException
-    {
+  {
     DefaultDocumentEvent event =
       new DefaultDocumentEvent(offset, length,
 			       DocumentEvent.EventType.REMOVE);
@@ -622,8 +621,8 @@ public abstract class AbstractDocument
   {
     remove(offset, length);
     insertString(offset, text, attributes);
-    }
-  
+  }
+
   /**
    * Adds a <code>DocumentListener</code> object to this document.
    *
@@ -639,11 +638,11 @@ public abstract class AbstractDocument
    *
    * @param listener the listener to remove
    */
-    public void removeDocumentListener(DocumentListener listener)
-    {
+  public void removeDocumentListener(DocumentListener listener)
+  {
     listenerList.remove(DocumentListener.class, listener);
-    }
-  
+  }
+
   /**
    * Returns all registered <code>DocumentListener</code>s.
    *
@@ -669,8 +668,8 @@ public abstract class AbstractDocument
    *
    * @param listener the listener to remove
    */
-    public void removeUndoableEditListener(UndoableEditListener listener)
-    {
+  public void removeUndoableEditListener(UndoableEditListener listener)
+  {
     listenerList.remove(UndoableEditListener.class, listener);
   }
 
@@ -682,8 +681,8 @@ public abstract class AbstractDocument
   public UndoableEditListener[] getUndoableEditListeners()
   {
     return (UndoableEditListener[]) getListeners(UndoableEditListener.class);
-    }
- 
+  }
+
   /**
    * Called before some content gets removed from this <code>Document</code>.
    * The default implementation does nothing but may be overridden by
@@ -692,11 +691,11 @@ public abstract class AbstractDocument
    *
    * @param chng the <code>DefaultDocumentEvent</code> describing the change
    */
-    protected void removeUpdate(DefaultDocumentEvent chng)
-    {
+  protected void removeUpdate(DefaultDocumentEvent chng)
+  {
     // Do nothing here. Subclasses may wish to override this.
-    }
-  
+  }
+
   /**
    * Called to render this <code>Document</code> visually. It obtains a read
    * lock, ensuring that no changes will be made to the <code>document</code>
@@ -712,10 +711,10 @@ public abstract class AbstractDocument
    * @param runnable the {@link Runnable} to execute
    */
   public void render(Runnable runnable)
-    {
+  {
     // FIXME: Implement me!
-    }
-      
+  }
+
   /**
    * Sets the asynchronous loading priority for this <code>Document</code>.
    * A value of <code>-1</code> indicates that this <code>Document</code>
@@ -724,36 +723,36 @@ public abstract class AbstractDocument
    * @param p the asynchronous loading priority to set
    */
   public void setAsynchronousLoadPriority(int p)
-    {
-    }
-  
+  {
+  }
+
   /**
    * Sets the properties of this <code>Document</code>.
    *
    * @param p the document properties to set
    */
   public void setDocumentProperties(Dictionary p)
-    {
+  {
     // FIXME: make me thread-safe
     properties = p;
-    }
- 
+  }
+
   /**
    * Blocks until a write lock can be obtained.
    */
-    protected  void writeLock()
-    {
+  protected void writeLock()
+  {
     // FIXME: Implement me.
-    }
- 
+  }
+
   /**
    * Releases the write lock. This allows waiting readers or writers to
    * obtain the lock.
    */
-    protected  void writeUnlock()
-    {
+  protected void writeUnlock()
+  {
     // FIXME: Implement me.
-    }
+  }
 
   /**
    * Returns the currently installed {@link DocumentFilter} for this
@@ -970,8 +969,8 @@ public abstract class AbstractDocument
   public abstract class AbstractElement
     implements Element, MutableAttributeSet, TreeNode, Serializable
   {
-    /** The serial version UID for AbstractElement. */
-    private static final long serialVersionUID = 1265312733007397733L;
+    /** The serialization UID (compatible with JDK1.5). */
+    private static final long serialVersionUID = 1712240033321461704L;
 
     /** The number of characters that this Element spans. */
     int count;
@@ -1218,7 +1217,7 @@ public abstract class AbstractDocument
     {
       return attributes.getAttributeCount();
     }
-      
+
     /**
      * Returns the names of the attributes of this element.
      *
@@ -1228,7 +1227,7 @@ public abstract class AbstractDocument
     {
       return attributes.getAttributeNames();
     }
-      
+
     /**
      * Returns the resolve parent of this element.
      *
@@ -1254,7 +1253,7 @@ public abstract class AbstractDocument
     {
       return attributes.isDefined(attrName);
     }
-      
+
     /**
      * Returns <code>true</code> if the specified <code>AttributeSet</code>
      * is equal to this element's <code>AttributeSet</code>, <code>false</code>
@@ -1355,49 +1354,6 @@ public abstract class AbstractDocument
     public abstract int getStartOffset();
 
     /**
-     * Prints diagnostic information to the specified stream.
-     *
-     * @param stream the stream to dump to
-     * @param indent the indentation level
-     * @param element the element to be dumped
-     */
-    private void dumpElement(PrintStream stream, String indent,
-                             Element element)
-    {
-      // FIXME: Should the method be removed?
-      System.out.println(indent + "<" + element.getName() +">");
-      
-      if (element.isLeaf())
-	{
-	  int start = element.getStartOffset();
-	  int end = element.getEndOffset();
-	  String text = "";
-	  try
-	    {
-	      text = getContent().getString(start, end - start);
-	    }
-	  catch (BadLocationException e)
-	    {
-          AssertionError error =
-            new AssertionError("BadLocationException should not be "
-                               + "thrown here. start = " + start
-                               + ", end = " + end);
-          error.initCause(e);
-          throw error;
-	    }
-	  System.out.println(indent + "  ["
-			     + start + ","
-			     + end + "]["
-			     + text + "]");
-	}
-      else
-	{
-	  for (int i = 0; i < element.getElementCount(); ++i)
-	    dumpElement(stream, indent + "  ", element.getElement(i));
-	}
-    }
-    
-    /**
      * Prints diagnostic output to the specified stream.
      *
      * @param stream the stream to write to
@@ -1405,10 +1361,65 @@ public abstract class AbstractDocument
      */
     public void dump(PrintStream stream, int indent)
     {
-      String indentStr = "";
+      StringBuffer b = new StringBuffer();
       for (int i = 0; i < indent; ++i)
-	indentStr += "  ";
-      dumpElement(stream, indentStr, this);
+        b.append(' ');
+      b.append('<');
+      b.append(getName());
+      // Dump attributes if there are any.
+      if (getAttributeCount() > 0)
+        {
+          b.append('\n');
+          Enumeration attNames = getAttributeNames();
+          while (attNames.hasMoreElements())
+            {
+              for (int i = 0; i < indent + 2; ++i)
+                b.append(' ');
+              Object attName = attNames.nextElement();
+              b.append(attName);
+              b.append('=');
+              Object attribute = getAttribute(attName);
+              b.append(attribute);
+              b.append('\n');
+            }
+        }
+      b.append(">\n");
+
+      // Dump element content for leaf elements.
+      if (isLeaf())
+        {
+          for (int i = 0; i < indent + 2; ++i)
+            b.append(' ');
+          int start = getStartOffset();
+          int end = getEndOffset();
+          b.append('[');
+          b.append(start);
+          b.append(',');
+          b.append(end);
+          b.append("][");
+          try
+            {
+              b.append(getDocument().getText(start, end - start));
+            }
+          catch (BadLocationException ex)
+            {
+              AssertionError err = new AssertionError("BadLocationException "
+                                                      + "must not be thrown "
+                                                      + "here.");
+              err.initCause(ex);
+            }
+          b.append("]\n");
+        }
+      stream.print(b.toString());
+
+      // Dump child elements if any.
+      int count = getElementCount();
+      for (int i = 0; i < count; ++i)
+        {
+          Element el = getElement(i);
+          if (el instanceof AbstractElement)
+            ((AbstractElement) el).dump(stream, indent + 2);
+        }
     }
   }
 
@@ -1418,9 +1429,9 @@ public abstract class AbstractDocument
    */
   public class BranchElement extends AbstractElement
   {
-    /** The serial version UID for BranchElement. */
-    private static final long serialVersionUID = -8595176318868717313L;
-    
+    /** The serialization UID (compatible with JDK1.5). */
+    private static final long serialVersionUID = -6037216547466333183L;
+
     /** The child elements of this BranchElement. */
     private Element[] children = new Element[0];
 
@@ -1511,11 +1522,11 @@ public abstract class AbstractDocument
       // as beginning from first element each time.
       for (int index = 0; index < children.length; ++index)
         {
-	  Element elem = children[index];
-      
-	  if ((elem.getStartOffset() <= offset)
-	      && (offset < elem.getEndOffset()))
-	    return index;
+          Element elem = children[index];
+
+          if ((elem.getStartOffset() <= offset)
+               && (offset < elem.getEndOffset()))
+            return index;
         }
 
       // If offset is greater than the index of the last element, return
@@ -1642,9 +1653,9 @@ public abstract class AbstractDocument
   public class DefaultDocumentEvent extends CompoundEdit
     implements DocumentEvent
   {
-    /** The serial version UID of DefaultDocumentEvent. */
-    private static final long serialVersionUID = -7406103236022413522L;
-    
+    /** The serialization UID (compatible with JDK1.5). */
+    private static final long serialVersionUID = 5230037221564563284L;
+
     /** The starting offset of the change. */
     private int offset;
 
@@ -1805,7 +1816,7 @@ public abstract class AbstractDocument
     {
       return added;
     }
-    
+
     /**
      * Returns the removed elements.
      *
@@ -1843,8 +1854,8 @@ public abstract class AbstractDocument
    */
   public class LeafElement extends AbstractElement
   {
-    /** The serial version UID of LeafElement. */
-    private static final long serialVersionUID = 5115368706941283802L;
+    /** The serialization UID (compatible with JDK1.5). */
+    private static final long serialVersionUID = -8906306331347768017L;
 
     /** Manages the start offset of this element. */
     Position startPos;
@@ -1865,26 +1876,26 @@ public abstract class AbstractDocument
     {
       super(parent, attributes);
 	{
-      try
-	{
+	  try
+	    {
 	      if (parent != null)
 		{
-	  startPos = parent.getDocument().createPosition(start);
-	  endPos = parent.getDocument().createPosition(end);
-	}
+		  startPos = parent.getDocument().createPosition(start);
+		  endPos = parent.getDocument().createPosition(end);
+		}
 	      else
 		{
 		  startPos = createPosition(start);
 		  endPos = createPosition(end);
 		}
 	    }
-      catch (BadLocationException ex)
-	{
+	  catch (BadLocationException ex)
+	    {
 	      AssertionError as;
 	      as = new AssertionError("BadLocationException thrown "
 				      + "here. start=" + start
 				      + ", end=" + end
-				   + ", length=" + getLength());
+				      + ", length=" + getLength());
 	      as.initCause(ex);
 	      throw as;
 	    }

@@ -37,16 +37,32 @@ exception statement from your version. */
 
 package javax.swing;
 
+import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.FocusListener;
+import java.beans.PropertyChangeListener;
 import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Vector;
 
 import javax.accessibility.Accessible;
+import javax.accessibility.AccessibleAction;
+import javax.accessibility.AccessibleComponent;
 import javax.accessibility.AccessibleContext;
+import javax.accessibility.AccessibleRole;
+import javax.accessibility.AccessibleSelection;
+import javax.accessibility.AccessibleState;
+import javax.accessibility.AccessibleStateSet;
+import javax.accessibility.AccessibleText;
+import javax.accessibility.AccessibleValue;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeModelEvent;
@@ -70,15 +86,1107 @@ import javax.swing.tree.TreeSelectionModel;
 
 public class JTree
 		extends	JComponent
-  implements Scrollable, Accessible
+			implements Scrollable, Accessible
 {
+
   /**
-   * Listens to the model of the JTree and updates the property
+   * This class implements accessibility support for the JTree class. It 
+   * provides an implementation of the Java Accessibility API appropriate 
+   * to tree user-interface elements.
+   */
+  protected class AccessibleJTree extends JComponent.AccessibleJComponent
+      implements AccessibleSelection, TreeSelectionListener, TreeModelListener,
+      TreeExpansionListener
+  {
+    
+    /**
+     * This class implements accessibility support for the JTree child. It provides 
+     * an implementation of the Java Accessibility API appropriate to tree nodes.
+     */
+    protected class AccessibleJTreeNode extends AccessibleContext 
+       implements Accessible, AccessibleComponent, AccessibleSelection, 
+       AccessibleAction
+    {
+      
+      private JTree tree;
+      private TreePath tp;
+      private Accessible acc;
+      private AccessibleStateSet states;
+      private Vector selectionList;
+      private Vector actionList;
+      private TreeModel mod;
+      private Cursor cursor;
+      
+      /**
+       * Constructs an AccessibleJTreeNode
+       * 
+       * @param t - the current tree
+       * @param p - the current path to be dealt with
+       * @param ap - the accessible object to use
+       */
+      public AccessibleJTreeNode(JTree t, TreePath p, Accessible ap)
+      {
+        states = new AccessibleStateSet();
+        selectionList = new Vector();
+        actionList = new Vector();
+        mod = tree.getModel();
+        cursor = JTree.this.getCursor();
+                
+        tree = t;
+        tp = p;
+        acc = ap;
+        
+        // Add all the children of this path that may already be
+        // selected to the selection list.
+        TreePath[] selected = tree.getSelectionPaths();
+        for (int i = 0; i < selected.length; i++)
+          {
+            TreePath sel = selected[i];
+            if ((sel.getParentPath()).equals(tp))
+              selectionList.add(sel);
+          }
+        
+        // Add all the actions available for a node to 
+        // the action list.
+        actionList.add("EXPAND");
+        actionList.add("COLLAPSE");
+        actionList.add("EDIT");
+        actionList.add("SELECT");
+        actionList.add("DESELECT");
+      }      
+      
+      /**
+       * Adds the specified selected item in the object to the object's
+       * selection.
+       * 
+       * @param i - the i-th child of this node.
+       */
+      public void addAccessibleSelection(int i)
+      {
+        if (mod != null)
+          {
+            Object child = mod.getChild(tp.getLastPathComponent(), i);
+            if (child != null)
+              {
+                if (!states.contains(AccessibleState.MULTISELECTABLE))
+                  clearAccessibleSelection();
+                selectionList.add(child);                  
+                tree.addSelectionPath(tp.pathByAddingChild(child));
+              }
+          }
+      }
+      
+      /**
+       * Adds the specified focus listener to receive focus events 
+       * from this component.
+       * 
+       * @param l - the new focus listener
+       */
+      public void addFocusListener(FocusListener l)
+      {
+        tree.addFocusListener(l);
+      }
+      
+      /**
+       * Add a PropertyChangeListener to the listener list.
+       * 
+       * @param l - the new property change listener
+       */
+      public void addPropertyChangeListener(PropertyChangeListener l)
+      {
+        // Nothing to do here.
+      }
+      
+      /**
+       * Clears the selection in the object, so that nothing in the 
+       * object is selected.
+       */
+      public void clearAccessibleSelection()
+      {
+        selectionList.clear();
+      }
+      
+      /**
+       * Checks whether the specified point is within this object's 
+       * bounds, where the point's x and y coordinates are defined to be 
+       * relative to the coordinate system of the object. 
+       * 
+       * @param p - the point to check
+       * @return true if p is in the bounds
+       */
+      public boolean contains(Point p)
+      {
+        return getBounds().contains(p);
+      }
+      
+      /**
+       * Perform the specified Action on the tree node.
+       * 
+       * @param i - the i-th action to perform
+       * @return true if the the action was performed; else false.
+       */
+      public boolean doAccessibleAction(int i)
+      {
+        if (i >= actionList.size() || i < 0)
+          return false;
+        
+        if (actionList.get(i).equals("EXPAND"))
+          tree.expandPath(tp);
+        else if (actionList.get(i).equals("COLLAPSE"))
+          tree.collapsePath(tp);
+        else if (actionList.get(i).equals("SELECT"))
+          tree.addSelectionPath(tp);
+        else if (actionList.get(i).equals("DESELECT"))
+          tree.removeSelectionPath(tp);
+        else if (actionList.get(i).equals("EDIT"))
+          tree.startEditingAtPath(tp);
+        else
+          return false;
+        return true;
+      }
+      
+      /**
+       * Get the AccessibleAction associated with this object.
+       * 
+       * @return the action
+       */
+      public AccessibleAction getAccessibleAction()
+      {
+        return this;
+      }
+      
+      /**
+       * Returns the number of accessible actions available in this tree node.
+       * 
+       * @return the number of actions
+       */
+      public int getAccessibleActionCount()
+      {
+        return actionList.size();
+      }
+      
+      /**
+       * Return a description of the specified action of the tree node.
+       * 
+       * @param i - the i-th action's description
+       * @return a description of the action
+       */
+      public String getAccessibleActionDescription(int i)
+      {
+        if (i < 0 || i >= actionList.size())
+          return (actionList.get(i)).toString();
+        return super.getAccessibleDescription();
+      }
+      
+      /**
+       * Returns the Accessible child, if one exists, contained at the 
+       * local coordinate Point.
+       * 
+       * @param p - the point of the accessible
+       * @return the accessible at point p if it exists
+       */
+      public Accessible getAccessibleAt(Point p)
+      {
+        TreePath acc = tree.getClosestPathForLocation(p.x, p.y);
+        if (acc != null)
+          return new AccessibleJTreeNode(tree, acc, this);
+        return null;
+      }
+      
+      /**
+       * Return the specified Accessible child of the object.
+       * 
+       * @param i - the i-th child of the current path
+       * @return the child if it exists
+       */
+      public Accessible getAccessibleChild(int i)
+      {
+        if (mod != null)
+          {
+            Object child = mod.getChild(tp.getLastPathComponent(), i);
+            if (child != null)
+              return new AccessibleJTreeNode(tree, tp.pathByAddingChild(child),
+                                             acc);
+          }
+        return null;
+      }
+      
+      /**
+       * Returns the number of accessible children in the object.
+       * 
+       * @return the number of children the current node has
+       */
+      public int getAccessibleChildrenCount()
+      {
+        TreeModel mod = getModel();
+        if (mod != null)
+          return mod.getChildCount(tp.getLastPathComponent());
+        return 0;
+      }
+      
+      /**
+       * Get the AccessibleComponent associated with this object.
+       * 
+       * @return the accessible component if it is supported.
+       */
+      public AccessibleComponent getAccessibleComponent()
+      {
+        return this;
+      }
+      
+      /**
+       * Get the AccessibleContext associated with this tree node.
+       * 
+       * @return an instance of this class
+       */
+      public AccessibleContext getAccessibleContext()
+      {
+        return this;
+      }
+      
+      /**
+       * Get the accessible description of this object.
+       * 
+       * @return the accessible description
+       */
+      public String getAccessibleDescription()
+      {
+        return super.getAccessibleDescription();
+      }
+      
+      /**
+       * Get the index of this object in its accessible parent.
+       * 
+       * @return the index of this in the parent.
+       */
+      public int getAccessibleIndexInParent()
+      {
+        AccessibleContext parent = getAccessibleParent().getAccessibleContext();
+        if (parent != null)
+          for (int i = 0; i < parent.getAccessibleChildrenCount(); i++)
+            {
+              if ((parent.getAccessibleChild(i)).equals(this))
+                return i;
+            }
+        return -1;
+      }
+      
+      /**
+       * Get the accessible name of this object.
+       * 
+       * @return the accessible name
+       */
+      public String getAccessibleName()
+      {
+        return super.getAccessibleName();
+      }
+      
+      /**
+       * Get the Accessible parent of this object.
+       * 
+       * @return the accessible parent if it exists.
+       */
+      public Accessible getAccessibleParent()
+      {
+        return super.getAccessibleParent();
+      }
+      
+      /**
+       * Get the role of this object.
+       * 
+       * @return the accessible role
+       */
+      public AccessibleRole getAccessibleRole()
+      {
+        return AccessibleJTree.this.getAccessibleRole();
+      }
+      
+      /**
+       * Get the AccessibleSelection associated with this object if one exists.
+       * 
+       * @return the accessible selection for this.
+       */
+      public AccessibleSelection getAccessibleSelection()
+      {
+        return this;
+      }
+      
+      /**
+       * Returns an Accessible representing the specified selected item 
+       * in the object.
+       * 
+       * @return the accessible representing a certain selected item.
+       */
+      public Accessible getAccessibleSelection(int i)
+      {
+        if (i > 0 && i < getAccessibleSelectionCount())
+            return new AccessibleJTreeNode(tree, 
+                  tp.pathByAddingChild(selectionList.get(i)), acc);
+        return null;
+      }
+      
+      /**
+       * Returns the number of items currently selected.
+       * 
+       * @return the number of items selected.
+       */
+      public int getAccessibleSelectionCount()
+      {
+        return selectionList.size();
+      }
+      
+      /**
+       * Get the state set of this object.
+       * 
+       * @return the state set for this object
+       */
+      public AccessibleStateSet getAccessibleStateSet()
+      {
+        if (isVisible())
+          states.add(AccessibleState.VISIBLE);
+        if (tree.isCollapsed(tp))
+          states.add(AccessibleState.COLLAPSED);
+        if (tree.isEditable())
+          states.add(AccessibleState.EDITABLE);
+        if (mod != null && 
+            !mod.isLeaf(tp.getLastPathComponent()))
+          states.add(AccessibleState.EXPANDABLE);
+        if (tree.isExpanded(tp))
+          states.add(AccessibleState.EXPANDED);
+        if (isFocusable())
+          states.add(AccessibleState.FOCUSABLE);
+        if (hasFocus())
+          states.add(AccessibleState.FOCUSED);
+        if (tree.getSelectionModel().getSelectionMode() != 
+          TreeSelectionModel.SINGLE_TREE_SELECTION)
+          states.add(AccessibleState.MULTISELECTABLE);
+        if (tree.isOpaque())
+          states.add(AccessibleState.OPAQUE);
+        if (tree.isPathSelected(tp))
+          states.add(AccessibleState.SELECTED);
+        if (isShowing())
+          states.add(AccessibleState.SHOWING);
+
+        states.add(AccessibleState.SELECTABLE);
+        return states;
+      }
+      
+      /**
+       * Get the AccessibleText associated with this object if one exists.
+       * 
+       * @return the accessible text
+       */
+      public AccessibleText getAccessibleText()
+      {
+        return super.getAccessibleText();
+      }
+      
+      /**
+       * Get the AccessibleValue associated with this object if one exists.
+       * 
+       * @return the accessible value if it exists
+       */
+      public AccessibleValue getAccessibleValue()
+      {
+        return super.getAccessibleValue();
+      }
+      
+      /**
+       * Get the background color of this object.
+       * 
+       * @return the color of the background.
+       */
+      public Color getBackground()
+      {
+        return tree.getBackground();
+      }
+      
+      /**
+       * Gets the bounds of this object in the form of a Rectangle object.
+       * 
+       * @return the bounds of the current node.
+       */
+      public Rectangle getBounds()
+      {
+        return tree.getPathBounds(tp);
+      }
+      
+      /**
+       * Gets the Cursor of this object.
+       * 
+       * @return the cursor for the current node
+       */
+      public Cursor getCursor()
+      {
+        return cursor;
+      }
+      
+      /**
+       * Gets the Font of this object.
+       * 
+       * @return the font for the current node
+       */
+      public Font getFont()
+      {
+        return tree.getFont();
+      }
+      
+      /**
+       * Gets the FontMetrics of this object.
+       * 
+       * @param f - the current font.
+       * @return the font metrics for the given font.
+       */
+      public FontMetrics getFontMetrics(Font f)
+      {
+        return tree.getFontMetrics(f);
+      }
+      
+      /**
+       * Get the foreground color of this object.
+       * 
+       * @return the foreground for this object.
+       */
+      public Color getForeground()
+      {
+        return tree.getForeground();
+      }
+      
+      /**
+       * Gets the locale of the component.
+       * 
+       * @return the locale of the component.
+       */
+      public Locale getLocale()
+      {
+        return tree.getLocale();
+      }
+      
+      /**
+       * Gets the location of the object relative to the 
+       * parent in the form of a point specifying the object's 
+       * top-left corner in the screen's coordinate space. 
+       * 
+       * @return the location of the current node.
+       */
+      public Point getLocation()
+      {
+        return getLocationInJTree();
+      }
+      
+      /**
+       * Returns the location in the tree.
+       * 
+       * @return the location in the JTree.
+       */
+      protected Point getLocationInJTree()
+      {
+        Rectangle bounds = tree.getPathBounds(tp);
+        return new Point(bounds.x, bounds.y);
+      }
+      
+      /**
+       * Returns the location of the object on the screen.
+       * 
+       * @return the location of the object on the screen.
+       */
+      public Point getLocationOnScreen()
+      {
+        Point loc = getLocation();
+        SwingUtilities.convertPointToScreen(loc, tree);
+        return loc;
+      }
+      
+      /**
+       * Returns the size of this object in the form of a Dimension object.
+       * 
+       * @return the size of the object
+       */
+      public Dimension getSize()
+      {
+        Rectangle b = getBounds();
+        return b.getSize();
+      }
+      
+      /**
+       * Returns true if the current child of this object is selected.
+       * 
+       * @param i - the child of the current node
+       * @return true if the child is selected.
+       */
+      public boolean isAccessibleChildSelected(int i)
+      {
+        Object child = mod.getChild(tp.getLastPathComponent(), i);
+        if (child != null)
+          return tree.isPathSelected(tp.pathByAddingChild(child));
+        return false;
+      }
+      
+      /**
+       * Determines if the object is enabled.
+       * 
+       * @return true if the tree is enabled
+       */
+      public boolean isEnabled()
+      {
+        return tree.isEnabled();
+      }
+      
+      /**
+       * Returns whether this object can accept focus or not.
+       * 
+       * @return true, it is always focus traversable
+       */
+      public boolean isFocusTraversable()
+      {
+        return true;
+      }
+      
+      /**
+       * Determines if the object is showing.
+       * 
+       * @return true if the object is visible and the
+       * parent is visible.
+       */
+      public boolean isShowing()
+      {
+        return isVisible() && tree.isShowing();
+      }
+      
+      /**
+       * Determines if the object is visible.
+       * 
+       * @return true if the object is visible.
+       */
+      public boolean isVisible()
+      {
+        return tree.isVisible(tp);
+      }
+      
+      /**
+       * Removes the specified selected item in the object from the
+       * object's selection.
+       * 
+       * @param i - the specified item to remove
+       */
+      public void removeAccessibleSelection(int i)
+      {
+        if (mod != null)
+          {
+            Object child = mod.getChild(tp.getLastPathComponent(), i);
+            if (child != null)
+              {
+                if (!states.contains(AccessibleState.MULTISELECTABLE))
+                  clearAccessibleSelection();
+                if (selectionList.contains(child))
+                  {
+                    selectionList.remove(child);                  
+                    tree.removeSelectionPath(tp.pathByAddingChild(child));
+                  }
+              }
+          }
+      }
+      
+      /**
+       * Removes the specified focus listener so it no longer receives focus 
+       * events from this component.
+       * 
+       * @param l - the focus listener to remove
+       */
+      public void removeFocusListener(FocusListener l)
+      {
+        tree.removeFocusListener(l);
+      }
+      
+      /**
+       * Remove a PropertyChangeListener from the listener list.
+       * 
+       * @param l - the property change listener to remove.
+       */
+      public void removePropertyChangeListener(PropertyChangeListener l)
+      {
+        // Nothing to do here.
+      }
+      
+      /**
+       * Requests focus for this object.
+       */
+      public void requestFocus()
+      {
+        tree.requestFocus();
+      }
+      
+      /**
+       * Causes every selected item in the object to be selected if the object 
+       * supports multiple selections.
+       */
+      public void selectAllAccessibleSelection()
+      {
+        Object parent = tp.getLastPathComponent();
+        if (mod != null)
+          {
+            for (int i = 0; i < mod.getChildCount(parent); i++)
+              {
+                Object child = mod.getChild(parent, i);
+                if (child != null)
+                  {
+                    if (!states.contains(AccessibleState.MULTISELECTABLE))
+                      clearAccessibleSelection();
+                    if (selectionList.contains(child))
+                      {
+                        selectionList.add(child);
+                        tree.addSelectionPath(tp.pathByAddingChild(child));
+                      }
+                  }
+              }
+          }
+      }
+      
+      /**
+       * Set the accessible description of this object.
+       * 
+       * @param s - the string to set the accessible description to.
+       */
+      public void setAccessibleDescription(String s)
+      {
+        super.setAccessibleDescription(s);
+      }
+      
+      /**
+       * Set the localized accessible name of this object.
+       * 
+       * @param s - the string to set the accessible name to.
+       */
+      public void setAccessibleName(String s)
+      {
+        super.setAccessibleName(s);
+      }
+      
+      /**
+       * Set the background color of this object.
+       * 
+       * @param c - the color to set the background to.
+       */
+      public void setBackground(Color c)
+      {
+        // Nothing to do here.
+      }
+      
+      /**
+       * Sets the bounds of this object in the form of a Rectangle object.
+       * 
+       * @param r - the bounds to set the object o
+       */
+      public void setBounds(Rectangle r)
+      {
+        // Nothing to do here.
+      }
+      
+      /**
+       * Sets the Cursor of this object.
+       * 
+       * @param c - the new cursor
+       */
+      public void setCursor(Cursor c)
+      {
+        cursor = c;
+      }
+      
+      /**
+       * Sets the enabled state of the object.
+       * 
+       * @param b - boolean to enable or disable object
+       */
+      public void setEnabled(boolean b)
+      {
+         // Nothing to do here.
+      }
+      
+      /**
+       * Sets the Font of this object.
+       * 
+       * @param f - the new font.
+       */
+      public void setFont(Font f)
+      {
+         // Nothing to do here.
+      }
+      
+      /**
+       * Sets the foreground color of this object.
+       * 
+       * @param c - the new foreground color.
+       */
+      public void setForeground(Color c)
+      {
+        // Nothing to do here.
+      }
+      
+      /**
+       * Sets the location of the object relative to the parent.
+       * 
+       * @param p - the new location for the object.
+       */
+      public void setLocation(Point p)
+      {
+        // Nothing to do here.
+      }
+      
+      /**
+       * Resizes this object so that it has width and height.
+       * 
+       * @param d - the new size for the object.
+       */
+      public void setSize(Dimension d)
+      {
+        // Nothing to do here.
+      }
+      
+      /**
+       * Sets the visible state of the object.
+       * 
+       * @param b - sets the objects visibility.
+       */
+      public void setVisible(boolean b)
+      {
+        // Nothing to do here.
+      }
+    }
+    
+    /**
+     * Constructor
+     */
+    public AccessibleJTree()
+    {
+      // Nothing to do here.
+    }
+    
+    /**
+     * Adds the specified selected item in the object to the object's selection.
+     * 
+     * @param i - the row to add to the tree's selection
+     */
+    public void addAccessibleSelection(int i)
+    {
+      addSelectionInterval(i, i);
+    }
+    
+    /**
+     * Clears the selection in the object, so that nothing in the object is selected.
+     */
+    public void clearAccessibleSelection()
+    {
+      clearSelection();
+    }
+    
+    /**
+     * Fire a visible data property change notification.
+     */
+    public void fireVisibleDataPropertyChange()
+    {
+      treeDidChange();
+    }
+    
+    /**
+     * Returns the Accessible child, if one exists, contained at the local 
+     * coordinate Point.
+     * 
+     * @param p - the point of the accessible to get.
+     * @return the accessible at point p.
+     */
+    public Accessible getAccessibleAt(Point p)
+    {
+      TreePath tp = getClosestPathForLocation(p.x, p.y);
+      if (tp != null)
+        return new AccessibleJTreeNode(JTree.this, tp, null);
+      return null;
+    }
+    
+    /**
+     * Return the nth Accessible child of the object.
+     * 
+     * @param i - the accessible child to get
+     * @return the i-th child
+     */
+    public Accessible getAccessibleChild(int i)
+    {
+      return null;
+    }
+    
+    /**
+     * Returns the number of top-level children nodes of this JTree.
+     * 
+     * @return the number of top-level children
+     */
+    public int getAccessibleChildrenCount()
+    {
+      TreeModel model = getModel();
+      if (model != null)
+        return model.getChildCount(model.getRoot());
+      return 0;
+    }
+    
+    /**
+     * Get the index of this object in its accessible parent.
+     * 
+     * @return the index of this object.
+     */
+    public int getAccessibleIndexInParent()
+    {
+      return 0;
+    }
+    
+    /**
+     * Get the role of this object.
+     * 
+     * @return the role of this object
+     */
+    public AccessibleRole getAccessibleRole()
+    {
+      return AccessibleRole.TREE;
+    }
+    
+    /**
+     * Get the AccessibleSelection associated with this object.
+     * 
+     * @return the accessible selection of the tree
+     */
+    public AccessibleSelection getAccessibleSelection()
+    {
+      TreeModel mod = getModel();
+      if (mod != null)
+        return (new AccessibleJTreeNode(JTree.this, 
+                  new TreePath(mod.getRoot()), null)).getAccessibleSelection();
+      return null;
+    }
+    
+    /**
+     * Returns an Accessible representing the specified selected item in the object.
+     * 
+     * @return the i-th accessible in the selection
+     */
+    public Accessible getAccessibleSelection(int i)
+    {
+      TreeModel mod = getModel();
+      if (mod != null)
+        return (new AccessibleJTreeNode(JTree.this, 
+                  new TreePath(mod.getRoot()), null)).getAccessibleSelection(i);
+      return null;
+    }
+    
+    /**
+     * Returns the number of items currently selected.
+     * 
+     * @param the number of selected accessibles.
+     */
+    public int getAccessibleSelectionCount()
+    {
+      return getSelectionCount();
+    }
+    
+    /**
+     * Returns true if the current child of this object is selected.
+     * 
+     * @param i - the child of this object
+     * @return true if the i-th child is selected.
+     */
+    public boolean isAccessibleChildSelected(int i)
+    {
+      // Nothing to do here.
+      return false;
+    }
+    
+    /**
+     * Removes the specified selected item in the object from the object's
+     * selection.
+     * 
+     * @param i - the i-th selected item to remove
+     */
+    public void removeAccessibleSelection(int i)
+    {
+      removeSelectionInterval(i, i);
+    }
+    
+    /**
+     * Causes every selected item in the object to be selected if the object
+     * supports multiple selections.
+     */
+    public void selectAllAccessibleSelection()
+    {
+      if (getSelectionModel().getSelectionMode() != 
+        TreeSelectionModel.SINGLE_TREE_SELECTION)
+      addSelectionInterval(0, getVisibleRowCount());
+    }
+    
+    /**
+     * Tree Collapsed notification
+     * 
+     * @param e - the event
+     */
+    public void treeCollapsed(TreeExpansionEvent e)
+    {
+      fireTreeCollapsed(e.getPath());
+    }
+   
+    /**
+     * Tree Model Expansion notification.
+     * 
+     * @param e - the event
+     */
+    public void treeExpanded(TreeExpansionEvent e)
+    {
+      fireTreeExpanded(e.getPath());
+    }
+    
+    /**
+     * Tree Model Node change notification.
+     * 
+     * @param e - the event
+     */
+    public void treeNodesChanged(TreeModelEvent e)
+    {
+      // Nothing to do here.
+    }
+    
+    /**
+     * Tree Model Node change notification.
+     * 
+     * @param e - the event
+     */
+    public void treeNodesInserted(TreeModelEvent e)
+    {
+      // Nothing to do here.
+    }
+    
+    /**
+     * Tree Model Node change notification.
+     * 
+     * @param e - the event
+     */
+    public void treeNodesRemoved(TreeModelEvent e)
+    {
+      // Nothing to do here.
+    }
+    
+    /**
+     * Tree Model structure change change notification.
+     * 
+     * @param e - the event
+     */
+    public void treeStructureChanged(TreeModelEvent e)
+    {
+      // Nothing to do here.
+    }
+    
+    /**
+     * Tree Selection Listener value change method.
+     * 
+     * @param e - the event
+     */
+    public void valueChanged(TreeSelectionEvent e)
+    {
+      fireValueChanged(e);
+    }
+  }
+  
+  public static class DynamicUtilTreeNode extends DefaultMutableTreeNode
+  {
+    protected Object childValue;
+
+    protected boolean loadedChildren;
+
+    /**
+     * Currently not set or used by this class. It might be set and used in
+     * later versions of this class.
+     */
+    protected boolean hasChildren;
+
+    public DynamicUtilTreeNode(Object value, Object children)
+    {
+      super(value);
+      childValue = children;
+      loadedChildren = false;
+    }
+
+    public int getChildCount()
+    {
+      loadChildren();
+      return super.getChildCount();
+    }
+
+    protected void loadChildren()
+    {
+      if (!loadedChildren)
+        {
+          createChildren(this, childValue);
+          loadedChildren = true;
+        }
+    }
+
+    public Enumeration children()
+    {
+      loadChildren();
+      return super.children();
+    }
+
+    /**
+     * Returns the child node at position <code>pos</code>. Subclassed
+     * here to load the children if necessary.
+     * 
+     * @param pos the position of the child node to fetch
+     * 
+     * @return the childnode at the specified position
+     */
+    public TreeNode getChildAt(int pos)
+    {
+      loadChildren();
+      return super.getChildAt(pos);
+    }
+
+    public boolean isLeaf()
+    {
+      return (childValue == null || !(childValue instanceof Hashtable
+          || childValue instanceof Vector || childValue.getClass()
+          .isArray()));
+    }
+
+    public static void createChildren(DefaultMutableTreeNode parent,
+                                      Object children)
+    {
+      if (children instanceof Hashtable)
+        {
+          Hashtable tab = (Hashtable) children;
+          Enumeration e = tab.keys();
+          while (e.hasMoreElements())
+            {
+              Object key = e.nextElement();
+              Object val = tab.get(key);
+              parent.add(new DynamicUtilTreeNode(key, val));
+            }
+        }
+      else if (children instanceof Vector)
+        {
+          Iterator i = ((Vector) children).iterator();
+          while (i.hasNext())
+            {
+              Object n = i.next();
+              parent.add(new DynamicUtilTreeNode(n, n));
+            }
+        }
+      else if (children != null && children.getClass().isArray())
+        {
+          Object[] arr = (Object[]) children;
+          for (int i = 0; i < arr.length; ++i)
+            parent.add(new DynamicUtilTreeNode(arr[i], arr[i]));
+        }
+    }
+  }
+
+  /**
+   * Listens to the model of the JTree and updates the property 
    * <code>expandedState</code> if nodes are removed or changed.
    */
-  protected class TreeModelHandler
-			implements
-			TreeModelListener
+  protected class TreeModelHandler implements TreeModelListener
   {
 
     /**
@@ -93,21 +1201,21 @@ public class JTree
      * that a node has changed its location or changed it's children. It
      * only means that some attributes of the node have changed that might
      * affect its presentation.
-     *
+     * 
      * This method is called after the actual change occured.
-     *
+     * 
      * @param ev the TreeModelEvent describing the change
      */
     public void treeNodesChanged(TreeModelEvent ev)
     {
-      // nothing to do here
+      // Nothing to do here.
     }
 
     /**
      * Notifies when a node is inserted into the tree.
-     *
+     * 
      * This method is called after the actual change occured.
-     *
+     * 
      * @param ev the TreeModelEvent describing the change
      */
     public void treeNodesInserted(TreeModelEvent ev)
@@ -117,11 +1225,11 @@ public class JTree
 
     /**
      * Notifies when a node is removed from the tree.
-     *
+     * 
      * This method is called after the actual change occured.
      *
      * @param ev the TreeModelEvent describing the change
-     */
+	 */
     public void treeNodesRemoved(TreeModelEvent ev)
     {
       // TODO: The API docs suggest that this method should do something
@@ -130,29 +1238,27 @@ public class JTree
 
     /**
      * Notifies when the structure of the tree is changed.
-     *
+     * 
      * This method is called after the actual change occured.
-     *
+     * 
      * @param ev the TreeModelEvent describing the change
      */
     public void treeStructureChanged(TreeModelEvent ev)
     {
-      // set state of new path
+      // Set state of new path.
       TreePath path = ev.getTreePath();
       setExpandedState(path, isExpanded(path));
     }
-  } // TreeModelHandler
+  }
 
   /**
-	 * This redirects TreeSelectionEvents and rewrites the source of it to be
-	 * this JTree. This is typically done when the tree model generates an
-	 * event, but the JTree object associated with that model should be listed
-	 * as the actual source of the event.
+   * This redirects TreeSelectionEvents and rewrites the source of it to be
+   * this JTree. This is typically done when the tree model generates an
+   * event, but the JTree object associated with that model should be listed
+   * as the actual source of the event.
    */
-  protected class TreeSelectionRedirector
-			implements
-			TreeSelectionListener,
-			Serializable
+  protected class TreeSelectionRedirector implements TreeSelectionListener,
+                                                     Serializable
   {
     /** The serial version UID. */
     private static final long serialVersionUID = -3505069663646241664L;
@@ -166,24 +1272,22 @@ public class JTree
 
     /**
      * Notifies when the tree selection changes.
-     *
+     * 
      * @param ev the TreeSelectionEvent that describes the change
      */
     public void valueChanged(TreeSelectionEvent ev)
     {
-			TreeSelectionEvent rewritten = (TreeSelectionEvent) ev
-					.cloneWithSource(JTree.this);
+      TreeSelectionEvent rewritten =
+        (TreeSelectionEvent) ev.cloneWithSource(JTree.this);
       fireValueChanged(rewritten);
-			JTree.this.repaint();
+      JTree.this.repaint();
     }
-  } // TreeSelectionRedirector
+  }
 
   /**
    * A TreeModel that does not allow anything to be selected.
    */
-  protected static class EmptySelectionModel
-			extends
-				DefaultTreeSelectionModel
+  protected static class EmptySelectionModel extends DefaultTreeSelectionModel
   {
     /** The serial version UID. */
     private static final long serialVersionUID = -5815023306225701477L;
@@ -191,7 +1295,8 @@ public class JTree
     /**
      * The shared instance of this model.
      */
-		protected static final EmptySelectionModel sharedInstance = new EmptySelectionModel();
+    protected static final EmptySelectionModel sharedInstance =
+      new EmptySelectionModel();
 
     /**
      * Creates a new instance of EmptySelectionModel.
@@ -202,7 +1307,7 @@ public class JTree
 
     /**
      * Returns the shared instance of EmptySelectionModel.
-     *
+     * 
      * @return the shared instance of EmptySelectionModel
      */
     public static EmptySelectionModel sharedInstance()
@@ -211,84 +1316,119 @@ public class JTree
     }
 
     /**
-		 * This catches attempts to set a selection and sets nothing instead.
-     *
+     * This catches attempts to set a selection and sets nothing instead.
+     * 
      * @param paths not used here
      */
     public void setSelectionPaths(TreePath[] paths)
     {
-      // we don't allow selections in this class
+      // We don't allow selections in this class.
     }
 
     /**
      * This catches attempts to add something to the selection.
-     *
+     * 
      * @param paths not used here
      */
     public void addSelectionPaths(TreePath[] paths)
     {
-      // we don't allow selections in this class
+      // We don't allow selections in this class.
     }
 
     /**
      * This catches attempts to remove something from the selection.
-     *
+     * 
      * @param paths not used here
      */
     public void removeSelectionPaths(TreePath[] paths)
     {
-      // we don't allow selections in this class
+      // We don't allow selections in this class.
     }
-  }// EmptySelectionModel
+  }
 
   private static final long serialVersionUID = 7559816092864483649L;
+
   public static final String CELL_EDITOR_PROPERTY = "cellEditor";
+
   public static final String CELL_RENDERER_PROPERTY = "cellRenderer";
+
   public static final String EDITABLE_PROPERTY = "editable";
-  public static final String INVOKES_STOP_CELL_EDITING_PROPERTY = "invokesStopCellEditing";
+
+  public static final String INVOKES_STOP_CELL_EDITING_PROPERTY =
+    "invokesStopCellEditing";
+
   public static final String LARGE_MODEL_PROPERTY = "largeModel";
+
   public static final String ROOT_VISIBLE_PROPERTY = "rootVisible";
+
   public static final String ROW_HEIGHT_PROPERTY = "rowHeight";
+
   public static final String SCROLLS_ON_EXPAND_PROPERTY = "scrollsOnExpand";
+
   public static final String SELECTION_MODEL_PROPERTY = "selectionModel";
+
   public static final String SHOWS_ROOT_HANDLES_PROPERTY = "showsRootHandles";
+
   public static final String TOGGLE_CLICK_COUNT_PROPERTY = "toggleClickCount";
+
   public static final String TREE_MODEL_PROPERTY = "model";
+
   public static final String VISIBLE_ROW_COUNT_PROPERTY = "visibleRowCount";
 
   /** @since 1.3 */
-  public static final String ANCHOR_SELECTION_PATH_PROPERTY = "anchorSelectionPath";
+  public static final String ANCHOR_SELECTION_PATH_PROPERTY =
+    "anchorSelectionPath";
 
-  /** @since 1.3 */
+	/** @since 1.3 */
   public static final String LEAD_SELECTION_PATH_PROPERTY = "leadSelectionPath";
 
   /** @since 1.3 */
-  public static final String EXPANDS_SELECTED_PATHS_PROPERTY = "expandsSelectedPaths";
+  public static final String EXPANDS_SELECTED_PATHS_PROPERTY =
+    "expandsSelectedPaths";
+
   private static final Object EXPANDED = new Object();
+
   private static final Object COLLAPSED = new Object();
+
   private boolean dragEnabled;
+
   private boolean expandsSelectedPaths;
+
   private TreePath anchorSelectionPath;
+
   private TreePath leadSelectionPath;
 
-  /*
+  /**
    * This contains the state of all nodes in the tree. Al/ entries map the
    * TreePath of a note to to its state. Valid states are EXPANDED and
-   * COLLAPSED.  Nodes not in this Hashtable are assumed state COLLAPSED.
+   * COLLAPSED. Nodes not in this Hashtable are assumed state COLLAPSED.
    */
-	private Hashtable nodeStates = new Hashtable();
+  private Hashtable nodeStates = new Hashtable();
+
   protected transient TreeCellEditor cellEditor;
+
   protected transient TreeCellRenderer cellRenderer;
+
   protected boolean editable;
+
   protected boolean invokesStopCellEditing;
+
   protected boolean largeModel;
+
   protected boolean rootVisible;
+
   protected int rowHeight;
+
   protected boolean scrollsOnExpand;
+
   protected transient TreeSelectionModel selectionModel;
+
   protected boolean showsRootHandles;
+
   protected int toggleClickCount;
+
   protected transient TreeModel treeModel;
+
   protected int visibleRowCount;
 
   /**
@@ -312,7 +1452,7 @@ public class JTree
 
   /**
    * Creates a new <code>JTree</code> object.
-   *
+   * 
    * @param value the initial nodes in the tree
    */
   public JTree(Hashtable value)
@@ -322,7 +1462,7 @@ public class JTree
 
   /**
    * Creates a new <code>JTree</code> object.
-   *
+   * 
    * @param value the initial nodes in the tree
    */
   public JTree(Object[] value)
@@ -332,7 +1472,7 @@ public class JTree
 
   /**
    * Creates a new <code>JTree</code> object.
-   *
+   * 
    * @param model the model to use
    */
   public JTree(TreeModel model)
@@ -345,7 +1485,7 @@ public class JTree
 
   /**
    * Creates a new <code>JTree</code> object.
-   *
+   * 
    * @param root the root node
    */
   public JTree(TreeNode root)
@@ -355,11 +1495,11 @@ public class JTree
 
   /**
    * Creates a new <code>JTree</code> object.
-   *
+   * 
    * @param root the root node
-	 * @param asksAllowChildren if false, all nodes without children are leaf
-	 *        nodes. If true, only nodes that do not allow children are leaf
-	 *        nodes.
+   * @param asksAllowChildren if false, all nodes without children are leaf
+   *        nodes. If true, only nodes that do not allow children are leaf
+   *        nodes.
    */
   public JTree(TreeNode root, boolean asksAllowChildren)
   {
@@ -368,104 +1508,12 @@ public class JTree
 
   /**
    * Creates a new <code>JTree</code> object.
-   *
+   * 
    * @param value the initial nodes in the tree
    */
   public JTree(Vector value)
   {
     this(createTreeModel(value));
-  }
-
-  public static class DynamicUtilTreeNode 
-			extends
-				DefaultMutableTreeNode
-  {
-    protected Object childValue;
-    protected boolean loadedChildren;
-
-    /**
-		 * Currently not set or used by this class. It might be set and used in
-		 * later versions of this class.
-     */
-    protected boolean hasChildren;
-    
-		public DynamicUtilTreeNode(Object value, Object children)
-    {
-      super(value);
-      childValue = children;
-      loadedChildren = false;
-    }
-
-    public int getChildCount()
-    {
-      loadChildren();
-      return super.getChildCount();
-    }
-
-    protected void loadChildren()
-    {
-      if (!loadedChildren)
-        {
-          createChildren(this, childValue);
-          loadedChildren = true;
-        }
-    }
-    
-    public Enumeration children()
-    {
-      loadChildren();
-      return super.children();
-    }
-
-    /**
-		 * Returns the child node at position <code>pos</code>. Subclassed
-		 * here to load the children if necessary.
-     *
-     * @param pos the position of the child node to fetch
-     *
-     * @return the childnode at the specified position
-     */
-    public TreeNode getChildAt(int pos)
-    {
-      loadChildren();
-      return super.getChildAt(pos);
-    }
-
-    public boolean isLeaf() 
-    {
-			return (childValue == null || !(childValue instanceof Hashtable
-					|| childValue instanceof Vector || childValue.getClass()
-					.isArray()));
-    }
-
-    public static void createChildren(DefaultMutableTreeNode parent,
-                                      Object children)
-    {
-      if (children instanceof Hashtable)
-        {
-          Hashtable tab = (Hashtable) children;
-          Enumeration e = tab.keys();
-          while (e.hasMoreElements()) 
-            {
-              Object key = e.nextElement();
-              Object val = tab.get(key);
-              parent.add(new DynamicUtilTreeNode(key, val));
-            }
-			} else if (children instanceof Vector)
-        {
-				Iterator i = ((Vector) children).iterator();
-          while (i.hasNext())
-            {
-              Object n = i.next();
-					parent.add(new DynamicUtilTreeNode(n, n));
-            }
-			} else if (children != null && children.getClass().isArray())
-        {
-          Object[] arr = (Object[]) children;
-          for (int i = 0; i < arr.length; ++i)
-            parent.add(new DynamicUtilTreeNode(arr[i], arr[i]));
-      }
-    }
   }
 
   public int getRowForPath(TreePath path)
@@ -477,7 +1525,7 @@ public class JTree
 
     return -1;
   }
-  
+
   public TreePath getPathForRow(int row)
   {
     TreeUI ui = getUI();
@@ -487,14 +1535,14 @@ public class JTree
   protected TreePath[] getPathBetweenRows(int index0, int index1)
   {
     TreeUI ui = getUI();
-    
+
     if (ui == null)
       return null;
-    
+
     int minIndex = Math.min(index0, index1);
     int maxIndex = Math.max(index0, index1);
     TreePath[] paths = new TreePath[maxIndex - minIndex + 1];
-    
+
     for (int i = minIndex; i <= maxIndex; ++i)
       paths[i - minIndex] = ui.getPathForRow(this, i);
 
@@ -503,104 +1551,104 @@ public class JTree
 
   /**
    * Creates a new <code>TreeModel</code> object.
-   *
+   * 
    * @param value the values stored in the model
    */
   protected static TreeModel createTreeModel(Object value)
-    {
+  {
     return new DefaultTreeModel(new DynamicUtilTreeNode(value, value));
-    }
-    
+  }
+
   /**
    * Return the UI associated with this <code>JTree</code> object.
-   *
+   * 
    * @return the associated <code>TreeUI</code> object
    */
-    public TreeUI getUI()
-    {
-        return (TreeUI) ui;
-    }
+  public TreeUI getUI()
+  {
+    return (TreeUI) ui;
+  }
 
   /**
    * Sets the UI associated with this <code>JTree</code> object.
-   *
+   * 
    * @param ui the <code>TreeUI</code> to associate
    */
-    public void setUI(TreeUI ui)
-    {
-        super.setUI(ui);
-    }
+  public void setUI(TreeUI ui)
+  {
+    super.setUI(ui);
+  }
 
   /**
    * This method resets the UI used to the Look and Feel defaults..
    */
-    public void updateUI()
-    {
+  public void updateUI()
+  {
     setUI((TreeUI) UIManager.getUI(this));
     revalidate();
     repaint();
-    }
+  }
 
   /**
-   * This method returns the String ID of the UI class of  Separator.
-   *
+   * This method returns the String ID of the UI class of Separator.
+   * 
    * @return The UI class' String ID.
    */
-    public String getUIClassID()
-    {
-	return "TreeUI";
-    }
+  public String getUIClassID()
+  {
+    return "TreeUI";
+  }
 
   /**
-	 * Gets the AccessibleContext associated with this
-	 * <code>JToggleButton</code>.
-   *
+   * Gets the AccessibleContext associated with this
+   * <code>JToggleButton</code>.
+   * 
    * @return the associated context
    */
-    public AccessibleContext getAccessibleContext()
-    {
-      return null;
-    }
+  public AccessibleContext getAccessibleContext()
+  {
+    return null;
+  }
 
   /**
-	 * Returns the preferred viewport size.
-   *
+   * Returns the preferred viewport size.
+   * 
    * @return the preferred size
    */
-    public Dimension getPreferredScrollableViewportSize()
-    {
-	  return new Dimension (getPreferredSize().width, getVisibleRowCount()*getRowHeight());
-    }
+  public Dimension getPreferredScrollableViewportSize()
+  {
+    return new Dimension (getPreferredSize().width, getVisibleRowCount()*getRowHeight());
+  }
 
-    public int getScrollableUnitIncrement(Rectangle visibleRect,
+  public int getScrollableUnitIncrement(Rectangle visibleRect,
                                         int orientation, int direction)
-    {
-	return 1;
-    }
+  {
+    return 1;
+  }
 
-    public int getScrollableBlockIncrement(Rectangle visibleRect,
+  public int getScrollableBlockIncrement(Rectangle visibleRect,
                                          int orientation, int direction)
-    {
-	return 1;
-    }
+  {
+    return 1;
+  }
 
-    public boolean getScrollableTracksViewportWidth()
-    {
+  public boolean getScrollableTracksViewportWidth()
+  {
     if (getParent() instanceof JViewport)
       return ((JViewport) getParent()).getHeight() > getPreferredSize().height;
-	return false;
-    }
+    return false;
+  }
 
-    public boolean getScrollableTracksViewportHeight()
-    {
+  public boolean getScrollableTracksViewportHeight()
+  {
     if (getParent() instanceof JViewport)
       return ((JViewport) getParent()).getWidth() > getPreferredSize().width;
-	return false;
-    }
+    return false;
+  }
 
   /**
    * Adds a <code>TreeExpansionListener</code> object to the tree.
-   *
+   * 
    * @param listener the listener to add
    */
   public void addTreeExpansionListener(TreeExpansionListener listener)
@@ -610,7 +1658,7 @@ public class JTree
 
   /**
    * Removes a <code>TreeExpansionListener</code> object from the tree.
-   *
+   * 
    * @param listener the listener to remove
    */
   public void removeTreeExpansionListener(TreeExpansionListener listener)
@@ -620,7 +1668,7 @@ public class JTree
 
   /**
    * Returns all added <code>TreeExpansionListener</code> objects.
-   *
+   * 
    * @return an array of listeners
    */
   public TreeExpansionListener[] getTreeExpansionListeners()
@@ -630,7 +1678,7 @@ public class JTree
 
   /**
    * Notifies all listeners that the tree was collapsed.
-   *
+   * 
    * @param path the path to the node that was collapsed
    */
   public void fireTreeCollapsed(TreePath path)
@@ -641,10 +1689,10 @@ public class JTree
     for (int index = 0; index < listeners.length; ++index)
       listeners[index].treeCollapsed(event);
   }
-  
+
   /**
    * Notifies all listeners that the tree was expanded.
-   *
+   * 
    * @param path the path to the node that was expanded
    */
   public void fireTreeExpanded(TreePath path)
@@ -658,7 +1706,7 @@ public class JTree
 
   /**
    * Adds a <code>TreeSelctionListener</code> object to the tree.
-   *
+   * 
    * @param listener the listener to add
    */
   public void addTreeSelectionListener(TreeSelectionListener listener)
@@ -668,7 +1716,7 @@ public class JTree
 
   /**
    * Removes a <code>TreeSelectionListener</code> object from the tree.
-   *
+   * 
    * @param listener the listener to remove
    */
   public void removeTreeSelectionListener(TreeSelectionListener listener)
@@ -678,18 +1726,18 @@ public class JTree
 
   /**
    * Returns all added <code>TreeSelectionListener</code> objects.
-   *
+   * 
    * @return an array of listeners
    */
   public TreeSelectionListener[] getTreeSelectionListeners()
   {
-		return (TreeSelectionListener[]) 
-					getListeners(TreeSelectionListener.class);
+    return (TreeSelectionListener[]) 
+    getListeners(TreeSelectionListener.class);
   }
 
   /**
    * Notifies all listeners when the selection of the tree changed.
-   *
+   * 
    * @param event the event to send
    */
   protected void fireValueChanged(TreeSelectionEvent event)
@@ -702,7 +1750,7 @@ public class JTree
 
   /**
    * Adds a <code>TreeWillExpandListener</code> object to the tree.
-   *
+   * 
    * @param listener the listener to add
    */
   public void addTreeWillExpandListener(TreeWillExpandListener listener)
@@ -712,7 +1760,7 @@ public class JTree
 
   /**
    * Removes a <code>TreeWillExpandListener</code> object from the tree.
-   *
+   * 
    * @param listener the listener to remove
    */
   public void removeTreeWillExpandListener(TreeWillExpandListener listener)
@@ -722,21 +1770,21 @@ public class JTree
 
   /**
    * Returns all added <code>TreeWillExpandListener</code> objects.
-   *
+   * 
    * @return an array of listeners
    */
   public TreeWillExpandListener[] getTreeWillExpandListeners()
   {
-		return (TreeWillExpandListener[]) 
-					getListeners(TreeWillExpandListener.class);
+    return (TreeWillExpandListener[]) 
+    getListeners(TreeWillExpandListener.class);
   }
 
   /**
    * Notifies all listeners that the tree will collapse.
-   *
+   * 
    * @param path the path to the node that will collapse
    */
-	public void fireTreeWillCollapse(TreePath path) throws ExpandVetoException
+  public void fireTreeWillCollapse(TreePath path) throws ExpandVetoException
   {
     TreeExpansionEvent event = new TreeExpansionEvent(this, path);
     TreeWillExpandListener[] listeners = getTreeWillExpandListeners();
@@ -747,10 +1795,10 @@ public class JTree
 
   /**
    * Notifies all listeners that the tree will expand.
-   *
+   * 
    * @param path the path to the node that will expand
    */
-	public void fireTreeWillExpand(TreePath path) throws ExpandVetoException
+  public void fireTreeWillExpand(TreePath path) throws ExpandVetoException
   {
     TreeExpansionEvent event = new TreeExpansionEvent(this, path);
     TreeWillExpandListener[] listeners = getTreeWillExpandListeners();
@@ -761,7 +1809,7 @@ public class JTree
 
   /**
    * Returns the model of this <code>JTree</code> object.
-   *
+   * 
    * @return the associated <code>TreeModel</code>
    */
   public TreeModel getModel()
@@ -771,7 +1819,7 @@ public class JTree
 
   /**
    * Sets the model to use in <code>JTree</code>.
-   *
+   * 
    * @param model the <code>TreeModel</code> to use
    */
   public void setModel(TreeModel model)
@@ -782,9 +1830,9 @@ public class JTree
     // add treeModelListener to the new model
     if (treeModelListener == null)
       treeModelListener = createTreeModelListener();
-		if (model != null) // as setModel(null) is allowed
-    model.addTreeModelListener(treeModelListener);
-    
+    if (model != null) // as setModel(null) is allowed
+      model.addTreeModelListener(treeModelListener);
+
     TreeModel oldValue = treeModel;
     treeModel = model;
 
@@ -793,9 +1841,9 @@ public class JTree
 
   /**
    * Checks if this <code>JTree</code> object is editable.
-   *
+   * 
    * @return <code>true</code> if this tree object is editable,
-   * <code>false</code> otherwise
+   *         <code>false</code> otherwise
    */
   public boolean isEditable()
   {
@@ -804,9 +1852,9 @@ public class JTree
 
   /**
    * Sets the <code>editable</code> property.
-   *
+   * 
    * @param flag <code>true</code> to make this tree object editable,
-   * <code>false</code> otherwise
+   *        <code>false</code> otherwise
    */
   public void setEditable(boolean flag)
   {
@@ -820,9 +1868,9 @@ public class JTree
 
   /**
    * Checks if the root element is visible.
-   *
+   * 
    * @return <code>true</code> if the root element is visible,
-   * <code>false</code> otherwise
+   *         <code>false</code> otherwise
    */
   public boolean isRootVisible()
   {
@@ -833,7 +1881,7 @@ public class JTree
   {
     if (rootVisible == flag)
       return;
-    
+
     boolean oldValue = rootVisible;
     rootVisible = flag;
     firePropertyChange(ROOT_VISIBLE_PROPERTY, oldValue, flag);
@@ -848,7 +1896,7 @@ public class JTree
   {
     if (showsRootHandles == flag)
       return;
-
+    
     boolean oldValue = showsRootHandles;
     showsRootHandles = flag;
     firePropertyChange(SHOWS_ROOT_HANDLES_PROPERTY, oldValue, flag);
@@ -856,7 +1904,6 @@ public class JTree
 
   public TreeCellEditor getCellEditor()
   {
-
     return cellEditor;
   }
 
@@ -869,12 +1916,12 @@ public class JTree
     cellEditor = editor;
     firePropertyChange(CELL_EDITOR_PROPERTY, oldValue, editor);
   }
-  
+
   public TreeCellRenderer getCellRenderer()
   {
     return cellRenderer;
   }
-  
+
   public void setCellRenderer(TreeCellRenderer newRenderer)
   {
     if (cellRenderer == newRenderer)
@@ -894,19 +1941,19 @@ public class JTree
   {
     if (selectionModel == model)
       return;
-    
-		if (selectionModel != null)
-			selectionModel.removeTreeSelectionListener(selectionRedirector);
+
+    if (selectionModel != null)
+      selectionModel.removeTreeSelectionListener(selectionRedirector);
 
     TreeSelectionModel oldValue = selectionModel;
     selectionModel = model;
 
-		if (selectionModel != null)
-			selectionModel.addTreeSelectionListener(selectionRedirector);
+    if (selectionModel != null)
+      selectionModel.addTreeSelectionListener(selectionRedirector);
 
     firePropertyChange(SELECTION_MODEL_PROPERTY, oldValue, model);
-		revalidate();
-		repaint();
+    revalidate();
+    repaint();
   }
 
   public int getVisibleRowCount()
@@ -941,7 +1988,6 @@ public class JTree
 
   public int getRowHeight()
   {
-
     return rowHeight;
   }
 
@@ -949,7 +1995,7 @@ public class JTree
   {
     if (rowHeight == height)
       return;
-    
+
     int oldValue = rowHeight;
     rowHeight = height;
     firePropertyChange(ROW_HEIGHT_PROPERTY, oldValue, height);
@@ -968,12 +2014,12 @@ public class JTree
   public void setInvokesStopCellEditing(boolean invoke)
   {
     if (invokesStopCellEditing == invoke)
-     return;
+      return;
 
     boolean oldValue = invokesStopCellEditing;
     invokesStopCellEditing = invoke;
-		firePropertyChange(INVOKES_STOP_CELL_EDITING_PROPERTY, 
-												oldValue, invoke);
+    firePropertyChange(INVOKES_STOP_CELL_EDITING_PROPERTY, 
+                       oldValue, invoke);
   }
 
   /**
@@ -991,7 +2037,7 @@ public class JTree
   {
     if (toggleClickCount == count)
       return;
-    
+
     int oldValue = toggleClickCount;
     toggleClickCount = count;
     firePropertyChange(TOGGLE_CLICK_COUNT_PROPERTY, oldValue, count);
@@ -1039,7 +2085,7 @@ public class JTree
   {
     selectionModel.setSelectionPaths(paths);
   }
-  
+
   public void setSelectionRow(int row)
   {
     TreePath path = getPathForRow(row);
@@ -1152,9 +2198,9 @@ public class JTree
   public void clearSelection()
   {
     selectionModel.clearSelection();
-      setLeadSelectionPath(null);
+    setLeadSelectionPath(null);
   }
-  
+
   public TreePath getLeadSelectionPath()
   {
     return leadSelectionPath;
@@ -1167,7 +2213,7 @@ public class JTree
   {
     if (leadSelectionPath == path)
       return;
-
+    
     TreePath oldValue = leadSelectionPath;
     leadSelectionPath = path;
     firePropertyChange(LEAD_SELECTION_PATH_PROPERTY, oldValue, path);
@@ -1236,17 +2282,17 @@ public class JTree
 
   public boolean isRowSelected(int row)
   {
-		return selectionModel.isPathSelected(getPathForRow(row));
+    return selectionModel.isPathSelected(getPathForRow(row));
   }
 
   public boolean isSelectionEmpty()
   {
     return selectionModel.isSelectionEmpty();
   }
-  
+
   /**
    * Return the value of the <code>dragEnabled</code> property.
-   *
+   * 
    * @return the value
    * 
    * @since 1.4
@@ -1258,14 +2304,13 @@ public class JTree
 
   /**
    * Set the <code>dragEnabled</code> property.
-   *
+   * 
    * @param enabled new value
    * 
    * @since 1.4
    */
   public void setDragEnabled(boolean enabled)
   {
-
     dragEnabled = enabled;
   }
 
@@ -1275,23 +2320,23 @@ public class JTree
 
     if (ui != null)
       return ui.getRowCount(this);
-    
+
     return 0;
   }
-  
+
   public void collapsePath(TreePath path)
   {
-      try
-        {
-          fireTreeWillCollapse(path);
-        }
-      catch (ExpandVetoException ev)
-        {
-        }
+    try
+      {
+        fireTreeWillCollapse(path);
+      }
+    catch (ExpandVetoException ev)
+      {
+      }
     setExpandedState(path, false);
-      fireTreeCollapsed(path);
+    fireTreeCollapsed(path);
   }
-  
+
   public void collapseRow(int row)
   {
     if (row < 0 || row >= getRowCount())
@@ -1306,21 +2351,21 @@ public class JTree
   public void expandPath(TreePath path)
   {
     // Don't expand if last path component is a leaf node.
-		if ((path == null) || (treeModel.isLeaf(path.getLastPathComponent())))
+    if ((path == null) || (treeModel.isLeaf(path.getLastPathComponent())))
       return;
 
-      try
-        {
-          fireTreeWillExpand(path);
-        }
-      catch (ExpandVetoException ev)
-        {
-        }
-  
+    try
+      {
+        fireTreeWillExpand(path);
+      }
+    catch (ExpandVetoException ev)
+      {
+      }
+
     setExpandedState(path, true);
-      fireTreeExpanded(path);
+    fireTreeExpanded(path);
   }
-  
+
   public void expandRow(int row)
   {
     if (row < 0 || row >= getRowCount())
@@ -1334,7 +2379,7 @@ public class JTree
 
   public boolean isCollapsed(TreePath path)
   {
-		return !isExpanded(path);
+    return !isExpanded(path);
   }
 
   public boolean isCollapsed(int row)
@@ -1364,10 +2409,10 @@ public class JTree
 
     if (parent != null)
       return isExpanded(parent);
-    
+
     return true;
   }
-  
+
   public boolean isExpanded(int row)
   {
     if (row < 0 || row >= getRowCount())
@@ -1439,7 +2484,7 @@ public class JTree
     if (ui != null)
       return ui.stopEditing(this);
 
-   return false;
+    return false;
   }
 
   public void cancelEditing()
@@ -1474,10 +2519,10 @@ public class JTree
 
     if (path != null)
       {
-	 Rectangle rect = getPathBounds(path);
+        Rectangle rect = getPathBounds(path);
 
-	 if ((rect != null) && rect.contains(x, y))
-	   return path;
+        if ((rect != null) && rect.contains(x, y))
+          return path;
       }
 
     return null;
@@ -1492,14 +2537,14 @@ public class JTree
 
     return -1;
   }
-  
+
   public TreePath getClosestPathForLocation(int x, int y)
   {
     TreeUI ui = getUI();
 
     if (ui != null)
       return ui.getClosestPathForLocation(this, x, y);
-    
+
     return null;
   }
 
@@ -1525,14 +2570,14 @@ public class JTree
 
   private void doExpandParents(TreePath path, boolean state)
   {
-    TreePath parent = path.getParentPath();
-    
-		if (!isExpanded(parent) && parent != null)
+    TreePath parent = path.getParentPath();		
+
+    if (!isExpanded(parent) && parent != null)
       doExpandParents(parent, false);
 
     nodeStates.put(path, state ? EXPANDED : COLLAPSED);
   }
-  
+
   protected void setExpandedState(TreePath path, boolean state)
   {
     if (path == null)
@@ -1562,7 +2607,7 @@ public class JTree
         if (path.isDescendant(parent))
           result.addElement(path);
       }
-    
+
     return result.elements();
   }
 
@@ -1596,14 +2641,14 @@ public class JTree
   }
 
   public boolean isPathEditable(TreePath path)
-  {    
+  {
     return isEditable();
   }
 
   /**
    * Creates and returns an instance of {@link TreeModelHandler}.
-   *
-   * @returns an instance of {@link TreeModelHandler}
+   * 
+   * @return an instance of {@link TreeModelHandler}
    */
   protected TreeModelListener createTreeModelListener()
   {
@@ -1611,35 +2656,32 @@ public class JTree
   }
 
   /**
-	 * Returns a sample TreeModel that can be used in a JTree. This can be used
-	 * in Bean- or GUI-Builders to show something interesting.
-   *
+   * Returns a sample TreeModel that can be used in a JTree. This can be used
+   * in Bean- or GUI-Builders to show something interesting.
+   * 
    * @return a sample TreeModel that can be used in a JTree
    */
   protected static TreeModel getDefaultTreeModel()
   {
     DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root node");
-		DefaultMutableTreeNode child1 = new DefaultMutableTreeNode(
-				"Child node 1");
-		DefaultMutableTreeNode child11 = new DefaultMutableTreeNode(
-				"Child node 1.1");
-		DefaultMutableTreeNode child12 = new DefaultMutableTreeNode(
-				"Child node 1.2");
-		DefaultMutableTreeNode child13 = new DefaultMutableTreeNode(
-				"Child node 1.3");
-		DefaultMutableTreeNode child2 = new DefaultMutableTreeNode(
-				"Child node 2");
-		DefaultMutableTreeNode child21 = new DefaultMutableTreeNode(
-				"Child node 2.1");
-		DefaultMutableTreeNode child22 = new DefaultMutableTreeNode(
-				"Child node 2.2");
-		DefaultMutableTreeNode child23 = new DefaultMutableTreeNode(
-				"Child node 2.3");
-		DefaultMutableTreeNode child24 = new DefaultMutableTreeNode(
-				"Child node 2.4");
+    DefaultMutableTreeNode child1 = new DefaultMutableTreeNode("Child node 1");
+    DefaultMutableTreeNode child11 =
+      new DefaultMutableTreeNode("Child node 1.1");
+    DefaultMutableTreeNode child12 =
+      new DefaultMutableTreeNode("Child node 1.2");
+    DefaultMutableTreeNode child13 =
+      new DefaultMutableTreeNode("Child node 1.3");
+    DefaultMutableTreeNode child2 = new DefaultMutableTreeNode("Child node 2");
+    DefaultMutableTreeNode child21 =
+      new DefaultMutableTreeNode("Child node 2.1");
+    DefaultMutableTreeNode child22 =
+      new DefaultMutableTreeNode("Child node 2.2");
+    DefaultMutableTreeNode child23 =
+      new DefaultMutableTreeNode("Child node 2.3");
+    DefaultMutableTreeNode child24 =
+      new DefaultMutableTreeNode("Child node 2.4");
 
-		DefaultMutableTreeNode child3 = new DefaultMutableTreeNode(
-				"Child node 3");
+    DefaultMutableTreeNode child3 = new DefaultMutableTreeNode("Child node 3");
     root.add(child1);
     root.add(child2);
     root.add(child3);
@@ -1654,13 +2696,13 @@ public class JTree
   }
 
   /**
-	 * Converts the specified value to a String. This is used by the renderers
-	 * of this JTree and its nodes.
-   *
+   * Converts the specified value to a String. This is used by the renderers
+   * of this JTree and its nodes.
+   * 
    * This implementation simply returns <code>value.toString()</code> and
-	 * ignores all other parameters. Subclass this method to control the
-	 * conversion.
-   *
+   * ignores all other parameters. Subclass this method to control the
+   * conversion.
+   * 
    * @param value the value that is converted to a String
    * @param selected indicates if that value is selected or not
    * @param expanded indicates if that value is expanded or not
@@ -1669,16 +2711,16 @@ public class JTree
    * @param hasFocus indicates if that node has focus or not
    */
   public String convertValueToText(Object value, boolean selected,
-			boolean expanded, boolean leaf, int row, boolean hasFocus)
+                                   boolean expanded, boolean leaf, int row, boolean hasFocus)
   {
     return value.toString();
   }
 
   /**
-	 * A String representation of this JTree. This is intended to be used for
-	 * debugging. The returned string may be empty but may not be
+   * A String representation of this JTree. This is intended to be used for
+   * debugging. The returned string may be empty but may not be
    * <code>null</code>.
-   *
+   * 
    * @return a String representation of this JTree
    */
   public String paramString()
@@ -1690,23 +2732,24 @@ public class JTree
   }
 
   /**
-	 * Returns all TreePath objects which are a descendants of the given path
-	 * and are exapanded at the moment of the execution of this method. If the
-	 * state of any node is beeing toggled while this method is executing this
+   * Returns all TreePath objects which are a descendants of the given path
+   * and are exapanded at the moment of the execution of this method. If the
+   * state of any node is beeing toggled while this method is executing this
    * change may be left unaccounted.
-   *  
+   * 
    * @param path The parent of this request
+   *
    * @return An Enumeration containing TreePath objects
    */
-  public Enumeration getExpandedDescendants(TreePath path) 
+  public Enumeration getExpandedDescendants(TreePath path)
   {
     Enumeration paths = nodeStates.keys();
     Vector relevantPaths = new Vector();
-		while (paths.hasMoreElements())
+    while (paths.hasMoreElements())
       {
         TreePath nextPath = (TreePath) paths.nextElement();
-			if (nodeStates.get(nextPath) == EXPANDED
-					&& path.isDescendant(nextPath))
+        if (nodeStates.get(nextPath) == EXPANDED
+            && path.isDescendant(nextPath))
           {
             relevantPaths.add(nextPath);
           }
@@ -1716,37 +2759,35 @@ public class JTree
 
   /**
    * Returns the next table element (beginning from the row
-	 * <code>startingRow</code> that starts with <code>prefix</code>.
-	 * Searching is done in the direction specified by <code>bias</code>.
-   *
+   * <code>startingRow</code> that starts with <code>prefix</code>.
+   * Searching is done in the direction specified by <code>bias</code>.
+   * 
    * @param prefix the prefix to search for in the cell values
    * @param startingRow the index of the row where to start searching from
-	 * @param bias the search direction, either {@link Position.Bias#Forward} or
-	 *        {@link Position.Bias#Backward}
-   *
-	 * @return the path to the found element or -1 if no such element has been
-	 *         found
-   *
+   * @param bias the search direction, either {@link Position.Bias#Forward} or
+   *        {@link Position.Bias#Backward}
+   * 
+   * @return the path to the found element or -1 if no such element has been
+   *         found
+   * 
    * @throws IllegalArgumentException if prefix is <code>null</code> or
-   *     startingRow is not valid
-   *
+   *         startingRow is not valid
+   * 
    * @since 1.4
    */
   public TreePath getNextMatch(String prefix, int startingRow,
                                Position.Bias bias)
   {
     if (prefix == null)
-			throw new IllegalArgumentException(
-					"The argument 'prefix' must not be" + " null.");
+      throw new IllegalArgumentException("The argument 'prefix' must not be"
+                                         + " null.");
     if (startingRow < 0)
-			throw new IllegalArgumentException(
-					"The argument 'startingRow' must not"
+      throw new IllegalArgumentException("The argument 'startingRow' must not"
                                          + " be less than zero.");
 
     int size = getRowCount();
     if (startingRow > size)
-			throw new IllegalArgumentException(
-					"The argument 'startingRow' must not"
+      throw new IllegalArgumentException("The argument 'startingRow' must not"
                                          + " be greater than the number of"
                                          + " elements in the TreeModel.");
 
@@ -1760,14 +2801,16 @@ public class JTree
             // FIXME: in the following call to convertValueToText the
             // last argument (hasFocus) should be done right.
             String item = convertValueToText(o, isRowSelected(i),
-						isExpanded(i), treeModel.isLeaf(o), i, false);
+                                             isExpanded(i), treeModel.isLeaf(o),
+                                             i, false);
             if (item.startsWith(prefix))
               {
                 foundPath = path;
                 break;
               }
           }
-		} else
+      }
+    else
       {
         for (int i = startingRow; i >= 0; i--)
           {
@@ -1776,7 +2819,7 @@ public class JTree
             // FIXME: in the following call to convertValueToText the
             // last argument (hasFocus) should be done right.
             String item = convertValueToText(o, isRowSelected(i),
-						isExpanded(i), treeModel.isLeaf(o), i, false);
+                                             isExpanded(i), treeModel.isLeaf(o), i, false);
             if (item.startsWith(prefix))
               {
                 foundPath = path;
@@ -1789,21 +2832,21 @@ public class JTree
 
   /**
    * Removes any paths in the current set of selected paths that are
-	 * descendants of <code>path</code>. If <code>includePath</code> is set
-	 * to <code>true</code> and <code>path</code> itself is selected, then
-	 * it will be removed too.
-	 * 
-	 * @param path the path from which selected descendants are to be removed
-	 * @param includeSelected if <code>true</code> then <code>path</code> itself
-	 *        will also be remove if it's selected
-   *
+   * descendants of <code>path</code>. If <code>includePath</code> is set
+   * to <code>true</code> and <code>path</code> itself is selected, then
+   * it will be removed too.
+   * 
+   * @param path the path from which selected descendants are to be removed
+   * @param includeSelected if <code>true</code> then <code>path</code> itself
+   *        will also be remove if it's selected
+   * 
    * @return <code>true</code> if something has been removed,
-   *     <code>false</code> otherwise
-   *
+   *         <code>false</code> otherwise
+   * 
    * @since 1.3
    */
   protected boolean removeDescendantSelectedPaths(TreePath path,
-                                                    boolean includeSelected)
+                                                  boolean includeSelected)
   {
     boolean removedSomething = false;
     TreePath[] selected = getSelectionPaths();
@@ -1817,5 +2860,39 @@ public class JTree
           }
       }
     return removedSomething;
+  }
+  
+  /**
+   * Removes any descendants of the TreePaths in toRemove that have been 
+   * expanded.
+   * 
+   * @param toRemove - Enumeration of TreePaths that need to be removed from
+   * cache of toggled tree paths.
+   */
+  protected void removeDescendantToggledPaths(Enumeration toRemove)
+  {
+    while (toRemove.hasMoreElements())
+      {
+        TreePath current = (TreePath) toRemove.nextElement();
+        Enumeration descendants = getDescendantToggledPaths(current);
+        
+        while (descendants.hasMoreElements())
+          {
+            TreePath currentDes = (TreePath) descendants.nextElement();
+            if (isExpanded(currentDes))
+                nodeStates.remove(currentDes);
+          }
+      }
+  }
+  
+  /**
+   * Sent when the tree has changed enough that we need to resize the bounds, 
+   * but not enough that we need to remove the expanded node set (e.g nodes
+   * were expanded or collapsed, or nodes were inserted into the tree). You 
+   * should never have to invoke this, the UI will invoke this as it needs to. 
+   */
+  public void treeDidChange()
+  {
+    repaint();
   }
 }

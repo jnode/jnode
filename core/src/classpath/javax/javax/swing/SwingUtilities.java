@@ -536,18 +536,18 @@ public class SwingUtilities
 
     if (source.isShowing() && destination.isShowing())
       {
-    convertPointToScreen(pt, source);
-    convertPointFromScreen(pt, destination);
+        convertPointToScreen(pt, source);
+        convertPointFromScreen(pt, destination);
       }
 
     return pt;
   }
-
+  
   public static Point convertPoint(Component source, Point aPoint, Component destination)
   {
     return convertPoint(source, aPoint.x, aPoint.y, destination);
   }
-  
+
   /**
    * Converts a rectangle from the coordinate space of one component to
    * another. This is equivalent to converting the rectangle from
@@ -840,7 +840,7 @@ public class SwingUtilities
         iconR.width = icon.getIconWidth();
         iconR.height = icon.getIconHeight();
       }
-    if (text == null)
+    if (text == null || text.equals(""))
       {
         textIconGap = 0;
 	textR.width = 0;
@@ -890,7 +890,9 @@ public class SwingUtilities
         iconR.y = 0;
         textR.y = (horizontalTextPosition == CENTER
                    ? iconR.height + textIconGap 
-                   : iconR.height - textR.height);
+                   : Math.max(iconR.height - textR.height, 0));
+        System.err.println("iconR.height: " + iconR.height);
+        System.err.println("textR.height: " + textR.height);
         break;
       case CENTER:
         int centerLine = Math.max(textR.height, iconR.height) / 2;
@@ -1027,7 +1029,7 @@ public class SwingUtilities
       ownerFrame = new OwnerFrame();
     return ownerFrame;
   }
-  
+
   /**
    * Checks if left mouse button was clicked.
    *

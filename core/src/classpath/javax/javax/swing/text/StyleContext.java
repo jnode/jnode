@@ -57,9 +57,15 @@ import javax.swing.event.EventListenerList;
 public class StyleContext 
     implements Serializable, AbstractDocument.AttributeContext
 {
+  /** The serialization UID (compatible with JDK1.5). */
+  private static final long serialVersionUID = 8042858831190784241L;
+
   public class NamedStyle
     implements Serializable, Style
   {
+    /** The serialization UID (compatible with JDK1.5). */
+    private static final long serialVersionUID = -6690628971806226374L;
+
     protected ChangeEvent changeEvent;
     protected EventListenerList listenerList;
       
@@ -288,7 +294,7 @@ public class StyleContext
     public boolean equals(Object obj)
     {
       return 
-        (obj instanceof SmallAttributeSet)
+        (obj instanceof AttributeSet)
         && this.isEqual((AttributeSet)obj);
     }
  
@@ -380,7 +386,7 @@ public class StyleContext
   // FIXME: also not sure if these tables ought to be static (singletons),
   // shared across all StyleContexts. I think so, but it's not clear in
   // docs. revert to non-shared if you think it matters.
-
+  
   /**
    * The name of the default style.
    */
@@ -463,7 +469,7 @@ public class StyleContext
   {
     return (Style) styleTable.get(name);
   }
-
+  
   /**
    * Get the names of the style. The returned enumeration always
    * contains at least one member, the default style.

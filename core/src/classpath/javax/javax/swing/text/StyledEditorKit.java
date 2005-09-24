@@ -40,20 +40,16 @@ package javax.swing.text;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.Serializable;
 
 import javax.swing.Action;
 import javax.swing.JEditorPane;
-import javax.swing.JTextPane;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
 /**
  * An {@link EditorKit} that supports editing styled text.
  *
- * @author	Andrew Selkirk
+ * @author Andrew Selkirk
  * @author Roman Kennke (roman@kennke.org)
  */
 public class StyledEditorKit extends DefaultEditorKit
@@ -61,24 +57,24 @@ public class StyledEditorKit extends DefaultEditorKit
   /** The serialVersionUID. */
   private static final long serialVersionUID = 7002391892985555948L;
 
-	/**
+  /**
    * Toggles the underline attribute for the selected text.
-	 */
+   */
   public static class UnderlineAction extends StyledEditorKit.StyledTextAction
   {
-		/**
+    /**
      * Creates an instance of <code>UnderlineAction</code>.
-		 */
+     */
     public UnderlineAction()
     {
       super("TODO"); // TODO: Figure out name for this action.
     }
 
-		/**
+    /**
      * Performs the action.
      *
      * @param event the <code>ActionEvent</code> that describes the action
-		 */
+     */
     public void actionPerformed(ActionEvent event)
     {
       JEditorPane editor = getEditor(event);
@@ -91,24 +87,24 @@ public class StyledEditorKit extends DefaultEditorKit
     }
   }
 
-	/**
+  /**
    * Toggles the italic attribute for the selected text.
-	 */
+   */
   public static class ItalicAction extends StyledEditorKit.StyledTextAction
   {
-		/**
+    /**
      * Creates an instance of <code>ItalicAction</code>.
-		 */
+     */
     public ItalicAction()
     {
       super("TODO"); // TODO: Figure out correct name of this Action.
     }
 
-		/**
+    /**
      * Performs the action.
      *
      * @param event the <code>ActionEvent</code> that describes the action
-		 */
+     */
     public void actionPerformed(ActionEvent event)
     {
       JEditorPane editor = getEditor(event);
@@ -121,24 +117,24 @@ public class StyledEditorKit extends DefaultEditorKit
     }
   }
 
-	/**
+  /**
    * Toggles the bold attribute for the selected text.
-	 */
+   */
   public static class BoldAction extends StyledEditorKit.StyledTextAction
   {
-		/**
+    /**
      * Creates an instance of <code>BoldAction</code>.
-		 */
+     */
     public BoldAction()
     {
       super("TODO"); // TODO: Figure out correct name of this Action.
     }
 
-		/**
+    /**
      * Performs the action.
      *
      * @param event the <code>ActionEvent</code> that describes the action
-		 */
+     */
     public void actionPerformed(ActionEvent event)
     {
       JEditorPane editor = getEditor(event);
@@ -151,34 +147,34 @@ public class StyledEditorKit extends DefaultEditorKit
     }
   }
 
-	/**
+  /**
    * Sets the alignment attribute on the selected text.
-	 */
+   */
   public static class AlignmentAction extends StyledEditorKit.StyledTextAction
   {
-		/**
+    /**
      * The aligment to set.
-		 */
-		private int a;
+     */
+    private int a;
 
-		/**
+    /**
      * Creates a new instance of <code>AlignmentAction</code> to set the
      * alignment to <code>a</code>.
      *
      * @param nm the name of the Action
      * @param a the alignment to set
-		 */
+     */
     public AlignmentAction(String nm, int a)
     {
       super(nm);
       this.a = a;
     }
 
-		/**
+    /**
      * Performs the action.
      *
      * @param event the <code>ActionEvent</code> that describes the action
-		 */
+     */
     public void actionPerformed(ActionEvent event)
     {
       SimpleAttributeSet atts = new SimpleAttributeSet();
@@ -187,34 +183,34 @@ public class StyledEditorKit extends DefaultEditorKit
     }
   }
 
-	/**
+  /**
    * Sets the foreground color attribute on the selected text.
-	 */
+   */
   public static class ForegroundAction extends StyledEditorKit.StyledTextAction
   {
-		/**
+    /**
      * The foreground color to set.
-		 */
-		private Color fg;
+     */
+    private Color fg;
 
-		/**
+    /**
      * Creates a new instance of <code>ForegroundAction</code> to set the
      * foreground color to <code>fg</code>.
      *
      * @param nm the name of the Action
      * @param fg the foreground color to set
-		 */
+     */
     public ForegroundAction(String nm, Color fg)
     {
       super(nm);
       this.fg = fg;
     }
 
-		/**
+    /**
      * Performs the action.
      *
      * @param event the <code>ActionEvent</code> that describes the action
-		 */
+     */
     public void actionPerformed(ActionEvent event)
     {
       SimpleAttributeSet atts = new SimpleAttributeSet();
@@ -223,34 +219,34 @@ public class StyledEditorKit extends DefaultEditorKit
     }
   }
 
-	/**
+  /**
    * Sets the font size attribute on the selected text.
-	 */
+   */
   public static class FontSizeAction extends StyledEditorKit.StyledTextAction
   {
-		/**
+    /**
      * The font size to set.
-		 */
-		private int size;
+     */
+    private int size;
 
-		/**
+    /**
      * Creates a new instance of <code>FontSizeAction</code> to set the
      * font size to <code>size</code>.
      *
      * @param nm the name of the Action
      * @param size the font size to set
-		 */
+     */
     public FontSizeAction(String nm, int size)
     {
       super(nm);
       this.size = size;
     }
 
-		/**
+    /**
      * Performs the action.
      *
      * @param event the <code>ActionEvent</code> that describes the action
-		 */
+     */
     public void actionPerformed(ActionEvent event)
     {
       SimpleAttributeSet atts = new SimpleAttributeSet();
@@ -259,34 +255,34 @@ public class StyledEditorKit extends DefaultEditorKit
     }
   }
 
-	/**
+  /**
    * Sets the font family attribute on the selected text.
-	 */
+   */
   public static class FontFamilyAction extends StyledEditorKit.StyledTextAction
   {
-		/**
+    /**
      * The font family to set.
-		 */
-		private String family;
+     */
+    private String family;
 
-		/**
+    /**
      * Creates a new instance of <code>FontFamilyAction</code> to set the
      * font family to <code>family</code>.
      *
      * @param nm the name of the Action
      * @param family the font family to set
-		 */
+     */
     public FontFamilyAction(String nm, String family)
     {
       super(nm);
       this.family = family;
     }
 
-		/**
+    /**
      * Performs the action.
      *
      * @param event the <code>ActionEvent</code> that describes the action
-		 */
+     */
     public void actionPerformed(ActionEvent event)
     {
       SimpleAttributeSet atts = new SimpleAttributeSet();
@@ -295,36 +291,36 @@ public class StyledEditorKit extends DefaultEditorKit
     }
   }
 
-	/**
+  /**
    * The abstract superclass of all styled TextActions. This class
    * provides some useful methods to manipulate the text attributes.
-	 */
+   */
   public abstract static class StyledTextAction extends TextAction
   {
-		/**
+    /**
      * Creates a new instance of <code>StyledTextAction</code>.
      *
      * @param nm the name of the <code>StyledTextAction</code>
-		 */
+     */
     public StyledTextAction(String nm)
     {
-			super(nm);
+      super(nm);
     }
 
-		/**
+    /**
      * Returns the <code>JEditorPane</code> component from which the
      * <code>ActionEvent</code> originated.
      *
      * @param event the <code>ActionEvent</code>
      * @return the <code>JEditorPane</code> component from which the
      *         <code>ActionEvent</code> originated
-		 */
+     */
     protected final JEditorPane getEditor(ActionEvent event)
     {
       return (JEditorPane) getTextComponent(event);
     }
 
-		/**
+    /**
      * Sets the specified character attributes on the currently selected
      * text of <code>editor</code>. If <code>editor</code> does not have
      * a selection, then the attributes are used as input attributes
@@ -334,14 +330,14 @@ public class StyledEditorKit extends DefaultEditorKit
      * @param atts the text attributes to set
      * @param replace if <code>true</code> the current attributes of the
      *        selection are replaces, otherwise they are merged
-		 */
+     */
     protected final void setCharacterAttributes(JEditorPane editor,
                                                 AttributeSet atts,
                                                 boolean replace)
     {
       Document doc = editor.getDocument();
       if (doc instanceof StyledDocument)
-    {
+	{
 	  StyledDocument styleDoc = (StyledDocument) editor.getDocument();
 	  EditorKit kit = editor.getEditorKit();
 	  if (!(kit instanceof StyledEditorKit))
@@ -370,14 +366,14 @@ public class StyledEditorKit extends DefaultEditorKit
 				 + "expected to be a StyledDocument.");
     }
 
-		/**
+    /**
      * Returns the {@link StyledDocument} that is used by <code>editor</code>.
      *
      * @param editor the <code>JEditorPane</code> from which to get the
      *        <code>StyledDocument</code>
      *
      * @return the {@link StyledDocument} that is used by <code>editor</code>
-		 */
+     */
     protected final StyledDocument getStyledDocument(JEditorPane editor)
     {
       Document doc = editor.getDocument();
@@ -388,14 +384,14 @@ public class StyledEditorKit extends DefaultEditorKit
       return (StyledDocument) doc;
     }
 
-		/**
+    /**
      * Returns the {@link StyledEditorKit} that is used by <code>editor</code>.
      *
      * @param editor the <code>JEditorPane</code> from which to get the
      *        <code>StyledEditorKit</code>
      *
      * @return the {@link StyledEditorKit} that is used by <code>editor</code>
-		 */
+     */
     protected final StyledEditorKit getStyledEditorKit(JEditorPane editor)
     {
       EditorKit kit = editor.getEditorKit();
@@ -406,7 +402,7 @@ public class StyledEditorKit extends DefaultEditorKit
       return (StyledEditorKit) kit;
     }
 
-		/**
+    /**
      * Sets the specified character attributes on the paragraph that
      * contains the currently selected
      * text of <code>editor</code>. If <code>editor</code> does not have
@@ -417,7 +413,7 @@ public class StyledEditorKit extends DefaultEditorKit
      * @param atts the text attributes to set
      * @param replace if <code>true</code> the current attributes of the
      *        selection are replaces, otherwise they are merged
-		 */
+     */
     protected final void setParagraphAttributes(JEditorPane editor,
                                                 AttributeSet atts,
                                                 boolean replace)
@@ -428,7 +424,7 @@ public class StyledEditorKit extends DefaultEditorKit
 	  StyledDocument styleDoc = (StyledDocument) editor.getDocument();
 	  EditorKit kit = editor.getEditorKit();
 	  if (!(kit instanceof StyledEditorKit))
-    {
+	    {
 	      StyledEditorKit styleKit = (StyledEditorKit) kit;
 	      int start = editor.getSelectionStart();
 	      int end = editor.getSelectionEnd();
@@ -454,23 +450,23 @@ public class StyledEditorKit extends DefaultEditorKit
     }
   }
 
-	/**
+  /**
    * A {@link ViewFactory} that is able to create {@link View}s for
    * the <code>Element</code>s that are supported by
    * <code>StyledEditorKit</code>, namely the following types of Elements:
    *
    * <ul>
-   * <li>{@link AbstractDocument.ContentElementName}</li>
-   * <li>{@link AbstractDocument.ParagraphElementName}</li>
-   * <li>{@link AbstractDocument.SectionElementName}</li>
-   * <li>{@link StyleContext.ComponentElementName}</li>
-   * <li>{@link StyleContext.IconElementName}</li>
+   * <li>{@link AbstractDocument#ContentElementName}</li>
+   * <li>{@link AbstractDocument#ParagraphElementName}</li>
+   * <li>{@link AbstractDocument#SectionElementName}</li>
+   * <li>{@link StyleConstants#ComponentElementName}</li>
+   * <li>{@link StyleConstants#IconElementName}</li>
    * </ul>
-	 */
+   */
   static class StyledViewFactory
     implements ViewFactory
   {
-		/**
+    /**
      * Creates a {@link View} for the specified <code>Element</code>.
      *
      * @param element the <code>Element</code> to create a <code>View</code>
@@ -478,7 +474,7 @@ public class StyledEditorKit extends DefaultEditorKit
      * @return the <code>View</code> for the specified <code>Element</code>
      *         or <code>null</code> if the type of <code>element</code> is
      *         not supported
-		 */
+     */
     public View create(Element element)
     {
       String name = element.getName();
@@ -501,18 +497,18 @@ public class StyledEditorKit extends DefaultEditorKit
     }
   }
 
-	/**
+  /**
    * Keeps track of the caret position and updates the currentRun
    * <code>Element</code> and the <code>inputAttributes</code>.
-	 */
+   */
   class CaretTracker
     implements CaretListener
   {
-		/**
+    /**
      * Notifies an update of the caret position.
      *
      * @param ev the event for the caret update
-		 */
+     */
     public void caretUpdate(CaretEvent ev)
     {
       Object source = ev.getSource();
@@ -530,43 +526,43 @@ public class StyledEditorKit extends DefaultEditorKit
       currentRun = styleDoc.getCharacterElement(ev.getDot());
       createInputAttributes(currentRun, inputAttributes);
     }
-    }
+  }
 
-		/**
+  /**
    * Stores the <code>Element</code> at the current caret position. This
    * is updated by {@link CaretTracker}.
-		 */
+   */
   Element currentRun;
 
-	/**
+  /**
    * The current input attributes. This is updated by {@link CaretTracker}.
-	 */
+   */
   MutableAttributeSet inputAttributes;
 
-	/**
+  /**
    * The CaretTracker that keeps track of the current input attributes, and
    * the current character run Element.
-	 */
+   */
   CaretTracker caretTracker;
 
-	/**
+  /**
    * The ViewFactory for StyledEditorKits.
-	 */
+   */
   StyledViewFactory viewFactory;
 
-	/**
+  /**
    * Creates a new instance of <code>StyledEditorKit</code>.
-	 */
+   */
   public StyledEditorKit()
   {
     inputAttributes = new SimpleAttributeSet();
   }
 
-	/**
+  /**
    * Creates an exact copy of this <code>StyledEditorKit</code>.
    *
    * @return an exact copy of this <code>StyledEditorKit</code>
-	 */
+   */
   public Object clone()
   {
     StyledEditorKit clone = (StyledEditorKit) super.clone();
@@ -574,7 +570,7 @@ public class StyledEditorKit extends DefaultEditorKit
     return clone;
   }
 
-	/**
+  /**
    * Returns the <code>Action</code>s supported by this {@link EditorKit}.
    * This includes the {@link BoldAction}, {@link ItalicAction} and
    * {@link UnderlineAction} as well as the <code>Action</code>s supported
@@ -585,7 +581,7 @@ public class StyledEditorKit extends DefaultEditorKit
    * instantiation.
    *
    * @return the <code>Action</code>s supported by this {@link EditorKit}
-	 */
+   */
   public Action[] getActions()
   {
     Action[] actions1 = super.getActions();
@@ -594,57 +590,57 @@ public class StyledEditorKit extends DefaultEditorKit
     return TextAction.augmentList(actions1, myActions);
   }
 
-	/**
+  /**
    * Returns the current input attributes. These are automatically set on
    * any newly inserted content, if not specified otherwise.
    *
    * @return the current input attributes
-	 */
+   */
   public MutableAttributeSet getInputAttributes()
   {
     return inputAttributes;
   }
 
-	/**
+  /**
    * Returns the {@link Element} that represents the character run at the
    * current caret position.
    *
    * @return the {@link Element} that represents the character run at the
    *         current caret position
-	 */
+   */
   public Element getCharacterAttributeRun()
   {
     return currentRun;
   }
 
-	/**
+  /**
    * Creates the default {@link Document} supported by this
    * <code>EditorKit</code>. This is an instance of
    * {@link DefaultStyledDocument} in this case but may be overridden by
    * subclasses.
    *
    * @return an instance of <code>DefaultStyledDocument</code>
-	 */
+   */
   public Document createDefaultDocument()
   {
     return new DefaultStyledDocument();
   }
 
-	/**
+  /**
    * Installs this <code>EditorKit</code> on the specified {@link JEditorPane}.
    * This basically involves setting up required listeners on the
    * <code>JEditorPane</code>.
    *
    * @param component the <code>JEditorPane</code> to install this
    *        <code>EditorKit</code> on
-	 */
+   */
   public void install(JEditorPane component)
   {
     CaretTracker tracker = new CaretTracker();
     component.addCaretListener(tracker);
   }
 
-	/**
+  /**
    * Deinstalls this <code>EditorKit</code> from the specified
    * {@link JEditorPane}. This basically involves removing all listeners from
    * <code>JEditorPane</code> that have been set up by this
@@ -652,7 +648,7 @@ public class StyledEditorKit extends DefaultEditorKit
    *
    * @param component the <code>JEditorPane</code> from which to deinstall this
    *        <code>EditorKit</code>
-	 */
+   */
   public void deinstall(JEditorPane component)
   {
     CaretTracker t = caretTracker;
@@ -661,22 +657,22 @@ public class StyledEditorKit extends DefaultEditorKit
     caretTracker = null;
   }
 
-	/**
+  /**
    * Returns a {@link ViewFactory} that is able to create {@link View}s
    * for {@link Element}s that are supported by this <code>EditorKit</code>,
    * namely the following types of <code>Element</code>s:
    *
    * <ul>
-   * <li>{@link AbstractDocument.ContentElementName}</li>
-   * <li>{@link AbstractDocument.ParagraphElementName}</li>
-   * <li>{@link AbstractDocument.SectionElementName}</li>
-   * <li>{@link StyleContext.ComponentElementName}</li>
-   * <li>{@link StyleContext.IconElementName}</li>
+   * <li>{@link AbstractDocument#ContentElementName}</li>
+   * <li>{@link AbstractDocument#ParagraphElementName}</li>
+   * <li>{@link AbstractDocument#SectionElementName}</li>
+   * <li>{@link StyleConstants#ComponentElementName}</li>
+   * <li>{@link StyleConstants#IconElementName}</li>
    * </ul>
    *
    * @return a {@link ViewFactory} that is able to create {@link View}s
    *          for {@link Element}s that are supported by this <code>EditorKit</code>
-	 */
+   */
   public ViewFactory getViewFactory()
   {
     if (viewFactory == null)
@@ -684,7 +680,7 @@ public class StyledEditorKit extends DefaultEditorKit
     return viewFactory;
   }
 
-	/**
+  /**
    * Copies the text attributes from <code>element</code> to <code>set</code>.
    * This is called everytime when the caret position changes to keep
    * track of the current input attributes. The attributes in <code>set</code>

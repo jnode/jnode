@@ -82,7 +82,7 @@ public class JScrollPane
   implements Accessible, ScrollPaneConstants
 {
   private static final long serialVersionUID = 5203525440012340014L;
-
+  
   protected JViewport columnHeader;
   protected JViewport rowHeader;
 
@@ -97,7 +97,7 @@ public class JScrollPane
   protected int verticalScrollBarPolicy;
 
   protected JViewport viewport;
-
+  
   Border viewportBorder;
   boolean wheelScrollingEnabled;
   ChangeListener scrollListener;  
@@ -228,10 +228,10 @@ public class JScrollPane
       remove(c);
   }
 
-  private void addNonNull(Component c)
+  private void addNonNull(Component c, Object constraints)
   {
     if (c != null)
-      add(c);
+      add(c, constraints);
   }
 
   public void setComponentOrientation(ComponentOrientation co)
@@ -250,7 +250,7 @@ public class JScrollPane
     JViewport old = columnHeader;
     removeNonNull(old);
     columnHeader = h;
-    addNonNull(h);
+    addNonNull(h, JScrollPane.COLUMN_HEADER);
     firePropertyChange("columnHeader", old, h);
     sync();
   }
@@ -294,25 +294,25 @@ public class JScrollPane
       {
         removeNonNull(lowerRight);
         lowerRight = c;
-        addNonNull(c);
+        addNonNull(c, JScrollPane.LOWER_RIGHT_CORNER);
       }
     else if (key == UPPER_RIGHT_CORNER)
       {
         removeNonNull(upperRight);
         upperRight = c;
-        addNonNull(c);
+        addNonNull(c, JScrollPane.UPPER_RIGHT_CORNER);
       }
     else if (key == LOWER_LEFT_CORNER)
       {
         removeNonNull(lowerLeft);
         lowerLeft = c;
-        addNonNull(c);
+        addNonNull(c, JScrollPane.LOWER_LEFT_CORNER);
       }
     else if (key == UPPER_LEFT_CORNER)
       {
         removeNonNull(upperLeft);
         upperLeft = c;
-        addNonNull(c);
+        addNonNull(c, JScrollPane.UPPER_LEFT_CORNER);
       }
     else
       throw new IllegalArgumentException("unknown corner " + key);
@@ -327,7 +327,7 @@ public class JScrollPane
     JScrollBar old = horizontalScrollBar;
     removeNonNull(old);
     horizontalScrollBar = h;
-    addNonNull(h);
+    addNonNull(h, JScrollPane.HORIZONTAL_SCROLLBAR);
     firePropertyChange("horizontalScrollBar", old, h);
     sync();
 
@@ -346,7 +346,7 @@ public class JScrollPane
   }
 
   public void setHorizontalScrollBarPolicy(int h)
-  {    
+  {
     if (horizontalScrollBarPolicy == h)
       return;
     
@@ -379,7 +379,7 @@ public class JScrollPane
     JViewport old = rowHeader;
     removeNonNull(old);
     rowHeader = v;
-    addNonNull(v);
+    addNonNull(v, JScrollPane.ROW_HEADER);
     firePropertyChange("rowHeader", old, v);
     sync();
   }
@@ -400,7 +400,7 @@ public class JScrollPane
     JScrollBar old = verticalScrollBar;
     removeNonNull(old);
     verticalScrollBar = v;
-    addNonNull(v);
+    addNonNull(v, JScrollPane.VERTICAL_SCROLLBAR);
     firePropertyChange("verticalScrollBar", old, v);
     sync();
 
@@ -457,7 +457,7 @@ public class JScrollPane
     viewport = v;
     if (v != null)
       v.addChangeListener(scrollListener);
-    addNonNull(v);
+    addNonNull(v, JScrollPane.VIEWPORT);
     revalidate();
     repaint();
     firePropertyChange("viewport", old, v);
@@ -504,7 +504,7 @@ public class JScrollPane
           JScrollBar vsb = JScrollPane.this.getVerticalScrollBar();
           JScrollBar hsb = JScrollPane.this.getHorizontalScrollBar();
           JViewport vp = JScrollPane.this.getViewport();
-          
+
           if (vp != null && event.getSource() == vp)
             {
               // if the viewport changed, we should update the VSB / HSB
@@ -538,8 +538,8 @@ public class JScrollPane
               
               if (vsb != null)
                 ypos = vsb.getValue();
-
-          if (hsb != null)
+              
+              if (hsb != null)
                 xpos = hsb.getValue();
 
               Point pt = new Point(xpos, ypos);
@@ -576,7 +576,7 @@ public class JScrollPane
   {
     this(null);
   }
-    
+
   /**
    * Creates a new <code>JScrollPane</code> that embeds the specified
    * <code>view</code> component, displaying vertical and horizontal scrollbars

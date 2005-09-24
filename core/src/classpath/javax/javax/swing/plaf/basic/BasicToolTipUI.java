@@ -61,55 +61,6 @@ import javax.swing.plaf.ToolTipUI;
  */
 public class BasicToolTipUI extends ToolTipUI
 {
-  /** The default Border around the JToolTip. */
-  private static Border defaultBorder = new Border()
-    {
-      // FIXME: This needs to go into Basic Look and Feel
-      // defaults.
-
-			/**
-			 * This method returns the border insets.
-			 *
-			 * @param c The Component to find Border insets for.
-			 *
-			 * @return The Border insets.
-			 */		 
-      public Insets getBorderInsets(Component c)
-      {
-	return new Insets(4, 4, 4, 4);
-      }
-
-			/**
-			 * This method returns whether the border is opaque.
-			 *
-			 * @return Whether the border is opaque.
-			 */
-      public boolean isBorderOpaque()
-      {
-	return false;
-      }
-
-			/**
-			 * This method paints the border.
-			 *
-			 * @param c The Component to paint this border around.
-			 * @param g The Graphics object to paint with.
-			 * @param x The x coordinate to start painting at.
-			 * @param y The y coordinate to start painting at.
-			 * @param w The width of the Component.
-			 * @param h The height of the Component.
-			 */
-      public void paintBorder(Component c, Graphics g, int x, int y, int w,
-                              int h)
-      {
-	Color saved = g.getColor();
-	g.setColor(Color.BLACK);
-
-	g.drawRect(0, 0, w - 1, h - 1);
-
-	g.setColor(saved);
-      }
-    };
 
 	/** The shared instance of BasicToolTipUI used for all ToolTips. */
 	private static BasicToolTipUI shared;
@@ -196,7 +147,7 @@ public class BasicToolTipUI extends ToolTipUI
     c.setBackground(defaults.getColor("ToolTip.background"));
     c.setForeground(defaults.getColor("ToolTip.foreground"));
     c.setFont(defaults.getFont("ToolTip.font"));
-    c.setBorder(defaultBorder);
+    c.setBorder(defaults.getBorder("ToolTip.border"));
   }
 
   /**

@@ -72,7 +72,7 @@ public class JSpinner extends JComponent
                                                               LayoutManager
   {
     private JSpinner spinner;
-    
+
     /** The JFormattedTextField that backs the editor. */
     JFormattedTextField ftf;
 
@@ -258,6 +258,31 @@ public class JSpinner extends JComponent
   }
 
   /**
+   * A <code>JSpinner</code> editor used for the {@link SpinnerListModel}.
+   * This editor uses a <code>JFormattedTextField</code> to edit the values
+   * of the spinner.
+   *
+   * @author Roman Kennke (kennke@aicas.com)
+   */
+  public static class ListEditor extends DefaultEditor
+  {
+    /**
+     * Creates a new instance of <code>ListEditor</code>.
+     *
+     * @param spinner the spinner for which this editor is used
+     */
+    public ListEditor(JSpinner spinner)
+    {
+      super(spinner);
+    }
+
+    public SpinnerListModel getModel()
+    {
+      return (SpinnerListModel) getSpinner().getModel();
+    }
+  }
+
+  /**
    * An editor class for a <code>JSpinner</code> that is used
    * for displaying and editing dates (e.g. that uses
    * <code>SpinnerDateModel</code> as model).
@@ -307,7 +332,7 @@ public class JSpinner extends JComponent
     /**
      * Initializes the JFormattedTextField for this editor.
      *
-     * @param the date format to use in the formatted text field
+     * @param format the date format to use in the formatted text field
      */
     private void init(SimpleDateFormat format)
     {

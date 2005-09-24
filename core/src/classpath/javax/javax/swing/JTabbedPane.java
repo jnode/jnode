@@ -1,4 +1,4 @@
-/* JTabbedPane.java -- 
+/* JTabbedPane.java --
    Copyright (C) 2002, 2004, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -56,8 +56,9 @@ import javax.swing.plaf.TabbedPaneUI;
 import javax.swing.plaf.UIResource;
 
 /**
- * This is a container for components. One component is displayed at a time.
- * Users can switch between components by clicking on tabs.
+ * This is a container for components where only one component is displayed at
+ * a given time and the displayed component can be switched by clicking on
+ * tabs.
  * 
  * <p>
  * Tabs can be oriented in several ways. They can be above, below, left and
@@ -72,14 +73,16 @@ public class JTabbedPane extends JComponent implements Serializable,
                                                        SwingConstants
 {
   /**
-   * DOCUMENT ME!
+   * Accessibility support for <code>JTabbedPane</code>.
    */
   protected class AccessibleJTabbedPane extends JComponent.AccessibleJComponent
     implements AccessibleSelection, ChangeListener
   {
-    /** DOCUMENT ME! */
+    /**
+     * The serialization UID.
+     */
     private static final long serialVersionUID = 7610530885966830483L;
-    
+
     /**
      * Creates a new AccessibleJTabbedPane object.
      */
@@ -89,18 +92,20 @@ public class JTabbedPane extends JComponent implements Serializable,
     }
 
     /**
-     * DOCUMENT ME!
+     * Receives notification when the selection state of the
+     * <code>JTabbedPane</code> changes.
      *
-     * @param e DOCUMENT ME!
+     * @param e the change event describing the change
      */
     public void stateChanged(ChangeEvent e)
     {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the accessible role of the <code>JTabbedPane</code>, which is
+     * {@link AccessibleRole#PAGE_TAB_LIST}.
      *
-     * @return DOCUMENT ME!
+     * @return the accessible role of the <code>JTabbedPane</code>
      */
     public AccessibleRole getAccessibleRole()
     {
@@ -108,9 +113,11 @@ public class JTabbedPane extends JComponent implements Serializable,
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the number of accessible child components of the
+     * <code>JTabbedPane</code>.
      *
-     * @return DOCUMENT ME!
+     * @return the number of accessible child components of the
+     *         <code>JTabbedPane</code>
      */
     public int getAccessibleChildrenCount()
     {
@@ -118,11 +125,11 @@ public class JTabbedPane extends JComponent implements Serializable,
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the accessible child component at the specified index.
      *
-     * @param i DOCUMENT ME!
+     * @param i the index of the child component to fetch
      *
-     * @return DOCUMENT ME!
+     * @return the accessible child component at the specified index
      */
     public Accessible getAccessibleChild(int i)
     {
@@ -130,9 +137,10 @@ public class JTabbedPane extends JComponent implements Serializable,
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the current selection state of the <code>JTabbedPane</code>
+     * as AccessibleSelection object.
      *
-     * @return DOCUMENT ME!
+     * @return the current selection state of the <code>JTabbedPane</code>
      */
     public AccessibleSelection getAccessibleSelection()
     {
@@ -140,11 +148,15 @@ public class JTabbedPane extends JComponent implements Serializable,
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the accessible child component at the specified coordinates.
+     * If there is no child component at this location, then return the
+     * currently selected tab.
      *
-     * @param p DOCUMENT ME!
+     * @param p the coordinates at which to look up the child component
      *
-     * @return DOCUMENT ME!
+     * @return the accessible child component at the specified coordinates or
+     *         the currently selected tab if there is no child component at
+     *         this location
      */
     public Accessible getAccessibleAt(Point p)
     {
@@ -152,9 +164,13 @@ public class JTabbedPane extends JComponent implements Serializable,
     }
 
     /**
-     * DOCUMENT ME!
+     * The number of selected child components of the
+     * <code>JTabbedPane</code>. This will be <code>0</code> if the
+     * <code>JTabbedPane</code> has no children, or <code>1</code> otherwise,
+     * since there is always exactly one tab selected. 
      *
-     * @return DOCUMENT ME!
+     * @return number of selected child components of the
+     *         <code>JTabbedPane</code>
      */
     public int getAccessibleSelectionCount()
     {
@@ -232,7 +248,7 @@ public class JTabbedPane extends JComponent implements Serializable,
     protected ModelListener()
     {
     }
-    
+
     /**
      * This method is called whenever the model  is changed.
      *
@@ -249,7 +265,7 @@ public class JTabbedPane extends JComponent implements Serializable,
    * A private class that holds all the information  for each tab.
    */
   private class Page
-    {
+  {
     /** The tooltip string. */
     private String tip;
 
@@ -289,9 +305,9 @@ public class JTabbedPane extends JComponent implements Serializable,
      * @param tip The tooltip associated with the tab.
      */
     protected Page(String title, Icon icon, Component component, String tip)
-	{
+    {
       this.title = title;
-	    this.icon = icon;
+      this.icon = icon;
       this.component = component;
       this.tip = tip;
     }
@@ -336,7 +352,7 @@ public class JTabbedPane extends JComponent implements Serializable,
     public void setTip(String tip)
     {
       this.tip = tip;
-	}
+    }
 
     /**
      * This method returns the background color.
@@ -389,8 +405,8 @@ public class JTabbedPane extends JComponent implements Serializable,
     }
 
     /** DOCUMENT ME! */
-  private static final long serialVersionUID = 1614381073220130939L;
-    
+    private static final long serialVersionUID = 1614381073220130939L;
+
     /**
      * This method sets the title of the tab.
      *
@@ -400,7 +416,7 @@ public class JTabbedPane extends JComponent implements Serializable,
     {
       title = text;
       if (title != null && title.length() <= underlinedChar)
-        setDisplayedMnemonicIndex(title.length() - 1);      
+	setDisplayedMnemonicIndex(title.length() - 1);
     }
 
     /**
@@ -518,7 +534,7 @@ public class JTabbedPane extends JComponent implements Serializable,
      *         or equal to title.length.
      */
     public void setDisplayedMnemonicIndex(int index)
-                                   throws IllegalArgumentException
+      throws IllegalArgumentException
     {
       if (index < -1 || title != null && index >= title.length())
 	throw new IllegalArgumentException();
@@ -560,8 +576,8 @@ public class JTabbedPane extends JComponent implements Serializable,
    * Creates a new JTabbedPane object with tabs on top and using wrap tab
    * layout.
    */
-    public JTabbedPane()
-    {
+  public JTabbedPane()
+  {
     this(SwingConstants.TOP, WRAP_TAB_LAYOUT);
   }
 
@@ -832,8 +848,8 @@ public class JTabbedPane extends JComponent implements Serializable,
 	  getSelectedComponent().hide();
 	if (index != -1 && getComponentAt(index) != null)
 	  getComponentAt(index).show();
-    model.setSelectedIndex(index);
-  }
+	model.setSelectedIndex(index);
+      }
   }
 
   /**
@@ -863,26 +879,28 @@ public class JTabbedPane extends JComponent implements Serializable,
    * This method inserts tabs into JTabbedPane. This includes adding the
    * component to the JTabbedPane and hiding it.
    *
-   * @param title The title of the tab.
-   * @param icon The tab's icon.
-   * @param component The component associated with the tab.
-   * @param tip The tooltip for the tab.
-   * @param index The index to insert the tab at.
+   * @param title the title of the tab; may be <code>null</code>
+   * @param icon the tab's icon; may be <code>null</code>
+   * @param component the component associated with the tab
+   * @param tip the tooltip for the tab
+   * @param index the index to insert the tab at
    */
   public void insertTab(String title, Icon icon, Component component,
                         String tip, int index)
   {
+    if (title == null)
+      title = "";
     Page p = new Page(title, icon, component, tip);
     tabs.insertElementAt(p, index);
 
     // Hide the component so we don't see it. Do it before we parent it
     // so we don't trigger a repaint.
     if (component != null)
-    {
-    component.hide();
-    super.add(component);
-    }
-  
+      {
+	component.hide();
+	super.add(component);
+      }
+
     if (getSelectedIndex() == -1)
       setSelectedIndex(0);
 
@@ -893,10 +911,10 @@ public class JTabbedPane extends JComponent implements Serializable,
   /**
    * This method adds a tab to the JTabbedPane.
    *
-   * @param title The title of the tab.
-   * @param icon The icon for the tab.
-   * @param component The associated component.
-   * @param tip The associated tooltip.
+   * @param title the title of the tab; may be <code>null</code>
+   * @param icon the icon for the tab; may be <code>null</code>
+   * @param component the associated component
+   * @param tip the associated tooltip
    */
   public void addTab(String title, Icon icon, Component component, String tip)
   {
@@ -906,9 +924,9 @@ public class JTabbedPane extends JComponent implements Serializable,
   /**
    * This method adds a tab to the JTabbedPane.
    *
-   * @param title The title of the tab.
-   * @param icon The icon for the tab.
-   * @param component The associated component.
+   * @param title the title of the tab; may be <code>null</code>
+   * @param icon the icon for the tab; may be <code>null</code>
+   * @param component the associated component
    */
   public void addTab(String title, Icon icon, Component component)
   {
@@ -918,8 +936,8 @@ public class JTabbedPane extends JComponent implements Serializable,
   /**
    * This method adds a tab to the JTabbedPane.
    *
-   * @param title The title of the tab.
-   * @param component The associated component.
+   * @param title the title of the tab; may be <code>null</code>
+   * @param component the associated component
    */
   public void addTab(String title, Component component)
   {
@@ -934,7 +952,7 @@ public class JTabbedPane extends JComponent implements Serializable,
    *
    * @param component The associated component.
    *
-   * @return The Component that was added.  
+   * @return The Component that was added.
    */
   public Component add(Component component)
   {
@@ -950,12 +968,12 @@ public class JTabbedPane extends JComponent implements Serializable,
    * instance of UIResource, it doesn't add the tab and instead add the
    * component directly to the JTabbedPane.
    *
-   * @param title The title of the tab.
-   * @param component The associated component.
+   * @param title the title of the tab; may be <code>null</code>
+   * @param component the associated component
    *
    * @return The Component that was added.
    */
-   public Component add(String title, Component component)
+  public Component add(String title, Component component)
   {
     if (component instanceof UIResource)
       super.add(component);
@@ -996,7 +1014,7 @@ public class JTabbedPane extends JComponent implements Serializable,
   public void add(Component component, Object constraints)
   {
     add(component, constraints, tabs.size());
-    }
+  }
 
   /**
    * This method adds a tab to the JTabbedPane. If the Component is an
@@ -1010,7 +1028,7 @@ public class JTabbedPane extends JComponent implements Serializable,
    * @param index The index to insert the tab at.
    */
   public void add(Component component, Object constraints, int index)
-    {
+  {
     if (component instanceof UIResource)
       super.add(component);
     else
@@ -1022,7 +1040,7 @@ public class JTabbedPane extends JComponent implements Serializable,
 	            (constraints instanceof Icon) ? (Icon) constraints : null,
 	            component, null, index);
       }
-    }
+  }
 
   /**
    * The tab and it's associated component are removed. After the component
@@ -1032,13 +1050,13 @@ public class JTabbedPane extends JComponent implements Serializable,
    * @param index The index of the tab to remove.
    */
   public void removeTabAt(int index)
-    {
+  {
     checkIndex(index, 0, tabs.size());
     Component c = getComponentAt(index);
     super.remove(index);
     c.show();
     tabs.remove(index);
-    }
+  }
 
   /**
    * This method removes the component from the JTabbedPane. After the
@@ -1048,13 +1066,13 @@ public class JTabbedPane extends JComponent implements Serializable,
    * @param component The Component to remove.
    */
   public void remove(Component component)
-    {
+  {
     // This simply removes the component.
     int index = indexOfComponent(component);
     super.remove(component);
     component.show();
     setComponentAt(index, null);
-    }
+  }
 
   /**
    * This method removes the tab and component from the JTabbedPane. It simply
@@ -1082,10 +1100,10 @@ public class JTabbedPane extends JComponent implements Serializable,
    *
    * @return The number of tabs in the JTabbedPane.
    */
-    public int getTabCount()
-    {
-	return tabs.size();
-    }
+  public int getTabCount()
+  {
+    return tabs.size();
+  }
 
   /**
    * This method returns the number of runs used  to paint the JTabbedPane.
@@ -1093,10 +1111,10 @@ public class JTabbedPane extends JComponent implements Serializable,
    * @return The number of runs.
    */
   public int getTabRunCount()
-    {
+  {
     return ((TabbedPaneUI) ui).getTabRunCount(this);
-    }
-    
+  }
+
   /**
    * This method returns the tab title given the index.
    *
@@ -1134,8 +1152,8 @@ public class JTabbedPane extends JComponent implements Serializable,
   {
     checkIndex(index, 0, tabs.size());
     return ((Page) tabs.elementAt(index)).getDisabledIcon();
-    }
-    
+  }
+
   /**
    * This method returns the tooltip string for the tab.
    *
@@ -1147,8 +1165,8 @@ public class JTabbedPane extends JComponent implements Serializable,
   {
     checkIndex(index, 0, tabs.size());
     return ((Page) tabs.elementAt(index)).getTip();
-    }
-    
+  }
+
   /**
    * This method returns the foreground color for the tab.
    *
@@ -1157,11 +1175,11 @@ public class JTabbedPane extends JComponent implements Serializable,
    * @return The foreground color for the tab.
    */
   public Color getForegroundAt(int index)
-    {
+  {
     checkIndex(index, 0, tabs.size());
     return ((Page) tabs.elementAt(index)).getForeground();
-    }
-    
+  }
+
   /**
    * This method returns the background color for the tab.
    *
@@ -1170,7 +1188,7 @@ public class JTabbedPane extends JComponent implements Serializable,
    * @return The background color for the tab.
    */
   public Color getBackgroundAt(int index)
-    {
+  {
     checkIndex(index, 0, tabs.size());
     return ((Page) tabs.elementAt(index)).getBackground();
   }
@@ -1311,8 +1329,8 @@ public class JTabbedPane extends JComponent implements Serializable,
   {
     checkIndex(index, 0, tabs.size());
     ((Page) tabs.elementAt(index)).setForeground(foreground);
-    }
-    
+  }
+
   /**
    * This method sets whether the tab is enabled.
    *
@@ -1459,10 +1477,10 @@ public class JTabbedPane extends JComponent implements Serializable,
    *
    * @return A string representation of this JTabbedPane.
    */
-   protected  String paramString()
-    {
-	return "JTabbedPane";
-    }
+  protected String paramString()
+  {
+    return "JTabbedPane";
+  }
 
   /**
    * DOCUMENT ME!

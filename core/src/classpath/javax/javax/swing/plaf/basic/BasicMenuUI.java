@@ -38,6 +38,7 @@ exception statement from your version. */
 
 package javax.swing.plaf.basic;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
@@ -92,7 +93,7 @@ public class BasicMenuUI extends BasicMenuItemUI
    */
   protected ChangeListener createChangeListener(JComponent c)
   {
-    return new ChangeHandler();
+    return new ChangeHandler((JMenu) c, this);
   }
 
   /**
@@ -328,7 +329,7 @@ public class BasicMenuUI extends BasicMenuItemUI
           (ii) or if this menu is in a menu bar and some other menu in a 
           menu bar was just selected and has its popup menu visible. 
                (If nothing was selected, menu should be pressed before
-               it will be selected)      
+               it will be selected)
       */
       JMenu menu = (JMenu) menuItem;
 
@@ -363,15 +364,15 @@ public class BasicMenuUI extends BasicMenuItemUI
       MenuSelectionManager manager = MenuSelectionManager.defaultManager();
       JMenu menu = (JMenu) menuItem;
       manager.processMouseEvent(e);
-      
+
       // Menu should be displayed when the menu is pressed only if 
       // it is top-level menu
       if (menu.isTopLevelMenu())
         {
 	  if (menu.getPopupMenu().isVisible())
-	      // If menu is visible and menu button was pressed.. 
-	      // then need to cancel the menu
-	      manager.clearSelectedPath();
+	    // If menu is visible and menu button was pressed.. 
+	    // then need to cancel the menu
+	    manager.clearSelectedPath();
 	  else
 	    {
 	      // Display the menu
@@ -464,9 +465,40 @@ public class BasicMenuUI extends BasicMenuItemUI
    */
   public class ChangeHandler implements ChangeListener
   {
+    /**
+     * Not used.
+     */
+    public boolean isSelected;
+
+    /**
+     * Not used.
+     */
+    public JMenu menu;
+
+    /**
+     * Not used.
+     */
+    public BasicMenuUI ui;
+
+    /**
+     * Not used.
+     */
+    public Component wasFocused;
+
+    /**
+     * Not used.
+     */
+    public ChangeHandler(JMenu m, BasicMenuUI ui)
+    {
+      // Not used.
+    }
+
+    /**
+     * Not used.
+     */
     public void stateChanged(ChangeEvent e)
     {
-      // FIXME: It seems that this class is not used anywhere
+      // Not used.
     }
   }
 

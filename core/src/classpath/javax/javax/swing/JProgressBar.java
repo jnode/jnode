@@ -243,7 +243,7 @@ public class JProgressBar extends JComponent implements SwingConstants,
     model = new DefaultBoundedRangeModel(minimum, 0, minimum, maximum);
     if (orientation != HORIZONTAL && orientation != VERTICAL)
       throw new IllegalArgumentException(orientation + " is not a legal orientation");    
-    this.orientation = orientation;
+    setOrientation(orientation);
     changeListener = createChangeListener();
     model.addChangeListener(changeListener);
     updateUI();
@@ -293,8 +293,8 @@ public class JProgressBar extends JComponent implements SwingConstants,
     Border border = getBorder();
     if (paintBorder && border != null)
       border.paintBorder(this, graphics, 0, 0,
-                            getWidth(),
-                            getHeight());
+                         getWidth(),
+                         getHeight());
   }
 
   /**

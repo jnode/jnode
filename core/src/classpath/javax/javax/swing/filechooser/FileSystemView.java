@@ -45,10 +45,10 @@ import javax.swing.Icon;
 
 /**
  * DOCUMENT ME!
-	 */
+ */
 public abstract class FileSystemView
 {
-	/**
+  /**
    * DOCUMENT ME!
    *
    * @param dir DOCUMENT ME!
@@ -143,7 +143,7 @@ public abstract class FileSystemView
     for (int i = 0; i < files.length; i++)
       if (! files[i].isHidden())
 	trim.add(files[i]);
-    File[] value = (File[]) trim.toArray(new File[0]);
+    File[] value = (File[]) trim.toArray(new File[trim.size()]);
     return value;
   }
 
@@ -356,6 +356,6 @@ public abstract class FileSystemView
     // traversable. (No files are listed when you traverse the directory)
     // My best guess is that as long as it's a directory, the file is
     // traversable.
-    return new Boolean(f.isDirectory());
+    return Boolean.valueOf(f.isDirectory());
   }
 }
