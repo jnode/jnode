@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -294,6 +294,7 @@ public final class Long extends Number implements Comparable<Long>
    *
    * @param val the value to wrap
    * @return the <code>Long</code>
+   * @since 1.5
    */
   public static synchronized Long valueOf(long val)
   {
@@ -641,9 +642,9 @@ public final class Long extends Number implements Comparable<Long>
    */
   public static long reverse(long val)
   {
-    int hi = Integer.reverse((int) val);
-    int lo = Integer.reverse((int) (val >>> 32));
-    return (((long) hi) << 32) | lo;
+    long hi = Integer.reverse((int) val) & 0xffffffffL;
+    long lo = Integer.reverse((int) (val >>> 32)) & 0xffffffffL;
+    return (hi << 32) | lo;
   }
 
   /**

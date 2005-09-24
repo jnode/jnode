@@ -138,6 +138,15 @@ public class ParsePosition
   }
 
   /**
+   * Return the hash code for this object.
+   * @return the hash code
+   */
+  public int hashCode()
+  {
+    return index ^ error_index;
+  }
+
+  /**
    * This method returns a <code>String</code> representation of this
    * object.
    *
