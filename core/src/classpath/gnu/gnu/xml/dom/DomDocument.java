@@ -210,12 +210,14 @@ public class DomDocument
    */
   public Element getElementById(String id)
   {
-    DomDoctype doctype = (DomDoctype) getDoctype();
-    
-    if (doctype == null || !doctype.hasIds()
-        || id == null || id.length() == 0)
+    if (id == null || id.length() == 0)
       {
         return null;
+      }
+    DomDoctype doctype = (DomDoctype) getDoctype();
+    if (doctype != null && !doctype.hasIds())
+      {
+        doctype = null;
       }
     
     // yes, this is linear in size of document.
@@ -233,6 +235,8 @@ public class DomDocument
         if (current.getNodeType() == ELEMENT_NODE)
           {
             DomElement element = (DomElement) current;
+            if (doctype != null)
+              {
             DTDElementTypeInfo info =
               doctype.getElementTypeInfo(current.getNodeName());
             if (info != null &&
@@ -251,6 +255,18 @@ public class DomDocument
                         return element;
                       }
                   }
+              }
+          }
+            // xml:id
+            String xmlId = element.getAttribute("xml:id");
+            if (xmlId == null)
+              {
+                xmlId = element.getAttributeNS(XMLConstants.XML_NS_URI,
+                                               "id");
+              }
+            if (id.equals(xmlId))
+              {
+                return element;
               }
           }
         

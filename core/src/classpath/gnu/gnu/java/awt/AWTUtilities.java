@@ -593,8 +593,11 @@ public class AWTUtilities
     if (destination == null)
       destination = getRoot(source);
 
+    if (source.isShowing() && destination.isShowing())
+      {
     convertPointToScreen(pt, source);
     convertPointFromScreen(pt, destination);
+      }
 
     return pt;
   }
