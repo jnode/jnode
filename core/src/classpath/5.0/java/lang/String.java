@@ -16,8 +16,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -40,20 +40,24 @@ exception statement from your version. */
 package java.lang;
 
 import gnu.java.lang.CharData;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CodingErrorAction;
-import java.nio.charset.CharacterCodingException;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
+
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CharsetEncoder;
+import java.nio.charset.CodingErrorAction;
+import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.UnsupportedCharsetException;
+import java.text.Collator;
 import java.util.Comparator;
 import java.util.Locale;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Strings represent an immutable set of characters.  All String literals
@@ -97,7 +101,7 @@ public final class String
 
   /**
    * Stores unicode multi-character uppercase expansion table.
-   * @see #toUpperCase(char)
+   * @see #toUpperCase(Locale)
    * @see CharData#UPPER_EXPAND
    */
   private static final char[] upperExpand
@@ -138,7 +142,7 @@ public final class String
   final int offset;
 
   /**
-   * An implementation for {@link CASE_INSENSITIVE_ORDER}.
+   * An implementation for {@link #CASE_INSENSITIVE_ORDER}.
    * This must be {@link Serializable}. The class name is dictated by
    * compatibility with Sun's JDK.
    */
@@ -553,6 +557,40 @@ public final class String
   }
 
   /**
+   * Get the code point at the specified index.  This is like #charAt(int),
+   * but if the character is the start of a surrogate pair, and the
+   * following character completes the pair, then the corresponding
+   * supplementary code point is returned.
+   * @param index the index of the codepoint to get, starting at 0
+   * @return the codepoint at the specified index
+   * @throws IndexOutOfBoundsException if index is negative or &gt;= length()
+   * @since 1.5
+   */
+  public synchronized int codePointAt(int index)
+  {
+    // Use the CharSequence overload as we get better range checking
+    // this way.
+    return Character.codePointAt(this, index);
+  }
+
+  /**
+   * Get the code point before the specified index.  This is like
+   * #codePointAt(int), but checks the characters at <code>index-1</code> and
+   * <code>index-2</code> to see if they form a supplementary code point.
+   * @param index the index just past the codepoint to get, starting at 0
+   * @return the codepoint at the specified index
+   * @throws IndexOutOfBoundsException if index is negative or &gt;= length()
+   *         (while unspecified, this is a StringIndexOutOfBoundsException)
+   * @since 1.5
+   */
+  public synchronized int codePointBefore(int index)
+  {
+    // Use the CharSequence overload as we get better range checking
+    // this way.
+    return Character.codePointBefore(this, index);
+  }
+
+  /**
    * Copies characters from this String starting at a specified start index,
    * ending at a specified stop index, to a character array starting at
    * a specified destination begin index.
@@ -632,16 +670,21 @@ public final class String
 	byte[] bytes = new byte[bbuf.remaining()];
 	bbuf.get(bytes);
 	return bytes;
-
-      } catch(IllegalCharsetNameException e){
-	  throw new UnsupportedEncodingException("Encoding: "+enc+
-						 " not found.");
-      } catch(UnsupportedCharsetException e){
-	  throw new UnsupportedEncodingException("Encoding: "+enc+
-						 " not found.");
-      } catch(CharacterCodingException e){
-	  // XXX - Ignore coding exceptions? They shouldn't really happen.
-	  return null;
+      } 
+    catch(IllegalCharsetNameException e)
+      {
+	throw new UnsupportedEncodingException("Encoding: " + enc
+					       + " not found.");
+      } 
+    catch(UnsupportedCharsetException e)
+      {
+	throw new UnsupportedEncodingException("Encoding: " + enc
+					       + " not found.");
+      } 
+    catch(CharacterCodingException e)
+      {
+	// This shouldn't ever happen.
+	throw (InternalError) new InternalError().initCause(e);
       }	  
   }
 
@@ -722,6 +765,26 @@ public final class String
             return false;
         return true;
       }
+  }
+
+  /**
+   * Compares the given CharSequence to this String. This is true if
+   * the CharSequence has the same content as this String at this
+   * moment.
+   *
+   * @param seq the CharSequence to compare to
+   * @return true if CharSequence has the same character sequence
+   * @throws NullPointerException if the given CharSequence is null
+   * @since 1.5
+   */
+  public boolean contentEquals(CharSequence seq)
+  {
+    if (seq.length() != count)
+      return false;
+    for (int i = 0; i < count; ++i)
+      if (value[offset + i] != seq.charAt(i))
+	return false;
+    return true;
   }
 
   /**
@@ -848,7 +911,7 @@ public final class String
    * @param ignoreCase true if case should be ignored in comparision
    * @param toffset index to start comparison at for this String
    * @param other String to compare region to this String
-   * @param oofset index to start comparison at for other
+   * @param ooffset index to start comparison at for other
    * @param len number of characters to compare
    * @return true if regions match, false otherwise
    * @throws NullPointerException if other is null
@@ -1094,8 +1157,8 @@ public final class String
    * Creates a substring of this String, starting at a specified index
    * and ending at one character before a specified index.
    *
-   * @param begin index to start substring (inclusive, base 0)
-   * @param end index to end at (exclusive)
+   * @param beginIndex index to start substring (inclusive, base 0)
+   * @param endIndex index to end at (exclusive)
    * @return new String which is a substring of this String
    * @throws IndexOutOfBoundsException if begin &lt; 0 || end &gt; length()
    *         || begin &gt; end (while unspecified, this is a
@@ -1444,7 +1507,7 @@ public final class String
    * Trims all characters less than or equal to <code>'\u0020'</code>
    * (<code>' '</code>) from the beginning and end of this String. This
    * includes many, but not all, ASCII control characters, and all
-   * {@link Character#whitespace(char)}.
+   * {@link Character#isWhitespace(char)}.
    *
    * @return new trimmed String, or this if nothing trimmed
    */
@@ -1482,10 +1545,9 @@ public final class String
    */
   public char[] toCharArray()
   {
-    // XXX ORP 1.0.9 crashes on (char[]) clone() during bootstrap, so we
-    // omit this optimization for now.
-    // if (count == value.length)
-    //   return (char[]) value.clone();
+    if (count == value.length)
+      return (char[]) value.clone();
+
     char[] copy = new char[count];
     VMSystem.arraycopy(value, offset, copy, 0, count);
     return copy;
@@ -1658,6 +1720,49 @@ public final class String
   public String intern()
   {
     return VMString.intern(this);
+  }
+
+  /**
+   * Return the number of code points between two indices in the
+   * <code>StringBuffer</code>.  An unpaired surrogate counts as a
+   * code point for this purpose.  Characters outside the indicated
+   * range are not examined, even if the range ends in the middle of a
+   * surrogate pair.
+   *
+   * @param start the starting index
+   * @param end one past the ending index
+   * @return the number of code points
+   * @since 1.5
+   */
+  public synchronized int codePointCount(int start, int end)
+  {
+    if (start < 0 || end >= count || start > end)
+      throw new StringIndexOutOfBoundsException();
+
+    start += offset;
+    end += offset;
+    int count = 0;
+    while (start < end)
+      {
+	char base = value[start];
+	if (base < Character.MIN_HIGH_SURROGATE
+	    || base > Character.MAX_HIGH_SURROGATE
+	    || start == end
+	    || start == count
+	    || value[start + 1] < Character.MIN_LOW_SURROGATE
+	    || value[start + 1] > Character.MAX_LOW_SURROGATE)
+	  {
+	    // Nothing.
+	  }
+	else
+	  {
+	    // Surrogate pair.
+	    ++start;
+	  }
+	++start;
+	++count;
+      }
+    return count;
   }
 
   /**

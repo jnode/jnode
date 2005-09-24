@@ -1,5 +1,6 @@
 /* Integer.java -- object wrapper for int
-   Copyright (C) 1998, 1999, 2001, 2002, 2004, 2005 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2001, 2002, 2004, 2005
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -15,8 +16,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -691,8 +692,8 @@ public final class Integer extends Number implements Comparable<Integer>
    * @throws NullPointerException if decode is true and str if null
    * @see #parseInt(String, int)
    * @see #decode(String)
-   * @see Byte#parseInt(String, int)
-   * @see Short#parseInt(String, int)
+   * @see Byte#parseByte(String, int)
+   * @see Short#parseShort(String, int)
    */
   static int parseInt(String str, int radix, boolean decode)
   {
@@ -702,12 +703,12 @@ public final class Integer extends Number implements Comparable<Integer>
     int len = str.length();
     boolean isNeg = false;
     if (len == 0)
-      throw new NumberFormatException();
+      throw new NumberFormatException("string length is null");
     int ch = str.charAt(index);
     if (ch == '-')
       {
         if (len == 1)
-          throw new NumberFormatException();
+          throw new NumberFormatException("pure '-'");
         isNeg = true;
         ch = str.charAt(++index);
       }
@@ -732,7 +733,7 @@ public final class Integer extends Number implements Comparable<Integer>
           }
       }
     if (index == len)
-      throw new NumberFormatException();
+      throw new NumberFormatException("non terminated number: " + str);
 
     int max = MAX_VALUE / radix;
     // We can't directly write `max = (MAX_VALUE + 1) / radix'.
@@ -744,12 +745,12 @@ public final class Integer extends Number implements Comparable<Integer>
     while (index < len)
       {
 	if (val < 0 || val > max)
-	  throw new NumberFormatException();
+	  throw new NumberFormatException("number overflow (pos=" + index + ") : " + str);
 
         ch = Character.digit(str.charAt(index++), radix);
         val = val * radix + ch;
         if (ch < 0 || (val < 0 && (! isNeg || val != MIN_VALUE)))
-          throw new NumberFormatException();
+          throw new NumberFormatException("invalid character at position " + index + " in " + str);
       }
     return isNeg ? -val : val;
   }

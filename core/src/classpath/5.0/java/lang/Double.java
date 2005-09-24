@@ -16,8 +16,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -38,7 +38,6 @@ exception statement from your version. */
 
 package java.lang;
 
-import gnu.classpath.Configuration;
 
 /**
  * Instances of class <code>Double</code> represent primitive
@@ -91,17 +90,17 @@ public final class Double extends Number implements Comparable<Double>
   public static final double NaN = 0.0 / 0.0;
 
   /**
+   * The number of bits needed to represent a <code>double</code>.
+   * @since 1.5
+   */
+  public static final int SIZE = 64;
+
+ /**
    * The primitive type <code>double</code> is represented by this
    * <code>Class</code> object.
    * @since 1.1
    */
   public static final Class<Double> TYPE = (Class<Double>) VMClassLoader.getPrimitiveClass('D');
-
-  /**
-   * The number of bits needed to represent a <code>double</code>.
-   * @since 1.5
-   */
-  public static final int SIZE = 64;
 
   /**
    * The immutable value of this Double.
@@ -176,6 +175,21 @@ public final class Double extends Number implements Comparable<Double>
   }
 
   /**
+   * Returns a <code>Double</code> object wrapping the value.
+   * In contrast to the <code>Double</code> constructor, this method
+   * may cache some values.  It is used by boxing conversion.
+   *
+   * @param val the value to wrap
+   * @return the <code>Double</code>
+   * @since 1.5
+   */
+  public static Double valueOf(double val)
+  {
+    // We don't actually cache, but we could.
+    return new Double(val);
+  }
+
+ /**
    * Create a new <code>Double</code> object using the <code>String</code>.
    *
    * @param s the <code>String</code> to convert
@@ -188,20 +202,6 @@ public final class Double extends Number implements Comparable<Double>
   public static Double valueOf(String s)
   {
     return new Double(parseDouble(s));
-  }
-
-  /**
-   * Returns a <code>Double</code> object wrapping the value.
-   * In contrast to the <code>Double</code> constructor, this method
-   * may cache some values.  It is used by boxing conversion.
-   *
-   * @param val the value to wrap
-   * @return the <code>Double</code>
-   */
-  public static Double valueOf(double val)
-  {
-    // We don't actually cache, but we could.
-    return new Double(val);
   }
 
   /**
