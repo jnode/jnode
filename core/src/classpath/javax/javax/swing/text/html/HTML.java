@@ -803,7 +803,7 @@ public class HTML
 
     /**
      * The &lt;ol&gt; tag , breaks flow, block tag.
- */
+     */
     public static final Tag OL = new Tag("ol", BREAKS | BLOCK);
 
     /**
@@ -945,22 +945,22 @@ public class HTML
      * This tag is not included into the array, returned by getAllTags().
      * toString() returns 'comment'. HTML reader synthesizes this tag.
      */
-    public static final Tag COMMENT = new Tag("comment", SYNTETIC);
+    public static final Tag COMMENT = new Tag("comment", SYNTHETIC);
 
     /**
      *  All text content is labeled with this tag.
      *  This tag is not included into the array, returned by getAllTags().
      *  toString() returns 'content'. HTML reader synthesizes this tag.
      */
-    public static final Tag CONTENT = new Tag("content", SYNTETIC);
+    public static final Tag CONTENT = new Tag("content", SYNTHETIC);
 
     /**
      * All text content must be in a paragraph element.
      * If a paragraph didn't exist when content was encountered,
      * a paragraph is manufactured.
-     * toString() returns 'implied'. HTML reader synthesizes this tag.
+     * toString() returns 'p-implied'. HTML reader synthesizes this tag.
      */
-    public static final Tag IMPLIED = new Tag("implied", SYNTETIC);
+    public static final Tag IMPLIED = new Tag("p-implied", SYNTHETIC);
     final String name;
     final int flags;
 
@@ -1144,20 +1144,20 @@ public class HTML
      */
     boolean isSyntetic()
     {
-      return (flags & SYNTETIC) != 0;
-  }
+      return (flags & SYNTHETIC) != 0;
+    }
 
     private static void unexpected(Exception ex)
                             throws Error
-  {
+    {
       throw new Error("This should never happen, report a bug", ex);
     }
   }
 
-    /**
+  /**
    * Represents an unknown HTML tag.
    * @author Mark Wielaard (mark@klomp.org)
-     */
+   */
   public static class UnknownTag
     extends Tag
     implements Serializable
@@ -1185,7 +1185,7 @@ public class HTML
   static final int BREAKS = 1;
   static final int BLOCK = 2;
   static final int PREFORMATTED = 4;
-  static final int SYNTETIC = 8;
+  static final int SYNTHETIC = 8;
   private static Map tagMap;
   private static Map attrMap;
 
@@ -1299,9 +1299,9 @@ public class HTML
         Tag[] tags = getAllTags();
 
         for (int i = 0; i < tags.length; i++)
-    {
+          {
             tagMap.put(tags [ i ].toString(), tags [ i ]);
-    }
+          }
       }
 
     return (Tag) tagMap.get(tagName.toLowerCase());

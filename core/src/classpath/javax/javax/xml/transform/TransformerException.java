@@ -47,9 +47,11 @@ import java.io.PrintWriter;
 public class TransformerException
   extends Exception
 {
+  private static final long serialVersionUID = 975798773772956428L;
 
+  // Field names fixed by serialization spec.
   private SourceLocator  locator;
-  private Throwable  cause;
+  private Throwable  containedException;
 
   /**
    * Constructor with a detail message.
@@ -57,7 +59,7 @@ public class TransformerException
   public TransformerException(String msg)
   {
     this(msg, null, null);
-	}
+  }
 
   /**
    * Constructor with an underlying cause.
@@ -65,7 +67,7 @@ public class TransformerException
   public TransformerException(Throwable cause)
   {
     this(cause.getMessage(), null, cause);
-	}
+  }
 
   /**
    * Constructor with a detail message and underlying cause.
@@ -73,7 +75,7 @@ public class TransformerException
   public TransformerException(String msg, Throwable cause)
   {
     this(msg, null, cause);
-	}
+  }
 
   /**
    * Constructor with a detail message and locator.
@@ -81,54 +83,54 @@ public class TransformerException
   public TransformerException(String msg, SourceLocator locator)
   {
     this(msg, locator, null);
-	}
+  }
 
   /**
    * Constructor with detail message, locator and underlying cause.
    */
-	public TransformerException(String msg, SourceLocator locator, 
+  public TransformerException(String msg, SourceLocator locator, 
                               Throwable cause)
   {
-		super(msg);
+    super(msg);
     this.locator = locator;
     if (cause != null)
       {
         initCause(cause);
-        this.cause = cause;
+        this.containedException = cause;
       }
-	}
+  }
 
-	/**
+  /**
    * Returns a locator indicating where the error occurred.
-	 */
+   */
   public SourceLocator getLocator()
   {
     return locator;
-	}
+  }
 
-	/**
+  /**
    * Sets the locator indicating where the error occurred.
-	 */
+   */
   public void setLocator(SourceLocator location)
   {
     locator = location;
-	}
+  }
 
-	/**
+  /**
    * Returns the underlying cause of this exception.
-	 */
+   */
   public Throwable getException()
   {
-    return cause;
-	    }
+    return containedException;
+  }
 
   /**
    * Returns the underlying cause of this exception.
    */
   public Throwable getCause()
   {
-    return cause;
-	    }
+    return containedException;
+  }
 
   /**
    * Initializes the root cause of this exception.
@@ -143,36 +145,36 @@ public class TransformerException
    */
   public Throwable initCause(Throwable cause)
   {
-    if (this.cause != null)
+    if (this.containedException != null)
       {
         throw new IllegalStateException();
-	    }
+      }
     if (cause == this)
       {
         throw new IllegalArgumentException();
-	}
-    this.cause = cause;
+      }
+    this.containedException = cause;
     return this;
-	}
+  }
 
-	/**
+  /**
    * Returns the exception message with location information appended.
-	 */
+   */
   public String getMessageAndLocation()
   {
     return (locator == null) ? getMessage() :
       getMessage() + ": " + getLocationAsString();
-	}
+  }
 
-	/**
+  /**
    * Returns the location information as a string.
-	 */
+   */
   public String getLocationAsString()
   {
     if (locator == null)
       {
         return null;
-	}
+      }
     String publicId = locator.getPublicId();
     String systemId = locator.getSystemId();
     int lineNumber = locator.getLineNumber();
@@ -221,21 +223,21 @@ public class TransformerException
   public void printStackTrace(PrintStream s)
   {
     super.printStackTrace(s);
-    if (cause != null)
+    if (containedException != null)
       {
         s.print("caused by ");
-        cause.printStackTrace(s);
-	}
-	}
+        containedException.printStackTrace(s);
+      }
+  }
 
   public void printStackTrace(PrintWriter s)
   {
     super.printStackTrace(s);
-    if (cause != null)
+    if (containedException != null)
       {
         s.print("caused by ");
-        cause.printStackTrace(s);
-		}
-	}
+        containedException.printStackTrace(s);
+      }
+  }
 
 }

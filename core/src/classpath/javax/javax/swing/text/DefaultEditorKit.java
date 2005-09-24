@@ -1,4 +1,4 @@
-/* DefaultEditorKit.java -- 
+/* DefaultEditorKit.java --
    Copyright (C) 2002, 2004, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -66,8 +66,7 @@ public class DefaultEditorKit extends EditorKit
    *
    * @see Toolkit#beep()
    */
-  public static class BeepAction
-    extends TextAction
+  public static class BeepAction extends TextAction
   {
     /**
      * Creates a new <code>BeepAction</code>.
@@ -95,8 +94,7 @@ public class DefaultEditorKit extends EditorKit
    * @see CutAction
    * @see PasteAction
    */
-  public static class CopyAction 
-    extends TextAction
+  public static class CopyAction extends TextAction
   {
 
     /**
@@ -128,8 +126,7 @@ public class DefaultEditorKit extends EditorKit
    * @see CopyAction
    * @see PasteAction
    */
-  public static class CutAction 
-    extends TextAction
+  public static class CutAction extends TextAction
   {
 
     /**
@@ -159,8 +156,7 @@ public class DefaultEditorKit extends EditorKit
    * @see CopyAction
    * @see CutAction
    */
-  public static class PasteAction 
-    extends TextAction
+  public static class PasteAction extends TextAction
   {
 
     /**
@@ -243,8 +239,7 @@ public class DefaultEditorKit extends EditorKit
    * of the text component. This is typically triggered by hitting
    * ENTER on the keyboard.
    */
-  public static class InsertBreakAction 
-    extends TextAction
+  public static class InsertBreakAction extends TextAction
   {
 
     /**
@@ -273,8 +268,7 @@ public class DefaultEditorKit extends EditorKit
    */
   // FIXME: Figure out what this Action is supposed to do. Obviously text
   // that is entered by the user is inserted through DefaultKeyTypedAction.
-  public static class InsertContentAction 
-    extends TextAction
+  public static class InsertContentAction extends TextAction
   {
 
     /**
@@ -298,8 +292,7 @@ public class DefaultEditorKit extends EditorKit
   /**
    * Inserts a TAB character into the text editor.
    */
-  public static class InsertTabAction 
-    extends TextAction
+  public static class InsertTabAction extends TextAction
   {
 
     /**
@@ -325,7 +318,7 @@ public class DefaultEditorKit extends EditorKit
    * The serial version of DefaultEditorKit.
    */
   private static final long serialVersionUID = 9017245433028523428L;
-  
+
   /**
    * The name of the <code>Action</code> that moves the caret one character
    * backwards.
@@ -819,9 +812,9 @@ public class DefaultEditorKit extends EditorKit
    * @return the <code>Caret</code> for this <code>EditorKit</code>
    */
   public Caret createCaret()
-    {
+  {
     return new DefaultCaret();
-    }
+  }
 
   /**
    * Creates the default {@link Document} that this <code>EditorKit</code>
@@ -831,9 +824,9 @@ public class DefaultEditorKit extends EditorKit
    *         supports
    */
   public Document createDefaultDocument()
-    {
-        return new PlainDocument();
-    }
+  {
+    return new PlainDocument();
+  }
 
   /**
    * Returns the <code>Action</code>s supported by this <code>EditorKit</code>.
@@ -841,9 +834,9 @@ public class DefaultEditorKit extends EditorKit
    * @return the <code>Action</code>s supported by this <code>EditorKit</code>
    */
   public Action[] getActions()
-    {
+  {
     return defaultActions;
-    }
+  }
 
   /**
    * Returns the content type that this <code>EditorKit</code> supports.
@@ -853,10 +846,10 @@ public class DefaultEditorKit extends EditorKit
    * @return the content type that this <code>EditorKit</code> supports
    */
   public String getContentType()
-    {
-	return "text/plain";
-    }
-    
+  {
+    return "text/plain";
+  }
+
   /**
    * Returns a {@link ViewFactory} that is able to create {@link View}s for
    * the <code>Element</code>s that are used in this <code>EditorKit</code>'s
@@ -868,9 +861,9 @@ public class DefaultEditorKit extends EditorKit
    *         <code>EditorKit</code>'s model
    */
   public ViewFactory getViewFactory()
-    {
-	return null;
-    }
+  {
+    return null;
+  }
 
   /**
    * Reads a document of the supported content type from an {@link InputStream}
@@ -887,9 +880,9 @@ public class DefaultEditorKit extends EditorKit
    */
   public void read(InputStream in, Document document, int offset)
     throws BadLocationException, IOException
-    {
+  {
     read(new InputStreamReader(in), document, offset);
-    }
+  }
 
   /**
    * Reads a document of the supported content type from a {@link Reader}
@@ -906,7 +899,7 @@ public class DefaultEditorKit extends EditorKit
    */
   public void read(Reader in, Document document, int offset)
     throws BadLocationException, IOException
-    {
+  {
     BufferedReader reader = new BufferedReader(in);
 
     String line;
@@ -914,13 +907,13 @@ public class DefaultEditorKit extends EditorKit
 
     while ((line = reader.readLine()) != null)
       {
-      content.append(line);
+	content.append(line);
 	content.append("\n");
       }
     
     document.insertString(offset, content.toString(),
 			  SimpleAttributeSet.EMPTY);
-    }
+  }
 
   /**
    * Writes the <code>Document</code> (or a fragment of the
@@ -940,9 +933,9 @@ public class DefaultEditorKit extends EditorKit
    */
   public void write(OutputStream out, Document document, int offset, int len)
     throws BadLocationException, IOException
-    {
+  {
     write(new OutputStreamWriter(out), document, offset, len);
-    }
+  }
 
   /**
    * Writes the <code>Document</code> (or a fragment of the
@@ -954,15 +947,23 @@ public class DefaultEditorKit extends EditorKit
    * @param offset the beginning offset from where to write
    * @param len the length of the fragment to write
    *
-   * @throws BadLocationException if <code>offset</code> or
-   *         <code>offset + len</code>is an invalid location inside
-   *         <code>document</code>
+   * @throws BadLocationException if <code>offset</code> is an 
+   * invalid location inside <code>document</code>.
    * @throws IOException if something goes wrong while writing to
    *        <code>out</code>
    */
   public void write(Writer out, Document document, int offset, int len)
-    throws BadLocationException, IOException
-    {
-    // TODO: Implement this properly.
-    }
+      throws BadLocationException, IOException
+  {
+    // Throw a BLE if offset is invalid
+    if (offset < 0 || offset > document.getLength())
+      throw new BadLocationException("Tried to write to invalid location",
+                                     offset);
+
+    // If they gave an overly large len, just adjust it
+    if (offset + len > document.getLength())
+      len = document.getLength() - offset;
+
+    out.write(document.getText(offset, len));
+  }
 }

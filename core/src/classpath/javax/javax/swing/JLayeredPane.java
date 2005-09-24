@@ -40,12 +40,15 @@ package javax.swing;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Graphics;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
 import javax.accessibility.Accessible;
+import javax.accessibility.AccessibleContext;
+import javax.accessibility.AccessibleRole;
 
 /**
  * A container that adds depth to the usual <code>Container</code> semantics.
@@ -116,6 +119,30 @@ import javax.accessibility.Accessible;
  */
 public class JLayeredPane extends JComponent implements Accessible
 {
+  
+  /**
+   * Provides accessibility support for <code>JLayeredPane</code>.
+   */
+  protected class AccessibleJLayeredPane extends AccessibleJComponent
+  {
+    /**
+     * Creates a new instance of <code>AccessibleJLayeredPane</code>.
+     */
+    public AccessibleJLayeredPane()
+    {
+      // Nothing to do here.
+    }
+
+    /**
+     * Returns the accessble role of <code>JLayeredPane</code>,
+     * {@link AccessibleRole#LAYERED_PANE}. 
+     */
+    public AccessibleRole getAccessibleRole()
+    {
+      return AccessibleRole.LAYERED_PANE;
+    }
+  }
+
   private static final long serialVersionUID = 5534920399324590459L;
   
   public static final String LAYER_PROPERTY = "layeredContainerLayer";
@@ -135,8 +162,8 @@ public class JLayeredPane extends JComponent implements Accessible
   {
     layers = new TreeMap ();
     componentToLayer = new Hashtable ();
+    setLayout(null);
   }
-
 
   /** 
    * Looks up the layer a child component is currently assigned to.
@@ -374,26 +401,26 @@ public class JLayeredPane extends JComponent implements Accessible
     int layer = getLayer (c);
     int[] range = layerToRange(new Integer(layer));
     if (range[0] == range[1])
-	    throw new IllegalArgumentException ();
+      throw new IllegalArgumentException ();
 
     int top = range[0];
     int bot = range[1];
     if (position == -1)
-	    position = (bot - top) - 1;
+      position = (bot - top) - 1;
     int targ = Math.min(top + position, bot-1);
     int curr = -1;
 
     Component[] comps = getComponents();
     for (int i = top; i < bot; ++i)
-	    {
+      {
         if (comps[i] == c)
           {
             curr = i;
             break;
           }
-	    }
+      }
     if (curr == -1)
-	    // should have found it
+      // should have found it
       throw new IllegalArgumentException();
 
     super.swapComponents (curr, targ);
@@ -546,26 +573,14 @@ public class JLayeredPane extends JComponent implements Accessible
    *
    * @param index the index of the child component to remove.
    */
-  public void remove (int index)
+  public void remove(int index)
   {
-    Component c = getComponent (index);
-    int layer = getLayer (c);
-    decrLayer (new Integer(layer));
-    componentToLayer.remove (c);
-    super.remove (index);
+    Component c = getComponent(index);
+    int layer = getLayer(c);
+    decrLayer(new Integer(layer));
+    componentToLayer.remove(c);
+    super.remove(index);
     revalidate();
-    repaint();
-  }
-
-  /**
-   * Removes a child from this container. The child is specified directly.
-   * After removal, the child no longer occupies a layer.
-   *
-   * @param comp the child to remove.
-   */
-  public void remove (Component comp)
-  {
-    remove (getIndexOf (comp));
   }
 
   /**
@@ -641,5 +656,34 @@ public class JLayeredPane extends JComponent implements Accessible
   public static void putLayer(JComponent component, int layer)
   {
     getLayeredPaneAbove(component).setLayer(component, layer);
+  }
+
+  /**
+   * Returns the accessible context for this <code>JLayeredPane</code>.
+   *
+   * @return the accessible context for this <code>JLayeredPane</code>
+   */
+  public AccessibleContext getAccessibleContext()
+  {
+    if (accessibleContext == null)
+      accessibleContext = new AccessibleJLayeredPane();
+    return accessibleContext;
+  }
+
+  /**
+   * This method is overridden order to provide a reasonable painting
+   * mechanism for <code>JLayeredPane</code>. This is necessary since
+   * <code>JLayeredPane</code>'s do not have an own UI delegate.
+   *
+   * Basically this method clears the background for the
+   * <code>JLayeredPane</code> and then calls <code>super.paint(g)</code>.
+   *
+   * @param g the graphics context to use
+   */
+  public void paint(Graphics g)
+  {
+    g.setColor(getBackground());
+    g.fillRect(0, 0, getWidth(), getHeight());
+    super.paint(g);
   }
 }

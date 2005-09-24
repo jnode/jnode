@@ -80,23 +80,27 @@ public class RepaintManager
    * swing paint thread, which revalidates all invalid components and
    * repaints any damage in the swing scene.</p>
    */
-
   protected class RepaintWorker
     implements Runnable
   {
+
     boolean live;
+
     public RepaintWorker()
     {
       live = false;
     }
+
     public synchronized void setLive(boolean b) 
     {
       live = b;
     }
+
     public synchronized boolean isLive()
     {
       return live;
     }
+
     public void run()
     {
       RepaintManager rm = RepaintManager.globalManager;
@@ -104,9 +108,9 @@ public class RepaintManager
       rm.validateInvalidComponents();
       rm.paintDirtyRegions();
     }
+
   }
 
-  
   /** 
    * A table storing the dirty regions of components.  The keys of this
    * table are components, the values are rectangles. Each component maps
@@ -118,10 +122,10 @@ public class RepaintManager
    * @see #isCompletelyDirty
    * @see #markCompletelyClean
    * @see #markCompletelyDirty
-	 */
-	Hashtable dirtyComponents;
+   */
+  Hashtable dirtyComponents;
 
-	/**
+  /**
    * A single, shared instance of the helper class. Any methods which mark
    * components as invalid or dirty eventually activate this instance. It
    * is added to the event queue if it is not already active, otherwise
@@ -141,30 +145,30 @@ public class RepaintManager
    * @see #addInvalidComponent
    * @see #removeInvalidComponent
    * @see #validateInvalidComponents
-	 */
-	Vector invalidComponents;
+   */
+  Vector invalidComponents;
 
-	/**
+  /** 
    * Whether or not double buffering is enabled on this repaint
    * manager. This is merely a hint to clients; the RepaintManager will
    * always return an offscreen buffer when one is requested.
    * 
    * @see #getDoubleBufferingEnabled
    * @see #setDoubleBufferingEnabled
-	 */
-	boolean doubleBufferingEnabled;
+   */
+  boolean doubleBufferingEnabled;
 
-	/**
+  /** 
    * The current offscreen buffer. This is reused for all requests for
    * offscreen drawing buffers. It grows as necessary, up to {@link
    * #doubleBufferMaximumSize}, but there is only one shared instance.
    *
    * @see #getOffscreenBuffer
    * @see #doubleBufferMaximumSize
-	 */
-	Image doubleBuffer;
+   */
+  Image doubleBuffer;
 
-	/**
+  /**
    * The maximum width and height to allocate as a double buffer. Requests
    * beyond this size are ignored.
    *
@@ -265,7 +269,7 @@ public class RepaintManager
         && ancestor instanceof JComponent
         && ((JComponent) ancestor).isValidateRoot())
       component = (JComponent) ancestor;
-    
+
     if (invalidComponents.contains(component))
       return;
 
@@ -458,7 +462,7 @@ public class RepaintManager
         Map.Entry ent = (Map.Entry) i.next();
         JRootPane root = (JRootPane) ent.getKey();
         Rectangle rect = (Rectangle) ent.getValue();
-        root.paintImmediately(rect);                
+        root.paintImmediately(rect);                	
       }
   }
 

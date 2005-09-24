@@ -56,13 +56,15 @@ public class ViewportLayout implements LayoutManager, Serializable
 
   public ViewportLayout() 
   {
-	}
+  }
+
   public void addLayoutComponent(String name, Component c) 
   {
-	}
+  }
+
   public void removeLayoutComponent(Component c) 
   {
-	}
+  }
 
   public Dimension preferredLayoutSize(Container parent) 
   {
@@ -72,21 +74,21 @@ public class ViewportLayout implements LayoutManager, Serializable
       {
         if (view instanceof Scrollable)
           return ((Scrollable)view).getPreferredScrollableViewportSize();
-      return view.getPreferredSize();
+        return view.getPreferredSize();
       }
     else
       return new Dimension();
-	}
+  }
 
   public Dimension minimumLayoutSize(Container parent) 
-            {
+  {
     JViewport vp = (JViewport)parent;
     Component view = vp.getView();
     if (view != null)
-    return view.getMinimumSize();
+      return view.getMinimumSize();
     else
       return new Dimension();
-            }
+  }
 
   /**
    * Layout the view and viewport to respect the following rules. These are
@@ -124,7 +126,7 @@ public class ViewportLayout implements LayoutManager, Serializable
 
     JViewport port = (JViewport) parent;    
     Component view = port.getView();
-
+    
     if (view == null)
       return;
 
@@ -144,7 +146,7 @@ public class ViewportLayout implements LayoutManager, Serializable
       {
         portBounds.y = 0;
         if ( !(view instanceof Scrollable) || ((Scrollable)view).getScrollableTracksViewportHeight())
-        viewPref.height = portBounds.height;
+          viewPref.height = portBounds.height;
       }
     else
       {
@@ -159,7 +161,7 @@ public class ViewportLayout implements LayoutManager, Serializable
       {
         portBounds.x = 0;
         if ( !(view instanceof Scrollable) || ((Scrollable)view).getScrollableTracksViewportWidth())
-        viewPref.width = portBounds.width;
+          viewPref.width = portBounds.width;
       }
     else
       {
@@ -171,5 +173,5 @@ public class ViewportLayout implements LayoutManager, Serializable
 
     port.setViewPosition(portBounds.getLocation());
     port.setViewSize(viewPref);
-	}
+  }
 }

@@ -45,49 +45,45 @@ import java.awt.event.MouseEvent;
  * Defines the methods that any menu element in a {@link JMenu} must
  * implement.
  *
- * @author	Andrew Selkirk
+ * @author Andrew Selkirk
  */
-public interface MenuElement {
+public interface MenuElement
+{
 
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * processMouseEvent
+   * @param event TODO
+   * @param path TODO
+   * @param manager TODO
+   */
+  void processMouseEvent(MouseEvent event, MenuElement[] path,
+                         MenuSelectionManager manager);
 
-	/**
-	 * processMouseEvent
-	 * @param event TODO
-	 * @param path TODO
-	 * @param manager TODO
-	 */
-	void processMouseEvent(MouseEvent event,
-			MenuElement[] path, MenuSelectionManager manager);
+  /**
+   * processKeyEvent
+   * @param event TODO
+   * @param path TODO
+   * @param manager TODO
+   */
+  void processKeyEvent(KeyEvent event, MenuElement[] path,
+                       MenuSelectionManager manager);
 
-	/**
-	 * processKeyEvent
-	 * @param event TODO
-	 * @param path TODO
-	 * @param manager TODO
-	 */
-	void processKeyEvent(KeyEvent event, 
-			MenuElement[] path, MenuSelectionManager manager);
+  /**
+   * menuSelectionChanged
+   * @param included TODO
+   */
+  void menuSelectionChanged(boolean included);
 
-	/**
-	 * menuSelectionChanged
-	 * @param included TODO
-	 */
-	void menuSelectionChanged(boolean included);
+  /**
+   * getSubElements
+   * @returns MenuElement[]
+   */
+  MenuElement[] getSubElements();
 
-	/**
-	 * getSubElements
-	 * @returns MenuElement[]
-	 */
-	MenuElement[] getSubElements();
+  /**
+   * getComponent
+   * @returns Component
+   */
+  Component getComponent();
 
-	/**
-	 * getComponent
-	 * @returns Component
-	 */
-	Component getComponent();
-
-
-} // MenuElement
+}

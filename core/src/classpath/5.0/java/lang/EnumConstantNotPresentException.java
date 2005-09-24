@@ -1,5 +1,6 @@
-/* BasicPasswordFieldUI.java
-   Copyright (C) 2004  Free Software Foundation, Inc.
+/* EnumConstantNotPresentException.java -- thrown when enum constant
+   not available
+   Copyright (C) 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -36,38 +37,58 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package javax.swing.plaf.basic;
+package java.lang;
 
-import javax.swing.JComponent;
-import javax.swing.UIDefaults;
-import javax.swing.plaf.ComponentUI;
-import javax.swing.text.Element;
-import javax.swing.text.PasswordView;
-import javax.swing.text.View;
-
-public class BasicPasswordFieldUI extends BasicTextFieldUI
+/**
+ * An exception of this type is thrown when a symbolic reference is
+ * made to an enum constant which does not exist.
+ *
+ * @author Tom Tromey (tromey@redhat.com)
+ * @since 1.5
+ */
+public class EnumConstantNotPresentException extends RuntimeException
 {
-  public BasicPasswordFieldUI()
-  {
-  }
+  /**
+   * The enum's type.  Note that the name is fixed by the
+   * serialization spec.
+   */
+  private Class<? extends Enum> enumType;
 
-  public View create(Element elem)
+  /**
+   * The name of the missing enum constant.  Note that the name is
+   * fixed by the serialization spec.
+   */
+  private String constantName;
+
+  /**
+   * Create a new EnumConstantNotPresentException with the indicated
+   * enum type and enum constant name.
+   * @param theEnum the enum's class
+   * @param name the name of the missing enum constant
+   */
+  public EnumConstantNotPresentException(Class<? extends Enum> theEnum,
+					 String name)
   {
-    return new PasswordView(elem);
-  }
-  
-  public static ComponentUI createUI(JComponent c)
-  {
-    return new BasicPasswordFieldUI();
+    super("enum " + theEnum + " is missing the constant " + name);
+    enumType = theEnum;
+    constantName = name;
   }
 
   /**
-   * Returns the prefix for entries in the {@link UIDefaults} table.
-   *
-   * @return "PasswordField"
+   * Return the name of the missing constant.
+   * @return the name of the missing constant
    */
-  protected String getPropertyPrefix()
+  public String constantName()
   {
-    return "PasswordField";
+    return constantName;
+  }
+
+  /**
+   * Return the enum type which is missing a constant.
+   * @return the enum type which is missing a constant
+   */
+  public Class<? extends Enum> enumType()
+  {
+    return enumType;
   }
 }

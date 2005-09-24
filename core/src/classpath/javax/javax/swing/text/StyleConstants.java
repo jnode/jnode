@@ -83,7 +83,7 @@ public class StyleConstants
   public static final Object ResolveAttribute = new StyleConstants("resolver");
 
   String keyname;
-  
+
   // Package-private to avoid accessor constructor for use by
   // subclasses.
   StyleConstants(String k) 
@@ -109,7 +109,7 @@ public class StyleConstants
     if (a.isDefined(Background))
       return (Color) a.getAttribute(Background);
     else
-      return Color.BLACK;
+      return Color.WHITE;
   } 
   
   public static int getBidiLevel(AttributeSet a)

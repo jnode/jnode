@@ -50,6 +50,7 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
+import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.MenuElement;
 import javax.swing.UIDefaults;
@@ -69,13 +70,13 @@ public class BasicMenuBarUI extends MenuBarUI
 
   /*ContainerListener that listens to the ContainerEvents fired from menu bar*/
   protected ContainerListener containerListener;
-
+  
   /*Property change listeners that listener to PropertyChangeEvent from menu bar*/
   protected PropertyChangeListener propertyChangeListener;
 
   /* menu bar for which this UI delegate is for*/
   protected JMenuBar menuBar;
-
+  
   /* MouseListener that listens to the mouseEvents fired from menu bar*/
   private MouseInputListener mouseListener;
 
@@ -308,9 +309,9 @@ public class BasicMenuBarUI extends MenuBarUI
     public void propertyChange(PropertyChangeEvent e)
     {
       if (e.getPropertyName().equals("borderPainted"))
-	menuBar.repaint();
+        menuBar.repaint();
       if (e.getPropertyName().equals("margin"))
-	menuBar.repaint();
+        menuBar.repaint();
     }
   }
   
@@ -326,7 +327,11 @@ public class BasicMenuBarUI extends MenuBarUI
       MenuElement[] me = menuBar.getSubElements();
       
       for (int i = 0; i < me.length; i++)
-        menuBar.getMenu(i).setSelected(false);
+        {
+          JMenu menu = menuBar.getMenu(i);
+          if (menu != null)
+            menu.setSelected(false);
+        }
     }
     
     /**

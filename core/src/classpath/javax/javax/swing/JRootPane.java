@@ -42,6 +42,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.IllegalComponentStateException;
 import java.awt.LayoutManager;
 import java.awt.LayoutManager2;
 import java.io.Serializable;
@@ -62,7 +63,7 @@ import javax.swing.plaf.RootPaneUI;
  */
 public class JRootPane extends JComponent implements Accessible
 {
-    //  The class used to obtain the accessible role for this object.
+  //  The class used to obtain the accessible role for this object.
   protected class AccessibleJRootPane extends AccessibleJComponent
   {
     /**
@@ -76,7 +77,7 @@ public class JRootPane extends JComponent implements Accessible
     protected AccessibleJRootPane()
     {
     }
-  
+
     /**
      * DOCUMENT ME!
      *
@@ -88,8 +89,8 @@ public class JRootPane extends JComponent implements Accessible
     }
   }
 
-    // Custom Layout Manager for JRootPane. It positions contentPane and 
-    // menuBar withing its layeredPane.
+  // Custom Layout Manager for JRootPane. It positions contentPane and 
+  // menuBar withing its layeredPane.
   protected class RootLayout implements LayoutManager2, Serializable
   {
     /** DOCUMENT ME! */
@@ -101,16 +102,16 @@ public class JRootPane extends JComponent implements Accessible
     protected RootLayout()
     {
     }
-    
+
     /**
      * DOCUMENT ME!
      *
      * @param comp DOCUMENT ME!
      * @param constraints DOCUMENT ME!
      */
-      public void addLayoutComponent(Component comp, Object constraints)
-	{	    
-	}        
+    public void addLayoutComponent(Component comp, Object constraints)
+    {
+    }
 
     /**
      * DOCUMENT ME!
@@ -118,21 +119,9 @@ public class JRootPane extends JComponent implements Accessible
      * @param name DOCUMENT ME!
      * @param comp DOCUMENT ME!
      */
-      public void addLayoutComponent(String name, Component comp)
-      {
+    public void addLayoutComponent(String name, Component comp)
+    {
     }
-  
-    /**
-     * DOCUMENT ME!
-     *
-     * @param target DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-      public float getLayoutAlignmentX(Container target)
-      {
-        return target.getAlignmentX();
-      }
 
     /**
      * DOCUMENT ME!
@@ -141,115 +130,118 @@ public class JRootPane extends JComponent implements Accessible
      *
      * @return DOCUMENT ME!
      */
-      public float getLayoutAlignmentY(Container target)
-      {
-        return target.getAlignmentY();
-      }
-  
+    public float getLayoutAlignmentX(Container target)
+    {
+      return target.getAlignmentX();
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param target DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public float getLayoutAlignmentY(Container target)
+    {
+      return target.getAlignmentY();
+    }
+
     /**
      * DOCUMENT ME!
      *
      * @param target DOCUMENT ME!
      */
-      public void invalidateLayout(Container target)
-      {
-      }
-  
+    public void invalidateLayout(Container target)
+    {
+    }
+
     /**
      * DOCUMENT ME!
      *
      * @param c DOCUMENT ME!
      */
-      public void layoutContainer(Container c)
-      {
-        Dimension menuBarSize;
-        Dimension containerSize = c.getSize(null);
-        Dimension contentPaneSize = contentPane.getPreferredSize();
-  
-        /*
-         if size of top-level window wasn't set then just set
-         contentPane and menuBar to its preferred sizes.
-         Otherwise, if the size of top-level window was specified then
-         set menuBar to its preferred size and make content pane
-         to fit into the remaining space
-  
+    public void layoutContainer(Container c)
+    {
+      Dimension menuBarSize;
+      int containerWidth = c.getBounds().width - getInsets().left
+                           - getInsets().right;
+      int containerHeight = c.getBounds().height - getInsets().top
+                            - getInsets().bottom;
+      Dimension contentPaneSize = contentPane.getPreferredSize();
 
-         +-------------------------------+
-         |  JLayeredPane                 |  
-         |  +--------------------------+ |
-         |  | menuBar                  | |
-         |  +--------------------------+ |
-         |  +--------------------------+ |
-         |  |contentPane               | |
-         |  |                          | |
-         |  |                          | |
-         |  |                          | |
-         |  +--------------------------+ |
-         +-------------------------------+
-
-        */
-        if (containerSize.width == 0 && containerSize.height == 0)
-          {
-	      if (menuBar != null)
-	      {
-	        int maxWidth;
-	        menuBarSize = menuBar.getPreferredSize();
-	        maxWidth = Math.max(menuBarSize.width, contentPaneSize.width);
-	        menuBar.setBounds(0, 0, maxWidth, menuBarSize.height);
-	      glassPane.setBounds(0, menuBarSize.height, maxWidth,
-	                          contentPaneSize.height);
-	        contentPane.setBounds(0, menuBarSize.height, maxWidth,
-	                              contentPaneSize.height);
-	        layeredPane.setSize(maxWidth,
-	                            menuBarSize.height + contentPaneSize.height);
-	      }
-	    else
-	      {
-	      glassPane.setBounds(0, 0, contentPaneSize.width,
-	                          contentPaneSize.height);
-	        contentPane.setBounds(0, 0, contentPaneSize.width,
-	                              contentPaneSize.height);
-	        layeredPane.setSize(contentPaneSize.width, contentPaneSize.height);
-	      }
-          }
-        else
-          {
-	    if (menuBar != null)
-	      {
-	        menuBarSize = menuBar.getPreferredSize();
-	        if (menuBarSize.height > containerSize.height)
-		   menuBarSize.height = containerSize.height;
-	        menuBar.setBounds(0, 0, containerSize.width, menuBarSize.height);
-	        int remainingHeight = containerSize.height - menuBarSize.height;
-	      glassPane.setBounds(0, menuBarSize.height, containerSize.width,
-	                          containerSize.height - menuBarSize.height);
-	        contentPane.setBounds(0, menuBarSize.height,
-	                              containerSize.width,
-	                              (containerSize.height - menuBarSize.height));
-	      }
-	    else
-	    {
-	      glassPane.setBounds(0, 0, containerSize.width,
-	                          containerSize.height);
-	      contentPane.setBounds(0, 0, containerSize.width,
-	                            containerSize.height);
-	    }
-
-	    layeredPane.setSize(containerSize.width, containerSize.height);
-          }
-      }
+      // 1. the glassPane fills entire viewable region (bounds - insets).
+      // 2. the layeredPane filles entire viewable region.
+      // 3. the menuBar is positioned at the upper edge of layeredPane.
+      // 4. the contentPane fills viewable region minus menuBar, if present.
       
-    /**
-     * DOCUMENT ME!
-     *
-     * @param target DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-      public Dimension maximumLayoutSize(Container target)
-      {
-        return preferredLayoutSize(target);
-      }
+      /*
+       if size of top-level window wasn't set then just set
+       contentPane and menuBar to its preferred sizes.
+       Otherwise, if the size of top-level window was specified then
+       set menuBar to its preferred size and make content pane
+       to fit into the remaining space
+
+
+       +-------------------------------+
+       |  JLayeredPane                 |
+       |  +--------------------------+ |
+       |  | menuBar                  | |
+       |  +--------------------------+ |
+       |  +--------------------------+ |
+       |  |contentPane               | |
+       |  |                          | |
+       |  |                          | |
+       |  |                          | |
+       |  +--------------------------+ |
+       +-------------------------------+
+
+      */
+      if (containerWidth == 0 && containerHeight == 0)
+        {
+          if (menuBar != null)
+            {
+              int maxWidth;
+              menuBarSize = menuBar.getPreferredSize();
+              maxWidth = Math.max(menuBarSize.width, contentPaneSize.width);
+              menuBar.setBounds(0, 0, maxWidth, menuBarSize.height);
+              glassPane.setBounds(0, 0, maxWidth, menuBarSize.height
+                                                  + contentPaneSize.height);
+              contentPane.setBounds(0, menuBarSize.height, maxWidth,
+                                    contentPaneSize.height);
+              layeredPane.setBounds(0, 0, maxWidth, menuBarSize.height
+                                                    + contentPaneSize.height);
+            }
+          else
+            {
+              glassPane.setBounds(0, 0, contentPaneSize.width,
+                                  contentPaneSize.height);
+              contentPane.setBounds(0, 0, contentPaneSize.width,
+                                    contentPaneSize.height);
+              layeredPane.setBounds(0, 0, contentPaneSize.width,
+                                    contentPaneSize.height);
+            }
+        }
+      else
+        {
+          if (menuBar != null)
+            {
+              menuBarSize = menuBar.getPreferredSize();
+              if (menuBarSize.height > containerHeight)
+                menuBarSize.height = containerHeight;
+              menuBar.setBounds(0, 0, containerWidth, menuBarSize.height);
+              glassPane.setBounds(0, 0, containerWidth, containerHeight);
+              contentPane.setBounds(0, menuBarSize.height, containerWidth,
+                                    (containerHeight - menuBarSize.height));
+            }
+          else
+            {
+              glassPane.setBounds(0, 0, containerWidth, containerHeight);
+              contentPane.setBounds(0, 0, containerWidth, containerHeight);
+            }
+          layeredPane.setBounds(0, 0, containerWidth, containerHeight);
+        }
+    }
 
     /**
      * DOCUMENT ME!
@@ -258,10 +250,22 @@ public class JRootPane extends JComponent implements Accessible
      *
      * @return DOCUMENT ME!
      */
-      public Dimension minimumLayoutSize(Container target)
-      {
-        return preferredLayoutSize(target);
-      }
+    public Dimension maximumLayoutSize(Container target)
+    {
+      return preferredLayoutSize(target);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param target DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public Dimension minimumLayoutSize(Container target)
+    {
+      return preferredLayoutSize(target);
+    }
 
     /**
      * DOCUMENT ME!
@@ -270,44 +274,44 @@ public class JRootPane extends JComponent implements Accessible
      *
      * @return DOCUMENT ME!
      */
-      public Dimension preferredLayoutSize(Container c)
-      {
-        Dimension menuBarSize;
-        Dimension prefSize;
+    public Dimension preferredLayoutSize(Container c)
+    {
+      Dimension menuBarSize;
+      Dimension prefSize;
 
-        Dimension containerSize = c.getSize();
-        Dimension contentPaneSize = contentPane.getPreferredSize();
+      Dimension containerSize = c.getSize();
+      Dimension contentPaneSize = contentPane.getPreferredSize();
 
-        if (containerSize.width == 0 && containerSize.height == 0)
-          {
-	    if (menuBar != null)
-	      {
-	        int maxWidth;
-	        menuBarSize = menuBar.getPreferredSize();
-	        maxWidth = Math.max(menuBarSize.width, contentPaneSize.width);
-	      prefSize = new Dimension(maxWidth,
-	                               contentPaneSize.height
-	                               + menuBarSize.height);
-	      }
-	    else
-	      prefSize = contentPaneSize;
-          }
-        else
-          prefSize = c.getSize();
+      if (containerSize.width == 0 && containerSize.height == 0)
+        {
+          if (menuBar != null)
+            {
+              int maxWidth;
+              menuBarSize = menuBar.getPreferredSize();
+              maxWidth = Math.max(menuBarSize.width, contentPaneSize.width);
+              prefSize = new Dimension(maxWidth,
+                                       contentPaneSize.height
+                                       + menuBarSize.height);
+            }
+          else
+            prefSize = contentPaneSize;
+        }
+      else
+        prefSize = c.getSize();
 
-        return prefSize;
-      }
+      return prefSize;
+    }
 
     /**
      * DOCUMENT ME!
      *
      * @param comp DOCUMENT ME!
      */
-      public void removeLayoutComponent(Component comp)
-      {
-      }
+    public void removeLayoutComponent(Component comp)
+    {
     }
-  
+  }
+
   /** DOCUMENT ME! */
   private static final long serialVersionUID = 8690748000348575668L;
 
@@ -320,21 +324,21 @@ public class JRootPane extends JComponent implements Accessible
   public static final int FILE_CHOOSER_DIALOG = 6;
   public static final int QUESTION_DIALOG = 7;
   public static final int WARNING_DIALOG = 8;
-	  
+          
   /** DOCUMENT ME! */
-    protected  Component glassPane;
+  protected Component glassPane;
 
   /** DOCUMENT ME! */
-    protected  JLayeredPane layeredPane;  
+  protected JLayeredPane layeredPane;
 
   /** DOCUMENT ME! */
-    protected  JMenuBar menuBar;  
+  protected JMenuBar menuBar;
 
   /** DOCUMENT ME! */
-    protected Container contentPane;
+  protected Container contentPane;
 
   protected JButton defaultButton;
-  
+
   /**
    * @since 1.4
    */
@@ -346,14 +350,14 @@ public class JRootPane extends JComponent implements Accessible
    * @param m DOCUMENT ME!
    */
   public void setJMenuBar(JMenuBar m)
-    {  
+  {
     JLayeredPane jlPane = getLayeredPane();
     if (menuBar != null)
       jlPane.remove(menuBar);
-      menuBar = m; 
+    menuBar = m;
     if (menuBar != null)
       jlPane.add(menuBar, JLayeredPane.FRAME_CONTENT_LAYER);
-    }
+  }
 
   /**
    * @deprecated Replaced by <code>setJMenuBar()</code>
@@ -372,7 +376,7 @@ public class JRootPane extends JComponent implements Accessible
   {
     return menuBar;
   }
-    
+
   /**
    * @deprecated Replaced by <code>getJMenuBar()</code>
    */
@@ -390,29 +394,40 @@ public class JRootPane extends JComponent implements Accessible
   {
     return true;
   }
-    
+
   /**
    * DOCUMENT ME!
    *
    * @return DOCUMENT ME!
    */
-    public Container getContentPane()
-    {
-	if (contentPane == null)
-		setContentPane(createContentPane());
-	return contentPane;
-    }
+  public Container getContentPane()
+  {
+    if (contentPane == null)
+      setContentPane(createContentPane());
+    return contentPane;
+  }
 
   /**
-   * DOCUMENT ME!
+   * Sets the JRootPane's content pane.  The content pane should typically be
+   * opaque for painting to work properly.  This method also 
+   * removes the old content pane from the layered pane.
    *
-   * @param p DOCUMENT ME!
+   * @param p the Container that will be the content pane
+   * @throws IllegalComponentStateException if p is null
    */
-    public void setContentPane(Container p)
-    {
-	contentPane = p;    
-	getLayeredPane().add(contentPane, JLayeredPane.FRAME_CONTENT_LAYER);
-    }
+  public void setContentPane(Container p)
+  {
+    if (p == null)
+      throw new IllegalComponentStateException ("cannot " +
+            "have a null content pane");
+    else
+      {
+        if (contentPane != null && contentPane.getParent() == layeredPane)
+          layeredPane.remove(contentPane);
+        contentPane = p;
+        getLayeredPane().add(contentPane, JLayeredPane.FRAME_CONTENT_LAYER);
+      }
+  }
 
   /**
    * DOCUMENT ME!
@@ -422,76 +437,75 @@ public class JRootPane extends JComponent implements Accessible
    * @param index DOCUMENT ME!
    */
   protected void addImpl(Component comp, Object constraints, int index)
-    {
-	super.addImpl(comp, constraints, index);
-    } 
+  {
+    super.addImpl(comp, constraints, index);
+  }
 
   /**
    * DOCUMENT ME!
    *
    * @return DOCUMENT ME!
    */
-    public Component getGlassPane() 
-    {
-	if (glassPane == null)
-	    setGlassPane(createGlassPane());
-	return glassPane;    
-    }
+  public Component getGlassPane()
+  {
+    if (glassPane == null)
+      setGlassPane(createGlassPane());
+    return glassPane;
+  }
 
   /**
    * DOCUMENT ME!
    *
    * @param f DOCUMENT ME!
    */
-    public void setGlassPane(Component f)
-    {
-	if (glassPane != null)
-	    remove(glassPane);
+  public void setGlassPane(Component f)
+  {
+    if (glassPane != null)
+      remove(glassPane);
 
-	glassPane = f; 
+    glassPane = f;
 
-	glassPane.setVisible(false);
-	add(glassPane, 0);
-    }
+    glassPane.setVisible(false);
+    add(glassPane, 0);
+  }
 
   /**
    * DOCUMENT ME!
    *
    * @return DOCUMENT ME!
    */
-    public JLayeredPane getLayeredPane() 
-    {
-	if (layeredPane == null)
-	    setLayeredPane(createLayeredPane());
-	return layeredPane;    
-    }
+  public JLayeredPane getLayeredPane()
+  {
+    if (layeredPane == null)
+      setLayeredPane(createLayeredPane());
+    return layeredPane;
+  }
 
   /**
    * DOCUMENT ME!
    *
    * @param f DOCUMENT ME!
    */
-    public void setLayeredPane(JLayeredPane f)
-    {
-	if (layeredPane != null)
-	    remove(layeredPane);
-	
-	layeredPane = f; 
-	add(f, -1);
-    }
-    
+  public void setLayeredPane(JLayeredPane f)
+  {
+    if (layeredPane != null)
+      remove(layeredPane);
+
+    layeredPane = f;
+    add(f, -1);
+  }
+
   /**
    * Creates a new <code>JRootPane</code> object.
    */
   public JRootPane()
-    {
-	setLayout(createRootLayout());
-	getGlassPane();
-	getLayeredPane();
-	getContentPane();
-	setDoubleBuffered(true);
-	updateUI();
-    }
+  {
+    setLayout(createRootLayout());
+    getGlassPane();
+    getLayeredPane();
+    getContentPane();
+    updateUI();
+  }
 
   /**
    * DOCUMENT ME!
@@ -500,8 +514,8 @@ public class JRootPane extends JComponent implements Accessible
    */
   protected LayoutManager createRootLayout()
   {
-        return new RootLayout();
-    } 
+    return new RootLayout();
+  }
 
   /**
    * DOCUMENT ME!
@@ -509,12 +523,12 @@ public class JRootPane extends JComponent implements Accessible
    * @return DOCUMENT ME!
    */
   protected Container createContentPane()
-    {
-	JPanel p = new JPanel();
+  {
+    JPanel p = new JPanel();
     p.setName(this.getName() + ".contentPane");
-	p.setLayout(new BorderLayout());
-	return p;
-    }
+    p.setLayout(new BorderLayout());
+    return p;
+  }
 
   /**
    * DOCUMENT ME!
@@ -522,14 +536,13 @@ public class JRootPane extends JComponent implements Accessible
    * @return DOCUMENT ME!
    */
   protected Component createGlassPane()
-    {
-	JPanel p = new JPanel();
+  {
+    JPanel p = new JPanel();
     p.setName(this.getName() + ".glassPane");
-	p.setLayout(new BorderLayout());
-	p.setVisible(false);
+    p.setVisible(false);
     p.setOpaque(false);
-	return p;
-    }
+    return p;
+  }
 
   /**
    * DOCUMENT ME!
@@ -537,11 +550,11 @@ public class JRootPane extends JComponent implements Accessible
    * @return DOCUMENT ME!
    */
   protected JLayeredPane createLayeredPane()
-    {
-	JLayeredPane l = new JLayeredPane();
-	l.setLayout(null);
-	return l;
-    }    
+  {
+    JLayeredPane l = new JLayeredPane();
+    l.setLayout(null);
+    return l;
+  }
 
   /**
    * DOCUMENT ME!
@@ -610,12 +623,12 @@ public class JRootPane extends JComponent implements Accessible
   public void setWindowDecorationStyle(int style)
   {
     if (style != NONE
-	&& style != FRAME
-	&& style != INFORMATION_DIALOG
-	&& style != ERROR_DIALOG
-	&& style != COLOR_CHOOSER_DIALOG
-	&& style != FILE_CHOOSER_DIALOG
-	&& style != QUESTION_DIALOG
+        && style != FRAME
+        && style != INFORMATION_DIALOG
+        && style != ERROR_DIALOG
+        && style != COLOR_CHOOSER_DIALOG
+        && style != FILE_CHOOSER_DIALOG
+        && style != QUESTION_DIALOG
         && style != WARNING_DIALOG
         && style != PLAIN_DIALOG)
       throw new IllegalArgumentException("invalid style");

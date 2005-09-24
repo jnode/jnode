@@ -43,7 +43,6 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Shape;
 
-import javax.swing.JComponent;
 import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 
@@ -61,49 +60,49 @@ public abstract class View implements SwingConstants
   private Element elt;
   private View parent;
 
-    /** 
+  /**
    * Creates a new <code>View</code> instance.
    *
    * @param elem an <code>Element</code> value
-     */
-    public View(Element elem)
-    {
-	elt = elem;
-    }
+   */
+  public View(Element elem)
+  {
+    elt = elem;
+  }
 
   public abstract void paint(Graphics g, Shape s);
 
   public void setParent(View parent)
-    {
+  {
     this.parent = parent;
-    }
-
+  }
+    
   public View getParent()
-    {
+  {
     return parent;
-    }
+  }
     
   public Container getContainer()
-    {
+  {
     View parent = getParent();
     if (parent == null)
       throw new AssertionError("The parent of a View must not be null.");
 
     return parent.getContainer();
-    }	   
-    
+  }
+  
   public Document getDocument()
-    {
+  {
     return getElement().getDocument();
-    }
-	
+  }
+    
   public Element getElement()
-    {
+  {
     return elt;
-    }
+  }
 
   public abstract float getPreferredSpan(int axis);
-  
+
   public int getResizeWeight(int axis)
   {
     return 0;
@@ -131,46 +130,46 @@ public abstract class View implements SwingConstants
   }
   
   public float getAlignment(int axis)
-    {
+  {
     return 0.5f;
-    }
-    
+  }
+
   public AttributeSet getAttributes()
-    {
+  {
     return getElement().getAttributes();
-    }
-    
+  }
+  
   public boolean isVisible()
-    {
+  {
     return true;
-    }
+  }
 
   public int getViewCount()
-    {
+  {
     return 0;
-    }
-    
+  }
+  
   public View getView(int index)
-    {
+  {
     return null;
-    }
+  }
 
   public ViewFactory getViewFactory()
-    {
+  {
     View parent = getParent();
     return parent != null ? parent.getViewFactory() : null;
   }
 
   public void replace(int offset, int length, View[] views)
-	    {
+  {
     // Default implementation does nothing.
   }
 
   public void insert(int offset, View view)
-		{
+  {
     View[] array = { view };
     replace(offset, 1, array);
-		}
+  }
 
   public void append(View view)
   {
@@ -182,7 +181,7 @@ public abstract class View implements SwingConstants
   public void removeAll()
   {
     replace(0, getViewCount(), new View[0]); 
-	    }
+  }
 
   public void remove(int index)
   {
@@ -193,7 +192,7 @@ public abstract class View implements SwingConstants
   {
     // The default implementation doesn't support fragmentation.
     return this;
-    }
+  }
 
   public int getStartOffset()
   {
@@ -347,7 +346,7 @@ public abstract class View implements SwingConstants
     Element el = getElement();
     DocumentEvent.ElementChange ec = ev.getChange(el);
     if (ec != null)
-        updateChildren(ec, ev, vf);
+      updateChildren(ec, ev, vf);
     forwardUpdate(ec, ev, shape, vf);
     updateLayout(ec, ev, shape);
   }

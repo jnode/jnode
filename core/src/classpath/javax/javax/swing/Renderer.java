@@ -47,26 +47,22 @@ import java.awt.Component;
  *
  * @specnote This interface is not used and exists only for compatibility.
  *           
- * @author	Andrew Selkirk
+ * @author Andrew Selkirk
  */
-public interface Renderer {
+public interface Renderer
+{
+  /**
+   * setValue
+   * @param value TODO
+   * @param selected TODO
+   */
+  void setValue(Object value, boolean selected);
 
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * setValue
-	 * @param value TODO
-	 * @param selected TODO
-	 */
-	void setValue(Object value, boolean selected);
-
-	/**
-	 * getComponent
-	 * @returns Component
-	 */
-	Component getComponent();
+  /**
+   * getComponent
+   * @returns Component
+   */
+  Component getComponent();
 
 
-} // Renderer
+}

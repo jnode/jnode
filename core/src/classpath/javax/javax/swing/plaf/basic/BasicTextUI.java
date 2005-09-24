@@ -74,7 +74,6 @@ import javax.swing.text.Element;
 import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Keymap;
-import javax.swing.text.PlainView;
 import javax.swing.text.Position;
 import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
@@ -111,7 +110,7 @@ public abstract class BasicTextUI extends TextUI
     {
     }
   }
-    
+
   /**
    * This view forms the root of the View hierarchy. However, it delegates
    * most calls to another View which is the real root of the hierarchy.
@@ -121,16 +120,16 @@ public abstract class BasicTextUI extends TextUI
    * {@link #getContainer}.
    */
   private class RootView extends View
-    {
+  {
     /** The real root view. */
     private View view;
-    
+
     /**
      * Creates a new RootView.
      */
     public RootView()
-	{
-	    super(null);
+    {
+      super(null);
     }
 
     /**
@@ -148,7 +147,7 @@ public abstract class BasicTextUI extends TextUI
       if (factory == null)
 	factory = BasicTextUI.this;
       return factory;
-	}
+    }
 
     /**
      * Indicates that the preferences of one of the child view has changed.
@@ -169,9 +168,9 @@ public abstract class BasicTextUI extends TextUI
      * @param v the root view to set
      */
     public void setView(View v)
-	{
-	    if (view != null)
-	view.setParent(null);
+    {
+      if (view != null)
+        view.setParent(null);
       
       if (v != null)
         v.setParent(null);
@@ -213,7 +212,7 @@ public abstract class BasicTextUI extends TextUI
      * @return the <code>Container</code> that contains this view
      */
     public Container getContainer()
-		{
+    {
       return textComponent;
     }
 
@@ -231,7 +230,7 @@ public abstract class BasicTextUI extends TextUI
 	return view.getPreferredSpan(axis);
 
       return Integer.MAX_VALUE;
-		}
+    }
 
     /**
      * Paints the view. This is delegated to the real root view.
@@ -242,8 +241,8 @@ public abstract class BasicTextUI extends TextUI
     public void paint(Graphics g, Shape s)
     {
       if (view != null)
-	view.paint(g, s);
-        }
+        view.paint(g, s);
+    }
 
 
     /**
@@ -272,7 +271,7 @@ public abstract class BasicTextUI extends TextUI
     {
       return ((View) view).modelToView(position, a, bias);
     }
-      
+
     /**
      * Maps coordinates from the <code>View</code>'s space into a position
      * in the document model.
@@ -328,12 +327,12 @@ public abstract class BasicTextUI extends TextUI
     {
       view.changedUpdate(ev, shape, vf);
     }
-    }
-  
+  }
+
   /**
    * Receives notifications when properties of the text component change.
    */
-  class UpdateHandler implements PropertyChangeListener
+  class PropertyChangeHandler implements PropertyChangeListener
   {
     /**
      * Notifies when a property of the text component changes.
@@ -343,13 +342,15 @@ public abstract class BasicTextUI extends TextUI
     public void propertyChange(PropertyChangeEvent event)
     {
       if (event.getPropertyName().equals("document"))
-	{
+        {
           // Document changed.
-	  modelChanged();
-	}
+	      modelChanged();
+        }
+
+      BasicTextUI.this.propertyChange(event);
     }
   }
-  
+
   /**
    * Listens for changes on the underlying model and forwards notifications
    * to the View. This also updates the caret position of the text component.
@@ -369,7 +370,7 @@ public abstract class BasicTextUI extends TextUI
       rootView.changedUpdate(ev, new Rectangle(0, 0, size.width, size.height),
                              rootView.getViewFactory());
     }
-    
+
     /**
      * Notification about a document insert event.
      *
@@ -420,7 +421,7 @@ public abstract class BasicTextUI extends TextUI
   /**
    * Receives notification when the model changes.
    */
-  UpdateHandler updateHandler = new UpdateHandler();
+  PropertyChangeHandler updateHandler = new PropertyChangeHandler();
 
   /** The DocumentEvent handler. */
   DocumentHandler documentHandler = new DocumentHandler();
@@ -440,9 +441,9 @@ public abstract class BasicTextUI extends TextUI
   /**
    * Creates a new <code>BasicTextUI</code> instance.
    */
-    public BasicTextUI()
-    {
-    }
+  public BasicTextUI()
+  {
+  }
 
   /**
    * Creates a {@link Caret} that should be installed into the text component.
@@ -450,7 +451,7 @@ public abstract class BasicTextUI extends TextUI
    * @return a caret that should be installed into the text component
    */
   protected Caret createCaret()
-    {
+  {
     return new BasicCaret();
   }
 
@@ -464,7 +465,7 @@ public abstract class BasicTextUI extends TextUI
   {
     return new BasicHighlighter();
   }
-  
+
   /**
    * The text component that is managed by this UI.
    *
@@ -473,16 +474,16 @@ public abstract class BasicTextUI extends TextUI
   protected final JTextComponent getComponent()
   {
     return textComponent;
-    }
+  }
 
   /**
    * Installs this UI on the text component.
    *
    * @param c the text component on which to install the UI
    */
-    public void installUI(final JComponent c) 
-    {
-	super.installUI(c);
+  public void installUI(final JComponent c)
+  {
+    super.installUI(c);
     c.setOpaque(true);
 
     textComponent = (JTextComponent) c;
@@ -492,7 +493,7 @@ public abstract class BasicTextUI extends TextUI
       {
 	doc = getEditorKit(textComponent).createDefaultDocument();
 	textComponent.setDocument(doc);
-    }
+      }
     
     textComponent.addPropertyChangeListener(updateHandler);
     modelChanged();
@@ -506,7 +507,7 @@ public abstract class BasicTextUI extends TextUI
    * Installs UI defaults on the text components.
    */
   protected void installDefaults()
-    {
+  {
     Caret caret = textComponent.getCaret();
     if (caret == null)
       {
@@ -611,7 +612,7 @@ public abstract class BasicTextUI extends TextUI
    * Installs the keyboard actions on the text components.
    */
   protected void installKeyboardActions()
-  {
+  {    
     // load any bindings for the older Keymap interface
     Keymap km = JTextComponent.getKeymap(getKeymapName());
     if (km == null)
@@ -648,7 +649,7 @@ public abstract class BasicTextUI extends TextUI
         return (InputMap) defaults.get(prefix + ".focusInputMap");
       }
   }
-  
+
   /**
    * Returns the ActionMap to be installed on the text component.
    *
@@ -662,7 +663,7 @@ public abstract class BasicTextUI extends TextUI
     UIDefaults defaults = UIManager.getLookAndFeelDefaults();    
     ActionMap am = (ActionMap) defaults.get(prefix + ".actionMap");
     if (am == null)
-  {
+      {
         am = createActionMap();
         defaults.put(prefix + ".actionMap", am);
       }
@@ -686,7 +687,7 @@ public abstract class BasicTextUI extends TextUI
       }
     return am;
   }
-  
+
   /**
    * Uninstalls this TextUI from the text component.
    *
@@ -732,7 +733,7 @@ public abstract class BasicTextUI extends TextUI
   {
     // FIXME: Uninstall keyboard actions here.
   }
-  
+
   /**
    * Returns the property prefix by which the text component's UIDefaults
    * are looked up.
@@ -753,12 +754,12 @@ public abstract class BasicTextUI extends TextUI
   {
     View v = getRootView(textComponent);
 
-	float w = v.getPreferredSpan(View.X_AXIS);
-	float h = v.getPreferredSpan(View.Y_AXIS);
+    float w = v.getPreferredSpan(View.X_AXIS);
+    float h = v.getPreferredSpan(View.Y_AXIS);
 
     return new Dimension((int) w, (int) h);
-    }
-    
+  }
+
   /**
    * Returns the maximum size for text components that use this UI.
    *
@@ -781,7 +782,7 @@ public abstract class BasicTextUI extends TextUI
    * @param c not used here
    */
   public final void paint(Graphics g, JComponent c)
-    {      
+  {
     paintSafely(g);
   }
 
@@ -815,14 +816,11 @@ public abstract class BasicTextUI extends TextUI
    */
   protected void paintBackground(Graphics g)
   {
-    if (textComponent.isEditable())
-      textComponent.setBackground(background);
-    else
-      textComponent.setBackground(inactiveBackground);
-
-    g.setColor(textComponent.getBackground());
-    g.fillRect(0, 0, textComponent.getWidth(), textComponent.getHeight());
-    }
+    // This method does nothing. All the background filling is done by the
+    // ComponentUI update method. However, the method is called by paint
+    // to provide a way for subclasses to draw something different (e.g. background
+    // images etc) on the background.
+  }
 
   /**
    * Marks the specified range inside the text component's model as
@@ -834,10 +832,10 @@ public abstract class BasicTextUI extends TextUI
    * @param p1 the end location inside the document model of the range that
    *        is damaged
    */
-    public void damageRange(JTextComponent t, int p0, int p1)
-    {
-	damageRange(t, p0, p1, null, null);
-    }    
+  public void damageRange(JTextComponent t, int p0, int p1)
+  {
+    damageRange(t, p0, p1, null, null);
+  }
 
   /**
    * Marks the specified range inside the text component's model as
@@ -855,9 +853,9 @@ public abstract class BasicTextUI extends TextUI
    */
   public void damageRange(JTextComponent t, int p0, int p1,
                           Position.Bias firstBias, Position.Bias secondBias)
-    {
+  {
     // TODO: Implement me.
-    }
+  }
 
   /**
    * Returns the {@link EditorKit} used for the text component that is managed
@@ -868,11 +866,11 @@ public abstract class BasicTextUI extends TextUI
    * @return the {@link EditorKit} used for the text component that is managed
    *         by this UI
    */
-    public EditorKit getEditorKit(JTextComponent t)
-    {
-	return kit;
-    }
-    
+  public EditorKit getEditorKit(JTextComponent t)
+  {
+    return kit;
+  }
+
   /**
    * Gets the next position inside the document model that is visible on
    * screen, starting from <code>pos</code>.
@@ -889,22 +887,22 @@ public abstract class BasicTextUI extends TextUI
    */
   public int getNextVisualPositionFrom(JTextComponent t, int pos,
                                        Position.Bias b, int direction,
-				  Position.Bias[] biasRet)
-        throws BadLocationException
-    {
+                                       Position.Bias[] biasRet)
+    throws BadLocationException
+  {
     return 0; // TODO: Implement me.
-    }
-    
+  }
+
   /**
    * Returns the root {@link View} of a text component.
    *
    * @return the root {@link View} of a text component
    */
-    public View getRootView(JTextComponent t)
-    {
+  public View getRootView(JTextComponent t)
+  {
     return rootView;
-    }
-    
+  }
+
   /**
    * Maps a position in the document into the coordinate space of the View.
    * The output rectangle usually reflects the font height but has a width
@@ -920,12 +918,12 @@ public abstract class BasicTextUI extends TextUI
    * @throws IllegalArgumentException if b is not one of the above listed
    *         valid values
    */
-    public Rectangle modelToView(JTextComponent t, int pos)
-      throws BadLocationException
-    {
+  public Rectangle modelToView(JTextComponent t, int pos)
+    throws BadLocationException
+  {
     return modelToView(t, pos, Position.Bias.Forward);
-    }
-    
+  }
+
   /**
    * Maps a position in the document into the coordinate space of the View.
    * The output rectangle usually reflects the font height but has a width
@@ -945,12 +943,12 @@ public abstract class BasicTextUI extends TextUI
    * @throws IllegalArgumentException if b is not one of the above listed
    *         valid values
    */
-    public Rectangle modelToView(JTextComponent t, int pos, Position.Bias bias)
-      throws BadLocationException
-    {
+  public Rectangle modelToView(JTextComponent t, int pos, Position.Bias bias)
+    throws BadLocationException
+  {
     return rootView.modelToView(pos, getVisibleEditorRect(), bias).getBounds();
-    }
-    
+  }
+
   /**
    * Maps a point in the <code>View</code> coordinate space to a position
    * inside a document model.
@@ -961,11 +959,11 @@ public abstract class BasicTextUI extends TextUI
    * @return the position inside the document model that corresponds to
    *     <code>pt</code>
    */
-    public int viewToModel(JTextComponent t, Point pt)
-    {
-	return viewToModel(t, pt, null);
-    }
-    
+  public int viewToModel(JTextComponent t, Point pt)
+  {
+    return viewToModel(t, pt, null);
+  }
+
   /**
    * Maps a point in the <code>View</code> coordinate space to a position
    * inside a document model.
@@ -978,10 +976,10 @@ public abstract class BasicTextUI extends TextUI
    * @return the position inside the document model that corresponds to
    *     <code>pt</code>
    */
-    public int viewToModel(JTextComponent t, Point pt, Position.Bias[] biasReturn)
-    {
+  public int viewToModel(JTextComponent t, Point pt, Position.Bias[] biasReturn)
+  {
     return 0; // FIXME: Implement me.
-    } 
+  }
 
   /**
    * Creates a {@link View} for the specified {@link Element}.
@@ -1010,7 +1008,7 @@ public abstract class BasicTextUI extends TextUI
     // Subclasses have to implement this to get this functionality.
     return null;
   }
-  
+
   /**
    * Returns the allocation to give the root view.
    *
@@ -1065,5 +1063,18 @@ public abstract class BasicTextUI extends TextUI
       return;
     View view = factory.create(elem);
     setView(view);
+  }
+
+  /**
+   * Receives notification whenever one of the text component's bound
+   * properties changes. This default implementation does nothing.
+   * It is a hook that enables subclasses to react to property changes
+   * on the text component.
+   *
+   * @param ev the property change event
+   */
+  protected void propertyChange(PropertyChangeEvent ev)
+  {
+    // The default implementation does nothing.
   }
 }

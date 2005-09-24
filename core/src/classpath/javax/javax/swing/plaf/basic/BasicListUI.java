@@ -125,7 +125,7 @@ public class BasicListUI extends ListUI
      * Helper method to repaint the focused cell's 
      * lost or acquired focus state.
      */
-    void repaintCellFocus()
+    protected void repaintCellFocus()
     {
     }
   }
@@ -186,10 +186,12 @@ public class BasicListUI extends ListUI
     }
   }
 
+
   /**
    * A helper class which listens for {@link KeyEvents}s 
    * from the {@link JList}.
    */
+  // FIXME: This should be handled somehow by the L&F key bindings.
   private class KeyHandler extends KeyAdapter
   {
     public KeyHandler()
@@ -198,8 +200,8 @@ public class BasicListUI extends ListUI
     
     public void keyPressed( KeyEvent evt ) 
     {
-          int lead = BasicListUI.this.list.getLeadSelectionIndex();
-          int max = BasicListUI.this.list.getModel().getSize() - 1;
+      int lead = BasicListUI.this.list.getLeadSelectionIndex();
+      int max = BasicListUI.this.list.getModel().getSize() - 1;
       // Do nothing if list is empty
       if (max == -1)
         return;
@@ -215,10 +217,7 @@ public class BasicListUI extends ListUI
               BasicListUI.this.list.setSelectedIndex(Math.min(lead+1,max));
             }
           else if (evt.getModifiers() == InputEvent.SHIFT_MASK)
-            {
-              BasicListUI.this.list.getSelectionModel().
-                setLeadSelectionIndex(Math.min(lead+1,max));
-            }
+            selectNextIndex();
         }
       else if ((evt.getKeyCode() == KeyEvent.VK_UP)
                || (evt.getKeyCode() == KeyEvent.VK_KP_UP))
@@ -229,10 +228,7 @@ public class BasicListUI extends ListUI
               BasicListUI.this.list.setSelectedIndex(Math.max(lead-1,0));
             }
           else if (evt.getModifiers() == InputEvent.SHIFT_MASK)
-            {
-              BasicListUI.this.list.getSelectionModel().
-                setLeadSelectionIndex(Math.max(lead-1,0));
-            }
+            selectPreviousIndex();
         }
       else if (evt.getKeyCode() == KeyEvent.VK_PAGE_UP)
         {
@@ -312,7 +308,7 @@ public class BasicListUI extends ListUI
           BasicListUI.this.list.getSelectionModel().
             setLeadSelectionIndex(Math.min(lead+1,max));
         }
-      
+
       BasicListUI.this.list.ensureIndexIsVisible
         (BasicListUI.this.list.getLeadSelectionIndex());
     }
@@ -459,9 +455,60 @@ public class BasicListUI extends ListUI
           if (e.getNewValue() != null && e.getNewValue() instanceof ListModel)
             ((ListModel) e.getNewValue()).addListDataListener(BasicListUI.this.listDataListener);
         }
+      // Update the updateLayoutStateNeeded flag.
+      if (e.getPropertyName().equals("model"))
+        updateLayoutStateNeeded += modelChanged;
+      else if (e.getPropertyName().equals("selectionModel"))
+        updateLayoutStateNeeded += selectionModelChanged;
+      else if (e.getPropertyName().equals("font"))
+        updateLayoutStateNeeded += fontChanged;
+      else if (e.getPropertyName().equals("fixedCellWidth"))
+        updateLayoutStateNeeded += fixedCellWidthChanged;
+      else if (e.getPropertyName().equals("fixedCellHeight"))
+        updateLayoutStateNeeded += fixedCellHeightChanged;
+      else if (e.getPropertyName().equals("prototypeCellValue"))
+        updateLayoutStateNeeded += prototypeCellValueChanged;
+      else if (e.getPropertyName().equals("cellRenderer"))
+        updateLayoutStateNeeded += cellRendererChanged;
+
       BasicListUI.this.damageLayout();
     }
   }
+
+  /**
+   * A constant to indicate that the model has changed.
+   */
+  protected static final int modelChanged = 1;
+
+  /**
+   * A constant to indicate that the selection model has changed.
+   */
+  protected static final int selectionModelChanged = 2;
+
+  /**
+   * A constant to indicate that the font has changed.
+   */
+  protected static final int fontChanged = 4;
+
+  /**
+   * A constant to indicate that the fixedCellWidth has changed.
+   */
+  protected static final int fixedCellWidthChanged = 8;
+
+  /**
+   * A constant to indicate that the fixedCellHeight has changed.
+   */
+  protected static final int fixedCellHeightChanged = 16;
+
+  /**
+   * A constant to indicate that the prototypeCellValue has changed.
+   */
+  protected static final int prototypeCellValueChanged = 32;
+
+  /**
+   * A constant to indicate that the cellRenderer has changed.
+   */
+  protected static final int cellRendererChanged = 64;
 
   /**
    * Creates a new BasicListUI for the component.
@@ -514,9 +561,18 @@ public class BasicListUI extends ListUI
   protected int[] cellHeights;
 
   /**
-   * A simple counter. When nonzero, indicates that the UI class is out of
+   * A bitmask that indicates which properties of the JList have changed.
+   * When nonzero, indicates that the UI class is out of
    * date with respect to the underlying list, and must recalculate the
    * list layout before painting or performing size calculations.
+   *
+   * @see #modelChanged
+   * @see #selectionModelChanged
+   * @see #fontChanged
+   * @see #fixedCellWidthChanged
+   * @see #fixedCellHeightChanged
+   * @see #prototypeCellValueChanged
+   * @see #cellRendererChanged
    */
   protected int updateLayoutStateNeeded;
 
@@ -694,13 +750,6 @@ public class BasicListUI extends ListUI
    */
   public BasicListUI()
   {
-    focusListener = new FocusHandler();
-    listDataListener = new ListDataHandler();
-    listSelectionListener = new ListSelectionHandler();
-    mouseInputListener = new MouseInputHandler();
-    keyListener = new KeyHandler();
-    propertyChangeListener = new PropertyChangeHandler();
-    componentListener = new ComponentHandler();
     updateLayoutStateNeeded = 1;
     rendererPane = new CellRendererPane();
   }
@@ -742,14 +791,28 @@ public class BasicListUI extends ListUI
    */
   protected void installListeners()
   {
+    if (focusListener == null)
+      focusListener = createFocusListener();
     list.addFocusListener(focusListener);
+    if (listDataListener == null)
+      listDataListener = createListDataListener();
     list.getModel().addListDataListener(listDataListener);
+    if (listSelectionListener == null)
+      listSelectionListener = createListSelectionListener();
     list.addListSelectionListener(listSelectionListener);
+    if (mouseInputListener == null)
+      mouseInputListener = createMouseInputListener();
     list.addMouseListener(mouseInputListener);
-    list.addKeyListener(keyListener);
     list.addMouseMotionListener(mouseInputListener);
+    if (propertyChangeListener == null)
+      propertyChangeListener = createPropertyChangeListener();
     list.addPropertyChangeListener(propertyChangeListener);
+
+    // FIXME: Are these two really needed? At least they are not documented.
+    keyListener = new KeyHandler();
     list.addComponentListener(componentListener);
+    componentListener = new ComponentHandler();
+    list.addKeyListener(keyListener);
   }
 
   /**
@@ -922,7 +985,7 @@ public class BasicListUI extends ListUI
       {
         Rectangle bounds = getCellBounds(list, row, row);
         if (bounds.intersects(clip))
-        paintCell(g, row, bounds, render, model, sel, lead);
+          paintCell(g, row, bounds, render, model, sel, lead);
       }
   }
 
@@ -1044,5 +1107,77 @@ public class BasicListUI extends ListUI
         break;
       }
     return loc;
+  }
+
+  /**
+   * Creates and returns the focus listener for this UI.
+   *
+   * @return the focus listener for this UI
+   */
+  protected FocusListener createFocusListener()
+  {
+    return new FocusHandler();
+  }
+
+  /**
+   * Creates and returns the list data listener for this UI.
+   *
+   * @return the list data listener for this UI
+   */
+  protected ListDataListener createListDataListener()
+  {
+    return new ListDataHandler();
+  }
+
+  /**
+   * Creates and returns the list selection listener for this UI.
+   *
+   * @return the list selection listener for this UI
+   */
+  protected ListSelectionListener createListSelectionListener()
+  {
+    return new ListSelectionHandler();
+  }
+
+  /**
+   * Creates and returns the mouse input listener for this UI.
+   *
+   * @return the mouse input listener for this UI
+   */
+  protected MouseInputListener createMouseInputListener()
+  {
+    return new MouseInputHandler();
+  }
+
+  /**
+   * Creates and returns the property change listener for this UI.
+   *
+   * @return the property change listener for this UI
+   */
+  protected PropertyChangeListener createPropertyChangeListener()
+  {
+    return new PropertyChangeHandler();
+  }
+
+  /**
+   * Selects the next list item and force it to be visible.
+   */
+  protected void selectNextIndex()
+  {
+    int index = list.getSelectedIndex();
+    index++;
+    list.setSelectedIndex(index);
+    list.ensureIndexIsVisible(index);
+  }
+
+  /**
+   * Selects the previous list item and force it to be visible.
+   */
+  protected void selectPreviousIndex()
+  {
+    int index = list.getSelectedIndex();
+    index--;
+    list.setSelectedIndex(index);
+    list.ensureIndexIsVisible(index);
   }
 }

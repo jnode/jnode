@@ -1,4 +1,4 @@
-/* GapContent.java -- 
+/* GapContent.java --
    Copyright (C) 2002, 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,12 +36,14 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package javax.swing.text; 
+package javax.swing.text;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.ListIterator;
+import java.util.Vector;
 
 import javax.swing.undo.UndoableEdit;
 
@@ -53,11 +55,11 @@ import javax.swing.undo.UndoableEdit;
  * minimal (simple array access). The array only has to be shifted around when
  * the insertion point moves (then the gap also moves and one array copy is
  * necessary) or when the gap is filled up and the buffer has to be enlarged.
- *
+ * 
  * TODO: Implement UndoableEdit support stuff
  */
 public class GapContent
-  implements AbstractDocument.Content, Serializable
+    implements AbstractDocument.Content, Serializable
 {
   /**
    * A {@link Position} implementation for <code>GapContent</code>.
@@ -114,7 +116,9 @@ public class GapContent
     public int getOffset()
     {
       // Check precondition.
-      assert(mark <= gapStart || mark > gapEnd);
+      assert mark <= gapStart || mark > gapEnd : "mark: " + mark
+                                               + ", gapStart: " + gapStart
+                                               + ", gapEnd: " + gapEnd;
 
       if (mark <= gapStart)
         return mark;
@@ -125,12 +129,12 @@ public class GapContent
 
   /** The serialization UID (compatible with JDK1.5). */
   private static final long serialVersionUID = -6226052713477823730L;
-    
+
   /**
    * This is the default buffer size and the amount of bytes that a buffer is
    * extended if it is full.
    */
-  static final int DEFAULT_BUFSIZE = 64;
+  static final int DEFAULT_BUFSIZE = 10;
 
   /**
    * The text buffer.
@@ -156,132 +160,132 @@ public class GapContent
   /**
    * Creates a new GapContent object.
    */
-    public GapContent()
-    {
+  public GapContent()
+  {
     this(DEFAULT_BUFSIZE);
-    }
-    
+  }
+
   /**
    * Creates a new GapContent object with a specified initial size.
-   *
+   * 
    * @param size the initial size of the buffer
    */
-    public GapContent(int size)
-    {
+  public GapContent(int size)
+  {
     buffer = (char[]) allocateArray(size);
-    gapStart = 0;
-    gapEnd = size - 1;
-    buffer[size - 1] = '\n';
+    gapStart = 1;
+    gapEnd = size;
+    buffer[0] = '\n';
     positions = new ArrayList();
-    }
+  }
 
   /**
    * Allocates an array of the specified length that can then be used as
    * buffer.
-   *
+   * 
    * @param size the size of the array to be allocated
-   *
+   * 
    * @return the allocated array
    */
   protected Object allocateArray(int size)
-    {
+  {
     return new char[size];
   }
 
   /**
    * Returns the length of the allocated buffer array.
-   *
+   * 
    * @return the length of the allocated buffer array
    */
   protected int getArrayLength()
-		{
+  {
     return buffer.length;
-    }
+  }
 
   /**
    * Returns the length of the content.
-   *
+   * 
    * @return the length of the content
    */
-    public int length()
-    {
+  public int length()
+  {
     return buffer.length - (gapEnd - gapStart);
-    }
+  }
 
   /**
    * Inserts a string at the specified position.
-   *
+   * 
    * @param where the position where the string is inserted
    * @param str the string that is to be inserted
-   *
+   * 
    * @return an UndoableEdit object (currently not supported, so
    *         <code>null</code> is returned)
-   *
+   * 
    * @throws BadLocationException if <code>where</code> is not a valid
    *         location in the buffer
    */
   public UndoableEdit insertString(int where, String str)
-    throws BadLocationException
-    {
+      throws BadLocationException
+  {
     // check arguments
     int length = length();
     int strLen = str.length();
 
     if (where >= length)
       throw new BadLocationException("the where argument cannot be greater"
-                                     + " than the content length", where);
+          + " than the content length", where);
 
     replace(where, 0, str.toCharArray(), str.length());
 
-	return null;
-    }
+    return null;
+  }
 
   /**
    * Removes a piece of content at th specified position.
-   *
+   * 
    * @param where the position where the content is to be removed
    * @param nitems number of characters to be removed
-   *
+   * 
    * @return an UndoableEdit object (currently not supported, so
    *         <code>null</code> is returned)
-   *
+   * 
    * @throws BadLocationException if <code>where</code> is not a valid
    *         location in the buffer
    */
   public UndoableEdit remove(int where, int nitems) throws BadLocationException
-    {
+  {
     // check arguments
     int length = length();
 
     if (where >= length)
       throw new BadLocationException("the where argument cannot be greater"
-                                     + " than the content length", where);
+          + " than the content length", where);
     if ((where + nitems) > length)
       throw new BadLocationException("where + nitems cannot be greater"
           + " than the content length", where + nitems);
 
     replace(where, nitems, null, 0);
 
-	return null;
-    }
+    return null;
+  }
 
   /**
    * Returns a piece of content as String.
-   *
+   * 
    * @param where the start location of the fragment
    * @param len the length of the fragment
-   *
+   * 
    * @throws BadLocationException if <code>where</code> or
    *         <code>where + len</code> are no valid locations in the buffer
    */
-    public String getString(int where, int len) throws BadLocationException
-    {
+  public String getString(int where, int len) throws BadLocationException
+  {
     Segment seg = new Segment();
     try
       {
-    getChars(where, len, seg);
-    return new String(seg.array, seg.offset, seg.count);
-    }
+        getChars(where, len, seg);
+        return new String(seg.array, seg.offset, seg.count);
+      }
     catch (StringIndexOutOfBoundsException ex)
       {
         int invalid = 0;
@@ -298,62 +302,62 @@ public class GapContent
 
   /**
    * Fetches a piece of content and stores it in a {@link Segment} object.
-   *
+   * 
    * If the requested piece of text spans the gap, the content is copied into a
    * new array. If it doesn't then it is contiguous and the actual content
    * store is returned.
-   *
+   * 
    * @param where the start location of the fragment
    * @param len the length of the fragment
    * @param txt the Segment object to store the fragment in
-   *
+   * 
    * @throws BadLocationException if <code>where</code> or
    *         <code>where + len</code> are no valid locations in the buffer
    */
   public void getChars(int where, int len, Segment txt)
-    throws BadLocationException
-    {
+      throws BadLocationException
+  {
     // check arguments
     int length = length();
     if (where >= length)
       throw new BadLocationException("the where argument cannot be greater"
-                                     + " than the content length", where);
+          + " than the content length", where);
     if ((where + len) > length)
       throw new BadLocationException("len plus where cannot be greater"
           + " than the content length", len + where);
-		
+
     // check if requested segment is contiguous
     if ((where < gapStart) && ((gapStart - where) < len))
-      {
-        // requested segment is not contiguous -> copy the pieces together
-        char[] copy = new char[len];
-        int lenFirst = gapStart - where; // the length of the first segment
-        System.arraycopy(buffer, where, copy, 0, lenFirst);
-        System.arraycopy(buffer, gapEnd, copy, lenFirst, len - lenFirst);
-        txt.array = copy;
-	txt.offset = 0;
-        txt.count = len;
-      }
+    {
+      // requested segment is not contiguous -> copy the pieces together
+      char[] copy = new char[len];
+      int lenFirst = gapStart - where; // the length of the first segment
+      System.arraycopy(buffer, where, copy, 0, lenFirst);
+      System.arraycopy(buffer, gapEnd, copy, lenFirst, len - lenFirst);
+      txt.array = copy;
+      txt.offset = 0;
+      txt.count = len;
+    }
     else
-      {
-        // requested segment is contiguous -> we can simply return the
-        // actual content
-        txt.array = buffer;
-        if (where < gapStart)
-          txt.offset = where;
-        else
-          txt.offset = where + (gapEnd - gapStart);
-        txt.count = len;
-      }
+    {
+      // requested segment is contiguous -> we can simply return the
+      // actual content
+      txt.array = buffer;
+      if (where < gapStart)
+        txt.offset = where;
+      else
+        txt.offset = where + (gapEnd - gapStart);
+      txt.count = len;
+    }
   }
 
   /**
    * Creates and returns a mark at the specified position.
-   *
+   * 
    * @param offset the position at which to create the mark
-   *
+   * 
    * @return the create Position object for the mark
-   *
+   * 
    * @throws BadLocationException if the offset is not a valid position in the
    *         buffer
    */
@@ -375,7 +379,7 @@ public class GapContent
     if (index < 0)
       index = -(index + 1);
     positions.add(index, pos);
-
+    
     return pos;
   }
 
@@ -384,12 +388,24 @@ public class GapContent
    * segment before the gap as it is and the segment after the gap at the end
    * of the new buffer array. This does change the gapEnd mark but not the
    * gapStart mark.
-   *
+   * 
    * @param newSize the new size of the gap
    */
   protected void shiftEnd(int newSize)
   {
-    int delta = (gapEnd - gapStart) - newSize;
+    assert newSize > (gapEnd - gapStart) : "The new gap size must be greater "
+                                           + "than the old gap size";
+
+    int delta = newSize - gapEnd + gapStart;
+    // Update the marks after the gapEnd.
+    Vector v = getPositionsInRange(null, gapEnd, buffer.length - gapEnd);
+    for (Iterator i = v.iterator(); i.hasNext();)
+    {
+      GapContentPosition p = (GapContentPosition) i.next();
+      p.mark += delta;
+    }
+
+    // Copy the data around.
     char[] newBuf = (char[]) allocateArray(length() + newSize);
     System.arraycopy(buffer, 0, newBuf, 0, gapStart);
     System.arraycopy(buffer, gapEnd, newBuf, gapStart + newSize, buffer.length
@@ -397,23 +413,11 @@ public class GapContent
     gapEnd = gapStart + newSize;
     buffer = newBuf;
 
-    // Update the marks after the gapEnd.
-    int index = Collections.binarySearch(positions, new GapContentPosition(
-        gapEnd));
-    if (index < 0)
-    {
-      index = -(index + 1);
-    }
-    for (ListIterator i = positions.listIterator(index); i.hasNext();)
-    {
-      GapContentPosition p = (GapContentPosition) i.next();
-      p.mark += delta;
-    }
   }
 
   /**
    * Shifts the gap to the specified position.
-   *
+   * 
    * @param newGapStart the new start position of the gap
    */
   protected void shiftGap(int newGapStart)
@@ -421,57 +425,103 @@ public class GapContent
     if (newGapStart == gapStart)
       return;
 
-    int newGapEnd = newGapStart + (gapEnd - gapStart);
-
-    // Update the positions between newGapEnd and (old) gapEnd. The marks
-    // must be shifted by (gapEnd - newGapEnd).
-    int index1 = Collections.binarySearch(positions,
-                                          new GapContentPosition(gapEnd));
-    int index2 = Collections.binarySearch(positions,
-                                          new GapContentPosition(newGapEnd));
-    if (index1 > 0 && index2 > 0)
-    {
-      int i1 = Math.min(index1, index2);
-      int i2 = Math.max(index1, index2);
-      for (ListIterator i = positions.listIterator(i1); i.hasNext();)
-      {
-        if (i.nextIndex() > i2)
-          break;
-
-        GapContentPosition p = (GapContentPosition) i.next();
-        p.mark += gapEnd - newGapEnd;
-      }
-      }
+    int newGapEnd = newGapStart + gapEnd - gapStart;
 
     if (newGapStart < gapStart)
       {
+        // Update the positions between newGapStart and (old) gapStart. The marks
+        // must be shifted by (gapEnd - gapStart).
+        Vector v = getPositionsInRange(null, newGapStart + 1,
+                                       gapStart - newGapStart + 1);
+        for (Iterator i = v.iterator(); i.hasNext();)
+          {
+            GapContentPosition p = (GapContentPosition) i.next();
+            p.mark += gapEnd - gapStart;
+          }
         System.arraycopy(buffer, newGapStart, buffer, newGapEnd, gapStart
-            - newGapStart);
+                         - newGapStart);
         gapStart = newGapStart;
         gapEnd = newGapEnd;
       }
     else
       {
+        // Update the positions between newGapEnd and (old) gapEnd. The marks
+        // must be shifted by (gapEnd - gapStart).
+        Vector v = getPositionsInRange(null, gapEnd,
+                                       newGapEnd - gapEnd);
+        for (Iterator i = v.iterator(); i.hasNext();)
+          {
+            GapContentPosition p = (GapContentPosition) i.next();
+            p.mark -= gapEnd - gapStart;
+          }
         System.arraycopy(buffer, gapEnd, buffer, gapStart, newGapStart
-            - gapStart);
+                         - gapStart);
         gapStart = newGapStart;
         gapEnd = newGapEnd;
       }
   }
 
   /**
-   * Returns the allocated buffer array.
+   * Shifts the gap start downwards. This does not affect the content of the
+   * buffer. This only updates the gap start and all the marks that are between
+   * the old gap start and the new gap start. They all are squeezed to the start
+   * of the gap, because their location has been removed.
    *
+   * @param newGapStart the new gap start
+   */
+  protected void shiftGapStartDown(int newGapStart)
+  {
+    if (newGapStart == gapStart)
+      return;
+
+    assert newGapStart < gapStart : "The new gap start must be less than the "
+                                    + "old gap start.";
+    Vector v = getPositionsInRange(null, newGapStart, gapStart - newGapStart);
+    for (Iterator i = v.iterator(); i.hasNext();)
+      {
+        GapContentPosition p = (GapContentPosition) i.next();
+        p.mark = gapStart;
+      }
+    gapStart = newGapStart;
+  }
+
+  /**
+   * Shifts the gap end upwards. This does not affect the content of the
+   * buffer. This only updates the gap end and all the marks that are between
+   * the old gap end and the new end start. They all are squeezed to the end
+   * of the gap, because their location has been removed.
+   *
+   * @param newGapEnd the new gap start
+   */
+  protected void shiftGapEndUp(int newGapEnd)
+  {
+    if (newGapEnd == gapEnd)
+      return;
+
+    assert newGapEnd > gapEnd : "The new gap end must be greater than the "
+                                + "old gap end.";
+    Vector v = getPositionsInRange(null, gapEnd, newGapEnd - gapEnd);
+    for (Iterator i = v.iterator(); i.hasNext();)
+      {
+        GapContentPosition p = (GapContentPosition) i.next();
+        p.mark = newGapEnd + 1;
+      }
+    gapEnd = newGapEnd;
+  }
+
+  /**
+   * Returns the allocated buffer array.
+   * 
    * @return the allocated buffer array
    */
   protected Object getArray()
   {
     return buffer;
-    }
+  }
 
   /**
    * Replaces a portion of the storage with the specified items.
-   *
+   * 
    * @param position the position at which to remove items
    * @param rmSize the number of items to remove
    * @param addItems the items to add at location
@@ -482,17 +532,77 @@ public class GapContent
   {
     // Remove content
     shiftGap(position);
-    gapEnd += rmSize;
+    shiftGapEndUp(gapEnd + rmSize);
 
     // If gap is too small, enlarge the gap.
-    if ((gapEnd - gapStart) < addSize)
-      shiftEnd(addSize);
+    if ((gapEnd - gapStart) <= addSize)
+      shiftEnd((addSize - gapEnd + gapStart + 1) * 2 + gapEnd + DEFAULT_BUFSIZE);
 
     // Add new items to the buffer.
     if (addItems != null)
       {
-    System.arraycopy(addItems, 0, buffer, gapStart, addSize);
-    gapStart += addSize;
+        System.arraycopy(addItems, 0, buffer, gapStart, addSize);
+        gapStart += addSize;
+      }
   }
+
+  /**
+   * Returns the start index of the gap within the buffer array.
+   *
+   * @return the start index of the gap within the buffer array
+   */
+  protected final int getGapStart()
+  {
+    return gapStart;
+  }
+
+  /**
+   * Returns the end index of the gap within the buffer array.
+   *
+   * @return the end index of the gap within the buffer array
+   */
+  protected final int getGapEnd()
+  {
+    return gapEnd;
+  }
+
+  /**
+   * Returns all <code>Position</code>s that are in the range specified by
+   * <code>offset</code> and </code>length</code> within the buffer array.
+   *
+   * @param v the vector to use; if <code>null</code>, a new Vector is allocated
+   * @param offset the start offset of the range to search
+   * @param length the length of the range to search
+   *
+   * @return the positions within the specified range
+   */
+  protected Vector getPositionsInRange(Vector v, int offset, int length)
+  {
+    Vector res = v;
+    if (res == null)
+      res = new Vector();
+    else
+      res.clear();
+
+    int endOffset = offset + length;
+
+    int index1 = Collections.binarySearch(positions,
+                                          new GapContentPosition(offset));
+    int index2 = Collections.binarySearch(positions,
+                                          new GapContentPosition(endOffset));
+    if (index1 < 0)
+      index1 = -(index1 + 1);
+    if (index2 < 0)
+      index2 = -(index2 + 1);
+    for (ListIterator i = positions.listIterator(index1); i.hasNext();)
+      {
+        if (i.nextIndex() > index2)
+          break;
+        
+        GapContentPosition p = (GapContentPosition) i.next();
+        if (p.mark >= offset && p.mark <= endOffset)
+          res.add(p);
+      }
+    return res;
   }
 }

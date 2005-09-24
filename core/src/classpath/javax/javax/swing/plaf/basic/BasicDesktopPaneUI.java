@@ -381,7 +381,7 @@ public class BasicDesktopPaneUI extends DesktopPaneUI
   protected void installKeyboardActions()
   {
     // FIXME: create actions and keystrokes.
-    registerKeyboardAction();
+    registerKeyboardActions();
   }
 
   /**
@@ -405,7 +405,7 @@ public class BasicDesktopPaneUI extends DesktopPaneUI
    * This method registers the actions to the appropriate Action and Input
    * maps.
    */
-  protected void registerKeyboardAction()
+  protected void registerKeyboardActions()
   {
     // FIXME: Do the binding.
     // XXX: the gtk windows tend to intercept a lot of the

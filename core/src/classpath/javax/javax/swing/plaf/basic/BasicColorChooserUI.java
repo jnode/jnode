@@ -243,9 +243,18 @@ public class BasicColorChooserUI extends ColorChooserUI
   {
     uninstallListeners();
     uninstallDefaults();
+    uninstallDefaultChoosers();
 
     pane = null;
     chooser = null;
+  }
+
+  /**
+   * Uninstalls the default color choosers that have been installed by this UI.
+   */
+  protected void uninstallDefaultChoosers()
+  {
+    defaultChoosers = null;
   }
 
   /**

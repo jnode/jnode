@@ -1,4 +1,4 @@
-/* JApplet.java -- 
+/* JApplet.java --
    Copyright (C) 2002, 2004, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -73,9 +73,14 @@ public class JApplet extends Applet
     }
   }
 
-  private static final long serialVersionUID = 7269359214497372587L;
+  /**
+   * The accessible context for this <code>JApplet</code>.
+   */
+  protected AccessibleContext accessibleContext;
 
-    protected  JRootPane         rootPane;
+  private static final long serialVersionUID = 7269359214497372587L;
+  
+  protected JRootPane rootPane;
 
   /**
    * @specnote rootPaneCheckingEnabled is false to comply with J2SE 5.0
@@ -89,24 +94,19 @@ public class JApplet extends Applet
    */
   private boolean initStageDone = false;
 
-  /**
-   * The accessible context for this <code>JApplet</code>.
-   */
-  AccessibleContext accessibleContext;
-
-    public JApplet()
-    {
-      super.setLayout(new BorderLayout(1, 1));
+  public JApplet()
+  {
+    super.setLayout(new BorderLayout(1, 1));
     getRootPane(); // Will do set/create.
     initStageDone = true; // Init stage is now over.
-    }
+  }
 
   public Dimension getPreferredSize()
   {
     return super.getPreferredSize();
   }
 
-  public  void setLayout(LayoutManager manager)
+  public void setLayout(LayoutManager manager)
   {
     // Check if we're in initialization stage.  If so, call super.setLayout
     // otherwise, valid calls go to the content pane
@@ -118,66 +118,66 @@ public class JApplet extends Applet
         getContentPane().setLayout(manager);
       }
     else
-    super.setLayout(manager);
+      super.setLayout(manager);
   }
 
-   public void setLayeredPane(JLayeredPane layeredPane) 
+  public void setLayeredPane(JLayeredPane layeredPane)
   {
     getRootPane().setLayeredPane(layeredPane);
   }
-  
-   public JLayeredPane getLayeredPane()
+
+  public JLayeredPane getLayeredPane()
   {
     return getRootPane().getLayeredPane();
   }
-  
-   public JRootPane getRootPane()
-    {
-        if (rootPane == null)
-            setRootPane(createRootPane());
-        return rootPane;          
-    }
+
+  public JRootPane getRootPane()
+  {
+    if (rootPane == null)
+      setRootPane(createRootPane());
+    return rootPane;
+  }
 
   protected void setRootPane(JRootPane root)
-    {
-        if (rootPane != null)
-            remove(rootPane);
-            
-        rootPane = root; 
-        add(rootPane, BorderLayout.CENTER);
-    }
+  {
+    if (rootPane != null)
+      remove(rootPane);
+
+    rootPane = root;
+    add(rootPane, BorderLayout.CENTER);
+  }
 
   protected JRootPane createRootPane()
   {
     return new JRootPane();
   }
 
-   public Container getContentPane()
+  public Container getContentPane()
   {
     return getRootPane().getContentPane();
   }
 
-   public void setContentPane(Container contentPane)
+  public void setContentPane(Container contentPane)
   {
     getRootPane().setContentPane(contentPane);
   }
-  
-   public  Component getGlassPane()
+
+  public Component getGlassPane()
   {
     return getRootPane().getGlassPane();
   }
-  
-   public void setGlassPane(Component glassPane)
+
+  public void setGlassPane(Component glassPane)
   {
     getRootPane().setGlassPane(glassPane);
   }
 
-    protected  void addImpl(Component comp, Object constraints, int index)
+  protected void addImpl(Component comp, Object constraints, int index)
   {
     // If we're adding in the initialization stage use super.add.
     // Otherwise pass the add onto the content pane.
     if (!initStageDone)
-    super.addImpl(comp, constraints, index);
+      super.addImpl(comp, constraints, index);
     else
       {
         if (isRootPaneCheckingEnabled())
@@ -186,55 +186,55 @@ public class JApplet extends Applet
         getContentPane().add(comp, constraints, index);
       }
   }
-  
-    public AccessibleContext getAccessibleContext()
+
+  public AccessibleContext getAccessibleContext()
   {
     if (accessibleContext == null)
       accessibleContext = new AccessibleJApplet();
     return accessibleContext;
   }
-  
-    public JMenuBar getJMenuBar()
+
+  public JMenuBar getJMenuBar()
   {
     return getRootPane().getJMenuBar();
   }
-    
-    public void setJMenuBar(JMenuBar menubar)
+
+  public void setJMenuBar(JMenuBar menubar)
   {
     getRootPane().setJMenuBar(menubar);
   }
-    
-    protected  String paramString()
+
+  protected String paramString()
   {
     return "JFrame";
   }
 
-    protected  void processKeyEvent(KeyEvent e)
+  protected void processKeyEvent(KeyEvent e)
   {
     super.processKeyEvent(e);
   }
-
-    public void remove(Component comp)
+  
+  public void remove(Component comp)
   {
     // If we're removing the root pane, use super.remove. Otherwise
     // pass it on to the content pane instead
     if (comp == rootPane)
       super.remove(rootPane);
     else
-    getContentPane().remove(comp);
+      getContentPane().remove(comp);
   }
 
-    protected  boolean isRootPaneCheckingEnabled()
+  protected boolean isRootPaneCheckingEnabled()
   {
     return rootPaneCheckingEnabled;
   }
 
-    protected  void setRootPaneCheckingEnabled(boolean enabled)
+  protected void setRootPaneCheckingEnabled(boolean enabled)
   {
     rootPaneCheckingEnabled = enabled;
   }
 
-    public void update(Graphics g)
+  public void update(Graphics g)
   {
     paint(g);
   }

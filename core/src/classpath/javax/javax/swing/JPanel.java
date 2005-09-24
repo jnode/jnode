@@ -80,68 +80,63 @@ public class JPanel extends JComponent implements Accessible
     }
   }
 
-  /**
-   * The accessible context for this <code>JPanel</code>.
-   */
-  AccessibleContext accessibleContext;
-
-    public JPanel()
-    {
+  public JPanel()
+  {
     this(new FlowLayout(), true);
-    }
-    
-    public JPanel(boolean double_buffered)
-    {
+  }
+
+  public JPanel(boolean double_buffered)
+  {
     this(new FlowLayout(), double_buffered);
-    }
-    
-    public JPanel(LayoutManager layout)
-    {
+  }
+
+  public JPanel(LayoutManager layout)
+  {
     this(layout, true);
-    }
-    
+  }
+
   public JPanel(LayoutManager layout, boolean isDoubleBuffered)
-    {
-	if (layout == null)
-	    {
+  {
+    if (layout == null)
+      {
         // TODO: Is this correct? Or should we throw a NPE?
-		layout = new FlowLayout();
-	    }
-	setLayout(layout); 
-	setOpaque(true); 
+        layout = new FlowLayout();
+      }
+    setLayout(layout); 
+    setOpaque(true); 
 
-	updateUI();	
-    } 
+    updateUI();	
+  } 
 
-    public String getUIClassID()
+  public String getUIClassID()
   {
     return "PanelUI";
   }
 
   public void setUI(PanelUI ui)
   {
-        super.setUI(ui);
-    }
-    
+    super.setUI(ui);
+  }
+
   public PanelUI getUI()
   {
     return (PanelUI) ui;
-    }
-    
+  }
+
   public void updateUI()
   {
     setUI((PanelUI) UIManager.getUI(this));
-    }
+  }
 
-    public AccessibleContext getAccessibleContext()
-    {
+  public AccessibleContext getAccessibleContext()
+  {
     if (accessibleContext == null)
       accessibleContext = new AccessibleJPanel();
     return accessibleContext;
-    }
+  }
     
-   protected  String paramString()
-    {
+  protected  String paramString()
+  {
 	return "JPanel";
-    }
+  }
 }

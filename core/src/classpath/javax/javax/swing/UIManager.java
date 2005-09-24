@@ -73,7 +73,7 @@ public class UIManager implements Serializable
      * @param clazz  the look and feel class name.
      */
     public LookAndFeelInfo(String name, 
-                    String clazz)
+			   String clazz)
     {
       this.name  = name;
       this.clazz = clazz;
@@ -131,11 +131,11 @@ public class UIManager implements Serializable
   static LookAndFeel currentLookAndFeel;
   
   static UIDefaults currentUIDefaults;
-  
+
   /** Property change listener mechanism. */
   static SwingPropertyChangeSupport listeners 
       = new SwingPropertyChangeSupport(UIManager.class);
-    
+
   static
   {
     String defaultlaf = System.getProperty("swing.defaultlaf");
@@ -146,17 +146,27 @@ public class UIManager implements Serializable
           LookAndFeel laf = (LookAndFeel) lafClass.newInstance();
           setLookAndFeel(laf);
         }
+      else
+        {
+          setLookAndFeel(new MetalLookAndFeel());
+        }
     }
     catch (Exception ex)
       {
         System.err.println("cannot initialize Look and Feel: " + defaultlaf);
         System.err.println("error: " + ex.getMessage());
         System.err.println("falling back to Metal Look and Feel");
+        try
+          {
+            setLookAndFeel(new MetalLookAndFeel());
+          }
+        catch (Exception ex2)
+        {
+          throw (Error) new AssertionError("There must be no problem installing"
+                                           + " the MetalLookAndFeel.")
+                                           .initCause(ex2);
+        }
       }
-    currentLookAndFeel = new MetalLookAndFeel();
-    currentLookAndFeel.initialize();
-    currentUIDefaults = currentLookAndFeel.getDefaults();
-
   }
 
   /**
@@ -248,10 +258,10 @@ public class UIManager implements Serializable
     for (int i = 0; i < count; i++)
       {
         if (auxLookAndFeels[i] == laf)
-      {
+          {
             LookAndFeel[] temp = new LookAndFeel[auxLookAndFeels.length - 1];
             if (i == 0)
-          {
+              {
                 System.arraycopy(auxLookAndFeels, 1, temp, 0, count - 1);  
               }
             else if (i == count - 1)
@@ -280,7 +290,7 @@ public class UIManager implements Serializable
    * 
    * @see #addAuxiliaryLookAndFeel(LookAndFeel)
    */
-  public static  LookAndFeel[] getAuxiliaryLookAndFeels()
+  public static LookAndFeel[] getAuxiliaryLookAndFeels()
   {
     return auxLookAndFeels;
   }
@@ -293,7 +303,7 @@ public class UIManager implements Serializable
    * 
    * @return The object.
    */
-  public static  Object get(Object key)
+  public static Object get(Object key)
   {
     return getLookAndFeelDefaults().get(key);
   }
@@ -306,7 +316,7 @@ public class UIManager implements Serializable
    * 
    * @return The object.
    */
-  public static  Object get(Object key, Locale locale)
+  public static Object get(Object key, Locale locale)
   {
     return getLookAndFeelDefaults().get(key ,locale);
   }
@@ -356,7 +366,7 @@ public class UIManager implements Serializable
   /**
    * Returns a drawing color from the defaults table. 
    */
-  public static  Color getColor(Object key)
+  public static Color getColor(Object key)
   {
     return (Color) getLookAndFeelDefaults().get(key);
   }
@@ -364,7 +374,7 @@ public class UIManager implements Serializable
   /**
    * Returns a drawing color from the defaults table. 
    */
-  public static  Color getColor(Object key, Locale locale)
+  public static Color getColor(Object key, Locale locale)
   {
     return (Color) getLookAndFeelDefaults().get(key);
   }
@@ -375,7 +385,7 @@ public class UIManager implements Serializable
    * 
    * @return <code>"javax.swing.plaf.metal.MetalLookAndFeel"</code>
    */
-  public static  String getCrossPlatformLookAndFeelClassName()
+  public static String getCrossPlatformLookAndFeelClassName()
   {	
     return "javax.swing.plaf.metal.MetalLookAndFeel";
   }

@@ -46,55 +46,51 @@ import java.awt.Container;
  * implement this interface, typically this is implemented by the
  * Swing top-level containers.
  *
- * @author	Andrew Selkirk
+ * @author Andrew Selkirk
  */
-public interface RootPaneContainer {
+public interface RootPaneContainer
+{
 
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * getRootPane
+   * @returns JRootPane
+   */
+  JRootPane getRootPane();
 
-	/**
-	 * getRootPane
-	 * @returns JRootPane
-	 */
-	JRootPane getRootPane();
+  /**
+   * setContentPane
+   * @param contentPane TODO
+   */
+  void setContentPane(Container contentPane);
 
-	/**
-	 * setContentPane
-	 * @param contentPane TODO
-	 */
-	void setContentPane(Container contentPane);
+  /**
+   * getContentPane
+   * @returns Container
+   */
+  Container getContentPane();
 
-	/**
-	 * getContentPane
-	 * @returns Container
-	 */
-	Container getContentPane();
+  /**
+   * setLayeredPane
+   * @param layeredPane TODO
+   */
+  void setLayeredPane(JLayeredPane layeredPane);
 
-	/**
-	 * setLayeredPane
-	 * @param layeredPane TODO
-	 */
-	void setLayeredPane(JLayeredPane layeredPane);
+  /**
+   * getLayeredPane
+   * @returns JLayeredPane
+   */
+  JLayeredPane getLayeredPane();
 
-	/**
-	 * getLayeredPane
-	 * @returns JLayeredPane
-	 */
-	JLayeredPane getLayeredPane();
+  /**
+   * setGlassPane
+   * @param glassPane TODO
+   */
+  void setGlassPane(Component glassPane);
 
-	/**
-	 * setGlassPane
-	 * @param glassPane TODO
-	 */
-	void setGlassPane(Component glassPane);
+  /**
+   * getGlassPane
+   * @returns Component
+   */
+  Component getGlassPane();
 
-	/**
-	 * getGlassPane
-	 * @returns Component
-	 */
-	Component getGlassPane();
-
-
-} // RootPaneContainer
+}

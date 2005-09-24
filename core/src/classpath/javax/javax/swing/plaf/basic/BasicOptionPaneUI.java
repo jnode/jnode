@@ -127,7 +127,7 @@ public class BasicOptionPaneUI extends OptionPaneUI
 	    value = new Integer(JOptionPane.YES_OPTION);
 	  if (text.equals(NO_STRING))
 	    value = new Integer(JOptionPane.NO_OPTION);
-    }
+        }
       optionPane.setValue(value);
       resetInputValue();
 
@@ -162,7 +162,7 @@ public class BasicOptionPaneUI extends OptionPaneUI
    *           public for compatibility.
    */
   public static class ButtonAreaLayout implements LayoutManager
-    {
+  {
     /** Whether this layout will center the buttons. */
     protected boolean centersChildren = true;
 
@@ -186,7 +186,7 @@ public class BasicOptionPaneUI extends OptionPaneUI
      * @param padding The padding between the buttons.
      */
     public ButtonAreaLayout(boolean syncAllWidths, int padding)
-	    {
+    {
       this.syncAllWidths = syncAllWidths;
       this.padding = padding;
     }
@@ -198,7 +198,7 @@ public class BasicOptionPaneUI extends OptionPaneUI
      * @param comp The component added.
      */
     public void addLayoutComponent(String string, Component comp)
-		{
+    {
       // Do nothing.
     }
 
@@ -208,9 +208,9 @@ public class BasicOptionPaneUI extends OptionPaneUI
      * @return Whether the children will be centered.
      */
     public boolean getCentersChildren()
-			{
+    {
       return centersChildren;
-			}
+    }
 
     /**
      * This method returns the amount of space between components.
@@ -220,7 +220,7 @@ public class BasicOptionPaneUI extends OptionPaneUI
     public int getPadding()
     {
       return padding;
-		}
+    }
 
     /**
      * This method returns whether all components will share widths (set to
@@ -229,7 +229,7 @@ public class BasicOptionPaneUI extends OptionPaneUI
      * @return Whether all components will share widths.
      */
     public boolean getSyncAllWidths()
-	    {
+    {
       return syncAllWidths;
     }
 
@@ -239,27 +239,27 @@ public class BasicOptionPaneUI extends OptionPaneUI
      * @param container The container to lay out.
      */
     public void layoutContainer(Container container)
-		    {
+    {
       Component[] buttonList = container.getComponents();
       int x = container.getInsets().left;
       if (getCentersChildren())
 	x += (int) ((double) (container.getSize().width) / 2
 	- (double) (buttonRowLength(container)) / 2);
       for (int i = 0; i < buttonList.length; i++)
-			    {
+        {
 	  Dimension dims = buttonList[i].getPreferredSize();
 	  if (syncAllWidths)
-				    {
+	    {
 	      buttonList[i].setBounds(x, 0, widthOfWidestButton, dims.height);
 	      x += widthOfWidestButton + getPadding();
-				    }
+	    }
 	  else
-				    {
+	    {
 	      buttonList[i].setBounds(x, 0, dims.width, dims.height);
 	      x += dims.width + getPadding();
 	    }
         }
-				    }
+    }
 
     /**
      * This method returns the width of the given container taking into
@@ -292,7 +292,7 @@ public class BasicOptionPaneUI extends OptionPaneUI
       if (getSyncAllWidths())
 	width = widest * buttonList.length
 	        + getPadding() * (buttonList.length - 1);
-				else
+      else
 	width = buttonLength;
 
       Insets insets = c.getInsets();
@@ -321,11 +321,11 @@ public class BasicOptionPaneUI extends OptionPaneUI
      * @return The preferred size.
      */
     public Dimension preferredLayoutSize(Container c)
-				    {
+    {
       int w = buttonRowLength(c);
 
       return new Dimension(w, tallestButton);
-				    }
+    }
 
     /**
      * This method removes the given component from the layout manager's
@@ -336,7 +336,7 @@ public class BasicOptionPaneUI extends OptionPaneUI
     public void removeLayoutComponent(Component c)
     {
       // Do nothing.
-			    }
+    }
 
     /**
      * This method sets whether the children will be centered.
@@ -346,7 +346,7 @@ public class BasicOptionPaneUI extends OptionPaneUI
     public void setCentersChildren(boolean newValue)
     {
       centersChildren = newValue;
-		    }
+    }
 
     /**
      * This method sets the amount of space between each component.
@@ -356,7 +356,7 @@ public class BasicOptionPaneUI extends OptionPaneUI
     public void setPadding(int newPadding)
     {
       padding = newPadding;
-	    }
+    }
 
     /**
      * This method sets whether the widths will be synced.
@@ -367,7 +367,7 @@ public class BasicOptionPaneUI extends OptionPaneUI
     {
       syncAllWidths = newValue;
     }
-    }
+  }
 
   /**
    * This helper class handles property change events from the JOptionPane.
@@ -377,7 +377,7 @@ public class BasicOptionPaneUI extends OptionPaneUI
    *           public for compatibility.
    */
   public class PropertyChangeHandler implements PropertyChangeListener
-    {
+  {
     /**
      * This method is called when one of the properties of the JOptionPane
      * changes.
@@ -399,21 +399,35 @@ public class BasicOptionPaneUI extends OptionPaneUI
 	  optionPane.remove(buttonContainer);
 	  optionPane.add(newButtons);
 	  buttonContainer = newButtons;
-    }
+        }
 
       else if (e.getPropertyName().equals(JOptionPane.MESSAGE_PROPERTY)
                || e.getPropertyName().equals(JOptionPane.WANTS_INPUT_PROPERTY)
                || e.getPropertyName().equals(JOptionPane.SELECTION_VALUES_PROPERTY))
         {
-	  optionPane.removeAll();
-	  messageAreaContainer = createMessageArea();
-	  optionPane.add(messageAreaContainer);
-	  optionPane.add(buttonContainer);
+          optionPane.remove(messageAreaContainer);
+          messageAreaContainer = createMessageArea();
+          optionPane.add(messageAreaContainer);
+          Container newButtons = createButtonArea();
+          optionPane.remove(buttonContainer);
+          optionPane.add(newButtons);
+          buttonContainer = newButtons;
+          optionPane.add(buttonContainer);
         }
       optionPane.invalidate();
       optionPane.repaint();
     }
   }
+
+  /**
+   * The minimum width for JOptionPanes.
+   */
+  public static final int MinimumWidth = 262;
+
+  /**
+   * The minimum height for JOptionPanes.
+   */
+  public static final int MinimumHeight = 90;
 
   /** Whether the JOptionPane contains custom components. */
   protected boolean hasCustomComponents = false;
@@ -432,12 +446,6 @@ public class BasicOptionPaneUI extends OptionPaneUI
 
   /** The component that receives input when the JOptionPane needs it. */
   protected JComponent inputComponent;
-
-  /** The minimum height of the JOptionPane. */
-  public static int minimumHeight;
-
-  /** The minimum width of the JOptionPane. */
-  public static int minimumWidth;
 
   /** The minimum dimensions of the JOptionPane. */
   protected Dimension minimumSize;
@@ -860,10 +868,10 @@ public class BasicOptionPaneUI extends OptionPaneUI
     addIcon(messageArea);
 
     JPanel rightSide = new JPanel();
-    rightSide.setBorder(BorderFactory.createEmptyBorder(0, 11, 17, 0));
+    rightSide.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
     rightSide.setLayout(new GridBagLayout());
     GridBagConstraints con = createConstraints();
-
+    
     addMessageComponents(rightSide, con, getMessage(),
                          getMaxCharactersPerLineCount(), false);
 
@@ -886,7 +894,7 @@ public class BasicOptionPaneUI extends OptionPaneUI
 	  }
       }
 
-    messageArea.add(rightSide, BorderLayout.EAST);
+    messageArea.add(rightSide, BorderLayout.CENTER);
 
     return messageArea;
   }
@@ -944,10 +952,16 @@ public class BasicOptionPaneUI extends OptionPaneUI
       case JOptionPane.YES_NO_CANCEL_OPTION:
 	return new Object[] { YES_STRING, NO_STRING, CANCEL_STRING };
       case JOptionPane.OK_CANCEL_OPTION:
-      case JOptionPane.DEFAULT_OPTION:
 	return new Object[] { OK_STRING, CANCEL_STRING };
+      case JOptionPane.DEFAULT_OPTION:
+        return (optionPane.getWantsInput() ) ?
+               new Object[] { OK_STRING, CANCEL_STRING } :
+               ( optionPane.getMessageType() == JOptionPane.QUESTION_MESSAGE ) ?
+               new Object[] { YES_STRING, NO_STRING, CANCEL_STRING } :
+               // ERROR_MESSAGE, INFORMATION_MESSAGE, WARNING_MESSAGE, PLAIN_MESSAGE
+               new Object[] { OK_STRING };
       }
-	    return null;
+    return null;
   }
 
   /**
@@ -1084,8 +1098,8 @@ public class BasicOptionPaneUI extends OptionPaneUI
   public Dimension getPreferredSize(JComponent c)
   {
     Dimension d = optionPane.getLayout().preferredLayoutSize(optionPane);
-	Dimension d2 = getMinimumOptionPaneSize();
-	
+    Dimension d2 = getMinimumOptionPaneSize();
+
     int w = Math.max(d.width, d2.width);
     int h = Math.max(d.height, d2.height);
     return new Dimension(w, h);
@@ -1131,7 +1145,7 @@ public class BasicOptionPaneUI extends OptionPaneUI
 	((JComponent) button).setBorder(buttonBorder);
 	buttonContainer = button;
 	optionPane.add(button);
-    }
+      }
 
     optionPane.setBorder(BorderFactory.createEmptyBorder(12, 12, 11, 11));
     optionPane.invalidate();
@@ -1155,8 +1169,6 @@ public class BasicOptionPaneUI extends OptionPaneUI
     buttonBorder = defaults.getBorder("OptionPane.buttonAreaBorder");
 
     minimumSize = defaults.getDimension("OptionPane.minimumSize");
-    minimumWidth = minimumSize.width;
-    minimumHeight = minimumSize.height;
 
     // FIXME: Image icons don't seem to work properly right now.
     // Once they do, replace the synthetic icons with these ones.
@@ -1260,7 +1272,7 @@ public class BasicOptionPaneUI extends OptionPaneUI
 	else if (inputComponent instanceof JComboBox)
 	  ((JComboBox) inputComponent).setSelectedItem(init);
 	else if (inputComponent instanceof JList)
-  {
+	  {
 	    //  ((JList) inputComponent).setSelectedValue(init, true);
 	  }
       }

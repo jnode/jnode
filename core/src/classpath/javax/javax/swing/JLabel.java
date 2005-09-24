@@ -54,7 +54,7 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 
 /**
- * A swing widget that displays a text message and/or an icon. 
+ * A swing widget that displays a text message and/or an icon.
  */
 public class JLabel extends JComponent implements Accessible, SwingConstants
 {
@@ -331,9 +331,6 @@ public class JLabel extends JComponent implements Accessible, SwingConstants
   /** The gap between the icon and the text. */
   private transient int iconTextGap = 4;
 
-  /** The accessible context for this JLabel. */
-  private AccessibleJLabel accessibleContext;
-
   /**
    * Creates a new vertically centered, horizontally on the leading edge
    * JLabel object with text and no icon.
@@ -589,7 +586,7 @@ public class JLabel extends JComponent implements Accessible, SwingConstants
   }
 
   /**
-   * This method sets which character in the text will be  the underlined
+   * This method sets which character in the text will be the underlined
    * character. If the given index is -1, then this indicates  that there is
    * no mnemonic. If the index is less than -1 or if the index is equal to
    * the length, this method will throw an IllegalArgumentException.
@@ -600,23 +597,23 @@ public class JLabel extends JComponent implements Accessible, SwingConstants
    *         length.
    */
   public void setDisplayedMnemonicIndex(int newIndex)
-                                 throws IllegalArgumentException
+    throws IllegalArgumentException
   {
     if (newIndex < -1 || (text != null && newIndex >= text.length()))
       throw new IllegalArgumentException();
-      
+
     if (newIndex == -1
         || text == null
 	|| text.charAt(newIndex) != displayedMnemonic)
       newIndex = -1;
-      
+
     if (newIndex != displayedMnemonicIndex)
-    {
+      {
 	int oldIndex = displayedMnemonicIndex;
 	displayedMnemonicIndex = newIndex;
 	firePropertyChange("displayedMnemonicIndex",
 	                   oldIndex, newIndex);
-    }
+      }
   }
 
   /**
@@ -719,8 +716,8 @@ public class JLabel extends JComponent implements Accessible, SwingConstants
     if (alignment == verticalAlignment)
       return;
 
-	int oldAlignment = verticalAlignment;
-	verticalAlignment = checkVerticalKey(alignment, "verticalAlignment");
+    int oldAlignment = verticalAlignment;
+    verticalAlignment = checkVerticalKey(alignment, "verticalAlignment");
     firePropertyChange("verticalAlignment", oldAlignment, verticalAlignment);
   }
 
@@ -865,7 +862,7 @@ public class JLabel extends JComponent implements Accessible, SwingConstants
 	firePropertyChange("labelFor", oldLabelFor, labelFor);
       }
   }
-  
+
   /**
    * This method overrides setFont so that we can call for a repaint after the
    * font is changed.

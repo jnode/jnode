@@ -49,28 +49,28 @@ import java.util.Vector;
  * selection. Whenever selection in the JComboBox changes, the ComboBoxModel
  * will fire ListDataEvents to ComboBox's ListDataListeners.
  *
- * @author	Andrew Selkirk
+ * @author Andrew Selkirk
  * @author Olga Rodimina
  * @author Robert Schuster
  */
-public class DefaultComboBoxModel extends AbstractListModel 
-		implements MutableComboBoxModel, Serializable
+public class DefaultComboBoxModel extends AbstractListModel
+  implements MutableComboBoxModel, Serializable
 {
   private static final long serialVersionUID = 6698657703676921904L;
 
-	/**
+  /**
    * List containing items in the combo box
-	 */
-	private Vector list;
+   */
+  private Vector list;
 
-	/**
+  /**
    * Currently selected item in the combo box list
-	 */
+   */
   private Object selectedItem = null;
 
-	/**
+  /**
    * Constructor DefaultComboBoxModel. Create empty JComboBox.
-	 */
+   */
   public DefaultComboBoxModel()
   {
     list = new Vector();
@@ -85,6 +85,8 @@ public class DefaultComboBoxModel extends AbstractListModel
   public DefaultComboBoxModel(Object[] items)
   {
     list = new Vector(Arrays.asList(items));
+    if (list.size() > 0)
+      selectedItem = list.get(0);
   }
 
   /**
@@ -96,6 +98,8 @@ public class DefaultComboBoxModel extends AbstractListModel
   public DefaultComboBoxModel(Vector vector)
   {
     this.list = vector;
+    if (vector.size() > 0)
+      selectedItem = vector.get(0);
   }
 
   /**
@@ -107,8 +111,17 @@ public class DefaultComboBoxModel extends AbstractListModel
    */
   public void addElement(Object object)
   {
-    list.add(object);
-    fireIntervalAdded(this, list.size() - 1, list.size());
+    if (list.size() == 0)
+      {
+        list.add(object);
+        selectedItem = object;
+        fireContentsChanged(this, -1, -1);
+      }
+    else
+      {
+        list.add(object);
+        fireIntervalAdded(this, list.size() - 1, list.size() - 1);
+      }
   }
 
   /**
@@ -122,7 +135,17 @@ public class DefaultComboBoxModel extends AbstractListModel
    */
   public void removeElementAt(int index)
   {
+    int selected = getIndexOf(selectedItem);
     list.remove(index);
+    if (selected == index) // choose a new selected item
+      {
+        if (selected > 0)
+          selectedItem = getElementAt(selected - 1);
+        else 
+          selectedItem = getElementAt(selected);
+            
+          
+      }
     fireIntervalRemoved(this, index, index);
   }
 
@@ -163,9 +186,13 @@ public class DefaultComboBoxModel extends AbstractListModel
    */
   public void removeAllElements()
   {
-    list.clear();
-    int listSize = getSize();
-    fireIntervalAdded(this, 0, listSize);
+    selectedItem = null;
+    int size = getSize();
+    if (size > 0)
+      {
+        list.clear();
+        fireIntervalRemoved(this, 0, size - 1);
+      }
   }
 
   /**
@@ -183,7 +210,7 @@ public class DefaultComboBoxModel extends AbstractListModel
    * ListDataEvent to all registered ListDataListeners of the JComboBox. The
    * start and end index of the event is set to -1 to indicate combo box's
    * selection has changed, and not its contents.
-   *
+   * 
    * <p>If the given object is not contained in the combo box list then nothing
    * happens.</p>
    *
@@ -191,14 +218,9 @@ public class DefaultComboBoxModel extends AbstractListModel
    */
   public void setSelectedItem(Object object)
   {
-    
-    // Updates the selected item only if the given object
-    // is null or in the list (this is how the JDK behaves).
-    if(object == null || list.contains(object)) {
     selectedItem = object;
-    fireContentsChanged(this, -1, -1);
-    }
-  	
+    if(object == null || list.contains(object)) 
+      fireContentsChanged(this, -1, -1);	
   }
 
   /**
@@ -220,6 +242,8 @@ public class DefaultComboBoxModel extends AbstractListModel
    */
   public Object getElementAt(int index)
   {
+    if (index < 0 || index >= list.size())
+      return null;
     return list.elementAt(index);
   }
 

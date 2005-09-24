@@ -44,7 +44,9 @@ package javax.xml.transform;
 public class TransformerFactoryConfigurationError
   extends Error
 {
-
+  private static final long serialVersionUID = -6527718720676281516L;
+  
+  // Name is fixed by the serialization spec.
   private final Exception  exception;
 
   /**
@@ -75,10 +77,10 @@ public class TransformerFactoryConfigurationError
    * Constructor with an underlying cause and detail message.
    */
   public TransformerFactoryConfigurationError(Exception e, String msg)
-    {
+  {
     super(msg);
-	exception = e;
-    }
+    exception = e;
+  }
 
   /**
    * Returns the detail message.
@@ -97,8 +99,8 @@ public class TransformerFactoryConfigurationError
    * Returns the underlying cause.
    */
   public Exception getException()
-    {
+  {
     return exception;
-    }
-
+  }
+  
 }
