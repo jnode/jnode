@@ -62,19 +62,15 @@ import org.omg.CORBA.StringHolder;
 import org.omg.CORBA.TCKind;
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.TypeCodeHolder;
-import org.omg.CORBA.TypeCodePackage.BadKind;
 import org.omg.CORBA.ValueBaseHolder;
 import org.omg.CORBA.portable.BoxedValueHelper;
 import org.omg.CORBA.portable.Streamable;
 
-import java.io.IOException;
 import java.io.Serializable;
-
 import java.lang.reflect.Field;
-
 import java.math.BigDecimal;
-
 import java.util.Arrays;
+import java.util.zip.Adler32;
 
 /**
  * The implementation of {@link Any}.
@@ -159,14 +155,14 @@ public class gnuAny
       }
     else
       {
-    cdrBufOutput out = new cdrBufOutput();
-    out.setOrb(orb);
-    write_value(out);
+        cdrBufOutput out = new cdrBufOutput();
+        out.setOrb(orb);
+        write_value(out);
 
-    cdrBufInput in = new cdrBufInput(out.buffer.toByteArray());
-    in.setOrb(orb);
-    return in;
-  }
+        cdrBufInput in = new cdrBufInput(out.buffer.toByteArray());
+        in.setOrb(orb);
+        return in;
+      }
   }
 
   /**
@@ -206,6 +202,28 @@ public class gnuAny
     byte[] bb = b.buffer.toByteArray();
 
     return Arrays.equals(ba, bb);
+  }
+  
+  /**
+   * Get the content - dependent hashcode.
+   */
+  public int hashCode()
+  {
+    if (has == null)
+      return type().kind().value();
+    else
+      {
+        Adler32 adler = new Adler32();
+
+        cdrBufOutput a = new cdrBufOutput();
+        a.setOrb(orb);
+        write_value(a);
+        
+        adler.update(a.buffer.toByteArray());
+        adler.update(type().kind().value());
+        
+        return (int) adler.getValue() & Integer.MAX_VALUE;
+      }
   }
 
   /**
@@ -284,7 +302,7 @@ public class gnuAny
     try
       {
         if (has instanceof ValueBaseHolder)
-        return ((ValueBaseHolder) has).value;
+          return ((ValueBaseHolder) has).value;
         else
           {
             // Normally, ValueBase holder must be an instance of the
@@ -293,7 +311,7 @@ public class gnuAny
             // way to access the wrapped value is via reflection.
             Field f = has.getClass().getField("value");
             return (Serializable) f.get(has);
-      }
+          }
       }
     catch (Exception ex)
       {
@@ -508,10 +526,10 @@ public class gnuAny
         has = new gnuValueHolder(x, typecode);
       }
     else
-  {
-    type(typecode);
-    insert_Value(x);
-  }
+      {
+        type(typecode);
+        insert_Value(x);
+      }
   }
 
   /** {@inheritDoc} */
@@ -523,11 +541,11 @@ public class gnuAny
       }
     else
       {
-    if (has instanceof ValueBaseHolder)
-      ((ValueBaseHolder) has).value = x;
-    else
-      has = new ValueBaseHolder(x);
-  }
+        if (has instanceof ValueBaseHolder)
+          ((ValueBaseHolder) has).value = x;
+        else
+          has = new ValueBaseHolder(x);
+      }
   }
 
   /**
@@ -753,14 +771,14 @@ public class gnuAny
           {
             has = holderFactory.createHolder(a_type);
             if (has == null)
-            {
-              // Use the Universal Holder that reads till the end of stream.
-              // This works with the extract/insert pair of the typical
-              // Helper.
-              cdrBufOutput buffer = new cdrBufOutput();
-              buffer.setOrb(orb);
-              has = new universalHolder(buffer);
-            }
+              {
+                // Use the Universal Holder that reads till the end of stream.
+                // This works with the extract/insert pair of the typical
+                // Helper.
+                cdrBufOutput buffer = new cdrBufOutput();
+                buffer.setOrb(orb);
+                has = new universalHolder(buffer);
+              }
           }
         type(a_type);
 
@@ -778,9 +796,9 @@ public class gnuAny
                 Class helperClass =
                   Class.forName(ObjectCreator.toHelperName(a_type.id()));
                 helper = (BoxedValueHelper) helperClass.newInstance();
-      }
+              }
             catch (Exception ex)
-      {
+              {
                 helper = null;
               }
 
@@ -855,9 +873,9 @@ public class gnuAny
                 has._type().kind().value() == kind
               )
              )
-          throw new BAD_OPERATION("Extracting " + typeNamer.nameIt(kind) +
-                                  " when stored " + typeNamer.nameIt(xKind)
-                                 );
+            throw new BAD_OPERATION("Extracting " + typeNamer.nameIt(kind) +
+                                    " when stored " + typeNamer.nameIt(xKind)
+                                   );
       }
     else
       {
@@ -867,9 +885,9 @@ public class gnuAny
                 has._type().kind().value() == kind
               )
              )
-          throw new BAD_OPERATION("Extracting " + typeNamer.nameIt(kind) +
-                                  " stored " + typeNamer.nameIt(type())
-                                 );
+            throw new BAD_OPERATION("Extracting " + typeNamer.nameIt(kind) +
+                                    " stored " + typeNamer.nameIt(type())
+                                   );
       }
   }
 
