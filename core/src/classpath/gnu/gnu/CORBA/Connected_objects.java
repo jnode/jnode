@@ -90,17 +90,6 @@ public class Connected_objects
      * applicable.
      */
     public final java.lang.Object identity;
-
-    public boolean equals(java.lang.Object other)
-    {
-      if (other instanceof cObject)
-        {
-          cObject o = (cObject) other;
-          return o.object.equals(object) && o.port == port;
-        }
-      else
-        return false;
-    }
   }
 
   /**
@@ -129,19 +118,19 @@ public class Connected_objects
   {
     synchronized (objects)
       {
-    Map.Entry item;
-    Iterator iter = objects.entrySet().iterator();
-    cObject ref;
+        Map.Entry item;
+        Iterator iter = objects.entrySet().iterator();
+        cObject ref;
 
-    while (iter.hasNext())
-      {
-        item = (Map.Entry) iter.next();
-        ref = (cObject) item.getValue();
+        while (iter.hasNext())
+          {
+            item = (Map.Entry) iter.next();
+            ref = (cObject) item.getValue();
             if (stored_object.equals(ref.object) ||
                 stored_object._is_equivalent(ref.object)
                )
-          return ref;
-      }
+              return ref;
+          }
       }
 
     return null;
@@ -176,8 +165,8 @@ public class Connected_objects
   {
     cObject rec = new cObject(object, port, key, identity);
     synchronized (objects)
-  {
-    objects.put(key, rec);
+      {
+        objects.put(key, rec);
       }
     return rec;
   }
@@ -193,8 +182,8 @@ public class Connected_objects
   {
     synchronized (objects)
       {
-    return (cObject) objects.get(key);
-  }
+        return (cObject) objects.get(key);
+      }
   }
 
   /**
@@ -214,10 +203,10 @@ public class Connected_objects
   {
     synchronized (objects)
       {
-    cObject ref = getKey(object);
-    if (ref != null)
-      objects.remove(ref.key);
-  }
+        cObject ref = getKey(object);
+        if (ref != null)
+          objects.remove(ref.key);
+      }
   }
 
   /**
@@ -227,7 +216,7 @@ public class Connected_objects
    */
   public void remove(byte[] key)
   {
-      objects.remove(key);
+    objects.remove(key);
   }
 
   /**
