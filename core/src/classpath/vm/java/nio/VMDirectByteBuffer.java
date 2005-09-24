@@ -21,7 +21,7 @@
  
 package java.nio;
 
-import gnu.classpath.RawData;
+import gnu.classpath.Pointer;
 
 import javax.naming.NameNotFoundException;
 
@@ -37,7 +37,7 @@ import org.vmmagic.unboxed.Offset;
 
 public final class VMDirectByteBuffer {
 
-	static RawData allocate(int capacity) {
+	static Pointer allocate(int capacity) {
 		return new MemoryRawData(capacity);
 	}
     
@@ -48,33 +48,33 @@ public final class VMDirectByteBuffer {
      */
     public static ByteBuffer wrap(MemoryResource resource) {
         final Object owner = resource.getOwner();
-        final RawData address = new MemoryRawData(resource);
+        final Pointer address = new MemoryRawData(resource);
         final int size = resource.getSize().toInt();
         final ByteBuffer result = new DirectByteBufferImpl.ReadWrite(owner, address, size, size, 0);
         result.mark();
         return result;
     }
 
-	static void free(RawData address) {
+	static void free(Pointer address) {
 		((MemoryRawData)address).resource.release();
 	}
 
-	static byte get(RawData address, int index) {
+	static byte get(Pointer address, int index) {
         final MemoryRawData mrd = (MemoryRawData)address;
 		final byte value = mrd.address.loadByte(Offset.fromIntZeroExtend(index));
 		return value;
 	}
 
-	static void get(RawData address, int index, byte[] dst, int offset,
+	static void get(Pointer address, int index, byte[] dst, int offset,
 			int length) {
 		((MemoryRawData)address).resource.getBytes(index, dst, offset, length);
 	}
 
-	static void put(RawData address, int index, byte value) {
+	static void put(Pointer address, int index, byte value) {
 		((MemoryRawData)address).resource.setByte(index, value);
 	}
 
-	static RawData adjustAddress(RawData address, int offset) {
+	static Pointer adjustAddress(Pointer address, int offset) {
 		final MemoryResource res = ((MemoryRawData)address).resource;
 		final Extent size = res.getSize().sub(offset);
 		try {
@@ -84,12 +84,12 @@ public final class VMDirectByteBuffer {
 		}
 	}
 
-	static void shiftDown(RawData address, int dst_offset, int src_offset,
+	static void shiftDown(Pointer address, int dst_offset, int src_offset,
 			int count) {
 		((MemoryRawData)address).resource.copy(src_offset, dst_offset, count);
 	}
 
-	private static class MemoryRawData extends RawData {
+	private static class MemoryRawData extends Pointer {
 
 		final MemoryResource resource;
         final Address address;
