@@ -316,7 +316,8 @@ public class ServerSocket
   {
     SecurityManager sm = System.getSecurityManager();
     if (sm != null)
-      sm.checkListen(impl.getLocalPort());
+      sm.checkAccept(impl.getInetAddress().getHostAddress(),
+                     impl.getLocalPort());
 
     Socket socket = new Socket();
 
