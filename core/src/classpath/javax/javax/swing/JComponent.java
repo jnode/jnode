@@ -341,6 +341,12 @@ public abstract class JComponent extends Container implements Serializable
   boolean autoscrolls = false;
 
   /**
+   * Indicates whether the current paint call is already double buffered or
+   * not. 
+   */
+  static boolean isPaintingDoubleBuffered = false;
+
+  /**
    * Listeners for events other than {@link PropertyChangeEvent} are
    * handled by this listener list. PropertyChangeEvents are handled in
    * {@link #changeSupport}.
@@ -1449,9 +1455,26 @@ public abstract class JComponent extends Container implements Serializable
    */
   public void paint(Graphics g)
   {
-    paintComponent(g);
-    paintBorder(g);
-    paintChildren(g);
+    RepaintManager rm = RepaintManager.currentManager(this);
+    // We do a little stunt act here to switch on double buffering if it's
+    // not already on. If we are not already doublebuffered, then we jump
+    // into the method paintDoubleBuffered, which turns on the double buffer
+    // and then calls paint(g) again. In the second call we go into the else
+    // branch of this if statement and actually paint things to the double
+    // buffer. When this method completes, the call stack unwinds back to
+    // paintDoubleBuffered, where the buffer contents is finally drawn to the
+    // screen.
+    if (!isPaintingDoubleBuffered && isDoubleBuffered()
+        && rm.isDoubleBufferingEnabled())
+      paintDoubleBuffered(g);
+    else
+      {
+        if (g.getClip() == null)
+          g.setClip(0, 0, getWidth(), getHeight());
+        paintComponent(g);
+        paintBorder(g);
+        paintChildren(g);
+      }
   }
 
   /**
@@ -1604,10 +1627,13 @@ public abstract class JComponent extends Container implements Serializable
   void paintImmediately2(Rectangle r)
   {
     RepaintManager rm = RepaintManager.currentManager(this);
+    Graphics g = getGraphics();
+    g.setClip(r.x, r.y, r.width, r.height);
     if (rm.isDoubleBufferingEnabled() && isDoubleBuffered())
-      paintDoubleBuffered(r);
+      paintDoubleBuffered(g);
     else
-      paintSimple(r);
+      paintSimple(g);
+    g.dispose();
   }
 
   /**
@@ -1615,38 +1641,40 @@ public abstract class JComponent extends Container implements Serializable
    *
    * @param r the area to be repainted
    */
-  void paintDoubleBuffered(Rectangle r)
+  void paintDoubleBuffered(Graphics g)
   {
+    
+    Rectangle r = g.getClipBounds();
+    if (r == null)
+      r = new Rectangle(0, 0, getWidth(), getHeight());
     RepaintManager rm = RepaintManager.currentManager(this);
 
     // Paint on the offscreen buffer.
-    Image buffer = rm.getOffscreenBuffer(this, getWidth(), getHeight());
-    Graphics g = buffer.getGraphics();
-    Graphics g2 = getComponentGraphics(g);
-    g2.setClip(r.x, r.y, r.width, r.height);
-    paint(g2);
-    g2.dispose();
-    g.dispose();
+    synchronized (paintLock)
+      {
+        Image buffer = rm.getOffscreenBuffer(this, getWidth(), getHeight());
+        Graphics g2 = buffer.getGraphics();
+        g2 = getComponentGraphics(g2);
+        g2.setClip(r.x, r.y, r.width, r.height);
+        isPaintingDoubleBuffered = true;
+        paint(g2);
+        isPaintingDoubleBuffered = false;
+        g2.dispose();
 
-    // Paint the buffer contents on screen.
-    Graphics g3 = getGraphics();
-    g3.setClip(r.x, r.y, r.width, r.height);
-    g3.drawImage(buffer, 0, 0, this);
-    g3.dispose();
+        // Paint the buffer contents on screen.
+        g.drawImage(buffer, 0, 0, this);
+      }
   }
 
   /**
    * Performs normal painting without double buffering.
    *
-   * @param r the area to be repainted
+   * @param g the graphics context to use
    */
-  void paintSimple(Rectangle r)
+  void paintSimple(Graphics g)
   {
-    Graphics g = getGraphics();
     Graphics g2 = getComponentGraphics(g);
     paint(g2);
-    g2.dispose();
-    g2.dispose();
   }
 
   /**

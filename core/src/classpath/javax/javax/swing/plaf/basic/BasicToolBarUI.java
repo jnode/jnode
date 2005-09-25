@@ -65,6 +65,7 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 import javax.swing.RootPaneContainer;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -131,6 +132,26 @@ public class BasicToolBarUI extends ToolBarUI implements SwingConstants
 
   /** The Focus listener for the JToolBar. */
   protected FocusListener toolBarFocusListener;
+
+  /**
+   * @deprecated since JDK1.3.
+   */
+  protected KeyStroke leftKey;
+
+  /**
+   * @deprecated since JDK1.3.
+   */
+  protected KeyStroke rightKey;
+
+  /**
+   * @deprecated since JDK1.3.
+   */
+  protected KeyStroke upKey;
+
+  /**
+   * @deprecated since JDK1.3.
+   */
+  protected KeyStroke downKey;
 
   /**
    * The floating window that is responsible for holding the JToolBar when it
@@ -591,10 +612,8 @@ public class BasicToolBarUI extends ToolBarUI implements SwingConstants
 
   /**
    * This method installs listeners for the JToolBar.
-   *
-   * @param toolbar The JToolBar to register listeners for.
    */
-  protected void installListeners(JToolBar toolbar)
+  protected void installListeners()
   {
     dockingListener = createDockingListener();
     toolBar.addMouseListener(dockingListener);
@@ -694,7 +713,7 @@ public class BasicToolBarUI extends ToolBarUI implements SwingConstants
 	toolBar.setOpaque(true);
 	installDefaults();
 	installComponents();
-	installListeners(toolBar);
+	installListeners();
 	installKeyboardActions();
       }
   }

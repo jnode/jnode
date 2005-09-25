@@ -1,5 +1,5 @@
-/* Inherited.java - Indicates inherited annotation
-   Copyright (C) 2004, 2005 Free Software Foundation
+/* IllegalFormatCodePointException.java
+   Copyright (C) 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,17 +35,24 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package java.lang.annotation;
 
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
+package java.util;
 
-/**
- * @author Tom Tromey (tromey@redhat.com)
- * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
- * @since 1.5
- */
-@Documented @Retention(RUNTIME) @Target(ANNOTATION_TYPE)
-public @interface Inherited
+/** @since 1.5 */
+public class IllegalFormatCodePointException extends IllegalFormatException
 {
+  private static final long serialVersionUID = 19080630L;
+
+  // Note: name fixed by serialization.
+  int c;
+
+  public IllegalFormatCodePointException(int c)
+  {
+    this.c = c;
+  }
+
+  public int getCodePoint()
+  {
+    return c;
+  }
 }
