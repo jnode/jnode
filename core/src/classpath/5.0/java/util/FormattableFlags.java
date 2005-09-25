@@ -1,5 +1,5 @@
-/* Inherited.java - Indicates inherited annotation
-   Copyright (C) 2004, 2005 Free Software Foundation
+/* FormattableFlags.java --
+   Copyright (C) 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,17 +35,26 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package java.lang.annotation;
 
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
+package java.util;
 
-/**
- * @author Tom Tromey (tromey@redhat.com)
- * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
- * @since 1.5
- */
-@Documented @Retention(RUNTIME) @Target(ANNOTATION_TYPE)
-public @interface Inherited
+/** @since 1.5 */
+public class FormattableFlags
 {
+  public static final int LEFT_JUSTIFY = 1;
+  public static final int UPPERCASE = 2;
+  public static final int ALTERNATE = 4;
+
+  // Used internally by Formatter.
+  // Changes here must be reflected in the FLAGS string there.
+  static final int PLUS = 8;
+  static final int SPACE = 16;
+  static final int ZERO = 32;
+  static final int COMMA = 64;
+  static final int PAREN = 128;
+
+  // Not instantiable.
+  private FormattableFlags()
+  {
+  }
 }

@@ -467,6 +467,8 @@ public abstract class BasicLookAndFeel extends LookAndFeel
       "FocusManagerClassName", "TODO",
       "FormattedTextField.background", new ColorUIResource(light),
       "FormattedTextField.caretForeground", new ColorUIResource(Color.black),
+      "FormattedTextField.font",
+      new FontUIResource("SansSerif", Font.PLAIN, 12),
       "FormattedTextField.foreground", new ColorUIResource(Color.black),
       "FormattedTextField.inactiveBackground", new ColorUIResource(light),
       "FormattedTextField.inactiveForeground", new ColorUIResource(Color.gray),

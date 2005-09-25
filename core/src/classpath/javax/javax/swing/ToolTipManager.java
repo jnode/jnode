@@ -44,7 +44,6 @@ import java.awt.FlowLayout;
 import java.awt.LayoutManager;
 import java.awt.Panel;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -521,9 +520,11 @@ public class ToolTipManager extends MouseAdapter implements MouseMotionListener
         tooltipWindow.pack();
         tooltipWindow.setBounds(p.x, p.y, dims.width, dims.height);
         tooltipWindow.show();
+        tooltipWindow.validate();
         tooltipWindow.repaint();
       }
     currentTip.setVisible(true);
+    currentTip.revalidate();
     currentTip.repaint();
   }
 
