@@ -54,7 +54,7 @@ public abstract class BMPDecoder {
     public BMPDecoder(BMPFileHeader fh, BMPInfoHeader ih){
 	fileHeader = fh;
 	infoHeader = ih;
-	offset = fh.SIZE + ih.SIZE;
+	offset = BMPFileHeader.SIZE + BMPInfoHeader.SIZE;
     }
 
     /**
