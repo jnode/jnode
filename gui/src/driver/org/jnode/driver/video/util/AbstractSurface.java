@@ -35,13 +35,14 @@ import org.jnode.driver.video.Surface;
  * Abstract and generic implementation of a Surface.
  * 
  * @author epr
- * @author Levente S\u00e1ntha
  */
 public abstract class AbstractSurface implements Surface {
 
 	protected int width;
 	protected int height;
 
+	private double[] curvesData = new double[200];
+	
 	public AbstractSurface(int width, int height) {
 		this.width = width;
 		this.height = height;
@@ -235,10 +236,11 @@ public abstract class AbstractSurface implements Surface {
 	 * @param mode
 	 */
 	protected void drawCurve(double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3, int color, int mode) {
-		final double[] points = new double[42];
-		Curves.calculateCubicCurve(x0, y0, x1, y1, x2, y2, x3, y3, points);
-		for (int i = 0; i < points.length - 2; i += 2) {
-			drawLine((int) points[i], (int) points[i + 1], (int) points[i + 2], (int) points[i + 3], color, mode);
+		//final double[] points = new double[42];
+		//Curves.calculateCubicCurve(x0, y0, x1, y1, x2, y2, x3, y3, points);
+		int length = Curves.calculateCubicCurveOpt2(x0,y0,x1,y1,x2,y2,x3,y3, curvesData);
+		for (int i = 0; i < length - 2; i += 2) {
+			drawLine((int) curvesData[i], (int) curvesData[i + 1], (int) curvesData[i + 2], (int) curvesData[i + 3], color, mode);
 		}
 	}
 
@@ -255,10 +257,11 @@ public abstract class AbstractSurface implements Surface {
 	 * @param mode
 	 */
 	protected void drawQuadCurve(double x0, double y0, double x1, double y1, double x2, double y2, int color, int mode) {
-		final double[] points = new double[42];
-		Curves.calculateQuadCurve(x0, y0, x1, y1, x2, y2, points);
-		for (int i = 0; i < points.length - 2; i += 2) {
-			drawLine((int) points[i], (int) points[i + 1], (int) points[i + 2], (int) points[i + 3], color, mode);
+		//final double[] points = new double[42];
+		//Curves.calculateQuadCurve(x0, y0, x1, y1, x2, y2, points);
+		int length = Curves.calculateQuadCurveOpt2(x0,y0,x1,y1,x2,y2,curvesData);
+		for (int i = 0; i < length - 2; i += 2) {
+			drawLine((int) curvesData[i], (int) curvesData[i + 1], (int) curvesData[i + 2], (int) curvesData[i + 3], color, mode);
 		}
 	}
 
@@ -357,20 +360,22 @@ public abstract class AbstractSurface implements Surface {
 	protected abstract int convertColor(Color color);
 
     /**
-     * @see org.jnode.driver.video.Surface#getRGBPixel(int, int)
-     */
-    public int getRGBPixel(int x, int y) {
-        throw new RuntimeException("getRGBPixel(int,int) is not implemented for this video driver");
-    }
+	 * @see org.jnode.driver.video.Surface#getRGBPixel(int, int)
+	 */
+	public int getRGBPixel(int x, int y) {
+		throw new RuntimeException(
+				"getRGBPixel(int,int) is not implemented for this video driver");
+	}
 
-    /**
-     * @see org.jnode.driver.video.Surface#getRGBPixels(java.awt.Rectangle)
-     */
-    public int[] getRGBPixels(Rectangle region) {
-        throw new RuntimeException("getRGBPixels(Rectangle) is not implemented for this video driver");
-    }
+	/**
+	 * @see org.jnode.driver.video.Surface#getRGBPixels(java.awt.Rectangle)
+	 */
+	public int[] getRGBPixels(Rectangle region) {
+		throw new RuntimeException(
+				"getRGBPixels(Rectangle) is not implemented for this video driver");
+	}
 
-    protected void setSize(int width, int height) {
+	protected void setSize(int width, int height) {
 		this.width = width;
 		this.height = height;
 	}

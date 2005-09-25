@@ -140,6 +140,10 @@ public class FBTest {
             }
             log.info("End of FBTest");
         }
+                
+        CurvesTest.compareCubicCurveImpl();
+        
+        CurvesTest.compareQuadCurveImpl();
     }
 
     final int randomX() {
