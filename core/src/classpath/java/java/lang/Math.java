@@ -1,5 +1,5 @@
 /* java.lang.Math -- common mathematical functions, native allowed
-   Copyright (C) 1998, 2001, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1998, 2001, 2002, 2003 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -35,6 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.lang;
 
 import java.util.Random;
@@ -48,15 +49,17 @@ import java.util.Random;
  *
  * @author Paul Fisher
  * @author John Keiser
- * @author Eric Blake <ebb9@email.byu.edu>
+ * @author Eric Blake (ebb9@email.byu.edu)
  * @since 1.0
  */
-public final class Math {
+public final class Math
+{
 	/**
 	 * Math is non-instantiable
 	 */
-	private Math() {
-	}
+  private Math()
+  {
+  }
 
 	/**
 	 * A random number generator, initialized on first use.
@@ -93,7 +96,8 @@ public final class Math {
 	 * @return the absolute value
 	 * @see Integer#MIN_VALUE
 	 */
-	public static int abs(int i) {
+  public static int abs(int i)
+  {
 		return (i < 0) ? -i : i;
 	}
 
@@ -111,7 +115,8 @@ public final class Math {
 	 * @return the absolute value
 	 * @see Long#MIN_VALUE
 	 */
-	public static long abs(long l) {
+  public static long abs(long l)
+  {
 		return (l < 0) ? -l : l;
 	}
 
@@ -126,7 +131,8 @@ public final class Math {
 	 * @param f the number to take the absolute value of
 	 * @return the absolute value
 	 */
-	public static float abs(float f) {
+  public static float abs(float f)
+  {
 		return (f <= 0) ? 0 - f : f;
 	}
 
@@ -141,7 +147,8 @@ public final class Math {
 	 * @param d the number to take the absolute value of
 	 * @return the absolute value
 	 */
-	public static double abs(double d) {
+  public static double abs(double d)
+  {
 		return (d <= 0) ? 0 - d : d;
 	}
 
@@ -152,7 +159,8 @@ public final class Math {
 	 * @param b a second number
 	 * @return the smaller of the two numbers
 	 */
-	public static int min(int a, int b) {
+  public static int min(int a, int b)
+  {
 		return (a < b) ? a : b;
 	}
 
@@ -163,7 +171,8 @@ public final class Math {
 	 * @param b a second number
 	 * @return the smaller of the two numbers
 	 */
-	public static long min(long a, long b) {
+  public static long min(long a, long b)
+  {
 		return (a < b) ? a : b;
 	}
 
@@ -175,14 +184,15 @@ public final class Math {
 	 * @param b a second number
 	 * @return the smaller of the two numbers
 	 */
-	public static float min(float a, float b) {
+  public static float min(float a, float b)
+  {
 		// this check for NaN, from JLS 15.21.1, saves a method call
-		if (Float.isNaN(a))
+    if (a != a)
 			return a;
 		// no need to check if b is NaN; < will work correctly
 		// recall that -0.0 == 0.0, but [+-]0.0 - [+-]0.0 behaves special
 		if (a == 0 && b == 0)
-			return - (-a - b);
+      return -(-a - b);
 		return (a < b) ? a : b;
 	}
 
@@ -194,14 +204,15 @@ public final class Math {
 	 * @param b a second number
 	 * @return the smaller of the two numbers
 	 */
-	public static double min(double a, double b) {
+  public static double min(double a, double b)
+  {
 		// this check for NaN, from JLS 15.21.1, saves a method call
-		if (Double.isNaN(a))
+    if (a != a)
 			return a;
 		// no need to check if b is NaN; < will work correctly
 		// recall that -0.0 == 0.0, but [+-]0.0 - [+-]0.0 behaves special
 		if (a == 0 && b == 0)
-			return - (-a - b);
+      return -(-a - b);
 		return (a < b) ? a : b;
 	}
 
@@ -212,7 +223,8 @@ public final class Math {
 	 * @param b a second number
 	 * @return the larger of the two numbers
 	 */
-	public static int max(int a, int b) {
+  public static int max(int a, int b)
+  {
 		return (a > b) ? a : b;
 	}
 
@@ -223,7 +235,8 @@ public final class Math {
 	 * @param b a second number
 	 * @return the larger of the two numbers
 	 */
-	public static long max(long a, long b) {
+  public static long max(long a, long b)
+  {
 		return (a > b) ? a : b;
 	}
 
@@ -235,9 +248,10 @@ public final class Math {
 	 * @param b a second number
 	 * @return the larger of the two numbers
 	 */
-	public static float max(float a, float b) {
+  public static float max(float a, float b)
+  {
 		// this check for NaN, from JLS 15.21.1, saves a method call
-		if (Float.isNaN(a))
+    if (a != a)
 			return a;
 		// no need to check if b is NaN; > will work correctly
 		// recall that -0.0 == 0.0, but [+-]0.0 - [+-]0.0 behaves special
@@ -254,9 +268,10 @@ public final class Math {
 	 * @param b a second number
 	 * @return the larger of the two numbers
 	 */
-	public static double max(double a, double b) {
+  public static double max(double a, double b)
+  {
 		// this check for NaN, from JLS 15.21.1, saves a method call
-		if (Double.isNaN(a))
+    if (a != a)
 			return a;
 		// no need to check if b is NaN; > will work correctly
 		// recall that -0.0 == 0.0, but [+-]0.0 - [+-]0.0 behaves special
@@ -519,7 +534,7 @@ public final class Math {
 	 * double to <code>x / y</code> (ties go to the even n); for a zero
 	 * remainder, the sign is that of <code>x</code>. If either argument is NaN,
 	 * the first argument is infinite, or the second argument is zero, the result
-	 * is NaN; if x is finite but y is infinte, the result is x. This is
+   * is NaN; if x is finite but y is infinite, the result is x. This is
 	 * accurate within the limits of doubles.
 	 *
 	 * @param x the dividend (the top half)
@@ -564,13 +579,14 @@ public final class Math {
 	 * @param a the value to act upon
 	 * @return the nearest integer to <code>a</code>
 	 */
-	public static double rint(double a) {
-		return StrictMath.rint(a);
-	}
+  public static double rint(double a)
+  {
+      return StrictMath.rint(a);
+  }
 
 	/**
 	 * Take the nearest integer to the argument.  This is equivalent to
-	 * <code>(int) Math.floor(a + 0.5f). If the argument is NaN, the result
+   * <code>(int) Math.floor(a + 0.5f)</code>. If the argument is NaN, the result
 	 * is 0; otherwise if the argument is outside the range of int, the result
 	 * will be Integer.MIN_VALUE or Integer.MAX_VALUE, as appropriate.
 	 *
@@ -579,8 +595,10 @@ public final class Math {
 	 * @see Integer#MIN_VALUE
 	 * @see Integer#MAX_VALUE
 	 */
-	public static int round(float a) {
-		if (Float.isNaN(a))
+  public static int round(float a)
+  {
+    // this check for NaN, from JLS 15.21.1, saves a method call
+    if (a != a)
 			return 0;
 		return (int) floor(a + 0.5f);
 	}
@@ -596,8 +614,10 @@ public final class Math {
 	 * @see Long#MIN_VALUE
 	 * @see Long#MAX_VALUE
 	 */
-	public static long round(double a) {
-		if (Double.isNaN(a))
+  public static long round(double a)
+  {
+    // this check for NaN, from JLS 15.21.1, saves a method call
+    if (a != a)
 			return 0;
 		return (long) floor(a + 0.5d);
 	}
@@ -614,7 +634,8 @@ public final class Math {
 	 * @see Random#nextDouble()
 	 * @see System#currentTimeMillis()
 	 */
-	public static synchronized double random() {
+  public static synchronized double random()
+  {
 		if (rand == null)
 			rand = new Random();
 		return rand.nextDouble();
@@ -629,7 +650,8 @@ public final class Math {
 	 * @return the angle in radians
 	 * @since 1.2
 	 */
-	public static double toRadians(double degrees) {
+  public static double toRadians(double degrees)
+  {
 		return (degrees * PI) / 180;
 	}
 
@@ -642,7 +664,8 @@ public final class Math {
 	 * @return the angle in degrees
 	 * @since 1.2
 	 */
-	public static double toDegrees(double rads) {
+  public static double toDegrees(double rads)
+  {
 		return (rads * 180) / PI;
 	}
 }
