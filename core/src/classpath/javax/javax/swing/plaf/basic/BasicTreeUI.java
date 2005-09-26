@@ -1339,7 +1339,6 @@ public class BasicTreeUI
     
     TreeModel mod = tree.getModel();
     setModel(mod);
-    tree.setRootVisible(true);
     if (mod != null)
       tree.expandPath(new TreePath(mod.getRoot()));
     treeSelectionModel = tree.getSelectionModel();
@@ -1399,7 +1398,7 @@ public class BasicTreeUI
     if (treeModel != null)
       {
         Object root = treeModel.getRoot();
-
+        
         paintRecursive(g, 0, 0, 0, 0, tree, treeModel, root);
 
         if (hasControlIcons())
@@ -3220,7 +3219,7 @@ public class BasicTreeUI
     TreePath path = new TreePath(getPathToRoot(node, 0));
     Icon icon = getCurrentControlIcon(path);
     
-    Rectangle clip = g.getClipBounds();
+    Rectangle clip = tree.getVisibleRect();
     if (indentation > clip.x + clip.width + rightChildIndent
         || descent > clip.y + clip.height + getRowHeight())
       return descent;

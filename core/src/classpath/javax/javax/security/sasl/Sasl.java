@@ -33,7 +33,7 @@ module.  An independent module is a module which is not derived from
 or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
-exception statement from your version.  */
+exception statement from your version. */
 
 
 package javax.security.sasl;
@@ -74,6 +74,8 @@ import javax.security.auth.callback.CallbackHandler;
  *      Sasl.createSaslServer(mechanism, protocol, serverName, props,
  *                            callbackHandler);
  * </pre>
+ *
+ * @since 1.5
  */
 public class Sasl
 {

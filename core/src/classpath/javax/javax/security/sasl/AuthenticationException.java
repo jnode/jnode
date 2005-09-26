@@ -1,5 +1,5 @@
 /* AuthenticationException.java --
-   Copyright (C) 2003, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -33,7 +33,7 @@ module.  An independent module is a module which is not derived from
 or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
-exception statement from your version.  */
+exception statement from your version. */
 
 
 package javax.security.sasl;
@@ -49,6 +49,8 @@ package javax.security.sasl;
  * instead of <code>AuthenticationException</code> if it is unable to determine
  * the nature of the failure, or if does not want to disclose the nature of the
  * failure, for example, due to security reasons.</p>
+ *
+ * @since 1.5
  */
 public class AuthenticationException extends SaslException
 {

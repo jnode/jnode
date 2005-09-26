@@ -1,5 +1,5 @@
-/* BaseBreakIterator.java -- Base class for default BreakIterators
-   Copyright (C) 1999, 2001, 2004 Free Software Foundation, Inc.
+/* MidiEvent.java -- A MIDI Event
+   Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -7,7 +7,7 @@ GNU Classpath is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2, or (at your option)
 any later version.
- 
+
 GNU Classpath is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -36,89 +36,60 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package gnu.java.text;
-
-import java.text.BreakIterator;
-import java.text.CharacterIterator;
-import java.text.StringCharacterIterator;
+package javax.sound.midi;
 
 /**
- * @author Tom Tromey <tromey@cygnus.com>
- * @date March 22, 1999
+ * A MIDI event is the combination of a MIDI message and a timestamp specified
+ * in MIDI ticks.
+ * 
+ * @author Anthony Green (green@redhat.com)
+ * @since 1.3
+ *
  */
-
-public abstract class BaseBreakIterator extends BreakIterator
+public class MidiEvent
 {
-  public BaseBreakIterator ()
-  {
-    // It isn't documented, but break iterators are created in a
-    // working state; their methods won't throw exceptions before
-    // setText().
-    iter = new StringCharacterIterator("");
-  }
-
-  public int current ()
-  {
-    return iter.getIndex();
-  }
-
-  public int first ()
-  {
-    iter.first();
-    return iter.getBeginIndex();
-  }
-
+  private final MidiMessage message;
+  private long tick;
+  
   /**
-   * Return the first boundary after <code>pos</code>.
-   * This has the side effect of setting the index of the 
-   * CharacterIterator.
+   * Create a MIDI event object from the given MIDI message and timestamp.
+   * 
+   * @param message the MidiMessage for this event
+   * @param tick the timestamp for this event
    */
-  public int following (int pos)
+  public MidiEvent(MidiMessage message, long tick)
   {
-    iter.setIndex(pos);
-    int r = next ();
-    return r;
+    this.message = message;
+    this.tick = tick;
   }
-
-  public CharacterIterator getText ()
+  
+  /**
+   * Get the MIDI message for this event.
+   * 
+   * @return the MidiMessage for this event
+   */
+  public MidiMessage getMessage()
   {
-    return iter;
+    return message;
   }
-
-  public int last ()
+  
+  /**
+   * Set the timestemp for this event in MIDI ticks.
+   * 
+   * @param tick the timestamp
+   */
+  public void setTick(long tick)
   {
-    iter.last();
-    // Go past the last character.
-    iter.next();
-    return iter.getEndIndex();
+    this.tick = tick;
   }
-
-  public int next (int n)
+  
+  /**
+   * Get the timestamp for this event in MIDI ticks.
+   * 
+   * @return the timestamp for this even in MIDI ticks
+   */
+  public long getTick()
   {
-    int r = iter.getIndex ();
-    if (n > 0)
-      {
-	while (n > 0 && r != DONE)
-	  {
-	    r = next ();
-	    --n;
-	  }
-      }
-    else if (n < 0)
-      {
-	while (n < 0 && r != DONE)
-	  {
-	    r = previous ();
-	    ++n;
-	  }
-      }
-    return r;
+    return tick;
   }
-
-  public void setText (CharacterIterator newText)
-  {
-    iter = newText;
-  }
-
-  protected CharacterIterator iter;
 }
