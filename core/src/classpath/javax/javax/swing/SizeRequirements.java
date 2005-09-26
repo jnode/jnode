@@ -166,7 +166,31 @@ public class SizeRequirements implements Serializable
   public static SizeRequirements
   getAlignedSizeRequirements(SizeRequirements[] children)
   {
-    return null; // TODO
+    float minLeft = 0;
+    float minRight = 0;
+    float prefLeft = 0;
+    float prefRight = 0;
+    float maxLeft = 0;
+    float maxRight = 0;
+    for (int i = 0; i < children.length; i++)
+      {
+        float myMinLeft = children[i].minimum * children[i].alignment;
+        float myMinRight = children[i].minimum - myMinLeft;
+        minLeft = Math.max(myMinLeft, minLeft);
+        minRight = Math.max(myMinRight, minRight);
+        float myPrefLeft = children[i].preferred * children[i].alignment;
+        float myPrefRight = children[i].preferred - myMinLeft;
+        prefLeft = Math.max(myPrefLeft, prefLeft);
+        prefRight = Math.max(myPrefRight, prefRight);
+        float myMaxLeft = children[i].maximum * children[i].alignment;
+        float myMaxRight = children[i].maximum - myMinLeft;
+        maxLeft = Math.max(myMaxLeft, maxLeft);
+        maxRight = Math.max(myMaxRight, maxRight);
+      }
+    int minSize = (int) (minLeft + minRight);
+    int prefSize = (int) (prefLeft + prefRight);
+    int maxSize = (int) (maxLeft + maxRight);
+    return new SizeRequirements(minSize, prefSize, maxSize, 0.5F);
   }
 
   /**
@@ -232,6 +256,7 @@ public class SizeRequirements implements Serializable
                                              int[] offsets, int[] spans,
                                              boolean forward)
   {
+    int span = 0;
     if (forward)
       {
         int offset = 0;
@@ -239,6 +264,7 @@ public class SizeRequirements implements Serializable
           {
             offsets[i] = offset;
             spans[i] = children[i].preferred;
+            span += spans[i];
             offset += children[i].preferred;
           }
       }
@@ -249,8 +275,71 @@ public class SizeRequirements implements Serializable
           {
             offset -= children[i].preferred;
             offsets[i] = offset;
+            span += spans[i];
             spans[i] = children[i].preferred;
           }
+      }
+    // Adjust spans so that we exactly fill the allocated region. If
+    if (span > allocated)
+      adjustSmaller(allocated, children, spans, span);
+    else
+      adjustGreater(allocated, children, spans, span);
+
+    // Adjust offsets.
+    if (forward)
+      {
+        int offset = 0;
+        for (int i = 0; i < children.length; i++)
+          {
+            offsets[i] = offset;
+            offset += spans[i];
+          }
+      }
+    else
+      {
+        int offset = allocated;
+        for (int i = 0; i < children.length; i++)
+          {
+            offset -= spans[i];
+            offsets[i] = offset;
+          }
+      }
+  }
+
+  private static void adjustSmaller(int allocated, SizeRequirements[] children,
+                                    int[] spans, int span)
+  {
+    // Sum up (prefSize - minSize) over all children
+    int sumDelta = 0;
+    for (int i = 0; i < children.length; i++)
+      sumDelta += children[i].preferred - children[i].minimum;
+
+    // Adjust all sizes according to their preferred and minimum sizes.
+    for (int i = 0; i < children.length; i++)
+      {
+        double factor = ((double) (children[i].preferred - children[i].minimum))
+                        / ((double) sumDelta);
+        // In case we have a sumDelta of 0, the factor should also be 0.
+        if (Double.isNaN(factor))
+          factor = 0;
+        spans[i] -= factor * (span - allocated);
+      }
+  }
+
+  private static void adjustGreater(int allocated, SizeRequirements[] children,
+                                    int[] spans, int span)
+  {
+    // Sum up (maxSize - prefSize) over all children
+    int sumDelta = 0;
+    for (int i = 0; i < children.length; i++)
+      sumDelta += children[i].maximum - children[i].preferred;
+
+    // Adjust all sizes according to their preferred and minimum sizes.
+    for (int i = 0; i < children.length; i++)
+      {
+        double factor = ((double) (children[i].maximum - children[i].preferred))
+                        / ((double) sumDelta);
+        spans[i] -= factor * (span - allocated);
       }
   }
 
@@ -317,12 +406,93 @@ public class SizeRequirements implements Serializable
                                                int[] offset, int[] spans,
                                                boolean forward)
   {
-    // TODO: Implement this correctly.
-    for (int i = 0; i < children.length; ++i)
+    // First we compute the position of the baseline.
+    float left = 0;
+    float right = 0;
+    for (int i = 0; i < children.length; i++)
       {
-        // This is only a hack to make things work a little.
-        spans[i] = Math.min(allocated, children[i].maximum);
+        float myLeft = children[i].preferred * children[i].alignment;
+        float myRight = children[i].preferred - myLeft;
+        left = Math.max(myLeft, left);
+        right = Math.max(myRight, right);
       }
+    int baseline = (int) ((left / (left + right)) * allocated);
+    // Now we can layout the components along the baseline.
+    for (int i = 0; i < children.length; i++)
+      {
+        float align = children[i].alignment;
+        // Try to fit the component into the available space.
+        int[] spanAndOffset = new int[2];
+        if (align < .5F)
+          adjustFromRight(children[i], baseline, allocated, spanAndOffset);
+        else
+          adjustFromLeft(children[i], baseline, allocated, spanAndOffset);
+        spans[i] = spanAndOffset[0];
+        offset[i] = spanAndOffset[1];
+      }
+  }
+
+  /**
+   * Adjusts the span and offset of a component for the aligned layout.
+   *
+   * @param reqs
+   * @param baseline
+   * @param allocated
+   * @param spanAndOffset
+   */
+  private static void adjustFromRight(SizeRequirements reqs, int baseline,
+                                      int allocated, int[] spanAndOffset)
+  {
+    float right = allocated - baseline;
+    // If the resulting span exceeds the maximum of the component, then adjust
+    // accordingly.
+    float maxRight = ((float) reqs.maximum) * (1.F - reqs.alignment);
+    if (right / (1.F - reqs.alignment) > reqs.maximum)
+      right = maxRight;
+    // If we have not enough space on the left side, then adjust accordingly.
+    if (right / (1.F - reqs.alignment) * reqs.alignment > allocated - baseline)
+      right = ((float) (allocated - baseline))
+             / reqs.alignment * (1.F - reqs.alignment);
+    // If we are below the minimum, then adjust upwards.
+      float minRight = ((float) reqs.minimum) * (1.F - reqs.alignment);
+    if (right / (1.F - reqs.alignment) < reqs.minimum)
+      right = Math.max(minRight, maxRight);
+
+    spanAndOffset[0] = (int) (right / (1.F - reqs.alignment));
+    spanAndOffset[1] = baseline -
+                       (int) (((float) spanAndOffset[0]) * reqs.alignment);
+  }
+
+  /**
+   * Adjusts the span and offset of a component for the aligned layout.
+   *
+   * @param reqs
+   * @param baseline
+   * @param allocated
+   * @param spanAndOffset
+   */
+  private static void adjustFromLeft(SizeRequirements reqs, int baseline,
+                                     int allocated, int[] spanAndOffset)
+  {
+    float left = baseline;
+    // If the resulting span exceeds the maximum of the component, then adjust
+    // accordingly.
+    float maxLeft = ((float) reqs.maximum) * reqs.alignment;
+    if (left / reqs.alignment > reqs.maximum)
+      left = maxLeft;
+    // If we have not enough space on the right side, then adjust accordingly.
+    if (left / reqs.alignment * (1.F - reqs.alignment) > allocated - baseline)
+      left = ((float) (allocated - baseline))
+             / (1.F - reqs.alignment) * reqs.alignment;
+
+    // If we are below the minimum, then adjust upwards.
+    float minLeft = ((float) reqs.minimum) * reqs.alignment;
+    if (left / reqs.alignment < reqs.minimum)
+      left = Math.max(minLeft, maxLeft);
+
+    spanAndOffset[0] = (int) (left / reqs.alignment);
+    spanAndOffset[1] = baseline -
+                       (int) (((float) spanAndOffset[0]) * reqs.alignment);
   }
 
   /**

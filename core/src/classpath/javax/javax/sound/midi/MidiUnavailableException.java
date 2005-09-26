@@ -1,5 +1,5 @@
-/* BaseBreakIterator.java -- Base class for default BreakIterators
-   Copyright (C) 1999, 2001, 2004 Free Software Foundation, Inc.
+/* MidiUnavailableException.java -- MIDI resources are not available
+   Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -7,7 +7,7 @@ GNU Classpath is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2, or (at your option)
 any later version.
- 
+
 GNU Classpath is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -36,89 +36,53 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package gnu.java.text;
-
-import java.text.BreakIterator;
-import java.text.CharacterIterator;
-import java.text.StringCharacterIterator;
+package javax.sound.midi;
 
 /**
- * @author Tom Tromey <tromey@cygnus.com>
- * @date March 22, 1999
+ * This exception is thrown when MIDI resources are not available.
+ * 
+ * @author Anthony Green (green@redhat.com)
+ * @since 1.3
+ *
  */
-
-public abstract class BaseBreakIterator extends BreakIterator
+public class MidiUnavailableException extends Exception
 {
-  public BaseBreakIterator ()
+  /**
+   * Create a MidiUnavailableException.
+   */
+  public MidiUnavailableException()
   {
-    // It isn't documented, but break iterators are created in a
-    // working state; their methods won't throw exceptions before
-    // setText().
-    iter = new StringCharacterIterator("");
-  }
-
-  public int current ()
-  {
-    return iter.getIndex();
-  }
-
-  public int first ()
-  {
-    iter.first();
-    return iter.getBeginIndex();
+    super();
   }
 
   /**
-   * Return the first boundary after <code>pos</code>.
-   * This has the side effect of setting the index of the 
-   * CharacterIterator.
+   * Create an MidiUnavailableException object.
+   * 
+   * @param s the exception message string
    */
-  public int following (int pos)
+  public MidiUnavailableException(String s)
   {
-    iter.setIndex(pos);
-    int r = next ();
-    return r;
+    super(s);
   }
 
-  public CharacterIterator getText ()
+  /**
+   * Create an MidiUnavailableException object.
+   * 
+   * @param s the exception message string
+   * @param cause the root cause of the exception
+   */
+  public MidiUnavailableException(String s, Throwable cause)
   {
-    return iter;
+    super(s, cause);
   }
 
-  public int last ()
+  /**
+   * Create an MidiUnavailableException object.
+   * 
+   * @param cause the root cause of the exception
+   */
+  public MidiUnavailableException(Throwable cause)
   {
-    iter.last();
-    // Go past the last character.
-    iter.next();
-    return iter.getEndIndex();
+    super(cause);
   }
-
-  public int next (int n)
-  {
-    int r = iter.getIndex ();
-    if (n > 0)
-      {
-	while (n > 0 && r != DONE)
-	  {
-	    r = next ();
-	    --n;
-	  }
-      }
-    else if (n < 0)
-      {
-	while (n < 0 && r != DONE)
-	  {
-	    r = previous ();
-	    ++n;
-	  }
-      }
-    return r;
-  }
-
-  public void setText (CharacterIterator newText)
-  {
-    iter = newText;
-  }
-
-  protected CharacterIterator iter;
 }

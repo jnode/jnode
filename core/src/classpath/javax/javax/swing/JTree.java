@@ -1837,6 +1837,7 @@ public class JTree
     treeModel = model;
 
     firePropertyChange(TREE_MODEL_PROPERTY, oldValue, model);
+    updateUI();
   }
 
   /**

@@ -168,7 +168,6 @@ public class MetalTreeUI
     createdCellEditor = true;
     TreeModel mod = tree.getModel();
     setModel(mod);
-    tree.setRootVisible(true);
     if (mod != null)
       tree.expandPath(new TreePath(mod.getRoot()));
     treeSelectionModel = tree.getSelectionModel();

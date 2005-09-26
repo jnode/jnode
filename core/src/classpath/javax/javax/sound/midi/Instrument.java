@@ -1,5 +1,5 @@
-/* BaseBreakIterator.java -- Base class for default BreakIterators
-   Copyright (C) 1999, 2001, 2004 Free Software Foundation, Inc.
+/* Instrument.java -- A MIDI Instrument
+   Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -7,7 +7,7 @@ GNU Classpath is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2, or (at your option)
 any later version.
- 
+
 GNU Classpath is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -36,89 +36,42 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package gnu.java.text;
-
-import java.text.BreakIterator;
-import java.text.CharacterIterator;
-import java.text.StringCharacterIterator;
+package javax.sound.midi;
 
 /**
- * @author Tom Tromey <tromey@cygnus.com>
- * @date March 22, 1999
+ * The abstract base class for all MIDI instruments.
+ * 
+ * @author Anthony Green (green@redhat.com)
+ * @since 1.3
+ *
  */
-
-public abstract class BaseBreakIterator extends BreakIterator
+public abstract class Instrument extends SoundbankResource
 {
-  public BaseBreakIterator ()
-  {
-    // It isn't documented, but break iterators are created in a
-    // working state; their methods won't throw exceptions before
-    // setText().
-    iter = new StringCharacterIterator("");
-  }
-
-  public int current ()
-  {
-    return iter.getIndex();
-  }
-
-  public int first ()
-  {
-    iter.first();
-    return iter.getBeginIndex();
-  }
-
+  // The instrument patch.
+  private Patch patch;
+    
   /**
-   * Return the first boundary after <code>pos</code>.
-   * This has the side effect of setting the index of the 
-   * CharacterIterator.
+   * Create a new Instrument.
+   * 
+   * @param soundbank the Soundbank containing the instrument.
+   * @param patch the patch for this instrument
+   * @param name the name of this instrument
+   * @param dataClass the class used to represent sample data for this instrument
    */
-  public int following (int pos)
+  protected Instrument(Soundbank soundbank, Patch patch, 
+                       String name, Class dataClass)
   {
-    iter.setIndex(pos);
-    int r = next ();
-    return r;
+    super(soundbank, name, dataClass);
+    this.patch = patch; 
   }
-
-  public CharacterIterator getText ()
+  
+  /**
+   * Get the patch for this instrument.
+   * 
+   * @return the patch for this instrument
+   */
+  public Patch getPatch()
   {
-    return iter;
-  }
-
-  public int last ()
-  {
-    iter.last();
-    // Go past the last character.
-    iter.next();
-    return iter.getEndIndex();
-  }
-
-  public int next (int n)
-  {
-    int r = iter.getIndex ();
-    if (n > 0)
-      {
-	while (n > 0 && r != DONE)
-	  {
-	    r = next ();
-	    --n;
-	  }
-      }
-    else if (n < 0)
-      {
-	while (n < 0 && r != DONE)
-	  {
-	    r = previous ();
-	    ++n;
-	  }
-      }
-    return r;
-  }
-
-  public void setText (CharacterIterator newText)
-  {
-    iter = newText;
-  }
-
-  protected CharacterIterator iter;
+    return patch;
+  } 
 }

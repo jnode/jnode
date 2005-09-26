@@ -53,6 +53,7 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.Window;
 import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
@@ -64,7 +65,6 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.ImageObserver;
 import java.awt.peer.LightweightPeer;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -183,21 +183,21 @@ public abstract class JComponent extends Container implements Serializable
   /** 
    * An explicit value for the component's preferred size; if not set by a
    * user, this is calculated on the fly by delegating to the {@link
-   * ComponentUI.getPreferredSize} method on the {@link #ui} property. 
+   * ComponentUI#getPreferredSize} method on the {@link #ui} property. 
    */
   Dimension preferredSize;
 
   /** 
    * An explicit value for the component's minimum size; if not set by a
    * user, this is calculated on the fly by delegating to the {@link
-   * ComponentUI.getMinimumSize} method on the {@link #ui} property. 
+   * ComponentUI#getMinimumSize} method on the {@link #ui} property. 
    */
   Dimension minimumSize;
 
   /** 
    * An explicit value for the component's maximum size; if not set by a
    * user, this is calculated on the fly by delegating to the {@link
-   * ComponentUI.getMaximumSize} method on the {@link #ui} property.
+   * ComponentUI#getMaximumSize} method on the {@link #ui} property.
    */
   Dimension maximumSize;
 
@@ -265,14 +265,14 @@ public abstract class JComponent extends Container implements Serializable
   /**
    * A set of flags indicating which debugging graphics facilities should
    * be enabled on this component. The values should be a combination of
-   * {@link DebugGraphics.NONE_OPTION}, {@link DebugGraphics.LOG_OPTION},
-   * {@link DebugGraphics.FLASH_OPTION}, or {@link
-   * DebugGraphics.BUFFERED_OPTION}.
+   * {@link DebugGraphics#NONE_OPTION}, {@link DebugGraphics#LOG_OPTION},
+   * {@link DebugGraphics#FLASH_OPTION}, or {@link
+   * DebugGraphics#BUFFERED_OPTION}.
    *
-   * @see setDebugGraphicsOptions
-   * @see getDebugGraphicsOptions
+   * @see #setDebugGraphicsOptions
+   * @see #getDebugGraphicsOptions
    * @see DebugGraphics
-   * @see getComponentGraphics
+   * @see #getComponentGraphics
    */
   int debugGraphicsOptions;
 
@@ -335,8 +335,8 @@ public abstract class JComponent extends Container implements Serializable
    * timed intervals, continuing off in the direction the mouse exited the
    * component, until the mouse is released or re-enters the component.
    *
-   * @see setAutoscrolls
-   * @see getAutoscrolls
+   * @see #setAutoscrolls
+   * @see #getAutoscrolls
    */
   boolean autoscrolls = false;
 
@@ -1472,8 +1472,8 @@ public abstract class JComponent extends Container implements Serializable
         if (g.getClip() == null)
           g.setClip(0, 0, getWidth(), getHeight());
         paintComponent(g);
-        paintBorder(g);
         paintChildren(g);
+        paintBorder(g);
       }
   }
 
@@ -1512,6 +1512,9 @@ public abstract class JComponent extends Container implements Serializable
    */
   protected void paintChildren(Graphics g)
   {
+    Shape originalClip = g.getClip();
+    Rectangle inner = SwingUtilities.calculateInnerArea(this, new Rectangle());
+    g.clipRect(inner.x, inner.y, inner.width, inner.height);
     Component[] children = getComponents();
     for (int i = children.length - 1; i >= 0; --i)
       {
@@ -1541,6 +1544,7 @@ public abstract class JComponent extends Container implements Serializable
             g.setClip(oldClip);
           }
       }
+    g.setClip(originalClip);
   }
 
   /**

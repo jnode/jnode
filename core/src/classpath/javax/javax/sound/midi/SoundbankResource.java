@@ -1,5 +1,5 @@
-/* BaseBreakIterator.java -- Base class for default BreakIterators
-   Copyright (C) 1999, 2001, 2004 Free Software Foundation, Inc.
+/* SoundbankResource.java -- An audio resource from a sound bank
+   Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -7,7 +7,7 @@ GNU Classpath is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2, or (at your option)
 any later version.
- 
+
 GNU Classpath is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -36,89 +36,69 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package gnu.java.text;
-
-import java.text.BreakIterator;
-import java.text.CharacterIterator;
-import java.text.StringCharacterIterator;
+package javax.sound.midi;
 
 /**
- * @author Tom Tromey <tromey@cygnus.com>
- * @date March 22, 1999
+ * SoundbankResource objects represent audio data stored in a sound bank.
+ * 
+ * @author Anthony Green (green@redhat.com)
+ * @since 1.3
+ *
  */
-
-public abstract class BaseBreakIterator extends BreakIterator
+public abstract class SoundbankResource
 {
-  public BaseBreakIterator ()
-  {
-    // It isn't documented, but break iterators are created in a
-    // working state; their methods won't throw exceptions before
-    // setText().
-    iter = new StringCharacterIterator("");
-  }
-
-  public int current ()
-  {
-    return iter.getIndex();
-  }
-
-  public int first ()
-  {
-    iter.first();
-    return iter.getBeginIndex();
-  }
-
+  private final Soundbank soundBank;
+  private final String name;
+  private final Class dataClass;
+  
   /**
-   * Return the first boundary after <code>pos</code>.
-   * This has the side effect of setting the index of the 
-   * CharacterIterator.
+   * Create a SoundbankResource object.
+   * 
+   * @param soundBank the soundbank object containing this resource
+   * @param name the name of the resource
+   * @param dataClass the class used to represent the audio data
    */
-  public int following (int pos)
+  protected SoundbankResource(Soundbank soundBank, String name, Class dataClass)
   {
-    iter.setIndex(pos);
-    int r = next ();
-    return r;
+    this.soundBank = soundBank;   
+    this.name = name;
+    this.dataClass = dataClass;
   }
-
-  public CharacterIterator getText ()
+  
+  /**
+   * Get the sound bank containing this resource.
+   * 
+   * @return the sound bank in which this resource resides
+   */
+  public Soundbank getSoundBank()
   {
-    return iter;
+    return soundBank;
   }
-
-  public int last ()
+  
+  /**
+   * Get the name of this resource.
+   * 
+   * @return the name of this resource
+   */
+  public String getName()
   {
-    iter.last();
-    // Go past the last character.
-    iter.next();
-    return iter.getEndIndex();
+    return name;
   }
-
-  public int next (int n)
+  
+  /**
+   * Get the class used to represent the audio data for this resource.
+   * 
+   * @return the class used to represent the audio data for this resource
+   */
+  public Class getDataClass()
   {
-    int r = iter.getIndex ();
-    if (n > 0)
-      {
-	while (n > 0 && r != DONE)
-	  {
-	    r = next ();
-	    --n;
-	  }
-      }
-    else if (n < 0)
-      {
-	while (n < 0 && r != DONE)
-	  {
-	    r = previous ();
-	    ++n;
-	  }
-      }
-    return r;
+    return dataClass;
   }
-
-  public void setText (CharacterIterator newText)
-  {
-    iter = newText;
-  }
-
-  protected CharacterIterator iter;
+  
+  /**
+   * Get the audio data for this resource.
+   * 
+   * @return the audio data object for this resource
+   */
+  public abstract Object getData();
 }
