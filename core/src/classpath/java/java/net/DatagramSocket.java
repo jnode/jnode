@@ -1,5 +1,5 @@
 /* DatagramSocket.java -- A class to model UDP sockets
-   Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004
+   Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2005
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -16,8 +16,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -37,6 +37,8 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 package java.net;
+
+import gnu.classpath.SystemProperties;
 
 import gnu.java.net.PlainDatagramSocketImpl;
 import gnu.java.nio.DatagramChannelImpl;
@@ -215,7 +217,9 @@ public class DatagramSocket
 		}
     catch (IOException e)
       {
-	throw new SocketException(e.getMessage());
+	SocketException se = new SocketException();
+	se.initCause(e);
+	throw se;
 		}
 	}
 
@@ -561,7 +565,7 @@ public class DatagramSocket
    * @exception IllegalBlockingModeException If this socket has an associated
    * channel, and the channel is in non-blocking mode.
    * @exception SecurityException If a security manager exists and its
-   * checkAccept ethod doesn't allow the receive.
+   * checkAccept method doesn't allow the receive.
 	 */
   public synchronized void receive(DatagramPacket p) throws IOException
   {

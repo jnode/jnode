@@ -1,5 +1,5 @@
-/* DirectByteBufferImpl.java -- 
-   Copyright (C) 2003, 2004 Free Software Foundation, Inc.
+/* MappedByteBufferImpl.java -- 
+   Copyright (C) 2002, 2003, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -40,96 +40,30 @@ package java.nio;
 
 import gnu.classpath.Pointer;
 
-abstract class DirectByteBufferImpl extends ByteBuffer
+import java.io.IOException;
+
+final class MappedByteBufferImpl extends MappedByteBuffer
 {
-  /**
-   * The owner is used to keep alive the object that actually owns the
-    * memory. There are three possibilities:
-    *  1) owner == this: We allocated the memory and we should free it,
-    *                    but *only* in finalize (if we've been sliced
-    *                    other objects will also have access to the
-    *                    memory).
-    *  2) owner == null: The byte buffer was created thru
-    *                    JNI.NewDirectByteBuffer. The JNI code is
-    *                    responsible for freeing the memory.
-    *  3) owner == some other object: The other object allocated the
-    *                                 memory and should free it.
-    */
-  private final Object owner;
+  boolean readOnly;
+
+  /** Posix uses this for the pointer returned by mmap;
+   * Win32 uses it for the pointer returned by MapViewOfFile. */
+  public Pointer implPtr;
+  /** Posix uses this for the actual length passed to mmap;
+   * Win32 uses it for the pointer returned by CreateFileMapping. */
+  public long implLen;
   
-  static final class ReadOnly extends DirectByteBufferImpl
+  public MappedByteBufferImpl(Pointer address, int size, boolean readOnly)
+    throws IOException
   {
-    ReadOnly(Object owner, Pointer address,
-	     int capacity, int limit,
-	     int position)
-      {
-      super(owner, address, capacity, limit, position);
-      }
-
-    public ByteBuffer put(byte value)
-    {
-      throw new ReadOnlyBufferException ();
-  }
-  
-    public ByteBuffer put(int index, byte value)
-    {
-      throw new ReadOnlyBufferException ();
-    }
-
-    public boolean isReadOnly()
-    {
-      return true;
-    }
-  }
-
-  static final class ReadWrite extends DirectByteBufferImpl
-  {
-    ReadWrite(int capacity)
-  {
-      super(capacity);
-  }
-  
-    ReadWrite(Object owner, Pointer address,
-			       int capacity, int limit,
-	      int position)
-  {
-      super(owner, address, capacity, limit, position);
-    }
-
-    public boolean isReadOnly()
-    {
-      return false;
-    }
-  }
-
-  DirectByteBufferImpl(int capacity)
-  {
-    super(capacity, capacity, 0, -1);
-    this.owner = this;
-    this.address = VMDirectByteBuffer.allocate(capacity);
-  }
-  
-  DirectByteBufferImpl(Object owner, Pointer address,
-		       int capacity, int limit,
-		       int position)
-  {
-    super(capacity, limit, position, -1);
-    this.owner = owner;
+    super(size, size, 0, -1);
     this.address = address;
-  }
-  
-  /**
-   * Allocates a new direct byte buffer.
-   */ 
-  public static ByteBuffer allocate(int capacity)
-  {
-    return new DirectByteBufferImpl.ReadWrite(capacity);
+    this.readOnly = readOnly;
   }
 
-  protected void finalize() throws Throwable
+  public boolean isReadOnly()
   {
-    if (owner == this)
-        VMDirectByteBuffer.free(address);
+    return readOnly;
   }
   
   public byte get()
@@ -140,6 +74,17 @@ abstract class DirectByteBufferImpl extends ByteBuffer
     byte result = VMDirectByteBuffer.get(address, pos);
     position(pos + 1);
     return result;
+  }
+
+  public ByteBuffer put(byte value)
+  {
+    checkIfReadOnly();
+    checkForOverflow();
+
+    int pos = position();
+    VMDirectByteBuffer.put(address, pos, value);
+    position(pos + 1);
+    return this;
   }
 
   public byte get(int index)
@@ -161,41 +106,15 @@ abstract class DirectByteBufferImpl extends ByteBuffer
     return this;
   }
 
-  public ByteBuffer put(byte value)
-  {
-    checkForOverflow();
-
-    int pos = position();
-    VMDirectByteBuffer.put(address, pos, value);
-    position(pos + 1);
-    return this;
-  }
-  
   public ByteBuffer put(int index, byte value)
   {
+    checkIfReadOnly();
     checkIndex(index);
 
     VMDirectByteBuffer.put(address, index, value);
     return this;
   }
-  
-  public ByteBuffer put (byte[] src, int offset, int length)
-  {
-    checkArraySize (src.length, offset, length);
-    checkForUnderflow (length);
 
-    int index = position ();
-    VMDirectByteBuffer.put (address, index, src, offset, length);
-    position (index + length);
-
-    return this;
-  }
-
-  void shiftDown(int dst_offset, int src_offset, int count)
-  {
-    VMDirectByteBuffer.shiftDown(address, dst_offset, src_offset, count);
-  }
-  
   public ByteBuffer compact()
   {
     checkIfReadOnly();
@@ -204,6 +123,7 @@ abstract class DirectByteBufferImpl extends ByteBuffer
     if (pos > 0)
       {
 	int count = remaining();
+	// Call shiftDown method optimized for direct buffers.
 	VMDirectByteBuffer.shiftDown(address, 0, pos, count);
 	position(count);
 	limit(capacity());
@@ -216,37 +136,39 @@ abstract class DirectByteBufferImpl extends ByteBuffer
     return this;
   }
 
+  public boolean isDirect()
+  {
+    return true;
+  }
+
   public ByteBuffer slice()
   {
     int rem = remaining();
     if (isReadOnly())
         return new DirectByteBufferImpl.ReadOnly
-      (owner, VMDirectByteBuffer.adjustAddress(address, position()),
+      (this, VMDirectByteBuffer.adjustAddress(address, position()),
        rem, rem, 0);
     else
         return new DirectByteBufferImpl.ReadWrite
-      (owner, VMDirectByteBuffer.adjustAddress(address, position()),
+      (this, VMDirectByteBuffer.adjustAddress(address, position()),
        rem, rem, 0);
   }
 
   private ByteBuffer duplicate(boolean readOnly)
   {
     int pos = position();
-    // @classpath-bugfix Changed mark detection
-//    reset();
-//    int mark = position();
-//    position(pos);
-    int mark = this.mark;
+    reset();
+    int mark = position();
+    position(pos);
     DirectByteBufferImpl result;
     if (readOnly)
-        result = new DirectByteBufferImpl.ReadOnly(owner, address, capacity(),
+        result = new DirectByteBufferImpl.ReadOnly(this, address, capacity(),
                                                    limit(), pos);
     else
-        result = new DirectByteBufferImpl.ReadWrite(owner, address, capacity(),
+        result = new DirectByteBufferImpl.ReadWrite(this, address, capacity(),
                                                     limit(), pos);
 
-    // @classpath-bugfix Added mark >= 0
-    if ((mark != pos) && (mark >= 0))
+    if (mark != pos)
       {
 	result.position(mark);
 	result.mark();
@@ -263,11 +185,6 @@ abstract class DirectByteBufferImpl extends ByteBuffer
   public ByteBuffer asReadOnlyBuffer()
   {
     return duplicate(true);
-  }
-
-  public boolean isDirect()
-  {
-    return true;
   }
 
   public CharBuffer asCharBuffer()
@@ -430,5 +347,27 @@ abstract class DirectByteBufferImpl extends ByteBuffer
   {
     ByteBufferHelper.putDouble(this, index, value, order());
     return this;
+  }
+
+  // NOTE: In libgcj these methods are implemented in natFileChannelXxx.cc,
+  // because they're small, and to put them next to FileChannelImpl::mapImpl.
+  void unmapImpl() 
+  { 
+      //TODO implement JNode specific
+  }
+  boolean isLoadedImpl()
+  { 
+      //TODO implement JNode specific
+      return false;
+  }
+    // FIXME: Try to load all pages into memory.
+  void loadImpl()
+  { 
+      //TODO implement JNode specific
+  }
+
+  void forceImpl()
+  {
+      //TODO implement JNode specific      
   }
 }

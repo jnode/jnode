@@ -74,6 +74,11 @@ public final class VMDirectByteBuffer {
 		((MemoryRawData)address).resource.setByte(index, value);
 	}
 
+    static void put(Pointer address, int index, byte[] src, int offset, int length)
+    {
+        ((MemoryRawData)address).resource.setBytes(src, offset, index, length);
+    }
+    
 	static Pointer adjustAddress(Pointer address, int offset) {
 		final MemoryResource res = ((MemoryRawData)address).resource;
 		final Extent size = res.getSize().sub(offset);
