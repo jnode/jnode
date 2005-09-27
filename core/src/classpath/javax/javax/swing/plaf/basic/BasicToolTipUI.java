@@ -39,20 +39,24 @@ exception statement from your version. */
 package javax.swing.plaf.basic;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Font;
 import java.awt.Insets;
+import java.awt.event.KeyEvent;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.event.InputEvent;
 
 import javax.swing.JComponent;
 import javax.swing.JToolTip;
+import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
-import javax.swing.border.Border;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.ToolTipUI;
 
@@ -62,8 +66,24 @@ import javax.swing.plaf.ToolTipUI;
 public class BasicToolTipUI extends ToolTipUI
 {
 
-	/** The shared instance of BasicToolTipUI used for all ToolTips. */
-	private static BasicToolTipUI shared;
+  /** The shared instance of BasicToolTipUI used for all ToolTips. */
+  private static BasicToolTipUI shared;
+
+  /** The tooltip's text */
+  private String text;
+
+  /** The accelerator's text */
+  private String accText;
+
+  /** The accelerator's deliminator */
+  private String accDeliminator;
+
+  /** The accelerator's font */
+  private Font accFont;
+
+  /** The accelerator's foreground color */
+  private Color accFore;
+    
 
   /**
    * Creates a new BasicToolTipUI object.
@@ -122,12 +142,46 @@ public class BasicToolTipUI extends ToolTipUI
   public Dimension getPreferredSize(JComponent c)
   {
     JToolTip tip = (JToolTip) c;
+    FontMetrics fm;
+    Toolkit g = tip.getToolkit();
+    text = tip.getTipText();
+    
+    // accelerator
+    JComponent component = tip.getComponent();
+    if (component instanceof JMenuItem)
+      {
+        JMenuItem item = (JMenuItem) component;
+        KeyStroke acc = item.getAccelerator();
+        String tipText = item.getToolTipText();
+        int mne = item.getMnemonic();
+
+        if (acc == null && mne > 0)
+          acc = KeyStroke.getKeyStroke(Character.toUpperCase((char) mne), 
+                                       InputEvent.ALT_MASK, false);
+        if (tipText != null && acc != null)
+          {
+            UIDefaults defaults = UIManager.getLookAndFeelDefaults();
+            accFore = defaults.getColor("MenuItem.acceleratorForeground");
+            accDeliminator = defaults.getString("MenuItem.acceleratorDelimiter");
+            accFont = defaults.getFont("MenuItem.acceleratorFont");
+            accText = getAcceleratorText(acc);
+            text = tipText + "  " + accText;
+          }
+        else
+          {
+            accFore = null;
+            accDeliminator = null;
+            accFont = null;
+            accText = null;
+          }
+      }
+    
     Rectangle vr = new Rectangle();
     Rectangle ir = new Rectangle();
     Rectangle tr = new Rectangle();
     Insets insets = tip.getInsets();
-    FontMetrics fm = tip.getToolkit().getFontMetrics(tip.getFont());
-    SwingUtilities.layoutCompoundLabel(tip, fm, tip.getTipText(), null,
+    fm = g.getFontMetrics(tip.getFont());
+    SwingUtilities.layoutCompoundLabel(tip, fm, text, null,
                                        SwingConstants.CENTER,
                                        SwingConstants.CENTER,
                                        SwingConstants.CENTER,
@@ -135,7 +189,32 @@ public class BasicToolTipUI extends ToolTipUI
     return new Dimension(insets.left + tr.width + insets.right,
                          insets.top + tr.height + insets.bottom);
   }
+  
+  /**
+   * Return text representation of the specified accelerator
+   * 
+   * @param accelerator
+   *          Accelerator for which to return string representation
+   * @return $String$ Text representation of the given accelerator
+   */
+  private String getAcceleratorText(KeyStroke accelerator)
+  {
+    // convert keystroke into string format
+    String modifiersText = "";
+    int modifiers = accelerator.getModifiers();
+    char keyChar = accelerator.getKeyChar();
+    int keyCode = accelerator.getKeyCode();
+    
+    if (modifiers != 0)
+      modifiersText = KeyEvent.getKeyModifiersText(modifiers)
+                      + accDeliminator;
 
+    if (keyCode == KeyEvent.VK_UNDEFINED)
+      return modifiersText + keyChar;
+    else
+      return modifiersText + KeyEvent.getKeyText(keyCode);
+  }
+  
   /**
    * This method installs the defaults for the given JComponent.
    *
@@ -182,6 +261,7 @@ public class BasicToolTipUI extends ToolTipUI
     JToolTip tip = (JToolTip) c;
 
     String text = tip.getTipText();
+    Toolkit t = tip.getToolkit();
     if (text == null)
       return;
 
@@ -189,19 +269,30 @@ public class BasicToolTipUI extends ToolTipUI
     vr = SwingUtilities.calculateInnerArea(tip, vr);
     Rectangle ir = new Rectangle();
     Rectangle tr = new Rectangle();
-    FontMetrics fm = tip.getToolkit().getFontMetrics(tip.getFont());
-    SwingUtilities.layoutCompoundLabel(tip, fm, tip.getTipText(), null,
+    FontMetrics fm = t.getFontMetrics(tip.getFont());
+    int ascent = fm.getAscent();
+    SwingUtilities.layoutCompoundLabel(tip, fm, text, null,
                                        SwingConstants.CENTER,
                                        SwingConstants.CENTER,
                                        SwingConstants.CENTER,
                                        SwingConstants.CENTER, vr, ir, tr, 0);
-
     Color saved = g.getColor();
     g.setColor(Color.BLACK);
 
-    g.drawString(text, vr.x, vr.y + fm.getAscent());
+    g.drawString(text, vr.x, vr.y + ascent); 
+    
+    // paint accelerator
+    if (accText != null)
+      {
+        g.setColor(accFore);
+        int textWidth = fm.stringWidth(text + "  ");
+        
+        fm = t.getFontMetrics(accFont);
+        int width = fm.stringWidth(accText);
+        g.drawString(accText, textWidth, vr.y + ascent);
+      }
 
-    g.setColor(saved);
+    g.setColor(saved);   
   }
 
   /**

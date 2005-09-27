@@ -75,7 +75,8 @@ public abstract class MidiMessage implements Cloneable
    * @param length The length of the MIDI message.
    * @throws InvalidMidiDataException Thrown when the MIDI message is invalid.
    */
-  protected void setMessage(byte[] data, int length) throws InvalidMidiDataException
+  protected void setMessage(byte[] data, int length) 
+    throws InvalidMidiDataException
   {
     this.data = new byte[length];
     System.arraycopy(data, 0, this.data, 0, length);

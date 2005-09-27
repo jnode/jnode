@@ -206,7 +206,8 @@ public class Sequence
       // FIXME
       // How can this possible be computed?  PPQ is pulses per quarter-note,
       // which is dependent on the tempo of the Sequencer.
-      throw new UnsupportedOperationException("Can't compute PPQ based lengths yet");
+      throw new 
+	  UnsupportedOperationException("Can't compute PPQ based lengths yet");
     }
     else
     {

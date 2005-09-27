@@ -249,8 +249,8 @@ public class ShortMessage extends MidiMessage
       return 0;
       
     default:
-      throw new InvalidMidiDataException ("Invalid status: 0x" 
-                                          + Integer.toHexString(originalStatus));
+      throw new InvalidMidiDataException("Invalid status: 0x" 
+                                         + Integer.toHexString(originalStatus));
     }
   }
   

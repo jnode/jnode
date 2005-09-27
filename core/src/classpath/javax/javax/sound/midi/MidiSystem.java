@@ -71,7 +71,8 @@ public class MidiSystem
    */
   public static MidiDevice.Info[] getMidiDeviceInfo()
   {
-    Iterator deviceProviders = ServiceFactory.lookupProviders(MidiDeviceProvider.class);
+    Iterator deviceProviders = 
+	ServiceFactory.lookupProviders(MidiDeviceProvider.class);
     List infoList = new ArrayList();
     
     while (deviceProviders.hasNext())
@@ -82,7 +83,8 @@ public class MidiSystem
         infoList.add(infos[--i]);
     }
     
-    return (MidiDevice.Info[]) infoList.toArray(new MidiDevice.Info[infoList.size()]);
+    return (MidiDevice.Info[]) 
+	infoList.toArray(new MidiDevice.Info[infoList.size()]);
   }
   
   /**
@@ -94,9 +96,10 @@ public class MidiSystem
    * @throws IllegalArgumentException if the device described by info is not found
    */
   public static MidiDevice getMidiDevice(MidiDevice.Info info) 
-    throws MidiUnavailableException, IllegalArgumentException
+    throws MidiUnavailableException
   {
-    Iterator deviceProviders = ServiceFactory.lookupProviders(MidiDeviceProvider.class);
+    Iterator deviceProviders = 
+	ServiceFactory.lookupProviders(MidiDeviceProvider.class);
     
     if (! deviceProviders.hasNext())
       throw new MidiUnavailableException("No MIDI device providers available.");
@@ -109,7 +112,8 @@ public class MidiSystem
         return provider.getDevice(info);
     } while (deviceProviders.hasNext());
     
-    throw new IllegalArgumentException("MIDI device " + info + " not available.");
+    throw new IllegalArgumentException("MIDI device " 
+				       + info + " not available.");
   }
   
   /**
@@ -259,7 +263,8 @@ public class MidiSystem
       if (sb != null)
         return sb;
     }
-    throw new InvalidMidiDataException("Cannot read soundbank from file " + file);
+    throw new InvalidMidiDataException("Cannot read soundbank from file " 
+				       + file);
   } 
 
   /**
@@ -281,7 +286,7 @@ public class MidiSystem
       if (sb != null)
         return sb;
     }
-    throw new InvalidMidiDataException("Cannot read MidiFileFormat from stream");
+    throw new InvalidMidiDataException("Can't read MidiFileFormat from stream");
   }
 
   /**
@@ -325,7 +330,8 @@ public class MidiSystem
       if (sb != null)
         return sb;
     }
-    throw new InvalidMidiDataException("Cannot read MidiFileFormat from file " + file);
+    throw new InvalidMidiDataException("Can't read MidiFileFormat from file " 
+				       + file);
   } 
   
   
@@ -452,7 +458,7 @@ public class MidiSystem
    * @throws IllegalArgumentException if fileType is not supported for in
    */
   public static int write(Sequence in, int fileType, OutputStream out)
-    throws IOException, IllegalArgumentException
+    throws IOException
   {
     Iterator writers = ServiceFactory.lookupProviders(MidiFileWriter.class);
     while (writers.hasNext())
@@ -462,7 +468,8 @@ public class MidiSystem
       if (fw.isFileTypeSupported(fileType, in))
         return fw.write(in, fileType, out);
     }
-    throw new IllegalArgumentException("File type " + fileType + " is not supported");
+    throw new IllegalArgumentException("File type " 
+				       + fileType + " is not supported");
   }
 
   /**
@@ -476,7 +483,7 @@ public class MidiSystem
    * @throws IllegalArgumentException if fileType is not supported for in
    */
   public static int write(Sequence in, int fileType, File out)
-    throws IOException, IllegalArgumentException
+    throws IOException
   {
     Iterator writers = ServiceFactory.lookupProviders(MidiFileWriter.class);
     while (writers.hasNext())
@@ -486,7 +493,8 @@ public class MidiSystem
       if (fw.isFileTypeSupported(fileType, in))
         return fw.write(in, fileType, out);
     }
-    throw new IllegalArgumentException("File type " + fileType + " is not supported");
+    throw new IllegalArgumentException("File type " 
+				       + fileType + " is not supported");
   }
 }
 

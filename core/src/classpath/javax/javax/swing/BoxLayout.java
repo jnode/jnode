@@ -44,7 +44,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.LayoutManager2;
-import java.awt.Rectangle;
 import java.io.Serializable;
 
 /**
@@ -168,7 +167,9 @@ public class BoxLayout implements LayoutManager2, Serializable
         hReq = SizeRequirements.getAlignedSizeRequirements(hSizeReqs);
         vReq = SizeRequirements.getTiledSizeRequirements(vSizeReqs);
       }
-    return new Dimension(hReq.preferred, vReq.preferred);
+    Insets insets = container.getInsets();
+    return new Dimension(hReq.preferred + insets.left + insets.right,
+                         vReq.preferred + insets.top + insets.bottom);
   }
 
   /**
@@ -222,8 +223,8 @@ public class BoxLayout implements LayoutManager2, Serializable
     int[] vOffsets = new int[children.length];
 
     Insets insets = container.getInsets();
-    int width = container.getWidth() - insets.left - insets.right - 1;
-    int height = container.getHeight() - insets.top - insets.bottom - 1;
+    int width = container.getWidth() - insets.left - insets.right;
+    int height = container.getHeight() - insets.top - insets.bottom;
     if (isHorizontalIn(container))
       {
         SizeRequirements.calculateTiledPositions(width, null,

@@ -1129,6 +1129,7 @@ public class MetalLookAndFeel extends BasicLookAndFeel
       "ToolBar.highlight", getControlHighlight(),
       "ToolBar.light", getControlHighlight(),
       "ToolBar.shadow", getControlShadow(),
+      "ToolBar.border", new MetalBorders.ToolBarBorder(),
 
       "ToolTip.background", getPrimaryControl(),
       "ToolTip.backgroundInactive", getControl(),

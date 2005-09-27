@@ -69,28 +69,28 @@ import javax.swing.plaf.MenuItemUI;
  * fired when menu item is selected. In addition to this events menuItem also
  * fire MenuDragMouseEvent and MenuKeyEvents when mouse is dragged over
  * the menu item or associated key with menu item is invoked respectively.
-	 */
+ */
 public class JMenuItem extends AbstractButton implements Accessible,
                                                          MenuElement
 {
   private static final long serialVersionUID = -1681004643499461044L;
 
   /** Combination of keyboard keys that can be used to activate this menu item */
-	private KeyStroke accelerator;
+  private KeyStroke accelerator;
 
-	/**
+  /**
    * Creates a new JMenuItem object.
-	 */
+   */
   public JMenuItem()
   {
     super();
   }
 
-	/**
+  /**
    * Creates a new JMenuItem with the given icon.
    *
    * @param icon Icon that will be displayed on the menu item
-	 */
+   */
   public JMenuItem(Icon icon)
   {
     // FIXME: The requestedFocusEnabled property should
@@ -99,55 +99,55 @@ public class JMenuItem extends AbstractButton implements Accessible,
     init(null, icon);
   }
 
-	/**
+  /**
    * Creates a new JMenuItem with the given label.
    *
    * @param text label for the menu item
-	 */
+   */
   public JMenuItem(String text)
   {
     this(text, null);
   }
 
-	/**
+  /**
    * Creates a new JMenuItem associated with the specified action.
    *
    * @param action action for this menu item
-	 */
+   */
   public JMenuItem(Action action)
   {
     super();
     super.setAction(action);
   }
 
-	/**
+  /**
    * Creates a new JMenuItem with specified text and icon.
    * Text is displayed to the left of icon by default.
    *
    * @param text label for this menu item
    * @param icon icon that will be displayed on this menu item
-	 */
+   */
   public JMenuItem(String text, Icon icon)
   {
     super();
     init(text, icon);
   }
 
-	/**
+  /**
    * Creates a new JMenuItem object.
    *
    * @param text label for this menu item
    * @param mnemonic - Single key that can be used with a
    * look-and-feel meta key to activate this menu item. However
    * menu item should be visible on the screen when mnemonic is used.
-	 */
+   */
   public JMenuItem(String text, int mnemonic)
   {
     this(text, null);
     setMnemonic(mnemonic);
   }
 
-	private void readObject(ObjectInputStream stream) 
+  private void readObject(ObjectInputStream stream)
                    throws IOException, ClassNotFoundException
   {
   }
@@ -156,12 +156,12 @@ public class JMenuItem extends AbstractButton implements Accessible,
   {
   }
 
-	/**
+  /**
    * Initializes this menu item
    *
    * @param text label for this menu item
    * @param icon icon to be displayed for this menu item
-	 */
+   */
   protected void init(String text, Icon icon)
   {
     super.init(text, icon);
@@ -179,107 +179,114 @@ public class JMenuItem extends AbstractButton implements Accessible,
     horizontalTextPosition = JButton.LEFT;
   }
 
-	/**
+  /**
    * Set the "UI" property of the menu item, which is a look and feel class
    * responsible for handling menuItem's input events and painting it.
    *
    * @param ui The new "UI" property
-	 */
+   */
   public void setUI(MenuItemUI ui)
   {
-		super.setUI(ui);
+    super.setUI(ui);
   }
 
-	/**
+  /**
    * This method sets this menuItem's UI to the UIManager's default for the
    * current look and feel.
-	 */
+   */
   public void updateUI()
   {
     MenuItemUI mi = ((MenuItemUI) UIManager.getUI(this));
     setUI(mi);
-		invalidate();
+    invalidate();
   }
 
-	/**
+  /**
    * This method returns a name to identify which look and feel class will be
    * the UI delegate for the menuItem.
    *
    * @return The Look and Feel classID. "MenuItemUI"
-	 */
+   */
   public String getUIClassID()
   {
     return "MenuItemUI";
   }
 
-	/**
+  /**
    * Returns true if button's model is armed and false otherwise. The
    * button model is armed if menu item has focus or it is selected.
    *
    * @return $boolean$ true if button's model is armed and false otherwise
-	 */
+   */
   public boolean isArmed()
   {
     return getModel().isArmed();
   }
 
-	/**
+  /**
    * Sets menuItem's "ARMED" property
    *
    * @param armed DOCUMENT ME!
-	 */
+   */
   public void setArmed(boolean armed)
   {
     getModel().setArmed(armed);
   }
 
-	/**
+  /**
    * Enable or disable menu item. When menu item is disabled,
    * its text and icon are grayed out if they exist.
    *
    * @param enabled if true enable menu item, and disable otherwise.
-	 */
+   */
   public void setEnabled(boolean enabled)
   {
     super.setEnabled(enabled);
   }
 
-	/**
+  /**
    * Return accelerator for this menu item.
    *
    * @return $KeyStroke$ accelerator for this menu item.
-	 */
+   */
   public KeyStroke getAccelerator()
   {
     return accelerator;
   }
 
-	/**
-   * Sets accelerator for this menu item.
-   *
+  /**
+   * Sets the key combination which invokes the menu item's action 
+   * listeners without navigating the menu hierarchy. Note that when the 
+   * keyboard accelerator is typed, it will work whether or not the 
+   * menu is currently displayed.
+   * 
    * @param keystroke accelerator for this menu item.
-	 */
+   */
   public void setAccelerator(KeyStroke keystroke)
   {
     this.accelerator = keystroke;
   }
 
-	/**
+  /**
    * Configures menu items' properties from properties of the specified action.
    * This method overrides configurePropertiesFromAction from AbstractButton
    * to also set accelerator property.
    *
    * @param action action to configure properties from
-	 */
+   */
   protected void configurePropertiesFromAction(Action action)
   {
     super.configurePropertiesFromAction(action);
 
     if (! (this instanceof JMenu) && action != null)
-      setAccelerator((KeyStroke) (action.getValue(Action.ACCELERATOR_KEY)));
+      {
+        setAccelerator((KeyStroke) (action.getValue(Action.ACCELERATOR_KEY)));
+        super.registerKeyboardAction(action, accelerator, 
+                                     JComponent.WHEN_IN_FOCUSED_WINDOW);
+      }
   }
 
-	/**
+  /**
    * Creates PropertyChangeListener to listen for the changes in action
    * properties.
    *
@@ -287,7 +294,7 @@ public class JMenuItem extends AbstractButton implements Accessible,
    *
    * @return $PropertyChangeListener$ Listener that listens to changes in
    * action properties.
-	 */
+   */
   protected PropertyChangeListener createActionPropertyChangeListener(Action action)
   {
     return new PropertyChangeListener()
@@ -300,14 +307,14 @@ public class JMenuItem extends AbstractButton implements Accessible,
       };
   }
 
-	/**
+  /**
    * Process mouse events forwarded from MenuSelectionManager.
    *
    * @param event event forwarded from MenuSelectionManager
    * @param path path to the menu element from which event was generated
    * @param manager MenuSelectionManager for the current menu hierarchy
-	 */
-	public void processMouseEvent(MouseEvent event, MenuElement[] path,
+   */
+  public void processMouseEvent(MouseEvent event, MenuElement[] path,
                                 MenuSelectionManager manager)
   {
     // Fire MenuDragMouseEvents if mouse is being dragged.
@@ -322,11 +329,11 @@ public class JMenuItem extends AbstractButton implements Accessible,
 	break;
       case MouseEvent.MOUSE_ENTERED:
 	if (isRolloverEnabled())
-	      model.setRollover(true);
+	  model.setRollover(true);
 	break;
       case MouseEvent.MOUSE_EXITED:
 	if (isRolloverEnabled())
-	      model.setRollover(false);
+	  model.setRollover(false);
 
 	// for JMenu last element on the path is its popupMenu.
 	// JMenu shouldn't me disarmed.	
@@ -335,10 +342,10 @@ public class JMenuItem extends AbstractButton implements Accessible,
 	break;
       case MouseEvent.MOUSE_PRESSED:
 	if ((event.getModifiersEx() & InputEvent.BUTTON1_DOWN_MASK) != 0)
-	      {
-		model.setArmed(true);
-		model.setPressed(true);
-	      }
+	  {
+	    model.setArmed(true);
+	    model.setPressed(true);
+	  }
 	break;
       case MouseEvent.MOUSE_RELEASED:
 	break;
@@ -376,20 +383,20 @@ public class JMenuItem extends AbstractButton implements Accessible,
    * @param event event forwarded from MenuSelectionManager
    * @param path path to the menu element from which event was generated
    * @param manager MenuSelectionManager for the current menu hierarchy
-	 */
-	public void processKeyEvent(KeyEvent event, MenuElement[] path,
+   */
+  public void processKeyEvent(KeyEvent event, MenuElement[] path,
                               MenuSelectionManager manager)
   {
     // Need to implement.
   }
 
-	/**
+  /**
    * This method fires MenuDragMouseEvents to registered listeners.
    * Different types of MenuDragMouseEvents are fired depending
    * on the observed mouse event.
    *
    * @param event Mouse
-	 */
+   */
   public void processMenuDragMouseEvent(MenuDragMouseEvent event)
   {
     switch (event.getID())
@@ -409,23 +416,23 @@ public class JMenuItem extends AbstractButton implements Accessible,
       }
   }
 
-	/**
+  /**
    * This method fires MenuKeyEvent to registered listeners.
    * Different types of MenuKeyEvents are fired depending
    * on the observed key event.
    *
    * @param event DOCUMENT ME!
-	 */
+   */
   public void processMenuKeyEvent(MenuKeyEvent event)
   {
     // Need to implement.
   }
 
-	/**
+  /**
    * Fires MenuDragMouseEvent to all of the menuItem's MouseInputListeners.
    *
    * @param event The event signifying that mouse entered menuItem while it was dragged
-	 */
+   */
   protected void fireMenuDragMouseEntered(MenuDragMouseEvent event)
   {
     EventListener[] ll = listenerList.getListeners(MenuDragMouseListener.class);
@@ -434,11 +441,11 @@ public class JMenuItem extends AbstractButton implements Accessible,
       ((MenuDragMouseListener) ll[i]).menuDragMouseEntered(event);
   }
 
-	/**
+  /**
    * Fires MenuDragMouseEvent to all of the menuItem's MouseInputListeners.
    *
    * @param event The event signifying that mouse has exited menu item, while it was dragged
-	 */
+   */
   protected void fireMenuDragMouseExited(MenuDragMouseEvent event)
   {
     EventListener[] ll = listenerList.getListeners(MenuDragMouseListener.class);
@@ -447,11 +454,11 @@ public class JMenuItem extends AbstractButton implements Accessible,
       ((MenuDragMouseListener) ll[i]).menuDragMouseExited(event);
   }
 
-	/**
+  /**
    * Fires MenuDragMouseEvent to all of the menuItem's MouseInputListeners.
    *
    * @param event The event signifying that mouse is being dragged over the menuItem
-	 */
+   */
   protected void fireMenuDragMouseDragged(MenuDragMouseEvent event)
   {
     EventListener[] ll = listenerList.getListeners(MenuDragMouseListener.class);
@@ -460,11 +467,11 @@ public class JMenuItem extends AbstractButton implements Accessible,
       ((MenuDragMouseListener) ll[i]).menuDragMouseDragged(event);
   }
 
-	/**
+  /**
    * This method fires a MenuDragMouseEvent to all the MenuItem's MouseInputListeners.
    *
    * @param event The event signifying that mouse was released while it was dragged over the menuItem
-	 */
+   */
   protected void fireMenuDragMouseReleased(MenuDragMouseEvent event)
   {
     EventListener[] ll = listenerList.getListeners(MenuDragMouseListener.class);
@@ -473,11 +480,11 @@ public class JMenuItem extends AbstractButton implements Accessible,
       ((MenuDragMouseListener) ll[i]).menuDragMouseReleased(event);
   }
 
-	/**
+  /**
    * This method fires a MenuKeyEvent to all the MenuItem's MenuKeyListeners.
    *
    * @param event The event signifying that key associated with this menu was pressed
-	 */
+   */
   protected void fireMenuKeyPressed(MenuKeyEvent event)
   {
     EventListener[] ll = listenerList.getListeners(MenuKeyListener.class);
@@ -486,11 +493,11 @@ public class JMenuItem extends AbstractButton implements Accessible,
       ((MenuKeyListener) ll[i]).menuKeyPressed(event);
   }
 
-	/**
+  /**
    * This method fires a MenuKeyEvent to all the MenuItem's MenuKeyListeners.
    *
    * @param event The event signifying that key associated with this menu was released
-	 */
+   */
   protected void fireMenuKeyReleased(MenuKeyEvent event)
   {
     EventListener[] ll = listenerList.getListeners(MenuKeyListener.class);
@@ -499,12 +506,12 @@ public class JMenuItem extends AbstractButton implements Accessible,
       ((MenuKeyListener) ll[i]).menuKeyTyped(event);
   }
 
-	/**
+  /**
    * This method fires a MenuKeyEvent to all the MenuItem's MenuKeyListeners.
    *
    * @param event The event signifying that key associated with this menu was typed.
    *        The key is typed when it was pressed and then released
-	 */
+   */
   protected void fireMenuKeyTyped(MenuKeyEvent event)
   {
     EventListener[] ll = listenerList.getListeners(MenuKeyListener.class);
@@ -513,7 +520,7 @@ public class JMenuItem extends AbstractButton implements Accessible,
       ((MenuKeyListener) ll[i]).menuKeyTyped(event);
   }
 
-	/**
+  /**
    * Method of the MenuElement interface.
    * This method is invoked by MenuSelectionManager when selection of
    * this menu item has changed. If this menu item was selected then
@@ -523,72 +530,72 @@ public class JMenuItem extends AbstractButton implements Accessible,
    *
    * @param changed indicates selection status of this menu item. If changed is
    * true then menu item is selected and deselected otherwise.
-	 */
+   */
   public void menuSelectionChanged(boolean changed)
   {
     Component parent = this.getParent();
     if (changed)
       {
-      model.setArmed(true);
+	model.setArmed(true);
 
 	if (parent != null && parent instanceof JPopupMenu)
 	  ((JPopupMenu) parent).setSelected(this);
       }
     else
       {
-      model.setArmed(false);
+	model.setArmed(false);
 
 	if (parent != null && parent instanceof JPopupMenu)
 	  ((JPopupMenu) parent).getSelectionModel().clearSelection();
       }
   }
 
-	/**
+  /**
    * Method of the MenuElement interface.
    *
    * @return $MenuElement[]$ Returns array of sub-components for this menu
    *         item. By default menuItem doesn't have any subcomponents and so
-   *             empty array is returned instead.
-	 */
+   *         empty array is returned instead.
+   */
   public MenuElement[] getSubElements()
   {
     return new MenuElement[0];
   }
 
-	/**
+  /**
    * Returns reference to the component that will paint this menu item.
    *
    * @return $Component$ Component that will paint this menu item.
    *         Simply returns reference to this menu item.
-	 */
+   */
   public Component getComponent()
   {
     return this;
   }
 
-	/**
+  /**
    * Adds a MenuDragMouseListener to this menu item. When mouse
    * is dragged over the menu item the MenuDragMouseEvents will be
    * fired, and these listeners will be called.
    *
    * @param listener The new listener to add
-	 */
+   */
   public void addMenuDragMouseListener(MenuDragMouseListener listener)
   {
     listenerList.add(MenuDragMouseListener.class, listener);
   }
 
-	/**
+  /**
    * Removes a MenuDragMouseListener from the menuItem's listener list.
    *
    * @param listener The listener to remove
-	 */
+   */
   public void removeMenuDragMouseListener(MenuDragMouseListener listener)
   {
     listenerList.remove(MenuDragMouseListener.class, listener);
   }
 
-	/**
+  /**
    * Returns all added MenuDragMouseListener objects.
    *
    * @return an array of listeners
@@ -605,23 +612,23 @@ public class JMenuItem extends AbstractButton implements Accessible,
    * invoked when MenuKeyEvents will be fired by this menu item.
    *
    * @param listener The new listener to add
-	 */
+   */
   public void addMenuKeyListener(MenuKeyListener listener)
   {
     listenerList.add(MenuKeyListener.class, listener);
   }
 
-	/**
+  /**
    * Removes an MenuKeyListener from the menuItem's listener list.
    *
    * @param listener The listener to remove
-	 */
+   */
   public void removeMenuKeyListener(MenuKeyListener listener)
   {
     listenerList.remove(MenuKeyListener.class, listener);
   }
 
-	/**
+  /**
    * Returns all added MenuKeyListener objects.
    *
    * @return an array of listeners
@@ -638,7 +645,7 @@ public class JMenuItem extends AbstractButton implements Accessible,
    * for debugging.
    *
    * @return A string describing this JMenuItem
-	 */
+   */
   protected String paramString()
   {
     return super.paramString();
@@ -649,7 +656,7 @@ public class JMenuItem extends AbstractButton implements Accessible,
     if (accessibleContext == null)
       accessibleContext = new AccessibleJMenuItem();
 
-		return accessibleContext;
+    return accessibleContext;
   }
 
   protected class AccessibleJMenuItem extends AccessibleAbstractButton

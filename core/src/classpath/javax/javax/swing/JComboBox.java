@@ -58,6 +58,7 @@ import javax.accessibility.AccessibleSelection;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.PopupMenuListener;
+import javax.swing.event.PopupMenuEvent;
 import javax.swing.plaf.ComboBoxUI;
 
 /**
@@ -840,6 +841,47 @@ public class JComboBox extends JComponent implements ItemSelectable,
       ll[i].actionPerformed(new ActionEvent(this,
                                             ActionEvent.ACTION_PERFORMED,
                                             actionCommand));
+  }
+
+  /**
+   * Fires a popupMenuCanceled() event to all <code>PopupMenuListeners</code>.
+   *
+   * Note: This method is intended for use by plaf classes only.
+   */
+  public void firePopupMenuCanceled()
+  {
+    PopupMenuListener[] listeners = getPopupMenuListeners();
+    PopupMenuEvent e = new PopupMenuEvent(this);
+    for(int i = 0; i < listeners.length; i++)
+      listeners[i].popupMenuCanceled(e);
+  }
+
+  /**
+   * Fires a popupMenuWillBecomeInvisible() event to all 
+   * <code>PopupMenuListeners</code>.
+   *
+   * Note: This method is intended for use by plaf classes only.
+   */
+  public void firePopupMenuWillBecomeInvisible()
+  {
+    PopupMenuListener[] listeners = getPopupMenuListeners();
+    PopupMenuEvent e = new PopupMenuEvent(this);
+    for(int i = 0; i < listeners.length; i++)
+      listeners[i].popupMenuWillBecomeInvisible(e);
+  }
+
+  /**
+   * Fires a popupMenuWillBecomeVisible() event to all 
+   * <code>PopupMenuListeners</code>.
+   *
+   * Note: This method is intended for use by plaf classes only.
+   */
+  public void firePopupMenuWillBecomeVisible()
+  {
+    PopupMenuListener[] listeners = getPopupMenuListeners();
+    PopupMenuEvent e = new PopupMenuEvent(this);
+    for(int i = 0; i < listeners.length; i++)
+      listeners[i].popupMenuWillBecomeVisible(e);
   }
 
   /**

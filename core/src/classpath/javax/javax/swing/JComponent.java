@@ -44,6 +44,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.FocusTraversalPolicy;
 import java.awt.Font;
@@ -242,7 +243,7 @@ public abstract class JComponent extends Container implements Serializable
    * The text to show in the tooltip associated with this component.
    * 
    * @see #setToolTipText
-   * @see #getToolTipText
+   * @see #getToolTipText()
    */
    String toolTipText;
 
@@ -322,7 +323,7 @@ public abstract class JComponent extends Container implements Serializable
    * try to request focus, but the request might fail. Thus it is only 
    * a hint guiding swing's behavior.
    *
-   * @see #requestFocus
+   * @see #requestFocus()
    * @see #isRequestFocusEnabled
    * @see #setRequestFocusEnabled
    */
@@ -1643,7 +1644,7 @@ public abstract class JComponent extends Container implements Serializable
   /**
    * Performs double buffered repainting.
    *
-   * @param r the area to be repainted
+   * @param g the graphics context to paint to
    */
   void paintDoubleBuffered(Graphics g)
   {
@@ -2095,8 +2096,19 @@ public abstract class JComponent extends Container implements Serializable
    */
   public void revalidate()
   {
-    invalidate();
-    RepaintManager.currentManager(this).addInvalidComponent(this);
+    if (! EventQueue.isDispatchThread())
+      SwingUtilities.invokeLater(new Runnable()
+        {
+          public void run()
+          {
+            revalidate();
+          }
+        });
+    else
+      {
+        invalidate();
+        RepaintManager.currentManager(this).addInvalidComponent(this);
+      }
   }
 
   /**
@@ -2316,6 +2328,10 @@ public abstract class JComponent extends Container implements Serializable
   public void setVisible(boolean v)
   {
     super.setVisible(v);
+    Container parent = getParent();
+    if (parent != null)
+      parent.repaint(getX(), getY(), getWidth(), getHeight());
+    revalidate();
   }
 
   /**

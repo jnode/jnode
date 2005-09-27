@@ -589,7 +589,7 @@ public class BasicToolBarUI extends ToolBarUI implements SwingConstants
   {
     UIDefaults defaults = UIManager.getLookAndFeelDefaults();
 
-    toolBar.setBorder(new ToolBarBorder());
+    toolBar.setBorder(defaults.getBorder("ToolBar.border"));
     toolBar.setBackground(defaults.getColor("ToolBar.background"));
     toolBar.setForeground(defaults.getColor("ToolBar.foreground"));
     toolBar.setFont(defaults.getFont("ToolBar.font"));
