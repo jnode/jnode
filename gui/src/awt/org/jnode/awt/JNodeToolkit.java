@@ -328,14 +328,6 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 		return getImage(url);
 	}
 
-	/**
-	 * @see gnu.java.awt.ClasspathToolkit#createImageProducer(java.net.URL)
-	 */
-	public ImageProducer createImageProducer(URL url) {
-		// TODO Auto-generated method stub
-		return super.createImageProducer(url);
-	}
-
 	public VolatileImage createVolatileImage(int width, int height) {
 		throw new RuntimeException("Not implemented");
 	}
