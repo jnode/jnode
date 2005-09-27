@@ -67,7 +67,8 @@ public interface Sequencer extends MidiDevice
    * @throws IOException if an I/O exception happens
    * @throws InvalidMidiDataException if the MIDI file contains bad data
    */
-  public void setSequence(InputStream istream) throws IOException, InvalidMidiDataException;
+  public void setSequence(InputStream istream) 
+      throws IOException, InvalidMidiDataException;
   
   /**
    * Get the current sequence object for this sequencer.

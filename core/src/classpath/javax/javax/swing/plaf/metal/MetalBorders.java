@@ -52,6 +52,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.border.AbstractBorder;
@@ -917,6 +918,44 @@ public class MetalBorders
   }
   
   /**
+   * A button border that is only visible when the mouse pointer is within 
+   * the button's bounds.
+   */
+  public static class RolloverButtonBorder
+    extends MetalBorders.ButtonBorder
+  {
+    /**
+     * Creates a new border instance.
+     */
+    public RolloverButtonBorder()
+    {
+    }
+    
+    /**
+     * Paints the border.
+     * 
+     * @param c  the component.
+     * @param g  the graphics device.
+     * @param x  the x-coordinate.
+     * @param y  the y-coordinate.
+     * @param w  the width.
+     * @param h  the height.
+     */
+    public void paintBorder(Component c, Graphics g, int x, int y, int w, 
+            int h)
+    {
+      boolean mouseIsOver = false;
+      if (c instanceof AbstractButton)
+        {
+          ButtonModel bmodel = ((AbstractButton) c).getModel();
+          mouseIsOver = bmodel.isRollover();
+        }
+      if (mouseIsOver)
+        super.paintBorder(c, g, x, y, w, h);
+    }
+  }
+  
+  /**
    * This border is used in Toolbar buttons as inner border.
    */
   static class RolloverMarginBorder extends AbstractBorder
@@ -1144,6 +1183,100 @@ public class MetalBorders
     }
   }
 
+  /**
+   * A border used when painting {@link JToolBar} instances.
+   */
+  public static class ToolBarBorder extends AbstractBorder
+    implements UIResource
+  {
+    /**
+     * Creates a new border instance.
+     */
+    public ToolBarBorder()
+    {
+    }
+    
+    /**
+     * Returns the border insets.
+     * 
+     * @param c  the component (ignored).
+     * 
+     * @return The border insets.
+     */
+    public Insets getBorderInsets(Component c)
+    {
+      return getBorderInsets(c, null);
+    }
+    
+    /**
+     * Returns the border insets.
+     * 
+     * @param c  the component (ignored).
+     * @return The border insets.
+     */
+    public Insets getBorderInsets(Component c, Insets newInsets)
+    {
+      JToolBar tb = (JToolBar) c;
+      if (tb.getOrientation() == JToolBar.HORIZONTAL)
+        {   
+          if (newInsets == null)
+            newInsets = new Insets(2, 16, 2, 2);
+          else
+            {
+              newInsets.top = 2;
+              newInsets.left = 16;
+              newInsets.bottom = 2;
+              newInsets.right = 2;
+            }
+          return newInsets;  
+        }
+      else // assume JToolBar.VERTICAL
+        { 
+          if (newInsets == null)
+            newInsets = new Insets(16, 2, 2, 2);
+          else
+            {
+              newInsets.top = 16;
+              newInsets.left = 2;
+              newInsets.bottom = 2;
+              newInsets.right = 2;
+            }
+          return newInsets;  
+        }
+
+    }
+    
+    /**
+     * Paints the border for the specified component.
+     * 
+     * @param c  the component.
+     * @param g  the graphics device.
+     * @param x  the x-coordinate.
+     * @param y  the y-coordinate.
+     * @param w  the width.
+     * @param h  the height.
+     */
+    public void paintBorder(Component c, Graphics g, int x, int y, int w, 
+        int h)
+    {
+        
+      JToolBar tb = (JToolBar) c;
+      if (tb.getOrientation() == JToolBar.HORIZONTAL)
+        {
+           MetalUtils.fillMetalPattern(g, x + 2, y + 2, x + 11, y + h - 5, 
+                  MetalLookAndFeel.getControlHighlight(), 
+                  MetalLookAndFeel.getControlDarkShadow());
+        }
+      else
+        { 
+          MetalUtils.fillMetalPattern(g, x + 2, y + 2, x + w - 5, y + 11, 
+                  MetalLookAndFeel.getControlHighlight(), 
+                  MetalLookAndFeel.getControlDarkShadow());
+        }
+    }
+    
+  }
+  
   /**
    * A border for table header cells.
    *

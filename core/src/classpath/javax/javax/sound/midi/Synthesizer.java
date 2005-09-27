@@ -91,8 +91,7 @@ public interface Synthesizer extends MidiDevice
    * @return true if the instrument was loaded and false otherwise
    * @throws IllegalArgumentException if this synth doesn't support instrument
    */
-  public boolean loadInstrument(Instrument instrument)
-    throws IllegalArgumentException;
+  public boolean loadInstrument(Instrument instrument);
   
   /**
    * Unload an instrument from this synth.
@@ -100,8 +99,7 @@ public interface Synthesizer extends MidiDevice
    * @param instrument the Instrument to unload
    * @throws IllegalArgumentException if this synth doesn't support instrument
    */
-  public void unloadInstrument(Instrument instrument)
-    throws IllegalArgumentException;
+  public void unloadInstrument(Instrument instrument);
   
   /**
    * Move an intrument from one place to another.  The instrument at the
@@ -112,8 +110,7 @@ public interface Synthesizer extends MidiDevice
    * @return if from was remapped
    * @throws IllegalArgumentException
    */
-  public boolean remapInstrument(Instrument from, Instrument to)
-    throws IllegalArgumentException;
+  public boolean remapInstrument(Instrument from, Instrument to);
   
   /**
    * Get the default Soundbank for this synth.  Return null if there is no
@@ -144,8 +141,7 @@ public interface Synthesizer extends MidiDevice
    * @return true if all instruments were loaded, false othewise
    * @throws IllegalArgumentException if the soundbank isn't supported by this
    */
-  public boolean loadAllInstruments(Soundbank soundbank)
-    throws IllegalArgumentException;
+  public boolean loadAllInstruments(Soundbank soundbank);
   
   /**
    * Unload all soundbank instruments from this synthesizer.
@@ -153,8 +149,7 @@ public interface Synthesizer extends MidiDevice
    * @param soundbank the Soundbank containing the instruments to unload
    * @throws IllegalArgumentException if the soundbank isn't supported by this
    */
-  public void unloadAllInstruments(Soundbank soundbank)
-    throws IllegalArgumentException;
+  public void unloadAllInstruments(Soundbank soundbank);
   
   /**
    * Load a subset of soundbank instruments into this synthesizer.  The 
@@ -165,8 +160,7 @@ public interface Synthesizer extends MidiDevice
    * @return true if instruments were loaded, false otherwise
    * @throws IllegalArgumentException if the soundbank isn't supported by this
    */
-  public boolean loadInstruments(Soundbank soundbank, Patch[] patchList)
-    throws IllegalArgumentException;
+  public boolean loadInstruments(Soundbank soundbank, Patch[] patchList);
   
   /**
    * Unload a subset of soundbank instruments from this synthesizer.
@@ -175,6 +169,5 @@ public interface Synthesizer extends MidiDevice
    * @param patchList the array of patches identifying instruments to unload
    * @throws IllegalArgumentException if the soundbank isn't supported by this
    */
-  public void unloadInstruments(Soundbank soundbank, Patch[] patchList)
-    throws IllegalArgumentException;
+  public void unloadInstruments(Soundbank soundbank, Patch[] patchList);
 }

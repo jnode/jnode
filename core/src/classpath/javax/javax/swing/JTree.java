@@ -1477,6 +1477,7 @@ public class JTree
    */
   public JTree(TreeModel model)
   {
+    setRootVisible(true);
     setModel(model);
     setSelectionModel(EmptySelectionModel.sharedInstance());
     setCellRenderer(new DefaultTreeCellRenderer());

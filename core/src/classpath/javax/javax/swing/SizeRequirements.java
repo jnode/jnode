@@ -282,7 +282,7 @@ public class SizeRequirements implements Serializable
     // Adjust spans so that we exactly fill the allocated region. If
     if (span > allocated)
       adjustSmaller(allocated, children, spans, span);
-    else
+    else if (span < allocated)
       adjustGreater(allocated, children, spans, span);
 
     // Adjust offsets.
@@ -314,6 +314,11 @@ public class SizeRequirements implements Serializable
     for (int i = 0; i < children.length; i++)
       sumDelta += children[i].preferred - children[i].minimum;
 
+    // If we have sumDelta == 0, then all components have prefSize == maxSize
+    // and we can't do anything about it.
+    if (sumDelta == 0)
+      return;
+
     // Adjust all sizes according to their preferred and minimum sizes.
     for (int i = 0; i < children.length; i++)
       {
@@ -333,6 +338,11 @@ public class SizeRequirements implements Serializable
     int sumDelta = 0;
     for (int i = 0; i < children.length; i++)
       sumDelta += children[i].maximum - children[i].preferred;
+
+    // If we have sumDelta == 0, then all components have prefSize == maxSize
+    // and we can't do anything about it.
+    if (sumDelta == 0)
+      return;
 
     // Adjust all sizes according to their preferred and minimum sizes.
     for (int i = 0; i < children.length; i++)
@@ -423,7 +433,7 @@ public class SizeRequirements implements Serializable
         float align = children[i].alignment;
         // Try to fit the component into the available space.
         int[] spanAndOffset = new int[2];
-        if (align < .5F)
+        if (align < .5F || baseline == 0)
           adjustFromRight(children[i], baseline, allocated, spanAndOffset);
         else
           adjustFromLeft(children[i], baseline, allocated, spanAndOffset);
