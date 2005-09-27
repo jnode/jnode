@@ -7,7 +7,7 @@ GNU Classpath is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2, or (at your option)
 any later version.
-
+ 
 GNU Classpath is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -46,32 +46,32 @@ public final class Gnu extends Provider
 {
   public Gnu()
   {
-    super("GNU", 1.0, "GNU provider v1.0 implementing SHA-1, MD5, DSA, RSA, X.509 Certificates and CRLs, PKIX certificate path validators, Collection cert stores, Diffie-Hellman key agreement and key pair generator");
+    super("GNU", 1.0, "GNU provider v1.0 implementing SHA-1, MD5, DSA, RSA, X.509 Certificates and CRLs, PKIX certificate path validators, Collection cert stores");
 
     AccessController.doPrivileged (new PrivilegedAction()
     {
       public Object run()
       {
-        // Note that all implementation class names are referenced by using
-        // Class.getName(). That way when we staticly link the Gnu provider
-        // we automatically get all the implementation classes.
+    // Note that all implementation class names are referenced by using
+    // Class.getName(). That way when we staticly link the Gnu provider
+    // we automatically get all the implementation classes.
 
-        // Signature
-        put("Signature.SHA1withDSA",
-            gnu.java.security.provider.DSASignature.class.getName());
+    // Signature
+    put("Signature.SHA1withDSA",
+        gnu.java.security.provider.DSASignature.class.getName());
 
-        put("Alg.Alias.Signature.DSS", "SHA1withDSA");
-        put("Alg.Alias.Signature.DSA", "SHA1withDSA");
-        put("Alg.Alias.Signature.SHAwithDSA", "SHA1withDSA");
-        put("Alg.Alias.Signature.DSAwithSHA", "SHA1withDSA");
-        put("Alg.Alias.Signature.DSAwithSHA1", "SHA1withDSA");
-        put("Alg.Alias.Signature.SHA/DSA", "SHA1withDSA");
-        put("Alg.Alias.Signature.SHA-1/DSA", "SHA1withDSA");
-        put("Alg.Alias.Signature.SHA1/DSA", "SHA1withDSA");
-        put("Alg.Alias.Signature.OID.1.2.840.10040.4.3", "SHA1withDSA");
-        put("Alg.Alias.Signature.1.2.840.10040.4.3", "SHA1withDSA");
-        put("Alg.Alias.Signature.1.3.14.3.2.13", "SHA1withDSA");
-        put("Alg.Alias.Signature.1.3.14.3.2.27", "SHA1withDSA");
+    put("Alg.Alias.Signature.DSS", "SHA1withDSA");
+    put("Alg.Alias.Signature.DSA", "SHA1withDSA");
+    put("Alg.Alias.Signature.SHAwithDSA", "SHA1withDSA");
+    put("Alg.Alias.Signature.DSAwithSHA", "SHA1withDSA");
+    put("Alg.Alias.Signature.DSAwithSHA1", "SHA1withDSA");
+    put("Alg.Alias.Signature.SHA/DSA", "SHA1withDSA");
+    put("Alg.Alias.Signature.SHA-1/DSA", "SHA1withDSA");
+    put("Alg.Alias.Signature.SHA1/DSA", "SHA1withDSA");
+    put("Alg.Alias.Signature.OID.1.2.840.10040.4.3", "SHA1withDSA");
+    put("Alg.Alias.Signature.1.2.840.10040.4.3", "SHA1withDSA");
+    put("Alg.Alias.Signature.1.3.14.3.2.13", "SHA1withDSA");
+    put("Alg.Alias.Signature.1.3.14.3.2.27", "SHA1withDSA");
 
         put("Signature.MD2withRSA", MD2withRSA.class.getName());
         put("Signature.MD2withRSA ImplementedIn", "Software");
@@ -97,19 +97,17 @@ public final class Gnu extends Provider
         put("Alg.Alias.Signature.OID.1.2.840.113549.1.1.5", "SHA1withRSA");
         put("Alg.Alias.Signature.1.2.840.113549.1.1.5", "SHA1withRSA");
 
-        // Key Pair Generator
-        put("KeyPairGenerator.DSA",
-            gnu.java.security.provider.DSAKeyPairGenerator.class.getName());
-        put("KeyPairGenerator.DiffieHellman", DiffieHellmanKeyPairGeneratorImpl.class.getName ());
+    // Key Pair Generator
+    put("KeyPairGenerator.DSA",
+        gnu.java.security.provider.DSAKeyPairGenerator.class.getName());
 
-        put("Alg.Alias.KeyPairGenerator.OID.1.2.840.10040.4.1", "DSA");
-        put("Alg.Alias.KeyPairGenerator.1.2.840.10040.4.1", "DSA");
-        put("Alg.Alias.KeyPairGenerator.1.3.14.3.2.12", "DSA");
-        put("Alg.Alias.KeyPairGenerator.DH", "DiffieHellman");
+    put("Alg.Alias.KeyPairGenerator.OID.1.2.840.10040.4.1", "DSA");
+    put("Alg.Alias.KeyPairGenerator.1.2.840.10040.4.1", "DSA");
+    put("Alg.Alias.KeyPairGenerator.1.3.14.3.2.12", "DSA");
 
-        // Key Factory
-        put("KeyFactory.DSA",
-            gnu.java.security.provider.DSAKeyFactory.class.getName());
+    // Key Factory
+    put("KeyFactory.DSA",
+        gnu.java.security.provider.DSAKeyFactory.class.getName());
 
         put("KeyFactory.Encoded", EncodedKeyFactory.class.getName());
         put("KeyFactory.Encoded ImplementedIn", "Software");
@@ -120,40 +118,37 @@ public final class Gnu extends Provider
 
         put("KeyFactory.RSA", RSAKeyFactory.class.getName());
 
-        put("Alg.Alias.KeyFactory.OID.1.2.840.10040.4.1", "DSA");
-        put("Alg.Alias.KeyFactory.1.2.840.10040.4.1", "DSA");
-        put("Alg.Alias.KeyFactory.1.3.14.3.2.12", "DSA");
+    put("Alg.Alias.KeyFactory.OID.1.2.840.10040.4.1", "DSA");
+    put("Alg.Alias.KeyFactory.1.2.840.10040.4.1", "DSA");
+    put("Alg.Alias.KeyFactory.1.3.14.3.2.12", "DSA");
 
-        put("KeyFactory.DiffieHellman", DiffieHellmanKeyFactoryImpl.class.getName());
-        put("Alg.Alias.KeyFactory.DH", "DiffieHellman");
+    // Message Digests
+    put("MessageDigest.SHA", gnu.java.security.provider.SHA.class.getName());
+    put("MessageDigest.MD5", gnu.java.security.provider.MD5.class.getName());
 
-        // Message Digests
-        put("MessageDigest.SHA", gnu.java.security.provider.SHA.class.getName());
-        put("MessageDigest.MD5", gnu.java.security.provider.MD5.class.getName());
-
-        // Format "Alias", "Actual Name"
-        put("Alg.Alias.MessageDigest.SHA1", "SHA");
-        put("Alg.Alias.MessageDigest.SHA-1", "SHA");
+    // Format "Alias", "Actual Name"
+    put("Alg.Alias.MessageDigest.SHA1", "SHA");
+    put("Alg.Alias.MessageDigest.SHA-1", "SHA");
         put("Alg.Alias.MessageDigest.SHA-160", "SHA");
 
-        // Algorithm Parameters
-        put("AlgorithmParameters.DSA",
-            gnu.java.security.provider.DSAParameters.class.getName());
+    // Algorithm Parameters
+    put("AlgorithmParameters.DSA",
+        gnu.java.security.provider.DSAParameters.class.getName());
 
         put("Alg.Alias.AlgorithmParameters.DSS", "DSA");
         put("Alg.Alias.AlgorithmParameters.SHAwithDSA", "DSA");
         put("Alg.Alias.AlgorithmParameters.OID.1.2.840.10040.4.3", "DSA");
         put("Alg.Alias.AlgorithmParameters.1.2.840.10040.4.3", "DSA");
 
-        // Algorithm Parameter Generator
-        put("AlgorithmParameterGenerator.DSA",
-            gnu.java.security.provider.DSAParameterGenerator.class.getName());
+    // Algorithm Parameter Generator
+    put("AlgorithmParameterGenerator.DSA",
+        gnu.java.security.provider.DSAParameterGenerator.class.getName());
 
-        // SecureRandom
-        put("SecureRandom.SHA1PRNG",
-            gnu.java.security.provider.SHA1PRNG.class.getName());
+    // SecureRandom
+    put("SecureRandom.SHA1PRNG",
+        gnu.java.security.provider.SHA1PRNG.class.getName());
 
-        // CertificateFactory
+    // CertificateFactory
         put("CertificateFactory.X509", X509CertificateFactory.class.getName());
 
         put("CertificateFactory.X509 ImplementedIn", "Software");
@@ -165,14 +160,6 @@ public final class Gnu extends Provider
 
         // CertStore
         put("CertStore.Collection", CollectionCertStoreImpl.class.getName());
-
-        // KeyAgreement
-        put("KeyAgreement.DiffieHellman", gnu.javax.crypto.DiffieHellmanImpl.class.getName());
-        put("Alg.Alias.KeyAgreement.DH", "DiffieHellman");
-
-        // Cipher
-        put("Cipher.RSAES-PKCS1-v1_5", gnu.javax.crypto.RSACipherImpl.class.getName());
-        put("Alg.Alias.Cipher.RSA", "RSAES-PKCS1-v1_5");
 
         return null;
       }
