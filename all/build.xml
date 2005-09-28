@@ -237,31 +237,37 @@ You can use this build system to perform various tasks,
 by specifying one or more targets on the command line. 
 See the list below for an explanation of all targets.
 			
-x86            Build the JNode bootable image for the X86 32-bit
-               architecture.			
-x86_64         Build the JNode bootable image for the X86 64-bit
-               architecture (AMD64).
+x86               Build the JNode bootable image for the X86 32-bit
+                  architecture.
+x86_64            Build the JNode bootable image for the X86 64-bit
+                  architecture (AMD64).
 			
-cd-x86         Build the JNode bootable CD-ROM for the X86
-               architecture 32 and 64-bit. The CD-ROM also contains
-               the JNode sources.
-cd-x86-lite    Build the JNode bootable CD-ROM for the X86 32-bit
-               architecture. 
-cd-x86_64-lite Build the JNode bootable CD-ROM for the X86 32-bit
-               architecture. 
+cd-x86            Build the JNode bootable CD-ROM for the X86
+                  architecture 32 and 64-bit. The CD-ROM also
+                  contains the JNode sources.
+cd-x86-lite       Build the JNode bootable CD-ROM for the X86
+                  32-bit architecture.
+cd-x86_64-lite    Build the JNode bootable CD-ROM for the X86
+                  64-bit architecture.
 			
-create-patch   Create a patch file containing the differences
-        	   between the local sources and the cvs HEAD branch.
+create-patch      Create a patch file containing the differences
+                  between the local sources and the cvs HEAD
+                  branch.
         	
-encoding-test  Verify the file encoding of all java source files.
-encoding-fix   Correct the file encoding of all java source files.
+boot-files-winNT  Build the JNode boot files for windows NT/2K/XP
+                  used together with NTLDR
+
+encoding-test     Verify the file encoding of all java source
+                  files.
+encoding-fix      Correct the file encoding of all java source
+                  files.
 			
-javadoc        Generate documentation of all java source files.
-javadoc-small  Generate documentation of the basic JNode api's.
+javadoc           Generate documentation of all java source files.
+javadoc-small     Generate documentation of the basic JNode api's.
 
-check-plugins  Run tests to check plugin dependencies.
+check-plugins     Run tests to check plugin dependencies.
 
-clean          Remove all intermediate build results.
+clean             Remove all intermediate build results.
         </echo>
     </target>
 
