@@ -220,7 +220,7 @@ public class BasicButtonUI extends ButtonUI
     return d;
   }
 
-  private static Icon currentIcon(AbstractButton b)
+  static Icon currentIcon(AbstractButton b)
   {
     Icon i = b.getIcon();
     ButtonModel model = b.getModel();
@@ -287,8 +287,6 @@ public class BasicButtonUI extends ButtonUI
     if ((b.getModel().isArmed() && b.getModel().isPressed()) 
         || b.isSelected())
       paintButtonPressed(g, b);
-    else
-      paintButtonNormal(g, vr, c);
 	
     paintIcon(g, c, ir);
     if (text != null)
@@ -352,24 +350,6 @@ public class BasicButtonUI extends ButtonUI
 	Rectangle area = new Rectangle();
 	SwingUtilities.calculateInnerArea(b, area);
         g.setColor(b.getBackground().darker());
-        g.fillRect(area.x, area.y, area.width, area.height);
-      }
-  }
-    
-  /**
-   * Paints the background area of an {@link AbstractButton} in the normal,
-   * non-pressed state.  This means filling the supplied area with the
-   * {@link normalBackgroundColor}.
-   *
-   * @param g The graphics context to paint with
-   * @param area The area in which to paint
-   * @param b The component to paint the state of
-   */
-  private void paintButtonNormal(Graphics g, Rectangle area, JComponent b)
-  {
-    if (((AbstractButton)b).isContentAreaFilled() && b.isOpaque())
-      {
-        g.setColor(b.getBackground());
         g.fillRect(area.x, area.y, area.width, area.height);
       }
   }

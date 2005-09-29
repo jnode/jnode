@@ -142,6 +142,26 @@ public class ShortMessage extends MidiMessage
    */
   public static final int PITCH_BEND = 0xE0; 
 
+  // Create and initialize a default, arbitrary message.
+  private static byte[] defaultMessage;
+  static
+  {
+    defaultMessage = new byte[1];
+    defaultMessage[0] = (byte) STOP;
+  }
+  
+  /**
+   * Create a short MIDI message.
+   * 
+   * The spec requires that this represent a valid MIDI message, but doesn't
+   * specify what it should be.  We've chosen the STOP message for our
+   * implementation.
+   */
+  public ShortMessage()
+  {
+    this(defaultMessage);   
+  }
+  
   /**
    * Create a short MIDI message.
    * 
@@ -163,7 +183,7 @@ public class ShortMessage extends MidiMessage
    * @param data2 the second data byte for this message
    * @throws InvalidMidiDataException if status is bad, or data is out of range
    */
-  private void setMessage(int status, int data1, int data2)
+  public void setMessage(int status, int data1, int data2)
     throws InvalidMidiDataException
   {
     length = getDataLength(status);
@@ -185,6 +205,14 @@ public class ShortMessage extends MidiMessage
         data[2] = (byte) data2;
       }
     }
+  }
+  
+  public void setMessage(int command, int channel, int data1, int data2)
+    throws InvalidMidiDataException
+  {
+    // TODO: This could probably stand some error checking.
+    // It currently assumes command and channel are valid values.
+    setMessage(command + channel, data1, data2);
   }
   
   /**

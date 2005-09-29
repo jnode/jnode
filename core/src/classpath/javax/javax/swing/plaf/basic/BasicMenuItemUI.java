@@ -572,9 +572,8 @@ public class BasicMenuItemUI extends MenuItemUI
           {
             int width = arrowIcon.getIconWidth();
             int height = arrowIcon.getIconHeight();
-
-            arrowIcon.paintIcon(m, g, vr.width - width + defaultTextIconGap,
-                                vr.y + 2);
+            int offset = (vr.height - height) / 2;
+            arrowIcon.paintIcon(m, g, vr.width - width, vr.y + offset);
           }
       }
 

@@ -131,7 +131,6 @@ public class JSeparator extends JComponent implements SwingConstants,
   public void updateUI()
   {
     setUI((SeparatorUI) UIManager.getUI(this));
-    invalidate();
   }
 
   /**

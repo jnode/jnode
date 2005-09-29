@@ -60,6 +60,7 @@ import java.beans.PropertyChangeListener;
 import java.util.Dictionary;
 import java.util.Enumeration;
 
+import javax.swing.AbstractAction;
 import javax.swing.BoundedRangeModel;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -237,12 +238,12 @@ public class BasicSliderUI extends SliderUI
       if (e.getPropertyName().equals("orientation"))
 	recalculateIfOrientationChanged();
       else if (e.getPropertyName().equals("model"))
-      {
-        BoundedRangeModel oldModel = (BoundedRangeModel) e.getOldValue();
-	oldModel.removeChangeListener(changeListener);
-	slider.getModel().addChangeListener(changeListener);
-	calculateThumbLocation();
-      }
+        {
+	  BoundedRangeModel oldModel = (BoundedRangeModel) e.getOldValue();
+	  oldModel.removeChangeListener(changeListener);
+	  slider.getModel().addChangeListener(changeListener);
+	  calculateThumbLocation();
+        }
 
       // elif the componentOrientation changes (this is a bound property,
       // just undocumented) we change leftToRightCache. In Sun's 
@@ -366,15 +367,15 @@ public class BasicSliderUI extends SliderUI
       currentMouseX = e.getX();
       currentMouseY = e.getY();
       if (slider.getValueIsAdjusting())
-      {
-        int value;
-        if (slider.getOrientation() == JSlider.HORIZONTAL)
-	  value = valueForXPosition(currentMouseX) - offset;
-	else
-	  value = valueForYPosition(currentMouseY) - offset;
-	
-	slider.setValue(value);
-      }
+        {
+	  int value;
+	  if (slider.getOrientation() == JSlider.HORIZONTAL)
+	    value = valueForXPosition(currentMouseX) - offset;
+	  else
+	    value = valueForYPosition(currentMouseY) - offset;
+
+	  slider.setValue(value);
+        }
     }
 
     /**
@@ -423,8 +424,8 @@ public class BasicSliderUI extends SliderUI
       else
         {
 	  slider.setValueIsAdjusting(true);
-          offset = value - slider.getValue();
-	}
+	  offset = value - slider.getValue();
+        }
     }
 
     /**
@@ -439,11 +440,11 @@ public class BasicSliderUI extends SliderUI
       currentMouseY = e.getY();
 
       if (slider.getValueIsAdjusting())
-      {
-        slider.setValueIsAdjusting(false);
-	if (slider.getSnapToTicks())
-	  slider.setValue(findClosestTick(slider.getValue()));
-      }
+        {
+	  slider.setValueIsAdjusting(false);
+	  if (slider.getSnapToTicks())
+	    slider.setValue(findClosestTick(slider.getValue()));
+        }
       if (scrollTimer != null)
 	scrollTimer.stop();
     }
@@ -467,6 +468,22 @@ public class BasicSliderUI extends SliderUI
 	return (value > slider.getValue());
       else
 	return (value < slider.getValue());
+    }
+  }
+
+  /**
+   * This class is no longer used as of JDK1.3.
+   */
+  public class ActionScroller extends AbstractAction
+  {
+    /**
+     * Not used.
+     *
+     * @param event not used
+     */
+    public void actionPerformed(ActionEvent event)
+    {
+      // Not used.
     }
   }
 
@@ -868,22 +885,22 @@ public class BasicSliderUI extends SliderUI
   public Dimension getPreferredHorizontalSize()
   {
     Insets insets = slider.getInsets();
-    
+
     // The width should cover all the labels (which are usually the
     // deciding factor of the width)
     int width = getWidthOfWidestLabel() * (slider.getLabelTable() == null ? 0
                                                                           : slider.getLabelTable()
                                                                                   .size());
-    
+
     // If there are not enough labels.
     // This number is pretty much arbitrary, but it looks nice.
     if (width < 200)
       width = 200;
-    
+
     // We can only draw inside of the focusRectangle, so we have to
     // pad it with insets.
     width += insets.left + insets.right + focusInsets.left + focusInsets.right;
-      
+
     // Height is determined by the thumb, the ticks and the labels.
     int height = getThumbSize().height;
 
@@ -893,10 +910,10 @@ public class BasicSliderUI extends SliderUI
 
     if (slider.getPaintLabels())
       height += getHeightOfTallestLabel();
-    
+
     height += insets.top + insets.bottom + focusInsets.top
     + focusInsets.bottom;
-	      
+
     return new Dimension(width, height);
   }
 
@@ -909,19 +926,19 @@ public class BasicSliderUI extends SliderUI
   public Dimension getPreferredVerticalSize()
   {
     Insets insets = slider.getInsets();
-    
+
     int height = getHeightOfTallestLabel() * (slider.getLabelTable() == null
                                               ? 0 : slider.getLabelTable()
                                                           .size());
-    
+
     if (height < 200)
       height = 200;
-      
+
     height += insets.top + insets.bottom + focusInsets.top
     + focusInsets.bottom;
 
     int width = getThumbSize().width;
-    
+
     if (slider.getPaintTicks() && slider.getMajorTickSpacing() > 0
         || slider.getMinorTickSpacing() > 0)
       width += getTickLength();
@@ -930,7 +947,7 @@ public class BasicSliderUI extends SliderUI
       width += getWidthOfWidestLabel();
 
     width += insets.left + insets.right + focusInsets.left + focusInsets.right;
-	     
+
     return new Dimension(width, height);
   }
 
@@ -992,7 +1009,7 @@ public class BasicSliderUI extends SliderUI
    * @return The dimensions of the preferred size.
    */
   public Dimension getPreferredSize(JComponent c)
-  {   
+  {
     if (slider.getOrientation() == JSlider.HORIZONTAL)
       return getPreferredHorizontalSize();
     else
@@ -1061,22 +1078,22 @@ public class BasicSliderUI extends SliderUI
         return new Dimension(width, 32767);
       }
   }
-  
+
   /**
    * This method calculates all the sizes of the rectangles by delegating to
    * the helper methods calculateXXXRect.
    */
-   protected void calculateGeometry()
-   {
-     calculateFocusRect();
-     calculateContentRect();
-     calculateThumbSize();
-     calculateTrackBuffer();
-     calculateTrackRect();
-     calculateTickRect();
-     calculateLabelRect();
-     calculateThumbLocation();
-   }
+  protected void calculateGeometry()
+  {
+    calculateFocusRect();
+    calculateContentRect();
+    calculateThumbSize();
+    calculateTrackBuffer();
+    calculateTrackRect();
+    calculateTickRect();
+    calculateLabelRect();
+    calculateThumbLocation();
+  }
 
   /**
    * This method calculates the size and position of the focusRect. This
@@ -1117,8 +1134,8 @@ public class BasicSliderUI extends SliderUI
     contentRect.y = focusRect.y + focusInsets.top;
     
     contentRect.width = focusRect.width - focusInsets.left - focusInsets.right;
-    contentRect.height = focusRect.height - focusInsets.top
-                         - focusInsets.bottom;
+    contentRect.height = focusRect.height - focusInsets.top 
+        - focusInsets.bottom;
 
     if (contentRect.width < 0)
       contentRect.width = 0;
@@ -1465,8 +1482,8 @@ public class BasicSliderUI extends SliderUI
     // FIXME: Move this to propertyChangeEvent handler, when we get those.
     leftToRightCache = slider.getComponentOrientation() != ComponentOrientation.RIGHT_TO_LEFT;
     // FIXME: This next line is only here because the above line is here.
-    calculateThumbLocation();
-    
+    calculateGeometry();
+
     if (slider.getPaintTrack())
       paintTrack(g);
     if (slider.getPaintTicks())
@@ -1625,7 +1642,7 @@ public class BasicSliderUI extends SliderUI
 	    double loc = tickRect.x + 0.5;
 	    double increment = (max == min) ? 0
 	        : majorSpace * (double) (tickRect.width - 1) / (max - min);
-	    if (drawInverted())
+            if (drawInverted())
 	      {
 		loc += tickRect.width;
 		increment *= -1;
@@ -1855,13 +1872,13 @@ public class BasicSliderUI extends SliderUI
     Dimension dim = label.getPreferredSize();
     int w = (int) dim.getWidth();
     int h = (int) dim.getHeight();
-    
+
     int max = slider.getMaximum();
     int min = slider.getMinimum();
 
     if (value > max || value < min)
       return;
-    
+
     //           value
     //             |
     //        ------------
@@ -1958,7 +1975,7 @@ public class BasicSliderUI extends SliderUI
   public void paintThumb(Graphics g)
   {
     Color saved_color = g.getColor();
-
+    
     Point a = new Point(thumbRect.x, thumbRect.y);
     Point b = new Point(a);
     Point c = new Point(a);
@@ -2091,7 +2108,7 @@ public class BasicSliderUI extends SliderUI
   protected void scrollDueToClickInTrack(int dir)
   {
     scrollTimer.stop();
-  
+
     scrollListener.setDirection(dir);
     scrollListener.setScrollByBlock(true);
 

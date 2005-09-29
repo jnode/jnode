@@ -99,7 +99,7 @@ public class BasicTableUI
   /** The action bound to KeyStrokes. */
   TableAction action;
 
-  class FocusHandler implements FocusListener
+  public class FocusHandler implements FocusListener
   {
     public void focusGained(FocusEvent e) 
     {
@@ -109,7 +109,7 @@ public class BasicTableUI
     }
   }
 
-  class MouseInputHandler implements MouseInputListener
+  public class MouseInputHandler implements MouseInputListener
   {
     Point begin, curr;
 

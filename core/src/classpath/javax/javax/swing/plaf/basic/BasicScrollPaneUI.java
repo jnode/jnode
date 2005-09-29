@@ -308,7 +308,7 @@ public class BasicScrollPaneUI extends ScrollPaneUI
     sp.getViewport().addChangeListener(viewportChangeListener);
 
     if (mouseWheelListener == null)
-      mouseWheelListener = new MouseWheelHandler();
+      mouseWheelListener = createMouseWheelListener();
     sp.addMouseWheelListener(mouseWheelListener);
   }
 
@@ -350,6 +350,16 @@ public class BasicScrollPaneUI extends ScrollPaneUI
   protected PropertyChangeListener createPropertyChangeListener()
   {
     return new PropertyChangeHandler();
+  }
+
+  /**
+   * Creates and returns the mouse wheel listener for the scrollpane.
+   *
+   * @return the mouse wheel listener for the scrollpane
+   */
+  protected MouseWheelListener createMouseWheelListener()
+  {
+    return new MouseWheelHandler();
   }
 
   public void uninstallUI(final JComponent c) 

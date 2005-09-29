@@ -102,9 +102,6 @@ public class MetalTabbedPaneUI
     }
   }
 
-  /** The shared UI instance for JTabbedPanes. */
-  private static HashMap instances = null;
-
   /**
    * Constructs a new instance of MetalTabbedPaneUI.
    */
@@ -122,20 +119,7 @@ public class MetalTabbedPaneUI
    */
   public static ComponentUI createUI(JComponent component)
   {
-    if (instances == null)
-      instances = new HashMap();
-
-    Object o = instances.get(component);
-    MetalTabbedPaneUI instance;
-    if (o == null)
-      {
-      instance = new MetalTabbedPaneUI();
-	instances.put(component, instance);
-      }
-    else
-      instance = (MetalTabbedPaneUI) o;
-
-    return instance;
+    return new MetalTabbedPaneUI();
   }
   
   /**

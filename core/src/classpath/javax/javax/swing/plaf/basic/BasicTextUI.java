@@ -529,6 +529,7 @@ public abstract class BasicTextUI extends TextUI
 
     // Fetch the colors for enabled/disabled text components.
     background = defaults.getColor(prefix + ".background");
+    textComponent.setBackground(background);
     inactiveBackground = defaults.getColor(prefix + ".inactiveBackground");
     textComponent.setForeground(defaults.getColor(prefix + ".foreground"));
     textComponent.setDisabledTextColor
