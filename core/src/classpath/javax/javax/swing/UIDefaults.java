@@ -184,9 +184,9 @@ public class UIDefaults extends Hashtable
                   .forName(className)
                   .getConstructor(clss)
                   .newInstance(objs);
-    }
+	      }
             catch (Exception e)
-    {
+	      {
                 return null;
               }
           }
@@ -200,13 +200,13 @@ public class UIDefaults extends Hashtable
       final Object[] objs = os;
       final Class[] clss = new Class[objs.length];
       for (int i = 0; i < objs.length; ++i)
-    {
+	{
           clss[i] = objs[i].getClass();
-    }
+	}
       inner = new LazyValue()
         { 
-    public Object createValue(UIDefaults table)
-    {
+	  public Object createValue(UIDefaults table)
+	  {
             try 
               {
                 return Class
@@ -252,10 +252,10 @@ public class UIDefaults extends Hashtable
   public UIDefaults(Object[] entries)
   {
     this();
-
+    
     for (int i = 0; (2 * i + 1) < entries.length; ++i)
       put(entries[2 * i], entries[2 * i + 1]);
-      }
+  }
 
   /**
    * Returns the entry for the specified <code>key</code> in the default
@@ -288,7 +288,7 @@ public class UIDefaults extends Hashtable
         String keyString = (String) key;
         ListIterator i = bundles.listIterator(0);
         while (i.hasNext())
-  {
+	  {
             String bundle_name = (String) i.next();
             ResourceBundle res =
               ResourceBundle.getBundle(bundle_name, loc);
@@ -577,8 +577,8 @@ public class UIDefaults extends Hashtable
    *
    * @param key the key to the requested entry
    *
-   * @return the boolean entry for <code>key</code> or null if no such entry
-   *     exists
+   * @return The boolean entry for <code>key</code> or <code>false</code> if no 
+   *         such entry exists.
    */
   public boolean getBoolean(Object key)
   {
@@ -736,20 +736,20 @@ public class UIDefaults extends Hashtable
       {
         getUIError ("failed to locate createUI method on " + cls.toString ());
         return null;
-  }
+      }
 
     try
-  {
+      {
         return (ComponentUI) factory.invoke (null, new Object[] { target });
-  }
+      }
     catch (java.lang.reflect.InvocationTargetException ite)
-	{
+      {
         getUIError ("InvocationTargetException ("+ ite.getTargetException() 
 		    +") calling createUI(...) on " + cls.toString ());
         return null;        
-	}
+      }
     catch (Exception e)
-  {
+      {
         getUIError ("exception calling createUI(...) on " + cls.toString ());
         return null;        
       }

@@ -59,7 +59,7 @@ import javax.swing.plaf.basic.BasicScrollBarUI;
 public class MetalScrollBarUI
   extends BasicScrollBarUI
 {
-
+  
   /**
    * A property change handler for the UI delegate that monitors for
    * changes to the "JScrollBar.isFreeStanding" property, and updates
@@ -107,7 +107,7 @@ public class MetalScrollBarUI
   
   /** The button that decreases the value in the scroll bar. */
   protected MetalScrollButton decreaseButton;
-
+  
   /** The scroll bar width. */
   protected int scrollBarWidth;
   
@@ -118,7 +118,7 @@ public class MetalScrollBarUI
    * side, and relies on being part of another container with its own borders
    * to look right visually. */
   protected boolean isFreeStanding;
-
+  
   /**
    * Constructs a new instance of MetalScrollBarUI.
    */
@@ -162,7 +162,7 @@ public class MetalScrollBarUI
    * @return A property change listener.
    */
   protected PropertyChangeListener createPropertyChangeListener()
-      {
+  {
     return new MetalScrollBarPropertyChangeHandler();
   }
   
@@ -257,7 +257,7 @@ public class MetalScrollBarUI
         g.drawRect(x, y, w - 1, h - 1);
       }
   }
-
+    
   /**
    * Paints the track for a vertical scrollbar.
    * 
@@ -345,7 +345,7 @@ public class MetalScrollBarUI
                thumbBounds.y + thumbBounds.height);
 
     // draw the pattern
-    MetalUtils.fillMetalPattern(g, thumbBounds.x + 3, thumbBounds.y + 3,
+    MetalUtils.fillMetalPattern(c, g, thumbBounds.x + 3, thumbBounds.y + 3,
                                 thumbBounds.width - 6, thumbBounds.height - 6,
                                 thumbHighlightColor, new Color(102, 102, 153));
   }

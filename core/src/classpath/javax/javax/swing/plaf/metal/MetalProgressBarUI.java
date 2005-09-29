@@ -47,9 +47,6 @@ import javax.swing.plaf.basic.BasicProgressBarUI;
 public class MetalProgressBarUI
   extends BasicProgressBarUI
 {  
-  /** The UI instances for MetalTreeUIs */
-  private static HashMap instances = null;
-
   /**
    * Constructs a new instance of MetalProgressBarUI.
    */
@@ -67,19 +64,6 @@ public class MetalProgressBarUI
    */
   public static ComponentUI createUI(JComponent component)
   {
-    if (instances == null)
-      instances = new HashMap();
-
-    Object o = instances.get(component);
-    MetalProgressBarUI instance;
-    if (o == null)
-      {
-        instance = new MetalProgressBarUI();
-        instances.put(component, instance);
-      }
-    else
-      instance = (MetalProgressBarUI) o;
-
-    return instance;
+    return new MetalProgressBarUI();
   }
 }

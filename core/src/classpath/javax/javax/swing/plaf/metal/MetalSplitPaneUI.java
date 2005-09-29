@@ -51,10 +51,6 @@ import javax.swing.plaf.basic.BasicSplitPaneDivider;
 public class MetalSplitPaneUI
   extends BasicSplitPaneUI
 {
-
-  /** The UI instances for MetalSplitPaneUIs */
-  private static HashMap instances;
-
   /**
    * Constructs a new instance of MetalSplitPaneUI.
    */
@@ -72,20 +68,7 @@ public class MetalSplitPaneUI
    */
   public static ComponentUI createUI(JComponent component)
   {
-    if (instances == null)
-      instances = new HashMap();
-
-    Object o = instances.get(component);
-    MetalSplitPaneUI instance;
-    if (o == null)
-      {
-      instance = new MetalSplitPaneUI();
-	instances.put(component, instance);
-      }
-    else
-      instance = (MetalSplitPaneUI) o;
-
-    return instance;
+    return new MetalSplitPaneUI();
   }
 
   /**

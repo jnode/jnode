@@ -53,6 +53,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.SwingConstants;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.border.AbstractBorder;
@@ -91,6 +92,9 @@ public class MetalBorders
    * The shared instance for getTextBorder().
    */
   private static Border textBorder;
+
+  /** The shared instance for getRolloverBorder(). */
+  private static Border rolloverBorder;
 
   /**
    * A MarginBorder that gets shared by multiple components.
@@ -682,16 +686,11 @@ public class MetalBorders
   /**
    * A border used for {@link JMenu} and {@link JMenuItem} components.
    */
-  public static class MenuItemBorder
-      extends AbstractBorder
-      implements UIResource
+  public static class MenuItemBorder extends AbstractBorder
+    implements UIResource
   {
     /** The border insets. */
-    protected static Insets borderInsets = new Insets(2, 2, 2, 2);
-    
-    // TODO: find where the real colors come from
-    private static Color borderColorDark = new Color(102, 102, 153);
-    private static Color borderColorLight = new Color(255, 255, 255);
+    protected static Insets borderInsets = new Insets(1, 1, 1, 1);
     
     /**
      * Creates a new border instance.
@@ -714,15 +713,17 @@ public class MetalBorders
     public void paintBorder(Component c, Graphics g, int x, int y, int w,
         int h)
     {
+      Color dark = MetalLookAndFeel.getPrimaryControlDarkShadow();
+      Color light = MetalLookAndFeel.getPrimaryControlHighlight();
       if (c instanceof JMenu) {
         JMenu menu = (JMenu) c;
         if (menu.isSelected())
         {
-          g.setColor(borderColorDark);
+          g.setColor(dark);
           g.drawLine(x, y, x, y + h);
           g.drawLine(x, y, x + w, y);
           g.drawLine(x + w - 2, y + 1, x + w - 2, y + h);
-          g.setColor(borderColorLight);
+          g.setColor(light);
           g.drawLine(x + w - 1, y + 1, x + w - 1, y + h);
         }
       }
@@ -730,12 +731,18 @@ public class MetalBorders
       {
         JMenuItem item = (JMenuItem) c;
         if (item.isArmed()) 
-        {
-          g.setColor(borderColorDark);
-          g.drawLine(x, y, x + w, y);
-          g.setColor(borderColorLight);
-          g.drawLine(x, y + h - 1, x + w, y + h - 1);
-        }          
+          {
+            g.setColor(dark);
+            g.drawLine(x, y, x + w, y);
+            g.setColor(light);
+            g.drawLine(x, y + h - 1, x + w, y + h - 1);
+          }
+        else
+          {
+            // Normally we draw a light line on the left.
+            g.setColor(light);
+            g.drawLine(x, y, x, y + h);
+          }
       }
     }
     
@@ -1015,7 +1022,7 @@ public class MetalBorders
   {
 
     /** The border's insets. */
-    protected static Insets borderInsets = new Insets(2, 2, 1, 1);
+    protected static Insets borderInsets = new Insets(3, 1, 2, 1);
 
     /**
      * Constructs a new PopupMenuBorder.
@@ -1085,7 +1092,6 @@ public class MetalBorders
       
       // draw highlighted inner border (only top and left)
       g.setColor(light);
-      g.drawLine(x + 1, y + 1, x + 1, y + h - 2);
       g.drawLine(x + 1, y + 1, x + w - 2, y + 1);
     }
     
@@ -1187,7 +1193,7 @@ public class MetalBorders
    * A border used when painting {@link JToolBar} instances.
    */
   public static class ToolBarBorder extends AbstractBorder
-    implements UIResource
+    implements UIResource, SwingConstants
   {
     /**
      * Creates a new border instance.
@@ -1263,13 +1269,13 @@ public class MetalBorders
       JToolBar tb = (JToolBar) c;
       if (tb.getOrientation() == JToolBar.HORIZONTAL)
         {
-           MetalUtils.fillMetalPattern(g, x + 2, y + 2, x + 11, y + h - 5, 
+           MetalUtils.fillMetalPattern(tb, g, x + 2, y + 2, x + 11, y + h - 5, 
                   MetalLookAndFeel.getControlHighlight(), 
                   MetalLookAndFeel.getControlDarkShadow());
         }
       else
         { 
-          MetalUtils.fillMetalPattern(g, x + 2, y + 2, x + w - 5, y + 11, 
+          MetalUtils.fillMetalPattern(tb, g, x + 2, y + 2, x + w - 5, y + 11, 
                   MetalLookAndFeel.getControlHighlight(), 
                   MetalLookAndFeel.getControlDarkShadow());
         }
@@ -1453,4 +1459,22 @@ public class MetalBorders
       marginBorder = new BasicBorders.MarginBorder();
     return marginBorder;
   }
+
+  /**
+   * Returns a shared instance of a compound border for rollover buttons.
+   * 
+   * @return A shared border instance.
+   */
+  static Border getRolloverBorder()
+  {
+    if (rolloverBorder == null)
+      {
+        Border outer = new MetalBorders.RolloverButtonBorder();
+        Border inner = MetalBorders.getMarginBorder();
+        rolloverBorder = new BorderUIResource.CompoundBorderUIResource(outer, 
+            inner);
+      }
+    return rolloverBorder;
+  }
+
 }

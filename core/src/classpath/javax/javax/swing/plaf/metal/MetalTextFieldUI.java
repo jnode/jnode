@@ -47,10 +47,6 @@ import javax.swing.plaf.basic.BasicTextFieldUI;
 public class MetalTextFieldUI
   extends BasicTextFieldUI
 {
-
-  /** The UI instances for MetalTextFieldUIs */
-  private static HashMap instances = null;
-
   /**
    * Constructs a new instance of MetalTextFieldUI.
    */
@@ -68,19 +64,6 @@ public class MetalTextFieldUI
    */
   public static ComponentUI createUI(JComponent component)
   {
-    if (instances == null)
-      instances = new HashMap();
-
-    Object o = instances.get(component);
-    MetalTextFieldUI instance;
-    if (o == null)
-      {
-      instance = new MetalTextFieldUI();
-	instances.put(component, instance);
-      }
-    else
-      instance = (MetalTextFieldUI) o;
-
-    return instance;
+    return new MetalTextFieldUI();
   }
 }

@@ -102,11 +102,11 @@ public class JPopupMenu extends JComponent implements Accessible, MenuElement
 
      1. if DefaultLightWeightPopupEnabled true
          (i)  use lightweight container if popup feets inside top-level window
-         (ii) only use heavyweight container (JWindow) if popup doesn't fit.
+         (ii) only use heavyweight container (JDialog) if popup doesn't fit.
 
      2. if DefaultLightWeightPopupEnabled false
          (i) if popup fits, use awt.Panel (mediumWeight)
-         (ii) if popup doesn't fit, use JWindow (heavyWeight)
+         (ii) if popup doesn't fit, use JDialog (heavyWeight)
   */
   private static boolean DefaultLightWeightPopupEnabled = true;
 
@@ -1015,7 +1015,7 @@ public class JPopupMenu extends JComponent implements Accessible, MenuElement
   }
 
   /**
-   * HeavyWeightPopup is JWindow that is used to display JPopupMenu menu item's
+   * HeavyWeightPopup is JDialog that is used to display JPopupMenu menu item's
    * on the screen
    */
   private class HeavyWeightPopup extends JDialog implements Popup
@@ -1033,12 +1033,12 @@ public class JPopupMenu extends JComponent implements Accessible, MenuElement
     }
 
     /**
-     * Displays JWindow container JPopupMenu's menu items to the screen
+     * Displays JDialog container JPopupMenu's menu items to the screen
      *
-     * @param x x-coordinate of JWindow containing menu items
-     * @param y y-coordinate of JWindow containing menu items
-     * @param width width of the JWindow
-     * @param height height of the JWindow
+     * @param x x-coordinate of JDialog containing menu items
+     * @param y y-coordinate of JDialog containing menu items
+     * @param width width of the JDialog
+     * @param height height of the JDialog
      */
     public void show(int x, int y, int width, int height)
     {

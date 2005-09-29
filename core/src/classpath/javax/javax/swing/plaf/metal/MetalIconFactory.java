@@ -1868,6 +1868,262 @@ public class MetalIconFactory implements Serializable
       return 2;
     }
   }
+
+  /**
+   * An icon representing a hard disk.
+   * 
+   * @see MetalIconFactory#getTreeHardDriveIcon()
+   */
+  private static class TreeHardDriveIcon 
+      implements Icon, Serializable 
+  {
+
+    /**
+     * Creates a new icon instance.
+     */
+    public TreeHardDriveIcon() 
+    { 
+    }
+
+    /**
+     * Returns the width of the icon, in pixels.
+     * 
+     * @return <code>16</code>.
+     */
+    public int getIconWidth() 
+    { 
+      return 16;
+    }
+
+    /**
+     * Returns the height of the icon, in pixels.
+     * 
+     * @return <code>16</code>.
+     */
+    public int getIconHeight()   
+    {
+      return 16;
+    }
+
+    /**
+     * Paints the icon at the specified location, using colors from the 
+     * current theme.
+     * 
+     * @param c  the component (ignored).
+     * @param g  the graphics device.
+     * @param x  the x-coordinate for the top-left of the icon.
+     * @param y  the y-coordinate for the top-left of the icon.
+     */
+    public void paintIcon(Component c, Graphics g, int x, int y) 
+    {
+      Color saved = g.getColor();
+      g.setColor(MetalLookAndFeel.getBlack());
+      g.drawLine(x + 1, y + 4, x + 1, y + 5);
+      g.drawLine(x + 14, y + 4, x + 14, y + 5);
+      g.drawLine(x + 1, y + 7, x + 1, y + 8);
+      g.drawLine(x + 14, y + 7, x + 14, y + 8);
+      g.drawLine(x + 1, y + 10, x + 1, y + 11);
+      g.drawLine(x + 14, y + 10, x + 14, y + 11);
+      
+      g.drawLine(x + 2, y + 3, x + 3, y + 3);
+      g.drawLine(x + 12, y + 3, x + 13, y + 3);
+      g.drawLine(x + 2, y + 6, x + 3, y + 6);
+      g.drawLine(x + 12, y + 6, x + 13, y + 6);
+      g.drawLine(x + 2, y + 9, x + 3, y + 9);
+      g.drawLine(x + 12, y + 9, x + 13, y + 9);
+      g.drawLine(x + 2, y + 12, x + 3, y + 12);
+      g.drawLine(x + 12, y + 12, x + 13, y + 12);
+      
+      g.drawLine(x + 4, y + 2, x + 11, y + 2);
+      g.drawLine(x + 4, y + 7, x + 11, y + 7);
+      g.drawLine(x + 4, y + 10, x + 11, y + 10);
+      g.drawLine(x + 4, y + 13, x + 11, y + 13);
+      
+      g.setColor(MetalLookAndFeel.getWhite());
+      g.fillRect(x + 4, y + 3, 2, 2);
+      g.drawLine(x + 6, y + 4, x + 6, y + 4);
+      g.drawLine(x + 7, y + 3, x + 9, y + 3);
+      g.drawLine(x + 8, y + 4, x + 8, y + 4);
+      g.drawLine(x + 11, y + 3, x + 11, y + 3);
+      g.fillRect(x + 2, y + 4, 2, 2); 
+      g.fillRect(x + 2, y + 7, 2, 2); 
+      g.fillRect(x + 2, y + 10, 2, 2); 
+      g.drawLine(x + 4, y + 6, x + 4, y + 6);
+      g.drawLine(x + 4, y + 9, x + 4, y + 9);
+      g.drawLine(x + 4, y + 12, x + 4, y + 12);
+      
+      g.setColor(MetalLookAndFeel.getControlShadow());
+      g.drawLine(x + 13, y + 4, x + 13, y + 4);
+      g.drawLine(x + 12, y + 5, x + 13, y + 5);
+      g.drawLine(x + 13, y + 7, x + 13, y + 7);
+      g.drawLine(x + 12, y + 8, x + 13, y + 8);
+      g.drawLine(x + 13, y + 10, x + 13, y + 10);
+      g.drawLine(x + 12, y + 11, x + 13, y + 11);
+      
+      g.drawLine(x + 10, y + 5, x + 10, y + 5);
+      g.drawLine(x + 7, y + 6, x + 7, y + 6);
+      g.drawLine(x + 9, y + 6, x + 9, y + 6);
+      g.drawLine(x + 11, y + 6, x + 11, y + 6);
+
+      g.drawLine(x + 10, y + 8, x + 10, y + 8);
+      g.drawLine(x + 7, y + 9, x + 7, y + 9);
+      g.drawLine(x + 9, y + 9, x + 9, y + 9);
+      g.drawLine(x + 11, y + 9, x + 11, y + 9);
+
+      g.drawLine(x + 10, y + 11, x + 10, y + 11);
+      g.drawLine(x + 7, y + 12, x + 7, y + 12);
+      g.drawLine(x + 9, y + 12, x + 9, y + 12);
+      g.drawLine(x + 11, y + 12, x + 11, y + 12);
+
+      g.setColor(saved);
+    }        
+  }  
+  
+  /**
+   * An icon representing a floppy disk.
+   * 
+   * @see MetalIconFactory#getTreeFloppyDriveIcon()
+   */
+  private static class TreeFloppyDriveIcon 
+      implements Icon, Serializable 
+  {
+
+    /**
+     * Creates a new icon instance.
+     */
+    public TreeFloppyDriveIcon() 
+    { 
+    }
+
+    /**
+     * Returns the width of the icon, in pixels.
+     * 
+     * @return <code>16</code>.
+     */
+    public int getIconWidth() 
+    { 
+      return 16;
+    }
+
+    /**
+     * Returns the height of the icon, in pixels.
+     * 
+     * @return <code>16</code>.
+     */
+    public int getIconHeight()   
+    {
+      return 16;
+    }
+
+    /**
+     * Paints the icon at the specified location, using colors from the 
+     * current theme.
+     * 
+     * @param c  the component (ignored).
+     * @param g  the graphics device.
+     * @param x  the x-coordinate for the top-left of the icon.
+     * @param y  the y-coordinate for the top-left of the icon.
+     */
+    public void paintIcon(Component c, Graphics g, int x, int y) 
+    {
+      Color saved = g.getColor();
+      
+      g.setColor(MetalLookAndFeel.getBlack());
+      g.drawLine(x + 1, y + 1, x + 13, y + 1);
+      g.drawLine(x + 1, y + 1, x + 1, y + 14);
+      g.drawLine(x + 1, y + 14, x + 14, y + 14);
+      g.drawLine(x + 14, y + 2, x + 14, y + 14);
+      
+      g.setColor(MetalLookAndFeel.getPrimaryControl());
+      g.fillRect(x + 2, y + 2, 12, 12);
+      
+      g.setColor(MetalLookAndFeel.getControlShadow());
+      g.fillRect(x + 5, y + 2, 6, 5);
+      g.drawLine(x + 4, y + 8, x + 11, y + 8);
+      g.drawLine(x + 3, y + 9, x + 3, y + 13);
+      g.drawLine(x + 12, y + 9, x + 12, y + 13);
+      
+      g.setColor(MetalLookAndFeel.getWhite());
+      g.fillRect(x + 8, y + 3, 2, 3);
+      g.fillRect(x + 4, y + 9, 8, 5);
+      
+      g.setColor(MetalLookAndFeel.getPrimaryControlShadow());
+      g.drawLine(x + 5, y + 10, x + 9, y + 10);
+      g.drawLine(x + 5, y + 12, x + 8, y + 12);
+
+      g.setColor(saved);
+    }        
+  }  
+
+  /**
+   * An icon representing a computer.
+   * 
+   * @see MetalIconFactory#getTreeComputerIcon()
+   */
+  private static class TreeComputerIcon implements Icon, Serializable 
+  {
+
+    /**
+     * Creates a new icon instance.
+     */
+    public TreeComputerIcon() 
+    { 
+    }
+
+    /**
+     * Returns the width of the icon, in pixels.
+     * 
+     * @return <code>16</code>.
+     */
+    public int getIconWidth() 
+    { 
+      return 16;
+    }
+
+    /**
+     * Returns the height of the icon, in pixels.
+     * 
+     * @return <code>16</code>.
+     */
+    public int getIconHeight()   
+    {
+      return 16;
+    }
+
+    /**
+     * Paints the icon at the specified location, using colors from the 
+     * current theme.
+     * 
+     * @param c  the component (ignored).
+     * @param g  the graphics device.
+     * @param x  the x-coordinate for the top-left of the icon.
+     * @param y  the y-coordinate for the top-left of the icon.
+     */
+    public void paintIcon(Component c, Graphics g, int x, int y) 
+    {
+      Color saved = g.getColor();
+      
+      g.setColor(MetalLookAndFeel.getBlack());
+      g.drawLine(x + 3, y + 1, x + 12, y + 1);
+      g.drawLine(x + 2, y + 2, x + 2, y + 8);
+      g.drawLine(x + 13, y + 2, x + 13, y + 8);
+      g.drawLine(x + 3, y + 9, x + 3, y + 9);
+      g.drawLine(x + 12, y + 9, x + 12, y + 9);
+      g.drawRect(x + 1, y + 10, 13, 4);
+      g.drawLine(x + 5, y + 3, x + 10, y + 3);
+      g.drawLine(x + 5, y + 8, x + 10, y + 8);
+      g.drawLine(x + 4, y + 4, x + 4, y + 7);
+      g.drawLine(x + 11, y + 4, x + 11, y + 7);
+
+      g.setColor(MetalLookAndFeel.getPrimaryControl());
+      g.fillRect(x + 5, y + 4, 6, 4);
+      
+      g.setColor(MetalLookAndFeel.getControlShadow());
+      g.drawLine(x + 6, y + 12, x + 8, y + 12);
+      g.drawLine(x + 10, y + 12, x + 12, y + 12);
+      g.setColor(saved);
+    }        
+  }  
     
   /** The cached RadioButtonIcon instance. */
   private static RadioButtonIcon radioButtonIcon;
@@ -2094,6 +2350,36 @@ public class MetalIconFactory implements Serializable
   public static Icon getTreeControlIcon(boolean isCollapsed) 
   {
     return new TreeControlIcon(isCollapsed);
+  }
+
+  /**
+   * Returns a 16x16 icon representing a computer.
+   * 
+   * @return The icon.
+   */
+  public static Icon getTreeComputerIcon() 
+  {
+    return new TreeComputerIcon();        
+  }
+    
+  /**
+   * Returns a 16x16 icon representing a floppy disk.
+   * 
+   * @return The icon.
+   */
+  public static Icon getTreeFloppyDriveIcon() 
+  {
+    return new TreeFloppyDriveIcon();
+  }
+    
+  /**
+   * Returns a 16x16 icon representing a hard disk.
+   * 
+   * @return The icon.
+   */
+  public static Icon getTreeHardDriveIcon() 
+  {
+    return new TreeHardDriveIcon();
   }
 
 }

@@ -348,7 +348,7 @@ public class MetalInternalFrameTitlePane extends BasicInternalFrameTitlePane
     Rectangle b = SwingUtilities.getLocalBounds(this);
     g.setColor(MetalLookAndFeel.getPrimaryControlShadow());
     g.fillRect(b.x, b.y, b.width, b.height);
-    MetalUtils.fillMetalPattern(g, b.x + 4, b.y + 2, b.width 
+    MetalUtils.fillMetalPattern(this, g, b.x + 4, b.y + 2, b.width 
             - paletteCloseIcon.getIconWidth() - 13, b.height - 5,
             MetalLookAndFeel.getPrimaryControlHighlight(), 
             MetalLookAndFeel.getBlack());
@@ -399,7 +399,7 @@ public class MetalInternalFrameTitlePane extends BasicInternalFrameTitlePane
           endX = Math.max(closeButton.getX(), endX);
         endX -= 7;
         if (endX > startX)
-          MetalUtils.fillMetalPattern(g, startX, 3, endX - startX, getHeight() - 6, Color.white, Color.gray);
+          MetalUtils.fillMetalPattern(this, g, startX, 3, endX - startX, getHeight() - 6, Color.white, Color.gray);
       }
     g.setColor(savedColor);
   }

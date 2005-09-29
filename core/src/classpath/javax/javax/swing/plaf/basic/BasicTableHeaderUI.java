@@ -71,8 +71,7 @@ public class BasicTableHeaderUI
   protected CellRendererPane rendererPane;
   protected Border cellBorder;
 
-  class MouseInputHandler
-    implements MouseInputListener
+  public class MouseInputHandler implements MouseInputListener
   {
     public void mouseClicked(MouseEvent e) {}
     public void mouseDragged(MouseEvent e) {}
@@ -181,7 +180,7 @@ public class BasicTableHeaderUI
       }
 
   }
-
+  
   public Dimension getPreferredSize(JComponent c)
   {
     TableColumnModel cmod = header.getColumnModel();

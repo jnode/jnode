@@ -1,5 +1,5 @@
-/* MetalSplitPaneDivider.java
-Copyright (C) 2005 Free Software Foundation, Inc.
+/* MetalButtonListener.java
+   Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,50 +35,52 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.swing.plaf.metal;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
+import java.beans.PropertyChangeEvent;
 
-import javax.swing.plaf.basic.BasicSplitPaneDivider;
+import javax.swing.AbstractButton;
+import javax.swing.plaf.UIResource;
+import javax.swing.plaf.basic.BasicButtonListener;
 
 /**
- * The divider that is used by the MetalSplitPaneUI.
- *
- * @author Roman Kennke (roman@kennke.org)
- *
+ * A listener for buttons under the {@link MetalLookAndFeel}.
+ * 
+ * @see MetalButtonUI#createButtonListener()
  */
-class MetalSplitPaneDivider extends BasicSplitPaneDivider
+class MetalButtonListener extends BasicButtonListener 
 {
-  /** The dark color in the pattern. */
-  Color dark;
-
-  /** The light color in the pattern. */
-  Color light;
-
+  
   /**
-   * Creates a new instance of MetalSplitPaneDivider.
-   *
-   * @param ui the <code>MetalSplitPaneUI</code> that uses this divider
+   * Creates a new instance.
+   * 
+   * @param button  the button.
    */
-  public MetalSplitPaneDivider(MetalSplitPaneUI ui, Color light, Color dark)
+  public MetalButtonListener(AbstractButton button)
   {
-    super(ui);
-    this.light = light;
-    this.dark = dark;
+    super(button);
   }
-
+  
   /**
-   * Paints the divider.
-   *
-   * @param g the <code>Graphics</code> context to use for painting
+   * Handles property change events.
+   * 
+   * @param e  the event.
    */
-  public void paint(Graphics g)
+  public void propertyChange(PropertyChangeEvent e)
   {
-    //super.paint(g);
-    Dimension s = getSize();
-    MetalUtils.fillMetalPattern(splitPane, g, 2, 2, s.width - 4, s.height - 4,
-                                light, dark);
+    super.propertyChange(e);
+    if (e.getPropertyName().equals(
+            AbstractButton.ROLLOVER_ENABLED_CHANGED_PROPERTY))
+      {
+        AbstractButton b = (AbstractButton) e.getSource();
+        if (b.getBorder() instanceof UIResource)
+          {
+            if (Boolean.TRUE.equals(e.getNewValue()))
+              b.setBorder(MetalBorders.getRolloverBorder());
+            else if (Boolean.FALSE.equals(e.getNewValue()))
+              b.setBorder(MetalBorders.getButtonBorder());
+          }
+      }
   }
 }

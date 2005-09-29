@@ -80,9 +80,6 @@ public class MetalTreeUI
   private TreeExpansionListener treeExpansionListener;
   private TreeModelListener treeModelListener;
     
-  /** The UI instances for MetalTreeUIs */
-  private static HashMap instances = null;
-
   /**
    * Constructs a new instance of MetalTreeUI.
    */
@@ -100,20 +97,7 @@ public class MetalTreeUI
    */
   public static ComponentUI createUI(JComponent component)
   {
-    if (instances == null)
-      instances = new HashMap();
-
-    Object o = instances.get(component);
-    MetalTreeUI instance;
-    if (o == null)
-      {
-        instance = new MetalTreeUI();
-        instances.put(component, instance);
-      }
-    else
-      instance = (MetalTreeUI) o;
-
-    return instance;
+    return new MetalTreeUI();
   }
   
   /**

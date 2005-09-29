@@ -475,13 +475,14 @@ public class ToolTipManager extends MouseAdapter implements MouseMotionListener
            
     if (isLightWeightPopupEnabled())
       {
-        JLayeredPane pane = ((JRootPane) SwingUtilities.
-            getAncestorOfClass(JRootPane.class, currentComponent)).
-            getLayeredPane();
-
-        // This should never happen, but just in case.
+        JLayeredPane pane = null;
+        JRootPane r = ((JRootPane) SwingUtilities.
+            getAncestorOfClass(JRootPane.class, currentComponent));
+        if (r != null)
+          pane = r.getLayeredPane();
         if (pane == null)
           return;
+        
         if (containerPanel != null)
           hideTip();
         
@@ -544,7 +545,7 @@ public class ToolTipManager extends MouseAdapter implements MouseMotionListener
       p.x = 0;
     if (p.y + d.height < c.getHeight())
       p.y += d.height;
-    else if (p.y + d.height > c.getHeight())
+    if (p.y + d.height > c.getHeight())
       p.y -= d.height*2;
     
     return p;

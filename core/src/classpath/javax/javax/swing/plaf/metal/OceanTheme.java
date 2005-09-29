@@ -37,6 +37,7 @@ exception statement from your version. */
 
 package javax.swing.plaf.metal;
 
+import javax.swing.UIDefaults;
 import javax.swing.plaf.ColorUIResource;
 
 /**
@@ -194,5 +195,15 @@ public class OceanTheme extends DefaultMetalTheme
   protected ColorUIResource getSecondary3()
   {
     return SECONDARY3;
+  }
+
+  /**
+   * Adds customized entries to the UIDefaults table.
+   *
+   * @param defaults the UI defaults table
+   */
+  public void addCustomEntriesToTable(UIDefaults defaults)
+  {
+    defaults.put("Button.rollover", Boolean.TRUE);
   }
 }

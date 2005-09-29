@@ -331,9 +331,75 @@ public class MidiSystem
         return sb;
     }
     throw new InvalidMidiDataException("Can't read MidiFileFormat from file " 
-				       + file);
+                                       + file);
   } 
   
+  /**
+   * Read a Sequence object from the given stream.
+   * 
+   * @param stream the stream from which to read the Sequence
+   * @return the Sequence object
+   * @throws InvalidMidiDataException if we were unable to read the Sequence
+   * @throws IOException if an I/O error happened while reading
+   */
+  public static Sequence getSequence(InputStream stream)
+    throws InvalidMidiDataException, IOException
+  {
+    Iterator readers = ServiceFactory.lookupProviders(MidiFileReader.class);
+    while (readers.hasNext())
+    {
+      MidiFileReader sr = (MidiFileReader) readers.next();
+      Sequence sq = sr.getSequence(stream);
+      if (sq != null)
+        return sq;
+    }
+    throw new InvalidMidiDataException("Can't read Sequence from stream");
+  }
+
+  /**
+   * Read a Sequence object from the given url.
+   * 
+   * @param url the url from which to read the Sequence
+   * @return the Sequence object
+   * @throws InvalidMidiDataException if we were unable to read the Sequence
+   * @throws IOException if an I/O error happened while reading
+   */
+  public static Sequence getSequence(URL url)
+    throws InvalidMidiDataException, IOException
+  {
+    Iterator readers = ServiceFactory.lookupProviders(MidiFileReader.class);
+    while (readers.hasNext())
+    {
+      MidiFileReader sr = (MidiFileReader) readers.next();
+      Sequence sq = sr.getSequence(url);
+      if (sq != null)
+        return sq;
+    }
+    throw new InvalidMidiDataException("Cannot read from url " + url);
+  }
+
+  /**
+   * Read a Sequence object from the given file.
+   * 
+   * @param file the file from which to read the Sequence
+   * @return the Sequence object
+   * @throws InvalidMidiDataException if we were unable to read the Sequence
+   * @throws IOException if an I/O error happened while reading
+   */
+  public static Sequence getSequence(File file)
+    throws InvalidMidiDataException, IOException
+  {
+    Iterator readers = ServiceFactory.lookupProviders(MidiFileReader.class);
+    while (readers.hasNext())
+    {
+      MidiFileReader sr = (MidiFileReader) readers.next();
+      Sequence sq = sr.getSequence(file);
+      if (sq != null)
+        return sq;
+    }
+    throw new InvalidMidiDataException("Can't read Sequence from file " 
+                                       + file);
+  } 
   
   /**
    * Return an array of supported MIDI file types on this system.
