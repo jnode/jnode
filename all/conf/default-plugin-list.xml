@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+Default Plugin List
 
+The default list of (non-system) plugins to be included in the init-jar.
+-->
 <plugin-list name="default">
     <manifest>
         <attribute key="Main-Class" value="org.jnode.shell.CommandShell"/>
