@@ -179,18 +179,21 @@ public class SizeRequirements implements Serializable
         minLeft = Math.max(myMinLeft, minLeft);
         minRight = Math.max(myMinRight, minRight);
         float myPrefLeft = children[i].preferred * children[i].alignment;
-        float myPrefRight = children[i].preferred - myMinLeft;
+        float myPrefRight = children[i].preferred - myPrefLeft;
         prefLeft = Math.max(myPrefLeft, prefLeft);
         prefRight = Math.max(myPrefRight, prefRight);
         float myMaxLeft = children[i].maximum * children[i].alignment;
-        float myMaxRight = children[i].maximum - myMinLeft;
+        float myMaxRight = children[i].maximum - myMaxLeft;
         maxLeft = Math.max(myMaxLeft, maxLeft);
         maxRight = Math.max(myMaxRight, maxRight);
       }
     int minSize = (int) (minLeft + minRight);
     int prefSize = (int) (prefLeft + prefRight);
     int maxSize = (int) (maxLeft + maxRight);
-    return new SizeRequirements(minSize, prefSize, maxSize, 0.5F);
+    float align = prefLeft / (prefRight + prefLeft);
+    if (Float.isNaN(align))
+      align = 0;
+    return new SizeRequirements(minSize, prefSize, maxSize, align);
   }
 
   /**

@@ -521,6 +521,22 @@ public class PropertyDescriptor extends FeatureDescriptor
         return newPropertyType;
     }
 
+    /**
+     * Return a hash code for this object, conforming to the contract described
+     * in {@link Object#hashCode()}.
+     * @return the hash code
+     * @since 1.5
+     */
+    public int hashCode()
+    {
+      return ((propertyType == null ? 0 : propertyType.hashCode())
+              | (propertyEditorClass == null ? 0 : propertyEditorClass.hashCode())
+              | (bound ? Boolean.TRUE : Boolean.FALSE).hashCode()
+              | (constrained ? Boolean.TRUE : Boolean.FALSE).hashCode()
+              | (getMethod == null ? 0 : getMethod.hashCode())
+              | (setMethod == null ? 0 : setMethod.hashCode()));
+    }
+
     /** Compares this <code>PropertyDescriptor</code> against the
      * given object.
      * Two PropertyDescriptors are equals if
