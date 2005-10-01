@@ -103,8 +103,9 @@ public class Box extends JComponent implements Accessible
       }
     }
     
-    protected AccessibleContext accessibleContext;
-    
+	// @classpath-bugfix Fix difference between Sun's class and this class.    
+    protected AccessibleContext accessibleContext;  
+      
     private transient Dimension min, pref, max;
     
     /**
