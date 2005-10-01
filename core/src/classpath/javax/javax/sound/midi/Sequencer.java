@@ -103,6 +103,11 @@ public interface Sequencer extends MidiDevice
   public void startRecording();
   
   /**
+   * Stop recording, although continue playing.
+   */
+  public void stopRecording();
+  
+  /**
    * Returns true if sequence is recording.
    * 
    * @return true if the sequence is recording and false otherwise
