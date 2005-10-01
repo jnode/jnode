@@ -76,8 +76,9 @@ public class EventQueue
 	private EventDispatchThread dispatchThread = new EventDispatchThread(this);
   private boolean shutdown = false;
 
+  // @vm-specific allow JNode access from VMAwtAPI
+  synchronized void setShutdown (boolean b)
   //synchronized private void setShutdown (boolean b) 
-  synchronized void setShutdown (boolean b) // all JNode access frm VMAwtAPI
   {
     shutdown = b;
   }
