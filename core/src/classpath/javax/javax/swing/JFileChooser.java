@@ -46,6 +46,7 @@ import java.io.File;
 import java.util.ArrayList;
 import javax.accessibility.Accessible;
 import javax.accessibility.AccessibleContext;
+import javax.accessibility.AccessibleRole;
 import javax.swing.JDialog;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileSystemView;
@@ -1196,6 +1197,21 @@ public class JFileChooser extends JComponent implements Accessible
    */
   public AccessibleContext getAccessibleContext()
   {
-    return null;
+    return new AccessibleJFileChooser();
+  }
+
+  /**
+   * Accessibility support for JFileChooser
+   */
+  protected class AccessibleJFileChooser 
+    extends JComponent.AccessibleJComponent
+  {
+    protected AccessibleJFileChooser()
+    {
+}
+    public AccessibleRole getAccessibleRole()
+    {
+      return AccessibleRole.FILE_CHOOSER;
+    }
   }
 }

@@ -48,6 +48,7 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JList;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 /**
@@ -99,7 +100,7 @@ public class MetalComboBoxButton extends JButton {
   public MetalComboBoxButton(JComboBox cb, Icon i, boolean onlyIcon,
       CellRendererPane pane, JList list)
   {
-    super(i);
+    super();
     comboBox = cb;
     comboIcon = i;
     iconOnly = onlyIcon;
@@ -200,6 +201,7 @@ public class MetalComboBoxButton extends JButton {
    */
   public void paintComponent(Graphics g)
   {
+    super.paintComponent(g);
     if (iconOnly)
       {
         Rectangle bounds = getBounds();
@@ -231,9 +233,14 @@ public class MetalComboBoxButton extends JButton {
         else
           g.setColor(MetalLookAndFeel.getControlDisabled());
         FontMetrics fm = g.getFontMetrics(comboBox.getFont());
-        // FIXME: the label may need truncating with '...' and the 
-        // alignment needs work
-        g.drawString(text, insets.left + 5, fm.getAscent() + 4);
+        Rectangle textR = new Rectangle();
+        text = SwingUtilities.layoutCompoundLabel(fm, text, null, 
+            SwingConstants.TOP, SwingConstants.LEFT, 
+            SwingConstants.CENTER, SwingConstants.RIGHT, 
+            innerArea, new Rectangle(), textR, 0);
+        int yAdj = (textR.height - fm.getAscent()) / 2 + 1;
+        g.setFont(comboBox.getFont());
+        g.drawString(text, textR.x, textR.y + textR.height - yAdj);
       }
   }
 }

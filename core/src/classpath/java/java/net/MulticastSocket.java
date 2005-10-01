@@ -16,8 +16,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -60,7 +60,7 @@ import java.util.Enumeration;
  * as "The Java Class Libraries", 2nd edition (Addison-Wesley, 1998).
  * Status:  Believed complete and correct.
  *
- * @author Warren Levy <warrenl@cygnus.com>
+ * @author Warren Levy (warrenl@cygnus.com)
  * @author Aaron M. Renn (arenn@urbanophile.com) (Documentation comments)
  * @since 1.1
  * @date May 18, 1999.
@@ -202,18 +202,18 @@ public class MulticastSocket extends DatagramSocket
   {
     if (isClosed())
       throw new SocketException("socket is closed");
-
+      
     // @vm-specific Set network interface via extended option
     getImpl().setOption(ExSocketOptions.SO_TRANSMIT_IF, netIf);
+/*    
+    Enumeration e = netIf.getInetAddresses();
     
-    
-			/*Enumeration e = netIf.getInetAddresses();
-
     if (! e.hasMoreElements())
       throw new SocketException("no network devices found");
 
     InetAddress address = (InetAddress) e.nextElement();
-    getImpl().setOption(SocketOptions.IP_MULTICAST_IF, address);*/
+    getImpl().setOption(SocketOptions.IP_MULTICAST_IF, address);
+*/
 	}
 
 	/**

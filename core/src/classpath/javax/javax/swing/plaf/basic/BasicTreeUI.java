@@ -329,7 +329,7 @@ public class BasicTreeUI
    * 
    * @return the indent value for the left child.
    */
-  public int getLeftChildIndent(int newAmount)
+  public int getLeftChildIndent()
   {
     return leftChildIndent;
   }
@@ -3642,7 +3642,7 @@ public class BasicTreeUI
    *          is the center position in y-direction FIXME what to do if x <
    *          (icon.width / 2). Same with y
    */
-  protected void drawCentered(JComponent c, Graphics g, Icon icon, int x, int y)
+  protected void drawCentered(Component c, Graphics g, Icon icon, int x, int y)
   {
     int beginPositionX = x - icon.getIconWidth() / 2;
     int beginPositionY = y - icon.getIconHeight() / 2;

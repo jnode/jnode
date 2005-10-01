@@ -45,10 +45,14 @@ import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.EventListener;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.EventListenerList;
 
 /**
@@ -60,6 +64,80 @@ import javax.swing.event.EventListenerList;
 public class DefaultCaret extends Rectangle
   implements Caret, FocusListener, MouseListener, MouseMotionListener
 {
+  /**
+   * Listens for changes in the text component's document and updates the
+   * caret accordingly.
+   * 
+   * @author Roman Kennke (kennke@aicas.com)
+   */
+  private class DocumentHandler implements DocumentListener
+  {
+    /**
+     * Receives notification that some text attributes have changed. No action
+     * is taken here.
+     *
+     * @param event the document event
+     */
+    public void changedUpdate(DocumentEvent event)
+    {
+      // Nothing to do here.
+    }
+
+    /**
+     * Receives notification that some text has been removed from the text
+     * component. The caret is moved backwards accordingly.
+     *
+     * @param event the document event
+     */
+    public void insertUpdate(DocumentEvent event)
+    {
+      int dot = getDot();
+      setDot(dot + event.getLength());
+    }
+
+    /**
+     * Receives notification that some text has been inserte into the text
+     * component. The caret is moved forwards accordingly.
+     *
+     * @param event the document event
+     */
+    public void removeUpdate(DocumentEvent event)
+    {
+      int dot = getDot();
+      setDot(dot - event.getLength());
+    }
+  }
+
+  /**
+   * Listens for property changes on the text document. This is used to add and
+   * remove our document listener, if the document of the text component has
+   * changed.
+   *
+   * @author Roman Kennke (kennke@aicas.com)
+   */
+  private class PropertyChangeHandler implements PropertyChangeListener
+  {
+
+    /**
+     * Receives notification when a property has changed on the text component.
+     * This adds/removes our document listener from the text component's
+     * document when the document changes.
+     *
+     * @param e the property change event
+     */
+    public void propertyChange(PropertyChangeEvent e)
+    {
+      if (e.getPropertyName().equals("document"))
+        {
+          Document oldDoc = (Document) e.getOldValue();
+          oldDoc.removeDocumentListener(documentListener);
+          Document newDoc = (Document) e.getNewValue();
+          newDoc.addDocumentListener(documentListener);
+        }
+    }
+    
+  }
+
   /** The serialization UID (compatible with JDK1.5). */
   private static final long serialVersionUID = 4325555698756477346L;
 
@@ -72,6 +150,16 @@ public class DefaultCaret extends Rectangle
    * Stores all registered event listeners.
    */
   protected EventListenerList listenerList = new EventListenerList();
+
+  /**
+   * Our document listener.
+   */
+  DocumentListener documentListener;
+
+  /**
+   * Our property listener.
+   */
+  PropertyChangeListener propertyChangeListener;
 
   /**
    * The text component in which this caret is installed.
@@ -251,6 +339,10 @@ public class DefaultCaret extends Rectangle
     textComponent.removeFocusListener(this);
     textComponent.removeMouseListener(this);
     textComponent.removeMouseMotionListener(this);
+    textComponent.getDocument().removeDocumentListener(documentListener);
+    documentListener = null;
+    textComponent.removePropertyChangeListener(propertyChangeListener);
+    propertyChangeListener = null;
     textComponent = null;
   }
 
@@ -267,6 +359,10 @@ public class DefaultCaret extends Rectangle
     textComponent.addFocusListener(this);
     textComponent.addMouseListener(this);
     textComponent.addMouseMotionListener(this);
+    propertyChangeListener = new PropertyChangeHandler();
+    textComponent.addPropertyChangeListener(propertyChangeListener);
+    documentListener = new DocumentHandler();
+    textComponent.getDocument().addDocumentListener(documentListener);
     repaint();
   }
 

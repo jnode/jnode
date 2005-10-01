@@ -76,8 +76,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-public class BasicTableUI
-  extends TableUI
+public class BasicTableUI extends TableUI
 {
   public static ComponentUI createUI(JComponent comp) 
   {
@@ -98,6 +97,50 @@ public class BasicTableUI
 
   /** The action bound to KeyStrokes. */
   TableAction action;
+
+  /**
+   * Handles key events for the JTable. Key events should be handled through
+   * the InputMap/ActionMap mechanism since JDK1.3. This class is only there
+   * for backwards compatibility.
+   * 
+   * @author Roman Kennke (kennke@aicas.com)
+   */
+  public class KeyHandler implements KeyListener
+  {
+
+    /**
+     * Receives notification that a key has been pressed and released.
+     *
+     * @param event the key event
+     */
+    public void keyTyped(KeyEvent event)
+    {
+      // Key events should be handled through the InputMap/ActionMap mechanism
+      // since JDK1.3. This class is only there for backwards compatibility.
+    }
+
+    /**
+     * Receives notification that a key has been pressed.
+     *
+     * @param event the key event
+     */
+    public void keyPressed(KeyEvent event)
+    {
+      // Key events should be handled through the InputMap/ActionMap mechanism
+      // since JDK1.3. This class is only there for backwards compatibility.
+    }
+
+    /**
+     * Receives notification that a key has been released.
+     *
+     * @param event the key event
+     */
+    public void keyReleased(KeyEvent event)
+    {
+      // Key events should be handled through the InputMap/ActionMap mechanism
+      // since JDK1.3. This class is only there for backwards compatibility.
+    }
+  }
 
   public class FocusHandler implements FocusListener
   {
@@ -204,6 +247,16 @@ public class BasicTableUI
   protected MouseInputListener createMouseInputListener() 
   {
     return new MouseInputHandler();
+  }
+
+  /**
+   * Creates and returns a key listener for the JTable.
+   *
+   * @return a key listener for the JTable
+   */
+  protected KeyListener createKeyListener()
+  {
+    return new KeyHandler();
   }
 
   /**
@@ -922,8 +975,14 @@ public class BasicTableUI
 
   protected void installListeners() 
   {
+    if (focusListener == null)
+      focusListener = createFocusListener();
     table.addFocusListener(focusListener);  
+    if (keyListener == null)
+      keyListener = createKeyListener();
     table.addKeyListener(keyListener);
+    if (mouseInputListener == null)
+      mouseInputListener = createMouseInputListener();
     table.addMouseListener(mouseInputListener);    
     table.addMouseMotionListener(mouseInputListener);
   }
@@ -963,8 +1022,6 @@ public class BasicTableUI
   public void installUI(JComponent comp) 
   {
     table = (JTable)comp;
-    focusListener = createFocusListener();  
-    mouseInputListener = createMouseInputListener();
     installDefaults();
     installKeyboardActions();
     installListeners();

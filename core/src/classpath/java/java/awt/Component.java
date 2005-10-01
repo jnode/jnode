@@ -901,15 +901,15 @@ public abstract class Component
         if (currentPeer != null)
             currentPeer.setVisible(true);
 
+        // The JDK repaints the component before invalidating the parent.
+        // So do we.
+        repaint();
         // Invalidate the parent if we have one. The component itself must
         // not be invalidated. We also avoid NullPointerException with
         // a local reference here.
         Container currentParent = parent;
         if (currentParent != null)
-          {
             currentParent.invalidate();
-            currentParent.repaint();
-          }
 
         ComponentEvent ce =
           new ComponentEvent(this,ComponentEvent.COMPONENT_SHOWN);
@@ -948,15 +948,15 @@ public abstract class Component
         
         this.visible = false;
         
+        // The JDK repaints the component before invalidating the parent.
+        // So do we.
+        repaint();
         // Invalidate the parent if we have one. The component itself must
         // not be invalidated. We also avoid NullPointerException with
         // a local reference here.
         Container currentParent = parent;
         if (currentParent != null)
-          {
             currentParent.invalidate();
-            currentParent.repaint();
-          }
 
         ComponentEvent ce =
           new ComponentEvent(this,ComponentEvent.COMPONENT_HIDDEN);
@@ -1074,8 +1074,7 @@ public abstract class Component
     Component p = parent;
     if (p != null)
       return p.getFont();
-    else
-      return new Font("Dialog", Font.PLAIN, 12);
+    return null;
 	}
 
 	/**
@@ -3480,8 +3479,11 @@ public abstract class Component
     ComponentPeer tmp = peer;
 		peer = null;
     if (tmp != null)
+      {
+        tmp.hide();
       tmp.dispose();
 	}
+  }
 
 	/**
    * AWT 1.0 GOT_FOCUS event handler.  This method is meant to be

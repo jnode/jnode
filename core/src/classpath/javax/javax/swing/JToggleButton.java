@@ -276,6 +276,7 @@ public class JToggleButton extends AbstractButton implements Accessible
 
     setModel(new ToggleButtonModel());	
     model.setSelected(selected);
+    setAlignmentX(LEFT_ALIGNMENT);
   }
 
   /**

@@ -1230,6 +1230,9 @@ public abstract class AbstractDocument implements Document, Serializable
 
     /**
      * Returns the resolve parent of this element.
+     * This is taken from the AttributeSet, but if this is null,
+     * this method instead returns the Element's parent's 
+     * AttributeSet
      *
      * @return the resolve parent of this element
      *
@@ -1237,7 +1240,9 @@ public abstract class AbstractDocument implements Document, Serializable
      */
     public AttributeSet getResolveParent()
     {
-      return attributes.getResolveParent();
+      if (attributes.getResolveParent() != null)
+        return attributes.getResolveParent();
+      return element_parent.getAttributes();
     }
 
     /**
@@ -1514,19 +1519,30 @@ public abstract class AbstractDocument implements Document, Serializable
      */
     public int getElementIndex(int offset)
     {
-      // If we have no children, return -1.
-      if (getElementCount() == 0)
-        return - 1;
-
+      // If offset is less than the start offset of our first child,
+      // return 0
+      if (offset < getStartOffset())
+        return 0;
+      
       // XXX: There is surely a better algorithm
       // as beginning from first element each time.
-      for (int index = 0; index < children.length; ++index)
+      for (int index = 0; index < children.length - 1; ++index)
         {
           Element elem = children[index];
 
           if ((elem.getStartOffset() <= offset)
                && (offset < elem.getEndOffset()))
             return index;
+          // If the next element's start offset is greater than offset
+          // then we have to return the closest Element, since no Elements
+          // will contain the offset
+          if (children[index + 1].getStartOffset() > offset)
+            {
+              if ((offset - elem.getEndOffset()) > (children[index + 1].getStartOffset() - offset))
+                return index + 1;
+              else
+                return index;
+            }
         }
 
       // If offset is greater than the index of the last element, return

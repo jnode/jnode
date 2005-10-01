@@ -97,50 +97,44 @@ public class JCheckBox extends JToggleButton implements Accessible
   
   public JCheckBox()
   {
-    super();
-    init();
+    this(null, null, false);
   }
 
   public JCheckBox(Action action)
   {
     super(action);
-    init();
   }
 
   public JCheckBox(Icon icon)
   { 
-    super(icon);
-    init();
+    this(null, icon, false);
   }    
   
   public JCheckBox(Icon icon, boolean selected)
   { 
-    super(icon, selected);
-    init();
+    this(null, icon, selected);
   }    
   
   public JCheckBox(String text)
   {
-    super(text);
-    init();
+    this(text, null, false);
   }
       
   public JCheckBox(String text, boolean selected)
   {
-    super(text, selected);
-    init();
+    this(text, null, selected);
   }
       
   public JCheckBox(String text, Icon icon)
   {
-    super(text, icon);
-    init();
+    this(text, icon, false);
   }
 
   public JCheckBox(String text, Icon icon, boolean selected)
   {
     super(text, icon, selected);
-    init();
+    setHorizontalAlignment(LEADING);
+    setBorderPainted(false);
   }
 
   /**

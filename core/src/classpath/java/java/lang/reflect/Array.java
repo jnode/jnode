@@ -1,5 +1,5 @@
 /* java.lang.reflect.Array - manipulate arrays by reflection
-   Copyright (C) 1998, 1999, 2001 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2001, 2003, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -71,7 +71,8 @@ import java.security.PrivilegedAction;
  * worse if you do this and use the generic set() function.
  *
  * @author John Keiser
- * @author Eric Blake <ebb9@email.byu.edu>
+ * @author Eric Blake (ebb9@email.byu.edu)
+ * @author Per Bothner (bothner@cygnus.com)
  * @see java.lang.Boolean#TYPE
  * @see java.lang.Byte#TYPE
  * @see java.lang.Short#TYPE
@@ -83,11 +84,14 @@ import java.security.PrivilegedAction;
  * @since 1.1
  * @status updated to 1.4
  */
-public final class Array {
+public final class Array 
+{
+
 	/**
 	 * This class is uninstantiable.
 	 */
-	private Array() {
+  private Array()
+  {
 	}
 
 	/**
@@ -101,7 +105,8 @@ public final class Array {
 	 * @throws NegativeArraySizeException when length is less than 0
 	 * @throws OutOfMemoryError if memory allocation fails
 	 */
-	public static Object newInstance(Class componentType, int length) {
+  public static Object newInstance(Class componentType, int length)
+  {
 		if (!componentType.isPrimitive())
 			return createObjectArray(componentType, length);
 		if (componentType == boolean.class)
@@ -148,10 +153,12 @@ public final class Array {
 	 *         than 0
 	 * @throws OutOfMemoryError if memory allocation fails
 	 */
-	public static Object newInstance(Class componentType, int[] dimensions) {
+  public static Object newInstance(Class componentType, int[] dimensions)
+  {
 		if (dimensions.length <= 0)
 			throw new IllegalArgumentException("Empty dimensions array.");
-		return createMultiArray(componentType, dimensions, dimensions.length - 1);
+    return createMultiArray(componentType, dimensions,
+                                  dimensions.length - 1);
 	}
 
 	/**
@@ -161,7 +168,8 @@ public final class Array {
 	 * @throws IllegalArgumentException if <code>array</code> is not an array
 	 * @throws NullPointerException if <code>array</code> is null
 	 */
-	public static int getLength(Object array) {
+  public static int getLength(Object array)
+  {
 		if (array instanceof Object[])
 			return ((Object[]) array).length;
 		if (array instanceof boolean[])
@@ -205,7 +213,8 @@ public final class Array {
 	 * @see #getFloat(Object, int)
 	 * @see #getDouble(Object, int)
 	 */
-	public static Object get(Object array, int index) {
+  public static Object get(Object array, int index)
+  {
 		if (array instanceof Object[])
 			return ((Object[]) array)[index];
 		if (array instanceof boolean[])
@@ -242,7 +251,8 @@ public final class Array {
 	 *         bounds
 	 * @see #get(Object, int)
 	 */
-	public static boolean getBoolean(Object array, int index) {
+  public static boolean getBoolean(Object array, int index)
+  {
 		if (array instanceof boolean[])
 			return ((boolean[]) array)[index];
 		if (array == null)
@@ -263,7 +273,8 @@ public final class Array {
 	 *         bounds
 	 * @see #get(Object, int)
 	 */
-	public static byte getByte(Object array, int index) {
+  public static byte getByte(Object array, int index)
+  {
 		if (array instanceof byte[])
 			return ((byte[]) array)[index];
 		if (array == null)
@@ -284,7 +295,8 @@ public final class Array {
 	 *         bounds
 	 * @see #get(Object, int)
 	 */
-	public static char getChar(Object array, int index) {
+	public static char getChar(Object array, int index) 
+	{
 		if (array instanceof char[])
 			return ((char[]) array)[index];
 		if (array == null)
@@ -305,7 +317,8 @@ public final class Array {
 	 *         bounds
 	 * @see #get(Object, int)
 	 */
-	public static short getShort(Object array, int index) {
+  public static short getShort(Object array, int index)
+  {
 		if (array instanceof short[])
 			return ((short[]) array)[index];
 		return getByte(array, index);
@@ -324,7 +337,8 @@ public final class Array {
 	 *         bounds
 	 * @see #get(Object, int)
 	 */
-	public static int getInt(Object array, int index) {
+  public static int getInt(Object array, int index)
+  {
 		if (array instanceof int[])
 			return ((int[]) array)[index];
 		if (array instanceof char[])
@@ -345,7 +359,8 @@ public final class Array {
 	 *         bounds
 	 * @see #get(Object, int)
 	 */
-	public static long getLong(Object array, int index) {
+  public static long getLong(Object array, int index)
+  {
 		if (array instanceof long[])
 			return ((long[]) array)[index];
 		return getInt(array, index);
@@ -364,7 +379,8 @@ public final class Array {
 	 *         bounds
 	 * @see #get(Object, int)
 	 */
-	public static float getFloat(Object array, int index) {
+  public static float getFloat(Object array, int index)
+  {
 		if (array instanceof float[])
 			return ((float[]) array)[index];
 		return getLong(array, index);
@@ -383,7 +399,8 @@ public final class Array {
 	 *         bounds
 	 * @see #get(Object, int)
 	 */
-	public static double getDouble(Object array, int index) {
+  public static double getDouble(Object array, int index)
+  {
 		if (array instanceof double[])
 			return ((double[]) array)[index];
 		return getFloat(array, index);
@@ -412,18 +429,18 @@ public final class Array {
 	 * @see #setFloat(Object, int, float)
 	 * @see #setDouble(Object, int, double)
 	 */
-	public static void set(Object array, int index, Object value) {
-		if (array instanceof Object[]) {
-			// Too bad Sun won't let us throw the easier ArrayStoreException!
-			if (!array.getClass().getComponentType().isInstance(value))
+  public static void set(Object array, int index, Object value)
+  {
+    if (array instanceof Object[])
+      {
+	// Too bad the API won't let us throw the easier ArrayStoreException!
+	if (value != null
+	    && ! array.getClass().getComponentType().isInstance(value))
 				throw new IllegalArgumentException();
 			((Object[]) array)[index] = value;
-		} else if (value instanceof Boolean)
-			setBoolean(array, index, ((Boolean) value).booleanValue());
+		}
 		else if (value instanceof Byte)
 			setByte(array, index, ((Byte) value).byteValue());
-		else if (value instanceof Character)
-			setChar(array, index, ((Character) value).charValue());
 		else if (value instanceof Short)
 			setShort(array, index, ((Short) value).shortValue());
 		else if (value instanceof Integer)
@@ -434,6 +451,10 @@ public final class Array {
 			setFloat(array, index, ((Float) value).floatValue());
 		else if (value instanceof Double)
 			setDouble(array, index, ((Double) value).doubleValue());
+    else if (value instanceof Character)
+      setChar(array, index, ((Character) value).charValue());
+    else if (value instanceof Boolean)
+      setBoolean(array, index, ((Boolean) value).booleanValue());
 		else if (array == null)
 			throw new NullPointerException();
 		else
@@ -453,7 +474,8 @@ public final class Array {
 	 *         bounds
 	 * @see #set(Object, int, Object)
 	 */
-	public static void setBoolean(Object array, int index, boolean value) {
+  public static void setBoolean(Object array, int index, boolean value)
+  {
 		if (array instanceof boolean[])
 			 ((boolean[]) array)[index] = value;
 		else if (array == null)
@@ -475,7 +497,8 @@ public final class Array {
 	 *         bounds
 	 * @see #set(Object, int, Object)
 	 */
-	public static void setByte(Object array, int index, byte value) {
+  public static void setByte(Object array, int index, byte value)
+  {
 		if (array instanceof byte[])
 			 ((byte[]) array)[index] = value;
 		else
@@ -495,7 +518,8 @@ public final class Array {
 	 *         bounds
 	 * @see #set(Object, int, Object)
 	 */
-	public static void setChar(Object array, int index, char value) {
+  public static void setChar(Object array, int index, char value)
+  {
 		if (array instanceof char[])
 			 ((char[]) array)[index] = value;
 		else
@@ -515,7 +539,8 @@ public final class Array {
 	 *         bounds
 	 * @see #set(Object, int, Object)
 	 */
-	public static void setShort(Object array, int index, short value) {
+  public static void setShort(Object array, int index, short value)
+  {
 		if (array instanceof short[])
 			 ((short[]) array)[index] = value;
 		else
@@ -535,7 +560,8 @@ public final class Array {
 	 *         bounds
 	 * @see #set(Object, int, Object)
 	 */
-	public static void setInt(Object array, int index, int value) {
+  public static void setInt(Object array, int index, int value)
+  {
 		if (array instanceof int[])
 			 ((int[]) array)[index] = value;
 		else
@@ -555,7 +581,8 @@ public final class Array {
 	 *         bounds
 	 * @see #set(Object, int, Object)
 	 */
-	public static void setLong(Object array, int index, long value) {
+  public static void setLong(Object array, int index, long value)
+  {
 		if (array instanceof long[])
 			 ((long[]) array)[index] = value;
 		else
@@ -575,7 +602,8 @@ public final class Array {
 	 *         bounds
 	 * @see #set(Object, int, Object)
 	 */
-	public static void setFloat(Object array, int index, float value) {
+  public static void setFloat(Object array, int index, float value)
+  {
 		if (array instanceof float[])
 			 ((float[]) array)[index] = value;
 		else
@@ -595,7 +623,8 @@ public final class Array {
 	 *         bounds
 	 * @see #set(Object, int, Object)
 	 */
-	public static void setDouble(Object array, int index, double value) {
+  public static void setDouble(Object array, int index, double value)
+  {
 		if (array instanceof double[])
 			 ((double[]) array)[index] = value;
 		else if (array == null)
@@ -616,13 +645,16 @@ public final class Array {
 	 */
 	// This would be faster if implemented natively, using the multianewarray
 	// bytecode instead of this recursive call
-	private static Object createMultiArray(Class type, int[] dimensions, int index) {
+  private static Object createMultiArray(Class type, int[] dimensions,
+                                         int index)
+  {
 		if (index == 0)
 			return newInstance(type, dimensions[0]);
 
 		Object toAdd = createMultiArray(type, dimensions, index - 1);
 		Class thisType = toAdd.getClass();
-		Object[] retval = (Object[]) createObjectArray(thisType, dimensions[index]);
+    Object[] retval
+      = (Object[]) createObjectArray(thisType, dimensions[index]);
 		if (dimensions[index] > 0)
 			retval[0] = toAdd;
 		int i = dimensions[index];

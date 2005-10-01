@@ -306,9 +306,14 @@ public class StyleContext
             return attrs[i+1];
         }
             
+      // Check the resolve parent, unless we're looking for the 
+      // ResolveAttribute, which would cause an infinite loop
+      if (!(key.equals(ResolveAttribute)))
+          {
       Object p = getResolveParent();
       if (p != null && p instanceof AttributeSet)
         return (((AttributeSet)p).getAttribute(key));
+          }
       
       return null;
     }
