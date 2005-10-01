@@ -353,21 +353,25 @@ final class MappedByteBufferImpl extends MappedByteBuffer
   // because they're small, and to put them next to FileChannelImpl::mapImpl.
   void unmapImpl() 
   { 
-      //TODO implement JNode specific
+      // @vm-specific
+      //TODO implement me
   }
   boolean isLoadedImpl()
   { 
-      //TODO implement JNode specific
+      // @vm-specific
+      //TODO implement me
       return false;
   }
     // FIXME: Try to load all pages into memory.
   void loadImpl()
   { 
-      //TODO implement JNode specific
+      // @vm-specific
+      //TODO implement me
   }
 
   void forceImpl()
   {
-      //TODO implement JNode specific      
+      // @vm-specific
+      //TODO implement me
   }
 }
