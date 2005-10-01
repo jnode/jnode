@@ -83,6 +83,14 @@ public class JFrame extends Frame
     }
   }
 
+  /**
+   * A flag for {@link #setDefaultCloseOperation(int)}, indicating that the
+   * application should be exited, when this <code>JFrame</code> is closed.
+   *
+   * @since 1.3
+   */
+  public static final int EXIT_ON_CLOSE = 3;
+
   private static final long serialVersionUID = -3362141868504252139L;
   private static boolean defaultLookAndFeelDecorated;
   private int close_action = HIDE_ON_CLOSE;

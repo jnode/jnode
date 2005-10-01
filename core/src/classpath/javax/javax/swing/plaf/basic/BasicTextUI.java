@@ -381,9 +381,6 @@ public abstract class BasicTextUI extends TextUI
       Dimension size = textComponent.getSize();
       rootView.insertUpdate(ev, new Rectangle(0, 0, size.width, size.height),
                             rootView.getViewFactory());
-      int caretPos = textComponent.getCaretPosition();
-      if (caretPos >= ev.getOffset())
-        textComponent.setCaretPosition(caretPos + ev.getLength());
     }
 
     /**
@@ -396,9 +393,6 @@ public abstract class BasicTextUI extends TextUI
       Dimension size = textComponent.getSize();
       rootView.removeUpdate(ev, new Rectangle(0, 0, size.width, size.height),
                             rootView.getViewFactory());
-      int caretPos = textComponent.getCaretPosition();
-      if (caretPos >= ev.getOffset())
-        textComponent.setCaretPosition(ev.getOffset());
     }
   }
 

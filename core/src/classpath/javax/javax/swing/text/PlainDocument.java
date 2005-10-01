@@ -132,8 +132,8 @@ public class PlainDocument extends AbstractDocument
         // collapse elements if the removal spans more than 1 line
         Element newEl = createLeafElement(rootElement,
                                           SimpleAttributeSet.EMPTY,
-                                          start, end - len);
-        rootElement.replace(i1, i2 - i1, new Element[]{ newEl });
+                                          start, end);
+        rootElement.replace(i1, i2 - i1 + 1, new Element[]{ newEl });
       }
     }
 

@@ -185,7 +185,8 @@ public class PolicyFile extends Policy {
     // Instance methods.
     // -------------------------------------------------------------------------
 
-    public final PermissionCollection getPermissions(CodeSource codeSource) {
+  public PermissionCollection getPermissions(CodeSource codeSource)
+  {
         Permissions perms = new Permissions();
         for (Iterator it = cs2pc.entrySet().iterator(); it.hasNext();) {
             final Map.Entry e = (Map.Entry) it.next();
@@ -218,7 +219,8 @@ public class PolicyFile extends Policy {
         // Nothing here
     }
 
-    public void refresh() {
+  public void refresh()
+  {
         cs2pc.clear();
         final List policyFiles = new ArrayList();
         try {
@@ -269,18 +271,16 @@ public class PolicyFile extends Policy {
     private static final int STATE_PERMS = 2;
 
     /**
-     * Parse a policy file, incorporating the permission definitions described
-     * therein.
+   * Parse a policy file, incorporating the permission definitions
+   * described therein.
      * 
-     * @param url
-     *            The URL of the policy file to read.
-     * @throws IOException
-     *             if an I/O error occurs, or if the policy file cannot be
-     *             parsed.
+   * @param url The URL of the policy file to read.
+   * @throws IOException if an I/O error occurs, or if the policy file
+   * cannot be parsed.
      */
-    private void parse(final URL url) throws IOException {
-        final StreamTokenizer in = new StreamTokenizer(new InputStreamReader(
-                url.openStream()));
+  private void parse(final URL url) throws IOException
+  {
+	    final StreamTokenizer in = new StreamTokenizer(new InputStreamReader(url.openStream()));
         in.resetSyntax();
         in.slashSlashComments(true);
         in.slashStarComments(true);
@@ -304,61 +304,76 @@ public class PolicyFile extends Policy {
         URL currentBase = null;
         List currentCerts = new LinkedList();
         Permissions currentPerms = new Permissions();
-        while ((tok = in.nextToken()) != StreamTokenizer.TT_EOF) {
-            switch (tok) {
+    while ((tok = in.nextToken()) != StreamTokenizer.TT_EOF)
+      {
+        switch (tok)
+          {
             case '{':
-                if (state != STATE_GRANT) error(url, in, "spurious '{'");
+            if (state != STATE_GRANT)
+              error(url, in, "spurious '{'");
                 state = STATE_PERMS;
                 tok = in.nextToken();
                 break;
             case '}':
-                if (state != STATE_PERMS) error(url, in, "spurious '}'");
+            if (state != STATE_PERMS)
+              error(url, in, "spurious '}'");
                 state = STATE_BEGIN;
                 currentPerms.setReadOnly();
                 Certificate[] c = null;
                 if (!currentCerts.isEmpty())
-                        c = (Certificate[]) currentCerts
-                                .toArray(new Certificate[ currentCerts.size()]);
+              c = (Certificate[]) currentCerts.toArray(new Certificate[currentCerts.size()]);
                 cs2pc.put(new CodeSource(currentBase, c), currentPerms);
                 currentCerts.clear();
                 currentPerms = new Permissions();
                 currentBase = null;
                 tok = in.nextToken();
-                if (tok != ';') in.pushBack();
+            if (tok != ';')
+              in.pushBack();
                 continue;
             }
-            if (tok != StreamTokenizer.TT_WORD) {
+        if (tok != StreamTokenizer.TT_WORD)
+          {
                 error(url, in, "expecting word token");
             }
 
             // keystore "<keystore-path>" [',' "<keystore-type>"] ';'
-            if (in.sval.equalsIgnoreCase("keystore")) {
+        if (in.sval.equalsIgnoreCase("keystore"))
+          {
                 String alg = KeyStore.getDefaultType();
                 tok = in.nextToken();
                 if (tok != '"' && tok != '\'')
                         error(url, in, "expecting key store URL");
                 String store = in.sval;
                 tok = in.nextToken();
-                if (tok == ',') {
+            if (tok == ',')
+              {
                     tok = in.nextToken();
                     if (tok != '"' && tok != '\'')
                             error(url, in, "expecting key store type");
                     alg = in.sval;
                     tok = in.nextToken();
                 }
-                if (tok != ';') error(url, in, "expecting semicolon");
-                try {
+            if (tok != ';')
+              error(url, in, "expecting semicolon");
+            try
+              {
                     KeyStore keystore = KeyStore.getInstance(alg);
                     keystore.load(new URL(url, store).openStream(), null);
                     keystores.add(keystore);
-                } catch (Exception x) {
+              }
+            catch (Exception x)
+              {
                     error(url, in, x.toString());
                 }
-            } else if (in.sval.equalsIgnoreCase("grant")) {
+          }
+        else if (in.sval.equalsIgnoreCase("grant"))
+          {
                 if (state != STATE_BEGIN)
                         error(url, in, "extraneous grant keyword");
                 state = STATE_GRANT;
-            } else if (in.sval.equalsIgnoreCase("signedBy")) {
+          }
+        else if (in.sval.equalsIgnoreCase("signedBy"))
+          {
                 if (state != STATE_GRANT && state != STATE_PERMS)
                         error(url, in, "spurious 'signedBy'");
                 if (keystores.isEmpty())
@@ -367,25 +382,33 @@ public class PolicyFile extends Policy {
                 if (tok != '"' && tok != '\'')
                         error(url, in, "expecting signedBy name");
                 StringTokenizer st = new StringTokenizer(in.sval, ",");
-                while (st.hasMoreTokens()) {
+            while (st.hasMoreTokens())
+              {
                     String alias = st.nextToken();
-                    for (Iterator it = keystores.iterator(); it.hasNext();) {
+                for (Iterator it = keystores.iterator(); it.hasNext(); )
+                  {
                         KeyStore keystore = (KeyStore) it.next();
-                        try {
+                    try
+                      {
                             if (keystore.isCertificateEntry(alias))
-                                    currentCerts.add(keystore
-                                            .getCertificate(alias));
-                        } catch (KeyStoreException kse) {
+                          currentCerts.add(keystore.getCertificate(alias));
+                      }
+                    catch (KeyStoreException kse)
+                      {
                             error(url, in, kse.toString());
                         }
                     }
                 }
                 tok = in.nextToken();
-                if (tok != ',') {
-                    if (state != STATE_GRANT) error(url, in, "spurious ','");
+            if (tok != ',')
+              {
+                if (state != STATE_GRANT)
+                  error(url, in, "spurious ','");
                     in.pushBack();
                 }
-            } else if (in.sval.equalsIgnoreCase("codeBase")) {
+          }
+        else if (in.sval.equalsIgnoreCase("codeBase"))
+          {
                 if (state != STATE_GRANT)
                         error(url, in, "spurious 'codeBase'");
                 tok = in.nextToken();
@@ -394,69 +417,91 @@ public class PolicyFile extends Policy {
                 String base = expand(in.sval);
                 if (File.separatorChar != '/')
                         base = base.replace(File.separatorChar, '/');
-                try {
+            try
+              {
                     currentBase = new URL(base);
-                } catch (MalformedURLException mue) {
+              }
+            catch (MalformedURLException mue)
+              {
                     error(url, in, mue.toString());
                 }
                 tok = in.nextToken();
-                if (tok != ',') in.pushBack();
-            } else if (in.sval.equalsIgnoreCase("principal")) {
+            if (tok != ',')
+              in.pushBack();
+          }
+        else if (in.sval.equalsIgnoreCase("principal"))
+          {
                 if (state != STATE_GRANT)
                         error(url, in, "spurious 'principal'");
                 tok = in.nextToken();
-                if (tok == StreamTokenizer.TT_WORD) {
+            if (tok == StreamTokenizer.TT_WORD)
+              {
                     tok = in.nextToken();
                     if (tok != '"' && tok != '\'')
                             error(url, in, "expecting principal name");
                     String name = in.sval;
                     Principal p = null;
-                    try {
+                try
+                  {
                         Class pclass = Class.forName(in.sval);
-                        Constructor c = pclass
-                                .getConstructor(new Class[] { String.class});
+                    Constructor c =
+                      pclass.getConstructor(new Class[] { String.class });
                         p = (Principal) c.newInstance(new Object[] { name});
-                    } catch (Exception x) {
+                  }
+                catch (Exception x)
+                  {
                         error(url, in, x.toString());
                     }
-                    for (Iterator it = keystores.iterator(); it.hasNext();) {
+                for (Iterator it = keystores.iterator(); it.hasNext(); )
+                  {
                         KeyStore ks = (KeyStore) it.next();
-                        try {
-                            for (Enumeration e = ks.aliases(); e
-                                    .hasMoreElements();) {
+                    try
+                      {
+                        for (Enumeration e = ks.aliases(); e.hasMoreElements(); )
+                          {
                                 String alias = (String) e.nextElement();
-                                if (ks.isCertificateEntry(alias)) {
+                            if (ks.isCertificateEntry(alias))
+                              {
                                     Certificate cert = ks.getCertificate(alias);
                                     if (!(cert instanceof X509Certificate))
                                             continue;
-                                    if (p.equals(((X509Certificate) cert)
-                                            .getSubjectDN())
-                                            || p
-                                                    .equals(((X509Certificate) cert)
-                                                            .getSubjectX500Principal()))
+                                if (p.equals(((X509Certificate) cert).getSubjectDN()) ||
+                                    p.equals(((X509Certificate) cert).getSubjectX500Principal()))
                                             currentCerts.add(cert);
                                 }
                             }
-                        } catch (KeyStoreException kse) {
+                      }
+                    catch (KeyStoreException kse)
+                      {
                             error(url, in, kse.toString());
                         }
                     }
-                } else if (tok == '"' || tok == '\'') {
+              }
+            else if (tok == '"' || tok == '\'')
+              {
                     String alias = in.sval;
-                    for (Iterator it = keystores.iterator(); it.hasNext();) {
+                for (Iterator it = keystores.iterator(); it.hasNext(); )
+                  {
                         KeyStore ks = (KeyStore) it.next();
-                        try {
+                    try
+                      {
                             if (ks.isCertificateEntry(alias))
                                     currentCerts.add(ks.getCertificate(alias));
-                        } catch (KeyStoreException kse) {
+                      }
+                    catch (KeyStoreException kse)
+                      {
                             error(url, in, kse.toString());
                         }
                     }
-                } else
+              }
+            else
                     error(url, in, "expecting principal");
                 tok = in.nextToken();
-                if (tok != ',') in.pushBack();
-            } else if (in.sval.equalsIgnoreCase("permission")) {
+            if (tok != ',')
+              in.pushBack();
+          }
+        else if (in.sval.equalsIgnoreCase("permission"))
+          {
                 if (state != STATE_PERMS)
                         error(url, in, "spurious 'permission'");
                 tok = in.nextToken();
@@ -464,21 +509,28 @@ public class PolicyFile extends Policy {
                         error(url, in, "expecting permission class name");
                 String className = in.sval;
                 Class clazz = null;
-                try {
+            try
+              {
                     clazz = Class.forName(className);
-                } catch (ClassNotFoundException cnfe) {
                 }
+            catch (ClassNotFoundException cnfe)
+              {
+              }
                 tok = in.nextToken();
-                if (tok == ';') {
-                    if (clazz == null) {
+            if (tok == ';')
+              {
+                if (clazz == null)
+                  {
                         currentPerms.add(new UnresolvedPermission(className,
-                                null, null, (Certificate[]) currentCerts
-                                        .toArray(new Certificate[ 0])));
+		      null, null, (Certificate[]) currentCerts.toArray(new Certificate[currentCerts.size()])));
                         continue;
                     }
-                    try {
+                try
+                  {
                         currentPerms.add((Permission) clazz.newInstance());
-                    } catch (Exception x) {
+                  }
+                catch (Exception x)
+                  {
                         error(url, in, x.toString());
                     }
                     continue;
@@ -487,34 +539,43 @@ public class PolicyFile extends Policy {
                         error(url, in, "expecting permission target");
                 String target = expand(in.sval);
                 tok = in.nextToken();
-                if (tok == ';') {
-                    if (clazz == null) {
+            if (tok == ';')
+              {
+                if (clazz == null)
+                  {
                         currentPerms.add(new UnresolvedPermission(className,
-                                target, null, (Certificate[]) currentCerts
-                                        .toArray(new Certificate[ 0])));
+		      target, null, (Certificate[]) currentCerts.toArray(new Certificate[currentCerts.size()])));
                         continue;
                     }
-                    try {
-                        Constructor c = clazz
-                                .getConstructor(new Class[] { String.class});
-                        currentPerms.add((Permission) c
-                                .newInstance(new Object[] { target}));
-                    } catch (Exception x) {
+                try
+                  {
+                    Constructor c =
+                      clazz.getConstructor(new Class[] { String.class });
+                    currentPerms.add((Permission) c.newInstance(
+                      new Object[] { target }));
+                  }
+                catch (Exception x)
+                  {
                         error(url, in, x.toString());
                     }
                     continue;
                 }
-                if (tok != ',') error(url, in, "expecting ','");
+            if (tok != ',')
+              error(url, in, "expecting ','");
                 tok = in.nextToken();
-                if (tok == StreamTokenizer.TT_WORD) {
+            if (tok == StreamTokenizer.TT_WORD)
+              {
                     if (!in.sval.equalsIgnoreCase("signedBy"))
                             error(url, in, "expecting 'signedBy'");
-                    try {
-                        Constructor c = clazz
-                                .getConstructor(new Class[] { String.class});
-                        currentPerms.add((Permission) c
-                                .newInstance(new Object[] { target}));
-                    } catch (Exception x) {
+                try
+                  {
+                    Constructor c =
+                      clazz.getConstructor(new Class[] { String.class });
+                    currentPerms.add((Permission) c.newInstance(
+                      new Object[] { target }));
+                  }
+                catch (Exception x)
+                  {
                         error(url, in, x.toString());
                     }
                     in.pushBack();
@@ -523,18 +584,23 @@ public class PolicyFile extends Policy {
                 if (tok != '"' && tok != '\'')
                         error(url, in, "expecting permission action");
                 String action = in.sval;
-                if (clazz == null) {
+            if (clazz == null)
+              {
                     currentPerms.add(new UnresolvedPermission(className,
-                            target, action, (Certificate[]) currentCerts
-                                    .toArray(new Certificate[ 0])));
+		  target, action, (Certificate[]) currentCerts.toArray(new Certificate[currentCerts.size()])));
                     continue;
-                } else {
-                    try {
-                        Constructor c = clazz.getConstructor(new Class[] {
-                                String.class, String.class});
-                        currentPerms.add((Permission) c
-                                .newInstance(new Object[] { target, action}));
-                    } catch (Exception x) {
+              }
+            else
+              {
+                try
+                  {
+                    Constructor c = clazz.getConstructor(
+                      new Class[] { String.class, String.class });
+                    currentPerms.add((Permission) c.newInstance(
+                      new Object[] { target, action }));
+                  }
+                catch (Exception x)
+                  {
                         error(url, in, x.toString());
                     }
                 }
@@ -546,14 +612,18 @@ public class PolicyFile extends Policy {
     }
 
     /**
-     * Expand all instances of <code>"${property-name}"</code> into <code>System.getProperty("property-name")</code>.
+   * Expand all instances of <code>"${property-name}"</code> into
+   * <code>System.getProperty("property-name")</code>.
      */
-    private static String expand(final String s) {
+  private static String expand(final String s)
+  {
         final StringBuffer result = new StringBuffer();
         final StringBuffer prop = new StringBuffer();
         int state = 0;
-        for (int i = 0; i < s.length(); i++) {
-            switch (state) {
+    for (int i = 0; i < s.length(); i++)
+      {
+        switch (state)
+          {
             case 0:
                 if (s.charAt(i) == '$')
                     state = 1;
@@ -563,26 +633,32 @@ public class PolicyFile extends Policy {
             case 1:
                 if (s.charAt(i) == '{')
                     state = 2;
-                else {
+            else
+              {
                     state = 0;
                     result.append('$').append(s.charAt(i));
                 }
                 break;
             case 2:
-                if (s.charAt(i) == '}') {
+            if (s.charAt(i) == '}')
+              {
                     String p = prop.toString();
-                    if (p.equals("/")) p = "file.separator";
+                if (p.equals("/"))
+                  p = "file.separator";
                     p = System.getProperty(p);
-                    if (p == null) p = "";
+                if (p == null)
+                  p = "";
                     result.append(p);
                     prop.setLength(0);
                     state = 0;
-                } else
+              }
+            else
                     prop.append(s.charAt(i));
                 break;
             }
         }
-        if (state != 0) result.append('$').append('{').append(prop);
+    if (state != 0)
+      result.append('$').append('{').append(prop);
         return result.toString();
     }
 
@@ -590,7 +666,8 @@ public class PolicyFile extends Policy {
      * I miss macros.
      */
     private static void error(URL base, StreamTokenizer in, String msg)
-            throws IOException {
+    throws IOException
+  {
         throw new IOException(base + ":" + in.lineno() + ": " + msg);
     }
 }

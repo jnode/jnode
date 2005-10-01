@@ -84,6 +84,7 @@ public class JMenuItem extends AbstractButton implements Accessible,
   public JMenuItem()
   {
     super();
+    init(null, null);
   }
 
   /**
@@ -118,6 +119,7 @@ public class JMenuItem extends AbstractButton implements Accessible,
   {
     super();
     super.setAction(action);
+    init(null, null);
   }
 
   /**

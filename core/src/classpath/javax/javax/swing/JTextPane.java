@@ -179,8 +179,6 @@ public class JTextPane
 	doc.setCharacterAttributes(start, contentLength, getInputAttributes(),
 				   true);
 
-	// Set dot to new position.
-	setCaretPosition(start + contentLength);
       }
     catch (BadLocationException e)
       {

@@ -394,4 +394,89 @@ public class Utilities
     wb.setText(text);
     return wb.following(offs);
   }
+  
+  /**
+   * Get the model position of the end of the row that contains the 
+   * specified model position.  Return null if the given JTextComponent
+   * does not have a size.
+   * @param c the JTextComponent
+   * @param offs the model position
+   * @return the model position of the end of the row containing the given 
+   * offset
+   * @throws BadLocationException if the offset is invalid
+   */
+  public static final int getRowEnd(JTextComponent c, int offs)
+      throws BadLocationException
+  {
+    String text = c.getText();
+    if (text == null)
+      return -1;
+
+    // Do a binary search for the smallest position X > offs
+    // such that that character at positino X is not on the same
+    // line as the character at position offs
+    int high = offs + ((text.length() - 1 - offs) / 2);
+    int low = offs;
+    int oldHigh = text.length() + 1;
+    while (true)
+      {
+        if (c.modelToView(high).y != c.modelToView(offs).y)
+          {
+            oldHigh = high;
+            high = low + ((high + 1 - low) / 2);
+            if (oldHigh == high)
+              return high - 1;
+          }
+        else
+          {
+            low = high;
+            high += ((oldHigh - high) / 2);
+            if (low == high)
+              return low;
+          }
+      }
+  }
+      
+  /**
+   * Get the model position of the start of the row that contains the specified
+   * model position. Return null if the given JTextComponent does not have a
+   * size.
+   * 
+   * @param c the JTextComponent
+   * @param offs the model position
+   * @return the model position of the start of the row containing the given
+   *         offset
+   * @throws BadLocationException if the offset is invalid
+   */
+  public static final int getRowStart(JTextComponent c, int offs)
+      throws BadLocationException
+  {
+    String text = c.getText();
+    if (text == null)
+      return -1;
+
+    // Do a binary search for the greatest position X < offs
+    // such that the character at position X is not on the same
+    // row as the character at position offs
+    int high = offs;
+    int low = 0;
+    int oldLow = 0;
+    while (true)
+      {
+        if (c.modelToView(low).y != c.modelToView(offs).y)
+          {
+            oldLow = low;
+            low = high - ((high + 1 - low) / 2);
+            if (oldLow == low)
+              return low + 1;
+          }
+        else
+          {
+            high = low;
+            low -= ((low - oldLow) / 2);
+            if (low == high)
+              return low;
+          }
+      }
+  }
 }

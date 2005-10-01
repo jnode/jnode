@@ -222,9 +222,6 @@ public class DefaultEditorKit extends EditorKit
             {
               t.getDocument().insertString(t.getCaret().getDot(),
                                            event.getActionCommand(), null);
-              t.getCaret().setDot(Math.min(t.getCaret().getDot() + 1,
-                                           t.getDocument().getEndPosition()
-                                           .getOffset()));
             }
           catch (BadLocationException be)
             {

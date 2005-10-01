@@ -479,6 +479,18 @@ public class BasicSliderUI extends SliderUI
     /**
      * Not used.
      *
+     * @param slider not used
+     * @param dir not used
+     * @param block not used
+     */
+    public ActionScroller(JSlider slider, int dir, boolean block)
+    {
+      // Not used.
+    }
+
+    /**
+     * Not used.
+     *
      * @param event not used
      */
     public void actionPerformed(ActionEvent event)

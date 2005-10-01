@@ -509,11 +509,6 @@ public class JTable extends JComponent
   protected ListSelectionModel selectionModel;
 
   /**
-   * The accessibleContext property.
-   */
-  protected AccessibleContext accessibleContext;
-
-  /**
    * The current cell editor. 
    */
   protected TableCellEditor cellEditor;
@@ -1093,13 +1088,14 @@ public class JTable extends JComponent
     // scroll direction.
 
     if (orientation == SwingConstants.VERTICAL)
-      return rowHeight;
+      return direction * rowHeight;
     else
       {
         int sum = 0;
         for (int i = 0; i < getColumnCount(); ++i)
           sum += columnModel.getColumn(0).getWidth();
-        return getColumnCount() == 0 ? 10 : sum / getColumnCount();
+        int inc = getColumnCount() == 0 ? 10 : sum / getColumnCount();
+        return direction * inc;
       }
   }
 

@@ -69,10 +69,6 @@ import java.util.StringTokenizer;
 public class Font implements Serializable
 {
 
-/*
-	 * Static Variables
-	 */
-
 /**
 	  * Constant indicating a "plain" font.
 	  */
@@ -170,11 +166,18 @@ public static final int HANGING_BASELINE = 2;
   protected String name;
 
   /**
-   * The size of this font in pixels.
+   * The size of this font in points, rounded.
    *
    * @since 1.0
    */
   protected int size;
+
+  /**
+   * The size of this font in points.
+   *
+   * @since 1.0
+   */
+  protected float pointSize;
 
   /**
    * The style of this font -- PLAIN, BOLD, ITALIC or BOLD+ITALIC.
@@ -190,11 +193,6 @@ private static final long serialVersionUID = -4206021311591459213L;
   // The ClasspathToolkit-provided peer which implements this font
   private ClasspathFontPeer peer;
 
-/*************************************************************************/
-
-/*
-	 * Static Methods
-	 */
 
 /**
 	  * Creates a <code>Font</code> object from the specified string, which
@@ -273,25 +271,23 @@ private static final long serialVersionUID = -4206021311591459213L;
 
   /* These methods delegate to the toolkit. */
 
-  protected static ClasspathToolkit tk ()
+  static ClasspathToolkit tk()
   {
-    return (ClasspathToolkit)(Toolkit.getDefaultToolkit ());
+    return (ClasspathToolkit) Toolkit.getDefaultToolkit();
   }
 
   /* Every factory method in Font should eventually call this. */
-  protected static Font getFontFromToolkit (String name, Map attribs)
+  static Font getFontFromToolkit(String name, Map attribs)
   {
     return tk ().getFont (name, attribs);
 	}
 
   /* Every Font constructor should eventually call this. */
-  protected static ClasspathFontPeer getPeerFromToolkit (String name, Map attrs)
+  static ClasspathFontPeer getPeerFromToolkit(String name, Map attrs)
   {
     return tk ().getClasspathFontPeer (name, attrs);
   }
 
-
-/*************************************************************************/
 
 /**
 	  * Returns a <code>Font</code> object from the passed property name.
@@ -310,8 +306,6 @@ private static final long serialVersionUID = -4206021311591459213L;
     return defval;
 }
 
-/*************************************************************************/
-
 /**
 	  * Returns a <code>Font</code> object from the passed property name.
 	  *
@@ -324,12 +318,6 @@ private static final long serialVersionUID = -4206021311591459213L;
 {
     return getFont (propname, (Font)null);
 }
-
-/*************************************************************************/
-
-/*
-	 * Constructors
-	 */
 
 /**
 	  * Initializes a new instance of <code>Font</code> with the specified
@@ -346,6 +334,8 @@ private static final long serialVersionUID = -4206021311591459213L;
     ClasspathFontPeer.copyStyleToAttrs (style, attrs);
     ClasspathFontPeer.copySizeToAttrs (size, attrs);
     this.peer = getPeerFromToolkit (name, attrs);
+    this.size = size;
+    this.pointSize = (float) size;
 	}
 
   public Font (Map attrs)
@@ -353,22 +343,20 @@ private static final long serialVersionUID = -4206021311591459213L;
     this(null, attrs);
   }
 
-  /* This extra constructor is here to permit ClasspathToolkit and to build
-     a font with a "logical name" as well as attrs.  */
-  public Font (String name, Map attrs)
+  /* This extra constructor is here to permit ClasspathToolkit and to
+   build a font with a "logical name" as well as attrs.
+   ClasspathToolkit.getFont(String,Map) uses reflection to call this
+   package-private constructor. */
+  Font(String name, Map attrs)
   {
     // If attrs is null, setting it to an empty HashMap will give this
     // Font default attributes.
     if (attrs == null)
       attrs = new HashMap();
-    this.peer = getPeerFromToolkit (name, attrs);
+    peer = getPeerFromToolkit(name, attrs);
+    size = (int) peer.getSize(this);
+    pointSize = peer.getSize(this);
 	}
-
-/*************************************************************************/
-
-/*
- * Instance Methods
-	  */
 
 /**
    * Returns the logical name of the font.  A logical name is the name the
@@ -386,24 +374,26 @@ private static final long serialVersionUID = -4206021311591459213L;
     return peer.getName (this);
 }
 
-/*************************************************************************/
-
 /**
-	  * Returns the style of the font.
+   * Returns the size of the font, in typographics points (1/72 of an inch),
+   * rounded to an integer.
 	  * 
-	  * @return The font style.
+   * @return The font size
 	  */
   public int getSize ()
 {
-    return (int) peer.getSize (this);
+    return size;
 }
 
+  /**
+   * Returns the size of the font, in typographics points (1/72 of an inch).
+   * 
+   * @return The font size
+   */
   public float getSize2D ()
 {
-    return peer.getSize (this);
+    return pointSize;
 }
-
-/*************************************************************************/
 
 /**
 	  * Tests whether or not this is a plain font.  This will be true if
@@ -417,8 +407,6 @@ private static final long serialVersionUID = -4206021311591459213L;
     return peer.isPlain (this); 
 }
 
-/*************************************************************************/
-
 /**
 	  * Tests whether or not this font is bold.
 	  *
@@ -430,8 +418,6 @@ private static final long serialVersionUID = -4206021311591459213L;
     return peer.isBold (this);
 }
 
-/*************************************************************************/
-
 /**
 	  * Tests whether or not this font is italic.
 	  *
@@ -442,8 +428,6 @@ private static final long serialVersionUID = -4206021311591459213L;
 {
     return peer.isItalic (this);
 }
-
-/*************************************************************************/
 
 /**
    * Returns the family name of this font. A family name describes a design
@@ -529,8 +513,9 @@ private static final long serialVersionUID = -4206021311591459213L;
   */
   public int canDisplayUpTo (char[] text, int start, int limit)
 {
-    return peer.canDisplayUpTo 
-      (this, new StringCharacterIterator (new String (text)), start, limit);
+    return peer.canDisplayUpTo(this,
+                               new StringCharacterIterator(new String (text)),
+                               start, limit);
 }
 
 /**
@@ -617,7 +602,8 @@ private static final long serialVersionUID = -4206021311591459213L;
   *
   * @see #layoutGlyphVector(FontRenderContext, char[], int, int, int)
   */
-  public GlyphVector createGlyphVector (FontRenderContext ctx, CharacterIterator i)
+  public GlyphVector createGlyphVector(FontRenderContext ctx,
+                                       CharacterIterator i)
 {
     return peer.createGlyphVector (this, ctx, i);
 }
@@ -639,8 +625,8 @@ private static final long serialVersionUID = -4206021311591459213L;
   */
   public GlyphVector createGlyphVector (FontRenderContext ctx, char[] chars)
 {
-    return peer.createGlyphVector 
-      (this, ctx, new StringCharacterIterator (new String (chars)));
+    return peer.createGlyphVector(this, ctx,
+                               new StringCharacterIterator(new String(chars)));
 }
 
 /**
@@ -955,7 +941,8 @@ private static final long serialVersionUID = -4206021311591459213L;
   public LineMetrics getLineMetrics(char[] chars, int begin, 
                                     int limit, FontRenderContext rc)
 {
-    return peer.getLineMetrics (this, new StringCharacterIterator (new String(chars)), 
+    return peer.getLineMetrics(this,
+                               new StringCharacterIterator(new String(chars)), 
                                 begin, limit, rc);
 }
 
@@ -1083,7 +1070,8 @@ private static final long serialVersionUID = -4206021311591459213L;
   public Rectangle2D getStringBounds (String str, int begin, 
                                       int limit, FontRenderContext frc)
 {
-    return peer.getStringBounds (this, new StringCharacterIterator(str), begin, limit, frc);
+    return peer.getStringBounds(this, new StringCharacterIterator(str), begin,
+                                limit, frc);
 }
 
 /**
@@ -1139,7 +1127,8 @@ private static final long serialVersionUID = -4206021311591459213L;
   public Rectangle2D getStringBounds (char[] chars, int begin, 
                                       int limit, FontRenderContext frc)
 {
-    return peer.getStringBounds (this, new StringCharacterIterator (new String (chars)), 
+    return peer.getStringBounds(this,
+                                new StringCharacterIterator(new String(chars)), 
                                  begin, limit, frc);
 }
 
@@ -1255,34 +1244,30 @@ private static final long serialVersionUID = -4206021311591459213L;
 	  * @return <code>true</code> if the specified object is equal to this
 	  * object, <code>false</code> otherwise.
 	  */
-public boolean
-equals(Object obj)
+  public boolean equals(Object obj)
 {
 		if (obj == null)
-    return(false);
+      return false;
 
 		if (!(obj instanceof Font))
-    return(false);
+      return false;
 
   Font f = (Font)obj;
 
-  return (f.getName ().equals (this.getName ()) &&
-          f.getFamily ().equals (this.getFamily ()) &&
-          f.getFontName ().equals (this.getFontName ()) &&
-          f.getTransform ().equals (this.getTransform ()) &&
-          f.getSize() == this.getSize() &&
-          f.getStyle() == this.getStyle());
+    return (f.getName().equals(this.getName())
+            && f.getFamily().equals(this.getFamily())
+            && f.getFontName().equals(this.getFontName())
+            && f.getTransform().equals(this.getTransform ())
+            && f.getSize() == this.getSize()
+            && f.getStyle() == this.getStyle());
 } 
-
-/*************************************************************************/
 
 /**
 	  * Returns a string representation of this font.
 	  *
 	  * @return A string representation of this font.
 	  */
-public String
-toString()
+  public String toString()
 {
   String styleString = "";
 
@@ -1332,5 +1317,5 @@ toString()
     return getLineMetrics (str, 0, str.length () - 1, frc);
 	}
 
-} // class Font 
+}
 

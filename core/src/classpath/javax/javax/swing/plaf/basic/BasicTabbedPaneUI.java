@@ -1737,6 +1737,10 @@ public class BasicTabbedPaneUI extends TabbedPaneUI implements SwingConstants
     // we WANT to paint the outermost run first and then work our way in.
     int tabCount = tabPane.getTabCount();
     int currRun = 1;
+    
+    if (tabCount > runCount)
+      runCount = tabCount;
+    
     if (tabCount < 1)
       return;
 

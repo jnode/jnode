@@ -364,6 +364,18 @@ public abstract class FontMetrics implements java.io.Serializable
   }
 
   /**
+   * Returns the bounds of the largest character in a Graphics context.
+   * @param context the Graphics context object.
+   * @return a <code>Rectangle2D</code> representing the bounds
+   */
+  public Rectangle2D getMaxCharBounds(Graphics context)
+  {
+    if( context instanceof Graphics2D )
+      return font.getMaxCharBounds(((Graphics2D)context).getFontRenderContext());
+    return font.getMaxCharBounds( gRC );
+  }
+
+  /**
  * Returns a {@link LineMetrics} object constructed with the
  * specified text and the {@link FontRenderContext} of the Graphics
  * object when it is an instance of Graphics2D or a generic
@@ -423,5 +435,14 @@ public abstract class FontMetrics implements java.io.Serializable
       return ((Graphics2D) context).getFontRenderContext();
 
     return gRC;
+  }
+
+  /**
+   * Returns if the font has uniform line metrics.
+   * @see Font#hasUniformLineMetrics()
+   */
+  public boolean hasUniformLineMetrics()
+  {
+    return font.hasUniformLineMetrics();
   }
 }

@@ -40,6 +40,7 @@ package javax.swing.plaf.basic;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ItemEvent;
@@ -179,7 +180,10 @@ public class BasicComboPopup extends JPopupMenu implements ComboPopup
     int popupHeight = getPopupHeightForRowCount(comboBox.getMaximumRowCount());
 
     list.setPreferredSize(new Dimension(cbBounds.width, popupHeight));
-    super.setPopupSize(cbBounds.width, popupHeight);
+    Insets insets1 = getInsets();
+    Insets insets2 = scroller.getInsets();
+    super.setPopupSize(cbBounds.width, popupHeight + insets1.top 
+            + insets1.bottom + insets2.top + insets2.bottom);
 
     // Highlight selected item in the combo box's drop down list
     if (comboBox.getSelectedIndex() != -1)

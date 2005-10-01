@@ -87,7 +87,29 @@ public class SimpleAttributeSet
     return s;
   }
 
+  /**
+   * Returns true if the given name and value represent an attribute
+   * found either in this AttributeSet or in its resolve parent hierarchy.
+   * @param name the key for the attribute
+   * @param value the value for the attribute
+   * @return true if the attribute is found here or in this set's resolve
+   * parent hierarchy
+   */
   public boolean containsAttribute(Object name, Object value)
+  {
+    return (tab.containsKey(name) && tab.get(name).equals(value)) || 
+      (getResolveParent() != null && getResolveParent().
+       containsAttribute(name, value));
+  }
+  
+  /**
+   * Returns true if the given name and value are found in this AttributeSet.
+   * Does not check the resolve parent.
+   * @param name the key for the attribute
+   * @param value the value for the attribute
+   * @return true if the attribute is found in this AttributeSet
+   */
+  boolean containsAttributeLocally(Object name, Object value)
   {
     return tab.containsKey(name) 
       && tab.get(name).equals(value);
@@ -160,11 +182,15 @@ public class SimpleAttributeSet
   {
     return tab.isEmpty();	
   }
-        
+
+  /**
+   * Returns true if the given set has the same number of attributes
+   * as this set and <code>containsAttributes(attr)</code> returns
+   * true.
+   */
   public boolean isEqual(AttributeSet attr)
   {
-    return attr != null 
-      && attr.containsAttributes(this)
+    return getAttributeCount() == attr.getAttributeCount()
       && this.containsAttributes(attr);
   }
     
@@ -173,9 +199,21 @@ public class SimpleAttributeSet
     tab.remove(name);
   }
 
+  /**
+   * Removes attributes from this set if they are found in the 
+   * given set.  Only attributes whose key AND value are removed.
+   * Removes attributes only from this set, not from the resolving parent.
+   */
   public void removeAttributes(AttributeSet attributes)
   {
-    removeAttributes(attributes.getAttributeNames());
+    Enumeration e = attributes.getAttributeNames();
+    while (e.hasMoreElements())
+      {
+        Object name = e.nextElement();
+        Object val = attributes.getAttribute(name);
+        if (containsAttributeLocally(name, val))
+          removeAttribute(name);     
+      }
   }
 
   public void removeAttributes(Enumeration names)

@@ -121,8 +121,7 @@ public class BasicScrollPaneUI extends ScrollPaneUI
       JViewport vp = scrollpane.getViewport();
       Point viewPosition = vp.getViewPosition();
       int ypos = vsb.getValue();
-
-      if (ypos != viewPosition.x)
+      if (ypos != viewPosition.y)
         {
           viewPosition.y = ypos;
           vp.setViewPosition(viewPosition);
@@ -159,9 +158,6 @@ public class BasicScrollPaneUI extends ScrollPaneUI
       JViewport vp = scrollpane.getViewport();
       JScrollBar hsb = scrollpane.getHorizontalScrollBar();
       JScrollBar vsb = scrollpane.getVerticalScrollBar();
-      Dimension extents = vp.getExtentSize();
-      if (extents.width != hsb.getModel().getExtent()
-          || extents.height != vsb.getModel().getExtent())
         syncScrollPaneWithViewport();
     }
 
@@ -282,6 +278,7 @@ public class BasicScrollPaneUI extends ScrollPaneUI
     super.installUI(c);
     installDefaults((JScrollPane) c);
     installListeners((JScrollPane) c);
+    installKeyboardActions((JScrollPane) c);
   }
 
   /**
@@ -310,6 +307,19 @@ public class BasicScrollPaneUI extends ScrollPaneUI
     if (mouseWheelListener == null)
       mouseWheelListener = createMouseWheelListener();
     sp.addMouseWheelListener(mouseWheelListener);
+  }
+
+  /**
+   * Installs additional keyboard actions on the scrollpane. This is a hook
+   * method provided to subclasses in order to install their own keyboard
+   * actions.
+   *
+   * @param sp the scrollpane to install keyboard actions on
+   */
+  protected void installKeyboardActions(JScrollPane sp)
+  {
+    // TODO: Is this only a hook method or should we actually do something
+    // here? If the latter, than figure out what and implement this.
   }
 
   /**
@@ -367,6 +377,7 @@ public class BasicScrollPaneUI extends ScrollPaneUI
     super.uninstallUI(c);
     this.uninstallDefaults((JScrollPane)c);
     uninstallListeners((JScrollPane) c);
+    installKeyboardActions((JScrollPane) c);
   }
 
   /**
@@ -385,6 +396,19 @@ public class BasicScrollPaneUI extends ScrollPaneUI
                              .removeChangeListener(vsbChangeListener);
     sp.getViewport().removeChangeListener(viewportChangeListener);
     sp.removeMouseWheelListener(mouseWheelListener);
+  }
+
+  /**
+   * Uninstalls all keyboard actions from the JScrollPane that have been
+   * installed by {@link #installKeyboardActions}. This is a hook method
+   * provided to subclasses to add their own keyboard actions.
+   *
+   * @param sp the scrollpane to uninstall keyboard actions from
+   */
+  protected void uninstallKeyboardActions(JScrollPane sp)
+  {
+    // TODO: Is this only a hook method or should we actually do something
+    // here? If the latter, than figure out what and implement this.
   }
 
   public Dimension getMinimumSize(JComponent c) 
@@ -406,10 +430,18 @@ public class BasicScrollPaneUI extends ScrollPaneUI
   protected void syncScrollPaneWithViewport()
   {
     JViewport vp = scrollpane.getViewport();
-    JScrollBar vsb = scrollpane.getVerticalScrollBar();
+
+    // Update the horizontal scrollbar.
     JScrollBar hsb = scrollpane.getHorizontalScrollBar();
-    hsb.getModel().setExtent(vp.getExtentSize().width);
-    vsb.getModel().setExtent(vp.getExtentSize().height);
+    hsb.setMaximum(vp.getViewSize().width);
+    hsb.setValue(vp.getViewPosition().x);
+    hsb.setVisibleAmount(vp.getExtentSize().width);
+    
+    // Update the vertical scrollbar.
+    JScrollBar vsb = scrollpane.getVerticalScrollBar();
+    vsb.setMaximum(vp.getViewSize().height);
+    vsb.setValue(vp.getViewPosition().y);
+    vsb.setVisibleAmount(vp.getExtentSize().height);
   }
 
   /**
