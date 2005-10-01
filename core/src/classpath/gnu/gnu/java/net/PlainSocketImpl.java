@@ -62,9 +62,9 @@ import gnu.classpath.Configuration;
  * combination of Java and native routines to implement standard BSD
  * style sockets of family AF_INET and types SOCK_STREAM and SOCK_DGRAM
  *
- * @author Per Bothner <bothner@cygnus.com>
- * @author Nic Ferrier <nferrier@tapsellferrier.co.uk>
- * @author Aaron M. Renn <arenn@urbanophile.com>
+ * @author Per Bothner (bothner@cygnus.com)
+ * @author Nic Ferrier (nferrier@tapsellferrier.co.uk)
+ * @author Aaron M. Renn (arenn@urbanophile.com)
  */
 public final class PlainSocketImpl extends SocketImpl
 {
@@ -164,6 +164,7 @@ public final class PlainSocketImpl extends SocketImpl
    */
   public void setOption(int optID, Object value) throws SocketException {
       // @vm-specific no natives
+      //TODO implement me      
       throw new SocketException("Not implemented");
   }
 
@@ -180,16 +181,33 @@ public final class PlainSocketImpl extends SocketImpl
    */
   public Object getOption(int optID) throws SocketException {
       // @vm-specific no natives
+      //TODO implement me      
       throw new SocketException("Not implemented");
   }
 
+  /**
+   * Flushes the input stream and closes it. If you read from the input stream
+   * after calling this method a <code>IOException</code> will be thrown.
+   * 
+   * @throws IOException if an error occurs
+   */
   public void shutdownInput()
   {
+      // @vm-specific no natives
+      //TODO implement me        
     throw new InternalError ("PlainSocketImpl::shutdownInput not implemented");
   }
 
-  public void shutdownOutput()
+  /**
+   * Flushes the output stream and closes it. If you write to the output stream
+   * after calling this method a <code>IOException</code> will be thrown.
+   * 
+   * @throws IOException if an error occurs
+   */
+  public void shutdownOutput() throws IOException
   {
+      // @vm-specific no natives
+      //TODO implement me        
     throw new InternalError ("PlainSocketImpl::shutdownOutput not implemented");
   }
 
@@ -203,6 +221,7 @@ public final class PlainSocketImpl extends SocketImpl
    */
   protected synchronized void create(boolean stream) throws IOException {
       // @vm-specific no natives
+      //TODO implement me            
       throw new SocketException("Not implemented");
   }
 
@@ -229,6 +248,7 @@ public final class PlainSocketImpl extends SocketImpl
    */
   protected void connect(InetAddress addr, int port) throws IOException {
       // @vm-specific no natives
+      //TODO implement me                  
       throw new SocketException("Not implemented");
   }
 
@@ -295,6 +315,7 @@ public final class PlainSocketImpl extends SocketImpl
   protected synchronized void listen(int queuelen)
     throws IOException {
       // @vm-specific no natives
+      //TODO implement me            
       throw new SocketException("Not implemented");
   }
 
@@ -307,6 +328,7 @@ public final class PlainSocketImpl extends SocketImpl
   protected synchronized void accept(SocketImpl impl)
     throws IOException {
       // @vm-specific no natives
+      //TODO implement me            
       throw new SocketException("Not implemented");
   }
 
@@ -320,6 +342,7 @@ public final class PlainSocketImpl extends SocketImpl
    */
   protected int available() throws IOException {
       // @vm-specific no natives
+      //TODO implement me            
       throw new SocketException("Not implemented");
   }
 
@@ -334,6 +357,7 @@ public final class PlainSocketImpl extends SocketImpl
    */
   protected void close() throws IOException {
       // @vm-specific no natives
+      //TODO implement me            
       throw new SocketException("Not implemented");
   }
 
@@ -354,6 +378,7 @@ public final class PlainSocketImpl extends SocketImpl
   protected int read(byte[] buf, int offset, int len)
     throws IOException {
       // @vm-specific no natives
+      //TODO implement me            
       throw new SocketException("Not implemented");
 
   }
@@ -368,6 +393,7 @@ public final class PlainSocketImpl extends SocketImpl
   protected void write(byte[] buf, int offset, int len)
     throws IOException {
       // @vm-specific no natives
+      //TODO implement me            
       throw new SocketException("Not implemented");
   }
 
@@ -407,7 +433,7 @@ public final class PlainSocketImpl extends SocketImpl
    * This class contains an implementation of <code>InputStream</code> for 
    * sockets.  It in an internal only class used by <code>PlainSocketImpl</code>.
    *
-   * @author Nic Ferrier <nferrier@tapsellferrier.co.uk>
+   * @author Nic Ferrier (nferrier@tapsellferrier.co.uk)
    */
   final class SocketInputStream
     extends InputStream
@@ -477,7 +503,7 @@ public final class PlainSocketImpl extends SocketImpl
    * <code>getOutputStream method</code>.  It expects only to  be used in that
    * context.
    *
-   * @author Nic Ferrier  <nferrier@tapsellferrier.co.uk>
+   * @author Nic Ferrier (nferrier@tapsellferrier.co.uk)
    */
   final class SocketOutputStream
     extends OutputStream
