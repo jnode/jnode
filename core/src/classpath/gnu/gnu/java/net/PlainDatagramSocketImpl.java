@@ -65,15 +65,8 @@ import gnu.classpath.Configuration;
  */
 public final class PlainDatagramSocketImpl extends DatagramSocketImpl
 {
-  // Static initializer to load native library
-  static
-  {
-    if (Configuration.INIT_LOAD_LIBRARY)
-      {
-        System.loadLibrary("javanet");
-      }
-  }
-  
+   // @vm-specific removed System.loadLibrary
+   
   /**
    * Option id for the IP_TTL (time to live) value.
    */
@@ -125,8 +118,10 @@ public final class PlainDatagramSocketImpl extends DatagramSocketImpl
    * @exception SocketException If an error occurs
    */
   protected synchronized void bind(int port, InetAddress addr)
-    throws SocketException {
+    throws SocketException
+  {
       // @vm-specific no natives
+      //TODO implement me
       throw new SocketException("Not implemented");
   }
 
@@ -137,6 +132,7 @@ public final class PlainDatagramSocketImpl extends DatagramSocketImpl
    */
   protected synchronized void create() throws SocketException {
       // @vm-specific no natives
+      //TODO implement me
       throw new SocketException("Not implemented");
   }
 
@@ -184,6 +180,7 @@ public final class PlainDatagramSocketImpl extends DatagramSocketImpl
                               byte[] buf, int offset, int len)
     throws IOException {
       // @vm-specific no natives
+      //TODO implement me      
       throw new SocketException("Not implemented");
   }
 
@@ -229,6 +226,7 @@ public final class PlainDatagramSocketImpl extends DatagramSocketImpl
    */
   private void receive0(DatagramPacket packet) throws IOException {
       // @vm-specific no natives
+      //TODO implement me      
       throw new SocketException("Not implemented");
   }
 
@@ -243,6 +241,7 @@ public final class PlainDatagramSocketImpl extends DatagramSocketImpl
   public synchronized void setOption(int option_id, Object val)
     throws SocketException {
       // @vm-specific no natives
+      //TODO implement me      
       throw new SocketException("Not implemented");
   }
 
@@ -258,6 +257,7 @@ public final class PlainDatagramSocketImpl extends DatagramSocketImpl
   public synchronized Object getOption(int option_id)
     throws SocketException {
       // @vm-specific no natives
+      //TODO implement me      
       throw new SocketException("Not implemented");
   }
 
@@ -266,6 +266,7 @@ public final class PlainDatagramSocketImpl extends DatagramSocketImpl
    */
   protected synchronized void close() {
       // @vm-specific no natives
+      //TODO implement me      
       throw new RuntimeException("Not implemented");
   }
 
@@ -318,6 +319,7 @@ public final class PlainDatagramSocketImpl extends DatagramSocketImpl
    */
   protected synchronized void leave(InetAddress addr) throws IOException {
       // @vm-specific no natives
+      //TODO implement me      
       throw new SocketException("Not implemented");
   }
 
