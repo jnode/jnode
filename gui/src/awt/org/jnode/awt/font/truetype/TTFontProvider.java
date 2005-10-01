@@ -65,6 +65,8 @@ public class TTFontProvider implements FontProvider {
 	 * @return True if this provider provides the given font, false otherwise
 	 */
 	public boolean provides(Font font) {
+        if(font == null) return false; // don't provide default (null) fonts 
+            
 		if (!fontsLoaded) {
 			loadFonts();
 		}
