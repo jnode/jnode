@@ -111,7 +111,7 @@ public abstract class ColorModel implements Transparency
 	 * Constructs the default color model.  The default color model 
 	 * can be obtained by calling <code>getRGBdefault</code> of this
 	 * class.
-	 * @param b the number of bits wide used for bit size of pixel values
+   * @param bits the number of bits wide used for bit size of pixel values
 	 */
   public ColorModel(int bits)
   {
