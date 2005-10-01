@@ -34,7 +34,10 @@ or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
+
 package javax.swing.text.html;
+
+import java.util.HashMap;
 
 /**
  * Provides CSS attributes to be used by the HTML view classes. The constants
@@ -45,6 +48,30 @@ package javax.swing.text.html;
  */
 public class CSS
 {
+  /**
+   * Returns an array of all CSS attributes.
+   *
+   * @return All available CSS.Attribute objects.
+   */
+  public static CSS.Attribute[] getAllAttributeKeys()
+  {
+    Object[] src = Attribute.attributeMap.values().toArray();
+    CSS.Attribute[] dst = new CSS.Attribute[ src.length ];
+    System.arraycopy(src, 0, dst, 0, src.length);
+    return dst;
+  }
+
+  /**
+   * Returns an a given CSS attribute.
+   *
+   * @param name - The name of the attribute.
+   * @return The CSS attribute with the given name, or <code>null</code> if
+   * no attribute with that name exists.
+   */
+  public static CSS.Attribute getAttribute(String name)
+  {
+    return (CSS.Attribute)Attribute.attributeMap.get( name );
+  }
 
   public static final class Attribute
   {
@@ -377,6 +404,11 @@ public class CSS
     String defaultValue;
 
     /**
+     * A HashMap of all attributes.
+     */
+    static HashMap attributeMap;
+
+    /**
      * Creates a new Attribute instance with the specified values.
      *
      * @param attr the attribute string
@@ -388,6 +420,9 @@ public class CSS
       attStr = attr;
       isInherited = inherited;
       defaultValue = def;
+      if( attributeMap == null)
+	attributeMap = new HashMap();
+      attributeMap.put( attr, this );
     }
 
     /**
