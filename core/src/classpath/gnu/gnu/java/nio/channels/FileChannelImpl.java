@@ -90,12 +90,17 @@ public final class FileChannelImpl extends FileChannel
   {
   }
 
-  public static FileChannelImpl create(File file, int mode) throws FileNotFoundException {
-      return new FileChannelImpl(file, mode);
+  /* Open a file.  MODE is a combination of the above mode flags. */
+  /* This is a static factory method, so that VM implementors can decide
+   * substitute subclasses of FileChannelImpl. */
+  public static FileChannelImpl create(File file, int mode)
+    throws FileNotFoundException
+  {
+    return new FileChannelImpl(file, mode);
   }
 
-  /* Open a file.  MODE is a combination of the above mode flags. */
-  public FileChannelImpl (File file, int mode) throws FileNotFoundException
+  private FileChannelImpl(File file, int mode)
+    throws FileNotFoundException
   {
     final String path = file.getPath();
     fh = open (path, mode);
@@ -197,7 +202,7 @@ public final class FileChannelImpl extends FileChannel
     throws IOException
   {
     if (position < 0)
-      throw new IllegalArgumentException ();
+      throw new IllegalArgumentException ("position: " + position);
     long oldPosition = implPosition ();
     position (position);
     int result = read(dst);
@@ -255,7 +260,7 @@ public final class FileChannelImpl extends FileChannel
     throws IOException
   {
     if (position < 0)
-      throw new IllegalArgumentException ();
+      throw new IllegalArgumentException ("position: " + position);
 
     if (!isOpen ())
       throw new ClosedChannelException ();
@@ -322,10 +327,11 @@ public final class FileChannelImpl extends FileChannel
 	  throw new NonWritableChannelException();
       }
     else
-      throw new IllegalArgumentException ();
+      throw new IllegalArgumentException ("mode: " + mode);
     
     if (position < 0 || size < 0 || size > Integer.MAX_VALUE)
-      throw new IllegalArgumentException ();
+      throw new IllegalArgumentException ("position: " + position
+					  + ", size: " + size);
     return mapImpl(nmode, position, (int) size);
   }
 
@@ -336,6 +342,14 @@ public final class FileChannelImpl extends FileChannel
   {
     if (!isOpen ())
       throw new ClosedChannelException ();
+
+    force ();
+  }
+
+  private void force ()
+  {
+  	// @vm-specific
+  	//TODO implement me
   }
 
   // like transferTo, but with a count of less than 2Gbytes
@@ -459,15 +473,16 @@ public final class FileChannelImpl extends FileChannel
   {
     if (position < 0
         || size < 0)
-      throw new IllegalArgumentException ();
+      throw new IllegalArgumentException ("position: " + position
+					  + ", size: " + size);
 
     if (!isOpen ())
       throw new ClosedChannelException ();
 
-    if (shared && (mode & READ) == 0)
+    if (shared && ((mode & READ) == 0))
       throw new NonReadableChannelException ();
 	
-    if (!shared && (mode & WRITE) == 0)
+    if (!shared && ((mode & WRITE) == 0))
       throw new NonWritableChannelException ();
 	
     boolean completed = false;
