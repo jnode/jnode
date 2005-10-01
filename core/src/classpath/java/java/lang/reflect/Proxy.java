@@ -111,8 +111,8 @@ import java.util.Set;
  *      the only way to create an instance of the proxy class.</li>
  *  <li>The proxy class contains a single constructor, which takes as
  *      its only argument an {@link InvocationHandler}.  The method
- *      {@link #newInstance} is shorthand to do the necessary
- *      reflection.</li>
+ *      {@link #newProxyInstance(ClassLoader, Class[], InvocationHandler)}
+ *      is shorthand to do the necessary reflection.</li>
  * </ul>
  *
  * <h3>Proxy Instances</h3>
