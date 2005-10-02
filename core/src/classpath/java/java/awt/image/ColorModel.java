@@ -115,9 +115,12 @@ public abstract class ColorModel implements Transparency
 	 */
   public ColorModel(int bits)
   {
-      // @classpath-bugfix Fix difference between Sun's class and this class. 
-    this(bits, // total bits, sRGB, four channels
+     // @classpath-bugfix Fix difference between Sun's class and this class. 
+     //this(bits * 4, // total bits, sRGB, four channels
+     this(bits, // total bits, sRGB, four channels
+	 //nArray(bits, 4), // bits for each channel      
 	 nArray(bits / 4, 4), // bits for each channel
+	 // @classpath-bugfix-end	 
 	 ColorSpace.getInstance(ColorSpace.CS_sRGB), // sRGB
 	 true, // has alpha
 	 false, // not premultiplied

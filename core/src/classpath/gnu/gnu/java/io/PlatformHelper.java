@@ -104,6 +104,7 @@ public class PlatformHelper
   {
       // @classpath-bugfix For the root, return the path itself (the remaining code will fail)
       if(isRootDirectory(path)) return path;
+      // @classpath-bugfix-end
       
     /*??
     if(path.indexOf('.') < 0 && path.indexOf("..") < 0)

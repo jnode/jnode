@@ -519,8 +519,10 @@ public abstract class Toolkit
     try
       {
         // @classpath-bugfix   Replace Class.forName
+        //Class cls = Class.forName(toolkit_name);
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         Class cls = cl.loadClass(toolkit_name);
+        // @classpath-bugfix-end
 			Object obj = cls.newInstance();
 			if (!(obj instanceof Toolkit))
           throw new AWTError(toolkit_name + " is not a subclass of " +
@@ -539,13 +541,14 @@ public abstract class Toolkit
 		}
 	}
 
+  // @classpath-bugfix
   /**
    * Flush a previously instantiate toolkit.
-   * @classpath-bugfix
    */
   protected static void clearDefaultToolkit() {
       toolkit = null;
   }
+  // @classpath-bugfix-end
   
 	/**
    * Returns an image from the specified file, which must be in a

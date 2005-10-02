@@ -233,10 +233,11 @@ abstract class DirectByteBufferImpl extends ByteBuffer
   {
     int pos = position();
     // @classpath-bugfix Changed mark detection
-//    reset();
-//    int mark = position();
-//    position(pos);
+	//reset();
+	//int mark = position();
+	//position(pos);
     int mark = this.mark;
+    // @classpath-bugfix-end
     DirectByteBufferImpl result;
     if (readOnly)
         result = new DirectByteBufferImpl.ReadOnly(owner, address, capacity(),
@@ -246,7 +247,9 @@ abstract class DirectByteBufferImpl extends ByteBuffer
                                                     limit(), pos);
 
     // @classpath-bugfix Added mark >= 0
+    // if (mark != pos)
     if ((mark != pos) && (mark >= 0))
+    // @classpath-bugfix-end
       {
 	result.position(mark);
 	result.mark();

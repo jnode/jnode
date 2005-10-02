@@ -176,12 +176,18 @@ public class DatagramSocket
 	 */
   public DatagramSocket(SocketAddress address) throws SocketException
   {
-      // @classpath-bugfix Security
+    // @classpath-bugfix Security
+    //String propVal = SystemProperties.getProperty("impl.prefix");
+    //if (propVal == null || propVal.equals(""))
     String propVal = (String)AccessController.doPrivileged(new GetPropertyAction("impl.prefix"));
-    if (factory != null) {
-        // @classpath-bugfix Use factory
+    // @classpath-bugfix-end
+    
+    // @classpath-bugfix Use factory
+    //if (propVal == null || propVal.equals(""))
+    if (factory != null) {        
         impl = factory.createDatagramSocketImpl();
     } else if (propVal == null || propVal.equals(""))
+    // @classpath-bugfix-end
       impl = new PlainDatagramSocketImpl();
     else
       try
