@@ -142,6 +142,8 @@ import java.util.StringTokenizer;
  * @author Casey Marshall (rsdio@metastatic.org)
  * @see java.security.Policy
  */
+
+// @vm-specific
 public class PolicyFile extends Policy {
 
     // Constants and fields.
