@@ -62,13 +62,15 @@ import java.io.Serializable;
  *
  * @author Original author unknown
  * @author Eric Blake (ebb9@email.byu.edu)
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @see Collection
  * @see Set
  * @see List
  * @see Map
  * @see Arrays
  * @since 1.2
- * @status updated to 1.4
+ * @status updated to 1.5
  */
 public class Collections
 {
@@ -107,6 +109,20 @@ public class Collections
    * @see Serializable
    */
   public static final Set EMPTY_SET = new EmptySet();
+
+  /**
+   * Returns an immutable, serializable parameterized empty set.
+   * Unlike the constant <code>EMPTY_SET</code>, the set returned by
+   * this method is type-safe.
+   *
+   * @return an empty parameterized set.
+   * @since 1.5
+   */
+  public static final <T> Set<T> emptySet()
+  {
+    /* FIXME: Could this be optimized? */
+    return new EmptySet<T>();
+  }
 
   /**
    * The implementation of {@link #EMPTY_SET}. This class name is required
@@ -261,6 +277,20 @@ public class Collections
    * @see RandomAccess
    */
   public static final List EMPTY_LIST = new EmptyList();
+
+  /**
+   * Returns an immutable, serializable parameterized empty list.
+   * Unlike the constant <code>EMPTY_LIST</code>, the list returned by
+   * this method is type-safe.
+   *
+   * @return an empty parameterized list.
+   * @since 1.5
+   */
+  public static final <T> List<T> emptyList()
+  {
+    /* FIXME: Could this be optimized? */
+    return new EmptyList<T>();
+  }
 
   /**
    * The implementation of {@link #EMPTY_LIST}. This class name is required
@@ -439,6 +469,20 @@ public class Collections
    * @see Serializable
    */
   public static final Map EMPTY_MAP = new EmptyMap();
+
+  /**
+   * Returns an immutable, serializable parameterized empty map.
+   * Unlike the constant <code>EMPTY_MAP</code>, the map returned by
+   * this method is type-safe.
+   *
+   * @return an empty parameterized map.
+   * @since 1.5
+   */
+  public static final <K,V> Map<K,V> emptyMap()
+  {
+    /* FIXME: Could this be optimized? */
+    return new EmptyMap<K,V>();
+  }
 
   /**
    * The implementation of {@link #EMPTY_MAP}. This class name is required
@@ -1151,6 +1195,33 @@ public class Collections
   }
 
   /**
+   * Get a comparator that implements the reverse of the ordering
+   * specified by the given Comparator. If the Comparator is null,
+   * this is equivalent to {@link #reverseOrder()}.  The return value
+   * of this method is Serializable, if the specified Comparator is
+   * either Serializable or null.
+   *
+   * @param c the comparator to invert
+   * @return a comparator that imposes reverse ordering
+   * @see Comparable
+   * @see Serializable
+   *
+   * @since 1.5
+   */
+  public static <T> Comparator<T> reverseOrder(final Comparator<T> c)
+  {
+    if (c == null)
+      return (Comparator<T>) rcInstance;
+    return new ReverseComparator<T> ()
+    {
+      public int compare(T a, T b)
+      {
+	return - c.compare(a, b);
+      }
+    };
+  }
+
+  /**
    * Get a comparator that implements the reverse of natural ordering. In
    * other words, this sorts Comparable objects opposite of how their
    * compareTo method would sort. This makes it easy to sort into reverse
@@ -1177,7 +1248,7 @@ public class Collections
    *
    * @author Eric Blake (ebb9@email.byu.edu)
    */
-  private static final class ReverseComparator<T>
+  private static class ReverseComparator<T>
     implements Comparator<T>, Serializable
   {
     /**
@@ -1235,8 +1306,7 @@ public class Collections
    * @throws UnsupportedOperationException if the list does not support set
    * @since 1.4
    */
-  /* FIXME: type should be List<?> but we can't do anything with this */
-  public static void rotate(List<? super Object> list, int distance)
+  public static void rotate(List<?> list, int distance)
   {
     int size = list.size();
     if (size == 0)
@@ -1269,12 +1339,13 @@ public class Collections
 
         // Now, make the swaps. We must take the remainder every time through
         // the inner loop so that we don't overflow i to negative values.
+	List<Object> objList = (List<Object>) list;
         while (--lcm >= 0)
           {
-            Object o = list.get(lcm);
+            Object o = objList.get(lcm);
             for (int i = lcm + distance; i != lcm; i = (i + distance) % size)
-              o = list.set(i, o);
-            list.set(lcm, o);
+              o = objList.set(i, o);
+            objList.set(lcm, o);
           }
       }
   }
@@ -1300,8 +1371,7 @@ public class Collections
    * @throws UnsupportedOperationException if l.listIterator() does not
    *         support the set operation
    */
-  /* FIXME: type should be List<?> but we can't do anything with this */
-  public static void shuffle(List<? super Object> l)
+  public static void shuffle(List<?> l)
   {
     if (defaultRandom == null)
       {
@@ -1344,16 +1414,16 @@ public class Collections
    * @throws UnsupportedOperationException if l.listIterator() does not
    *         support the set operation
    */
-  /* FIXME: type should be List<?> but we can't do anything with this */
-  public static void shuffle(List<? super Object> l, Random r)
+  public static void shuffle(List<?> l, Random r)
   {
     int lsize = l.size();
-    ListIterator i = ((List) l).listIterator(lsize);
+    List<Object> list = (List<Object>) l;
+    ListIterator<Object> i = list.listIterator(lsize);
     boolean sequential = isSequential(l);
     Object[] a = null; // stores a copy of the list for the sequential case
 
     if (sequential)
-      a = l.toArray();
+      a = list.toArray();
 
     for (int pos = lsize - 1; pos > 0; --pos)
       {
@@ -1369,10 +1439,92 @@ public class Collections
             a[swap] = i.previous();
           }
         else
-          o = l.set(swap, i.previous());
+          o = list.set(swap, i.previous());
 
 	i.set(o);
       }
+  }
+
+  /**
+   * Returns the frequency of the specified object within the supplied
+   * collection.  The frequency represents the number of occurrences of
+   * elements within the collection which return <code>true</code> when
+   * compared with the object using the <code>equals</code> method.
+   * 
+   * @param c the collection to scan for occurrences of the object.
+   * @param o the object to locate occurrances of within the collection.
+   * @throws NullPointerException if the collection is <code>null</code>.
+   * @since 1.5 
+   */
+  public static int frequency (Collection<?> c, Object o)
+  {
+    int result = 0;
+    for (Object v : c)
+      {
+	if (AbstractCollection.equals(o, v))
+	  ++result;
+      }
+    return result;
+  }
+
+  /**
+   * Adds all the specified elements to the given collection, in a similar
+   * way to the <code>addAll</code> method of the <code>Collection</code>.
+   * However, this is a variable argument method which allows the new elements
+   * to be specified individually or in array form, as opposed to the list
+   * required by the collection's <code>addAll</code> method.  This has
+   * benefits in both simplicity (multiple elements can be added without
+   * having to be wrapped inside a grouping structure) and efficiency
+   * (as a redundant list doesn't have to be created to add an individual
+   * set of elements or an array).
+   *
+   * @param c the collection to which the elements should be added.
+   * @param a the elements to be added to the collection.
+   * @return true if the collection changed its contents as a result.
+   * @throws UnsupportedOperationException if the collection does not support
+   *                                       addition.
+   * @throws NullPointerException if one or more elements in a are null,
+   *                              and the collection does not allow null
+   *                              elements.  This exception is also thrown
+   *                              if either <code>c</code> or <code>a</code>
+   *                              are null.
+   * @throws IllegalArgumentException if the collection won't allow an element
+   *                                  to be added for some other reason.
+   * @since 1.5
+   */
+  public static <T> boolean addAll(Collection<? super T> c, T... a)
+  {
+    boolean overall = false;
+
+    for (T element : a)
+      {
+	boolean result = c.add(element);
+	if (result)
+	  overall = true;
+      }
+    return overall;
+  }
+
+  /**
+   * Returns true if the two specified collections have no elements in
+   * common.  This method may give unusual results if one or both collections
+   * use a non-standard equality test.  In the trivial case of comparing
+   * a collection with itself, this method returns true if, and only if,
+   * the collection is empty.
+   *
+   * @param c1 the first collection to compare.
+   * @param c2 the second collection to compare.
+   * @return true if the collections are disjoint.
+   * @throws NullPointerException if either collection is null.
+   * @since 1.5
+   */
+  public static boolean disjoint(Collection<?> c1, Collection<?> c2)
+  {
+    Collection<Object> oc1 = (Collection<Object>) c1;
+    for (Object o : oc1)
+      if (c2.contains(o))
+	return false;
+    return true;
   }
 
 
@@ -1740,8 +1892,8 @@ public class Collections
   }
 
   /**
-   * The implementation of {@link #singletonMap(Object)}. This class name
-   * is required for compatibility with Sun's JDK serializability.
+   * The implementation of {@link #singletonMap(Object, Object)}. This class
+   * name is required for compatibility with Sun's JDK serializability.
    *
    * @author Eric Blake (ebb9@email.byu.edu)
    */
@@ -1967,10 +2119,10 @@ public class Collections
    *         list.size()
    * @since 1.4
    */
-  /* FIXME: type should be List<?> but we can't do anything with this */
-  public static void swap(List<? super Object> l, int i, int j)
+  public static void swap(List<?> l, int i, int j)
   {
-    l.set(i, l.set(j, l.get(i)));
+    List<Object> list = (List<Object>) l;
+    list.set(i, list.set(j, list.get(i)));
   }
 
 
@@ -2531,12 +2683,13 @@ public class Collections
     }
 
   /**
-   * Add an element to the end of the underlying list (optional operation).
-   * If the list imposes restraints on what can be inserted, such as no null
-   * elements, this should be documented.  A lock is obtained on the mutex before
-   * any of the elements are added.
+   * Add the contents of a collection to the underlying list at the given
+   * index (optional operation).  If the list imposes restraints on what 
+   * can be inserted, such as no null elements, this should be documented.
+   * A lock is obtained on the mutex before any of the elements are added.
    *
-   * @param o the object to add
+   * @param index the index at which to insert
+   * @param c the collection to add
    * @return <code>true</code>, as defined by Collection for a modified list
    * @throws UnsupportedOperationException if this list does not support the
    *         add operation
@@ -3877,7 +4030,7 @@ public class Collections
     /**
      * Called only by trusted code to specify the mutex as well as the set.
      * @param sync the mutex
-     * @param l the list
+     * @param ss the set
      */
     SynchronizedSortedSet(Object sync, SortedSet<T> ss)
     {
@@ -5514,18 +5667,1714 @@ public class Collections
     }
   } // class UnmodifiableSortedSet
 
-  // @classpath-bugfix Added missing method
-  public static final <T> List<T> emptyList() {
-      return EMPTY_LIST;
+  /**
+   * <p> 
+   * Returns a dynamically typesafe view of the given collection,
+   * where any modification is first checked to ensure that the type
+   * of the new data is appropriate.  Although the addition of
+   * generics and parametrically-typed collections prevents an
+   * incorrect type of element being added to a collection at
+   * compile-time, via static type checking, this can be overridden by
+   * casting.  In contrast, wrapping the collection within a
+   * dynamically-typesafe wrapper, using this and associated methods,
+   * <emph>guarantees</emph> that the collection will only contain
+   * elements of an appropriate type (provided it only contains such
+   * at the type of wrapping, and all subsequent access is via the
+   * wrapper).  This can be useful for debugging the cause of a
+   * <code>ClassCastException</code> caused by erroneous casting, or
+   * for protecting collections from corruption by external libraries.
+   * </p>
+   * <p> 
+   * Since the collection might be a List or a Set, and those
+   * have incompatible equals and hashCode requirements, this relies
+   * on Object's implementation rather than passing those calls on to
+   * the wrapped collection. The returned Collection implements
+   * Serializable, but can only be serialized if the collection it
+   * wraps is likewise Serializable.
+   * </p>
+   * 
+   * @param c the collection to wrap in a dynamically typesafe wrapper
+   * @param type the type of elements the collection should hold.
+   * @return a dynamically typesafe view of the collection.
+   * @see Serializable
+   * @since 1.5
+   */
+  public static <E> Collection<E> checkedCollection(Collection<E> c,
+						    Class<E> type)
+  {
+    return new CheckedCollection<E>(c, type);
   }
 
-  // @classpath-bugfix Added missing method
-  public static final <K,V> Map<K,V> emptyMap() {
-      return EMPTY_MAP;
+  /**
+   * The implementation of {@link #checkedCollection(Collection,Class)}. This
+   * class name is required for compatibility with Sun's JDK serializability.
+   *
+   * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+   * @since 1.5
+   */
+  private static class CheckedCollection<E>
+    implements Collection<E>, Serializable
+  {
+    /**
+     * Compatible with JDK 1.5.
+     */
+    private static final long serialVersionUID = 1578914078182001775L;
+    
+    /**
+     * The wrapped collection. Package visible for use by subclasses.
+     * @serial the real collection
+     */
+    final Collection<E> c;
+
+    /**
+     * The type of the elements of this collection.
+     * @serial the element type.
+     */
+    final Class<E> type;
+
+    /**
+     * Wrap a given collection.
+     * @param c the collection to wrap
+     * @param type the type to wrap
+     * @throws NullPointerException if c is null
+     */
+    CheckedCollection(Collection<E> c, Class<E> type)
+    {
+      this.c = c;
+      this.type = type;
+      if (c == null)
+        throw new NullPointerException();
+    }
+
+    /**
+     * Adds the supplied object to the collection, on the condition that
+     * it is of the correct type.
+     *
+     * @param o the object to add.
+     * @return <code>true</code> if the collection was modified as a result
+     *                           of this action.
+     * @throws ClassCastException if the object is not of the correct type.
+     */
+    public boolean add(E o)
+    {
+      if (type.isInstance(o))
+	return c.add(o);
+      else
+	throw new ClassCastException("The element is of the incorrect type.");
+    }
+
+    /**
+     * Adds the elements of the specified collection to the backing collection,
+     * provided they are all of the correct type.
+     *
+     * @param coll the collection to add.
+     * @return <code>true</code> if the collection was modified as a result
+     *                           of this action.
+     * @throws ClassCastException if <code>c</code> contained elements of an
+     *                            incorrect type.
+     */
+    public boolean addAll(Collection<? extends E> coll)
+    {
+      Collection<E> typedColl = (Collection<E>) c;
+      for (E element : typedColl)
+	{
+	  if (!type.isInstance(element))
+	    throw new ClassCastException("A member of the collection is not of the correct type.");
+	}
+      return c.addAll(typedColl);
+    }
+
+    /**
+     * Removes all elements from the underlying collection.
+     */
+    public void clear()
+    {
+      c.clear();
+    }
+
+    /**
+     * Test whether the underlying collection contains a given object as one
+     * of its elements.
+     *
+     * @param o the element to look for.
+     * @return <code>true</code> if the underlying collection contains at least
+     *         one element e such that
+     *         <code>o == null ? e == null : o.equals(e)</code>.
+     * @throws ClassCastException if the type of o is not a valid type for the
+     *         underlying collection.
+     * @throws NullPointerException if o is null and the underlying collection
+     *         doesn't support null values.
+     */
+    public boolean contains(Object o)
+    {
+      return c.contains(o);
+    }
+
+    /**
+     * Test whether the underlying collection contains every element in a given
+     * collection.
+     *
+     * @param coll the collection to test for.
+     * @return <code>true</code> if for every element o in c, contains(o) would
+     *         return <code>true</code>.
+     * @throws ClassCastException if the type of any element in c is not a
+     *                            valid type for the underlying collection.
+     * @throws NullPointerException if some element of c is null and the
+     *                              underlying collection does not support
+     *                              null values.
+     * @throws NullPointerException if c itself is null.
+     */
+    public boolean containsAll(Collection<?> coll)
+    {
+      return c.containsAll(coll);
+    }
+
+    /**
+     * Tests whether the underlying collection is empty, that is,
+     * if size() == 0.
+     *
+     * @return <code>true</code> if this collection contains no elements.
+     */
+    public boolean isEmpty()
+    {
+      return c.isEmpty();
+    }
+
+    /**
+     * Obtain an Iterator over the underlying collection, which maintains
+     * its checked nature.
+     *
+     * @return a Iterator over the elements of the underlying
+     *         collection, in any order.
+     */
+    public Iterator<E> iterator()
+    {
+      return new CheckedIterator<E>(c.iterator(), type);
+    }
+
+    /**
+     * Removes the supplied object from the collection, if it exists.
+     *
+     * @param o The object to remove.
+     * @return <code>true</code> if the object was removed (i.e. the underlying
+     *         collection returned 1 or more instances of o).
+     */
+    public boolean remove(Object o)
+    {
+      return c.remove(o);
+    }
+
+    /**
+     * Removes all objects in the supplied collection from the backing
+     * collection, if they exist within it.
+     *
+     * @param coll the collection of objects to remove.
+     * @return <code>true</code> if the collection was modified.
+     */
+    public boolean removeAll(Collection<?> coll)
+    {
+      return c.removeAll(coll);
+    }
+
+    /**
+     * Retains all objects specified by the supplied collection which exist
+     * within the backing collection, and removes all others.
+     *
+     * @param coll the collection of objects to retain.
+     * @return <code>true</code> if the collection was modified.
+     */
+    public boolean retainAll(Collection<?> coll)
+    {
+      return c.retainAll(coll);
+    }
+
+    /**
+     * Retrieves the number of elements in the underlying collection.
+     *
+     * @return the number of elements in the collection.
+     */
+    public int size()
+    {
+      return c.size();
+    }
+
+    /**
+     * Copy the current contents of the underlying collection into an array.
+     *
+     * @return an array of type Object[] with a length equal to the size of the
+     *         underlying collection and containing the elements currently in
+     *         the underlying collection, in any order.
+     */
+    public Object[] toArray()
+    {
+      return c.toArray();
+    }
+
+    /**
+     * <p>
+     * Copy the current contents of the underlying collection into an array. If
+     * the array passed as an argument has length less than the size of the
+     * underlying collection, an array of the same run-time type as a, with a
+     * length equal to the size of the underlying collection, is allocated
+     * using reflection.
+     * </p>
+     * <p>
+     * Otherwise, a itself is used.  The elements of the underlying collection
+     * are copied into it, and if there is space in the array, the following
+     * element is set to null. The resultant array is returned.
+     * </p>
+     * <p>
+     * <emph>Note</emph>: The fact that the following element is set to null
+     * is only useful if it is known that this collection does not contain
+     * any null elements.
+     *
+     * @param a the array to copy this collection into.
+     * @return an array containing the elements currently in the underlying
+     *         collection, in any order.
+     * @throws ArrayStoreException if the type of any element of the
+     *         collection is not a subtype of the element type of a.
+     */
+    public <S> S[] toArray(S[] a)
+    {
+      return c.toArray(a);
+    }
+
+    /**
+     * A textual representation of the unmodifiable collection.
+     *
+     * @return The checked collection in the form of a <code>String</code>.
+     */
+    public String toString()
+    {
+      return c.toString();
+    }
+  } // class CheckedCollection
+
+  /**
+   * The implementation of the various iterator methods in the
+   * checked classes.
+   *
+   * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+   * @since 1.5
+   */
+  private static class CheckedIterator<E>
+    implements Iterator<E>
+  {
+    /**
+     * The wrapped iterator.
+     */
+    private final Iterator<E> i;
+
+    /**
+     * The type of the elements of this collection.
+     * @serial the element type.
+     */
+    final Class<E> type;
+
+    /**
+     * Only trusted code creates a wrapper.
+     * @param i the wrapped iterator
+     * @param type the type of the elements within the checked list.
+     */
+    CheckedIterator(Iterator<E> i, Class<E> type)
+    {
+      this.i = i;
+      this.type = type;
+    }
+
+    /**
+     * Obtains the next element in the underlying collection.
+     *
+     * @return the next element in the collection.
+     * @throws NoSuchElementException if there are no more elements.
+     */
+    public E next()
+    {
+      return i.next();
+    }
+
+    /**
+     * Tests whether there are still elements to be retrieved from the
+     * underlying collection by <code>next()</code>.  When this method
+     * returns <code>true</code>, an exception will not be thrown on calling
+     * <code>next()</code>.
+     *
+     * @return <code>true</code> if there is at least one more element in the
+     *         underlying collection.
+     */
+    public boolean hasNext()
+    {
+      return i.hasNext();
+    }
+
+    /**
+     * Removes the next element from the collection.
+     */
+    public void remove()
+    {
+      i.remove();
+    }
+  } // class CheckedIterator
+
+  /**
+   * <p> 
+   * Returns a dynamically typesafe view of the given list,
+   * where any modification is first checked to ensure that the type
+   * of the new data is appropriate.  Although the addition of
+   * generics and parametrically-typed collections prevents an
+   * incorrect type of element being added to a collection at
+   * compile-time, via static type checking, this can be overridden by
+   * casting.  In contrast, wrapping the collection within a
+   * dynamically-typesafe wrapper, using this and associated methods,
+   * <emph>guarantees</emph> that the collection will only contain
+   * elements of an appropriate type (provided it only contains such
+   * at the type of wrapping, and all subsequent access is via the
+   * wrapper).  This can be useful for debugging the cause of a
+   * <code>ClassCastException</code> caused by erroneous casting, or
+   * for protecting collections from corruption by external libraries.
+   * </p>
+   * <p>
+   * The returned List implements Serializable, but can only be serialized if
+   * the list it wraps is likewise Serializable. In addition, if the wrapped
+   * list implements RandomAccess, this does too.
+   * </p>
+   *
+   * @param l the list to wrap
+   * @param type the type of the elements within the checked list.
+   * @return a dynamically typesafe view of the list
+   * @see Serializable
+   * @see RandomAccess
+   */
+  public static <E> List<E> checkedList(List<E> l, Class<E> type)
+  {
+    if (l instanceof RandomAccess)
+      return new CheckedRandomAccessList<E>(l, type);
+    return new CheckedList<E>(l, type);
   }
-  
-  // @classpath-bugfix Added missing method
-  public static final <T> Set<T> emptySet() {
-      return EMPTY_SET;
+
+  /**
+   * The implementation of {@link #checkedList(List,Class)} for sequential
+   * lists. This class name is required for compatibility with Sun's JDK
+   * serializability.
+   *
+   * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+   * @since 1.5
+   */
+  private static class CheckedList<E> 
+    extends CheckedCollection<E>
+    implements List<E>
+  {
+    /**
+     * Compatible with JDK 1.5.
+     */
+    private static final long serialVersionUID = 65247728283967356L;
+
+    /**
+     * The wrapped list; stored both here and in the superclass to avoid
+     * excessive casting. Package visible for use by subclass.
+     * @serial the wrapped list
+     */
+    final List<E> list;
+
+    /**
+     * Wrap a given list.
+     * @param l the list to wrap
+     * @param type the type of the elements within the checked list.
+     * @throws NullPointerException if l is null
+     */
+    CheckedList(List<E> l, Class<E> type)
+    {
+      super(l, type);
+      list = l;
+    }
+
+    /**
+     * Adds the supplied element to the underlying list at the specified
+     * index, provided it is of the right type.
+     *
+     * @param index The index at which to place the new element.
+     * @param o the object to add.
+     * @throws ClassCastException if the type of the object is not a
+     *                            valid type for the underlying collection.
+     */
+    public void add(int index, E o)
+    {
+      if (type.isInstance(o))
+	list.add(index, o);
+      else
+	throw new ClassCastException("The object is of the wrong type.");
+    }
+
+    /**
+     * Adds the members of the supplied collection to the underlying
+     * collection at the specified index, provided they are all of the
+     * correct type.
+     *
+     * @param index the index at which to place the new element.
+     * @param c the collections of objects to add.
+     * @throws ClassCastException if the type of any element in c is not a
+     *                            valid type for the underlying collection.
+     */
+    public boolean addAll(int index, Collection<? extends E> coll)
+    {
+      Collection<E> typedColl = (Collection<E>) coll;
+      for (E element : typedColl)
+	{
+	  if (!type.isInstance(element))
+	    throw new ClassCastException("A member of the collection is not of the correct type.");
+	}
+      return list.addAll(index, coll);
+    }
+
+    /**
+     * Returns <code>true</code> if the object, o, is an instance of
+     * <code>List</code> with the same size and elements
+     * as the underlying list.
+     *
+     * @param o The object to compare.
+     * @return <code>true</code> if o is equivalent to the underlying list.
+     */
+    public boolean equals(Object o)
+    {
+      return list.equals(o);
+    }
+
+    /**
+     * Retrieves the element at a given index in the underlying list.
+     *
+     * @param index the index of the element to be returned
+     * @return the element at the specified index in the underlying list
+     * @throws IndexOutOfBoundsException if index &lt; 0 || index &gt;= size()
+     */
+    public E get(int index)
+    {
+      return list.get(index);
+    }
+
+    /**
+     * Computes the hash code for the underlying list.
+     * The exact computation is described in the documentation
+     * of the <code>List</code> interface.
+     *
+     * @return The hash code of the underlying list.
+     * @see List#hashCode()
+     */
+    public int hashCode()
+    {
+      return list.hashCode();
+    }
+
+    /**
+     * Obtain the first index at which a given object is to be found in the
+     * underlying list.
+     *
+     * @param o the object to search for
+     * @return the least integer n such that <code>o == null ? get(n) == null :
+     *         o.equals(get(n))</code>, or -1 if there is no such index.
+     * @throws ClassCastException if the type of o is not a valid
+     *         type for the underlying list.
+     * @throws NullPointerException if o is null and the underlying
+     *         list does not support null values.
+     */
+    public int indexOf(Object o)
+    {
+      return list.indexOf(o);
+    }
+
+    /**
+     * Obtain the last index at which a given object is to be found in the
+     * underlying list.
+     *
+     * @return the greatest integer n such that
+     *         <code>o == null ? get(n) == null : o.equals(get(n))</code>,
+     *         or -1 if there is no such index.
+     * @throws ClassCastException if the type of o is not a valid
+     *         type for the underlying list.
+     * @throws NullPointerException if o is null and the underlying
+     *         list does not support null values.
+     */
+    public int lastIndexOf(Object o)
+    {
+      return list.lastIndexOf(o);
+    }
+
+    /**
+     * Obtains a list iterator over the underlying list, starting at the
+     * beginning and maintaining the checked nature of this list.
+     *
+     * @return a <code>CheckedListIterator</code> over the elements of the
+     *         underlying list, in order, starting at the beginning.
+     */
+    public ListIterator<E> listIterator()
+    {
+      return new CheckedListIterator<E>(list.listIterator(), type);
+    }
+
+  /**
+   * Obtains a list iterator over the underlying list, starting at the
+   * specified index and maintaining the checked nature of this list.  An
+   * initial call to <code>next()</code> will retrieve the element at the
+   * specified index, and an initial call to <code>previous()</code> will
+   * retrieve the element at index - 1.
+   *
+   * @param index the position, between 0 and size() inclusive, to begin the
+   *        iteration from.
+   * @return a <code>CheckedListIterator</code> over the elements of the
+   *         underlying list, in order, starting at the specified index.
+   * @throws IndexOutOfBoundsException if index &lt; 0 || index &gt; size()
+   */
+    public ListIterator<E> listIterator(int index)
+    {
+      return new CheckedListIterator<E>(list.listIterator(index), type);
+    }
+
+    /**
+     * Removes the element at the specified index.
+     *
+     * @param index The index of the element to remove.
+     * @return the removed element.
+     */
+    public E remove(int index)
+    {
+      return list.remove(index);
+    }
+
+    /**
+     * Replaces the element at the specified index in the underlying list
+     * with that supplied.
+     *
+     * @param index the index of the element to replace.
+     * @param o the new object to place at the specified index.
+     * @return the replaced element.
+     */
+    public E set(int index, E o)
+    {
+      return list.set(index, o);
+    }
+
+    /**
+     * Obtain a List view of a subsection of the underlying list, from
+     * fromIndex (inclusive) to toIndex (exclusive). If the two indices
+     * are equal, the sublist is empty. The returned list will be
+     * checked, like this list.  Changes to the elements of the
+     * returned list will be reflected in the underlying list. The effect
+     * of structural modifications is undefined.
+     *
+     * @param fromIndex the index that the returned list should start from
+     *        (inclusive).
+     * @param toIndex the index that the returned list should go
+     *                to (exclusive).
+     * @return a List backed by a subsection of the underlying list.
+     * @throws IndexOutOfBoundsException if fromIndex &lt; 0
+     *         || toIndex &gt; size() || fromIndex &gt; toIndex.
+     */
+    public List<E> subList(int fromIndex, int toIndex)
+    {
+      return checkedList(list.subList(fromIndex, toIndex), type);
+    }
+  } // class CheckedList
+
+  /**
+   * The implementation of {@link #checkedList(List)} for random-access
+   * lists. This class name is required for compatibility with Sun's JDK
+   * serializability.
+   *
+   * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+   * @since 1.5
+   */
+  private static final class CheckedRandomAccessList<E>
+    extends CheckedList<E>
+    implements RandomAccess
+  {
+    /**
+     * Compatible with JDK 1.5.
+     */
+    private static final long serialVersionUID = 1638200125423088369L;
+
+    /**
+     * Wrap a given list.
+     * @param l the list to wrap
+     * @param type the type of the elements within the checked list.
+     * @throws NullPointerException if l is null
+     */
+    CheckedRandomAccessList(List<E> l, Class<E> type)
+    {
+      super(l, type);
+    }
+  } // class CheckedRandomAccessList
+
+  /**
+   * The implementation of {@link CheckedList#listIterator()}.
+   *
+   * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+   * @since 1.5
+   */
+  private static final class CheckedListIterator<E>
+    extends CheckedIterator<E>
+    implements ListIterator<E>
+  {
+    /**
+     * The wrapped iterator, stored both here and in the superclass to
+     * avoid excessive casting.
+     */
+    private final ListIterator<E> li;
+
+    /**
+     * Only trusted code creates a wrapper.
+     * @param li the wrapped iterator
+     */
+    CheckedListIterator(ListIterator<E> li, Class<E> type)
+    {
+      super(li, type);
+      this.li = li;
+    }
+
+    /**
+     * Adds the supplied object at the current iterator position, provided
+     * it is of the correct type.
+     *
+     * @param o the object to add.
+     * @throws ClassCastException if the type of the object is not a
+     *                            valid type for the underlying collection.
+     */
+    public void add(E o)
+    {
+      if (type.isInstance(o))
+	li.add(o);
+      else
+	throw new ClassCastException("The object is of the wrong type.");
+    }
+
+    /**
+     * Tests whether there are still elements to be retrieved from the
+     * underlying collection by <code>previous()</code>.  When this method
+     * returns <code>true</code>, an exception will not be thrown on calling
+     * <code>previous()</code>.
+     *
+     * @return <code>true</code> if there is at least one more element prior
+     *         to the current position in the underlying list.
+     */
+    public boolean hasPrevious()
+    {
+      return li.hasPrevious();
+    }
+
+    /**
+     * Find the index of the element that would be returned by a call to next.
+     * If <code>hasNext()</code> returns <code>false</code>, this returns the
+     * list size.
+     *
+     * @return the index of the element that would be returned by
+     *         <code>next()</code>.
+     */
+    public int nextIndex()
+    {
+      return li.nextIndex();
+    }
+
+    /**
+     * Obtains the previous element in the underlying list.
+     *
+     * @return the previous element in the list.
+     * @throws NoSuchElementException if there are no more prior elements.
+     */
+    public E previous()
+    {
+      return li.previous();
+    }
+
+    /**
+     * Find the index of the element that would be returned by a call to
+     * previous. If <code>hasPrevious()</code> returns <code>false</code>,
+     * this returns -1.
+     *
+     * @return the index of the element that would be returned by
+     *         <code>previous()</code>.
+     */
+    public int previousIndex()
+    {
+      return li.previousIndex();
+    }
+
+    /**
+     * Sets the next element to that supplied, provided that it is of the
+     * correct type.
+     *
+     * @param o The new object to replace the existing one.
+     * @throws ClassCastException if the type of the object is not a
+     *                            valid type for the underlying collection.
+     */
+    public void set(E o)
+    {
+      if (type.isInstance(o))
+	li.set(o);
+      else
+	throw new ClassCastException("The object is of the wrong type.");
+    }
+  } // class CheckedListIterator
+
+  /**
+   * <p> 
+   * Returns a dynamically typesafe view of the given map,
+   * where any modification is first checked to ensure that the type
+   * of the new data is appropriate.  Although the addition of
+   * generics and parametrically-typed collections prevents an
+   * incorrect type of element being added to a collection at
+   * compile-time, via static type checking, this can be overridden by
+   * casting.  In contrast, wrapping the collection within a
+   * dynamically-typesafe wrapper, using this and associated methods,
+   * <emph>guarantees</emph> that the collection will only contain
+   * elements of an appropriate type (provided it only contains such
+   * at the type of wrapping, and all subsequent access is via the
+   * wrapper).  This can be useful for debugging the cause of a
+   * <code>ClassCastException</code> caused by erroneous casting, or
+   * for protecting collections from corruption by external libraries.
+   * </p>
+   * <p>
+   * The returned Map implements Serializable, but can only be serialized if
+   * the map it wraps is likewise Serializable.
+   * </p>
+   *
+   * @param m the map to wrap
+   * @param keyType the dynamic type of the map's keys.
+   * @param valueType the dynamic type of the map's values.
+   * @return a dynamically typesafe view of the map
+   * @see Serializable
+   */
+  public static <K, V> Map<K, V> checkedMap(Map<K, V> m, Class<K> keyType,
+					    Class<V> valueType)
+  {
+    return new CheckedMap<K, V>(m, keyType, valueType);
   }
+
+  /**
+   * The implementation of {@link #checkedMap(Map)}. This
+   * class name is required for compatibility with Sun's JDK serializability.
+   *
+   * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+   * @since 1.5
+   */
+  private static class CheckedMap<K, V> 
+    implements Map<K, V>, Serializable
+  {
+    /**
+     * Compatible with JDK 1.5.
+     */
+    private static final long serialVersionUID = 5742860141034234728L;
+
+    /**
+     * The wrapped map.
+     * @serial the real map
+     */
+    private final Map<K, V> m;
+
+    /**
+     * The type of the map's keys.
+     * @serial the key type.
+     */
+    final Class<K> keyType;
+
+    /**
+     * The type of the map's values.
+     * @serial the value type.
+     */
+    final Class<V> valueType;
+
+    /**
+     * Cache the entry set.
+     */
+    private transient Set<Map.Entry<K, V>> entries;
+
+    /**
+     * Cache the key set.
+     */
+    private transient Set<K> keys;
+
+    /**
+     * Cache the value collection.
+     */
+    private transient Collection<V> values;
+
+    /**
+     * Wrap a given map.
+     * @param m the map to wrap
+     * @param keyType the dynamic type of the map's keys.
+     * @param valueType the dynamic type of the map's values.
+     * @throws NullPointerException if m is null
+     */
+    CheckedMap(Map<K, V> m, Class<K> keyType, Class<V> valueType)
+    {
+      this.m = m;
+      this.keyType = keyType;
+      this.valueType = valueType;
+      if (m == null)
+        throw new NullPointerException();
+    }
+
+    /**
+     * Clears all pairs from the map.
+     */
+    public void clear()
+    {
+      m.clear();
+    }
+
+    /**
+     * Returns <code>true</code> if the underlying map contains a mapping for
+     * the given key.
+     *
+     * @param key the key to search for
+     * @return <code>true</code> if the map contains the key
+     * @throws ClassCastException if the key is of an inappropriate type
+     * @throws NullPointerException if key is <code>null</code> but the map
+     *         does not permit null keys
+     */
+    public boolean containsKey(Object key)
+    {
+      return m.containsKey(key);
+    }
+
+    /**
+     * Returns <code>true</code> if the underlying map contains at least one
+     * mapping with the given value.  In other words, it returns
+     * <code>true</code> if a value v exists where
+     * <code>(value == null ? v == null : value.equals(v))</code>.
+     * This usually requires linear time.
+     *
+     * @param value the value to search for
+     * @return <code>true</code> if the map contains the value
+     * @throws ClassCastException if the type of the value is not a valid type
+     *         for this map.
+     * @throws NullPointerException if the value is null and the map doesn't
+     *         support null values.
+     */
+    public boolean containsValue(Object value)
+    {
+      return m.containsValue(value);
+    }
+
+    /**
+     * <p>
+     * Returns a checked set view of the entries in the underlying map.
+     * Each element in the set is a unmodifiable variant of
+     * <code>Map.Entry</code>.
+     * </p>
+     * <p>
+     * The set is backed by the map, so that changes in one show up in the
+     * other.  Modifications made while an iterator is in progress cause
+     * undefined behavior.  
+     * </p>
+     *
+     * @return the checked set view of all mapping entries.
+     * @see Map.Entry
+     */
+    public Set<Map.Entry<K, V>> entrySet()
+    {
+      if (entries == null)
+	{
+      // @classpath-bugfix give an 'inconvertible types' at compilation 
+	  //Class<Map.Entry<K,V>> klass =
+	  //  (Class<Map.Entry<K,V>>) Map.Entry.class;
+      Class klass = Map.Entry.class;
+      // @classpath-bugfix-end
+	  entries = new CheckedEntrySet<Map.Entry<K,V>,K,V>(m.entrySet(),
+							    klass,
+							    keyType,
+							    valueType);
+	}
+      return entries;
+    }
+
+    /**
+     * The implementation of {@link CheckedMap#entrySet()}. This class
+     * is <emph>not</emph> serializable.
+     *
+     * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+     * @since 1.5
+     */
+    private static final class CheckedEntrySet<E,SK,SV>
+      extends CheckedSet<E>
+    {
+      /**
+       * The type of the map's keys.
+       * @serial the key type.
+       */
+      private final Class<SK> keyType;
+      
+      /**
+       * The type of the map's values.
+       * @serial the value type.
+       */
+      private final Class<SV> valueType;
+      
+      /**
+       * Wrap a given set of map entries.
+       *
+       * @param s the set to wrap.
+       * @param type the type of the set's entries.
+       * @param keyType the type of the map's keys.
+       * @param valueType the type of the map's values.
+       */
+      CheckedEntrySet(Set<E> s, Class<E> type, Class<SK> keyType,
+		      Class<SV> valueType)
+      {
+        super(s, type);
+	this.keyType = keyType;
+	this.valueType = valueType;
+      }
+
+      // The iterator must return checked map entries.
+      public Iterator<E> iterator()
+      {
+        return new CheckedIterator<E>(c.iterator(), type)
+	{
+	  /**
+	   * Obtains the next element from the underlying set of
+	   * map entries.
+	   *
+	   * @return the next element in the collection.
+	   * @throws NoSuchElementException if there are no more elements.
+	   */
+          public E next()
+          {
+            final Map.Entry e = (Map.Entry) super.next();
+            return (E) new Map.Entry()
+	    {
+	      /**
+	       * Returns <code>true</code> if the object, o, is also a map
+	       * entry with an identical key and value.
+	       *
+	       * @param o the object to compare.
+	       * @return <code>true</code> if o is an equivalent map entry.
+	       */
+              public boolean equals(Object o)
+              {
+                return e.equals(o);
+              }
+	      
+	      /**
+	       * Returns the key of this map entry.
+	       *
+	       * @return the key.
+	       */
+              public Object getKey()
+              {
+                return e.getKey();
+              }
+
+	      /**
+	       * Returns the value of this map entry.
+	       *
+	       * @return the value.
+	       */
+              public Object getValue()
+              {
+                return e.getValue();
+              }
+
+	      /**
+	       * Computes the hash code of this map entry.
+	       * The computation is described in the <code>Map</code>
+	       * interface documentation.
+	       *
+	       * @return the hash code of this entry.
+	       * @see Map#hashCode()
+	       */ 
+	      public int hashCode()
+              {
+                return e.hashCode();
+              }
+
+	      /**
+	       * Sets the value of this map entry, provided it is of the
+	       * right type.
+	       *
+	       * @param value The new value.
+	       * @throws ClassCastException if the type of the value is not
+	       *                            a valid type for the underlying
+	       *                             map.
+	       */
+              public Object setValue(Object value)
+              {
+		if (valueType.isInstance(value))
+		  return e.setValue(value);
+		else
+		  throw new ClassCastException("The value is of the wrong type.");
+              }
+
+	      /**
+	       * Returns a textual representation of the map entry.
+	       *
+	       * @return The map entry as a <code>String</code>.
+	       */
+              public String toString()
+              {
+                return e.toString();
+              }
+	    };
+          }
+	};
+      }
+    } // class CheckedEntrySet
+
+    /**
+     * Returns <code>true</code> if the object, o, is also an instance
+     * of <code>Map</code> with an equal set of map entries.
+     *
+     * @param o The object to compare.
+     * @return <code>true</code> if o is an equivalent map.
+     */
+    public boolean equals(Object o)
+    {
+      return m.equals(o);
+    }
+
+    /**
+     * Returns the value associated with the supplied key or
+     * null if no such mapping exists.  An ambiguity can occur
+     * if null values are accepted by the underlying map.
+     * In this case, <code>containsKey()</code> can be used
+     * to separate the two possible cases of a null result.
+     *
+     * @param key The key to look up.
+     * @return the value associated with the key, or null if key not in map.
+     * @throws ClassCastException if the key is an inappropriate type.
+     * @throws NullPointerException if this map does not accept null keys.
+     * @see #containsKey(Object)
+     */
+    public V get(Object key)
+    {
+      return m.get(key);
+    }
+
+    /**
+     * Adds a new pair to the map, provided both the key and the value are
+     * of the correct types.
+     *
+     * @param key The new key.
+     * @param value The new value.
+     * @return the previous value of the key, or null if there was no mapping.
+     * @throws ClassCastException if the type of the key or the value is
+     *                            not a valid type for the underlying map.    
+     */
+    public V put(K key, V value)
+    {
+      if (keyType.isInstance(key))
+	{
+	  if (valueType.isInstance(value))
+	    return m.put(key,value);
+	  else
+	    throw new ClassCastException("The value is of the wrong type.");
+	}
+      throw new ClassCastException("The key is of the wrong type.");
+    }
+
+    /**
+     * Computes the hash code for the underlying map, as the sum
+     * of the hash codes of all entries.
+     *
+     * @return The hash code of the underlying map.
+     * @see Map.Entry#hashCode()
+     */
+    public int hashCode()
+    {
+      return m.hashCode();
+    }
+
+    /**
+     * Returns <code>true</code> if the underlying map contains no entries.
+     *
+     * @return <code>true</code> if the map is empty.
+     */
+    public boolean isEmpty()
+    {
+      return m.isEmpty();
+    }
+
+    /**
+     * <p>
+     * Returns a checked set view of the keys in the underlying map.
+     * The set is backed by the map, so that changes in one show up in the
+     * other.
+     * </p>
+     * <p>
+     * Modifications made while an iterator is in progress cause undefined
+     * behavior.  These modifications are again limited to the values of
+     * the keys.
+     * </p>
+     *
+     * @return the set view of all keys.
+     */
+    public Set<K> keySet()
+    {
+      if (keys == null)
+        keys = new CheckedSet<K>(m.keySet(), keyType);
+      return keys;
+    }
+
+    /**
+     * Adds all pairs within the supplied map to the underlying map,
+     * provided they are all have the correct key and value types.
+     *
+     * @param m the map, the entries of which should be added
+     *          to the underlying map.
+     * @throws ClassCastException if the type of a key or value is
+     *                            not a valid type for the underlying map.    
+     */
+    public void putAll(Map<? extends K, ? extends V> map)
+    {
+      Map<K,V> typedMap = (Map<K,V>) map;
+      for (Map.Entry<K,V> entry : typedMap.entrySet())
+	{
+	  if (!keyType.isInstance(entry.getKey()))
+	    throw new ClassCastException("A key is of the wrong type.");
+	  if (!valueType.isInstance(entry.getValue()))
+	    throw new ClassCastException("A value is of the wrong type.");
+	}
+      m.putAll(typedMap);
+    }
+
+    /**
+     * Removes a pair from the map.
+     *
+     * @param o The key of the entry to remove.
+     * @return The value the key was associated with, or null
+     *         if no such mapping existed.  Null is also returned
+     *         if the removed entry had a null key.
+     * @throws UnsupportedOperationException as an unmodifiable
+     *         map does not support the <code>remove</code> operation.
+     */
+    public V remove(Object o)
+    {
+      return m.remove(o);
+    }
+
+
+    /**
+     * Returns the number of key-value mappings in the underlying map.
+     * If there are more than Integer.MAX_VALUE mappings, Integer.MAX_VALUE
+     * is returned.
+     *
+     * @return the number of mappings.
+     */
+    public int size()
+    {
+      return m.size();
+    }
+
+    /**
+     * Returns a textual representation of the map.
+     *
+     * @return The map in the form of a <code>String</code>.
+     */
+    public String toString()
+    {
+      return m.toString();
+    }
+
+    /**
+     * <p>
+     * Returns a unmodifiable collection view of the values in the underlying
+     * map.  The collection is backed by the map, so that changes in one show
+     * up in the other.
+     * </p>
+     * <p>
+     * Modifications made while an iterator is in progress cause undefined
+     * behavior.  These modifications are again limited to the values of
+     * the keys.
+     * </p>
+     * 
+     * @return the collection view of all values.
+     */
+    public Collection<V> values()
+    {
+      if (values == null)
+        values = new CheckedCollection<V>(m.values(), valueType);
+      return values;
+    }
+  } // class CheckedMap
+
+  /**
+   * <p> 
+   * Returns a dynamically typesafe view of the given set,
+   * where any modification is first checked to ensure that the type
+   * of the new data is appropriate.  Although the addition of
+   * generics and parametrically-typed collections prevents an
+   * incorrect type of element being added to a collection at
+   * compile-time, via static type checking, this can be overridden by
+   * casting.  In contrast, wrapping the collection within a
+   * dynamically-typesafe wrapper, using this and associated methods,
+   * <emph>guarantees</emph> that the collection will only contain
+   * elements of an appropriate type (provided it only contains such
+   * at the type of wrapping, and all subsequent access is via the
+   * wrapper).  This can be useful for debugging the cause of a
+   * <code>ClassCastException</code> caused by erroneous casting, or
+   * for protecting collections from corruption by external libraries.
+   * </p>
+   * <p>
+   * The returned Set implements Serializable, but can only be serialized if
+   * the set it wraps is likewise Serializable.
+   * </p>
+   *
+   * @param s the set to wrap.
+   * @param type the type of the elements within the checked list.
+   * @return a dynamically typesafe view of the set
+   * @see Serializable
+   */
+  public static <E> Set<E> checkedSet(Set<E> s, Class<E> type)
+  {
+    return new CheckedSet<E>(s, type);
+  }
+
+  /**
+   * The implementation of {@link #checkedSet(Set)}. This class
+   * name is required for compatibility with Sun's JDK serializability.
+   *
+   * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+   * @since 1.5
+   */
+  private static class CheckedSet<E> 
+    extends CheckedCollection<E>
+    implements Set<E>
+  {
+    /**
+     * Compatible with JDK 1.5.
+     */
+    private static final long serialVersionUID = 4694047833775013803L;
+
+    /**
+     * Wrap a given set.
+     *
+     * @param s the set to wrap
+     * @throws NullPointerException if s is null
+     */
+    CheckedSet(Set<E> s, Class<E> type)
+    {
+      super(s, type);
+    }
+
+    /**
+     * Returns <code>true</code> if the object, o, is also an instance of
+     * <code>Set</code> of the same size and with the same entries.
+     *
+     * @return <code>true</code> if o is an equivalent set.
+     */
+    public boolean equals(Object o)
+    {
+      return c.equals(o);
+    }
+
+    /**
+     * Computes the hash code of this set, as the sum of the
+     * hash codes of all elements within the set.
+     *
+     * @return the hash code of the set.
+     */ 
+    public int hashCode()
+    {
+      return c.hashCode();
+    }
+  } // class CheckedSet
+
+  /**
+   * <p> 
+   * Returns a dynamically typesafe view of the given sorted map,
+   * where any modification is first checked to ensure that the type
+   * of the new data is appropriate.  Although the addition of
+   * generics and parametrically-typed collections prevents an
+   * incorrect type of element being added to a collection at
+   * compile-time, via static type checking, this can be overridden by
+   * casting.  In contrast, wrapping the collection within a
+   * dynamically-typesafe wrapper, using this and associated methods,
+   * <emph>guarantees</emph> that the collection will only contain
+   * elements of an appropriate type (provided it only contains such
+   * at the type of wrapping, and all subsequent access is via the
+   * wrapper).  This can be useful for debugging the cause of a
+   * <code>ClassCastException</code> caused by erroneous casting, or
+   * for protecting collections from corruption by external libraries.
+   * </p>
+   * <p>
+   * The returned SortedMap implements Serializable, but can only be
+   * serialized if the map it wraps is likewise Serializable.
+   * </p>
+   *
+   * @param m the map to wrap.
+   * @param keyType the dynamic type of the map's keys.
+   * @param valueType the dynamic type of the map's values.
+   * @return a dynamically typesafe view of the map
+   * @see Serializable
+   */
+  public static <K, V> SortedMap<K, V> checkedSortedMap(SortedMap<K, V> m,
+							Class<K> keyType,
+							Class<V> valueType)
+  {
+    return new CheckedSortedMap<K, V>(m, keyType, valueType);
+  }
+
+  /**
+   * The implementation of {@link #checkedSortedMap(SortedMap,Class,Class)}.
+   * This class name is required for compatibility with Sun's JDK
+   * serializability.
+   *
+   * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+   */
+  private static class CheckedSortedMap<K, V>
+    extends CheckedMap<K, V>
+    implements SortedMap<K, V>
+  {
+    /**
+     * Compatible with JDK 1.5.
+     */
+    private static final long serialVersionUID = 1599671320688067438L;
+
+    /**
+     * The wrapped map; stored both here and in the superclass to avoid
+     * excessive casting.
+     * @serial the wrapped map
+     */
+    private final SortedMap<K, V> sm;
+
+    /**
+     * Wrap a given map.
+     *
+     * @param sm the map to wrap
+     * @param keyType the dynamic type of the map's keys.
+     * @param valueType the dynamic type of the map's values.
+     * @throws NullPointerException if sm is null
+     */
+    CheckedSortedMap(SortedMap<K, V> sm, Class<K> keyType, Class<V> valueType)
+    {
+      super(sm, keyType, valueType);
+      this.sm = sm;
+    }
+
+    /**
+     * Returns the comparator used in sorting the underlying map,
+     * or null if it is the keys' natural ordering.
+     *
+     * @return the sorting comparator.
+     */
+    public Comparator<? super K> comparator()
+    {
+      return sm.comparator();
+    }
+
+    /**
+     * Returns the first (lowest sorted) key in the map.
+     *
+     * @return the first key.
+     * @throws NoSuchElementException if this map is empty.
+     */
+    public K firstKey()
+    {
+      return sm.firstKey();
+    }
+
+    /**
+     * <p>
+     * Returns a checked view of the portion of the map strictly less
+     * than toKey. The view is backed by the underlying map, so changes in
+     * one show up in the other.  The submap supports all optional operations
+     * of the original.  This operation is equivalent to
+     * <code>subMap(firstKey(), toKey)</code>.
+     * </p>
+     * <p>
+     * The returned map throws an IllegalArgumentException any time a key is
+     * used which is out of the range of toKey. Note that the endpoint, toKey,
+     * is not included; if you want this value to be included, pass its
+     * successor object in to toKey.  For example, for Integers, you could
+     * request <code>headMap(new Integer(limit.intValue() + 1))</code>.
+     * </p>
+     *
+     * @param toKey the exclusive upper range of the submap.
+     * @return the submap.
+     * @throws ClassCastException if toKey is not comparable to the map
+     *                            contents.
+     * @throws IllegalArgumentException if this is a subMap, and toKey is out
+     *         of range.
+     * @throws NullPointerException if toKey is null but the map does not allow
+     *         null keys.
+     */
+    public SortedMap<K, V> headMap(K toKey)
+    {
+      return new CheckedSortedMap<K, V>(sm.headMap(toKey), keyType, valueType);
+    }
+
+    /**
+     * Returns the last (highest sorted) key in the map.
+     *
+     * @return the last key.
+     * @throws NoSuchElementException if this map is empty.
+     */
+    public K lastKey()
+    {
+      return sm.lastKey();
+    }
+
+    /**
+     * <p>
+     * Returns a checked view of the portion of the map greater than or
+     * equal to fromKey, and strictly less than toKey. The view is backed by
+     * the underlying map, so changes in one show up in the other. The submap
+     * supports all optional operations of the original.
+     * </p>
+     * <p>
+     * The returned map throws an IllegalArgumentException any time a key is
+     * used which is out of the range of fromKey and toKey. Note that the
+     * lower endpoint is included, but the upper is not; if you want to
+     * change the inclusion or exclusion of an endpoint, pass its successor
+     * object in instead.  For example, for Integers, you could request
+     * <code>subMap(new Integer(lowlimit.intValue() + 1),
+     * new Integer(highlimit.intValue() + 1))</code> to reverse
+     * the inclusiveness of both endpoints.
+     * </p>
+     *
+     * @param fromKey the inclusive lower range of the submap.
+     * @param toKey the exclusive upper range of the submap.
+     * @return the submap.
+     * @throws ClassCastException if fromKey or toKey is not comparable to
+     *         the map contents.
+     * @throws IllegalArgumentException if this is a subMap, and fromKey or
+     *         toKey is out of range.
+     * @throws NullPointerException if fromKey or toKey is null but the map
+     *         does not allow null keys.
+     */
+    public SortedMap<K, V> subMap(K fromKey, K toKey)
+    {
+      return new CheckedSortedMap<K, V>(sm.subMap(fromKey, toKey), keyType, 
+					valueType);
+    }
+
+    /**
+     * <p>
+     * Returns a checked view of the portion of the map greater than or
+     * equal to fromKey. The view is backed by the underlying map, so changes
+     * in one show up in the other. The submap supports all optional operations
+     * of the original.
+     * </p>
+     * <p>
+     * The returned map throws an IllegalArgumentException any time a key is
+     * used which is out of the range of fromKey. Note that the endpoint,
+     * fromKey, is included; if you do not want this value to be included,
+     * pass its successor object in to fromKey.  For example, for Integers,
+     * you could request
+     * <code>tailMap(new Integer(limit.intValue() + 1))</code>.
+     * </p>
+     *
+     * @param fromKey the inclusive lower range of the submap
+     * @return the submap
+     * @throws ClassCastException if fromKey is not comparable to the map
+     *         contents
+     * @throws IllegalArgumentException if this is a subMap, and fromKey is out
+     *         of range
+     * @throws NullPointerException if fromKey is null but the map does not
+     *                              allow null keys
+     */
+    public SortedMap<K, V> tailMap(K fromKey)
+    {
+      return new CheckedSortedMap<K, V>(sm.tailMap(fromKey), keyType,
+					valueType);
+    }
+  } // class CheckedSortedMap
+
+  /**
+   * <p>
+   * Returns a dynamically typesafe view of the given sorted set,
+   * where any modification is first checked to ensure that the type
+   * of the new data is appropriate.  Although the addition of
+   * generics and parametrically-typed collections prevents an
+   * incorrect type of element being added to a collection at
+   * compile-time, via static type checking, this can be overridden by
+   * casting.  In contrast, wrapping the collection within a
+   * dynamically-typesafe wrapper, using this and associated methods,
+   * <emph>guarantees</emph> that the collection will only contain
+   * elements of an appropriate type (provided it only contains such
+   * at the type of wrapping, and all subsequent access is via the
+   * wrapper).  This can be useful for debugging the cause of a
+   * <code>ClassCastException</code> caused by erroneous casting, or
+   * for protecting collections from corruption by external libraries.
+   * </p>
+   * <p>
+   * The returned SortedSet implements Serializable, but can only be
+   * serialized if the set it wraps is likewise Serializable.
+   * </p>
+   *
+   * @param s the set to wrap.
+   * @param type the type of the set's elements.
+   * @return a dynamically typesafe view of the set
+   * @see Serializable
+   */
+  public static <E> SortedSet<E> checkedSortedSet(SortedSet<E> s,
+						  Class<E> type)
+  {
+    return new CheckedSortedSet<E>(s, type);
+  }
+
+  /**
+   * The implementation of {@link #checkedSortedSet(SortedSet,Class)}. This
+   * class name is required for compatibility with Sun's JDK serializability.
+   *
+   * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+   * @since 1.5
+   */
+  private static class CheckedSortedSet<E> 
+    extends CheckedSet<E>
+    implements SortedSet<E>
+  {
+    /**
+     * Compatible with JDK 1.4.
+     */
+    private static final long serialVersionUID = 1599911165492914959L;
+
+    /**
+     * The wrapped set; stored both here and in the superclass to avoid
+     * excessive casting.
+     * 
+     * @serial the wrapped set
+     */
+    private SortedSet<E> ss;
+
+    /**
+     * Wrap a given set.
+     *
+     * @param ss the set to wrap.
+     * @param type the type of the set's elements.
+     * @throws NullPointerException if ss is null
+     */
+    CheckedSortedSet(SortedSet<E> ss, Class<E> type)
+    {
+      super(ss, type);
+      this.ss = ss;
+    }
+
+    /**
+     * Returns the comparator used in sorting the underlying set,
+     * or null if it is the elements' natural ordering.
+     *
+     * @return the sorting comparator
+     */
+    public Comparator<? super E> comparator()
+    {
+      return ss.comparator();
+    }
+
+    /**
+     * Returns the first (lowest sorted) element in the underlying
+     * set.
+     *
+     * @return the first element.
+     * @throws NoSuchElementException if the set is empty.
+     */
+    public E first()
+    {
+      return ss.first();
+    }
+
+    /**
+     * <p>
+     * Returns a checked view of the portion of the set strictly
+     * less than toElement. The view is backed by the underlying set,
+     * so changes in one show up in the other.  The subset supports
+     * all optional operations of the original.  This operation
+     * is equivalent to <code>subSet(first(), toElement)</code>.
+     * </p>
+     * <p>
+     * The returned set throws an IllegalArgumentException any time an
+     * element is used which is out of the range of toElement. Note that
+     * the endpoint, toElement, is not included; if you want this value
+     * included, pass its successor object in to toElement.  For example,
+     * for Integers, you could request
+     * <code>headSet(new Integer(limit.intValue() + 1))</code>.
+     * </p>
+     *
+     * @param toElement the exclusive upper range of the subset
+     * @return the subset.
+     * @throws ClassCastException if toElement is not comparable to the set
+     *         contents.
+     * @throws IllegalArgumentException if this is a subSet, and toElement is
+     *                                  out of range.
+     * @throws NullPointerException if toElement is null but the set does not
+     *         allow null elements.
+     */
+    public SortedSet<E> headSet(E toElement)
+    {
+      return new CheckedSortedSet<E>(ss.headSet(toElement), type);
+    }
+
+    /**
+     * Returns the last (highest sorted) element in the underlying
+     * set.
+     *
+     * @return the last element.
+     * @throws NoSuchElementException if the set is empty.
+     */
+    public E last()
+    {
+      return ss.last();
+    }
+
+    /**
+     * <p>
+     * Returns a checked view of the portion of the set greater than or
+     * equal to fromElement, and strictly less than toElement. The view is
+     * backed by the underlying set, so changes in one show up in the other.
+     * The subset supports all optional operations of the original.
+     * </p>
+     * <p>
+     * The returned set throws an IllegalArgumentException any time an
+     * element is used which is out of the range of fromElement and toElement.
+     * Note that the lower endpoint is included, but the upper is not; if you
+     * want to change the inclusion or exclusion of an endpoint, pass its
+     * successor object in instead.  For example, for Integers, you can request
+     * <code>subSet(new Integer(lowlimit.intValue() + 1),
+     * new Integer(highlimit.intValue() + 1))</code> to reverse
+     * the inclusiveness of both endpoints.
+     * </p>
+     * 
+     * @param fromElement the inclusive lower range of the subset.
+     * @param toElement the exclusive upper range of the subset.
+     * @return the subset.
+     * @throws ClassCastException if fromElement or toElement is not comparable
+     *         to the set contents.
+     * @throws IllegalArgumentException if this is a subSet, and fromElement or
+     *         toElement is out of range.
+     * @throws NullPointerException if fromElement or toElement is null but the
+     *         set does not allow null elements.
+     */
+    public SortedSet<E> subSet(E fromElement, E toElement)
+    {
+      return new CheckedSortedSet<E>(ss.subSet(fromElement, toElement), type);
+    }
+
+    /**
+     * <p>
+     * Returns a checked view of the portion of the set greater than or equal
+     * to fromElement. The view is backed by the underlying set, so changes in
+     * one show up in the other. The subset supports all optional operations
+     * of the original.
+     * </p>
+     * <p>
+     * The returned set throws an IllegalArgumentException any time an
+     * element is used which is out of the range of fromElement. Note that
+     * the endpoint, fromElement, is included; if you do not want this value
+     * to be included, pass its successor object in to fromElement.  For
+     * example, for Integers, you could request
+     * <code>tailSet(new Integer(limit.intValue() + 1))</code>.
+     * </p>
+     *
+     * @param fromElement the inclusive lower range of the subset
+     * @return the subset.
+     * @throws ClassCastException if fromElement is not comparable to the set
+     *         contents.
+     * @throws IllegalArgumentException if this is a subSet, and fromElement is
+     *         out of range.
+     * @throws NullPointerException if fromElement is null but the set does not
+     *         allow null elements.
+     */
+    public SortedSet<E> tailSet(E fromElement)
+    {
+      return new CheckedSortedSet<E>(ss.tailSet(fromElement), type);
+    }
+  } // class CheckedSortedSet
+
 } // class Collections
