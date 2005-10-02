@@ -1,5 +1,5 @@
 /* Enum.java - Base class for all enums
-   Copyright (C) 2004 Free Software Foundation
+   Copyright (C) 2004, 2005 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -38,8 +38,6 @@ exception statement from your version. */
 package java.lang;
 
 import java.io.Serializable;
-import java.io.ObjectInputStream.GetField;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * @since 1.5
@@ -62,16 +60,30 @@ public abstract class Enum<T extends Enum<T>>
     this.ordinal = ordinal;
   }
 
-  // @classpath-bugfix   Implemented this method
+  /**
+   * Returns an Enum for a enum class given a description string of
+   * the enum constant.
+   *
+   * @exception NullPointerException when etype or s are null.
+   * @exception IllegalArgumentException when there is no value s in
+   * the enum etype.
+   */
   @SuppressWarnings("unchecked")
-  public static <S extends Enum<S>> Enum valueOf(Class<S> etype, String s) {
+  public static <S extends Enum<S>> S valueOf(Class<S> etype, String s)
+  {
         if (etype == null || s == null)
             throw new NullPointerException();
-        try {
+
+    try
+      {
             return (S) etype.getDeclaredField(s).get(null);
-        } catch (NoSuchFieldException exception) {
+      }
+    catch (NoSuchFieldException exception)
+      {
             throw new IllegalArgumentException(s);
-        } catch (IllegalAccessException exception) {
+      }
+    catch (IllegalAccessException exception)
+      {
             throw new Error("Unable to access Enum class");
         }
     }
