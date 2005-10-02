@@ -965,24 +965,19 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 */
 	public void writeADD(int operandSize, int dstDisp, int imm32) {
         testOperandSize(operandSize, BITS8 | BITS16 | BITS32);
-        //TODO review
-        if(operandSize == BITS32){
-            write8(0x81);
-            write8(5);
-            write32(dstDisp);
-            write32(imm32);
-        } else if(operandSize == BITS16) {
+        switch (operandSize) {
+        case BITS8:
+            write1bOpcodeModMem(0x80, operandSize, dstDisp, 0);
+            break;
+        case BITS16:
             write8(OSIZE_PREFIX);
-            write8(0x81);
-            write8(5);
-            write32(dstDisp);
-            write16(imm32);
-        } else if(operandSize == BITS8) {
-            write8(0x80);
-            write8(5);
-            write32(dstDisp);
-            write8(imm32);
+            write1bOpcodeModMem(0x81, operandSize, dstDisp, 0);
+            break;
+        case BITS32:
+            write1bOpcodeModMem(0x81, operandSize, dstDisp, 0);
+            break;
         }
+        write32(imm32);
 	}
 
 	/**
@@ -1097,24 +1092,19 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 */
 	public void writeAND(int operandSize, int dstDisp, int imm32) {
         testOperandSize(operandSize, BITS8 | BITS16 | BITS32);
-        //TODO review
-        if(operandSize == BITS32){
-            write8(0x81);
-            write8(0x25);
-            write32(dstDisp);
-            write32(imm32);
-        } else if(operandSize == BITS16) {
+        switch (operandSize) {
+        case BITS8:
+            write1bOpcodeModMem(0x80, operandSize, dstDisp, 4);
+            break;
+        case BITS16:
             write8(OSIZE_PREFIX);
-            write8(0x81);
-            write8(0x25);
-            write32(dstDisp);
-            write16(imm32);
-        } else if(operandSize == BITS8) {
-            write8(0x80);
-            write8(0x25);
-            write32(dstDisp);
-            write8(imm32);
+            write1bOpcodeModMem(0x81, operandSize, dstDisp, 4);
+            break;
+        case BITS32:
+            write1bOpcodeModMem(0x81, operandSize, dstDisp, 4);
+            break;
         }
+        write8(imm32);
 	}
 
 	/**
@@ -2600,7 +2590,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		if (operandSize == BITS64) {
 			rex |= REX_W_PREFIX;
 		}
-		if (rm.getNr() > 7) {
+		if ((rm != null) && (rm.getNr() > 7)) {
 			rex |= REX_B_PREFIX;
 		}
 		if (reg > 7) {
@@ -2732,6 +2722,21 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		write8(opcode3);
 		writeModRM(rm.getNr() & 7, disp, reg & 7);
 	}
+
+    /**
+     * Write a 1-byte instruction followed by a mod-r/m byte+offset for the
+     * following addressing scheme's disp32
+     *
+     * @param opcode
+     * @param disp
+     * @param reg
+     */
+    private final void write1bOpcodeModMem(int opcode, int operandSize, 
+            int disp, int reg) {
+        writeModRMRREXPrefix(operandSize, null, reg);
+        write8(opcode);
+        writeModRM(5, disp, reg & 7);
+    }
 
 	/**
 	 * Write a mod-r/m byte+offset+scale+index+base for the following addressing
