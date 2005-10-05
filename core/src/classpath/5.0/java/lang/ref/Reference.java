@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -68,7 +68,7 @@ package java.lang.ref;
  * work.  It is useful to keep track, when an object is finalized.
  *
  * @author Jochen Hoenicke
- * @see java.util.WeakHashtable
+ * @see java.util.WeakHashMap
  */
 public abstract class Reference<T>
 {
@@ -91,7 +91,7 @@ public abstract class Reference<T>
    * (not to null, that value is used to mark a not enqueued
    * reference).  
    */
-  Reference nextOnQueue; // @classpath-bugfix Did not compile using eclipse 3.1M7
+  Reference<T> nextOnQueue;   
 
   /**
    * This lock should be taken by the garbage collector, before
