@@ -57,8 +57,21 @@ public class CompareTask extends Task {
 
     private String vmSpecificTag = "@vm-specific";
 
+    // represent an unsubmitted classpath bugfix 
+    // (if not matching the tag 'classpathBugIDTag')
     private String classpathBugfixTag = "@classpath-bugfix";
+    
+    private String classpathBugfixEndTag = "@classpath-bugfix-end";
 
+    // represent a submitted classpath bugfix (followed by an ID) 
+    // this tag is immediately followed by the classpath bugzilla's identifier
+    private String classpathBugIDTag = "@classpath-bugfix-";
+    
+    // url of Classpath Bugzilla
+    private final String CP_BUGZILLA_URL = "http://gcc.gnu.org/bugzilla/show_bug.cgi?id=";
+    
+    private String jnodeMail = "@jnode.org";
+    
     private static final int NO_CHANGE = 0x01;
 
     private static final int NEEDS_MERGE = 0x02;
@@ -74,6 +87,8 @@ public class CompareTask extends Task {
     private static final int FLAG_JNODE = 0x0800;
 
     private static final int FLAG_TARGET_DIFF = 0x1000;
+    
+    private static final int FLAG_UNSUBMITTED_CLASSPATH_BUGFIX = 0x2000;
 
     public void execute() {
         if (destDir == null) {
@@ -92,14 +107,19 @@ public class CompareTask extends Task {
 
         try {
             destDir.mkdirs();
+            final File outBugsFile = new File(destDir, "classpath-bugfix.html");
+            final PrintWriter outBugs = new PrintWriter(new FileWriter(outBugsFile));
+            reportHeader(outBugs, "Class", "Target", "Classpath bugs");
+            
             final File outFile = new File(destDir, "classpath-compare.html");
             final PrintWriter out = new PrintWriter(new FileWriter(outFile));
-            reportHeader(out);
+            reportHeader(out, "Class", "Target", "Merge status");
+            
             int missingInCp = 0;
             int missingInVm = 0;
             int needsMerge = 0;
             int diffVmSpecific = 0;
-            int diffClasspathBugfix = 0;
+            int diffClasspathBugfix = 0;            
             int diffNative = 0;
             int diffJNode = 0;
             int vmSpecific = 0;
@@ -124,38 +144,41 @@ public class CompareTask extends Task {
                     }
                 } else if (cpFile == null) {
                     // File is not found in classpath sources
-                    reportMissing(out, vmFile.getReportName(), "vm", 0);
+                    reportMissing(out, vmFile.getReportName(), "vm", new Flags());
                     missingInVm++;
                 } else {
                     // We have both the classpath version and the vm version.
                     cpFile = cpFile.getBestFileForTarget(vmFile.getTarget());
 
+                    // Let's compare them                    
                     final String diffFileName = vmFile.getReportName() + ".diff";
-                    int rc = runDiff(vmFile, cpFile, diffFileName, packageDiffs);
-                    switch (rc & ~FLAGS_MASK) {
+                    Flags rc = runDiff(vmFile, cpFile, diffFileName, packageDiffs);
+                    switch (rc.asInt() & ~FLAGS_MASK) {
                     case NO_CHANGE:
                         break;
                     case NEEDS_MERGE:
                         reportNeedsMerge(out, vmFile.getReportName(), vmFile
-                                .getTarget(), diffFileName, rc & FLAGS_MASK);
+                                .getTarget(), diffFileName, rc.mask(FLAGS_MASK));
                         needsMerge++;
                         break;
                     default:
                         throw new RuntimeException("Invalid rc " + rc);
                     }
-                    if ((rc & FLAG_VM_SPECIFIC) != 0) {
+                    if (rc.isSet(FLAG_VM_SPECIFIC)) {
                         diffVmSpecific++;
                     }
-                    if ((rc & FLAG_CLASSPATH_BUGFIX) != 0) {
+                    if (rc.isSet(FLAG_CLASSPATH_BUGFIX)) {
                         diffClasspathBugfix++;
                     }
-                    if ((rc & FLAG_NATIVE) != 0) {
+                    if (rc.isSet(FLAG_NATIVE)) {
                         diffNative++;
                     }
-                    if ((rc & FLAG_JNODE) != 0) {
+                    if (rc.isSet(FLAG_JNODE)) {
                         diffJNode++;
                     }
-                    // Let's compare them
+                    
+                    reportClasspathBugs(outBugs, vmFile.getReportName(), vmFile
+                            .getTarget(), rc);
                 }
             }
 
@@ -198,7 +221,7 @@ public class CompareTask extends Task {
             }
             if (diffClasspathBugfix > 0) {
                 out.println("Found " + diffClasspathBugfix
-                        + " local classpath bugfixes<br/>");
+                        + " local <a href=\"classpath-bugfix.html\">classpath bugfixes</a><br/>");
                 log("Found " + diffClasspathBugfix
                         + " local classpath bugfixes");
             }
@@ -216,6 +239,10 @@ public class CompareTask extends Task {
             reportFooter(out);
             out.flush();
             out.close();
+            
+            reportFooter(outBugs);
+            outBugs.flush();
+            outBugs.close();            
         } catch (IOException ex) {
             throw new BuildException(ex);
         } catch (InterruptedException ex) {
@@ -223,10 +250,15 @@ public class CompareTask extends Task {
         }
     }
 
-    protected int runDiff(SourceFile vmFile, SourceFile cpFile,
+    protected Flags runDiff(SourceFile vmFile, SourceFile cpFile,
             String diffFileName, Map<String, String> packageDiffs)
             throws IOException, InterruptedException {
-        final String[] cmd = { "diff", "-b", // Ignore white space change
+        final String[] cmd = { "diff", 
+                //"-b", // Ignore white space change
+                "-E", // Ignore changes due to tab expansion
+                "-w", // Ignore all white space change
+                "-B", // Ignore changes whose lines are all blank
+                "-N", // Treat absent files as empty
                 "-au", "-I", ".*$" + "Id:.*$.*", // Avoid cvs keyword
                                                     // expansion in this string
                 vmFile.getFileName(), cpFile.getFile().getAbsolutePath() };
@@ -256,16 +288,17 @@ public class CompareTask extends Task {
                 }
                 packageDiffs.put(pkg, pkgDiff);
 
-                int flags = getFlags(diffStr);
+                Flags flags = getFlags(diffStr);
                 if (!vmFile.getTarget().equals(cpFile.getTarget())) {
-                    flags |= FLAG_TARGET_DIFF;
+                    flags.set(FLAG_TARGET_DIFF);
                 }
-                return flags | NEEDS_MERGE;
+                flags.set(NEEDS_MERGE);
+                return flags;
             } finally {
                 os.close();
             }
         } else {
-            return NO_CHANGE;
+            return new Flags(NO_CHANGE);
         }
     }
 
@@ -281,31 +314,32 @@ public class CompareTask extends Task {
         }
     }
 
-    protected void reportHeader(PrintWriter out) {
+    protected void reportHeader(PrintWriter out, String... headers) {
         out.println("<html>");
         out.println("<title>Classpath compare</title>");
         out.println("<style type='text/css'>");
-        out.println(".classpath-only     { background-color: #FFFFAA; }");
-        out.println(".vm-only            { background-color: #CCCCFF; }");
-        out.println(".needsmerge         { background-color: #FF9090; }");
-        out.println(".vm-specific        { background-color: #119911; }");
-        out.println(".vm-specific-source { background-color: #22FF22; }");
-        out.println(".classpath-bugfix   { background-color: #CCFFCC; }");
+        out.println(".classpath-only         { background-color: #FFFFAA; }");
+        out.println(".vm-only                { background-color: #CCCCFF; }");
+        out.println(".needsmerge             { background-color: #FF9090; }");
+        out.println(".vm-specific            { background-color: #119911; }");
+        out.println(".vm-specific-source     { background-color: #22FF22; }");
+        out.println(".classpath-bugfix       { background-color: #CCFFCC; }");
         out.println("</style>");
         out.println("<body>");
         out.println("<h1>Classpath compare results</h1>");
         out.println("Created at " + new Date());
         out.println("<table border='1' width='100%' style='border: solid 1'>");
         out.println("<tr>");
-        out.println("<th align='left'>Class</th>");
-        out.println("<th align='left'>Target</th>");
-        out.println("<th align='left'>Merge status</th>");
+        for(String header : headers)
+        {
+            out.println("<th align='left'>"+header+"</th>");
+        }
         out.println("</tr>");
         out.flush();
     }
 
     protected void reportMissing(PrintWriter out, String fname,
-            String existsIn, int flags) {
+            String existsIn, Flags flags) {
         out.println("<tr class='" + existsIn + "-only'>");
         out.println("<td>" + fname + "</td>");
         out.println("<td>&nbsp;</td>");
@@ -328,8 +362,8 @@ public class CompareTask extends Task {
     }
 
     protected void reportNeedsMerge(PrintWriter out, String fname,
-            String target, String diffFileName, int flags) {
-        out.println("<tr class='" + flagsToStyleClass(flags) + "'>");
+            String target, String diffFileName, Flags flags) {
+        out.println("<tr class='" + flagsToStyleClass(flags.asInt()) + "'>");
         out.println("<td>" + fname + "</td>");
         if (target.equals(TargetedFileSet.DEFAULT_TARGET)) {
             target = "&nbsp;";
@@ -342,8 +376,34 @@ public class CompareTask extends Task {
         out.flush();
     }
 
+    protected void reportClasspathBugs(PrintWriter out, String fname, String target, 
+            Flags flags) 
+    {
+        String[] cpBugIDs = flags.getBugIDs();
+        if(cpBugIDs.length == 0) return; // no bug in this file
+        
+        out.println("<tr class='" + flagsToStyleClass(flags.asInt()) + "'>");
+        out.println("<td>" + fname + "</td>");
+        if (target.equals(TargetedFileSet.DEFAULT_TARGET)) {
+            target = "&nbsp;";
+        }
+        out.println("<td>" + target + "</td>");
+        out.println("<td>");
+        int i = 0;
+        for(String bugID : cpBugIDs)
+        {
+            if(i > 0) out.println(",");
+            out.println("<a href='" + CP_BUGZILLA_URL + bugID+"'>"+bugID+"</a>");
+            i++;
+        }
+        
+        out.println("</td>");
+        out.println("</tr>");
+        out.flush();
+    }
+    
     protected void reportPackageDiff(PrintWriter out, String pkg,
-            String diffFileName, int flags) {
+            String diffFileName, Flags flags) {
         out.println("<tr class='needsmerge'>");
         out.println("<td>" + pkg + "</td>");
         out.println("<td>&nbsp;</td>");
@@ -369,33 +429,33 @@ public class CompareTask extends Task {
         }
     }
 
-    protected void reportFlags(PrintWriter out, int flags) {
+    protected void reportFlags(PrintWriter out, Flags flags) {
         final StringBuffer b = new StringBuffer();
-        if ((flags & FLAG_TARGET_DIFF) != 0) {
+        if (flags.isSet(FLAG_TARGET_DIFF)) {
             if (b.length() > 0) {
                 b.append(", ");
             }
             b.append("different target");
         }
-        if ((flags & FLAG_VM_SPECIFIC) != 0) {
+        if (flags.isSet(FLAG_VM_SPECIFIC)) {
             if (b.length() > 0) {
                 b.append(", ");
             }
             b.append("vm-specific");
         }
-        if ((flags & FLAG_CLASSPATH_BUGFIX) != 0) {
+        if (flags.isSet(FLAG_CLASSPATH_BUGFIX)) {
             if (b.length() > 0) {
                 b.append(", ");
             }
             b.append("cp-bugfix");
         }
-        if ((flags & FLAG_NATIVE) != 0) {
+        if (flags.isSet(FLAG_NATIVE)) {
             if (b.length() > 0) {
                 b.append(", ");
             }
             b.append("native");
         }
-        if ((flags & FLAG_JNODE) != 0) {
+        if (flags.isSet(FLAG_JNODE)) {
             if (b.length() > 0) {
                 b.append(", ");
             }
@@ -409,34 +469,90 @@ public class CompareTask extends Task {
         }
     }
 
-    protected int getFlags(String code) {
-        int flags = 0;
-        if (code.indexOf("native") >= 0) {
-            flags |= FLAG_NATIVE;
-        }
-        if (code.toLowerCase().indexOf("jnode") >= 0) {
-            flags |= FLAG_JNODE;
-        }
-        if (code.indexOf(vmSpecificTag) >= 0) {
-            flags |= FLAG_VM_SPECIFIC;
-        }
-        if (code.indexOf(classpathBugfixTag) >= 0) {
-            flags |= FLAG_CLASSPATH_BUGFIX;
-        }
+    protected Flags getFlags(String code) 
+    {
+        final Flags flags = new Flags();
+        getFlags(code, flags);
         return flags;
     }
+    
+    protected void getFlags(String code, final Flags flags) {
+        final int nbChars = code.length(); 
+        for(int i = 0 ; i < nbChars ; i++)
+        {
+            if(matchTag(code, i, "native")) {
+                flags.set(FLAG_NATIVE);
+                i += "native".length();
+                continue;
+            }
+            
+            if (matchTag(code, i, "jnode")) {
+                // exclude the case where there is jnode mails ("@jnode.org")
+                if((i == 0) || !matchTag(code, i - 1, jnodeMail))
+                {                    
+                    flags.set(FLAG_JNODE);                
+                }
+                i += "jnode".length();
+                continue;
+            }
+            if (matchTag(code, i, vmSpecificTag)) {
+                flags.set(FLAG_VM_SPECIFIC);
+                i += vmSpecificTag.length();
+                continue;
+            }
 
-    protected int getFlags(SourceFile file) throws IOException {
+            if ( matchTag(code, i, classpathBugfixTag) &&
+                !matchTag(code, i, classpathBugfixEndTag) ) 
+            {
+                flags.set(FLAG_CLASSPATH_BUGFIX);
+                
+                // has this bugfix been submitted ?
+                if( matchTag(code, i, classpathBugIDTag) )
+                {
+                    // bugfix has been submitted 
+                    int startID = i + classpathBugIDTag.length();
+                    int endID = startID;
+                    while((endID < code.length()) && 
+                          Character.isDigit(code.charAt(endID)) ) 
+                    { 
+                        endID++; 
+                    }
+                    
+                    String id = code.substring(startID, endID);
+                    flags.addBugID(id);
+                }
+                else
+                {                    
+                    // bugfix hasn't been submitted
+                    flags.set(FLAG_UNSUBMITTED_CLASSPATH_BUGFIX);                
+                }
+                i += classpathBugfixTag.length();
+                continue;
+            }
+        }
+    }
+    
+    private boolean matchTag(String code, int startIndex, String tag)
+    {
+        int endIndex = startIndex+tag.length();
+        if(endIndex > code.length()) return false;
+        
+        return code.substring(startIndex, endIndex).equals(tag);
+    }
+
+    protected Flags getFlags(SourceFile file) throws IOException {
         final FileReader fr = new FileReader(file.getFile());
         try {
             final BufferedReader in = new BufferedReader(fr);
-            final StringBuffer b = new StringBuffer();
+            //final StringBuffer b = new StringBuffer();
             String line;
+            final Flags flags = new Flags();
             while ((line = in.readLine()) != null) {
-                b.append(line);
-                b.append('\n');
+                getFlags(line.toString(), flags);
+                //b.append(line);
+                //b.append('\n');
             }
-            return getFlags(b.toString());
+            return flags;
         } finally {
             fr.close();
         }
@@ -476,21 +592,5 @@ public class CompareTask extends Task {
      */
     public final void setDestDir(File destDir) {
         this.destDir = destDir;
-    }
-
-    /**
-     * @param classpathBugfixTag
-     *            The classpathBugfixTag to set.
-     */
-    public final void setClasspathBugfixTag(String classpathBugfixTag) {
-        this.classpathBugfixTag = classpathBugfixTag;
-    }
-
-    /**
-     * @param vmSpecificTag
-     *            The vmSpecificTag to set.
-     */
-    public final void setVmSpecificTag(String vmSpecificTag) {
-        this.vmSpecificTag = vmSpecificTag;
     }
 }
