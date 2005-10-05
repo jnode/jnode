@@ -288,9 +288,11 @@ public final class Math
 	 * @param a the angle (in radians)
 	 * @return sin(a)
 	 */
+    // @classpath-bugfix-22918
 	public static double sin(double a) {
 		return StrictMath.sin(a);
 	}
+	// @classpath-bugfix-end
 
 	/**
 	 * The trigonometric function <em>cos</em>. The cosine of NaN or infinity is
@@ -299,9 +301,11 @@ public final class Math
 	 * @param a the angle (in radians)
 	 * @return cos(a)
 	 */
+	// @classpath-bugfix-22918
 	public static double cos(double a) {
 		return StrictMath.cos(a);
 	}
+	// @classpath-bugfix-end
 
 	/**
 	 * The trigonometric function <em>tan</em>. The tangent of NaN or infinity
@@ -311,9 +315,11 @@ public final class Math
 	 * @param a the angle (in radians)
 	 * @return tan(a)
 	 */
+	// @classpath-bugfix-22918
 	public static double tan(double a) {
 		return StrictMath.tan(a);
 	}
+	// @classpath-bugfix-end
 
 	/**
 	 * The trigonometric function <em>arcsin</em>. The range of angles returned
@@ -324,9 +330,11 @@ public final class Math
 	 * @param a the sin to turn back into an angle
 	 * @return arcsin(a)
 	 */
+	// @classpath-bugfix-22918
 	public static double asin(double a) {
 		return StrictMath.asin(a);
 	}
+	// @classpath-bugfix-end
 
 	/**
 	 * The trigonometric function <em>arccos</em>. The range of angles returned
@@ -337,9 +345,11 @@ public final class Math
 	 * @param a the cos to turn back into an angle
 	 * @return arccos(a)
 	 */
+	// @classpath-bugfix-22918
 	public static double acos(double a) {
 		return StrictMath.acos(a);
 	}
+	// @classpath-bugfix-end
 
 	/**
 	 * The trigonometric function <em>arcsin</em>. The range of angles returned
@@ -351,9 +361,11 @@ public final class Math
 	 * @return arcsin(a)
 	 * @see #atan2(double, double)
 	 */
+	// @classpath-bugfix-22918
 	public static double atan(double a) {
 		return StrictMath.atan(a);
 	}
+	// @classpath-bugfix-end
 
 	/**
 	 * A special version of the trigonometric function <em>arctan</em>, for
@@ -402,9 +414,11 @@ public final class Math
 	 * @return <em>theta</em> in the conversion of (x, y) to (r, theta)
 	 * @see #atan(double)
 	 */
+	// @classpath-bugfix-22918
 	public static double atan2(double y, double x) {
 		return StrictMath.atan2(y, x);
 	}
+	// @classpath-bugfix-end
 
 	/**
 	 * Take <em>e</em><sup>a</sup>.  The opposite of <code>log()</code>. If the
@@ -418,9 +432,11 @@ public final class Math
 	 * @see #log(double)
 	 * @see #pow(double, double)
 	 */
+	// @classpath-bugfix-22918
 	public static double exp(double a) {
 		return StrictMath.exp(a);
 	}
+	// @classpath-bugfix-end
 
 	/**
 	 * Take ln(a) (the natural log).  The opposite of <code>exp()</code>. If the
@@ -436,9 +452,11 @@ public final class Math
 	 * @return the natural log of <code>a</code>
 	 * @see #exp(double)
 	 */
+	// @classpath-bugfix-22918
 	public static double log(double a) {
 		return StrictMath.log(a);
 	}
+	// @classpath-bugfix-end
 
 	/**
 	 * Take a square root. If the argument is NaN or negative, the result is
@@ -452,9 +470,11 @@ public final class Math
 	 * @return the square root of the argument
 	 * @see #pow(double, double)
 	 */
+	// @classpath-bugfix-22918    
 	public static double sqrt(double a) {
 		return StrictMath.sqrt(a);
 	}
+	// @classpath-bugfix-end    
 
 	/**
 	 * Raise a number to a power. Special cases:<ul>
@@ -524,9 +544,11 @@ public final class Math
 	 * @param b the power to raise it to
 	 * @return a<sup>b</sup>
 	 */
+	// @classpath-bugfix-22918    
 	public static double pow(double a, double b) {
 		return StrictMath.pow(a, b);
 	}
+	// @classpath-bugfix-end    
 
 	/**
 	 * Get the IEEE 754 floating point remainder on two numbers. This is the
@@ -542,9 +564,11 @@ public final class Math
 	 * @return the IEEE 754-defined floating point remainder of x/y
 	 * @see #rint(double)
 	 */
+	// @classpath-bugfix-22918    
 	public static double IEEEremainder(double x, double y) {
 		return StrictMath.IEEEremainder(x, y);
 	}
+	// @classpath-bugfix-end    
 
 	/**
 	 * Take the nearest integer that is that is greater than or equal to the
@@ -555,9 +579,11 @@ public final class Math
 	 * @param a the value to act upon
 	 * @return the nearest integer &gt;= <code>a</code>
 	 */
+	// @classpath-bugfix-22918    
 	public static double ceil(double a) {
 		return StrictMath.ceil(a);
 	}
+	// @classpath-bugfix-end   
 
 	/**
 	 * Take the nearest integer that is that is less than or equal to the
@@ -567,9 +593,11 @@ public final class Math
 	 * @param a the value to act upon
 	 * @return the nearest integer &lt;= <code>a</code>
 	 */
+	// @classpath-bugfix-22918    
 	public static double floor(double a) {
 		return StrictMath.floor(a);		
 	}
+	// @classpath-bugfix-end    
 
 	/**
 	 * Take the nearest integer to the argument.  If it is exactly between
@@ -579,10 +607,12 @@ public final class Math
 	 * @param a the value to act upon
 	 * @return the nearest integer to <code>a</code>
 	 */
+  // @classpath-bugfix-22918    
   public static double rint(double a)
   {
       return StrictMath.rint(a);
   }
+  // @classpath-bugfix-end
 
 	/**
 	 * Take the nearest integer to the argument.  This is equivalent to

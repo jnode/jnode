@@ -664,7 +664,8 @@ public final class Array
 	}
 
 
-    //LS
+     // LS
+    // @classpath-bugfix-22923 should be placed in VMArray
 	/**
 	 * Dynamically create an array of objects.
 	 *
@@ -706,4 +707,5 @@ public final class Array
         return result;
 	}
     private static VmHeapManager heapManager;
+    // @classpath-bugfix-end
 }
