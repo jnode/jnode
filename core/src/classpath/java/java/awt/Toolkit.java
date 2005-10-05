@@ -518,7 +518,7 @@ public abstract class Toolkit
                                              default_toolkit_name);
     try
       {
-        // @classpath-bugfix   Replace Class.forName
+        // @classpath-bugfix-22969   Replace Class.forName
         //Class cls = Class.forName(toolkit_name);
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         Class cls = cl.loadClass(toolkit_name);

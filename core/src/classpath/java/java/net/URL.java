@@ -124,9 +124,11 @@ import java.util.StringTokenizer;
  */
 public final class URL implements Serializable
 {
+    // @classpath-bugfix-22903
     // @vm-specific Added org.jnode.protocol
   private static final String DEFAULT_SEARCH_PATH =
     "org.jnode.protocol|gnu.java.net.protocol|gnu.inet";
+    // @classpath-bugfix-end
 
   // Cached System ClassLoader
   private static ClassLoader systemClassLoader;
