@@ -38,22 +38,31 @@ exception statement from your version. */
 
 package gnu.CORBA;
 
+import gnu.CORBA.CDR.UnknownExceptionCtxHandler;
+import gnu.CORBA.CDR.cdrBufInput;
 import gnu.CORBA.CDR.cdrBufOutput;
+import gnu.CORBA.CDR.cdrInput;
+import gnu.CORBA.GIOP.ServiceContext;
+import gnu.classpath.VMStackWalker;
 
 import org.omg.CORBA.Any;
 import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.CompletionStatusHelper;
 import org.omg.CORBA.MARSHAL;
-import org.omg.CORBA.StructMember;
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.TCKind;
 import org.omg.CORBA.UNKNOWN;
 import org.omg.CORBA.UserException;
+import org.omg.CORBA.portable.IDLEntity;
 import org.omg.CORBA.portable.InputStream;
 import org.omg.CORBA.portable.OutputStream;
+import org.omg.CORBA.portable.ValueBase;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.WeakHashMap;
+
+import javax.rmi.CORBA.Util;
 
 /**
  * Creates java objects from the agreed IDL names for the simple case when the
@@ -79,6 +88,24 @@ public class ObjectCreator
   public static final String CLASSPATH_PREFIX = "gnu.CORBA.";
 
   /**
+   * Maps classes to they IDL or RMI names. Computing RMI name is an expensive
+   * operations, so frequently used RMI keys are reused. The map must be weak to
+   * ensure that the class can be unloaded, when applicable.
+   */
+  public static Map m_names = new WeakHashMap();
+
+  /**
+   * Maps IDL strings into known classes. The map must be weak to ensure that
+   * the class can be unloaded, when applicable.
+   */
+  public static Map m_classes = new WeakHashMap();
+
+  /**
+   * Maps IDL types to they helpers.
+   */
+  public static Map m_helpers = new WeakHashMap();
+
+  /**
    * Try to instantiate an object with the given IDL name. The object must be
    * mapped to the local java class. The omg.org domain must be mapped into the
    * object in either org/omg or gnu/CORBA namespace.
@@ -88,64 +115,50 @@ public class ObjectCreator
    */
   public static java.lang.Object createObject(String idl, String suffix)
   {
+    synchronized (m_classes)
+      {
+        Class known = (Class) (suffix == null ? m_classes.get(idl)
+          : m_classes.get(idl + 0xff + suffix));
+        Object object;
+
+        if (known != null)
+          {
     try
       {
-        return Class.forName(toClassName(JAVA_PREFIX, idl) + suffix)
-                    .newInstance();
+                return known.newInstance();
       }
     catch (Exception ex)
       {
+                RuntimeException rex = new RuntimeException(idl + " suffix "
+                  + suffix, ex);
+                throw rex;
+              }
+          }
+        else
+          {
+            if (suffix == null)
+              suffix = "";
         try
           {
-            return Class.forName(toClassName(CLASSPATH_PREFIX, idl) + suffix)
-                        .newInstance();
+                known = forName(toClassName(JAVA_PREFIX, idl) + suffix);
+                object = known.newInstance();
+              }
+            catch (Exception ex)
+              {
+                try
+                  {
+                    known = forName(toClassName(CLASSPATH_PREFIX, idl)
+                      + suffix);
+                    object = known.newInstance();
           }
         catch (Exception exex)
           {
         return null;
       }
   }
-  }
-
-  /**
-   * Create the system exception with the given idl name.
-   *
-   * @param idl the exception IDL name, must match the syntax "IDL:<class/name>:1.0".
-   * @param minor the exception minor code.
-   * @param completed the exception completion status.
-   *
-   * @return the created exception.
-   */
-  public static SystemException createSystemException(String idl, int minor,
-                                                      CompletionStatus completed
-                                                     )
-  {
-    try
-      {
-        String cl = toClassName(JAVA_PREFIX, idl);
-        Class exClass = Class.forName(cl);
-
-        Constructor constructor =
-          exClass.getConstructor(new Class[]
-                                 {
-              String.class, int.class, CompletionStatus.class
-                                 }
-                                );
-
-        Object exception =
-          constructor.newInstance(new Object[]
-                                  {
-              " Remote exception " + idl + ", minor " + minor + ", " +
-              completed + ".", new Integer(minor), completed
-                                  }
-                                 );
-
-        return (SystemException) exception;
-      }
-    catch (Exception ex)
-      {
-        ex.printStackTrace();
-        return new UNKNOWN("Unsupported system exception", minor, completed);
+            m_classes.put(idl + 0xff + suffix, known);
+            return object;
+          }
       }
   }
 
@@ -153,17 +166,59 @@ public class ObjectCreator
    * Read the system exception from the given stream.
    *
    * @param input the CDR stream to read from.
+   * @param contexts the service contexts in request/reply header/
+   *
    * @return the exception that has been stored in the stream (IDL name, minor
    * code and completion status).
    */
-  public static SystemException readSystemException(InputStream input)
+  public static SystemException readSystemException(InputStream input,
+    ServiceContext[] contexts)
   {
+    SystemException exception;
+
     String idl = input.read_string();
     int minor = input.read_ulong();
-    CompletionStatus status = CompletionStatusHelper.read(input);
+    CompletionStatus completed = CompletionStatusHelper.read(input);
 
-    SystemException exception =
-      ObjectCreator.createSystemException(idl, minor, status);
+    try
+      {
+        exception = (SystemException) createObject(idl, null);
+        exception.minor = minor;
+        exception.completed = completed;
+      }
+    catch (Exception ex)
+                                 {
+        UNKNOWN u = new UNKNOWN("Unsupported system exception " + idl, minor,
+          completed);
+        u.initCause(ex);
+        throw u;
+                                 }
+
+    try
+      {
+        // If UnknownExceptionInfo is present in the contexts, read it and
+        // set as a cause of this exception.
+        ServiceContext uEx = ServiceContext.find(
+          ServiceContext.UnknownExceptionInfo, contexts);
+
+        if (uEx != null)
+          {
+            cdrBufInput in = new cdrBufInput(uEx.context_data);
+            in.setOrb(in.orb());
+            if (input instanceof cdrInput)
+                                  {
+                ((cdrInput) input).cloneSettings(in);
+                                  }
+
+            Throwable t = UnknownExceptionCtxHandler.read(in, contexts);
+            exception.initCause(t);
+          }
+      }
+    catch (Exception ex)
+      {
+        // Unsupported context format. Do not terminate as the user program may
+        // not need it.
+  }
 
     return exception;
   }
@@ -183,13 +238,10 @@ public class ObjectCreator
   {
     try
       {
-        String helper = toHelperName(idl);
-        Class helperClass = Class.forName(helper);
+        Class helperClass = findHelper(idl);
 
-        Method read =
-          helperClass.getMethod("read",
-            new Class[] { org.omg.CORBA.portable.InputStream.class }
-                               );
+        Method read = helperClass.getMethod("read",
+          new Class[] { org.omg.CORBA.portable.InputStream.class });
 
         return (UserException) read.invoke(null, new Object[] { input });
       }
@@ -232,10 +284,9 @@ public class ObjectCreator
    * @param ex an exception to write.
    */
   public static void writeSystemException(OutputStream output,
-                                          SystemException ex
-                                         )
+    SystemException ex)
   {
-    String exIDL = toIDL(ex.getClass().getName());
+    String exIDL = getRepositoryId(ex.getClass());
     output.write_string(exIDL);
     output.write_ulong(ex.minor);
     CompletionStatusHelper.write(output, ex.completed);
@@ -268,13 +319,18 @@ public class ObjectCreator
    *
    * @param IDL the idl name.
    *
-   * TODO Cache the returned classes, avoiding these string manipulations each
-   * time the conversion is required.
-   *
    * @return the matching class or null if no such is available.
    */
   public static Class Idl2class(String IDL)
   {
+    synchronized (m_classes)
+      {
+        Class c = (Class) m_classes.get(IDL);
+
+        if (c != null)
+          return c;
+        else
+          {
     String s = IDL;
     int a = s.indexOf(':') + 1;
     int b = s.lastIndexOf(':');
@@ -288,11 +344,15 @@ public class ObjectCreator
 
     try
       {
-        return Class.forName(cn);
+                c = forName(cn);
+                m_classes.put(IDL, c);
+                return c;
       }
     catch (ClassNotFoundException ex)
       {
         return null;
+      }
+  }
       }
   }
 
@@ -325,22 +385,41 @@ public class ObjectCreator
   }
 
   /**
-   * Convert the class name to IDL name.
+   * Convert the class name to IDL or RMI name (repository id). If the class
+   * inherits from IDLEntity, ValueBase or SystemException, returns repository
+   * Id in the IDL:(..) form. If it does not, returns repository Id in the
+   * RMI:(..) form.
    *
-   * @param cn the class name.
+   * @param cx the class for that the name must be computed.
    *
-   * @return the idl name.
+   * @return the idl or rmi name.
    */
-  public static String toIDL(String cn)
+  public static synchronized String getRepositoryId(Class cx)
+  {
+    String name = (String) m_names.get(cx);
+    if (name != null)
+      return name;
+
+    String cn = cx.getName();
+    if (!(IDLEntity.class.isAssignableFrom(cx)
+      || ValueBase.class.isAssignableFrom(cx) || SystemException.class.isAssignableFrom(cx)))
+      {
+        // Not an IDL entity.
+        name = Util.createValueHandler().getRMIRepositoryID(cx);
+      }
+    else
   {
     if (cn.startsWith(JAVA_PREFIX))
-      cn = OMG_PREFIX + cn.substring(JAVA_PREFIX.length()).replace('.', '/');
+          cn = OMG_PREFIX
+            + cn.substring(JAVA_PREFIX.length()).replace('.', '/');
     else if (cn.startsWith(CLASSPATH_PREFIX))
-      cn =
-        OMG_PREFIX +
-        cn.substring(CLASSPATH_PREFIX.length()).replace('.', '/');
+          cn = OMG_PREFIX
+            + cn.substring(CLASSPATH_PREFIX.length()).replace('.', '/');
 
-    return "IDL:" + cn + ":1.0";
+        name = "IDL:" + cn + ":1.0";
+      }
+    m_names.put(cx, name);
+    return name;
   }
 
   /**
@@ -360,12 +439,10 @@ public class ObjectCreator
     try
       {
         String helperClassName = object.getClass().getName() + "Helper";
-        Class helperClass = Class.forName(helperClassName);
+        Class helperClass = forName(helperClassName);
 
-        Method insert =
-          helperClass.getMethod("insert",
-            new Class[] { Any.class, object.getClass() }
-          );
+        Method insert = helperClass.getMethod("insert", new Class[] {
+          Any.class, object.getClass() });
 
         insert.invoke(null, new Object[] { into, object });
 
@@ -387,7 +464,7 @@ public class ObjectCreator
       {
         cdrBufOutput output = new cdrBufOutput();
 
-        String m_exception_id = toIDL(exception.getClass().getName());
+        String m_exception_id = getRepositoryId(exception.getClass());
         output.write_string(m_exception_id);
         output.write_ulong(exception.minor);
         CompletionStatusHelper.write(output, exception.completed);
@@ -443,5 +520,70 @@ public class ObjectCreator
       ok = insertSysException(into, new UNKNOWN());
     if (!ok)
       throw new InternalError("Exception wrapping broken");
+  }
+
+  /**
+   * Find helper for the class with the given name.
+   */
+  public static Class findHelper(String idl)
+  {
+    synchronized (m_helpers)
+      {
+        Class c = (Class) m_helpers.get(idl);
+        if (c != null)
+          return c;
+        try
+          {
+            String helper = toHelperName(idl);
+            c = forName(helper);
+
+            m_helpers.put(idl, c);
+            return c;
+          }
+        catch (Exception ex)
+          {
+            return null;
+          }
+      }
+  }
+  
+  /**
+   * Load the class with the given name. This method tries to use the context
+   * class loader first. If this fails, it searches for the suitable class
+   * loader in the caller stack trace. This method is a central point where all
+   * requests to find a class by name are delegated.
+   */
+  public static Class forName(String className) throws ClassNotFoundException
+  {
+    try
+      {
+        return Class.forName(className, true,
+                             Thread.currentThread().getContextClassLoader());
+      }
+    catch (ClassNotFoundException nex)
+      {
+        /**
+         * Returns the first user defined class loader on the call stack, or
+         * null when no non-null class loader was found.
+         */
+        Class[] ctx = VMStackWalker.getClassContext();
+        for (int i = 0; i < ctx.length; i++)
+          {
+            // Since we live in a class loaded by the bootstrap
+            // class loader, getClassLoader is safe to call without
+            // needing to be wrapped in a privileged action.
+            ClassLoader cl = ctx[i].getClassLoader();
+            try
+              {
+                if (cl != null)
+                  return Class.forName(className, true, cl);
+              }
+            catch (ClassNotFoundException nex2)
+              {
+                // Try next.
+              }
+          }
+      }
+    throw new ClassNotFoundException(className);
   }
 }

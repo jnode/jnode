@@ -123,7 +123,10 @@ public class Version
       }
     catch (IOException ex)
       {
-        throw new MARSHAL("IOException while reading message header");
+        MARSHAL m = new MARSHAL("IOException while reading message header");
+        m.initCause(ex);
+        m.minor = Minor.Header;
+        throw m;
       }
   }
 
@@ -209,7 +212,10 @@ public class Version
       }
     catch (IOException ex)
       {
-        throw new MARSHAL("IOException while writing message header");
+        MARSHAL m = new MARSHAL("IOException while writing message header");
+        m.minor = Minor.Header;
+        m.initCause(ex);
+        throw m;
       }
   }
  

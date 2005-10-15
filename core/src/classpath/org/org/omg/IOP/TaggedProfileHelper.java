@@ -38,6 +38,7 @@ exception statement from your version. */
 
 package org.omg.IOP;
 
+import gnu.CORBA.Minor;
 import gnu.CORBA.CDR.cdrBufInput;
 import gnu.CORBA.CDR.cdrBufOutput;
 
@@ -118,6 +119,7 @@ public abstract class TaggedProfileHelper
     catch (ClassCastException cex)
       {
         BAD_OPERATION bad = new BAD_OPERATION("TaggedProfile expected");
+        bad.minor = Minor.Any;        
         bad.initCause(cex);
         throw bad;
       }
@@ -178,6 +180,7 @@ public abstract class TaggedProfileHelper
         catch (IOException e)
           {
             MARSHAL m = new MARSHAL();
+            m.minor = Minor.Encapsulation;
             m.initCause(e);
             throw m;
           }

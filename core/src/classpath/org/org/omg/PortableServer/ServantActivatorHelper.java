@@ -38,6 +38,8 @@ exception statement from your version. */
 
 package org.omg.PortableServer;
 
+import gnu.CORBA.Minor;
+
 import org.omg.CORBA.Any;
 import org.omg.CORBA.BAD_PARAM;
 import org.omg.CORBA.MARSHAL;
@@ -125,7 +127,9 @@ public abstract class ServantActivatorHelper
    */
   public static ServantActivator read(InputStream input)
   {
-    throw new MARSHAL();
+    MARSHAL m = new MARSHAL("Inappropriate");
+    m.minor = Minor.Inappropriate;
+    throw m;
   }
 
   /**
@@ -140,6 +144,8 @@ public abstract class ServantActivatorHelper
    */
   public static void write(OutputStream output, ServantActivator value)
   {
-    throw new MARSHAL();
+    MARSHAL m = new MARSHAL("Inappropriate");
+    m.minor = Minor.Inappropriate;
+    throw m;
   }
 }

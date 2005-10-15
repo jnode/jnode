@@ -38,6 +38,7 @@ exception statement from your version. */
 
 package org.omg.CORBA;
 
+import gnu.CORBA.Minor;
 import gnu.CORBA.TypeCodeHelper;
 
 import org.omg.CORBA.portable.ApplicationException;
@@ -114,6 +115,7 @@ public class _IDLTypeStub
     catch (UserException ex)
       {
         MARSHAL m = new MARSHAL();
+        m.minor = Minor.UserException;
         m.initCause(ex);
         throw m;
       }

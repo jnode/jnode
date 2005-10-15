@@ -38,10 +38,9 @@ exception statement from your version. */
 
 package org.omg.CORBA;
 
+import gnu.CORBA.Minor;
 import gnu.CORBA.Restricted_ORB;
-import gnu.CORBA.gnuAny;
 
-import org.omg.CORBA.TypeCodePackage.BadKind;
 import org.omg.CORBA.portable.BoxedValueHelper;
 import org.omg.CORBA.portable.InputStream;
 import org.omg.CORBA.portable.OutputStream;
@@ -121,7 +120,9 @@ public class StringValueHelper
       }
     catch (ClassCastException ex)
       {
-        throw new MARSHAL("String expected");
+        MARSHAL m = new MARSHAL("String expected");
+        m.minor = Minor.ClassCast;
+        throw m;
       }
   }
 
@@ -141,7 +142,11 @@ public class StringValueHelper
         return an_any.extract_string();
       }
     else
-      throw new BAD_OPERATION("Contains not a string value type");
+      {
+        BAD_OPERATION bad = new BAD_OPERATION("String value type expected");
+        bad.minor = Minor.Any;
+        throw bad;
+      }
   }
 
   /**

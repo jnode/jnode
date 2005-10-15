@@ -39,6 +39,7 @@ exception statement from your version. */
 package org.omg.CORBA;
 
 import gnu.CORBA.DynAn.NameValuePairHolder;
+import gnu.CORBA.Minor;
 import gnu.CORBA.aliasTypeCode;
 import gnu.CORBA.primitiveTypeCode;
 import gnu.CORBA.stringTypeCode;
@@ -75,7 +76,9 @@ public abstract class NameValuePairHelper
       }
     catch (ClassCastException ex)
       {
-        throw new BAD_OPERATION("NameValuePair expected");
+        BAD_OPERATION bad = new BAD_OPERATION("NameValuePair expected");
+        bad.minor = Minor.Any;
+        throw bad;
       }
   }
 

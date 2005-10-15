@@ -38,6 +38,7 @@ exception statement from your version. */
 
 package org.omg.CORBA;
 
+import gnu.CORBA.Minor;
 import gnu.CORBA.primitiveTypeCode;
 
 import org.omg.CORBA.portable.InputStream;
@@ -63,7 +64,9 @@ public abstract class ObjectHelper
       }
     catch (ClassCastException ex)
       {
-        throw new BAD_OPERATION("CORBA object expected");
+        BAD_OPERATION bad = new BAD_OPERATION("CORBA object expected");
+        bad.minor = Minor.Any;
+        throw bad;        
       }
   }
 

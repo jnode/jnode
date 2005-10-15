@@ -38,6 +38,7 @@ exception statement from your version. */
 
 package org.omg.CORBA;
 
+import gnu.CORBA.Minor;
 import gnu.CORBA.Restricted_ORB;
 import gnu.CORBA.TypeCodeHelper;
 
@@ -177,6 +178,7 @@ public abstract class ValueMemberHelper
     catch (UserException ex)
       {
         MARSHAL m = new MARSHAL();
+        m.minor = Minor.UserException;        
         m.initCause(ex);
         throw m;
       }
@@ -200,6 +202,7 @@ public abstract class ValueMemberHelper
     catch (UserException ex)
       {
         MARSHAL m = new MARSHAL();
+        m.minor = Minor.UserException;        
         m.initCause(ex);
         throw m;
       }

@@ -38,6 +38,8 @@ exception statement from your version. */
 
 package org.omg.PortableServer.POAManagerPackage;
 
+import gnu.CORBA.Minor;
+
 import org.omg.CORBA.BAD_OPERATION;
 import org.omg.CORBA.portable.IDLEntity;
 
@@ -153,12 +155,15 @@ public class State
       }
     catch (ArrayIndexOutOfBoundsException ex)
       {
-        throw new BAD_OPERATION("Invalid enumeration code " + code);
+        BAD_OPERATION bad = new BAD_OPERATION("Invalid state " + code);
+        bad.minor = Minor.Enumeration;
+        throw bad;
       }
   }
 
   /**
    * Returns a short string representation.
+   * 
    * @return the name of the current enumeration value.
    */
   public String toString()
