@@ -50,6 +50,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.peer.FontPeer;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.text.AttributedCharacterIterator;
 import java.text.CharacterIterator;
@@ -191,7 +192,7 @@ private static final long serialVersionUID = -4206021311591459213L;
 
 
   // The ClasspathToolkit-provided peer which implements this font
-  private ClasspathFontPeer peer;
+  private transient ClasspathFontPeer peer;
 
 
 /**
@@ -1317,5 +1318,19 @@ private static final long serialVersionUID = -4206021311591459213L;
     return getLineMetrics (str, 0, str.length () - 1, frc);
 	}
 
-}
+  /**
+   * Reads the normal fields from the stream and then constructs the
+   * peer from the style and size through getPeerFromToolkit().
+   */
+  private void readObject(ObjectInputStream ois)
+    throws IOException, ClassNotFoundException
+  {
+    ois.defaultReadObject();
 
+    HashMap attrs = new HashMap();
+    ClasspathFontPeer.copyStyleToAttrs(style, attrs);
+    ClasspathFontPeer.copySizeToAttrs(size, attrs);
+    peer = getPeerFromToolkit(name, attrs);
+
+  }
+}

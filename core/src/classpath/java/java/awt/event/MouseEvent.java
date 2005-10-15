@@ -42,6 +42,7 @@ import gnu.java.awt.EventModifier;
 
 import java.awt.Component;
 import java.awt.Point;
+import java.awt.PopupMenu;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 

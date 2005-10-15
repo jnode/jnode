@@ -121,6 +121,7 @@ public class XMLOutputFactoryImpl
   {
     if (IS_PREFIX_DEFAULTING.equals(name))
       prefixDefaulting = ((Boolean) value).booleanValue();
+    else
     throw new IllegalArgumentException(name);
   }
 

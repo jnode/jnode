@@ -274,6 +274,14 @@ public class Extension
       return (byte[]) encoded;
     }
 
+    public int hashCode()
+    {
+      int result = 0;
+      for (int i = 0; i < encoded.length; ++i)
+        result = result * 31 + encoded[i];
+      return result;
+    }
+
     public boolean equals(Object o)
     {
       if (!(o instanceof Value))

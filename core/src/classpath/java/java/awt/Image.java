@@ -141,7 +141,6 @@ public abstract class Image
 	 * This method is only valid for off-screen objects.
 	 *
 	 * @return a graphics context object for an off-screen object
-   * @see Graphics#getcreateImage(int, int)
 	 */
 	public abstract Graphics getGraphics();
 
