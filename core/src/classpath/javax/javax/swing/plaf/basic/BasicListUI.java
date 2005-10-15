@@ -63,6 +63,7 @@ import javax.swing.JViewport;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
+import javax.swing.LookAndFeel;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.event.ListDataEvent;
@@ -762,11 +763,10 @@ public class BasicListUI extends ListUI
    */
   protected void installDefaults()
   {
-    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-    list.setForeground(defaults.getColor("List.foreground"));
-    list.setBackground(defaults.getColor("List.background"));
-    list.setSelectionForeground(defaults.getColor("List.selectionForeground"));
-    list.setSelectionBackground(defaults.getColor("List.selectionBackground"));
+    LookAndFeel.installColorsAndFont(list, "List.background",
+                                     "List.foreground", "List.font");
+    list.setSelectionForeground(UIManager.getColor("List.selectionForeground"));
+    list.setSelectionBackground(UIManager.getColor("List.selectionBackground"));
     list.setOpaque(true);
   }
 

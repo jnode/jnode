@@ -106,7 +106,7 @@ public class BasicToggleButtonUI extends BasicButtonUI
     paintIcon(g, b, ir);
     if (text != null)
       paintText(g, b, tr, text);
-    if (b.isFocusOwner())
+    if (b.isFocusOwner() && b.isFocusPainted())
       paintFocus(g, b, vr, tr, ir);
   }
 

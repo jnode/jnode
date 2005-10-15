@@ -39,19 +39,23 @@ exception statement from your version. */
 package javax.swing.plaf.metal;
 
 import java.awt.Component;
+import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.List;
 
+import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JList;
+import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileSystemView;
+import javax.swing.filechooser.FileView;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicFileChooserUI;
 
@@ -154,6 +158,85 @@ public class MetalFileChooserUI
       fireContentsChanged(this, 0, items.size() - 1);
     }
     
+  }
+
+  /**
+   * Handles changes to the selection in the directory combo box.
+   */
+  protected class DirectoryComboBoxAction
+    extends AbstractAction
+  {
+    /**
+     * Creates a new action.
+     */
+    protected DirectoryComboBoxAction()
+    {
+    }
+    
+    /**
+     * Handles the action event.
+     * 
+     * @param e  the event.
+     */
+    public void actionPerformed(ActionEvent e)
+    {
+      JFileChooser fc = getFileChooser();
+      fc.setCurrentDirectory((File) directoryModel.getSelectedItem());
+    }
+  }
+
+  /**
+   * A renderer for the files and directories in the file chooser.
+   */
+  protected class FileRenderer
+    extends DefaultListCellRenderer
+  {
+    
+    /**
+     * Creates a new renderer.
+     */
+    protected FileRenderer()
+    {
+    }
+    
+    /**
+     * Returns a component that can render the specified value.
+     * 
+     * @param list  the list.
+     * @param value  the value (a {@link File}).
+     * @param index  the index.
+     * @param isSelected  is the item selected?
+     * @param cellHasFocus  does the item have the focus?
+     * 
+     * @return The renderer.
+     */
+    public Component getListCellRendererComponent(JList list, Object value,
+        int index, boolean isSelected, boolean cellHasFocus)
+    {
+      FileView v = getFileView(getFileChooser());
+      File f = (File) value;
+      setText(v.getName(f));
+      setIcon(v.getIcon(f));
+      if (isSelected)
+        {
+          setBackground(list.getSelectionBackground());
+          setForeground(list.getSelectionForeground());
+        }
+      else
+        {
+          setBackground(list.getBackground());
+          setForeground(list.getForeground());
+        }
+
+      setEnabled(list.isEnabled());
+      setFont(list.getFont());
+
+      if (cellHasFocus)
+        setBorder(UIManager.getBorder("List.focusCellHighlightBorder"));
+      else
+        setBorder(noFocusBorder);
+      return this;
+    }
   }
 
   /**
@@ -289,6 +372,9 @@ public class MetalFileChooserUI
     }
   }
 
+  /** The model for the directory combo box. */
+  private DirectoryComboBoxModel directoryModel;
+  
   /**
    * A factory method that returns a UI delegate for the specified
    * component.

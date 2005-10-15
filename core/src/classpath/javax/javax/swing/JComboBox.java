@@ -1029,19 +1029,6 @@ public class JComboBox extends JComponent implements ItemSelectable,
   }
 
   /**
-   * This method always returns false to indicate that JComboBox  itself is
-   * not focus traversable.
-   *
-   * @return false to indicate that JComboBox itself is not focus traversable.
-   *
-   * @deprecated
-   */
-  public boolean isFocusTraversable()
-  {
-    return false;
-  }
-
-  /**
    * setKeySelectionManager
    *
    * @param aManager

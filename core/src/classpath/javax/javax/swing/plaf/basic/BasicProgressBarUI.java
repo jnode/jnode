@@ -56,10 +56,10 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.JComponent;
 import javax.swing.JProgressBar;
+import javax.swing.LookAndFeel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -712,21 +712,19 @@ public class BasicProgressBarUI extends ProgressBarUI
    */
   protected void installDefaults()
   {
-    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-
-    progressBar.setFont(defaults.getFont("ProgressBar.font"));
-    progressBar.setForeground(defaults.getColor("ProgressBar.foreground"));
-    progressBar.setBackground(defaults.getColor("ProgressBar.background"));
-    progressBar.setBorder(defaults.getBorder("ProgressBar.border"));
+    LookAndFeel.installColorsAndFont(progressBar, "ProgressBar.background",
+                                     "ProgressBar.foreground",
+                                     "ProgressBar.font");
+    LookAndFeel.installBorder(progressBar, "ProgressBar.border");
     progressBar.setOpaque(true);
 
-    selectionForeground = defaults.getColor("ProgressBar.selectionForeground");
-    selectionBackground = defaults.getColor("ProgressBar.selectionBackground");
-    cellLength = defaults.getInt("ProgressBar.cellLength");
-    cellSpacing = defaults.getInt("ProgressBar.cellSpacing");
+    selectionForeground = UIManager.getColor("ProgressBar.selectionForeground");
+    selectionBackground = UIManager.getColor("ProgressBar.selectionBackground");
+    cellLength = UIManager.getInt("ProgressBar.cellLength");
+    cellSpacing = UIManager.getInt("ProgressBar.cellSpacing");
 
-    int repaintInterval = defaults.getInt("ProgressBar.repaintInterval");
-    int cycleTime = defaults.getInt("ProgressBar.cycleTime");
+    int repaintInterval = UIManager.getInt("ProgressBar.repaintInterval");
+    int cycleTime = UIManager.getInt("ProgressBar.cycleTime");
 
     if (cycleTime % repaintInterval != 0
         && (cycleTime / repaintInterval) % 2 != 0)

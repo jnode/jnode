@@ -70,8 +70,8 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.LookAndFeel;
 import javax.swing.SwingUtilities;
-import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.plaf.ComponentUI;
@@ -1156,19 +1156,17 @@ public class BasicOptionPaneUI extends OptionPaneUI
    */
   protected void installDefaults()
   {
-    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-
-    optionPane.setFont(defaults.getFont("OptionPane.font"));
-    optionPane.setBackground(defaults.getColor("OptionPane.background"));
-    optionPane.setForeground(defaults.getColor("OptionPane.foreground"));
-    optionPane.setBorder(defaults.getBorder("OptionPane.border"));
+    LookAndFeel.installColorsAndFont(optionPane, "OptionPane.background",
+                                     "OptionPane.foreground",
+                                     "OptionPane.font");
+    LookAndFeel.installBorder(optionPane, "OptionPane.border");
     optionPane.setOpaque(true);
 
-    messageBorder = defaults.getBorder("OptionPane.messageAreaBorder");
-    messageForeground = defaults.getColor("OptionPane.messageForeground");
-    buttonBorder = defaults.getBorder("OptionPane.buttonAreaBorder");
+    messageBorder = UIManager.getBorder("OptionPane.messageAreaBorder");
+    messageForeground = UIManager.getColor("OptionPane.messageForeground");
+    buttonBorder = UIManager.getBorder("OptionPane.buttonAreaBorder");
 
-    minimumSize = defaults.getDimension("OptionPane.minimumSize");
+    minimumSize = UIManager.getDimension("OptionPane.minimumSize");
 
     // FIXME: Image icons don't seem to work properly right now.
     // Once they do, replace the synthetic icons with these ones.

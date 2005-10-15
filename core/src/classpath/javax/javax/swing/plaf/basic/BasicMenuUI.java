@@ -49,6 +49,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.LookAndFeel;
 import javax.swing.MenuSelectionManager;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
@@ -206,20 +207,17 @@ public class BasicMenuUI extends BasicMenuItemUI
    */
   protected void installDefaults()
   {
-    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-
-    menuItem.setBackground(defaults.getColor("Menu.background"));
-    menuItem.setBorder(defaults.getBorder("Menu.border"));
-    menuItem.setFont(defaults.getFont("Menu.font"));
-    menuItem.setForeground(defaults.getColor("Menu.foreground"));
-    menuItem.setMargin(defaults.getInsets("Menu.margin"));
-    acceleratorFont = defaults.getFont("Menu.acceleratorFont");
-    acceleratorForeground = defaults.getColor("Menu.acceleratorForeground");
-    acceleratorSelectionForeground = defaults.getColor("Menu.acceleratorSelectionForeground");
-    selectionBackground = defaults.getColor("Menu.selectionBackground");
-    selectionForeground = defaults.getColor("Menu.selectionForeground");
-    arrowIcon = defaults.getIcon("Menu.arrowIcon");
-    oldBorderPainted = defaults.getBoolean("Menu.borderPainted");
+    LookAndFeel.installBorder(menuItem, "Menu.border");
+    LookAndFeel.installColorsAndFont(menuItem, "Menu.background",
+                                     "Menu.foreground", "Menu.font");
+    menuItem.setMargin(UIManager.getInsets("Menu.margin"));
+    acceleratorFont = UIManager.getFont("Menu.acceleratorFont");
+    acceleratorForeground = UIManager.getColor("Menu.acceleratorForeground");
+    acceleratorSelectionForeground = UIManager.getColor("Menu.acceleratorSelectionForeground");
+    selectionBackground = UIManager.getColor("Menu.selectionBackground");
+    selectionForeground = UIManager.getColor("Menu.selectionForeground");
+    arrowIcon = UIManager.getIcon("Menu.arrowIcon");
+    oldBorderPainted = UIManager.getBoolean("Menu.borderPainted");
     menuItem.setOpaque(true);
   }
 

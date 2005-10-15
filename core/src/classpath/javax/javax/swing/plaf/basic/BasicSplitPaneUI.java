@@ -58,7 +58,7 @@ import java.beans.PropertyChangeListener;
 import javax.swing.JComponent;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
-import javax.swing.UIDefaults;
+import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.SplitPaneUI;
@@ -989,16 +989,16 @@ public class BasicSplitPaneUI extends SplitPaneUI
    */
   protected void installDefaults()
   {
+    LookAndFeel.installColors(splitPane, "SplitPane.background",
+                              "SplitPane.foreground");
+    LookAndFeel.installBorder(splitPane, "SplitPane.border");
     divider = createDefaultDivider();
     resetLayoutManager();
     nonContinuousLayoutDivider = createDefaultNonContinuousLayoutDivider();
     splitPane.add(divider, JSplitPane.DIVIDER);
 
     // There is no need to add the nonContinuousLayoutDivider
-    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-    splitPane.setBackground(defaults.getColor("SplitPane.background"));
-    splitPane.setBorder(defaults.getBorder("SplitPane.border"));
-    splitPane.setDividerSize(defaults.getInt("SplitPane.dividerSize"));
+    splitPane.setDividerSize(UIManager.getInt("SplitPane.dividerSize"));
     splitPane.setOpaque(true);
   }
 

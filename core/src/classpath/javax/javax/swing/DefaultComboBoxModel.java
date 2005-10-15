@@ -222,8 +222,17 @@ public class DefaultComboBoxModel extends AbstractListModel
    */
   public void setSelectedItem(Object object)
   {
+    if (selectedItem == null)
+      {
+        if (object == null)
+          return;
+      }
+    else
+      {
+        if (selectedItem.equals(object))
+          return;
+      }
     selectedItem = object;
-    if(object == null || list.contains(object)) 
       fireContentsChanged(this, -1, -1);	
   }
 

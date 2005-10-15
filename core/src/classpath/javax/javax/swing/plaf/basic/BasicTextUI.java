@@ -55,6 +55,7 @@ import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
+import javax.swing.LookAndFeel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
@@ -366,8 +367,7 @@ public abstract class BasicTextUI extends TextUI
      */
     public void changedUpdate(DocumentEvent ev)
     {
-      Dimension size = textComponent.getSize();
-      rootView.changedUpdate(ev, new Rectangle(0, 0, size.width, size.height),
+      rootView.changedUpdate(ev, getVisibleEditorRect(),
                              rootView.getViewFactory());
     }
 
@@ -378,8 +378,7 @@ public abstract class BasicTextUI extends TextUI
      */
     public void insertUpdate(DocumentEvent ev)
     {
-      Dimension size = textComponent.getSize();
-      rootView.insertUpdate(ev, new Rectangle(0, 0, size.width, size.height),
+      rootView.insertUpdate(ev, getVisibleEditorRect(),
                             rootView.getViewFactory());
     }
 
@@ -390,8 +389,7 @@ public abstract class BasicTextUI extends TextUI
      */
     public void removeUpdate(DocumentEvent ev)
     {
-      Dimension size = textComponent.getSize();
-      rootView.removeUpdate(ev, new Rectangle(0, 0, size.width, size.height),
+      rootView.removeUpdate(ev, getVisibleEditorRect(),
                             rootView.getViewFactory());
     }
   }
@@ -514,20 +512,17 @@ public abstract class BasicTextUI extends TextUI
       textComponent.setHighlighter(createHighlighter());
 
     String prefix = getPropertyPrefix();
-    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-    textComponent.setMargin(defaults.getInsets(prefix + ".margin"));
-    textComponent.setBorder(defaults.getBorder(prefix + ".border"));
-    textComponent.setFont(defaults.getFont(prefix + ".font"));
+    LookAndFeel.installColorsAndFont(textComponent, prefix + ".background",
+                                     prefix + ".foreground", prefix + ".font");
+    LookAndFeel.installBorder(textComponent, prefix + ".border");
+    textComponent.setMargin(UIManager.getInsets(prefix + ".margin"));
 
-    caret.setBlinkRate(defaults.getInt(prefix + ".caretBlinkRate"));
+    caret.setBlinkRate(UIManager.getInt(prefix + ".caretBlinkRate"));
 
     // Fetch the colors for enabled/disabled text components.
-    background = defaults.getColor(prefix + ".background");
-    textComponent.setBackground(background);
-    inactiveBackground = defaults.getColor(prefix + ".inactiveBackground");
-    textComponent.setForeground(defaults.getColor(prefix + ".foreground"));
+    inactiveBackground = UIManager.getColor(prefix + ".inactiveBackground");
     textComponent.setDisabledTextColor
-                         (defaults.getColor(prefix + ".inactiveForeground"));
+                         (UIManager.getColor(prefix + ".inactiveForeground"));
   }
 
   /**
@@ -973,7 +968,7 @@ public abstract class BasicTextUI extends TextUI
    */
   public int viewToModel(JTextComponent t, Point pt, Position.Bias[] biasReturn)
   {
-    return 0; // FIXME: Implement me.
+    return rootView.viewToModel(pt.x, pt.y, getVisibleEditorRect(), biasReturn);
   }
 
   /**
@@ -1019,7 +1014,7 @@ public abstract class BasicTextUI extends TextUI
     int height = textComponent.getHeight();
 
     if (width <= 0 || height <= 0)
-      return null;
+      return new Rectangle(0, 0, 0, 0);
 	
     Insets insets = textComponent.getInsets();
     return new Rectangle(insets.left, insets.top,

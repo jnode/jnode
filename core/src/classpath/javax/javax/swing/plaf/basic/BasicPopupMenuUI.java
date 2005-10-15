@@ -53,12 +53,11 @@ import javax.swing.JLayeredPane;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.LookAndFeel;
 import javax.swing.MenuElement;
 import javax.swing.MenuSelectionManager;
 import javax.swing.RootPaneContainer;
 import javax.swing.SwingUtilities;
-import javax.swing.UIDefaults;
-import javax.swing.UIManager;
 import javax.swing.event.MouseInputListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
@@ -131,12 +130,9 @@ public class BasicPopupMenuUI extends PopupMenuUI
    */
   public void installDefaults()
   {
-    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-
-    popupMenu.setBackground(defaults.getColor("PopupMenu.background"));
-    popupMenu.setBorder(defaults.getBorder("PopupMenu.border"));
-    popupMenu.setFont(defaults.getFont("PopupMenu.font"));
-    popupMenu.setForeground(defaults.getColor("PopupMenu.foreground"));
+    LookAndFeel.installColorsAndFont(popupMenu, "PopupMenu.background",
+                                     "PopupMenu.foreground", "PopupMenu.font");
+    LookAndFeel.installBorder(popupMenu, "PopupMenu.border");
     popupMenu.setOpaque(true);
   }
 

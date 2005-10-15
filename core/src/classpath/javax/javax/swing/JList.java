@@ -1326,7 +1326,8 @@ public class JList extends JComponent implements Accessible, Scrollable
    * 
    * @return index of the cell to which specified location is closest to.
    */
-   public int locationToIndex(Point location) {
+   public int locationToIndex(Point location)
+   {
      return getUI().locationToIndex(this, location);      
    }
 
@@ -1336,8 +1337,9 @@ public class JList extends JComponent implements Accessible, Scrollable
    * 
    * @return location of the cell located at the specified index in the list.
    */
-   public Point indexToLocation(int index){
-     return getCellBounds(index, index).getLocation();
+   public Point indexToLocation(int index)
+   {
+     return getUI().indexToLocation(this, index);
    }
 
   /**
@@ -2114,7 +2116,7 @@ public class JList extends JComponent implements Accessible, Scrollable
    */
   public Rectangle getCellBounds(int index0, int index1)
   {
-    return ((ListUI) ui).getCellBounds(this, index0, index1);
+    return getUI().getCellBounds(this, index0, index1);
   }
 
   /**

@@ -56,20 +56,17 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 
-import javax.swing.BorderFactory;
 import javax.swing.DefaultDesktopManager;
 import javax.swing.DesktopManager;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.KeyStroke;
+import javax.swing.LookAndFeel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.border.AbstractBorder;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.Border;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 import javax.swing.event.MouseInputAdapter;
@@ -1204,10 +1201,8 @@ public class BasicInternalFrameUI extends InternalFrameUI
    */
   protected void installDefaults()
     {
-      UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-      Border border = defaults.getBorder("InternalFrame.border");
-      frame.setBorder(border);
-      frame.setFrameIcon(defaults.getIcon("InternalFrame.icon"));
+      LookAndFeel.installBorder(frame, "InternalFrame.border");
+      frame.setFrameIcon(UIManager.getIcon("InternalFrame.icon"));
       // InternalFrames are invisible by default.
       frame.setVisible(false);
   }

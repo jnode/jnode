@@ -92,6 +92,46 @@ public class BoxLayout implements LayoutManager2, Serializable
   private int way = X_AXIS;
 
   /**
+   * The size requirements of the containers children for the X direction.
+   */
+  private SizeRequirements[] xChildren;
+
+  /**
+   * The size requirements of the containers children for the Y direction.
+   */
+  private SizeRequirements[] yChildren;
+
+  /**
+   * The size requirements of the container to be laid out for the X direction.
+   */
+  private SizeRequirements xTotal;
+
+  /**
+   * The size requirements of the container to be laid out for the Y direction.
+   */
+  private SizeRequirements yTotal;
+
+  /**
+   * The offsets of the child components in the X direction.
+   */
+  private int[] offsetsX;
+
+  /**
+   * The offsets of the child components in the Y direction.
+   */
+  private int[] offsetsY;
+
+  /**
+   * The spans of the child components in the X direction.
+   */
+  private int[] spansX;
+
+  /**
+   * The spans of the child components in the Y direction.
+   */
+  private int[] spansY;
+
+  /**
    * Constructs a <code>BoxLayout</code> object.
    *
    * @param container The container that needs to be laid out.
@@ -147,29 +187,13 @@ public class BoxLayout implements LayoutManager2, Serializable
    */
   public Dimension preferredLayoutSize(Container parent)
   {
-    if (parent != container)
-      throw new AWTError("invalid parent");
+    if (container != parent)
+      throw new AWTError("BoxLayout can't be shared");
 
-    // Setup the SizeRequirements for both the X and Y axis.
-    Component[] children = container.getComponents();
-    SizeRequirements[] hSizeReqs = new SizeRequirements[children.length];
-    SizeRequirements[] vSizeReqs = new SizeRequirements[children.length];
-    getSizeRequirements(hSizeReqs, vSizeReqs);
-    SizeRequirements hReq;
-    SizeRequirements vReq;
-    if (isHorizontalIn(container))
-      {
-        hReq = SizeRequirements.getTiledSizeRequirements(hSizeReqs);
-        vReq = SizeRequirements.getAlignedSizeRequirements(vSizeReqs);
-      }
-    else
-      {
-        hReq = SizeRequirements.getAlignedSizeRequirements(hSizeReqs);
-        vReq = SizeRequirements.getTiledSizeRequirements(vSizeReqs);
-      }
-    Insets insets = container.getInsets();
-    return new Dimension(hReq.preferred + insets.left + insets.right,
-                         vReq.preferred + insets.top + insets.bottom);
+    checkTotalRequirements();
+    Insets i = container.getInsets();
+    return new Dimension(xTotal.preferred + i.left + i.right,
+                         yTotal.preferred + i.top + i.bottom);
   }
 
   /**
@@ -181,27 +205,11 @@ public class BoxLayout implements LayoutManager2, Serializable
    */
   public Dimension minimumLayoutSize(Container parent)
   {
-    if (parent != container)
-      throw new AWTError("invalid parent");
+    if (container != parent)
+      throw new AWTError("BoxLayout can't be shared");
 
-    // Setup the SizeRequirements for both the X and Y axis.
-    Component[] children = container.getComponents();
-    SizeRequirements[] hSizeReqs = new SizeRequirements[children.length];
-    SizeRequirements[] vSizeReqs = new SizeRequirements[children.length];
-    getSizeRequirements(hSizeReqs, vSizeReqs);
-    SizeRequirements hReq;
-    SizeRequirements vReq;
-    if (isHorizontalIn(container))
-      {
-        hReq = SizeRequirements.getTiledSizeRequirements(hSizeReqs);
-        vReq = SizeRequirements.getAlignedSizeRequirements(vSizeReqs);
-      }
-    else
-      {
-        hReq = SizeRequirements.getAlignedSizeRequirements(hSizeReqs);
-        vReq = SizeRequirements.getTiledSizeRequirements(vSizeReqs);
-      }
-    return new Dimension(hReq.minimum, vReq.minimum);
+    checkTotalRequirements();
+    return new Dimension(xTotal.minimum, yTotal.minimum);
   }
 
   /**
@@ -211,41 +219,16 @@ public class BoxLayout implements LayoutManager2, Serializable
    */
   public void layoutContainer(Container parent)
   {
-    // Setup the SizeRequirements for both the X and Y axis.
-    Component[] children = container.getComponents();
-    SizeRequirements[] hSizeReqs = new SizeRequirements[children.length];
-    SizeRequirements[] vSizeReqs = new SizeRequirements[children.length];
-    getSizeRequirements(hSizeReqs, vSizeReqs);
-
-    int[] hSpans = new int[children.length];
-    int[] hOffsets = new int[children.length];
-    int[] vSpans = new int[children.length];
-    int[] vOffsets = new int[children.length];
-
-    Insets insets = container.getInsets();
-    int width = container.getWidth() - insets.left - insets.right;
-    int height = container.getHeight() - insets.top - insets.bottom;
-    if (isHorizontalIn(container))
+    synchronized(container.getTreeLock())
       {
-        SizeRequirements.calculateTiledPositions(width, null,
-                                                 hSizeReqs, hOffsets, hSpans);
-        SizeRequirements.calculateAlignedPositions(height, null,
-                                                 vSizeReqs, vOffsets, vSpans);
-      }
-    else
-      {
-        SizeRequirements.calculateTiledPositions(height, null,
-                                                 vSizeReqs, vOffsets, vSpans);
-        SizeRequirements.calculateAlignedPositions(width, null,
-                                                 hSizeReqs, hOffsets, hSpans);
-      }
+      if (container != parent)
+        throw new AWTError("BoxLayout can't be shared");
 
-    // Set positions and widths of child components.
+      checkLayout();
+      Component[] children = container.getComponents();
+      Insets in = container.getInsets();
     for (int i = 0; i < children.length; i++)
-      {
-        Component child = children[i];
-        child.setBounds(hOffsets[i] + insets.left, vOffsets[i] + insets.top,
-                        hSpans[i], vSpans[i]);
+        children[i].setBounds(offsetsX[i] + in.left, offsetsY[i] + in.top, spansX[i], spansY[i]);
       }
   }
 
@@ -268,10 +251,11 @@ public class BoxLayout implements LayoutManager2, Serializable
    */
   public float getLayoutAlignmentX(Container parent)
   {
-    if (parent != container)
-      throw new AWTError("invalid parent");
+    if (container != parent)
+      throw new AWTError("BoxLayout can't be shared");
     
-    return 0;
+    checkTotalRequirements();
+    return xTotal.alignment;
   }
 
   /**
@@ -283,10 +267,11 @@ public class BoxLayout implements LayoutManager2, Serializable
    */
   public float getLayoutAlignmentY(Container parent)
   {
-    if (parent != container)
-      throw new AWTError("invalid parent");
+    if (container != parent)
+      throw new AWTError("BoxLayout can't be shared");
     
-    return 0;
+    checkTotalRequirements();
+    return yTotal.alignment;
   }
 
   /**
@@ -296,8 +281,14 @@ public class BoxLayout implements LayoutManager2, Serializable
    */
   public void invalidateLayout(Container parent)
   {
-    if (parent != container)
-      throw new AWTError("invalid parent");
+    xChildren = null;
+    yChildren = null;
+    xTotal = null;
+    yTotal = null;
+    offsetsX = null;
+    offsetsY = null;
+    spansX = null;
+    spansY = null;
   }
 
   /**
@@ -310,63 +301,111 @@ public class BoxLayout implements LayoutManager2, Serializable
    */
   public Dimension maximumLayoutSize(Container parent)
   {
-    if (parent != container)
-      throw new AWTError("invalid parent");
+    if (container != parent)
+      throw new AWTError("BoxLayout can't be shared");
 
-    // Setup the SizeRequirements for both the X and Y axis.
-    Component[] children = container.getComponents();
-    SizeRequirements[] hSizeReqs = new SizeRequirements[children.length];
-    SizeRequirements[] vSizeReqs = new SizeRequirements[children.length];
-    getSizeRequirements(hSizeReqs, vSizeReqs);
-    SizeRequirements hReq;
-    SizeRequirements vReq;
-    if (isHorizontalIn(container))
-      {
-        hReq = SizeRequirements.getTiledSizeRequirements(hSizeReqs);
-        vReq = SizeRequirements.getAlignedSizeRequirements(vSizeReqs);
-      }
-    else
-      {
-        hReq = SizeRequirements.getAlignedSizeRequirements(hSizeReqs);
-        vReq = SizeRequirements.getTiledSizeRequirements(vSizeReqs);
-      }
-    return new Dimension(hReq.maximum, vReq.maximum);
+    checkTotalRequirements();
+    return new Dimension(xTotal.maximum, yTotal.maximum);
   }
 
   /**
-   * Fills arrays of SizeRequirements for the horizontal and vertical
-   * requirements of the children of component.
-   *
-   * @param hSizeReqs the horizontal requirements to be filled by this method
-   * @param vSizeReqs the vertical requirements to be filled by this method
+   * Makes sure that the xTotal and yTotal fields are set up correctly. A call
+   * to {@link #invalidateLayout} sets these fields to null and they have to be
+   * recomputed.
    */
-  private void getSizeRequirements(SizeRequirements[] hSizeReqs,
-                                   SizeRequirements[] vSizeReqs)
+  private void checkTotalRequirements()
+  {
+    if (xTotal == null || yTotal == null)
+      {
+        checkRequirements();
+    if (isHorizontalIn(container))
+      {
+            xTotal = SizeRequirements.getTiledSizeRequirements(xChildren);
+            yTotal = SizeRequirements.getAlignedSizeRequirements(yChildren);
+      }
+    else
+      {
+            xTotal = SizeRequirements.getAlignedSizeRequirements(xChildren);
+            yTotal = SizeRequirements.getTiledSizeRequirements(yChildren);
+          }
+      }
+  }
+
+  /**
+   * Makes sure that the xChildren and yChildren fields are correctly set up.
+   * A call to {@link #invalidateLayout(Container)} sets these fields to null,
+   * so they have to be set up again.
+   */
+  private void checkRequirements()
+  {
+    if (xChildren == null || yChildren == null)
   {
     Component[] children = container.getComponents();
+        xChildren = new SizeRequirements[children.length];
+        yChildren = new SizeRequirements[children.length];
     for (int i = 0; i < children.length; i++)
       {
-        Component child = children[i];
-        if (! child.isVisible())
+            if (! children[i].isVisible())
+              {
+                xChildren[i] = new SizeRequirements();
+                yChildren[i] = new SizeRequirements();
+              }
+            else
+              {
+                xChildren[i] =
+                  new SizeRequirements(children[i].getMinimumSize().width,
+                                       children[i].getPreferredSize().width,
+                                       children[i].getMaximumSize().width,
+                                       children[i].getAlignmentX());
+                yChildren[i] =
+                  new SizeRequirements(children[i].getMinimumSize().height,
+                                       children[i].getPreferredSize().height,
+                                       children[i].getMaximumSize().height,
+                                       children[i].getAlignmentY());
+              }
+          }
+      }
+  }
+
+  /**
+   * Makes sure that the offsetsX, offsetsY, spansX and spansY fields are set
+   * up correctly. A call to {@link #invalidateLayout} sets these fields
+   * to null and they have to be recomputed.
+   */
+  private void checkLayout()
+  {
+    if (offsetsX == null || offsetsY == null || spansX == null
+        || spansY == null)
+      {
+        checkRequirements();
+        checkTotalRequirements();
+        int len = container.getComponents().length;
+        offsetsX = new int[len];
+        offsetsY = new int[len];
+        spansX = new int[len];
+        spansY = new int[len];
+
+        Insets in = container.getInsets();
+        int width = container.getWidth() - in.left - in.right;
+        int height = container.getHeight() - in.top -in.bottom;
+
+        if (isHorizontalIn(container))
           {
-            SizeRequirements req = new SizeRequirements();
-            hSizeReqs[i] = req;
-            vSizeReqs[i] = req;
+            SizeRequirements.calculateTiledPositions(width,
+                                                     xTotal, xChildren,
+                                                     offsetsX, spansX);
+            SizeRequirements.calculateAlignedPositions(height,
+                                                       yTotal, yChildren,
+                                                       offsetsY, spansY);
           }
         else
           {
-            SizeRequirements hReq =
-              new SizeRequirements(child.getMinimumSize().width,
-                                   child.getPreferredSize().width,
-                                   child.getMaximumSize().width,
-                                   child.getAlignmentX());
-            hSizeReqs[i] = hReq;
-            SizeRequirements vReq =
-              new SizeRequirements(child.getMinimumSize().height,
-                                   child.getPreferredSize().height,
-                                   child.getMaximumSize().height,
-                                   child.getAlignmentY());
-            vSizeReqs[i] = vReq;
+            SizeRequirements.calculateAlignedPositions(width,
+                                                       xTotal, xChildren,
+                                                       offsetsX, spansX);
+            SizeRequirements.calculateTiledPositions(height,
+                                                     yTotal, yChildren,
+                                                     offsetsY, spansY);
           }
       }
   }

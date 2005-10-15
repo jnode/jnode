@@ -400,6 +400,7 @@ public class JLabel extends JComponent implements Accessible, SwingConstants
     this.text = text;
     this.icon = icon;
     this.horizontalAlignment = horizontalAlignment;
+    setAlignmentX(0.0F);
     updateUI();
   }
 

@@ -43,9 +43,14 @@ import java.awt.ComponentOrientation;
 import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.Rectangle;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.accessibility.Accessible;
+import javax.accessibility.AccessibleContext;
 import javax.swing.border.Border;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.plaf.ScrollPaneUI;
 import javax.swing.plaf.UIResource;
 
@@ -73,10 +78,73 @@ import javax.swing.plaf.UIResource;
  * <tr><td>wheelScrollingEnabled       </td><td>scrollPane      </td><td>yes   </td></tr>
  * </table>
  */
-public class JScrollPane 
-  extends JComponent 
+public class JScrollPane extends JComponent
   implements Accessible, ScrollPaneConstants
 {
+  /**
+   * Provides accessibility support for the <code>JScrollPane</code>.
+   *
+   * @author Roman Kennke (kennke@aicas.com)
+   */
+  protected class AccessibleJScrollPane extends AccessibleJComponent
+    implements ChangeListener, PropertyChangeListener
+  {
+
+    /**
+     * The viewport of the underlying scrollpane.
+     */
+    protected JViewport viewPort;
+
+    /**
+     * Creates a new <code>AccessibleJScrollPane</code> object. This
+     * initializes the <code>viewport</code> field with the current viewport
+     * from the scrollpane associated with this
+     * <code>AccessibleJScrollPane</code>.
+     */
+    public AccessibleJScrollPane()
+    {
+      viewPort = getViewport();
+      viewPort.addChangeListener(this);
+      viewPort.addPropertyChangeListener(this);
+    }
+
+    /**
+     * Receives notification when the state of the viewport changes.
+     *
+     * @param event the change event
+     */
+    public void stateChanged(ChangeEvent event)
+    {
+      // TODO: Figure out what should be done here, if anything.
+    }
+
+    /**
+     * Receives notification if any of the viewport's bound properties changes.
+     *
+     * @param e the propery change event
+     */
+    public void propertyChange(PropertyChangeEvent e)
+    {
+      // TODO: Figure out what should be done here, if anything.
+    }
+
+    /**
+     * Resets the <code>viewPort</code> field when the scrollpane's viewport
+     * changes. This method is called by
+     * {@link JScrollPane#setViewport(JViewport)} in order to update the
+     * <code>viewPort</code> field and set up the listeners on this viewport
+     * correctly.
+     */
+    public void resetViewPort()
+    {
+      viewPort.removeChangeListener(this);
+      viewPort.removePropertyChangeListener(this);
+      viewPort = getViewport();
+      viewPort.addChangeListener(this);
+      viewPort.addPropertyChangeListener(this);
+    }
+  }
+
   private static final long serialVersionUID = 5203525440012340014L;
   
   protected JViewport columnHeader;
@@ -430,6 +498,11 @@ public class JScrollPane
     repaint();
     firePropertyChange("viewport", old, v);
     sync();
+    if (accessibleContext != null)
+      {
+        AccessibleJScrollPane asp = (AccessibleJScrollPane) accessibleContext;
+        asp.resetViewPort();
+      }
   }
 
   public void setViewportBorder(Border b)
@@ -620,5 +693,19 @@ public class JScrollPane
                                               direction);
         }
     }
+  }
+
+  /**
+   * Returns the accessible context associated with this
+   * <code>JScrollPane</code>.
+   *
+   * @return the accessible context associated with this
+   *         <code>JScrollPane</code>
+   */
+  public AccessibleContext getAccessibleContext()
+  {
+    if (accessibleContext == null)
+      accessibleContext = new AccessibleJScrollPane();
+    return accessibleContext;
   }
 }

@@ -129,6 +129,27 @@ public abstract class AbstractDocument implements Document, Serializable
   protected EventListenerList listenerList = new EventListenerList();
 
   /**
+   * Stores the current writer thread.  Used for locking.
+   */ 
+  private Thread currentWriter = null;
+  
+  /**
+   * The number of readers.  Used for locking.
+   */
+  private int numReaders = 0;
+  
+  /**
+   * Tells if there are one or more writers waiting.
+   */
+  private int numWritersWaiting = 0;  
+
+  /**
+   * A condition variable that readers and writers wait on.
+   */
+  Object documentCV = new Object();
+
+  
+  /**
    * Creates a new <code>AbstractDocument</code> with the specified
    * {@link Content} model.
    *
@@ -347,8 +368,7 @@ public abstract class AbstractDocument implements Document, Serializable
    */
   protected Thread getCurrentWriter()
   {
-    // FIXME: Implement locking!
-    return null;
+    return currentWriter;
   }
 
   /**
@@ -519,8 +539,39 @@ public abstract class AbstractDocument implements Document, Serializable
     DefaultDocumentEvent event =
       new DefaultDocumentEvent(offset, text.length(),
 			       DocumentEvent.EventType.INSERT);
-    content.insertString(offset, text);
+    
+    writeLock();
+    UndoableEdit temp = content.insertString(offset, text);
+    writeUnlock();
+    
+    GapContent.UndoInsertString changes = null;
+    if (content instanceof GapContent)
+      changes = (GapContent.UndoInsertString) temp;
     insertUpdate(event, attributes);
+
+    if (changes != null)
+      {
+        // We need to add an ElementChange to our DocumentEvent
+        // so let's set up the parameters
+        Element root = getDefaultRootElement();
+        int start = root.getElementIndex(changes.where);
+        int end = root.getElementIndex(changes.where+changes.length);
+
+        if (!(start == 0 && end == 0))
+          {
+            Element[] removed = new Element[1];
+            removed[0] = root;
+            Element[] added = new Element[end - start + 1];
+            for (int i = start; i <= end; i++)
+              added[i - start] = root.getElement(i);
+
+            ElementEdit edit = new ElementEdit(
+                                               root,
+                                               root.getElementIndex(changes.where),
+                                               removed, added);
+            event.addEdit(edit);
+          }
+      }
     fireInsertUpdate(event);
   }
 
@@ -565,10 +616,28 @@ public abstract class AbstractDocument implements Document, Serializable
   }
 
   /**
-   * Blocks until a read lock can be obtained.
+   * Blocks until a read lock can be obtained.  Must block if there is
+   * currently a writer modifying the <code>Document</code>.
    */
   public void readLock()
   {
+    if (currentWriter != null && currentWriter.equals(Thread.currentThread()))
+      return;
+    synchronized (documentCV)
+      {
+        while (currentWriter != null || numWritersWaiting > 0)
+          {
+            try
+              {
+                documentCV.wait();
+              }
+            catch (InterruptedException ie)
+              {
+                throw new Error("interrupted trying to get a readLock");
+              }
+          }
+          numReaders++;
+      }
   }
 
   /**
@@ -577,6 +646,40 @@ public abstract class AbstractDocument implements Document, Serializable
    */
   public void readUnlock()
   {
+    // Note we could have a problem here if readUnlock was called without a
+    // prior call to readLock but the specs simply warn users to ensure that
+    // balance by using a finally block:
+    // readLock()
+    // try
+    // { 
+    //   doSomethingHere 
+    // }
+    // finally
+    // {
+    //   readUnlock();
+    // }
+    
+    // All that the JDK seems to check for is that you don't call unlock
+    // more times than you've previously called lock, but it doesn't make
+    // sure that the threads calling unlock were the same ones that called lock
+
+    // FIXME: the reference implementation throws a 
+    // javax.swing.text.StateInvariantError here
+    if (numReaders == 0)
+      throw new IllegalStateException("document lock failure");
+    
+    synchronized (documentCV)
+    {
+      // If currentWriter is not null, the application code probably had a 
+      // writeLock and then tried to obtain a readLock, in which case 
+      // numReaders wasn't incremented
+      if (currentWriter == null)
+        {
+          numReaders --;
+          if (numReaders == 0 && numWritersWaiting != 0)
+            documentCV.notify();
+        }
+    }
   }
 
   /**
@@ -594,9 +697,41 @@ public abstract class AbstractDocument implements Document, Serializable
     DefaultDocumentEvent event =
       new DefaultDocumentEvent(offset, length,
 			       DocumentEvent.EventType.REMOVE);
+    
+    // Here we set up the parameters for an ElementChange, if one
+    // needs to be added to the DocumentEvent later
+    Element root = getDefaultRootElement();
+    int start = root.getElementIndex(offset);
+    int end = root.getElementIndex(offset + length);
+    
+    Element[] removed = new Element[end - start + 1];
+    for (int i = start; i <= end; i++)
+      removed[i - start] = root.getElement(i);
+    
     removeUpdate(event);
-    content.remove(offset, length);
+
+    Element[] added = new Element[1];
+    added[0] = root.getElement(start);
+    boolean shouldFire = content.getString(offset, length).length() != 0;
+    
+    writeLock();
+    UndoableEdit temp = content.remove(offset, length);
+    writeUnlock();
+    
     postRemoveUpdate(event);
+    
+    GapContent.UndoRemove changes = null;
+    if (content instanceof GapContent)
+      changes = (GapContent.UndoRemove) temp;
+
+    if (changes != null && !(start == end))
+      {
+        // We need to add an ElementChange to our DocumentEvent
+        ElementEdit edit = new ElementEdit (root, start, removed, added);
+        event.addEdit(edit);
+      }
+    
+    if (shouldFire)
     fireRemoveUpdate(event);
   }
 
@@ -712,7 +847,15 @@ public abstract class AbstractDocument implements Document, Serializable
    */
   public void render(Runnable runnable)
   {
-    // FIXME: Implement me!
+    readLock();
+    try
+    {
+      runnable.run();
+    }
+    finally
+    {
+      readUnlock();
+    }
   }
 
   /**
@@ -738,11 +881,30 @@ public abstract class AbstractDocument implements Document, Serializable
   }
 
   /**
-   * Blocks until a write lock can be obtained.
+   * Blocks until a write lock can be obtained.  Must wait if there are 
+   * readers currently reading or another thread is currently writing.
    */
   protected void writeLock()
   {
-    // FIXME: Implement me.
+    if (currentWriter!= null && currentWriter.equals(Thread.currentThread()))
+      return;
+    synchronized (documentCV)
+      {
+        numWritersWaiting++;
+        while (numReaders > 0)
+          {
+            try
+              {
+                documentCV.wait();
+              }
+            catch (InterruptedException ie)
+              {
+                throw new Error("interruped while trying to obtain write lock");
+              }
+          }
+        numWritersWaiting --;
+        currentWriter = Thread.currentThread();
+      }
   }
 
   /**
@@ -751,7 +913,14 @@ public abstract class AbstractDocument implements Document, Serializable
    */
   protected void writeUnlock()
   {
-    // FIXME: Implement me.
+    synchronized (documentCV)
+    {
+        if (currentWriter.equals(Thread.currentThread()))
+          {
+            currentWriter = null;
+            documentCV.notifyAll();
+          }
+    }
   }
 
   /**

@@ -44,6 +44,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Shape;
+import java.awt.Toolkit;
 import java.text.BreakIterator;
 
 import javax.swing.SwingConstants;
@@ -258,7 +259,7 @@ public class GlyphView extends View implements TabableView, Cloneable
     public float getHeight(GlyphView view)
     {
       Font font = view.getFont();
-      FontMetrics metrics = view.getContainer().getFontMetrics(font);
+      FontMetrics metrics = Toolkit.getDefaultToolkit().getFontMetrics(font);
       float height = metrics.getHeight();
       return height;
     }
@@ -377,7 +378,7 @@ public class GlyphView extends View implements TabableView, Cloneable
     {
       Element el = view.getElement();
       Font font = view.getFont();
-      FontMetrics fm = view.getContainer().getFontMetrics(font);
+      FontMetrics fm = Toolkit.getDefaultToolkit().getFontMetrics(font);
       Segment txt = view.getText(p0, p1);
       int span = Utilities.getTabbedTextWidth(txt, fm, (int) x, te, p0);
       return span;

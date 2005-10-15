@@ -41,13 +41,11 @@ package javax.swing.plaf.basic;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Insets;
 import java.awt.Rectangle;
 
 import javax.swing.JComponent;
 import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
-import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.SeparatorUI;
@@ -142,10 +140,8 @@ public class BasicSeparatorUI extends SeparatorUI
    */
   protected void installDefaults(JSeparator s)
   {
-    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-
-    shadow = defaults.getColor("Separator.shadow");
-    highlight = defaults.getColor("Separator.highlight");
+    shadow = UIManager.getColor("Separator.shadow");
+    highlight = UIManager.getColor("Separator.highlight");
     s.setOpaque(false);
   }
 

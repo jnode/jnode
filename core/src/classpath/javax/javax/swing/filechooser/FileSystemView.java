@@ -48,6 +48,9 @@ import javax.swing.Icon;
  */
 public abstract class FileSystemView
 {
+  /** The instance returned by {@link #getFileSystemView()}. */
+  private static FileSystemView defaultFileSystemView;
+  
   /**
    * DOCUMENT ME!
    *
@@ -148,20 +151,22 @@ public abstract class FileSystemView
   }
 
   /**
-   * DOCUMENT ME!
+   * Returns a default {@link FileSystemView} appropriate for the platform.
    *
-   * @return DOCUMENT ME!
+   * @return A default {@link FileSystemView} appropriate for the platform.
    */
   public static FileSystemView getFileSystemView()
   {
+    if (defaultFileSystemView == null)
+      {
     if (File.separator.equals("/"))
-      return new UnixFileSystemView();
-
+          defaultFileSystemView = new UnixFileSystemView();
     // else if (File.Separator.equals("\"))
     //	return new Win32FileSystemView();
     // else 
     //	return new GenericFileSystemView();
-    return null;
+      }
+    return defaultFileSystemView;
   }
 
   /**

@@ -531,13 +531,15 @@ public class MetalIconFactory implements Serializable
     }
 
     /**
-     * Returns the height of the icon, in pixels.
+     * Returns the height of the icon, in pixels.  The height returned is 
+     * <code>16</code> plus the value returned by 
+     * {@link #getAdditionalHeight()}.
      * 
      * @return The height of the icon.
      */
     public int getIconHeight() 
     {
-      return 16;
+      return 16 + getAdditionalHeight();
     }
     
     /**
@@ -570,9 +572,11 @@ public class MetalIconFactory implements Serializable
     }
     
     /**
-     * Returns the additional height (???).
+     * Returns the additional height for the icon.  The 
+     * {@link #getIconHeight()} method adds this value to the icon height it
+     * returns.  Subclasses can override this method to adjust the icon height.
      * 
-     * @return The additional height.
+     * @return The additional height (<code>0</code> unless overridden).
      */
     public int getAdditionalHeight() 
     {
@@ -606,13 +610,15 @@ public class MetalIconFactory implements Serializable
     }
     
     /**
-     * Returns the height of the icon, in pixels.
+     * Returns the height of the icon, in pixels.  The height returned is 
+     * <code>16</code> plus the value returned by 
+     * {@link #getAdditionalHeight()}.
      * 
      * @return The height of the icon.
      */
     public int getIconHeight() 
     {
-      return 16;
+      return 16 + getAdditionalHeight();
     }
 
     /**
@@ -643,9 +649,11 @@ public class MetalIconFactory implements Serializable
     }
     
     /**
-     * Returns the additional height (???).
+     * Returns the additional height for the icon.  The 
+     * {@link #getIconHeight()} method adds this value to the icon height it
+     * returns.  Subclasses can override this method to adjust the icon height.
      * 
-     * @return The additional height.
+     * @return The additional height (<code>0</code> unless overridden).
      */
     public int getAdditionalHeight() 
     {
@@ -1816,9 +1824,10 @@ public class MetalIconFactory implements Serializable
     }
     
     /**
-     * Returns the additional height (???).
+     * Returns the additional height for this icon, in this case <code>2</code>
+     * pixels.
      * 
-     * @return The additional height.
+     * @return <code>2</code>.
      */
     public int getAdditionalHeight() 
     {
@@ -1849,9 +1858,10 @@ public class MetalIconFactory implements Serializable
     }
     
     /**
-     * Returns the additional height (???).
+     * Returns the additional height for this icon, in this case <code>4</code>
+     * pixels.
      * 
-     * @return The additional height.
+     * @return <code>4</code>.
      */
     public int getAdditionalHeight() 
     {
@@ -2125,9 +2135,45 @@ public class MetalIconFactory implements Serializable
     }        
   }  
     
+  /** The icon returned by {@link #getCheckBoxIcon()}. */
+  private static Icon checkBoxIcon;
+  
+  /** The icon returned by {@link #getCheckBoxMenuItemIcon()}. */
+  private static Icon checkBoxMenuItemIcon;
+  
+  /** The icon returned by {@link #getFileChooserDetailViewIcon()}. */
+  private static Icon fileChooserDetailViewIcon;
+
+  /** The icon returned by {@link #getFileChooserHomeFolderIcon()}. */
+  private static Icon fileChooserHomeFolderIcon;
+
+  /** The icon returned by {@link #getFileChooserListViewIcon()}. */
+  private static Icon fileChooserListViewIcon;
+
+  /** The icon returned by {@link #getFileChooserNewFolderIcon()}. */
+  private static Icon fileChooserNewFolderIcon;
+
+  /** The icon returned by {@link #getFileChooserUpFolderIcon()}. */
+  private static Icon fileChooserUpFolderIcon;
+
   /** The cached RadioButtonIcon instance. */
   private static RadioButtonIcon radioButtonIcon;
 
+  /** The icon returned by {@link #getRadioButtonMenuItemIcon()}. */
+  private static Icon radioButtonMenuItemIcon;
+
+  /** The icon returned by {@link #getInternalFrameDefaultMenuIcon()}. */
+  private static Icon internalFrameDefaultMenuIcon;
+
+  /** The icon returned by {@link #getTreeComputerIcon()}. */
+  private static Icon treeComputerIcon;
+  
+  /** The icon instance returned by {@link #getTreeFloppyDriveIcon()}. */
+  private static Icon treeFloppyDriveIcon;
+  
+  /** The icon instance returned by {@link #getTreeHardDriveIcon()}. */
+  private static Icon treeHardDriveIcon;
+  
   /**
    * Creates a new instance.  All the methods are static, so creating an 
    * instance isn't necessary.
@@ -2145,7 +2191,9 @@ public class MetalIconFactory implements Serializable
    */
   public static Icon getCheckBoxIcon() 
   {
-    return new MetalCheckBoxIcon();
+    if (checkBoxIcon == null)
+      checkBoxIcon = new MetalCheckBoxIcon();
+    return checkBoxIcon;
   }
   
   /**
@@ -2156,7 +2204,9 @@ public class MetalIconFactory implements Serializable
    */
   public static Icon getCheckBoxMenuItemIcon() 
   {
-    return new CheckBoxMenuItemIcon();
+    if (checkBoxMenuItemIcon == null)
+      checkBoxMenuItemIcon = new CheckBoxMenuItemIcon();
+    return checkBoxMenuItemIcon;
   }
 
   /**
@@ -2166,7 +2216,9 @@ public class MetalIconFactory implements Serializable
    */
   public static Icon getFileChooserDetailViewIcon() 
   {
-    return new FileChooserDetailViewIcon();
+    if (fileChooserDetailViewIcon == null)
+      fileChooserDetailViewIcon = new FileChooserDetailViewIcon();
+    return fileChooserDetailViewIcon;
   }
     
   /**
@@ -2176,7 +2228,9 @@ public class MetalIconFactory implements Serializable
    */
   public static Icon getFileChooserHomeFolderIcon() 
   {
-    return new FileChooserHomeFolderIcon();        
+    if (fileChooserHomeFolderIcon == null)
+      fileChooserHomeFolderIcon = new FileChooserHomeFolderIcon();
+    return fileChooserHomeFolderIcon;        
   }
     
   /**
@@ -2186,7 +2240,9 @@ public class MetalIconFactory implements Serializable
    */
   public static Icon getFileChooserListViewIcon() 
   {
-    return new FileChooserListViewIcon();
+    if (fileChooserListViewIcon == null)
+      fileChooserListViewIcon = new FileChooserListViewIcon();
+    return fileChooserListViewIcon;
   }
     
   /**
@@ -2196,7 +2252,9 @@ public class MetalIconFactory implements Serializable
    */
   public static Icon getFileChooserNewFolderIcon() 
   {
-    return new FileChooserNewFolderIcon();
+    if (fileChooserNewFolderIcon == null)
+      fileChooserNewFolderIcon = new FileChooserNewFolderIcon();
+    return fileChooserNewFolderIcon;
   }
     
   /**
@@ -2206,7 +2264,9 @@ public class MetalIconFactory implements Serializable
    */
   public static Icon getFileChooserUpFolderIcon() 
   {
-    return new FileChooserUpFolderIcon();
+    if (fileChooserUpFolderIcon == null)
+      fileChooserUpFolderIcon = new FileChooserUpFolderIcon();
+    return fileChooserUpFolderIcon;
   }
 
   /**
@@ -2228,7 +2288,9 @@ public class MetalIconFactory implements Serializable
    */
   public static Icon getRadioButtonMenuItemIcon() 
   {
-    return new RadioButtonMenuItemIcon();
+    if (radioButtonMenuItemIcon == null)
+      radioButtonMenuItemIcon = new RadioButtonMenuItemIcon();
+    return radioButtonMenuItemIcon;
   }
 
   /**
@@ -2263,7 +2325,9 @@ public class MetalIconFactory implements Serializable
    */
   public static Icon getInternalFrameDefaultMenuIcon() 
   {
-    return new InternalFrameDefaultMenuIcon();
+    if (internalFrameDefaultMenuIcon == null)
+      internalFrameDefaultMenuIcon = new InternalFrameDefaultMenuIcon();
+    return internalFrameDefaultMenuIcon;
   }
   
   /**
@@ -2359,7 +2423,9 @@ public class MetalIconFactory implements Serializable
    */
   public static Icon getTreeComputerIcon() 
   {
-    return new TreeComputerIcon();        
+    if (treeComputerIcon == null)
+      treeComputerIcon = new TreeComputerIcon();
+    return treeComputerIcon;        
   }
     
   /**
@@ -2369,7 +2435,9 @@ public class MetalIconFactory implements Serializable
    */
   public static Icon getTreeFloppyDriveIcon() 
   {
-    return new TreeFloppyDriveIcon();
+    if (treeFloppyDriveIcon == null)
+      treeFloppyDriveIcon = new TreeFloppyDriveIcon();
+    return treeFloppyDriveIcon;
   }
     
   /**
@@ -2379,7 +2447,9 @@ public class MetalIconFactory implements Serializable
    */
   public static Icon getTreeHardDriveIcon() 
   {
-    return new TreeHardDriveIcon();
+    if (treeHardDriveIcon == null)
+      treeHardDriveIcon = new TreeHardDriveIcon();
+    return treeHardDriveIcon;
   }
 
 }

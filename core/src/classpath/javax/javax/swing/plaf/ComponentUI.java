@@ -40,6 +40,7 @@ package javax.swing.plaf;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 
 import javax.accessibility.Accessible;
 import javax.swing.JComponent;
@@ -182,7 +183,8 @@ public abstract class ComponentUI
     if (c.isOpaque())
     {
       g.setColor(c.getBackground());
-      g.fillRect(0, 0, c.getWidth(), c.getHeight());
+      Rectangle clip = g.getClipBounds();
+      g.fillRect(clip.x, clip.y, clip.width, clip.height);
     }
     paint(g, c);
   }

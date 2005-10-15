@@ -46,6 +46,9 @@ import java.awt.event.MouseEvent;
 
 import javax.accessibility.Accessible;
 import javax.accessibility.AccessibleContext;
+import javax.accessibility.AccessibleRole;
+import javax.accessibility.AccessibleSelection;
+import javax.accessibility.AccessibleStateSet;
 import javax.swing.plaf.MenuBarUI;
 
 /**
@@ -59,6 +62,137 @@ import javax.swing.plaf.MenuBarUI;
  */
 public class JMenuBar extends JComponent implements Accessible, MenuElement
 {
+  /**
+   * Provides accessibility support for <code>JMenuBar</code>.
+   * 
+   * @author Roman Kennke (kennke@aicas.com)
+   */
+  protected class AccessibleJMenuBar extends AccessibleJComponent
+    implements AccessibleSelection
+  {
+
+    /**
+     * Returns the number of selected items in the menu bar. Possible values
+     * are <code>0</code> if nothing is selected, or <code>1</code> if one
+     * item is selected.
+     *
+     * @return the number of selected items in the menu bar
+     */
+    public int getAccessibleSelectionCount()
+    {
+      int count = 0;
+      if (getSelectionModel().getSelectedIndex() != -1)
+        count = 1;
+      return count;
+    }
+
+    /**
+     * Returns the selected with index <code>i</code> menu, or
+     * <code>null</code> if the specified menu is not selected.
+     *
+     * @param i the index of the menu to return
+     *
+     * @return the selected with index <code>i</code> menu, or
+     *         <code>null</code> if the specified menu is not selected
+     */
+    public Accessible getAccessibleSelection(int i)
+    {
+      if (getSelectionModel().getSelectedIndex() != i)
+        return null;
+      return getMenu(i);
+    }
+
+    /**
+     * Returns <code>true</code> if the specified menu is selected,
+     * <code>false</code> otherwise.
+     *
+     * @param i the index of the menu to check
+     *
+     *@return <code>true</code> if the specified menu is selected,
+     *        <code>false</code> otherwise
+     */
+    public boolean isAccessibleChildSelected(int i)
+    {
+      return getSelectionModel().getSelectedIndex() == i;
+    }
+
+    /**
+     * Selects the menu with index <code>i</code>. If another menu is already
+     * selected, this will be deselected.
+     *
+     * @param i the menu to be selected
+     */
+    public void addAccessibleSelection(int i)
+    {
+      getSelectionModel().setSelectedIndex(i);
+    }
+
+    /**
+     * Deselects the menu with index <code>i</code>.
+     *
+     * @param i the menu index to be deselected
+     */
+    public void removeAccessibleSelection(int i)
+    {
+      if (getSelectionModel().getSelectedIndex() == i)
+        getSelectionModel().clearSelection();
+    }
+
+    /**
+     * Deselects all possibly selected menus.
+     */
+    public void clearAccessibleSelection()
+    {
+      getSelectionModel().clearSelection();
+    }
+
+    /**
+     * In menu bars it is not possible to select all items, so this method
+     * does nothing.
+     */
+    public void selectAllAccessibleSelection()
+    {
+      // In menu bars it is not possible to select all items, so this method
+      // does nothing.
+    }
+
+    /**
+     * Returns the accessible role of <code>JMenuBar</code>, which is
+     * {@link AccessibleRole#MENU_BAR}.
+     *
+     * @return the accessible role of <code>JMenuBar</code>, which is
+     *         {@link AccessibleRole#MENU_BAR}
+     */
+    public AccessibleRole getAccessibleRole()
+    {
+      return AccessibleRole.MENU_BAR;
+    }
+
+    /**
+     * Returns the <code>AccessibleSelection</code> for this object. This
+     * method returns <code>this</code>, since the
+     * <code>AccessibleJMenuBar</code> manages its selection itself.
+     *
+     * @return the <code>AccessibleSelection</code> for this object
+     */
+    public AccessibleSelection getAccessibleSelection()
+    {
+      return this;
+    }
+
+    /**
+     * Returns the state of this <code>AccessibleJMenuBar</code>.
+     *
+     * @return the state of this <code>AccessibleJMenuBar</code>.
+     */
+    public AccessibleStateSet getAccessibleStateSet()
+    {
+      AccessibleStateSet stateSet = super.getAccessibleStateSet();
+      // TODO: Figure out what state must be added to the super state set.
+      return stateSet;
+    }
+  }
+
   private static final long serialVersionUID = -8191026883931977036L;
 
   /** JMenuBar's model. It keeps track of selected menu's index */
@@ -106,7 +240,9 @@ public class JMenuBar extends JComponent implements Accessible, MenuElement
 
   public AccessibleContext getAccessibleContext()
   {
-    return null;
+    if (accessibleContext == null)
+      accessibleContext = new AccessibleJMenuBar();
+    return accessibleContext;
   }
 
   /**

@@ -50,9 +50,8 @@ import java.beans.PropertyChangeListener;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.LookAndFeel;
 import javax.swing.SwingUtilities;
-import javax.swing.UIDefaults;
-import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.LabelUI;
 
@@ -345,11 +344,8 @@ public class BasicLabelUI
    */
   protected void installDefaults(JLabel c)
   {
-    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-
-    c.setForeground(defaults.getColor("Label.foreground"));
-    c.setBackground(defaults.getColor("Label.background"));
-    c.setFont(defaults.getFont("Label.font"));
+    LookAndFeel.installColorsAndFont(c, "Label.background", "Label.foreground",
+                                     "Label.font");
     //XXX: There are properties we don't use called disabledForeground
     //and disabledShadow.
   }

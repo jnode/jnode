@@ -175,9 +175,10 @@ public class CellRendererPane
     // reparent c
     addImpl(c, null, 0);
 
+    Rectangle oldClip = graphics.getClipBounds();
     // translate to (x,y)
     graphics.translate(x, y);
-
+    graphics.clipRect(0, 0, w, h);
     // set bounds of c
     c.setBounds(0, 0, w, h);
 
@@ -192,7 +193,7 @@ public class CellRendererPane
 
     // untranslate g
     graphics.translate(-x, -y);
-
+    graphics.setClip(oldClip);
 	} // paintComponent()
 
 	/**

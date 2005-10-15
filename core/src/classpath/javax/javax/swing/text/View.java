@@ -86,8 +86,8 @@ public abstract class View implements SwingConstants
   {
     View parent = getParent();
     if (parent == null)
-      throw new AssertionError("The parent of a View must not be null.");
-
+      return null;
+    else
     return parent.getContainer();
   }
   
@@ -507,6 +507,30 @@ public abstract class View implements SwingConstants
   }
 
   /**
+   * Maps a position in the document into the coordinate space of the View.
+   * The output rectangle usually reflects the font height but has a width
+   * of zero.
+   *
+   * This method is deprecated and calls
+   * {@link #modelToView(int, Position.Bias, int, Position.Bias, Shape)} with
+   * a bias of {@link Position.Bias#Forward}.
+   *
+   * @param pos the position of the character in the model
+   * @param a the area that is occupied by the view
+   *
+   * @return a rectangle that gives the location of the document position
+   *         inside the view coordinate space
+   *
+   * @throws BadLocationException if <code>pos</code> is invalid
+   *
+   * @deprecated Use {@link #modelToView(int, Shape, Position.Bias)} instead.
+   */
+  public Shape modelToView(int pos, Shape a) throws BadLocationException
+  {
+    return modelToView(pos, a, Position.Bias.Forward);
+  }
+
+  /**
    * Maps coordinates from the <code>View</code>'s space into a position
    * in the document model.
    *
@@ -520,6 +544,25 @@ public abstract class View implements SwingConstants
    */
   public abstract int viewToModel(float x, float y, Shape a, Position.Bias[] b);
 
+  /**
+   * Maps coordinates from the <code>View</code>'s space into a position
+   * in the document model. This method is deprecated and only there for
+   * compatibility.
+   *
+   * @param x the x coordinate in the view space
+   * @param y the y coordinate in the view space
+   * @param a the allocation of this <code>View</code>
+   *
+   * @return the position in the document that corresponds to the screen
+   *         coordinates <code>x, y</code>
+   *
+   * @deprecated Use {@link #viewToModel(float, float, Shape, Position.Bias[])}
+   *             instead.
+   */
+  public int viewToModel(float x, float y, Shape a)
+  {
+    return viewToModel(x, y, a, new Position.Bias[0]);
+  }
 
   /**
    * Dumps the complete View hierarchy. This method can be used for debugging

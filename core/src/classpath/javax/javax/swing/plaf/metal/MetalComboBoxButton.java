@@ -232,15 +232,81 @@ public class MetalComboBoxButton extends JButton {
           g.setColor(MetalLookAndFeel.getBlack());
         else
           g.setColor(MetalLookAndFeel.getControlDisabled());
+        Rectangle viewArea = new Rectangle(innerArea.x, innerArea.y,
+                innerArea.width - comboIcon.getIconWidth() - 7, 
+                innerArea.height);
         FontMetrics fm = g.getFontMetrics(comboBox.getFont());
         Rectangle textR = new Rectangle();
         text = SwingUtilities.layoutCompoundLabel(fm, text, null, 
-            SwingConstants.TOP, SwingConstants.LEFT, 
+            SwingConstants.CENTER, SwingConstants.LEFT, 
             SwingConstants.CENTER, SwingConstants.RIGHT, 
-            innerArea, new Rectangle(), textR, 0);
-        int yAdj = (textR.height - fm.getAscent()) / 2 + 1;
+            viewArea, new Rectangle(), textR, 0);
+        // FIXME: this truncation should be done within layoutCompoundLabel()
+        text = truncateText(text, 
+                innerArea.width - comboIcon.getIconWidth() - 7, fm);
+        int yAdj = fm.getDescent() + fm.getLeading();
         g.setFont(comboBox.getFont());
         g.drawString(text, textR.x, textR.y + textR.height - yAdj);
       }
   }
+  
+  /**
+   * A utility method that checks the width of a string and, if necessary,
+   * truncates it (adding a '...' suffix to indicate the truncation) to fit
+   * within the specified width.
+   * 
+   * FIXME: this method performs a function that needs to be incorporated into
+   * the SwingUtilities.layoutCompoundLabel() code.  But that method does some
+   * multi-line calculations that I don't understand yet, so for now this code
+   * is local.
+   * 
+   * @param text  the text.
+   * @param width  the available width.
+   * @param fm  the font metrics.
+   * 
+   * @return The text, truncated if necessary.
+   */
+  private static String truncateText(String text, int width, FontMetrics fm)
+  {  
+    if (text == null)
+      return null;
+    int textWidth = fm.stringWidth(text);
+    if (width > 0 && width < textWidth)
+      {
+        int dotWidth = fm.stringWidth("...");
+        int available = width - dotWidth;
+        if (available > 0)
+          {
+            int lower = 0;
+            int upper = text.length();
+            while (upper > lower)
+              {
+                if (fm.stringWidth(text.substring(0, upper)) <= available)
+                  lower = upper;  // we're finished  
+                else 
+                  {
+                    if (lower == upper - 1)
+                      upper = lower;  // we're finished
+                    else
+                      {
+                        int mid = lower + (upper - lower) / 2;
+                        if (fm.stringWidth(text.substring(0, mid)) <= available)
+                          lower = mid;
+                        else
+                          upper = mid;
+                      }
+                  }
+              }
+            if (upper < text.length())
+              text = text.substring(0, upper) + "...";
+          }
+        else
+          {
+            // there's not even enough space for the "..."
+            text = ""; 
+          }
+      }
+    return text;
+  }
+
 }

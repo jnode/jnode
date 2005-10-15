@@ -38,6 +38,7 @@ exception statement from your version. */
 
 package javax.swing.plaf.basic;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyVetoException;
@@ -49,10 +50,10 @@ import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.KeyStroke;
-import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.DesktopPaneUI;
+import javax.swing.plaf.UIResource;
 
 /**
  * This class is the UI delegate for JDesktopPane for the Basic look and feel.
@@ -361,9 +362,9 @@ public class BasicDesktopPaneUI extends DesktopPaneUI
    */
   protected void installDefaults()
   {
-    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-
-    desktop.setBackground(defaults.getColor("desktop"));
+    Color bg = desktop.getBackground();
+    if (bg == null || bg instanceof UIResource)
+      desktop.setBackground(UIManager.getColor("desktop"));
   }
 
   /**

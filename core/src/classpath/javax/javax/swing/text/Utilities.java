@@ -235,6 +235,12 @@ public class Utilities
     for (pos = p0; pos < s.getEndIndex(); pos++)
       {
         char nextChar = s.array[pos];
+        if (nextChar == 0)
+          {
+            if (! round)
+              pos--;
+            break;
+          }
         if (nextChar != '\n')
           currentX += fm.charWidth(nextChar);
         else

@@ -46,6 +46,7 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import javax.accessibility.AccessibleContext;
 import javax.accessibility.AccessibleStateSet;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -69,15 +70,19 @@ public class JTextField extends JTextComponent
      */
     protected AccessibleJTextField()
     {
+      super();
     }
 
     /**
-     * getAccessibleStateSet
-     * @return AccessibleStateSet
+     * Returns the accessible state of this <code>AccessibleJTextField</code>.
+     *
+     * @return the accessible state of this <code>AccessibleJTextField</code>
      */
     public AccessibleStateSet getAccessibleStateSet()
     {
-      return null;
+      AccessibleStateSet state = super.getAccessibleStateSet();
+      // TODO: Figure out what state must be added here to the super's state.
+      return state;
     }
   }
 
@@ -480,5 +485,17 @@ public class JTextField extends JTextComponent
   {
     FontMetrics metrics = getToolkit().getFontMetrics(getFont());
     return metrics.charWidth('m');
+  }
+
+  /**
+   * Returns the accessible context associated with the <code>JTextField</code>.
+   *
+   * @return the accessible context associated with the <code>JTextField</code>
+   */
+  public AccessibleContext getAccessibleContext()
+  {
+    if (accessibleContext == null)
+      accessibleContext = new AccessibleJTextField();
+    return accessibleContext;
   }
 }

@@ -38,9 +38,15 @@ exception statement from your version. */
 
 package javax.swing;
 
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.Toolkit;
+import java.net.URL;
 
+import javax.swing.border.Border;
+import javax.swing.plaf.IconUIResource;
+import javax.swing.plaf.UIResource;
 import javax.swing.text.JTextComponent;
 
 public abstract class LookAndFeel
@@ -113,14 +119,27 @@ public abstract class LookAndFeel
    */
   public static void installBorder(JComponent c, String defaultBorderName)
     {
+    Border b = c.getBorder();
+    if (b == null || b instanceof UIResource)
+      c.setBorder(UIManager.getBorder(defaultBorderName));
     }
 
   /**
    * Convenience method for initializing a component's foreground and
    * background color properties with values from the current defaults table.
    */
-    public static void installColors(JComponent c, String defaultBgName, String defaultFgName)
+  public static void installColors(JComponent c, String defaultBgName,
+                                   String defaultFgName)
     {
+    // Install background.
+    Color bg = c.getBackground();
+    if (bg == null || bg instanceof UIResource)
+      c.setBackground(UIManager.getColor(defaultBgName));
+
+    // Install foreground.
+    Color fg = c.getForeground();
+    if (fg == null || fg instanceof UIResource)
+      c.setForeground(UIManager.getColor(defaultFgName));
     }
 
   /**
@@ -132,6 +151,12 @@ public abstract class LookAndFeel
 					  String defaultFgName,
 					  String defaultFontName)
     {
+    // Install colors.
+    installColors(component, defaultBgName, defaultFgName);
+    // Install font.
+    Font f = component.getFont();
+    if (f == null || f instanceof UIResource)
+      component.setFont(UIManager.getFont(defaultFontName));
     }
   
   /**
@@ -177,7 +202,14 @@ public abstract class LookAndFeel
    */
     public static Object makeIcon(Class baseClass, String gifFile)
     {
-	return null;
+    final URL file = baseClass.getResource(gifFile);
+    return new UIDefaults.LazyValue() 
+      {
+        public Object createValue(UIDefaults table)
+        {
+          return new IconUIResource(new ImageIcon(file));
+        }
+      };
     }
   
   /**
