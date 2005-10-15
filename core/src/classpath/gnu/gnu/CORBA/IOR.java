@@ -310,6 +310,7 @@ public class IOR
       catch (Exception e)
         {
           MARSHAL m = new MARSHAL("Unable to write Internet profile.");
+          m.minor = Minor.IOR;
           m.initCause(e);
           throw m;
         }

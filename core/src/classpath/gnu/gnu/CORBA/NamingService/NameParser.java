@@ -51,8 +51,6 @@ import org.omg.CORBA.ORBPackage.InvalidName;
 import org.omg.CORBA.portable.Delegate;
 import org.omg.CORBA.portable.ObjectImpl;
 import org.omg.CosNaming.NamingContext;
-import org.omg.CosNaming.NamingContextExtHelper;
-import org.omg.CosNaming.NamingContextHelper;
 import org.omg.CosNaming._NamingContextStub;
 
 import java.io.UnsupportedEncodingException;

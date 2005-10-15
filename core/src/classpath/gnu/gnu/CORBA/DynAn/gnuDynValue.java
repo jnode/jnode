@@ -38,6 +38,7 @@ exception statement from your version. */
 
 package gnu.CORBA.DynAn;
 
+import gnu.CORBA.Minor;
 import gnu.CORBA.Unexpected;
 
 import org.omg.CORBA.Any;
@@ -301,9 +302,12 @@ public class gnuDynValue extends abstractRecord implements DynValue,
             ValueFactory factory =
               ((org.omg.CORBA_2_3.ORB) orb).lookup_value_factory(official_type.id());
             if (factory == null)
-              throw new MARSHAL("Factory for " + official_type.id() +
-                                " not registered."
-                               );
+              {
+                MARSHAL m = new MARSHAL("Factory for " + official_type.id() +
+                " not registered.");
+                m.minor = Minor.Factory;
+                throw m;
+              }
 
             OutputStream out = orb.create_output_stream();
 

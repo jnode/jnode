@@ -39,6 +39,8 @@ exception statement from your version. */
 
 package org.omg.DynamicAny;
 
+import gnu.CORBA.Minor;
+
 import org.omg.CORBA.BAD_PARAM;
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.ORB;
@@ -161,13 +163,8 @@ public abstract class DynAnyFactoryHelper
    */
   static String not_applicable(String Id)
   {
-    try
-      {
-        throw new MARSHAL("The read/write are not applicable for " + Id);
-      }
-    catch (Exception e)
-      {
-        throw new MARSHAL();
-      }
+    MARSHAL m = new MARSHAL("The read/write are not applicable for " + Id);
+    m.minor = Minor.Inappropriate;
+    throw m;
   }
 }

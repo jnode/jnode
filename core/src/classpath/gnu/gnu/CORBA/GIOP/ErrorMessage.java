@@ -39,6 +39,7 @@ exception statement from your version. */
 package gnu.CORBA.GIOP;
 
 import gnu.CORBA.IOR;
+import gnu.CORBA.Minor;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -90,6 +91,7 @@ public class ErrorMessage
     catch (IOException ex)
       {
         MARSHAL t = new MARSHAL();
+        t.minor = Minor.Header;
         t.initCause(ex);
         throw t;
       }

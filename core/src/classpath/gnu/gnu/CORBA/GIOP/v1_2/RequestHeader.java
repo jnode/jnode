@@ -38,6 +38,7 @@ exception statement from your version. */
 
 package gnu.CORBA.GIOP.v1_2;
 
+import gnu.CORBA.Minor;
 import gnu.CORBA.CDR.cdrInput;
 import gnu.CORBA.CDR.cdrOutput;
 import gnu.CORBA.GIOP.ServiceContext;
@@ -58,6 +59,11 @@ import org.omg.CORBA.NO_IMPLEMENT;
 public class RequestHeader
   extends gnu.CORBA.GIOP.v1_0.RequestHeader
 {
+  /**
+   * Use serialVersionUID for interoperability. 
+   */
+  private static final long serialVersionUID = 1;
+  
   /**
    * Indicates that the object is addressed by the object key.
    */
@@ -150,9 +156,11 @@ public class RequestHeader
               throw new NO_IMPLEMENT("Object addressing by by IOR addressing info");
 
             default :
-              throw new MARSHAL("Unknow addressing method in request, " +
+              MARSHAL m = new MARSHAL("Unknow addressing method in request, " +
                                 AddressingDisposition
                                );
+              m.minor = Minor.UnsupportedAddressing;
+              throw m;
           }
 
         operation = in.read_string();
@@ -164,6 +172,7 @@ public class RequestHeader
     catch (IOException ex)
       {
         MARSHAL t = new MARSHAL();
+        t.minor = Minor.Header;
         t.initCause(ex);
         throw t;
       }

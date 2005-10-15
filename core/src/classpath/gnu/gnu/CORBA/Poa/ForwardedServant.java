@@ -41,6 +41,7 @@ package gnu.CORBA.Poa;
 import gnu.CORBA.IOR;
 import gnu.CORBA.IOR_Delegate;
 import gnu.CORBA.IOR_contructed_object;
+import gnu.CORBA.Minor;
 
 import org.omg.CORBA.BAD_PARAM;
 import org.omg.CORBA.CompletionStatus;
@@ -175,6 +176,7 @@ public class ForwardedServant
         catch (IOException io_ex)
           {
             MARSHAL m = new MARSHAL();
+            m.minor = Minor.Forwarding;
             m.initCause(io_ex);
             throw m;
           }

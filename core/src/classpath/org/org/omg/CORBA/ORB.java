@@ -38,6 +38,7 @@ exception statement from your version. */
 
 package org.omg.CORBA;
 
+import gnu.CORBA.ObjectCreator;
 import gnu.CORBA.Restricted_ORB;
 import gnu.CORBA.fixedTypeCode;
 import gnu.CORBA.generalTypeCode;
@@ -1167,7 +1168,7 @@ public abstract class ORB
 
     try
       {
-        orb = (ORB) Class.forName(orbClassName).newInstance();
+        orb = (ORB) ObjectCreator.forName(orbClassName).newInstance();
       }
     catch (ClassNotFoundException ex)
       {

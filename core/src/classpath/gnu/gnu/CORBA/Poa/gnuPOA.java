@@ -1612,4 +1612,24 @@ public class gnuPOA
     else
       return null;
   }
+  
+  /**
+   * Recursively searches for the given servant in the POA tree.
+   */
+  public activeObjectMap.Obj findServant(Servant servant)
+  {
+    activeObjectMap.Obj h = aom.findServant(servant);
+    if (h != null)
+      return h;
+    else
+      {
+        for (int i = 0; i < children.size(); i++)
+          {
+            h = ((gnuPOA) children.get(i)).findServant(servant);
+            if (h != null)
+              return h;
+          }
+      }
+    return h;
+  }  
 }

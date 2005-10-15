@@ -38,6 +38,8 @@ exception statement from your version. */
 
 package org.omg.PortableInterceptor;
 
+import gnu.CORBA.Minor;
+
 import org.omg.CORBA.Any;
 import org.omg.CORBA.BAD_PARAM;
 import org.omg.CORBA.MARSHAL;
@@ -133,7 +135,9 @@ public abstract class CurrentHelper
    */
   public static Current read(InputStream input)
   {
-    throw new MARSHAL();
+    MARSHAL m = new MARSHAL("Inappropriate");
+    m.minor = Minor.Inappropriate;
+    throw m;
   }
 
   /**
@@ -145,6 +149,8 @@ public abstract class CurrentHelper
    */
   public static void write(OutputStream output, Current value)
   {
-    throw new MARSHAL();
+    MARSHAL m = new MARSHAL("Inappropriate");
+    m.minor = Minor.Inappropriate;
+    throw m;
   }
 }

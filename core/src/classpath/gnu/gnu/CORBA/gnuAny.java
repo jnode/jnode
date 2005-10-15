@@ -63,7 +63,6 @@ import org.omg.CORBA.TCKind;
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.TypeCodeHolder;
 import org.omg.CORBA.ValueBaseHolder;
-import org.omg.CORBA.portable.BoxedValueHelper;
 import org.omg.CORBA.portable.Streamable;
 
 import java.io.Serializable;
@@ -89,6 +88,11 @@ import java.util.zip.Adler32;
 public class gnuAny
   extends Any
 {
+  /**
+   * Use serialVersionUID for interoperability. 
+   */
+  private static final long serialVersionUID = 1;
+  
   /**
    * The value, returned by {@link #type()} if the value has been
    * not intialized.
@@ -250,7 +254,10 @@ public class gnuAny
       }
     catch (ClassCastException ex)
       {
-        throw new BAD_OPERATION();
+        BAD_OPERATION bad = new BAD_OPERATION();
+        bad.initCause(ex);
+        bad.minor = Minor.Any;
+        throw bad;
       }
   }
 
@@ -315,7 +322,10 @@ public class gnuAny
       }
     catch (Exception ex)
       {
-        return new BAD_OPERATION("Value type expected");
+        BAD_OPERATION bad = new BAD_OPERATION("Value type expected");
+        bad.minor = Minor.Any;
+        bad.initCause(ex);
+        throw bad;
       }
   }
 
@@ -789,20 +799,7 @@ public class gnuAny
             // reading the value, not the value header.
             Field vField = has.getClass().getField("value");
 
-            BoxedValueHelper helper;
-
-            try
-              {
-                Class helperClass =
-                  Class.forName(ObjectCreator.toHelperName(a_type.id()));
-                helper = (BoxedValueHelper) helperClass.newInstance();
-              }
-            catch (Exception ex)
-              {
-                helper = null;
-              }
-
-            Object content = Vio.read(input, helper);
+            Object content = Vio.read(input, a_type.id());
             vField.set(has, content);
           }
         else
@@ -811,6 +808,7 @@ public class gnuAny
     catch (Exception ex)
       {
         MARSHAL m = new MARSHAL();
+        m.minor = Minor.Any;
         m.initCause(ex);
         throw m;
       }
@@ -856,6 +854,7 @@ public class gnuAny
 
   /**
    * Check if the current value if the value of the given kind.
+   * 
    * @param kind a kind to check.
    * @throws BAD_OPERATION if the value is not set of is different kind.
    */
@@ -863,31 +862,35 @@ public class gnuAny
                 throws BAD_OPERATION
   {
     if (has == null)
-      throw new BAD_OPERATION("value not set");
+      {
+        BAD_OPERATION bad = new BAD_OPERATION("value not set");
+        bad.minor = Minor.Any;
+        throw bad;
+      }
 
     if (xKind >= 0)
       {
         if (xKind != kind)
-          if (!(
-                xKind == TCKind._tk_alias &&
-                has._type().kind().value() == kind
-              )
-             )
-            throw new BAD_OPERATION("Extracting " + typeNamer.nameIt(kind) +
-                                    " when stored " + typeNamer.nameIt(xKind)
-                                   );
+          if (!(xKind == TCKind._tk_alias && has._type().kind().value() == kind))
+            {
+              BAD_OPERATION bad = new BAD_OPERATION("Extracting "
+                + typeNamer.nameIt(kind) + " when stored "
+                + typeNamer.nameIt(xKind));
+              bad.minor = Minor.Any;
+              throw bad;
+            }
       }
     else
       {
         if (type().kind().value() != kind)
-          if (!(
-                type().kind().value() == TCKind._tk_alias &&
-                has._type().kind().value() == kind
-              )
-             )
-            throw new BAD_OPERATION("Extracting " + typeNamer.nameIt(kind) +
-                                    " stored " + typeNamer.nameIt(type())
-                                   );
+          if (!(type().kind().value() == TCKind._tk_alias && has._type().kind().value() == kind))
+            {
+              BAD_OPERATION bad = new BAD_OPERATION("Extracting "
+                + typeNamer.nameIt(kind) + " stored "
+                + typeNamer.nameIt(type()));
+              bad.minor = Minor.Any;
+              throw bad;
+            }
       }
   }
 

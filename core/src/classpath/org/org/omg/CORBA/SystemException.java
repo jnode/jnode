@@ -42,6 +42,7 @@ import java.io.Serializable;
 
 /**
  * The root class for all CORBA standard exceptions.
+ * 
  * @author Audrius Meskauskas (AudriusA@Bioinformatics.org)
  */
 public class SystemException
@@ -49,8 +50,7 @@ public class SystemException
   implements Serializable
 {
   /**
-   * Use serialVersionUID for interoperability.
-   * Using the version 1.4 UID.
+   * Use serialVersionUID for interoperability. Using the version 1.4 UID.
    */
   private static final long serialVersionUID = -8486391734674855519L;
 
@@ -60,22 +60,35 @@ public class SystemException
   public CompletionStatus completed;
 
   /**
-   * The additional exception error code ("minor").
+   * <p>
+   * Contains more details about the exception. The lower 12 bits contain a
+   * code, defining the reason why exception has been thrown. The higher 20 bits
+   * hold "Vendor Minor Codeset ID" (VMCID).
+   * </p>
+   * <p>
+   * The Classpath specifice minor exception codes are documented in the headers
+   * of the corresponding exceptions (for instance, {@link MARSHAL}).
+   * </p>
+   * 
+   * The VMCID 0 and 0xfffff are reserved for experimental use. 
+   * 
+   * @see OMGVMCID
    */
   public int minor;
 
   /**
    * Constructs an instance of the CORBA standard exception.
-   * @param a_reason a string, explaining the reason why the 
-   * exceptions has been thrown.
+   * 
+   * @param a_reason a string, explaining the reason why the exceptions has been
+   * thrown.
    * @param a_minor an additional error code (known as the "minor")
    * @param a_completed the task completion status.
    */
   protected SystemException(String a_reason, int a_minor,
-                            CompletionStatus a_completed
-                           )
+                            CompletionStatus a_completed)
   {
-    super(a_reason);
+    super(a_reason + " Minor: " + Integer.toHexString(a_minor) + " ("
+      + (a_minor & 0xFFF) + "). Completed: "+a_completed);
     minor = a_minor;
     completed = a_completed;
   }
