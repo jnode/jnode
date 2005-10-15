@@ -1405,12 +1405,9 @@ public abstract class Component
         if (parent != null)
           {
             Rectangle parentBounds = parent.getBounds();
-            Rectangle oldBounds = new Rectangle(parent.getX() + oldx,
-                                                parent.getY() + oldy,
-                                                oldwidth, oldheight);
-            Rectangle newBounds = new Rectangle(parent.getX() + x,
-                                                parent.getY() + y,
-                                                width, height);
+            Rectangle oldBounds = new Rectangle(oldx, oldy, oldwidth,
+                                                oldheight);
+            Rectangle newBounds = new Rectangle(x, y, width, height);
             Rectangle destroyed = oldBounds.union(newBounds);
             if (!destroyed.isEmpty())
               parent.repaint(0, destroyed.x, destroyed.y, destroyed.width,
@@ -1734,11 +1731,8 @@ public abstract class Component
     if (peer != null)
       {
 			Graphics gfx = peer.getGraphics();
-			if (gfx != null)
-				return gfx;
-			// create graphics for lightweight:
-			Container parent = getParent();
-        if (parent != null)
+        // Create peer for lightweights.
+        if (gfx == null && parent != null)
           {
 				gfx = parent.getGraphics();
 				Rectangle bounds = getBounds();
@@ -1746,6 +1740,8 @@ public abstract class Component
 				gfx.translate(bounds.x, bounds.y);
 				return gfx;
 			}
+        gfx.setFont(font);
+        return gfx;
 		}
 		return null;
 	}

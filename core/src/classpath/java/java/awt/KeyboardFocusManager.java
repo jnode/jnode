@@ -39,6 +39,7 @@ exception statement from your version. */
 package java.awt;
 
 import java.applet.Applet;
+import java.awt.FocusTraversalPolicy;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
@@ -213,7 +214,7 @@ public abstract class KeyboardFocusManager
       currentFocusOwners */
   private static Map currentFocusCycleRoots = new HashMap ();
 
-  /** The default {@link FocusTraveralPolicy} that focus-managing
+  /** The default {@link FocusTraversalPolicy} that focus-managing
       {@link Container}s will use to define their initial focus
       traversal policy. */
   private FocusTraversalPolicy defaultPolicy;
@@ -1364,11 +1365,11 @@ public abstract class KeyboardFocusManager
    *
    * @return a global object set by the current ThreadGroup, or null
    *
-   * @see getFocusOwner
-   * @see getPermanentFocusOwner
-   * @see getFocusedWindow
-   * @see getActiveWindow
-   * @see getCurrentFocusCycleRoot
+   * @see #getFocusOwner()
+   * @see #getPermanentFocusOwner()
+   * @see #getFocusedWindow()
+   * @see #getActiveWindow()
+   * @see #getCurrentFocusCycleRoot()
    */
   private Object getObject (Map globalMap)
   {
@@ -1388,11 +1389,11 @@ public abstract class KeyboardFocusManager
    * @throws SecurityException if this is not the keyboard focus
    * manager associated with the current {@link java.lang.ThreadGroup}
    *
-   * @see getGlobalFocusOwner
-   * @see getGlobalPermanentFocusOwner
-   * @see getGlobalFocusedWindow
-   * @see getGlobalActiveWindow
-   * @see getGlobalCurrentFocusCycleRoot
+   * @see #getGlobalFocusOwner()
+   * @see #getGlobalPermanentFocusOwner()
+   * @see #getGlobalFocusedWindow()
+   * @see #getGlobalActiveWindow()
+   * @see #getGlobalCurrentFocusCycleRoot()
    */
   private Object getGlobalObject (Map globalMap)
   {
@@ -1432,11 +1433,11 @@ public abstract class KeyboardFocusManager
    * @param newObject the object to set
    * @param property the property that will change
    *
-   * @see setGlobalFocusOwner
-   * @see setGlobalPermanentFocusOwner
-   * @see setGlobalFocusedWindow
-   * @see setGlobalActiveWindow
-   * @see setGlobalCurrentFocusCycleRoot
+   * @see #setGlobalFocusOwner(Component)
+   * @see #setGlobalPermanentFocusOwner(Component)
+   * @see #setGlobalFocusedWindow(Window)
+   * @see #setGlobalActiveWindow(Window)
+   * @see #setGlobalCurrentFocusCycleRoot(Container)
    */
   private void setGlobalObject (Map globalMap,
                                 Object newObject,
