@@ -142,8 +142,8 @@ public class MetalTreeUI
     setRowHeight(defaults.getInt("Tree.rowHeight"));
     tree.requestFocusInWindow(false);
     
-    setExpandedIcon(defaults.getIcon("Tree.expandedIcon"));
-    setCollapsedIcon(defaults.getIcon("Tree.collapsedIcon"));
+    setExpandedIcon(defaults.getIcon("Tree.openIcon"));
+    setCollapsedIcon(defaults.getIcon("Tree.closedIcon"));
     
     currentCellRenderer = createDefaultCellRenderer();
     rendererPane = createCellRendererPane();
@@ -153,7 +153,11 @@ public class MetalTreeUI
     TreeModel mod = tree.getModel();
     setModel(mod);
     if (mod != null)
-      tree.expandPath(new TreePath(mod.getRoot()));
+      {
+        TreePath path = new TreePath(mod.getRoot());
+        if (!tree.isExpanded(path))
+          toggleExpandState(path);
+      }
     treeSelectionModel = tree.getSelectionModel();
     drawingCache = new Hashtable();
     nodeDimensions = createNodeDimensions();

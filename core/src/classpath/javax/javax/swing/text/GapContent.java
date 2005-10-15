@@ -41,9 +41,13 @@ package javax.swing.text;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.Vector;
 
+import javax.swing.undo.AbstractUndoableEdit;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoableEdit;
 
 /**
@@ -126,6 +130,83 @@ public class GapContent
     }
   }
 
+  class UndoInsertString extends AbstractUndoableEdit
+  {
+    public int where, length;
+    String text;
+    public UndoInsertString(int start, int len)
+    {
+      where = start;
+      length = len;
+    }
+
+    public void undo () throws CannotUndoException
+    {
+      super.undo();
+      try
+      {
+        text = getString(where, length);
+        remove(where, length);
+      }
+      catch (BadLocationException ble)
+      {
+        throw new CannotUndoException();
+      }
+    }
+    
+    public void redo () throws CannotUndoException
+    {
+      super.redo();
+      try
+      {
+        insertString(where, text);
+      }
+      catch (BadLocationException ble)
+      {
+        throw new CannotRedoException();
+      }
+    }
+    
+  }
+  
+  class UndoRemove extends AbstractUndoableEdit
+  {
+    public int where;
+    String text;
+    public UndoRemove(int start, String removedText)
+    {
+      where = start;
+      text = removedText;
+    }
+
+    public void undo () throws CannotUndoException
+    {
+      super.undo();
+      try
+      {
+        insertString(where, text);
+      }
+      catch (BadLocationException ble)
+      {
+        throw new CannotUndoException();
+      }
+    }
+    
+    public void redo () throws CannotUndoException
+    {
+      super.redo();
+      try
+      {
+        remove(where, text.length());
+      }
+      catch (BadLocationException ble)
+      {
+        throw new CannotRedoException();
+      }
+    }
+    
+  }
+  
   /** The serialization UID (compatible with JDK1.5). */
   private static final long serialVersionUID = -6226052713477823730L;
 
@@ -217,8 +298,7 @@ public class GapContent
    * @param where the position where the string is inserted
    * @param str the string that is to be inserted
    * 
-   * @return an UndoableEdit object (currently not supported, so
-   *         <code>null</code> is returned)
+   * @return an UndoableEdit object
    * 
    * @throws BadLocationException if <code>where</code> is not a valid
    *         location in the buffer
@@ -234,9 +314,9 @@ public class GapContent
       throw new BadLocationException("the where argument cannot be greater"
           + " than the content length", where);
 
-    replace(where, 0, str.toCharArray(), str.length());
+    replace(where, 0, str.toCharArray(), strLen);
 
-    return null;
+    return new UndoInsertString(where, strLen);
   }
 
   /**
@@ -245,8 +325,7 @@ public class GapContent
    * @param where the position where the content is to be removed
    * @param nitems number of characters to be removed
    * 
-   * @return an UndoableEdit object (currently not supported, so
-   *         <code>null</code> is returned)
+   * @return an UndoableEdit object
    * 
    * @throws BadLocationException if <code>where</code> is not a valid
    *         location in the buffer
@@ -263,9 +342,10 @@ public class GapContent
       throw new BadLocationException("where + nitems cannot be greater"
           + " than the content length", where + nitems);
 
+    String removedText = getString(where, nitems);
     replace(where, nitems, null, 0);
 
-    return null;
+    return new UndoRemove(where, removedText);
   }
 
   /**
@@ -564,18 +644,13 @@ public class GapContent
 
     int index1 = Collections.binarySearch(positions,
                                           new GapContentPosition(offset));
-    int index2 = Collections.binarySearch(positions,
-                                          new GapContentPosition(endOffset));
     if (index1 < 0)
       index1 = -(index1 + 1);
-    if (index2 < 0)
-      index2 = -(index2 + 1);
     for (ListIterator i = positions.listIterator(index1); i.hasNext();)
       {
-        if (i.nextIndex() > index2)
-          break;
-        
         GapContentPosition p = (GapContentPosition) i.next();
+        if (p.mark > endOffset)
+          break;
         if (p.mark >= offset && p.mark <= endOffset)
           res.add(p);
       }
@@ -597,18 +672,14 @@ public class GapContent
 
     int index1 = Collections.binarySearch(positions,
                                           new GapContentPosition(offset));
-    int index2 = Collections.binarySearch(positions,
-                                          new GapContentPosition(endOffset));
     if (index1 < 0)
       index1 = -(index1 + 1);
-    if (index2 < 0)
-      index2 = -(index2 + 1);
     for (ListIterator i = positions.listIterator(index1); i.hasNext();)
       {
-        if (i.nextIndex() > index2)
+        GapContentPosition p = (GapContentPosition) i.next();
+        if (p.mark > endOffset)
           break;
         
-        GapContentPosition p = (GapContentPosition) i.next();
         if (p.mark >= offset && p.mark <= endOffset)
           p.mark = value;
 }
@@ -628,18 +699,14 @@ public class GapContent
 
     int index1 = Collections.binarySearch(positions,
                                           new GapContentPosition(offset));
-    int index2 = Collections.binarySearch(positions,
-                                          new GapContentPosition(endOffset));
     if (index1 < 0)
       index1 = -(index1 + 1);
-    if (index2 < 0)
-      index2 = -(index2 + 1);
     for (ListIterator i = positions.listIterator(index1); i.hasNext();)
       {
-        if (i.nextIndex() > index2)
+        GapContentPosition p = (GapContentPosition) i.next();
+        if (p.mark > endOffset)
           break;
         
-        GapContentPosition p = (GapContentPosition) i.next();
         if (p.mark >= offset && p.mark <= endOffset)
           p.mark += incr;
       }
@@ -657,5 +724,40 @@ public class GapContent
       return;
 
     setPositionsInRange(gapEnd, 0, 0);
+  }
+
+  /**
+   * Outputs debugging info to System.err. It prints out the buffer array,
+   * the gapStart is marked by a &lt; sign, the gapEnd is marked by a &gt;
+   * sign and each position is marked by a # sign.
+   */
+  private void dump()
+  {
+    System.err.println("GapContent debug information");
+    System.err.println("buffer length: " + buffer.length);
+    System.err.println("gap start: " + gapStart);
+    System.err.println("gap end: " + gapEnd);
+    for (int i = 0; i < buffer.length; i++)
+      {
+        if (i == gapStart)
+          System.err.print('<');
+        if (i == gapEnd)
+          System.err.print('>');
+
+        if (!Character.isISOControl(buffer[i]))
+          System.err.print(buffer[i]);
+        else
+          System.err.print('.');
+      }
+    System.err.println();
+  }
+
+  private void dumpPositions()
+  {
+    for (Iterator i = positions.iterator(); i.hasNext();)
+      {
+        GapContentPosition pos = (GapContentPosition) i.next();
+        System.err.println("position at: " + pos.mark);
+      }
   }
 }

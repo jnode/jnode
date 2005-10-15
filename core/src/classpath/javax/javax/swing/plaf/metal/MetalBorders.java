@@ -463,8 +463,16 @@ public class MetalBorders
     public void paintBorder(Component c, Graphics g, int x, int y, int w, 
         int h)
     {
+      boolean enabledTextBorder;
+      if (c instanceof JTextComponent)
+	{
       JTextComponent tc = (JTextComponent) c;
-      if (tc.isEnabled() && tc.isEditable())
+	  enabledTextBorder = tc.isEnabled() && tc.isEditable();
+	}
+      else
+	enabledTextBorder = false;
+
+      if (enabledTextBorder)
         super.paintBorder(c, g, x, y, w, h);
       else
         {

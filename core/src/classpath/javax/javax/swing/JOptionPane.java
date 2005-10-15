@@ -509,6 +509,8 @@ public class JOptionPane extends JComponent implements Accessible
    */
   public Object getInputValue()
   {
+    if (getValue().equals(new Integer(CANCEL_OPTION)))
+      setInputValue(null);
     return inputValue;
   }
 
@@ -1057,7 +1059,7 @@ public class JOptionPane extends JComponent implements Accessible
     dialog.pack();
     dialog.show();
 
-    return (String) pane.getInputValue();
+    return pane.getInputValue();
   }
 
   /**
@@ -1125,7 +1127,9 @@ public class JOptionPane extends JComponent implements Accessible
 
     startModal(frame);
 
+    if (pane.getValue() instanceof Integer)
     return ((Integer) pane.getValue()).intValue();
+    return -1;
   }
 
   /**
@@ -1150,7 +1154,9 @@ public class JOptionPane extends JComponent implements Accessible
 
     startModal(frame);
 
+    if (pane.getValue() instanceof Integer)
     return ((Integer) pane.getValue()).intValue();
+    return -1;
   }
 
   /**
@@ -1176,7 +1182,9 @@ public class JOptionPane extends JComponent implements Accessible
 
     startModal(frame);
 
+    if (pane.getValue() instanceof Integer)
     return ((Integer) pane.getValue()).intValue();
+    return -1;
   }
 
   /**
@@ -1204,7 +1212,9 @@ public class JOptionPane extends JComponent implements Accessible
 
     startModal(frame);
 
+    if (pane.getValue() instanceof Integer)
     return ((Integer) pane.getValue()).intValue();
+    return -1;
   }
 
   /**
@@ -1288,7 +1298,7 @@ public class JOptionPane extends JComponent implements Accessible
 
     startModal(frame);
 
-    return (String) pane.getInputValue();
+    return pane.getInputValue();
   }
 
   /**
@@ -1381,7 +1391,9 @@ public class JOptionPane extends JComponent implements Accessible
 
     startModal(frame);
 
+    if (pane.getValue() instanceof Integer)
     return ((Integer) pane.getValue()).intValue();
+    return -1;
   }
 
   /**
@@ -1468,7 +1480,9 @@ public class JOptionPane extends JComponent implements Accessible
     dialog.pack();
     dialog.show();
 
+    if (pane.getValue() instanceof Integer)
     return ((Integer) pane.getValue()).intValue();
+    return -1;
   }
 
   /**

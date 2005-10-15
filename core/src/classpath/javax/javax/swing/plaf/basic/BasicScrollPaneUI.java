@@ -50,10 +50,9 @@ import javax.swing.JComponent;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
+import javax.swing.LookAndFeel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.ScrollPaneLayout;
-import javax.swing.UIDefaults;
-import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.ComponentUI;
@@ -256,11 +255,10 @@ public class BasicScrollPaneUI extends ScrollPaneUI
   protected void installDefaults(JScrollPane p)
   {
     scrollpane = p;
-    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-    p.setForeground(defaults.getColor("ScrollPane.foreground"));
-    p.setBackground(defaults.getColor("ScrollPane.background"));
-    p.setFont(defaults.getFont("ScrollPane.font"));
-    p.setBorder(defaults.getBorder("ScrollPane.border"));
+    LookAndFeel.installColorsAndFont(p, "ScrollPane.background",
+                                     "ScrollPane.foreground",
+                                     "ScrollPane.font");
+    LookAndFeel.installBorder(p, "ScrollPane.border");
     p.setOpaque(true);
   }
 

@@ -46,7 +46,7 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.CellRendererPane;
 import javax.swing.JComponent;
-import javax.swing.UIDefaults;
+import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.event.MouseInputListener;
@@ -94,11 +94,10 @@ public class BasicTableHeaderUI
 
   protected void installDefaults()
   {
-    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-    header.setBackground(defaults.getColor("TableHeader.background"));
-    header.setForeground(defaults.getColor("TableHeader.foreground"));
-    header.setFont(defaults.getFont("TableHeader.font"));
-    cellBorder = defaults.getBorder("TableHeader.cellBorder");
+    LookAndFeel.installColorsAndFont(header, "TableHeader.background",
+                                     "TableHeader.foreground",
+                                     "TableHeader.font");
+    cellBorder = UIManager.getBorder("TableHeader.cellBorder");
   }
 
   protected void installKeyboardActions()
@@ -156,6 +155,7 @@ public class BasicTableHeaderUI
         Rectangle bounds = header.getHeaderRect(i);
         if (bounds.intersects(clip))
           {
+            Rectangle oldClip = gfx.getClipBounds();
             TableColumn col = cmod.getColumn(i);
             TableCellRenderer rend = col.getHeaderRenderer();
             if (rend == null)
@@ -172,10 +172,12 @@ public class BasicTableHeaderUI
             if (comp instanceof JComponent)
               ((JComponent)comp).setBorder(cellBorder);
             gfx.translate(bounds.x, bounds.y);
+            gfx.setClip(0, 0, bounds.width, bounds.height);
             comp.setSize(bounds.width, bounds.height);
             comp.setLocation(0,0);
             comp.paint(gfx);
             gfx.translate(-bounds.x, -bounds.y);
+            gfx.setClip(oldClip);
           }
       }
 

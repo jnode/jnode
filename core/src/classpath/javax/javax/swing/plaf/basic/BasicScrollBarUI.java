@@ -58,6 +58,7 @@ import javax.swing.BoundedRangeModel;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JScrollBar;
+import javax.swing.LookAndFeel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -830,21 +831,19 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
    */
   protected void installDefaults()
   {
-    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-
-    scrollbar.setForeground(defaults.getColor("ScrollBar.foreground"));
-    scrollbar.setBackground(defaults.getColor("ScrollBar.background"));
-    scrollbar.setBorder(defaults.getBorder("ScrollBar.border"));
+    LookAndFeel.installColors(scrollbar, "ScrollBar.background",
+                              "ScrollBar.foreground");
+    LookAndFeel.installBorder(scrollbar, "ScrollBar.border");
     scrollbar.setOpaque(true);
     scrollbar.setLayout(this);
 
-    thumbColor = defaults.getColor("ScrollBar.thumb");
-    thumbDarkShadowColor = defaults.getColor("ScrollBar.thumbDarkShadow");
-    thumbHighlightColor = defaults.getColor("ScrollBar.thumbHighlight");
-    thumbLightShadowColor = defaults.getColor("ScrollBar.thumbShadow");
+    thumbColor = UIManager.getColor("ScrollBar.thumb");
+    thumbDarkShadowColor = UIManager.getColor("ScrollBar.thumbDarkShadow");
+    thumbHighlightColor = UIManager.getColor("ScrollBar.thumbHighlight");
+    thumbLightShadowColor = UIManager.getColor("ScrollBar.thumbShadow");
 
-    maximumThumbSize = defaults.getDimension("ScrollBar.maximumThumbSize");
-    minimumThumbSize = defaults.getDimension("ScrollBar.minimumThumbSize");
+    maximumThumbSize = UIManager.getDimension("ScrollBar.maximumThumbSize");
+    minimumThumbSize = UIManager.getDimension("ScrollBar.minimumThumbSize");
   }
 
   /**

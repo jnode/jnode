@@ -66,10 +66,10 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+import javax.swing.LookAndFeel;
 import javax.swing.RootPaneContainer;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.event.MouseInputListener;
@@ -587,18 +587,15 @@ public class BasicToolBarUI extends ToolBarUI implements SwingConstants
    */
   protected void installDefaults()
   {
-    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
+    LookAndFeel.installBorder(toolBar, "ToolBar.border");
+    LookAndFeel.installColorsAndFont(toolBar, "ToolBar.background",
+                                     "ToolBar.foreground", "ToolBar.font");
 
-    toolBar.setBorder(defaults.getBorder("ToolBar.border"));
-    toolBar.setBackground(defaults.getColor("ToolBar.background"));
-    toolBar.setForeground(defaults.getColor("ToolBar.foreground"));
-    toolBar.setFont(defaults.getFont("ToolBar.font"));
+    dockingBorderColor = UIManager.getColor("ToolBar.dockingForeground");
+    dockingColor = UIManager.getColor("ToolBar.dockingBackground");
 
-    dockingBorderColor = defaults.getColor("ToolBar.dockingForeground");
-    dockingColor = defaults.getColor("ToolBar.dockingBackground");
-
-    floatingBorderColor = defaults.getColor("ToolBar.floatingForeground");
-    floatingColor = defaults.getColor("ToolBar.floatingBackground");
+    floatingBorderColor = UIManager.getColor("ToolBar.floatingForeground");
+    floatingColor = UIManager.getColor("ToolBar.floatingBackground");
   }
 
   /**

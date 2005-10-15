@@ -553,6 +553,7 @@ public abstract class BasicLookAndFeel extends LookAndFeel
         "shift PAGE_UP","scrollUpExtendSelection",
         "KP_DOWN", "selectNextRow"
       }),
+      "List.font", new FontUIResource("Dialog", Font.PLAIN, 12),
       "List.foreground", new ColorUIResource(Color.black),
       "List.selectionBackground", new ColorUIResource(0, 0, 128),
       "List.selectionForeground", new ColorUIResource(Color.white),

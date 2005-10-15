@@ -59,6 +59,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
+import javax.swing.LookAndFeel;
 import javax.swing.MenuElement;
 import javax.swing.MenuSelectionManager;
 import javax.swing.SwingConstants;
@@ -396,23 +397,20 @@ public class BasicMenuItemUI extends MenuItemUI
    */
   protected void installDefaults()
   {
-    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-
-    menuItem.setBackground(defaults.getColor("MenuItem.background"));
-    menuItem.setBorder(defaults.getBorder("MenuItem.border"));
-    menuItem.setFont(defaults.getFont("MenuItem.font"));
-    menuItem.setForeground(defaults.getColor("MenuItem.foreground"));
-    menuItem.setMargin(defaults.getInsets("MenuItem.margin"));
-    menuItem.setOpaque(true);
-    acceleratorFont = defaults.getFont("MenuItem.acceleratorFont");
-    acceleratorForeground = defaults.getColor("MenuItem.acceleratorForeground");
-    acceleratorSelectionForeground = defaults.getColor("MenuItem.acceleratorSelectionForeground");
-    selectionBackground = defaults.getColor("MenuItem.selectionBackground");
-    selectionForeground = defaults.getColor("MenuItem.selectionForeground");
-    acceleratorDelimiter = defaults.getString("MenuItem.acceleratorDelimiter");
+    LookAndFeel.installBorder(menuItem, "MenuItem.border");
+    LookAndFeel.installColorsAndFont(menuItem, "MenuItem.background",
+                                     "MenuItem.foreground", "MenuItem.font");
+    menuItem.setMargin(UIManager.getInsets("MenuItem.margin"));
+    acceleratorFont = UIManager.getFont("MenuItem.acceleratorFont");
+    acceleratorForeground = UIManager.getColor("MenuItem.acceleratorForeground");
+    acceleratorSelectionForeground = UIManager.getColor("MenuItem.acceleratorSelectionForeground");
+    selectionBackground = UIManager.getColor("MenuItem.selectionBackground");
+    selectionForeground = UIManager.getColor("MenuItem.selectionForeground");
+    acceleratorDelimiter = UIManager.getString("MenuItem.acceleratorDelimiter");
 
     menuItem.setHorizontalTextPosition(SwingConstants.TRAILING);
     menuItem.setHorizontalAlignment(SwingConstants.LEADING);
+    menuItem.setOpaque(true);
   }
 
   /**

@@ -70,8 +70,8 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
+import javax.swing.LookAndFeel;
 import javax.swing.SwingUtilities;
-import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
@@ -241,23 +241,12 @@ public class BasicComboBoxUI extends ComboBoxUI
    */
   protected void installDefaults()
   {
-    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-    Font f = comboBox.getFont();
-    Color fore = comboBox.getForeground();
-    Color back = comboBox.getBackground();
-    if (f == null || f instanceof UIResource)
-      comboBox.setFont(defaults.getFont("ComboBox.font"));
-    
-    if (fore == null || fore instanceof UIResource)
-      comboBox.setForeground(defaults.getColor("ComboBox.foreground"));
-
-    if (back == null || back instanceof UIResource)
-      comboBox.setBackground(defaults.getColor("ComboBox.background"));
-
+    LookAndFeel.installColorsAndFont(comboBox, "ComboBox.background",
+                                     "ComboBox.foreground", "ComboBox.font");
     // fetch the button color scheme
-    shadow = defaults.getColor("ComboBox.buttonShadow");
-    darkShadow = defaults.getColor("ComboBox.buttonDarkShadow");
-    highlight = defaults.getColor("ComboBox.buttonHighlight");
+    shadow = UIManager.getColor("ComboBox.buttonShadow");
+    darkShadow = UIManager.getColor("ComboBox.buttonDarkShadow");
+    highlight = UIManager.getColor("ComboBox.buttonHighlight");
   }
 
   /**

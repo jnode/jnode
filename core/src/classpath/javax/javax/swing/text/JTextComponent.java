@@ -53,6 +53,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputMethodListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -1018,8 +1019,13 @@ public abstract class JTextComponent extends JComponent
   {
     try
       {
+        if (doc instanceof AbstractDocument)
+          ((AbstractDocument) doc).replace(0, doc.getLength(), text, null);
+        else
+          {
 	doc.remove(0, doc.getLength());
 	doc.insertString(0, text, null);
+      }
       }
     catch (BadLocationException e)
       {
@@ -1668,4 +1674,19 @@ public abstract class JTextComponent extends JComponent
   {
     output.write(getText());
   }  
+
+  /**
+   * Returns the tooltip text for this text component for the given mouse
+   * event. This forwards the call to
+   * {@link TextUI#getToolTipText(JTextComponent, Point)}.
+   *
+   * @param ev the mouse event
+   *
+   * @return the tooltip text for this text component for the given mouse
+   *         event
+   */
+  public String getToolTipText(MouseEvent ev)
+  {
+    return getUI().getToolTipText(this, ev.getPoint());
+  }
 }

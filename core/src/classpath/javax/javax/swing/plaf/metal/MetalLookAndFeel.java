@@ -49,6 +49,7 @@ import javax.swing.plaf.BorderUIResource;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.plaf.InsetsUIResource;
+import javax.swing.plaf.BorderUIResource.LineBorderUIResource;
 import javax.swing.plaf.basic.BasicLookAndFeel;
 
 
@@ -856,6 +857,11 @@ public class MetalLookAndFeel extends BasicLookAndFeel
       "FormattedTextField.selectionBackground", getTextHighlightColor(),
       "FormattedTextField.selectionForeground", getHighlightedTextColor(),
 
+      "FileView.computerIcon", MetalIconFactory.getTreeComputerIcon(),
+      "FileView.directoryIcon", MetalIconFactory.getTreeFolderIcon(),
+      "FileView.fileIcon", MetalIconFactory.getTreeLeafIcon(),
+      "FileView.floppyDriveIcon", MetalIconFactory.getTreeFloppyDriveIcon(),
+      "FileView.hardDriveIcon", MetalIconFactory.getTreeHardDriveIcon(),
 
       "InternalFrame.activeTitleBackground", getWindowTitleBackground(),
       "InternalFrame.activeTitleForeground", getWindowTitleForeground(),
@@ -888,6 +894,8 @@ public class MetalLookAndFeel extends BasicLookAndFeel
       "List.foreground", getUserTextColor(),
       "List.selectionBackground", getTextHighlightColor(),
       "List.selectionForeground", getHighlightedTextColor(),
+      "List.focusCellHighlightBorder", 
+        new LineBorderUIResource(MetalLookAndFeel.getFocusColor()),
 
       "Menu.acceleratorFont", new FontUIResource("Dialog", Font.PLAIN, 10),
       "Menu.acceleratorForeground", getAcceleratorForeground(),
@@ -1061,7 +1069,8 @@ public class MetalLookAndFeel extends BasicLookAndFeel
       "Table.focusCellBackground", getWindowBackground(),
       "Table.focusCellForeground", getControlTextColor(),
       "Table.foreground", getControlTextColor(),
-      "Table.focusCellHighlightBorder", getControlShadow(),
+      "Table.focusCellHighlightBorder",
+      new BorderUIResource.LineBorderUIResource(getControlShadow()),
       "Table.focusCellBackground", getWindowBackground(),
       "Table.gridColor", getControlDarkShadow(),
       "Table.selectionBackground", new ColorUIResource(204, 204, 255),

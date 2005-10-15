@@ -272,7 +272,7 @@ public class JLayeredPane extends JComponent implements Accessible
    * Increments the recorded size of a given layer.
    *
    * @param layer the layer number to increment.
-   * @see #incrLayer()
+   * @see #incrLayer
    */
   private void incrLayer(Integer layer)
   {
@@ -286,7 +286,7 @@ public class JLayeredPane extends JComponent implements Accessible
    * Decrements the recorded size of a given layer.
    *
    * @param layer the layer number to decrement.
-   * @see #decrLayer()
+   * @see #incrLayer
    */
   private void decrLayer(Integer layer)
   {
@@ -685,5 +685,16 @@ public class JLayeredPane extends JComponent implements Accessible
     g.setColor(getBackground());
     g.fillRect(0, 0, getWidth(), getHeight());
     super.paint(g);
+  }
+
+  /**
+   * Overridden to return <code>false</code>, since <code>JLayeredPane</code>
+   * cannot guarantee that its children don't overlap.
+   *
+   * @return <code>false</code>
+   */
+  public boolean isOptimizedDrawingEnabled()
+  {
+    return false;
   }
 }

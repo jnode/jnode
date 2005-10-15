@@ -95,6 +95,10 @@ public class BasicRadioButtonUI extends BasicToggleButtonUI
       b.setIcon(icon);
     if (b.getSelectedIcon() == null)
       b.setSelectedIcon(icon);
+    if (b.getDisabledIcon() == null)
+      b.setDisabledIcon(icon);
+    if (b.getDisabledSelectedIcon() == null)
+      b.setDisabledSelectedIcon(icon);
   }
 
   /**
@@ -141,10 +145,14 @@ public class BasicRadioButtonUI extends BasicToggleButtonUI
     g.setFont(f);
 
     Icon currentIcon = null;
-    if (b.isSelected())
+    if (b.isSelected() && b.isEnabled())
       currentIcon = b.getSelectedIcon();
-    else
+    else if (!b.isSelected() && b.isEnabled())
       currentIcon = b.getIcon();
+    else if (b.isSelected() && !b.isEnabled())
+      currentIcon = b.getDisabledSelectedIcon();
+    else // (!b.isSelected() && !b.isEnabled())
+      currentIcon = b.getDisabledIcon();
 
     SwingUtilities.calculateInnerArea(b, vr);
     String text = SwingUtilities.layoutCompoundLabel
@@ -160,7 +168,7 @@ public class BasicRadioButtonUI extends BasicToggleButtonUI
     if (text != null)
       paintText(g, b, tr, text);
     // TODO: Figure out what is the size parameter?
-    if (b.hasFocus())
+    if (b.hasFocus() && b.isFocusPainted())
     paintFocus(g, tr, null);
   }
 

@@ -976,8 +976,6 @@ public class JTree
     
     /**
      * Returns the number of items currently selected.
-     * 
-     * @param the number of selected accessibles.
      */
     public int getAccessibleSelectionCount()
     {
@@ -1477,11 +1475,10 @@ public class JTree
    */
   public JTree(TreeModel model)
   {
+    updateUI();
     setRootVisible(true);
     setModel(model);
     setSelectionModel(EmptySelectionModel.sharedInstance());
-    setCellRenderer(new DefaultTreeCellRenderer());
-    updateUI();
   }
 
   /**
@@ -1602,13 +1599,13 @@ public class JTree
 
   /**
    * Gets the AccessibleContext associated with this
-   * <code>JToggleButton</code>.
+   * <code>JTree</code>.
    * 
    * @return the associated context
    */
   public AccessibleContext getAccessibleContext()
   {
-    return null;
+    return new AccessibleJTree();
   }
 
   /**
@@ -1633,14 +1630,14 @@ public class JTree
     return 1;
   }
 
-  public boolean getScrollableTracksViewportWidth()
+  public boolean getScrollableTracksViewportHeight()
   {
     if (getParent() instanceof JViewport)
       return ((JViewport) getParent()).getHeight() > getPreferredSize().height;
     return false;
   }
 
-  public boolean getScrollableTracksViewportHeight()
+  public boolean getScrollableTracksViewportWidth()
   {
     if (getParent() instanceof JViewport)
       return ((JViewport) getParent()).getWidth() > getPreferredSize().width;

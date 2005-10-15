@@ -90,9 +90,13 @@ public class MetalScrollBarUI
         {
           Boolean prop = (Boolean) e.getNewValue();
           isFreeStanding = (prop == null ? true : prop.booleanValue());
+	  if (increaseButton != null)
           increaseButton.setFreeStanding(isFreeStanding);
+	  if (decreaseButton != null)
           decreaseButton.setFreeStanding(isFreeStanding);
         }
+      else
+	super.propertyChange(e);
     }
   }
   

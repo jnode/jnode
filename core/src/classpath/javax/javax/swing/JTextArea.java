@@ -42,6 +42,8 @@ import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Rectangle;
 
+import javax.accessibility.AccessibleContext;
+import javax.accessibility.AccessibleStateSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
@@ -91,6 +93,35 @@ import javax.swing.text.View;
 
 public class JTextArea extends JTextComponent
 {
+  /**
+   * Provides accessibility support for <code>JTextArea</code>.
+   *
+   * @author Roman Kennke (kennke@aicas.com)
+   */
+  protected class AccessibleJTextArea extends AccessibleJTextComponent
+  {
+
+    /**
+     * Creates a new <code>AccessibleJTextArea</code> object.
+     */
+    protected AccessibleJTextArea()
+    {
+      super();
+    }
+
+    /**
+     * Returns the accessible state of this <code>AccessibleJTextArea</code>.
+     *
+     * @return  the accessible state of this <code>AccessibleJTextArea</code>
+     */
+    public AccessibleStateSet getAccessibleStateSet()
+    {
+      AccessibleStateSet state = super.getAccessibleStateSet();
+      // TODO: Figure out what state must be added here to the super's state.
+      return state;
+    }
+  }
+
   /**
    * Compatible with Sun's JDK
    */
@@ -556,5 +587,17 @@ public class JTextArea extends JTextComponent
     int neededHeight = (int) view.getPreferredSpan(View.VERTICAL);
     return new Dimension(Math.max(reqWidth, neededWidth),
                           Math.max(reqHeight, neededHeight));
+  }
+
+  /**
+   * Returns the accessible context associated with the <code>JTextArea</code>.
+   *
+   * @return the accessible context associated with the <code>JTextArea</code>
+   */
+  public AccessibleContext getAccessibleContext()
+  {
+    if (accessibleContext == null)
+      accessibleContext = new AccessibleJTextArea();
+    return accessibleContext;
   }
 }

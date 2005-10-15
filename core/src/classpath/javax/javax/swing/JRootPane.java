@@ -340,6 +340,32 @@ public class JRootPane extends JComponent implements Accessible
   protected JButton defaultButton;
 
   /**
+   * This field is unused since JDK1.3. To override the default action you
+   * should modify the JRootPane's ActionMap.
+   *
+   * @deprecated since JDK1.3
+   *
+   * @specnote the specs indicate that the type of this field is
+   *           a package private inner class
+   *           javax.swing.JRootPane.DefaultAction. I assume that the closest
+   *           public superclass is javax.swing.Action.
+   */
+  protected Action defaultPressAction;
+
+  /**
+   * This field is unused since JDK1.3. To override the default action you
+   * should modify the JRootPane's ActionMap.
+   *
+   * @deprecated since JDK1.3
+   *
+   * @specnote the specs indicate that the type of this field is
+   *           a package private inner class
+   *           javax.swing.JRootPane.DefaultAction. I assume that the closest
+   *           public superclass is javax.swing.Action.
+   */
+  protected Action defaultReleaseAction;
+
+  /**
    * @since 1.4
    */
   private int windowDecorationStyle = NONE;

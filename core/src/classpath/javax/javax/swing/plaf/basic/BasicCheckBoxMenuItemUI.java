@@ -83,9 +83,7 @@ public class BasicCheckBoxMenuItemUI extends BasicMenuItemUI
   protected void installDefaults()
   {
     super.installDefaults();
-
-    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-    checkIcon = defaults.getIcon("CheckBoxMenuItem.checkIcon");
+    checkIcon = UIManager.getIcon("CheckBoxMenuItem.checkIcon");
   }
 
   /**
