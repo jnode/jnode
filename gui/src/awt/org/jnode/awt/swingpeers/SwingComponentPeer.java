@@ -24,7 +24,6 @@ package org.jnode.awt.swingpeers;
 import org.apache.log4j.Logger;
 import org.jnode.awt.JNodeGenericPeer;
 
-import javax.swing.JComponent;
 import java.awt.AWTEvent;
 import java.awt.BufferCapabilities;
 import java.awt.Color;
@@ -57,7 +56,7 @@ import java.awt.peer.ContainerPeer;
  * @author Levente S\u00e1ntha
  */
 
-abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends JComponent>
+abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Component>
         extends JNodeGenericPeer<SwingToolkit, awtT> implements ComponentPeer {
 
     ///////////////////////////////////////////////////////////////////////////////////////

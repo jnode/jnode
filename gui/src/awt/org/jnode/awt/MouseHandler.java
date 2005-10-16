@@ -30,9 +30,13 @@ import org.jnode.driver.input.PointerEvent;
 import org.jnode.driver.input.PointerListener;
 import org.jnode.driver.video.HardwareCursorAPI;
 
-import javax.swing.*;
-
-import java.awt.*;
+import javax.swing.SwingUtilities;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.EventQueue;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;

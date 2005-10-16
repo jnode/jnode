@@ -31,7 +31,7 @@ import javax.swing.JComponent;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-abstract class SwingContainerPeer<awtT extends Container, swingPeerT extends JComponent>
+abstract class SwingContainerPeer<awtT extends Container, swingPeerT extends Container>
         extends SwingComponentPeer<awtT, swingPeerT> implements ContainerPeer,
         ISwingContainerPeer {
 
