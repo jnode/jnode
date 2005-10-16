@@ -91,8 +91,9 @@ public class Socket
 
   /**
    * True if the socket is bound.
+   * Package private so it can be set from ServerSocket when accept is called.
    */
-  private boolean bound;
+  boolean bound;
 
   /**
    * True if input is shutdown.
@@ -481,7 +482,7 @@ public class Socket
 	/**
 	 * Returns the local address to which this socket is bound.  If this socket
    * is not connected, then a wildcard address, for which
-   * @see isAnyLocalAddress() is <code>true</code>, is returned.
+   * @see InetAddress#isAnyLocalAddress() is <code>true</code>, is returned.
 	 *
 	 * @return The local address
 	 *

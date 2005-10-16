@@ -337,6 +337,10 @@ private static final long serialVersionUID = -4206021311591459213L;
     this.peer = getPeerFromToolkit (name, attrs);
     this.size = size;
     this.pointSize = (float) size;
+    if (name != null)
+      this.name = name;
+    else
+      this.name = peer.getName(this);
 	}
 
   public Font (Map attrs)
@@ -357,6 +361,10 @@ private static final long serialVersionUID = -4206021311591459213L;
     peer = getPeerFromToolkit(name, attrs);
     size = (int) peer.getSize(this);
     pointSize = peer.getSize(this);
+    if (name != null)
+      this.name = name;
+    else
+      this.name = peer.getName(this);
 	}
 
 /**

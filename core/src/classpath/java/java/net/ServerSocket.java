@@ -370,6 +370,7 @@ public class ServerSocket
 	    
     impl.accept(socket.impl);
     socket.implCreated = true;
+    socket.bound = true;
   }
 
   /**

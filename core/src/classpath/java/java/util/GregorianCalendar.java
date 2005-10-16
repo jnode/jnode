@@ -870,6 +870,17 @@ public class GregorianCalendar extends Calendar
 	}
 
 	/**
+   * Return a hash code for this object, following the general contract
+   * specified by {@link Object#hashCode()}.
+   * @return the hash code
+   */
+  public int hashCode()
+  {
+    int val = (int) ((gregorianCutover >>> 32) ^ (gregorianCutover & 0xffffffff));
+    return super.hashCode() ^ val;
+  }
+
+  /**
    * Compares the given calendar with this.  An object, o, is
    * equivalent to this if it is also a <code>GregorianCalendar</code>
    * with the same time since the epoch under the same conditions
@@ -890,7 +901,8 @@ public class GregorianCalendar extends Calendar
 			return false;
 
     GregorianCalendar cal = (GregorianCalendar) o;
-		return (cal.getTimeInMillis() == getTimeInMillis());
+    return (cal.gregorianCutover == gregorianCutover
+            && super.equals(o));
 	}
 
 	/**
