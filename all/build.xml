@@ -433,6 +433,8 @@ clean             Remove all intermediate build results.
             <exclude name="external/**/*"/>
             <exclude name="gnu/java/awt/peer/gtk/**/*"/>
             <exclude name="gnu/java/awt/peer/qt/**/*"/>
+            <exclude name="gnu/javax/sound/midi/alsa/**/*"/>
+            <exclude name="gnu/javax/sound/midi/dssi/**/*"/>
             <exclude name="gnu/javax/swing/plaf/gtk/**/*"/>
             <exclude name="gnu/test/**/*"/>
             <exclude name="gnu/xml/libxmlj/**/*"/>
