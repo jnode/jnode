@@ -366,7 +366,6 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
      * @see java.awt.peer.ComponentPeer#handleEvent(java.awt.AWTEvent)
      */
     public void handleEvent(AWTEvent event) {
-        Unsafe.debug("handleEvent(" + event + ")");
         final int id = event.getID();
         switch (id) {
             case PaintEvent.PAINT: 
@@ -457,8 +456,8 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
      * @see java.awt.peer.ComponentPeer#repaint(long, int, int, int, int)
      */
     public void repaint(long tm, int x, int y, int width, int height) {
-        log.info("repaint (" + tm + ", " + x + ", " + y + ", " + width + ", "
-                + height);
+        //log.info("repaint (" + tm + ", " + x + ", " + y + ", " + width + ", "
+//                + height);
         if (x == 0 && y == 0 && width == 0 && height == 0) {
             return;
         }
@@ -554,7 +553,6 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
      * @see java.awt.peer.ComponentPeer#setVisible(boolean)
      */
     public void setVisible(boolean visible) {
-        Unsafe.debug("setVisible(" + visible + ")");
         if (visible) {
             paintAWTComponent();
         }

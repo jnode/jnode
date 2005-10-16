@@ -48,8 +48,8 @@ final class DesktopFrame extends JFrame implements JNodeAwtContext {
     @Override
     public void repaint(long tm, int x, int y, int width, int height) {
         // TODO Auto-generated method stub
-        log.info("repaint (" + tm + ", " + x + ", " + y + ", " + width + ", "
-                + height);
+        //log.info("repaint (" + tm + ", " + x + ", " + y + ", " + width + ", "
+          //      + height);
         super.repaint(tm, x, y, width, height);
     }
 
