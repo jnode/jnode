@@ -40,9 +40,9 @@ final class SwingScrollbarPeer extends SwingComponentPeer<Scrollbar, SwingScroll
 
 	public SwingScrollbarPeer(SwingToolkit toolkit, Scrollbar sb) {
 		super(toolkit, sb, new SwingScrollbar(sb));
-		SwingToolkit.add(sb, jComponent);
-		SwingToolkit.copyAwtProperties(sb, jComponent);
-		final SwingScrollbar jsb = (SwingScrollbar)jComponent;
+		SwingToolkit.add(sb, peerComponent);
+		SwingToolkit.copyAwtProperties(sb, peerComponent);
+		final SwingScrollbar jsb = (SwingScrollbar)peerComponent;
 		jsb.setOrientation(sb.getOrientation());
 		jsb.setBlockIncrement(sb.getBlockIncrement());
 		jsb.setUnitIncrement(sb.getUnitIncrement());
@@ -54,21 +54,21 @@ final class SwingScrollbarPeer extends SwingComponentPeer<Scrollbar, SwingScroll
 	 * @see java.awt.peer.ScrollbarPeer#setLineIncrement(int)
 	 */
 	public void setLineIncrement(int inc) {
-		((JScrollBar)jComponent).setUnitIncrement(inc);
+		((JScrollBar)peerComponent).setUnitIncrement(inc);
 	}
 
 	/**
 	 * @see java.awt.peer.ScrollbarPeer#setPageIncrement(int)
 	 */
 	public void setPageIncrement(int inc) {
-		((JScrollBar)jComponent).setBlockIncrement(inc);
+		((JScrollBar)peerComponent).setBlockIncrement(inc);
 	}
 
 	/**
 	 * @see java.awt.peer.ScrollbarPeer#setValues(int, int, int, int)
 	 */
 	public void setValues(int value, int visible, int min, int max) {
-		((JScrollBar)jComponent).setValues(value, visible, min, max);
+		((JScrollBar)peerComponent).setValues(value, visible, min, max);
 	}
 
 }

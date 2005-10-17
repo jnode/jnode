@@ -57,7 +57,7 @@ final class SwingPopupMenuPeer extends SwingBaseMenuPeer<PopupMenu, JPopupMenu>
 
     @SuppressWarnings("deprecation")
     public void show(Component component, int x, int y) {
-        ((JPopupMenu)jComponent).show(((SwingComponentPeer) component.getPeer()).jComponent, x, y);
+        ((JPopupMenu)jComponent).show(((SwingComponentPeer) component.getPeer()).peerComponent, x, y);
     }
 
     @SuppressWarnings("deprecation")

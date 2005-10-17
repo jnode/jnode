@@ -43,7 +43,7 @@ final class SwingTextFieldPeer extends
 	public SwingTextFieldPeer(SwingToolkit toolkit, TextField textField) {
 		super(toolkit, textField, new SwingTextField(textField));
 		setText(textField.getText());
-        jComponent.setColumns(textField.getColumns());
+        peerComponent.setColumns(textField.getColumns());
 		setEditable(textField.isEditable());
 	}
 
@@ -51,14 +51,14 @@ final class SwingTextFieldPeer extends
 	 * @see java.awt.peer.TextFieldPeer#getMinimumSize(int)
 	 */
 	public Dimension getMinimumSize(int len) {
-		return jComponent.getMinimumSize();
+		return peerComponent.getMinimumSize();
 	}
 
 	/**
 	 * @see java.awt.peer.TextFieldPeer#getPreferredSize(int)
 	 */
 	public Dimension getPreferredSize(int len) {
-		return jComponent.getPreferredSize();
+		return peerComponent.getPreferredSize();
 	}
 
 	/**

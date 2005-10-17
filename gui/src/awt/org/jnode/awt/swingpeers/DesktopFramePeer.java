@@ -50,7 +50,6 @@ import java.awt.peer.ContainerPeer;
 import org.apache.log4j.Logger;
 import org.jnode.awt.JNodeGenericPeer;
 import org.jnode.awt.JNodeGraphics;
-import org.jnode.vm.Unsafe;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -65,7 +64,7 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
     private static final Point TOP_LEFT = new Point(0, 0);
 
     private Insets insets;
-    
+
     private final Frame awtFrame;
 
     /**
@@ -354,12 +353,12 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
         final Graphics g = getGraphics();
         if (g != null) {
             if (event.getID() == PaintEvent.PAINT) {
-                target.paint(g);
+                targetComponent.paint(g);
             } else {
-                target.update(g);                        
+                targetComponent.update(g);
             }
             g.dispose();
-        }    
+        }
     }
 
     /**
@@ -368,7 +367,7 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
     public void handleEvent(AWTEvent event) {
         final int id = event.getID();
         switch (id) {
-            case PaintEvent.PAINT: 
+            case PaintEvent.PAINT:
             case PaintEvent.UPDATE: {
                 processPaintEvent((PaintEvent)event);
             } break;
@@ -440,7 +439,7 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
      *      java.awt.image.ImageObserver)
      */
     public boolean prepareImage(Image img, int width, int height,
-            ImageObserver ob) {
+                                ImageObserver ob) {
         return toolkit.prepareImage(img, width, height, ob);
     }
 
@@ -480,7 +479,7 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
      *      boolean, boolean, long)
      */
     public boolean requestFocus(Component source, boolean bool1, boolean bool2,
-            long x) {
+                                long x) {
         // TODO Auto-generated method stub
         return false;
     }
@@ -618,8 +617,8 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
     }
 
     protected final void paintAWTComponent() {
-        if (target != null) {
-            toolkit.postEvent(new PaintEvent(target, PaintEvent.PAINT, target
+        if (targetComponent != null) {
+            toolkit.postEvent(new PaintEvent(targetComponent, PaintEvent.PAINT, targetComponent
                     .getBounds()));
         }
     }

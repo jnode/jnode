@@ -41,7 +41,7 @@ final class SwingDialogPeer extends SwingBaseWindowPeer<Dialog, SwingDialog>
      * @see org.jnode.awt.swingpeers.SwingBaseWindowPeer#setTitle(java.lang.String)
      */
     public void setTitle(String title) {
-        if (!target.isUndecorated()) {
+        if (!targetComponent.isUndecorated()) {
             super.setTitle(title);
         }
     }

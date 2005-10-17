@@ -29,18 +29,18 @@ import java.awt.Toolkit;
 public abstract class JNodeGenericPeer<toolkitT extends JNodeToolkit, compT> {
 
 	protected final toolkitT toolkit;
-	protected final compT target;
+	protected final compT targetComponent;
 
 	public JNodeGenericPeer(toolkitT toolkit, compT target) {
 		this.toolkit = toolkit;
-		this.target = target;
+		this.targetComponent = target;
 	}
 
     /**
      * @return
      */
-    public final compT getTarget() {
-        return this.target;
+    public final compT getTargetComponent() {
+        return this.targetComponent;
     }
 
 	/**

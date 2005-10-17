@@ -43,8 +43,8 @@ final class SwingScrollPanePeer extends
 	public SwingScrollPanePeer(SwingToolkit toolkit, ScrollPane scrollPane) {
 		super(toolkit, scrollPane, new SwingScrollPane(scrollPane));
 
-		SwingToolkit.add(scrollPane, jComponent);
-		SwingToolkit.copyAwtProperties(scrollPane, jComponent);
+		SwingToolkit.add(scrollPane, peerComponent);
+		SwingToolkit.copyAwtProperties(scrollPane, peerComponent);
 	}
 
 	/**
