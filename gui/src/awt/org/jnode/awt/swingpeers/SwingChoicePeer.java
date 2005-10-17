@@ -41,7 +41,7 @@ final class SwingChoicePeer extends SwingComponentPeer<Choice, SwingChoice> impl
 
 	public SwingChoicePeer(SwingToolkit toolkit, Choice choice) {
 		super(toolkit, choice, new SwingChoice(choice));
-		final JComboBox combo = (JComboBox) jComponent;
+		final JComboBox combo = (JComboBox) peerComponent;
         DefaultComboBoxModel model = new DefaultComboBoxModel();
         final int cnt = choice.getItemCount();
         for (int i = 0; i < cnt; i++) {
@@ -69,7 +69,7 @@ final class SwingChoicePeer extends SwingComponentPeer<Choice, SwingChoice> impl
 	}
 
 	private DefaultComboBoxModel model() {
-		return ((DefaultComboBoxModel) ((JComboBox) jComponent).getModel());
+		return ((DefaultComboBoxModel) ((JComboBox) peerComponent).getModel());
 	}
 
 	// Deprecated
@@ -79,7 +79,7 @@ final class SwingChoicePeer extends SwingComponentPeer<Choice, SwingChoice> impl
 	}
 
 	public void select(int index) {
-		((JComboBox) jComponent).setSelectedIndex(index);
+		((JComboBox) peerComponent).setSelectedIndex(index);
 	}
 
 }

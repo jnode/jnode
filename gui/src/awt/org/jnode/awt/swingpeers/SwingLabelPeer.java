@@ -42,8 +42,8 @@ final class SwingLabelPeer extends SwingComponentPeer<Label, SwingLabel>
      */
     public SwingLabelPeer(SwingToolkit toolkit, Label label) {
         super(toolkit, label, new SwingLabel(label));
-        SwingToolkit.add(label, jComponent);
-        SwingToolkit.copyAwtProperties(label, jComponent);
+        SwingToolkit.add(label, peerComponent);
+        SwingToolkit.copyAwtProperties(label, peerComponent);
         setText(label.getText());
         setAlignment(label.getAlignment());
     }
@@ -54,7 +54,7 @@ final class SwingLabelPeer extends SwingComponentPeer<Label, SwingLabel>
      * @see java.awt.peer.LabelPeer#setText(java.lang.String)
      */
     public void setText(String text) {
-        jComponent.setText(text);
+        peerComponent.setText(text);
     }
 
     /**
@@ -65,13 +65,13 @@ final class SwingLabelPeer extends SwingComponentPeer<Label, SwingLabel>
     public void setAlignment(int alignment) {
         switch (alignment) {
         case Label.LEFT:
-            jComponent.setHorizontalAlignment(SwingConstants.LEFT);
+            peerComponent.setHorizontalAlignment(SwingConstants.LEFT);
             break;
         case Label.CENTER:
-            jComponent.setHorizontalAlignment(SwingConstants.CENTER);
+            peerComponent.setHorizontalAlignment(SwingConstants.CENTER);
             break;
         case Label.RIGHT:
-            jComponent.setHorizontalAlignment(SwingConstants.RIGHT);
+            peerComponent.setHorizontalAlignment(SwingConstants.RIGHT);
             break;
         }
     }

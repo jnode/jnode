@@ -48,26 +48,26 @@ final class SwingTextAreaPeer extends
 
 		switch (textArea.getScrollbarVisibility()) {
 		case TextArea.SCROLLBARS_BOTH:
-			SwingToolkit.add(textArea, new JScrollPane(jComponent,
+			SwingToolkit.add(textArea, new JScrollPane(peerComponent,
 					ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS));
 			break;
 		case TextArea.SCROLLBARS_HORIZONTAL_ONLY:
-			SwingToolkit.add(textArea, new JScrollPane(jComponent,
+			SwingToolkit.add(textArea, new JScrollPane(peerComponent,
 					ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
 					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS));
 			break;
 		case TextArea.SCROLLBARS_VERTICAL_ONLY:
-			SwingToolkit.add(textArea, new JScrollPane(jComponent,
+			SwingToolkit.add(textArea, new JScrollPane(peerComponent,
 					ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER));
 			break;
 		case TextArea.SCROLLBARS_NONE:
-			SwingToolkit.add(textArea, jComponent);
+			SwingToolkit.add(textArea, peerComponent);
 			break;
 		}
 
-		final SwingTextArea jta = (SwingTextArea)jComponent;
+		final SwingTextArea jta = (SwingTextArea)peerComponent;
 		SwingToolkit.copyAwtProperties(textArea, jta);
 		setText(textArea.getText());
 		jta.setRows(textArea.getRows());
@@ -79,14 +79,14 @@ final class SwingTextAreaPeer extends
 	 * @see java.awt.peer.TextAreaPeer#getMinimumSize(int, int)
 	 */
 	public Dimension getMinimumSize(int rows, int cols) {
-		return ((JTextArea)jComponent).getMinimumSize();
+		return ((JTextArea)peerComponent).getMinimumSize();
 	}
 
 	/**
 	 * @see java.awt.peer.TextAreaPeer#getPreferredSize(int, int)
 	 */
 	public Dimension getPreferredSize(int rows, int cols) {
-		return ((JTextArea)jComponent).getPreferredSize();
+		return ((JTextArea)peerComponent).getPreferredSize();
 	}
 
 	/**
@@ -101,7 +101,7 @@ final class SwingTextAreaPeer extends
 	 */
 	public void insertText(String text, int pos) {
 		try {
-			((JTextArea)jComponent).getDocument().insertString(pos, text, null);
+			((JTextArea)peerComponent).getDocument().insertString(pos, text, null);
 		} catch (BadLocationException ex) {
 			throw new RuntimeException(ex);
 		}
@@ -133,7 +133,7 @@ final class SwingTextAreaPeer extends
 	 */
 	public void replaceText(String text, int start_pos, int end_pos) {
 		try {
-			final Document doc = ((JTextArea)jComponent).getDocument();
+			final Document doc = ((JTextArea)peerComponent).getDocument();
 			doc.remove(start_pos, end_pos - start_pos);
 			doc.insertString(start_pos, text, null);
 		} catch (BadLocationException ex) {

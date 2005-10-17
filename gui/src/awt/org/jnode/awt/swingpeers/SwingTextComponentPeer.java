@@ -37,8 +37,8 @@ abstract class SwingTextComponentPeer<awtT extends TextComponent, peerT extends 
 			awtT textComponent, peerT peer) {
 		super(toolkit, textComponent, peer);
 
-		SwingToolkit.add(textComponent, jComponent);
-		SwingToolkit.copyAwtProperties(textComponent, jComponent);
+		SwingToolkit.add(textComponent, peerComponent);
+		SwingToolkit.copyAwtProperties(textComponent, peerComponent);
 		setText(textComponent.getText());
 		setEditable(textComponent.isEditable());
 	}
@@ -55,7 +55,7 @@ abstract class SwingTextComponentPeer<awtT extends TextComponent, peerT extends 
 	 * @see java.awt.peer.TextComponentPeer#getCaretPosition()
 	 */
 	public int getCaretPosition() {
-		return jComponent.getCaretPosition();
+		return peerComponent.getCaretPosition();
 	}
 
 	/**
@@ -78,49 +78,49 @@ abstract class SwingTextComponentPeer<awtT extends TextComponent, peerT extends 
 	 * @see java.awt.peer.TextComponentPeer#getSelectionEnd()
 	 */
 	public int getSelectionEnd() {
-		return jComponent.getSelectionEnd();
+		return peerComponent.getSelectionEnd();
 	}
 
 	/**
 	 * @see java.awt.peer.TextComponentPeer#getSelectionStart()
 	 */
 	public int getSelectionStart() {
-		return jComponent.getSelectionStart();
+		return peerComponent.getSelectionStart();
 	}
 
 	/**
 	 * @see java.awt.peer.TextComponentPeer#getText()
 	 */
 	public String getText() {
-		return jComponent.getText();
+		return peerComponent.getText();
 	}
 
 	/**
 	 * @see java.awt.peer.TextComponentPeer#select(int, int)
 	 */
 	public void select(int start_pos, int end_pos) {
-		jComponent.select(start_pos, end_pos);
+		peerComponent.select(start_pos, end_pos);
 	}
 
 	/**
 	 * @see java.awt.peer.TextComponentPeer#setCaretPosition(int)
 	 */
 	public void setCaretPosition(int pos) {
-		jComponent.setCaretPosition(pos);
+		peerComponent.setCaretPosition(pos);
 	}
 
 	/**
 	 * @see java.awt.peer.TextComponentPeer#setEditable(boolean)
 	 */
 	public void setEditable(boolean editable) {
-		jComponent.setEditable(editable);
+		peerComponent.setEditable(editable);
 	}
 
 	/**
 	 * @see java.awt.peer.TextComponentPeer#setText(java.lang.String)
 	 */
 	public void setText(String text) {
-		jComponent.setText(text);
+		peerComponent.setText(text);
 	}
 
     public InputMethodRequests getInputMethodRequests() {

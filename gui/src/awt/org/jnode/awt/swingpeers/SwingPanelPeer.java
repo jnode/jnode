@@ -42,10 +42,10 @@ final class SwingPanelPeer extends SwingContainerPeer<Panel, SwingPanel>
 
 	public SwingPanelPeer(SwingToolkit toolkit, Panel panel) {
 		super(toolkit, panel, new SwingPanel(panel));
-		final SwingPanel jPanel = (SwingPanel) jComponent;
+		final SwingPanel jPanel = (SwingPanel) peerComponent;
 		SwingToolkit.add(panel, jPanel);
 		SwingToolkit.copyAwtProperties(panel, jPanel);
-        jComponent.setLayout(new SwingContainerLayout(panel, this));
+        peerComponent.setLayout(new SwingContainerLayout(panel, this));
 	}
 
 }

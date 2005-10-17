@@ -63,7 +63,7 @@ abstract class SwingContainerPeer<awtT extends Container, swingPeerT extends Con
 	 * @see java.awt.peer.ContainerPeer#beginValidate()
 	 */
 	public void beginValidate() {
-        ((ISwingPeer<awtT>)jComponent).validatePeerOnly();
+        ((ISwingPeer<awtT>)peerComponent).validatePeerOnly();
 	}
 
 	/**
@@ -76,7 +76,7 @@ abstract class SwingContainerPeer<awtT extends Container, swingPeerT extends Con
 	 * @see java.awt.peer.ContainerPeer#getInsets()
 	 */
 	public Insets getInsets() {
-		return jComponent.getInsets();
+		return peerComponent.getInsets();
 	}
 
 	/**
@@ -98,7 +98,7 @@ abstract class SwingContainerPeer<awtT extends Container, swingPeerT extends Con
 	 *      javax.swing.JComponent)
 	 */
 	public void addAWTComponent(Component awtComponent, JComponent peer) {
-		jComponent.add(peer);
+		peerComponent.add(peer);
 	}
 
     public boolean isRestackSupported() {

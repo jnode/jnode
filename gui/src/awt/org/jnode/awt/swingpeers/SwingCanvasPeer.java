@@ -35,8 +35,8 @@ final class SwingCanvasPeer extends SwingComponentPeer<Canvas, SwingCanvas> impl
 
 	public SwingCanvasPeer(SwingToolkit toolkit, Canvas canvas) {
         super(toolkit, canvas, new SwingCanvas(canvas));
-		SwingToolkit.add(canvas, jComponent);
-		SwingToolkit.copyAwtProperties(canvas, jComponent);
+		SwingToolkit.add(canvas, peerComponent);
+		SwingToolkit.copyAwtProperties(canvas, peerComponent);
 	}
 
 }

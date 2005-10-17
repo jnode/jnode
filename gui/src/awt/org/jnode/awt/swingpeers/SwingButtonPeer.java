@@ -40,13 +40,13 @@ final class SwingButtonPeer extends SwingComponentPeer<Button, SwingButton> impl
      */
 	public SwingButtonPeer(SwingToolkit toolkit, Button button) {
         super(toolkit, button, new SwingButton(button));
-		SwingToolkit.add(button, jComponent);
-		SwingToolkit.copyAwtProperties(button, jComponent);
-        jComponent.setText(button.getLabel());
+		SwingToolkit.add(button, peerComponent);
+		SwingToolkit.copyAwtProperties(button, peerComponent);
+        peerComponent.setText(button.getLabel());
 	}
 
     public void setLabel(String label) {
-        jComponent.setText(label);
+        peerComponent.setText(label);
     }
 }
 

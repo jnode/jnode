@@ -49,15 +49,15 @@ final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame>
     public SwingFramePeer(SwingToolkit toolkit, Frame target) {
         super(toolkit, target, new SwingFrame(target));
         setResizable(target.isResizable());
-        jComponent.setIconifiable(true);
-        jComponent.setMaximizable(true);
-        jComponent.setClosable(true);
+        peerComponent.setIconifiable(true);
+        peerComponent.setMaximizable(true);
+        peerComponent.setClosable(true);
         try {
-            jComponent.setIcon(target.getState() == Frame.ICONIFIED);
+            peerComponent.setIcon(target.getState() == Frame.ICONIFIED);
         } catch (PropertyVetoException x) {
         }
         setState(target.getState());
-        jComponent.setTitle(target.getTitle());
+        peerComponent.setTitle(target.getTitle());
         // frame.setIconImage(awtFrame.getIconImage());
         MenuBar mb = target.getMenuBar();
         if (mb != null) {
@@ -94,9 +94,9 @@ final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame>
         SwingToolkit.invokeNowOrLater(new Runnable() {
             public void run() {
                 mb.addNotify();
-                jComponent
+                peerComponent
                         .setJMenuBar(((SwingMenuBarPeer) mb.getPeer()).jComponent);
-                target.invalidate();
+                targetComponent.invalidate();
             }
         });
     }

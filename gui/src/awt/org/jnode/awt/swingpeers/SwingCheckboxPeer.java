@@ -39,7 +39,7 @@ final class SwingCheckboxPeer extends SwingComponentPeer<Checkbox, SwingCheckBox
 
 	public SwingCheckboxPeer(SwingToolkit toolkit, Checkbox checkBox) {
 		super(toolkit, checkBox, new SwingCheckBox(checkBox));
-		final JCheckBox jcb = (JCheckBox) jComponent;
+		final JCheckBox jcb = (JCheckBox) peerComponent;
 		SwingToolkit.add(checkBox, jcb);
 		SwingToolkit.copyAwtProperties(checkBox, jcb);
 		jcb.setText(checkBox.getLabel());
@@ -51,11 +51,11 @@ final class SwingCheckboxPeer extends SwingComponentPeer<Checkbox, SwingCheckBox
 	}
 
 	public void setState(boolean state) {
-		((JCheckBox) jComponent).setSelected(state);
+		((JCheckBox) peerComponent).setSelected(state);
 	}
 
 	public void setLabel(String label) {
-		((JCheckBox) jComponent).setText(label);
+		((JCheckBox) peerComponent).setText(label);
 	}
 }
 

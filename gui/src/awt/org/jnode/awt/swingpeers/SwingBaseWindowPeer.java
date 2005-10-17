@@ -30,9 +30,9 @@ abstract class SwingBaseWindowPeer<awtT extends Window, swingPeerT extends Swing
             swingPeerT jComponent) {
         super(toolkit, window, jComponent);
         jComponent.initialize(this);
-        jComponent.getContentPane().setLayout(new SwingContainerLayout(target, this));
-        jComponent.setLocation(target.getLocation());
-        jComponent.setSize(target.getSize());
+        jComponent.getContentPane().setLayout(new SwingContainerLayout(targetComponent, this));
+        jComponent.setLocation(targetComponent.getLocation());
+        jComponent.setSize(targetComponent.getSize());
         this.eventDispatcher = new WindowEventDispatcher();
         jComponent.addInternalFrameListener(eventDispatcher);
     }
@@ -44,9 +44,9 @@ abstract class SwingBaseWindowPeer<awtT extends Window, swingPeerT extends Swing
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 final JDesktopPane desktop = toolkit.getAwtContext().getDesktop();
-                desktop.add(jComponent);
-                desktop.setSelectedFrame(jComponent);
-                jComponent.toFront();
+                desktop.add(peerComponent);
+                desktop.setSelectedFrame(peerComponent);
+                peerComponent.toFront();
                 desktop.doLayout();
             }
         });
@@ -57,29 +57,29 @@ abstract class SwingBaseWindowPeer<awtT extends Window, swingPeerT extends Swing
      *      javax.swing.JComponent)
      */
     public final void addAWTComponent(Component awtComponent, JComponent peer) {
-        jComponent.getContentPane().add(peer);
+        peerComponent.getContentPane().add(peer);
     }
 
     public final Point getLocationOnScreen() {
-        return jComponent.getLocation();
+        return peerComponent.getLocation();
     }
 
     /**
      * @see java.awt.peer.ComponentPeer#getGraphics()
      */
     public final Graphics getGraphics() {
-        return jComponent.getGraphics();
+        return peerComponent.getGraphics();
     }
 
     /**
      * @see java.awt.peer.ContainerPeer#getInsets()
      */
     public final Insets getInsets() {
-        final Container contentPane = jComponent.getContentPane();
+        final Container contentPane = peerComponent.getContentPane();
         // if ((contentPane.getWidth() == 0) || (contentPane.getHeight() == 0))
         // {
-        // jComponent.doLayout();
-        // jComponent.getRootPane().doLayout();
+        // peerComponent.doLayout();
+        // peerComponent.getRootPane().doLayout();
         // }
         final int cpWidth = contentPane.getWidth();
         final int cpHeight = contentPane.getHeight();
@@ -87,17 +87,17 @@ abstract class SwingBaseWindowPeer<awtT extends Window, swingPeerT extends Swing
         if ((cpWidth > 0) && (cpHeight > 0)) {
             insets = new Insets(0, 0, 0, 0);
             Component c = contentPane;
-            while (c != jComponent) {
+            while (c != peerComponent) {
                 insets.left += c.getX();
                 insets.top += c.getY();
                 c = c.getParent();
             }
-            final int dw = jComponent.getWidth() - contentPane.getWidth();
-            final int dh = jComponent.getHeight() - contentPane.getHeight();
+            final int dw = peerComponent.getWidth() - contentPane.getWidth();
+            final int dh = peerComponent.getHeight() - contentPane.getHeight();
             insets.right = dw - insets.left;
             insets.bottom = dh - insets.top;
         } else {
-            insets = jComponent.getInsets();
+            insets = peerComponent.getInsets();
         }
         return insets;
     }
@@ -107,7 +107,7 @@ abstract class SwingBaseWindowPeer<awtT extends Window, swingPeerT extends Swing
      * @param resizeable
      */
     public final void setResizable(boolean resizeable) {
-        jComponent.setResizable(resizeable);
+        peerComponent.setResizable(resizeable);
     }
 
     /**
@@ -115,18 +115,18 @@ abstract class SwingBaseWindowPeer<awtT extends Window, swingPeerT extends Swing
      * @param title
      */
     public void setTitle(String title) {
-        jComponent.setTitle(title);
+        peerComponent.setTitle(title);
     }
     
     public final void dispose() {
-        jComponent.dispose();
+        peerComponent.dispose();
         toolkit.onDisposeFrame(this);
     }
 
     public void toBack() {
         SwingToolkit.invokeNowOrLater(new Runnable() {
             public void run() {
-                jComponent.toBack();
+                peerComponent.toBack();
             }
         });
     }
@@ -134,7 +134,7 @@ abstract class SwingBaseWindowPeer<awtT extends Window, swingPeerT extends Swing
     public void toFront() {
         SwingToolkit.invokeNowOrLater(new Runnable() {
             public void run() {
-                jComponent.toFront();
+                peerComponent.toFront();
             }
         });
     }
@@ -143,7 +143,7 @@ abstract class SwingBaseWindowPeer<awtT extends Window, swingPeerT extends Swing
      * Fire a WindowEvent with a given id to the awtComponent.
      */
     private final void fireWindowEvent(int id) {
-        getToolkitImpl().postEvent(new WindowEvent(target, id));
+        getToolkitImpl().postEvent(new WindowEvent(targetComponent, id));
     }
 
     public void updateAlwaysOnTop() {

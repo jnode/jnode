@@ -62,7 +62,7 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
     ///////////////////////////////////////////////////////////////////////////////////////
     // Private
     protected final Logger log = Logger.getLogger(getClass());
-    protected final swingPeerT jComponent;
+    protected final swingPeerT peerComponent;
 
     /**
      * Initialize this instance.
@@ -72,7 +72,7 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
      */
     public SwingComponentPeer(SwingToolkit toolkit, awtT target, swingPeerT swingPeer) {
         super(toolkit, target);
-        this.jComponent = swingPeer;
+        this.peerComponent = swingPeer;
         if (!(swingPeer instanceof ISwingPeer)) {
             throw new IllegalArgumentException("peer must implement ISwingPeer");
         }
@@ -143,12 +143,12 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
     }
 
     public Graphics getGraphics() {
-        final Component parent = target.getParent();
+        final Component parent = targetComponent.getParent();
         if (parent != null) {
-            final int x = jComponent.getX();
-            final int y = jComponent.getY();
-            final int width = jComponent.getWidth();
-            final int height = jComponent.getHeight();
+            final int x = peerComponent.getX();
+            final int y = peerComponent.getY();
+            final int width = peerComponent.getWidth();
+            final int height = peerComponent.getHeight();
             return parent.getGraphics().create(x, y, width, height);
         } else {
             throw new Error();
@@ -164,8 +164,8 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
      * @return The location on screen
      */
     public Point getLocationOnScreen() {
-        Point p = target.getLocation();
-        Container parent = target.getParent();
+        Point p = targetComponent.getLocation();
+        Container parent = targetComponent.getParent();
         while (parent != null) {
             p.translate(parent.getX(), parent.getY());
             parent = parent.getParent();
@@ -174,25 +174,25 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
     }
 
     public final Dimension getMinimumSize() {
-        return jComponent.getMinimumSize();
+        return peerComponent.getMinimumSize();
     }
 
     public final Dimension getPreferredSize() {
-        return jComponent.getPreferredSize();
+        return peerComponent.getPreferredSize();
     }
 
     /**
      * Response on paint events.
      */
     private void processPaintEvent(PaintEvent event) {
-        final Graphics g = jComponent.getGraphics();
+        final Graphics g = peerComponent.getGraphics();
         if (g != null) {
             //Point p = component.getLocationOnScreen();
             //g.translate(p.x, p.y);
             if (event.getID() == PaintEvent.PAINT) {
-                target.paint(g);
+                targetComponent.paint(g);
             } else {
-                target.update(g);
+                targetComponent.update(g);
             }
             //g.translate(-p.x, -p.y);
             g.dispose();
@@ -210,10 +210,10 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
                 processPaintEvent((PaintEvent)event);
             } break;
             default: {
-                if (event.getSource() == target) {
-                    event.setSource(jComponent);
+                if (event.getSource() == targetComponent) {
+                    event.setSource(peerComponent);
                 }
-                ((ISwingPeer<awtT>)jComponent).processAWTEvent(event);
+                ((ISwingPeer<awtT>)peerComponent).processAWTEvent(event);
             } break;
         }
     }
@@ -222,9 +222,9 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
      * Post a paint event for the AWT component on the event queue.
      */
     protected final void postPaintEvent() {
-        if (target != null) {
-            toolkit.postEvent(new PaintEvent(target, PaintEvent.PAINT,
-                    target.getBounds()));
+        if (targetComponent != null) {
+            toolkit.postEvent(new PaintEvent(targetComponent, PaintEvent.PAINT,
+                    targetComponent.getBounds()));
         }
     }
 
@@ -239,7 +239,7 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
     // Focus
 
     public final boolean isFocusable() {
-        return jComponent.isFocusable();
+        return peerComponent.isFocusable();
     }
 
     /**
@@ -247,7 +247,7 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
      */
     @SuppressWarnings("deprecation")
     public final boolean isFocusTraversable() {
-        return jComponent.isFocusTraversable();
+        return peerComponent.isFocusTraversable();
     }
 
     // Obscurity
@@ -257,17 +257,17 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
     }
 
     public final Dimension minimumSize() {
-        return jComponent.getMinimumSize();
+        return peerComponent.getMinimumSize();
     }
 
     public final void paint(Graphics g) {
-        jComponent.paint(g);
+        peerComponent.paint(g);
     }
 
     // Deprecated
 
     public final Dimension preferredSize() {
-        return jComponent.getPreferredSize();
+        return peerComponent.getPreferredSize();
     }
 
     public final boolean prepareImage(Image img, int width, int height, ImageObserver o) {
@@ -275,11 +275,11 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
     }
 
     public final void print(Graphics g) {
-        jComponent.print(g);
+        peerComponent.print(g);
     }
 
     public final void repaint(long tm, int x, int y, int width, int height) {
-        jComponent.repaint(tm, x, y, width, height);
+        peerComponent.repaint(tm, x, y, width, height);
         postPaintEvent();
     }
 
@@ -287,7 +287,7 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
      * @see java.awt.peer.ComponentPeer#requestFocus()
      */
     public final void requestFocus() {
-        jComponent.requestFocus();
+        peerComponent.requestFocus();
     }
 
     public final boolean requestFocus(Component lightweightChild, boolean temporary,
@@ -300,16 +300,16 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
         if (isReshapeInProgress) {
             return;
         }
-        final int oldWidth = jComponent.getWidth();
-        final int oldHeight = jComponent.getHeight();
+        final int oldWidth = peerComponent.getWidth();
+        final int oldHeight = peerComponent.getHeight();
         isReshapeInProgress = true;
-        jComponent.setBounds(x, y, width, height);
+        peerComponent.setBounds(x, y, width, height);
         isReshapeInProgress = false;
         fireComponentEvent(oldWidth, width, oldHeight, height);
     }
 
     public final void setBackground(Color c) {
-        jComponent.setBackground(c);
+        peerComponent.setBackground(c);
         postPaintEvent();
     }
 
@@ -332,12 +332,12 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
      * @see java.awt.peer.ComponentPeer#setCursor(java.awt.Cursor)
      */
     public final void setCursor(Cursor cursor) {
-        jComponent.setCursor(cursor);
+        peerComponent.setCursor(cursor);
 
     }
 
     public final void setEnabled(boolean b) {
-        jComponent.setEnabled(b);
+        peerComponent.setEnabled(b);
     }
 
     /**
@@ -347,17 +347,17 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
     }
 
     public final void setFont(Font f) {
-        jComponent.setFont(f);
+        peerComponent.setFont(f);
         postPaintEvent();
     }
 
     public final void setForeground(Color c) {
-        jComponent.setForeground(c);
+        peerComponent.setForeground(c);
         postPaintEvent();
     }
 
     public void setVisible(boolean b) {
-        jComponent.setVisible(b);
+        peerComponent.setVisible(b);
     }
 
     public final void show() {
@@ -375,19 +375,19 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
      */
     protected final void fireComponentEvent(int what) {
         final EventQueue queue = toolkit.getSystemEventQueue();
-        queue.postEvent(new ComponentEvent(target, what));
+        queue.postEvent(new ComponentEvent(targetComponent, what));
     }
 
     public void layout() {
-        jComponent.doLayout();
+        peerComponent.doLayout();
     }
 
     public Rectangle getBounds() {
-        return jComponent.getBounds();
+        return peerComponent.getBounds();
     }
 
     public void setBounds(int x, int y, int width, int height, int z) {
-        jComponent.setBounds(x, y, width, height);
+        peerComponent.setBounds(x, y, width, height);
     }
 
     public boolean isReparentSupported() {
