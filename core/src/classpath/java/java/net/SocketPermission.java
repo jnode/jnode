@@ -326,8 +326,13 @@ public final class SocketPermission extends Permission implements Serializable
       {
 	// This will dump if hostport if all sorts of bad data was passed to
 	// the constructor
-	String range = p.hostport.substring(hostport.indexOf(":") + 1);
-	if (range.startsWith("-"))
+
+// @classpath-bugfix 18/10/2005 Martin Husted Hartvig (hagar@jnode.org) :
+// Wrong usage of hostport and not p.hostport in call to indexOf
+   String range = p.hostport.substring(p.hostport.indexOf(":") + 1);
+// @classpath-bugfix-end
+
+  if (range.startsWith("-"))
 	  theirfirstport = 0;
 	else if (range.indexOf("-") == -1)
 	  theirfirstport = Integer.parseInt(range);
@@ -401,6 +406,12 @@ public final class SocketPermission extends Permission implements Serializable
 	if (theircanonical.endsWith(wild_domain))
 	  return true;
         }
+
+// @classpath-bugfix 18/10/2005 Martin Husted Hartvig (hagar@jnode.org) :
+// Missed wildcard as host address    
+    if (ourhost.equals("*"))
+      return true;
+// @classpath-bugfix-end
 
         // Didn't make it
         return false;
