@@ -15,6 +15,7 @@
   <runtime>
     <library name="jnode-gui.jar">
       <export name="org.jnode.desktop.*"/>
+      <export name="org.jnode.desktop.classic.*"/>
     </library>
   </runtime>
 
