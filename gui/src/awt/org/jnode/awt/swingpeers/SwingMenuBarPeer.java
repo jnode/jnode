@@ -40,16 +40,26 @@ final class SwingMenuBarPeer extends SwingMenuComponentPeer<MenuBar, JMenuBar>
     public SwingMenuBarPeer(SwingToolkit toolkit, MenuBar menuBar) {
         super(toolkit, menuBar, new JMenuBar());
         int mc = menuBar.getMenuCount();
+
+
         Menu help_menu = menuBar.getHelpMenu();
         if (help_menu != null) {
             mc--;
+            //TODO provide a workaround for the smissing swing feature, help menu
+            /*
             help_menu.addNotify();
             jComponent.setHelpMenu(((SwingMenuPeer) help_menu.getPeer()).jComponent);
+            */
         }
         for (int i = 0; i < mc; i++) {
             Menu menu = menuBar.getMenu(i);
             menu.addNotify();
             jComponent.add(((SwingMenuPeer) menu.getPeer()).jComponent);
+        }
+        //TODO a better workaround than this
+        if(help_menu != null){
+            help_menu.addNotify();
+            jComponent.add(((SwingMenuPeer) help_menu.getPeer()).jComponent);
         }
     }
 
@@ -61,8 +71,10 @@ final class SwingMenuBarPeer extends SwingMenuComponentPeer<MenuBar, JMenuBar>
 
     @SuppressWarnings("deprecation")
     public void addHelpMenu(Menu helpMenu) {
+        //TODO provide a workaround for the smissing swing feature, help menu
         helpMenu.addNotify();
-        jComponent.setHelpMenu(((SwingMenuPeer) helpMenu.getPeer()).jComponent);
+        //jComponent.setHelpMenu(((SwingMenuPeer) helpMenu.getPeer()).jComponent);
+        jComponent.add(((SwingMenuPeer) helpMenu.getPeer()).jComponent);
     }
 
     @SuppressWarnings("deprecation")
