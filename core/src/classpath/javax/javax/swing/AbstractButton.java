@@ -165,6 +165,8 @@ public abstract class AbstractButton extends JComponent
      */
     public void stateChanged(ChangeEvent ev)
     {
+      AbstractButton.this.fireStateChanged();
+      repaint();
     }
   }
 
@@ -375,6 +377,7 @@ public abstract class AbstractButton extends JComponent
     
     protected AccessibleAbstractButton()
     {
+      // Nothing to do here yet.
     }
 
     public AccessibleStateSet getAccessibleStateSet()
@@ -519,7 +522,7 @@ public abstract class AbstractButton extends JComponent
    * The {@link #init(String, Icon)} method is not called automatically by this
    * constructor.
    *
-   * @see {@link #init(String, Icon)}
+   * @see #init(String, Icon)
    */
   public AbstractButton()
   {
@@ -949,6 +952,9 @@ public abstract class AbstractButton extends JComponent
    */
   public void setEnabled(boolean b)
   {
+    // Do nothing if state does not change.
+    if (b == isEnabled())
+      return;
     super.setEnabled(b);
     ButtonModel mod = getModel();
     if (mod != null)
@@ -1632,14 +1638,7 @@ public abstract class AbstractButton extends JComponent
    */
   protected  ChangeListener createChangeListener()
   {
-    return new ChangeListener()
-      {
-        public void stateChanged(ChangeEvent e)
-        {
-          AbstractButton.this.fireStateChanged();
-          AbstractButton.this.repaint();          
-        }
-      };
+    return new ButtonChangeListener();
   }
 
   /**
@@ -2005,6 +2004,7 @@ public abstract class AbstractButton extends JComponent
    */
   public void updateUI()
   {
+    // TODO: What to do here?
   }
 
   /**

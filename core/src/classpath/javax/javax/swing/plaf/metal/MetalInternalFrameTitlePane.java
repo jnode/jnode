@@ -214,6 +214,7 @@ public class MetalInternalFrameTitlePane extends BasicInternalFrameTitlePane
      */
     public void removeLayoutComponent(Component c)
     {
+      // Nothing to do here.
     }
   }
 
@@ -234,7 +235,7 @@ public class MetalInternalFrameTitlePane extends BasicInternalFrameTitlePane
   protected int paletteTitleHeight;
    
   /** The label used to display the title for the internal frame. */
-  private JLabel title;
+  JLabel title;
   
   /**
    * Creates a new title pane for the specified frame.

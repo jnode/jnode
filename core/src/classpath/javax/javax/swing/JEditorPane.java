@@ -41,6 +41,8 @@ package javax.swing;
 import java.awt.Dimension;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -611,9 +613,26 @@ public class JEditorPane extends JTextComponent
   /**
    * This method initializes from a stream. 
    */
-  public void read(InputStream in, Object desc)
-    throws IOException
+  public void read(InputStream in, Object desc) throws IOException
+  {
+    EditorKit kit = getEditorKit();
+    if (kit instanceof HTMLEditorKit && desc instanceof HTMLDocument)
+      {
+        Document doc = (Document) desc;
+        try
+          {
+            kit.read(in, doc, 0);
+          }
+        catch (BadLocationException ex)
+          {
+            assert false : "BadLocationException must not be thrown here.";
+          }
+      }
+    else
     {
+        Reader inRead = new InputStreamReader(in);
+        super.read(inRead, desc);
+      }
     }
     
   /**
@@ -622,6 +641,7 @@ public class JEditorPane extends JTextComponent
   public static void registerEditorKitForContentType(String type,
                                                      String classname)
     {
+    // TODO: Implement this properly.
     }
     
   /**
@@ -631,6 +651,7 @@ public class JEditorPane extends JTextComponent
                                                      String classname,
                                                      ClassLoader loader)
     {
+    // TODO: Implement this properly.
     }
     
   /**
@@ -639,6 +660,7 @@ public class JEditorPane extends JTextComponent
    */
   public void replaceSelection(String content)
     {
+    // TODO: Implement this properly.
     }
     
   /**
@@ -647,6 +669,7 @@ public class JEditorPane extends JTextComponent
    */
   public void scrollToReference(String reference)
     {
+    // TODO: Implement this properly.
     }
     
   public final void setContentType(String type)

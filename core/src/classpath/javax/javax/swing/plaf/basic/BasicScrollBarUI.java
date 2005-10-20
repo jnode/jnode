@@ -173,7 +173,6 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
 	  decrButton.addMouseListener(buttonListener);
 	  calculatePreferredSize();
         }
-      scrollbar.repaint();
     }
   }
 

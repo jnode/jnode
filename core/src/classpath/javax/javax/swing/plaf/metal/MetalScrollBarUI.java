@@ -56,8 +56,7 @@ import javax.swing.plaf.basic.BasicScrollBarUI;
 /**
  * A UI delegate for the {@link JScrollBar} component.
  */
-public class MetalScrollBarUI
-  extends BasicScrollBarUI
+public class MetalScrollBarUI extends BasicScrollBarUI
 {
   
   /**
@@ -75,6 +74,7 @@ public class MetalScrollBarUI
      */
     public MetalScrollBarPropertyChangeHandler()
     {
+      // Nothing to do here.
     }
     
     /**

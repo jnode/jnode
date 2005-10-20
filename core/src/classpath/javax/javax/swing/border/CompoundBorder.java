@@ -48,8 +48,7 @@ import java.awt.Insets;
  *
  * @author Sascha Brawer (brawer@dandelis.ch)
  */
-public class CompoundBorder
-  extends AbstractBorder
+public class CompoundBorder extends AbstractBorder
 {
   /**
    * Determined using the <code>serialver</code> tool
@@ -121,11 +120,10 @@ public class CompoundBorder
    */
   public boolean isBorderOpaque ()
   {
-    /* While it would be safe to assume true for the opacity of
-     * a null border, this behavior would not be according to
-     * the API specification. Also, it is pathological to have
-     * null borders anyway.
-     */
+    // While it would be safe to assume true for the opacity of
+    // a null border, this behavior would not be according to
+    // the API specification. Also, it is pathological to have
+    // null borders anyway.
     if ((insideBorder == null) || (outsideBorder == null))
       return false;
 
@@ -148,9 +146,9 @@ public class CompoundBorder
   public void paintBorder(Component c, Graphics g,
                           int x, int y, int width, int height)
   {
-    /* If there is an outside border, paint it and reduce the
-     * bounding box by its insets.
-     */
+    // If there is an outside border, paint it and reduce the
+    // bounding box by its insets.
+    //
     if (outsideBorder != null)
     {
       Insets outsideInsets;
@@ -161,9 +159,8 @@ public class CompoundBorder
       x += outsideInsets.left;
       y += outsideInsets.top;
 
-      /* Reduce width and height by the respective extent of the
-       * outside border.
-       */
+      // Reduce width and height by the respective extent of the
+      // outside border.
       width -= outsideInsets.left + outsideInsets.right;
       height -= outsideInsets.top + outsideInsets.bottom;
     }
@@ -192,7 +189,7 @@ public class CompoundBorder
     else
       insets.left = insets.right = insets.top = insets.bottom = 0;
 
-    /* If there is an outside border, add it to insets. */
+    // If there is an outside border, add it to insets.
     if (outsideBorder != null)
     {
       borderInsets = outsideBorder.getBorderInsets(c);
@@ -202,7 +199,7 @@ public class CompoundBorder
       insets.bottom += borderInsets.bottom;
     }
 
-    /* If there is an inside border, add it to insets. */
+    // If there is an inside border, add it to insets.
     if (insideBorder != null)
     {
       borderInsets = insideBorder.getBorderInsets(c);
@@ -224,11 +221,10 @@ public class CompoundBorder
    */
   public Insets getBorderInsets (Component c)
   {
-    /* It is not clear why CompoundBorder does not simply inherit
-     * the implementation from AbstractBorder. However, we want
-     * to be compatible with the API specification, which overrides
-     * the getBorderInsets(Component) method.
-     */
+    // It is not clear why CompoundBorder does not simply inherit
+    // the implementation from AbstractBorder. However, we want
+    // to be compatible with the API specification, which overrides
+    // the getBorderInsets(Component) method.
     return getBorderInsets (c, null);
   }
 

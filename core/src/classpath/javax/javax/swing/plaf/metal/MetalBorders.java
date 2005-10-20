@@ -106,9 +106,7 @@ public class MetalBorders
   /**
    * The border that is drawn around Swing buttons.
    */
-  public static class ButtonBorder
-    extends AbstractBorder
-    implements UIResource
+  public static class ButtonBorder extends AbstractBorder implements UIResource
   {
     /** The borders insets. */
     protected static Insets borderInsets = new Insets(3, 3, 3, 3);
@@ -118,6 +116,7 @@ public class MetalBorders
      */
     public ButtonBorder()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -231,6 +230,7 @@ public class MetalBorders
      */
     public DesktopIconBorder()
     {
+      // Nothing to do here.
     }
     
     /**
@@ -295,6 +295,7 @@ public class MetalBorders
      */
     public Flush3DBorder()
     {
+      // Nothing to do here.
     }
     
     /**
@@ -361,8 +362,7 @@ public class MetalBorders
    * 
    * @since 1.3
    */
-  public static class PaletteBorder
-    extends AbstractBorder
+  public static class PaletteBorder extends AbstractBorder
     implements UIResource
   {
     /**
@@ -370,6 +370,7 @@ public class MetalBorders
      */
     public PaletteBorder()
     {
+      // Nothing to do here.
     }
     
     /**
@@ -448,6 +449,7 @@ public class MetalBorders
      */
     public TextFieldBorder()
     {
+      // Nothing to do here.
     }
     
     /**
@@ -496,6 +498,7 @@ public class MetalBorders
      */
     public InternalFrameBorder()
     {
+      // Nothing to do here.
     }
     
     /**
@@ -596,6 +599,7 @@ public class MetalBorders
      */
     public OptionDialogBorder()
     {
+      // Nothing to do here.
     }
     
     /**
@@ -705,6 +709,7 @@ public class MetalBorders
      */
     public MenuItemBorder()
     {
+      // Nothing to do here.
     }
     
     /**
@@ -804,6 +809,7 @@ public class MetalBorders
      */
     public MenuBarBorder()
     {
+      // Nothing to do here.
     }
     
     /**
@@ -871,6 +877,7 @@ public class MetalBorders
      */
     public ScrollPaneBorder()
     {
+      // Nothing to do here.
     }
     
     /**
@@ -944,6 +951,7 @@ public class MetalBorders
      */
     public RolloverButtonBorder()
     {
+      // Nothing to do here.
     }
     
     /**
@@ -983,6 +991,7 @@ public class MetalBorders
      */
     public RolloverMarginBorder()
     {
+      // Nothing to do here.
     }
     
     /**
@@ -1037,6 +1046,7 @@ public class MetalBorders
      */
     public PopupMenuBorder()
     {
+      // Nothing to do here.
     }
     
     /**
@@ -1118,6 +1128,7 @@ public class MetalBorders
      */
     public ToggleButtonBorder()
     {
+      // Nothing to do here.
     }
     
     /**
@@ -1208,6 +1219,7 @@ public class MetalBorders
      */
     public ToolBarBorder()
     {
+      // Nothing to do here.
     }
     
     /**

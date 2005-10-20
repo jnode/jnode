@@ -163,14 +163,17 @@ public class TransferHandler implements Serializable
 
   public void exportAsDrag (JComponent c, InputEvent e, int action) 
   {    
+    // TODO: Implement this properly
   }
 
   protected void exportDone (JComponent c, Transferable data, int action) 
   {
+    // TODO: Implement this properly
   }
 
   public void exportToClipboard(JComponent c, Clipboard clip, int action) 
   {
+    // TODO: Implement this properly
   } 
 
   public int getSourceActions (JComponent c)

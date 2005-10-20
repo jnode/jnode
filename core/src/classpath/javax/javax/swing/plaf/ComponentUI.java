@@ -87,6 +87,7 @@ public abstract class ComponentUI
    */
   public ComponentUI()
   {
+    // Nothing to do here.
   }
   
   
@@ -158,6 +159,8 @@ public abstract class ComponentUI
    */
   public void paint(Graphics g, JComponent c)
   {
+    // Nothing is done here. This method is meant to be overridden by
+    // subclasses.
   }
   
   
@@ -184,7 +187,7 @@ public abstract class ComponentUI
     {
       g.setColor(c.getBackground());
       Rectangle clip = g.getClipBounds();
-      g.fillRect(clip.x, clip.y, clip.width, clip.height);
+      g.fillRect(0, 0, c.getWidth(), c.getHeight());
     }
     paint(g, c);
   }

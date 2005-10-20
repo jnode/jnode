@@ -46,7 +46,8 @@ import javax.swing.JTree;
  * TreeCellRenderer public interface
  * @author Andrew Selkirk
  */
-public interface TreeCellRenderer {
+public interface TreeCellRenderer
+{
 
 	/**
 	 * getTreeCellRendererComponent
@@ -56,12 +57,13 @@ public interface TreeCellRenderer {
 	 * @param expanded TODO
 	 * @param leaf TODO
 	 * @param row TODO
-	 * @param us TODO
+   * @param hasFocus TODO
 	 * @returns TODO
 	 */
-	Component getTreeCellRendererComponent(JTree tree,
-			Object value, boolean selected, boolean expanded,
-			boolean leaf, int row, boolean hasFocus);
+  Component getTreeCellRendererComponent(JTree tree, Object value,
+                                         boolean selected, boolean expanded,
+                                         boolean leaf, int row,
+                                         boolean hasFocus);
 
 
-} // TreeCellRenderer
+}

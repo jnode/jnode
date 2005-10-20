@@ -834,6 +834,7 @@ public class BasicMenuItemUI extends MenuItemUI
      */
     protected MouseInputHandler()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -979,11 +980,11 @@ public class BasicMenuItemUI extends MenuItemUI
      * Tbis method is invoked when mouse exits the menu item while it is being
      * dragged
      * 
-     * @param e
-     *          The MenuDragMouseEvent
+     * @param e the MenuDragMouseEvent
      */
     public void menuDragMouseExited(MenuDragMouseEvent e)
     {
+      // TODO: What should be done here, if anything?
     }
 
     /**
@@ -1019,6 +1020,7 @@ public class BasicMenuItemUI extends MenuItemUI
      */
     public void menuKeyPressed(MenuKeyEvent e)
     {
+      // TODO: What should be done here, if anything?
     }
 
     /**
@@ -1029,6 +1031,7 @@ public class BasicMenuItemUI extends MenuItemUI
      */
     public void menuKeyReleased(MenuKeyEvent e)
     {
+      // TODO: What should be done here, if anything?
     }
 
     /**
@@ -1040,6 +1043,7 @@ public class BasicMenuItemUI extends MenuItemUI
      */
     public void menuKeyTyped(MenuKeyEvent e)
     {
+      // TODO: What should be done here, if anything?
     }
   }
 

@@ -75,6 +75,8 @@ public class JTabbedPane extends JComponent implements Serializable,
   /**
    * Accessibility support for <code>JTabbedPane</code>.
    */
+  // FIXME: This inner class is a complete stub and must be implemented
+  // properly.
   protected class AccessibleJTabbedPane extends JComponent.AccessibleJComponent
     implements AccessibleSelection, ChangeListener
   {
@@ -99,6 +101,7 @@ public class JTabbedPane extends JComponent implements Serializable,
      */
     public void stateChanged(ChangeEvent e)
     {
+      // Implement this properly.
     }
 
     /**
@@ -208,6 +211,7 @@ public class JTabbedPane extends JComponent implements Serializable,
      */
     public void addAccessibleSelection(int i)
     {
+      // TODO: Implement this properly.
     }
 
     /**
@@ -217,6 +221,7 @@ public class JTabbedPane extends JComponent implements Serializable,
      */
     public void removeAccessibleSelection(int i)
     {
+      // TODO: Implement this properly.
     }
 
     /**
@@ -224,6 +229,7 @@ public class JTabbedPane extends JComponent implements Serializable,
      */
     public void clearAccessibleSelection()
     {
+      // TODO: Implement this properly.
     }
 
     /**
@@ -231,6 +237,7 @@ public class JTabbedPane extends JComponent implements Serializable,
      */
     public void selectAllAccessibleSelection()
     {
+      // TODO: Implement this properly.
     }
   }
 
@@ -247,6 +254,7 @@ public class JTabbedPane extends JComponent implements Serializable,
      */
     protected ModelListener()
     {
+      // Nothing to do here.
     }
 
     /**

@@ -57,8 +57,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-public class BasicTableHeaderUI
-  extends TableHeaderUI
+public class BasicTableHeaderUI extends TableHeaderUI
 {
 
   public static ComponentUI createUI(JComponent h)
@@ -73,13 +72,40 @@ public class BasicTableHeaderUI
 
   public class MouseInputHandler implements MouseInputListener
   {
-    public void mouseClicked(MouseEvent e) {}
-    public void mouseDragged(MouseEvent e) {}
-    public void mouseEntered(MouseEvent e) {}
-    public void mouseExited(MouseEvent e) {}
-    public void mouseMoved(MouseEvent e) {}
-    public void mousePressed(MouseEvent e) {}
-    public void mouseReleased(MouseEvent e) {}
+    public void mouseClicked(MouseEvent e)
+    {
+      // TODO: Implement this properly.
+    }
+
+    public void mouseDragged(MouseEvent e)
+    {
+      // TODO: Implement this properly.
+    }
+
+    public void mouseEntered(MouseEvent e)
+    {
+      // TODO: Implement this properly.
+    }
+
+    public void mouseExited(MouseEvent e)
+    {
+      // TODO: Implement this properly.
+    }
+
+    public void mouseMoved(MouseEvent e)
+    {
+      // TODO: Implement this properly.
+    }
+
+    public void mousePressed(MouseEvent e)
+    {
+      // TODO: Implement this properly.
+    }
+
+    public void mouseReleased(MouseEvent e)
+    {
+      // TODO: Implement this properly.
+    }
   }
 
   protected MouseInputListener createMouseInputListener()
@@ -102,6 +128,7 @@ public class BasicTableHeaderUI
 
   protected void installKeyboardActions()
   {
+    // TODO: Implement this properly.
   }
 
   protected void installListeners()
@@ -126,6 +153,7 @@ public class BasicTableHeaderUI
 
   protected void uninstallKeyboardActions()
   {
+    // TODO: Implement this properly.
   }
 
   protected void uninstallListeners()

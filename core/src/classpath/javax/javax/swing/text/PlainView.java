@@ -49,8 +49,7 @@ import java.awt.Shape;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentEvent.ElementChange;
 
-public class PlainView extends View
-  implements TabExpander
+public class PlainView extends View implements TabExpander
 {
   Color selectedColor;
   Color unselectedColor;
@@ -256,6 +255,7 @@ public class PlainView extends View
             }
             catch (BadLocationException ex)
               {
+            assert false : "BadLocationException should not be thrown here.";
               }
         
         if (seg == null || seg.array == null || seg.count == 0)
@@ -417,6 +417,7 @@ public class PlainView extends View
           }
         catch (BadLocationException ex)
           {
+            assert false : "BadLocationException should not be thrown here.";
           }
                 
         if (seg == null || seg.array == null || seg.count == 0)
@@ -504,8 +505,7 @@ public class PlainView extends View
     else
       {
         Rectangle repaintRec = rec0.union(rec1);
-        host.repaint(0, repaintRec.y, host.getWidth(),
-                     repaintRec.height);
+        host.repaint();
       }    
   }
 

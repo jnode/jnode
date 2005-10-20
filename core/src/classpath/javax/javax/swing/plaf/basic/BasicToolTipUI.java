@@ -160,6 +160,7 @@ public class BasicToolTipUI extends ToolTipUI
    */
   protected void installListeners(JComponent c)
   {
+    // TODO: Implement this properly.
   }
 
   /**
@@ -228,6 +229,7 @@ public class BasicToolTipUI extends ToolTipUI
    */
   protected void uninstallListeners(JComponent c)
   {
+    // TODO: Implement this properly.
   }
 
   /**

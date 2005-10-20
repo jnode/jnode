@@ -38,14 +38,11 @@ exception statement from your version. */
 
 package javax.swing.plaf.metal;
 
-import java.util.HashMap;
-
 import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicProgressBarUI;
 
-public class MetalProgressBarUI
-  extends BasicProgressBarUI
+public class MetalProgressBarUI extends BasicProgressBarUI
 {  
   /**
    * Constructs a new instance of MetalProgressBarUI.

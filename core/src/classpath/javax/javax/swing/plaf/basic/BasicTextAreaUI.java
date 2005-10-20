@@ -55,6 +55,7 @@ public class BasicTextAreaUI extends BasicTextUI
 
   public BasicTextAreaUI()
   {
+    // Nothing to do here.
   }
 
   public View create(Element elem)

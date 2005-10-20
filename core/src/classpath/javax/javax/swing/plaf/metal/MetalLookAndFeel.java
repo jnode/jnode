@@ -781,7 +781,7 @@ public class MetalLookAndFeel extends BasicLookAndFeel
       "Button.foreground", getControlTextColor(),
       "Button.highlight", getControlHighlight(),
       "Button.light", getControlHighlight(),
-      "Button.margin", new Insets(2, 14, 2, 14),
+      "Button.margin", new InsetsUIResource(2, 14, 2, 14),
       "Button.select", getControlShadow(),
       "Button.shadow", getControlShadow(),
 
@@ -890,6 +890,7 @@ public class MetalLookAndFeel extends BasicLookAndFeel
       "Label.font", getControlTextFont(),
       "Label.foreground", getSystemTextColor(),
 
+      "List.font", getControlTextFont(),
       "List.background", getWindowBackground(),
       "List.foreground", getUserTextColor(),
       "List.selectionBackground", getTextHighlightColor(),

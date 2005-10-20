@@ -98,5 +98,6 @@ public class BasicCheckBoxMenuItemUI extends BasicMenuItemUI
                                 MenuElement[] path,
                          MenuSelectionManager manager)
   {
+    // TODO: What should be done here?
   }
 }

@@ -620,6 +620,7 @@ public class JList extends JComponent implements Accessible, Scrollable
      */
     public AccessibleJList()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -922,7 +923,7 @@ public class JList extends JComponent implements Accessible, Scrollable
 
   /** 
    * This property specifies a foreground color for the selected cells in
-   * the list. When {@link ListCellRenderer.getListCellRendererComponent}
+   * the list. When {@link ListCellRenderer#getListCellRendererComponent}
    * is called with a selected cell object, the component returned will
    * have its "foreground" set to this color.
    */
@@ -930,7 +931,7 @@ public class JList extends JComponent implements Accessible, Scrollable
 
   /** 
    * This property specifies a background color for the selected cells in
-   * the list. When {@link ListCellRenderer.getListCellRendererComponent}
+   * the list. When {@link ListCellRenderer#getListCellRendererComponent}
    * is called with a selected cell object, the component returned will
    * have its "background" property set to this color.
    */
@@ -957,9 +958,9 @@ public class JList extends JComponent implements Accessible, Scrollable
   /** 
    * This property indicates a <em>preference</em> for the number of rows
    * displayed in the list, and will scale the
-   * {@link #preferredScrollableViewportSize} property accordingly. The actual
+   * {@link #getPreferredScrollableViewportSize} property accordingly. The actual
    * number of displayed rows, when the list is placed in a real {@link
-   * Viewport} or other component, may be greater or less than this number.
+   * JViewport} or other component, may be greater or less than this number.
    */
   int visibleRowCount;
 
@@ -1011,7 +1012,7 @@ public class JList extends JComponent implements Accessible, Scrollable
                                            event.getValueIsAdjusting());
       JList.this.repaint();
     }
-  };
+  }
 
   /** 
    * Shared ListListener instance, subscribed to both the current {@link
@@ -1178,7 +1179,7 @@ public class JList extends JComponent implements Accessible, Scrollable
   /**
    * Sets the value of the {@link #visibleRowCount} property. 
    *
-   * @param visibleRowCount The new property value
+   * @param vc The new property value
    */
   public void setVisibleRowCount(int vc)
   {
@@ -1304,8 +1305,8 @@ public class JList extends JComponent implements Accessible, Scrollable
 
   /**
    * Returns the list index of the upper left or upper right corner of the
-   * {@link #visibleRect} property, depending on the {@link
-   * #componentOrientation} property.
+   * visible rectangle of this list, depending on the {@link
+   * Component#getComponentOrientation} property.
    *
    * @return The index of the first visible list cell, or <code>-1</code>
    * if none is visible.
@@ -1344,8 +1345,8 @@ public class JList extends JComponent implements Accessible, Scrollable
 
   /**
    * Returns the list index of the lower right or lower left corner of the
-   * {@link #visibleRect} property, depending on the {@link
-   * #componentOrientation} property.
+   * visible rectangle of this list, depending on the {@link
+   * Component#getComponentOrientation} property.
    *
    * @return The index of the last visible list cell, or <code>-1</code>
    * if none is visible.
@@ -1368,7 +1369,7 @@ public class JList extends JComponent implements Accessible, Scrollable
    * selected.
    *
    * @return An array of model indices, each of which is selected according
-   * to the {@link #selection} property
+   *         to the {@link #getSelectedValues} property
    */
   public int[] getSelectedIndices()
   {
@@ -1413,7 +1414,7 @@ public class JList extends JComponent implements Accessible, Scrollable
    * @return The first selected element, or <code>null</code> if no element
    * is selected.
    *
-   * @see getSelectedValues
+   * @see #getSelectedValues
    */
   public Object getSelectedValue()
   {
@@ -1429,7 +1430,7 @@ public class JList extends JComponent implements Accessible, Scrollable
    *
    * @return An array containing all the selected values
    *
-   * @see getSelectedValue
+   * @see #setSelectedValue
    */
   public Object[] getSelectedValues()
   {
@@ -1588,7 +1589,7 @@ public class JList extends JComponent implements Accessible, Scrollable
   }
 
   /**
-   * Sets the value of the {@link #celLRenderer} property.
+   * Sets the value of the {@link #getCellRenderer} property.
    *
    * @param renderer The new property value
    */
@@ -1762,14 +1763,14 @@ public class JList extends JComponent implements Accessible, Scrollable
 
   public AccessibleContext getAccessibleContext()
   {
-    return null;
+    return new AccessibleJList();
   }
 
   /**
    * Returns a size indicating how much space this list would like to
    * consume, when contained in a scrollable viewport. This is part of the
    * {@link Scrollable} interface, which interacts with {@link
-   * ScrollPaneLayout} and {@link Viewport} to define scrollable objects.
+   * ScrollPaneLayout} and {@link JViewport} to define scrollable objects.
    *
    * @return The preferred size
    */
@@ -1939,7 +1940,7 @@ public class JList extends JComponent implements Accessible, Scrollable
   }
 
   /**
-   * Gets the value of the {@link #scrollableTracksViewportWidth} property.
+   * Gets the value of the <code>scrollableTracksViewportWidth</code> property.
    *
    * @return <code>true</code> if the viewport is larger (horizontally)
    * than the list and the list should be expanded to fit the viewport;
@@ -1964,7 +1965,7 @@ public class JList extends JComponent implements Accessible, Scrollable
   }
 
   /**
-   * Gets the value of the {@link #scrollableTracksViewportWidth} property.
+   * Gets the value of the </code>scrollableTracksViewportWidth</code> property.
    *
    * @return <code>true</code> if the viewport is larger (vertically)
    * than the list and the list should be expanded to fit the viewport;
@@ -2126,8 +2127,8 @@ public class JList extends JComponent implements Accessible, Scrollable
    *
    * @param prefix the prefix to search for in the cell values
    * @param startIndex the index where to start searching from
-   * @param bias the search direction, either {@link Position.Bias.Forward}
-   *     or {@link Position.Bias.Backward}
+   * @param bias the search direction, either {@link Position.Bias#Forward}
+   *     or {@link Position.Bias#Backward}
    *
    * @return the index of the found element or -1 if no such element has
    *     been found

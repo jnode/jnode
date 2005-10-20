@@ -64,15 +64,13 @@ import javax.swing.plaf.basic.BasicFileChooserUI;
  * A UI delegate for the {@link JFileChooser} component.  This class is only
  * partially implemented and is not usable yet.
  */
-public class MetalFileChooserUI 
-  extends BasicFileChooserUI
+public class MetalFileChooserUI extends BasicFileChooserUI
 {
   /** 
    * A combo box model containing the selected directory and all its parent
    * directories.
    */
-  protected class DirectoryComboBoxModel
-    extends AbstractListModel
+  protected class DirectoryComboBoxModel extends AbstractListModel
     implements ComboBoxModel
   {
     /** Storage for the items in the model. */
@@ -163,14 +161,14 @@ public class MetalFileChooserUI
   /**
    * Handles changes to the selection in the directory combo box.
    */
-  protected class DirectoryComboBoxAction
-    extends AbstractAction
+  protected class DirectoryComboBoxAction extends AbstractAction
   {
     /**
      * Creates a new action.
      */
     protected DirectoryComboBoxAction()
     {
+      // Nothing to do here.
     }
     
     /**
@@ -188,8 +186,7 @@ public class MetalFileChooserUI
   /**
    * A renderer for the files and directories in the file chooser.
    */
-  protected class FileRenderer
-    extends DefaultListCellRenderer
+  protected class FileRenderer extends DefaultListCellRenderer
   {
     
     /**
@@ -197,6 +194,7 @@ public class MetalFileChooserUI
      */
     protected FileRenderer()
     {
+      // Nothing to do here.
     }
     
     /**
@@ -341,14 +339,14 @@ public class MetalFileChooserUI
   /**
    * A renderer for the items in the file filter combo box.
    */
-  public class FilterComboBoxRenderer
-    extends DefaultListCellRenderer
+  public class FilterComboBoxRenderer extends DefaultListCellRenderer
   {
     /**
      * Creates a new renderer.
      */
     public FilterComboBoxRenderer()
     { 
+      // Nothing to do here.
     }
     
     /**
@@ -373,7 +371,7 @@ public class MetalFileChooserUI
   }
 
   /** The model for the directory combo box. */
-  private DirectoryComboBoxModel directoryModel;
+  DirectoryComboBoxModel directoryModel;
   
   /**
    * A factory method that returns a UI delegate for the specified

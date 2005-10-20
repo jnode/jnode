@@ -106,6 +106,7 @@ public class BasicFileChooserUI extends FileChooserUI
      */
     public AcceptAllFileFilter()
     {
+      // Nothing to do here.
     }
     
     /**
@@ -144,6 +145,7 @@ public class BasicFileChooserUI extends FileChooserUI
      */
     protected ApproveSelectionAction()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -184,6 +186,7 @@ public class BasicFileChooserUI extends FileChooserUI
      */
     public BasicFileView()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -305,6 +308,7 @@ public class BasicFileChooserUI extends FileChooserUI
      */
     protected CancelSelectionAction()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -332,6 +336,7 @@ public class BasicFileChooserUI extends FileChooserUI
      */
     protected ChangeToParentDirectoryAction()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -449,6 +454,7 @@ public class BasicFileChooserUI extends FileChooserUI
      */
     protected GoHomeAction()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -478,6 +484,7 @@ public class BasicFileChooserUI extends FileChooserUI
      */
     protected NewFolderAction()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -513,6 +520,7 @@ public class BasicFileChooserUI extends FileChooserUI
      */
     protected SelectionListener()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -545,6 +553,7 @@ public class BasicFileChooserUI extends FileChooserUI
      */
     protected UpdateAction()
     {
+      // Nothing to do here.
     }
 
     /**

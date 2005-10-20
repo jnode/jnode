@@ -481,6 +481,8 @@ public class JLabel extends JComponent implements Accessible, SwingConstants
 
 	if (text != null && text.length() <= displayedMnemonicIndex)
 	  setDisplayedMnemonicIndex(text.length() - 1);
+        revalidate();
+        repaint();
       }
   }
 

@@ -64,6 +64,7 @@ public class DefaultTableCellRenderer extends JLabel
   {
     public UIResource()
     {
+      super();
     }
   }
 
@@ -135,7 +136,12 @@ public class DefaultTableCellRenderer extends JLabel
     if (table == null)
       return this;
 
-    if (isSelected)
+    if (isSelected && hasFocus)
+      {
+        setBackground(table.getBackground());
+        setForeground(table.getSelectionForeground());
+      }
+    else if (table.isRowSelected(row))
       {
         setBackground(table.getSelectionBackground());
         setForeground(table.getSelectionForeground());

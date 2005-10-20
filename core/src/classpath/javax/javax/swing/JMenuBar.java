@@ -520,9 +520,14 @@ public class JMenuBar extends JComponent implements Accessible, MenuElement
    * Sets help menu for this menu bar
    *
    * @param menu help menu
+   *
+   * @specnote The specification states that this method is not yet implemented
+   *           and should throw an exception.
    */
   public void setHelpMenu(JMenu menu)
   {
+    // We throw an Error here, just as Sun's JDK does.
+    throw new Error("setHelpMenu() not yet implemented.");
   }
 
   /**

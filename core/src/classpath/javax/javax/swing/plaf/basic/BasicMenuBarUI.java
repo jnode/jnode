@@ -256,6 +256,7 @@ public class BasicMenuBarUI extends MenuBarUI
   {
     public void stateChanged(ChangeEvent event)
     {
+      // TODO: What should be done here, if anything?
     }
   }
 
@@ -334,6 +335,7 @@ public class BasicMenuBarUI extends MenuBarUI
      */
     public void mousePressed(MouseEvent e)
     {
+      // TODO: What should be done here, if anything?
     }
     
     /**
@@ -343,6 +345,7 @@ public class BasicMenuBarUI extends MenuBarUI
      */
     public void mouseReleased(MouseEvent e)
     {
+      // TODO: What should be done here, if anything?
     }
     
     /**
@@ -352,6 +355,7 @@ public class BasicMenuBarUI extends MenuBarUI
      */
     public void mouseExited(MouseEvent e)
     {
+      // TODO: What should be done here, if anything?
     }
     
     /**
@@ -361,6 +365,7 @@ public class BasicMenuBarUI extends MenuBarUI
      */
     public void mouseDragged(MouseEvent e)
     {
+      // TODO: What should be done here, if anything?
     }
     
     /**
@@ -370,6 +375,7 @@ public class BasicMenuBarUI extends MenuBarUI
      */
     public void mouseMoved(MouseEvent e)
     {
+      // TODO: What should be done here, if anything?
     }
     
     /**
@@ -379,6 +385,7 @@ public class BasicMenuBarUI extends MenuBarUI
      */
     public void mouseEntered(MouseEvent e)
     {
+      // TODO: What should be done here, if anything?
     }
   }
 }

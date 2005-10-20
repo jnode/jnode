@@ -283,6 +283,8 @@ public class DefaultEditorKit extends EditorKit
      */
     public void actionPerformed(ActionEvent event)
     {
+      // FIXME: Figure out what this Action is supposed to do. Obviously text
+      // that is entered by the user is inserted through DefaultKeyTypedAction.
     }
   }
 
@@ -689,6 +691,7 @@ public class DefaultEditorKit extends EditorKit
    */
   public DefaultEditorKit()
   {
+    // Nothing to do here.
   }
 
   /**

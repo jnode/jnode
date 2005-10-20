@@ -44,12 +44,8 @@ import javax.swing.event.TreeModelListener;
  * TreeModel public interface
  * @author Andrew Selkirk
  */
-public interface TreeModel {
-
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
-
+public interface TreeModel
+{
 	/**
 	 * getRoot
 	 * @returns Object
@@ -88,7 +84,7 @@ public interface TreeModel {
 	/**
 	 * getIndexOfChild
 	 * @param parent TODO
-	 * @param ild TODO
+   * @param child TODO
 	 * @returns int
 	 */
 	int getIndexOfChild(Object parent, Object child);
@@ -106,4 +102,4 @@ public interface TreeModel {
 	void removeTreeModelListener(TreeModelListener listener);
 
 
-} // TreeModel
+}

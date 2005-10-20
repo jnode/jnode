@@ -165,7 +165,7 @@ public interface BoundedRangeModel
    * 
    * @param value the value
    * @param extent the extent
-   * @param minnimum the minimum value
+   * @param minimum the minimum value
    * @param maximum the maximum value
    * @param adjusting a flag that indicates the model is being adjusted 
    *                  continuously.

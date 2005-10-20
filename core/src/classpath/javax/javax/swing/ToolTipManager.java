@@ -67,6 +67,7 @@ public class ToolTipManager extends MouseAdapter implements MouseMotionListener
      */
     protected stillInsideTimerAction()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -92,6 +93,7 @@ public class ToolTipManager extends MouseAdapter implements MouseMotionListener
      */
     protected outsideTimerAction()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -102,6 +104,7 @@ public class ToolTipManager extends MouseAdapter implements MouseMotionListener
      */
     public void actionPerformed(ActionEvent event)
     {
+      // TODO: What should be done here, if anything?
     }
   }
 
@@ -117,6 +120,7 @@ public class ToolTipManager extends MouseAdapter implements MouseMotionListener
      */
     protected insideTimerAction()
     {
+      // Nothing to do here.
     }
 
     /**

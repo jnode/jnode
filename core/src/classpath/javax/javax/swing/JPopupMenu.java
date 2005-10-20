@@ -49,9 +49,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.EventListener;
 
@@ -156,15 +153,6 @@ public class JPopupMenu extends JComponent implements Accessible, MenuElement
     setSelectionModel(new DefaultSingleSelectionModel());
     super.setVisible(false);
     updateUI();
-  }
-
-  private void readObject(ObjectInputStream stream)
-                   throws IOException, ClassNotFoundException
-  {
-  }
-
-  private void writeObject(ObjectOutputStream stream) throws IOException
-  {
   }
 
   /**
@@ -564,8 +552,7 @@ public class JPopupMenu extends JComponent implements Accessible, MenuElement
             Dimension screenSize = getToolkit().getScreenSize();
             
             boolean fit = true;
-            Dimension size = this.getPreferredSize();
-
+            Dimension size = this.getSize();
             if ((size.width > (rootContainer.getWidth() - popupLocation.x))
                 || (size.height > (rootContainer.getHeight() - popupLocation.y)))
               fit = false;
@@ -1054,6 +1041,7 @@ public class JPopupMenu extends JComponent implements Accessible, MenuElement
   {
     public Separator()
     {
+      super();
     }
 
     public String getUIClassID()
@@ -1068,6 +1056,7 @@ public class JPopupMenu extends JComponent implements Accessible, MenuElement
 
     protected AccessibleJPopupMenu()
     {
+      // Nothing to do here.
     }
 
     public AccessibleRole getAccessibleRole()

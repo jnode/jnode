@@ -1182,6 +1182,7 @@ public class BasicTabbedPaneUI extends TabbedPaneUI implements SwingConstants
    */
   private class ScrollingViewport extends JViewport implements UIResource
   {
+    // TODO: Maybe remove this inner class.
   }
 
   /**

@@ -56,8 +56,7 @@ import javax.swing.plaf.basic.BasicSliderUI;
 /**
  * A UI delegate for the {@link JSlider} component.
  */
-public class MetalSliderUI
-  extends BasicSliderUI
+public class MetalSliderUI extends BasicSliderUI
 {
   /**
    * A property change handler that updates the rendered component in response
@@ -73,6 +72,7 @@ public class MetalSliderUI
      */
     protected MetalPropertyListener()
     {
+      // Nothing to do here.
     }
     
     /**
