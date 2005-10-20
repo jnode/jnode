@@ -79,6 +79,7 @@ public class ButtonGroup implements Serializable
    */
   public ButtonGroup()
   {
+    // Nothing to do here.
   }
     
   /**

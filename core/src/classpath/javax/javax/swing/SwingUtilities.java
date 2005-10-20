@@ -1116,7 +1116,7 @@ public class SwingUtilities
    * <pre>
    *  [{@link javax.swing.JComponent#getActionMap()}] 
    *          --&gt; [{@link javax.swing.ActionMap}] 
-   *     parent --&gt; [{@link javax.swing.text.KeymapActionMap}] 
+   *     parent --&gt; [{@link javax.swing.text.JTextComponent.KeymapActionMap}] 
    *       parent --&gt; [{@link javax.swing.plaf.ActionMapUIResource}]
    * </pre>
    *
@@ -1159,7 +1159,7 @@ public class SwingUtilities
    * <pre>
    *  [{@link javax.swing.JComponent#getInputMap()}] 
    *          --&gt; [{@link javax.swing.InputMap}] 
-   *     parent --&gt; [{@link javax.swing.text.KeymapWrapper}] 
+   *     parent --&gt; [{@link javax.swing.text.JTextComponent.KeymapWrapper}] 
    *       parent --&gt; [{@link javax.swing.plaf.InputMapUIResource}]
    * </pre>
    *

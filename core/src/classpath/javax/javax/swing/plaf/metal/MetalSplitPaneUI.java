@@ -39,7 +39,6 @@ exception statement from your version. */
 package javax.swing.plaf.metal;
 
 import java.awt.Color;
-import java.util.HashMap;
 
 import javax.swing.JComponent;
 import javax.swing.UIDefaults;
@@ -48,8 +47,7 @@ import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 
-public class MetalSplitPaneUI
-  extends BasicSplitPaneUI
+public class MetalSplitPaneUI extends BasicSplitPaneUI
 {
   /**
    * Constructs a new instance of MetalSplitPaneUI.

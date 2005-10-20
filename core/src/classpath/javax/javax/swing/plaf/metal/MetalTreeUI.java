@@ -44,8 +44,8 @@ import java.awt.Rectangle;
 import java.awt.event.ComponentListener;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseListener;
 import java.beans.PropertyChangeListener;
-import java.util.HashMap;
 import java.util.Hashtable;
 
 import javax.swing.JComponent;
@@ -56,7 +56,6 @@ import javax.swing.tree.TreeCellEditor;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.event.CellEditorListener;
-import javax.swing.event.MouseInputListener;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionListener;
@@ -64,15 +63,14 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicTreeUI;
 
-public class MetalTreeUI
-  extends BasicTreeUI
+public class MetalTreeUI extends BasicTreeUI
 {
 
   /** Listeners */
   private PropertyChangeListener propertyChangeListener;
   private FocusListener focusListener;
   private TreeSelectionListener treeSelectionListener;
-  private MouseInputListener mouseInputListener;
+  private MouseListener mouseListener;
   private KeyListener keyListener;
   private PropertyChangeListener selectionModelPropertyChangeListener;
   private ComponentListener componentListener;
@@ -140,10 +138,11 @@ public class MetalTreeUI
     rightChildIndent = defaults.getInt("Tree.rightChildIndent");
     leftChildIndent = defaults.getInt("Tree.leftChildIndent");
     setRowHeight(defaults.getInt("Tree.rowHeight"));
+    tree.setRowHeight(defaults.getInt("Tree.rowHeight"));
     tree.requestFocusInWindow(false);
     
-    setExpandedIcon(defaults.getIcon("Tree.openIcon"));
-    setCollapsedIcon(defaults.getIcon("Tree.closedIcon"));
+    setExpandedIcon(defaults.getIcon("Tree.expandedIcon"));
+    setCollapsedIcon(defaults.getIcon("Tree.collapsedIcon"));
     
     currentCellRenderer = createDefaultCellRenderer();
     rendererPane = createCellRendererPane();
@@ -152,12 +151,7 @@ public class MetalTreeUI
     createdCellEditor = true;
     TreeModel mod = tree.getModel();
     setModel(mod);
-    if (mod != null)
-      {
-        TreePath path = new TreePath(mod.getRoot());
-        if (!tree.isExpanded(path))
-          toggleExpandState(path);
-      }
+
     treeSelectionModel = tree.getSelectionModel();
     drawingCache = new Hashtable();
     nodeDimensions = createNodeDimensions();
@@ -165,7 +159,7 @@ public class MetalTreeUI
     propertyChangeListener = createPropertyChangeListener();
     focusListener = createFocusListener();
     treeSelectionListener = createTreeSelectionListener();
-    mouseInputListener = new MouseInputHandler(null, null, null);
+    mouseListener = createMouseListener();
     keyListener = createKeyListener();
     selectionModelPropertyChangeListener = createSelectionModelPropertyChangeListener();
     componentListener = createComponentListener();
@@ -181,13 +175,20 @@ public class MetalTreeUI
     tree.addPropertyChangeListener(propertyChangeListener);
     tree.addFocusListener(focusListener);
     tree.addTreeSelectionListener(treeSelectionListener);
-    tree.addMouseListener(mouseInputListener);
+    tree.addMouseListener(mouseListener);
     tree.addKeyListener(keyListener);
     tree.addPropertyChangeListener(selectionModelPropertyChangeListener);
     tree.addComponentListener(componentListener);
     tree.addTreeExpansionListener(treeExpansionListener);
     if (treeModel != null)
       treeModel.addTreeModelListener(treeModelListener);
+    
+    if (mod != null)
+      {
+        TreePath path = new TreePath(mod.getRoot());
+        if (!tree.isExpanded(path))
+          toggleExpandState(path);
+      }
     
     completeUIInstall();
   }
@@ -218,7 +219,7 @@ public class MetalTreeUI
     tree.removePropertyChangeListener(propertyChangeListener);
     tree.removeFocusListener(focusListener);
     tree.removeTreeSelectionListener(treeSelectionListener);
-    tree.removeMouseListener(mouseInputListener);
+    tree.removeMouseListener(mouseListener);
     tree.removeKeyListener(keyListener);
     tree.removePropertyChangeListener(selectionModelPropertyChangeListener);
     tree.removeComponentListener(componentListener);

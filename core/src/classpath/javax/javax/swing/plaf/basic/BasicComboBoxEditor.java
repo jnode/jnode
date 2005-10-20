@@ -168,6 +168,7 @@ public class BasicComboBoxEditor extends Object implements ComboBoxEditor,
      */
     public UIResource()
     {
+      // Nothing to do here.
     }
   }
 }

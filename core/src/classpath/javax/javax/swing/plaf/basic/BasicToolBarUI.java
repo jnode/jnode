@@ -1016,6 +1016,7 @@ public class BasicToolBarUI extends ToolBarUI implements SwingConstants
      */
     public void mouseMoved(MouseEvent e)
     {
+      // TODO: What should be done here, if anything?
     }
 
     /**

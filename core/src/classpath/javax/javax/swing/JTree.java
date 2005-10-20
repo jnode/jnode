@@ -73,7 +73,6 @@ import javax.swing.event.TreeWillExpandListener;
 import javax.swing.plaf.TreeUI;
 import javax.swing.text.Position;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.ExpandVetoException;
@@ -84,9 +83,7 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-public class JTree
-		extends	JComponent
-			implements Scrollable, Accessible
+public class JTree extends JComponent implements Scrollable, Accessible
 {
 
   /**
@@ -976,6 +973,8 @@ public class JTree
     
     /**
      * Returns the number of items currently selected.
+     * 
+     * @return the number of selected accessibles.
      */
     public int getAccessibleSelectionCount()
     {
@@ -1192,6 +1191,7 @@ public class JTree
      */
     protected TreeModelHandler()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -1266,6 +1266,7 @@ public class JTree
      */
     protected TreeSelectionRedirector()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -1301,6 +1302,7 @@ public class JTree
      */
     protected EmptySelectionModel()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -1583,8 +1585,6 @@ public class JTree
   public void updateUI()
   {
     setUI((TreeUI) UIManager.getUI(this));
-    revalidate();
-    repaint();
   }
 
   /**
@@ -2047,12 +2047,25 @@ public class JTree
     if (path == null)
       return;
 
+    Object[] oPath = path.getPath();
+    TreePath temp = new TreePath(oPath[0]);
+    boolean stop = false;
+    int i = 1;
+    while (!stop)
+      {
+        while (isVisible(temp))
+          if (i < oPath.length)
+            temp = temp.pathByAddingChild(oPath[i++]);
+          else
+            {
+              stop = true;
+              break;
+            }
+        makeVisible(temp);
+      }
     Rectangle rect = getPathBounds(path);
-
-    if (rect == null)
-      return;
-
     scrollRectToVisible(rect);
+    setSelectionPath(temp);
   }
 
   public void scrollRowToVisible(int row)
@@ -2331,6 +2344,7 @@ public class JTree
       }
     catch (ExpandVetoException ev)
       {
+        // We do nothing if attempt has been vetoed.
       }
     setExpandedState(path, false);
     fireTreeCollapsed(path);
@@ -2359,6 +2373,7 @@ public class JTree
       }
     catch (ExpandVetoException ev)
       {
+        // We do nothing if attempt has been vetoed.
       }
 
     setExpandedState(path, true);

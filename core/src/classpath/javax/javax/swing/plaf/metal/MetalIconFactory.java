@@ -77,6 +77,7 @@ public class MetalIconFactory implements Serializable
      */
     public CheckBoxMenuItemIcon() 
     {
+      // Nothing to do here.
     }
       
     /**
@@ -144,14 +145,15 @@ public class MetalIconFactory implements Serializable
    * 
    * @see MetalIconFactory#getFileChooserDetailViewIcon()
    */
-  private static class FileChooserDetailViewIcon 
-      implements Icon, Serializable {
+  private static class FileChooserDetailViewIcon implements Icon, Serializable
+  {
     
     /**
      * Creates a new icon.
      */
     public FileChooserDetailViewIcon() 
     {
+      // Nothing to do here.
     }
       
     /**
@@ -223,14 +225,15 @@ public class MetalIconFactory implements Serializable
    * 
    * @see MetalIconFactory#getFileChooserHomeFolderIcon()
    */
-  private static class FileChooserHomeFolderIcon 
-      implements Icon, Serializable {
+  private static class FileChooserHomeFolderIcon implements Icon, Serializable
+  {
         
     /**
      * Creates a new icon.
      */
     public FileChooserHomeFolderIcon() 
     {
+      // Nothing to do here.
     }
 
     /**
@@ -318,6 +321,7 @@ public class MetalIconFactory implements Serializable
      */
     public FileChooserListViewIcon() 
     {
+      // Nothing to do here.
     }
     
     /**
@@ -406,14 +410,14 @@ public class MetalIconFactory implements Serializable
    * 
    * @see MetalIconFactory#getFileChooserNewFolderIcon()
    */
-  private static class FileChooserNewFolderIcon 
-      implements Icon, Serializable 
+  private static class FileChooserNewFolderIcon  implements Icon, Serializable
   {
     /** 
      * Creates a new icon.
      */
     public FileChooserNewFolderIcon() 
     {
+      // Nothing to do here.
     }
     
     /**
@@ -478,8 +482,7 @@ public class MetalIconFactory implements Serializable
    * 
    * @see MetalIconFactory#getFileChooserNewFolderIcon()
    */
-  private static class FileChooserUpFolderIcon 
-    extends FileChooserNewFolderIcon
+  private static class FileChooserUpFolderIcon extends FileChooserNewFolderIcon
     implements Icon, Serializable 
   {
     /**
@@ -487,6 +490,7 @@ public class MetalIconFactory implements Serializable
      */
     public FileChooserUpFolderIcon() 
     {
+      // Nothing to do here.
     }
     
     /**
@@ -740,8 +744,7 @@ public class MetalIconFactory implements Serializable
    *
    * @author Roman Kennke (roman@kennke.org)
    */
-  static class RadioButtonIcon
-    implements Icon, UIResource, Serializable
+  static class RadioButtonIcon implements Icon, UIResource, Serializable
   {
 
     /**
@@ -855,14 +858,14 @@ public class MetalIconFactory implements Serializable
   /**
    * An icon displayed for {@link JRadioButtonMenuItem} components.
    */
-  private static class RadioButtonMenuItemIcon 
-      implements Icon, Serializable 
+  private static class RadioButtonMenuItemIcon implements Icon, Serializable 
   {
     /**
      * Creates a new icon instance.
      */
     public RadioButtonMenuItemIcon() 
     {  
+      // Nothing to do here.
     }
 
     /**
@@ -932,8 +935,7 @@ public class MetalIconFactory implements Serializable
    * The icon used to display the thumb control on a horizontally oriented
    * {@link JSlider} component.
    */
-  private static class HorizontalSliderThumbIcon 
-      implements Icon, Serializable 
+  private static class HorizontalSliderThumbIcon  implements Icon, Serializable
   {
 
     /**
@@ -941,6 +943,7 @@ public class MetalIconFactory implements Serializable
      */
     public HorizontalSliderThumbIcon() 
     {
+      // Nothing to do here.
     }
     
     /**
@@ -1175,6 +1178,7 @@ public class MetalIconFactory implements Serializable
      */
     public InternalFrameDefaultMenuIcon() 
     {
+      // Nothing to do here.
     }
     
     /**
@@ -1348,8 +1352,7 @@ public class MetalIconFactory implements Serializable
    * An icon used for the 'maximize' button in the title frame of a 
    * {@link JInternalFrame}.
    */
-  private static class InternalFrameMaximizeIcon 
-      implements Icon, Serializable 
+  private static class InternalFrameMaximizeIcon implements Icon, Serializable
   {
     
     /**
@@ -1357,6 +1360,7 @@ public class MetalIconFactory implements Serializable
      */
     public InternalFrameMaximizeIcon() 
     {
+      // Nothing to do here.
     }
     
     /**
@@ -1460,8 +1464,7 @@ public class MetalIconFactory implements Serializable
   /**
    * An icon used in the title frame of a {@link JInternalFrame}.
    */
-  private static class InternalFrameMinimizeIcon 
-      implements Icon, Serializable 
+  private static class InternalFrameMinimizeIcon implements Icon, Serializable
   {
   
     /**
@@ -1469,6 +1472,7 @@ public class MetalIconFactory implements Serializable
      */
     public InternalFrameMinimizeIcon() 
     {
+      // Nothing to do here.
     }
     
     /**
@@ -1571,6 +1575,7 @@ public class MetalIconFactory implements Serializable
      */
     public VerticalSliderThumbIcon() 
     {
+      // Nothing to do here.
     }
     
     /**
@@ -1821,6 +1826,7 @@ public class MetalIconFactory implements Serializable
      */
     public TreeFolderIcon() 
     {     
+      // Nothing to do here.
     }
     
     /**
@@ -1855,6 +1861,7 @@ public class MetalIconFactory implements Serializable
      */
     public TreeLeafIcon() 
     {
+      // Nothing to do here.
     }
     
     /**
@@ -1884,8 +1891,7 @@ public class MetalIconFactory implements Serializable
    * 
    * @see MetalIconFactory#getTreeHardDriveIcon()
    */
-  private static class TreeHardDriveIcon 
-      implements Icon, Serializable 
+  private static class TreeHardDriveIcon implements Icon, Serializable
   {
 
     /**
@@ -1893,6 +1899,7 @@ public class MetalIconFactory implements Serializable
      */
     public TreeHardDriveIcon() 
     { 
+      // Nothing to do here.
     }
 
     /**
@@ -1994,8 +2001,7 @@ public class MetalIconFactory implements Serializable
    * 
    * @see MetalIconFactory#getTreeFloppyDriveIcon()
    */
-  private static class TreeFloppyDriveIcon 
-      implements Icon, Serializable 
+  private static class TreeFloppyDriveIcon implements Icon, Serializable
   {
 
     /**
@@ -2003,6 +2009,7 @@ public class MetalIconFactory implements Serializable
      */
     public TreeFloppyDriveIcon() 
     { 
+      // Nothing to do here.
     }
 
     /**
@@ -2078,6 +2085,7 @@ public class MetalIconFactory implements Serializable
      */
     public TreeComputerIcon() 
     { 
+      // Nothing to do here.
     }
 
     /**
@@ -2180,6 +2188,7 @@ public class MetalIconFactory implements Serializable
    */
   public MetalIconFactory() 
   {   
+    // Nothing to do here.
   }
 
   /**

@@ -43,11 +43,8 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.LayoutManager;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.io.Serializable;
-
-import javax.swing.border.Border;
 
 /**
  * ScrollPaneLayout
@@ -64,6 +61,7 @@ public class ScrollPaneLayout
   {
     public UIResource()
     {
+      super();
     }
   }
 
@@ -79,8 +77,9 @@ public class ScrollPaneLayout
   protected int vsbPolicy;
   protected int hsbPolicy;
 
-  public ScrollPaneLayout() {
-		
+  public ScrollPaneLayout()
+  {
+	// Nothing to do here.
   }
 
   public void syncWithScrollPane(JScrollPane scrollPane) {
@@ -255,8 +254,8 @@ public class ScrollPaneLayout
 
   public Dimension preferredLayoutSize(Container parent) 
   {
-    if (parent != null && parent instanceof JScrollPane)
-      {
+    // Sun's implementation simply throws a ClassCastException if
+    // parent is no JScrollPane, so do we.
         JScrollPane sc = (JScrollPane) parent;
         Dimension viewportSize = viewport.getPreferredSize();
         int width = viewportSize.width;
@@ -269,16 +268,15 @@ public class ScrollPaneLayout
           width += rowHead.getPreferredSize().width;
         if (colHead != null && colHead.isVisible())
           height += colHead.getPreferredSize().height;
-        return new Dimension(width, height);
-      }
-    // TODO: Probably throw an exception here. Check this.
-        return new Dimension(0,0);
+    Insets i = sc.getInsets();
+    return new Dimension(width + i.left + i.right,
+                         height + i.left + i.right);
       }
 
   public Dimension minimumLayoutSize(Container parent)
   {
-    if (parent != null && parent instanceof JScrollPane)
-      {
+    // Sun's implementation simply throws a ClassCastException if
+    // parent is no JScrollPane, so do we.
         JScrollPane sc = (JScrollPane) parent;
         Dimension viewportSize = viewport.getMinimumSize();
         int width = viewportSize.width;
@@ -291,10 +289,9 @@ public class ScrollPaneLayout
           width += rowHead.getMinimumSize().width;
         if (colHead != null && colHead.isVisible())
           height += colHead.getMinimumSize().height;
-        return new Dimension(width, height);
-          }
-    // TODO: Probably throw an exception here. Check this.
-        return new Dimension(0,0);
+    Insets i = sc.getInsets();
+    return new Dimension(width + i.left + i.right,
+                         height + i.top + i.bottom);
       }
 
   /**
@@ -320,8 +317,8 @@ public class ScrollPaneLayout
    */
   public void layoutContainer(Container parent)
   {
-    if (parent instanceof JScrollPane)
-      {
+    // Sun's implementation simply throws a ClassCastException if
+    // parent is no JScrollPane, so do we.
         JScrollPane sc = (JScrollPane) parent;
             JViewport viewport = sc.getViewport();
             Dimension viewSize = viewport.getViewSize();
@@ -408,7 +405,6 @@ public class ScrollPaneLayout
             if (lowerRight != null)
               lowerRight.setBounds(new Rectangle(x3, y3, x4-x3, y4-y3));
       }
-  }
 
   /**
    * Returns the bounds of the border around a ScrollPane's viewport.

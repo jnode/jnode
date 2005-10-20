@@ -76,6 +76,7 @@ public class JRootPane extends JComponent implements Accessible
      */
     protected AccessibleJRootPane()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -101,6 +102,7 @@ public class JRootPane extends JComponent implements Accessible
      */
     protected RootLayout()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -111,6 +113,7 @@ public class JRootPane extends JComponent implements Accessible
      */
     public void addLayoutComponent(Component comp, Object constraints)
     {
+      // Nothing to do here.
     }
 
     /**
@@ -121,6 +124,7 @@ public class JRootPane extends JComponent implements Accessible
      */
     public void addLayoutComponent(String name, Component comp)
     {
+      // Nothing to do here.
     }
 
     /**
@@ -154,6 +158,7 @@ public class JRootPane extends JComponent implements Accessible
      */
     public void invalidateLayout(Container target)
     {
+      // Nothing to do here.
     }
 
     /**
@@ -309,6 +314,7 @@ public class JRootPane extends JComponent implements Accessible
      */
     public void removeLayoutComponent(Component comp)
     {
+      // Nothing to do here.
     }
   }
 

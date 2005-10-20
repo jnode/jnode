@@ -110,6 +110,8 @@ public abstract class LookAndFeel
    */
     public void initialize()
     {
+    // We do nothing here. This method is meant to be overridden by
+    // LookAndFeel implementations.
     }
 
   /**
@@ -185,6 +187,7 @@ public abstract class LookAndFeel
    */
     public static void loadKeyBindings(InputMap retMap, Object[] keys)
     {
+    // TODO: Implement this properly.
     }
 
   /**
@@ -256,6 +259,8 @@ public abstract class LookAndFeel
    */
     public void uninitialize()
     {
+    // We do nothing here. This method is meant to be overridden by
+    // LookAndFeel implementations.
     }
 
   /**
@@ -264,5 +269,7 @@ public abstract class LookAndFeel
    */
     public static void uninstallBorder(JComponent c)
     {
+    if (c.getBorder() instanceof UIResource)
+      c.setBorder(null);
     }
 }

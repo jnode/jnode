@@ -142,6 +142,7 @@ public class JViewport extends JComponent implements Accessible
      */
     protected ViewListener()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -398,12 +399,8 @@ public class JViewport extends JComponent implements Accessible
 
   public void setView(Component v)
   {
-    while (getComponentCount() > 0)
-      {
         if (viewListener != null)
           getView().removeComponentListener(viewListener);
-        //remove(0);
-      }
 
     if (v != null)
       {
@@ -414,26 +411,15 @@ public class JViewport extends JComponent implements Accessible
     fireStateChanged();
   }
     revalidate();
-  }
-    
-  public void revalidate()
-  {
-    damaged = true;
-    fireStateChanged();
-    super.revalidate();
+    repaint();
   }
 
   public void reshape(int x, int y, int w, int h)
   {
-    boolean changed = 
-      (x != getX()) 
-      || (y != getY()) 
-      || (w != getWidth())
-      || (h != getHeight());
     if (w != getWidth() || h != getHeight())
       sizeChanged = true;
     super.reshape(x, y, w, h);
-    if (changed)
+    if (sizeChanged)
       {
         damaged = true;
       fireStateChanged();
@@ -456,6 +442,14 @@ public class JViewport extends JComponent implements Accessible
     return insets;
   }
     
+
+  /**
+   * Overridden to return <code>false</code>, so the JViewport's paint method
+   * gets called instead of directly calling the children. This is necessary
+   * in order to get a useful clipping and translation on the children.
+   *
+   * @return <code>false</code>
+   */
   public boolean isOptimizedDrawingEnabled()
   {
     return false;
@@ -561,38 +555,34 @@ public class JViewport extends JComponent implements Accessible
    */
   public void scrollRectToVisible(Rectangle contentRect)
   {
+    Component view = getView();
+    if (view == null)
+      return;    
+      
     Point pos = getViewPosition();
     Rectangle viewBounds = getView().getBounds();
     Rectangle portBounds = getBounds();
     
-    // FIXME: should validate the view if it is not valid, however
-    // this may cause excessive validation when the containment
-    // hierarchy is being created.
+    if (isShowing())
+      getView().validate();
     
-    // if contentRect is larger than the portBounds, center the view
-    if (contentRect.height > portBounds.height || 
-        contentRect.width > portBounds.width)
-      {
-        setViewPosition(new Point(contentRect.x, contentRect.y));
-        return;
-      }
-    
-    // Y-DIRECTION
-    if (contentRect.y < -viewBounds.y)
-      setViewPosition(new Point(pos.x, contentRect.y));
-    else if (contentRect.y + contentRect.height > 
-             -viewBounds.y + portBounds.height)
-      setViewPosition (new Point(pos.x, contentRect.y - 
-                                 (portBounds.height - contentRect.height)));
-    
-    // X-DIRECTION
-    pos = getViewPosition();
-    if (contentRect.x < -viewBounds.x)
-      setViewPosition(new Point(contentRect.x, pos.y));
-    else if (contentRect.x + contentRect.width > 
-             -viewBounds.x + portBounds.width)
-      setViewPosition (new Point(contentRect.x - 
-                                 (portBounds.width - contentRect.width), pos.y));
+    // If the bottom boundary of contentRect is below the port
+    // boundaries, scroll up as necessary.
+    if (contentRect.y + contentRect.height + viewBounds.y > portBounds.height)
+      pos.y = contentRect.y + contentRect.height - viewBounds.height;
+    // If contentRect.y is above the port boundaries, scroll down to
+    // contentRect.y.
+    if (contentRect.y + viewBounds.y < 0)
+      pos.y = contentRect.y;
+    // If the right boundary of contentRect is right from the port
+    // boundaries, scroll left as necessary.
+    if (contentRect.x + contentRect.width + viewBounds.x > portBounds.width)
+      pos.x = contentRect.x + contentRect.width - viewBounds.width;
+    // If contentRect.x is left from the port boundaries, scroll right to
+    // contentRect.x.
+    if (contentRect.x + viewBounds.x < 0)
+      pos.x = contentRect.x;
+    setViewPosition(pos);
   }
 
   /**
@@ -606,6 +596,25 @@ public class JViewport extends JComponent implements Accessible
     if (accessibleContext == null)
       accessibleContext = new AccessibleJViewport();
     return accessibleContext;
+  }
+
+  /**
+   * Forward repaint to parent to make sure only one paint is performed by the
+   * RepaintManager.
+   *
+   * @param tm number of milliseconds to defer the repaint request
+   * @param x the X coordinate of the upper left corner of the dirty area
+   * @param y the Y coordinate of the upper left corner of the dirty area
+   * @param w the width of the dirty area
+   * @param h the height of the dirty area
+   */
+  public void repaint(long tm, int x, int y, int w, int h)
+  {
+    Component parent = getParent();
+    if (parent != null)
+      {
+        parent.repaint(tm, x + getX(), y + getY(), w, h);
+      }
   }
 
   protected void addImpl(Component comp, Object constraints, int index)

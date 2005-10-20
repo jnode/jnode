@@ -72,6 +72,7 @@ public class GlyphView extends View implements TabableView, Cloneable
      */
     public GlyphPainter()
     {
+      // Nothing to do here.
     }
 
     /**

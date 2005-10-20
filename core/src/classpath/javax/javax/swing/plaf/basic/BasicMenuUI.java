@@ -244,6 +244,7 @@ public class BasicMenuUI extends BasicMenuItemUI
 
   protected void setupPostTimer(JMenu menu)
   {
+    // TODO: Implement this properly.
   }
 
   /**
@@ -355,6 +356,7 @@ public class BasicMenuUI extends BasicMenuItemUI
 
     public void mouseMoved(MouseEvent e)
     {
+      // TODO: What should be done here, if anything?
     }
 
     public void mousePressed(MouseEvent e)
@@ -455,6 +457,7 @@ public class BasicMenuUI extends BasicMenuItemUI
       */
     public void propertyChange(PropertyChangeEvent e)
     {
+      // TODO: Implement this properly.
     }
   }
 
@@ -536,6 +539,7 @@ public class BasicMenuUI extends BasicMenuItemUI
      */
     public void menuDragMouseExited(MenuDragMouseEvent e)
     {
+      // TODO: What should be done here, if anything?
     }
 
     /**
@@ -546,6 +550,7 @@ public class BasicMenuUI extends BasicMenuItemUI
      */
     public void menuDragMouseReleased(MenuDragMouseEvent e)
     {
+      // TODO: What should be done here, if anything?
     }
   }
 
@@ -562,6 +567,7 @@ public class BasicMenuUI extends BasicMenuItemUI
      */
     public void menuKeyPressed(MenuKeyEvent e)
     {
+      // TODO: What should be done here, if anything?
     }
 
     /**
@@ -571,6 +577,7 @@ public class BasicMenuUI extends BasicMenuItemUI
      */
     public void menuKeyReleased(MenuKeyEvent e)
     {
+      // TODO: What should be done here, if anything?
     }
 
     /**
@@ -581,6 +588,7 @@ public class BasicMenuUI extends BasicMenuItemUI
      */
     public void menuKeyTyped(MenuKeyEvent e)
     {
+      // TODO: What should be done here, if anything?
     }
   }
 }

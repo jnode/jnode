@@ -68,6 +68,8 @@ public class JToolBar extends JComponent implements SwingConstants, Accessible
 	/**
 	 * AccessibleJToolBar
 	 */
+  // FIXME: This inner class is a complete stub and must be implemented
+  // properly.
   protected class AccessibleJToolBar extends AccessibleJComponent
   {
     /** DOCUMENT ME! */
@@ -78,6 +80,7 @@ public class JToolBar extends JComponent implements SwingConstants, Accessible
 		 */
     protected AccessibleJToolBar()
     {
+      // Nothing to do here.
     }
 
 		/**

@@ -90,6 +90,7 @@ public abstract class JTextComponent extends JComponent
   /**
    * AccessibleJTextComponent
    */
+  // FIXME: This inner class is a complete stub and needs to be implemented.
   public class AccessibleJTextComponent extends AccessibleJComponent
     implements AccessibleText, CaretListener, DocumentListener
   {
@@ -100,6 +101,7 @@ public abstract class JTextComponent extends JComponent
      */
     public AccessibleJTextComponent()
     {
+      // Nothing to do here.
     }
 
     /**

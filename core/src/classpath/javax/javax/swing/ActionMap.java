@@ -80,6 +80,7 @@ public class ActionMap
 	 */
   public ActionMap()
   {
+    // Nothing to do here.
   }
 
 	/**

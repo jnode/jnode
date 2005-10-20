@@ -45,16 +45,12 @@ import java.awt.Font;
  * @author	Andrew Selkirk
  * @version	1.0
  */
-public interface StyledDocument extends Document {
-
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
-
+public interface StyledDocument extends Document
+{
 	/**
 	 * addStyle
 	 * @param nm TODO
-	 * @param rent TODO
+   * @param parent TODO
 	 * @returns Style
 	 */
 	Style addStyle(String nm, Style parent);
@@ -79,8 +75,8 @@ public interface StyledDocument extends Document {
 	 * @param set TODO
 	 * @param replace TODO
 	 */
-	void setCharacterAttributes(int offset, int length,
-		AttributeSet set, boolean replace);
+  void setCharacterAttributes(int offset, int length, AttributeSet set,
+                              boolean replace);
 
 	/**
 	 * setParagraphAttributes
@@ -89,8 +85,8 @@ public interface StyledDocument extends Document {
 	 * @param set TODO
 	 * @param replace TODO
 	 */
-	void setParagraphAttributes(int offset, int length,
-		AttributeSet set, boolean replace);
+  void setParagraphAttributes(int offset, int length, AttributeSet set,
+                              boolean replace);
 
 	/**
 	 * getLogicalStyle
@@ -141,5 +137,4 @@ public interface StyledDocument extends Document {
 	 */
 	Font getFont(AttributeSet set);
 
-
-} // StyledDocument
+}

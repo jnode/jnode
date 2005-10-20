@@ -46,12 +46,8 @@ import java.awt.image.VolatileImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Vector;
 
 /**
  * <p>The repaint manager holds a set of dirty regions, invalid components,
@@ -226,7 +222,7 @@ public class RepaintManager
    * manager. This is merely a hint to clients; the RepaintManager will
    * always return an offscreen buffer when one is requested.
    * 
-   * @see #getDoubleBufferingEnabled
+   * @see #isDoubleBufferingEnabled
    * @see #setDoubleBufferingEnabled
    */
   boolean doubleBufferingEnabled;
@@ -257,7 +253,7 @@ public class RepaintManager
    * components in all windows.  This is package-private to avoid an accessor
    * method.
    *
-   * @see #currentManager
+   * @see #currentManager(JComponent)
    * @see #setCurrentManager
    */
   static RepaintManager globalManager;

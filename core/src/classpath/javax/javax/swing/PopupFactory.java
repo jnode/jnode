@@ -55,8 +55,8 @@ public class PopupFactory
   /**
    * The shared factory object.
    *
-   * @see #getSharedFactory
-   * @see #setSharedFactory
+   * @see #getSharedInstance
+   * @see #setSharedInstance
    */
   private static PopupFactory sharedFactory;
 
@@ -69,6 +69,7 @@ public class PopupFactory
    */
   public PopupFactory()
   {
+    // Nothing to do here.
   }
 
 

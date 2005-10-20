@@ -64,7 +64,8 @@ public abstract class AbstractColorChooserPanel extends JPanel
 	 */
   public AbstractColorChooserPanel()
   {
-	} // AbstractColorChooserPanel()
+    // Nothing to do here.
+  }
 
 	/**
    * This method returns the name displayed in the tab for this chooser panel.

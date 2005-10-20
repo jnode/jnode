@@ -53,6 +53,7 @@ public class BasicViewportUI extends ViewportUI
   }
   protected void uninstallDefaults(JComponent c)
   {
+    // TODO: Implement this properly.
   }
 
   public static ComponentUI createUI(JComponent c)

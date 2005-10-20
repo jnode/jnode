@@ -98,48 +98,6 @@ public class BasicArrowButton extends JButton implements SwingConstants
    */
   transient Color highlight = Color.WHITE;
 
-  /** The border around the ArrowButton. */
-  private transient Border buttonBorder = new Border()
-    {
-      public Insets getBorderInsets(Component c)
-      {
-	return new Insets(2, 2, 2, 2);
-      }
-
-      public boolean isBorderOpaque()
-      {
-	return true;
-      }
-
-      public void paintBorder(Component c, Graphics g, int x, int y, int w,
-                              int h)
-      {
-        Color saved = g.getColor();
-        AbstractButton b = (AbstractButton) c;
-        if (b.getModel().isPressed())
-          {
-            g.setColor(darkShadow);
-            g.drawRect(x, y, x + w - 1, y + h - 1);
-          }
-        else
-          {
-            g.setColor(highlight);
-            g.drawLine(x + 1, y + 1, x + w - 3, y + 1);
-            g.drawLine(x + 1, y + 1, x + 1, y + h - 2);
-
-            g.setColor(shadow);
-            g.drawLine(x + 1, y + h - 2, x + w - 1, y + h - 2);
-            g.drawLine(x + w - 2, y + 1, x + w - 2, y + h - 2);
-
-            g.setColor(darkShadow);
-            g.drawLine(x, y + h - 1, x + w - 1, y + h - 1);
-            g.drawLine(x + w - 1, y, x + w - 1, y + h - 1);
-
-            g.setColor(saved);
-          }
-      }
-    };
-
   /**
    * Creates a new BasicArrowButton object.
    *
@@ -148,7 +106,6 @@ public class BasicArrowButton extends JButton implements SwingConstants
   public BasicArrowButton(int direction)
   {
     super();
-    setBorder(buttonBorder);
     setDirection(direction);
   }
 

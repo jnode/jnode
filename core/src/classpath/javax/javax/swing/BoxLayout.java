@@ -155,6 +155,7 @@ public class BoxLayout implements LayoutManager2, Serializable
    */
   public void addLayoutComponent(String name, Component component)
   {
+    // Nothing to do here.
   }
 
   /**
@@ -164,6 +165,7 @@ public class BoxLayout implements LayoutManager2, Serializable
    */
   public void removeLayoutComponent(Component component)
   {
+    // Nothing to do here.
   }
 
   private boolean isHorizontalIn(Container parent)
@@ -228,7 +230,8 @@ public class BoxLayout implements LayoutManager2, Serializable
       Component[] children = container.getComponents();
       Insets in = container.getInsets();
     for (int i = 0; i < children.length; i++)
-        children[i].setBounds(offsetsX[i] + in.left, offsetsY[i] + in.top, spansX[i], spansY[i]);
+        children[i].setBounds(offsetsX[i] + in.left, offsetsY[i] + in.top,
+                              spansX[i], spansY[i]);
       }
   }
 
@@ -240,6 +243,7 @@ public class BoxLayout implements LayoutManager2, Serializable
    */
   public void addLayoutComponent(Component child, Object constraints)
   {
+    // Nothing to do here.
   }
 
   /**

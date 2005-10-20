@@ -41,9 +41,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Rectangle;
-import java.awt.Shape;
 import java.awt.TexturePaint;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -116,7 +113,7 @@ class MetalUtils
   /**
    * Fills a rectangle with the typical Metal pattern using Java2D.
    *
-   * @param g the <code>Graphics2D</code> context to use
+   * @param g2d the <code>Graphics2D</code> context to use
    * @param x the X coordinate of the upper left corner of the rectangle to
    *     fill
    * @param y the Y coordinate of the upper left corner of the rectangle to

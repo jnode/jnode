@@ -81,6 +81,7 @@ public class BasicDesktopPaneUI extends DesktopPaneUI
 	    }
 	  catch (PropertyVetoException pve)
 	    {
+              // We do nothing if the attempts has been vetoed.
 	    }
         }
     }
@@ -119,6 +120,7 @@ public class BasicDesktopPaneUI extends DesktopPaneUI
 	    }
 	  catch (PropertyVetoException pve)
 	    {
+              // We do nothing if the attempts has been vetoed.
 	    }
         }
     }
@@ -157,6 +159,7 @@ public class BasicDesktopPaneUI extends DesktopPaneUI
 	    }
 	  catch (PropertyVetoException pve)
 	    {
+              // We do nothing if the attempt has been vetoed.
 	    }
         }
     }
@@ -246,6 +249,7 @@ public class BasicDesktopPaneUI extends DesktopPaneUI
 	    }
 	  catch (PropertyVetoException pve)
 	    {
+              // We do nothing if the attempt has been vetoed.
 	    }
         }
     }
@@ -305,6 +309,7 @@ public class BasicDesktopPaneUI extends DesktopPaneUI
    */
   public BasicDesktopPaneUI()
   {
+    // Nothing to do here.
   }
 
   /**

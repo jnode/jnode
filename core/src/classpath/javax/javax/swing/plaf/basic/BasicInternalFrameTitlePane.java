@@ -106,6 +106,7 @@ public class BasicInternalFrameTitlePane extends JComponent
 	    }
 	  catch (PropertyVetoException pve)
 	    {
+              // We do nothing if the attempt has been vetoed.
 	    }
         }
     }
@@ -144,6 +145,7 @@ public class BasicInternalFrameTitlePane extends JComponent
 	    }
 	  catch (PropertyVetoException pve)
 	    {
+              // We do nothing if the attempt has been vetoed.
 	    }
         }
     }
@@ -182,6 +184,7 @@ public class BasicInternalFrameTitlePane extends JComponent
         }
       catch (PropertyVetoException pve)
         {
+          // We do nothing if the attempt has been vetoed.
         }
     }
   }
@@ -246,6 +249,7 @@ public class BasicInternalFrameTitlePane extends JComponent
 	    }
 	  catch (PropertyVetoException pve)
 	    {
+              // We do nothing if the attempt has been vetoed.
 	    }
         }
     }
@@ -481,6 +485,7 @@ public class BasicInternalFrameTitlePane extends JComponent
      */
     public void removeLayoutComponent(Component c)
     {
+      // Nothing to do here.
     }
   }
 

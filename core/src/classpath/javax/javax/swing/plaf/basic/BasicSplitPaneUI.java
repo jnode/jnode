@@ -940,6 +940,7 @@ public class BasicSplitPaneUI extends SplitPaneUI
    */
   public BasicSplitPaneUI()
   {
+    // Nothing to do here.
   }
 
   /**
@@ -1302,18 +1303,23 @@ public class BasicSplitPaneUI extends SplitPaneUI
     location = validLocation(location);
     Container p = jc.getParent();
     Dimension rightPrefSize = jc.getRightComponent().getPreferredSize();
-    if (getOrientation() == 0 && location > jc.getSize().height)
+    Dimension size = jc.getSize();
+    // check if the size has been set for the splitpane
+    if (size.width == 0 && size.height == 0)
+      size = jc.getPreferredSize();
+    
+    if (getOrientation() == 0 && location > size.height)
       {
-        location = jc.getSize().height;
+        location = size.height;
         while (p != null)
           {
             p.setSize(p.getWidth(), p.getHeight() + rightPrefSize.height);
             p = p.getParent();
           }
       }
-    else if (location > jc.getSize().width)
+    else if (location > size.width)
       {
-        location = jc.getSize().width;
+        location = size.width;
         while (p != null)
           {
             p.setSize(p.getWidth() + rightPrefSize.width, p.getHeight());
@@ -1407,6 +1413,7 @@ public class BasicSplitPaneUI extends SplitPaneUI
    */
   public void paint(Graphics g, JComponent jc)
   {
+    // TODO: What should be done here?
   }
 
   /**

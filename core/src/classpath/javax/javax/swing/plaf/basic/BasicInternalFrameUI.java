@@ -445,6 +445,7 @@ public class BasicInternalFrameUI extends InternalFrameUI
      */
     public void addLayoutComponent(String name, Component c)
     {
+      // Nothing to do here.
     }
 
     /**
@@ -634,6 +635,7 @@ public class BasicInternalFrameUI extends InternalFrameUI
      */
     public void removeLayoutComponent(Component c)
     {
+      // Nothing to do here.
     }
   }
 
@@ -1135,6 +1137,7 @@ public class BasicInternalFrameUI extends InternalFrameUI
    */
   public BasicInternalFrameUI(JInternalFrame b)
   {
+    // Nothing to do here.
   }
 
   /**

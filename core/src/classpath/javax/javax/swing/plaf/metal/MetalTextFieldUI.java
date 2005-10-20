@@ -38,14 +38,11 @@ exception statement from your version. */
 
 package javax.swing.plaf.metal;
 
-import java.util.HashMap;
-
 import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicTextFieldUI;
 
-public class MetalTextFieldUI
-  extends BasicTextFieldUI
+public class MetalTextFieldUI extends BasicTextFieldUI
 {
   /**
    * Constructs a new instance of MetalTextFieldUI.

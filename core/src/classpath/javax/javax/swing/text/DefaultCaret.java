@@ -344,6 +344,7 @@ public class DefaultCaret extends Rectangle
    */
   public void mouseExited(MouseEvent event)
   {
+    // TODO: What to do here, if anything?
   }
 
   /**
@@ -380,6 +381,7 @@ public class DefaultCaret extends Rectangle
    */
   public void focusGained(FocusEvent event)
   {
+    // TODO: Implement this properly.
   }
 
   /**
@@ -389,6 +391,7 @@ public class DefaultCaret extends Rectangle
    */
   public void focusLost(FocusEvent event)
   {
+    // TODO: Implement this properly.
   }
 
   /**

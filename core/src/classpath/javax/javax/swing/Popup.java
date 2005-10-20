@@ -89,6 +89,7 @@ public class Popup
    */
   protected Popup()
   {
+    // Nothing to do here.
   }
 
 

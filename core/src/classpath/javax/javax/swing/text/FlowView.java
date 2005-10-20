@@ -72,6 +72,7 @@ public abstract class FlowView extends BoxView
      */
     public FlowStrategy()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -138,7 +139,7 @@ public abstract class FlowView extends BoxView
      * Performs the layout for the whole view. By default this rebuilds
      * all the physical views from the logical views of the managed FlowView.
      *
-     * This is called by {@link FlowLayout#layout} to update the layout of
+     * This is called by {@link FlowView#layout} to update the layout of
      * the view.
      *
      * @param fv the flow view for which we perform the layout
@@ -211,7 +212,7 @@ public abstract class FlowView extends BoxView
      * not fit in the available span and also cannot be broken down).
      *
      * @param fv the flow view
-     * @param startOffset the start offset for the view to be created
+     * @param offset the start offset for the view to be created
      * @param spanLeft the available span
      * @param rowIndex the index of the row
      *
@@ -500,7 +501,7 @@ public abstract class FlowView extends BoxView
    * The real children are created at layout time and each represent one
    * row.
    *
-   * This method is called by {@link #setParent} in order to initialize
+   * This method is called by {@link View#setParent} in order to initialize
    * the view.
    *
    * @param vf the view factory to use for creating the child views
@@ -524,7 +525,7 @@ public abstract class FlowView extends BoxView
 
   /**
    * Performs the layout of this view. If the span along the flow axis changed,
-   * this first calls {@link FlowStrategy.layout} in order to rebuild the
+   * this first calls {@link FlowStrategy#layout} in order to rebuild the
    * rows of this view. Then the superclass's behaviour is called to arrange
    * the rows within the box.
    *
