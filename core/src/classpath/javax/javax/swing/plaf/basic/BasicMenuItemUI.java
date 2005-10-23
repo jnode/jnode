@@ -50,10 +50,13 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 
 import javax.swing.ButtonModel;
 import javax.swing.Icon;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -163,6 +166,11 @@ public class BasicMenuItemUI extends MenuItemUI
   private PropertyChangeListener propertyChangeListener;
 
   /**
+   * ItemListener to listen for item changes in the menu item
+   */
+  private ItemListener itemListener;
+
+  /**
    * Number of spaces between accelerator and menu item's label.
    */
   private int defaultAcceleratorLabelGap = 10;
@@ -181,6 +189,7 @@ public class BasicMenuItemUI extends MenuItemUI
     menuDragMouseListener = createMenuDragMouseListener(menuItem);
     menuKeyListener = createMenuKeyListener(menuItem);
     propertyChangeListener = new PropertyChangeHandler();
+    itemListener = new ItemHandler();
   }
 
   /**
@@ -431,6 +440,7 @@ public class BasicMenuItemUI extends MenuItemUI
     menuItem.addMenuDragMouseListener(menuDragMouseListener);
     menuItem.addMenuKeyListener(menuKeyListener);
     menuItem.addPropertyChangeListener(propertyChangeListener);
+    menuItem.addItemListener(itemListener);
   }
 
   /**
@@ -719,6 +729,7 @@ public class BasicMenuItemUI extends MenuItemUI
     menuItem.removeMenuDragMouseListener(menuDragMouseListener);
     menuItem.removeMenuKeyListener(menuKeyListener);
     menuItem.removePropertyChangeListener(propertyChangeListener);
+    menuItem.removeItemListener(itemListener);
   }
 
   /**
@@ -949,7 +960,7 @@ public class BasicMenuItemUI extends MenuItemUI
   /**
    * This class handles mouse dragged events.
    */
-  protected class MenuDragMouseHandler implements MenuDragMouseListener
+  private class MenuDragMouseHandler implements MenuDragMouseListener
   {
     /**
      * Tbis method is invoked when mouse is dragged over the menu item.
@@ -1010,7 +1021,7 @@ public class BasicMenuItemUI extends MenuItemUI
    * This class handles key events occuring when menu item is visible on the
    * screen.
    */
-  protected class MenuKeyHandler implements MenuKeyListener
+  private class MenuKeyHandler implements MenuKeyListener
   {
     /**
      * This method is invoked when key has been pressed
@@ -1051,7 +1062,7 @@ public class BasicMenuItemUI extends MenuItemUI
    * Helper class that listens for changes to the properties of the {@link
    * JMenuItem}.
    */
-  protected class PropertyChangeHandler implements PropertyChangeListener
+  private class PropertyChangeHandler implements PropertyChangeListener
   {
     /**
      * This method is called when one of the menu item's properties change.
@@ -1060,6 +1071,31 @@ public class BasicMenuItemUI extends MenuItemUI
      */
     public void propertyChange(PropertyChangeEvent evt)
     {
+      menuItem.revalidate();
+      menuItem.repaint();
+    }
+  }
+  
+  /**
+   * Helper class that listens for item changes to the properties of the {@link
+   * JMenuItem}.
+   */
+  private class ItemHandler implements ItemListener
+  {
+    /**
+     * This method is called when one of the menu item changes.
+     *
+     * @param evt A {@link ItemEvent}.
+     */
+    public void itemStateChanged(ItemEvent evt)
+    {
+      boolean state = false;
+      if (menuItem instanceof JCheckBoxMenuItem)
+        {
+          if (evt.getStateChange() == ItemEvent.SELECTED)
+            state = true;
+          ((JCheckBoxMenuItem) menuItem).setState(state);
+        }
       menuItem.revalidate();
       menuItem.repaint();
     }

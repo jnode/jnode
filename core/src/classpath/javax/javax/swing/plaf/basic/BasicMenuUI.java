@@ -422,10 +422,13 @@ public class BasicMenuUI extends BasicMenuItemUI
     public void menuDeselected(MenuEvent e)
     {
       JMenu menu = (JMenu) menuItem;
+      if (menu.getParent() != null)
+        {
       if (menu.isTopLevelMenu())
 	((JMenuBar) menu.getParent()).getSelectionModel().clearSelection();
       else
 	((JPopupMenu) menu.getParent()).getSelectionModel().clearSelection();
+    }
     }
 
     /**

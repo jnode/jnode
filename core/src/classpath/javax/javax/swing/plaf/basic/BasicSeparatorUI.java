@@ -55,27 +55,6 @@ import javax.swing.plaf.SeparatorUI;
  */
 public class BasicSeparatorUI extends SeparatorUI
 {
-  /**
-   * The standard minimum size.
-   */
-  static final Dimension minSize = new Dimension(0, 0);
-
-  /**
-   * The standard horizontal preferred size.
-   */
-  static final Dimension horizontalPrefSize = new Dimension(0, 2);
-
-  /**
-   * The standard vertical preferred size.
-   */
-  static final Dimension verticalPrefSize = new Dimension(2, 0);
-
-  /**
-   * The standard maxnimum size.
-   */
-  static final Dimension maxSize = new Dimension(Short.MAX_VALUE,
-                                                 Short.MAX_VALUE);
-
   /** The shadow color. */
   protected Color shadow;
 
@@ -234,12 +213,12 @@ public class BasicSeparatorUI extends SeparatorUI
    */
   public Dimension getPreferredSize(JComponent c)
   {
-    Dimension pref = verticalPrefSize;
+    Dimension pref = new Dimension(2, 0);
     if (c instanceof JSeparator)
       {
 	JSeparator s = (JSeparator) c;
 	if (s.getOrientation() == JSeparator.HORIZONTAL)
-          pref = horizontalPrefSize;
+          pref = new Dimension(0, 2);
       }
     return pref;
   }
@@ -254,7 +233,7 @@ public class BasicSeparatorUI extends SeparatorUI
    */
   public Dimension getMinimumSize(JComponent c)
   {
-    return minSize;
+    return new Dimension(0, 0);
   }
 
   /**
@@ -267,6 +246,7 @@ public class BasicSeparatorUI extends SeparatorUI
    */
   public Dimension getMaximumSize(JComponent c)
   {
-    return maxSize;
+    return new Dimension(Short.MAX_VALUE,
+                         Short.MAX_VALUE);
   }
 }

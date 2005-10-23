@@ -179,9 +179,9 @@ public class MetalRadioButtonUI
   protected void paintFocus(Graphics g, Rectangle t, Dimension d)
   {
     g.setColor(focusColor);
-    g.drawRect(t.x, t.y, t.width, t.height);
-    // FIXME: we seem to be drawing too tight a rectangle here, perhaps there
-    // is some padding to do somewhere???
+    // minus 2 because of line thickness. Prevents border
+    // from being cutoff.
+    g.drawRect(t.x, t.y, t.width - 2, t.height - 2);
   }
   
 }
