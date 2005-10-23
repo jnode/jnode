@@ -931,36 +931,6 @@ public class BasicListUI extends ListUI
     list.removePropertyChangeListener(propertyChangeListener);
   }
 
-  private int convertModifiers(int mod)
-  {
-    if ((mod & KeyEvent.SHIFT_DOWN_MASK) != 0)
-      {
-        mod |= KeyEvent.SHIFT_MASK;
-        mod &= ~KeyEvent.SHIFT_DOWN_MASK;
-      }
-    if ((mod & KeyEvent.CTRL_DOWN_MASK) != 0)
-      {
-        mod |= KeyEvent.CTRL_MASK;
-        mod &= ~KeyEvent.CTRL_DOWN_MASK;
-      }
-    if ((mod & KeyEvent.META_DOWN_MASK) != 0)
-      {
-        mod |= KeyEvent.META_MASK;
-        mod &= ~KeyEvent.META_DOWN_MASK;
-      }
-    if ((mod & KeyEvent.ALT_DOWN_MASK) != 0)
-      {
-        mod |= KeyEvent.ALT_MASK;
-        mod &= ~KeyEvent.ALT_DOWN_MASK;
-      }
-    if ((mod & KeyEvent.ALT_GRAPH_DOWN_MASK) != 0)
-      {
-        mod |= KeyEvent.ALT_GRAPH_MASK;
-        mod &= ~KeyEvent.ALT_GRAPH_DOWN_MASK;
-      }
-    return mod;
-  }
-  
   /**
    * Installs keyboard actions for this UI in the {@link JList}.
    */
@@ -974,24 +944,19 @@ public class BasicListUI extends ListUI
     action = new ListAction();
     Object keys[] = focusInputMap.allKeys();
     // Register key bindings in the UI InputMap-ActionMap pair
-    // Note that we register key bindings with both the old and new modifier
-    // masks: InputEvent.SHIFT_MASK and InputEvent.SHIFT_DOWN_MASK and so on.
     for (int i = 0; i < keys.length; i++)
       {
-        parentInputMap.put(KeyStroke.getKeyStroke
-                           (((KeyStroke)keys[i]).getKeyCode(), convertModifiers
-                            (((KeyStroke)keys[i]).getModifiers())),
-                            (String)focusInputMap.get((KeyStroke)keys[i]));
+        KeyStroke stroke = (KeyStroke)keys[i];
+        String actionString = (String) focusInputMap.get(stroke);
+        parentInputMap.put(KeyStroke.getKeyStroke(stroke.getKeyCode(),
+                                                  stroke.getModifiers()),
+                           actionString);
 
-        parentInputMap.put(KeyStroke.getKeyStroke
-                           (((KeyStroke)keys[i]).getKeyCode(), 
-                            ((KeyStroke)keys[i]).getModifiers()),
-                            (String)focusInputMap.get((KeyStroke)keys[i]));
-
-        parentActionMap.put
-        ((String)focusInputMap.get((KeyStroke)keys[i]), new ActionListenerProxy
-         (action, (String)focusInputMap.get((KeyStroke)keys[i])));
+        parentActionMap.put (actionString, 
+                             new ActionListenerProxy(action, actionString));
       }
+    // Register the new InputMap-ActionMap as the parents of the list's
+    // InputMap and ActionMap
     parentInputMap.setParent(list.getInputMap().getParent());
     parentActionMap.setParent(list.getActionMap().getParent());
     list.getInputMap().setParent(parentInputMap);

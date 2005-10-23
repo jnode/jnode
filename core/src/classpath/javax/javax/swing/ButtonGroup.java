@@ -90,6 +90,8 @@ public class ButtonGroup implements Serializable
     public void add(AbstractButton b) 
     {
 	b.getModel().setGroup(this);
+    if (b.isSelected())
+      sel = b.getModel();
     buttons.addElement(b);
     }
     

@@ -565,7 +565,13 @@ public class BoxView
     SizeRequirements[] childReqs = getChildRequirements(axis);
     // Calculate the spans and offsets using the SizeRequirements uility
     // methods.
-    SizeRequirements.calculateAlignedPositions(targetSpan, null, childReqs,
+    // TODO: This might be an opportunity for performance optimization. Here
+    // we could use a cached instance of SizeRequirements instead of passing
+    // null to baselineRequirements. However, this would involve rewriting
+    // the baselineRequirements() method to not use the SizeRequirements
+    // utility method, since they cannot reuse a cached instance.
+    SizeRequirements total = baselineRequirements(axis, null);
+    SizeRequirements.calculateAlignedPositions(targetSpan, total, childReqs,
                                                offsets, spans);
     validateLayout(axis);
   }

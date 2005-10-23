@@ -334,36 +334,6 @@ public class BasicTableUI extends TableUI
     rendererPane = new CellRendererPane();
   }
 
-  private int convertModifiers(int mod)
-  {
-    if ((mod & KeyEvent.SHIFT_DOWN_MASK) != 0)
-      {
-        mod |= KeyEvent.SHIFT_MASK;
-        mod &= ~KeyEvent.SHIFT_DOWN_MASK;
-      }
-    if ((mod & KeyEvent.CTRL_DOWN_MASK) != 0)
-      {
-        mod |= KeyEvent.CTRL_MASK;
-        mod &= ~KeyEvent.CTRL_DOWN_MASK;
-      }
-    if ((mod & KeyEvent.META_DOWN_MASK) != 0)
-      {
-        mod |= KeyEvent.META_MASK;
-        mod &= ~KeyEvent.META_DOWN_MASK;
-      }
-    if ((mod & KeyEvent.ALT_DOWN_MASK) != 0)
-      {
-        mod |= KeyEvent.ALT_MASK;
-        mod &= ~KeyEvent.ALT_DOWN_MASK;
-      }
-    if ((mod & KeyEvent.ALT_GRAPH_DOWN_MASK) != 0)
-      {
-        mod |= KeyEvent.ALT_GRAPH_MASK;
-        mod &= ~KeyEvent.ALT_GRAPH_DOWN_MASK;
-      }
-    return mod;
-  }
-
   protected void installKeyboardActions() 
   {
     UIDefaults defaults = UIManager.getLookAndFeelDefaults();
@@ -374,23 +344,17 @@ public class BasicTableUI extends TableUI
     action = new TableAction();
     Object keys[] = ancestorMap.allKeys();
     // Register key bindings in the UI InputMap-ActionMap pair
-    // Note that we register key bindings with both the old and new modifier
-    // masks: InputEvent.SHIFT_MASK and InputEvent.SHIFT_DOWN_MASK and so on.
     for (int i = 0; i < keys.length; i++)
       {
-        parentInputMap.put(KeyStroke.getKeyStroke
-                      (((KeyStroke)keys[i]).getKeyCode(), convertModifiers
-                       (((KeyStroke)keys[i]).getModifiers())),
-                           (String)ancestorMap.get((KeyStroke)keys[i]));
+        KeyStroke stroke = (KeyStroke)keys[i];
+        String actionString = (String) ancestorMap.get(stroke);
 
-        parentInputMap.put(KeyStroke.getKeyStroke
-                      (((KeyStroke)keys[i]).getKeyCode(), 
-                       ((KeyStroke)keys[i]).getModifiers()),
-                           (String)ancestorMap.get((KeyStroke)keys[i]));
+        parentInputMap.put(KeyStroke.getKeyStroke(stroke.getKeyCode(),
+                                                  stroke.getModifiers()),
+                           actionString);
 
-        parentActionMap.put
-          ((String)ancestorMap.get((KeyStroke)keys[i]), new ActionListenerProxy
-           (action, (String)ancestorMap.get((KeyStroke)keys[i])));
+        parentActionMap.put (actionString, 
+                             new ActionListenerProxy (action, actionString));
 
       }
     // Set the UI InputMap-ActionMap pair to be the parents of the

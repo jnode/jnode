@@ -174,7 +174,26 @@ public class JToggleButton extends AbstractButton implements Accessible
                                               ActionEvent.ACTION_PERFORMED,
                                               actionCommand));
         }
+    }
 
+      /**
+       * Checks if the button is selected.
+       * 
+       * @returns true if the button is selected
+       */
+      public boolean isSelected()
+      {
+        return super.isSelected();
+      }
+      
+      /**
+       * Sets the selected state of the button.
+       * 
+       * @param b true if button is selected
+       */
+      public void setSelected(boolean b)
+      {
+        super.setSelected(b);
     }
   }
 
