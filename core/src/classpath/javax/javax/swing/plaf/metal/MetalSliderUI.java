@@ -149,11 +149,11 @@ public class MetalSliderUI extends BasicSliderUI
   }
 
   /**
-   * Returns an instance of MetalSliderUI.
+   * Returns a new instance of <code>MetalSliderUI</code>.
    *
    * @param component the component (ignored).
    *
-   * @return an instance of MetalSliderUI
+   * @return A new instance of <code>MetalSliderUI</code>.
    */
   public static ComponentUI createUI(JComponent component)
   {

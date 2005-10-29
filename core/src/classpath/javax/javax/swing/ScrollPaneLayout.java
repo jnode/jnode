@@ -258,11 +258,18 @@ public class ScrollPaneLayout
     // parent is no JScrollPane, so do we.
         JScrollPane sc = (JScrollPane) parent;
         Dimension viewportSize = viewport.getPreferredSize();
+    Dimension viewSize = viewport.getViewSize();
         int width = viewportSize.width;
         int height = viewportSize.height;
-        if (hsb != null && hsb.isVisible())
+
+    // horizontal scrollbar needed if the view's preferred width
+    // is larger than the viewport's preferred width
+    if (hsb != null && viewSize.width > viewportSize.width)
           height += hsb.getPreferredSize().height;
-        if (vsb != null && vsb.isVisible())
+
+    // vertical scrollbar needed if the view's preferred height
+    // is larger than the viewport's preferred height
+    if (vsb != null && viewSize.height > viewportSize.height)
           width += vsb.getPreferredSize().width;
         if (rowHead != null && rowHead.isVisible())
           width += rowHead.getPreferredSize().width;

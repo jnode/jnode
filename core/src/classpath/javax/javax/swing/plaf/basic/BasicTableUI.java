@@ -52,10 +52,11 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
 import javax.swing.CellRendererPane;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.InputMap;
@@ -94,11 +95,13 @@ public class BasicTableUI extends TableUI
   /** The normal cell border. */
   Border cellBorder;
 
-  /** The cell border for selected/highlighted cells. */
-  Border highlightCellBorder;
-
   /** The action bound to KeyStrokes. */
   TableAction action;
+
+  /**
+   * Listens for changes to the tables properties.
+   */
+  private PropertyChangeListener propertyChangeListener;
 
   /**
    * Handles key events for the JTable. Key events should be handled through
@@ -198,8 +201,11 @@ public class BasicTableUI extends TableUI
 
     public void mouseDragged(MouseEvent e) 
     {
+      if (table.isEnabled())
+        {
       curr = new Point(e.getX(), e.getY());
       updateSelection(e.isControlDown());      
+    }
     }
 
     public void mouseEntered(MouseEvent e) 
@@ -219,6 +225,8 @@ public class BasicTableUI extends TableUI
 
     public void mousePressed(MouseEvent e) 
     {
+      if (table.isEnabled())
+        {
       ListSelectionModel rowModel = table.getSelectionModel();
       ListSelectionModel colModel = table.getColumnModel().getSelectionModel();
       int rowLead = rowModel.getLeadSelectionIndex();
@@ -246,10 +254,65 @@ public class BasicTableUI extends TableUI
         if (table.isEditing())
           table.editingStopped(new ChangeEvent(e));
     }
+    }
+
     public void mouseReleased(MouseEvent e) 
     {
+      if (table.isEnabled())
+        {
       begin = null;
       curr = null;
+    }
+  }
+  }
+
+  /**
+   * Listens for changes to the model property of the JTable and adjusts some
+   * settings.
+   *
+   * @author Roman Kennke (kennke@aicas.com)
+   */
+  private class PropertyChangeHandler implements PropertyChangeListener
+  {
+    /**
+     * Receives notification if one of the JTable's properties changes.
+     *
+     * @param ev the property change event
+     */
+    public void propertyChange(PropertyChangeEvent ev)
+    {
+      String propName = ev.getPropertyName();
+      if (propName.equals("model"))
+        {
+          ListSelectionModel rowSel = table.getSelectionModel();
+          rowSel.clearSelection();
+          ListSelectionModel colSel = table.getColumnModel().getSelectionModel();
+          colSel.clearSelection();
+          TableModel model = table.getModel();
+
+          // Adjust lead and anchor selection indices of the row and column
+          // selection models.
+          if (model.getRowCount() > 0)
+            {
+              rowSel.setAnchorSelectionIndex(0);
+              rowSel.setLeadSelectionIndex(0);
+            }
+          else
+            {
+              rowSel.setAnchorSelectionIndex(-1);
+              rowSel.setLeadSelectionIndex(-1);
+            }
+          if (model.getColumnCount() > 0)
+            {
+              colSel.setAnchorSelectionIndex(0);
+              colSel.setLeadSelectionIndex(0);
+            }
+          else
+            {
+              colSel.setAnchorSelectionIndex(-1);
+              colSel.setLeadSelectionIndex(-1);
+            }
+        }
     }
   }
 
@@ -328,9 +391,6 @@ public class BasicTableUI extends TableUI
     table.setSelectionForeground(UIManager.getColor("Table.selectionForeground"));
     table.setSelectionBackground(UIManager.getColor("Table.selectionBackground"));
     table.setOpaque(true);
-
-    highlightCellBorder = UIManager.getBorder("Table.focusCellHighlightBorder");
-    cellBorder = BorderFactory.createEmptyBorder(1, 1, 1, 1);
     rendererPane = new CellRendererPane();
   }
 
@@ -1060,6 +1120,9 @@ public class BasicTableUI extends TableUI
       mouseInputListener = createMouseInputListener();
     table.addMouseListener(mouseInputListener);    
     table.addMouseMotionListener(mouseInputListener);
+    if (propertyChangeListener == null)
+      propertyChangeListener = new PropertyChangeHandler();
+    table.addPropertyChangeListener(propertyChangeListener);
   }
 
   protected void uninstallDefaults() 
@@ -1093,6 +1156,8 @@ public class BasicTableUI extends TableUI
     table.removeKeyListener(keyListener);
     table.removeMouseListener(mouseInputListener);    
     table.removeMouseMotionListener(mouseInputListener);
+    table.removePropertyChangeListener(propertyChangeListener);
+    propertyChangeListener = null;
   }
 
   public void installUI(JComponent comp) 
@@ -1128,20 +1193,27 @@ public class BasicTableUI extends TableUI
                  TableCellRenderer rend, TableModel data,
                  int rowLead, int colLead)
   {
-    boolean isSel = table.isCellSelected(row, col);
-    boolean hasFocus = (table.getSelectionModel().getLeadSelectionIndex() == row) && table.hasFocus();
+    boolean rowSelAllowed = table.getRowSelectionAllowed();
+    boolean colSelAllowed = table.getColumnSelectionAllowed();
+    boolean isSel = false;
+    if (rowSelAllowed && colSelAllowed || !rowSelAllowed && !colSelAllowed)
+      isSel = table.isCellSelected(row, col);
+    else
+      isSel = table.isRowSelected(row) && table.getRowSelectionAllowed()
+           || table.isColumnSelected(col) && table.getColumnSelectionAllowed();
+
+    // Determine the focused cell. The focused cell is the cell at the
+    // leadSelectionIndices of the row and column selection model.
+    ListSelectionModel rowSel = table.getSelectionModel();
+    ListSelectionModel colSel = table.getColumnModel().getSelectionModel();
+    boolean hasFocus = table.hasFocus() && table.isEnabled()
+                       && rowSel.getLeadSelectionIndex() == row
+                       && colSel.getLeadSelectionIndex() == col;
+
     Component comp = rend.getTableCellRendererComponent(table,
                                                        data.getValueAt(row, col),
                                                        isSel, hasFocus, row, col);
     
-    // If the cell is the lead selection then highlight its border
-    if (table.getSelectionModel().getLeadSelectionIndex() == row
-        && table.getColumnModel().getSelectionModel().
-        getLeadSelectionIndex() == col)
-      ((JComponent) comp).setBorder(highlightCellBorder);
-    else
-      ((JComponent) comp).setBorder(cellBorder);   
-      
     rendererPane.paintComponent(g, comp, table, bounds);
     
     // FIXME: this is manual painting of the Caret, why doesn't the 
@@ -1182,18 +1254,17 @@ public class BasicTableUI extends TableUI
         y = y0;
         TableColumn col = cols.getColumn(c);
         int width = col.getWidth();
-
+        int halfGapWidth = gap.width / 2;
+        int halfGapHeight = gap.height / 2;
         for (int r = 0; r < nrows && y < ymax; ++r)
           {
-            Rectangle bounds = new Rectangle(x, y, width, height);
+            Rectangle bounds = new Rectangle(x + halfGapWidth,
+                                             y + halfGapHeight + 1,
+                                             width - gap.width + 1,
+                                             height - gap.height);
               if (bounds.intersects(clip))
               {
-                paintCell(
-                          gfx,
-                          r,
-                          c,
-                          bounds,
-                          table.getCellRenderer(r, c),
+                paintCell(gfx, r, c, bounds, table.getCellRenderer(r, c),
                           table.getModel(),
                           table.getSelectionModel().getLeadSelectionIndex(),
                           table.getColumnModel().getSelectionModel().getLeadSelectionIndex());
@@ -1219,7 +1290,7 @@ public class BasicTableUI extends TableUI
         for (int c = 0; c < ncols && x < xmax; ++c)
           {
             x += cols.getColumn(c).getWidth();
-            gfx.drawLine(x - gap.width, y0, x - gap.width, ymax);
+            gfx.drawLine(x, y0, x, ymax);
             paintedLine = true;
           }
         gfx.setColor(save);

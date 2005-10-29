@@ -238,6 +238,19 @@ public class DefaultListSelectionModel implements Cloneable,
    */
   public void setLeadSelectionIndex(int leadIndex)
   {
+    // Only set the lead selection index to < 0 if anchorSelectionIndex < 0.
+    if (leadIndex < 0)
+      {
+        if (anchorSelectionIndex < 0)
+          leadSelectionIndex = -1;
+        else
+          return;
+      }
+
+    // Only touch the lead selection index if the anchor is >= 0.
+    if (anchorSelectionIndex < 0)
+      return;
+
     if (selectionMode == SINGLE_SELECTION)
       setSelectionInterval (leadIndex, leadIndex);
     

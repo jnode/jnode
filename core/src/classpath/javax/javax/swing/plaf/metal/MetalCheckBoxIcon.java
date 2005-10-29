@@ -47,8 +47,7 @@ import javax.swing.JCheckBox;
 import javax.swing.plaf.UIResource;
 
 /**
- * An {@link Icon} implementation for {@link JCheckBox}es in the
- * Metal Look &amp; Feel.
+ * An {@link Icon} used by the {@link MetalCheckBoxUI} class.
  *
  * @author Roman Kennke (roman@kennke.org)
  */

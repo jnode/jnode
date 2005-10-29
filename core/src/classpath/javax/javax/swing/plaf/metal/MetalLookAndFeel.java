@@ -1016,6 +1016,7 @@ public class MetalLookAndFeel extends BasicLookAndFeel
       "ScrollBar.thumbShadow", getPrimaryControlDarkShadow(),
       "ScrollBar.track", getControl(),
       "ScrollBar.trackHighlight", getControlDarkShadow(),
+      "ScrollBar.width", new Integer(17),
 
       "ScrollPane.background", getControl(),
       "ScrollPane.border", new MetalBorders.ScrollPaneBorder(),

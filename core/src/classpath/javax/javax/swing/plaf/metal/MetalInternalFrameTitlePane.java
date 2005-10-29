@@ -61,9 +61,10 @@ import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 
 
 /**
- * The title pane for a {@link JInternalFrame}.  This can be displayed in two
- * styles: one for regular internal frames, and the other for "palette" style
- * internal frames.
+ * The title pane for a {@link JInternalFrame} (see 
+ * {@link MetalInternalFrameUI#createNorthPane(JInternalFrame)}).  This can 
+ * be displayed in two styles: one for regular internal frames, and the other 
+ * for "palette" style internal frames.
  */
 public class MetalInternalFrameTitlePane extends BasicInternalFrameTitlePane 
 {
@@ -86,7 +87,7 @@ public class MetalInternalFrameTitlePane extends BasicInternalFrameTitlePane
     
     /**
      * Handles <code>JInternalFrame.isPalette</code> property changes, with all
-     * other propert changes being passed to the superclass.
+     * other property changes being passed to the superclass.
      * 
      * @param e  the event.
      */
@@ -316,6 +317,9 @@ public class MetalInternalFrameTitlePane extends BasicInternalFrameTitlePane
       // do nothing    
   }
   
+  /**
+   * Adds the sub components of the title pane.
+   */
   protected void addSubComponents()
   {
     // FIXME:  this method is probably overridden to only add the required 
@@ -423,6 +427,11 @@ public class MetalInternalFrameTitlePane extends BasicInternalFrameTitlePane
       closeButton.setIcon(closeIcon);
   }
   
+  /**
+   * Creates and returns a property change handler for the title pane.
+   * 
+   * @return The property change handler.
+   */
   protected PropertyChangeListener createPropertyChangeListener()
   {
     return new MetalInternalFrameTitlePanePropertyChangeHandler();   

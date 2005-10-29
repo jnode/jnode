@@ -2426,7 +2426,7 @@ public class MetalIconFactory implements Serializable
   }
 
   /**
-   * Returns a 16x16 icon representing a computer.
+   * Returns a <code>16x16</code> icon representing a computer.
    * 
    * @return The icon.
    */
@@ -2438,7 +2438,7 @@ public class MetalIconFactory implements Serializable
   }
     
   /**
-   * Returns a 16x16 icon representing a floppy disk.
+   * Returns a <code>16x16</code> icon representing a floppy disk.
    * 
    * @return The icon.
    */
@@ -2450,7 +2450,7 @@ public class MetalIconFactory implements Serializable
   }
     
   /**
-   * Returns a 16x16 icon representing a hard disk.
+   * Returns a <code>16x16</code> icon representing a hard disk.
    * 
    * @return The icon.
    */

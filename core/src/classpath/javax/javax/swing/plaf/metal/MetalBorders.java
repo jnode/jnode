@@ -45,11 +45,13 @@ import java.awt.Insets;
 
 import javax.swing.AbstractButton;
 import javax.swing.ButtonModel;
+import javax.swing.JButton;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
@@ -65,8 +67,7 @@ import javax.swing.text.JTextComponent;
 
 
 /**
- * This factory class creates borders for the different Swing components
- * UI.
+ * A factory class that creates borders for the different Swing components.
  *
  * @author Roman Kennke (roman@kennke.org)
  */
@@ -88,9 +89,7 @@ public class MetalBorders
   /** The shared instance for getTextFieldBorder(). */
   private static Border textFieldBorder;
 
-  /**
-   * The shared instance for getTextBorder().
-   */
+  /** The shared instance for getTextBorder(). */
   private static Border textBorder;
 
   /** The shared instance for getRolloverBorder(). */
@@ -104,7 +103,7 @@ public class MetalBorders
   private static BasicBorders.MarginBorder marginBorder;
 
   /**
-   * The border that is drawn around Swing buttons.
+   * A border used for {@link JButton} components.
    */
   public static class ButtonBorder extends AbstractBorder implements UIResource
   {
@@ -112,7 +111,7 @@ public class MetalBorders
     protected static Insets borderInsets = new Insets(3, 3, 3, 3);
 
     /**
-     * Creates a new instance of ButtonBorder.
+     * Creates a new instance of <code>ButtonBorder</code>.
      */
     public ButtonBorder()
     {
@@ -186,11 +185,11 @@ public class MetalBorders
     }
 
     /**
-     * Returns the insets of the ButtonBorder.
+     * Returns the insets of the <code>ButtonBorder</code>.
      *
      * @param c the component for which the border is used
      *
-     * @return the insets of the ButtonBorder
+     * @return The insets of the ButtonBorder
      */
     public Insets getBorderInsets(Component c)
     {
@@ -198,19 +197,20 @@ public class MetalBorders
     }
 
     /**
-     * Returns the insets of the ButtonBorder in the specified Insets object.
+     * Returns the insets of the <code>ButtonBorder</code> in the specified 
+     * <code>newInsets</code> object.
      *
      * @param c the component for which the border is used
-     * @param newInsets the insets object where to put the values
+     * @param newInsets the insets object where to put the values (if 
+     *        <code>null</code>, a new instance is created).
      *
-     * @return the insets of the ButtonBorder
+     * @return The insets.
      */
     public Insets getBorderInsets(Component c, Insets newInsets)
     {
       if (newInsets == null)
         newInsets = new Insets(0, 0, 0, 0);
 
-      AbstractButton b = (AbstractButton) c;
       newInsets.bottom = borderInsets.bottom;
       newInsets.left = borderInsets.left;
       newInsets.right = borderInsets.right;
@@ -488,7 +488,7 @@ public class MetalBorders
   }
 
   /**
-   * A border used when painting {@link JInternalFrame} instances.
+   * A border used for the {@link JInternalFrame} component.
    */
   public static class InternalFrameBorder extends AbstractBorder
     implements UIResource
@@ -587,7 +587,7 @@ public class MetalBorders
   }
 
   /**
-   * A border used when painting {@link JInternalFrame} instances that are
+   * A border used for {@link JInternalFrame} components that are
    * presented as dialogs (by the {@link JOptionPane} class).
    */
   public static class OptionDialogBorder extends AbstractBorder
@@ -863,7 +863,7 @@ public class MetalBorders
   }
 
   /**
-   * A border for JScrollPanes.
+   * A border for {@link JScrollPane} components.
    */
   public static class ScrollPaneBorder
     extends AbstractBorder
@@ -1116,7 +1116,7 @@ public class MetalBorders
   }
 
   /**
-   * A border used for {@link JToggleButton} components.
+   * A border used for the {@link JToggleButton} component.
    * 
    * @since 1.3
    */
@@ -1209,7 +1209,7 @@ public class MetalBorders
   }
 
   /**
-   * A border used when painting {@link JToolBar} instances.
+   * A border used for the {@link JToolBar} component.
    */
   public static class ToolBarBorder extends AbstractBorder
     implements UIResource, SwingConstants

@@ -64,7 +64,7 @@ import javax.swing.plaf.UIResource;
 import javax.swing.plaf.basic.BasicToolTipUI;
 
 /**
- * A UI delegate for the {@link JToolTip} class.
+ * A UI delegate for the {@link JToolTip} component.
  */
 public class MetalToolTipUI
   extends BasicToolTipUI

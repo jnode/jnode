@@ -437,8 +437,8 @@ public abstract class CompositeView
     int index = -1;
     for (int i = 0; i < children.length; i++)
       {
-        if (children[i].getStartOffset() >= pos
-            && children[i].getEndOffset() < pos)
+        if (children[i].getStartOffset() <= pos
+            && children[i].getEndOffset() > pos)
           {
             index = i;
             break;

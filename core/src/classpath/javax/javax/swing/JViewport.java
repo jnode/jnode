@@ -569,7 +569,7 @@ public class JViewport extends JComponent implements Accessible
     // If the bottom boundary of contentRect is below the port
     // boundaries, scroll up as necessary.
     if (contentRect.y + contentRect.height + viewBounds.y > portBounds.height)
-      pos.y = contentRect.y + contentRect.height - viewBounds.height;
+      pos.y = contentRect.y + contentRect.height - portBounds.height;
     // If contentRect.y is above the port boundaries, scroll down to
     // contentRect.y.
     if (contentRect.y + viewBounds.y < 0)
@@ -577,7 +577,7 @@ public class JViewport extends JComponent implements Accessible
     // If the right boundary of contentRect is right from the port
     // boundaries, scroll left as necessary.
     if (contentRect.x + contentRect.width + viewBounds.x > portBounds.width)
-      pos.x = contentRect.x + contentRect.width - viewBounds.width;
+      pos.x = contentRect.x + contentRect.width - portBounds.width;
     // If contentRect.x is left from the port boundaries, scroll right to
     // contentRect.x.
     if (contentRect.x + viewBounds.x < 0)

@@ -80,11 +80,18 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.text.Caret;
 
-public class JTable extends JComponent
+public class JTable
+  extends JComponent
   implements TableModelListener, Scrollable, TableColumnModelListener,
              ListSelectionListener, CellEditorListener, Accessible
 {
-  protected class AccessibleJTable extends AccessibleJComponent
+  /**
+   * Provides accessibility support for <code>JTable</code>.
+   *
+   * @author Roman Kennke (kennke@aicas.com)
+   */
+  protected class AccessibleJTable
+    extends AccessibleJComponent
     implements AccessibleSelection, ListSelectionListener, TableModelListener,
     TableColumnModelListener, CellEditorListener, PropertyChangeListener,
     AccessibleExtendedTable
@@ -149,6 +156,9 @@ public class JTable extends JComponent
       getCellEditor().addCellEditorListener(this);
     }
 
+    /**
+     * Returns the number of selected items in this table.
+     */
     public int getAccessibleSelectionCount()
     {
       return getSelectedColumnCount();
@@ -1034,16 +1044,11 @@ public class JTable extends JComponent
         setColumnModel(createDefaultColumnModel());
         autoCreate = true;
       }
-    setModel(dm == null ? createDefaultDataModel() : dm);
-    setSelectionModel(sm == null ? createDefaultSelectionModel() : sm);
-    setAutoCreateColumnsFromModel(autoCreate);
     initializeLocalVars();
-    // The next two lines are for compliance with the JDK which starts
-    // the JLists associated with a JTable  with both lead selection 
-    // indices at 0, rather than -1 as in regular JLists
-    selectionModel.setLeadSelectionIndex(0);
-    columnModel.getSelectionModel().setLeadSelectionIndex(0);
     updateUI();
+    setSelectionModel(sm == null ? createDefaultSelectionModel() : sm);
+    setModel(dm == null ? createDefaultDataModel() : dm);
+    setAutoCreateColumnsFromModel(autoCreate);
   }    
 
   protected void initializeLocalVars()
@@ -1323,8 +1328,7 @@ public class JTable extends JComponent
       {
         int y0 = getLocation().y;
         int nrows = getRowCount();
-        Dimension gap = getIntercellSpacing();
-        int height = getRowHeight() + (gap == null ? 0 : gap.height);
+        int height = getRowHeight();
         int y = point.y;
 
         for (int i = 0; i < nrows; ++i)
@@ -2034,6 +2038,8 @@ public class JTable extends JComponent
     if (dataModel == m)
       return;
     
+    TableModel oldModel = dataModel;
+
     // Remove table as TableModelListener from old model.
     if (dataModel != null)
       dataModel.removeTableModelListener(this);
@@ -2051,6 +2057,9 @@ public class JTable extends JComponent
           createDefaultColumnsFromModel();
       }
     
+    // This property is bound, so we fire a property change event.
+    firePropertyChange("model", oldModel, dataModel);
+
     // Repaint table.
     revalidate();
     repaint();

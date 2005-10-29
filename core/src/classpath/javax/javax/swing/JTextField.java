@@ -48,8 +48,6 @@ import java.beans.PropertyChangeListener;
 
 import javax.accessibility.AccessibleContext;
 import javax.accessibility.AccessibleStateSet;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.PlainDocument;
@@ -197,16 +195,7 @@ public class JTextField extends JTextComponent
    */
   protected Document createDefaultModel()
   {
-    // subclassed to swallow newlines
-    return new PlainDocument()
-    {
-      public void insertString(int offset, String str, AttributeSet a)
-          throws BadLocationException
-      {
-        if (str != null && str.indexOf('\n') == -1)
-          super.insertString(offset, str, a);
-      }
-    };
+    return new PlainDocument();
   }
 
   /**

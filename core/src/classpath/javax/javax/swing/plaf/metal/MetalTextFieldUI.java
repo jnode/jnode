@@ -39,9 +39,13 @@ exception statement from your version. */
 package javax.swing.plaf.metal;
 
 import javax.swing.JComponent;
+import javax.swing.JTextField;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicTextFieldUI;
 
+/**
+ * A UI delegate for the {@link JTextField} component.
+ */
 public class MetalTextFieldUI extends BasicTextFieldUI
 {
   /**
@@ -53,11 +57,11 @@ public class MetalTextFieldUI extends BasicTextFieldUI
   }
 
   /**
-   * Returns an instance of MetalTextFieldUI.
+   * Returns a new instance of <code>MetalTextFieldUI</code>.
    *
    * @param component the component for which we return an UI instance
    *
-   * @return an instance of MetalTextFieldUI
+   * @return A new instance of <code>MetalTextFieldUI</code>.
    */
   public static ComponentUI createUI(JComponent component)
   {

@@ -485,4 +485,40 @@ public class Utilities
           }
       }
   }
+  
+  /**
+   * Determine where to break the text in the given Segment, attempting to find
+   * a word boundary.
+   * @param s the Segment that holds the text
+   * @param metrics the font metrics used for calculating the break point
+   * @param x0 starting view location representing the start of the text
+   * @param x the target view location
+   * @param e the TabExpander used for expanding tabs (if this is null tabs
+   * are expanded to 1 space)
+   * @param startOffset the offset in the Document of the start of the text
+   * @return the offset at which we should break the text
+   */
+  public static final int getBreakLocation(Segment s, FontMetrics metrics,
+                                           int x0, int x, TabExpander e,
+                                           int startOffset)
+  {
+    int mark = Utilities.getTabbedTextOffset(s, metrics, x0, x, e, startOffset);
+    BreakIterator breaker = BreakIterator.getWordInstance();
+    breaker.setText(s.toString());
+    
+    // If mark is equal to the end of the string, just use that position
+    if (mark == s.count)
+      return mark;
+    
+    // Try to find a word boundary previous to the mark at which we 
+    // can break the text
+    int preceding = breaker.preceding(mark + 1);
+    
+    if (preceding != 0)
+      return preceding;
+    else
+      // If preceding is 0 we couldn't find a suitable word-boundary so
+      // just break it on the character boundary
+      return mark;
+  }
 }
