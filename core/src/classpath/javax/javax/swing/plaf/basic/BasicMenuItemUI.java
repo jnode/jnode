@@ -48,8 +48,6 @@ import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
@@ -161,11 +159,6 @@ public class BasicMenuItemUI extends MenuItemUI
   private String acceleratorDelimiter;
 
   /**
-   * PropertyChangeListener to listen for property changes in the menu item
-   */
-  private PropertyChangeListener propertyChangeListener;
-
-  /**
    * ItemListener to listen for item changes in the menu item
    */
   private ItemListener itemListener;
@@ -188,7 +181,6 @@ public class BasicMenuItemUI extends MenuItemUI
     mouseInputListener = createMouseInputListener(menuItem);
     menuDragMouseListener = createMenuDragMouseListener(menuItem);
     menuKeyListener = createMenuKeyListener(menuItem);
-    propertyChangeListener = new PropertyChangeHandler();
     itemListener = new ItemHandler();
   }
 
@@ -439,7 +431,6 @@ public class BasicMenuItemUI extends MenuItemUI
     menuItem.addMouseMotionListener(mouseInputListener);
     menuItem.addMenuDragMouseListener(menuDragMouseListener);
     menuItem.addMenuKeyListener(menuKeyListener);
-    menuItem.addPropertyChangeListener(propertyChangeListener);
     menuItem.addItemListener(itemListener);
   }
 
@@ -728,7 +719,6 @@ public class BasicMenuItemUI extends MenuItemUI
     menuItem.removeMouseListener(mouseInputListener);
     menuItem.removeMenuDragMouseListener(menuDragMouseListener);
     menuItem.removeMenuKeyListener(menuKeyListener);
-    menuItem.removePropertyChangeListener(propertyChangeListener);
     menuItem.removeItemListener(itemListener);
   }
 
@@ -1058,24 +1048,6 @@ public class BasicMenuItemUI extends MenuItemUI
     }
   }
 
-  /**
-   * Helper class that listens for changes to the properties of the {@link
-   * JMenuItem}.
-   */
-  private class PropertyChangeHandler implements PropertyChangeListener
-  {
-    /**
-     * This method is called when one of the menu item's properties change.
-     *
-     * @param evt A {@link PropertyChangeEvent}.
-     */
-    public void propertyChange(PropertyChangeEvent evt)
-    {
-      menuItem.revalidate();
-      menuItem.repaint();
-    }
-  }
-  
   /**
    * Helper class that listens for item changes to the properties of the {@link
    * JMenuItem}.

@@ -571,12 +571,18 @@ public class JEditorPane extends JTextComponent
 
   public boolean getScrollableTracksViewportHeight()
   {
-    return false;
+  /*  Container parent = getParent();
+    return (parent instanceof JViewport &&
+        parent.isValid());*/
+    return isValid();
   }
 
   public boolean getScrollableTracksViewportWidth()
   {
-    return false;
+    /*Container parent = getParent();
+    return (parent instanceof JViewport &&
+        parent.isValid());*/
+    return isValid();
   }
 
   public URL getPage()

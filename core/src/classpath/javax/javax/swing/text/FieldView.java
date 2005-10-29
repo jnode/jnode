@@ -118,7 +118,7 @@ public class FieldView extends PlainView
     FontMetrics fm = getFontMetrics();
 
     if (axis == Y_AXIS)
-      return fm.getHeight();
+      return super.getPreferredSpan(axis);
 
     String text;
     Element elem = getElement();
@@ -134,7 +134,7 @@ public class FieldView extends PlainView
 	text = "";
       }
     
-    return fm.stringWidth(text);
+    return fm.stringWidth(text) + 30;
   }
 
   public int getResizeWeight(int axis)

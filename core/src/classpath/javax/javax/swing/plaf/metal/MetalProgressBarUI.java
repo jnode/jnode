@@ -39,13 +39,17 @@ exception statement from your version. */
 package javax.swing.plaf.metal;
 
 import javax.swing.JComponent;
+import javax.swing.JProgressBar;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicProgressBarUI;
 
+/**
+ * A UI delegate for the {@link JProgressBar} component.
+ */
 public class MetalProgressBarUI extends BasicProgressBarUI
 {  
   /**
-   * Constructs a new instance of MetalProgressBarUI.
+   * Constructs a new instance of <code>MetalProgressBarUI</code>.
    */
   public MetalProgressBarUI()
   {
@@ -53,11 +57,11 @@ public class MetalProgressBarUI extends BasicProgressBarUI
   }
 
   /**
-   * Returns an instance of MetalProgressBarUI.
+   * Returns a new instance of <code>MetalProgressBarUI</code>.
    *
    * @param component the component for which we return an UI instance
    *
-   * @return an instance of MetalProgressBarUI
+   * @return A new instance of <code>MetalProgressBarUI</code>.
    */
   public static ComponentUI createUI(JComponent component)
   {

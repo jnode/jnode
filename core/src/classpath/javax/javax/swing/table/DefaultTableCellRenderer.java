@@ -43,8 +43,10 @@ import java.awt.Component;
 import java.awt.Rectangle;
 import java.io.Serializable;
 
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JTable;
+import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JTextField;
@@ -136,12 +138,7 @@ public class DefaultTableCellRenderer extends JLabel
     if (table == null)
       return this;
 
-    if (isSelected && hasFocus)
-      {
-        setBackground(table.getBackground());
-        setForeground(table.getSelectionForeground());
-      }
-    else if (table.isRowSelected(row))
+    if (isSelected)
       {
         setBackground(table.getSelectionBackground());
         setForeground(table.getSelectionForeground());
@@ -151,6 +148,13 @@ public class DefaultTableCellRenderer extends JLabel
         setBackground(table.getBackground());
         setForeground(table.getForeground());
       }
+    if (hasFocus)
+      {
+        setBackground(table.getBackground());
+        setBorder(UIManager.getBorder("Table.focusCellHighlightBorder"));
+      }
+    else
+      setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
     setEnabled(table.isEnabled());
     setFont(table.getFont());

@@ -45,6 +45,7 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 
 import javax.swing.AbstractButton;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
@@ -54,8 +55,7 @@ import javax.swing.plaf.basic.BasicButtonListener;
 import javax.swing.plaf.basic.BasicButtonUI;
 
 /**
- * The Metal Look &amp; Feel implementation for
- * {@link javax.swing.AbstractButton}s.
+ * A UI delegate for the {@link JButton} component.
  *
  * @author Roman Kennke (roman@kennke.org)
  */

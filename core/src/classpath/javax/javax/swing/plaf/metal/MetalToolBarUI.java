@@ -54,8 +54,8 @@ public class MetalToolBarUI extends BasicToolBarUI
 {
   
   /**
-   * A listener that responds when components are added to or removed from the
-   * toolbar.  This class is no longer used - the required behaviour is now
+   * A listener (no longer used) that responds when components are added to or 
+   * removed from the {@link JToolBar}.  The required behaviour is now
    * handled in the super class. 
    * 
    * @see MetalToolBarUI#createContainerListener()
@@ -73,8 +73,9 @@ public class MetalToolBarUI extends BasicToolBarUI
   }
 
   /**
-   * A listener that responds to property change events.  This class is no 
-   * longer used - the required behaviour is now handled in the super class. 
+   * A listener (no longer used) that responds to property change events in a
+   * {@link JToolBar} component.  The required behaviour is now handled in the 
+   * super class. 
    * 
    * @see MetalToolBarUI#createRolloverListener()
    */

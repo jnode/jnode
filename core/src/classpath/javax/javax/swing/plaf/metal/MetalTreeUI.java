@@ -63,6 +63,9 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicTreeUI;
 
+/**
+ * A UI delegate for the {@link JTree} component.
+ */
 public class MetalTreeUI extends BasicTreeUI
 {
 
@@ -79,7 +82,7 @@ public class MetalTreeUI extends BasicTreeUI
   private TreeModelListener treeModelListener;
     
   /**
-   * Constructs a new instance of MetalTreeUI.
+   * Constructs a new instance of <code>MetalTreeUI</code>.
    */
   public MetalTreeUI()
   {
@@ -87,11 +90,11 @@ public class MetalTreeUI extends BasicTreeUI
   }
 
   /**
-   * Returns an instance of MetalTreeUI.
+   * Returns a new instance of <code>MetalTreeUI</code>.
    *
    * @param component the component for which we return an UI instance
    *
-   * @return an instance of MetalTreeUI
+   * @return A new instance of <code>MetalTreeUI</code>.
    */
   public static ComponentUI createUI(JComponent component)
   {

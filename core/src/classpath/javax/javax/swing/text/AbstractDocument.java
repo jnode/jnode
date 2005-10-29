@@ -541,38 +541,13 @@ public abstract class AbstractDocument implements Document, Serializable
 			       DocumentEvent.EventType.INSERT);
     
     writeLock();
-    UndoableEdit temp = content.insertString(offset, text);
-    writeUnlock();
-    
-    GapContent.UndoInsertString changes = null;
-    if (content instanceof GapContent)
-      changes = (GapContent.UndoInsertString) temp;
+    UndoableEdit undo = content.insertString(offset, text);
     insertUpdate(event, attributes);
+    writeUnlock();
 
-    if (changes != null)
-      {
-        // We need to add an ElementChange to our DocumentEvent
-        // so let's set up the parameters
-        Element root = getDefaultRootElement();
-        int start = root.getElementIndex(changes.where);
-        int end = root.getElementIndex(changes.where+changes.length);
-
-        if (!(start == 0 && end == 0))
-          {
-            Element[] removed = new Element[1];
-            removed[0] = root;
-            Element[] added = new Element[end - start + 1];
-            for (int i = start; i <= end; i++)
-              added[i - start] = root.getElement(i);
-
-            ElementEdit edit = new ElementEdit(
-                                               root,
-                                               root.getElementIndex(changes.where),
-                                               removed, added);
-            event.addEdit(edit);
-          }
-      }
     fireInsertUpdate(event);
+    if (undo != null)
+      fireUndoableEditUpdate(new UndoableEditEvent(this, undo));
   }
 
   /**
@@ -916,7 +891,7 @@ public abstract class AbstractDocument implements Document, Serializable
   {
     synchronized (documentCV)
     {
-        if (currentWriter.equals(Thread.currentThread()))
+        if (Thread.currentThread().equals(currentWriter))
           {
             currentWriter = null;
             documentCV.notifyAll();

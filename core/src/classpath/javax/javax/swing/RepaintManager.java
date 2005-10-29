@@ -1,5 +1,5 @@
 /* RepaintManager.java --
-   Copyright (C) 2002, 2004  Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -508,7 +508,7 @@ public class RepaintManager
   {
     // In order to keep the blocking of application threads minimal, we switch
     // the invalidComponents field with the workInvalidComponents field and
-    // work wíth the workInvalidComponents field.
+    // work with the workInvalidComponents field.
     synchronized(this)
     {
       ArrayList swap = invalidComponents;

@@ -38,7 +38,6 @@ exception statement from your version. */
 
 package javax.swing.plaf.basic;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -77,8 +76,6 @@ public class BasicButtonUI extends ButtonUI
   protected int defaultTextShiftOffset = 0;
 
   private int textShiftOffset;
-
-  private Color focusColor;
 
   /**
    * Factory method to create an instance of BasicButtonUI for a given
@@ -160,7 +157,6 @@ public class BasicButtonUI extends ButtonUI
     LookAndFeel.installColorsAndFont(b, prefix + "background",
                                      prefix + "foreground", prefix + "font");
     LookAndFeel.installBorder(b, prefix + "border");
-    focusColor = UIManager.getColor(prefix + "focus");
     b.setMargin(UIManager.getInsets(prefix + "margin"));
     b.setIconTextGap(UIManager.getInt(prefix + "textIconGap"));
     b.setInputMap(JComponent.WHEN_FOCUSED, 
@@ -401,11 +397,11 @@ public class BasicButtonUI extends ButtonUI
    */
   protected void paintButtonPressed(Graphics g, AbstractButton b)
   {
-    if (b.isContentAreaFilled())
+    if (b.isContentAreaFilled() && b.isOpaque())
       {
 	Rectangle area = new Rectangle();
 	SwingUtilities.calculateInnerArea(b, area);
-        g.setColor(b.getBackground().darker());
+        g.setColor(UIManager.getColor(getPropertyPrefix() + "shadow"));
         g.fillRect(area.x, area.y, area.width, area.height);
       }
   }

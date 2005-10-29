@@ -644,8 +644,6 @@ public class JLayeredPane extends JComponent implements Accessible
     incrLayer (layer);
 	
     super.addImpl(comp, null, newIdx);	
-    revalidate();
-    repaint();
   }     
 
   /**

@@ -86,7 +86,7 @@ public class BoxLayout implements LayoutManager2, Serializable
    */
   private Container container;
   
-  /*
+  /**
    * Current type of component layouting. Defaults to X_AXIS.
    */
   private int way = X_AXIS;
@@ -189,6 +189,8 @@ public class BoxLayout implements LayoutManager2, Serializable
    */
   public Dimension preferredLayoutSize(Container parent)
   {
+    synchronized (container.getTreeLock())
+      {
     if (container != parent)
       throw new AWTError("BoxLayout can't be shared");
 
@@ -196,6 +198,7 @@ public class BoxLayout implements LayoutManager2, Serializable
     Insets i = container.getInsets();
     return new Dimension(xTotal.preferred + i.left + i.right,
                          yTotal.preferred + i.top + i.bottom);
+  }
   }
 
   /**
@@ -207,11 +210,14 @@ public class BoxLayout implements LayoutManager2, Serializable
    */
   public Dimension minimumLayoutSize(Container parent)
   {
+    synchronized (container.getTreeLock())
+      {
     if (container != parent)
       throw new AWTError("BoxLayout can't be shared");
 
     checkTotalRequirements();
     return new Dimension(xTotal.minimum, yTotal.minimum);
+  }
   }
 
   /**
@@ -255,11 +261,14 @@ public class BoxLayout implements LayoutManager2, Serializable
    */
   public float getLayoutAlignmentX(Container parent)
   {
+    synchronized (container.getTreeLock())
+      {
     if (container != parent)
       throw new AWTError("BoxLayout can't be shared");
     
     checkTotalRequirements();
     return xTotal.alignment;
+  }
   }
 
   /**
@@ -271,11 +280,14 @@ public class BoxLayout implements LayoutManager2, Serializable
    */
   public float getLayoutAlignmentY(Container parent)
   {
+    synchronized (container.getTreeLock())
+      {
     if (container != parent)
       throw new AWTError("BoxLayout can't be shared");
     
     checkTotalRequirements();
     return yTotal.alignment;
+  }
   }
 
   /**
@@ -285,6 +297,8 @@ public class BoxLayout implements LayoutManager2, Serializable
    */
   public void invalidateLayout(Container parent)
   {
+    synchronized (container.getTreeLock())
+      {
     xChildren = null;
     yChildren = null;
     xTotal = null;
@@ -293,6 +307,7 @@ public class BoxLayout implements LayoutManager2, Serializable
     offsetsY = null;
     spansX = null;
     spansY = null;
+  }
   }
 
   /**
@@ -305,11 +320,14 @@ public class BoxLayout implements LayoutManager2, Serializable
    */
   public Dimension maximumLayoutSize(Container parent)
   {
+    synchronized (container.getTreeLock())
+      {
     if (container != parent)
       throw new AWTError("BoxLayout can't be shared");
 
     checkTotalRequirements();
     return new Dimension(xTotal.maximum, yTotal.maximum);
+  }
   }
 
   /**

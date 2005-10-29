@@ -47,8 +47,7 @@ import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicTabbedPaneUI;
 
 /**
- * A UI delegate used for the {@link JTabbedPane} component in the 
- * {@link MetalLookAndFeel}.
+ * A UI delegate for the {@link JTabbedPane} component.
  */
 public class MetalTabbedPaneUI extends BasicTabbedPaneUI
 {
