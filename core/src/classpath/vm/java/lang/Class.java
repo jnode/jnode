@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package java.lang;
 
 import gnu.java.lang.VMClassHelper;
@@ -58,7 +58,8 @@ import org.jnode.vm.classmgr.VmType;
  * 
  * @author epr
  */
-public final class Class<T> implements AnnotatedElement, Serializable, Type, GenericDeclaration {
+public final class Class<T> implements AnnotatedElement, Serializable, Type,
+        GenericDeclaration {
 
     /**
      * Compatible with JDK 1.0+.
@@ -68,8 +69,9 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type, Gen
     /**
      * Permission used in {@link #getVmClass()}
      */
-    private static final JNodePermission GETVMCLASS = new JNodePermission("getVmClass");
-    
+    private static final JNodePermission GETVMCLASS = new JNodePermission(
+            "getVmClass");
+
     private final VmType<T> vmClass;
 
     private Constructor[] declaredConstructors;
@@ -150,14 +152,19 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type, Gen
         if (c.classAssertionStatus != null)
             synchronized (c) {
                 status = c.classAssertionStatus.get(getName());
-                if (status != null)
+                if (status != null) {
                     return status.equals(Boolean.TRUE);
+                }
             }
         else {
+            if (ClassLoader.StaticData.systemClassAssertionStatus == null) {
+                throw new Error("systClassAssertionStatus == null");
+            }
             status = ClassLoader.StaticData.systemClassAssertionStatus
                     .get(getName());
-            if (status != null)
+            if (status != null) {
                 return status.equals(Boolean.TRUE);
+            }
         }
         if (c.packageAssertionStatus != null)
             synchronized (c) {
@@ -217,7 +224,7 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type, Gen
      * @return Class
      */
     public final Class< ? super T> getSuperclass() {
-        VmType<? super T> superCls = getLinkedVmClass().getSuperClass();
+        VmType< ? super T> superCls = getLinkedVmClass().getSuperClass();
         if (superCls != null) {
             return superCls.asClass();
         } else {
@@ -280,7 +287,7 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type, Gen
      *             if c is null
      * @since 1.1
      */
-    public boolean isAssignableFrom(Class<?> c) {
+    public boolean isAssignableFrom(Class< ? > c) {
         return getLinkedVmClass().isAssignableFrom(c.getLinkedVmClass());
     }
 
@@ -290,7 +297,7 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type, Gen
     public Annotation[] getAnnotations() {
         return vmClass.getAnnotations();
     }
-    
+
     /**
      * @see java.lang.reflect.AnnotatedElement#getAnnotation(java.lang.Class)
      */
@@ -308,7 +315,8 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type, Gen
     /**
      * @see java.lang.reflect.AnnotatedElement#isAnnotationPresent(java.lang.Class)
      */
-    public boolean isAnnotationPresent(Class< ? extends Annotation> annotationClass) {
+    public boolean isAnnotationPresent(
+            Class< ? extends Annotation> annotationClass) {
         return vmClass.isAnnotationPresent(annotationClass);
     }
 
@@ -382,7 +390,7 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type, Gen
     public Field[] getFields() {
         if (fields == null) {
             ArrayList<Field> list = new ArrayList<Field>();
-            Class<?> cls = this;
+            Class< ? > cls = this;
             while (cls != null) {
                 final Field[] dlist = cls.getDeclaredFields();
                 for (int i = 0; i < dlist.length; i++) {
@@ -448,7 +456,7 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type, Gen
     public Class getComponentType() {
         final VmType<T> vmClass = getLinkedVmClass();
         if (vmClass instanceof VmArrayClass) {
-            final VmType<?> vmCompType = ((VmArrayClass<T>) vmClass)
+            final VmType< ? > vmCompType = ((VmArrayClass<T>) vmClass)
                     .getComponentType();
             if (vmCompType != null) {
                 return vmCompType.asClass();
@@ -467,9 +475,9 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type, Gen
      * @throws NoSuchMethodException
      * @throws SecurityException
      */
-    public Method getMethod(String name, Class<?>[] argTypes)
+    public Method getMethod(String name, Class< ? >[] argTypes)
             throws NoSuchMethodException, SecurityException {
-        VmType<?>[] vmArgTypes;
+        VmType< ? >[] vmArgTypes;
         if (argTypes == null) {
             vmArgTypes = null;
         } else {
@@ -495,7 +503,7 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type, Gen
     public Method[] getMethods() {
         if (methods == null) {
             final ArrayList<Method> list = new ArrayList<Method>();
-            Class<?> cls = this;
+            Class< ? > cls = this;
             while (cls != null) {
                 final Method[] dlist = cls.getDeclaredMethods();
                 for (int i = 0; i < dlist.length; i++) {
@@ -518,9 +526,9 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type, Gen
      * @throws NoSuchMethodException
      * @throws SecurityException
      */
-    public Method getDeclaredMethod(String name, Class<?>[] argTypes)
+    public Method getDeclaredMethod(String name, Class< ? >[] argTypes)
             throws NoSuchMethodException, SecurityException {
-        VmType<?>[] vmArgTypes;
+        VmType< ? >[] vmArgTypes;
         if (argTypes == null) {
             vmArgTypes = null;
         } else {
@@ -718,11 +726,11 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type, Gen
             throws NoSuchMethodException {
         // Check security
         memberAccessCheck(Member.PUBLIC);
-        
+
         // Create signature
         String signature = Signature.toSignature(null, argTypes);
-        final VmMethod vmMethod = getLinkedVmClass().getDeclaredMethod("<init>",
-                signature);
+        final VmMethod vmMethod = getLinkedVmClass().getDeclaredMethod(
+                "<init>", signature);
         if (vmMethod != null) {
             return (Constructor) vmMethod.asMember();
         } else {
@@ -973,7 +981,7 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type, Gen
             }
         }
     }
-    
+
     /**
      * Strip the last portion of the name (after the last dot).
      * 

@@ -52,8 +52,8 @@ public abstract class ClassLoader {
     /**
      * The map of package assertion status overrides, or null if no package
      * overrides have been specified yet. The values of the map should be
-     * Boolean.TRUE or Boolean.FALSE, and the unnamed package is represented
-     * by the null key. This map must be synchronized on this instance.
+     * Boolean.TRUE or Boolean.FALSE, and the unnamed package is represented by
+     * the null key. This map must be synchronized on this instance.
      */
     // Package visible for use by Class.
     Map<String, Boolean> packageAssertionStatus;
@@ -92,7 +92,7 @@ public abstract class ClassLoader {
                     SecurityManager.current = new SecurityManager();
                 } else {
                     try {
-                        Class<?> cl = Class.forName(secman, false,
+                        Class< ? > cl = Class.forName(secman, false,
                                 StaticData.systemClassLoader);
                         SecurityManager.current = (SecurityManager) cl
                                 .newInstance();
@@ -111,8 +111,13 @@ public abstract class ClassLoader {
          */
         static final ProtectionDomain defaultProtectionDomain;
         static {
-            CodeSource cs = new CodeSource(null, null);
-            PermissionCollection perm = Policy.getPolicy().getPermissions(cs);
+            final CodeSource cs = new CodeSource(null, null);
+            PermissionCollection perm = (PermissionCollection) AccessController
+                    .doPrivileged(new PrivilegedAction() {
+                        public Object run() {
+                            return Policy.getPolicy().getPermissions(cs);
+                        }
+                    });
             defaultProtectionDomain = new ProtectionDomain(cs, perm);
         }
 
@@ -407,7 +412,7 @@ public abstract class ClassLoader {
      * @return the Class object, or null if the class has not been loaded
      */
     protected final Class findLoadedClass(String name) {
-        VmType<?> vmClass = vmClassLoader.findLoadedClass(name);
+        VmType< ? > vmClass = vmClassLoader.findLoadedClass(name);
         if (vmClass != null) {
             return vmClass.asClass();
         } else {
@@ -726,7 +731,7 @@ public abstract class ClassLoader {
         // The toString() hack catches null, as required.
         classAssertionStatus.put(name.toString(), Boolean.valueOf(enabled));
     }
-    
+
     /**
      * Resets the default assertion status of this classloader, its packages and
      * classes, all to false. This allows overriding defaults inherited from the
