@@ -110,6 +110,14 @@ public final class SocketPermission extends Permission implements Serializable
 {
     static final long serialVersionUID = -7204263841984476862L;
 
+// @classpath-bugfix 31/10/2005 Martin Husted Hartvig (hagar@jnode.org) :
+// rewritten implies method
+    static protected final String wildcard = "*";
+    static protected final String ports = ":";
+    static protected final String portDelimitor = "-";
+    static protected final String empty = "";
+// @classpath-bugfix-end
+
 // FIXME: Needs serialization work, including readObject/writeObject methods.
 
     /**
@@ -257,163 +265,171 @@ public final class SocketPermission extends Permission implements Serializable
    * @return <code>true</code> if the <code>Permission</code> is implied by
    * this object, <code>false</code> otherwise.
      */
-  public boolean implies(Permission perm)
-  {
-    SocketPermission p;
 
-        // First make sure we are the right object type
-    if (perm instanceof SocketPermission)
-      p = (SocketPermission) perm;
-    else
-            return false;
+    public boolean implies(Permission perm)
+    {
+// @classpath-bugfix 31/10/2005 Martin Husted Hartvig (hagar@jnode.org) :
+// rewritten implies method
+      SocketPermission p;
 
-        // Next check the actions
-    String ourlist = getActions();
-    String theirlist = p.getActions();
-
-    if (! ourlist.startsWith(theirlist))
-            return false;
-
-        // Now check ports
-    int ourfirstport = 0;
-
-    // Now check ports
-    int ourlastport = 0;
-
-    // Now check ports
-    int theirfirstport = 0;
-
-    // Now check ports
-    int theirlastport = 0;
-
-    // Get ours
-    if (hostport.indexOf(":") == -1)
-      {
-	ourfirstport = 0;
-	ourlastport = 65535;
-      }
-    else
-      {
-	// FIXME:  Needs bulletproofing.
-	// This will dump if hostport if all sorts of bad data was passed to
-	// the constructor
-	String range = hostport.substring(hostport.indexOf(":") + 1);
-	if (range.startsWith("-"))
-	  ourfirstport = 0;
-	else if (range.indexOf("-") == -1)
-	  ourfirstport = Integer.parseInt(range);
-	else
-	  ourfirstport =
-	    Integer.parseInt(range.substring(0, range.indexOf("-")));
-
-	if (range.endsWith("-"))
-	  ourlastport = 65535;
-	else if (range.indexOf("-") == -1)
-	  ourlastport = Integer.parseInt(range);
-	else
-	  ourlastport =
-	    Integer.parseInt(range.substring(range.indexOf("-") + 1,
-	                                     range.length()));
-      }
-
-    // Get theirs
-    if (p.hostport.indexOf(":") == -1)
-      {
-	theirfirstport = 0;
-	ourlastport = 65535;
-      }
-    else
-      {
-	// This will dump if hostport if all sorts of bad data was passed to
-	// the constructor
-
-// @classpath-bugfix 18/10/2005 Martin Husted Hartvig (hagar@jnode.org) :
-// Wrong usage of hostport and not p.hostport in call to indexOf
-   String range = p.hostport.substring(p.hostport.indexOf(":") + 1);
-// @classpath-bugfix-end
-
-  if (range.startsWith("-"))
-	  theirfirstport = 0;
-	else if (range.indexOf("-") == -1)
-	  theirfirstport = Integer.parseInt(range);
-	else
-	  theirfirstport =
-	    Integer.parseInt(range.substring(0, range.indexOf("-")));
-
-	if (range.endsWith("-"))
-	  theirlastport = 65535;
-	else if (range.indexOf("-") == -1)
-	  theirlastport = Integer.parseInt(range);
-	else
-	  theirlastport =
-	    Integer.parseInt(range.substring(range.indexOf("-") + 1,
-	                                     range.length()));
-        }
-
-    // Now check them
-    if ((theirfirstport < ourfirstport) || (theirlastport > ourlastport))
-      return false;
-
-        // Finally we can check the hosts
-    String ourhost;
-
-    // Finally we can check the hosts
-    String theirhost;
-
-    // Get ours
-    if (hostport.indexOf(":") == -1)
-      ourhost = hostport;
-    else
-      ourhost = hostport.substring(0, hostport.indexOf(":"));
-
-    // Get theirs
-    if (p.hostport.indexOf(":") == -1)
-      theirhost = p.hostport;
-    else
-      theirhost = p.hostport.substring(0, p.hostport.indexOf(":"));
-
-        // Are they equal?
-    if (ourhost.equals(theirhost))
-      return true;
-
-    // Try the canonical names
-    String ourcanonical = null;
-
-        // Try the canonical names
-    String theircanonical = null;
-    try
-      {
-            ourcanonical = InetAddress.getByName(ourhost).getHostName();
-            theircanonical = InetAddress.getByName(theirhost).getHostName();
-      }
-    catch (UnknownHostException e)
-      {
-	// Who didn't resolve?  Just assume current address is canonical enough
-            // Is this ok to do?
-	if (ourcanonical == null)
-	  ourcanonical = ourhost;
-	if (theircanonical == null)
-	  theircanonical = theirhost;
-        }
-
-    if (ourcanonical.equals(theircanonical))
-      return true;
-
-        // Well, last chance. Try for a wildcard
-    if (ourhost.indexOf("*.") != -1)
-      {
-            String wild_domain = ourhost.substring(ourhost.indexOf("*" + 1));
-	if (theircanonical.endsWith(wild_domain))
-	  return true;
-        }
-
-// @classpath-bugfix 18/10/2005 Martin Husted Hartvig (hagar@jnode.org) :
-// Missed wildcard as host address    
-    if (ourhost.equals("*"))
-      return true;
-// @classpath-bugfix-end
-
-        // Didn't make it
+      // First make sure we are the right object type
+      if (perm instanceof SocketPermission)
+        p = (SocketPermission) perm;
+      else
         return false;
+
+      // Next check the actions
+      String ourlist = getActions();
+      String theirlist = p.getActions();
+
+      if (ourlist.indexOf(theirlist) == -1)
+        return false;
+
+      if (hostport.equals(empty) && p.hostport.equals(empty))
+        return true;
+
+      // Now check ports
+      int ourfirstport = 0;
+
+      // Now check ports
+      int ourlastport = 0;
+
+      // Now check ports
+      int theirfirstport = 0;
+
+      // Now check ports
+      int theirlastport = 0;
+
+      // Finally we can check the hosts
+      String ourhost;
+
+      // Finally we can check the hosts
+      String theirhost;
+
+      String range;
+
+      int portsIndex;
+      int portDelimitorIndex;
+
+      // Get ours
+      portsIndex = hostport.indexOf(ports);
+      if (portsIndex == -1)
+      {
+        ourlastport = 65535;
+        ourhost = hostport;
+      }
+      else
+      {
+        // FIXME:  Needs bulletproofing.
+        // This will dump if hostport if all sorts of bad data was passed to
+        // the constructor
+        range = hostport.substring(portsIndex + 1);
+        portDelimitorIndex = range.indexOf(portDelimitor);
+
+        if (portDelimitorIndex == 0)
+        {
+          ourfirstport = 0;
+        }
+        else if (portDelimitorIndex == -1)
+        {
+          ourfirstport = Integer.parseInt(range);
+          ourlastport = ourfirstport;
+        }
+        else
+          ourfirstport = Integer.parseInt(range.substring(0, portDelimitorIndex));
+
+
+        if (range.endsWith(portDelimitor))
+          ourlastport = 65535;
+        else
+          ourlastport = Integer.parseInt(range.substring(portDelimitorIndex + 1, range.length()));
+
+        ourhost = hostport.substring(0, portsIndex);
+      }
+
+      // Get theirs
+      portsIndex = p.hostport.indexOf(ports);
+      if (portsIndex == -1)
+      {
+        theirlastport = 65535;
+        theirhost = p.hostport;
+      }
+      else
+      {
+        // This will dump if hostport if all sorts of bad data was passed to
+        // the constructor
+
+        range = p.hostport.substring(portsIndex + 1);
+        portDelimitorIndex = range.indexOf(portDelimitor);
+
+        if (portDelimitorIndex == 0)
+          theirfirstport = 0;
+        else if (portDelimitorIndex == -1)
+        {
+          theirfirstport = Integer.parseInt(range);
+          theirlastport = theirfirstport;
+        }
+        else
+          theirfirstport = Integer.parseInt(range.substring(0, portDelimitorIndex));
+
+        if (range.endsWith(portDelimitor))
+          theirlastport = 65535;
+        else
+          theirlastport = Integer.parseInt(range.substring(portDelimitorIndex + 1, range.length()));
+
+        theirhost = p.hostport.substring(0, portsIndex);
+      }
+
+      // Now check them
+      if ((theirfirstport < ourfirstport) || (theirlastport > ourlastport))
+      {
+        return false;
+      }
+      // Are they equal?
+      if (ourhost.equals(theirhost))
+        return true;
+
+      // Try the canonical names
+      String ourcanonical = null;
+
+      // Try the canonical names
+      String theircanonical = null;
+      try
+      {
+        ourcanonical = InetAddress.getByName(ourhost).getHostName();
+        theircanonical = InetAddress.getByName(theirhost).getHostName();
+      }
+      catch (UnknownHostException e)
+      {
+        // Who didn't resolve?  Just assume current address is canonical enough
+        // Is this ok to do?
+        if (ourcanonical == null)
+          ourcanonical = ourhost;
+        if (theircanonical == null)
+          theircanonical = theirhost;
+      }
+
+      if (ourcanonical.equals(theircanonical))
+        return true;
+
+      // Well, last chance. Try for a wildcard
+      int wildcardIndex = ourcanonical.indexOf(wildcard);
+
+      if (wildcardIndex != -1 && ourcanonical.length() > 1)
+      {
+        String wild_domain = ourcanonical.substring(wildcardIndex + 1);
+
+        if (theircanonical.endsWith(wild_domain))
+        {
+          return true;
+        }
+      }
+
+      if (ourcanonical.equals(wildcard))
+        return true;
+
+      // Didn't make it
+      return false;
+// @classpath-bugfix-end
     }
 }
