@@ -185,15 +185,30 @@ public class BasicScrollPaneUI extends ScrollPaneUI
      */
     public void propertyChange(PropertyChangeEvent e)
     {
-      if (e.getPropertyName().equals("viewport"))
+      String propName = e.getPropertyName();
+      if (propName.equals("viewport"))
         updateViewport(e);
-      else if (e.getPropertyName().equals("rowHeader"))
+      else if (propName.equals("rowHeader"))
         updateRowHeader(e);
-      else if (e.getPropertyName().equals("columnHeader"))
+      else if (propName.equals("columnHeader"))
         updateColumnHeader(e);
-      else if (e.getPropertyName().equals("horizontalScrollBarPolicy")
+      else if (propName.equals("horizontalScrollBarPolicy")
           || e.getPropertyName().equals("verticalScrollBarPolicy"))
         updateScrollBarDisplayPolicy(e);
+      else if (propName.equals("verticalScrollBar"))
+        {
+          JScrollBar oldSb = (JScrollBar) e.getOldValue();
+          oldSb.getModel().removeChangeListener(vsbChangeListener);
+          JScrollBar newSb = (JScrollBar) e.getNewValue();
+          newSb.getModel().addChangeListener(vsbChangeListener);
+        }
+      else if (propName.equals("horizontalScrollBar"))
+        {
+          JScrollBar oldSb = (JScrollBar) e.getOldValue();
+          oldSb.getModel().removeChangeListener(hsbChangeListener);
+          JScrollBar newSb = (JScrollBar) e.getNewValue();
+          newSb.getModel().addChangeListener(hsbChangeListener);
+        }
     }
 
   }

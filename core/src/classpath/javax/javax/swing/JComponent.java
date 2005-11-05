@@ -84,6 +84,8 @@ import javax.accessibility.AccessibleKeyBinding;
 import javax.accessibility.AccessibleRole;
 import javax.accessibility.AccessibleStateSet;
 import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import javax.swing.event.EventListenerList;
@@ -161,9 +163,14 @@ public abstract class JComponent extends Container implements Serializable
     protected ContainerListener accessibleContainerHandler;
     protected FocusListener accessibleFocusHandler;
 
+    /**
+     * Manages the property change listeners;
+     */
+    private SwingPropertyChangeSupport changeSupport;
+
     protected AccessibleJComponent()
     {
-      // TODO: Implement this properly.
+      changeSupport = new SwingPropertyChangeSupport(this);
     }
 
     /**
@@ -173,16 +180,58 @@ public abstract class JComponent extends Container implements Serializable
      */
     public void addPropertyChangeListener(PropertyChangeListener listener)
     {
-      // TODO: Why is this overridden?
-      super.addPropertyChangeListener(listener);
+      changeSupport.addPropertyChangeListener(listener);
     }
 
+    /**
+     * Removes a propery change listener from the list of registered listeners.
+     *
+     * @param listener the listener to remove
+     */
     public void removePropertyChangeListener(PropertyChangeListener listener)
     {
-      // TODO: Implement this properly.
+      changeSupport.removePropertyChangeListener(listener);
     }
-    public int getAccessibleChildrenCount() { return 0; }
-    public Accessible getAccessibleChild(int value0) { return null; }
+
+    /**
+     * Returns the number of accessible children of this object.
+     *
+     * @return  the number of accessible children of this object
+     */
+    public int getAccessibleChildrenCount()
+    {
+      int count = 0;
+      Component[] children = getComponents();
+      for (int i = 0; i < children.length; ++i)
+        {
+          if (children[i] instanceof Accessible)
+            count++;
+        }
+      return count;
+    }
+
+    /**
+     * Returns the accessible child component at index <code>i</code>.
+     *
+     * @param i the index of the accessible child to return
+     *
+     * @return the accessible child component at index <code>i</code>
+     */
+    public Accessible getAccessibleChild(int i)
+    {
+      int index = 0;
+      Component[] children = getComponents();
+      Accessible found = null;
+      for (int j = 0; index != i; j++)
+        {
+          if (children[j] instanceof Accessible)
+            index++;
+          if (index == i)
+            found = (Accessible) children[index];
+        }
+      // TODO: Figure out what to do when i is not a valid index.
+      return found;
+    }
 
     /**
      * Returns the accessible state set of this component.
@@ -196,13 +245,115 @@ public abstract class JComponent extends Container implements Serializable
       return super.getAccessibleStateSet();
     }
 
-    public String getAccessibleName() { return null; }
-    public String getAccessibleDescription() { return null; }
-    public AccessibleRole getAccessibleRole() { return null; }
-    protected String getBorderTitle(Border value0) { return null; }
-    public String getToolTipText() { return null; }
-    public String getTitledBorderText() { return null; }
-    public AccessibleKeyBinding getAccessibleKeyBinding() { return null; }
+    /**
+     * Returns the localized name for this object. Generally this should
+     * almost never return {@link Component#getName()} since that is not
+     * a localized name. If the object is some kind of text component (like
+     * a menu item), then the value of the object may be returned. Also, if
+     * the object has a tooltip, the value of the tooltip may also be
+     * appropriate.
+     *
+     * @return the localized name for this object or <code>null</code> if this
+     *         object has no name
+     */
+    public String getAccessibleName()
+    {
+      // TODO: Figure out what exactly to return here. It's possible that this
+      // method simply should return null.
+      return null;
+    }
+
+    /**
+     * Returns the localized description of this object.
+     *
+     * @return the localized description of this object or <code>null</code>
+     *         if this object has no description
+     */
+    public String getAccessibleDescription()
+    {
+      // TODO: Figure out what exactly to return here. It's possible that this
+      // method simply should return null.
+      return null;
+    }
+
+    /**
+     * Returns the accessible role of this component.
+     *
+     * @return the accessible role of this component
+     *
+     * @see AccessibleRole
+     */
+    public AccessibleRole getAccessibleRole()
+    {
+      // TODO: Check if this is correct.
+      return AccessibleRole.SWING_COMPONENT;
+    }
+
+    /**
+     * Recursivly searches a border hierarchy (starting at <code>border) for
+     * a titled border and returns the title if one is found, <code>null</code>
+     * otherwise.
+     *
+     * @param border the border to start search from
+     *
+     * @return the border title of a possibly found titled border
+     */
+    protected String getBorderTitle(Border border)
+    {
+      String title = null;
+      if (border instanceof CompoundBorder)
+        {
+          CompoundBorder compound = (CompoundBorder) border;
+          Border inner = compound.getInsideBorder();
+          title = getBorderTitle(inner);
+          if (title == null)
+            {
+              Border outer = compound.getOutsideBorder();
+              title = getBorderTitle(outer);
+            }
+        }
+      else if (border instanceof TitledBorder)
+        {
+          TitledBorder titled = (TitledBorder) border;
+          title = titled.getTitle(); 
+        }
+      return title;
+    }
+
+    /**
+     * Returns the tooltip text for this accessible component.
+     *
+     * @return the tooltip text for this accessible component
+     */
+    public String getToolTipText()
+    {
+      return JComponent.this.getToolTipText();
+    }
+
+    /**
+     * Returns the title of the border of this accessible component if
+     * this component has a titled border, otherwise returns <code>null</code>.
+     *
+     * @return the title of the border of this accessible component if
+     *         this component has a titled border, otherwise returns
+     *         <code>null</code>
+     */
+    public String getTitledBorderText()
+    {
+      return getBorderTitle(getBorder()); 
+    }
+
+    /**
+     * Returns the keybindings associated with this accessible component or
+     * <code>null</code> if the component does not support key bindings.
+     *
+     * @return the keybindings associated with this accessible component
+     */
+    public AccessibleKeyBinding getAccessibleKeyBinding()
+    {
+      // TODO: Implement this properly.
+      return null;
+    }
   }
 
   /** 
@@ -3031,7 +3182,7 @@ public abstract class JComponent extends Container implements Serializable
     Rectangle currentClip = clip;
     Component found = this;
     Container parent = this; 
-    while (parent != null)
+    while (parent != null && !(parent instanceof Window))
       {
         Container newParent = parent.getParent();
         if (newParent == null)

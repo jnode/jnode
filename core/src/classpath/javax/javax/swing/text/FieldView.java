@@ -130,11 +130,11 @@ public class FieldView extends PlainView
       }
     catch (BadLocationException e)
       {
-	// This should never happen.
+        assert false : e.toString();
 	text = "";
       }
     
-    return fm.stringWidth(text) + 30;
+    return fm.stringWidth(text);
   }
 
   public int getResizeWeight(int axis)

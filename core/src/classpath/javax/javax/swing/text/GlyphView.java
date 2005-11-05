@@ -666,8 +666,11 @@ public class GlyphView extends View implements TabableView, Cloneable
       }
     catch (BadLocationException ex)
       {
-        throw new AssertionError("BadLocationException must not be thrown "
+	AssertionError ae;
+        ae = new AssertionError("BadLocationException must not be thrown "
                                  + "here");
+	ae.initCause(ex);
+	throw ae;
       }
     FontMetrics fm = null; // Fetch font metrics somewhere.
     return Utilities.getTabbedTextWidth(seg, fm, 0, null, p0);
@@ -714,8 +717,11 @@ public class GlyphView extends View implements TabableView, Cloneable
       }
     catch (BadLocationException ex)
       {
-        throw new AssertionError("BadLocationException should not be "
+	AssertionError ae;
+        ae = new AssertionError("BadLocationException should not be "
                                  + "thrown here. p0 = " + p0 + ", p1 = " + p1);
+	ae.initCause(ex);
+	throw ae;
       }
 
     return txt;
@@ -1053,5 +1059,35 @@ public class GlyphView extends View implements TabableView, Cloneable
     GlyphPainter painter = getGlyphPainter();
     return painter.getNextVisualPositionFrom(this, pos, bias, a, direction,
                                              biasRet);
+  }
+
+  /**
+   * Returns the document position that is (visually) nearest to the given
+   * document position <code>pos</code> in the given direction <code>d</code>.
+   *
+   * @param c the text component
+   * @param pos the document position
+   * @param b the bias for <code>pos</code>
+   * @param d the direction, must be either {@link SwingConstants#NORTH},
+   *        {@link SwingConstants#SOUTH}, {@link SwingConstants#WEST} or
+   *        {@link SwingConstants#EAST}
+   * @param biasRet an array of {@link Position.Bias} that can hold at least
+   *        one element, which is filled with the bias of the return position
+   *        on method exit
+   *
+   * @return the document position that is (visually) nearest to the given
+   *         document position <code>pos</code> in the given direction
+   *         <code>d</code>
+   *
+   * @throws BadLocationException if <code>pos</code> is not a valid offset in
+   *         the document model
+   */
+  public int getNextVisualPositionFrom(JTextComponent c, int pos,
+                                       Position.Bias b, int d,
+                                       Position.Bias[] biasRet)
+    throws BadLocationException
+  {
+    // TODO: Implement this properly.
+    throw new AssertionError("Not implemented yet.");
   }
 }

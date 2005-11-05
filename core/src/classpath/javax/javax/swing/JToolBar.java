@@ -752,7 +752,6 @@ public class JToolBar extends JComponent implements SwingConstants, Accessible
       {
         AbstractButton b = (AbstractButton) component;
         b.setRolloverEnabled(rollover);
-        b.updateUI();
       }
 
   } // addImpl()

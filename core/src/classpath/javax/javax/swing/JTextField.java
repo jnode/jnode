@@ -120,6 +120,11 @@ public class JTextField extends JTextComponent
   private PropertyChangeListener actionPropertyChangeListener;
 
   /**
+   * The horizontal visibility of the textfield.
+   */
+  private BoundedRangeModel horizontalVisibility;
+
+  /**
    * Creates a new instance of <code>JTextField</code>.
    */
   public JTextField()
@@ -185,6 +190,9 @@ public class JTextField extends JTextComponent
 
     // default value for alignment
     align = LEADING;
+
+    // Initialize the horizontal visibility model.
+    horizontalVisibility = new DefaultBoundedRangeModel();
   }
 
   /**
@@ -486,5 +494,21 @@ public class JTextField extends JTextComponent
     if (accessibleContext == null)
       accessibleContext = new AccessibleJTextField();
     return accessibleContext;
+  }
+
+  /**
+   * Returns the bounded range model that describes the horizontal visibility
+   * of the text field in the case when the text does not fit into the
+   * available space. The actual values of this model are managed by the look
+   * and feel implementation.
+   *
+   * @return the bounded range model that describes the horizontal visibility
+   */
+  public BoundedRangeModel getHorizontalVisibility()
+  {
+    // TODO: The real implementation of this property is still missing.
+    // However, this is not done in JTextField but must instead be handled in
+    // javax.swing.text.FieldView.
+    return horizontalVisibility;
   }
 }

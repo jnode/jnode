@@ -49,11 +49,6 @@ import javax.swing.plaf.basic.BasicScrollPaneUI;
 public class MetalScrollPaneUI
   extends BasicScrollPaneUI
 {
-
-  // FIXME: maybe replace by a Map of instances when this becomes stateful
-  /** The shared UI instance for JScrollPanes. */
-  private static MetalScrollPaneUI instance = null;
-
   /**
    * Constructs a new instance of <code>MetalScrollPaneUI</code>.
    */
@@ -71,8 +66,6 @@ public class MetalScrollPaneUI
    */
   public static ComponentUI createUI(JComponent component)
   {
-    if (instance == null)
-      instance = new MetalScrollPaneUI();
-    return instance;
+    return new MetalScrollPaneUI();
   }
 }

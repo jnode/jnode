@@ -596,6 +596,7 @@ public class BasicToolBarUI extends ToolBarUI implements SwingConstants
 
     floatingBorderColor = UIManager.getColor("ToolBar.floatingForeground");
     floatingColor = UIManager.getColor("ToolBar.floatingBackground");
+    setRolloverBorders(toolBar.isRollover());
   }
 
   /**

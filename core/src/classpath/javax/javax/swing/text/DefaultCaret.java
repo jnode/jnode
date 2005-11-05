@@ -40,6 +40,8 @@ package javax.swing.text;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
@@ -49,7 +51,9 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.EventListener;
 
+import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -65,6 +69,27 @@ import javax.swing.event.EventListenerList;
 public class DefaultCaret extends Rectangle
   implements Caret, FocusListener, MouseListener, MouseMotionListener
 {
+
+  /**
+   * Controls the blinking of the caret.
+   *
+   * @author Roman Kennke (kennke@aicas.com)
+   */
+  private class BlinkTimerListener implements ActionListener
+  {
+    /**
+     * Receives notification when the blink timer fires and updates the visible
+     * state of the caret.
+     *
+     * @param event the action event
+     */
+    public void actionPerformed(ActionEvent event)
+    {
+      visible = !visible;
+      repaint();
+    }
+  }
+
   /**
    * Listens for changes in the text component's document and updates the
    * caret accordingly.
@@ -238,14 +263,25 @@ public class DefaultCaret extends Rectangle
   private Point magicCaretPosition = null;
 
   /**
-   * Indicates if this <code>Caret</code> is currently visible or not.
+   * Indicates if this <code>Caret</code> is currently visible or not. This is
+   * package private to avoid an accessor method.
    */
-  private boolean visible = true;
+  boolean visible = false;
 
   /**
    * The current highlight entry.
    */
   private Object highlightEntry;
+
+  private Timer blinkTimer;
+
+  /**
+   * Creates a new <code>DefaultCaret</code> instance.
+   */
+  public DefaultCaret()
+  {
+    // Nothing to do here.
+  }
 
   /**
    * Sets the Caret update policy.
@@ -292,7 +328,7 @@ public class DefaultCaret extends Rectangle
    */
   public void mouseDragged(MouseEvent event)
   {
-    // FIXME: Implement this properly.
+    moveCaret(event);
   }
 
   /**
@@ -322,7 +358,7 @@ public class DefaultCaret extends Rectangle
    */
   public void mouseClicked(MouseEvent event)
   {
-    // FIXME: Implement this properly.
+    // TODO: Implement double- and triple-click behaviour here.
   }
 
   /**
@@ -344,7 +380,7 @@ public class DefaultCaret extends Rectangle
    */
   public void mouseExited(MouseEvent event)
   {
-    // TODO: What to do here, if anything?
+    // Nothing to do here.
   }
 
   /**
@@ -357,10 +393,7 @@ public class DefaultCaret extends Rectangle
    */
   public void mousePressed(MouseEvent event)
   {
-    // FIXME: Implement this properly.
-    if (!(event.getButton() == MouseEvent.BUTTON1))
-      return;
-    setDot(textComponent.viewToModel(event.getPoint()));
+    positionCaret(event);
   }
 
   /**
@@ -381,7 +414,7 @@ public class DefaultCaret extends Rectangle
    */
   public void focusGained(FocusEvent event)
   {
-    // TODO: Implement this properly.
+    setVisible(true);
   }
 
   /**
@@ -391,7 +424,8 @@ public class DefaultCaret extends Rectangle
    */
   public void focusLost(FocusEvent event)
   {
-    // TODO: Implement this properly.
+    if (event.isTemporary() == false)
+      setVisible(false);
   }
 
   /**
@@ -402,7 +436,8 @@ public class DefaultCaret extends Rectangle
    */
   protected void moveCaret(MouseEvent event)
   {
-    // FIXME: Implement this properly.
+    int newDot = getComponent().viewToModel(event.getPoint());
+    moveDot(newDot);
   }
 
   /**
@@ -413,7 +448,8 @@ public class DefaultCaret extends Rectangle
    */
   protected void positionCaret(MouseEvent event)
   {
-    // FIXME: Implement this properly.
+    int newDot = getComponent().viewToModel(event.getPoint());
+    setDot(newDot);
   }
 
   /**
@@ -433,6 +469,11 @@ public class DefaultCaret extends Rectangle
     textComponent.removePropertyChangeListener(propertyChangeListener);
     propertyChangeListener = null;
     textComponent = null;
+
+    // Deinstall blink timer if present.
+    if (blinkTimer != null)
+      blinkTimer.stop();
+    blinkTimer = null;
   }
 
   /**
@@ -559,7 +600,7 @@ public class DefaultCaret extends Rectangle
    */
   protected final void repaint()
   {
-    textComponent.repaint(this);
+    getComponent().repaint(x, y, width, height);
   }
 
   /**
@@ -570,7 +611,8 @@ public class DefaultCaret extends Rectangle
    */
   public void paint(Graphics g)
   {
-    if (textComponent == null)
+    JTextComponent comp = getComponent();
+    if (comp == null)
       return;
 
     int dot = getDot();
@@ -582,15 +624,23 @@ public class DefaultCaret extends Rectangle
       }
     catch (BadLocationException e)
       {
-	// This should never happen as dot should be always valid.
+        assert false : "Unexpected bad caret location: " + dot;
 	return;
       }
 
     if (rect == null)
       return;
     
-    // First we need to delete the old caret.
-    // FIXME: Implement deleting of old caret.
+    // Check if paint has possibly been called directly, without a previous
+    // call to damage(). In this case we need to do some cleanup first.
+    if ((x != rect.x) || (y != rect.y))
+      {
+        repaint(); // Erase previous location of caret.
+        x = rect.x;
+        y = rect.y;
+        width = 1;
+        height = rect.height;
+      }
     
     // Now draw the caret on the new position if visible.
     if (visible)
@@ -687,6 +737,8 @@ public class DefaultCaret extends Rectangle
    */
   public void setBlinkRate(int rate)
   {
+    if (blinkTimer != null)
+      blinkTimer.setDelay(rate);
     blinkRate = rate;
   }
 
@@ -714,6 +766,7 @@ public class DefaultCaret extends Rectangle
   {
     this.dot = dot;
     handleHighlight();
+    adjustVisibility(this);
     repaint();
   }
 
@@ -731,6 +784,7 @@ public class DefaultCaret extends Rectangle
     this.dot = dot;
     this.mark = dot;
     handleHighlight();
+    adjustVisibility(this);
     repaint();
   }
 
@@ -757,7 +811,29 @@ public class DefaultCaret extends Rectangle
     if (v != visible)
       {
     visible = v;
-    repaint();
+        if (visible)
+          if (textComponent.isEnabled() && textComponent.isEditable())
+            {
+              if (blinkTimer == null)
+                initBlinkTimer();
+              blinkTimer.start();
+            }
+        else
+          {
+            if (blinkTimer != null)
+              blinkTimer.stop();
+          }
+        Rectangle area = null;
+        try
+          {
+            area = getComponent().modelToView(getDot());
+          }
+        catch (BadLocationException ex)
+          {
+            assert false: "Unexpected bad caret location: " + getDot();
+          }
+        if (area != null)
+          damage(area);
   }
   }
 
@@ -771,5 +847,47 @@ public class DefaultCaret extends Rectangle
   protected Highlighter.HighlightPainter getSelectionPainter()
   {
     return DefaultHighlighter.DefaultPainter;
+  }
+
+  /**
+   * Updates the carets rectangle properties to the specified rectangle and
+   * repaints the caret.
+   *
+   * @param r the rectangle to set as the caret rectangle
+   */
+  protected void damage(Rectangle r)
+  {
+    if (r == null)
+      return;
+    x = r.x;
+    y = r.y;
+    width = 1;
+    // height is normally set in paint and we leave it untouched. However, we
+    // must set a valid value here, since otherwise the painting mechanism
+    // sets a zero clip and never calls paint.
+    if (height <= 0)
+      height = getComponent().getHeight();
+    repaint();
+  }
+
+  /**
+   * Adjusts the text component so that the caret is visible. This default
+   * implementation simply calls
+   * {@link JComponent#scrollRectToVisible(Rectangle)} on the text component.
+   * Subclasses may wish to change this.
+   */
+  protected void adjustVisibility(Rectangle rect)
+  {
+    getComponent().scrollRectToVisible(rect);
+  }
+
+  /**
+   * Initializes the blink timer.
+   */
+  private void initBlinkTimer()
+  {
+    // Setup the blink timer.
+    blinkTimer = new Timer(getBlinkRate(), new BlinkTimerListener());
+    blinkTimer.setRepeats(true);
   }
 }

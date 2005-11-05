@@ -2259,9 +2259,12 @@ public class BasicTreeUI extends TreeUI
           boolean inBounds = bounds.contains(click.x, click.y);
           if ((inBounds || cntlClick) && tree.isVisible(path))
             {
+              if (inBounds)
+                {
               selectPath(tree, path);
-              if (inBounds && e.getClickCount() == 2 && !isLeaf(row))
+                  if (e.getClickCount() == 2 && !isLeaf(row))
                   toggleExpandState(path);
+                }
               
               if (cntlClick)
                 {
@@ -3162,9 +3165,9 @@ public class BasicTreeUI extends TreeUI
             y0 += halfHeight;
           }
 
-        int max = mod.getChildCount(curr);
         if (isExpanded)
           {
+            int max = mod.getChildCount(curr);
             for (int i = 0; i < max; i++)
               {
                 int indent = indentation + rightChildIndent;
@@ -3739,8 +3742,10 @@ public class BasicTreeUI extends TreeUI
     
     if (tree.isVisible(path))
       {
-        bounds.width = preferredSize.width;
+        if (!validCachedPreferredSize)
+          updateCachedPreferredSize();
         bounds.x += gap;
+        bounds.width = preferredSize.width + bounds.x;
         
         if (editingComponent != null && editingPath != null && isEditing(tree)
             && node.equals(editingPath.getLastPathComponent()))
@@ -3797,6 +3802,9 @@ public class BasicTreeUI extends TreeUI
    */
   void updateCurrentVisiblePath()
   {
+    if (treeModel == null)
+      return;
+
     Object next = treeModel.getRoot();
     Rectangle bounds = getCellBounds(0, 0, next);
     
@@ -3806,8 +3814,8 @@ public class BasicTreeUI extends TreeUI
     if ((bounds.width == 0 && bounds.height == 0) || (!isRootVisible() 
         && tree.isExpanded(new TreePath(next))))
       next = getNextNode(next);
-    TreePath current = null;
 
+    TreePath current = null;
     while (next != null)
       {
         if (current == null)
@@ -3815,9 +3823,13 @@ public class BasicTreeUI extends TreeUI
         else 
             current = current.pathByAddingChild(next);
         do
+          {
+            TreePath path = new TreePath(getPathToRoot(next, 0));
+            if (tree.isVisible(path) && tree.isExpanded(path))
           next = getNextNode(next);
-        while (next != null && 
-            !tree.isVisible(new TreePath(getPathToRoot(next, 0))));
+            else next = getNextSibling(next);
+          }
+        while (next != null && !tree.isVisible(new TreePath(getPathToRoot(next, 0))));
       }
     currentVisiblePath = current;
     tree.setVisibleRowCount(getRowCount(tree));

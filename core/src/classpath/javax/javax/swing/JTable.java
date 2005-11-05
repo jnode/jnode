@@ -40,11 +40,15 @@ package javax.swing;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DateFormat;
@@ -52,12 +56,16 @@ import java.text.NumberFormat;
 import java.util.Date;
 import java.util.EventObject;
 import java.util.Hashtable;
+import java.util.Locale;
 import java.util.Vector;
 
 import javax.accessibility.Accessible;
+import javax.accessibility.AccessibleComponent;
 import javax.accessibility.AccessibleContext;
 import javax.accessibility.AccessibleExtendedTable;
+import javax.accessibility.AccessibleRole;
 import javax.accessibility.AccessibleSelection;
+import javax.accessibility.AccessibleStateSet;
 import javax.accessibility.AccessibleTable;
 import javax.accessibility.AccessibleTableModelChange;
 import javax.swing.event.CellEditorListener;
@@ -96,6 +104,444 @@ public class JTable
     TableColumnModelListener, CellEditorListener, PropertyChangeListener,
     AccessibleExtendedTable
   {
+
+    /**
+     * Provides accessibility support for table cells.
+     *
+     * @author Roman Kennke (kennke@aicas.com)
+     */
+    protected class AccessibleJTableCell
+      extends AccessibleContext
+      implements Accessible, AccessibleComponent
+    {
+
+      /**
+       * The table of this cell.
+       */
+      private JTable table;
+
+      /**
+       * The row index of this cell.
+       */
+      private int row;
+
+      /**
+       * The column index of this cell.
+       */
+      private int column;
+
+      /**
+       * The index of this cell inside the AccessibleJTable parent.
+       */
+      private int index;
+
+      /**
+       * Creates a new <code>AccessibleJTableCell</code>.
+       *
+       * @param t the table
+       * @param r the row
+       * @param c the column
+       * @param i the index of this cell inside the accessible table parent
+       */
+      public AccessibleJTableCell(JTable t, int r, int c, int i)
+      {
+        table = t;
+        row = r;
+        column = c;
+        index = i;
+      }
+
+      /**
+       * Returns the accessible row for the table cell.
+       *
+       * @return the accessible row for the table cell
+       */
+      public AccessibleRole getAccessibleRole()
+      {
+        // TODO: What is the role of the table cell?
+        return AccessibleRole.UNKNOWN;
+      }
+
+      /**
+       * Returns the accessible state set of this accessible table cell.
+       *
+       * @return the accessible state set of this accessible table cell
+       */
+      public AccessibleStateSet getAccessibleStateSet()
+      {
+        // TODO: What state shoiuld be returned here?
+        return new AccessibleStateSet();
+      }
+
+      /**
+       * Returns the index of this cell in the parent object.
+       *
+       * @return the index of this cell in the parent object
+       */
+      public int getAccessibleIndexInParent()
+      {
+        return index;
+      }
+
+      /**
+       * Returns the number of children of this object. Table cells cannot have
+       * children, so we return <code>0</code> here.
+       *
+       * @return <code>0</code>
+       */
+      public int getAccessibleChildrenCount()
+      {
+        return 0;
+      }
+
+      /**
+       * Returns the accessible child at index <code>i</code>. Table cells
+       * don't have children, so we return <code>null</code> here.
+       *
+       * @return <code>null</code>
+       */
+      public Accessible getAccessibleChild(int i)
+      {
+        return null;
+      }
+
+      /**
+       * Returns the locale setting for this accessible table cell.
+       *
+       * @return the locale setting for this accessible table cell
+       */
+      public Locale getLocale()
+      {
+        // TODO: For now, we return english here. This must be fixed as soon
+        // as we have a localized Swing.
+        return Locale.ENGLISH;
+      }
+
+      /**
+       * Returns the accessible context of this table cell. Since accessible
+       * table cells are their own accessible context, we return
+       * <code>this</code>.
+       *
+       * @return the accessible context of this table cell
+       */
+      public AccessibleContext getAccessibleContext()
+      {
+        return this;
+      }
+
+      /**
+       * Returns the background color of this cell.
+       *
+       * @return the background color of this cell
+       */
+      public Color getBackground()
+      {
+        return table.getBackground();
+      }
+
+      /**
+       * Sets the background of the cell. Since table cells cannot have
+       * individual background colors, this method does nothing. Set the
+       * background directly on the table instead.
+       * 
+       * @param color not used
+       */
+      public void setBackground(Color color)
+      {
+        // This method does nothing. See API comments.
+      }
+
+      /**
+       * Returns the foreground color of the table cell.
+       *
+       * @return the foreground color of the table cell
+       */
+      public Color getForeground()
+      {
+        return table.getForeground();
+      }
+
+      /**
+       * Sets the foreground of the cell. Since table cells cannot have
+       * individual foreground colors, this method does nothing. Set the
+       * foreground directly on the table instead.
+       * 
+       * @param color not used
+       */
+      public void setForeground(Color color)
+      {
+        // This method does nothing. See API comments.
+      }
+
+      /**
+       * Returns the cursor for this table cell.
+       *
+       * @return the cursor for this table cell
+       */
+      public Cursor getCursor()
+      {
+        return table.getCursor();
+      }
+
+      /**
+       * Sets the cursor of the cell. Since table cells cannot have
+       * individual cursors, this method does nothing. Set the
+       * cursor directly on the table instead.
+       * 
+       * @param cursor not used
+       */
+      public void setCursor(Cursor cursor)
+      {
+        // This method does nothing. See API comments.
+      }
+
+      /**
+       * Returns the font of the table cell.
+       *
+       * @return the font of the table cell
+       */
+      public Font getFont()
+      {
+        return table.getFont();
+      }
+
+      /**
+       * Sets the font of the cell. Since table cells cannot have
+       * individual fonts, this method does nothing. Set the
+       * font directly on the table instead.
+       * 
+       * @param font not used
+       */
+      public void setFont(Font font)
+      {
+        // This method does nothing. See API comments.
+      }
+
+      /**
+       * Returns the font metrics for a specified font.
+       *
+       * @param font the font for which we return the metrics
+       *
+       * @return the font metrics for a specified font
+       */
+      public FontMetrics getFontMetrics(Font font)
+      {
+        return table.getFontMetrics(font);
+      }
+
+      /**
+       * Returns <code>true</code> if this table cell is enabled,
+       * <code>false</code> otherwise.
+       *
+       * @return <code>true</code> if this table cell is enabled,
+       *         <code>false</code> otherwise
+       */
+      public boolean isEnabled()
+      {
+        return table.isEnabled();
+      }
+
+      /**
+       * Table cells cannot be disabled or enabled individually, so this method
+       * does nothing. Set the enabled flag on the table itself.
+       *
+       * @param b not used here
+       */
+      public void setEnabled(boolean b)
+      {
+        // This method does nothing. See API comments.
+      }
+
+      /**
+       * Returns <code>true</code> if this cell is visible, <code>false</code>
+       * otherwise.
+       *
+       * @return <code>true</code> if this cell is visible, <code>false</code>
+       *         otherwise
+       */
+      public boolean isVisible()
+      {
+        return table.isVisible();
+      }
+
+      /**
+       * The visibility cannot be set on individual table cells, so this method
+       * does nothing. Set the visibility on the table itself.
+       *
+       * @param b not used
+       */
+      public void setVisible(boolean b)
+      {
+        // This method does nothing. See API comments.
+      }
+
+      /**
+       * Returns <code>true</code> if this table cell is currently showing on
+       * screen.
+       *
+       * @return <code>true</code> if this table cell is currently showing on
+       *         screen
+       */
+      public boolean isShowing()
+      {
+        return table.isShowing();
+      }
+
+      /**
+       * Returns <code>true</code> if this table cell contains the location
+       * at <code>point</code>, <code>false</code> otherwise.
+       * <code>point</code> is interpreted as relative to the coordinate system
+       * of the table cell.
+       *
+       * @return <code>true</code> if this table cell contains the location
+       *         at <code>point</code>, <code>false</code> otherwise
+       */
+      public boolean contains(Point point)
+      {
+        Rectangle cellRect = table.getCellRect(row, column, true);
+        cellRect.x = 0;
+        cellRect.y = 0;
+        return cellRect.contains(point);
+      }
+
+      /**
+       * Returns the screen location of the table cell.
+       *
+       * @return the screen location of the table cell
+       */
+      public Point getLocationOnScreen()
+      {
+        Point tableLoc = table.getLocationOnScreen();
+        Rectangle cellRect = table.getCellRect(row, column, true);
+        tableLoc.x += cellRect.x;
+        tableLoc.y += cellRect.y;
+        return tableLoc;
+      }
+
+      /**
+       * Returns the location of this cell relative to the table's bounds.
+       *
+       * @return the location of this cell relative to the table's bounds
+       */
+      public Point getLocation()
+      {
+        Rectangle cellRect = table.getCellRect(row, column, true);
+        return new Point(cellRect.x, cellRect.y);
+      }
+
+      /**
+       * The location of the table cells cannot be manipulated directly, so
+       * this method does nothing.
+       *
+       * @param point not used
+       */
+      public void setLocation(Point point)
+      {
+        // This method does nothing. See API comments.
+      }
+
+      /**
+       * Returns the bounds of the cell relative to its table.
+       *
+       * @return the bounds of the cell relative to its table
+       */
+      public Rectangle getBounds()
+      {
+        return table.getCellRect(row, column, true);
+      }
+
+      /**
+       * The bounds of the table cells cannot be manipulated directly, so
+       * this method does nothing.
+       *
+       * @param rectangle not used
+       */
+      public void setBounds(Rectangle rectangle)
+      {
+        // This method does nothing. See API comments.
+      }
+
+      /**
+       * Returns the size of the table cell.
+       *
+       * @return the size of the table cell
+       */
+      public Dimension getSize()
+      {
+        Rectangle cellRect = table.getCellRect(row, column, true);
+        return new Dimension(cellRect.width, cellRect.height);
+      }
+
+      /**
+       * The size cannot be set on table cells directly, so this method does
+       * nothing.
+       *
+       * @param dimension not used
+       */
+      public void setSize(Dimension dimension)
+      {
+        // This method does nothing. See API comments.
+      }
+
+      /**
+       * Table cells have no children, so we return <code>null</code> here.
+       *
+       * @return <code>null</code>
+       */
+      public Accessible getAccessibleAt(Point point)
+      {
+        return null;
+      }
+
+      /**
+       * Returns <code>true</code> if this table cell is focus traversable,
+       * <code>false</code> otherwise.
+       *
+       * @return <code>true</code> if this table cell is focus traversable,
+       *         <code>false</code> otherwise
+       */
+      public boolean isFocusTraversable()
+      {
+        return table.isFocusable();
+      }
+
+      /**
+       * Requests that this table cell gets the keyboard focus.
+       */
+      public void requestFocus()
+      {
+        // We first set the selection models' lead selection to this cell.
+        table.getColumnModel().getSelectionModel()
+        .setLeadSelectionIndex(column);
+        table.getSelectionModel().setLeadSelectionIndex(row);
+        // Now we request that the table receives focus.
+        table.requestFocus();
+      }
+
+      /**
+       * Adds a focus listener to this cell. The focus listener is really
+       * added to the table, so there is no way to find out when an individual
+       * cell changes the focus.
+       *
+       * @param listener the focus listener to add
+       */
+      public void addFocusListener(FocusListener listener)
+      {
+        table.addFocusListener(listener);
+      }
+
+      /**
+       * Removes a focus listener from the cell. The focus listener is really
+       * removed from the table.
+       *
+       * @param listener the listener to remove
+       */
+      public void removeFocusListener(FocusListener listener)
+      {
+        table.removeFocusListener(listener);
+      }
+        
+    }
 
     protected class AccessibleJTableModelChange
       implements AccessibleTableModelChange
@@ -206,10 +652,48 @@ public class JTable
       
     }
 
+    /**
+     * Receives notification when the table model changes. Depending on the
+     * type of change, this method calls {@link #tableRowsInserted} or
+     * {@link #tableRowsDeleted}.
+     *
+     * @param event the table model event
+     */
     public void tableChanged(TableModelEvent event)
     {
-      // TODO Auto-generated method stub
+      switch (event.getType())
+        {
+        case TableModelEvent.INSERT:
+          tableRowsInserted(event);
+          break;
+        case TableModelEvent.DELETE:
+          tableRowsDeleted(event);
+          break;
+        }
+    }
+
+    /**
+     * Receives notification when one or more rows have been inserted into the
+     * table.
+     *
+     * @param event the table model event
+     */
+    public void tableRowsInserted(TableModelEvent event)
+    {
+      // TODO: What to do here, if anything? This might be a hook method for
+      // subclasses...
+    }
       
+    /**
+     * Receives notification when one or more rows have been deleted from the
+     * table.
+     *
+     * @param event the table model event
+     */
+    public void tableRowsDeleted(TableModelEvent event)
+    {
+      // TODO: What to do here, if anything? This might be a hook method for
+      // subclasses...
     }
 
     public void columnAdded(TableColumnModelEvent event)
@@ -1044,11 +1528,22 @@ public class JTable
         setColumnModel(createDefaultColumnModel());
         autoCreate = true;
       }
-    initializeLocalVars();
-    updateUI();
     setSelectionModel(sm == null ? createDefaultSelectionModel() : sm);
     setModel(dm == null ? createDefaultDataModel() : dm);
     setAutoCreateColumnsFromModel(autoCreate);
+    initializeLocalVars();
+    // The following four lines properly set the lead selection indices.
+    // After this, the UI will handle the lead selection indices.
+    // FIXME: this should probably not be necessary, if the UI is installed
+    // before the TableModel is set then the UI will handle things on its
+    // own, but certain variables need to be set before the UI can be installed
+    // so we must get the correct order for all the method calls in this
+    // constructor.
+    selectionModel.setAnchorSelectionIndex(0);    
+    selectionModel.setLeadSelectionIndex(0);
+    columnModel.getSelectionModel().setAnchorSelectionIndex(0);
+    columnModel.getSelectionModel().setLeadSelectionIndex(0);
+    updateUI();
   }    
 
   protected void initializeLocalVars()

@@ -828,9 +828,6 @@ public class JFileChooser extends JComponent implements Accessible
    */
   public String getDialogTitle()
   {
-    if (dialogTitle == null)
-      return getUI().getDialogTitle(this);
-    else
     return dialogTitle;
   }
 
@@ -942,9 +939,6 @@ public class JFileChooser extends JComponent implements Accessible
    */
   public String getApproveButtonText()
   {
-    if (approveButtonText == null)
-      return getUI().getApproveButtonText(this);
-    else
     return approveButtonText;
   }
 
@@ -1264,9 +1258,6 @@ public class JFileChooser extends JComponent implements Accessible
    */
   public FileView getFileView()
   {
-    if (fv == null)
-      return getUI().getFileView(this);
-    else
     return fv;
   }
 
@@ -1280,7 +1271,12 @@ public class JFileChooser extends JComponent implements Accessible
    */
   public String getName(File f)
   {
-    return getFileView().getName(f);
+    String name = null;
+    if (fv != null)
+      name = fv.getName(f);
+    if (name == null)
+      name = getUI().getFileView(this).getName(f);
+    return name;
   }
 
   /**
@@ -1293,7 +1289,12 @@ public class JFileChooser extends JComponent implements Accessible
    */
   public String getDescription(File f)
   {
-    return getFileView().getDescription(f);
+    String result = null;
+    if (fv != null)
+      result = fv.getDescription(f);
+    if (result == null)
+      result = getUI().getFileView(this).getDescription(f);
+    return result;
   }
 
   /**
@@ -1306,7 +1307,12 @@ public class JFileChooser extends JComponent implements Accessible
    */
   public String getTypeDescription(File f)
   {
-    return getFileView().getTypeDescription(f);
+    String result = null;
+    if (fv != null)
+      result = getFileView().getTypeDescription(f);
+    if (result == null)
+      result = getUI().getFileView(this).getTypeDescription(f);
+    return result;
   }
 
   /**
@@ -1318,7 +1324,12 @@ public class JFileChooser extends JComponent implements Accessible
    */
   public Icon getIcon(File f)
   {
-    return getFileView().getIcon(f);
+    Icon result = null;
+    if (fv != null)
+      result = fv.getIcon(f);
+    if (result == null)
+      result = getUI().getFileView(this).getIcon(f);
+    return result;
   }
 
   /**

@@ -45,6 +45,8 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Shape;
 
+import javax.swing.SwingConstants;
+import javax.swing.event.DocumentEvent;
 import javax.swing.text.Position.Bias;
 
 /**
@@ -67,6 +69,15 @@ public class WrappedPlainView extends BoxView implements TabExpander
   
   /** Whether or not to wrap on word boundaries **/
   boolean wordWrap;
+  
+  /** A ViewFactory that creates WrappedLines **/
+  ViewFactory viewFactory = new WrappedLineCreator();
+  
+  /** The start of the selected text **/
+  int selectionStart;
+  
+  /** The end of the selected text **/
+  int selectionEnd;
   
   /**
    * The instance returned by {@link #getLineBuffer()}.
@@ -127,6 +138,64 @@ public class WrappedPlainView extends BoxView implements TabExpander
   }
 
   /**
+   * Draws a line of text, suppressing white space at the end and expanding
+   * tabs.  Calls drawSelectedText and drawUnselectedText.
+   * @param p0 starting document position to use
+   * @param p1 ending document position to use
+   * @param g graphics context
+   * @param x starting x position
+   * @param y starting y position
+   */
+  protected void drawLine(int p0, int p1, Graphics g, int x, int y)
+  {
+    try
+    {
+      // We have to draw both selected and unselected text.  There are
+      // several cases:
+      //  - entire range is unselected
+      //  - entire range is selected
+      //  - start of range is selected, end of range is unselected
+      //  - start of range is unselected, end of range is selected
+      //  - middle of range is selected, start and end of range is unselected
+      
+      // entire range unselected:      
+      if ((selectionStart == selectionEnd) || 
+          (p0 > selectionEnd || p1 < selectionStart))
+        drawUnselectedText(g, x, y, p0, p1);
+      
+      // entire range selected
+      else if (p0 >= selectionStart && p1 <= selectionEnd)
+        drawSelectedText(g, x, y, p0, p1);
+      
+      // start of range selected, end of range unselected
+      else if (p0 >= selectionStart)
+        {
+          x = drawSelectedText(g, x, y, p0, selectionEnd);
+          drawUnselectedText(g, x, y, selectionEnd, p1);
+        }
+      
+      // start of range unselected, end of range selected
+      else if (selectionStart > p0 && selectionEnd > p1)
+        {
+          x = drawUnselectedText(g, x, y, p0, selectionStart);
+          drawSelectedText(g, x, y, selectionStart, p1);
+        }
+      
+      // middle of range selected
+      else if (selectionStart > p0)
+        {
+          x = drawUnselectedText(g, x, y, p0, selectionStart);
+          x = drawSelectedText(g, x, y, selectionStart, selectionEnd);
+          drawUnselectedText(g, x, y, selectionEnd, p1);
+        }        
+    }
+    catch (BadLocationException ble)
+    {
+      // shouldn't happen
+    }
+  }
+
+  /**
    * Renders the range of text as selected text.  Just paints the text 
    * in the color specified by the host component.  Assumes the highlighter
    * will render the selected background.
@@ -144,7 +213,7 @@ public class WrappedPlainView extends BoxView implements TabExpander
     g.setColor(selectedColor);
     Segment segment = getLineBuffer();
     getDocument().getText(p0, p1 - p0, segment);
-    return Utilities.drawTabbedText(segment, x, y, g, this, 0);
+    return Utilities.drawTabbedText(segment, x, y, g, this, p0);
   }
 
   /**
@@ -168,7 +237,7 @@ public class WrappedPlainView extends BoxView implements TabExpander
 
     Segment segment = getLineBuffer();
     getDocument().getText(p0, p1 - p0, segment);
-    return Utilities.drawTabbedText(segment, x, y, g, this, segment.offset);
+    return Utilities.drawTabbedText(segment, x, y, g, this, p0);
   }  
   
   /**
@@ -201,7 +270,9 @@ public class WrappedPlainView extends BoxView implements TabExpander
   protected int calculateBreakPosition(int p0, int p1)
   {
     Container c = getContainer();
-    Rectangle alloc = c.getBounds();
+    Rectangle alloc = c.isValid() ? c.getBounds()
+                                 : new Rectangle(c.getPreferredSize());
+    updateMetrics();
     try
       {
         getDocument().getText(p0, p1 - p0, getLineBuffer());
@@ -214,11 +285,121 @@ public class WrappedPlainView extends BoxView implements TabExpander
     if (wordWrap)
       return p0
              + Utilities.getBreakLocation(lineBuffer, metrics, alloc.x,
-                                          alloc.x + alloc.width, this, p0);
+                                          alloc.x + alloc.width, this, 0);
     else
+      {
       return p0
              + Utilities.getTabbedTextOffset(lineBuffer, metrics, alloc.x,
-                                             alloc.x + alloc.width, this, p0);
+                                             alloc.x + alloc.width, this, 0);
+      }
+  }
+  
+  void updateMetrics()
+  {
+    Container component = getContainer();
+    metrics = component.getFontMetrics(component.getFont());
+  }
+  
+  /**
+   * Determines the preferred span along the given axis.  Implemented to 
+   * cache the font metrics and then call the super classes method.
+   */
+  public float getPreferredSpan (int axis)
+  {
+    updateMetrics();
+    return super.getPreferredSpan(axis);
+  }
+  
+  /**
+   * Determines the minimum span along the given axis.  Implemented to 
+   * cache the font metrics and then call the super classes method.
+   */
+  public float getMinimumSpan (int axis)
+  {
+    updateMetrics();
+    return super.getMinimumSpan(axis);
+  }
+  
+  /**
+   * Determines the maximum span along the given axis.  Implemented to 
+   * cache the font metrics and then call the super classes method.
+   */
+  public float getMaximumSpan (int axis)
+  {
+    updateMetrics();
+    return super.getMaximumSpan(axis);
+  }
+  
+  /**
+   * Called when something was inserted.  Overridden so that
+   * the view factory creates WrappedLine views.
+   */
+  public void insertUpdate (DocumentEvent e, Shape a, ViewFactory f)
+  {
+    super.insertUpdate(e, a, viewFactory);
+    // FIXME: could improve performance by repainting only the necessary area
+    getContainer().repaint();
+  }
+  
+  /**
+   * Called when something is removed.  Overridden so that
+   * the view factory creates WrappedLine views.
+   */
+  public void removeUpdate (DocumentEvent e, Shape a, ViewFactory f)
+  {
+    super.removeUpdate(e, a, viewFactory);
+    // FIXME: could improve performance by repainting only the necessary area
+    getContainer().repaint();
+  }
+  
+  /**
+   * Called when the portion of the Document that this View is responsible
+   * for changes.  Overridden so that the view factory creates
+   * WrappedLine views.
+   */
+  public void changedUpdate (DocumentEvent e, Shape a, ViewFactory f)
+  {
+    super.changedUpdate(e, a, viewFactory);
+    // FIXME: could improve performance by repainting only the necessary area
+    getContainer().repaint();
+  }
+    
+  class WrappedLineCreator implements ViewFactory
+  {
+    // Creates a new WrappedLine
+    public View create(Element elem)
+    {
+      return new WrappedLine(elem);
+    }    
+  }
+  
+  /**
+   * Renders the <code>Element</code> that is associated with this
+   * <code>View</code>.  Caches the metrics and then calls
+   * super.paint to paint all the child views.
+   *
+   * @param g the <code>Graphics</code> context to render to
+   * @param a the allocated region for the <code>Element</code>
+   */
+  public void paint(Graphics g, Shape a)
+  {
+    JTextComponent comp = (JTextComponent)getContainer();
+    selectionStart = comp.getSelectionStart();
+    selectionEnd = comp.getSelectionEnd();
+    updateMetrics();
+    super.paint(g, a);
+  }
+  
+  /**
+   * Sets the size of the View.  Implemented to update the metrics
+   * and then call super method.
+   */
+  public void setSize (float width, float height)
+  {
+    updateMetrics();
+    if (width != getWidth())
+      preferenceChanged(null, true, true);
+    super.setSize(width, height);
   }
   
   class WrappedLine extends View
@@ -238,7 +419,35 @@ public class WrappedPlainView extends BoxView implements TabExpander
      */
     public void paint(Graphics g, Shape s)
     {
-      // TODO Auto-generated method stub      
+      // Ensure metrics are up-to-date.
+      updateMetrics();
+      JTextComponent textComponent = (JTextComponent) getContainer();
+
+      g.setFont(textComponent.getFont());
+      selectedColor = textComponent.getSelectedTextColor();
+      unselectedColor = textComponent.getForeground();
+      disabledColor = textComponent.getDisabledTextColor();
+
+      // FIXME: this is a hack, for some reason textComponent.getSelectedColor
+      // was returning black, which is not visible against a black background
+      selectedColor = Color.WHITE;
+      
+      Rectangle rect = s.getBounds();
+      int lineHeight = metrics.getHeight();
+
+      int end = getEndOffset();
+      int currStart = getStartOffset();
+      int currEnd;      
+      while (currStart < end)
+        {
+          currEnd = calculateBreakPosition(currStart, end);
+          drawLine(currStart, currEnd, g, rect.x, rect.y);
+          rect.y += lineHeight;          
+          if (currEnd == currStart)
+            currStart ++;
+          else
+            currStart = currEnd;          
+        }
     }
 
     /**
@@ -248,11 +457,11 @@ public class WrappedPlainView extends BoxView implements TabExpander
      */
     int determineNumLines()
     {      
+      numLines = 0;
       int end = getEndOffset();
       if (end == 0)
         return 0;
       
-      numLines = 0;
       int breakPoint;
       for (int i = getStartOffset(); i < end;)
         {
@@ -281,10 +490,7 @@ public class WrappedPlainView extends BoxView implements TabExpander
       if (axis == X_AXIS)
         return getWidth();
       else if (axis == Y_AXIS)
-        {
-          metrics = getContainer().getFontMetrics(getContainer().getFont());
           return numLines * metrics.getHeight(); 
-        }
       
       throw new IllegalArgumentException("Invalid axis for getPreferredSpan: "
                                          + axis);
@@ -301,10 +507,10 @@ public class WrappedPlainView extends BoxView implements TabExpander
      * in model space
      * @throws BadLocationException if the given model position is invalid
      */
-    public Shape modelToView(int pos, Shape a, Bias b) throws BadLocationException
+    public Shape modelToView(int pos, Shape a, Bias b)
+        throws BadLocationException
     {
       Segment s = getLineBuffer();
-      metrics = getContainer().getFontMetrics(getContainer().getFont());
       int lineHeight = metrics.getHeight();
       Rectangle rect = a.getBounds();
       
@@ -335,7 +541,9 @@ public class WrappedPlainView extends BoxView implements TabExpander
                 {
                   // Shouldn't happen
                 }
-              rect.x += Utilities.getTabbedTextWidth(s, metrics, rect.x, WrappedPlainView.this, currLineStart);
+              rect.x += Utilities.getTabbedTextWidth(s, metrics, rect.x,
+                                                     WrappedPlainView.this,
+                                                     currLineStart);
               return rect;
             }
           // Increment rect.y so we're checking the next logical line
@@ -368,7 +576,6 @@ public class WrappedPlainView extends BoxView implements TabExpander
       Rectangle rect = a.getBounds();
       int currLineStart = getStartOffset();
       int end = getEndOffset();
-      metrics = getContainer().getFontMetrics(getContainer().getFont());
       int lineHeight = metrics.getHeight();
       if (y < rect.y)
         return currLineStart;
@@ -413,5 +620,81 @@ public class WrappedPlainView extends BoxView implements TabExpander
             currLineStart = currLineEnd;
         }
     }    
+
+    /**
+     * Returns the document position that is (visually) nearest to the given
+     * document position <code>pos</code> in the given direction <code>d</code>.
+     *
+     * @param c the text component
+     * @param pos the document position
+     * @param b the bias for <code>pos</code>
+     * @param d the direction, must be either {@link SwingConstants#NORTH},
+     *        {@link SwingConstants#SOUTH}, {@link SwingConstants#WEST} or
+     *        {@link SwingConstants#EAST}
+     * @param biasRet an array of {@link Position.Bias} that can hold at least
+     *        one element, which is filled with the bias of the return position
+     *        on method exit
+     *
+     * @return the document position that is (visually) nearest to the given
+     *         document position <code>pos</code> in the given direction
+     *         <code>d</code>
+     *
+     * @throws BadLocationException if <code>pos</code> is not a valid offset 
+     *         in the document model
+     */
+    public int getNextVisualPositionFrom(JTextComponent c, int pos,
+                                         Position.Bias b, int d,
+                                         Position.Bias[] biasRet)
+      throws BadLocationException
+    {
+      // TODO: Implement this properly.
+      throw new AssertionError("Not implemented yet.");
+    }
+    
+    /**
+     * This method is called from insertUpdate and removeUpdate.
+     * If the number of lines in the document has changed, just repaint
+     * the whole thing (note, could improve performance by not repainting 
+     * anything above the changes).  If the number of lines hasn't changed, 
+     * just repaint the given Rectangle.
+     * @param a the Rectangle to repaint if the number of lines hasn't changed
+     */
+    void updateDamage (Rectangle a)
+    {
+      int newNumLines = determineNumLines();
+      if (numLines != newNumLines)
+        {
+          numLines = newNumLines;
+          getContainer().repaint();
+        }
+      else
+        getContainer().repaint(a.x, a.y, a.width, a.height);
+    }
+    
+    /**
+     * This method is called when something is inserted into the Document
+     * that this View is displaying.
+     * 
+     * @param changes the DocumentEvent for the changes.
+     * @param a the allocation of the View
+     * @param f the ViewFactory used to rebuild
+     */
+    public void insertUpdate (DocumentEvent changes, Shape a, ViewFactory f)
+    {
+      updateDamage((Rectangle)a); 
+    }
+    
+    /**
+     * This method is called when something is removed from the Document
+     * that this View is displaying.
+     * 
+     * @param changes the DocumentEvent for the changes.
+     * @param a the allocation of the View
+     * @param f the ViewFactory used to rebuild
+     */
+    public void removeUpdate (DocumentEvent changes, Shape a, ViewFactory f)
+    {
+      updateDamage((Rectangle)a); 
+    }
   }
 }
