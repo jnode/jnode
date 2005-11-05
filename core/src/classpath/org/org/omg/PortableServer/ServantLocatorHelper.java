@@ -117,6 +117,25 @@ public abstract class ServantLocatorHelper
   }
 
   /**
+   * Narrow the given object to the ServantLocator. For the objects that are
+   * always local, this operation does not differ from the ordinary
+   * {@link #narrow} (ClassCastException will be thrown if narrowing something
+   * different).
+   * 
+   * @param obj the object to cast.
+   * 
+   * @return the casted ServantLocator.
+   * 
+   * @since 1.5
+   * 
+   * @see OMG issue 4158.
+   */
+  public static ServantLocator unchecked_narrow(org.omg.CORBA.Object obj)
+  {
+    return narrow(obj);
+  }    
+
+  /**
    * This should read the servant locator, but it cannot be transferred
    * this way as its operations cannot be remote. The operations cannot
    * be remote because one of the method parameters, POA, is required to be

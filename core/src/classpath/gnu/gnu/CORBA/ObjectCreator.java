@@ -39,10 +39,11 @@ exception statement from your version. */
 package gnu.CORBA;
 
 import gnu.CORBA.CDR.UnknownExceptionCtxHandler;
-import gnu.CORBA.CDR.cdrBufInput;
-import gnu.CORBA.CDR.cdrBufOutput;
-import gnu.CORBA.CDR.cdrInput;
+import gnu.CORBA.CDR.BufferredCdrInput;
+import gnu.CORBA.CDR.BufferedCdrOutput;
+import gnu.CORBA.CDR.AbstractCdrInput;
 import gnu.CORBA.GIOP.ServiceContext;
+import gnu.CORBA.typecodes.RecordTypeCode;
 import gnu.classpath.VMStackWalker;
 
 import org.omg.CORBA.Any;
@@ -203,11 +204,11 @@ public class ObjectCreator
 
         if (uEx != null)
           {
-            cdrBufInput in = new cdrBufInput(uEx.context_data);
+            BufferredCdrInput in = new BufferredCdrInput(uEx.context_data);
             in.setOrb(in.orb());
-            if (input instanceof cdrInput)
+            if (input instanceof AbstractCdrInput)
                                   {
-                ((cdrInput) input).cloneSettings(in);
+                ((AbstractCdrInput) input).cloneSettings(in);
                                   }
 
             Throwable t = UnknownExceptionCtxHandler.read(in, contexts);
@@ -462,7 +463,7 @@ public class ObjectCreator
   {
     try
       {
-        cdrBufOutput output = new cdrBufOutput();
+        BufferedCdrOutput output = new BufferedCdrOutput();
 
         String m_exception_id = getRepositoryId(exception.getClass());
         output.write_string(m_exception_id);
@@ -471,11 +472,11 @@ public class ObjectCreator
 
         String name = getDefaultName(m_exception_id);
 
-        universalHolder h = new universalHolder(output);
+        GeneralHolder h = new GeneralHolder(output);
 
         into.insert_Streamable(h);
 
-        recordTypeCode r = new recordTypeCode(TCKind.tk_except);
+        RecordTypeCode r = new RecordTypeCode(TCKind.tk_except);
         r.setId(m_exception_id);
         r.setName(name);
         into.type(r);
