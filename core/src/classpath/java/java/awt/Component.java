@@ -587,6 +587,7 @@ public abstract class Component
 	 */
   protected Component()
   {
+    // Nothing to do here.
 	}
 
 	/**
@@ -762,7 +763,7 @@ public abstract class Component
     if (! visible || peer == null)
 			return false;
 
-		return parent == null ? true : parent.isShowing();
+    return parent == null ? false : parent.isShowing();
 	}
 
 	/**
@@ -903,6 +904,7 @@ public abstract class Component
 
         // The JDK repaints the component before invalidating the parent.
         // So do we.
+        if (isShowing())
         repaint();
         // Invalidate the parent if we have one. The component itself must
         // not be invalidated. We also avoid NullPointerException with
@@ -945,11 +947,12 @@ public abstract class Component
         ComponentPeer currentPeer=peer;
         if (currentPeer != null)
             currentPeer.setVisible(false);
-        
+        boolean wasShowing = isShowing();
         this.visible = false;
         
         // The JDK repaints the component before invalidating the parent.
         // So do we.
+        if (wasShowing)
         repaint();
         // Invalidate the parent if we have one. The component itself must
         // not be invalidated. We also avoid NullPointerException with
@@ -975,7 +978,7 @@ public abstract class Component
   {
 		if (foreground != null)
 			return foreground;
-    return parent == null ? SystemColor.windowText : parent.getForeground();
+    return parent == null ? null : parent.getForeground();
 	}
 
 	/**
@@ -1641,7 +1644,7 @@ public abstract class Component
 	 */
   public Dimension getMaximumSize()
   {
-		return new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
+    return new Dimension(Short.MAX_VALUE, Short.MAX_VALUE);
 	}
 
 	/**
@@ -3805,12 +3808,15 @@ public abstract class Component
         synchronized (getTreeLock ())
           {
             // Find this Component's top-level ancestor.
-            Container parent = getParent ();
-
+            Container parent = (this instanceof Container) ? (Container) this
+                                                          : getParent();            
             while (parent != null
                    && !(parent instanceof Window))
               parent = parent.getParent ();
 
+            if (parent == null)
+              return;
+            
             Window toplevel = (Window) parent;
             if (toplevel.isFocusableWindow ())
               {
@@ -5564,6 +5570,7 @@ p   * <li>the set of backward traversal keys
 			 */
       protected AccessibleAWTComponentHandler()
       {
+        // Nothing to do here.
 			}
 
 			/**
@@ -5595,6 +5602,7 @@ p   * <li>the set of backward traversal keys
 			 */
       public void componentMoved(ComponentEvent e)
       {
+        // Nothing to do here.
 			}
 
 			/**
@@ -5604,6 +5612,7 @@ p   * <li>the set of backward traversal keys
 			 */
       public void componentResized(ComponentEvent e)
       {
+        // Nothing to do here.
 			}
 		} // class AccessibleAWTComponentHandler
 
@@ -5621,6 +5630,7 @@ p   * <li>the set of backward traversal keys
 			 */
       protected AccessibleAWTFocusHandler()
       {
+        // Nothing to do here.
 			}
 
 			/**
