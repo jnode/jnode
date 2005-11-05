@@ -273,14 +273,16 @@ public class BasicPopupMenuUI extends PopupMenuUI
 
       RootPaneContainer rootContainer = (RootPaneContainer) SwingUtilities
                                         .getRoot(invoker);
+      if (rootContainer != null)
+        {
       ((Container) rootContainer).removeComponentListener(topWindowListener);
 
-      // If this popup menu is the last popup menu visible on the screen, then
+          // If this popup menu is the last popup menu visible on the screen,
+          // then
       // stop interrupting mouse events in the glass pane before hiding this 
       // last popup menu.
       boolean topLevelMenu = (popupMenu.getInvoker() instanceof JMenu)
-                             && ((JMenu) popupMenu.getInvoker())
-                                .isTopLevelMenu();
+                                 && ((JMenu) popupMenu.getInvoker()).isTopLevelMenu();
 
       if (topLevelMenu || ! (popupMenu.getInvoker() instanceof MenuElement))
         {
@@ -291,6 +293,7 @@ public class BasicPopupMenuUI extends PopupMenuUI
 	  glassPane.removeMouseListener(mouseInputListener);
 	  mouseInputListener = null;
         }
+    }
     }
 
     /**

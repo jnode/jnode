@@ -56,6 +56,7 @@ import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.LookAndFeel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
@@ -328,6 +329,35 @@ public abstract class BasicTextUI extends TextUI
     public void changedUpdate(DocumentEvent ev, Shape shape, ViewFactory vf)
     {
       view.changedUpdate(ev, shape, vf);
+    }
+
+    /**
+     * Returns the document position that is (visually) nearest to the given
+     * document position <code>pos</code> in the given direction <code>d</code>.
+     *
+     * @param c the text component
+     * @param pos the document position
+     * @param b the bias for <code>pos</code>
+     * @param d the direction, must be either {@link SwingConstants#NORTH},
+     *        {@link SwingConstants#SOUTH}, {@link SwingConstants#WEST} or
+     *        {@link SwingConstants#EAST}
+     * @param biasRet an array of {@link Position.Bias} that can hold at least
+     *        one element, which is filled with the bias of the return position
+     *        on method exit
+     *
+     * @return the document position that is (visually) nearest to the given
+     *         document position <code>pos</code> in the given direction
+     *         <code>d</code>
+     *
+     * @throws BadLocationException if <code>pos</code> is not a valid offset in
+     *         the document model
+     */
+    public int getNextVisualPositionFrom(JTextComponent c, int pos,
+                                         Position.Bias b, int d,
+                                         Position.Bias[] biasRet)
+      throws BadLocationException
+    {
+      return view.getNextVisualPositionFrom(c, pos, b, d, biasRet);
     }
   }
 
@@ -769,6 +799,18 @@ public abstract class BasicTextUI extends TextUI
   }
 
   /**
+   * Returns the minimum size for text components. This returns the size
+   * of the component's insets.
+   *
+   * @return the minimum size for text components
+   */
+  public Dimension getMinimumSize(JComponent c)
+  {
+    Insets i = c.getInsets();
+    return new Dimension(i.left + i.right, i.top + i.bottom);
+  }
+
+  /**
    * Paints the text component.
    *
    * @param g the <code>Graphics</code> context to paint to
@@ -1034,6 +1076,8 @@ public abstract class BasicTextUI extends TextUI
   {
     rootView.setView(view);
     view.setParent(rootView);
+    textComponent.revalidate();
+    textComponent.repaint();
   }
 
   /**

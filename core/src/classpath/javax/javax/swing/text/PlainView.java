@@ -46,6 +46,7 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Shape;
 
+import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentEvent.ElementChange;
 
@@ -148,7 +149,9 @@ public class PlainView extends View implements TabExpander
       }
     catch (BadLocationException e)
       {
-	// This should never happen.
+	AssertionError ae = new AssertionError("Unexpected bad location");
+	ae.initCause(e);
+	throw ae;
       }
   }
 
@@ -251,11 +254,13 @@ public class PlainView extends View implements TabExpander
             int end = child.getEndOffset();
         try
           {
-            el.getDocument().getText(start, start + end, seg);
+            el.getDocument().getText(start, end - start, seg);
             }
             catch (BadLocationException ex)
               {
-            assert false : "BadLocationException should not be thrown here.";
+            AssertionError ae = new AssertionError("Unexpected bad location");
+	    ae.initCause(ex);
+	    throw ae;
               }
         
         if (seg == null || seg.array == null || seg.count == 0)
@@ -322,16 +327,18 @@ public class PlainView extends View implements TabExpander
     
     Element line = root.getElement(lineClicked);
     Segment s = getLineBuffer();
-
     int start = line.getStartOffset();
-    int end = line.getEndOffset();
+    // We don't want the \n at the end of the line.
+    int end = line.getEndOffset() - 1;
     try
     {
       doc.getText(start, end - start, s);
     }
     catch (BadLocationException ble)
     {
-      //this should never happen
+        AssertionError ae = new AssertionError("Unexpected bad location");
+        ae.initCause(ble);
+        throw ae;
     }
     
     int pos = Utilities.getTabbedTextOffset(s, metrics, rec.x, (int)x, this, start);
@@ -417,7 +424,9 @@ public class PlainView extends View implements TabExpander
           }
         catch (BadLocationException ex)
           {
-            assert false : "BadLocationException should not be thrown here.";
+            AssertionError ae = new AssertionError("Unexpected bad location");
+	    ae.initCause(ex);
+	    throw ae;
           }
                 
         if (seg == null || seg.array == null || seg.count == 0)
@@ -521,6 +530,36 @@ public class PlainView extends View implements TabExpander
     if (lineBuffer == null)
       lineBuffer = new Segment();
     return lineBuffer;
+  }
+
+  /**
+   * Returns the document position that is (visually) nearest to the given
+   * document position <code>pos</code> in the given direction <code>d</code>.
+   *
+   * @param c the text component
+   * @param pos the document position
+   * @param b the bias for <code>pos</code>
+   * @param d the direction, must be either {@link SwingConstants#NORTH},
+   *        {@link SwingConstants#SOUTH}, {@link SwingConstants#WEST} or
+   *        {@link SwingConstants#EAST}
+   * @param biasRet an array of {@link Position.Bias} that can hold at least
+   *        one element, which is filled with the bias of the return position
+   *        on method exit
+   *
+   * @return the document position that is (visually) nearest to the given
+   *         document position <code>pos</code> in the given direction
+   *         <code>d</code>
+   *
+   * @throws BadLocationException if <code>pos</code> is not a valid offset in
+   *         the document model
+   */
+  public int getNextVisualPositionFrom(JTextComponent c, int pos,
+                                       Position.Bias b, int d,
+                                       Position.Bias[] biasRet)
+    throws BadLocationException
+  {
+    // TODO: Implement this properly.
+    throw new AssertionError("Not implemented yet.");
   }
 }
 

@@ -548,8 +548,8 @@ public class JPopupMenu extends JComponent implements Accessible, MenuElement
             firePopupMenuWillBecomeVisible();
             
             PopupFactory pf = PopupFactory.getSharedInstance();
-            popup = pf.getPopup(invoker, this, popupLocationX, popupLocationY);
             pack();
+            popup = pf.getPopup(invoker, this, popupLocationX, popupLocationY);
             popup.show();
           }
         else

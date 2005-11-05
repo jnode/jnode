@@ -50,7 +50,6 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.InputMethodListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -73,7 +72,6 @@ import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
-import javax.swing.Timer;
 import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.event.CaretEvent;
@@ -300,48 +298,6 @@ public abstract class JTextComponent extends JComponent
     {
       this.key = key;
       this.actionName = actionName;
-    }
-  }
-
-  /**
-   * The timer that lets the caret blink.
-   */
-  private class CaretBlinkTimer extends Timer implements ActionListener
-  {
-    /**
-     * Creates a new CaretBlinkTimer object with a default delay of 1 second.
-     */
-    public CaretBlinkTimer()
-    {
-      super(1000, null);
-      addActionListener(this);
-    }
-
-    /**
-     * Lets the caret blink.
-     */
-    public void actionPerformed(ActionEvent ev)
-    {
-      Caret c = caret;
-      if (c != null)
-	c.setVisible(!c.isVisible());
-    }
-
-    /**
-     * Updates the blink delay according to the current caret.
-     */
-    public void update()
-    {
-      stop();
-      Caret c = caret;
-      if (c != null)
-	{
-	  setDelay(c.getBlinkRate());
-	  if (editable)
-	    start();
-	  else
-	    c.setVisible(false);
-	}
     }
   }
 
@@ -701,8 +657,6 @@ public abstract class JTextComponent extends JComponent
   private char focusAccelerator = '\0';
   private NavigationFilter navigationFilter;
 
-  private CaretBlinkTimer caretBlinkTimer;
-
   /**
    * Get a Keymap from the global keymap table, by name.
    *
@@ -960,8 +914,6 @@ public abstract class JTextComponent extends JComponent
         creatingKeymap = true;
       }
 
-    caretBlinkTimer = new CaretBlinkTimer();
-
     setFocusable(true);
     setEditable(true);
     enableEvents(AWTEvent.KEY_EVENT_MASK);
@@ -1200,14 +1152,6 @@ public abstract class JTextComponent extends JComponent
     if (editable == newValue)
       return;
 
-    if (newValue == true)
-      caretBlinkTimer.start();
-    else
-      {
-        caretBlinkTimer.stop();
-        caret.setVisible(false);
-      }
-
     boolean oldValue = editable;
     editable = newValue;
     firePropertyChange("editable", oldValue, newValue);
@@ -1235,8 +1179,6 @@ public abstract class JTextComponent extends JComponent
     
     Caret oldCaret = caret;
     caret = newCaret;
-
-    caretBlinkTimer.update();
 
     if (caret != null)
       caret.install(this);
@@ -1405,7 +1347,7 @@ public abstract class JTextComponent extends JComponent
     start = Math.max(start, 0);
     start = Math.min(start, length);
 
-    end = Math.max(end, 0);
+    end = Math.max(end, start);
     end = Math.min(end, length);
 
     setCaretPosition(start);

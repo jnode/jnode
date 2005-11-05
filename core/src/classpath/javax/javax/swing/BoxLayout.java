@@ -141,6 +141,9 @@ public class BoxLayout implements LayoutManager2, Serializable
    */
   public BoxLayout(Container container, int way)
   {
+    if (way != X_AXIS && way != Y_AXIS && way != LINE_AXIS && way != PAGE_AXIS)
+      throw new AWTError("Invalid axis");
+
     int width = 0;
     int height = 0;
     this.container = container;
@@ -216,7 +219,9 @@ public class BoxLayout implements LayoutManager2, Serializable
       throw new AWTError("BoxLayout can't be shared");
 
     checkTotalRequirements();
-    return new Dimension(xTotal.minimum, yTotal.minimum);
+        Insets i = container.getInsets();
+        return new Dimension(xTotal.minimum + i.left + i.right,
+                             yTotal.minimum + i.top + i.bottom);
   }
   }
 
@@ -297,6 +302,9 @@ public class BoxLayout implements LayoutManager2, Serializable
    */
   public void invalidateLayout(Container parent)
   {
+    if (container != parent)
+      throw new AWTError("BoxLayout can't be shared");
+
     synchronized (container.getTreeLock())
       {
     xChildren = null;
@@ -326,7 +334,9 @@ public class BoxLayout implements LayoutManager2, Serializable
       throw new AWTError("BoxLayout can't be shared");
 
     checkTotalRequirements();
-    return new Dimension(xTotal.maximum, yTotal.maximum);
+        Insets i = container.getInsets();
+        return new Dimension(xTotal.maximum + i.left + i.right,
+                             yTotal.maximum + i.top + i.bottom);
   }
   }
 

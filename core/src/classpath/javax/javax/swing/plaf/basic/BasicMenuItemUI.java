@@ -169,9 +169,9 @@ public class BasicMenuItemUI extends MenuItemUI
   private int defaultAcceleratorLabelGap = 10;
 
   /**
-   * Number of spaces between the text and the arrow icon.
+   * The gap between different menus on the MenuBar.
    */
-  private int defaultTextArrowIconGap = 10;
+  private int MenuGap = 10;
   
   /**
    * Creates a new BasicMenuItemUI object.
@@ -350,7 +350,12 @@ public class BasicMenuItemUI extends MenuItemUI
 
     if (arrowIcon != null && (c instanceof JMenu))
       {
-        d.width = d.width + arrowIcon.getIconWidth() + defaultTextArrowIconGap;
+        if (!((JMenu) c).isTopLevelMenu())
+          // It is a MenuItem
+          d.width += arrowIcon.getIconWidth() + m.getParent().getWidth();
+        else
+          // It is a Menu, no arrowIcon painted.
+          d.width += MenuGap;
 
         if (arrowIcon.getIconHeight() > d.height)
           d.height = arrowIcon.getIconHeight();
@@ -398,16 +403,18 @@ public class BasicMenuItemUI extends MenuItemUI
    */
   protected void installDefaults()
   {
-    LookAndFeel.installBorder(menuItem, "MenuItem.border");
-    LookAndFeel.installColorsAndFont(menuItem, "MenuItem.background",
-                                     "MenuItem.foreground", "MenuItem.font");
-    menuItem.setMargin(UIManager.getInsets("MenuItem.margin"));
-    acceleratorFont = UIManager.getFont("MenuItem.acceleratorFont");
-    acceleratorForeground = UIManager.getColor("MenuItem.acceleratorForeground");
-    acceleratorSelectionForeground = UIManager.getColor("MenuItem.acceleratorSelectionForeground");
-    selectionBackground = UIManager.getColor("MenuItem.selectionBackground");
-    selectionForeground = UIManager.getColor("MenuItem.selectionForeground");
-    acceleratorDelimiter = UIManager.getString("MenuItem.acceleratorDelimiter");
+    String prefix = getPropertyPrefix();
+    LookAndFeel.installBorder(menuItem, prefix + ".border");
+    LookAndFeel.installColorsAndFont(menuItem, prefix + ".background",
+                                     prefix + ".foreground", prefix + ".font");
+    menuItem.setMargin(UIManager.getInsets(prefix + ".margin"));
+    acceleratorFont = UIManager.getFont(prefix + ".acceleratorFont");
+    acceleratorForeground = UIManager.getColor(prefix + ".acceleratorForeground");
+    acceleratorSelectionForeground = UIManager.getColor(prefix + ".acceleratorSelectionForeground");
+    selectionBackground = UIManager.getColor(prefix + ".selectionBackground");
+    selectionForeground = UIManager.getColor(prefix + ".selectionForeground");
+    acceleratorDelimiter = UIManager.getString(prefix + ".acceleratorDelimiter");
+    checkIcon = UIManager.getIcon(prefix + ".checkIcon");
 
     menuItem.setHorizontalTextPosition(SwingConstants.TRAILING);
     menuItem.setHorizontalAlignment(SwingConstants.LEADING);

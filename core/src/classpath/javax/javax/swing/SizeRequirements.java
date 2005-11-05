@@ -142,13 +142,26 @@ public class SizeRequirements implements Serializable
   public static SizeRequirements
   getTiledSizeRequirements(SizeRequirements[] children)
   {
-    SizeRequirements result = new SizeRequirements();
+    long minimum = 0;
+    long preferred = 0;
+    long maximum = 0;
     for (int i = 0; i < children.length; i++)
       {
-        result.minimum += children[i].minimum;
-        result.preferred += children[i].preferred;
-        result.maximum += children[i].maximum;
+        minimum += children[i].minimum;
+        preferred += children[i].preferred;
+        maximum += children[i].maximum;
       }
+    // Overflow check.
+    if (minimum > Integer.MAX_VALUE)
+      minimum = Integer.MAX_VALUE;
+    if (preferred > Integer.MAX_VALUE)
+      preferred = Integer.MAX_VALUE;
+    if (maximum > Integer.MAX_VALUE)
+      maximum = Integer.MAX_VALUE;
+    SizeRequirements result = new SizeRequirements((int) minimum,
+                                                   (int) preferred,
+                                                   (int) maximum,
+                                                   0.5F);
     return result;
   }
 
@@ -338,12 +351,10 @@ public class SizeRequirements implements Serializable
                                     int[] spans, int span)
   {
     // Sum up (maxSize - prefSize) over all children
-    int sumDelta = 0;
+    long sumDelta = 0;
     for (int i = 0; i < children.length; i++)
       {
       sumDelta += children[i].maximum - children[i].preferred;
-        if (sumDelta < 0)
-          sumDelta = Integer.MAX_VALUE;
       }
 
     // If we have sumDelta == 0, then all components have prefSize == maxSize
@@ -356,7 +367,7 @@ public class SizeRequirements implements Serializable
       {
         double factor = ((double) (children[i].maximum - children[i].preferred))
                         / ((double) sumDelta);
-        spans[i] -= factor * (span - allocated);
+        spans[i] += factor * (allocated - span);
       }
   }
 

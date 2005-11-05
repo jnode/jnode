@@ -65,10 +65,21 @@ public class Timer
      */
     public void run()
     {
-      running = true;
       try
         {
-          sleep(initialDelay);
+          synchronized (queueLock)
+            {
+              try
+                {
+                  queueLock.wait(initialDelay);
+                }
+              catch (InterruptedException e)
+                {
+                  // Ignored
+                }
+
+              if (!running)
+                return;
 
           queueEvent();
 
@@ -77,12 +88,16 @@ public class Timer
               {
                 try
                   {
-                    sleep(delay);
+                        queueLock.wait(delay);
                   }
                 catch (InterruptedException e)
                   {
-                    return;
+                         // Ignored
                   }
+
+                    if (!running)
+                      break;
+
                 queueEvent();
 
                 if (logTimers)
@@ -93,7 +108,8 @@ public class Timer
               }
           running = false;
         }
-      catch (Exception e)
+	}
+      finally
         {
           // The timer is no longer running.
           running = false;
@@ -399,10 +415,13 @@ public class Timer
    */
   public void start()
   {
-    if (isRunning())
+    synchronized (queueLock)
+      {
+	if (waker != null)
       return;
     waker = new Waker();
     waker.start();
+  }
   }
 
   /**
@@ -410,12 +429,13 @@ public class Timer
    */
   public void stop()
   {
-    running = false;
-    if (waker != null)
-      waker.interrupt();
     synchronized (queueLock)
       {
+	running = false;
         queue = 0;
+	if (waker != null)
+	  queueLock.notifyAll();
+	waker = null;
       }
   }
 

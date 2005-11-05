@@ -1909,7 +1909,9 @@ public class BasicFileChooserUI extends FileChooserUI
    */
   public String getApproveButtonText(JFileChooser fc)
   {
-    if (fc.getDialogType() == JFileChooser.SAVE_DIALOG)
+    if (fc.getApproveButtonText() != null)
+      return fc.getApproveButtonText();
+    else if (fc.getDialogType() == JFileChooser.SAVE_DIALOG)
       return saveButtonText;
     else
       return openButtonText;

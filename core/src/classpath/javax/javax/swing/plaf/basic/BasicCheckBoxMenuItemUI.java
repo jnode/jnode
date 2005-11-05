@@ -60,8 +60,6 @@ public class BasicCheckBoxMenuItemUI extends BasicMenuItemUI
   public BasicCheckBoxMenuItemUI()
   {
     super();
-    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-    checkIcon = UIManager.getIcon("CheckBoxMenuItem.checkIcon");
   }
   
   /**
@@ -99,6 +97,7 @@ public class BasicCheckBoxMenuItemUI extends BasicMenuItemUI
                                 MenuElement[] path,
                          MenuSelectionManager manager)
   {
+    // TODO: May not be implemented properly.
     item.processMouseEvent(e, path, manager);
   }
 }

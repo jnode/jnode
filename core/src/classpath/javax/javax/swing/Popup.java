@@ -226,6 +226,11 @@ public class Popup
     private JPanel panel;
 
     /**
+     * The layered pane of the owner.
+     */
+    private JLayeredPane layeredPane;
+    
+    /**
      * Constructs a new <code>LightweightPopup</code> given its owner,
      * contents and the screen position where the popup
      * will appear.
@@ -252,6 +257,10 @@ public class Popup
       this.contents = contents;
       this.x = x;
       this.y = y;
+      
+      JRootPane rootPane = SwingUtilities.getRootPane(owner);
+      JLayeredPane layeredPane = rootPane.getLayeredPane();
+      this.layeredPane = layeredPane;
     }
 
     /**
@@ -260,8 +269,6 @@ public class Popup
      */
     public void show()
     {
-      JRootPane rootPane = SwingUtilities.getRootPane(owner);
-      JLayeredPane layeredPane = rootPane.getLayeredPane();
       // We insert a JPanel between the layered pane and the contents so we
       // can fiddle with the setLocation() method without disturbing a
       // JPopupMenu (which overrides setLocation in an unusual manner).
@@ -282,8 +289,6 @@ public class Popup
      */
     public void hide()
     {
-      JRootPane rootPane = SwingUtilities.getRootPane(owner);
-      JLayeredPane layeredPane = rootPane.getLayeredPane();
       layeredPane.remove(panel);
     }
   }

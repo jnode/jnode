@@ -59,8 +59,6 @@ public class BasicRadioButtonMenuItemUI extends BasicMenuItemUI
   public BasicRadioButtonMenuItemUI()
   {
     super();
-    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-    checkIcon = defaults.getIcon("RadioButtonMenuItem.checkIcon");
   }
 
   /**
@@ -98,6 +96,7 @@ public class BasicRadioButtonMenuItemUI extends BasicMenuItemUI
                                 MenuElement[] path,
                          MenuSelectionManager manager)
   {
+    // TODO: May not be implemented properly.
     item.processMouseEvent(e, path, manager);
   }
 }

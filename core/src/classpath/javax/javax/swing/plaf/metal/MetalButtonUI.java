@@ -197,8 +197,8 @@ public class MetalButtonUI
       Color savedColor = g.getColor();
       g.setColor(getFocusColor());
       Rectangle focusRect = iconRect.union(textRect);
-      g.drawRect(focusRect.x - 1, focusRect.y - 1,
-                 focusRect.width + 1, focusRect.height + 1);
+      g.drawRect(focusRect.x - 1, focusRect.y,
+                 focusRect.width + 1, focusRect.height);
       g.setColor(savedColor);
     }
   }
