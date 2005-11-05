@@ -56,12 +56,8 @@ public interface FSFile extends FSObject {
 	 * and stored in <code>dest</code> starting at offset <code>ofs</code>.
 	 * @param fileOffset
 	 * @param dest
-	 * @param off
-	 * @param len
 	 * @throws IOException
 	 */	
-//	public void read(long fileOffset, byte[] dest, int off, int len)
-//	throws IOException;
       public void read(long fileOffset, ByteBuffer dest)
       throws IOException;
 	
@@ -71,11 +67,8 @@ public interface FSFile extends FSObject {
 	 * <code>ofs</code> and written to this file starting at offset <code>fileOffset</code>.
 	 * @param fileOffset
 	 * @param src
-	 * @param off
-	 * @param len
 	 * @throws IOException
-	 */	
-	//public void write(long fileOffset, byte[] src, int off, int len)
+	 */
     public void write(long fileOffset, ByteBuffer src)
 	throws IOException;
 	
