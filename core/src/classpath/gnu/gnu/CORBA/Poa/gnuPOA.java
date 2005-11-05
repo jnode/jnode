@@ -87,8 +87,8 @@ import org.omg.PortableServer.POAPackage.ServantAlreadyActive;
 import org.omg.PortableServer.POAPackage.ServantNotActive;
 import org.omg.PortableServer.POAPackage.WrongAdapter;
 import org.omg.PortableServer.POAPackage.WrongPolicy;
-import gnu.CORBA.CDR.cdrBufInput;
-import gnu.CORBA.CDR.cdrBufOutput;
+import gnu.CORBA.CDR.BufferredCdrInput;
+import gnu.CORBA.CDR.BufferedCdrOutput;
 
 /**
  * Our POA implementation.
@@ -102,7 +102,7 @@ public class gnuPOA
   /**
    * The active object map, mapping between object keys, objects and servants.
    */
-  public final activeObjectMap aom = new activeObjectMap();
+  public final AOM aom = new AOM();
 
   /**
    * The children of this POA.
@@ -199,7 +199,7 @@ public class gnuPOA
          throws InvalidPolicy
   {
     // Add default policies.
-    Policy[] all_policies = policySets.withDefault(a_policies);
+    Policy[] all_policies = StandardPolicies.withDefault(a_policies);
 
     name = a_name;
     parent = a_parent;
@@ -222,7 +222,7 @@ public class gnuPOA
     for (int i = 0; i < s_policies.length; i++)
       {
         s_policies [ i ] = all_policies [ i ].copy();
-        m_policies.add(((vPolicy) s_policies [ i ]).getValue());
+        m_policies.add(((AccessiblePolicy) s_policies [ i ]).getValue());
       }
 
     retain_servant = applies(ServantRetentionPolicyValue.RETAIN);
@@ -281,7 +281,7 @@ public class gnuPOA
     keys.addAll(aom.keySet());
 
     byte[] key;
-    activeObjectMap.Obj obj;
+    AOM.Obj obj;
     boolean last;
     for (int i = 0; i < keys.size(); i++)
       {
@@ -445,7 +445,7 @@ public class gnuPOA
     required(ServantRetentionPolicyValue.RETAIN);
     required(IdAssignmentPolicyValue.SYSTEM_ID);
 
-    activeObjectMap.Obj exists = aom.findServant(a_servant);
+    AOM.Obj exists = aom.findServant(a_servant);
 
     if (exists != null)
       {
@@ -464,8 +464,8 @@ public class gnuPOA
         // activations.
       }
 
-    byte[] object_key = activeObjectMap.getFreeId();
-    servantDelegate delegate = new servantDelegate(a_servant, this, object_key);
+    byte[] object_key = AOM.getFreeId();
+    ServantDelegateImpl delegate = new ServantDelegateImpl(a_servant, this, object_key);
     connectDelegate(object_key, delegate);
     return object_key;
   }
@@ -514,12 +514,12 @@ public class gnuPOA
     // already active.
     if (applies(IdUniquenessPolicyValue.UNIQUE_ID))
       {
-        activeObjectMap.Obj sx = aom.findServant(a_servant, false);
+        AOM.Obj sx = aom.findServant(a_servant, false);
         if (sx != null)
           throw new ServantAlreadyActive();
       }
 
-    activeObjectMap.Obj exists = aom.get(an_Object_Id);
+    AOM.Obj exists = aom.get(an_Object_Id);
     if (exists != null)
       {
         if (exists.servant == null)
@@ -537,8 +537,8 @@ public class gnuPOA
       }
     else
       {
-        servantDelegate delegate =
-          new servantDelegate(a_servant, this, an_Object_Id);
+        ServantDelegateImpl delegate =
+          new ServantDelegateImpl(a_servant, this, an_Object_Id);
         connectDelegate(an_Object_Id, delegate);
       }
   }
@@ -556,7 +556,7 @@ public class gnuPOA
    * (the required servant manager may be missing).
    */
   private void locateServant(byte[] an_Object_Id, Servant a_servant,
-                             activeObjectMap.Obj exists, boolean use_forwarding
+                             AOM.Obj exists, boolean use_forwarding
                             )
                       throws InternalError
   {
@@ -582,8 +582,8 @@ public class gnuPOA
         throw new OBJ_ADAPTER("no servant", 4, CompletionStatus.COMPLETED_NO);
       }
 
-    servantDelegate delegate =
-      new servantDelegate(exists.servant, this, an_Object_Id);
+    ServantDelegateImpl delegate =
+      new ServantDelegateImpl(exists.servant, this, an_Object_Id);
     exists.servant._set_delegate(delegate);
     object.setServant(exists.servant);
     connect_to_orb(an_Object_Id, delegate.object);
@@ -605,7 +605,7 @@ public class gnuPOA
   {
     required(ServantRetentionPolicyValue.RETAIN);
 
-    activeObjectMap.Obj exists = aom.get(the_Object_Id);
+    AOM.Obj exists = aom.get(the_Object_Id);
 
     if (exists == null || exists.isDeactiveted())
       throw new ObjectNotActive();
@@ -615,7 +615,7 @@ public class gnuPOA
     // Check if this servant is serving something else.
     aom.remove(the_Object_Id);
 
-    activeObjectMap.Obj other = aom.findServant(exists.servant, false);
+    AOM.Obj other = aom.findServant(exists.servant, false);
 
     boolean remaining = other != null;
 
@@ -643,7 +643,7 @@ public class gnuPOA
                                         throws WrongPolicy
   {
     required(IdAssignmentPolicyValue.SYSTEM_ID);
-    return create_reference_with_id(activeObjectMap.getFreeId(), a_repository_id);
+    return create_reference_with_id(AOM.getFreeId(), a_repository_id);
   }
 
   /**
@@ -672,7 +672,7 @@ public class gnuPOA
       ids = new String[] { a_repository_id };
 
     // Check maybe such object is already activated.
-    activeObjectMap.Obj e = aom.get(an_object_id);
+    AOM.Obj e = aom.get(an_object_id);
 
     Servant servant;
     if (e == null)
@@ -847,7 +847,7 @@ public class gnuPOA
       return m_poa_id;
     else
       {
-        cdrBufOutput buffer = new cdrBufOutput();
+        BufferedCdrOutput buffer = new BufferedCdrOutput();
         POA p = this;
         while (p != null)
           {
@@ -874,7 +874,7 @@ public class gnuPOA
   {
     required(ServantRetentionPolicyValue.RETAIN);
 
-    activeObjectMap.Obj ref = aom.get(the_Object_Id);
+    AOM.Obj ref = aom.get(the_Object_Id);
     if (ref == null)
       throw new ObjectNotActive();
     else
@@ -897,7 +897,7 @@ public class gnuPOA
   {
     if (applies(ServantRetentionPolicyValue.RETAIN))
       {
-        activeObjectMap.Obj ref = aom.get(the_Object_Id);
+        AOM.Obj ref = aom.get(the_Object_Id);
         if (ref == null || ref.isDeactiveted())
           {
             if (default_servant != null)
@@ -932,7 +932,7 @@ public class gnuPOA
   public byte[] reference_to_id(org.omg.CORBA.Object the_Object)
                          throws WrongAdapter, WrongPolicy
   {
-    activeObjectMap.Obj ref = aom.findObject(the_Object);
+    AOM.Obj ref = aom.findObject(the_Object);
     if (ref == null)
       throw new WrongAdapter();
     return ref.key;
@@ -958,7 +958,7 @@ public class gnuPOA
   {
     if (applies(ServantRetentionPolicyValue.RETAIN))
       {
-        activeObjectMap.Obj ref = aom.findObject(the_Object);
+        AOM.Obj ref = aom.findObject(the_Object);
         if (ref == null)
           throw new WrongAdapter();
         else if (ref.isDeactiveted() || ref.servant == null)
@@ -1017,7 +1017,7 @@ public class gnuPOA
         )
        )
       {
-        activeObjectMap.Obj ref = null;
+        AOM.Obj ref = null;
         if (!applies(IdUniquenessPolicyValue.MULTIPLE_ID))
           ref = aom.findServant(the_Servant);
         if (ref == null &&
@@ -1071,7 +1071,7 @@ public class gnuPOA
   {
     required(ServantRetentionPolicyValue.RETAIN);
 
-    activeObjectMap.Obj exists = null;
+    AOM.Obj exists = null;
 
     if (!applies(IdUniquenessPolicyValue.MULTIPLE_ID))
       exists = aom.findServant(the_Servant);
@@ -1098,10 +1098,10 @@ public class gnuPOA
       {
         checkDiscarding();
 
-        byte[] object_key = activeObjectMap.getFreeId();
+        byte[] object_key = AOM.getFreeId();
 
-        servantDelegate delegate =
-          new servantDelegate(the_Servant, this, object_key);
+        ServantDelegateImpl delegate =
+          new ServantDelegateImpl(the_Servant, this, object_key);
         connectDelegate(object_key, delegate);
 
         return delegate.object;
@@ -1126,7 +1126,7 @@ public class gnuPOA
    * under the forwarding exception (for remote client). Otherwise, the
    * request is internally redirected (for local invocation).
    */
-  private Servant incarnate(activeObjectMap.Obj x, byte[] object_key,
+  private Servant incarnate(AOM.Obj x, byte[] object_key,
                             Servant a_servant, boolean use_forwarding
                            )
   {
@@ -1328,7 +1328,7 @@ public class gnuPOA
     keys.addAll(aom.keySet());
 
     byte[] key;
-    activeObjectMap.Obj obj;
+    AOM.Obj obj;
     for (int i = 0; i < keys.size(); i++)
       {
         key = (byte[]) keys.get(i);
@@ -1433,7 +1433,7 @@ public class gnuPOA
    * Connect the given delegate under the given key, also calling
    * incarnate.
    */
-  private void connectDelegate(byte[] object_key, servantDelegate delegate)
+  private void connectDelegate(byte[] object_key, ServantDelegateImpl delegate)
   {
     aom.add(delegate);
     connect_to_orb(object_key, delegate.object);
@@ -1517,9 +1517,9 @@ public class gnuPOA
   /**
    * Recursively searches for the given object in the POA tree.
    */
-  public activeObjectMap.Obj findObject(org.omg.CORBA.Object object)
+  public AOM.Obj findObject(org.omg.CORBA.Object object)
   {
-    activeObjectMap.Obj h = aom.findObject(object);
+    AOM.Obj h = aom.findObject(object);
     if (h != null)
       return h;
     else
@@ -1540,9 +1540,9 @@ public class gnuPOA
    * and poa ids.
    * @return
    */
-  public activeObjectMap.Obj findKey(byte[] object_id, byte[] poa_id)
+  public AOM.Obj findKey(byte[] object_id, byte[] poa_id)
   {
-    activeObjectMap.Obj h = null;
+    AOM.Obj h = null;
     if (Arrays.equals(poa_id, id()))
       h = aom.get(object_id);
     if (h != null)
@@ -1563,9 +1563,9 @@ public class gnuPOA
    * Parses the given key, extracts poa and object id and searches
    * for such reference.
    */
-  public activeObjectMap.Obj findIorKey(byte[] ior_key)
+  public AOM.Obj findIorKey(byte[] ior_key)
   {
-    cdrBufInput in = new cdrBufInput(ior_key);
+    BufferredCdrInput in = new BufferredCdrInput(ior_key);
     int signature = in.read_long();
     if (signature != SIGNATURE)
       return null;
@@ -1582,7 +1582,7 @@ public class gnuPOA
    */
   public byte[] toIORKey(byte[] object_id)
   {
-    cdrBufOutput buffer = new cdrBufOutput();
+    BufferedCdrOutput buffer = new BufferedCdrOutput();
     buffer.write_long(SIGNATURE);
     buffer.write_sequence(object_id);
     buffer.write_sequence(id());
@@ -1600,7 +1600,7 @@ public class gnuPOA
    */
   public byte[] idFormIor(byte[] ior_key)
   {
-    cdrBufInput in = new cdrBufInput(ior_key);
+    BufferredCdrInput in = new BufferredCdrInput(ior_key);
     int signature = in.read_long();
     if (signature != SIGNATURE)
       return null;
@@ -1616,9 +1616,9 @@ public class gnuPOA
   /**
    * Recursively searches for the given servant in the POA tree.
    */
-  public activeObjectMap.Obj findServant(Servant servant)
+  public AOM.Obj findServant(Servant servant)
   {
-    activeObjectMap.Obj h = aom.findServant(servant);
+    AOM.Obj h = aom.findServant(servant);
     if (h != null)
       return h;
     else

@@ -37,8 +37,8 @@ exception statement from your version. */
 
 package org.omg.CORBA;
 
-import gnu.CORBA.primitiveTypeCode;
-import gnu.CORBA.recordTypeCode;
+import gnu.CORBA.typecodes.PrimitiveTypeCode;
+import gnu.CORBA.typecodes.RecordTypeCode;
 
 import org.omg.CORBA.Any;
 import org.omg.CORBA.TCKind;
@@ -98,10 +98,10 @@ public abstract class PolicyErrorCodeHelper
    */
   public static TypeCode type()
   {
-    recordTypeCode r = new recordTypeCode(TCKind.tk_alias);
+    RecordTypeCode r = new RecordTypeCode(TCKind.tk_alias);
     r.setName("PolicyErrorCode");
     r.setId(id());
-    r.setContentType(new primitiveTypeCode(TCKind.tk_short));
+    r.setContentType(new PrimitiveTypeCode(TCKind.tk_short));
     return r;
   }
 

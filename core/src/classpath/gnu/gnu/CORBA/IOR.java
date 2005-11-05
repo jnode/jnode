@@ -38,12 +38,12 @@ exception statement from your version. */
 
 package gnu.CORBA;
 
-import gnu.CORBA.CDR.cdrBufInput;
-import gnu.CORBA.CDR.cdrBufOutput;
-import gnu.CORBA.CDR.cdrInput;
-import gnu.CORBA.CDR.cdrOutput;
+import gnu.CORBA.CDR.BufferredCdrInput;
+import gnu.CORBA.CDR.BufferedCdrOutput;
+import gnu.CORBA.CDR.AbstractCdrInput;
+import gnu.CORBA.CDR.AbstractCdrOutput;
 import gnu.CORBA.GIOP.CharSets_OSF;
-import gnu.CORBA.GIOP.cxCodeSet;
+import gnu.CORBA.GIOP.CodeSetServiceContext;
 
 import org.omg.CORBA.BAD_PARAM;
 import org.omg.CORBA.CompletionStatus;
@@ -174,16 +174,16 @@ public class IOR
      * The negotiated coding result for this IOR. Saves time, requred for
      * negotiation computations.
      */
-    public cxCodeSet negotiated;
+    public CodeSetServiceContext negotiated;
 
     /**
      * Read the code set profile information from the given input stream.
      *
      * @param profile a stream to read from.
      */
-    public void read(cdrInput profile)
+    public void read(AbstractCdrInput profile)
     {
-      cdrBufInput encapsulation = profile.read_encapsulation();
+      BufferredCdrInput encapsulation = profile.read_encapsulation();
       narrow.read(encapsulation);
       wide.read(encapsulation);
     }
@@ -201,9 +201,9 @@ public class IOR
      *
      * @param profile a stream to write into.
      */
-    public void write(cdrOutput profile)
+    public void write(AbstractCdrOutput profile)
     {
-      cdrOutput encapsulation = profile.createEncapsulation();
+      AbstractCdrOutput encapsulation = profile.createEncapsulation();
       narrow.write(encapsulation);
       wide.write(encapsulation);
       try
@@ -274,13 +274,13 @@ public class IOR
   /**
      * Write the internet profile (except the heading tag.
    */
-    public void write(cdrOutput out)
+    public void write(AbstractCdrOutput out)
     {
       try
         {
           // Need to write the Internet profile into the separate
           // stream as we must know the size in advance.
-          cdrOutput b = out.createEncapsulation();
+          AbstractCdrOutput b = out.createEncapsulation();
 
           version.write(b);
           b.write_string(host);
@@ -393,7 +393,7 @@ public class IOR
             buf.write(cx);
           }
 
-        cdrBufInput cdr = new cdrBufInput(buf.toByteArray());
+        BufferredCdrInput cdr = new BufferredCdrInput(buf.toByteArray());
 
         r._read(cdr);
         return r;
@@ -412,7 +412,7 @@ public class IOR
    * @param c a stream to read from.
    * @throws IOException if the stream throws it.
    */
-  public void _read(cdrInput c)
+  public void _read(AbstractCdrInput c)
              throws IOException, BAD_PARAM
   {
     int endian;
@@ -434,13 +434,13 @@ public class IOR
    * If the stream contains a null value, the Id and Internet fields become
    * equal to null. Otherwise Id contains some string (possibly empty).
    *
-   * Id is checked for null in cdrInput that then returns null instead of
+   * Id is checked for null in AbstractCdrInput that then returns null instead of
    * object.
    *
    * @param c a stream to read from.
    * @throws IOException if the stream throws it.
    */
-  public void _read_no_endian(cdrInput c)
+  public void _read_no_endian(AbstractCdrInput c)
                        throws IOException, BAD_PARAM
   {
     Id = c.read_string();
@@ -457,7 +457,7 @@ public class IOR
     for (int i = 0; i < n_profiles; i++)
       {
         int tag = c.read_long();
-        cdrBufInput profile = c.read_encapsulation();
+        BufferredCdrInput profile = c.read_encapsulation();
 
         if (tag == Internet_profile.TAG_INTERNET_IOP)
           {
@@ -516,7 +516,7 @@ public class IOR
    * Write this IOR record to the provided CDR stream. This procedure writes the
    * zero (Big Endian) marker first.
    */
-  public void _write(cdrOutput out)
+  public void _write(AbstractCdrOutput out)
   {
     // Always use Big Endian.
     out.write(0);
@@ -529,7 +529,7 @@ public class IOR
    * The null value is written as defined in OMG specification (zero length
    * string, followed by an empty set of profiles).
    */
-  public static void write_null(cdrOutput out)
+  public static void write_null(AbstractCdrOutput out)
   {
     // Empty Id string.
     out.write_string("");
@@ -542,7 +542,7 @@ public class IOR
    * Write this IOR record to the provided CDR stream. The procedure writed data
    * in Big Endian, but does NOT add any endian marker to the beginning.
    */
-  public void _write_no_endian(cdrOutput out)
+  public void _write_no_endian(AbstractCdrOutput out)
   {
         // Write repository id.
         out.write_string(Id);
@@ -596,7 +596,7 @@ public class IOR
    */
   public String toStringifiedReference()
   {
-    cdrBufOutput out = new cdrBufOutput();
+    BufferedCdrOutput out = new BufferedCdrOutput();
 
     _write(out);
 
@@ -676,7 +676,7 @@ public class IOR
         TaggedComponent[] present;
         if (profile.profile_data.length > 0)
           {
-            cdrBufInput in = new cdrBufInput(profile.profile_data);
+            BufferredCdrInput in = new BufferredCdrInput(profile.profile_data);
 
             present = new TaggedComponent[in.read_long()];
 
@@ -688,7 +688,7 @@ public class IOR
         else
           present = new TaggedComponent[0];
 
-        cdrBufOutput out = new cdrBufOutput(profile.profile_data.length
+        BufferedCdrOutput out = new BufferedCdrOutput(profile.profile_data.length
                                             + component.component_data.length
                                             + 8);
 

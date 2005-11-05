@@ -80,6 +80,25 @@ public abstract class DynSequenceHelper
   }
 
   /**
+   * Narrow the given object to the DynSequence. For the objects that are
+   * always local, this operation does not differ from the ordinary
+   * {@link #narrow} (ClassCastException will be thrown if narrowing something
+   * different).
+   * 
+   * @param obj the object to cast.
+   * 
+   * @return the casted DynSequence.
+   * 
+   * @since 1.5 
+   * 
+   * @see OMG issue 4158.
+   */
+  public static DynSequence unchecked_narrow(org.omg.CORBA.Object obj)
+  {
+    return narrow(obj);
+  }    
+
+  /**
    * Get the type code of the {@link DynSequence}.
    */
   public static TypeCode type()

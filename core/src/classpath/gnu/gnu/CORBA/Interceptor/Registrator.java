@@ -88,7 +88,7 @@ public class Registrator extends LocalObject implements ORBInitInfo
   /**
    * The agreed properties prefix.
    */
-  public final String m_prefix =
+  public static final String m_prefix =
     "org.omg.PortableInterceptor.ORBInitializerClass.";
 
   /**

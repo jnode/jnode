@@ -38,7 +38,7 @@
 
 package gnu.CORBA.NamingService;
 
-import gnu.CORBA.Functional_ORB;
+import gnu.CORBA.OrbFunctional;
 import gnu.CORBA.IOR;
 import gnu.CORBA.Unexpected;
 import gnu.CORBA.Version;
@@ -72,7 +72,7 @@ import java.util.StringTokenizer;
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
 public class NameParser
-  extends snConverter
+  extends NameTransformer
 {
   /**
    * The corbaloc prefix.
@@ -112,7 +112,7 @@ public class NameParser
   /**
    * The string to name converter, initialized on demand.
    */
-  static snConverter converter;
+  static NameTransformer converter;
 
   /**
    * The current position.
@@ -141,7 +141,7 @@ public class NameParser
    * @return the resolved object.
    */
   public synchronized org.omg.CORBA.Object corbaloc(String corbaloc,
-    Functional_ORB orb)
+    OrbFunctional orb)
     throws BAD_PARAM
   {
     boolean corbaname;
@@ -327,7 +327,7 @@ public class NameParser
       }
 
     if (converter == null)
-      converter = new snConverter();
+      converter = new NameTransformer();
 
     try
       {
@@ -378,7 +378,7 @@ public class NameParser
 
   static NameParser n = new NameParser();
 
-  static void corbalocT(String ior, Functional_ORB orb)
+  static void corbalocT(String ior, OrbFunctional orb)
   {
     System.out.println(ior);
     System.out.println(n.corbaloc(ior, orb));
@@ -389,7 +389,7 @@ public class NameParser
   {
     try
       {
-        Functional_ORB orb = (Functional_ORB) ORB.init(args, null);
+        OrbFunctional orb = (OrbFunctional) ORB.init(args, null);
         corbalocT("corbaloc:iiop:1.3@155axyz.com/Prod/aTradingService", orb);
         corbalocT("corbaloc:iiop:2.7@255bxyz.com/Prod/bTradingService", orb);
         corbalocT("corbaloc:iiop:355cxyz.com/Prod/cTradingService", orb);

@@ -40,10 +40,10 @@ package gnu.javax.rmi.CORBA;
 
 import gnu.CORBA.Minor;
 import gnu.CORBA.ObjectCreator;
-import gnu.CORBA.generalTypeCode;
 import gnu.CORBA.Poa.ORB_1_4;
-import gnu.CORBA.Poa.activeObjectMap;
+import gnu.CORBA.Poa.AOM;
 import gnu.CORBA.Poa.gnuPOA;
+import gnu.CORBA.typecodes.GeneralTypeCode;
 
 import org.omg.CORBA.Any;
 import org.omg.CORBA.BAD_PARAM;
@@ -97,7 +97,7 @@ import javax.transaction.TransactionRolledbackException;
  * @author Audrius Meskauskas (AudriusA@Bioinformatics.org) (implementation)
  */
 public class UtilDelegateImpl
-  extends gnuRmiUtil
+  extends RmiUtilities
   implements UtilDelegate
 {
   /**
@@ -309,7 +309,7 @@ public class UtilDelegateImpl
 
                         if (target instanceof org.omg.CORBA.Object)
                           {
-                            activeObjectMap.Obj record = orb.rootPOA.findObject((org.omg.CORBA.Object) target);
+                            AOM.Obj record = orb.rootPOA.findObject((org.omg.CORBA.Object) target);
     
                             if (record != null && record.servant == r.tie
                               && record.poa instanceof gnuPOA)
@@ -647,7 +647,7 @@ public class UtilDelegateImpl
     Any any = output.orb().create_any();
     if (object == null)
       {
-        generalTypeCode t = new generalTypeCode(TCKind.tk_abstract_interface);
+        GeneralTypeCode t = new GeneralTypeCode(TCKind.tk_abstract_interface);
         t.setId("IDL:omg.org/CORBA/AbstractBase:1.0");
         t.setName("");
         any.type(t);
@@ -687,7 +687,7 @@ public class UtilDelegateImpl
    */
   void writeAnyAsRemote(OutputStream output, Object object)
   {
-    generalTypeCode t = new generalTypeCode(TCKind.tk_objref);
+    GeneralTypeCode t = new GeneralTypeCode(TCKind.tk_objref);
     t.setId(m_ValueHandler.getRMIRepositoryID(object.getClass()));
     t.setName(object.getClass().getName());
 
