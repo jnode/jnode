@@ -816,7 +816,66 @@ public class Window extends Container implements Accessible
         y = center.y - (height / 2);
         setLocation (x, y);
       }
-    // FIXME: handle case where component is non-null.
+    else
+      {
+        int x = c.getX();
+        int y = c.getY();
+
+        int cWidth = c.getWidth();
+        int cHeight = c.getHeight();
+        Dimension screenSize = getToolkit().getScreenSize();
+
+        // If bottom of component is cut off, window placed
+        // on the left or the right side of component
+        if ((y + cHeight) > screenSize.height)
+          {
+            // If the right side of the component is closer to the center
+            if ((screenSize.width / 2 - x) <= 0)
+              {
+                if ((x - width) >= 0)
+                  x -= width;
+                else
+                  x = 0;
+              }
+            else
+              {
+                if ((x + cWidth + width) <= screenSize.width)
+                  x += cWidth;
+                else
+                  x = screenSize.width - width;
+              }
+
+            y = screenSize.height - height;
+          }
+        else if (cWidth > width || cHeight > height)
+          {
+            // If right side of component is cut off
+            if ((x + width) > screenSize.width)
+              x = screenSize.width - width;
+            // If left side of component is cut off
+            else if (x < 0)
+              x = 0;
+            else
+              x += (cWidth - width) / 2;
+            
+            y += (cHeight - height) / 2;
+          }
+        else
+          {
+            // If right side of component is cut off
+            if ((x + width) > screenSize.width)
+              x = screenSize.width - width;
+            // If left side of component is cut off
+            else if (x < 0)
+              x = 0;
+            else
+              x -= (width - cWidth) / 2;
+            
+            y -= (height - cHeight) / 2;
+          }
+
+        setLocation(x, y);
+      }
   }
 
   /**

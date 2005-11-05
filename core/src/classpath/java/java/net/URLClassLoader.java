@@ -235,12 +235,10 @@ public class URLClassLoader extends SecureClassLoader
   abstract static class Resource
   {
     final URLLoader loader;
-    final String name;
 
-    Resource(URLLoader loader, String name)
+    Resource(URLLoader loader)
     {
       this.loader = loader;
-      this.name = name;
     }
 
     /**
@@ -391,11 +389,13 @@ public class URLClassLoader extends SecureClassLoader
   static final class JarURLResource extends Resource
   {
     private final JarEntry entry;
+    private final String name;
 
     JarURLResource(JarURLLoader loader, String name, JarEntry entry)
     {
-      super(loader, name);
+      super(loader);
       this.entry = entry;
+      this.name = name;
     }
 
     InputStream getInputStream() throws IOException
@@ -496,7 +496,7 @@ public class URLClassLoader extends SecureClassLoader
     RemoteResource(RemoteURLLoader loader, String name, URL url,
 		   InputStream stream, int length)
     {
-      super(loader, name);
+      super(loader);
       this.url = url;
       this.stream = stream;
       this.length = length;
@@ -539,7 +539,7 @@ public class URLClassLoader extends SecureClassLoader
 	{
 	  File file = new File(dir, name).getCanonicalFile();
 	  if (file.exists() && !file.isDirectory())
-	    return new FileResource(this, file.getPath(), file);
+	    return new FileResource(this, file);
 	}
       catch (IOException e)
 	{
@@ -553,9 +553,9 @@ public class URLClassLoader extends SecureClassLoader
   {
     final File file;
 
-    FileResource(FileURLLoader loader, String name, File file)
+    FileResource(FileURLLoader loader, File file)
     {
-      super(loader, name);
+      super(loader);
       this.file = file;
     }
 
@@ -573,8 +573,7 @@ public class URLClassLoader extends SecureClassLoader
     {
       try
 	{
-	  return new URL(loader.baseURL, name,
-			 loader.classloader.getURLStreamHandler("file"));
+          return file.toURL();
 	}
       catch (MalformedURLException e)
 	{
@@ -755,13 +754,21 @@ public class URLClassLoader extends SecureClassLoader
   }
 
   /**
-   * Adds an array of new locations to the end of the internal URL store.
+   * Adds an array of new locations to the end of the internal URL
+   * store.  Called from the the constructors. Should not call to the
+   * protected addURL() method since that can be overridden and
+   * subclasses are not yet in a good state at this point.
+   * jboss 4.0.3 for example depends on this.
+   *
    * @param newUrls the locations to add
    */
   private void addURLs(URL[] newUrls)
   {
     for (int i = 0; i < newUrls.length; i++)
-      addURL(newUrls[i]);
+      {
+	urls.add(newUrls[i]);
+	addURLImpl(newUrls[i]);
+      }
   }
 
   /** 
@@ -786,13 +793,13 @@ public class URLClassLoader extends SecureClassLoader
    * package is sealed. If the Manifest indicates that the package is sealed
    * then the Package will be sealed with respect to the supplied URL.
    *
-   * @exception IllegalArgumentException If this package name already exists
-   * in this class loader
    * @param name The name of the package
    * @param manifest The manifest describing the specification,
    * implementation and sealing details of the package
    * @param url the code source url to seal the package
    * @return the defined Package
+   * @throws IllegalArgumentException If this package name already exists
+   * in this class loader
    */
   protected Package definePackage(String name, Manifest manifest, URL url) 
     throws IllegalArgumentException

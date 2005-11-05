@@ -705,6 +705,8 @@ public class GridBagLayout
                       if (lastInCol.containsKey(new Integer(x)))
                         {
                           Component lastComponent = (Component) lastInRow.get(new Integer(x));
+                          if (lastComponent != null)
+                            {
                           GridBagConstraints lastConstraints = lookupInternalConstraints(lastComponent);
 
                           if (lastConstraints.gridheight == GridBagConstraints.RELATIVE)
@@ -718,6 +720,7 @@ public class GridBagLayout
                                                             lastConstraints.gridy + Math.max (1, lastConstraints.gridheight));
                             }
                         }
+                    }
                     }
                   constraints.gridheight = max_y - constraints.gridy;
                 }
