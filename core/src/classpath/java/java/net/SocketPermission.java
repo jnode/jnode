@@ -110,7 +110,7 @@ public final class SocketPermission extends Permission implements Serializable
 {
     static final long serialVersionUID = -7204263841984476862L;
 
-// @classpath-bugfix 31/10/2005 Martin Husted Hartvig (hagar@jnode.org) :
+// @classpath-bugfix 24708 31/10/2005 Martin Husted Hartvig (hagar@jnode.org) :
 // rewritten implies method
     static protected final String wildcard = "*";
     static protected final String ports = ":";
@@ -268,7 +268,7 @@ public final class SocketPermission extends Permission implements Serializable
 
     public boolean implies(Permission perm)
     {
-// @classpath-bugfix 31/10/2005 Martin Husted Hartvig (hagar@jnode.org) :
+// @classpath-bugfix 24708 31/10/2005 Martin Husted Hartvig (hagar@jnode.org) :
 // rewritten implies method
       SocketPermission p;
 
