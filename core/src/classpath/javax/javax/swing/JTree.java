@@ -2065,7 +2065,8 @@ public class JTree extends JComponent implements Scrollable, Accessible
       }
     Rectangle rect = getPathBounds(path);
     scrollRectToVisible(rect);
-    setSelectionPath(temp);
+    revalidate();
+    repaint();
   }
 
   public void scrollRowToVisible(int row)
@@ -2363,8 +2364,8 @@ public class JTree extends JComponent implements Scrollable, Accessible
 
   public void expandPath(TreePath path)
   {
-    // Don't expand if last path component is a leaf node.
-    if ((path == null) || (treeModel.isLeaf(path.getLastPathComponent())))
+    // Don't expand if path is null
+    if (path == null)
       return;
 
     try

@@ -192,7 +192,7 @@ public class MetalButtonUI
    */
   protected void paintFocus(Graphics g, AbstractButton b, Rectangle viewRect,
           Rectangle textRect, Rectangle iconRect) {
-    if (b.hasFocus() && b.isFocusPainted())
+    if (b.isEnabled() && b.hasFocus() && b.isFocusPainted())
     {
       Color savedColor = g.getColor();
       g.setColor(getFocusColor());

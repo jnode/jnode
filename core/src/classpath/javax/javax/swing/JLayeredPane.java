@@ -254,18 +254,26 @@ public class JLayeredPane extends JComponent implements Accessible
         Map.Entry pair = (Map.Entry) i.next();
         Integer layerNum = (Integer) pair.getKey ();
         Integer layerSz = (Integer) pair.getValue ();
-        if (layerNum.intValue() == layer.intValue())
+        int layerInt = layerNum.intValue();
+        if (layerInt == layer.intValue())
           {
             ret[0] = ret[1] - layerSz.intValue ();
-            return ret;
+            break;
+          }
+        // In the following case there exists no layer with the specified
+        // number, so we return an empty interval here with the index at which
+        // such a layer would be inserted
+        else if (layerInt > layer.intValue())
+          {
+            ret[1] = ret[0];
+            break;
           }
         else
           {
             ret[1] -= layerSz.intValue ();
           }
 	    }
-    // should have found the layer during iteration
-    throw new IllegalArgumentException ();
+    return ret;
   }
 
   /**

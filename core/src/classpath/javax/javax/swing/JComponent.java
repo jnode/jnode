@@ -390,7 +390,7 @@ public abstract class JComponent extends Container implements Serializable
    * @see javax.swing.OverlayLayout
    * @see javax.swing.BoxLayout
    */
-  float alignmentX = 0.5f;
+  float alignmentX = -1.0F;
 
   /**
    * A value between 0.0 and 1.0 indicating the preferred vertical
@@ -405,7 +405,7 @@ public abstract class JComponent extends Container implements Serializable
    * @see javax.swing.OverlayLayout
    * @see javax.swing.BoxLayout
    */
-  float alignmentY = 0.5f;
+  float alignmentY = -1.0F;
 
   /** 
    * The border painted around this component.
@@ -1009,7 +1009,12 @@ public abstract class JComponent extends Container implements Serializable
    */
   public float getAlignmentX()
   {
-    return alignmentX;
+    float ret = alignmentX;
+    if (alignmentX < 0)
+      // alignment has not been set explicitly.
+      ret = super.getAlignmentX();
+
+    return ret;
   }
 
   /**
@@ -1022,7 +1027,12 @@ public abstract class JComponent extends Container implements Serializable
    */
   public float getAlignmentY()
   {
-    return alignmentY;
+    float ret = alignmentY;
+    if (alignmentY < 0)
+      // alignment has not been set explicitly.
+      ret = super.getAlignmentY();
+
+    return ret;
   }
 
   /**
@@ -2337,6 +2347,11 @@ public abstract class JComponent extends Container implements Serializable
    */
   public void setAlignmentX(float a)
   {
+    if (a < 0.0F)
+      alignmentX = 0.0F;
+    else if (a > 1.0)
+      alignmentX = 1.0F;
+    else
     alignmentX = a;
   }
 
@@ -2347,6 +2362,11 @@ public abstract class JComponent extends Container implements Serializable
    */
   public void setAlignmentY(float a)
   {
+    if (a < 0.0F)
+      alignmentY = 0.0F;
+    else if (a > 1.0)
+      alignmentY = 1.0F;
+    else
     alignmentY = a;
   }
 
@@ -2435,38 +2455,44 @@ public abstract class JComponent extends Container implements Serializable
   }
 
   /**
-   * Set the value of the {@link #maximumSize} property.
+   * Set the value of the {@link #maximumSize} property. The passed value is
+   * copied, the later direct changes on the argument have no effect on the
+   * property value.
    *
    * @param max The new value of the property
    */
   public void setMaximumSize(Dimension max)
   {
     Dimension oldMaximumSize = maximumSize;
-    maximumSize = max;
+    maximumSize = new Dimension(max);
     firePropertyChange("maximumSize", oldMaximumSize, maximumSize);
   }
 
   /**
-   * Set the value of the {@link #minimumSize} property.
+   * Set the value of the {@link #minimumSize} property. The passed value is
+   * copied, the later direct changes on the argument have no effect on the
+   * property value.
    *
    * @param min The new value of the property
    */
   public void setMinimumSize(Dimension min)
   {
     Dimension oldMinimumSize = minimumSize;
-    minimumSize = min;
+    minimumSize = new Dimension(min);
     firePropertyChange("minimumSize", oldMinimumSize, minimumSize);
   }
 
   /**
-   * Set the value of the {@link #preferredSize} property.
+   * Set the value of the {@link #preferredSize} property. The passed value is
+   * copied, the later direct changes on the argument have no effect on the
+   * property value.
    *
    * @param pref The new value of the property
    */
   public void setPreferredSize(Dimension pref)
   {
     Dimension oldPreferredSize = preferredSize;
-    preferredSize = pref;
+    preferredSize = new Dimension(pref);
     firePropertyChange("preferredSize", oldPreferredSize, preferredSize);
   }
 

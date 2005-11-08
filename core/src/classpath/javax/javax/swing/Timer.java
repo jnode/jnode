@@ -65,10 +65,10 @@ public class Timer
      */
     public void run()
     {
-      try
-        {
           synchronized (queueLock)
             {
+              try
+                {
               try
                 {
                   queueLock.wait(initialDelay);
@@ -106,8 +106,6 @@ public class Timer
                 if ( ! repeats)
                   break;
               }
-          running = false;
-        }
 	}
       finally
         {
@@ -115,6 +113,7 @@ public class Timer
           running = false;
         }
     }
+  }
   }
 
   /**
@@ -157,7 +156,7 @@ public class Timer
 
   /**
    * <code>true</code> if the timer is currently active, firing events
-   * as scheduled.
+   * as scheduled. Should only be checked/set with queueLock held.
    */
   boolean running;
 
@@ -417,10 +416,12 @@ public class Timer
   {
     synchronized (queueLock)
       {
-	if (waker != null)
-      return;
+	if (!running)
+	  {
+	    running = true;
     waker = new Waker();
     waker.start();
+  }
   }
   }
 
@@ -433,7 +434,6 @@ public class Timer
       {
 	running = false;
         queue = 0;
-	if (waker != null)
 	  queueLock.notifyAll();
 	waker = null;
       }
@@ -493,14 +493,12 @@ public class Timer
   /**
   * Post a scheduled event to the event queue.
   * Package-private to avoid an accessor method.
+  * Called with queueLock held and running = true from Waker.run().
   */
   void queueEvent()
   {
-    synchronized (queueLock)
-      {
         queue++;
         if (queue == 1)
           SwingUtilities.invokeLater(drainer);
       }
   }
-}

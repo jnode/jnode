@@ -39,6 +39,7 @@ exception statement from your version. */
 package javax.swing;
 
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.Point;
 
 
@@ -275,8 +276,9 @@ public class Popup
       if (panel == null)
         {
           panel = new JPanel();
-          panel.setLayout(null);
+          panel.setLayout(new FlowLayout(0, 0, 0));
         }
+      
       panel.add(contents);
       panel.setSize(contents.getSize());
       Point layeredPaneLoc = layeredPane.getLocationOnScreen();

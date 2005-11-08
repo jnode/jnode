@@ -129,7 +129,7 @@ public class MetalComboBoxEditor extends BasicComboBoxEditor
   }
   
   /** The editor's border insets. */
-  protected static Insets editorBorderInsets = new Insets(2, 2, 2, 2);
+  protected static Insets editorBorderInsets = new Insets(4, 2, 4, 0);
   
   /**
    * Creates a new editor.
@@ -137,7 +137,6 @@ public class MetalComboBoxEditor extends BasicComboBoxEditor
   public MetalComboBoxEditor()
   {
     super();
-    editor = new JTextField();
     editor.setBorder(new MetalComboBoxEditorBorder());
   }
   
