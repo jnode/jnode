@@ -1768,9 +1768,14 @@ public class JTable
     // If the structure changes, we need to revalidate, since that might
     // affect the size parameters of the JTable. Otherwise we only need
     // to perform a repaint to update the view.
-    if (event.getType() == TableModelEvent.INSERT
-        || event.getType() == TableModelEvent.DELETE)
+    if (event.getType() == TableModelEvent.INSERT)
       revalidate();
+    else if (event.getType() == TableModelEvent.DELETE)
+      {
+        if (dataModel.getRowCount() == 0)
+          clearSelection();
+        revalidate();
+      }
     repaint();
   }
 

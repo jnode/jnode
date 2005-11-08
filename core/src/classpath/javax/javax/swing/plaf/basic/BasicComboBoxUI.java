@@ -480,9 +480,10 @@ public class BasicComboBoxUI extends ComboBoxUI
     ComboBoxEditor currentEditor = comboBox.getEditor();
     if (currentEditor == null || currentEditor instanceof UIResource)
       {
-    comboBox.setEditor(createEditor());
-    editor = comboBox.getEditor().getEditorComponent();
+        currentEditor = createEditor();
+        comboBox.setEditor(currentEditor);
       }
+    editor = currentEditor.getEditorComponent();
 
     comboBox.revalidate();
   }
@@ -851,13 +852,15 @@ public class BasicComboBoxUI extends ComboBoxUI
   }
 
   /**
-   * Returns size of the largest item in the combo box. This size will be the
-   * size of the combo box, not including the arrowButton.
+   * Returns the size of the display area for the combo box. This size will be 
+   * the size of the combo box, not including the arrowButton.
    *
-   * @return dimensions of the largest item in the combo box.
+   * @return The size of the display area for the combo box.
    */
   protected Dimension getDisplaySize()
   {
+    if (!comboBox.isEditable()) 
+      {
     Object prototype = comboBox.getPrototypeDisplayValue();
     if (prototype != null)
       {
@@ -904,6 +907,22 @@ public class BasicComboBoxUI extends ComboBoxUI
     displaySize = size;
     return displaySize;
   }
+  }
+    else // an editable combo,  
+      {
+        Component comp = comboBox.getEditor().getEditorComponent();
+        Dimension prefSize = comp.getPreferredSize();
+        int width = prefSize.width;
+        int height = prefSize.height + 2;
+        Object prototype = comboBox.getPrototypeDisplayValue();
+        if (prototype != null)
+          {
+            FontMetrics fm = comboBox.getFontMetrics(comboBox.getFont());
+            width = Math.max(width, fm.stringWidth(prototype.toString()) + 2);
+          }
+        displaySize = new Dimension(width, height);
+        return displaySize;
+      }
   }
 
   /**

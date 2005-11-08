@@ -862,6 +862,7 @@ public class JOptionPane extends JComponent implements Accessible
     JDialog dialog = pane.createDialog(parentComponent, "Select an Option");
 
     dialog.pack();
+    dialog.setLocationRelativeTo(parentComponent);
     dialog.show();
     
     if (pane.getValue() instanceof Integer)
@@ -889,6 +890,7 @@ public class JOptionPane extends JComponent implements Accessible
     JOptionPane pane = new JOptionPane(message, PLAIN_MESSAGE, optionType);
     JDialog dialog = pane.createDialog(parentComponent, title);
     dialog.pack();
+    dialog.setLocationRelativeTo(parentComponent);
     dialog.show();
 
     if (pane.getValue() instanceof Integer)
@@ -917,6 +919,7 @@ public class JOptionPane extends JComponent implements Accessible
     JOptionPane pane = new JOptionPane(message, messageType, optionType);
     JDialog dialog = pane.createDialog(parentComponent, title);
     dialog.pack();
+    dialog.setLocationRelativeTo(parentComponent);
     dialog.show();
 
     if (pane.getValue() instanceof Integer)
@@ -947,6 +950,7 @@ public class JOptionPane extends JComponent implements Accessible
     JOptionPane pane = new JOptionPane(message, messageType, optionType, icon);
     JDialog dialog = pane.createDialog(parentComponent, title);
     dialog.pack();
+    dialog.setLocationRelativeTo(parentComponent);
     dialog.show();
 
     if (pane.getValue() instanceof Integer)
@@ -973,6 +977,7 @@ public class JOptionPane extends JComponent implements Accessible
     pane.setWantsInput(true);
     JDialog dialog = pane.createDialog(parentComponent, null);
     dialog.pack();
+    dialog.setLocationRelativeTo(parentComponent);
     dialog.show();
 
     return (String) pane.getInputValue();
@@ -1000,6 +1005,7 @@ public class JOptionPane extends JComponent implements Accessible
     pane.setWantsInput(true);
     JDialog dialog = pane.createDialog(parentComponent, null);
     dialog.pack();
+    dialog.setLocationRelativeTo(parentComponent);
     dialog.show();
 
     return (String) pane.getInputValue();
@@ -1026,6 +1032,7 @@ public class JOptionPane extends JComponent implements Accessible
     pane.setWantsInput(true);
     JDialog dialog = pane.createDialog(parentComponent, title);
     dialog.pack();
+    dialog.setLocationRelativeTo(parentComponent);
     dialog.show();
 
     return (String) pane.getInputValue();
@@ -1059,6 +1066,7 @@ public class JOptionPane extends JComponent implements Accessible
     pane.setInitialSelectionValue(initialSelectionValue);
     JDialog dialog = pane.createDialog(parentComponent, title);
     dialog.pack();
+    dialog.setLocationRelativeTo(parentComponent);
     dialog.show();
 
     return pane.getInputValue();
@@ -1410,6 +1418,7 @@ public class JOptionPane extends JComponent implements Accessible
     JOptionPane pane = new JOptionPane(message, INFORMATION_MESSAGE);
     JDialog dialog = pane.createDialog(parentComponent, null);
     dialog.pack();
+    dialog.setLocationRelativeTo(parentComponent);
     dialog.show();
   }
 
@@ -1429,6 +1438,7 @@ public class JOptionPane extends JComponent implements Accessible
     JOptionPane pane = new JOptionPane(message, messageType);
     JDialog dialog = pane.createDialog(parentComponent, title);
     dialog.pack();
+    dialog.setLocationRelativeTo(parentComponent);
     dialog.show();
   }
 
@@ -1450,6 +1460,7 @@ public class JOptionPane extends JComponent implements Accessible
     pane.setIcon(icon);
     JDialog dialog = pane.createDialog(parentComponent, title);
     dialog.pack();
+    dialog.setLocationRelativeTo(parentComponent);
     dialog.show();
   }
 
@@ -1480,6 +1491,7 @@ public class JOptionPane extends JComponent implements Accessible
 
     JDialog dialog = pane.createDialog(parentComponent, title);
     dialog.pack();
+    dialog.setLocationRelativeTo(parentComponent);
     dialog.show();
 
     if (pane.getValue() instanceof Integer)

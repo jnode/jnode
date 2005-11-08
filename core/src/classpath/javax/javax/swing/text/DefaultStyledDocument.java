@@ -772,6 +772,34 @@ public class DefaultStyledDocument extends AbstractDocument
         }
       offset += len;
     }
+    
+    /**
+     * Creates a copy of the element <code>clonee</code> that has the parent
+     * <code>parent</code>.
+     * @param parent the parent of the newly created Element
+     * @param clonee the Element to clone
+     * @return the cloned Element
+     */
+    public Element clone (Element parent, Element clonee)
+    {
+      // If the Element we want to clone is a leaf, then simply copy it
+      if (clonee.isLeaf())
+        return createLeafElement(parent, clonee.getAttributes(),
+                                 clonee.getStartOffset(), clonee.getEndOffset());
+      
+      // Otherwise create a new BranchElement with the desired parent and 
+      // the clonee's attributes
+      BranchElement result = (BranchElement) createBranchElement(parent, clonee.getAttributes());
+      
+      // And clone all the of clonee's children
+      Element[] children = new Element[clonee.getElementCount()];
+      for (int i = 0; i < children.length; i++)
+        children[i] = clone(result, clonee.getElement(i));
+      
+      // Make the cloned children the children of the BranchElement
+      result.replace(0, 0, children);
+      return result;
+    }
   }
 
   /**

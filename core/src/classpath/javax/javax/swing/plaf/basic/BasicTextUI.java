@@ -552,6 +552,7 @@ public abstract class BasicTextUI extends TextUI
     caret.setBlinkRate(UIManager.getInt(prefix + ".caretBlinkRate"));
 
     // Fetch the colors for enabled/disabled text components.
+    background = UIManager.getColor(prefix + ".background");
     inactiveBackground = UIManager.getColor(prefix + ".inactiveBackground");
     textComponent.setDisabledTextColor
                          (UIManager.getColor(prefix + ".inactiveForeground"));
