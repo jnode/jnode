@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.fs.ftpfs.command"
+        name="Jnode Information FileSystem"
+        version="@VERSION@"
+        license-name="lgpl"
+        provider-name="JNode.org">
+        
+        
+  <requires>
+    <import plugin="org.jnode.shell"/>
+    <import plugin="org.jnode.fs.ftpfs"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-fs.jar">
+      <export name="org.jnode.fs.ftpfs.command.*"/>
+    </library>
+  </runtime>
+  
+  <extension point="org.jnode.shell.aliases">
+    <alias name="ftpmount" class="org.jnode.fs.ftpfs.command.FTPMountCommand"/>
+    <alias name="ftpdevice" class="org.jnode.fs.ftpfs.command.MakeFTPDeviceCommand"/>      
+  </extension>
+  
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.net.SocketPermission" name="*:0-" actions="connect,resolve"/>
+  </extension> 
+        
+</plugin>

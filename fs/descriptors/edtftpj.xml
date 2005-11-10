@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="edtftpj"
+        name="FTP client library"
+        version="1.5.2"
+        license-name="lgpl"
+        provider-name="Enterprise Distributed Technologies"
+        provider-url="http://www.enterprisedt.com/products/edtftpj/">
+        
+  <requires>
+    <import plugin="org.jnode.net"/>
+  </requires>
+        
+  <runtime>
+    <library name="edtftpj.jar">
+      <export name="*"/>
+    </library>
+  </runtime>
+        
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.net.SocketPermission" name="*:0-" actions="connect,resolve"/>
+    <permission class="java.util.PropertyPermission" name="edtftp.log.level" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="edtftp.log.log4j" actions="read"/>
+  </extension>
+        
+</plugin>
