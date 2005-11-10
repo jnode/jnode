@@ -64,6 +64,7 @@ public class CatCommand implements Command{
             while ((len = is.read(buf)) > 0) {
                out.write(buf, 0, len);
             }
+            out.println();
             out.flush();
             is.close();
         }
