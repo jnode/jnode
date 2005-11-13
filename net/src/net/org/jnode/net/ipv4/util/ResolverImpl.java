@@ -23,6 +23,7 @@ package org.jnode.net.ipv4.util;
 
 import java.net.UnknownHostException;
 import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.HashMap;
@@ -72,6 +73,13 @@ public class ResolverImpl implements Resolver {
 
     public static Resolver getInstance() {
         if (res == null) {
+            AccessController.doPrivileged(new PrivilegedAction() {
+               public Object run() {
+                   System.setProperty("dns.server", "127.0.0.1");
+                   System.setProperty("dns.search", "localdomain");
+                   return null;
+               }
+            });
             res = new ResolverImpl();
         }
 

@@ -43,8 +43,8 @@
 	<!-- DNS -->
     <permission class="java.net.SocketPermission" name="*" actions="resolve"/>
     <permission class="java.net.SocketPermission" name="*:53" actions="connect,resolve,listen"/>
-    <permission class="java.util.PropertyPermission" name="dns.server" actions="read"/>
-    <permission class="java.util.PropertyPermission" name="dns.search" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="dns.server" actions="read,write"/>
+    <permission class="java.util.PropertyPermission" name="dns.search" actions="read,write"/>
   </extension>
 
   <extension point="org.jnode.net.networkLayers">
