@@ -528,12 +528,29 @@ public class Vm extends VmSystemObject implements Statistics {
                 Unsafe.debug(e.thread.getThreadState());
                 Unsafe.debug(" p0x");
                 Unsafe.debug(e.thread.priority);
+                Unsafe.debug(" wf:");
+                VmThread waitFor = e.thread.getWaitForThread();
+                Unsafe.debug((waitFor != null) ? waitFor.asThread().getName() : "none");
                 Unsafe.debug("\n");
                 if (dumpStack && (stackReader != null)) {
                     stackReader.debugStackTrace(e.thread);
                     Unsafe.debug("\n");
                 }
             }
+            e = e.next;
+        }
+    }
+
+    /**
+     * Dump the status of this queue on Unsafe.debug.
+     */
+    final static void verifyThreads() {
+        final Vm vm = getVm();
+        // final SpinLock lock = vm.allThreadsLock;
+        final VmThreadQueue.AllThreadsQueue q = vm.allThreads;
+        VmThreadQueueEntry e = q.first;
+        while (e != null) {
+            e.thread.verifyState();
             e = e.next;
         }
     }
