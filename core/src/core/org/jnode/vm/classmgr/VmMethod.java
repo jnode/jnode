@@ -198,8 +198,13 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
      * Compile this method with n optimization level 1 higher then the current
      * optimization level.
      */
-    public final synchronized void recompile() {
-        doCompile(nativeCodeOptLevel + 1);
+    public final void recompile() {
+        final int optLevel = nativeCodeOptLevel + 1;
+        if (!declaringClass.isPrepared()) {
+            throw new IllegalStateException(
+                    "Declaring class must have been prepared");
+        }
+        declaringClass.getLoader().compileRuntime(this, optLevel, false);
     }
 
     /**
@@ -215,21 +220,6 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
         type.initialize();
         final VmMethod method = type.getDeclaredMethod(methodIndex);
         method.recompile();
-    }
-
-    /**
-     * Compile all the methods in this class during runtime.
-     * 
-     * @param optLevel
-     *            The optimization level
-     */
-    private synchronized final void doCompile(int optLevel) {
-        if (!declaringClass.isPrepared()) {
-            throw new IllegalStateException(
-                    "Declaring class must have been prepared");
-        }
-        declaringClass.getLoader().compileRuntime(this, optLevel, false);
-        // setModifier(true, Modifier.ACC_COMPILED);
     }
 
     public final boolean isAbstract() {
@@ -266,7 +256,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
      * 
      * @param cl
      */
-    protected synchronized void resolve(VmClassLoader cl) {
+    protected void resolve(VmClassLoader cl) {
         resolveTypes();
     }
 
@@ -277,10 +267,11 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
                         .getLoader());
                 returnType = sig.getReturnType();
                 int count = sig.getParamCount();
-                paramTypes = new VmType[count];
+                final VmType[] types = new VmType[count];
                 for (int i = 0; i < count; i++) {
-                    paramTypes[i] = sig.getParamType(i);
+                    types[i] = sig.getParamType(i);
                 }
+                this.paramTypes = types;
             } catch (ClassNotFoundException ex) {
                 throw (Error) new NoClassDefFoundError("In method "
                         + toString()).initCause(ex);
@@ -420,16 +411,17 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
      *            The optimization level of the generated code.
      */
     public final void addCompiledCode(VmCompiledCode code, int optLevel) {
-        if ((this.nativeCode != null) && (optLevel <= nativeCodeOptLevel)) {
-            throw new RuntimeException("Cannot set code twice");
+        if ((this.nativeCode == null) || (optLevel > nativeCodeOptLevel)) {
+            synchronized (this) {
+                code.setNext(this.compiledCode);
+                this.compiledCode = code;
+                this.nativeCode = code.getNativeCode();
+                this.compiledCode = code;
+                Vm.getVm().getSharedStatics().setMethodCode(
+                        getSharedStaticsIndex(), code.getNativeCode());
+                this.nativeCodeOptLevel = (short) optLevel;
+            }
         }
-        code.setNext(this.compiledCode);
-        this.compiledCode = code;
-        this.nativeCode = code.getNativeCode();
-        this.compiledCode = code;
-        Vm.getVm().getSharedStatics().setMethodCode(getSharedStaticsIndex(),
-                code.getNativeCode());
-        this.nativeCodeOptLevel = (short)optLevel;
     }
 
     /**
