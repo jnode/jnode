@@ -1,7 +1,6 @@
 package org.jnode.fs.ftpfs;
 
 import org.jnode.fs.FSFile;
-import org.jnode.fs.FSEntry;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
