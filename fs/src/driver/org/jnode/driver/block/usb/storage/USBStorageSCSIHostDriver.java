@@ -55,9 +55,14 @@ public class USBStorageSCSIHostDriver extends Driver implements SCSIHostControll
             final USBConfiguration conf = usbDev.getConfiguration(0);
             usbDev.setConfiguration(conf);
 			// Set transport protocol
+            usbDevData.setMaxLun((byte)0);
 			if(conf.getInterface(0).getDescriptor().getInterfaceProtocol() == US_PR_BULK){
+				log.info("*** Set transport protocol to BULK ONLY");
 				usbDevData.setTransport(new USBStorageBulkTransport(usbDev, usbDevData));
-			} 
+				((USBStorageBulkTransport)usbDevData.getTransport()).getMaxLun(usbDev);
+			} else if(conf.getInterface(0).getDescriptor().getInterfaceProtocol() == US_PR_SCM_ATAPI){
+				log.info("*** Set transport protocol to SCM ATAPI");
+			}
 			
             USBEndPoint ep;
 			
@@ -79,7 +84,6 @@ public class USBStorageSCSIHostDriver extends Driver implements SCSIHostControll
             usbDev.registerAPI(SCSIHostControllerAPI.class, this);
             final Bus hostBus = new USBStorageSCSIHostBus(getDevice());
             scsiDevice = new USBStorageSCSIDevice(hostBus, "_sg");
-            scsiDevice.setDriver(new USBStorageSCSIDriver());
 
             // Execute INQUIRY
             try {
@@ -116,15 +120,13 @@ public class USBStorageSCSIHostDriver extends Driver implements SCSIHostControll
     }
 
     public void requestCompleted(USBRequest request) {
-        // TODO Auto-generated method stub
-
+		log.debug("USBStorageSCSIHostDriver completed with status:" + request.getStatus());
     }
 
     public void requestFailed(USBRequest request) {
-        // TODO Auto-generated method stub
-
+        log.debug("USBStorageSCSIHostDriver failed with status:" + request.getStatus());
     }
-    
+ 
     private final class USBStorageSCSIHostBus extends Bus {
 
         /**

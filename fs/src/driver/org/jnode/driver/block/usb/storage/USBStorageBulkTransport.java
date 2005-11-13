@@ -63,11 +63,12 @@ final class USBStorageBulkTransport implements ITransport, USBPipeListener,
     public void transport(CDB cdb) {
         try {
             byte[] scsiCmd = cdb.toByteArray();
-
+            // Setup command wrapper 
             BulkCommandBlockWrapper bcb = new BulkCommandBlockWrapper();
             bcb.setSignature(US_BULK_CB_SIGN);
             bcb.setDataTransferLength(scsiCmd.length);
             bcb.setFlags((byte) 0);
+            bcb.setLun((byte)0);
             bcb.setCdb(scsiCmd);
             // Sent CBW to device
             USBPacket data = new USBPacket(bcb.getCBW());
@@ -75,9 +76,9 @@ final class USBStorageBulkTransport implements ITransport, USBPipeListener,
 			pipe.open();
             USBRequest req = pipe.createRequest(data);
             pipe.addListener(this);
-            pipe.asyncSubmit(req);
+            pipe.syncSubmit(req,5000);
+            
         } catch (USBException e) {
-            // TODO throws exception
             e.printStackTrace();
         }
     }
@@ -91,6 +92,15 @@ final class USBStorageBulkTransport implements ITransport, USBPipeListener,
                 | USB_TYPE_CLASS | USB_RECIP_INTERFACE, 0xFF, 0, 0, 0), null);
         pipe.syncSubmit(req, GET_TIMEOUT);
     }
+    
+    public void getMaxLun(USBDevice usbDev) throws USBException {
+    	final USBControlPipe pipe = usbDev.getDefaultControlPipe();
+        final USBRequest req = pipe.createRequest(new SetupPacket(USB_DIR_IN
+                | USB_TYPE_CLASS | USB_RECIP_INTERFACE, 0xFE, 0, 0, 1), new USBPacket(1));
+        pipe.syncSubmit(req, GET_TIMEOUT);
+        log.debug("*** Time out reach, request status :" + req.getStatus());
+    }
+    
 
     public void requestCompleted(USBRequest request) {
 		log.debug("USBStorageBulkTransport completed with status:" + request.getStatus());
