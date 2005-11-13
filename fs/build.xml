@@ -11,7 +11,8 @@
   <path id="my-cp">
     <pathelement location="${jnode-core.jar}"/>
     <pathelement location="${jnode-shell.jar}"/>
-    <pathelement location="${edtftpj.jar}"/>      
+    <pathelement location="${edtftpj.jar}"/>
+    <pathelement location="${jcifs.jar}"/>      
     <path refid="cp"/>
   </path>
 
