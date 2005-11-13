@@ -66,8 +66,7 @@ public class Vm extends VmSystemObject implements Statistics {
     private final VmHeapManager heapManager;
 
     /** Set this boolean to turn the hot method manager on/off */
-//    private final boolean runHotMethodManager = false;
-
+    // private final boolean runHotMethodManager = false;
     /** Should this VM run in debug mode? */
     private final boolean debugMode;
 
@@ -513,13 +512,40 @@ public class Vm extends VmSystemObject implements Statistics {
     }
 
     /**
+     * Dump the status of this queue on Unsafe.debug.
+     */
+    final static void dumpWaitingThreads(boolean dumpStack, VmStackReader stackReader) {
+        final Vm vm = getVm();
+        // final SpinLock lock = vm.allThreadsLock;
+        final VmThreadQueue.AllThreadsQueue q = vm.allThreads;
+        VmThreadQueueEntry e = q.first;
+        while (e != null) {
+            if (e.thread.isWaiting()) {
+                Unsafe.debug(e.thread.asThread().getName());
+                Unsafe.debug(" id0x");
+                Unsafe.debug(e.thread.getId());
+                Unsafe.debug(" s0x");
+                Unsafe.debug(e.thread.getThreadState());
+                Unsafe.debug(" p0x");
+                Unsafe.debug(e.thread.priority);
+                Unsafe.debug("\n");
+                if (dumpStack && (stackReader != null)) {
+                    stackReader.debugStackTrace(e.thread);
+                    Unsafe.debug("\n");
+                }
+            }
+            e = e.next;
+        }
+    }
+
+    /**
      * Call the visitor for all live threads.
      * 
      * @param visitor
      */
     static final VmThread getThreadById(int id) {
         final Vm vm = getVm();
-//        final SpinLock lock = vm.allThreadsLock;
+        // final SpinLock lock = vm.allThreadsLock;
         final VmThreadQueue.AllThreadsQueue q = vm.allThreads;
         VmThreadQueueEntry e = q.first;
         while (e != null) {
