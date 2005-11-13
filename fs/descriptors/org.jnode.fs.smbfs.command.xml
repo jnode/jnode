@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.fs.smbfs.command"
+        name="Samba file system commands for JNode"
+        version="@VERSION@"
+        license-name="lgpl"
+        provider-name="JNode.org">
+        
+        
+  <requires>
+    <import plugin="org.jnode.shell"/>
+    <import plugin="org.jnode.fs.smbfs"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-fs.jar">
+      <export name="org.jnode.fs.smbfs.command.*"/>
+    </library>
+  </runtime>
+  
+  <extension point="org.jnode.shell.aliases">
+    <alias name="smbmount" class="org.jnode.fs.smbfs.command.SMBMountCommand"/>
+    <alias name="smbdevice" class="org.jnode.fs.smbfs.command.MakeSMBDeviceCommand"/>      
+  </extension>
+  
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.net.SocketPermission" name="*:0-" actions="connect,resolve"/>
+    <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>
+    <permission class="java.net.NetPermission" name="specifyStreamHandler"/>  
+  </extension> 
+        
+</plugin>
