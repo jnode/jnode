@@ -2,7 +2,7 @@
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
 <plugin id="org.jnode.fs.ftpfs.command"
-        name="Jnode Information FileSystem"
+        name="FTP file system commands for JNode"
         version="@VERSION@"
         license-name="lgpl"
         provider-name="JNode.org">

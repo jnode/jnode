@@ -51,6 +51,7 @@
     <permission class="org.jnode.security.JNodePermission" name="getVmThread"/>
     <permission class="org.jnode.security.JNodePermission" name="getVmClass"/>
     <permission class="java.net.SocketPermission" name="*" actions="resolve"/>
+    <permission class="java.net.SocketPermission" name="*:0-" actions="connect,resolve"/>  
   </extension>
 
 </plugin>
