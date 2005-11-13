@@ -4,19 +4,18 @@ import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSAccessRights;
 
 import java.io.IOException;
-import java.util.Date;
 
 import com.enterprisedt.net.ftp.FTPFile;
 
 /**
  * @author Levente S\u00e1ntha
  */
-public class FTPFSEntry implements FSEntry {
+public abstract class FTPFSEntry implements FSEntry {
     FTPFileSystem fileSystem;
     FTPFile ftpFile;
     FTPFSDirectory parent;
 
-    public FTPFSEntry(FTPFileSystem fileSystem, FTPFile ftpFile) {
+    FTPFSEntry(FTPFileSystem fileSystem, FTPFile ftpFile) {
         this.fileSystem = fileSystem;
         this.ftpFile = ftpFile;
     }

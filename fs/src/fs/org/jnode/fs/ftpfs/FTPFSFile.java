@@ -12,9 +12,10 @@ import com.enterprisedt.net.ftp.FTPException;
 /**
  * @author Levente S\u00e1ntha
  */
-public class FTPFSFile extends FTPFSEntry implements FSFile, FSEntry {
+public class FTPFSFile extends FTPFSEntry implements FSFile {
     private byte[] data;
-    public FTPFSFile(FTPFileSystem fileSystem, FTPFile ftpFile) {
+
+    FTPFSFile(FTPFileSystem fileSystem, FTPFile ftpFile) {
         super(fileSystem, ftpFile);
     }
 
