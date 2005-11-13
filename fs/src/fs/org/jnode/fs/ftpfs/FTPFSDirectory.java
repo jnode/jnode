@@ -14,7 +14,7 @@ import java.util.Map;
 public class FTPFSDirectory extends FTPFSEntry implements FSDirectory {
     private Map<String, FTPFSEntry> entries;
 
-    public FTPFSDirectory(FTPFileSystem fileSystem, FTPFile ftpFile) {
+    FTPFSDirectory(FTPFileSystem fileSystem, FTPFile ftpFile) {
         super(fileSystem, ftpFile);
     }
 
