@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="jcifs"
+        name="Samba client library"
+        version="1.2.6"
+        license-name="lgpl"
+        provider-name="www.samba.org"
+        provider-url="http://jcifs.samba.org">
+        
+  <requires>
+    <import plugin="org.jnode.net"/>
+  </requires>
+        
+  <runtime>
+    <library name="jcifs.jar">
+      <export name="*"/>
+    </library>
+  </runtime>
+        
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.net.SocketPermission" name="*:0-" actions="connect,resolve"/>
+    <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>
+    <permission class="java.net.NetPermission" name="specifyStreamHandler"/>  
+  </extension>
+        
+</plugin>
