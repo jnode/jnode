@@ -1795,7 +1795,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 	 *            The optimization level
 	 * @return The number of compiled methods
 	 */
-	public final synchronized int compileBootstrap(NativeCodeCompiler compiler,
+	public final int compileBootstrap(NativeCodeCompiler compiler,
 			NativeStream os, int optLevel) {
 		if (!isPrepared()) {
 			throw new IllegalStateException("VmType must have been prepared");
@@ -1835,7 +1835,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 	 *            The optimization level
 	 * @return The number of compiled methods
 	 */
-	public final synchronized int compileRuntime(int optLevel, boolean enableTestCompilers) {
+	public final int compileRuntime(int optLevel, boolean enableTestCompilers) {
 		if (!isPrepared()) {
 			throw new IllegalStateException("VmType must have been prepared");
 		}
@@ -1867,7 +1867,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 		return compileCount;
 	}
 
-    public final synchronized int disassemble(String methodName, int optLevel, boolean enableTestCompilers, Writer writer) {
+    public final int disassemble(String methodName, int optLevel, boolean enableTestCompilers, Writer writer) {
         if (!isPrepared()) {
             throw new IllegalStateException("VmType must have been prepared");
         }
