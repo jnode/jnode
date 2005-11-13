@@ -104,6 +104,9 @@ The default list of (non-system) plugins to be included in the init-jar.
     <plugin id="edtftpj"/>
     <plugin id="org.jnode.fs.ftpfs"/>
     <plugin id="org.jnode.fs.ftpfs.command"/>
+    <plugin id="jcifs"/>
+    <plugin id="org.jnode.fs.smbfs"/>
+    <plugin id="org.jnode.fs.smbfs.command"/>
 
 
     <plugin id="org.jnode.partitions"/>

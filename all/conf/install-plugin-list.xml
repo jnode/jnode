@@ -63,6 +63,8 @@
   <plugin id="org.jnode.fs.jifs.def"/>
   <plugin id="edtftpj"/>
   <plugin id="org.jnode.fs.ftpfs"/>
+  <plugin id="jcifs"/>
+  <plugin id="org.jnode.fs.smbfs"/>
 
 
   <plugin id="org.jnode.partitions"/>
