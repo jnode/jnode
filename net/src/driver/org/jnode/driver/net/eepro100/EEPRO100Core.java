@@ -290,8 +290,6 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler,
 		log.debug(flags.getName() + " : Init transmit with TIMEOUT=" + timeout);
 		// Set the source address
 		hwAddress.writeTo(buf, 6);
-		log.debug("Source      : " +((EthernetHeader)buf.getLinkLayerHeader()).getSource().toString());
-		log.debug("Destination : " + ((EthernetHeader)buf.getLinkLayerHeader()).getDestination().toString());
 		buffers.transmit(buf);
 		log.debug(flags.getName() + " : End transmit");
 	}
