@@ -10,6 +10,8 @@
 	<property name="jnode.disk.pln" value="${my-build.dir}/jnodedisk${jnode.bits}.pln" />
 	<property name="jnode.disk.geometry" value="64/16/63" />
 
+	<property name="jnode.virtual.memsize" value="384" />
+
 	<property name="grub-ver" value="grub-0.97-i386-pc" />
 	<property name="grub.dir" value="${my-build.dir}/${grub-ver}/boot/grub" />
 	<property name="grub.dist" value="${my-lib.dir}/${grub-ver}.tar.gz" />
@@ -196,6 +198,8 @@
 		<copy todir="${bootdisk.dir}">
 			<fileset dir="${initjars.dir}">
 				<!-- Limit the size of the bootdisk -->
+				<include name="default.jgz"/>
+				<include name="full.jgz"/>
 				<exclude name="fullgui.jgz"/>
 				<exclude name="install.jgz"/>
 			</fileset>	
@@ -264,11 +268,24 @@
 	<target name="cdrom" depends="prepare">
 		<copy file="${sources.dist.tar.gz}" todir="${my-build.dir}/cdrom-full" />
 		<create-cdrom destfile="${jnode-x86.iso}" dir="${my-build.dir}/cdrom-full" />
+
+		<taskdef name="vmware" classname="org.jnode.build.VMwareBuilderTask" classpathref="cp-x86" />
+		<vmware 
+			isofile="${jnode-x86-lite.iso}"
+			memsize="${jnode.virtual.memsize}"
+		/>
 	</target>
 
 	<!-- Create a bootable CDROM image -->
 	<target name="cdrom-lite" depends="prepare">
 		<create-cdrom destfile="${jnode-x86-lite.iso}" dir="${my-build.dir}/cdrom-lite" />
+
+		<taskdef name="vmware" classname="org.jnode.build.VMwareBuilderTask" classpathref="cp-x86" />
+		
+		<vmware 
+			isofile="${jnode-x86-lite.iso}"
+			memsize="${jnode.virtual.memsize}"
+		/>
 	</target>
 
 	<!-- Prepare for netboot -->
