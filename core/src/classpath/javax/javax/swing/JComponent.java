@@ -546,7 +546,7 @@ public abstract class JComponent extends Container implements Serializable
   
   private InputMap inputMap_whenFocused;
   private InputMap inputMap_whenAncestorOfFocused;
-  private InputMap inputMap_whenInFocusedWindow;
+  private ComponentInputMap inputMap_whenInFocusedWindow;
   private ActionMap actionMap;
   /** @since 1.3 */
   private boolean verifyInputWhenFocusTarget;
@@ -555,6 +555,11 @@ public abstract class JComponent extends Container implements Serializable
   private TransferHandler transferHandler;
 
   /** 
+   * Indicates if this component is currently painting a tile or not.
+   */
+  private boolean paintingTile;
+
+  /**
    * A cached Rectangle object to be reused. Be careful when you use that,
    * so that it doesn't get modified in another context within the same
    * method call chain.
@@ -983,7 +988,8 @@ public abstract class JComponent extends Container implements Serializable
   {
     VetoableChangeListener[] listeners = getVetoableChangeListeners();
 
-    PropertyChangeEvent evt = new PropertyChangeEvent(this, propertyName, oldValue, newValue);
+    PropertyChangeEvent evt = 
+      new PropertyChangeEvent(this, propertyName, oldValue, newValue);
 
     for (int i = 0; i < listeners.length; i++)
       listeners[i].vetoableChange(evt);
@@ -1614,13 +1620,16 @@ public abstract class JComponent extends Container implements Serializable
   }
 
   /**
-   * Return <code>true</code> if this component is currently painting a tile.
+   * Return <code>true</code> if this component is currently painting a tile,
+   * this means that paint() is called again on another child component. This
+   * method returns <code>false</code> if this component does not paint a tile
+   * or if the last tile is currently painted.
    *
-   * @return Whether the component is painting a tile
+   * @return whether the component is painting a tile
    */
   public boolean isPaintingTile()
   {
-    return false;
+    return paintingTile;
   }
 
   /**
@@ -1685,10 +1694,11 @@ public abstract class JComponent extends Container implements Serializable
       {
         if (g.getClip() == null)
           g.setClip(0, 0, getWidth(), getHeight());
-        paintComponent(g);
-        paintBorder(g);
-        paintChildren(g);
-        Rectangle clip = g.getClipBounds();
+        Graphics g2 = getComponentGraphics(g);
+        paintComponent(g2);
+        paintBorder(g2);
+        paintChildren(g2);
+        Rectangle clip = g2.getClipBounds();
         if (clip.x == 0 && clip.y == 0 && clip.width == getWidth()
             && clip.height == getHeight())
           RepaintManager.currentManager(this).markCompletelyClean(this);
@@ -1734,8 +1744,38 @@ public abstract class JComponent extends Container implements Serializable
     Rectangle inner = SwingUtilities.calculateInnerArea(this, rectCache);
     g.clipRect(inner.x, inner.y, inner.width, inner.height);
     Component[] children = getComponents();
-    for (int i = children.length - 1; i >= 0; --i)
+
+    // Find the bottommost component that needs to be painted. This is a
+    // component that completely covers the current clip and is opaque. In
+    // this case we don't need to paint the components below it.
+    int startIndex = children.length - 1;
+    // No need to check for overlapping components when this component is
+    // optimizedDrawingEnabled (== it tiles its children).
+    if (! isOptimizedDrawingEnabled())
       {
+        Rectangle clip = g.getClipBounds();
+        for (int i = 0; i < children.length; i++)
+          {
+            Rectangle childBounds = children[i].getBounds();
+            if (children[i].isOpaque()
+                && SwingUtilities.isRectangleContainingRectangle(childBounds,
+                                                            g.getClipBounds()))
+              {
+                startIndex = i;
+                break;
+              }
+          }
+      }
+    // paintingTile becomes true just before we start painting the component's
+    // children.
+    paintingTile = true;
+    for (int i = startIndex; i >= 0; --i)
+      {
+        // paintingTile must be set to false before we begin to start painting
+        // the last tile.
+        if (i == 0)
+          paintingTile = false;
+
         if (!children[i].isVisible())
           continue;
 
@@ -1785,7 +1825,7 @@ public abstract class JComponent extends Container implements Serializable
         Graphics g2 = g;
         if (!(g instanceof Graphics2D))
           g2 = g.create();
-        ui.update(getComponentGraphics(g2), this);
+        ui.update(g2, this);
         if (!(g instanceof Graphics2D))
           g2.dispose();
       }
@@ -1878,9 +1918,15 @@ public abstract class JComponent extends Container implements Serializable
         g2 = getComponentGraphics(g2);
         g2.setClip(r.x, r.y, r.width, r.height);
         isPaintingDoubleBuffered = true;
+    try
+      {
         paint(g2);
+      }
+    finally
+      {
         isPaintingDoubleBuffered = false;
         g2.dispose();
+      }
 
         // Paint the buffer contents on screen.
         g.drawImage(buffer, 0, 0, this);
@@ -2021,7 +2067,11 @@ public abstract class JComponent extends Container implements Serializable
         break;
 
       case WHEN_IN_FOCUSED_WINDOW:
-        inputMap_whenInFocusedWindow = map;
+        if (map != null && !(map instanceof ComponentInputMap))
+            throw new 
+              IllegalArgumentException("WHEN_IN_FOCUSED_WINDOW " + 
+                                       "InputMap must be a ComponentInputMap");
+        inputMap_whenInFocusedWindow = (ComponentInputMap)map;
         break;
         
       case UNDEFINED_CONDITION:
@@ -2047,7 +2097,7 @@ public abstract class JComponent extends Container implements Serializable
 
       case WHEN_IN_FOCUSED_WINDOW:
         if (inputMap_whenInFocusedWindow == null)
-          inputMap_whenInFocusedWindow = new InputMap();
+          inputMap_whenInFocusedWindow = new ComponentInputMap(this);
         return inputMap_whenInFocusedWindow;
 
       case UNDEFINED_CONDITION:
@@ -2162,40 +2212,56 @@ public abstract class JComponent extends Container implements Serializable
     // 4. The WHEN_IN_FOCUSED_WINDOW maps of all the enabled components in
     //    the focused window are searched.
     
-    if (processKeyBinding(KeyStroke.getKeyStrokeForEvent(e), 
-                          e, WHEN_FOCUSED, e.getID() == KeyEvent.KEY_PRESSED))
+    KeyStroke keyStroke = KeyStroke.getKeyStrokeForEvent(e);
+    boolean pressed = e.getID() == KeyEvent.KEY_PRESSED;
+    
+    if (processKeyBinding(keyStroke, e, WHEN_FOCUSED, pressed))
+      {
       // This is step 1 from above comment.
       e.consume();
-    else if (processKeyBinding(KeyStroke.getKeyStrokeForEvent(e),
-                               e, WHEN_ANCESTOR_OF_FOCUSED_COMPONENT,
-                               e.getID() == KeyEvent.KEY_PRESSED))
+        return;
+      }
+    else if (processKeyBinding
+             (keyStroke, e, WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, pressed))
+      {
       // This is step 2 from above comment.
       e.consume();
-    else
-      {
+        return;
+      }
+    
         // This is step 3 from above comment.
-        Container current = this;
-        while ((current = current.getParent()) instanceof JComponent)
+    Container current = getParent();    
+    while (current != null)
           {
-            if (((JComponent)current).processKeyBinding
-                (KeyStroke.getKeyStrokeForEvent(e), e, 
-                 WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, 
-                 e.getID() == KeyEvent.KEY_PRESSED))
+        // If current is a JComponent, see if it handles the event in its
+        // WHEN_ANCESTOR_OF_FOCUSED_COMPONENT maps.
+        if ((current instanceof JComponent) && 
+            ((JComponent)current).processKeyBinding 
+            (keyStroke, e,WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, pressed))
               {
                 e.consume();
-                break;
+            return;
               }
-            if (current instanceof Window || current instanceof Applet
-                || current instanceof JInternalFrame)
+        
+        // Stop when we've tried a top-level container and it didn't handle it
+        if (current instanceof Window || current instanceof Applet)
               break;
+        
+        // Move up the hierarchy
+        current = current.getParent();
           }
-        if (e.isConsumed())
+    
+    // Current being null means the JComponent does not currently have a
+    // top-level ancestor, in which case we don't need to check 
+    // WHEN_IN_FOCUSED_WINDOW bindings.
+    if (current == null || e.isConsumed())
           return;
         
-        // This is step 4 from above comment.
-        // FIXME: Implement.  Note, should use ComponentInputMaps rather
-        // than walking the entire containment hierarchy.
-      }
+    // This is step 4 from above comment.  KeyboardManager maintains mappings
+    // related to WHEN_IN_FOCUSED_WINDOW bindings so that we don't have to 
+    // traverse the containment hierarchy each time.
+    if (KeyboardManager.getManager().processKeyStroke(current, keyStroke, e))
+      e.consume();
   }
 
   protected boolean processKeyBinding(KeyStroke ks,
@@ -2464,7 +2530,10 @@ public abstract class JComponent extends Container implements Serializable
   public void setMaximumSize(Dimension max)
   {
     Dimension oldMaximumSize = maximumSize;
+    if (max != null) 
     maximumSize = new Dimension(max);
+    else
+      maximumSize = null;
     firePropertyChange("maximumSize", oldMaximumSize, maximumSize);
   }
 
@@ -2478,7 +2547,10 @@ public abstract class JComponent extends Container implements Serializable
   public void setMinimumSize(Dimension min)
   {
     Dimension oldMinimumSize = minimumSize;
+    if (min != null)
     minimumSize = new Dimension(min);
+    else
+      minimumSize = null;
     firePropertyChange("minimumSize", oldMinimumSize, minimumSize);
   }
 
@@ -2492,7 +2564,10 @@ public abstract class JComponent extends Container implements Serializable
   public void setPreferredSize(Dimension pref)
   {
     Dimension oldPreferredSize = preferredSize;
+    if (pref != null)
     preferredSize = new Dimension(pref);
+    else
+      preferredSize = null;
     firePropertyChange("preferredSize", oldPreferredSize, preferredSize);
   }
 
@@ -2823,41 +2898,22 @@ public abstract class JComponent extends Container implements Serializable
    */
   public void addNotify()
   {
+    // Register the WHEN_IN_FOCUSED_WINDOW keyboard bindings
+    // Note that here we unregister all bindings associated with
+    // this component and then re-register them.  This may be more than
+    // necessary if the top-level ancestor hasn't changed.  Should
+    // maybe improve this.
+    KeyboardManager km = KeyboardManager.getManager();
+    km.clearBindingsForComp(this);
+    km.registerEntireMap((ComponentInputMap)
+                         this.getInputMap(WHEN_IN_FOCUSED_WINDOW));
     super.addNotify();
-
-    // let parents inherit the keybord mapping
-    InputMap input = getInputMap();
-    ActionMap actions = getActionMap();
-
-    Container parent = getParent();
-    while ((parent != null) && (parent instanceof JComponent))
-      {
-        JComponent jParent = (JComponent) parent;
-        InputMap parentInput = jParent.getInputMap();
-        ActionMap parentAction = jParent.getActionMap();
-
-        KeyStroke[] ikeys = input.keys();
-        for (int i = 0; i < ikeys.length; i++)
-          {
-            Object o = input.get(ikeys[i]);
-            parentInput.put(ikeys[i], o);
-          }
-
-        Object[] akeys = actions.keys();
-        for (int i = 0; i < akeys.length; i++)
-          {
-            Action a = actions.get(akeys[i]);
-            parentAction.put(akeys[i], a);
-          }
-
-        parent = jParent.getParent();
-      }
 
     // Notify AncestorListeners.
     fireAncestorEvent(this, AncestorEvent.ANCESTOR_ADDED);
 
     // fire property change event for 'ancestor'
-    firePropertyChange("ancestor", null, parent);
+    firePropertyChange("ancestor", null, getParent());
   }
 
   /**
@@ -2880,37 +2936,13 @@ public abstract class JComponent extends Container implements Serializable
   {
     super.removeNotify();
 
-    // let parents inherit the keybord mapping
-    InputMap input = getInputMap();
-    ActionMap actions = getActionMap();
-
-    Container parent = getParent();
-    while ((parent != null) && (parent instanceof JComponent))
-      {
-        JComponent jParent = (JComponent) parent;
-        InputMap parentInput = jParent.getInputMap();
-        ActionMap parentAction = jParent.getActionMap();
-
-        KeyStroke[] ikeys = input.allKeys();
-        for (int i = 0; i < ikeys.length; i++)
-          {
-            parentInput.remove(ikeys[i]);
-          }
-
-        Object[] akeys = actions.allKeys();
-        for (int i = 0; i < akeys.length; i++)
-          {
-            parentAction.remove(akeys[i]);
-          }
-
-        parent = jParent.getParent();
-      }
+    KeyboardManager.getManager().clearBindingsForComp(this);
 
     // Notify ancestor listeners.
     fireAncestorEvent(this, AncestorEvent.ANCESTOR_REMOVED);
 
     // fire property change event for 'ancestor'
-    firePropertyChange("ancestor", parent, null);
+    firePropertyChange("ancestor", getParent(), null);
   }
 
   /**
@@ -3296,5 +3328,36 @@ public abstract class JComponent extends Container implements Serializable
           found = p;
       }
     return found;
+  }
+  
+  /**
+   * This is the method that gets called when the WHEN_IN_FOCUSED_WINDOW map
+   * is changed.
+   *
+   * @param changed the JComponent associated with the WHEN_IN_FOCUSED_WINDOW
+   *        map
+   */
+  void updateComponentInputMap(ComponentInputMap changed)
+  {
+    // Since you can change a component's input map via
+    // setInputMap, we have to check if <code>changed</code>
+    // is still in our WHEN_IN_FOCUSED_WINDOW map hierarchy
+    InputMap curr = getInputMap(WHEN_IN_FOCUSED_WINDOW);
+    while (curr != null && curr != changed)
+      curr = curr.getParent();
+    
+    // If curr is null then changed is not in the hierarchy
+    if (curr == null)
+      return;
+    
+    // Now we have to update the keyboard manager's hashtable
+    KeyboardManager km = KeyboardManager.getManager();
+    
+    // This is a poor strategy, should be improved.  We currently 
+    // delete all the old bindings for the component and then register
+    // the current bindings.
+    km.clearBindingsForComp(changed.getComponent());
+    km.registerEntireMap((ComponentInputMap) 
+                         getInputMap(WHEN_IN_FOCUSED_WINDOW));
   }
 }

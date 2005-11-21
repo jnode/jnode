@@ -283,6 +283,7 @@ public class BasicComboBoxUI extends ComboBoxUI
 
     focusListener = createFocusListener();
     comboBox.addFocusListener(focusListener);
+    listBox.addFocusListener(focusListener);
 
     itemListener = createItemListener();
     comboBox.addItemListener(itemListener);
@@ -332,6 +333,7 @@ public class BasicComboBoxUI extends ComboBoxUI
     propertyChangeListener = null;
 
     comboBox.removeFocusListener(focusListener);
+    listBox.removeFocusListener(focusListener);
     focusListener = null;
 
     comboBox.removeItemListener(itemListener);
@@ -610,7 +612,10 @@ public class BasicComboBoxUI extends ComboBoxUI
   public void setPopupVisible(JComboBox c, boolean v)
   {
     if (v)
+      {
       popup.show();
+        popup.getList().requestFocus();
+      }
     else
       popup.hide();
   }
@@ -797,9 +802,9 @@ public class BasicComboBoxUI extends ComboBoxUI
                 isPressed, hasFocus);
         if (! comboBox.isEnabled())
           {
-            comp.setBackground(UIManager.getLookAndFeelDefaults().getColor(
+            comp.setBackground(UIManager.getColor(
                 "ComboBox.disabledBackground"));
-            comp.setForeground(UIManager.getLookAndFeelDefaults().getColor(
+            comp.setForeground(UIManager.getColor(
                 "ComboBox.disabledForeground"));
             comp.setEnabled(false);
           }

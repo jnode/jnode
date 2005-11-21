@@ -46,14 +46,20 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Rectangle;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
+import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
 import javax.swing.ButtonModel;
 import javax.swing.Icon;
+import javax.swing.InputMap;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
@@ -72,6 +78,8 @@ import javax.swing.event.MenuDragMouseListener;
 import javax.swing.event.MenuKeyEvent;
 import javax.swing.event.MenuKeyListener;
 import javax.swing.event.MouseInputListener;
+import javax.swing.plaf.ActionMapUIResource;
+import javax.swing.plaf.ComponentInputMapUIResource;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.MenuItemUI;
 
@@ -173,6 +181,54 @@ public class BasicMenuItemUI extends MenuItemUI
    */
   private int MenuGap = 10;
   
+  /** A PropertyChangeListener to make UI updates after property changes **/
+  PropertyChangeHandler propertyChangeListener;
+  
+  /**
+   * A class to handle PropertChangeEvents for the JMenuItem
+   * @author Anthony Balkissoon abalkiss at redhat dot com.   
+   */
+  class PropertyChangeHandler implements PropertyChangeListener
+  {
+    /**
+     * This method is called when a property of the menuItem is changed.
+     * Currently it is only used to update the accelerator key bindings.
+     * 
+     * @param e
+     *          the PropertyChangeEvent
+     */
+    public void propertyChange(PropertyChangeEvent e)
+    {
+      if (e.getPropertyName() == "accelerator")
+        {
+          InputMap map = SwingUtilities.getUIInputMap(menuItem, JComponent.WHEN_IN_FOCUSED_WINDOW);
+          if (map != null)
+            map.remove((KeyStroke)e.getOldValue());
+          else
+            map = new ComponentInputMapUIResource(menuItem);
+          map.put((KeyStroke)e.getNewValue(), "doClick");
+        }
+    }
+  }
+  
+  /**
+   * A class to handle accelerator keys.  This is the Action we will
+   * perform when the accelerator key for this JMenuItem is pressed.
+   * @author Anthony Balkissoon abalkiss at redhat dot com
+   *
+   */
+  class ClickAction extends AbstractAction
+  {
+    /**
+     * This is what is done when the accelerator key for the JMenuItem is
+     * pressed.
+     */
+    public void actionPerformed(ActionEvent event)
+    {
+      doClick(MenuSelectionManager.defaultManager());
+    }    
+  }
+  
   /**
    * Creates a new BasicMenuItemUI object.
    */
@@ -182,6 +238,7 @@ public class BasicMenuItemUI extends MenuItemUI
     menuDragMouseListener = createMenuDragMouseListener(menuItem);
     menuKeyListener = createMenuKeyListener(menuItem);
     itemListener = new ItemHandler();
+    propertyChangeListener = new PropertyChangeHandler();
   }
 
   /**
@@ -418,7 +475,6 @@ public class BasicMenuItemUI extends MenuItemUI
 
     menuItem.setHorizontalTextPosition(SwingConstants.TRAILING);
     menuItem.setHorizontalAlignment(SwingConstants.LEADING);
-    menuItem.setOpaque(true);
   }
 
   /**
@@ -426,7 +482,17 @@ public class BasicMenuItemUI extends MenuItemUI
    */
   protected void installKeyboardActions()
   {
-    // FIXME: Need to implement
+    InputMap focusedWindowMap = SwingUtilities.getUIInputMap(menuItem, JComponent.WHEN_IN_FOCUSED_WINDOW);
+    if (focusedWindowMap == null)
+      focusedWindowMap = new ComponentInputMapUIResource(menuItem);
+    focusedWindowMap.put(menuItem.getAccelerator(), "doClick");
+    SwingUtilities.replaceUIInputMap(menuItem, JComponent.WHEN_IN_FOCUSED_WINDOW, focusedWindowMap);
+    
+    ActionMap UIActionMap = SwingUtilities.getUIActionMap(menuItem);
+    if (UIActionMap == null)
+      UIActionMap = new ActionMapUIResource();
+    UIActionMap.put("doClick", new ClickAction());
+    SwingUtilities.replaceUIActionMap(menuItem, UIActionMap);
   }
 
   /**
@@ -439,6 +505,7 @@ public class BasicMenuItemUI extends MenuItemUI
     menuItem.addMenuDragMouseListener(menuDragMouseListener);
     menuItem.addMenuKeyListener(menuKeyListener);
     menuItem.addItemListener(itemListener);
+    menuItem.addPropertyChangeListener(propertyChangeListener);
   }
 
   /**
@@ -456,6 +523,7 @@ public class BasicMenuItemUI extends MenuItemUI
     installDefaults();
     installComponents(menuItem);
     installListeners();
+    installKeyboardActions();
   }
 
   /**
@@ -484,11 +552,20 @@ public class BasicMenuItemUI extends MenuItemUI
    */
   protected void paintBackground(Graphics g, JMenuItem menuItem, Color bgColor)
   {
-    Dimension size = getPreferredSize(menuItem);
-    Color foreground = g.getColor();
-    g.setColor(bgColor);
-    g.drawRect(0, 0, size.width, size.height);
-    g.setColor(foreground);
+    // Menu item is considered to be highlighted when it is selected.
+    // But we don't want to paint the background of JCheckBoxMenuItems
+    ButtonModel mod = menuItem.getModel();
+    if ((menuItem.isSelected() && checkIcon == null) || (mod != null && 
+        mod.isArmed())
+        && (menuItem.getParent() instanceof MenuElement))
+      {
+        if (menuItem.isContentAreaFilled())
+          {
+            g.setColor(selectionBackground);
+            g.fillRect(0, 0, menuItem.getWidth(), menuItem.getHeight());
+          }
+      }
+
   }
 
   /**
@@ -542,28 +619,6 @@ public class BasicMenuItemUI extends MenuItemUI
     br.y -= insets.top;
     br.width += insets.right + insets.left;
     br.height += insets.top + insets.bottom;
-
-    // Menu item is considered to be highlighted when it is selected.
-    // But we don't want to paint the background of JCheckBoxMenuItems
-    ButtonModel mod = m.getModel();
-    if ((m.isSelected() && checkIcon == null) || (mod != null && 
-        mod.isArmed())
-        && (m.getParent() instanceof MenuElement))
-      {
-        if (m.isContentAreaFilled())
-          {
-            g.setColor(selectionBackground);
-            g.fillRect(br.x, br.y, br.width, br.height);
-          }
-      }
-    else
-      {
-        if (m.isContentAreaFilled())
-          {
-            g.setColor(m.getBackground());
-            g.fillRect(br.x, br.y, br.width, br.height);
-          }
-      }
 
     // If this menu item is a JCheckBoxMenuItem then paint check icon
     if (checkIcon != null)
@@ -715,7 +770,8 @@ public class BasicMenuItemUI extends MenuItemUI
    */
   protected void uninstallKeyboardActions()
   {
-    // FIXME: need to implement
+    SwingUtilities.replaceUIInputMap(menuItem,
+                                     JComponent.WHEN_IN_FOCUSED_WINDOW, null);
   }
 
   /**
@@ -727,6 +783,7 @@ public class BasicMenuItemUI extends MenuItemUI
     menuItem.removeMenuDragMouseListener(menuDragMouseListener);
     menuItem.removeMenuKeyListener(menuKeyListener);
     menuItem.removeItemListener(itemListener);
+    menuItem.removePropertyChangeListener(propertyChangeListener);
   }
 
   /**

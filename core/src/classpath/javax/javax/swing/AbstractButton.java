@@ -956,6 +956,7 @@ public abstract class AbstractButton extends JComponent
     if (b == isEnabled())
       return;
     super.setEnabled(b);
+    setFocusable(b);
     ButtonModel mod = getModel();
     if (mod != null)
       mod.setEnabled(b);

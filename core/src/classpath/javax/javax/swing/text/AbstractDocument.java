@@ -673,20 +673,8 @@ public abstract class AbstractDocument implements Document, Serializable
       new DefaultDocumentEvent(offset, length,
 			       DocumentEvent.EventType.REMOVE);
     
-    // Here we set up the parameters for an ElementChange, if one
-    // needs to be added to the DocumentEvent later
-    Element root = getDefaultRootElement();
-    int start = root.getElementIndex(offset);
-    int end = root.getElementIndex(offset + length);
-    
-    Element[] removed = new Element[end - start + 1];
-    for (int i = start; i <= end; i++)
-      removed[i - start] = root.getElement(i);
-    
     removeUpdate(event);
 
-    Element[] added = new Element[1];
-    added[0] = root.getElement(start);
     boolean shouldFire = content.getString(offset, length).length() != 0;
     
     writeLock();
@@ -694,17 +682,6 @@ public abstract class AbstractDocument implements Document, Serializable
     writeUnlock();
     
     postRemoveUpdate(event);
-    
-    GapContent.UndoRemove changes = null;
-    if (content instanceof GapContent)
-      changes = (GapContent.UndoRemove) temp;
-
-    if (changes != null && !(start == end))
-      {
-        // We need to add an ElementChange to our DocumentEvent
-        ElementEdit edit = new ElementEdit (root, start, removed, added);
-        event.addEdit(edit);
-      }
     
     if (shouldFire)
     fireRemoveUpdate(event);
@@ -2144,7 +2121,10 @@ public abstract class AbstractDocument implements Document, Serializable
      */
     public String getName()
     {
-      return ContentElementName;
+      String name = super.getName();
+      if (name == null)
+        name = ContentElementName;
+      return name;
     }
 
     /**

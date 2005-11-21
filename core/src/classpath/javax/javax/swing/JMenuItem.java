@@ -254,7 +254,9 @@ public class JMenuItem extends AbstractButton implements Accessible,
    */
   public void setAccelerator(KeyStroke keystroke)
   {
+    KeyStroke old = this.accelerator;
     this.accelerator = keystroke;
+    firePropertyChange ("accelerator", old, keystroke);
   }
 
   /**

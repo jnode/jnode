@@ -130,8 +130,10 @@ public class FieldView extends PlainView
       }
     catch (BadLocationException e)
       {
-        assert false : e.toString();
-	text = "";
+	// Should never happen
+	AssertionError ae = new AssertionError();
+	ae.initCause(e);
+	throw ae;
       }
     
     return fm.stringWidth(text);

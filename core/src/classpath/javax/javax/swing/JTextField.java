@@ -203,7 +203,9 @@ public class JTextField extends JTextComponent
    */
   protected Document createDefaultModel()
   {
-    return new PlainDocument();
+    PlainDocument doc = new PlainDocument();
+    doc.putProperty("filterNewlines", Boolean.TRUE);
+    return doc;
   }
 
   /**

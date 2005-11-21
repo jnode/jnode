@@ -1302,7 +1302,9 @@ public class BasicSplitPaneUI extends SplitPaneUI
   {
     location = validLocation(location);
     Container p = jc.getParent();
-    Dimension rightPrefSize = jc.getRightComponent().getPreferredSize();
+    Component right = jc.getRightComponent();
+    Dimension rightPrefSize = right == null ? new Dimension(0, 0)
+                                           : right.getPreferredSize();
     Dimension size = jc.getSize();
     // check if the size has been set for the splitpane
     if (size.width == 0 && size.height == 0)
@@ -1363,11 +1365,9 @@ public class BasicSplitPaneUI extends SplitPaneUI
    */
   public int getMinimumDividerLocation(JSplitPane jc)
   {
-    int value = layoutManager.getInitialLocation(jc.getInsets())
-                - layoutManager.getAvailableSize(jc.getSize(), jc.getInsets())
-                + splitPane.getDividerSize();
-    if (layoutManager.components[1] != null)
-      value += layoutManager.minimumSizeOfComponent(1);
+    int value = layoutManager.getInitialLocation(jc.getInsets());
+    if (layoutManager.components[0] != null)
+      value -= layoutManager.minimumSizeOfComponent(0);
     return value;
   }
 
@@ -1487,11 +1487,13 @@ public class BasicSplitPaneUI extends SplitPaneUI
    */
   protected void startDragging()
   {
+    Component left = splitPane.getLeftComponent();
+    Component right = splitPane.getRightComponent();
     dividerSize = divider.getDividerSize();
     setLastDragLocation(-1);
 
-    if (! splitPane.getLeftComponent().isLightweight()
-        || ! splitPane.getRightComponent().isLightweight())
+    if ((left != null && !left.isLightweight())
+        || (right != null && !right.isLightweight()))
       draggingHW = true;
 
     if (splitPane.isContinuousLayout())
