@@ -200,8 +200,6 @@
 				<!-- Limit the size of the bootdisk -->
 				<include name="default.jgz"/>
 				<include name="full.jgz"/>
-				<exclude name="fullgui.jgz"/>
-				<exclude name="install.jgz"/>
 			</fileset>	
 		</copy>
 
