@@ -17,6 +17,7 @@
   </runtime>
 
   <extension point="org.jnode.security.permissions">
+    <permission class="java.lang.RuntimePermission" name="selectorProvider"/>
     <permission class="java.util.PropertyPermission" name="dns.server" actions="read"/>
     <permission class="java.util.PropertyPermission" name="dns.search" actions="read"/>
     <permission class="java.net.SocketPermission" name="*" actions="resolve"/>
