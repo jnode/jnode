@@ -269,7 +269,7 @@ public class CompareTask extends Task {
         exe.setCommandline(cmd);
         exe.setWorkingDirectory(vmFile.getBaseDir());
         final int rc = exe.execute();
-        if (rc != 0) {
+        if ((rc != 0) && (out.size() > 0)) {
             File diffFile = new File(destDir, diffFileName);
             FileOutputStream os = new FileOutputStream(diffFile);
             try {
