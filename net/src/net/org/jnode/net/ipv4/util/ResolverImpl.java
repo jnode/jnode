@@ -43,6 +43,7 @@ import org.xbill.DNS.TextParseException;
  * @author Martin Hartvig
  */
 public class ResolverImpl implements Resolver {
+    
     private static ExtendedResolver resolver;
 
     private static Map<String, org.xbill.DNS.Resolver> resolvers;
@@ -193,6 +194,9 @@ public class ResolverImpl implements Resolver {
         if (hostname == null) {
             throw new UnknownHostException("null");
         }
+        if (hostname.equals("*")) {
+            throw new UnknownHostException("*");            
+        }
         if (resolver == null) {
             throw new UnknownHostException(hostname);
         }
@@ -201,6 +205,8 @@ public class ResolverImpl implements Resolver {
             public Object run() throws UnknownHostException {
                 ProtocolAddress[] protocolAddresses;
 
+                //System.out.println("getByName: " + hostname);
+                
                 protocolAddresses = getFromHostsFile(hostname);
                 if (protocolAddresses != null) {
                     return protocolAddresses;
