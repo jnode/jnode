@@ -1,5 +1,5 @@
-/* URISyntax.java -- 
-   Copyright (C) 2003, 2005 Free Software Foundation, Inc.
+/* MetalMenuBarUI.java -- MenuBar UI for the Metal L&F
+   Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,82 +35,54 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package javax.print.attribute;
 
-import java.io.Serializable;
-import java.net.URI;
+package javax.swing.plaf.metal;
+
+import java.awt.Graphics;
+
+import javax.swing.JComponent;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.basic.BasicMenuBarUI;
 
 /**
- * <code>URISyntax</code> is the abstract base class of all attribute 
- * classes having an Uniform Resource Identifier URI as value.
+ * A UI implementation for MenuBar in the Metal Look &amp; Feel.
  * 
- * @author Michael Koch (konqueror@gmx.de)
+ * @author Roman Kennke (kennke@aicas.com)
+ *
+ * @since 1.5
  */
-public abstract class URISyntax
-  implements Cloneable, Serializable
+public class MetalMenuBarUI extends BasicMenuBarUI
 {
-  private static final long serialVersionUID = -7842661210486401678L;
-
-  private URI uri;
-
   /**
-   * Creates a <code>URISyntax</code> object.
+   * Creates and returns a new instance of this UI for the specified component.
    *
-   * @param uri the URI value for the syntax
+   * @param c the component to create a UI for
    *
-   * @exception NullPointerException if uri is null
+   * @return the UI for the component
    */
-  protected URISyntax(URI uri)
+  public static ComponentUI createUI(JComponent c)
   {
-    if (uri == null)
-      throw new NullPointerException("uri may not be null");
-
-    this.uri = uri;
+    return new MetalMenuBarUI();
   }
 
-  /**
-   * Tests if the given object is equal to this object.
-   *
-   * @param obj the object to test
-   *
-   * @return <code>true</code> if both objects are equal, 
-   * <code>false</code> otherwise.
-   */
-  public boolean equals(Object obj)
-  {
-    if (! (obj instanceof URISyntax))
-      return false;
-
-    return uri.equals(((URISyntax) obj).getURI());
-  }
 
   /**
-   * Returns the URI value of this syntax object.
-   *
-   * @return The URI.
+   * If the property <code>MenuBar.gradient</code> is set, then a gradient
+   * is painted as background, otherwise the normal superclass behaviour is
+   * called.
    */
-  public URI getURI()
+  public void update(Graphics g, JComponent c)
   {
-    return uri;
+    if (c.isOpaque() && UIManager.get("MenuBar.gradient") != null)
+      {
+        MetalUtils.paintGradient(g, 0, 0, c.getWidth(), c.getHeight(),
+                                 SwingConstants.VERTICAL, "MenuBar.gradient");
+        paint(g, c);
+      }
+    else
+      super.update(g, c);
   }
 
-  /**
-   * Returns the hashcode for this object.
-   *
-   * @return The hashcode.
-   */
-  public int hashCode()
-  {
-    return uri.hashCode();
-  }
-
-  /**
-   * Returns the string representation for this object.
-   *
-   * @return The string representation.
-   */
-  public String toString()
-  {
-    return uri.toString();
-  }
 }

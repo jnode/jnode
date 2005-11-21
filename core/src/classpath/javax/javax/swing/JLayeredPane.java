@@ -38,9 +38,12 @@ exception statement from your version. */
 
 package javax.swing;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Graphics;
+import java.awt.Rectangle;
+import java.awt.Shape;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
@@ -158,6 +161,8 @@ public class JLayeredPane extends JComponent implements Accessible
   TreeMap layers;               // Layer Number (Integer) -> Layer Size (Integer)
   Hashtable componentToLayer;   // Component -> Layer Number (Integer)
 
+  private transient Rectangle rectCache;
+  
   public JLayeredPane()
   {
     layers = new TreeMap ();
@@ -689,8 +694,14 @@ public class JLayeredPane extends JComponent implements Accessible
    */
   public void paint(Graphics g)
   {
+    if (isOpaque())
+      {
+        Color oldColor = g.getColor();
+        Rectangle clip = g.getClipBounds();
     g.setColor(getBackground());
-    g.fillRect(0, 0, getWidth(), getHeight());
+        g.fillRect(clip.x, clip.y, clip.width, clip.height);
+        g.setColor(oldColor);
+      }
     super.paint(g);
   }
 

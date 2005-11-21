@@ -1990,9 +1990,8 @@ public class JTable
   {
     TableCellRenderer renderer =
       columnModel.getColumn(column).getCellRenderer();
-    
     if (renderer == null)
-      renderer = getDefaultRenderer(dataModel.getColumnClass(column));
+      renderer = getDefaultRenderer(getColumnClass(column));
     
     return renderer;
   }
@@ -2973,7 +2972,7 @@ public class JTable
 
   public Class getColumnClass(int column)
   {
-    return dataModel.getColumnClass(column);
+    return getModel().getColumnClass(column);
   }
   
   public String getColumnName(int column)

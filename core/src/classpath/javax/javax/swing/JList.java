@@ -1322,7 +1322,11 @@ public class JList extends JComponent implements Accessible, Scrollable
 
 
   /**
-   * Returns index of the cell to which specified location is closest to
+   * Returns index of the cell to which specified location is closest to. If
+   * the location is outside the bounds of the list, then the greatest index
+   * in the list model is returned. If the list model is empty, then
+   * <code>-1</code> is returned.
+   *
    * @param location for which to look for in the list
    * 
    * @return index of the cell to which specified location is closest to.
@@ -1620,10 +1624,15 @@ public class JList extends JComponent implements Accessible, Scrollable
    * #listListener} is unsubscribed from the existing model, if it exists,
    * and re-subscribed to the new model.
    *
-   * @param model The new property value
+   * @param model  the new model (<code>null</code> not permitted).
+   * 
+   * @throws IllegalArgumentException if <code>model</code> is 
+   *         <code>null</code>.
    */
   public void setModel(ListModel model)
   {
+    if (model == null) 
+      throw new IllegalArgumentException("Null 'model' argument.");
     if (this.model == model)
       return;
     

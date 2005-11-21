@@ -65,6 +65,10 @@ import java.util.Iterator;
  */
 public class RepaintManager
 {
+  /**
+   * The current repaint managers, indexed by their ThreadGroups.
+   */
+  static HashMap currentRepaintManagers;
 
   /**
    * <p>A helper class which is placed into the system event queue at
@@ -102,7 +106,9 @@ public class RepaintManager
 
     public void run()
     {
-      RepaintManager rm = RepaintManager.globalManager;
+      ThreadGroup threadGroup = Thread.currentThread().getThreadGroup();
+      RepaintManager rm =
+        (RepaintManager) currentRepaintManagers.get(threadGroup);
       setLive(false);
       rm.validateInvalidComponents();
       rm.paintDirtyRegions();
@@ -249,16 +255,6 @@ public class RepaintManager
 
 
   /**
-   * The global, shared RepaintManager instance. This is reused for all
-   * components in all windows.  This is package-private to avoid an accessor
-   * method.
-   *
-   * @see #currentManager(JComponent)
-   * @see #setCurrentManager
-   */
-  static RepaintManager globalManager;
-
-  /**
    * Create a new RepaintManager object.
    */
   public RepaintManager()
@@ -275,31 +271,46 @@ public class RepaintManager
   }
 
   /**
-   * Get the value of the shared {@link #globalManager} instance, possibly
-   * returning a special manager associated with the specified
-   * component. The default implementaiton ignores the component parameter.
+   * Returns the <code>RepaintManager</code> for the current thread's
+   * thread group. The default implementation ignores the
+   * <code>component</code> parameter and returns the same repaint manager
+   * for all components.
    *
-   * @param component A component to look up the manager of
+   * @param component a component to look up the manager of
    *
-   * @return The current repaint manager
+   * @return the current repaint manager for the calling thread's thread group
+   *         and the specified component
    *
    * @see #setCurrentManager
    */
   public static RepaintManager currentManager(Component component)
   {
-    if (globalManager == null)
-      globalManager = new RepaintManager();
-    return globalManager;
+    if (currentRepaintManagers == null)
+      currentRepaintManagers = new HashMap();
+    ThreadGroup threadGroup = Thread.currentThread().getThreadGroup();
+    RepaintManager currentManager =
+      (RepaintManager) currentRepaintManagers.get(threadGroup);
+    if (currentManager == null)
+      {
+        currentManager = new RepaintManager();
+        currentRepaintManagers.put(threadGroup, currentManager);
+      }
+    return currentManager;
   }
 
   /**
-   * Get the value of the shared {@link #globalManager} instance, possibly
-   * returning a special manager associated with the specified
-   * component. The default implementaiton ignores the component parameter.
+   * Returns the <code>RepaintManager</code> for the current thread's
+   * thread group. The default implementation ignores the
+   * <code>component</code> parameter and returns the same repaint manager
+   * for all components.
    *
-   * @param component A component to look up the manager of
+   * This method is only here for backwards compatibility with older versions
+   * of Swing and simply forwards to {@link #currentManager(Component)}.
    *
-   * @return The current repaint manager
+   * @param component a component to look up the manager of
+   *
+   * @return the current repaint manager for the calling thread's thread group
+   *         and the specified component
    *
    * @see #setCurrentManager
    */
@@ -309,15 +320,20 @@ public class RepaintManager
   }
 
   /**
-   * Set the value of the shared {@link #globalManager} instance.
+   * Sets the repaint manager for the calling thread's thread group.
    *
-   * @param manager The new value of the shared instance
+   * @param manager the repaint manager to set for the current thread's thread
+   *        group
    *
-   * @see #currentManager(JComponent)
+   * @see #currentManager(Component)
    */
   public static void setCurrentManager(RepaintManager manager)
   {
-    globalManager = manager;
+    if (currentRepaintManagers == null)
+      currentRepaintManagers = new HashMap();
+
+    ThreadGroup threadGroup = Thread.currentThread().getThreadGroup();
+    currentRepaintManagers.put(threadGroup, manager);
   }
 
   /**

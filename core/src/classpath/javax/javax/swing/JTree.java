@@ -1480,7 +1480,7 @@ public class JTree extends JComponent implements Scrollable, Accessible
     updateUI();
     setRootVisible(true);
     setModel(model);
-    setSelectionModel(EmptySelectionModel.sharedInstance());
+    setSelectionModel(new EmptySelectionModel());
   }
 
   /**
@@ -2597,7 +2597,6 @@ public class JTree extends JComponent implements Scrollable, Accessible
   {
     if (path == null)
       return;
-    TreePath parent = path.getParentPath();
 
     doExpandParents(path, state);
   }

@@ -75,30 +75,38 @@ public class TransferHandler implements Serializable
 	}
     }
   
+    /**
+     * Get the system cliboard. If not available, create and return the VM-local
+     * clipboard.
+     * 
+     * @param component a component, used to get the toolkit.
+     * @return the clipboard
+     */
     private static Clipboard getClipboard(JComponent component)
     {
-      SecurityManager sm = System.getSecurityManager();
-    
-      if (sm != null)
+      // Avoid throwing exception if the system clipboard access failed
+      // in the past.
+      if (clipboard != null)
+        return clipboard;
+      else
 	{
 	  try
 	    {
+              SecurityManager sm = System.getSecurityManager();
+              if (sm != null)
 	      sm.checkSystemClipboardAccess();
 
 	      // We may access system clipboard.
 	      return component.getToolkit().getSystemClipboard();
 	    }
-	  catch (SecurityException e)
+          catch (Exception e)
 	    {
 	      // We may not access system clipboard.
-	    }
-	}
-    
-      // Create VM-local clipboard if non exists yet.
-      if (clipboard == null)
+              // Create VM-local clipboard if none exists yet.
         clipboard = new Clipboard("Clipboard");
-
       return clipboard;
+    }
+  }
     }
   }
   

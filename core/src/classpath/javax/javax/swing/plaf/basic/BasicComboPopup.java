@@ -38,9 +38,9 @@ exception statement from your version. */
 
 package javax.swing.plaf.basic;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ItemEvent;
@@ -56,6 +56,7 @@ import java.awt.event.MouseMotionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -179,11 +180,8 @@ public class BasicComboPopup extends JPopupMenu implements ComboPopup
     // to display number of rows equal to 'maximumRowCount' property
     int popupHeight = getPopupHeightForRowCount(comboBox.getMaximumRowCount());
 
-    list.setPreferredSize(new Dimension(cbBounds.width, popupHeight));
-    Insets insets1 = getInsets();
-    Insets insets2 = scroller.getInsets();
-    super.setPopupSize(cbBounds.width, popupHeight + insets1.top 
-            + insets1.bottom + insets2.top + insets2.bottom);
+    scroller.setPreferredSize(new Dimension(cbBounds.width, popupHeight));
+    pack();
 
     // Highlight selected item in the combo box's drop down list
     if (comboBox.getSelectedIndex() != -1)
@@ -482,6 +480,7 @@ public class BasicComboPopup extends JPopupMenu implements ComboPopup
    */
   protected void configureScroller()
   {
+    scroller.setBorder(null);
     scroller.getViewport().setView(list);
     scroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
   }
@@ -492,6 +491,7 @@ public class BasicComboPopup extends JPopupMenu implements ComboPopup
    */
   protected void configurePopup()
   {
+    setBorder(BorderFactory.createLineBorder(Color.BLACK));
     // initialize list that will be used to display combo box's items
     this.list = createList();
     ((JLabel) list.getCellRenderer()).setHorizontalAlignment(SwingConstants.LEFT);

@@ -171,7 +171,9 @@ public class ActionMap
 	 */
   public Object[] keys()
   {
+    if (size() != 0)
     return actionMap.keySet().toArray();
+    return null;
   }
 
 	/**
@@ -188,7 +190,9 @@ public class ActionMap
 			set.addAll(Arrays.asList(parent.allKeys()));
 
     set.addAll(actionMap.keySet());
+    if (set.size() != 0)
     return set.toArray();
+    return null;
   }
 
 	/**

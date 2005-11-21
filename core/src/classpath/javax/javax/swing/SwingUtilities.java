@@ -1138,13 +1138,11 @@ public class SwingUtilities
     else
       {
         ActionMap parent = child.getParent();
-        while(parent != null)
+        while (parent != null && !(parent instanceof ActionMapUIResource))
           {
             child = parent;
             parent = child.getParent();
           }
-
-        if (child != null)
           child.setParent(uiActionMap);
       }
   }
@@ -1181,10 +1179,12 @@ public class SwingUtilities
       component.setInputMap(condition, uiInputMap);
     else
       {
-        while(child.getParent() != null
-              && !(child.getParent() instanceof InputMapUIResource))
-          child = child.getParent();
-        if (child != null)
+        InputMap parent = child.getParent();
+        while (parent != null && !(parent instanceof InputMapUIResource))
+          {
+            child = parent;
+            parent = parent.getParent();
+          }
           child.setParent(uiInputMap);
       }
   }

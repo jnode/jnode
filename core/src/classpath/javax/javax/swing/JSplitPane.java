@@ -170,13 +170,15 @@ public class JSplitPane extends JComponent implements Accessible
 	public static final int HORIZONTAL_SPLIT = 1;
 
   /** The property fired when the last divider location property changes. */
-  public static final String LAST_DIVIDER_LOCATION_PROPERTY = "lastDividerLocation";
+  public static final String LAST_DIVIDER_LOCATION_PROPERTY = 
+    "lastDividerLocation";
 
   /** The constraints string used to add components to the left. */
   public static final String LEFT = "left";
 
   /** The property fired when the one touch expandable property changes. */
-  public static final String ONE_TOUCH_EXPANDABLE_PROPERTY = "oneTouchExpandable";
+  public static final String ONE_TOUCH_EXPANDABLE_PROPERTY = 
+    "oneTouchExpandable";
 
   /** The property fired when the orientation property changes. */
 	public static final String ORIENTATION_PROPERTY = "orientation";
@@ -199,7 +201,8 @@ public class JSplitPane extends JComponent implements Accessible
   /** Whether the JSplitPane uses one touch expandable buttons. */
   protected boolean oneTouchExpandable = false;
 
-  // This is the master dividerSize variable and sets the BasicSplitPaneDivider one accordingly
+  // This is the master dividerSize variable and sets the 
+  // BasicSplitPaneDivider one accordingly
 
   /** The size of the divider. */
   protected int dividerSize = 10;
@@ -286,7 +289,8 @@ public class JSplitPane extends JComponent implements Accessible
    */
   public JSplitPane()
   {
-    this(HORIZONTAL_SPLIT, false, null, null);
+    this(HORIZONTAL_SPLIT, false, new JButton("left button"),
+         new JButton("right button"));
   }
 
   /**
@@ -300,7 +304,8 @@ public class JSplitPane extends JComponent implements Accessible
    * @param constraints The constraints string to use.
    * @param index Where to place to component in the list of components.
    *
-   * @throws IllegalArgumentException When the constraints is not a known identifier.
+   * @throws IllegalArgumentException When the constraints is not a known 
+   * identifier.
    */
   protected void addImpl(Component comp, Object constraints, int index)
   {
@@ -335,7 +340,8 @@ public class JSplitPane extends JComponent implements Accessible
 	else if (placement.equals(DIVIDER))
 	  constraints = null;
 	else
-	  throw new IllegalArgumentException("Constraints is not a known identifier.");
+          throw new 
+            IllegalArgumentException("Constraints is not a known identifier.");
 
 	super.addImpl(comp, constraints, index);
       }
@@ -634,7 +640,8 @@ public class JSplitPane extends JComponent implements Accessible
   public void setDividerLocation(double proportionalLocation)
   {
     if (proportionalLocation > 1 || proportionalLocation < 0)
-      throw new IllegalArgumentException("proportion has to be between 0 and 1.");
+      throw new IllegalArgumentException
+        ("proportion has to be between 0 and 1.");
 
     int max = (orientation == HORIZONTAL_SPLIT) ? getWidth() : getHeight();
     setDividerLocation((int) (proportionalLocation * max));
@@ -700,7 +707,7 @@ public class JSplitPane extends JComponent implements Accessible
     if (comp != null)
       add(comp, LEFT);
     else
-      add(new JButton("left button"), LEFT);
+      remove (leftComponent);
   }
 
   /**
@@ -732,7 +739,8 @@ public class JSplitPane extends JComponent implements Accessible
   public void setOrientation(int orientation)
   {
     if (orientation != HORIZONTAL_SPLIT && orientation != VERTICAL_SPLIT)
-      throw new IllegalArgumentException("orientation must be one of VERTICAL_SPLIT, HORIZONTAL_SPLIT");
+      throw new IllegalArgumentException
+        ("orientation must be one of VERTICAL_SPLIT, HORIZONTAL_SPLIT");
     if (orientation != this.orientation)
       {
 	int oldOrientation = this.orientation;
@@ -766,7 +774,7 @@ public class JSplitPane extends JComponent implements Accessible
     if (comp != null)
       add(comp, RIGHT);
     else
-	add(new JButton("right button"), RIGHT);
+      remove (rightComponent);
   }
 
   /**

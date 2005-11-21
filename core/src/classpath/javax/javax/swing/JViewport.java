@@ -246,7 +246,18 @@ public class JViewport extends JComponent implements Accessible
   public JViewport()
   {
     setOpaque(true);
-    setScrollMode(BLIT_SCROLL_MODE);
+    String scrollModeProp =
+      System.getProperty("gnu.javax.swing.JViewport.scrollMode",
+                         "BLIT");
+    int myScrollMode;
+    if (scrollModeProp.equalsIgnoreCase("simple"))
+      myScrollMode = SIMPLE_SCROLL_MODE;
+    else if (scrollModeProp.equalsIgnoreCase("backingstore"))
+      myScrollMode = BACKINGSTORE_SCROLL_MODE;
+    else
+      myScrollMode = BLIT_SCROLL_MODE;
+    setScrollMode(myScrollMode);
+
     updateUI();
     setLayout(createLayoutManager());
     lastPaintPosition = new Point();

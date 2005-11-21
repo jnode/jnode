@@ -38,6 +38,7 @@ exception statement from your version. */
 
 package javax.swing.plaf;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Rectangle;
@@ -185,9 +186,10 @@ public abstract class ComponentUI
   {
     if (c.isOpaque())
     {
+      Color oldColor = g.getColor();
       g.setColor(c.getBackground());
-      Rectangle clip = g.getClipBounds();
       g.fillRect(0, 0, c.getWidth(), c.getHeight());
+      g.setColor(oldColor);
     }
     paint(g, c);
   }
