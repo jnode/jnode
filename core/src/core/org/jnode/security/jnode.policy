@@ -49,6 +49,7 @@ grant {
 	permission java.util.PropertyPermission "swing.defaultlaf", "read";
 	
 	// Hacks to fix classpath's lack of security
+	permission java.util.PropertyPermission "java.nio.channels.spi.SelectorProvider", "read";
 	permission java.util.PropertyPermission "java.protocol.handler.pkgs", "read";
 	permission java.util.PropertyPermission "awt.appletWarning", "read";
 	permission java.util.PropertyPermission "awt.image.incrementalDraw", "read";
