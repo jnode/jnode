@@ -84,31 +84,25 @@ public class TransferHandler implements Serializable
      */
     private static Clipboard getClipboard(JComponent component)
     {
-      // Avoid throwing exception if the system clipboard access failed
-      // in the past.
-      if (clipboard != null)
-        return clipboard;
-      else
-	{
 	  try
 	    {
               SecurityManager sm = System.getSecurityManager();
               if (sm != null)
 	      sm.checkSystemClipboardAccess();
 
-	      // We may access system clipboard.
+          // We may access the system clipboard.
 	      return component.getToolkit().getSystemClipboard();
 	    }
           catch (Exception e)
 	    {
 	      // We may not access system clipboard.
               // Create VM-local clipboard if none exists yet.
+          if (clipboard == null)
         clipboard = new Clipboard("Clipboard");
       return clipboard;
     }
   }
     }
-  }
   
   private static final long serialVersionUID = -967749805571669910L;
 

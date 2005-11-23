@@ -71,7 +71,7 @@ public class Timer
 	System.out.println("javax.swing.Timer -> queueEvent()");
       queueEvent();
 
-                if ( ! repeats)
+      if (!repeats)
 	task = null;
   }
   }
