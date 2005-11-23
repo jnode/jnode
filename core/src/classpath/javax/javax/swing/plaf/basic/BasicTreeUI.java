@@ -1180,12 +1180,10 @@ public class BasicTreeUI extends TreeUI
           {
             TreePath curr = new TreePath(getPathToRoot(path[i], 0));
             Rectangle bounds = getPathBounds(tree, curr);  
-            
             if (treeModel != null)
               isLeaf = treeModel.isLeaf(path[i]);
             if (!isLeaf && hasControlIcons())
               bounds.width += getCurrentControlIcon(curr).getIconWidth();
-
             maxWidth = Math.max(maxWidth, bounds.x + bounds.width);
           }
         preferredSize = new Dimension(maxWidth, (getRowHeight() * path.length));
@@ -2769,6 +2767,7 @@ public class BasicTreeUI extends TreeUI
       else if (e.getActionCommand().equals("selectPrevious"))
         {
           Object prev = getPreviousVisibleNode(last);
+          
           if (prev != null)
             {
               TreePath newPath = new TreePath(getPathToRoot(prev, 0));
@@ -2778,6 +2777,7 @@ public class BasicTreeUI extends TreeUI
       else if (e.getActionCommand().equals("selectNext"))
         {
           Object next = getNextVisibleNode(last);
+          
           if (next != null)
             {
               TreePath newPath = new TreePath(getPathToRoot(next, 0));
@@ -3202,7 +3202,6 @@ public class BasicTreeUI extends TreeUI
 
     Object node = curr;
     Object sibling = null;
-
     do
       {
         sibling = getNextSibling(node);

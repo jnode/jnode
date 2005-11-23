@@ -575,7 +575,6 @@ public class BasicListUI extends ListUI
         updateLayoutStateNeeded += prototypeCellValueChanged;
       else if (e.getPropertyName().equals("cellRenderer"))
         updateLayoutStateNeeded += cellRendererChanged;
-
       BasicListUI.this.damageLayout();
     }
   }

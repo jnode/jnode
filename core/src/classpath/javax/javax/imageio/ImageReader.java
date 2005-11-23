@@ -1664,7 +1664,7 @@ public abstract class ImageReader
         else
           dest = destType.createBufferedImage
             (destRegion.width, destRegion.height);
-}
+      }
     return dest;
   }
 

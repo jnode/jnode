@@ -41,6 +41,7 @@ package javax.swing.plaf.metal;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.LayoutManager;
+import java.awt.Rectangle;
 
 import javax.swing.JComponent;
 import javax.swing.JTabbedPane;
@@ -383,5 +384,244 @@ public class MetalTabbedPaneUI extends BasicTabbedPaneUI
     selectHighlight = UIManager.getColor("TabbedPane.selectHighlight");
     tabAreaBackground = UIManager.getColor("TabbedPane.tabAreaBackground");
     minTabWidth = 0;
+  }
+  
+  /**
+   * Returns the color for the gap.
+   * 
+   * @param currentRun - The current run to return the color for
+   * @param x - The x position of the current run
+   * @param y - The y position of the current run
+   * 
+   * @return the color for the gap in the current run.
+   */
+  protected Color getColorForGap(int currentRun, int x, int y)
+  {
+    return tabAreaBackground;
+  }
+  
+  /**
+   * Paints the highlight below the tab, if there is one.
+   */
+  protected void paintHighlightBelowTab()
+  {
+    // Nothing to do here, no highlight below the tab as far
+    // as I can see.
+  }
+  
+  /**
+   * Returns true if the gap should be filled in.
+   * 
+   * @param currentRun - The current run
+   * @param tabIndex - The current tab
+   * @param x - The x position of the tab
+   * @param y - The y position of the tab
+   * 
+   * @return true if the gap at the current run should be filled 
+   */
+  protected boolean shouldFillGap(int currentRun, int tabIndex,
+                                  int x, int y)
+  {
+    return true;
+  }
+  
+  /**
+   * Returns true if we should rotate the tab runs. 
+   * 
+   * @param tabPlacement - The current tab placement.
+   * @param selectedRun - The selected run.
+   * 
+   * @return true if the tab runs should be rotated.
+   */
+  protected boolean shouldRotateTabRuns(int tabPlacement,
+                                        int selectedRun)
+  {
+    // false because tab runs are not rotated in the MetalLookAndFeel
+    return false;
+  }
+  
+  /**
+   * This method returns the max tab height.
+   *
+   * @param tabPlacement The JTabbedPane's tab placement.
+   *
+   * @return The maximum tab height.
+   */
+  protected int calculateMaxTabHeight(int tabPlacement)
+  {
+    return super.calculateMaxTabHeight(tabPlacement);
+  }
+  
+  /**
+   * This method returns how much the label for the tab should shift in the X
+   * direction.
+   *
+   * @param tabPlacement The JTabbedPane's tab placement.
+   * @param tabIndex The tab index being painted.
+   * @param isSelected Whether this tab is selected.
+   *
+   * @return The amount the label should shift by in the X direction.
+   */
+  protected int getTabLabelShiftX(int tabPlacement, int tabIndex,
+                                  boolean isSelected)
+  {
+    // No reason to shift.
+    return 0;
+  }
+  
+  /**
+   * This method returns how much the label for the tab should shift in the Y
+   * direction.
+   *
+   * @param tabPlacement The JTabbedPane's tab placement.
+   * @param tabIndex The tab index being painted.
+   * @param isSelected Whether this tab is selected.
+   *
+   * @return The amount the label should shift by in the Y direction.
+   */
+  protected int getTabLabelShiftY(int tabPlacement, int tabIndex,
+                                  boolean isSelected)
+  {
+    // No reason to shift.
+    return 0;
+  }
+  
+  /**
+   * This method returns the tab run overlay.
+   *
+   * @param tabPlacement The JTabbedPane's tab placement.
+   *
+   * @return The tab run overlay.
+   */
+  protected int getTabRunOverlay(int tabPlacement)
+  {
+    tabRunOverlay = UIManager.getInt("TabbedPane.tabRunOverlay");
+    return tabRunOverlay;
+  }
+  
+  /**
+   * This method paints the JTabbedPane.
+   *
+   * @param g The Graphics object to paint with.
+   * @param c The JComponent to paint.
+   */
+  public void paint(Graphics g, JComponent c)
+  {
+    super.paint(g, c);
+  }
+  
+  /**
+   * This method paints the bottom edge of the content border.
+   *
+   * @param g The Graphics object to paint with.
+   * @param tabPlacement The JTabbedPane's tab placement.
+   * @param selectedIndex The selected tab index.
+   * @param x The x coordinate for the content area.
+   * @param y The y coordinate for the content area.
+   * @param w The width of the content area.
+   * @param h The height of the content area.
+   */
+  protected void paintContentBorderBottomEdge(Graphics g, int tabPlacement,
+                                              int selectedIndex, int x, int y,
+                                              int w, int h)
+  {
+    super.paintContentBorderBottomEdge(g, tabPlacement, selectedIndex, 
+                                       x, y, w, h);
+  }
+  
+  /**
+   * This method paints the left edge of the content border.
+   *
+   * @param g The Graphics object to paint with.
+   * @param tabPlacement The JTabbedPane's tab placement.
+   * @param selectedIndex The selected tab index.
+   * @param x The x coordinate for the content area.
+   * @param y The y coordinate for the content area.
+   * @param w The width of the content area.
+   * @param h The height of the content area.
+   */
+  protected void paintContentBorderLeftEdge(Graphics g, int tabPlacement,
+                                            int selectedIndex, int x, int y,
+                                            int w, int h)
+  {
+    super.paintContentBorderLeftEdge(g, tabPlacement, selectedIndex, 
+                                       x, y, w, h);
+  }
+  
+  /**
+   * This method paints the right edge of the content border.
+   *
+   * @param g The Graphics object to paint with.
+   * @param tabPlacement The JTabbedPane's tab placement.
+   * @param selectedIndex The selected tab index.
+   * @param x The x coordinate for the content area.
+   * @param y The y coordinate for the content area.
+   * @param w The width of the content area.
+   * @param h The height of the content area.
+   */
+  protected void paintContentBorderRightEdge(Graphics g, int tabPlacement,
+                                             int selectedIndex, int x, int y,
+                                             int w, int h)
+  {
+    super.paintContentBorderRightEdge(g, tabPlacement, selectedIndex, 
+                                      x, y, w, h);
+  }
+  
+  /**
+   * This method paints the top edge of the content border.
+   *
+   * @param g The Graphics object to paint with.
+   * @param tabPlacement The JTabbedPane's tab placement.
+   * @param selectedIndex The selected tab index.
+   * @param x The x coordinate for the content area.
+   * @param y The y coordinate for the content area.
+   * @param w The width of the content area.
+   * @param h The height of the content area.
+   */
+  protected void paintContentBorderTopEdge(Graphics g, int tabPlacement,
+                                           int selectedIndex, int x, int y,
+                                           int w, int h)
+  {
+    super.paintContentBorderTopEdge(g, tabPlacement, selectedIndex, 
+                                      x, y, w, h);
+  }
+  
+  /**
+   * This method paints the focus rectangle around the selected tab.
+   *
+   * @param g The Graphics object to paint with.
+   * @param tabPlacement The JTabbedPane's tab placement.
+   * @param rects The array of rectangles keeping track of size and position.
+   * @param tabIndex The tab index.
+   * @param iconRect The icon bounds.
+   * @param textRect The text bounds.
+   * @param isSelected Whether this tab is selected.
+   */
+  protected void paintFocusIndicator(Graphics g, int tabPlacement,
+                                     Rectangle[] rects, int tabIndex,
+                                     Rectangle iconRect, Rectangle textRect,
+                                     boolean isSelected)
+  {
+    super.paintFocusIndicator(g, tabPlacement, rects, tabIndex, 
+                              iconRect, textRect, isSelected);
+  }
+  
+  /**
+   * Notifies this UI delegate that it's time to paint the specified 
+   * component. This method is invoked by JComponent when the specified 
+   * component is being painted. By default this method will fill the 
+   * specified component with its background color (if its opaque property
+   * is true) and then immediately call paint. In general this method need 
+   * not be overridden by subclasses; all look-and-feel rendering code should 
+   * reside in the paint method.
+   * 
+   * @param g - the Graphics context in which to paint
+   * @param c - the component being painted; this argument 
+   * is often ignored, but might be used if the UI object is 
+   * stateless and shared by multiple components
+   */
+  public void update(Graphics g, JComponent c)
+  {
+    super.update(g, c);
   }
 }
