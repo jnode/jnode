@@ -36,6 +36,9 @@ import nanoxml.XMLParseException;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.taskdefs.Jar;
+import org.apache.tools.ant.taskdefs.Manifest;
+import org.apache.tools.ant.taskdefs.ManifestException;
+import org.apache.tools.ant.taskdefs.Manifest.Attribute;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.ZipFileSet;
 import org.apache.tools.ant.util.FileUtils;
@@ -129,6 +132,13 @@ public class PluginTask extends AbstractPluginTask {
 		} catch (IOException ex) {
 			throw new BuildException(ex);
 		}
+        
+        // Create manifest
+        try {
+            jarTask.addConfiguredManifest(createManifest(descr));
+        } catch (ManifestException ex) {
+            throw new BuildException(ex);
+        }
 
 		// Add runtime resources
 		final Runtime rt = descr.getRuntime();
@@ -142,6 +152,22 @@ public class PluginTask extends AbstractPluginTask {
 
 		jarTask.execute();
 	}
+    
+    /**
+     * Create a manifest for the given descriptor
+     * @param descr
+     * @return
+     * @throws ManifestException 
+     */
+    protected Manifest createManifest(PluginDescriptor descr) throws ManifestException {
+        Manifest mf = new Manifest();
+        
+        mf.addConfiguredAttribute(new Manifest.Attribute("Bundle-SymbolicName", descr.getId()));
+        mf.addConfiguredAttribute(new Manifest.Attribute("Bundle-ManifestVersion", "2"));
+        mf.addConfiguredAttribute(new Manifest.Attribute("Bundle-Version", descr.getVersion()));
+        
+        return mf;
+    }
     
     protected void addResourceList(File pluginDescr, Collection<ZipFileSet> resources) throws XMLParseException, FileNotFoundException, IOException {
         final XMLElement xml = new XMLElement();
