@@ -1,4 +1,4 @@
-/* ObjectReferenceFactory.java --
+/* ObjectReferenceTemplateSeqHolder.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -38,20 +38,67 @@ exception statement from your version. */
 
 package org.omg.PortableInterceptor;
 
-import org.omg.CORBA.portable.IDLEntity;
+import org.omg.CORBA.portable.Streamable;
+import org.omg.CORBA.portable.InputStream;
+import org.omg.CORBA.portable.OutputStream;
 
 /**
- * Provides the possibility to create the CORBA object reference.
- * The reference is created from repository id (defining the type of the
- * object) and the object id (defining the identity of the object).
- * The operation for creating reference is defined separately in
- * {@link ObjectReferenceFactoryOperations}.
- *
- * @since 1.5
- *
+ * A holder for the array of {@link ObjectReferenceTemplate}s.
+ * 
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public interface ObjectReferenceFactory
-  extends ObjectReferenceFactoryOperations, IDLEntity
+public class ObjectReferenceTemplateSeqHolder
+  implements Streamable
 {
+  /**
+   * The stored ObjectReferenceTemplate value.
+   */
+  public ObjectReferenceTemplate[] value;
+
+  /**
+   * Create the unitialised instance, leaving the value field with default
+   * <code>null</code> value.
+   */
+  public ObjectReferenceTemplateSeqHolder()
+  {
+  }
+
+  /**
+   * Create the initialised instance.
+   * 
+   * @param initialValue the value that will be assigned to the
+   * <code>value</code> field.
+   */
+  public ObjectReferenceTemplateSeqHolder(ObjectReferenceTemplate[] initialValue)
+  {
+    value = initialValue;
+  }
+
+  /**
+   * Fill in the {@link value} by data from the CDR stream.
+   * 
+   * @param input the org.omg.CORBA.portable stream to read.
+   */
+  public void _read(InputStream input)
+  {
+    value = ObjectReferenceTemplateSeqHelper.read(input);
+  }
+
+  /**
+   * Write the stored value into the CDR stream.
+   * 
+   * @param output the org.omg.CORBA.portable stream to write.
+   */
+  public void _write(OutputStream output)
+  {
+    ObjectReferenceTemplateSeqHelper.write(output, value);
+  }
+
+  /**
+   * Get the typecode of the ObjectReferenceTemplate.
+   */
+  public org.omg.CORBA.TypeCode _type()
+  {
+    return ObjectReferenceTemplateSeqHelper.type();
+  }
 }

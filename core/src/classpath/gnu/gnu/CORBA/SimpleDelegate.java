@@ -196,13 +196,11 @@ public class SimpleDelegate
   }
 
   /**
-   * Returns true if the objects are the same of have
-   * the same delegate set. All objects in this implementation
-   * have a separate delegate.
+   * Returns true if the objects are the same or have the same delegate set. All
+   * objects in this implementation have a separate delegate.
    */
   public boolean is_equivalent(org.omg.CORBA.Object target,
-                               org.omg.CORBA.Object other
-                              )
+    org.omg.CORBA.Object other)
   {
     if (target == other)
       return true;
@@ -210,13 +208,25 @@ public class SimpleDelegate
       {
         try
           {
-            org.omg.CORBA.portable.Delegate a =
-              ((ObjectImpl) target)._get_delegate();
-            org.omg.CORBA.portable.Delegate b =
-              ((ObjectImpl) other)._get_delegate();
+            org.omg.CORBA.portable.Delegate a = ((ObjectImpl) target)._get_delegate();
+            org.omg.CORBA.portable.Delegate b = ((ObjectImpl) other)._get_delegate();
             if (a == b)
               {
                 return true;
+              }
+            else
+              {
+                // We compere the IOR's in this case.
+                if (a instanceof IorProvider && b instanceof IorProvider)
+                  {
+                    IOR ia = ((IorProvider) a).getIor();
+                    IOR ib = ((IorProvider) b).getIor();
+
+                    if (ia != null && ib != null)
+                      return (ia.equals(ib));
+                    else
+                      return ia == ib;
+                  }
               }
             if (a != null && b != null)
               {

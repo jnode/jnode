@@ -40,7 +40,6 @@ package gnu.CORBA.Poa;
 
 import gnu.CORBA.ByteArrayComparator;
 
-import org.omg.PortableServer.POA;
 import org.omg.PortableServer.Servant;
 
 import java.util.Iterator;
@@ -67,7 +66,7 @@ public class AOM
     /**
      * Create an initialised instance.
      */
-    Obj(org.omg.CORBA.Object _object, byte[] _key, Servant _servant, POA _poa)
+    Obj(org.omg.CORBA.Object _object, byte[] _key, Servant _servant, gnuPOA _poa)
     {
       object = _object;
       key = _key;
@@ -96,7 +95,7 @@ public class AOM
     /**
      * The POA, where the object is connected.
      */
-    public final POA poa;
+    public final gnuPOA poa;
 
     /**
      * The object key.
@@ -258,7 +257,7 @@ public class AOM
    *
    * @return the newly created object record.
    */
-  public Obj add(org.omg.CORBA.Object object, Servant servant, POA poa)
+  public Obj add(org.omg.CORBA.Object object, Servant servant, gnuPOA poa)
   {
     return add(generateObjectKey(object), object, servant, poa);
   }
@@ -272,7 +271,7 @@ public class AOM
    * @param poa the POA, where the object is connected.
    */
   public Obj add(byte[] key, org.omg.CORBA.Object object, Servant servant,
-                 POA poa
+                 gnuPOA poa
                 )
   {
     Obj rec = new Obj(object, key, servant, poa);

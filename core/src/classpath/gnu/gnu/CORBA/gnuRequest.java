@@ -839,11 +839,11 @@ public class gnuRequest extends Request implements Cloneable
             InputStream socketInput = socket.getInputStream();
             response_header.read(socketInput);
 
-            byte [] r;
+            byte[] r;
             if (orb instanceof OrbFunctional)
               {
                 OrbFunctional fo = (OrbFunctional) orb;
-                r =response_header.readMessage(socketInput, socket, 
+                r = response_header.readMessage(socketInput, socket,
                   fo.TOUT_WHILE_READING, fo.TOUT_AFTER_RECEIVING);
               }
             else
@@ -951,7 +951,7 @@ public class gnuRequest extends Request implements Cloneable
 
     switch (m_rph.reply_status)
       {
-        case ReplyHeader.NO_EXCEPTION :
+        case ReplyHeader.NO_EXCEPTION:
 
           NamedValue arg;
 
@@ -997,7 +997,7 @@ public class gnuRequest extends Request implements Cloneable
 
           break;
 
-        case ReplyHeader.SYSTEM_EXCEPTION :
+        case ReplyHeader.SYSTEM_EXCEPTION:
           if (align)
             {
               input.align(8);
@@ -1014,7 +1014,7 @@ public class gnuRequest extends Request implements Cloneable
 
           throw m_sys_ex;
 
-        case ReplyHeader.USER_EXCEPTION :
+        case ReplyHeader.USER_EXCEPTION:
           if (align)
             {
               input.align(8);
@@ -1036,8 +1036,8 @@ public class gnuRequest extends Request implements Cloneable
 
           break;
 
-        case ReplyHeader.LOCATION_FORWARD_PERM :
-        case ReplyHeader.LOCATION_FORWARD :
+        case ReplyHeader.LOCATION_FORWARD_PERM:
+        case ReplyHeader.LOCATION_FORWARD:
           if (response.header.version.since_inclusive(1, 2))
             input.align(8);
 
@@ -1063,7 +1063,7 @@ public class gnuRequest extends Request implements Cloneable
           p_invoke();
           return;
 
-        default :
+        default:
           throw new MARSHAL("Unknow reply status", 8100 + m_rph.reply_status,
             CompletionStatus.COMPLETED_NO);
       }

@@ -64,6 +64,7 @@ import org.omg.CORBA.portable.OutputStream;
 import org.omg.CORBA.portable.ValueFactory;
 import org.omg.PortableInterceptor.ClientRequestInterceptorOperations;
 import org.omg.PortableInterceptor.IORInterceptorOperations;
+import org.omg.PortableInterceptor.IORInterceptor_3_0Operations;
 import org.omg.PortableInterceptor.ServerRequestInterceptorOperations;
 
 import java.applet.Applet;
@@ -97,7 +98,7 @@ public class OrbRestricted extends org.omg.CORBA_2_3.ORB
    * The cumulated listener for all IOR interceptors. Interceptors are used by
    * {@link gnu.CORBA.Poa.ORB_1_4}.
    */
-  public IORInterceptorOperations iIor;
+  public IORInterceptor_3_0Operations iIor;
 
   /**
    * The cumulated listener for all server request interceptors. Interceptors

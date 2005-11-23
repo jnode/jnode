@@ -49,6 +49,7 @@ import gnu.CORBA.typecodes.RecordTypeCode;
 import gnu.CORBA.typecodes.RecursiveTypeCode;
 
 import org.omg.CORBA.ORBPackage.InconsistentTypeCode;
+import org.omg.PortableInterceptor.ObjectReferenceTemplate;
 
 import java.applet.Applet;
 
@@ -95,6 +96,21 @@ import java.util.Properties;
  * <td>org.omg.CORBA.ORBInitRef</td>
  * <td>Specifies the initial reference, accessible by name with the method
  * {@link #resolve_initial_references(String)}.</td>
+ * </tr>
+ * <tr>
+ * <td>org.omg.CORBA.ORBid</td>
+ * <td>Specifies the name (ORB Id) of this ORB. The ORB Id is later accessible
+ * by {@link ObjectReferenceTemplate#orb_id}. The default value includes the
+ * hashcode of the ORB instance that is normally different for each ORB. 
+ * </td>
+ * </tr>
+ * <tr>
+ * <td>org.omg.CORBA.ServerId</td>
+ * <td>Specifies the name (Server Id) of this server. This property assigns
+ * value to the <i>static</i> field, ensuring that all ORB's on the same jre
+ * have the same Server Id. It is normally set as the system property. The
+ * server Id is later accessible as {@link ObjectReferenceTemplate#server_id}.
+ * </td>
  * </tr>
  * <tr>
  * <td>gnu.CORBA.ListenerPort</td>
@@ -874,8 +890,8 @@ public abstract class ORB
         {
           for (int i = 0; i < args.length - 1; i++)
             {
-              if (args [ i ].equals(orbKey))
-                ocn = args [ i + 1 ];
+              if (args[i].equals(orbKey))
+                ocn = args[i + 1];
               if (args[i].equals(lpKey))
                 lp = args[i + 1];
             }
@@ -1024,6 +1040,12 @@ public abstract class ORB
    * that runs on the given host at the given port. The ORB expects to find 
    * there the {@link org.omg.CosNaming.NamingContext} under the key 
    * "NameService.<br>
+   * 7. file://[file name] Read the object definition string from the 
+   * file system<br>
+   * 8. http://[url] Read the object definition string from the provided
+   * url.<br>
+   * 9. ftp://[url] Read the object definition string from the provided
+   * url.<br>
    * 
    * <p>The default port is always 2809. The default iiop version is 1.0
    * that now may not always be supported, so we would recommend to specify

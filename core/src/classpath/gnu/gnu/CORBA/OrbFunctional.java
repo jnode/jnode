@@ -298,6 +298,17 @@ public class OrbFunctional extends OrbRestricted
   public static final String NAME_SERVICE = "NameService";
   
   /**
+   * Defines the ORB ID that is accessible by IOR interceptors.
+   */
+  public static final String ORB_ID = "org.omg.CORBA.ORBid";
+  
+  
+  /**
+   * Defines the SERVER ID that is accessible by IOR interceptors.
+   */
+  public static final String SERVER_ID = "org.omg.CORBA.ServerId";
+  
+  /**
    * The if the client has once opened a socket, it should start sending the
    * message header in a given time. Otherwise the server will close the socket.
    * This prevents server hang when the client opens the socket, but does not
@@ -370,6 +381,17 @@ public class OrbFunctional extends OrbRestricted
    * seven seconds.
    */
   public static int TANDEM_REQUESTS = 7000;
+
+  /**
+   * The Id of this ORB.
+   */
+  public String orb_id = "orb_"+hashCode();
+  
+  /**
+   * The Id of this Server. This field is defined static to ensure it has
+   * the same value over all ORB's in this machine.
+   */
+  public static String server_id = "server_"+OrbFunctional.class.hashCode(); 
 
   /**
    * The map of the already conncted objects.
@@ -1108,37 +1130,39 @@ public class OrbFunctional extends OrbRestricted
       {
         for (int i = 0; i < para.length; i++)
           {
-            if (para [ i ] [ 0 ].equals(LISTEN_ON))
-              Port = Integer.parseInt(para [ i ] [ 1 ]);
-            if (para [ i ] [ 0 ].equals(REFERENCE))
+            if (para[i][0].equals(LISTEN_ON))
+              Port = Integer.parseInt(para[i][1]);
+            if (para[i][0].equals(REFERENCE))
               {
-                StringTokenizer st =
-                  new StringTokenizer(para [ i ] [ 1 ], "=");
+                StringTokenizer st = new StringTokenizer(para[i][1], "=");
                 initial_references.put(st.nextToken(),
-                  string_to_object(st.nextToken())
-                );
+                  string_to_object(st.nextToken()));
               }
 
-            if (para [ i ] [ 0 ].equals(NS_HOST))
-              ns_host = para [ i ] [ 1 ];
-            if (para [ i ] [ 0 ].equals(START_READING_MESSAGE))
-              TOUT_START_READING_MESSAGE = Integer.parseInt(para [ i ] [ 1 ]);
-            if (para [ i ] [ 0 ].equals(WHILE_READING))
-              TOUT_WHILE_READING = Integer.parseInt(para [ i ] [ 1 ]);
-            if (para [ i ] [ 0 ].equals(AFTER_RECEIVING))
-              TOUT_AFTER_RECEIVING = Integer.parseInt(para [ i ] [ 1 ]);
+            if (para[i][0].equals(ORB_ID))
+              orb_id = para[i][1];
+
+            if (para[i][0].equals(SERVER_ID))
+              server_id = para[i][1];
+
+            if (para[i][0].equals(NS_HOST))
+              ns_host = para[i][1];
+            if (para[i][0].equals(START_READING_MESSAGE))
+              TOUT_START_READING_MESSAGE = Integer.parseInt(para[i][1]);
+            if (para[i][0].equals(WHILE_READING))
+              TOUT_WHILE_READING = Integer.parseInt(para[i][1]);
+            if (para[i][0].equals(AFTER_RECEIVING))
+              TOUT_AFTER_RECEIVING = Integer.parseInt(para[i][1]);
             try
               {
-                if (para [ i ] [ 0 ].equals(NS_PORT))
-                  ns_port = Integer.parseInt(para [ i ] [ 1 ]);
+                if (para[i][0].equals(NS_PORT))
+                  ns_port = Integer.parseInt(para[i][1]);
               }
             catch (NumberFormatException ex)
               {
-                BAD_PARAM bad =
-                  new BAD_PARAM("Invalid " + NS_PORT +
-                    "property, unable to parse '" +
-                    props.getProperty(NS_PORT) + "'"
-                  );
+                BAD_PARAM bad = new BAD_PARAM("Invalid " + NS_PORT
+                  + "property, unable to parse '" + props.getProperty(NS_PORT)
+                  + "'");
                 bad.initCause(ex);
                 throw bad;
               }
@@ -1163,29 +1187,33 @@ public class OrbFunctional extends OrbRestricted
       {
         for (int i = 0; i < para.length - 1; i++)
           {
-            if (para [ i ].endsWith("ListenOn"))
-              Port = Integer.parseInt(para [ i + 1 ]);
-            if (para [ i ].endsWith("ORBInitRef"))
+            if (para[i].endsWith("ListenOn"))
+              Port = Integer.parseInt(para[i + 1]);
+            if (para[i].endsWith("ORBInitRef"))
               {
-                StringTokenizer st = new StringTokenizer(para [ i + 1 ], "=");
+                StringTokenizer st = new StringTokenizer(para[i + 1], "=");
                 initial_references.put(st.nextToken(),
-                  string_to_object(st.nextToken())
-                );
+                  string_to_object(st.nextToken()));
               }
 
-            if (para [ i ].endsWith("ORBInitialHost"))
-              ns_host = para [ i + 1 ];
+            if (para[i].endsWith("ORBInitialHost"))
+              ns_host = para[i + 1];
+
+            if (para[i].endsWith("ServerId"))
+              server_id = para[i++];
+            else if (para[i].endsWith("ORBid"))
+              orb_id = para[i++];
+
             try
               {
-                if (para [ i ].endsWith("ORBInitialPort"))
-                  ns_port = Integer.parseInt(para [ i + 1 ]);
+                if (para[i].endsWith("ORBInitialPort"))
+                  ns_port = Integer.parseInt(para[i + 1]);
               }
             catch (NumberFormatException ex)
               {
-                throw new BAD_PARAM("Invalid " + para [ i ] +
-                  "parameter, unable to parse '" +
-                  props.getProperty(para [ i + 1 ]) + "'"
-                );
+                throw new BAD_PARAM("Invalid " + para[i]
+                  + "parameter, unable to parse '"
+                  + props.getProperty(para[i + 1]) + "'");
               }
           }
       }
@@ -1584,6 +1612,18 @@ public class OrbFunctional extends OrbRestricted
         // TODO log it.
         return;
       }
+    finally
+      {
+        try 
+          {
+            if (service!=null && !service.isClosed())
+              service.close();
+          }
+        catch (IOException ioex)
+          {
+            // OK.
+          }
+      }
   }
   
   /**
@@ -1640,6 +1680,12 @@ public class OrbFunctional extends OrbRestricted
                 throw p;
               }
           }
+        
+        if (props.containsKey(ORB_ID))
+          orb_id = props.getProperty(ORB_ID);
+        
+        if (props.containsKey(SERVER_ID))
+          server_id = props.getProperty(SERVER_ID);
         
         Enumeration en = props.elements();
         while (en.hasMoreElements())

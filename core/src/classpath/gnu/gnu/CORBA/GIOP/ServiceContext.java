@@ -255,7 +255,6 @@ public class ServiceContext
       }
   }
 
-
   /**
    * Find context with the given name in the context array.
    */

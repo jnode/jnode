@@ -1,4 +1,4 @@
-/* ObjectReferenceFactory.java --
+/* IORInterceptor_3_0Holder.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -38,20 +38,69 @@ exception statement from your version. */
 
 package org.omg.PortableInterceptor;
 
-import org.omg.CORBA.portable.IDLEntity;
+import org.omg.CORBA.portable.InputStream;
+import org.omg.CORBA.portable.OutputStream;
+import org.omg.CORBA.portable.Streamable;
 
 /**
- * Provides the possibility to create the CORBA object reference.
- * The reference is created from repository id (defining the type of the
- * object) and the object id (defining the identity of the object).
- * The operation for creating reference is defined separately in
- * {@link ObjectReferenceFactoryOperations}.
- *
+ * A holder for the object {@link IORInterceptor_3_0}.
+ * 
  * @since 1.5
- *
+ * 
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public interface ObjectReferenceFactory
-  extends ObjectReferenceFactoryOperations, IDLEntity
+public class IORInterceptor_3_0Holder
+  implements Streamable
 {
+  /**
+   * The stored IORInterceptor_3_0 value.
+   */
+  public IORInterceptor_3_0 value;
+
+  /**
+   * Create the unitialised instance, leaving the value field with default
+   * <code>null</code> value.
+   */
+  public IORInterceptor_3_0Holder()
+  {
+  }
+
+  /**
+   * Create the initialised instance.
+   * 
+   * @param initialValue the value that will be assigned to the
+   * <code>value</code> field.
+   */
+  public IORInterceptor_3_0Holder(IORInterceptor_3_0 initialValue)
+  {
+    value = initialValue;
+  }
+
+  /**
+   * Fill in the {@link value} by data from the CDR stream.
+   * 
+   * @param input the org.omg.CORBA.portable stream to read.
+   */
+  public void _read(InputStream input)
+  {
+    value = IORInterceptor_3_0Helper.read(input);
+  }
+
+  /**
+   * Write the stored value into the CDR stream.
+   * 
+   * @param output the org.omg.CORBA.portable stream to write.
+   */
+  public void _write(OutputStream output)
+  {
+    IORInterceptor_3_0Helper.write(output, value);
+  }
+
+  /**
+   * Get the typecode of the IORInterceptor_3_0.
+   */
+  public org.omg.CORBA.TypeCode _type()
+  {
+    return IORInterceptor_3_0Helper.type();
+  }
 }

@@ -136,7 +136,7 @@ public class SocketRepository
         try
           {
             // Set one minute time out that will be changed later.
-            s.setSoTimeout(60*1000);
+                s.setSoTimeout(60 * 1000);
           }
         catch (SocketException e)
           {
@@ -147,5 +147,5 @@ public class SocketRepository
         return s;
       }
   }
-}
+  }
 }

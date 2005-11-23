@@ -151,7 +151,7 @@ public class State
   {
     try
       {
-        return enume [ code ];
+        return enume[code];
       }
     catch (ArrayIndexOutOfBoundsException ex)
       {
