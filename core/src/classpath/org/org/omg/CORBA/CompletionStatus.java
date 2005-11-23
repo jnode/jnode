@@ -119,7 +119,7 @@ public class CompletionStatus
   {
     try
       {
-        return states [ completion ];
+        return states[completion];
       }
     catch (ArrayIndexOutOfBoundsException ex)
       {

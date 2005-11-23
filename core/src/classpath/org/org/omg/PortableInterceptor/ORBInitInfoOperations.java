@@ -63,7 +63,10 @@ public interface ORBInitInfoOperations
     throws DuplicateName;
 
   /**
-   * Register the IOR (object reference) interceptor.
+   * Register the IOR (object reference) interceptor. If the registered
+   * interceptor implements the extended {@link IORInterceptor_3_0} interface,
+   * ORB will call its additional methods, defined in the
+   * {@link IORInterceptor_3_0Operations}.
    *
    * @param interceptor the interceptor to register.
    *

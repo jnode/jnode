@@ -58,7 +58,6 @@ import org.omg.CORBA.Policy;
 import org.omg.CORBA.PolicyError;
 import org.omg.CORBA.portable.ObjectImpl;
 import org.omg.PortableInterceptor.PolicyFactory;
-import org.omg.PortableServer.POA;
 import org.omg.PortableServer.Servant;
 import org.omg.PortableServer.POAManagerPackage.State;
 import org.omg.PortableServer.POAPackage.InvalidPolicy;
@@ -206,7 +205,7 @@ public class ORB_1_4
       {
         AOM.Obj obj = rootPOA.findIorKey(ior.key);
 
-        POA poa;
+        gnuPOA poa;
 
         // Null means that the object was connected to the ORB directly.
         if (obj == null)
@@ -218,6 +217,7 @@ public class ORB_1_4
 
         // This may modify the ior.
         iIor.establish_components(info);
+        iIor.components_established(info);
       }
     return ior;
   }

@@ -59,6 +59,8 @@ import org.omg.IOP.TaggedProfileHelper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.zip.Adler32;
 
 /**
  * The implementaton of the Interoperable Object Reference (IOR). IOR can be
@@ -715,5 +717,52 @@ public class IOR
     else
       // The future supported tagged profiles should be added here.
       throw new BAD_PARAM("Unsupported profile type " + profile.tag);
+  }
+  
+  /**
+   * Checks for equality.
+   */
+  public boolean equals(Object x)
+  {
+    if (x instanceof IOR)
+      {
+        boolean keys;
+        boolean hosts = true;
+
+        IOR other = (IOR) x;
+        
+        if (Internet==null || other.Internet==null)
+          return Internet == other.Internet;
+        
+        if (key != null && other.key != null)
+          keys = Arrays.equals(key, other.key);
+        else
+          keys = key == other.key;
+
+        if (Internet != null && Internet.host != null)
+          if (other.Internet != null && other.Internet.host != null)
+            hosts = other.Internet.host.equals(Internet.host);
+
+        return keys & hosts && Internet.port==other.Internet.port;
+      }
+    else
+      return false;
+  }
+  
+  /**
+   * Get the hashcode of this IOR.
+   */
+  public int hashCode()
+  {
+    Adler32 adler = new Adler32();
+    if (key != null)
+      adler.update(key);
+    if (Internet != null)
+      {
+        if (Internet.host != null)
+          adler.update(Internet.host.getBytes());
+        adler.update(Internet.port);
+      }
+    return (int) adler.getValue();
   }
 }

@@ -181,7 +181,7 @@ public class LocalDelegate
     String[] maybe = object._ids();
     for (int i = 0; i < maybe.length; i++)
       {
-        if (maybe [ i ].equals(idl_id))
+        if (maybe[i].equals(idl_id))
           return true;
       }
     return false;

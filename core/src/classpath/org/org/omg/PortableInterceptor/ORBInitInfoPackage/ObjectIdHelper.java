@@ -82,7 +82,7 @@ public class ObjectIdHelper
   public static TypeCode type()
   {
     ORB orb = OrbRestricted.Singleton;
-    return orb.create_alias_tc(id(), "Object Id", orb.create_string_tc(0));
+    return orb.create_alias_tc(id(), "ObjectId", orb.create_string_tc(0));
   }
 
   /**

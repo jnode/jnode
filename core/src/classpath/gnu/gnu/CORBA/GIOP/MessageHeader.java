@@ -215,7 +215,7 @@ public class MessageHeader
   {
     try
       {
-        return types [ type ];
+        return types[type];
       }
     catch (ArrayIndexOutOfBoundsException ex)
       {
@@ -281,7 +281,7 @@ public class MessageHeader
   {
     try
       {
-        byte[] xMagic = new byte[ MAGIC.length ];
+        byte[] xMagic = new byte[MAGIC.length];
         istream.read(xMagic);
         if (!Arrays.equals(xMagic, MAGIC))
           {
@@ -348,11 +348,8 @@ public class MessageHeader
 
         // Write version number.
         version.write((OutputStream) dout);
-
         dout.write(flags);
-
         dout.write(message_type);
-
         dout.writeInt(message_size);
       }
     catch (IOException ex)
