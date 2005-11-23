@@ -278,7 +278,6 @@ public class EtchedBorder extends AbstractBorder
       && ((shadow == null) || (shadow.getAlpha() == 255));
   }
 
-  
   /**
    * Returns the appearance of this EtchedBorder, which is either
    * {@link #RAISED} or {@link #LOWERED}.
@@ -308,7 +307,6 @@ public class EtchedBorder extends AbstractBorder
     else
       return c.getBackground().brighter();
   }
-  
   
   /**
    * Returns the color that will be used for highlighted parts when
@@ -404,4 +402,3 @@ public class EtchedBorder extends AbstractBorder
     }
   }
 }
-

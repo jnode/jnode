@@ -232,7 +232,7 @@ public class BoxLayout implements LayoutManager2, Serializable
    */
   public void layoutContainer(Container parent)
   {
-    synchronized(container.getTreeLock())
+    synchronized (container.getTreeLock())
       {
       if (container != parent)
         throw new AWTError("BoxLayout can't be shared");

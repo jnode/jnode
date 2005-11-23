@@ -301,7 +301,6 @@ public class BoxView
       setSize(bounds.width, bounds.height);
 
     Rectangle inside = getInsideAllocation(a);
-
     Rectangle copy = new Rectangle(inside);
     int count = getViewCount();
     for (int i = 0; i < count; ++i)
@@ -477,7 +476,6 @@ public class BoxView
   protected View getViewAtPoint(int x, int y, Rectangle r)
   {
     View result = null;
-
     int count = getViewCount();
     Rectangle copy = new Rectangle(r);
 
@@ -551,7 +549,6 @@ public class BoxView
     // methods.
     SizeRequirements.calculateTiledPositions(targetSpan, null, childReqs,
                                              offsets, spans);
-
     validateLayout(axis);
   }
 

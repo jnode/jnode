@@ -284,7 +284,7 @@ public class BasicPopupMenuUI extends PopupMenuUI
       boolean topLevelMenu = (popupMenu.getInvoker() instanceof JMenu)
                                  && ((JMenu) popupMenu.getInvoker()).isTopLevelMenu();
 
-      if (topLevelMenu || ! (popupMenu.getInvoker() instanceof MenuElement))
+          if (topLevelMenu || !(popupMenu.getInvoker() instanceof MenuElement))
         {
           // set glass pane not to interrupt mouse events and remove
 	  // mouseInputListener

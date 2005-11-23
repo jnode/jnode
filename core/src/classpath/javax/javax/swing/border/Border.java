@@ -91,7 +91,6 @@ public interface Border
    */
   Insets getBorderInsets(Component c);
   
-  
   /**
    * Determines whether this border fills every pixel in its area
    * when painting.

@@ -187,4 +187,5 @@ public class IconView
     // TODO: Implement this properly.
     throw new AssertionError("Not implemented yet.");
   }
+
 }

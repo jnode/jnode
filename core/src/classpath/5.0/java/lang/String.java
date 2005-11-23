@@ -54,6 +54,7 @@ import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.text.Collator;
 import java.util.Comparator;
+import java.util.Formatter;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -147,7 +148,7 @@ public final class String
    * compatibility with Sun's JDK.
    */
   private static final class CaseInsensitiveComparator
-    implements Comparator, Serializable
+    implements Comparator<String>, Serializable
   {
     /**
      * Compatible with JDK 1.2.
@@ -171,9 +172,9 @@ public final class String
      * @throws ClassCastException if either argument is not a String
      * @see #compareToIgnoreCase(String)
      */
-    public int compare(Object o1, Object o2)
+    public int compare(String o1, String o2)
     {
-      return ((String) o1).compareToIgnoreCase((String) o2);
+      return o1.compareToIgnoreCase(o2);
     }
   } // class CaseInsensitiveComparator
 
@@ -185,7 +186,7 @@ public final class String
    * @see Collator#compare(String, String)
    * @since 1.2
    */
-  public static final Comparator CASE_INSENSITIVE_ORDER
+  public static final Comparator<String> CASE_INSENSITIVE_ORDER
     = new CaseInsensitiveComparator();
 
   /**
@@ -236,6 +237,7 @@ public final class String
    * @param count the number of characters from data to copy
    * @throws NullPointerException if data is null
    * @throws IndexOutOfBoundsException if (offset &lt; 0 || count &lt; 0
+   *         || offset + count &lt; 0 (overflow)
    *         || offset + count &gt; data.length)
    *         (while unspecified, this is a StringIndexOutOfBoundsException)
    */
@@ -259,6 +261,7 @@ public final class String
    * @param count the number of characters from ascii to copy
    * @throws NullPointerException if ascii is null
    * @throws IndexOutOfBoundsException if (offset &lt; 0 || count &lt; 0
+   *         || offset + count &lt; 0 (overflow)
    *         || offset + count &gt; ascii.length)
    *         (while unspecified, this is a StringIndexOutOfBoundsException)
    * @see #String(byte[])
@@ -270,8 +273,13 @@ public final class String
    */
   public String(byte[] ascii, int hibyte, int offset, int count)
   {
-    if (offset < 0 || count < 0 || offset + count > ascii.length)
-      throw new StringIndexOutOfBoundsException();
+    if (offset < 0)
+      throw new StringIndexOutOfBoundsException("offset: " + offset);
+    if (count < 0)
+      throw new StringIndexOutOfBoundsException("count: " + count);
+    if (offset + count < 0 || offset + count > ascii.length)
+      throw new StringIndexOutOfBoundsException("offset + count: "
+						+ (offset + count));
     value = new char[count];
     this.offset = 0;
     this.count = count;
@@ -330,8 +338,13 @@ public final class String
   public String(byte[] data, int offset, int count, String encoding)
     throws UnsupportedEncodingException
   {
-    if (offset < 0 || count < 0 || offset + count > data.length)
-      throw new StringIndexOutOfBoundsException();
+    if (offset < 0)
+      throw new StringIndexOutOfBoundsException("offset: " + offset);
+    if (count < 0)
+      throw new StringIndexOutOfBoundsException("count: " + count);
+    if (offset + count < 0 || offset + count > data.length)
+      throw new StringIndexOutOfBoundsException("offset + count: "
+						+ (offset + count));
     try 
       {
         CharsetDecoder csd = Charset.forName(encoding).newDecoder();
@@ -405,8 +418,13 @@ public final class String
    */
   public String(byte[] data, int offset, int count)
   {
-    if (offset < 0 || count < 0 || offset + count > data.length)
-      throw new StringIndexOutOfBoundsException();
+    if (offset < 0)
+      throw new StringIndexOutOfBoundsException("offset: " + offset);
+    if (count < 0)
+      throw new StringIndexOutOfBoundsException("count: " + count);
+    if (offset + count < 0 || offset + count > data.length)
+      throw new StringIndexOutOfBoundsException("offset + count: "
+						+ (offset + count));
     int o, c;
     char[] v;
     String encoding;
@@ -515,8 +533,13 @@ public final class String
    */
   String(char[] data, int offset, int count, boolean dont_copy)
   {
-    if (offset < 0 || count < 0 || offset + count > data.length)
-      throw new StringIndexOutOfBoundsException();
+    if (offset < 0)
+      throw new StringIndexOutOfBoundsException("offset: " + offset);
+    if (count < 0)
+      throw new StringIndexOutOfBoundsException("count: " + count);
+    if (offset + count < 0 || offset + count > data.length)
+      throw new StringIndexOutOfBoundsException("offset + count: "
+						+ (offset + count));
     if (dont_copy)
       {
         value = data;
@@ -1612,6 +1635,8 @@ public final class String
    * @return String containing the chars from data[offset..offset+count]
    * @throws NullPointerException if data is null
    * @throws IndexOutOfBoundsException if (offset &lt; 0 || count &lt; 0
+   *         || offset + count &lt; 0 (overflow)
+   *         || offset + count &lt; 0 (overflow)
    *         || offset + count &gt; data.length)
    *         (while unspecified, this is a StringIndexOutOfBoundsException)
    * @see #String(char[], int, int)
@@ -1706,6 +1731,20 @@ public final class String
   public static String valueOf(double d)
   {
     return Double.toString(d);
+  }
+
+
+  /** @since 1.5 */
+  public static String format(Locale locale, String format, Object... args)
+  {
+    Formatter f = new Formatter(locale);
+    return f.format(format, args).toString();
+  }
+
+  /** @since 1.5 */
+  public static String format(String format, Object... args)
+  {
+    return format(Locale.getDefault(), format, args);
   }
 
   /**
@@ -1814,6 +1853,18 @@ public final class String
       }
     return upperSpecial[mid + 1];
   }
+  /**
+   * @classpath-bugfix Missing method in generics branch
+   * Returns true iff this String contains the sequence of Characters
+   * described in s.
+   * @param s the CharSequence
+   * @return true iff this String contains s
+   */
+  public boolean contains (CharSequence s)
+  {
+    return this.indexOf(s.toString()) != -1;
+  }
+  
 
   /**
    * Returns the value array of the given string if it is zero based or a

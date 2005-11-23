@@ -326,6 +326,7 @@ public class BasicTableUI extends TableUI
     return new MouseInputHandler();
   }
 
+
   /**
    * Creates and returns a key listener for the JTable.
    *
@@ -1192,27 +1193,7 @@ public class BasicTableUI extends TableUI
                  TableCellRenderer rend, TableModel data,
                  int rowLead, int colLead)
   {
-    boolean rowSelAllowed = table.getRowSelectionAllowed();
-    boolean colSelAllowed = table.getColumnSelectionAllowed();
-    boolean isSel = false;
-    if (rowSelAllowed && colSelAllowed || !rowSelAllowed && !colSelAllowed)
-      isSel = table.isCellSelected(row, col);
-    else
-      isSel = table.isRowSelected(row) && table.getRowSelectionAllowed()
-           || table.isColumnSelected(col) && table.getColumnSelectionAllowed();
-
-    // Determine the focused cell. The focused cell is the cell at the
-    // leadSelectionIndices of the row and column selection model.
-    ListSelectionModel rowSel = table.getSelectionModel();
-    ListSelectionModel colSel = table.getColumnModel().getSelectionModel();
-    boolean hasFocus = table.hasFocus() && table.isEnabled()
-                       && rowSel.getLeadSelectionIndex() == row
-                       && colSel.getLeadSelectionIndex() == col;
-
-    Component comp = rend.getTableCellRendererComponent(table,
-                                                       data.getValueAt(row, col),
-                                                       isSel, hasFocus, row, col);
-    
+    Component comp = table.prepareRenderer(rend, row, col);
     rendererPane.paintComponent(g, comp, table, bounds);
     
     // FIXME: this is manual painting of the Caret, why doesn't the 
@@ -1285,12 +1266,10 @@ public class BasicTableUI extends TableUI
         x = x0;
         Color save = gfx.getColor();
         gfx.setColor(grid);
-        boolean paintedLine = false;
         for (int c = 0; c < ncols && x < xmax; ++c)
           {
             x += cols.getColumn(c).getWidth();
             gfx.drawLine(x, y0, x, ymax);
-            paintedLine = true;
           }
         gfx.setColor(save);
       }
@@ -1301,12 +1280,10 @@ public class BasicTableUI extends TableUI
         y = y0;
         Color save = gfx.getColor();
         gfx.setColor(grid);
-        boolean paintedLine = false;
         for (int r = 0; r < nrows && y < ymax; ++r)
           {
             y += height;
             gfx.drawLine(x0, y, xmax, y);
-            paintedLine = true;
           }
         gfx.setColor(save);
       }

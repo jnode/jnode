@@ -332,14 +332,12 @@ public class ScrollPaneLayout
 
             int x1 = 0, x2 = 0, x3 = 0, x4 = 0;
             int y1 = 0, y2 = 0, y3 = 0, y4 = 0;
-
             Rectangle scrollPaneBounds = SwingUtilities.calculateInnerArea(sc, null);
 
             x1 = scrollPaneBounds.x;
             y1 = scrollPaneBounds.y;
             x4 = scrollPaneBounds.x + scrollPaneBounds.width;
             y4 = scrollPaneBounds.y + scrollPaneBounds.height;
-            
             if (colHead != null)
               y2 = y1 + colHead.getPreferredSize().height;
             else
@@ -376,18 +374,18 @@ public class ScrollPaneLayout
 
             // now set the layout
             if (viewport != null)
-              viewport.setBounds(new Rectangle(x2, y2, x3-x2, y3-y2));
+      viewport.setBounds(new Rectangle(x2, y2, x3 - x2, y3 - y2));
 
             if (colHead != null)
-              colHead.setBounds(new Rectangle(x2, y1, x3-x2, y2-y1));
+      colHead.setBounds(new Rectangle(x2, y1, x3 - x2, y2 - y1));
 
             if (rowHead != null)
-              rowHead.setBounds(new Rectangle(x1, y2, x2-x1, y3-y2));
+      rowHead.setBounds(new Rectangle(x1, y2, x2 - x1, y3 - y2));
 
             if (showVsb)
               {
                 vsb.setVisible(true);
-                vsb.setBounds(new Rectangle(x3, y2, x4-x3, y3-y2));
+        vsb.setBounds(new Rectangle(x3, y2, x4 - x3, y3 - y2));
               }
             else if (vsb != null)
               vsb.setVisible(false);
@@ -395,22 +393,22 @@ public class ScrollPaneLayout
             if (showHsb)
               {
                 hsb.setVisible(true);
-                hsb.setBounds(new Rectangle(x2, y3, x3-x2, y4-y3));
+        hsb.setBounds(new Rectangle(x2, y3, x3 - x2, y4 - y3));
               }
             else if (hsb != null)
               hsb.setVisible(false);
 
             if (upperLeft != null)
-              upperLeft.setBounds(new Rectangle(x1, y1, x2-x1, y2-y1));
+      upperLeft.setBounds(new Rectangle(x1, y1, x2 - x1, y2 - y1));
 
             if (upperRight != null)
-              upperRight.setBounds(new Rectangle(x3, y1, x4-x3, y2-y1));
+      upperRight.setBounds(new Rectangle(x3, y1, x4 - x3, y2 - y1));
 
             if (lowerLeft != null)
-              lowerLeft.setBounds(new Rectangle(x1, y3, x2-x1, y4-y3));
+      lowerLeft.setBounds(new Rectangle(x1, y3, x2 - x1, y4 - y3));
 
             if (lowerRight != null)
-              lowerRight.setBounds(new Rectangle(x3, y3, x4-x3, y4-y3));
+      lowerRight.setBounds(new Rectangle(x3, y3, x4 - x3, y4 - y3));
       }
 
   /**

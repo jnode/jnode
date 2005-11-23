@@ -297,7 +297,6 @@ public class PlainView extends View implements TabExpander
         span = metrics.getHeight() * el.getElementCount();
         break;
       }
-
     return span;
   }
 

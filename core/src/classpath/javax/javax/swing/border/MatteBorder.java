@@ -400,4 +400,3 @@ public class MatteBorder extends EmptyBorder
     }
   }
 }
-

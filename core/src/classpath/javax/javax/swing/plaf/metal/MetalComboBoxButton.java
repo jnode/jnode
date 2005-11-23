@@ -238,4 +238,4 @@ public class MetalComboBoxButton extends JButton {
         comboIcon.paintIcon(comboBox, g, iconX, iconY);
                       }
                   }
-              }
+}

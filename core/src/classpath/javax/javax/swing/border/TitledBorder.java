@@ -1011,6 +1011,7 @@ public class TitledBorder extends AbstractBorder
     LineMetrics lmet = m.font.getLineMetrics(m.trimmedText, 0,
                                              m.trimmedText.length(), frc);
     m.lineHeight = (int) lmet.getStrikethroughOffset();
+        
     // Fallback in case that LineMetrics is not available/working.
     if (m.lineHeight == 0)
       m.lineHeight = (int) (0.3333 * (double) m.textAscent);

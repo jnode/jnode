@@ -458,7 +458,6 @@ public class GapContent
     if (index < 0)
       index = -(index + 1);
     positions.add(index, pos);
-    
     return pos;
   }
 
@@ -500,7 +499,6 @@ public class GapContent
       return;
 
     int newGapEnd = newGapStart + gapEnd - gapStart;
-
     if (newGapStart < gapStart)
       {
         // Update the positions between newGapStart and (old) gapStart. The marks
@@ -682,8 +680,9 @@ public class GapContent
         
         if (p.mark >= offset && p.mark <= endOffset)
           p.mark = value;
-}
   }
+  }
+  
   /**
    * Adjusts the mark of all <code>Position</code>s that are in the range 
    * specified by <code>offset</code> and </code>length</code> within 

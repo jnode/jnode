@@ -168,6 +168,14 @@ public class JEditorPane extends JTextComponent
   {
 
     /**
+     * Creates a new JEditorPaneAccessibleHypertextSupport object.
+     */
+    public JEditorPaneAccessibleHypertextSupport()
+    {
+      super();
+    }
+    
+    /**
      * The accessible representation of a HTML link. 
      *
      * @author Roman Kennke (kennke@aicas.com)

@@ -56,7 +56,6 @@ public class CompoundBorder extends AbstractBorder
    */
   static final long serialVersionUID = 9054540377030555103L;
 
-
   /**
    * The inside border, which is painted between the bordered
    * Component and the outside border. It is valid for
@@ -64,14 +63,12 @@ public class CompoundBorder extends AbstractBorder
    */
   protected Border insideBorder;
 
-
   /**
    * The outside border, which is painted outside both the
    * bordered Component and the inside border. It is valid for
    * <code>outsideBorder</code> to be <code>null</code>.
    */
   protected Border outsideBorder;
-
 
   /**
    * Constructs a CompoundBorder whose inside and outside borders
@@ -82,11 +79,10 @@ public class CompoundBorder extends AbstractBorder
    *
    * @see EmptyBorder
    */
-  public CompoundBorder ()
+  public CompoundBorder()
   {
     this (null, null);
   }
-
 
   /**
    * Constructs a CompoundBorder with the specified inside and
@@ -102,12 +98,11 @@ public class CompoundBorder extends AbstractBorder
    *        component. It is acceptable to pass <code>null</code>, in
    *        which case no inside border is painted.
    */
-  public CompoundBorder (Border outsideBorder, Border insideBorder)
+  public CompoundBorder(Border outsideBorder, Border insideBorder)
   {
     this.outsideBorder = outsideBorder;
     this.insideBorder = insideBorder;
   }
-
 
   /**
    * Determines whether or not this border is opaque. An opaque
@@ -118,7 +113,7 @@ public class CompoundBorder extends AbstractBorder
    * @return <code>true</code> if both the inside and outside borders
    *         are opaque, or <code>false</code> otherwise.
    */
-  public boolean isBorderOpaque ()
+  public boolean isBorderOpaque()
   {
     // While it would be safe to assume true for the opacity of
     // a null border, this behavior would not be according to
@@ -131,7 +126,6 @@ public class CompoundBorder extends AbstractBorder
       && outsideBorder.isBorderOpaque();
   }
     
-
   /**
    * Paints the compound border by first painting the outside border,
    * then painting the inside border tightly nested into the outside. 
@@ -168,7 +162,6 @@ public class CompoundBorder extends AbstractBorder
     if (insideBorder != null)
       insideBorder.paintBorder(c, g, x, y, width, height);
   }
-
 
   /**
    * Changes the specified insets to the insets of this border,
@@ -212,14 +205,13 @@ public class CompoundBorder extends AbstractBorder
     return insets;
   }
 
-
   /**
    * Determines the insets of this border, which is the sum of the
    * insets of the inside and the outside border.
    *
    * @param c the component in the center of this border.
    */
-  public Insets getBorderInsets (Component c)
+  public Insets getBorderInsets(Component c)
   {
     // It is not clear why CompoundBorder does not simply inherit
     // the implementation from AbstractBorder. However, we want
@@ -228,17 +220,15 @@ public class CompoundBorder extends AbstractBorder
     return getBorderInsets (c, null);
   }
 
-
   /**
    * Returns the outside border, which is painted outside both the
    * bordered Component and the inside border. It is valid for the
    * result to be <code>null</code>.
    */
-  public Border getOutsideBorder ()
+  public Border getOutsideBorder()
   {
     return outsideBorder;
   }
-
 
   /**
    * Returns the inside border, which is painted between the bordered
@@ -250,4 +240,3 @@ public class CompoundBorder extends AbstractBorder
     return insideBorder;
   }
 }
-

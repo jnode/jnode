@@ -2467,4 +2467,79 @@ public class MetalIconFactory implements Serializable
     return treeHardDriveIcon;
   }
 
+  /**
+   * Returns a new instance of a 4 x 8 icon showing a small black triangle that
+   * points to the right.  This is displayed in menu items that have a 
+   * sub menu.
+   * 
+   * @return The icon.
+   */
+  public static Icon getMenuArrowIcon()
+  {
+    return new Icon()
+    {
+      public int getIconHeight()
+      {
+        return 8;
+      }
+
+      public int getIconWidth()
+      {
+        return 4;
+      }
+
+      public void paintIcon(Component c, Graphics g, int x, int y)
+      {
+        Color saved = g.getColor();
+        g.setColor(Color.BLACK);
+        for (int i = 0; i < 4; i++)
+          g.drawLine(x + i, y + i, x + i, y + 7 - i);
+        g.setColor(saved);
+      }
+    };
+  }
+  
+  /**
+   * Returns a new instance of a 4 x 8 icon showing a small black triangle that
+   * points to the right.  This is displayed in menu items that have a 
+   * sub menu.
+   * 
+   * @return The icon.
+   */
+  public static Icon getMenuItemArrowIcon()
+  {
+    return getMenuArrowIcon();
+  }
+  
+  /**
+   * Returns a new instance of a 13 x 13 icon showing a small black check mark.
+   * 
+   * @return The icon.
+   */
+  public static Icon getMenuItemCheckIcon()
+  {
+    return new Icon()
+    {
+      public int getIconHeight()
+      {
+        return 13;
+      }
+
+      public int getIconWidth()
+      {
+        return 13;
+      }
+
+      public void paintIcon(Component c, Graphics g, int x, int y)
+      {
+        Color saved = g.getColor();
+        g.setColor(Color.BLACK);
+        g.drawLine(3 + x, 5 + y, 3 + x, 9 + y);
+        g.drawLine(4 + x, 5 + y, 4 + x, 9 + y);
+        g.drawLine(5 + x, 7 + y, 9 + x, 3 + y);
+        g.drawLine(5 + x, 8 + y, 9 + x, 4 + y);
+        g.setColor(saved);
+      }
+    };
+  }
 }

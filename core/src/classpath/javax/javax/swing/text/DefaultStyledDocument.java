@@ -974,7 +974,7 @@ public class DefaultStyledDocument extends AbstractDocument
   {
     Element element = getDefaultRootElement();
 
-    while (! element.isLeaf())
+    while (!element.isLeaf())
       {
 	int index = element.getElementIndex(position);
 	element = element.getElement(index);

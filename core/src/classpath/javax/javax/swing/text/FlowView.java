@@ -236,7 +236,6 @@ public abstract class FlowView extends BoxView
 
       if (span <= spanLeft)
         return child;
-
       else if (child.getBreakWeight(flowAxis, offset, spanLeft)
                > BadBreakWeight)
         // FIXME: What to do with the pos parameter here?

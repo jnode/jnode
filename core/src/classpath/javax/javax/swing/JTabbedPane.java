@@ -969,6 +969,7 @@ public class JTabbedPane extends JComponent implements Serializable,
       super.add(component);
     else
       insertTab(component.getName(), null, component, null, tabs.size());
+    
     return component;
   }
 
