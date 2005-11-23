@@ -254,11 +254,11 @@ public class CompareTask extends Task {
             String diffFileName, Map<String, String> packageDiffs)
             throws IOException, InterruptedException {
         final String[] cmd = { "diff", 
-                //"-b", // Ignore white space change
-                "-E", // Ignore changes due to tab expansion
-                "-w", // Ignore all white space change
-                "-B", // Ignore changes whose lines are all blank
-                "-N", // Treat absent files as empty
+                "-b", // Ignore white space change
+                //"-E", // Ignore changes due to tab expansion
+                //"-w", // Ignore all white space change
+                //"-B", // Ignore changes whose lines are all blank
+                //"-N", // Treat absent files as empty
                 "-au", "-I", ".*$" + "Id:.*$.*", // Avoid cvs keyword
                                                     // expansion in this string
                 vmFile.getFileName(), cpFile.getFile().getAbsolutePath() };
