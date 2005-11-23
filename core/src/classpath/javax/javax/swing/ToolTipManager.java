@@ -360,6 +360,7 @@ public class ToolTipManager extends MouseAdapter implements MouseMotionListener
         && getContentPaneDeepestComponent(event) == currentComponent)
       return;
     currentPoint = event.getPoint();
+
     currentComponent = (Component) event.getSource();
 
     if (exitTimer.isRunning())
@@ -369,7 +370,7 @@ public class ToolTipManager extends MouseAdapter implements MouseMotionListener
 	return;
       }
     // This should always be stopped unless we have just fake-exited.
-    if (! enterTimer.isRunning())
+    if (!enterTimer.isRunning())
       enterTimer.start();
   }
 

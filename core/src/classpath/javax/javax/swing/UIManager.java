@@ -650,7 +650,6 @@ public class UIManager implements Serializable
   {
     if (newLookAndFeel != null && ! newLookAndFeel.isSupportedLookAndFeel())
       throw new UnsupportedLookAndFeelException(newLookAndFeel.getName());
-    
     LookAndFeel oldLookAndFeel = currentLookAndFeel;
     if (oldLookAndFeel != null)
       oldLookAndFeel.uninitialize();

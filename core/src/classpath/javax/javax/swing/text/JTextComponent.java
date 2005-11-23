@@ -921,7 +921,8 @@ public abstract class JTextComponent extends JComponent
     
     // need to do this after updateUI()
     if (creatingKeymap)
-      loadKeymap(defkeymap, 
+      loadKeymap(
+                 defkeymap,
                  new KeyBinding[] { 
                    new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0),
                                   DefaultEditorKit.backwardAction),
@@ -929,6 +930,21 @@ public abstract class JTextComponent extends JComponent
                                   DefaultEditorKit.forwardAction),
                    new KeyBinding(KeyStroke.getKeyStroke("typed \b"),
                                   DefaultEditorKit.deletePrevCharAction),
+                     new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_X, 
+                                                           KeyEvent.CTRL_DOWN_MASK),
+                                    DefaultEditorKit.cutAction),
+                     new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_C, 
+                                                           KeyEvent.CTRL_DOWN_MASK),
+                                    DefaultEditorKit.copyAction),
+                     new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_V, 
+                                                           KeyEvent.CTRL_DOWN_MASK),
+                                    DefaultEditorKit.pasteAction),
+                     new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 
+                                                            KeyEvent.SHIFT_DOWN_MASK),
+                                     DefaultEditorKit.selectionBackwardAction),
+                     new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 
+                                                           KeyEvent.SHIFT_DOWN_MASK),
+                                    DefaultEditorKit.selectionForwardAction),
                    new KeyBinding(KeyStroke.getKeyStroke("typed \u007f"),
                                   DefaultEditorKit.deleteNextCharAction)                   
                  },

@@ -431,6 +431,7 @@ public class DefaultCaret extends Rectangle
   public void focusGained(FocusEvent event)
   {
     setVisible(true);
+    updateTimerStatus();
   }
 
   /**
@@ -441,7 +442,33 @@ public class DefaultCaret extends Rectangle
   public void focusLost(FocusEvent event)
   {
     if (event.isTemporary() == false)
+      {
       setVisible(false);
+        // Stop the blinker, if running.
+        if (blinkTimer != null && blinkTimer.isRunning())
+          blinkTimer.stop();
+      }
+  }
+  
+  /**
+   * Install (if not present) and start the timer, if the caret must blink. The
+   * caret does not blink if it is invisible, or the component is disabled or
+   * not editable.
+   */
+  private void updateTimerStatus()
+  {
+    if (textComponent.isEnabled() && textComponent.isEditable())
+      {
+        if (blinkTimer == null)
+          initBlinkTimer();
+        if (!blinkTimer.isRunning())
+          blinkTimer.start();
+      }
+    else
+      {
+        if (blinkTimer != null)
+          blinkTimer.stop();
+      }
   }
 
   /**
@@ -509,6 +536,7 @@ public class DefaultCaret extends Rectangle
     textComponent.addPropertyChangeListener(propertyChangeListener);
     documentListener = new DocumentHandler();
     textComponent.getDocument().addDocumentListener(documentListener);
+
     repaint();
   }
 
@@ -869,18 +897,7 @@ public class DefaultCaret extends Rectangle
     if (v != visible)
       {
     visible = v;
-        if (visible)
-          if (textComponent.isEnabled() && textComponent.isEditable())
-            {
-              if (blinkTimer == null)
-                initBlinkTimer();
-              blinkTimer.start();
-            }
-        else
-          {
-            if (blinkTimer != null)
-              blinkTimer.stop();
-          }
+        updateTimerStatus();
         Rectangle area = null;
         try
           {

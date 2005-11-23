@@ -56,11 +56,10 @@ public abstract class AbstractBorder implements Border, Serializable
 {
   static final long serialVersionUID = -545885975315191844L;
 
-
   /**
    * Constructs a new AbstractBorder.
    */
-  public AbstractBorder ()
+  public AbstractBorder()
   {
     // Nothing to do here.
   }
@@ -99,11 +98,10 @@ public abstract class AbstractBorder implements Border, Serializable
    *
    * @see #getBorderInsets(java.awt.Component, java.awt.Insets)
    */
-  public Insets getBorderInsets (Component c)
+  public Insets getBorderInsets(Component c)
   {
-    return new Insets (0, 0, 0, 0);
+    return new Insets(0, 0, 0, 0);
   }
-
 
   /**
    * Determines the insets of this border. The implementation provided
@@ -117,12 +115,11 @@ public abstract class AbstractBorder implements Border, Serializable
    *
    * @see #getBorderInsets(Component)
    */
-  public Insets getBorderInsets (Component c, Insets insets) 
+  public Insets getBorderInsets(Component c, Insets insets) 
   {
     insets.left = insets.right = insets.top = insets.bottom = 0;
     return insets;
   }
-
 
   /**
    * Determines whether or not this border is opaque. An opaque border
@@ -133,11 +130,10 @@ public abstract class AbstractBorder implements Border, Serializable
    *
    * @return <code>false</code>.
    */
-  public boolean isBorderOpaque () 
+  public boolean isBorderOpaque() 
   {
     return false;
   }
-
 
   /**
    * Returns a rectangle that covers the specified area minus this
@@ -156,7 +152,6 @@ public abstract class AbstractBorder implements Border, Serializable
   {
     return getInteriorRectangle (c, this, x, y, width, height);
   }
-
   
   /**
    * Returns a rectangle that covers the specified area minus a

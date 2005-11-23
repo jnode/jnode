@@ -85,7 +85,7 @@ public class JApplet extends Applet
   /**
    * @specnote rootPaneCheckingEnabled is false to comply with J2SE 5.0
    */
-  protected boolean rootPaneCheckingEnabled=false;
+  protected boolean rootPaneCheckingEnabled = false;
 
   public JApplet()
   {

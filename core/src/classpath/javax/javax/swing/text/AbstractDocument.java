@@ -535,7 +535,6 @@ public abstract class AbstractDocument implements Document, Serializable
     // Just return when no text to insert was given.
     if (text == null || text.length() == 0)
       return;
-    
     DefaultDocumentEvent event =
       new DefaultDocumentEvent(offset, text.length(),
 			       DocumentEvent.EventType.INSERT);

@@ -354,7 +354,6 @@ public class BasicTabbedPaneUI extends TabbedPaneUI implements SwingConstants
           for (int i = 0; i < tabCount; i++)
             {
               width = calculateTabWidth(tabPlacement, i, fm);
-
               if (runWidth + width > max)
                 {
                   runWidth = tabAreaInsets.left + insets.left

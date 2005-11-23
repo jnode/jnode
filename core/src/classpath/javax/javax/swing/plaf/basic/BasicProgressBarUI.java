@@ -400,7 +400,6 @@ public class BasicProgressBarUI extends ProgressBarUI
 	r.width = (int) boxIndependent;
 	r.height = (int) boxDependent;
       }
-
     return r;
   }
 
@@ -947,4 +946,5 @@ public class BasicProgressBarUI extends ProgressBarUI
     animationTimer = null;
     progressBar = null;
   }
+
 }

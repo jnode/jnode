@@ -194,7 +194,6 @@ public abstract class ComponentUI
     paint(g, c);
   }
   
-  
   /**
    * Determines the preferred size of a component. The default
    * implementation returns <code>null</code>, which means that

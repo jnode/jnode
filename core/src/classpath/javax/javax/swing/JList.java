@@ -1806,7 +1806,7 @@ public class JList extends JComponent implements Accessible, Scrollable
         if (fixedCellWidth == -1)
       return new Dimension(256, 16 * getVisibleRowCount());
         else
-      return new Dimension (fixedCellWidth, 16 * getVisibleRowCount());
+          return new Dimension(fixedCellWidth, 16 * getVisibleRowCount());
       }
 
     // Calculate the width: if fixedCellWidth was set use that, otherwise

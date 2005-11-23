@@ -344,7 +344,7 @@ public class BasicSplitPaneUI extends SplitPaneUI
 	      if (dims != null)
 	        {
 		  width += dims.width;
-		  if (! (components[i] instanceof BasicSplitPaneDivider))
+                  if (!(components[i] instanceof BasicSplitPaneDivider))
 		    height = Math.max(height, dims.height);
 	        }
 	    }
@@ -637,7 +637,6 @@ public class BasicSplitPaneUI extends SplitPaneUI
       int x = insets.left;
       int h = size;
       int w = containerSize.width - insets.left - insets.right;
-
       c.setBounds(x, y, w, h);
     }
 
@@ -818,7 +817,6 @@ public class BasicSplitPaneUI extends SplitPaneUI
 	  int[] tmpSizes = layoutManager.getSizes();
 	  dividerSize = tmpSizes[2];
 	  int newSpace = newSize - tmpSizes[2];
-
 	  tmpSizes[2] = newSize;
 
 	  tmpSizes[0] += newSpace / 2;

@@ -337,4 +337,3 @@ public class LineBorder extends AbstractBorder
     return (!roundedCorners) && (lineColor.getAlpha() == 255);
   }
 }
-
