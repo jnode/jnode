@@ -15,8 +15,7 @@
 
   <plugin id="org.jnode.shell.command.ant"/>
     
-  <plugin id="com.jcraft.jsch"/>
-  <plugin id="crypto-security"/>
+  
 
   <plugin id="org.jnode.test.gui"/>
 
