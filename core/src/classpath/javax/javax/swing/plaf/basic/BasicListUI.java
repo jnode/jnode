@@ -524,7 +524,14 @@ public class BasicListUI extends ListUI
      */
     public void mouseDragged(MouseEvent event)
     {
-      // TODO: What should be done here, if anything?
+      Point click = event.getPoint();
+      int index = locationToIndex(list, click);
+      if (index == -1)
+        return;
+      if (!event.isShiftDown() && !event.isControlDown())
+        list.setSelectedIndex(index);
+      
+      list.ensureIndexIsVisible(list.getLeadSelectionIndex());
     }
 
     /**

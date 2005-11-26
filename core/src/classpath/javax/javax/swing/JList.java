@@ -1077,6 +1077,7 @@ public class JList extends JComponent implements Accessible, Scrollable
 
     setModel(new DefaultListModel());
     setSelectionModel(createSelectionModel());
+    setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
     updateUI();
   }

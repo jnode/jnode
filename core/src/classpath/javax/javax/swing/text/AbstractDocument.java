@@ -544,6 +544,7 @@ public abstract class AbstractDocument implements Document, Serializable
     insertUpdate(event, attributes);
     writeUnlock();
 
+    if (event.modified)
     fireInsertUpdate(event);
     if (undo != null)
       fireUndoableEditUpdate(new UndoableEditEvent(this, undo));
@@ -1809,6 +1810,12 @@ public abstract class AbstractDocument implements Document, Serializable
     Hashtable changes;
 
     /**
+     * Indicates if this event has been modified or not. This is used to
+     * determine if this event is thrown.
+     */
+    boolean modified;
+
+    /**
      * Creates a new <code>DefaultDocumentEvent</code>.
      *
      * @param offset the starting offset of the change
@@ -1822,6 +1829,7 @@ public abstract class AbstractDocument implements Document, Serializable
       this.length = length;
       this.type = type;
       changes = new Hashtable();
+      modified = false;
     }
 
     /**
@@ -1836,6 +1844,7 @@ public abstract class AbstractDocument implements Document, Serializable
       // XXX - Fully qualify ElementChange to work around gcj bug #2499.
       if (edit instanceof DocumentEvent.ElementChange)
         {
+          modified = true;
           DocumentEvent.ElementChange elEdit =
             (DocumentEvent.ElementChange) edit;
           changes.put(elEdit.getElement(), elEdit);

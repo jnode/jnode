@@ -41,6 +41,7 @@ package javax.swing.plaf.metal;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.JComponent;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicScrollPaneUI;
@@ -93,6 +94,10 @@ public class MetalScrollPaneUI
   public void installUI(JComponent c)
   {
     super.installUI(c);
+    JScrollBar hsb = scrollpane.getHorizontalScrollBar();
+    hsb.putClientProperty(MetalScrollBarUI.FREE_STANDING_PROP, Boolean.FALSE);
+    JScrollBar vsb = scrollpane.getVerticalScrollBar();
+    vsb.putClientProperty(MetalScrollBarUI.FREE_STANDING_PROP, Boolean.FALSE);
   }
 
   /**
@@ -114,6 +119,10 @@ public class MetalScrollPaneUI
    */
   public void uninstallUI(JComponent c)
   {
+    JScrollBar hsb = scrollpane.getHorizontalScrollBar();
+    hsb.putClientProperty(MetalScrollBarUI.FREE_STANDING_PROP, null);
+    JScrollBar vsb = scrollpane.getVerticalScrollBar();
+    vsb.putClientProperty(MetalScrollBarUI.FREE_STANDING_PROP, null);
     super.uninstallUI(c);
   }
 
