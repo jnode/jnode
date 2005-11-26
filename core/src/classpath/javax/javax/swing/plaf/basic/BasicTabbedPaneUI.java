@@ -1881,6 +1881,7 @@ public class BasicTabbedPaneUI extends TabbedPaneUI implements SwingConstants
   protected void paintIcon(Graphics g, int tabPlacement, int tabIndex,
                            Icon icon, Rectangle iconRect, boolean isSelected)
   {
+    if (icon != null)
     icon.paintIcon(tabPane, g, iconRect.x, iconRect.y);
   }
 

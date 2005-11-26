@@ -334,9 +334,9 @@ public abstract class BasicTextUI extends TextUI
      * Returns the document position that is (visually) nearest to the given
      * document position <code>pos</code> in the given direction <code>d</code>.
      *
-     * @param c the text component
      * @param pos the document position
      * @param b the bias for <code>pos</code>
+     * @param a the allocation for the view
      * @param d the direction, must be either {@link SwingConstants#NORTH},
      *        {@link SwingConstants#SOUTH}, {@link SwingConstants#WEST} or
      *        {@link SwingConstants#EAST}
@@ -351,12 +351,11 @@ public abstract class BasicTextUI extends TextUI
      * @throws BadLocationException if <code>pos</code> is not a valid offset in
      *         the document model
      */
-    public int getNextVisualPositionFrom(JTextComponent c, int pos,
-                                         Position.Bias b, int d,
-                                         Position.Bias[] biasRet)
+    public int getNextVisualPositionFrom(int pos, Position.Bias b, Shape a,
+                                         int d, Position.Bias[] biasRet)
       throws BadLocationException
     {
-      return view.getNextVisualPositionFrom(c, pos, b, d, biasRet);
+      return view.getNextVisualPositionFrom(pos, b, a, d, biasRet);
     }
   }
 

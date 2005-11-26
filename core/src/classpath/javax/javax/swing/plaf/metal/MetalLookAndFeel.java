@@ -40,7 +40,6 @@ package javax.swing.plaf.metal;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Insets;
 
 import javax.swing.LookAndFeel;
 import javax.swing.UIDefaults;
@@ -55,7 +54,17 @@ import javax.swing.plaf.basic.BasicLookAndFeel;
 
 /**
  * A custom look and feel that is designed to look similar across different
- * operating systems.
+ * operating systems.  To install this look and feel, add the following code 
+ * (or something similar) near the start of your application:</p>
+ * <pre>
+ * try
+ * {
+ * &nbsp;&nbsp;UIManager.setLookAndFeel(new MetalLookAndFeel());
+ * }
+ * catch (UnsupportedLookAndFeelException e)
+ * {
+ * &nbsp;&nbsp;e.printStackTrace();
+ * }</pre>
  */
 public class MetalLookAndFeel extends BasicLookAndFeel
 {	   
@@ -691,6 +700,7 @@ public class MetalLookAndFeel extends BasicLookAndFeel
       "CheckBoxUI", "javax.swing.plaf.metal.MetalCheckBoxUI",
       "ComboBoxUI", "javax.swing.plaf.metal.MetalComboBoxUI",
       "DesktopIconUI", "javax.swing.plaf.metal.MetalDesktopIconUI",
+      "FileChooserUI", "javax.swing.plaf.metal.MetalFileChooserUI",
       "InternalFrameUI", "javax.swing.plaf.metal.MetalInternalFrameUI",
       "LabelUI", "javax.swing.plaf.metal.MetalLabelUI",
       "MenuBarUI", "javax.swing.plaf.metal.MetalMenuBarUI",
@@ -858,6 +868,17 @@ public class MetalLookAndFeel extends BasicLookAndFeel
       "FormattedTextField.selectionBackground", getTextHighlightColor(),
       "FormattedTextField.selectionForeground", getHighlightedTextColor(),
 
+      "FileChooser.upFolderIcon", 
+          MetalIconFactory.getFileChooserUpFolderIcon(),
+      "FileChooser.listViewIcon", 
+          MetalIconFactory.getFileChooserListViewIcon(),
+      "FileChooser.newFolderIcon", 
+          MetalIconFactory.getFileChooserNewFolderIcon(),
+      "FileChooser.homeFolderIcon", 
+          MetalIconFactory.getFileChooserHomeFolderIcon(),
+      "FileChooser.detailsViewIcon", 
+          MetalIconFactory.getFileChooserDetailViewIcon(),
+
       "FileView.computerIcon", MetalIconFactory.getTreeComputerIcon(),
       "FileView.directoryIcon", MetalIconFactory.getTreeFolderIcon(),
       "FileView.fileIcon", MetalIconFactory.getTreeLeafIcon(),
@@ -902,9 +923,11 @@ public class MetalLookAndFeel extends BasicLookAndFeel
       "Menu.acceleratorFont", new FontUIResource("Dialog", Font.PLAIN, 10),
       "Menu.acceleratorForeground", getAcceleratorForeground(),
       "Menu.acceleratorSelectionForeground", getAcceleratorSelectedForeground(),
+      "Menu.arrowIcon", MetalIconFactory.getMenuArrowIcon(),
       "Menu.background", getMenuBackground(),
       "Menu.border", new MetalBorders.MenuItemBorder(),
       "Menu.borderPainted", Boolean.TRUE,
+      "Menu.checkIcon", MetalIconFactory.getMenuItemCheckIcon(),
       "Menu.disabledForeground", getMenuDisabledForeground(),
       "Menu.font", getControlTextFont(),
       "Menu.foreground", getMenuForeground(),
@@ -921,6 +944,7 @@ public class MetalLookAndFeel extends BasicLookAndFeel
       "MenuItem.acceleratorFont", new FontUIResource("Dialog", Font.PLAIN, 10),
       "MenuItem.acceleratorForeground", getAcceleratorForeground(),
       "MenuItem.acceleratorSelectionForeground", getAcceleratorSelectedForeground(),
+      "MenuItem.arrowIcon", MetalIconFactory.getMenuItemArrowIcon(),
       "MenuItem.background", getMenuBackground(),
       "MenuItem.border", new MetalBorders.MenuItemBorder(),
       "MenuItem.disabledForeground", getMenuDisabledForeground(),

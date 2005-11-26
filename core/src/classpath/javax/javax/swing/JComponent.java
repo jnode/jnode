@@ -801,14 +801,23 @@ public abstract class JComponent extends Container implements Serializable
   }
 
   /**
-   * Return all registered listeners of a particular type.
+   * Returns all registered {@link EventListener}s of the given 
+   * <code>listenerType</code>.
    *
-   * @param listenerType The type of listener to return
+   * @param listenerType the class of listeners to filter (<code>null</code> 
+   *                     not permitted).
    *
-   * @return All listeners in the {@link #listenerList} which 
-   * are of the specified type
+   * @return An array of registered listeners.
    *
+   * @throws ClassCastException if <code>listenerType</code> does not implement
+   *                            the {@link EventListener} interface.
+   * @throws NullPointerException if <code>listenerType</code> is 
+   *                              <code>null</code>.
+   *                            
+   * @see #getAncestorListeners()
    * @see #listenerList
+   * 
+   * @since 1.3
    */
   public EventListener[] getListeners(Class listenerType)
   {

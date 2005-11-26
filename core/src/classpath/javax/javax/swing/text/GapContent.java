@@ -644,6 +644,13 @@ public class GapContent
                                           new GapContentPosition(offset));
     if (index1 < 0)
       index1 = -(index1 + 1);
+
+    // Search the first index with the specified offset. The binarySearch does
+    // not necessarily find the first one.
+    while (index1 > 0
+        && ((GapContentPosition) positions.get(index1 - 1)).mark == offset)
+      index1--;
+
     for (ListIterator i = positions.listIterator(index1); i.hasNext();)
       {
         GapContentPosition p = (GapContentPosition) i.next();
@@ -672,6 +679,13 @@ public class GapContent
                                           new GapContentPosition(offset));
     if (index1 < 0)
       index1 = -(index1 + 1);
+
+    // Search the first index with the specified offset. The binarySearch does
+    // not necessarily find the first one.
+    while (index1 > 0
+        && ((GapContentPosition) positions.get(index1 - 1)).mark == offset)
+      index1--;
+
     for (ListIterator i = positions.listIterator(index1); i.hasNext();)
       {
         GapContentPosition p = (GapContentPosition) i.next();
@@ -700,6 +714,12 @@ public class GapContent
                                           new GapContentPosition(offset));
     if (index1 < 0)
       index1 = -(index1 + 1);
+
+    // Search the first index with the specified offset. The binarySearch does
+    // not necessarily find the first one.
+    while (index1 > 0
+        && ((GapContentPosition) positions.get(index1 - 1)).mark == offset)
+      index1--;
     for (ListIterator i = positions.listIterator(index1); i.hasNext();)
       {
         GapContentPosition p = (GapContentPosition) i.next();
