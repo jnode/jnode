@@ -15,9 +15,13 @@
 
 
   <runtime>
-    <library name="jsch-0.1.15.jar">
+    <library name="jsch-0.1.24.jar">
       <export name="*"/>
     </library>
   </runtime>
+  
+  <extension point="org.jnode.security.permissions">
+        <permission class="java.net.SocketPermission" name="*" actions="connect, resolve"/>
+  </extension>
 
 </plugin>
