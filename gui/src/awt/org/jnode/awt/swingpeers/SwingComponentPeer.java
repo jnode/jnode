@@ -23,6 +23,7 @@ package org.jnode.awt.swingpeers;
 
 import org.apache.log4j.Logger;
 import org.jnode.awt.JNodeGenericPeer;
+import org.jnode.awt.JNodeGraphics;
 
 import java.awt.AWTEvent;
 import java.awt.BufferCapabilities;
@@ -143,6 +144,7 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
     }
 
     public Graphics getGraphics() {
+        /*
         final Component parent = targetComponent.getParent();
         if (parent != null) {
             final int x = peerComponent.getX();
@@ -153,6 +155,9 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
         } else {
             throw new Error();
         }
+        */
+        //TODO review this !!! 
+        return new JNodeGraphics(this);
     }
 
     public final GraphicsConfiguration getGraphicsConfiguration() {
