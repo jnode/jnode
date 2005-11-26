@@ -43,74 +43,52 @@ public class TaskBar extends JPanel {
         setBorder(new BevelBorder(BevelBorder.RAISED));
         startButton = new JButton("Start");
         startButton.setBorder(new EmptyBorder(1,3,1,3));
+
         add(startButton, BorderLayout.WEST);
         startMenu = new JPopupMenu();
 
-        JMenuItem mi = new JMenuItem("AWTDemo");
-        mi.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                startApp("Tetris", "org.jnode.test.gui.AWTDemo");
-            }
-        });
-        startMenu.add(mi);
+        JMenu awtMenu = new JMenu("AWT tests");
+        startMenu.add(awtMenu);
+        awtMenu.add(createMenuItem("AWTDemo", "org.jnode.test.gui.AWTDemo"));
+        awtMenu.add(createMenuItem("AWTFrameTest", "org.jnode.test.gui.AWTFrameTest"));
 
-        mi = new JMenuItem("AWTFrameTest");
-        mi.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                startApp("Tetris", "org.jnode.test.gui.AWTFrameTest");
-            }
-        });
-        startMenu.add(mi);
-
-        mi = new JMenuItem("SwingTest");
-        mi.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                startApp("Tetris", "org.jnode.test.gui.SwingTest");
-            }
-        });
-        startMenu.add(mi);
+        JMenu swingMenu = new JMenu("Swing tests");
+        startMenu.add(swingMenu);
+        swingMenu.add(createMenuItem("SwingTest", "org.jnode.test.gui.SwingTest"));
+        swingMenu.add(createMenuItem("JTableTest", "org.jnode.test.gui.JTableTest"));
+        swingMenu.add(createMenuItem("JTreeTest", "org.jnode.test.gui.JTreeTest"));
+        swingMenu.add(createMenuItem("JInternalFrameTest", "org.jnode.test.gui.JInternalFrameTest"));
+        swingMenu.add(createMenuItem("JDPTest", "org.jnode.test.gui.JDPTest"));
 
         JMenu gamesMenu = new JMenu("Games");
         startMenu.add(gamesMenu);
 
-        mi = new JMenuItem("Tetris");
-        mi.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                startApp("Tetris", "org.jnode.test.gui.Tetris");
-            }
-        });
-        gamesMenu.add(mi);
+        gamesMenu.add(createMenuItem("Tetris", "org.jnode.test.gui.Tetris"));
+        gamesMenu.add(createMenuItem("BoxWorld", "org.jnode.test.gui.BoxWorld"));
+        gamesMenu.add(createMenuItem("Rubik", "org.jnode.test.gui.Rubik"));
 
-        mi = new JMenuItem("BoxWorld");
-        mi.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                startApp("Tetris", "org.jnode.test.gui.BoxWorld");
-            }
-        });
-        gamesMenu.add(mi);
+        JMenu settingsMenu = new JMenu("Settings");
+        startMenu.add(settingsMenu);
+        settingsMenu.add(desktopColorMI = new JMenuItem("Desktop color"));
 
-        mi = new JMenuItem("Rubik");
-        mi.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                startApp("Tetris", "org.jnode.test.gui.Rubik");
-            }
-        });
-        gamesMenu.add(mi);
-
-        /*
-        startMenu.addSeparator();
-
-        startMenu.add(desktopColorMI = new JMenuItem("Desktop color"));
-        */
-
-
-        startMenu.addSeparator();
-        startMenu.add(quitMI = new JMenuItem("Quit"));
-        startMenu.add(haltMI = new JMenuItem("Halt"));
-        startMenu.add(restartMI = new JMenuItem("Restart"));
+        JMenu exitMenu = new JMenu("Exit");
+        startMenu.add(exitMenu);
+        exitMenu.add(quitMI = new JMenuItem("Quit"));
+        exitMenu.add(restartMI = new JMenuItem("Restart"));
+        exitMenu.add(haltMI = new JMenuItem("Halt"));
         windowBar = new WindowBar();
         add(windowBar, BorderLayout.CENTER);
         add(new Clock(), BorderLayout.EAST);
+    }
+
+    private JMenuItem createMenuItem(final String label, final String classname){
+        JMenuItem mi = new JMenuItem(label);
+        mi.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                startApp(label, classname);
+            }
+        });
+        return mi;
     }
 
     final void startApp(final String name, final String className) {
