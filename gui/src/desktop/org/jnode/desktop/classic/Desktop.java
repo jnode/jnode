@@ -30,20 +30,23 @@ import org.jnode.vm.Vm;
 import org.jnode.vm.VmSystem;
 
 import javax.swing.DefaultDesktopManager;
+import javax.swing.JButton;
+import javax.swing.JColorChooser;
 import javax.swing.JDesktopPane;
+import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
-import javax.swing.JFrame;
-import javax.swing.JColorChooser;
-import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import java.awt.AWTError;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Point;
-import java.awt.BorderLayout;
+import java.awt.Toolkit;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ContainerEvent;
@@ -62,125 +65,144 @@ public class Desktop implements Runnable {
      * @see Runnable#run()
      */
     public void run() {
-        final ClassLoader cl = getClass().getClassLoader();
-        final ExtensionPoint appsEP;
-        if (cl instanceof PluginClassLoader) {
-            appsEP = ((PluginClassLoader) cl).getDeclaringPluginDescriptor().getExtensionPoint("apps");
-        } else {
-            throw new AWTError("Need to be loaded using a plugin classloader");
-        }
-        this.taskBar = new TaskBar(appsEP);
-
-
-        final JNodeToolkit tk = JNodeToolkit.getJNodeToolkit();
-        final JNodeAwtContext ctx = tk.getAwtContext();
-        final JDesktopPane desktop = ctx.getDesktop();
-        final Container awtRoot = ctx.getAwtRoot();
-
-        taskBar.startButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                if(taskBar.startMenu.isShowing()){
-                    taskBar.startMenu.setVisible(false);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                final ClassLoader cl = getClass().getClassLoader();
+                final ExtensionPoint appsEP;
+                if (cl instanceof PluginClassLoader) {
+                    appsEP = ((PluginClassLoader) cl).getDeclaringPluginDescriptor().getExtensionPoint("apps");
                 } else {
-                    Point p = taskBar.startButton.getLocationOnScreen();
-                    int h = taskBar.startMenu.getPreferredSize().height;
-                    taskBar.startMenu.show(desktop, 0, p.y - h);
+                    throw new AWTError("Need to be loaded using a plugin classloader");
                 }
-            }
-        });
+                Desktop.this.taskBar = new TaskBar(appsEP);
 
 
-        taskBar.quitMI.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                taskBar.startMenu.setVisible(false);
-                JNodeToolkit.stopGui();
-            }
-        });
+                final JNodeToolkit tk = JNodeToolkit.getJNodeToolkit();
+                final JNodeAwtContext ctx = tk.getAwtContext();
+                final JDesktopPane desktop = ctx.getDesktop();
+                final Container awtRoot = ctx.getAwtRoot();
 
-        taskBar.haltMI.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                JNodeToolkit.stopGui();
-                VmSystem.halt(false);
-            }
-        });
-
-        taskBar.restartMI.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                JNodeToolkit.stopGui();
-                VmSystem.halt(true);
-            }
-        });
-
-        /*
-        taskBar.desktopColorMI.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                final JFrame f = new JFrame("Desktop color");
-                final JColorChooser color_chooser = new JColorChooser();
-                f.add(color_chooser, BorderLayout.CENTER);
-                JButton ok = new JButton("OK");
-                ok.addActionListener(new ActionListener() {
+                taskBar.startButton.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent event) {
-                        desktop.setBackground(color_chooser.getColor());
-                        f.setVisible(false);
+                        if (taskBar.startMenu.isShowing()) {
+                            taskBar.startMenu.setVisible(false);
+                        } else {
+                            Point p = taskBar.startButton.getLocationOnScreen();
+                            int h = taskBar.startMenu.getPreferredSize().height;
+                            taskBar.startMenu.show(desktop, 0, p.y - h);
+                        }
                     }
                 });
-                JButton cancel = new JButton("Cancel");
-                cancel.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent event) {
-                        f.setVisible(false);
+
+
+                taskBar.quitMI.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        taskBar.startMenu.setVisible(false);
+                        JNodeToolkit.stopGui();
                     }
                 });
-                JPanel buttons = new JPanel();
-                buttons.add(ok);
-                buttons.add(cancel);
-                f.add(buttons, BorderLayout.SOUTH);
-                f.setSize(400,300);
-                f.validate();
-                f.setVisible(true);
+
+                taskBar.haltMI.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        JNodeToolkit.stopGui();
+                        VmSystem.halt(false);
+                    }
+                });
+
+                taskBar.restartMI.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        JNodeToolkit.stopGui();
+                        VmSystem.halt(true);
+                    }
+                });
+
+
+                taskBar.desktopColorMI.addActionListener(new ActionListener() {
+                    private JFrame f;
+                    private Color oldColor;
+                    public void actionPerformed(ActionEvent e) {
+                        if(f == null){
+                            f = new JFrame("Desktop color");
+                            final JColorChooser color_chooser = new JColorChooser();
+                            f.add(color_chooser, BorderLayout.CENTER);
+                            JButton ok = new JButton("OK");
+                            ok.addActionListener(new ActionListener() {
+                                public void actionPerformed(ActionEvent event) {
+                                    desktop.setBackground(color_chooser.getColor());
+                                    f.setVisible(false);
+                                }
+                            });
+                            JButton apply = new JButton("Apply");
+                            apply.addActionListener(new ActionListener() {
+                                public void actionPerformed(ActionEvent event) {
+                                    desktop.setBackground(color_chooser.getColor());
+                                }
+                            });
+                            JButton cancel = new JButton("Cancel");
+                            cancel.addActionListener(new ActionListener() {
+                                public void actionPerformed(ActionEvent event) {
+                                    desktop.setBackground(oldColor);
+                                    f.setVisible(false);
+                                }
+                            });
+                            JPanel buttons = new JPanel();
+                            buttons.add(ok);
+                            buttons.add(apply);
+                            buttons.add(cancel);
+                            f.add(buttons, BorderLayout.SOUTH);
+                        }
+                        oldColor = desktop.getBackground();
+                        Dimension ss = Toolkit.getDefaultToolkit().getScreenSize();
+                        int x = (ss.width - 500) / 2;
+                        int y = (ss.height - 400) / 2;
+                        f.setSize(500, 400);
+                        f.setVisible(true);
+                        f.setLocation(x, y);
+                    }
+                });
+
+
+                awtRoot.removeAll();
+                awtRoot.setLayout(null);
+                awtRoot.add(desktop);
+                final int h = awtRoot.getHeight();
+                final int controlBarHeight = 36;
+                final int w = awtRoot.getWidth();
+                desktop.setBounds(0, 0, w, h - controlBarHeight);
+                awtRoot.add(taskBar);
+                taskBar.setBounds(0, h - controlBarHeight, w, controlBarHeight);
+
+                awtRoot.invalidate();
+                awtRoot.repaint();
+                System.out.println("taskBar.bounds=" + taskBar.getBounds());
+                System.out.println("desktop.bounds=" + desktop.getBounds());
+
+                // Update desktopmanager
+                desktop.setDesktopManager(new DesktopManagerImpl());
+                desktop.addContainerListener(new DesktopContainerListener());
+
+                // Set background info
+                final int dx = 30;
+                final int dy = dx;
+                final JLabel welcomeLbl = new JLabel("Welcome to JNode");
+                welcomeLbl.setForeground(Color.WHITE);
+                welcomeLbl.setLocation(dx, dy);
+                welcomeLbl.setFont(welcomeLbl.getFont().deriveFont(20.0f));
+                welcomeLbl.setSize(welcomeLbl.getPreferredSize());
+                desktop.add(welcomeLbl, (Integer) (JLayeredPane.DEFAULT_LAYER - 1));
+
+                final JLabel versionLbl = new JLabel("version " + Vm.getVm().getVersion());
+                versionLbl.setForeground(Color.WHITE);
+                versionLbl.setFont(versionLbl.getFont().deriveFont(14.0f));
+                versionLbl.setSize(versionLbl.getPreferredSize());
+                versionLbl.setLocation(desktop.getWidth() - versionLbl.getWidth() - dy, desktop.getHeight() - versionLbl.getHeight() - dy);
+                desktop.add(versionLbl, (Integer) (JLayeredPane.DEFAULT_LAYER - 1));
+
+                // Update
+                desktop.doLayout();
+                desktop.repaint();
             }
         });
-        */
-
-
-        awtRoot.removeAll();
-        awtRoot.setLayout(null);
-        awtRoot.add(desktop);
-        final int h = awtRoot.getHeight();
-        final int controlBarHeight = 36;
-        final int w = awtRoot.getWidth();
-        desktop.setBounds(0, 0, w, h - controlBarHeight);
-        awtRoot.add(taskBar);
-        taskBar.setBounds(0, h - controlBarHeight, w, controlBarHeight);
-
-        awtRoot.invalidate();
-        awtRoot.repaint();
-        System.out.println("taskBar.bounds=" + taskBar.getBounds());
-        System.out.println("desktop.bounds=" + desktop.getBounds());
-
-        // Update desktopmanager
-        desktop.setDesktopManager(new DesktopManagerImpl());
-        desktop.addContainerListener(new DesktopContainerListener());
-
-        // Set background info
-        final int dx = 30;
-        final int dy = dx;
-        final JLabel welcomeLbl = new JLabel("Welcome to JNode");
-        welcomeLbl.setForeground(Color.WHITE);
-        welcomeLbl.setLocation(dx, dy);
-        welcomeLbl.setFont(welcomeLbl.getFont().deriveFont(20.0f));
-        welcomeLbl.setSize(welcomeLbl.getPreferredSize());
-        desktop.add(welcomeLbl, (Integer) (JLayeredPane.DEFAULT_LAYER - 1));
-
-        final JLabel versionLbl = new JLabel("version " + Vm.getVm().getVersion());
-        versionLbl.setForeground(Color.WHITE);
-        versionLbl.setFont(versionLbl.getFont().deriveFont(14.0f));
-        versionLbl.setSize(versionLbl.getPreferredSize());
-        versionLbl.setLocation(desktop.getWidth() - versionLbl.getWidth() - dy, desktop.getHeight() - versionLbl.getHeight() - dy);
-        desktop.add(versionLbl, (Integer) (JLayeredPane.DEFAULT_LAYER - 1));
-
-        // Update 
-        desktop.doLayout();
-        desktop.repaint();
     }
 
     private class DesktopContainerListener implements ContainerListener {
