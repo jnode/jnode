@@ -29,6 +29,7 @@ public class NumberUtils {
     public static final int K = 1024;
     public static final int M = 1024*1024;
     public static final int G = 1024*1024*1024;
+    public static final int T = 1024*1024*1024*1024;
     
     /**
      * Convert a float to a string with a given maximum number of fraction digits.
@@ -235,9 +236,14 @@ public class NumberUtils {
 	    if (v < K) {
 	        return String.valueOf(v) + "M";
 	    }
+	    // Is < 1Tb?
+	    v = v >>> 10;
+	    if (v < K) {
+	        return String.valueOf(v) + "G";
+	    }
 	    // Large...
 	    v = v >>> 10;
-        return String.valueOf(v) + "G";
+    	    return String.valueOf(v) + "T";
 	}
     
     /**
@@ -250,18 +256,17 @@ public class NumberUtils {
             return 0;
         
         int multiplier = 1;     
-        if(size.endsWith("G"))
-        {
+        
+	if(size.endsWith("T")) {
+            multiplier = T;
+            size = size.substring(0, size.length() - 1);
+        } else if(size.endsWith("G")) {
             multiplier = G;
             size = size.substring(0, size.length() - 1);
-        }
-        else if(size.endsWith("M"))
-        {
+        } else if(size.endsWith("M")) {
             multiplier = M; 
             size = size.substring(0, size.length() - 1);
-        }
-        else if(size.endsWith("K"))
-        {
+        } else if(size.endsWith("K")) {
             multiplier = K;          
             size = size.substring(0, size.length() - 1);
         }

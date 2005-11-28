@@ -27,6 +27,7 @@ import org.jnode.shell.help.FileArgument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
+import org.jnode.util.NumberUtils;
 
 import java.io.File;
 import java.io.InputStream;
@@ -91,17 +92,17 @@ public class DirCommand implements Command {
                     sb.setLength(0);
                     lastModified.setTime(f.lastModified());
                     if (f.isFile()) {
-                        String ln = String.valueOf(f.length());
+                        String ln = NumberUtils.size(f.length());
                         int cnt = LEFT_MARGIN - ln.length();
                         for (int j = 0; j < cnt; j++, sb.append(' '))
                             ;
                         sb.append(ln);
-                        sb.append("B   ");
+                        sb.append("   ");
                         sb.append(df.format(lastModified));
                         sb.append("   ");
                         sb.append(f.getName());
                     } else {
-                        for (int j = 0; j < LEFT_MARGIN + 4; j++, sb.append(' '))
+                        for (int j = 0; j < LEFT_MARGIN + 3; j++, sb.append(' '))
                             ;
                         sb.append(df.format(lastModified));
                         sb.append("   [");
