@@ -24,6 +24,7 @@ package org.jnode.vm.memmgr.def;
 import java.util.TreeMap;
 
 import org.jnode.vm.memmgr.HeapStatistics;
+import org.jnode.util.NumberUtils;
 
 /**
  * @author Martin Husted Hartvig (hagar@jnode.org)
@@ -127,7 +128,12 @@ final class DefHeapStatistics extends HeapStatistics {
 
             if (objectSize != 0) {
                 sb.append(usage);
-                sb.append(getTotalSize());
+		long size = getTotalSize();
+		if (size >= 1024) {
+            	    sb.append(NumberUtils.size(size) + " (" + getTotalSize() + "b)");
+		} else {
+		    sb.append(size + "b");
+		}
             }
         }
     }

@@ -27,6 +27,7 @@ import java.io.PrintStream;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.Command;
 import org.jnode.shell.help.Help;
+import org.jnode.util.NumberUtils;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -45,8 +46,8 @@ public class MemoryCommand implements Command
 	 */
 	public void execute(CommandLine cmdLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
 		final Runtime rt = Runtime.getRuntime();
-		out.println("Total memory " + (rt.totalMemory()/1048576) + "Mb");
-		out.println("Used memory  " + ((rt.totalMemory() - rt.freeMemory())/1048576) + "Mb");
-		out.println("Free memory  " + (rt.freeMemory()/1048576) + "Mb");
+		out.println("Total memory " + NumberUtils.size(rt.totalMemory()));
+		out.println("Used memory  " + NumberUtils.size(rt.totalMemory() - rt.freeMemory()));
+		out.println("Free memory  " + NumberUtils.size(rt.freeMemory()));
 	}
 }

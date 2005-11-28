@@ -28,6 +28,7 @@ import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.*;
 import org.jnode.vm.Vm;
 import org.jnode.vm.memmgr.GCStatistics;
+import org.jnode.util.NumberUtils;
 
 /**
  * @author epr
@@ -55,8 +56,8 @@ public class GcCommand {
 		throws Exception {
 			
 		final Runtime rt = Runtime.getRuntime();
-		out.println("Memory size: " + rt.totalMemory());
-		out.println("Free memory: " + rt.freeMemory());
+		out.println("Memory size: " + NumberUtils.size(rt.totalMemory()));
+		out.println("Free memory: " + NumberUtils.size(rt.freeMemory()));
 
 		out.println("Starting gc...");
 		
@@ -66,8 +67,8 @@ public class GcCommand {
         Thread.yield();
 		long end = System.currentTimeMillis();
 		
-		out.println("Memory size: " + rt.totalMemory());
-		out.println("Free memory: " + rt.freeMemory());
+		out.println("Memory size: " + NumberUtils.size(rt.totalMemory()));
+		out.println("Free memory: " + NumberUtils.size(rt.freeMemory()));
 		out.println("Time taken : " + (end-start) + "ms");
         out.println("Stats      : " + stats.toString());
 	}
