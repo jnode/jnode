@@ -15,5 +15,6 @@
 	<classpathentry kind="lib" path="/JNode-Core/lib/cglib-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/edtftpj-1.5.2.jar"/>
 	<classpathentry kind="lib" path="lib/jcifs-1.2.6.jar"/>
+	<classpathentry kind="lib" path="/JNode-Core/lib/commons-net-1.1.0.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
