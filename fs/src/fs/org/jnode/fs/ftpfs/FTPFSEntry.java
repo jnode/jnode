@@ -2,10 +2,9 @@ package org.jnode.fs.ftpfs;
 
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSAccessRights;
+import org.apache.commons.net.ftp.FTPFile;
 
 import java.io.IOException;
-
-import com.enterprisedt.net.ftp.FTPFile;
 
 /**
  * @author Levente S\u00e1ntha
@@ -61,7 +60,8 @@ public abstract class FTPFSEntry implements FSEntry {
      */
 
     public long getLastModified() throws IOException {
-        return ftpFile.lastModified().getTime();
+        //return ftpFile.lastModified().getTime();
+        return ftpFile.getTimestamp().getTimeInMillis();
     }
 
     /**
@@ -82,7 +82,7 @@ public abstract class FTPFSEntry implements FSEntry {
      * Is this entry refering to a (sub-)directory?
      */
     public boolean isDirectory() {
-        return ftpFile.isDir();
+        return ftpFile.isDirectory();
     }
 
     /**
@@ -99,7 +99,7 @@ public abstract class FTPFSEntry implements FSEntry {
      * Is this entry refering to a file?
      */
     public boolean isFile() {
-        return !ftpFile.isDir();
+        return !ftpFile.isFile();
     }
 
     /**
