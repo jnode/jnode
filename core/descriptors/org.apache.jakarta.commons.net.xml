@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.apache.jakarta.commons.net" 
+        name="Jakarta Commons-Net"
+        version="@VERSION@"
+        provider-name="jakarta.apache.org"
+        license-name="apache2.0">
+        
+  <requires>
+    <import plugin="org.jnode.net"/>
+  </requires>
+        
+  <runtime>
+    <library name="commons-net-1.1.0.jar">
+      <export name="*"/>
+    </library>
+  </runtime>
+        
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.net.SocketPermission" name="*" actions="connect,listen"/>
+  </extension>
+        
+</plugin>
