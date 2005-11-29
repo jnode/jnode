@@ -3,12 +3,12 @@ package org.jnode.fs.ftpfs;
 import org.jnode.fs.FileSystem;
 import org.jnode.driver.DeviceListener;
 import org.jnode.driver.Device;
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
 
 import java.io.IOException;
 import java.util.Date;
 
-import com.enterprisedt.net.ftp.FTPClient;
-import com.enterprisedt.net.ftp.FTPFile;
 
 /**
  * @author Levente S\u00e1ntha
@@ -35,9 +35,11 @@ public class FTPFileSystem extends FTPClient implements FileSystem {
             }
         });
         try{
-            setRemoteHost(device.getHost());
-            setTimeout(300000);
-            connect();
+
+//            setRemoteHost(device.getHost());
+//            setTimeout(300000);
+//            connect();
+            connect(device.getHost());
             login(device.getUser(),device.getPassword());
             thread = new Thread(new Runnable(){
                 public void run() {
@@ -56,16 +58,19 @@ public class FTPFileSystem extends FTPClient implements FileSystem {
                 }
             },"ftpfs_keepalive");
             thread.start();
+            //FTPFile f = new FTPFile("/", "/", 0, true, new Date(0));
+            FTPFile f = new FTPFile();
+            f.setName(printWorkingDirectory());
+            root = new FTPFSDirectory(this, f);
+            closed = false;
         }catch(Exception e){
             throw new RuntimeException(e);
         }
-        FTPFile f = new FTPFile("/", "/", 0, true, new Date(0));
-        root = new FTPFSDirectory(this, f);
-        closed = false;
+
     }
 
     private synchronized void nop() throws Exception{
-        dirDetails(root.path());
+        listFiles(root.path());
     }
 
 

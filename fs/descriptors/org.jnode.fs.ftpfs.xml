@@ -10,7 +10,7 @@
         
   <requires>
 	<import plugin="org.jnode.fs"/>
-    <import plugin="edtftpj"/>
+    <import plugin="org.apache.jakarta.commons.net"/>
   </requires>
         
   <runtime>

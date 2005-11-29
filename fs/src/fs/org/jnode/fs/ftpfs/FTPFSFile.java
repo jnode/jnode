@@ -1,12 +1,12 @@
 package org.jnode.fs.ftpfs;
 
 import org.jnode.fs.FSFile;
+import org.apache.commons.net.ftp.FTPFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 
-import com.enterprisedt.net.ftp.FTPFile;
-import com.enterprisedt.net.ftp.FTPException;
 
 /**
  * @author Levente S\u00e1ntha
@@ -24,7 +24,7 @@ public class FTPFSFile extends FTPFSEntry implements FSFile {
      * @return long
      */
     public long getLength() {
-        return ftpFile.size();
+        return ftpFile.getSize();
     }
 
     /**
@@ -40,8 +40,13 @@ public class FTPFSFile extends FTPFSEntry implements FSFile {
         try {
             if(data == null){
                 synchronized(fileSystem) {
-                    fileSystem.chdir(parent.path());
-                    data = fileSystem.get(getName());
+                    fileSystem.cwd(parent.path());
+                    //data = fileSystem.get(getName());
+                    InputStream in = fileSystem.retrieveFileStream(getName());
+                    int i = in.available();
+                    data = new byte[i];
+                    in.read(data);
+
                 }
             }
             int len = dest.remaining();
@@ -49,7 +54,7 @@ public class FTPFSFile extends FTPFSEntry implements FSFile {
             if(len > 0){
                 dest.put(data, (int) fileOffset, len);
             }
-        }catch(FTPException e){
+        }catch(Exception e){
             throw new IOException("Read error");
         }
     }
