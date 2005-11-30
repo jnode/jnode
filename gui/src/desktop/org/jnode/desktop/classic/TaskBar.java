@@ -34,6 +34,10 @@ public class TaskBar extends JPanel {
     JMenuItem haltMI;
     JMenuItem restartMI;
     JMenuItem desktopColorMI;
+    JMenuItem changeResMI1;
+    JMenuItem changeResMI2;
+    JMenuItem changeResMI3;
+    JMenuItem changeResMI4;
 
     public TaskBar(ExtensionPoint appsEP) {
         BorderLayout layout = new BorderLayout();
@@ -51,6 +55,11 @@ public class TaskBar extends JPanel {
         startMenu.add(awtMenu);
         awtMenu.add(createMenuItem("AWTDemo", "org.jnode.test.gui.AWTDemo"));
         awtMenu.add(createMenuItem("AWTFrameTest", "org.jnode.test.gui.AWTFrameTest"));
+        awtMenu.add(createMenuItem("AWTMenuBuilderTest", "org.jnode.test.gui.AWTMenuBuilderTest"));
+        awtMenu.add(createMenuItem("AWTMenuTest", "org.jnode.test.gui.AWTMenuTest"));
+        awtMenu.add(createMenuItem("AWTTest", "org.jnode.test.gui.AWTTest"));
+        awtMenu.add(createMenuItem("AWTTest2", "org.jnode.test.gui.AWTTest2"));
+        awtMenu.add(createMenuItem("RobotTest", "org.jnode.test.gui.RobotTest"));
 
         JMenu swingMenu = new JMenu("Swing tests");
         startMenu.add(swingMenu);
@@ -70,6 +79,10 @@ public class TaskBar extends JPanel {
         JMenu settingsMenu = new JMenu("Settings");
         startMenu.add(settingsMenu);
         settingsMenu.add(desktopColorMI = new JMenuItem("Desktop color"));
+        settingsMenu.add(changeResMI1 = new JMenuItem("Set to 640x480/32"));
+        settingsMenu.add(changeResMI2 = new JMenuItem("Set to 800x600/32"));
+        settingsMenu.add(changeResMI3 = new JMenuItem("Set to 1024x768/32"));
+        settingsMenu.add(changeResMI4 = new JMenuItem("Set to 1280x1024/32"));
 
         JMenu exitMenu = new JMenu("Exit");
         startMenu.add(exitMenu);

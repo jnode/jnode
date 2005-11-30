@@ -26,6 +26,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.DefaultFocusTraversalPolicy;
 import java.awt.Dimension;
+import java.awt.Toolkit;
 
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
@@ -37,7 +38,7 @@ import org.jnode.awt.JNodeAwtContext;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final class DesktopFrame extends JFrame implements JNodeAwtContext {
+public final class DesktopFrame extends JFrame implements JNodeAwtContext {
     private static final Color DESKTOP_BACKGROUND_COLOR = new Color(70, 130, 180);
 	private final JDesktopPane desktop;
 	private static final Logger log = Logger.getLogger(DesktopFrame.class);
@@ -78,7 +79,15 @@ final class DesktopFrame extends JFrame implements JNodeAwtContext {
 		return (JComponent)getContentPane();
 	}
 
-	/**
+    public void adjustDesktopSize(int width, int height) {
+        setSize(width, height);
+        doLayout();
+        repaint();
+        setVisible(false);
+        show();
+    }
+
+    /**
 	 * @see javax.swing.JFrame#frameInit()
 	 */
 	protected void frameInit() {

@@ -39,6 +39,8 @@ import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.JPopupMenu;
+import javax.swing.JMenuItem;
 import java.awt.AWTError;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -51,6 +53,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseAdapter;
+import java.security.AccessController;
+
+import gnu.java.security.action.SetPropertyAction;
 
 /**
  * @author Levente S\u00e1ntha
@@ -117,11 +124,12 @@ public class Desktop implements Runnable {
                 });
 
 
-                taskBar.desktopColorMI.addActionListener(new ActionListener() {
+                ActionListener desktopColorAction = new ActionListener() {
                     private JFrame f;
                     private Color oldColor;
+
                     public void actionPerformed(ActionEvent e) {
-                        if(f == null){
+                        if (f == null) {
                             f = new JFrame("Desktop color");
                             final JColorChooser color_chooser = new JColorChooser();
                             f.add(color_chooser, BorderLayout.CENTER);
@@ -159,7 +167,29 @@ public class Desktop implements Runnable {
                         f.setVisible(true);
                         f.setLocation(x, y);
                     }
-                });
+                };
+                taskBar.desktopColorMI.addActionListener(desktopColorAction);
+                class ChangeScreenResolution implements ActionListener, Runnable {
+                    private String resolution;
+
+                    public ChangeScreenResolution(String resolution) {
+                        this.resolution = resolution;
+                    }
+
+                    public void run() {
+                        Dimension ss = ((JNodeToolkit) Toolkit.getDefaultToolkit()).changeScreenSize(resolution);
+                        AccessController.doPrivileged(new SetPropertyAction("jnode.awt.screensize", resolution));
+                        ctx.adjustDesktopSize(ss.width, ss.height);
+                    }
+
+                    public void actionPerformed(ActionEvent event) {
+                        SwingUtilities.invokeLater(this);
+                    }
+                }
+                taskBar.changeResMI1.addActionListener(new ChangeScreenResolution("640x480/32"));
+                taskBar.changeResMI2.addActionListener(new ChangeScreenResolution("800x600/32"));
+                taskBar.changeResMI3.addActionListener(new ChangeScreenResolution("1024x768/32"));
+                taskBar.changeResMI4.addActionListener(new ChangeScreenResolution("1280x1024/32"));
 
 
                 awtRoot.removeAll();
@@ -197,6 +227,26 @@ public class Desktop implements Runnable {
                 versionLbl.setSize(versionLbl.getPreferredSize());
                 versionLbl.setLocation(desktop.getWidth() - versionLbl.getWidth() - dy, desktop.getHeight() - versionLbl.getHeight() - dy);
                 desktop.add(versionLbl, (Integer) (JLayeredPane.DEFAULT_LAYER - 1));
+
+                final JPopupMenu desktopMenu = new JPopupMenu("Desktop settings");
+                JMenuItem desktopColor = new JMenuItem("Desktop color");
+                desktopColor.addActionListener(desktopColorAction);
+                desktopMenu.add(desktopColor);
+                desktopMenu.add(taskBar.changeResMI1);
+                desktopMenu.add(taskBar.changeResMI2);
+                desktopMenu.add(taskBar.changeResMI3);
+                desktopMenu.add(taskBar.changeResMI4);
+                desktop.addMouseListener(new MouseAdapter() {
+                    public void mousePressed(MouseEvent event) {
+                        if(event.getButton() == MouseEvent.BUTTON2){
+                            if (desktopMenu .isShowing()) {
+                                desktopMenu .setVisible(false);
+                            } else {
+                                desktopMenu.show(desktop, event.getX(), event.getY());
+                            }
+                        }
+                    }
+                });
 
                 // Update
                 desktop.doLayout();
