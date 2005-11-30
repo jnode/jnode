@@ -27,6 +27,8 @@ import javax.swing.JButton;
 import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.JPopupMenu;
+import javax.swing.JMenuItem;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
@@ -34,6 +36,8 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyVetoException;
 import java.util.HashMap;
 import java.util.Map;
@@ -84,11 +88,11 @@ public class WindowBar extends JPanel {
         private final JInternalFrame frame;
 
         /**
-         * @param frame
+         * @param iFrame
          */
-        public FrameWrapper(JInternalFrame frame) {
-            this.frame = frame;
-            this.setText(frame.getTitle());
+        public FrameWrapper(JInternalFrame iFrame) {
+            this.frame = iFrame;
+            this.setText(iFrame.getTitle());
             this.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
                     try {
@@ -133,6 +137,53 @@ public class WindowBar extends JPanel {
                     //To change body of implemented methods use File | Settings | File Templates.
                 }
             });
+            final JPopupMenu frameActions = new JPopupMenu();
+            JMenuItem minimize = new JMenuItem("Minimize");
+            frameActions.add(minimize);
+            minimize.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    try {
+                        frame.setIcon(true);
+                    }catch(PropertyVetoException e){
+                        //ignore
+                    }
+                }
+            });
+            JMenuItem maximize = new JMenuItem("Maximize");
+            frameActions.add(maximize);
+            maximize.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    try {
+                        frame.setMaximum(true);
+                    }catch(PropertyVetoException e){
+                        //ignore
+                    }
+                }
+            });
+
+            JMenuItem close = new JMenuItem("Close");
+            frameActions.add(close);
+            close.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    try {
+                        frame.setClosed(true);
+                    }catch(PropertyVetoException e){
+                        //ignore
+                    }
+                }
+            });
+
+            this.addMouseListener(new MouseAdapter() {
+                    public void mousePressed(MouseEvent event) {
+                        if(event.getButton() == MouseEvent.BUTTON2){
+                            if (frameActions .isShowing()) {
+                                frameActions .setVisible(false);
+                            } else {                                
+                                frameActions.show(frame.getDesktopPane(), event.getX(), event.getY());
+                            }
+                        }
+                    }
+                });
         }
 
         public final JInternalFrame getFrame() {

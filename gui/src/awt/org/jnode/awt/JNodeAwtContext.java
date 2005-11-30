@@ -40,4 +40,7 @@ public interface JNodeAwtContext {
 	 * @return
 	 */
 	public JComponent getAwtRoot();
+
+
+    public void adjustDesktopSize(int width, int height);
 }

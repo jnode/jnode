@@ -337,6 +337,10 @@ public final class SwingToolkit extends JNodeToolkit {
     }
 
     public Component getTopComponentAt(int x, int y) {
+        if(desktopFrame == null){
+            //no AWT yet, drop the event
+            return null;
+        }
         Component comp = desktopFrame.getDesktop().getComponentAt(x,y);
         if(comp instanceof SwingBaseWindow){
             SwingBaseWindow base = (SwingBaseWindow) comp;
@@ -429,6 +433,10 @@ public final class SwingToolkit extends JNodeToolkit {
             public JDesktopPane getDesktop() {
                 final JNodeAwtContext ctx = getAwtContext();
                 return (ctx == null) ? null : getAwtContext().getDesktop();
+            }
+
+            public void adjustDesktopSize(int width, int height) {
+                getAwtContext().adjustDesktopSize(width, height);
             }
         }));
 

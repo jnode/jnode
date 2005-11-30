@@ -87,7 +87,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 
     private final Object initCloseLock = new Object();
     private EventQueue waitingNativeQueue;
-    
+
 	private class LRUCache<K, V> extends java.util.LinkedHashMap<K, V> {
 		int max_entries;
 
@@ -112,7 +112,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 
     /**
 	 * Gets the default toolkit casted to JNodeToolkit.
-	 * 
+	 *
 	 * @throws AWTError
 	 *             If the default toolkit is not instanceof JNodeToolkit.
 	 * @return The current toolkit casted to JNodeToolkit.
@@ -166,7 +166,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
         }
         ((JNodeToolkit) tk).refresh();
     }
-    
+
     protected void refresh() {
         // Override me
     }
@@ -257,7 +257,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	/**
      * JNode specific method. Create a buffered image compatible with the
      * graphics configuration.
-     * 
+     *
      * @param width
      * @param height
      * @return The compatible image
@@ -347,7 +347,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
             final KeyboardHandler keyboardHandler = this.keyboardHandler;
             final MouseHandler mouseHandler = this.mouseHandler;
             final Surface graphics = this.graphics;
-            
+
 			if (keyboardHandler != null) {
 				keyboardHandler.close();
 			}
@@ -357,18 +357,18 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 			if (graphics != null) {
 				graphics.close();
 			}
-            
+
             this.api = null;
             this.graphics = null;
             this.keyboardHandler = null;
             this.mouseHandler = null;
-            
+
             // Shutdown the eventqueue
             final JNodeEventQueue eventQueue = this._eventQueue;
             if (eventQueue != null) {
                 eventQueue.shutdown();
             }
-            
+
             synchronized (initCloseLock) {
                 this.refCount = 0;
                 initCloseLock.notifyAll();
@@ -378,7 +378,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 		    return rc;
         }
 	}
-	
+
 	private final void doWaitUntilStopped() {
 	    synchronized (initCloseLock) {
 	        while (graphics != null) {
@@ -393,7 +393,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 
 	/**
 	 * Gets the AWT context.
-	 * 
+	 *
 	 * @return the AWT context
 	 */
 	public abstract JNodeAwtContext getAwtContext();
@@ -466,7 +466,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 
 	/**
 	 * Gets the font manager, or null if not found.
-	 * 
+	 *
 	 * @return The font mananger
 	 */
 	public FontManager getFontManager() {
@@ -527,7 +527,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	public final GraphicsConfiguration getGraphicsConfiguration() {
 		return config;
 	}
-    
+
     /**
      * Test if the image is valid (!= null), otherwise return an error image.
      */
@@ -663,7 +663,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 
 	/**
 	 * Gets the top most visible component at a given location.
-	 * 
+	 *
 	 * @param x
 	 * @param y
 	 * @return the component
@@ -730,7 +730,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 
 				screenSize.width = config.getConfig().getScreenWidth();
 				screenSize.height = config.getConfig().getScreenHeight();
-                
+
                 final EventQueue eventQueue = getSystemEventQueueImpl();
 				this.keyboardHandler = new KeyboardHandler(eventQueue);
 				this.mouseHandler = new MouseHandler(dev.getDevice(),
@@ -762,7 +762,51 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 		return rc;
 	}
 
-	public void iterateNativeQueue(EventQueue locked, boolean block) {
+    public Dimension changeScreenSize(String screenSizeId) {
+        final JNodeFrameBufferDevice dev = (JNodeFrameBufferDevice) GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        if (dev == null) {
+            throw new AWTError("No framebuffer device found");
+        }
+        GraphicsConfiguration[] configurations = dev.getConfigurations();
+        JNodeGraphicsConfiguration conf = null;
+        for (GraphicsConfiguration g_conf : configurations) {
+            if (screenSizeId.equals(g_conf.toString())) {
+                conf = (JNodeGraphicsConfiguration) g_conf;
+                break;
+            }
+        }
+
+        if (conf == null) {
+            log.warn("Configuration not found " + screenSizeId);
+            return getScreenSize();
+        }
+
+        this.config = conf;
+        log.info("Using: " + config);
+        this.api = dev.getAPI();
+        try {
+
+            //close the old stuff
+            this.graphics.close();
+            this.mouseHandler.close();
+
+            //open the new
+            this.graphics = api.open(config.getConfig());
+            if (graphics == null) {
+                log.debug("No Graphics for device: " + dev.getIDstring());
+            }
+
+            screenSize.width = config.getConfig().getScreenWidth();
+            screenSize.height = config.getConfig().getScreenHeight();
+
+            this.mouseHandler = new MouseHandler(dev.getDevice(), screenSize, getSystemEventQueueImpl(), keyboardHandler);
+            return getScreenSize();
+        } catch (Exception e) {
+            throw (AWTError) new AWTError(e.getMessage()).initCause(e);
+        }
+    }
+
+    public void iterateNativeQueue(EventQueue locked, boolean block) {
         if (block) {
             this.waitingNativeQueue = locked;
             synchronized (locked) {
@@ -836,7 +880,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
         }
 	}
 
-    /** 
+    /**
      * A helper class to return to clients in cases where a BufferedImage is
      * desired but its construction fails.
      */
