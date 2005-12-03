@@ -23,6 +23,8 @@ package org.jnode.shell.help;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -37,16 +39,23 @@ public class ThreadNameArgument extends Argument {
 		super(name, description);
 	}
 
-	public String complete(String partial) {
-		final ArrayList<String> names = new ArrayList<String>();
-		ThreadGroup grp = Thread.currentThread().getThreadGroup();
-		while (grp.getParent() != null) {
-			grp = grp.getParent();
-		}
-		findList(grp, partial, names);
+    public String complete(final String partial) {
+        final ArrayList<String> names = new ArrayList<String>();
+        ThreadGroup grp = Thread.currentThread().getThreadGroup();
+        while (grp.getParent() != null) {
+            grp = grp.getParent();
+        }
 
-		return complete(partial, names);
-	}
+        final ThreadGroup grp_f = grp;
+        AccessController.doPrivileged(new PrivilegedAction() {
+            public Object run() {
+                findList(grp_f, partial, names);
+                return null;
+            }
+        });
+
+        return complete(partial, names);
+    }
 
 	private void findList(ThreadGroup grp, String partial, List<String> names) {
 		final int cnt = grp.activeCount();
