@@ -800,6 +800,8 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
             screenSize.height = config.getConfig().getScreenHeight();
 
             this.mouseHandler = new MouseHandler(dev.getDevice(), screenSize, getSystemEventQueueImpl(), keyboardHandler);
+            getAwtContext().adjustDesktopSize(screenSize.width, screenSize.height);
+            onResize();
             return getScreenSize();
         } catch (Exception e) {
             throw (AWTError) new AWTError(e.getMessage()).initCause(e);
@@ -840,7 +842,9 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 
 	protected abstract void onInitialize();
 
-	/**
+    protected abstract void onResize();
+
+    /**
 	 * @param image
 	 * @param width
 	 * @param height

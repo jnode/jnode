@@ -445,6 +445,10 @@ public final class SwingToolkit extends JNodeToolkit {
         desktopFrame.show();
     }
 
+    protected void onResize() {
+        //nothing to do here yet
+    }
+
     /**
      * Sets the source of the event to the given component.
      */
