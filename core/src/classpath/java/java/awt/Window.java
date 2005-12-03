@@ -823,7 +823,7 @@ public class Window extends Container implements Accessible
 
         x = c.getLocationOnScreen().x;
         y = c.getLocationOnScreen().y;
-        
+
         // If bottom of component is cut off, window placed
         // on the left or the right side of component
         if ((y + cHeight) > screenSize.height)
@@ -856,7 +856,7 @@ public class Window extends Container implements Accessible
               x = 0;
             else
               x += (cWidth - width) / 2;
-            
+
             y += (cHeight - height) / 2;
           }
         else
@@ -869,7 +869,7 @@ public class Window extends Container implements Accessible
               x = 0;
             else
               x -= (width - cWidth) / 2;
-            
+
             if ((y - (height - cHeight) / 2) > 0)
             y -= (height - cHeight) / 2;
             else
@@ -1043,7 +1043,7 @@ public class Window extends Container implements Accessible
     ResourceBundle rb = ResourceBundle.getBundle(rbName, Locale.getDefault(),
       ClassLoader.getSystemClassLoader());
     if (rb != null)
-      applyResourceBundle(rb);    
+      applyResourceBundle(rb);
   }
 
   /**
@@ -1060,7 +1060,7 @@ public class Window extends Container implements Accessible
     return accessibleContext;
   }
 
-  /** 
+  /**
    * Get graphics configuration.  The implementation for Window will
    * not ask any parent containers, since Window is a toplevel
    * window and not actually embedded in the parent component.
@@ -1081,17 +1081,17 @@ public class Window extends Container implements Accessible
           case WindowEvent.WINDOW_GAINED_FOCUS:
             windowFocusListener.windowGainedFocus (event);
             break;
-            
+
           case WindowEvent.WINDOW_LOST_FOCUS:
             windowFocusListener.windowLostFocus (event);
             break;
-            
+
           default:
             break;
           }
       }
   }
-  
+
   /**
    * @since 1.4
    */
@@ -1120,10 +1120,10 @@ public class Window extends Container implements Accessible
 
     return false;
   }
-  
+
   /**
    * Returns the value of the focusableWindowState property.
-   * 
+   *
    * @since 1.4
    */
   public boolean getFocusableWindowState ()
@@ -1133,12 +1133,50 @@ public class Window extends Container implements Accessible
 
   /**
    * Sets the value of the focusableWindowState property.
-   * 
+   *
    * @since 1.4
    */
   public void setFocusableWindowState (boolean focusableWindowState)
   {
     this.focusableWindowState = focusableWindowState;
+  }
+
+  // setBoundsCallback is needed so that when a user moves a window,
+  // the Window's location can be updated without calling the peer's
+  // setBounds method.  When a user moves a window the peer window's
+  // location is updated automatically and the windowing system sends
+  // a message back to the application informing it of its updated
+  // dimensions.  We must update the AWT Window class with these new
+  // dimensions.  But we don't want to call the peer's setBounds
+  // method, because the peer's dimensions have already been updated.
+  // (Under X, having this method prevents Configure event loops when
+  // moving windows: Component.setBounds -> peer.setBounds ->
+  // postConfigureEvent -> Component.setBounds -> ...  In some cases
+  // Configure event loops cause windows to jitter back and forth
+  // continuously).
+  void setBoundsCallback (int x, int y, int w, int h)
+  {
+    if (this.x == x && this.y == y && width == w && height == h)
+      return;
+    invalidate();
+    boolean resized = width != w || height != h;
+    boolean moved = this.x != x || this.y != y;
+    this.x = x;
+    this.y = y;
+    width = w;
+    height = h;
+    if (resized && isShowing ())
+      {
+        ComponentEvent ce =
+          new ComponentEvent(this, ComponentEvent.COMPONENT_RESIZED);
+        getToolkit().getSystemEventQueue().postEvent(ce);
+      }
+    if (moved && isShowing ())
+      {
+        ComponentEvent ce =
+          new ComponentEvent(this, ComponentEvent.COMPONENT_MOVED);
+        getToolkit().getSystemEventQueue().postEvent(ce);
+      }
   }
 
   /**
