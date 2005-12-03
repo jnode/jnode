@@ -26,7 +26,6 @@ import org.jnode.awt.JNodeAwtContext;
 import org.jnode.awt.JNodeToolkit;
 import org.jnode.plugin.ExtensionPoint;
 import org.jnode.plugin.PluginClassLoader;
-import org.jnode.vm.Vm;
 import org.jnode.vm.VmSystem;
 
 import javax.swing.DefaultDesktopManager;
@@ -35,8 +34,6 @@ import javax.swing.JColorChooser;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
-import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.JPopupMenu;
@@ -180,6 +177,8 @@ public class Desktop implements Runnable {
                         Dimension ss = ((JNodeToolkit) Toolkit.getDefaultToolkit()).changeScreenSize(resolution);
                         AccessController.doPrivileged(new SetPropertyAction("jnode.awt.screensize", resolution));
                         ctx.adjustDesktopSize(ss.width, ss.height);
+                        System.out.println("screenres1: " + ss);
+                        System.out.println("screenres2: " + Toolkit.getDefaultToolkit().getScreenSize());
                     }
 
                     public void actionPerformed(ActionEvent event) {
@@ -193,40 +192,19 @@ public class Desktop implements Runnable {
 
 
                 awtRoot.removeAll();
-                awtRoot.setLayout(null);
-                awtRoot.add(desktop);
-                final int h = awtRoot.getHeight();
+                awtRoot.setLayout(new BorderLayout());
                 final int controlBarHeight = 36;
                 final int w = awtRoot.getWidth();
-                desktop.setBounds(0, 0, w, h - controlBarHeight);
-                awtRoot.add(taskBar);
-                taskBar.setBounds(0, h - controlBarHeight, w, controlBarHeight);
+                taskBar.setPreferredSize(new Dimension(w, controlBarHeight));
+                awtRoot.add(desktop, BorderLayout.CENTER);
+                awtRoot.add(taskBar, BorderLayout.SOUTH);
 
                 awtRoot.invalidate();
                 awtRoot.repaint();
-                System.out.println("taskBar.bounds=" + taskBar.getBounds());
-                System.out.println("desktop.bounds=" + desktop.getBounds());
 
                 // Update desktopmanager
                 desktop.setDesktopManager(new DesktopManagerImpl());
                 desktop.addContainerListener(new DesktopContainerListener());
-
-                // Set background info
-                final int dx = 30;
-                final int dy = dx;
-                final JLabel welcomeLbl = new JLabel("Welcome to JNode");
-                welcomeLbl.setForeground(Color.WHITE);
-                welcomeLbl.setLocation(dx, dy);
-                welcomeLbl.setFont(welcomeLbl.getFont().deriveFont(20.0f));
-                welcomeLbl.setSize(welcomeLbl.getPreferredSize());
-                desktop.add(welcomeLbl, (Integer) (JLayeredPane.DEFAULT_LAYER - 1));
-
-                final JLabel versionLbl = new JLabel("version " + Vm.getVm().getVersion());
-                versionLbl.setForeground(Color.WHITE);
-                versionLbl.setFont(versionLbl.getFont().deriveFont(14.0f));
-                versionLbl.setSize(versionLbl.getPreferredSize());
-                versionLbl.setLocation(desktop.getWidth() - versionLbl.getWidth() - dy, desktop.getHeight() - versionLbl.getHeight() - dy);
-                desktop.add(versionLbl, (Integer) (JLayeredPane.DEFAULT_LAYER - 1));
 
                 final JPopupMenu desktopMenu = new JPopupMenu("Desktop settings");
                 JMenuItem desktopColor = new JMenuItem("Desktop color");

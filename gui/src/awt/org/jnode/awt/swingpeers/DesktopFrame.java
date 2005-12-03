@@ -81,10 +81,6 @@ public final class DesktopFrame extends JFrame implements JNodeAwtContext {
 
     public void adjustDesktopSize(int width, int height) {
         setSize(width, height);
-        doLayout();
-        repaint();
-        setVisible(false);
-        show();
     }
 
     /**
