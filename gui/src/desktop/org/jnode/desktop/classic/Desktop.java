@@ -174,11 +174,8 @@ public class Desktop implements Runnable {
                     }
 
                     public void run() {
-                        Dimension ss = ((JNodeToolkit) Toolkit.getDefaultToolkit()).changeScreenSize(resolution);
+                        ((JNodeToolkit) Toolkit.getDefaultToolkit()).changeScreenSize(resolution);
                         AccessController.doPrivileged(new SetPropertyAction("jnode.awt.screensize", resolution));
-                        ctx.adjustDesktopSize(ss.width, ss.height);
-                        System.out.println("screenres1: " + ss);
-                        System.out.println("screenres2: " + Toolkit.getDefaultToolkit().getScreenSize());
                     }
 
                     public void actionPerformed(ActionEvent event) {
