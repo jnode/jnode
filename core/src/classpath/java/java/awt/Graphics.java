@@ -51,22 +51,22 @@ import java.text.AttributedCharacterIterator;
 public abstract class Graphics
 {
 
-/**
+  /**
 	  * Default constructor for subclasses.
 	  */
-protected
-Graphics()
-{
-}
+  protected
+  Graphics()
+  {
+  }
 
-/**
+  /**
 	  * Returns a copy of this <code>Graphics</code> object.
 	  *
 	  * @return A copy of this object.
 	  */
   public abstract Graphics create();
 
-/**
+  /**
 	  * Returns a copy of this <code>Graphics</code> object.  The origin point
 	  * will be translated to the point (x, y) and the cliping rectangle set
 	  * to the intersection of the clipping rectangle in this object and the
@@ -80,7 +80,7 @@ Graphics()
 	  * @return A copy of this object, modified as specified.
 	  */
   public Graphics create(int x, int y, int width, int height)
-{
+  {
 		Graphics g = create();
 
 		g.translate(x, y);
@@ -89,9 +89,9 @@ Graphics()
 		g.clipRect(0, 0, width, height);
 
   return(g);
-}
+  }
 
-/**
+  /**
 	  * Translates this context so that its new origin point is the point
 	  * (x, y).
 	  *
@@ -100,27 +100,27 @@ Graphics()
 	  */
   public abstract void translate(int x, int y);
 
-/**
+  /**
 	  * Returns the current color for this object.
 	  *
 	  * @return The color for this object.
 	  */
   public abstract Color getColor();
 
-/**
+  /**
 	  * Sets the current color for this object.
 	  *
 	  * @param color The new color.
 	  */
   public abstract void setColor(Color color);
 
-/**
+  /**
 	  * Sets this context into "paint" mode, where the target pixels are
 	  * completely overwritten when drawn on.
 	  */
   public abstract void setPaintMode();
 
-/**
+  /**
 	  * Sets this context info "XOR" mode, where the targe pixles are
 	  * XOR-ed when drawn on. 
 	  *
@@ -128,31 +128,31 @@ Graphics()
 	  */
   public abstract void setXORMode(Color color);
 
-/**
+  /**
 	  * Returns the current font for this graphics context.
 	  *
 	  * @return The current font.
 	  */
   public abstract Font getFont();
 
-/**
+  /**
 	  * Sets the font for this graphics context to the specified value.
 	  *
 	  * @param font The new font.
 	  */
   public abstract void setFont(Font font);
 
-/**
+  /**
 	  * Returns the font metrics for the current font.
 	  *
 	  * @return The font metrics for the current font.
 	  */
   public FontMetrics getFontMetrics()
-{
+  {
     return getFontMetrics(getFont());
-}
+  }
 
-/**
+  /**
 	  * Returns the font metrics for the specified font.
 	  *
 	  * @param font The font to return metrics for.
@@ -161,7 +161,7 @@ Graphics()
 	  */
   public abstract FontMetrics getFontMetrics(Font font);
 
-/**
+  /**
 	  * Returns the bounding rectangle of the clipping region for this 
 	  * graphics context.
 	  *
@@ -169,7 +169,7 @@ Graphics()
 	  */
   public abstract Rectangle getClipBounds();
 
-/**
+  /**
 	  * Returns the bounding rectangle of the clipping region for this 
 	  * graphics context.
 	  *
@@ -179,11 +179,11 @@ Graphics()
 	  * <code>getClipBounds()</code>.
 	  */
   public Rectangle getClipRect()
-{
+  {
     return getClipBounds();
-}
+  }
 
-/**
+  /**
 	  * Sets the clipping region to the intersection of the current clipping
 	  * region and the rectangle determined by the specified parameters.
 	  *
@@ -194,7 +194,7 @@ Graphics()
 	  */
   public abstract void clipRect(int x, int y, int width, int height);
 
-/**
+  /**
 	  * Sets the clipping region to the rectangle determined by the specified
 	  * parameters.
 	  *
@@ -205,21 +205,21 @@ Graphics()
 	  */
   public abstract void setClip(int x, int y, int width, int height);
 
-/**
+  /**
 	  * Returns the current clipping region as a <code>Shape</code> object.
 	  *
 	  * @return The clipping region as a <code>Shape</code>.
 	  */
   public abstract Shape getClip();
 
-/**
+  /**
 	  * Sets the clipping region to the specified <code>Shape</code>.
 	  *
   * @param clip The new clipping region.
 	  */
   public abstract void setClip(Shape clip);
 
-/**
+  /**
 	  * Copies the specified rectangle to the specified offset location.
 	  *
 	  * @param x The X coordinate of the upper left corner of the copy rect.
@@ -232,7 +232,7 @@ Graphics()
   public abstract void copyArea(int x, int y, int width, int height, int dx,
                                 int dy);
 
-/**
+  /**
 	  * Draws a line between the two specified points.
 	  *
 	  * @param x1 The X coordinate of the first point.
@@ -242,7 +242,7 @@ Graphics()
 	  */
   public abstract void drawLine(int x1, int y1, int x2, int y2);
 
-/**
+  /**
 	  * Fills the area bounded by the specified rectangle.
 	  *
 	  * @param x The X coordinate of the upper left corner of the fill rect.
@@ -252,7 +252,7 @@ Graphics()
 	  */
   public abstract void fillRect(int x, int y, int width, int height);
 
-/**
+  /**
 	  * Draws the outline of the specified rectangle.
 	  *
 	  * @param x The X coordinate of the upper left corner of the draw rect.
@@ -261,7 +261,7 @@ Graphics()
 	  * @param height The height of the draw rect.
 	  */
   public void drawRect(int x, int y, int width, int height)
-{
+  {
 		int x1 = x;
 		int y1 = y;
 		int x2 = x + width;
@@ -270,9 +270,9 @@ Graphics()
 		drawLine(x2, y1, x2, y2);
 		drawLine(x2, y2, x1, y2);
 		drawLine(x1, y2, x1, y1);
-}
+  }
 
-/**
+  /**
 	  * Clears the specified rectangle.
 	  *
 	  * @param x The X coordinate of the upper left corner of the clear rect.
@@ -282,7 +282,7 @@ Graphics()
 	  */
   public abstract void clearRect(int x, int y, int width, int height);
 
-/**
+  /**
 	  * Draws the outline of the specified rectangle with rounded cornders.
 	  *
 	  * @param x The X coordinate of the upper left corner of the draw rect.
@@ -295,7 +295,7 @@ Graphics()
   public abstract void drawRoundRect(int x, int y, int width, int height,
                                      int arcWidth, int arcHeight);
 
-/**
+  /**
 	  * Fills the specified rectangle with rounded cornders.
 	  *
 	  * @param x The X coordinate of the upper left corner of the fill rect.
@@ -309,7 +309,7 @@ Graphics()
                                      int arcWidth, int arcHeight);
 
   public void draw3DRect(int x, int y, int width, int height, boolean raised)
-{
+  {
 		Color color = getColor();
 		Color tl = color.brighter();
 		Color br = color.darker();
@@ -333,9 +333,9 @@ Graphics()
 		drawLine(x2, y1, x2, y2);
 		drawLine(x2, y2, x1, y2);
 		setColor(color);
-}
+  }
 
-/**
+  /**
 	  * Fills the specified rectangle with a 3D effect
 	  *
 	  * @param x The X coordinate of the upper left corner of the fill rect.
@@ -346,12 +346,12 @@ Graphics()
 	  * <code>false</code> if it should appear etched.
 	  */
   public void fill3DRect(int x, int y, int width, int height, boolean raised)
-{
+  {
 		fillRect(x, y, width, height);
   draw3DRect(x, y, width-1, height-1, raised);
-}
+  }
 
-/**
+  /**
 	  * Draws an oval that just fits within the specified rectangle.
 	  *
 	  * @param x The X coordinate of the upper left corner of the rect.
@@ -361,7 +361,7 @@ Graphics()
 	  */
   public abstract void drawOval(int x, int y, int width, int height);
 
-/**
+  /**
 	  * Fills an oval that just fits within the specified rectangle.
 	  *
 	  * @param x The X coordinate of the upper left corner of the rect.
@@ -371,7 +371,7 @@ Graphics()
 	  */
   public abstract void fillOval(int x, int y, int width, int height);
 
-/**
+  /**
 	  * Draws an arc using the specified bounding rectangle and the specified
 	  * angle parameter.  The arc is centered at the center of the rectangle.
 	  * The arc starts at the arcAngle position and extend for arcAngle
@@ -387,7 +387,7 @@ Graphics()
   public abstract void drawArc(int x, int y, int width, int height,
                                int arcStart, int arcAngle);
 
-/**
+  /**
 	  * Fills the arc define by the specified bounding rectangle and the specified
 	  * angle parameter.  The arc is centered at the center of the rectangle.
 	  * The arc starts at the arcAngle position and extend for arcAngle
@@ -403,7 +403,7 @@ Graphics()
   public abstract void fillArc(int x, int y, int width, int height,
                                int arcStart, int arcAngle);
 
-/**
+  /**
 	  * Draws a series of interconnected lines determined by the arrays
 	  * of corresponding x and y coordinates.
 	  *
@@ -413,7 +413,7 @@ Graphics()
 	  */
   public abstract void drawPolyline(int xPoints[], int yPoints[], int npoints);
 
-/**
+  /**
 	  * Draws a series of interconnected lines determined by the arrays
 	  * of corresponding x and y coordinates.  The figure is closed if necessary
 	  * by connecting the first and last points.
@@ -424,17 +424,17 @@ Graphics()
 	  */
   public abstract void drawPolygon(int xPoints[], int yPoints[], int npoints);
 
-/**
+  /**
 	  * Draws the specified polygon.
 	  *
 	  * @param polygon The polygon to draw.
 	  */
   public void drawPolygon(Polygon polygon)
-{
+  {
 		drawPolygon(polygon.xpoints, polygon.ypoints, polygon.npoints);
-}
+  }
 
-/**
+  /**
 	  * Fills the polygon determined by the arrays
 	  * of corresponding x and y coordinates.
 	  *
@@ -444,17 +444,17 @@ Graphics()
 	  */
   public abstract void fillPolygon(int xPoints[], int yPoints[], int npoints);
 
-/**
+  /**
 	  * Fills the specified polygon
 	  *
 	  * @param polygon The polygon to fill.
 	  */
   public void fillPolygon(Polygon polygon)
-{
+  {
 		fillPolygon(polygon.xpoints, polygon.ypoints, polygon.npoints);
-}
+  }
 
-/**
+  /**
 	  * Draws the specified string starting at the specified point.
 	  *
 	  * @param string The string to draw.
@@ -466,7 +466,7 @@ Graphics()
   public abstract void drawString (AttributedCharacterIterator ci, int x,
                                    int y);
 
-/**
+  /**
 	  * Draws the specified characters starting at the specified point.
 	  *
 	  * @param data The array of characters to draw.
@@ -476,17 +476,17 @@ Graphics()
 	  * @param y The Y coordinate of the point to draw at.
 	  */
   public void drawChars(char data[], int offset, int length, int x, int y)
-{
+  {
 		drawString(new String(data, offset, length), x, y);
-}
+  }
 
   public void drawBytes(byte[] data, int offset, int length, int x, int y)
-{
+  {
 		String str = new String(data, offset, length);
 		drawString(str, x, y);
-}
+  }
 
-/**
+  /**
 	  * Draws all of the image that is available and returns.  If the image
 	  * is not completely loaded, <code>false</code> is returned and 
 	  * the specified iamge observer is notified as more data becomes 
@@ -503,7 +503,7 @@ Graphics()
   public abstract boolean drawImage(Image image, int x, int y,
                                     ImageObserver observer);
 
-/**
+  /**
 	  * Draws all of the image that is available and returns.  The image
 	  * is scaled to fit in the specified rectangle.  If the image
 	  * is not completely loaded, <code>false</code> is returned and 
@@ -523,7 +523,7 @@ Graphics()
   public abstract boolean drawImage(Image image, int x, int y, int width,
                                     int height, ImageObserver observer);
 
-/**
+  /**
 	  * Draws all of the image that is available and returns.  If the image
 	  * is not completely loaded, <code>false</code> is returned and 
 	  * the specified iamge observer is notified as more data becomes 
@@ -541,7 +541,7 @@ Graphics()
   public abstract boolean drawImage(Image image, int x, int y, Color bgcolor,
                                     ImageObserver observer);
 
-/**
+  /**
 	  * Draws all of the image that is available and returns.  The image
 	  * is scaled to fit in the specified rectangle.  If the image
 	  * is not completely loaded, <code>false</code> is returned and 
@@ -563,14 +563,14 @@ Graphics()
                                     int height, Color bgcolor,
           ImageObserver observer);
 
-/**
+  /**
 	  * FIXME: Write Javadocs for this when you understand it.
 	  */
   public abstract boolean drawImage(Image image, int dx1, int dy1, int dx2,
                                     int dy2, int sx1, int sy1, int sx2,
                                     int sy2, ImageObserver observer);
 
-/**
+  /**
 	  * FIXME: Write Javadocs for this when you understand it.
 	  */
   public abstract boolean drawImage(Image image, int dx1, int dy1, int dx2,
@@ -578,31 +578,31 @@ Graphics()
                                     int sy2, Color bgcolor,
                                     ImageObserver observer);
 
-/**
+  /**
 	  * Free any resources held by this graphics context immediately instead
 	  * of waiting for the object to be garbage collected and finalized.
 	  */
   public abstract void dispose();
 
-/**
+  /**
 	  * Frees the resources held by this graphics context when it is
 	  * garbage collected.
 	  */
   public void finalize()
-{
+  {
 		dispose();
-}
+  }
 
-/**
+  /**
 	  * Returns a string representation of this object.
 	  *
  * @return A string representation of this object. 
 	  */
   public String toString()
-{
+  {
     return getClass ().getName () + "[font=" + getFont () + ",color="
            + getColor () + "]";
-}
+  }
 
   /**
    * Returns <code>true</code> if the specified rectangle intersects with the
@@ -616,12 +616,12 @@ Graphics()
    *         current clip, <code>false</code> otherwise
    */
   public boolean hitClip(int x, int y, int width, int height)
-{
+  {
     return getClip().intersects(x, y, width, height);
-}
+  }
 
   public Rectangle getClipBounds(Rectangle r)
-{
+  {
 		Rectangle clipBounds = getClipBounds();
 
 		if (r == null)
@@ -632,5 +632,5 @@ Graphics()
 		r.width = clipBounds.width;
 		r.height = clipBounds.height;
 		return r;
-}
+  }
 }
