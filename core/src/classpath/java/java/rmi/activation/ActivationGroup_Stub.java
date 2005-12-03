@@ -1,5 +1,6 @@
 /* ActivationGroup_Stub.java -- Stub class for ActivationGroup impls.
    Copyright (C) 2005 Free Software Foundation, Inc.
+
 This file is part of GNU Classpath.
 
 GNU Classpath is free software; you can redistribute it and/or modify

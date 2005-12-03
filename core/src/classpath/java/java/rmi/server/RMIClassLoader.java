@@ -59,10 +59,10 @@ public class RMIClassLoader
   /**
    * @deprecated
    */
-  public static Class loadClass (String name)
+  public static Class loadClass(String name)
     throws MalformedURLException, ClassNotFoundException
   {
-    return loadClass ("", name);
+    return loadClass("", name);
   }
 
   public static Class loadClass(String codebase, String name)
@@ -138,7 +138,7 @@ public class RMIClassLoader
    * @return a space seperated list of URLs where the class-definition
    * of cl may be found
    */
-  public static String getClassAnnotation (Class cl)
+  public static String getClassAnnotation(Class cl)
   {
     RMIClassLoaderSpi spi = getProviderInstance();
     if (spi == null)
