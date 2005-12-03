@@ -36,6 +36,7 @@ import java.awt.Component;
 import java.awt.MenuBar;
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.BorderLayout;
 import java.awt.peer.WindowPeer;
 import java.awt.peer.FramePeer;
 
@@ -187,7 +188,10 @@ abstract class SwingJBaseWindow<awtT extends Window, swingPeerT extends SwingJBa
          * @see javax.swing.JRootPane#createContentPane()
          */
         protected Container createContentPane() {
-            return new ContentPane();
+            ContentPane p = new ContentPane();
+            p.setName(this.getName() + ".contentPane");
+            p.setLayout(new BorderLayout());
+            return p;
         }
     }
 }
@@ -229,7 +233,9 @@ abstract class SwingJBaseWindowPeer<awtT extends Window, swingPeerT extends Swin
      * @see java.awt.peer.ComponentPeer#getGraphics()
      */
     public final Graphics getGraphics() {
-        return peerComponent.getGraphics();
+        //TODO review this
+        //return peerComponent.getGraphics();
+        return super.getGraphics();
     }
 
     /**

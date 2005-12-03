@@ -68,7 +68,9 @@ abstract class SwingBaseWindowPeer<awtT extends Window, swingPeerT extends Swing
      * @see java.awt.peer.ComponentPeer#getGraphics()
      */
     public final Graphics getGraphics() {
-        return peerComponent.getGraphics();
+        //TODO review this
+        //return peerComponent.getGraphics();
+        return super.getGraphics();
     }
 
     /**
