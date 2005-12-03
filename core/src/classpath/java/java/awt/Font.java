@@ -70,35 +70,35 @@ import java.util.StringTokenizer;
 public class Font implements Serializable
 {
 
-/**
+  /**
 	  * Constant indicating a "plain" font.
 	  */
-public static final int PLAIN = 0;
+  public static final int PLAIN = 0;
 
-/**
+  /**
 	  * Constant indicating a "bold" font.
 	  */
-public static final int BOLD = 1;
+  public static final int BOLD = 1;
 
-/**
+  /**
 	  * Constant indicating an "italic" font.
 	  */
-public static final int ITALIC = 2;
+  public static final int ITALIC = 2;
 
-/**
+  /**
  * Constant indicating the baseline mode characteristic of Roman.
  */
-public static final int ROMAN_BASELINE = 0;
+  public static final int ROMAN_BASELINE = 0;
 
-/**
+  /**
  * Constant indicating the baseline mode characteristic of Chinese.
  */
-public static final int CENTER_BASELINE = 1;
+  public static final int CENTER_BASELINE = 1;
 
-/**
+  /**
  * Constant indicating the baseline mode characteristic of Devanigri.
  */
-public static final int HANGING_BASELINE = 2;  
+  public static final int HANGING_BASELINE = 2;  
 
 
 	/**
@@ -187,15 +187,15 @@ public static final int HANGING_BASELINE = 2;
    */
   protected int style;
 
-// Serialization constant
-private static final long serialVersionUID = -4206021311591459213L;
+//Serialization constant
+  private static final long serialVersionUID = -4206021311591459213L;
 
 
   // The ClasspathToolkit-provided peer which implements this font
   private transient ClasspathFontPeer peer;
 
 
-/**
+  /**
 	  * Creates a <code>Font</code> object from the specified string, which
 	  * is in one of the following formats:
 	  * <p>
@@ -215,8 +215,8 @@ private static final long serialVersionUID = -4206021311591459213L;
   * 
   * @return A font.
 	  */
-  public static Font decode (String fontspec)
-{
+  public static Font decode(String fontspec)
+  {
   if (fontspec == null) 
     fontspec = "Dialog-PLAIN-12";
 		String name = null;
@@ -254,7 +254,7 @@ private static final long serialVersionUID = -4206021311591459213L;
         {
 				tokenval = Integer.parseInt(token);
 			}
-      catch(NumberFormatException e)
+        catch (NumberFormatException e)
         {
 	  // Ignored.
 	}
@@ -264,11 +264,11 @@ private static final long serialVersionUID = -4206021311591459213L;
 		}
 
     HashMap attrs = new HashMap();
-    ClasspathFontPeer.copyStyleToAttrs (style, attrs);
-    ClasspathFontPeer.copySizeToAttrs (size, attrs);
+    ClasspathFontPeer.copyStyleToAttrs(style, attrs);
+    ClasspathFontPeer.copySizeToAttrs(size, attrs);
 
-    return getFontFromToolkit (name, attrs);
-}
+    return getFontFromToolkit(name, attrs);
+  }
 
   /* These methods delegate to the toolkit. */
 
@@ -280,17 +280,17 @@ private static final long serialVersionUID = -4206021311591459213L;
   /* Every factory method in Font should eventually call this. */
   static Font getFontFromToolkit(String name, Map attribs)
   {
-    return tk ().getFont (name, attribs);
+    return tk().getFont(name, attribs);
 	}
 
   /* Every Font constructor should eventually call this. */
   static ClasspathFontPeer getPeerFromToolkit(String name, Map attrs)
   {
-    return tk ().getClasspathFontPeer (name, attrs);
+    return tk().getClasspathFontPeer(name, attrs);
   }
 
 
-/**
+  /**
 	  * Returns a <code>Font</code> object from the passed property name.
 	  *
 	  * @param propname The name of the system property.
@@ -299,15 +299,15 @@ private static final long serialVersionUID = -4206021311591459213L;
 	  * @return The requested font, or <code>default</code> if the property 
 	  * not exist or is malformed.
 	  */
-  public static Font getFont (String propname, Font defval)
-{
+  public static Font getFont(String propname, Font defval)
+  {
 		String propval = System.getProperty(propname);
 		if (propval != null)
-      return decode (propval);
+      return decode(propval);
     return defval;
-}
+  }
 
-/**
+  /**
 	  * Returns a <code>Font</code> object from the passed property name.
 	  *
 	  * @param propname The name of the system property.
@@ -315,12 +315,12 @@ private static final long serialVersionUID = -4206021311591459213L;
 	  * @return The requested font, or <code>null</code> if the property 
 	  * not exist or is malformed.
 	  */
-  public static Font getFont (String propname)
-{
-    return getFont (propname, (Font)null);
-}
+  public static Font getFont(String propname)
+  {
+    return getFont(propname, (Font) null);
+  }
 
-/**
+  /**
 	  * Initializes a new instance of <code>Font</code> with the specified
 	  * attributes.
 	  *
@@ -328,13 +328,12 @@ private static final long serialVersionUID = -4206021311591459213L;
 	  * @param style The font style.
 	  * @param size The font point size.
 	  */
-
-  public Font (String name, int style, int size)
+  public Font(String name, int style, int size)
   {
     HashMap attrs = new HashMap();
-    ClasspathFontPeer.copyStyleToAttrs (style, attrs);
-    ClasspathFontPeer.copySizeToAttrs (size, attrs);
-    this.peer = getPeerFromToolkit (name, attrs);
+    ClasspathFontPeer.copyStyleToAttrs(style, attrs);
+    ClasspathFontPeer.copySizeToAttrs(size, attrs);
+    this.peer = getPeerFromToolkit(name, attrs);
     this.size = size;
     this.pointSize = (float) size;
     if (name != null)
@@ -343,7 +342,7 @@ private static final long serialVersionUID = -4206021311591459213L;
       this.name = peer.getName(this);
 	}
 
-  public Font (Map attrs)
+  public Font(Map attrs)
   {
     this(null, attrs);
   }
@@ -367,7 +366,7 @@ private static final long serialVersionUID = -4206021311591459213L;
       this.name = peer.getName(this);
 	}
 
-/**
+  /**
    * Returns the logical name of the font.  A logical name is the name the
    * font was constructed with. It may be the name of a logical font (one
    * of 6 required names in all java environments) or it may be a face
@@ -379,66 +378,66 @@ private static final long serialVersionUID = -4206021311591459213L;
   * @see #getFontName()
   */
   public String getName ()
-{
-    return peer.getName (this);
-}
+  {
+    return peer.getName(this);
+  }
 
-/**
+  /**
    * Returns the size of the font, in typographics points (1/72 of an inch),
    * rounded to an integer.
 	  * 
    * @return The font size
 	  */
-  public int getSize ()
-{
+  public int getSize()
+  {
     return size;
-}
+  }
 
   /**
    * Returns the size of the font, in typographics points (1/72 of an inch).
    * 
    * @return The font size
    */
-  public float getSize2D ()
-{
+  public float getSize2D()
+  {
     return pointSize;
-}
+  }
 
-/**
+  /**
 	  * Tests whether or not this is a plain font.  This will be true if
 	  * and only if neither the bold nor the italics style is set.
 	  *
 	  * @return <code>true</code> if this is a plain font, <code>false</code>
 	  * otherwise.
 	  */
-  public boolean isPlain ()
-{
-    return peer.isPlain (this); 
-}
+  public boolean isPlain()
+  {
+    return peer.isPlain(this); 
+  }
 
-/**
+  /**
 	  * Tests whether or not this font is bold.
 	  *
 	  * @return <code>true</code> if this font is bold, <code>false</code>
 	  * otherwise.
 	  */
-  public boolean isBold ()
-{
-    return peer.isBold (this);
-}
+  public boolean isBold()
+  {
+    return peer.isBold(this);
+  }
 
-/**
+  /**
 	  * Tests whether or not this font is italic.
 	  *
 	  * @return <code>true</code> if this font is italic, <code>false</code>
 	  * otherwise.
 	  */
-  public boolean isItalic ()
-{
-    return peer.isItalic (this);
-}
+  public boolean isItalic()
+  {
+    return peer.isItalic(this);
+  }
 
-/**
+  /**
    * Returns the family name of this font. A family name describes a design
    * or "brand name" (such as Helvetica or Palatino). It is less specific
    * than a font face name (such as Helvetica Bold).
@@ -451,12 +450,12 @@ private static final long serialVersionUID = -4206021311591459213L;
   * @see #getFontName()
   * @see GraphicsEnvironment#getAvailableFontFamilyNames()
 	 */
-  public String getFamily ()
-{
-    return peer.getFamily (this);
-}
+  public String getFamily()
+  {
+    return peer.getFamily(this);
+  }
 
-/**
+  /**
   * Returns integer code representing the sum of style flags of this font, a
   * combination of either {@link #PLAIN}, {@link #BOLD}, or {@link #ITALIC}.
   *
@@ -466,12 +465,12 @@ private static final long serialVersionUID = -4206021311591459213L;
   * @see #isBold()
   * @see #isItalic()
   */
-  public int getStyle ()
-{
-    return peer.getStyle (this);
-}
+  public int getStyle()
+  {
+    return peer.getStyle(this);
+  }
 
-/**
+  /**
   * Checks if specified character maps to a glyph in this font.
 	 *
   * @param c The character to check.
@@ -480,12 +479,12 @@ private static final long serialVersionUID = -4206021311591459213L;
   *
   * @since 1.2
 	 */
-  public boolean canDisplay (char c)
-{
-    return peer.canDisplay (this, c);    
-}
+  public boolean canDisplay(char c)
+  {
+    return peer.canDisplay(this, c);    
+  }
 
-/**
+  /**
   * Checks how much of a given string can be mapped to glyphs in 
   * this font.
   *
@@ -497,13 +496,13 @@ private static final long serialVersionUID = -4206021311591459213L;
   *
   * @since 1.2
   */
-  public int canDisplayUpTo (String s)
-{
-    return peer.canDisplayUpTo (this, new StringCharacterIterator (s), 
-                                0, s.length () - 1);
-}
+  public int canDisplayUpTo(String s)
+  {
+    return peer.canDisplayUpTo(this, new StringCharacterIterator(s), 
+                               0, s.length() - 1);
+  }
 
-/**
+  /**
   * Checks how much of a given sequence of text can be mapped to glyphs in
   * this font.
   *
@@ -521,13 +520,13 @@ private static final long serialVersionUID = -4206021311591459213L;
   * invalid in <code>text</code>.
   */
   public int canDisplayUpTo (char[] text, int start, int limit)
-{
+  {
     return peer.canDisplayUpTo(this,
                                new StringCharacterIterator(new String (text)),
                                start, limit);
-}
+  }
 
-/**
+  /**
   * Checks how much of a given sequence of text can be mapped to glyphs in
   * this font.
   *
@@ -544,12 +543,12 @@ private static final long serialVersionUID = -4206021311591459213L;
   * @throws IndexOutOfBoundsException if the range [start, limit] is
   * invalid in <code>i</code>.
   */
-  public int canDisplayUpTo (CharacterIterator i, int start, int limit)
-{
-    return peer.canDisplayUpTo (this, i, start, limit);    
-}
+  public int canDisplayUpTo(CharacterIterator i, int start, int limit)
+  {
+    return peer.canDisplayUpTo(this, i, start, limit);    
+  }
 
-/**
+  /**
   * Creates a new font with point size 1 and {@link #PLAIN} style,
   * reading font data from the provided input stream. The resulting font
   * can have further fonts derived from it using its
@@ -572,11 +571,11 @@ private static final long serialVersionUID = -4206021311591459213L;
   */
   public static Font createFont (int fontFormat, InputStream is) 
   throws FontFormatException, IOException
-{
-    return tk().createFont (fontFormat, is);
-}
+  {
+    return tk().createFont(fontFormat, is);
+  }
 
-/**
+  /**
   * Maps characters to glyphs in a one-to-one relationship, returning a new
   * {@link GlyphVector} with a mapped glyph for each input character. This
   * sort of mapping is often sufficient for some scripts such as Roman, but
@@ -591,12 +590,12 @@ private static final long serialVersionUID = -4206021311591459213L;
   *
   * @see #layoutGlyphVector(FontRenderContext, char[], int, int, int)
   */
-  public GlyphVector createGlyphVector (FontRenderContext ctx, String str)
-{
-    return peer.createGlyphVector (this, ctx, new StringCharacterIterator (str));
-}
+  public GlyphVector createGlyphVector(FontRenderContext ctx, String str)
+  {
+    return peer.createGlyphVector(this, ctx, new StringCharacterIterator(str));
+  }
 
-/**
+  /**
   * Maps characters to glyphs in a one-to-one relationship, returning a new
   * {@link GlyphVector} with a mapped glyph for each input character. This
   * sort of mapping is often sufficient for some scripts such as Roman, but
@@ -613,11 +612,11 @@ private static final long serialVersionUID = -4206021311591459213L;
   */
   public GlyphVector createGlyphVector(FontRenderContext ctx,
                                        CharacterIterator i)
-{
-    return peer.createGlyphVector (this, ctx, i);
-}
+  {
+    return peer.createGlyphVector(this, ctx, i);
+  }
 
-/**
+  /**
   * Maps characters to glyphs in a one-to-one relationship, returning a new
   * {@link GlyphVector} with a mapped glyph for each input character. This
   * sort of mapping is often sufficient for some scripts such as Roman, but
@@ -632,13 +631,13 @@ private static final long serialVersionUID = -4206021311591459213L;
   *
   * @see #layoutGlyphVector(FontRenderContext, char[], int, int, int)
   */
-  public GlyphVector createGlyphVector (FontRenderContext ctx, char[] chars)
-{
+  public GlyphVector createGlyphVector(FontRenderContext ctx, char[] chars)
+  {
     return peer.createGlyphVector(this, ctx,
                                new StringCharacterIterator(new String(chars)));
-}
+  }
 
-/**
+  /**
   * Extracts a sequence of glyphs from a font, returning a new {@link
   * GlyphVector} with a mapped glyph for each input glyph code. 
   *
@@ -656,13 +655,12 @@ private static final long serialVersionUID = -4206021311591459213L;
   * purpose was to transport character codes inside integers. I assume it
   * is mis-documented in the Sun documentation.
   */
+  public GlyphVector createGlyphVector(FontRenderContext ctx, int[] glyphCodes)
+  {
+    return peer.createGlyphVector(this, ctx, glyphCodes);
+  }
 
-  public GlyphVector createGlyphVector (FontRenderContext ctx, int[] glyphCodes)
-{
-    return peer.createGlyphVector (this, ctx, glyphCodes);
-}
-
-/**
+  /**
   * Produces a new {@link Font} based on the current font, adjusted to a
   * new size and style.
   *
@@ -673,12 +671,12 @@ private static final long serialVersionUID = -4206021311591459213L;
   *
   * @since 1.2
   */
-  public Font deriveFont (int style, float size)
-{
-    return peer.deriveFont (this, style, size);
-}
+  public Font deriveFont(int style, float size)
+  {
+    return peer.deriveFont(this, style, size);
+  }
 
-/**
+  /**
   * Produces a new {@link Font} based on the current font, adjusted to a
   * new size.
   *
@@ -688,12 +686,12 @@ private static final long serialVersionUID = -4206021311591459213L;
   *
   * @since 1.2
   */
-  public Font deriveFont (float size)
-{
-    return peer.deriveFont (this, size);
-}
+  public Font deriveFont(float size)
+  {
+    return peer.deriveFont(this, size);
+  }
 
-/**
+  /**
   * Produces a new {@link Font} based on the current font, adjusted to a
   * new style.
   *
@@ -703,12 +701,12 @@ private static final long serialVersionUID = -4206021311591459213L;
   *
   * @since 1.2
   */
-  public Font deriveFont (int style)
-{
-    return peer.deriveFont (this, style);
-}
+  public Font deriveFont(int style)
+  {
+    return peer.deriveFont(this, style);
+  }
 
-/**
+  /**
   * Produces a new {@link Font} based on the current font, adjusted to a
   * new style and subjected to a new affine transformation.
   *
@@ -723,15 +721,15 @@ private static final long serialVersionUID = -4206021311591459213L;
   *
   * @since 1.2
   */
-  public Font deriveFont (int style, AffineTransform a)
-{
+  public Font deriveFont(int style, AffineTransform a)
+  {
     if (a == null)
-      throw new IllegalArgumentException ("Affine transformation is null");
+      throw new IllegalArgumentException("Affine transformation is null");
 
-    return peer.deriveFont (this, style, a);
-}
+    return peer.deriveFont(this, style, a);
+  }
 
-/**
+  /**
   * Produces a new {@link Font} based on the current font, subjected
   * to a new affine transformation.
   *
@@ -744,15 +742,15 @@ private static final long serialVersionUID = -4206021311591459213L;
   *
   * @since 1.2
   */
-  public Font deriveFont (AffineTransform a)
-{
+  public Font deriveFont(AffineTransform a)
+  {
     if (a == null)
-      throw new IllegalArgumentException ("Affine transformation is null");
+      throw new IllegalArgumentException("Affine transformation is null");
 
-    return peer.deriveFont (this, a);
-}
+    return peer.deriveFont(this, a);
+  }
 
-/**
+  /**
   * Produces a new {@link Font} based on the current font, adjusted to a
   * new set of attributes.
   *
@@ -762,12 +760,12 @@ private static final long serialVersionUID = -4206021311591459213L;
   *
   * @since 1.2
   */
-  public Font deriveFont (Map attributes)
-{
-    return peer.deriveFont (this, attributes);
-}
+  public Font deriveFont(Map attributes)
+  {
+    return peer.deriveFont(this, attributes);
+  }
 
-/**
+  /**
   * Returns a map of chracter attributes which this font currently has set.
   *
   * @return A map of chracter attributes which this font currently has set.
@@ -776,12 +774,12 @@ private static final long serialVersionUID = -4206021311591459213L;
   * @see java.text.AttributedCharacterIterator.Attribute
   * @see java.awt.font.TextAttribute
   */
-  public Map getAttributes ()
-{
-    return peer.getAttributes (this);
-}
+  public Map getAttributes()
+  {
+    return peer.getAttributes(this);
+  }
 
-/**
+  /**
   * Returns an array of chracter attribute keys which this font understands. 
   *
   * @return An array of chracter attribute keys which this font understands.
@@ -791,11 +789,11 @@ private static final long serialVersionUID = -4206021311591459213L;
   * @see java.awt.font.TextAttribute
   */
   public AttributedCharacterIterator.Attribute[] getAvailableAttributes()
-{
-    return peer.getAvailableAttributes (this);
-}
+  {
+    return peer.getAvailableAttributes(this);
+  }
 
-/**
+  /**
   * Returns a baseline code (one of {@link #ROMAN_BASELINE}, {@link
   * #CENTER_BASELINE} or {@link #HANGING_BASELINE}) indicating which baseline
   * this font will measure baseline offsets for, when presenting glyph
@@ -816,12 +814,12 @@ private static final long serialVersionUID = -4206021311591459213L;
   *
   * @see LineMetrics#getBaselineOffsets()
   */
-  public byte getBaselineFor (char c)
-{
-    return peer.getBaselineFor (this, c);
-}
+  public byte getBaselineFor(char c)
+  {
+    return peer.getBaselineFor(this, c);
+  }
 
-/**
+  /**
   * Returns the family name of this font. A family name describes a
   * typographic style (such as Helvetica or Palatino). It is more specific
   * than a logical font name (such as Sans Serif) but less specific than a
@@ -839,12 +837,12 @@ private static final long serialVersionUID = -4206021311591459213L;
   * @see GraphicsEnvironment#getAvailableFontFamilyNames()
   * @see Locale
   */
-  public String getFamily (Locale lc)
-{
-    return peer.getFamily (this, lc); 
-}
+  public String getFamily(Locale lc)
+  {
+    return peer.getFamily(this, lc); 
+  }
 
-/**
+  /**
   * Returns a font appropriate for the given attribute set.
   *
   * @param attributes The attributes required for the new font.
@@ -855,12 +853,12 @@ private static final long serialVersionUID = -4206021311591459213L;
   *
   * @see java.awt.font.TextAttribute  
   */
-  public static Font getFont (Map attributes)
-{
-    return getFontFromToolkit (null, attributes);
-}
+  public static Font getFont(Map attributes)
+  {
+    return getFontFromToolkit(null, attributes);
+  }
 
-/**
+  /**
   * Returns the font face name of the font.  A font face name describes a
   * specific variant of a font family (such as Helvetica Bold). It is more
   * specific than both a font family name (such as Helvetica) and a logical
@@ -873,12 +871,12 @@ private static final long serialVersionUID = -4206021311591459213L;
   * @see #getName()
   * @see #getFamily()
   */
-  public String getFontName ()
-{
-    return peer.getFontName (this);
-}
+  public String getFontName()
+  {
+    return peer.getFontName(this);
+  }
 
-/**
+  /**
   * Returns the font face name of the font.  A font face name describes a
   * specific variant of a font family (such as Helvetica Bold). It is more
    * specific than both a font family name (such as Helvetica).
@@ -893,12 +891,12 @@ private static final long serialVersionUID = -4206021311591459213L;
   * @see #getName()
   * @see #getFamily()
   */
-  public String getFontName (Locale lc)
-{
-    return peer.getFontName (this, lc);
-}
+  public String getFontName(Locale lc)
+  {
+    return peer.getFontName(this, lc);
+  }
 
-/**
+  /**
   * Returns the italic angle of this font, a measurement of its slant when
   * style is {@link #ITALIC}. The precise meaning is the inverse slope of a
   * caret line which "best measures" the font's italic posture.
@@ -907,12 +905,12 @@ private static final long serialVersionUID = -4206021311591459213L;
   *
   * @see java.awt.font.TextAttribute#POSTURE
   */
-  public float getItalicAngle ()
-{
-    return peer.getItalicAngle (this);
-}
+  public float getItalicAngle()
+  {
+    return peer.getItalicAngle(this);
+  }
 
-/**
+  /**
   * Returns a {@link LineMetrics} object constructed with the specified
   * text and {@link FontRenderContext}. 
   *
@@ -928,12 +926,12 @@ private static final long serialVersionUID = -4206021311591459213L;
   */
   public LineMetrics getLineMetrics(String text, int begin, 
                                     int limit, FontRenderContext rc)
-{
-    return peer.getLineMetrics (this, new StringCharacterIterator (text), 
+  {
+    return peer.getLineMetrics(this, new StringCharacterIterator(text), 
                                 begin, limit, rc);
-}
+  }
 
-/**
+  /**
   * Returns a {@link LineMetrics} object constructed with the specified
   * text and {@link FontRenderContext}. 
   *
@@ -949,13 +947,13 @@ private static final long serialVersionUID = -4206021311591459213L;
   */
   public LineMetrics getLineMetrics(char[] chars, int begin, 
                                     int limit, FontRenderContext rc)
-{
+  {
     return peer.getLineMetrics(this,
                                new StringCharacterIterator(new String(chars)), 
                                 begin, limit, rc);
-}
+  }
 
-/**
+  /**
   * Returns a {@link LineMetrics} object constructed with the specified
   * text and {@link FontRenderContext}. 
   *
@@ -969,13 +967,13 @@ private static final long serialVersionUID = -4206021311591459213L;
   * @throws IndexOutOfBoundsException if the range [begin, limit] is
   * invalid in <code>ci</code>.
   */
-  public LineMetrics getLineMetrics (CharacterIterator ci, int begin, 
+  public LineMetrics getLineMetrics(CharacterIterator ci, int begin, 
                                      int limit, FontRenderContext rc)
-{
-    return peer.getLineMetrics (this, ci, begin, limit, rc);
-}
+  {
+    return peer.getLineMetrics(this, ci, begin, limit, rc);
+  }
 
-/**
+  /**
   * Returns the maximal bounding box of all the bounding boxes in this
   * font, when the font's bounding boxes are evaluated in a given {@link
   * FontRenderContext}
@@ -984,12 +982,12 @@ private static final long serialVersionUID = -4206021311591459213L;
   *
   * @return The maximal bounding box.
   */
-  public Rectangle2D getMaxCharBounds (FontRenderContext rc)
-{
-    return peer.getMaxCharBounds (this, rc);
-}
+  public Rectangle2D getMaxCharBounds(FontRenderContext rc)
+  {
+    return peer.getMaxCharBounds(this, rc);
+  }
 
-/**
+  /**
   * Returns the glyph code this font uses to represent missing glyphs. This
   * code will be present in glyph vectors when the font was unable to
   * locate a glyph to represent a particular character code.
@@ -998,12 +996,12 @@ private static final long serialVersionUID = -4206021311591459213L;
   *
   * @since 1.2
   */
-  public int getMissingGlyphCode ()
-{
-    return peer.getMissingGlyphCode (this);
-}
+  public int getMissingGlyphCode()
+  {
+    return peer.getMissingGlyphCode(this);
+  }
 
-/**
+  /**
   * Returns the overall number of glyphs in this font. This number is one
   * more than the greatest glyph code used in any glyph vectors this font
   * produces. In other words, glyph codes are taken from the range
@@ -1013,12 +1011,12 @@ private static final long serialVersionUID = -4206021311591459213L;
   * 
   * @since 1.2
   */
-  public int getNumGlyphs ()
-{
-    return peer.getMissingGlyphCode (this);
-}
+  public int getNumGlyphs()
+  {
+    return peer.getMissingGlyphCode(this);
+  }
 
-/**
+  /**
   * Returns the PostScript Name of this font.   
   *
   * @return The PostScript Name of this font.
@@ -1029,12 +1027,12 @@ private static final long serialVersionUID = -4206021311591459213L;
   * @see #getFamily()
   * @see #getFontName()
   */
-  public String getPSName ()
-{
-    return peer.getPostScriptName (this);
-}
+  public String getPSName()
+  {
+    return peer.getPostScriptName(this);
+  }
 
-/**
+  /**
   * Returns the logical bounds of the specified string when rendered with this
   * font in the specified {@link FontRenderContext}. This box will include the
   * glyph origin, ascent, advance, height, and leading, but may not include all
@@ -1049,12 +1047,12 @@ private static final long serialVersionUID = -4206021311591459213L;
   *
   * @see #createGlyphVector(FontRenderContext, String)
   */
-  public Rectangle2D getStringBounds (String str, FontRenderContext frc)
-{
-    return getStringBounds (str, 0, str.length () - 1, frc);
-}
+  public Rectangle2D getStringBounds(String str, FontRenderContext frc)
+  {
+    return getStringBounds(str, 0, str.length() - 1, frc);
+  }
 
-/**
+  /**
   * Returns the logical bounds of the specified string when rendered with this
   * font in the specified {@link FontRenderContext}. This box will include the
   * glyph origin, ascent, advance, height, and leading, but may not include all
@@ -1076,14 +1074,14 @@ private static final long serialVersionUID = -4206021311591459213L;
   *
   * @see #createGlyphVector(FontRenderContext, String)
   */
-  public Rectangle2D getStringBounds (String str, int begin, 
+  public Rectangle2D getStringBounds(String str, int begin, 
                                       int limit, FontRenderContext frc)
-{
+  {
     return peer.getStringBounds(this, new StringCharacterIterator(str), begin,
                                 limit, frc);
-}
+  }
 
-/**
+  /**
   * Returns the logical bounds of the specified string when rendered with this
   * font in the specified {@link FontRenderContext}. This box will include the
   * glyph origin, ascent, advance, height, and leading, but may not include all
@@ -1105,13 +1103,13 @@ private static final long serialVersionUID = -4206021311591459213L;
   *
   * @see #createGlyphVector(FontRenderContext, CharacterIterator)
   */
-  public Rectangle2D getStringBounds (CharacterIterator ci, int begin, 
+  public Rectangle2D getStringBounds(CharacterIterator ci, int begin, 
                                       int limit, FontRenderContext frc)
-{
-    return peer.getStringBounds (this, ci, begin, limit, frc);
-}
+  {
+    return peer.getStringBounds(this, ci, begin, limit, frc);
+  }
 
-/**
+  /**
   * Returns the logical bounds of the specified string when rendered with this
   * font in the specified {@link FontRenderContext}. This box will include the
   * glyph origin, ascent, advance, height, and leading, but may not include all
@@ -1133,26 +1131,26 @@ private static final long serialVersionUID = -4206021311591459213L;
   *
   * @see #createGlyphVector(FontRenderContext, char[])
   */
-  public Rectangle2D getStringBounds (char[] chars, int begin, 
+  public Rectangle2D getStringBounds(char[] chars, int begin, 
                                       int limit, FontRenderContext frc)
-{
+  {
     return peer.getStringBounds(this,
                                 new StringCharacterIterator(new String(chars)), 
                                  begin, limit, frc);
-}
+  }
 
-/**
+  /**
   * Returns a copy of the affine transformation this font is currently
   * subject to, if any.
   *
   * @return The current transformation.
  */
-  public AffineTransform getTransform ()
-{
-    return peer.getTransform (this);
-}
+  public AffineTransform getTransform()
+  {
+    return peer.getTransform(this);
+  }
 
-/**
+  /**
   * Indicates whether this font's line metrics are uniform. A font may be
   * composed of several "subfonts", each covering a different code range,
   * and each with their own line metrics. A font with no subfonts, or
@@ -1164,24 +1162,24 @@ private static final long serialVersionUID = -4206021311591459213L;
   * @see LineMetrics
   * @see #getLineMetrics(String, FontRenderContext)
   */
-  public boolean hasUniformLineMetrics ()
-{
-    return peer.hasUniformLineMetrics (this);
-}
+  public boolean hasUniformLineMetrics()
+  {
+    return peer.hasUniformLineMetrics(this);
+  }
 
-/**
+  /**
   * Indicates whether this font is subject to a non-identity affine
   * transformation.
   *
   * @return <code>true</code> iff the font has a non-identity affine
   * transformation applied to it.
   */
-  public boolean isTransformed ()
-{
-    return peer.isTransformed (this);
-}
+  public boolean isTransformed()
+  {
+    return peer.isTransformed(this);
+  }
 
-/**
+  /**
   * Produces a glyph vector representing a full layout fo the specified
   * text in this font. Full layouts may include complex shaping and
   * reordering operations, for scripts such as Arabic or Hindi.
@@ -1208,39 +1206,39 @@ private static final long serialVersionUID = -4206021311591459213L;
   * @throws IndexOutOfBoundsException if the range [begin, limit] is
   * invalid in <code>chars</code>. 
   */
-  public GlyphVector layoutGlyphVector (FontRenderContext frc, 
+  public GlyphVector layoutGlyphVector(FontRenderContext frc, 
                                         char[] chars, int start, 
                                         int limit, int flags)
-{
-    return peer.layoutGlyphVector (this, frc, chars, start, limit, flags);
-}
+  {
+    return peer.layoutGlyphVector(this, frc, chars, start, limit, flags);
+  }
 
 
-/**
+  /**
 	  * Returns a native peer object for this font.
 	  *
 	  * @return A native peer object for this font.
   *
   * @deprecated
 	  */
-  public FontPeer getPeer ()
-{
+  public FontPeer getPeer()
+  {
     return peer;
-}
+  }
 
 
-/**
+  /**
 	  * Returns a hash value for this font.
 	  * 
 	  * @return A hash for this font.
 	  */
   public int hashCode()
-{
+  {
     return this.toString().hashCode();
-}
+  }
 
 
-/**
+  /**
 	  * Tests whether or not the specified object is equal to this font.  This
 	  * will be true if and only if:
 	  * <P>
@@ -1254,14 +1252,14 @@ private static final long serialVersionUID = -4206021311591459213L;
 	  * object, <code>false</code> otherwise.
 	  */
   public boolean equals(Object obj)
-{
+  {
 		if (obj == null)
       return false;
 
-		if (!(obj instanceof Font))
+    if (! (obj instanceof Font))
       return false;
 
-  Font f = (Font)obj;
+    Font f = (Font) obj;
 
     return (f.getName().equals(this.getName())
             && f.getFamily().equals(this.getFamily())
@@ -1269,18 +1267,18 @@ private static final long serialVersionUID = -4206021311591459213L;
             && f.getTransform().equals(this.getTransform ())
             && f.getSize() == this.getSize()
             && f.getStyle() == this.getStyle());
-} 
+  }
 
-/**
+  /**
 	  * Returns a string representation of this font.
 	  *
 	  * @return A string representation of this font.
 	  */
   public String toString()
-{
+  {
   String styleString = "";
 
-  switch (getStyle ())
+    switch (getStyle())
     {
     case 0:
       styleString = "plain";
@@ -1295,12 +1293,12 @@ private static final long serialVersionUID = -4206021311591459213L;
       styleString = "unknown";
     }
 
-  return getClass ().getName () 
+    return getClass().getName() 
     + "[family=" + getFamily ()
     + ",name=" + getFontName ()
     + ",style=" + styleString
     + ",size=" + getSize () + "]";
-}
+  }
 
 
 	/**
@@ -1323,7 +1321,7 @@ private static final long serialVersionUID = -4206021311591459213L;
 	 */
   public LineMetrics getLineMetrics(String str, FontRenderContext frc)
   {
-    return getLineMetrics (str, 0, str.length () - 1, frc);
+    return getLineMetrics(str, 0, str.length() - 1, frc);
 	}
 
   /**
