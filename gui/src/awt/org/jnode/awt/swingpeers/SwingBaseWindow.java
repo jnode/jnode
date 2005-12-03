@@ -10,6 +10,7 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.VMAwtAPI;
 import java.awt.Window;
+import java.awt.BorderLayout;
 
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
@@ -165,7 +166,10 @@ abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBase
          * @see javax.swing.JRootPane#createContentPane()
          */
         protected Container createContentPane() {
-            return new ContentPane();
+            ContentPane p = new ContentPane();
+            p.setName(this.getName() + ".contentPane");
+            p.setLayout(new BorderLayout());
+            return p;
         }
     }
 }
