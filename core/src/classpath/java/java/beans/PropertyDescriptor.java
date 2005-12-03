@@ -61,7 +61,6 @@ import java.lang.reflect.Method;
  ** @since 1.1
  ** @status updated to 1.4
  **/
-
 public class PropertyDescriptor extends FeatureDescriptor
 {
   Class propertyType;

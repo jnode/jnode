@@ -252,7 +252,7 @@ public class PortableRemoteObjectDelegateImpl
       {
         narrowed = narrowTo.newInstance();
       }
-    catch(Exception e)
+    catch (Exception e)
       {
         ClassCastException cex = new ClassCastException("Cannot instantiate "
           + narrowTo.getName());

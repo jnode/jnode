@@ -518,7 +518,7 @@ public class UtilDelegateImpl
     else if (ex instanceof INV_OBJREF)
   {
         rex = new NoSuchObjectException(message);
-        rex.initCause(ex);
+        rex.detail = ex;
   }
     else if (ex instanceof NO_PERMISSION)
       rex = new AccessException(message, ex);
@@ -529,22 +529,22 @@ public class UtilDelegateImpl
     else if (ex instanceof OBJECT_NOT_EXIST)
       {
         rex = new NoSuchObjectException(message);
-        rex.initCause(ex);
+        rex.detail = ex;
       }
     else if (ex instanceof TRANSACTION_REQUIRED)
       {
         rex = new TransactionRequiredException(message);
-        rex.initCause(ex);
+        rex.detail = ex;
       }
     else if (ex instanceof TRANSACTION_ROLLEDBACK)
   {
         rex = new TransactionRolledbackException(message);
-        rex.initCause(ex);
+        rex.detail = ex;
   }
     else if (ex instanceof INVALID_TRANSACTION)
       {
         rex = new InvalidTransactionException(message);
-        rex.initCause(ex);
+        rex.detail = ex;
       }
     else if (ex instanceof UNKNOWN)
       rex = wrapException(ex.getCause());

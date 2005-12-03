@@ -96,7 +96,7 @@ public class DelegateFactory
         Class dclass = ObjectCreator.forName(dcname);
         return dclass.newInstance();
       }
-    catch(Exception e)
+    catch (Exception e)
       {
         InternalError ierr = new InternalError("Exception when trying to get "
           + type + "delegate instance:" + dcname);
