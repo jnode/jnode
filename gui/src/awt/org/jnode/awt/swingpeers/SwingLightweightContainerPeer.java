@@ -24,6 +24,7 @@ package org.jnode.awt.swingpeers;
 import java.awt.AWTEvent;
 import java.awt.Container;
 import java.awt.Insets;
+import java.awt.Graphics;
 import java.awt.peer.LightweightPeer;
 
 import javax.swing.JComponent;
@@ -48,6 +49,10 @@ final class SwingLightweightContainerPeer extends
             containerInsets = new Insets(0, 0, 0, 0);
         }
         return containerInsets;
+    }
+
+    public Graphics getGraphics() {
+        return null;
     }
 
 }
