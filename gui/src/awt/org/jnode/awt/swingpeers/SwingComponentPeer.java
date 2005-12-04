@@ -156,8 +156,29 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
             throw new Error();
         }
         */
-        //TODO review this !!! 
-        return new JNodeGraphics(this);
+        //TODO review this !!!
+        final int x = peerComponent.getX();
+        final int y = peerComponent.getY();
+        final int width = peerComponent.getWidth();
+        final int height = peerComponent.getHeight();
+        JNodeGraphics g = new JNodeGraphics(this);
+        g.translate(x,y);
+        g.clipRect(0, 0, width, height);
+
+        /*
+        Throwable t = new Throwable();
+        StackTraceElement[] st = t.getStackTrace();
+        for(StackTraceElement ste : st){
+            if(ste.getClassName().contains("BoxWorld") && ste.getMethodName().equals("changeState")){
+                System.out.println("SwingComponent.getGraphics");
+                t.printStackTrace(System.out);
+                System.out.println("target compoennt: " + targetComponent);
+                System.out.println("peer compoennt: " + peerComponent);
+            }
+        }
+        */
+
+        return g;
     }
 
     public final GraphicsConfiguration getGraphicsConfiguration() {
