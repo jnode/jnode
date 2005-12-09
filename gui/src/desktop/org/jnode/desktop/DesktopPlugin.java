@@ -50,7 +50,7 @@ public class DesktopPlugin extends Plugin {
 	 * @see org.jnode.plugin.Plugin#startPlugin()
 	 */
 	protected void startPlugin() throws PluginException {
-		System.setProperty("jnode.desktop", "org.jnode.desktop.Desktop");
+		System.setProperty("jnode.desktop", "org.jnode.desktop.classic.Desktop");
 	}
 
 	/**
