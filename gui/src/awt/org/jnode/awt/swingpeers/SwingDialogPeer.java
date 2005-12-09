@@ -32,10 +32,16 @@ import java.awt.peer.DialogPeer;
 final class SwingDialogPeer extends SwingBaseWindowPeer<Dialog, SwingDialog>
         implements DialogPeer, ISwingContainerPeer {
 
-	public SwingDialogPeer(SwingToolkit toolkit, Dialog target) {
+    public SwingDialogPeer(SwingToolkit toolkit, Dialog target) {
         super(toolkit, target, new SwingDialog(target));
         setTitle(target.getTitle());
-	}
+        setResizable(target.isResizable());
+        peerComponent.setIconifiable(true);
+        peerComponent.setMaximizable(true);
+        peerComponent.setClosable(true);
+        peerComponent.setTitle(target.getTitle());
+        addToDesktop();
+    }
 
     /**
      * @see org.jnode.awt.swingpeers.SwingBaseWindowPeer#setTitle(java.lang.String)
