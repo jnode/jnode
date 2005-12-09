@@ -63,6 +63,7 @@ public class TaskBar extends JPanel {
 
         JMenu swingMenu = new JMenu("Swing tests");
         startMenu.add(swingMenu);
+        swingMenu.add(createMenuItem("Editor", "org.jnode.test.gui.Editor"));
         swingMenu.add(createMenuItem("SwingTest", "org.jnode.test.gui.SwingTest"));
         swingMenu.add(createMenuItem("JTableTest", "org.jnode.test.gui.JTableTest"));
         swingMenu.add(createMenuItem("JTreeTest", "org.jnode.test.gui.JTreeTest"));
