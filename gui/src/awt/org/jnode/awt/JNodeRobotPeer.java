@@ -3,25 +3,14 @@
  */
 package org.jnode.awt;
 
-import java.awt.GraphicsDevice;
-import java.awt.Rectangle;
-import java.awt.event.InputEvent;
-import java.awt.image.PixelGrabber;
-import java.awt.peer.RobotPeer;
-import java.util.Collection;
-
-import org.jnode.awt.image.JNodeImage;
-import org.jnode.driver.ApiNotFoundException;
-import org.jnode.driver.Device;
-import org.jnode.driver.DeviceNotFoundException;
-import org.jnode.driver.DeviceUtils;
 import org.jnode.driver.input.KeyboardAPI;
 import org.jnode.driver.input.KeyboardEvent;
 import org.jnode.driver.input.KeyboardInterpreter;
-import org.jnode.driver.input.KeyboardListener;
-import org.jnode.driver.input.PointerAPI;
-import org.jnode.driver.input.PointerEvent;
-import org.jnode.shell.help.ParsedArguments;
+
+import java.awt.GraphicsDevice;
+import java.awt.Rectangle;
+import java.awt.event.InputEvent;
+import java.awt.peer.RobotPeer;
 
 /**
  * @author Levente S\u00e1ntha
