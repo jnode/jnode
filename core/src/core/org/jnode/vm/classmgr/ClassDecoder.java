@@ -55,6 +55,8 @@ public final class ClassDecoder {
     // VM ClassLoader Code
     // ------------------------------------------
 
+    private static char[] SourceFile;
+
     private static char[] CodeAttrName;
 
     private static char[] ConstantValueAttrName;
@@ -180,6 +182,7 @@ public final class ClassDecoder {
         if (ConstantValueAttrName == null) {
             ConstantValueAttrName = "ConstantValue".toCharArray();
             CodeAttrName = "Code".toCharArray();
+            SourceFile = "SourceFile".toCharArray();
             ExceptionsAttrName = "Exceptions".toCharArray();
             LineNrTableAttrName = "LineNumberTable".toCharArray();
             LocalVariableTableAttrName = "LocalVariableTable".toCharArray();
@@ -398,6 +401,7 @@ public final class ClassDecoder {
         final int acount = data.getChar();
         VmAnnotation[] rVisAnn = null;
         VmAnnotation[] rInvisAnn = null;
+        String sourceFile = null;
         for (int a = 0; a < acount; a++) {
             final String attrName = cp.getUTF8(data.getChar());
             final int length = data.getInt();
@@ -406,11 +410,14 @@ public final class ClassDecoder {
             } else if (VmArray.equals(RuntimeInvisibleAnnotationsAttrName,
                     attrName)) {
                 rInvisAnn = readRuntimeAnnotations(data, cp, false);
+            } else if (VmArray.equals(SourceFile, attrName)) {
+                sourceFile = cp.getUTF8(data.getChar());
             } else {
                 skip(data, length);
             }
         }
         cls.setRuntimeAnnotations(rVisAnn);
+        cls.setSourceFile(sourceFile);
         if (rInvisAnn != null) {
             cls.addPragmaFlags(getClassPragmaFlags(rInvisAnn, clsName));
         }
