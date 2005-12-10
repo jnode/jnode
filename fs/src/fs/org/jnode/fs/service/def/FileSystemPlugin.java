@@ -213,7 +213,7 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
             throws FileSystemException {
         FileSystemType result = fsTypeManager.getSystemType(name);
         if (result == null) { throw new FileSystemException(
-                "Not existent FisleSystemType"); }
+                "FileSystemType " + name + " doesn't exist"); }
         return result;
     }
 }
