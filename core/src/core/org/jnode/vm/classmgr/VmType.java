@@ -65,7 +65,10 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 	/** The name of this class */
 	private String name;
 
-	/** All methods and constructors declared in this class */
+    /** The the source file name of this class */
+	private String sourceFile;
+
+    /** All methods and constructors declared in this class */
 	private VmMethod[] methodTable;
 
 	/** All fields declared in this class */
@@ -2208,5 +2211,13 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
      */
     final char getPragmaFlags() {
         return this.pragmaFlags;
+    }
+
+    public String getSourceFile() {
+        return sourceFile;
+    }
+
+    public void setSourceFile(String sourceFile) {
+        this.sourceFile = sourceFile;
     }
 }
