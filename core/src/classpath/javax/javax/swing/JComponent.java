@@ -45,7 +45,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.FlowLayout;
 import java.awt.FocusTraversalPolicy;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -621,7 +620,6 @@ public abstract class JComponent extends Container implements Serializable
   public JComponent()
   {
     super();
-    super.setLayout(new FlowLayout());
     setDropTarget(new DropTarget());
     defaultLocale = Locale.getDefault();
     debugGraphicsOptions = DebugGraphics.NONE_OPTION;
@@ -2740,7 +2738,7 @@ public abstract class JComponent extends Container implements Serializable
    */
   public void updateUI()
   {
-    System.out.println("update UI not overwritten in class: " + this);
+    // Nothing to do here.
   }
 
   public static Locale getDefaultLocale()
