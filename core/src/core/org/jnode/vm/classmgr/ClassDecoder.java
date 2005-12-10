@@ -124,7 +124,7 @@ public final class ClassDecoder {
      * 
      * @param value
      * @param alignment
-     * @return
+     * @return the new value
      */
     private static final int align(int value, int alignment) {
         while ((value % alignment) != 0) {
@@ -137,7 +137,6 @@ public final class ClassDecoder {
      * Is the given type of the BOOT_TYPES classes.
      * 
      * @param type
-     * @return
      */
     private static final boolean isBootType(VmType< ? > type) {
         final String typeName = type.getName();
@@ -201,10 +200,9 @@ public final class ClassDecoder {
      * Decode a given class.
      * 
      * @param data
-     * @param offset
-     * @param class_image_length
      * @param rejectNatives
      * @param clc
+     * @param protectionDomain
      * @return The decoded class
      * @throws ClassFormatError
      */
@@ -443,19 +441,16 @@ public final class ClassDecoder {
      * 
      * @param className
      * @param data
-     * @param offset
-     * @param class_image_length
      * @param rejectNatives
      * @param clc
+     * @param protectionDomain
      * @return The defined class
      */
     public static final VmType defineClass(String className, ByteBuffer data,
             boolean rejectNatives, VmClassLoader clc,
             ProtectionDomain protectionDomain) {
         cl_init();
-        final VmType cls = decodeClass(data, rejectNatives, clc,
-                protectionDomain);
-        return cls;
+        return decodeClass(data, rejectNatives, clc, protectionDomain);
     }
 
     /**
@@ -463,7 +458,7 @@ public final class ClassDecoder {
      * 
      * @param method
      * @param cl
-     * @return
+     * @return the bytecode
      */
     private static VmByteCode getNativeCodeReplacement(VmMethod method,
             VmClassLoader cl, boolean verbose) {
@@ -516,7 +511,7 @@ public final class ClassDecoder {
     /**
      * Decode the data of a code-attribute
      * 
-     * @param reader
+     * @param data
      * @param cls
      * @param cp
      * @param method
@@ -564,7 +559,7 @@ public final class ClassDecoder {
     /**
      * Decode the data of a Exceptions attribute
      * 
-     * @param reader
+     * @param data
      * @param cls
      * @param cp
      * @return The read exceptions
@@ -613,10 +608,10 @@ public final class ClassDecoder {
     /**
      * Read the fields table
      * 
-     * @param reader
-     * @param cls
+     * @param data
      * @param cp
      * @param slotSize
+     * @param pragmaFlags
      */
     private static FieldData[] readFields(ByteBuffer data, VmCP cp,
             int slotSize, int pragmaFlags) {
@@ -663,10 +658,12 @@ public final class ClassDecoder {
     /**
      * Read the fields table
      * 
-     * @param reader
      * @param cls
-     * @param cp
+     * @param fieldDatas
+     * @param sharedStatics
+     * @param isolatedStatics
      * @param slotSize
+     * @param pragmaFlags
      */
     private static void createFields(VmType< ? > cls, FieldData[] fieldDatas,
             VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics,
@@ -804,8 +801,7 @@ public final class ClassDecoder {
 
         // Align the instance fields for minimal object size.
         if ((pragmaFlags & TypePragmaFlags.NO_FIELD_ALIGNMENT) == 0) {
-            final int alignedObjectSize = alignInstanceFields(ftable, slotSize);
-            objectSize = alignedObjectSize;
+            objectSize = alignInstanceFields(ftable, slotSize);
         }
 
         cls.setFieldTable(ftable);
@@ -817,7 +813,7 @@ public final class ClassDecoder {
     /**
      * Read the interfaces table
      * 
-     * @param reader
+     * @param data
      * @param cls
      * @param cp
      * @return Some flags
@@ -846,7 +842,7 @@ public final class ClassDecoder {
     /**
      * Decode the data of a LineNumberTable-attribute
      * 
-     * @param reader
+     * @param data
      * @return The line number map
      */
     private static final VmLineNumberMap readLineNrTable(ByteBuffer data) {
@@ -865,7 +861,8 @@ public final class ClassDecoder {
     /**
      * Decode the data of a LocalVariable-attribute
      * 
-     * @param reader
+     * @param data
+     * @param cp
      * @return The line number map
      */
     private static final VmLocalVariableTable readLocalVariableTable(ByteBuffer data, VmCP cp) {
@@ -892,10 +889,12 @@ public final class ClassDecoder {
     /**
      * Read the method table
      * 
-     * @param reader
+     * @param data
      * @param rejectNatives
      * @param cls
      * @param cp
+     * @param statics
+     * @param cl
      */
     private static void readMethods(ByteBuffer data, boolean rejectNatives,
             VmType cls, VmCP cp, VmStatics statics, VmClassLoader cl) {
@@ -1014,8 +1013,8 @@ public final class ClassDecoder {
     /**
      * Combine the pragma flags for a given list of annotations.
      * 
-     * @param data
-     * @param cp
+     * @param annotations
+     * @param className
      */
     private static int getMethodPragmaFlags(VmAnnotation[] annotations, String className) {
         int flags = 0;
@@ -1034,8 +1033,8 @@ public final class ClassDecoder {
     /**
      * Combine the pragma flags for a given list of annotations.
      * 
-     * @param data
-     * @param cp
+     * @param annotations
+     * @param className
      */
     private static int getClassPragmaFlags(VmAnnotation[] annotations, String className) {
         int flags = 0;
