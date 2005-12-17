@@ -1294,7 +1294,7 @@ public abstract class JComponent extends Container implements Serializable
   {
     Dimension prefSize = null;
     if (preferredSize != null)
-      prefSize = preferredSize;
+      prefSize = new Dimension(preferredSize);
 
     else if (ui != null)
       {
@@ -1305,12 +1305,7 @@ public abstract class JComponent extends Container implements Serializable
 
     if (prefSize == null)
       prefSize = super.getPreferredSize();
-    // make sure that prefSize is not smaller than minSize
-    if (minimumSize != null && prefSize != null
-        && (minimumSize.width > prefSize.width
-            || minimumSize.height > prefSize.height))
-        prefSize = new Dimension(Math.max(minimumSize.width, prefSize.width),
-                                 Math.max(minimumSize.height, prefSize.height));
+
     return prefSize;
   }
 

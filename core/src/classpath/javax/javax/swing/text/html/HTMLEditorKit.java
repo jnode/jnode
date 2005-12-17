@@ -38,6 +38,7 @@ exception statement from your version. */
 
 package javax.swing.text.html;
 
+
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -47,6 +48,7 @@ import java.awt.Cursor;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
+import java.io.StringReader;
 import java.io.Writer;
 
 import javax.accessibility.Accessible;
@@ -59,13 +61,16 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.BoxView;
 import javax.swing.text.ComponentView;
 import javax.swing.text.Document;
+import javax.swing.text.EditorKit;
 import javax.swing.text.Element;
 import javax.swing.text.IconView;
 import javax.swing.text.LabelView;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.ParagraphView;
 import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
 import javax.swing.text.StyledEditorKit;
+import javax.swing.text.TextAction;
 import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
 import javax.swing.text.html.parser.ParserDelegator;
@@ -92,7 +97,7 @@ public class HTMLEditorKit
        */
       public LinkController() 
       {
-        // FIXME: Anything to do here?
+        super();
       }
       
       /**
@@ -104,6 +109,10 @@ public class HTMLEditorKit
        */
       public void mouseClicked(MouseEvent e)
       {
+        /*
+         These MouseInputAdapter methods generate mouse appropriate events around
+         hyperlinks (entering, exiting, and activating).
+         */
         // FIXME: Not implemented.
       }
       
@@ -114,6 +123,10 @@ public class HTMLEditorKit
        */
       public void mouseDragged(MouseEvent e)
       {
+        /*
+        These MouseInputAdapter methods generate mouse appropriate events around
+        hyperlinks (entering, exiting, and activating).
+        */
         // FIXME: Not implemented.        
       }
       
@@ -124,6 +137,10 @@ public class HTMLEditorKit
        */
       public void mouseMoved(MouseEvent e)
       {
+        /*
+        These MouseInputAdapter methods generate mouse appropriate events around
+        hyperlinks (entering, exiting, and activating).
+        */
         // FIXME: Not implemented.
       }
       
@@ -138,6 +155,10 @@ public class HTMLEditorKit
       protected void activateLink(int pos,
                                   JEditorPane editor)
       {
+        /*
+          This method creates and fires a HyperlinkEvent if the document is an
+          instance of HTMLDocument and the href tag of the link is not null.
+         */
         // FIXME: Not implemented.
       }
     }
@@ -209,6 +230,8 @@ public class HTMLEditorKit
                                   HTML.Tag alternateAddTag) 
       {
         super(name);
+        // Fields are for easy access when the action is applied to an actual
+        // document.
         this.html = html;
         this.parentTag = parentTag;
         this.addTag = addTag;
@@ -236,9 +259,8 @@ public class HTMLEditorKit
        * @param addTag -
        *          the first tag to start inserting into document
        */
-      protected void insertHTML(JEditorPane editor, HTMLDocument doc,
-                                int offset, String html,
-                                int popDepth, int pushDepth,
+      protected void insertHTML(JEditorPane editor, HTMLDocument doc, int offset,
+                              String html, int popDepth, int pushDepth,
                                 HTML.Tag addTag)
       {
         try 
@@ -246,9 +268,14 @@ public class HTMLEditorKit
           super.getHTMLEditorKit(editor).insertHTML(doc, offset, html,
                                                     popDepth, pushDepth, addTag);
         }
-        catch (Exception e)
+        catch (IOException e)
+          {
+            throw (RuntimeException) new RuntimeException("Parser is null.").initCause(e);
+          }
+        catch (BadLocationException ex)
         {
-          throw new RuntimeException(e);
+            throw (RuntimeException) new RuntimeException("BadLocationException: "
+                                              + offset).initCause(ex);
         }
       }
       
@@ -257,15 +284,20 @@ public class HTMLEditorKit
        * and then the number of pushes that need to be performed. The it calls
        * insertHTML.
        * 
-       * @param editor - the editor to use to get the editorkit
+       * @param editor -
+       *          the editor to use to get the editorkit
        * @param doc -
        *          the Document to insert the HTML into.
        * @param offset -
        *          where to begin inserting the HTML.
-       * @param insertElement - the element to insert
-       * @param html - the html to insert
-       * @param parentTag - the parent tag
-       * @param addTag - the first tag
+       * @param insertElement -
+       *          the element to insert
+       * @param html -
+       *          the html to insert
+       * @param parentTag -
+       *          the parent tag
+       * @param addTag -
+       *          the first tag
        */
       protected void insertAtBoundary(JEditorPane editor,
                                       HTMLDocument doc, int offset,
@@ -273,7 +305,18 @@ public class HTMLEditorKit
                                       String html, HTML.Tag parentTag,
                                       HTML.Tag addTag)
       {
-        // FIXME: Not implemented.
+        /*
+        As its name implies, this protected method is used when HTML is inserted at a
+        boundary. (A boundary in this case is an offset in doc that exactly matches the
+        beginning offset of the parentTag.) It performs the extra work required to keep
+        the tag stack in shape and then calls insertHTML(). The editor and doc argu-
+        ments are the editor pane and document where the HTML should go. The offset
+        argument represents the cursor location or selection start in doc. The insert-
+        Element and parentTag arguments are used to calculate the proper number of
+        tag pops and pushes before inserting the HTML (via html and addTag, which are
+        passed directly to insertHTML()).
+        */
+        // FIXME: not implemented
       }
       
       /**
@@ -310,13 +353,21 @@ public class HTMLEditorKit
        */
       public void actionPerformed(ActionEvent ae)
       {
-        // FIXME: Not implemented.
+        Object source = ae.getSource();
+        if (source instanceof JEditorPane)
+          {
+            JEditorPane pane = ((JEditorPane) source);
+            Document d = pane.getDocument();
+            if (d instanceof HTMLDocument)
+              insertHTML(pane, (HTMLDocument) d, 0, html, 0, 0, addTag);
+            // FIXME: is this correct parameters?
+          }
+        // FIXME: else not implemented
       }
     }
   
   /**
-   * Abstract Action class that helps inserting HTML
-   * into an existing document.
+   * Abstract Action class that helps inserting HTML into an existing document.
    */
   public abstract static class HTMLTextAction
     extends StyledEditorKit.StyledTextAction
@@ -338,7 +389,10 @@ public class HTMLEditorKit
        */
       protected HTMLDocument getHTMLDocument(JEditorPane e)
       {
-        return (HTMLDocument) e.getDocument();
+        Document d = e.getDocument();
+        if (d instanceof HTMLDocument)
+          return (HTMLDocument) d;
+        throw new IllegalArgumentException("Document is not a HTMLDocument.");
       }
       
       /**
@@ -349,7 +403,10 @@ public class HTMLEditorKit
        */
       protected HTMLEditorKit getHTMLEditorKit(JEditorPane e) 
       {
-        return (HTMLEditorKit) e.getEditorKit();
+        EditorKit d = e.getEditorKit();
+        if (d instanceof HTMLEditorKit)
+          return (HTMLEditorKit) d;
+        throw new IllegalArgumentException("EditorKit is not a HTMLEditorKit.");
       }
       
       /**
@@ -363,28 +420,27 @@ public class HTMLEditorKit
       protected Element[] getElementsAt(HTMLDocument doc,
                                         int offset)
       {
-        // More efficent than using a Vector
-        Element[] roots = doc.getRootElements();
-        int size = 0;
-        int rootSize = roots.length;
+        return getElementsAt(doc.getDefaultRootElement(), offset, 0);
+      }
         
-        // Get total size
-        for (int i = 0; i < rootSize; i++)
-          size += roots[i].getElementCount() + 1;
-        
-        Element[] elements = new Element[size];
-        
-        // Add all roots to the array first
-        for (int j = 0; j < rootSize; j++)
-          elements[j] = roots[j];
-        
-        // Add all the children of the roots
-        for (int k = 0; k < rootSize; k++)
+      /**
+       * Helper function to get all elements using recursion.
+       */
+      private Element[] getElementsAt(Element root, int offset, int depth)
+      {
+        Element[] elements = null;
+        if (root != null)
           {
-            Element current = roots[k];
-            elements[k] = current.getElement(current.getElementIndex(offset));
+            if (root.isLeaf())
+              {
+                elements = new Element[depth + 1];
+                elements[depth] = root;
+                return elements;
+              }
+            elements = getElementsAt(root.getElement(root.getElementIndex(offset)),
+                                     offset, depth + 1);
+            elements[depth] = root;
           }
-        
         return elements;
       }
       
@@ -393,16 +449,31 @@ public class HTMLEditorKit
        * to get an element representing tag. -1 if no elements are found, 0 if
        * the parent of the leaf at offset represents the tag.
        * 
-       * @param doc - the document to search
-       * @param offset - the offset to check
-       * @param tag - the tag to look for
-       * @return - the number of elements needed to get an element representing tag.
+       * @param doc -
+       *          the document to search
+       * @param offset -
+       *          the offset to check
+       * @param tag -
+       *          the tag to look for
+       * @return - the number of elements needed to get an element representing
+       *         tag.
        */
       protected int elementCountToTag(HTMLDocument doc,
                                       int offset, HTML.Tag tag)
       {
-        // FIXME: Not implemented.
-        return -1;
+        Element root = doc.getDefaultRootElement();
+        int num = -1;
+        Element next = root.getElement(root.getElementIndex(offset));
+        
+        while (!next.isLeaf())
+          {
+            num++;
+            if (next.getAttributes().
+                getAttribute(StyleConstants.NameAttribute).equals(tag))
+              return num;
+            next = next.getElement(next.getElementIndex(offset));
+          }
+        return num;
       }
       
       /**
@@ -417,8 +488,19 @@ public class HTMLEditorKit
       protected Element findElementMatchingTag(HTMLDocument doc,
                                                int offset, HTML.Tag tag)
       {
-        // FIXME: Not implemented.
-        return null;
+        Element element = doc.getDefaultRootElement();
+        Element tagElement = null;
+        
+        while (element != null)
+          {
+            Object otag = element.getAttributes().getAttribute(
+                                     StyleConstants.NameAttribute);
+            if (otag instanceof HTML.Tag && otag.equals(tag))
+              tagElement = element;
+            element = element.getElement(element.getElementIndex(offset));
+          }
+        
+        return tagElement;
       }
     }
   
@@ -429,6 +511,15 @@ public class HTMLEditorKit
   public static class HTMLFactory
     implements ViewFactory
   {
+    
+    /**
+     * Constructor
+     */
+    public HTMLFactory()
+    {
+      // Do Nothing here.
+    }
+    
     /**
      * Creates a {@link View} for the specified <code>Element</code>.
      *
@@ -542,7 +633,7 @@ public class HTMLEditorKit
      */
     public ParserCallback()
     {
-      // TODO: What to do here, if anything?
+      // Nothing to do here.
     }
     
     /**
@@ -550,7 +641,7 @@ public class HTMLEditorKit
      */
     public void flush() throws BadLocationException
     {
-      // TODO: What to do here, if anything?
+      // Nothing to do here.
     }
 
     /**
@@ -560,7 +651,7 @@ public class HTMLEditorKit
      */
     public void handleComment(char[] comment, int position)
     {
-      // TODO: What to do here, if anything?
+      // Nothing to do here.
     }
 
     /**
@@ -571,7 +662,7 @@ public class HTMLEditorKit
      */
     public void handleEndOfLineString(String end_of_line)
     {
-      // TODO: What to do here, if anything?
+      // Nothing to do here.
     }
 
     /**
@@ -583,7 +674,7 @@ public class HTMLEditorKit
      */
     public void handleEndTag(HTML.Tag tag, int position)
     {
-      // TODO: What to do here, if anything?
+      // Nothing to do here.
     }
 
     /**
@@ -594,7 +685,7 @@ public class HTMLEditorKit
      */
     public void handleError(String message, int position)
     {
-      // TODO: What to do here, if anything?
+      // Nothing to do here.
     }
 
     /**
@@ -607,7 +698,7 @@ public class HTMLEditorKit
     public void handleSimpleTag(HTML.Tag tag, MutableAttributeSet attributes,
                                 int position)
     {
-      // TODO: What to do here, if anything?
+      // Nothing to do here.
     }
 
     /**
@@ -620,7 +711,7 @@ public class HTMLEditorKit
     public void handleStartTag(HTML.Tag tag, MutableAttributeSet attributes,
                                int position)
     {
-      // TODO: What to do here, if anything?
+      // Nothing to do here.
     }
 
     /**
@@ -630,7 +721,7 @@ public class HTMLEditorKit
      */
     public void handleText(char[] text, int position)
     {
-      // TODO: What to do here, if anything?
+      // Nothing to do here.
     }
   }
 
@@ -706,6 +797,18 @@ public class HTMLEditorKit
   public static final String PARA_INDENT_RIGHT = "html-para-indent-right";
   
   /**
+   * Actions for HTML 
+   */
+  private static final Action[] defaultActions = {
+    // FIXME: Add default actions for html
+  };
+  
+  /**
+   * The current style sheet.
+   */
+  StyleSheet styleSheet;
+  
+  /**
    * The ViewFactory for HTMLFactory.
    */
   HTMLFactory viewFactory;
@@ -720,6 +823,42 @@ public class HTMLEditorKit
    */
   Cursor defaultCursor;
     
+  /**
+   * The parser.
+   */
+  Parser parser;
+  
+  /**
+   * The mouse listener used for links.
+   */
+  LinkController mouseListener;
+  
+  /**
+   * Style context for this editor.
+   */
+  StyleContext styleContext;
+  
+  /** The content type */
+  String contentType = "text/html";
+  
+  /** The input attributes defined by default.css */
+  MutableAttributeSet inputAttributes;
+  
+  /** The editor pane used. */
+  JEditorPane editorPane;
+    
+  /**
+   * Constructs an HTMLEditorKit, creates a StyleContext, and loads the style sheet.
+   */
+  public HTMLEditorKit()
+  {
+    super();    
+    styleContext = new StyleContext();
+    styleSheet = new StyleSheet();
+    styleSheet.importStyleSheet(getClass().getResource(DEFAULT_CSS));
+    // FIXME: Set inputAttributes with default.css    
+  }
+  
   /**
    * Gets a factory suitable for producing views of any 
    * models that are produced by this kit.
@@ -741,6 +880,7 @@ public class HTMLEditorKit
   public Document createDefaultDocument()
   {
     HTMLDocument document = new HTMLDocument();
+    document.setParser(getParser());
     return document;
   }
 
@@ -752,7 +892,9 @@ public class HTMLEditorKit
    */
   protected Parser getParser()
   {
-    return new ParserDelegator();
+    if (parser == null)
+      parser = new ParserDelegator();
+    return parser;
   }
   
   /**
@@ -775,7 +917,20 @@ public class HTMLEditorKit
                          int popDepth, int pushDepth, HTML.Tag insertTag)
       throws BadLocationException, IOException
   {
-    // FIXME: Not implemented.
+    Parser parser = getParser();
+    if (offset < 0 || offset > doc.getLength())
+      throw new BadLocationException("Bad location", offset);
+    if (parser == null)
+      throw new IOException("Parser is null.");
+
+    ParserCallback pc = ((HTMLDocument) doc).getReader
+                          (offset, popDepth, pushDepth, insertTag);
+
+    // FIXME: What should ignoreCharSet be set to?
+    
+    // parser.parse inserts html into the buffer
+    parser.parse(new StringReader(html), pc, false);
+    pc.flush();
   }
   
   /**
@@ -794,7 +949,28 @@ public class HTMLEditorKit
   public void read(Reader in, Document doc, int pos) throws IOException,
       BadLocationException
   {
-    // FIXME: Not implemented.
+    if (doc instanceof HTMLDocument)
+      {
+        Parser parser = getParser();
+        if (pos < 0 || pos > doc.getLength())
+          throw new BadLocationException("Bad location", pos);
+        if (parser == null)
+          throw new IOException("Parser is null.");
+        
+        HTMLDocument hd = ((HTMLDocument) doc);
+        hd.setBase(editorPane.getPage());
+        ParserCallback pc = hd.getReader(pos);
+        
+        // FIXME: What should ignoreCharSet be set to?
+        
+        // parser.parse inserts html into the buffer
+        parser.parse(in, pc, false);
+        pc.flush();
+      }
+    else
+      // read in DefaultEditorKit is called.
+      // the string is inserted in the document as usual.
+      super.read(in, doc, pos);
   }
   
   /**
@@ -812,7 +988,13 @@ public class HTMLEditorKit
   public void write(Writer out, Document doc, int pos, int len)
       throws IOException, BadLocationException
   {
-    // FIXME: Not implemented.
+    if (doc instanceof HTMLDocument)
+      {
+        // FIXME: Not implemented. Use HTMLWriter.
+        out.write(doc.getText(pos, len));
+      }
+    else
+      super.write(out, doc, pos, len);
   }
   
   /**
@@ -823,7 +1005,7 @@ public class HTMLEditorKit
    */
   public String getContentType()
   {
-    return "text/html";
+    return contentType;
   } 
   
   /**
@@ -848,8 +1030,8 @@ public class HTMLEditorKit
   protected void createInputAttributes(Element element,
                                        MutableAttributeSet set)
   {
-    // FIXME: Not implemented.
-    super.createInputAttributes(element, set);
+    set.addAttributes(element.getAttributes());
+    // FIXME: Not fully implemented.
   }
   
   /**
@@ -859,8 +1041,11 @@ public class HTMLEditorKit
    */
   public void install(JEditorPane c)
   {
-    // FIXME: Anything else to do here?
     super.install(c);
+    mouseListener = new LinkController();
+    c.addMouseListener(mouseListener);
+    editorPane = c;
+    // FIXME: need to set up hyperlinklistener object
   }
   
   /**
@@ -871,8 +1056,10 @@ public class HTMLEditorKit
    */
   public void deinstall(JEditorPane c)
   {
-    // FIXME: Need to uninstall all listeners attached.
     super.deinstall(c);
+    c.removeMouseListener(mouseListener);
+    mouseListener = null;
+    editorPane = null;
   }
   
   /**
@@ -897,8 +1084,7 @@ public class HTMLEditorKit
    */
   public Action[] getActions()
   {
-    // FIXME: should return different actions?
-    return super.getActions();
+    return TextAction.augmentList(super.getActions(), defaultActions);
   }
   
   /**
@@ -945,9 +1131,41 @@ public class HTMLEditorKit
     defaultCursor = cursor;
   }
   
+  /**
+   * Gets the input attributes used for the styled editing actions.
+   * 
+   * @return the attribute set
+   */
   public MutableAttributeSet getInputAttributes()
   {
-    // FIXME: Anything else to do here?
-    return super.getInputAttributes();
+    return inputAttributes;
+  }
+  
+  /**
+   * Get the set of styles currently being used to render the HTML elements. 
+   * By default the resource specified by DEFAULT_CSS gets loaded, and is 
+   * shared by all HTMLEditorKit instances.
+   * 
+   * @return the style sheet.
+   */
+  public StyleSheet getStyleSheet()
+  {
+    if (styleSheet == null)
+      styleSheet = new StyleSheet();
+    return styleSheet;
+  }
+  
+  /**
+   * Set the set of styles to be used to render the various HTML elements. 
+   * These styles are specified in terms of CSS specifications. Each document 
+   * produced by the kit will have a copy of the sheet which it can add the 
+   * document specific styles to. By default, the StyleSheet specified is shared 
+   * by all HTMLEditorKit instances. 
+   * 
+   * @param s - the new style sheet
+   */
+  public void setStyleSheet(StyleSheet s)
+  {
+    styleSheet = s;
   }
 }
