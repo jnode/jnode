@@ -100,7 +100,7 @@ public class Tetris extends JPanel implements KeyListener {
 
 	private boolean pause = false;
 
-	private boolean up;
+	private boolean up = true;
 
 	private Thread thread;
 
@@ -189,7 +189,7 @@ public class Tetris extends JPanel implements KeyListener {
 				paintBox(g2, WIDTH_C + 1, HEIGHT_C + 2 + j, c);
 			}
 		}
-		if (up) {
+		if (isUp()) {
 			int[][] b = BLOCKS[si][bi];
 			for (int i = 0; i < b.length; i++) {
 				paintBox(g2, x + b[i][0], y + b[i][1], COLORS[si + 1]);
@@ -247,7 +247,7 @@ public class Tetris extends JPanel implements KeyListener {
 			flipPause();
 			return;
 		}
-		if (!up || pause)
+		if (!isUp() || pause)
 			return;
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_UP:
@@ -278,8 +278,8 @@ public class Tetris extends JPanel implements KeyListener {
 	}
 
 	public void newGame() {
-		if (thread != null) {
-			up = false;
+        setUp(false);
+        if (thread != null) {
 			if (pause) {
 				flipPause();
 			}
@@ -308,9 +308,8 @@ public class Tetris extends JPanel implements KeyListener {
 		thread = new Thread(new Runnable() {
 			public void run() {
 				try {
-					up = true;
 					long before, after, sleep;
-					stop: while (up) {
+					stop: while (isUp()) {
 						before = System.currentTimeMillis();
 						synchronized (Tetris.class) {
 							while (pause) {
@@ -320,7 +319,7 @@ public class Tetris extends JPanel implements KeyListener {
 									System.out.println("back from waiting");
 								} catch (InterruptedException ignore) {
 								}
-								if (!up)
+								if (!isUp())
 									break stop;
 							}
 						}
@@ -330,7 +329,7 @@ public class Tetris extends JPanel implements KeyListener {
 						} else {
 							newBlock();
 							if (!hasRoom(bi, x, y)) {
-								up = false;
+								setUp(false);
 								end = true;
 								repaint();
 							}
@@ -349,7 +348,8 @@ public class Tetris extends JPanel implements KeyListener {
 				}
 			}
 		});
-		thread.start();
+        setUp(true);
+        thread.start();
 	}
 
 	private void flipPause() {
@@ -446,4 +446,12 @@ public class Tetris extends JPanel implements KeyListener {
 		tetris.requestFocus();
 		tetris.newGame();
 	}
+
+    private synchronized boolean isUp() {
+        return up;
+    }
+
+    private synchronized void setUp(boolean up) {
+        this.up = up;
+    }
 }
