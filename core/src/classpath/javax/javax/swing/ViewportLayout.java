@@ -145,12 +145,13 @@ public class ViewportLayout implements LayoutManager, Serializable
                                      portBounds.y + portBounds.height);
         
     // vertical implementation of the above rules
+    if ((! (view instanceof Scrollable)
+         || ((Scrollable) view).getScrollableTracksViewportHeight())
+        && viewPref.height < portBounds.height)
+      viewPref.height = portBounds.height;
+
     if (portBounds.height >= viewMinimum.height)
-      {
         portBounds.y = 0;
-        if ( !(view instanceof Scrollable) || ((Scrollable)view).getScrollableTracksViewportHeight())
-          viewPref.height = portBounds.height;
-      }
     else
       {
         int overextension = portLowerRight.y - viewPref.height;
@@ -159,12 +160,13 @@ public class ViewportLayout implements LayoutManager, Serializable
       }
 
     // horizontal implementation of the above rules
+    if ((! (view instanceof Scrollable)
+         || ((Scrollable) view).getScrollableTracksViewportWidth())
+        && viewPref.width < portBounds.width)
+      viewPref.width = portBounds.width;
+
     if (portBounds.width >= viewMinimum.width)
-      {
         portBounds.x = 0;
-        if ( !(view instanceof Scrollable) || ((Scrollable)view).getScrollableTracksViewportWidth())
-          viewPref.width = portBounds.width;
-      }
     else
       {
         int overextension = portLowerRight.x - viewPref.width;
@@ -173,11 +175,6 @@ public class ViewportLayout implements LayoutManager, Serializable
       }
 
     port.setViewPosition(portBounds.getLocation());
-    // TODO: I doubt that the size should really be touched here, except when
-    // the view is somehow smaller than its minimumSize. I would think that
-    // when the size of a view is set manually to a fixed value, that this
-    // value should be left unchanged, and not reset to the preferred or
-    // minimum size. -- Roman Kennke
     port.setViewSize(viewPref);
   }
 }

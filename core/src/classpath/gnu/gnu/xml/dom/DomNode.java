@@ -1271,6 +1271,7 @@ public abstract class DomNode
 
     void detach()
     {
+      if (current != null)
       current.detach();
       current = null;
       
