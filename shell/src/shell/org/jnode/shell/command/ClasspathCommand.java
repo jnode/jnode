@@ -36,13 +36,15 @@ import org.jnode.shell.help.URLArgument;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
+ * @author Levente S\u00e1ntha
  */
 public class ClasspathCommand {
 
 	static final OptionArgument ARG_ACTION = new OptionArgument("action",
 			"action to do on the classpath", new OptionArgument.Option("add",
 					"Add an URL to the classpath"), new OptionArgument.Option(
-					"clear", "Remove all URL's from the classpath"));
+					"clear", "Remove all URL's from the classpath"), new OptionArgument.Option(
+					"refresh", "Refresh the loaded classes on next use"));
 
 	static final URLArgument ARG_URL = new URLArgument("url", "the url");
 
@@ -69,15 +71,31 @@ public class ClasspathCommand {
 				}
 			} else if (action.equals("clear")) {
 				clearClassPath();
+			} else if (action.equals("refresh")) {
+				refreshClassPath();
 			}
 		} else {
 			printClassPath();
 		}
 	}
 
-	private static void addClassPath(URL url) {
-		getClassLoader().add(url);
-	}
+    private static void refreshClassPath() {
+        URL[] urls = getClassLoader().getURLs();
+        clearClassPath();
+        if(urls != null)
+            for(URL url : urls)
+                addClassPath(url);
+    }
+
+    private static void addClassPath(URL url) {
+        URL[] urls = getClassLoader().getURLs();
+        if(urls != null)
+            for(URL u : urls)
+                if(u.equals(url))
+                    return;
+
+        getClassLoader().add(url);
+    }
 
 	private static void clearClassPath() {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -103,7 +121,6 @@ public class ClasspathCommand {
 	private static class CPClassLoader extends URLClassLoader {
 
 		/**
-		 * @param urls
 		 * @param parent
 		 * @throws SecurityException
 		 */
