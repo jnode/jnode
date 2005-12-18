@@ -37,6 +37,12 @@ exception statement from your version. */
 
 package java.lang;
 
+import org.jnode.vm.VmSystem;
+import org.jnode.vm.VmProcessor;
+import org.jnode.vm.VmStackFrame;
+import org.jnode.vm.classmgr.VmMethod;
+import org.jnode.vm.classmgr.VmType;
+
 /**
  * VM dependant state and support methods for Throwable.
  * It is deliberately package local and final and should only be accessed
@@ -53,6 +59,7 @@ final class VMThrowable
    * VM private data.
    */
   private transient Object vmdata;
+  private Object[] backtrace;
 
   /**
    * Private contructor, create VMThrowables with fillInStackTrace();
@@ -70,8 +77,10 @@ final class VMThrowable
    */
   static VMThrowable fillInStackTrace(Throwable t)
   {
-      // @vm-specific TODO implement me
-      throw new RuntimeException("Not yet implemented");
+      VMThrowable vmt = new VMThrowable();
+      vmt.backtrace = VmSystem.getStackTrace(VmProcessor.current().getCurrentThread());
+      return vmt;
+
   }
 
   /**
@@ -84,7 +93,20 @@ final class VMThrowable
    */
   StackTraceElement[] getStackTrace(Throwable t)
   {
-      // @vm-specific TODO implement me
-      throw new RuntimeException("Not yet implemented");
+      final VmStackFrame[] vm_trace = (VmStackFrame[]) backtrace;
+      final int length = vm_trace.length;
+      final StackTraceElement[] trace = new StackTraceElement[length];
+      for(int i = length; i-- > 0; ){
+          final VmStackFrame frame = vm_trace[i];
+          final String location = frame.getLocationInfo();
+          final int lineNumber = "?".equals(location) ? -1 : Integer.parseInt(location);
+          final VmMethod method = frame.getMethod();
+          final VmType<?> vmClass = (method == null) ? null : method.getDeclaringClass();
+          final String fname = (vmClass == null) ? null : vmClass.getSourceFile();
+          final String cname = (vmClass == null) ? "<unknown class>" : vmClass.getName();
+          final String mname = (method == null) ? "<unknown method>" : method.getName();
+          trace[i] = new StackTraceElement(fname, lineNumber, cname,  mname, method.isNative());
+      }
+      return trace;
   }
 }
