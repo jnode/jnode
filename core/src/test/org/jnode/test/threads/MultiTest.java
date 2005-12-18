@@ -32,6 +32,11 @@ public class MultiTest {
     public static void main(String[] argv) throws InterruptedException {
         print("Testing multiple threads...");
         int n = 10;
+        try {
+            n = Integer.parseInt(argv[0]);
+        }catch(Exception e){
+            //ignore
+        }
         Incrementer[] incr = new Incrementer[n];
         Thread[] thr = new Thread[n];
         for (int i = 0; i < n; i++) {
