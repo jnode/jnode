@@ -16,6 +16,7 @@
             <export name="org.jnode.test.*"/>
             <export name="org.jnode.test.bugs.*"/>
             <export name="org.jnode.test.security.*"/>
+            <export name="org.jnode.test.threads.*"/>
         </library>
     </runtime>
 
