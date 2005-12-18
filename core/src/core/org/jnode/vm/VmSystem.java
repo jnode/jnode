@@ -452,7 +452,8 @@ public final class VmSystem {
 
         VmType lastClass = null;
 
-        int i = 0;
+        //skip the first element which is VMThrowable.fillInStackTrace()
+        int i = 1;
         while (i < cnt) {
 
             final VmStackFrame f = mt[i];
