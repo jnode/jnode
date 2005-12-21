@@ -71,6 +71,7 @@ public class QueueProcessorThread<T> extends Thread {
      */
     public void stopProcessor() {
         this.stop = true;
+        this.queue.close();
         // this.interrupt();
     }
 
