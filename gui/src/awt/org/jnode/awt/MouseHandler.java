@@ -96,7 +96,7 @@ public class MouseHandler implements PointerListener {
         } catch (ApiNotFoundException ex) {
             log.info("No hardware-cursor found on device " + fbDevice.getId());
         }
-        if (hwCursor != null) {
+        //if (hwCursor != null) {
             try {
                 final Collection<Device> pointers = DeviceUtils
                         .getDevicesByAPI(PointerAPI.class);
@@ -107,16 +107,18 @@ public class MouseHandler implements PointerListener {
             } catch (ApiNotFoundException ex) {
                 log.error("Strange...", ex);
             }
-        }
+        //}
         this.keyboardHandler = keyboardHandler;
         this.hwCursor = hwCursor;
         this.pointerAPI = pointerAPI;
         this.screenSize = screenSize;
         if (pointerAPI != null) {
             log.debug("Using PointerDevice " + pointerDevice.getId());
+            if(hwCursor != null){
             hwCursor.setCursorImage(JNodeCursors.ARROW);
             hwCursor.setCursorVisible(true);
             hwCursor.setCursorPosition(0, 0);
+            }
             pointerAPI.addPointerListener(this);
         }
     }
@@ -218,7 +220,7 @@ public class MouseHandler implements PointerListener {
           final int newAbsY = absolute ? newY : y + newY;
           x = Math.min(screenSize.width - 1, Math.max(0, newAbsX));
           y = Math.min(screenSize.height - 1, Math.max(0, newAbsY));
-          hwCursor.setCursorPosition(x, y);
+          if(hwCursor != null) hwCursor.setCursorPosition(x, y);
           
         lastButtons = buttons;
                 
