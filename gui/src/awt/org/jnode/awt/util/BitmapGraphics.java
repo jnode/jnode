@@ -355,22 +355,36 @@ public abstract class BitmapGraphics {
          * @see org.jnode.awt.util.BitmapGraphics#doCopyArea(int, int, int, int,
          *      int, int)
          */
-        protected void doCopyArea(int x, int y, int width, int height, int dx,
-                int dy) {
-            log.error("Not implemented");
+        protected void doCopyArea(int srcX, int srcY, int width, int height, int dstX,
+                int dstY) {
+            for (int row = 0; row < height; row++) {
+                final int srcOfs = offset + ((srcY + row) * bytesPerLine)
+                        + (srcX * bytesPerLine);
+                final int dstOfs = offset + ((dstY + row) * bytesPerLine)
+                        + (dstX * bytesPerLine);
+                mem.copy(srcOfs, dstOfs, width);
+            }
 
         }
 
         protected void doDrawImage(Raster src, int srcX, int srcY, int dstX,
                 int dstY, int width, int height) {
-            // TODO Implement me
-            log.error("Not implemented");
+            final byte[] buf = new byte[width];
+            for (int row = 0; row < height; row++) {
+                final int ofs = offset + ((dstY + row) * bytesPerLine) + (dstX * bytesPerLine);
+                src.getDataElements(srcX, srcY + row, width, 1, buf);
+                mem.setBytes(buf, 0, ofs, width);
+            }
         }
 
         protected void doDrawImage(Raster src, int srcX, int srcY, int dstX,
                 int dstY, int width, int height, int bgColor) {
-            // TODO Implement me
-            log.error("Not implemented");
+            final byte[] buf = new byte[width];
+            for (int row = 0; row < height; row++) {
+                final int ofs = offset + ((dstY + row) * bytesPerLine) + (dstX * bytesPerLine);
+                src.getDataElements(srcX, srcY + row, width, 1, buf);
+                mem.setBytes(buf, 0, ofs, width);
+            }
         }
 
         /**
@@ -379,9 +393,21 @@ public abstract class BitmapGraphics {
          */
         protected void doDrawAlphaRaster(Raster raster, int srcX, int srcY,
                 int dstX, int dstY, int width, int height, int color) {
-            // TODO Implement me
-            log.error("Not implemented");
-        }
+            final byte[] buf = new byte[width];
+            //TODO this method is still buggy, the "new" font render does not work with it.
+            color &= 0x00FFFFFF;
+            final int ofsX = dstX << 2;
+
+            for (int row = height - 1; row >= 0; row--) {
+                final int ofs = offset + ((dstY + row) * bytesPerLine) + ofsX;
+                raster.getDataElements(srcX, srcY + row, width, 1, buf);
+                for (int i = width - 1; i >= 0; i--) {
+                    final int alpha = (buf[i] & 0xFF);
+                    buf[i] = (byte) ((alpha ^ (color & 0xFF) ^ ((color >> 8) & 0xFF) ^ ((color >> 16) & 0xFF)));
+                }
+                mem.setBytes(buf, 0, ofs, width);
+            }
+       }
 
         public int doGetPixel(int x, int y) {
             // TODO Implement me
