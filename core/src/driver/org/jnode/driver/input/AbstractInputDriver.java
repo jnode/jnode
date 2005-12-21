@@ -59,6 +59,7 @@ abstract public class AbstractInputDriver<E extends SystemEvent> extends Driver
         InputDaemon daemon = this.daemon;
         this.daemon = null;
         if (daemon != null) {
+            daemon.setRunningState(false);
             daemon.interrupt();
         }        
     }
@@ -124,6 +125,7 @@ abstract public class AbstractInputDriver<E extends SystemEvent> extends Driver
      * InputDaemon that translates scancodes to SystemEvents and dispatches those events.
      */
     class InputDaemon extends Thread {
+        private boolean runningState;
     
         public InputDaemon(String name) {
             super(name);
@@ -139,7 +141,8 @@ abstract public class AbstractInputDriver<E extends SystemEvent> extends Driver
         final void processChannel() {
             final ByteBuffer buf = ByteBuffer.allocate(1);
             final ByteChannel channel = getChannel();
-            while ((channel != null) && channel.isOpen()) {
+            setRunningState(true);
+            while ((channel != null) && channel.isOpen() && isRunningState()) {
                 try {
                     buf.rewind();
                     if (channel.read(buf) != 1) {
@@ -155,6 +158,14 @@ abstract public class AbstractInputDriver<E extends SystemEvent> extends Driver
                     ex.printStackTrace();
                 }
             }
-        }        
-    }    
+        }
+
+        public synchronized boolean isRunningState() {
+            return runningState;
+        }
+
+        public synchronized void setRunningState(boolean runningState) {
+            this.runningState = runningState;
+        }
+    }
 }
