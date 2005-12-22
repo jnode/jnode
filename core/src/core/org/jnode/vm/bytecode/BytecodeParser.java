@@ -951,7 +951,7 @@ public class BytecodeParser {
         int v2 = bytecode.get() & 0xFF;
         int v3 = bytecode.get() & 0xFF;
         int v4 = bytecode.get() & 0xFF;
-        return (v1 << 16) | (v2 << 16) | (v3 << 8) | v4;
+        return (v1 << 24) | (v2 << 16) | (v3 << 8) | v4;
     }
 
     /**
