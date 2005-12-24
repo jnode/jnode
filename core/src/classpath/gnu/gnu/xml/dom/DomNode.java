@@ -1337,6 +1337,8 @@ public abstract class DomNode
           return;
         }
       
+      if (current != null)
+	current.detach();
       current = null;
     }
 
@@ -1355,6 +1357,7 @@ public abstract class DomNode
           lastIndex--;
         }
         Node ret = current.previousNode ();
+	current.detach();
         current = null;
         return ret;
       } 
@@ -1363,6 +1366,7 @@ public abstract class DomNode
       while (++lastIndex != index)
         current.nextNode ();
         Node ret = current.nextNode ();
+        current.detach();
         current = null;
         return ret;
     }
@@ -1376,7 +1380,7 @@ public abstract class DomNode
         {
           retval++;
         }
-      current = null;
+      iter.detach();      
       return retval;
     }
     
