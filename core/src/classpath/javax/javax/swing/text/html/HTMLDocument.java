@@ -57,12 +57,15 @@ import javax.swing.text.ElementIterator;
 import javax.swing.text.GapContent;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
 import javax.swing.text.html.HTML.Tag;
 
 /**
- * TODO: This class is not yet completetely implemented.
+ * TODO: Add more comments here 
  *
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
+ * @author Anthony Balkissoon (abalkiss@redhat.com)
+ * @author Lillian Angel (langel@redhat.com)
  */
 public class HTMLDocument extends DefaultStyledDocument
 {
@@ -467,7 +470,7 @@ public class HTMLDocument extends DefaultStyledDocument
      */
     public String getName()
     {
-      return (String) getAttribute(NameAttribute); 
+      return (String) getAttribute(StyleConstants.NameAttribute); 
     }
   }
   
@@ -499,7 +502,7 @@ public class HTMLDocument extends DefaultStyledDocument
      */
     public String getName()
     {
-      return (String) getAttribute(NameAttribute);      
+      return (String) getAttribute(StyleConstants.NameAttribute);      
     }
     
     /**
@@ -1095,7 +1098,8 @@ public class HTMLDocument extends DefaultStyledDocument
      */
     public void flush() throws BadLocationException
     {
-      ElementSpec[] elements = new ElementSpec[parseBuffer.size()];
+      DefaultStyledDocument.ElementSpec[] elements;
+      elements = new DefaultStyledDocument.ElementSpec[parseBuffer.size()];
       parseBuffer.copyInto(elements);
       parseBuffer.removeAllElements();
       insert(offset, elements);
@@ -1245,7 +1249,9 @@ public class HTMLDocument extends DefaultStyledDocument
     protected void blockOpen(HTML.Tag t, MutableAttributeSet attr)
     {
       printBuffer();
-      ElementSpec element = new ElementSpec(attr.copyAttributes(), ElementSpec.StartTagType);
+      DefaultStyledDocument.ElementSpec element;
+      element = new DefaultStyledDocument.ElementSpec(attr.copyAttributes(),
+			DefaultStyledDocument.ElementSpec.StartTagType);
       parseBuffer.addElement(element);
       printBuffer();
     }
@@ -1259,7 +1265,9 @@ public class HTMLDocument extends DefaultStyledDocument
     protected void blockClose(HTML.Tag t)
     {
       printBuffer();
-      ElementSpec element = new ElementSpec(null, ElementSpec.EndTagType);
+      DefaultStyledDocument.ElementSpec element;
+      element = new DefaultStyledDocument.ElementSpec(null,
+				DefaultStyledDocument.ElementSpec.EndTagType);
       parseBuffer.addElement(element);
       printBuffer();
     }
@@ -1296,7 +1304,9 @@ public class HTMLDocument extends DefaultStyledDocument
       if (charAttr != null)
         attributes = charAttr.copyAttributes();
 
-      ElementSpec element = new ElementSpec(attributes, ElementSpec.ContentType,
+      DefaultStyledDocument.ElementSpec element;
+      element = new DefaultStyledDocument.ElementSpec(attributes,
+			      DefaultStyledDocument.ElementSpec.ContentType,
                                             data, offs, length);
       
       printBuffer();
@@ -1392,7 +1402,9 @@ public class HTMLDocument extends DefaultStyledDocument
             if (child.getAttributes().containsAttribute(attribute, value))
               return child;
             
-            return getElement(child, attribute, value);
+            Element grandChild = getElement(child, attribute, value);
+            if (grandChild != null)
+              return grandChild;
           }
       }
     return null;

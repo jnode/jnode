@@ -879,7 +879,7 @@ public class HTMLEditorKit
    */
   public Document createDefaultDocument()
   {
-    HTMLDocument document = new HTMLDocument();
+    HTMLDocument document = new HTMLDocument(getStyleSheet());
     document.setParser(getParser());
     return document;
   }
@@ -1030,6 +1030,7 @@ public class HTMLEditorKit
   protected void createInputAttributes(Element element,
                                        MutableAttributeSet set)
   {
+    set.removeAttributes(set);
     set.addAttributes(element.getAttributes());
     // FIXME: Not fully implemented.
   }
@@ -1151,7 +1152,10 @@ public class HTMLEditorKit
   public StyleSheet getStyleSheet()
   {
     if (styleSheet == null)
+      {
       styleSheet = new StyleSheet();
+        styleSheet.importStyleSheet(getClass().getResource(DEFAULT_CSS));
+      }
     return styleSheet;
   }
   
