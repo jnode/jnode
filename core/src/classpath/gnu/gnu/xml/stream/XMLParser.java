@@ -66,8 +66,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -91,7 +92,7 @@ import gnu.java.net.CRLFInputStream;
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
 public class XMLParser
-  implements XMLStreamReader, NamespaceContext, Location
+  implements XMLStreamReader, NamespaceContext
 {
 
   private static final int INIT = 0;
@@ -128,6 +129,7 @@ public class XMLParser
   private ArrayList attrs = new ArrayList();
   private StringBuffer buf = new StringBuffer();
   private StringBuffer nmtokenBuf = new StringBuffer();
+  private StringBuffer literalBuf = new StringBuffer();
   private char[] tmpBuf = new char[1024];
 
   private String piTarget, piData;
@@ -148,15 +150,15 @@ public class XMLParser
   private final boolean namespaceAware;
   private final boolean baseAware;
 
-  private final XMLReporter reporter;
-  private final XMLResolver resolver;
+  final XMLReporter reporter;
+  final XMLResolver resolver;
 
   private static final String TEST_START_ELEMENT = "<";
   private static final String TEST_END_ELEMENT = "</";
   private static final String TEST_COMMENT = "<!--";
   private static final String TEST_PI = "<?";
   private static final String TEST_CDATA = "<![CDATA[";
-  private static final String TEST_XML_DECL = "<?xml ";
+  private static final String TEST_XML_DECL = "<?xml";
   private static final String TEST_DOCTYPE_DECL = "<!DOCTYPE";
   private static final String TEST_ELEMENT_DECL = "<!ELEMENT";
   private static final String TEST_ATTLIST_DECL = "<!ATTLIST";
@@ -286,28 +288,6 @@ public class XMLParser
     return acc.iterator();
   }
 
-  // -- Location --
-
-  public int getCharacterOffset()
-  {
-    return input.offset;
-  }
-
-  public int getColumnNumber()
-  {
-    return input.column;
-  }
-
-  public int getLineNumber()
-  {
-    return input.line;
-  }
-
-  public String getLocationURI()
-  {
-    return input.systemId;
-  }
-
   // -- XMLStreamReader --
 
   public void close()
@@ -366,16 +346,11 @@ public class XMLParser
   {
     if (doctype != null)
       {
-        LinkedHashMap attlist =
-          (LinkedHashMap) doctype.attlists.get(elementName);
-        if (attlist != null)
-          {
-            AttributeDecl att = (AttributeDecl) attlist.get(attName);
+        AttributeDecl att = doctype.getAttributeDecl(elementName, attName);
             if (att != null)
               return att.type;
           }
-      }
-    return null;
+    return "CDATA";
   }
 
   public String getAttributeValue(int index)
@@ -408,10 +383,7 @@ public class XMLParser
     String qn = ("".equals(a.prefix)) ? a.localName :
       a.prefix + ":" + a.localName;
     String elementName = buf.toString();
-    LinkedHashMap attlist = (LinkedHashMap) doctype.attlists.get(elementName);
-    if (attlist == null)
-      return false;
-    return attlist.containsKey(qn);
+    return doctype.isAttributeDeclared(elementName, qn);
   }
   
   public String getCharacterEncodingScheme()
@@ -466,7 +438,7 @@ public class XMLParser
 
   public Location getLocation()
   {
-    return this;
+    return input;
   }
 
   public QName getName()
@@ -791,14 +763,7 @@ public class XMLParser
     try
       {
         if (!input.initialized)
-          {
             input.init();
-            if (inputStack.size() > 1)
-              {
-                if (tryRead(TEST_XML_DECL))
-                  readTextDecl();
-              }
-          }
         //System.out.println("input="+input.name+" "+input.inputEncoding);
         switch (state)
           {
@@ -857,7 +822,7 @@ public class XMLParser
                           }
                         else if (replaceERefs)
                           {
-                            expandEntity(ref); //report start-entity
+                            expandEntity(ref, false); //report start-entity
                             event = next();
                           }
                         else
@@ -874,6 +839,9 @@ public class XMLParser
               }
             break;
           case EMPTY_ELEMENT:
+            String elementName = (String) stack.removeLast();
+            buf.setLength(0);
+            buf.append(elementName);
             state = stack.isEmpty() ? MISC : CONTENT;
             event = XMLStreamConstants.END_ELEMENT;
             break;
@@ -927,6 +895,10 @@ public class XMLParser
               {
                 if (event == XMLStreamConstants.END_DOCUMENT)
                   throw new NoSuchElementException();
+                char c = readCh();
+                if (c != '\uffff')
+                  error("Only comments and PIs may appear after " +
+                        "the root element");
                 event = XMLStreamConstants.END_DOCUMENT;
               }
             break;
@@ -981,17 +953,7 @@ public class XMLParser
   private char readCh()
     throws IOException, XMLStreamException
   {
-    int c = read();
-    /*if (c == -1)
-      {
-        if (inputStack.size() > 1)
-          {
-            popInput();
-            return readCh();
-          }
-        return (char) -1;
-      }*/
-    char ret = (char) c;
+    char c = (char) read();
     if (expandPE && c == '%')
       {
         if (peIsError)
@@ -999,7 +961,7 @@ public class XMLParser
         parsePEReference();
         return readCh();
       }
-    return ret;
+    return c;
   }
 
   private void require(char delim)
@@ -1092,6 +1054,10 @@ public class XMLParser
         while (!tryRead(delim))
           {
             char c = readCh();
+            if (c == '\uffff')
+              throw new EOFException();
+            else if (c < 32 && c != 10 && c != 9 && c != 13)
+              error("illegal XML character", Character.toString(c));
             buf.append(c);
           }
       }
@@ -1115,7 +1081,12 @@ public class XMLParser
         if (white)
           ret = true;
         else if (c == '\uffff')
+          {
+            if (inputStack.size() > 1)
+              popInput();
+            else
           throw new EOFException();
+      }
       }
     while (white);
     reset();
@@ -1133,6 +1104,11 @@ public class XMLParser
       {
         mark(1);
         char c = readCh();
+        while (c == '\uffff' && inputStack.size() > 1)
+          {
+            popInput();
+            c = readCh();
+          }
         white = (c == ' ' || c == '\t' || c == '\n' || c == '\r');
       }
     while (white);
@@ -1169,6 +1145,13 @@ public class XMLParser
   private void pushInput(String name, String text)
     throws IOException, XMLStreamException
   {
+    // Check for recursion
+    for (Iterator i = inputStack.iterator(); i.hasNext(); )
+      {
+        Input ctx = (Input) i.next();
+        if (name.equals(ctx.name))
+          error("entities may not be self-recursive", name);
+      }
     pushInput(new Input(null, new StringReader(text), input.publicId,
                         input.systemId, name, input.inputEncoding));
     //System.out.println("pushInput "+name+" "+text);
@@ -1185,15 +1168,47 @@ public class XMLParser
     InputStream in = null;
     String base = getXMLBase();
     String url = absolutize(base, ids.systemId);
-    // TODO try to resolve via public ID
+    // Unparsed entity?
+    boolean unparsedEntity = false;
+    if (ids.notationName != null)
+      {
+        ExternalIds notation = doctype.getNotation(ids.notationName);
+        if (notation == null)
+          error("reference to undeclared notation", ids.notationName);
+        unparsedEntity = true;
+      }
+    // Check for recursion
+    for (Iterator i = inputStack.iterator(); i.hasNext(); )
+      {
+        Input ctx = (Input) i.next();
+        if (url.equals(ctx.systemId))
+          error("entities may not be self-recursive", url);
+        if (name.equals(ctx.name))
+          error("entities may not be self-recursive", name);
+      }
     if (in == null && url != null && resolver != null)
+      {
+        if (resolver instanceof XMLResolver2)
+          in = ((XMLResolver2) resolver).resolve(ids.publicId, url);
+        else
       in = resolver.resolve(url);
+      }
     if (in == null)
       in = resolve(url);
     if (in == null)
       error("unable to resolve external entity",
             (ids.systemId != null) ? ids.systemId : ids.publicId);
+    if (unparsedEntity)
+      {
+        // TODO read unparsed entity into buf
+      }
+    else
+      {
     pushInput(new Input(in, ids.publicId, url, name, input.inputEncoding));
+        input.init();
+        if (tryRead(TEST_XML_DECL))
+          readTextDecl();
+      }
     //System.out.println("pushInput "+name+" "+url);
   }
 
@@ -1208,6 +1223,12 @@ public class XMLParser
   {
     if (href == null)
       return null;
+    int ci = href.indexOf(':');
+    if (ci > 1 && isLowercaseAscii(href.substring(0, ci)))
+      {
+        // href is absolute already
+        return href;
+      }
     if (base == null)
       base = "";
     else
@@ -1255,6 +1276,18 @@ public class XMLParser
     return base + href;
   }
 
+  private static boolean isLowercaseAscii(String text)
+  {
+    int len = text.length();
+    for (int i = 0; i < len; i++)
+      {
+        char c = text.charAt(i);
+        if (c < 97 || c > 122)
+          return false;
+      }
+    return true;
+  }
+
   private InputStream resolve(String url)
     throws IOException
   {
@@ -1271,7 +1304,7 @@ public class XMLParser
   private void popInput()
   {
     Input old = (Input) inputStack.removeLast();
-    if (startEntityStack.contains(old.name))
+    if (!"".equals(old.name))
       endEntityStack.addFirst(old.name);
     input = (Input) inputStack.getLast();
     //System.out.print("\n(-input:"+input.systemId+")"); 
@@ -1285,6 +1318,7 @@ public class XMLParser
     throws IOException, XMLStreamException
   {
     final int flags = LIT_DISABLE_CREF | LIT_DISABLE_PE | LIT_DISABLE_EREF;
+    requireWhitespace();
     if (tryRead("version"))
       {
         readEq();
@@ -1314,6 +1348,7 @@ public class XMLParser
   {
     final int flags = LIT_DISABLE_CREF | LIT_DISABLE_PE | LIT_DISABLE_EREF;
     
+    requireWhitespace();
     require("version");
     readEq();
     xmlVersion = readLiteral(flags);
@@ -1384,7 +1419,7 @@ public class XMLParser
             else
               {
                 peIsError = expandPE = true;
-                readMarkupdecl();
+                readMarkupdecl(false);
                 peIsError = expandPE = false;
               }
           }
@@ -1395,7 +1430,7 @@ public class XMLParser
     // Parse external subset
     if (ids.systemId != null && externalEntities)
       {
-        pushInput(null, ">");
+        pushInput("", ">");
         pushInput("[dtd]", ids);
         // loop until we get back to ">"
         while (true)
@@ -1412,9 +1447,11 @@ public class XMLParser
             else
               {
                 reset();
-                peIsError = expandPE = true;
-                readMarkupdecl();
-                peIsError = expandPE = false;
+                //peIsError = expandPE = true;
+                expandPE = true;
+                readMarkupdecl(true);
+                //peIsError = expandPE = false;
+                expandPE = true;
               }
           }
         if (inputStack.size() != 2)
@@ -1427,7 +1464,7 @@ public class XMLParser
     buf.append(rootName);
   }
 
-  private void readMarkupdecl()
+  private void readMarkupdecl(boolean inExternalSubset)
     throws IOException, XMLStreamException
   {
     boolean saved = expandPE;
@@ -1448,12 +1485,12 @@ public class XMLParser
     else if (tryRead(TEST_ENTITY_DECL))
       {
         expandPE = saved;
-        readEntityDecl();
+        readEntityDecl(inExternalSubset);
       }
     else if (tryRead(TEST_NOTATION_DECL))
       {
         expandPE = saved;
-        readNotationDecl();
+        readNotationDecl(inExternalSubset);
       }
     else if (tryRead(TEST_PI))
       {
@@ -1479,7 +1516,7 @@ public class XMLParser
             skipWhitespace();
             while (!tryRead("]]>"))
               {
-                readMarkupdecl();
+                readMarkupdecl(inExternalSubset);
                 skipWhitespace();
               }
           }
@@ -1500,6 +1537,9 @@ public class XMLParser
                   case ']':
                     if (tryRead("]>"))
                       nesting--;
+                    break;
+                  case '\uffff':
+                    throw new EOFException();
                   }
               }
             expandPE = true;
@@ -1527,9 +1567,9 @@ public class XMLParser
     throws IOException, XMLStreamException
   {
     if (tryRead("EMPTY"))
-      doctype.elements.put(elementName, "EMPTY");
+      doctype.addElementDecl(elementName, "EMPTY");
     else if (tryRead("ANY"))
-      doctype.elements.put(elementName, "ANY");
+      doctype.addElementDecl(elementName, "ANY");
     else
       {
         StringBuffer acc = new StringBuffer();
@@ -1562,7 +1602,7 @@ public class XMLParser
           }
         else
           readElements(acc);
-        doctype.elements.put(elementName, acc.toString());
+        doctype.addElementDecl(elementName, acc.toString());
       }
   }
 
@@ -1812,28 +1852,13 @@ public class XMLParser
     else
       value = readLiteral(flags);
     expandPE = saved;
-    /*if ("ENUMERATION".equals(type))
-      type = enumer;
-    else if ("NOTATION".equals(type))
-      type = "NOTATION " + enumer;*/
     // Register attribute def
-    LinkedHashMap attlist =
-      (LinkedHashMap) doctype.attlists.get(elementName);
-    if (attlist == null)
-      {
-        attlist = new LinkedHashMap();
-        doctype.attlists.put(elementName, attlist);
-      }
-    if (attlist.containsKey(name))
-      {
-        return;
-      }
     AttributeDecl attribute =
       new AttributeDecl(type, value, valueType, enumeration);
-    attlist.put(name, attribute);
+    doctype.addAttributeDecl(elementName, name, attribute);
   }
 
-  private void readEntityDecl()
+  private void readEntityDecl(boolean inExternalSubset)
     throws IOException, XMLStreamException
   {
     int flags = 0;
@@ -1850,7 +1875,7 @@ public class XMLParser
     // Read entity name
     String name = readNmtoken(true);
     if (name.indexOf(':') != -1)
-      error("Illegal character ':' in entity name", name);
+      error("illegal character ':' in entity name", name);
     if (peFlag)
       name = "%" + name;
     requireWhitespace();
@@ -1860,8 +1885,8 @@ public class XMLParser
     if (c == '"' || c == '\'')
       {
         // Internal entity replacement text
-        String value = readLiteral(flags);
-        doctype.entities.put(name, value);
+        String value = readLiteral(flags | LIT_DISABLE_EREF);
+        doctype.addEntityDecl(name, value, inExternalSubset);
       }
     else
       {
@@ -1875,30 +1900,30 @@ public class XMLParser
             requireWhitespace();
             ids.notationName = readNmtoken(true);
           }
-        doctype.entities.put(name, ids);
+        doctype.addEntityDecl(name, ids, inExternalSubset);
       }
     // finish
     skipWhitespace();
     require('>');
   }
 
-  private void readNotationDecl()
+  private void readNotationDecl(boolean inExternalSubset)
     throws IOException, XMLStreamException
   {
     requireWhitespace();
     String notationName = readNmtoken(true);
     if (notationName.indexOf(':') != -1)
-      error("Illegal character ':' in notation name", notationName);
+      error("illegal character ':' in notation name", notationName);
     requireWhitespace();
     ExternalIds ids = readExternalIds(true, false);
     ids.notationName = notationName;
-    doctype.notations.put(notationName, ids);
+    doctype.addNotationDecl(notationName, ids, inExternalSubset);
     skipWhitespace();
     require('>');
   }
 
   /**
-   * Returns a tuple {publicId, syatemId}.
+   * Returns a tuple {publicId, systemId}.
    */
   private ExternalIds readExternalIds(boolean inNotation, boolean isSubset)
     throws IOException, XMLStreamException
@@ -1918,12 +1943,12 @@ public class XMLParser
             c = readCh();
             reset();
             if (c == '"' || c == '\'')
-              ids.systemId = readLiteral(flags);
+              ids.systemId = absolutize(input.systemId, readLiteral(flags));
           }
         else
           {
             requireWhitespace();
-            ids.systemId = readLiteral(flags);
+            ids.systemId = absolutize(input.systemId, readLiteral(flags));
           }
 
         for (int i = 0; i < ids.publicId.length(); i++)
@@ -1942,7 +1967,7 @@ public class XMLParser
     else if (tryRead("SYSTEM"))
       {
         requireWhitespace();
-        ids.systemId = readLiteral(flags);
+        ids.systemId = absolutize(input.systemId, readLiteral(flags));
       }
     else if (!isSubset)
       {
@@ -1969,7 +1994,11 @@ public class XMLParser
     attrs.clear();
     // Push namespace context
     if (namespaceAware)
+      {
+        if (":".equals(elementName))
+          error("XML Namespaces forbids names consisting of a single colon");
       namespaces.addFirst(new LinkedHashMap());
+      }
     // Read element content
     boolean white = tryWhitespace();
     mark(1);
@@ -1988,11 +2017,7 @@ public class XMLParser
     // supply defaulted attributes
     if (doctype != null)
       {
-        LinkedHashMap attlist =
-          (LinkedHashMap) doctype.attlists.get(elementName);
-        if (attlist != null)
-          {
-            for (Iterator i = attlist.entrySet().iterator(); i.hasNext(); )
+        for (Iterator i = doctype.attlistIterator(elementName); i.hasNext(); )
               {
                 Map.Entry entry = (Map.Entry) i.next();
                 String attName = (String) entry.getKey();
@@ -2010,15 +2035,8 @@ public class XMLParser
                     if (ctx.containsKey(attName.substring(6)))
                       continue; // namespace was specified
                   }
-                else
-                  {
-                    for (Iterator j = attrs.iterator(); j.hasNext(); )
-                      {
-                        Attribute a = (Attribute) j.next();
-                        if (attName.equals(a.name))
-                          continue; // attribute was specified
-                      }
-                  }
+            else if (attributeSpecified(attName))
+              continue;
                 AttributeDecl decl = (AttributeDecl) entry.getValue();
                 if (decl.value == null)
                   continue;
@@ -2033,7 +2051,6 @@ public class XMLParser
                   attrs.add(attr);
               }
           }
-      }
     if (baseAware)
       {
         String base = getAttributeValue(XMLConstants.XML_NS_URI, "base");
@@ -2042,17 +2059,28 @@ public class XMLParser
     // make element name available for read
     buf.setLength(0);
     buf.append(elementName);
+    // push element onto stack
+    stack.addLast(elementName);
     switch (c)
       {
       case '>':
-        // push element onto stack
-        stack.addLast(elementName);
         return CONTENT;
       case '/':
         require('>');
         return EMPTY_ELEMENT;
       }
     return -1; // to satisfy compiler
+  }
+
+  private boolean attributeSpecified(String attName)
+  {
+    for (Iterator j = attrs.iterator(); j.hasNext(); )
+      {
+        Attribute a = (Attribute) j.next();
+        if (attName.equals(a.name))
+          return true;
+      }
+    return false;
   }
 
   /**
@@ -2072,23 +2100,27 @@ public class XMLParser
       readLiteral(flags) : readLiteral(flags | LIT_NORMALIZE);
     // add attribute event
     Attribute attr = this.new Attribute(attributeName, type, true, value);
-    if (namespaceAware && attributeName.equals("xmlns"))
+    if (namespaceAware)
+      {
+        if (attributeName.equals(":"))
+          error("XML Namespaces forbids names consisting of a single colon");
+        else if (attributeName.equals("xmlns"))
       {
         LinkedHashMap ctx = (LinkedHashMap) namespaces.getFirst();
         if (ctx.containsKey(XMLConstants.DEFAULT_NS_PREFIX))
           error("duplicate default namespace");
       }
-    else if (namespaceAware && attributeName.startsWith("xmlns:"))
+        else if (attributeName.startsWith("xmlns:"))
       {
         LinkedHashMap ctx = (LinkedHashMap) namespaces.getFirst();
         if (ctx.containsKey(attributeName.substring(6)))
           error("duplicate namespace", attributeName.substring(6));
       }
-    else
-      {
-        if (attrs.contains(attr))
+        else if (attrs.contains(attr))
           error("duplicate attribute", attributeName);
       }
+    else if (attrs.contains(attr))
+      error("duplicate attribute", attributeName);
     if (namespaceAware)
       {
         if (!addNamespace(attr))
@@ -2162,9 +2194,9 @@ public class XMLParser
     expandPE = false;
     piTarget = readNmtoken(true);
     if (piTarget.indexOf(':') != -1)
-      error("Illegal character in PI target", new Character(':'));
+      error("illegal character in PI target", new Character(':'));
     if ("xml".equalsIgnoreCase(piTarget))
-      error("Illegal PI target", piTarget);
+      error("illegal PI target", piTarget);
     if (tryRead(TEST_END_PI))
       piData = null;
     else
@@ -2285,10 +2317,11 @@ public class XMLParser
                       buf.append(text);
                     else
                       {
-                        if (replaceERefs)
-                          expandEntity(entityName); //report start-entity
-                        else
-                          reset(); // report reference
+                        //if (replaceERefs)
+                        //  expandEntity(entityName, false); //report start-entity
+                        //else
+                        //  reset(); // report reference
+                        pushInput("", "&" + entityName + ";");
                         done = true;
                         break;
                       }
@@ -2309,6 +2342,14 @@ public class XMLParser
                   }
                 entities = true;
                 break; // end of text sequence
+              case '>':
+                int l = buf.length();
+                if (l > 1 &&
+                    buf.charAt(l - 1) == ']' &&
+                    buf.charAt(l - 2) == ']')
+                  error("Character data may not contain unescaped ']]>'");
+                buf.append(c);
+                break;
               case '<':
                 reset();
                 read(tmpBuf, 0, i);
@@ -2332,23 +2373,43 @@ public class XMLParser
           done = true;
       }
     if (entities)
-      normalizeCRLF();
+      normalizeCRLF(buf);
     return white ? XMLStreamConstants.SPACE : XMLStreamConstants.CHARACTERS;
   }
 
   /**
    * Expands the specified entity.
    */
-  private void expandEntity(String name)
+  private void expandEntity(String name, boolean inAttr)
     throws IOException, XMLStreamException
   {
     if (doctype != null)
       {
-        Object value = doctype.entities.get(name);
+        Object value = doctype.getEntity(name);
         if (value != null)
           {
+            if (xmlStandalone == Boolean.TRUE)
+              {
+                if (doctype.isEntityExternal(name))
+                  error("reference to external entity in standalone document");
+                else if (value instanceof ExternalIds)
+                  {
+                    ExternalIds ids = (ExternalIds) value;
+                    if (ids.notationName != null &&
+                        doctype.isNotationExternal(ids.notationName))
+                      error("reference to external notation in " +
+                            "standalone document");
+                  }
+              }
             if (value instanceof String)
-              pushInput(name, (String) value);
+              {
+                String text = (String) value;
+                if (inAttr && text.indexOf('<') != -1)
+                  error("< in attribute value");
+                pushInput(name, text);
+              }
+            else if (inAttr)
+              error("reference to external entity in attribute value", name);
             else
               pushInput(name, (ExternalIds) value);
             if (name != null)
@@ -2356,7 +2417,7 @@ public class XMLParser
             return;
           }
       }
-    error("Reference to undeclared entity", name);
+    error("reference to undeclared entity", name);
   }
 
   /**
@@ -2396,12 +2457,16 @@ public class XMLParser
     char delim = readCh();
     if (delim != '\'' && delim != '"')
       error("expected '\"' or \"'\"", new Character(delim));
-    buf.setLength(0);
+    literalBuf.setLength(0);
     if ((flags & LIT_DISABLE_PE) != 0)
       expandPE = false;
     boolean entities = false;
-    for (char c = literalReadCh(); c != delim; c = literalReadCh())
+    int inputStackSize = inputStack.size();
+    do
       {
+        char c = literalReadCh();
+        if (c == delim && inputStackSize == inputStack.size())
+          break;
         switch (c)
           {
           case '\n':
@@ -2419,7 +2484,12 @@ public class XMLParser
             if (c == '#')
               {
                 if ((flags & LIT_DISABLE_CREF) != 0)
-                  error("literal may not contain character reference");
+                  {
+                    reset();
+                    c = '&';
+                  }
+                else
+                  {
                 mark(1);
                 c = readCh();
                 boolean hex = (c == 'x');
@@ -2434,25 +2504,33 @@ public class XMLParser
                       c = ' '; // normalize
                     else if ((flags & LIT_ATTRIBUTE) != 0 && c == '\t')
                       c = ' '; // normalize
-                    buf.append(c);
+                        literalBuf.append(c);
                   }
                 entities = true;
                 continue;
               }
+              }
             else
               {
                 if ((flags & LIT_DISABLE_EREF) != 0)
-                  error("literal may not contain entity reference");
+                  {
+                    reset();
+                    c = '&';
+                  }
+                else
+                  {
                 reset();
                 if (replaceERefs || (flags & LIT_NORMALIZE) > 0)
                   {
                     String entityName = readNmtoken(true);
                     require(';');
-                    String text = (String) PREDEFINED_ENTITIES.get(entityName);
+                        String text =
+                          (String) PREDEFINED_ENTITIES.get(entityName);
                     if (text != null)
-                      buf.append(text);
+                          literalBuf.append(text);
                     else
-                      expandEntity(entityName);
+                          expandEntity(entityName,
+                                       (flags & LIT_ATTRIBUTE) != 0);
                     entities = true;
                     continue;
                   }
@@ -2460,20 +2538,29 @@ public class XMLParser
                   error("parser is configured not to replace entity " +
                         "references");
               }
+              }
             break;
           case '<':
             if ((flags & LIT_ATTRIBUTE) != 0)
               error("attribute values may not contain '<'");
             break;
+          case '\uffff':
+            if (inputStack.size() > 1)
+              {
+                popInput();
+                continue;
           }
-        buf.append(c);
+            throw new EOFException();
       }
+        literalBuf.append(c);
+      }
+    while (true);
     expandPE = saved;
     if (entities)
-      normalizeCRLF();
+      normalizeCRLF(literalBuf);
     if ((flags & LIT_NORMALIZE) > 0)
-      normalize();
-    return buf.toString();
+      literalBuf = normalize(literalBuf);
+    return literalBuf.toString();
   }
 
   /**
@@ -2481,7 +2568,7 @@ public class XMLParser
    * This discards leading and trailing whitespace, and replaces sequences
    * of whitespace with a single space.
    */
-  private void normalize()
+  private StringBuffer normalize(StringBuffer buf)
   {
     StringBuffer acc = new StringBuffer();
     int len = buf.length();
@@ -2499,7 +2586,7 @@ public class XMLParser
             avState = 2;
           }
       }
-    buf = acc;
+    return acc;
   }
 
   /**
@@ -2507,7 +2594,7 @@ public class XMLParser
    * This may be necessary if combinations of CR or LF were declared as
    * (character) entity references in the input.
    */
-  private void normalizeCRLF()
+  private void normalizeCRLF(StringBuffer buf)
   {
     int len = buf.length() - 1;
     for (int i = 0; i < len; i++)
@@ -2529,25 +2616,36 @@ public class XMLParser
   {
     String name = readNmtoken(true);
     require(';');
+    mark(1); // ensure we don't reset to before the semicolon
     if (doctype != null)
       {
-        Object entity = doctype.entities.get("%" + name);
+        String entityName = "%" + name;
+        Object entity = doctype.getEntity(entityName);
         if (entity != null)
           {
+            if (xmlStandalone == Boolean.TRUE)
+              {
+                if (doctype.isEntityExternal(entityName))
+                  error("reference to external parameter entity in " +
+                        "standalone document");
+              }
             if (entity instanceof String)
               pushInput(name, (String) entity);
             else
               pushInput(name, (ExternalIds) entity);
           }
-      }
+        else
     error("reference to undeclared parameter entity", name);
+  }
+    else
+      error("reference to parameter entity without doctype", name);
   }
 
   private char[] readCharacterRef(int base)
     throws IOException, XMLStreamException
   {
     StringBuffer b = new StringBuffer();
-    for (char c = readCh(); c != ';'; c = readCh())
+    for (char c = readCh(); c != ';' && c != '\uffff'; c = readCh())
       b.append(c);
     try
       {
@@ -2890,16 +2988,122 @@ public class XMLParser
     final String rootName;
     final String publicId;
     final String systemId;
-    final LinkedHashMap elements = new LinkedHashMap();
-    final LinkedHashMap attlists = new LinkedHashMap();
-    final LinkedHashMap entities = new LinkedHashMap();
-    final LinkedHashMap notations = new LinkedHashMap();
+    private final LinkedHashMap elements = new LinkedHashMap();
+    private final LinkedHashMap attlists = new LinkedHashMap();
+    private final LinkedHashMap entities = new LinkedHashMap();
+    private final LinkedHashMap notations = new LinkedHashMap();
+    private final LinkedList entries = new LinkedList();
+    private final HashSet externalEntities = new HashSet();
+    private final HashSet externalNotations = new HashSet();
 
     Doctype(String rootName, String publicId, String systemId)
     {
       this.rootName = rootName;
       this.publicId = publicId;
       this.systemId = systemId;
+    }
+    
+    void addElementDecl(String name, String model)
+    {
+      if (elements.containsKey(name))
+        return;
+      elements.put(name, model);
+      entries.add("E" + name);
+    }
+
+    void addAttributeDecl(String ename, String aname, AttributeDecl decl)
+    {
+      LinkedHashMap attlist = (LinkedHashMap) attlists.get(ename);
+      if (attlist == null)
+        {
+          attlist = new LinkedHashMap();
+          attlists.put(ename, attlist);
+        }
+      else if (attlist.containsKey(aname))
+        return;
+      attlist.put(aname, decl);
+      String key = "A" + ename;
+      if (!entries.contains(key))
+        entries.add(key);
+    }
+
+    void addEntityDecl(String name, String text, boolean inExternalSubset)
+    {
+      if (entities.containsKey(name))
+        return;
+      entities.put(name, text);
+      entries.add("e" + name);
+      if (inExternalSubset)
+        externalEntities.add(name);
+    }
+    
+    void addEntityDecl(String name, ExternalIds ids, boolean inExternalSubset)
+    {
+      if (entities.containsKey(name))
+        return;
+      entities.put(name, ids);
+      entries.add("e" + name);
+      if (inExternalSubset)
+        externalEntities.add(name);
+    }
+
+    void addNotationDecl(String name, ExternalIds ids, boolean inExternalSubset)
+    {
+      if (notations.containsKey(name))
+        return;
+      notations.put(name, ids);
+      entries.add("n" + name);
+      if (inExternalSubset)
+        externalNotations.add(name);
+    }
+
+    String getElementModel(String name)
+    {
+      return (String) elements.get(name);
+    }
+
+    AttributeDecl getAttributeDecl(String ename, String aname)
+    {
+      LinkedHashMap attlist = (LinkedHashMap) attlists.get(ename);
+      return (attlist == null) ? null : (AttributeDecl) attlist.get(aname);
+    }
+
+    boolean isAttributeDeclared(String ename, String aname)
+    {
+      LinkedHashMap attlist = (LinkedHashMap) attlists.get(ename);
+      return (attlist == null) ? false : attlist.containsKey(aname);
+    }
+
+    Iterator attlistIterator(String ename)
+    {
+      LinkedHashMap attlist = (LinkedHashMap) attlists.get(ename);
+      return (attlist == null) ? Collections.EMPTY_LIST.iterator() :
+        attlist.entrySet().iterator();
+    }
+
+    Object getEntity(String name)
+    {
+      return entities.get(name);
+    }
+
+    boolean isEntityExternal(String name)
+    {
+      return externalEntities.contains(name);
+    }
+
+    ExternalIds getNotation(String name)
+    {
+      return (ExternalIds) notations.get(name);
+    }
+
+    boolean isNotationExternal(String name)
+    {
+      return externalNotations.contains(name);
+    }
+
+    Iterator entryIterator()
+    {
+      return entries.iterator();
     }
     
   }
@@ -2930,7 +3134,17 @@ public class XMLParser
     
   }
 
+  interface XMLResolver2
+    extends XMLResolver
+  {
+
+    InputStream resolve(String publicId, String systemId)
+      throws XMLStreamException;
+
+  }
+
   static class Input
+    implements Location
   {
     
     int line = 1, markLine;
@@ -2994,11 +3208,36 @@ public class XMLParser
           reader = new CRLFReader(reader);
         }
       this.reader = reader;
+      initialized = false;
+    }
+
+    // -- Location --
+    
+    public int getCharacterOffset()
+    {
+      return offset;
+    }
+    
+    public int getColumnNumber()
+    {
+      return column;
+    }
+
+    public int getLineNumber()
+    {
+      return line;
+    }
+
+    public String getLocationURI()
+    {
+      return systemId;
     }
 
     void init()
       throws IOException
     {
+      if (initialized)
+        return;
       if (!forceReader && in != null)
         detectEncoding();
       initialized = true;
@@ -3023,6 +3262,8 @@ public class XMLParser
       offset++;
       int ret = reader.read();
       //System.out.println("read1:"+((char) ret));
+      if (ret == 0x0d)
+        ret = 0x0a;
       if (ret == 0x0a)
         {
           line++;
@@ -3046,6 +3287,11 @@ public class XMLParser
           for (int i = 0; i < ret; i++)
             {
               char c = b[off + i];
+              if (c == 0x0d)
+                {
+                  c = 0x0a;
+                  b[off + i] = c;
+                }
               if (c == 0x0a)
                 {
                   line++;
@@ -3167,6 +3413,22 @@ public class XMLParser
           inputEncoding = encoding;
           reader = new XMLInputStreamReader((XMLInputStreamReader) reader,
                                             encoding);
+        }
+      else
+        {
+          /*if (reporter != null)
+            {
+            try
+            {
+            reporter.report("unable to set input encoding '" + encoding +
+            "': input is specified as reader", "WARNING",
+            encoding, this);
+            }
+            catch (XMLStreamException e)
+            {
+          // Am I bothered?
+          }}*/
+          System.err.println("Can't set input encoding "+encoding);
         }
     }
 
