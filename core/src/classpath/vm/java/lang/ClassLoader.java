@@ -18,8 +18,11 @@ import java.security.PermissionCollection;
 import java.security.Policy;
 import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.jnode.vm.VmJavaClassLoader;
@@ -537,8 +540,56 @@ public abstract class ClassLoader {
         return result;
     }
 
-    public Enumeration getResources(String name) throws IOException {
-        return EmptyEnumeration.getInstance();
+    public Enumeration getResources(String name) throws IOException {    	
+        final List<URL> urls = new ArrayList<URL>();
+        getResourcesImpl(name, urls);
+        
+    	return new Enumeration<URL>()
+    	{
+    		private Iterator<URL> it = urls.iterator();
+
+			public boolean hasMoreElements() {
+				return it.hasNext();
+			}
+
+			public URL nextElement() {
+				return it.next();
+			}    		
+    	};
+    }
+    
+    protected boolean getResourcesImpl(String name, List<URL> urls) throws IOException {
+    	URL result = null;
+        if (parent == null) {
+            if (vmClassLoader.resourceExists(name)) {
+                try {
+                    if (name.startsWith("/")) {
+                    	result = new URL("system://" + name);
+                    } else {
+                    	result = new URL("system:///" + name);
+                    }
+                } catch (MalformedURLException ex) {
+                    ex.printStackTrace();
+                    result = null;
+                }
+                if(result != null)
+                {
+                	if(!urls.contains(result)) urls.add(result);
+                }
+            }
+        } else {
+            parent.getResourcesImpl(name, urls);
+        }
+
+        if (result == null) {
+            result = findResource(name);
+            if(result != null)
+            {
+            	if(!urls.contains(result)) urls.add(result);
+            }
+        }
+        
+        return (result != null);
     }
 
     /**
