@@ -23,12 +23,17 @@ package org.jnode.plugin.model;
 
 import gnu.java.security.action.GetPolicyAction;
 
+import java.io.IOException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.security.AccessController;
 import java.security.CodeSource;
 import java.security.Policy;
 import java.security.ProtectionDomain;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.List;
 
 import org.jnode.plugin.PluginClassLoader;
 import org.jnode.plugin.PluginDescriptor;
@@ -230,7 +235,69 @@ final class PluginClassLoaderImpl extends PluginClassLoader {
 		}
 		return url;
 	}
+	
+    public Enumeration getResources(String name) {
+    	System.err.println("getResources "+name);
+    	final List<URL> urls = new ArrayList<URL>();
+    	
+    	//
+		// Try the prerequisite loaders first
+		final int max = prerequisiteLoaders.length;
+		for (int i = 0; i < max; i++) {
+			final PluginClassLoaderImpl cl = prerequisiteLoaders[i];
+			if (cl != null) {
+				final URL url = cl.findResource(name);
+				if (url != null) {
+					System.err.println("adding "+url);
+					if(!urls.contains(url)) urls.add(url);
+				}
+			}
+		}
+        
+        // Try the fragments
+        URL url = null;
+        for (FragmentDescriptorModel fragment : descriptor.fragments()) {
+            url = fragment.getResource(name);
+            if (url != null) {
+    		    try {
+    		        startPlugin();
+                    fragment.startPlugin(registry);
+    		    } catch (PluginException ex) {
+    		        BootLog.error("Cannot start plugin", ex);
+    		    }
+    		    System.err.println("adding "+url);
+    		    if(!urls.contains(url)) urls.add(url);
+            }
+        }
+        
+		// Not found, try my own plugin
+		//System.out.println("Try resource " + name + " on " + jar.getDescriptor().getId());
+        url = jar.getResource(name);
+        if (url != null) {
+		    try {
+		        startPlugin();
+		    } catch (PluginException ex) {
+		        BootLog.error("Cannot start plugin", ex);
+		    }
+		    System.err.println("adding "+url);
+		    if(!urls.contains(url)) urls.add(url);
+        }
+    	//
+    	
+    	return new Enumeration<URL>()
+    	{
+    		private Iterator<URL> it = urls.iterator();
 
+			public boolean hasMoreElements() {
+				return it.hasNext();
+			}
+
+			public URL nextElement() {
+				return it.next();
+			}    		
+    	};
+    }
+    
 	/**
 	 * Try to load the data of a class with a given name.
 	 * 
