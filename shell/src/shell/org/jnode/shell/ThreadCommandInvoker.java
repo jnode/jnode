@@ -22,18 +22,26 @@
 package org.jnode.shell;
 
 import gnu.java.security.action.InvokeAction;
+
+import java.awt.event.KeyEvent;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
+
 import org.jnode.driver.input.KeyboardEvent;
 import org.jnode.driver.input.KeyboardListener;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.HelpException;
 import org.jnode.shell.help.SyntaxErrorException;
-
-import java.awt.event.KeyEvent;
-import java.io.*;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedActionException;
 
 /**
  * User: Sam Reid Date: Dec 20, 2003 Time: 1:20:33 AM Copyright (c) Dec 20, 2003
@@ -226,7 +234,12 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
 
         if (threadProcess != null) {
             unblock();
-            threadProcess.stop(new ThreadDeath());
+            
+            AccessController.doPrivileged(new PrivilegedAction(){
+				public Object run() {
+		            threadProcess.stop(new ThreadDeath());
+					return null;
+				}});
         }
     }
 
