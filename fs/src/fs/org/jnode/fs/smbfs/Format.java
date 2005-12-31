@@ -1,31 +1,24 @@
 /*
- * Cay S. Horstmann & Gary Cornell, Core Java
- * Published By Sun Microsystems Press/Prentice-Hall
- * Copyright (C) 1997 Sun Microsystems Inc.
- * All Rights Reserved.
+ * $Id$
  *
- * Permission to use, copy, modify, and distribute this 
- * software and its documentation for NON-COMMERCIAL purposes
- * and without fee is hereby granted provided that this 
- * copyright notice appears in all copies. 
- * 
- * THE AUTHORS AND PUBLISHER MAKE NO REPRESENTATIONS OR 
- * WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, EITHER 
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE 
- * IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A 
- * PARTICULAR PURPOSE, OR NON-INFRINGEMENT. THE AUTHORS
- * AND PUBLISHER SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED 
- * BY LICENSEE AS A RESULT OF USING, MODIFYING OR DISTRIBUTING 
- * THIS SOFTWARE OR ITS DERIVATIVES.
+ * JNode.org
+ * Copyright (C) 2006 JNode.org
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License 
+ * along with this library; if not, write to the Free Software Foundation, 
+ * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
  
-/**
- * A class for formatting numbers that follows printf conventions.
- * Also implements C-like atoi and atof functions
- * @version 1.04 13 Sep 1998
- * @author Cay Horstmann
- */
-
 package org.jnode.fs.smbfs;
 
 import java.io.*;
