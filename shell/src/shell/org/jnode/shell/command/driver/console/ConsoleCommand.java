@@ -32,7 +32,6 @@ import org.jnode.driver.console.TextConsole;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.ShellException;
-import org.jnode.shell.ShellUtils;
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
