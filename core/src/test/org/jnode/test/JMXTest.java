@@ -1,5 +1,5 @@
 /*
- * $Id: header.txt,v 1.3 2005/12/31 18:11:39 epr Exp $
+ * $Id: header.txt,v 1.4 2006/01/01 12:20:42 epr Exp $
  *
  * JNode.org
  * Copyright (C) 2003-2006 JNode.org
@@ -14,7 +14,7 @@
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
  * License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
