@@ -4,7 +4,7 @@
     <typedef file="${basedir}/lib/jnode.xml"/>
 
     <!-- JNode version -->
-    <property name="jnode-ver" value="0.2.2-dev"/>
+    <property name="jnode-ver" value="0.2.2"/>
 
     <!-- Java target and source version -->
     <property name="java.target" value="1.5"/>
@@ -332,7 +332,7 @@ clean             Remove all intermediate build results.
         <mkdir dir="${upload.dir}"/>
         <gzip src="${jnode-x86.iso}" destfile="${upload.dir}/jnode-x86-${jnode-ver}.iso.gz"/>
         <copy todir="${upload.dir}" file="${sources.dist.tar.gz}"/>
-        <ftp server="upload.sourceforge.net" remotedir="incoming" passive="yes" newer="yes" verbose="yes" userid="ftp" password="ftp">
+        <ftp server="upload.sourceforge.net" remotedir="incoming" passive="yes" newer="yes" verbose="yes" userid="anonymous" password="${user.name}@users.sourceforge.net">
             <fileset dir="${upload.dir}"/>
         </ftp>
     </target>
