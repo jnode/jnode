@@ -22,6 +22,9 @@
 package org.jnode.fs.jifs.directories;
 
 import java.io.IOException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.jifs.*;
 import org.jnode.fs.jifs.files.*;
@@ -54,11 +57,16 @@ public class JIFSDthreads extends JIFSDirectory {
 		addGroup(grp);
 	}
 	
-	private void addGroup(ThreadGroup grp) {
+	private void addGroup(final ThreadGroup grp) {
 
 		final int max = grp.activeCount() * 2;
 		final Thread[] ts = new Thread[max];
-		grp.enumerate(ts,false);
+        AccessController.doPrivileged(new PrivilegedAction() {
+            public Object run() {
+                grp.enumerate(ts,false);
+                return null;
+            }
+        });
 		for (int i = 0; i < max; i++) {
 			final Thread t = ts[i];
 			if (t != null) {
@@ -69,8 +77,13 @@ public class JIFSDthreads extends JIFSDirectory {
 		
 		final int gmax = grp.activeGroupCount() * 2;
 		final ThreadGroup[] tgs = new ThreadGroup[gmax];
-		grp.enumerate(tgs, false);
-		
+
+		AccessController.doPrivileged(new PrivilegedAction() {
+            public Object run() {
+                grp.enumerate(tgs, false);
+                return null;
+            }
+        });
 		for (int i = 0; i < gmax; i++) {
 			final ThreadGroup tg = tgs[i];
 			if (tg != null) {
