@@ -41,7 +41,6 @@ package javax.swing.plaf;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Rectangle;
 
 import javax.accessibility.Accessible;
 import javax.swing.JComponent;

@@ -64,6 +64,7 @@ import javax.swing.undo.UndoableEdit;
 public class GapContent
     implements AbstractDocument.Content, Serializable
 {
+  
   /**
    * A {@link Position} implementation for <code>GapContent</code>.
    */
@@ -122,7 +123,6 @@ public class GapContent
       assert mark <= gapStart || mark >= gapEnd : "mark: " + mark
                                                + ", gapStart: " + gapStart
                                                + ", gapEnd: " + gapEnd;
-
       if (mark <= gapStart)
         return mark;
       else
@@ -130,11 +130,11 @@ public class GapContent
     }
   }
 
-  class UndoInsertString extends AbstractUndoableEdit
+  class InsertUndo extends AbstractUndoableEdit
   {
     public int where, length;
     String text;
-    public UndoInsertString(int start, int len)
+    public InsertUndo(int start, int len)
     {
       where = start;
       length = len;
@@ -316,7 +316,7 @@ public class GapContent
 
     replace(where, 0, str.toCharArray(), strLen);
 
-    return new UndoInsertString(where, strLen);
+    return new InsertUndo(where, strLen);
   }
 
   /**
@@ -449,7 +449,7 @@ public class GapContent
     // We store the actual array index in the GapContentPosition. The real
     // offset is then calculated in the GapContentPosition.
     int mark = offset;
-    if (offset > gapStart)
+    if (offset >= gapStart)
       mark += gapEnd - gapStart;
     GapContentPosition pos = new GapContentPosition(mark);
 
@@ -584,6 +584,7 @@ public class GapContent
   {
     if (gapStart != position)
       shiftGap(position);
+      
     // Remove content
     if (rmSize > 0)
     shiftGapEndUp(gapEnd + rmSize);

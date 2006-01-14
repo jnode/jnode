@@ -1,5 +1,5 @@
 /* LiteralNode.java -- 
-   Copyright (C) 2004 Free Software Foundation, Inc.
+   Copyright (C) 2004,2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -77,32 +77,22 @@ final class LiteralNode
             elementExcludeResultPrefixes = new HashSet();
             StringTokenizer st = new StringTokenizer(attr.getNodeValue());
             while (st.hasMoreTokens())
-              {
                 elementExcludeResultPrefixes.add(st.nextToken());
               }
-          }
         else
-          {
             elementExcludeResultPrefixes = Collections.EMPTY_SET;
           }
-      }
     else
-      {
         elementExcludeResultPrefixes = null;
       }
-  }
 
   TemplateNode clone(Stylesheet stylesheet)
   {
     TemplateNode ret = new LiteralNode(source);
     if (children != null)
-      {
         ret.children = children.clone(stylesheet);
-      }
     if (next != null)
-      {
         ret.next = next.clone(stylesheet);
-      }
     return ret;
   }
 
@@ -127,17 +117,13 @@ final class LiteralNode
           {
             String prefix = source.getPrefix();
             if (prefix == null)
-              {
                 prefix = "#default";
-              }
             String resultPrefix =
               (String) stylesheet.namespaceAliases.get(prefix);
             if (resultPrefix != null)
               {
                 if ("#default".equals(resultPrefix))
-                  {
                     resultPrefix = null;
-                  }
                 String uri = source.lookupNamespaceURI(resultPrefix);
                 String name = source.getNodeName();
                 // Create a new element node in the result document
@@ -189,43 +175,28 @@ final class LiteralNode
             result = result2;
           }
         if (nextSibling != null)
-          {
             parent.insertBefore(result, nextSibling);
-          }
         else
-          {
             parent.appendChild(result);
-          }
         if (nodeType == Node.ELEMENT_NODE)
-          {
             stylesheet.addNamespaceNodes(source, result, doc,
                                          elementExcludeResultPrefixes);
-          }
         // children
         if (children != null)
-          {
             children.apply(stylesheet, mode,
                            context, pos, len,
                            result, null);
           }
-      }
     // next sibling
     if (next != null)
-      {
         next.apply(stylesheet, mode,
                    context, pos, len,
                    parent, nextSibling);
       }
-  }
 
   public String toString()
   {
-    StringBuffer buf = new StringBuffer(getClass().getName());
-    buf.append('[');
-    buf.append("source=");
-    buf.append(source);
-    buf.append(']');
-    return buf.toString();
+    return source.toString();
   }
   
 }
