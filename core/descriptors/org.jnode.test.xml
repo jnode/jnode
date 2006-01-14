@@ -24,6 +24,7 @@
         <alias name="ArithOpt" class="org.jnode.test.ArithOpt"/>
         <alias name="PerfCtrTest" class="org.jnode.test.PerfCtrTest"/>
         <alias name="Sieve" class="org.jnode.test.Sieve"/>
+        <alias name="TestSecurityManager" class="org.jnode.test.security.TestSecurityManager"/>
     </extension>
 
     <extension point="org.jnode.security.permissions">
@@ -31,6 +32,13 @@
         <!-- JMXTest -->
         <permission class="javax.management.MBeanServerPermission" name="*"/>
         <permission class="javax.management.MBeanPermission" name="*" actions="*"/>
+        
+        <!-- ResourceTest -->
+        <permission class="java.util.PropertyPermission" name="user.language" actions="write"/>       
+        
+        <!-- TestSecurityManager -->
+        <permission class="java.lang.RuntimePermission" name="createSecurityManager"/>
+        <permission class="java.lang.RuntimePermission" name="setSecurityManager"/>
     </extension>
 
 </plugin>
