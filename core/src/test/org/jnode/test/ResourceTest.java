@@ -24,6 +24,8 @@ package org.jnode.test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.PropertyResourceBundle;
@@ -34,7 +36,7 @@ import junit.framework.TestCase;
 import org.jnode.plugin.PluginResourceBundle;
 
 /**
- * Documentation at http://www.javaworld.com/javaworld/javaqa/2003-08/01-qa-0808-property.html
+ * Documentation at {@link http://www.javaworld.com/javaworld/javaqa/2003-08/01-qa-0808-property.html}
 * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Fabien DUMINY (fduminy at users.sourceforge.net)
@@ -234,9 +236,9 @@ public class ResourceTest extends TestCase
         return (idx < 0) ? fullName : fullName.substring(idx+1);
     }
 
-    protected void doGetBundle(Locale locale, String suffix)
+    protected void doGetBundle(final Locale locale, String suffix)
     {
-        Locale.setDefault(locale);
+        changeLocale(locale);
         
         ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_NAME);
         assertNotNull(bundle);
@@ -247,9 +249,21 @@ public class ResourceTest extends TestCase
 
     protected void doGetLocalizedMessage(Locale locale, String suffix)
     {
-        Locale.setDefault(locale);
+        changeLocale(locale);
         
         String msg = PluginResourceBundle.getLocalizedMessage(TEST_KEY);
         assertEquals(TEST_VALUE+suffix, msg);
-    }    
+    }
+    
+    private void changeLocale(final Locale locale)
+    {
+        AccessController.doPrivileged(new PrivilegedAction()
+                {
+                    public Object run()
+                    {
+                        Locale.setDefault(locale);
+                        return null;
+                    }            
+                });        
+    }
 }
