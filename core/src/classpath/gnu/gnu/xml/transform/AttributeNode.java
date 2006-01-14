@@ -1,5 +1,5 @@
 /* AttributeNode.java -- 
-   Copyright (C) 2004 Free Software Foundation, Inc.
+   Copyright (C) 2004,2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -75,13 +75,9 @@ final class AttributeNode
                              namespace.clone(stylesheet),
                              source);
     if (children != null)
-      {
         ret.children = children.clone(stylesheet);
-      }
     if (next != null)
-      {
         ret.next = next.clone(stylesheet);
-      }
     return ret;
   }
 
@@ -113,10 +109,8 @@ final class AttributeNode
         // Use XPath string-value of fragment
         namespaceValue = Expr.stringValue(fragment);
         if (namespaceValue.length() == 0)
-          {
             namespaceValue = null;
           }
-      }
     
     String prefix = getPrefix(nameValue);
     if (namespaceValue == null)
@@ -124,9 +118,7 @@ final class AttributeNode
         if (prefix != null)
           {
             if (XMLConstants.XML_NS_PREFIX.equals(prefix))
-              {
                 namespaceValue = XMLConstants.XML_NS_URI;
-              }
             else
               {
                 // Resolve namespace for this prefix
@@ -153,9 +145,7 @@ final class AttributeNode
         // Resolve prefix for this namespace
         prefix = source.lookupPrefix(namespaceValue);
         if (prefix != null)
-          {
             nameValue = prefix + ":" + nameValue;
-          }
         else
           {
             if (namespaceValue != null)
@@ -196,28 +186,20 @@ final class AttributeNode
         if (attrs != null)
           {
             if (namespace != null)
-              {
                 attrs.setNamedItemNS(attr);
-              }
             else
-              {
                 attrs.setNamedItem(attr);
               }
-          }
         if (children != null)
-          {
             children.apply(stylesheet, mode,
                            context, pos, len,
                            attr, null);
           }
-      }
     if (next != null)
-      {
         next.apply(stylesheet, mode,
                    context, pos, len,
                    parent, nextSibling);
       }
-  }
 
   final String getPrefix(String name)
   {
@@ -241,19 +223,15 @@ final class AttributeNode
   public boolean references(QName var)
   {
     if (name != null && name.references(var))
-      {
         return true;
-      }
     if (namespace != null && namespace.references(var))
-      {
         return true;
-      }
     return super.references(var);
   }
   
   public String toString()
   {
-    StringBuffer buf = new StringBuffer(getClass().getName());
+    StringBuffer buf = new StringBuffer("attribute");
     buf.append('[');
     buf.append("name=");
     buf.append(name);

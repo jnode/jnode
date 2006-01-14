@@ -262,6 +262,7 @@ public class JProgressBar extends JComponent implements SwingConstants,
   {
     this.model = model;
     changeListener = createChangeListener();
+    if (model != null)
     model.addChangeListener(changeListener);
     updateUI();    
   }
