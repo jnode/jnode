@@ -36,7 +36,7 @@ import org.jnode.system.event.FocusEvent;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
-class TextScreenConsole extends AbstractConsole implements TextConsole {
+public class TextScreenConsole extends AbstractConsole implements TextConsole {
 
 	/** The screen I'm writing on */
 	private final TextScreen screen;
