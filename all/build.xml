@@ -30,6 +30,7 @@
     <property name="jnode-net.jar" value="${root.dir}/net/build/classes"/>
     <property name="jnode-shell.jar" value="${root.dir}/shell/build/classes"/>
     <property name="jnode-fonts.jar" value="${build.dir}/descriptors/jnode-fonts.jar"/>
+	<property name="jnode-images.jar" value="${build.dir}/descriptors/jnode-images.jar"/>	
 
 	<property name="jnode-mmtk-genrc.jar" value="${root.dir}/core/build/classes-plan/org.jnode.vm.memmgr.mmtk.genrc"/>
 	<property name="jnode-mmtk-ms.jar" value="${root.dir}/core/build/classes-plan/org.jnode.vm.memmgr.mmtk.ms"/>
@@ -194,6 +195,7 @@
             <libalias name="ant-trax.jar" alias="${ant-trax.jar}"/>
             <libalias name="edtftpj.jar" alias="${edtftpj.jar}"/>
             <libalias name="jcifs.jar" alias="${jcifs.jar}"/>
+        	
             <descriptors dir="${descriptors.dir}/">
                 <include name="*.xml"/>
                 <exclude name="*plugin-list.xml"/>

@@ -8,7 +8,8 @@
         license-name="lgpl"
         class="org.jnode.desktop.DesktopPlugin">
         
-  <requires>
+  <requires>  
+    <import plugin="org.classpath.ext.imageio"/>
     <import plugin="org.jnode.awt"/>
   </requires>
   
@@ -17,12 +18,23 @@
       <export name="org.jnode.desktop.*"/>
       <export name="org.jnode.desktop.classic.*"/>
     </library>
+    
+    <library name="jnode-images.jar">
+      <export name="*"/>
+    </library>    
   </runtime>
 
   <extension-point id="apps" name="Applications that can be started from the desktop"/>
 
   <extension point="org.jnode.security.permissions">
     <permission class="java.util.PropertyPermission" name="jnode.desktop" actions="read,write"/>
+    
+    <permission class="java.lang.RuntimePermission" name="getClassLoader" />
+    <permission class="java.util.PropertyPermission" name="java.util.logging.manager" actions="read"/>
+    <permission class="java.util.logging.LoggingPermission" name="control" actions="" />
+    <permission class="java.util.PropertyPermission" name="java.util.logging.config.class" actions="read" />
+    <permission class="java.util.PropertyPermission" name="java.util.logging.config.file" actions="read" />
+    <permission class="java.util.PropertyPermission" name="gnu.classpath.home.url" actions="read" />
   </extension>
         
 </plugin>
