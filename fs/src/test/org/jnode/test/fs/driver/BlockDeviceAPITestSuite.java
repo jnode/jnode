@@ -35,6 +35,11 @@ import org.jnode.test.support.TestConfig;
 
 public class BlockDeviceAPITestSuite extends AbstractTestSuite
 {
+	public BlockDeviceAPITestSuite()
+	{
+		System.out.println("new BlockDeviceAPITestSuite");
+	}
+	
     public List<TestConfig> getConfigs()
     {
         List<TestConfig> configs = new ArrayList<TestConfig>();

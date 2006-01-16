@@ -41,6 +41,12 @@ import org.jnode.test.support.TestConfig;
 
 public class FSTestSuite extends AbstractTestSuite
 {
+	public FSTestSuite()
+	{
+		System.out.println("new FSTestSuite");
+	}
+	
+
     public List<TestConfig> getConfigs()
     {
         List<TestConfig> configs = new ArrayList<TestConfig>();

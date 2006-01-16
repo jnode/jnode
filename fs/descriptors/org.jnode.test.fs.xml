@@ -76,4 +76,9 @@
     <permission class="java.util.PropertyPermission" name="jnode.cmdline" actions="read,write"/>
     <permission class="java.util.PropertyPermission" name="jnode.prompt" actions="read,write"/>
   </extension>
+  
+  <extension point="org.jnode.testrunner.tests">
+    <suite class="org.jnode.test.fs.filesystem.FSTestSuite"/>
+    <suite class="org.jnode.test.fs.driver.BlockDeviceAPITestSuite"/>
+  </extension>  
 </plugin>
