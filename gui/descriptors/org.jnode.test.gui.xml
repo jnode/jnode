@@ -30,6 +30,7 @@
     <application name="Swing menu test" class="org.jnode.test.gui.SwingMenuTest"/>
     <application name="Tetris"         class="org.jnode.test.gui.Tetris"/>
     <application name="Console"        class="org.jnode.test.gui.ConsoleTest"/>
+    <application name="Console2"        class="org.jnode.test.gui.ConsoleTest2"/>    
     <!-- application name="BoxWorld"       class="org.jnode.test.gui.BoxWorld"/ -->  
     <!-- application name="Thinlet"        class="thinlet.ThinTest"/ -->
     <!-- application name="GlyphTest"      class="org.jnode.test.gui.GlyphTest"/ -->
