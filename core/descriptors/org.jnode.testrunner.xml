@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.testrunner"
+    name="JNode Test runner"
+    version="@VERSION@"
+    license-name="lgpl"
+    provider-name="JNode.org"
+    auto-start="true"
+    class="org.jnode.test.framework.TestRunnerPlugin">
+
+    <requires>
+        <import plugin="org.junit" version="3.8"/>
+    </requires>
+    
+  <runtime>
+    <library name="jnode-core.jar">
+      <export name="org.jnode.test.framework.*"/>
+    </library>
+  </runtime>
+
+	<extension-point id="tests" name="Tests"/>
+	
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.util.PropertyPermission" name="java.io.tmpdir" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="user.home" actions="read"/>
+  </extension>
+</plugin>
