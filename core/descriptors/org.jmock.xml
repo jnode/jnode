@@ -18,4 +18,8 @@
       <export name="*"/>
     </library>
   </runtime>        
+
+  <extension point="org.jnode.security.permissions">
+	<permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="delete"/>
+  </extension>     
 </plugin>
