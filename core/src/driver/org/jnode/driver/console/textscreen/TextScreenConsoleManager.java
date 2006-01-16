@@ -36,7 +36,7 @@ import org.jnode.naming.InitialNaming;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final class TextScreenConsoleManager extends AbstractConsoleManager {
+final public class TextScreenConsoleManager extends AbstractConsoleManager {
 
     private int SCROLLABLE_HEIGHT = 500;
     
