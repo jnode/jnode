@@ -25,6 +25,13 @@
   <extension point="org.jnode.security.permissions">
 	<permission class="java.io.FilePermission" name="/junit.properties" actions="read"/>    
     <permission class="java.util.PropertyPermission" name="user.home" actions="read"/>
+    
+    <permission class="java.util.PropertyPermission" name="user.dir" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="os.name" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="java.io.tmpdir" actions="read"/>
+	<permission class="java.io.FilePermission" name="/junit.properties" actions="read"/>    
+	<permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write,delete"/>
+	<permission class="java.lang.reflect.ReflectPermission" name="*" actions="suppressAccessChecks"/>	    
   </extension>
 
 </plugin>
