@@ -38,6 +38,10 @@
       <fileset dir="${basedir}/fonts">
       </fileset>
     </jar>
+    <jar jarfile="${jnode-images.jar}">
+      <fileset dir="${basedir}/images">
+      </fileset>
+    </jar>
   </target>
 
 <!-- Do it all -->
