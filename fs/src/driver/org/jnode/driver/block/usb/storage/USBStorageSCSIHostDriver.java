@@ -35,18 +35,18 @@ import org.jnode.driver.bus.scsi.SCSIHostControllerAPI;
 import org.jnode.driver.bus.scsi.cdb.spc.CDBInquiry;
 import org.jnode.driver.bus.scsi.cdb.spc.InquiryData;
 import org.jnode.driver.bus.usb.USBConfiguration;
-import org.jnode.driver.bus.usb.USBConstants;
 import org.jnode.driver.bus.usb.USBDevice;
 import org.jnode.driver.bus.usb.USBEndPoint;
 import org.jnode.driver.bus.usb.USBException;
 import org.jnode.driver.bus.usb.USBPipeListener;
 import org.jnode.driver.bus.usb.USBRequest;
+import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeoutException;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class USBStorageSCSIHostDriver extends Driver implements SCSIHostControllerAPI, USBPipeListener, USBStorageConstants, USBConstants {
+public class USBStorageSCSIHostDriver extends Driver implements SCSIHostControllerAPI, USBPipeListener, USBStorageConstants {
 
     /** My logger */
     private static final Logger log = Logger.getLogger(USBStorageSCSIHostDriver.class);
@@ -80,6 +80,8 @@ public class USBStorageSCSIHostDriver extends Driver implements SCSIHostControll
 				((USBStorageBulkTransport)usbDevData.getTransport()).getMaxLun(usbDev);
 			} else if(conf.getInterface(0).getDescriptor().getInterfaceProtocol() == US_PR_SCM_ATAPI){
 				log.info("*** Set transport protocol to SCM ATAPI");
+			} else {
+				throw new DriverException("Transport protocol not implemented.");
 			}
 			
             USBEndPoint ep;
@@ -91,11 +93,14 @@ public class USBStorageSCSIHostDriver extends Driver implements SCSIHostControll
                     // In or Out ?
                     if ((ep.getDescriptor().getEndPointAddress() & USB_DIR_IN) == 0) {
                         usbDevData.setBulkInEndPoint(ep);
+                        log.info("*** Set bulk in endpoint");
                     } else {
                         usbDevData.setBulkOutEndPoint(ep);
+                        log.info("*** Set bulk out endpoint");
                     }
                 } else if ((ep.getDescriptor().getAttributes() & USB_ENDPOINT_XFERTYPE_MASK) == USB_ENDPOINT_XFER_INT) {
                     usbDevData.setIntrEndPoint(ep);
+                    log.info("*** Set interrupt endpoint");
                 }
             }
 

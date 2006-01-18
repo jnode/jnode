@@ -21,13 +21,15 @@
  
 package org.jnode.driver.block.usb.storage;
 
+import org.jnode.driver.bus.usb.USBConstants;
+
 /**
  * @author flesire
  *
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
-public interface USBStorageConstants {
+public interface USBStorageConstants extends USBConstants {
     /* Sub Classes */
     public final static int US_SC_RBC	=0x01;		/* Typically, flash devices */
     public final static int US_SC_8020	=0x02;		/* CD-ROM */
@@ -57,10 +59,14 @@ public interface USBStorageConstants {
     /* Transport */
     public final static int CB_RESET_CMD_SIZE = 	12;
     
-    public final static int  US_BULK_CB_WRAP_LEN = 31;
-    public final static int  US_BULK_CB_SIGN	 = 0x43425355;	/*spells out USBC */
-    public final static int  US_BULK_FLAG_IN	 = 1;	
-    public final static int  US_BULK_FLAG_OUT	 = 0;
+    public final static int US_BULK_CB_SIGN	 = 0x43425355;	/*spells out USBC */
+    public final static int US_BULK_CB_WRAP_LEN = 31;
+    public final static int US_BULK_CB_LUN_MASK = 0x07;
+    public final static int US_BULK_FLAG_IN	 = 0x80;	
+    public final static int US_BULK_FLAG_OUT	 = 0x00;
+    
+    public final static int US_BULK_CS_SIGN	 = 0x53425355;	/*spells out USBS */
+    public final static int US_BULK_CS_WRAP_LEN = 13;
 
 
 }
