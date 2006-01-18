@@ -34,7 +34,7 @@ import org.jnode.driver.bus.usb.USBInterface;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class USBStorageDeviceToDriverMapper implements DeviceToDriverMapper, USBStorageConstants, USBConstants {
+public class USBStorageDeviceToDriverMapper implements DeviceToDriverMapper, USBStorageConstants {
 	/** My logger */
 	private static final Logger log = Logger.getLogger(USBStorageDeviceToDriverMapper.class);
 	/**
