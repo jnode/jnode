@@ -56,8 +56,9 @@ public class FormatCommand {
     static final OptionArgument FS = new OptionArgument("fstype",
             "File system type", new OptionArgument.Option[] {
                     new OptionArgument.Option("fat16", "FAT 16 filesystem"),
-                    new OptionArgument.Option("fat12", "FAT 12 filesystem"),
-                    new OptionArgument.Option("ext2", "EXT2 filesystem"), });
+                    new OptionArgument.Option("fat12", "FAT 12 filesystem")
+                    //TODO Ext2 format must be implemented.
+                    /*new OptionArgument.Option("ext2", "EXT2 filesystem"),*/ });
 
     static final OptionArgument BS_VAL = new OptionArgument("blocksize",
             "block size for ext2 filesystem", new OptionArgument.Option[] {
