@@ -22,6 +22,8 @@
 package org.jnode.fs.iso9660;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 
 import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
@@ -61,7 +63,9 @@ public final class ISO9660Entry implements FSEntry {
      * @see org.jnode.fs.FSEntry#getLastModified()
      */
     public long getLastModified() throws IOException {
-        throw new UnsupportedOperationException("not yet implemented");
+    	//FIXME Correct implementation to return real last modified time for ISO9660 entry.
+    	Date now = new Date();
+        return now.getTime();
     }
 
     /**
