@@ -29,7 +29,7 @@ import java.awt.image.WritableRaster;
 import org.apache.log4j.Logger;
 import org.jnode.awt.font.TextRenderer;
 import org.jnode.awt.font.renderer.GlyphRenderer;
-import org.jnode.awt.font.renderer.RenderCache;
+//import org.jnode.awt.font.renderer.RenderCache;
 import org.jnode.awt.font.renderer.RenderContext;
 import org.jnode.driver.video.Surface;
 import org.jnode.font.bdf.BDFFont;
@@ -47,7 +47,7 @@ public class BDFTextRenderer implements TextRenderer {
 
     private final double fontSize;
 
-    private final RenderCache renderCache;
+//    private final RenderCache renderCache;
 
     /** Key of the alpha raster in the render context */
     private static final String ALPHA_RASTER = BDFTextRenderer.class.getName()
@@ -59,9 +59,9 @@ public class BDFTextRenderer implements TextRenderer {
      * @param fontData
      * @param fontSize
      */
-    public BDFTextRenderer(RenderCache renderCache, BDFFont fontData,
+    public BDFTextRenderer(/*RenderCache renderCache,*/ BDFFont fontData,
             int fontSize) {
-        this.renderCache = renderCache;
+//        this.renderCache = renderCache;
         this.fontData = fontData;
         this.fontSize = fontSize;
     }
@@ -72,6 +72,7 @@ public class BDFTextRenderer implements TextRenderer {
      * @return
      */
     private WritableRaster createAlphaRaster() {
+        /*
         final RenderContext ctx = renderCache.getContext();
         WritableRaster r = (WritableRaster) ctx.getObject(ALPHA_RASTER);
         final int fontSizeUp = (int) (fontSize + 0.5);
@@ -82,6 +83,8 @@ public class BDFTextRenderer implements TextRenderer {
             Vm.getVm().getCounter(ALPHA_RASTER).inc();
         }
         return r;
+        */
+        return null;
     }
 
     /**
