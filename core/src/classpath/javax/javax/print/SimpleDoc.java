@@ -1,5 +1,5 @@
-/* Doc.java --
-   Copyright (C) 2004, 2006 Free Software Foundation, Inc.
+/* SimpleDoc.java -- 
+   Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -38,40 +38,75 @@ exception statement from your version. */
 
 package javax.print;
 
+import java.io.ByteArrayInputStream;
+import java.io.CharArrayReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.StringReader;
 
+import javax.print.attribute.AttributeSetUtilities;
 import javax.print.attribute.DocAttributeSet;
 
 /**
- * <code>Doc</code> specifies the interface for print services how to obtain 
- * the print data and document specific attributes for printing. 
+ * Simple implementation of the <code>Doc</code> interface capable of handling 
+ * the predefined document flavors of <code>DocFlavor</code>.
  * <p>
- * The print data is always passed to a {@link javax.print.DocPrintJob} object 
- * as a <code>Doc</code> object which allows the print services to:
- * <ul>
- * <li>Determine the actual document format of the supplied print data. This
- *  is supplied as a {@link javax.print.DocFlavor} object with the MIME type
- *  and the representation class of the print data.</li>
- * <li>Obtain the print data either in its representation class or depending
- *  on the document format through convenience methods as a 
- *  {@link java.io.Reader} or an {@link java.io.InputStream}.</li>
- * <li>Obtain the document's attribute set specifying the attributes which
- *  apply to this document instance.</li>
- * </ul> 
- * </p><p>
- * Every method of a <code>Doc</code> implementation has to return always the 
- * same object on every method call. Therefore if the print job consumes the 
- * print data via a stream or a reader object it can read only once the 
- * supplied print data. Implementations of this interface have to be thread 
- * safe. 
- * </p>
+ * This implementation can construct a reader or stream for the service from 
+ * the print data and ensures that always the same object is returned on each
+ * method call. It does simple checks that the supplied data matches the 
+ * specified flavor of the doc object and supports thread safe access.
+ * </p> 
  * 
- * @author Michael Koch (konqueror@gmx.de)
+ * @author Wolfgang Baer (WBaer@gmx.de)
  */
-public interface Doc
-{
+public class SimpleDoc implements Doc
+{  
+  private final Object printData;
+  private final DocFlavor flavor;
+  private final DocAttributeSet attributes;
+  
+  private InputStream stream;
+  private Reader reader;
+
+  /**
+   * Constructs a SimpleDoc with the specified print data, doc flavor and doc attribute set.
+   * @param printData the object with the data to print.
+   * @param flavor the document flavor of the print data.
+   * @param attributes the attributes of the doc (may be <code>null</code>).
+   * 
+   * @throws IllegalArgumentException if either <code>printData</code> or
+   *   <code>flavor</code> are <code>null</code>, or the print data is not
+   *   supplied in the document format specified by the given flavor object.
+   */
+  public SimpleDoc(Object printData, DocFlavor flavor, 
+      DocAttributeSet attributes)
+  {
+    if (printData == null || flavor == null)
+      throw new IllegalArgumentException("printData/flavor may not be null");
+    
+    if (! (printData.getClass().getName().equals(
+           flavor.getRepresentationClassName())
+        || flavor.getRepresentationClassName().equals("java.io.Reader")
+           && printData instanceof Reader
+        || flavor.getRepresentationClassName().equals("java.io.InputStream")
+           && printData instanceof InputStream))
+      {
+        throw new IllegalArgumentException("data is not of declared flavor type");
+      }          
+    
+    this.printData = printData;
+    this.flavor = flavor;
+    
+    if (attributes != null)
+      this.attributes = AttributeSetUtilities.unmodifiableView(attributes);
+    else
+      this.attributes = null;
+    
+    stream = null;
+    reader = null;
+  }
+
   /**
    * Returns the unmodifiable view of the attributes of this doc object.
    * <p>
@@ -84,14 +119,20 @@ public interface Doc
    * 
    * @return The unmodifiable attributes set, or <code>null</code>.
    */
-  DocAttributeSet getAttributes();
+  public DocAttributeSet getAttributes()
+  {
+    return attributes;
+  }
 
   /**
    * Returns the flavor of this doc objects print data.
-   *  
+   * 
    * @return The document flavor.
    */
-  DocFlavor getDocFlavor();
+  public DocFlavor getDocFlavor()
+  {
+    return flavor;
+  }
 
   /**
    * Returns the print data of this doc object.
@@ -105,7 +146,10 @@ public interface Doc
    * @throws IOException if representation class is a stream and I/O
    * exception occures.
    */
-  Object getPrintData() throws IOException;
+  public Object getPrintData() throws IOException
+  {
+    return printData;
+  }
 
   /**
    * Returns a <code>Reader</code> object for extracting character print data
@@ -124,7 +168,24 @@ public interface Doc
    * 
    * @throws IOException if an error occurs.
    */
-  Reader getReaderForText() throws IOException;
+  public Reader getReaderForText() throws IOException
+  {
+    synchronized (this)
+      {
+        // construct the reader if applicable on request
+        if (reader == null)
+          {
+            if (flavor instanceof DocFlavor.CHAR_ARRAY)
+              reader = new CharArrayReader((char[]) printData);
+            else if (flavor instanceof DocFlavor.STRING)
+              reader = new StringReader((String) printData);
+            else if (flavor instanceof DocFlavor.READER)
+              reader = (Reader) printData;
+          }
+        
+        return reader;
+      }   
+  }
 
   /**
    * Returns an <code>InputStream</code> object for extracting byte print data
@@ -142,5 +203,21 @@ public interface Doc
    * 
    * @throws IOException if an error occurs.
    */
-  InputStream getStreamForBytes() throws IOException;
+  public InputStream getStreamForBytes() throws IOException
+  {
+    synchronized (this)
+      {
+        // construct the stream if applicable on request
+        if (stream == null)
+          {
+            if (flavor instanceof DocFlavor.BYTE_ARRAY)
+              stream = new ByteArrayInputStream((byte[]) printData);
+            else if (flavor instanceof DocFlavor.INPUT_STREAM)
+              stream = (InputStream) printData;
+          }
+        
+        return stream;
+      }    
+  }
+
 }

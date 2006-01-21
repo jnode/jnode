@@ -70,26 +70,39 @@ class Template
 
   Template(Stylesheet stylesheet, 
            QName name, Pattern match, TemplateNode node,
-           int precedence, double priority, QName mode)
+           int precedence, String priorityAttr, QName mode)
   {
     this.stylesheet = stylesheet;
     this.name = name;
     this.match = match;
     this.node = node;
+    this.precedence = precedence;
+    this.mode = mode;
+    
+    double p = DEFAULT_PRIORITY;
+    boolean a = false;
+    if (priorityAttr != null)
+      p = Double.parseDouble(priorityAttr);
+    else
+      {
     // adjust priority if necessary
     // see XSLT section 5.5
-    Test test = getNodeTest(match);
-    if (test != null)
+        if (match instanceof Selector)
+          {
+            Selector selector = (Selector) match;
+            Test[] tests = selector.getTests();
+            if (tests.length > 0)
       {
+                Test test = tests[0];
         if (test instanceof NameTest)
           {
             NameTest nameTest = (NameTest) test;
-            if (nameTest.matchesAny() ||
-                nameTest.matchesAnyLocalName())
-                priority = -0.25d;
+                    if (nameTest.matchesAny())
+                      p = -0.25d;
+                    else if (nameTest.matchesAnyLocalName())
+                      p = -0.20d;
             else
-                priority = 0.0d;
-            isAnyNode = false;
+                      p = 0.0d;
           }
         else
           {
@@ -97,17 +110,33 @@ class Template
             if (nodeTypeTest.getNodeType() ==
                 Node.PROCESSING_INSTRUCTION_NODE &&
                 nodeTypeTest.getData() != null)
-                priority = 0.0d;
+                      p = 0.0d;
             else
-                priority = -0.5d;
-            isAnyNode = (nodeTypeTest.getNodeType() == 0);
+                      p = -0.5d;
+                    a = (nodeTypeTest.getNodeType() == 0);
               }
+                // Add a small difference for predicates
+                if (tests.length > 1)
+                  p += ((double) tests.length - 1) * 0.001;
           }
-    else
-      isAnyNode = false;
+          }
+      }
+    this.priority = p;
+    this.isAnyNode = a;
+  }
+  
+  private Template(Stylesheet stylesheet, 
+           QName name, Pattern match, TemplateNode node,
+           int precedence, double priority, QName mode, boolean isAnyNode)
+  {
+    this.stylesheet = stylesheet;
+    this.name = name;
+    this.match = match;
+    this.node = node;
     this.precedence = precedence;
     this.priority = priority;
     this.mode = mode;
+    this.isAnyNode = isAnyNode;
   }
 
   Template clone(Stylesheet stylesheet)
@@ -121,7 +150,8 @@ class Template
                         (node == null) ? null : node.clone(stylesheet),
                         precedence,
                         priority,
-                        mode);
+                        mode,
+                        isAnyNode);
   }
   
   public int compareTo(Object other)
@@ -141,13 +171,6 @@ class Template
 
   Test getNodeTest(Expr expr)
   {
-    if (expr instanceof Selector)
-      {
-        Selector selector = (Selector) expr;
-        Test[] tests = selector.getTests();
-        if (tests.length > 0)
-            return tests[0];
-          }
     return null;
   }
 
