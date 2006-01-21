@@ -32,7 +32,7 @@ import org.jnode.awt.font.renderer.GlyphRenderer;
 //import org.jnode.awt.font.renderer.RenderCache;
 import org.jnode.awt.font.renderer.RenderContext;
 import org.jnode.driver.video.Surface;
-import org.jnode.font.bdf.BDFFont;
+//import org.jnode.font.bdf.BDFFont;
 import org.jnode.vm.Vm;
 
 /**
@@ -43,7 +43,7 @@ public class BDFTextRenderer implements TextRenderer {
     /** My logger */
     private static final Logger log = Logger.getLogger(BDFTextRenderer.class);
 
-    private final BDFFont fontData;
+//    private final BDFFont fontData;
 
     private final double fontSize;
 
@@ -59,10 +59,10 @@ public class BDFTextRenderer implements TextRenderer {
      * @param fontData
      * @param fontSize
      */
-    public BDFTextRenderer(/*RenderCache renderCache,*/ BDFFont fontData,
+    public BDFTextRenderer(/*RenderCache renderCache, BDFFont fontData,*/
             int fontSize) {
 //        this.renderCache = renderCache;
-        this.fontData = fontData;
+//        this.fontData = fontData;
         this.fontSize = fontSize;
     }
 
