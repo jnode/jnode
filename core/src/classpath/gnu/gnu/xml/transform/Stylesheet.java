@@ -440,7 +440,6 @@ class Stylesheet
               }
           }
       }
-    //System.err.println("\tcandidates="+candidates);
     if (selected == null)
       {
         // Apply built-in template
@@ -523,11 +522,9 @@ class Stylesheet
     String p = getAttribute(attrs, "priority");
     String mm = getAttribute(attrs, "mode");
     QName mode = (mm == null) ? null : getQName(mm);
-    double priority = (p == null) ? Template.DEFAULT_PRIORITY :
-      Double.parseDouble(p);
     Node children = node.getFirstChild();
     return new Template(this, name, match, parse(children),
-                        precedence, priority, mode);
+                        precedence, p, mode);
   }
 
   /**
@@ -818,7 +815,7 @@ class Stylesheet
             templates.add(new Template(this, null, new Root(),
                                        parse(rootClone),
                                        precedence,
-                                       Template.DEFAULT_PRIORITY,
+                                       null,
                                        null));
           }
         else

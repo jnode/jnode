@@ -108,6 +108,14 @@ public final class Selector
 
   public boolean matches(Node context)
   {
+    // If called directly, selector is the top level of the path
+    return matches(context,
+                   getContextPosition(context),
+                   getContextSize(context));
+  }
+  
+  boolean matches(Node context, int pos, int len)
+  {
     short nodeType = context.getNodeType();
     switch (axis)
       {
@@ -125,20 +133,12 @@ public final class Selector
       default:
         return false;
       }
-    int tlen = tests.length;
-    if (tlen > 0)
-      {
-        int pos = getContextPosition(context);
-        int len = getContextSize(context);
-        if (len == 0)
-          System.err.println("WARNING: context size is 0");
-        for (int j = 0; j < tlen && len > 0; j++)
+    for (int j = 0; j < tests.length && len > 0; j++)
           {
             Test test = tests[j];
             if (!test.matches(context, pos, len))
                 return false;
               }
-          }
     return true;
   }
 
@@ -147,7 +147,10 @@ public final class Selector
     int pos = 1;
     for (ctx = ctx.getPreviousSibling(); ctx != null;
          ctx = ctx.getPreviousSibling())
+      {
+        if (tests[0].matches(ctx, 1, 1))
         pos++;
+      }
     return pos;
   }
 
@@ -161,10 +164,16 @@ public final class Selector
     int count = 1;
     Node sib = ctx.getPreviousSibling();
     for (; sib != null; sib = sib.getPreviousSibling())
+      {
+        if (tests[0].matches(ctx, 1, 1))
       count++;
+      }
     sib = ctx.getNextSibling();
     for (; sib != null; sib = sib.getNextSibling())
+      {
+        if (tests[0].matches(ctx, 1, 1))
       count++;
+      }
     return count;
   }
 

@@ -650,7 +650,7 @@ public class SAXParser
               }
           }
       }
-    catch (XMLStreamException e)
+    catch (Exception e)
       {
         if (!startDocumentDone && contentHandler != null)
           contentHandler.startDocument();
@@ -664,9 +664,9 @@ public class SAXParser
       }
     finally
       {
+        reset();
         if (opened)
           in.close();
-        reset();
       }
   }
 

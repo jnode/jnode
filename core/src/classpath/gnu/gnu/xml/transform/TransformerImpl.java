@@ -691,7 +691,7 @@ class TransformerImpl
                 for (Iterator i = children.iterator(); i.hasNext(); )
                   {
                     ctx = (Node) i.next();
-                    reindent(doc, ctx, offset + 1);
+                    reindent(doc, ctx, offset);
                   }
               }
             else
@@ -709,9 +709,9 @@ class TransformerImpl
                   }
                 buf = new StringBuffer();
                 buf.append('\n');
-                ws = buf.toString();
                 for (int i = 0; i < offset; i++)
                     buf.append(INDENT_WHITESPACE);
+                ws = buf.toString();
                 node.appendChild(doc.createTextNode(ws));
               }
           }
