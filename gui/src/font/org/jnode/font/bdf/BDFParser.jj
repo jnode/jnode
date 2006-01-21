@@ -1,0 +1,412 @@
+options {
+	LOOKAHEAD=1;
+	STATIC=false;
+	SANITY_CHECK=true;
+	DEBUG_PARSER=false;
+	DEBUG_TOKEN_MANAGER=false;
+}
+
+PARSER_BEGIN(BDFParser)
+
+/*
+ Copyright (C) 2002-2006 Stephane Meslin-Weber <steph@tangency.co.uk>
+ All rights reserved.
+ 
+ This file is part of Odonata.
+ 
+ Odonata is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ Odonata is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GNU Classpath; see the file COPYING.  If not, write to
+ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ Boston, MA 02110-1301 USA.
+
+ Linking this library statically or dynamically with other modules is
+ making a combined work based on this library.  Thus, the terms and
+ conditions of the GNU General Public License cover the whole
+ combination.
+
+ As a special exception, the copyright holders of this library give you
+ permission to link this library with independent modules to produce an
+ executable, regardless of the license terms of these independent
+ modules, and to copy and distribute the resulting executable under
+ terms of your choice, provided that you also meet, for each linked
+ independent module, the terms and conditions of the license of that
+ module.  An independent module is a module which is not derived from
+ or based on this library.  If you modify this library, you may extend
+ this exception to your version of the library, but you are not
+ obligated to do so.  If you do not wish to do so, delete this
+ exception statement from your version. 
+*/
+package uk.co.tangency.odonata.font.bdf.parser;
+
+/**
+ * Parses a font in BDF format.
+ * <p>The BDF Font specification from Adobe can be fount at
+ * <a href="http://partners.adobe.com/public/developer/en/font/5005.BDF_Spec.pdf">Adobe's partner site</a></p>
+ * <p>Bit-depths higher than 1 are curtesy of Fontforge's BDF 2.3 spec at
+ * <a href="fontforge.sourceforge.net/BDFgrey.html">Fontforge's website</a>
+ */
+public class BDFParser {
+	
+	public static final int PLAIN = 0;
+	public static final int BOLD = 1;
+	public static final int ITALIC = 2;
+	
+	public BDFFontContainer createFont() throws Exception {
+		return loadFont();
+	}
+
+	/**
+	 * Value object, removes need for AWT's Dimension.
+	 */
+	public static class Dimension {
+	    public int width,height;
+	    public void setSize(int w, int h) {
+	        width = w;
+	        height = h;
+	    }
+	}
+	
+	/**
+	 * Value object, removes need for AWT's Rectangle.
+	 */
+	public static class Rectangle {
+	    public int x,y,width,height;
+	    
+	    public Rectangle() {}
+	    public Rectangle(Rectangle rect) {
+	        setBounds(rect.x,rect.y,rect.width,rect.height);
+	    }
+	    
+	    public void setBounds(int x, int y, int w, int h) {
+	        this.x = x;
+	        this.y = y;
+	        this.width = w;
+	        this.height = h;
+	    }
+	}	
+	
+	/**
+	 * Value object, not really needed externally.
+	 */
+	public static class Version {
+		private int major;
+		private int minor;
+		
+		Version(){		
+		}
+		
+		void setVersion(int major, int minor){
+			this.major = major;
+			this.minor = minor;
+		}
+		
+		public int getMajor() {
+			return major;
+		}
+		
+		public int getMinor() {
+			return minor;
+		}
+		
+		public String toString() {
+			return major+"."+minor;
+		}
+	}
+}
+
+
+
+PARSER_END(BDFParser)
+ 
+BDFFontContainer loadFont():
+{
+	BDFFontContainer font = null;
+	int[] version = null;
+	String[] comments = null;
+	String[] fontName = null;
+	int[] size = null;
+	int[] bBox = null;
+	int contentVersion = 0;
+	int metrics = 0;
+	String[] properties = null;
+	BDFGlyph[] chars = null;
+	int style = PLAIN;
+}
+{
+	<STARTFONT>
+	(
+		version = getVersion() 
+		(
+			fontName = getFontName()
+			| size = getSize()
+			| bBox = setBoundingBox()
+			| metrics = setMetricsSet()
+			| comments = getComments()
+			| properties = properties()
+			| contentVersion = setContentVersion()
+		)+
+		chars = getChars()
+		<ENDFONT>
+		<EOF>
+	)
+	{
+		
+		if("i".equalsIgnoreCase(fontName[BDFFontContainer.SLANT]) || "o".equalsIgnoreCase(fontName[BDFFontContainer.SLANT])){
+			style = ITALIC;
+			System.err.println(fontName[0]+" "+fontName[BDFFontContainer.SLANT]);
+		}
+		if("bold".equalsIgnoreCase(fontName[BDFFontContainer.WEIGHT]))
+			style += BOLD;
+		
+		font = new BDFFontContainer(fontName,style,size[0]);
+		font.setBoundingBox(bBox[0],bBox[1],bBox[2],bBox[3]);
+		font.setResolution(size[1], size[2]);
+		font.setComments(comments);
+		font.setProperties(properties);
+		
+		if(size!=null && size.length==4)
+			font.setDepth(size[3]);
+			
+		font.setGlyphs(chars);
+		return font;
+	}
+}
+
+// Parse the BDF version, currently 2.[123] are valid.
+int[] getVersion():
+{
+	Token major, minor;
+}
+{
+	major = <INT>
+	"."
+	minor = <INT>
+	
+	{
+		return new int[] { Integer.parseInt(major.image), Integer.parseInt(minor.image) };
+	}
+}
+
+// Sets the metric set
+int setMetricsSet():
+{}
+{
+	<METRICSSET>
+	<INT> {
+		return Integer.parseInt(token.image);
+	}
+}
+
+// Collates all raw glyphs
+BDFGlyph[] getChars():
+{
+	BDFGlyph[] glyphs = null;
+	int count = 0;
+}
+{
+	<CHARS>
+	<INT> {
+		glyphs = new BDFGlyph[Integer.parseInt(token.image)];
+	}
+	(
+		glyphs[count++] = getChar()
+	)+
+	{
+		return glyphs;
+	}
+}
+
+// Gets font bounding box
+int[] setBoundingBox():
+{int x,y,width,height;}
+{
+	<FONTBOUNDINGBOX>
+	
+	// yes, this is indeed width, height, x, y...
+	<INT> { width = Integer.parseInt(token.image); }
+	<INT> { height = Integer.parseInt(token.image); }
+	<INT> { x = Integer.parseInt(token.image); }
+	<INT> { y = Integer.parseInt(token.image); }
+	{
+		return new int[]{x,y,width,height};
+	}
+}
+
+// Gets this font's comments
+String[] getComments():
+{java.util.ArrayList list = new java.util.ArrayList();}
+{
+	(
+		<COMMENT>
+		<CONTENTSTRING> {
+			list.add(token.image);
+		}
+	)+
+	{
+		String[] comments = new String[list.size()];
+		return (String[])list.toArray(comments);
+	}
+}
+
+// Gets the font size, resolutions and bit depth
+int[] getSize():
+{int pointSize, xres, yres, depth = 1;}
+{
+	<SIZE>
+	<INT> { pointSize = Integer.parseInt(token.image); }
+	<INT> { xres = Integer.parseInt(token.image); }
+	<INT> { yres = Integer.parseInt(token.image); }
+	(<INT> { depth = Integer.parseInt(token.image); })?
+	{
+		return new int[]{pointSize, xres, yres, depth};
+	}
+}
+
+// Gets the content version
+int setContentVersion():
+{}
+{
+	<CONTENTVERSION>
+	<INT> {
+		return Integer.parseInt(token.image);
+	}
+}
+
+// Gets the font name... currently expects a PostScript name but will survive if it isn't in that format
+String[] getFontName():
+{
+	Token string;
+	String[] template = new String[14];
+}
+{
+	<FONTNAME>
+	string = <FONTFAMILYSTRING>
+	{
+		java.util.Arrays.fill(template,"");
+		String[] split = string.image.trim().split("-");
+		System.arraycopy(split,1,template,0,split.length-2);
+		return template;
+	}
+}
+
+// Gets the font properties
+String[] properties():
+{
+	String[] properties;
+	int count = 0;
+}
+{
+	<STARTPROPERTIES> <PROPERTYCOUNT> {
+		properties = new String[Integer.parseInt(token.image)];
+	}
+	(
+		<PROPERTYTEXT> {
+			properties[count++] = token.image;
+		}
+	)+
+	<ENDPROPERTIES>
+	{
+		return properties;
+	}
+}
+
+// Gets a single character glyph
+BDFGlyph getChar():
+{
+	BDFGlyph dat;
+	Token encoding,swx0,swy0,dwx0,dwy0,swx1,swy1,dwx1,dwy1;
+	Token x,y,width,height;
+	StringBuffer buf = new StringBuffer();
+}
+{
+	<STARTCHAR>
+	<CHARTEXT> {
+		dat = new BDFGlyph(token.image);
+	}		
+	
+	<ENCODING>
+	encoding = <INT>
+	
+	<SWIDTH>
+	swx0 = <INT>
+	swy0 = <INT>
+	
+	<DWIDTH>
+	dwx0 = <INT>
+	dwy0 = <INT>
+	
+	<BBX>
+	// Again, width, height, x, y
+	width = <INT>
+	height = <INT>
+	x = <INT>
+	y = <INT>
+
+	<BITMAP>
+	(
+		<HEX> {
+			buf.append(token.image);
+		}
+	)+
+	<ENDCHAR>
+	{
+		dat.setSWidth(Integer.parseInt(swx0.image),Integer.parseInt(swy0.image));
+		dat.setDWidth(Integer.parseInt(dwx0.image),Integer.parseInt(dwy0.image));
+		dat.setBBX(Integer.parseInt(x.image),Integer.parseInt(y.image),
+		           Integer.parseInt(width.image),Integer.parseInt(height.image));
+		dat.setRawData(buf);
+		return dat;
+	}	
+}
+SKIP : { < SKIPPED : " " | "\t" | "\n" | "\r" | "\r\n" > }
+TOKEN : { < INT : ("-" | ["0"-"9"])+ > }
+//TOKEN : { < VERSION : <INT> "." <INT> > }
+TOKEN : { < STARTFONT : "STARTFONT" > }
+TOKEN : { < ENDFONT : "ENDFONT" > }
+TOKEN : { < CONTENTVERSION : "CONTENTVERSION" > }
+TOKEN : { < FONTBOUNDINGBOX : "FONTBOUNDINGBOX" > }
+TOKEN : { < METRICSSET : "METRICSSET" > }
+TOKEN : { < SIZE : "SIZE" > }
+TOKEN : { < CHARS : "CHARS" > }
+TOKEN : { < STARTCHAR : "STARTCHAR" > : STARTCHARSTATE }
+ <STARTCHARSTATE> SKIP : { < " " > : CHARTEXTSTATE }
+ <CHARTEXTSTATE> TOKEN : { < CHARTEXT : (~["\r","\n"])+ > : CHARSTATE }
+ <CHARSTATE> SKIP : { < "\n" | "\r" | "\r\n" > : DEFAULT }
+ 
+TOKEN : { < ENCODING : "ENCODING" >  }
+TOKEN : { < SWIDTH : "SWIDTH" > }
+TOKEN : { < DWIDTH : "DWIDTH"  > }
+TOKEN : { < BBX : "BBX" > }
+//SKIP : { < " "| "\t" | "\n" | "\r" | "\r\n" > }
+TOKEN : { < BITMAP : "BITMAP" > : BITMAPSTATE }
+  <BITMAPSTATE> TOKEN : { < HEX : (["0"-"9"] | (["A"-"F"] | ["a"-"f"])){2} > : BITMAPSTATE }
+  <BITMAPSTATE> TOKEN : { < ENDCHAR : "ENDCHAR" > : DEFAULT }
+  <BITMAPSTATE> SKIP : { < (" " | "\t" | "\n" | "\r" | "\r\n") > : BITMAPSTATE }
+
+TOKEN : { < STARTPROPERTIES : "STARTPROPERTIES" > : PROPERTYCOUNTSTATE }
+ <PROPERTYCOUNTSTATE> SKIP : { < " " > : PROPERTYCOUNTSTATE }
+ <PROPERTYCOUNTSTATE> TOKEN : { <PROPERTYCOUNT : ("-" | ["0"-"9"])+ > : PROPERTYSTATE }
+ <PROPERTYSTATE> TOKEN : { <ENDPROPERTIES : "ENDPROPERTIES" > : DEFAULT }
+ <PROPERTYSTATE> TOKEN : { <PROPERTYTEXT : (~["\r","\n"])+ > : PROPERTYSTATE }
+ <PROPERTYSTATE> SKIP : { < "\n" | "\r" | "\r\n" > : PROPERTYSTATE }
+
+TOKEN : { < COMMENT : "COMMENT" > : COMMENTSTATE }
+ <COMMENTSTATE> TOKEN : { <CONTENTSTRING : (~["\r","\n"])* ("\n" | "\r" | "\r\n") > : DEFAULT }
+// <COMMENTSTATE> SKIP : { < "\n" | "\r" | "\r\n" > : DEFAULT }
+
+TOKEN : { < FONTNAME : "FONT" > : FONTSTATE }
+// <FONTSTATE> SKIP : { < " " > : FONTFAMILYSTATE }
+// <FONTFAMILYSTATE> SKIP : { < "-" > : FONTSTYLESTATE }
+ <FONTSTATE> TOKEN : { <FONTFAMILYSTRING : (~["\r","\n"])* ("\n" | "\r" | "\r\n") > : DEFAULT }
+// <FONTSTYLESTATE> TOKEN : { <FONTSTYLESTRING : (~["\r","\n"])+ > : FONTSTYLESTATE }
+// <FONTSTYLESTATE> SKIP : { < "\n" | "\r" | "\r\n" > : DEFAULT }
