@@ -437,26 +437,8 @@ public class Socket
     if (! isBound())
       bind(null);
 
-    try
-      {
 	getImpl().connect(endpoint, timeout);
       }
-    catch (IOException exception)
-      {
-	close();
-	throw exception;
-      }
-    catch (RuntimeException exception)
-      {
-	close();
-	throw exception;
-      }
-    catch (Error error)
-      {
-	close();
-	throw error;
-      }
-	}
 
 	/**
 	 * Returns the address of the remote end of the socket.  If this socket

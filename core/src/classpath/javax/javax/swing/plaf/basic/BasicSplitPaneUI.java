@@ -62,6 +62,7 @@ import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.SplitPaneUI;
+import javax.swing.plaf.UIResource;
 
 /**
  * This is the Basic Look and Feel implementation of the SplitPaneUI  class.
@@ -253,20 +254,21 @@ public class BasicSplitPaneUI extends SplitPaneUI
 	  JSplitPane split = (JSplitPane) container;
 	  distributeExtraSpace();
 	  Insets insets = split.getInsets();
-	  int width = getInitialLocation(insets);
 	  Dimension dims = split.getSize();
-	  for (int i = 0; i < components.length; i += 2)
-	    {
-	      if (components[i] == null)
-		continue;
-	      setComponentToSize(components[i], sizes[i], width, insets, dims);
-	      width += sizes[i];
-	    }
-	  if (components[1] != null)
-	    {
-	      setComponentToSize(components[1], sizes[1], width, insets, dims);
-	      width += sizes[1];
-	    }
+          int loc = getInitialLocation(insets);
+          int available = getAvailableSize(dims, insets);
+          sizes[0] = getDividerLocation(split) - loc;
+          sizes[1] = available - sizes[0] - sizes[1];
+          // The size of the divider won't change.
+
+          // Layout component#1.
+          setComponentToSize(components[0], sizes[0], loc, insets, dims);
+          // Layout divider.
+          loc += sizes[0];
+          setComponentToSize(components[2], sizes[2], loc, insets, dims);
+          // Layout component#2. 
+          loc += sizes[2];
+          setComponentToSize(components[1], sizes[1], loc, insets, dims);
         }
     }
 
@@ -451,21 +453,7 @@ public class BasicSplitPaneUI extends SplitPaneUI
      */
     void distributeExtraSpace()
     {
-      int availSize = getAvailableSize(splitPane.getSize(),
-                                       splitPane.getInsets());
-      int[] newSizes = new int[3];
-      double weight = splitPane.getResizeWeight();
-
-      int oldLen = sizes[0] + sizes[1];
-
-      // dividers don't change size.
-      availSize -= sizes[2] + oldLen;
-
-      int rightAlloc = (int) (availSize * (1 - weight));
-      int leftAlloc = availSize - rightAlloc;
-
-      sizes[0] += leftAlloc;
-      sizes[1] += rightAlloc;
+      // FIXME: This needs to be reimplemented correctly.
     }
 
     /**
@@ -933,6 +921,8 @@ public class BasicSplitPaneUI extends SplitPaneUI
   /** The JSplitPane that this UI draws. */
   protected JSplitPane splitPane;
 
+  private int dividerLocation;
+
   /**
    * Creates a new BasicSplitPaneUI object.
    */
@@ -992,6 +982,7 @@ public class BasicSplitPaneUI extends SplitPaneUI
                               "SplitPane.foreground");
     LookAndFeel.installBorder(splitPane, "SplitPane.border");
     divider = createDefaultDivider();
+    divider.setBorder(UIManager.getBorder("SplitPaneDivider.border"));
     resetLayoutManager();
     nonContinuousLayoutDivider = createDefaultNonContinuousLayoutDivider();
     splitPane.add(divider, JSplitPane.DIVIDER);
@@ -1012,7 +1003,9 @@ public class BasicSplitPaneUI extends SplitPaneUI
     divider = null;
     nonContinuousLayoutDivider = null;
 
+    if (splitPane.getBackground() instanceof UIResource)
     splitPane.setBackground(null);
+    if (splitPane.getBorder() instanceof UIResource)
     splitPane.setBorder(null);
   }
 
@@ -1298,44 +1291,7 @@ public class BasicSplitPaneUI extends SplitPaneUI
    */
   public void setDividerLocation(JSplitPane jc, int location)
   {
-    location = validLocation(location);
-    Container p = jc.getParent();
-    Component right = jc.getRightComponent();
-    Dimension rightPrefSize = right == null ? new Dimension(0, 0)
-                                           : right.getPreferredSize();
-    Dimension size = jc.getSize();
-    // check if the size has been set for the splitpane
-    if (size.width == 0 && size.height == 0)
-      size = jc.getPreferredSize();
-    
-    if (getOrientation() == 0 && location > size.height)
-      {
-        location = size.height;
-        while (p != null)
-          {
-            p.setSize(p.getWidth(), p.getHeight() + rightPrefSize.height);
-            p = p.getParent();
-          }
-      }
-    else if (location > size.width)
-      {
-        location = size.width;
-        while (p != null)
-          {
-            p.setSize(p.getWidth() + rightPrefSize.width, p.getHeight());
-            p = p.getParent();
-          }
-      }
-    
-    setLastDragLocation(getDividerLocation(splitPane));
-    splitPane.setLastDividerLocation(getDividerLocation(splitPane));
-    int[] tmpSizes = layoutManager.getSizes();
-    tmpSizes[0] = location
-                  - layoutManager.getInitialLocation(splitPane.getInsets());
-    tmpSizes[1] = layoutManager.getAvailableSize(splitPane.getSize(),
-                                                 splitPane.getInsets())
-                  - tmpSizes[0];
-    layoutManager.setSizes(tmpSizes);
+    dividerLocation = validLocation(location);
     splitPane.revalidate();
     splitPane.repaint();
   }
@@ -1349,8 +1305,7 @@ public class BasicSplitPaneUI extends SplitPaneUI
    */
   public int getDividerLocation(JSplitPane jc)
   {
-    return layoutManager.sizes[0]
-           + layoutManager.getInitialLocation(splitPane.getInsets());
+    return dividerLocation;
   }
 
   /**
@@ -1365,7 +1320,7 @@ public class BasicSplitPaneUI extends SplitPaneUI
   {
     int value = layoutManager.getInitialLocation(jc.getInsets());
     if (layoutManager.components[0] != null)
-      value -= layoutManager.minimumSizeOfComponent(0);
+      value += layoutManager.minimumSizeOfComponent(0);
     return value;
   }
 
