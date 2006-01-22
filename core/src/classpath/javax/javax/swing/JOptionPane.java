@@ -236,7 +236,7 @@ public class JOptionPane extends JComponent implements Accessible
   protected boolean wantsInput;
 
   /** The common frame used when no parent is provided. */
-  private static Frame privFrame = SwingUtilities.getOwnerFrame();
+  private static Frame privFrame = (Frame) SwingUtilities.getOwnerFrame(null);
 
   /**
    * Creates a new JOptionPane object using a message of "JOptionPane

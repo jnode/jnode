@@ -152,6 +152,8 @@ public class PopupFactory
     // If we have a root pane and the contents fits within the root pane and
     // lightweight popups are enabled, than we can use a lightweight popup.
     JRootPane root = SwingUtilities.getRootPane(owner);
+    if (root != null)
+      {
     Point rootLoc = root.getLocationOnScreen();
     Dimension contentsSize = contents.getSize();
     Dimension rootSize = root.getSize();
@@ -159,6 +161,9 @@ public class PopupFactory
         && (x - rootLoc.x) + contentsSize.width < rootSize.width
         && (y - rootLoc.y) + contentsSize.height < rootSize.height)
       popup = new Popup.LightweightPopup(owner, contents, x, y);
+    else
+      popup = new Popup.JWindowPopup(owner, contents, x, y);
+      }
     else
       popup = new Popup.JWindowPopup(owner, contents, x, y);
     return popup;
