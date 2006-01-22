@@ -22,12 +22,13 @@
 package org.jnode.fs.ftpfs;
 
 import org.jnode.fs.FSDirectory;
-import org.apache.commons.net.ftp.FTPFile;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import com.enterprisedt.net.ftp.FTPFile;
 
 /**
  * @author Levente S\u00e1ntha
@@ -66,10 +67,10 @@ public class FTPFSDirectory extends FTPFSEntry implements FSDirectory {
                 entries = new HashMap<String, FTPFSEntry>();
                 FTPFile[] ftpFiles = null;
                 synchronized(fileSystem){
-                    ftpFiles = fileSystem.listFiles(path());
+                    ftpFiles = fileSystem.dirDetails(path());
                 }
                 for (FTPFile f : ftpFiles) {
-                    FTPFSEntry e = f.isDirectory() ? new FTPFSDirectory(fileSystem, f) : new FTPFSFile(fileSystem, f);
+                    FTPFSEntry e = f.isDir() ? new FTPFSDirectory(fileSystem, f) : new FTPFSFile(fileSystem, f);
                     e.setParent(this);
                     entries.put(f.getName(), e);
                 }

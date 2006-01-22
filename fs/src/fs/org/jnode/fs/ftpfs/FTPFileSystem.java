@@ -24,11 +24,14 @@ package org.jnode.fs.ftpfs;
 import org.jnode.fs.FileSystem;
 import org.jnode.driver.DeviceListener;
 import org.jnode.driver.Device;
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPFile;
 
 import java.io.IOException;
 import java.util.Date;
+import java.security.PrivilegedAction;
+import java.security.AccessController;
+
+import com.enterprisedt.net.ftp.FTPClient;
+import com.enterprisedt.net.ftp.FTPFile;
 
 
 /**
@@ -40,7 +43,7 @@ public class FTPFileSystem extends FTPClient implements FileSystem {
     private boolean closed;
     private Thread thread;
 
-    public FTPFileSystem(FTPFSDevice device) {
+    public FTPFileSystem(final FTPFSDevice device) {
         this.device = device;
         device.addListener(new DeviceListener() {
             public void deviceStarted(Device device) {
@@ -57,10 +60,20 @@ public class FTPFileSystem extends FTPClient implements FileSystem {
         });
         try{
 
-//            setRemoteHost(device.getHost());
-//            setTimeout(300000);
-//            connect();
-            connect(device.getHost());
+            setRemoteHost(device.getHost());
+            setTimeout(300000);
+            AccessController.doPrivileged(
+            new PrivilegedAction(){
+                public Object run() {
+                    try{
+                        connect();
+                        return null;
+                    }catch(Exception e){
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+
             login(device.getUser(),device.getPassword());
             thread = new Thread(new Runnable(){
                 public void run() {
@@ -79,9 +92,9 @@ public class FTPFileSystem extends FTPClient implements FileSystem {
                 }
             },"ftpfs_keepalive");
             thread.start();
-            //FTPFile f = new FTPFile("/", "/", 0, true, new Date(0));
-            FTPFile f = new FTPFile();
-            f.setName(printWorkingDirectory());
+            FTPFile f = new FTPFile("/", "/", 0, true, new Date(0));
+//            FTPFile f = new FTPFile();
+//            f.setName(printWorkingDirectory());
             root = new FTPFSDirectory(this, f);
             closed = false;
         }catch(Exception e){
@@ -91,7 +104,7 @@ public class FTPFileSystem extends FTPClient implements FileSystem {
     }
 
     private synchronized void nop() throws Exception{
-        listFiles(root.path());
+        dir(root.path());
     }
 
 
