@@ -202,7 +202,7 @@ public class Desktop implements Runnable {
                 taskBar.setPreferredSize(new Dimension(w, controlBarHeight));                
                 awtRoot.add(taskBar, BorderLayout.SOUTH);
 
-        		Image background = loadImage("button_red_i_like.png");
+        		Image background = null;//loadImage("button_red_i_like.png");
         		if(background != null)
         		{
         			System.err.println("IMAGE FOUND");
