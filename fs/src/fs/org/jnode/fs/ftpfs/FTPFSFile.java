@@ -22,11 +22,11 @@
 package org.jnode.fs.ftpfs;
 
 import org.jnode.fs.FSFile;
-import org.apache.commons.net.ftp.FTPFile;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
+
+import com.enterprisedt.net.ftp.FTPFile;
 
 
 /**
@@ -45,7 +45,7 @@ public class FTPFSFile extends FTPFSEntry implements FSFile {
      * @return long
      */
     public long getLength() {
-        return ftpFile.getSize();
+        return ftpFile.size();
     }
 
     /**
@@ -61,12 +61,12 @@ public class FTPFSFile extends FTPFSEntry implements FSFile {
         try {
             if(data == null){
                 synchronized(fileSystem) {
-                    fileSystem.cwd(parent.path());
-                    //data = fileSystem.get(getName());
-                    InputStream in = fileSystem.retrieveFileStream(getName());
-                    int i = in.available();
-                    data = new byte[i];
-                    in.read(data);
+                    fileSystem.chdir(parent.path());
+                    data = fileSystem.get(getName());
+                    //InputStream in = fileSystem.retrieveFileStream(getName());
+                    //int i = in.available();
+                    //data = new byte[i];
+                    //in.read(data);
 
                 }
             }
