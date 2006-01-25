@@ -158,7 +158,7 @@ public class IBMPartitionTableEntry implements PartitionTableEntry {
 		b.append(' ');
 		b.append("s:"+getStartLba());
 		b.append(' ');
-		long tmp = getStartLba() + getNrSectors();
+		long tmp = getStartLba() + getNrSectors() - 1;
 		b.append("e:"+ tmp);
 		//b.append(NumberUtils.hex(getStartLba(), 8));
 		//b.append('+');
