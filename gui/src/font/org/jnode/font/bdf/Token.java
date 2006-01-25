@@ -37,7 +37,7 @@
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version. 
 */
-package uk.co.tangency.odonata.font.bdf.parser;
+package org.jnode.font.bdf;
 
 /**
  * Describes the input token stream.
