@@ -23,6 +23,8 @@ package org.jnode.driver.block;
 
 import java.io.IOException;
 
+import org.jnode.partitions.PartitionTable;
+
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
@@ -46,4 +48,13 @@ public class PartitionableBlockAlignmentSupport extends BlockAlignmentSupport
     public int getSectorSize() throws IOException {
         return parentApi.getSectorSize();
     }        
+    
+    /**
+     * Gets the partition table that this block device contains.
+     * @return Null if no partition table is found.
+     * @throws IOException
+     */
+    public PartitionTable getPartitionTable() throws IOException {
+        return parentApi.getPartitionTable();
+    }
 }
