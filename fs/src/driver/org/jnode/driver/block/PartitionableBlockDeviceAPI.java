@@ -23,6 +23,8 @@ package org.jnode.driver.block;
 
 import java.io.IOException;
 
+import org.jnode.partitions.PartitionTable;
+
 /**
  * This device API is implemented by block devices that
  * support partition tables.
@@ -36,4 +38,11 @@ public interface PartitionableBlockDeviceAPI extends BlockDeviceAPI {
      * @return The sector size in bytes
      */
     public int getSectorSize() throws IOException;
+    
+    /**
+     * Gets the partition table that this block device contains.
+     * @return Null if no partition table is found.
+     * @throws IOException
+     */
+    public PartitionTable getPartitionTable() throws IOException;
 }

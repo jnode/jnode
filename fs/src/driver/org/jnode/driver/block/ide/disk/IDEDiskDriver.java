@@ -52,6 +52,7 @@ import org.jnode.driver.bus.ide.IDEDriverUtils;
 import org.jnode.driver.bus.ide.command.IDEReadSectorsCommand;
 import org.jnode.driver.bus.ide.command.IDEWriteSectorsCommand;
 import org.jnode.naming.InitialNaming;
+import org.jnode.partitions.PartitionTable;
 import org.jnode.partitions.ibm.IBMPartitionTable;
 import org.jnode.partitions.ibm.IBMPartitionTableEntry;
 import org.jnode.system.BootLog;
@@ -76,6 +77,7 @@ public class IDEDiskDriver extends Driver implements IDEDeviceAPI, IDEConstants 
 	/** Support 48-bit addressing? */
 	private boolean s48bit;
 	private IDEDiskBus diskBus;
+    private IBMPartitionTable pt;
 
 	/**
 	 * @see org.jnode.driver.Driver#startDevice()
@@ -110,7 +112,7 @@ public class IDEDiskDriver extends Driver implements IDEDeviceAPI, IDEConstants 
             } catch (NamingException ex) {
                 throw new DriverException(ex);
             }
-			final IBMPartitionTable pt = factory.createIBMPartitionTable(bs, dev);
+			this.pt = factory.createIBMPartitionTable(bs, dev);
 						
 			int partIndex = 0;
 			final int max = pt.getLength();
@@ -181,6 +183,7 @@ public class IDEDiskDriver extends Driver implements IDEDeviceAPI, IDEConstants 
 		}
 
 		dev.unregisterAPI(BlockDeviceAPI.class);
+        this.pt = null;
 	}
 
 	/**
@@ -325,5 +328,14 @@ public class IDEDiskDriver extends Driver implements IDEDeviceAPI, IDEConstants 
      */
     public int getSectorSize() throws IOException {
         return SECTOR_SIZE;
+    }
+    
+    /**
+     * Gets the partition table that this block device contains.
+     * @return Null if no partition table is found.
+     * @throws IOException
+     */
+    public PartitionTable getPartitionTable() throws IOException {
+        return pt;
     }
 }
