@@ -1024,6 +1024,7 @@ public abstract class BasicLookAndFeel extends LookAndFeel
       "SplitPane.highlight", new ColorUIResource(highLight),
       "SplitPane.shadow", new ColorUIResource(shadow),
       "SplitPaneDivider.border", BasicBorders.getSplitPaneDividerBorder(),
+      "SplitPaneDivider.draggingColor", new ColorUIResource(Color.DARK_GRAY),
       "TabbedPane.ancestorInputMap", new UIDefaults.LazyInputMap(new Object[] {
         "ctrl PAGE_DOWN","navigatePageDown",
         "ctrl PAGE_UP", "navigatePageUp",

@@ -258,7 +258,7 @@ public class BasicSplitPaneUI extends SplitPaneUI
           int loc = getInitialLocation(insets);
           int available = getAvailableSize(dims, insets);
           sizes[0] = getDividerLocation(split) - loc;
-          sizes[1] = available - sizes[0] - sizes[1];
+          sizes[1] = available - sizes[0] - sizes[2];
           // The size of the divider won't change.
 
           // Layout component#1.
@@ -390,6 +390,8 @@ public class BasicSplitPaneUI extends SplitPaneUI
     {
       for (int i = 0; i < components.length; i++)
 	resetSizeAt(i);
+      setDividerLocation(splitPane,
+                         getInitialLocation(splitPane.getInsets()) + sizes[0]);
     }
 
     /**
@@ -823,8 +825,6 @@ public class BasicSplitPaneUI extends SplitPaneUI
 	  if (prop <= 1 && prop >= 0)
 	    splitPane.setDividerLocation(prop);
         }
-      layoutManager.layoutContainer(splitPane);
-      splitPane.repaint();
       // Don't have to deal with continuous_layout - only
       // necessary in dragging modes (and it's checked
       // every time you drag there)
@@ -1212,7 +1212,8 @@ public class BasicSplitPaneUI extends SplitPaneUI
     if (nonContinuousLayoutDivider == null)
       {
 	nonContinuousLayoutDivider = new Canvas();
-	nonContinuousLayoutDivider.setBackground(Color.DARK_GRAY);
+        Color c = UIManager.getColor("SplitPaneDivider.draggingColor");
+        nonContinuousLayoutDivider.setBackground(c);
       }
     return nonContinuousLayoutDivider;
   }
@@ -1291,7 +1292,7 @@ public class BasicSplitPaneUI extends SplitPaneUI
    */
   public void setDividerLocation(JSplitPane jc, int location)
   {
-    dividerLocation = validLocation(location);
+    dividerLocation = location;
     splitPane.revalidate();
     splitPane.repaint();
   }
@@ -1456,8 +1457,6 @@ public class BasicSplitPaneUI extends SplitPaneUI
 	nonContinuousLayoutDivider.setVisible(true);
 	nonContinuousLayoutDivider.setBounds(divider.getBounds());
       }
-    splitPane.revalidate();
-    splitPane.repaint();
   }
 
   /**
@@ -1499,11 +1498,9 @@ public class BasicSplitPaneUI extends SplitPaneUI
       nonContinuousLayoutDivider.setVisible(false);
     draggingHW = false;
     location = validLocation(location);
-    dragDividerTo(location);
     splitPane.setDividerLocation(location);
     splitPane.setLastDividerLocation(beginDragDividerLocation);
     beginDragDividerLocation = -1;
-    splitPane.repaint();
   }
 
   /**

@@ -60,7 +60,7 @@ import javax.print.attribute.DocAttributeSet;
  * 
  * @author Wolfgang Baer (WBaer@gmx.de)
  */
-public class SimpleDoc implements Doc
+public final class SimpleDoc implements Doc
 {  
   private final Object printData;
   private final DocFlavor flavor;

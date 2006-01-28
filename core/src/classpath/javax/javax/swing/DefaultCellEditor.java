@@ -521,25 +521,7 @@ public class DefaultCellEditor
                                               boolean expanded, boolean leaf,
                                               int row)
   {
-    if (editorComponent instanceof JTextField)
-      {
-        ((JTextField)editorComponent).setText(value.toString());
-        delegate = new EditorDelegate();
-        ((JTextField)editorComponent).addActionListener(delegate);
-      }
-    else if (editorComponent instanceof JCheckBox)
-      {
-        ((JCheckBox)editorComponent).setText(value.toString());
-        delegate = new EditorDelegate();
-        ((JCheckBox)editorComponent).addActionListener(delegate);
-      }
-    else if (editorComponent instanceof JComboBox)
-      {
-        ((JComboBox)editorComponent).setSelectedItem(value.toString());
-        delegate = new EditorDelegate();
-        ((JComboBox)editorComponent).addActionListener(delegate);
-      }
-
+    delegate.setValue(value);
     return editorComponent;
 	} // getTreeCellEditorComponent()
 
