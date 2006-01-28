@@ -1482,6 +1482,9 @@ public class JTree extends JComponent implements Scrollable, Accessible
     setModel(model);
     setSelectionModel(new EmptySelectionModel());
     selectionModel.setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+    
+    // The root node appears expanded by default.
+    nodeStates.put(new TreePath(model.getRoot()), EXPANDED);
   }
 
   /**
@@ -2497,6 +2500,7 @@ public class JTree extends JComponent implements Scrollable, Accessible
   {
     TreeUI ui = getUI();
 
+    if (isEditing())
     if (ui != null)
       return ui.stopEditing(this);
 
@@ -2507,6 +2511,7 @@ public class JTree extends JComponent implements Scrollable, Accessible
   {
     TreeUI ui = getUI();
 
+    if (isEditing())
     if (ui != null)
       ui.cancelEditing(this);
   }
@@ -2738,7 +2743,7 @@ public class JTree extends JComponent implements Scrollable, Accessible
    * 
    * @return a String representation of this JTree
    */
-  public String paramString()
+  protected String paramString()
   {
     // TODO: this is completely legal, but it would possibly be nice
     // to return some more content, like the tree structure, some properties

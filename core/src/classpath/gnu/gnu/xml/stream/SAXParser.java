@@ -660,6 +660,9 @@ public class SAXParser
           errorHandler.fatalError(e2);
         if (contentHandler != null)
           contentHandler.endDocument();
+        if (e instanceof IOException)
+          throw (IOException) e;
+        else
         throw e2;
       }
     finally

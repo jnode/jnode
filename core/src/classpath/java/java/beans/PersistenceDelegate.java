@@ -59,8 +59,7 @@ public abstract class PersistenceDelegate
       {
         type = type.getSuperclass();
 
-        PersistenceDelegate pd = out.getPersistenceDelegate(
-          oldInstance.getClass().getSuperclass());
+        PersistenceDelegate pd = out.getPersistenceDelegate(type);
 
         pd.initialize(type, oldInstance, newInstance, out);
       }

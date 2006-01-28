@@ -1,5 +1,5 @@
-/* gnu/regexp/RETokenChar.java
-   Copyright (C) 1998-2001, 2004 Free Software Foundation, Inc.
+/* MatchResult.java -- Result of a regular expression match.
+   Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -36,56 +36,46 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package gnu.regexp;
+package java.util.regex;
 
-final class RETokenChar extends REToken {
-  private char[] ch;
-  private boolean insens;
-
-  RETokenChar(int subIndex, char c, boolean ins) {
-    super(subIndex);
-    ch = new char [1];
-    ch[0] = (insens = ins) ? Character.toLowerCase(c) : c;
-  }
-
-  int getMinimumLength() {
-    return ch.length;
-  }
+/**
+ * This interface represents the result of a regular expression match.
+ * It can be used to query the contents of the match, but not to modify
+ * them.
+ * @since 1.5
+ */
+public interface MatchResult
+{
+  /** Returns the index just after the last matched character.  */
+  int end();
   
-    boolean match(CharIndexed input, REMatch mymatch) {
-	int z = ch.length;
-	char c;
-	for (int i=0; i<z; i++) {
-	    c = input.charAt(mymatch.index+i);
-	    if (( (insens) ? Character.toLowerCase(c) : c ) != ch[i]) {
-		return false;
-	    }
-	}
-	mymatch.index += z;
+  /**
+   * Returns the index just after the last matched character of the
+   * given sub-match group.
+   * @param group the sub-match group
+   */ 
+  int end(int group);
 
-	return next(input, mymatch);
-    }
+  /** Returns the substring of the input which was matched.  */
+  String group();
+  
+  /** 
+   * Returns the substring of the input which was matched by the
+   * given sub-match group.
+   * @param group the sub-match group
+   */
+  String group(int group);
 
-  // Overrides REToken.chain() to optimize for strings
-  boolean chain(REToken next) {
-    if (next instanceof RETokenChar && ((RETokenChar)next).insens == insens) {
-      RETokenChar cnext = (RETokenChar) next;
-      // assume for now that next can only be one character
-      int newsize = ch.length + cnext.ch.length;
-      
-      char[] chTemp = new char [newsize];
-      
-      System.arraycopy(ch,0,chTemp,0,ch.length);
-      System.arraycopy(cnext.ch,0,chTemp,ch.length,cnext.ch.length);
-      
-      ch = chTemp;
-      return false;
-    } else return super.chain(next);
-  }
+  /** Returns the number of sub-match groups in the matching pattern.  */  
+  int groupCount();
 
-  void dump(StringBuffer os) {
-    os.append(ch);
-  }
+  /** Returns the index of the first character of the match.  */
+  int start();
+
+  /**
+   * Returns the index of the first character of the given sub-match
+   * group.
+   * @param group the sub-match group
+   */
+  int start(int group);
 }
-
-
