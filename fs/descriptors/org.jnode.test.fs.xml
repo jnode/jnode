@@ -47,11 +47,6 @@
       <export name="org.jnode.test.fs.filesystem.*"/>      
       <export name="org.jnode.test.fs.filesystem.config.*"/>
       <export name="org.jnode.test.fs.filesystem.tests.*"/>
-      
-      <export name="org.jnode.fs.ext2.*"/>
-      <export name="org.jnode.fs.ntfs.*"/>
-      <export name="org.jnode.fs.fat.*"/>
-      <export name="org.jnode.fs.iso9660.*"/>              
     </library>
   </runtime>
         
