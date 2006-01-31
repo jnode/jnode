@@ -61,8 +61,8 @@ no_pse_feat:
 	LOOPDIE
 	
 no_cpuid_msg:		db 'Processor has no CPUID. halt...',0;
-no_pse_feat_msg:	db 'Processor has PSE support. halt...',0;
-no_fpu_feat_msg:	db 'Processor has FPU support. halt...',0;
+no_pse_feat_msg:	db 'Processor has no PSE support. halt...',0;
+no_fpu_feat_msg:	db 'Processor has no FPU support. halt...',0;
 	
 %ifdef BITS64
 	bits 64
