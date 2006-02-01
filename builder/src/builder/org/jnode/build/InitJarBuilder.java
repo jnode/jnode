@@ -209,6 +209,8 @@ public class InitJarBuilder extends AbstractPluginsTask {
         final ArrayList<PluginJar> result = new ArrayList<PluginJar>(pluginJars.size());
         final HashSet<String> ids = new HashSet<String>();
         while (!pluginJars.isEmpty()) {
+        	boolean somethingRemoved = false;
+            
             for (Iterator<PluginJar> i = pluginJars.iterator(); i.hasNext();) {
                 final BuildPluginJar piJar = (BuildPluginJar) i.next();
                 if (piJar.hasAllPrerequisitesInSet(ids)) {
@@ -216,7 +218,19 @@ public class InitJarBuilder extends AbstractPluginsTask {
                     result.add(piJar);
                     ids.add(piJar.getDescriptor().getId());
                     i.remove();
+                    somethingRemoved = true;
                 }
+            }
+            
+            if(!somethingRemoved)
+            {
+            	StringBuilder sb = new StringBuilder("cycle in plugin dependencies :\n");
+                for (Iterator<PluginJar> i = pluginJars.iterator(); i.hasNext();) 
+                {
+                    final BuildPluginJar piJar = (BuildPluginJar) i.next();
+                    sb.append(piJar.getDescriptor().getId()).append('\n');
+                }
+                throw new BuildException(sb.toString());
             }
         }
         return result;
