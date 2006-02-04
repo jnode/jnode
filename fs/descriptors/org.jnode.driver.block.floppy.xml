@@ -16,6 +16,7 @@
   <runtime>
     <library name="jnode-fs.jar">
       <export name="org.jnode.driver.block.floppy.*"/>
+      <export name="org.jnode.driver.block.floppy.support.*"/>
     </library>
   </runtime>
         
