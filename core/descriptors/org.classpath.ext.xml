@@ -12,7 +12,6 @@
 
   <runtime>
     <library name="jnode-core.jar">
-      <export name="gnu.java.locale.*"/>
 
       <export name="gnu.javax.swing.text.html.parser.*"/>
       <export name="gnu.javax.swing.text.html.parser.models.*"/>
