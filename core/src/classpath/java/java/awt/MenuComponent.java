@@ -60,20 +60,10 @@ import javax.accessibility.AccessibleStateSet;
 public abstract class MenuComponent implements Serializable
 {
 
-/*
- * Static Variables
- */
+//Serialization Constant
+  private static final long serialVersionUID = -4536902356223894379L;
 
-// Serialization Constant
-private static final long serialVersionUID = -4536902356223894379L;
-
-/*************************************************************************/
-
-/*
- * Instance Variables
- */
-
-/**
+  /**
  * The font for this component.
  *
  * @see #getFont()
@@ -165,249 +155,217 @@ private static final long serialVersionUID = -4536902356223894379L;
    */
   transient FocusListener focusListener;
 
-/*************************************************************************/
-
-/*
- * Constructors
- */
-
-/**
+  /**
   * Default constructor for subclasses.
   *
-  * @exception HeadlessException If GraphicsEnvironment.isHeadless() is true.
+   * @throws HeadlessException ff GraphicsEnvironment.isHeadless() is true
   */
-public
-MenuComponent()
-{
+  public MenuComponent()
+  {
   if (GraphicsEnvironment.isHeadless())
-    throw new HeadlessException ();
-}
-
-/*************************************************************************/
-
-/*
- * Instance Methods
- */
+      throw new HeadlessException();
+  }
 
 /**
   * Returns the font in use for this component.
   *
-  * @return The font for this component.
+  * @return the font for this component
   */
-public Font
-getFont()
-{
+  public Font getFont()
+  {
   if (font != null)
     return font;
 
   if (parent != null)
-    return parent.getFont ();
+      return parent.getFont();
 
   return null;
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Sets the font for this component to the specified font.
   *
-  * @param font The new font for this component.
+   * @param font the new font for this component
   */
-public void
-setFont(Font font)
-{
+  public void setFont(Font font)
+  {
   this.font = font;
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Returns the name of this component.
   *
-  * @return The name of this component.
+   * @return the name of this component
   */
-public String
-getName()
-{
-  return(name);
-}
+  public String getName()
+  {
+    return name;
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Sets the name of this component to the specified name.
   *
-  * @param name The new name of this component.
+   * @param name the new name of this component
   */
-public void
-setName(String name)
-{
+  public void setName(String name)
+  {
   this.name = name;
   nameExplicitlySet = true;
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Returns the parent of this component.
   * 
-  * @return The parent of this component.
+   * @return the parent of this component
   */
-public MenuContainer
-getParent()
-{
-  return(parent);
-} 
+  public MenuContainer getParent()
+  {
+    return parent;
+  } 
 
-/*************************************************************************/
-
-// Sets the parent of this component.
-final void
-setParent(MenuContainer parent)
-{
+  /**
+   * Sets the parent of this component.
+   *
+   * @param parent the parent to set
+   */
+  final void setParent(MenuContainer parent)
+  {
   this.parent = parent;
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Returns the native windowing system peer for this component.
   *
-  * @return The peer for this component.
+   * @return the peer for this component
   *
   * @deprecated
   */
-public MenuComponentPeer
-getPeer()
-{
-  return(peer);
-}
+  public MenuComponentPeer getPeer()
+  {
+    return peer;
+  }
 
-/*************************************************************************/
-
-// Sets the peer for this component.
-final void
-setPeer(MenuComponentPeer peer)
-{
+  /**
+   * Sets the peer for this component.
+   *
+   * @param peer the peer to set
+   */
+  final void setPeer(MenuComponentPeer peer)
+  {
   this.peer = peer;
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Destroys this component's native peer
   */
-public void
-removeNotify()
-{
+  public void removeNotify()
+  {
   if (peer != null)
     peer.dispose();
   peer = null;
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Returns the toolkit in use for this component.
   *
-  * @return The toolkit for this component.
+   * @return the toolkit for this component
   */
-final Toolkit
-getToolkit()
-{
-  return(toolkit);
-}
+  final Toolkit getToolkit()
+  {
+    return toolkit;
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Returns the object used for synchronization locks on this component
   * when performing tree and layout functions.
   *
-  * @return The synchronization lock for this component.
+   * @return the synchronization lock for this component
   */
-protected final Object
-getTreeLock()
-{
-  return(tree_lock);
-}
+  protected final Object getTreeLock()
+  {
+    return tree_lock;
+  }
 
-/*************************************************************************/
+  /**
+   * Sets the sync lock object for this component.
+   *
+   * @param treeLock the sync lock to set
+   */
+  final void setTreeLock(Object treeLock)
+  {
+    this.tree_lock = treeLock;
+  }
 
-// The sync lock object for this component.
-final void
-setTreeLock(Object tree_lock)
-{
-  this.tree_lock = tree_lock;
-}
-
-/*************************************************************************/
-
-/**
+  /**
   * AWT 1.0 event dispatcher.
   *
+   * @return true if the event was dispatched, false otherwise
+   *
   * @deprecated Deprecated in favor of <code>dispatchEvent()</code>.
-  * @return true if the event was dispatched, false otherwise.
   */
-public boolean
-postEvent(Event event)
-{
-  // This is overridden by subclasses that support events.
-  return false;
-}
-/*************************************************************************/
+  public boolean
+  postEvent(Event event)
+  {
+    boolean retVal = false;
+    MenuContainer parent = getParent();
+    if (parent == null)
+      {
+        if (this instanceof MenuBar)
+          {
+            MenuBar menuBar = (MenuBar) this;
+            if (menuBar.frame != null)
+              retVal = menuBar.frame.postEvent(event);
+          }
+      }
+    else
+      retVal = parent.postEvent(event);
 
-/**
+    return retVal;
+  }
+
+  /**
   * Sends this event to this component or a subcomponent for processing.
   *
   * @param event The event to dispatch
   */
-public final void dispatchEvent(AWTEvent event)
-{
+  public final void dispatchEvent(AWTEvent event)
+  {
+    // Convert AWT 1.1 event to AWT 1.0 event.
+    Event oldStyleEvent = Component.translateEvent(event);
+    if (oldStyleEvent != null)
+      {
+        postEvent(oldStyleEvent);
+      }
+
   // See comment in Component.dispatchEvent().
   dispatchEventImpl(event);
-}
+  }
 
-
-/**
+  /**
  * Implementation of dispatchEvent. Allows trusted package classes
  * to dispatch additional events first.  This implementation first
  * translates <code>event</code> to an AWT 1.0 event and sends the
  * result to {@link #postEvent}.  The event is then
  * passed on to {@link #processEvent} for local processing.
  *
- * @param event the event to dispatch.
+   * @param event the event to dispatch
  */
-void dispatchEventImpl(AWTEvent event)
-{
-  Event oldStyleEvent;
-
-  // This is overridden by subclasses that support events.
-  /* Convert AWT 1.1 event to AWT 1.0 event */
-  oldStyleEvent = Component.translateEvent(event);
-  if (oldStyleEvent != null)
+  void dispatchEventImpl(AWTEvent event)
     {
-      postEvent(oldStyleEvent);
-    }
-  /* Do local processing */
+    // Do local processing.
   processEvent(event);
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Processes the specified event.  In this class, this method simply
   * calls one of the more specific event handlers.
   * 
-  * @param event The event to process.
+   * @param event the event to process
   */
-protected void
-processEvent(AWTEvent event)
-{
-  /* 
-     Pass a focus event to the focus listener for
-     the accessibility context.
-  */
+  protected void processEvent(AWTEvent event)
+  {
+    // Pass a focus event to the focus listener for
+    // the accessibility context.
   if (event instanceof FocusEvent)
     {
       if (focusListener != null)
@@ -423,55 +381,48 @@ processEvent(AWTEvent event)
             }
         }
     }
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Returns a string representation of this component.
   *
-  * @return A string representation of this component
+   * @return a string representation of this component
   */
-public String
-toString()
-{
-  return this.getClass().getName() + "[" + paramString() + "]";
-}
+  public String toString()
+  {
+    return getClass().getName() + "[" + paramString() + "]";
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Returns a debugging string for this component
   */
-protected String
-paramString()
-{
+  protected String paramString()
+  {
   return "name=" + getName();
-}
+  }
 
-/**
+  /**
  * Gets the AccessibleContext associated with this <code>MenuComponent</code>.
  * As an abstract class, we return null.  Concrete subclasses should return
  * their implementation of the accessibility context.
  *
- * @return null.
+   * @return null
  */
-
-public AccessibleContext getAccessibleContext()
-{
+  public AccessibleContext getAccessibleContext()
+  {
   return null;
-}
+  }
 
-/**
+  /**
  * This class provides a base for the accessibility support of menu
  * components.
  *
  * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  */
-protected abstract class AccessibleAWTMenuComponent
+  protected abstract class AccessibleAWTMenuComponent
   extends AccessibleContext
   implements Serializable, AccessibleComponent, AccessibleSelection
-{
+  {
 
   /**
    * Compatible with JDK 1.4.2 revision 5
@@ -484,6 +435,7 @@ protected abstract class AccessibleAWTMenuComponent
    */
   protected AccessibleAWTMenuComponent()
   {
+      // Nothing to do here.
   }
 
   /**
@@ -500,26 +452,24 @@ protected abstract class AccessibleAWTMenuComponent
    * is left to subclasses.
    *
    * @param index the index of the specified child within a
-   *        zero-based list of the component's children.
+     *        zero-based list of the component's children
    */
   public void addAccessibleSelection(int index)
   {
-    /* Subclasses with children should implement this */
+      // Subclasses with children should implement this.
   }
 
   /**
    * Registers the specified focus listener to receive
    * focus events from this component.
    *
-   * @param listener the new focus listener.
+     * @param listener the new focus listener
    */
   public void addFocusListener(FocusListener listener)
   {
-    /*
-     * Chain the new focus listener to the existing chain
-     * of focus listeners.  Each new focus listener is
-     * coupled via multicasting to the existing chain.
-     */
+       // Chain the new focus listener to the existing chain
+       // of focus listeners.  Each new focus listener is
+       // coupled via multicasting to the existing chain.
     focusListener = AWTEventMulticaster.add(focusListener, listener);
   }
 
@@ -535,6 +485,7 @@ protected abstract class AccessibleAWTMenuComponent
    */
   public void clearAccessibleSelection()
   {
+      // Nothing to do here.
   }
 
   /**
@@ -550,16 +501,14 @@ protected abstract class AccessibleAWTMenuComponent
    * must provide the bounding rectangle via <code>getBounds()</code>
    * in order for this method to work.  
    *
-   * @param point the point to check against this component.
-   * @return true if the point is within this component.
+     * @param point the point to check against this component
+     * @return true if the point is within this component
    * @see #getBounds()
    */
   public boolean contains(Point point)
   {
-    /* 
-       We can simply return the result of a
-       test for containment in the bounding rectangle 
-    */
+      // We can simply return the result of a
+      // test for containment in the bounding rectangle.
     return getBounds().contains(point);
   }
 
@@ -577,8 +526,8 @@ protected abstract class AccessibleAWTMenuComponent
    * is left to subclasses.
    * 
    * @param point the point at which the returned accessible
-   *        is located.
-   * @return null.
+     *        is located
+     * @return null
    */
   public Accessible getAccessibleAt(Point point)
   {
@@ -595,8 +544,9 @@ protected abstract class AccessibleAWTMenuComponent
    * is left to subclasses.
    *
    * @param index the index of the <code>Accessible</code> child
-   *        to retrieve.
-   * @return null.
+     *        to retrieve
+     *
+     * @return null
    */
   public Accessible getAccessibleChild(int index)
   {
@@ -612,7 +562,7 @@ protected abstract class AccessibleAWTMenuComponent
    * <br />
    * <br />
    *
-   * @return 0.
+     * @return 0
    */
   public int getAccessibleChildrenCount()
   {
@@ -625,7 +575,7 @@ protected abstract class AccessibleAWTMenuComponent
    * context itself implements <code>AccessibleComponent</code>,
    * this is the return value.
    *
-   * @return the context itself.
+     * @return the context itself
    */
   public AccessibleComponent getAccessibleComponent()
   {
@@ -645,7 +595,8 @@ protected abstract class AccessibleAWTMenuComponent
    * file system'.
    *
    * @return a description of the component.  Currently,
-   *         this is just the contents of the name property.
+     *         this is just the contents of the name property
+     *
    * @see MenuComponent#setName(String)
    */
   public String getAccessibleDescription()
@@ -658,7 +609,7 @@ protected abstract class AccessibleAWTMenuComponent
    * If no parent exists, -1 is returned.
    *
    * @return -1 as the parent, a <code>MenuContainer</code>
-   *         is not <code>Accessible</code>.
+     *         is not <code>Accessible</code>
    */
   public int getAccessibleIndexInParent()
   {
@@ -680,7 +631,8 @@ protected abstract class AccessibleAWTMenuComponent
    * name.
    *
    * @return a localized name for this component.  Currently, this
-   *         is just the contents of the name property.
+     *         is just the contents of the name property
+     *
    * @see MenuComponent#setName(String)
    */
   public String getAccessibleName()
@@ -694,7 +646,7 @@ protected abstract class AccessibleAWTMenuComponent
    * <code>MenuContainer</code>, which doesn't implement
    * <code>Accessible</code>, this method returns null.
    *
-   * @return null.
+     * @return null
    */
   public Accessible getAccessibleParent()
   {
@@ -711,7 +663,7 @@ protected abstract class AccessibleAWTMenuComponent
    * method should be overridden by concrete subclasses, so
    * as to return an appropriate role for the component.
    *
-   * @return <code>AccessibleRole.AWT_COMPONENT</code>.
+     * @return <code>AccessibleRole.AWT_COMPONENT</code>
    */
   public AccessibleRole getAccessibleRole()
   {
@@ -724,7 +676,7 @@ protected abstract class AccessibleAWTMenuComponent
    * context itself implements <code>AccessibleSelection</code>,
    * this is the return value.
    *
-   * @return the context itself.
+     * @return the context itself
    */
   public AccessibleSelection getAccessibleSelection()
   {
@@ -746,7 +698,7 @@ protected abstract class AccessibleAWTMenuComponent
    * is left to subclasses.
    *
    * @param index the index of the selected <code>Accessible</code>
-   *        child.
+     *        child
    */
   public Accessible getAccessibleSelection(int index)
   {
@@ -763,7 +715,7 @@ protected abstract class AccessibleAWTMenuComponent
    * this abstract class, the implementation of this method
    * is left to subclasses.
    *
-   * @return 0.
+     * @return 0
    */
   public int getAccessibleSelectionCount()
   {
@@ -784,7 +736,7 @@ protected abstract class AccessibleAWTMenuComponent
    * properties also need to be handled using
    * <code>PropertyChangeListener</code>s.
    *
-   * @return an empty <code>AccessibleStateSet</code>.
+     * @return an empty <code>AccessibleStateSet</code>
    */
   public AccessibleStateSet getAccessibleStateSet()
   {
@@ -803,7 +755,8 @@ protected abstract class AccessibleAWTMenuComponent
    * menu component should override this method and provide
    * the appropriate information.
    *
-   * @return the default system background color for menus.
+     * @return the default system background color for menus
+     *
    * @see #setBackground(java.awt.Color)
    */
   public Color getBackground()
@@ -826,7 +779,8 @@ protected abstract class AccessibleAWTMenuComponent
    * menu component should override this method and provide
    * the appropriate information.
    *
-   * @return null.
+     * @return null
+     *
    * @see #setBounds(java.awt.Rectangle)
    */
   public Rectangle getBounds()
@@ -847,7 +801,8 @@ protected abstract class AccessibleAWTMenuComponent
    * of an onscreen menu component may override this method and provide
    * the appropriate information.
    *
-   * @return the default system cursor.
+     * @return the default system cursor
+     *
    * @see #setCursor(java.awt.Cursor)
    */
   public Cursor getCursor()
@@ -858,7 +813,8 @@ protected abstract class AccessibleAWTMenuComponent
   /**
    * Returns the <code>Font</code> used for text created by this component.
    *
-   * @return the current font.
+     * @return the current font
+     *
    * @see #setFont(java.awt.Font)
    */
   public Font getFont()
@@ -878,10 +834,12 @@ protected abstract class AccessibleAWTMenuComponent
    * is available.
    *
    * @param font the font about which to retrieve rendering and metric
-   *        information.
+     *        information
+     *
    * @return the metrics of the given font, as provided by the system
-   *         toolkit.
-   * @throws NullPointerException if the supplied font was null.
+     *         toolkit
+     *
+     * @throws NullPointerException if the supplied font was null
    */
   public FontMetrics getFontMetrics(Font font)
   {
@@ -900,7 +858,8 @@ protected abstract class AccessibleAWTMenuComponent
    * menu component should override this method and provide
    * the appropriate information.
    *
-   * @return the default system text color for menus.
+     * @return the default system text color for menus
+     *
    * @see #setForeground(java.awt.Color)
    */
   public Color getForeground()
@@ -919,7 +878,7 @@ protected abstract class AccessibleAWTMenuComponent
    * which maintain such a property should override this method
    * and provide the locale information more accurately.
    *
-   * @return the default locale for this JVM instance.
+     * @return the default locale for this JVM instance
    */
   public Locale getLocale()
   {
@@ -938,12 +897,13 @@ protected abstract class AccessibleAWTMenuComponent
    * must provide the bounding rectangle via <code>getBounds()</code>
    * in order for this method to work.  
    *
-   * @return the location of the component, relative to its parent.
+     * @return the location of the component, relative to its parent
+     *
    * @see #setLocation(java.awt.Point)
    */
   public Point getLocation()
   {
-    /* Simply return the location of the bounding rectangle */
+      // Simply return the location of the bounding rectangle.
     return getBounds().getLocation();
   }
 
@@ -960,7 +920,7 @@ protected abstract class AccessibleAWTMenuComponent
    * menu component should override this method and provide
    * the appropriate information.
    *
-   * @return the location of the component, relative to the screen.
+     * @return the location of the component, relative to the screen
    */
   public Point getLocationOnScreen()
   {
@@ -976,12 +936,13 @@ protected abstract class AccessibleAWTMenuComponent
    * must provide the bounding rectangle via <code>getBounds()</code>
    * in order for this method to work.  
    *
-   * @return the size of the component.
+     * @return the size of the component
+     *
    * @see #setSize(java.awt.Dimension)
    */
   public Dimension getSize()
   {
-    /* Simply return the size of the bounding rectangle */
+      // Simply return the size of the bounding rectangle.
     return getBounds().getSize();
   }
 
@@ -994,8 +955,9 @@ protected abstract class AccessibleAWTMenuComponent
    * this abstract class, the implementation of this method
    * is left to subclasses.
    *
-   * @param index the index of the accessible child to check for selection.
-   * @return false.
+     * @param index the index of the accessible child to check for selection
+     *
+     * @return false
    */
   public boolean isAccessibleChildSelected(int index)
   {
@@ -1010,7 +972,8 @@ protected abstract class AccessibleAWTMenuComponent
    * its enabled or disabled state, the implementation of this
    * method is left to subclasses.
    *
-   * @return false.
+     * @return false
+     *
    * @see #setEnabled(boolean)
    */
   public boolean isEnabled()
@@ -1027,7 +990,7 @@ protected abstract class AccessibleAWTMenuComponent
    * its ability to accept the focus, the implementation of this
    * method is left to subclasses.
    *
-   * @return false.
+     * @return false
    */
   public boolean isFocusTraversable()
   {
@@ -1047,7 +1010,8 @@ protected abstract class AccessibleAWTMenuComponent
    * relating to visibility, the implementation of this method is
    * left to subclasses.
    *
-   * @return false.
+     * @return false
+     *
    * @see #isVisible()
    */
   public boolean isShowing()
@@ -1066,7 +1030,8 @@ protected abstract class AccessibleAWTMenuComponent
    * As this abstract component has no properties relating to its
    * visibility, the implementation of this method is left to subclasses.
    *
-   * @return false.
+     * @return false
+     *
    * @see #isShowing()
    * @see #setVisible(boolean)
    */
@@ -1085,22 +1050,22 @@ protected abstract class AccessibleAWTMenuComponent
    * this abstract class, the implementation of this method
    * is left to subclasses.
    *
-   * @param index the index of the <code>Accessible</code> child.
+     * @param index the index of the <code>Accessible</code> child
    */
   public void removeAccessibleSelection(int index)
   {
-    /* Subclasses with children should implement this */
+      // Subclasses with children should implement this.
   }
 
   /**
    * Removes the specified focus listener from the list of registered
    * focus listeners for this component.
    *
-   * @param listener the listener to remove.
+     * @param listener the listener to remove
    */
   public void removeFocusListener(FocusListener listener)
   {
-    /* Remove the focus listener from the chain */
+      // Remove the focus listener from the chain.
     focusListener = AWTEventMulticaster.remove(focusListener, listener);
   }
 
@@ -1115,7 +1080,7 @@ protected abstract class AccessibleAWTMenuComponent
    */
   public void requestFocus()
   {
-    /* Ignored */
+      // Ignored.
   }
 
   /**
@@ -1136,7 +1101,7 @@ protected abstract class AccessibleAWTMenuComponent
    */
   public void selectAllAccessibleSelection()
   {
-    /* Simply call addAccessibleSelection() on all accessible children */
+      // Simply call addAccessibleSelection() on all accessible children.
     for (int a = 0; a < getAccessibleChildrenCount(); ++a)
       {
         addAccessibleSelection(a);
@@ -1156,12 +1121,13 @@ protected abstract class AccessibleAWTMenuComponent
    * menu component should override this method and provide
    * the appropriate information.
    *
-   * @param color the new color to use for the background.
+     * @param color the new color to use for the background
+     *
    * @see #getBackground()
    */
   public void setBackground(Color color)
   {
-    /* Ignored */
+      // Ignored.
   }
 
   /**
@@ -1179,12 +1145,13 @@ protected abstract class AccessibleAWTMenuComponent
    * the appropriate information.
    *
    * @param rectangle a rectangle which specifies the new bounds of
-   *        the component.
+     *        the component
+     *
    * @see #getBounds()
    */
   public void setBounds(Rectangle rectangle)
   {
-    /* Ignored */
+      // Ignored.
   }
 
   /**
@@ -1199,12 +1166,13 @@ protected abstract class AccessibleAWTMenuComponent
    * subclasses which handle the drawing of an onscreen menu component
    * may override this method and provide the appropriate information.
    *
-   * @param cursor the new cursor to use.
+     * @param cursor the new cursor to use
+     *
    * @see #getCursor()
    */
   public void setCursor(Cursor cursor)
   {
-    /* Ignored */
+      // Ignored.
   }
 
   /**
@@ -1216,12 +1184,13 @@ protected abstract class AccessibleAWTMenuComponent
    * method is left to subclasses.
    *
    * @param enabled true if the component should be enabled,
-   *        false otherwise.
+     *        false otherwise
+     *
    * @see #isEnabled()
    */
   public void setEnabled(boolean enabled)
   {
-    /* Ignored */
+      // Ignored.
   }
 
   /**
@@ -1234,7 +1203,7 @@ protected abstract class AccessibleAWTMenuComponent
    */
   public void setFont(Font font)
   {
-    /* Call the method of the enclosing component */
+      // Call the method of the enclosing component.
     MenuComponent.this.setFont(font);
   }
 
@@ -1252,12 +1221,13 @@ protected abstract class AccessibleAWTMenuComponent
    * menu component should override this method and provide
    * the appropriate information.
    *
-   * @param color the new foreground color.
+     * @param color the new foreground color
+     *
    * @see #getForeground()
    */
   public void setForeground(Color color)
   {
-    /* Ignored */
+      // Ignored.
   }
 
   /**
@@ -1272,7 +1242,8 @@ protected abstract class AccessibleAWTMenuComponent
    * must provide the bounding rectangle via <code>getBounds()</code>
    * in order for this method to work.  
    *
-   * @param point the location of the component, relative to its parent.
+     * @param point the location of the component, relative to its parent
+     *
    * @see #getLocation()
    */
   public void setLocation(Point point)
@@ -1289,7 +1260,8 @@ protected abstract class AccessibleAWTMenuComponent
    * must provide the bounding rectangle via <code>getBounds()</code>
    * in order for this method to work.  
    *
-   * @param size the new size of the component.
+     * @param size the new size of the component
+     *
    * @see #getSize()
    */
   public void setSize(Dimension size)
@@ -1309,16 +1281,16 @@ protected abstract class AccessibleAWTMenuComponent
    * visibility, the implementation of this method is left to subclasses.
    *
    * @param visibility the new visibility of the component -- true if
-   *        the component is visible, false if not.
+     *        the component is visible, false if not
+     *
    * @see #isShowing()
    * @see #isVisible()
    */
   public void setVisible(boolean visibility)
   {
-    /* Ignored */
+      // Ignored.
   }
 
-} /* class AccessibleAWTMenuComponent */
-          
+  }
 
-} // class MenuComponent
+}

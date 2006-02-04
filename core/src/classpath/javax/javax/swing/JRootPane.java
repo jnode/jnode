@@ -120,11 +120,6 @@ public class JRootPane extends JComponent implements Accessible
     private Rectangle menuBarBounds;
 
     /**
-     * The cached preferred size.
-     */
-    private Dimension prefSize;
-
-    /**
      * Creates a new <code>RootLayout</code> object.
      */
     protected RootLayout()
@@ -191,7 +186,6 @@ public class JRootPane extends JComponent implements Accessible
           layeredPaneBounds = null;
           contentPaneBounds = null;
           menuBarBounds = null;
-          prefSize = null;
         }
     }
 
@@ -287,12 +281,7 @@ public class JRootPane extends JComponent implements Accessible
      */
     public Dimension preferredLayoutSize(Container c)
     {
-      // We must synchronize here, otherwise we cannot guarantee that the
-      // prefSize is still non-null when returning.
-      synchronized (this)
-        {
-          if (prefSize == null)
-            {
+      Dimension prefSize = new Dimension();
               Insets i = getInsets();
               prefSize = new Dimension(i.left + i.right, i.top + i.bottom);
               Dimension contentPrefSize = contentPane.getPreferredSize();
@@ -305,11 +294,7 @@ public class JRootPane extends JComponent implements Accessible
                     prefSize.width += menuBarSize.width - contentPrefSize.width;
                   prefSize.height += menuBarSize.height;
             }
-        }
-          // Return a copy here so the cached value won't get trashed by some
-          // other component.
-          return new Dimension(prefSize);
-      }
+      return prefSize;
     }
 
     /**

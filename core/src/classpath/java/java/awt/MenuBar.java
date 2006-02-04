@@ -39,7 +39,6 @@ exception statement from your version. */
 package java.awt;
 
 import java.awt.peer.MenuBarPeer;
-import java.awt.peer.MenuComponentPeer;
 
 import java.io.Serializable;
 import java.util.Enumeration;
@@ -60,222 +59,173 @@ public class MenuBar extends MenuComponent
   implements MenuContainer, Serializable, Accessible
 {
 
-/*
- * Static Variables
- */
-
-// Serialization Constant
-private static final long serialVersionUID = -4930327919388951260L;
-
-/*************************************************************************/
-
-/*
- * Instance Variables
- */
-
-/**
-  * @serial The menu used for providing help information
-  */
-private Menu helpMenu;
-
-/**
-  * @serial The menus contained in this menu bar.
-  */
-private Vector menus = new Vector();
+//Serialization Constant
+  private static final long serialVersionUID = -4930327919388951260L;
 
   /**
-   * The accessible context for this component.
-   *
-   * @see #getAccessibleContext()
-   * @serial ignored.
-   */
-  private transient AccessibleContext accessibleContext;
+  * @serial The menu used for providing help information
+  */
+  private Menu helpMenu;
 
-/*************************************************************************/
+  /**
+  * @serial The menus contained in this menu bar.
+  */
+  private Vector menus = new Vector();
 
-/*
- * Constructors
+  /**
+   * The frame that this menubar is associated with. We need to know this so
+   * that {@link MenuComponent#postEvent(Event)} can post the event to the
+   * frame if no other component processed the event.
  */
+  Frame frame;
 
-/**
+  /**
   * Initializes a new instance of <code>MenuBar</code>.
   *
-  * @exception HeadlessException If GraphicsEnvironment.isHeadless() is true.
+   * @throws HeadlessException if GraphicsEnvironment.isHeadless() is true
   */
-public
-MenuBar()
-{
+  public MenuBar()
+  {
   if (GraphicsEnvironment.isHeadless())
-    throw new HeadlessException ();
-}
+      throw new HeadlessException();
+  }
 
-/*************************************************************************/
-
-/*
- * Instance Methods
- */
-
-/**
+  /**
   * Returns the help menu for this menu bar.  This may be <code>null</code>.
   *
-  * @return The help menu for this menu bar.
+   * @return the help menu for this menu bar
   */
-public Menu
-getHelpMenu()
-{
-  return(helpMenu);
-}
+  public Menu getHelpMenu()
+  {
+    return helpMenu;
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Sets the help menu for this menu bar.
   *
-  * @param menu The new help menu for this menu bar.
+   * @param menu the new help menu for this menu bar
   */
-public synchronized void
-setHelpMenu(Menu menu)
-{
+  public synchronized void setHelpMenu(Menu menu)
+  {
   if (helpMenu != null)
     {
-      helpMenu.removeNotify ();
+        helpMenu.removeNotify();
       helpMenu.parent = null;
     }
   helpMenu = menu;
 
   if (menu.parent != null)
-    menu.parent.remove (menu);
+      menu.parent.remove(menu);
   menu.parent = this;
 
-  MenuBarPeer peer = (MenuBarPeer) getPeer ();
-  if (peer != null)
+    MenuBarPeer myPeer = (MenuBarPeer) getPeer ();
+    if (myPeer != null)
     {
       menu.addNotify();
-      peer.addHelpMenu (menu);
+        myPeer.addHelpMenu(menu);
+      }
     }
-}
 
-/*************************************************************************/
-
-/** Add a menu to this MenuBar.  If the menu has already has a
+  /**
+   * Add a menu to this MenuBar.  If the menu has already has a
  * parent, it is first removed from its old parent before being
  * added.
  *
- * @param menu The menu to add.
+   * @param menu the menu to add
  *
- * @return The menu that was added.
+   * @return the menu that was added
  */
-public synchronized Menu
-add(Menu menu)
-{
+  public synchronized Menu add(Menu menu)
+  {
   if (menu.parent != null)
-    menu.parent.remove (menu);
+      menu.parent.remove(menu);
 
   menu.parent = this;
   menus.addElement(menu);
 
   if (peer != null)
-    {
       menu.addNotify();
-    }
 
-  return(menu);
-}
+    return menu;
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Removes the menu at the specified index.
   *
-  * @param index The index of the menu to remove from the menu bar.
+   * @param index the index of the menu to remove from the menu bar
   */
-public synchronized void
-remove(int index)
-{
-  Menu m = (Menu) menus.get (index);
-  menus.remove (index);
-  m.removeNotify ();
+  public synchronized void remove(int index)
+  {
+    Menu m = (Menu) menus.get(index);
+    menus.remove(index);
+    m.removeNotify();
   m.parent = null;
 
   if (peer != null)
     {
       MenuBarPeer mp = (MenuBarPeer) peer;
-      mp.delMenu (index);
+        mp.delMenu(index);
+      }
     }
-}
 
-/*************************************************************************/
-
-/**
+  /**
   * Removes the specified menu from the menu bar.
   *
-  * @param menu The menu to remove from the menu bar.
+   * @param menu the menu to remove from the menu bar
   */
-public void
-remove(MenuComponent menu)
-{
+  public void remove(MenuComponent menu)
+  {
   int index = menus.indexOf(menu);
   if (index == -1)
     return;
 
   remove(index);
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Returns the number of elements in this menu bar.
   *
-  * @return The number of elements in the menu bar.
+   * @return the number of elements in the menu bar
   */
-public int
-getMenuCount()
-{
-  return countMenus ();
-}
+  public int getMenuCount()
+  {
+    return countMenus();
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Returns the number of elements in this menu bar.
   *
-  * @return The number of elements in the menu bar.
+   * @return the number of elements in the menu bar
   *
-  * @deprecated This method is deprecated in favor of <code>getMenuCount()</code>.
+   * @deprecated This method is deprecated in favor of
+   *             <code>getMenuCount()</code>.
   */
-public int
-countMenus()
-{
-  return menus.size () + (getHelpMenu () == null ? 0 : 1);
-}
+  public int countMenus()
+  {
+    return menus.size() + (getHelpMenu() == null ? 0 : 1);
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Returns the menu at the specified index.
   *
   * @param index the index of the menu
   *
-  * @return The requested menu.
+   * @return the requested menu
   *
-  * @exception ArrayIndexOutOfBoundsException If the index is not valid.
+   * @throws ArrayIndexOutOfBoundsException if the index is not valid
   */
-public Menu
-getMenu(int index)
-{
-  return((Menu)menus.elementAt(index));
-}
+  public Menu getMenu(int index)
+  {
+    return (Menu) menus.elementAt(index);
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Creates this object's native peer.
   */
-public void
-addNotify()
-{
+  public void addNotify()
+  {
   if (getPeer() == null)
-    setPeer((MenuComponentPeer)getToolkit().createMenuBar(this));
+      setPeer(getToolkit().createMenuBar(this));
   Enumeration e = menus.elements();
   while (e.hasMoreElements())
   {
@@ -287,35 +237,30 @@ addNotify()
     helpMenu.addNotify();
     ((MenuBarPeer) peer).addHelpMenu(helpMenu);
   }
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Destroys this object's native peer.
   */
-public void
-removeNotify()
-{
+  public void removeNotify()
+  {
   Enumeration e = menus.elements();
   while (e.hasMoreElements())
   {
     Menu mi = (Menu) e.nextElement();
     mi.removeNotify();
   }
+    frame = null;
   super.removeNotify();
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Returns a list of all shortcuts for the menus in this menu bar.
   *
-  * @return A list of all shortcuts for the menus in this menu bar.
+   * @return a list of all shortcuts for the menus in this menu bar
   */
-public synchronized Enumeration
-shortcuts()
-{
+  public synchronized Enumeration shortcuts()
+  {
   Vector shortcuts = new Vector();
   Enumeration e = menus.elements();
 
@@ -326,73 +271,67 @@ shortcuts()
         shortcuts.addElement(menu.getShortcut());
     }
 
-  return(shortcuts.elements());
-}
+    return shortcuts.elements();
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Returns the menu item for the specified shortcut, or <code>null</code>
   * if no such item exists.
   *
-  * @param shortcut The shortcut to return the menu item for.
+   * @param shortcut the shortcut to return the menu item for
   *
-  * @return The menu item for the specified shortcut.
+   * @return the menu item for the specified shortcut
   */
-public MenuItem
-getShortcutMenuItem(MenuShortcut shortcut)
-{
+  public MenuItem getShortcutMenuItem(MenuShortcut shortcut)
+  {
   Enumeration e = menus.elements();
 
   while (e.hasMoreElements())
     {
-      Menu menu = (Menu)e.nextElement();
+        Menu menu = (Menu) e.nextElement();
       MenuShortcut s = menu.getShortcut();
-      if ((s != null) && (s.equals(shortcut)))
-        return(menu);
+        if ((s != null) && s.equals(shortcut))
+          return menu;
     }
 
-  return(null);
-}
+    return null;
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Deletes the specified menu shortcut.
   *
-  * @param shortcut The shortcut to delete.
+   * @param shortcut the shortcut to delete
   */
-public void
-deleteShortcut(MenuShortcut shortcut)
-{
+  public void deleteShortcut(MenuShortcut shortcut)
+  {
   MenuItem it;
   // This is a slow implementation, but it probably doesn't matter.
   while ((it = getShortcutMenuItem (shortcut)) != null)
-    it.deleteShortcut ();
-}
+      it.deleteShortcut();
+  }
 
-/**
+  /**
  * Gets the AccessibleContext associated with this <code>MenuBar</code>.
  * The context is created, if necessary.
  *
  * @return the associated context
  */
-public AccessibleContext getAccessibleContext()
-{
-  /* Create the context if this is the first request */
+  public AccessibleContext getAccessibleContext()
+  {
+    // Create the context if this is the first request.
   if (accessibleContext == null)
       accessibleContext = new AccessibleAWTMenuBar();
   return accessibleContext;
-}
+  }
 
-/**
+  /**
  * This class provides accessibility support for AWT menu bars.
  *
  * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  */
-protected class AccessibleAWTMenuBar
+  protected class AccessibleAWTMenuBar
   extends AccessibleAWTMenuComponent
-{
+  {
   
   /**
    * Compatible with JDK 1.4.2 revision 5
@@ -411,13 +350,13 @@ protected class AccessibleAWTMenuBar
   /**
    * Returns the accessible role relating to the menu bar.
    *
-   * @return <code>AccessibleRole.MENU_BAR</code>.
+     * @return <code>AccessibleRole.MENU_BAR</code>
    */
   public AccessibleRole getAccessibleRole()
   {
     return AccessibleRole.MENU_BAR;
   }
 
-} // class AccessibleAWTMenuBar
+  }
 
-} // class MenuBar
+}
