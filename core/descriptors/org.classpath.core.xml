@@ -18,8 +18,10 @@
       <export name="gnu.java.awt.peer.*"/>
       <export name="gnu.java.awt.image.*"/>
       <export name="gnu.java.beans.*"/>
+      <export name="gnu.java.beans.decoder.*"/>
       <export name="gnu.java.beans.editors.*"/>
-      <export name="gnu.java.beans.info.*"/>
+      <export name="gnu.java.beans.encoder.*"/>
+      <export name="gnu.java.beans.encoder.elements.*"/>
       <export name="gnu.java.io.*"/>
       <export name="gnu.java.math.*"/>
       <export name="gnu.java.net.*"/>
@@ -38,11 +40,17 @@
       <export name="gnu.java.locale.LocaleHelper"/>
       <export name="gnu.java.locale.LocaleInformation_en"/>
       <export name="gnu.java.locale.LocaleInformation"/>
+      <export name="gnu.java.rmi.*"/>
+      <export name="gnu.java.rmi.dgc.*"/>
+      <export name="gnu.java.rmi.registry.*"/>
+      <export name="gnu.java.rmi.server.*"/>
       <export name="gnu.java.security.*"/>
       <export name="gnu.java.security.action.*"/>
       <export name="gnu.java.security.ber.*"/>
       <export name="gnu.java.security.der.*"/>
+      <export name="gnu.java.security.hash.*"/>
       <export name="gnu.java.security.pkcs.*"/>
+      <export name="gnu.java.security.prng.*"/>
       <export name="gnu.java.security.provider.*"/>
       <export name="gnu.java.security.util.*"/>
       <export name="gnu.java.security.x509.*"/>
@@ -52,6 +60,7 @@
       <export name="gnu.java.util.prefs.*"/>
       <export name="gnu.javax.crypto.*"/>
       <export name="gnu.regexp.*"/>
+      <export name="gnu.xml.stream.*"/>
 
       <export name="java.applet.*"/>
       <export name="java.awt.*"/>
@@ -108,6 +117,11 @@
       <export name="javax.naming.event.*"/>
       <export name="javax.naming.ldap.*"/>
       <export name="javax.naming.spi.*"/>
+      <export name="javax.sound.sampled.*"/>
+      <export name="javax.sound.sampled.spi.*"/>
+      <export name="javax.xml.stream.*"/>
+      <export name="javax.xml.stream.events.*"/>
+      <export name="javax.xml.stream.util.*"/>
 
       <export name="javax.security.auth.x500.*"/>
 
