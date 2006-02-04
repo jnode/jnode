@@ -36,7 +36,6 @@
     <alias name="memory" class="org.jnode.shell.command.MemoryCommand"/>
     <alias name="namespace" class="org.jnode.shell.command.NamespaceCommand"/>
     <alias name="thread" class="org.jnode.shell.command.ThreadCommand"/>
-    <alias name="bsh" class="org.jnode.shell.command.BeanshellCommand"/>
     <alias name="loadkeys" class="org.jnode.shell.command.LoadkeysCommand"/>
     <alias name="locale" class="org.jnode.shell.command.LocaleCommand"/>
     <alias name="onheap" class="org.jnode.shell.command.OnHeapCommand"/>
