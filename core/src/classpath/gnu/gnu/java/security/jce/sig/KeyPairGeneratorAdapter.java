@@ -43,7 +43,7 @@ import gnu.java.security.key.KeyPairGeneratorFactory;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyPair;
-import java.security.KeyPairGeneratorSpi;
+import java.security.KeyPairGenerator;
 import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;
 
@@ -66,7 +66,7 @@ import java.security.spec.AlgorithmParameterSpec;
  *
  * @version $Revision$
  */
-abstract class KeyPairGeneratorAdapter extends KeyPairGeneratorSpi
+abstract class KeyPairGeneratorAdapter extends KeyPairGenerator
 {
 
   // Constants and variables
@@ -85,7 +85,7 @@ abstract class KeyPairGeneratorAdapter extends KeyPairGeneratorSpi
    */
   protected KeyPairGeneratorAdapter(String kpgName)
   {
-    super();
+    super(kpgName);
 
     this.adaptee = KeyPairGeneratorFactory.getInstance(kpgName);
   }

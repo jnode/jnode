@@ -68,7 +68,7 @@ public class JWindow extends Window implements Accessible, RootPaneContainer
     /**
      * Creates a new instance of <code>AccessibleJWindow</code>.
      */
-    public AccessibleJWindow()
+    protected AccessibleJWindow()
     {
       super();
       // Nothing to do here.

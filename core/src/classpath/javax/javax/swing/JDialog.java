@@ -74,7 +74,7 @@ public class JDialog extends Dialog implements Accessible, WindowConstants,
     /**
      * Creates a new instance of <code>AccessibleJDialog</code>.
      */
-    public AccessibleJDialog()
+    protected AccessibleJDialog()
     {
       super();
       // Nothing to do here.

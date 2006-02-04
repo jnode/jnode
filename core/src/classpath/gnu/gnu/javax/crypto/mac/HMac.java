@@ -132,12 +132,15 @@ public class HMac extends BaseMac implements Cloneable
 
   // java.lang.Cloneable interface implementation ----------------------------
 
-  public Object clone()
+  public Object clone() throws CloneNotSupportedException
   {
-    HMac result = new HMac((IMessageDigest) underlyingHash.clone());
-    result.ipadHash = this.ipadHash;
-    result.opadHash = this.opadHash;
-    result.ipad = (byte[])this.ipad.clone();
+    HMac result = (HMac) super.clone();
+    if (this.ipadHash != null)
+      result.ipadHash = (IMessageDigest) this.ipadHash.clone();
+    if (this.opadHash != null)
+      result.opadHash = (IMessageDigest) this.opadHash.clone();
+    if (this.ipad != null)
+      result.ipad = (byte[]) this.ipad.clone();
 
     return result;
   }
