@@ -553,15 +553,20 @@ clean             Remove all intermediate build results.
 		<!-- Check all plugins -->
 		<taskdef name="checkDeps" classname="org.jnode.build.dependencies.BCELDependencyChecker" 
 			classpathref="cp-jnode" />
-		<checkDeps>
+        <!--
+        TODO: remove duplicate classes from mmtk related plugins and enable their checking. 
+        -->
+        <checkDeps>
 			<plugins dir="${plugins.dir}/">
 				<include name="*.jar" />
-			</plugins>
+                <exclude name="*mmtk*.jar" />
+            </plugins>
 			
 			<descriptors dir="${descriptors.dir}/">
 				<include name="*.xml" />
 				<exclude name="*plugin-list.xml" />
-			</descriptors>
+                <exclude name="*mmtk*.xml" />
+            </descriptors>
 		</checkDeps>
 	</target>
 
