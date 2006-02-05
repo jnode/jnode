@@ -39,7 +39,7 @@ The default list of (non-system) plugins to be included in the init-jar.
     <plugin id="org.jnode.driver"/>
     <plugin id="org.jnode.driver.character"/>
     <plugin id="org.jnode.driver.block"/>
-    <!-- plugin id="org.jnode.driver.block.floppy"/ -->
+    <plugin id="org.jnode.driver.block.floppy"/>
     <plugin id="org.jnode.driver.block.ide.disk"/>
     <plugin id="org.jnode.driver.block.ramdisk"/>
     <plugin id="org.jnode.driver.block.ramdisk.command"/>
