@@ -21,12 +21,14 @@
  
 package org.jnode.driver.bus.ide.atapi;
 
+import org.apache.log4j.Logger;
 import org.jnode.driver.Bus;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceAlreadyRegisteredException;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.Driver;
 import org.jnode.driver.DriverException;
+import org.jnode.driver.block.usb.storage.USBStorageSCSIDriver;
 import org.jnode.driver.bus.ide.IDEBus;
 import org.jnode.driver.bus.ide.IDEDevice;
 import org.jnode.driver.bus.ide.command.IDEPacketCommand;
@@ -35,6 +37,7 @@ import org.jnode.driver.bus.scsi.SCSIDevice;
 import org.jnode.driver.bus.scsi.SCSIException;
 import org.jnode.driver.bus.scsi.SCSIHostControllerAPI;
 import org.jnode.driver.bus.scsi.cdb.spc.CDBInquiry;
+import org.jnode.driver.bus.scsi.cdb.spc.CDBTestUnitReady;
 import org.jnode.driver.bus.scsi.cdb.spc.InquiryData;
 import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeoutException;
@@ -47,6 +50,10 @@ public class ATAPIDriver extends Driver implements SCSIHostControllerAPI {
     private ATAPIBus atapiBus;
 
     private ATAPISCSIDevice scsiDevice;
+    
+    private static final Logger log = Logger.getLogger(ATAPIDriver.class);
+    
+    
 
     /**
      * @see org.jnode.driver.Driver#startDevice()
@@ -62,14 +69,14 @@ public class ATAPIDriver extends Driver implements SCSIHostControllerAPI {
 
         // Create the generic SCSI device, attached to the ATAPI bus
         scsiDevice = new ATAPISCSIDevice(atapiBus, "_sg");
-
+        
         // Execute INQUIRY
         try {
             scsiDevice.inquiry();
         } catch (SCSIException ex) {
-            throw new DriverException("Cannot INQUIRY device", ex);
+            throw new DriverException("Cannot INQUIRY device due to SCSIException", ex);
         } catch (TimeoutException ex) {
-            throw new DriverException("Cannot INQUIRY device", ex);
+            throw new DriverException("Cannot INQUIRY device due to TimeoutException", ex);
         } catch (InterruptedException ex) {
             throw new DriverException("Interrupted while INQUIRY device", ex);
         }
@@ -120,6 +127,8 @@ public class ATAPIDriver extends Driver implements SCSIHostControllerAPI {
     class ATAPISCSIDevice extends SCSIDevice {
 
         private InquiryData inquiryResult;
+        
+        
 
         /**
          * Initialize this instance.
@@ -166,7 +175,7 @@ public class ATAPIDriver extends Driver implements SCSIHostControllerAPI {
                 InterruptedException {
             final byte[] inqData = new byte[ 96];
             scsiDevice.executeCommand(new CDBInquiry(inqData.length), inqData,
-                    0, 5000);
+                    0, 50000);
             inquiryResult = new InquiryData(inqData);
         }
 
