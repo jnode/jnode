@@ -169,8 +169,12 @@ public class CellRendererPane extends Container implements Accessible
     addImpl(c, null, 0);
 
     Rectangle oldClip = graphics.getClipBounds();
+    boolean translated = false;
+    try
+      {
     // translate to (x,y)
     graphics.translate(x, y);
+        translated = true;
     graphics.clipRect(0, 0, w, h);
     // set bounds of c
     c.setBounds(0, 0, w, h);
@@ -183,10 +187,14 @@ public class CellRendererPane extends Container implements Accessible
 
     // paint component
     c.paint(graphics);
-
+      }
+    finally
+      {
     // untranslate g
+        if (translated)
     graphics.translate(-x, -y);
     graphics.setClip(oldClip);
+  }
   }
 
 	/**

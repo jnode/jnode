@@ -643,6 +643,47 @@ public class DefaultStyledDocument extends AbstractDocument implements
     }
 
     /**
+     * Creates and returns a deep clone of the specified <code>clonee</code>
+     * with the specified parent as new parent.
+     *
+     * This method can only clone direct instances of {@link BranchElement}
+     * or {@link LeafElement}.
+     *
+     * @param parent the new parent
+     * @param clonee the element to be cloned
+     *
+     * @return the cloned element with the new parent
+     */
+    public Element clone(Element parent, Element clonee)
+    {
+      Element clone = clonee;
+      // We can only handle AbstractElements here.
+      if (clonee instanceof BranchElement)
+        {
+          BranchElement branchEl = (BranchElement) clonee;
+          BranchElement branchClone =
+            new BranchElement(parent, branchEl.getAttributes());
+          // Also clone all of the children.
+          int numChildren = branchClone.getElementCount();
+          Element[] cloneChildren = new Element[numChildren];
+          for (int i = 0; i < numChildren; ++i)
+            {
+              cloneChildren[i] = clone(branchClone,
+                                       branchClone.getElement(i));
+            }
+          branchClone.replace(0, numChildren, cloneChildren);
+          clone = branchClone;
+        }
+      else if (clonee instanceof LeafElement)
+        {
+          clone = new LeafElement(parent, clonee.getAttributes(),
+                                  clonee.getStartOffset(),
+                                  clonee.getEndOffset());
+        }
+      return clone;
+    }
+
+    /**
      * Inserts new <code>Element</code> in the document at the specified
      * position. Most of the work is done by {@link #insertUpdate}, after some
      * fields have been prepared for it.
@@ -684,10 +725,15 @@ public class DefaultStyledDocument extends AbstractDocument implements
           BranchElement e = (BranchElement) curr.e;
           Element[] removed = curr.getRemovedElements();
           Element[] added = curr.getAddedElements();
+          // FIXME: We probably shouldn't create the empty Element[] in the
+          // first place.
+          if (removed.length > 0 || added.length > 0)
+            {
           e.replace(curr.index, removed.length, added);
           ElementEdit ee = new ElementEdit(e, curr.index, removed, added);
           ev.addEdit(ee);
         }
+    }
     }
 
     /**

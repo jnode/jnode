@@ -539,17 +539,23 @@ public abstract class AbstractDocument implements Document, Serializable
       new DefaultDocumentEvent(offset, text.length(),
 			       DocumentEvent.EventType.INSERT);
     
+    try
+      {
     writeLock();
     UndoableEdit undo = content.insertString(offset, text);
     if (undo != null)
       event.addEdit(undo);
 
     insertUpdate(event, attributes);
-    writeUnlock();
 
     fireInsertUpdate(event);
     if (undo != null)
       fireUndoableEditUpdate(new UndoableEditEvent(this, undo));
+  }
+    finally
+      {
+        writeUnlock();
+      }
   }
 
   /**
@@ -675,18 +681,18 @@ public abstract class AbstractDocument implements Document, Serializable
       new DefaultDocumentEvent(offset, length,
 			       DocumentEvent.EventType.REMOVE);
     
-    removeUpdate(event);
-
-    boolean shouldFire = content.getString(offset, length).length() != 0;
-    
+    try
+      {
     writeLock();
     UndoableEdit temp = content.remove(offset, length);
-    writeUnlock();
-    
+        removeUpdate(event);
     postRemoveUpdate(event);
-    
-    if (shouldFire)
     fireRemoveUpdate(event);
+  }
+    finally
+      {
+        writeUnlock();
+      } 
   }
 
   /**

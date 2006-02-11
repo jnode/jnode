@@ -246,6 +246,8 @@ public final class REMatch implements Serializable, Cloneable {
      * <code>$0</code> through <code>$9</code>.  <code>$0</code> matches
      * the full substring matched; <code>$<i>n</i></code> matches
      * subexpression number <i>n</i>.
+     * <code>$10, $11, ...</code> may match the 10th, 11th, ... subexpressions
+     * if such subexpressions exist.
      *
      * @param input A string consisting of literals and <code>$<i>n</i></code> tokens.
      */
@@ -256,6 +258,16 @@ public final class REMatch implements Serializable, Cloneable {
 	for (pos = 0; pos < input.length()-1; pos++) {
 	    if ((input.charAt(pos) == '$') && (Character.isDigit(input.charAt(pos+1)))) {
 		int val = Character.digit(input.charAt(++pos),10);
+		int pos1 = pos + 1;
+		while (pos1 < input.length() &&
+		       Character.isDigit(input.charAt(pos1))) {
+		    int val1 = val*10 + Character.digit(input.charAt(pos1),10);
+		    if (val1 >= start.length) break;
+		    pos1++;
+		    val = val1;
+		}
+		pos = pos1 - 1;
+
 		if (val < start.length) {
 		    output.append(toString(val));
 		} 

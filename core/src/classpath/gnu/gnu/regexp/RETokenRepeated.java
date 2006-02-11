@@ -84,6 +84,13 @@ final class RETokenRepeated extends REToken {
 	return (min * token.getMinimumLength());
     }
 
+    int getMaximumLength() {
+        if (max == Integer.MAX_VALUE) return Integer.MAX_VALUE;
+	int tmax = token.getMaximumLength();
+	if (tmax == Integer.MAX_VALUE) return tmax;
+	return (max * tmax);
+    }
+
     boolean stopMatchingIfSatisfied = true;
 
     private static REMatch findDoables(REToken tk,

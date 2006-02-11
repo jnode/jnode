@@ -277,35 +277,38 @@ public class GlyphView extends View implements TabableView, Cloneable
     public void paint(GlyphView view, Graphics g, Shape a, int p0,
                       int p1)
     {
+      Color oldColor = g.getColor();
       int height = (int) getHeight(view);
       Segment txt = view.getText(p0, p1);
       Rectangle bounds = a.getBounds();
-
       TabExpander tabEx = null;
       View parent = view.getParent();
       if (parent instanceof TabExpander)
         tabEx = (TabExpander) parent;
 
-      // Fill the background of the text run.
-      Color background = view.getBackground();
-      g.setColor(background);
       int width = Utilities.getTabbedTextWidth(txt, g.getFontMetrics(),
                                                bounds.x, tabEx, txt.offset);
+      // Fill the background of the text run.
+      Color background = view.getBackground();
+      if (background != null)
+        {
+      g.setColor(background);
       g.fillRect(bounds.x, bounds.y, width, height);
-
+        }
       // Draw the actual text.
       g.setColor(view.getForeground());
       g.setFont(view.getFont());
+      int ascent = g.getFontMetrics().getAscent();
       if (view.isSuperscript())
         // TODO: Adjust font for superscripting.
-        Utilities.drawTabbedText(txt, bounds.x, bounds.y - height / 2, g, tabEx,
-                                   txt.offset);
+        Utilities.drawTabbedText(txt, bounds.x, bounds.y + ascent - height / 2,
+                                 g, tabEx, txt.offset);
       else if (view.isSubscript())
         // TODO: Adjust font for subscripting.
-        Utilities.drawTabbedText(txt, bounds.x, bounds.y + height / 2, g, tabEx,
-                                 txt.offset);
+        Utilities.drawTabbedText(txt, bounds.x, bounds.y + ascent + height / 2,
+                                 g, tabEx, txt.offset);
       else
-        Utilities.drawTabbedText(txt, bounds.x, bounds.y, g, tabEx,
+        Utilities.drawTabbedText(txt, bounds.x, bounds.y + ascent, g, tabEx,
                                  txt.offset);
 
       if (view.isStikeThrough())
@@ -320,6 +323,7 @@ public class GlyphView extends View implements TabableView, Cloneable
           g.drawLine(bounds.x, bounds.y + lineHeight, bounds.height + width,
                      bounds.y + lineHeight);
         }
+      g.setColor(oldColor);
     }
 
     /**
@@ -485,8 +489,8 @@ public class GlyphView extends View implements TabableView, Cloneable
   public GlyphView(Element element)
   {
     super(element);
-    startOffset = element.getStartOffset();
-    endOffset = element.getEndOffset();
+    startOffset = -1;
+    endOffset = -1;
   }
 
   /**
@@ -682,7 +686,10 @@ public class GlyphView extends View implements TabableView, Cloneable
    */
   public int getStartOffset()
   {
-    return startOffset;
+    int start = startOffset;
+    if (start < 0)
+      start = super.getStartOffset();
+    return start;
   }
 
   /**
@@ -694,7 +701,10 @@ public class GlyphView extends View implements TabableView, Cloneable
    */
   public int getEndOffset()
   {
-    return endOffset;
+    int end = endOffset;
+    if (end < 0)
+      end = super.getEndOffset();
+    return end;
   }
 
   /**
@@ -771,7 +781,11 @@ public class GlyphView extends View implements TabableView, Cloneable
   {
     Element el = getElement();
     AttributeSet atts = el.getAttributes();
-    return StyleConstants.getBackground(atts);
+    // We cannot use StyleConstants.getBackground() here, because that returns
+    // BLACK as default (when background == null). What we need is the
+    // background setting of the text component instead, which is what we get
+    // when background == null anyway.
+    return (Color) atts.getAttribute(StyleConstants.Background);
   }
 
   /**
@@ -922,23 +936,24 @@ public class GlyphView extends View implements TabableView, Cloneable
       weight = super.getBreakWeight(axis, pos, len);
     else
       {
-        // Determine the model locations at pos and pos + len.
-        int spanX = (int) getPreferredSpan(X_AXIS);
-        int spanY = (int) getPreferredSpan(Y_AXIS);
-        Rectangle dummyAlloc = new Rectangle(0, 0, spanX, spanY);
-        Position.Bias[] biasRet = new Position.Bias[1];
-        int offset1 = viewToModel(pos, spanY / 2, dummyAlloc, biasRet);
-        int offset2 = viewToModel(pos, spanY / 2, dummyAlloc, biasRet);
-        Segment txt = getText(offset1, offset2);
-        BreakIterator lineBreaker = BreakIterator.getLineInstance();
-        lineBreaker.setText(txt);
-        int breakLoc = lineBreaker.previous();
-        if (breakLoc == offset1)
-          weight = View.BadBreakWeight;
-        else if(breakLoc ==  BreakIterator.DONE)
-          weight = View.GoodBreakWeight;
-        else
-          weight = View.ExcellentBreakWeight;
+        // FIXME: Commented out because the Utilities.getBreakLocation method
+        // is still buggy. The GoodBreakWeight is a reasonable workaround for
+        // now.
+//        int startOffset = getStartOffset();
+//        int endOffset = getEndOffset() - 1;
+//        Segment s = getText(startOffset, endOffset);
+//        Container c = getContainer();
+//        FontMetrics fm = c.getFontMetrics(c.getFont());
+//        int x0 = (int) pos;
+//        int x = (int) (pos + len);
+//        int breakLoc = Utilities.getBreakLocation(s, fm, x0, x,
+//                                                  getTabExpander(),
+//                                                  startOffset);
+//        if (breakLoc == startOffset || breakLoc == endOffset)
+//          weight = GoodBreakWeight;
+//        else
+//          weight = ExcellentBreakWeight;
+        weight = GoodBreakWeight;
       }
     return weight;
   }
@@ -961,8 +976,8 @@ public class GlyphView extends View implements TabableView, Cloneable
   /**
    * Receives notification that some text has been inserted within the
    * text fragment that this view is responsible for. This calls
-   * {@link View#preferenceChanged(View, boolean, boolean)} on the parent for
-   * width.
+   * {@link View#preferenceChanged(View, boolean, boolean)} for the
+   * direction in which the glyphs are rendered.
    *
    * @param e the document event describing the change; not used here
    * @param a the view allocation on screen; not used here
@@ -970,7 +985,7 @@ public class GlyphView extends View implements TabableView, Cloneable
    */
   public void insertUpdate(DocumentEvent e, Shape a, ViewFactory vf)
   {
-    getParent().preferenceChanged(this, true, false);
+    preferenceChanged(this, true, false);
   }
 
   /**
@@ -1000,7 +1015,9 @@ public class GlyphView extends View implements TabableView, Cloneable
   public View createFragment(int p0, int p1)
   {
     GlyphView fragment = (GlyphView) clone();
+    if (p0 != getStartOffset())
     fragment.startOffset = p0;
+    if (p1 != getEndOffset())
     fragment.endOffset = p1;
     return fragment;
   }

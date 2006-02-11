@@ -747,6 +747,17 @@ public class GapContent
   }
 
   /**
+   * @specnote This method is not very well specified and the positions vector
+   *           is implementation specific. The undo positions are managed
+   *           differently in this implementation, this method is only here
+   *           for binary compatibility.
+   */
+  protected void updateUndoPositions(Vector positions, int offset, int length)
+  {
+    // We do nothing here.
+  }
+
+  /**
    * Outputs debugging info to System.err. It prints out the buffer array,
    * the gapStart is marked by a &lt; sign, the gapEnd is marked by a &gt;
    * sign and each position is marked by a # sign.

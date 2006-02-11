@@ -148,14 +148,16 @@ public class DefaultCaret extends Rectangle
      */
     public void removeUpdate(DocumentEvent event)
     {
-      if (policy == ALWAYS_UPDATE || 
-          (SwingUtilities.isEventDispatchThread() && 
-           policy == UPDATE_WHEN_ON_EDT))
+      if (policy == ALWAYS_UPDATE
+          || (SwingUtilities.isEventDispatchThread()
+              && policy == UPDATE_WHEN_ON_EDT))
         {
       int dot = getDot();
       setDot(dot - event.getLength());
     }
-      else if (policy == NEVER_UPDATE)
+      else if (policy == NEVER_UPDATE
+               || (! SwingUtilities.isEventDispatchThread()
+                   && policy == UPDATE_WHEN_ON_EDT))
         {
           int docLength = event.getDocument().getLength();
           if (getDot() > docLength)
@@ -812,7 +814,10 @@ public class DefaultCaret extends Rectangle
   {
     if (dot >= 0)
       {
-    this.dot = dot;
+        Document doc = textComponent.getDocument();
+        if (doc != null)
+          this.dot = Math.min(dot, doc.getLength());
+        this.dot = Math.max(this.dot, 0);
     handleHighlight();
     adjustVisibility(this);
         appear();
@@ -836,7 +841,7 @@ public class DefaultCaret extends Rectangle
         if (doc != null)
           this.dot = Math.min(dot, doc.getLength());
         this.dot = Math.max(this.dot, 0);
-    this.mark = dot;
+        this.mark = this.dot;
     handleHighlight();
     adjustVisibility(this);
         appear();

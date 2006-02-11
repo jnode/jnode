@@ -1,5 +1,5 @@
-/* gnu/regexp/RETokenChar.java
-   Copyright (C) 1998-2001, 2004 Free Software Foundation, Inc.
+/* gnu/regexp/RETokenLookBehind.java
+   Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,61 +35,82 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-
 package gnu.regexp;
 
-final class RETokenChar extends REToken {
-  private char[] ch;
-  private boolean insens;
+/**
+ * @author Ito Kazumitsu
+ */
+final class RETokenLookBehind extends REToken
+{
+  REToken re;
+  boolean negative;
 
-  RETokenChar(int subIndex, char c, boolean ins) {
-    super(subIndex);
-    ch = new char [1];
-    ch[0] = (insens = ins) ? Character.toLowerCase(c) : c;
+  RETokenLookBehind(REToken re, boolean negative) throws REException {
+    super(0);
+    this.re = re;
+    this.negative = negative;
   }
 
-  int getMinimumLength() {
-    return ch.length;
-  }
-  
   int getMaximumLength() {
-    return ch.length;
+    return 0;
   }
-  
-    boolean match(CharIndexed input, REMatch mymatch) {
-	int z = ch.length;
-	char c;
-	for (int i=0; i<z; i++) {
-	    c = input.charAt(mymatch.index+i);
-	    if (( (insens) ? Character.toLowerCase(c) : c ) != ch[i]) {
-		return false;
-	    }
-	}
-	mymatch.index += z;
 
-	return next(input, mymatch);
+  boolean match(CharIndexed input, REMatch mymatch)
+  {
+    int max = re.getMaximumLength();
+    CharIndexed behind = input.lookBehind(mymatch.index, max);
+    REMatch trymatch = (REMatch)mymatch.clone();
+    REMatch trymatch1 = (REMatch)mymatch.clone();
+    REMatch newMatch = null;
+    int curIndex = trymatch.index + behind.length() - input.length();
+    trymatch.index = 0;
+    RETokenMatchHereOnly stopper = new RETokenMatchHereOnly(curIndex);
+    REToken re1 = (REToken) re.clone();
+    re1.chain(stopper);
+    if (re1.match(behind, trymatch)) {
+      if (negative) return false;
+      if (next(input, trymatch1))
+        newMatch = trymatch1;
     }
 
-  // Overrides REToken.chain() to optimize for strings
-  boolean chain(REToken next) {
-    if (next instanceof RETokenChar && ((RETokenChar)next).insens == insens) {
-      RETokenChar cnext = (RETokenChar) next;
-      // assume for now that next can only be one character
-      int newsize = ch.length + cnext.ch.length;
-      
-      char[] chTemp = new char [newsize];
-      
-      System.arraycopy(ch,0,chTemp,0,ch.length);
-      System.arraycopy(cnext.ch,0,chTemp,ch.length,cnext.ch.length);
-      
-      ch = chTemp;
+    if (newMatch != null) {
+      if (negative) return false;
+      //else
+      mymatch.assignFrom(newMatch);
+      return true;
+    }
+    else { // no match
+      if (negative)
+        return next(input, mymatch);
+      //else
       return false;
-    } else return super.chain(next);
+    }
   }
 
-  void dump(StringBuffer os) {
-    os.append(ch);
-  }
+    void dump(StringBuffer os) {
+	os.append("(?<");
+	os.append(negative ? '!' : '=');
+	re.dumpAll(os);
+	os.append(')');
+    }
+
+    private static class RETokenMatchHereOnly extends REToken {
+
+        int getMaximumLength() { return 0; }
+
+	private int index;
+
+	RETokenMatchHereOnly(int index) {
+	    super(0);
+	    this.index = index;
+	}
+
+	boolean match(CharIndexed input, REMatch mymatch) {
+	    return index == mymatch.index;
+	}
+
+        void dump(StringBuffer os) {}
+
+    }
 }
-
 

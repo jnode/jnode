@@ -1,5 +1,5 @@
-/* gnu/regexp/CharIndexedCharArray.java
-   Copyright (C) 1998-2001, 2004, 2006 Free Software Foundation, Inc.
+/* gnu/regexp/RETokenIndependent.java
+   Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -36,36 +36,41 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 package gnu.regexp;
-import java.io.Serializable;
 
-class CharIndexedCharArray implements CharIndexed, Serializable {
-    private char[] s;
-    private int anchor;
-    
-    CharIndexedCharArray(char[] str, int index) {
-	s = str;
-	anchor = index;
-    }
-    
-    public char charAt(int index) {
-	int pos = anchor + index;
-	return ((pos < s.length) && (pos >= 0)) ? s[pos] : OUT_OF_BOUNDS;
-    }
-    
-    public boolean isValid() {
-	return (anchor < s.length);
-    }
-    
-    public boolean move(int index) {
-	return ((anchor += index) < s.length);
-    }
-    
-    public CharIndexed lookBehind(int index, int length) {
-	if (length > (anchor + index)) length = anchor + index;
-	return new CharIndexedCharArray(s, anchor + index - length);
-    }
+/**
+ * @author Ito Kazumitsu
+ */
+final class RETokenIndependent extends REToken
+{
+  REToken re;
 
-    public int length() {
-	return s.length - anchor;
+  RETokenIndependent(REToken re) throws REException {
+    super(0);
+    this.re = re;
+  }
+
+  int getMinimumLength() {
+    return re.getMinimumLength();
+  }
+
+  int getMaximumLength() {
+    return re.getMaximumLength();
+  }
+
+  boolean match(CharIndexed input, REMatch mymatch)
+  {
+    if (re.match(input, mymatch)) {
+      // Once we have found a match, we do not see other possible matches.
+      mymatch.next = null;
+      return next(input, mymatch);
+    }
+    return false;
+  }
+
+    void dump(StringBuffer os) {
+	os.append("(?>");
+	re.dumpAll(os);
+	os.append(')');
     }
 }
+
