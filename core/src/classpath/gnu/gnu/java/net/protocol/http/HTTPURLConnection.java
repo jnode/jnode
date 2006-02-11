@@ -254,7 +254,7 @@ public class HTTPURLConnection
               }
           }
         
-        if (isRedirect(response) && getInstanceFollowRedirects())
+        if (response.isRedirect() && getInstanceFollowRedirects())
           {
 	    // Read the response body, if there is one.  If the
 	    // redirect points us back at the same server, we will use
@@ -349,21 +349,12 @@ public class HTTPURLConnection
           {
             responseSink = response.getBody();
             
-            if (response.getCode() == 404)
-              {
+            if (response.isError())
                 errorSink = responseSink;
-                throw new FileNotFoundException(url.toString());
-              }
           }
       }
     while (retry);
     connected = true;
-  }
-
-  private static boolean isRedirect(Response response)
-  {
-    int sc = response.getCode();
-    return (sc != 304 && (sc / 100) == 3);
   }
 
   /**
@@ -449,21 +440,31 @@ public class HTTPURLConnection
 
   public String getRequestProperty(String key)
   {
+    if (key == null)
+      return null;
+    
     return requestHeaders.getValue(key);
   }
 
   public Map getRequestProperties()
   {
+    if (connected)
+      throw new IllegalStateException("Already connected");
+    
     return requestHeaders;
   }
 
   public void setRequestProperty(String key, String value)
   {
+    super.setRequestProperty(key, value);
+    
     requestHeaders.put(key, value);
   }
 
   public void addRequestProperty(String key, String value)
   {
+    super.addRequestProperty(key, value);
+    
     String old = requestHeaders.getValue(key);
     if (old == null)
       {
@@ -515,6 +516,17 @@ public class HTTPURLConnection
       {
         throw new ProtocolException("doInput is false");
       }
+    
+    if (response.isError())
+      {
+        int code = response.getCode();
+        if (code == 404 || code == 410)
+          throw new FileNotFoundException(url.toString());
+      
+        throw new IOException("Server returned HTTP response code " + code
+                              + " for URL " + url.toString());
+      }
+    
     return responseSink;
   }
 

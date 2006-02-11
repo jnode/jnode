@@ -1,5 +1,5 @@
 /* Request.java --
-   Copyright (C) 2004, 2005 Free Software Foundation, Inc.
+   Copyright (C) 2004, 2005, 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -94,11 +94,6 @@ public class Request
   protected RequestBodyWriter requestBodyWriter;
 
   /**
-   * Request body negotiation threshold for 100-continue expectations.
-   */
-  protected int requestBodyNegotiationThreshold;
-
-  /**
    * Map of response header handlers.
    */
   protected Map responseHeaderHandlers;
@@ -127,7 +122,6 @@ public class Request
     this.path = path;
     requestHeaders = new Headers();
     responseHeaderHandlers = new HashMap();
-    requestBodyNegotiationThreshold = 4096;
   }
 
   /**
@@ -251,21 +245,6 @@ public class Request
   }
 
   /**
-   * Sets the request body negotiation threshold.
-   * If this is set, it determines the maximum size that the request body
-   * may be before body negotiation occurs(via the
-   * <code>100-continue</code> expectation). This ensures that a large
-   * request body is not sent when the server wouldn't have accepted it
-   * anyway.
-   * @param threshold the body negotiation threshold, or &lt;=0 to disable
-   * request body negotation entirely
-   */
-  public void setRequestBodyNegotiationThreshold(int threshold)
-  {
-    requestBodyNegotiationThreshold = threshold;
-  }
-
-  /**
    * Dispatches this request.
    * A request can only be dispatched once; calling this method a second
    * time results in a protocol exception.
@@ -291,10 +270,10 @@ public class Request
     if (requestBodyWriter != null)
       {
         contentLength = requestBodyWriter.getContentLength();
-        if (contentLength > requestBodyNegotiationThreshold)
+        String expect = getHeader("Expect");
+        if (expect != null && expect.equals("100-continue"))
           {
             expectingContinue = true;
-            setHeader("Expect", "100-continue");
           }
         else
           {

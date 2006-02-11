@@ -229,6 +229,65 @@ public class KeyPairCodecFactory
     return KeyPairGeneratorFactory.getNames();
   }
 
+  /**
+   * Returns the fully qualified name of the designated encoding ID.
+   * 
+   * @param formatID the unique identifier of the encoding format.
+   * @return the fully qualified name of the designated format. Returns
+   *         <code>null</code> if no such encoding format is known.
+   */
+  public static final String getEncodingName(int formatID)
+  {
+    String result = null;
+    switch (formatID)
+      {
+      case Registry.RAW_ENCODING_ID:
+        result = Registry.RAW_ENCODING;
+        break;
+      case Registry.X509_ENCODING_ID:
+        result = Registry.X509_ENCODING;
+        break;
+      case Registry.PKCS8_ENCODING_ID:
+        result = Registry.PKCS8_ENCODING;
+        break;
+      case Registry.ASN1_ENCODING_ID:
+        result = Registry.ASN1_ENCODING;
+        break;
+      }
+
+    return result;
+  }
+
+  /**
+   * Returns the short name of the designated encoding ID. This is used by the
+   * JCE Adapters.
+   * 
+   * @param formatID the unique identifier of the encoding format.
+   * @return the short name of the designated format. Returns <code>null</code>
+   *         if no such encoding format is known.
+   */
+  public static final String getEncodingShortName(int formatID)
+  {
+    String result = null;
+    switch (formatID)
+      {
+      case Registry.RAW_ENCODING_ID:
+        result = Registry.RAW_ENCODING_SHORT_NAME;
+        break;
+      case Registry.X509_ENCODING_ID:
+        result = Registry.X509_ENCODING_SORT_NAME;
+        break;
+      case Registry.PKCS8_ENCODING_ID:
+        result = Registry.PKCS8_ENCODING_SHORT_NAME;
+        break;
+      case Registry.ASN1_ENCODING_ID:
+        result = Registry.ASN1_ENCODING_SHORT_NAME;
+        break;
+      }
+
+    return result;
+  }
+
   private static IKeyPairCodec makeInstance (String clazz)
   {
     try
