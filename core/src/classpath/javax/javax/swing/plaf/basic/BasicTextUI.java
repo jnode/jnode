@@ -46,15 +46,11 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
@@ -70,6 +66,7 @@ import javax.swing.plaf.ActionMapUIResource;
 import javax.swing.plaf.InputMapUIResource;
 import javax.swing.plaf.TextUI;
 import javax.swing.plaf.UIResource;
+import javax.swing.text.AbstractDocument;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Caret;
 import javax.swing.text.DefaultCaret;
@@ -161,11 +158,11 @@ public abstract class BasicTextUI extends TextUI
      * Indicates that the preferences of one of the child view has changed.
      * This calls revalidate on the text component.
      *
-     * @param view the child view which's preference has changed
+     * @param v the child view which's preference has changed
      * @param width <code>true</code> if the width preference has changed
      * @param height <code>true</code> if the height preference has changed
      */
-    public void preferenceChanged(View view, boolean width, boolean height)
+    public void preferenceChanged(View v, boolean width, boolean height)
     {
       textComponent.revalidate();
     }
@@ -207,10 +204,10 @@ public abstract class BasicTextUI extends TextUI
      */
     public int getViewCount()
     {
+      int count = 0;
       if (view != null)
-        return 1;
-      else
-        return 0;
+        count = 1;
+      return count;
     }
 
     /**
@@ -249,7 +246,11 @@ public abstract class BasicTextUI extends TextUI
     public void paint(Graphics g, Shape s)
     {
       if (view != null)
+        {
+          Rectangle b = s.getBounds();
+          view.setSize(b.width, b.height);
         view.paint(g, s);
+    }
     }
 
 
@@ -277,7 +278,7 @@ public abstract class BasicTextUI extends TextUI
     public Shape modelToView(int position, Shape a, Position.Bias bias)
       throws BadLocationException
     {
-      return ((View) view).modelToView(position, a, bias);
+      return view.modelToView(position, a, bias);
     }
 
     /**
@@ -368,7 +369,7 @@ public abstract class BasicTextUI extends TextUI
   /**
    * Receives notifications when properties of the text component change.
    */
-  class PropertyChangeHandler implements PropertyChangeListener
+  private class PropertyChangeHandler implements PropertyChangeListener
   {
     /**
      * Notifies when a property of the text component changes.
@@ -448,7 +449,7 @@ public abstract class BasicTextUI extends TextUI
   /**
    * Receives notification when the model changes.
    */
-  PropertyChangeHandler updateHandler = new PropertyChangeHandler();
+  private PropertyChangeHandler updateHandler = new PropertyChangeHandler();
 
   /** The DocumentEvent handler. */
   DocumentHandler documentHandler = new DocumentHandler();
@@ -522,7 +523,6 @@ public abstract class BasicTextUI extends TextUI
 	doc = getEditorKit(textComponent).createDefaultDocument();
 	textComponent.setDocument(doc);
       }
-    
     textComponent.addPropertyChangeListener(updateHandler);
     modelChanged();
     
@@ -821,18 +821,49 @@ public abstract class BasicTextUI extends TextUI
   }
 
   /**
-   * Paints the text component.
+   * Paints the text component. This acquires a read lock on the model and then
+   * calls {@link #paintSafely(Graphics)} in order to actually perform the
+   * painting.
    *
    * @param g the <code>Graphics</code> context to paint to
    * @param c not used here
    */
   public final void paint(Graphics g, JComponent c)
   {
+    try
+      {
+        Document doc = textComponent.getDocument();
+        if (doc instanceof AbstractDocument)
+          {
+            AbstractDocument aDoc = (AbstractDocument) doc;
+            aDoc.readLock();
+          }
+        
     paintSafely(g);
+  }
+    finally
+      {
+        Document doc = textComponent.getDocument();
+        if (doc instanceof AbstractDocument)
+          {
+            AbstractDocument aDoc = (AbstractDocument) doc;
+            aDoc.readUnlock();
+          }
+      }
   }
 
   /**
-   * Actually performs the painting.
+   * This paints the text component while beeing sure that the model is not
+   * modified while painting.
+   *
+   * The following is performed in this order:
+   * <ol>
+   * <li>If the text component is opaque, the background is painted by
+   * calling {@link #paintBackground(Graphics)}.</li>
+   * <li>If there is a highlighter, the highlighter is painted.</li>
+   * <li>The view hierarchy is painted.</li>
+   * <li>The Caret is painter.</li>
+   * </ol>
    *
    * @param g the <code>Graphics</code> context to paint to
    */
@@ -861,10 +892,23 @@ public abstract class BasicTextUI extends TextUI
    */
   protected void paintBackground(Graphics g)
   {
-    // This method does nothing. All the background filling is done by the
-    // ComponentUI update method. However, the method is called by paint
-    // to provide a way for subclasses to draw something different (e.g.
-    // background images etc) on the background.
+    Color old = g.getColor();
+    g.setColor(textComponent.getBackground());
+    g.fillRect(0, 0, textComponent.getWidth(), textComponent.getHeight());
+    g.setColor(old);
+  }
+
+  /**
+   * Overridden for better control over background painting. This now simply
+   * calls {@link #paint} and this delegates the background painting to
+   * {@link #paintBackground}.
+   *
+   * @param g the graphics to use
+   * @param c the component to be painted
+   */
+  public void update(Graphics g, JComponent c)
+  {
+    paint(g, c);
   }
 
   /**
@@ -1065,7 +1109,6 @@ public abstract class BasicTextUI extends TextUI
    */
   protected Rectangle getVisibleEditorRect()
   {
-    JTextComponent textComponent = getComponent();
     int width = textComponent.getWidth();
     int height = textComponent.getHeight();
 

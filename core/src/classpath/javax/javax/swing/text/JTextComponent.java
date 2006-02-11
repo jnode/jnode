@@ -1241,9 +1241,15 @@ public abstract class JTextComponent extends JComponent
    */
   public String getSelectedText()
   {
+    int start = getSelectionStart();
+    int offset = getSelectionEnd() - start;
+    
+    if (offset <= 0)
+      return null;
+    
     try
       {
-	return doc.getText(getSelectionStart(), getSelectionEnd());
+        return doc.getText(start, offset);
       }
     catch (BadLocationException e)
       {

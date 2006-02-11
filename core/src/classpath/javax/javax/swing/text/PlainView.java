@@ -46,7 +46,6 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Shape;
 
-import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentEvent.ElementChange;
 
@@ -153,7 +152,8 @@ public class PlainView extends View implements TabExpander
 	metrics = g.getFontMetrics();
 	// FIXME: Selected text are not drawn yet.
 	Element line = getElement().getElement(lineIndex);
-	drawUnselectedText(g, x, y, line.getStartOffset(), line.getEndOffset());
+        drawUnselectedText(g, x, y, line.getStartOffset(),
+                           line.getEndOffset() - 1);
 	//drawSelectedText(g, , , , );
       }
     catch (BadLocationException e)

@@ -70,6 +70,17 @@ final class RETokenOneOf extends REToken {
     return min;
   }
 
+
+  int getMaximumLength() {
+    int max = 0;
+    int x;
+    for (int i=0; i < options.size(); i++) {
+      if ((x = ((REToken) options.elementAt(i)).getMaximumLength()) > max)
+	max = x;
+    }
+    return max;
+  }
+
     boolean match(CharIndexed input, REMatch mymatch) {
       return negative ? matchN(input, mymatch) : matchP(input, mymatch);
     }

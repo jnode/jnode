@@ -42,6 +42,10 @@ final class RETokenEndSub extends REToken {
 	super(subIndex);
     }
     
+    int getMaximumLength() {
+      return 0;
+    }
+    
     boolean match(CharIndexed input, REMatch mymatch) {
 	mymatch.end[subIndex] = mymatch.index;
 	return next(input, mymatch);

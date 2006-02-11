@@ -329,6 +329,8 @@ public class JTextPane
       {
 	MutableAttributeSet inputAttributes =
 	  getStyledEditorKit().getInputAttributes();
+        if (replace)
+          inputAttributes.removeAttributes(inputAttributes);
 	inputAttributes.addAttributes(attribute);
       }
     else

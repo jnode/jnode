@@ -1,5 +1,5 @@
 /* JTable.java -- 
-   Copyright (C) 2002, 2004, 2005  Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2005, 2006  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -1878,22 +1878,22 @@ public class JTable
 
   /**
    * Invoked when the table changes.
+   * <code>null</code> means everything changed.
    */
   public void tableChanged (TableModelEvent event)
   {
     // update the column model from the table model if the structure has
     // changed and the flag autoCreateColumnsFromModel is set
-    if ((event.getFirstRow() ==TableModelEvent.HEADER_ROW)
+    if ((event == null || (event.getFirstRow() == TableModelEvent.HEADER_ROW))
         && autoCreateColumnsFromModel)
-
         createDefaultColumnsFromModel();
 
     // If the structure changes, we need to revalidate, since that might
     // affect the size parameters of the JTable. Otherwise we only need
     // to perform a repaint to update the view.
-    if (event.getType() == TableModelEvent.INSERT)
+    if (event == null || event.getType() == TableModelEvent.INSERT)
       revalidate();
-    else if (event.getType() == TableModelEvent.DELETE)
+    if (event == null || event.getType() == TableModelEvent.DELETE)
       {
         if (dataModel.getRowCount() == 0)
           clearSelection();

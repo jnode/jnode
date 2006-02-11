@@ -40,7 +40,6 @@ package javax.swing.text;
 
 import java.awt.Container;
 import java.awt.Graphics;
-import java.awt.Rectangle;
 import java.awt.Shape;
 
 import javax.swing.SwingConstants;
@@ -101,27 +100,65 @@ public abstract class View implements SwingConstants
     return elt;
   }
 
+  /**
+   * Returns the preferred span along the specified axis. Normally the view is
+   * rendered with the span returned here if that is possible.
+   *
+   * @param axis the axis
+   *
+   * @return the preferred span along the specified axis
+   */
   public abstract float getPreferredSpan(int axis);
 
+  /**
+   * Returns the resize weight of this view. A value of <code>0</code> or less
+   * means this view is not resizeable. Positive values make the view
+   * resizeable. The default implementation returns <code>0</code>
+   * unconditionally.
+   *
+   * @param axis the axis
+   *
+   * @return the resizability of this view along the specified axis
+   */
   public int getResizeWeight(int axis)
   {
     return 0;
   }
 
+  /**
+   * Returns the maximum span along the specified axis. The default
+   * implementation will forward to
+   * {@link #getPreferredSpan(int)} unless {@link #getResizeWeight(int)}
+   * returns a value > 0, in which case this returns {@link Integer#MIN_VALUE}.
+   *
+   * @param axis the axis
+   *
+   * @return the maximum span along the specified axis
+   */
   public float getMaximumSpan(int axis)
   {
+    float max = Integer.MAX_VALUE;
     if (getResizeWeight(axis) <= 0)
-      return getPreferredSpan(axis);
-
-    return Integer.MAX_VALUE;
+      max = getPreferredSpan(axis);
+    return max;
   }
 
+  /**
+   * Returns the minimum span along the specified axis. The default
+   * implementation will forward to
+   * {@link #getPreferredSpan(int)} unless {@link #getResizeWeight(int)}
+   * returns a value > 0, in which case this returns <code>0</code>.
+   *
+   * @param axis the axis
+   *
+   * @return the minimum span along the specified axis
+   */
   public float getMinimumSpan(int axis)
   {
+    float min = 0;
     if (getResizeWeight(axis) <= 0)
-      return getPreferredSpan(axis);
-
-    return Integer.MAX_VALUE;
+      min = getPreferredSpan(axis);
+    return min;
   }
   
   public void setSize(float width, float height)
@@ -129,6 +166,20 @@ public abstract class View implements SwingConstants
     // The default implementation does nothing.
   }
   
+  /**
+   * Returns the alignment of this view along the baseline of the parent view.
+   * An alignment of <code>0.0</code> will align this view with the left edge
+   * along the baseline, an alignment of <code>0.5</code> will align it
+   * centered to the baseline, an alignment of <code>1.0</code> will align
+   * the right edge along the baseline.
+   *
+   * The default implementation returns 0.5 unconditionally.
+   *
+   * @param axis the axis
+   *
+   * @return the alignment of this view along the parents baseline for the
+   *         specified axis
+   */
   public float getAlignment(int axis)
   {
     return 0.5f;
@@ -160,6 +211,15 @@ public abstract class View implements SwingConstants
     return parent != null ? parent.getViewFactory() : null;
   }
 
+  /**
+   * Replaces a couple of child views with new child views. If
+   * <code>length == 0</code> then this is a simple insertion, if
+   * <code>views == null</code> this only removes some child views.
+   *
+   * @param offset the offset at which to replace
+   * @param length the number of child views to be removed
+   * @param views the new views to be inserted, may be <code>null</code>
+   */
   public void replace(int offset, int length, View[] views)
   {
     // Default implementation does nothing.
@@ -392,6 +452,10 @@ public abstract class View implements SwingConstants
    * of the change to the model. This calles {@link #forwardUpdateToView}
    * for each View that must be forwarded to.
    *
+   * If <code>ec</code> is not <code>null</code> (this means there have been
+   * structural changes to the element that this view is responsible for) this
+   * method should recognize this and don't notify newly added child views.
+   *
    * @param ec the ElementChange describing the element changes (may be
    *           <code>null</code> if there were no changes)
    * @param ev the DocumentEvent describing the changes to the model
@@ -404,10 +468,32 @@ public abstract class View implements SwingConstants
                                DocumentEvent ev, Shape shape, ViewFactory vf)
   {
     int count = getViewCount();
-    for (int i = 0; i < count; i++)
+    if (count > 0)
       {
+        int startOffset = ev.getOffset();
+        int endOffset = startOffset + ev.getLength();
+        // FIXME: What about this bias stuff?
+        int startIndex = getViewIndex(startOffset, Position.Bias.Forward);
+        int endIndex = getViewIndex(endOffset, Position.Bias.Forward);
+        int index = -1;
+        int addLength = -1;
+        if (ec != null)
+          {
+            index = ec.getIndex();
+            addLength = ec.getChildrenAdded().length;
+          }
+
+        if (startIndex >= 0 && endIndex >= 0)
+          {
+            for (int i = startIndex; i <= endIndex; i++)
+              {
+                // Skip newly added child views.
+                if (index >= 0 && i >= index && i < (index+addLength))
+                  continue;
         View child = getView(i);
         forwardUpdateToView(child, ev, shape, vf);
+      }
+  }
       }
   }
 
