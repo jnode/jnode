@@ -180,7 +180,7 @@ public class MediaSize extends Size2DSyntax
    *
    * @return The class <code>MediaSize</code> itself.
    */
-  public Class getCategory()
+  public final Class getCategory()
   {
     return MediaSize.class;
   }
@@ -281,7 +281,7 @@ public class MediaSize extends Size2DSyntax
    *
    * @return The name "media-size".
    */
-  public String getName()
+  public final String getName()
   {
     return "media-size";
   }
@@ -293,6 +293,10 @@ public class MediaSize extends Size2DSyntax
    */
   public static final class ISO 
   {
+    private ISO()
+    {
+      // prevent instantiation
+    }
 
     /**
      * ISO A0 paper, 841 mm x 1189 mm.
@@ -442,6 +446,11 @@ public class MediaSize extends Size2DSyntax
    */
   public static final class NA
   {
+    private NA()
+    {
+      // prevent instantiation
+    }
+    
     /**
      * US Legal paper size, 8.5 inch x 14 inch
      */
@@ -557,6 +566,11 @@ public class MediaSize extends Size2DSyntax
    */
   public static final class Engineering 
   {
+    private Engineering()
+    {
+      // prevent instantiation
+    }
+    
     /**
      * ANSI A paper size. 8.5 inch x 11 inch
      */
@@ -595,6 +609,11 @@ public class MediaSize extends Size2DSyntax
    */
   public static final class JIS 
   {
+    private JIS()
+    {
+      // prevent instantiation
+    }
+    
     /**
      * JIS B0 paper. 1030 mm x 1456 mm
      * Note: The JIS B-series is not identical to the ISO B-series.
@@ -789,6 +808,11 @@ public class MediaSize extends Size2DSyntax
    */
   public static final class Other
   {
+    private Other()
+    {
+      // prevent instantiation
+    }
+    
     /**
      * US Executive paper size, 7.25 inch x 10.5 inch
      */

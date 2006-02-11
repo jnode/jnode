@@ -2308,6 +2308,10 @@ public abstract class Component
 	 */
   public final void dispatchEvent(AWTEvent e)
   {
+    Event oldEvent = translateEvent(e);
+    if (oldEvent != null)
+      postEvent (oldEvent);
+
 		// Some subclasses in the AWT package need to override this behavior,
 		// hence the use of dispatchEventImpl().
 		dispatchEventImpl(e);
@@ -4481,6 +4485,109 @@ p   * <li>the set of backward traversal keys
 	}
 
 	/**
+   * Report a change in a bound property to any registered property listeners.
+   *
+   * @param propertyName the property that changed
+   * @param oldValue the old property value
+   * @param newValue the new property value
+   *
+   * @since 1.5
+   */
+  public void firePropertyChange(String propertyName, byte oldValue,
+                                    byte newValue)
+  {
+    if (changeSupport != null)
+      changeSupport.firePropertyChange(propertyName, new Byte(oldValue),
+                                       new Byte(newValue));
+  }
+
+  /**
+   * Report a change in a bound property to any registered property listeners.
+   *
+   * @param propertyName the property that changed
+   * @param oldValue the old property value
+   * @param newValue the new property value
+   *
+   * @since 1.5
+   */
+  public void firePropertyChange(String propertyName, char oldValue,
+                                    char newValue)
+  {
+    if (changeSupport != null)
+      changeSupport.firePropertyChange(propertyName, new Character(oldValue),
+                                       new Character(newValue));
+  }
+
+  /**
+   * Report a change in a bound property to any registered property listeners.
+   *
+   * @param propertyName the property that changed
+   * @param oldValue the old property value
+   * @param newValue the new property value
+   *
+   * @since 1.5
+   */
+  public void firePropertyChange(String propertyName, short oldValue,
+                                    short newValue)
+  {
+    if (changeSupport != null)
+      changeSupport.firePropertyChange(propertyName, new Short(oldValue),
+                                       new Short(newValue));
+  }
+
+  /**
+   * Report a change in a bound property to any registered property listeners.
+   *
+   * @param propertyName the property that changed
+   * @param oldValue the old property value
+   * @param newValue the new property value
+   *
+   * @since 1.5
+   */
+  public void firePropertyChange(String propertyName, long oldValue,
+                                    long newValue)
+  {
+    if (changeSupport != null)
+      changeSupport.firePropertyChange(propertyName, new Long(oldValue),
+                                       new Long(newValue));
+  }
+
+  /**
+   * Report a change in a bound property to any registered property listeners.
+   *
+   * @param propertyName the property that changed
+   * @param oldValue the old property value
+   * @param newValue the new property value
+   *
+   * @since 1.5
+   */
+  public void firePropertyChange(String propertyName, float oldValue,
+                                    float newValue)
+  {
+    if (changeSupport != null)
+      changeSupport.firePropertyChange(propertyName, new Float(oldValue),
+                                       new Float(newValue));
+  }
+
+
+  /**
+   * Report a change in a bound property to any registered property listeners.
+   *
+   * @param propertyName the property that changed
+   * @param oldValue the old property value
+   * @param newValue the new property value
+   *
+   * @since 1.5
+   */
+  public void firePropertyChange(String propertyName, double oldValue,
+                                 double newValue)
+  {
+    if (changeSupport != null)
+      changeSupport.firePropertyChange(propertyName, new Double(oldValue),
+                                       new Double(newValue));
+  }
+
+  /**
 	 * Sets the text layout orientation of this component. New components default
 	 * to UNKNOWN (which behaves like LEFT_TO_RIGHT). This method affects only
 	 * the current component, while
@@ -4597,7 +4704,7 @@ p   * <li>the set of backward traversal keys
    */
   static Event translateEvent (AWTEvent e)
   {
-    Component target = (Component) e.getSource ();
+    Object target = e.getSource ();
     Event translated = null;
 
     if (e instanceof InputEvent)
@@ -4790,15 +4897,11 @@ p   * <li>the set of backward traversal keys
 
   void dispatchEventImpl(AWTEvent e)
   {
-    Event oldEvent = translateEvent (e);
     // This boolean tells us not to process focus events when the focus
     // opposite component is the same as the focus component.
     boolean ignoreFocus = 
       (e instanceof FocusEvent && 
        ((FocusEvent)e).getComponent() == ((FocusEvent)e).getOppositeComponent());
-
-    if (oldEvent != null)
-      postEvent (oldEvent);
 
     if (eventTypeEnabled (e.id))
       {
@@ -4925,16 +5028,6 @@ p   * <li>the set of backward traversal keys
     Rectangle r1 = queuedEvent.getUpdateRect();
     Rectangle r2 = newEvent.getUpdateRect();
     Rectangle union = r1.union(r2);
-
-    int r1a = r1.width * r1.height;
-    int r2a = r2.width * r2.height;
-    int ua  = union.width * union.height;
-
-    if (ua > (r1a+r2a)*2)
-      return null;
-    /* The 2 factor should maybe be reconsidered. Perhaps 3/2
-       would be better? */
-
     newEvent.setUpdateRect(union);
     return newEvent;
   }
