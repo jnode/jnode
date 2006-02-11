@@ -1,5 +1,6 @@
 /* Container.java -- parent container class in AWT
-   Copyright (C) 1999, 2000, 2002, 2003, 2004, 2005  Free Software Foundation
+   Copyright (C) 1999, 2000, 2002, 2003, 2004, 2005, 2006
+   Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -101,7 +102,6 @@ public class Container extends Component
 
   /* Anything else is non-serializable, and should be declared "transient". */
   transient ContainerListener containerListener;
-  transient PropertyChangeSupport changeSupport; 
 
   /** The focus traversal policy that determines how focus is
       transferred between this Container and its children. */
@@ -183,25 +183,6 @@ public class Container extends Component
           System.arraycopy(component, 0, result, 0, ncomponents);
 
         return result;
-      }
-  }
-
-  /**
-   * Swaps the components at position i and j, in the container.
-   */
-
-  protected void swapComponents (int i, int j)
-  {   
-    synchronized (getTreeLock ())
-      {
-        if (i < 0 
-            || i >= component.length
-            || j < 0 
-            || j >= component.length)
-          throw new ArrayIndexOutOfBoundsException ();
-        Component tmp = component[i];
-        component[i] = component[j];
-        component[j] = tmp;
       }
   }
 
@@ -385,6 +366,8 @@ public class Container extends Component
         // Notify the layout manager.
         if (layoutMgr != null)
           {
+	    // If we have a LayoutManager2 the constraints are "real",
+	    // otherwise they are the "name" of the Component to add.
             if (layoutMgr instanceof LayoutManager2)
               {
                 LayoutManager2 lm2 = (LayoutManager2) layoutMgr;
@@ -393,7 +376,7 @@ public class Container extends Component
             else if (constraints instanceof String)
               layoutMgr.addLayoutComponent((String) constraints, comp);
             else
-              layoutMgr.addLayoutComponent(null, comp);
+              layoutMgr.addLayoutComponent("", comp);
           }
 
         // We previously only sent an event when this container is showing.
@@ -449,9 +432,6 @@ public class Container extends Component
                                                ContainerEvent.COMPONENT_REMOVED,
                                                r);
         getToolkit().getSystemEventQueue().postEvent(ce);
-
-            // Repaint this container.
-            repaint();
       }
   }
   }
@@ -1563,25 +1543,102 @@ public class Container extends Component
   
   public void addPropertyChangeListener (PropertyChangeListener listener)
   {
-    if (listener == null)
-      return;
-
-    if (changeSupport == null)
-      changeSupport = new PropertyChangeSupport (this);
-
-    changeSupport.addPropertyChangeListener (listener);
+    // TODO: Why is this overridden?
+    super.addPropertyChangeListener(listener);
   }
   
-  public void addPropertyChangeListener (String name,
+  public void addPropertyChangeListener (String propertyName,
                                          PropertyChangeListener listener)
   {
-    if (listener == null)
-      return;
-    
-    if (changeSupport == null)
-      changeSupport = new PropertyChangeSupport (this);
+    // TODO: Why is this overridden?
+    super.addPropertyChangeListener(propertyName, listener);
+  }
 
-    changeSupport.addPropertyChangeListener (name, listener);
+
+  /**
+   * Sets the Z ordering for the component <code>comp</code> to
+   * <code>index</code>. Components with lower Z order paint above components
+   * with higher Z order.
+   *
+   * @param comp the component for which to change the Z ordering
+   * @param index the index to set
+   *
+   * @throws NullPointerException if <code>comp == null</code>
+   * @throws IllegalArgumentException if comp is an ancestor of this container
+   * @throws IllegalArgumentException if <code>index</code> is not in
+   *         <code>[0, getComponentCount()]</code> for moving between
+   *         containers or <code>[0, getComponentCount() - 1]</code> for moving
+   *         inside this container
+   * @throws IllegalArgumentException if <code>comp == this</code>
+   * @throws IllegalArgumentException if <code>comp</code> is a
+   *         <code>Window</code>
+   *
+   * @see #getComponentZOrder(Component)
+   *
+   * @since 1.5
+   */
+  public final void setComponentZOrder(Component comp, int index)
+  {
+    if (comp == null)
+      throw new NullPointerException("comp must not be null");
+    if (comp instanceof Container && ((Container) comp).isAncestorOf(this))
+      throw new IllegalArgumentException("comp must not be an ancestor of "
+                                         + "this");
+    if (comp instanceof Window)
+      throw new IllegalArgumentException("comp must not be a Window");
+    
+    if (comp == this)
+      throw new IllegalArgumentException("cannot add component to itself");
+
+    // FIXME: Implement reparenting.
+    if ( comp.getParent() != this)
+      throw new AssertionError("Reparenting is not implemented yet");
+    else
+      {
+        // Find current component index.
+        int currentIndex = getComponentZOrder(comp);
+        if (currentIndex < index)
+          {
+            System.arraycopy(component, currentIndex + 1, component,
+                             currentIndex, index - currentIndex);
+          }
+        else
+          {
+            System.arraycopy(component, index, component, index + 1,
+                             currentIndex - index);
+          }
+        component[index] = comp;
+      }
+  }
+
+  /**
+   * Returns the Z ordering index of <code>comp</code>. If <code>comp</code>
+   * is not a child component of this Container, this returns <code>-1</code>.
+   *
+   * @param comp the component for which to query the Z ordering
+   *
+   * @return the Z ordering index of <code>comp</code> or <code>-1</code> if
+   *         <code>comp</code> is not a child of this Container
+   *
+   * @see #setComponentZOrder(Component, int)
+   *
+   * @since 1.5
+   */
+  public final int getComponentZOrder(Component comp)
+  {
+    int index = -1;
+    if (component != null)
+      {
+        for (int i = 0; i < component.length; i++)
+          {
+            if (component[i] == comp)
+              {
+                index = i;
+                break;
+              }
+          }
+      }
+    return index;
   }
 
   // Hidden helper methods.
@@ -1634,30 +1691,19 @@ public class Container extends Component
                           Component comp)
   {
     Rectangle bounds = comp.getBounds();
-    Rectangle oldClip = gfx.getClipBounds();
-    if (oldClip == null)
-      oldClip = bounds;
 
-    Rectangle clip = oldClip.intersection(bounds);
+    if(!gfx.hitClip(bounds.x,bounds.y, bounds.width, bounds.height))
+      return;
 
-    if (clip.isEmpty()) return;
-
-    boolean clipped = false;
-    boolean translated = false;
+    Graphics g2 = gfx.create(bounds.x, bounds.y, bounds.width,
+                             bounds.height);
     try
       {
-        gfx.setClip(clip.x, clip.y, clip.width, clip.height);
-        clipped = true;
-        gfx.translate(bounds.x, bounds.y);
-        translated = true;
-        visitor.visit(comp, gfx);
+        visitor.visit(comp, g2);
       }
     finally
       {
-        if (translated)
-          gfx.translate (-bounds.x, -bounds.y);
-        if (clipped)
-          gfx.setClip (oldClip.x, oldClip.y, oldClip.width, oldClip.height);
+        g2.dispose();
       }
   }
 
