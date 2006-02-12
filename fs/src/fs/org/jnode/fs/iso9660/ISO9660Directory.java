@@ -27,6 +27,7 @@ import java.util.Iterator;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystem;
+import org.jnode.util.LittleEndian;
 
 /**
  * @author Chira
@@ -57,7 +58,7 @@ public final class ISO9660Directory implements FSDirectory {
             final byte[] buffer = parent.getExtentData();
 
             public boolean hasNext() {
-                return ((offset < buffer.length) && (buffer[ offset] > 0));
+                return ((offset < buffer.length) && LittleEndian.getUInt8(buffer, offset) > 0);
             }
 
             public FSEntry next() {
@@ -68,7 +69,7 @@ public final class ISO9660Directory implements FSDirectory {
                 return new ISO9660Entry((ISO9660FileSystem) entry
                         .getFileSystem(), fEntry);
             }
-            
+
             /**
              * @see java.util.Iterator#remove()
              */
@@ -125,7 +126,7 @@ public final class ISO9660Directory implements FSDirectory {
     }
 
 	/**
-	 * Save all dirty (unsaved) data to the device 
+	 * Save all dirty (unsaved) data to the device
 	 * @throws IOException
 	 */
 	public void flush() throws IOException
