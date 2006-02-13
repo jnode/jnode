@@ -23,10 +23,7 @@ package org.jnode.debug;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.SocketAddress;
-import java.net.SocketException;
+import java.net.*;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
@@ -58,7 +55,8 @@ public class UDPOutputStream extends OutputStream {
      * @throws IOException
      */
     public void close() throws IOException {
-        super.close();
+      socket.close();
+      super.close();
     }
 
     /**

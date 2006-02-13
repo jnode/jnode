@@ -24,6 +24,7 @@
 
   <extension point="org.jnode.security.permissions">
     <permission class="java.lang.RuntimePermission" name="setIO"/>
-  </extension>       
+    <permission class="java.net.SocketPermission" name="*" actions="resolve"/>
+  </extension>
         
 </plugin>
