@@ -9,7 +9,6 @@
         
   <requires>
     <import plugin="org.jnode.fs"/>
-    <import plugin="org.jnode.fs.fat"/>
     <import plugin="org.jnode.shell.help"/>
   </requires>
         
