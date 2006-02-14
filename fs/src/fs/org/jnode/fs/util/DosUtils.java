@@ -38,14 +38,15 @@ public class DosUtils {
 	public static long decodeDateTime(int dosDate, int dosTime) {
 		Calendar cal = Calendar.getInstance();
 		
-		cal.set(Calendar.SECOND, (dosTime & 0x1f) * 2);
+		cal.set(Calendar.MILLISECOND, 0);
+    cal.set(Calendar.SECOND, (dosTime & 0x1f) * 2);
 		cal.set(Calendar.MINUTE, (dosTime >> 5) & 0x3f);
 		cal.set(Calendar.HOUR_OF_DAY, dosTime >> 11);
-		
+
 		cal.set(Calendar.DATE, dosDate & 0x1f);
 		cal.set(Calendar.MONTH, ((dosDate >> 5) & 0x0f) - 1 );
 		cal.set(Calendar.YEAR, 1980 + (dosDate >> 9));
-		
+
 		return cal.getTimeInMillis();
 	}
 
@@ -57,7 +58,7 @@ public class DosUtils {
 	public static int encodeTime(long javaDateTime) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeInMillis(javaDateTime);
-		
+
 		return 2048 * cal.get(Calendar.HOUR_OF_DAY) +
 		        32 * cal.get(Calendar.MINUTE) +
 		        cal.get(Calendar.SECOND) / 2;
@@ -71,7 +72,7 @@ public class DosUtils {
 	public static int encodeDate(long javaDateTime) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeInMillis(javaDateTime);
-		
+
 		return 512 * (cal.get(Calendar.YEAR) - 1980) +
 				32 * ( cal.get(Calendar.MONTH) + 1 ) +
 				cal.get(Calendar.DATE);
