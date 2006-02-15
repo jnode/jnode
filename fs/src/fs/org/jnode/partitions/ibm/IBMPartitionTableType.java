@@ -38,7 +38,7 @@ public class IBMPartitionTableType implements PartitionTableType {
      * @see org.jnode.partitions.PartitionTableType#create(org.jnode.driver.Device)
      */
     public PartitionTable create(byte[] firstSector, Device device) throws PartitionTableException {
-        return new IBMPartitionTable(firstSector, device);
+        return new IBMPartitionTable(this, firstSector, device);
     }
 
     /**

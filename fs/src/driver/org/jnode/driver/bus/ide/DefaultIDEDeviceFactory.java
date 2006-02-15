@@ -24,6 +24,7 @@ package org.jnode.driver.bus.ide;
 import org.jnode.driver.Device;
 import org.jnode.driver.DriverException;
 import org.jnode.partitions.ibm.IBMPartitionTable;
+import org.jnode.partitions.ibm.IBMPartitionTableType;
 import org.jnode.system.ResourceNotFreeException;
 
 public class DefaultIDEDeviceFactory implements IDEDeviceFactory
@@ -50,6 +51,6 @@ public class DefaultIDEDeviceFactory implements IDEDeviceFactory
 
     public IBMPartitionTable createIBMPartitionTable(byte[] bs, Device dev)
     {
-        return new IBMPartitionTable(bs, dev);
+        return new IBMPartitionTable(new IBMPartitionTableType(), bs, dev);
     }
 }

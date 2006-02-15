@@ -33,12 +33,17 @@ import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.driver.bus.ide.IDEConstants;
 import org.jnode.partitions.PartitionTable;
 import org.jnode.partitions.PartitionTableEntry;
+import org.jnode.partitions.PartitionTableType;
+
+import com.sun.org.apache.bcel.internal.generic.NEW;
 
 /**
  * @author epr
  */
 public class IBMPartitionTable implements PartitionTable {
-	
+
+    /** The type of partition table */
+    private final IBMPartitionTableType tableType;
 	/** The bootsector data */
 	//private final byte[] bootSector;
 	/** The partition entries */
@@ -60,14 +65,15 @@ public class IBMPartitionTable implements PartitionTable {
 	 * Create a new instance
 	 * @param bootSector
 	 */
-	public IBMPartitionTable(byte[] bootSector, Device device) {
+	public IBMPartitionTable(IBMPartitionTableType tableType, byte[] bootSector, Device device) {
 		//this.bootSector = bootSector;
+        this.tableType = tableType;
 		this.partitions = new IBMPartitionTableEntry[4];
 		this.drivedDevice = device;
 		if(containsPartitionTable(bootSector)) {
 			for (int partNr = 0; partNr < partitions.length ;  partNr++) {
 				log.debug("try part "+ partNr);
-				partitions[partNr] = new IBMPartitionTableEntry(bootSector, partNr);
+				partitions[partNr] = new IBMPartitionTableEntry(this, bootSector, partNr);
 				if(partitions[partNr].isExtended()) {
 					extendedPartitionEntry = partNr;
 					log.debug("Found Extended partitions");
@@ -96,9 +102,10 @@ public class IBMPartitionTable implements PartitionTable {
 			// I think we ca'nt get it
 			log.error("IOException");
 		}
+        
 		IBMPartitionTableEntry entry = null;
 		for(int i = 0; i < 4 ; i++) {
-			entry = new IBMPartitionTableEntry(sector.array(), i);
+			entry = new IBMPartitionTableEntry(this, sector.array(), i);
 			if(entry.isValid() && !entry.isEmpty()) {
 				//corrct the offset
 				
@@ -158,4 +165,11 @@ public class IBMPartitionTable implements PartitionTable {
 	public List<IBMPartitionTableEntry> getExtendedPartitions() {
 		return extendedPartitions;
 	}
+
+    /**
+     * @see org.jnode.partitions.PartitionTable#getType()
+     */
+    public PartitionTableType getType() {
+        return tableType;
+    }    
 }
