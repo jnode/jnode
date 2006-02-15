@@ -22,6 +22,7 @@
 package org.jnode.partitions.ibm;
 
 import org.jnode.driver.block.CHS;
+import org.jnode.partitions.PartitionTable;
 import org.jnode.partitions.PartitionTableEntry;
 import org.jnode.util.LittleEndian;
 import org.jnode.util.NumberUtils;
@@ -35,8 +36,10 @@ public class IBMPartitionTableEntry implements PartitionTableEntry {
 	//private final int partNr;
 	private final byte[] bs;
 	private final int ofs;
+    private final IBMPartitionTable parent;
 	
-	public IBMPartitionTableEntry(byte[] bs, int partNr) {
+	public IBMPartitionTableEntry(IBMPartitionTable parent, byte[] bs, int partNr) {
+        this.parent = parent;
 		this.bs = bs;
 		//this.partNr = partNr;
 		this.ofs = 446 + (partNr*16);
@@ -47,8 +50,22 @@ public class IBMPartitionTableEntry implements PartitionTableEntry {
 	public boolean isValid() {
 		return !isEmpty();
 	}
-	
-	public boolean isEmpty() {
+
+	/**
+     * @see org.jnode.partitions.PartitionTableEntry#getChildPartitionTable()
+     */
+    public PartitionTable getChildPartitionTable() {
+        throw new Error("Not implemented yet");
+    }
+
+    /**
+     * @see org.jnode.partitions.PartitionTableEntry#hasChildPartitionTable()
+     */
+    public boolean hasChildPartitionTable() {
+        return isExtended();
+    }
+
+    public boolean isEmpty() {
 		return (getSystemIndicator() == IBMPartitionTypes.PARTTYPE_EMPTY);
 	}
 	

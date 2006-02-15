@@ -26,6 +26,11 @@ package org.jnode.partitions;
  */
 public interface PartitionTable {
 	
+    /**
+     * Gets the type of this partition table
+     */
+    public PartitionTableType getType();
+    
 	/**
 	 * Gets the number of entries in this table
 	 */

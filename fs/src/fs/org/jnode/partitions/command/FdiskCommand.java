@@ -43,6 +43,7 @@ import org.jnode.fs.fat.GrubBootSector;
 import org.jnode.naming.InitialNaming;
 import org.jnode.partitions.ibm.IBMPartitionTable;
 import org.jnode.partitions.ibm.IBMPartitionTableEntry;
+import org.jnode.partitions.ibm.IBMPartitionTableType;
 import org.jnode.partitions.ibm.IBMPartitionTypes;
 import org.jnode.shell.help.DeviceArgument;
 import org.jnode.shell.help.Help;
@@ -295,7 +296,7 @@ public class FdiskCommand {
 			ByteBuffer MBR = ByteBuffer.allocate(IDEConstants.SECTOR_SIZE);
 			api.read(0, MBR);
 			if (IBMPartitionTable.containsPartitionTable(MBR.array())) {
-				IBMPartitionTable partitionTable = new IBMPartitionTable(MBR.array(), current);
+				IBMPartitionTable partitionTable = new IBMPartitionTable(new IBMPartitionTableType(), MBR.array(), current);
 				int nbPartitions = partitionTable.getLength();
 
 				System.out.println(

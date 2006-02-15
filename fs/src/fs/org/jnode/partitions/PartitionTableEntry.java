@@ -30,5 +30,18 @@ public interface PartitionTableEntry {
 	 * Is this a valid entry, if not it must be ignored.
 	 */
 	public boolean isValid();
+    
+    /**
+     * Does this partition actually is a set of partitions with
+     * a partition table of itself.
+     */
+    public boolean hasChildPartitionTable();
+    
+    /**
+     * Gets the partition table that describes the partitions
+     * within this partition.
+     * @return null of {{@link #hasChildPartitionTable()} is false.
+     */
+    public PartitionTable getChildPartitionTable();
 
 }

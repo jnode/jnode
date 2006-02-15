@@ -358,7 +358,7 @@ public class BootSector {
 
 	public synchronized IBMPartitionTableEntry getPartition(int partNr) {
 		if (partitions[partNr] == null) {
-			partitions[partNr] = new IBMPartitionTableEntry(data, partNr);
+			partitions[partNr] = new IBMPartitionTableEntry(null, data, partNr);
 		}
 		return partitions[partNr];
 	}
