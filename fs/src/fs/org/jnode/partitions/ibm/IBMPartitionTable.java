@@ -35,8 +35,6 @@ import org.jnode.partitions.PartitionTable;
 import org.jnode.partitions.PartitionTableEntry;
 import org.jnode.partitions.PartitionTableType;
 
-import com.sun.org.apache.bcel.internal.generic.NEW;
-
 /**
  * @author epr
  */
