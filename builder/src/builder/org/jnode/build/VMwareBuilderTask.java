@@ -31,6 +31,7 @@ import org.apache.tools.ant.Task;
 
 public class VMwareBuilderTask extends Task {
 
+	private String logFile; // log file use for kernel debugger messages
     private String isoFile;
     private int memorySize;
 
@@ -48,6 +49,20 @@ public class VMwareBuilderTask extends Task {
         this.memorySize = memorySize;
     }
 
+    /**
+     * @return Returns the memorySize.
+     */
+    public final String getLogFile() {
+        return logFile;
+    }
+
+    /**
+     * @param memorySize The memorySize to set.
+     */
+    public final void setLogFile(String logFile) {
+        this.logFile = logFile;
+    }
+    
     /**
      * @see org.apache.tools.ant.Task#execute()
      */
@@ -83,6 +98,13 @@ public class VMwareBuilderTask extends Task {
                 put(w, "ethernet0.generatedAddress", "00:0c:29:7f:ec:b8");  
                 put(w, "ethernet0.generatedAddressOffset", "0");  
 
+                if((logFile != null) && (logFile.trim().length() != 0))
+                {
+	                put(w, "serial0.present", "TRUE");
+	                put(w, "serial0.fileType", "file");
+	                put(w, "serial0.fileName", logFile);
+                }
+                
                 put(w, "tools.syncTime", "TRUE");  
                 put(w, "ide1:0.startConnected", "TRUE");  
                 put(w, "uuid.action", "create");  
