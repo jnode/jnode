@@ -553,8 +553,9 @@ public class HTMLEditorKit
             view = new BlockView(element, View.Y_AXIS);
           
           // FIXME: Uncomment when the views have been implemented
-         /* else if (tag.equals(HTML.Tag.CONTENT))
+          else if (tag.equals(HTML.Tag.CONTENT))
             view = new InlineView(element); 
+          /*
           else if (tag.equals(HTML.Tag.MENU) || tag.equals(HTML.Tag.DIR)
                    || tag.equals(HTML.Tag.UL) || tag.equals(HTML.Tag.OL))
             view = new ListView(element);

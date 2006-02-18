@@ -38,10 +38,8 @@ exception statement from your version. */
 
 package javax.swing.text.html;
 
-import java.net.URL;
-
 import java.io.IOException;
-
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Stack;
 import java.util.Vector;
@@ -131,16 +129,17 @@ public class HTMLDocument extends DefaultStyledDocument
   }
   
   /**
-   * Replaces the contents of the document with the given element specifications.
-   * This is called before insert if the loading is done in bursts. This is the
-   * only method called if loading the document entirely in one burst.
+   * Replaces the contents of the document with the given element
+   * specifications. This is called before insert if the loading is done
+   * in bursts. This is the only method called if loading the document
+   * entirely in one burst.
    * 
    * @param data - the date that replaces the content of the document
    */
-  protected void create(DefaultStyledDocument.ElementSpec[] data)
+  protected void create(ElementSpec[] data)
   {
-    // FIXME: Not implemented
-    System.out.println("create not implemented");
+    // Once the super behaviour is properly implemented it should be sufficient
+    // to simply call super.create(data).
     super.create(data);
   }
   
@@ -149,11 +148,35 @@ public class HTMLDocument extends DefaultStyledDocument
    * 
    * @return the new default root
    */
-  protected AbstractDocument.AbstractElement createDefaultRoot()
+  protected AbstractElement createDefaultRoot()
   {
-    // FIXME: Not implemented
-    System.out.println("createDefaultRoot not implemented");
-    return super.createDefaultRoot();
+    AttributeContext ctx = getAttributeContext();
+
+    // Create html element.
+    AttributeSet atts = ctx.getEmptySet();
+    atts = ctx.addAttribute(atts, StyleConstants.NameAttribute, HTML.Tag.HTML);
+    BranchElement html = (BranchElement) createBranchElement(null, atts);
+
+    // Create body element.
+    atts = ctx.getEmptySet();
+    atts = ctx.addAttribute(atts, StyleConstants.NameAttribute, HTML.Tag.BODY);
+    BranchElement body = (BranchElement) createBranchElement(html, atts);
+    html.replace(0, 0, new Element[] { body });
+
+    // Create p element.
+    atts = ctx.getEmptySet();
+    atts = ctx.addAttribute(atts, StyleConstants.NameAttribute, HTML.Tag.P);
+    BranchElement p = (BranchElement) createBranchElement(body, atts);
+    body.replace(0, 0, new Element[] { p });
+
+    // Create an empty leaf element.
+    atts = ctx.getEmptySet();
+    atts = ctx.addAttribute(atts, StyleConstants.NameAttribute,
+                            HTML.Tag.CONTENT);
+    Element leaf = createLeafElement(p, atts, 0, 1);
+    p.replace(0, 0, new Element[]{ leaf });
+
+    return html;
   }
   
   /**
@@ -165,28 +188,29 @@ public class HTMLDocument extends DefaultStyledDocument
    * @param a - the attributes for the element
    * @param p0 - the beginning of the range >= 0
    * @param p1 - the end of the range >= p0
+   *
    * @return the new element
    */
   protected Element createLeafElement(Element parent, AttributeSet a, int p0,
                                       int p1)
   {
-    // FIXME: Not implemented
-    System.out.println("createLeafElement not implemented");
-    return super.createLeafElement(parent, a, p0, p1);
+    RunElement el = new RunElement(parent, a, p0, p1);
+    el.addAttribute(StyleConstants.NameAttribute, HTML.Tag.CONTENT);
+    return new RunElement(parent, a, p0, p1);
   }
 
-  /** This method returns an HTMLDocument.BlockElement object representing the
+  /**
+   * This method returns an HTMLDocument.BlockElement object representing the
    * attribute set a and attached to parent.
    * 
    * @param parent - the parent element
    * @param a - the attributes for the element
+   *
    * @return the new element
    */
   protected Element createBranchElement(Element parent, AttributeSet a)
   {
-    // FIXME: Not implemented
-    System.out.println("createBranchElement not implemented");
-    return super.createBranchElement(parent, a);
+    return new BlockElement(parent, a);
   }
   
   /**
@@ -470,7 +494,11 @@ public class HTMLDocument extends DefaultStyledDocument
      */
     public String getName()
     {
-      return (String) getAttribute(StyleConstants.NameAttribute); 
+      Object tag = getAttribute(StyleConstants.NameAttribute);
+      String name = null;
+      if (tag != null)
+        name = tag.toString();
+      return name;
     }
   }
   
@@ -502,7 +530,11 @@ public class HTMLDocument extends DefaultStyledDocument
      */
     public String getName()
     {
-      return (String) getAttribute(StyleConstants.NameAttribute);      
+      Object tag = getAttribute(StyleConstants.NameAttribute);
+      String name = null;
+      if (tag != null)
+        name = tag.toString();
+      return name;
     }
     
     /**
@@ -699,8 +731,8 @@ public class HTMLDocument extends DefaultStyledDocument
        */
       public void start(HTML.Tag t, MutableAttributeSet a)
       {
-        // FIXME: Implement.
-        print ("ParagraphAction.start not implemented");
+        // FIXME: What else must be done here?
+        blockOpen(t, a);
       }
       
       /**
@@ -709,8 +741,8 @@ public class HTMLDocument extends DefaultStyledDocument
        */
       public void end(HTML.Tag t)
       {
-        // FIXME: Implement.
-        print ("ParagraphAction.end not implemented");
+        // FIXME: What else must be done here?
+        blockClose(t);
       } 
     }
     
@@ -1102,7 +1134,11 @@ public class HTMLDocument extends DefaultStyledDocument
       elements = new DefaultStyledDocument.ElementSpec[parseBuffer.size()];
       parseBuffer.copyInto(elements);
       parseBuffer.removeAllElements();
+      if (offset == 0)
+        create(elements);
+      else
       insert(offset, elements);
+
       offset += HTMLDocument.this.getLength() - offset;
     }
     
@@ -1250,7 +1286,8 @@ public class HTMLDocument extends DefaultStyledDocument
     {
       printBuffer();
       DefaultStyledDocument.ElementSpec element;
-      element = new DefaultStyledDocument.ElementSpec(attr.copyAttributes(),
+      attr.addAttribute(StyleConstants.NameAttribute, t);
+      element = new DefaultStyledDocument.ElementSpec(attr,
 			DefaultStyledDocument.ElementSpec.StartTagType);
       parseBuffer.addElement(element);
       printBuffer();
@@ -1300,13 +1337,16 @@ public class HTMLDocument extends DefaultStyledDocument
     {
       // Copy the attribute set, don't use the same object because 
       // it may change
+      AttributeContext ctx = getAttributeContext();
       AttributeSet attributes = null;
       if (charAttr != null)
         attributes = charAttr.copyAttributes();
-
+      else
+        attributes = ctx.getEmptySet();
+      attributes = ctx.addAttribute(attributes, StyleConstants.NameAttribute,
+                                    HTML.Tag.CONTENT);
       DefaultStyledDocument.ElementSpec element;
-      element = new DefaultStyledDocument.ElementSpec(attributes,
-			      DefaultStyledDocument.ElementSpec.ContentType,
+      element = new ElementSpec(attributes, ElementSpec.ContentType,
                                             data, offs, length);
       
       printBuffer();

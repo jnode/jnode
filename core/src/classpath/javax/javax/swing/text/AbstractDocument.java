@@ -646,6 +646,12 @@ public abstract class AbstractDocument implements Document, Serializable
     // more times than you've previously called lock, but it doesn't make
     // sure that the threads calling unlock were the same ones that called lock
 
+    // If the current thread holds the write lock, and attempted to also obtain
+    // a readLock, then numReaders hasn't been incremented and we don't need
+    // to unlock it here.
+    if (currentWriter == Thread.currentThread())
+      return;
+
     // FIXME: the reference implementation throws a 
     // javax.swing.text.StateInvariantError here
     if (numReaders == 0)
@@ -847,7 +853,7 @@ public abstract class AbstractDocument implements Document, Serializable
    */
   protected void writeLock()
   {
-    if (currentWriter!= null && currentWriter.equals(Thread.currentThread()))
+    if (currentWriter != null && currentWriter.equals(Thread.currentThread()))
       return;
     synchronized (documentCV)
       {
@@ -1701,9 +1707,12 @@ public abstract class AbstractDocument implements Document, Serializable
      */
     public int getEndOffset()
     {
+      int end = 0;
       if (getElementCount() == 0)
-        throw new NullPointerException("This BranchElement has no children.");
-      return children[children.length - 1].getEndOffset();
+        end = getLength(); // FIXME: That ain't correct, fix it.
+      else
+        end = children[children.length - 1].getEndOffset();
+      return end;
     }
 
     /**
@@ -1728,9 +1737,12 @@ public abstract class AbstractDocument implements Document, Serializable
      */
     public int getStartOffset()
     {
+      int start = 0;
       if (getElementCount() == 0)
-        throw new NullPointerException("This BranchElement has no children.");
-      return children[0].getStartOffset();
+        start = 0; // FIXME: That ain't correct, fix it.
+      else
+        start = children[0].getStartOffset();
+      return start;
     }
 
     /**

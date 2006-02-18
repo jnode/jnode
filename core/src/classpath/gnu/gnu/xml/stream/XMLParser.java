@@ -710,7 +710,7 @@ public class XMLParser
 
   public int getNamespaceCount()
   {
-    if (!namespaceAware)
+    if (!namespaceAware || namespaces.isEmpty())
       return 0;
     switch (event)
       {
@@ -984,10 +984,10 @@ public class XMLParser
     if (event == XMLStreamConstants.END_ELEMENT)
       {
         // Pop namespace context
-        if (namespaceAware)
+        if (namespaceAware && !namespaces.isEmpty())
           namespaces.removeFirst();
         // Pop base context
-        if (baseAware)
+        if (baseAware && !bases.isEmpty())
           bases.removeFirst();
       }
     if (!startEntityStack.isEmpty())
@@ -1881,7 +1881,10 @@ public class XMLParser
     throws IOException, XMLStreamException
   {
     requireWhitespace();
+    boolean saved = expandPE;
+    expandPE = (inputStack.size() > 1);
     String name = readNmtoken(true);
+    expandPE = saved;
     requireWhitespace();
     readContentspec(name);
     skipWhitespace();
@@ -2096,7 +2099,10 @@ public class XMLParser
     throws IOException, XMLStreamException
   {
     requireWhitespace();
+    boolean saved = expandPE;
+    expandPE = (inputStack.size() > 1);
     String elementName = readNmtoken(true);
+    expandPE = saved;
     boolean white = tryWhitespace();
     while (!tryRead('>'))
       {
@@ -2828,8 +2834,6 @@ public class XMLParser
           error("Duplicate default namespace declaration");
         if (XMLConstants.XML_NS_URI.equals(attr.value))
           error("can't bind XML namespace");
-        if ("".equals(attr.value) && !input.xml11)
-          error("illegal use of 1.1-style prefix unbinding in 1.0 document");
         ctx.put(XMLConstants.DEFAULT_NS_PREFIX, attr.value);
         return true;
       }
@@ -3077,7 +3081,15 @@ public class XMLParser
                 break;
               case 0x3c: // '<'
                 reset();
-                read(tmpBuf, 0, i);
+                // read i characters
+                int count = 0, remaining = i;
+                do
+                  {
+                    int r = read(tmpBuf, 0, remaining);
+                    count += r;
+                    remaining -= r;
+                  }
+                while (count < i);
                 i = len;
                 if (coalescing && tryRead(TEST_CDATA))
                   readUntil(TEST_END_CDATA); // read CDATA section into buf
@@ -3248,15 +3260,7 @@ public class XMLParser
                   reset();
                 char[] ref = readCharacterRef(hex ? 16 : 10);
                 for (int i = 0; i < ref.length; i++)
-                  {
-                        char x = ref[i];
-                    if ((flags & (LIT_ATTRIBUTE | LIT_PUBID)) != 0 &&
-                            (x == 0x0a || x == 0x0d))
-                          x = 0x20; // normalize
-                        else if ((flags & LIT_ATTRIBUTE) != 0 && x == 0x09)
-                          x = 0x20; // normalize
-                        literalBuf.append(x);
-                  }
+                      literalBuf.append(ref[i]);
                 entities = true;
                 continue;
               }

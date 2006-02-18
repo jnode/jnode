@@ -176,9 +176,12 @@ public class DSSKeyPairX509Codec
     return result;
   }
 
+  /**
+   * @throws InvalidParameterException ALWAYS.
+   */
   public byte[] encodePrivateKey(PrivateKey key)
   {
-    throw new IllegalArgumentException("Wrong format for private keys");
+    throw new InvalidParameterException("Wrong format for private keys");
   }
 
   /**
@@ -210,7 +213,7 @@ public class DSSKeyPairX509Codec
 
         OID algOID = (OID) derOID.getValue();
         if (! algOID.equals(DSA_ALG_OID))
-          throw new IllegalArgumentException("Unexpected OID: " + algOID);
+          throw new InvalidParameterException("Unexpected OID: " + algOID);
 
         DERValue derParams = der.read();
         checkIsConstructed(derParams, "Wrong DSS Parameters field");
@@ -246,8 +249,11 @@ public class DSSKeyPairX509Codec
     return new DSSPublicKey(Registry.X509_ENCODING_ID, p, q, g, y);
   }
 
+  /**
+   * @throws InvalidParameterException ALWAYS.
+   */
   public PrivateKey decodePrivateKey(byte[] input)
   {
-    throw new IllegalArgumentException("Wrong format for private keys");
+    throw new InvalidParameterException("Wrong format for private keys");
   }
 }

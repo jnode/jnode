@@ -671,7 +671,7 @@ public class DefaultStyledDocument extends AbstractDocument implements
               cloneChildren[i] = clone(branchClone,
                                        branchClone.getElement(i));
             }
-          branchClone.replace(0, numChildren, cloneChildren);
+          branchClone.replace(0, 0, cloneChildren);
           clone = branchClone;
         }
       else if (clonee instanceof LeafElement)
@@ -1203,7 +1203,8 @@ public class DefaultStyledDocument extends AbstractDocument implements
               edit.addRemovedElements(removed);
               edit.addAddedElements(added);
               
-              BranchElement newPar = (BranchElement) new BranchElement(el.getParentElement(),
+              BranchElement newPar =
+                (BranchElement) createBranchElement(el.getParentElement(),
                                                                        el.getAttributes());
               newPar.replace(0, 0, newAdded);
               res = new Element[] { null, newPar };
@@ -1217,7 +1218,7 @@ public class DefaultStyledDocument extends AbstractDocument implements
               Edit edit = getEditForParagraphAndIndex((BranchElement) el, editIndex);
               edit.addRemovedElements(removed);
               
-              BranchElement newPar = (BranchElement) new BranchElement(el.getParentElement(),
+              BranchElement newPar = (BranchElement) createBranchElement(el.getParentElement(),
                                                                        el.getAttributes());
                                                                
               newPar.replace(0, 0, removed);
@@ -1271,7 +1272,8 @@ public class DefaultStyledDocument extends AbstractDocument implements
         {
           // recreate left-side of branch and all its children before offset
           // add the fractured leaves to the right branch
-          BranchElement rightBranch = new BranchElement(parent, parentAtts);
+          BranchElement rightBranch =
+            (BranchElement) createBranchElement(parent, parentAtts);
           
           // Check if left branch has already been edited. If so, we only
           // need to create the right branch.
@@ -1286,7 +1288,8 @@ public class DefaultStyledDocument extends AbstractDocument implements
             }
           else
             {
-              leftBranch = new BranchElement(parent, parentAtts);
+              leftBranch =
+                (BranchElement) createBranchElement(parent, parentAtts);
               added = new Element[] { leftBranch, rightBranch };
 
               // add fracture to leftBranch
@@ -1390,7 +1393,9 @@ public class DefaultStyledDocument extends AbstractDocument implements
                                          startOffset, startOffset + len);
           else
             {
-              BranchElement br = new BranchElement(parent, curr.getAttributes());
+              BranchElement br =
+                (BranchElement) createBranchElement(parent,
+                                                    curr.getAttributes());
               int bSize = curr.getElementCount();
               for (int k = 0; k < bSize; k++)
                 {
@@ -1437,40 +1442,6 @@ public class DefaultStyledDocument extends AbstractDocument implements
     
     return curr;
     }
-    
-    /**
-     * Creates a copy of the element <code>clonee</code> that has the parent
-     * <code>parent</code>.
-   * 
-   * @param parent
-   *          the parent of the newly created Element
-   * @param clonee
-   *          the Element to clone
-     * @return the cloned Element
-     */
-  public Element clone(Element parent, Element clonee)
-    {
-      // If the Element we want to clone is a leaf, then simply copy it
-      if (clonee.isLeaf())
-        return createLeafElement(parent, clonee.getAttributes(),
-                                 clonee.getStartOffset(), clonee.getEndOffset());
-      
-      // Otherwise create a new BranchElement with the desired parent and 
-      // the clonee's attributes
-    BranchElement result = (BranchElement) createBranchElement(
-                                                               parent,
-                                                               clonee.getAttributes());
-      
-      // And clone all the of clonee's children
-      Element[] children = new Element[clonee.getElementCount()];
-      for (int i = 0; i < children.length; i++)
-        children[i] = clone(result, clonee.getElement(i));
-      
-      // Make the cloned children the children of the BranchElement
-      result.replace(0, 0, children);
-      return result;
-    }
-
     /**
    * Instance of all editing information for an object in the Vector. This class
    * is used to add information to the DocumentEvent associated with an
@@ -1697,7 +1668,9 @@ public class DefaultStyledDocument extends AbstractDocument implements
    */
   private StyleChangeListener styleChangeListener;
 
-  /** Vector that contains all the edits. */
+  /**
+   * Vector that contains all the edits. Maybe replace by a HashMap.
+   */
   Vector edits = new Vector();
 
   /**
@@ -1775,12 +1748,13 @@ public class DefaultStyledDocument extends AbstractDocument implements
     Element[] tmp;
     SectionElement section = new SectionElement();
 
-    BranchElement paragraph = new BranchElement(section, null);
+    BranchElement paragraph =
+      (BranchElement) createBranchElement(section, null);
     tmp = new Element[1];
     tmp[0] = paragraph;
     section.replace(0, 0, tmp);
 
-    LeafElement leaf = new LeafElement(paragraph, null, 0, 1);
+    Element leaf = createLeafElement(paragraph, null, 0, 1);
     tmp = new Element[1];
     tmp[0] = leaf;
     paragraph.replace(0, 0, tmp);
@@ -2376,20 +2350,69 @@ public class DefaultStyledDocument extends AbstractDocument implements
    */
   protected void create(ElementSpec[] data)
   {
+    writeLock();
     try
       {
-        // Clear content.
-        content.remove(0, content.length());
-        // Clear buffer and root element.
-        buffer = new ElementBuffer(createDefaultRoot());
-        // Insert the data.
-        insert(0, data);
+        // Clear content if there is some.
+        int len = getLength();
+        if (len > 0)
+          remove(0, len);
+
+        // Now we insert the content.
+        StringBuilder b = new StringBuilder();
+        for (int i = 0; i < data.length; ++i)
+          {
+            ElementSpec el = data[i];
+            if (el.getArray() != null && el.getLength() > 0)
+              b.append(el.getArray(), el.getOffset(), el.getLength());
+          }
+        Content content = getContent();
+        UndoableEdit cEdit = content.insertString(0, b.toString());
+
+        DefaultDocumentEvent ev =
+          new DefaultDocumentEvent(0, b.length(),
+                                   DocumentEvent.EventType.INSERT);
+        ev.addEdit(cEdit);
+
+        // We do a little trick here to get the new structure: We instantiate
+        // a new ElementBuffer with a new root element, insert into that root
+        // and then reparent the newly created elements to the old root
+        // element.
+        BranchElement createRoot =
+          (BranchElement) createBranchElement(null, null);
+        Element dummyLeaf = createLeafElement(createRoot, null, 0, 1);
+        createRoot.replace(0, 0, new Element[]{ dummyLeaf });
+        ElementBuffer createBuffer = new ElementBuffer(createRoot);
+        createBuffer.insert(0, b.length(), data, new DefaultDocumentEvent(0, b.length(), DocumentEvent.EventType.INSERT));
+        // Now the new root is the first child of the createRoot.
+        Element newRoot = createRoot.getElement(0);
+        BranchElement root = (BranchElement) getDefaultRootElement();
+        Element[] added = new Element[newRoot.getElementCount()];
+        for (int i = 0; i < added.length; ++i)
+          {
+            added[i] = newRoot.getElement(i);
+            ((AbstractElement) added[i]).element_parent = root;
+          }
+        Element[] removed = new Element[root.getElementCount()];
+        for (int i = 0; i < removed.length; ++i)
+          removed[i] = root.getElement(i);
+
+        // Replace the old elements in root with the new and update the event.
+        root.replace(0, removed.length, added);
+        ev.addEdit(new ElementEdit(root, 0, removed, added));
+
+        fireInsertUpdate(ev);
+        fireUndoableEditUpdate(new UndoableEditEvent(this, ev));
       }
     catch (BadLocationException ex)
       {
         AssertionError err = new AssertionError("Unexpected bad location");
         err.initCause(ex);
         throw err;
+      }
+    finally
+      {
+        writeUnlock();
       }
   }
 }
