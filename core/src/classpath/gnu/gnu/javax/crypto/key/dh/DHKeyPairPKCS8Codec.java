@@ -1,4 +1,4 @@
-/* RSAKeyPairPKCS8Codec.java -- PKCS#8 Encoding/Decoding handler
+/* DHKeyPairPKCS8Codec.java -- PKCS#8 encoder/decoder for DH keys
    Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,7 +36,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package gnu.java.security.key.rsa;
+package gnu.javax.crypto.key.dh;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -53,15 +53,12 @@ import gnu.java.security.der.DERReader;
 import gnu.java.security.der.DERValue;
 import gnu.java.security.der.DERWriter;
 import gnu.java.security.key.IKeyPairCodec;
+import gnu.java.security.util.Util;
 
-/**
- * An implementation of an {@link IKeyPairCodec} that knows how to encode /
- * decode PKCS#8 ASN.1 external representation of RSA private keys.
- */
-public class RSAKeyPairPKCS8Codec
+public class DHKeyPairPKCS8Codec
     implements IKeyPairCodec
 {
-  private static final OID RSA_ALG_OID = new OID(Registry.RSA_OID_STRING);
+  private static final OID DH_ALG_OID = new OID(Registry.DH_OID_STRING);
 
   // implicit 0-arguments constructor
 
@@ -91,8 +88,8 @@ public class RSAKeyPairPKCS8Codec
   }
 
   /**
-   * Returns the PKCS#8 ASN.1 <i>PrivateKeyInfo</i> representation of an RSA
-   * private key. The ASN.1 specification is as follows:
+   * Returns the DER-encoded form of the PKCS#8 ASN.1 <i>PrivateKeyInfo</i>
+   * representation of a DH private key. The ASN.1 specification is as follows:
    * 
    * <pre>
    *   PrivateKeyInfo ::= SEQUENCE {
@@ -105,78 +102,47 @@ public class RSAKeyPairPKCS8Codec
    *     algorithm   OBJECT IDENTIFIER,
    *     parameters  ANY DEFINED BY algorithm OPTIONAL
    *   }
-   * </pre>
-   * 
-   * <p>The <i>privateKey</i> field, which is an OCTET STRING, contains the
-   * DER-encoded form of the RSA private key defined as:</p>
-   * 
-   * <pre>
-   *   RSAPrivateKey ::= SEQUENCE {
-   *     version                 INTEGER, -- MUST be 0
-   *     modulus                 INTEGER, -- n
-   *     publicExponent          INTEGER, -- e
-   *     privateExponent         INTEGER, -- d
-   *     prime1                  INTEGER, -- p
-   *     prime2                  INTEGER, -- q
-   *     exponent1               INTEGER, -- d mod (p-1)
-   *     exponent2               INTEGER, -- d mod (q-1)
-   *     coefficient             INTEGER, -- (inverse of q) mod p
+   *
+   *   DhParams ::= SEQUENCE {
+   *     p  INTEGER, -- odd prime, p=jq +1
+   *     g  INTEGER, -- generator, g
+   *     q  INTEGER  -- factor of p-1
    *   }
    * </pre>
    * 
    * @return the DER encoded form of the ASN.1 representation of the
-   *         <i>PrivateKeyInfo</i> field for an RSA {@link PrivateKey}..
+   *         <i>PrivateKeyInfo</i> field in an X.509 certificate.
    * @throw InvalidParameterException if an error occurs during the marshalling
    *        process.
    */
   public byte[] encodePrivateKey(PrivateKey key)
   {
-    if (! (key instanceof GnuRSAPrivateKey))
+    if (! (key instanceof GnuDHPrivateKey))
       throw new InvalidParameterException("Wrong key type");
-
-    GnuRSAPrivateKey pk = (GnuRSAPrivateKey) key;
-    BigInteger n = pk.getN();
-    BigInteger e = pk.getE();
-    BigInteger d = pk.getPrivateExponent();
-    BigInteger p = pk.getPrimeP();
-    BigInteger q = pk.getPrimeQ();
-    BigInteger dP = pk.getPrimeExponentP();
-    BigInteger dQ = pk.getPrimeExponentQ();
-    BigInteger qInv = pk.getCrtCoefficient();
 
     DERValue derVersion = new DERValue(DER.INTEGER, BigInteger.ZERO);
 
-    DERValue derOID = new DERValue(DER.OBJECT_IDENTIFIER, RSA_ALG_OID);
+    DERValue derOID = new DERValue(DER.OBJECT_IDENTIFIER, DH_ALG_OID);
 
-    ArrayList algorithmID = new ArrayList(1);
+    GnuDHPrivateKey pk = (GnuDHPrivateKey) key;
+    BigInteger p = pk.getParams().getP();
+    BigInteger g = pk.getParams().getG();
+    BigInteger q = pk.getQ();
+    BigInteger x = pk.getX();
+
+    ArrayList params = new ArrayList(3);
+    params.add(new DERValue(DER.INTEGER, p));
+    params.add(new DERValue(DER.INTEGER, g));
+    params.add(new DERValue(DER.INTEGER, q));
+    DERValue derParams = new DERValue(DER.CONSTRUCTED | DER.SEQUENCE, params);
+
+    ArrayList algorithmID = new ArrayList(2);
     algorithmID.add(derOID);
+    algorithmID.add(derParams);
     DERValue derAlgorithmID = new DERValue(DER.CONSTRUCTED | DER.SEQUENCE,
                                            algorithmID);
 
-    DERValue derRSAVersion = new DERValue(DER.INTEGER, BigInteger.ZERO);
-    DERValue derN = new DERValue(DER.INTEGER, n);
-    DERValue derE = new DERValue(DER.INTEGER, e);
-    DERValue derD = new DERValue(DER.INTEGER, d);
-    DERValue derP = new DERValue(DER.INTEGER, p);
-    DERValue derQ = new DERValue(DER.INTEGER, q);
-    DERValue derDP = new DERValue(DER.INTEGER, dP);
-    DERValue derDQ = new DERValue(DER.INTEGER, dQ);
-    DERValue derQInv = new DERValue(DER.INTEGER, qInv);
-
-    ArrayList rsaPrivateKey = new ArrayList();
-    rsaPrivateKey.add(derRSAVersion);
-    rsaPrivateKey.add(derN);
-    rsaPrivateKey.add(derE);
-    rsaPrivateKey.add(derD);
-    rsaPrivateKey.add(derP);
-    rsaPrivateKey.add(derQ);
-    rsaPrivateKey.add(derDP);
-    rsaPrivateKey.add(derDQ);
-    rsaPrivateKey.add(derQInv);
-    DERValue derRSAPrivateKey = new DERValue(DER.CONSTRUCTED | DER.SEQUENCE,
-                                             rsaPrivateKey);
-    byte[] pkBytes = derRSAPrivateKey.getEncoded();
-    DERValue derPrivateKey = new DERValue(DER.OCTET_STRING, pkBytes);
+    DERValue derPrivateKey = new DERValue(DER.OCTET_STRING, Util.trim(x));
 
     ArrayList pki = new ArrayList(3);
     pki.add(derVersion);
@@ -191,10 +157,10 @@ public class RSAKeyPairPKCS8Codec
         DERWriter.write(baos, derPKI);
         result = baos.toByteArray();
       }
-    catch (IOException x)
+    catch (IOException e)
       {
         InvalidParameterException y = new InvalidParameterException();
-        y.initCause(x);
+        y.initCause(e);
         throw y;
       }
 
@@ -210,9 +176,9 @@ public class RSAKeyPairPKCS8Codec
   }
 
   /**
-   * @param input the byte array to unmarshall into a valid RSA
+   * @param input the byte array to unmarshall into a valid DH
    *          {@link PrivateKey} instance. MUST NOT be null.
-   * @return a new instance of a {@link GnuRSAPrivateKey} decoded from the
+   * @return a new instance of a {@link GnuDHPrivateKey} decoded from the
    *         <i>PrivateKeyInfo</i> material fed as <code>input</code>.
    * @throw InvalidParameterException if an exception occurs during the
    *        unmarshalling process.
@@ -222,7 +188,7 @@ public class RSAKeyPairPKCS8Codec
     if (input == null)
       throw new InvalidParameterException("Input bytes MUST NOT be null");
 
-    BigInteger version, n, e, d, p, q, dP, dQ, qInv;
+    BigInteger version, p, q, g, x;
     DERReader der = new DERReader(input);
     try
       {
@@ -230,7 +196,9 @@ public class RSAKeyPairPKCS8Codec
         checkIsConstructed(derPKI, "Wrong PrivateKeyInfo field");
 
         DERValue derVersion = der.read();
-        checkIsBigInteger(derVersion, "Wrong Version field");
+        if (! (derVersion.getValue() instanceof BigInteger))
+          throw new InvalidParameterException("Wrong Version field");
+
         version = (BigInteger) derVersion.getValue();
         if (version.compareTo(BigInteger.ZERO) != 0)
           throw new InvalidParameterException("Unexpected Version: " + version);
@@ -240,56 +208,33 @@ public class RSAKeyPairPKCS8Codec
 
         DERValue derOID = der.read();
         OID algOID = (OID) derOID.getValue();
-        if (! algOID.equals(RSA_ALG_OID))
+        if (! algOID.equals(DH_ALG_OID))
           throw new InvalidParameterException("Unexpected OID: " + algOID);
 
+        DERValue derParams = der.read();
+        checkIsConstructed(derParams, "Wrong DSS Parameters field");
+
         DERValue val = der.read();
-        byte[] pkBytes = (byte[]) val.getValue();
-
-        der = new DERReader(pkBytes);
-        DERValue derRSAPrivateKey = der.read();
-        checkIsConstructed(derRSAPrivateKey, "Wrong RSAPrivateKey field");
-        
-        val = der.read();
-        checkIsBigInteger(val, "Wrong RSAPrivateKey Version field");
-        version = (BigInteger) val.getValue();
-        if (version.compareTo(BigInteger.ZERO) != 0)
-          throw new InvalidParameterException("Unexpected RSAPrivateKey Version: "
-                                              + version);
-
-        val = der.read();
-        checkIsBigInteger(val, "Wrong modulus field");
-        n = (BigInteger) val.getValue();
-        val = der.read();
-        checkIsBigInteger(val, "Wrong publicExponent field");
-        e = (BigInteger) val.getValue();
-        val = der.read();
-        checkIsBigInteger(val, "Wrong privateExponent field");
-        d = (BigInteger) val.getValue();
-        val = der.read();
-        checkIsBigInteger(val, "Wrong prime1 field");
+        checkIsBigInteger(val, "Wrong P field");
         p = (BigInteger) val.getValue();
         val = der.read();
-        checkIsBigInteger(val, "Wrong prime2 field");
+        checkIsBigInteger(val, "Wrong G field");
+        g = (BigInteger) val.getValue();
+        val = der.read();
+        checkIsBigInteger(val, "Wrong Q field");
         q = (BigInteger) val.getValue();
+
         val = der.read();
-        checkIsBigInteger(val, "Wrong exponent1 field");
-        dP = (BigInteger) val.getValue();
-        val = der.read();
-        checkIsBigInteger(val, "Wrong exponent2 field");
-        dQ = (BigInteger) val.getValue();
-        val = der.read();
-        checkIsBigInteger(val, "Wrong coefficient field");
-        qInv = (BigInteger) val.getValue();
+        byte[] xBytes = (byte[]) val.getValue();
+        x = new BigInteger(1, xBytes);
       }
-    catch (IOException x)
+    catch (IOException e)
       {
         InvalidParameterException y = new InvalidParameterException();
-        y.initCause(x);
+        y.initCause(e);
         throw y;
       }
 
-    return new GnuRSAPrivateKey(Registry.PKCS8_ENCODING_ID, n, e, d, p, q,
-                                dP, dQ, qInv);
+    return new GnuDHPrivateKey(Registry.PKCS8_ENCODING_ID, q, p, g, x);
   }
 }

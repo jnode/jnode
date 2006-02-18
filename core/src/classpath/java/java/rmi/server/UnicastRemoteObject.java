@@ -46,44 +46,60 @@ import java.rmi.RemoteException;
 
 public class UnicastRemoteObject extends RemoteServer
 {
-private static final long serialVersionUID = 4974527148936298033L;
-//The following serialized fields are from Java API Documentation "Serialized form"
-private int port = 0;
-private RMIClientSocketFactory csf = null;
-private RMIServerSocketFactory ssf = null;
+  private static final long serialVersionUID = 4974527148936298033L;
 
-protected UnicastRemoteObject() throws RemoteException {
+  //The following serialized fields are from Java API Documentation
+  // "Serialized form"
+  private int port = 0;
+  private RMIClientSocketFactory csf = null;
+  private RMIServerSocketFactory ssf = null;
+
+  protected UnicastRemoteObject()
+    throws RemoteException
+  {
 	this(0);
-}
+  }
 
-protected UnicastRemoteObject(int port) throws RemoteException {
-	this(port, RMISocketFactory.getSocketFactory(), RMISocketFactory.getSocketFactory());
-}
+  protected UnicastRemoteObject(int port)
+    throws RemoteException
+  {
+	this(port, RMISocketFactory.getSocketFactory(),
+         RMISocketFactory.getSocketFactory());
+  }
 
-protected UnicastRemoteObject(int port, RMIClientSocketFactory csf, RMIServerSocketFactory ssf) throws RemoteException {
+  protected UnicastRemoteObject(int port, RMIClientSocketFactory csf,
+                                RMIServerSocketFactory ssf)
+    throws RemoteException
+  {
   this.port = port;
   //Is RMIXXXSocketFactory serializable
   //this.csf = csf;
   //this.ssf = ssf;
   this.ref = new UnicastServerRef(new ObjID(), port, ssf);
   exportObject(this);
-}
+  }
 
-protected UnicastRemoteObject(RemoteRef ref) throws RemoteException {
-	super((UnicastServerRef)ref);
+  protected UnicastRemoteObject(RemoteRef ref)
+    throws RemoteException
+  {
+	super((UnicastServerRef) ref);
 	exportObject(this);
-}
+  }
 
-public Object clone() throws CloneNotSupportedException {
+  public Object clone()
+    throws CloneNotSupportedException
+  {
 	throw new Error("Not implemented");
-}
+  }
 
-public static RemoteStub exportObject(Remote obj) throws RemoteException {
-	UnicastServerRef sref = (UnicastServerRef)((RemoteObject)obj).getRef();
-	return (sref.exportObject(obj));
-}
+  public static RemoteStub exportObject(Remote obj)
+    throws RemoteException
+  {
+	return (RemoteStub) exportObject(obj, 0);
+  }
 
-  public static Remote exportObject(Remote obj, int port) throws RemoteException 
+  public static Remote exportObject(Remote obj, int port)
+    throws RemoteException
   {
     return exportObject(obj, port, null);
   }
@@ -93,12 +109,12 @@ public static RemoteStub exportObject(Remote obj) throws RemoteException {
   {
     UnicastServerRef sref = null;
     if (obj instanceof RemoteObject)
-      sref = (UnicastServerRef)((RemoteObject)obj).getRef ();
-    if(sref == null)
-      {
-	sref = new UnicastServerRef(new ObjID (), port, ssf);
-      }
-    Remote stub = sref.exportObject (obj); 
+      sref = (UnicastServerRef) ((RemoteObject) obj).getRef();
+
+    if (sref == null)
+      sref = new UnicastServerRef(new ObjID(), port, ssf);
+
+    Remote stub = sref.exportObject(obj);
     addStub(obj, stub);
     return stub;
   }
@@ -106,7 +122,8 @@ public static RemoteStub exportObject(Remote obj) throws RemoteException {
   /**
    * FIXME
    */
-  public static Remote exportObject(Remote obj, int port, RMIClientSocketFactory csf, 
+  public static Remote exportObject(Remote obj, int port,
+                                    RMIClientSocketFactory csf,
 				    RMIServerSocketFactory ssf) 
     throws RemoteException 
   {
@@ -119,12 +136,13 @@ public static RemoteStub exportObject(Remote obj) throws RemoteException {
     if (obj instanceof RemoteObject)
       {
 	deleteStub(obj);
-	UnicastServerRef sref = (UnicastServerRef)((RemoteObject)obj).getRef();
+        UnicastServerRef sref =
+          (UnicastServerRef) ((RemoteObject) obj).getRef();
 	return sref.unexportObject(obj, force);
       }
     else
       {
-      //FIX ME
+        // FIXME
       ;
       }
     return true;

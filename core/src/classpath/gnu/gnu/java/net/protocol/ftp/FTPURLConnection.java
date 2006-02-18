@@ -1,5 +1,5 @@
 /* FTPURLConnection.java --
-   Copyright (C) 2003, 2004  Free Software Foundation, Inc.
+   Copyright (C) 2003, 2004, 2006  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -38,8 +38,8 @@ exception statement from your version. */
 
 package gnu.java.net.protocol.ftp;
 
+import gnu.classpath.SystemProperties;
 import gnu.java.net.GetLocalHostAction;
-import gnu.java.security.action.GetPropertyAction;
 
 import java.io.FileNotFoundException;
 import java.io.FilterInputStream;
@@ -113,11 +113,9 @@ public class FTPURLConnection
     else
       {
         username = "anonymous";
-        PrivilegedAction a = new GetPropertyAction("user.name");
-        String systemUsername =(String) AccessController.doPrivileged(a);
-        a = new GetLocalHostAction();
+        GetLocalHostAction a = new GetLocalHostAction();
         InetAddress localhost =(InetAddress) AccessController.doPrivileged(a);
-        password = systemUsername + "@" +
+        password = SystemProperties.getProperty("user.name") + "@" +
           ((localhost == null) ? "localhost" : localhost.getHostName());
       }
     connection = new FTPConnection(host, port);
@@ -167,24 +165,13 @@ public class FTPURLConnection
         connect();
       }
     String path = url.getPath();
-    String filename = null;
-    int lsi = path.lastIndexOf('/');
-    if (lsi != -1)
+    if (connection.changeWorkingDirectory(path))
       {
-        filename = path.substring(lsi + 1);
-        path = path.substring(0, lsi);
-        if (!connection.changeWorkingDirectory(path))
-          {
-            throw new FileNotFoundException(path);
-          }
-      }
-    if (filename != null && filename.length() > 0)
-      {
-        return this.new ClosingInputStream(connection.retrieve(filename));
+        return this.new ClosingInputStream(connection.list(null));
       }
     else
       {
-        return this.new ClosingInputStream(connection.list(null));
+        return this.new ClosingInputStream(connection.retrieve(path));
       }
   }
   
@@ -198,20 +185,8 @@ public class FTPURLConnection
       {
         connect();
       }
-    String dir = url.getPath();
-    String filename = url.getFile();
-    if (!connection.changeWorkingDirectory(dir))
-      {
-        throw new FileNotFoundException(dir);
-      }
-    if (filename != null)
-      {
-        return this.new ClosingOutputStream(connection.store(filename));
-      }
-    else
-      {
-        throw new FileNotFoundException(filename);
-      }
+    String path = url.getPath();
+    return this.new ClosingOutputStream(connection.store(path));
   }
 
   public String getRequestProperty(String key)

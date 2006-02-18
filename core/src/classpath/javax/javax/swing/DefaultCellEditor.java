@@ -376,7 +376,7 @@ public class DefaultCellEditor
    * Create the DefaultCellEditor that uses the text field as its editor
    * component (appropriate for the text content)
    * 
-   * @param the text field as will be used as the editor component.
+   * @param textfield the text field as will be used as the editor component
 	 */
   public DefaultCellEditor(JTextField textfield)
   {

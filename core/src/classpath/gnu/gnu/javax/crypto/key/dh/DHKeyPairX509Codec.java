@@ -1,4 +1,4 @@
-/* RSAKeyPairX509Codec.java -- X.509 Encoding/Decoding handler
+/* DHKeyPairX509Codec.java -- X.509 DER encoder/decoder for DH keys
    Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,7 +36,15 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package gnu.java.security.key.rsa;
+package gnu.javax.crypto.key.dh;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.InvalidParameterException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.ArrayList;
 
 import gnu.java.security.OID;
 import gnu.java.security.Registry;
@@ -47,22 +55,10 @@ import gnu.java.security.der.DERValue;
 import gnu.java.security.der.DERWriter;
 import gnu.java.security.key.IKeyPairCodec;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.math.BigInteger;
-import java.security.InvalidParameterException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.util.ArrayList;
-
-/**
- * An implementation of an {@link IKeyPairCodec} that knows how to encode /
- * decode X.509 ASN.1 external representation of RSA public keys.
- */
-public class RSAKeyPairX509Codec
+public class DHKeyPairX509Codec
     implements IKeyPairCodec
 {
-  private static final OID RSA_ALG_OID = new OID(Registry.RSA_OID_STRING);
+  private static final OID DH_ALG_OID = new OID(Registry.DH_OID_STRING);
 
   // implicit 0-arguments constructor
 
@@ -84,9 +80,9 @@ public class RSAKeyPairX509Codec
   }
 
   /**
-   * Returns the X.509 ASN.1 <i>SubjectPublicKeyInfo</i> representation of an
-   * RSA public key. The ASN.1 specification, as defined in RFC-3280, and
-   * RFC-2459, is as follows:
+   * Returns the DER-encoded form of the X.509 ASN.1 <i>SubjectPublicKeyInfo</i>
+   * representation of a DH public key. The ASN.1 specification, as defined in
+   * RFC-3280, and RFC-2459, is as follows:
    *
    * <pre>
    *   SubjectPublicKeyInfo ::= SEQUENCE {
@@ -98,52 +94,61 @@ public class RSAKeyPairX509Codec
    *     algorithm   OBJECT IDENTIFIER,
    *     parameters  ANY DEFINED BY algorithm OPTIONAL
    *   }
-   * </pre>
-   * 
-   * <p>The <i>subjectPublicKey</i> field, which is a BIT STRING, contains the
-   * DER-encoded form of the RSA public key defined as:</p>
-   * 
-   * <pre>
-   *   RSAPublicKey ::= SEQUENCE {
-   *     modulus         INTEGER, -- n
-   *     publicExponent  INTEGER  -- e
+   *
+   *   DhParams ::= SEQUENCE {
+   *     p  INTEGER, -- odd prime, p=jq +1
+   *     g  INTEGER, -- generator, g
+   *     q  INTEGER  -- factor of p-1
    *   }
    * </pre>
    * 
+   * <p>The <i>subjectPublicKey</i> field, which is a BIT STRING, contains the
+   * DER-encoded form of the DH public key as an INTEGER.</p>
+   * 
+   * <pre>
+   *       DHPublicKey ::= INTEGER -- public key, y = g^x mod p
+   * </pre>
+   * 
    * @param key the {@link PublicKey} instance to encode. MUST be an instance of
-   *          {@link GnuRSAPublicKey}.
-   * @return the ASN.1 representation of the <i>SubjectPublicKeyInfo</i> in an
-   *         X.509 certificate.
+   *          {@link GnuDHPublicKey}.
+   * @return the DER-encoded form of the ASN.1 representation of the
+   *         <i>SubjectPublicKeyInfo</i> in an X.509 certificate.
    * @throw InvalidParameterException if <code>key</code> is not an instance
-   *        of {@link GnuRSAPublicKey} or if an exception occurs during the
+   *        of {@link GnuDHPublicKey} or if an exception occurs during the
    *        marshalling process.
    */
   public byte[] encodePublicKey(PublicKey key)
   {
-    if (! (key instanceof GnuRSAPublicKey))
-      throw new InvalidParameterException("key");
+    if (! (key instanceof GnuDHPublicKey))
+      throw new InvalidParameterException("Wrong key type");
 
-    DERValue derOID = new DERValue(DER.OBJECT_IDENTIFIER, RSA_ALG_OID);
+    DERValue derOID = new DERValue(DER.OBJECT_IDENTIFIER, DH_ALG_OID);
 
-    GnuRSAPublicKey rsaKey = (GnuRSAPublicKey) key;
-    BigInteger n = rsaKey.getN();
-    BigInteger e = rsaKey.getE();
+    GnuDHPublicKey dhKey = (GnuDHPublicKey) key;
+    BigInteger p = dhKey.getParams().getP();
+    BigInteger g = dhKey.getParams().getG();
+    BigInteger q = dhKey.getQ();
+    BigInteger y = dhKey.getY();
 
-    DERValue derN = new DERValue(DER.INTEGER, n);
-    DERValue derE = new DERValue(DER.INTEGER, e);
+    DERValue derP = new DERValue(DER.INTEGER, p);
+    DERValue derG = new DERValue(DER.INTEGER, g);
+    DERValue derQ = new DERValue(DER.INTEGER, q);
 
-    ArrayList algorithmID = new ArrayList(1);
+    ArrayList params = new ArrayList(3);
+    params.add(derP);
+    params.add(derG);
+    params.add(derQ);
+    DERValue derParams = new DERValue(DER.CONSTRUCTED | DER.SEQUENCE, params);
+
+    ArrayList algorithmID = new ArrayList(2);
     algorithmID.add(derOID);
+    algorithmID.add(derParams);
     DERValue derAlgorithmID = new DERValue(DER.CONSTRUCTED | DER.SEQUENCE,
                                            algorithmID);
 
-    ArrayList publicKey = new ArrayList(2);
-    publicKey.add(derN);
-    publicKey.add(derE);
-    DERValue derPublicKey = new DERValue(DER.CONSTRUCTED | DER.SEQUENCE,
-                                         publicKey);
-    byte[] spkBytes = derPublicKey.getEncoded();
-    DERValue derSPK = new DERValue(DER.BIT_STRING, new BitString(spkBytes));
+    DERValue derDHPublicKey = new DERValue(DER.INTEGER, y);
+    byte[] yBytes = derDHPublicKey.getEncoded();
+    DERValue derSPK = new DERValue(DER.BIT_STRING, new BitString(yBytes));
 
     ArrayList spki = new ArrayList(2);
     spki.add(derAlgorithmID);
@@ -159,9 +164,9 @@ public class RSAKeyPairX509Codec
       }
     catch (IOException x)
       {
-        InvalidParameterException y = new InvalidParameterException();
-        y.initCause(x);
-        throw y;
+        InvalidParameterException e = new InvalidParameterException();
+        e.initCause(x);
+        throw e;
       }
 
     return result;
@@ -176,9 +181,9 @@ public class RSAKeyPairX509Codec
   }
 
   /**
-   * @param input the byte array to unmarshall into a valid RSA
+   * @param input the byte array to unmarshall into a valid DH
    *          {@link PublicKey} instance. MUST NOT be null.
-   * @return a new instance of a {@link GnuRSAPublicKey} decoded from the
+   * @return a new instance of a {@link GnuDHPublicKey} decoded from the
    *         <i>SubjectPublicKeyInfo</i> material in an X.509 certificate.
    * @throw InvalidParameterException if an exception occurs during the
    *        unmarshalling process.
@@ -188,7 +193,7 @@ public class RSAKeyPairX509Codec
     if (input == null)
       throw new InvalidParameterException("Input bytes MUST NOT be null");
 
-    BigInteger n, e;
+    BigInteger p, g, q, y;
     DERReader der = new DERReader(input);
     try
       {
@@ -203,34 +208,41 @@ public class RSAKeyPairX509Codec
           throw new InvalidParameterException("Wrong Algorithm field");
 
         OID algOID = (OID) derOID.getValue();
-        if (! algOID.equals(RSA_ALG_OID))
+        if (! algOID.equals(DH_ALG_OID))
           throw new InvalidParameterException("Unexpected OID: " + algOID);
 
+        DERValue derParams = der.read();
+        checkIsConstructed(derParams, "Wrong DH Parameters field");
+
         DERValue val = der.read();
+        checkIsBigInteger(val, "Wrong P field");
+        p = (BigInteger) val.getValue();
+        val = der.read();
+        checkIsBigInteger(val, "Wrong G field");
+        g = (BigInteger) val.getValue();
+        val = der.read();
+        checkIsBigInteger(val, "Wrong Q field");
+        q = (BigInteger) val.getValue();
+
+        val = der.read();
         if (! (val.getValue() instanceof BitString))
           throw new InvalidParameterException("Wrong SubjectPublicKey field");
 
-        byte[] spkBytes = ((BitString) val.getValue()).toByteArray();
+        byte[] yBytes = ((BitString) val.getValue()).toByteArray();
 
-        der = new DERReader(spkBytes);
-        val = der.read();
-        checkIsConstructed(derAlgorithmID, "Wrong subjectPublicKey field");
-
-        val = der.read();
-        checkIsBigInteger(val, "Wrong modulus field");
-        n = (BigInteger) val.getValue();
-        val = der.read();
-        checkIsBigInteger(val, "Wrong publicExponent field");
-        e = (BigInteger) val.getValue();
+        DERReader dhPub = new DERReader(yBytes);
+        val = dhPub.read();
+        checkIsBigInteger(val, "Wrong Y field");
+        y = (BigInteger) val.getValue();
       }
     catch (IOException x)
       {
-        InvalidParameterException y = new InvalidParameterException();
-        y.initCause(x);
-        throw y;
+        InvalidParameterException e = new InvalidParameterException();
+        e.initCause(x);
+        throw e;
       }
 
-    return new GnuRSAPublicKey(Registry.X509_ENCODING_ID, n, e);
+    return new GnuDHPublicKey(Registry.X509_ENCODING_ID, q, p, g, y);
   }
 
   /**

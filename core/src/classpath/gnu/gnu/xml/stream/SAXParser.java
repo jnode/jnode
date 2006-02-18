@@ -649,6 +649,9 @@ public class SAXParser
                   lexicalHandler.endDTD();
               }
           }
+        reset();
+        if (opened)
+          in.close();
       }
     catch (Exception e)
       {
@@ -660,16 +663,13 @@ public class SAXParser
           errorHandler.fatalError(e2);
         if (contentHandler != null)
           contentHandler.endDocument();
+        reset();
+        if (opened)
+          in.close();
         if (e instanceof IOException)
           throw (IOException) e;
         else
         throw e2;
-      }
-    finally
-      {
-        reset();
-        if (opened)
-          in.close();
       }
   }
 

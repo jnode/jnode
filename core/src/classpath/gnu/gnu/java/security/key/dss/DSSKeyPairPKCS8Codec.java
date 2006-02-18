@@ -85,9 +85,12 @@ public class DSSKeyPairPKCS8Codec
     return PKCS8_FORMAT;
   }
 
+  /**
+   * @throws InvalidParameterException ALWAYS.
+   */
   public byte[] encodePublicKey(PublicKey key)
   {
-    throw new IllegalArgumentException("Wrong format for public keys");
+    throw new InvalidParameterException("Wrong format for public keys");
   }
 
   /**
@@ -121,7 +124,7 @@ public class DSSKeyPairPKCS8Codec
   public byte[] encodePrivateKey(PrivateKey key)
   {
     if (! (key instanceof DSSPrivateKey))
-      throw new IllegalArgumentException("Wrong key type");
+      throw new InvalidParameterException("Wrong key type");
 
     DERValue derVersion = new DERValue(DER.INTEGER, BigInteger.ZERO);
 
@@ -170,9 +173,12 @@ public class DSSKeyPairPKCS8Codec
     return result;
   }
 
+  /**
+   * @throws InvalidParameterException ALWAYS.
+   */
   public PublicKey decodePublicKey(byte[] input)
   {
-    throw new IllegalArgumentException("Wrong format for public keys");
+    throw new InvalidParameterException("Wrong format for public keys");
   }
 
   /**

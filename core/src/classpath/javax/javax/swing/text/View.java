@@ -71,8 +71,29 @@ public abstract class View implements SwingConstants
 
   public abstract void paint(Graphics g, Shape s);
 
+  /**
+   * Sets the parent for this view. This is the first method that is beeing
+   * called on a view to setup the view hierarchy. This is also the last method
+   * beeing called when the view is disconnected from the view hierarchy, in
+   * this case <code>parent</code> is null.
+   *
+   * If <code>parent</code> is <code>null</code>, a call to this method also
+   * calls <code>setParent</code> on the children, thus disconnecting them from
+   * the view hierarchy. That means that super must be called when this method
+   * is overridden.
+   *
+   * @param parent the parent to set, <code>null</code> when this view is
+   *        beeing disconnected from the view hierarchy
+   */
   public void setParent(View parent)
   {
+    if (parent == null)
+      {
+        int numChildren = getViewCount();
+        for (int i = 0; i < numChildren; i++)
+          getView(i).setParent(this);
+      }
+
     this.parent = parent;
   }
     

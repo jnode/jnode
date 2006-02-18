@@ -556,6 +556,20 @@ public final class GnuCrypto extends Provider
         put("KeyStore.GKR", gnu.javax.crypto.jce.keyring.GnuKeyring.class.getName());
         put("Alg.Alias.KeyStore.GnuKeyring", "GKR");
 
+        // KeyPairGenerator ---------------------------------------------------
+        put("KeyPairGenerator.DH",
+            gnu.javax.crypto.jce.sig.DHKeyPairGeneratorSpi.class.getName());
+        put("KeyPairGenerator.DH KeySize", "512");
+        put("KeyPairGenerator.DH ImplementedIn", "Software");
+
+        put("Alg.Alias.KeyPairGenerator.DiffieHellman", "DH");
+
+        // KeyFactory ---------------------------------------------------------
+        put("KeyFactory.DH",
+            gnu.javax.crypto.jce.sig.DHKeyFactory.class.getName());
+
+        put("Alg.Alias,KeyFactory.DiffieHellman", "DH");
+
         return null;
       }
     });

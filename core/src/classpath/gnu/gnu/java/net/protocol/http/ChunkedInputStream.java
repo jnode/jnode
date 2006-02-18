@@ -91,12 +91,7 @@ public class ChunkedInputStream
       {
         return -1;
       }
-    int ret = (int) buf[0];
-    if (ret < 0)
-      {
-        ret += 0x100;
-      }
-    return ret;
+    return 0xff & buf[0];
   }
 
   public int read(byte[] buffer)

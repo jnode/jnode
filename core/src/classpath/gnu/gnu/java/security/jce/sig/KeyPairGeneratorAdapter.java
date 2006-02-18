@@ -66,7 +66,7 @@ import java.security.spec.AlgorithmParameterSpec;
  *
  * @version $Revision$
  */
-abstract class KeyPairGeneratorAdapter extends KeyPairGenerator
+public abstract class KeyPairGeneratorAdapter extends KeyPairGenerator
 {
 
   // Constants and variables

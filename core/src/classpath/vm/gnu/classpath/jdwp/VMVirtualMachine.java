@@ -1,27 +1,48 @@
-/*
- * $Id$
- *
- * JNode.org
- * Copyright (C) 2003-2006 JNode.org
- *
- * This library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published
- * by the Free Software Foundation; either version 2.1 of the License, or
- * (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
- * License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
- 
+/* VMVirtualMachine.java -- A reference implementation of a JDWP virtual
+   machine
+
+   Copyright (C) 2005 Free Software Foundation
+
+This file is part of GNU Classpath.
+
+GNU Classpath is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+GNU Classpath is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with GNU Classpath; see the file COPYING.  If not, write to the
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
+
+Linking this library statically or dynamically with other modules is
+making a combined work based on this library.  Thus, the terms and
+conditions of the GNU General Public License cover the whole
+combination.
+
+As a special exception, the copyright holders of this library give you
+permission to link this library with independent modules to produce an
+executable, regardless of the license terms of these independent
+modules, and to copy and distribute the resulting executable under
+terms of your choice, provided that you also meet, for each linked
+terms of your choice, provided that you also meet, for each linked
+independent module, the terms and conditions of the license of that
+module.  An independent module is a module which is not derived from
+or based on this library.  If you modify this library, you may extend
+this exception to your version of the library, but you are not
+obligated to do so.  If you do not wish to do so, delete this
+exception statement from your version. */
+
+
 package gnu.classpath.jdwp;
 
 import gnu.classpath.jdwp.event.EventRequest;
+import gnu.classpath.jdwp.exception.JdwpException;
 import gnu.classpath.jdwp.exception.InvalidClassException;
 import gnu.classpath.jdwp.exception.InvalidObjectException;
 import gnu.classpath.jdwp.id.ObjectId;
@@ -48,12 +69,14 @@ public class VMVirtualMachine
    *
    * @param  thread  the thread to suspend
    */
-  public static native void suspendThread (Thread thread);
+  public static native void suspendThread (Thread thread)
+    throws JdwpException;
 
   /**
    * Suspend all threads
    */
   public static void suspendAllThreads ()
+    throws JdwpException
   {
     // Our JDWP thread group -- don't suspend any of those threads
     Thread current = Thread.currentThread ();
@@ -98,7 +121,8 @@ public class VMVirtualMachine
    *
    * @param  thread  the thread to resume
    */
-  public static native void resumeThread (Thread thread);
+  public static native void resumeThread (Thread thread)
+    throws JdwpException;
 
   /**
    * Resume all threads. This simply decrements the thread's
@@ -106,6 +130,7 @@ public class VMVirtualMachine
    * to run.
    */
   public static void resumeAllThreads ()
+    throws JdwpException
   {
     // Our JDWP thread group -- don't resume
     Thread current = Thread.currentThread ();
@@ -147,17 +172,20 @@ public class VMVirtualMachine
    * @param  thread  the thread whose suspend count is desired
    * @return the number of times the thread has been suspended
    */
-  public static native int getSuspendCount (Thread thread);
+  public static native int getSuspendCount (Thread thread)
+    throws JdwpException;
  
   /**
    * Returns a count of the number of loaded classes in the VM
    */
-  public static native int getAllLoadedClassesCount ();
+  public static native int getAllLoadedClassesCount ()
+    throws JdwpException;
 
   /**
    * Returns an iterator over all the loaded classes in the VM
    */
-  public static native Iterator getAllLoadedClasses ();
+  public static native Iterator getAllLoadedClasses ()
+    throws JdwpException;
 
   /**
    * Returns the status of the given class
@@ -166,7 +194,8 @@ public class VMVirtualMachine
    * @return a flag containing the class's status
    * @see JdwpConstants.ClassStatus
    */
-  public static native int getClassStatus (Class clazz);
+  public static native int getClassStatus (Class clazz)
+    throws JdwpException;
 
 
   /**
@@ -178,7 +207,8 @@ public class VMVirtualMachine
    * @return a list of frames
    */
   public static native ArrayList getFrames (Thread thread, int strart,
-					    int length);
+					    int length)
+    throws JdwpException;
 
   /**
    * Returns the frame for a given thread with the frame ID in
@@ -190,7 +220,8 @@ public class VMVirtualMachine
    * @param  bb      buffer containing the frame's ID
    * @return the desired frame
    */
-  public static native VMFrame getFrame (Thread thread, ByteBuffer bb);
+  public static native VMFrame getFrame (Thread thread, ByteBuffer bb)
+    throws JdwpException;
 
   /**
    * Returns the number of frames in the thread's stack
@@ -198,7 +229,8 @@ public class VMVirtualMachine
    * @param  thread  the thread for which to get a frame count
    * @return the number of frames in the thread's stack
    */
-  public static native int getFrameCount (Thread thread);
+  public static native int getFrameCount (Thread thread)
+    throws JdwpException;
 
 
   /**
@@ -208,7 +240,8 @@ public class VMVirtualMachine
    * @return integer status of the thread
    * @see JdwpConstants.ThreadStatus
    */
-  public static native int getThreadStatus (Thread thread);
+  public static native int getThreadStatus (Thread thread)
+    throws JdwpException;
 
   /**
    * Returns a list of all classes which this class loader has been
@@ -217,7 +250,8 @@ public class VMVirtualMachine
    * @param  cl  the class loader
    * @return a list of all visible classes
    */
-  public static native ArrayList getLoadRequests (ClassLoader cl);
+  public static native ArrayList getLoadRequests (ClassLoader cl)
+    throws JdwpException;
 
   /**
    * Executes a method in the virtual machine
@@ -234,7 +268,8 @@ public class VMVirtualMachine
   public static native MethodResult executeMethod (Object obj, Thread thread,
 					    Class clazz, Method method,
 					    Object[] values,
-					    boolean nonVirtual);
+					    boolean nonVirtual)
+    throws JdwpException;
 
   /**
    * "Returns variable information for the method. The variable table
@@ -246,7 +281,8 @@ public class VMVirtualMachine
    * @param  method  the method for which variable information is desired
    * @return a result object containing the information
    */
-  public static native VariableTable getVarTable (Class clazz, Method method);
+  public static native VariableTable getVarTable (Class clazz, Method method)
+    throws JdwpException;
 
   /**
    * "Returns line number information for the method, if present. The line
@@ -259,7 +295,8 @@ public class VMVirtualMachine
    * @param  method  the method whose line table is desired
    * @return a result object containing the line table
    */
-  public static native LineTable getLineTable (Class clazz, Method method);
+  public static native LineTable getLineTable (Class clazz, Method method)
+    throws JdwpException;
 
   /**
    * "Returns the name of source file in which a reference type was declared"
@@ -268,7 +305,8 @@ public class VMVirtualMachine
    * @return a string containing the source file name; "no path information
    *         for the file is included"
    */
-  public static native String getSourceFile (Class clazz);
+  public static native String getSourceFile (Class clazz)
+    throws JdwpException;
 
   /**
    * Register a request from the debugger
@@ -279,14 +317,16 @@ public class VMVirtualMachine
    * or do some internal work to set up the event notification (useful for
    * execution-related events like breakpoints, single-stepping, etc.).
    */
-  public static native void registerEvent (EventRequest request);
+  public static native void registerEvent (EventRequest request)
+    throws JdwpException;
 
   /**
    * Unregisters the given request
    *
    * @param  request  the request to unregister
    */
-  public static native void unregisterEvent (EventRequest request);
+  public static native void unregisterEvent (EventRequest request)
+    throws JdwpException;
 
 
   /**
@@ -294,5 +334,6 @@ public class VMVirtualMachine
    *
    * @param  kind  the type of events to clear
    */
-  public static native void clearEvents (byte kind);
+  public static native void clearEvents (byte kind)
+    throws JdwpException;
 }

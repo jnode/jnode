@@ -103,12 +103,22 @@ public class GnuDHKeyPairGenerator implements IKeyPairGenerator
   /** Property name of the size in bits (Integer) of the private exponent (x). */
   public static final String EXPONENT_SIZE = "gnu.crypto.dh.m";
 
+  /**
+   * Property name of the preferred encoding format to use when externalizing
+   * generated instance of key-pairs from this generator. The property is taken
+   * to be an {@link Integer} that encapsulates an encoding format identifier.
+   */
+  public static final String PREFERRED_ENCODING_FORMAT = "gnu.crypto.dh.encoding";
+
   /** Default value for the size in bits of the public prime (p). */
   //   private static final int DEFAULT_PRIME_SIZE = 1024;
   private static final int DEFAULT_PRIME_SIZE = 512;
 
   /** Default value for the size in bits of the private exponent (x). */
   private static final int DEFAULT_EXPONENT_SIZE = 160;
+
+  /** Default encoding format to use when none was specified. */
+  private static final int DEFAULT_ENCODING_FORMAT = Registry.RAW_ENCODING_ID;
 
   /** The SHA instance to use. */
   private Sha160 sha = new Sha160();
@@ -136,6 +146,9 @@ public class GnuDHKeyPairGenerator implements IKeyPairGenerator
 
   /** Our default source of randomness. */
   private PRNG prng = null;
+
+  /** Preferred encoding format of generated keys. */
+  private int preferredFormat;
 
   // Constructor(s)
   // -------------------------------------------------------------------------
@@ -191,6 +204,11 @@ public class GnuDHKeyPairGenerator implements IKeyPairGenerator
       {
         throw new IllegalArgumentException("exponent size > modulus size");
       }
+
+    // what is the preferred encoding format
+    Integer formatID = (Integer) attributes.get(PREFERRED_ENCODING_FORMAT);
+    preferredFormat = formatID == null ? DEFAULT_ENCODING_FORMAT
+                                       : formatID.intValue();
   }
 
   public KeyPair generate()
@@ -231,8 +249,8 @@ public class GnuDHKeyPairGenerator implements IKeyPairGenerator
       }
     BigInteger y = g.modPow(x, p);
 
-    PrivateKey secK = new GnuDHPrivateKey(q, p, g, x);
-    PublicKey pubK = new GnuDHPublicKey(q, p, g, y);
+    PrivateKey secK = new GnuDHPrivateKey(preferredFormat, q, p, g, x);
+    PublicKey pubK = new GnuDHPublicKey(preferredFormat, q, p, g, y);
 
     return new KeyPair(pubK, secK);
   }
