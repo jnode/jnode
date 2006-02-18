@@ -183,6 +183,9 @@ final class FPCompilerFPU extends FPCompiler {
 			final Item result = ifac.createFPUStack(toType);
 			vstack.push(result);
 			vstack.fpuStack.push(result);
+            
+            // Now load to GPR (to force conversion)
+            result.loadToGPR(ec);
 		}
 	}
 
