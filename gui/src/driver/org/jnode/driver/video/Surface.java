@@ -117,6 +117,14 @@ public interface Surface {
     int getRGBPixel (int x, int y);
 
     /**
+     * Sets the color of the pixel at the specified screen coordinates.
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @param color the new color of the pixel 
+     */
+    void setRGBPixel (int x, int y, int color);
+    
+    /**
      * Gets the pixels from the specifed region region.
      * @param region a rectangular region of the screen in screen coordinates
      * @return the array of RGB pixel values
