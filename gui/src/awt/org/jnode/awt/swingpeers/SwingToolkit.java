@@ -398,9 +398,14 @@ public final class SwingToolkit extends JNodeToolkit {
             repaintManager = null;
         }
 
-        // Close the desktop
-        desktopFrame.dispose();
-        desktopFrame = null;
+        // sometime when the start of wat has failed, desktopFrame can be null
+        // so, we must check it is not null
+        if(desktopFrame != null)
+        {
+	        // Close the desktop
+	        desktopFrame.dispose();
+	        desktopFrame = null;
+        }
     }
 
     // /////////////////////////////////////////////////////////////////////////////////////
