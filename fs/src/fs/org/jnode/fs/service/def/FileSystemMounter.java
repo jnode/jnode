@@ -160,7 +160,7 @@ final class FileSystemMounter implements DeviceListener {
                         final FileSystem fs = fst.create(device, readOnly);
                         fileSystemService.registerFileSystem(fs);
                         
-                        final String fullPath = MOUNT_ROOT + File.separatorChar + device.getId();
+                        final String fullPath = File.separatorChar + MOUNT_ROOT + File.separatorChar + device.getId();
                         log.debug("Mounting " + device.getId() + " on " + fullPath);
                         fileSystemService.mount(fullPath, fs, null);
                         
