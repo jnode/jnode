@@ -844,6 +844,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 
     protected abstract void onResize();
 
+    public abstract boolean isWindow(Component comp);
     /**
 	 * @param image
 	 * @param width
