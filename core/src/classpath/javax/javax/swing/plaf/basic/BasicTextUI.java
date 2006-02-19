@@ -516,19 +516,19 @@ public abstract class BasicTextUI extends TextUI
     c.setOpaque(true);
 
     textComponent = (JTextComponent) c;
-
     Document doc = textComponent.getDocument();
     if (doc == null)
       {
 	doc = getEditorKit(textComponent).createDefaultDocument();
 	textComponent.setDocument(doc);
       }
-    textComponent.addPropertyChangeListener(updateHandler);
-    modelChanged();
-    
     installDefaults();
     installListeners();
     installKeyboardActions();
+
+    // We need to trigger this so that the view hierarchy gets initialized.
+    modelChanged();
+
   }
 
   /**
@@ -584,6 +584,7 @@ public abstract class BasicTextUI extends TextUI
   protected void installListeners()
   {
     textComponent.addFocusListener(focuslistener);
+    textComponent.addPropertyChangeListener(updateHandler);
     installDocumentListeners();
   }
 
@@ -728,8 +729,6 @@ public abstract class BasicTextUI extends TextUI
     super.uninstallUI(component);
     rootView.setView(null);
 
-    textComponent.removePropertyChangeListener(updateHandler);
-
     uninstallDefaults();
     uninstallListeners();
     uninstallKeyboardActions();
@@ -752,6 +751,7 @@ public abstract class BasicTextUI extends TextUI
    */
   protected void uninstallListeners()
   {
+    textComponent.removePropertyChangeListener(updateHandler);
     textComponent.removeFocusListener(focuslistener);
     textComponent.getDocument().removeDocumentListener(documentHandler);
   }
