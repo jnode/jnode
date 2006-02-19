@@ -413,7 +413,8 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
     }
 
     public void setBounds(int x, int y, int width, int height, int z) {
-        peerComponent.setBounds(x, y, width, height);
+        setBounds(x, y, width, height);
+        //peerComponent.setBounds(x, y, width, height);
     }
 
     public boolean isReparentSupported() {

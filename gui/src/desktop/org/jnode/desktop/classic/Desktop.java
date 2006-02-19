@@ -92,7 +92,7 @@ public class Desktop implements Runnable {
                 final JNodeAwtContext ctx = tk.getAwtContext();
                 final JDesktopPane desktop = ctx.getDesktop();
                 final Container awtRoot = ctx.getAwtRoot();
-                
+
                 taskBar.startButton.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent event) {
                         if (taskBar.startMenu.isShowing()) {
@@ -129,47 +129,50 @@ public class Desktop implements Runnable {
 
 
                 ActionListener desktopColorAction = new ActionListener() {
-                    private JFrame f;
+                    private JFrame frame;
+                    private JColorChooser colorChooser;
                     private Color oldColor;
 
                     public void actionPerformed(ActionEvent e) {
-                        if (f == null) {
-                            f = new JFrame("Desktop color");
-                            final JColorChooser color_chooser = new JColorChooser();
-                            f.add(color_chooser, BorderLayout.CENTER);
+                        //if (frame == null) {
+                            frame = new JFrame("Desktop color");
+                            colorChooser = new JColorChooser();
+                            frame.add(colorChooser, BorderLayout.CENTER);
                             JButton ok = new JButton("OK");
                             ok.addActionListener(new ActionListener() {
                                 public void actionPerformed(ActionEvent event) {
-                                    desktop.setBackground(color_chooser.getColor());
-                                    f.setVisible(false);
+                                    desktop.setBackground(colorChooser.getColor());
+                                    frame.setVisible(false);
                                 }
                             });
                             JButton apply = new JButton("Apply");
                             apply.addActionListener(new ActionListener() {
                                 public void actionPerformed(ActionEvent event) {
-                                    desktop.setBackground(color_chooser.getColor());
+                                    desktop.setBackground(colorChooser.getColor());
                                 }
                             });
                             JButton cancel = new JButton("Cancel");
                             cancel.addActionListener(new ActionListener() {
                                 public void actionPerformed(ActionEvent event) {
                                     desktop.setBackground(oldColor);
-                                    f.setVisible(false);
+                                    frame.setVisible(false);
                                 }
                             });
                             JPanel buttons = new JPanel();
                             buttons.add(ok);
                             buttons.add(apply);
                             buttons.add(cancel);
-                            f.add(buttons, BorderLayout.SOUTH);
-                        }
+                            frame.add(buttons, BorderLayout.SOUTH);
+                        //}
+
                         oldColor = desktop.getBackground();
+                        colorChooser.setColor(oldColor);
                         Dimension ss = Toolkit.getDefaultToolkit().getScreenSize();
                         int x = (ss.width - 500) / 2;
                         int y = (ss.height - 400) / 2;
-                        f.setSize(500, 400);
-                        f.setVisible(true);
-                        f.setLocation(x, y);
+                        frame.setSize(500, 400);
+                        frame.setVisible(true);
+                        frame.setLocation(x, y);
                     }
                 };
                 taskBar.desktopColorMI.addActionListener(desktopColorAction);
@@ -199,21 +202,21 @@ public class Desktop implements Runnable {
                 awtRoot.setLayout(new BorderLayout());
                 final int controlBarHeight = 36;
                 final int w = awtRoot.getWidth();
-                taskBar.setPreferredSize(new Dimension(w, controlBarHeight));                
+                taskBar.setPreferredSize(new Dimension(w, controlBarHeight));
                 awtRoot.add(taskBar, BorderLayout.SOUTH);
 
-        		Image background = null;//loadImage("button_red_i_like.png");
-        		if(background != null)
-        		{
-        			System.err.println("IMAGE FOUND");
-        			awtRoot.add(new JLabel(new ImageIcon(background)), BorderLayout.CENTER);
-        		}
-        		else
-        		{
-        			System.err.println("IMAGE NOT FOUND");
-        			awtRoot.add(desktop, BorderLayout.CENTER);
-        		}
-                
+                Image background = null;//loadImage("button_red_i_like.png");
+                if(background != null)
+                {
+                    System.err.println("IMAGE FOUND");
+                    awtRoot.add(new JLabel(new ImageIcon(background)), BorderLayout.CENTER);
+                }
+                else
+                {
+                    System.err.println("IMAGE NOT FOUND");
+                    awtRoot.add(desktop, BorderLayout.CENTER);
+                }
+
                 awtRoot.invalidate();
                 awtRoot.repaint();
 
@@ -255,7 +258,7 @@ public class Desktop implements Runnable {
          */
         public void componentAdded(ContainerEvent event) {
             final Component c = event.getChild();
-            if (c instanceof JInternalFrame) {
+            if (c instanceof JInternalFrame && !JNodeToolkit.getJNodeToolkit().isWindow(c)) {
                 taskBar.windowBar.addFrame((JInternalFrame) c);
             } else {
                 log.info("componentAdded: " + c.getClass().getName());
@@ -276,7 +279,7 @@ public class Desktop implements Runnable {
     }
 
     private class DesktopManagerImpl extends DefaultDesktopManager {
-    	
+
         /**
          * @see javax.swing.DesktopManager#deiconifyFrame(javax.swing.JInternalFrame)
          */
@@ -299,24 +302,24 @@ public class Desktop implements Runnable {
             }
         }
     }
-    
+
     public static Image loadImage(String resName)
     {
-    	
-		try {
-			System.err.println("*** loadImage ***");
-			final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-			System.err.println("cl="+cl);
-			Enumeration e = cl.getResources("/" + resName);
-			while(e.hasMoreElements())
-			{
-				System.err.println("url="+e.nextElement());
-			}
-			System.err.println("end urls");
-			
-			final URL url = cl.getResource("/" + resName);						
-			System.err.println("url="+url);
-			if (url != null) {
+
+        try {
+            System.err.println("*** loadImage ***");
+            final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+            System.err.println("cl="+cl);
+            Enumeration e = cl.getResources("/" + resName);
+            while(e.hasMoreElements())
+            {
+                System.err.println("url="+e.nextElement());
+            }
+            System.err.println("end urls");
+
+            final URL url = cl.getResource("/" + resName);
+            System.err.println("url="+url);
+            if (url != null) {
 // method 1 : generic read (with imageio api)				
 //				return ImageIO.read(url);
 
@@ -324,17 +327,17 @@ public class Desktop implements Runnable {
 //				PNGCodecHandler codec = new PNGCodecHandler();
 //				codec.read(url.openStream(), ReadType.NORMAL);
 //				return codec.getImageObject().getBufferedImage();
-			} else {
-				System.err.println("Cannot find image " + resName);
-			}			
-		} catch (IOException ex) {
-			ex.printStackTrace();
-			System.err.println("Cannot find image " + resName + ": " + ex.getMessage());
-		} catch (Throwable ex) {
-			ex.printStackTrace();
-			System.err.println("Cannot find image " + resName + ": " + ex.getMessage());
-		}
-		
-		return null;
+            } else {
+                System.err.println("Cannot find image " + resName);
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            System.err.println("Cannot find image " + resName + ": " + ex.getMessage());
+        } catch (Throwable ex) {
+            ex.printStackTrace();
+            System.err.println("Cannot find image " + resName + ": " + ex.getMessage());
+        }
+
+        return null;
     }
 }

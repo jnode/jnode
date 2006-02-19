@@ -454,6 +454,10 @@ public final class SwingToolkit extends JNodeToolkit {
         //nothing to do here yet
     }
 
+    public boolean isWindow(Component comp) {
+        return comp instanceof SwingWindow;
+    }
+
     /**
      * Sets the source of the event to the given component.
      */
