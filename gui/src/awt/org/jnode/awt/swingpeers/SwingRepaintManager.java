@@ -125,7 +125,7 @@ final class SwingRepaintManager extends RepaintManager {
 
     private void checkThread() {
         if (!SwingUtilities.isEventDispatchThread()) {
-            log.debug("Wrong Thread", new Exception("Stacktracr"));
+            log.debug("Wrong Thread", new Exception("Stacktrace"));
         }
     }
 }
