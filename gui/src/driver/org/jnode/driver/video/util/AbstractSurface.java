@@ -367,6 +367,17 @@ public abstract class AbstractSurface implements Surface {
 				"getRGBPixel(int,int) is not implemented for this video driver");
 	}
 
+    /**
+     * Sets the color of the pixel at the specified screen coordinates.
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @param color the new color of the pixel 
+     */
+    public void setRGBPixel (int x, int y, int color)
+    {
+    	drawPixel(x, y, color, PAINT_MODE);
+    }
+	
 	/**
 	 * @see org.jnode.driver.video.Surface#getRGBPixels(java.awt.Rectangle)
 	 */
