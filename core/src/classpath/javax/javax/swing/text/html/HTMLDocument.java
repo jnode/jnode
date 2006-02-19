@@ -1337,7 +1337,7 @@ public class HTMLDocument extends DefaultStyledDocument
     {
       // Copy the attribute set, don't use the same object because 
       // it may change
-      AttributeContext ctx = getAttributeContext();
+      AbstractDocument.AttributeContext ctx = getAttributeContext();
       AttributeSet attributes = null;
       if (charAttr != null)
         attributes = charAttr.copyAttributes();
@@ -1346,7 +1346,8 @@ public class HTMLDocument extends DefaultStyledDocument
       attributes = ctx.addAttribute(attributes, StyleConstants.NameAttribute,
                                     HTML.Tag.CONTENT);
       DefaultStyledDocument.ElementSpec element;
-      element = new ElementSpec(attributes, ElementSpec.ContentType,
+      element = new DefaultStyledDocument.ElementSpec(attributes,
+                                DefaultStyledDocument.ElementSpec.ContentType,
                                             data, offs, length);
       
       printBuffer();

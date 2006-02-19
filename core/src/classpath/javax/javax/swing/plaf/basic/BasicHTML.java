@@ -138,7 +138,7 @@ public class BasicHTML
   /**
    * Stores a HTML renderer in <code>c</code>'s client property if
    * <code>text</code> is HTML, otherwise it clears the corresponding client
-   * property. This is useful for {@link java.swing.plaf.ComponentUI}
+   * property. This is useful for {@link javax.swing.plaf.ComponentUI}
    * implementations that are shared between it's components.
    *
    * @param c the component to update the renderer for
