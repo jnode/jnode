@@ -30,6 +30,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import java.awt.BorderLayout;
@@ -186,9 +187,17 @@ public class TaskBar extends JPanel {
 
                 public void run() {
                     calendar.setTimeInMillis(System.currentTimeMillis());
-                    int h = calendar.get(Calendar.HOUR_OF_DAY);
-                    int m = calendar.get(Calendar.MINUTE);
-                    setText((h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m);
+                    final int h = calendar.get(Calendar.HOUR_OF_DAY);
+                    final int m = calendar.get(Calendar.MINUTE);
+                    SwingUtilities.invokeLater(new Runnable()
+                    {
+                    	public void run()
+                    	{
+                    		// insure that the modification of swing component
+                    		// is done in the awt event dispatcher thread
+                            setText((h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m);                    		
+                    	}
+                    });
                 }
             }, 0, 60 * 1000);
         }
