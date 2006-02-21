@@ -13,6 +13,7 @@
   <path id="my-cp">
     <path refid="cp"/>
   	<pathelement location="${mmtk.jar}"/>
+  	<pathelement location="${mauve.jar}"/>
   </path>
 
   <macrodef name="ExpandTest">
