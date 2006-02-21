@@ -65,7 +65,7 @@ import org.jnode.vm.classmgr.VmField;
  */
 public final class Field extends AccessibleObject implements Member, AnnotatedElement {
 
-	private VmField vmField;
+	private final VmField vmField;
 
 	/**
 	 * This class is uninstantiable except natively.

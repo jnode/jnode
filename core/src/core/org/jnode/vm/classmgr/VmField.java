@@ -108,7 +108,7 @@ public abstract class VmField extends VmMember {
 	 * Resolve the type of this field
 	 * @param cl
 	 */
-	protected synchronized void resolve(VmClassLoader cl) {
+	protected final synchronized void resolve() {
 		try {
 			type = new Signature(getSignature(), declaringClass.getLoader()).getType();
 		} catch (ClassNotFoundException ex) {
@@ -130,6 +130,9 @@ public abstract class VmField extends VmMember {
 	 * @return VmClass
 	 */
 	public VmType<?> getType() {
+        if (type == null) {
+            resolve();
+        }
 		return type;
 	}
 	

@@ -1747,11 +1747,11 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 	 * 
 	 * @param clc
 	 */
-	public final void resolveCpRefs(VmClassLoader clc) {
+	public final void resolveCpRefs() {
 		if (!resolvedCpRefs) {
 			prepare();
 			if (superClass != null) {
-				superClass.resolveCpRefs(clc);
+				superClass.resolveCpRefs();
 			}
 
 			/**
@@ -1760,7 +1760,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 			final int fcnt = getNoDeclaredFields();
 			for (int i = 0; i < fcnt; i++) {
 				final VmField fs = fieldTable[i];
-				fs.resolve(clc);
+				fs.resolve();
 			}
 
 			/**
@@ -1769,7 +1769,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 			final int mcnt = getNoDeclaredMethods();
 			for (int i = 0; i < mcnt; i++) {
 				final VmMethod mts = methodTable[i];
-				mts.resolve(clc);
+				mts.resolve();
 			}
 
 			VmCP cp = this.cp;
@@ -1777,7 +1777,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 				for (int i = 0; i < cp.getLength(); i++) {
 					final Object obj = cp.getAny(i);
 					if (obj instanceof VmResolvableConstObject) {
-						((VmResolvableConstObject) obj).resolve(clc);
+						((VmResolvableConstObject) obj).resolve(loader);
 					}
 				}
 			}

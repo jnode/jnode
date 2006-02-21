@@ -212,7 +212,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                     if (!vmClass.isCpRefsResolved() && compHigh) {
                         // log("Resolving CP of " + vmClass.getName(),
                         // Project.MSG_VERBOSE);
-                        vmClass.resolveCpRefs(clsMgr);
+                        vmClass.resolveCpRefs(/*clsMgr*/);
                         again = true;
                     }
                     final int mcnt;
