@@ -256,7 +256,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
      * 
      * @param cl
      */
-    protected void resolve(VmClassLoader cl) {
+    protected final void resolve() {
         resolveTypes();
     }
 
