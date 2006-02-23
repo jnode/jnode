@@ -33,7 +33,7 @@ final class SwingDialogPeer extends SwingBaseWindowPeer<Dialog, SwingDialog>
         implements DialogPeer, ISwingContainerPeer {
 
     public SwingDialogPeer(SwingToolkit toolkit, Dialog target) {
-        super(toolkit, target, new SwingDialog(target));
+        super(toolkit, target, new SwingDialog(target, target.getTitle()));
         setTitle(target.getTitle());
         setResizable(target.isResizable());
         peerComponent.setIconifiable(true);
@@ -55,8 +55,8 @@ final class SwingDialogPeer extends SwingBaseWindowPeer<Dialog, SwingDialog>
 
 final class SwingDialog extends SwingBaseWindow<Dialog, SwingDialog> {
     
-    public SwingDialog(Dialog target) {
-        super(target);
+    public SwingDialog(Dialog target, String title) {
+        super(target, title);
     }
 }
 
