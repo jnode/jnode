@@ -143,6 +143,7 @@ public class Desktop implements Runnable {
                                 public void actionPerformed(ActionEvent event) {
                                     desktop.setBackground(colorChooser.getColor());
                                     frame.setVisible(false);
+                                    frame.dispose();
                                 }
                             });
                             JButton apply = new JButton("Apply");
@@ -156,6 +157,7 @@ public class Desktop implements Runnable {
                                 public void actionPerformed(ActionEvent event) {
                                     desktop.setBackground(oldColor);
                                     frame.setVisible(false);
+                                    frame.dispose();
                                 }
                             });
                             JPanel buttons = new JPanel();
@@ -285,7 +287,7 @@ public class Desktop implements Runnable {
          */
         public void deiconifyFrame(JInternalFrame frame) {
             final JDesktopPane p = frame.getDesktopPane();
-            //frame.setVisible(true);
+            frame.setVisible(true);
             if (p != null) {
                 p.setSelectedFrame(frame);
             }
@@ -296,7 +298,7 @@ public class Desktop implements Runnable {
          */
         public void iconifyFrame(JInternalFrame frame) {
             final JDesktopPane p = frame.getDesktopPane();
-            //frame.setVisible(false);
+            frame.setVisible(false);
             if ((p != null) && (p.getSelectedFrame() == frame)) {
                 p.setSelectedFrame(null);
             }
