@@ -87,6 +87,11 @@ public class BoxView
   private int[] span = new int[2];
 
   /**
+   * The SizeRequirements of the child views along the X_AXIS and Y_AXIS.
+   */
+  private SizeRequirements[][] childReqs = new SizeRequirements[2][];
+
+  /**
    * Creates a new <code>BoxView</code> for the given
    * <code>Element</code> and axis. Valid values for the axis are
    * {@link View#X_AXIS} and {@link View#Y_AXIS}.
@@ -274,6 +279,9 @@ public class BoxView
   public void paint(Graphics g, Shape a)
   {
     Rectangle inside = getInsideAllocation(a);
+    // TODO: Used for debugging.
+    //g.drawRect(inside.x, inside.y, inside.width, inside.height);
+
     Rectangle copy = new Rectangle(inside);
     int count = getViewCount();
     for (int i = 0; i < count; ++i)
@@ -296,24 +304,14 @@ public class BoxView
    */
   public float getPreferredSpan(int axis)
   {
-    if (!isLayoutValid(axis))
-      {
-        if (axis == myAxis)
-          requirements[axis] = calculateMajorAxisRequirements(axis,
-                                                           requirements[axis]);
-        else
-          requirements[axis] = calculateMinorAxisRequirements(axis,
-                                                           requirements[axis]);
-      }
+    updateRequirements(axis);
     return requirements[axis].preferred;
   }
 
   /**
    * Returns the maximum span of this view along the specified axis.
-   * This calculates the maximum span using
-   * {@link #calculateMajorAxisRequirements} or
-   * {@link #calculateMinorAxisRequirements} (depending on the axis) and
-   * returns the resulting maximum span.
+   * This returns <code>Integer.MAX_VALUE</code> for the minor axis
+   * and the preferred span for the major axis.
    *
    * @param axis the axis
    *
@@ -321,16 +319,12 @@ public class BoxView
    */
   public float getMaximumSpan(int axis)
   {
-    if (!isLayoutValid(axis))
-      {
+    float max;
         if (axis == myAxis)
-          requirements[axis] = calculateMajorAxisRequirements(axis,
-                                                           requirements[axis]);
+      max = getPreferredSpan(axis);
     else
-          requirements[axis] = calculateMinorAxisRequirements(axis,
-                                                           requirements[axis]);
-      }
-    return requirements[axis].maximum;
+      max = Integer.MAX_VALUE;
+    return max;
   }
 
   /**
@@ -346,15 +340,7 @@ public class BoxView
    */
   public float getMinimumSpan(int axis)
   {
-    if (!isLayoutValid(axis))
-      {
-        if (axis == myAxis)
-          requirements[axis] = calculateMajorAxisRequirements(axis,
-                                                           requirements[axis]);
-        else
-          requirements[axis] = calculateMinorAxisRequirements(axis,
-                                                           requirements[axis]);
-      }
+    updateRequirements(axis);
     return requirements[axis].minimum;
   }
 
@@ -373,8 +359,45 @@ public class BoxView
   protected SizeRequirements baselineRequirements(int axis,
                                                   SizeRequirements sr)
   {
-    SizeRequirements[] childReqs = getChildRequirements(axis);
-    return SizeRequirements.getAlignedSizeRequirements(childReqs);
+    updateChildRequirements(axis);
+
+    SizeRequirements res = sr;
+    if (res == null)
+      res = new SizeRequirements();
+
+    float minLeft = 0;
+    float minRight = 0;
+    float prefLeft = 0;
+    float prefRight = 0;
+    float maxLeft = 0;
+    float maxRight = 0;
+    for (int i = 0; i < childReqs[axis].length; i++)
+      {
+        float myMinLeft = childReqs[axis][i].minimum * childReqs[axis][i].alignment;
+        float myMinRight = childReqs[axis][i].minimum - myMinLeft;
+        minLeft = Math.max(myMinLeft, minLeft);
+        minRight = Math.max(myMinRight, minRight);
+        float myPrefLeft = childReqs[axis][i].preferred * childReqs[axis][i].alignment;
+        float myPrefRight = childReqs[axis][i].preferred - myPrefLeft;
+        prefLeft = Math.max(myPrefLeft, prefLeft);
+        prefRight = Math.max(myPrefRight, prefRight);
+        float myMaxLeft = childReqs[axis][i].maximum * childReqs[axis][i].alignment;
+        float myMaxRight = childReqs[axis][i].maximum - myMaxLeft;
+        maxLeft = Math.max(myMaxLeft, maxLeft);
+        maxRight = Math.max(myMaxRight, maxRight);
+      }
+    int minSize = (int) (minLeft + minRight);
+    int prefSize = (int) (prefLeft + prefRight);
+    int maxSize = (int) (maxLeft + maxRight);
+    float align = prefLeft / (prefRight + prefLeft);
+    if (Float.isNaN(align))
+      align = 0;
+
+    res.alignment = align;
+    res.maximum = maxSize;
+    res.preferred = prefSize;
+    res.minimum = minSize;
+    return res;
   }
 
   /**
@@ -389,12 +412,13 @@ public class BoxView
   protected void baselineLayout(int span, int axis, int[] offsets,
                                 int[] spans)
   {
-    SizeRequirements[] childReqs = getChildRequirements(axis);
+    updateChildRequirements(axis);
+    updateRequirements(axis);
+
     // Calculate the spans and offsets using the SizeRequirements uility
     // methods.
     SizeRequirements.calculateAlignedPositions(span, requirements[axis],
-                                               childReqs, offsets, spans);
-    layoutValid[axis] = true;
+                                               childReqs[axis], offsets, spans);
   }
 
   /**
@@ -411,8 +435,34 @@ public class BoxView
   protected SizeRequirements calculateMajorAxisRequirements(int axis,
                                                            SizeRequirements sr)
   {
-    SizeRequirements[] childReqs = getChildRequirements(axis);
-    return SizeRequirements.getTiledSizeRequirements(childReqs);
+    updateChildRequirements(axis);
+
+    SizeRequirements result = sr;
+    if (result == null)
+      result = new SizeRequirements();
+
+    long minimum = 0;
+    long preferred = 0;
+    long maximum = 0;
+    for (int i = 0; i < children.length; i++)
+      {
+        minimum += childReqs[axis][i].minimum;
+        preferred += childReqs[axis][i].preferred;
+        maximum += childReqs[axis][i].maximum;
+      }
+    // Overflow check.
+    if (minimum > Integer.MAX_VALUE)
+      minimum = Integer.MAX_VALUE;
+    if (preferred > Integer.MAX_VALUE)
+      preferred = Integer.MAX_VALUE;
+    if (maximum > Integer.MAX_VALUE)
+      maximum = Integer.MAX_VALUE;
+
+    result.minimum = (int) minimum;
+    result.preferred = (int) preferred;
+    result.maximum = (int) maximum;
+    result.alignment = 0.5F;
+    return result;
   }
 
   /**
@@ -430,8 +480,45 @@ public class BoxView
   protected SizeRequirements calculateMinorAxisRequirements(int axis,
                                                            SizeRequirements sr)
   {
-    SizeRequirements[] childReqs = getChildRequirements(axis);
-    return SizeRequirements.getAlignedSizeRequirements(childReqs);
+    updateChildRequirements(axis);
+
+    SizeRequirements res = sr;
+    if (res == null)
+      res = new SizeRequirements();
+
+    float minLeft = 0;
+    float minRight = 0;
+    float prefLeft = 0;
+    float prefRight = 0;
+    float maxLeft = 0;
+    float maxRight = 0;
+    for (int i = 0; i < childReqs[axis].length; i++)
+      {
+        float myMinLeft = childReqs[axis][i].minimum * childReqs[axis][i].alignment;
+        float myMinRight = childReqs[axis][i].minimum - myMinLeft;
+        minLeft = Math.max(myMinLeft, minLeft);
+        minRight = Math.max(myMinRight, minRight);
+        float myPrefLeft = childReqs[axis][i].preferred * childReqs[axis][i].alignment;
+        float myPrefRight = childReqs[axis][i].preferred - myPrefLeft;
+        prefLeft = Math.max(myPrefLeft, prefLeft);
+        prefRight = Math.max(myPrefRight, prefRight);
+        float myMaxLeft = childReqs[axis][i].maximum * childReqs[axis][i].alignment;
+        float myMaxRight = childReqs[axis][i].maximum - myMaxLeft;
+        maxLeft = Math.max(myMaxLeft, maxLeft);
+        maxRight = Math.max(myMaxRight, maxRight);
+      }
+    int minSize = (int) (minLeft + minRight);
+    int prefSize = (int) (prefLeft + prefRight);
+    int maxSize = (int) (maxLeft + maxRight);
+    float align = prefLeft / (prefRight + prefLeft);
+    if (Float.isNaN(align))
+      align = 0;
+
+    res.alignment = align;
+    res.maximum = maxSize;
+    res.preferred = prefSize;
+    res.minimum = minSize;
+    return res;
   }
 
 
@@ -559,11 +646,10 @@ public class BoxView
     int minorAxis = myAxis == X_AXIS ? Y_AXIS : X_AXIS;
     if ((! isLayoutValid(minorAxis)) || newSpan[minorAxis] != span[minorAxis])
       {
-        requirements[minorAxis] = calculateMinorAxisRequirements(minorAxis,
-                                                      requirements[minorAxis]);
-        layoutMinorAxis(newSpan[minorAxis], minorAxis, offsets[minorAxis],
+        layoutValid[minorAxis] = false;
+        span[minorAxis] = newSpan[minorAxis];
+        layoutMinorAxis(span[minorAxis], minorAxis, offsets[minorAxis],
                         spans[minorAxis]);
-        span[myAxis] = newSpan[myAxis];
 
         // Update the child view's sizes.
         for (int i = 0; i < count; ++i)
@@ -577,11 +663,10 @@ public class BoxView
     // Update major axis as appropriate.
     if ((! isLayoutValid(myAxis)) || newSpan[myAxis] != span[myAxis])
       {
-        requirements[myAxis] = calculateMajorAxisRequirements(myAxis,
-                                                         requirements[myAxis]);
-        layoutMajorAxis(newSpan[myAxis], myAxis, offsets[myAxis],
-                        spans[myAxis]);
+        layoutValid[myAxis] = false;
         span[myAxis] = newSpan[myAxis];
+        layoutMajorAxis(span[myAxis], myAxis, offsets[myAxis],
+                        spans[myAxis]);
 
         // Update the child view's sizes.
         for (int i = 0; i < count; ++i)
@@ -591,11 +676,10 @@ public class BoxView
         layoutValid[myAxis] = true;
       }
 
-
-    assert layoutValid[myAxis] == true
-           : "Major axis layout must be valid after layout";
-    assert layoutValid[minorAxis] == true
-    : "Minor axis layout must be valid after layout";
+    if (layoutValid[myAxis] == false)
+	  System.err.println("WARNING: Major axis layout must be valid after layout");
+    if (layoutValid[minorAxis] == false)
+      System.err.println("Minor axis layout must be valid after layout");
   }
 
   /**
@@ -610,12 +694,15 @@ public class BoxView
   protected void layoutMajorAxis(int targetSpan, int axis, int[] offsets,
                                  int[] spans)
   {
-    SizeRequirements[] childReqs = getChildRequirements(axis);
+    updateChildRequirements(axis);
+    updateRequirements(axis);
+
     // Calculate the spans and offsets using the SizeRequirements uility
     // methods.
-    SizeRequirements.calculateTiledPositions(targetSpan, null, childReqs,
+    SizeRequirements.calculateTiledPositions(targetSpan, requirements[axis],
+                                             childReqs[axis],
                                              offsets, spans);
-    layoutValid[axis] = true;
+
   }
 
   /**
@@ -630,12 +717,14 @@ public class BoxView
   protected void layoutMinorAxis(int targetSpan, int axis, int[] offsets,
                                  int[] spans)
   {
-    SizeRequirements[] childReqs = getChildRequirements(axis);
+    updateChildRequirements(axis);
+    updateRequirements(axis);
+
     // Calculate the spans and offsets using the SizeRequirements uility
     // methods.
     SizeRequirements.calculateAlignedPositions(targetSpan, requirements[axis],
-                                               childReqs, offsets, spans);
-    layoutValid[axis] = true;
+                                               childReqs[axis], offsets,
+                                               spans);
   }
 
   /**
@@ -680,29 +769,6 @@ public class BoxView
   public void setSize(float width, float height)
   {
     layout((int) width, (int) height);
-  }
-
-  /**
-   * Returns the size requirements of this view's children for the major
-   * axis.
-   *
-   * @return the size requirements of this view's children for the major
-   *         axis
-   */
-  private SizeRequirements[] getChildRequirements(int axis)
-  {
-    // Allocate SizeRequirements for each child view.
-    int count = getViewCount();
-    SizeRequirements[] childReqs = new SizeRequirements[count];
-    for (int i = 0; i < count; ++i)
-      {
-        View view = getView(i);
-        childReqs[i] = new SizeRequirements((int) view.getMinimumSpan(axis),
-                                            (int) view.getPreferredSpan(axis),
-                                            (int) view.getMaximumSpan(axis),
-                                            view.getAlignment(axis));
-      }
-    return childReqs;
   }
 
   /**
@@ -758,9 +824,7 @@ public class BoxView
       align = 0.5F;
     else
       {
-        if (! isLayoutValid(axis))
-          requirements[axis] = calculateMinorAxisRequirements(axis,
-                                                           requirements[axis]);
+        updateRequirements(axis);
         align = requirements[axis].alignment;
       }
     return align;
@@ -773,7 +837,7 @@ public class BoxView
    * @param height indicates that the preferred height of the child changed.
    * @param child the child View. 
    */
-  public void preferenceChanged (View child, boolean width, boolean height)
+  public void preferenceChanged(View child, boolean width, boolean height)
   {
     if (width)
       layoutValid[X_AXIS] = false;
@@ -859,5 +923,51 @@ public class BoxView
   {
     // FIXME: What to do here?
     return super.flipEastAndWestAtEnds(position, bias);
+  }
+
+  /**
+   * Updates the child requirements along the specified axis. The requirements
+   * are only updated if the layout for the specified axis is marked as
+   * invalid.
+   *
+   * @param axis the axis to be updated
+   */
+  private void updateChildRequirements(int axis)
+  {
+    if (! isLayoutValid(axis))
+      {
+        int numChildren = getViewCount();
+        if (childReqs[axis] == null || childReqs[axis].length != numChildren)
+          childReqs[axis] = new SizeRequirements[numChildren];
+        for (int i = 0; i < numChildren; ++i)
+          {
+            View child = getView(i);
+            childReqs[axis][i] =
+              new SizeRequirements((int) child.getMinimumSpan(axis),
+                                   (int) child.getPreferredSpan(axis),
+                                   (int) child.getMaximumSpan(axis),
+                                   child.getAlignment(axis));
+          }
+      }
+  }
+
+  /**
+   * Updates the view's cached requirements along the specified axis if
+   * necessary. The requirements are only updated if the layout for the
+   * specified axis is marked as invalid.
+   *
+   * @param axis the axis
+   */
+  private void updateRequirements(int axis)
+  {
+    if (! layoutValid[axis])
+      {
+        if (axis == myAxis)
+          requirements[axis] = calculateMajorAxisRequirements(axis,
+                                                           requirements[axis]);
+        else
+          requirements[axis] = calculateMinorAxisRequirements(axis,
+                                                           requirements[axis]);
+      }
   }
 }

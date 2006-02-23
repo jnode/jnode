@@ -863,7 +863,10 @@ public class DefaultEditorKit extends EditorKit
             if (t != null)
               {
                 Caret c = t.getCaret();
-                int x = c.getMagicCaretPosition().x;
+                // The magic caret position may be null when the caret
+                // has not moved yet.
+                Point mcp = c.getMagicCaretPosition();
+                int x = (mcp != null) ? mcp.x : 0;
                 int pos = Utilities.getPositionAbove(t, t.getCaretPosition(), x);
                 
                 if (pos > -1)
@@ -886,7 +889,10 @@ public class DefaultEditorKit extends EditorKit
             if (t != null)
               {
                 Caret c = t.getCaret();
-                int x = c.getMagicCaretPosition().x;
+                // The magic caret position may be null when the caret
+                // has not moved yet.
+                Point mcp = c.getMagicCaretPosition();
+                int x = (mcp != null) ? mcp.x : 0;
                 int pos = Utilities.getPositionBelow(t, t.getCaretPosition(), x);
                 
                 if (pos > -1)
@@ -908,7 +914,7 @@ public class DefaultEditorKit extends EditorKit
 	  {
         int offs = t.getCaretPosition() - 1;
         
-        if(offs > 0)
+        if(offs >= 0)
           {
             Caret c = t.getCaret();
             c.moveDot(offs);
@@ -959,7 +965,10 @@ public class DefaultEditorKit extends EditorKit
             if (t != null)
               {
                 Caret c = t.getCaret();
-                int x = c.getMagicCaretPosition().x;
+                // The magic caret position may be null when the caret
+                // has not moved yet.
+                Point mcp = c.getMagicCaretPosition();
+                int x = (mcp != null) ? mcp.x : 0;
                 int pos = Utilities.getPositionAbove(t, t.getCaretPosition(), x);
                 
                 if (pos > -1)
@@ -982,7 +991,10 @@ public class DefaultEditorKit extends EditorKit
             if (t != null)
               {
                 Caret c = t.getCaret();
-                int x = c.getMagicCaretPosition().x;
+                // The magic caret position may be null when the caret
+                // has not moved yet.
+                Point mcp = c.getMagicCaretPosition();
+                int x = (mcp != null) ? mcp.x : 0;
                 int pos = Utilities.getPositionBelow(t, t.getCaretPosition(), x);
                 
                 if (pos > -1)

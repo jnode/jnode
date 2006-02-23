@@ -1,5 +1,5 @@
-/* SpinnerUI.java --
-   Copyright (C) 2003, 2004, 2005  Free Software Foundation, Inc.
+/* BasicSpinnerUI.java --
+   Copyright (C) 2003, 2004, 2005, 2006,  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -41,6 +41,7 @@ package javax.swing.plaf.basic;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
@@ -59,22 +60,21 @@ import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.SpinnerUI;
 
 /**
- * DOCUMENT ME!
+ * A UI delegate for the {@link JSpinner} component.
  *
  * @author Ka-Hing Cheung
  *
- * @see javax.swing.JSpinner
  * @since 1.4
  */
 public class BasicSpinnerUI extends SpinnerUI
 {
   /**
-   * Creates a new <code>ComponentUI</code> for the specified
+   * Creates a new <code>BasicSpinnerUI</code> for the specified
    * <code>JComponent</code>
    *
-   * @param c DOCUMENT ME!
+   * @param c  the component (ignored).
    *
-   * @return a ComponentUI
+   * @return A new instance of {@link BasicSpinnerUI}.
    */
   public static ComponentUI createUI(JComponent c)
   {
@@ -144,13 +144,14 @@ public class BasicSpinnerUI extends SpinnerUI
   {
     return new PropertyChangeListener()
       {
-	public void propertyChange(PropertyChangeEvent evt)
+        public void propertyChange(PropertyChangeEvent event)
 	{
 	  // FIXME: Add check for enabled property change. Need to
 	  // disable the buttons.
-	  if ("editor".equals(evt.getPropertyName()))
-	    BasicSpinnerUI.this.replaceEditor((JComponent) evt.getOldValue(),
-	                                      (JComponent) evt.getNewValue());
+          if ("editor".equals(event.getPropertyName()))
+            BasicSpinnerUI.this.replaceEditor((JComponent) event.getOldValue(),
+                (JComponent) event.getNewValue());
+          // FIXME: Handle 'font' property change
 	}
       };
   }
@@ -169,6 +170,12 @@ public class BasicSpinnerUI extends SpinnerUI
     LookAndFeel.installColorsAndFont(spinner, "Spinner.background",
                                      "Spinner.foreground", "Spinner.font");
     LookAndFeel.installBorder(spinner, "Spinner.border");
+    JComponent e = spinner.getEditor();
+    if (e instanceof JSpinner.DefaultEditor)
+      {
+        JSpinner.DefaultEditor de = (JSpinner.DefaultEditor) e;
+        de.getTextField().setBorder(null);  
+      }
     spinner.setLayout(createLayout());
     spinner.setOpaque(true);
   }
@@ -352,7 +359,8 @@ public class BasicSpinnerUI extends SpinnerUI
   private PropertyChangeListener listener = createPropertyChangeListener();
 
   /**
-   * DOCUMENT ME!
+   * A layout manager for the {@link JSpinner} component.  The spinner has
+   * three subcomponents: an editor, a 'next' button and a 'previous' button.
    */
   private class DefaultLayoutManager implements LayoutManager
   {
@@ -374,49 +382,43 @@ public class BasicSpinnerUI extends SpinnerUI
 	    |        | p |    | p |        |
 	    --------------    --------------
 	  */
-	  Dimension e = minSize(editor);
-	  Dimension n = minSize(next);
-	  Dimension p = minSize(previous);
+          Dimension e = prefSize(editor);
+          Dimension n = prefSize(next);
+          Dimension p = prefSize(previous);
 	  Dimension s = spinner.getPreferredSize();
 
 	  int x = l2r ? i.left : i.right;
 	  int y = i.top;
 	  int w = Math.max(p.width, n.width);
-	  int h = Math.max(p.height, n.height);
-	  h = Math.max(h, e.height / 2);
-	  int e_width = s.width - w;
+          int h = e.height / 2;
+          int e_width = s.width - w - i.left - i.right;
 
 	  if (l2r)
 	    {
-	      setBounds(editor, x, y + (s.height - e.height) / 2, e_width,
-	                e.height);
+              setBounds(editor, x, y, e_width, 2 * h);
 	      x += e_width;
-
 	      setBounds(next, x, y, w, h);
 	      y += h;
-
 	      setBounds(previous, x, y, w, h);
 	    }
 	  else
 	    {
 	      setBounds(next, x, y + (s.height - e.height) / 2, w, h);
 	      y += h;
-
-	      setBounds(previous, x, y, w, h);
+              setBounds(previous, x, y + (s.height - e.height) / 2, w, h);
 	      x += w;
 	      y -= h;
-
 	      setBounds(editor, x, y, e_width, e.height);
 	    }
         }
     }
 
     /**
-     * DOCUMENT ME!
+     * Calculates the minimum layout size.
      *
-     * @param parent DOCUMENT ME!
+     * @param parent  the parent.
      *
-     * @return DOCUMENT ME!
+     * @return The minimum layout size.
      */
     public Dimension minimumLayoutSize(Container parent)
     {
@@ -431,29 +433,25 @@ public class BasicSpinnerUI extends SpinnerUI
 
       int nextWidth = 0;
       int previousWidth = 0;
-      int otherHeight = 0;
 
       if (next != null)
         {
 	  Dimension tmp = next.getMinimumSize();
 	  nextWidth = tmp.width;
-	  otherHeight += tmp.height;
         }
       if (previous != null)
         {
 	  Dimension tmp = previous.getMinimumSize();
 	  previousWidth = tmp.width;
-	  otherHeight += tmp.height;
         }
 
-      d.height = Math.max(d.height, otherHeight);
       d.width += Math.max(nextWidth, previousWidth);
 
       return d;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the preferred layout size of the container.
      *
      * @param parent DOCUMENT ME!
      *
@@ -472,24 +470,22 @@ public class BasicSpinnerUI extends SpinnerUI
 
       int nextWidth = 0;
       int previousWidth = 0;
-      int otherHeight = 0;
 
       if (next != null)
         {
 	  Dimension tmp = next.getPreferredSize();
 	  nextWidth = tmp.width;
-	  otherHeight += tmp.height;
         }
       if (previous != null)
         {
 	  Dimension tmp = previous.getPreferredSize();
 	  previousWidth = tmp.width;
-	  otherHeight += tmp.height;
         }
 
-      d.height = Math.max(d.height, otherHeight);
       d.width += Math.max(nextWidth, previousWidth);
-
+      Insets insets = parent.getInsets();
+      d.width = d.width + insets.left + insets.right;
+      d.height = d.height + insets.top + insets.bottom;
       return d;
     }
 
@@ -531,22 +527,22 @@ public class BasicSpinnerUI extends SpinnerUI
      *
      * @return DOCUMENT ME!
      */
-    private Dimension minSize(Component c)
+    private Dimension prefSize(Component c)
     {
       if (c == null)
 	return new Dimension();
       else
-	return c.getMinimumSize();
+        return c.getPreferredSize();
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the bounds for the specified component.
      *
-     * @param c DOCUMENT ME!
-     * @param x DOCUMENT ME!
-     * @param y DOCUMENT ME!
-     * @param w DOCUMENT ME!
-     * @param h DOCUMENT ME!
+     * @param c  the component.
+     * @param x  the x-coordinate for the top-left of the component bounds.
+     * @param y  the y-coordinate for the top-left of the component bounds.
+     * @param w  the width of the bounds.
+     * @param h  the height of the bounds.
      */
     private void setBounds(Component c, int x, int y, int w, int h)
     {
@@ -554,13 +550,13 @@ public class BasicSpinnerUI extends SpinnerUI
 	c.setBounds(x, y, w, h);
     }
 
-    /** DOCUMENT ME! */
+    /** The editor component. */
     private Component editor;
 
-    /** DOCUMENT ME! */
+    /** The next button. */
     private Component next;
 
-    /** DOCUMENT ME! */
+    /** The previous button. */
     private Component previous;
   }
 }
