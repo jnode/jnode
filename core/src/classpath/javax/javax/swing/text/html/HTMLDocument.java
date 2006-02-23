@@ -150,7 +150,7 @@ public class HTMLDocument extends DefaultStyledDocument
    */
   protected AbstractElement createDefaultRoot()
   {
-    AttributeContext ctx = getAttributeContext();
+    AbstractDocument.AttributeContext ctx = getAttributeContext();
 
     // Create html element.
     AttributeSet atts = ctx.getEmptySet();
@@ -475,7 +475,7 @@ public class HTMLDocument extends DefaultStyledDocument
   {
     public BlockElement (Element parent, AttributeSet a)
     {
-      super (parent, a);
+      super(parent, a);
     }
     
     /**
@@ -1286,8 +1286,10 @@ public class HTMLDocument extends DefaultStyledDocument
     {
       printBuffer();
       DefaultStyledDocument.ElementSpec element;
-      attr.addAttribute(StyleConstants.NameAttribute, t);
-      element = new DefaultStyledDocument.ElementSpec(attr,
+      AbstractDocument.AttributeContext ctx = getAttributeContext();
+      AttributeSet copy = attr.copyAttributes();
+      copy = ctx.addAttribute(copy, StyleConstants.NameAttribute, t);
+      element = new DefaultStyledDocument.ElementSpec(copy,
 			DefaultStyledDocument.ElementSpec.StartTagType);
       parseBuffer.addElement(element);
       printBuffer();

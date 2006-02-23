@@ -311,7 +311,7 @@ public class GlyphView extends View implements TabableView, Cloneable
         Utilities.drawTabbedText(txt, bounds.x, bounds.y + ascent, g, tabEx,
                                  txt.offset);
 
-      if (view.isStikeThrough())
+      if (view.isStrikeThrough())
         {
           int strikeHeight = (int) (getAscent(view) / 2);
           g.drawLine(bounds.x, bounds.y + strikeHeight, bounds.height + width,
@@ -474,12 +474,12 @@ public class GlyphView extends View implements TabableView, Cloneable
   /**
    * The start offset within the document for this view.
    */
-  int startOffset;
+  private int startOffset;
 
   /**
    * The end offset within the document for this view.
    */
-  int endOffset;
+  private int endOffset;
 
   /**
    * Creates a new <code>GlyphView</code> for the given <code>Element</code>.
@@ -538,8 +538,7 @@ public class GlyphView extends View implements TabableView, Cloneable
   {
     Element el = getElement();
     checkPainter();
-    getGlyphPainter().paint(this, g, a, el.getStartOffset(),
-                            el.getEndOffset());
+    getGlyphPainter().paint(this, g, a, getStartOffset(), getEndOffset());
   }
 
 
@@ -568,6 +567,7 @@ public class GlyphView extends View implements TabableView, Cloneable
       }
     else
       span = painter.getHeight(this); 
+
     return span;
   }
 
@@ -796,7 +796,7 @@ public class GlyphView extends View implements TabableView, Cloneable
    *
    * @return whether the text should be rendered strike-through or not
    */
-  public boolean isStikeThrough()
+  public boolean isStrikeThrough()
   {
     Element el = getElement();
     AttributeSet atts = el.getAttributes();
@@ -890,13 +890,15 @@ public class GlyphView extends View implements TabableView, Cloneable
 
     checkPainter();
     GlyphPainter painter = getGlyphPainter();
-    int breakLocation = painter.getBoundedPosition(this, p0, pos, len);
+
     // Try to find a suitable line break.
     BreakIterator lineBreaker = BreakIterator.getLineInstance();
     Segment txt = new Segment();
     try
       {
-        getDocument().getText(getStartOffset(), getEndOffset(), txt);
+        int start = getStartOffset();
+        int length = getEndOffset() - start;
+        getDocument().getText(start, length, txt);
       }
     catch (BadLocationException ex)
       {
@@ -905,11 +907,10 @@ public class GlyphView extends View implements TabableView, Cloneable
         err.initCause(ex);
         throw err;
       }
-    lineBreaker.setText(txt);
-    int goodBreakLocation = lineBreaker.previous();
-    if (goodBreakLocation != BreakIterator.DONE)
-      breakLocation = goodBreakLocation;
-
+    int breakLocation =
+      Utilities.getBreakLocation(txt, getContainer().getFontMetrics(getFont()),
+                                 (int) pos, (int) (pos + len),
+                                 getTabExpander(), p0);
     View brokenView = createFragment(p0, breakLocation);
     return brokenView;
   }
@@ -970,7 +971,7 @@ public class GlyphView extends View implements TabableView, Cloneable
    */
   public void changedUpdate(DocumentEvent e, Shape a, ViewFactory vf)
   {
-    getParent().preferenceChanged(this, true, true);
+    preferenceChanged(this, true, true);
   }
 
   /**
@@ -1000,7 +1001,7 @@ public class GlyphView extends View implements TabableView, Cloneable
    */
   public void removeUpdate(DocumentEvent e, Shape a, ViewFactory vf)
   {
-    getParent().preferenceChanged(this, true, false);
+    preferenceChanged(this, true, false);
   }
 
   /**

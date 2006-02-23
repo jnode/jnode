@@ -578,6 +578,38 @@ public class DefaultCaret extends Rectangle
     return mark;
   }
 
+  private void clearHighlight()
+  {
+    Highlighter highlighter = textComponent.getHighlighter();
+    
+    if (highlighter == null)
+      return;
+    
+    if (selectionVisible)
+      {
+    try
+      {
+        if (highlightEntry == null)
+          highlightEntry = highlighter.addHighlight(0, 0, getSelectionPainter());
+        else
+          highlighter.changeHighlight(highlightEntry, 0, 0);
+      }
+    catch (BadLocationException e)
+      {
+        // This should never happen.
+        throw new InternalError();
+      }
+      }
+    else
+      {
+    if (highlightEntry != null)
+      {
+        highlighter.removeHighlight(highlightEntry);
+        highlightEntry = null;
+      }
+      }
+  }
+  
   private void handleHighlight()
   {
     Highlighter highlighter = textComponent.getHighlighter();
@@ -588,7 +620,7 @@ public class DefaultCaret extends Rectangle
     int p0 = Math.min(dot, mark);
     int p1 = Math.max(dot, mark);
     
-    if (selectionVisible && p0 != p1)
+    if (selectionVisible)
       {
 	try
 	  {
@@ -818,6 +850,7 @@ public class DefaultCaret extends Rectangle
         if (doc != null)
           this.dot = Math.min(dot, doc.getLength());
         this.dot = Math.max(this.dot, 0);
+        
     handleHighlight();
     adjustVisibility(this);
         appear();
@@ -842,7 +875,8 @@ public class DefaultCaret extends Rectangle
           this.dot = Math.min(dot, doc.getLength());
         this.dot = Math.max(this.dot, 0);
         this.mark = this.dot;
-    handleHighlight();
+        
+        clearHighlight();
     adjustVisibility(this);
         appear();
       }

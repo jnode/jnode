@@ -38,13 +38,10 @@ exception statement from your version. */
 
 package javax.swing.text;
 
-import java.awt.Container;
-import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Shape;
-import java.util.Iterator;
-import java.util.Vector;
 
+import javax.swing.SizeRequirements;
 import javax.swing.event.DocumentEvent;
 
 /**
@@ -215,7 +212,7 @@ public abstract class FlowView extends BoxView
           int rowViewCount = row.getViewCount();
           offset = row.getView(rowViewCount - 1).getEndOffset();
         }
-      return offset;
+      return offset != pos ? offset : -1;
     }
 
     /**
@@ -317,149 +314,14 @@ public abstract class FlowView extends BoxView
    * visual representation, this is handled by the physical view implemented
    * in the <code>FlowView</code>.
    */
-  class LogicalView extends View
+  class LogicalView extends BoxView
   {
-    /**
-     * The child views of this logical view.
-     */
-    Vector children;
-
     /**
      * Creates a new LogicalView instance.
      */
-    LogicalView(Element el)
-    {
-      super(el);
-      children = new Vector();
-    }
-
-    /**
-     * Returns the container that holds this view. The logical view returns
-     * the enclosing FlowView's container here.
-     *
-     * @return the container that holds this view
-     */
-    public Container getContainer()
-    {
-      return FlowView.this.getContainer();
-    }
-
-    /**
-     * Returns the number of child views of this logical view.
-     *
-     * @return the number of child views of this logical view
-     */
-    public int getViewCount()
-    {
-      return children.size();
-    }
-
-    /**
-     * Returns the child view at the specified index.
-     *
-     * @param index the index
-     *
-     * @return the child view at the specified index
-     */
-    public View getView(int index)
-    {
-      return (View) children.get(index);
-    }
-
-    /**
-     * Replaces some child views with other child views.
-     *
-     * @param offset the offset at which to replace child views
-     * @param length the number of children to remove
-     * @param views the views to be inserted
-     */
-    public void replace(int offset, int length, View[] views)
-    {
-      if (length > 0)
+    LogicalView(Element el, int axis)
         {
-          for (int count = 0; count < length; ++count)
-            children.remove(offset);
-        }
-
-      int endOffset = offset + views.length;
-      for (int i = offset; i < endOffset; ++i)
-        {
-          children.add(i, views[i - offset]);
-          // Set the parent of the child views to the flow view itself so
-          // it has something to resolve.
-          views[i - offset].setParent(FlowView.this);
-        }
-    }
-
-    /**
-     * Returns the index of the child view that contains the specified
-     * position in the document model.
-     *
-     * @param pos the position for which we are searching the child view
-     * @param b the bias
-     *
-     * @return the index of the child view that contains the specified
-     *         position in the document model
-     */
-    public int getViewIndex(int pos, Position.Bias b)
-    {
-      int index = -1;
-      int i = 0;
-      for (Iterator it = children.iterator(); it.hasNext(); i++)
-        {
-          View child = (View) it.next();
-          if (pos >= child.getStartOffset() && pos < child.getEndOffset())
-            {
-              index = i;
-              break;
-            }
-        }
-      return index;
-    }
-
-    /**
-     * Throws an AssertionError because it must never be called. LogicalView
-     * only serves as a holder for child views and has no visual
-     * representation.
-     */
-    public float getPreferredSpan(int axis)
-    {
-      throw new AssertionError("This method must not be called in "
-                               + "LogicalView.");
-    }
-
-    /**
-     * Throws an AssertionError because it must never be called. LogicalView
-     * only serves as a holder for child views and has no visual
-     * representation.
-     */
-    public Shape modelToView(int pos, Shape a, Position.Bias b)
-      throws BadLocationException
-    {
-      throw new AssertionError("This method must not be called in "
-                               + "LogicalView.");
-    }
-
-    /**
-     * Throws an AssertionError because it must never be called. LogicalView
-     * only serves as a holder for child views and has no visual
-     * representation.
-     */
-    public void paint(Graphics g, Shape s)
-    {
-      throw new AssertionError("This method must not be called in "
-                               + "LogicalView.");
-    }
-
-    /**
-     * Throws an AssertionError because it must never be called. LogicalView
-     * only serves as a holder for child views and has no visual
-     * representation.
-     */
-    public int viewToModel(float x, float y, Shape a, Position.Bias[] b)
-    {
-      throw new AssertionError("This method must not be called in "
-                               + "LogicalView.");
+      super(el, axis);
     }
   }
 
@@ -581,16 +443,8 @@ public abstract class FlowView extends BoxView
   {
     if (layoutPool == null)
       {
-        layoutPool = new LogicalView(getElement());
+        layoutPool = new LogicalView(getElement(), getAxis());
         layoutPool.setParent(this);
-        Element el = getElement();
-        int count = el.getElementCount();
-        for (int i = 0; i < count; ++i)
-          {
-            Element childEl = el.getElement(i);
-            View childView = vf.create(childEl);
-            layoutPool.append(childView);
-          }
       }
   }
 
@@ -718,5 +572,31 @@ public abstract class FlowView extends BoxView
           }
       }
     return result;
+  }
+
+  /**
+   * Calculates the size requirements of this <code>BoxView</code> along
+   * its minor axis, that is the axis opposite to the axis specified in the
+   * constructor.
+   *
+   * This is overridden and forwards the request to the logical view.
+   *
+   * @param axis the axis that is examined
+   * @param r the <code>SizeRequirements</code> object to hold the result,
+   *        if <code>null</code>, a new one is created
+   *
+   * @return the size requirements for this <code>BoxView</code> along
+   *         the specified axis
+   */
+  protected SizeRequirements calculateMinorAxisRequirements(int axis,
+                                                            SizeRequirements r)
+  {
+    // We need to call super here so that the alignment is properly
+    // calculated.
+    SizeRequirements res = super.calculateMinorAxisRequirements(axis, r);
+    res.minimum = (int) layoutPool.getMinimumSpan(axis);
+    res.preferred = (int) layoutPool.getPreferredSpan(axis);
+    res.maximum = (int) layoutPool.getMaximumSpan(axis);
+    return res;
   }
 }

@@ -91,7 +91,7 @@ public abstract class View implements SwingConstants
       {
         int numChildren = getViewCount();
         for (int i = 0; i < numChildren; i++)
-          getView(i).setParent(this);
+          getView(i).setParent(null);
       }
 
     this.parent = parent;

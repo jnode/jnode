@@ -1,5 +1,5 @@
 /* BasicTextUI.java --
-   Copyright (C) 2002, 2003, 2004, 2005  Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005, 2006  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -79,6 +79,7 @@ import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Keymap;
 import javax.swing.text.Position;
+import javax.swing.text.Utilities;
 import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
 
@@ -178,7 +179,7 @@ public abstract class BasicTextUI extends TextUI
         view.setParent(null);
       
       if (v != null)
-        v.setParent(null);
+        v.setParent(this);
 
       view = v;
     }
@@ -875,9 +876,19 @@ public abstract class BasicTextUI extends TextUI
     if (textComponent.isOpaque())
       paintBackground(g);
     
-    if (highlighter != null
-	&& textComponent.getSelectionStart() != textComponent.getSelectionEnd())
+    // Try painting with the highlighter without checking whether there
+    // is a selection because a highlighter can be used to do more than
+    // marking selected text.
+    if (highlighter != null)
+      {
+        // Handle restoring of the color here to prevent
+        // drawing problems when the Highlighter implementor
+        // forgets to restore it.
+        Color oldColor = g.getColor();
       highlighter.paint(g);
+        g.setColor(oldColor);
+      }
+      
 
     rootView.paint(g, getVisibleEditorRect());
 
@@ -943,7 +954,84 @@ public abstract class BasicTextUI extends TextUI
   public void damageRange(JTextComponent t, int p0, int p1,
                           Position.Bias firstBias, Position.Bias secondBias)
   {
-    // TODO: Implement me.
+    try
+      {
+        // Limit p0 and p1 to sane values to prevent unfriendly
+        // BadLocationExceptions. This makes it possible for the highlighter
+        // to send us illegal values which can happen when a large number
+        // of selected characters are removed (eg. by pressing delete
+        // or backspace).
+        // The reference implementation does not throw an exception, too.
+        p0 = Math.min(p0, t.getDocument().getLength());
+        p1 = Math.min(p1, t.getDocument().getLength());
+
+        Rectangle l1 = modelToView(t, p0, firstBias);
+        Rectangle l2 = modelToView(t, p1, secondBias);
+        if (l1.y == l2.y)
+          t.repaint(l1.union(l2));
+        else
+          {
+            // The two rectangles lie on different lines and we need a
+            // different algorithm to calculate the damaged area:
+            // 1. The line of p0 is damaged from the position of p0
+            // to the right border.
+            // 2. All lines between the ones where p0 and p1 lie on
+            // are completely damaged. Use the allocation area to find
+            // out the bounds.
+            // 3. The final line is damaged from the left bound to the
+            // position of p1.
+            Insets insets = t.getInsets();
+
+            // Damage first line until the end.
+            l1.width = insets.right + t.getWidth() - l1.x;
+            t.repaint(l1);
+            
+            // Note: Utilities.getPositionBelow() may return the offset
+            // that was put in. In that case there is no next line and
+            // we should stop searching for one.
+            
+            int posBelow = Utilities.getPositionBelow(t, p0, l1.x);
+            if (posBelow < p1 && posBelow != -1 && posBelow != p0)
+              {
+                // Take the rectangle of the offset we just found and grow it
+                // to the maximum width. Retain y because this is our start
+                // height.
+                Rectangle grow = modelToView(t, posBelow);
+                grow.x = insets.left;
+                grow.width = t.getWidth() + insets.right;
+                
+                // Find further lines which have to be damaged completely.
+                int nextPosBelow = posBelow;
+                while (nextPosBelow < p1 && nextPosBelow != -1 && posBelow != nextPosBelow)
+                  {
+                    posBelow = nextPosBelow;
+                    nextPosBelow = Utilities.getPositionBelow(t, posBelow, l1.x);
+                  }
+                // Now posBelow is an offset on the last line which has to be damaged
+                // completely. (newPosBelow is on the same line as p1)
+                 
+                // Retrieve the rectangle of posBelow and use its y and height
+                // value to calculate the final height of the multiple line
+                // spanning rectangle.
+                Rectangle end = modelToView(t, posBelow);
+                grow.height = end.y + end.height - grow.y;
+                
+                // Mark that area as damage.
+                t.repaint(grow);
+              }
+            
+            // Damage last line from its beginning to the position of p1.
+            l2.width += l2.x;
+            l2.x = insets.left;
+            t.repaint(l2);
+          }
+      }
+    catch (BadLocationException ex)
+      {
+        AssertionError err = new AssertionError("Unexpected bad location");
+        err.initCause(ex);
+        throw err;
+      }
   }
 
   /**
@@ -1129,7 +1217,6 @@ public abstract class BasicTextUI extends TextUI
   protected final void setView(View view)
   {
     rootView.setView(view);
-    view.setParent(rootView);
     textComponent.revalidate();
     textComponent.repaint();
   }

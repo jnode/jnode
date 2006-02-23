@@ -66,9 +66,14 @@ public class ParagraphView extends FlowView implements TabExpander
 
     public float getAlignment(int axis)
     {
-      // FIXME: This is very likely not 100% correct. Work this out.
-      return 0.0F;
+      float align;
+      if (axis == X_AXIS)
+        align = 0.0F; // TODO: Implement according to justification
+      else
+        align = super.getAlignment(axis);
+      return align;
     }
+
     protected void loadChildren(ViewFactory vf)
     {
       // Do nothing here. The children are added while layouting.
@@ -133,17 +138,18 @@ public class ParagraphView extends FlowView implements TabExpander
    */
   public float getAlignment(int axis)
   {
+    float align;
     if (axis == X_AXIS)
-      return 0.0F;
+      align = super.getAlignment(axis);
     else if (getViewCount() > 0)
       {
-
         float prefHeight = getPreferredSpan(Y_AXIS);
         float firstRowHeight = getView(0).getPreferredSpan(Y_AXIS);
-        return (firstRowHeight / 2.F) / prefHeight;
+        align = (firstRowHeight / 2.F) / prefHeight;
       }
     else
-      return 0.0F;
+      align = 0.0F;
+    return align;
   }
 
   /**
@@ -414,5 +420,4 @@ public class ParagraphView extends FlowView implements TabExpander
     // This method is not used.
     return 0;
   }
-
 }

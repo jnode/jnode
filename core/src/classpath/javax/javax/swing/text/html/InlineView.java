@@ -146,6 +146,7 @@ public class InlineView
   protected void setPropertiesFromAttributes()
   {
     // FIXME: Implement this.
+    super.setPropertiesFromAttributes();
   }
 
   /**
