@@ -30,8 +30,8 @@ import java.beans.PropertyVetoException;
 
 final class SwingFrame extends SwingBaseWindow<Frame, SwingFrame> {
 
-    public SwingFrame(Frame awtFrame) {
-        super(awtFrame);
+    public SwingFrame(Frame awtFrame, String title) {
+        super(awtFrame, title);
     }
 
 }
@@ -47,7 +47,7 @@ final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame>
      * Initialize this instance.
      */
     public SwingFramePeer(SwingToolkit toolkit, Frame target) {
-        super(toolkit, target, new SwingFrame(target));
+        super(toolkit, target, new SwingFrame(target, target.getTitle()));
         setResizable(target.isResizable());
         peerComponent.setIconifiable(true);
         peerComponent.setMaximizable(true);

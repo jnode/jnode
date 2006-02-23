@@ -48,12 +48,17 @@ abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBase
     /** The swing peer implementation */
     private SwingBaseWindowPeer<awtT, swingPeerT> swingPeer;
 
+    public SwingBaseWindow(awtT target) {
+        this.target = target;
+    }
+    
     /**
      * Initialize this instance.
      * 
      * @param target
      */
-    public SwingBaseWindow(awtT target) {
+    public SwingBaseWindow(awtT target, String title) {
+        super(title, true, true, true, true);
         this.target = target;
     }
 
