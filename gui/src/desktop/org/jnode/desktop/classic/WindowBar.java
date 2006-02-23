@@ -112,12 +112,14 @@ public class WindowBar extends JPanel {
 
                 public void internalFrameClosed(InternalFrameEvent event) {
                     remove(FrameWrapper.this);
+                    removeFrame(FrameWrapper.this.frame);
                     revalidate();
                     repaint();
                 }
 
                 public void internalFrameClosing(InternalFrameEvent event) {
                     remove(FrameWrapper.this);
+                    removeFrame(FrameWrapper.this.frame);
                     revalidate();
                     repaint();
                 }
@@ -127,11 +129,11 @@ public class WindowBar extends JPanel {
                 }
 
                 public void internalFrameDeiconified(InternalFrameEvent event) {
-                    //To change body of implemented methods use File | Settings | File Templates.
+                    repaint();
                 }
 
                 public void internalFrameIconified(InternalFrameEvent event) {
-                    //To change body of implemented methods use File | Settings | File Templates.
+                    repaint();
                 }
 
                 public void internalFrameOpened(InternalFrameEvent event) {
