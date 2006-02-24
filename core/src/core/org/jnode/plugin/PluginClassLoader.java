@@ -18,18 +18,26 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.plugin;
 
+import java.util.Set;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public abstract class PluginClassLoader extends ClassLoader {
 
-	/**
-	 * Gets the descriptor of the plugin in which this element was declared.
-	 * @return The descriptor
-	 */
-	public abstract PluginDescriptor getDeclaringPluginDescriptor();    
+    /**
+     * Gets the descriptor of the plugin in which this element was declared.
+     * 
+     * @return The descriptor
+     */
+    public abstract PluginDescriptor getDeclaringPluginDescriptor();
+
+    /**
+     * Gets the names of the classes contained in this plugin
+     * @return
+     */
+    public abstract Set<String> getClassNames();
 }
