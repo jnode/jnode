@@ -19,6 +19,7 @@
   </runtime>
 
   <extension point="org.jnode.shell.aliases">
+    <alias name="mauve-plugin" class="org.jnode.test.mauve.PluginTestHarness"/>
     <alias name="mauve-simple" class="org.jnode.test.mauve.SingleTestHarness"/>
   </extension>
 
