@@ -608,13 +608,13 @@ public final class VmSystem {
         Class< ? > dst_class = dst.getClass();
 
         if (!src_class.isArray()) {
-            Unsafe.debug('!');
+            //Unsafe.debug('!');
             throw new ArrayStoreException("src is not an array");
         }
 
         if (!dst_class.isArray()) {
-            Unsafe.debug("dst is not an array:");
-            Unsafe.debug(dst_class.getName());
+            //Unsafe.debug("dst is not an array:");
+            //Unsafe.debug(dst_class.getName());
             throw new ArrayStoreException("dst is not an array");
         }
 
@@ -632,9 +632,9 @@ public final class VmSystem {
         }
 
         if (src_type != dst_type) {
-            Unsafe.debug("invalid array types:");
-            Unsafe.debug(src_class.getName());
-            Unsafe.debug(dst_class.getName());
+            //Unsafe.debug("invalid array types:");
+            //Unsafe.debug(src_class.getName());
+            //Unsafe.debug(dst_class.getName());
             throw new ArrayStoreException("Invalid array types");
         }
 
@@ -659,15 +659,19 @@ public final class VmSystem {
 
         final int srcLen = srcAddr.loadInt(lengthOffset);
         final int dstLen = dstAddr.loadInt(lengthOffset);
+        
+        // Calc end index (if overflow, then will be < 0 )
+        final int srcEnd = srcPos + length;
+        final int dstEnd = dstPos + length;
 
-        if (srcPos + length > srcLen) {
+        if ((srcEnd > srcLen) || (srcEnd < 0)) {
             throw new IndexOutOfBoundsException("srcPos+length > src.length ("
                     + srcPos + "+" + length + " > " + srcLen + ")");
         }
-        if (dstPos + length > dstLen) {
+        if ((dstEnd > dstLen) || (dstEnd < 0)) {
             throw new IndexOutOfBoundsException("dstPos+length > dst.length");
         }
-
+        
         final int elemsize;
         final boolean isObjectArray;
         switch (src_type) {
