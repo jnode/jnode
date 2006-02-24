@@ -92,7 +92,7 @@ public class DirCommand implements Command {
                     sb.setLength(0);
                     lastModified.setTime(f.lastModified());
                     if (f.isFile()) {
-                        String ln = NumberUtils.size(f.length());
+                        String ln = String.valueOf(f.length()).concat("B");
                         int cnt = LEFT_MARGIN - ln.length();
                         for (int j = 0; j < cnt; j++, sb.append(' '))
                             ;
