@@ -29,7 +29,7 @@ public class NumberUtils {
     public static final int K = 1024;
     public static final int M = 1024*1024;
     public static final int G = 1024*1024*1024;
-    public static final int T = 1024*1024*1024*1024;
+    public static final long T = 1024l*1024l*1024l*1024l;
     
     /**
      * Convert a float to a string with a given maximum number of fraction digits.
@@ -50,21 +50,18 @@ public class NumberUtils {
 
 	/**
 	 * Converts a byte to an unsigned value.
-	 * @author markhale
 	 */
 	public static int toUnsigned(final byte b) {
 		return b & 0xFF;
 	}
 	/**
 	 * Converts a short to an unsigned value.
-	 * @author markhale
 	 */
 	public static int toUnsigned(final short s) {
 		return s & 0xFFFF;
 	}
 	/**
 	 * Converts an int to an unsigned value.
-	 * @author markhale
 	 */
 	public static long toUnsigned(final int i) {
 		return i & 0xFFFFFFFFL;
@@ -218,46 +215,49 @@ public class NumberUtils {
 	
 	/** 
 	 * Convert the given value to a size string like 64K
-	 * @param v
-	 * @return
+	 * @param v the size to convert
+	 * @return the text for of the size
 	 */
 	public static String size(long v) {
 	    // Is < 1Kb?
 	    if (v < K) {
-	        return String.valueOf(v) + "b";
+	        return String.valueOf(v) + "B";
 	    }
 	    // Is < 1Mb?
 	    v = v >>> 10;
 	    if (v < K) {
-	        return String.valueOf(v) + "K";
+	        return String.valueOf(v) + "KB";
 	    }
 	    // Is < 1Gb?
 	    v = v >>> 10;
 	    if (v < K) {
-	        return String.valueOf(v) + "M";
+	        return String.valueOf(v) + "MB";
 	    }
 	    // Is < 1Tb?
 	    v = v >>> 10;
 	    if (v < K) {
-	        return String.valueOf(v) + "G";
+	        return String.valueOf(v) + "GB";
 	    }
 	    // Large...
 	    v = v >>> 10;
-    	    return String.valueOf(v) + "T";
+    	    return String.valueOf(v) + "TB";
 	}
     
     /**
      * 
      * @param size a number eventually followed by  a multiplier (K: Kilobytes, M: Megabytes, G:Gigabytes)  
-     * @return
+     * @return the numeric value of the size
      */
     public static long getSize(String size) {
         if((size == null) || size.trim().equals(""))
             return 0;
         
-        int multiplier = 1;     
-        
-	if(size.endsWith("T")) {
+        long multiplier = 1;
+
+        if(size.endsWith("B"))
+            size = size.substring(0, size.length() - 1);
+
+        if(size.endsWith("T")) {
             multiplier = T;
             size = size.substring(0, size.length() - 1);
         } else if(size.endsWith("G")) {
