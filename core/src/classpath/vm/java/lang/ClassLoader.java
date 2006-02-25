@@ -621,6 +621,29 @@ public abstract class ClassLoader {
     }
 
     /**
+    * Called whenever all locations of a named resource are needed.
+    * It is called by <code>getResources()</code> after it has called
+    * <code>parent.getResources()</code>. The results are combined by
+    * the <code>getResources()</code> method.
+    *
+    * <p>The default implementation always returns an empty Enumeration.
+    * Subclasses should override it when they can provide an Enumeration of
+    * URLs (possibly just one element) to the named resource.
+    * The first URL of the Enumeration should be the same as the one
+    * returned by <code>findResource</code>.
+    *
+    * @param name the name of the resource to be found
+    * @return a possibly empty Enumeration of URLs to the named resource
+    * @throws IOException if I/O errors occur in the process
+    * @since 1.2
+    */
+    protected Enumeration findResources(String name) throws IOException
+    {
+    return EmptyEnumeration.getInstance();
+    }
+
+
+    /**
      * Returns the Package object for the requested package name. It returns
      * null when the package is not defined by this classloader or one of its
      * parents.

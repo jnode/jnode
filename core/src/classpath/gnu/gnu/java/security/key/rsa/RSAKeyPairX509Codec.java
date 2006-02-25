@@ -46,6 +46,7 @@ import gnu.java.security.der.DERReader;
 import gnu.java.security.der.DERValue;
 import gnu.java.security.der.DERWriter;
 import gnu.java.security.key.IKeyPairCodec;
+import gnu.java.security.util.DerUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -65,18 +66,6 @@ public class RSAKeyPairX509Codec
   private static final OID RSA_ALG_OID = new OID(Registry.RSA_OID_STRING);
 
   // implicit 0-arguments constructor
-
-  private static void checkIsConstructed(DERValue v, String msg)
-  {
-    if (! v.isConstructed())
-      throw new InvalidParameterException(msg);
-  }
-
-  private static void checkIsBigInteger(DERValue v, String msg)
-  {
-    if (! (v.getValue() instanceof BigInteger))
-      throw new InvalidParameterException(msg);
-  }
 
   public int getFormatID()
   {
@@ -193,10 +182,10 @@ public class RSAKeyPairX509Codec
     try
       {
         DERValue derSPKI = der.read();
-        checkIsConstructed(derSPKI, "Wrong SubjectPublicKeyInfo field");
+        DerUtil.checkIsConstructed(derSPKI, "Wrong SubjectPublicKeyInfo field");
 
         DERValue derAlgorithmID = der.read();
-        checkIsConstructed(derAlgorithmID, "Wrong AlgorithmIdentifier field");
+        DerUtil.checkIsConstructed(derAlgorithmID, "Wrong AlgorithmIdentifier field");
 
         DERValue derOID = der.read();
         if (! (derOID.getValue() instanceof OID))
@@ -214,13 +203,13 @@ public class RSAKeyPairX509Codec
 
         der = new DERReader(spkBytes);
         val = der.read();
-        checkIsConstructed(derAlgorithmID, "Wrong subjectPublicKey field");
+        DerUtil.checkIsConstructed(derAlgorithmID, "Wrong subjectPublicKey field");
 
         val = der.read();
-        checkIsBigInteger(val, "Wrong modulus field");
+        DerUtil.checkIsBigInteger(val, "Wrong modulus field");
         n = (BigInteger) val.getValue();
         val = der.read();
-        checkIsBigInteger(val, "Wrong publicExponent field");
+        DerUtil.checkIsBigInteger(val, "Wrong publicExponent field");
         e = (BigInteger) val.getValue();
       }
     catch (IOException x)

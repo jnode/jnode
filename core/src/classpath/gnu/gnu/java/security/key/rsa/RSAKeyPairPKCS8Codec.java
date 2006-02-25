@@ -53,6 +53,7 @@ import gnu.java.security.der.DERReader;
 import gnu.java.security.der.DERValue;
 import gnu.java.security.der.DERWriter;
 import gnu.java.security.key.IKeyPairCodec;
+import gnu.java.security.util.DerUtil;
 
 /**
  * An implementation of an {@link IKeyPairCodec} that knows how to encode /
@@ -64,18 +65,6 @@ public class RSAKeyPairPKCS8Codec
   private static final OID RSA_ALG_OID = new OID(Registry.RSA_OID_STRING);
 
   // implicit 0-arguments constructor
-
-  private static void checkIsConstructed(DERValue v, String msg)
-  {
-    if (! v.isConstructed())
-      throw new InvalidParameterException(msg);
-  }
-
-  private static void checkIsBigInteger(DERValue v, String msg)
-  {
-    if (! (v.getValue() instanceof BigInteger))
-      throw new InvalidParameterException(msg);
-  }
 
   public int getFormatID()
   {
@@ -227,16 +216,16 @@ public class RSAKeyPairPKCS8Codec
     try
       {
         DERValue derPKI = der.read();
-        checkIsConstructed(derPKI, "Wrong PrivateKeyInfo field");
+        DerUtil.checkIsConstructed(derPKI, "Wrong PrivateKeyInfo field");
 
         DERValue derVersion = der.read();
-        checkIsBigInteger(derVersion, "Wrong Version field");
+        DerUtil.checkIsBigInteger(derVersion, "Wrong Version field");
         version = (BigInteger) derVersion.getValue();
         if (version.compareTo(BigInteger.ZERO) != 0)
           throw new InvalidParameterException("Unexpected Version: " + version);
 
         DERValue derAlgoritmID = der.read();
-        checkIsConstructed(derAlgoritmID, "Wrong AlgorithmIdentifier field");
+        DerUtil.checkIsConstructed(derAlgoritmID, "Wrong AlgorithmIdentifier field");
 
         DERValue derOID = der.read();
         OID algOID = (OID) derOID.getValue();
@@ -248,38 +237,38 @@ public class RSAKeyPairPKCS8Codec
 
         der = new DERReader(pkBytes);
         DERValue derRSAPrivateKey = der.read();
-        checkIsConstructed(derRSAPrivateKey, "Wrong RSAPrivateKey field");
+        DerUtil.checkIsConstructed(derRSAPrivateKey, "Wrong RSAPrivateKey field");
         
         val = der.read();
-        checkIsBigInteger(val, "Wrong RSAPrivateKey Version field");
+        DerUtil.checkIsBigInteger(val, "Wrong RSAPrivateKey Version field");
         version = (BigInteger) val.getValue();
         if (version.compareTo(BigInteger.ZERO) != 0)
           throw new InvalidParameterException("Unexpected RSAPrivateKey Version: "
                                               + version);
 
         val = der.read();
-        checkIsBigInteger(val, "Wrong modulus field");
+        DerUtil.checkIsBigInteger(val, "Wrong modulus field");
         n = (BigInteger) val.getValue();
         val = der.read();
-        checkIsBigInteger(val, "Wrong publicExponent field");
+        DerUtil.checkIsBigInteger(val, "Wrong publicExponent field");
         e = (BigInteger) val.getValue();
         val = der.read();
-        checkIsBigInteger(val, "Wrong privateExponent field");
+        DerUtil.checkIsBigInteger(val, "Wrong privateExponent field");
         d = (BigInteger) val.getValue();
         val = der.read();
-        checkIsBigInteger(val, "Wrong prime1 field");
+        DerUtil.checkIsBigInteger(val, "Wrong prime1 field");
         p = (BigInteger) val.getValue();
         val = der.read();
-        checkIsBigInteger(val, "Wrong prime2 field");
+        DerUtil.checkIsBigInteger(val, "Wrong prime2 field");
         q = (BigInteger) val.getValue();
         val = der.read();
-        checkIsBigInteger(val, "Wrong exponent1 field");
+        DerUtil.checkIsBigInteger(val, "Wrong exponent1 field");
         dP = (BigInteger) val.getValue();
         val = der.read();
-        checkIsBigInteger(val, "Wrong exponent2 field");
+        DerUtil.checkIsBigInteger(val, "Wrong exponent2 field");
         dQ = (BigInteger) val.getValue();
         val = der.read();
-        checkIsBigInteger(val, "Wrong coefficient field");
+        DerUtil.checkIsBigInteger(val, "Wrong coefficient field");
         qInv = (BigInteger) val.getValue();
       }
     catch (IOException x)

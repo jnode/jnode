@@ -89,6 +89,7 @@ public class DSSKeyFactory extends KeyFactorySpi
         try
           {
             result = new DSSKeyPairX509Codec().decodePublicKey(encoded);
+            return result;
           }
         catch (RuntimeException x)
           {
@@ -122,6 +123,7 @@ public class DSSKeyFactory extends KeyFactorySpi
         try
           {
             result = new DSSKeyPairPKCS8Codec().decodePrivateKey(encoded);
+            return result;
           }
         catch (RuntimeException x)
           {

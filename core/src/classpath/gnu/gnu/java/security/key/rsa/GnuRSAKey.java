@@ -40,7 +40,7 @@ package gnu.java.security.key.rsa;
 
 import gnu.java.security.Registry;
 import gnu.java.security.key.IKeyPairCodec;
-import gnu.java.security.key.KeyPairCodecFactory;
+import gnu.java.security.util.FormatUtil;
 
 import java.math.BigInteger;
 import java.security.Key;
@@ -118,7 +118,7 @@ public abstract class GnuRSAKey implements Key, RSAKey
 
   public String getFormat()
   {
-    return KeyPairCodecFactory.getEncodingShortName(defaultFormat);
+    return FormatUtil.getEncodingShortName(defaultFormat);
   }
 
   // Other instance methods --------------------------------------------------
