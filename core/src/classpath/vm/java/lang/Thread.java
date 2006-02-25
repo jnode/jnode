@@ -120,8 +120,18 @@ public class Thread implements Runnable {
         return MonitorManager.holdsLock(obj);
     }
 
+    /**
+     * Has the current thread been interrupted.
+     * The interrupted flag is cleared.
+     * @return
+     */
     public static boolean interrupted() {
-        return currentThread().isInterrupted();
+        VmThread current = VmThread.currentThread();
+        if (current != null) {
+            return current.isInterrupted(true);
+        } else {
+            return false;
+        }
     }
 
     public static void sleep(long millis) throws InterruptedException {
@@ -410,8 +420,12 @@ public class Thread implements Runnable {
         return daemon;
     }
 
+    /**
+     * Has this thread been interrupted
+     * @return
+     */
     public boolean isInterrupted() {
-        return vmThread.isInterrupted();
+        return vmThread.isInterrupted(false);
     }
 
     /**
@@ -439,6 +453,11 @@ public class Thread implements Runnable {
      * wait/notify for some other purpose.
      */
     public final synchronized void join() throws InterruptedException {
+        // Test interrupted status
+        if (vmThread.isInterrupted(true)) {
+            throw new InterruptedException();
+        }
+        
         while (isAlive()) {
             /* wait sets this.state = WAITING; */
             wait();
@@ -451,6 +470,11 @@ public class Thread implements Runnable {
         if (millis == 0) {
             join();
         } else {
+            // Test interrupted status
+            if (vmThread.isInterrupted(true)) {
+                throw new InterruptedException();
+            }
+            
             final long stopTime = VmSystem.currentKernelMillis() + millis;
             while (isAlive() && (millis > 0)) {
                 /* wait sets this.state = WAITING; */
