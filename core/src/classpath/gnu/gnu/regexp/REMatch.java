@@ -1,5 +1,5 @@
 /* gnu/regexp/REMatch.java
-   Copyright (C) 1998-2001, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -69,6 +69,8 @@ public final class REMatch implements Serializable, Cloneable {
     REMatch next; // other possibility (to avoid having to use arrays)
     boolean empty; // empty string matched. This flag is used only within
 		   // RETokenRepeated.
+    int matchFlags; // flags passed to match methods
+    static final int MF_FIND_ALL = 0x01;
 
     public Object clone() {
 	try {

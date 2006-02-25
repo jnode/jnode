@@ -281,16 +281,16 @@ public class TMMH16 extends BaseMac implements Cloneable
       result.keystream = (IRandom) this.keystream.clone();
 
     if (this.prefix != null)
-      result.prefix = (byte[])this.prefix.clone();
+      result.prefix = (byte[]) this.prefix.clone();
 
     if (this.context != null)
-      result.context = (int[])this.context.clone();
+      result.context = (int[]) this.context.clone();
 
     if (this.K0 != null)
-      result.K0 = (int[])this.K0.clone();
+      result.K0 = (int[]) this.K0.clone();
 
     if (this.Ki != null)
-      result.Ki = (int[])this.Ki.clone();
+      result.Ki = (int[]) this.Ki.clone();
 
     return result;
   }

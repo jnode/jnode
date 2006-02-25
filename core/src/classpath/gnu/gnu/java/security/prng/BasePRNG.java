@@ -188,7 +188,7 @@ public abstract class BasePRNG implements IRandom
   {
     BasePRNG result = (BasePRNG) super.clone();
     if (this.buffer != null)
-      result.buffer = (byte[])this.buffer.clone();
+      result.buffer = (byte[]) this.buffer.clone();
 
     return result;
   }

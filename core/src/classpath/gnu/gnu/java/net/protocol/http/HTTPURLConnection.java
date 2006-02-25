@@ -70,13 +70,6 @@ public class HTTPURLConnection
   extends HttpsURLConnection
   implements HandshakeCompletedListener
 {
-
-  /**
-   * Pool of reusable connections, used if keepAlive is true.
-   */
-  private static final LinkedHashMap connectionPool = new LinkedHashMap();
-  static int maxConnections;
-
   /*
    * The underlying connection.
    */
@@ -134,9 +127,6 @@ public class HTTPURLConnection
       agent = System.getProperty("http.agent");
       String ka = System.getProperty("http.keepAlive");
       keepAlive = !(ka != null && "false".equals(ka));
-      String mc = System.getProperty("http.maxConnections");
-      maxConnections = (mc != null && mc.length() > 0) ?
-        Math.max(Integer.parseInt(mc), 1) : 5;
       return null;
     }
 
@@ -366,16 +356,7 @@ public class HTTPURLConnection
     HTTPConnection connection;
     if (keepAlive)
       {
-        Object key = HTTPConnection.getPoolKey(host, port, secure);
-        synchronized (connectionPool)
-          {
-            connection = (HTTPConnection) connectionPool.remove(key);
-            if (connection == null)
-              {
-                connection = new HTTPConnection(host, port, secure);
-                connection.setPool(connectionPool);
-              }
-          }
+        connection = HTTPConnection.Pool.instance.get(host, port, secure);
       }
     else
       {
