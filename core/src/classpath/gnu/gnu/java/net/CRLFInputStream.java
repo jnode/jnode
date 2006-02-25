@@ -145,13 +145,14 @@ public class CRLFInputStream
     throws IOException
   {
     doReset = false;
-    int lm1 = len - 1;
-    for (int i = off; i < len; i++)
+    int end = off + len;
+    int em1 = end - 1;
+    for (int i = off; i < end; i++)
       {
         if (b[i] == CR)
           {
             int d;
-            if (i == lm1)
+            if (i == em1)
               {
                 d = in.read();
                 doReset = true;

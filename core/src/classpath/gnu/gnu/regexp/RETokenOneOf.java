@@ -187,6 +187,8 @@ final class RETokenOneOf extends REToken {
   }
 
     private boolean matchP(CharIndexed input, REMatch mymatch, boolean tryOnly) {
+      boolean stopMatchingIfSatisfied =
+	  (mymatch.matchFlags & REMatch.MF_FIND_ALL) == 0;
     REMatch.REMatchList newMatch = new REMatch.REMatchList();
     REToken tk;
     for (int i=0; i < options.size(); i++) {
@@ -204,6 +206,7 @@ final class RETokenOneOf extends REToken {
 	if (tk.match(input, tryMatch)) { // match was successful
 	  if (tryOnly) return true;
 	    newMatch.addTail(tryMatch);
+	  if (stopMatchingIfSatisfied) break;
 	} // is a match
     } // try next option
       if (tryOnly) return false;
