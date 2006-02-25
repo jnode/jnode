@@ -88,7 +88,10 @@ class MetalUtils
   static void fillMetalPattern(Component c, Graphics g, int x, int y, int w, int h,
                                 Color light, Color dark)
   {
-    if (g instanceof Graphics2D)
+    //if (g instanceof Graphics2D)
+
+    if (false /* we don't have propper g2d in jnode yet, use the simple graphics here*/
+            && g instanceof Graphics2D)  
       fillMetalPattern2D((Graphics2D) g, x, y, w, h, light, dark);
     else
       {
