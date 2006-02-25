@@ -44,18 +44,30 @@ public class PluginTestHarness extends TestHarness {
 
     private boolean verbose = false;
 
+    private boolean checkpointResult = true;
+
     private String last_check;
+
+    private int passed = 0;
+
+    private int failed = 0;
 
     public PluginTestHarness(Testlet t) {
         className = t.getClass().getName();
     }
 
     public void check(boolean result) {
+        checkpointResult &= result;
         if (!result) {
             String message = (result ? "PASS" : "FAIL") + ": " + className
                     + ((last_check == null) ? "" : (": " + last_check))
                     + " (number " + count + ")";
             System.out.println(message);
+        }
+        if (result) {
+            passed++;
+        } else {
+            failed++;
         }
         count++;
     }
@@ -112,7 +124,8 @@ public class PluginTestHarness extends TestHarness {
     public void checkPoint(String name) {
         last_check = name;
         count = 0;
-        //System.out.println("# " + name);
+        checkpointResult = true;
+        // System.out.println("# " + name);
     }
 
     public void verbose(String message) {
@@ -151,33 +164,75 @@ public class PluginTestHarness extends TestHarness {
         }
     }
 
+    private static void usage() {
+        System.out.println("Usage: mauve-plugin <test-plugin> [filter]");
+    }
+
     public static void main(String[] args) throws Exception {
-        if (args.length > 0) {
-            String name = args[0];
-            PluginManager pm = InitialNaming.lookup(PluginManager.NAME);
-            PluginDescriptor descr = pm.getRegistry().getPluginDescriptor(name);
-            ClassLoader cl = descr.getPluginClassLoader();
-            if (cl instanceof PluginClassLoader) {
-                PluginClassLoader pcl = (PluginClassLoader) cl;
-                for (String className : pcl.getClassNames()) {
-                    try {
-                        Class k = pcl.loadClass(className);
-                        if (Testlet.class.isAssignableFrom(k)) {
-                            System.out.println("Running " + className);
-                            Testlet t = (Testlet) k.newInstance();
-                            TestHarness h = new PluginTestHarness(t);
-                            t.test(h);
-                        }
-                    } catch (Throwable ex) {
-                        System.out.println("Exception in " + className);
-                        ex.printStackTrace();
-                    }
+
+        // Parse arguments
+        String name = null;
+        String filter = null;
+        boolean stopOnFail = true;
+
+        int argIndex = 0;
+        for (; argIndex < args.length; argIndex++) {
+            String arg = args[argIndex];
+            if ((arg.charAt(0) == '/') || (arg.charAt(0) == '-')) {
+                arg = arg.substring(1);
+                if (arg == "continue") {
+                    stopOnFail = false;
+                } else {
+                    System.out.println("Unknown argument " + args[argIndex]);
                 }
             } else {
-                System.out.println("Plugin has no PluginClassLoader");
+                break;
             }
+        }
+        name = (argIndex < args.length) ? args[argIndex++] : null;
+        filter = (argIndex < args.length) ? args[argIndex++] : "";
+
+        if (name == null) {
+            usage();
         } else {
-            System.out.println("Usage: mauve-plugin <test-plugin>");
+            PluginManager pm = InitialNaming.lookup(PluginManager.NAME);
+            PluginDescriptor descr = pm.getRegistry().getPluginDescriptor(name);
+            if (descr == null) {
+                System.out.println("Plugin " + name + " not found");
+            } else {
+                int passed = 0;
+                int failed = 0;
+                ClassLoader cl = descr.getPluginClassLoader();
+                if (cl instanceof PluginClassLoader) {
+                    PluginClassLoader pcl = (PluginClassLoader) cl;
+                    for (String className : pcl.getClassNames()) {
+                        if (className.startsWith(filter)) {
+                            try {
+                                Class k = pcl.loadClass(className);
+                                if (Testlet.class.isAssignableFrom(k)) {
+                                    System.out.println("Running " + className);
+                                    Testlet t = (Testlet) k.newInstance();
+                                    PluginTestHarness h = new PluginTestHarness(
+                                            t);
+                                    t.test(h);
+                                    passed += h.passed;
+                                    failed += h.failed;
+                                    if (!h.checkpointResult && stopOnFail) {
+                                        break;
+                                    }
+                                }
+                            } catch (Throwable ex) {
+                                System.out.println("Exception in " + className);
+                                ex.printStackTrace();
+                            }
+                        }
+                    }
+                    System.out.println("Tests passed: " + passed + ", failed: "
+                            + failed);
+                } else {
+                    System.out.println("Plugin has no PluginClassLoader");
+                }
+            }
         }
     }
 }
