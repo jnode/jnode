@@ -54,6 +54,7 @@ import gnu.java.security.der.DERReader;
 import gnu.java.security.der.DERValue;
 import gnu.java.security.der.DERWriter;
 import gnu.java.security.key.IKeyPairCodec;
+import gnu.java.security.util.DerUtil;
 
 public class DHKeyPairX509Codec
     implements IKeyPairCodec
@@ -61,18 +62,6 @@ public class DHKeyPairX509Codec
   private static final OID DH_ALG_OID = new OID(Registry.DH_OID_STRING);
 
   // implicit 0-arguments constructor
-
-  private static void checkIsConstructed(DERValue v, String msg)
-  {
-    if (! v.isConstructed())
-      throw new InvalidParameterException(msg);
-  }
-
-  private static void checkIsBigInteger(DERValue v, String msg)
-  {
-    if (! (v.getValue() instanceof BigInteger))
-      throw new InvalidParameterException(msg);
-  }
 
   public int getFormatID()
   {
@@ -198,10 +187,10 @@ public class DHKeyPairX509Codec
     try
       {
         DERValue derSPKI = der.read();
-        checkIsConstructed(derSPKI, "Wrong SubjectPublicKeyInfo field");
+        DerUtil.checkIsConstructed(derSPKI, "Wrong SubjectPublicKeyInfo field");
 
         DERValue derAlgorithmID = der.read();
-        checkIsConstructed(derAlgorithmID, "Wrong AlgorithmIdentifier field");
+        DerUtil.checkIsConstructed(derAlgorithmID, "Wrong AlgorithmIdentifier field");
 
         DERValue derOID = der.read();
         if (! (derOID.getValue() instanceof OID))
@@ -212,16 +201,16 @@ public class DHKeyPairX509Codec
           throw new InvalidParameterException("Unexpected OID: " + algOID);
 
         DERValue derParams = der.read();
-        checkIsConstructed(derParams, "Wrong DH Parameters field");
+        DerUtil.checkIsConstructed(derParams, "Wrong DH Parameters field");
 
         DERValue val = der.read();
-        checkIsBigInteger(val, "Wrong P field");
+        DerUtil.checkIsBigInteger(val, "Wrong P field");
         p = (BigInteger) val.getValue();
         val = der.read();
-        checkIsBigInteger(val, "Wrong G field");
+        DerUtil.checkIsBigInteger(val, "Wrong G field");
         g = (BigInteger) val.getValue();
         val = der.read();
-        checkIsBigInteger(val, "Wrong Q field");
+        DerUtil.checkIsBigInteger(val, "Wrong Q field");
         q = (BigInteger) val.getValue();
 
         val = der.read();
@@ -232,7 +221,7 @@ public class DHKeyPairX509Codec
 
         DERReader dhPub = new DERReader(yBytes);
         val = dhPub.read();
-        checkIsBigInteger(val, "Wrong Y field");
+        DerUtil.checkIsBigInteger(val, "Wrong Y field");
         y = (BigInteger) val.getValue();
       }
     catch (IOException x)

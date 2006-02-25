@@ -53,6 +53,7 @@ import gnu.java.security.der.DERReader;
 import gnu.java.security.der.DERValue;
 import gnu.java.security.der.DERWriter;
 import gnu.java.security.key.IKeyPairCodec;
+import gnu.java.security.util.DerUtil;
 import gnu.java.security.util.Util;
 
 public class DHKeyPairPKCS8Codec
@@ -61,18 +62,6 @@ public class DHKeyPairPKCS8Codec
   private static final OID DH_ALG_OID = new OID(Registry.DH_OID_STRING);
 
   // implicit 0-arguments constructor
-
-  private static void checkIsConstructed(DERValue v, String msg)
-  {
-    if (! v.isConstructed())
-      throw new InvalidParameterException(msg);
-  }
-
-  private static void checkIsBigInteger(DERValue v, String msg)
-  {
-    if (! (v.getValue() instanceof BigInteger))
-      throw new InvalidParameterException(msg);
-  }
 
   public int getFormatID()
   {
@@ -193,7 +182,7 @@ public class DHKeyPairPKCS8Codec
     try
       {
         DERValue derPKI = der.read();
-        checkIsConstructed(derPKI, "Wrong PrivateKeyInfo field");
+        DerUtil.checkIsConstructed(derPKI, "Wrong PrivateKeyInfo field");
 
         DERValue derVersion = der.read();
         if (! (derVersion.getValue() instanceof BigInteger))
@@ -204,7 +193,7 @@ public class DHKeyPairPKCS8Codec
           throw new InvalidParameterException("Unexpected Version: " + version);
 
         DERValue derAlgoritmID = der.read();
-        checkIsConstructed(derAlgoritmID, "Wrong AlgorithmIdentifier field");
+        DerUtil.checkIsConstructed(derAlgoritmID, "Wrong AlgorithmIdentifier field");
 
         DERValue derOID = der.read();
         OID algOID = (OID) derOID.getValue();
@@ -212,16 +201,16 @@ public class DHKeyPairPKCS8Codec
           throw new InvalidParameterException("Unexpected OID: " + algOID);
 
         DERValue derParams = der.read();
-        checkIsConstructed(derParams, "Wrong DSS Parameters field");
+        DerUtil.checkIsConstructed(derParams, "Wrong DSS Parameters field");
 
         DERValue val = der.read();
-        checkIsBigInteger(val, "Wrong P field");
+        DerUtil.checkIsBigInteger(val, "Wrong P field");
         p = (BigInteger) val.getValue();
         val = der.read();
-        checkIsBigInteger(val, "Wrong G field");
+        DerUtil.checkIsBigInteger(val, "Wrong G field");
         g = (BigInteger) val.getValue();
         val = der.read();
-        checkIsBigInteger(val, "Wrong Q field");
+        DerUtil.checkIsBigInteger(val, "Wrong Q field");
         q = (BigInteger) val.getValue();
 
         val = der.read();

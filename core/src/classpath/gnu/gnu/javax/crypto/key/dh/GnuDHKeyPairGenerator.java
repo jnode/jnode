@@ -52,6 +52,7 @@ import java.security.SecureRandom;
 import java.util.Map;
 
 import javax.crypto.spec.DHGenParameterSpec;
+import javax.crypto.spec.DHParameterSpec;
 
 /**
  * <p>An implementation of a Diffie-Hellman keypair generator.</p>
@@ -92,8 +93,8 @@ public class GnuDHKeyPairGenerator implements IKeyPairGenerator
   public static final String SOURCE_OF_RANDOMNESS = "gnu.crypto.dh.prng";
 
   /**
-   * Property name of an optional {@link DHGenParameterSpec} instance to use
-   * for this generator.
+   * Property name of an optional {@link DHGenParameterSpec} or
+   * {@link DHParameterSpec} instance to use for this generator.
    */
   public static final String DH_PARAMETERS = "gnu.crypto.dh.params";
 
@@ -112,10 +113,10 @@ public class GnuDHKeyPairGenerator implements IKeyPairGenerator
 
   /** Default value for the size in bits of the public prime (p). */
   //   private static final int DEFAULT_PRIME_SIZE = 1024;
-  private static final int DEFAULT_PRIME_SIZE = 512;
+  public static final int DEFAULT_PRIME_SIZE = 512;
 
   /** Default value for the size in bits of the private exponent (x). */
-  private static final int DEFAULT_EXPONENT_SIZE = 160;
+  public static final int DEFAULT_EXPONENT_SIZE = 160;
 
   /** Default encoding format to use when none was specified. */
   private static final int DEFAULT_ENCODING_FORMAT = Registry.RAW_ENCODING_ID;
@@ -175,13 +176,20 @@ public class GnuDHKeyPairGenerator implements IKeyPairGenerator
 
     // are we given a set of Diffie-Hellman generation parameters or we shall
     // use our own?
-    DHGenParameterSpec params = (DHGenParameterSpec) attributes.get(DH_PARAMETERS);
+    Object params = attributes.get(DH_PARAMETERS);
 
     // find out the desired sizes
-    if (params != null)
+    if (params instanceof DHGenParameterSpec)
       {
-        l = params.getPrimeSize();
-        m = params.getExponentSize();
+        DHGenParameterSpec jceSpec = (DHGenParameterSpec) params;
+        l = jceSpec.getPrimeSize();
+        m = jceSpec.getExponentSize();
+      }
+    else if (params instanceof DHParameterSpec)
+      {
+        DHParameterSpec jceSpec = (DHParameterSpec) params;
+        l = jceSpec.getP().bitLength();
+        m = jceSpec.getL();
       }
     else
       {

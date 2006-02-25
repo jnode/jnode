@@ -1,5 +1,5 @@
 /* ZipOutputStream.java --
-   Copyright (C) 2001, 2004, 2005  Free Software Foundation, Inc.
+   Copyright (C) 2001, 2004, 2005, 2006  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -161,6 +161,16 @@ public class ZipOutputStream extends DeflaterOutputStream implements ZipConstant
 	}
 
 	/**
+   * Write a long value as an int.  Some of the zip constants
+   * are declared as longs even though they fit perfectly well
+   * into integers.
+   */
+  private void writeLeInt(long value) throws IOException
+  {
+    writeLeInt((int) value);
+  }
+
+  /**
 	 * Starts a new Zip entry. It automatically closes the previous
 	 * entry if present.  If the compression method is stored, the entry
 	 * must have a valid size and crc, otherwise all elements (except

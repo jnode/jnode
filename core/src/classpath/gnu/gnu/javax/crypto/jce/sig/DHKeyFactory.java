@@ -88,6 +88,7 @@ public class DHKeyFactory
         try
           {
             result = new DHKeyPairX509Codec().decodePublicKey(encoded);
+            return result;
           }
         catch (RuntimeException x)
           {
@@ -120,6 +121,7 @@ public class DHKeyFactory
         try
           {
             result = new DHKeyPairPKCS8Codec().decodePrivateKey(encoded);
+            return result;
           }
         catch (RuntimeException x)
           {

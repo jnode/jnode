@@ -159,7 +159,7 @@ public class DSSKeyPairGenerator implements IKeyPairGenerator
   public static final String PREFERRED_ENCODING_FORMAT = "gnu.crypto.dss.encoding";
 
   /** Default value for the modulus length. */
-  private static final int DEFAULT_MODULUS_LENGTH = 1024;
+  public static final int DEFAULT_MODULUS_LENGTH = 1024;
 
   /** Default encoding format to use when none was specified. */
   private static final int DEFAULT_ENCODING_FORMAT = Registry.RAW_ENCODING_ID;

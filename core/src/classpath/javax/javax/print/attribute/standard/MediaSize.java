@@ -87,7 +87,7 @@ public class MediaSize extends Size2DSyntax
       tmp = MediaSize.Other.EXECUTIVE;
     }
   
-  private MediaSizeName media;
+  private MediaSizeName mediaName;
   
   /**
    * Creates a <code>MediaSize</code> object. The created object will be added 
@@ -128,7 +128,7 @@ public class MediaSize extends Size2DSyntax
   public MediaSize(float x, float y, int units, MediaSizeName media)
   {
     super(x, y, units);
-    this.media = media;
+    mediaName = media;
     mediaCache.add(this);
   }
   
@@ -171,7 +171,7 @@ public class MediaSize extends Size2DSyntax
   public MediaSize(int x, int y, int units, MediaSizeName media)
   {
     super(x, y, units);
-    this.media = media;
+    mediaName = media;
     mediaCache.add(this);
   }
   
@@ -273,7 +273,7 @@ public class MediaSize extends Size2DSyntax
    */
   public MediaSizeName getMediaSizeName()
   {
-    return media;
+    return mediaName;
   }
 
   /**

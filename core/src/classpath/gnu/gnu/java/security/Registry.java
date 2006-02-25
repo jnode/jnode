@@ -223,9 +223,15 @@ public interface Registry
 
   String DSS_SIG = "dss";
 
-  String RSA_PSS_SIG = "rsa-pss";
+  String RSA_SIG_PREFIX = "rsa-";
 
-  String RSA_PKCS1_V1_5_SIG = "rsa-pkcs1-v1.5";
+  String RSA_PSS_ENCODING = "pss";
+
+  String RSA_PSS_SIG = RSA_SIG_PREFIX + RSA_PSS_ENCODING;
+
+  String RSA_PKCS1_V1_5_ENCODING = "pkcs1-v1.5";
+
+  String RSA_PKCS1_V1_5_SIG = RSA_SIG_PREFIX + RSA_PKCS1_V1_5_ENCODING;
 
   /** DSA is synonymous to DSS. */
   String DSA_SIG = "dsa";
@@ -308,6 +314,9 @@ public interface Registry
 
   byte[] MAGIC_RAW_RSA_PSS_SIGNATURE = new byte[] { 0x47, RAW_ENCODING_ID,
                                                    0x52, 0x53 };
+
+  byte[] MAGIC_RAW_RSA_PKCS1V1_5_SIGNATURE = new byte[] { 0x47, RAW_ENCODING_ID,
+                                                          0x52, 0x54 };
 
   byte[] MAGIC_RAW_DH_PUBLIC_KEY = new byte[] { 0x47, RAW_ENCODING_ID, 0x48,
                                                0x50 };
