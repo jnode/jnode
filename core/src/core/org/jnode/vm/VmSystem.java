@@ -319,7 +319,8 @@ public final class VmSystem {
      */
     public static int getHashCode(Object obj) {
         if (obj == null) {
-            throw new NullPointerException();
+            // According to spec, null has zero as hashcode.
+            return 0;
         } else {
             return ObjectReference.fromObject(obj).toAddress().toInt();
         }
