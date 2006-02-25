@@ -40,11 +40,9 @@ import org.jnode.plugin.PluginManager;
 public class PluginTestHarness extends TestHarness {
     private int count;
 
-    private String className;
+    private final String className;
 
-    private boolean verbose = false;
-
-    private boolean checkpointResult = true;
+    private final boolean verbose;
 
     private String last_check;
 
@@ -52,13 +50,13 @@ public class PluginTestHarness extends TestHarness {
 
     private int failed = 0;
 
-    public PluginTestHarness(Testlet t) {
+    public PluginTestHarness(Testlet t, boolean verbose) {
         className = t.getClass().getName();
+        this.verbose = verbose;
     }
 
     public void check(boolean result) {
-        checkpointResult &= result;
-        if (!result) {
+        if (!result || verbose) {
             String message = (result ? "PASS" : "FAIL") + ": " + className
                     + ((last_check == null) ? "" : (": " + last_check))
                     + " (number " + count + ")";
@@ -124,7 +122,6 @@ public class PluginTestHarness extends TestHarness {
     public void checkPoint(String name) {
         last_check = name;
         count = 0;
-        checkpointResult = true;
         // System.out.println("# " + name);
     }
 
@@ -174,14 +171,20 @@ public class PluginTestHarness extends TestHarness {
         String name = null;
         String filter = null;
         boolean stopOnFail = true;
+        boolean verbose = false;
+        boolean quiet = false;
 
         int argIndex = 0;
         for (; argIndex < args.length; argIndex++) {
             String arg = args[argIndex];
             if ((arg.charAt(0) == '/') || (arg.charAt(0) == '-')) {
                 arg = arg.substring(1);
-                if (arg == "continue") {
+                if (arg.equals("c") || arg.equals("continue")) {
                     stopOnFail = false;
+                } else if (arg.equals("v") || arg.equals("verbose")) {
+                    verbose = true;
+                } else if (arg.equals("q") || arg.equals("quiet")) {
+                    quiet = true;
                 } else {
                     System.out.println("Unknown argument " + args[argIndex]);
                 }
@@ -210,14 +213,17 @@ public class PluginTestHarness extends TestHarness {
                             try {
                                 Class k = pcl.loadClass(className);
                                 if (Testlet.class.isAssignableFrom(k)) {
-                                    System.out.println("Running " + className);
+                                    if (!quiet) {
+                                        System.out.println("Running "
+                                                + className);
+                                    }
                                     Testlet t = (Testlet) k.newInstance();
                                     PluginTestHarness h = new PluginTestHarness(
-                                            t);
+                                            t, verbose);
                                     t.test(h);
                                     passed += h.passed;
                                     failed += h.failed;
-                                    if (!h.checkpointResult && stopOnFail) {
+                                    if ((h.failed > 0) && stopOnFail) {
                                         break;
                                     }
                                 }
