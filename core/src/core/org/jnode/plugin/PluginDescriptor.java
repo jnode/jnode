@@ -28,6 +28,10 @@ package org.jnode.plugin;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public interface PluginDescriptor {
+    
+    public static final int MIN_PRIORITY = 1;
+    public static final int MAX_PRIORITY = 10;
+    public static final int DEFAULT_PRIORITY = 5;
 	
 	/**
 	 * Gets the unique identifier of this plugin
@@ -157,6 +161,13 @@ public interface PluginDescriptor {
 	 * @return
 	 */
 	public boolean isAutoStart();
+    
+    /**
+     * Gets the priority of this plugin.
+     * Plugins are loaded by increasing priority. 
+     * @return
+     */
+    public int getPriority();
 	
 	/**
 	 * Gets the classloader of this plugin descriptor.

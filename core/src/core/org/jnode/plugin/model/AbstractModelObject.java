@@ -73,6 +73,28 @@ abstract class AbstractModelObject extends VmSystemObject {
 		return v.equalsIgnoreCase("true") || v.equals("1") || v.equalsIgnoreCase("yes") || v.equalsIgnoreCase("on");
 	}
 
+    /**
+     * Utility method to get an attribute from and element and test for its presence if it is required.
+     * 
+     * @param e
+     * @param name
+     * @param defValue
+     * @return The attribute
+     * @throws PluginException
+     *             required is true, but the attribute was not found
+     */
+    protected final int getIntAttribute(XMLElement e, String name, int defValue) throws PluginException {
+        final String v = getAttribute(e, name, false);
+        if (v == null) {
+            return defValue;
+        }
+        try {
+            return Integer.parseInt(v);
+        } catch (Exception ex) {
+            return defValue;
+        }
+    }
+
 	/**
 	 * Resolve all references to (elements of) other plugin descriptors
 	 * 

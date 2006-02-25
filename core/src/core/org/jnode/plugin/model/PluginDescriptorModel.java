@@ -98,6 +98,8 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     private final boolean system;
 
     private final String version;
+    
+    private final int priority;
 
     /**
      * Create a new instance
@@ -118,6 +120,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
         className = getAttribute(e, "class", false);
         system = getBooleanAttribute(e, "system", false);
         autoStart = getBooleanAttribute(e, "auto-start", false);
+        priority = Math.min(MAX_PRIORITY, Math.max(MIN_PRIORITY, getIntAttribute(e, "priority", DEFAULT_PRIORITY)));
 
         // if (registry != null) {
         // registry.registerPlugin(this);
@@ -529,6 +532,15 @@ public class PluginDescriptorModel extends AbstractModelObject implements
         return autoStart;
     }
 
+    /**
+     * Gets the priority of this plugin.
+     * Plugins are loaded by increasing priority. 
+     * @return
+     */
+    public int getPriority() {
+        return priority;
+    }
+    
     /**
      * Is this a descriptor of a fragment.
      * 
