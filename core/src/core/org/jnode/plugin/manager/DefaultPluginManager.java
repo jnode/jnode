@@ -26,6 +26,7 @@ import gnu.java.security.action.GetPropertyAction;
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -115,6 +116,9 @@ public final class DefaultPluginManager extends PluginManager {
         final String cmdLine = (String)AccessController.doPrivileged(new GetPropertyAction("jnode.cmdline", ""));
         final boolean debug = (cmdLine.indexOf("debug") > 0);
         final List<PluginDescriptor> descrList = createPluginDescriptorList();
+        
+        // Order list by priority
+        Collections.sort(descrList, new PriorityComparator());
 
         // 2 loops, first start all system plugins,
         // then start all auto-start plugins
@@ -373,5 +377,20 @@ public final class DefaultPluginManager extends PluginManager {
         public final String getPluginId() {
             return this.pluginId;
         }
+    }
+    
+    private static class PriorityComparator implements Comparator<PluginDescriptor> {
+
+        /**
+         * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+         */
+        public int compare(PluginDescriptor o1, PluginDescriptor o2) {
+            int p1 = o1.getPriority();
+            int p2 = o2.getPriority();
+            if (p1 > p2) { return -1; }
+            if (p1 == p2) { return 0; }
+            return 1;
+        }
+        
     }
 }
