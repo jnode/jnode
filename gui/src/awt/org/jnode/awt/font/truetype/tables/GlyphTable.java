@@ -23,10 +23,10 @@ package org.jnode.awt.font.truetype.tables;
 
 import java.io.IOException;
 
+import org.jnode.awt.font.spi.Glyph;
 import org.jnode.awt.font.truetype.TTFFontData;
 import org.jnode.awt.font.truetype.TTFInput;
 import org.jnode.awt.font.truetype.glyph.CompositeGlyph;
-import org.jnode.awt.font.truetype.glyph.Glyph;
 import org.jnode.awt.font.truetype.glyph.SimpleGlyph;
 
 /**

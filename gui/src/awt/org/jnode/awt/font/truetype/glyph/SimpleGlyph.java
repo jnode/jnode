@@ -26,7 +26,7 @@ import java.io.IOException;
 
 import org.jnode.awt.font.truetype.TTFInput;
 
-public class SimpleGlyph extends Glyph {
+public class SimpleGlyph extends TTFGlyph {
 
 	private static final int ON_CURVE = 0;
 	private static final int X_SHORT = 1;

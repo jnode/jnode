@@ -29,6 +29,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.jnode.awt.font.TextRenderer;
+import org.jnode.awt.font.spi.ShapedGlyph;
 import org.jnode.awt.font.truetype.tables.CMapTable;
 import org.jnode.awt.font.truetype.tables.GlyphTable;
 import org.jnode.awt.font.truetype.tables.HorizontalHeaderTable;
@@ -99,7 +100,7 @@ public class TTFSimpleTextRenderer implements TextRenderer {
                 // get the index for the needed glyph
                 final int index = encTable.getTableFormat().getGlyphIndex(
                         text.charAt(i));
-                Shape shape = glyphTable.getGlyph(index).getShape();
+                Shape shape = ((ShapedGlyph) glyphTable.getGlyph(index)).getShape();
                 if (text.charAt(i) != ' ')
                     gp.append(shape.getPathIterator(tx), false);
                 tx.translate(hmTable.getAdvanceWidth(index), 0);
