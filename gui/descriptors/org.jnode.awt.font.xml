@@ -10,6 +10,12 @@
         
   <requires>
     <import plugin="org.jnode.awt"/>
+
+	<!-- should not be necessary here
+		since it is only necessary for bdf font renderer
+		TODO remove that import :
+	-->
+    <import plugin="org.jnode.font.bdf"/>    
   </requires>
         
   <runtime>

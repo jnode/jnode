@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<fragment id="org.jnode.awt.font.bdf"
+        plugin-id="org.jnode.awt.font"
+        plugin-version="@VERSION@"
+        name="JNode BDF Font Provider"
+        version="@VERSION@"
+        provider-name="JNode.org"
+        license-name="classpath">
+
+  <requires>
+<!--  
+    <import plugin="org.jnode.awt"/>
+-->    
+    <import plugin="org.jnode.font.bdf"/>
+  </requires>
+
+  <runtime>
+    <library name="jnode-gui.jar">
+      <export name="org.jnode.awt.font.bdf.*"/>
+    </library>
+  </runtime>
+
+  <extension-point id="fonts" name="JNode BDF Font URLs"/>
+
+  <extension point="org.jnode.awt.font.providers">
+    <mapper class="org.jnode.awt.font.bdf.BDFFontProvider"/>
+  </extension>
+</fragment>

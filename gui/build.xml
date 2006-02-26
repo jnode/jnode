@@ -31,6 +31,12 @@
       <src path="${my-src.dir}/font"/>  
       <classpath refid="my-cp"/>
     </jnode.compile>
+	<!-- copy properties files -->
+    <copy todir="${my-classes.dir}/org/jnode/font/bdf/">
+	  <fileset dir="${my-src.dir}/font/org/jnode/font/bdf/">
+	    <include name="**/*.properties" />
+	  </fileset>	    
+    </copy>    	  	
   </target>
 
 <!-- Assemble the jarfile -->
