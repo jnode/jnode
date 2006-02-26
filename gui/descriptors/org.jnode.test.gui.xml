@@ -9,7 +9,6 @@
         
   <requires>
     <import plugin="org.jnode.awt"/>
-    <import plugin="org.jnode.awt.font"/>
     <import plugin="org.jnode.awt.font.truetype"/>
     <import plugin="org.jnode.desktop"/>
     <import plugin="org.jnode.shell.help"/>
