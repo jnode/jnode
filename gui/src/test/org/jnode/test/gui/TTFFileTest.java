@@ -21,13 +21,6 @@
  
 package org.jnode.test.gui;
 
-import org.jnode.awt.font.truetype.TTFFontData;
-import org.jnode.awt.font.truetype.TTFFontDataFile;
-import org.jnode.awt.font.truetype.tables.CMapTable;
-import org.jnode.awt.font.truetype.tables.GlyphTable;
-import org.jnode.awt.font.truetype.tables.HorizontalHeaderTable;
-import org.jnode.awt.font.truetype.tables.HorizontalMetricsTable;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Frame;
@@ -40,6 +33,14 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
+
+import org.jnode.awt.font.truetype.TTFFontData;
+import org.jnode.awt.font.truetype.TTFFontDataFile;
+import org.jnode.awt.font.truetype.glyph.TTFGlyph;
+import org.jnode.awt.font.truetype.tables.CMapTable;
+import org.jnode.awt.font.truetype.tables.GlyphTable;
+import org.jnode.awt.font.truetype.tables.HorizontalHeaderTable;
+import org.jnode.awt.font.truetype.tables.HorizontalMetricsTable;
 
 /**
  *
@@ -145,7 +146,8 @@ public class TTFFileTest {
         for (int i = 0; i < s.length(); i++) {
             // get the index for the needed glyph
             final int index = encTable.getTableFormat().getGlyphIndex(s.charAt(i));
-            final GeneralPath shape = glyphTable.getGlyph(index).getShape();
+            final TTFGlyph glyph = (TTFGlyph) glyphTable.getGlyph(index);
+            final GeneralPath shape = glyph.getShape();
             gp.append(shape.getPathIterator(tx), false);
             tx.translate(hmTable.getAdvanceWidth(index), 0);
         }
@@ -181,8 +183,8 @@ public class TTFFileTest {
             final char ch = s.charAt(i);
             System.out.println("Getting index for char: " + ch);
             final int index = encTable.getTableFormat().getGlyphIndex(ch);
-            final GeneralPath shape = glyphTable.getGlyph(index).getShape();
-
+            final TTFGlyph glyph = (TTFGlyph) glyphTable.getGlyph(index); 
+            final GeneralPath shape = glyph.getShape();
             PathIterator pi = shape.getPathIterator(null);
             final float[] f = new float[6];
             while (!pi.isDone()) {
