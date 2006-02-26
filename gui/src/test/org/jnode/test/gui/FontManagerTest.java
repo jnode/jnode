@@ -24,6 +24,11 @@ package org.jnode.test.gui;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 
+import javax.naming.NamingException;
+
+import org.jnode.awt.font.FontManager;
+import org.jnode.naming.InitialNaming;
+
 /**
  * @author Valentin Chira
  *
@@ -33,13 +38,27 @@ import java.awt.GraphicsEnvironment;
 public class FontManagerTest {
 
     public static void main(String[] args) {
+        // fonts loaded
         Font[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
-        // foants loaded
-
-        System.out.println("" + fonts.length);
-
+        FontManager mgr = getFontManager();
+        
+        System.out.println("" + fonts.length + " available font(s)");
         for (int i = 0; i < fonts.length; i++) {
-            System.out.println(fonts[i].getName());
+        	final Font font = fonts[i];
+            System.out.println("name="+font.getName()+
+            				   " family="+font.getFamily()+"\n"+
+            				   "\tfontName="+font.getFontName()+
+            				   " size="+font.getSize()+"\n"+
+            				   "\tmetrics="+mgr.getFontMetrics(font));
         }
+    }
+    
+    private static FontManager getFontManager()
+    {
+		try {
+			return InitialNaming.lookup(FontManager.NAME);
+		} catch (NamingException ex) {
+			return null;
+		}    	
     }
 }

@@ -42,9 +42,9 @@ import javax.swing.JPanel;
 
 import org.jnode.awt.font.renderer.GlyphRenderer;
 import org.jnode.awt.font.renderer.RenderContext;
+import org.jnode.awt.font.spi.ShapedGlyph;
 import org.jnode.awt.font.truetype.TTFFontData;
 import org.jnode.awt.font.truetype.TTFFontDataFile;
-import org.jnode.awt.font.truetype.glyph.Glyph;
 import org.jnode.awt.font.truetype.tables.HorizontalHeaderTable;
 
 /**
@@ -84,7 +84,7 @@ public class GlyphTest {
     private static Raster renderChar(char ch, TTFFontData fdata, RenderContext ctx)
     throws IOException {
         final int idx = fdata.getCMapTable().getEncodingTable(0).getTableFormat().getGlyphIndex(ch);
-        Glyph g = fdata.getGlyphTable().getGlyph(idx);
+        final ShapedGlyph g = (ShapedGlyph) fdata.getGlyphTable().getGlyph(idx); 
         Shape shape = g.getShape();
 //        System.out.println("shape.bounds " + shape.getBounds());
         final HorizontalHeaderTable hheadTable = fdata
