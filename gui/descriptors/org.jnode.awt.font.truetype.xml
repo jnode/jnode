@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
-<plugin id="org.jnode.awt.font.truetype" 
+<fragment id="org.jnode.awt.font.truetype" 
+		plugin-id="org.jnode.awt.font"
+		plugin-version="@VERSION@"
         name="JNode AWT TrueType Font Provider"
         version="@VERSION@"
         provider-name="JNode.org"
         license-name="lgpl"
         class="org.jnode.awt.font.truetype.TTFPlugin">
-        
-  <requires>
-    <import plugin="org.jnode.awt.font"/>
-  </requires>
         
   <runtime>
     <library name="jnode-gui.jar">
@@ -30,4 +28,4 @@
     <permission class="java.lang.reflect.ReflectPermission" name="suppressAccessChecks"/>
     <permission class="java.util.PropertyPermission" name="jnode.font.renderer" actions="read"/>
   </extension>
-</plugin>
+</fragment>
