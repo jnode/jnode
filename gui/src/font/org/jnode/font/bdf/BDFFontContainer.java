@@ -42,9 +42,21 @@ import java.io.Reader;
 import java.util.HashMap;
 import java.util.PropertyResourceBundle;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
 
 public class BDFFontContainer {
-    private static final PropertyResourceBundle charMapper = (PropertyResourceBundle)PropertyResourceBundle.getBundle("uk.co.tangency.odonata.font.bdf.mappings");
+	private static final Logger log = Logger.getLogger(BDFFontContainer.class);
+	static
+	{
+		log.setLevel(Level.DEBUG);
+	}
+	
+    private static final PropertyResourceBundle charMapper = 
+    	(PropertyResourceBundle)PropertyResourceBundle.getBundle(
+    				BDFFontContainer.class.getPackage().getName()+".mappings");
+    
     static final Object LOCK = new Object();
     private static final long serialVersionUID = -2156798287434571634L;
 
@@ -78,8 +90,11 @@ public class BDFFontContainer {
     private int style;
             
     public static final BDFFontContainer createFont(Reader r) throws Exception {
+    	log.debug("<<< BEGIN createFont >>>");    	
         BDFParser parser = new BDFParser(r);
+        log.debug("createFont: before parser.createFont");
         BDFFontContainer font = parser.createFont();
+        log.debug("<<< END createFont >>>");        
         return font;
     }
     

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.font.bdf" 
+        name="Odonata BDF Font Parser"
+        version="@VERSION@"
+        provider-name="Odonata"
+        provider-url="http://odonata.tangency.co.uk/"
+        license-name="classpath">
+        
+  <runtime>
+    <library name="jnode-gui.jar">
+      <export name="org.jnode.font.bdf.*"/>
+    </library>
+  </runtime>
+</plugin>

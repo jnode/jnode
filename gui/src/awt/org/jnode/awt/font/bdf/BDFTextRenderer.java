@@ -22,127 +22,94 @@
 package org.jnode.awt.font.bdf;
 
 import java.awt.Color;
+import java.awt.FontMetrics;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
-import java.awt.image.WritableRaster;
 
-import org.apache.log4j.Logger;
 import org.jnode.awt.font.TextRenderer;
-import org.jnode.awt.font.renderer.GlyphRenderer;
-//import org.jnode.awt.font.renderer.RenderCache;
-import org.jnode.awt.font.renderer.RenderContext;
+import org.jnode.awt.font.renderer.RenderCache;
+import org.jnode.awt.font.spi.AbstractTextRenderer;
+import org.jnode.awt.font.spi.FontData;
 import org.jnode.driver.video.Surface;
-//import org.jnode.font.bdf.BDFFont;
-import org.jnode.vm.Vm;
+import org.jnode.font.bdf.BDFFontContainer;
+import org.jnode.font.bdf.BDFGlyph;
+import org.jnode.font.bdf.BDFMetrics;
 
 /**
  * @author Fabien DUMINY (fduminy@jnode.org)
  */
 public class BDFTextRenderer implements TextRenderer {
-
-    /** My logger */
-    private static final Logger log = Logger.getLogger(BDFTextRenderer.class);
-
-//    private final BDFFont fontData;
-
-    private final double fontSize;
-
-//    private final RenderCache renderCache;
-
-    /** Key of the alpha raster in the render context */
-    private static final String ALPHA_RASTER = BDFTextRenderer.class.getName()
-            + "AR";
-
+	private BDFFontContainer bdfFont;
+	
     /**
      * Create a new instance
      * 
      * @param fontData
      * @param fontSize
      */
-    public BDFTextRenderer(/*RenderCache renderCache, BDFFont fontData,*/
-            int fontSize) {
-//        this.renderCache = renderCache;
-//        this.fontData = fontData;
-        this.fontSize = fontSize;
+    public BDFTextRenderer(BDFFontContainer bdfFont) {
+    	this.bdfFont = bdfFont;
     }
-
+    
     /**
-     * Create/get the alpha raster used for rendering.
+     * Strings are drawn using .pjaf font files read in <code>PJAFontData</code>
+     * objects by <code>PJAGraphicsManager</code>.
+     * <p>
+     * NOTE: This method derived from PJA rendering code.
      * 
-     * @return
+     * @see com.eteks.awt.PJAGraphicsManager
+     * @see com.eteks.awt.PJAFontData
+     * @see java.awt.Graphics
      */
-    private WritableRaster createAlphaRaster() {
-        /*
-        final RenderContext ctx = renderCache.getContext();
-        WritableRaster r = (WritableRaster) ctx.getObject(ALPHA_RASTER);
-        final int fontSizeUp = (int) (fontSize + 0.5);
-        if ((r == null) || (r.getWidth() < fontSizeUp)
-                || (r.getHeight() < fontSizeUp)) {
-            r = GlyphRenderer.createRaster(fontSizeUp, fontSizeUp);
-            ctx.setObject(ALPHA_RASTER, r);
-            Vm.getVm().getCounter(ALPHA_RASTER).inc();
+    final public void render(Surface surface, Shape clip, AffineTransform tx,
+            String str, int x, int y, Color color) {   
+        if (str == null || str.length() == 0) {
+            System.err.println("empty string!");
+            return;
         }
-        return r;
-        */
-        return null;
-    }
+        
+        BDFMetrics fm = (BDFMetrics)bdfFont.getFontMetrics();
+        int charsCount = str.length();
 
-    /**
-     * Render a given text to the given graphics at the given location.
-     * 
-     * @param g
-     * @param text
-     * @param x
-     * @param y
-     */
-    public void render(Surface surface, Shape clip, AffineTransform tx,
-            String text, int x, int y, Color color) {
-        try {
-/*        	
-            //final GlyphTable glyphTable = fontData.getGlyphTable();
-            //final CMapTable cmapTable = fontData.getCMapTable();
+        if ((bdfFont != null) && (charsCount > 0)) {
+            int offset = 0;
+            char[] chars = str.toCharArray();
 
-            if (!(cmapTable.getNrEncodingTables() > 0)) {
-                throw new RuntimeException("No Encoding is found!");
-            }
-            final CMapTable.EncodingTable encTable = cmapTable
-                    .getEncodingTable(0);
-            if (encTable.getTableFormat() == null) {
-                throw new RuntimeException("The table is NUll!!");
-            }	
-            fontData.getFontMetrics().getLineMetrics((String) null, 0, 0, (Graphics) null);
-            final HorizontalHeaderTable hheadTable = fontData
-                    .getHorizontalHeaderTable();
-            final double ascent = hheadTable.getAscent();
-            final HorizontalMetricsTable hmTable = fontData
-                    .getHorizontalMetricsTable();
-            final double scale = fontSize / ascent;
-
-            final int textLength = text.length();
-            final WritableRaster alphaRaster = createAlphaRaster();
-            for (int i = 0; i < textLength; i++) {
-                // get the index for the needed glyph
-                final char ch = text.charAt(i);
-                final int index = encTable.getTableFormat().getGlyphIndex(ch);
-                if (ch != ' ') {
-                    final Glyph g = glyphTable.getGlyph(index);
-                    final GlyphRenderer renderer = renderCache.getRenderer(g,
-                            ascent);
-                    final Dimension d;
-                    d = renderer.createGlyphRaster(alphaRaster, fontSize);
-
-                    final Point2D minLoc = renderer.getMinLocation(fontSize);
-                    final int dstX = x + (int) minLoc.getX();
-                    final int dstY = y - d.height + (int) minLoc.getY();
-
-                    surface.drawAlphaRaster(alphaRaster, tx, 0, 0, dstX, dstY,
-                            d.width, d.height, color);
+            for(int i=0;i<charsCount;i++) {
+                int base = fm.getDescent();
+                BDFGlyph glyph = bdfFont.getGlyph(chars[i]);
+                if(glyph==null) {
+                    continue;
                 }
-                x += (scale * (double) hmTable.getAdvanceWidth(index));
-            }            
-*/            
-        } catch (Exception ex) {
-            log.error("Error drawing text", ex);
+                
+                int fHeight= glyph.getBbx().height;
+                int[] fData = glyph.getData();
+                int scan = fData.length/fHeight;
+                
+                for(int k=0;k<fHeight;k++) {
+                    for(int j=0;j<scan;j++) {
+                        int fPixel = fData[(k*scan)+j];
+                        if(fPixel!=0) {
+                            int r = color.getRed(); //(color & 0x00FF0000) >> 16;
+                            int g = color.getGreen(); //(color & 0x0000FF00) >> 8;
+                            int b = color.getBlue(); //(color & 0x000000FF);
+                            
+                            r = ((r * fPixel)>>bdfFont.getDepth()) & 0xFF;
+                            g = ((g * fPixel)>>bdfFont.getDepth()) & 0xFF;
+                            b = ((b * fPixel)>>bdfFont.getDepth()) & 0xFF;
+                            
+                            fPixel = (((r << 16)+ (g << 8) +  b )| 0xFF000000);
+    
+                            int px = x+offset+j;
+                            int py = y+(bdfFont.getBoundingBox().height+base-fHeight)+k-glyph.getBbx().y; 
+                            surface.setRGBPixel(px, py, fPixel);
+                        }
+                    }
+                }
+                
+                offset+=glyph.getDWidth().width-glyph.getBbx().x;
+            }
         }
-    }
+    }    
 }
+	
