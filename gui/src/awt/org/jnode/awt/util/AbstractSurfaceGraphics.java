@@ -407,10 +407,23 @@ public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
      * @see java.awt.Graphics#drawString(java.lang.String,int,int)
      */
     public void drawString(String text, int x, int y) {
+    	try
+    	{
     	//		System.out.println("drawText():" + text);
         final Font font = getFont();
     	if (font != null)
-    		((JNodeToolkit) Toolkit.getDefaultToolkit()).getFontManager()
+    	{
+    		JNodeToolkit tk = ((JNodeToolkit) Toolkit.getDefaultToolkit());
+    		if(tk == null) { System.err.println("Toolkit is null"); return; }
+    		if(tk.getFontManager() == null) { System.err.println("FontManager is null"); return; }
+    		
+    		tk.getFontManager()
     				.drawText(surface, this.clip, this.transform, text, font, x, y, getColor());
+    	}
+    	}
+    	catch(Throwable t)
+    	{
+    		log.error("error in drawString", t);
+    	}
     }
 }
