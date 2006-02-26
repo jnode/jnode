@@ -56,12 +56,11 @@ public class TTFontProvider extends AbstractFontProvider {
 	{
         final String renderer = (String)AccessController.doPrivileged(new GetPropertyAction("jnode.font.renderer", "simple"));
         TextRenderer r;
-        //if (false || renderer.equals("new")) {
+        if (false || renderer.equals("new")) {
             r = new TTFTextRenderer(renderCache, getFontMetrics(font), getFontData(font));
-        	//r = new TTFTextRenderer(renderCache, getFontData(font), 12);
-        //} else {
-        //    r = new TTFSimpleTextRenderer(getFontData(font), font.getSize());                
-        //}
+        } else {
+            r = new TTFSimpleTextRenderer(getFontData(font), font.getSize());                
+        }
         log.debug("created TextRenderer for TTF");
         return r;
 	}
