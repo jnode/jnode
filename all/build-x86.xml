@@ -11,6 +11,7 @@
 	<property name="jnode.disk.geometry" value="64/16/63" />
 
 	<property name="jnode.virtual.memsize" value="384" />
+	<property name="logFile" value="${build.dir}/debugger.txt" />
 
 	<property name="grub-ver" value="grub-0.97-i386-pc" />
 	<property name="grub.dir" value="${my-build.dir}/${grub-ver}/boot/grub" />
@@ -270,6 +271,7 @@
 		<taskdef name="vmware" classname="org.jnode.build.VMwareBuilderTask" classpathref="cp-x86" />
 		<vmware 
 			isofile="${jnode-x86-lite.iso}"
+			logFile="${logFile}"
 			memsize="${jnode.virtual.memsize}"
 		/>
 	</target>
@@ -282,6 +284,7 @@
 		
 		<vmware 
 			isofile="${jnode-x86-lite.iso}"
+			logFile="${logFile}"
 			memsize="${jnode.virtual.memsize}"
 		/>
 	</target>
