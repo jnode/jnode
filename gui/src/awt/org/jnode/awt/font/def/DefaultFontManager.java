@@ -65,20 +65,20 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
      * Start this manager
      * @throws PluginException
      */
-    protected void start() throws PluginException {
+    public void start() throws PluginException {
         providersEP.addListener(this);
-        updateFontProviders();
         try {
             InitialNaming.bind(NAME, this);
         } catch (NamingException ex) {
             throw new PluginException(ex);
         }
+        updateFontProviders();
     }
 
     /**
      * Start this manager
      */
-    protected void stop() {
+    public void stop() {
         InitialNaming.unbind(NAME);
         providersEP.removeListener(this);
     }
@@ -185,11 +185,16 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
      * @return The provider
      */
     private FontProvider getProvider(Font font) {
+    	log.debug("getProvider for "+font.getName()+
+					" ("+providers.size()+" availables)");    	
         for (FontProvider prv : providers.values()) {
-            if (prv.provides(font)) {
+        	log.debug("font="+font+" provider="+prv);            
+        	if (prv.provides(font)) {
+        		log.debug("provider found");
                 return prv;
             }
         }
+        log.debug("font="+font+" NO PROVIDER");
         return null;
     }
     
