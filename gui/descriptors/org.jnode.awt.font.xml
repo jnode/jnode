@@ -14,8 +14,9 @@
         
   <runtime>
     <library name="jnode-gui.jar">
-      <export name="org.jnode.awt.font.def.*"/>
-      <export name="org.jnode.awt.font.renderer.*"/>
+	    <export name="org.jnode.awt.font.spi.*"/>
+		<export name="org.jnode.awt.font.def.*"/>
+		<export name="org.jnode.awt.font.renderer.*"/>
     </library>
     <library name="jnode-fonts.jar">
       <export name="*"/>
@@ -23,8 +24,4 @@
   </runtime>
 
   <extension-point id="providers" name="JNode Font Providers"/>
-
-  <extension point="org.jnode.security.permissions">
-    <permission class="java.util.PropertyPermission" name="jnode.font.renderer" actions="read"/>
-  </extension>
 </plugin>
