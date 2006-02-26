@@ -26,6 +26,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jnode.awt.font.spi.AbstractFontProvider;
+import org.jnode.awt.font.spi.FontData;
+import org.jnode.awt.font.spi.Glyph;
 import org.jnode.awt.font.truetype.tables.CMapTable;
 import org.jnode.awt.font.truetype.tables.GlyphTable;
 import org.jnode.awt.font.truetype.tables.HeadTable;
@@ -43,7 +46,7 @@ import org.jnode.awt.font.truetype.tables.TTFTable;
  * @author Simon Fischer
  * @version $Id$
  */
-public abstract class TTFFontData {
+public abstract class TTFFontData implements FontData {
 
     /** Tables indexed by tag */
     private final Map<TableClass, TTFTable> tables = new HashMap<TableClass, TTFTable>();
@@ -55,6 +58,25 @@ public abstract class TTFFontData {
     protected TTFFontData() {
     }
     
+	public Glyph getGlyph(char c) throws IOException
+	{
+		final GlyphTable glyphTable = getGlyphTable();
+		final CMapTable cmapTable = getCMapTable();
+
+		if (!(cmapTable.getNrEncodingTables() > 0)) {
+			throw new RuntimeException("No Encoding is found!");
+		}
+		
+		final CMapTable.EncodingTable encTable = cmapTable.getEncodingTable(0);
+		if (encTable.getTableFormat() == null) {
+			throw new RuntimeException("The table is NUll!!");
+		}
+		
+		//get the index for the needed glyph
+		final int index = encTable.getTableFormat().getGlyphIndex(c);
+        return glyphTable.getGlyph(index);
+	}
+	
     /**
      * Gets the version of this font data.
      * @return
@@ -92,6 +114,8 @@ public abstract class TTFFontData {
      */
     private final TTFTable getTable(TableClass tag) throws IOException {
         final TTFTable table = tables.get(tag);
+        
+    	if(table == null) throw new IOException("table is null for tag "+tag.getTag());
         table.read();
         return table;
     }

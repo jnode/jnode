@@ -19,7 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.awt.font.truetype;
+package org.jnode.awt.font.spi;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -30,33 +30,61 @@ import java.awt.geom.Point2D;
 import java.awt.image.WritableRaster;
 
 import org.apache.log4j.Logger;
+import org.jnode.awt.font.TextRenderer;
 import org.jnode.awt.font.renderer.GlyphRenderer;
 import org.jnode.awt.font.renderer.RenderCache;
 import org.jnode.awt.font.renderer.RenderContext;
-import org.jnode.awt.font.spi.AbstractTextRenderer;
-import org.jnode.awt.font.spi.FontData;
-import org.jnode.awt.font.spi.Glyph;
-import org.jnode.awt.font.truetype.tables.CMapTable;
-import org.jnode.awt.font.truetype.tables.GlyphTable;
-import org.jnode.awt.font.truetype.tables.HorizontalHeaderTable;
-import org.jnode.awt.font.truetype.tables.HorizontalMetricsTable;
 import org.jnode.driver.video.Surface;
 import org.jnode.vm.Vm;
 
 /**
  * @author epr
+ * @author Fabien DUMINY (fduminy@jnode.org)
  */
-public class TTFTextRenderer extends AbstractTextRenderer {
-	/**
-	 * Create a new instance
-	 * 
-	 * @param renderCache
-	 * @param fontMetrics
-	 * @param fontData
-	 */
-    public TTFTextRenderer(RenderCache renderCache, FontMetrics fontMetrics,
+abstract public class AbstractTextRenderer implements TextRenderer {
+
+    /** My logger */
+	protected static final Logger log = Logger.getLogger(AbstractTextRenderer.class);
+
+    protected final FontMetrics fontMetrics;
+
+    protected final RenderCache renderCache;
+    
+    protected final FontData fontData;
+
+    /** Key of the alpha raster in the render context */
+    protected static final String ALPHA_RASTER = AbstractTextRenderer.class.getName()
+            + "AR";
+
+    /**
+     * Create a new instance
+     * 
+     * @param fontData
+     * @param fontSize
+     */
+    public AbstractTextRenderer(RenderCache renderCache, FontMetrics fontMetrics,
             FontData fontData) {
-    	super(renderCache, fontMetrics, fontData);
+        this.renderCache = renderCache;
+        this.fontMetrics = fontMetrics;
+        this.fontData = fontData;
+    }
+
+    /**
+     * Create/get the alpha raster used for rendering.
+     * 
+     * @return
+     */
+    final protected WritableRaster createAlphaRaster() {
+        final RenderContext ctx = renderCache.getContext();
+        WritableRaster r = (WritableRaster) ctx.getObject(ALPHA_RASTER);
+        final int fontSizeUp = (int) (fontMetrics.getFont().getSize() + 0.5);
+        if ((r == null) || (r.getWidth() < fontSizeUp)
+                || (r.getHeight() < fontSizeUp)) {
+            r = GlyphRenderer.createRaster(fontSizeUp, fontSizeUp);
+            ctx.setObject(ALPHA_RASTER, r);
+            Vm.getVm().getCounter(ALPHA_RASTER).inc();
+        }
+        return r;
     }
 
     /**
@@ -66,38 +94,20 @@ public class TTFTextRenderer extends AbstractTextRenderer {
      * @param text
      * @param x
      * @param y
-     */    
+     */
     public void render(Surface surface, Shape clip, AffineTransform tx,
             String text, int x, int y, Color color) {
         try {
-        	final TTFFontData fd = (TTFFontData) fontData;
-        	final int fontSize = fontMetrics.getFont().getSize();
-            final GlyphTable glyphTable = fd.getGlyphTable();
-            final CMapTable cmapTable = fd.getCMapTable();
-
-            if (!(cmapTable.getNrEncodingTables() > 0)) {
-                throw new RuntimeException("No Encoding is found!");
-            }
-            final CMapTable.EncodingTable encTable = cmapTable
-                    .getEncodingTable(0);
-            if (encTable.getTableFormat() == null) {
-                throw new RuntimeException("The table is NUll!!");
-            }
-            final HorizontalHeaderTable hheadTable = fd
-                    .getHorizontalHeaderTable();
-            final double ascent = hheadTable.getAscent();
-            final HorizontalMetricsTable hmTable = fd
-                    .getHorizontalMetricsTable();
+            final double ascent = fontMetrics.getAscent();
+            final int fontSize = fontMetrics.getFont().getSize();
             final double scale = fontSize / ascent;
 
             final int textLength = text.length();
             final WritableRaster alphaRaster = createAlphaRaster();
             for (int i = 0; i < textLength; i++) {
-                // get the index for the needed glyph
                 final char ch = text.charAt(i);
-                final int index = encTable.getTableFormat().getGlyphIndex(ch);
                 if (ch != ' ') {
-                    final Glyph g = glyphTable.getGlyph(index);
+                	final Glyph g = fontData.getGlyph(ch);
                     final GlyphRenderer renderer = renderCache.getRenderer(g,
                             ascent);
                     final Dimension d;
@@ -110,7 +120,7 @@ public class TTFTextRenderer extends AbstractTextRenderer {
                     surface.drawAlphaRaster(alphaRaster, tx, 0, 0, dstX, dstY,
                             d.width, d.height, color);
                 }
-                x += (scale * (double) hmTable.getAdvanceWidth(index));
+                x += fontMetrics.charWidth(ch);
             }
         } catch (Exception ex) {
             log.error("Error drawing text", ex);

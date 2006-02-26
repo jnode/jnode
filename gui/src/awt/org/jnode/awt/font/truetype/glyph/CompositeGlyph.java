@@ -25,11 +25,12 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.io.IOException;
 
+import org.jnode.awt.font.spi.ShapedGlyph;
 import org.jnode.awt.font.truetype.TTFInput;
 import org.jnode.awt.font.truetype.tables.GlyphTable;
 
 
-public class CompositeGlyph extends Glyph {
+public class CompositeGlyph extends TTFGlyph {
 
 	private static final int ARGS_WORDS = 0;
 	private static final int ARGS_XY = 1;
@@ -92,7 +93,8 @@ public class CompositeGlyph extends Glyph {
 				System.err.println("TTFGlyfTable: WE_HAVE_A_TWO_BY_TWO not implemented.");
 			}
 
-			GeneralPath appendGlyph = (GeneralPath) table.getGlyph(glyphIndex).getShape().clone();
+			ShapedGlyph glyph = (ShapedGlyph) table.getGlyph(glyphIndex);
+			GeneralPath appendGlyph = (GeneralPath) glyph.getShape().clone();
 			appendGlyph.transform(t);
 			shape.append(appendGlyph, false);
 		}
