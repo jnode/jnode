@@ -34,7 +34,6 @@ import org.jnode.vm.Vm;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmMultiMediaSupport;
 import org.jnode.vm.VmProcessor;
-import org.jnode.vm.VmStackReader;
 import org.jnode.vm.VmSystem;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmSharedStatics;
@@ -96,14 +95,11 @@ public abstract class VmX86Architecture extends VmArchitecture {
     /** The MP configuration table */
     private MPConfigTable mpConfigTable;
 
-    /** The stackreader of this architecture */
-    private final VmX86StackReader stackReader;
-
     /**
      * Initialize this instance using the default compiler.
      */
-    public VmX86Architecture() {
-        this("L1A");
+    public VmX86Architecture(int referenceSize) {
+        this(referenceSize, "L1A");
     }
 
     /**
@@ -112,8 +108,8 @@ public abstract class VmX86Architecture extends VmArchitecture {
      * @param compiler
      *            L1a to use L1A compiler, L1 compiler otherwise.
      */
-    public VmX86Architecture(String compiler) {
-        this.stackReader = new VmX86StackReader(getReferenceSize());
+    public VmX86Architecture(int referenceSize, String compiler) {
+        super(referenceSize, new VmX86StackReader(referenceSize));
         this.compilers = new NativeCodeCompiler[2];
         this.compilers[0] = new X86StubCompiler();
         this.compilers[1] = new X86Level1ACompiler();
@@ -181,15 +177,6 @@ public abstract class VmX86Architecture extends VmArchitecture {
      */
     public final NativeCodeCompiler[] getTestCompilers() {
         return testCompilers;
-    }
-
-    /**
-     * Gets the stackreader for this architecture.
-     * 
-     * @return Stack reader
-     */
-    public final VmStackReader getStackReader() {
-        return stackReader;
     }
 
     /**

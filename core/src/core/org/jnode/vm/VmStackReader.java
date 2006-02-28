@@ -21,10 +21,10 @@
  
 package org.jnode.vm;
 
+import org.jnode.vm.annotation.KernelSpace;
 import org.jnode.vm.classmgr.VmCompiledCode;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
-import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Offset;
 
@@ -40,6 +40,7 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @param sf The stackframe to get the previous frame from.
 	 * @return The previous frame or null.
 	 */
+    @KernelSpace
 	final Address getPrevious(Address sf) {
 		if (isValid(sf)) {
 			return sf.loadAddress(getPreviousOffset(sf));
@@ -53,6 +54,7 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @param sf Stackframe pointer
 	 * @return The method
 	 */
+    @KernelSpace
 	final VmMethod getMethod(Address sf) {
         final int ccid = sf.loadInt(getMethodIdOffset(sf));
         if (ccid == 0) {
@@ -96,6 +98,7 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @param sf
 	 * @return boolean
 	 */
+    @KernelSpace
 	final boolean isValid(Address sf) {
 		if (sf == null) {
 			return false;
@@ -168,6 +171,7 @@ public abstract class VmStackReader extends VmSystemObject {
 	/**
 	 * Show the current stacktrace using Screen.debug.
 	 */	
+    @KernelSpace
 	public final void debugStackTrace() {
         debugStackTrace(20);
 	}
@@ -175,6 +179,7 @@ public abstract class VmStackReader extends VmSystemObject {
     /**
      * Show the current stacktrace using Screen.debug.
      */ 
+    @KernelSpace
     public final void debugStackTrace(int max) {
         Address f = VmMagic.getCurrentFrame();
         Unsafe.debug("Debug stacktrace: ");
@@ -202,7 +207,8 @@ public abstract class VmStackReader extends VmSystemObject {
 	/**
 	 * Show the stacktrace of the given thread using Screen.debug.
 	 */	
-	public final void debugStackTrace(VmThread thread) throws UninterruptiblePragma {
+    @KernelSpace
+	public final void debugStackTrace(VmThread thread) {
 		Address f = thread.getStackFrame();
 		Unsafe.debug("Debug stacktrace: ");
 		boolean first = true;
@@ -231,6 +237,7 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @param sf The stackframe to get the previous frame from.
 	 * @return The previous frame or null.
 	 */
+    @KernelSpace
 	protected abstract Offset getPreviousOffset(Address sf);
 
 	/**
@@ -238,6 +245,7 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @param sf Stackframe pointer
 	 * @return The method id offset
 	 */
+    @KernelSpace
 	protected abstract Offset getMethodIdOffset(Address sf);
 
 	/**
@@ -245,5 +253,6 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @param sf Stackframe pointer
 	 * @return The return address offset
 	 */
+    @KernelSpace
 	protected abstract Offset getReturnAddressOffset(Address sf);
 }

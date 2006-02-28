@@ -21,6 +21,7 @@
  
 package org.vmmagic.unboxed;
 
+import org.jnode.vm.annotation.KernelSpace;
 import org.vmmagic.pragma.Uninterruptible;
 
 /**
@@ -43,6 +44,7 @@ public final class ObjectReference implements Uninterruptible {
 	 *            The object
 	 * @return The corresponding reference
 	 */
+    @KernelSpace
 	public static ObjectReference fromObject(Object obj) {
 		return null;
 	}
@@ -79,6 +81,7 @@ public final class ObjectReference implements Uninterruptible {
 	/**
 	 * Get a heap address for the object.
 	 */
+    @KernelSpace
 	public Address toAddress() {
 		return null;
 	}

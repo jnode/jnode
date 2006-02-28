@@ -22,6 +22,7 @@
 package org.vmmagic.unboxed;
 
 import org.jnode.vm.VmAddress;
+import org.jnode.vm.annotation.KernelSpace;
 
 /**
  * Stub implementation of an Address type. Needs commenting.
@@ -286,6 +287,7 @@ public final class Address implements UnboxedObject {
      *            the offset to the value.
      * @return the read value
      */
+    @KernelSpace
     public int loadInt(Offset offset) {
         return 0;
     }
@@ -350,6 +352,7 @@ public final class Address implements UnboxedObject {
      *            the offset to the value.
      * @return the read address value.
      */
+    @KernelSpace
     public Address loadAddress(Offset offset) {
         return null;
     }
@@ -360,6 +363,7 @@ public final class Address implements UnboxedObject {
      * 
      * @return the read word value.
      */
+    @KernelSpace
     public Word loadWord() {
         return null;
     }

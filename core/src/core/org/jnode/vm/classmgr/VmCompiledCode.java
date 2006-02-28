@@ -23,6 +23,8 @@ package org.jnode.vm.classmgr;
 
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.VmAddress;
+import org.jnode.vm.annotation.KernelSpace;
+import org.jnode.vm.annotation.Uninterruptible;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 import org.vmmagic.unboxed.Address;
 
@@ -241,6 +243,8 @@ public final class VmCompiledCode extends AbstractCode {
     /**
      * @return Returns the method.
      */
+    @KernelSpace
+    @Uninterruptible
     public final VmMethod getMethod() {
         return method;
     }

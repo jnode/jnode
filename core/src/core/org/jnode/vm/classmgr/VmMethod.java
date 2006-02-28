@@ -117,15 +117,6 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
     }
 
     /**
-     * Get the VmClass this method is declared in. *
-     * 
-     * @return The declaring class
-     */
-    public final VmType<?> getDeclaringClass() {
-        return declaringClass;
-    }
-
-    /**
      * Get the currently used byte-code information for this method. This
      * bytecode may have been optimized. This may return null if this is a
      * native or abstract method.
@@ -192,6 +183,15 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
                     + mangle("#" + getName() + '.' + getSignature())).intern();
         }
         return mangledName;
+    }
+
+    /**
+     * Gets the full name of this method consisting of
+     * its declaring class, its name and its signature.
+     * @return
+     */
+    public final String getFullName() {
+        return declaringClass.getName() + '#' + getName() + '!' + getSignature();
     }
 
     /**
@@ -377,6 +377,11 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
      */
     final void addPragmaFlags(int flags) {
         this.pragmaFlags |= flags;
+        
+        // KernelSpace implies uninterruptible
+        if ((flags & MethodPragmaFlags.KERNELSPACE) != 0) {
+            this.pragmaFlags |= MethodPragmaFlags.UNINTERRUPTIBLE;
+        }
     }
 
     /**
@@ -513,6 +518,14 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
      */
     public final boolean hasPrivilegedActionPragma() {
         return ((pragmaFlags & MethodPragmaFlags.PRIVILEGEDACTION) != 0);        
+    }
+
+    /**
+     * Is the KernelSpace pragma set for this method.
+     * @return
+     */
+    public final boolean hasKernelSpacePragma() {
+        return ((pragmaFlags & MethodPragmaFlags.KERNELSPACE) != 0);        
     }
 
     /**

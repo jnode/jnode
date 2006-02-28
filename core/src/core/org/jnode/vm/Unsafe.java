@@ -24,6 +24,7 @@ package org.jnode.vm;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.security.JNodePermission;
 import org.jnode.vm.annotation.Inline;
+import org.jnode.vm.annotation.KernelSpace;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
 import org.vmmagic.pragma.UninterruptiblePragma;
@@ -468,6 +469,7 @@ public final class Unsafe {
     /**
      * Cause the system to stop TODO Protect me again
      */
+    @KernelSpace
     public static void die(String msg) {
         debug("Real panic: ");
         if (msg != null) {
@@ -479,46 +481,55 @@ public final class Unsafe {
     /**
      * Cause the system to stop TODO Protect me again
      */
+    @KernelSpace
     private static native void die();
 
     /**
      * Print the given string on the screen.
      */
+    @KernelSpace
     public static native void debug(String str);
 
     /**
      * Print the given value on the screen.
      */
+    @KernelSpace
     public static native void debug(char value);
 
     /**
      * Print the given value on the screen.
      */
+    @KernelSpace
     public static native void debug(int value);
 
     /**
      * Print the given value on the screen.
      */
+    @KernelSpace
     public static native void debug(long value);
 
     /**
      * Print the given value on the screen.
      */
+    @KernelSpace
     public static native void debug(Address value);
 
     /**
      * Print the given value on the screen.
      */
+    @KernelSpace
     public static native void debug(Word value);
 
     /**
      * Print the given value on the screen.
      */
+    @KernelSpace
     public static native void debug(Extent value);
 
     /**
      * Print the given value on the screen.
      */
+    @KernelSpace
     public static native void debug(Offset value);
 
     /**
@@ -531,6 +542,7 @@ public final class Unsafe {
     /**
      * Is the kernel debugger enabled?
      */
+    @KernelSpace
     public static native boolean isKdbEnabled();
 
     /**
@@ -538,6 +550,7 @@ public final class Unsafe {
      * 
      * @return The byte, or -1 if no data available.
      */
+    @KernelSpace
     static native int readKdbInput();
 
     /**

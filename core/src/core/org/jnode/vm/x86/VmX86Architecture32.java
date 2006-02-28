@@ -108,7 +108,7 @@ public final class VmX86Architecture32 extends VmX86Architecture {
      * @param compiler
      */
     public VmX86Architecture32(String compiler) {
-        super(compiler);
+        super(SLOT_SIZE, compiler);
         this.imtCompiler = new X86IMTCompiler32();
         this.typeSizeInfo = new TypeSizeInfo(1, 1, 2, 2, 1);
     }
@@ -129,15 +129,6 @@ public final class VmX86Architecture32 extends VmX86Architecture {
      */
     public final IMTCompiler getIMTCompiler() {
         return imtCompiler;
-    }
-
-    /**
-     * Gets the size in bytes of an object reference.
-     * 
-     * @return Size of reference, always 4 here
-     */
-    public final int getReferenceSize() {
-        return SLOT_SIZE;
     }
 
     /**

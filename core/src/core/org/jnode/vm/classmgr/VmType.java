@@ -38,6 +38,7 @@ import org.jnode.vm.Vm;
 import org.jnode.vm.VmReflection;
 import org.jnode.vm.VmSystemClassLoader;
 import org.jnode.vm.annotation.Inline;
+import org.jnode.vm.annotation.KernelSpace;
 import org.jnode.vm.annotation.LoadStatics;
 import org.jnode.vm.annotation.NoInline;
 import org.jnode.vm.annotation.SharedStatics;
@@ -669,6 +670,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 	 * 
 	 * @return The name of this class
 	 */
+    @KernelSpace
 	public final String getName() {
 		return name;
 	}

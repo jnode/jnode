@@ -21,6 +21,7 @@
  
 package org.jnode.vm.classmgr;
 
+import org.jnode.vm.annotation.KernelSpace;
 import org.vmmagic.pragma.Uninterruptible;
 
 /**
@@ -93,7 +94,8 @@ abstract class VmMember extends VmAnnotatedElement implements Uninterruptible {
 	 * 
 	 * @return String
 	 */
-	public String getName() {
+    @KernelSpace
+	public final String getName() {
 		return name;
 	}
 
@@ -103,7 +105,7 @@ abstract class VmMember extends VmAnnotatedElement implements Uninterruptible {
 	 * @param otherName
 	 * @return boolean
 	 */
-	public boolean nameEquals(String otherName) {
+	public final boolean nameEquals(String otherName) {
 		return name.equals(otherName);
 	}
 
@@ -112,11 +114,11 @@ abstract class VmMember extends VmAnnotatedElement implements Uninterruptible {
 	 * 
 	 * @return String
 	 */
-	public String getSignature() {
+	public final String getSignature() {
 		return signature;
 	}
 
-	public boolean signatureEquals(String otherSignature) {
+	public final boolean signatureEquals(String otherSignature) {
 		return signature.equals(otherSignature);
 	}
 
@@ -125,7 +127,9 @@ abstract class VmMember extends VmAnnotatedElement implements Uninterruptible {
 	 * 
 	 * @return VmClass
 	 */
-	public VmType<?> getDeclaringClass() {
+    @KernelSpace
+    @org.jnode.vm.annotation.Uninterruptible
+	public final VmType<?> getDeclaringClass() {
 		return declaringClass;
 	}
 
@@ -133,35 +137,35 @@ abstract class VmMember extends VmAnnotatedElement implements Uninterruptible {
 	 * Is this member public?
 	 * @return boolean
 	 */
-	public boolean isPublic() {
+	public final boolean isPublic() {
 		return Modifier.isPublic(modifiers);
 	}
 	/**
 	 * Is this member protected?
 	 * @return boolean
 	 */
-	public boolean isProtected() {
+	public final boolean isProtected() {
 		return Modifier.isProtected(modifiers);
 	}
 	/**
 	 * Is this member private?
 	 * @return boolean
 	 */
-	public boolean isPrivate() {
+	public final boolean isPrivate() {
 		return Modifier.isPrivate(modifiers);
 	}
 	/**
 	 * Is this member static?
 	 * @return boolean
 	 */
-	public boolean isStatic() {
+	public final boolean isStatic() {
 		return Modifier.isStatic(modifiers);
 	}
 	/**
 	 * Is this member final?
 	 * @return boolean
 	 */
-	public boolean isFinal() {
+	public final  boolean isFinal() {
 		return Modifier.isFinal(modifiers);
 	}
 
@@ -180,7 +184,7 @@ abstract class VmMember extends VmAnnotatedElement implements Uninterruptible {
 	 * @see java.lang.Object#hashCode()
 	 * @return int
 	 */
-	public int getMemberHashCode() {
+	public final int getMemberHashCode() {
 		return cachedHashCode;
 	}
 
@@ -188,7 +192,7 @@ abstract class VmMember extends VmAnnotatedElement implements Uninterruptible {
 	 * @see java.lang.Object#hashCode()
 	 * @return int
 	 */
-	public int hashCode() {
+	public final int hashCode() {
 		return cachedHashCode;
 	}
 
@@ -196,7 +200,7 @@ abstract class VmMember extends VmAnnotatedElement implements Uninterruptible {
 	 * @see org.jnode.vm.VmSystemObject#getExtraInfo()
 	 * @return String
 	 */
-	public String getExtraInfo() {
+	public final String getExtraInfo() {
 		return "Modifiers: " + Modifier.toString(modifiers);
 	}
 

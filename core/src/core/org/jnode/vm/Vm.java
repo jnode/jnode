@@ -38,8 +38,10 @@ import org.jnode.util.CounterGroup;
 import org.jnode.util.Statistic;
 import org.jnode.util.Statistics;
 import org.jnode.vm.annotation.Inline;
+import org.jnode.vm.annotation.KernelSpace;
 import org.jnode.vm.annotation.NoInline;
 import org.jnode.vm.annotation.SharedStatics;
+import org.jnode.vm.annotation.Uninterruptible;
 import org.jnode.vm.classmgr.CompiledCodeList;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmSharedStatics;
@@ -220,6 +222,8 @@ public class Vm extends VmSystemObject implements Statistics {
     /**
      * @return Returns the instance.
      */
+    @KernelSpace
+    @Uninterruptible
     public static final Vm getVm() {
         return instance;
     }
@@ -514,6 +518,7 @@ public class Vm extends VmSystemObject implements Statistics {
     /**
      * Dump the status of this queue on Unsafe.debug.
      */
+    @KernelSpace
     final static void dumpWaitingThreads(boolean dumpStack, VmStackReader stackReader) {
         final Vm vm = getVm();
         // final SpinLock lock = vm.allThreadsLock;
@@ -521,7 +526,7 @@ public class Vm extends VmSystemObject implements Statistics {
         VmThreadQueueEntry e = q.first;
         while (e != null) {
             if (e.thread.isWaiting()) {
-                Unsafe.debug(e.thread.asThread().getName());
+                Unsafe.debug(e.thread.getName());
                 Unsafe.debug(" id0x");
                 Unsafe.debug(e.thread.getId());
                 Unsafe.debug(" s0x");
@@ -530,7 +535,7 @@ public class Vm extends VmSystemObject implements Statistics {
                 Unsafe.debug(e.thread.priority);
                 Unsafe.debug(" wf:");
                 VmThread waitFor = e.thread.getWaitForThread();
-                Unsafe.debug((waitFor != null) ? waitFor.asThread().getName() : "none");
+                Unsafe.debug((waitFor != null) ? waitFor.getName() : "none");
                 Unsafe.debug("\n");
                 if (dumpStack && (stackReader != null)) {
                     stackReader.debugStackTrace(e.thread);
@@ -544,6 +549,7 @@ public class Vm extends VmSystemObject implements Statistics {
     /**
      * Dump the status of this queue on Unsafe.debug.
      */
+    @KernelSpace
     final static void verifyThreads() {
         final Vm vm = getVm();
         // final SpinLock lock = vm.allThreadsLock;
@@ -579,6 +585,7 @@ public class Vm extends VmSystemObject implements Statistics {
      * 
      * @return Returns the compiledMethods.
      */
+    @KernelSpace
     public static final CompiledCodeList getCompiledMethods() {
         return instance.compiledMethods;
     }

@@ -114,6 +114,10 @@ yieldPointHandler:
 	; and change the current EIP to yieldPointHandler_doReschedule, which will 
 	; save the registers and call VmScheduler.reschedule
 yieldPointHandler_reschedule:
+	; Save current stackframe (so we can show stacktraces)
+	mov ADI,CURRENTTHREAD
+	SAVEREG VmX86Thread_EBP_OFS, OLD_EBP
+
 	; Actually call VmScheduler.reschedule (in kernel mode!)
 	push ABP
 	xor ABP,ABP						; Make java stacktraces terminate

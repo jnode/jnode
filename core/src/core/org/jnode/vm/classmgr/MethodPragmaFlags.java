@@ -56,4 +56,7 @@ public interface MethodPragmaFlags {
     /** No write barriers will be emitted */
     public static final char NOWRITEBARRIER = 0x0100;
     
+    /** Method is run in kernel space (ring 0) */
+    public static final char KERNELSPACE = 0x0200;
+    
 }
