@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.classmgr;
 
 import gnu.java.lang.VMClassHelper;
@@ -33,6 +33,7 @@ import org.jnode.vm.annotation.AllowedPackages;
 import org.jnode.vm.annotation.CheckPermission;
 import org.jnode.vm.annotation.DoPrivileged;
 import org.jnode.vm.annotation.Inline;
+import org.jnode.vm.annotation.KernelSpace;
 import org.jnode.vm.annotation.LoadStatics;
 import org.jnode.vm.annotation.NoFieldAlignments;
 import org.jnode.vm.annotation.NoInline;
@@ -112,7 +113,9 @@ public final class ClassDecoder {
             new PragmaAnnotation(PrivilegedActionPragma.class,
                     MethodPragmaFlags.PRIVILEGEDACTION),
             new PragmaAnnotation(Uninterruptible.class,
-                    MethodPragmaFlags.UNINTERRUPTIBLE), };
+                    MethodPragmaFlags.UNINTERRUPTIBLE),
+            new PragmaAnnotation(KernelSpace.class,
+                    MethodPragmaFlags.KERNELSPACE), };
 
     private static final byte[] TYPE_SIZES = { 1, 2, 4, 8 };
 
@@ -279,7 +282,7 @@ public final class ClassDecoder {
             }
                 break;
             case 12:
-            // Name and Type
+                // Name and Type
             {
                 final int nIdx = data.getChar();
                 final int dIdx = data.getChar();
@@ -553,7 +556,8 @@ public final class ClassDecoder {
             }
         }
 
-        return new VmByteCode(method, code, noLocals, maxStack, etable, lnTable, lvTable);
+        return new VmByteCode(method, code, noLocals, maxStack, etable,
+                lnTable, lvTable);
     }
 
     /**
@@ -865,23 +869,25 @@ public final class ClassDecoder {
      * @param cp
      * @return The line number map
      */
-    private static final VmLocalVariableTable readLocalVariableTable(ByteBuffer data, VmCP cp) {
+    private static final VmLocalVariableTable readLocalVariableTable(
+            ByteBuffer data, VmCP cp) {
         final int len = data.getChar();
         if (len == 0) {
             return VmLocalVariableTable.EMPTY;
         } else {
             final VmLocalVariable[] table = new VmLocalVariable[len];
-            
+
             for (int i = 0; i < len; i++) {
                 final char startPc = data.getChar();
                 final char length = data.getChar();
                 final char nameIdx = data.getChar();
                 final char descrIdx = data.getChar();
                 final char index = data.getChar();
-                
-                table[i] = new VmLocalVariable(startPc, length, nameIdx, descrIdx, index);
+
+                table[i] = new VmLocalVariable(startPc, length, nameIdx,
+                        descrIdx, index);
             }
-            
+
             return new VmLocalVariableTable(table);
         }
     }
@@ -956,10 +962,12 @@ public final class ClassDecoder {
                 }
                 mts.setRuntimeAnnotations(rVisAnn);
                 if (rVisAnn != null) {
-                    mts.addPragmaFlags(getMethodPragmaFlags(rVisAnn, cls.getName()));
+                    mts.addPragmaFlags(getMethodPragmaFlags(rVisAnn, cls
+                            .getName()));
                 }
                 if (rInvisAnn != null) {
-                    mts.addPragmaFlags(getMethodPragmaFlags(rInvisAnn, cls.getName()));
+                    mts.addPragmaFlags(getMethodPragmaFlags(rInvisAnn, cls
+                            .getName()));
                 }
                 if ((modifiers & Modifier.ACC_NATIVE) != 0) {
                     final VmByteCode bc = getNativeCodeReplacement(mts, cl,
@@ -1016,7 +1024,8 @@ public final class ClassDecoder {
      * @param annotations
      * @param className
      */
-    private static int getMethodPragmaFlags(VmAnnotation[] annotations, String className) {
+    private static int getMethodPragmaFlags(VmAnnotation[] annotations,
+            String className) {
         int flags = 0;
         for (VmAnnotation a : annotations) {
             final String typeDescr = a.getTypeDescriptor();
@@ -1036,7 +1045,8 @@ public final class ClassDecoder {
      * @param annotations
      * @param className
      */
-    private static int getClassPragmaFlags(VmAnnotation[] annotations, String className) {
+    private static int getClassPragmaFlags(VmAnnotation[] annotations,
+            String className) {
         int flags = 0;
         for (VmAnnotation a : annotations) {
             final String typeDescr = a.getTypeDescriptor();
@@ -1075,7 +1085,7 @@ public final class ClassDecoder {
             for (int i = 0; i < numElemValuePairs; i++) {
                 data.getChar(); // Skip name ref
                 skipElementValue(data, cp);
-            }            
+            }
         }
         return new VmAnnotation(typeDescr, values);
     }
@@ -1172,7 +1182,7 @@ public final class ClassDecoder {
                 skipElementValue(data, cp);
             }
         }
-        break;
+            break;
         default:
             throw new ClassFormatError("Unknown element_value tag '"
                     + (char) tag + "'");
@@ -1248,32 +1258,35 @@ public final class ClassDecoder {
         public final char flags;
 
         public final String typeDescr;
-        
+
         private final String[] allowedPackages;
 
         public PragmaAnnotation(Class< ? extends Annotation> cls, char flags) {
             this.typeDescr = "L" + cls.getName().replace('.', '/') + ";";
             this.flags = flags;
-            final AllowedPackages ann = cls.getAnnotation(AllowedPackages.class);
+            final AllowedPackages ann = cls
+                    .getAnnotation(AllowedPackages.class);
             if (ann != null) {
                 allowedPackages = ann.value();
             } else {
                 allowedPackages = null;
             }
         }
-        
+
         /**
          * Is this annotation allowed for the given classname.
          */
         public final void checkPragmaAllowed(String className) {
             if (allowedPackages != null) {
-                final String pkg = className.substring(0, className.lastIndexOf('.'));
+                final String pkg = className.substring(0, className
+                        .lastIndexOf('.'));
                 for (String allowedPkg : allowedPackages) {
                     if (pkg.equals(allowedPkg)) {
                         return;
                     }
                 }
-                throw new SecurityException("Pragma " + typeDescr + " is not allowed in class " + className);
+                throw new SecurityException("Pragma " + typeDescr
+                        + " is not allowed in class " + className);
             }
         }
     }

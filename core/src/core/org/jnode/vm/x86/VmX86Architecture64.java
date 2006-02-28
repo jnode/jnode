@@ -83,7 +83,7 @@ public final class VmX86Architecture64 extends VmX86Architecture {
 	 * @param compiler
 	 */
 	public VmX86Architecture64(String compiler) {
-		super(compiler);
+		super(SLOT_SIZE, compiler);
 		this.imtCompiler = new X86IMTCompiler64();
         this.typeSizeInfo = new TypeSizeInfo(1, 1, 2, 2, 1);
 	}
@@ -101,13 +101,6 @@ public final class VmX86Architecture64 extends VmX86Architecture {
 	 */
 	public final IMTCompiler getIMTCompiler() {
 		return imtCompiler;
-	}
-
-	/**
-	 * @see org.jnode.vm.VmArchitecture#getReferenceSize()
-	 */
-	public final int getReferenceSize() {
-		return SLOT_SIZE;
 	}
 
     /**

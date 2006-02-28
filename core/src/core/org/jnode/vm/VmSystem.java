@@ -44,8 +44,10 @@ import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.system.SimpleResourceOwner;
 import org.jnode.util.SystemInputStream;
+import org.jnode.vm.annotation.KernelSpace;
 import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.jnode.vm.annotation.SharedStatics;
+import org.jnode.vm.annotation.Uninterruptible;
 import org.jnode.vm.classmgr.AbstractExceptionHandler;
 import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmByteCode;
@@ -777,7 +779,9 @@ public final class VmSystem {
      * @return The current time of the kernel
      * @throws UninterruptiblePragma
      */
-    public static long currentKernelMillis() throws UninterruptiblePragma {
+    @KernelSpace
+    @Uninterruptible
+    public static long currentKernelMillis() {
         return currentTimeMillis;
     }
 

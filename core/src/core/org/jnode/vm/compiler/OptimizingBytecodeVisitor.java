@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.compiler;
 
 import org.jnode.util.Counter;
@@ -38,65 +38,89 @@ import org.jnode.vm.classmgr.VmType;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public final class OptimizingBytecodeVisitor extends
-        DelegatingCompilerBytecodeVisitor<InlineBytecodeVisitor> {
+        VerifyingCompilerBytecodeVisitor<InlineBytecodeVisitor> {
 
-    /** Maximum length of methods that will be inlined */ 
+    /** Maximum length of methods that will be inlined */
     private static final int SIZE_LIMIT = 32;
-    /** Maximum depth of recursive inlining */ 
+
+    /** Maximum depth of recursive inlining */
     private static final int MAX_INLINE_DEPTH = 5;
-    
+
     /** Common method entrypoints */
     private final EntryPoints entryPoints;
+
     /** The classloader */
     private final VmClassLoader loader;
+
     /** The method that is currently being visited */
     private VmMethod method;
+
     /** The current max locals of method (adjusted for inlined methods) */
     private char maxLocals;
+
     /** Diff to add to local indexes */
     private char localDelta;
+
     /** Has a return been visited during an inline */
     private boolean visitedReturn = false;
+
     /** How many nested inlines we're currently in (0 == no inline) */
     private byte inlineDepth = 0;
-    
+
     // Inter instruction optimization flags
-    
+
     /**
      * Optimization flag constants.
      */
     private static interface OptFlags {
         int ASTORE = 0x0001;
+
         int ISTORE = 0x0002;
+
         int LSTORE = 0x0004;
+
         int FSTORE = 0x0008;
+
         int DSTORE = 0x0010;
 
         int ALOAD = 0x0020;
+
         int ILOAD = 0x0040;
+
         int LLOAD = 0x0080;
+
         int FLOAD = 0x0100;
+
         int DLOAD = 0x0200;
-}
-    
+    }
+
     /** Optimize flags set by the current instruction */
     private int optimizeFlags;
+
     /** Optimize flags set by the previous instruction */
     private int previousOptimizeFlags;
+
     /** Index of the last xstore instruction */
     private int storeIndex;
+
     /** Index of the last xload instruction */
     private int loadIndex;
 
     /** Statistic counter for #inlined invokespecial's */
-    private static Counter inlineSpecialCounter = Vm.getVm().getCounter("inlined-invokespecial");
+    private static Counter inlineSpecialCounter = Vm.getVm().getCounter(
+            "inlined-invokespecial");
+
     /** Statistic counter for #inlined invokespecial's */
-    private static Counter inlineStaticCounter = Vm.getVm().getCounter("inlined-invokestatic");
+    private static Counter inlineStaticCounter = Vm.getVm().getCounter(
+            "inlined-invokestatic");
+
     /** Statistic counter for #inlined invokespecial's */
-    private static Counter inlineVirtualCounter = Vm.getVm().getCounter("inlined-invokevirtual");
+    private static Counter inlineVirtualCounter = Vm.getVm().getCounter(
+            "inlined-invokevirtual");
 
     /** Statistic counter for astore/aload sequence */
-    private static Counter storeLoadCounter = Vm.getVm().getCounter("store-load");
+    private static Counter storeLoadCounter = Vm.getVm().getCounter(
+            "store-load");
 
     /**
      * Initialize this instance.
@@ -104,8 +128,8 @@ public final class OptimizingBytecodeVisitor extends
      * @param delegate
      * @param loader
      */
-    public OptimizingBytecodeVisitor(EntryPoints entryPoints, InlineBytecodeVisitor delegate,
-            VmClassLoader loader) {
+    public OptimizingBytecodeVisitor(EntryPoints entryPoints,
+            InlineBytecodeVisitor delegate, VmClassLoader loader) {
         super(delegate);
         this.entryPoints = entryPoints;
         this.loader = loader;
@@ -116,7 +140,7 @@ public final class OptimizingBytecodeVisitor extends
      */
     public void startMethod(VmMethod method) {
         this.method = method;
-        this.maxLocals = (char)method.getBytecode().getNoLocals();
+        this.maxLocals = (char) method.getBytecode().getNoLocals();
         // Reset optimization flags
         this.optimizeFlags = 0;
         this.previousOptimizeFlags = 0;
@@ -149,13 +173,14 @@ public final class OptimizingBytecodeVisitor extends
     /**
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_invokespecial(org.jnode.vm.classmgr.VmConstMethodRef)
      */
-    public void visit_invokespecial(VmConstMethodRef methodRef) {
+    public void visit_invokespecial(VmConstMethodRef methodRef) {        
         methodRef.resolve(loader);
         final VmMethod im = methodRef.getResolvedVmMethod();
         if (!canInline(im)) {
             // Do not inline this call
             super.visit_invokespecial(methodRef);
         } else {
+            verifyInvoke(methodRef);
             inlineSpecialCounter.inc();
             inline(im);
         }
@@ -171,11 +196,12 @@ public final class OptimizingBytecodeVisitor extends
             // Do not inline this call
             super.visit_invokestatic(methodRef);
         } else {
+            verifyInvoke(methodRef);
             inlineStaticCounter.inc();
             inline(im);
         }
     }
-    
+
     /**
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_invokevirtual(org.jnode.vm.classmgr.VmConstMethodRef)
      */
@@ -186,6 +212,7 @@ public final class OptimizingBytecodeVisitor extends
             // Do not inline this call
             super.visit_invokevirtual(methodRef);
         } else {
+            verifyInvoke(methodRef);
             inlineVirtualCounter.inc();
             inline(im);
         }
@@ -193,21 +220,27 @@ public final class OptimizingBytecodeVisitor extends
 
     /**
      * Inline the given method into the current method
+     * 
      * @param im
      */
     private void inline(VmMethod im) {
         // Save some variables
         final char oldLocalDelta = this.localDelta;
         final boolean oldVisitedReturn = this.visitedReturn;
-        final VmMethod oldMethod = this.method;        
+        final VmMethod oldMethod = this.method;
         final InlineBytecodeVisitor ibv = getDelegate();
-		final VmByteCode bc = im.getBytecode();
+        final VmByteCode bc = im.getBytecode();
 
-		// Calculate the new maxLocals
+        // Calculate the new maxLocals
         final int imLocals = bc.getNoLocals(); // #Locals of the inlined method
-        final int curLocals = oldMethod.getBytecode().getNoLocals(); // #Locals of the current method       
-        maxLocals = (char)Math.max(maxLocals, oldLocalDelta + curLocals + imLocals);
-        
+        final int curLocals = oldMethod.getBytecode().getNoLocals(); // #Locals
+                                                                        // of
+                                                                        // the
+                                                                        // current
+                                                                        // method
+        maxLocals = (char) Math.max(maxLocals, oldLocalDelta + curLocals
+                + imLocals);
+
         // Set new variables
         this.localDelta += curLocals;
         this.visitedReturn = false;
@@ -217,43 +250,44 @@ public final class OptimizingBytecodeVisitor extends
         // Reset optimization flags
         this.optimizeFlags = 0;
         this.previousOptimizeFlags = 0;
-        
+
         // Start the inlining
         ibv.startInlinedMethodHeader(im, maxLocals);
-        
+
         // Store the arguments in the locals of the inlined method
         storeArgumentsToLocals(im, ibv, localDelta);
-                
+
         // Start the inlining
         ibv.startInlinedMethodCode(im, maxLocals);
-        
+
         // Emit a NOP so we can differentiate when a method is virtually empty
         if (inlineDepth > 1) {
             ibv.visit_nop();
         }
-        
-		// Create the control flow graph
-		ControlFlowGraph cfg = (ControlFlowGraph) bc.getCompilerData();
-		if (cfg == null) {
-			cfg = new ControlFlowGraph(bc);
-			bc.setCompilerData(cfg);
-		}
-		// Compile the code 1 basic block at a time
-		final CompilerBytecodeParser parser = new CompilerBytecodeParser(bc, cfg, this);
-		for (BasicBlock bb : cfg) {
-			this.startBasicBlock(bb);
-			parser.parse(bb.getStartPC(), bb.getEndPC(), false);
-			this.endBasicBlock();
-		}
-		
-		if (!this.isReturnVisited()) {
-			// Generate a dummy return to avoid breaking the compilers
-			createDummyReturn(im, this);
-		}
-        
+
+        // Create the control flow graph
+        ControlFlowGraph cfg = (ControlFlowGraph) bc.getCompilerData();
+        if (cfg == null) {
+            cfg = new ControlFlowGraph(bc);
+            bc.setCompilerData(cfg);
+        }
+        // Compile the code 1 basic block at a time
+        final CompilerBytecodeParser parser = new CompilerBytecodeParser(bc,
+                cfg, this);
+        for (BasicBlock bb : cfg) {
+            this.startBasicBlock(bb);
+            parser.parse(bb.getStartPC(), bb.getEndPC(), false);
+            this.endBasicBlock();
+        }
+
+        if (!this.isReturnVisited()) {
+            // Generate a dummy return to avoid breaking the compilers
+            createDummyReturn(im, this);
+        }
+
         // End the inlining
         ibv.endInlinedMethod(oldMethod);
-        
+
         // Restore variables
         this.localDelta = oldLocalDelta;
         this.visitedReturn = oldVisitedReturn;
@@ -262,57 +296,59 @@ public final class OptimizingBytecodeVisitor extends
 
         // Reset optimization flags
         this.optimizeFlags = 0;
-        this.previousOptimizeFlags = 0;       
+        this.previousOptimizeFlags = 0;
     }
-    
+
     private void createDummyReturn(VmMethod im, CompilerBytecodeVisitor bcv) {
-		if (im.isReturnVoid()) {
-			bcv.visit_return();
-		} else if (im.isReturnObject()) {
-			bcv.visit_aconst_null();
-			bcv.visit_areturn();
-		} else if (im.isReturnWide()) {
-			if (im.getReturnType().getJvmType() == JvmType.DOUBLE) {
-				// double
-				bcv.visit_dconst(0.0);
-				bcv.visit_dreturn();
-			} else {
-				// long
-				bcv.visit_lconst(0);
-				bcv.visit_lreturn();
-			}			
-		} else {
-			if (im.getReturnType().getJvmType() == JvmType.FLOAT) {
-				// float
-				bcv.visit_fconst(0.0f);
-				bcv.visit_freturn();
-			} else {
-				// int
-				bcv.visit_iconst(0);
-				bcv.visit_ireturn();
-			}						
-		}
+        if (im.isReturnVoid()) {
+            bcv.visit_return();
+        } else if (im.isReturnObject()) {
+            bcv.visit_aconst_null();
+            bcv.visit_areturn();
+        } else if (im.isReturnWide()) {
+            if (im.getReturnType().getJvmType() == JvmType.DOUBLE) {
+                // double
+                bcv.visit_dconst(0.0);
+                bcv.visit_dreturn();
+            } else {
+                // long
+                bcv.visit_lconst(0);
+                bcv.visit_lreturn();
+            }
+        } else {
+            if (im.getReturnType().getJvmType() == JvmType.FLOAT) {
+                // float
+                bcv.visit_fconst(0.0f);
+                bcv.visit_freturn();
+            } else {
+                // int
+                bcv.visit_iconst(0);
+                bcv.visit_ireturn();
+            }
+        }
     }
 
     /**
      * Pop the method arguments of the stack and store them in locals.
+     * 
      * @param im
      * @param ibv
      * @param localDelta
      */
-    private void storeArgumentsToLocals(VmMethod im, InlineBytecodeVisitor ibv, int localDelta) {        
+    private void storeArgumentsToLocals(VmMethod im, InlineBytecodeVisitor ibv,
+            int localDelta) {
         final int cnt = im.getNoArguments();
         int local = localDelta + im.getArgSlotCount() - 1;
-        /*if (im.isStatic()) {
-            local--;
-        }*/
-        
-        for (int i = cnt-1; i >= 0; i--) {
-            final VmType<?> argType = im.getArgumentType(i);
-            //System.out.println("arg" + i + ": " + argType);
-            
+        /*
+         * if (im.isStatic()) { local--; }
+         */
+
+        for (int i = cnt - 1; i >= 0; i--) {
+            final VmType< ? > argType = im.getArgumentType(i);
+            // System.out.println("arg" + i + ": " + argType);
+
             if (argType.isPrimitive()) {
-                final VmPrimitiveClass<?> pc = (VmPrimitiveClass<?>)argType;
+                final VmPrimitiveClass< ? > pc = (VmPrimitiveClass< ? >) argType;
                 if (pc.isWide()) {
                     local--;
                     if (pc.isFloatingPoint()) {
@@ -320,7 +356,7 @@ public final class OptimizingBytecodeVisitor extends
                         ibv.visit_dstore(local);
                     } else {
                         // long
-                        ibv.visit_lstore(local);                        
+                        ibv.visit_lstore(local);
                     }
                 } else {
                     if (pc.isFloatingPoint()) {
@@ -328,38 +364,40 @@ public final class OptimizingBytecodeVisitor extends
                         ibv.visit_fstore(local);
                     } else {
                         // int
-                        ibv.visit_istore(local);                        
-                    }                    
+                        ibv.visit_istore(local);
+                    }
                 }
             } else {
                 ibv.visit_astore(local);
             }
             local--;
         }
-        
+
         if (!im.isStatic()) {
             // TODO add nullpointer check
-            
+
             // Store this pointer.
             ibv.visit_astore(local);
-        }        
+        }
     }
-    
+
     /**
      * Can the given method be inlined?
+     * 
      * @param method
      * @return
      */
     private boolean canInline(VmMethod method) {
-        
+
         // First determine if we CAN inline
         if (method.isNative() || method.isAbstract() || method.isSynchronized()) {
             return false;
         }
-        if (!(method.isFinal() || method.isPrivate() || method.isStatic() || method.getDeclaringClass().isFinal())) {
+        if (!(method.isFinal() || method.isPrivate() || method.isStatic() || method
+                .getDeclaringClass().isFinal())) {
             return false;
         }
-        final VmType<?> declClass = method.getDeclaringClass();
+        final VmType< ? > declClass = method.getDeclaringClass();
         if (declClass.isMagicType()) {
             return false;
         }
@@ -387,19 +425,21 @@ public final class OptimizingBytecodeVisitor extends
             }
         }
         return true;
-    }  
-    
+    }
+
     /**
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_aload(int)
      */
     public void visit_aload(int index) {
         index += localDelta;
-        if (((previousOptimizeFlags & OptFlags.ASTORE) != 0) && (storeIndex == index)) {
+        if (((previousOptimizeFlags & OptFlags.ASTORE) != 0)
+                && (storeIndex == index)) {
             storeLoadCounter.inc();
             super.visit_aloadStored(index);
-        } else if (((previousOptimizeFlags & OptFlags.ALOAD) != 0) && (loadIndex == index)) {
+        } else if (((previousOptimizeFlags & OptFlags.ALOAD) != 0)
+                && (loadIndex == index)) {
             super.visit_dup();
-        } else {       
+        } else {
             super.visit_aload(index);
         }
         loadIndex = index;
@@ -433,12 +473,14 @@ public final class OptimizingBytecodeVisitor extends
      */
     public void visit_dload(int index) {
         index += localDelta;
-        if (((previousOptimizeFlags & OptFlags.DSTORE) != 0) && (storeIndex == index)) {
+        if (((previousOptimizeFlags & OptFlags.DSTORE) != 0)
+                && (storeIndex == index)) {
             storeLoadCounter.inc();
             super.visit_dloadStored(index);
-        } else if (((previousOptimizeFlags & OptFlags.DLOAD) != 0) && (loadIndex == index)) {
+        } else if (((previousOptimizeFlags & OptFlags.DLOAD) != 0)
+                && (loadIndex == index)) {
             super.visit_dup2();
-        } else {       
+        } else {
             super.visit_dload(index);
         }
         loadIndex = index;
@@ -472,12 +514,14 @@ public final class OptimizingBytecodeVisitor extends
      */
     public void visit_fload(int index) {
         index += localDelta;
-        if (((previousOptimizeFlags & OptFlags.FSTORE) != 0) && (storeIndex == index)) {
+        if (((previousOptimizeFlags & OptFlags.FSTORE) != 0)
+                && (storeIndex == index)) {
             storeLoadCounter.inc();
             super.visit_floadStored(index);
-        } else if (((previousOptimizeFlags & OptFlags.FLOAD) != 0) && (loadIndex == index)) {
+        } else if (((previousOptimizeFlags & OptFlags.FLOAD) != 0)
+                && (loadIndex == index)) {
             super.visit_dup();
-        } else {       
+        } else {
             super.visit_fload(index);
         }
         loadIndex = index;
@@ -518,12 +562,14 @@ public final class OptimizingBytecodeVisitor extends
      */
     public void visit_iload(int index) {
         index += localDelta;
-        if (((previousOptimizeFlags & OptFlags.ISTORE) != 0) && (storeIndex == index)) {
+        if (((previousOptimizeFlags & OptFlags.ISTORE) != 0)
+                && (storeIndex == index)) {
             storeLoadCounter.inc();
             super.visit_iloadStored(index);
-        } else if (((previousOptimizeFlags & OptFlags.ILOAD) != 0) && (loadIndex == index)) {
+        } else if (((previousOptimizeFlags & OptFlags.ILOAD) != 0)
+                && (loadIndex == index)) {
             super.visit_dup();
-        } else {       
+        } else {
             super.visit_iload(index);
         }
         loadIndex = index;
@@ -557,12 +603,14 @@ public final class OptimizingBytecodeVisitor extends
      */
     public void visit_lload(int index) {
         index += localDelta;
-        if (((previousOptimizeFlags & OptFlags.LSTORE) != 0) && (storeIndex == index)) {
+        if (((previousOptimizeFlags & OptFlags.LSTORE) != 0)
+                && (storeIndex == index)) {
             storeLoadCounter.inc();
             super.visit_lloadStored(index);
-        } else if (((previousOptimizeFlags & OptFlags.LLOAD) != 0) && (loadIndex == index)) {
+        } else if (((previousOptimizeFlags & OptFlags.LLOAD) != 0)
+                && (loadIndex == index)) {
             super.visit_dup2();
-        } else {       
+        } else {
             super.visit_lload(index);
         }
         loadIndex = index;
@@ -609,9 +657,10 @@ public final class OptimizingBytecodeVisitor extends
             getDelegate().visit_inlinedReturn(JvmType.VOID);
         }
     }
-    
+
     /**
      * Have we visited a return statement?
+     * 
      * @return
      */
     public boolean isReturnVisited() {
@@ -639,7 +688,7 @@ public final class OptimizingBytecodeVisitor extends
         if (false) {
             // Inline call to {@link SoftByteCodes#allocObject}
             clazz.resolve(loader);
-            
+
             /* Setup a call to SoftByteCodes.allocObject */
             visit_ldc(clazz.getResolvedVmClass()); // vmClass
             visit_iconst(-1); // size

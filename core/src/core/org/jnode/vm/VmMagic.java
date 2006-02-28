@@ -21,6 +21,7 @@
  
 package org.jnode.vm;
 
+import org.jnode.vm.annotation.KernelSpace;
 import org.jnode.vm.classmgr.VmClassType;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Word;
@@ -108,6 +109,7 @@ public final class VmMagic {
 	 * 
 	 * @return The address of the stackframe of the current thread
 	 */
+    @KernelSpace
 	protected static Address getCurrentFrame() {
 		return null;
 	}
@@ -146,6 +148,7 @@ public final class VmMagic {
      * Gets the processor executing the current thread.
      * @return
      */
+    @KernelSpace
     final static VmProcessor currentProcessor() {
         return null;
     }

@@ -25,6 +25,7 @@ import java.nio.ByteOrder;
 
 import org.jnode.security.JNodePermission;
 import org.jnode.system.ResourceManager;
+import org.jnode.vm.annotation.KernelSpace;
 import org.jnode.vm.classmgr.TypeSizeInfo;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmSharedStatics;
@@ -45,6 +46,13 @@ public abstract class VmArchitecture extends VmSystemObject {
     private final JNodePermission MMAP_PERM = new JNodePermission("getMemoryMap");
     private transient MemoryMapEntry[] memoryMap;
     private transient VmMultiMediaSupport multiMediaSupport;
+    private final int referenceSize;
+    private final VmStackReader stackReader;
+    
+    protected VmArchitecture(int referenceSize, VmStackReader stackReader) {
+        this.referenceSize = referenceSize;
+        this.stackReader = stackReader;
+    }
     
     /**
 	 * Gets the name of this architecture.
@@ -73,7 +81,10 @@ public abstract class VmArchitecture extends VmSystemObject {
 	 * 
 	 * @return Reference size
 	 */
-	public abstract int getReferenceSize();
+    @KernelSpace
+	public final int getReferenceSize() {
+        return referenceSize;
+    }
     
     /**
      * Gets the log base two of the size of an OS page
@@ -102,7 +113,10 @@ public abstract class VmArchitecture extends VmSystemObject {
 	 * 
 	 * @return Stack reader
 	 */
-	public abstract VmStackReader getStackReader();
+    @KernelSpace
+	public final VmStackReader getStackReader() {
+	    return stackReader;   
+    }
 
 	/**
 	 * Gets all compilers for this architecture.

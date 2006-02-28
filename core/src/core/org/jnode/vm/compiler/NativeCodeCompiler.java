@@ -248,8 +248,12 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
             cm.setCodeStart(os.getObjectRef(label));
         } else {
             // Create the visitor
-            final CompilerBytecodeVisitor bcv = createBytecodeVisitor(method,
+            CompilerBytecodeVisitor bcv = createBytecodeVisitor(method,
                     cm, os, level, isBootstrap);
+            // Wrap in verifier if needed
+            if (!(bcv instanceof VerifyingCompilerBytecodeVisitor)) {
+                bcv = new VerifyingCompilerBytecodeVisitor<CompilerBytecodeVisitor>(bcv);
+            }
             // Get the bytecode
             final VmByteCode bc = method.getBytecode();
             // Create the control flow graph

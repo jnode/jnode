@@ -23,6 +23,8 @@ package org.jnode.vm.classmgr;
 
 import org.jnode.vm.VmAddress;
 import org.jnode.vm.VmSystemObject;
+import org.jnode.vm.annotation.KernelSpace;
+import org.jnode.vm.annotation.Uninterruptible;
 import org.jnode.vm.compiler.CompiledMethod;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 
@@ -85,6 +87,8 @@ public final class CompiledCodeList extends VmSystemObject {
      * @param cmid
      * @return
      */
+    @KernelSpace
+    @Uninterruptible
     public final VmCompiledCode get(int cmid) {
         if ((cmid >= 0) && (cmid < list.length)) {
             return list[cmid];

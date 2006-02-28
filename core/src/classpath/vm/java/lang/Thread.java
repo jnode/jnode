@@ -29,6 +29,8 @@ import org.jnode.vm.MonitorManager;
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmSystem;
 import org.jnode.vm.VmThread;
+import org.jnode.vm.annotation.KernelSpace;
+import org.jnode.vm.annotation.SystemProtected;
 
 /**
  * Kore implementation of the <code>java.lang.Thread</code> class.
@@ -252,6 +254,7 @@ public class Thread implements Runnable {
 
         this.vmThread = VmProcessor.current().createThread(this);
         this.vmThread.setPriority(current.getPriority());
+        this.vmThread.updateName();
         
         InheritableThreadLocal.newChildThread(this); // FDy : CLASSPATH patch ?
     }
@@ -286,6 +289,7 @@ public class Thread implements Runnable {
         this.name = "System";
         this.target = null;
         this.parent = null;
+        this.vmThread.updateName();
     }
 
     /**
@@ -293,8 +297,9 @@ public class Thread implements Runnable {
      */
     public void checkAccess() {
         SecurityManager sm = System.getSecurityManager();
-        if (sm != null)
+        if (sm != null) {
             sm.checkAccess(this);
+        }
     }
 
     /**
@@ -389,6 +394,18 @@ public class Thread implements Runnable {
         if (sm != null) {
             sm.checkPermission(GETVMTHREAD_PERM);
         }
+        return vmThread;
+    }
+
+    /**
+     * Gets the internal thread representation.
+     * Used for kernel space access.
+     * 
+     * @return
+     */
+    @KernelSpace
+    @SystemProtected
+    protected final VmThread getVmThreadKS() {
         return vmThread;
     }
 
@@ -544,6 +561,7 @@ public class Thread implements Runnable {
     public final void setName(String name) {
         checkAccess();
         this.name = name;
+        this.vmThread.updateName();
     }
 
     public final void setPriority(int priority) {
