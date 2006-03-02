@@ -26,6 +26,7 @@
     <mapper id="8086:1029" name="Intel EtherExpress Pro/100 type 1029" driver-class="org.jnode.driver.net.eepro100.EEPRO100Driver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
     <mapper id="8086:1030" name="Intel EtherExpress Pro/100 type 1030" driver-class="org.jnode.driver.net.eepro100.EEPRO100Driver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
     <mapper id="8086:2449" name="Intel Pro/100 V Network" driver-class="org.jnode.driver.net.eepro100.EEPRO100Driver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="8086:1050" name="Intel 82562EZ 10/100 " driver-class="org.jnode.driver.net.eepro100.EEPRO100Driver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
   </extension>
         
   <extension point="org.jnode.security.permissions">
