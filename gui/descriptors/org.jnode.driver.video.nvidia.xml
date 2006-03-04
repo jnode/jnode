@@ -31,6 +31,8 @@
     <mapper id="10de:00a0" architecture="NV04A" name="Aladdin TNT2" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
     <mapper id="10de:0100" architecture="NV10A" name="GeForce 256" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
     <mapper id="10de:0101" architecture="NV10A" name="GeForce DDR" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="10de:0110" architecture="NV11" name="GeForce2 MX/MX 400" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="10de:0111" architecture="NV11DDR" name="GeForce2 MX 100 DDR/200 DDR" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
     <mapper id="10de:0202" architecture="NV10A" name="GeForce 3Ti500" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
     <mapper id="10de:0286" architecture="NV28M" name="GeForce4 4200 Go" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
   </extension>
