@@ -42,5 +42,11 @@ public class CDBRead10 extends CDB {
         setInt32(2, lba);
         setInt16(7, nrBlocks);
     }
+
+	@Override
+	public int getDataTransfertCount() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
     
 }

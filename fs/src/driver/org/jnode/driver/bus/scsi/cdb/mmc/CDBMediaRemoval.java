@@ -42,4 +42,9 @@ public class CDBMediaRemoval extends CDB {
         code |= (persistent ? 0x02 : 0x00);
         setInt8(4, code);
     }
+
+	@Override
+	public int getDataTransfertCount() {
+		return 0;
+	}
 }

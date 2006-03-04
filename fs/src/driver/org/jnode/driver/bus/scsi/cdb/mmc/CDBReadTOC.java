@@ -31,12 +31,18 @@ import org.jnode.driver.bus.scsi.CDB;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class CDBReadTOC extends CDB {
+	private int dataTransfertCount;
 
     public CDBReadTOC(int allocationLength) {
         super(10, 0x43);
         setInt8(1, 0x02); // MSF flag
-        setInt16(7, allocationLength);
+        dataTransfertCount = allocationLength;
+        setInt16(7, dataTransfertCount);
         setInt8(9, 0x80); // TOC format
     }
-    
+
+	@Override
+	public int getDataTransfertCount() {
+		return dataTransfertCount;
+	}
 }
