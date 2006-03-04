@@ -33,45 +33,37 @@ import org.jnode.driver.bus.usb.USBInterface;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class USBInputDeviceToDriverMapper implements DeviceToDriverMapper, USBConstants {
+public class USBInputDeviceToDriverMapper implements DeviceToDriverMapper, USBConstants, USBHidConstants {
 
 	/**
 	 * @see org.jnode.driver.DeviceToDriverMapper#findDriver(org.jnode.driver.Device)
 	 */
 	public Driver findDriver(Device device) {
-		if (!(device instanceof USBDevice)) {
-			return null;
-		}
+		if (device instanceof USBDevice) {
+			final USBDevice dev = (USBDevice) device;
+			if (dev.getDescriptor().getDeviceClass() == USB_CLASS_PER_INTERFACE) {
+	
+				final USBConfiguration conf = dev.getConfiguration(0);
+				final USBInterface intf = conf.getInterface(0);
+				final InterfaceDescriptor descr = intf.getDescriptor();
 		
-		final USBDevice dev = (USBDevice) device;
-		if (dev.getDescriptor().getDeviceClass() != USB_CLASS_PER_INTERFACE) {
-			return null;
+				if (descr.getInterfaceClass() == USB_CLASS_HID) {
+					if (descr.getInterfaceSubClass() == HID_SUBCLASS_BOOT_INTERFACE) {
+						switch (descr.getInterfaceProtocol()) {
+							case HID_PROTOCOL_KEYBOARD :
+								// We found an USB keyboard
+								return new USBKeyboardDriver();
+							case HID_PROTOCOL_MOUSE :
+								// We found an USB mouse
+								return new USBMouseDriver();
+							default :
+								return null;
+						}
+					}
+				}
+			}
 		}
-
-		final USBConfiguration conf = dev.getConfiguration(0);
-		final USBInterface intf = conf.getInterface(0);
-		final InterfaceDescriptor descr = intf.getDescriptor();
-
-		if (descr.getInterfaceClass() != USB_CLASS_HID) {
-			return null;
-		}
-		
-		// SubClass: 1 = boot interface subclass
-		if (descr.getInterfaceSubClass() != 1) {
-			return null;
-		}
-		
-		// Protocol: 1 = keyboard, 2 = mouse
-		switch (descr.getInterfaceProtocol()) {
-			case 1 :
-				// We found an USB keyboard
-				return new USBKeyboardDriver();
-			case 2 :
-				// We found an USB mouse
-				return new USBMouseDriver();
-			default :
-				return null;
-		}
+		return null;
 	}
 	
 	/**
