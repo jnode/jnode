@@ -38,4 +38,10 @@ public class CDBReadCapacity extends CDB {
         super(10, 0x25);
     }
 
+	@Override
+	public int getDataTransfertCount() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 }

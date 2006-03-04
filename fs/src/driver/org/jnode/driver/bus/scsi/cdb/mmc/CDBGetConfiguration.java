@@ -31,11 +31,18 @@ import org.jnode.driver.bus.scsi.CDB;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class CDBGetConfiguration extends CDB {
+	private int dataTransfertCount;
 
     public CDBGetConfiguration(int allocationLength, int startingFeatureNumber) {
         super(10, 0x46);
+        dataTransfertCount = Math.min(allocationLength, 0xFFFF);
         setInt16(2, startingFeatureNumber);
-        setInt16(7, Math.min(allocationLength, 0xFFFF));
+        setInt16(7, dataTransfertCount);
     }
+
+	@Override
+	public int getDataTransfertCount() {
+		return dataTransfertCount;
+	}
     
 }
