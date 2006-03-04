@@ -31,12 +31,18 @@ import org.jnode.driver.bus.scsi.CDB;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class CDBReportLuns extends CDB {
-
+	private int dataTransfertCount;
     /**
      * Initialize this instance.
      */
     public CDBReportLuns(int allocationLength) {
         super(12, 0xa0);
+        dataTransfertCount = allocationLength;
         setInt32(6, allocationLength);
     }
+
+	@Override
+	public int getDataTransfertCount() {
+		return dataTransfertCount;
+	}
 }

@@ -44,4 +44,6 @@ public abstract class CDB extends SCSIBuffer {
     public final int getOpcode() {
         return getUInt8(0);
     }
+    
+    public abstract int getDataTransfertCount();
 }
