@@ -38,4 +38,9 @@ public class CDBTestUnitReady extends CDB {
     public CDBTestUnitReady() {
         super(6, 0x00);
     }
+
+	@Override
+	public int getDataTransfertCount() {
+		return 0;
+	}
 }

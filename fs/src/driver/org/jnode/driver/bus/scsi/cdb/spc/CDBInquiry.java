@@ -31,12 +31,17 @@ import org.jnode.driver.bus.scsi.CDB;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class CDBInquiry extends CDB {
-
+	private int dataTransfertCount;
     /**
      * Initialize this instance
      */
     public CDBInquiry(int allocationLength) {
         super(6, 0x12);
-        setInt16(3, Math.min(allocationLength, 0xFFFF));
+        dataTransfertCount = Math.min(allocationLength, 0xFFFF);
+        setInt16(3, dataTransfertCount);
+    }
+    
+    public int getDataTransfertCount(){
+    	return dataTransfertCount;
     }
 }

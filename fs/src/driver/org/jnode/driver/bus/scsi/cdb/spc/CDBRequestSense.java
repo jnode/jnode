@@ -31,12 +31,18 @@ import org.jnode.driver.bus.scsi.CDB;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class CDBRequestSense extends CDB {
-
+	private int dataTransfertCount;
     /**
      * Initialize this instance.
      */
     public CDBRequestSense(int allocationLength) {
         super(6, 0x03);
-        setInt8(4, Math.min(allocationLength, 0xFF));
+        dataTransfertCount = Math.min(allocationLength, 0xFF); 
+        setInt8(4, dataTransfertCount);
     }
+
+	@Override
+	public int getDataTransfertCount() {
+		return dataTransfertCount;
+	}
 }
