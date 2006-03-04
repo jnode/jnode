@@ -68,23 +68,22 @@ final class USBStorageBulkTransport implements ITransport, USBPipeListener,
         try {
             byte[] scsiCmd = cdb.toByteArray();
             // Setup command wrapper 
-            BulkCommandBlockWrapper bcb = new BulkCommandBlockWrapper();
-            bcb.setSignature(US_BULK_CB_SIGN);
-            bcb.setDataTransferLength(scsiCmd.length);
-            bcb.setFlags((byte) 0);
-            bcb.setLun((byte)0);
-            bcb.setCdb(scsiCmd);
+            CBW cbw = new CBW();
+            cbw.setSignature(US_BULK_CB_SIGN);
+            cbw.setTag(1);
+            cbw.setDataTransferLength((byte)cdb.getDataTransfertCount());
+            cbw.setFlags((byte) 0);
+            cbw.setLun((byte)0);
+            cbw.setLength((byte)scsiCmd.length);
+            cbw.setCdb(scsiCmd);
+            log.debug(cbw.toString());
             // Sent CBW to device
-            USBPacket data = new USBPacket(bcb.getCBW());
             pipe = (USBDataPipe) devData.getBulkOutEndPoint().getPipe();
+            pipe.addListener(this);
 			pipe.open();
-            USBRequest req = pipe.createRequest(data);
+            USBRequest req = pipe.createRequest(cbw);
             log.debug("*** Request data     : " + req.toString());
             log.debug("*** Request status   : 0x" + NumberUtils.hex(req.getStatus(),4));
-            log.debug("*** Packet size      : " + data.getSize());
-            log.debug("*** Packet data size : " + data.getData().length);
-            log.debug("*** Packet data      : " + data.toString());
-            pipe.addListener(this);
             pipe.asyncSubmit(req);
         } catch (USBException e) {
             e.printStackTrace();
@@ -108,6 +107,7 @@ final class USBStorageBulkTransport implements ITransport, USBPipeListener,
      * @throws USBException
      */
     public void getMaxLun(USBDevice usbDev) throws USBException {
+    	log.info("*** Get max lun ***");
     	final USBControlPipe pipe = usbDev.getDefaultControlPipe();
     	final USBPacket packet = new USBPacket(1);
         final USBRequest req = pipe.createRequest(new SetupPacket(USB_DIR_IN
@@ -115,9 +115,6 @@ final class USBStorageBulkTransport implements ITransport, USBPipeListener,
         pipe.syncSubmit(req, GET_TIMEOUT);
         log.debug("*** Request data     : " + req.toString());
         log.debug("*** Request status   : 0x" + NumberUtils.hex(req.getStatus(),4));
-        log.debug("*** Packet size      : " + packet.getSize());
-        log.debug("*** Packet data size : " + packet.getData().length);
-        log.debug("*** Packet data      : " + packet.toString());
         if(req.getStatus() == USBREQ_ST_COMPLETED){
         	devData.setMaxLun(packet.getData()[0]);
         } else if (req.getStatus() == USBREQ_ST_STALLED){
@@ -129,8 +126,12 @@ final class USBStorageBulkTransport implements ITransport, USBPipeListener,
     
 
     public void requestCompleted(USBRequest request) {
+    	log.debug("*** Request Completed ***");
     	log.debug("*** Request data     : " + request.toString());
 		log.debug("USBStorageBulkTransport completed with status : 0x" + NumberUtils.hex(request.getStatus(),4));
+		
+		CSW csw = (CSW) request;
+		log.debug(csw.toString());
     }
         
     public void requestFailed(USBRequest request) {

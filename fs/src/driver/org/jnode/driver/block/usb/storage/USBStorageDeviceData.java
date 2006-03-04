@@ -21,11 +21,17 @@
  
 package org.jnode.driver.block.usb.storage;
 
+import org.jnode.driver.bus.usb.InterfaceDescriptor;
 import org.jnode.driver.bus.usb.USBDataPipe;
 import org.jnode.driver.bus.usb.USBEndPoint;
 
 final class USBStorageDeviceData {
-    
+    /** */
+	private InterfaceDescriptor intf;
+	/** */
+	private int protocol;
+	/** */
+	private int subClass;
 	/** */
 	private ITransport transport;
 	/** */
@@ -46,7 +52,11 @@ final class USBStorageDeviceData {
 	private byte maxLun;
 
 	
-	public USBStorageDeviceData() {
+	public USBStorageDeviceData(InterfaceDescriptor intf) {
+		this.intf = intf;
+		this.maxLun = 0;
+		this.protocol = intf.getInterfaceProtocol();
+		this.subClass = intf.getInterfaceSubClass();
 	}
 	
 	/**
@@ -179,6 +189,22 @@ final class USBStorageDeviceData {
 	 */
 	public void setTransport(ITransport transport) {
 		this.transport = transport;
+	}
+
+	public int getProtocol() {
+		return protocol;
+	}
+
+	public void setProtocol(int protocol) {
+		this.protocol = protocol;
+	}
+
+	public int getSubClass() {
+		return subClass;
+	}
+
+	public void setSubClass(int subClass) {
+		this.subClass = subClass;
 	}
 
 }

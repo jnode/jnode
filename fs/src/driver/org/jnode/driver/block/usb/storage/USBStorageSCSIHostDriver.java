@@ -32,7 +32,10 @@ import org.jnode.driver.bus.scsi.CDB;
 import org.jnode.driver.bus.scsi.SCSIDevice;
 import org.jnode.driver.bus.scsi.SCSIException;
 import org.jnode.driver.bus.scsi.SCSIHostControllerAPI;
+import org.jnode.driver.bus.scsi.cdb.mmc.CapacityData;
+import org.jnode.driver.bus.scsi.cdb.mmc.MMCUtils;
 import org.jnode.driver.bus.scsi.cdb.spc.CDBInquiry;
+import org.jnode.driver.bus.scsi.cdb.spc.CDBTestUnitReady;
 import org.jnode.driver.bus.scsi.cdb.spc.InquiryData;
 import org.jnode.driver.bus.usb.USBConfiguration;
 import org.jnode.driver.bus.usb.USBDevice;
@@ -52,7 +55,7 @@ public class USBStorageSCSIHostDriver extends Driver implements SCSIHostControll
     private static final Logger log = Logger.getLogger(USBStorageSCSIHostDriver.class);
 
     /** Storage specific device data */
-    private USBStorageDeviceData usbDevData;
+    private USBStorageDeviceData USBMassStorage;
     
     /** The SCSI device that i'm host of */
     private USBStorageSCSIDevice scsiDevice;
@@ -67,20 +70,22 @@ public class USBStorageSCSIHostDriver extends Driver implements SCSIHostControll
     protected void startDevice() throws DriverException {
         try {
             final USBDevice usbDev = (USBDevice)getDevice();
-            this.usbDevData = new USBStorageDeviceData();
-
-//           Set configuration 0
             final USBConfiguration conf = usbDev.getConfiguration(0);
             usbDev.setConfiguration(conf);
 			// Set transport protocol
-            usbDevData.setMaxLun((byte)0);
-			if(conf.getInterface(0).getDescriptor().getInterfaceProtocol() == US_PR_BULK){
+            this.USBMassStorage = new USBStorageDeviceData(conf.getInterface(0).getDescriptor());
+            switch (USBMassStorage.getProtocol()) {
+            case US_PR_CBI:
+            	log.info("*** Set transport protocol to CONTROL/BULK/INTERRUPT");
+				break;
+			case US_PR_BULK:
 				log.info("*** Set transport protocol to BULK ONLY");
-				usbDevData.setTransport(new USBStorageBulkTransport(usbDev, usbDevData));
-				((USBStorageBulkTransport)usbDevData.getTransport()).getMaxLun(usbDev);
-			} else if(conf.getInterface(0).getDescriptor().getInterfaceProtocol() == US_PR_SCM_ATAPI){
+				USBMassStorage.setTransport(new USBStorageBulkTransport(usbDev, USBMassStorage));
+				((USBStorageBulkTransport)USBMassStorage.getTransport()).getMaxLun(usbDev);
+				break;
+			case US_PR_SCM_ATAPI:
 				log.info("*** Set transport protocol to SCM ATAPI");
-			} else {
+			default:
 				throw new DriverException("Transport protocol not implemented.");
 			}
 			
@@ -92,14 +97,14 @@ public class USBStorageSCSIHostDriver extends Driver implements SCSIHostControll
                 if ((ep.getDescriptor().getAttributes() & USB_ENDPOINT_XFERTYPE_MASK) == USB_ENDPOINT_XFER_BULK) {
                     // In or Out ?
                     if ((ep.getDescriptor().getEndPointAddress() & USB_DIR_IN) == 0) {
-                        usbDevData.setBulkInEndPoint(ep);
+                    	USBMassStorage.setBulkInEndPoint(ep);
                         log.info("*** Set bulk in endpoint");
                     } else {
-                        usbDevData.setBulkOutEndPoint(ep);
+                    	USBMassStorage.setBulkOutEndPoint(ep);
                         log.info("*** Set bulk out endpoint");
                     }
                 } else if ((ep.getDescriptor().getAttributes() & USB_ENDPOINT_XFERTYPE_MASK) == USB_ENDPOINT_XFER_INT) {
-                    usbDevData.setIntrEndPoint(ep);
+                	USBMassStorage.setIntrEndPoint(ep);
                     log.info("*** Set interrupt endpoint");
                 }
             }
@@ -107,23 +112,31 @@ public class USBStorageSCSIHostDriver extends Driver implements SCSIHostControll
             usbDev.registerAPI(SCSIHostControllerAPI.class, this);
             final Bus hostBus = new USBStorageSCSIHostBus(getDevice());
             scsiDevice = new USBStorageSCSIDevice(hostBus, "_sg");
-
+            /*try {
+                scsiDevice.testUnit();
+            } catch (SCSIException ex) {
+                throw new DriverException("Cannot TEST UNIT READY device", ex);
+            } catch (TimeoutException ex) {
+                throw new DriverException("Cannot TEST UNIT READY device : timeout", ex);
+            } catch (InterruptedException ex) {
+                throw new DriverException("Interrupted while TEST UNIT READY device", ex);
+            }*/
             // Execute INQUIRY
             try {
                 scsiDevice.inquiry();
             } catch (SCSIException ex) {
                 throw new DriverException("Cannot INQUIRY device", ex);
             } catch (TimeoutException ex) {
-                throw new DriverException("Cannot INQUIRY device", ex);
+                throw new DriverException("Cannot INQUIRY device : timeout", ex);
             } catch (InterruptedException ex) {
                 throw new DriverException("Interrupted while INQUIRY device", ex);
             }
-
             // Register the generic SCSI device.
             try {
                 final DeviceManager dm = usbDev.getManager();
-                dm.rename(usbDev, SCSIHostControllerAPI.DEVICE_PREFIX, true);
+                dm.rename(scsiDevice, "sg", true);
                 dm.register(scsiDevice);
+                dm.rename(usbDev, SCSIHostControllerAPI.DEVICE_PREFIX, true);
             } catch (DeviceAlreadyRegisteredException ex) {
                 throw new DriverException(ex);
             }
@@ -172,11 +185,17 @@ public class USBStorageSCSIHostDriver extends Driver implements SCSIHostControll
         public int executeCommand(CDB cdb, byte[] data, int dataOffset, long timeout)
                 throws SCSIException, TimeoutException, InterruptedException {
 			log.debug("*** execute command ***");
-            ITransport t = usbDevData.getTransport();
+            ITransport t = USBMassStorage.getTransport();
 			t.transport(cdb);
             return 0;
         }
 
+        protected final void testUnit() throws SCSIException, TimeoutException, InterruptedException{
+        	log.info("*** Test unit ready ***");
+        	int res = this.executeCommand(new CDBTestUnitReady(),null,0,50000);
+        	log.debug("*** result : 0x" + NumberUtils.hex(res) + " ***" );
+        }
+        
         /**
          * Execute an INQUUIRY command.
          * 
@@ -186,9 +205,18 @@ public class USBStorageSCSIHostDriver extends Driver implements SCSIHostControll
          */
         protected final void inquiry() throws SCSIException, TimeoutException,
                 InterruptedException {
+        	log.info("*** INQUIRY ***");
             final byte[] inqData = new byte[96];
-            this.executeCommand(new CDBInquiry(inqData.length), inqData, 0, 5000);
+            this.executeCommand(new CDBInquiry(inqData.length), inqData, 0, 50000);
             inquiryResult = new InquiryData(inqData);
+            log.debug("INQUIRY Data : " + inquiryResult.toString());
+        }
+        
+        protected final void capacity() throws SCSIException, TimeoutException, InterruptedException {
+        	log.info("*** Read capacity ***");
+            CapacityData cd = MMCUtils.readCapacity(this);
+            log.debug("Capacity Data : " + cd.toString());
+        	
         }
 
         /**
