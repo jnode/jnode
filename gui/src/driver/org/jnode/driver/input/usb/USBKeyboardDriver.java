@@ -30,6 +30,7 @@ import org.jnode.driver.bus.usb.USBDataPipe;
 import org.jnode.driver.bus.usb.USBDevice;
 import org.jnode.driver.bus.usb.USBEndPoint;
 import org.jnode.driver.bus.usb.USBException;
+import org.jnode.driver.bus.usb.USBInterface;
 import org.jnode.driver.bus.usb.USBPacket;
 import org.jnode.driver.bus.usb.USBPipeListener;
 import org.jnode.driver.bus.usb.USBRequest;
@@ -322,13 +323,16 @@ public class USBKeyboardDriver extends Driver implements USBPipeListener, USBCon
 	protected void startDevice() throws DriverException {
 		try {
 			final USBDevice dev = (USBDevice) getDevice();
-
-			// Set configuration 0
 			final USBConfiguration conf = dev.getConfiguration(0);
-			dev.setConfiguration(conf);
-
-			// Get the HID endpoint
-			this.ep = conf.getInterface(0).getEndPoint(0);
+			//dev.setConfiguration(conf);
+			final USBInterface intf = conf.getInterface(0);
+			this.ep = null;
+			for (int i = 0; i < intf.getDescriptor().getNumEndPoints(); i++) {
+				ep = intf.getEndPoint(i);
+				if(((ep.getDescriptor().getAttributes() & USB_ENDPOINT_XFERTYPE_MASK) == USB_ENDPOINT_XFER_INT) 
+					&& ((ep.getDescriptor().getEndPointAddress() & USB_DIR_IN) == 0)) break;
+			}
+			if(this.ep==null) throw new DriverException("Found no interrupt endpoint, HID specs required at least one.");
 
 			// 
 			log.debug("Interval " + ep.getDescriptor().getInterval());
