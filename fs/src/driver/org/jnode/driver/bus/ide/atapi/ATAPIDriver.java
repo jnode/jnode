@@ -28,7 +28,6 @@ import org.jnode.driver.DeviceAlreadyRegisteredException;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.Driver;
 import org.jnode.driver.DriverException;
-import org.jnode.driver.block.usb.storage.USBStorageSCSIDriver;
 import org.jnode.driver.bus.ide.IDEBus;
 import org.jnode.driver.bus.ide.IDEDevice;
 import org.jnode.driver.bus.ide.command.IDEPacketCommand;
@@ -37,7 +36,6 @@ import org.jnode.driver.bus.scsi.SCSIDevice;
 import org.jnode.driver.bus.scsi.SCSIException;
 import org.jnode.driver.bus.scsi.SCSIHostControllerAPI;
 import org.jnode.driver.bus.scsi.cdb.spc.CDBInquiry;
-import org.jnode.driver.bus.scsi.cdb.spc.CDBTestUnitReady;
 import org.jnode.driver.bus.scsi.cdb.spc.InquiryData;
 import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeoutException;
@@ -177,6 +175,7 @@ public class ATAPIDriver extends Driver implements SCSIHostControllerAPI {
             scsiDevice.executeCommand(new CDBInquiry(inqData.length), inqData,
                     0, 50000);
             inquiryResult = new InquiryData(inqData);
+            log.debug("INQUIRY Data : " + inquiryResult.toString());
         }
 
         /**
