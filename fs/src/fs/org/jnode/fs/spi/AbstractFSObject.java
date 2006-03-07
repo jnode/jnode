@@ -58,8 +58,16 @@ public abstract class AbstractFSObject implements FSObject {
 	final public boolean isValid() {
 		return valid;
 	}
-	
-	/**
+
+    /**
+     * Set the valid flag.
+     * @param valid
+     */
+    protected final void setValid(boolean valid){
+        this.valid = valid;
+    }
+
+    /**
 	 * Is this object dirty (ie some data need to be saved to device)
 	 * @return
 	 * @throws IOException
