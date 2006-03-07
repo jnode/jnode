@@ -67,9 +67,9 @@ public final class VMStackWalker {
 	 */
 	public static Class getCallingClass() {
 		Class[] ctx = getClassContext();
-		if (ctx.length < 3)
+		if (ctx.length < 5)
 			return null;
-		return ctx[2];
+		return ctx[4];
 	}
 
 	/**
@@ -85,8 +85,8 @@ public final class VMStackWalker {
 	 */
 	public static ClassLoader getCallingClassLoader() {
 		Class[] ctx = getClassContext();
-		if (ctx.length < 3)
+		if (ctx.length < 5)
 			return null;
-		return ctx[2].getClassLoader();
+		return ctx[4].getClassLoader();
 	}
 }
