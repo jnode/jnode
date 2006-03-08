@@ -40,4 +40,9 @@ public abstract class PluginClassLoader extends ClassLoader {
      * @return
      */
     public abstract Set<String> getClassNames();
+    
+    public String toString()
+    {
+    	return getClass().getName()+"("+getDeclaringPluginDescriptor().getId()+")";
+    }
 }
