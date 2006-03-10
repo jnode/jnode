@@ -52,4 +52,7 @@
     </library>
   </runtime>
   
+  <extension point="org.jnode.security.permissions">
+	  <permission class="java.util.PropertyPermission" name="gnu.javax.swing.DebugGraphics" actions="read"/>
+  </extension>       
 </fragment>
