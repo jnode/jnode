@@ -188,7 +188,9 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
     public VmType findLoadedClass(String name) {
         if (classInfos != null) {
             if (name.indexOf('/') >= 0) {
-                throw new IllegalArgumentException("name contains '/'");
+                //throw new IllegalArgumentException("name contains '/'");
+                //return null here
+                return null;
             }
             final ClassInfo ci = getClassInfo(name, false);
             if (ci != null) {
@@ -312,7 +314,9 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
         // BootLog.debug("load class" + name);
 
         if (name.indexOf('/') >= 0) {
-            throw new IllegalArgumentException("name contains '/'");
+            //throw new IllegalArgumentException("name contains '/'");
+            //throw CNFE here
+            throw new ClassNotFoundException(name);
         }
 
         if ((failedClassNames != null) && (failedClassNames.contains(name))) {
