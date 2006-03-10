@@ -43,6 +43,7 @@ import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.jnode.vm.classmgr.ClassDecoder;
 import org.jnode.vm.classmgr.IMTBuilder;
 import org.jnode.vm.classmgr.SelectorMap;
+import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmSharedStatics;
@@ -64,7 +65,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     private transient URL classesURL;
 
-    private transient boolean verbose = false;
+    static private transient boolean verbose = false;
 
     private transient boolean failOnNewLoad = false;
 
@@ -474,21 +475,86 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
         try {
             for (ResourceLoader l : resourceLoaders) {
                 if (l.containsResource(resName)) {
+                    if (verbose) {
+                        System.out.println("resourceExists(" + resName + ")->true");
+                    }
                     return true;
                 }
             }
             final InputStream is = getResourceAsStream(resName);
             if (is != null) {
+                if (verbose) {
+                    System.out.println("resourceExists(" + resName + "), using getResourceAsStream->true");
+                }
                 is.close();
                 return true;
             } else {
+                if (verbose) {
+                    System.out.println("resourceExists(" + resName + "), using getResourceAsStream->false");
+                }
                 return false;
             }
         } catch (IOException ex) {
+            if (verbose) {
+                ex.printStackTrace();
+            }
             return false;
         }
     }
 
+    protected URL findResource(String name) 
+    {
+        if (verbose) {
+            System.out.println("VmSystemClassLoader.findResource(" + name + ")");
+        }
+        if (name.startsWith("/")) {
+            name = name.substring(1);
+        }
+        if (classesURL != null) {
+            if (verbose) {
+                System.out.println("Loading resource " + name + " from "+classesURL);
+            }
+            try {
+				return new URL(classesURL, name);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+				return null;
+			}
+        } else if (systemRtJar != null) {
+            if (verbose) {
+                System.out.println("Loading resource " + name + " from systemRtJar");
+            }
+            final byte[] data = (byte[]) systemRtJar.get(name);
+            if(verbose)
+            {
+            	System.out.println(">>>>>> findResource("+name+"), (data==null)="+(data == null));
+            }
+            
+            if(data != null)
+            {
+            	if(verbose)
+            	{
+            		System.out.println(">>>>>> resource: "+new String(data));
+            	}
+            	return ClassLoader.getSystemResource(name);
+            } else {
+                for (ResourceLoader l : resourceLoaders) {
+                    final URL url = l.getResource(name);
+                    if (url != null) {
+                        return url;
+                    }
+                }
+                return null;
+            }
+        } else {
+            if (verbose) {
+            	System.out.println("!!!! findResource("+name+") : ERROR");        	
+            }
+            return null;
+        }    	
+    }
+
+    	
     /**
      * Gets an inputstream for a resource with the given name.
      * 
@@ -506,12 +572,15 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
         }
         if (classesURL != null) {
             if (verbose) {
-                System.out.println("Loading resource " + name);
+                System.out.println("Loading resource " + name + " from "+classesURL);
             }
             URL url = new URL(classesURL, name);
             // System.out.println("url=" + url);
             return url.openStream();
         } else if (systemRtJar != null) {
+            if (verbose) {
+                System.out.println("Loading resource " + name + " from systemRtJar");
+            }
             final byte[] data = (byte[]) systemRtJar.get(name);
             if (data != null) {
                 return new ByteArrayInputStream(data);
@@ -699,14 +768,22 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
         VmSystemClassLoader systemLoader = VmSystem.getSystemClassLoader();
         return ((systemLoader == this) || (systemLoader == null));
     }
-
-    static class ClassLoaderWrapper extends ClassLoader {
-
+    
+    static class ClassLoaderWrapper extends ClassLoader 
+    {
+    	//TODO maybe it should be declared as 'protected' in ClassLoader ???
+    	private final VmSystemClassLoader vmClassLoader;
+    	
         public ClassLoaderWrapper(VmSystemClassLoader vmClassLoader) {
             super(vmClassLoader);
+            this.vmClassLoader = vmClassLoader;
         }
+        
+        protected URL findResource(String name) {
+        	return vmClassLoader.findResource(name);
+        }        
     }
-
+    
     /**
      * Class that holds information of a loading &amp; loaded class.
      * 
