@@ -8,7 +8,8 @@
   <property name="my-classes.dir" value="${my-build.dir}/classes"/>
   <property name="my-classes-plan.dir" value="${my-build.dir}/classes-plan"/>
   <property name="my-src.dir" value="${basedir}/src"/>
-
+  <property name="my-non-resources" value="**/*.java,**/package.html"/>
+	
   <!-- Subproject specific classpath -->
   <path id="my-cp">
     <path refid="cp"/>
@@ -16,6 +17,30 @@
   	<pathelement location="${mauve.jar}"/>
   </path>
 
+  <!-- the sources that we have to compile -->
+  <path id="classpath-sources">
+	<pathelement location="${my-src.dir}/classpath/gnu"/>
+	<pathelement location="${my-src.dir}/classpath/java"/>
+	<pathelement location="${my-src.dir}/classpath/javax"/>
+	<pathelement location="${my-src.dir}/classpath/org"/>
+	<pathelement location="${my-src.dir}/classpath/5.0"/>
+	<pathelement location="${my-src.dir}/classpath/ext"/>
+	<pathelement location="${my-src.dir}/classpath/vm"/>    	
+  </path>
+  <path id="my-sources1">
+	<path refid="classpath-sources"/>
+	<pathelement location="${my-src.dir}/core"/>
+	<pathelement location="${my-src.dir}/nanoxml"/>
+	<pathelement location="${my-src.dir}/vmmagic"/>
+	<pathelement location="${my-src.dir}/mmtk-vm"/>
+	<pathelement location="${my-src.dir}/driver"/>
+	<pathelement location="${my-src.dir}/test"/>
+  </path>
+  <path id="my-sources">
+	<path refid="my-sources1"/>
+	<pathelement location="${my-gen.dir}"/>
+  </path>
+		
   <macrodef name="ExpandTest">
     <attribute name="classname"/>
     <attribute name="type"/>
@@ -77,35 +102,27 @@
   <target name="compile" depends="prepare">
     <jnode.compile>
       <bootclasspath>
-        <pathelement location="${my-src.dir}/classpath/gnu"/>
-        <pathelement location="${my-src.dir}/classpath/java"/>
-        <pathelement location="${my-src.dir}/classpath/javax"/>
-        <pathelement location="${my-src.dir}/classpath/org"/>
-        <pathelement location="${my-src.dir}/classpath/5.0"/>
-        <pathelement location="${my-src.dir}/classpath/ext"/>
-        <pathelement location="${my-src.dir}/classpath/vm"/>
-		<pathelement location="${mx4j.jar}"/>
+      	<pathelement location="${classpath-sources}" />
+		<pathelement location="${mx4j.jar}"/> <!-- should be in GNU Classpath since java 5.0 -->
       </bootclasspath>
-      <src path="${my-src.dir}/classpath/gnu"/>
-      <src path="${my-src.dir}/classpath/java"/>
-      <src path="${my-src.dir}/classpath/javax"/>
-      <src path="${my-src.dir}/classpath/org"/>
-      <src path="${my-src.dir}/classpath/5.0"/>
-      <src path="${my-src.dir}/classpath/ext"/>        
-      <src path="${my-src.dir}/classpath/vm"/>
-      <src path="${my-src.dir}/core"/>
-      <src path="${my-src.dir}/nanoxml"/>
-      <src path="${my-src.dir}/vmmagic"/>
-      <src path="${my-src.dir}/mmtk-vm"/>
-      <src path="${my-src.dir}/driver"/>
-      <src path="${my-src.dir}/test"/>
-      <src path="${my-gen.dir}"/>
+      <src refid="my-sources" />
       <classpath refid="my-cp"/>
     </jnode.compile>
     <!-- Copy all non java files to class dir -->
     <copy todir="${my-classes.dir}">
-      <fileset dir="${my-src.dir}/core" excludes="**/*.java,**/package.html"/>
-      <fileset dir="${my-src.dir}/driver" excludes="**/*.java,**/package.html"/>
+	    <fileset dir="${my-src.dir}/classpath/gnu" excludes="${my-non-resources}"/>
+	    <fileset dir="${my-src.dir}/classpath/java" excludes="${my-non-resources}"/>
+	    <fileset dir="${my-src.dir}/classpath/javax" excludes="${my-non-resources}"/>
+	    <fileset dir="${my-src.dir}/classpath/org" excludes="${my-non-resources}"/>
+	    <fileset dir="${my-src.dir}/classpath/5.0" excludes="${my-non-resources}"/>
+	    <fileset dir="${my-src.dir}/classpath/ext" excludes="${my-non-resources}"/>
+	    <fileset dir="${my-src.dir}/classpath/vm" excludes="${my-non-resources}"/>
+	    <fileset dir="${my-src.dir}/core" excludes="${my-non-resources}"/>
+	    <fileset dir="${my-src.dir}/nanoxml" excludes="${my-non-resources}"/>
+	    <fileset dir="${my-src.dir}/vmmagic" excludes="${my-non-resources}"/>
+	    <fileset dir="${my-src.dir}/mmtk-vm" excludes="${my-non-resources}"/>
+	    <fileset dir="${my-src.dir}/driver" excludes="${my-non-resources}"/>
+	    <fileset dir="${my-src.dir}/test" excludes="${my-non-resources}"/>
     </copy>
   	
   	<!-- Create & compile plan classes -->
