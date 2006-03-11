@@ -221,7 +221,7 @@ public final class VmSystem {
         res.put("java.version", "1.1.0");
         res.put("java.vendor", "JNode.org");
         res.put("java.vendor.url", "http://jnode.org");
-        res.put("java.home", "/");
+        res.put("java.home", "/jifs/");
         res.put("java.vm.specification.version", "1.4");
         res.put("java.vm.specification.vendor", "JNode.org");
         res.put("java.vm.specification.name", "jnode");
