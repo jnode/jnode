@@ -320,7 +320,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
      * 
      * @return
      */
-    final List<FragmentDescriptorModel> fragments() {
+    public final List<FragmentDescriptorModel> fragments() {
         return fragments;
     }
 
