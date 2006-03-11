@@ -27,6 +27,7 @@ import java.io.IOException;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmProcess;
 import org.jnode.vm.VmSystem;
+import org.jnode.vm.VmExit;
 
 /**
  * VMRuntime represents the interface to the Virtual Machine.
@@ -38,7 +39,7 @@ final class VMRuntime
     /**
      * No instance is ever created.
      */
-    private VMRuntime() 
+    private VMRuntime()
     {
     }
 
@@ -59,7 +60,7 @@ final class VMRuntime
      * @return the number of bytes of free memory for more Objects
      */
     static long freeMemory() {
-		return VmSystem.freeMemory();        
+        return VmSystem.freeMemory();
     }
 
     /**
@@ -69,7 +70,7 @@ final class VMRuntime
      * @return the total number of bytes of memory for Objects
      */
     static long totalMemory() {
-		return VmSystem.totalMemory();
+        return VmSystem.totalMemory();
     }
 
     /**
@@ -81,7 +82,7 @@ final class VMRuntime
      *         to allocate
      */
     static long maxMemory() {
-		return VmSystem.totalMemory();
+        return VmSystem.totalMemory();
     }
 
     /**
@@ -91,7 +92,7 @@ final class VMRuntime
      * collection takes place even without calling this method.
      */
     static void gc() {
-		VmSystem.gc();
+        VmSystem.gc();
     }
 
     /**
@@ -102,7 +103,7 @@ final class VMRuntime
      * @see #finalize()
      */
     static void runFinalization() {
-		VmSystem.gc();
+        VmSystem.gc();
     }
 
     /**
@@ -112,7 +113,7 @@ final class VMRuntime
      * @see #finalize()
      */
     static void runFinalizationForExit() {
-        
+
     }
 
     /**
@@ -123,7 +124,7 @@ final class VMRuntime
      * @param on whether to turn instruction tracing on
      */
     static void traceInstructions(boolean on) {
-        
+
     }
 
     /**
@@ -134,7 +135,7 @@ final class VMRuntime
      * @param on whether to turn method tracing on
      */
     static void traceMethodCalls(boolean on) {
-        
+
     }
 
     /**
@@ -143,7 +144,7 @@ final class VMRuntime
      * @param value whether to run finalizers on exit
      */
     static void runFinalizersOnExit(boolean value) {
-        
+
     }
 
     /**
@@ -152,8 +153,7 @@ final class VMRuntime
      * @param status the status to end the process with
      */
     static void exit(int status) {
-//LS        throw new Error("Cannot exit yet");
-        System.err.println("Cannot exit yet with System.exit()");
+        throw new VmExit(status);
     }
 
     /**
@@ -195,27 +195,27 @@ final class VMRuntime
      * @throws NullPointerException if cmd or env have null elements
      */
     static Process exec(String[] cmd, String[] env, File dir)
-	throws IOException {
-		if (env == null) {
-			env = new String[0];
-		}
+    throws IOException {
+        if (env == null) {
+            env = new String[0];
+        }
 
-		String mainClassName = cmd[0];
-		String[] cmdArgs = new String[cmd.length - 1];
-		System.arraycopy(cmd, 1, cmdArgs, 0, cmdArgs.length);
-		try {
-			final Process p =
-				VmProcess.createProcess(mainClassName, cmdArgs, env);
-			if (p == null) {
-				throw new IOException("Exec error");
-			} else {
-				return p;
-			}
-		} catch (Exception ex) {
-			final IOException ioe = new IOException("Exec error");
-			ioe.initCause(ex);
-			throw ioe;
-		}
+        String mainClassName = cmd[0];
+        String[] cmdArgs = new String[cmd.length - 1];
+        System.arraycopy(cmd, 1, cmdArgs, 0, cmdArgs.length);
+        try {
+            final Process p =
+                VmProcess.createProcess(mainClassName, cmdArgs, env);
+            if (p == null) {
+                throw new IOException("Exec error");
+            } else {
+                return p;
+            }
+        } catch (Exception ex) {
+            final IOException ioe = new IOException("Exec error");
+            ioe.initCause(ex);
+            throw ioe;
+        }
     }
 
     /**

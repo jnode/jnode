@@ -42,6 +42,7 @@ import org.jnode.driver.input.KeyboardListener;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.HelpException;
 import org.jnode.shell.help.SyntaxErrorException;
+import org.jnode.vm.VmExit;
 
 /**
  * User: Sam Reid Date: Dec 20, 2003 Time: 1:20:33 AM Copyright (c) Dec 20, 2003
@@ -234,12 +235,12 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
 
         if (threadProcess != null) {
             unblock();
-            
+
             AccessController.doPrivileged(new PrivilegedAction(){
-				public Object run() {
-		            threadProcess.stop(new ThreadDeath());
-					return null;
-				}});
+                public Object run() {
+                    threadProcess.stop(new ThreadDeath());
+                    return null;
+                }});
         }
     }
 
@@ -309,6 +310,9 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
                         // Don't care
                         ex1.printStackTrace();
                     }
+                    err.println(tex.getMessage());
+                    unblock();
+                } else if (tex instanceof VmExit) {
                     err.println(tex.getMessage());
                     unblock();
                 } else {
