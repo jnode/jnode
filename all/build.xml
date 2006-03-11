@@ -49,6 +49,7 @@
 	<property name="mauve.jar" value="${root.dir}/core/lib/mauve.jar"/>
     <property name="edtftpj.jar" value="${root.dir}/fs/lib/edtftpj-1.5.2.jar"/>
     <property name="jcifs.jar" value="${root.dir}/fs/lib/jcifs-1.2.6.jar"/>
+    <property name="ejc.jar" value="${root.dir}/core/lib/ejc-3.1.1.jar"/>
 
     <!-- libraries needed to run tests -->
     <property name="jmock-cglib.jar" value="${root.dir}/core/lib/jmock-cglib-1.0.1.jar"/>
@@ -195,6 +196,7 @@
             <libalias name="ant-trax.jar" alias="${ant-trax.jar}"/>
             <libalias name="edtftpj.jar" alias="${edtftpj.jar}"/>
             <libalias name="jcifs.jar" alias="${jcifs.jar}"/>
+            <libalias name="ejc.jar" alias="${ejc.jar}"/>
         	
             <descriptors dir="${descriptors.dir}/">
                 <include name="*.xml"/>
