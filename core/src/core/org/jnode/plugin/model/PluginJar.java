@@ -41,6 +41,7 @@ import org.jnode.util.FileUtils;
 import org.jnode.util.JarBuffer;
 import org.jnode.vm.BootableObject;
 import org.jnode.vm.ResourceLoader;
+import org.jnode.vm.Vm;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -52,6 +53,12 @@ public class PluginJar implements BootableObject, ResourceLoader {
 
     /** The resources in the jar file */
     private final Map<String, ByteBuffer> resources;
+
+    private ByteBuffer buffer;
+    //This field holds the system plugin data added to the boot image
+    //Results in a 7MB increase of memory usage but the system jars
+    //become accessible to the complier
+    private final byte[] initBuffer;
 
     /**
      * Initialize this instance
@@ -71,9 +78,18 @@ public class PluginJar implements BootableObject, ResourceLoader {
      * @param pluginIs
      */
     public PluginJar(PluginRegistryModel registry, ByteBuffer pluginIs,
-            URL pluginUrl) throws PluginException {
+                     URL pluginUrl) throws PluginException {
 
         try {
+            //get a reference to the plugin jar data
+            if(Vm.isWritingImage()){
+                //buildtime
+                initBuffer = pluginIs.array();
+            } else {
+                //runtime
+                buffer = pluginIs;
+                initBuffer = new byte[0];
+            }
             // Load the plugin into memory
             resources = loadResources(pluginIs);
         } catch (IOException ex) {
@@ -130,14 +146,14 @@ public class PluginJar implements BootableObject, ResourceLoader {
     public Collection<String> resourceNames() {
         return Collections.unmodifiableCollection(resources.keySet());
     }
-    
+
     /**
      * Remove all resources.
      */
     public void clearResources() {
         resources.clear();
     }
-    
+
     /**
      * Does this jar-file contain the resource with the given name.
      * 
@@ -189,5 +205,13 @@ public class PluginJar implements BootableObject, ResourceLoader {
             }
         }
         return map;
+    }
+
+    public ByteBuffer getBuffer() {
+        if(buffer == null){
+            //such plugins were added to the bootimage during the build
+            buffer = ByteBuffer.wrap(initBuffer);
+        }
+        return buffer;
     }
 }
