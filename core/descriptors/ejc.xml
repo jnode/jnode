@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="ejc"
+        name="Eclipse Java Compiler"
+        version="3.1.1"
+        provider-name="eclipse.org"
+        provider-url="http://eclipse.org"
+        license-name="epl">
+                
+  <requires>
+    <import plugin="org.apache.tools.ant-launcher"/>
+  </requires>
+        
+  <runtime>
+    <library name="ejc.jar">
+      <export name="*"/>
+    </library>
+  </runtime>  
+
+  <extension point="org.jnode.shell.aliases">
+    <alias name="javac" class="org.eclipse.jdt.internal.compiler.batch.Main"/>
+  </extension>
+
+  <extension point="org.jnode.security.permissions">
+      <permission class="java.security.AllPermission"/>
+  </extension>     
+</plugin>
