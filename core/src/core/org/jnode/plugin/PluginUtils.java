@@ -21,10 +21,17 @@
  
 package org.jnode.plugin;
 
+import java.util.Locale;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+
+import org.jnode.system.BootLog;
+
 /**
  * Plugin utility methods.
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
+ * @author Fabien DUMINY (fduminy@jnode.org)
  */
 public class PluginUtils {
     
@@ -41,4 +48,66 @@ public class PluginUtils {
             return null;
         }
     }
+
+	public static String getLocalizedMessage(Class parent, String bundleName, 
+						String messageKey)
+	{
+		String fullName;
+		ClassLoader loader;
+		if(parent == null)
+		{
+			// no parent means that name is already absolute 
+			fullName = bundleName;
+	    	loader = PluginUtils.class.getClassLoader();    		
+		}
+		else
+		{
+	    	// relative name to absolute
+			fullName = parent.getPackage().getName() + "." + bundleName;
+			loader = parent.getClassLoader();
+		}
+		
+	    ResourceBundle bundle = null;
+	    String message = null;        
+	    	
+	    try
+	    {
+	        BootLog.debug("messageKey="+messageKey+", trying with " + Locale.getDefault());
+	        bundle = ResourceBundle.getBundle(fullName, Locale.getDefault(), loader);
+	    }
+	    catch (MissingResourceException e)
+	    {
+	        try
+	        {
+	        	BootLog.debug("trying with " + Locale.ENGLISH);
+	            bundle = ResourceBundle.getBundle(fullName, Locale.ENGLISH, loader);
+	        }
+	        catch (MissingResourceException mre)
+	        {                
+	        	BootLog.error("can't get message", mre);
+	        }
+	    }    
+	    
+	    BootLog.debug("bundle="+bundle);
+	    if(bundle != null)
+	    {
+	        try
+	        {
+	        	BootLog.debug("got bundle "+bundleName);
+	            message = bundle.getString(messageKey); 
+	        }
+	        catch (MissingResourceException mre)
+	        {                
+	            mre.printStackTrace();                
+	        }
+	    }
+	
+	    if(message == null)
+	    {
+	    	BootLog.error("can't get message from bundle "+bundleName+" with key "+messageKey);	    	
+	    }
+	    
+	    return (message == null) ? ('?' + messageKey + '?') : message; 
+	}
+        
 }
