@@ -33,13 +33,13 @@ import java.util.ResourceBundle;
 
 import junit.framework.TestCase;
 
-import org.jnode.plugin.PluginResourceBundle;
+import org.jnode.plugin.PluginUtils;
 
 /**
  * Documentation at {@link http://www.javaworld.com/javaworld/javaqa/2003-08/01-qa-0808-property.html}
 * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
- * @author Fabien DUMINY (fduminy at users.sourceforge.net)
+ * @author Fabien DUMINY (fduminy@jnode.org)
  */
 public class ResourceTest extends TestCase 
 {
@@ -251,7 +251,7 @@ public class ResourceTest extends TestCase
     {
         changeLocale(locale);
         
-        String msg = PluginResourceBundle.getLocalizedMessage(TEST_KEY);
+        String msg = PluginUtils.getLocalizedMessage(getClass(), RELATIVE_BUNDLE_NAME, TEST_KEY);
         assertEquals(TEST_VALUE+suffix, msg);
     }
     
