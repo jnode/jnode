@@ -21,16 +21,18 @@
  
 package org.jnode.shell.help.def;
 
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Syntax;
-import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.Argument;
+import org.jnode.shell.help.Help;
+import org.jnode.shell.help.Parameter;
+import org.jnode.shell.help.Syntax;
 
 /**
  * @author qades
+ * @author Fabien DUMINY (fduminy@jnode.org)
  */
 public class DefaultHelp extends Help {
-
+	public static final String RESOURCE_NAME = "messages.properties";
+	
     /**
      * Create a new instance
      */
@@ -57,7 +59,7 @@ public class DefaultHelp extends Help {
 
         final Parameter[] params = syntax.getParams();
         if (params.length != 0)
-            System.out.println("\nParameters:");
+            System.out.println("\n"+Help.getLocalizedHelp("help.parameters")+":");
         for (int i = 0; i < params.length; i++)
             params[i].describe(this);
     }
@@ -79,7 +81,7 @@ public class DefaultHelp extends Help {
         final Parameter[] params = syntax.getParams();
         for (int i = 0; i < params.length; i++)
             line.append(' ').append(params[i].format());
-        System.out.println("Usage: " + line);
+        System.out.println(Help.getLocalizedHelp("help.usage")+": " + line);
         format(new Cell[]{new Cell(4, 54)}, new String[]{syntax.getDescription()});
     }
 

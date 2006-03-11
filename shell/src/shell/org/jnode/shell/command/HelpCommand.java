@@ -25,24 +25,28 @@ import java.lang.reflect.Field;
 
 import javax.naming.NameNotFoundException;
 
-import org.jnode.plugin.PluginResourceBundle;
 import org.jnode.shell.Shell;
 import org.jnode.shell.ShellUtils;
 import org.jnode.shell.alias.NoSuchAliasException;
-import org.jnode.shell.help.*;
+import org.jnode.shell.help.AliasArgument;
+import org.jnode.shell.help.Help;
+import org.jnode.shell.help.HelpException;
+import org.jnode.shell.help.Parameter;
+import org.jnode.shell.help.ParsedArguments;
 
 /**
  * @author qades
+ * @author Fabien DUMINY (fduminy@jnode.org)
  */
 public class HelpCommand {
 
-    static final AliasArgument ARG_COMMAND = new AliasArgument("command", PluginResourceBundle.getLocalizedMessage("help.arg.command"));
+    static final AliasArgument ARG_COMMAND = new AliasArgument("command", Help.getLocalizedHelp("help.arg.command"));
 	static final Parameter PARAM_COMMAND = new Parameter(ARG_COMMAND, Parameter.OPTIONAL);
 
 	public static Help.Info HELP_INFO =
 		new Help.Info(
 			"help",
-			PluginResourceBundle.getLocalizedMessage("help.desc"),
+			Help.getLocalizedHelp("help.desc"),
 			new Parameter[] { PARAM_COMMAND });
 
 	public static void main(String[] args)
