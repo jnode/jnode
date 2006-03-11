@@ -26,12 +26,15 @@ import java.lang.reflect.Field;
 import javax.naming.NamingException;
 
 import org.jnode.naming.InitialNaming;
+import org.jnode.plugin.PluginUtils;
 import org.jnode.shell.CommandLine;
 
 /**
  * @author qades
+ * @author Fabien DUMINY (fduminy@jnode.org)
  */
 public abstract class Help {
+    public static final String BUNDLE_NAME = "messages"; // must be in our package
 
     public static final Class<Help> NAME = Help.class;
 
@@ -43,6 +46,12 @@ public abstract class Help {
         } catch (NamingException ex) {
             throw new HelpException("Help application not found");
         }
+    }
+    
+    public static String getLocalizedHelp(String messageKey)
+    {
+    	return PluginUtils.getLocalizedMessage(Help.class, 
+    					BUNDLE_NAME, messageKey);
     }
 
     public static Info getInfo(Class clazz) throws HelpException {
