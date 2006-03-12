@@ -1,5 +1,5 @@
 /* Headers.java --
-   Copyright (C) 2004 Free Software Foundation, Inc.
+   Copyright (C) 2004, 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -44,130 +44,96 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
- * A collection of HTTP header names and associated values.
- * Retrieval of values is case insensitive. An iteration over the keys
+ * A collection of HTTP header names and associated values.  The
+ * values are {@link ArrayList ArrayLists} of Strings.  Retrieval of
+ * values is case insensitive. An iteration over the collection
  * returns the header names in the order they were received.
  *
  * @author Chris Burdess (dog@gnu.org)
+ * @author David Daney (ddaney@avtrex.com)
  */
-public class Headers
-  extends LinkedHashMap
+class Headers
 {
+  /**
+   * A list of HeaderElements
+   */
+  private final ArrayList headers = new ArrayList();
 
-  static final DateFormat dateFormat = new HTTPDateFormat();
+  /**
+   * The HTTP dateformat used to parse date header fields.
+   */
+  private static final DateFormat dateFormat = new HTTPDateFormat();
 
-  static class Header
+  /**
+   * Class for a Header element consisting of
+   * a name and value String.
+   */
+  static class HeaderElement
   {
+    String name;
+    String value;
 
-    final String name;
-
-    Header(String name)
-    {
-      if (name == null || name.length() == 0)
+    HeaderElement(String name, String value)
         {
-          throw new IllegalArgumentException(name);
-        }
       this.name = name;
+      this.value = value;
     }
-
-    public int hashCode()
-    {
-      return name.toLowerCase().hashCode();
-    }
-
-    public boolean equals(Object other)
-    {
-      if (other instanceof Header)
-        {
-          return ((Header) other).name.equalsIgnoreCase(name);
-        }
-      return false;
-    }
-
-    public String toString()
-    {
-      return name;
-    }
-    
-  }
-
-  static class HeaderEntry
-    implements Map.Entry
-  {
-
-    final Map.Entry entry;
-
-    HeaderEntry(Map.Entry entry)
-    {
-      this.entry = entry;
-    }
-
-    public Object getKey()
-    {
-      return ((Header) entry.getKey()).name;
-    }
-
-    public Object getValue()
-    {
-      return entry.getValue();
-    }
-
-    public Object setValue(Object value)
-    {
-      return entry.setValue(value);
-    }
-
-    public int hashCode()
-    {
-      return entry.hashCode();
-    }
-
-    public boolean equals(Object other)
-    {
-      return entry.equals(other);
-    }
-
-    public String toString()
-    {
-      return getKey().toString() + "=" + getValue();
-    }
-    
-  }
-
-  public Headers()
-  {
-  }
-
-  public boolean containsKey(Object key)
-  {
-    return super.containsKey(new Header((String) key));
-  }
-
-  public Object get(Object key)
-  {
-    return super.get(new Header((String) key));
   }
 
   /**
-   * Returns the value of the specified header as a string.
+   * Default constructor.
+   */
+  public Headers()
+  {
+    // nothing to do
+  }
+
+  /**
+   * Return an Iterator over this collection of headers.
+   * Iterator.getNext() returns objects of type {@link HeaderElement}.
+   *
+   * @return the Iterator.
+   */
+  Iterator iterator()
+  {
+    return headers.iterator();
+  }
+
+  /**
+   * Returns the value of the specified header as a string. If
+   * multiple values are present, the last one is returned.
+   * 
+   * @param header the header name (case insensitive search)
+   * @return The header value or <code>null</code> if not found.
    */
   public String getValue(String header)
   {
-    return (String) super.get(new Header(header));
+    for (int i = headers.size() - 1; i >= 0; i--)
+      {
+        HeaderElement e = (HeaderElement)headers.get(i);
+        if (e.name.equalsIgnoreCase(header))
+          {
+            return e.value;
+          }
+      }
+    return null;
   }
 
   /**
-   * Returns the value of the specified header as an integer,
-   * or -1 if the header is not present or not an integer.
+   * Returns the value of the specified header as an integer. If
+   * multiple values are present, the last one is returned.
+   * 
+   * @param header the header name (case insensitive search)
+   * @return The header value or <code>-1</code> if not present or
+   * not an integer value.
    */
   public int getIntValue(String header)
   {
@@ -182,13 +148,18 @@ public class Headers
       }
     catch (NumberFormatException e)
       {
+        // fall through
       }
     return -1;
   }
 
   /**
-   * Returns the value of the specified header as a long, or -1 if the
-   * header is not present or cannot be parsed as a long.
+   * Returns the value of the specified header as a long. If
+   * multiple values are present, the last one is returned.
+   * 
+   * @param header the header name (case insensitive search)
+   * @return The header value or <code>-1</code> if not present or
+   * not a long value.
    */
   public long getLongValue(String header)
   {
@@ -203,13 +174,18 @@ public class Headers
       }
     catch (NumberFormatException e)
       {
+        // fall through
       }
     return -1;
   }
 
   /**
-   * Returns the value of the specified header as a date,
-   * or <code>null</code> if the header is not present or not a date.
+   * Returns the value of the specified header as a date. If
+   * multiple values are present, the last one is returned.
+   * 
+   * @param header the header name (case insensitive search)
+   * @return The header value or <code>null</code> if not present or
+   * not a date value.
    */
   public Date getDateValue(String header)
   {
@@ -228,51 +204,71 @@ public class Headers
       }
   }
 
-  public Object put(Object key, Object value)
+  /**
+   * Add a header to this set of headers.  If there is an existing
+   * header with the same name it's value is replaced with the new value.
+   * If multiple headers of the same name exist only the last one's value 
+   * is replaced.
+   *
+   * @param name the header name
+   * @param value the header value
+   *
+   * @see #addValue(String, String)
+   */
+  public void put(String name, String value)
   {
-    return super.put(new Header((String) key), value);
-  }
-
-  public Object remove(Object key)
+    for (int i = headers.size() - 1; i >= 0; i--)
   {
-    return super.remove(new Header((String) key));
-  }
-
-  public void putAll(Map t)
-  {
-    for (Iterator i = t.keySet().iterator(); i.hasNext(); )
+        HeaderElement e = (HeaderElement)headers.get(i);
+        if (e.name.equalsIgnoreCase(name))
       {
-        String key = (String) i.next();
-        String value = (String) t.get(key);
-        put(key, value);
+            e.value = value;
+            return;
       }
   }
   
-  public Set keySet()
-  {
-    Set keys = super.keySet();
-    Set ret = new LinkedHashSet();
-    for (Iterator i = keys.iterator(); i.hasNext(); )
-      {
-        ret.add(((Header) i.next()).name);
-      }
-    return ret;
+    // nothing was replaced so add it as new HeaderElement
+    addValue(name, value);
   }
-
-  public Set entrySet()
+  
+  /**
+   * Add all headers from a set of headers to this set. Any existing header 
+   * with the same (case insensitive) name as one of the new headers will 
+   * be overridden.
+   *
+   * @param o the headers to be added
+   */
+  public void putAll(Headers o)
   {
-    Set entries = super.entrySet();
-    Set ret = new LinkedHashSet();
-    for (Iterator i = entries.iterator(); i.hasNext(); )
+    for (Iterator it = o.iterator(); it.hasNext(); )
       {
-        Map.Entry entry = (Map.Entry) i.next();
-        ret.add(new HeaderEntry(entry));
+        HeaderElement e = (HeaderElement)it.next();
+        remove(e.name);
+        addValue(e.name, e.value);
       }
-    return ret;
   }
 
   /**
-   * Parse the specified input stream, adding headers to this collection.
+   * Remove a header from this set of headers.  If there is more than
+   * one instance of a header of the given name, they are all removed.
+   *
+   * @param name the header name
+   */
+  public void remove(String name)
+  {
+    for (Iterator it = headers.iterator(); it.hasNext(); )
+      {
+        HeaderElement e = (HeaderElement)it.next();
+        if (e.name.equalsIgnoreCase(name))
+          it.remove();
+      }
+  }
+
+  /**
+   * Parse the specified InputStream, adding headers to this collection.
+   *
+   * @param in the InputStream.
+   * @throws IOException if I/O error occured.
    */
   public void parse(InputStream in)
     throws IOException
@@ -334,18 +330,91 @@ public class Headers
       }
   }
   
-  private void addValue(String name, String value)
+
+  /**
+   * Add a header to this set of headers.  If there is an existing
+   * header with the same name, it is not effected.
+   *
+   * @param name the header name
+   * @param value the header value
+   *
+   * @see #put(String, String)
+   */
+  public void addValue(String name, String value)
   {
-    Header key = new Header(name);
-    String old = (String) super.get(key);
-    if (old == null)
+    headers.add(headers.size(), new HeaderElement(name, value));
+  }
+
+  /**
+   * Get a new Map containing all the headers.  The keys of the Map
+   * are Strings (the header names). The headers will be included 
+   * case-sensitive in the map so that querying must be done with the
+   * correct case of the needed header name. The values of the Map are
+   * unmodifiable Lists containing Strings (the header values).
+   *
+   * <p> 
+   * The returned map is modifiable. Changing it will not effect this
+   * collection of Headers in any way.</p>
+   *
+   * @return a Map containing all the headers.
+   */
+  public Map getAsMap()
+  {
+    LinkedHashMap m = new LinkedHashMap();
+    for (Iterator it = headers.iterator(); it.hasNext(); )
       {
-        super.put(key, value);
+        HeaderElement e = (HeaderElement)it.next();
+        ArrayList l = (ArrayList)m.get(e.name);
+        if (l == null)
+          {
+            l = new ArrayList(1);
+            l.add(e.value);
+            m.put(e.name, l);
       }
     else
-      {
-        super.put(key, old + ", " + value);
+          l.add(0, e.value);
       }
+    for (Iterator it = m.entrySet().iterator(); it.hasNext(); )
+      {
+        Map.Entry me = (Map.Entry)it.next();
+        ArrayList l = (ArrayList)me.getValue();
+        me.setValue(Collections.unmodifiableList(l));
+      }
+    return m;
+  }
+  
+  /**
+   * Get the name of the Nth header.
+   *
+   * @param i the header index.
+   *
+   * @return The header name, or <code>null</code> if index outside of range.
+   *
+   * @see #getHeaderValue(int)
+   */
+  public String getHeaderName(int i)
+      {
+    if (i >= headers.size() || i < 0)
+      return null;
+    
+    return ((HeaderElement)headers.get(i)).name;
+      }
+
+  /**
+   * Get the value of the Nth header.
+   *
+   * @param i the header index.
+   *
+   * @return the header value, or <code>null</code> if index outside of range.
+   *
+   * @see #getHeaderName(int)
+   */
+  public String getHeaderValue(int i)
+  {
+    if (i >= headers.size() || i < 0)
+      return null;
+    
+    return ((HeaderElement)headers.get(i)).value;
   }
   
 }

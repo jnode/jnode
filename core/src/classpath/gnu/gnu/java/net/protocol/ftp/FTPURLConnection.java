@@ -41,7 +41,6 @@ package gnu.java.net.protocol.ftp;
 import gnu.classpath.SystemProperties;
 import gnu.java.net.GetLocalHostAction;
 
-import java.io.FileNotFoundException;
 import java.io.FilterInputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
@@ -51,7 +50,6 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.Map;
 
