@@ -43,7 +43,6 @@ import gnu.classpath.jdwp.event.Event;
 import gnu.classpath.jdwp.event.EventManager;
 import gnu.classpath.jdwp.event.EventRequest;
 import gnu.classpath.jdwp.exception.JdwpException;
-import gnu.classpath.jdwp.id.ThreadId;
 import gnu.classpath.jdwp.processor.PacketProcessor;
 import gnu.classpath.jdwp.transport.ITransport;
 import gnu.classpath.jdwp.transport.JdwpConnection;

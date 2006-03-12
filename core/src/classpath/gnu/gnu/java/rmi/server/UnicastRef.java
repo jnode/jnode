@@ -1,5 +1,5 @@
 /* UnicastRef.java --
-   Copyright (c) 1996, 1997, 1998, 1999, 2002, 2005
+   Copyright (c) 1996, 1997, 1998, 1999, 2002, 2005, 2006
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,7 +36,10 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package gnu.java.rmi.server;
+
+import gnu.java.rmi.dgc.LeaseRenewingTask;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -50,6 +53,7 @@ import java.lang.reflect.Method;
 import java.rmi.ConnectException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.rmi.dgc.Lease;
 import java.rmi.server.ObjID;
 import java.rmi.server.Operation;
 import java.rmi.server.RMIClientSocketFactory;
@@ -59,62 +63,213 @@ import java.rmi.server.RemoteRef;
 import java.rmi.server.UID;
 
 public class UnicastRef
-	implements RemoteRef, ProtocolConstants {
+    implements RemoteRef, ProtocolConstants
+{
 
-public ObjID objid;
-UnicastConnectionManager manager;
+  /**
+   * Use serial version UID for iteroperability
+   */
+  private static final long serialVersionUID = 1;
 
-/**
- * Used by serialization, and let subclass capable of having default constructor
+  public ObjID objid;
+
+  UnicastConnectionManager manager;
+
+  /**
+   * Used by serialization, and let subclass capable of having default
+   * constructor
  */
-// must be public otherwise java.rmi.RemoteObject cannot instantiate this class
-// -- iP
-public UnicastRef() {
-}
+  // must be public otherwise java.rmi.RemoteObject cannot instantiate this
+  // class
+  // -- iP
+  public UnicastRef()
+  {
+  }
 
-public UnicastRef(ObjID objid, String host, int port, RMIClientSocketFactory csf) {
+  public UnicastRef(ObjID objid, String host, int port,
+                    RMIClientSocketFactory csf)
+  {
 	this(objid);
 	manager = UnicastConnectionManager.getInstance(host, port, csf);
-}
+  }
 
-public UnicastRef(ObjID objid) {
+  public UnicastRef(ObjID objid)
+  {
 	this.objid = objid;
-}
+  }
 
-public Object invoke(Remote obj, Method method, Object[] params, long opnum) throws Exception {
-    // Check if client and server are in the same VM, then local call can be used to
+  public Object invoke(Remote obj, Method method, Object[] params, long opnum)
+      throws Exception
+  {
+    // Check if client and server are in the same VM, then local call can be
+    // used to
     // replace remote call, but it's somewhat violating remote semantic.
     Object svrobj = manager.serverobj;
     
-    // Make sure that the server object is compatible. It could be loaded from a different
+    // Make sure that the server object is compatible. It could be loaded from a
+    // different
     // classloader --iP
-    if(svrobj != null && method.getDeclaringClass().isInstance(svrobj)){
-        //local call
+    if (svrobj != null && method.getDeclaringClass().isInstance(svrobj))
+      {
+        // local call
 		Object ret = null;
-		try{
+        try
+          {
 		    ret = method.invoke(svrobj, params);
-		}catch(InvocationTargetException e){
-		    throw (Exception)e.getTargetException();
 		}
-		//System.out.println("\n\n ***** local call: " + method + "\nreturn: " + ret + "\n\n");
+        catch (InvocationTargetException e)
+          {
+            throw (Exception) e.getTargetException();
+          }
+        // System.out.println("\n\n ***** local call: " + method + "\nreturn: "
+        // + ret + "\n\n");
 		return ret;
 	}
-	//System.out.println("***************** remote call:" + manager.serverPort);
-	return (invokeCommon(obj, method, params, -1, opnum));
-}
+    // System.out.println("***************** remote call:" +
+    // manager.serverPort);
+    return (invokeCommon(obj, method, params, - 1, opnum));
+  }
 
-private Object invokeCommon(Remote obj, Method method, Object[] params, int opnum, long hash) throws Exception {
+  /**
+   * The ordinary number of the DGC messages.
+   */
+  static long dgcSequence;
+
+  /**
+   * The DGC object id, also serves as a synchronization target to increment the
+   * dgcSequence safely.
+   */
+  static final ObjID dgcId = new ObjID(ObjID.DGC_ID);
+
+  ObjID[] this_id;
+
+  /**
+   * The number of the method "dirty" in the DGC.
+   */
+  static int DIRTY = 1;
+
+  /**
+   * The DGC interface hash code.
+   */
+  static final long dgcInterfaceHash = - 669196253586618813L;
+
+  /**
+   * Notify the DGC of the remote side that we still hold this object.
+   */
+  public Lease notifyDGC(Lease lease) throws Exception
+  {
+    long seq;
+    synchronized (dgcId)
+      {
+        seq = dgcSequence++;
+      }
+
+    if (this_id == null)
+      this_id = new ObjID[] { objid };
+
+    UnicastConnection conn;
+    try
+      {
+        conn = manager.getConnection();
+      }
+    catch (IOException e1)
+      {
+        throw new RemoteException("connection failed to host: "
+                                  + manager.serverName, e1);
+      }
+
+    ObjectOutputStream out;
+    DataOutputStream dout;
+    try
+      {
+        dout = conn.getDataOutputStream();
+        dout.writeByte(MESSAGE_CALL);
+
+        out = conn.startObjectOutputStream(); // (re)start ObjectOutputStream
+
+        dgcId.write(out);
+        // The number of the operation is 1 ("dirty")
+        out.writeInt(DIRTY);
+        out.writeLong(dgcInterfaceHash);
+
+        RMIObjectOutputStream rout = (RMIObjectOutputStream) out;
+
+        rout.writeValue(this_id, this_id.getClass());
+        rout.writeLong(seq);
+        rout.writeValue(lease, lease.getClass());
+
+        out.flush();
+      }
+    catch (IOException e2)
+      {
+        throw new RemoteException("DGC call failed: ", e2);
+      }
+
+    int returncode;
+    Object returnval;
+    DataInputStream din;
+    ObjectInputStream in;
+    UID ack;
+    try
+      {
+        din = conn.getDataInputStream();
+
+        if ((returncode = din.readUnsignedByte()) != MESSAGE_CALL_ACK)
+          {
+            conn.disconnect();
+            throw new RemoteException("DGC Call not acked:" + returncode);
+          }
+
+        in = conn.startObjectInputStream(); // (re)start ObjectInputStream
+        returncode = in.readUnsignedByte();
+        ack = UID.read(in);
+
+        if (returncode == RETURN_NACK)
+          {
+            returnval = in.readObject(); // get Exception
+
+          }
+        else
+          {
+            returnval = ((RMIObjectInputStream) in).readValue(Lease.class);
+          }
+      }
+    catch (IOException e3)
+      {
+        throw new RemoteException("DGC call return failed: ", e3);
+      }
+
+    manager.discardConnection(conn);
+
+    if (returncode != RETURN_ACK && returnval != null)
+      {
+        if (returncode == RETURN_NACK)
+          throw (Exception) returnval;
+        else
+          throw new RemoteException("DGC unexpected returncode: " + returncode);
+      }
+
+    return (Lease) returnval;
+  }
+
+  private Object invokeCommon(Remote obj, Method method, Object[] params,
+                              int opnum, long hash) throws Exception
+  {
 	UnicastConnection conn;
-	try {
+    try
+      {
 		conn = manager.getConnection();
 	}
-	catch (IOException e1) {
-		throw new RemoteException("connection failed to host: " + manager.serverName, e1);
+    catch (IOException e1)
+      {
+        throw new RemoteException("connection failed to host: "
+                                  + manager.serverName, e1);
 	}
 
 	ObjectOutputStream out;
 	DataOutputStream dout;
-	try {
+    try
+      {
 		dout = conn.getDataOutputStream();
 		dout.writeByte(MESSAGE_CALL);
 
@@ -126,12 +281,13 @@ private Object invokeCommon(Remote obj, Method method, Object[] params, int opnu
 		
 		// must handle primitive class and their wrapper classes
 		Class clss[] = method.getParameterTypes();
-	    for(int i = 0; i < clss.length; i++)
-	        ((RMIObjectOutputStream)out).writeValue(params[i], clss[i]);
+        for (int i = 0; i < clss.length; i++)
+          ((RMIObjectOutputStream) out).writeValue(params[i], clss[i]);
 
 		out.flush();
 	}
-	catch (IOException e2) {
+    catch (IOException e2)
+      {
 		throw new RemoteException("call failed: ", e2);
 	}
 
@@ -140,10 +296,12 @@ private Object invokeCommon(Remote obj, Method method, Object[] params, int opnu
 	DataInputStream din;
 	ObjectInputStream in;
 	UID ack;
-	try {
+    try
+      {
 		din = conn.getDataInputStream();
 		
-		if ((returncode = din.readUnsignedByte()) != MESSAGE_CALL_ACK) {
+        if ((returncode = din.readUnsignedByte()) != MESSAGE_CALL_ACK)
+          {
 		    conn.disconnect();
 			throw new RemoteException("Call not acked:" + returncode);
 		}
@@ -154,126 +312,194 @@ private Object invokeCommon(Remote obj, Method method, Object[] params, int opnu
 
 		Class cls = method.getReturnType();
 
-	if (returncode == RETURN_NACK) { 
+        if (returncode == RETURN_NACK)
+          {
 	    returnval = in.readObject();  // get Exception
 
-        } else if(cls == Void.TYPE) { 
+          }
+        else if (cls == Void.TYPE)
+          {
             returnval = null;
-            // in.readObject() // not required! returntype 'void' means no field is returned.
-        } else {
-            returnval = ((RMIObjectInputStream)in).readValue(cls); // get returnvalue
+            // in.readObject() // not required! returntype 'void' means no field
+            // is returned.
+          }
+        else
+          {
+            returnval = ((RMIObjectInputStream) in).readValue(cls); // get
+                                                                    // returnvalue
+          }
 	}
-	} catch (IOException e3) {
-	    //for debug: e3.printStackTrace();
+    catch (IOException e3)
+      {
+        // for debug: e3.printStackTrace();
 		throw new RemoteException("call return failed: ", e3);
 	}
 
-    /* if DGCAck is necessary??
-    //According to RMI wire protocol, send a DGCAck 
-    // to indicate receiving return value
-    dout.writeByte(MESSAGE_DGCACK);
-    ack.write(dout);
-    out.flush();
+    /*
+     * if DGCAck is necessary?? //According to RMI wire protocol, send a DGCAck //
+     * to indicate receiving return value dout.writeByte(MESSAGE_DGCACK);
+     * ack.write(dout); out.flush();
     */
     
 	manager.discardConnection(conn);
 
-	if (returncode != RETURN_ACK && returnval != null) {
-		if (returncode == RETURN_NACK) throw (Exception)returnval;
-		else throw new RemoteException("unexpected returncode: " + returncode);
+    if (returncode != RETURN_ACK && returnval != null)
+      {
+        if (returncode == RETURN_NACK)
+          throw (Exception) returnval;
+        else
+          throw new RemoteException("unexpected returncode: " + returncode);
 	}
 
 	return (returnval);
-}
+  }
 
-/**
+  /**
  * @deprecated
  */
-public RemoteCall newCall(RemoteObject obj, Operation[] op, int opnum, long hash) throws RemoteException {
+  public RemoteCall newCall(RemoteObject obj, Operation[] op, int opnum,
+                            long hash) throws RemoteException
+  {
     UnicastConnection conn;
     
-	try {
+    try
+      {
 		conn = manager.getConnection();
 	}
-	catch (IOException e1) {
-		throw new ConnectException("connection failed to host: " + manager.serverName, e1);
+    catch (IOException e1)
+      {
+        throw new ConnectException("connection failed to host: "
+                                   + manager.serverName, e1);
 	}
 
-    //obj: useless?
+    // obj: useless?
 
 	return (new UnicastRemoteCall(conn, objid, opnum, hash));
-}
+  }
 
-/**
+  /**
  * @deprecated
  */
-public void invoke(RemoteCall call) throws Exception {
-	UnicastRemoteCall c = (UnicastRemoteCall)call;
+  public void invoke(RemoteCall call) throws Exception
+  {
+    UnicastRemoteCall c = (UnicastRemoteCall) call;
 	call.executeCall();
-}
+  }
 
-/**
+  /**
  * @deprecated
  */
-public void done(RemoteCall call) throws RemoteException {
-	UnicastRemoteCall c = (UnicastRemoteCall)call;
-	try{
+  public void done(RemoteCall call) throws RemoteException
+  {
+    UnicastRemoteCall c = (UnicastRemoteCall) call;
+    try
+      {
 	    c.done();
-	} catch(IOException e){}
+      }
+    catch (IOException e)
+      {
+      }
     UnicastConnection conn = c.getConnection();
 	manager.discardConnection(conn);
-}
+  }
 
-public void writeExternal(ObjectOutput out) throws IOException {
-	if (manager == null) {
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    if (manager == null)
+      {
 		throw new IOException("no connection");
 	}
 	manager.write(out);
 	objid.write(out);
 	// This byte is somewhat confusing when interoperating with JDK
-	out.writeByte(0); //RETURN_ACK);
-}
+    out.writeByte(0); // RETURN_ACK);
+  }
 
-public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+  public void readExternal(ObjectInput in) throws IOException,
+      ClassNotFoundException
+  {
 	manager = UnicastConnectionManager.read(in);
 	objid = ObjID.read(in);
 	byte ack = in.readByte();
 	// This byte is somewhat confusing when interoperating with JDK
-	if (ack != RETURN_ACK && ack != 0/*jdk ack value*/) {
+    if (ack != RETURN_ACK && ack != 0/* jdk ack value */)
+      {
 		throw new IOException("no ack found");
 	}
-}
 
-public boolean remoteEquals(RemoteRef ref) {
+    // Notify the DGC of the remote side that we hold the reference to the
+    // received object. Do not notify if the client and server are on the
+    // same virtual machine.
+    if (manager.serverobj == null)
+      LeaseRenewingTask.scheduleLeases(this);
+  }
+
+  public boolean remoteEquals(RemoteRef ref)
+  {
 	throw new Error("Not implemented");
-}
+  }
 
-public int remoteHashCode() {
+  public int remoteHashCode()
+  {
 	throw new Error("Not implemented");
-}
+  }
 
-public String getRefClass(ObjectOutput out) {
+  public String getRefClass(ObjectOutput out)
+  {
 	return ("UnicastRef");
-}
+  }
 
-public String remoteToString() {
+  public String remoteToString()
+  {
 	throw new Error("Not implemented");
-}
+  }
 
-public void dump(UnicastConnection conn) {
-	try {
+  public void dump(UnicastConnection conn)
+  {
+    try
+      {
 		DataInputStream din = conn.getDataInputStream();
-		for (;;) {
+        for (;;)
+          {
 			int b = din.readUnsignedByte();
 			System.out.print(Integer.toHexString(b));
-			if (b >= 32 && b < 128) {
-				System.out.print(": " + (char)b);
+            if (b >= 32 && b < 128)
+              {
+                System.out.print(": " + (char) b);
 			}
 			System.out.println();
 		}
 	}
-	catch (IOException _) {
+    catch (IOException _)
+      {
+      }
+  }
+
+  /**
+   * Check if this UnicastRef points to the object as the passed UnicastRef.
+   * Both the object Id and manager must be the same.
+   * 
+   * @return true if the passed reference points to the same remote object as
+   *         this reference, false otherwise.
+   */
+  public boolean equals(Object other)
+  {
+    if (other instanceof UnicastRef)
+      {
+        UnicastRef r = (UnicastRef) other;
+        return r.manager.equals(manager) && r.objid.equals(objid);
+      }
+    else
+      return false;
+  }
+
+  /**
+   * Get the hash code of this UnicastRef, combining hash code of the manager
+   * with hash code of the object id.
+   */
+  public int hashCode()
+  {
+    return manager.hashCode() ^ objid.hashCode();
 	}
-}
 
 }

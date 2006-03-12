@@ -38,6 +38,7 @@ exception statement from your version. */
 
 package gnu.java.rmi.dgc;
 
+import gnu.java.rmi.server.UnicastServer;
 import gnu.java.rmi.server.UnicastServerRef;
 
 import java.rmi.RemoteException;
@@ -46,73 +47,136 @@ import java.rmi.dgc.Lease;
 import java.rmi.dgc.VMID;
 import java.rmi.server.ObjID;
 import java.rmi.server.RMISocketFactory;
-import java.util.Hashtable;
+import java.util.Collection;
+import java.util.TimerTask;
 
 /**
-  * I let DGCImpl to extend UnicastServerRef, but not 
-  * UnicastRemoteObject, because UnicastRemoteObject must
-  * exportObject automatically.
+ * The DGC implementation is used for the server side during the distributed
+ * garbage collection. This interface contains the two methods: dirty and clean.
+ * A dirty call is made when a remote reference is unmarshaled in a client. A
+ * corresponding clean call is made by client it no longer uses that remote
+ * reference. A reference to a remote object is also automatically released
+ * after so called lease period that starts after the dirty call is received. It
+ * is the client's responsibility to renew the leases, by making additional
+ * dirty calls before such leases expire.
   */
 public class DGCImpl
-    extends UnicastServerRef implements DGC {
+    extends UnicastServerRef
+    implements DGC
+{
+  /*
+   * The DGCImpl extends UnicastServerRef and not UnicastRemoteObject, because
+   * UnicastRemoteObject must exportObject automatically.
+   */
 
-    private static final long LEASE_VALUE = 600000L;
-    // leaseCache caches a LeaseRecord associated with a vmid
-    private Hashtable leaseCache = new Hashtable();
+  /**
+   * Use the serial version UID for interoperability.
+   */
+  private static final long serialVersionUID = 1;
 
-public DGCImpl() throws RemoteException {
-    	super(new ObjID(ObjID.DGC_ID), 0, RMISocketFactory.getSocketFactory());
-}
+  /**
+   * Protects the array of object Id's for the scheduled period of time
+   * (lease). After the time expires, the protector is automatically discarded,
+   * making the references unprotected and hence applicable for the garbage
+   * collection.
+   */
+  class RefProtector extends TimerTask
+  {
+    /**
+     * The corresponding server references to protect. Each Id may contain
+     * multiple references that are stored to collection.
+     */
+    Collection[] references;
 
-public Lease dirty(ObjID[] ids, long sequenceNum, Lease lease) throws RemoteException {
-	VMID vmid = lease.getVMID();
-    	if (vmid == null)
-    	    vmid = new VMID();
-    	long leaseValue = LEASE_VALUE;
-    	//long leaseValue = lease.getValue();
-    lease = new Lease(vmid, leaseValue);
-        synchronized(leaseCache){
-            LeaseRecord lr = (LeaseRecord)leaseCache.get(vmid);
-            if (lr != null)
-                lr.reset(leaseValue);
-            else{
-                lr = new LeaseRecord(vmid, leaseValue);
-                leaseCache.put(vmid, lr);
-            }
+    /**
+     * Create the new instance of the reference protector that protects the
+     * given array of ids and exists for the given period of time.
+     *  
+     * @param ids the ids to protect.
+     */
+    RefProtector(ObjID[] ids, long timeToLive)
+    {
+      references = new Collection[ids.length];
+      for (int i = 0; i < ids.length; i++)
+        {
+          references[i] = UnicastServer.getExported(ids[i]);
         }
         
-	return (lease);
-}
+      // Schedule the existence.
+      LeaseRenewingTask.timer.schedule(this, timeToLive);
+    }
 
-public void clean(ObjID[] ids, long sequenceNum, VMID vmid, boolean strong) throws RemoteException {
-  // Not implemented
-}
+    /**
+     * Break all links, ensuring easy collection of the references by the gc.
+     */
+    public void run()
+    {
+      for (int i = 0; i < references.length; i++)
+        {
+          references[i].clear();
+          references[i] = null;
+        }
+    }
+  }
     
   /**
-   * LeaseRecord associates a vmid to expireTime.
+   * This defauld lease value is used if the lease value, passed to the
+   * {@link #dirty} is equal to zero.
    */
-  private static class LeaseRecord{
-    private VMID vmid;
-    private long expireTime;
+  static final long LEASE_VALUE = 600000L;
     
-    LeaseRecord(VMID vmid, long leaseValue){
-      this.vmid = vmid;
-      reset(leaseValue);
+  /**
+   * Create the new DGC implementation.
+   * 
+   * @throws RemoteException if the super constructor throws or the
+   * socket factory fails.
+   */
+  public DGCImpl() throws RemoteException
+  {
+    super(new ObjID(ObjID.DGC_ID), 0, RMISocketFactory.getSocketFactory());
     }
     
-    // reset expireTime
-    void reset(long leaseValue){
-      long l = System.currentTimeMillis();
-      expireTime = l + leaseValue;
-    }
+  /**
+   * Mark the given objects referecnes as used on the client side.
+   * 
+   * @param ids the ids of the used objects.
+   * @param sequenceNum the number of the call (used to detect and discard late
+   *          calls).
+   * @param lease the requested lease
+   * @return the granted lease
+   */
+  public Lease dirty(ObjID[] ids, long sequenceNum, Lease lease)
+      throws RemoteException
+  { 
+    // We do not fill in VMID because in this implementation it is not used.
+    long leaseValue = lease.getValue();
+    
+    // Grant the maximal default lease time if the passed value is zero.
+    if (leaseValue <= 0)
+      leaseValue = LEASE_VALUE;
+    
+    // Create (and shedule of the given existence) the new reference
+    // protector.
+    new RefProtector(ids, leaseValue);    
 
-    boolean isExpired(){
-      long l = System.currentTimeMillis();
-      if ( l > expireTime)
-	return true;
-      return false;
+    lease = new Lease(lease.getVMID(), leaseValue);
+    return lease;
     }
         
-  } //End of LeaseRecord
+  /**
+   * Mark the given objects as no longer used on the client side.
+   * 
+   * @param ids the ids of the objects that are no longer used.
+   * @param sequenceNum the number of the call (used to detect and discard late
+   *          calls)
+   * @param vmid the VMID of the client.
+   * @param strong make the "strong" clean call.
+   */
+  public void clean(ObjID[] ids, long sequenceNum, VMID vmid, boolean strong)
+      throws RemoteException
+  {
+    // Not implemented
+    // TODO implement
+  }
 
-} //End of DGCImpl
+} // End of DGCImpl
