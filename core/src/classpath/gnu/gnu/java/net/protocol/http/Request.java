@@ -302,12 +302,10 @@ public class Request
             String line = method + ' ' + requestUri + ' ' + version + CRLF;
             out.write(line.getBytes(US_ASCII));
             // Request headers
-            for (Iterator i = requestHeaders.keySet().iterator();
-                 i.hasNext(); )
+            for (Iterator i = requestHeaders.iterator(); i.hasNext(); )
               {
-                String name =(String) i.next();
-                String value =(String) requestHeaders.get(name);
-                line = name + HEADER_SEP + value + CRLF;
+                Headers.HeaderElement elt = (Headers.HeaderElement)i.next();
+                line = elt.name + HEADER_SEP + elt.value + CRLF;
                 out.write(line.getBytes(US_ASCII));
               }
             out.write(CRLF.getBytes(US_ASCII));
@@ -438,23 +436,17 @@ public class Request
 
   void notifyHeaderHandlers(Headers headers)
   {
-    for (Iterator i = headers.entrySet().iterator(); i.hasNext(); )
+    for (Iterator i = headers.iterator(); i.hasNext(); )
       {
-        Map.Entry entry = (Map.Entry) i.next();
-        String name =(String) entry.getKey();
+        Headers.HeaderElement entry = (Headers.HeaderElement) i.next();
         // Handle Set-Cookie
-        if ("Set-Cookie".equalsIgnoreCase(name))
-          {
-            String value = (String) entry.getValue();
-            handleSetCookie(value);
-          }
+        if ("Set-Cookie".equalsIgnoreCase(entry.name))
+            handleSetCookie(entry.value);
+
         ResponseHeaderHandler handler =
-          (ResponseHeaderHandler) responseHeaderHandlers.get(name);
+          (ResponseHeaderHandler) responseHeaderHandlers.get(entry.name);
         if (handler != null)
-          {
-            String value = (String) entry.getValue();
-            handler.setValue(value);
-          }
+            handler.setValue(entry.value);
       }
   }
 

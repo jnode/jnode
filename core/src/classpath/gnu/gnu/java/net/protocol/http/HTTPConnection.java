@@ -38,7 +38,6 @@ exception statement from your version. */
 
 package gnu.java.net.protocol.http;
 
-import gnu.classpath.Configuration;
 import gnu.classpath.SystemProperties;
 import gnu.java.net.EmptyX509TrustManager;
 
@@ -54,8 +53,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.ListIterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import javax.net.ssl.HandshakeCompletedListener;
@@ -267,7 +266,8 @@ public class HTTPConnection
 
   /**
    * Returns the HTTP version string supported by this connection.
-   * @see #version
+   * @see #majorVersion
+   * @see #minorVersion
    */
   public String getVersion()
   {
@@ -458,7 +458,7 @@ public class HTTPConnection
      * connection to the requested server it is returned.  Otherwise a
      * new connection is created.
      *
-     * @param hostname the name of the host to connect to
+     * @param host the name of the host to connect to
      * @param port the port on the host to connect to
      * @param secure whether to use a secure connection
      *
@@ -488,6 +488,7 @@ public class HTTPConnection
           if (matches(cc, host, port, secure))
             {
               c = cc;
+              it.remove();
               break;
             }
         }
