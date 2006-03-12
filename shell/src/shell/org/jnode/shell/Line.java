@@ -22,13 +22,19 @@
 package org.jnode.shell;
 
 import java.io.PrintStream;
+import java.util.Arrays;
+import java.util.Collections;
 
 import org.jnode.driver.console.TextConsole;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
+ * @author Fabien DUMINY (fduminy@jnode.org)
  */
 class Line {
+	//TODO get the real screen width (in columns)
+    final static private int SCREEN_WIDTH = 80;
+    
     private int consoleX;
 
     private int consoleY;
@@ -166,11 +172,77 @@ class Line {
 
             out.println();
             String[] list = info.getItems();
-            for (int i = 0; i < list.length; i++)
-                out.println(list[i]);
+            
+            final int minItemsToSplit = 5;
+            if(list.length > minItemsToSplit)
+            {
+	            list = splitInColumns(list); 
+            }
+
+        	// display items column (may be single or multiple columns)
+            for (String item : list)
+            {               	
+            	// item may actually be a single item or in fact multiple items
+            	if((item.length() % SCREEN_WIDTH) == 0)
+            	{
+            		// we are already at the first column of the next line 
+            		out.print(item);
+            	}
+            	else
+            	{
+            		// we aren't at the first column of the next line
+            		out.println(item);
+            	}
+            }
 
             posOnCurrentLine = oldPosOnCurrentLine;
         }
+    }
+    
+    protected String[] splitInColumns(String[] items)
+    {
+        final int separatorWidth = 3;
+        
+        // compute the maximum width of items
+        int maxWidth = 0;
+        for(String item : items)
+        {
+        	if(item.length() > maxWidth)
+        	{
+        		maxWidth = item.length();
+        	}
+        }
+        
+        final int columnWidth = maxWidth + separatorWidth;
+        final int nbColumns = SCREEN_WIDTH / columnWidth;
+        final boolean lastLineIsFull = ((items.length % nbColumns) == 0);
+        final int nbLines = (items.length / nbColumns) + (lastLineIsFull ? 0 : 1);
+        
+        String[] lines = new String[nbLines];
+    	StringBuilder line = new StringBuilder(SCREEN_WIDTH);
+    	int lineNum = 0;
+        for(int itemNum = 0 ; itemNum < items.length ; )
+        {
+        	for(int c = 0 ; c < nbColumns ; c++)
+        	{
+        		final String item = items[itemNum++];
+        		line.append(item);
+        		
+        		// add some blanks
+        		final int nbBlanks = columnWidth - item.length();
+        		for(int i = 0 ; i < nbBlanks ; i++)
+        		{
+        			line.append(' ');
+        		}
+
+        		if(itemNum >= items.length) break;
+        	}
+        	
+        	lines[lineNum++] = line.toString(); 
+        	line.setLength(0); // clear the buffer
+        }
+        
+        return lines; 
     }
 
     public void appendChar(char c) {

@@ -21,12 +21,16 @@
  
 package org.jnode.shell.command;
 
+import gnu.java.net.GetLocalHostAction;
+
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Locale;
 
 import org.jnode.shell.help.Argument;
+import org.jnode.shell.help.CountryArgument;
 import org.jnode.shell.help.Help;
+import org.jnode.shell.help.LanguageArgument;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.Syntax;
@@ -34,12 +38,12 @@ import org.jnode.shell.help.Syntax;
 /**
  * Change the default locale of JNode
  * 
- * @author Fabien DUMINY 
+ * @author Fabien DUMINY (fduminy@jnode.org) 
  */
 public class LocaleCommand {
 
-    static final Argument LANGUAGE = new Argument("language", "language parameter");
-    static final Argument COUNTRY = new Argument("country", "country parameter");
+    static final Argument LANGUAGE = new LanguageArgument("language", "language parameter");
+    static final Argument COUNTRY = new CountryArgument("country", "country parameter");
     static final Argument VARIANT = new Argument("variant", "variant parameter");
     
     static final Parameter PARAM_LANGUAGE = new Parameter(LANGUAGE, Parameter.MANDATORY);
@@ -68,21 +72,11 @@ public class LocaleCommand {
         
         if (PARAM_LANGUAGE.isSatisfied()) {
             final String language = LANGUAGE.getValue(cmdLine);
-            if(!isValidLanguage(language))
-            {
-            	err.println("unknown language: "+language);
-            	return;
-            }
 
             String country = "";
             if(PARAM_COUNTRY.isSatisfied())
             {
             	country = COUNTRY.getValue(cmdLine);
-	            if(!isValidCountry(country))
-	            {
-	            	err.println("unknown country: "+country);
-	            	return;
-	            }
             }            
 
             String variant = "";
@@ -130,52 +124,5 @@ public class LocaleCommand {
         }
         
     	return locale;
-    }
-    
-    /**
-     * Validate the country
-     * @param country
-     * @return
-     */
-    protected boolean isValidCountry(String country)
-    {
-    	if((country == null) || "".equals(country))
-    		return true;
-    	
-    	boolean valid = false;
-    	String[] countries = Locale.getISOCountries();
-    	
-    	for(int i = 0 ; i < countries.length ; i++)
-    	{
-    		if(countries[i].equals(country))
-    		{
-    			valid = true;
-    			break;
-    		}
-    	}
-    	
-    	return valid;
-    }
-
-    /**
-     * Validate the language 
-     * @param language
-     * @return
-     */
-    protected boolean isValidLanguage(String language)
-    {
-    	boolean valid = false;
-    	String[] languages = Locale.getISOLanguages();
-    	
-    	for(int i = 0 ; i < languages.length ; i++)
-    	{
-    		if(languages[i].equals(language))
-    		{
-    			valid = true;
-    			break;
-    		}
-    	}
-    	
-    	return valid;
-    }
+    }    
 }
