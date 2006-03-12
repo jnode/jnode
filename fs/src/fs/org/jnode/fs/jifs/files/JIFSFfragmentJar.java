@@ -30,7 +30,6 @@ public class JIFSFfragmentJar extends JIFSFpluginJar {
     }
 
     public void refresh(){
-        super.refresh();
         try{
             final PluginManager mgr = InitialNaming.lookup(PluginManager.NAME);
             PluginDescriptorModel pdm = (PluginDescriptorModel) mgr.getRegistry().getPluginDescriptor(pluginId);
@@ -38,7 +37,7 @@ public class JIFSFfragmentJar extends JIFSFpluginJar {
                 isvalid = false;
                 for(PluginDescriptorModel fdm : pdm.fragments()){
                     if(fdm.getId().equals(fragmentId)){
-                        buffer = pdm.getJarFile().getBuffer();
+                        buffer = fdm.getJarFile().getBuffer();
                         isvalid = buffer != null;
                     }
                 }

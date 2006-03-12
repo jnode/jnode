@@ -30,7 +30,6 @@ public class JIFSFpluginJar extends JIFSFile {
     }
 
     public void refresh(){
-        super.refresh();
         try{
             final PluginManager mgr = InitialNaming.lookup(PluginManager.NAME);
             PluginDescriptorModel pdm = (PluginDescriptorModel) mgr.getRegistry().getPluginDescriptor(id);
