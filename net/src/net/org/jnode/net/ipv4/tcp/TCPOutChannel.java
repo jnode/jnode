@@ -216,7 +216,7 @@ public class TCPOutChannel {
         }
         snd_max = snd_next;
         // Create & send the segment
-        final TCPOutSegment seg = new TCPOutSegment(ipHdr, hdr, dataBuffer, 0, timeoutTicks);
+        final TCPOutSegment seg = new TCPOutSegment(ipHdr, hdr, dataBuffer, dataOffset, timeoutTicks);
         seg.send(tcp);
         if (!seg.isAckOnly() && !hdr.isFlagSynchronizeSet()) {
             log.debug("Adding segment " + seg.getSeqNr() + " to unacklist");
