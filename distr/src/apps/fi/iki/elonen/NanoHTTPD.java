@@ -426,8 +426,7 @@ public class NanoHTTPD
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
-				PrintWriter pw = new PrintWriter( byteArrayOutputStream );
-//				PrintWriter pw = new PrintWriter( out );
+				PrintWriter pw = new PrintWriter( out , true);
 
 				pw.print("HTTP/1.0 " + status + " \r\n");
 
@@ -459,9 +458,8 @@ public class NanoHTTPD
 					while ( read == 2048 )
 					{
 						read = data.read( buff, 0, 2048 );
-						byteArrayOutputStream.write( buff, 0, read );
 
-//						out.write( buff, 0, read );
+						out.write( buff, 0, read );
 					}
 				}
 
