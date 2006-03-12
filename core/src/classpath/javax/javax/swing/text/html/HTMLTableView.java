@@ -1,5 +1,5 @@
-/* NoPermissionException.java --
-   Copyright (C) 2000, 2004, 2006 Free Software Foundation, Inc.
+/* HTMLTableView.java -- A table view for HTML tables
+   Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -36,20 +36,47 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package javax.naming;
+package javax.swing.text.html;
 
- 
-public class NoPermissionException extends NamingSecurityException
+import javax.swing.text.Element;
+import javax.swing.text.TableView;
+import javax.swing.text.View;
+import javax.swing.text.ViewFactory;
+
+/**
+ * A conrete implementation of TableView that renders HTML tables.
+ * 
+ * @author Roman Kennke (kennke@aicas.com)
+ */
+class HTMLTableView
+    extends TableView
 {
-  private static final long serialVersionUID = 8395332708699751775L;
 
-  public NoPermissionException ()
+  /**
+   * Creates a new HTMLTableView for the specified element.
+   *
+   * @param el the element for the table view
+   */
+  public HTMLTableView(Element el)
   {
-    super ();
+    super(el);
   }
 
-  public NoPermissionException (String msg)
+  /**
+   * Loads the children of the Table. This completely bypasses the ViewFactory
+   * and creates instances of TableRow instead.
+   *
+   * @param vf ignored
+   */
+  protected void loadChildren(ViewFactory vf)
   {
-    super (msg);
+    Element el = getElement();
+    int numChildren = el.getElementCount();
+    View[] rows = new View[numChildren];
+    for (int i = 0; i < numChildren; ++i)
+      {
+        rows[i] = createTableRow(el.getElement(i));
+      }
+    replace(0, getViewCount(), rows);
   }
 }

@@ -40,6 +40,7 @@ exception statement from your version. */
 package gnu.java.rmi.server;
 
 import gnu.java.rmi.dgc.DGCImpl;
+import gnu.java.util.WeakIdentityHashMap;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -51,53 +52,100 @@ import java.rmi.RemoteException;
 import java.rmi.ServerError;
 import java.rmi.server.ObjID;
 import java.rmi.server.UID;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Map;
-import java.util.Hashtable;
-import java.util.IdentityHashMap;
+import java.util.WeakHashMap;
 
 public class UnicastServer
-	implements ProtocolConstants {
+    implements ProtocolConstants
+{
 
-static private Hashtable objects = new Hashtable();  //mapping OBJID to server ref
-static private Map refcache = Collections.synchronizedMap(new IdentityHashMap()); //mapping obj itself to server ref
-static private DGCImpl dgc;
+  /**
+   * Mapping OBJID to server ref by .equals().
+   */
+  static private Map objects = Collections.synchronizedMap(new WeakHashMap());
 
-public static void exportObject(UnicastServerRef obj) {
+  /**
+   * Mapping obj itself to server ref by identity.
+   */
+  static private Map refcache = Collections.synchronizedMap(new WeakIdentityHashMap());
+
+  static private DGCImpl dgc;
+
+  public static void exportObject(UnicastServerRef obj)
+  {
 	startDGC();
 	objects.put(obj.objid, obj);
 	refcache.put(obj.myself, obj);
 	obj.manager.startServer();
-}
+  }
 
-// FIX ME: I haven't handle force parameter
-public static boolean unexportObject(UnicastServerRef obj, boolean force) {
+  // FIX ME: I haven't handle force parameter
+  public static boolean unexportObject(UnicastServerRef obj, boolean force)
+  {
 	objects.remove(obj.objid);
 	refcache.remove(obj.myself);
 	obj.manager.stopServer();
 	return true;
-}
+  }
 
-public static UnicastServerRef getExportedRef(Remote remote){
-    return (UnicastServerRef)refcache.get(remote);
-}
+  public static UnicastServerRef getExportedRef(Remote remote)
+  {
+    return (UnicastServerRef) refcache.get(remote);
+  }
 
-private static synchronized void startDGC() {
-	if (dgc == null) {
-		try {
+  /**
+   * Get the server references to the object, previously exported via this
+   * server. As the identity map is scanned, more than one reference may match
+   * this Id.
+   * 
+   * @param id the id of the exported object
+   * @return the server reference to this object, null if none.
+   */
+  public static Collection getExported(Object id)
+  {
+    synchronized (objects)
+      {
+        ArrayList list = new ArrayList();
+        Iterator iter = objects.entrySet().iterator();
+        Map.Entry e;
+        Object key;
+        while (iter.hasNext())
+          {
+            e = (Map.Entry) iter.next();
+            key = e.getKey();
+            if (key != null && key.equals(id))
+              list.add(e.getValue());
+          }
+        return list;
+      }
+  }
+
+  private static synchronized void startDGC()
+  {
+    if (dgc == null)
+      {
+        try
+          {
 			dgc = new DGCImpl();
 			// Changed DGCImpl to inherit UnicastServerRef directly
-			//((UnicastServerRef)dgc.getRef()).exportObject(dgc);
+            // ((UnicastServerRef)dgc.getRef()).exportObject(dgc);
 			dgc.exportObject(dgc);
 		}
-		catch (RemoteException e) {
+        catch (RemoteException e)
+          {
 			e.printStackTrace();
 		}
 	}
-}
+  }
 
-public static void dispatch(UnicastConnection conn) throws Exception {
-	switch (conn.getDataInputStream().readUnsignedByte()) {
+  public static void dispatch(UnicastConnection conn) throws Exception
+  {
+    switch (conn.getDataInputStream().readUnsignedByte())
+      {
 	case MESSAGE_CALL:
 		incomingMessageCall(conn);
 		break;
@@ -110,61 +158,74 @@ public static void dispatch(UnicastConnection conn) throws Exception {
 	default:
 		throw new Exception("bad method type");
 	}
-}
+  }
 
-private static void incomingMessageCall(UnicastConnection conn) throws IOException {
-	ObjectInputStream in = conn.startObjectInputStream();  // (re)start ObjectInputStream
+  private static void incomingMessageCall(UnicastConnection conn)
+      throws IOException
+  {
+    ObjectInputStream in = conn.startObjectInputStream(); // (re)start
+                                                          // ObjectInputStream
 
 	ObjID objid = ObjID.read(in);
 	int method = in.readInt();
 	long hash = in.readLong();
 
-//System.out.println("ObjID: " + objid + ", method: " + method + ", hash: " + hash);
+    // System.out.println("ObjID: " + objid + ", method: " + method + ", hash: "
+    // + hash);
 
 	// Use the objid to locate the relevant UnicastServerRef
-	UnicastServerRef uref = (UnicastServerRef)objects.get(objid);
+    UnicastServerRef uref = (UnicastServerRef) objects.get(objid);
 	Object returnval;
 	int returncode = RETURN_ACK;
-	// returnval is from Method.invoke(), so we must check the return class to see
+    // returnval is from Method.invoke(), so we must check the return class to
+    // see
 	// if it's primitive type
 	Class returncls = null;
-	if (uref != null) {
-		try {
+    if (uref != null)
+      {
+        try
+          {
 			// Dispatch the call to it.
 			returnval = uref.incomingMessageCall(conn, method, hash);
 			returncls = uref.getMethodReturnType(method, hash);
 		}
-		catch (Exception e) {
+        catch (Exception e)
+          {
 			returnval = e;
 			returncode = RETURN_NACK;
 		}
-                catch (Error e) {
-			returnval = new ServerError ("An Error is thrown while processing the invocation on the server", e);
+        catch (Error e)
+          {
+            returnval = new ServerError(
+                                        "An Error is thrown while processing the invocation on the server",
+                                        e);
 			returncode = RETURN_NACK;
                 }
 	}
-	else {
+    else
+      {
 		returnval = new NoSuchObjectException("");
 		returncode = RETURN_NACK;
 	}
 
 	conn.getDataOutputStream().writeByte(MESSAGE_CALL_ACK);
 
-	ObjectOutputStream out = conn.startObjectOutputStream();   // (re)start ObjectOutputStream
+    ObjectOutputStream out = conn.startObjectOutputStream(); // (re)start
+                                                              // ObjectOutputStream
 
 	out.writeByte(returncode);
 	(new UID()).write(out);
 
-	//System.out.println("returnval=" + returnval + " returncls=" + returncls);
+    // System.out.println("returnval=" + returnval + " returncls=" + returncls);
 
-	if(returnval != null && returncls != null)
-	    ((RMIObjectOutputStream)out).writeValue(returnval, returncls);
+    if (returnval != null && returncls != null)
+      ((RMIObjectOutputStream) out).writeValue(returnval, returncls);
 
 	// 1.1/1.2 void return type detection:
-	else if (!(returnval instanceof RMIVoidValue || returncls == Void.TYPE)) 
+    else if (! (returnval instanceof RMIVoidValue || returncls == Void.TYPE))
 	    out.writeObject(returnval);
 
 	out.flush();
-}
+  }
 
 }
