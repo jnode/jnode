@@ -108,8 +108,9 @@ abstract public class AbstractFontProvider implements FontProvider {
 	final public TextRenderer getTextRenderer(Font font) {
 		TextRenderer r = (TextRenderer) renderers.get(font);
 		if (r == null) {
-			renderers.put(font, createTextRenderer(renderCache, font));
-		}
+            r=createTextRenderer(renderCache, font);
+            renderers.put(font, r);
+        }
 		return r;
 	}
 	
