@@ -1,5 +1,5 @@
 /* TreeExpansionEvent.java --
-   Copyright (C) 2002, 2004  Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2006,  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -46,44 +46,32 @@ import javax.swing.tree.TreePath;
  * TreeExpansionEvent
  * @author Andrew Selkirk
  */
-public class TreeExpansionEvent extends EventObject {
-
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
+public class TreeExpansionEvent extends EventObject 
+{
 
 	/**
 	 * path
 	 */
 	protected TreePath	path		= null;
 
-
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
-
 	/**
 	 * Constructor TreeExpansionEvent
 	 * @param source Source object
 	 * @param path Path
 	 */
-	public TreeExpansionEvent(Object source, TreePath path) {
+  public TreeExpansionEvent(Object source, TreePath path) 
+  {
 		super(source);
 		this.path = path;
-	} // TreeExpansionEvent()
-
-
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
+  }
 	
 	/**
 	 * getPath
-	 * @returns Tree path
+   * @return Tree path
 	 */
-	public TreePath getPath() {
+  public TreePath getPath() 
+  {
 		return path;
-	} // getPath()
+  } 
 
-
-} // TreeExpansionEvent
+} 

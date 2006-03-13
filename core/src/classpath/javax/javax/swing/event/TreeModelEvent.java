@@ -1,5 +1,5 @@
 /* TreeModelEvent.java --
-   Copyright (C) 2002, 2004  Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2006,  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -46,11 +46,8 @@ import javax.swing.tree.TreePath;
  * TreeModelEvent
  * @author Andrew Selkirk
  */
-public class TreeModelEvent extends EventObject {
-
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
+public class TreeModelEvent extends EventObject 
+{
 	
 	/**
 	 * childIndices
@@ -67,20 +64,16 @@ public class TreeModelEvent extends EventObject {
 	 */
 	protected TreePath	path			= null;
 
-
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
-	
 	/**
 	 * Constructor TreeModelEvent
 	 * @param source Source object
 	 * @param path
 	 */
-	public TreeModelEvent(Object source, Object[] path) {
+  public TreeModelEvent(Object source, Object[] path) 
+  {
 		super(source);
 		this.path = new TreePath(path);
-	} // TreeModelEvent()
+  } 
 
 	/**
 	 * Constructor TreeModelEvent
@@ -90,22 +83,24 @@ public class TreeModelEvent extends EventObject {
 	 * @param children Children
 	 */
 	public TreeModelEvent(Object source, Object[] path,
-						int[] childIndices, Object[] children) {
+      int[] childIndices, Object[] children) 
+  {
 		super(source);
 		this.path		 	= new TreePath(path);
 		this.childIndices	= childIndices;
 		this.children		= children;
-	} // TreeModelEvent()
+  } 
 
 	/**
 	 * Constructor TreeModelEvent
 	 * @param source Source object
 	 * @param path Path
 	 */
-	public TreeModelEvent(Object source, TreePath path) {
+  public TreeModelEvent(Object source, TreePath path) 
+  {
 		super(source);
 		this.path = path;
-	} // TreeModelEvent()
+  } 
 
 	/**
 	 * Constructor TreeModelEvent
@@ -115,59 +110,59 @@ public class TreeModelEvent extends EventObject {
 	 * @param children Children
 	 */
 	public TreeModelEvent(Object source, TreePath path,
-						int[] childIndices, Object[] children) {
+      int[] childIndices, Object[] children) 
+  {
 		super(source);
 		this.path		 	= path;
 		this.childIndices	= childIndices;
 		this.children		= children;
-	} // TreeModelEvent()
-
-
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
+  } 
 
 	/**
 	 * getChildIndices
-	 * @returns child indices
+   * @return child indices
 	 */
-	public int[] getChildIndices() {
+  public int[] getChildIndices()  
+  {
 		return childIndices;
-	} // getChildIndices()
+  } 
 
 	/**
 	 * getChildren
-	 * @returns children
+   * @return children
 	 */
-	public Object[] getChildren() {
+  public Object[] getChildren()  
+  {
 		return children;
-	} // getChildren()
+  } 
 
 	/**
 	 * getPath
-	 * @returns path
+   * @return path
 	 */
-	public Object[] getPath() {
+  public Object[] getPath() 
+  {
 		return path.getPath();
-	} // getPath()
+  } 
 
 	/**
 	 * getTreePath
-	 * @returns TreePath
+   * @return TreePath
 	 */
-	public TreePath getTreePath() {
+  public TreePath getTreePath() 
+  {
 		return path;
-	} // getTreePath()
+  } 
 
 	/**
 	 * String representation
-	 * @returns String representation
+   * @return String representation
 	 */
-	public String toString() {
-		return getClass() + " [Source: " + getSource() + ", TreePath: " + getTreePath() +
-        ", Child Indicies: " + getChildIndices() + ", Children: " + getChildren() + 
-        ", Path: " + getPath() +"]";
-	} // toString()
+  public String toString() 
+  {
+    return getClass() + " [Source: " + getSource() + ", TreePath: " 
+        + getTreePath() + ", Child Indicies: " + getChildIndices() 
+        + ", Children: " + getChildren() + ", Path: " + getPath() +"]";
+  } 
 
-
-} // TreeModelEvent
+} 

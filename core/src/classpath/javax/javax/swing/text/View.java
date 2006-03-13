@@ -40,9 +40,11 @@ package javax.swing.text;
 
 import java.awt.Container;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.Shape;
 
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 
 public abstract class View implements SwingConstants
@@ -493,8 +495,7 @@ public abstract class View implements SwingConstants
       {
         int startOffset = ev.getOffset();
         int endOffset = startOffset + ev.getLength();
-        // FIXME: What about this bias stuff?
-        int startIndex = getViewIndex(startOffset, Position.Bias.Forward);
+        int startIndex = getViewIndex(startOffset, Position.Bias.Backward);
         int endIndex = getViewIndex(endOffset, Position.Bias.Forward);
         int index = -1;
         int addLength = -1;
@@ -610,9 +611,9 @@ public abstract class View implements SwingConstants
     if (b2 != Position.Bias.Forward && b2 != Position.Bias.Backward)
       throw new IllegalArgumentException
 	("b2 must be either Position.Bias.Forward or Position.Bias.Backward");
-    Shape s1 = modelToView(p1, a, b1);
-    Shape s2 = modelToView(p2, a, b2);
-    return s1.getBounds().union(s2.getBounds());
+    Rectangle s1 = (Rectangle) modelToView(p1, a, b1);
+    Rectangle s2 = (Rectangle) modelToView(p2, a, b2);
+    return SwingUtilities.computeUnion(s1.x, s1.y, s1.width, s1.height, s2);
   }
 
   /**
@@ -677,7 +678,7 @@ public abstract class View implements SwingConstants
    * Dumps the complete View hierarchy. This method can be used for debugging
    * purposes.
    */
-  void dump()
+  protected void dump()
   {
     // Climb up the hierarchy to the parent.
     View parent = getParent();
@@ -697,7 +698,7 @@ public abstract class View implements SwingConstants
   {
     for (int i = 0; i < indent; ++i)
       System.out.print('.');
-    System.out.println(this);
+    System.out.println(this + "(" + getStartOffset() + "," + getEndOffset() + ": " + getElement());
 
     int count = getViewCount();
     for (int i = 0; i < count; ++i)

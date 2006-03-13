@@ -46,6 +46,7 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Shape;
 
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentEvent.ElementChange;
 
@@ -570,7 +571,9 @@ public class PlainView extends View implements TabExpander
       host.repaint();
     else
       {
-        Rectangle repaintRec = rec0.union(rec1);
+        Rectangle repaintRec = SwingUtilities.computeUnion(rec0.x, rec0.y,
+                                                           rec0.width,
+                                                           rec0.height, rec1);
         host.repaint(repaintRec.x, repaintRec.y, repaintRec.width,
                      repaintRec.height);
       }    

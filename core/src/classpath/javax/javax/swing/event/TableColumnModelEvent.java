@@ -1,5 +1,5 @@
 /* TableColumnModelEvent.java --
-   Copyright (C) 2002, 2004  Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2006,  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -46,11 +46,8 @@ import javax.swing.table.TableColumnModel;
  * TableColumnModelEvent
  * @author Andrew Selkirk
  */
-public class TableColumnModelEvent extends EventObject {
-
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
+public class TableColumnModelEvent extends EventObject 
+{
 
 	/**
 	 * fromIndex
@@ -62,44 +59,35 @@ public class TableColumnModelEvent extends EventObject {
 	 */
 	protected	int	toIndex			= 0;
 
-
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
-
 	/**
 	 * Constructor TableColumnModelEvent
 	 * @param source Source TableColumnModel
 	 * @param from From index
 	 * @param to To index
 	 */
-	public TableColumnModelEvent(TableColumnModel source,
-								int from, int to) {
+  public TableColumnModelEvent(TableColumnModel source, int from, int to) 
+  {
 		super(source);
 		fromIndex = from;
 		toIndex   = to;
-	} // TableColumnModelEvent()
-
-
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
+  }
 
 	/**
 	 * getFromIndex.
-	 * @returns From index
+   * @return From index
 	 */
-	public int getFromIndex() {
+  public int getFromIndex() 
+  {
 		return fromIndex;
-	} // getFromIndex()
+  } 
 
 	/**
 	 * getToIndex.
-	 * @returns To index
+   * @return To index
 	 */
-	public int getToIndex() {
+  public int getToIndex() 
+  {
 		return toIndex;
-	} // getToIndex()
+  }
 
-
-} // TableColumnModelEvent
+}

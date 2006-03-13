@@ -373,7 +373,8 @@ public abstract class CompositeView
    */
   public int getViewIndex(int pos, Position.Bias b)
   {
-    // FIXME: Handle bias somehow.
+    if (b == Position.Bias.Backward && pos != 0)
+      pos -= 1;
     return getViewIndexAtPosition(pos);
   }
 

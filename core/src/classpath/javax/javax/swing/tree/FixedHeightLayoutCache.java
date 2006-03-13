@@ -1,5 +1,5 @@
 /* FixedHeightLayoutCache.java --
-Copyright (C) 2002, 2004  Free Software Foundation, Inc.
+Copyright (C) 2002, 2004, 2006,  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -51,35 +51,23 @@ public class FixedHeightLayoutCache
 		extends AbstractLayoutCache
 {
 
-	// -------------------------------------------------------------
-	// Variables --------------------------------------------------
-	// -------------------------------------------------------------
-
-	// -------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	// -------------------------------------------------------------
-
 	/**
 	 * Constructor FixedHeightLayoutCache
 	 */
 	public FixedHeightLayoutCache()
 	{
 		// TODO
-	} // FixedHeightLayoutCache()
-
-	// -------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	// -------------------------------------------------------------
+  } 
 
 	/**
 	 * getRowCount
 	 * 
-	 * @returns int
+   * @return int
 	 */
 	public int getRowCount()
 	{
 		return 0; // TODO
-	} // getRowCount()
+  }  
 
 	/**
 	 * invalidatePathBounds
@@ -89,7 +77,7 @@ public class FixedHeightLayoutCache
 	public void invalidatePathBounds(TreePath value0)
 	{
 		// TODO
-	} // invalidatePathBounds()
+  } 
 
 	/**
 	 * invalidateSizes
@@ -97,87 +85,87 @@ public class FixedHeightLayoutCache
 	public void invalidateSizes()
 	{
 		// TODO
-	} // invalidateSizes()
+  } 
 
 	/**
 	 * isExpanded
 	 * 
 	 * @param value0 TODO
-	 * @returns boolean
+   * @return boolean
 	 */
 	public boolean isExpanded(TreePath value0)
 	{
 		return false; // TODO
-	} // isExpanded()
+  } 
 
 	/**
 	 * getBounds
 	 * 
 	 * @param value0 TODO
 	 * @param value1 TODO
-	 * @returns Rectangle
+   * @return Rectangle
 	 */
 	public Rectangle getBounds(TreePath value0, Rectangle value1)
 	{
 		return null; // TODO
-	} // getBounds()
+  } 
 
 	/**
 	 * getPathForRow
 	 * 
 	 * @param row TODO
-	 * @returns TreePath
+   * @return TreePath
 	 */
 	public TreePath getPathForRow(int row)
 	{
 		//TODO
 		return null;
-	} // getPathForRow()
+  } 
 
 	/**
 	 * getRowForPath
 	 * 
 	 * @param value0 TODO
-	 * @returns int
+   * @return int
 	 */
 	public int getRowForPath(TreePath value0)
 	{
 		return 0;
-	} // getRowForPath()
+  } 
 
 	/**
 	 * getPathClosestTo
 	 * 
 	 * @param value0 TODO
 	 * @param value1 TODO
-	 * @returns TreePath
+   * @return TreePath
 	 */
 	public TreePath getPathClosestTo(int value0, int value1)
 	{
 		return null; // TODO
-	} // getPathClosestTo()
+  } 
 
 	/**
 	 * getVisibleChildCount
 	 * 
 	 * @param value0 TODO
-	 * @returns int
+   * @return int
 	 */
 	public int getVisibleChildCount(TreePath value0)
 	{
 		return 0; // TODO
-	} // getVisibleChildCount()
+  } 
 
 	/**
 	 * getVisiblePathsFrom
 	 * 
 	 * @param value0 TODO
-	 * @returns Enumeration
+   * @return Enumeration
 	 */
 	public Enumeration getVisiblePathsFrom(TreePath value0)
 	{
 		return null; // TODO
-	} // getVisiblePathsFrom()
+  }
 
 	/**
 	 * setExpandedState
@@ -188,18 +176,18 @@ public class FixedHeightLayoutCache
 	public void setExpandedState(TreePath value0, boolean value1)
 	{
 		// TODO
-	} // setExpandedState()
+  } 
 
 	/**
 	 * getExpandedState
 	 * 
 	 * @param value0 TODO
-	 * @returns boolean
+   * @return boolean
 	 */
 	public boolean getExpandedState(TreePath value0)
 	{
 		return false; // TODO
-	} // getExpandedState()
+  }
 
 	/**
 	 * treeNodesChanged
@@ -209,7 +197,7 @@ public class FixedHeightLayoutCache
 	public void treeNodesChanged(TreeModelEvent value0)
 	{
 		// TODO
-	} // treeNodesChanged()
+  } 
 
 	/**
 	 * treeNodesInserted
@@ -219,7 +207,7 @@ public class FixedHeightLayoutCache
 	public void treeNodesInserted(TreeModelEvent value0)
 	{
 		// TODO
-	} // treeNodesInserted()
+  } 
 
 	/**
 	 * treeNodesRemoved
@@ -229,7 +217,7 @@ public class FixedHeightLayoutCache
 	public void treeNodesRemoved(TreeModelEvent value0)
 	{
 		// TODO
-	} // treeNodesRemoved()
+  } 
 
 	/**
 	 * treeStructureChanged
@@ -239,6 +227,6 @@ public class FixedHeightLayoutCache
 	public void treeStructureChanged(TreeModelEvent value0)
 	{
 		// TODO
-	} // treeStructureChanged()
+  } 
 
-} // FixedHeightLayoutCache
+}
