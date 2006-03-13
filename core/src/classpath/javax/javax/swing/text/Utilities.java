@@ -515,7 +515,7 @@ public class Utilities
     breaker.setText(s);
     
     // If mark is equal to the end of the string, just use that position
-    if (mark == s.count)
+    if (mark >= s.count)
       return mark;
     
     // Try to find a word boundary previous to the mark at which we 

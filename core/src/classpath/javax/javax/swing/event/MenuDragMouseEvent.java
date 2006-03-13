@@ -1,5 +1,5 @@
 /* MenuDragMouseEvent.java --
-   Copyright (C) 2002, 2004  Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2006,  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -48,11 +48,8 @@ import javax.swing.MenuSelectionManager;
  * MenuDragMouseEvent
  * @author Andrew Selkirk
  */
-public class MenuDragMouseEvent extends MouseEvent {
-
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
+public class MenuDragMouseEvent extends MouseEvent 
+{
 
 	/**
 	 * path
@@ -63,11 +60,6 @@ public class MenuDragMouseEvent extends MouseEvent {
 	 * manager
 	 */
 	private	MenuSelectionManager	manager		= null;
-
-
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
 
 	/**
 	 * Constructor MenuDragMouseEvent
@@ -84,32 +76,29 @@ public class MenuDragMouseEvent extends MouseEvent {
 	 */
 	public MenuDragMouseEvent(Component source, int id, long when, int modifiers,
 						int x, int y, int clickCount, boolean popupTrigger,
-						MenuElement[] path, MenuSelectionManager manager) {
+      MenuElement[] path, MenuSelectionManager manager) 
+  {
 		super(source, id, when, modifiers, x, y, clickCount, popupTrigger);
 		this.path = path;
 		this.manager = manager;
-	} // MenuDragMouseEvent()
-
-
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
+  } 
 
 	/**
 	 * Get path
-	 * @returns path
+   * @return path
 	 */
-	public MenuElement[] getPath() {
+  public MenuElement[] getPath() 
+  {
 		return path;
-	} // getPath()
+  } 
 
 	/**
 	 * Get menu selection manager
-	 * @returns manager
+   * @return manager
 	 */
-	public MenuSelectionManager getMenuSelectionManager() {
+  public MenuSelectionManager getMenuSelectionManager() 
+  {
 		return manager;
-	} // getMenuSelectionManager()
+  }
 
-
-} // MenuDragMouseEvent
+} 

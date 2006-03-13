@@ -127,7 +127,7 @@ public abstract class FlowView extends BoxView
      *
      * @return the logical view of the managed <code>FlowView</code>
      */
-    public View getLogicalView(FlowView fv)
+    protected View getLogicalView(FlowView fv)
     {
       return fv.layoutPool;
     }
@@ -210,7 +210,10 @@ public abstract class FlowView extends BoxView
           int flowSpan = fv.getFlowSpan(axis);
           adjustRow(fv, rowIndex, flowSpan, flowStart);
           int rowViewCount = row.getViewCount();
+          if (rowViewCount > 0)
           offset = row.getView(rowViewCount - 1).getEndOffset();
+          else
+            offset = -1;
         }
       return offset != pos ? offset : -1;
     }

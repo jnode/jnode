@@ -1,5 +1,5 @@
 /* MenuKeyEvent.java --
-   Copyright (C) 2002, 2004  Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2006,  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -48,11 +48,8 @@ import javax.swing.MenuSelectionManager;
  * MenuKeyEvent
  * @author Andrew Selkirk
  */
-public class MenuKeyEvent extends KeyEvent {
-
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
+public class MenuKeyEvent extends KeyEvent 
+{
 
 	/**
 	 * path
@@ -63,11 +60,6 @@ public class MenuKeyEvent extends KeyEvent {
 	 * manager
 	 */
 	private	MenuSelectionManager	manager		= null;
-
-
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
 
 	/**
 	 * Constructor MenuKeyEvent
@@ -82,32 +74,29 @@ public class MenuKeyEvent extends KeyEvent {
 	 */
 	public MenuKeyEvent(Component source, int id, long when, int modifiers,
 						int keyCode, char keyChar, MenuElement[] path,
-						MenuSelectionManager manager) {
+      MenuSelectionManager manager) 
+  {
 		super(source, id, when, modifiers, keyCode, keyChar);
 		this.path = path;
 		this.manager = manager;
-	} // MenuKeyEvent()
-
-
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
+  } 
 
 	/**
 	 * getPath
-	 * @returns path
+   * @return path
 	 */
-	public MenuElement[] getPath() {
+  public MenuElement[] getPath() 
+  {
 		return path;
-	} // getPath()
+  }
 
 	/**
 	 * getMenuSelectionManager
-	 * @returns MenuSelectionManager
+   * @return MenuSelectionManager
 	 */
-	public MenuSelectionManager getMenuSelectionManager() {
+  public MenuSelectionManager getMenuSelectionManager() 
+  {
 		return manager;
-	} // getMenuSelectionManager()
+  }
 
-
-} // MenuKeyEvent
+} 

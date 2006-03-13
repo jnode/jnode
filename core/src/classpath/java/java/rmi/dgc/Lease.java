@@ -1,5 +1,6 @@
 /* Lease.java
   Copyright (c) 1996, 1997, 1998, 1999 Free Software Foundation, Inc.
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -39,29 +40,61 @@ package java.rmi.dgc;
 
 import java.io.Serializable;
 
+/**
+ * A lease object is used to request and grant leases for the remote objects. It
+ * contains the lease duration and the unique VM indentifier.
+ */
 public final class Lease
-	implements Serializable {
+    implements Serializable
+{
 
-static final long serialVersionUID = -5713411624328831948L;
+  static final long serialVersionUID = - 5713411624328831948L;
 
-private VMID vmid;
-private long value;
+  private VMID vmid;
 
-public Lease(VMID id, long duration) {
+  private long value;
+
+  /**
+   * Create the new lease with the given id and duration
+   * 
+   * @param id the lease id
+   * @param duration the lease duration
+   */
+  public Lease(VMID id, long duration)
+  {
 	vmid = id;
 	value = duration;
-}
+  }
 
-public VMID getVMID() {
+  /**
+   * Get the lease id.
+   * 
+   * @return the lease id
+   */
+  public VMID getVMID()
+  {
 	return (vmid);
-}
+  }
 
-public long getValue() {
+  /**
+   * Get the lease duration
+   * 
+   * @return the lease duration
+   */
+  public long getValue()
+  {
 	return (value);
-}
+  }
 
-public String toString() {
+  /**
+   * Get the string representation of this lease
+   * 
+   * @return the string represenation (lease id, followed by the lease
+   *         duration).
+   */
+  public String toString()
+  {
 	return ("[" + vmid.toString() + ", " + Long.toString(value) + "]");
-}
+  }
 
 }
