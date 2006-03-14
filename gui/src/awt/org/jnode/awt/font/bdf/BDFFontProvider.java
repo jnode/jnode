@@ -34,11 +34,13 @@ import org.apache.log4j.Logger;
 import org.jnode.awt.font.TextRenderer;
 import org.jnode.awt.font.renderer.RenderCache;
 import org.jnode.awt.font.spi.AbstractFontProvider;
+import org.jnode.awt.font.truetype.TTFFont;
+import org.jnode.awt.font.truetype.TTFFontData;
 import org.jnode.font.bdf.BDFFontContainer;
 import org.jnode.vm.Unsafe;
 
 /**
- * @author epr
+ * @author Fabien DUMINY (fduminy@jnode.org)
  */
 public class BDFFontProvider extends AbstractFontProvider {
 	/** My logger */
@@ -53,12 +55,13 @@ public class BDFFontProvider extends AbstractFontProvider {
 	
 	public BDFFontProvider()
 	{
+		super("bdf");
 		log.debug("new BDFFontProvider");
 	}
 	
 	protected TextRenderer createTextRenderer(RenderCache renderCache, Font font)
 	{
-		final BDFFont bdfFont = (BDFFont) font;
+		final BDFFont bdfFont = getBDFFont(font);
 		final TextRenderer renderer = new BDFTextRenderer(bdfFont.getContainer());
         log.debug("created TextRenderer for BDF");
         return renderer;
@@ -66,8 +69,8 @@ public class BDFFontProvider extends AbstractFontProvider {
 	
 
 	protected FontMetrics createFontMetrics(Font font) throws IOException
-	{
-		final BDFFont bdfFont = (BDFFont) font;
+	{		
+		final BDFFont bdfFont = getBDFFont(font);
 		return bdfFont.getFontMetrics();
 	}
 	
@@ -93,5 +96,19 @@ public class BDFFontProvider extends AbstractFontProvider {
 	protected String[] getSystemFonts()
 	{
 		return SYSTEM_FONTS;
+	}
+	
+	private BDFFont getBDFFont(Font font) {
+		if (font instanceof BDFFont) {
+			return (BDFFont) font;
+		} else {
+			final BDFFont bdf = (BDFFont) getCompatibleFont(font);
+			if (bdf != null) {
+				return bdf;
+			} else {
+				log.warn("Font not instanceof BDFFont: " + font.getClass().getName());
+				return null;
+			}
+		}
 	}
 }

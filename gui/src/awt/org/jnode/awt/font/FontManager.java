@@ -31,6 +31,7 @@ import org.jnode.driver.video.Surface;
 
 /**
  * @author epr
+ * 
  */
 public interface FontManager {
 

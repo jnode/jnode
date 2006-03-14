@@ -21,11 +21,14 @@
  
 package org.jnode.awt.font.def;
 
+import gnu.java.security.action.GetPropertyAction;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.security.AccessController;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -52,6 +55,7 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
     private static final Logger log = Logger.getLogger(DefaultFontManager.class);
     private final ExtensionPoint providersEP;
     private final HashMap<String, FontProvider> providers = new HashMap<String, FontProvider>();
+    private FontProvider firstProvider;
 
     /**
      * Create a new instance
@@ -174,7 +178,13 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
             final String className = elements[j].getAttribute("class");
             log.debug("Removed provider: class=" + className);
             if (className != null) {
-                providers.remove(className);
+                FontProvider prv = providers.remove(className);
+                if(firstProvider == prv)
+                {
+                	firstProvider = null;
+                	
+                	//TODO choose another first provider ?
+                }
             }
         }
     }
@@ -185,9 +195,27 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
      * @return The provider
      */
     private FontProvider getProvider(Font font) {
+        final String firstProviderName = (String)AccessController.doPrivileged(new GetPropertyAction("jnode.font.renderer", "ttf"));
+        if((firstProvider == null) || ((firstProvider != null) && !firstProviderName.equals(firstProvider.getName())))
+        {
+            for (FontProvider prv : providers.values()) {
+            	if (firstProviderName.equals(prv.getName())) {
+            		firstProvider = prv;
+            		break;
+                }
+            }
+        }
+
+    	if (firstProvider.provides(font)) {
+    		log.debug("using firstProvider "+firstProviderName);
+            return firstProvider;
+    	}
+        
     	log.debug("getProvider for "+font.getName()+
 					" ("+providers.size()+" availables)");    	
         for (FontProvider prv : providers.values()) {
+        	if(firstProviderName.equals(prv.getName())) continue; // skip the first provider
+        			
         	log.debug("font="+font+" provider="+prv);            
         	if (prv.provides(font)) {
         		log.debug("provider found");
