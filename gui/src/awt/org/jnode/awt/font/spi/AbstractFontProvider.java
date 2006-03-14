@@ -57,12 +57,28 @@ abstract public class AbstractFontProvider implements FontProvider {
 	private final HashMap<String, Font> fontsByName = new HashMap<String, Font>();
 	/** Have the system fonts been loaded yet */
 	private boolean fontsLoaded = false;
-//	/** All system fonts */
-//	private static final String SYSTEM_FONTS[] = { "bhm.ttf", "bhmbd.ttf", "bhmbi.ttf", "bhmi.ttf", "luxisr.ttf", "roman.ttf", "times.ttf", "velehrad.ttf" };
     private final RenderContext context = new RenderContext();
 	/** The render cache */
 	private final RenderCache renderCache = new RenderCache(context);
+	
+	private final String name;
 
+	protected AbstractFontProvider(String name)
+	{
+		this.name = name;
+	}
+	
+
+	/**
+	 * Give the name of the font (used for setting the first provider to use
+	 * among all available ones) 
+	 */
+	final public String getName()
+	{
+		return name;
+	}
+
+	
 	/**
 	 * Does this provides provide the given font?
 	 * 

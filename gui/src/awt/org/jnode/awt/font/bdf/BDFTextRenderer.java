@@ -22,20 +22,19 @@
 package org.jnode.awt.font.bdf;
 
 import java.awt.Color;
-import java.awt.FontMetrics;
+import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 
 import org.jnode.awt.font.TextRenderer;
-import org.jnode.awt.font.renderer.RenderCache;
-import org.jnode.awt.font.spi.AbstractTextRenderer;
-import org.jnode.awt.font.spi.FontData;
 import org.jnode.driver.video.Surface;
 import org.jnode.font.bdf.BDFFontContainer;
 import org.jnode.font.bdf.BDFGlyph;
 import org.jnode.font.bdf.BDFMetrics;
 
 /**
+ * @author Stephane Meslin-Weber
  * @author Fabien DUMINY (fduminy@jnode.org)
  */
 public class BDFTextRenderer implements TextRenderer {
@@ -73,7 +72,8 @@ public class BDFTextRenderer implements TextRenderer {
 
         if ((bdfFont != null) && (charsCount > 0)) {
             int offset = 0;
-            char[] chars = str.toCharArray();
+            final char[] chars = str.toCharArray();
+            final int bdfFontDepth = bdfFont.getDepth();
 
             for(int i=0;i<charsCount;i++) {
                 int base = fm.getDescent();
@@ -82,27 +82,61 @@ public class BDFTextRenderer implements TextRenderer {
                     continue;
                 }
                 
-                int fHeight= glyph.getBbx().height;
-                int[] fData = glyph.getData();
-                int scan = fData.length/fHeight;
+                final int fHeight= glyph.getBbx().height;
+                final int glyphBbxY = glyph.getBbx().y;
+                final int bdfFontBbxHeight = bdfFont.getBoundingBox().height;
+                final int[] fData = glyph.getData();
+                final int scan = fData.length/fHeight;
+                final Point2D src = new Point2D.Double();
+                final Point2D dst = new Point2D.Double();
+                
+//                if(i == 0)
+//                {
+//                    System.out.println("BDF:x="+x+" y="+y+" fHeight="+fHeight+
+//                    		" fData.length="+fData.length+" scan="+scan+
+//                    		" bdfFontBbxHeight="+bdfFontBbxHeight+
+//                    		" glyphBbxY="+glyphBbxY+" base="+base);
+//                    Rectangle r = clip.getBounds();
+//                    System.out.println("bounds:x="+r.x+" y="+r.y+
+//                    			" width="+r.width+" height="+r.height);
+//                    src.setLocation(x, y);
+//                    tx.transform(src, dst);                    
+//                    System.out.println("newX="+dst.getX()+" newY="+dst.getY());
+//                    
+//                    double[] d = new double[9];
+//                    tx.getMatrix(d);
+//                    for(int j = 0 ; j  < d.length ; j++) System.out.print(d[j] + " ");
+//                    System.out.println();
+//                }
                 
                 for(int k=0;k<fHeight;k++) {
+                	final int offsetLine = k*scan;
                     for(int j=0;j<scan;j++) {
-                        int fPixel = fData[(k*scan)+j];
+                        int fPixel = fData[offsetLine+j];
                         if(fPixel!=0) {
                             int r = color.getRed(); //(color & 0x00FF0000) >> 16;
                             int g = color.getGreen(); //(color & 0x0000FF00) >> 8;
                             int b = color.getBlue(); //(color & 0x000000FF);
                             
-                            r = ((r * fPixel)>>bdfFont.getDepth()) & 0xFF;
-                            g = ((g * fPixel)>>bdfFont.getDepth()) & 0xFF;
-                            b = ((b * fPixel)>>bdfFont.getDepth()) & 0xFF;
+                            r = ((r * fPixel)>>bdfFontDepth) & 0xFF;
+                            g = ((g * fPixel)>>bdfFontDepth) & 0xFF;
+                            b = ((b * fPixel)>>bdfFontDepth) & 0xFF;
                             
                             fPixel = (((r << 16)+ (g << 8) +  b )| 0xFF000000);
     
                             int px = x+offset+j;
-                            int py = y+(bdfFont.getBoundingBox().height+base-fHeight)+k-glyph.getBbx().y; 
-                            surface.setRGBPixel(px, py, fPixel);
+                            //int py = y+(bdfFontBbxHeight+base-fHeight)+k-glyphBbxY;
+                            int py = y+(base-fHeight)+k-glyphBbxY;
+                            
+                            src.setLocation(px, py);
+                            tx.transform(src, dst);
+                            //if(clip.contains(dst))
+                            //{
+	                            px = (int) dst.getX();
+	                            py = (int) dst.getY();
+	                            	
+	                            surface.setRGBPixel(px, py, fPixel);
+                            //}
                         }
                     }
                 }

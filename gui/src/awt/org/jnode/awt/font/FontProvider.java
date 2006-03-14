@@ -27,9 +27,15 @@ import java.util.Set;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
+ * @author Fabien DUMINY (fduminy@jnode.org)
  */
 public interface FontProvider {
-
+	/**
+	 * Give the name of the font (used for setting the first provider to use
+	 * among all available ones) 
+	 */
+	public String getName();
+	
 	/**
 	 * Does this provides provide the given font?
 	 * @param font
