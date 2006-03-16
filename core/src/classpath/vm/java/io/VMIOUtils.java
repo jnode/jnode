@@ -21,6 +21,8 @@
  
 package java.io;
 
+import org.jnode.system.BootLog;
+
 /**
  * Helper class for connecting java.io to JNode.
  * 
@@ -51,6 +53,13 @@ public class VMIOUtils {
 	 */
     public static VMFileSystemAPI getAPI() 
 	throws IOException {
+    	if(api == null)
+    	{
+    		final String msg = "VMFileSystemAPI not yet initialized";
+    		BootLog.error(msg);
+    		throw new IOException(msg);
+    	}
+    	
 		return api;
 	}
 
