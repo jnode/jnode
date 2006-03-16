@@ -31,7 +31,9 @@ import org.jnode.driver.input.KeyboardAPI;
 import org.jnode.driver.input.KeyboardInterpreter;
 import org.jnode.driver.input.KeyboardInterpreterFactory;
 import org.jnode.shell.help.Argument;
+import org.jnode.shell.help.CountryArgument;
 import org.jnode.shell.help.Help;
+import org.jnode.shell.help.LanguageArgument;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.Syntax;
@@ -43,9 +45,9 @@ import org.jnode.shell.help.Syntax;
  */
 public class LoadkeysCommand {
 
-    static final Argument COUNTRY = new Argument("country", "country parameter");
+    static final Argument COUNTRY = new CountryArgument("country", "country parameter");
 
-    static final Argument LANGUAGE = new Argument("language", "language parameter");
+    static final Argument LANGUAGE = new LanguageArgument("language", "language parameter");
 
     static final Argument VARIANT = new Argument("variant", "variant parameter");
 
@@ -59,8 +61,8 @@ public class LoadkeysCommand {
             "loadkeys",
             new Syntax[] { 
             	new Syntax("Display the current keyboard layout"),
-            	new Syntax("change the current keyboard layout\n\tExample : loadkeys FR fr",
-                    PARAM_COUNTRY, PARAM_LANGUAGE, PARAM_VARIANT)
+            	new Syntax("change the current keyboard layout\n\tExample : loadkeys fr",
+                    PARAM_LANGUAGE, PARAM_COUNTRY, PARAM_VARIANT)
 				});
 
     public static void main(String[] args) throws Exception {
