@@ -78,6 +78,9 @@ public interface X86CompilerConstants extends X86Constants {
 	/** Magic value for L1a compiler */
 	public static final int L1A_COMPILER_MAGIC =  VmStackFrame.MAGIC_COMPILED  | 0x3c;
 
+    /** Magic value for L1b compiler */
+    public static final int L1B_COMPILER_MAGIC =  VmStackFrame.MAGIC_COMPILED  | 0x3d;
+
 	/** Magic value for l2 compiler */
 	public static final int L2_COMPILER_MAGIC = VmStackFrame.MAGIC_COMPILED | 0x8e;
 }

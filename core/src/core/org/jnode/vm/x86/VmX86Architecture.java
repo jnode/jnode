@@ -39,6 +39,7 @@ import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 import org.jnode.vm.x86.compiler.l1a.X86Level1ACompiler;
+import org.jnode.vm.x86.compiler.l1b.X86Level1BCompiler;
 import org.jnode.vm.x86.compiler.stub.X86StubCompiler;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
@@ -112,7 +113,11 @@ public abstract class VmX86Architecture extends VmArchitecture {
         super(referenceSize, new VmX86StackReader(referenceSize));
         this.compilers = new NativeCodeCompiler[2];
         this.compilers[0] = new X86StubCompiler();
-        this.compilers[1] = new X86Level1ACompiler();
+        if ("L1B".equals(compiler)) {
+            this.compilers[1] = new X86Level1BCompiler();            
+        } else {
+            this.compilers[1] = new X86Level1ACompiler();
+        }
         this.testCompilers = null;
     }
 
