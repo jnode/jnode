@@ -18,78 +18,92 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.util;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public final class Counter extends Statistic
-{
+public final class Counter extends Statistic implements Comparable<Counter> {
 
-  private final static String is = "=";
-  private int counter = 0;
+    private final static String is = "=";
 
-  public Counter(String name)
-  {
-    super(name, null);
-  }
+    private int counter = 0;
 
-  public Counter(String name, String description)
-  {
-    super(name, description);
-  }
+    public Counter(String name) {
+        this(name, null, 0);
+    }
 
-  /**
-   * Gets the counter of this statistic
-   *
-   * @return the counter
-   */
-  public int get()
-  {
-    return counter;
-  }
+    public Counter(String name, String description) {
+        this(name, description, 0);
+    }
+    
+    public Counter(String name, int value) {
+        this(name, null, value);
+    }
 
-  public Object getValue()
-  {
-    return new Integer(counter);
-  }
+    public Counter(String name, String description, int value) {
+        super(name, description);
+        this.counter = value;
+    }
+    
+    /**
+     * Gets the counter of this statistic
+     * 
+     * @return the counter
+     */
+    public int get() {
+        return counter;
+    }
 
-  /**
-   * Increment the counter of this statistic by 1.
-   */
-  public void inc()
-  {
-    counter++;
-  }
+    public Object getValue() {
+        return new Integer(counter);
+    }
 
-  /**
-   * Reset the counter to 0.
-   */
-  public void reset()
-  {
-    counter = 0;
-  }
+    /**
+     * Increment the counter of this statistic by 1.
+     */
+    public void inc() {
+        counter++;
+    }
 
-  /**
-   * Add <i>increment</i> to the counter of this statistic.
-   */
-  public void add(int increment) {
-      counter+=increment;
-  }
-      
-  /**
-   * Convert to a String representation
-   *
-   * @return String
-   * @see java.lang.Object#toString()
-   */
-  public String toString()
-  {
-    StringBuffer stringBuffer = new StringBuffer(getName());
-    stringBuffer.append(is);
-    stringBuffer.append(counter);
+    /**
+     * Reset the counter to 0.
+     */
+    public void reset() {
+        counter = 0;
+    }
 
-    return stringBuffer.toString();
-  }
+    /**
+     * Add <i>increment</i> to the counter of this statistic.
+     */
+    public void add(int increment) {
+        counter += increment;
+    }
+
+    /**
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
+    public int compareTo(Counter o) {
+        if (o.counter < this.counter) {
+            return 1;
+        } else if (o.counter > this.counter) {
+            return -1;
+        } 
+        return 0;
+    }
+
+    /**
+     * Convert to a String representation
+     * 
+     * @return String
+     * @see java.lang.Object#toString()
+     */
+    public String toString() {
+        StringBuffer stringBuffer = new StringBuffer(getName());
+        stringBuffer.append(is);
+        stringBuffer.append(counter);
+
+        return stringBuffer.toString();
+    }
 }
