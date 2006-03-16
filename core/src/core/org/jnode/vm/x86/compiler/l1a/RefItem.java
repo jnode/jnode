@@ -80,6 +80,16 @@ final class RefItem extends WordItem implements X86CompilerConstants {
 	    if (Vm.VerifyAssertions) Vm._assert(getKind() == Kind.CONSTANT, "kind == Kind.CONSTANT");
 		return value;
 	}
+    
+    /**
+     * Is the value of this item null.
+     * Item must have a CONSTANT kind.
+     * @return
+     */
+    boolean isNull() {
+        if (Vm.VerifyAssertions) Vm._assert(getKind() == Kind.CONSTANT, "kind == Kind.CONSTANT");
+        return (value == null);
+    }
 
 	/**
 	 * Load my constant to the given os.
