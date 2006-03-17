@@ -191,6 +191,10 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     /** My counters */
     private final CounterGroup counters = Vm.getVm().getCounterGroup(getClass().getName());
 
+    /** Do counting? */
+    private final boolean countBytecode = true;
+    private final boolean countConstOps = true;
+    
 	/**
 	 * Create a new instance
 	 * 
@@ -253,8 +257,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param index
 	 */
 	final void checkBounds(RefItem ref, IntItem index) { 
-	    counters.getCounter("checkbounds").inc();
-        final Label curInstrLabel = getCurInstrLabel();
+	    if (countBytecode) { counters.getCounter("checkbounds").inc(); }
+        
+	    final Label curInstrLabel = getCurInstrLabel();
 		final Label test = new Label(curInstrLabel + "$$cbtest");
 		final Label failed = new Label(curInstrLabel + "$$cbfailed");
 
@@ -763,8 +768,10 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		IntItem v2 = vstack.popInt();
 		IntItem v1 = vstack.popInt();
         
+		if (countConstOps) { counters.getCounter("ioperation").inc(); }
+		
         if (v2.isConstant() && v1.isConstant()) {
-            counters.getCounter("ioperation-const").inc();
+            if (countConstOps) { counters.getCounter("ioperation-const").inc(); }
             
             final int v;
             switch (operation) {
@@ -790,7 +797,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
             v2.release(eContext);
             vstack.push(ifac.createIConst(eContext, v));
         } else {           
-            counters.getCounter("ioperation-nonconst").inc();
+            
+        	if (countConstOps) { counters.getCounter("ioperation-nonconst").inc(); }
 
             if (prepareForOperation(v1, v2, commutative)) {
                 // Swap
@@ -1107,21 +1115,24 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_aaload()
 	 */
-	public final void visit_aaload() {
+	public final void visit_aaload() { 
+		if(countBytecode) { counters.getCounter("aaload").inc(); }
 		waload(JvmType.REFERENCE);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_aastore()
 	 */
-	public final void visit_aastore() {
+	public final void visit_aastore() { 
+		if(countBytecode) { counters.getCounter("aastore").inc(); }
 		wastore(JvmType.REFERENCE);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_aconst_null()
 	 */
-	public final void visit_aconst_null() {
+	public final void visit_aconst_null() { 
+		if(countBytecode) { counters.getCounter("aconst_null").inc(); }
 		vstack.push(ifac.createAConst(eContext, null));
 	}
 
@@ -1129,7 +1140,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param index
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_aload(int)
 	 */
-	public final void visit_aload(int index) {
+	public final void visit_aload(int index) { 
+		if(countBytecode) { counters.getCounter("aload").inc(); }
         wload(JvmType.REFERENCE, index, false);
 	}
 
@@ -1137,14 +1149,15 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
      * @see org.jnode.vm.compiler.CompilerBytecodeVisitor#visit_aloadStored(int)
      */
     public void visit_aloadStored(int index) {
+		if(countBytecode) { counters.getCounter("aloadStored").inc(); }
         wload(JvmType.REFERENCE, index, true);
     }
     /**
 	 * @param classRef
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_anewarray(org.jnode.vm.classmgr.VmConstClass)
 	 */
-	public final void visit_anewarray(VmConstClass classRef) {
-        counters.getCounter("anewarray").inc();
+	public final void visit_anewarray(VmConstClass classRef) { 
+		if(countBytecode) { counters.getCounter("anewarray").inc(); }
 
         // Push all, since we're going to call other methods
 		vstack.push(eContext);
@@ -1181,14 +1194,18 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_areturn()
 	 */
-	public final void visit_areturn() {
+	public final void visit_areturn() { 
+		if(countBytecode) { counters.getCounter("areturn").inc(); }
 		wreturn(JvmType.REFERENCE, true);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_arraylength()
 	 */
-	public final void visit_arraylength() {
+	public final void visit_arraylength() { 
+		
+		if(countBytecode) { counters.getCounter("arraylength").inc(); }
+		
 		final RefItem ref = vstack.popRef();
 		final IntItem result = (IntItem) L1AHelper.requestWordRegister(
 				eContext, JvmType.INT, false);
@@ -1212,14 +1229,17 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param index
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_astore(int)
 	 */
-	public final void visit_astore(int index) {
+	public final void visit_astore(int index) { 
+		if(countBytecode) { counters.getCounter("astore").inc(); }
 		wstore(JvmType.REFERENCE, index);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_athrow()
 	 */
-	public final void visit_athrow() {
+	public final void visit_athrow() { 
+		if(countBytecode) { counters.getCounter("athrow").inc(); }
+		
 		final RefItem ref = vstack.popRef();
 
 		// Exception must be in EAX
@@ -1238,28 +1258,32 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_baload()
 	 */
-	public final void visit_baload() {
+	public final void visit_baload() { 
+		if(countBytecode) { counters.getCounter("baload").inc(); }
 		waload(JvmType.BYTE);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_bastore()
 	 */
-	public final void visit_bastore() {
+	public final void visit_bastore() { 
+		if(countBytecode) { counters.getCounter("bastore").inc(); }
 		wastore(JvmType.BYTE);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_caload()
 	 */
-	public final void visit_caload() {
+	public final void visit_caload() { 
+		if(countBytecode) { counters.getCounter("caload").inc(); }
 		waload(JvmType.CHAR);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_castore()
 	 */
-	public final void visit_castore() {
+	public final void visit_castore() { 
+		if(countBytecode) { counters.getCounter("castore").inc(); }
 		wastore(JvmType.CHAR);
 	}
 
@@ -1267,7 +1291,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param classRef
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_checkcast(org.jnode.vm.classmgr.VmConstClass)
 	 */
-	public final void visit_checkcast(VmConstClass classRef) {
+	public final void visit_checkcast(VmConstClass classRef) { 
+		if(countBytecode) { counters.getCounter("checkcast").inc(); }
+		
 		// Resolve classRef
 		classRef.resolve(loader);
 		final VmType<?> resolvedType = classRef.getResolvedVmClass();
@@ -1370,56 +1396,64 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_d2f()
 	 */
-	public final void visit_d2f() {
+	public final void visit_d2f() { 
+		if(countBytecode) { counters.getCounter("d2f").inc(); }
 		fpCompiler.convert(JvmType.DOUBLE, JvmType.FLOAT);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_d2i()
 	 */
-	public final void visit_d2i() {
+	public final void visit_d2i() { 
+		if(countBytecode) { counters.getCounter("d2i").inc(); }
 		fpCompiler.convert(JvmType.DOUBLE, JvmType.INT);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_d2l()
 	 */
-	public final void visit_d2l() {
+	public final void visit_d2l() { 
+		if(countBytecode) { counters.getCounter("d2l").inc(); }
 		fpCompiler.convert(JvmType.DOUBLE, JvmType.LONG);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dadd()
 	 */
-	public final void visit_dadd() {
+	public final void visit_dadd() { 
+		if(countBytecode) { counters.getCounter("dadd").inc(); }
 		fpCompiler.add(JvmType.DOUBLE);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_daload()
 	 */
-	public final void visit_daload() {
+	public final void visit_daload() { 
+		if(countBytecode) { counters.getCounter("daload").inc(); }
 		fpCompiler.fpaload(JvmType.DOUBLE);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dastore()
 	 */
-	public final void visit_dastore() {
+	public final void visit_dastore() { 
+		if(countBytecode) { counters.getCounter("dastore").inc(); }
 		dwastore(JvmType.DOUBLE);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dcmpg()
 	 */
-	public final void visit_dcmpg() {
+	public final void visit_dcmpg() { 
+		if(countBytecode) { counters.getCounter("dcmpg").inc(); }
 		fpCompiler.compare(true, JvmType.DOUBLE, getCurInstrLabel());
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dcmpl()
 	 */
-	public final void visit_dcmpl() {
+	public final void visit_dcmpl() { 
+		if(countBytecode) { counters.getCounter("dcmpl").inc(); }
 		fpCompiler.compare(false, JvmType.DOUBLE, getCurInstrLabel());
 	}
 
@@ -1427,14 +1461,16 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param value
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dconst(double)
 	 */
-	public final void visit_dconst(double value) {
+	public final void visit_dconst(double value) { 
+		if(countBytecode) { counters.getCounter("dconst").inc(); }
 		vstack.push(ifac.createDConst(eContext, value));
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ddiv()
 	 */
-	public final void visit_ddiv() {
+	public final void visit_ddiv() { 
+		if(countBytecode) { counters.getCounter("ddiv").inc(); }
 		fpCompiler.div(JvmType.DOUBLE);
 	}
 
@@ -1442,7 +1478,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param index
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dload(int)
 	 */
-	public final void visit_dload(int index) {
+	public final void visit_dload(int index) { 
+		if(countBytecode) { counters.getCounter("dload").inc(); }
 		vstack.push(ifac.createLocal(JvmType.DOUBLE, stackFrame
 				.getWideEbpOffset(typeSizeInfo, index)));
 	}
@@ -1450,28 +1487,32 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dmul()
 	 */
-	public final void visit_dmul() {
+	public final void visit_dmul() { 
+		if(countBytecode) { counters.getCounter("dmul").inc(); }
 		fpCompiler.mul(JvmType.DOUBLE);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dneg()
 	 */
-	public final void visit_dneg() {
+	public final void visit_dneg() { 
+		if(countBytecode) { counters.getCounter("dneg").inc(); }
 		fpCompiler.neg(JvmType.DOUBLE);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_drem()
 	 */
-	public final void visit_drem() {
+	public final void visit_drem() { 
+		if(countBytecode) { counters.getCounter("drem").inc(); }
 		fpCompiler.rem(JvmType.DOUBLE);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dreturn()
 	 */
-	public final void visit_dreturn() {
+	public final void visit_dreturn() { 
+		if(countBytecode) { counters.getCounter("dreturn").inc(); }
 		dwreturn(JvmType.DOUBLE, true);
 	}
 
@@ -1479,21 +1520,24 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param index
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dstore(int)
 	 */
-	public final void visit_dstore(int index) {
+	public final void visit_dstore(int index) { 
+		if(countBytecode) { counters.getCounter("dstore").inc(); }
 		dwstore(JvmType.DOUBLE, index);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dsub()
 	 */
-	public final void visit_dsub() {
+	public final void visit_dsub() { 
+		if(countBytecode) { counters.getCounter("dsub").inc(); }
 		fpCompiler.sub(JvmType.DOUBLE);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dup()
 	 */
-	public final void visit_dup() {
+	public final void visit_dup() { 
+		if(countBytecode) { counters.getCounter("dup").inc(); }
 		final Item v1 = vstack.pop();
 		v1.loadIf(eContext, Item.Kind.STACK | Item.Kind.FPUSTACK);
 		vstack.push(v1);
@@ -1503,7 +1547,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dup_x1()
 	 */
-	public final void visit_dup_x1() {
+	public final void visit_dup_x1() { 
+		if(countBytecode) { counters.getCounter("dup_x1").inc(); }
 		final Item v1 = vstack.pop();
 		final Item v2 = vstack.pop();
 		v1.loadIf(eContext, Item.Kind.STACK | Item.Kind.FPUSTACK);
@@ -1516,7 +1561,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dup_x2()
 	 */
-	public final void visit_dup_x2() {
+	public final void visit_dup_x2() { 
+		if(countBytecode) { counters.getCounter("dup_x2").inc(); }
 		final Item v1 = vstack.pop();
 		final Item v2 = vstack.pop();
 		v1.loadIf(eContext, Item.Kind.STACK | Item.Kind.FPUSTACK);
@@ -1540,7 +1586,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dup2()
 	 */
-	public final void visit_dup2() {
+	public final void visit_dup2() { 
+		if(countBytecode) { counters.getCounter("dup2").inc(); }
 		final Item v1 = vstack.pop();
 		v1.loadIf(eContext, Item.Kind.STACK | Item.Kind.FPUSTACK);
 		if (v1.getCategory() == 1) {
@@ -1561,7 +1608,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dup2_x1()
 	 */
-	public final void visit_dup2_x1() {
+	public final void visit_dup2_x1() { 
+		if(countBytecode) { counters.getCounter("dup2_x1").inc(); }
 		final Item v1 = vstack.pop();
 		final Item v2 = vstack.pop();
 		v1.loadIf(eContext, Item.Kind.STACK | Item.Kind.FPUSTACK);
@@ -1585,7 +1633,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dup2_x2()
 	 */
-	public final void visit_dup2_x2() {
+	public final void visit_dup2_x2() { 
+		if(countBytecode) { counters.getCounter("dup2_x2").inc(); }
+		
 		// Push all on the stack, since this opcode is just too complicated
 		vstack.push(eContext);
 
@@ -1650,21 +1700,24 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_f2d()
 	 */
-	public final void visit_f2d() {
+	public final void visit_f2d() { 
+		if(countBytecode) { counters.getCounter("f2d").inc(); }
 		fpCompiler.convert(JvmType.FLOAT, JvmType.DOUBLE);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_f2i()
 	 */
-	public final void visit_f2i() {
+	public final void visit_f2i() { 
+		if(countBytecode) { counters.getCounter("f2i").inc(); }
 		fpCompiler.convert(JvmType.FLOAT, JvmType.INT);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_f2l()
 	 */
-	public final void visit_f2l() {
+	public final void visit_f2l() { 
+		if(countBytecode) { counters.getCounter("f2l").inc(); }
 		fpCompiler.convert(JvmType.FLOAT, JvmType.LONG);
 	}
 
@@ -1672,6 +1725,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fadd()
 	 */
 	public final void visit_fadd() {
+		if(countBytecode) { counters.getCounter("fadd").inc(); }
 		fpCompiler.add(JvmType.FLOAT);
 	}
 
@@ -1679,6 +1733,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_faload()
 	 */
 	public final void visit_faload() {
+		if(countBytecode) { counters.getCounter("faload").inc(); }
 		fpCompiler.fpaload(JvmType.FLOAT);
 	}
 
@@ -1686,6 +1741,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fastore()
 	 */
 	public final void visit_fastore() {
+		if(countBytecode) { counters.getCounter("fastore").inc(); }
 		wastore(JvmType.FLOAT);
 	}
 
@@ -1693,6 +1749,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fcmpg()
 	 */
 	public final void visit_fcmpg() {
+		if(countBytecode) { counters.getCounter("fcmpg").inc(); }
 		fpCompiler.compare(true, JvmType.FLOAT, getCurInstrLabel());
 	}
 
@@ -1700,6 +1757,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fcmpl()
 	 */
 	public final void visit_fcmpl() {
+		if(countBytecode) { counters.getCounter("fcmpl").inc(); }
 		fpCompiler.compare(false, JvmType.FLOAT, getCurInstrLabel());
 	}
 
@@ -1708,6 +1766,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fconst(float)
 	 */
 	public final void visit_fconst(float value) {
+		if(countBytecode) { counters.getCounter("fconst").inc(); }
 		vstack.push(ifac.createFConst(eContext, value));
 	}
 
@@ -1715,6 +1774,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fdiv()
 	 */
 	public final void visit_fdiv() {
+		if(countBytecode) { counters.getCounter("fdiv").inc(); }
 		fpCompiler.div(JvmType.FLOAT);
 	}
 
@@ -1723,6 +1783,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fload(int)
 	 */
 	public final void visit_fload(int index) {
+		if(countBytecode) { counters.getCounter("fload").inc(); }
         wload(JvmType.FLOAT, index, false);
 	}
 
@@ -1730,33 +1791,38 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
      * @see org.jnode.vm.compiler.CompilerBytecodeVisitor#visit_floadStored(int)
      */
     public void visit_floadStored(int index) {
+    	if(countBytecode) { counters.getCounter("floadStored").inc(); }
         wload(JvmType.FLOAT, index, true);
     }
     /**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fmul()
 	 */
-	public final void visit_fmul() {
+	public final void visit_fmul() { 
+		if(countBytecode) { counters.getCounter("fmul").inc(); }
 		fpCompiler.mul(JvmType.FLOAT);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fneg()
 	 */
-	public final void visit_fneg() {
+	public final void visit_fneg() { 
+		if(countBytecode) { counters.getCounter("fneg").inc(); }
 		fpCompiler.neg(JvmType.FLOAT);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_frem()
 	 */
-	public final void visit_frem() {
+	public final void visit_frem() { 
+		if(countBytecode) { counters.getCounter("frem").inc(); }
 		fpCompiler.rem(JvmType.FLOAT);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_freturn()
 	 */
-	public final void visit_freturn() {
+	public final void visit_freturn() { 
+		if(countBytecode) { counters.getCounter("freturn").inc(); }
 		wreturn(JvmType.FLOAT, true);
 	}
 
@@ -1764,14 +1830,16 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param index
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fstore(int)
 	 */
-	public final void visit_fstore(int index) {
+	public final void visit_fstore(int index) { 
+		if(countBytecode) { counters.getCounter("fstore").inc(); }
 		wstore(JvmType.FLOAT, index);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fsub()
 	 */
-	public final void visit_fsub() {
+	public final void visit_fsub() { 
+		if(countBytecode) { counters.getCounter("fsub").inc(); }
 		fpCompiler.sub(JvmType.FLOAT);
 	}
 
@@ -1779,7 +1847,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param fieldRef
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_getfield(org.jnode.vm.classmgr.VmConstFieldRef)
 	 */
-	public final void visit_getfield(VmConstFieldRef fieldRef) {
+	public final void visit_getfield(VmConstFieldRef fieldRef) { 
+		if(countBytecode) { counters.getCounter("getfield").inc(); }
+		
 		fieldRef.resolve(loader);
 		final VmField field = fieldRef.getResolvedVmField();
 		if (field.isStatic()) {
@@ -1863,8 +1933,10 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param fieldRef
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_getstatic(org.jnode.vm.classmgr.VmConstFieldRef)
 	 */
-	public final void visit_getstatic(VmConstFieldRef fieldRef) {
-        final Label curInstrLabel = getCurInstrLabel();
+	public final void visit_getstatic(VmConstFieldRef fieldRef) { 
+		if(countBytecode) { counters.getCounter("getstatic").inc(); }
+        
+		final Label curInstrLabel = getCurInstrLabel();
 		fieldRef.resolve(loader);
 		final int type = JvmType.SignatureToType(fieldRef.getSignature());
 		final VmStaticField sf = (VmStaticField) fieldRef.getResolvedVmField();
@@ -1938,7 +2010,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param address
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_goto(int)
 	 */
-	public final void visit_goto(int address) {
+	public final void visit_goto(int address) { 
+		if(countBytecode) { counters.getCounter("goto").inc(); }
 		vstack.push(eContext);
 		os.writeJMP(helper.getInstrLabel(address));
 	}
@@ -1946,7 +2019,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_i2b()
 	 */
-	public final void visit_i2b() {
+	public final void visit_i2b() { 
+		if(countBytecode) { counters.getCounter("i2b").inc(); }
+		
 		final IntItem v = vstack.popInt();
 		if (v.isConstant()) {
 			vstack.push(ifac.createIConst(eContext, (byte) v.getValue()));
@@ -1961,7 +2036,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_i2c()
 	 */
-	public final void visit_i2c() {
+	public final void visit_i2c() { 
+		if(countBytecode) { counters.getCounter("i2c").inc(); }
+		
 		final IntItem v = vstack.popInt();
 		if (v.isConstant()) {
 			vstack.push(ifac.createIConst(eContext, (char) v.getValue()));
@@ -1977,13 +2054,15 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_i2d()
 	 */
 	public final void visit_i2d() {
+		if(countBytecode) { counters.getCounter("i2d").inc(); }
 		fpCompiler.convert(JvmType.INT, JvmType.DOUBLE);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_i2f()
 	 */
-	public final void visit_i2f() {
+	public final void visit_i2f() { 
+		if(countBytecode) { counters.getCounter("i2f").inc(); }
 		fpCompiler.convert(JvmType.INT, JvmType.FLOAT);
 	}
 
@@ -1991,6 +2070,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_i2l()
 	 */
 	public final void visit_i2l() {
+		if(countBytecode) { counters.getCounter("i2l").inc(); }
+		
 		final IntItem v = vstack.popInt();
 		if (v.isConstant()) {
 			vstack.push(ifac.createLConst(eContext, v.getValue()));
@@ -2028,6 +2109,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_i2s()
 	 */
 	public final void visit_i2s() {
+		if(countBytecode) { counters.getCounter("i2s").inc(); }
 		final IntItem v = vstack.popInt();
 		if (v.isConstant()) {
 			vstack.push(ifac.createIConst(eContext, (short) v.getValue()));
@@ -2042,7 +2124,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iadd()
 	 */
-	public final void visit_iadd() {
+	public final void visit_iadd() { 
+		if(countBytecode) { counters.getCounter("iadd").inc(); }
 		ioperation(X86Operation.ADD, true);
 	}
 
@@ -2050,6 +2133,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iaload()
 	 */
 	public final void visit_iaload() {
+		if(countBytecode) { counters.getCounter("iaload").inc(); }
 		waload(JvmType.INT);
 	}
 
@@ -2057,6 +2141,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iand()
 	 */
 	public final void visit_iand() {
+		if(countBytecode) { counters.getCounter("iand").inc(); }
 		ioperation(X86Operation.AND, true);
 	}
 
@@ -2064,6 +2149,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iastore()
 	 */
 	public final void visit_iastore() {
+		if(countBytecode) { counters.getCounter("iastore").inc(); }
 		wastore(JvmType.INT);
 	}
 
@@ -2072,6 +2158,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iconst(int)
 	 */
 	public final void visit_iconst(int value) {
+		if(countBytecode) { counters.getCounter("iconst").inc(); }
 		vstack.push(ifac.createIConst(eContext, value));
 	}
 
@@ -2079,23 +2166,26 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_idiv()
 	 */
 	public final void visit_idiv() {
+		
 		final X86RegisterPool pool = eContext.getGPRPool();
 
 		// Pop the arguments of the vstack
 		final IntItem v2 = vstack.popInt();
 		final IntItem v1 = vstack.popInt();
 		
+		if(countBytecode) { counters.getCounter("idiv").inc(); }
+		
         final int shift;
 		if (v1.isConstant() && v2.isConstant()) {
-            // Update counter
-            counters.getCounter("idiv-const").inc();
+        
+			if(countConstOps) { counters.getCounter("idiv-const").inc(); }
             
 		    vstack.push(ifac.createIConst(eContext, v1.getValue() / v2.getValue()));
             v1.release(eContext);
             v2.release(eContext);
         } else if (v2.isConstant() && ((shift = getShiftForMultiplier(v2.getValue())) > 0)) {
-            // Update counter
-            counters.getCounter("idiv-const-shift").inc();
+            
+        	if(countConstOps) { counters.getCounter("idiv-const-shift").inc(); }
 
             // Load v1
             v1.load(eContext);
@@ -2109,8 +2199,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
             // And push the result on the vstack.
             vstack.push(v1);            
 		} else {		    
-            // Update counter
-            counters.getCounter("idiv-nonconst").inc();
+            
+			if(countConstOps) { counters.getCounter("idiv-nonconst").inc(); }
 
             // We need v1 in EAX, so if that is not the case,
 		    // spill those item using EAX
@@ -2146,7 +2236,10 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param address
 	 * @param jccOpcode
 	 */
-	private final void visit_if_acmp(int address, int jccOpcode) {
+	private final void visit_if_acmp(int address, int jccOpcode) { 
+		
+		if(countBytecode) { counters.getCounter("if_acmp").inc(); }
+		
 		RefItem v2 = vstack.popRef();
 		RefItem v1 = vstack.popRef();
 
@@ -2185,6 +2278,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_acmpeq(int)
 	 */
 	public final void visit_if_acmpeq(int address) {
+		if(countBytecode) { counters.getCounter("if_acmpeq").inc(); }
 		visit_if_acmp(address, X86Constants.JE); // JE
 	}
 
@@ -2193,6 +2287,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_acmpne(int)
 	 */
 	public final void visit_if_acmpne(int address) {
+		if(countBytecode) { counters.getCounter("if_acmpne").inc(); }
 		visit_if_acmp(address, X86Constants.JNE); // JNE
 	}
 
@@ -2203,6 +2298,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param jccOpcode
 	 */
 	private final void visit_if_icmp(int address, int jccOpcode) {
+		
+		if(countBytecode) { counters.getCounter("if_icmp").inc(); }
+		
 		IntItem v2 = vstack.popInt();
 		IntItem v1 = vstack.popInt();
 
@@ -2242,6 +2340,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmpeq(int)
 	 */
 	public final void visit_if_icmpeq(int address) {
+		if(countBytecode) { counters.getCounter("if_icmpeq").inc(); }
 		visit_if_icmp(address, X86Constants.JE); // JE
 	}
 
@@ -2250,6 +2349,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmpge(int)
 	 */
 	public final void visit_if_icmpge(int address) {
+		if(countBytecode) { counters.getCounter("if_icmpge").inc(); }
 		visit_if_icmp(address, X86Constants.JGE); // JGE
 	}
 
@@ -2258,6 +2358,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmpgt(int)
 	 */
 	public final void visit_if_icmpgt(int address) {
+		if(countBytecode) { counters.getCounter("if_icmpgt").inc(); }
 		visit_if_icmp(address, X86Constants.JG); // JG
 	}
 
@@ -2266,6 +2367,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmple(int)
 	 */
 	public final void visit_if_icmple(int address) {
+		if(countBytecode) { counters.getCounter("if_icmple").inc(); }
 		visit_if_icmp(address, X86Constants.JLE); // JLE
 	}
 
@@ -2274,6 +2376,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmplt(int)
 	 */
 	public final void visit_if_icmplt(int address) {
+		if(countBytecode) { counters.getCounter("if_icmplt").inc(); }
 		visit_if_icmp(address, X86Constants.JL); // JL
 	}
 
@@ -2282,6 +2385,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmpne(int)
 	 */
 	public final void visit_if_icmpne(int address) {
+		if(countBytecode) { counters.getCounter("if_icmpne").inc(); }
 		visit_if_icmp(address, X86Constants.JNE); // JNE
 	}
 
@@ -2290,6 +2394,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifeq(int)
 	 */
 	public final void visit_ifeq(int address) {
+		if(countBytecode) { counters.getCounter("ifeq").inc(); }
 		visit_ifxx(JvmType.INT, address, X86Constants.JE); // JE
 	}
 
@@ -2298,6 +2403,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifge(int)
 	 */
 	public final void visit_ifge(int address) {
+		if(countBytecode) { counters.getCounter("ifge").inc(); }
 		visit_ifxx(JvmType.INT, address, X86Constants.JGE); // JGE
 	}
 
@@ -2306,6 +2412,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifgt(int)
 	 */
 	public final void visit_ifgt(int address) {
+		if(countBytecode) { counters.getCounter("ifgt").inc(); }
 		visit_ifxx(JvmType.INT, address, X86Constants.JG); // JG
 	}
 
@@ -2314,6 +2421,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifle(int)
 	 */
 	public final void visit_ifle(int address) {
+		if(countBytecode) { counters.getCounter("ifle").inc(); }
 		visit_ifxx(JvmType.INT, address, X86Constants.JLE); // JLE
 	}
 
@@ -2322,6 +2430,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iflt(int)
 	 */
 	public final void visit_iflt(int address) {
+		if(countBytecode) { counters.getCounter("iflt").inc(); }
 		visit_ifxx(JvmType.INT, address, X86Constants.JL); // JL
 	}
 
@@ -2330,6 +2439,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifne(int)
 	 */
 	public final void visit_ifne(int address) {
+		if(countBytecode) { counters.getCounter("ifne").inc(); }
 		visit_ifxx(JvmType.INT, address, X86Constants.JNE); // JNE
 	}
 
@@ -2338,6 +2448,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifnonnull(int)
 	 */
 	public final void visit_ifnonnull(int address) {
+		if(countBytecode) { counters.getCounter("ifnonnull").inc(); }
 		visit_ifxx(JvmType.REFERENCE, address, X86Constants.JNE);
 	}
 
@@ -2346,6 +2457,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifnull(int)
 	 */
 	public final void visit_ifnull(int address) {
+		if(countBytecode) { counters.getCounter("ifnull").inc(); }
 		visit_ifxx(JvmType.REFERENCE, address, X86Constants.JE);
 	}
 
@@ -2403,7 +2515,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param incValue
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iinc(int, int)
 	 */
-	public final void visit_iinc(int index, int incValue) {
+	public final void visit_iinc(int index, int incValue) { 
+		if(countBytecode) { counters.getCounter("iinc").inc(); }
+		
 		final int ebpOfs = stackFrame.getEbpOffset(typeSizeInfo, index);
 
 		// pin down other references to this local
@@ -2424,6 +2538,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iload(int)
 	 */
 	public final void visit_iload(int index) {
+		if(countBytecode) { counters.getCounter("iload").inc(); }
         wload(JvmType.INT, index, false);
 	}
 
@@ -2431,7 +2546,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
      * @see org.jnode.vm.compiler.CompilerBytecodeVisitor#visit_iloadStored(int)
      */
     public void visit_iloadStored(int index) {
-        wload(JvmType.INT, index, true);
+		if(countBytecode) { counters.getCounter("iloadStored").inc(); }
+		wload(JvmType.INT, index, true);
     }
     /**
 	 * Convert the given multiplier to a shift number.
@@ -2453,15 +2569,20 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_imul()
 	 */
-	public final void visit_imul() {
+	public final void visit_imul() { 
+		
 		IntItem v2 = vstack.popInt();
 		IntItem v1 = vstack.popInt();
 
+		if(countBytecode) { counters.getCounter("imul").inc(); }
+		
         if (v2.isConstant() && v1.isConstant()) {
-            vstack.push(ifac.createIConst(eContext, v1.getValue() * v2.getValue()));
+    		if(countConstOps) { counters.getCounter("imul-const").inc(); }
+        	vstack.push(ifac.createIConst(eContext, v1.getValue() * v2.getValue()));
             v1.release(eContext);
             v2.release(eContext);
         } else {
+    		if(countConstOps) { counters.getCounter("imul-nonconst").inc(); }
             if (prepareForOperation(v1, v2, true)) {
                 // Swap
                 final IntItem tmp = v2;
@@ -2509,7 +2630,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ineg()
 	 */
-	public final void visit_ineg() {
+	public final void visit_ineg() { 
+		if(countBytecode) { counters.getCounter("ineg").inc(); }
 		final IntItem val = vstack.popInt();
 		val.loadIf(eContext, ~Item.Kind.CONSTANT);
 		if (val.isConstant()) {
@@ -2557,7 +2679,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_instanceof(org.jnode.vm.classmgr.VmConstClass)
 	 */
 	public final void visit_instanceof(VmConstClass classRef) {
-        // Resolve the classRef
+		if(countBytecode) { counters.getCounter("instanceof").inc(); }
+        
+		// Resolve the classRef
 		classRef.resolve(loader);
 
 		// Prepare
@@ -2648,6 +2772,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 */
 	public final void visit_invokeinterface(VmConstIMethodRef methodRef,
 			int count) {
+		
+		if(countBytecode) { counters.getCounter("invokeinterface").inc(); }
+		
 		vstack.push(eContext);
 
 		// Resolve the method
@@ -2677,6 +2804,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_invokespecial(org.jnode.vm.classmgr.VmConstMethodRef)
 	 */
 	public final void visit_invokespecial(VmConstMethodRef methodRef) {
+		
+		if(countBytecode) { counters.getCounter("invokespecial").inc(); }
+		
 		// Flush the stack before an invoke
 		vstack.push(eContext);
 
@@ -2700,7 +2830,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param methodRef
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_invokestatic(org.jnode.vm.classmgr.VmConstMethodRef)
 	 */
-	public final void visit_invokestatic(VmConstMethodRef methodRef) {
+	public final void visit_invokestatic(VmConstMethodRef methodRef) { 
+		if(countBytecode) { counters.getCounter("invokestatic").inc(); }
+		
 		methodRef.resolve(loader);
 		final VmStaticMethod method = (VmStaticMethod) methodRef
 				.getResolvedVmMethod();
@@ -2723,7 +2855,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param methodRef
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_invokevirtual(org.jnode.vm.classmgr.VmConstMethodRef)
 	 */
-	public final void visit_invokevirtual(VmConstMethodRef methodRef) {
+	public final void visit_invokevirtual(VmConstMethodRef methodRef) { 
+		if(countBytecode) { counters.getCounter("invokevirtual").inc(); }
+		
 		methodRef.resolve(loader);
 		final VmMethod mts = methodRef.getResolvedVmMethod();
 
@@ -2744,14 +2878,14 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
             
             if (method.isFinal() || method.isPrivate() || declClass.isFinal()) {
                 // Do a fast invocation
-                counters.getCounter("virtual-final").inc();
+                if (countBytecode) { counters.getCounter("invokevirtual-final").inc(); }
                 
                 // Call the methods native code from the statics table
                 helper.invokeJavaMethod(method);
                 // Result is already on the stack.
             } else {
                 // Do a virtual method table invocation
-                counters.getCounter("virtual-vmt").inc();
+            	if (countBytecode) { counters.getCounter("invokevirtual-vmt").inc(); }
 
                 final int tibIndex = method.getTibOffset();
                 final int argSlotCount = Signature.getArgSlotCount(typeSizeInfo, methodRef
@@ -2780,14 +2914,17 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ior()
 	 */
-	public final void visit_ior() {
+	public final void visit_ior() { 
+		if(countBytecode) { counters.getCounter("ior").inc(); }
 		ioperation(X86Operation.OR, true);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_irem()
 	 */
-	public final void visit_irem() {
+	public final void visit_irem() { 
+		if(countBytecode) { counters.getCounter("irem").inc(); }
+		
 		// Pre-claim result in EDX
 		L1AHelper.requestRegister(eContext, X86Register.EDX);
 		final IntItem result = (IntItem) ifac.createReg(eContext, JvmType.INT,
@@ -2823,21 +2960,24 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ireturn()
 	 */
-	public final void visit_ireturn() {
+	public final void visit_ireturn() { 
+		if(countBytecode) { counters.getCounter("ireturn").inc(); }
 		wreturn(JvmType.INT, true);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ishl()
 	 */
-	public final void visit_ishl() {
+	public final void visit_ishl() { 
+		if(countBytecode) { counters.getCounter("ishl").inc(); }
 		ishift(X86Operation.SAL);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ishr()
 	 */
-	public final void visit_ishr() {
+	public final void visit_ishr() { 
+		if(countBytecode) { counters.getCounter("ishr").inc(); }
 		ishift(X86Operation.SAR);
 	}
 
@@ -2845,28 +2985,32 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param index
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_istore(int)
 	 */
-	public final void visit_istore(int index) {
+	public final void visit_istore(int index) { 
+		if(countBytecode) { counters.getCounter("istore").inc(); }
 		wstore(JvmType.INT, index);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_isub()
 	 */
-	public final void visit_isub() {
+	public final void visit_isub() { 
+		if(countBytecode) { counters.getCounter("isub").inc(); }
 		ioperation(X86Operation.SUB, false);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iushr()
 	 */
-	public final void visit_iushr() {
+	public final void visit_iushr() { 
+		if(countBytecode) { counters.getCounter("iushr").inc(); }
 		ishift(X86Operation.SHR);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ixor()
 	 */
-	public final void visit_ixor() {
+	public final void visit_ixor() { 
+		if(countBytecode) { counters.getCounter("ixor").inc(); }
 		ioperation(X86Operation.XOR, true);
 	}
 
@@ -2874,28 +3018,33 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param address
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_jsr(int)
 	 */
-	public final void visit_jsr(int address) {
+	public final void visit_jsr(int address) { 
+		if(countBytecode) { counters.getCounter("jsr").inc(); }
 		os.writeCALL(helper.getInstrLabel(address));
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_l2d()
 	 */
-	public final void visit_l2d() {
+	public final void visit_l2d() { 
+		if(countBytecode) { counters.getCounter("l2d").inc(); }
 		fpCompiler.convert(JvmType.LONG, JvmType.DOUBLE);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_l2f()
 	 */
-	public final void visit_l2f() {
+	public final void visit_l2f() { 
+		if(countBytecode) { counters.getCounter("l2f").inc(); }
 		fpCompiler.convert(JvmType.LONG, JvmType.FLOAT);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_l2i()
 	 */
-	public final void visit_l2i() {
+	public final void visit_l2i() { 
+		if(countBytecode) { counters.getCounter("l2i").inc(); }
+		
 		final LongItem v = vstack.popLong();
 		if (v.isConstant()) {
 			vstack.push(ifac.createIConst(eContext, (int) v.getValue()));
@@ -2926,13 +3075,16 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ladd()
 	 */
 	public final void visit_ladd() {
+		if(countBytecode) { counters.getCounter("ladd").inc(); }
 		loperation(X86Operation.ADD, X86Operation.ADC, true);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_laload()
 	 */
-	public final void visit_laload() {
+	public final void visit_laload() { 
+		if(countBytecode) { counters.getCounter("laload").inc(); }
+		
 		final IntItem idx = vstack.popInt();
 		final RefItem ref = vstack.popRef();
 
@@ -2972,14 +3124,16 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_land()
 	 */
-	public final void visit_land() {
+	public final void visit_land() { 
+		if(countBytecode) { counters.getCounter("land").inc(); }
 		loperation(X86Operation.AND, X86Operation.AND, true);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lastore()
 	 */
-	public final void visit_lastore() {
+	public final void visit_lastore() { 
+		if(countBytecode) { counters.getCounter("lastore").inc(); }
 		dwastore(JvmType.LONG);
 	}
 
@@ -2987,6 +3141,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lcmp()
 	 */
 	public final void visit_lcmp() {
+		
+		if(countBytecode) { counters.getCounter("lcmp").inc(); }
+		
 		final LongItem v2 = vstack.popLong();
 		final LongItem v1 = vstack.popLong();
 
@@ -3041,7 +3198,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param v
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lconst(long)
 	 */
-	public final void visit_lconst(long v) {
+	public final void visit_lconst(long v) { 
+		if(countBytecode) { counters.getCounter("lconst").inc(); }
 		vstack.push(ifac.createLConst(eContext, v));
 	}
 
@@ -3049,9 +3207,11 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param value
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ldc(VmConstClass)
 	 */
-	public final void visit_ldc(VmConstClass classRef) {
-        counters.getCounter("ldc-class").inc();
-        // Push all, since we're going to call other methods
+	public final void visit_ldc(VmConstClass classRef) { 
+		
+		if(countBytecode) { counters.getCounter("ldc-class").inc(); }
+
+		// Push all, since we're going to call other methods
         vstack.push(eContext);
 
         L1AHelper.requestRegister(eContext, helper.AAX);
@@ -3076,8 +3236,11 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
     /**
      * Push the given VmType on the stack.
      */
-    public final void visit_ldc(VmType<?> value) {
-        final WordItem item = L1AHelper.requestWordRegister(eContext, JvmType.REFERENCE, false);
+    public final void visit_ldc(VmType<?> value) { 
+    	
+    	if(countBytecode) { counters.getCounter("ldc-vmtype").inc(); }
+        
+    	final WordItem item = L1AHelper.requestWordRegister(eContext, JvmType.REFERENCE, false);
         final Label curInstrLabel = getCurInstrLabel();
         final GPR reg = item.getRegister();
 
@@ -3094,17 +3257,17 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param value
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ldc(VmConstString)
 	 */
-	public final void visit_ldc(VmConstString value) {
+	public final void visit_ldc(VmConstString value) { 
+		if(countBytecode) { counters.getCounter("ldc-conststring").inc(); }
 		vstack.push(ifac.createAConst(eContext, value));
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ldiv()
 	 */
-	public final void visit_ldiv() {
-        // Maintain counter
-        counters.getCounter("ldiv").inc();
-        
+	public final void visit_ldiv() { 
+		if(countBytecode) { counters.getCounter("ldiv").inc(); }
+                
 		if (os.isCode32()) {
 			// TODO: port to orp-style
 			vstack.push(eContext);
@@ -3150,7 +3313,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param index
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lload(int)
 	 */
-	public final void visit_lload(int index) {
+	public final void visit_lload(int index) { 
+		if(countBytecode) { counters.getCounter("lload").inc(); }
 		vstack.push(ifac.createLocal(JvmType.LONG, stackFrame
 				.getWideEbpOffset(typeSizeInfo, index)));
 	}
@@ -3158,9 +3322,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lmul()
 	 */
-	public final void visit_lmul() {
-        // Maintain counter
-        counters.getCounter("lmul").inc();
+	public final void visit_lmul() { 
+		if(countBytecode) { counters.getCounter("lmul").inc(); }
 
         if (os.isCode32()) {
             final Label curInstrLabel = getCurInstrLabel();
@@ -3230,7 +3393,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lneg()
 	 */
-	public final void visit_lneg() {
+	public final void visit_lneg() { 
+		if(countBytecode) { counters.getCounter("lneg").inc(); }
+		
 		final LongItem v = vstack.popLong();
 
 		if (v.isConstant()) {
@@ -3266,6 +3431,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 */
 	public final void visit_lookupswitch(int defAddress, int[] matchValues,
 			int[] addresses) {
+		
+		if(countBytecode) { counters.getCounter("lookupswitch").inc(); }
+		
 		final int n = matchValues.length;
 		// BootLog.debug("lookupswitch length=" + n);
 
@@ -3287,14 +3455,18 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lor()
 	 */
-	public final void visit_lor() {
+	public final void visit_lor() { 
+		if(countBytecode) { counters.getCounter("lor").inc(); }
 		loperation(X86Operation.OR, X86Operation.OR, true);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lrem()
 	 */
-	public final void visit_lrem() {
+	public final void visit_lrem() { 
+
+		if(countBytecode) { counters.getCounter("lrem").inc(); }
+		
 		if (os.isCode32()) {
 			// TODO: port to orp-style
 			vstack.push(eContext);
@@ -3341,15 +3513,18 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lreturn()
 	 */
-	public final void visit_lreturn() {
+	public final void visit_lreturn() { 
+		if(countBytecode) { counters.getCounter("lreturn").inc(); }
 		dwreturn(JvmType.LONG, true);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lshl()
 	 */
-	public final void visit_lshl() {
-        final GPR ECX = X86Register.ECX;
+	public final void visit_lshl() { 
+		if(countBytecode) { counters.getCounter("lshl").inc(); }
+        
+		final GPR ECX = X86Register.ECX;
         
 		final IntItem cnt = vstack.popInt();
 		final LongItem val = vstack.popLong();
@@ -3394,8 +3569,10 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lshr()
 	 */
-	public final void visit_lshr() {
-        final GPR ECX = X86Register.ECX;
+	public final void visit_lshr() { 
+		if(countBytecode) { counters.getCounter("lshr").inc(); }
+        
+		final GPR ECX = X86Register.ECX;
         
 		final IntItem cnt = vstack.popInt();
 		final LongItem val = vstack.popLong();
@@ -3447,20 +3624,23 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lstore(int)
 	 */
 	public final void visit_lstore(int index) {
+		if(countBytecode) { counters.getCounter("lstore").inc(); }
 		dwstore(JvmType.LONG, index);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lsub()
 	 */
-	public final void visit_lsub() {
+	public final void visit_lsub() { 
+		if(countBytecode) { counters.getCounter("lsub").inc(); }
 		loperation(X86Operation.SUB, X86Operation.SBB, false);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lushr()
 	 */
-	public final void visit_lushr() {
+	public final void visit_lushr() { 
+		if(countBytecode) { counters.getCounter("lushr").inc(); }
         final GPR ECX = X86Register.ECX;
         
 		final IntItem cnt = vstack.popInt();
@@ -3513,6 +3693,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lxor()
 	 */
 	public final void visit_lxor() {
+		if(countBytecode) { counters.getCounter("lxor").inc(); }
 		loperation(X86Operation.XOR, X86Operation.XOR, true);
 	}
 
@@ -3520,7 +3701,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_monitorenter()
 	 */
 	public final void visit_monitorenter() {
-        counters.getCounter("monitor-enter").inc();
+		if(countBytecode) { counters.getCounter("monitorenter").inc(); }
         
 		vstack.push(eContext);
 		final RefItem v = vstack.popRef();
@@ -3534,7 +3715,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_monitorexit()
 	 */
 	public final void visit_monitorexit() {
-        counters.getCounter("monitor-exit").inc();
+
+		if(countBytecode) { counters.getCounter("monitorexit").inc(); }
 
         vstack.push(eContext);
 		final RefItem v = vstack.popRef();
@@ -3550,10 +3732,11 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_multianewarray(VmConstClass,
 	 *      int)
 	 */
-	public final void visit_multianewarray(VmConstClass clazz, int dimensions) {
-        counters.getCounter("multianewarray").inc();
+	public final void visit_multianewarray(VmConstClass clazz, int dimensions) { 
+		
+		if(countBytecode) { counters.getCounter("multianewarray").inc(); }
 
-        // flush all vstack items to the stack
+		// flush all vstack items to the stack
 		// all registers are freed
 		vstack.push(eContext);
 
@@ -3600,7 +3783,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_new(org.jnode.vm.classmgr.VmConstClass)
 	 */
 	public final void visit_new(VmConstClass classRef) {
-        counters.getCounter("new").inc();
+
+		if(countBytecode) { counters.getCounter("new").inc(); }
 
         // Push all
 		vstack.push(eContext);
@@ -3624,8 +3808,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param type
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_newarray(int)
 	 */
-	public final void visit_newarray(int type) {
-        counters.getCounter("newarray").inc();
+	public final void visit_newarray(int type) { 
+		
+		if(countBytecode) { counters.getCounter("newarray").inc(); }
         
 		// Load count
 		final IntItem count = vstack.popInt();
@@ -3648,6 +3833,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_nop()
 	 */
 	public final void visit_nop() {
+		if(countBytecode) { counters.getCounter("nop").inc(); }
 		// Nothing
 		os.writeNOP();
 	}
@@ -3655,14 +3841,16 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_pop()
 	 */
-	public final void visit_pop() {
+	public final void visit_pop() { 
+		if(countBytecode) { counters.getCounter("pop").inc(); }
 		generic_pop(helper.SLOTSIZE);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_pop2()
 	 */
-	public final void visit_pop2() {
+	public final void visit_pop2() { 
+		if(countBytecode) { counters.getCounter("pop2").inc(); }
 		generic_pop(helper.SLOTSIZE * 2);
 	}
 
@@ -3670,7 +3858,10 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param fieldRef
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_putfield(org.jnode.vm.classmgr.VmConstFieldRef)
 	 */
-	public final void visit_putfield(VmConstFieldRef fieldRef) {
+	public final void visit_putfield(VmConstFieldRef fieldRef) { 
+		
+		if(countBytecode) { counters.getCounter("putfield").inc(); }
+		
 		fieldRef.resolve(loader);
 		final VmField field = fieldRef.getResolvedVmField();
 		if (field.isStatic()) {
@@ -3745,8 +3936,11 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param fieldRef
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_putstatic(org.jnode.vm.classmgr.VmConstFieldRef)
 	 */
-	public final void visit_putstatic(VmConstFieldRef fieldRef) {
-        final Label curInstrLabel = getCurInstrLabel();
+	public final void visit_putstatic(VmConstFieldRef fieldRef) { 
+		
+		if(countBytecode) { counters.getCounter("putstatic").inc(); }
+        
+		final Label curInstrLabel = getCurInstrLabel();
 		fieldRef.resolve(loader);
 		final VmStaticField sf = (VmStaticField) fieldRef.getResolvedVmField();
 
@@ -3833,7 +4027,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param index
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ret(int)
 	 */
-	public final void visit_ret(int index) {
+	public final void visit_ret(int index) { 
+		if(countBytecode) { counters.getCounter("ret").inc(); }
+		
 		// Calc EBP offset
 		final int ebpOfs = stackFrame.getEbpOffset(typeSizeInfo, index);
 
@@ -3844,7 +4040,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_return()
 	 */
-	public final void visit_return() {
+	public final void visit_return() { 
+		if(countBytecode) { counters.getCounter("return").inc(); }
+		
 		stackFrame.emitReturn();
 		assertCondition(vstack.isEmpty(), "vstack should be empty; it is ",
 				vstack);
@@ -3853,21 +4051,26 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_saload()
 	 */
-	public final void visit_saload() {
+	public final void visit_saload() { 
+		if(countBytecode) { counters.getCounter("saload").inc(); }
 		waload(JvmType.SHORT);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_sastore()
 	 */
-	public final void visit_sastore() {
+	public final void visit_sastore() { 
+		if(countBytecode) { counters.getCounter("sastore").inc(); }
 		wastore(JvmType.SHORT);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_swap()
 	 */
-	public final void visit_swap() {
+	public final void visit_swap() { 
+		
+		if(countBytecode) { counters.getCounter("swap").inc(); }
+		
 		final Item v1 = vstack.pop();
 		final Item v2 = vstack.pop();
 		assertCondition((v1.getCategory() == 1) && (v2.getCategory() == 1),
@@ -3895,6 +4098,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 */
 	public final void visit_tableswitch(int defAddress, int lowValue,
 			int highValue, int[] addresses) {
+		
+		if(countBytecode) { counters.getCounter("tableswitch").inc(); }
+		
 		// IMPROVE: check Jaos implementation
 		final IntItem val = vstack.popInt();
 		val.load(eContext);
@@ -3905,7 +4111,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
         if ((n > 4) && os.isCode32()) {
             // Optimized version.  Needs some overhead, so only useful for
             // larger tables.
-            counters.getCounter("tableswitch-opt").inc();
+        	if (countBytecode) { counters.getCounter("tableswitch-opt").inc(); }
             
             final GPR tmp = (GPR)L1AHelper.requestRegister(eContext, JvmType.REFERENCE, false);
             if (os.isCode64()) {
@@ -3969,7 +4175,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
         } else {
             // Space wasting, but simple implementation
 
-            counters.getCounter("tableswitch-nonopt").inc();
+        	if (countBytecode) { counters.getCounter("tableswitch-nonopt").inc(); }
             for (int i = 0; i < n; i++) {
                 os.writeCMP_Const(valr, lowValue + i);
                 os.writeJCC(helper.getInstrLabel(addresses[i]), X86Constants.JE); // JE
@@ -4284,7 +4490,6 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
     private final void wload(int jvmType, int index, boolean useStored) {
         Item constValue = constLocals.get(index);
         if (constValue != null) {
-            counters.getCounter("const-local").inc();            
             vstack.push(constValue.clone(eContext));
         } else if (false && useStored && (wstoreReg != null)) {
             vstack.push(L1AHelper.requestWordRegister(eContext, jvmType, wstoreReg));
