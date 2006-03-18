@@ -1416,7 +1416,7 @@ public class JTable
   protected boolean rowSelectionAllowed;
 
   /**
-   * @deprecated Use {@link #rowSelectionAllowed}, {@link 
+   * Obsolete. Use {@link #rowSelectionAllowed}, {@link 
    * #getColumnSelectionAllowed}, or the combined methods {@link
    * #getCellSelectionEnabled} and {@link #setCellSelectionEnabled(boolean)}.
    */
@@ -3092,7 +3092,9 @@ public class JTable
   private void distributeSpillResizing(TableColumn[] cols, int spill,
                                        TableColumn resizeIt)
   {
-    int average = spill / (cols.length-1);
+    int average = 0;
+    if (cols.length != 1)
+      average = spill / (cols.length-1);
     for (int i = 0; i < cols.length; i++)
       {
         if (cols[i] != null && !cols[i].equals(resizeIt))

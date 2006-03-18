@@ -634,6 +634,7 @@ public class MediaTracker implements java.io.Serializable
 	    else
 	      prev.next = e.next;
 	  }
+            else
 	prev = e;
 	e = e.next;
       }

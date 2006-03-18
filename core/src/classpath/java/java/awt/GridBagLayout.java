@@ -349,23 +349,38 @@ public class GridBagLayout
       // be invalidated, clearing the layout information cache,
       // layoutInfo.  So we wait until after this for loop to set
       // layoutInfo.
-      for(int i = 0; i < components.length; i++)
+      Component lastComp = null;
+      int cellx = 0;
+      int celly = 0;
+      int cellw = 0;
+      int cellh = 0;
+      for (int i = 0; i < components.length; i++)
 	{
-          Component component = components [i];
+        Component component = components[i];
 		
           // If component is not visible we dont have to care about it.
-          if (!component.isVisible())
+        if (! component.isVisible())
             continue;
 		
-          GridBagConstraints constraints =
-              lookupInternalConstraints(component);
+        Dimension dim = component.getPreferredSize();
+        GridBagConstraints constraints = lookupInternalConstraints(component);
+        
+        if (lastComp != null
+            && constraints.gridheight == GridBagConstraints.REMAINDER)
+          celly += cellh;
+        else
+          celly = sumIntArray(info.rowHeights, constraints.gridy);
+        
+        if (lastComp != null
+            && constraints.gridwidth == GridBagConstraints.REMAINDER)
+          cellx += cellw;
+        else
+          cellx = sumIntArray(info.colWidths, constraints.gridx);
 
-          int cellx = sumIntArray(info.colWidths, constraints.gridx);
-          int celly = sumIntArray(info.rowHeights, constraints.gridy);
-          int cellw = sumIntArray(info.colWidths,
-                                  constraints.gridx + constraints.gridwidth) - cellx;
-          int cellh = sumIntArray(info.rowHeights,
-                                  constraints.gridy + constraints.gridheight) - celly;
+        cellw = sumIntArray(info.colWidths, constraints.gridx
+                                            + constraints.gridwidth) - cellx;
+        cellh = sumIntArray(info.rowHeights, constraints.gridy
+                                             + constraints.gridheight) - celly;
 
           Insets insets = constraints.insets;
           if (insets != null)
@@ -376,15 +391,13 @@ public class GridBagLayout
               cellh -= insets.top + insets.bottom;
 	    }
 
-          Dimension dim = component.getPreferredSize();
-
           // Note: Documentation says that padding is added on both sides, but
           // visual inspection shows that the Sun implementation only adds it
           // once, so we do the same.
           dim.width += constraints.ipadx;
           dim.height += constraints.ipady;
 
-          switch(constraints.fill)
+        switch (constraints.fill)
 	    {
             case GridBagConstraints.HORIZONTAL:
               dim.width = cellw;
@@ -398,10 +411,10 @@ public class GridBagLayout
               break;
 	    }
 
-          int x;
-          int y;
+        int x = 0;
+        int y = 0;
 
-          switch(constraints.anchor)
+        switch (constraints.anchor)
 	    {
             case GridBagConstraints.NORTH:
               x = cellx + (cellw - dim.width) / 2;
@@ -440,15 +453,16 @@ public class GridBagLayout
               y = celly + (cellh - dim.height) / 2;
               break;
 	    }
-
-          component.setBounds(info.pos_x + x, info.pos_y + y, dim.width, dim.height);
+        component.setBounds(info.pos_x + x, info.pos_y + y, dim.width,
+                            dim.height);
+        lastComp = component;
 	}
 
       // DEBUG
-      //dumpLayoutInfo (info);
+    //dumpLayoutInfo(info);
 
       // Cache layout information.
-      layoutInfo = getLayoutInfo (parent, PREFERREDSIZE);
+    layoutInfo = getLayoutInfo(parent, PREFERREDSIZE);
     }
 
     /**
@@ -485,7 +499,6 @@ public class GridBagLayout
       for (int i = 0; i < components.length; i++)
 	{
           Component component = components [i];
-		
           // If component is not visible we dont have to care about it.
           if (!component.isVisible())
             continue;
@@ -515,7 +528,6 @@ public class GridBagLayout
           // 4. neither gridx or gridy == RELATIVE
           //
           //       nothing to check; just add it
-
 
           // cases 1 and 2
           if(constraints.gridx == GridBagConstraints.RELATIVE)
@@ -560,7 +572,9 @@ public class GridBagLayout
               // this column. We want to add this component below it.
               // If this column is empty, add to the 0 position.
               if (!lastInCol.containsKey(new Integer(constraints.gridx))) 
-                y = 0;
+                {
+                  y = current_y;
+                }
               else
                 {
                   Component lastComponent = (Component)lastInCol.get(new Integer(constraints.gridx));
@@ -918,7 +932,7 @@ public class GridBagLayout
           sizes[start] = Math.max(sizes[start], size);
           weights[start] = Math.max(weights[start], weight);
         }
-      else if (span > 1)
+      else
         {
           int numOccupied = span;
           int lastOccupied = -1;
