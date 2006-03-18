@@ -282,16 +282,22 @@ public class Window extends Container implements Accessible
   {
     synchronized (getTreeLock())
     {
-    if (parent != null && !parent.isDisplayable())
+        if (parent != null && ! parent.isDisplayable())
       parent.addNotify();
     if (peer == null)
       addNotify();
 
+        validate();
+        if (visible)
+          toFront();
+        else
+          {
+            super.show();
     // Show visible owned windows.
 	Iterator e = ownedWindows.iterator();
-	while(e.hasNext())
+            while (e.hasNext())
 	  {
-	    Window w = (Window)(((Reference) e.next()).get());
+                Window w = (Window) (((Reference) e.next()).get());
 	    if (w != null)
 	      {
 		if (w.isVisible())
@@ -304,23 +310,20 @@ public class Window extends Container implements Accessible
 	      // synchronous access to ownedWindows there.
 	      e.remove();
 	  }
-    validate();
-    super.show();
-    toFront();
+          }
+        KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+        manager.setGlobalFocusedWindow(this);
 
-    KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager ();
-    manager.setGlobalFocusedWindow (this);
-
-    if (!shown)
+        if (! shown)
       {
-        FocusTraversalPolicy policy = getFocusTraversalPolicy ();
+            FocusTraversalPolicy policy = getFocusTraversalPolicy();
         Component initialFocusOwner = null;
 
         if (policy != null)
-          initialFocusOwner = policy.getInitialComponent (this);
+              initialFocusOwner = policy.getInitialComponent(this);
 
         if (initialFocusOwner != null)
-          initialFocusOwner.requestFocusInWindow ();
+              initialFocusOwner.requestFocusInWindow();
 
         shown = true;
       }
