@@ -482,7 +482,7 @@ public class BorderLayout implements LayoutManager2, java.io.Serializable
       Component my_south = south;
       Component my_west = west;
 
-        // FIXME: Note that we currently don't handle vertical layouts.
+        // Note that we currently don't handle vertical layouts.
         // Neither does JDK 1.3.
       if (firstLine != null)
 	my_north = firstLine;
