@@ -47,7 +47,7 @@ final class SwingMenuPeer extends SwingBaseMenuPeer<Menu, JMenu> implements Menu
     @SuppressWarnings("deprecation")
     public void addItem(MenuItem item) {
         item.addNotify();
-        jComponent.add(((SwingMenuItemPeer)item.getPeer()).jComponent);
+        jComponent.add(((SwingBaseMenuItemPeer)item.getPeer()).jComponent);
     }
 
     public void delItem(int index) {
