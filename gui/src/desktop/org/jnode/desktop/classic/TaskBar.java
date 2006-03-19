@@ -51,8 +51,6 @@ import java.util.GregorianCalendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import gnu.testlet.javax.swing.UIManager.setLookAndFeel;
-
 /**
  * @author Levente S\u00e1ntha
  */
