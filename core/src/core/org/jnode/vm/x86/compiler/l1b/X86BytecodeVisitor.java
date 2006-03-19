@@ -203,7 +203,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 	 * @param isBootstrap
 	 * @param context
 	 */
-public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
+    public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			boolean isBootstrap, EntryPoints context,
 			MagicHelper magicHelper, TypeSizeInfo typeSizeInfo) {
 		this.os = (X86Assembler) outputStream;
@@ -234,8 +234,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 				xmmPool, ifac, context);
 		vstack.initializeStackMgr(stackMgr, eContext);
 		// TODO check for SSE support and switch to SSE compiler if available
-		this.fpCompiler = new FPCompilerFPU(this, os, eContext, vstack,
-				arrayDataOffset);
+		//this.fpCompiler = new FPCompilerSSE(this, os, eContext, vstack, arrayDataOffset);
+		this.fpCompiler = new FPCompilerFPU(this, os, eContext, vstack,	arrayDataOffset);
 	}
 	private final void assertCondition(boolean cond, String message) {
 		if (!cond)
@@ -259,6 +259,13 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	final void checkBounds(RefItem ref, IntItem index) { 
 	    if (countBytecode) { counters.getCounter("checkbounds").inc(); }
         
+	    
+	    if (index.isConstant()) {
+	    	//System.err.println("Index constant = " + index.getValue() + ", ref.register = " + ref.getRegister());
+	    	// only one side has to be checked, > 0 can be checked at compile time
+	    	if (countConstOps) { counters.getCounter("TODOcheckbounds-indexIsConst").inc(); }
+	    }
+	    
 	    final Label curInstrLabel = getCurInstrLabel();
 		final Label test = new Label(curInstrLabel + "$$cbtest");
 		final Label failed = new Label(curInstrLabel + "$$cbfailed");
@@ -807,6 +814,124 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
                 v1 = tmp;
             }
             
+            if (v2.isConstant()) {
+
+            	if (countConstOps) {
+            		counters.getCounter("TODOioperation-SECONDconst").inc();
+            	}
+            	
+            	final int value = v2.getValue();
+            	
+            	switch(operation) {
+                case X86Operation.ADD: 
+                	if (value == 0) {
+                    	if (countConstOps) {
+                    		counters.getCounter("NEWioperation-SECONDconstADD0").inc();
+                    	}
+                		v2.release(eContext);
+                		vstack.push(v1);
+                		return;
+                	} else if (value == 1) {
+                    	if (countConstOps) {
+                    		counters.getCounter("NEWioperation-SECONDconstADD1").inc();
+                    	}
+                		v2.release(eContext);
+                		os.writeINC(v1.getRegister());
+                		vstack.push(v1);
+                		return;
+                	} else if (value == -1) {
+                    	if (countConstOps) {
+                    		counters.getCounter("NEWioperation-SECONDconstADD-1").inc();
+                    	}
+                    	v2.release(eContext);
+                    	os.writeDEC(v1.getRegister());
+                    	vstack.push(v1);
+                    	return;
+                	}
+                	break;
+                case X86Operation.AND:
+                	if (value == 0) {
+                    	if (countConstOps) {
+                    		counters.getCounter("NEWioperation-SECONDconstAND0").inc();
+                    	}
+                		v1.release(eContext);
+                		v2.release(eContext);
+                		vstack.push(ifac.createIConst(eContext, 0));
+                		return;
+                	} /* else if (value == 0xFF) {
+                	    // TODO DOES NOT WORK FOR SOME REASON :/
+                    	if (countConstOps) {
+                    		counters.getCounter("NEWioperation-SECONDconstAND0xFF").inc();
+                    	}
+                		v2.release(eContext)
+            			v1.loadToBITS8GPR(eContext);
+            			final GPR r = v1.getRegister();
+            			os.writeMOVSX(r, r, BYTESIZE);
+            			vstack.push(v1);
+            			return;
+                	}  else if (value == 0xFFFF) {
+                		if (countConstOps) {
+                    		counters.getCounter("NEWioperation-SECONDconstAND0xFFFF").inc();
+                    	}
+                		v2.release(eContext);
+                		final GPR r1 = v1.getRegister();
+                		os.writeMOVSX(r1, r1, WORDSIZE);
+                		vstack.push(v1);
+                		return;
+                	}*/
+                	break;
+                case X86Operation.OR:
+                	if (value == 0) {
+                    	if (countConstOps) {
+                    		counters.getCounter("NEWioperation-SECONDconstOR0").inc();
+                    	}                	
+                		v2.release(eContext);
+                		vstack.push(v1);
+                		return;
+                	}
+                    break;
+                case X86Operation.SUB: 
+                	if (value == 1) {
+                    	if (countConstOps) {
+                    		counters.getCounter("NEWioperation-SECONDconstSUB1").inc();
+                    	}
+                    	v2.release(eContext);
+                    	os.writeDEC(v1.getRegister());
+                    	vstack.push(v1);
+                    	return;
+                	} else if (value == -1) {
+                    	if (countConstOps) {
+                    		counters.getCounter("NEWioperation-SECONDconstSUB-1").inc();
+                    	}
+                    	v2.release(eContext);
+                    	os.writeINC(v1.getRegister());
+                    	vstack.push(v1);
+                    	return;
+                	}
+                	break;
+                case X86Operation.XOR:
+                	if (value == -1) {
+                		if (countConstOps) {
+                    		counters.getCounter("NEWioperation-SECONDconstXOR-1").inc();
+                    	}
+                		v2.release(eContext);
+                		os.writeNOT(v1.getRegister());
+                		vstack.push(v1);
+                		return;
+                	}
+                	break;
+                default:
+                    throw new RuntimeException("Invalid operation " + operation);
+            	}
+
+            	//System.err.println("Commutativ operation, second = " + v2.getValue() + ", operation = " + operation);
+            	
+            }
+            
+            //
+            // Normal processing of operation:
+            //
+            
             final X86Register.GPR r1 = (X86Register.GPR) v1.getRegister();
             switch (v2.getKind()) {
             case Item.Kind.GPR:
@@ -831,6 +956,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param operation
 	 */
 	private final void ishift(int operation) {
+
 		final IntItem shift = vstack.popInt();
 		final boolean isconst = shift.isConstant();
 
@@ -843,6 +969,11 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		final IntItem val = vstack.popInt();
 		val.load(eContext);
 
+		if (val.isConstant() && isconst) {
+			// TODO, implement constant ishift
+			if(countConstOps) { counters.getCounter("TODOishift-const").inc(); }
+		}
+		
 		final GPR valr = val.getRegister();
 		if (isconst) {
 			final int imm8 = shift.getValue();
@@ -897,6 +1028,17 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			boolean commutative) {
 		LongItem v2 = vstack.popLong();
 		LongItem v1 = vstack.popLong();
+
+		if(countConstOps) { counters.getCounter("loperation").inc(); }
+
+		if (v1.isConstant() && v2.isConstant()) {
+			if(countConstOps) { counters.getCounter("TODOloperation-const").inc(); }
+			// TODO loperation for constants
+		} else if (v1.isConstant() || v2.isConstant()) {
+			if (countConstOps) { counters.getCounter("TODOloperation-ONEconst" + commutative).inc(); }
+			// TODO check for constants making it easier...
+		}
+				
 		if (prepareForOperation(v1, v2, commutative)) {
 			// Swap
 			final LongItem tmp = v2;
@@ -2024,8 +2166,10 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		
 		final IntItem v = vstack.popInt();
 		if (v.isConstant()) {
+			if(countConstOps) { counters.getCounter("i2b-const").inc(); }
 			vstack.push(ifac.createIConst(eContext, (byte) v.getValue()));
 		} else {
+			if(countConstOps) { counters.getCounter("i2b-nonconst").inc(); }
 			v.loadToBITS8GPR(eContext);
 			final GPR r = v.getRegister();
 			os.writeMOVSX(r, r, BYTESIZE);
@@ -2041,8 +2185,10 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		
 		final IntItem v = vstack.popInt();
 		if (v.isConstant()) {
+			if(countConstOps) { counters.getCounter("i2c-const").inc(); }
 			vstack.push(ifac.createIConst(eContext, (char) v.getValue()));
 		} else {
+			if(countBytecode) { counters.getCounter("i2c-nonconst").inc(); }
 			v.load(eContext);
 			final GPR r = v.getRegister();
 			os.writeMOVZX(r, r, WORDSIZE);
@@ -2183,15 +2329,45 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		    vstack.push(ifac.createIConst(eContext, v1.getValue() / v2.getValue()));
             v1.release(eContext);
             v2.release(eContext);
-        } else if (v2.isConstant() && ((shift = getShiftForMultiplier(v2.getValue())) > 0)) {
             
-        	if(countConstOps) { counters.getCounter("idiv-const-shift").inc(); }
+        } else if (v2.isConstant() && (Math.abs(v2.getValue()) == 1)) {
 
+        	// CHECK: check again if that is correct
+        	
+        	if(countConstOps) { counters.getCounter("NEWidiv-const+/-1").inc(); }
+
+            if (v2.getValue() < 0) {
+
+            	// Load v1
+                v1.load(eContext);
+                
+            	os.writeNEG(v1.getRegister());
+            }
+            
+            // Release
+            v2.release(eContext);
+
+            // And push the result on the vstack.
+            vstack.push(v1);            
+
+        } else if (v2.isConstant() && ((shift = getShiftForMultiplier(Math.abs(v2.getValue()))) > 0)) {
+
+        	// CHECK: check again if that is correct
+        	if (v2.getValue() < 0) {
+        		if(countConstOps) { counters.getCounter("NEWidiv-const-shift<0").inc(); }
+        	} else {
+        		if(countConstOps) { counters.getCounter("idiv-const-shift>0").inc(); }
+        	}
+        			
             // Load v1
             v1.load(eContext);
             
             // Divide by shifting
             os.writeSAR(v1.getRegister(), shift);
+
+            if (v2.getValue() < 0) {
+            	os.writeNEG(v1.getRegister());
+            }
 
             // Release
             v2.release(eContext);
@@ -2238,11 +2414,22 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 */
 	private final void visit_if_acmp(int address, int jccOpcode) { 
 		
-		if(countBytecode) { counters.getCounter("if_acmp").inc(); }
+		if(countConstOps) { counters.getCounter("if_acmp").inc(); }
 		
 		RefItem v2 = vstack.popRef();
 		RefItem v1 = vstack.popRef();
 
+		if (v1.isConstant() && v2.isConstant()) {
+		
+			if (countConstOps) { counters.getCounter("TODOif_acmp-const").inc(); }
+			// TODO implement constant acmp
+			
+		} else {
+			
+			if (countConstOps) { counters.getCounter("if_acmp-nonconst").inc(); }
+			
+		}
+		
 		// flush vstack before jumping
 		vstack.push(eContext);
 
@@ -2299,11 +2486,22 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 */
 	private final void visit_if_icmp(int address, int jccOpcode) {
 		
-		if(countBytecode) { counters.getCounter("if_icmp").inc(); }
+		if(countConstOps) { counters.getCounter("if_icmp").inc(); }
 		
 		IntItem v2 = vstack.popInt();
 		IntItem v1 = vstack.popInt();
 
+		
+		if (v1.isConstant() && v2.isConstant()) {
+			
+			if(countConstOps) { counters.getCounter("TODOif_icmp-const").inc(); }
+			// TODO implement constant if_icmp
+			
+		} else if (v1.isConstant() || v2.isConstant()){
+			
+			if(countConstOps) { counters.getCounter("TODOif_icmp-ONEonst-CheckSpecialCases").inc(); }
+		}
+		
 		// flush vstack before jumping
 		vstack.push(eContext);
 
@@ -2549,6 +2747,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		if(countBytecode) { counters.getCounter("iloadStored").inc(); }
 		wload(JvmType.INT, index, true);
     }
+
     /**
 	 * Convert the given multiplier to a shift number.
 	 * 
@@ -2558,6 +2757,23 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	private final int getShiftForMultiplier(int val) {
 		int mul = 2;
 		for (int i = 1; i <= 31; i++) {
+			if (val == mul) {
+				return i;
+			}
+			mul <<= 1;
+		}
+		return -1;
+	}
+
+    /**
+	 * Convert the given multiplier to a shift number.
+	 * 
+	 * @param val
+	 * @return -1 if not shiftable.
+	 */
+	private final int getShiftForMultiplier(long val) {
+		long mul = 1;
+		for (int i = 0; i <= 63; i++) {
 			if (val == mul) {
 				return i;
 			}
@@ -2582,7 +2798,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
             v1.release(eContext);
             v2.release(eContext);
         } else {
-    		if(countConstOps) { counters.getCounter("imul-nonconst").inc(); }
+        	
             if (prepareForOperation(v1, v2, true)) {
                 // Swap
                 final IntItem tmp = v2;
@@ -2593,19 +2809,36 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
             final GPR r1 = v1.getRegister();
             switch (v2.getKind()) {
             case Item.Kind.GPR:
+                if(countConstOps) { counters.getCounter("imul-nonconst").inc(); }
                 os.writeIMUL(r1, v2.getRegister());
                 break;
             case Item.Kind.CONSTANT:
                 final int val = v2.getValue();
                 if (val == 0) {
-                    os.writeXOR(r1, r1); // * 0
+                	
+                    if(countConstOps) { counters.getCounter("NEWimul-const0").inc(); }
+
+                    // CHECK: check again if this is correct
+                    //os.writeXOR(r1, r1); // * 0
+
+                    // since now v1 is 0, it is a CONSTANT value
+                    v1.release(eContext);
+                    v2.release(eContext);
+                    final IntItem item = ifac.createIConst(eContext, 0);
+                    vstack.push(item);
+                    
+                    return;
+                    
                 } else if (val == 1) {
+                    if(countConstOps) { counters.getCounter("imul-const1").inc(); }
                     // Do nothing
                 } else if (val == -1) {
+                    if(countConstOps) { counters.getCounter("imul-const~1").inc(); }
                     os.writeNEG(r1); // * -1
                 } else {
                     final int shift = getShiftForMultiplier(Math.abs(val));
                     if (shift > 0) {
+                        if(countConstOps) { counters.getCounter("imul-constShift").inc(); }
                         // abs(val) is multiple of 2 && val=2^shift where shift
                         // <=
                         // 31
@@ -2614,11 +2847,13 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
                             os.writeNEG(r1);
                         }
                     } else {
+                        if(countConstOps) { counters.getCounter("imul-nonconst").inc(); }
                         os.writeIMUL_3(r1, r1, val);
                     }
                 }
                 break;
             case Item.Kind.LOCAL:
+                if(countConstOps) { counters.getCounter("imul-nonconst").inc(); }
                 os.writeIMUL(r1, helper.BP, v2.getOffsetToFP(eContext));
                 break;
             }
@@ -2635,8 +2870,10 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		final IntItem val = vstack.popInt();
 		val.loadIf(eContext, ~Item.Kind.CONSTANT);
 		if (val.isConstant()) {
+			if(countConstOps) { counters.getCounter("ineg-const").inc(); }
 			vstack.push(ifac.createIConst(eContext, -val.getValue()));
 		} else {
+			if(countConstOps) { counters.getCounter("ineg-nonconst").inc(); }
 			os.writeNEG(val.getRegister());
 			vstack.push(val);
 		}
@@ -2934,6 +3171,13 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		final IntItem v2 = vstack.popInt();
 		final IntItem v1 = vstack.popInt();
 
+		if (v1.isConstant() && v2.isConstant()) {
+			if(countConstOps) { counters.getCounter("TODOirem-const").inc(); }
+		} else if (v2.isConstant()) {
+			// TODO check for 2^n and use AND 0xFF instead of irem
+			if(countBytecode) { counters.getCounter("TODOirem-SECONDconst" + v2.getValue()).inc(); }
+		}
+		
 		// v1 must be in EAX
 		L1AHelper.requestRegister(eContext, X86Register.EAX, v1);
 
@@ -3047,8 +3291,10 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		
 		final LongItem v = vstack.popLong();
 		if (v.isConstant()) {
+			if(countConstOps) { counters.getCounter("l2i-const").inc(); }			
 			vstack.push(ifac.createIConst(eContext, (int) v.getValue()));
 		} else {
+			if(countConstOps) { counters.getCounter("l2i-nonconst").inc(); }
 			final X86RegisterPool pool = eContext.getGPRPool();
 			final IntItem result;
 			v.load(eContext);
@@ -3147,6 +3393,12 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		final LongItem v2 = vstack.popLong();
 		final LongItem v1 = vstack.popLong();
 
+		if (v1.isConstant() && v2.isConstant()) {
+			if(countConstOps) { counters.getCounter("TODOlcmp-const").inc(); }
+		} else if (v1.isConstant() || v2.isConstant()) {
+			if(countConstOps) { counters.getCounter("TODOlcmp-ONEconst-checkSpecialCases").inc(); }
+		}
+			
 		// Load
 		v2.load(eContext);
 		v1.load(eContext);
@@ -3273,6 +3525,15 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			vstack.push(eContext);
 			final LongItem v2 = vstack.popLong();
 			final LongItem v1 = vstack.popLong();
+
+			if (countConstOps) {
+				if (v1.isConstant() && v2.isConstant()) {
+					counters.getCounter("TODOldiv-const").inc();
+				} else if (v2.isConstant() && (getShiftForMultiplier(Math.abs(v2.getValue())) > 0)) {
+					counters.getCounter("TODOldiv-const-shift").inc();
+				}
+			}
+			
 			v2.release1(eContext);
 			v1.release1(eContext);
 			
@@ -3332,6 +3593,17 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			vstack.push(eContext);
 			final LongItem v2 = vstack.popLong();
 			final LongItem v1 = vstack.popLong();
+
+			if (countConstOps) {
+				if (v1.isConstant() && v2.isConstant()) {
+					counters.getCounter("TODOlmul-const").inc();
+				} else if (v1.isConstant() && (getShiftForMultiplier(Math.abs(v1.getValue())) > 0)) {
+					counters.getCounter("TODOlmul-const1-shift").inc();
+				} else if (v2.isConstant() && (getShiftForMultiplier(Math.abs(v2.getValue())) > 0)) {
+					counters.getCounter("TODOlmul-const2-shift").inc();
+				}
+			}
+			
 			v2.release1(eContext);
 			v1.release1(eContext);
             
@@ -3399,8 +3671,10 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		final LongItem v = vstack.popLong();
 
 		if (v.isConstant()) {
+			if(countConstOps) { counters.getCounter("lneg-const").inc(); }
 			vstack.push(ifac.createLConst(eContext, -v.getValue()));
 		} else {
+			if(countConstOps) { counters.getCounter("lneg-nonconst").inc(); }
 			// Load val
 			v.load(eContext);
 			if (os.isCode32()) {
@@ -3529,6 +3803,10 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		final IntItem cnt = vstack.popInt();
 		final LongItem val = vstack.popLong();
 
+		if (cnt.isConstant() && val.isConstant()) {
+			if(countConstOps) { counters.getCounter("TODOlshl-const").inc(); }
+		}
+		
         if (!cnt.uses(ECX)) {
             val.spillIfUsing(eContext, ECX);
             L1AHelper.requestRegister(eContext, ECX, cnt);
@@ -3576,6 +3854,10 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
         
 		final IntItem cnt = vstack.popInt();
 		final LongItem val = vstack.popLong();
+
+		if (cnt.isConstant() && val.isConstant()) {
+			if(countConstOps) { counters.getCounter("TODOlshr-const").inc(); }
+		}
 
 		// Get cnt into ECX
 		if (!cnt.uses(ECX)) {
@@ -3645,6 +3927,10 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
         
 		final IntItem cnt = vstack.popInt();
 		final LongItem val = vstack.popLong();
+
+		if (cnt.isConstant() && val.isConstant()) {
+			if(countConstOps) { counters.getCounter("TODOlushr-const").inc(); }
+		}
 
 		// Get cnt into ECX
 		if (!cnt.uses(ECX)) {
@@ -4103,6 +4389,11 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		
 		// IMPROVE: check Jaos implementation
 		final IntItem val = vstack.popInt();
+		
+		if (val.isConstant()) {
+			if(countConstOps) { counters.getCounter("TODOtableswitch-constVal!!").inc(); }
+		}
+		
 		val.load(eContext);
 		GPR valr = val.getRegister();
 		vstack.push(eContext);
