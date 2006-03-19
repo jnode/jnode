@@ -35,6 +35,7 @@
     <permission class="java.util.PropertyPermission" name="java.util.logging.config.class" actions="read" />
     <permission class="java.util.PropertyPermission" name="java.util.logging.config.file" actions="read" />
     <permission class="java.util.PropertyPermission" name="gnu.classpath.home.url" actions="read" />
+    <permission class="java.awt.AWTPermission" name="listenToAllAWTEvents" actions="read" />
   </extension>
         
 </plugin>
