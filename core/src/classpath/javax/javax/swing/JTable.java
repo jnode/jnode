@@ -1020,18 +1020,6 @@ public class JTable
     private final JCheckBox checkBox = new JCheckBox();
     
     /**
-     * The check box must have the text field background and be centered.
-     */
-    private BooleanCellRenderer()
-    {
-      // Render the checkbox identically as the text field.
-      JTextField f = new JTextField();
-      checkBox.setForeground(f.getForeground());
-      checkBox.setBackground(f.getBackground());
-      checkBox.setHorizontalAlignment(SwingConstants.CENTER);      
-    }
-    
-    /**
      * Get the check box.
      */
     JCheckBox getCheckBox()
@@ -1048,7 +1036,6 @@ public class JTable
      * @param hasFocus has the cell the focus?
      * @param row the row to render
      * @param column the cell to render
-     * 
      * @return this component (the default table cell renderer)
      */
     public Component getTableCellRendererComponent(JTable table, Object value,
@@ -1056,6 +1043,32 @@ public class JTable
                                                    boolean hasFocus, int row,
                                                    int column)
     {
+      if (isSelected)
+        {
+          checkBox.setBackground(table.getSelectionBackground());
+          checkBox.setForeground(table.getSelectionForeground());
+        }
+      else
+        {
+          checkBox.setBackground(table.getBackground());
+          checkBox.setForeground(table.getForeground());
+        }
+
+      if (hasFocus)
+        {
+          checkBox.setBorder(
+            UIManager.getBorder("Table.focusCellHighlightBorder"));
+          if (table.isCellEditable(row, column))
+            {
+              checkBox.setBackground(
+                UIManager.getColor("Table.focusCellBackground"));
+              checkBox.setForeground(
+                UIManager.getColor("Table.focusCellForeground"));
+            }
+        }
+      else
+        checkBox.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+
       // Null is rendered as false.
       if (value == null)
         checkBox.setSelected(false);
@@ -1253,22 +1266,18 @@ public class JTable
        */
       TableTextField()
       {
-        setBorder(null);
+        setBorder(BorderFactory.createLineBorder(getGridColor(), 2));
       }
       
       /**
-       * Scroll the table, making the given rectangle of this component
-       * visible. Mind the component position with relate to the table. 
        * With not this method overridden, the scroll pane scrolls to the
        * top left cornec (untranslated position of the caret) after the first
        * keystroke.
        */
       public void scrollRectToVisible(Rectangle r)
       {
-        // In private class we known that the rectangle data will not be
-        // reused and we need not to clone it.
-        r.translate(getX(), getY());
-        super.scrollRectToVisible(r);
+        // Do nothing here. If the editing session starts outside the visible
+        // bounds, the editCellAt will scroll.
       }
     }    
   
@@ -3260,8 +3269,6 @@ public class JTable
   public void updateUI()
   {
     setUI((TableUI) UIManager.getUI(this));
-    revalidate();
-    repaint();
   }
 
   /**
@@ -3660,16 +3667,6 @@ public class JTable
   private void moveToCellBeingEdited(Component component)
   {
      Rectangle r = getCellRect(editingRow, editingColumn, true);
-     // Place the text field so that it would not touch the table
-     // border.
-     
-     // TODO Figure out while 5 and which constant should here be.
-     int xOffset = 5;
-     r.x+=xOffset;
-     r.y++;
-     r.width -=xOffset;
-     r.height --;
-     
      // Clone rectangle as getCellRect returns the cached value.
      component.setBounds(new Rectangle(r));
   }

@@ -362,8 +362,7 @@ public class JColorChooser extends JComponent implements Accessible
   public void updateUI()
   {
     setUI((ColorChooserUI) UIManager.getUI(this));
-    revalidate();
-	} // updateUI()
+  }
 
 	/**
    * This method returns a String identifier for the UI Class to be used with

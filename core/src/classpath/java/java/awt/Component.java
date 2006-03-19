@@ -906,7 +906,7 @@ public abstract class Component
 
         // The JDK repaints the component before invalidating the parent.
         // So do we.
-        if (isShowing())
+        if (isShowing() && isLightweight())
         repaint();
         // Invalidate the parent if we have one. The component itself must
         // not be invalidated. We also avoid NullPointerException with

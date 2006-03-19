@@ -1,5 +1,5 @@
 /* DefaultFocusManager.java --
-   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2006, Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -49,7 +49,8 @@ import java.util.Stack;
  *
  * @author	Andrew Selkirk
  */
-public class DefaultFocusManager extends FocusManager {
+public class DefaultFocusManager extends FocusManager 
+{
 
 	/**
 	 * historyStack
@@ -104,7 +105,7 @@ public class DefaultFocusManager extends FocusManager {
    * 
    * @param container
    *          TODO
-	 * @returns Component
+   * @return Component
 	 */
   public Component getFirstComponent(Container container)
   {
@@ -116,7 +117,7 @@ public class DefaultFocusManager extends FocusManager {
    * 
    * @param container
    *          TODO
-	 * @returns Component
+   * @return Component
 	 */
   public Component getLastComponent(Container container)
   {
@@ -130,7 +131,7 @@ public class DefaultFocusManager extends FocusManager {
    *          TODO
    * @param component
    *          TODO
-	 * @returns Component
+   * @return Component
 	 */
   public Component getComponentBefore(Container container, Component component)
   {
@@ -144,7 +145,7 @@ public class DefaultFocusManager extends FocusManager {
    *          TODO
    * @param component
    *          TODO
-	 * @returns Component
+   * @return Component
 	 */
   public Component getComponentAfter(Container container, Component component)
   {
@@ -158,7 +159,7 @@ public class DefaultFocusManager extends FocusManager {
    *          TODO
    * @param component2
    *          TODO
-	 * @returns boolean
+   * @return boolean
 	 */
   public boolean compareTabOrder(Component component1, Component component2)
   {

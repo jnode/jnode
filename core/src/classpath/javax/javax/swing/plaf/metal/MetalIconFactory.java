@@ -756,6 +756,17 @@ public class MetalIconFactory implements Serializable
   {
 
     /**
+     * This is used as a mask when painting the gradient. See
+     * {@link MetalUtils#paintGradient(java.awt.Graphics, int, int, int, int,
+     *  float, float, java.awt.Color, java.awt.Color, java.awt.Color, int,
+     *  int[][])} for details.
+     */
+    private static int[][] gradientMask = new int[][] {{3, 7}, {1, 9}, {1, 9},
+                                                       {0, 10}, {0, 10}, {0, 10},
+                                                       {0, 10}, {1, 9}, {1, 9},
+                                                       {3, 7}};
+
+    /**
      * Returns the width of the icon in pixels.
      *
      * @return the width of the icon in pixels
@@ -788,8 +799,9 @@ public class MetalIconFactory implements Serializable
     public void paintIcon(Component c, Graphics g, int x, int y) 
     {
       if (UIManager.get("RadioButton.gradient") != null)
-        MetalUtils.paintGradient(g, x, y, getIconWidth(), getIconHeight(),
-                              SwingConstants.VERTICAL, "RadioButton.gradient");
+        MetalUtils.paintGradient(g, x + 2, y + 2, 8, 8,
+                              SwingConstants.VERTICAL, "RadioButton.gradient",
+                              gradientMask);
 
       Color savedColor = g.getColor();
       JRadioButton b = (JRadioButton) c;
@@ -951,6 +963,14 @@ public class MetalIconFactory implements Serializable
   {
 
     /**
+     * This mask is used to paint the gradient in the shape of the thumb.
+     */
+    int[][] gradientMask = new int[][] { {0, 12}, {0, 12}, {0, 12}, {0, 12},
+                                         {0, 12}, {0, 12}, {0, 12}, {1, 12},
+                                         {2, 10}, {3, 9}, {4, 8}, {5, 7},
+                                         {6, 6}};
+
+    /**
      * Creates a new instance.
      */
     public HorizontalSliderThumbIcon() 
@@ -1008,7 +1028,21 @@ public class MetalIconFactory implements Serializable
       g.drawLine(x + 6, y + 14, x, y + 8);
       g.drawLine(x, y + 7, x, y + 1);
       
-      // fill the icon
+      // Fill the icon.
+      if (MetalLookAndFeel.getCurrentTheme() instanceof OceanTheme
+          && enabled)
+        {
+          String gradient;
+          if (focus)
+            gradient = "Slider.focusGradient";
+          else
+            gradient = "Slider.gradient";
+          MetalUtils.paintGradient(g, x + 1, y + 2, 12, 13,
+                                   SwingConstants.VERTICAL, gradient,
+                                   gradientMask);
+        }
+      else
+        {
       if (focus)
         g.setColor(MetalLookAndFeel.getPrimaryControlShadow());
       else
@@ -1020,9 +1054,11 @@ public class MetalIconFactory implements Serializable
       g.drawLine(x + 5, y + 12, x + 9, y + 12);
       g.drawLine(x + 6, y + 13, x + 8, y + 13);
       g.drawLine(x + 7, y + 14, x + 7, y + 14);
+        }
       
-      // if the slider is enabled, draw dots and highlights
-      if (c.isEnabled())
+      // If the slider is enabled, draw dots and highlights.
+      if (c.isEnabled()
+          && !(MetalLookAndFeel.getCurrentTheme() instanceof OceanTheme))
         {
           if (focus)
             g.setColor(MetalLookAndFeel.getPrimaryControlDarkShadow());
@@ -1039,7 +1075,7 @@ public class MetalIconFactory implements Serializable
           g.drawLine(x + 7, y + 7, x + 7, y + 7);
           g.drawLine(x + 11, y + 7, x + 11, y + 7);
 
-          // draw highlights
+          // Draw highlights
           if (focus)
             g.setColor(MetalLookAndFeel.getPrimaryControl());
           else
@@ -1583,6 +1619,14 @@ public class MetalIconFactory implements Serializable
   private static class VerticalSliderThumbIcon implements Icon, Serializable 
   {
     /**
+     * This mask is used to paint the gradient in the shape of the thumb.
+     */
+    int[][] gradientMask = new int[][] { {0, 12}, {0, 12}, {0, 12}, {0, 12},
+                                         {0, 12}, {0, 12}, {0, 12}, {1, 12},
+                                         {2, 10}, {3, 9}, {4, 8}, {5, 7},
+                                         {6, 6}};
+
+    /**
      * Creates a new instance.
      */
     public VerticalSliderThumbIcon() 
@@ -1641,7 +1685,21 @@ public class MetalIconFactory implements Serializable
       g.drawLine(x + 8, y + 14, x + 1, y + 14);
       g.drawLine(x, y + 13, x, y + 1);
       
-      // fill the icon
+      // Fill the icon.
+      if (MetalLookAndFeel.getCurrentTheme() instanceof OceanTheme
+          && enabled)
+        {
+          String gradient;
+          if (focus)
+            gradient = "Slider.focusGradient";
+          else
+            gradient = "Slider.gradient";
+          MetalUtils.paintGradient(g, x + 2, y + 1, 13, 12,
+                                   SwingConstants.HORIZONTAL, gradient,
+                                   gradientMask);
+        }
+      else
+        {
       if (focus)
         g.setColor(MetalLookAndFeel.getPrimaryControlShadow());
       else
@@ -1653,9 +1711,11 @@ public class MetalIconFactory implements Serializable
       g.drawLine(x + 12, y + 5, x + 12, y + 9);
       g.drawLine(x + 13, y + 6, x + 13, y + 8);
       g.drawLine(x + 14, y + 7, x + 14, y + 7);
+        }
       
       // if the slider is enabled, draw dots and highlights
-      if (enabled)
+      if (enabled
+          && ! (MetalLookAndFeel.getCurrentTheme() instanceof OceanTheme))
         {
           if (focus)
             g.setColor(MetalLookAndFeel.getPrimaryControlDarkShadow());

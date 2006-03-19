@@ -364,6 +364,8 @@ public class BasicSliderUI extends SliderUI
      */
     public void mouseDragged(MouseEvent e)
     {
+      if (slider.isEnabled())
+        {
       currentMouseX = e.getX();
       currentMouseY = e.getY();
       if (slider.getValueIsAdjusting())
@@ -376,6 +378,7 @@ public class BasicSliderUI extends SliderUI
 
 	  slider.setValue(value);
         }
+    }
     }
 
     /**
@@ -399,6 +402,8 @@ public class BasicSliderUI extends SliderUI
      */
     public void mousePressed(MouseEvent e)
     {
+      if (slider.isEnabled())
+        {
       currentMouseX = e.getX();
       currentMouseY = e.getY();
 
@@ -427,6 +432,7 @@ public class BasicSliderUI extends SliderUI
 	  offset = value - slider.getValue();
         }
     }
+    }
 
     /**
      * Called when the mouse is released.  This should stop the timer that
@@ -436,6 +442,8 @@ public class BasicSliderUI extends SliderUI
      */
     public void mouseReleased(MouseEvent e)
     {
+      if (slider.isEnabled())
+        {
       currentMouseX = e.getX();
       currentMouseY = e.getY();
 
@@ -447,6 +455,7 @@ public class BasicSliderUI extends SliderUI
         }
       if (scrollTimer != null)
 	scrollTimer.stop();
+    }
     }
 
     /**

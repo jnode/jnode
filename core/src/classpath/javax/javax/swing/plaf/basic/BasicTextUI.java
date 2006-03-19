@@ -365,6 +365,38 @@ public abstract class BasicTextUI extends TextUI
     {
       return view.getNextVisualPositionFrom(pos, b, a, d, biasRet);
     }
+
+    /**
+     * Returns the startOffset of this view, which is always the beginning
+     * of the document.
+     *
+     * @return the startOffset of this view
+     */
+    public int getStartOffset()
+    {
+      return 0;
+    }
+
+    /**
+     * Returns the endOffset of this view, which is always the end
+     * of the document.
+     *
+     * @return the endOffset of this view
+     */
+    public int getEndOffset()
+    {
+      return getDocument().getLength();
+    }
+
+    /**
+     * Returns the document associated with this view.
+     *
+     * @return the document associated with this view
+     */
+    public Document getDocument()
+    {
+      return textComponent.getDocument();
+    }
   }
 
   /**
@@ -514,7 +546,6 @@ public abstract class BasicTextUI extends TextUI
   public void installUI(final JComponent c)
   {
     super.installUI(c);
-    c.setOpaque(true);
 
     textComponent = (JTextComponent) c;
     Document doc = textComponent.getDocument();
@@ -991,7 +1022,11 @@ public abstract class BasicTextUI extends TextUI
             // we should stop searching for one.
             
             int posBelow = Utilities.getPositionBelow(t, p0, l1.x);
-            if (posBelow < p1 && posBelow != -1 && posBelow != p0)
+            int p1RowStart = Utilities.getRowStart(t, p1);
+            
+            if (posBelow != -1
+                && posBelow != p0
+                && Utilities.getRowStart(t, posBelow) != p1RowStart)
               {
                 // Take the rectangle of the offset we just found and grow it
                 // to the maximum width. Retain y because this is our start
@@ -1002,10 +1037,15 @@ public abstract class BasicTextUI extends TextUI
                 
                 // Find further lines which have to be damaged completely.
                 int nextPosBelow = posBelow;
-                while (nextPosBelow < p1 && nextPosBelow != -1 && posBelow != nextPosBelow)
+                while (nextPosBelow != -1
+                       && posBelow != nextPosBelow
+                       && Utilities.getRowStart(t, nextPosBelow) != p1RowStart)
                   {
                     posBelow = nextPosBelow;
                     nextPosBelow = Utilities.getPositionBelow(t, posBelow, l1.x);
+                    
+                    if (posBelow == nextPosBelow)
+                      break;
                   }
                 // Now posBelow is an offset on the last line which has to be damaged
                 // completely. (newPosBelow is on the same line as p1)

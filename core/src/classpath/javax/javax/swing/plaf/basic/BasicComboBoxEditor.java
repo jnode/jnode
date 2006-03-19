@@ -1,5 +1,5 @@
 /* BasicComboBoxEditor.java --
-   Copyright (C) 2004, 2005  Free Software Foundation, Inc.
+   Copyright (C) 2004, 2005, 2006  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -39,9 +39,13 @@ exception statement from your version. */
 package javax.swing.plaf.basic;
 
 import java.awt.Component;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+
+import java.util.Iterator;
+import java.util.LinkedList;
 
 import javax.swing.ComboBoxEditor;
 import javax.swing.JTextField;
@@ -58,6 +62,8 @@ public class BasicComboBoxEditor extends Object implements ComboBoxEditor,
   /** The editor component. */
   protected JTextField editor;
 
+  private ComboBoxEditorListener listener;
+
   /**
    * Creates a new <code>BasicComboBoxEditor</code> instance.
    */
@@ -66,6 +72,7 @@ public class BasicComboBoxEditor extends Object implements ComboBoxEditor,
     editor = new JTextField();
     editor.setBorder(null);
     editor.setColumns(9);
+    listener = new ComboBoxEditorListener();
   }
 
   /**
@@ -149,7 +156,7 @@ public class BasicComboBoxEditor extends Object implements ComboBoxEditor,
    */
   public void addActionListener(ActionListener l)
   {
-    editor.addActionListener(l);
+    listener.addListener(l);
   }
 
   /**
@@ -159,7 +166,7 @@ public class BasicComboBoxEditor extends Object implements ComboBoxEditor,
    */
   public void removeActionListener(ActionListener l)
   {
-    editor.removeActionListener(l);
+    listener.removeListener(l);
   }
 
   /**
@@ -175,6 +182,40 @@ public class BasicComboBoxEditor extends Object implements ComboBoxEditor,
     public UIResource()
     {
       // Nothing to do here.
+    }
+  }
+
+  /**
+   * Helper class that forwards action events between the jtextfield
+   * editor and the basic combo box editor for use by the combo box.
+   */
+  class ComboBoxEditorListener implements ActionListener
+  {
+    private final LinkedList listeners = new LinkedList();
+  
+    public void actionPerformed(ActionEvent ae)
+    {
+      ActionEvent nae;
+      nae = new ActionEvent(BasicComboBoxEditor.this,
+			    ae.getID(), ae.getActionCommand(),
+			    ae.getWhen(), ae.getModifiers());
+      Iterator it = listeners.iterator();
+      while (it.hasNext())
+	((ActionListener) it.next()).actionPerformed(nae);
+    }
+
+    void addListener(ActionListener al)
+    {
+      if (listeners.size() == 0)
+	editor.addActionListener(this);
+      listeners.add(al);
+    }
+
+    void removeListener(ActionListener al)
+    {
+      listeners.remove(al);
+      if (listeners.size() == 0)
+	editor.removeActionListener(this);
     }
   }
 }

@@ -1,5 +1,5 @@
 /* BasicListUI.java --
-   Copyright (C) 2002, 2004, 2005 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2005, 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -64,6 +64,7 @@ import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.LookAndFeel;
+import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.event.ListDataEvent;
@@ -178,6 +179,7 @@ public class BasicListUI extends ListUI
       int index1 = e.getFirstIndex();
       int index2 = e.getLastIndex();
       Rectangle damaged = getCellBounds(list, index1, index2);
+      if (damaged != null)
       list.repaint(damaged);
     }
   }
@@ -715,7 +717,8 @@ public class BasicListUI extends ListUI
    * @param index2 The last row to incude in the bounds
    *
    * @return A rectangle encompassing the range of rows between 
-   * <code>index1</code> and <code>index2</code> inclusive
+   * <code>index1</code> and <code>index2</code> inclusive, or null
+   * such a rectangle couldn't be calculated for the given indexes.
    */
   public Rectangle getCellBounds(JList l, int index1, int index2)
   {
@@ -739,9 +742,8 @@ public class BasicListUI extends ListUI
     for (int i = minIndex + 1; i <= maxIndex; i++)
       {
         Point hiLoc = indexToLocation(list, i);
-        Rectangle hibounds = new Rectangle(hiLoc.x, hiLoc.y, width,
-                                           getCellHeight(i));
-        bounds = bounds.union(hibounds);
+        bounds = SwingUtilities.computeUnion(hiLoc.x, hiLoc.y, width,
+                                             getCellHeight(i), bounds);
       }
 
     return bounds;
@@ -1182,7 +1184,7 @@ public class BasicListUI extends ListUI
     for (int row = startIndex; row <= endIndex; ++row)
       {
         Rectangle bounds = getCellBounds(list, row, row);
-        if (bounds.intersects(clip))
+        if (bounds != null && bounds.intersects(clip))
           paintCell(g, row, bounds, render, model, sel, lead);
       }
   }

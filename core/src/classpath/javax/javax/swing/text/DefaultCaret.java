@@ -387,7 +387,10 @@ public class DefaultCaret extends Rectangle
         try
           {
             if (count == 3)
-              t.select(Utilities.getRowStart(t, newDot), Utilities.getRowEnd(t, newDot));
+              {
+                setDot(Utilities.getRowStart(t, newDot));
+                moveDot( Utilities.getRowEnd(t, newDot));
+              }
             else
               {
                 int nextWord = Utilities.getNextWord(t, newDot);
@@ -397,7 +400,10 @@ public class DefaultCaret extends Rectangle
                 // word but we want to select that. We have to use
                 // Utilities.nextWord() to get it.
                 if (newDot == nextWord)
-                  t.select(nextWord, Utilities.getNextWord(t, nextWord));
+                  {
+                    setDot(nextWord);
+                    moveDot(Utilities.getNextWord(t, nextWord));
+                  }
                 else
                   {
                     int previousWord = Utilities.getPreviousWord(t, newDot);
@@ -406,10 +412,16 @@ public class DefaultCaret extends Rectangle
                     // If the user clicked in the space between two words,
                     // then select the space.
                     if (newDot >= previousWordEnd && newDot <= nextWord)
-                      t.select(previousWordEnd, nextWord);
+                      {
+                        setDot(previousWordEnd);
+                        moveDot(nextWord);
+                      }
                     // Otherwise select the word under the mouse pointer.
                     else
-                      t.select(previousWord, previousWordEnd);
+                      {
+                        setDot(previousWord);
+                        moveDot(previousWordEnd);
+                      }
                   }
               }
           }
@@ -417,8 +429,6 @@ public class DefaultCaret extends Rectangle
           {
             // TODO: Swallowing ok here?
           }
-        
-        dot = newDot;
       }
     
   }

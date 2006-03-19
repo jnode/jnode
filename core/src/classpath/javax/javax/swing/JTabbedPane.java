@@ -739,7 +739,6 @@ public class JTabbedPane extends JComponent implements Serializable,
   public void updateUI()
   {
     setUI((TabbedPaneUI) UIManager.getUI(this));
-    invalidate();
   }
 
   /**
@@ -1165,7 +1164,7 @@ public class JTabbedPane extends JComponent implements Serializable,
    */
   public void remove(int index)
   {
-    remove(getComponentAt(index));
+    super.remove(index);
     removeTabAt(index);
   }
 
