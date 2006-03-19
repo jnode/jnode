@@ -18,10 +18,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.desktop.classic;
 
 import org.apache.log4j.Logger;
+import org.jnode.awt.JNodeToolkit;
 import org.jnode.plugin.ExtensionPoint;
 
 import javax.swing.JButton;
@@ -31,9 +32,16 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.LookAndFeel;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.metal.DefaultMetalTheme;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+import javax.swing.plaf.metal.OceanTheme;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
@@ -42,6 +50,8 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import gnu.testlet.javax.swing.UIManager.setLookAndFeel;
 
 /**
  * @author Levente S\u00e1ntha
@@ -68,7 +78,7 @@ public class TaskBar extends JPanel {
         setLayout(layout);
         setBorder(new BevelBorder(BevelBorder.RAISED));
         startButton = new JButton("Start");
-        startButton.setBorder(new EmptyBorder(1,3,1,3));
+        startButton.setBorder(new EmptyBorder(1, 3, 1, 3));
 
         add(startButton, BorderLayout.WEST);
         startMenu = new JPopupMenu();
@@ -101,11 +111,58 @@ public class TaskBar extends JPanel {
 
         JMenu settingsMenu = new JMenu("Settings");
         startMenu.add(settingsMenu);
+        settingsMenu.addSeparator();
         settingsMenu.add(desktopColorMI = new JMenuItem("Desktop color"));
         settingsMenu.add(changeResMI1 = new JMenuItem("Set to 640x480/32"));
         settingsMenu.add(changeResMI2 = new JMenuItem("Set to 800x600/32"));
         settingsMenu.add(changeResMI3 = new JMenuItem("Set to 1024x768/32"));
         settingsMenu.add(changeResMI4 = new JMenuItem("Set to 1280x1024/32"));
+        settingsMenu.addSeparator();
+        UIManager.LookAndFeelInfo[] lafs = UIManager.getInstalledLookAndFeels();
+        for (int i = 0; i < lafs.length; ++i) {
+            final UIManager.LookAndFeelInfo laf = lafs[i];
+            JMenuItem item = new JMenuItem(laf.getName());
+            item.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    try {
+                        Class c = Thread.currentThread().getContextClassLoader().loadClass(laf.getClassName());
+                        UIManager.setLookAndFeel((LookAndFeel) c.newInstance());
+                    }
+                    catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                    SwingUtilities.updateComponentTreeUI((Component) JNodeToolkit.getJNodeToolkit().getAwtContext());
+                }
+            });
+            settingsMenu.add(item);
+        }
+        settingsMenu.addSeparator();
+        JMenuItem metal_theme = new JMenuItem("Metal");
+        settingsMenu.add(metal_theme);
+        metal_theme.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                MetalLookAndFeel.setCurrentTheme(new DefaultMetalTheme());
+                try {
+                    UIManager.setLookAndFeel(new MetalLookAndFeel());
+                } catch (UnsupportedLookAndFeelException ex) {
+                    ex.printStackTrace();
+                }
+                SwingUtilities.updateComponentTreeUI((Component) JNodeToolkit.getJNodeToolkit().getAwtContext());
+            }
+        });
+        JMenuItem ocean_theme = new JMenuItem("Ocean");
+        settingsMenu.add(ocean_theme);
+        ocean_theme.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                MetalLookAndFeel.setCurrentTheme(new OceanTheme());
+                try {
+                    UIManager.setLookAndFeel(new MetalLookAndFeel());
+                } catch (UnsupportedLookAndFeelException ex) {
+                    ex.printStackTrace();
+                }
+                SwingUtilities.updateComponentTreeUI((Component) JNodeToolkit.getJNodeToolkit().getAwtContext());
+            }
+        });
 
         JMenu exitMenu = new JMenu("Exit");
         startMenu.add(exitMenu);
@@ -117,7 +174,7 @@ public class TaskBar extends JPanel {
         add(new Clock(), BorderLayout.EAST);
     }
 
-    private JMenuItem createMenuItem(final String label, final String classname){
+    private JMenuItem createMenuItem(final String label, final String classname) {
         JMenuItem mi = new JMenuItem(label);
         mi.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
@@ -162,18 +219,18 @@ public class TaskBar extends JPanel {
         TimerTask task;
 
         public Clock() {
-            setBorder(new EmptyBorder(1,1,1,5));
+            setBorder(new EmptyBorder(1, 1, 1, 5));
             timer = new Timer(true);
             startTimer();
         }
 
         public void setVisible(boolean v) {
             if (v) {
-                if(task == null){
+                if (task == null) {
                     startTimer();
                 }
             } else {
-                if(task != null) {
+                if (task != null) {
                     task.cancel();
                     task = null;
                 }
@@ -189,14 +246,12 @@ public class TaskBar extends JPanel {
                     calendar.setTimeInMillis(System.currentTimeMillis());
                     final int h = calendar.get(Calendar.HOUR_OF_DAY);
                     final int m = calendar.get(Calendar.MINUTE);
-                    SwingUtilities.invokeLater(new Runnable()
-                    {
-                    	public void run()
-                    	{
-                    		// insure that the modification of swing component
-                    		// is done in the awt event dispatcher thread
-                            setText((h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m);                    		
-                    	}
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            // insure that the modification of swing component
+                            // is done in the awt event dispatcher thread
+                            setText((h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m);
+                        }
                     });
                 }
             }, 0, 60 * 1000);

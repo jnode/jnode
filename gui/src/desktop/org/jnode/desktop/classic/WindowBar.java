@@ -22,6 +22,8 @@
 package org.jnode.desktop.classic;
 
 import org.apache.log4j.Logger;
+import org.jnode.awt.JNodeToolkit;
+import org.jnode.awt.JNodeAwtContext;
 
 import javax.swing.JButton;
 import javax.swing.JInternalFrame;
@@ -29,6 +31,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.JPopupMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JDesktopPane;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
@@ -113,6 +116,10 @@ public class WindowBar extends JPanel {
                 public void internalFrameClosed(InternalFrameEvent event) {
                     remove(FrameWrapper.this);
                     removeFrame(FrameWrapper.this.frame);
+                    final JNodeToolkit tk = JNodeToolkit.getJNodeToolkit();
+                    final JNodeAwtContext ctx = tk.getAwtContext();
+                    final JDesktopPane desktop = ctx.getDesktop();
+                    desktop.remove(FrameWrapper.this.frame);
                     revalidate();
                     repaint();
                 }
@@ -120,6 +127,10 @@ public class WindowBar extends JPanel {
                 public void internalFrameClosing(InternalFrameEvent event) {
                     remove(FrameWrapper.this);
                     removeFrame(FrameWrapper.this.frame);
+                    final JNodeToolkit tk = JNodeToolkit.getJNodeToolkit();
+                    final JNodeAwtContext ctx = tk.getAwtContext();
+                    final JDesktopPane desktop = ctx.getDesktop();
+                    desktop.remove(FrameWrapper.this.frame);
                     revalidate();
                     repaint();
                 }
