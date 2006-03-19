@@ -1,5 +1,5 @@
 /* MetalLookAndFeel.java
-   Copyright (C) 2002, 2005 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2005, 2006, Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -90,7 +90,7 @@ public class MetalLookAndFeel extends BasicLookAndFeel
   protected void createDefaultTheme()
   {
     if (theme == null)
-    setCurrentTheme(new DefaultMetalTheme());
+      setCurrentTheme(new OceanTheme());
   }
 
   /**
@@ -899,7 +899,7 @@ public class MetalLookAndFeel extends BasicLookAndFeel
       "CheckBoxMenuItem.acceleratorForeground", getAcceleratorForeground(),
       "CheckBoxMenuItem.acceleratorSelectionForeground", getAcceleratorSelectedForeground(),
       "CheckBoxMenuItem.background", getMenuBackground(),
-      "CheckBoxMenuItem.borderPainted", new Boolean(true),
+      "CheckBoxMenuItem.borderPainted", Boolean.TRUE,
       "CheckBoxMenuItem.commandSound", "sounds/MenuItemCommand.wav",
       "CheckBoxMenuItem.checkIcon", MetalIconFactory.getCheckBoxMenuItemIcon(),
       "CheckBoxMenuItem.disabledForeground", getMenuDisabledForeground(),
@@ -1171,6 +1171,7 @@ public class MetalLookAndFeel extends BasicLookAndFeel
 
       "Spinner.arrowButtonInsets", new InsetsUIResource(0, 0, 0, 0),
       "Spinner.background", getControl(),
+      "Spinner.border", MetalBorders.getTextFieldBorder(),
       "Spinner.font", new FontUIResource("Dialog", Font.BOLD, 12),
       "Spinner.foreground", getControl(),
 

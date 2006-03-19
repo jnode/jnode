@@ -92,7 +92,7 @@ public class BasicInternalFrameUI extends InternalFrameUI
      */
     public void internalFrameActivated(InternalFrameEvent e)
     {
-      // FIXME: Implement.
+      frame.getGlassPane().setVisible(false);
     }
 
     /**
@@ -122,7 +122,7 @@ public class BasicInternalFrameUI extends InternalFrameUI
      */
     public void internalFrameDeactivated(InternalFrameEvent e)
     {
-      // FIXME: Implement.
+      frame.getGlassPane().setVisible(true);
     }
 
     /**
@@ -255,7 +255,7 @@ public class BasicInternalFrameUI extends InternalFrameUI
       else if (e.getSource() == titlePane)
         {
           Rectangle fBounds = frame.getBounds();
-
+          frame.putClientProperty("bufferedDragging", Boolean.TRUE);
           dm.dragFrame(frame, e.getX() - xOffset + b.x, e.getY() - yOffset
                                                         + b.y);
         }
@@ -326,7 +326,10 @@ public class BasicInternalFrameUI extends InternalFrameUI
       if (e.getSource() == frame && frame.isResizable())
         dm.endResizingFrame(frame);
       else if (e.getSource() == titlePane)
+        {
         dm.endDraggingFrame(frame);
+          frame.putClientProperty("bufferedDragging", null);
+        }
     }
 
     /**
@@ -462,8 +465,6 @@ public class BasicInternalFrameUI extends InternalFrameUI
       dims.width -= insets.left + insets.right;
       dims.height -= insets.top + insets.bottom;
 
-      frame.getRootPane().getGlassPane().setBounds(0, 0, dims.width,
-                                                   dims.height);
       int nh = 0;
       int sh = 0;
       int ew = 0;
@@ -521,18 +522,6 @@ public class BasicInternalFrameUI extends InternalFrameUI
     public Dimension minimumLayoutSize(Container c)
     {
       return getSize(c, true);
-    }
-
-    /**
-     * This method returns the maximum layout size.
-     * 
-     * @param c
-     *          The Container to find a maximum layout size for.
-     * @return The maximum dimensions for the JInternalFrame.
-     */
-    public Dimension maximumLayoutSize(Container c)
-    {
-      return preferredLayoutSize(c);
     }
 
     /**
@@ -1128,16 +1117,13 @@ public class BasicInternalFrameUI extends InternalFrameUI
       {
         frame = (JInternalFrame) c;
 
-        ((JComponent) frame.getRootPane().getGlassPane()).setOpaque(false);
-        frame.getRootPane().getGlassPane().setVisible(true);
-
         installDefaults();
         installListeners();
         installComponents();
         installKeyboardActions();
 
-        frame.setOpaque(true);
-        frame.invalidate();
+        if (! frame.isSelected())
+          frame.getGlassPane().setVisible(true);
       }
   }
 
@@ -1153,9 +1139,7 @@ public class BasicInternalFrameUI extends InternalFrameUI
     uninstallListeners();
     uninstallDefaults();
 
-    ((JComponent) frame.getRootPane().getGlassPane()).setOpaque(true);
     frame.getRootPane().getGlassPane().setVisible(false);
-
     frame = null;
   }
 
@@ -1168,8 +1152,6 @@ public class BasicInternalFrameUI extends InternalFrameUI
       frame.setLayout(internalFrameLayout);
       LookAndFeel.installBorder(frame, "InternalFrame.border");
       frame.setFrameIcon(UIManager.getIcon("InternalFrame.icon"));
-      // InternalFrames are invisible by default.
-      frame.setVisible(false);
   }
 
   /**

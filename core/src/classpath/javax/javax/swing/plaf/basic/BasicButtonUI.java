@@ -156,6 +156,7 @@ public class BasicButtonUI extends ButtonUI
     LookAndFeel.installColorsAndFont(b, prefix + "background",
                                      prefix + "foreground", prefix + "font");
     LookAndFeel.installBorder(b, prefix + "border");
+    if (b.getMargin() == null || b.getMargin() instanceof UIResource)
     b.setMargin(UIManager.getInsets(prefix + "margin"));
     b.setIconTextGap(UIManager.getInt(prefix + "textIconGap"));
     b.setInputMap(JComponent.WHEN_FOCUSED, 
@@ -173,8 +174,10 @@ public class BasicButtonUI extends ButtonUI
       b.setFont(null);
     b.setForeground(null);
     b.setBackground(null);
+    if (b.getBorder() instanceof UIResource)
     b.setBorder(null);
     b.setIconTextGap(defaultTextIconGap);
+    if (b.getMargin() instanceof UIResource)
     b.setMargin(null);
   }
 

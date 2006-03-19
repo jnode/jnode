@@ -38,10 +38,16 @@ exception statement from your version. */
 
 package javax.swing.plaf.basic;
 
+import java.awt.AWTEvent;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Toolkit;
+import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -59,6 +65,7 @@ import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.KeyStroke;
 import javax.swing.LookAndFeel;
+import javax.swing.MenuSelectionManager;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
@@ -77,6 +84,53 @@ import javax.swing.plaf.InsetsUIResource;
 public abstract class BasicLookAndFeel extends LookAndFeel
   implements Serializable
 {
+
+  /**
+   * Helps closing menu popups when the user clicks outside of any menu area.
+   * This is implemented as an AWTEventListener that listens on the event
+   * queue directly, grabs all mouse events from there and finds out of they
+   * are targetted at a menu/submenu/menubar or not. If not,
+   * the MenuSelectionManager is messaged to close the currently opened menus,
+   * if any.
+   * 
+   * @author Roman Kennke (kennke@aicas.com)
+   */
+  private class PopupHelper implements AWTEventListener
+  {
+
+    /**
+     * Receives an event from the event queue.
+     *
+     * @param event
+     */
+    public void eventDispatched(AWTEvent event)
+    {
+      if (event instanceof MouseEvent)
+        {
+          MouseEvent mouseEvent = (MouseEvent) event;
+          if (mouseEvent.getID() == MouseEvent.MOUSE_PRESSED)
+            mousePressed(mouseEvent);
+        }
+    }
+
+    /**
+     * Handles mouse pressed events from the event queue.
+     *
+     * @param ev the mouse pressed event
+     */
+    private void mousePressed(MouseEvent ev)
+    {
+      // Autoclose all menus managed by the MenuSelectionManager.
+      MenuSelectionManager m = MenuSelectionManager.defaultManager();
+      Component target = ev.getComponent();
+      if (target instanceof Container)
+        target = ((Container) target).findComponentAt(ev.getPoint());
+      if (! m.isComponentPartOfCurrentMenu(target))
+        m.clearSelectedPath();
+    }
+
+  }
+
   /**
    * An action that can play an audio file.
    *
@@ -136,6 +190,11 @@ public abstract class BasicLookAndFeel extends LookAndFeel
   }
 
   static final long serialVersionUID = -6096995660290287879L;
+
+  /**
+   * Helps closing menu popups when user clicks outside of the menu area.
+   */
+  private transient PopupHelper popupHelper;
 
   private ActionMap audioActionMap;
 
@@ -1522,4 +1581,23 @@ public abstract class BasicLookAndFeel extends LookAndFeel
       }
   }
 
+  /**
+   * Initializes the Look and Feel.
+   */
+  public void initialize()
+  {
+    Toolkit toolkit = Toolkit.getDefaultToolkit();
+    popupHelper = new PopupHelper();
+    toolkit.addAWTEventListener(popupHelper, AWTEvent.MOUSE_EVENT_MASK);
+  }
+
+  /**
+   * Uninitializes the Look and Feel.
+   */
+  public void uninitialize()
+  {
+    Toolkit toolkit = Toolkit.getDefaultToolkit();
+    toolkit.removeAWTEventListener(popupHelper);
+    popupHelper = null;
+  }
 }

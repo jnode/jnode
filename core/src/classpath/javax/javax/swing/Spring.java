@@ -37,6 +37,9 @@ exception statement from your version. */
 
 package javax.swing;
 
+import java.awt.Component;
+import java.awt.Dimension;
+
 /**
  * Calculates the space between component edges, that are layed out by
  * {@link SpringLayout}.
@@ -57,7 +60,7 @@ public abstract class Spring
 {
 
   /** Indicates a not-set value. **/
-  public static final int UNSET = -2147483648;
+  public static final int UNSET = Integer.MIN_VALUE;
 
   /**
    * Creates a new Spring object. This constructor is used by the static
@@ -153,6 +156,33 @@ public abstract class Spring
    */
   public abstract void setValue(int value);
 
+  private int getShrinkRange() 
+  {
+    return (getPreferredValue() - getMinimumValue());
+  }
+
+  private int getExpandRange() 
+  {
+    return (getMaximumValue() - getPreferredValue());
+  }
+
+  double getStrain()
+  {
+    int v = getValue();
+    int p = getPreferredValue();
+    int r = (v < p) ? getShrinkRange() : getExpandRange();
+    if (r == 0)
+      r = 1;
+    return (double)(v - p) / r;
+  }
+
+  void setStrain(double strain) 
+  {
+    int r = (strain < 0) ? getShrinkRange() : getExpandRange();
+    int v = (getPreferredValue() + (int)(strain * r));
+    setValue(v);
+  }
+
   /**
    * Creates and returns a Spring, which is always the sum of s1 and s2.
    * min_sum = min_s1 + min_s2, pref_sum = pref_s1 + pref_s2, max_sum =
@@ -165,6 +195,139 @@ public abstract class Spring
   public static Spring sum(Spring s1, Spring s2)
   {
     return new AddSpring(s1, s2);
+  }
+
+  /**
+   * Return a new Spring which computes its values by scaling
+   * the values of another spring by a constant factor.  If the
+   * factor is negative, the minimum and maximum values of
+   * the argument spring will be interchanged.
+   * @param spring the spring to track
+   * @param factor the factor by which to scale
+   * @return a new multiplicative Spring
+   * @since 1.5
+   */
+  public static Spring scale(final Spring spring, final float factor)
+  {
+    if (spring == null)
+      throw new NullPointerException("spring argument is null");
+    return new Spring()
+    {
+      public int getMaximumValue()
+      {
+        return (int) ((factor < 0 ? spring.getMinimumValue()
+                            : spring.getMaximumValue())
+                      * factor);
+      }
+
+      public int getMinimumValue()
+      {
+        return (int) ((factor < 0 ? spring.getMaximumValue()
+                                  : spring.getMinimumValue())
+                            * factor);
+      }
+
+      public int getPreferredValue()
+      {
+        return (int) (spring.getPreferredValue() * factor);
+      }
+
+      public int getValue()
+      {
+        return (int) (spring.getValue() * factor);
+      }
+
+      public void setValue(int value)
+      {
+        spring.setValue((int) (value / factor));
+      }
+    };
+  }
+
+  /**
+   * Return a new Spring which takes its values from the specified
+   * Component.  In particular, the maximum value is taken from
+   * the maximumSize, the minimum value is taken from the minimumSize,
+   * the preferred value is taken from the preferredSize, and the
+   * value is taken from the component's current size.  These values
+   * change as the component changes size.
+   * @param component the component
+   * @return a new Spring which tracks the component's width
+   * @since 1.5
+   */
+  public static Spring width(final Component component)
+  {
+    return new Spring()
+    {
+      public int getMaximumValue()
+      {
+        return component.getMaximumSize().width;
+      }
+
+      public int getMinimumValue()
+      {
+        return component.getMinimumSize().width;
+      }
+
+      public int getPreferredValue()
+      {
+        return component.getPreferredSize().width;
+      }
+
+      public int getValue()
+      {
+        return component.getSize().width;
+      }
+
+      public void setValue(int value)
+      {
+        Dimension d = component.getSize();
+        component.setSize(value, d.height);
+      }
+    };
+  }
+
+  /**
+   * Return a new Spring which takes its values from the specified
+   * Component.  In particular, the maximum value is taken from
+   * the maximumSize, the minimum value is taken from the minimumSize,
+   * the preferred value is taken from the preferredSize, and the
+   * value is taken from the component's current size.  These values
+   * change as the component changes size.
+   * @param component the component
+   * @return a new Spring which tracks the component's height
+   * @since 1.5
+   */
+  public static Spring height(final Component component)
+  {
+    return new Spring()
+    {
+      public int getMaximumValue()
+      {
+        return component.getMaximumSize().height;
+      }
+
+      public int getMinimumValue()
+      {
+        return component.getMinimumSize().height;
+      }
+
+      public int getPreferredValue()
+      {
+        return component.getPreferredSize().height;
+      }
+
+      public int getValue()
+      {
+        return component.getSize().height;
+      }
+
+      public void setValue(int value)
+      {
+        Dimension d = component.getSize();
+        component.setSize(d.width, value);
+      }
+    };
   }
 
   /**
@@ -187,6 +350,11 @@ public abstract class Spring
     /** The actual value of the spring. */
     private int value;
 
+    public String toString()
+    {
+      return "SimpleSpring of " + value;
+    }
+
     /**
      * Creates a new SimpleSpring object.
      *
@@ -199,7 +367,7 @@ public abstract class Spring
       min = newMin;
       pref = newPref;
       max = newMax;
-      value = Spring.UNSET;
+      value = newPref;
     }
 
     /**
@@ -239,12 +407,8 @@ public abstract class Spring
      */
     public int getValue()
     {
-
       if (value == Spring.UNSET)
-        {
-          value = pref;
-        }
-	    
+          return pref;
       return value;
     }
 	
@@ -255,22 +419,9 @@ public abstract class Spring
      */
     public void setValue(int val)
     {
-
-      if (val > max)
-        {
-          value = max;
-	}
-      else if (val < min)
-        {
-          value = min;
-	}
-      else
-        {
           value = val;
         }
     }
-
-  }
 
 
   /**
@@ -287,6 +438,11 @@ public abstract class Spring
 
     /** The current value for this Spring. */
     private int value;
+
+    public String toString()
+    {
+      return "AddSpring of " + s1 + " and " + s2;
+    }
 
     /**
      * Creates a new AddSpring object.
@@ -361,20 +517,24 @@ public abstract class Spring
      */
     public void setValue(int val)
     {
-
-      if (val > getMaximumValue())
+      if (val == Spring.UNSET)
         {
-          value = getMaximumValue();
+        if (value != Spring.UNSET)
+        {
+          s1.setValue(Spring.UNSET);
+          s2.setValue(Spring.UNSET);
         }
-      else if (val < getMinimumValue())
-        {
-          value = getMinimumValue();
-        }
-      else
-        {
-          value = val;
+        value = Spring.UNSET;
+        return;
         }
 
+      value = val;
+
+      //Spead the value over the two components
+      double fStrain = getStrain();
+      s1.setStrain(fStrain);
+      int remainder = val - s1.getValue();
+      s2.setValue(remainder);
     }
 	
   }
@@ -391,8 +551,10 @@ public abstract class Spring
     /** The Spring from which to calculate the negation. */
     private final Spring s;
 
-    /** The current value of this Spring. */
-    private int value;
+    public String toString()
+    {
+      return "MinusSpring of " + s;
+    }
 
     /**
      * Creates a new MinusSpring object.
@@ -402,7 +564,6 @@ public abstract class Spring
     {
       super();
       this.s = s;
-      value = Spring.UNSET;
     }
 
     /** Returns the maximum value of this Spring.
@@ -441,11 +602,7 @@ public abstract class Spring
      */
     public int getValue()
     {
-      if (value == Spring.UNSET)
-        {
-	  value = -s.getValue();
-	}
-      return value;
+      return -s.getValue();
     }
 
     /**
@@ -455,22 +612,11 @@ public abstract class Spring
      */
     public void setValue(int val)
     {
-    
-      if (val > getMaximumValue())
-        {
-          value = getMaximumValue();
-	}
-      else if (val < getMinimumValue())
-	{
-          value = getMinimumValue();
-        }
+      if (val == Spring.UNSET)
+        s.setValue(Spring.UNSET);
       else
-	{
-	  value = val;
+        s.setValue(-val);
         }
-
-    }
-
   }
 
 
@@ -485,6 +631,11 @@ public abstract class Spring
     /** The two other Springs from which to calculate the maximum. */
     private final Spring s1;
     private final Spring s2;
+
+    public String toString()
+    {
+      return "MaxSpring of " + s1 + " and " + s2;
+    }
 
     /** The current value of this Spring. */
     private int value;
@@ -563,18 +714,31 @@ public abstract class Spring
      */
     public void setValue(int val)
     {
-
-      if (val > getMaximumValue())
+      if (val == Spring.UNSET)
+      {
+        if (value != Spring.UNSET)
         {
-          value = getMaximumValue();
+          s1.setValue(Spring.UNSET);
+          s2.setValue(Spring.UNSET);
 	}
-      else if (val < getMinimumValue())
+        value = Spring.UNSET;
+        return;
+      }
+
+      value = val;
+
+      int p1 = s1.getPreferredValue();
+      int p2 = s2.getPreferredValue();
+
+      if (p1 < p2)
         {
-          value = getMinimumValue();
+        s1.setValue(Math.min(val, p1));
+        s2.setValue(val);
         }
       else
         {
-          value = val;
+        s1.setValue(val);
+        s2.setValue(Math.min(val, p2));
         }
     }
   }

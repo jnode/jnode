@@ -115,6 +115,8 @@ public class BasicTableUI extends TableUI
 
     /**
      * Receives notification that a key has been pressed and released.
+     * Activates the editing session for the focused cell by pressing the
+     * character keys.
      *
      * @param event the key event
      */
@@ -122,6 +124,16 @@ public class BasicTableUI extends TableUI
     {
       // Key events should be handled through the InputMap/ActionMap mechanism
       // since JDK1.3. This class is only there for backwards compatibility.
+      
+      // Editor activation is a specific kind of response to ''any''
+      // character key. Hence it is handled here.
+      if (!table.isEditing() && table.isEnabled())
+        {
+          int r = table.getSelectedRow();
+          int c = table.getSelectedColumn();
+          if (table.isCellEditable(r, c))
+            table.editCellAt(r, c);
+        }
     }
 
     /**

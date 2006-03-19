@@ -1,5 +1,5 @@
 /* SwingUtilities.java --
-   Copyright (C) 2002, 2004, 2005  Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2005, 2006,  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -91,23 +91,23 @@ public class SwingUtilities
    * of the <em>component's</em> coordinate system, where (0,0) is the
    * upper left corner of the component's bounds.
    *
-   * @param c The component to measure the bounds of
-   * @param r A Rectangle to store the return value in, or
-   * <code>null</code>
+   * @param c  the component to measure the bounds of (if <code>null</code>, 
+   *     this method returns <code>null</code>).
+   * @param r  a carrier to store the return value in (if <code>null</code>, a
+   *     new <code>Rectangle</code> instance is created).
    *
-   * @return The calculated area inside the component and its border
-   * insets
+   * @return The calculated area inside the component and its border insets.
    */
   public static Rectangle calculateInnerArea(JComponent c, Rectangle r)
   {
-    Rectangle b = getLocalBounds(c);
-    if (r == null)
-      r = new Rectangle();
+    if (c == null)
+      return null;
+    r = c.getBounds(r);
     Insets i = c.getInsets();
-    r.x = b.x + i.left;
-    r.width = b.width - i.left - i.right;
-    r.y = b.y + i.top;
-    r.height = b.height - i.top - i.bottom;
+    r.x = i.left;
+    r.width = r.width - i.left - i.right;
+    r.y = i.top;
+    r.height = r.height - i.top - i.bottom;
     return r;
   }
 
@@ -600,20 +600,46 @@ public class SwingUtilities
    */
   public static void updateComponentTreeUI(Component comp)
   {
-    if (comp == null)
-      return;
-    
-    if (comp instanceof Container)
+    updateComponentTreeUIImpl(comp);
+    if (comp instanceof JComponent)
       {
-        Component[] children = ((Container)comp).getComponents();
-        for (int i = 0; i < children.length; ++i)
-          updateComponentTreeUI(children[i]);
+        JComponent jc = (JComponent) comp;
+        jc.revalidate();
+      }
+    else
+      {
+        comp.invalidate();
+        comp.validate();
+      }
+    comp.repaint();
       }
 
-    if (comp instanceof JComponent)
-      ((JComponent)comp).updateUI();
+  /**
+   * Performs the actual work for {@link #updateComponentTreeUI(Component)}.
+   * This calls updateUI() on c if it is a JComponent, and then walks down
+   * the component tree and calls this method on each child component.
+   *
+   * @param c the component to update the UI
+   */
+  private static void updateComponentTreeUIImpl(Component c)
+  {
+    if (c instanceof JComponent)
+      {
+        JComponent jc = (JComponent) c;
+        jc.updateUI();
   }
 
+    Component[] components = null;
+    if (c instanceof JMenu)
+      components = ((JMenu) c).getMenuComponents();
+    else if (c instanceof Container)
+      components = ((Container) c).getComponents();
+    if (components != null)
+      {
+        for (int i = 0; i < components.length; ++i)
+          updateComponentTreeUIImpl(components[i]);
+      }
+  }
 
   /**
    * <p>Layout a "compound label" consisting of a text string and an icon
@@ -1128,6 +1154,8 @@ public class SwingUtilities
             child = parent;
             parent = child.getParent();
           }
+        // Sanity check to avoid loops.
+        if (child != uiActionMap)
           child.setParent(uiActionMap);
       }
   }
@@ -1170,6 +1198,8 @@ public class SwingUtilities
             child = parent;
             parent = parent.getParent();
           }
+        // Sanity check to avoid loops.
+        if (child != uiInputMap)
           child.setParent(uiInputMap);
       }
   }
@@ -1247,26 +1277,31 @@ public class SwingUtilities
   }
 
   /**
-   * Calculates the intersection of two rectangles.
+   * Calculates the intersection of two rectangles. The result is stored
+   * in <code>rect</code>. This is basically the same
+   * like {@link Rectangle#intersection(Rectangle)}, only that it does not
+   * create new Rectangle instances. The tradeoff is that you loose any data in
+   * <code>rect</code>.
    *
    * @param x upper-left x coodinate of first rectangle
    * @param y upper-left y coodinate of first rectangle
    * @param w width of first rectangle
    * @param h height of first rectangle
    * @param rect a Rectangle object of the second rectangle
-   * @throws NullPointerException if rect is null.
+   *
+   * @throws NullPointerException if rect is null
    *
    * @return a rectangle corresponding to the intersection of the
-   * two rectangles. A zero rectangle is returned if the rectangles
-   * do not overlap.
+   *         two rectangles. An empty rectangle is returned if the rectangles
+   *         do not overlap
    */
   public static Rectangle computeIntersection(int x, int y, int w, int h,
                                               Rectangle rect)
   {
-    int x2 = (int) rect.getX();
-    int y2 = (int) rect.getY();
-    int w2 = (int) rect.getWidth();
-    int h2 = (int) rect.getHeight();
+    int x2 = (int) rect.x;
+    int y2 = (int) rect.y;
+    int w2 = (int) rect.width;
+    int h2 = (int) rect.height;
 
     int dx = (x > x2) ? x : x2;
     int dy = (y > y2) ? y : y2;
@@ -1274,9 +1309,11 @@ public class SwingUtilities
     int dh = (y + h < y2 + h2) ? (y + h - dy) : (y2 + h2 - dy);
 
     if (dw >= 0 && dh >= 0)
-      return new Rectangle(dx, dy, dw, dh);
+      rect.setBounds(dx, dy, dw, dh);
+    else
+      rect.setBounds(0, 0, 0, 0);
 
-    return new Rectangle(0, 0, 0, 0);
+    return rect;
   }
   
   /**
@@ -1293,26 +1330,31 @@ public class SwingUtilities
   }
 
   /**
-   * Calculates the union of two rectangles.
+   * Calculates the union of two rectangles. The result is stored in
+   * <code>rect</code>. This is basically the same as
+   * {@link Rectangle#union(Rectangle)} except that it avoids creation of new
+   * Rectangle objects. The tradeoff is that you loose any data in
+   * <code>rect</code>.
    *
    * @param x upper-left x coodinate of first rectangle
    * @param y upper-left y coodinate of first rectangle
    * @param w width of first rectangle
    * @param h height of first rectangle
    * @param rect a Rectangle object of the second rectangle
-   * @throws NullPointerException if rect is null.
+   *
+   * @throws NullPointerException if rect is null
    *
    * @return a rectangle corresponding to the union of the
-   * two rectangles. A rectangle encompassing both is returned if the
-   * rectangles do not overlap.
+   *         two rectangles; a rectangle encompassing both is returned if the
+   *         rectangles do not overlap
    */
   public static Rectangle computeUnion(int x, int y, int w, int h,
                                        Rectangle rect)
   {
-    int x2 = (int) rect.getX();
-    int y2 = (int) rect.getY();
-    int w2 = (int) rect.getWidth();
-    int h2 = (int) rect.getHeight();
+    int x2 = (int) rect.x;
+    int y2 = (int) rect.y;
+    int w2 = (int) rect.width;
+    int h2 = (int) rect.height;
 
     int dx = (x < x2) ? x : x2;
     int dy = (y < y2) ? y : y2;
@@ -1320,9 +1362,10 @@ public class SwingUtilities
     int dh = (y + h > y2 + h2) ? (y + h - dy) : (y2 + h2 - dy);
 
     if (dw >= 0 && dh >= 0)
-      return new Rectangle(dx, dy, dw, dh);
-
-    return new Rectangle(0, 0, 0, 0);
+      rect.setBounds(dx, dy, dw, dh);
+    else
+      rect.setBounds(0, 0, 0, 0);
+    return rect;
   }
 
   /**

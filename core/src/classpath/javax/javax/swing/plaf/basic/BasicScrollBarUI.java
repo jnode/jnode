@@ -383,7 +383,7 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
      *
      * @return Whether the thumb should keep scrolling.
      */
-    public boolean shouldScroll(int direction)
+    boolean shouldScroll(int direction)
     {
       int value;
       if (scrollbar.getOrientation() == HORIZONTAL)
@@ -655,16 +655,14 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
       {
 	width += incrButton.getPreferredSize().getWidth();
 	width += decrButton.getPreferredSize().getWidth();
-
-	width += (scrollbar.getMaximum() - scrollbar.getMinimum());
+        width += 16;
 	height = UIManager.getInt("ScrollBar.width");
       }
     else
       {
 	height += incrButton.getPreferredSize().getHeight();
 	height += decrButton.getPreferredSize().getHeight();
-
-	height += (scrollbar.getMaximum() - scrollbar.getMinimum());
+        height += 16;
 	width = UIManager.getInt("ScrollBar.width");
       }
 
@@ -721,18 +719,6 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
    */
   protected void installComponents()
   {
-    if (incrButton != null)
-      scrollbar.add(incrButton);
-    if (decrButton != null)
-      scrollbar.add(decrButton);
-  }
-
-  /**
-   * This method installs the defaults for the scrollbar specified by the
-   * Basic Look and Feel.
-   */
-  protected void installDefaults()
-  {
     int orientation = scrollbar.getOrientation();
     switch (orientation)
       {
@@ -746,6 +732,18 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
         break;
       }
 
+    if (incrButton != null)
+      scrollbar.add(incrButton);
+    if (decrButton != null)
+      scrollbar.add(decrButton);
+  }
+
+  /**
+   * This method installs the defaults for the scrollbar specified by the
+   * Basic Look and Feel.
+   */
+  protected void installDefaults()
+  {
     LookAndFeel.installColors(scrollbar, "ScrollBar.background",
                               "ScrollBar.foreground");
     LookAndFeel.installBorder(scrollbar, "ScrollBar.border");

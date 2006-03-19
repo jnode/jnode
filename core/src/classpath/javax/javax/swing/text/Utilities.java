@@ -100,7 +100,9 @@ public class Utilities
     int pos = s.offset;
     int len = 0;
 
-    for (int offset = s.offset; offset < (s.offset + s.count); ++offset)
+    int end = s.offset + s.count;
+
+    for (int offset = s.offset; offset < end; ++offset)
       {
         char c = buffer[offset];
         if (c == '\t' || c == '\n')
@@ -140,7 +142,7 @@ public class Utilities
     if (len > 0)
       g.drawChars(buffer, pos, len, pixelX, pixelY + ascent);            
     
-    return pixelX;
+    return pixelX + pixelWidth;
   }
 
   /**

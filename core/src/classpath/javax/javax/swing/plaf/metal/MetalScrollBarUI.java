@@ -41,6 +41,7 @@ package javax.swing.plaf.metal;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Insets;
 import java.awt.Rectangle;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -48,6 +49,7 @@ import java.beans.PropertyChangeListener;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JScrollBar;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicScrollBarUI;
@@ -347,10 +349,15 @@ public class MetalScrollBarUI extends BasicScrollBarUI
     else 
       paintThumbVertical(g, c, thumbBounds);
 
-    // draw the pattern
+    // Draw the pattern when the theme is not Ocean.
+    if (! (MetalLookAndFeel.getCurrentTheme() instanceof OceanTheme))
+      {
     MetalUtils.fillMetalPattern(c, g, thumbBounds.x + 3, thumbBounds.y + 3,
-            thumbBounds.width - 6, thumbBounds.height - 6,
-            thumbHighlightColor, thumbLightShadowColor);
+                                    thumbBounds.width - 6,
+                                    thumbBounds.height - 6,
+                                    thumbHighlightColor,
+                                    thumbLightShadowColor);
+      }
   }
 
   /**
@@ -368,12 +375,23 @@ public class MetalScrollBarUI extends BasicScrollBarUI
     int w = thumbBounds.width;
     int h = thumbBounds.height;
     
-    // first we fill the background
+    // First we fill the background.
+    MetalTheme theme = MetalLookAndFeel.getCurrentTheme();
+    if (theme instanceof OceanTheme
+        && UIManager.get("ScrollBar.gradient") != null)
+      {
+        MetalUtils.paintGradient(g, x + 2, y + 2, w - 4, h - 2,
+                                 SwingConstants.VERTICAL,
+                                 "ScrollBar.gradient");
+      }
+    else
+      {
     g.setColor(thumbColor);
     if (isFreeStanding)
       g.fillRect(x, y, w, h - 1);
     else
       g.fillRect(x, y, w, h);
+      }
     
     // then draw the dark box
     g.setColor(thumbLightShadowColor);
@@ -403,6 +421,19 @@ public class MetalScrollBarUI extends BasicScrollBarUI
     g.setColor(UIManager.getColor("ScrollBar.shadow"));
     g.drawLine(x + w, y + 1, x + w, y + h - 1);
 
+    // For the OceanTheme, draw the 3 lines in the middle.
+    if (theme instanceof OceanTheme)
+      {
+        g.setColor(thumbLightShadowColor);
+        int middle = x + w / 2;
+        g.drawLine(middle - 2, y + 4, middle - 2, y + h - 5);
+        g.drawLine(middle, y + 4, middle, y + h - 5);
+        g.drawLine(middle + 2, y + 4, middle + 2, y + h - 5);
+        g.setColor(UIManager.getColor("ScrollBar.highlight"));
+        g.drawLine(middle - 1, y + 5, middle - 1, y + h - 4);
+        g.drawLine(middle + 1, y + 5, middle + 1, y + h - 4);
+        g.drawLine(middle + 3, y + 5, middle + 3, y + h - 4);
+      }
   }
 
   /**
@@ -420,12 +451,23 @@ public class MetalScrollBarUI extends BasicScrollBarUI
     int w = thumbBounds.width;
     int h = thumbBounds.height;
     
-    // first we fill the background
+    // First we fill the background.
+    MetalTheme theme = MetalLookAndFeel.getCurrentTheme();
+    if (theme instanceof OceanTheme
+        && UIManager.get("ScrollBar.gradient") != null)
+      {
+        MetalUtils.paintGradient(g, x + 2, y + 2, w - 2, h - 4,
+                                 SwingConstants.HORIZONTAL,
+                                 "ScrollBar.gradient");
+      }
+    else
+      {
     g.setColor(thumbColor);
     if (isFreeStanding)
       g.fillRect(x, y, w - 1, h);
     else
       g.fillRect(x, y, w, h);
+      }
      
     // then draw the dark box
     g.setColor(thumbLightShadowColor);
@@ -454,6 +496,20 @@ public class MetalScrollBarUI extends BasicScrollBarUI
     // draw the shadow line
     g.setColor(UIManager.getColor("ScrollBar.shadow"));
     g.drawLine(x + 1, y + h, x + w - 2, y + h);
+
+    // For the OceanTheme, draw the 3 lines in the middle.
+    if (theme instanceof OceanTheme)
+      {
+        g.setColor(thumbLightShadowColor);
+        int middle = y + h / 2;
+        g.drawLine(x + 4, middle - 2, x + w - 5, middle - 2);
+        g.drawLine(x + 4, middle, x + w - 5, middle);
+        g.drawLine(x + 4, middle + 2, x + w - 5, middle + 2);
+        g.setColor(UIManager.getColor("ScrollBar.highlight"));
+        g.drawLine(x + 5, middle - 1, x + w - 4, middle - 1);
+        g.drawLine(x + 5, middle + 1, x + w - 4, middle + 1);
+        g.drawLine(x + 5, middle + 3, x + w - 4, middle + 3);
+      }
   }
   
   /**
@@ -465,11 +521,60 @@ public class MetalScrollBarUI extends BasicScrollBarUI
    */
   protected Dimension getMinimumThumbSize()
   {
+    Dimension retVal;
+    if (scrollbar != null)
+      {
     if (isFreeStanding)
-      return MIN_THUMB_SIZE_FREE_STANDING;
+          retVal = MIN_THUMB_SIZE_FREE_STANDING;
     else
-    return MIN_THUMB_SIZE;
+          retVal = MIN_THUMB_SIZE;
   }
+    else
+      retVal = new Dimension(0, 0);
+    return retVal;
+  }
+
+  /**
+   * Returns the <code>preferredSize</code> for the specified scroll bar.
+   * For a vertical scrollbar the height is the sum of the preferred heights
+   * of the buttons plus <code>30</code>. The width is fetched from the
+   * <code>UIManager</code> property <code>ScrollBar.width</code>.
+   *
+   * For horizontal scrollbars the width is the sum of the preferred widths
+   * of the buttons plus <code>30</code>. The height is fetched from the
+   * <code>UIManager</code> property <code>ScrollBar.height</code>.
+   *
+   * @param c the scrollbar for which to calculate the preferred size
+   *
+   * @return the <code>preferredSize</code> for the specified scroll bar
+   */
+  public Dimension getPreferredSize(JComponent c)
+  {
+    int height;
+    int width;
+    height = width = 0;
   
+    if (scrollbar.getOrientation() == SwingConstants.HORIZONTAL)
+      {
+        width += incrButton.getPreferredSize().getWidth();
+        width += decrButton.getPreferredSize().getWidth();
+        width += 30;
+        height = UIManager.getInt("ScrollBar.width");
+      }
+    else
+      {
+        height += incrButton.getPreferredSize().getHeight();
+        height += decrButton.getPreferredSize().getHeight();
+        height += 30;
+        width = UIManager.getInt("ScrollBar.width");
+      }
+
+    Insets insets = scrollbar.getInsets();
+
+    height += insets.top + insets.bottom;
+    width += insets.left + insets.right;
+
+    return new Dimension(width, height);
+  } 
 }
 

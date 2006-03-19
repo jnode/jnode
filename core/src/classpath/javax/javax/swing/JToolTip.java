@@ -194,7 +194,5 @@ public class JToolTip extends JComponent implements Accessible
   public void updateUI()
   {
     setUI((ToolTipUI) UIManager.getUI(this));
-    revalidate();
-    repaint();
   }
 }

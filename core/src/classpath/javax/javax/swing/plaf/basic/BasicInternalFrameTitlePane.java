@@ -307,7 +307,7 @@ public class BasicInternalFrameTitlePane extends JComponent
 	  else
 	    closeButton.setVisible(false);
 	}
-      else if (propName.equals("iconifiable"))
+      else if (propName.equals("iconable"))
 	{
 	  if (evt.getNewValue().equals(Boolean.TRUE))
 	    iconButton.setVisible(true);
@@ -321,7 +321,7 @@ public class BasicInternalFrameTitlePane extends JComponent
 	  else
 	    maxButton.setVisible(false);
 	}
-	
+      enableActions();
     }
   }
 
@@ -340,7 +340,7 @@ public class BasicInternalFrameTitlePane extends JComponent
      *
      * @return True if this Component can receive focus.
      */
-    public boolean isFocusTransversable()
+    public boolean isFocusTraversable()
     {
       return true;
     }
