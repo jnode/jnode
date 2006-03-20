@@ -32,77 +32,41 @@ import org.jnode.util.NumberUtils;
  * @author flesire
  */
 public class EEPRO100Buffer implements EEPRO100Constants {
-
-	// --- Constants
+	//--- Constants
 	private static final int FRAME_SIZE = EthernetConstants.ETH_FRAME_LEN;
-	
-	private final static int PKT_BUF_SZ = 1536;
-
-	// static final public int RX_NR_FRAME = 32;
-	private final static int DATA_BUFFER_SIZE = 1536;
-
-	private final static int PacketReceived = 0xc000;
-	/** Logger */
+	private static final int PKT_BUF_SZ = 1536;
+	private static final int DATA_BUFFER_SIZE = 1536;
+	private static final int PacketReceived = 0xc000;
+	//---
 	protected final Logger log = Logger.getLogger(getClass());
-	/** Resource manager */
 	private ResourceManager rm;
-	/** registers */
 	private EEPRO100Registers regs;
-	
 	private EEPRO100RxFD rxPacket;
 	private EEPRO100TxFD txFD;
-	
-	
 	// --- Rx Variables
 	private int rxMode;
-
 	private int curRx;
-
 	private int dirtyRx;
-
 	public EEPRO100RxFD[] rxRing = new EEPRO100RxFD[RX_RING_SIZE];
-
 	private EEPRO100RxFD[] rxPackets = new EEPRO100RxFD[128];
-
 	private int rx_packets;
-
 	private int rxErrors;
-
 	private EEPRO100RxFD last_rxf;
-
 	private int rxPacketIndex;
-
 	private int lastRxTime;
-
 	// --- Tx Variables
 	private int txThreshold = 0x01200000;
-
 	private int curTx;
-
 	private int dirtyTx;
-
 	public EEPRO100TxFD[] txRing = new EEPRO100TxFD[TX_RING_SIZE];
-
 	private EEPRO100TxFD lastCmd;
-
 	private int lastCmdTime;
-
 	// --- Others variables
-	
+	private int jiffies;
 
-	
-
-	
-
-	int jiffies;
-
-	/**
-	 *  
-	 */
 	public EEPRO100Buffer(EEPRO100Registers regs, ResourceManager rm) {
 		this.regs = regs;
 		this.rm = rm;
-		/* Set up the Tx queue early.. */
 		curTx = 0;
 		dirtyTx = 0;
 	}
@@ -147,8 +111,9 @@ public class EEPRO100Buffer implements EEPRO100Constants {
 		txFD = new EEPRO100TxFD(rm);
 		txFD.setCommand(CmdIASetup);
 		txFD.setStatus(0x0000);
-		//txFD.setLink();
-		//txFD.setDescriptorAddress();
+		txFD.setCount(0x02208000);
+		txFD.setLink(txFD.getFirstDPDAddress().toInt());
+		txFD.setDescriptorAddress(txFD.getBufferAddress());
 	}
 
 	/**
@@ -216,49 +181,28 @@ public class EEPRO100Buffer implements EEPRO100Constants {
 	 *  
 	 */
 	public void txProcess() {
-		/*
-		 * Caution: the write order is important here, set the base address with
-		 * the "ownership" bits last.
-		 */
 
-		/* Prevent interrupts from changing the Tx ring from underneath us. */
+		// Caution: the write order is important here, set the base address with
+		// the "ownership" bits last.
+
+		// Prevent interrupts from changing the Tx ring from underneath us.
 		int flags;
-
 		/* Calculate the Tx descriptor entry. */
-		// int mask = CpuControl.maskCPUInterrupts();
 		int txEntry = getCurTx() & TX_RING_SIZE - 1;
-
-		/*
-		 * if (debug > 6) { sb.append("start: ").append(txEntry).append('
-		 * ').append( Integer.toHexString(txRing[txEntry].bufferAddress));
-		 * System.out.println(sb.toString()); sb.setLength(0); }
-		 */
-		/* Todo: be a little more clever about setting the interrupt bit. */
 		txRing[txEntry].setStatus(0);
 		txRing[txEntry].setCommand(CmdSuspend | CmdTx | CmdTxFlex);
 
 		getNextTx();
 		txRing[txEntry].setLink(txRing[getCurTx() & TX_RING_SIZE - 1]
 				.getBufferAddress());
-		/* We may nominally release the lock here. */
-		txRing[txEntry]
-				.setDescriptorAddress(txRing[txEntry].getBufferAddress() + 16);
-		/* The data region is always in one buffer descriptor. */
+		// We may nominally release the lock here.
+		txRing[txEntry].setDescriptorAddress(txRing[txEntry].getBufferAddress() + 16);
+		// The data region is always in one buffer descriptor.
 		txRing[txEntry].setCount(getTxThreshold());
-
-		/*
-		 * Todo: perhaps leave the interrupt bit set if the Tx queue is more
-		 * than half full. Argument against: we should be receiving packets and
-		 * scavenging the queue. Argument for: if so, it shouldn't matter.
-		 */
-
 		EEPRO100TxFD lastCmd0 = lastCmd;
 		lastCmd = txRing[txEntry];
-		// lastCmd0.clearSuspend();
-
 		EEPRO100Utils.waitForCmdDone(regs);
 		regs.setReg8(SCBCmd, CUResume);
-		// trans_start = jiffies;
 	}
 
 	// --- Accessors ---

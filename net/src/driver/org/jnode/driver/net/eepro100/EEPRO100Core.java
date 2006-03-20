@@ -37,7 +37,6 @@ import org.jnode.net.HardwareAddress;
 import org.jnode.net.SocketBuffer;
 import org.jnode.net.ethernet.EthernetAddress;
 import org.jnode.net.ethernet.EthernetConstants;
-import org.jnode.net.ethernet.EthernetHeader;
 import org.jnode.system.IOResource;
 import org.jnode.system.IRQHandler;
 import org.jnode.system.IRQResource;
@@ -50,7 +49,7 @@ import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeoutException;
 
 /**
- * @author flesire
+ * @author Fabien Lesire (galatnm at gmail dot com)
  */
 public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler,
 		EEPRO100Constants, EthernetConstants {
