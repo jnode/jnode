@@ -253,6 +253,12 @@ final class MagicHelper extends BaseX86MagicHelper {
             vstack.push(result);
         }
             break;
+        case SIZE: {
+            if (Vm.VerifyAssertions) Vm._assert(isstatic);
+            final IntItem result = ifac.createIConst(ec, slotSize);
+            vstack.push(result);
+            break;
+        }
         case ISMAX: {
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final WordItem addr = vstack.popRef();

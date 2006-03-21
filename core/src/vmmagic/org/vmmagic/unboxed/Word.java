@@ -55,6 +55,14 @@ public final class Word implements UnboxedObject {
         return new Word(0xFFFFFFFFL & val);
     }
 
+    /**
+     * Size of an address in bytes (typically 4 or 8)
+     * @return
+     */
+    public static int size() {
+        throw new RuntimeException("Not supported at buildtime");
+    }
+
     public static Word zero() {
         return new Word(0);
     }

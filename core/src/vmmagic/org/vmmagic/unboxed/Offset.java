@@ -54,6 +54,14 @@ public final class Offset implements UnboxedObject {
         return new Offset(0xFFFFFFFFL & address);
     }
 
+    /**
+     * Size of an address in bytes (typically 4 or 8)
+     * @return
+     */
+    public static int size() {
+        throw new RuntimeException("Not supported at buildtime");
+    }
+
     public static Offset zero() {
         return new Offset(0);
     }
