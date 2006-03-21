@@ -125,9 +125,6 @@ public final class VmSystem {
             // Initialize VmThread
             VmThread.initialize();
 
-            /* Initialize the monitor system */
-            MonitorManager.initialize();
-
             final Vm vm = Vm.getVm();
 
             // Initialize the monitors for the heap manager

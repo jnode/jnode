@@ -94,16 +94,16 @@ final class HeapHelperImpl extends HeapHelper implements Uninterruptible {
             int newColor) {
         final Address addr = ObjectReference.fromObject(dst).toAddress().add(
                 flagsOffset);
-        int oldValue;
-        int newValue;
-        do {
-            oldValue = addr.prepareInt();
-            if ((oldValue & ObjectFlags.GC_COLOUR_MASK) != oldColor) {
+        for (;;) {
+            Word oldValue = addr.prepareWord();
+            if (oldValue.and(Word.fromIntZeroExtend(ObjectFlags.GC_COLOUR_MASK)).NE(Word.fromIntZeroExtend(oldColor))) {
                 return false;
             }
-            newValue = (oldValue & ~ObjectFlags.GC_COLOUR_MASK) | newColor;
-        } while (!addr.attempt(oldValue, newValue));
-        return true;
+            Word newValue = oldValue.and(Word.fromIntZeroExtend(ObjectFlags.GC_COLOUR_MASK).not()).or(Word.fromIntZeroExtend(newColor));
+            if (addr.attempt(oldValue, newValue)) {
+                return true;
+            }
+        }
     }
 
     /**
@@ -181,7 +181,7 @@ final class HeapHelperImpl extends HeapHelper implements Uninterruptible {
      *      org.jnode.vm.VmArchitecture)
      */
     public final Monitor getInflatedMonitor(Object object, VmArchitecture arch) {
-        return MonitorManager.getInflatedMonitor(object, arch);
+        return MonitorManager.getInflatedMonitor(object);
     }
 
     /**
