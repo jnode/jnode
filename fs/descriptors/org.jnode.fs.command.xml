@@ -31,6 +31,7 @@
     <alias name="mount" class="org.jnode.fs.command.MountCommand"/>
     <alias name="pwd" class="org.jnode.fs.command.PwdCommand"/>
     <alias name="touch" class="org.jnode.fs.command.TouchCommand"/>
+    <alias name="hexdump" class="org.jnode.fs.command.HexdumpCommand"/>
   </extension>
 
   <extension point="org.jnode.security.permissions">
