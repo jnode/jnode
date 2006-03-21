@@ -57,6 +57,14 @@ public final class Extent implements UnboxedObject {
         return new Extent(0xFFFFFFFFL & extent);
     }
 
+    /**
+     * Size of an extent in bytes (typically 4 or 8)
+     * @return
+     */
+    public static int size() {
+        throw new RuntimeException("Not supported at buildtime");
+    }
+
     public static Extent zero() {
         return new Extent(0);
     }

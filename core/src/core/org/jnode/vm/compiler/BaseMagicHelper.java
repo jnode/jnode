@@ -153,6 +153,7 @@ public class BaseMagicHelper {
         LOADWORD_OFS("loadWord", 1, "(Lorg/vmmagic/unboxed/Offset;)Lorg/vmmagic/unboxed/Word;"),
         LOADOBJECTREFERENCE("loadObjectReference", 0, "()Lorg/vmmagic/unboxed/ObjectReference;"),
         LOADOBJECTREFERENCE_OFS("loadObjectReference", 1, "(Lorg/vmmagic/unboxed/Offset;)Lorg/vmmagic/unboxed/ObjectReference;"),
+        SIZE("size"),
         STOREBYTE("store", 1, "(B)V"),
         STOREBYTE_OFS("store", 2, "(BLorg/vmmagic/unboxed/Offset;)V"),
         STORECHAR("store", 1, "(C)V"),

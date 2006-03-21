@@ -70,6 +70,14 @@ public final class Address implements UnboxedObject {
         return new Address(0);
     }
 
+    /**
+     * Size of an address in bytes (typically 4 or 8)
+     * @return
+     */
+    public static int size() {
+        throw new RuntimeException("Not supported at buildtime");
+    }
+
     public static Address max() {
         return new Address(0xFFFFFFFFFFFFFFFFL);
     }
