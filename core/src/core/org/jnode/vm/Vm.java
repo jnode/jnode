@@ -53,7 +53,7 @@ import org.jnode.vm.memmgr.VmHeapManager;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @SharedStatics
-public class Vm extends VmSystemObject implements Statistics {
+public final class Vm extends VmSystemObject implements Statistics {
 
     /** The single instance */
     private static Vm instance;

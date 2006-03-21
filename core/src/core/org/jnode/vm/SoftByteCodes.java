@@ -24,6 +24,7 @@ package org.jnode.vm;
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.annotation.LoadStatics;
 import org.jnode.vm.annotation.PrivilegedActionPragma;
+import org.jnode.vm.annotation.Uninterruptible;
 import org.jnode.vm.classmgr.TIBLayout;
 import org.jnode.vm.classmgr.VmArrayClass;
 import org.jnode.vm.classmgr.VmClassLoader;
@@ -34,7 +35,6 @@ import org.jnode.vm.classmgr.VmField;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.memmgr.VmHeapManager;
-import org.vmmagic.pragma.Uninterruptible;
 import org.vmmagic.pragma.UninterruptiblePragma;
 
 /**
@@ -42,7 +42,8 @@ import org.vmmagic.pragma.UninterruptiblePragma;
  * 
  * @author epr
  */
-public class SoftByteCodes implements Uninterruptible {
+@Uninterruptible
+public final class SoftByteCodes {
 
     public static final int EX_NULLPOINTER = 0;
 
