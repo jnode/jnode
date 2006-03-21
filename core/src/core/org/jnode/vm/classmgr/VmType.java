@@ -25,6 +25,7 @@ import gnu.java.lang.VMClassHelper;
 
 import java.io.Serializable;
 import java.io.Writer;
+import java.lang.isolate.VMIsolate;
 import java.lang.reflect.InvocationTargetException;
 import java.security.ProtectionDomain;
 import java.util.Arrays;
@@ -347,9 +348,10 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 	 * 
 	 * @param bootClasses
 	 */
-    @SuppressWarnings("unchecked") @LoadStatics
+    @SuppressWarnings("unchecked") 
+    @LoadStatics
 	protected static void loadFromBootClassArray(VmType[] bootClasses) {
-		Unsafe.debug("loadFromBootClassArray");
+		Unsafe.debug("[loadFromBootClassArray:");
 		final int count = bootClasses.length;
 		for (int i = 0; i < count; i++) {
 			final VmType<?> vmClass = bootClasses[i];
@@ -402,7 +404,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 				}
 			}
 		}
-        Unsafe.debug('\n');
+        Unsafe.debug("]\n");
 	}
 
 	/**
@@ -633,19 +635,27 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 	 * @param isBuildEnv
 	 * @return The class
 	 */
-    @SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked")
 	private final Class<T> asClass(boolean isBuildEnv) {
-		if (javaClass == null) {
-			if (isBuildEnv) {
-				try {
-					javaClass = Class.forName(getName());
-				} catch (ClassNotFoundException ex) { /* ignore */
-				}
-			} else {
-				javaClass = new Class<T>(this);
-			}
-		}
-		return javaClass;
+	    if (isBuildEnv) {
+	        if (javaClass == null) {
+	            try {
+	                javaClass = Class.forName(getName());
+	            } catch (ClassNotFoundException ex) { /* ignore */
+	                throw new NoClassDefFoundError(getName()); 
+	            }
+	        }
+            return javaClass;
+        } else {
+            if (VMIsolate.isRoot()) {
+                if (javaClass == null) {
+                    javaClass = new Class(this);
+                }
+                return javaClass;
+            } else {
+                return VMIsolate.currentIsolate().getClassForType(this);
+            }
+        }
 	}
 
 	/**
@@ -2014,7 +2024,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 	 */
     @Inline
 	public final void initialize() {
-	    if (!isInitialized()) {
+	    if (!isInitialized() && !isInitializing()) {
             linkAndInitialize();
 		}
 	}
@@ -2037,7 +2047,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 	/**
 	 * Invoke the static initializer of this class.
 	 */
-	private synchronized void doInitialize() {
+	private synchronized final void doInitialize() {
 		if (!isInitialized()) {
 			if (!isInitializing()) {
 				state |= VmTypeState.ST_INITIALIZING;

@@ -44,7 +44,7 @@ public final class OptimizingBytecodeVisitor extends
     private static final int SIZE_LIMIT = 32;
 
     /** Maximum depth of recursive inlining */
-    private static final int MAX_INLINE_DEPTH = 5;
+    private static final int MAX_INLINE_DEPTH = -1;//5;
 
     /** Common method entrypoints */
     private final EntryPoints entryPoints;
@@ -671,6 +671,7 @@ public final class OptimizingBytecodeVisitor extends
      * @see org.jnode.vm.compiler.DelegatingCompilerBytecodeVisitor#visit_monitorenter()
      */
     public void visit_monitorenter() {
+        verifyMonitor();
         inline(entryPoints.getMonitorEnterMethod());
     }
 
@@ -678,6 +679,7 @@ public final class OptimizingBytecodeVisitor extends
      * @see org.jnode.vm.compiler.DelegatingCompilerBytecodeVisitor#visit_monitorexit()
      */
     public void visit_monitorexit() {
+        verifyMonitor();
         inline(entryPoints.getMonitorExitMethod());
     }
 

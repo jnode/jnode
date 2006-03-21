@@ -69,6 +69,26 @@ public class VerifyingCompilerBytecodeVisitor<T extends CompilerBytecodeVisitor>
         verifyInvoke(methodRef);
         super.visit_invokevirtual(methodRef);
     }
+    
+    
+
+    /**
+     * @see org.jnode.vm.compiler.DelegatingCompilerBytecodeVisitor#visit_monitorenter()
+     */
+    @Override
+    public void visit_monitorenter() {
+        verifyMonitor();
+        super.visit_monitorenter();
+    }
+
+    /**
+     * @see org.jnode.vm.compiler.DelegatingCompilerBytecodeVisitor#visit_monitorexit()
+     */
+    @Override
+    public void visit_monitorexit() {
+        verifyMonitor();
+        super.visit_monitorexit();
+    }
 
     /**
      * Verify the invoke of the given method from the current method.
@@ -84,6 +104,20 @@ public class VerifyingCompilerBytecodeVisitor<T extends CompilerBytecodeVisitor>
                 //throw new ClassFormatError("Method '" + currentMethod + "' calls method outside KernelSpace: " + callee);
                 System.out.println("Method '" + currentMethod.getFullName() + "' calls method outside KernelSpace: " + callee.getFullName());
             }
+            if (callee.isSynchronized()) {
+                //throw new ClassFormatError("Method '" + currentMethod + "' calls synchronized method: " + callee);
+                System.out.println("Method '" + currentMethod.getFullName() + "' calls synchronized method: " + callee.getFullName());
+            }
+        }
+    }
+
+    /**
+     * Verify the monitor usage of the current method.
+     */
+    protected final void verifyMonitor() {
+        if (currentKernelSpace) {
+            //throw new ClassFormatError("Method '" + currentMethod + "' uses monitors");
+            System.out.println("Method '" + currentMethod.getFullName() + "' uses monitors");
         }
     }
 }

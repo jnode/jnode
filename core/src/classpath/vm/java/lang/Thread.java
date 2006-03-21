@@ -21,6 +21,7 @@
  
 package java.lang;
 
+import java.lang.isolate.IsolateThread;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -31,6 +32,7 @@ import org.jnode.vm.VmSystem;
 import org.jnode.vm.VmThread;
 import org.jnode.vm.annotation.KernelSpace;
 import org.jnode.vm.annotation.SystemProtected;
+import org.jnode.vm.classmgr.VmIsolatedStatics;
 
 /**
  * Kore implementation of the <code>java.lang.Thread</code> class.
@@ -254,6 +256,37 @@ public class Thread implements Runnable {
 
         this.vmThread = VmProcessor.current().createThread(this);
         this.vmThread.setPriority(current.getPriority());
+        this.vmThread.updateName();
+        
+        InheritableThreadLocal.newChildThread(this); // FDy : CLASSPATH patch ?
+    }
+
+    /**
+     * Create a new instance with a given group as containing group, a runnable
+     * as thread runner and a given name.
+     * 
+     * @param group
+     * @param target
+     * @param name
+     */
+    protected Thread(ThreadGroup group, Runnable target, String name, VmIsolatedStatics isolatedStatics) {
+        if (!(this instanceof IsolateThread)) {
+            throw new SecurityException("Constructor can only be called from IsolateThread");
+        }
+        if (group == null) {
+            throw new InternalError("Isolate thread has invalid group: " + name);
+        }
+
+        group.addThread(this);
+
+        this.group = group;
+        this.target = target;
+        this.name = name;
+        this.parent = null;
+        this.daemon = false;
+
+        this.vmThread = VmProcessor.current().createThread(isolatedStatics, this);
+        this.vmThread.setPriority(this.getPriority());
         this.vmThread.updateName();
         
         InheritableThreadLocal.newChildThread(this); // FDy : CLASSPATH patch ?
