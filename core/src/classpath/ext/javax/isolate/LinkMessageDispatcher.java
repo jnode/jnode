@@ -61,9 +61,9 @@ public final class LinkMessageDispatcher implements Runnable {
      * @see java.lang.Runnable#run()
      */
     public void run() {
-//        while (!shutdown) {
-//            // TODO implement me
-//        }
+        while (!shutdown) {
+            // TODO implement me
+        }
     }
 
 }

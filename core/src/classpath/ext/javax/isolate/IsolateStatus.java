@@ -27,19 +27,25 @@ package javax.isolate;
 public class IsolateStatus {
 
     /**
-     * Defines the types of IsolateEvent the can be generated.
+     * Defines the state of an Isolate.
      * 
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
-    public static enum Type {
-        /** The starting state */
+    public static enum State {
+        /** Isolate is starting */
         STARTING,
 
-        /** The stopping state */
+        /** Isolate is started */
+        STARTED,
+
+        /** Isolate is exiting */
         EXITING,
 
-        /** The terminated state */
-        TERMINATED;
+        /** Isolate has exited */
+        EXITED,
+
+        /** State is not known */
+        UNKNOWN;
     }
 
     /**
@@ -72,10 +78,9 @@ public class IsolateStatus {
         UNCAUGHT_EXCEPTION;
     }
     
-    private final Isolate source;
-    private final Type type;
     private final ExitReason exitReason;
-    private final int exitStatus;
+    private final State state;
+    private final int exitCode;
     
     /**
      * Initialize this instance.
@@ -83,11 +88,10 @@ public class IsolateStatus {
      * @param type
      * @param exitReason
      */
-    IsolateStatus(Isolate source, Type type, ExitReason exitReason, int exitStatus) {
-        this.source = source;
-        this.type = type;
+    IsolateStatus(State state, ExitReason exitReason, int exitCode) {
+        this.state = state;
         this.exitReason = exitReason;
-        this.exitStatus = exitStatus;
+        this.exitCode = exitCode;
     }
     
     /**
@@ -107,34 +111,18 @@ public class IsolateStatus {
     }
     
     /**
-     * Gets the exit status.
+     * Gets the exit code.
      * @return
      */
-    public int getExitStatus() {
-        return exitStatus;
+    public int getExitCode() {
+        return exitCode;
     }
     
     /**
-     * Gets the source of this event.
+     * Gets the state of the isolate.
      * @return
      */
-    public Isolate getIsolate() {
-        return source;
-    }
-    
-    /**
-     * Gets the isolate the started the source isolate.
-     * @return
-     */
-    public Isolate getStarter() {
-        return null;
-    }
-    
-    /**
-     * Gets the type of this event.
-     * @return
-     */
-    public Type getType() {
-        return type;
+    public State getState() {
+        return state;
     }
 }
