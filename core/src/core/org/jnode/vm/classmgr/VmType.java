@@ -25,12 +25,13 @@ import gnu.java.lang.VMClassHelper;
 
 import java.io.Serializable;
 import java.io.Writer;
-import java.lang.isolate.VMIsolate;
 import java.lang.reflect.InvocationTargetException;
 import java.security.ProtectionDomain;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
+
+import javax.isolate.VMIsolate;
 
 import org.jnode.assembler.NativeStream;
 import org.jnode.vm.JvmType;

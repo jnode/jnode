@@ -89,7 +89,7 @@ public final class Isolate {
      * 
      * @return Never null, may be zero length
      */
-    public static IsolateMessage[] currentIsolateStartMessages() {
+    public static LinkMessage[] currentIsolateStartMessages() {
         return VMIsolate.currentIsolate().getIsolateStartMessages();
     }
 
@@ -165,7 +165,7 @@ public final class Isolate {
      * @param messages
      * @throws IsolateStartupException
      */
-    public void start(IsolateMessage[] messages) throws IsolateStartupException {
+    public void start(LinkMessage[] messages) throws IsolateStartupException {
         impl.start(messages);
     }
 }
