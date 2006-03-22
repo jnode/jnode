@@ -32,4 +32,10 @@ public abstract class Link {
      * @return
      */
     public abstract Isolate getReceiver();
+    
+    /**
+     * Returns the isolate that can send on this link.
+     * @return
+     */
+    public abstract Isolate getSender();
 }
