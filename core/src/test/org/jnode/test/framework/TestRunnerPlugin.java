@@ -53,14 +53,13 @@ public class TestRunnerPlugin extends Plugin  {
      * Start this plugin
      */
     protected void startPlugin() throws PluginException {
-    	BootLog.debug("TestRunnerPlugin start");
-    	manager.runTests();
+    	// nothing to do
     }
 
     /**
      * Stop this plugin
      */
     protected void stopPlugin() {
-    	//TODO
+    	// nothing to do
     }
 }
