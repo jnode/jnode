@@ -7,7 +7,8 @@
     license-name="lgpl"
     provider-name="JNode.org"
     auto-start="true"
-    class="org.jnode.test.framework.TestRunnerPlugin">
+    class="org.jnode.test.framework.TestRunnerPlugin"
+    priority="1">
 
     <requires>
         <import plugin="org.junit" version="3.8"/>
@@ -24,5 +25,7 @@
   <extension point="org.jnode.security.permissions">
     <permission class="java.util.PropertyPermission" name="java.io.tmpdir" actions="read"/>
     <permission class="java.util.PropertyPermission" name="user.home" actions="read"/>
+    
+    <permission class="java.io.FilePermission" name="/junit.properties" actions="read"/>
   </extension>
 </plugin>
