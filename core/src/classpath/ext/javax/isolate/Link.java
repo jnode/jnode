@@ -26,4 +26,10 @@ package javax.isolate;
  */
 public abstract class Link {
 
+    /**
+     * Returns the isolate that can receive on this link or null if it is not
+     * possible to determine a unique receiver.
+     * @return
+     */
+    public abstract Isolate getReceiver();
 }
