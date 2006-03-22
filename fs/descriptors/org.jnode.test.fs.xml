@@ -55,7 +55,6 @@
     <alias name="FileTest"      class="org.jnode.test.fs.FileTest"/>
     <alias name="LfnTest"      class="org.jnode.test.fs.LfnTest"/>
     <alias name="SCSITest"      class="org.jnode.test.fs.SCSITest"/>
-    <alias name="AllFSTest" class="org.jnode.test.fs.AllFSTest"/>    
   </extension>
 
   <extension point="org.jnode.security.permissions">
@@ -73,7 +72,7 @@
   </extension>
   
   <extension point="org.jnode.testrunner.tests">
-    <suite class="org.jnode.test.fs.filesystem.FSTestSuite"/>
-    <suite class="org.jnode.test.fs.driver.BlockDeviceAPITestSuite"/>
+    <test class="org.jnode.test.fs.filesystem.FSTestSuite" category="fs"/>
+    <test class="org.jnode.test.fs.driver.BlockDeviceAPITestSuite" category="fs,driver"/>
   </extension>  
 </plugin>
