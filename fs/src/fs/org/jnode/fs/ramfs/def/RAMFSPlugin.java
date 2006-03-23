@@ -10,12 +10,13 @@ import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceNotFoundException;
 import org.jnode.driver.DeviceUtils;
 import org.jnode.driver.DriverException;
+import org.jnode.driver.DeviceException;
+import org.jnode.driver.virtual.VirtualDevice;
+import org.jnode.driver.virtual.VirtualDeviceFactory;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
 import org.jnode.fs.service.FileSystemService;
-import org.jnode.fs.ramfs.RAMFSDevice;
-import org.jnode.fs.ramfs.RAMFSDriver;
 import org.jnode.fs.ramfs.RAMFileSystemType;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.Plugin;
@@ -43,14 +44,10 @@ public class RAMFSPlugin extends Plugin {
             FileSystemType type = fSS.getFileSystemTypeForNameSystemTypes(RAMFileSystemType.NAME);
 
             try {
-         	
-            	final RAMFSDevice dev = new RAMFSDevice();
-            	dev.setDriver(new RAMFSDriver());
-            	
-            	final DeviceManager dm = DeviceUtils.getDeviceManager();
-            	dm.register(dev);
-			    
-            	log.info(dev.getId() + " registered");
+
+                VirtualDevice dev = VirtualDeviceFactory.createDevice(RAMFileSystemType.VIRTUAL_DEVICE_NAME);
+
+                log.info(dev.getId() + " registered");
          		
             	final FileSystem fs = type.create(dev, true);
                 fSS.registerFileSystem(fs);
@@ -64,8 +61,8 @@ public class RAMFSPlugin extends Plugin {
             	log.error("RAMFS is allready running.");
             } catch (FileSystemException ex) {
             	log.error("Cannot mount " + type.getName() + " filesystem ", ex);
-            } catch (DriverException e){
-            	log.debug("DriverExeption.");
+            } catch (DeviceException ex){
+            	log.debug("DeviceExeption.", ex);
             } catch (IOException ex) {
             	log.error("Cannot mount RAMFS", ex);
             } 
@@ -87,8 +84,8 @@ public class RAMFSPlugin extends Plugin {
     		
 			final DeviceManager dm = DeviceUtils.getDeviceManager();
     		
-			RAMFSDevice dev = (RAMFSDevice) dm.getDevice("nulldevice");
-    		fSS.unregisterFileSystem(dev);
+            VirtualDevice dev = (VirtualDevice) dm.getDevice(RAMFileSystemType.VIRTUAL_DEVICE_NAME);
+            fSS.unregisterFileSystem(dev);
 
     		log.info("RAMFS unmounted");
     		

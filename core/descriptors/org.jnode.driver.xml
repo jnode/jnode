@@ -16,6 +16,7 @@
     <library name="jnode-core.jar">
       <export name="org.jnode.driver.*"/>
       <export name="org.jnode.driver.util.*"/>
+      <export name="org.jnode.driver.virtual.*"/>
     </library>
   </runtime>
         

@@ -12,8 +12,9 @@ public class RAMFileSystemType implements FileSystemType {
 	private static final int DEFAULT_SIZE = 104857600;
 	
 	public static final String NAME = "RAMFS";
-		
-	public String getName() {
+    public static final String VIRTUAL_DEVICE_NAME = "ramfsdevice";
+
+    public String getName() {
 		return NAME;
 	}
 
@@ -25,17 +26,11 @@ public class RAMFileSystemType implements FileSystemType {
 	public FileSystem create(Device device, boolean readOnly)
 			throws FileSystemException {
 		
-		if (!(device instanceof RAMFSDevice))
-			throw new FileSystemException("Only NULL Device is supported");
-		
 		return new RAMFileSystem(device, readOnly, DEFAULT_SIZE);
 	}
 
 	public FileSystem format(Device device, Object specificOptions)
 			throws FileSystemException {
-
-		if (!(device instanceof RAMFSDevice))
-			throw new FileSystemException("Only NULL Device is supported");
 
 		// TODO read in specificOptions ... How todo that??
 
