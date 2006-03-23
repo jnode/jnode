@@ -80,11 +80,6 @@ public class FTPFSFile extends FTPFSEntry implements FSFile {
         }
     }
 
-
-
-
-
-
     /**
      * Flush any cached data to the disk.
      *
