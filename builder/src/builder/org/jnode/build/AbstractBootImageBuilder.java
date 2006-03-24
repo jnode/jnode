@@ -1308,6 +1308,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         addCompileHighOptLevel("gnu.java.io.encode");
         addCompileHighOptLevel("gnu.java.lang");
         addCompileHighOptLevel("gnu.java.lang.reflect");
+        addCompileHighOptLevel("gnu.java.locale");
 
         addCompileHighOptLevel("org.jnode.assembler");
         addCompileHighOptLevel("org.jnode.boot");
@@ -1356,12 +1357,45 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             addCompileHighOptLevel("java.awt.font");
             addCompileHighOptLevel("java.awt.geom");
 
-            addPreloadPackage("javax.swing");
-            addPreloadPackage("javax.swing.border");
-            addPreloadPackage("javax.swing.event");
-            addPreloadPackage("javax.swing.plaf");
-            addPreloadPackage("javax.swing.plaf.basic");
-            addPreloadPackage("javax.swing.plaf.metal");
+            addCompileHighOptLevel("gnu.javax.swing.text.html.parser");
+            addCompileHighOptLevel("gnu.javax.swing.text.html.parser.models");
+            addCompileHighOptLevel("gnu.javax.swing.text.html.parser.support");
+            addCompileHighOptLevel("gnu.javax.swing.text.html.parser.support.low");
+
+            addCompileHighOptLevel("javax.swing");
+            addCompileHighOptLevel("javax.swing.border");
+            addCompileHighOptLevel("javax.swing.event");
+            addCompileHighOptLevel("javax.swing.plaf");
+            addCompileHighOptLevel("javax.swing.plaf.basic");
+            addCompileHighOptLevel("javax.swing.plaf.metal");
+            addCompileHighOptLevel("javax.swing.text");
+            addCompileHighOptLevel("javax.swing.text.html");
+            addCompileHighOptLevel("javax.swing.text.html.parser");
+            addCompileHighOptLevel("javax.swing.text.rtf");
+            addCompileHighOptLevel("javax.swing.table");
+            addCompileHighOptLevel("javax.swing.tree");
+            addCompileHighOptLevel("javax.swing.colorchooser");
+            addCompileHighOptLevel("javax.swing.filechooser");
+            addCompileHighOptLevel("javax.swing.undo");
+
+            addCompileHighOptLevel("org.jnode.awt");
+            addCompileHighOptLevel("org.jnode.awt.swingpeers");
+
+            addCompileHighOptLevel("gnu.java.locale");
+
+            addCompileHighOptLevel("javax.net");
+            addCompileHighOptLevel("javax.net.ssl");
+
+            addCompileHighOptLevel("javax.security");
+            addCompileHighOptLevel("javax.security.auth");
+            addCompileHighOptLevel("javax.security.auth.callback");
+            addCompileHighOptLevel("javax.security.auth.login");
+            addCompileHighOptLevel("javax.security.auth.spi");
+            addCompileHighOptLevel("javax.security.cert");
+            addCompileHighOptLevel("javax.security.sasl");
+
+            addCompileHighOptLevel("org.ietf.jgss");
+
         }
     }
 
