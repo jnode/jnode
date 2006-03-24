@@ -14,6 +14,9 @@
   <runtime>
     <library name="jnode-shell.jar">
       <export name="org.jnode.shell.command.*"/>
+      <export name="org.jnode.shell.command.benchmark.*"/>
+      <export name="org.jnode.shell.command.benchmark.jgfutil.*"/>
+      <export name="org.jnode.shell.command.benchmark.section1.*"/>
     </library>
   </runtime>
 
@@ -39,6 +42,7 @@
     <alias name="loadkeys" class="org.jnode.shell.command.LoadkeysCommand"/>
     <alias name="locale" class="org.jnode.shell.command.LocaleCommand"/>
     <alias name="onheap" class="org.jnode.shell.command.OnHeapCommand"/>
+    <alias name="grep" class="org.jnode.shell.command.GrepCommand"/>
   </extension>
 
   <extension point="org.jnode.security.permissions">
