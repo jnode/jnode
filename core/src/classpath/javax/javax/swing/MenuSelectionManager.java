@@ -38,6 +38,8 @@ exception statement from your version. */
 
 package javax.swing;
 
+import gnu.classpath.NotImplementedException;
+
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
@@ -216,18 +218,34 @@ public class MenuSelectionManager
   public boolean isComponentPartOfCurrentMenu(Component c)
   {
     MenuElement[] subElements;
+    boolean ret = false;
       for (int i = 0; i < selectedPath.size(); i++)
       {
-         subElements = ((MenuElement) selectedPath.get(i)).getSubElements();
+        // Check first element.
+        MenuElement first = (MenuElement) selectedPath.get(i);
+        if (SwingUtilities.isDescendingFrom(c, first.getComponent()))
+          {
+            ret = true;
+            break;
+          }
+        else
+          {
+            // Check sub elements.
+            subElements = first.getSubElements();
          for (int j = 0; j < subElements.length; j++)
          {
             MenuElement me = subElements[j]; 
-            if (me != null && (me.getComponent()).equals(c))
-               return true;
+                if (me != null
+                    && (SwingUtilities.isDescendingFrom(c, me.getComponent())))
+                  {
+                    ret = true;
+                    break;
+                  }
+              }
          }
       }
 
-      return false;
+      return ret;
   }
 
   /**
@@ -236,6 +254,7 @@ public class MenuSelectionManager
    * @param e DOCUMENT ME!
    */
   public void processKeyEvent(KeyEvent e)
+    throws NotImplementedException
   {
     throw new UnsupportedOperationException("not implemented");
   }

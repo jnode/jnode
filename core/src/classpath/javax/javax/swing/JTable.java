@@ -1326,7 +1326,6 @@ public class JTable
    */
   public static final int AUTO_RESIZE_LAST_COLUMN = 3;
 
-
   /**
    * A table mapping {@link java.lang.Class} objects to 
    * {@link TableCellEditor} objects. This table is consulted by the 
@@ -1947,8 +1946,6 @@ public class JTable
    */
   public int columnAtPoint(Point point)
   {
-    if (point != null)
-      {
         int ncols = getColumnCount();
         Dimension gap = getIntercellSpacing();
         TableColumnModel cols = getColumnModel();
@@ -1962,7 +1959,6 @@ public class JTable
               return i;
             x -= width;
           }
-      }
     return -1;
   }
 
@@ -1970,8 +1966,7 @@ public class JTable
    * Returns index of the row that contains specified point or -1 if this table
    * doesn't contain this point.
    *
-   * @param point
-   *          point to identify the row
+   * @param point point to identify the row
    * @return index of the row that contains specified point or -1 if this table
    *         doesn't contain this point.
    */
@@ -2098,24 +2093,37 @@ public class JTable
       return true;
   }
 
-  public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction)
+  /**
+   * Return the preferred scrolling amount (in pixels) for the given scrolling
+   * direction and orientation. This method handles a partially exposed row by
+   * returning the distance required to completely expose the item. When
+   * scrolling the top item is completely exposed.
+   * 
+   * @param visibleRect the currently visible part of the component.
+   * @param orientation the scrolling orientation
+   * @param direction the scrolling direction (negative - up, positive -down).
+   *          The values greater than one means that more mouse wheel or similar
+   *          events were generated, and hence it is better to scroll the longer
+   *          distance.
+   * @author Audrius Meskauskas (audriusa@bioinformatics.org)
+   */
+  public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation,
+                                        int direction)
   {
-    // FIXME: I don't exactly know what sun does here. in both cases they
-    // pick values which do *not* simply expose the next cell in a given
-    // scroll direction.
+    int h = (rowHeight + rowMargin);
+    int delta = h * direction;
 
+    // Round so that the top would start from the row boundary
     if (orientation == SwingConstants.VERTICAL)
-      return direction * rowHeight;
-    else
       {
-        int sum = 0;
-        for (int i = 0; i < getColumnCount(); ++i)
-          sum += columnModel.getColumn(0).getWidth();
-        int inc = getColumnCount() == 0 ? 10 : sum / getColumnCount();
-        return direction * inc;
+        // Completely expose the top row
+        int near = ((visibleRect.y + delta + h / 2) / h) * h;
+        int diff = visibleRect.y + delta - near;
+        delta -= diff;
       }
+    return delta;
+    // TODO when scrollng horizontally, scroll into the column boundary.
   }
-
 
   /**
    * Get the cell editor, suitable for editing the given cell. The default

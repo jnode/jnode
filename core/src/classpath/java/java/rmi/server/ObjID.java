@@ -93,12 +93,12 @@ public final class ObjID
    * The object Id (either well-known value or the value of the incrementing
    * object counter.
    */
-  private long objNum;
+  long objNum;
 
   /**
    * The object unique identifier, generated individually for each object.
    */
-  private UID space;
+  UID space;
 
   /**
    * Create the new object id, unique for this host.
@@ -157,7 +157,7 @@ public final class ObjID
    */
   public int hashCode()
   {
-    return ((int) objNum);
+    return space == null ? (int) objNum : space.hashCode() ^ (int) objNum;
   }
 
   /**
@@ -165,11 +165,25 @@ public final class ObjID
    */
   public boolean equals(Object obj)
   {
-    if (obj instanceof ObjID && this.objNum == ((ObjID) obj).objNum)
+    if (obj instanceof ObjID)
       {
-		return (true);
+        ObjID that = (ObjID) obj;
+        return that.objNum == objNum && eq(that.space, space);
 	}
-	return (false);
+    else
+      return false;
+  }
+
+  /**
+   * Compare by .equals if both a and b are not null, compare directly if at
+   * least one of them is null.
+   */
+  static final boolean eq(Object a, Object b)
+  {
+    if (a == null || b == null)
+      return a == b;
+    else
+      return a.equals(b);
   }
 
   /**
@@ -177,7 +191,7 @@ public final class ObjID
    */
   public String toString()
   {
-	return ("[objNum: " + objNum + ", " + space + "]");
+    return (objNum + ":" + space);
   }
 
 }

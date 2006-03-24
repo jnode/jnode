@@ -187,6 +187,7 @@ public class ReferenceTypeCommandSet
     Class clazz = refId.getType();
 
     VMMethod[] methods = VMVirtualMachine.getAllClassMethods(clazz);
+    os.writeInt (methods.length);
     for (int i = 0; i < methods.length; i++)
       {
         VMMethod method = methods[i];

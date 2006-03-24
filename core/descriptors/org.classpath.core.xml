@@ -38,6 +38,7 @@
       <export name="gnu.java.lang.*"/>
       <export name="gnu.java.lang.reflect.*"/>
       <export name="gnu.java.locale.LocaleHelper"/>
+      <export name="gnu.java.locale.LocaleData"/>  
       <export name="gnu.java.locale.LocaleInformation_en"/>
       <export name="gnu.java.locale.LocaleInformation"/>
       <export name="gnu.java.rmi.*"/>

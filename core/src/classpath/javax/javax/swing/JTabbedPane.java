@@ -379,7 +379,12 @@ public class JTabbedPane extends JComponent implements Serializable,
      */
     public Color getBackground()
     {
-      return bg;
+      Color background;
+      if (bg == null)
+        background = JTabbedPane.this.getBackground();
+      else
+        background = bg;
+      return background;
     }
 
     /**
@@ -399,7 +404,12 @@ public class JTabbedPane extends JComponent implements Serializable,
      */
     public Color getForeground()
     {
-      return fg;
+      Color foreground;
+      if (fg == null)
+        foreground = JTabbedPane.this.getForeground();
+      else
+        foreground = fg;
+      return foreground;
     }
 
     /**
@@ -949,7 +959,11 @@ public class JTabbedPane extends JComponent implements Serializable,
    */
   public Component getSelectedComponent()
   {
-    return getComponentAt(getSelectedIndex());
+    int selectedIndex = getSelectedIndex();
+    Component selected = null;
+    if (selectedIndex >= 0)
+      selected = getComponentAt(selectedIndex);
+    return selected;
   }
 
   /**

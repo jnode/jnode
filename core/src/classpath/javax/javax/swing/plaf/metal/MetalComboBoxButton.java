@@ -112,6 +112,7 @@ public class MetalComboBoxButton
     iconOnly = onlyIcon;
     listBox = list;
     rendererPane = pane;
+    setRolloverEnabled(false);
     setEnabled(comboBox.isEnabled());
     setFocusable(comboBox.isEnabled());
   }
@@ -187,7 +188,7 @@ public class MetalComboBoxButton
    */
   public boolean isFocusTraversable()
   {
-    return !comboBox.isEditable() && comboBox.isEnabled();
+    return false;
   }
   
   /**
@@ -198,8 +199,16 @@ public class MetalComboBoxButton
   public void setEnabled(boolean enabled)
   {
     super.setEnabled(enabled);
-    // TODO: figure out what this might need to be used for
-    // perhaps it has something to do with the button's icon and/or border?
+    if (enabled)
+      {
+        setBackground(comboBox.getBackground());
+        setForeground(comboBox.getForeground());
+      }
+    else
+      {
+        setBackground(UIManager.getColor("ComboBox.disabledBackground"));
+        setForeground(UIManager.getColor("ComboBox.disabledForeground"));
+      }
   }
   
   /**

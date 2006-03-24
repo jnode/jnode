@@ -1,5 +1,5 @@
 /* CRLFInputStream.java --
-   Copyright (C) 2002, 2003, 2004  Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004, 2006  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -39,7 +39,6 @@ exception statement from your version. */
 package gnu.java.net;
 
 import java.io.BufferedInputStream;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -49,7 +48,7 @@ import java.io.InputStream;
  * @author Chris Burdess (dog@gnu.org)
  */
 public class CRLFInputStream
-  extends FilterInputStream
+  extends InputStream
 {
   /**
    * The CR octet.
@@ -61,6 +60,11 @@ public class CRLFInputStream
    */
   public static final int LF = 10;
 
+  /**
+   * The underlying input stream.
+   */
+  protected InputStream in;
+  
   private boolean doReset;
 
   /**
@@ -69,7 +73,7 @@ public class CRLFInputStream
    */
   public CRLFInputStream(InputStream in)
   {
-    super(in.markSupported() ? in : new BufferedInputStream(in));
+    this.in = in.markSupported() ? in : new BufferedInputStream(in);
   }
 
   /**

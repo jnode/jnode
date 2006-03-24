@@ -38,6 +38,8 @@ exception statement from your version. */
 
 package javax.swing.tree;
 
+import gnu.classpath.NotImplementedException;
+
 import java.awt.Rectangle;
 import java.util.Enumeration;
 
@@ -144,6 +146,7 @@ public abstract class AbstractLayoutCache
 	 */
 	protected Rectangle getNodeDimensions(Object value, int row, int depth,
 			boolean expanded, Rectangle bounds)
+    throws NotImplementedException
 	{
 		if (bounds == null)
 			return new Rectangle();
@@ -239,6 +242,7 @@ public abstract class AbstractLayoutCache
 	 * @return int
 	 */
 	public int getPreferredHeight()
+      throws NotImplementedException
 	{
 		return 0; // TODO
 	}
@@ -251,6 +255,7 @@ public abstract class AbstractLayoutCache
 	 * @return int
 	 */
 	public int getPreferredWidth(Rectangle value0)
+      throws NotImplementedException
 	{
 		return 0; // TODO
 	}
@@ -393,6 +398,7 @@ public abstract class AbstractLayoutCache
 	 * @return an array of rows
 	 */
 	public int[] getRowsForPaths(TreePath[] paths)
+      throws NotImplementedException
 	{
 		return null; // TODO
 	}
@@ -403,6 +409,7 @@ public abstract class AbstractLayoutCache
 	 * @return boolean
 	 */
 	protected boolean isFixedRowHeight()
+      throws NotImplementedException
 	{
 		return false; // TODO
 	}

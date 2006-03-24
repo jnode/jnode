@@ -449,9 +449,15 @@ public class UnicastRef
 	return ("UnicastRef");
   }
 
+  /**
+   * Return the string representing the remote reference information.
+   */
   public String remoteToString()
   {
-	throw new Error("Not implemented");
+    if (manager!=null)
+      return manager.toString();
+    else
+      return "null manager";
   }
 
   public void dump(UnicastConnection conn)
