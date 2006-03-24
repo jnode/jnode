@@ -29,10 +29,11 @@ import org.apache.log4j.Logger;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceNotFoundException;
 import org.jnode.driver.DeviceUtils;
+import org.jnode.driver.virtual.VirtualDevice;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.jifs.ExtFSEntry;
-import org.jnode.fs.jifs.JIFSDevice;
 import org.jnode.fs.jifs.JIFSDirectory;
+import org.jnode.fs.jifs.JIFileSystemType;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.ConfigurationElement;
@@ -61,7 +62,7 @@ final class JIFSExtension implements ExtensionPointListener {
 		try {
          	FileSystemService fSS = InitialNaming.lookup(FileSystemService.NAME);
          	final DeviceManager dm = DeviceUtils.getDeviceManager();
-    		JIFSDevice dev = (JIFSDevice)dm.getDevice("jifs");
+    		VirtualDevice dev = (VirtualDevice) dm.getDevice(JIFileSystemType.VIRTUAL_DEVICE_NAME);
     		JIFSDirectory rootdir = (JIFSDirectory)fSS.getFileSystem(dev).getRootEntry();
     		extdir = (JIFSDirectory)rootdir.getEntry("extended").getDirectory();
     	} catch (NameNotFoundException e){
