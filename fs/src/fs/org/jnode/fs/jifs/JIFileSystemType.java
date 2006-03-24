@@ -36,15 +36,17 @@ public class JIFileSystemType implements FileSystemType {
 
 	/** Name of this filesystem type */
 	public static final String NAME = "JIFS";
-	/**	Logger*/	
+    public static final String VIRTUAL_DEVICE_NAME = "jifs";
+    
+    /**	Logger*/
 	private static final Logger log = Logger.getLogger(JIFileSystemType.class);
 
-	/**
-	 * Gets the unique name of this file system type.
-	 */
-	public String getName() {
-		return NAME;
-	}
+    /**
+     * Gets the unique name of this file system type.
+     */
+    public String getName() {
+        return NAME;
+    }
 
 	/**
 	 * Can this FileSystemType be used on the given first sector of a
