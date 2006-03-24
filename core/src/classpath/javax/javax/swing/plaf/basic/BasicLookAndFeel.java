@@ -38,6 +38,8 @@ exception statement from your version. */
 
 package javax.swing.plaf.basic;
 
+import gnu.classpath.NotImplementedException;
+
 import java.awt.AWTEvent;
 import java.awt.Color;
 import java.awt.Component;
@@ -340,6 +342,7 @@ public abstract class BasicLookAndFeel extends LookAndFeel
    */
   protected void loadSystemColors(UIDefaults defaults, String[] systemColors,
                                   boolean useNative)
+    throws NotImplementedException
   {
     // TODO
   }
@@ -1114,6 +1117,7 @@ public abstract class BasicLookAndFeel extends LookAndFeel
       "TabbedPane.shadow", new ColorUIResource(shadow),
       "TabbedPane.tabbedPaneContentBorderInsets", new InsetsUIResource(3, 2, 1, 2),
       "TabbedPane.tabbedPaneTabPadInsets", new InsetsUIResource(1, 1, 1, 1),
+      "TabbedPane.tabsOpaque", Boolean.TRUE,
       "TabbedPane.tabAreaInsets", new InsetsUIResource(3, 2, 0, 2),
       "TabbedPane.tabInsets", new InsetsUIResource(0, 4, 1, 4),
       "TabbedPane.tabRunOverlay", new Integer(2),

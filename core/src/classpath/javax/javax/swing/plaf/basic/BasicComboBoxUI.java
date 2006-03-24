@@ -70,7 +70,6 @@ import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import javax.swing.LookAndFeel;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
@@ -672,9 +671,7 @@ public class BasicComboBoxUI extends ComboBoxUI
    */
   public Dimension getPreferredSize(JComponent c)
   {
-    Dimension size = getMinimumSize(c);
-    size.width += 4;
-    return size;
+    return getMinimumSize(c);
   }
 
   /**
@@ -691,10 +688,8 @@ public class BasicComboBoxUI extends ComboBoxUI
       {
         Insets i = getInsets();
     Dimension d = getDisplaySize();
-        d.height += i.top + i.bottom;
-        int arrowButtonWidth = d.height - (i.top + i.bottom);
-        cachedMinimumSize = new Dimension(d.width + arrowButtonWidth + i.left
-                                          + i.right, d.height);
+        d.width += i.left + i.right + d.height;
+        cachedMinimumSize = new Dimension(d.width, d.height + i.top + i.bottom);
 	isMinimumSizeDirty = false;
       }
     return new Dimension(cachedMinimumSize);
@@ -710,9 +705,7 @@ public class BasicComboBoxUI extends ComboBoxUI
    */
   public Dimension getMaximumSize(JComponent c)
   {
-    Dimension size = getPreferredSize(c);
-    size.width = 32767;
-    return size;
+    return new Dimension(32767, 32767);
   }
 
   public int getAccessibleChildrenCount(JComponent c)
@@ -780,11 +773,16 @@ public class BasicComboBoxUI extends ComboBoxUI
    */
   protected Rectangle rectangleForCurrentValue()
   {
-    Rectangle cbBounds = SwingUtilities.getLocalBounds(comboBox);
-    Rectangle abBounds = arrowButton.getBounds();   
-    Rectangle rectForCurrentValue = new Rectangle(cbBounds.x, cbBounds.y,
-      cbBounds.width - abBounds.width, cbBounds.height);
-    return rectForCurrentValue;
+    int w = comboBox.getWidth();
+    int h = comboBox.getHeight();
+    Insets i = comboBox.getInsets();
+    int arrowSize = h - (i.top + i.bottom);
+    if (arrowButton != null)
+      {
+        arrowSize = arrowButton.getWidth();
+      }
+    return new Rectangle(i.left, i.top, w - (i.left + i.right + arrowSize),
+                         h - (i.top + i.left));
   }
 
   /**
@@ -902,9 +900,9 @@ public class BasicComboBoxUI extends ComboBoxUI
                                                                    false);
     currentValuePane.add(comp);
     comp.setFont(comboBox.getFont());
-    int h = comp.getPreferredSize().height;
+    Dimension d = comp.getPreferredSize();
     currentValuePane.remove(comp);
-    return new Dimension(100, h);
+    return d;
   }
 
   /**
@@ -915,16 +913,31 @@ public class BasicComboBoxUI extends ComboBoxUI
    */
   protected Dimension getDisplaySize()
   {
-    if (comboBox.isEditable() && comboBox.getModel().getSize() == 0)
-      return new Dimension(100, editor.getPreferredSize().height);
-
     Dimension dim = new Dimension();
     ListCellRenderer renderer = comboBox.getRenderer();
-    ComboBoxModel model = comboBox.getModel();
-    if (renderer != null && model.getSize() > 0)
+    if (renderer == null)
       {
-        // TODO: Optimize using prototype here.
+        renderer = DEFAULT_RENDERER;
+      }
+    
+    Object prototype = comboBox.getPrototypeDisplayValue();
+    if (prototype != null)
+      {
+        Component comp = renderer.getListCellRendererComponent
+          (listBox, prototype, -1, false, false);
+        currentValuePane.add(comp);
+        comp.setFont(comboBox.getFont());
+        Dimension renderSize = comp.getPreferredSize();
+        currentValuePane.remove(comp);
+        dim.height = renderSize.height;
+        dim.width = renderSize.width;
+      }
+    else
+      {
+        ComboBoxModel model = comboBox.getModel();
         int size = model.getSize();
+        if (size > 0)
+          {
         for (int i = 0; i < size; ++i)
           {
             Component comp = renderer.getListCellRendererComponent
@@ -936,6 +949,14 @@ public class BasicComboBoxUI extends ComboBoxUI
             dim.width = Math.max(dim.width, renderSize.width);
             dim.height = Math.max(dim.height, renderSize.height);
   }
+          }
+        else
+          {
+            dim = getDefaultSize();
+            if (comboBox.isEditable())
+              dim.width = 100;
+          }
+      }
         if (comboBox.isEditable())
           {
             Dimension editSize = editor.getPreferredSize();
@@ -943,9 +964,7 @@ public class BasicComboBoxUI extends ComboBoxUI
             dim.height = Math.max(dim.height, editSize.height);
           }
         displaySize.setSize(dim.width, dim.height);
-        return displaySize;
-      }
-    return getDefaultSize();
+    return dim;
   }
 
   /**
@@ -1046,12 +1065,11 @@ public class BasicComboBoxUI extends ComboBoxUI
       int arrowSize = comboBox.getHeight() - (i.top + i.bottom);
       int editorWidth = comboBox.getBounds().width - arrowSize;
 
-      if (editor != null)
-        editor.setBounds(rectangleForCurrentValue());
-      
       if (arrowButton != null)
         arrowButton.setBounds(comboBox.getWidth() - (i.right + arrowSize),
                               i.top, arrowSize, arrowSize);
+      if (editor != null)
+        editor.setBounds(rectangleForCurrentValue());
     }
   }
 

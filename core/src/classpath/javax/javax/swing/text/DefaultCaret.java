@@ -63,12 +63,17 @@ import javax.swing.event.EventListenerList;
 /**
  * The default implementation of the {@link Caret} interface.
  *
- * @author orgininal author unknown
+ * @author original author unknown
  * @author Roman Kennke (roman@kennke.org)
  */
 public class DefaultCaret extends Rectangle
   implements Caret, FocusListener, MouseListener, MouseMotionListener
 {
+
+  /** A text component in the current VM which currently has a
+   * text selection or <code>null</code>.
+   */ 
+  static JTextComponent componentWithSelection;
 
   /**
    * Controls the blinking of the caret.
@@ -346,6 +351,7 @@ public class DefaultCaret extends Rectangle
    */
   public void mouseDragged(MouseEvent event)
   {
+    if (event.getButton() == MouseEvent.BUTTON1)
     moveCaret(event);
   }
 
@@ -379,7 +385,7 @@ public class DefaultCaret extends Rectangle
   {
     int count = event.getClickCount();
     
-    if (count >= 2)
+    if (event.getButton() == MouseEvent.BUTTON1 && count >= 2)
       {
         int newDot = getComponent().viewToModel(event.getPoint());
         JTextComponent t = getComponent();
@@ -465,10 +471,35 @@ public class DefaultCaret extends Rectangle
    */
   public void mousePressed(MouseEvent event)
   {
+    int button = event.getButton();
+    
+    // The implementation assumes that consuming the event makes the AWT event
+    // mechanism forget about this event instance and not transfer focus.
+    // By observing how the RI reacts the following behavior has been
+    // implemented (in regard to text components):
+    // - a left-click moves the caret
+    // - a left-click when shift is held down expands the selection
+    // - a right-click or click with any additionaly mouse button
+    //   on a text component is ignored
+    // - a middle-click positions the caret and pastes the clipboard
+    //   contents.
+    // - a middle-click when shift is held down is ignored
+    
+    if (button == MouseEvent.BUTTON1)
     if (event.isShiftDown())
       moveCaret(event);
     else
     positionCaret(event);
+      else if(button == MouseEvent.BUTTON2)
+        if (event.isShiftDown())
+          event.consume();
+        else
+          {
+            positionCaret(event);
+            textComponent.paste();
+          }
+      else
+        event.consume();
   }
 
   /**
@@ -650,6 +681,11 @@ public class DefaultCaret extends Rectangle
           highlightEntry = highlighter.addHighlight(0, 0, getSelectionPainter());
         else
           highlighter.changeHighlight(highlightEntry, 0, 0);
+        
+        // Free the global variable which stores the text component with an active
+        // selection.
+        if (componentWithSelection == textComponent)
+          componentWithSelection = null;
       }
     catch (BadLocationException e)
       {
@@ -685,6 +721,17 @@ public class DefaultCaret extends Rectangle
 	      highlightEntry = highlighter.addHighlight(p0, p1, getSelectionPainter());
 	    else
 	      highlighter.changeHighlight(highlightEntry, p0, p1);
+            
+            // If another component currently has a text selection clear that selection
+            // first.
+            if (componentWithSelection != null)
+              if (componentWithSelection != textComponent)
+                {
+                  Caret c = componentWithSelection.getCaret();
+                  c.setDot(c.getDot());
+                }
+            componentWithSelection = textComponent;
+            
 	  }
 	catch (BadLocationException e)
 	  {
@@ -912,8 +959,8 @@ public class DefaultCaret extends Rectangle
         this.dot = Math.max(this.dot, 0);
         
     handleHighlight();
-    adjustVisibility(this);
         appear();
+        adjustVisibility(this);
       }
   }
 
@@ -937,8 +984,8 @@ public class DefaultCaret extends Rectangle
         this.mark = this.dot;
         
         clearHighlight();
-    adjustVisibility(this);
         appear();
+        adjustVisibility(this);
       }
   }
   

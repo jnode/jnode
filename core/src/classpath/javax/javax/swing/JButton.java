@@ -103,11 +103,6 @@ public class JButton extends AbstractButton
     setModel(new DefaultButtonModel());
   }
 
-  public Object[] getSelectedObjects()
-  {
-    return null;
-  }
-
   protected void configurePropertiesFromAction(Action a)
   {
     // Factory method which sets the AbstractButton's properties according to

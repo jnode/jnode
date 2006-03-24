@@ -42,10 +42,14 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.HeadlessException;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Shape;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.beans.PropertyChangeEvent;
@@ -607,6 +611,44 @@ public abstract class BasicTextUI extends TextUI
       public void focusLost(FocusEvent e)
       {
         textComponent.repaint();
+        
+        // Integrates Swing text components with the system clipboard:
+        // The idea is that if one wants to copy text around X11-style
+        // (select text and middle-click in the target component) the focus
+        // will move to the new component which gives the old focus owner the
+        // possibility to paste its selection into the clipboard.
+        if (!e.isTemporary()
+            && textComponent.getSelectionStart()
+               != textComponent.getSelectionEnd())
+          {
+            SecurityManager sm = System.getSecurityManager();
+            try
+              {
+                if (sm != null)
+                  sm.checkSystemClipboardAccess();
+                
+                Clipboard cb = Toolkit.getDefaultToolkit().getSystemSelection();
+                if (cb != null)
+                  {
+                    StringSelection selection = new StringSelection(textComponent.getSelectedText());
+                    cb.setContents(selection, selection);
+                  }
+              }
+            catch (SecurityException se)
+              {
+                // Not allowed to access the clipboard: Ignore and
+                // do not access it.
+              }
+            catch (HeadlessException he)
+              {
+                // There is no AWT: Ignore and do not access the
+                // clipboard.
+              }
+            catch (IllegalStateException ise)
+            {
+                // Clipboard is currently unavaible.
+            }
+          }
       }
     };
 

@@ -44,7 +44,7 @@ import java.rmi.RemoteException;
 
 /**
  * Activates remote object, providing the live reference to the activable remote
- * object.  
+ * object. Usually there is only one activator per host.
  *
  * @see ActivationSystem
  * @see ActivationMonitor

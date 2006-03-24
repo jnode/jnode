@@ -172,7 +172,9 @@ public class BasicButtonUI extends ButtonUI
   {
     if (b.getFont() instanceof UIResource)
       b.setFont(null);
+    if (b.getForeground() instanceof UIResource)
     b.setForeground(null);
+    if (b.getBackground() instanceof UIResource)
     b.setBackground(null);
     if (b.getBorder() instanceof UIResource)
     b.setBorder(null);

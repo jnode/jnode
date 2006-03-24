@@ -38,6 +38,8 @@ exception statement from your version. */
 
 package javax.imageio.stream;
 
+import gnu.classpath.NotImplementedException;
+
 import java.io.IOException;
 import java.nio.ByteOrder;
 
@@ -53,14 +55,14 @@ public abstract class ImageOutputStreamImpl extends ImageInputStreamImpl
   }
 
   protected final void flushBits()
-    throws IOException
+    throws IOException, NotImplementedException
   {
     // FIXME: Implement me.
     throw new Error("not implemented");
   }
 
   public void write(byte[] data)
-    throws IOException
+    throws IOException, NotImplementedException
   {
     write(data, 0, data.length);
   }
@@ -72,7 +74,7 @@ public abstract class ImageOutputStreamImpl extends ImageInputStreamImpl
     throws IOException;
 
   public void writeBit(int bit)
-    throws IOException
+    throws IOException, NotImplementedException
   {
     // FIXME: Implement me.
     throw new Error("not implemented");
@@ -117,7 +119,7 @@ public abstract class ImageOutputStreamImpl extends ImageInputStreamImpl
   }
 
   public void writeChars(String data)
-    throws IOException
+    throws IOException, NotImplementedException
   {
     // FIXME: Implement me.
     throw new Error("not implemented");
@@ -238,7 +240,7 @@ public abstract class ImageOutputStreamImpl extends ImageInputStreamImpl
   }
   
   public void writeUTF(String data)
-    throws IOException
+    throws IOException, NotImplementedException
   {
     throw new Error("not implemented");
   }

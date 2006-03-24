@@ -39,6 +39,7 @@ exception statement from your version. */
 package javax.swing.plaf.metal;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Insets;
 
@@ -141,6 +142,39 @@ public class MetalComboBoxEditor extends BasicComboBoxEditor
     }
   }
   
+  /**
+   * A special textfield implementation for the MetalComboBoxEditor.
+   */
+  private class EditorTextField extends JTextField
+  {
+    EditorTextField(String s, int columns)
+    {
+      super(s, columns);
+    }
+
+    /**
+     * Tests seem to show that the textfield in MetalComboBoxEditors have
+     * a height + 4.
+     */
+    public Dimension getPreferredSize()
+    {
+      Dimension size = super.getPreferredSize();
+      size.height += 4;
+      return size;
+    }
+
+    /**
+     * Tests seem to show that the textfield in MetalComboBoxEditors have
+     * a height + 4.
+     */
+    public Dimension getMinimumSize()
+    {
+      Dimension size = super.getMinimumSize();
+      size.height += 4;
+      return size;
+    }
+  }
+
   /** The editor's border insets. */
   protected static Insets editorBorderInsets = new Insets(2, 2, 2, 0);
   
@@ -149,7 +183,7 @@ public class MetalComboBoxEditor extends BasicComboBoxEditor
    */
   public MetalComboBoxEditor()
   {
-    editor = new JTextField("", 9);
+    editor = new EditorTextField("", 9);
     editor.setBorder(new MetalComboBoxEditorBorder());
   }
   

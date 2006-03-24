@@ -1,4 +1,4 @@
-/* ActivationDecc.java --
+/* ActivationDesc.java -- record with info to activate an object
   Copyright (c) 1996, 1997, 1998, 1999 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -51,6 +51,8 @@ import java.rmi.MarshalledObject;
  * <li>the object restart mode</li>
  * <li>the object specific intialization information</li>
  * </ul>
+ * 
+ * @author Audrius Meskauskas (audriusa@bioinformatics.org) (from stub) 
  */
 public final class ActivationDesc
     implements Serializable
@@ -210,10 +212,10 @@ public final class ActivationDesc
     if (obj instanceof ActivationDesc)
       {
         ActivationDesc that = (ActivationDesc) obj;
-        return groupid.equals(that.groupid) &&
-               classname.equals(that.classname) && 
-               location.equals(that.location) && 
-               data.equals(that.data)
+        return eq(groupid, that.groupid) &&
+               eq(classname, that.classname) && 
+               eq(location, that.location) && 
+               eq(data, that.data)
                && restart == that.restart;
       }
     else
@@ -226,7 +228,27 @@ public final class ActivationDesc
    */
   public int hashCode()
   {
-    return groupid.hashCode() ^ classname.hashCode() ^ 
-      location.hashCode() ^ data.hashCode();
+    return hash(groupid) ^ hash(classname) ^ 
+      hash(location) ^ hash(data);
+  }
+  
+  /**
+   * Get the hashcode of x or 0 if x == null.
+   */
+  static final int hash(Object x)
+  {
+    return x == null ? 0 : x.hashCode();
+  }
+  
+  /**
+   * Compare by .equals if both a and b are not null, compare directly if at
+   * least one of them is null.
+   */
+  static final boolean eq(Object a, Object b)
+  {
+    if (a == null || b == null)
+      return a == b;
+    else
+      return a.equals(b);
   }
 }
