@@ -87,8 +87,9 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 
     private final Object initCloseLock = new Object();
     private EventQueue waitingNativeQueue;
+    private Clipboard systemClipboard;
 
-	private class LRUCache<K, V> extends java.util.LinkedHashMap<K, V> {
+    private class LRUCache<K, V> extends java.util.LinkedHashMap<K, V> {
 		int max_entries;
 
 		public LRUCache(int max) {
@@ -204,7 +205,8 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 
 	public JNodeToolkit() {
 		refCount = 0;
-	}
+        systemClipboard = new Clipboard("JNodeSystemClipboard");
+    }
 
 	/**
      * This method need only accessed from JNodeRobotPeer in the same package
@@ -632,14 +634,13 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	public Dimension getScreenSize() {
 		return new Dimension(screenSize);
 	}
-
-	/**
+    
+    /**
 	 * @see java.awt.Toolkit#getSystemClipboard()
 	 * @return The clipboard
 	 */
 	public Clipboard getSystemClipboard() {
-		// TODO Auto-generated method stub
-		return null;
+		return systemClipboard;
 	}
 
 	/**
