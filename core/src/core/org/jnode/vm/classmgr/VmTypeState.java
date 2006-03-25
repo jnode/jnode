@@ -35,9 +35,12 @@ public interface VmTypeState {
 	public static final char ST_PREPARED     = 0x0020;
 	public static final char ST_COMPILED     = 0x0040;
 	public static final char ST_COMPILING    = 0x0080;
-	public static final char ST_INITIALIZED  = 0x0100;
-	public static final char ST_INITIALIZING = 0x0200;
+    public static final char ST_ALWAYS_INITIALIZED  = 0x0100; // Class has no initializer
     public static final char ST_LINKED       = 0x2000;
 	public static final char ST_INVALID      = 0x8000;
+
+    // Isolate specific states
+    public static final char IST_INITIALIZED  = 0x0100;
+    public static final char IST_INITIALIZING = 0x0200;
 
 }

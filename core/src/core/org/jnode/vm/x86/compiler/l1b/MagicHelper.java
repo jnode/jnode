@@ -872,7 +872,45 @@ final class MagicHelper extends BaseX86MagicHelper {
             }            
             vstack.push(item);
         } break;
-         
+        case GETSHAREDSTATICSFIELDADDRESS: {
+            if (Vm.VerifyAssertions) Vm._assert(isstatic);
+            final IntItem index = (IntItem)vstack.pop();
+            index.load(ec);
+            final RefItem item = (RefItem)L1AHelper.requestWordRegister(ec, JvmType.REFERENCE, false);
+            final GPR itemReg = item.getRegister();
+            final int offset = ec.getContext().getVmProcessorSharedStaticsTable().getOffset();
+            // Load table
+            if (os.isCode32()) {
+                os.writePrefix(X86Constants.FS_PREFIX);
+                os.writeMOV(itemReg, offset);
+            } else {
+                os.writeMOV(BITS64, itemReg, X86CompilerConstants.PROCESSOR64, offset);
+            }
+            os.writeLEA(itemReg, itemReg, index.getRegister(), os.getWordSize(), VmArray.DATA_OFFSET * os.getWordSize());
+            index.release(ec);
+            vstack.push(item);
+            }
+        break;
+        case GETISOLATEDSTATICSFIELDADDRESS: {
+            if (Vm.VerifyAssertions) Vm._assert(isstatic);
+            final IntItem index = (IntItem)vstack.pop();
+            index.load(ec);
+            final RefItem item = (RefItem)L1AHelper.requestWordRegister(ec, JvmType.REFERENCE, false);
+            final GPR itemReg = item.getRegister();
+            final int offset = ec.getContext().getVmProcessorIsolatedStaticsTable().getOffset();
+            // Load table
+            if (os.isCode32()) {
+                os.writePrefix(X86Constants.FS_PREFIX);
+                os.writeMOV(itemReg, offset);
+            } else {
+                os.writeMOV(BITS64, itemReg, X86CompilerConstants.PROCESSOR64, offset);
+            }
+            os.writeLEA(itemReg, itemReg, index.getRegister(), os.getWordSize(), VmArray.DATA_OFFSET * os.getWordSize());
+            index.release(ec);
+            vstack.push(item);
+            }
+        break;
+
         // xyzArray classes
         case ARR_CREATE: {
             if (os.isCode32()) {

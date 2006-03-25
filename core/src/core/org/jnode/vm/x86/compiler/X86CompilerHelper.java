@@ -337,7 +337,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
                 if (os.isCode32()) {
                     writeGetStaticsEntry(label, aax, cls);
                 } else {
-                    writeGetStaticsEntry64(label, (GPR64)aax, cls);            
+                    writeGetStaticsEntry64(label, (GPR64)aax, (VmSharedStaticsEntry)cls);            
                 }
                 // Write code to initialize
                 writeClassInitialize(label, aax, cls);
@@ -356,9 +356,10 @@ public class X86CompilerHelper implements X86CompilerConstants {
             final Label doInit = new Label(curInstrLabel + "$$do-cinit-ex");
             final Label done = new Label(curInstrLabel + "$$done-cinit-ex");
 
+            // TODO FIXME make fast again..  Now the initialize method is always called.
             // Test declaringClass.modifiers
             os.writeTEST(BITS32, classReg, entryPoints.getVmTypeState()
-                    .getOffset(), VmTypeState.ST_INITIALIZED);
+                    .getOffset(), VmTypeState.ST_ALWAYS_INITIALIZED);
             
             // Jump when not initialized to diInit.
             // Branch predication expects this forward jump NOT
@@ -416,7 +417,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
             if (os.isCode32()) {
                 writeGetStaticsEntry(label, AAX, entry.getKey());
             } else {
-                writeGetStaticsEntry64(label, (GPR64)AAX, entry.getKey());            
+                writeGetStaticsEntry64(label, (GPR64)AAX, (VmSharedStaticsEntry)entry.getKey());            
             }
             // Call cls.initialize
             os.writePUSH(AAX); // cls
