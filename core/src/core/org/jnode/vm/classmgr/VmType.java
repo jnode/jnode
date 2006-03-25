@@ -36,6 +36,7 @@ import org.jnode.vm.JvmType;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmIsolate;
+import org.jnode.vm.VmIsolateLocal;
 import org.jnode.vm.VmReflection;
 import org.jnode.vm.VmSystemClassLoader;
 import org.jnode.vm.annotation.Inline;
@@ -98,7 +99,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 	private final VmClassLoader loader;
 
 	/** The corresponding java.lang.Class of this class */
-	private Class<T> javaClass;
+	private VmIsolateLocal<Class<T>> javaClassHolder;
 
 	/** Have the references in the constant pool been resolved? */
 	private boolean resolvedCpRefs;
@@ -637,25 +638,22 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 	 */
 	@SuppressWarnings("unchecked")
 	private final Class<T> asClass(boolean isBuildEnv) {
-	    if (isBuildEnv) {
-	        if (javaClass == null) {
-	            try {
-	                javaClass = Class.forName(getName());
-	            } catch (ClassNotFoundException ex) { /* ignore */
-	                throw new NoClassDefFoundError(getName()); 
-	            }
-	        }
-            return javaClass;
-        } else {
-            if (VmIsolate.isRoot()) {
-                if (javaClass == null) {
-                    javaClass = new Class(this);
+        if (javaClassHolder == null) {
+            javaClassHolder = new VmIsolateLocal<Class<T>>();
+        }
+        
+        if (javaClassHolder.get() == null) {
+            if (isBuildEnv) {
+                try {
+                    javaClassHolder.set(Class.forName(getName()));
+                } catch (ClassNotFoundException ex) { /* ignore */
+                    throw new NoClassDefFoundError(getName()); 
                 }
-                return javaClass;
             } else {
-                return VmIsolate.currentIsolate().getClassForType(this);
+                javaClassHolder.set(new Class(this));                
             }
         }
+        return javaClassHolder.get();
 	}
 
 	/**

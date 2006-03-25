@@ -43,7 +43,6 @@ import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.jnode.vm.classmgr.ClassDecoder;
 import org.jnode.vm.classmgr.IMTBuilder;
 import org.jnode.vm.classmgr.SelectorMap;
-import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmSharedStatics;
@@ -186,7 +185,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      * @param name
      * @return VmClass
      */
-    public VmType findLoadedClass(String name) {
+    public VmType<?> findLoadedClass(String name) {
         if (classInfos != null) {
             if (name.indexOf('/') >= 0) {
                 //throw new IllegalArgumentException("name contains '/'");
@@ -369,10 +368,19 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      * @return ClassLoader
      */
     public final ClassLoader asClassLoader() {
-        if (classLoader == null) {
-            classLoader = new ClassLoaderWrapper(this);
+        if (VmIsolate.isRoot()) {
+            if (classLoader == null) {
+                classLoader = new ClassLoaderWrapper(this);
+            }
+            return classLoader;
+        } else {
+            ClassLoader loader = VmIsolate.currentIsolate().getSystemClassLoader();
+            if (loader == null) {
+                loader = new ClassLoaderWrapper(this);
+                VmIsolate.currentIsolate().setSystemClassLoader(loader);
+            }
+            return loader;
         }
-        return classLoader;
     }
 
     /**

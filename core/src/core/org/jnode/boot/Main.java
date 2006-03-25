@@ -32,6 +32,7 @@ import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmSystem;
 import org.jnode.vm.annotation.LoadStatics;
 import org.jnode.vm.annotation.SharedStatics;
+import org.jnode.vm.annotation.Uninterruptible;
 import org.vmmagic.pragma.UninterruptiblePragma;
 
 /**
@@ -54,7 +55,8 @@ public final class Main {
 	 * @return int
 	 */
     @LoadStatics
-	public static int vmMain() throws UninterruptiblePragma {
+    @Uninterruptible
+	public static int vmMain() {
 		//return 15;
 		try {
 			Unsafe.debug("Starting JNode\n");
