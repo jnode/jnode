@@ -140,4 +140,12 @@ public final class X86StubCompiler extends AbstractX86Compiler {
     public GCMapIterator createGCMapIterator() {
         return new EmptyGCMapIterator();
     }
+
+    /**
+     * @see org.jnode.vm.compiler.NativeCodeCompiler#getCompilerPackages()
+     */
+    @Override
+    public String[] getCompilerPackages() {
+        return new String[] { "org.jnode.vm.x86.compiler", "org.jnode.vm.x86.compiler.stup" };
+    }
 }

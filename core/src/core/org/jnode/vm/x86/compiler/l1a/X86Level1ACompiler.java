@@ -147,4 +147,12 @@ public final class X86Level1ACompiler extends AbstractX86Compiler {
     public GCMapIterator createGCMapIterator() {
         return new X86GCMapIterator();
     }
+
+    /**
+     * @see org.jnode.vm.compiler.NativeCodeCompiler#getCompilerPackages()
+     */
+    @Override
+    public String[] getCompilerPackages() {
+        return new String[] { "org.jnode.vm.x86.compiler", "org.jnode.vm.x86.compiler.l1a" };
+    }
 }

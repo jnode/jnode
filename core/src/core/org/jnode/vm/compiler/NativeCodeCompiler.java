@@ -338,4 +338,10 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
      * @return
      */
     public abstract GCMapIterator createGCMapIterator();
+    
+    /**
+     * Gets the names of the packages that are required by this compiler.
+     * @return
+     */
+    public abstract String[] getCompilerPackages();
 }
