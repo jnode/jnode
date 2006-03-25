@@ -43,6 +43,8 @@ import org.jnode.plugin.PluginPrerequisite;
 import org.jnode.plugin.Runtime;
 import org.jnode.system.BootLog;
 import org.jnode.util.BootableArrayList;
+import org.jnode.vm.VmIsolate;
+import org.jnode.vm.VmIsolateLocal;
 import org.jnode.vm.VmSystem;
 
 /**
@@ -55,7 +57,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
 
     private final boolean autoStart;
 
-    private transient ClassLoader classLoader;
+    private transient VmIsolateLocal<ClassLoader> classLoaderHolder;
 
     private final String className;
 
@@ -430,40 +432,45 @@ public class PluginDescriptorModel extends AbstractModelObject implements
      * @return ClassLoader
      */
     public ClassLoader getPluginClassLoader() {
-        if (classLoader == null) {
+        if (classLoaderHolder == null) {
+            classLoaderHolder = new VmIsolateLocal<ClassLoader>();
+        }
+        if (classLoaderHolder.get() == null) {
             if (system) {
-                classLoader = ClassLoader.getSystemClassLoader();
+                classLoaderHolder.set(ClassLoader.getSystemClassLoader());
             } else {
-                if (registry == null) {
-                    throw new RuntimeException("Plugin is not resolved yet");
-                }
-                if (jarFile == null) {
-                    throw new RuntimeException(
-                            "Cannot create classloader without a jarfile");
-                }
-                final int reqMax = requires.length;
-                final PluginClassLoaderImpl[] preLoaders = new PluginClassLoaderImpl[reqMax];
-                for (int i = 0; i < reqMax; i++) {
-                    final String reqId = requires[i].getPluginId();
-                    final PluginDescriptor reqDescr = registry
-                            .getPluginDescriptor(reqId);
-                    final ClassLoader cl = reqDescr.getPluginClassLoader();
-                    if (cl instanceof PluginClassLoaderImpl) {
-                        preLoaders[i] = (PluginClassLoaderImpl) cl;
-                    }
-                }
-                final PrivilegedAction a = new PrivilegedAction() {
-                    public Object run() {
-                        return new PluginClassLoaderImpl(registry,
-                                PluginDescriptorModel.this, jarFile, preLoaders);
-                    }
-                };
-                classLoader = (PluginClassLoaderImpl) AccessController
-                        .doPrivileged(a);
-                // new PluginClassLoader(jarFile, preLoaders);
+                classLoaderHolder.set(createClassLoader());
             }
         }
-        return classLoader;
+        return classLoaderHolder.get();
+    }
+    
+    private final PluginClassLoaderImpl createClassLoader() {
+        if (registry == null) {
+            throw new RuntimeException("Plugin is not resolved yet");
+        }
+        if (jarFile == null) {
+            throw new RuntimeException(
+                    "Cannot create classloader without a jarfile");
+        }
+        final int reqMax = requires.length;
+        final PluginClassLoaderImpl[] preLoaders = new PluginClassLoaderImpl[reqMax];
+        for (int i = 0; i < reqMax; i++) {
+            final String reqId = requires[i].getPluginId();
+            final PluginDescriptor reqDescr = registry
+                    .getPluginDescriptor(reqId);
+            final ClassLoader cl = reqDescr.getPluginClassLoader();
+            if (cl instanceof PluginClassLoaderImpl) {
+                preLoaders[i] = (PluginClassLoaderImpl) cl;
+            }
+        }
+        final PrivilegedAction a = new PrivilegedAction() {
+            public Object run() {
+                return new PluginClassLoaderImpl(registry,
+                        PluginDescriptorModel.this, jarFile, preLoaders);
+            }
+        };
+        return (PluginClassLoaderImpl) AccessController.doPrivileged(a);        
     }
 
     /**

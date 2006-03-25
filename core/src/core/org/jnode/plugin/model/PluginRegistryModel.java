@@ -45,6 +45,7 @@ import org.jnode.plugin.PluginReference;
 import org.jnode.plugin.PluginRegistry;
 import org.jnode.plugin.PluginSecurityConstants;
 import org.jnode.util.BootableHashMap;
+import org.jnode.vm.VmIsolateLocal;
 import org.jnode.vm.VmSystemObject;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
@@ -62,7 +63,7 @@ public final class PluginRegistryModel extends VmSystemObject implements
     /** A map off all extensionpoints (id, ep) */
     private final BootableHashMap<String, ExtensionPoint> extensionPoints;
 
-    private transient PluginsClassLoader classLoader;
+    private transient VmIsolateLocal<PluginsClassLoader> classLoaderHolder;
 
     /**
      * Initialize this instance.
@@ -404,10 +405,13 @@ public final class PluginRegistryModel extends VmSystemObject implements
      * @return ClassLoader
      */
     public ClassLoader getPluginsClassLoader() {
-        if (classLoader == null) {
-            classLoader = new PluginsClassLoader(this);
+        if (classLoaderHolder == null) {
+            classLoaderHolder = new VmIsolateLocal<PluginsClassLoader>();
         }
-        return classLoader;
+        if (classLoaderHolder.get() == null) {
+            classLoaderHolder.set(new PluginsClassLoader(this));
+        }
+        return classLoaderHolder.get();
     }
 
     static class DTDResolver implements EntityResolver {
