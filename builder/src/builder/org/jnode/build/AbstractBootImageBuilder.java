@@ -21,12 +21,10 @@
  
 package org.jnode.build;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.net.URL;
@@ -161,7 +159,6 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      */
     public AbstractBootImageBuilder() {
         asmSourceInfo = new AsmSourceInfo();
-        setupCompileHighOptLevelPackages();
         legalInstanceClasses = setupLegalInstanceClasses();
     }
     
@@ -380,6 +377,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             VmIsolatedStatics isolatedStatics) throws BuildException;
 
     private final void doExecute() throws BuildException {
+        setupCompileHighOptLevelPackages();
+
         debug = (getProject().getProperty("jnode.debug") != null);
 
         final long lmKernel = kernelFile.lastModified();
@@ -1227,18 +1226,6 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         }        
     }
 
-    private byte[] read(InputStream is) throws IOException {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        final byte[] buf = new byte[4096];
-        int len;
-        while ((len = is.read(buf)) > 0) {
-            bos.write(buf, 0, len);
-        }
-        is.close();
-        bos.close();
-        return bos.toByteArray();
-    }
-
     /**
      * Sets the debugFile.
      * 
@@ -1327,8 +1314,14 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         addCompileHighOptLevel("org.jnode.vm.bytecode");
         addCompileHighOptLevel("org.jnode.vm.classmgr");
         addCompileHighOptLevel("org.jnode.vm.compiler");
-        addCompileHighOptLevel("org.jnode.vm.compiler.ir");
-        addCompileHighOptLevel("org.jnode.vm.compiler.ir.quad");
+//        addCompileHighOptLevel("org.jnode.vm.compiler.ir");
+//        addCompileHighOptLevel("org.jnode.vm.compiler.ir.quad");
+        for (NativeCodeCompiler compiler : getArchitecture().getCompilers()) {
+            for (String packageName : compiler.getCompilerPackages()) {
+                addCompileHighOptLevel(packageName);
+            }
+        }        
+        
         addCompileHighOptLevel("org.jnode.vm.memmgr");
         addCompileHighOptLevel("org.jnode.vm.memmgr.def");
         addCompileHighOptLevel("org.jnode.vm.memmgr.mmtk");
