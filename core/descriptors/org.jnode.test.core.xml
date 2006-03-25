@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.test.core"
+    name="JNode Core (VM/OS) Test classes"
+    version="@VERSION@"
+    license-name="lgpl"
+    provider-name="JNode.org">
+
+    <runtime>
+        <library name="jnode-core.jar">
+            <export name="org.jnode.test.core.*"/>
+        </library>
+    </runtime>
+
+    <extension point="org.jnode.shell.aliases">
+        <alias name="ArithOpt" class="org.jnode.test.core.ArithOpt"/>
+        <alias name="IsolateTest" class="org.jnode.test.core.IsolateTest"/>
+        <alias name="PerfCtrTest" class="org.jnode.test.core.PerfCtrTest"/>
+        <alias name="Sieve" class="org.jnode.test.core.Sieve"/>
+    </extension>
+
+    <extension point="org.jnode.security.permissions">
+        <permission class="java.util.PropertyPermission" name="user.home" actions="read"/>
+    </extension>
+
+</plugin>

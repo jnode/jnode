@@ -21,9 +21,6 @@
     </runtime>
 
     <extension point="org.jnode.shell.aliases">
-        <alias name="ArithOpt" class="org.jnode.test.ArithOpt"/>
-        <alias name="PerfCtrTest" class="org.jnode.test.PerfCtrTest"/>
-        <alias name="Sieve" class="org.jnode.test.Sieve"/>
         <alias name="TestSecurityManager" class="org.jnode.test.security.TestSecurityManager"/>
     </extension>
 
