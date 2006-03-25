@@ -49,6 +49,7 @@ import java.rmi.activation.ActivationID;
 import java.rmi.activation.ActivationInstantiator;
 import java.rmi.activation.ActivationMonitor;
 import java.rmi.activation.ActivationSystem;
+import java.rmi.activation.Activator;
 import java.rmi.activation.UnknownGroupException;
 import java.rmi.activation.UnknownObjectException;
 import java.util.HashMap;
@@ -63,7 +64,7 @@ import java.util.Map;
  */
 public class ActivationSystemTransient
     extends DefaultActivationSystem
-    implements ActivationSystem, ActivationMonitor
+    implements ActivationSystem, ActivationMonitor, Activator
 {
   /**
    * Maps group identifiers into group descriptions.
