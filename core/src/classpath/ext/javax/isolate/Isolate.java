@@ -23,13 +23,15 @@ package javax.isolate;
 
 import java.util.Properties;
 
+import org.jnode.vm.VmIsolate;
+
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public final class Isolate {
 
     /** The actual isolate implementation */
-    private final VMIsolate impl;
+    private final VmIsolate impl;
 
     /**
      * Constructor for the root isolate.
@@ -37,7 +39,7 @@ public final class Isolate {
      * @param mainClass
      * @param args
      */
-    Isolate(VMIsolate impl) {
+    public Isolate(VmIsolate impl) {
         this.impl = impl;
     }
 
@@ -72,7 +74,7 @@ public final class Isolate {
      * @param stderr
      */
     public Isolate(StreamBindings bindings, Properties properties, String mainClass, String[] args) {
-        this.impl = new VMIsolate(this, bindings, properties, mainClass, args);
+        this.impl = new VmIsolate(this, bindings, properties, mainClass, args);
     }
 
     /**
@@ -81,16 +83,7 @@ public final class Isolate {
      * @return
      */
     public static Isolate currentIsolate() {
-        return VMIsolate.currentIsolate().getIsolate();
-    }
-
-    /**
-     * Gets the messages past to the start of this isolate.
-     * 
-     * @return Never null, may be zero length
-     */
-    public static LinkMessage[] currentIsolateStartMessages() {
-        return VMIsolate.currentIsolate().getIsolateStartMessages();
+        return VmIsolate.currentIsolate().getIsolate();
     }
 
     /**
@@ -108,7 +101,7 @@ public final class Isolate {
      * @param status
      */
     public void exit(int status) {
-        impl.exit(status);
+        impl.exit(this, status);
     }
 
     /**
@@ -117,7 +110,7 @@ public final class Isolate {
      * @param status
      */
     public void halt(int status) {
-        impl.halt(status);
+        impl.halt(this, status);
     }
 
     /**
@@ -165,7 +158,7 @@ public final class Isolate {
      * @param messages
      * @throws IsolateStartupException
      */
-    public void start(LinkMessage[] messages) throws IsolateStartupException {
-        impl.start(messages);
+    public void start(Link... links) throws IsolateStartupException {
+        impl.start(this, links);
     }
 }

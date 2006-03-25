@@ -31,12 +31,11 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 
-import javax.isolate.VMIsolate;
-
 import org.jnode.assembler.NativeStream;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
+import org.jnode.vm.VmIsolate;
 import org.jnode.vm.VmReflection;
 import org.jnode.vm.VmSystemClassLoader;
 import org.jnode.vm.annotation.Inline;
@@ -648,13 +647,13 @@ public abstract class VmType<T> extends VmAnnotatedElement implements VmSharedSt
 	        }
             return javaClass;
         } else {
-            if (VMIsolate.isRoot()) {
+            if (VmIsolate.isRoot()) {
                 if (javaClass == null) {
                     javaClass = new Class(this);
                 }
                 return javaClass;
             } else {
-                return VMIsolate.currentIsolate().getClassForType(this);
+                return VmIsolate.currentIsolate().getClassForType(this);
             }
         }
 	}

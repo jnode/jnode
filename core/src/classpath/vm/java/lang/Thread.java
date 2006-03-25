@@ -24,9 +24,9 @@ package java.lang;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import javax.isolate.IsolateThread;
 
 import org.jnode.security.JNodePermission;
+import org.jnode.vm.IsolateThread;
 import org.jnode.vm.MonitorManager;
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmSystem;
