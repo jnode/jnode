@@ -222,7 +222,7 @@ public class BaseMagicHelper {
         
         private final String name;
         private final String signature;
-        private final int argCount;
+//        private final int argCount;
         private static BootableHashMap<VmMethod, MagicMethod> methods = new BootableHashMap<VmMethod, MagicMethod>();
         
         private MagicMethod(String name) {
@@ -230,12 +230,12 @@ public class BaseMagicHelper {
         }
         private MagicMethod(String name, int argCount) {
             this.name = name;
-            this.argCount = argCount;
+//            this.argCount = argCount;
             this.signature = null;
         }
         private MagicMethod(String name, int argCount, String signature) {
             this.name = name;
-            this.argCount = argCount;
+//            this.argCount = argCount;
             this.signature = signature;
         }
         
