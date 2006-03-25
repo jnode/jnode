@@ -120,6 +120,9 @@ public class DefaultActivationGroup
   {
     try
       {
+        if (ActivationSystemTransient.debug)
+          System.out.println("Instantiating "+desc.getClassName());
+        
         Remote object;
         Class objectClass;
 

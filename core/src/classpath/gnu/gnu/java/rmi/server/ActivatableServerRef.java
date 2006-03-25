@@ -43,6 +43,8 @@ import java.rmi.RemoteException;
 import java.rmi.activation.ActivationID;
 import java.rmi.server.ObjID;
 import java.rmi.server.RMIServerSocketFactory;
+import java.rmi.server.RemoteStub;
+import java.rmi.server.Skeleton;
 
 /**
  * The activatable server reference works like UnicastServerReference, but it
@@ -117,7 +119,7 @@ public class ActivatableServerRef extends UnicastServerRef
     catch (Exception exc)
       {
         RemoteException rx = new RemoteException("Activation failed.");
-        rx.initCause(exc);
+        rx.detail = exc;
         throw rx;
       }
   }
@@ -143,4 +145,54 @@ public class ActivatableServerRef extends UnicastServerRef
     UnicastServer.registerActivatable(this);
     return r;
   }
+  
+  /**
+   * Export object and ensure it is present in the server activation table as
+   * well.
+   * 
+   * @param aClass the class being exported, must implement Remote.
+   */
+  public Remote exportClass(Class aClass) throws RemoteException
+  {
+    if (!Remote.class.isAssignableFrom(aClass))
+      throw new InternalError(aClass.getName()+" must implement Remote");
+
+        String ignoreStubs;
+        
+        ClassLoader loader =aClass.getClassLoader(); 
+        
+        // Stubs are always searched for the bootstrap classes that may have
+        // obsolete pattern and may still need also skeletons.
+        if (loader==null)
+          ignoreStubs = "false";
+        else
+          ignoreStubs = System.getProperty("java.rmi.server.ignoreStubClasses", 
+                                           "false");
+        
+        if (! ignoreStubs.equals("true"))
+          {
+            // Find and install the stub
+            Class cls = aClass;
+
+            // where ist the _Stub? (check superclasses also)
+            Class expCls = expCls = findStubSkelClass(cls);
+
+            if (expCls != null)
+              {
+                stub = (RemoteStub) getHelperClass(expCls, "_Stub");
+                // Find and install the skeleton (if there is one)
+                skel = (Skeleton) getHelperClass(expCls, "_Skel");
+              }
+          }
+
+        if (stub == null)
+          stub = createProxyStub(aClass, this);
+
+        // Build hash of methods which may be called.
+        buildMethodHash(aClass, true);
+
+    UnicastServer.registerActivatable(this);
+    return stub;
+  }
+  
 }
