@@ -10,6 +10,7 @@
         
   <requires>
     <import plugin="org.jnode.driver.video"/>
+    <import plugin="org.jnode.driver.sound.speaker"/>
     <import plugin="org.jnode.log4j"/>
   </requires>
   
