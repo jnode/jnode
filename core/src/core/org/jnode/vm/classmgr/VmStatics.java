@@ -175,6 +175,13 @@ public abstract class VmStatics extends VmSystemObject {
 		}
 	}
 
+    public final int getInt(int idx) {
+        if (types[idx] != TYPE_INT) {
+            throw new IllegalArgumentException("Type error " + types[idx]);
+        }
+        return statics[idx];
+    }
+
 	public final void setObject(int idx, Object value) {
 		if (types[idx] != TYPE_OBJECT) {
 			throw new IllegalArgumentException("Type error " + types[idx]);

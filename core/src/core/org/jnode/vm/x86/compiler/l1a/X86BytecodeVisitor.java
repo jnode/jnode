@@ -629,7 +629,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
             if (os.isCode32()) {
                 helper.writeGetStaticsEntry(curInstrLabel, tmpr, type);
             } else {
-                helper.writeGetStaticsEntry64(curInstrLabel, (GPR64)tmpr, type);                
+                helper.writeGetStaticsEntry64(curInstrLabel, (GPR64)tmpr, (VmSharedStaticsEntry)type);                
             }
 			helper.writeClassInitialize(curInstrLabel, tmpr, type);
 		}
@@ -1347,7 +1347,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
             if (os.isCode32()) {
                 helper.writeGetStaticsEntry(curInstrLabel, tmpr, resolvedType);
             } else {
-                helper.writeGetStaticsEntry64(curInstrLabel, (GPR64)tmpr, resolvedType);                
+                helper.writeGetStaticsEntry64(curInstrLabel, (GPR64)tmpr, (VmSharedStaticsEntry)resolvedType);                
             }
 
 			// Call SoftByteCodes.classCastFailed(Object, VmType)
@@ -3085,7 +3085,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
         if (os.isCode32()) {
             helper.writeGetStaticsEntry(curInstrLabel, reg, value);
         } else {
-            helper.writeGetStaticsEntry64(curInstrLabel, (GPR64)reg, value);            
+            helper.writeGetStaticsEntry64(curInstrLabel, (GPR64)reg, (VmSharedStaticsEntry)value);            
         }
         vstack.push(item);
     }
@@ -4232,7 +4232,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
                         classReg, declClass);
             } else {
                 helper.writeGetStaticsEntry64(new Label(curInstrLabel + "$$ic"),
-                        (GPR64)classReg, declClass);                
+                        (GPR64)classReg, (VmSharedStaticsEntry)declClass);                
             }
 
             // Write class initialization code
@@ -4272,7 +4272,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
         if (os.isCode32()) {
             helper.writeGetStaticsEntry(curInstrLabel, dst, type);
         } else {
-            helper.writeGetStaticsEntry64(curInstrLabel, (GPR64)dst, type);            
+            helper.writeGetStaticsEntry64(curInstrLabel, (GPR64)dst, (VmSharedStaticsEntry)type);            
         }
 	}
     

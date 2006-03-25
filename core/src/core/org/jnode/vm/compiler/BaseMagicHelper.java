@@ -214,6 +214,8 @@ public class BaseMagicHelper {
         DIFF("diff"),
         NULLREFERENCE("nullReference"),
         CURRENTPROCESSOR("currentProcessor", 0, "()Lorg/jnode/vm/VmProcessor;"),
+        GETSHAREDSTATICSFIELDADDRESS("getSharedStaticFieldAddress"),
+        GETISOLATEDSTATICSFIELDADDRESS("getIsolatedStaticFieldAddress"),
         // Array classes
         ARR_CREATE("create"),
         ARR_GET("get"),

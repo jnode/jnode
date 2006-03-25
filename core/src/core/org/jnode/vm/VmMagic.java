@@ -149,7 +149,21 @@ public final class VmMagic {
      * @return
      */
     @KernelSpace
-    final static VmProcessor currentProcessor() {
+    public final static VmProcessor currentProcessor() {
+        return null;
+    }
+    
+    /**
+     * Gets the address of a shared static field.
+     */
+    public final static Address getSharedStaticFieldAddress(int index) {
+        return null;
+    }
+    
+    /**
+     * Gets the address of a isolated static field.
+     */
+    public final static Address getIsolatedStaticFieldAddress(int index) {
         return null;
     }
     
