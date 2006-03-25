@@ -121,7 +121,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
     private final HashSet<String> preloadPackages = new HashSet<String>();
 
-    protected boolean debug = false;
+    protected boolean debug = true;
 
     private File debugFile;
 
@@ -1066,7 +1066,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
     protected final void printLabels(NativeStream os, VmType[] bootClasses,
             VmSharedStatics statics) throws BuildException,
             UnresolvedObjectRefException {
-        if (!debug) {
+        if (System.getProperty("bootimage.log") == null) {
             return;
         }
 
