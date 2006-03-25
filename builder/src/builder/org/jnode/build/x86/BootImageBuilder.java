@@ -683,12 +683,6 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 		addCompileHighOptLevel("org.jnode.assembler.x86");
 		addCompileHighOptLevel("org.jnode.system.x86");
 		addCompileHighOptLevel("org.jnode.vm.x86");
-		addCompileHighOptLevel("org.jnode.vm.x86.compiler");
-		addCompileHighOptLevel("org.jnode.vm.x86.compiler.stub");
-		// addCompileHighOptLevel("org.jnode.vm.x86.compiler.l1");
-		addCompileHighOptLevel("org.jnode.vm.x86.compiler.l1a");
-        addCompileHighOptLevel("org.jnode.vm.x86.compiler.l1b");
-		addCompileHighOptLevel("org.jnode.vm.x86.compiler.l2");
 	}
 
 	/**
