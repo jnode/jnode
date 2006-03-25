@@ -53,6 +53,7 @@ public class KeyboardHandler implements
     private KeyboardAPI keyboardAPI;
 
     private int modifiers;
+    private boolean pressed;
 
     /**
      * Initialize this instance.
@@ -85,21 +86,24 @@ public class KeyboardHandler implements
      * @param event
      */
     public void keyPressed(KeyboardEvent event) {
-        final int key_code = event.getKeyCode();
-        if (event.isAltDown() && key_code == KeyEvent.VK_F12) {
-            event.consume();
-            JNodeToolkit.stopGui();
-        } else if (event.isControlDown() && event.isAltDown()
-                && key_code == KeyEvent.VK_F5) {
-            event.consume();
-            JNodeToolkit.refreshGui();
-        } else {
 
-            int modifiers = event.getModifiers();
-            setModifiers(modifiers);
-            postEvent(KeyEvent.KEY_PRESSED, event.getTime(), modifiers, key_code, event.getKeyChar());
-            event.consume();
+        if(processSystemKey(event))
+            return;
+
+        int modifiers = event.getModifiers();
+        setModifiers(modifiers);
+
+        postEvent(KeyEvent.KEY_PRESSED, event.getTime(), modifiers, event.getKeyCode(), event.getKeyChar());
+        pressed = true;
+
+        event.consume();
+
+        char ch = event.getKeyChar();
+        if (ch != KeyEvent.CHAR_UNDEFINED && !event.isAltDown() && !event.isControlDown()) {
+            postEvent(KeyEvent.KEY_TYPED, event.getTime(),
+                    event.getModifiers(), KeyEvent.VK_UNDEFINED, ch);
         }
+
     }
 
     /**
@@ -108,12 +112,12 @@ public class KeyboardHandler implements
     public void keyReleased(KeyboardEvent event) {
         int modifiers = event.getModifiers();
         setModifiers(modifiers);
-        postEvent(KeyEvent.KEY_RELEASED, event.getTime(), modifiers,
+        event.consume();
+
+        if(pressed){
+            postEvent(KeyEvent.KEY_RELEASED, event.getTime(), modifiers,
                 event.getKeyCode(), event.getKeyChar());
-        char ch = event.getKeyChar();
-        if (ch != KeyEvent.CHAR_UNDEFINED) {
-            postEvent(KeyEvent.KEY_TYPED, event.getTime(),
-                    event.getModifiers(), KeyEvent.VK_UNDEFINED, ch);
+            pressed = false;
         }
     }
 
@@ -124,7 +128,7 @@ public class KeyboardHandler implements
      * @param keyChar
      */
     private void postEvent(int id, long time, int modifiers, int keyCode,
-            char keyChar) {
+                           char keyChar) {
         JNodeToolkit tk = (JNodeToolkit) Toolkit.getDefaultToolkit();
         Frame top = tk.getTop();
         if(top == null){
@@ -132,9 +136,25 @@ public class KeyboardHandler implements
             //drop this event
             return;
         }
-        KeyEvent me = new KeyEvent(top, id, time, modifiers, keyCode,
+        KeyEvent ke = new KeyEvent(top, id, time, modifiers, keyCode,
                 keyChar);
-        eventQueue.postEvent(me);
+//        Unsafe.debug(ke.toString()+"\n");
+        eventQueue.postEvent(ke);
+    }
+
+    private boolean processSystemKey(KeyboardEvent event) {
+        final int key_code = event.getKeyCode();
+        if (key_code == KeyEvent.VK_F12 && event.isAltDown() ||
+                key_code == KeyEvent.VK_BACK_SPACE && event.isAltDown() && event.isControlDown()) {
+            event.consume();
+            JNodeToolkit.stopGui();
+            return true;
+        } else if (key_code == KeyEvent.VK_F5 && event.isControlDown() && event.isAltDown()) {
+            event.consume();
+            JNodeToolkit.refreshGui();
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -161,8 +181,8 @@ public class KeyboardHandler implements
             public Object run() {
                 //setCurrentKeyboardFocusManager(KeyboardHandler.this);
                 return null;
-            }            
-        });        
+            }
+        });
     }
 
     /**
@@ -173,8 +193,8 @@ public class KeyboardHandler implements
             public Object run() {
                 //setCurrentKeyboardFocusManager(null);
                 return null;
-            }            
-        });        
+            }
+        });
     }
 
     /**
