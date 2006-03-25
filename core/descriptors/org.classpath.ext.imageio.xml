@@ -17,6 +17,10 @@
       <export name="javax.imageio.metadata.*"/>
       <export name="javax.imageio.spi.*"/>
       <export name="javax.imageio.stream.*"/>
+      <export name="javax.imageio.plugins.bmp.*"/>
+      <export name="javax.imageio.plugins.jpeg.*"/>
+
+      <export name="gnu.javax.imageio.bmp.*"/>
     </library>
   </runtime>
   
