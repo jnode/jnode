@@ -1085,7 +1085,6 @@ public final class ClassDecoder {
         int flags = 0;
         for (String name : SHARED_STATICS_CLASSNAMES) {
             if (className.equals(name)) {
-                System.out.println("FOUND IT: "+ className);
                 flags |= TypePragmaFlags.SHAREDSTATICS;
                 break;
             }

@@ -12,7 +12,18 @@ public class IsolateTest {
      * @param args
      */
     public static void main(String[] args) {
-        Isolate newIsolate = new Isolate("org.jnode.test.core.IsolatedHelloWorld", new String[0]);
+        String mainClass;
+        String[] isolateArgs;
+        if (args.length > 0) {
+            mainClass = args[0];
+            isolateArgs = new String[args.length - 1];
+            System.arraycopy(args, 1, isolateArgs, 0, args.length - 1);
+        } else {
+            mainClass = "org.jnode.test.core.IsolatedHelloWorld";
+            isolateArgs = new String[0];
+        }            
+        
+        Isolate newIsolate = new Isolate(mainClass, isolateArgs);
         try {
             newIsolate.start();
         } catch (IsolateStartupException e) {
