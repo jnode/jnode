@@ -1030,9 +1030,20 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     }
 
     /**
-     * Mark this type initialized. Can only be called during bootstrapping.
+     * Is this type always initialized in every isolate.
+     * 
+     * @return boolean
      */
-    public final void setInitialized() {
+    @Inline
+    public final boolean isAlwaysInitialized() {
+        return ((state & (VmTypeState.ST_ALWAYS_INITIALIZED)) != 0);
+    }
+
+    /**
+     * Mark this type always initialized. 
+     * Can only be called during bootstrapping.
+     */
+    public final void setAlwaysInitialized() {
         Vm._assert(!Vm.isRunningVm());
         state |= VmTypeState.ST_ALWAYS_INITIALIZED;
     }

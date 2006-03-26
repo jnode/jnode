@@ -327,7 +327,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
         if (method.isStatic() && !method.isInitializer()) {
             // Only when class is not initialize
             final VmType< ? > cls = method.getDeclaringClass();
-            if (!cls.isInitialized()) {
+            if (!cls.isAlwaysInitialized()) {
                 final GPR aax = this.AAX;
                 final Label label = genLabel("$$class-init");
 
@@ -363,7 +363,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
      */
     public final void writeClassInitialize(Label curInstrLabel, GPR classReg,
             GPR tmpReg, VmType< ? > cls) {
-        if (!cls.isInitialized()) {
+        if (!cls.isAlwaysInitialized()) {
             // Create jump labels
             final Label testIsolated = new Label(curInstrLabel + "$$testiso-cinit");
             final Label doInit = new Label(curInstrLabel + "$$do-cinit-ex");
@@ -565,7 +565,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
         if (method.isStatic() && !method.isInitializer()) {
             // Only when class is not initialize
             final VmType< ? > cls = method.getDeclaringClass();
-            if (!cls.isInitialized()) {
+            if (!cls.isAlwaysInitialized()) {
                 return true;
             }
         }

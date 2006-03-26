@@ -637,7 +637,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 		final Label notInstanceOfLabel = new Label(curInstrLabel
                 + "notInstanceOf");
 
-		if (!type.isInitialized()) {
+		if (!type.isAlwaysInitialized()) {
             if (os.isCode32()) {
                 helper.writeGetStaticsEntry(curInstrLabel, tmpr, type);
             } else {
@@ -2084,7 +2084,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 		final VmStaticField sf = (VmStaticField) fieldRef.getResolvedVmField();
 
 		// Initialize if needed
-		if (!sf.getDeclaringClass().isInitialized()) {
+		if (!sf.getDeclaringClass().isAlwaysInitialized()) {
 			writeInitializeClass(fieldRef);
 		}
 
@@ -4231,7 +4231,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 		final VmStaticField sf = (VmStaticField) fieldRef.getResolvedVmField();
 
 		// Initialize class if needed
-		if (!sf.getDeclaringClass().isInitialized()) {
+		if (!sf.getDeclaringClass().isAlwaysInitialized()) {
 			writeInitializeClass(fieldRef);
 		}
 
@@ -4716,7 +4716,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 
 		final VmType<?> declClass = fieldRef.getResolvedVmField()
 				.getDeclaringClass();
-		if (!declClass.isInitialized()) {
+		if (!declClass.isAlwaysInitialized()) {
             final Label curInstrLabel = getCurInstrLabel();
             
             // Allocate a register to hold the class

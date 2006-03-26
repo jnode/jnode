@@ -401,7 +401,7 @@ public final class OptimizingBytecodeVisitor extends
         if (declClass.isMagicType()) {
             return false;
         }
-        if (!declClass.isInitialized()) {
+        if (!declClass.isAlwaysInitialized()) {
             return false;
         }
         final VmByteCode bc = method.getBytecode();
