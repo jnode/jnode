@@ -889,7 +889,13 @@ final class MagicHelper extends BaseX86MagicHelper {
             } else {
                 os.writeMOV(BITS64, itemReg, X86CompilerConstants.PROCESSOR64, offset);
             }
-            os.writeLEA(itemReg, itemReg, index.getRegister(), os.getWordSize(), VmArray.DATA_OFFSET * os.getWordSize());
+            GPR indexReg = index.getRegister();
+            if (os.isCode64()) {
+                GPR64 indexReg64 = L1AHelper.get64BitReg(ec, indexReg);
+                os.writeMOVSXD(indexReg64, (GPR32)indexReg);
+                indexReg = indexReg64;
+            }
+            os.writeLEA(itemReg, itemReg, indexReg, os.getWordSize(), VmArray.DATA_OFFSET * os.getWordSize());
             index.release(ec);
             vstack.push(item);
             }
@@ -908,7 +914,13 @@ final class MagicHelper extends BaseX86MagicHelper {
             } else {
                 os.writeMOV(BITS64, itemReg, X86CompilerConstants.PROCESSOR64, offset);
             }
-            os.writeLEA(itemReg, itemReg, index.getRegister(), os.getWordSize(), VmArray.DATA_OFFSET * os.getWordSize());
+            GPR indexReg = index.getRegister();
+            if (os.isCode64()) {
+                GPR64 indexReg64 = L1AHelper.get64BitReg(ec, indexReg);
+                os.writeMOVSXD(indexReg64, (GPR32)indexReg);
+                indexReg = indexReg64;
+            }
+            os.writeLEA(itemReg, itemReg, indexReg, os.getWordSize(), VmArray.DATA_OFFSET * os.getWordSize());
             index.release(ec);
             vstack.push(item);
             }
