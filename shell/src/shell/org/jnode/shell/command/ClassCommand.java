@@ -50,13 +50,15 @@ public class ClassCommand {
 	}
 	
 	private static void showClass(Class<?> type, PrintStream out) {
+        final VmType<?> vmType = type.getVmClass();
 		out.println("Name             : " + type.getName());
 		//out.println("Is abstract      : " + type.isAbstract());
 		out.println("Is array         : " + type.isArray());
 		out.println("Is primitive     : " + type.isPrimitive());
+        out.println("Shared statics   : " + vmType.isSharedStatics());
+        out.println("Is initialized   : " + vmType.isInitialized());
 		out.println("Protection domain: " + type.getProtectionDomain());
         
-        final VmType<?> vmType = type.getVmClass();
         if (vmType instanceof VmClassType) {
             out.println("#Instances       : " + ((VmClassType<?>)vmType).getInstanceCount());
         }
