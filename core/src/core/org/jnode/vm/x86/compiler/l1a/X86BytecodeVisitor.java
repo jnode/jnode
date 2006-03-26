@@ -625,7 +625,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		final Label notInstanceOfLabel = new Label(curInstrLabel
                 + "notInstanceOf");
 
-		if (!type.isInitialized()) {
+		if (!type.isAlwaysInitialized()) {
             if (os.isCode32()) {
                 helper.writeGetStaticsEntry(curInstrLabel, tmpr, type);
             } else {
@@ -1870,7 +1870,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		final VmStaticField sf = (VmStaticField) fieldRef.getResolvedVmField();
 
 		// Initialize if needed
-		if (!sf.getDeclaringClass().isInitialized()) {
+		if (!sf.getDeclaringClass().isAlwaysInitialized()) {
 			writeInitializeClass(fieldRef);
 		}
 
@@ -3751,7 +3751,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		final VmStaticField sf = (VmStaticField) fieldRef.getResolvedVmField();
 
 		// Initialize class if needed
-		if (!sf.getDeclaringClass().isInitialized()) {
+		if (!sf.getDeclaringClass().isAlwaysInitialized()) {
 			writeInitializeClass(fieldRef);
 		}
 
@@ -4219,7 +4219,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 
 		final VmType<?> declClass = fieldRef.getResolvedVmField()
 				.getDeclaringClass();
-		if (!declClass.isInitialized()) {
+		if (!declClass.isAlwaysInitialized()) {
             final Label curInstrLabel = getCurInstrLabel();
             
             // Allocate a register to hold the class

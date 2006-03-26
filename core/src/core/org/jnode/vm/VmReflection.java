@@ -454,7 +454,7 @@ public final class VmReflection {
 	 */
 	private static final void initialize(VmStaticField sf) {
 		final VmType<?> declClass = sf.getDeclaringClass();
-		if (!declClass.isInitialized()) {
+		if (!declClass.isAlwaysInitialized()) {
 			if (!(sf.isPrimitive() && sf.isFinal())) {
 				sf.getDeclaringClass().initialize();
 			}

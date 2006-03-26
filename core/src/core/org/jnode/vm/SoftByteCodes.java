@@ -121,7 +121,7 @@ public final class SoftByteCodes {
             result = field;
         }
         VmType< ? > declClass = result.getDeclaringClass();
-        if ((isStatic) && (!declClass.isInitialized())) {
+        if ((isStatic) && (!declClass.isAlwaysInitialized())) {
             if (!(result.isPrimitive() && result.isFinal())) {
                 declClass.initialize();
             }

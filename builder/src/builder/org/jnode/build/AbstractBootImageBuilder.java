@@ -1467,7 +1467,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                         }
                     }
                     if (name.startsWith("org.mmtk.") || type.isEnum()) {
-                        type.setInitialized();
+                        type.setAlwaysInitialized();
                     }
                 } catch (JNodeClassNotFoundException ex) {
                     log("JNode class not found" + ex.getMessage());

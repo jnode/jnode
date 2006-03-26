@@ -37,6 +37,7 @@ Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 
 package java.security;
 
+import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmAccessController;
 
 /**
@@ -92,6 +93,9 @@ public final class AccessController
      */
     public static Object doPrivileged(PrivilegedAction action) 
     {
+        if (action == null) {
+            Unsafe.debug("action == null!! ");
+        }
         return VmAccessController.doPrivileged(action, null);
     }
 
