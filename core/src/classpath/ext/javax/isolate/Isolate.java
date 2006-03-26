@@ -74,7 +74,7 @@ public final class Isolate {
      * @param stderr
      */
     public Isolate(StreamBindings bindings, Properties properties, String mainClass, String[] args) {
-        this.impl = new VmIsolate(this, bindings, properties, mainClass, args);
+        this.impl = new VmIsolate(this, bindings.getBindings(), properties, mainClass, args);
     }
 
     /**
