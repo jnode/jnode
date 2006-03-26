@@ -27,6 +27,7 @@ import java.lang.reflect.Method;
 
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmAddress;
+import org.jnode.vm.VmIsolateLocal;
 import org.jnode.vm.annotation.MagicPermission;
 import org.vmmagic.unboxed.Address;
 
@@ -46,7 +47,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
     private VmType returnType;
 
     /** java.lang.reflect.Method for this method */
-    private Member javaMember;
+    private VmIsolateLocal<Member> javaMemberHolder;
 
     /** The bytecode (if any) */
     private VmByteCode bytecode;
@@ -155,12 +156,17 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
      * @return Method
      */
     public final Member asMember() {
+        if (javaMemberHolder == null) {
+            javaMemberHolder = new VmIsolateLocal<Member>();            
+        }
+        Member javaMember = javaMemberHolder.get();
         if (javaMember == null) {
             if (isConstructor()) {
                 javaMember = new Constructor(this);
             } else {
                 javaMember = new Method(this);
             }
+            javaMemberHolder.set(javaMember);
         }
         return javaMember;
     }

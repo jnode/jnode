@@ -23,10 +23,12 @@ package org.jnode.vm.classmgr;
 
 import java.lang.reflect.Field;
 
+import org.jnode.vm.VmIsolateLocal;
+
 public abstract class VmField extends VmMember {
 
 	/** java.lang.reflect.Field corresponding to this field */
-	private Field javaField;
+	private VmIsolateLocal<Field> javaFieldHolder;
 	/** Type of this field */
 	private VmType type;
 	/** Is the type of this field primitive? */
@@ -97,10 +99,14 @@ public abstract class VmField extends VmMember {
 	 * Return me as java.lang.reflect.Field
 	 * @return Field
 	 */
-	public Field asField() {
-		if (javaField == null) {
-			javaField = new Field(this);
-		}
+	public final Field asField() {
+        if (javaFieldHolder == null) {
+            javaFieldHolder = new VmIsolateLocal<Field>();
+        }
+        Field javaField = javaFieldHolder.get();
+        if (javaField == null) {
+            javaFieldHolder.set(javaField = new Field(this));            
+        }
 		return javaField;
 	}
 
