@@ -30,7 +30,6 @@ import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmAddress;
 import org.jnode.vm.VmArchitecture;
-import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.annotation.MagicPermission;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.ObjectReference;
@@ -40,38 +39,34 @@ import org.vmmagic.unboxed.UnboxedObject;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @MagicPermission
-public abstract class VmStatics extends VmSystemObject {
-
-	private static final byte TYPE_INT = 0x01;
-	private static final byte TYPE_LONG = 0x02;
-	private static final byte TYPE_OBJECT = 0x03;
-	private static final byte TYPE_ADDRESS = 0x04;
-	private static final byte TYPE_METHOD_CODE = 0x05;
-	private static final byte TYPE_STRING = 0x06;
-	private static final byte TYPE_CLASS = 0x07;
-	private static final byte MAX_TYPE = TYPE_CLASS;
+public abstract class VmStatics extends VmStaticsBase {
 
 	private int[] statics;
-	private byte[] types;
-	private final int[] typeCounter = new int[MAX_TYPE + 1];
 	private transient Object[] objects;
-	private int next;
 	private final int slotLength;
 	private final boolean lsbFirst;
 	private transient ObjectResolver resolver;
 	private transient boolean locked;
+    private final VmStaticsAllocator allocator;
 
 	/**
 	 * Initialize this instance
 	 */
 	public VmStatics(VmArchitecture arch, ObjectResolver resolver, int size) {
-		this.statics = new int[size];
-		this.types = new byte[size];
-		this.objects = new Object[size];
-		this.lsbFirst = (arch.getByteOrder() == ByteOrder.LITTLE_ENDIAN);
-		this.slotLength = arch.getReferenceSize() >> 2;
-		this.resolver = resolver;
+        this(new VmStaticsAllocator(size), arch, resolver);
 	}
+
+    /**
+     * Initialize this instance
+     */
+    protected VmStatics(VmStaticsAllocator allocator, VmArchitecture arch, ObjectResolver resolver) {
+        this.statics = new int[allocator.getCapacity()];
+        this.allocator = allocator;
+        this.objects = new Object[allocator.getCapacity()];
+        this.lsbFirst = (arch.getByteOrder() == ByteOrder.LITTLE_ENDIAN);
+        this.slotLength = arch.getReferenceSize() >> 2;
+        this.resolver = resolver;
+    }
 
 	/**
 	 * Allocate an int/float type entry.
@@ -79,7 +74,7 @@ public abstract class VmStatics extends VmSystemObject {
 	 * @return the index of the allocated entry.
 	 */
 	final int allocIntField() {
-		return alloc(TYPE_INT, 1);
+		return allocator.alloc(TYPE_INT, 1);
 	}
 
 	/**
@@ -88,7 +83,7 @@ public abstract class VmStatics extends VmSystemObject {
 	 * @return the index of the allocated entry.
 	 */
 	final int allocLongField() {
-		return alloc(TYPE_LONG, 2);
+		return allocator.alloc(TYPE_LONG, 2);
 	}
 
 	/**
@@ -97,7 +92,7 @@ public abstract class VmStatics extends VmSystemObject {
 	 * @return the index of the allocated entry.
 	 */
 	final int allocObjectField() {
-		return alloc(TYPE_OBJECT, slotLength);
+		return allocator.alloc(TYPE_OBJECT, slotLength);
 	}
 
 	/**
@@ -106,7 +101,7 @@ public abstract class VmStatics extends VmSystemObject {
 	 * @return the index of the allocated entry.
 	 */
 	final int allocConstantStringField(String value) {
-		final int idx = alloc(TYPE_STRING, slotLength);
+		final int idx = allocator.alloc(TYPE_STRING, slotLength);
 		setRawObject(idx, value);
 		return idx;
 	}
@@ -117,7 +112,7 @@ public abstract class VmStatics extends VmSystemObject {
 	 * @return the index of the allocated entry.
 	 */
 	public final int allocAddressField() {
-		return alloc(TYPE_ADDRESS, slotLength);
+		return allocator.alloc(TYPE_ADDRESS, slotLength);
 	}
 
 	/**
@@ -126,7 +121,7 @@ public abstract class VmStatics extends VmSystemObject {
 	 * @return the index of the allocated entry.
 	 */
 	final int allocMethodCode() {
-		final int idx = alloc(TYPE_METHOD_CODE, slotLength);
+		final int idx = allocator.alloc(TYPE_METHOD_CODE, slotLength);
 		return idx;
 	}
     
@@ -136,9 +131,7 @@ public abstract class VmStatics extends VmSystemObject {
      * @param nativeCode
      */
     final void setMethodCode(int idx, VmAddress nativeCode) {
-        if (types[idx] != TYPE_METHOD_CODE) {
-            throw new IllegalArgumentException("Type error " + types[idx]);
-        }
+        allocator.testType(idx, TYPE_METHOD_CODE);
         setRawObject(idx, nativeCode);
     }
 
@@ -148,7 +141,7 @@ public abstract class VmStatics extends VmSystemObject {
 	 * @return the index of the allocated entry.
 	 */
 	final int allocClass(VmType type) {
-		final int idx = alloc(TYPE_CLASS, slotLength);
+		final int idx = allocator.alloc(TYPE_CLASS, slotLength);
 		setRawObject(idx, type);
 		return idx;
 	}
@@ -159,16 +152,12 @@ public abstract class VmStatics extends VmSystemObject {
      * @return
      */
     final VmType getTypeEntry(int idx) {
-        if (types[idx] != TYPE_CLASS) {
-            throw new IllegalArgumentException("Type error " + types[idx]);
-        }
+        allocator.testType(idx, TYPE_CLASS);
         return (VmType)getRawObject(idx);
     }
 
 	public final void setInt(int idx, int value) {
-		if (types[idx] != TYPE_INT) {
-			throw new IllegalArgumentException("Type error " + types[idx]);
-		}
+        allocator.testType(idx, TYPE_INT);
 		if (statics[idx] != value) {
 			if (locked) {
 				throw new RuntimeException("Locked");
@@ -178,16 +167,12 @@ public abstract class VmStatics extends VmSystemObject {
 	}
 
     public final int getInt(int idx) {
-        if (types[idx] != TYPE_INT) {
-            throw new IllegalArgumentException("Type error " + types[idx]);
-        }
+        allocator.testType(idx, TYPE_INT);
         return statics[idx];
     }
 
 	public final void setObject(int idx, Object value) {
-		if (types[idx] != TYPE_OBJECT) {
-			throw new IllegalArgumentException("Type error " + types[idx]);
-		}
+        allocator.testType(idx, TYPE_OBJECT);
 		if (setRawObject(idx, value)) {
 			if (locked) {
 				throw new RuntimeException("Locked");
@@ -199,9 +184,7 @@ public abstract class VmStatics extends VmSystemObject {
         if (!Vm.isWritingImage()) {
             throw new IllegalStateException("Only allowed during bootimage creation.");
         }
-        if (types[idx] != TYPE_ADDRESS) {
-            throw new IllegalArgumentException("Type error " + types[idx]);
-        }
+        allocator.testType(idx, TYPE_ADDRESS);
         if (setRawObject(idx, value)) {
             if (locked) {
                 throw new RuntimeException("Locked");
@@ -213,9 +196,7 @@ public abstract class VmStatics extends VmSystemObject {
         if (!Vm.isWritingImage()) {
             throw new IllegalStateException("Only allowed during bootimage creation.");
         }
-        if (types[idx] != TYPE_ADDRESS) {
-            throw new IllegalArgumentException("Type error " + types[idx]);
-        }
+        allocator.testType(idx, TYPE_ADDRESS);
         if (setRawObject(idx, value)) {
             if (locked) {
                 throw new RuntimeException("Locked");
@@ -286,9 +267,7 @@ public abstract class VmStatics extends VmSystemObject {
 		if (locked) {
 			throw new RuntimeException("Locked");
 		}
-		if (types[idx] != TYPE_LONG) {
-			throw new IllegalArgumentException("Type error " + types[idx]);
-		}
+        allocator.testType(idx, TYPE_LONG);
 		if (lsbFirst) {
 			statics[idx + 0] = (int) (value & 0xFFFFFFFFL);
 			statics[idx + 1] = (int) ((value >>> 32) & 0xFFFFFFFFL);
@@ -296,24 +275,6 @@ public abstract class VmStatics extends VmSystemObject {
 			statics[idx + 1] = (int) (value & 0xFFFFFFFFL);
 			statics[idx + 0] = (int) ((value >>> 32) & 0xFFFFFFFFL);
 		}
-	}
-
-	/**
-	 * Allocate an entry.
-	 * 
-	 * @param type
-	 * @param length
-	 * @return the index of the allocated entry.
-	 */
-	private final synchronized int alloc(byte type, int length) {
-		if (locked) {
-			throw new RuntimeException("Locked");
-		}
-		final int idx = next;
-		types[idx] = type;
-		typeCounter[type]++;
-		next += length;
-		return idx;
 	}
 
 	/**
@@ -331,7 +292,7 @@ public abstract class VmStatics extends VmSystemObject {
 	 * @return int
 	 */
 	public final int getType(int index) {
-		return types[index];
+		return allocator.getType(index);
 	}
 
 	/**
@@ -354,8 +315,8 @@ public abstract class VmStatics extends VmSystemObject {
 		final byte[] types;
 		final int length;
 		table = this.statics;
-		types = this.types;
-		length = this.next;
+		types = allocator.getTypes();
+		length = allocator.getLength();
 		if (slotLength == 1) {
 			for (int i = 0; i < length; i++) {
 				final byte type = types[i];
@@ -392,11 +353,7 @@ public abstract class VmStatics extends VmSystemObject {
 	}
 
 	public final void dumpStatistics(PrintStream out) {
-		out.println("  #static int fields  " + typeCounter[TYPE_INT]);
-		out.println("  #static long fields " + typeCounter[TYPE_LONG]);
-		out.println("  #methods            " + typeCounter[TYPE_METHOD_CODE]);
-		out.println("  #types              " + typeCounter[TYPE_CLASS]);
-		out.println("  table.length        " + next);
+        allocator.dumpStatistics(out);
 	}
 
 	/**
@@ -412,12 +369,12 @@ public abstract class VmStatics extends VmSystemObject {
 				count++;
 				if (slotLength == 1) {
 					statics[i] = resolver.addressOf32(value);
-					if ((statics[i] == 0) && (types[i] != TYPE_ADDRESS)) {
+					if ((statics[i] == 0) && (allocator.getType(i) != TYPE_ADDRESS)) {
 						throw new RuntimeException("addressof32(" + value + ") is null");
 					}
 				} else {
 					final long lvalue = resolver.addressOf64(value);
-					if ((lvalue == 0L) && (types[i] != TYPE_ADDRESS)) {
+					if ((lvalue == 0L) && (allocator.getType(i) != TYPE_ADDRESS)) {
 						throw new RuntimeException("addressof64(" + value + ") is null");
 					}
 					if (lsbFirst) {
@@ -428,7 +385,7 @@ public abstract class VmStatics extends VmSystemObject {
 						statics[i + 0] = (int) ((lvalue >>> 32) & 0xFFFFFFFFL);
 					}
 				}
-			} else if (types[i] == TYPE_METHOD_CODE) {
+			} else if (allocator.getType(i) == TYPE_METHOD_CODE) {
 				throw new RuntimeException("Method is null");
 			}
 		}
@@ -436,4 +393,12 @@ public abstract class VmStatics extends VmSystemObject {
 		locked = true;
 		//System.out.println("VmStatics#verifyBeforeEmit count=" + count);
 	}
+    
+    /**
+     * Gets my statics allocator.
+     * @return
+     */
+    protected final VmStaticsAllocator getAllocator() {
+        return allocator;
+    }
 }
