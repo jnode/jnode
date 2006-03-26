@@ -57,7 +57,7 @@ final class MagicHelper extends BaseX86MagicHelper {
      * @param method
      * @param isstatic
      */
-    public void emitMagic(EmitterContext ec, VmMethod method, boolean isstatic, X86BytecodeVisitor bcv) {
+    public void emitMagic(EmitterContext ec, VmMethod method, boolean isstatic, X86BytecodeVisitor bcv, VmMethod caller) {
         //final int type = getClass(method);
         final MagicMethod mcode = MagicMethod.get(method);
         final VirtualStack vstack = ec.getVStack();
@@ -67,6 +67,9 @@ final class MagicHelper extends BaseX86MagicHelper {
 //        final EntryPoints context = ec.getContext();  
         final X86CompilerHelper helper = ec.getHelper();
         final int slotSize = os.isCode32() ? 4 : 8;
+
+        // Test magic permission first
+        testMagicPermission(mcode, caller);
 
         switch (mcode) {
         case ADD: {
@@ -910,6 +913,10 @@ final class MagicHelper extends BaseX86MagicHelper {
             vstack.push(item);
             }
         break;
+        case ISRUNNINGJNODE: {
+            if (Vm.VerifyAssertions) Vm._assert(isstatic);
+            vstack.push(ifac.createIConst(ec, 1));
+        } break;
 
         // xyzArray classes
         case ARR_CREATE: {

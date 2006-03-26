@@ -33,6 +33,7 @@ import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.system.SimpleResourceOwner;
 import org.jnode.util.AccessControllerUtils;
+import org.jnode.vm.annotation.MagicPermission;
 import org.vmmagic.unboxed.Address;
 
 /*
@@ -86,7 +87,8 @@ import org.vmmagic.unboxed.Address;
 /**
  * @author epr
  */
-public class DMA implements DMAConstants {
+@MagicPermission
+final class DMA implements DMAConstants {
 
 	/** Number of channels */
 	public static final int MAX = 8;

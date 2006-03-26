@@ -23,6 +23,7 @@ package org.jnode.vm.memmgr.def;
 
 import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.VmMagic;
+import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.memmgr.HeapHelper;
@@ -31,6 +32,7 @@ import org.vmmagic.pragma.Uninterruptible;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@MagicPermission
 final class GCSweepVisitor extends ObjectVisitor implements ObjectFlags,
         Uninterruptible {
 

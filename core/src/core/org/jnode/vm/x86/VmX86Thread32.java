@@ -22,11 +22,13 @@
 package org.jnode.vm.x86;
 
 import org.jnode.util.NumberUtils;
+import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@MagicPermission
 public final class VmX86Thread32 extends VmX86Thread {
 
     /**

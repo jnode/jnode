@@ -27,6 +27,7 @@ import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.annotation.Inline;
+import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
@@ -39,6 +40,7 @@ import org.vmmagic.unboxed.Offset;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@MagicPermission
 final class GCVerifyVisitor extends ObjectVisitor {
 
     private final HeapHelper helper;

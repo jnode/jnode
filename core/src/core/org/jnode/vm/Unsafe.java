@@ -25,6 +25,7 @@ import org.jnode.assembler.ObjectResolver;
 import org.jnode.security.JNodePermission;
 import org.jnode.vm.annotation.Inline;
 import org.jnode.vm.annotation.KernelSpace;
+import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
 import org.vmmagic.pragma.UninterruptiblePragma;
@@ -39,11 +40,13 @@ import org.vmmagic.unboxed.Word;
  * 
  * @author epr
  */
+@MagicPermission
 public final class Unsafe {
 
     private static final JNodePermission GET_JUMP_TABLE_PERM = new JNodePermission(
             "getJumpTable");
 
+    @MagicPermission
     public static class UnsafeObjectResolver extends ObjectResolver {
 
         public UnsafeObjectResolver() {

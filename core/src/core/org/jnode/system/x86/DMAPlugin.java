@@ -34,13 +34,15 @@ import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.system.SimpleResourceOwner;
+import org.jnode.vm.annotation.MagicPermission;
 import org.vmmagic.unboxed.Address;
 
 /**
  * DMA service for X86 architecture.
  * @author epr
  */
-public class DMAPlugin extends Plugin implements DMAManager {
+@MagicPermission
+public final class DMAPlugin extends Plugin implements DMAManager {
 
 	/** All channels */
 	private final X86DMAChannel[] channels;

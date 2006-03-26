@@ -28,7 +28,7 @@ import org.jnode.util.NumberUtils;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class MPBusEntry extends MPEntry {
+final class MPBusEntry extends MPEntry {
 
     /**
      * @param mem

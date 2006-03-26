@@ -19,27 +19,27 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.vm.classmgr;
+package org.jnode.vm.annotation;
+
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.CLASS;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 /**
- * Variable pragma flags for methods.
+ * This annotation is used to request permission to use magic code
+ * in the methods of this type.
+ * It is up to the classloader & verifier to verify that this permission
+ * is actually allowed. If not, an exception must be thrown during 
+ * class loading.
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public interface TypePragmaFlags {
+@Documented
+@Retention(CLASS)
+@Target(TYPE)
+public @interface MagicPermission {
 
-    /** Method of this type will not get any yieldpoints */
-    public static final char UNINTERRUPTIBLE = 0x0001;
-    
-    /** Static variables of this type will be shared between isolates */
-    public static final char SHAREDSTATICS = 0x0002;
-    
-    /** Fields of this type must not be re-ordered */
-    public static final char NO_FIELD_ALIGNMENT = 0x0004;
-
-    /** Methods of this type are allowed to use magic code. */
-    public static final char MAGIC_PERMISSION = 0x0008;
-
-    /** All flags that are inherited from the super class */
-    static final char INHERITABLE_FLAGS_MASK = UNINTERRUPTIBLE;    
 }

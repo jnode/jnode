@@ -23,6 +23,7 @@ package org.jnode.vm.memmgr.def;
 
 import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.VmMagic;
+import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.vmmagic.pragma.Uninterruptible;
@@ -30,6 +31,7 @@ import org.vmmagic.pragma.Uninterruptible;
 /**
  * @author epr
  */
+@MagicPermission
 final class GCSetWhiteVisitor extends ObjectVisitor implements ObjectFlags, Uninterruptible {
 
 	private final HeapHelper helper;

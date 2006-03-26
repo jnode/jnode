@@ -45,6 +45,7 @@ import org.jnode.system.ResourceOwner;
 import org.jnode.system.SimpleResourceOwner;
 import org.jnode.util.SystemInputStream;
 import org.jnode.vm.annotation.KernelSpace;
+import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.jnode.vm.annotation.SharedStatics;
 import org.jnode.vm.annotation.Uninterruptible;
@@ -71,6 +72,7 @@ import org.vmmagic.unboxed.Offset;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @SharedStatics
+@MagicPermission
 public final class VmSystem {
 
     public static final int RC_HANDLER = 0xFFFFFFFB;

@@ -27,8 +27,10 @@ import java.lang.reflect.Method;
 
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmAddress;
+import org.jnode.vm.annotation.MagicPermission;
 import org.vmmagic.unboxed.Address;
 
+@MagicPermission
 public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry {
 
     /** Address of native code of this method */

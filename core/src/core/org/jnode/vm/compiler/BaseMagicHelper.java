@@ -96,148 +96,147 @@ public class BaseMagicHelper {
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
     public enum MagicMethod {        
-        ADD("add"),
-        AND("and"),
-        OR("or"),
-        NOT("not"),
-        SUB("sub"),
-        XOR("xor"),
-        ZERO("zero"),
-        MAX("max"),
-        ONE("one"),
-        TOINT("toInt"),
-        TOLONG("toLong"),
-        TOWORD("toWord"),
-        TOADDRESS("toAddress"),
-        TOEXTENT("toExtent"),
-        TOOFFSET("toOffset"),
-        TOOBJECTREFERENCE("toObjectReference"),
-        EQUALS("equals"),
-        ISZERO("isZero"),
-        ISMAX("isMax"),
-        ISNULL("isNull"),
-        EQ("EQ"),
-        NE("NE"),
-        GT("GT"),
-        GE("GE"),
-        LT("LT"),
-        LE("LE"),
-        SGT("sGT"),
-        SGE("sGE"),
-        SLT("sLT"),
-        SLE("sLE"),
-        FROMINT("fromInt"),
-        FROMINTSIGNEXTEND("fromIntSignExtend"),
-        FROMINTZEROEXTEND("fromIntZeroExtend"),
-        FROMLONG("fromLong"),
-        LSH("lsh"),
-        RSHL("rshl"),
-        RSHA("rsha"),
-        LOADBYTE("loadByte", 0, "()B"),
-        LOADBYTE_OFS("loadByte", 1, "(Lorg/vmmagic/unboxed/Offset;)B"),
-        LOADCHAR("loadChar", 0, "()C"),
-        LOADCHAR_OFS("loadChar", 1, "(Lorg/vmmagic/unboxed/Offset;)C"),
-        LOADSHORT("loadShort", 0, "()S"),
-        LOADSHORT_OFS("loadShort", 1, "(Lorg/vmmagic/unboxed/Offset;)S"),
-        LOADINT("loadInt", 0, "()I"),
-        LOADINT_OFS("loadInt", 1, "(Lorg/vmmagic/unboxed/Offset;)I"),
-        LOADFLOAT("loadFloat", 0, "()F"),
-        LOADFLOAT_OFS("loadFloat", 1, "(Lorg/vmmagic/unboxed/Offset;)F"),
-        LOADLONG("loadLong", 0, "()J"),
-        LOADLONG_OFS("loadLong", 1, "(Lorg/vmmagic/unboxed/Offset;)J"),
-        LOADDOUBLE("loadDouble", 0, "()D"),
-        LOADDOUBLE_OFS("loadDouble", 1, "(Lorg/vmmagic/unboxed/Offset;)D"),
-        LOADADDRESS("loadAddress", 0, "()Lorg/vmmagic/unboxed/Address;"),
-        LOADADDRESS_OFS("loadAddress", 1, "(Lorg/vmmagic/unboxed/Offset;)Lorg/vmmagic/unboxed/Address;"),
-        LOADWORD("loadWord", 0, "()Lorg/vmmagic/unboxed/Word;"),
-        LOADWORD_OFS("loadWord", 1, "(Lorg/vmmagic/unboxed/Offset;)Lorg/vmmagic/unboxed/Word;"),
-        LOADOBJECTREFERENCE("loadObjectReference", 0, "()Lorg/vmmagic/unboxed/ObjectReference;"),
-        LOADOBJECTREFERENCE_OFS("loadObjectReference", 1, "(Lorg/vmmagic/unboxed/Offset;)Lorg/vmmagic/unboxed/ObjectReference;"),
-        SIZE("size"),
-        STOREBYTE("store", 1, "(B)V"),
-        STOREBYTE_OFS("store", 2, "(BLorg/vmmagic/unboxed/Offset;)V"),
-        STORECHAR("store", 1, "(C)V"),
-        STORECHAR_OFS("store", 2, "(CLorg/vmmagic/unboxed/Offset;)V"),
-        STORESHORT("store", 1, "(S)V"),
-        STORESHORT_OFS("store", 2, "(SLorg/vmmagic/unboxed/Offset;)V"),
-        STOREINT("store", 1, "(I)V"),
-        STOREINT_OFS("store", 2, "(ILorg/vmmagic/unboxed/Offset;)V"),
-        STOREFLOAT("store", 1, "(F)V"),
-        STOREFLOAT_OFS("store", 2, "(FLorg/vmmagic/unboxed/Offset;)V"),
-        STORELONG("store", 1, "(J)V"),
-        STORELONG_OFS("store", 2, "(JLorg/vmmagic/unboxed/Offset;)V"),
-        STOREDOUBLE("store", 1, "(D)V"),
-        STOREDOUBLE_OFS("store", 2, "(DLorg/vmmagic/unboxed/Offset;)V"),
-        STOREADDRESS("store", 1, "(Lorg/vmmagic/unboxed/Address;)V"),
-        STOREADDRESS_OFS("store", 2, "(Lorg/vmmagic/unboxed/Address;Lorg/vmmagic/unboxed/Offset;)V"),
-        STOREWORD("store", 1, "(Lorg/vmmagic/unboxed/Word;)V"),
-        STOREWORD_OFS("store", 2, "(Lorg/vmmagic/unboxed/Word;Lorg/vmmagic/unboxed/Offset;)V"),
-        STOREOBJECTREFERENCE("store", 1, "(Lorg/vmmagic/unboxed/ObjectReference;)V"),
-        STOREOBJECTREFERENCE_OFS("store", 2, "(Lorg/vmmagic/unboxed/ObjectReference;Lorg/vmmagic/unboxed/Offset;)V"),
-        PREPAREINT("prepareInt", 0, "()I"),
-        PREPAREINT_OFS("prepareInt", 1, "(Lorg/vmmagic/unboxed/Offset;)I"),
-        PREPAREADDRESS("prepareAddress", 0, "()Lorg/vmmagic/unboxed/Address;"),
-        PREPAREADDRESS_OFS("prepareAddress", 1, "(Lorg/vmmagic/unboxed/Offset;)Lorg/vmmagic/unboxed/Address;"),
-        PREPAREWORD("prepareWord", 0, "()Lorg/vmmagic/unboxed/Word;"),
-        PREPAREWORD_OFS("prepareWord", 1, "(Lorg/vmmagic/unboxed/Offset;)Lorg/vmmagic/unboxed/Word;"),
-        PREPAREOBJECTREFERENCE("prepareObjectReference", 0, "()Lorg/vmmagic/unboxed/ObjectReference;"),
-        PREPAREOBJECTREFERENCE_OFS("prepareObjectReference", 1, "(Lorg/vmmagic/unboxed/Offset;)Lorg/vmmagic/unboxed/ObjectReference;"),
-        ATTEMPTINT("attempt", 2, "(II)Z"),
-        ATTEMPTINT_OFS("attempt", 3, "(IILorg/vmmagic/unboxed/Offset;)Z"),
-        ATTEMPTADDRESS("attempt", 2, "(Lorg/vmmagic/unboxed/Address;Lorg/vmmagic/unboxed/Address;)Z"),
-        ATTEMPTADDRESS_OFS("attempt", 3, "(Lorg/vmmagic/unboxed/Address;Lorg/vmmagic/unboxed/Address;Lorg/vmmagic/unboxed/Offset;)Z"),
-        ATTEMPTOBJECTREFERENCE("attempt", 2, "(Lorg/vmmagic/unboxed/ObjectReference;Lorg/vmmagic/unboxed/ObjectReference;)Z"),
-        ATTEMPTOBJECTREFERENCE_OFS("attempt", 3, "(Lorg/vmmagic/unboxed/ObjectReference;Lorg/vmmagic/unboxed/ObjectReference;Lorg/vmmagic/unboxed/Offset;)Z"),
-        ATTEMPTWORD("attempt", 2, "(Lorg/vmmagic/unboxed/Word;Lorg/vmmagic/unboxed/Word;)Z"),
-        ATTEMPTWORD_OFS("attempt", 3, "(Lorg/vmmagic/unboxed/Word;Lorg/vmmagic/unboxed/Word;Lorg/vmmagic/unboxed/Offset;)Z"),
-        FROMOBJECT("fromObject"),
-        FROMADDRESS("fromAddress"),
-        GETOBJECTTYPE("getObjectType"),
-        GETTIB("getTIB"),
-        GETOBJECTFLAGS("getObjectFlags"),
-        SETOBJECTFLAGS("setObjectFlags"),
-        TOOBJECT("toObject"),
-        GETARRAYDATA("getArrayData"),
-        GETOBJECTCOLOR("getObjectColor"),
-        ISFINALIZED("isFinalized"),
-        ATOMICADD("atomicAdd"),
-        ATOMICAND("atomicAnd"),
-        ATOMICOR("atomicOr"),
-        ATOMICSUB("atomicSub"),
-        GETCURRENTFRAME("getCurrentFrame"),
-        GETTIMESTAMP("getTimeStamp"),
-        INTBITSTOFLOAT("intBitsToFloat"),
-        FLOATTORAWINTBITS("floatToRawIntBits"),
-        LONGBITSTODOUBLE("longBitsToDouble"),
-        DOUBLETORAWLONGBITS("doubleToRawLongBits"),
-        BREAKPOINT("breakPoint"),
-        DIFF("diff"),
-        NULLREFERENCE("nullReference"),
-        CURRENTPROCESSOR("currentProcessor", 0, "()Lorg/jnode/vm/VmProcessor;"),
-        GETSHAREDSTATICSFIELDADDRESS("getSharedStaticFieldAddress"),
-        GETISOLATEDSTATICSFIELDADDRESS("getIsolatedStaticFieldAddress"),
+        ADD("add", false),
+        AND("and", false),
+        OR("or", false),
+        NOT("not", false),
+        SUB("sub", false),
+        XOR("xor", false),
+        ZERO("zero", false),
+        MAX("max", false),
+        ONE("one", false),
+        TOINT("toInt", false),
+        TOLONG("toLong", false),
+        TOWORD("toWord", false),
+        TOADDRESS("toAddress", true),
+        TOEXTENT("toExtent", false),
+        TOOFFSET("toOffset", false),
+        TOOBJECTREFERENCE("toObjectReference", true),
+        EQUALS("equals", false),
+        ISZERO("isZero", false),
+        ISMAX("isMax", false),
+        ISNULL("isNull", false),
+        EQ("EQ", false),
+        NE("NE", false),
+        GT("GT", false),
+        GE("GE", false),
+        LT("LT", false),
+        LE("LE", false),
+        SGT("sGT", false),
+        SGE("sGE", false),
+        SLT("sLT", false),
+        SLE("sLE", false),
+        FROMINT("fromInt", false),
+        FROMINTSIGNEXTEND("fromIntSignExtend", false),
+        FROMINTZEROEXTEND("fromIntZeroExtend", false),
+        FROMLONG("fromLong", false),
+        LSH("lsh", false),
+        RSHL("rshl", false),
+        RSHA("rsha", false),
+        LOADBYTE("loadByte", true, "()B"),
+        LOADBYTE_OFS("loadByte", true, "(Lorg/vmmagic/unboxed/Offset;)B"),
+        LOADCHAR("loadChar", true, "()C"),
+        LOADCHAR_OFS("loadChar", true, "(Lorg/vmmagic/unboxed/Offset;)C"),
+        LOADSHORT("loadShort", true, "()S"),
+        LOADSHORT_OFS("loadShort", true, "(Lorg/vmmagic/unboxed/Offset;)S"),
+        LOADINT("loadInt", true, "()I"),
+        LOADINT_OFS("loadInt", true, "(Lorg/vmmagic/unboxed/Offset;)I"),
+        LOADFLOAT("loadFloat", true, "()F"),
+        LOADFLOAT_OFS("loadFloat", true, "(Lorg/vmmagic/unboxed/Offset;)F"),
+        LOADLONG("loadLong", true, "()J"),
+        LOADLONG_OFS("loadLong", true, "(Lorg/vmmagic/unboxed/Offset;)J"),
+        LOADDOUBLE("loadDouble", true, "()D"),
+        LOADDOUBLE_OFS("loadDouble", true, "(Lorg/vmmagic/unboxed/Offset;)D"),
+        LOADADDRESS("loadAddress", true, "()Lorg/vmmagic/unboxed/Address;"),
+        LOADADDRESS_OFS("loadAddress", true, "(Lorg/vmmagic/unboxed/Offset;)Lorg/vmmagic/unboxed/Address;"),
+        LOADWORD("loadWord", true, "()Lorg/vmmagic/unboxed/Word;"),
+        LOADWORD_OFS("loadWord", true, "(Lorg/vmmagic/unboxed/Offset;)Lorg/vmmagic/unboxed/Word;"),
+        LOADOBJECTREFERENCE("loadObjectReference", true, "()Lorg/vmmagic/unboxed/ObjectReference;"),
+        LOADOBJECTREFERENCE_OFS("loadObjectReference", true, "(Lorg/vmmagic/unboxed/Offset;)Lorg/vmmagic/unboxed/ObjectReference;"),
+        SIZE("size", false),
+        STOREBYTE("store", true, "(B)V"),
+        STOREBYTE_OFS("store", true, "(BLorg/vmmagic/unboxed/Offset;)V"),
+        STORECHAR("store", true, "(C)V"),
+        STORECHAR_OFS("store", true, "(CLorg/vmmagic/unboxed/Offset;)V"),
+        STORESHORT("store", true, "(S)V"),
+        STORESHORT_OFS("store", true, "(SLorg/vmmagic/unboxed/Offset;)V"),
+        STOREINT("store", true, "(I)V"),
+        STOREINT_OFS("store", true, "(ILorg/vmmagic/unboxed/Offset;)V"),
+        STOREFLOAT("store", true, "(F)V"),
+        STOREFLOAT_OFS("store", true, "(FLorg/vmmagic/unboxed/Offset;)V"),
+        STORELONG("store", true, "(J)V"),
+        STORELONG_OFS("store", true, "(JLorg/vmmagic/unboxed/Offset;)V"),
+        STOREDOUBLE("store", true, "(D)V"),
+        STOREDOUBLE_OFS("store", true, "(DLorg/vmmagic/unboxed/Offset;)V"),
+        STOREADDRESS("store", true, "(Lorg/vmmagic/unboxed/Address;)V"),
+        STOREADDRESS_OFS("store", true, "(Lorg/vmmagic/unboxed/Address;Lorg/vmmagic/unboxed/Offset;)V"),
+        STOREWORD("store", true, "(Lorg/vmmagic/unboxed/Word;)V"),
+        STOREWORD_OFS("store", true, "(Lorg/vmmagic/unboxed/Word;Lorg/vmmagic/unboxed/Offset;)V"),
+        STOREOBJECTREFERENCE("store", true, "(Lorg/vmmagic/unboxed/ObjectReference;)V"),
+        STOREOBJECTREFERENCE_OFS("store", true, "(Lorg/vmmagic/unboxed/ObjectReference;Lorg/vmmagic/unboxed/Offset;)V"),
+        PREPAREINT("prepareInt", true, "()I"),
+        PREPAREINT_OFS("prepareInt", true, "(Lorg/vmmagic/unboxed/Offset;)I"),
+        PREPAREADDRESS("prepareAddress", true, "()Lorg/vmmagic/unboxed/Address;"),
+        PREPAREADDRESS_OFS("prepareAddress", true, "(Lorg/vmmagic/unboxed/Offset;)Lorg/vmmagic/unboxed/Address;"),
+        PREPAREWORD("prepareWord", true, "()Lorg/vmmagic/unboxed/Word;"),
+        PREPAREWORD_OFS("prepareWord", true, "(Lorg/vmmagic/unboxed/Offset;)Lorg/vmmagic/unboxed/Word;"),
+        PREPAREOBJECTREFERENCE("prepareObjectReference", true, "()Lorg/vmmagic/unboxed/ObjectReference;"),
+        PREPAREOBJECTREFERENCE_OFS("prepareObjectReference", true, "(Lorg/vmmagic/unboxed/Offset;)Lorg/vmmagic/unboxed/ObjectReference;"),
+        ATTEMPTINT("attempt", true, "(II)Z"),
+        ATTEMPTINT_OFS("attempt", true, "(IILorg/vmmagic/unboxed/Offset;)Z"),
+        ATTEMPTADDRESS("attempt", true, "(Lorg/vmmagic/unboxed/Address;Lorg/vmmagic/unboxed/Address;)Z"),
+        ATTEMPTADDRESS_OFS("attempt", true, "(Lorg/vmmagic/unboxed/Address;Lorg/vmmagic/unboxed/Address;Lorg/vmmagic/unboxed/Offset;)Z"),
+        ATTEMPTOBJECTREFERENCE("attempt", true, "(Lorg/vmmagic/unboxed/ObjectReference;Lorg/vmmagic/unboxed/ObjectReference;)Z"),
+        ATTEMPTOBJECTREFERENCE_OFS("attempt", true, "(Lorg/vmmagic/unboxed/ObjectReference;Lorg/vmmagic/unboxed/ObjectReference;Lorg/vmmagic/unboxed/Offset;)Z"),
+        ATTEMPTWORD("attempt", true, "(Lorg/vmmagic/unboxed/Word;Lorg/vmmagic/unboxed/Word;)Z"),
+        ATTEMPTWORD_OFS("attempt", true, "(Lorg/vmmagic/unboxed/Word;Lorg/vmmagic/unboxed/Word;Lorg/vmmagic/unboxed/Offset;)Z"),
+        FROMOBJECT("fromObject", true),
+        FROMADDRESS("fromAddress", true),
+        GETOBJECTTYPE("getObjectType", true),
+        GETTIB("getTIB", true),
+        GETOBJECTFLAGS("getObjectFlags", true),
+        SETOBJECTFLAGS("setObjectFlags", true),
+        TOOBJECT("toObject", true),
+        GETARRAYDATA("getArrayData", true),
+        GETOBJECTCOLOR("getObjectColor", true),
+        ISFINALIZED("isFinalized", true),
+        ATOMICADD("atomicAdd", true),
+        ATOMICAND("atomicAnd", true),
+        ATOMICOR("atomicOr", true),
+        ATOMICSUB("atomicSub", true),
+        GETCURRENTFRAME("getCurrentFrame", true),
+        GETTIMESTAMP("getTimeStamp", true),
+        INTBITSTOFLOAT("intBitsToFloat", false),
+        FLOATTORAWINTBITS("floatToRawIntBits", false),
+        LONGBITSTODOUBLE("longBitsToDouble", false),
+        DOUBLETORAWLONGBITS("doubleToRawLongBits", false),
+        BREAKPOINT("breakPoint", true),
+        DIFF("diff", false),
+        NULLREFERENCE("nullReference", false),
+        CURRENTPROCESSOR("currentProcessor", true, "()Lorg/jnode/vm/VmProcessor;"),
+        GETSHAREDSTATICSFIELDADDRESS("getSharedStaticFieldAddress", true),
+        GETISOLATEDSTATICSFIELDADDRESS("getIsolatedStaticFieldAddress", true),
+        ISRUNNINGJNODE("isRunningJNode", false, "()Z"),
+        
         // Array classes
-        ARR_CREATE("create"),
-        ARR_GET("get"),
-        ARR_SET("set"),
-        ARR_LENGTH("length");
+        ARR_CREATE("create", true),
+        ARR_GET("get", true),
+        ARR_SET("set", true),
+        ARR_LENGTH("length", false);
         
         private final String name;
         private final String signature;
-//        private final int argCount;
+        private final boolean permissionRequired;
         private static BootableHashMap<VmMethod, MagicMethod> methods = new BootableHashMap<VmMethod, MagicMethod>();
         
-        private MagicMethod(String name) {
-            this(name, 0);
-        }
-        private MagicMethod(String name, int argCount) {
+        private MagicMethod(String name, boolean permissionRequired) {
             this.name = name;
-//            this.argCount = argCount;
             this.signature = null;
+            this.permissionRequired = permissionRequired;          
         }
-        private MagicMethod(String name, int argCount, String signature) {
+        private MagicMethod(String name, boolean permissionRequired, String signature) {
             this.name = name;
-//            this.argCount = argCount;
+            this.permissionRequired = permissionRequired;
             this.signature = signature;
         }
         
@@ -260,6 +259,30 @@ public class BaseMagicHelper {
             }
             throw new InternalError("Unknown method " + mname + '#' + msignature + " in "
                     + method.getDeclaringClass().getName());
+        }
+        
+        /**
+         * Is MagicPermission required for this method.
+         * @return
+         */
+        final boolean isPermissionRequired() {
+            return this.permissionRequired;
+        }
+    }
+    
+    /**
+     * Is the given method allowed to call magic code.
+     * @param caller
+     */
+    public static void testMagicPermission(MagicMethod callee, VmMethod caller)
+    throws SecurityException {
+        if (callee.isPermissionRequired()) {
+            if (!caller.getDeclaringClass().isMagicPermissionGranted()) {
+                System.out.println("MagicPermission is not granted for type: "
+                        + caller.getDeclaringClass().getName());
+                // throw new SecurityException("MagicPermission is not granted
+                // for method: " + caller.getFullName());
+            }
         }
     }
 }

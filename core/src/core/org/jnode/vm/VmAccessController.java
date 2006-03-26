@@ -30,6 +30,7 @@ import java.security.ProtectionDomain;
 
 import org.jnode.vm.annotation.CheckPermission;
 import org.jnode.vm.annotation.DoPrivileged;
+import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
 
@@ -38,6 +39,7 @@ import org.jnode.vm.classmgr.VmType;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@MagicPermission
 public final class VmAccessController {
 
     /**

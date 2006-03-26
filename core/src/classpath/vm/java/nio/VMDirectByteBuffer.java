@@ -31,10 +31,12 @@ import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.system.SimpleResourceOwner;
+import org.jnode.vm.annotation.MagicPermission;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.Offset;
 
+@MagicPermission
 public final class VMDirectByteBuffer {
 
 	static Pointer allocate(int capacity) {

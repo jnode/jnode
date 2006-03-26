@@ -35,6 +35,7 @@ import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmMultiMediaSupport;
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmSystem;
+import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.compiler.NativeCodeCompiler;
@@ -50,6 +51,7 @@ import org.vmmagic.unboxed.Offset;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@MagicPermission
 public abstract class VmX86Architecture extends VmArchitecture {
 
     /** Start address of the boot image (1Mb) */

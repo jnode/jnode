@@ -33,6 +33,7 @@ import org.jnode.assembler.x86.X86TextAssembler;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmProcessor;
+import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.jnode.vm.classmgr.TypeSizeInfo;
 import org.jnode.vm.classmgr.VmClassLoader;
@@ -50,6 +51,7 @@ import org.vmmagic.unboxed.Address;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@MagicPermission
 public abstract class AbstractX86Compiler extends NativeCodeCompiler implements
         X86CompilerConstants {
 

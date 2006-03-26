@@ -24,6 +24,7 @@ package org.jnode.vm.x86;
 import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.VmThread;
+import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.memmgr.VmHeapManager;
 import org.vmmagic.pragma.UninterruptiblePragma;
@@ -36,6 +37,7 @@ import org.vmmagic.unboxed.Word;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@MagicPermission
 public abstract class VmX86Thread extends VmThread {
 
 	// State when not running

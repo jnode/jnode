@@ -22,6 +22,7 @@
 package org.jnode.vm;
 
 import org.jnode.system.MemoryScanner;
+import org.jnode.vm.annotation.MagicPermission;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Offset;
 
@@ -29,6 +30,7 @@ import org.vmmagic.unboxed.Offset;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@MagicPermission
 final class MemoryScannerImpl implements MemoryScanner {
 
     /**

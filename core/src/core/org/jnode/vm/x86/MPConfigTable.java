@@ -28,13 +28,15 @@ import java.util.List;
 import org.jnode.system.BootLog;
 import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceNotFreeException;
+import org.jnode.vm.annotation.MagicPermission;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.MagicUtils;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class MPConfigTable {
+@MagicPermission
+final class MPConfigTable {
 
     private final MemoryResource mem;
 

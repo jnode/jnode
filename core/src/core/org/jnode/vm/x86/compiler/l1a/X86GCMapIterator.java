@@ -21,6 +21,7 @@
  
 package org.jnode.vm.x86.compiler.l1a;
 
+import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.VmCompiledCode;
 import org.jnode.vm.compiler.GCMapIterator;
 import org.vmmagic.unboxed.Address;
@@ -29,6 +30,7 @@ import org.vmmagic.unboxed.Offset;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@MagicPermission
 final class X86GCMapIterator extends GCMapIterator {
 
     /** Address of the current stack frame */

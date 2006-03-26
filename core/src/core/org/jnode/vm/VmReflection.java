@@ -23,6 +23,7 @@ package org.jnode.vm;
 
 import java.lang.reflect.InvocationTargetException;
 
+import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.VmField;
 import org.jnode.vm.classmgr.VmInstanceField;
 import org.jnode.vm.classmgr.VmMethod;
@@ -38,7 +39,8 @@ import org.vmmagic.unboxed.ObjectReference;
  * 
  * @author epr
  */
-public class VmReflection {
+@MagicPermission
+public final class VmReflection {
 
 	public static Object getObject(VmField field, Object o) {
 		if (field.isStatic()) {

@@ -22,12 +22,14 @@
 package java.lang;
 
 import org.jnode.vm.VmMagic;
+import org.jnode.vm.annotation.MagicPermission;
 
 /**
  * VM specific double routines.
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@MagicPermission
 public final class VMDouble {
     private char[] chars;
 

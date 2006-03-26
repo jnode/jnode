@@ -27,6 +27,7 @@ import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.annotation.Inline;
+import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.annotation.NoInline;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.VmNormalClass;
@@ -40,6 +41,7 @@ import org.vmmagic.unboxed.Offset;
 /**
  * @author epr
  */
+@MagicPermission
 final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
         Uninterruptible {
 

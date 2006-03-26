@@ -31,6 +31,7 @@ import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.system.SimpleResourceOwner;
+import org.jnode.vm.annotation.MagicPermission;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.ObjectReference;
@@ -42,6 +43,7 @@ import org.vmmagic.unboxed.Word;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@MagicPermission
 class MemoryResourceImpl extends Region implements MemoryResource {
 
     /** My parent */

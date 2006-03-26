@@ -31,6 +31,7 @@ import org.jnode.vm.Vm;
 import org.jnode.vm.VmAddress;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmSystemObject;
+import org.jnode.vm.annotation.MagicPermission;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.ObjectReference;
 import org.vmmagic.unboxed.UnboxedObject;
@@ -38,6 +39,7 @@ import org.vmmagic.unboxed.UnboxedObject;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@MagicPermission
 public abstract class VmStatics extends VmSystemObject {
 
 	private static final byte TYPE_INT = 0x01;

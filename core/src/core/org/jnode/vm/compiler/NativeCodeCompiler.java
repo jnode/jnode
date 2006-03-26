@@ -31,6 +31,7 @@ import org.jnode.vm.Vm;
 import org.jnode.vm.VmAddress;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.VmSystemObject;
+import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.bytecode.BasicBlock;
 import org.jnode.vm.bytecode.ControlFlowGraph;
 import org.jnode.vm.classmgr.VmAddressMap;
@@ -46,6 +47,7 @@ import org.vmmagic.unboxed.Address;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@MagicPermission
 public abstract class NativeCodeCompiler extends VmSystemObject {
 
     /**

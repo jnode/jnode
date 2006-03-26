@@ -42,6 +42,7 @@ import org.jnode.vm.VmSystemClassLoader;
 import org.jnode.vm.annotation.Inline;
 import org.jnode.vm.annotation.KernelSpace;
 import org.jnode.vm.annotation.LoadStatics;
+import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.annotation.NoInline;
 import org.jnode.vm.annotation.SharedStatics;
 import org.jnode.vm.annotation.Uninterruptible;
@@ -52,6 +53,7 @@ import org.vmmagic.unboxed.Address;
 
 @SharedStatics
 @Uninterruptible
+@MagicPermission
 public abstract class VmType<T> extends VmAnnotatedElement implements
         VmSharedStaticsEntry, VmIsolatedStaticsEntry {
 
@@ -650,7 +652,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
         if (javaClassHolder == null) {
             javaClassHolder = new VmIsolateLocal<Class<T>>();
         }
-        
+
         final Class<T> javaClass = javaClassHolder.get();
         if (javaClass == null) {
             if (isBuildEnv) {
@@ -842,6 +844,15 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     }
 
     /**
+     * Does this type have magic permission.
+     * 
+     * @return boolean
+     */
+    public final boolean isMagicPermissionGranted() {
+        return ((pragmaFlags & TypePragmaFlags.MAGIC_PERMISSION) != 0);
+    }
+
+    /**
      * Is this type public.
      * 
      * @return boolean
@@ -962,30 +973,32 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     public final boolean isCompiled() {
         return ((state & VmTypeState.ST_COMPILED) != 0);
     }
-    
+
     /**
-     * Gets the isolated state of this type. 
+     * Gets the isolated state of this type.
      */
     @Inline
     private final int getIsolatedState() {
-        if (Vm.isRunningVm()) {
-            return VmMagic.getIsolatedStaticFieldAddress(isolatedStaticsIndex).loadInt();
+        if (VmMagic.isRunningJNode()) {
+            return VmMagic.getIsolatedStaticFieldAddress(isolatedStaticsIndex)
+                    .loadInt();
         } else {
-            return loader.getIsolatedStatics().getInt(isolatedStaticsIndex);            
+            return loader.getIsolatedStatics().getInt(isolatedStaticsIndex);
         }
     }
-    
+
     /**
      * Add a bit to the isolated state of this type.
      */
     @Inline
     private final void addIsolatedState(int value) {
-        final int index = isolatedStaticsIndex;
-        if (Vm.isRunningVm()) {
-            final Address ptr = VmMagic.getIsolatedStaticFieldAddress(index);
+        if (VmMagic.isRunningJNode()) {
+            final Address ptr = VmMagic
+                    .getIsolatedStaticFieldAddress(isolatedStaticsIndex);
             ptr.store(ptr.loadInt() | value);
         } else {
             final VmIsolatedStatics statics;
+            final int index = isolatedStaticsIndex;
             statics = loader.getIsolatedStatics();
             statics.setInt(index, statics.getInt(index) | value);
         }
@@ -998,7 +1011,11 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
      */
     @Inline
     final boolean isInitializing() {
-        return ((getIsolatedState() & VmTypeState.IST_INITIALIZING) != 0);
+        if (isSharedStatics()) {
+            return ((state & VmTypeState.SST_INITIALIZING) != 0);
+        } else {
+            return ((getIsolatedState() & VmTypeState.IST_INITIALIZING) != 0);
+        }
     }
 
     /**
@@ -1008,7 +1025,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
      */
     @Inline
     public final boolean isInitialized() {
-        return ((state & VmTypeState.ST_ALWAYS_INITIALIZED) != 0)
+        return ((state & (VmTypeState.ST_ALWAYS_INITIALIZED | VmTypeState.SST_INITIALIZED)) != 0)
                 || ((getIsolatedState() & VmTypeState.IST_INITIALIZED) != 0);
     }
 
@@ -2100,7 +2117,12 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     private synchronized final void doInitialize() {
         if (!isInitialized()) {
             if (!isInitializing()) {
-                addIsolatedState(VmTypeState.IST_INITIALIZING);
+                final boolean sharedStatics = isSharedStatics();
+                if (sharedStatics) {
+                    state |= VmTypeState.SST_INITIALIZING;
+                } else {
+                    addIsolatedState(VmTypeState.IST_INITIALIZING);
+                }
                 /*
                  * Screen.debug("initialize("); Screen.debug(name);
                  */
@@ -2121,7 +2143,11 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
                         }
                     }
                 }
-                addIsolatedState(VmTypeState.IST_INITIALIZED);
+                if (sharedStatics) {
+                    state |= VmTypeState.SST_INITIALIZED;
+                } else {
+                    addIsolatedState(VmTypeState.IST_INITIALIZED);
+                }
             }
         }
     }
@@ -2288,9 +2314,10 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Index of the isolated type state. This refers to an int entry.
+     * 
      * @see org.jnode.vm.classmgr.VmIsolatedStaticsEntry#getIsolatedStaticsIndex()
      */
     public final int getIsolatedStaticsIndex() {
         return isolatedStaticsIndex;
-    }        
+    }
 }

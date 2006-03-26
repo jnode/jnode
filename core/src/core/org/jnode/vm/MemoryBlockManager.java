@@ -21,7 +21,8 @@
  
 package org.jnode.vm;
 
-import org.vmmagic.pragma.Uninterruptible;
+import org.jnode.vm.annotation.MagicPermission;
+import org.jnode.vm.annotation.Uninterruptible;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.Word;
@@ -34,8 +35,9 @@ import org.vmmagic.unboxed.Word;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public final class MemoryBlockManager extends VmSystemObject implements
-		Uninterruptible {
+@MagicPermission
+@Uninterruptible
+public final class MemoryBlockManager extends VmSystemObject {
 
 	/** Size of a memory block. */
 	static final int BLOCK_SIZE_SHIFT = 16;

@@ -35,6 +35,7 @@ import org.jnode.vm.annotation.DoPrivileged;
 import org.jnode.vm.annotation.Inline;
 import org.jnode.vm.annotation.KernelSpace;
 import org.jnode.vm.annotation.LoadStatics;
+import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.annotation.NoFieldAlignments;
 import org.jnode.vm.annotation.NoInline;
 import org.jnode.vm.annotation.NoReadBarrier;
@@ -90,6 +91,8 @@ public final class ClassDecoder {
             TypePragmaFlags.UNINTERRUPTIBLE), };
 
     private static final PragmaAnnotation[] CLASS_ANNOTATIONS = new PragmaAnnotation[] {
+            new PragmaAnnotation(MagicPermission.class,
+                    TypePragmaFlags.MAGIC_PERMISSION),
             new PragmaAnnotation(NoFieldAlignments.class,
                     TypePragmaFlags.NO_FIELD_ALIGNMENT),
             new PragmaAnnotation(SharedStatics.class,
@@ -116,6 +119,13 @@ public final class ClassDecoder {
                     MethodPragmaFlags.UNINTERRUPTIBLE),
             new PragmaAnnotation(KernelSpace.class,
                     MethodPragmaFlags.KERNELSPACE), };
+    
+    /**
+     * Names of classes that you use shared statics, but cannot be modified.
+     */
+    private static final String[] SHARED_STATICS_CLASSNAMES = {
+        "java.util.TreeMap",
+    };
 
     private static final byte[] TYPE_SIZES = { 1, 2, 4, 8 };
 
@@ -382,18 +392,17 @@ public final class ClassDecoder {
         cls.setCp(cp);
 
         // Determine if we can safely align the fields
-        int pragmaFlags = 0;
+        //int pragmaFlags = 0;
         if (isBootType(cls)) {
-            pragmaFlags |= TypePragmaFlags.NO_FIELD_ALIGNMENT;
+            cls.addPragmaFlags(TypePragmaFlags.NO_FIELD_ALIGNMENT);
         }
+        cls.addPragmaFlags(getClassNamePragmaFlags(clsName));
 
         // Interface table
-        pragmaFlags |= readInterfaces(data, cls, cp);
-        cls.addPragmaFlags(pragmaFlags);
+        cls.addPragmaFlags(readInterfaces(data, cls, cp));
 
         // Field table
-        final FieldData[] fieldData = readFields(data, cp, slotSize,
-                pragmaFlags);
+        final FieldData[] fieldData = readFields(data, cp, slotSize);
 
         // Method Table
         readMethods(data, rejectNatives, cls, cp, sharedStatics, clc);
@@ -429,7 +438,7 @@ public final class ClassDecoder {
         // Create the fields
         if (fieldData != null) {
             createFields(cls, fieldData, sharedStatics, isolatedStatics,
-                    slotSize, pragmaFlags);
+                    slotSize, cls.getPragmaFlags());
         }
 
         return cls;
@@ -618,7 +627,7 @@ public final class ClassDecoder {
      * @param pragmaFlags
      */
     private static FieldData[] readFields(ByteBuffer data, VmCP cp,
-            int slotSize, int pragmaFlags) {
+            int slotSize) {
         final int fcount = data.getChar();
         if (fcount > 0) {
             final FieldData[] ftable = new FieldData[fcount];
@@ -1055,6 +1064,30 @@ public final class ClassDecoder {
                     ma.checkPragmaAllowed(className);
                     flags |= ma.flags;
                 }
+            }
+        }
+        for (String name : SHARED_STATICS_CLASSNAMES) {
+            if (className.equals(name)) {
+                System.out.println("FOUND IT: "+ className);
+                flags |= TypePragmaFlags.SHAREDSTATICS;
+                break;
+            }
+        }
+        return flags;
+    }
+
+    /**
+     * Combine the pragma flags for a given classname.
+     * 
+     * @param className
+     */
+    private static int getClassNamePragmaFlags(String className) {
+        int flags = 0;
+        for (String name : SHARED_STATICS_CLASSNAMES) {
+            if (className.equals(name)) {
+                System.out.println("FOUND IT: "+ className);
+                flags |= TypePragmaFlags.SHAREDSTATICS;
+                break;
             }
         }
         return flags;

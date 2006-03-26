@@ -21,6 +21,7 @@
  
 package org.jnode.vm;
 
+import org.jnode.vm.annotation.MagicPermission;
 import org.vmmagic.unboxed.Address;
 
 /**
@@ -28,6 +29,7 @@ import org.vmmagic.unboxed.Address;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@MagicPermission
 final class VmJavaMultiMediaSupport extends VmMultiMediaSupport {
 
     /**

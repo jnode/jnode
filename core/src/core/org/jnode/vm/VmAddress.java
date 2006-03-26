@@ -22,6 +22,7 @@
 package org.jnode.vm;
 
 import org.jnode.util.NumberUtils;
+import org.jnode.vm.annotation.MagicPermission;
 import org.vmmagic.unboxed.Address;
 
 /**
@@ -30,6 +31,7 @@ import org.vmmagic.unboxed.Address;
  * be objects by the garbage collector.
  * @author epr
  */
+@MagicPermission
 public abstract class VmAddress extends VmSystemObject {
 	
 	/**
