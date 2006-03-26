@@ -22,6 +22,7 @@
 package org.jnode.vm.x86;
 
 import org.jnode.vm.VmStackReader;
+import org.jnode.vm.annotation.MagicPermission;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Offset;
 
@@ -44,6 +45,7 @@ import org.vmmagic.unboxed.Offset;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@MagicPermission
 public final class VmX86StackReader extends VmStackReader {
 
 	// Locals are before this object.

@@ -33,7 +33,6 @@ import org.jnode.vm.VmSystem;
 import org.jnode.vm.annotation.LoadStatics;
 import org.jnode.vm.annotation.SharedStatics;
 import org.jnode.vm.annotation.Uninterruptible;
-import org.vmmagic.pragma.UninterruptiblePragma;
 
 /**
  * First class that is executed when JNode boots.

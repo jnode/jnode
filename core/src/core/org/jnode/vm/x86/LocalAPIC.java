@@ -27,6 +27,7 @@ import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeUtils;
+import org.jnode.vm.annotation.MagicPermission;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 
@@ -34,6 +35,7 @@ import org.vmmagic.unboxed.Extent;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@MagicPermission
 final class LocalAPIC {
 
     static final int ICR_DELIVERY_MODE_FIXED = 0x00 << 8;

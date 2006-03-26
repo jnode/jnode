@@ -631,7 +631,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
             } else {
                 helper.writeGetStaticsEntry64(curInstrLabel, (GPR64)tmpr, (VmSharedStaticsEntry)type);                
             }
-			helper.writeClassInitialize(curInstrLabel, tmpr, type);
+			helper.writeClassInitialize(curInstrLabel, tmpr, tmpr, type);
 		}
 
 		// Clear result (means !instanceof)
@@ -1293,7 +1293,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 
 			// Resolve the class
 			writeResolveAndLoadClassToReg(classRef, classr);
-			helper.writeClassInitialize(curInstrLabel, classr, resolvedType);
+			helper.writeClassInitialize(curInstrLabel, classr, tmpr, resolvedType);
 
 			final Label okLabel = new Label(curInstrLabel + "cc-ok");
 
@@ -2583,7 +2583,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 
 			/* Objectref is already on the stack */
 			writeResolveAndLoadClassToReg(classRef, classr);
-			helper.writeClassInitialize(curInstrLabel, classr, resolvedType);
+			helper.writeClassInitialize(curInstrLabel, classr, tmpr, resolvedType);
 
 			final Label trueLabel = new Label(curInstrLabel + "io-true");
 			final Label endLabel = new Label(curInstrLabel + "io-end");
@@ -2706,7 +2706,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 				.getResolvedVmMethod();
 
 		if (method.getDeclaringClass().isMagicType()) {
-			magicHelper.emitMagic(eContext, method, true, this);
+			magicHelper.emitMagic(eContext, method, true, this, currentMethod);
 		} else {
 			// Flush the stack before an invoke
 			vstack.push(eContext);
@@ -2735,7 +2735,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		final VmInstanceMethod method = (VmInstanceMethod) mts;
         final VmType<?> declClass = method.getDeclaringClass();
 		if (declClass.isMagicType()) {
-			magicHelper.emitMagic(eContext, method, false, this);
+			magicHelper.emitMagic(eContext, method, false, this, currentMethod);
 		} else {
 			// TODO: port to orp-style
 			vstack.push(eContext);
@@ -4236,7 +4236,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
             }
 
             // Write class initialization code
-            helper.writeClassInitialize(curInstrLabel, classReg, declClass);
+            helper.writeClassInitialize(curInstrLabel, classReg, classReg, declClass);
             
             // Free class
             L1AHelper.releaseRegister(eContext, classReg);

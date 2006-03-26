@@ -22,11 +22,13 @@
 package org.jnode.vm.x86;
 
 import org.jnode.vm.VmMagic;
+import org.jnode.vm.annotation.MagicPermission;
 import org.vmmagic.unboxed.Address;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@MagicPermission
 final class TSS32 {
 
     private final int[] tss;

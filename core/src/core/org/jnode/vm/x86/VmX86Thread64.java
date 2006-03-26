@@ -23,6 +23,7 @@ package org.jnode.vm.x86;
 
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.ObjectVisitor;
+import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.memmgr.VmHeapManager;
 import org.vmmagic.unboxed.Address;
@@ -31,6 +32,7 @@ import org.vmmagic.unboxed.Word;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@MagicPermission
 public final class VmX86Thread64 extends VmX86Thread {
 
 	// State when not running

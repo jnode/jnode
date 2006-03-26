@@ -22,6 +22,7 @@
 package org.jnode.vm;
 
 import org.jnode.system.MultiMediaMemoryResource;
+import org.jnode.vm.annotation.MagicPermission;
 import org.vmmagic.unboxed.Address;
 
 /**
@@ -29,6 +30,7 @@ import org.vmmagic.unboxed.Address;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@MagicPermission
 final class MultiMediaMemoryResourceImpl extends MemoryResourceImpl implements
         MultiMediaMemoryResource {
 

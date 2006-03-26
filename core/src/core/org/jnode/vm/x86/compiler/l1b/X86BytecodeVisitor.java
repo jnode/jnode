@@ -643,7 +643,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             } else {
                 helper.writeGetStaticsEntry64(curInstrLabel, (GPR64)tmpr, (VmSharedStaticsEntry)type);                
             }
-			helper.writeClassInitialize(curInstrLabel, tmpr, type);
+			helper.writeClassInitialize(curInstrLabel, tmpr, tmpr, type);
 		}
 
 		// Clear result (means !instanceof)
@@ -1461,7 +1461,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 
 			// Resolve the class
 			writeResolveAndLoadClassToReg(classRef, classr);
-			helper.writeClassInitialize(curInstrLabel, classr, resolvedType);
+			helper.writeClassInitialize(curInstrLabel, classr, tmpr, resolvedType);
 
 			final Label okLabel = new Label(curInstrLabel + "cc-ok");
 
@@ -2944,7 +2944,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 
 			/* Objectref is already on the stack */
 			writeResolveAndLoadClassToReg(classRef, classr);
-			helper.writeClassInitialize(curInstrLabel, classr, resolvedType);
+			helper.writeClassInitialize(curInstrLabel, classr, tmpr, resolvedType);
 
 			final Label trueLabel = new Label(curInstrLabel + "io-true");
 			final Label endLabel = new Label(curInstrLabel + "io-end");
@@ -3075,7 +3075,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 				.getResolvedVmMethod();
 
 		if (method.getDeclaringClass().isMagicType()) {
-			magicHelper.emitMagic(eContext, method, true, this);
+			magicHelper.emitMagic(eContext, method, true, this, currentMethod);
 		} else {
 			// Flush the stack before an invoke
 			vstack.push(eContext);
@@ -3106,7 +3106,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 		final VmInstanceMethod method = (VmInstanceMethod) mts;
         final VmType<?> declClass = method.getDeclaringClass();
 		if (declClass.isMagicType()) {
-			magicHelper.emitMagic(eContext, method, false, this);
+			magicHelper.emitMagic(eContext, method, false, this, currentMethod);
 		} else {
 			// TODO: port to orp-style
 			vstack.push(eContext);
@@ -4733,7 +4733,7 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             }
 
             // Write class initialization code
-            helper.writeClassInitialize(curInstrLabel, classReg, declClass);
+            helper.writeClassInitialize(curInstrLabel, classReg, classReg, declClass);
             
             // Free class
             L1AHelper.releaseRegister(eContext, classReg);

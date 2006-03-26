@@ -30,6 +30,7 @@ import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.annotation.Inline;
+import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmClassLoader;
@@ -44,6 +45,7 @@ import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.Word;
 
+@MagicPermission
 public final class DefaultHeapManager extends VmHeapManager {
 
     /**

@@ -24,6 +24,7 @@ package org.jnode.vm.memmgr.def;
 import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.annotation.Inline;
+import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmClassType;
@@ -40,6 +41,7 @@ import org.vmmagic.unboxed.Word;
 /**
  * @author epr
  */
+@MagicPermission
 final class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
 
     /** Offset within this heap of the next free memory block */

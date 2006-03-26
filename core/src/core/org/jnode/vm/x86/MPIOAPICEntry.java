@@ -23,13 +23,15 @@ package org.jnode.vm.x86;
 
 import org.jnode.system.MemoryResource;
 import org.jnode.util.NumberUtils;
+import org.jnode.vm.annotation.MagicPermission;
 import org.vmmagic.unboxed.Address;
 
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class MPIOAPICEntry extends MPEntry {
+@MagicPermission
+class MPIOAPICEntry extends MPEntry {
 
     /**
      * @param mem

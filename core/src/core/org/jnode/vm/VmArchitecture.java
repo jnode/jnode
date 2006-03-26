@@ -26,6 +26,7 @@ import java.nio.ByteOrder;
 import org.jnode.security.JNodePermission;
 import org.jnode.system.ResourceManager;
 import org.jnode.vm.annotation.KernelSpace;
+import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.TypeSizeInfo;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmSharedStatics;
@@ -41,6 +42,7 @@ import org.vmmagic.unboxed.Word;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@MagicPermission
 public abstract class VmArchitecture extends VmSystemObject {
 
     private final JNodePermission MMAP_PERM = new JNodePermission("getMemoryMap");

@@ -33,6 +33,7 @@ import org.jnode.vm.Vm;
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmThread;
 import org.jnode.vm.annotation.LoadStatics;
+import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.performance.PerformanceCounters;
@@ -45,6 +46,7 @@ import org.vmmagic.unboxed.Word;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@MagicPermission
 public abstract class VmX86Processor extends VmProcessor {
 
     /** The IRQ counters */

@@ -22,6 +22,7 @@
 package java.lang;
 
 import org.jnode.vm.VmMagic;
+import org.jnode.vm.annotation.MagicPermission;
 
 /*
  * This class is a reference version, mainly for compiling a class library jar.
@@ -34,6 +35,7 @@ import org.jnode.vm.VmMagic;
  * 
  * @author Dave Grove <groved@us.ibm.com>
  */
+@MagicPermission
 final class VMFloat {
 	/**
 	 * Convert the float to the IEEE 754 floating-point "single format" bit

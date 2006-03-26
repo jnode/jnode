@@ -24,6 +24,7 @@ package org.jnode.vm.classmgr;
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.VmAddress;
 import org.jnode.vm.annotation.KernelSpace;
+import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.annotation.Uninterruptible;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 import org.vmmagic.unboxed.Address;
@@ -31,6 +32,7 @@ import org.vmmagic.unboxed.Address;
 /**
  * @author epr
  */
+@MagicPermission
 public final class VmCompiledCode extends AbstractCode {
 
     /** Address of native code of this method */

@@ -268,6 +268,9 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      * @return
      */
     private synchronized ClassInfo getClassInfo(String name, boolean create) {
+        if (name == null) {
+            Unsafe.debug(" getClassInfo(null)!! ");
+        }
         ClassInfo ci = (ClassInfo) classInfos.get(name);
         if (ci != null) {
             return ci;

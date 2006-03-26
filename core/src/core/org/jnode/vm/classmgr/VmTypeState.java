@@ -43,4 +43,8 @@ public interface VmTypeState {
     public static final char IST_INITIALIZED  = 0x0100;
     public static final char IST_INITIALIZING = 0x0200;
 
+
+    // Shared specific states
+    public static final char SST_INITIALIZED  = 0x0100;
+    public static final char SST_INITIALIZING = ST_ALWAYS_INITIALIZED;
 }

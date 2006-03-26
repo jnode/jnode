@@ -23,6 +23,7 @@ package org.jnode.vm;
 
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.annotation.LoadStatics;
+import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.jnode.vm.annotation.Uninterruptible;
 import org.jnode.vm.classmgr.TIBLayout;
@@ -43,6 +44,7 @@ import org.vmmagic.pragma.UninterruptiblePragma;
  * @author epr
  */
 @Uninterruptible
+@MagicPermission
 public final class SoftByteCodes {
 
     public static final int EX_NULLPOINTER = 0;

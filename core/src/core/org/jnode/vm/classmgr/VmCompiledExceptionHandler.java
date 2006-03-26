@@ -22,12 +22,14 @@
 package org.jnode.vm.classmgr;
 
 import org.jnode.vm.VmAddress;
+import org.jnode.vm.annotation.MagicPermission;
 import org.vmmagic.unboxed.Address;
 
 /**
  * @author epr
  */
-public class VmCompiledExceptionHandler extends AbstractExceptionHandler {
+@MagicPermission
+public final class VmCompiledExceptionHandler extends AbstractExceptionHandler {
 
 	private final VmAddress handler;
 	private final VmAddress startPtr;

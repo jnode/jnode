@@ -34,6 +34,7 @@ import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.system.ResourcePermission;
 import org.jnode.system.SimpleResourceOwner;
+import org.jnode.vm.annotation.MagicPermission;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 
@@ -42,6 +43,7 @@ import org.vmmagic.unboxed.Extent;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@MagicPermission
 final class ResourceManagerImpl implements ResourceManager {
 	
     private final ResourcePermission IOPORTS_PERM = new ResourcePermission("ioports");

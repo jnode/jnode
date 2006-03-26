@@ -28,6 +28,7 @@ import org.jnode.vm.VmMagic;
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.annotation.Inline;
+import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.annotation.NoInline;
 import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmArrayClass;
@@ -43,6 +44,7 @@ import org.vmmagic.unboxed.Offset;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@MagicPermission
 public abstract class VmHeapManager extends VmSystemObject {
 
     /**

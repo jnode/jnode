@@ -28,13 +28,15 @@ import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.util.NumberUtils;
+import org.jnode.vm.annotation.MagicPermission;
 import org.vmmagic.unboxed.Address;
 
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class MPFloatingPointerStructure {
+@MagicPermission
+final class MPFloatingPointerStructure {
 
     private MemoryResource mem;
     private static final int MAGIC = 0x5F504D5F; // _MP_

@@ -23,6 +23,7 @@ package org.jnode.vm.memmgr.def;
 
 import org.jnode.system.BootLog;
 import org.jnode.vm.Monitor;
+import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.vmmagic.unboxed.Word;
 
@@ -32,6 +33,7 @@ import org.vmmagic.unboxed.Word;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@MagicPermission
 final class FinalizerThread extends Thread {
 
     /** The heap manager */

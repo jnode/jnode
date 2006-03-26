@@ -24,6 +24,7 @@ package org.jnode.vm.memmgr.def;
 import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.SpinLock;
 import org.jnode.vm.annotation.Inline;
+import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.vmmagic.pragma.Uninterruptible;
@@ -41,6 +42,7 @@ import org.vmmagic.unboxed.Word;
  * 
  * @author epr
  */
+@MagicPermission
 abstract class VmAbstractHeap extends SpinLock implements Uninterruptible {
 
 	/** Start address of this heap (inclusive) */

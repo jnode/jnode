@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86.compiler;
 
 import java.util.HashMap;
@@ -98,8 +98,8 @@ public class X86CompilerHelper implements X86CompilerConstants {
     private final AbstractX86StackManager stackMgr;
 
     private final X86Assembler os;
-    
-    private final Map<VmType<?>, Label> classInitLabels = new HashMap<VmType<?>, Label>();
+
+    private final Map<VmType< ? >, Label> classInitLabels = new HashMap<VmType< ? >, Label>();
 
     /**
      * Create a new instance
@@ -136,7 +136,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
         final X86CpuID cpuId = (X86CpuID) os.getCPUID();
         haveCMOV = cpuId.hasFeature(X86CpuID.FEAT_CMOV);
     }
-    
+
     /**
      * Reset the state of this helper.
      */
@@ -327,7 +327,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
         if (method.isStatic() && !method.isInitializer()) {
             // Only when class is not initialize
             final VmType< ? > cls = method.getDeclaringClass();
-            if (!cls.isInitialized()) {                
+            if (!cls.isInitialized()) {
                 final GPR aax = this.AAX;
                 final Label label = genLabel("$$class-init");
 
@@ -337,10 +337,11 @@ public class X86CompilerHelper implements X86CompilerConstants {
                 if (os.isCode32()) {
                     writeGetStaticsEntry(label, aax, cls);
                 } else {
-                    writeGetStaticsEntry64(label, (GPR64)aax, (VmSharedStaticsEntry)cls);            
+                    writeGetStaticsEntry64(label, (GPR64) aax,
+                            (VmSharedStaticsEntry) cls);
                 }
                 // Write code to initialize
-                writeClassInitialize(label, aax, cls);
+                writeClassInitialize(label, aax, aax, cls);
                 // Restore eax
                 os.writePOP(aax);
                 return true;
@@ -349,29 +350,53 @@ public class X86CompilerHelper implements X86CompilerConstants {
         return false;
     }
 
+    /**
+     * Emit code to test the initialized state of a class and if required, call
+     * the class initializer.
+     * 
+     * @param curInstrLabel
+     * @param classReg
+     * @param tmpReg
+     *            A temporary reference type register. This may be the same as
+     *            classReg, but this register is not preserved.
+     * @param cls
+     */
     public final void writeClassInitialize(Label curInstrLabel, GPR classReg,
-            VmType< ? > cls) {
+            GPR tmpReg, VmType< ? > cls) {
         if (!cls.isInitialized()) {
             // Create jump labels
+            final Label testIsolated = new Label(curInstrLabel + "$$testiso-cinit");
             final Label doInit = new Label(curInstrLabel + "$$do-cinit-ex");
             final Label done = new Label(curInstrLabel + "$$done-cinit-ex");
 
-            // TODO FIXME make fast again..  Now the initialize method is always called.
-            // Test declaringClass.modifiers
+            // Test declaringClass.modifiers (mostly true)
             os.writeTEST(BITS32, classReg, entryPoints.getVmTypeState()
                     .getOffset(), VmTypeState.ST_ALWAYS_INITIALIZED);
-            
-            // Jump when not initialized to diInit.
+            if (!cls.isSharedStatics()) {
+                // Jump when not initialized to isolated state test
+                // Branch predication expects this forward jump NOT
+                // to be taken.
+                os.writeJCC(testIsolated, X86Constants.JZ);           
+                // We don't have to initialize, so jump over the init-code.
+                os.writeJMP(done);
+                
+                // Test isolated class state
+                os.setObjectRef(testIsolated);
+                writeLoadIsolatedStatics(curInstrLabel, "$$ld-is-stat", tmpReg);
+                final int offset = getIsolatedStaticsOffset(cls);
+                os.writeTEST(BITS32, tmpReg, offset, VmTypeState.IST_INITIALIZED);
+            }
+            // Jump when not initialized to doInit.
             // Branch predication expects this forward jump NOT
             // to be taken.
-            os.writeJCC(doInit, X86Constants.JZ);
+            os.writeJCC(doInit, X86Constants.JZ);           
 
             // We don't have to initialize, so jump over the init-code.
             os.writeJMP(done);
-            
+
             // Start initialize code
             os.setObjectRef(doInit);
-            
+
             // Get label for class initialize code
             Label initializer = classInitLabels.get(cls);
             if (initializer == null) {
@@ -381,17 +406,18 @@ public class X86CompilerHelper implements X86CompilerConstants {
             }
             // Setup call to class initializer code
             os.writeCALL(initializer);
-            
+            os.writeJMP(done);
+
             // Set the done label
             os.setObjectRef(done);
         }
     }
-    
+
     /**
      * Write the class initializer code.
      */
     public final void writeClassInitializers() {
-        for (Map.Entry<VmType<?>, Label> entry : classInitLabels.entrySet()) {
+        for (Map.Entry<VmType< ? >, Label> entry : classInitLabels.entrySet()) {
             final Label label = entry.getValue();
             // Set label
             os.setObjectRef(label);
@@ -417,7 +443,8 @@ public class X86CompilerHelper implements X86CompilerConstants {
             if (os.isCode32()) {
                 writeGetStaticsEntry(label, AAX, entry.getKey());
             } else {
-                writeGetStaticsEntry64(label, (GPR64)AAX, (VmSharedStaticsEntry)entry.getKey());            
+                writeGetStaticsEntry64(label, (GPR64) AAX,
+                        (VmSharedStaticsEntry) entry.getKey());
             }
             // Call cls.initialize
             os.writePUSH(AAX); // cls
@@ -440,7 +467,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
                 os.writePOP(X86Register.RAX);
             }
             // Return
-            os.writeRET(); 
+            os.writeRET();
         }
     }
 
@@ -518,9 +545,9 @@ public class X86CompilerHelper implements X86CompilerConstants {
                 .getOffset();
         if (os.isCode32()) {
             Vm.getVm().getCounter("### load " + dst.getName()).inc();
-//            os.writeXOR(dst, dst);
+            // os.writeXOR(dst, dst);
             os.writePrefix(X86Constants.FS_PREFIX);
-//            os.writeMOV(INTSIZE, dst, dst, offset);
+            // os.writeMOV(INTSIZE, dst, dst, offset);
             os.writeMOV(dst, offset);
         } else {
             os.writeMOV(BITS64, dst, PROCESSOR64, offset);

@@ -22,6 +22,7 @@
 package org.jnode.vm;
 
 import org.jnode.vm.annotation.KernelSpace;
+import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.VmClassType;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Word;
@@ -34,6 +35,7 @@ import org.vmmagic.unboxed.Word;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@MagicPermission
 public final class VmMagic {
 
 	/**
@@ -165,6 +167,15 @@ public final class VmMagic {
      */
     public final static Address getIsolatedStaticFieldAddress(int index) {
         return null;
+    }
+    
+    /**
+     * Are we currently running JNode.
+     * 
+     * @return true when running JNode, false when running any other VM.
+     */
+    public final static boolean isRunningJNode() {
+        return false;
     }
     
 	/**

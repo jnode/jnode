@@ -22,6 +22,7 @@
 package org.jnode.vm;
 
 import org.jnode.vm.annotation.KernelSpace;
+import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.VmCompiledCode;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
@@ -33,6 +34,7 @@ import org.vmmagic.unboxed.Offset;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@MagicPermission
 public abstract class VmStackReader extends VmSystemObject {
 
 	/**

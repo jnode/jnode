@@ -25,9 +25,11 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.jnode.system.MemoryResource;
+import org.jnode.vm.annotation.MagicPermission;
 
 
-class MemoryResourceInputStream extends InputStream {
+@MagicPermission
+final class MemoryResourceInputStream extends InputStream {
     
     private final MemoryResource resource;
     private int offset;

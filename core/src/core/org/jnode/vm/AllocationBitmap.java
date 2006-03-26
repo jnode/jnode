@@ -21,7 +21,8 @@
  
 package org.jnode.vm;
 
-import org.vmmagic.pragma.Uninterruptible;
+import org.jnode.vm.annotation.MagicPermission;
+import org.jnode.vm.annotation.Uninterruptible;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.Word;
@@ -31,7 +32,9 @@ import org.vmmagic.unboxed.Word;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class AllocationBitmap implements Uninterruptible {
+@MagicPermission
+@Uninterruptible
+public class AllocationBitmap {
 
     /** Inclusive start address of the bitmap memory region */
     private Address start = Address.zero();

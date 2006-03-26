@@ -21,6 +21,7 @@
  
 package org.jnode.vm;
 
+import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmMethod;
@@ -36,6 +37,7 @@ import org.vmmagic.unboxed.Word;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@MagicPermission
 final class HeapHelperImpl extends HeapHelper implements Uninterruptible {
 
     private static final class ThreadRootVisitor extends VmThreadVisitor {

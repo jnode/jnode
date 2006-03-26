@@ -23,6 +23,7 @@ package org.jnode.vm.x86;
 
 import org.jnode.vm.VirtualMemoryRegion;
 import org.jnode.vm.VmProcessor;
+import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.TypeSizeInfo;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmSharedStatics;
@@ -35,6 +36,7 @@ import org.vmmagic.unboxed.Extent;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@MagicPermission
 public final class VmX86Architecture64 extends VmX86Architecture {
 
     /** Start address of the virtual memory region  available to devices (3Gb) */
