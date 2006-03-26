@@ -21,30 +21,19 @@
  
 package org.jnode.vm.classmgr;
 
-import org.jnode.assembler.ObjectResolver;
-import org.jnode.vm.VmArchitecture;
+import org.jnode.vm.VmSystemObject;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public final class VmIsolatedStatics extends VmStatics {
+abstract class VmStaticsBase extends VmSystemObject {
 
-    /** Size of the statics table */
-    private static final int SIZE = 1 << 15;
-
-    /**
-     * @param arch
-     * @param resolver
-     */
-    public VmIsolatedStatics(VmArchitecture arch, ObjectResolver resolver) {
-        super(arch, resolver, SIZE);
-    }
-
-    /**
-     * @param arch
-     * @param resolver
-     */
-    public VmIsolatedStatics(VmIsolatedStatics parent, VmArchitecture arch, ObjectResolver resolver) {
-        super(parent.getAllocator(), arch, resolver);
-    }
+	protected static final byte TYPE_INT = 0x01;
+    protected static final byte TYPE_LONG = 0x02;
+    protected static final byte TYPE_OBJECT = 0x03;
+    protected static final byte TYPE_ADDRESS = 0x04;
+    protected static final byte TYPE_METHOD_CODE = 0x05;
+    protected static final byte TYPE_STRING = 0x06;
+    protected static final byte TYPE_CLASS = 0x07;
+    protected static final byte MAX_TYPE = TYPE_CLASS;
 }
