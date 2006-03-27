@@ -27,6 +27,8 @@ import javax.naming.NameAlreadyBoundException;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 
+import org.jnode.vm.annotation.SharedStatics;
+
 /**
  * This class provides a namespace that is used by the JNode system. Various
  * services are bound into this namespace. <p/>A service bound into this
@@ -38,7 +40,8 @@ import javax.naming.NamingException;
  * 
  * @author epr
  */
-public class InitialNaming {
+@SharedStatics
+public final class InitialNaming {
 
     /** All bound names+services */
     static NameSpace namespace;

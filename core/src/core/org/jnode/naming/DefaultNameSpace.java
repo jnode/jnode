@@ -30,10 +30,14 @@ import javax.naming.NameAlreadyBoundException;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 
+import org.jnode.vm.VmIsolate;
+import org.jnode.vm.annotation.PrivilegedActionPragma;
+import org.jnode.vm.classmgr.VmType;
+
 public class DefaultNameSpace implements NameSpace {
 
     /** All bound names+services */
-    protected final Map<Class<?>, Object> namespace = new HashMap<Class<?>, Object>();
+    protected final Map<VmType<?>, Object> namespace = new HashMap<VmType<?>, Object>();
 
     /**
      * Bind a given service in the namespace under a given name.
@@ -43,16 +47,17 @@ public class DefaultNameSpace implements NameSpace {
      * @throws NameAlreadyBoundException
      *             if the name already exists within this namespace
      */
+    @PrivilegedActionPragma
     public <T> void bind(Class<T> name, T service) throws NamingException,
             NameAlreadyBoundException {
         if (name == null) {
             throw new IllegalArgumentException("name == null");
         }
         synchronized (namespace) {
-            if (namespace.containsKey(name)) {
+            if (namespace.containsKey(name.getVmClass())) {
                 throw new NameAlreadyBoundException(name.getName());
             }
-            namespace.put(name, service);
+            namespace.put(name.getVmClass(), service);
         }
     }
 
@@ -62,9 +67,10 @@ public class DefaultNameSpace implements NameSpace {
      * 
      * @param name
      */
+    @PrivilegedActionPragma
     public void unbind(Class<?> name) {
         synchronized (namespace) {
-            namespace.remove(name);
+            namespace.remove(name.getVmClass());
         }
     }
 
@@ -75,9 +81,16 @@ public class DefaultNameSpace implements NameSpace {
      * @throws NameNotFoundException
      *             if the name was not found in this namespace
      */
+    @PrivilegedActionPragma
     public <T> T lookup(Class<T> name) throws NameNotFoundException {
-        final Object result = namespace.get(name);
+        final Object result = namespace.get(name.getVmClass());
         if (result == null) {
+//            if (!VmIsolate.isRoot()) {
+//                System.out.println("Looking for " + name.getVmClass().hashCode());
+//                for (VmType<?> type : namespace.keySet()) {
+//                    System.out.println("   found " + type.hashCode() + " " + (type == name.getVmClass()));
+//                }
+//            }
             throw new NameNotFoundException(name.getName());
         }
         return name.cast(result);
@@ -87,9 +100,13 @@ public class DefaultNameSpace implements NameSpace {
      * Gets a set containing all names (Class) of the bound services.
      */
     public Set<Class<?>> nameSet() {
-        final Set<Class<?>> result;
+        final HashSet<VmType<?>> types;
         synchronized (namespace) {
-            result = new HashSet<Class<?>>(namespace.keySet());
+            types = new HashSet<VmType<?>>(namespace.keySet());
+        }
+        final Set<Class<?>> result = new HashSet<Class<?>>(types.size());
+        for (VmType<?> type : types) {
+            result.add(type.asClass());
         }
         return result;
     }
