@@ -18,12 +18,14 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.shell.command.driver.console;
 
 import java.awt.event.KeyEvent;
 import java.util.Set;
 
+import javax.isolate.Isolate;
+import javax.isolate.IsolateStartupException;
 import javax.naming.NameNotFoundException;
 
 import org.jnode.driver.console.Console;
@@ -49,10 +51,14 @@ public class ConsoleCommand {
             new Argument("-n", "create new Shell Console", false),
             Parameter.OPTIONAL);
 
-    public static Help.Info HELP_INFO = new Help.Info(
-            "console",
+    private static Parameter IsolateNewConsoleParameter = new Parameter(
+            new Argument("-i", "Isolate new Shell Console", false),
+            Parameter.OPTIONAL);
+
+    public static Help.Info HELP_INFO = new Help.Info("console",
             new Syntax[] { new Syntax("Console administration",
-                    new Parameter[] { ListParameter, NewUserConsoleParameter }), });
+                    new Parameter[] { ListParameter, NewUserConsoleParameter,
+                            IsolateNewConsoleParameter }), });
 
     /**
      * Displays the system date
@@ -66,29 +72,58 @@ public class ConsoleCommand {
         final ConsoleManager conMgr = (ConsoleManager) InitialNaming
                 .lookup(ConsoleManager.NAME);
         
-        if (args.length > 0) {
-            if (args[0].equals("-l")) {
-                final Set<String> consoleNames = conMgr.getConsoleNames();
-                System.out.println("Nr. of registered consoles: "
-                        + consoleNames.size());
-                for (String name : consoleNames) {
-                    final Console console = conMgr.getConsole(name);
-                    System.out.println("      - " + name + " ACCEL:" + KeyEvent.getKeyText(console.getAcceleratorKeyCode()));
+        boolean listConsoles = false;
+        boolean newConsole = false;
+        boolean isolateNewConsole = false;
+        
+        System.out.print("args: ");
+        for (String arg : args) {
+            System.out.print(arg);
+            if (arg.equals("-l")) {
+                listConsoles = true;
+            } else if (arg.equals("-n")) {
+                newConsole = true;
+            } else if (arg.equals("-i")) {
+                isolateNewConsole = true;
+            }
+        }
+        System.out.println();
+        
+        if (listConsoles) {
+            final Set<String> consoleNames = conMgr.getConsoleNames();
+            System.out.println("Nr. of registered consoles: "
+                    + consoleNames.size());
+            for (String name : consoleNames) {
+                final Console console = conMgr.getConsole(name);
+                System.out.println("      - "
+                        + name
+                        + " ACCEL:"
+                        + KeyEvent.getKeyText(console
+                                .getAcceleratorKeyCode()));
+            }
+        } else if (newConsole) {
+            if (isolateNewConsole) {
+                try {
+                    Isolate newIsolate = new Isolate(ConsoleCommand.class.getName(), new String[] { "-n" });
+                    newIsolate.start();
+                } catch (IsolateStartupException ex) {
+                    System.out.println("Failed to start new isolated console");
+                    ex.printStackTrace(System.err);
                 }
-            } else if (args[0].equals("-n")) {
-                final TextConsole console = (TextConsole) conMgr
-                        .createConsole(null, ConsoleManager.CreateOptions.TEXT
-                                | ConsoleManager.CreateOptions.SCROLLABLE);
+            } else {
+                final TextConsole console = (TextConsole) conMgr.createConsole(
+                        null, ConsoleManager.CreateOptions.TEXT
+                        | ConsoleManager.CreateOptions.SCROLLABLE);
                 CommandShell commandShell = new CommandShell(console);
                 new Thread(commandShell).start();
-
+                
                 System.out.println("Console created with name:"
                         + console.getConsoleName());
             }
         } else {
             System.out.println("test RawTextConsole");
-            final TextConsole console = (TextConsole) conMgr
-                    .createConsole(null, ConsoleManager.CreateOptions.TEXT);
+            final TextConsole console = (TextConsole) conMgr.createConsole(
+                    null, ConsoleManager.CreateOptions.TEXT);
             conMgr.registerConsole(console);
             conMgr.focus(console);
             console.clear();
