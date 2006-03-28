@@ -23,10 +23,27 @@ package org.jnode.plugin;
 
 import java.util.Set;
 
+import org.jnode.vm.classmgr.VmClassLoader;
+
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public abstract class PluginClassLoader extends ClassLoader {
+    
+    /**
+     * Default ctor
+     */
+    public PluginClassLoader() {
+        // No code here
+    }
+
+    /**
+     * Wrap this classloader around the given vmClassLoader.
+     * Requires special permission.
+     */
+    protected PluginClassLoader(ClassLoader parent, VmClassLoader vmClassLoader) {
+        super(parent, vmClassLoader);
+    }
 
     /**
      * Gets the descriptor of the plugin in which this element was declared.

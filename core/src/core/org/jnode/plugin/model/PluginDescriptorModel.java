@@ -43,9 +43,9 @@ import org.jnode.plugin.PluginPrerequisite;
 import org.jnode.plugin.Runtime;
 import org.jnode.system.BootLog;
 import org.jnode.util.BootableArrayList;
-import org.jnode.vm.VmIsolate;
 import org.jnode.vm.VmIsolateLocal;
 import org.jnode.vm.VmSystem;
+import org.jnode.vm.classmgr.VmClassLoader;
 
 /**
  * Implementation of {@link org.jnode.plugin.PluginDescriptor}.
@@ -58,6 +58,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     private final boolean autoStart;
 
     private transient VmIsolateLocal<ClassLoader> classLoaderHolder;
+    private transient VmClassLoader vmClassLoader;
 
     private final String className;
 
@@ -464,13 +465,23 @@ public class PluginDescriptorModel extends AbstractModelObject implements
                 preLoaders[i] = (PluginClassLoaderImpl) cl;
             }
         }
+        final VmClassLoader currentVmClassLoader = this.vmClassLoader;
         final PrivilegedAction a = new PrivilegedAction() {
             public Object run() {
-                return new PluginClassLoaderImpl(registry,
+                if (currentVmClassLoader != null) {
+                    PluginClassLoaderImpl cl = new PluginClassLoaderImpl(currentVmClassLoader, registry,
+                            PluginDescriptorModel.this, jarFile, preLoaders);
+                    return new Object[] { cl, currentVmClassLoader };
+                } else {
+                    PluginClassLoaderImpl cl = new PluginClassLoaderImpl(registry,
                         PluginDescriptorModel.this, jarFile, preLoaders);
+                    return new Object[] { cl, cl.getVmClassLoader() };
+                }
             }
         };
-        return (PluginClassLoaderImpl) AccessController.doPrivileged(a);        
+        final Object[] result = (Object[]) AccessController.doPrivileged(a);
+        this.vmClassLoader = (VmClassLoader) result[1];
+        return (PluginClassLoaderImpl) result[0];
     }
 
     /**

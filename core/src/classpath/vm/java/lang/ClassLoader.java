@@ -42,6 +42,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.jnode.security.JNodePermission;
 import org.jnode.vm.VmJavaClassLoader;
 import org.jnode.vm.VmSystem;
 import org.jnode.vm.VmSystemClassLoader;
@@ -215,6 +216,46 @@ public abstract class ClassLoader {
         }
         this.parent = null;
         this.vmClassLoader = vmClassLoader;
+    }
+
+    /**
+     * Create a new classloader wrapped around a given VmClassLoader,
+     * with a given parent loader.
+     * 
+     * @param vmClassLoader
+     */
+    protected ClassLoader(ClassLoader parent, VmClassLoader vmClassLoader) {
+        /* May we create a new classloader? */
+        SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            sm.checkCreateClassLoader();
+            sm.checkPermission(new JNodePermission("wrapVmClassLoader"));
+        }
+        if (vmClassLoader == null) {
+            throw new IllegalArgumentException("vmClassLoader cannot be null");
+        }
+        if (vmClassLoader.isSystemClassLoader()) {
+            throw new IllegalArgumentException(
+                    "vmClassLoader must not be system classloader");
+        }
+        if (parent == null) {
+            throw new IllegalArgumentException("parent cannot be null");
+        }
+        this.parent = parent;
+        this.vmClassLoader = vmClassLoader;
+    }
+    
+    /**
+     * Gets the VmClassLoader that is used by this classloader.
+     * This method requires special permission.
+     * @return
+     */
+    public final VmClassLoader getVmClassLoader() {
+        SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            sm.checkPermission(new JNodePermission("getVmClassLoader"));
+        }
+        return vmClassLoader;
     }
 
     /**

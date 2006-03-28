@@ -41,6 +41,7 @@ import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
 import org.jnode.system.BootLog;
 import org.jnode.vm.ResourceLoader;
+import org.jnode.vm.classmgr.VmClassLoader;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -67,6 +68,21 @@ final class PluginClassLoaderImpl extends PluginClassLoader {
     public PluginClassLoaderImpl(PluginRegistryModel registry,
             PluginDescriptorModel descr, PluginJar jar,
             PluginClassLoaderImpl[] prerequisiteLoaders) {
+        this.registry = registry;
+        this.descriptor = descr;
+        this.jar = jar;
+        this.prerequisiteLoaders = prerequisiteLoaders;
+    }
+
+    /**
+     * Initialize this instance.
+     * 
+     * @param jar
+     */
+    protected PluginClassLoaderImpl(VmClassLoader vmClassLoader, PluginRegistryModel registry,
+            PluginDescriptorModel descr, PluginJar jar,
+            PluginClassLoaderImpl[] prerequisiteLoaders) {
+        super(ClassLoader.getSystemClassLoader(), vmClassLoader);
         this.registry = registry;
         this.descriptor = descr;
         this.jar = jar;
