@@ -62,7 +62,7 @@ public class LoadkeysCommand {
             new Syntax[] { 
             	new Syntax("Display the current keyboard layout"),
             	new Syntax("change the current keyboard layout\n\tExample : loadkeys fr",
-                    PARAM_LANGUAGE, PARAM_COUNTRY, PARAM_VARIANT)
+            			PARAM_COUNTRY, PARAM_LANGUAGE, PARAM_VARIANT)
 				});
 
     public static void main(String[] args) throws Exception {
