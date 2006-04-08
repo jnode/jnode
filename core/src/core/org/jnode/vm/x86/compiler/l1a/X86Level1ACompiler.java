@@ -33,6 +33,7 @@ import org.jnode.vm.compiler.EntryPoints;
 import org.jnode.vm.compiler.GCMapIterator;
 import org.jnode.vm.compiler.InlineBytecodeVisitor;
 import org.jnode.vm.compiler.OptimizingBytecodeVisitor;
+import org.jnode.vm.isolate.VmIsolateLocal;
 import org.jnode.vm.x86.X86CpuID;
 import org.jnode.vm.x86.compiler.AbstractX86Compiler;
 
@@ -80,7 +81,7 @@ public final class X86Level1ACompiler extends AbstractX86Compiler {
 
     /** Should this compiler try to inline methods? */
     private final boolean inlineMethods = true;
-    private final MagicHelper magicHelper = new MagicHelper();
+    private final VmIsolateLocal<MagicHelper> magicHelperHolder = new VmIsolateLocal<MagicHelper>();
 
     /**
      * Initialize this instance.
@@ -102,12 +103,22 @@ public final class X86Level1ACompiler extends AbstractX86Compiler {
             CompiledMethod cm, NativeStream os, int level, boolean isBootstrap) {
         final InlineBytecodeVisitor cbv;
         final EntryPoints entryPoints = getEntryPoints();
-        cbv = new X86BytecodeVisitor(os, cm, isBootstrap, entryPoints, magicHelper, getTypeSizeInfo());
+        cbv = new X86BytecodeVisitor(os, cm, isBootstrap, entryPoints, getMagicHelper(), getTypeSizeInfo());
         if (inlineMethods /*&& ((X86Assembler)os).isCode32()*/) {
             final VmClassLoader loader = method.getDeclaringClass().getLoader();
             return new OptimizingBytecodeVisitor(entryPoints, cbv, loader);
         } else {
             return cbv;
+        }
+    }
+    
+    private final MagicHelper getMagicHelper() {
+        final MagicHelper helper = magicHelperHolder.get();
+        if (helper != null) {
+            return helper;
+        } else {
+            magicHelperHolder.set(new MagicHelper());
+            return magicHelperHolder.get();
         }
     }
 

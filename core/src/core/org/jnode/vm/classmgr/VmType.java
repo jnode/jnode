@@ -35,7 +35,6 @@ import org.jnode.assembler.NativeStream;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
-import org.jnode.vm.VmIsolateLocal;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.VmReflection;
 import org.jnode.vm.VmSystemClassLoader;
@@ -49,6 +48,7 @@ import org.jnode.vm.annotation.Uninterruptible;
 import org.jnode.vm.compiler.CompileError;
 import org.jnode.vm.compiler.CompiledIMT;
 import org.jnode.vm.compiler.NativeCodeCompiler;
+import org.jnode.vm.isolate.VmIsolateLocal;
 import org.vmmagic.unboxed.Address;
 
 @SharedStatics

@@ -50,6 +50,7 @@ import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.compiler.CompiledIMT;
 import org.jnode.vm.compiler.IMTCompiler;
 import org.jnode.vm.compiler.NativeCodeCompiler;
+import org.jnode.vm.isolate.VmIsolate;
 
 /**
  * Default classloader.

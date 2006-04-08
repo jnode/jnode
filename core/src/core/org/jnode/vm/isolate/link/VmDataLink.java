@@ -1,84 +1,118 @@
 /*
  * $Id$
- *
- * JNode.org
- * Copyright (C) 2003-2006 JNode.org
- *
- * This library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published
- * by the Free Software Foundation; either version 2.1 of the License, or
- * (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
- * License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
-package javax.isolate;
+package org.jnode.vm.isolate.link;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
+import java.util.LinkedList;
+import java.util.Queue;
 
-import org.jnode.vm.isolate.link.VmDataLink;
+import javax.isolate.ClosedLinkException;
+import javax.isolate.Link;
+import javax.isolate.LinkMessage;
+
+import org.jnode.vm.isolate.VmIsolate;
+import org.jnode.vm.isolate.VmIsolateLocal;
 
 /**
+ * Shared implementation of javax.isolate.Link
+ * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public abstract class Link {
+public final class VmDataLink {
+
+    private final VmIsolateLocal<DataLinkImpl> linkHolder = new VmIsolateLocal<DataLinkImpl>();
+
+    private final Queue<LinkMessageImpl> messages = new LinkedList<LinkMessageImpl>();
+
+    private boolean closed = false;
+
+    private VmIsolate sender;
+
+    private VmIsolate receiver;
 
     /**
-     * Returns the isolate that can receive on this link or null if it is not
-     * possible to determine a unique receiver.
+     * Create a new data link between the given isolates.
      * 
+     * @param sender
+     * @param receiver
      * @return
      */
-    public abstract Isolate getReceiver();
+    public static Link newLink(VmIsolate sender, VmIsolate receiver) {
+        if (sender == receiver) {
+            throw new IllegalArgumentException("sender == receiver");
+        }
+        VmDataLink vmLink = new VmDataLink(sender, receiver);
+        return vmLink.asLink();
+    }
 
+    public static VmDataLink fromLink(Link link) {
+        return ((DataLinkImpl)link).getImpl();
+    }
+    
     /**
-     * Returns the isolate that can send on this link.
-     * 
-     * @return
+     * @param sender
+     * @param receiver
      */
-    public abstract Isolate getSender();
-
-    /**
-     * Closes this Link, disabling both sending and receiving on it. Invocations
-     * of send() or receive() on a closed Link will result in a
-     * ClosedLinkException. For any send() or receive() invocations that are
-     * active in other threads when close() is invoked, those invocations will
-     * either complete successfully on both sides, or both sides will see a
-     * ClosedLinkException. If the invoking isolate is neither a sender nor a
-     * receiver on this Link, an IllegalStateException will be thrown, and the
-     * Link will not be closed. If this Link is already closed or is in the
-     * process of closing, invoking this method has no effect.
-     */
-    public void close() {
+    VmDataLink(VmIsolate sender, VmIsolate receiver) {
+        this.sender = sender;
+        this.receiver = receiver;
     }
 
     /**
-     * Tests to see if this Link is open.
-     * 
-     * A data link is open from the point of its creation until the earliest
-     * occurrence of at least one of its associated isolates closing it, or of
-     * at least one of its associated Isolates terminating.
-     * 
-     * A status link is open from the point of its creation until the earliest
-     * occurrence of its receiving isolate closing it, of its receiving isolate
-     * terminating, or of the receipt of a message containing a
-     * IsolateStatus.State object with value EXITED.
-     * 
-     * This method throws IllegalStateException if the invoking isolate is
-     * neither a sender nor a receiver for this link.
+     * Gets this shared link as Link instance.
      * 
      * @return
      */
-    public boolean isOpen() {
-        return false;
+    public final Link asLink() {
+        final DataLinkImpl link = linkHolder.get();
+        if (link == null) {
+            linkHolder.set(new DataLinkImpl(this));
+            return linkHolder.get();
+        } else {
+            return link;
+        }
+    }
+
+    /**
+     * Close this link.
+     */
+    final void close() {
+        if (!this.closed) {
+            final VmIsolate current = VmIsolate.currentIsolate();
+            if ((current != receiver) && (current != sender)) {
+                throw new IllegalStateException(
+                        "Only sender or receiver can close this link");
+            }
+            this.closed = true;
+            synchronized (this) {
+                notifyAll();
+            }
+        }
+    }
+
+    /**
+     * Is this link currently open.
+     * 
+     * @return
+     */
+    final boolean isOpen() {
+        return !closed;
+    }
+
+    /**
+     * @return the receiver
+     */
+    final VmIsolate getReceiver() {
+        return receiver;
+    }
+
+    /**
+     * @return the sender
+     */
+    final VmIsolate getSender() {
+        return sender;
     }
 
     /**
@@ -131,9 +165,31 @@ public abstract class Link {
      * 
      * @return
      */
-    public LinkMessage receive() throws ClosedLinkException,
+    final LinkMessage receive() throws ClosedLinkException,
             IllegalStateException, InterruptedIOException, IOException {
-        return null;
+        if (VmIsolate.currentIsolate() != receiver) {
+            // Current isolate is not the receiver
+            throw new IllegalStateException();
+        }
+        if (this.closed) {
+            throw new ClosedLinkException();
+        }
+        final LinkMessageImpl message;
+        synchronized (this) {
+            while (messages.isEmpty()) {
+                if (this.closed) {
+                    throw new ClosedLinkException();
+                }
+                try {
+                    wait();
+                } catch (InterruptedException ex) {
+                    throw new InterruptedIOException();
+                }
+            }
+            message = messages.poll();
+            notifyAll();
+        }
+        return message.CloneMessage();
     }
 
     /**
@@ -187,47 +243,30 @@ public abstract class Link {
      * @throws InterruptedIOException
      * @throws IOException
      */
-    public void send(LinkMessage message) throws ClosedLinkException,
+    final void send(LinkMessage message) throws ClosedLinkException,
             InterruptedIOException, IOException {
-
-    }
-
-    /**
-     * Tests this Link for equality with the given object. Returns true if and
-     * only if other is not null and denotes the same link as this, with respect
-     * to rendezvous points.
-     * 
-     * @param other
-     * @return
-     */
-    public boolean equals(Object other) {
-        return super.equals(other);
-    }
-
-    /**
-     * Returns a description of this link. It includes information returned by
-     * getSender().toString() and getReceiver().toString().
-     * 
-     * @see java.lang.Object#toString()
-     */
-    public String toString() {
-        return super.toString();
-    }
-
-    /**
-     * Creates a new data link between the given pair of Isolate instances. The
-     * sender and the receiver must not be equal.
-     * 
-     * The links that this method returns support the optional getSender() and
-     * getReceiver() methods.
-     * 
-     * @param sender
-     * @param receiver
-     * @return
-     * @throws ClosedLinkException
-     */
-    public static Link newLink(Isolate sender, Isolate receiver)
-            throws ClosedLinkException {
-        return VmDataLink.newLink(sender.getImpl(), receiver.getImpl());
+        if (VmIsolate.currentIsolate() != sender) {
+            // Current isolate is not a sender
+            throw new UnsupportedOperationException();
+        }
+        if (this.closed) {
+            throw new ClosedLinkException();
+        }
+        final LinkMessageImpl messageImpl = (LinkMessageImpl)message;
+        synchronized (this) {
+            if (this.closed) {
+                throw new ClosedLinkException();
+            }
+            // Send message
+            messages.add(messageImpl);
+            // Wait for the message to be picked up by the receiver
+            while (messages.contains(messageImpl) && !closed) {
+                try {
+                    wait();
+                } catch (InterruptedException ex) {
+                    throw new InterruptedIOException();
+                }
+            }
+        }
     }
 }
