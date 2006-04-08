@@ -42,8 +42,11 @@ final class FileSystemManager {
 	 * 
 	 * @param fs
 	 */
-	public synchronized void registerFileSystem(FileSystem fs) {
-		filesystems.put(fs.getDevice(), fs);
+	public void registerFileSystem(FileSystem fs) {
+        final Device device = fs.getDevice();
+        synchronized (this) {
+            filesystems.put(device, fs);
+        }
 	}
 
 	/**
@@ -53,7 +56,6 @@ final class FileSystemManager {
 	 */
 	public synchronized FileSystem unregisterFileSystem(Device device) {
 		return filesystems.remove(device);
-
 	}
 
 	/**
