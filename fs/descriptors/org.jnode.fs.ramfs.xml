@@ -5,8 +5,7 @@
         name="JNode TempFileSystem"
         version="@VERSION@"
         license-name="lgpl"
-        provider-name="JNode.org"
-        class="org.jnode.fs.ramfs.def.RAMFSPlugin">
+        provider-name="JNode.org">
         
   <requires>
 	<import plugin="org.jnode.fs.service"/>
@@ -17,7 +16,6 @@
   <runtime>
     <library name="jnode-fs.jar">
       <export name="org.jnode.fs.ramfs.*"/>
-      <export name="org.jnode.fs.ramfs.def.*"/>
     </library>
   </runtime>
         
