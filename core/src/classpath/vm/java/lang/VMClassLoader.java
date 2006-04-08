@@ -21,10 +21,14 @@
  
 package java.lang;
 
+import java.nio.ByteBuffer;
+import java.security.ProtectionDomain;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jnode.vm.LoadCompileService;
 import org.jnode.vm.VmSystem;
+import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.jnode.vm.classmgr.VmType;
 
 /**
@@ -113,5 +117,24 @@ final class VMClassLoader {
      */
     static final Map<String, Boolean> classAssertionStatus() {
         return new HashMap<String, Boolean>();
+    }
+    
+    /**
+     * Define the class from the given byte array.
+     * @param loader
+     * @param name
+     * @param data
+     * @param offset
+     * @param length
+     * @param protDomain
+     * @return
+     */
+    @PrivilegedActionPragma
+    static Class defineClass(ClassLoader loader, String name,
+                        byte[] data, int offset, int length,
+                           ProtectionDomain protDomain) {
+        ByteBuffer buffer = ByteBuffer.wrap(data, offset, length);
+        VmType<?> vmType = LoadCompileService.defineClass(name, buffer, protDomain, loader.getVmClassLoader());
+        return vmType.asClass();
     }
 }
