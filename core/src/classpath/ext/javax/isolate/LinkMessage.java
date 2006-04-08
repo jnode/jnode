@@ -112,7 +112,7 @@ public abstract class LinkMessage {
     }
     
     public static LinkMessage newIsolateMessage(Isolate isolate) {
-        return LinkMessageFactory.newIsolateMessage(isolate);
+        return LinkMessageFactory.newIsolateMessage(isolate.getImpl());
     }
     
     public static LinkMessage newLinkMessage(Link link) {
