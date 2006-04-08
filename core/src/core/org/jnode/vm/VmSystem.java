@@ -150,6 +150,9 @@ public final class VmSystem {
 
             // Calibrate the processors
             VmProcessor.current().calibrate();
+            
+            // Setup class loading & compilation service
+            LoadCompileService.start();
 
             // Load the initial jarfile
             initJar = loadInitJar(rm);

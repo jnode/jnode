@@ -187,8 +187,8 @@ public final class VmDataLink {
                 }
             }
             message = messages.poll();
-            notifyAll();
         }
+        message.notifyReceived();
         return message.CloneMessage();
     }
 
@@ -259,14 +259,14 @@ public final class VmDataLink {
             }
             // Send message
             messages.add(messageImpl);
-            // Wait for the message to be picked up by the receiver
-            while (messages.contains(messageImpl) && !closed) {
-                try {
-                    wait();
-                } catch (InterruptedException ex) {
-                    throw new InterruptedIOException();
-                }
-            }
+            notifyAll();
+        }
+        
+        // Wait for the message to be picked up by the receiver
+        try {
+            messageImpl.waitUntilReceived();
+        } catch (InterruptedException ex) {
+            throw new InterruptedIOException();
         }
     }
 }

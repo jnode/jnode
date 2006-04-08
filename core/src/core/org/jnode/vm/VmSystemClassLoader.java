@@ -93,7 +93,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
     private transient HashSet<String> failedClassNames;
 
     private List<ResourceLoader> resourceLoaders;
-
+    
     /**
      * Constructor for VmClassLoader.
      * 
@@ -647,39 +647,6 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
     public void setFailOnNewLoad(boolean failOnNewLoad) {
         if (classesURL != null) {
             this.failOnNewLoad = failOnNewLoad;
-        }
-    }
-
-    /**
-     * Compile the given method
-     * 
-     * @param vmMethod
-     *            The method to compile
-     * @param optLevel
-     *            The optimization level
-     */
-    public void compileRuntime(VmMethod vmMethod, int optLevel,
-            boolean enableTestCompilers) {
-        final NativeCodeCompiler cmps[];
-        int index;
-        if (enableTestCompilers) {
-            index = optLevel;
-            optLevel += arch.getCompilers().length;
-            cmps = arch.getTestCompilers();
-        } else {
-            index = optLevel;
-            cmps = arch.getCompilers();
-        }
-
-        final NativeCodeCompiler cmp;
-        if (index < 0) {
-            index = 0;
-        } else if (index >= cmps.length) {
-            index = cmps.length - 1;
-        }
-        if (vmMethod.getNativeCodeOptLevel() < optLevel) {
-            cmp = cmps[index];
-            cmp.compileRuntime(vmMethod, getResolver(), optLevel, null);
         }
     }
 

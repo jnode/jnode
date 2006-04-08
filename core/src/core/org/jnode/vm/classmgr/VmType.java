@@ -33,6 +33,7 @@ import java.util.HashSet;
 
 import org.jnode.assembler.NativeStream;
 import org.jnode.vm.JvmType;
+import org.jnode.vm.LoadCompileService;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmMagic;
@@ -1944,8 +1945,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
             for (int i = 0; i < count; i++) {
                 final VmMethod method = mt[i];
                 if (optLevel > method.getNativeCodeOptLevel()) {
-                    loader
-                            .compileRuntime(method, optLevel,
+                    LoadCompileService.compile(method, optLevel,
                                     enableTestCompilers);
                     // method.setModifier(true, Modifier.ACC_COMPILED);
                     compileCount++;

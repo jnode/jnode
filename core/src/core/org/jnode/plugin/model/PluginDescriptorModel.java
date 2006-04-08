@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.plugin.model;
 
 import java.lang.reflect.Constructor;
@@ -58,6 +58,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     private final boolean autoStart;
 
     private transient VmIsolateLocal<ClassLoader> classLoaderHolder;
+
     private transient VmClassLoader vmClassLoader;
 
     private final String className;
@@ -77,6 +78,8 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     private final String licenseUrl;
 
     private List<PluginDescriptorListener> listeners;
+
+    private final Object listenerLock = new Object();
 
     private final String name;
 
@@ -98,10 +101,12 @@ public class PluginDescriptorModel extends AbstractModelObject implements
 
     private boolean starting = false;
 
+    private final Object startLock = new Object();
+
     private final boolean system;
 
     private final String version;
-    
+
     private final int priority;
 
     /**
@@ -123,7 +128,8 @@ public class PluginDescriptorModel extends AbstractModelObject implements
         className = getAttribute(e, "class", false);
         system = getBooleanAttribute(e, "system", false);
         autoStart = getBooleanAttribute(e, "auto-start", false);
-        priority = Math.min(MAX_PRIORITY, Math.max(MIN_PRIORITY, getIntAttribute(e, "priority", DEFAULT_PRIORITY)));
+        priority = Math.min(MAX_PRIORITY, Math.max(MIN_PRIORITY,
+                getIntAttribute(e, "priority", DEFAULT_PRIORITY)));
 
         // if (registry != null) {
         // registry.registerPlugin(this);
@@ -220,11 +226,13 @@ public class PluginDescriptorModel extends AbstractModelObject implements
      * 
      * @param listener
      */
-    public synchronized void addListener(PluginDescriptorListener listener) {
-        if (listeners == null) {
-            listeners = new ArrayList<PluginDescriptorListener>();
+    public final void addListener(PluginDescriptorListener listener) {
+        synchronized (listenerLock) {
+            if (listeners == null) {
+                listeners = new ArrayList<PluginDescriptorListener>();
+            }
+            listeners.add(listener);
         }
-        listeners.add(listener);
     }
 
     /**
@@ -287,7 +295,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
      */
     public final void firePluginStarted() {
         final List<PluginDescriptorListener> listeners;
-        synchronized (this) {
+        synchronized (listenerLock) {
             if (this.listeners != null) {
                 listeners = new ArrayList<PluginDescriptorListener>(
                         this.listeners);
@@ -305,7 +313,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
      */
     public final void firePluginStop() {
         final List<PluginDescriptorListener> listeners;
-        synchronized (this) {
+        synchronized (listenerLock) {
             if (this.listeners != null) {
                 listeners = new ArrayList<PluginDescriptorListener>(
                         this.listeners);
@@ -445,7 +453,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements
         }
         return classLoaderHolder.get();
     }
-    
+
     private final PluginClassLoaderImpl createClassLoader() {
         if (registry == null) {
             throw new RuntimeException("Plugin is not resolved yet");
@@ -469,12 +477,14 @@ public class PluginDescriptorModel extends AbstractModelObject implements
         final PrivilegedAction a = new PrivilegedAction() {
             public Object run() {
                 if (currentVmClassLoader != null) {
-                    PluginClassLoaderImpl cl = new PluginClassLoaderImpl(currentVmClassLoader, registry,
+                    PluginClassLoaderImpl cl = new PluginClassLoaderImpl(
+                            currentVmClassLoader, registry,
                             PluginDescriptorModel.this, jarFile, preLoaders);
                     return new Object[] { cl, currentVmClassLoader };
                 } else {
-                    PluginClassLoaderImpl cl = new PluginClassLoaderImpl(registry,
-                        PluginDescriptorModel.this, jarFile, preLoaders);
+                    PluginClassLoaderImpl cl = new PluginClassLoaderImpl(
+                            registry, PluginDescriptorModel.this, jarFile,
+                            preLoaders);
                     return new Object[] { cl, cl.getVmClassLoader() };
                 }
             }
@@ -551,14 +561,15 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     }
 
     /**
-     * Gets the priority of this plugin.
-     * Plugins are loaded by increasing priority. 
+     * Gets the priority of this plugin. Plugins are loaded by increasing
+     * priority.
+     * 
      * @return
      */
     public int getPriority() {
         return priority;
     }
-    
+
     /**
      * Is this a descriptor of a fragment.
      * 
@@ -596,9 +607,11 @@ public class PluginDescriptorModel extends AbstractModelObject implements
      * 
      * @param listener
      */
-    public synchronized void removeListener(PluginDescriptorListener listener) {
-        if (listeners != null) {
-            listeners.remove(listener);
+    public final void removeListener(PluginDescriptorListener listener) {
+        synchronized (listenerLock) {
+            if (listeners != null) {
+                listeners.remove(listener);
+            }
         }
     }
 
@@ -637,41 +650,72 @@ public class PluginDescriptorModel extends AbstractModelObject implements
      */
     final void startPlugin(final PluginRegistryModel registry)
             throws PluginException {
-        if (started) {
+        if (started || starting) {
             return;
         }
-        synchronized (this) {
+        synchronized (startLock) {
             if (started || starting) {
                 return;
             }
             starting = true;
-            // BootLog.info("Resolve on plugin " + getId());
-            try {
-                AccessController.doPrivileged(new PrivilegedExceptionAction() {
-                    public Object run() throws PluginException {
-                        resolve(registry);
-                        final int reqMax = requires.length;
-                        for (int i = 0; i < reqMax; i++) {
-                            final String reqId = requires[i].getPluginId();
-                            // BootLog.info("Start dependency " + reqId);
-                            final PluginDescriptorModel reqDescr = (PluginDescriptorModel) registry
-                                    .getPluginDescriptor(reqId);
-                            reqDescr.startPlugin(registry);
-                        }
-                        // BootLog.info("Start myself " + getId());
-                        getPlugin().start();
-                        return null;
+        }
+        // BootLog.info("Resolve on plugin " + getId());
+        try {
+            AccessController.doPrivileged(new PrivilegedExceptionAction() {
+                public Object run() throws PluginException {
+                    resolve(registry);
+                    final int reqMax = requires.length;
+                    for (int i = 0; i < reqMax; i++) {
+                        final String reqId = requires[i].getPluginId();
+                        // BootLog.info("Start dependency " + reqId);
+                        final PluginDescriptorModel reqDescr = (PluginDescriptorModel) registry
+                        .getPluginDescriptor(reqId);
+                        reqDescr.startPlugin(registry);
+                        // Make sure that it is really started
+                        reqDescr.waitUntilStarted();
                     }
-                });
-            } catch (PrivilegedActionException ex) {
-                BootLog.error("Error starting plugin", ex);
-                try {
-                    Thread.sleep(10000);
-                } catch (InterruptedException ex1) {
-                    // Ignore
+                    // BootLog.info("Start myself " + getId());
+                    getPlugin().start();
+                    return null;
                 }
-            } finally {
+            });
+        } catch (PrivilegedActionException ex) {
+            BootLog.error("Error starting plugin", ex);
+            /*try {
+                Thread.sleep(10000);
+            } catch (InterruptedException ex1) {
+                // Ignore
+            }*/
+        } finally {
+            synchronized (startLock) {
                 started = true;
+                startLock.notifyAll();
+            }
+        }
+    }
+    
+    /**
+     * Block the current thread until this plugin is started.
+     * If the current thread is starting this plugin, then the thread
+     * will not be blocked.
+     * @throws InterruptedException 
+     * @throws  
+     */
+    private void waitUntilStarted() throws PluginException {
+        if (!started) {
+            synchronized (startLock) {
+                if (starting) {
+                    // I'm the thread doing the start, otherwise
+                    // we would have been blocked here.
+                    return;
+                }
+                while (!started) {
+                    try {
+                        startLock.wait();
+                    } catch (InterruptedException ex) {
+                        throw new PluginException(ex);
+                    }
+                }
             }
         }
     }
