@@ -21,12 +21,10 @@
  
 package java.lang;
 
-import java.nio.ByteBuffer;
 import java.security.ProtectionDomain;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jnode.vm.LoadCompileService;
 import org.jnode.vm.VmSystem;
 import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.jnode.vm.classmgr.VmType;
@@ -132,9 +130,7 @@ final class VMClassLoader {
     @PrivilegedActionPragma
     static Class defineClass(ClassLoader loader, String name,
                         byte[] data, int offset, int length,
-                           ProtectionDomain protDomain) {
-        ByteBuffer buffer = ByteBuffer.wrap(data, offset, length);
-        VmType<?> vmType = LoadCompileService.defineClass(name, buffer, protDomain, loader.getVmClassLoader());
-        return vmType.asClass();
+                           ProtectionDomain protDomain) {        
+        return loader.defineClass(name, data, offset, length, protDomain);
     }
 }
