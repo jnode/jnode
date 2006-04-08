@@ -21,8 +21,8 @@
  
 package org.jnode.fs.service.def;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,8 +60,8 @@ final class FileSystemTypeManager implements ExtensionPointListener {
 	 * Gets all registered file system types.
 	 * All instances of the returned collection are instanceof FileSystemType.
 	 */
-	public Collection<FileSystemType> fileSystemTypes() {
-		return Collections.unmodifiableCollection(types.values());
+	public synchronized Collection<FileSystemType> fileSystemTypes() {
+		return new ArrayList<FileSystemType>(types.values());
 	}
     
     /**
@@ -69,7 +69,7 @@ final class FileSystemTypeManager implements ExtensionPointListener {
      * @param name the fileSystemType name
      * @return null if it doesn't exists
      */
-    public FileSystemType getSystemType(String name) {
+    public synchronized FileSystemType getSystemType(String name) {
         return types.get(name);
     }
     
@@ -77,17 +77,24 @@ final class FileSystemTypeManager implements ExtensionPointListener {
 	/**
 	* Load all known file system types.
 	*/
-	protected synchronized void refreshFileSystemTypes() {
-		types.clear();
-		
+	protected final void refreshFileSystemTypes() {
+        
+        // Create new type map
+        HashMap<String, FileSystemType> newTypes = new HashMap<String, FileSystemType>();
 		final Extension[] extensions = typesEP.getExtensions();
 		for (int i = 0; i < extensions.length; i++) {
 			final Extension ext = extensions[i];
 			final ConfigurationElement[] elements = ext.getConfigurationElements();
 			for (int j = 0; j < elements.length; j++) {
-				createType(types, elements[j]);
+				createType(newTypes, elements[j]);
 			}
 		}
+        
+        // Save new type map
+        synchronized (this) {
+            this.types.clear();
+            this.types.putAll(newTypes);
+        }
 	}
 
 	/**
@@ -131,5 +138,4 @@ final class FileSystemTypeManager implements ExtensionPointListener {
 	public void extensionRemoved(ExtensionPoint point, Extension extension) {
 		refreshFileSystemTypes();
 	}
-
 }
