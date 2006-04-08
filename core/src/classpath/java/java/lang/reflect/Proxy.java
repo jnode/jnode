@@ -41,6 +41,8 @@ package java.lang.reflect;
 import gnu.java.lang.reflect.TypeSignature;
 
 import java.io.Serializable;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -1261,9 +1263,16 @@ public class Proxy implements Serializable
 	  // we're in the same package.
                 m.flag = true;
 
+                // @classpath-bugfix
+          ProtectionDomain protDomain = (ProtectionDomain)AccessController.doPrivileged(new PrivilegedAction() {
+              public Object run() {
+                  return Object.class.getProtectionDomain();
+              }
+          });
+                
           Object[] args = {loader, qualName, bytecode, new Integer(0),
                         new Integer(bytecode.length),
-                           Object.class.getProtectionDomain() };
+                           protDomain };
                 Class clazz = (Class) m.invoke(null, args);
 
                 // Finally, initialize the m field of the proxy class, before
