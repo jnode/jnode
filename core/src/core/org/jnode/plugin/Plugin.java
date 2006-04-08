@@ -98,8 +98,17 @@ public abstract class Plugin {
 		        BootLog.debug("__Starting " + descriptor.getId());
 		    }
             started = true;
-		    startPlugin();
-		    ((PluginDescriptorModel)descriptor).firePluginStarted();
+            try {
+                try {
+                    startPlugin();
+                } finally {
+                    ((PluginDescriptorModel)descriptor).firePluginStarted();                
+                }
+            } catch (PluginException ex) {
+                throw ex;
+            } catch (Throwable ex) {
+                throw new PluginException(ex);
+            }
 		}
 	}
 
@@ -116,8 +125,17 @@ public abstract class Plugin {
 	    }
 		if (started) {
             started = false;
-		    ((PluginDescriptorModel)descriptor).firePluginStop();
-			stopPlugin();
+            try {
+                try {
+                    ((PluginDescriptorModel)descriptor).firePluginStop();
+                } finally {
+                    stopPlugin();
+                }
+            } catch (PluginException ex) {
+                throw ex;
+            } catch (Throwable ex) {
+                throw new PluginException(ex);
+            }
 		}
 	}
 

@@ -24,7 +24,6 @@ package org.jnode.vm;
 import java.nio.ByteBuffer;
 import java.security.ProtectionDomain;
 
-import org.jnode.vm.classmgr.ClassDecoder;
 import org.jnode.vm.classmgr.SelectorMap;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmType;
@@ -37,7 +36,7 @@ abstract class VmAbstractClassLoader extends VmClassLoader {
 	/**
 	 * @see org.jnode.vm.classmgr.VmClassLoader#defineClass(java.lang.String, byte[], int, int, java.security.ProtectionDomain)
 	 */
-	public final VmType defineClass(String name, byte[] data, int offset, int length, ProtectionDomain protDomain) {
+	public final VmType<?> defineClass(String name, byte[] data, int offset, int length, ProtectionDomain protDomain) {
         ByteBuffer buf = ByteBuffer.wrap(data, offset, length);
         return defineClass(name, buf, protDomain);
 	}
@@ -45,19 +44,30 @@ abstract class VmAbstractClassLoader extends VmClassLoader {
     /**
      * @see org.jnode.vm.classmgr.VmClassLoader#defineClass(java.lang.String, ByteBuffer, java.security.ProtectionDomain)
      */
-    public synchronized final VmType defineClass(String name, ByteBuffer data, ProtectionDomain protDomain) {
-        VmType<?> vmClass = findLoadedClass(name);
-        if (vmClass != null) {
-            return vmClass;
+    public final VmType<?> defineClass(String name, ByteBuffer data, ProtectionDomain protDomain) {
+        VmType<?> vmClass;
+        synchronized (this) {
+            vmClass = findLoadedClass(name);
+            if (vmClass != null) {
+                return vmClass;
+            }
         }
-        vmClass = ClassDecoder.defineClass(name, data, true, this, protDomain);
+        //vmClass = ClassDecoder.defineClass(name, data, true, this, protDomain);
+        vmClass = LoadCompileService.defineClass(name, data, protDomain, this);
         name = vmClass.getName();
         if (!isSystemClassLoader()) {
             if (name.startsWith("org.jnode.vm") || name.startsWith("java.lang")) {
                 throw new SecurityException("Only the system classloader can load this class");
             }
         }
-        addLoadedClass(name, vmClass);
+        synchronized (this) {
+            VmType<?> foundClass = findLoadedClass(name);
+            if (foundClass != null) {
+                return foundClass;
+            } else {
+                addLoadedClass(name, vmClass);
+            }
+        }
         return vmClass;
     }
     

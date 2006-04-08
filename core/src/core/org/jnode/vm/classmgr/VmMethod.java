@@ -25,6 +25,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 
+import org.jnode.vm.LoadCompileService;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmAddress;
 import org.jnode.vm.annotation.MagicPermission;
@@ -212,7 +213,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
             throw new IllegalStateException(
                     "Declaring class must have been prepared");
         }
-        declaringClass.getLoader().compileRuntime(this, optLevel, false);
+        LoadCompileService.compile(this, optLevel, false);
     }
 
     /**
