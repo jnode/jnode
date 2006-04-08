@@ -6,9 +6,10 @@ package org.jnode.vm.isolate.link;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import javax.isolate.Isolate;
 import javax.isolate.Link;
 import javax.isolate.LinkMessage;
+
+import org.jnode.vm.isolate.VmIsolate;
 
 public final class LinkMessageFactory {
 
@@ -37,7 +38,7 @@ public final class LinkMessageFactory {
      * @param isolate
      * @return
      */
-    public static LinkMessage newIsolateMessage(Isolate isolate) {
+    public static LinkMessage newIsolateMessage(VmIsolate isolate) {
         throw new UnsupportedOperationException();    
     }
     
@@ -46,7 +47,7 @@ public final class LinkMessageFactory {
      * @return
      */
     public static LinkMessage newLinkMessage(Link link) {
-        throw new UnsupportedOperationException();
+        return new LinkLinkMessage(((DataLinkImpl)link).getImpl());
     }
     
     /**
