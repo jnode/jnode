@@ -156,11 +156,13 @@ public final class LoadCompileService {
             request = requestQueue.get(0);
             requestQueue.remove(0);
         }
-        // Process request
-        request.execute();
-
-        // Notify waiting threads
-        request.setFinished();
+        try {
+            // Process request
+            request.execute();
+        } finally {
+            // Notify waiting threads
+            request.setFinished();
+        }
     }
 
     /**
@@ -208,6 +210,7 @@ public final class LoadCompileService {
     private static abstract class Request {
 
         private boolean finished = false;
+        private Throwable exception;
 
         /**
          * Wait until this request is finished.
@@ -215,10 +218,13 @@ public final class LoadCompileService {
         final synchronized void waitUntilFinished() {
             while (!finished) {
                 try {
-                    wait();
+                    wait(5000);
                 } catch (InterruptedException ex) {
                     // Ignore
                 }
+            }
+            if (exception != null) {
+                throw new RuntimeException(errorMessage(), exception);
             }
         }
 
@@ -226,11 +232,25 @@ public final class LoadCompileService {
             finished = true;
             notifyAll();
         }
+        
+        final void execute() {
+            try {
+                doExecute();
+            } catch (Throwable ex) {
+                this.exception = ex;
+            }
+        }
 
         /**
          * Execute this request.
          */
-        abstract void execute();
+        abstract void doExecute();
+
+        /**
+         * Gets request specific error message.
+         * @return
+         */
+        abstract String errorMessage();
     }
 
     final static class CompileRequest extends Request {
@@ -258,8 +278,16 @@ public final class LoadCompileService {
          * 
          * @see org.jnode.vm.LoadCompileService.Request#execute()
          */
-        void execute() {
+        void doExecute() {
             service.doCompile(method, optLevel, enableTestCompilers);
+        }
+
+        /**
+         * @see org.jnode.vm.LoadCompileService.Request#errorMessage()
+         */
+        @Override
+        String errorMessage() {
+            return "Error in compilation: ";
         }
     }
 
@@ -293,7 +321,7 @@ public final class LoadCompileService {
          * 
          * @see org.jnode.vm.LoadCompileService.Request#execute()
          */
-        void execute() {
+        void doExecute() {
             definedType = service.doDefineClass(name, data, protDomain, loader);
         }
 
@@ -302,6 +330,14 @@ public final class LoadCompileService {
          */
         final VmType< ? > getDefinedType() {
             return definedType;
+        }
+
+        /**
+         * @see org.jnode.vm.LoadCompileService.Request#errorMessage()
+         */
+        @Override
+        String errorMessage() {
+            return "Error in class loading: ";
         }
     }
 }

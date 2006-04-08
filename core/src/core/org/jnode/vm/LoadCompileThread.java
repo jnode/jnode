@@ -27,6 +27,7 @@ final class LoadCompileThread extends Thread {
                 service.processNextRequest();
             } catch (Throwable ex) {
                 // Ignore
+                ex.printStackTrace(System.err);
             }
         }
     }
