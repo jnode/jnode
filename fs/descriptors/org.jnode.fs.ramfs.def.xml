@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.fs.ramfs.def"
+        name="JNode TempFileSystem"
+        version="@VERSION@"
+        license-name="lgpl"
+        provider-name="JNode.org"
+        class="org.jnode.fs.ramfs.def.RAMFSPlugin">
+        
+  <requires>
+	<import plugin="org.jnode.fs.ramfs"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-fs.jar">
+      <export name="org.jnode.fs.ramfs.def.*"/>
+    </library>
+  </runtime>
+        
+</plugin>

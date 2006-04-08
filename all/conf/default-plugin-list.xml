@@ -94,10 +94,11 @@ The default list of (non-system) plugins to be included in the init-jar.
     <plugin id="org.jnode.fs.command"/>
     <plugin id="org.jnode.fs.ext2"/>
     <plugin id="org.jnode.fs.fat"/>
+    <plugin id="org.jnode.fs.ramfs"/>
+    <plugin id="org.jnode.fs.ramfs.def"/>
     <plugin id="org.jnode.fs.iso9660"/>
     <plugin id="org.jnode.fs.ntfs"/>
     <plugin id="org.jnode.fs.service"/>
-    <plugin id="org.jnode.fs.initrd"/>
     <plugin id="org.jnode.fs.jifs"/>
     <plugin id="org.jnode.fs.jifs.command"/>
     <plugin id="org.jnode.fs.jifs.def"/>

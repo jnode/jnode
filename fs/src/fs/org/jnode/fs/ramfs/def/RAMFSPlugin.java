@@ -16,6 +16,7 @@ import org.jnode.driver.virtual.VirtualDeviceFactory;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
+import org.jnode.fs.FSDirectory;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.fs.ramfs.RAMFileSystemType;
 import org.jnode.naming.InitialNaming;
@@ -39,7 +40,7 @@ public class RAMFSPlugin extends Plugin {
     	log.info("start ramfs");
     	
         try {
-         	
+
         	FileSystemService fSS = InitialNaming.lookup(FileSystemService.NAME);
             FileSystemType type = fSS.getFileSystemTypeForNameSystemTypes(RAMFileSystemType.NAME);
 
@@ -52,10 +53,15 @@ public class RAMFSPlugin extends Plugin {
             	final FileSystem fs = type.create(dev, true);
                 fSS.registerFileSystem(fs);
 
-                final String mountPath = "ramfs";
+                final String mountPath = "jnode";
+
                 fSS.mount(mountPath, fs, null);
                 
                 log.info("Mounted " + type.getName() + " on " + mountPath);
+
+                FSDirectory root_dir = fs.getRootEntry().getDirectory();
+                root_dir.addDirectory("home");
+                root_dir.addDirectory("tmp");
                             
             } catch (DeviceAlreadyRegisteredException ex){
             	log.error("RAMFS is allready running.");

@@ -233,7 +233,7 @@ public final class VmSystem {
         res.put("java.class.version", "1.1");
         res.put("java.class.path", "");
         res.put("java.library.path", "");
-        res.put("java.io.tmpdir", "/devices/jnode/tmp");
+        res.put("java.io.tmpdir", "/jnode/tmp");
         res.put("java.compiler", "Internal");
         res.put("java.ext.dirs", "");
         res.put("os.name", "JNode");
@@ -243,7 +243,7 @@ public final class VmSystem {
         res.put("path.separator", ":");
         res.put("line.separator", "\n");
         res.put("user.name", "System");
-        res.put("user.home", "/");
+        res.put("user.home", "/jnode/home");
         res.put("user.dir", "/");
 
         // Log4j properties
