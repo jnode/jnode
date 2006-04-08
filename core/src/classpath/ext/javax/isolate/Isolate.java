@@ -18,12 +18,12 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package javax.isolate;
 
 import java.util.Properties;
 
-import org.jnode.vm.VmIsolate;
+import org.jnode.vm.isolate.VmIsolate;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -73,8 +73,10 @@ public final class Isolate {
      * @param stdout
      * @param stderr
      */
-    public Isolate(StreamBindings bindings, Properties properties, String mainClass, String[] args) {
-        this.impl = new VmIsolate(this, bindings.getBindings(), properties, mainClass, args);
+    public Isolate(StreamBindings bindings, Properties properties,
+            String mainClass, String[] args) {
+        this.impl = new VmIsolate(this, bindings.getBindings(), properties,
+                mainClass, args);
     }
 
     /**
@@ -160,5 +162,28 @@ public final class Isolate {
      */
     public void start(Link... links) throws IsolateStartupException {
         impl.start(this, links);
+    }
+
+    /**
+     * Retrieves a copy of the Link array passed to start() by the current
+     * isolate's creator. Modification of this array will have no effect on
+     * subsequent invocation of this method.
+     * 
+     * This method never returns null: it will return a zero-length array if
+     * this isolate's creator passed null to start().
+     * 
+     * @return
+     */
+    public static Link[] getLinks() {
+        return VmIsolate.getLinks();
+    }
+
+    /**
+     * Gets the implementation instance.
+     * 
+     * @return
+     */
+    final VmIsolate getImpl() {
+        return impl;
     }
 }

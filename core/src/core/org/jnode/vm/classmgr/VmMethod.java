@@ -27,8 +27,8 @@ import java.lang.reflect.Method;
 
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmAddress;
-import org.jnode.vm.VmIsolateLocal;
 import org.jnode.vm.annotation.MagicPermission;
+import org.jnode.vm.isolate.VmIsolateLocal;
 import org.vmmagic.unboxed.Address;
 
 @MagicPermission

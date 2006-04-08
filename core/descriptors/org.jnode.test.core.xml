@@ -16,6 +16,7 @@
     <extension point="org.jnode.shell.aliases">
         <alias name="ArithOpt" class="org.jnode.test.core.ArithOpt"/>
         <alias name="IsolateTest" class="org.jnode.test.core.IsolateTest"/>
+        <alias name="LinkTest" class="org.jnode.test.core.LinkTest"/>
         <alias name="PerfCtrTest" class="org.jnode.test.core.PerfCtrTest"/>
         <alias name="Sieve" class="org.jnode.test.core.Sieve"/>
     </extension>

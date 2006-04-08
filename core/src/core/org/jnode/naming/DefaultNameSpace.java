@@ -30,9 +30,9 @@ import javax.naming.NameAlreadyBoundException;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 
-import org.jnode.vm.VmIsolate;
 import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.isolate.VmIsolate;
 
 public class DefaultNameSpace implements NameSpace {
 

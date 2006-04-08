@@ -7,7 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.net.Socket;
 
-import org.jnode.vm.VmStreamBindings;
+import org.jnode.vm.isolate.VmStreamBindings;
 
 public final class StreamBindings {
     

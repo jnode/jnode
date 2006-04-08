@@ -1314,6 +1314,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         addCompileHighOptLevel("org.jnode.vm.bytecode");
         addCompileHighOptLevel("org.jnode.vm.classmgr");
         addCompileHighOptLevel("org.jnode.vm.compiler");
+        addCompileHighOptLevel("org.jnode.vm.isolate");
 //        addCompileHighOptLevel("org.jnode.vm.compiler.ir");
 //        addCompileHighOptLevel("org.jnode.vm.compiler.ir.quad");
         for (NativeCodeCompiler compiler : getArchitecture().getCompilers()) {

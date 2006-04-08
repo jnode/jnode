@@ -26,7 +26,6 @@ import java.util.WeakHashMap;
 
 
 import org.jnode.security.JNodePermission;
-import org.jnode.vm.IsolateThread;
 import org.jnode.vm.MonitorManager;
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmSystem;
@@ -34,6 +33,7 @@ import org.jnode.vm.VmThread;
 import org.jnode.vm.annotation.KernelSpace;
 import org.jnode.vm.annotation.SystemProtected;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
+import org.jnode.vm.isolate.IsolateThread;
 
 /**
  * Kore implementation of the <code>java.lang.Thread</code> class.

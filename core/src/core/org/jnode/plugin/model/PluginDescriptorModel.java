@@ -43,9 +43,9 @@ import org.jnode.plugin.PluginPrerequisite;
 import org.jnode.plugin.Runtime;
 import org.jnode.system.BootLog;
 import org.jnode.util.BootableArrayList;
-import org.jnode.vm.VmIsolateLocal;
 import org.jnode.vm.VmSystem;
 import org.jnode.vm.classmgr.VmClassLoader;
+import org.jnode.vm.isolate.VmIsolateLocal;
 
 /**
  * Implementation of {@link org.jnode.plugin.PluginDescriptor}.

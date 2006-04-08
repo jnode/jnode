@@ -23,7 +23,7 @@ package org.jnode.vm.classmgr;
 
 import java.lang.reflect.Field;
 
-import org.jnode.vm.VmIsolateLocal;
+import org.jnode.vm.isolate.VmIsolateLocal;
 
 public abstract class VmField extends VmMember {
 
