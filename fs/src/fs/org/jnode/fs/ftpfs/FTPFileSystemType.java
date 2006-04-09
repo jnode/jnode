@@ -31,7 +31,7 @@ import org.jnode.partitions.PartitionTableEntry;
 /**
  * @author Levente S\u00e1ntha
  */
-public class FTPFileSystemType implements FileSystemType {
+public class FTPFileSystemType implements FileSystemType<FTPFileSystem> {
     public static final String NAME = "FTPFS";
     /**
      * Create a filesystem from a given device.
@@ -71,7 +71,7 @@ public class FTPFileSystemType implements FileSystemType {
      * @throws org.jnode.fs.FileSystemException
      *
      */
-    public FileSystem format(Device device, Object specificOptions) throws FileSystemException {
+    public FTPFileSystem format(Device device, Object specificOptions) throws FileSystemException {
         return null;
     }
 }

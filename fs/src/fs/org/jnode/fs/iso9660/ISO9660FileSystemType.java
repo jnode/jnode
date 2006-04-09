@@ -34,7 +34,7 @@ import org.jnode.partitions.PartitionTableEntry;
 /**
  * @author Chira
  */
-public class ISO9660FileSystemType implements FileSystemType {
+public class ISO9660FileSystemType implements FileSystemType<ISO9660FileSystem> {
 
     public static final String NAME = "ISO9660";
 
@@ -74,7 +74,7 @@ public class ISO9660FileSystemType implements FileSystemType {
     /**
      * @see org.jnode.fs.FileSystemType#create(Device, boolean)
      */
-    public FileSystem create(Device device, boolean readOnly) throws FileSystemException {
+    public ISO9660FileSystem create(Device device, boolean readOnly) throws FileSystemException {
         return new ISO9660FileSystem(device, readOnly);
     }
 
@@ -82,7 +82,7 @@ public class ISO9660FileSystemType implements FileSystemType {
      * @see org.jnode.fs.FileSystemType#format(org.jnode.driver.Device,
      *      java.lang.Object)
      */
-    public FileSystem format(Device device, Object specificOptions)
+    public ISO9660FileSystem format(Device device, Object specificOptions)
             throws FileSystemException {
         throw new FileSystemException("Not yet implemented");
     }

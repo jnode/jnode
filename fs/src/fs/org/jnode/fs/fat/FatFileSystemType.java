@@ -37,7 +37,7 @@ import org.jnode.partitions.ibm.IBMPartitionTypes;
 /**
  * @author epr
  */
-public class FatFileSystemType implements FileSystemType {
+public class FatFileSystemType implements FileSystemType<FatFileSystem> {
 
 	/** Name of this filesystem type */
 	public static final String NAME = "FAT";
@@ -94,7 +94,7 @@ public class FatFileSystemType implements FileSystemType {
 	 * @param device
 	 * @param readOnly
 	 */
-	public FileSystem create(Device device, boolean readOnly) throws FileSystemException {
+	public FatFileSystem create(Device device, boolean readOnly) throws FileSystemException {
 		return new FatFileSystem(device, readOnly);
 	}
 
@@ -105,7 +105,7 @@ public class FatFileSystemType implements FileSystemType {
 	 * @see org.jnode.fs.FileSystemType#format(org.jnode.driver.Device,
 	 *      java.lang.Object)
 	 */
-	public FileSystem format(Device device, Object specificOptions) throws FileSystemException {
+	public FatFileSystem format(Device device, Object specificOptions) throws FileSystemException {
 		try {
 			long numberOfSectors;
 			long offset;

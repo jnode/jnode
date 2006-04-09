@@ -32,7 +32,7 @@ import org.jnode.partitions.PartitionTableEntry;
 /**
  * @author Andreas H\u00e4nel
  */
-public class JIFileSystemType implements FileSystemType {
+public class JIFileSystemType implements FileSystemType<JIFileSystem> {
 
 	/** Name of this filesystem type */
 	public static final String NAME = "JIFS";
@@ -71,8 +71,8 @@ public class JIFileSystemType implements FileSystemType {
 	 * @return JIFileSystem(device,readOnly)
 	 * @throws FileSystemException
 	 */
-	public FileSystem create(Device device, boolean readOnly) throws FileSystemException {
-		FileSystem ret = new JIFileSystem(device, readOnly);
+	public JIFileSystem create(Device device, boolean readOnly) throws FileSystemException {
+		JIFileSystem ret = new JIFileSystem(device, readOnly);
 		if (ret== null){
 			log.error("got NULL from the JIFileSystem...");
 		}
@@ -84,7 +84,7 @@ public class JIFileSystemType implements FileSystemType {
 	 * 
 	 * @return null
 	 */	 
-	public FileSystem format(Device device, Object specificOptions) throws FileSystemException {
+	public JIFileSystem format(Device device, Object specificOptions) throws FileSystemException {
 		return null;		
 	}
 }

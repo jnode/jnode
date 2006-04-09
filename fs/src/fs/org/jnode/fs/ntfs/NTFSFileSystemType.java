@@ -34,7 +34,7 @@ import org.jnode.partitions.ibm.IBMPartitionTypes;
  * @author Chira
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class NTFSFileSystemType implements FileSystemType {
+public class NTFSFileSystemType implements FileSystemType<NTFSFileSystem> {
 
     public static final String NAME = "NTFS";
 
@@ -61,7 +61,7 @@ public class NTFSFileSystemType implements FileSystemType {
     /**
      * @see org.jnode.fs.FileSystemType#create(Device, boolean)
      */
-    public FileSystem create(Device device, boolean readOnly)
+    public NTFSFileSystem create(Device device, boolean readOnly)
             throws FileSystemException {
         return new NTFSFileSystem(device, readOnly);
     }
@@ -70,7 +70,7 @@ public class NTFSFileSystemType implements FileSystemType {
      * @see org.jnode.fs.FileSystemType#format(org.jnode.driver.Device,
      *      java.lang.Object)
      */
-    public FileSystem format(Device device, Object specificOptions)
+    public NTFSFileSystem format(Device device, Object specificOptions)
             throws FileSystemException {
         throw new FileSystemException("Not yet implemented");
     }
