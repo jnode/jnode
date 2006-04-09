@@ -153,6 +153,8 @@ final class FileSystemMounter implements DeviceListener {
         try {
             final PartitionTableEntry ptEntry = api.getPartitionTableEntry();
             final ByteBuffer bs = ByteBuffer.allocate(api.getSectorSize());
+            final String mountPath = File.separatorChar + MOUNT_ROOT + File.separatorChar;
+            
             api.read(0, bs);
             for (FileSystemType fst : fileSystemService.fileSystemTypes()) {
                 if (fst.supports(ptEntry, bs.array(), api)) {
@@ -160,7 +162,7 @@ final class FileSystemMounter implements DeviceListener {
                         final FileSystem fs = fst.create(device, readOnly);
                         fileSystemService.registerFileSystem(fs);
                         
-                        final String fullPath = File.separatorChar + MOUNT_ROOT + File.separatorChar + device.getId();
+                        final String fullPath = mountPath + device.getId();
                         log.debug("Mounting " + device.getId() + " on " + fullPath);
                         fileSystemService.mount(fullPath, fs, null);
                         
