@@ -31,7 +31,7 @@ import org.jnode.partitions.PartitionTableEntry;
  * 
  * @author epr
  */
-public interface FileSystemType {
+public interface FileSystemType<T extends FileSystem> {
 
 	/**
 	 * Gets the unique name of this file system type.
@@ -55,7 +55,7 @@ public interface FileSystemType {
 	 * @param device
 	 * @param readOnly
 	 */
-	public FileSystem create(Device device, boolean readOnly) throws FileSystemException;
+	public T create(Device device, boolean readOnly) throws FileSystemException;
 
     /**
      * Format a filesystem for a given device according to its Partition table entry.
@@ -65,7 +65,7 @@ public interface FileSystemType {
      * @return the newly created FileSystem
      * @throws FileSystemException
      */
-   public FileSystem format(Device device, Object specificOptions) throws FileSystemException;
+   public T format(Device device, Object specificOptions) throws FileSystemException;
     
 
 }

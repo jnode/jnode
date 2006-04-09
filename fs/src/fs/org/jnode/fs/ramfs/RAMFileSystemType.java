@@ -7,7 +7,7 @@ import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
 import org.jnode.partitions.PartitionTableEntry;
 
-public class RAMFileSystemType implements FileSystemType {
+public class RAMFileSystemType implements FileSystemType<RAMFileSystem> {
 
 	private static final int DEFAULT_SIZE = 104857600;
 	
@@ -23,13 +23,13 @@ public class RAMFileSystemType implements FileSystemType {
 		return false;
 	}
 
-	public FileSystem create(Device device, boolean readOnly)
+	public RAMFileSystem create(Device device, boolean readOnly)
 			throws FileSystemException {
 		
 		return new RAMFileSystem(device, readOnly, DEFAULT_SIZE);
 	}
 
-	public FileSystem format(Device device, Object specificOptions)
+	public RAMFileSystem format(Device device, Object specificOptions)
 			throws FileSystemException {
 
 		// TODO read in specificOptions ... How todo that??

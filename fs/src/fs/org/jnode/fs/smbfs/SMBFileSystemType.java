@@ -30,7 +30,7 @@ import org.jnode.partitions.PartitionTableEntry;
 /**
  * @author Levente S\u00e1ntha
  */
-public class SMBFileSystemType implements FileSystemType {
+public class SMBFileSystemType implements FileSystemType<SMBFileSystem> {
     public static final String NAME = "SMBFS";
 
     /**

@@ -34,7 +34,7 @@ import org.jnode.partitions.PartitionTableEntry;
  * @author Fabien DUMINY (fduminy at users.sourceforge.net)
  *
  */
-public class JarFileSystemType implements FileSystemType {
+public class JarFileSystemType implements FileSystemType<JarFileSystem> {
 
     public static final String NAME = "jar";
 
@@ -54,7 +54,7 @@ public class JarFileSystemType implements FileSystemType {
     /**
      * @see org.jnode.fs.FileSystemType#create(Device, boolean)
      */
-    public FileSystem create(Device device, boolean readOnly) throws FileSystemException {
+    public JarFileSystem create(Device device, boolean readOnly) throws FileSystemException {
         // jar file systems are always readOnly        
         return new JarFileSystem((JarFileDevice) device);
     }
@@ -63,7 +63,7 @@ public class JarFileSystemType implements FileSystemType {
      * @see org.jnode.fs.FileSystemType#format(org.jnode.driver.Device,
      *      java.lang.Object)
      */
-    public FileSystem format(Device device, Object specificOptions)
+    public JarFileSystem format(Device device, Object specificOptions)
             throws FileSystemException {
         throw new FileSystemException("Not yet implemented");
     }

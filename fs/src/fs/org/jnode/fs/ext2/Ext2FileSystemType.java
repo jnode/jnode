@@ -36,14 +36,14 @@ import org.jnode.partitions.ibm.IBMPartitionTypes;
 /**
  * @author Andras Nagy
  */
-public class Ext2FileSystemType implements FileSystemType {
+public class Ext2FileSystemType implements FileSystemType<Ext2FileSystem> {
 
 	public static final String NAME = "EXT2";
 
 	/**
 	 * @see org.jnode.fs.FileSystemType#create(Device, boolean)
 	 */
-	public FileSystem create(Device device, boolean readOnly) throws FileSystemException {
+	public Ext2FileSystem create(Device device, boolean readOnly) throws FileSystemException {
 		Ext2FileSystem fs = new Ext2FileSystem(device, readOnly);
 		fs.read();
 		return fs;
@@ -80,7 +80,7 @@ public class Ext2FileSystemType implements FileSystemType {
 	/**
 	 * @see org.jnode.fs.FileSystemType#format(org.jnode.driver.Device, java.lang.Object)
 	 */
-	public synchronized FileSystem format(Device device, Object specificOptions) throws FileSystemException {
+	public synchronized Ext2FileSystem format(Device device, Object specificOptions) throws FileSystemException {
         //throw new FileSystemException("Not ye implemented");
 		
 		//currently the only option is the block size
