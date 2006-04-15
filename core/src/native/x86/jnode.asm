@@ -74,9 +74,11 @@ TSS_DS		equ 0x38
 %include "cpu.asm"
 %include "cpu32.asm"
 %ifdef BITS32
+	%define CURRENTPROCESSORID		dword[fs:VmProcessor_ID_OFS]
   %include "ints32.asm"
   %include "mm32.asm"
 %else  
+	%define CURRENTPROCESSORID		dword[r12+VmProcessor_ID_OFS]
   %include "ints64.asm"
 %endif
 %include "console.asm"
@@ -140,6 +142,7 @@ extern Luser_esp
 scr_ofs:		DA 0
 hexchars: 		db '0123456789ABCDEF' 
 SPINLOCK		console_lock
+SPINLOCK		die_lock
 jnodeFinished:	DA 0
 kdb_enabled		dd 0
 kdb_port		dd 0x3f8

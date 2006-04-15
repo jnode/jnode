@@ -27,3 +27,12 @@
 	pop AAX
 %endmacro
 	
+; Jump to the given target if the spinlock is locked
+; args: lock, target
+%macro SPINLOCK_JUMP_IF_LOCKED 2
+	push AAX
+	mov AAX,WORD [%1]
+	test AAX,AAX
+	pop AAX
+	jnz %2
+%endmacro

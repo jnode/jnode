@@ -3845,6 +3845,19 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_return()
 	 */
 	public final void visit_return() {
+        // Discard vstack first
+        while (!vstack.isEmpty()) {
+            Item v = vstack.pop();
+            if (v.isStack()) {
+                // sanity check
+                if (VirtualStack.checkOperandStack) {
+                    vstack.operandStack.pop(v);
+                }
+                os.writeLEA(helper.SP, helper.SP, v.getCategory() * helper.SLOTSIZE);
+            }
+            v.release(eContext);
+        }
+        
 		stackFrame.emitReturn();
 		assertCondition(vstack.isEmpty(), "vstack should be empty; it is ",
 				vstack);

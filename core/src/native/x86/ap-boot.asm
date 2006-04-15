@@ -184,7 +184,7 @@ ap_test:
 	inc byte [0xb8000+0]	
 	jmp ap_test
 	
-ap_boot_msg: 	 db 'AP-boot',0
-ap_user_msg: 	 db 'AP-usermode #$#$#$#$#$#$#$#$#$#$#$#$#$#$#',0
+ap_boot_msg: 	 db 'AP-boot',0xd,0xa,0
+ap_user_msg: 	 db 'AP-usermode',0xd,0xa,0
 	
 	

@@ -25,7 +25,7 @@ video_mode_reg	equ 0x3d8
 	shr AAX,%1
 	and AAX,0x0f
 	mov al,[eax+hexchars]
-	call sys_print_char%2
+	call sys_do_print_char%2
 %endmacro
 
 %macro CONSOLE_FUNCTIONS 0-1
@@ -85,6 +85,13 @@ sys_clrscr%1:
 ; Print a character in al
 sys_print_char%1:
 	SPINLOCK_ENTER console_lock
+	call sys_do_print_char%1
+	SPINLOCK_EXIT console_lock
+	ret
+
+; Print a character in al
+; This subroutine does NOT claim locks, so you must do that first.
+sys_do_print_char%1:
 	cmp al,LF
 	je %%pc_nextline
 	cmp al,CR
@@ -140,11 +147,11 @@ sys_print_char%1:
 %%pc_ok:
 	call set_cursor%1
 	call kdb_send_char%1
-	SPINLOCK_EXIT console_lock
 	ret
 
 ; Print a value in EAX (in hex format)
 sys_print_eax%1:
+	SPINLOCK_ENTER console_lock
 	push AAX
 	push ABX
 	mov ebx,eax
@@ -157,14 +164,16 @@ sys_print_eax%1:
 	digit 4, %1
 	digit 0, %1
 	mov al,' '
-	call sys_print_char%1
+	call sys_do_print_char%1
 	pop ABX
 	pop AAX
+	SPINLOCK_EXIT console_lock
 	ret
 
 %ifdef BITS64
 ; Print a value in RAX (in hex format)
 sys_print_rax%1:
+	SPINLOCK_ENTER console_lock
 	push AAX
 	push ABX
 	mov ABX,AAX
@@ -185,27 +194,31 @@ sys_print_rax%1:
 	digit 4, 64
 	digit 0, 64
 	mov al,' '
-	call sys_print_char%1
+	call sys_do_print_char%1
 	pop ABX
 	pop AAX
+	SPINLOCK_EXIT console_lock
 	ret
 %endif
 
 ; Print a value in AL (in hex format)
 sys_print_al%1:
+	SPINLOCK_ENTER console_lock
 	push AAX
 	push ABX
 	mov ebx,eax
 	digit 4, %1
 	digit 0, %1
 	mov al,' '
-	call sys_print_char%1
+	call sys_do_print_char%1
 	pop ABX
 	pop AAX
+	SPINLOCK_EXIT console_lock
 	ret
 
 ; Print a null terminated string pointed to by EAX/RAX
 sys_print_str%1:
+	SPINLOCK_ENTER console_lock
 	push ASI
 	mov ASI,AAX
 %%ps_lp:
@@ -213,10 +226,11 @@ sys_print_str%1:
 	cmp al,0
 	je %%ps_ready
 	inc ASI
-	call sys_print_char%1
+	call sys_do_print_char%1
 	jmp %%ps_lp
 %%ps_ready:
 	pop ASI
+	SPINLOCK_EXIT console_lock
 	ret
 %endmacro
 

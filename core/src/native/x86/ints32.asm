@@ -125,15 +125,18 @@ inthandler_ret:
 int_die:
 	cli
 	mov ebx,ebp
+	SPINLOCK_JUMP_IF_LOCKED die_lock, int_die_halt
+	SPINLOCK_ENTER die_lock ; This lock is never released, so other CPU's just hold here
 	call sys_print_intregs
 	;ret
 int_die_halt:
 	cli
 	mov dword [int_die_halted],1
 	PRINT_STR int_die_halt_msg
+	PRINT_WORD CURRENTPROCESSORID
 	hlt
 
-int_die_halt_msg: db 'Real panic: int_die_halt!',0
+int_die_halt_msg: db 'Real panic: int_die_halt! ',0
 
 %macro idm_print_reg 2
 	PRINT_STR idm_%1
@@ -147,6 +150,7 @@ int_die_halt_msg: db 'Real panic: int_die_halt!',0
 %endmacro
 
 sys_print_intregs:
+	idm_print_reg procid, CURRENTPROCESSORID
 	idm_print_reg intno, [ebp+INTNO]
 	idm_print_reg error, [ebp+ERROR]
 	idm_print_reg cr2, cr2
@@ -206,6 +210,7 @@ sys_print_intregs_loop2:
 	pop ecx
 	ret
 
+idm_procid: db 0xd,0xa,'proid: ',0
 idm_intno:  db 0xd,0xa,'int  : ',0
 idm_error:  db        ' Error: ',0
 idm_cr2:    db        ' CR2  : ',0

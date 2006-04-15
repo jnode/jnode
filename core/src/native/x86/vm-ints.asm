@@ -185,6 +185,9 @@ yieldPointHandler_fxSaveInit:
 	; Restore the next thread
 yieldPointHandler_restore:
 	mov ADI,NEXTTHREAD
+	; For added safety, test if NEXTHREAD != null
+	test ADI,ADI
+	jz near yieldPointHandler_done
 	RESTOREREG VmX86Thread_EAX_OFS, OLD_EAX
 	RESTOREREG VmX86Thread_EBX_OFS, OLD_EBX
 	RESTOREREG VmX86Thread_ECX_OFS, OLD_ECX

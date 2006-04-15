@@ -257,4 +257,12 @@ public abstract class VmX86Thread extends VmThread {
     public final MSR[] getWriteOnlyMSRs() {
         return writeOnlyMSRs;
     }
+    
+    /**
+     * Gets the end address of the stack of this thread.
+     * @return
+     */
+    final Address getStackEnd() {
+        return stackEnd;
+    }
 }
