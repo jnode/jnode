@@ -614,9 +614,11 @@ public class UIManager implements Serializable
    * setInstalledLookAndFeels(javax.swing.UIManager.LookAndFeelInfo[]).
    */
   public static void installLookAndFeel(LookAndFeelInfo info)
-    throws NotImplementedException
   {
-    // FIXME: not yet implemented
+    LookAndFeelInfo[] newInstalled = new LookAndFeelInfo[installed.length + 1];
+    System.arraycopy(installed, 0, newInstalled, 0, installed.length);
+    newInstalled[newInstalled.length - 1] = info;
+    setInstalledLookAndFeels(newInstalled);
   }
 
   /**
@@ -635,9 +637,8 @@ public class UIManager implements Serializable
    * Replaces the current array of installed LookAndFeelInfos.
    */
   public static void setInstalledLookAndFeels(UIManager.LookAndFeelInfo[] infos)
-    throws NotImplementedException
   {
-    // FIXME: not yet implemented.
+    installed = infos;
   }
   
   /**
