@@ -77,7 +77,8 @@ public abstract class AbstractLayoutCache
 		 * @return Rectangle
 		 */
 		public abstract Rectangle getNodeDimensions(Object value0, int value1,
-				int value2, boolean value3, Rectangle value4);
+                                                int value2, boolean value3,
+                                                Rectangle value4);
 	}
 
 	/**
@@ -134,24 +135,23 @@ public abstract class AbstractLayoutCache
 	}
 
 	/**
-	 * getNodeDimensions
-	 * 
-	 * @param value TODO
-	 * @param row TODO
-	 * @param depth TODO
-	 * @param expanded TODO
-	 * @param bounds TODO
-	 * 
-	 * @return Rectangle
+  * Get the node dimensions. The NodeDimensions property must be set
+  * (unless the method is overridden, like if
+  * {@link FixedHeightLayoutCache}. If the method is not overridden and
+  * the property is not set, the InternalError is thrown.
+  * 
+  * @param value the last node in the path
+  * @param row the node row
+  * @param depth the indentation depth
+  * @param expanded true if this node is expanded, false otherwise
+  * @param bounds the area where the tree is displayed
 	 */
 	protected Rectangle getNodeDimensions(Object value, int row, int depth,
 			boolean expanded, Rectangle bounds)
-    throws NotImplementedException
 	{
-		if (bounds == null)
-			return new Rectangle();
-		return null;
-		// TODO		
+    if (nodeDimensions == null)
+      throw new InternalError("The NodeDimensions are not set");
+    return nodeDimensions.getNodeDimensions(value, row, depth, expanded, bounds);
 	}
 
 	/**
@@ -391,16 +391,21 @@ public abstract class AbstractLayoutCache
 	public abstract void treeStructureChanged(TreeModelEvent event);
 
 	/**
-	 * getRowsForPaths
+   * Get the tree row numbers for the given pathes. This method performs
+   * the "bulk" conversion that may be faster than mapping pathes one by
+   * one. To have the benefit from the bulk conversion, the method must be
+   * overridden in the derived classes. The default method delegates work
+   * to the {@link #getRowForPath(TreePath)}.
 	 * 
-	 * @param paths the tree paths
-	 * 
-	 * @return an array of rows
+   * @param paths the tree paths the array of the tree pathes.
+   * @return the array of the matching tree rows.
 	 */
 	public int[] getRowsForPaths(TreePath[] paths)
-      throws NotImplementedException
 	{
-		return null; // TODO
+    int[] rows = new int[paths.length];
+    for (int i = 0; i < rows.length; i++)
+      rows[i] = getRowForPath(paths[i]);
+    return rows;
 	}
 
 	/**

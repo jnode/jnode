@@ -1,5 +1,5 @@
-/* Position.java -- 
-   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
+/* GnuPath.java -- The extended version of TreePath
+   Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,28 +35,31 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package javax.swing.text;
 
+package gnu.javax.swing.tree;
 
-public interface Position
+import javax.swing.tree.TreePath;
+
+/**
+ * The tree path with additional data. Needed for the optimized tree drawing.
+ * Returned by layout caches.
+ * 
+ * @author Audrius Meskauskas
+ */
+public class GnuPath extends TreePath
 {
-  static final class Bias
-    {
-    public static final Bias Backward = new Bias("backward");
-    public static final Bias Forward = new Bias("forward");
-
-    private String name;
-    
-    private Bias(String n)
-    {
-      name = n;
-    }
-
-    public String toString()
-    {
-      return name;
-    }
-    }
-    
-    int getOffset();
+  /**
+   * The flag, marking the last visible child.
+   */
+  public boolean isLastChild;
+  
+  /**
+   * Create a new path, specifying flag if this path is the path to the
+   * last visible child (needed for optimized tree drawing). 
+   */
+  public GnuPath(Object[] path, boolean lastChild)
+  {
+    super(path);
+    isLastChild = lastChild;
+  }
 }

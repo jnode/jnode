@@ -55,7 +55,8 @@ import java.rmi.activation.UnknownObjectException;
 /**
  * The default activation group class. This activation group assumes that
  * all classes are accessible via current thread context class loader.
- * The remote class loading is not supported for security reasons.
+ * The remote class loading is not supported for security reasons. The 
+ * activation always occurs in the current jre.
  * 
  * @author Audrius Meskauskas (audriusa@Bioinformatics.org)
  */

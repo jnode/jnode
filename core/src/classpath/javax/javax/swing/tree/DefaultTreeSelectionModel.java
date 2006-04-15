@@ -1,5 +1,5 @@
 /* DefaultTreeSelectionModel.java 
-   Copyright (C) 2002, 2004, 2005 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2005, 2006 Free Software Foundation, Inc.
    
 This file is part of GNU Classpath.
 
@@ -35,6 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.swing.tree;
 
 import gnu.classpath.NotImplementedException;
@@ -54,17 +55,24 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 
 /**
- * DefaultTreeSelectionModel
+ * The implementation of the default tree selection model. The installed
+ * listeners are notified about the path and not the row changes. If you
+ * specifically need to track the row changes, register the listener for the
+ * expansion events.
  * 
  * @author Andrew Selkirk
  */
 public class DefaultTreeSelectionModel
   implements Cloneable, Serializable, TreeSelectionModel
 {
+  
+  /**
+   * Use serialVersionUID for interoperability.
+   */
   static final long serialVersionUID = 3288129636638950196L;
 
 	/**
-	 * SELECTION_MODE_PROPERTY
+   * The name of the selection mode property.
 	 */
 	public static final String SELECTION_MODE_PROPERTY = "selectionMode";
 
@@ -123,17 +131,23 @@ public class DefaultTreeSelectionModel
   }
 
 	/**
-   * Creates a clone of this DefaultTreeSelectionModel with the same
-   * selection.
+   * Creates a clone of this DefaultTreeSelectionModel with the same selection.
+   * The cloned instance will have the same registered listeners, the listeners
+   * themselves will not be cloned. The selection will be cloned.
    *
    * @exception CloneNotSupportedException should not be thrown here
-   *
-   * @return a clone of this DefaultTreeSelectionModel
+   * @return a copy of this DefaultTreeSelectionModel
 	 */
-	public Object clone() 
-      throws CloneNotSupportedException, NotImplementedException
+  public Object clone() throws CloneNotSupportedException
   {
-		return null; // TODO
+    DefaultTreeSelectionModel cloned = 
+      (DefaultTreeSelectionModel) super.clone();
+    
+    // Clone the selection and the list selection model.
+    cloned.selection = (TreePath[]) selection.clone();
+    cloned.listSelectionModel = 
+      (DefaultListSelectionModel) listSelectionModel.clone();
+    return cloned;
   }
 
 	/**
@@ -141,8 +155,7 @@ public class DefaultTreeSelectionModel
    *
    * @return a string that shows this object's properties
 	 */
-  public String toString()
-      throws NotImplementedException
+  public String toString() throws NotImplementedException
   {
 		return null; // TODO
   }
@@ -172,25 +185,21 @@ public class DefaultTreeSelectionModel
   }
 
 	/**
-   * Sets the RowMapper that should be used to map between paths and their
-   * rows.
+   * Sets the RowMapper that should be used to map between paths and their rows.
    *
-   * @param rowMapper the RowMapper to set
-   *
+   * @param mapper the RowMapper to set
 	 * @see RowMapper
 	 */
-	public void setRowMapper(RowMapper rowMapper)
-      throws NotImplementedException
+  public void setRowMapper(RowMapper mapper)
   {
-		// TODO
+    rowMapper = mapper;
   }
 
 	/**
-   * Returns the RowMapper that is currently used to map between paths and
-   * their rows.
+   * Returns the RowMapper that is currently used to map between paths and their
+   * rows.
    *
    * @return the current RowMapper
-   *
 	 * @see RowMapper
 	 */
   public RowMapper getRowMapper()
@@ -204,7 +213,6 @@ public class DefaultTreeSelectionModel
 	 * {@link #DISCONTIGUOUS_TREE_SELECTION}.
    *
    * @param mode the selection mode to be set
-   *
 	 * @see #getSelectionMode
 	 * @see #SINGLE_TREE_SELECTION
 	 * @see #CONTIGUOUS_TREE_SELECTION
@@ -219,7 +227,6 @@ public class DefaultTreeSelectionModel
    * Returns the current selection mode.
    *
    * @return the current selection mode
-   *
 	 * @see #setSelectionMode
 	 * @see #SINGLE_TREE_SELECTION
 	 * @see #CONTIGUOUS_TREE_SELECTION
@@ -231,46 +238,41 @@ public class DefaultTreeSelectionModel
   }
 
 	/**
-   * Sets this path as the only selection.
-   *
-	 * If this changes the selection the registered TreeSelectionListeners are
-	 * notified.
+   * Sets this path as the only selection. If this changes the selection the
+   * registered TreeSelectionListeners are notified.
    *
    * @param path the path to set as selection
 	 */
   public void setSelectionPath(TreePath path)
   {
-		selection = new TreePath[] {
-			path };
+    selection = new TreePath[] { path };
   }
 
 	/**
-   * Sets the paths as selection. This method checks for duplicates and
-   * removes them.
-   *
-	 * If this changes the selection the registered TreeSelectionListeners are
-	 * notified.
+   * Sets the paths as selection. This method checks for duplicates and removes
+   * them. If this changes the selection the registered TreeSelectionListeners
+   * are notified.
    *
    * @param paths the paths to set as selection
 	 */
 	public void setSelectionPaths(TreePath[] paths)
       throws NotImplementedException
   {
+    // Must be called, as defined in JDK API 1.4.
+    insureUniqueness();
 		// TODO
   }
 
 	/**
 	 * Adds a path to the list of selected paths. This method checks if the path
-	 * is already selected and doesn't add the same path twice.
-   *
-	 * If this changes the selection the registered TreeSelectionListeners are
-	 * notified.
+   * is already selected and doesn't add the same path twice. If this changes
+   * the selection the registered TreeSelectionListeners are notified.
    *
    * @param path the path to add to the selection
 	 */
 	public void addSelectionPath(TreePath path)
   {
-		if (!isPathSelected(path))
+    if (! isPathSelected(path))
 		{
 			if (isSelectionEmpty())
 				setSelectionPath(path);
@@ -283,37 +285,37 @@ public class DefaultTreeSelectionModel
 				System.arraycopy(temp, 0, selection, 0, temp.length);
 			}
 			leadPath = path;
-			fireValueChanged(new TreeSelectionEvent(this, path, true,
-					leadPath, path));
+        fireValueChanged(new TreeSelectionEvent(this, path, true, leadPath,
+                                                path));
 		}
   }
 
 	/**
    * Adds the paths to the list of selected paths. This method checks if the
-   * paths are already selected and doesn't add the same path twice.
-   *
-	 * If this changes the selection the registered TreeSelectionListeners are
-	 * notified.
+   * paths are already selected and doesn't add the same path twice. If this
+   * changes the selection the registered TreeSelectionListeners are notified.
    *
    * @param paths the paths to add to the selection
 	 */
 	public void addSelectionPaths(TreePath[] paths)
   {
+    // Must be called, as defined in JDK API 1.4.
+    insureUniqueness();
+    
 		if (paths != null)
 		{
 			TreePath v0 = null;
 			for (int i = 0; i < paths.length; i++)
 			{
 				v0 = paths[i];
-				if (!isPathSelected(v0))
+            if (! isPathSelected(v0))
 				{
 					if (isSelectionEmpty())
 						setSelectionPath(v0);
 					else
 					{
 						TreePath[] temp = new TreePath[selection.length + 1];
-						System.arraycopy(selection, 0, temp, 0,
-								selection.length);
+                    System.arraycopy(selection, 0, temp, 0, selection.length);
 						temp[temp.length - 1] = v0;
 						selection = new TreePath[temp.length];
 						System.arraycopy(temp, 0, selection, 0, temp.length);
@@ -327,16 +329,14 @@ public class DefaultTreeSelectionModel
   }
 
 	/**
-   * Removes the path from the selection.
-   *
-	 * If this changes the selection the registered TreeSelectionListeners are
-	 * notified.
+   * Removes the path from the selection. If this changes the selection the
+   * registered TreeSelectionListeners are notified.
    *
    * @param path the path to remove
 	 */
 	public void removeSelectionPath(TreePath path)
   {
-		int index = -1;
+    int index = - 1;
 		if (isPathSelected(path))
 		{
 			for (int i = 0; i < selection.length; i++)
@@ -349,21 +349,19 @@ public class DefaultTreeSelectionModel
 			}
 			TreePath[] temp = new TreePath[selection.length - 1];
 			System.arraycopy(selection, 0, temp, 0, index);
-			System.arraycopy(selection, index + 1, temp, index,
-					selection.length - index - 1);
+        System.arraycopy(selection, index + 1, temp, index, selection.length
+                                                            - index - 1);
 			selection = new TreePath[temp.length];
 			System.arraycopy(temp, 0, selection, 0, temp.length);
 
-			fireValueChanged(new TreeSelectionEvent(this, path, false,
-					leadPath, path));
+        fireValueChanged(new TreeSelectionEvent(this, path, false, leadPath,
+                                                path));
 		}
   }
 
 	/**
-   * Removes the paths from the selection.
-   *
-	 * If this changes the selection the registered TreeSelectionListeners are
-	 * notified.
+   * Removes the paths from the selection. If this changes the selection the
+   * registered TreeSelectionListeners are notified.
    *
 	 * @param paths the paths to remove
 	 */
@@ -371,7 +369,7 @@ public class DefaultTreeSelectionModel
   {
 		if (paths != null)
 		{
-			int index = -1;
+        int index = - 1;
 			TreePath v0 = null;
 			for (int i = 0; i < paths.length; i++)
 			{
@@ -401,8 +399,8 @@ public class DefaultTreeSelectionModel
   }
 
 	/**
-	 * Returns the first path in the selection. This is especially useful when
-	 * the selectionMode is {@link #SINGLE_TREE_SELECTION}.
+   * Returns the first path in the selection. This is especially useful when the
+   * selectionMode is {@link #SINGLE_TREE_SELECTION}.
    *
    * @return the first path in the selection
 	 */
@@ -441,7 +439,6 @@ public class DefaultTreeSelectionModel
    * Checks if a given path is in the selection.
    *
    * @param path the path to check
-   *
    * @return <code>true</code> if the path is in the selection,
    *         <code>false</code> otherwise
 	 */
@@ -502,13 +499,11 @@ public class DefaultTreeSelectionModel
    * Returns all <code>TreeSelectionListener</code> added to this model.
    *
    * @return an array of listeners
-   *
    * @since 1.4
 	 */
   public TreeSelectionListener[] getTreeSelectionListeners()
   {
-		return (TreeSelectionListener[]) 
-				getListeners(TreeSelectionListener.class);
+    return (TreeSelectionListener[]) getListeners(TreeSelectionListener.class);
   }
 
 	/**
@@ -528,9 +523,7 @@ public class DefaultTreeSelectionModel
    * Returns all added listeners of a special type.
    *
    * @param listenerType the listener type
-   *
    * @return an array of listeners
-   *
    * @since 1.3
    */
   public EventListener[] getListeners(Class listenerType)
@@ -558,9 +551,8 @@ public class DefaultTreeSelectionModel
 	 */
   public int getMinSelectionRow()
   {
-		if ((rowMapper == null) || (selection == null)
-				|| (selection.length == 0))
-      return -1;
+    if ((rowMapper == null) || (selection == null) || (selection.length == 0))
+      return - 1;
 		else
 		{
       int[] rows = rowMapper.getRowsForPaths(selection);
@@ -578,13 +570,12 @@ public class DefaultTreeSelectionModel
 	 */
   public int getMaxSelectionRow()
   {
-		if ((rowMapper == null) || (selection == null)
-				|| (selection.length == 0))
-      return -1;
+    if ((rowMapper == null) || (selection == null) || (selection.length == 0))
+      return - 1;
 		else
 		{
       int[] rows = rowMapper.getRowsForPaths(selection);
-      int maxRow = -1;
+        int maxRow = - 1;
       for (int index = 0; index < rows.length; index++)
         maxRow = Math.max(maxRow, rows[index]);
       return maxRow;
@@ -595,12 +586,10 @@ public class DefaultTreeSelectionModel
    * Checks if a particular row is selected.
    *
    * @param row the index of the row to check
-   *
    * @return <code>true</code> if the row is in this selection,
    *         <code>false</code> otherwise
 	 */
-	public boolean isRowSelected(int row)
-      throws NotImplementedException
+  public boolean isRowSelected(int row) throws NotImplementedException
   {
 		return false; // TODO
   }
@@ -608,8 +597,7 @@ public class DefaultTreeSelectionModel
 	/**
    * Updates the mappings from TreePaths to row indices.
 	 */
-  public void resetRowSelection()
-      throws NotImplementedException
+  public void resetRowSelection() throws NotImplementedException
   {
 		// TODO
   }
@@ -622,10 +610,9 @@ public class DefaultTreeSelectionModel
   public int getLeadSelectionRow()
   {
     if ((rowMapper == null) || (leadPath == null))
-      return -1;
+      return - 1;
     else
-			return rowMapper.getRowsForPaths(new TreePath[] {
-				leadPath })[0];
+      return rowMapper.getRowsForPaths(new TreePath[] { leadPath })[0];
   }
 
 	/**
@@ -662,7 +649,6 @@ public class DefaultTreeSelectionModel
    * Returns all added <code>PropertyChangeListener</code> objects.
    *
    * @return an array of listeners.
-   *
    * @since 1.4
    */
   public PropertyChangeListener[] getPropertyChangeListeners()
@@ -671,19 +657,15 @@ public class DefaultTreeSelectionModel
   }
 
 	/**
-   * Makes sure the currently selected paths are valid according to the
-   * current selectionMode.
-   *
-	 * If the selectionMode is set to {@link #CONTIGUOUS_TREE_SELECTION} and the
-	 * selection isn't contiguous then the selection is reset to the first set
-	 * of contguous paths.
-	 * 
-	 * If the selectionMode is set to {@link #SINGLE_TREE_SELECTION} and the
-	 * selection has more than one path, the selection is reset to the contain
-	 * only the first path.
+   * Makes sure the currently selected paths are valid according to the current
+   * selectionMode. If the selectionMode is set to
+   * {@link #CONTIGUOUS_TREE_SELECTION} and the selection isn't contiguous then
+   * the selection is reset to the first set of contguous paths. If the
+   * selectionMode is set to {@link #SINGLE_TREE_SELECTION} and the selection
+   * has more than one path, the selection is reset to the contain only the
+   * first path.
 	 */
-  protected void insureRowContinuity()
-      throws NotImplementedException
+  protected void insureRowContinuity() throws NotImplementedException
   {
 		// TODO
   }
@@ -709,11 +691,10 @@ public class DefaultTreeSelectionModel
    * <li>we have no RowMapper assigned</li>
    * <li>nothing is currently selected</li>
 	 * <li>selectionMode is {@link #DISCONTIGUOUS_TREE_SELECTION}</li>
-   * <li>adding the paths to the selection still results in a contiguous set
-   *   of paths</li>
+   * <li>adding the paths to the selection still results in a contiguous set of
+   * paths</li>
    *
    * @param paths the paths to check
-   *
    * @return <code>true</code> if the paths can be added with respect to the
    *         selectionMode
 	 */
@@ -728,8 +709,8 @@ public class DefaultTreeSelectionModel
 	 * selection according to selectionMode.
    *
    * @param paths the paths to check
-	 * @return <code>true</code> if the paths can be removed with respect to
-	 *         the selectionMode
+   * @return <code>true</code> if the paths can be removed with respect to the
+   *         selectionMode
 	 */
 	protected boolean canPathsBeRemoved(TreePath[] paths)
       throws NotImplementedException
@@ -752,18 +733,19 @@ public class DefaultTreeSelectionModel
 	/**
    * Updates the lead index instance field.
 	 */
-  protected void updateLeadIndex()
-      throws NotImplementedException
+  protected void updateLeadIndex() throws NotImplementedException
   {
 		// STUB
   }
 
 	/**
-   * Deprecated and not used.
+   * This method exists due historical reasons and returns without action
+   * (unless overridden). For compatibility with the applications that override
+   * it, it is still called from the {@link #setSelectionPaths(TreePath[])} and
+   * {@link #addSelectionPaths(TreePath[])}.
 	 */
   protected void insureUniqueness()
-      throws NotImplementedException
   {
-		// TODO
+    // Following the API 1.4, the method should return without action.
   }
 }
