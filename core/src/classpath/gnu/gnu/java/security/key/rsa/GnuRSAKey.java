@@ -48,8 +48,6 @@ import java.security.interfaces.RSAKey;
 
 /**
  * <p>A base asbtract class for both public and private RSA keys.</p>
- *
- * @version $Revision$
  */
 public abstract class GnuRSAKey implements Key, RSAKey
 {

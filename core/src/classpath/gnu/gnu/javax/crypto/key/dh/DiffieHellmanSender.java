@@ -55,7 +55,6 @@ import javax.crypto.interfaces.DHPrivateKey;
  * Diffie-Hellman key agreement exchange (A in [HAC]).</p>
  *
  * @see DiffieHellmanKeyAgreement
- * @version $Revision$
  */
 public class DiffieHellmanSender extends DiffieHellmanKeyAgreement
 {

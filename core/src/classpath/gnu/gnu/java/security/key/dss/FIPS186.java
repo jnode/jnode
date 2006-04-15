@@ -53,8 +53,6 @@ import java.security.SecureRandom;
  * <a href="http://www.itl.nist.gov/fipspubs/fip186.htm">Digital Signature
  * Standard (DSS)</a>, Federal Information Processing Standards Publication 186.
  * National Institute of Standards and Technology.
- *
- * @version $Revision$
  */
 public class FIPS186
 {

@@ -45,8 +45,6 @@ import java.util.Set;
 
 /**
  * <p>A Cascade <i>Stage</i> in a Cascade Cipher.</p>
- *
- * @version $Revision$
  */
 class CascadeStage extends Stage
 {

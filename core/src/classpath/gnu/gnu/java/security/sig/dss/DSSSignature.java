@@ -111,8 +111,6 @@ import java.util.Random;
  *    Signature Standard (DSS)</a>, Federal Information Processing Standards
  *    Publication 186. National Institute of Standards and Technology.</li>
  * </ol>
- *
- * @version $Revision$
  */
 public class DSSSignature extends BaseSignature
 {

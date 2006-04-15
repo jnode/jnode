@@ -55,6 +55,7 @@ import java.security.InvalidParameterException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 /**
  * An implementation of an {@link IKeyPairCodec} that knows how to encode /
@@ -63,6 +64,7 @@ import java.util.ArrayList;
 public class RSAKeyPairX509Codec
     implements IKeyPairCodec
 {
+  private static final Logger log = Logger.getLogger(RSAKeyPairX509Codec.class.getName());
   private static final OID RSA_ALG_OID = new OID(Registry.RSA_OID_STRING);
 
   // implicit 0-arguments constructor
@@ -88,9 +90,12 @@ public class RSAKeyPairX509Codec
    *     parameters  ANY DEFINED BY algorithm OPTIONAL
    *   }
    * </pre>
-   * 
-   * <p>The <i>subjectPublicKey</i> field, which is a BIT STRING, contains the
-   * DER-encoded form of the RSA public key defined as:</p>
+   * <p>
+   * As indicated in RFC-2459: "The parameters field shall have ASN.1 type NULL
+   * for this algorithm identifier.".
+   * <p>
+   * The <i>subjectPublicKey</i> field, which is a BIT STRING, contains the
+   * DER-encoded form of the RSA public key defined as:
    * 
    * <pre>
    *   RSAPublicKey ::= SEQUENCE {
@@ -109,6 +114,8 @@ public class RSAKeyPairX509Codec
    */
   public byte[] encodePublicKey(PublicKey key)
   {
+    log.entering(this.getClass().getName(), "encodePublicKey()", key);
+
     if (! (key instanceof GnuRSAPublicKey))
       throw new InvalidParameterException("key");
 
@@ -153,6 +160,7 @@ public class RSAKeyPairX509Codec
         throw y;
       }
 
+    log.exiting(this.getClass().getName(), "encodePublicKey()", result);
     return result;
   }
 
@@ -174,6 +182,8 @@ public class RSAKeyPairX509Codec
    */
   public PublicKey decodePublicKey(byte[] input)
   {
+    log.entering(this.getClass().getName(), "decodePublicKey()", input);
+
     if (input == null)
       throw new InvalidParameterException("Input bytes MUST NOT be null");
 
@@ -195,7 +205,11 @@ public class RSAKeyPairX509Codec
         if (! algOID.equals(RSA_ALG_OID))
           throw new InvalidParameterException("Unexpected OID: " + algOID);
 
+        // rfc-2459 states that this field is OPTIONAL but NULL if/when present
         DERValue val = der.read();
+        if (val.getTag() == DER.NULL)
+          val = der.read();
+
         if (! (val.getValue() instanceof BitString))
           throw new InvalidParameterException("Wrong SubjectPublicKey field");
 
@@ -219,7 +233,9 @@ public class RSAKeyPairX509Codec
         throw y;
       }
 
-    return new GnuRSAPublicKey(Registry.X509_ENCODING_ID, n, e);
+    PublicKey result = new GnuRSAPublicKey(Registry.X509_ENCODING_ID, n, e);
+    log.exiting(this.getClass().getName(), "decodePublicKey()", result);
+    return result;
   }
 
   /**

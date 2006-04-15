@@ -43,8 +43,6 @@ import gnu.java.security.Registry;
 /**
  * The implementation of the Rijndael <i>Service Provider Interface</i>
  * (<b>SPI</b>) adapter.
- *
- * @version $Revision$
  */
 public final class RijndaelSpi extends CipherAdapter
 {

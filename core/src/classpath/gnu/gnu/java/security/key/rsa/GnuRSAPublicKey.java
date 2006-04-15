@@ -55,8 +55,6 @@ import java.security.interfaces.RSAPublicKey;
  *    Primitive specification and supporting documentation.<br>
  *    Jakob Jonsson and Burt Kaliski.</li>
  * </ol>
- *
- * @version $Revision$
  */
 public class GnuRSAPublicKey extends GnuRSAKey implements PublicKey,
     RSAPublicKey
