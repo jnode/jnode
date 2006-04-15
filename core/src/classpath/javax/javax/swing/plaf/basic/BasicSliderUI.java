@@ -1,5 +1,5 @@
 /* BasicSliderUI.java --
-   Copyright (C) 2004, 2005  Free Software Foundation, Inc.
+   Copyright (C) 2004, 2005, 2006,  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,6 +37,8 @@ exception statement from your version. */
 
 
 package javax.swing.plaf.basic;
+
+import gnu.classpath.NotImplementedException;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -204,6 +206,7 @@ public class BasicSliderUI extends SliderUI
      * @param e A {@link FocusEvent}.
      */
     public void focusGained(FocusEvent e)
+      throws NotImplementedException
     {
       // FIXME: implement.
     }
@@ -215,6 +218,7 @@ public class BasicSliderUI extends SliderUI
      * @param e A {@link FocusEvent}.
      */
     public void focusLost(FocusEvent e)
+      throws NotImplementedException
     {
       // FIXME: implement.
     }
@@ -244,6 +248,8 @@ public class BasicSliderUI extends SliderUI
 	  slider.getModel().addChangeListener(changeListener);
 	  calculateThumbLocation();
         }
+      else if (e.getPropertyName().equals("paintTicks"))
+        calculateGeometry();
 
       // elif the componentOrientation changes (this is a bound property,
       // just undocumented) we change leftToRightCache. In Sun's 
@@ -416,7 +422,8 @@ public class BasicSliderUI extends SliderUI
       if (slider.getSnapToTicks())
 	value = findClosestTick(value);
 
-      // If the thumb is hit, then we don't need to set the timers to move it. 
+          // If the thumb is hit, then we don't need to set the timers to 
+          // move it. 
       if (! thumbRect.contains(e.getPoint()))
         {
 	  // The mouse has hit some other part of the slider.
@@ -864,6 +871,7 @@ public class BasicSliderUI extends SliderUI
    *        installed.
    */
   protected void installKeyboardActions(JSlider slider)
+    throws NotImplementedException
   {
     // FIXME: implement.
   }
@@ -876,6 +884,7 @@ public class BasicSliderUI extends SliderUI
    *        uninstalled.
    */
   protected void uninstallKeyboardActions(JSlider slider)
+    throws NotImplementedException
   {
     // FIXME: implement.
   }
@@ -908,8 +917,7 @@ public class BasicSliderUI extends SliderUI
     // The width should cover all the labels (which are usually the
     // deciding factor of the width)
     int width = getWidthOfWidestLabel() * (slider.getLabelTable() == null ? 0
-                                                                          : slider.getLabelTable()
-                                                                                  .size());
+        : slider.getLabelTable().size());
 
     // If there are not enough labels.
     // This number is pretty much arbitrary, but it looks nice.
@@ -1129,8 +1137,8 @@ public class BasicSliderUI extends SliderUI
   }
 
   /**
-   * This method calculates the size but not the position of the thumbRect. It
-   * must take into account the orientation of the slider.
+   * Sets the width and height of the <code>thumbRect</code> field, using the
+   * dimensions returned by {@link #getThumbSize()}.
    */
   protected void calculateThumbSize()
   {
@@ -1144,8 +1152,9 @@ public class BasicSliderUI extends SliderUI
   }
 
   /**
-   * This method calculates the size and position of the contentRect. This
-   * method does not need to be  called if the orientation changes.
+   * Updates the <code>contentRect</code> field to an area inside the 
+   * <code>focusRect</code>. This method does not need to be called if the 
+   * orientation changes.
    */
   protected void calculateContentRect()
   {
@@ -1183,25 +1192,39 @@ public class BasicSliderUI extends SliderUI
   }
 
   /**
-   * Calculates the gap size between the left edge of the contentRect and the
-   * left edge of the trackRect.
+   * Calculates the gap size between the edge of the <code>contentRect</code> 
+   * and the edge of the <code>trackRect</code>, storing the result in the
+   * <code>trackBuffer</code> field.  Sufficient space needs to be reserved 
+   * for the slider thumb and/or the labels at each end of the slider track.
    */
   protected void calculateTrackBuffer()
   {
     if (slider.getOrientation() == JSlider.HORIZONTAL)
-      trackBuffer = thumbRect.width / 2;
+      {
+        int w = Math.max(getWidthOfLowValueLabel(), getWidthOfHighValueLabel());
+        trackBuffer = Math.max(thumbRect.width / 2, w / 2);
+        
+      }
     else
-      trackBuffer = thumbRect.height / 2;
+      {
+        int h = Math.max(getHeightOfLowValueLabel(), 
+                         getHeightOfHighValueLabel());
+        trackBuffer = Math.max(thumbRect.height / 2, h / 2);
+      }
   }
 
   /**
-   * This method returns the size of the thumbRect.
+   * Returns the size of the slider's thumb.  The size is hard coded to
+   * <code>11 x 20</code> for horizontal sliders, and <code>20 x 11</code> for 
+   * vertical sliders. Note that a new instance of {@link Dimension} is 
+   * returned for every call to this method (this seems wasteful, but 
+   * {@link Dimension} instances are not immutable, so this is probably 
+   * unavoidable).
    *
-   * @return The dimensions of the thumb.
+   * @return The size of the slider's thumb.
    */
   protected Dimension getThumbSize()
   {
-    // TODO: shouldn't create new objects every time
     if (slider.getOrientation() == JSlider.HORIZONTAL)
       return new Dimension(11, 20);
     else
@@ -1221,6 +1244,8 @@ public class BasicSliderUI extends SliderUI
         if (slider.getPaintTicks() && (slider.getMajorTickSpacing() > 0 
             || slider.getMinorTickSpacing() > 0))
           h += getTickLength();
+        if (slider.getPaintLabels())
+          h += getHeightOfTallestLabel();
 	trackRect.y = contentRect.y + (contentRect.height - h) / 2 - 1;
 	trackRect.width = contentRect.width - 2 * trackBuffer;
 	trackRect.height = thumbRect.height;
@@ -1231,6 +1256,8 @@ public class BasicSliderUI extends SliderUI
         if (slider.getPaintTicks() && (slider.getMajorTickSpacing() > 0
             || slider.getMinorTickSpacing() > 0))
           w += getTickLength();  
+        if (slider.getPaintLabels())
+          w += getWidthOfWidestLabel();
 	trackRect.x = contentRect.x + (contentRect.width - w) / 2 - 1;
 	trackRect.y = contentRect.y + trackBuffer;
 	trackRect.width = thumbRect.width;
@@ -1264,7 +1291,7 @@ public class BasicSliderUI extends SliderUI
 	tickRect.x = trackRect.x;
 	tickRect.y = trackRect.y + trackRect.height;
 	tickRect.width = trackRect.width;
-	tickRect.height = getTickLength();
+        tickRect.height = (slider.getPaintTicks() ? getTickLength() : 0);
 
 	if (tickRect.y + tickRect.height > contentRect.y + contentRect.height)
 	  tickRect.height = contentRect.y + contentRect.height - tickRect.y;
@@ -1273,7 +1300,7 @@ public class BasicSliderUI extends SliderUI
       {
 	tickRect.x = trackRect.x + trackRect.width;
 	tickRect.y = trackRect.y;
-	tickRect.width = getTickLength();
+        tickRect.width = (slider.getPaintTicks() ? getTickLength() : 0);
 	tickRect.height = trackRect.height;
 
 	if (tickRect.x + tickRect.width > contentRect.x + contentRect.width)
@@ -1292,13 +1319,13 @@ public class BasicSliderUI extends SliderUI
 	labelRect.x = contentRect.x;
 	labelRect.y = tickRect.y + tickRect.height;
 	labelRect.width = contentRect.width;
-	labelRect.height = contentRect.height - labelRect.y;
+        labelRect.height = getHeightOfTallestLabel();
       }
     else
       {
 	labelRect.x = tickRect.x + tickRect.width;
 	labelRect.y = contentRect.y;
-	labelRect.width = contentRect.width - labelRect.x;
+        labelRect.width = getWidthOfWidestLabel();
 	labelRect.height = contentRect.height;
       }
   }
@@ -1361,38 +1388,42 @@ public class BasicSliderUI extends SliderUI
   }
 
   /**
-   * This method returns the width of the label whose key has the highest
-   * value.
+   * Returns the width of the label whose key has the highest value, or 0 if
+   * there are no labels.
    *
-   * @return The width of the high value label or 0 if no label table exists.
+   * @return The width of the label whose key has the highest value.
+   *
+   * @see #getHighestValueLabel()
    */
   protected int getWidthOfHighValueLabel()
   {
     Component highValueLabel = getHighestValueLabel();
     if (highValueLabel != null)
-      return highValueLabel.getWidth();
+      return highValueLabel.getPreferredSize().width;
     else
       return 0;
   }
 
   /**
-   * This method returns the width of the label whose key has the lowest
-   * value.
+   * Returns the width of the label whose key has the lowest value, or 0 if
+   * there are no labels.
    *
-   * @return The width of the low value label or 0 if no label table exists.
+   * @return The width of the label whose key has the lowest value.
+   *
+   * @see #getLowestValueLabel()
    */
   protected int getWidthOfLowValueLabel()
   {
     Component lowValueLabel = getLowestValueLabel();
     if (lowValueLabel != null)
-      return lowValueLabel.getWidth();
+      return lowValueLabel.getPreferredSize().width;
     else
       return 0;
   }
 
   /**
-   * This method returns the height of the label whose key has the highest
-   * value.
+   * Returns the height of the label whose key has the highest value, or 0 if
+   * there are no labels.
    *
    * @return The height of the high value label or 0 if no label table exists.
    */
@@ -1400,14 +1431,14 @@ public class BasicSliderUI extends SliderUI
   {
     Component highValueLabel = getHighestValueLabel();
     if (highValueLabel != null)
-      return highValueLabel.getHeight();
+      return highValueLabel.getPreferredSize().height;
     else
       return 0;
   }
 
   /**
-   * This method returns the height of the label whose key has the lowest
-   * value.
+   * Returns the height of the label whose key has the lowest value, or 0 if
+   * there are no labels.
    *
    * @return The height of the low value label or 0 if no label table exists.
    */
@@ -1415,19 +1446,20 @@ public class BasicSliderUI extends SliderUI
   {
     Component lowValueLabel = getLowestValueLabel();
     if (lowValueLabel != null)
-      return lowValueLabel.getHeight();
+      return lowValueLabel.getPreferredSize().height;
     else
       return 0;
   }
 
   /**
-   * This method returns whether the slider is to be drawn inverted.
+   * Returns <code>true</code> if the slider scale is to be drawn inverted,
+   * and <code>false</code> if not.
    *
-   * @return True is the slider is to be drawn inverted.
+   * @return <code>true</code> if the slider is to be drawn inverted.
    */
   protected boolean drawInverted()
   {
-    return ! (slider.getInverted() ^ leftToRightCache);
+    return slider.getInverted();
   }
 
   /**
@@ -1460,9 +1492,10 @@ public class BasicSliderUI extends SliderUI
   }
 
   /**
-   * This method returns the label whose  key has the highest value.
+   * Returns the label whose key has the highest value.
    *
-   * @return The high value label or null if no label table exists.
+   * @return The label whose key has the highest value or <code>null</code> if 
+   *     no label table exists.
    */
   protected Component getHighestValueLabel()
   {
@@ -1499,7 +1532,8 @@ public class BasicSliderUI extends SliderUI
   public void paint(Graphics g, JComponent c)
   {
     // FIXME: Move this to propertyChangeEvent handler, when we get those.
-    leftToRightCache = slider.getComponentOrientation() != ComponentOrientation.RIGHT_TO_LEFT;
+    leftToRightCache = slider.getComponentOrientation() 
+        != ComponentOrientation.RIGHT_TO_LEFT;
     // FIXME: This next line is only here because the above line is here.
     calculateGeometry();
 
@@ -1658,38 +1692,16 @@ public class BasicSliderUI extends SliderUI
       {
 	if (slider.getOrientation() == JSlider.HORIZONTAL)
 	  {
-	    double loc = tickRect.x + 0.5;
-	    double increment = (max == min) ? 0
-	        : majorSpace * (double) (tickRect.width - 1) / (max - min);
-            if (drawInverted())
-	      {
-		loc += tickRect.width;
-		increment *= -1;
-	      }
             g.translate(0, tickRect.y);
 	    for (int i = min; i <= max; i += majorSpace)
-	      {
-		paintMajorTickForHorizSlider(g, tickRect, (int) loc);
-		loc += increment;
-	      }
+              paintMajorTickForHorizSlider(g, tickRect, xPositionForValue(i));
             g.translate(0, -tickRect.y);
 	  }
-	else
+        else // JSlider.VERTICAL
 	  {
-	    double loc = tickRect.height + tickRect.y + 0.5;
-	    double increment = (max == min) ? 0
-	        : -majorSpace * (double) (tickRect.height - 1) / (max - min);
-	    if (drawInverted())
-	      {
-		loc = tickRect.y + 0.5;
-		increment *= -1;
-	      }
             g.translate(tickRect.x, 0);
 	    for (int i = min; i <= max; i += majorSpace)
-	      {
-		paintMajorTickForVertSlider(g, tickRect, (int) loc);
-		loc += increment;
-	      }
+              paintMajorTickForVertSlider(g, tickRect, yPositionForValue(i));
             g.translate(-tickRect.x, 0);
 	  }
       }
@@ -1697,45 +1709,23 @@ public class BasicSliderUI extends SliderUI
       {
 	if (slider.getOrientation() == JSlider.HORIZONTAL)
 	  {
-	    double loc = tickRect.x + 0.5;
-	    double increment = (max == min) ? 0
-	        : minorSpace * (double) (tickRect.width - 1) / (max - min);
-	    if (drawInverted())
-	      {
-		loc += tickRect.width;
-		increment *= -1;
-	      }
             g.translate(0, tickRect.y);
 	    for (int i = min; i <= max; i += minorSpace)
-	      {
-		paintMinorTickForHorizSlider(g, tickRect, (int) loc);
-		loc += increment;
-	      }
+              paintMinorTickForHorizSlider(g, tickRect, xPositionForValue(i));
             g.translate(0, -tickRect.y);
 	  }
 	else
 	  {
-	    double loc = tickRect.height + tickRect.y + 0.5;
-	    double increment = (max == min) ? 0
-	        : -minorSpace * (double) (tickRect.height - 1) / (max - min);
-	    if (drawInverted())
-	      {
-		loc = tickRect.y + 0.5;
-		increment *= -1;
-	      }
             g.translate(tickRect.x, 0);
 	    for (int i = min; i <= max; i += minorSpace)
-	      {
-		paintMinorTickForVertSlider(g, tickRect, (int) loc);
-		loc += increment;
-	      }
+              paintMinorTickForVertSlider(g, tickRect, yPositionForValue(i));
             g.translate(-tickRect.x, 0);
 	  }
       }
   }
 
-  /* Minor ticks start at 1/4 of the height (or width) of the tickRect and extend
-     to 1/2 of the tickRect.
+  /* Minor ticks start at 1/4 of the height (or width) of the tickRect and 
+     extend to 1/2 of the tickRect.
 
      Major ticks start at 1/4 of the height and extend to 3/4.
    */
@@ -1927,7 +1917,7 @@ public class BasicSliderUI extends SliderUI
       h = labelRect.height;
 
     label.setBounds(xpos, ypos, w, h);
-    javax.swing.SwingUtilities.paintComponent(g, label, null, label.getBounds());
+    SwingUtilities.paintComponent(g, label, null, label.getBounds());
   }
 
   /**
@@ -1966,7 +1956,7 @@ public class BasicSliderUI extends SliderUI
       w = labelRect.width;
 
     label.setBounds(xpos, ypos, w, h);
-    javax.swing.SwingUtilities.paintComponent(g, label, null, label.getBounds());
+    SwingUtilities.paintComponent(g, label, null, label.getBounds());
   }
 
   /**
@@ -2028,7 +2018,8 @@ public class BasicSliderUI extends SliderUI
                         new int[] { b.y + 1, c.y - 1, d.y - 1 }, 3);
     
 	all = new Polygon(new int[] { a.x + 1, b.x - 2, c.x - 2, d.x, e.x + 1 },
-	                  new int[] { a.y + 1, b.y + 1, c.y - 1, d.y - 1, e.y }, 5);
+                          new int[] { a.y + 1, b.y + 1, c.y - 1, d.y - 1, e.y },
+                          5);
       }
     else
       {
@@ -2047,8 +2038,10 @@ public class BasicSliderUI extends SliderUI
 
     light = new Polygon(new int[] { c.x - 1, d.x, e.x + 1},
                        new int[] { c.y, d.y - 1, e.y - 1}, 3);
-	all = new Polygon(new int[] { a.x + 1, b.x, c.x - 2, c.x - 2, d.x, e.x + 1 },
-	                  new int[] { a.y + 1, b.y + 1, c.y - 1, c.y, d.y - 2, e.y - 2 }, 6);
+        all = new Polygon(new int[] { a.x + 1, b.x, c.x - 2, c.x - 2, d.x, 
+                                      e.x + 1 },
+                          new int[] { a.y + 1, b.y + 1, c.y - 1, c.y, d.y - 2, 
+                                      e.y - 2 }, 6);
       }
 
     g.setColor(Color.WHITE);
@@ -2135,53 +2128,60 @@ public class BasicSliderUI extends SliderUI
   }
 
   /**
-   * This method returns the X coordinate for the value passed in.
+   * Returns the x-coordinate (relative to the component) for the given slider 
+   * value.  This method assumes that the <code>trackRect</code> field is
+   * set up.
    *
-   * @param value The value to calculate an x coordinate for.
+   * @param value  the slider value.
    *
-   * @return The x coordinate for the value.
+   * @return The x-coordinate.
    */
   protected int xPositionForValue(int value)
   {
-    int min = slider.getMinimum();
-    int max = slider.getMaximum();
-    int len = trackRect.width - 1;
+    double min = slider.getMinimum();
+    if (value < min)
+      value = (int) min;
+    double max = slider.getMaximum();
+    if (value > max)
+      value = (int) max;
+    double len = trackRect.width;
+    if ((max - min) <= 0.0)
+      return 0;
+    int xPos = (int) ((value - min) / (max - min) * len + 0.5);
 
-    int xPos = (max == min) ? 0 : (value - min) * len / (max - min);
-
-    if (! drawInverted())
-      xPos += trackRect.x;
+    if (drawInverted())
+      return trackRect.x + Math.max(trackRect.width - xPos - 1, 0);
     else
-      {
-	xPos = len - xPos;
-	xPos += trackRect.x;
-      }
-    return xPos;
+      return trackRect.x + Math.min(xPos, trackRect.width - 1);
   }
 
   /**
-   * This method returns the y coordinate for the value passed in.
+   * Returns the y-coordinate (relative to the component) for the given slider 
+   * value.  This method assumes that the <code>trackRect</code> field is 
+   * set up.
    *
-   * @param value The value to calculate a y coordinate for.
+   * @param value  the slider value.
    *
-   * @return The y coordinate for the value.
+   * @return The y-coordinate.
    */
   protected int yPositionForValue(int value)
   {
-    int min = slider.getMinimum();
-    int max = slider.getMaximum();
-    int len = trackRect.height - 1;
+    double min = slider.getMinimum();
+    if (value < min)
+      value = (int) min;
+    double max = slider.getMaximum();
+    if (value > max)
+      value = (int) max;
+    int len = trackRect.height;
+    if ((max - min) <= 0.0)
+      return 0;
 
-    int yPos = (max == min) ? 0 : (value - min) * len / (max - min);
+    int yPos = (int) ((value - min) / (max - min) * len + 0.5);
 
     if (! drawInverted())
-      {
-	yPos = len - yPos;
-	yPos += trackRect.y;
-      }
+      return trackRect.y + trackRect.height - Math.max(yPos, 1);
     else
-      yPos += trackRect.y;
-    return yPos;
+      return trackRect.y + Math.min(yPos, trackRect.height - 1);
   }
 
   /**

@@ -1,5 +1,5 @@
-/* MetalDesktopIconUI.java
-   Copyright (C) 2005, 2006, Free Software Foundation, Inc.
+/* MalformedParameterizedTypeException.java
+   Copyright (C) 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -36,37 +36,25 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package javax.swing.plaf.metal;
+package java.lang.reflect;
 
-import javax.swing.JComponent;
-import javax.swing.JInternalFrame;
-import javax.swing.plaf.ComponentUI;
-import javax.swing.plaf.basic.BasicDesktopIconUI;
-
-/**
- * A UI delegate for the {@link JInternalFrame.JDesktopIcon} component.
+/** 
+ * This exception class is thrown when one of the reflection
+ * methods encountered an invalid parameterized type within
+ * the metadata of a class.  One possible reason for this
+ * exception being thrown is the specification of too few or
+ * too many type variables.
+ *
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+ * @since 1.5 
  */
-public class MetalDesktopIconUI
-  extends BasicDesktopIconUI
+public class MalformedParameterizedTypeException 
+  extends RuntimeException
 {
+  private static final long serialVersionUID = -5696557788586220964L;
 
-  /**
-   * Constructs a new instance of <code>MetalDesktopIconUI</code>.
-   */
-  public MetalDesktopIconUI()
+  public MalformedParameterizedTypeException()
   {
-    super();
-  }
-
-  /**
-   * Returns a new <code>MetalDesktopIconUI</code> instance.
-   *
-   * @param component  the component (ignored).
-   *
-   * @return A new <code>MetalDesktopIconUI</code> instance.
-   */
-  public static ComponentUI createUI(JComponent component)
-  {
-    return new MetalDesktopIconUI();
   }
 }
