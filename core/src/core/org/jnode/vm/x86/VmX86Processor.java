@@ -29,11 +29,15 @@ import org.jnode.system.ResourceNotFreeException;
 import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeUtils;
 import org.jnode.vm.CpuID;
+import org.jnode.vm.IdleThread;
+import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmThread;
 import org.jnode.vm.annotation.LoadStatics;
 import org.jnode.vm.annotation.MagicPermission;
+import org.jnode.vm.annotation.PrivilegedActionPragma;
+import org.jnode.vm.annotation.Uninterruptible;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.performance.PerformanceCounters;
@@ -148,34 +152,35 @@ public abstract class VmX86Processor extends VmProcessor {
     /**
      * Send a startup signal to this processor.
      */
+    @PrivilegedActionPragma
     final void startup(ResourceManager rm) throws ResourceNotFreeException {
         // Save resource manager, so when this processor starts, it can be
         // used right away.
         this.rm = rm;
         final VmProcessor me = current();
-        BootLog.info("Startup of 0x" + NumberUtils.hex(getId(), 2) + " from "
-                + NumberUtils.hex(me.getId(), 2));
+        Unsafe.debug("Startup of 0x" + NumberUtils.hex(getId(), 2) + " from "
+                + NumberUtils.hex(me.getId(), 2) + "\n");
 
         // Setup kernel structures
         setupStructures();
 
         // Setup the boot code
         final Address bootCode = setupBootCode(rm, gdt);
-
+        
         // Make sure APIC is enabled (the apic of the current CPU!)
-        BootLog.info("Enabling APIC current state " + apic.isEnabled());
+        Unsafe.debug("Enabling APIC: current state " + apic.isEnabled() + "\n");
         apic.setEnabled(true);
         apic.clearErrors();
         // TimeUtils.loop(5000);
 
         // Send INIT IPI
-        BootLog.info("Sending INIT IPI");
+        Unsafe.debug("Sending INIT IPI\n");
         apic.sendInitIPI(getId(), true);
         apic.loopUntilNotBusy();
         TimeUtils.loop(10);
 
         // Send INIT-DeAssert IPI
-        BootLog.info("Sending INIT-DeAssert IPI");
+        Unsafe.debug("Sending INIT-DeAssert IPI\n");
         apic.sendInitIPI(getId(), false);
         apic.loopUntilNotBusy();
         TimeUtils.loop(10);
@@ -183,15 +188,16 @@ public abstract class VmX86Processor extends VmProcessor {
         final int numStarts = 2;
         for (int i = 0; i < numStarts; i++) {
             // Send STARTUP IPI
-            BootLog.info("Sending STARTUP IPI");
+            Unsafe.debug("Sending STARTUP IPI to " + getId() + "\n");
             apic.clearErrors();
             apic.sendStartupIPI(getId(), bootCode);
             apic.loopUntilNotBusy();
-            // BootLog.info("Not busy");
+            // Unsafe.debug("Not busy");
             TimeUtils.loop(100);
             apic.clearErrors();
         }
 
+        Unsafe.debug("X86 CPU Start finished\n");
         // BootLog.info("loop 5000");
         // TimeUtils.loop(5000);
     }
@@ -217,6 +223,7 @@ public abstract class VmX86Processor extends VmProcessor {
         final byte[] userStack = new byte[VmThread.DEFAULT_STACK_SLOTS * getArchitecture().getReferenceSize()];
         setupUserStack(userStack);
         this.currentThread = createThread(getIsolatedStatics(), userStack);
+        this.stackEnd = ((VmX86Thread)currentThread).getStackEnd().toAddress();
 
         // gdt.dump(System.out);
     }
@@ -246,12 +253,16 @@ public abstract class VmX86Processor extends VmProcessor {
      * Entry point for starting Application processors.
      */
     @LoadStatics
+    @Uninterruptible
     static final void applicationProcessorMain() {
         final VmX86Processor cpu = (VmX86Processor) current();
-        BootLog.info("Starting Application Processor " + cpu.getId());
-
+        Unsafe.debug("Starting Application Processor " + cpu.getIdString());
+              
         // First force a load of CPUID
         cpu.getCPUID();
+        
+        // Prepare for threading
+        cpu.systemReadyForThreadSwitch();
 
         // Detect and start logical CPU's
         try {
@@ -260,7 +271,10 @@ public abstract class VmX86Processor extends VmProcessor {
             BootLog.error("Cannot detect logical processors", ex);
         }
 
-        // TODO do something useful.
+        // Run idle thread. 
+        // The scheduler will fetch other work
+        Unsafe.debug("Running normal threads on " + cpu.getIdString());
+        cpu.getIdleThread().run();
     }
 
     /**
@@ -278,6 +292,9 @@ public abstract class VmX86Processor extends VmProcessor {
             // No HTT
             return;
         }
+        
+        // Prepare for threading first
+        cpu.systemReadyForThreadSwitch();
 
         final VmX86Architecture arch = (VmX86Architecture) cpu
                 .getArchitecture();
@@ -285,7 +302,7 @@ public abstract class VmX86Processor extends VmProcessor {
         // Now create and start all logical processors
         for (int i = 1; i < logCpuCnt; i++) {
             final int logId = cpu.getId() | i;
-            BootLog.info("Adding logical CPU 0x" + NumberUtils.hex(logId, 2));
+            Unsafe.debug("Adding logical CPU 0x" + NumberUtils.hex(logId, 2));
             final VmX86Processor logCpu = (VmX86Processor) arch
                     .createProcessor(logId, Vm.getVm().getSharedStatics(), cpu.getIsolatedStatics());
             logCpu.logical = true;

@@ -4329,6 +4329,18 @@ final class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 	public final void visit_return() { 
 		if(countBytecode) { counters.getCounter("return").inc(); }
 		
+        // Discard vstack first
+        while (!vstack.isEmpty()) {
+            Item v = vstack.pop();
+            if (v.isStack()) {
+                // sanity check
+                if (VirtualStack.checkOperandStack) {
+                    vstack.operandStack.pop(v);
+                }
+            }
+            v.release(eContext);
+        }
+        
 		stackFrame.emitReturn();
 		assertCondition(vstack.isEmpty(), "vstack should be empty; it is ",
 				vstack);

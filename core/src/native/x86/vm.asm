@@ -106,6 +106,7 @@ vm_print_string_ret:
 ; Print a char array in who's reference is in EAX
 ; -----------------------------------------------
 vm_print_chararray:
+	SPINLOCK_ENTER console_lock
     push AAX
     push ACX
     push ASI
@@ -122,9 +123,9 @@ vm_print_chararray_loop:
 	lodsw
 	push ASI
 %ifdef BITS32	
-	call sys_print_char32
+	call sys_do_print_char32
 %else
-	call sys_print_char64
+	call sys_do_print_char64
 %endif	
 	pop ASI
 	dec ecx
@@ -137,6 +138,7 @@ vm_print_chararray_ret:
 	pop ASI
 	pop ACX
 	pop AAX
+	SPINLOCK_EXIT console_lock
 	ret
 	
 ; -----------------------------------------------
