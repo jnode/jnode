@@ -43,8 +43,6 @@ import java.util.Map;
 
 /**
  * The visible methods of every asymmetric keypair generator.<p>
- *
- * @version $Revision$
  */
 public interface IKeyPairGenerator
 {

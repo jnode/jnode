@@ -43,8 +43,6 @@ import gnu.java.security.Registry;
 /**
  * The implementation of the Null cipher <i>Service Provider Interface</i>
  * (<b>SPI</b>) adapter.
- *
- * @version $Revision$
  */
 public final class NullCipherSpi extends CipherAdapter
 {

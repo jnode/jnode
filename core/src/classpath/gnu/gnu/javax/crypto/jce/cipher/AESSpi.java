@@ -52,8 +52,6 @@ import java.security.spec.InvalidParameterSpecException;
 /**
  * The implementation of the AES <i>Service Provider Interface</i>
  * (<b>SPI</b>) adapter.
- *
- * @version $Revision$
  */
 public final class AESSpi extends CipherAdapter
 {

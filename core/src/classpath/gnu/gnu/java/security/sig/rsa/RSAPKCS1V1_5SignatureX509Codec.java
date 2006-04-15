@@ -39,22 +39,15 @@ exception statement from your version. */
 package gnu.java.security.sig.rsa;
 
 import gnu.java.security.Registry;
-import gnu.java.security.der.BitString;
-import gnu.java.security.der.DER;
-import gnu.java.security.der.DERReader;
-import gnu.java.security.der.DERValue;
-import gnu.java.security.der.DERWriter;
 import gnu.java.security.sig.ISignatureCodec;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.security.InvalidParameterException;
 
 /**
  * An implementation of an {@link ISignatureCodec} that knows to encode and
- * decode RSA PKCS1 (v1.5) signatures into the DER-encoded form of the ASN.1
- * structure defined in RFC-2459, and RFC-2313 as described in the next
- * paragraphs.
+ * decode RSA PKCS1 (v1.5) signatures into the raw bytes which would constitute
+ * a DER-encoded form of the ASN.1 structure defined in RFC-2459, and RFC-2313
+ * as described in the next paragraphs.
  * <p>
  * Digital signatures when transmitted in an X.509 certificates are encoded
  * in DER (Distinguished Encoding Rules) as a BIT STRING; i.e.
@@ -68,13 +61,26 @@ import java.security.InvalidParameterException;
  * </pre>
  * <p>
  * The output of the encoder, and the input of the decoder, of this codec are
- * then the bytes of such a BIT STRING.
+ * then the <i>raw</i> bytes of such a BIT STRING; i.e. not the DER-encoded
+ * form itself.
  * <p>
  * Our implementation of the RSA PKCS1 signature algorithm outputs a byte array
  * as the result of generating a digital signature, in accordance with RFC-2313.
- * As a consequence, the encoder and decoder of this codec, simply marshall and
- * unmarshall such a byte array into the DER-encoded BIT STRING expected (or
- * supplied) by an X.509 certificate.
+ * As a consequence, the encoder and decoder of this codec, simply pass through
+ * such a byte array.
+ * <p>
+ * Client code that needs to build a DER BIT STRING <b>MUST</b> construct such
+ * an ASN.1 value. The following is an example of how to do this:
+ * <p>
+ * <pre>
+ * ...
+ * import gnu.java.security.der.BitString;
+ * import gnu.java.security.der.DER;
+ * import gnu.java.security.der.DERValue;
+ * ...
+ * DERValue bitString = new DERValue(DER.BIT_STRING, new BitString(sigBytes));
+ * ...
+ * </pre>
  */
 public class RSAPKCS1V1_5SignatureX509Codec
     implements ISignatureCodec
@@ -87,71 +93,36 @@ public class RSAPKCS1V1_5SignatureX509Codec
   }
 
   /**
-   * Encodes an RSA Signature output as a <i>signature</i> BIT STRING as defined
-   * in the documentation of this class.
+   * Encodes an RSA Signature output as a <i>signature</i> BIT STRING as
+   * defined in the documentation of this class.
    * 
    * @param signature the output of the RSA PKCS1 (v1.5) signature algorithm;
    *          i.e. the value returned by the invocation of
    *          {@link gnu.java.security.sig.ISignature#sign()} method. In the
    *          case of the RSA PKCS1 (v1.5) signature this is an array of bytes.
-   * @return the DER-encoded output of an RSA signature as defined in rfc-2459.
-   * @throws InvalidParameterException if an exception occurs during the
-   *           marshalling process.
+   * @return the raw bytes of an RSA signature which could be then used as the
+   *         contents of a BIT STRING as per rfc-2459.
    */
   public byte[] encodeSignature(Object signature)
   {
-    byte[] sBytes = (byte[]) signature;
-    DERValue derSignature = new DERValue(DER.BIT_STRING,
-                                         new BitString(sBytes));
-    byte[] result;
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    try
-      {
-        DERWriter.write(baos, derSignature);
-        result = baos.toByteArray();
-      }
-    catch (IOException x)
-      {
-        InvalidParameterException y = new InvalidParameterException();
-        y.initCause(x);
-        throw y;
-      }
-
+    byte[] result = (byte[]) signature;
     return result;
   }
 
   /**
-   * Decodes a <i>signature</i> BIT STRING as defined in the documentation of
-   * this class.
+   * Decodes a <i>signature</i> as defined in the documentation of this class.
    * 
    * @param input the byte array to unmarshall into a valid RSA PKCS1 (v1.5)
-   *          signature instance; i.e. an array of two MPIs. MUST NOT be null.
-   * @return an array of bytes decoded from the designated <code>input</code>.
-   * @throw InvalidParameterException if an exception occurs during the
-   *        unmarshalling process.
+   *          signature instance; i.e. a byte array. MUST NOT be null.
+   * @return an array of raw bytes decoded from the designated input. In the
+   *         case of RSA PKCS1 (v1.5) this is the same as the input.
+   * @throw InvalidParameterException if the <code>input</code> array is null.
    */
   public Object decodeSignature(byte[] input)
   {
     if (input == null)
       throw new InvalidParameterException("Input bytes MUST NOT be null");
 
-    byte[] result;
-    DERReader der = new DERReader(input);
-    try
-      {
-        DERValue derSignature = der.read();
-        if (! (derSignature.getValue() instanceof BitString))
-          throw new InvalidParameterException("Wrong signature field");
-
-        result = ((BitString) derSignature.getValue()).toByteArray();
-      }
-    catch (IOException x)
-      {
-        InvalidParameterException y = new InvalidParameterException();
-        y.initCause(x);
-        throw y;
-      }
-
-    return result;
+    return input;
   }
 }

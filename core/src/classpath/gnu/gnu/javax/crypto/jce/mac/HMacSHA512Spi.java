@@ -42,8 +42,6 @@ import gnu.java.security.Registry;
 /**
  * <p>The implementation of the HMAC-SHA-512 <i>Service Provider Interface</i>
  * (<b>SPI</b>) adapter.</p>
- *
- * @version $Revision$
  */
 public class HMacSHA512Spi extends MacAdapter
 {

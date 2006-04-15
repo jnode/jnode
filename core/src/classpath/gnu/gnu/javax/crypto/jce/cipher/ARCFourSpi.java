@@ -64,8 +64,6 @@ import javax.crypto.ShortBufferException;
 /**
  * The <i>Service Provider Interface</i> (<b>SPI</b>) for the ARCFOUR
  * stream cipher.
- *
- * @version $Revision$
  */
 public class ARCFourSpi extends CipherSpi
 {

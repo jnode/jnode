@@ -42,8 +42,6 @@ import java.math.BigInteger;
 
 /**
  * <p>A collection of utility methods used throughout this project.</p>
- *
- * @version $Revision$
  */
 public class Util
 {

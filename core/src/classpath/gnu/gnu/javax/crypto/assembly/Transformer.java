@@ -77,7 +77,6 @@ import java.util.Map;
  * @see CascadeTransformer
  * @see PaddingTransformer
  * @see DeflateTransformer
- * @version $Revision$
  */
 public abstract class Transformer
 {
