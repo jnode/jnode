@@ -3,7 +3,7 @@ package org.jnode.vm;
 /**
  * @author Levente S\u00e1ntha
  */
-public class VmExit extends RuntimeException {
+public class VmExit extends Error {
     private int status;
 
     public VmExit(int status) {
