@@ -26,6 +26,7 @@
 	<pathelement location="${my-src.dir}/classpath/5.0"/>
 	<pathelement location="${my-src.dir}/classpath/ext"/>
 	<pathelement location="${my-src.dir}/classpath/vm"/>    	
+	<pathelement location="${my-src.dir}/classpath/tools"/>
   </path>
   <path id="my-sources1">
 	<path refid="classpath-sources"/>
@@ -117,6 +118,7 @@
 	    <fileset dir="${my-src.dir}/classpath/5.0" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/classpath/ext" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/classpath/vm" excludes="${my-non-resources}"/>
+	    <fileset dir="${my-src.dir}/classpath/tools" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/core" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/nanoxml" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/vmmagic" excludes="${my-non-resources}"/>
