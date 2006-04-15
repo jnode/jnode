@@ -1,4 +1,4 @@
-/* DefaultActivationSystem.java -- FIXME: briefly describe file purpose
+/* ActivationSystemTransient.java -- The transient RMI object activation system.
    Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -69,23 +69,23 @@ public class ActivationSystemTransient
   /**
    * Maps group identifiers into group descriptions.
    */
-  BidiTable groupDescs = new BidiTable();  
+  protected final BidiTable groupDescs;  
   
   /**
    * Maps object identifiers into object activation descriptions
    */
-  BidiTable descriptions = new BidiTable();
+  protected final BidiTable descriptions;
 
   /**
-   * Maps group descriptions into group object instantiators.
+   * Maps group identifiers into already activated groups.
    */
-  Map groupInstantiators = new Hashtable();
+  protected transient final Map groupInstantiators = new Hashtable();
   
   /**
    * The cache of the activated objects, maps activation ids to remote
    * object stubs.
    */
-  Map activatedObjects = new HashMap();
+  protected transient final Map activatedObjects = new HashMap();
  
   /**
    * The object incarnation counter.
@@ -102,11 +102,23 @@ public class ActivationSystemTransient
    */
   public static boolean debug = false;
   
+  
   /**
-   * This group should not be instantiated outside the group code.
+   * Creates the group which uses the given maps to store the data.
+   */
+  protected ActivationSystemTransient(BidiTable objectDescriptions,
+                                      BidiTable groupDescriptiopns)
+  {
+    descriptions = objectDescriptions;
+    groupDescs = groupDescriptiopns;
+  }
+  
+  /**
+   * Creates the group with transient maps.
    */
   protected ActivationSystemTransient()
   {
+    this (new BidiTable(), new BidiTable());
   }
   
   public static ActivationSystem getInstance()
@@ -282,11 +294,13 @@ public class ActivationSystemTransient
   }
   
   /**
-   * No action.
+   * Calls .shutdown on all bidirectional tables (has no effect if these
+   * table are not persistent).
    */
   public void shutdown() throws RemoteException
   {
-    // Nothing to do.
+    descriptions.shutdown();
+    groupDescs.shutdown();
   }
   
   /**

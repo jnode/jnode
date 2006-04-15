@@ -52,6 +52,8 @@ import java.util.Iterator;
  * @see java.beans.beancontext.BeanContextMembershipListener
  */
 public class BeanContextMembershipEvent extends BeanContextEvent {
+        private static final long serialVersionUID = 3499346510334590959L;
+
 	/**
 	 * The children that were added or removed.
 	 */

@@ -251,21 +251,34 @@ public class UnicastRef
 
     return (Lease) returnval;
   }
-
-  private Object invokeCommon(Remote obj, Method method, Object[] params,
+  /**
+   * Invoke the remote method on the given object. This part is overridden by
+   * the activatable objects.
+   */
+  protected Object invokeCommon(Remote obj, Method method, Object[] params,
                               int opnum, long hash) throws Exception
   {
 	UnicastConnection conn;
     try
       {
 		conn = manager.getConnection();
+        return invokeCommon(conn, obj, method, params, opnum, hash);
 	}
     catch (IOException e1)
       {
         throw new RemoteException("connection failed to host: "
                                   + manager.serverName, e1);
 	}
+  }
 
+  /**
+   * Invoke the remote method on the given object when connection is already
+   * established.
+   */
+  protected Object invokeCommon(UnicastConnection conn, Remote obj,
+                                Method method, Object[] params, int opnum,
+                                long hash) throws Exception
+  {
 	ObjectOutputStream out;
 	DataOutputStream dout;
     try

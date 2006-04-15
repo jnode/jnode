@@ -38,6 +38,9 @@ exception statement from your version. */
 
 package gnu.java.rmi.server;
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.activation.ActivationID;
@@ -193,6 +196,32 @@ public class ActivatableServerRef extends UnicastServerRef
 
     UnicastServer.registerActivatable(this);
     return stub;
+  }
+  
+  /**
+   * Get the referencing class.
+   */
+  public String getRefClass(ObjectOutput out)
+  {
+    return "ActivatableRef";
+  }
+
+  /**
+   * Read the content from the input stream.
+   */
+  public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException
+  {
+    super.readExternal(in);
+    actId = (ActivationID) in.readObject();
+  }
+
+  /**
+   * Write the content to the output stream.
+   */
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    super.writeExternal(out);
+    out.writeObject(actId);
   }
   
 }

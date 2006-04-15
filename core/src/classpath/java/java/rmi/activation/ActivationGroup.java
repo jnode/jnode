@@ -38,7 +38,6 @@ exception statement from your version. */
 
 package java.rmi.activation;
 
-import gnu.java.rmi.activation.ActivationSystemTransient;
 import gnu.java.rmi.activation.DefaultActivationGroup;
 import gnu.java.rmi.activation.DefaultActivationSystem;
 
@@ -230,7 +229,9 @@ public abstract class ActivationGroup
       {
         if (currentGroupId==null)
           {
-            setSystem(ActivationSystemTransient.getInstance());
+            // This will also assing the currentGroupId to the current
+            // (default) group of the default system.
+            setSystem(DefaultActivationSystem.get());
           }
       }
     catch (ActivationException e)
@@ -239,7 +240,6 @@ public abstract class ActivationGroup
         ierr.initCause(e);
         throw ierr;
       }
-      
       
     return currentGroupId;
   }
@@ -300,8 +300,7 @@ public abstract class ActivationGroup
   public static ActivationSystem getSystem() throws ActivationException
   {
     if (system == null)
-      return DefaultActivationSystem.get();
-    else
+      system = DefaultActivationSystem.get();
       return system;
   }
 

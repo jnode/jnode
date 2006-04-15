@@ -52,7 +52,7 @@ import javax.swing.text.Position.Bias;
  *
  * @author Roman Kennke (kennke@aicas.com)
  */
-public class NullView
+class NullView
     extends View
 {
 
