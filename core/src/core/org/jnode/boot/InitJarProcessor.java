@@ -26,7 +26,10 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.jar.Manifest;
+import java.util.jar.Attributes;
 
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
@@ -126,6 +129,22 @@ public class InitJarProcessor {
             return mf.getMainAttributes().getValue("Main-Class");
         } else {
             return null;
+        }
+    }
+
+    public String[] getMainClassArguments() {
+        if (mf != null) {
+            Attributes mainAttributes = mf.getMainAttributes();
+            SortedMap<String,String> arg_map = new TreeMap<String, String>();
+            for(Object key : mainAttributes.keySet()){
+                String s = String.valueOf(key);
+                if(s.startsWith("Main-Class-Arg")){
+                    arg_map.put(s, String.valueOf(mainAttributes.get(key)));
+                }
+            }
+            return arg_map.values().toArray(new String[arg_map.size()]);
+        } else {
+            return new String[0];
         }
     }
 }
