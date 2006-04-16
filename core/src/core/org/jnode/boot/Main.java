@@ -22,6 +22,7 @@
 package org.jnode.boot;
 
 import java.util.List;
+import java.lang.reflect.Method;
 
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginManager;
@@ -75,21 +76,29 @@ public final class Main {
 
 			final ClassLoader loader = pluginRegistry.getPluginsClassLoader();
 			final String mainClassName = proc.getMainClassName();
-			final Runnable main;
-			if (mainClassName != null) {
-				final Class mainClass = loader.loadClass(mainClassName);
-				main = (Runnable) mainClass.newInstance();
+            final Class mainClass;
+            if (mainClassName != null) {
+				mainClass = loader.loadClass(mainClassName);
 			} else {
 				BootLog.warn("No Main-Class found");
-				main = null;
-			}
+                mainClass = null;
+            }
 			final long end = VmSystem.currentKernelMillis();
 			System.out.println("JNode initialization finished in " + (end - start) + "ms.");
 
-			if (main != null) {
-			    main.run();
-			}
-
+            if(mainClass != null){
+                try{
+                    final Method mainMethod = mainClass.getMethod("main", new Class[]{ String[].class});
+                    mainMethod.invoke(null, new Object[]{proc.getMainClassArguments()});
+                } catch(NoSuchMethodException x) {
+                    final Object insatnce = mainClass.newInstance();
+                    if(insatnce instanceof Runnable){
+                        ((Runnable) insatnce).run();
+                    } else {
+                        BootLog.warn("No valid Main-Class");
+                    }
+                }
+            }
 		} catch (Throwable ex) {
 			BootLog.error("Error in bootstrap", ex);
 			ex.printStackTrace();
