@@ -34,6 +34,7 @@ import org.jnode.vm.Vm;
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmScheduler;
 import org.jnode.vm.VmThread;
+import org.jnode.vm.annotation.KernelSpace;
 import org.jnode.vm.annotation.LoadStatics;
 import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.annotation.PrivilegedActionPragma;
@@ -54,7 +55,7 @@ import org.vmmagic.unboxed.Word;
 public abstract class VmX86Processor extends VmProcessor {
 
     /** The IRQ counters */
-    private final int[] irqCount = new int[16];
+    private final int[] irqCount = new int[X86IRQManager.IRQ_COUNT];
 
     /** The local API */
     private LocalAPIC localAPIC;
@@ -112,6 +113,8 @@ public abstract class VmX86Processor extends VmProcessor {
      * 
      * @return int[]
      */
+    @Uninterruptible
+    @KernelSpace
     protected final int[] getIrqCounters() {
         return irqCount;
     }

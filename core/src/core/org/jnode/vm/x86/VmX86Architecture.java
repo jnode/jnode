@@ -29,6 +29,7 @@ import org.jnode.system.BootLog;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
+import org.jnode.vm.IRQManager;
 import org.jnode.vm.MemoryMapEntry;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
@@ -109,6 +110,9 @@ public abstract class VmX86Architecture extends VmArchitecture {
 
     /** The MP configuration table */
     private MPConfigTable mpConfigTable;
+    
+    /** Programmable interrupt controller */
+    private PIC8259A pic8259a;
 
     /**
      * Initialize this instance using the default compiler.
@@ -315,6 +319,21 @@ public abstract class VmX86Architecture extends VmArchitecture {
     public abstract VmProcessor createProcessor(int id,
             VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics,
             VmScheduler scheduler);
+       
+    /**
+     * @see org.jnode.vm.VmArchitecture#createIRQManager()
+     */
+    @Override
+    protected final IRQManager createIRQManager(VmProcessor processor) {
+        final VmX86Processor cpu = (VmX86Processor) processor;
+        synchronized (this) {
+            // Create PIC if not available
+            if (pic8259a == null) {
+                pic8259a = new PIC8259A();
+            }
+        }                
+        return new X86IRQManager(cpu, pic8259a);
+    }
 
     /**
      * Initialize a processor wrt. APIC and add it to the list of processors.
