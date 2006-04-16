@@ -175,6 +175,12 @@ public abstract class VmArchitecture extends VmSystemObject {
 	protected abstract VmProcessor createProcessor(int id, VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics, VmScheduler scheduler);
 
     /**
+     * Create the IRQ manager for this architecture.
+     * @return
+     */
+    protected abstract IRQManager createIRQManager(VmProcessor processor);
+    
+    /**
      * Gets the start address of the given space.
      * @return
      */
