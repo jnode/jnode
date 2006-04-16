@@ -132,6 +132,10 @@ public class InitJarProcessor {
         }
     }
 
+    /**
+     * Gets the value of Main-Class-Arg1, Main-Class-Arg2 ...  from the initjar manifest.
+     * @return the array of String arguments or an empty array if there are no arguments
+     */
     public String[] getMainClassArguments() {
         if (mf != null) {
             Attributes mainAttributes = mf.getMainAttributes();

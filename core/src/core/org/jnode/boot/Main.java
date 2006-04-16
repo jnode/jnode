@@ -95,7 +95,7 @@ public final class Main {
                     if(insatnce instanceof Runnable){
                         ((Runnable) insatnce).run();
                     } else {
-                        BootLog.warn("No valid Main-Class");
+                        BootLog.warn("No valid Main-Class found");
                     }
                 }
             }
