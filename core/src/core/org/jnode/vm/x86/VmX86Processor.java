@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86;
 
 import java.io.PrintStream;
@@ -57,7 +57,7 @@ public abstract class VmX86Processor extends VmProcessor {
     private final int[] irqCount = new int[16];
 
     /** The local API */
-    private LocalAPIC apic;
+    private LocalAPIC localAPIC;
 
     /** GDT used in this processor */
     private GDT gdt;
@@ -91,15 +91,16 @@ public abstract class VmX86Processor extends VmProcessor {
 
     /** Kernel variable (vm-inst.asm) */
     volatile int deviceNaCounter;
-    
+
     /** My performance counter accessor */
     transient X86PerformanceCounters perfCounters;
 
     /**
      * @param id
      */
-    public VmX86Processor(int id, VmX86Architecture arch, VmSharedStatics statics,
-            VmIsolatedStatics isolatedStatics, VmScheduler scheduler, X86CpuID cpuId) {
+    public VmX86Processor(int id, VmX86Architecture arch,
+            VmSharedStatics statics, VmIsolatedStatics isolatedStatics,
+            VmScheduler scheduler, X86CpuID cpuId) {
         super(id, arch, statics, isolatedStatics, scheduler);
         if (cpuId != null) {
             setCPUID(cpuId);
@@ -128,7 +129,7 @@ public abstract class VmX86Processor extends VmProcessor {
      * @return Returns the apic.
      */
     final LocalAPIC getApic() {
-        return this.apic;
+        return this.localAPIC;
     }
 
     /**
@@ -136,7 +137,7 @@ public abstract class VmX86Processor extends VmProcessor {
      *            The apic to set.
      */
     final void setApic(LocalAPIC apic) {
-        this.apic = apic;
+        this.localAPIC = apic;
     }
 
     /**
@@ -144,8 +145,8 @@ public abstract class VmX86Processor extends VmProcessor {
      * Id field.
      */
     final void loadAndSetApicID() {
-        if (this.apic != null) {
-            setId(apic.getId());
+        if (this.localAPIC != null) {
+            setId(localAPIC.getId());
         }
     }
 
@@ -158,48 +159,47 @@ public abstract class VmX86Processor extends VmProcessor {
         // used right away.
         this.rm = rm;
         final VmProcessor me = current();
-        Unsafe.debug("Startup of 0x" + NumberUtils.hex(getId(), 2) + " from "
-                + NumberUtils.hex(me.getId(), 2) + "\n");
+        Unsafe.debug("Starting up CPU " + getIdString() + " from "
+                + me.getIdString() + "\n");
 
         // Setup kernel structures
         setupStructures();
 
         // Setup the boot code
         final Address bootCode = setupBootCode(rm, gdt);
-        
-        // Make sure APIC is enabled (the apic of the current CPU!)
-        Unsafe.debug("Enabling APIC: current state " + apic.isEnabled() + "\n");
-        apic.setEnabled(true);
-        apic.clearErrors();
+
+        // Make sure Local APIC is enabled (the local apic of the current CPU!)
+        Unsafe.debug("Enabling Local APIC: current state="
+                + (localAPIC.isEnabled() ? "enabled" : "disabled") + "\n");
+        localAPIC.setEnabled(true);
+        localAPIC.clearErrors();
         // TimeUtils.loop(5000);
 
         // Send INIT IPI
-        Unsafe.debug("Sending INIT IPI\n");
-        apic.sendInitIPI(getId(), true);
-        apic.loopUntilNotBusy();
+        Unsafe.debug("Sending INIT IPI to " + getIdString() + "\n");
+        localAPIC.sendInitIPI(getId(), true);
+        localAPIC.loopUntilNotBusy();
         TimeUtils.loop(10);
 
         // Send INIT-DeAssert IPI
-        Unsafe.debug("Sending INIT-DeAssert IPI\n");
-        apic.sendInitIPI(getId(), false);
-        apic.loopUntilNotBusy();
+        Unsafe.debug("Sending INIT-DeAssert IPI to " + getIdString() + "\n");
+        localAPIC.sendInitIPI(getId(), false);
+        localAPIC.loopUntilNotBusy();
         TimeUtils.loop(10);
 
         final int numStarts = 2;
         for (int i = 0; i < numStarts; i++) {
             // Send STARTUP IPI
-            Unsafe.debug("Sending STARTUP IPI to " + getId() + "\n");
-            apic.clearErrors();
-            apic.sendStartupIPI(getId(), bootCode);
-            apic.loopUntilNotBusy();
+            Unsafe.debug("Sending STARTUP IPI to " + getIdString() + "\n");
+            localAPIC.clearErrors();
+            localAPIC.sendStartupIPI(getId(), bootCode);
+            localAPIC.loopUntilNotBusy();
             // Unsafe.debug("Not busy");
             TimeUtils.loop(100);
-            apic.clearErrors();
+            localAPIC.clearErrors();
         }
 
-        Unsafe.debug("X86 CPU Start finished\n");
-        // BootLog.info("loop 5000");
-        // TimeUtils.loop(5000);
+        Unsafe.debug("Started up " + getIdString() + "\n");
     }
 
     /**
@@ -208,7 +208,8 @@ public abstract class VmX86Processor extends VmProcessor {
      * @param stack
      * @return The new thread
      */
-    protected abstract VmX86Thread createThread(VmIsolatedStatics isolatedStatics, byte[] stack);
+    protected abstract VmX86Thread createThread(
+            VmIsolatedStatics isolatedStatics, byte[] stack);
 
     /**
      * Setup the required CPU structures. GDT, TSS, kernel stack, user stack,
@@ -220,10 +221,11 @@ public abstract class VmX86Processor extends VmProcessor {
         setupGDT(gdt);
 
         // Create user stack
-        final byte[] userStack = new byte[VmThread.DEFAULT_STACK_SLOTS * getArchitecture().getReferenceSize()];
+        final byte[] userStack = new byte[VmThread.DEFAULT_STACK_SLOTS
+                * getArchitecture().getReferenceSize()];
         setupUserStack(userStack);
         this.currentThread = createThread(getIsolatedStatics(), userStack);
-        this.stackEnd = ((VmX86Thread)currentThread).getStackEnd().toAddress();
+        this.stackEnd = ((VmX86Thread) currentThread).getStackEnd().toAddress();
 
         // gdt.dump(System.out);
     }
@@ -256,11 +258,12 @@ public abstract class VmX86Processor extends VmProcessor {
     @Uninterruptible
     static final void applicationProcessorMain() {
         final VmX86Processor cpu = (VmX86Processor) current();
-        Unsafe.debug("Starting Application Processor " + cpu.getIdString());
-              
+        Unsafe.debug("Starting Application Processor " + cpu.getIdString()
+                + "\n");
+
         // First force a load of CPUID
         cpu.getCPUID();
-        
+
         // Prepare for threading
         cpu.systemReadyForThreadSwitch();
 
@@ -271,9 +274,9 @@ public abstract class VmX86Processor extends VmProcessor {
             BootLog.error("Cannot detect logical processors", ex);
         }
 
-        // Run idle thread. 
+        // Run idle thread.
         // The scheduler will fetch other work
-        Unsafe.debug("Running normal threads on " + cpu.getIdString());
+        Unsafe.debug("Running normal threads on " + cpu.getIdString() + "\n");
         cpu.getIdleThread().run();
     }
 
@@ -292,7 +295,7 @@ public abstract class VmX86Processor extends VmProcessor {
             // No HTT
             return;
         }
-        
+
         // Prepare for threading first
         cpu.systemReadyForThreadSwitch();
 
@@ -304,29 +307,31 @@ public abstract class VmX86Processor extends VmProcessor {
             final int logId = cpu.getId() | i;
             Unsafe.debug("Adding logical CPU 0x" + NumberUtils.hex(logId, 2));
             final VmX86Processor logCpu = (VmX86Processor) arch
-                    .createProcessor(logId, Vm.getVm().getSharedStatics(), cpu.getIsolatedStatics(), cpu.getScheduler());
+                    .createProcessor(logId, Vm.getVm().getSharedStatics(), cpu
+                            .getIsolatedStatics(), cpu.getScheduler());
             logCpu.logical = true;
             arch.initX86Processor(logCpu);
             logCpu.startup(rm);
         }
     }
 
-    
     /**
      * Gets the performance counter accessor of this processor.
+     * 
      * @return
      */
     public final PerformanceCounters getPerformanceCounters() {
         if (perfCounters == null) {
             synchronized (this) {
-                if (perfCounters == null) {                
-                    perfCounters = X86PerformanceCounters.create(this, (X86CpuID)getCPUID());
+                if (perfCounters == null) {
+                    perfCounters = X86PerformanceCounters.create(this,
+                            (X86CpuID) getCPUID());
                 }
             }
         }
         return perfCounters;
     }
-    
+
     public void dumpStatistics(PrintStream out) {
         out.println(getCPUID());
         out.println("fxSave/Restore " + fxSaveCounter + "/" + fxRestoreCounter

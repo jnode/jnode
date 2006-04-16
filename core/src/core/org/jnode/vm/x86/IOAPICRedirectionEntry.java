@@ -46,7 +46,13 @@ final class IOAPICRedirectionEntry {
 
     private int high;
     
-    private static final int DESTMOD = 1 << 11;
+    // Destination mode
+    private static final int DESTMOD_MASK = 1 << 11;
+    /** Destination is specified by APIC id */
+    private static final int DESTMOD_PHYSICAL = 0;
+    /** Destination is specified by processor set */
+    private static final int DESTMOD_LOGICAL = DESTMOD_MASK;
+    
     //private static final int IRR = 1 << 14;
     private static final int TRIGGERMODE = 1 << 15;
     private static final int MASK = 1 << 16;
@@ -99,12 +105,21 @@ final class IOAPICRedirectionEntry {
     }
 
     /**
-     * Is this entry set for physical destination.
+     * Is this entry set for physical destination to an APIC ID.
      * 
      * @return True/false
      */
-    public boolean isPhysicalDestination() {
-        return ((low & DESTMOD) == 0);
+    public final boolean isPhysicalDestination() {
+        return ((low & DESTMOD_MASK) == DESTMOD_PHYSICAL);
+    }
+
+    /**
+     * Is this entry set for logical destination to set of processors.
+     * 
+     * @return True/false
+     */
+    public final boolean isLogicalDestination() {
+        return ((low & DESTMOD_MASK) == DESTMOD_LOGICAL);
     }
 
     /**
