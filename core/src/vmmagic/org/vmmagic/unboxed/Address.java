@@ -546,6 +546,7 @@ public final class Address implements UnboxedObject {
      *            the new value.
      * @return true if the attempt was successful.
      */
+    @KernelSpace
     public boolean attempt(ObjectReference old, ObjectReference value) {
         return false;
     }

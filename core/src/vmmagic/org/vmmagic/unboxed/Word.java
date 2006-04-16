@@ -21,6 +21,8 @@
  
 package org.vmmagic.unboxed;
 
+import org.jnode.vm.annotation.KernelSpace;
+
 /**
  * To be commented.
  * 
@@ -67,6 +69,7 @@ public final class Word implements UnboxedObject {
         return new Word(0);
     }
 
+    @KernelSpace
     public static Word one() {
         return new Word(1);
     }
@@ -99,6 +102,7 @@ public final class Word implements UnboxedObject {
         return new Word(this.v + w2);
     }
 
+    @KernelSpace
     public Word add(Word w2) {
         return new Word(this.v + w2.v);
     }
@@ -115,6 +119,7 @@ public final class Word implements UnboxedObject {
         return new Word(this.v - w2);
     }
 
+    @KernelSpace
     public Word sub(Word w2) {
         return new Word(this.v - w2.v);
     }
@@ -127,6 +132,7 @@ public final class Word implements UnboxedObject {
         return new Word(this.v - w2.v);
     }
 
+    @KernelSpace
     public boolean isZero() {
         return EQ(zero());
     }

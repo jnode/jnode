@@ -32,8 +32,10 @@ import org.jnode.vm.MemoryMapEntry;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmArchitecture;
+import org.jnode.vm.VmMagic;
 import org.jnode.vm.VmMultiMediaSupport;
 import org.jnode.vm.VmProcessor;
+import org.jnode.vm.VmScheduler;
 import org.jnode.vm.VmSystem;
 import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
@@ -227,7 +229,7 @@ public abstract class VmX86Architecture extends VmArchitecture {
         }
 
         // Set the APIC reference of the current (bootstrap) processor
-        final VmX86Processor cpu = (VmX86Processor) VmProcessor.current();
+        final VmX86Processor cpu = (VmX86Processor) VmMagic.currentProcessor();
         cpu.setApic(localAPIC);
         cpu.loadAndSetApicID();
 
@@ -264,7 +266,7 @@ public abstract class VmX86Architecture extends VmArchitecture {
                 if (cpuEntry.isEnabled() && !cpuEntry.isBootstrap()) {
                     // New CPU
                     final VmX86Processor newCpu = (VmX86Processor) createProcessor(
-                            cpuEntry.getApicID(), Vm.getVm().getSharedStatics(), cpu.getIsolatedStatics());
+                            cpuEntry.getApicID(), Vm.getVm().getSharedStatics(), cpu.getIsolatedStatics(), cpu.getScheduler());
                     initX86Processor(newCpu);
                     try {
                         newCpu.startup(rm);
@@ -284,7 +286,7 @@ public abstract class VmX86Architecture extends VmArchitecture {
      * 
      * @return The processor
      */
-    public abstract VmProcessor createProcessor(int id, VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics);
+    public abstract VmProcessor createProcessor(int id, VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics, VmScheduler scheduler);
 
     /**
      * Initialize a processor wrt. APIC and add it to the list of processors.

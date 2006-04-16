@@ -29,10 +29,10 @@ import org.jnode.system.ResourceNotFreeException;
 import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeUtils;
 import org.jnode.vm.CpuID;
-import org.jnode.vm.IdleThread;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmProcessor;
+import org.jnode.vm.VmScheduler;
 import org.jnode.vm.VmThread;
 import org.jnode.vm.annotation.LoadStatics;
 import org.jnode.vm.annotation.MagicPermission;
@@ -99,8 +99,8 @@ public abstract class VmX86Processor extends VmProcessor {
      * @param id
      */
     public VmX86Processor(int id, VmX86Architecture arch, VmSharedStatics statics,
-            VmIsolatedStatics isolatedStatics, X86CpuID cpuId) {
-        super(id, arch, statics, isolatedStatics);
+            VmIsolatedStatics isolatedStatics, VmScheduler scheduler, X86CpuID cpuId) {
+        super(id, arch, statics, isolatedStatics, scheduler);
         if (cpuId != null) {
             setCPUID(cpuId);
         }
@@ -304,7 +304,7 @@ public abstract class VmX86Processor extends VmProcessor {
             final int logId = cpu.getId() | i;
             Unsafe.debug("Adding logical CPU 0x" + NumberUtils.hex(logId, 2));
             final VmX86Processor logCpu = (VmX86Processor) arch
-                    .createProcessor(logId, Vm.getVm().getSharedStatics(), cpu.getIsolatedStatics());
+                    .createProcessor(logId, Vm.getVm().getSharedStatics(), cpu.getIsolatedStatics(), cpu.getScheduler());
             logCpu.logical = true;
             arch.initX86Processor(logCpu);
             logCpu.startup(rm);

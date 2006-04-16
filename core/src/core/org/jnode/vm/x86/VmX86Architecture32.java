@@ -26,6 +26,7 @@ import static org.jnode.vm.VirtualMemoryRegion.ACPI;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VirtualMemoryRegion;
 import org.jnode.vm.VmProcessor;
+import org.jnode.vm.VmScheduler;
 import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.TypeSizeInfo;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
@@ -120,8 +121,8 @@ public final class VmX86Architecture32 extends VmX86Architecture {
      * 
      * @return The processor
      */
-    public VmProcessor createProcessor(int id, VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics) {
-        return new VmX86Processor32(id, this, sharedStatics, isolatedStatics, null);
+    public VmProcessor createProcessor(int id, VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics, VmScheduler scheduler) {
+        return new VmX86Processor32(id, this, sharedStatics, isolatedStatics, scheduler, null);
     }
 
     /**

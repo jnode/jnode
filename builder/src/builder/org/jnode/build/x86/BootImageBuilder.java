@@ -49,6 +49,7 @@ import org.jnode.vm.SoftByteCodes;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmProcessor;
+import org.jnode.vm.VmScheduler;
 import org.jnode.vm.VmSystem;
 import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.VmThread;
@@ -160,16 +161,17 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 	protected VmProcessor createProcessor(VmSharedStatics statics, VmIsolatedStatics isolatedStatics)
 			throws BuildException {
 		this.sharedStatics = statics;
+        VmScheduler scheduler = new VmScheduler(getArchitecture());
 		if (processor == null) {
 			switch (bits) {
 			case 32:
 				processor = new VmX86Processor32(0,
-						(VmX86Architecture32) getArchitecture(), statics, isolatedStatics,
+						(VmX86Architecture32) getArchitecture(), statics, isolatedStatics, scheduler,
 						getCPUID());
 				break;
 			case 64:
 				processor = new VmX86Processor64(0,
-						(VmX86Architecture64) getArchitecture(), statics, isolatedStatics,
+						(VmX86Architecture64) getArchitecture(), statics, isolatedStatics, scheduler,
 						getCPUID());
 				break;
 			default:

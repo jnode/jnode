@@ -23,6 +23,7 @@ package org.jnode.vm.x86;
 
 import org.jnode.vm.VirtualMemoryRegion;
 import org.jnode.vm.VmProcessor;
+import org.jnode.vm.VmScheduler;
 import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.TypeSizeInfo;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
@@ -94,8 +95,8 @@ public final class VmX86Architecture64 extends VmX86Architecture {
 	 * @see org.jnode.vm.VmArchitecture#createProcessor(int,
 	 *      org.jnode.vm.classmgr.VmStatics)
 	 */
-	public final VmProcessor createProcessor(int id, VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics) {
-		return new VmX86Processor64(id, this, sharedStatics, isolatedStatics, null);
+	public final VmProcessor createProcessor(int id, VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics, VmScheduler scheduler) {
+		return new VmX86Processor64(id, this, sharedStatics, isolatedStatics, scheduler, null);
 	}
 
 	/**

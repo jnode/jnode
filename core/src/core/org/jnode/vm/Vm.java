@@ -262,7 +262,7 @@ public final class Vm extends VmSystemObject implements Statistics {
             final SecurityManager sm = System.getSecurityManager();
             out.println("Security manager: " + sm);
             for (VmProcessor cpu : vm.processors) {
-                out.println("Processor " + vm.processors.indexOf(cpu));
+                out.println("Processor " + vm.processors.indexOf(cpu) + " (" + cpu.getIdString() + ")");
                 cpu.dumpStatistics(out);
             }
             if ((args.length > 0) && args[0].equals("reset")) {
