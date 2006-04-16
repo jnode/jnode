@@ -140,7 +140,7 @@ int_die_halt:
 	cli
 	mov WORD [int_die_halted],1
 	PRINT_STR int_die_halt_msg
-	PRINT_WORD CURRENTPROCESSORID
+	PRINT_INT CURRENTPROCESSORID
 	hlt
 
 int_die_halt_msg: db 'Real panic: int_die_halt! ',0
@@ -157,7 +157,8 @@ int_die_halt_msg: db 'Real panic: int_die_halt! ',0
 %endmacro
 
 sys_print_intregs:
-	idm_print_reg procid, CURRENTPROCESSORID
+	PRINT_STR idm_procid
+	PRINT_INT CURRENTPROCESSORID
 	idm_print_reg intno, [rbp+INTNO]
 	idm_print_reg error, [rbp+ERROR]
 	idm_print_reg cr2, cr2
