@@ -232,6 +232,33 @@ public class X86CpuID extends CpuID {
 	        return 1;
 	    }
 	}
+    
+    /**
+     * Calculate the physical package id for the given APIC id.
+     * @param apicId
+     * @return
+     */
+    public final int getPhysicalPackageId(int apicId) {
+        int index_lsb = 0;
+        int index_msb = 31;
+        final int numLogicalProcessors = getLogicalProcessors();
+
+        int tmp = numLogicalProcessors;
+        while ((tmp & 1) == 0) {
+            tmp >>=1 ;
+            index_lsb++;
+        }
+        tmp = numLogicalProcessors;
+        while ((tmp & 0x80000000 ) == 0) {
+            tmp <<=1 ;
+            index_msb--;
+        }
+        if (index_lsb != index_msb ) {
+            index_msb++;
+        }
+        
+        return ((data[5] >> 24) & 0xFF) >> index_msb;
+    }
 	
 	/**
 	 * Has this CPU a given feature.

@@ -18,10 +18,11 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.x86;
 
 import java.nio.ByteOrder;
+import java.util.HashMap;
 
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.system.BootLog;
@@ -58,7 +59,7 @@ public abstract class VmX86Architecture extends VmArchitecture {
 
     /** Start address of the boot image (1Mb) */
     public static final int BOOT_IMAGE_START = 0x00100000;
-    
+
     // Page entry flags
     protected static final int PF_PRESENT = 0x00000001;
 
@@ -75,19 +76,28 @@ public abstract class VmX86Architecture extends VmArchitecture {
     protected static final int PF_DIRTY = 0x00000040;
 
     protected static final int PF_PSE = 0x00000080;
-    
-    protected static final int MBMMAP_BASEADDR = 0;  // 64-bit base address
-    protected static final int MBMMAP_LENGTH   = 8;  // 64-bit length
-    protected static final int MBMMAP_TYPE     = 16; // 32-bit type
-    protected static final int MBMMAP_ESIZE    = 20;
+
+    protected static final int MBMMAP_BASEADDR = 0; // 64-bit base address
+
+    protected static final int MBMMAP_LENGTH = 8; // 64-bit length
+
+    protected static final int MBMMAP_TYPE = 16; // 32-bit type
+
+    protected static final int MBMMAP_ESIZE = 20;
 
     // Values for MBMMAP_TYPE field
     protected static final int MMAP_TYPE_MEMORY = 1; // Available memory
+
     protected static final int MMAP_TYPE_RESERVED = 2; // Reserved memory
+
     protected static final int MMAP_TYPE_ACPI = 3; // ACPI reclaim memory
+
     protected static final int MMAP_TYPE_NVS = 4; // ACPI NVS memory
-    protected static final int MMAP_TYPE_UNUSABLE = 5; // Memory with errors found in it
-    
+
+    protected static final int MMAP_TYPE_UNUSABLE = 5; // Memory with errors
+
+    // found in it
+
     /** The compilers */
     private final NativeCodeCompiler[] compilers;
 
@@ -118,7 +128,7 @@ public abstract class VmX86Architecture extends VmArchitecture {
         this.compilers = new NativeCodeCompiler[2];
         this.compilers[0] = new X86StubCompiler();
         if ("L1B".equals(compiler)) {
-            this.compilers[1] = new X86Level1BCompiler();            
+            this.compilers[1] = new X86Level1BCompiler();
         } else {
             this.compilers[1] = new X86Level1ACompiler();
         }
@@ -135,17 +145,17 @@ public abstract class VmX86Architecture extends VmArchitecture {
     }
 
     /**
-	 * Gets the full name of this architecture, including operating mode.
-	 * 
-	 * @return Name
-	 */
-	public String getFullName() {
-    	if (getReferenceSize() == 4) {
-    		return getName() + "-32";
-    	} else {
-    		return getName() + "-64";    		
-    	}
-	}
+     * Gets the full name of this architecture, including operating mode.
+     * 
+     * @return Name
+     */
+    public String getFullName() {
+        if (getReferenceSize() == 4) {
+            return getName() + "-32";
+        } else {
+            return getName() + "-64";
+        }
+    }
 
     /**
      * Gets the byte ordering of this architecture.
@@ -155,17 +165,18 @@ public abstract class VmX86Architecture extends VmArchitecture {
     public final ByteOrder getByteOrder() {
         return ByteOrder.LITTLE_ENDIAN;
     }
-    
+
     /**
      * Gets the operating mode.
+     * 
      * @return
      */
     public final X86Constants.Mode getMode() {
-    	if (getReferenceSize() == 4) {
-    		return X86Constants.Mode.CODE32;
-    	} else {
-    		return X86Constants.Mode.CODE64;
-    	}
+        if (getReferenceSize() == 4) {
+            return X86Constants.Mode.CODE32;
+        } else {
+            return X86Constants.Mode.CODE64;
+        }
     }
 
     /**
@@ -240,9 +251,9 @@ public abstract class VmX86Architecture extends VmArchitecture {
                 if (apicEntry.getFlags() != 0) {
                     try {
                         // We found an enabled I/O APIC.
-                        final IOAPIC apic = new IOAPIC(rm, owner, apicEntry
+                        final IOAPIC ioAPIC = new IOAPIC(rm, owner, apicEntry
                                 .getAddress());
-                        apic.dump(System.out);
+                        ioAPIC.dump(System.out);
                         break;
                     } catch (ResourceNotFreeException ex) {
                         BootLog.error("Cannot claim I/O APIC region ", ex);
@@ -259,24 +270,39 @@ public abstract class VmX86Architecture extends VmArchitecture {
                     ex);
         }
 
-        // Find all CPU's
+        // Find all physical AP processors
+        final X86CpuID cpuId = (X86CpuID) cpu.getCPUID();
+        final HashMap<Integer, MPProcessorEntry> physCpus = new HashMap<Integer, MPProcessorEntry>();
         for (MPEntry e : mpConfigTable.entries()) {
             if (e.getEntryType() == 0) {
                 final MPProcessorEntry cpuEntry = (MPProcessorEntry) e;
                 if (cpuEntry.isEnabled() && !cpuEntry.isBootstrap()) {
-                    // New CPU
-                    final VmX86Processor newCpu = (VmX86Processor) createProcessor(
-                            cpuEntry.getApicID(), Vm.getVm().getSharedStatics(), cpu.getIsolatedStatics(), cpu.getScheduler());
-                    initX86Processor(newCpu);
-                    try {
-                        newCpu.startup(rm);
-                    } catch (ResourceNotFreeException ex) {
-                        BootLog
-                                .error(
-                                        "Cannot claim region for processor startup",
-                                        ex);
+                    // Check if it is a physical CPU
+                    final int apicId = cpuEntry.getApicID();
+                    int physId = cpuId.getPhysicalPackageId(apicId);
+                    // This algorithme is based on the specification
+                    // that physical processors are listed before logical
+                    // processors.
+                    if (!physCpus.containsKey(physId)) {
+                        // New physical CPU found
+                        physCpus.put(physId, cpuEntry);
                     }
                 }
+            }
+        }
+
+        // Start all physical AP processors
+        for (MPProcessorEntry cpuEntry : physCpus.values()) {
+            final int apicId = cpuEntry.getApicID();
+            // New CPU
+            final VmX86Processor newCpu = (VmX86Processor) createProcessor(
+                    apicId, Vm.getVm().getSharedStatics(), cpu
+                            .getIsolatedStatics(), cpu.getScheduler());
+            initX86Processor(newCpu);
+            try {
+                newCpu.startup(rm);
+            } catch (ResourceNotFreeException ex) {
+                BootLog.error("Cannot claim region for processor startup", ex);
             }
         }
     }
@@ -286,7 +312,9 @@ public abstract class VmX86Architecture extends VmArchitecture {
      * 
      * @return The processor
      */
-    public abstract VmProcessor createProcessor(int id, VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics, VmScheduler scheduler);
+    public abstract VmProcessor createProcessor(int id,
+            VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics,
+            VmScheduler scheduler);
 
     /**
      * Initialize a processor wrt. APIC and add it to the list of processors.
@@ -297,31 +325,34 @@ public abstract class VmX86Architecture extends VmArchitecture {
         cpu.setApic(localAPIC);
         super.addProcessor(cpu);
     }
-    
+
     /**
      * Print the multiboot memory map to Unsafe.debug.
      */
     protected final void dumpMultibootMMap() {
         final int cnt = UnsafeX86.getMultibootMMapLength();
         Address mmap = UnsafeX86.getMultibootMMap();
-        
+
         Unsafe.debug("Memory map\n");
         for (int i = 0; i < cnt; i++) {
-            long base = mmap.loadLong(Offset.fromIntZeroExtend(MBMMAP_BASEADDR));
-            long length = mmap.loadLong(Offset.fromIntZeroExtend(MBMMAP_LENGTH));
+            long base = mmap
+                    .loadLong(Offset.fromIntZeroExtend(MBMMAP_BASEADDR));
+            long length = mmap
+                    .loadLong(Offset.fromIntZeroExtend(MBMMAP_LENGTH));
             int type = mmap.loadInt(Offset.fromIntZeroExtend(MBMMAP_TYPE));
             mmap = mmap.add(MBMMAP_ESIZE);
-            
+
             Unsafe.debug(mmapTypeToString(type));
             Unsafe.debug(base);
             Unsafe.debug(" - ");
             Unsafe.debug(base + length - 1);
             Unsafe.debug('\n');
-        }        
+        }
     }
-    
+
     /**
      * Convert an mmap type into a human readable string.
+     * 
      * @param type
      * @return
      */
@@ -349,16 +380,19 @@ public abstract class VmX86Architecture extends VmArchitecture {
         final int cnt = UnsafeX86.getMultibootMMapLength();
         final MemoryMapEntry[] map = new MemoryMapEntry[cnt];
         Address mmap = UnsafeX86.getMultibootMMap();
-        
+
         for (int i = 0; i < cnt; i++) {
-            long base = mmap.loadLong(Offset.fromIntZeroExtend(MBMMAP_BASEADDR));
-            long length = mmap.loadLong(Offset.fromIntZeroExtend(MBMMAP_LENGTH));
+            long base = mmap
+                    .loadLong(Offset.fromIntZeroExtend(MBMMAP_BASEADDR));
+            long length = mmap
+                    .loadLong(Offset.fromIntZeroExtend(MBMMAP_LENGTH));
             int type = mmap.loadInt(Offset.fromIntZeroExtend(MBMMAP_TYPE));
             mmap = mmap.add(MBMMAP_ESIZE);
 
-            map[i] = new X86MemoryMapEntry(Address.fromLong(base), Extent.fromLong(length), type);
+            map[i] = new X86MemoryMapEntry(Address.fromLong(base), Extent
+                    .fromLong(length), type);
         }
-        
+
         return map;
     }
 
@@ -366,11 +400,11 @@ public abstract class VmX86Architecture extends VmArchitecture {
      * @see org.jnode.vm.VmArchitecture#createMultiMediaSupport()
      */
     protected VmMultiMediaSupport createMultiMediaSupport() {
-        final X86CpuID id = (X86CpuID)VmProcessor.current().getCPUID();
+        final X86CpuID id = (X86CpuID) VmProcessor.current().getCPUID();
         if (id.hasMMX()) {
             return new MMXMultiMediaSupport();
         } else {
             return super.createMultiMediaSupport();
         }
-    }        
+    }
 }
