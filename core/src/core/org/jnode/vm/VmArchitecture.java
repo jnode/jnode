@@ -172,7 +172,7 @@ public abstract class VmArchitecture extends VmSystemObject {
 	 * 
 	 * @return The processor
 	 */
-	protected abstract VmProcessor createProcessor(int id, VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics);
+	protected abstract VmProcessor createProcessor(int id, VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics, VmScheduler scheduler);
 
     /**
      * Gets the start address of the given space.
