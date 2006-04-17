@@ -113,6 +113,12 @@ public abstract class VmX86Architecture extends VmArchitecture {
     
     /** Programmable interrupt controller */
     private PIC8259A pic8259a;
+    
+    /** The boot processor */
+    private transient VmX86Processor bootProcessor;
+    
+    /** The centralized irq manager */
+    private transient X86IRQManager irqManager;
 
     /**
      * Initialize this instance using the default compiler.
@@ -207,6 +213,10 @@ public abstract class VmX86Architecture extends VmArchitecture {
      * @see org.jnode.vm.VmArchitecture#initializeProcessors(ResourceManager)
      */
     protected final void initializeProcessors(ResourceManager rm) {
+        // Mark current cpu as bootprocessor
+        final VmX86Processor bootCpu = (VmX86Processor) VmMagic.currentProcessor();
+        this.bootProcessor = bootCpu;
+        bootCpu.setBootProcessor(true);
 
         final String cmdLine = VmSystem.getCmdLine();
         if (cmdLine.indexOf("mp=no") >= 0) {
@@ -244,9 +254,8 @@ public abstract class VmX86Architecture extends VmArchitecture {
         }
 
         // Set the APIC reference of the current (bootstrap) processor
-        final VmX86Processor cpu = (VmX86Processor) VmMagic.currentProcessor();
-        cpu.setApic(localAPIC);
-        cpu.loadAndSetApicID();
+        bootCpu.setApic(localAPIC);
+        bootCpu.loadAndSetApicID();
 
         // Find & initialize this I/O APIC.
         for (MPEntry entry : mpConfigTable.entries()) {
@@ -275,7 +284,7 @@ public abstract class VmX86Architecture extends VmArchitecture {
         }
 
         // Find all physical AP processors
-        final X86CpuID cpuId = (X86CpuID) cpu.getCPUID();
+        final X86CpuID cpuId = (X86CpuID) bootCpu.getCPUID();
         final HashMap<Integer, MPProcessorEntry> physCpus = new HashMap<Integer, MPProcessorEntry>();
         for (MPEntry e : mpConfigTable.entries()) {
             if (e.getEntryType() == 0) {
@@ -300,8 +309,8 @@ public abstract class VmX86Architecture extends VmArchitecture {
             final int apicId = cpuEntry.getApicID();
             // New CPU
             final VmX86Processor newCpu = (VmX86Processor) createProcessor(
-                    apicId, Vm.getVm().getSharedStatics(), cpu
-                            .getIsolatedStatics(), cpu.getScheduler());
+                    apicId, Vm.getVm().getSharedStatics(), bootCpu
+                            .getIsolatedStatics(), bootCpu.getScheduler());
             initX86Processor(newCpu);
             try {
                 newCpu.startup(rm);
@@ -309,6 +318,10 @@ public abstract class VmX86Architecture extends VmArchitecture {
                 BootLog.error("Cannot claim region for processor startup", ex);
             }
         }
+        
+        // If there is more then one CPU, start sending timeslice interrupts now
+        BootLog.info("Activating timeslice interrupts");
+        bootCpu.activateTimeSliceInterrupts();
     }
 
     /**
@@ -325,14 +338,16 @@ public abstract class VmX86Architecture extends VmArchitecture {
      */
     @Override
     protected final IRQManager createIRQManager(VmProcessor processor) {
-        final VmX86Processor cpu = (VmX86Processor) processor;
         synchronized (this) {
             // Create PIC if not available
             if (pic8259a == null) {
                 pic8259a = new PIC8259A();
             }
+            if (irqManager == null) {
+                irqManager = new X86IRQManager(bootProcessor, pic8259a);
+            }
         }                
-        return new X86IRQManager(cpu, pic8259a);
+        return irqManager;
     }
 
     /**

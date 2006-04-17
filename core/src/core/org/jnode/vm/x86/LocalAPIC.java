@@ -27,9 +27,13 @@ import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeUtils;
+import org.jnode.vm.annotation.Inline;
+import org.jnode.vm.annotation.KernelSpace;
 import org.jnode.vm.annotation.MagicPermission;
+import org.jnode.vm.annotation.Uninterruptible;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
+import org.vmmagic.unboxed.Word;
 
 
 /**
@@ -159,6 +163,28 @@ final class LocalAPIC {
     }
     
     /**
+     * Send a FIXED interrupt on the inter processor bus.
+     * @param dstId
+     * @param dstShorthand
+     * @param vector Interrupt vector
+     */
+    @KernelSpace
+    @Uninterruptible
+    @Inline
+    final void sendFixedIPI(int dstId, int dstShorthand, int vector) {
+        // Wait until not busy
+        while (isIPIPending()) {
+            // Wait
+        }
+        
+        final int high = (dstId & 0xFF) << 24;
+        int low = ICR_DELIVERY_MODE_FIXED | ICR_DESTINATION_MODE_PHYSICAL | dstShorthand;
+        low |= (vector & 0xFF);
+        mem.setInt(REG_ICR_HIGH, high);
+        mem.setInt(REG_ICR_LOW, low);
+    }
+    
+    /**
      * Wait until the IPI is finished.
      */
     public final void loopUntilNotBusy() {
@@ -177,8 +203,26 @@ final class LocalAPIC {
     }
     
     /**
+     * Get the current error flags.
+     */
+    public final int getErrors() {
+        return mem.getInt(REG_ESR);
+    }
+    
+    /**
+     * Gets the address if the EOI register.
+     * @return
+     */
+    final Address getEOIAddress() {
+        return mem.getAddress().add(Word.fromIntZeroExtend(REG_EOI));
+    }
+    
+    /**
      * Is an IPI pending?
      */
+    @KernelSpace
+    @Uninterruptible
+    @Inline
     public final boolean isIPIPending() {
         return ((mem.getInt(REG_ICR_LOW) & ICR_DELIVERY_STATUS_PENDING) != 0);
     }

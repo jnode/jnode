@@ -68,7 +68,12 @@ TSS_DS		equ 0x38
 %1:
 %endmacro
 
-%define KERNEL_STACKEND		(kernel_stack + (VmThread_STACK_OVERFLOW_LIMIT_SLOTS * SLOT_SIZE))
+%define BOOT_KERNEL_STACKEND		(kernel_stack + (VmThread_STACK_OVERFLOW_LIMIT_SLOTS * SLOT_SIZE))
+%ifdef BITS32
+	%define KERNELSTACKEND 			dword[fs:VmProcessor_KERNELSTACKEND_OFS]
+%else
+	%define KERNELSTACKEND 			qword[r12+VmProcessor_KERNELSTACKEND_OFS]
+%endif
 
 %include "kernel.asm"
 %include "cpu.asm"
@@ -100,6 +105,8 @@ TSS_DS		equ 0x38
 	%define DEVICENACOUNTER			dword[fs:VmX86Processor_DEVICENACOUNTER_OFS]
 	%define FXSAVECOUNTER			dword[fs:VmX86Processor_FXSAVECOUNTER_OFS]
 	%define FXRESTORECOUNTER		dword[fs:VmX86Processor_FXRESTORECOUNTER_OFS]
+	%define SENDTIMESLICEINTERRUPT	dword[fs:VmX86Processor_SENDTIMESLICEINTERRUPT_OFS]
+	%define LOCALAPICEOI			dword[fs:VmX86Processor_LOCALAPICEOIADDRESS_OFS]
 %else
 	%define THREADSWITCHINDICATOR	dword[r12+VmProcessor_THREADSWITCHINDICATOR_OFS]
 	%define CURRENTPROCESSOR		qword[r12+VmProcessor_ME_OFS]
@@ -114,6 +121,8 @@ TSS_DS		equ 0x38
 	%define DEVICENACOUNTER			qword[r12+VmX86Processor_DEVICENACOUNTER_OFS]
 	%define FXSAVECOUNTER			qword[r12+VmX86Processor_FXSAVECOUNTER_OFS]
 	%define FXRESTORECOUNTER		qword[r12+VmX86Processor_FXRESTORECOUNTER_OFS]
+	%define SENDTIMESLICEINTERRUPT	qword[r12+VmX86Processor_SENDTIMESLICEINTERRUPT_OFS]
+	%define LOCALAPICEOI			qword[r12+VmX86Processor_LOCALAPICEOIADDRESS_OFS]
 %endif
 
 ; Invoke the method in EAX
