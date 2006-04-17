@@ -92,7 +92,7 @@ public abstract class Preferences {
      * "java.util.prefs.PreferencesFactory" is not set.
      */
     private static final String defaultFactoryClass
-        = "gnu.java.util.prefs.MemoryBasedFactory";
+        = "gnu.java.util.prefs.FileBasedFactory";
 
     /** Permission needed to access system or user root. */
     private static final Permission prefsPermission
