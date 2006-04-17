@@ -344,26 +344,28 @@ public final class SwingToolkit extends JNodeToolkit {
         Component comp = desktopFrame.getDesktop().getComponentAt(x,y);
         if(comp instanceof SwingBaseWindow){
             SwingBaseWindow base = (SwingBaseWindow) comp;
-            Window w = base.getAWTComponent();
-            if(w instanceof Frame){
-                MenuBar mb = ((Frame)w).getMenuBar();
-                if(mb != null){
-                    JMenuBar jmb = ((SwingMenuBarPeer)mb.getPeer()).jComponent;
-                    Point p = new Point(x,y);
-                    SwingUtilities.convertPointFromScreen(p, jmb);
-                    comp = SwingUtilities.getDeepestComponentAt(jmb, p.x, p.y);
-                    if(comp != null && (comp != jmb || comp == jmb && jmb.contains(p.x,p.y))){
-                        return comp;
+            if(base.isShowing()){
+                Window w = base.getAWTComponent();
+                if(w instanceof Frame){
+                    MenuBar mb = ((Frame)w).getMenuBar();
+                    if(mb != null){
+                        JMenuBar jmb = ((SwingMenuBarPeer)mb.getPeer()).jComponent;
+                        Point p = new Point(x,y);
+                        SwingUtilities.convertPointFromScreen(p, jmb);
+                        comp = SwingUtilities.getDeepestComponentAt(jmb, p.x, p.y);
+                        if(comp != null && (comp != jmb || comp == jmb && jmb.contains(p.x,p.y))){
+                            return comp;
+                        }
                     }
                 }
-            }
-            Point p = new Point(x,y);
-            SwingUtilities.convertPointFromScreen(p, w);
-            comp = SwingUtilities.getDeepestComponentAt(w, p.x, p.y);
-            if(comp == w){
-                p = new Point(x,y);
-                SwingUtilities.convertPointFromScreen(p, base);
-                comp = SwingUtilities.getDeepestComponentAt(base, p.x, p.y);
+                Point p = new Point(x,y);
+                SwingUtilities.convertPointFromScreen(p, w);
+                comp = SwingUtilities.getDeepestComponentAt(w, p.x, p.y);
+                if(comp == w){
+                    p = new Point(x,y);
+                    SwingUtilities.convertPointFromScreen(p, base);
+                    comp = SwingUtilities.getDeepestComponentAt(base, p.x, p.y);
+                }
             }
         } else {
             comp = super.getTopComponentAt(x, y);
