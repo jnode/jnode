@@ -23,6 +23,8 @@ package org.jnode.system;
 
 import java.nio.ByteBuffer;
 
+import org.jnode.vm.annotation.KernelSpace;
+import org.jnode.vm.annotation.Uninterruptible;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.Offset;
@@ -94,6 +96,8 @@ public interface MemoryResource extends Resource {
 	 * @param memPtr
 	 * @return int
 	 */
+    @KernelSpace
+    @Uninterruptible
 	public abstract int getInt(int memPtr);
 	
 	/**
@@ -357,6 +361,8 @@ public interface MemoryResource extends Resource {
 	 * @param memPtr
 	 * @param value
 	 */	
+    @KernelSpace
+    @Uninterruptible
 	public abstract void setInt(int memPtr, int value);
 
 	/**

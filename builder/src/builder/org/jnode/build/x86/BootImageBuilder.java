@@ -375,6 +375,12 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 				"applicationProcessorMain", "()V"));
 		os.getObjectRef(new Label("VmX86Processor_applicationProcessorMain"))
 				.link(refJava);
+
+        // Link VmX86Processor_broadcastTimeSliceInterrupt
+        refJava = os.getObjectRef(x86ProcessorClass.getMethod(
+                "broadcastTimeSliceInterrupt", "()V"));
+        os.getObjectRef(new Label("VmX86Processor_broadcastTimeSliceInterrupt"))
+                .link(refJava);
 	}
 
 	/**

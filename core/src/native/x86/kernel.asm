@@ -202,6 +202,7 @@ go_user_cs:
 	; Setup current processor
 	mov r12, vmCurProcessor
 %endif	
+	mov KERNELSTACKEND, BOOT_KERNEL_STACKEND
 	sti
 
 	; Set tracing on

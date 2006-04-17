@@ -19,7 +19,7 @@ final class X86IRQManager extends IRQManager {
      * @param irqCount
      */
     X86IRQManager(VmX86Processor cpu, PIC8259A pic8259a) {
-        super(cpu.getIrqCounters());
+        super(cpu.getIrqCounters(), cpu);
         this.pic8259a = pic8259a;
     }
 

@@ -9,6 +9,7 @@
 	extern VmSystem_initialized
 	extern SoftByteCodes_systemException
 	extern VmProcessor_reschedule
+	extern VmX86Processor_broadcastTimeSliceInterrupt
 	global currentTimeMillisStaticsIdx
 	
 currentTimeMillisStaticsIdx	DA 0
@@ -26,6 +27,21 @@ stub_yieldPointHandler:
 	int_entry
 	mov ABP,ASP
 	call yieldPointHandler
+	int_exit
+	
+; -----------------------------------------------
+; Low level Timeslice Handler
+; This low level interrupt handler is coded
+; by hand for optimal speed.
+; -----------------------------------------------
+
+stub_timesliceHandler:
+	push dword 0		; Error code
+	push dword 0		; INTNO (not relevant)
+	push dword 0		; Handler (not relevant)
+	int_entry
+	mov ABP,ASP
+	call timesliceHandler
 	int_exit
 	
 ; -----------------------------------------------
@@ -121,9 +137,10 @@ yieldPointHandler_reschedule:
 	; Actually call VmScheduler.reschedule (in kernel mode!)
 	push ABP
 	xor ABP,ABP						; Make java stacktraces terminate
-	mov STACKEND,KERNEL_STACKEND	; Set kernel stack end for correct stackoverflow tests
+	mov AAX,KERNELSTACKEND
+	mov STACKEND,AAX				; Set kernel stack end for correct stackoverflow tests
 	mov AAX,VmProcessor_reschedule	; Load reschedule method
-	push dword vmCurProcessor		; this
+	push CURRENTPROCESSOR			; this
 	INVOKE_JAVA_METHOD
 	pop ABP
 	; Now save the current thread state
@@ -316,6 +333,21 @@ timer_handler:
 	add DEADLOCKCOUNTER, 1
 	test DEADLOCKCOUNTER, 0x4000
 	jnz timer_deadlock
+	
+	; Broadcast timeslice interrupt (if needed)
+	test SENDTIMESLICEINTERRUPT, 1
+	jz timer_ret
+	; Call VmX86Processor.broadcastTimeSliceInterrupt (in kernel mode!)
+	push ABP
+	xor ABP,ABP						; Make java stacktraces terminate
+	mov AAX,KERNELSTACKEND
+	mov STACKEND,AAX				; Set kernel stack end for correct stackoverflow tests
+	mov AAX,VmX86Processor_broadcastTimeSliceInterrupt ; Load broadcastTimeSliceInterrupt method
+	mov byte [0xb8000+79*2],'1'
+	push CURRENTPROCESSOR			; this
+	INVOKE_JAVA_METHOD
+	mov byte [0xb8000+79*2],'2'
+	pop ABP
 timer_ret:
 	mov al,0x60 ; EOI IRQ0
 	out 0x20,al
@@ -327,6 +359,21 @@ timer_deadlock:
 	jnz timer_ret
 	PRINT_STR deadLock_msg
 	jmp int_die
+	
+; -----------------------------------------------
+; Handle a timeslice interrupt broadcasted by the boot processor
+; -----------------------------------------------
+timesliceHandler:
+	; Set a thread switch needed indicator
+	inc byte [0xb8000+78*2]
+	or THREADSWITCHINDICATOR, VmProcessor_TSI_SWITCH_NEEDED
+	add DEADLOCKCOUNTER, 1
+	test DEADLOCKCOUNTER, 0x4000
+	jnz timer_deadlock
+	; Send EOI to local APIC
+	mov AAX,LOCALAPICEOI
+	mov dword [AAX],0
+	ret
 	
 ; -----------------------------------------------
 ; Handle an IRQ interrupt

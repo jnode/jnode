@@ -37,6 +37,7 @@ import org.jnode.vm.VmThread;
 import org.jnode.vm.annotation.KernelSpace;
 import org.jnode.vm.annotation.LoadStatics;
 import org.jnode.vm.annotation.MagicPermission;
+import org.jnode.vm.annotation.NoFieldAlignments;
 import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.jnode.vm.annotation.Uninterruptible;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
@@ -44,6 +45,7 @@ import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.performance.PerformanceCounters;
 import org.jnode.vm.x86.performance.X86PerformanceCounters;
 import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.MagicUtils;
 import org.vmmagic.unboxed.Word;
 
 /**
@@ -51,20 +53,34 @@ import org.vmmagic.unboxed.Word;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@NoFieldAlignments
+@Uninterruptible
 @MagicPermission
 public abstract class VmX86Processor extends VmProcessor {
 
+    /** Interrupt vector for Timeslice interrupt */
+    private static final int TIMESLICE_VECTOR = 0x33;
+    
     /** The IRQ counters */
     private final int[] irqCount = new int[X86IRQManager.IRQ_COUNT];
 
     /** The local API */
     private LocalAPIC localAPIC;
+    
+    /** Memory address of the EOI register in the local APIC */
+    private Address localApicEOIAddress;
 
     /** GDT used in this processor */
     private GDT gdt;
 
     /** Is this a logical processor? */
     private boolean logical = false;
+    
+    /** Is this the boot processor? */
+    private boolean bootProcessor;
+    
+    /** Must the processor send timeslice interrupts to other cpu's (vm_ints.asm) */
+    volatile Word sendTimeSliceInterrupt;
 
     /** The resource manager */
     private ResourceManager rm;
@@ -141,6 +157,7 @@ public abstract class VmX86Processor extends VmProcessor {
      */
     final void setApic(LocalAPIC apic) {
         this.localAPIC = apic;
+        this.localApicEOIAddress = apic.getEOIAddress();
     }
 
     /**
@@ -336,8 +353,47 @@ public abstract class VmX86Processor extends VmProcessor {
     }
 
     public void dumpStatistics(PrintStream out) {
-        out.println(getCPUID());
-        out.println("fxSave/Restore " + fxSaveCounter + "/" + fxRestoreCounter
+        out.println("Type       : " + (bootProcessor ? "BSP" : (logical ? "AP-logical" : "AP")));
+        out.println("CPUID      : " + getCPUID());
+        out.println("fxSave/Res : " + fxSaveCounter + "/" + fxRestoreCounter
                 + "/" + deviceNaCounter);
+        out.println("Local APIC : " + ((localAPIC == null) ? "not present" : ((localAPIC.isEnabled() ? "enabled" : "disabled") + NumberUtils.hex(localAPIC.getErrors(), 4))));
+        out.println("TimeSliceBC: " + (sendTimeSliceInterrupt.isZero() ? "disabled" : "enabled"));
+        out.println("TSI        : " + MagicUtils.toString(getTSIAddress().loadWord()));
+    }
+    
+    /**
+     * Broadcast a timeslice interrupt to all other processors.
+     *
+     */
+    @LoadStatics
+    @KernelSpace
+    @Uninterruptible
+    final void broadcastTimeSliceInterrupt() {
+//        Unsafe.debug("broadcast ts-int\n");
+        localAPIC.sendFixedIPI(0, LocalAPIC.ICR_DESTINATION_SHORTHAND_ALL_EX_SELF, TIMESLICE_VECTOR);
+//        Unsafe.debug("end broadcast ts-int\n");
+    }
+
+    /**
+     * Is this processor the boot processor?
+     * @return the bootProcessor
+     */
+    public final boolean isBootProcessor() {
+        return bootProcessor;
+    }
+
+    /**
+     * @param bootProcessor the bootProcessor to set
+     */
+    final void setBootProcessor(boolean bootProcessor) {
+        this.bootProcessor = bootProcessor;
+    }
+
+    /**
+     * @param sendTimeSliceInterrupt the sendTimeSliceInterrupt to set
+     */
+    final void activateTimeSliceInterrupts() {
+        this.sendTimeSliceInterrupt = Word.one();
     }
 }

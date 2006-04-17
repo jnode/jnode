@@ -114,6 +114,7 @@ Lsetup_idt:
 	intport 0x30, yieldPointHandler, 3
 	intport 0x31, int_stack_overflow, 3
 	intport 0x32, syscallHandler, 3
+	intport 0x33, timesliceHandler, 3
 
 	lidt [idt]
 

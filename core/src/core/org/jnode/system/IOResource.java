@@ -21,6 +21,9 @@
  
 package org.jnode.system;
 
+import org.jnode.vm.annotation.KernelSpace;
+import org.jnode.vm.annotation.Uninterruptible;
+
 /**
  * I/O port resource.
  * 
@@ -67,6 +70,8 @@ public interface IOResource extends Resource {
 	 * @param portNr Absolute port number (not relative to startPort)
 	 * @param value
 	 */
+    @KernelSpace
+    @Uninterruptible
 	public abstract void outPortByte(int portNr, int value);
 
 	/**
