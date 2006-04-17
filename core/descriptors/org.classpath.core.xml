@@ -50,6 +50,9 @@
       <export name="gnu.java.security.ber.*"/>
       <export name="gnu.java.security.der.*"/>
       <export name="gnu.java.security.hash.*"/>
+      <export name="gnu.java.security.jce.hash.*"/>
+      <export name="gnu.java.security.jce.prng.*"/>
+      <export name="gnu.java.security.jce.sig.*"/>
       <export name="gnu.java.security.pkcs.*"/>
       <export name="gnu.java.security.prng.*"/>
       <export name="gnu.java.security.provider.*"/>
