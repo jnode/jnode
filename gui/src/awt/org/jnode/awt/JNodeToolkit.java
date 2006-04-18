@@ -27,20 +27,7 @@ import gnu.java.awt.peer.ClasspathFontPeer;
 import gnu.java.awt.peer.ClasspathTextLayoutPeer;
 import gnu.java.awt.peer.EmbeddedWindowPeer;
 import gnu.java.security.action.GetPropertyAction;
-import org.apache.log4j.Logger;
-import org.jnode.awt.font.FontManager;
-import org.jnode.awt.font.JNodeFontPeer;
-import org.jnode.awt.image.GIFDecoder;
-import org.jnode.awt.image.JNodeImage;
-import org.jnode.driver.DeviceException;
-import org.jnode.driver.sound.speaker.SpeakerUtils;
-import org.jnode.driver.video.AlreadyOpenException;
-import org.jnode.driver.video.FrameBufferAPI;
-import org.jnode.driver.video.Surface;
-import org.jnode.driver.video.UnknownConfigurationException;
-import org.jnode.naming.InitialNaming;
 
-import javax.naming.NamingException;
 import java.awt.AWTError;
 import java.awt.AWTException;
 import java.awt.Component;
@@ -75,10 +62,27 @@ import java.net.URLConnection;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.text.AttributedString;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+
+import javax.naming.NamingException;
+
+import org.apache.log4j.Logger;
+import org.jnode.awt.font.FontManager;
+import org.jnode.awt.font.JNodeFontPeer;
+import org.jnode.awt.image.GIFDecoder;
+import org.jnode.awt.image.JNodeImage;
+import org.jnode.driver.DeviceException;
+import org.jnode.driver.sound.speaker.SpeakerUtils;
+import org.jnode.driver.video.AlreadyOpenException;
+import org.jnode.driver.video.FrameBufferAPI;
+import org.jnode.driver.video.Surface;
+import org.jnode.driver.video.UnknownConfigurationException;
+import org.jnode.naming.InitialNaming;
 
 /**
  * @author epr
@@ -279,8 +283,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	 * @see gnu.java.awt.ClasspathToolkit#createFont(int, java.io.InputStream)
 	 */
 	public Font createFont(int format, InputStream stream) {
-		// TODO Auto-generated method stub
-		return null;
+		return getFontManager().createFont(format, stream);
 	}
 
 	/**
@@ -895,31 +898,31 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
         }
 
         public int getWidth(ImageObserver observer) {
-            return -1;
+            return 1;
         }
 
         public int getHeight(ImageObserver observer) {
-            return -1;
+            return 1;
         }
 
         public ImageProducer getSource() {
 
             return new ImageProducer() {
-                HashSet<ImageConsumer> consumers = new HashSet<ImageConsumer>();
+                Set<ImageConsumer> consumers = new HashSet<ImageConsumer>();
 
-                public void addConsumer(ImageConsumer ic) {
+                synchronized public void addConsumer(ImageConsumer ic) {
                     consumers.add(ic);
                 }
 
-                public boolean isConsumer(ImageConsumer ic) {
+                synchronized public boolean isConsumer(ImageConsumer ic) {
                     return consumers.contains(ic);
                 }
 
-                public void removeConsumer(ImageConsumer ic) {
+                synchronized public void removeConsumer(ImageConsumer ic) {
                     consumers.remove(ic);
                 }
 
-                public void startProduction(ImageConsumer ic) {
+                synchronized public void startProduction(ImageConsumer ic) {
                     consumers.add(ic);
                     for (ImageConsumer c : consumers) {
                         c.imageComplete(ImageConsumer.IMAGEERROR);
