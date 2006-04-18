@@ -56,7 +56,9 @@
     <property name="jmock.jar" value="${root.dir}/core/lib/jmock-1.0.1.jar"/>
     <property name="cglib.jar" value="${root.dir}/core/lib/cglib-2.1.jar"/>
     <property name="asm.jar" value="${root.dir}/core/lib/asm.jar"/>
-
+	<property name="jcfe.jar" value="${root.dir}/core/lib/jcfe.jar"/>
+	<property name="jfunc.jar" value="${root.dir}/core/lib/jfunc.jar"/>
+	
     <property name="log4j.jar" value="${root.dir}/core/lib/log4j-1.2.8.jar"/>
     <property name="gnu-crypto.jar" value="${root.dir}/core/lib/gnu-crypto.jar"/>
     <property name="javax-crypto.jar" value="${root.dir}/core/lib/javax-crypto.jar"/>
@@ -81,7 +83,11 @@
     <property name="sources.dist.tar.gz" value="${build.dir}/jnodesources-${jnode-ver}.tar.gz"/>
     <property name="jnode-x86.iso" value="${cdroms.dir}/jnode-x86.iso"/>
     <property name="jnode-x86-lite.iso" value="${cdroms.dir}/jnode-x86-lite.iso"/>
-
+	
+<!--
+	<!-- libraries needed for external applications -->
+	<property name="jedit.jar" value="${root.dir}/distr/lib/jedit.jar"/>
+-->
     <path id="cp">
         <pathelement location="${ant.jar}"/>
         <pathelement location="${junit.jar}"/>
@@ -94,6 +100,8 @@
         <pathelement location="${javax-crypto.jar}"/>
         <pathelement location="${basedir}/conf"/>
         <pathelement location="${beanshell.jar}"/>
+        <pathelement location="${jcfe.jar}"/>
+        <pathelement location="${jfunc.jar}"/>
     </path>
 
     <path id="cp-jnode">
@@ -189,6 +197,8 @@
             <libalias name="asm.jar" alias="${asm.jar}"/>
             <libalias name="cglib.jar" alias="${cglib.jar}"/>
         	<libalias name="mauve.jar" alias="${mauve.jar}"/>
+        	<libalias name="jcfe.jar" alias="${jcfe.jar}"/>
+        	<libalias name="jfunc.jar" alias="${jfunc.jar}"/>
 
             <libalias name="ant.jar" alias="${ant.jar}"/>
             <libalias name="ant-commons-net.jar" alias="${ant-commons-net.jar}"/>
@@ -197,7 +207,9 @@
             <libalias name="edtftpj.jar" alias="${edtftpj.jar}"/>
             <libalias name="jcifs.jar" alias="${jcifs.jar}"/>
             <libalias name="ejc.jar" alias="${ejc.jar}"/>
-        	
+<!--
+            <libalias name="jedit.jar" alias="${jedit.jar}"/>        	
+-->
             <descriptors dir="${descriptors.dir}/">
                 <include name="*.xml"/>
                 <exclude name="*plugin-list.xml"/>
