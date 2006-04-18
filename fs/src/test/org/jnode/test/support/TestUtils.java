@@ -98,53 +98,6 @@ public class TestUtils {
         return file;
     }
 
-    static public FileSystem formatDevice(Device device,
-            Class< ? extends FileSystem> fsClass, Object formatOptions)
-            throws FileSystemException, IOException {
-        log.info("<<< BEGIN formatDevice >>>");
-
-        // format the device
-        FileSystemType type = getFsType(fsClass);
-        FileSystem fs = type.format(device, formatOptions);
-        fs.close();
-
-        log.info("<<< END formatDevice >>>");
-
-        return fs;
-    }
-
-    static public FileSystem mountDevice(Device device,
-            Class< ? extends FileSystem> fsClass, boolean readOnly)
-            throws IOException, FileSystemException, NameNotFoundException {
-        log.debug("<<< BEGIN mountDevice >>>");
-
-        // mount the device
-        FileSystemType type = getFsType(fsClass);
-        FileSystem fs = type.create(device, readOnly);
-
-        log.debug("<<< END mountDevice >>>");
-
-        return fs;
-    }
-
-    static public FileSystemType getFsType(Class< ? extends FileSystem> fsClass) {
-        FileSystemType fsType = null;
-        if (fsClass == FatFileSystem.class)
-            fsType = new FatFileSystemType();
-        else if (fsClass == Ext2FileSystem.class)
-            fsType = new Ext2FileSystemType();
-        else if (fsClass == ISO9660FileSystem.class)
-            fsType = new ISO9660FileSystemType();
-        else if (fsClass == NTFSFileSystem.class)
-            fsType = new NTFSFileSystemType();
-
-        if (fsType != null)
-            return fsType;
-
-        throw new UnsupportedOperationException(fsClass.getName()
-                + " is unsupported");
-    }
-
     static public void listEntries(Iterator<? extends FSEntry> iterator) throws Exception {
         log.debug("<<< BEGIN listEntries >>>");
         int i = 0;
@@ -419,17 +372,6 @@ public class TestUtils {
             }
 
         return true;
-    }
-
-    static public String[] getEmptyDirNames(Class fsClass, boolean isRoot) {
-        if (fsClass == Ext2FileSystem.class)
-            return new String[] { ".", "..", "lost+found" };
-        else if (fsClass == ISO9660FileSystem.class)
-            return new String[] { ".", ".." };
-        else if (fsClass == NTFSFileSystem.class)
-            return new String[] { "." };
-        else
-            return null;
     }
 
     static public RamDiskDevice createRamDisk(int size) {

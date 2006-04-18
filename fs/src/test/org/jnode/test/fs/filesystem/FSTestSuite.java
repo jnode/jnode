@@ -21,120 +21,59 @@
  
 package org.jnode.test.fs.filesystem;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import junit.extensions.jfunc.JFuncSuite;
+import junit.extensions.jfunc.textui.JFuncRunner;
 
-import org.jnode.test.fs.filesystem.config.DeviceParam;
-import org.jnode.test.fs.filesystem.config.FS;
-import org.jnode.test.fs.filesystem.config.FSAccessMode;
 import org.jnode.test.fs.filesystem.config.FSTestConfig;
-import org.jnode.test.fs.filesystem.config.FSType;
-import org.jnode.test.fs.filesystem.config.FileParam;
-import org.jnode.test.fs.filesystem.config.OsType;
 import org.jnode.test.fs.filesystem.tests.BasicFSTest;
 import org.jnode.test.fs.filesystem.tests.ConcurrentAccessFSTest;
 import org.jnode.test.fs.filesystem.tests.FileFSTest;
 import org.jnode.test.fs.filesystem.tests.TreeFSTest;
-import org.jnode.test.support.AbstractTestSuite;
-import org.jnode.test.support.TestConfig;
 
-public class FSTestSuite extends AbstractTestSuite
+public class FSTestSuite extends JFuncSuite
 {
+	public static void main(String[] args) throws Throwable {
+		//JFuncRunner.run(FSTestSuite.suite());
+		//JFuncRunner.main(new String[]{"-v", "--color", FSTestSuite.class.getName()});
+		JFuncRunner.main(new String[]{"-v", FSTestSuite.class.getName()});
+	}
+	
 	public FSTestSuite()
 	{
 		System.out.println("new FSTestSuite");
 	}
 	
+	public static JFuncSuite suite() throws Throwable
+	{
+		JFuncSuite suite = new JFuncSuite();
 
-    public List<TestConfig> getConfigs()
-    {
-        List<TestConfig> configs = new ArrayList<TestConfig>();
-        String tempDir = System.getProperty("java.io.tmpdir");
-		final String diskFileName = tempDir + File.separatorChar + "diskimg.WRK";
-		
-        configs.addAll(createFileConfigs(OsType.OTHER_OS, FSType.EXT2, 
-                FSAccessMode.BOTH, "1", DO_FORMAT, diskFileName, "1M"));
-
-        configs.addAll(createFileConfigs(OsType.OTHER_OS, FSType.EXT2, 
-                FSAccessMode.BOTH, "4", DO_FORMAT, diskFileName, "1M"));
-		
-//        configs.addAll(createFileConfigs(OsType.OTHER_OS, FSType.NTFS, 
-//                FSAccessMode.BOTH, "", DO_FORMAT, diskFileName, "1M"));
-
-        configs.addAll(createFileConfigs(OsType.OTHER_OS, FSType.FAT, 
-                FSAccessMode.BOTH, "12", DO_FORMAT, diskFileName, "1M"));
-		
-        configs.addAll(createFileConfigs(OsType.OTHER_OS, FSType.FAT, 
-                FSAccessMode.BOTH, "16", DO_FORMAT, diskFileName, "1M"));
-
-        configs.addAll(createFileConfigs(OsType.OTHER_OS, FSType.FAT, 
-                FSAccessMode.BOTH, "32", DO_FORMAT, diskFileName, "1M"));
-        		
-//        configs.addAll(createFileConfigs(OsType.OTHER_OS, FSType.ISO9660, 
-//                FSAccessMode.BOTH, "", DO_FORMAT, diskFileName, "1M"));
-		
-/*        
-        configs.addAll(createConfigs(OsType.JNODE_OS, FSType.EXT2, 
-                FSAccessMode.BOTH, "1", DO_FORMAT));
-        //<workDevice name="hdb5" />
-    
-        configs.addAll(createConfigs(OsType.JNODE_OS, FSType.EXT2, 
-                FSAccessMode.BOTH, null, DO_NOT_FORMAT));
-        //<workRamdisk size="1M" />
-*/
-        
-        return configs;
-    }
-    
-    public Class[] getTestSuites()
-    {
-        return new Class[]
-                  {
-                          BasicFSTest.class, 
-                          FileFSTest.class, 
-                          TreeFSTest.class, 
-                          ConcurrentAccessFSTest.class
-                  };
-    }
-    
-    public static final boolean DO_FORMAT = true;
-    public static final boolean DO_NOT_FORMAT = false;
-
-    static private List<FSTestConfig> createFileConfigs(OsType osType, FSType fsType, 
-            FSAccessMode accessMode, String options, boolean format, String fileSize, String fileName)
-    {
-        FileParam fp = new FileParam(fileSize, fileName);
-        return createConfigs(osType, fsType, 
-                accessMode, options, format, fp);        
-    }
-    
-    static private List<FSTestConfig> createConfigs(OsType osType, FSType fsType, 
-            FSAccessMode accessMode, String options, boolean format, DeviceParam device)
-    {
-        List<FSTestConfig> configs = new ArrayList<FSTestConfig>();
-        
-        if(osType.isCurrentOS())
+        for(FSTestConfig config : new FSConfigurations())
         {
-            if(accessMode.doReadOnlyTests())
-            {                   
-                // true=readOnly mode 
-                FS fs = new FS(fsType, true, options, format);
-                
-                FSTestConfig cfg = new FSTestConfig(osType, fs, device);
-                configs.add(cfg);
-            }
+            BasicFSTest basicTest = (BasicFSTest) suite.getTestProxy(new BasicFSTest());
+            basicTest.testAddDirectory(config);
+            basicTest.testAddFile(config);
+            basicTest.testAddFileThenRemountFSAndGetFile(config);
+            basicTest.testGetRootEntry(config);
+            basicTest.testListRootEntries(config);
+            basicTest.testRemoveThenRemountFSAndGetEntry(config);
             
-            if(accessMode.doReadWriteTests())
-            {
-                // false=readWrite mode 
-                FS fs = new FS(fsType, false, options, format);
-                
-                FSTestConfig cfg = new FSTestConfig(osType, fs, device);
-                configs.add(cfg);
-            }
+            FileFSTest fileTest = (FileFSTest) suite.getTestProxy(new FileFSTest());
+            fileTest.testSetLength(config);
+            fileTest.testWriteFileInReadOnlyMode(config);
+            fileTest.testWriteFileThenRemountFSAndRead(config);
+ 
+            TreeFSTest treeTest = (TreeFSTest) suite.getTestProxy(new TreeFSTest());
+            treeTest.testFSTree(config);
+            treeTest.testFSTreeWithRemountAndLongName(config);
+            treeTest.testFSTreeWithRemountAndShortName(config);
+ 
+            ConcurrentAccessFSTest threadTest = (ConcurrentAccessFSTest) 
+            						suite.getTestProxy(new ConcurrentAccessFSTest());
+            threadTest.testRead(config);
+            threadTest.testWrite(config);
+            threadTest.testReadWrite(config);
         }
         
-        return configs;        
-    }    
+		return suite;
+	}
 }

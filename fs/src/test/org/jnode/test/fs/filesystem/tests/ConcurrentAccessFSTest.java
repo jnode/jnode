@@ -27,7 +27,9 @@ import java.util.Vector;
 
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSFile;
+import org.jnode.fs.FileSystem;
 import org.jnode.test.fs.filesystem.AbstractFSTest;
+import org.jnode.test.fs.filesystem.config.FSTestConfig;
 import org.jnode.test.support.TestUtils;
 
 /**
@@ -50,16 +52,43 @@ public class ConcurrentAccessFSTest extends AbstractFSTest {
         super(name);
     }
 
-    /*
-     * public void testWrite() throws Throwable { if(!isReadOnly()) { FSFile
-     * file = prepareFile(); Monitor monitor = new Monitor();
-     * createWriters(monitor, file); monitor.waitAll(); assertTrue("integrity
-     * test failed", isGoodResultFile(file)); } } public void testReadWrite()
-     * throws Throwable { FSFile file = prepareFile(); Monitor monitor = new
-     * Monitor(); createReaders(monitor, file); if(!isReadOnly()) {
-     * createWriters(monitor, file); } monitor.waitAll(); assertTrue("integrity
-     * test failed", isGoodResultFile(file)); }
-     */
+    public void testRead(FSTestConfig config) throws Throwable {
+		setUp(config);
+		
+        FSFile file = prepareFile(config);
+
+        Monitor monitor = new Monitor();
+
+        createReaders(monitor, file);
+
+        monitor.waitAll();
+    }
+
+    public void testWrite(FSTestConfig config) throws Throwable {
+		if (!config.isReadOnly()) {
+			setUp(config);
+			
+			FSFile file = prepareFile(config);
+			Monitor monitor = new Monitor();
+			createWriters(monitor, file);
+			monitor.waitAll();
+			assertTrue("integrity test failed", isGoodResultFile(file));
+		}
+	}
+
+	public void testReadWrite(FSTestConfig config) throws Throwable {
+		setUp(config);
+		
+		FSFile file = prepareFile(config);
+		Monitor monitor = new Monitor();
+		createReaders(monitor, file);
+		if (!config.isReadOnly()) {
+			createWriters(monitor, file);
+		}
+		monitor.waitAll();
+		assertTrue("integrity test failed", isGoodResultFile(file));
+	}
+    
     protected void createReaders(Monitor monitor, FSFile file) {
         for (int i = 0; i < NB_READERS; i++)
             monitor.addWorker(new Reader(monitor, file, i * 2, NB_READERS * 2,
@@ -83,8 +112,8 @@ public class ConcurrentAccessFSTest extends AbstractFSTest {
         return TestUtils.equals(expData, data.array());
     }
 
-    protected FSFile prepareFile() throws Exception {
-        remountFS(false);
+    protected FSFile prepareFile(FSTestConfig config) throws Exception {
+        remountFS(config, false);
 
         final String fileName = "RWTest";
         FSEntry rootEntry = getFs().getRootEntry();
@@ -94,7 +123,7 @@ public class ConcurrentAccessFSTest extends AbstractFSTest {
         file.flush();
         assertEquals("Bad file size", FILE_SIZE_IN_WORDS * 2, file.getLength());
 
-        remountFS();
+        remountFS(config, getFs().isReadOnly());
 
         rootEntry = getFs().getRootEntry();
         entry = rootEntry.getDirectory().getEntry(fileName);
@@ -102,16 +131,6 @@ public class ConcurrentAccessFSTest extends AbstractFSTest {
         assertEquals("Bad file size", FILE_SIZE_IN_WORDS * 2, file.getLength());
 
         return file;
-    }
-
-    public void testRead() throws Throwable {
-        FSFile file = prepareFile();
-
-        Monitor monitor = new Monitor();
-
-        createReaders(monitor, file);
-
-        monitor.waitAll();
     }
 }
 

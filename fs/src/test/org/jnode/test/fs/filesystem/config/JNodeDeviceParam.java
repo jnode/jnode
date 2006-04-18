@@ -88,7 +88,7 @@ public class JNodeDeviceParam extends DeviceParam {
     }
 
     public String toString() {
-        return "Device[name=" + deviceName + "]";
+        return "Device[" + deviceName + "]";
     }
 
     /**

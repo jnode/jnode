@@ -73,7 +73,7 @@ public class ResourceParam extends DeviceParam
 
 	public String toString()
 	{
-		return "Resource(" + super.toString() + " tmpFile=" + file.getAbsolutePath() + ")";
+		return "Resource[" + " tmpFile=" + file.getAbsolutePath() + ")";
 	}
 				
 	/**

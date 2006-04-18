@@ -27,6 +27,7 @@ import java.io.IOException;
 import org.jnode.driver.Device;
 import org.jnode.driver.block.FileDevice;
 import org.jnode.test.support.TestUtils;
+import org.jnode.util.NumberUtils;
 
 /**
  * @author Fabien DUMINY 
@@ -73,28 +74,8 @@ public class FileParam extends DeviceParam
 	/**
 	 * @param size The fileSize to set.
 	 */
-	public void setSize(String size) {
-		if((size == null) || size.trim().equals(""))
-			this.fileSize = 0;
-		
-		int multiplier = 1;		
-		if(size.endsWith("G"))
-		{
-			multiplier = 1024 * 1024 * 1024;
-			size = size.substring(0, size.length() - 1);
-		}
-		else if(size.endsWith("M"))
-		{
-			multiplier = 1024 * 1024; 
-			size = size.substring(0, size.length() - 1);
-		}
-		else if(size.endsWith("K"))
-		{
-			multiplier = 1024; 			
-			size = size.substring(0, size.length() - 1);
-		}
-		
-		this.fileSize = Long.parseLong(size) * multiplier;
+	public void setSize(String size) {		
+		this.fileSize = NumberUtils.getSize(size);
 	}
 
 	/**
@@ -111,7 +92,7 @@ public class FileParam extends DeviceParam
 	 */
 	public String toString()
 	{
-		return "File[\""+file.getName() + "\" size=" + fileSize + "]";
+		return "File["+file.getName() + ' ' + NumberUtils.size(fileSize) + "]";
 	}
 	
 	private File file;
