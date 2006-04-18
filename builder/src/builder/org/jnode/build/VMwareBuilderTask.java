@@ -91,13 +91,19 @@ public class VMwareBuilderTask extends Task {
                 put(w, "nvram", "JNode.nvram");  
                 put(w, "MemTrimRate", "-1");  
                 put(w, "ide0:0.redo", "");  
-                put(w, "ethernet0.addressType", "generated");  
+                
+                put(w, "ethernet0.present", "TRUE");
+                put(w, "ethernet0.connectionType", "bridged");
+                put(w, "ethernet0.addressType", "generated");
+                put(w, "ethernet0.generatedAddress", "00:0c:29:2a:96:30");
+                put(w, "ethernet0.generatedAddressOffset", "0");
+                put(w, "ethernet0.vnet", "/dev/vmnet1");
+                put(w, "ethernet0.startConnected", "TRUE");
+                
                 put(w, "uuid.location", "56 4d 94 59 c9 96 80 88-6c 3a 37 80 04 68 c9 b2");
                 put(w, "uuid.bios", "56 4d 94 59 c9 96 80 88-6c 3a 37 80 04 68 c9 b2");
 
-                put(w, "ethernet0.generatedAddress", "00:0c:29:7f:ec:b8");  
-                put(w, "ethernet0.generatedAddressOffset", "0");  
-
+                		
                 if((logFile != null) && (logFile.trim().length() != 0))
                 {
 	                put(w, "serial0.present", "TRUE");
