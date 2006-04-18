@@ -196,18 +196,22 @@ public class Runtime
     if (status != 0)
       halt(status);
 
-    while (true)
-      try
-        {
-          exitSequence.join();
-        }
-      catch (InterruptedException e)
-        {
-          // Ignore, we've suspended indefinitely to let all shutdown
-          // hooks complete, and to let any non-zero exits through, because
-          // this is a duplicate call to exit(0).
-        }
-		}
+      while (shutdownHooks != null)
+      {
+        try
+          {
+            exitSequence.join();
+          }
+        catch (InterruptedException e)
+          {
+            // Ignore, we've suspended indefinitely to let all shutdown
+            // hooks complete, and to let any non-zero exits through, because
+            // this is a duplicate call to exit(0).
+          }
+      }
+
+      halt(status);
+    }
 
   /**
    * On first invocation, run all the shutdown hooks and return true.
@@ -289,6 +293,11 @@ public class Runtime
 	// Run finalization on all finalizable objects (even if they are
 	// still reachable).
         VMRuntime.runFinalizationForExit();
+
+        synchronized (libpath)
+          {
+            exitSequence = null;
+          }
       }
     return first;
 	}
