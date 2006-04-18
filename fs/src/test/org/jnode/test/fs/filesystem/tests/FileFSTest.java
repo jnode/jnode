@@ -25,9 +25,11 @@ import java.nio.ByteBuffer;
 
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSFile;
+import org.jnode.fs.FileSystem;
 import org.jnode.fs.ReadOnlyFileSystemException;
 import org.jnode.fs.util.FSUtils;
 import org.jnode.test.fs.filesystem.AbstractFSTest;
+import org.jnode.test.fs.filesystem.config.FSTestConfig;
 import org.jnode.test.support.TestUtils;
 
 /**
@@ -45,15 +47,17 @@ public class FileFSTest extends AbstractFSTest {
         super(name);
     }
             
-	public void testWriteFileThenRemountFSAndRead() throws Exception
+	public void testWriteFileThenRemountFSAndRead(FSTestConfig config) throws Exception
 	{
+		setUp(config);
+		
 		final String fileName = "RWTest";		
 		
 		FSDirectory rootDir = getFs().getRootEntry().getDirectory();
 		FSFile file = null;
 		ByteBuffer data = ByteBuffer.wrap(TestUtils.getTestData(FILE_SIZE_IN_WORDS));
 				
-		if(isReadOnly())
+		if(config.isReadOnly())
 		{
 			try
 			{
@@ -74,9 +78,9 @@ public class FileFSTest extends AbstractFSTest {
 			assertEquals("bad file.length after write", data.capacity(), file.getLength());			
 		}
 				
-		remountFS();
+		remountFS(config, config.isReadOnly());
 
-		if(!isReadOnly())
+		if(!config.isReadOnly())
 		{
 			FSDirectory rootDir2 = getFs().getRootEntry().getDirectory();
 			FSFile file2 = rootDir2.getEntry(fileName).getFile();
@@ -91,10 +95,12 @@ public class FileFSTest extends AbstractFSTest {
 		}
 	}
 	
-	public void testWriteFileInReadOnlyMode() throws Exception
+	public void testWriteFileInReadOnlyMode(FSTestConfig config) throws Exception
 	{
-		if(isReadOnly())
+		if(config.isReadOnly())
 		{
+			setUp(config);
+			
 			final String fileName = "RWTest";
 
 			 ByteBuffer data = ByteBuffer.wrap(addTestFile(fileName, FILE_SIZE_IN_WORDS));
@@ -116,12 +122,14 @@ public class FileFSTest extends AbstractFSTest {
 		}		
 	}
 	
-	public void testSetLength() throws Exception
+	public void testSetLength(FSTestConfig config) throws Exception
 	{
+		setUp(config);
+		
 		final int newSize = 128;
 		final String fileName = "RWTest";
 		
-		if(isReadOnly())
+		if(config.isReadOnly())
 		{
 			byte[] data = addTestFile(fileName, FILE_SIZE_IN_WORDS);
 			

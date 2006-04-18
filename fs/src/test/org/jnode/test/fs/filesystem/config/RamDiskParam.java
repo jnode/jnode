@@ -60,7 +60,7 @@ public class RamDiskParam extends JNodeDeviceParam
 	 */
 	public String toString()
 	{
-		return "Ramdisk[name="+getDeviceName()+" size=" + ramdiskSize + "]";
+		return "Ramdisk["+getDeviceName() + ' ' + NumberUtils.size(ramdiskSize) + "]";
 	}
 			
 	private long ramdiskSize;

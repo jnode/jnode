@@ -23,22 +23,22 @@ package org.jnode.test.fs.filesystem.config;
 
 import org.jnode.util.OsUtils;
 
-public class OsType
+public enum OsType
 {
     /**
      * An OS that is the JNode OS
      */
-    public static final OsType JNODE_OS = new OsType("JNodeOS");
+    JNODE_OS("JNodeOS"),
     
     /**
      * An OS that is or is not the JNode OS
      */
-    public static final OsType BOTH_OS  = new OsType("BothOS");
+    BOTH_OS("BothOS"),
     
     /**
      * An OS that is not the JNode OS
      */
-    public static final OsType OTHER_OS = new OsType("OtherOS");
+    OTHER_OS("OtherOS");
     
     private OsType(String name)
     {
@@ -62,9 +62,7 @@ public class OsType
         else
             isCurrOS = false;
         
-        System.out.println(name+".isCurrentOS="+isCurrOS);
-        
-        return isCurrOS;
+        return isCurrOS;        
     }
         
     public String toString()

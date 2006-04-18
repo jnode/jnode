@@ -25,8 +25,10 @@ import java.io.IOException;
 
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
+import org.jnode.fs.FileSystem;
 import org.jnode.fs.util.FSUtils;
 import org.jnode.test.fs.filesystem.AbstractFSTest;
+import org.jnode.test.fs.filesystem.config.FSTestConfig;
 
 /**
  * 
@@ -43,10 +45,12 @@ public class TreeFSTest extends AbstractFSTest {
         super(name);
     }
                 
-	public void testFSTree() throws IOException, Exception
+	public void testFSTree(FSTestConfig config) throws IOException, Exception
 	{
-		if(!isReadOnly())
+		if(!config.isReadOnly())
 		{
+			setUp(config);
+			
 			FSDirectory rootDir = getFs().getRootEntry().getDirectory();
 			FSEntry dir1 = rootDir.addDirectory("dir1");
 			assertNotNull("dir1 not added", rootDir.getEntry("dir1"));
@@ -61,24 +65,26 @@ public class TreeFSTest extends AbstractFSTest {
 			FSEntry gotDir1 = gotRootDir.getEntry("dir1");
 			//assertNotNull("dir1 not saved", gotDir1);
 			assertTrue("same ref (gotDir1) after remount", gotDir1==dir1);
-			assertEquals("returned bad entry",dir1.getName(), gotDir1.getName());			
+			assertEquals("returned bad entry",dir1.getName(), gotDir1.getName());
 		}
 	}
 
-	public void testFSTreeWithRemountAndShortName() throws Exception
+	public void testFSTreeWithRemountAndShortName(FSTestConfig config) throws Exception
 	{
-		doTestFSTreeWithRemount("dir1");
+		doTestFSTreeWithRemount(config, "dir1");
 	}
 	
-	public void testFSTreeWithRemountAndLongName() throws Exception
+	public void testFSTreeWithRemountAndLongName(FSTestConfig config) throws Exception
 	{
-		doTestFSTreeWithRemount("This is a Long FileName.extension");
+		doTestFSTreeWithRemount(config, "This is a Long FileName.extension");
 	}
 
-	private void doTestFSTreeWithRemount(String fileName) throws Exception
+	private void doTestFSTreeWithRemount(FSTestConfig config, String fileName) throws Exception
 	{
-		if(!isReadOnly())
+		if(!config.isReadOnly())
 		{
+			setUp(config);
+			
 			FSDirectory rootDir = getFs().getRootEntry().getDirectory();
 			log.debug("### testFSTreeWithRemount: rootDir=\n" + FSUtils.toString(rootDir, true));
 			
@@ -86,7 +92,7 @@ public class TreeFSTest extends AbstractFSTest {
 			assertNotNull("'"+fileName+"' not added", rootDir.getEntry(fileName));
 			
 			log.debug("### testFSTreeWithRemount: before remountFS");
-			remountFS();
+			remountFS(config, getFs().isReadOnly());
 			log.debug("### testFSTreeWithRemount: after remountFS");
 			
 			FSDirectory gotRootDir = getFs().getRootEntry().getDirectory();

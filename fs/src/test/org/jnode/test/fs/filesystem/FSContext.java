@@ -39,7 +39,7 @@ public class FSContext extends Context
         deviceParam = cfg.getDeviceParam(); 
         workDevice = deviceParam.getDevice();
         
-        cfg.getFileSystem().format(workDevice);
+        cfg.getFileSystem().mount(workDevice);
     }
 
     public void destroy() throws Exception

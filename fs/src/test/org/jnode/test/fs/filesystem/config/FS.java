@@ -23,7 +23,10 @@ package org.jnode.test.fs.filesystem.config;
 
 import java.io.IOException;
 
+import javax.naming.NameNotFoundException;
+
 import org.jnode.driver.Device;
+import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 
 /**
@@ -31,12 +34,12 @@ import org.jnode.fs.FileSystemException;
  * @author Fabien DUMINY
  */
 public class FS {
-	private FSType type;
-	private boolean readOnly;
-	private boolean format;
-	private String options;
+	final private FSType type;
+	final private boolean readOnly;
+	final private boolean format;
+	final private Object options;
 			
-	public FS(FSType type, boolean readOnly, String options, boolean format)
+	public FS(FSType type, boolean readOnly, Object options, boolean format)
 	{
 		this.type = type;
         this.readOnly = readOnly;
@@ -51,46 +54,24 @@ public class FS {
 		return type;
 	}
 	/**
-	 * @param type The type to set.
-	 */
-	public void setType(FSType type) {
-		this.type = type;
-	}
-	/**
 	 * @return Returns the readOnly.
 	 */
 	public boolean isReadOnly() {
 		return readOnly;
 	}
-	/**
-	 * @param readOnly The readOnly to set.
-	 */
-	public void setReadOnly(boolean readOnly) {
-		this.readOnly = readOnly;
-	}
     
-	public void format(Device device) throws FileSystemException, IOException
+	public FileSystem mount(Device device) throws FileSystemException, IOException, InstantiationException, IllegalAccessException, NameNotFoundException
 	{
 		if(format)
 			type.format(device, options);
-	}
-	
-	/**
-	 * @param format The format to set.
-	 */
-	public void setFormat(boolean format) {
-		this.format = format;
+		
+		return type.mount(device, readOnly);
 	}
 	
 	public String toString()
 	{
-		return type + (readOnly ? " ro" : " rw") + ",format=" + format;
-	}
-
-	/**
-	 * @param options The options to set.
-	 */
-	public void setOptions(String options) {
-		this.options = options;
+		return type.toString() + '(' + String.valueOf(options) +')' + 
+			   (readOnly ? " ro" : " rw") + 
+			   (format ? "" : "not") + " formatted";
 	}
 }

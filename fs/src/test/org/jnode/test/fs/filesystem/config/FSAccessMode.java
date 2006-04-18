@@ -21,22 +21,22 @@
  
 package org.jnode.test.fs.filesystem.config;
 
-public class FSAccessMode
+public enum FSAccessMode
 {
     /**
      * Do tests for access in readOnly mode
      */
-    public static final FSAccessMode READ_ONLY = new FSAccessMode("ReadOnly", true, false);
+    READ_ONLY("ReadOnly", true, false),
     
     /**
      * Do tests for access in readWrite mode
      */
-    public static final FSAccessMode READ_WRITE  = new FSAccessMode("ReadWrite", false, true);
+    READ_WRITE("ReadWrite", false, true),
     
     /**
      * Do tests for access in readOnly and in readWrite mode
      */
-    public static final FSAccessMode BOTH = new FSAccessMode("Both", true, true);
+    BOTH("Both", true, true);
     
     public String toString()
     {

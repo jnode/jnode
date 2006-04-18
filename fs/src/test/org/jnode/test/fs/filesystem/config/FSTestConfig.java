@@ -28,7 +28,7 @@ import org.jnode.test.support.TestConfig;
 /**
  * @author Fabien DUMINY
  */
-public class FSTestConfig implements TestConfig {
+public class FSTestConfig {
 
     final private DeviceParam deviceParam;
 
@@ -45,10 +45,6 @@ public class FSTestConfig implements TestConfig {
         this.deviceParam = deviceParam;
         this.os = osType;
         this.fs = fs;
-    }
-
-    final public Class getContextClass() {
-        return FSContext.class;
     }
 
     /**
