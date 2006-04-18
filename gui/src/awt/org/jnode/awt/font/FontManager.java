@@ -26,6 +26,8 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.io.InputStream;
+import java.util.Collections;
 
 import org.jnode.driver.video.Surface;
 
@@ -36,7 +38,7 @@ import org.jnode.driver.video.Surface;
 public interface FontManager {
 
 	public static final Class<FontManager> NAME = FontManager.class;//"FontManager";
-
+	
 	/**
 	 * Returns an array containing a one-point size instance of all fonts 
 	 * available in this provider. 
@@ -75,5 +77,9 @@ public interface FontManager {
 	 * @param y
 	 */
 	public void drawText(Surface g, Shape clip, AffineTransform tx, String text, Font font, int x, int y, Color color);
-
+	
+	/**
+	 * 
+	 */
+	public Font createFont(int format, InputStream stream);	
 }
