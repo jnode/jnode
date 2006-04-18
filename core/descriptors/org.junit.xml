@@ -16,7 +16,7 @@
         
   <extension point="org.jnode.security.permissions">
     <permission class="java.util.PropertyPermission" name="user.home" actions="read"/>
-	<permission class="java.io.FilePermission" name="/junit.properties" actions="read"/>    
+	<permission class="java.io.FilePermission" name="/jnode/home/junit.properties" actions="read"/>
   </extension>
 
 </plugin>
