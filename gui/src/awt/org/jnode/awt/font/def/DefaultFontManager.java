@@ -28,7 +28,9 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.io.InputStream;
 import java.security.AccessController;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -57,6 +59,9 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
     private final HashMap<String, FontProvider> providers = new HashMap<String, FontProvider>();
     private FontProvider firstProvider;
 
+	public final Map<Integer, String> fontTypeToProviderName = (Map<Integer, String>)
+								Collections.singletonMap(Font.TRUETYPE_FONT, "ttf");
+    
     /**
      * Create a new instance
      * @param providersEP
@@ -189,12 +194,57 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
         }
     }
 
+	public Font createFont(int format, InputStream stream)
+	{
+		String name = fontTypeToProviderName.get(format);
+		if(name == null) throw new IllegalArgumentException("unknown format "+name);
+
+		if(getFirstProvider().getName().equals(name))
+		{
+			//return firstProvider;
+			return null;
+		}
+		
+        for (FontProvider prv : providers.values()) {
+        	if (prv.getName().equals(name)) {
+                //return prv.;
+        		return null; //TODO
+            }
+        }
+        
+        throw new IllegalArgumentException("can't create font with format "+name);        
+	}
+
     /**
      * Gets the provider for a given font
      * @param font
      * @return The provider
      */
     private FontProvider getProvider(Font font) {
+    	FontProvider prov = getFirstProvider();
+    	final String firstProvName = prov.getName();
+    	if (prov.provides(font)) {
+    		log.debug("using firstProvider "+firstProvName);
+            return prov;
+    	}
+        
+    	log.debug("getProvider for "+font.getName()+
+					" ("+providers.size()+" availables)");    	
+        for (FontProvider prv : providers.values()) {
+        	if(firstProvName.equals(prv.getName())) continue; // skip the first provider
+        			
+        	log.debug("font="+font+" provider="+prv);            
+        	if (prv.provides(font)) {
+        		log.debug("provider found");
+                return prv;
+            }
+        }
+        log.debug("font="+font+" NO PROVIDER");
+        return null;
+    }
+    
+    private FontProvider getFirstProvider()
+    {
         final String firstProviderName = (String)AccessController.doPrivileged(new GetPropertyAction("jnode.font.renderer", "ttf"));
         if((firstProvider == null) || ((firstProvider != null) && !firstProviderName.equals(firstProvider.getName())))
         {
@@ -205,25 +255,7 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
                 }
             }
         }
-
-    	if (firstProvider.provides(font)) {
-    		log.debug("using firstProvider "+firstProviderName);
-            return firstProvider;
-    	}
-        
-    	log.debug("getProvider for "+font.getName()+
-					" ("+providers.size()+" availables)");    	
-        for (FontProvider prv : providers.values()) {
-        	if(firstProviderName.equals(prv.getName())) continue; // skip the first provider
-        			
-        	log.debug("font="+font+" provider="+prv);            
-        	if (prv.provides(font)) {
-        		log.debug("provider found");
-                return prv;
-            }
-        }
-        log.debug("font="+font+" NO PROVIDER");
-        return null;
+        return firstProvider;
     }
     
     /**
