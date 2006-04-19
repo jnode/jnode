@@ -133,6 +133,9 @@ yieldPointHandler_reschedule:
 	; Save current stackframe (so we can show stacktraces)
 	mov ADI,CURRENTTHREAD
 	SAVEREG VmX86Thread_EBP_OFS, OLD_EBP
+	; Set currentProcessor field
+	mov AAX,CURRENTPROCESSOR
+	mov [ADI+VmThread_CURRENTPROCESSOR_OFS],AAX
 
 	; Actually call VmScheduler.reschedule (in kernel mode!)
 	push ABP
@@ -176,7 +179,7 @@ yieldPointHandler_SaveMSRs:
 yieldPointHandler_fxSave:
 	; Is the FX used since the last thread switch?
 	test dword [ADI+VmX86Thread_FXFLAGS_OFS],VmX86Thread_FXF_USED
-	jz yieldPointHandler_restore	; No... do not save anything
+	jz yieldPointHandler_saveEnd	; No... do not save anything
 	; Increment counter
 	inc FXSAVECOUNTER
 	; Clear FXF_USED flag
@@ -190,17 +193,22 @@ yieldPointHandler_loadFxStatePtr:
 	test dword [cpu_features],FEAT_FXSR
 	jz yieldPointHandler_fpuSave
 	fxsave [ABX]
-	jmp yieldPointHandler_restore
+	jmp yieldPointHandler_saveEnd
 yieldPointHandler_fpuSave:
 	fnsave [ABX]
-	jmp yieldPointHandler_restore
+yieldPointHandler_saveEnd:
+	; Reset currentProcessor field
+	mov WORD [ADI+VmThread_CURRENTPROCESSOR_OFS],0
+	jmp yieldPointHandler_restore_
 
 yieldPointHandler_fxSaveInit:
 	call fixFxStatePtr
 	jmp yieldPointHandler_loadFxStatePtr
 
+
+
 	; Restore the next thread
-yieldPointHandler_restore:
+yieldPointHandler_restore_:
 	mov ADI,NEXTTHREAD
 	; For added safety, test if NEXTHREAD != null
 	test ADI,ADI

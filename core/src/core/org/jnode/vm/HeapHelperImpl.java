@@ -18,17 +18,16 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm;
 
 import org.jnode.vm.annotation.MagicPermission;
+import org.jnode.vm.annotation.Uninterruptible;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmHeapManager;
-import org.vmmagic.pragma.Uninterruptible;
-import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.ObjectReference;
@@ -38,7 +37,8 @@ import org.vmmagic.unboxed.Word;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @MagicPermission
-final class HeapHelperImpl extends HeapHelper implements Uninterruptible {
+@Uninterruptible
+final class HeapHelperImpl extends HeapHelper {
 
     private static final class ThreadRootVisitor extends VmThreadVisitor {
 
@@ -98,10 +98,14 @@ final class HeapHelperImpl extends HeapHelper implements Uninterruptible {
                 flagsOffset);
         for (;;) {
             Word oldValue = addr.prepareWord();
-            if (oldValue.and(Word.fromIntZeroExtend(ObjectFlags.GC_COLOUR_MASK)).NE(Word.fromIntZeroExtend(oldColor))) {
+            if (oldValue
+                    .and(Word.fromIntZeroExtend(ObjectFlags.GC_COLOUR_MASK))
+                    .NE(Word.fromIntZeroExtend(oldColor))) {
                 return false;
             }
-            Word newValue = oldValue.and(Word.fromIntZeroExtend(ObjectFlags.GC_COLOUR_MASK).not()).or(Word.fromIntZeroExtend(newColor));
+            Word newValue = oldValue.and(
+                    Word.fromIntZeroExtend(ObjectFlags.GC_COLOUR_MASK).not())
+                    .or(Word.fromIntZeroExtend(newColor));
             if (addr.attempt(oldValue, newValue)) {
                 return true;
             }
@@ -200,7 +204,7 @@ final class HeapHelperImpl extends HeapHelper implements Uninterruptible {
      * call a call to {@link #stopThreadsAtSafePoint()}.
      */
     public void restartThreads() {
-        VmProcessor.current().enableReschedule();
+        VmMagic.currentProcessor().enableReschedule(true);
     }
 
     /**
@@ -228,7 +232,7 @@ final class HeapHelperImpl extends HeapHelper implements Uninterruptible {
      * the calling thread (the GC thread) will continue.
      */
     public final void stopThreadsAtSafePoint() {
-        VmProcessor.current().disableReschedule();
+        VmMagic.currentProcessor().disableReschedule(true);
     }
 
     /**
@@ -251,8 +255,7 @@ final class HeapHelperImpl extends HeapHelper implements Uninterruptible {
     /**
      * @see org.jnode.vm.memmgr.HeapHelper#bootArchitecture(boolean)
      */
-    public final void bootArchitecture(boolean emptyMMap) 
-    throws UninterruptiblePragma {
+    public final void bootArchitecture(boolean emptyMMap) {
         Vm.getArch().boot(emptyMMap);
     }
 }
