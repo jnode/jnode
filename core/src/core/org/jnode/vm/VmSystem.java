@@ -431,26 +431,26 @@ public final class VmSystem {
         final VmStackFrame[] mt;
         // Address lastIP = null;
         if (current.isInSystemException()) {
-            proc.disableReschedule();
+            proc.disableReschedule(false);
             try {
                 mt = reader.getVmStackTrace(current.getExceptionStackFrame(),
                         current.getExceptionInstructionPointer(),
                         STACKTRACE_LIMIT);
             } finally {
-                proc.enableReschedule();
+                proc.enableReschedule(false);
             }
         } else if (current == proc.getCurrentThread()) {
             final Address curFrame = VmMagic.getCurrentFrame();
             mt = reader.getVmStackTrace(reader.getPrevious(curFrame), reader
                     .getReturnAddress(curFrame), STACKTRACE_LIMIT);
         } else {
-            proc.disableReschedule();
+            proc.disableReschedule(false);
             try {
                 mt = reader.getVmStackTrace(current.getStackFrame(), current
                         .getInstructionPointer(), STACKTRACE_LIMIT);
                 // lastIP = current.getInstructionPointer();
             } finally {
-                proc.enableReschedule();
+                proc.enableReschedule(false);
             }
         }
         final int cnt = (mt == null) ? 0 : mt.length;
