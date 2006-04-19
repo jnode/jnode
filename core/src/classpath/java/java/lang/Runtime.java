@@ -196,6 +196,7 @@ public class Runtime
     if (status != 0)
       halt(status);
 
+// @classpath-bugfix 27213 19/4/2006 Martin Husted Hartvig (hagar@jnode.org) :
       while (shutdownHooks != null)
       {
         try
@@ -211,6 +212,7 @@ public class Runtime
       }
 
       halt(status);
+// @classpath-bugfix-end
     }
 
   /**
@@ -294,10 +296,12 @@ public class Runtime
 	// still reachable).
         VMRuntime.runFinalizationForExit();
 
+// @classpath-bugfix 27213 19/4/2006 Martin Husted Hartvig (hagar@jnode.org) :
         synchronized (libpath)
           {
             exitSequence = null;
           }
+// @classpath-bugfix-end
       }
     return first;
 	}
