@@ -24,13 +24,13 @@ package org.jnode.shell.command;
 import java.io.InputStream;
 import java.io.PrintStream;
 
+import org.jnode.shell.Command;
+import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.ThreadNameArgument;
-import org.jnode.shell.Command;
-import org.jnode.shell.CommandLine;
-import org.jnode.vm.VmSystem;
+import org.jnode.vm.scheduler.VmThread;
 
 /**
  * Shell command to view threads or a specific thread.
@@ -105,7 +105,7 @@ public class ThreadCommand  implements Command
           stringBuffer = null;
 
 					if (threadName != null) {
-						final Object[] trace = VmSystem.getStackTrace(t.getVmThread());
+						final Object[] trace = VmThread.getStackTrace(t.getVmThread());
 						final int traceLen = trace.length;
 						for (int k = 0; k < traceLen; k++) {
               stringBuffer = new StringBuffer();

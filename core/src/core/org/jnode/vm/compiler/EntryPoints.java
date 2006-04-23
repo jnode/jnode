@@ -171,8 +171,6 @@ public class EntryPoints extends VmSystemObject {
             allocObjectMethod = testMethod(vmSoftByteCodesClass.getMethod(
                     "allocObject",
                     "(Lorg/jnode/vm/classmgr/VmType;I)Ljava/lang/Object;"));
-            systemExceptionMethod = testMethod(vmSoftByteCodesClass.getMethod(
-                    "systemException", "(II)Ljava/lang/Throwable;"));
             classCastFailedMethod = testMethod(vmSoftByteCodesClass.getMethod(
                     "classCastFailed", "(Ljava/lang/Object;Lorg/jnode/vm/classmgr/VmType;)V"));
             throwArrayOutOfBounds = testMethod(vmSoftByteCodesClass.getMethod(
@@ -203,7 +201,7 @@ public class EntryPoints extends VmSystemObject {
 
             // MonitorManager
             this.vmMonitorManagerClass = loader.loadClass(
-                    "org.jnode.vm.MonitorManager", true);
+                    "org.jnode.vm.scheduler.MonitorManager", true);
             monitorEnterMethod = testMethod(vmMonitorManagerClass.getMethod(
                     "monitorEnter", "(Ljava/lang/Object;)V"));
             monitorExitMethod = testMethod(vmMonitorManagerClass.getMethod(
@@ -247,13 +245,20 @@ public class EntryPoints extends VmSystemObject {
             this.vmConstIMethodRefSelectorField = (VmInstanceField) testField(cimrClass
                     .getField("selector"));
 
-            // VmProcessor.threadSwitchIndicator
-            final VmType procClass = loader.loadClass(
-                    "org.jnode.vm.VmProcessor", true);
-            vmThreadSwitchIndicatorOffset = ((VmInstanceField) testField(procClass
+            // VmProcessor
+            final VmType processorClass = loader.loadClass(
+                    "org.jnode.vm.scheduler.VmProcessor", true);
+            vmThreadSwitchIndicatorOffset = ((VmInstanceField) testField(processorClass
                     .getField("threadSwitchIndicator"))).getOffset();
-            yieldPoint = testMethod(procClass.getMethod("yieldPoint", "()V"));
-            vmProcessorMeField = (VmInstanceField)testField(procClass.getField("me"));
+            yieldPoint = testMethod(processorClass.getMethod("yieldPoint", "()V"));
+            vmProcessorMeField = (VmInstanceField)testField(processorClass.getField("me"));
+            vmProcessorStackEnd = (VmInstanceField) testField(processorClass
+                    .getField("stackEnd"));
+            vmProcessorSharedStaticsTable = (VmInstanceField) testField(processorClass
+                    .getField("staticsTable"));
+            vmProcessorIsolatedStaticsTable = (VmInstanceField) testField(processorClass
+                    .getField("isolatedStaticsTable"));
+
 
             // VmType
             final VmType typeClass = loader.loadClass(
@@ -272,15 +277,11 @@ public class EntryPoints extends VmSystemObject {
             vmCPCp = (VmInstanceField) testField(cpClass.getField("cp"));
 
             // VmProcessor
-            final VmType processorClass = loader.loadClass(
-                    "org.jnode.vm.VmProcessor", true);
-            vmProcessorStackEnd = (VmInstanceField) testField(processorClass
-                    .getField("stackEnd"));
-            vmProcessorSharedStaticsTable = (VmInstanceField) testField(processorClass
-                    .getField("staticsTable"));
-            vmProcessorIsolatedStaticsTable = (VmInstanceField) testField(processorClass
-                    .getField("isolatedStaticsTable"));
-
+            // VmThread
+            final VmType vmThreadClass = loader.loadClass("org.jnode.vm.scheduler.VmThread", true);
+            systemExceptionMethod = testMethod(vmThreadClass.getMethod(
+                    "systemException", "(II)Ljava/lang/Throwable;"));
+            
             // VmMethod
             final VmType vmMethodClass = loader.loadClass(
                     "org.jnode.vm.classmgr.VmMethod", true);
@@ -636,7 +637,7 @@ public class EntryPoints extends VmSystemObject {
     }
 
     /**
-     * @see org.jnode.vm.VmProcessor#yieldPoint()
+     * @see org.jnode.vm.scheduler.VmProcessor#yieldPoint()
      * @return Returns the yieldPoint.
      */
     public final VmMethod getYieldPoint() {

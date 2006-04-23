@@ -23,10 +23,11 @@ package org.jnode.vm.x86;
 
 import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.VmMagic;
-import org.jnode.vm.VmThread;
+import org.jnode.vm.annotation.Internal;
 import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.memmgr.VmHeapManager;
+import org.jnode.vm.scheduler.VmThread;
 import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.ObjectReference;
@@ -107,7 +108,8 @@ public abstract class VmX86Thread extends VmThread {
 	 * Gets the most current stackframe of this thread.
 	 * @return Stackframe 
 	 */
-	protected Address getStackFrame() {
+    @Internal
+	public final Address getStackFrame() {
 		return ebp;
 	}
 	

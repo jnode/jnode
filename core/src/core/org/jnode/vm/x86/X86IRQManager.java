@@ -3,9 +3,9 @@
  */
 package org.jnode.vm.x86;
 
-import org.jnode.vm.IRQManager;
 import org.jnode.vm.annotation.KernelSpace;
 import org.jnode.vm.annotation.Uninterruptible;
+import org.jnode.vm.scheduler.IRQManager;
 
 final class X86IRQManager extends IRQManager {
 

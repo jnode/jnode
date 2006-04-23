@@ -18,10 +18,9 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm;
 
-import org.jnode.util.NumberUtils;
 import org.jnode.vm.annotation.LoadStatics;
 import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.annotation.PrivilegedActionPragma;
@@ -36,7 +35,6 @@ import org.jnode.vm.classmgr.VmField;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.memmgr.VmHeapManager;
-import org.vmmagic.pragma.UninterruptiblePragma;
 
 /**
  * Class with software implementations of "difficult" java bytecodes.
@@ -46,23 +44,6 @@ import org.vmmagic.pragma.UninterruptiblePragma;
 @Uninterruptible
 @MagicPermission
 public final class SoftByteCodes {
-
-    public static final int EX_NULLPOINTER = 0;
-
-    public static final int EX_PAGEFAULT = 1;
-
-    public static final int EX_INDEXOUTOFBOUNDS = 2;
-
-    public static final int EX_DIV0 = 3;
-
-    public static final int EX_ABSTRACTMETHOD = 4;
-
-    public static final int EX_STACKOVERFLOW = 5;
-
-    // public static final int EX_CLASSCAST = 6;
-    public static final int EX_COPRO_OR = 7;
-
-    public static final int EX_COPRO_ERR = 8;
 
     private static VmHeapManager heapManager;
 
@@ -74,8 +55,7 @@ public final class SoftByteCodes {
      * @return boolean
      * @throws UninterruptiblePragma
      */
-    public static boolean isInstanceof(Object object, VmType T)
-            throws UninterruptiblePragma {
+    public static boolean isInstanceof(Object object, VmType T) {
         if (object == null) {
             return false;
         } else {
@@ -101,8 +81,7 @@ public final class SoftByteCodes {
      * @throws UninterruptiblePragma
      */
     public static VmField resolveField(VmMethod currentMethod,
-            VmConstFieldRef fieldRef, boolean isStatic)
-            throws UninterruptiblePragma {
+            VmConstFieldRef fieldRef, boolean isStatic) {
         if (!fieldRef.getConstClass().isResolved()) {
             resolveClass(fieldRef.getConstClass());
         }
@@ -139,7 +118,7 @@ public final class SoftByteCodes {
      * @throws UninterruptiblePragma
      */
     public static VmMethod resolveMethod(VmMethod currentMethod,
-            VmConstMethodRef methodRef) throws UninterruptiblePragma {
+            VmConstMethodRef methodRef) {
         if (!methodRef.getConstClass().isResolved()) {
             resolveClass(methodRef.getConstClass());
         }
@@ -177,8 +156,7 @@ public final class SoftByteCodes {
      * @throws UninterruptiblePragma
      */
     @PrivilegedActionPragma
-    public static VmType resolveClass(VmConstClass classRef)
-            throws UninterruptiblePragma {
+    public static VmType resolveClass(VmConstClass classRef) {
         if (classRef.isResolved()) {
             return classRef.getResolvedVmClass();
         } else {
@@ -213,8 +191,7 @@ public final class SoftByteCodes {
      * @return Object The new object
      * @throws UninterruptiblePragma
      */
-    public static Object allocObject(VmType< ? > vmClass, int size)
-            throws UninterruptiblePragma {
+    public static Object allocObject(VmType< ? > vmClass, int size) {
         VmHeapManager hm = heapManager;
         if (hm == null) {
             heapManager = hm = Vm.getHeapManager();
@@ -236,8 +213,7 @@ public final class SoftByteCodes {
      * @return The allocated array
      * @throws UninterruptiblePragma
      */
-    public static Object allocMultiArray(VmType vmClass, int[] dimensions)
-            throws UninterruptiblePragma {
+    public static Object allocMultiArray(VmType vmClass, int[] dimensions) {
         // Syslog.debug("allocMultiArray "); // + vmClass);
         return multinewarray_helper(dimensions, dimensions.length - 1,
                 (VmArrayClass) vmClass);
@@ -259,11 +235,10 @@ public final class SoftByteCodes {
      *             if one of the array sizes in dims is negative
      * @throws OutOfMemoryError
      *             if there is not enough memory to perform operation
-     * @throws UninterruptiblePragma
      */
     public static Object multinewarray_helper(int[] dims, int ind,
             VmArrayClass< ? > a) throws OutOfMemoryError,
-            NegativeArraySizeException, UninterruptiblePragma {
+            NegativeArraySizeException {
         // Syslog.debug("multinewarray_helper "); //+ " cls=" + a);
         a.initialize();
         final int length = dims[ind];
@@ -290,8 +265,7 @@ public final class SoftByteCodes {
      * @return Object The new array
      * @throws UninterruptiblePragma
      */
-    public static Object anewarray(VmType< ? > vmClass, int elements)
-            throws UninterruptiblePragma {
+    public static Object anewarray(VmType< ? > vmClass, int elements) {
 
         final VmArrayClass< ? > arrCls = vmClass.getArrayClass();
         VmHeapManager hm = heapManager;
@@ -314,7 +288,7 @@ public final class SoftByteCodes {
      * @throws UninterruptiblePragma
      */
     public static Object allocPrimitiveArray(VmType< ? > currentClass,
-            int atype, int elements) throws UninterruptiblePragma {
+            int atype, int elements) {
         VmHeapManager hm = heapManager;
         if (hm == null) {
             heapManager = hm = Vm.getHeapManager();
@@ -340,8 +314,7 @@ public final class SoftByteCodes {
      * @return Object The new array
      * @throws UninterruptiblePragma
      */
-    public static Object allocArray(VmType vmClass, int elements)
-            throws UninterruptiblePragma {
+    public static Object allocArray(VmType vmClass, int elements) {
         VmHeapManager hm = heapManager;
         if (hm == null) {
             heapManager = hm = Vm.getHeapManager();
@@ -393,79 +366,12 @@ public final class SoftByteCodes {
     }
 
     /**
-     * Create an exception for a system-trapped situation.
-     * 
-     * @param nr
-     * @param address
-     * @return Throwable
-     * @throws UninterruptiblePragma
-     */
-    @LoadStatics @PrivilegedActionPragma
-    public static Throwable systemException(int nr, int address)
-            throws UninterruptiblePragma {
-        // if (VmSystem.debug > 0) {
-        // Unsafe.debugStackTrace();
-        // }
-
-        // Do stack overflows without anything that is not
-        // absolutely needed
-        if (nr == EX_STACKOVERFLOW) {
-            if (true) {
-                Unsafe.debug("Stack overflow:\n");
-                Unsafe.debugStackTrace(50);
-                Unsafe.debug('\n');
-            }
-            throw new StackOverflowError();
-        }
-
-        if (false) {
-            Unsafe.debug(nr);
-            Unsafe.debug(address);
-            Unsafe.die("System exception");
-        }
-        // Unsafe.debug(nr); Unsafe.debug(address);
-        final String hexAddress = NumberUtils.hex(address, 8);
-        final VmThread current = VmProcessor.current().getCurrentThread();
-        // final String state = " (" + current.getReadableErrorState() + ")";
-        final String state = "";
-        // Mark a system exception, so the stacktrace uses the exception frame
-        // instead of the current frame.
-        current.setInSystemException();
-        switch (nr) {
-        case EX_NULLPOINTER:
-            return new NullPointerException("NPE at address " + hexAddress
-                    + state);
-        case EX_PAGEFAULT:
-            return new InternalError("Page fault at " + hexAddress + state);
-        case EX_INDEXOUTOFBOUNDS:
-            return new ArrayIndexOutOfBoundsException("Out of bounds at index "
-                    + address + state);
-        case EX_DIV0:
-            return new ArithmeticException("Division by zero at address "
-                    + hexAddress + state);
-        case EX_ABSTRACTMETHOD:
-            return new AbstractMethodError("Abstract method at " + hexAddress
-                    + state);
-        case EX_STACKOVERFLOW:
-            return new StackOverflowError();
-        case EX_COPRO_OR:
-            throw new ArithmeticException("Coprocessor overrun");
-        case EX_COPRO_ERR:
-            throw new ArithmeticException("Coprocessor error");
-        default:
-            return new UnknownError("Unknown system-exception at " + hexAddress
-                    + state);
-        }
-    }
-
-    /**
      * Throw an array index out of bounds exception.
      * 
      * @param array
      * @param index
      */
-    public static void throwArrayOutOfBounds(Object array, int index)
-            throws UninterruptiblePragma {
+    public static void throwArrayOutOfBounds(Object array, int index) {
         throw new ArrayIndexOutOfBoundsException(index);
     }
 
@@ -477,9 +383,9 @@ public final class SoftByteCodes {
      * @throws UninterruptiblePragma
      * @throws PrivilegedActionPragma
      */
-    @LoadStatics @PrivilegedActionPragma
-    public static void unknownOpcode(int opcode, int pc)
-            throws UninterruptiblePragma {
+    @LoadStatics
+    @PrivilegedActionPragma
+    public static void unknownOpcode(int opcode, int pc) {
         throw new Error("Unknown opcode " + opcode + " at pc " + pc);
     }
 }

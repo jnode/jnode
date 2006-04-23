@@ -22,7 +22,7 @@
 package org.jnode.vm.memmgr.def;
 
 import org.jnode.system.BootLog;
-import org.jnode.vm.Monitor;
+import org.jnode.vm.scheduler.Monitor;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

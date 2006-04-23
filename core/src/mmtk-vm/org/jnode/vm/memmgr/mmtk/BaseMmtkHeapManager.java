@@ -36,7 +36,6 @@ import org.jnode.system.ResourceOwner;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmArchitecture;
-import org.jnode.vm.VmProcessor;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmArrayClass;
 import org.jnode.vm.classmgr.VmClassLoader;
@@ -47,6 +46,7 @@ import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.HeapStatistics;
 import org.jnode.vm.memmgr.VmHeapManager;
 import org.jnode.vm.memmgr.VmWriteBarrier;
+import org.jnode.vm.scheduler.VmProcessor;
 import org.mmtk.plan.BasePlan;
 import org.mmtk.policy.Space;
 import org.mmtk.utility.heap.HeapGrowthManager;
@@ -104,7 +104,7 @@ public abstract class BaseMmtkHeapManager extends VmHeapManager implements
     }
 
     /**
-     * @see org.jnode.vm.memmgr.VmHeapManager#createProcessorHeapData(org.jnode.vm.VmProcessor)
+     * @see org.jnode.vm.memmgr.VmHeapManager#createProcessorHeapData(org.jnode.vm.scheduler.VmProcessor)
      */
     public final Object createProcessorHeapData(VmProcessor cpu) {
         try {

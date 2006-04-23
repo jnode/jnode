@@ -240,7 +240,7 @@ int_df_msg: db 'Real panic: Double fault! Halting...',0
 int_div:
 	cmp GET_OLD_CS, USER_CS
 	jne int_die
-	SYSTEM_EXCEPTION SoftByteCodes_EX_DIV0, GET_OLD_EIP
+	SYSTEM_EXCEPTION VmThread_EX_DIV0, GET_OLD_EIP
 	ret
 
 ; ---------------------------
@@ -249,7 +249,7 @@ int_div:
 int_bc:
 	cmp GET_OLD_CS, USER_CS
 	jne int_die
-	SYSTEM_EXCEPTION SoftByteCodes_EX_INDEXOUTOFBOUNDS, GET_OLD_EIP
+	SYSTEM_EXCEPTION VmThread_EX_INDEXOUTOFBOUNDS, GET_OLD_EIP
 	ret
 
 ; ---------------------------
@@ -258,7 +258,7 @@ int_bc:
 int_copro_or:
 	cmp GET_OLD_CS, USER_CS
 	jne int_die
-	SYSTEM_EXCEPTION SoftByteCodes_EX_COPRO_OR, GET_OLD_EIP
+	SYSTEM_EXCEPTION VmThread_EX_COPRO_OR, GET_OLD_EIP
 	ret
 
 ; ---------------------------
@@ -267,7 +267,7 @@ int_copro_or:
 int_copro_err:
 	cmp GET_OLD_CS, USER_CS
 	jne int_die
-	SYSTEM_EXCEPTION SoftByteCodes_EX_COPRO_ERR, GET_OLD_EIP
+	SYSTEM_EXCEPTION VmThread_EX_COPRO_ERR, GET_OLD_EIP
 	ret
 
 ; ---------------------------

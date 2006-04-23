@@ -144,7 +144,7 @@ GLABEL Q43org5jnode2vm6Unsafe23invokeObject2e28Lorg2fjnode2fvm2fclassmgr2fVmMeth
 
 ; int Unsafe.initThread(VmThread thread, Object newStack, int stackSize)
 ; Initialize the new Thread.
-GLABEL Q43org5jnode2vm6Unsafe23initThread2e28Lorg2fjnode2fvm2fVmThread3bLjava2flang2fObject3bI29V
+GLABEL Q43org5jnode2vm6Unsafe23initThread2e28Lorg2fjnode2fvm2fscheduler2fVmThread3bLjava2flang2fObject3bI29V
 	push ABX
 	mov ACX,[ASP+(4*SLOT_SIZE)]		; newThread
 	mov ADX,[ASP+(3*SLOT_SIZE)]		; newStack

@@ -33,6 +33,8 @@ import org.jnode.vm.annotation.DoPrivileged;
 import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.scheduler.VmProcessor;
+import org.jnode.vm.scheduler.VmThread;
 
 /**
  * JNode VM implementation of the java AccessControl system.

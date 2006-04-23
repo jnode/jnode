@@ -24,7 +24,6 @@ package org.jnode.vm.x86.compiler.l1b;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.assembler.x86.X86BinaryAssembler;
-import org.jnode.vm.VmProcessor;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.compiler.CompiledMethod;
@@ -33,6 +32,7 @@ import org.jnode.vm.compiler.EntryPoints;
 import org.jnode.vm.compiler.GCMapIterator;
 import org.jnode.vm.compiler.InlineBytecodeVisitor;
 import org.jnode.vm.compiler.OptimizingBytecodeVisitor;
+import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.x86.X86CpuID;
 import org.jnode.vm.x86.compiler.AbstractX86Compiler;
 

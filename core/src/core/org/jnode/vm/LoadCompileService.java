@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.vm.annotation.Inline;
+import org.jnode.vm.annotation.Internal;
 import org.jnode.vm.annotation.KernelSpace;
 import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.annotation.SharedStatics;
@@ -109,7 +110,8 @@ public final class LoadCompileService {
     }
     
     @KernelSpace
-    final static void showInfo() {
+    @Internal
+    public final static void showInfo() {
         Unsafe.debug(" #loadcompile requests: ");
         Unsafe.debug((service != null) ? service.requestQueue.size() : 0);
     }

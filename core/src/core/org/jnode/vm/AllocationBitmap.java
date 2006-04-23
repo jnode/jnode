@@ -23,6 +23,7 @@ package org.jnode.vm;
 
 import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.annotation.Uninterruptible;
+import org.jnode.vm.scheduler.VmThread;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.Word;

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm;
 
 import java.io.IOException;
@@ -44,6 +44,7 @@ import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.system.SimpleResourceOwner;
 import org.jnode.util.SystemInputStream;
+import org.jnode.vm.annotation.Internal;
 import org.jnode.vm.annotation.KernelSpace;
 import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.annotation.PrivilegedActionPragma;
@@ -60,6 +61,8 @@ import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmStaticField;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.memmgr.VmWriteBarrier;
+import org.jnode.vm.scheduler.VmProcessor;
+import org.jnode.vm.scheduler.VmThread;
 import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
@@ -78,8 +81,6 @@ public final class VmSystem {
     public static final int RC_HANDLER = 0xFFFFFFFB;
 
     public static final int RC_DEFHANDLER = 0xFFFFFFF1;
-
-    private static final int STACKTRACE_LIMIT = 256;
 
     private static boolean inited;
 
@@ -120,7 +121,8 @@ public final class VmSystem {
             VmSystem.out = getSystemOut();
 
             /* Initialize the system classloader */
-            VmSystemClassLoader loader = (VmSystemClassLoader) (getVmClass(VmProcessor.current()).getLoader());
+            VmSystemClassLoader loader = (VmSystemClassLoader) (getVmClass(VmProcessor
+                    .current()).getLoader());
             systemLoader = loader;
             loader.initialize();
 
@@ -150,7 +152,7 @@ public final class VmSystem {
 
             // Calibrate the processors
             VmProcessor.current().calibrate();
-            
+
             // Setup class loading & compilation service
             LoadCompileService.start();
 
@@ -346,8 +348,8 @@ public final class VmSystem {
      * @return The classloader
      */
     protected static VmClassLoader getContextClassLoader() {
-        final VmStackReader reader = VmProcessor.current()
-                .getArchitecture().getStackReader();
+        final VmStackReader reader = VmProcessor.current().getArchitecture()
+                .getStackReader();
         final VmSystemClassLoader systemLoader = VmSystem.systemLoader;
         Address f = VmMagic.getCurrentFrame();
         while (reader.isValid(f)) {
@@ -372,10 +374,10 @@ public final class VmSystem {
      * @return Class[]
      */
     public static Class[] getClassContext() {
-        final VmStackReader reader = VmProcessor.current()
-                .getArchitecture().getStackReader();
+        final VmStackReader reader = VmProcessor.current().getArchitecture()
+                .getStackReader();
         final VmStackFrame[] stack = reader.getVmStackTrace(VmMagic
-                .getCurrentFrame(), null, STACKTRACE_LIMIT);
+                .getCurrentFrame(), null, VmThread.STACKTRACE_LIMIT);
         final int count = stack.length;
         final Class[] result = new Class[count];
 
@@ -393,7 +395,8 @@ public final class VmSystem {
         Unsafe.idle();
     }
 
-    protected static Object allocStack(int size) {
+    @Internal
+    public static final Object allocStack(int size) {
         try {
             return Vm.getHeapManager()
                     .newInstance(
@@ -403,101 +406,6 @@ public final class VmSystem {
             throw (NoClassDefFoundError) new NoClassDefFoundError()
                     .initCause(ex);
         }
-    }
-
-    /**
-     * Gets the stacktrace of a given thread.
-     * 
-     * @param current
-     * @return The stacktrace
-     */
-    public static Object[] getStackTrace(VmThread current) {
-        if (current.inException) {
-            Unsafe.debug("Exception in getStackTrace");
-            VmProcessor.current().getArchitecture().getStackReader()
-                    .debugStackTrace();
-            Unsafe.die("getStackTrace");
-            return null;
-        } else {
-            current.inException = true;
-        }
-
-        if (Vm.getHeapManager().isLowOnMemory()) {
-            return null;
-        }
-
-        final VmProcessor proc = VmProcessor.current();
-        final VmStackReader reader = proc.getArchitecture().getStackReader();
-        final VmStackFrame[] mt;
-        // Address lastIP = null;
-        if (current.isInSystemException()) {
-            proc.disableReschedule(false);
-            try {
-                mt = reader.getVmStackTrace(current.getExceptionStackFrame(),
-                        current.getExceptionInstructionPointer(),
-                        STACKTRACE_LIMIT);
-            } finally {
-                proc.enableReschedule(false);
-            }
-        } else if (current == proc.getCurrentThread()) {
-            final Address curFrame = VmMagic.getCurrentFrame();
-            mt = reader.getVmStackTrace(reader.getPrevious(curFrame), reader
-                    .getReturnAddress(curFrame), STACKTRACE_LIMIT);
-        } else {
-            proc.disableReschedule(false);
-            try {
-                mt = reader.getVmStackTrace(current.getStackFrame(), current
-                        .getInstructionPointer(), STACKTRACE_LIMIT);
-                // lastIP = current.getInstructionPointer();
-            } finally {
-                proc.enableReschedule(false);
-            }
-        }
-        final int cnt = (mt == null) ? 0 : mt.length;
-
-        VmType lastClass = null;
-
-        //skip the first element which is VMThrowable.fillInStackTrace()
-        int i = 1;
-        while (i < cnt) {
-
-            final VmStackFrame f = mt[i];
-            if (f == null) {
-                break;
-            }
-            final VmMethod method = f.getMethod();
-            if (method == null) {
-                break;
-            }
-            final VmType< ? > vmClass = method.getDeclaringClass();
-            if (vmClass == null) {
-                break;
-            }
-            final VmType< ? > sClass = vmClass.getSuperClass();
-            if ((lastClass != null) && (sClass != lastClass)
-                    && (vmClass != lastClass)) {
-                break;
-            }
-            final String mname = method.getName();
-            if (mname == null) {
-                break;
-            }
-            if (!("<init>".equals(mname) || "fillInStackTrace".equals(mname) || "getStackTrace"
-                    .equals(mname))) {
-                break;
-            }
-            lastClass = vmClass;
-            i++;
-        }
-
-        final VmStackFrame[] st = new VmStackFrame[cnt - i];
-        int j = 0;
-        for (; i < cnt; i++) {
-            st[j++] = mt[i];
-        }
-
-        current.inException = false;
-        return st;
     }
 
     /**
@@ -613,13 +521,13 @@ public final class VmSystem {
         Class< ? > dst_class = dst.getClass();
 
         if (!src_class.isArray()) {
-            //Unsafe.debug('!');
+            // Unsafe.debug('!');
             throw new ArrayStoreException("src is not an array");
         }
 
         if (!dst_class.isArray()) {
-            //Unsafe.debug("dst is not an array:");
-            //Unsafe.debug(dst_class.getName());
+            // Unsafe.debug("dst is not an array:");
+            // Unsafe.debug(dst_class.getName());
             throw new ArrayStoreException("dst is not an array");
         }
 
@@ -637,9 +545,9 @@ public final class VmSystem {
         }
 
         if (src_type != dst_type) {
-            //Unsafe.debug("invalid array types:");
-            //Unsafe.debug(src_class.getName());
-            //Unsafe.debug(dst_class.getName());
+            // Unsafe.debug("invalid array types:");
+            // Unsafe.debug(src_class.getName());
+            // Unsafe.debug(dst_class.getName());
             throw new ArrayStoreException("Invalid array types");
         }
 
@@ -664,7 +572,7 @@ public final class VmSystem {
 
         final int srcLen = srcAddr.loadInt(lengthOffset);
         final int dstLen = dstAddr.loadInt(lengthOffset);
-        
+
         // Calc end index (if overflow, then will be < 0 )
         final int srcEnd = srcPos + length;
         final int dstEnd = dstPos + length;
@@ -676,26 +584,26 @@ public final class VmSystem {
         if ((dstEnd > dstLen) || (dstEnd < 0)) {
             throw new IndexOutOfBoundsException("dstPos+length > dst.length");
         }
-        
+
         final int elemsize;
         final boolean isObjectArray;
         switch (src_type) {
         case 'Z':
-        // Boolean
+            // Boolean
         case 'B':
             // Byte
             elemsize = 1;
             isObjectArray = false;
             break;
         case 'C':
-        // Character
+            // Character
         case 'S':
             // Short
             elemsize = 2;
             isObjectArray = false;
             break;
         case 'I':
-        // Integer
+            // Integer
         case 'F':
             // Float
             elemsize = 4;
@@ -707,7 +615,7 @@ public final class VmSystem {
             isObjectArray = true;
             break;
         case 'J':
-        // Long
+            // Long
         case 'D':
             // Double
             elemsize = 8;
@@ -863,7 +771,8 @@ public final class VmSystem {
      * 
      * @return
      */
-    final static float calculateJNodeMips() throws UninterruptiblePragma {
+    @Uninterruptible
+    public final static float calculateJNodeMips() {
         final long millis = currentTimeMillis % 1000;
         while (millis == (currentTimeMillis % 1000)) {
             // Wait
@@ -956,11 +865,10 @@ public final class VmSystem {
         final Object staticsTable;
         final Offset offset;
         if (f.isShared()) {
-            staticsTable = VmProcessor.current().getSharedStaticsTable();
+            staticsTable = VmMagic.currentProcessor().getSharedStaticsTable();
             offset = Offset.fromIntZeroExtend(f.getSharedStaticsIndex() << 2);
         } else {
-            staticsTable = VmProcessor.current()
-                    .getIsolatedStaticsTable();
+            staticsTable = VmMagic.currentProcessor().getIsolatedStaticsTable();
             offset = Offset.fromIntZeroExtend(f.getIsolatedStaticsIndex() << 2);
         }
         final Address ptr = VmMagic.getArrayData(staticsTable);

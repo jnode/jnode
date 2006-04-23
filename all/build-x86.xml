@@ -119,10 +119,10 @@
 			<class classname="java.lang.Throwable" />
 			<class classname="org.jnode.build.x86.BootImageBuilder" static="on" />
 			<class classname="org.jnode.vm.SoftByteCodes" static="on" />
-			<class classname="org.jnode.vm.VmProcessor" />
-			<class classname="org.jnode.vm.VmProcessor" static="on" />
-			<class classname="org.jnode.vm.VmThread" />
-			<class classname="org.jnode.vm.VmThread" static="on" />
+			<class classname="org.jnode.vm.scheduler.VmProcessor" />
+			<class classname="org.jnode.vm.scheduler.VmProcessor" static="on" />
+			<class classname="org.jnode.vm.scheduler.VmThread" />
+			<class classname="org.jnode.vm.scheduler.VmThread" static="on" />
 			<class classname="org.jnode.vm.classmgr.ObjectLayout" static="on" />
 			<class classname="org.jnode.vm.classmgr.TIBLayout" static="on" />
 			<class classname="org.jnode.vm.classmgr.VmArray" static="on" />

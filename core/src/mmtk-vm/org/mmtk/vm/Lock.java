@@ -21,7 +21,7 @@
  
 package org.mmtk.vm;
 
-import org.jnode.vm.ProcessorLock;
+import org.jnode.vm.scheduler.ProcessorLock;
 
 /**
  * Simple, fair locks with deadlock detection. The implementation mimics a

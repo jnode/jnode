@@ -22,9 +22,9 @@
 package org.jnode.test.core;
 
 import org.jnode.util.NumberUtils;
-import org.jnode.vm.VmProcessor;
 import org.jnode.vm.performance.PerformanceCounterEvent;
 import org.jnode.vm.performance.PerformanceCounters;
+import org.jnode.vm.scheduler.VmProcessor;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

@@ -21,8 +21,8 @@
  
 package org.jnode.shell.command.system;
 
-import org.jnode.vm.IRQManager;
-import org.jnode.vm.VmProcessor;
+import org.jnode.vm.scheduler.IRQManager;
+import org.jnode.vm.scheduler.VmProcessor;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

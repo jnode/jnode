@@ -21,9 +21,11 @@
  
 package org.jnode.vm;
 
+import org.jnode.vm.annotation.Internal;
 import org.jnode.vm.annotation.KernelSpace;
 import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.VmClassType;
+import org.jnode.vm.scheduler.VmProcessor;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Word;
 
@@ -112,7 +114,8 @@ public final class VmMagic {
 	 * @return The address of the stackframe of the current thread
 	 */
     @KernelSpace
-	protected static Address getCurrentFrame() {
+    @Internal
+	public static Address getCurrentFrame() {
 		return null;
 	}
 

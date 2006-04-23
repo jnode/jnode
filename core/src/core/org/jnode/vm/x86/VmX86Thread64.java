@@ -83,7 +83,7 @@ public final class VmX86Thread64 extends VmX86Thread {
 	}
     
     /**
-     * @see org.jnode.vm.VmThread#visit(org.jnode.vm.ObjectVisitor, org.jnode.vm.memmgr.VmHeapManager)
+     * @see org.jnode.vm.scheduler.VmThread#visit(org.jnode.vm.ObjectVisitor, org.jnode.vm.memmgr.VmHeapManager)
      */
     public boolean visit(ObjectVisitor visitor, VmHeapManager heapManager) {
         if (!super.visit(visitor, heapManager)) {

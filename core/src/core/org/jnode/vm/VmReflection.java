@@ -31,6 +31,7 @@ import org.jnode.vm.classmgr.VmStaticField;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.memmgr.VmHeapManager;
 import org.jnode.vm.memmgr.VmWriteBarrier;
+import org.jnode.vm.scheduler.VmProcessor;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.ObjectReference;
 
