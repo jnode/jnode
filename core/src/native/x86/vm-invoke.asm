@@ -10,7 +10,7 @@
 	extern VmMethod_Class
 
 GLABEL vm_invoke_abstract
-	push dword SoftByteCodes_EX_ABSTRACTMETHOD ; Exception number
+	push dword VmThread_EX_ABSTRACTMETHOD ; Exception number
 	push AAX ; Address
 	mov AAX,SoftByteCodes_systemException
 	INVOKE_JAVA_METHOD

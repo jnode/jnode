@@ -21,10 +21,10 @@
  
 package org.jnode.vm.memmgr;
 
-import org.jnode.vm.Monitor;
 import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.classmgr.VmMethod;
+import org.jnode.vm.scheduler.Monitor;
 import org.vmmagic.pragma.Uninterruptible;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;

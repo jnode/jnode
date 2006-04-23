@@ -44,15 +44,11 @@ import org.jnode.linker.Elf;
 import org.jnode.linker.ElfLinker;
 import org.jnode.plugin.PluginRegistry;
 import org.jnode.util.NumberUtils;
-import org.jnode.vm.MonitorManager;
 import org.jnode.vm.SoftByteCodes;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmArchitecture;
-import org.jnode.vm.VmProcessor;
-import org.jnode.vm.VmScheduler;
 import org.jnode.vm.VmSystem;
 import org.jnode.vm.VmSystemObject;
-import org.jnode.vm.VmThread;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmClassType;
@@ -63,6 +59,10 @@ import org.jnode.vm.classmgr.VmMethodCode;
 import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.classmgr.VmStaticField;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.scheduler.MonitorManager;
+import org.jnode.vm.scheduler.VmProcessor;
+import org.jnode.vm.scheduler.VmScheduler;
+import org.jnode.vm.scheduler.VmThread;
 import org.jnode.vm.x86.VmX86Architecture;
 import org.jnode.vm.x86.VmX86Architecture32;
 import org.jnode.vm.x86.VmX86Architecture64;
@@ -158,10 +158,11 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 	 * @return The processor
 	 * @throws BuildException
 	 */
-	protected VmProcessor createProcessor(VmSharedStatics statics, VmIsolatedStatics isolatedStatics)
+	protected VmProcessor createProcessor(Vm vm, VmSharedStatics statics, VmIsolatedStatics isolatedStatics)
 			throws BuildException {
 		this.sharedStatics = statics;
         VmScheduler scheduler = new VmScheduler(getArchitecture());
+        vm.setScheduler(scheduler);
 		if (processor == null) {
 			switch (bits) {
 			case 32:
@@ -315,17 +316,16 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 		refJava = os.getObjectRef(vmMethodClass.getMethod("recompile", "()V"));
 		os.getObjectRef(new Label("VmMethod_recompile")).link(refJava);
 
-		/* Link SoftByteCodes_systemException */
-		VmType sbcClass = loadClass(SoftByteCodes.class);
-		refJava = os.getObjectRef(sbcClass.getMethod("systemException",
-				"(II)Ljava/lang/Throwable;"));
-		os.getObjectRef(sbcSystemException).link(refJava);
-
 		final VmType vmThreadClass = loadClass(VmThread.class);
+
+        /* Link VmThread_systemException */
+        refJava = os.getObjectRef(vmThreadClass.getMethod("systemException",
+                "(II)Ljava/lang/Throwable;"));
+        os.getObjectRef(sbcSystemException).link(refJava);
 
 		/* Link VmThread_runThread */
 		refJava = os.getObjectRef(vmThreadClass.getMethod("runThread",
-				"(Lorg/jnode/vm/VmThread;)V"));
+				"(Lorg/jnode/vm/scheduler/VmThread;)V"));
 		os.getObjectRef(vmThreadRunThread).link(refJava);
 
 		/* Link VmProcessor_reschedule */

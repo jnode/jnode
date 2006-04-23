@@ -25,7 +25,6 @@ import java.io.PrintStream;
 
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmMagic;
-import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.annotation.Inline;
 import org.jnode.vm.annotation.MagicPermission;
@@ -36,6 +35,7 @@ import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.scheduler.VmProcessor;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.ObjectReference;

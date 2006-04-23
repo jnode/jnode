@@ -25,7 +25,7 @@ import java.io.PrintStream;
 import java.util.Map;
 
 import org.jnode.driver.input.KeyboardEvent;
-import org.jnode.vm.VmSystem;
+import org.jnode.vm.scheduler.VmThread;
 
 
 /**
@@ -82,7 +82,7 @@ public class ThreadState extends DebugState {
     private void showThread(PrintStream out, Thread thread) {
         DebuggerUtils.showThreadHeading(out, thread);
         out.println();
-        final Object[] trace = VmSystem.getStackTrace(thread.getVmThread());
+        final Object[] trace = VmThread.getStackTrace(thread.getVmThread());
         final int traceLen = Math.min(trace.length, 10);
         for (int k = 0; k < traceLen; k++) {
             out.println(trace[ k]);

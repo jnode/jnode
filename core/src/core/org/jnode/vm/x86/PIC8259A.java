@@ -10,11 +10,11 @@ import org.jnode.system.IOResource;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.SimpleResourceOwner;
-import org.jnode.vm.ProcessorLock;
 import org.jnode.vm.annotation.Inline;
 import org.jnode.vm.annotation.KernelSpace;
 import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.jnode.vm.annotation.Uninterruptible;
+import org.jnode.vm.scheduler.ProcessorLock;
 
 /**
  * Wrapper for the 8259A Programmable Interrupt Controller.

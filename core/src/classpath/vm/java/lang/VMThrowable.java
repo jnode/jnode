@@ -22,10 +22,11 @@
 package java.lang;
 
 import org.jnode.vm.VmSystem;
-import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmStackFrame;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.scheduler.VmProcessor;
+import org.jnode.vm.scheduler.VmThread;
 
 /**
  * VM dependant state and support methods for Throwable.
@@ -62,7 +63,7 @@ final class VMThrowable
   static VMThrowable fillInStackTrace(Throwable t)
   {
       VMThrowable vmt = new VMThrowable();
-      vmt.backtrace = VmSystem.getStackTrace(VmProcessor.current().getCurrentThread());
+      vmt.backtrace = VmThread.getStackTrace(VmProcessor.current().getCurrentThread());
       return vmt;
 
   }

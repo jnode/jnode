@@ -467,7 +467,7 @@ int_stack_first_overflow:
 	sub ADX,(VmThread_STACK_OVERFLOW_LIMIT_SLOTS * SLOT_SIZE)
 	mov [AAX+VmThread_STACKEND_OFS],ADX
 	mov STACKEND,ADX
-	mov AAX,SoftByteCodes_EX_STACKOVERFLOW
+	mov AAX,VmThread_EX_STACKOVERFLOW
 	mov WORD [ABP+OLD_EIP],doSystemException
 	jmp int_system_exception
 	

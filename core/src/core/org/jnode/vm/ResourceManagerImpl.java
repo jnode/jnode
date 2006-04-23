@@ -35,6 +35,7 @@ import org.jnode.system.ResourceOwner;
 import org.jnode.system.ResourcePermission;
 import org.jnode.system.SimpleResourceOwner;
 import org.jnode.vm.annotation.MagicPermission;
+import org.jnode.vm.scheduler.VmProcessor;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 

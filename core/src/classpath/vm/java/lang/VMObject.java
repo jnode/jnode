@@ -21,8 +21,8 @@
  
 package java.lang;
 
-import org.jnode.vm.MonitorManager;
 import org.jnode.vm.VmSystem;
+import org.jnode.vm.scheduler.MonitorManager;
 
 /**
  * Object is the ultimate superclass of every class (excepting interfaces). As

@@ -24,10 +24,13 @@ package org.jnode.vm;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.security.JNodePermission;
 import org.jnode.vm.annotation.Inline;
+import org.jnode.vm.annotation.Internal;
 import org.jnode.vm.annotation.KernelSpace;
 import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.scheduler.VmProcessor;
+import org.jnode.vm.scheduler.VmThread;
 import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
@@ -467,7 +470,8 @@ public final class Unsafe {
     /**
      * Halt the processor until the next interrupt arrives.
      */
-    protected static native void idle();
+    @Internal
+    public static native void idle();
 
     /**
      * Cause the system to stop TODO Protect me again
@@ -554,7 +558,8 @@ public final class Unsafe {
      * @return The byte, or -1 if no data available.
      */
     @KernelSpace
-    static native int readKdbInput();
+    @Internal
+    public static native int readKdbInput();
 
     /**
      * Initialize the new Thread.
@@ -563,7 +568,8 @@ public final class Unsafe {
      * @param newStack
      * @param stackSize
      */
-    protected static native void initThread(VmThread curThread,
+    @Internal
+    public static native void initThread(VmThread curThread,
             Object newStack, int stackSize);
 
     protected static native int inPortByte(int portNr);
@@ -711,7 +717,8 @@ public final class Unsafe {
      * @param id
      * @return The required length of id.
      */
-    static native int getCPUID(int[] id);
+    @Internal
+    public static native int getCPUID(int[] id);
 
     /**
      * List the current stacktrace on the kernel debug output.

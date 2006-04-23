@@ -28,6 +28,11 @@ import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmHeapManager;
+import org.jnode.vm.scheduler.Monitor;
+import org.jnode.vm.scheduler.MonitorManager;
+import org.jnode.vm.scheduler.VmProcessor;
+import org.jnode.vm.scheduler.VmThread;
+import org.jnode.vm.scheduler.VmThreadVisitor;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.ObjectReference;
@@ -249,7 +254,7 @@ final class HeapHelperImpl extends HeapHelper {
             return;
         }
         threadRootVisitor.initialize(visitor, heapManager);
-        Vm.visitAllThreads(threadRootVisitor);
+        VmMagic.currentProcessor().getScheduler().visitAllThreads(threadRootVisitor);
     }
 
     /**

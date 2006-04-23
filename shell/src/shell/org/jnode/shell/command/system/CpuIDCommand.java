@@ -26,7 +26,7 @@ import java.io.PrintStream;
 
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
-import org.jnode.vm.VmProcessor;
+import org.jnode.vm.scheduler.VmProcessor;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

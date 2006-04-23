@@ -32,7 +32,6 @@ import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
-import org.jnode.vm.VmProcessor;
 import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmInstanceField;
@@ -44,6 +43,7 @@ import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.classmgr.VmTypeState;
 import org.jnode.vm.compiler.EntryPoints;
 import org.jnode.vm.memmgr.VmWriteBarrier;
+import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.x86.X86CpuID;
 
 /**

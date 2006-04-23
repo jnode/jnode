@@ -30,6 +30,7 @@
       <export name="org.jnode.vm.isolate.link.*"/>
       <export name="org.jnode.vm.memmgr.*"/>
       <export name="org.jnode.vm.performance.*"/>
+      <export name="org.jnode.vm.scheduler.*"/>
     </library>
   </runtime>
   

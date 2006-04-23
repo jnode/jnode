@@ -401,11 +401,11 @@ int_pf:
 	neg eax
 	test eax,0xFFFFF000 ; Error in last (null) page?
 	jz int_pf_npe
-	SYSTEM_EXCEPTION SoftByteCodes_EX_PAGEFAULT, cr2
+	SYSTEM_EXCEPTION VmThread_EX_PAGEFAULT, cr2
 	ret
 int_pf_npe:
 	;jmp int_die
-	SYSTEM_EXCEPTION SoftByteCodes_EX_NULLPOINTER, GET_OLD_EIP
+	SYSTEM_EXCEPTION VmThread_EX_NULLPOINTER, GET_OLD_EIP
 	ret
 	
 int_pf_kernel:

@@ -21,11 +21,13 @@
  
 package org.jnode.vm;
 
+import org.jnode.vm.annotation.Internal;
 import org.jnode.vm.annotation.KernelSpace;
 import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.VmCompiledCode;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.scheduler.VmThread;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Offset;
 
@@ -43,7 +45,8 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @return The previous frame or null.
 	 */
     @KernelSpace
-	final Address getPrevious(Address sf) {
+    @Internal
+	public final Address getPrevious(Address sf) {
 		if (isValid(sf)) {
 			return sf.loadAddress(getPreviousOffset(sf));
 		} else {
@@ -91,7 +94,8 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @param sf Stackframe pointer
 	 * @return The address
 	 */
-	final Address getReturnAddress(Address sf) {
+    @Internal
+	public final Address getReturnAddress(Address sf) {
 		return sf.loadAddress(getReturnAddressOffset(sf));
 	}
 
@@ -131,7 +135,8 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @param limit Maximum length of returned array.
 	 * @return VmStackFrame[]
 	 */
-	final VmStackFrame[] getVmStackTrace(Address frame, Address ip, int limit) {
+    @Internal
+	public final VmStackFrame[] getVmStackTrace(Address frame, Address ip, int limit) {
 
         final VmStackFrameEnumerator sfEnum = new VmStackFrameEnumerator(this, frame, ip);
 		int count = 0;
@@ -161,7 +166,8 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @param sf
 	 * @return int
 	 */
-	final int countStackFrames(Address sf) {
+    @Internal
+	public final int countStackFrames(Address sf) {
 		int count = 0;
 		while (isValid(sf)) {
 			count++;

@@ -61,7 +61,6 @@ import org.jnode.vm.Unsafe;
 import org.jnode.vm.VirtualMemoryRegion;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmArchitecture;
-import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmSystemClassLoader;
 import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.bytecode.BytecodeParser;
@@ -82,6 +81,7 @@ import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmHeapManager;
+import org.jnode.vm.scheduler.VmProcessor;
 import org.vmmagic.unboxed.UnboxedObject;
 
 /**
@@ -373,7 +373,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * @return The processor
      * @throws BuildException
      */
-    protected abstract VmProcessor createProcessor(VmSharedStatics statics,
+    protected abstract VmProcessor createProcessor(Vm vm, VmSharedStatics statics,
             VmIsolatedStatics isolatedStatics) throws BuildException;
 
     private final void doExecute() throws BuildException {
@@ -456,7 +456,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             blockedObjects.add(vm);
             blockedObjects.add(Vm.getCompiledMethods());
 
-            final VmProcessor proc = createProcessor(clsMgr.getSharedStatics(),
+            final VmProcessor proc = createProcessor(vm, clsMgr.getSharedStatics(),
                     clsMgr.getIsolatedStatics());
             log("Building for " + proc.getCPUID());
 
@@ -1315,6 +1315,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         addCompileHighOptLevel("org.jnode.vm.classmgr");
         addCompileHighOptLevel("org.jnode.vm.compiler");
         addCompileHighOptLevel("org.jnode.vm.isolate");
+        addCompileHighOptLevel("org.jnode.vm.scheduler");
 //        addCompileHighOptLevel("org.jnode.vm.compiler.ir");
 //        addCompileHighOptLevel("org.jnode.vm.compiler.ir.quad");
         for (NativeCodeCompiler compiler : getArchitecture().getCompilers()) {

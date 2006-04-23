@@ -213,7 +213,7 @@ public class BaseMagicHelper {
         BREAKPOINT("breakPoint", true),
         DIFF("diff", false),
         NULLREFERENCE("nullReference", false),
-        CURRENTPROCESSOR("currentProcessor", true, "()Lorg/jnode/vm/VmProcessor;"),
+        CURRENTPROCESSOR("currentProcessor", true, "()Lorg/jnode/vm/scheduler/VmProcessor;"),
         GETSHAREDSTATICSFIELDADDRESS("getSharedStaticFieldAddress", true),
         GETISOLATEDSTATICSFIELDADDRESS("getIsolatedStaticFieldAddress", true),
         ISRUNNINGJNODE("isRunningJNode", false, "()Z"),

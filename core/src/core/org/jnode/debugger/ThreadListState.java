@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.jnode.driver.input.KeyboardEvent;
-import org.jnode.vm.VmThread;
+import org.jnode.vm.scheduler.VmThread;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

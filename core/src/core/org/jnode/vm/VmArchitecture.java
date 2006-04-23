@@ -25,6 +25,7 @@ import java.nio.ByteOrder;
 
 import org.jnode.security.JNodePermission;
 import org.jnode.system.ResourceManager;
+import org.jnode.vm.annotation.Internal;
 import org.jnode.vm.annotation.KernelSpace;
 import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.TypeSizeInfo;
@@ -32,6 +33,9 @@ import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.compiler.IMTCompiler;
 import org.jnode.vm.compiler.NativeCodeCompiler;
+import org.jnode.vm.scheduler.IRQManager;
+import org.jnode.vm.scheduler.VmProcessor;
+import org.jnode.vm.scheduler.VmScheduler;
 import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
@@ -178,7 +182,8 @@ public abstract class VmArchitecture extends VmSystemObject {
      * Create the IRQ manager for this architecture.
      * @return
      */
-    protected abstract IRQManager createIRQManager(VmProcessor processor);
+    @Internal
+    public abstract IRQManager createIRQManager(VmProcessor processor);
     
     /**
      * Gets the start address of the given space.

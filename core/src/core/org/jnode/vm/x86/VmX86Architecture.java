@@ -29,20 +29,21 @@ import org.jnode.system.BootLog;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
-import org.jnode.vm.IRQManager;
 import org.jnode.vm.MemoryMapEntry;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.VmMultiMediaSupport;
-import org.jnode.vm.VmProcessor;
-import org.jnode.vm.VmScheduler;
 import org.jnode.vm.VmSystem;
+import org.jnode.vm.annotation.Internal;
 import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.compiler.NativeCodeCompiler;
+import org.jnode.vm.scheduler.IRQManager;
+import org.jnode.vm.scheduler.VmProcessor;
+import org.jnode.vm.scheduler.VmScheduler;
 import org.jnode.vm.x86.compiler.l1a.X86Level1ACompiler;
 import org.jnode.vm.x86.compiler.l1b.X86Level1BCompiler;
 import org.jnode.vm.x86.compiler.stub.X86StubCompiler;
@@ -337,7 +338,8 @@ public abstract class VmX86Architecture extends VmArchitecture {
      * @see org.jnode.vm.VmArchitecture#createIRQManager()
      */
     @Override
-    protected final IRQManager createIRQManager(VmProcessor processor) {
+    @Internal
+    public final IRQManager createIRQManager(VmProcessor processor) {
         synchronized (this) {
             // Create PIC if not available
             if (pic8259a == null) {

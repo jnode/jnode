@@ -38,6 +38,7 @@ import org.jnode.util.CounterGroup;
 import org.jnode.util.Statistic;
 import org.jnode.util.Statistics;
 import org.jnode.vm.annotation.Inline;
+import org.jnode.vm.annotation.Internal;
 import org.jnode.vm.annotation.KernelSpace;
 import org.jnode.vm.annotation.NoInline;
 import org.jnode.vm.annotation.SharedStatics;
@@ -48,6 +49,8 @@ import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmHeapManager;
+import org.jnode.vm.scheduler.VmProcessor;
+import org.jnode.vm.scheduler.VmScheduler;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -84,12 +87,6 @@ public final class Vm extends VmSystemObject implements Statistics {
     /** All statistics */
     private transient Map<String, Statistic> statistics;
 
-    /** Lock for accessing the all threads list */
-    private final SpinLock allThreadsLock;
-
-    /** List of all threads */
-    private final VmThreadQueue.AllThreadsQueue allThreads;
-
     /** List of all compiled methods */
     private final CompiledCodeList compiledMethods;
 
@@ -98,6 +95,8 @@ public final class Vm extends VmSystemObject implements Statistics {
 
     /** For assertion checking things that should never happen. */
     public static final boolean NOT_REACHED = false;
+    
+    private VmScheduler scheduler;
 
     /**
      * Initialize a new instance
@@ -117,8 +116,6 @@ public final class Vm extends VmSystemObject implements Statistics {
         this.heapManager = createHeapManager(helper, arch, loader, pluginReg);
         this.statics = statics;
         this.processors = new BootableArrayList<VmProcessor>();
-        this.allThreadsLock = new SpinLock();
-        this.allThreads = new VmThreadQueue.AllThreadsQueue("all");
         this.compiledMethods = new CompiledCodeList();
     }
 
@@ -461,126 +458,6 @@ public final class Vm extends VmSystemObject implements Statistics {
     }
 
     /**
-     * Register a thread in the list of all live threads.
-     * 
-     * @param thread
-     */
-    static final void registerThread(VmThread thread) {
-        final Vm vm = getVm();
-        final VmThreadQueue.AllThreadsQueue q = vm.allThreads;
-        if (isWritingImage()) {
-            q.add(thread, "Vm");
-        } else {
-            final SpinLock lock = vm.allThreadsLock;
-            lock.lock();
-            try {
-                q.add(thread, "Vm");
-            } finally {
-                lock.unlock();
-            }
-        }
-    }
-
-    /**
-     * Remove the given thread from the list of all threads.
-     * 
-     * @param thread
-     */
-    static final void unregisterThread(VmThread thread) {
-        final Vm vm = getVm();
-        final SpinLock lock = vm.allThreadsLock;
-        final VmThreadQueue.AllThreadsQueue q = vm.allThreads;
-        lock.lock();
-        try {
-            q.remove(thread);
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    /**
-     * Call the visitor for all live threads.
-     * 
-     * @param visitor
-     */
-    static final boolean visitAllThreads(VmThreadVisitor visitor) {
-        final Vm vm = getVm();
-        final SpinLock lock = vm.allThreadsLock;
-        final VmThreadQueue.AllThreadsQueue q = vm.allThreads;
-        lock.lock();
-        try {
-            return q.visit(visitor);
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    /**
-     * Dump the status of this queue on Unsafe.debug.
-     */
-    @KernelSpace
-    final static void dumpWaitingThreads(boolean dumpStack, VmStackReader stackReader) {
-        final Vm vm = getVm();
-        // final SpinLock lock = vm.allThreadsLock;
-        final VmThreadQueue.AllThreadsQueue q = vm.allThreads;
-        VmThreadQueueEntry e = q.first;
-        while (e != null) {
-            if (e.thread.isWaiting()) {
-                Unsafe.debug(e.thread.getName());
-                Unsafe.debug(" id0x");
-                Unsafe.debug(e.thread.getId());
-                Unsafe.debug(" s0x");
-                Unsafe.debug(e.thread.getThreadState());
-                Unsafe.debug(" p0x");
-                Unsafe.debug(e.thread.priority);
-                Unsafe.debug(" wf:");
-                VmThread waitFor = e.thread.getWaitForThread();
-                Unsafe.debug((waitFor != null) ? waitFor.getName() : "none");
-                Unsafe.debug("\n");
-                if (dumpStack && (stackReader != null)) {
-                    stackReader.debugStackTrace(e.thread);
-                    Unsafe.debug("\n");
-                }
-            }
-            e = e.next;
-        }
-    }
-
-    /**
-     * Dump the status of this queue on Unsafe.debug.
-     */
-    @KernelSpace
-    final static void verifyThreads() {
-        final Vm vm = getVm();
-        // final SpinLock lock = vm.allThreadsLock;
-        final VmThreadQueue.AllThreadsQueue q = vm.allThreads;
-        VmThreadQueueEntry e = q.first;
-        while (e != null) {
-            e.thread.verifyState();
-            e = e.next;
-        }
-    }
-
-    /**
-     * Call the visitor for all live threads.
-     * 
-     * @param visitor
-     */
-    static final VmThread getThreadById(int id) {
-        final Vm vm = getVm();
-        // final SpinLock lock = vm.allThreadsLock;
-        final VmThreadQueue.AllThreadsQueue q = vm.allThreads;
-        VmThreadQueueEntry e = q.first;
-        while (e != null) {
-            if (e.thread.getId() == id) {
-                return e.thread;
-            }
-            e = e.next;
-        }
-        return null;
-    }
-
-    /**
      * Gets the list of compiled methods.
      * 
      * @return Returns the compiledMethods.
@@ -605,6 +482,24 @@ public final class Vm extends VmSystemObject implements Statistics {
             if (hm != null) {
                 hm.notifyClassResolved(vmType);
             }
+        }
+    }
+
+    /**
+     * @return the scheduler
+     */
+    @Internal
+    public final VmScheduler getScheduler() {
+        return scheduler;
+    }
+
+    /**
+     * @param scheduler the scheduler to set
+     */
+    @Internal
+    public final void setScheduler(VmScheduler scheduler) {
+        if (this.scheduler == null) {
+            this.scheduler = scheduler;
         }
     }
 }

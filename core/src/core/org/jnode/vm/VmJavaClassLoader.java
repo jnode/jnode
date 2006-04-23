@@ -32,6 +32,7 @@ import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.compiler.CompiledIMT;
+import org.jnode.vm.scheduler.VmProcessor;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

@@ -21,12 +21,14 @@
  
 package org.jnode.vm;
 
-import org.vmmagic.pragma.Uninterruptible;
+import org.jnode.vm.annotation.Uninterruptible;
+
 
 /**
  * @author epr
  */
-final class MathSupport implements Uninterruptible {
+@Uninterruptible
+public final class MathSupport {
 
     private final char[] v = new char[5];
     private final char[] u = new char[5];
@@ -299,7 +301,7 @@ final class MathSupport implements Uninterruptible {
         char u3 = HHALF(LHALFQ(uq));
         char u4 = LHALF(LHALFQ(uq));
         
-        final MathSupport mathSupport = VmProcessor.current().getMathSupport();
+        final MathSupport mathSupport = VmMagic.currentProcessor().getMathSupport();
         final char[] v = mathSupport.v; 
         v[0] = 0;
         v[1] = HHALF(HHALFQ(vq));

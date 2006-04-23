@@ -24,11 +24,9 @@ package org.jnode.vm.memmgr.def;
 import java.io.PrintStream;
 
 import org.jnode.vm.MemoryBlockManager;
-import org.jnode.vm.Monitor;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmMagic;
-import org.jnode.vm.VmProcessor;
 import org.jnode.vm.annotation.Inline;
 import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.ObjectFlags;
@@ -41,6 +39,8 @@ import org.jnode.vm.memmgr.GCStatistics;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.HeapStatistics;
 import org.jnode.vm.memmgr.VmHeapManager;
+import org.jnode.vm.scheduler.Monitor;
+import org.jnode.vm.scheduler.VmProcessor;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.Word;
@@ -459,7 +459,7 @@ public final class DefaultHeapManager extends VmHeapManager {
     }
 
     /**
-     * @see org.jnode.vm.memmgr.VmHeapManager#createProcessorHeapData(org.jnode.vm.VmProcessor)
+     * @see org.jnode.vm.memmgr.VmHeapManager#createProcessorHeapData(org.jnode.vm.scheduler.VmProcessor)
      */
     public Object createProcessorHeapData(VmProcessor cpu) {
         // No need here, so return null.
