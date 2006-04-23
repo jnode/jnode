@@ -21,12 +21,14 @@
  
 package org.jnode.vm;
 
+import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.annotation.Uninterruptible;
 
 
 /**
  * @author epr
  */
+@MagicPermission
 @Uninterruptible
 public final class MathSupport {
 

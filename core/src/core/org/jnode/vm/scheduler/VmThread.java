@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.vm.scheduler;
 
 import org.jnode.util.NumberUtils;
@@ -89,10 +89,12 @@ public abstract class VmThread extends VmSystemObject {
     protected final VmThreadQueueEntry queueEntry = new VmThreadQueueEntry(this);
 
     /** Next pointer used in list of sleeping threads */
-    protected final VmThreadQueueEntry sleepQueueEntry = new VmThreadQueueEntry(this);
+    protected final VmThreadQueueEntry sleepQueueEntry = new VmThreadQueueEntry(
+            this);
 
     /** Next pointer used in list of all threads */
-    protected final VmThreadQueueEntry allThreadsEntry = new VmThreadQueueEntry(this);
+    protected final VmThreadQueueEntry allThreadsEntry = new VmThreadQueueEntry(
+            this);
 
     /** The size (in bytes) of the stack of this thread */
     private int stackSize;
@@ -124,34 +126,41 @@ public abstract class VmThread extends VmSystemObject {
     /** Identifier of the last created thread */
     private static int lastId;
 
-    /** Has this thread been interrupted? */    private boolean interrupted;
+    /** Has this thread been interrupted? */
+    private boolean interrupted;
 
     /** Is this thread in an exception initialization? */
     boolean inException;
 
     /** Is this thread in the process of being stopped? */
     private boolean stopping;
-    
+
     /** Name of this thread. */
     private String name;
 
     /** Inherited context of this thread */
     private VmAccessControlContext context;
-    
+
     private boolean inSystemException;
-    
-    /** The isolated statics table of the isolate that this thread is currently running is */
+
+    /**
+     * The isolated statics table of the isolate that this thread is currently
+     * running is
+     */
     private volatile VmIsolatedStatics isolatedStatics;
-    
-    /** The processor that is required to run this thread. Null means no specific requirements */
+
+    /**
+     * The processor that is required to run this thread. Null means no specific
+     * requirements
+     */
     private volatile VmProcessor requiredProcessor;
-    
+
     /** The processor currently at work on this thread */
     volatile VmProcessor currentProcessor;
 
     /**
-     * State is set to CREATED by the static initializer. Once set to other
-     * than CREATED, it should never go back. Alternates between RUNNING and
+     * State is set to CREATED by the static initializer. Once set to other than
+     * CREATED, it should never go back. Alternates between RUNNING and
      * SUSPENDED/WAITING as suspend()/wait() and reseume() are called.
      * <p>
      * Can be set to INTERRUPTED if ASLEEP, or WAITING. Can be set to DESTROYED
@@ -163,29 +172,35 @@ public abstract class VmThread extends VmSystemObject {
      * Can sleep if RUNNING. <blockquote>
      * 
      * <pre>
-     *  /--------------------\ V | CREATED -&gt; RUNNING -&gt; SUSPENDED /
-     *  &lt;/blockquote&gt;</pre>
+     *    /--------------------\ V | CREATED -&gt; RUNNING -&gt; SUSPENDED /
+     *    &lt;/blockquote&gt;
+     * </pre>
      */
-    private final static int CREATED = 0;
+    final static int CREATED = 0;
 
-    private final static int ASLEEP = 3;
+    final static int ASLEEP = 3;
 
-    private final static int DESTROYED = 5;
+    final static int DESTROYED = 5;
 
-    private final static int RUNNING = 1;
+    final static int RUNNING = 1;
 
-    private final static int STOPPED = 4;
+    final static int STOPPED = 4;
 
-    private final static int SUSPENDED = 2;
+    final static int SUSPENDED = 2;
 
-    private final static int WAITING = 6;
+    final static int WAITING_ENTER = 6;
 
-    private final static int YIELDING = 7;
+    final static int WAITING_NOTIFY = 7;
+
+    final static int WAITING_NOTIFY_TIMEOUT = 8;
+
+    final static int YIELDING = 9;
 
     final static int MAXSTATE = YIELDING;
 
     final static String[] STATE_NAMES = { "CREATED", "RUNNING", "SUSPENDED",
-            "ASLEEP", "STOPPED", "DESTROYED", "WAITING", "YIELDING"};
+            "ASLEEP", "STOPPED", "DESTROYED", "WAITING_ENTER",
+            "WAITING_NOTIFY", "WAITING_NOTIFY_TIMEOUT", "YIELDING" };
 
     /**
      * Create a new instance. This constructor can only be called during the
@@ -208,7 +223,8 @@ public abstract class VmThread extends VmSystemObject {
      * Create a new instance. This constructor can only be called during the
      * bootstrap phase.
      */
-    protected VmThread(VmIsolatedStatics isolatedStatics, Object stack, Address stackEnd, int stackSize) {
+    protected VmThread(VmIsolatedStatics isolatedStatics, Object stack,
+            Address stackEnd, int stackSize) {
         this.isolatedStatics = isolatedStatics;
         this.threadState = RUNNING;
         this.stackSize = stackSize;
@@ -291,21 +307,23 @@ public abstract class VmThread extends VmSystemObject {
 
     public final void start() {
         switch (threadState) {
-        case CREATED:
-            {
-                //Screen.debug("thread.start");
-                final VmScheduler scheduler = VmMagic.currentProcessor().getScheduler();
-                stack = VmSystem.allocStack(stackSize);
-                Unsafe.initThread(this, stack, stackSize);
-                stackEnd = getStackEnd(stack, stackSize);
-                scheduler.registerThread(this);
-                threadState = RUNNING;
-                scheduler.addToReadyQueue(this, false, "thread.start");
-            }
+        case CREATED: {
+            // Screen.debug("thread.start");
+            final VmScheduler scheduler = VmMagic.currentProcessor()
+                    .getScheduler();
+            stack = VmSystem.allocStack(stackSize);
+            Unsafe.initThread(this, stack, stackSize);
+            stackEnd = getStackEnd(stack, stackSize);
+            scheduler.registerThread(this);
+            threadState = RUNNING;
+            scheduler.addToReadyQueue(this, false, "thread.start");
+        }
             break;
         case RUNNING:
         case SUSPENDED:
-        case WAITING:
+        case WAITING_ENTER:
+        case WAITING_NOTIFY:
+        case WAITING_NOTIFY_TIMEOUT:
         case ASLEEP:
             throw new IllegalThreadStateException("already started");
         case STOPPED:
@@ -329,7 +347,7 @@ public abstract class VmThread extends VmSystemObject {
         if (javaThread != null) {
             javaThread.onExit();
             // Notify joining threads
-            synchronized(javaThread){
+            synchronized (javaThread) {
                 javaThread.notifyAll();
             }
         }
@@ -348,7 +366,7 @@ public abstract class VmThread extends VmSystemObject {
     private final void doStop() {
         final VmProcessor proc = VmMagic.currentProcessor();
         final VmThread current = proc.getCurrentThread();
-        proc.getScheduler().unregisterThread(this);        
+        proc.getScheduler().unregisterThread(this);
         // Go into low level stuff
         proc.disableReschedule(true);
         this.threadState = STOPPED;
@@ -371,7 +389,8 @@ public abstract class VmThread extends VmSystemObject {
      * 
      * @throws UninterruptiblePragma
      */
-    public final void interrupt() throws UninterruptiblePragma {
+    @Uninterruptible
+    public final void interrupt() {
         // Set interrupted state
         this.interrupted = true;
 
@@ -381,13 +400,15 @@ public abstract class VmThread extends VmSystemObject {
         try {
             switch (threadState) {
             case ASLEEP:
-            case WAITING:
-                {
-                    // Remove from queues
-                    wakeUpByScheduler();
-                    // Add to ready queue
-                    proc.getScheduler().addToReadyQueue(this, false, "thread.interrupt");
-                }
+            case WAITING_ENTER:
+            case WAITING_NOTIFY:
+            case WAITING_NOTIFY_TIMEOUT: {
+                // Remove from queues
+                wakeUpByScheduler();
+                // Add to ready queue
+                proc.getScheduler().addToReadyQueue(this, false,
+                        "thread.interrupt");
+            }
                 break;
             }
         } finally {
@@ -429,7 +450,7 @@ public abstract class VmThread extends VmSystemObject {
 
     /**
      * Set the state from suspended to yielding
-     *
+     * 
      */
     @KernelSpace
     @Uninterruptible
@@ -438,7 +459,8 @@ public abstract class VmThread extends VmSystemObject {
         if (threadState == SUSPENDED) {
             threadState = RUNNING;
             // FIXME make multi cpu safe
-            proc.getScheduler().addToReadyQueue(this, false, "thread.unsecureResume");
+            proc.getScheduler().addToReadyQueue(this, false,
+                    "thread.unsecureResume");
         }
     }
 
@@ -458,7 +480,7 @@ public abstract class VmThread extends VmSystemObject {
             proc.suspend(true);
         }
     }
-    
+
     /**
      * Suspend this thread.
      * 
@@ -498,11 +520,14 @@ public abstract class VmThread extends VmSystemObject {
      * @throws UninterruptiblePragma
      */
     @Uninterruptible
-    public final void sleep(long millis, int nanos)
-            throws InterruptedException {
-        if (currentThread() != this) { return; }
-        if (threadState != RUNNING) { return; }
-        
+    public final void sleep(long millis, int nanos) throws InterruptedException {
+        if (currentThread() != this) {
+            return;
+        }
+        if (threadState != RUNNING) {
+            return;
+        }
+
         // Test interrupted status
         if (this.interrupted) {
             this.interrupted = false;
@@ -525,8 +550,9 @@ public abstract class VmThread extends VmSystemObject {
 
     /**
      * Returns <code>true</code> if the thread represented by this object is
-     * running (including suspended, asleep, or interrupted). Returns <code>false</code>
-     * if the thread hasn't be started yet, is stopped or destroyed.
+     * running (including suspended, asleep, or interrupted). Returns
+     * <code>false</code> if the thread hasn't be started yet, is stopped or
+     * destroyed.
      * 
      * @return <code>true</code> if thread is alive, <code>false</code> if
      *         not.
@@ -541,7 +567,9 @@ public abstract class VmThread extends VmSystemObject {
             return false;
         case RUNNING:
         case SUSPENDED:
-        case WAITING:
+        case WAITING_ENTER:
+        case WAITING_NOTIFY:
+        case WAITING_NOTIFY_TIMEOUT:
         case ASLEEP:
         case YIELDING:
             return !stopping;
@@ -607,20 +635,22 @@ public abstract class VmThread extends VmSystemObject {
     @KernelSpace
     @Uninterruptible
     public final boolean isWaiting() {
-        return (threadState == WAITING);
+        return ((threadState >= WAITING_ENTER) && (threadState <= WAITING_NOTIFY_TIMEOUT));
     }
 
     /**
      * Gets the state of this thread.
+     * 
      * @return
      */
     @KernelSpace
     final int getThreadState() {
         return threadState;
     }
-    
+
     /**
      * Gets the thread this thread is waiting for (or null).
+     * 
      * @return
      */
     @KernelSpace
@@ -631,12 +661,13 @@ public abstract class VmThread extends VmSystemObject {
 
     /**
      * Gets a human readable name for the current thread state.
+     * 
      * @return
      */
     @KernelSpace
     @Uninterruptible
     public final String getThreadStateName() {
-        return STATE_NAMES[ threadState];
+        return STATE_NAMES[threadState];
     }
 
     /**
@@ -685,12 +716,14 @@ public abstract class VmThread extends VmSystemObject {
      * Setup this thread to wait for the given monitor
      * 
      * @param monitor
-     * @throws UninterruptiblePragma
+     * @param One
+     *            of the Thread WAITING_XYZ states.
      */
-    final void prepareWait(Monitor monitor) throws UninterruptiblePragma {
+    @Uninterruptible
+    final void prepareWait(Monitor monitor, int waitState) {
         // Keep this order of assignments!
         this.waitForMonitor = monitor;
-        this.threadState = WAITING;
+        this.threadState = waitState;
     }
 
     /**
@@ -701,12 +734,13 @@ public abstract class VmThread extends VmSystemObject {
      */
     @Uninterruptible
     final void wakeupAfterMonitor(Monitor monitor) {
-        if (this.threadState == WAITING) {
+        if (isWaiting()) {
             final VmProcessor proc = VmMagic.currentProcessor();
             proc.disableReschedule(true);
             try {
                 this.threadState = RUNNING;
-                proc.getScheduler().addToReadyQueue(this, false, "thread.wakeupAfterMonitor");
+                proc.getScheduler().addToReadyQueue(this, false,
+                        "thread.wakeupAfterMonitor");
             } finally {
                 proc.enableReschedule(true);
             }
@@ -728,22 +762,21 @@ public abstract class VmThread extends VmSystemObject {
         switch (threadState) {
         case ASLEEP:
         case RUNNING:
-        case YIELDING:
-            {
-                // Do nothing
-            }
+        case YIELDING: {
+            // Do nothing
+        }
             break;
-        case WAITING:
-            {
-                final Monitor mon = this.waitForMonitor;
-                mon.removeThreadFromQueues(this);
-            }
+        case WAITING_ENTER:
+        case WAITING_NOTIFY:
+        case WAITING_NOTIFY_TIMEOUT: {
+            final Monitor mon = this.waitForMonitor;
+            mon.removeThreadFromQueues(this);
+        }
             break;
-        default:
-            {
-                Unsafe.debug("Incorrect threadState in wakeUpByScheduler ");
-                Unsafe.debug(threadState);
-            }
+        default: {
+            Unsafe.debug("Incorrect threadState in wakeUpByScheduler ");
+            Unsafe.debug(threadState);
+        }
         }
         threadState = RUNNING;
     }
@@ -764,8 +797,9 @@ public abstract class VmThread extends VmSystemObject {
     public void setPriority(int priority) {
         checkAccess();
         if ((priority < Thread.MIN_PRIORITY)
-                || (priority > Thread.MAX_PRIORITY)) { throw new IllegalArgumentException(
-                "Invalid priority"); }
+                || (priority > Thread.MAX_PRIORITY)) {
+            throw new IllegalArgumentException("Invalid priority");
+        }
         if (asThread() instanceof SystemThread) {
             this.priority = priority;
         }
@@ -813,9 +847,10 @@ public abstract class VmThread extends VmSystemObject {
     public final int getId() {
         return id;
     }
-    
+
     /**
      * Gets the name of this thread.
+     * 
      * @return
      */
     @KernelSpace
@@ -825,7 +860,7 @@ public abstract class VmThread extends VmSystemObject {
 
     /**
      * Update my name from the java thread that wraps me.
-     *
+     * 
      */
     public final void updateName() {
         if (this.javaThread != null) {
@@ -848,54 +883,85 @@ public abstract class VmThread extends VmSystemObject {
     final void verifyState() throws UninterruptiblePragma {
         switch (threadState) {
         case CREATED:
-            if (queueEntry.isInUse()) { throw new Error(
-                    "Created thread cannot have an inuse queueEntry"); }
-            if (sleepQueueEntry.isInUse()) { throw new Error(
-                    "Created thread cannot have an inuse sleepQueueEntry"); }
+            if (queueEntry.isInUse()) {
+                throw new Error(
+                        "Created thread cannot have an inuse queueEntry");
+            }
+            if (sleepQueueEntry.isInUse()) {
+                throw new Error(
+                        "Created thread cannot have an inuse sleepQueueEntry");
+            }
             break;
         case ASLEEP:
-            if (queueEntry.isInUse()) { throw new Error(
-                    "Sleeping thread cannot have an inuse queueEntry"); }
-            if (!sleepQueueEntry.isInUse()) { throw new Error(
-                    "Sleeping thread must have an inuse sleepQueueEntry"); }
+            if (queueEntry.isInUse()) {
+                throw new Error(
+                        "Sleeping thread cannot have an inuse queueEntry");
+            }
+            if (!sleepQueueEntry.isInUse()) {
+                throw new Error(
+                        "Sleeping thread must have an inuse sleepQueueEntry");
+            }
             break;
         case DESTROYED:
-            if (queueEntry.isInUse()) { throw new Error(
-                    "Destroyed thread cannot have an inuse queueEntry"); }
-            if (sleepQueueEntry.isInUse()) { throw new Error(
-                    "Destroyed thread cannot have an inuse sleepQueueEntry"); }
+            if (queueEntry.isInUse()) {
+                throw new Error(
+                        "Destroyed thread cannot have an inuse queueEntry");
+            }
+            if (sleepQueueEntry.isInUse()) {
+                throw new Error(
+                        "Destroyed thread cannot have an inuse sleepQueueEntry");
+            }
             break;
         case RUNNING:
             if (!queueEntry.isInUse()) {
-                if (VmProcessor.current().getCurrentThread() != this) { throw new Error(
-                        "Running thread must be inuse on ready queue or current thread"); }
+                if (VmProcessor.current().getCurrentThread() != this) {
+                    throw new Error(
+                            "Running thread must be inuse on ready queue or current thread");
+                }
             }
-            if (sleepQueueEntry.isInUse()) { throw new Error(
-                    "Running thread cannot have an inuse sleepQueueEntry"); }
+            if (sleepQueueEntry.isInUse()) {
+                throw new Error(
+                        "Running thread cannot have an inuse sleepQueueEntry");
+            }
             break;
         case STOPPED:
-            if (queueEntry.isInUse()) { throw new Error(
-                    "Stopped thread cannot have an inuse queueEntry"); }
-            if (sleepQueueEntry.isInUse()) { throw new Error(
-                    "Stopped thread cannot have an inuse sleepQueueEntry"); }
+            if (queueEntry.isInUse()) {
+                throw new Error(
+                        "Stopped thread cannot have an inuse queueEntry");
+            }
+            if (sleepQueueEntry.isInUse()) {
+                throw new Error(
+                        "Stopped thread cannot have an inuse sleepQueueEntry");
+            }
             break;
         case SUSPENDED:
-            if (queueEntry.isInUse()) { throw new Error(
-                    "Suspended thread cannot have an inuse queueEntry"); }
-            if (sleepQueueEntry.isInUse()) { throw new Error(
-                    "Suspended thread cannot have an inuse sleepQueueEntry"); }
+            if (queueEntry.isInUse()) {
+                throw new Error(
+                        "Suspended thread cannot have an inuse queueEntry");
+            }
+            if (sleepQueueEntry.isInUse()) {
+                throw new Error(
+                        "Suspended thread cannot have an inuse sleepQueueEntry");
+            }
             break;
-        case WAITING:
-            if (waitForMonitor == null) { throw new Error(
-                    "Waiting thread must have a waitForMonitor"); }
-            if (!queueEntry.isInUse()) { throw new Error(
-                    "Waiting thread must have an inuse queueEntry"); }
+        case WAITING_ENTER:
+        case WAITING_NOTIFY:
+        case WAITING_NOTIFY_TIMEOUT:
+            if (waitForMonitor == null) {
+                throw new Error("Waiting thread must have a waitForMonitor");
+            }
+            if (!queueEntry.isInUse()) {
+                throw new Error("Waiting thread must have an inuse queueEntry");
+            }
             break;
         case YIELDING:
-            if (!queueEntry.isInUse()) { throw new Error(
-                    "Yielding thread must have an inuse queueEntry"); }
-            if (sleepQueueEntry.isInUse()) { throw new Error(
-                    "Yielding thread cannot have an inuse sleepQueueEntry"); }
+            if (!queueEntry.isInUse()) {
+                throw new Error("Yielding thread must have an inuse queueEntry");
+            }
+            if (sleepQueueEntry.isInUse()) {
+                throw new Error(
+                        "Yielding thread cannot have an inuse sleepQueueEntry");
+            }
             break;
         default:
             throw new Error("Unknown thread state " + threadState);
@@ -913,7 +979,7 @@ public abstract class VmThread extends VmSystemObject {
     public String toString() {
         if (javaThread != null) {
             return "%" + javaThread.getName() + ", st"
-                    + STATE_NAMES[ threadState] + "%";
+                    + STATE_NAMES[threadState] + "%";
         } else {
             return "%@null@, st" + threadState + "%";
         }
@@ -938,12 +1004,12 @@ public abstract class VmThread extends VmSystemObject {
     protected abstract Address getInstructionPointer();
 
     /**
-     * Gets the stackframe of the last system exception of this thread. 
+     * Gets the stackframe of the last system exception of this thread.
      */
     protected abstract Address getExceptionStackFrame();
 
     /**
-     * Gets the instruction pointer of the last system exception of this thread. 
+     * Gets the instruction pointer of the last system exception of this thread.
      */
     protected abstract Address getExceptionInstructionPointer();
 
@@ -986,20 +1052,23 @@ public abstract class VmThread extends VmSystemObject {
 
     /**
      * Detect a deadlock on this thread.
-     *
+     * 
      */
-    private final void detectDeadlock() throws UninterruptiblePragma {
-        if (threadState == WAITING) {
-            walkWaitingThreads(this);    
+    @Uninterruptible
+    private final void detectDeadlock() {
+        if (isWaiting()) {
+            walkWaitingThreads(this);
         }
     }
-    
+
     /**
      * Helper for detectDeadlock
+     * 
      * @param thread
      * @throws UninterruptiblePragma
      */
-    private final void walkWaitingThreads(VmThread thread) throws UninterruptiblePragma {
+    @Uninterruptible
+    private final void walkWaitingThreads(VmThread thread) {
         if (thread == null) {
             return;
         }
@@ -1010,18 +1079,19 @@ public abstract class VmThread extends VmSystemObject {
         final VmThread owner = waitForMonitor.getOwner();
         if (owner == this) {
             // We have a deadlock
-            Unsafe.debug("Deadlock["); 
+            Unsafe.debug("Deadlock[");
             Unsafe.debug(this.asThread().getName());
             Unsafe.debug(", ");
             Unsafe.debug(owner.asThread().getName());
         } else {
             walkWaitingThreads(owner);
         }
-    } 
-    
+    }
+
     /**
-     * Gets the inSystemException attribute.
-     * Reading this attribute also clears it.
+     * Gets the inSystemException attribute. Reading this attribute also clears
+     * it.
+     * 
      * @return Returns the inSystemException.
      */
     final boolean isInSystemException() {
@@ -1029,14 +1099,14 @@ public abstract class VmThread extends VmSystemObject {
         this.inSystemException = false;
         return rc;
     }
-    
+
     /**
      * Sets the inSystemException state.
      */
     final void setInSystemException() {
         this.inSystemException = true;
     }
-    
+
     /**
      * 
      * @param isolate
@@ -1051,11 +1121,14 @@ public abstract class VmThread extends VmSystemObject {
 
     /**
      * Visit all objects on the stack and register state of this thread.
+     * 
      * @param visitor
      * @param heapManager
-     * @return true if the last visit returned true or no visit was made, false otherwise.
+     * @return true if the last visit returned true or no visit was made, false
+     *         otherwise.
      */
-    public abstract boolean visit(ObjectVisitor visitor, VmHeapManager heapManager);
+    public abstract boolean visit(ObjectVisitor visitor,
+            VmHeapManager heapManager);
 
     /**
      * @return the requiredProcessor
@@ -1067,7 +1140,8 @@ public abstract class VmThread extends VmSystemObject {
     }
 
     /**
-     * @param requiredProcessor the requiredProcessor to set
+     * @param requiredProcessor
+     *            the requiredProcessor to set
      */
     protected final void setRequiredProcessor(VmProcessor requiredProcessor) {
         this.requiredProcessor = requiredProcessor;
@@ -1081,12 +1155,13 @@ public abstract class VmThread extends VmSystemObject {
     }
 
     /**
-     * @param currentProcessor the currentProcessor to set
+     * @param currentProcessor
+     *            the currentProcessor to set
      */
     final void setCurrentProcessor(VmProcessor currentProcessor) {
         this.currentProcessor = currentProcessor;
-    } 
-    
+    }
+
     /**
      * Gets the stacktrace of a given thread.
      * 
@@ -1190,7 +1265,8 @@ public abstract class VmThread extends VmSystemObject {
      * @return Throwable
      * @throws UninterruptiblePragma
      */
-    @LoadStatics @PrivilegedActionPragma
+    @LoadStatics
+    @PrivilegedActionPragma
     public static Throwable systemException(int nr, int address)
             throws UninterruptiblePragma {
         // if (VmSystem.debug > 0) {
