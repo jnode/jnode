@@ -135,7 +135,7 @@ public final class Monitor {
                 lock();
                 try {
                     VmMagic.currentProcessor().disableReschedule(true);
-                    prepareWait(current, enterQueue, "mon-enter");
+                    prepareWait(current, enterQueue, VmThread.WAITING_ENTER, "mon-enter");
                 } finally {
                     unlock();
                 }
@@ -206,9 +206,10 @@ public final class Monitor {
             exMsg = "Monitor is not locked";
         } else {
             final int oldLockCount = lockCount;
+            final int waitState = (timeout > 0) ? VmThread.WAITING_NOTIFY_TIMEOUT : VmThread.WAITING_NOTIFY;
             lock();
             try {
-                prepareWait(current, notifyQueue, "mon-notify");
+                prepareWait(current, notifyQueue, waitState, "mon-notify");
                 VmMagic.currentProcessor().disableReschedule(true);
             } finally {
                 unlock();
@@ -360,12 +361,12 @@ public final class Monitor {
      * @throws UninterruptiblePragma
      */
     private final void prepareWait(VmThread thread,
-            VmThreadQueue.ScheduleQueue queue, String queueName) {
+            VmThreadQueue.ScheduleQueue queue, int waitState, String queueName) {
         if (monitorLock != 1) {
             Unsafe.debug("MonitorLock not claimed");
             Unsafe.die("prepareWait");
         }
-        thread.prepareWait(this);
+        thread.prepareWait(this, waitState);
         queue.add(thread, false, "mon.prepareWait");
     }
 
