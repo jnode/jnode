@@ -21,7 +21,7 @@
 
 package org.mmtk.vm;
 
-import org.jnode.vm.VmProcessor;
+import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.vmmagic.pragma.InlinePragma;
 import org.vmmagic.pragma.Uninterruptible;
