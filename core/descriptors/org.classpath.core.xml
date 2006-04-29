@@ -17,6 +17,7 @@
       <export name="gnu.java.awt.color.*"/>
       <export name="gnu.java.awt.peer.*"/>
       <export name="gnu.java.awt.image.*"/>
+      <export name="gnu.java.awt.java2d.*"/>
       <export name="gnu.java.beans.*"/>
       <export name="gnu.java.beans.decoder.*"/>
       <export name="gnu.java.beans.editors.*"/>
@@ -64,6 +65,8 @@
       <export name="gnu.java.util.prefs.*"/>
       <export name="gnu.java.util.jar.*"/>
       <export name="gnu.javax.crypto.*"/>
+      <export name="gnu.javax.crypto.jce.*"/>
+      <export name="gnu.javax.net.ssl.provider.*"/>
       <export name="gnu.regexp.*"/>
       <export name="gnu.xml.stream.*"/>
 
@@ -87,6 +90,7 @@
       <export name="java.io.*"/>
       <export name="java.lang.*"/>
       <export name="java.lang.annotation.*"/>
+      <export name="java.lang.instrument.*"/>
       <export name="java.lang.ref.*"/>
       <export name="java.lang.reflect.*"/>
       <export name="java.math.*"/>
