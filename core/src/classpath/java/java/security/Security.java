@@ -101,7 +101,11 @@ public final class Security
 	  System.err.println
 	    ("         Falling back to standard GNU security provider");
 		  }
+              // Note that this matches our classpath.security file.
 	  providers.addElement (new gnu.java.security.provider.Gnu());
+	      providers.addElement(new gnu.javax.crypto.jce.GnuCrypto());
+              providers.addElement(new gnu.javax.crypto.jce.GnuSasl());
+              providers.addElement(new gnu.javax.net.ssl.provider.Jessie());
         }
     }
     // This class can't be instantiated.

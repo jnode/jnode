@@ -38,6 +38,8 @@ exception statement from your version. */
 
 package javax.swing.plaf.basic;
 
+import gnu.classpath.NotImplementedException;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
@@ -1168,6 +1170,7 @@ public class BasicTableUI extends TableUI
   }
 
   protected void uninstallKeyboardActions() 
+    throws NotImplementedException
   {
     // TODO: Implement this properly.
   }

@@ -48,6 +48,7 @@ import java.text.BreakIterator;
  * inside this package.
  *
  * @author Roman Kennke (roman@ontographics.com)
+ * @author Robert Schuster (robertschuster@fsfe.org)
  */
 public class Utilities
 {
@@ -238,34 +239,39 @@ public class Utilities
     // At the end of the for loop, this holds the requested model location
     int pos;
     int currentX = x0;
+    int width = 0;
 
     for (pos = 0; pos < s.count; pos++)
       {
         char nextChar = s.array[s.offset+pos];
         
         if (nextChar == 0)
-          {
-            if (! round && pos > 0)
-              pos--;
             break;
-          }
+        
         if (nextChar != '\t')
-          currentX += fm.charWidth(nextChar);
+          width = fm.charWidth(nextChar);
         else
           {
             if (te == null)
-              currentX += fm.charWidth(' ');
+              width = fm.charWidth(' ');
             else
-              currentX = (int) te.nextTabStop(currentX, pos);
+              width = ((int) te.nextTabStop(currentX, pos)) - currentX;
           }
         
-        if (currentX >= x)
+        if (round)
           {
-            if (! round && pos > 0)
-              pos--;
+            if (currentX + (width>>1) > x)
+              break;
+          }
+        else
+          {
+            if (currentX + width > x)
             break;
           }
+        
+        currentX += width;
       }
+
     return pos + p0;
   }
 
@@ -316,8 +322,11 @@ public class Utilities
     String text = c.getText();
     BreakIterator wb = BreakIterator.getWordInstance();
     wb.setText(text);
+        
     int last = wb.following(offs);
     int current = wb.next();
+    int cp;
+
     while (current != BreakIterator.DONE)
       {
         for (int i = last; i < current; i++)
@@ -330,7 +339,8 @@ public class Utilities
         last = current;
         current = wb.next();
       }
-    return BreakIterator.DONE;
+    
+    throw new BadLocationException("no more word", offs);
   }
 
   /**
@@ -511,21 +521,25 @@ public class Utilities
                                            int x0, int x, TabExpander e,
                                            int startOffset)
   {
-    int mark = Utilities.getTabbedTextOffset(s, metrics, x0, x, e, startOffset);
+    int mark = Utilities.getTabbedTextOffset(s, metrics, x0, x, e, startOffset, false);
     BreakIterator breaker = BreakIterator.getWordInstance();
     breaker.setText(s);
     
-    // If mark is equal to the end of the string, just use that position
-    if (mark >= s.count)
+    // If startOffset and s.offset differ then we need to use
+    // that difference two convert the offset between the two metrics. 
+    int shift = startOffset - s.offset;
+    
+    // If mark is equal to the end of the string, just use that position.
+    if (mark >= shift + s.count)
       return mark;
     
     // Try to find a word boundary previous to the mark at which we 
-    // can break the text
-    int preceding = breaker.preceding(mark + 1);
+    // can break the text.
+    int preceding = breaker.preceding(mark + 1 - shift);
     
     if (preceding != 0)
-      return preceding;
-    else
+      return preceding + shift;
+    
       // If preceding is 0 we couldn't find a suitable word-boundary so
       // just break it on the character boundary
       return mark;

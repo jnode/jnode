@@ -1936,6 +1936,12 @@ public abstract class JComponent extends Container implements Serializable
                         newPaintRects.add(rect);
                       }
                   }
+                else
+                  {
+                    // Not opaque, need to reuse the current paint rectangles
+                    // for the next component.
+                    newPaintRects.add(r);
+                  }
                 
               }
             else
@@ -2024,34 +2030,10 @@ public abstract class JComponent extends Container implements Serializable
     g.clipRect(inner.x, inner.y, inner.width, inner.height);
     Component[] children = getComponents();
 
-    // Find the bottommost component that needs to be painted. This is the
-    // component that - together with the rectangles of the components that
-    // are painted above it - covers the whole clip area.
-    Rectangle rect = new Rectangle();
-    int startIndex = children.length - 1;
-        for (int i = 0; i < children.length; i++)
-          {
-        Rectangle b = children[i].getBounds();
-        if (children[i].isOpaque() && children[i].isVisible()
-            && g.hitClip(b.x, b.y, b.width, b.height))
-          {
-            if (rect.isEmpty())
-              rect.setBounds(b);
-            else
-              SwingUtilities.computeUnion(b.x, b.y, b.width, b.height, rect);
-
-            if (SwingUtilities.isRectangleContainingRectangle(rect, inner))
-              {
-                startIndex = i;
-                break;
-              }
-          }
-      }
-
     // paintingTile becomes true just before we start painting the component's
     // children.
     paintingTile = true;
-    for (int i = startIndex; i >= 0; i--) //children.length; i++)
+    for (int i = children.length - 1; i >= 0; i--) //children.length; i++)
       {
         // paintingTile must be set to false before we begin to start painting
         // the last tile.
@@ -2942,9 +2924,12 @@ public abstract class JComponent extends Container implements Serializable
   }
 
   /**
-   * Set the value of the {@link #opaque} property.
+   * Set if the component should paint all pixels withing its bounds.
+   * If this property is set to false, the component expects the cleared
+   * background.
    *
-   * @param isOpaque The new value of the property
+   * @param isOpaque if true, paint all pixels. If false, expect the clean
+   * background. 
    *
    * @see ComponentUI#update
    */

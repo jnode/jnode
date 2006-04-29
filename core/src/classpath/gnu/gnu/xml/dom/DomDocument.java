@@ -150,6 +150,14 @@ public class DomDocument
   }
 
   /**
+   * Sets whether to check for document characters.
+   */
+  public void setCheckingCharacters(boolean flag)
+  {
+    checkingCharacters = flag;
+  }  
+  
+  /**
    * <b>DOM L1</b>
    * Returns the constant "#document".
    */
@@ -235,16 +243,7 @@ public class DomDocument
         if (current.getNodeType() == ELEMENT_NODE)
           {
             DomElement element = (DomElement) current;
-            if (doctype != null)
-              {
-            DTDElementTypeInfo info =
-              doctype.getElementTypeInfo(current.getNodeName());
-            if (info != null &&
-                id.equals(element.getAttribute(info.idAttrName)))
-              {
-                return element;
-              }
-            else if (element.userIdAttrs != null)
+            if (element.userIdAttrs != null)
               {
                 for (Iterator i = element.userIdAttrs.iterator();
                      i.hasNext(); )
@@ -256,6 +255,15 @@ public class DomDocument
                       }
                   }
               }
+            if (doctype != null)
+              {
+                DTDElementTypeInfo info =
+                  doctype.getElementTypeInfo(current.getNodeName());
+                if (info != null &&
+                    id.equals(element.getAttribute(info.idAttrName)))
+                  {
+                    return element;
+                  }
           }
             // xml:id
             String xmlId = element.getAttribute("xml:id");
@@ -535,10 +543,9 @@ public class DomDocument
     int index = name.indexOf(':');
     if (index != -1)
       {
-        if (index == 0 || name.lastIndexOf(':') != index)
+        if (index == 0 || index == (len - 1) || name.lastIndexOf(':') != index)
           {
-            throw new DomDOMException(DOMException.NAMESPACE_ERR,
-                                      name, null, 0);
+            throw new DomDOMException(DOMException.NAMESPACE_ERR, name, null, 0);
           }
       }
   }

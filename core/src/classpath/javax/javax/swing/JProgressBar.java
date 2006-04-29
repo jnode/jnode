@@ -634,15 +634,28 @@ public class JProgressBar extends JComponent implements SwingConstants,
   }
 
   /**
-   * This method returns a string that can be used to 
-   * describe this JProgressBar. This method is usually
-   * only used for debugging purposes.
+   * Returns an implementation-dependent string describing the attributes of
+   * this <code>JProgressBar</code>.
    *
-   * @return A string that describes this JProgressBar.
+   * @return A string describing the attributes of this 
+   *     <code>JProgressBar</code> (never <code>null</code>).
    */
   protected String paramString()
   {
-    return "JProgressBar";
+    String superParamStr = super.paramString();
+    StringBuffer sb = new StringBuffer();
+    sb.append(",orientation=");
+    if (orientation == HORIZONTAL)
+      sb.append("HORIZONTAL");
+    else
+      sb.append("VERTICAL");
+    sb.append(",paintBorder=").append(isBorderPainted());
+    sb.append(",paintString=").append(isStringPainted());
+    sb.append(",progressString=");
+    if (progressString != null)
+      sb.append(progressString);
+    sb.append(",indeterminateString=").append(isIndeterminate());
+    return superParamStr + sb.toString();
   }
 
   /**

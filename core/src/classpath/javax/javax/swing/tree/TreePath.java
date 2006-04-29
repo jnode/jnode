@@ -58,6 +58,11 @@ public class TreePath implements Serializable
 	 */
   private final Object[] path;
 
+  /**
+   * The parent path (to be reused).
+   */
+  private transient TreePath parentPath;
+
 
 	/**
    * Creates a path from the list of objects representing tree elements.  The
@@ -295,6 +300,11 @@ public class TreePath implements Serializable
     if (path.length <= 1)
       return null;
 
-    return new TreePath(this.getPath(), path.length - 1);
+    // Reuse the parent path, if possible. The parent path is requested
+    // during the tree repainting, so reusing generates a lot less garbage.
+    if (parentPath == null)
+      parentPath = new TreePath(this.getPath(), path.length - 1);
+    
+    return parentPath;
   }
 }
