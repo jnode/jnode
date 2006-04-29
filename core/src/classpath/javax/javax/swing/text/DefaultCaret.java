@@ -96,7 +96,7 @@ public class DefaultCaret extends Rectangle
 
     public void setDot(int dot, Bias bias)
     {
-      DefaultCaret.this.setDot(dot);
+      DefaultCaret.this.setDotImpl(dot);
     }
     
   }

@@ -1,5 +1,5 @@
 /* JComboBox.java --
-   Copyright (C) 2002, 2004, 2005  Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2005, 2006,  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -1102,15 +1102,33 @@ public class JComboBox extends JComponent implements ItemSelectable,
   }
 
   /**
-   * A string that describes this JComboBox. Normally only used for debugging.
+   * Returns an implementation-dependent string describing the attributes of
+   * this <code>JComboBox</code>.
    *
-   * @return A string describing this JComboBox
+   * @return A string describing the attributes of this <code>JComboBox</code>
+   *         (never <code>null</code>).
    */
   protected String paramString()
   {
-    return "JComboBox";
+    String superParamStr = super.paramString();
+    StringBuffer sb = new StringBuffer();
+    sb.append(",isEditable=").append(isEditable());
+    sb.append(",lightWeightPopupEnabled=").append(isLightWeightPopupEnabled());
+    sb.append(",maximumRowCount=").append(getMaximumRowCount());
+    
+    sb.append(",selectedItemReminder=");
+    if (selectedItemReminder != null)
+      sb.append(selectedItemReminder);
+    return superParamStr + sb.toString();
   }
 
+  /**
+   * Returns the object that provides accessibility features for this
+   * <code>JComboBox</code> component.
+   *
+   * @return The accessible context (an instance of 
+   *         {@link AccessibleJComboBox}).
+   */
   public AccessibleContext getAccessibleContext()
   {
     if (accessibleContext == null)
@@ -1258,6 +1276,11 @@ public class JComboBox extends JComponent implements ItemSelectable,
       return false;
     }
 
+    /**
+     * Returns the accessible role for the <code>JComboBox</code> component.
+     *
+     * @return {@link AccessibleRole#COMBO_BOX}.
+     */
     public AccessibleRole getAccessibleRole()
     {
       return AccessibleRole.COMBO_BOX;

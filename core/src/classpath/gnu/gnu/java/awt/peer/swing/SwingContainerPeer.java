@@ -61,7 +61,7 @@ public class SwingContainerPeer
    *
    * @param awtCont
    */
-  public SwingContainerPeer(Container awtCont)
+  public SwingContainerPeer(Component awtCont)
   {
     init(awtCont, null);
   }
@@ -92,12 +92,7 @@ public class SwingContainerPeer
    */
   public Insets getInsets()
   {
-    Insets retVal;
-    if (swingComponent != null)
-      retVal = swingComponent.getJComponent().getInsets();
-    else
-      retVal = new Insets(0, 0, 0, 0);
-    return retVal;
+    return insets();
   }
 
   /**
@@ -214,6 +209,8 @@ public class SwingContainerPeer
   protected void handleMouseEvent(MouseEvent ev)
   {
     Component comp = awtComponent.getComponentAt(ev.getPoint());
+    if (comp != null)
+      {
     ComponentPeer peer = comp.getPeer();
     if (awtComponent != comp && !comp.isLightweight() && peer instanceof SwingComponentPeer)
       {
@@ -221,6 +218,7 @@ public class SwingContainerPeer
         ev.setSource(comp);
         ((SwingComponentPeer) peer).handleMouseEvent(ev);
       }
+  }
   }
 
   /**
@@ -231,11 +229,14 @@ public class SwingContainerPeer
   protected void handleMouseMotionEvent(MouseEvent ev)
   {
     Component comp = awtComponent.getComponentAt(ev.getPoint());
+    if (comp != null)
+      {
     ComponentPeer peer = comp.getPeer();
     if (awtComponent != comp && !comp.isLightweight() && peer instanceof SwingComponentPeer)
       {
         ev.translatePoint(comp.getX(), comp.getY());
         ((SwingComponentPeer) peer).handleMouseMotionEvent(ev);
       }
+  }
   }
 }

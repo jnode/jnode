@@ -38,6 +38,8 @@ exception statement from your version. */
 
 package javax.swing.plaf.basic;
 
+import gnu.classpath.NotImplementedException;
+
 import java.awt.AWTEvent;
 import java.awt.Color;
 import java.awt.Component;
@@ -1209,6 +1211,7 @@ public class BasicInternalFrameUI extends InternalFrameUI
    * This method installs the keyboard actions for the JInternalFrame.
    */
   protected void installKeyboardActions()
+    throws NotImplementedException
   {
     // FIXME: Implement.
   }
@@ -1291,6 +1294,7 @@ public class BasicInternalFrameUI extends InternalFrameUI
    * This method uninstalls the keyboard actions for the JInternalFrame.
    */
   protected void uninstallKeyboardActions()
+    throws NotImplementedException
   {
     // FIXME: Implement.
   }

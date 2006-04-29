@@ -223,27 +223,60 @@ public class DefaultTreeModel
   }
 
 	/**
-   * Invoke this method if you've modified the TreeNodes upon 
-   * which this model depends. The model will notify all of its 
-   * listeners that the model has changed.
+   * <p>
+   * Invoke this method if you've modified the TreeNodes upon which this model
+   * depends. The model will notify all of its listeners that the model has
+   * changed. It will fire the events, necessary to update the layout caches and
+   * repaint the tree. The tree will <i>not</i> be properly refreshed if you
+   * call the JTree.repaint instead.
+   * </p>
+   * <p>
+   * This method will refresh the information about whole tree from the root. If
+   * only part of the tree should be refreshed, it is more effective to call
+   * {@link #reload(TreeNode)}.
+   * </p>
 	 */
   public void reload()
-    throws NotImplementedException
   {
-		// TODO
+    // Need to duplicate the code because the root can formally be
+    // no an instance of the TreeNode.
+    int n = getChildCount(root);
+    int[] childIdx = new int[n];
+    Object[] children = new Object[n];
+
+    for (int i = 0; i < n; i++)
+      {
+        childIdx[i] = i;
+        children[i] = getChild(root, i);
+      }
+
+    fireTreeStructureChanged(this, new Object[] { root }, childIdx, children);
   }
 
 	/**
-   * Invoke this method if you've modified the TreeNodes upon 
-   * which this model depends. The model will notify all of its 
-   * listeners that the model has changed.
+   * Invoke this method if you've modified the TreeNodes upon which this model
+   * depends. The model will notify all of its listeners that the model has
+   * changed. It will fire the events, necessary to update the layout caches and
+   * repaint the tree. The tree will <i>not</i> be properly refreshed if you
+   * call the JTree.repaint instead.
    * 
-   * @param node - TODO
+   * @param node - the tree node, from which the tree nodes have changed
+   *          (inclusive). If you do not know this node, call {@link #reload()}
+   *          instead.
 	 */
   public void reload(TreeNode node)
-    throws NotImplementedException
   {
-		// TODO
+    int n = getChildCount(node);
+    int[] childIdx = new int[n];
+    Object[] children = new Object[n];
+
+    for (int i = 0; i < n; i++)
+      {
+        childIdx[i] = i;
+        children[i] = getChild(node, i);
+      }
+
+    fireTreeStructureChanged(this, getPathToRoot(node), childIdx, children);
   }
 
 	/**
@@ -392,9 +425,18 @@ public class DefaultTreeModel
    * @param node that had its children and grandchildren changed.
 	 */
   public void nodeStructureChanged(TreeNode node)
-    throws NotImplementedException
   {
-		// TODO
+    int n = getChildCount(root);
+    int[] childIdx = new int[n];
+    Object[] children = new Object[n];
+
+    for (int i = 0; i < n; i++)
+      {
+        childIdx[i] = i;
+        children[i] = getChild(root, i);
+      }
+
+    fireTreeStructureChanged(this, new Object[] { root }, childIdx, children);
   }
 
 	/**

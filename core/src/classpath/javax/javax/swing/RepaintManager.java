@@ -160,9 +160,9 @@ public class RepaintManager
       if (o1 instanceof JComponent && o2 instanceof JComponent)
         {
           JComponent c1 = (JComponent) o1;
-          Rectangle d1 = (Rectangle) dirtyComponents.get(c1);
+          Rectangle d1 = (Rectangle) dirtyComponentsWork.get(c1);
           JComponent c2 = (JComponent) o2;
-          Rectangle d2 = (Rectangle) dirtyComponents.get(c2);
+          Rectangle d2 = (Rectangle) dirtyComponentsWork.get(c2);
           return d2.width * d2.height - d1.width * d1.height;
         }
         throw new ClassCastException("This comparator can only be used with "
@@ -186,6 +186,12 @@ public class RepaintManager
    * @see #markCompletelyDirty
    */
   HashMap dirtyComponents;
+
+  /**
+   * The dirtyComponents which is used in paintDiryRegions to avoid unnecessary
+   * locking.
+   */
+  HashMap dirtyComponentsWork;
 
   /**
    * The comparator used for ordered inserting into the repaintOrder list. 
@@ -262,6 +268,7 @@ public class RepaintManager
   public RepaintManager()
   {
     dirtyComponents = new HashMap();
+    dirtyComponentsWork = new HashMap();
     invalidComponents = new ArrayList();
     repaintWorker = new RepaintWorker();
     doubleBufferMaximumSize = new Dimension(2000,2000);
@@ -554,13 +561,20 @@ public class RepaintManager
     if (dirtyComponents.size() == 0)
       return;
 
+    // Swap dirtyRegions with dirtyRegionsWork to avoid locking.
     synchronized (dirtyComponents)
       {
+        HashMap swap = dirtyComponents;
+        dirtyComponents = dirtyComponentsWork;
+        dirtyComponentsWork = swap;
+      }
+
+    ArrayList repaintOrder = new ArrayList(dirtyComponentsWork.size());;
         // We sort the components by their size here. This way we have a good
         // chance that painting the bigger components also paints the smaller
         // components and we don't need to paint them twice.
-        ArrayList repaintOrder = new ArrayList(dirtyComponents.size());
-        repaintOrder.addAll(dirtyComponents.keySet());
+    repaintOrder.addAll(dirtyComponentsWork.keySet());
+
         if (comparator == null)
           comparator = new ComponentComparator();
         Collections.sort(repaintOrder, comparator);
@@ -570,16 +584,14 @@ public class RepaintManager
         JComponent comp = (JComponent) i.next();
         // If a component is marked completely clean in the meantime, then skip
         // it.
-            Rectangle damaged = (Rectangle) dirtyComponents.get(comp);
+        Rectangle damaged = (Rectangle) dirtyComponentsWork.remove(comp);
         if (damaged == null || damaged.isEmpty())
           continue;
         comp.paintImmediately(damaged);
-            dirtyComponents.remove(comp);
           }
         repaintUnderway = false;
         commitRemainingBuffers();
       }
-  }
 
   /**
    * Get an offscreen buffer for painting a component's image. This image

@@ -61,7 +61,6 @@ import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
-import javax.swing.KeyStroke;
 import javax.swing.LookAndFeel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -69,7 +68,6 @@ import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.plaf.ActionMapUIResource;
-import javax.swing.plaf.InputMapUIResource;
 import javax.swing.plaf.TextUI;
 import javax.swing.plaf.UIResource;
 import javax.swing.text.AbstractDocument;
@@ -824,6 +822,7 @@ public abstract class BasicTextUI extends TextUI
    * this UI.
    */
   protected void uninstallKeyboardActions()
+    throws NotImplementedException
   {
     // FIXME: Uninstall keyboard actions here.
   }
@@ -1139,9 +1138,14 @@ public abstract class BasicTextUI extends TextUI
   public int getNextVisualPositionFrom(JTextComponent t, int pos,
                                        Position.Bias b, int direction,
                                        Position.Bias[] biasRet)
-    throws BadLocationException, NotImplementedException
+    throws BadLocationException
   {
-    return 0; // TODO: Implement me.
+    // A comment in the spec of NavigationFilter.getNextVisualPositionFrom()
+    // suggests that this method should be implemented by forwarding the call
+    // the root view.
+    return rootView.getNextVisualPositionFrom(pos, b,
+                                              getVisibleEditorRect(),
+                                              direction, biasRet);
   }
 
   /**

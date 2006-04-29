@@ -275,7 +275,17 @@ public class WrappedPlainView extends BoxView implements TabExpander
   protected int calculateBreakPosition(int p0, int p1)
   {
     Container c = getContainer();
-    Rectangle alloc = new Rectangle(0, 0, getWidth(), getHeight());
+    
+    int li = getLeftInset();
+    int ti = getTopInset();
+    
+    Rectangle alloc = new Rectangle(li, ti,
+                                    getWidth()-getRightInset()-li,
+                                    getHeight()-getBottomInset()-ti);
+
+    // Mimic a behavior observed in the RI.
+    if (alloc.isEmpty())
+      return 0;
     
     updateMetrics();
     
@@ -288,10 +298,10 @@ public class WrappedPlainView extends BoxView implements TabExpander
         // this shouldn't happen
         throw new InternalError("Invalid offsets p0: " + p0 + " - p1: " + p1);
       }
-    // FIXME: Should we account for the insets of the container?
+
     if (wordWrap)
-      return p0 + Utilities.getBreakLocation(lineBuffer, metrics, alloc.x,
-                                          alloc.x + alloc.width, this, 0);
+      return Utilities.getBreakLocation(lineBuffer, metrics, alloc.x,
+                                          alloc.x + alloc.width, this, p0);
     else
       return p0 + Utilities.getTabbedTextOffset(lineBuffer, metrics, alloc.x,
                                              alloc.x + alloc.width, this, 0,
@@ -419,7 +429,7 @@ public class WrappedPlainView extends BoxView implements TabExpander
   class WrappedLine extends View
   { 
     /** Used to cache the number of lines for this View **/
-    int numLines;
+    int numLines = 1;
     
     public WrappedLine(Element elem)
     {
@@ -438,16 +448,29 @@ public class WrappedPlainView extends BoxView implements TabExpander
       int end = getEndOffset();
       int currStart = getStartOffset();
       int currEnd;      
+      int count = 0;
       while (currStart < end)
         {
           currEnd = calculateBreakPosition(currStart, end);
+
           drawLine(currStart, currEnd, g, rect.x, rect.y + metrics.getAscent());
+          
           rect.y += lineHeight;          
           if (currEnd == currStart)
             currStart ++;
           else
             currStart = currEnd;          
+          
+          count++;
+          
         }
+      
+      if (count != numLines)
+        {
+          numLines = count;
+          preferenceChanged(this, false, true);
+        }
+      
     }
 
     /**
@@ -469,6 +492,9 @@ public class WrappedPlainView extends BoxView implements TabExpander
           // careful: check that there's no off-by-one problem here
           // depending on which position calculateBreakPosition returns
           breakPoint = calculateBreakPosition(i, end);
+          
+          if (breakPoint == 0)
+            return;
           
           // If breakPoint is equal to the current index no further
           // line is needed and we can end the loop.
@@ -578,13 +604,15 @@ public class WrappedPlainView extends BoxView implements TabExpander
       Rectangle rect = a.getBounds();
       int currLineStart = getStartOffset();
       
-      // WrappedLine does not represent the last possible offset in a line.
-      // So we should never return that offset. Behavior observed in the RI.
-      int end = getEndOffset() - 1;
+      // Although calling modelToView with the last possible offset will
+      // cause a BadLocationException in CompositeView it is allowed
+      // to return that offset in viewToModel.
+      int end = getEndOffset();
       
       int lineHeight = metrics.getHeight();
       if (y < rect.y)
         return currLineStart;
+
       if (y > rect.y + rect.height)
         return end;
       
@@ -592,9 +620,10 @@ public class WrappedPlainView extends BoxView implements TabExpander
       // text but the area where text *may* be painted. This means the width
       // is most of the time identical to the component's width.
 
-      while (true)
+      while (currLineStart != end)
         {
           int currLineEnd = calculateBreakPosition(currLineStart, end);
+
           // If we're at the right y-position that means we're on the right
           // logical line and we should look for the character
           if (y >= rect.y && y < rect.y + lineHeight)
@@ -608,18 +637,27 @@ public class WrappedPlainView extends BoxView implements TabExpander
                   // Shouldn't happen
                 }
               
-              return Utilities.getTabbedTextOffset(s, metrics, rect.x,
+              int offset = Utilities.getTabbedTextOffset(s, metrics, rect.x,
                                                        (int) x,
                                                        WrappedPlainView.this,
                                                        currLineStart);
+              // If the calculated offset is the end of the line (in the
+              // document (= start of the next line) return the preceding
+              // offset instead. This makes sure that clicking right besides
+              // the last character in a line positions the cursor after the
+              // last character and not in the beginning of the next line.
+              return (offset == currLineEnd) ? offset - 1 : offset;
             }
           // Increment rect.y so we're checking the next logical line
           rect.y += lineHeight;
           
           // Increment currLineStart to the model position of the start
-          // of the next logical line
+          // of the next logical line.
             currLineStart = currLineEnd;
+
         }
+      
+      return end;
     }    
 
     /**
@@ -632,6 +670,16 @@ public class WrappedPlainView extends BoxView implements TabExpander
      */
     void updateDamage (Rectangle a)
     {
+      // If the allocation area is empty we can't do anything useful.
+      // As determining the number of lines is impossible in that state we
+      // reset it to an invalid value which can then be recalculated at a
+      // later point.
+      if (a.isEmpty())
+        {
+          numLines = 1;
+          return;
+        }
+      
       int oldNumLines = numLines;
       determineNumLines();
       

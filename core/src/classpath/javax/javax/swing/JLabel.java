@@ -512,6 +512,7 @@ public class JLabel extends JComponent implements Accessible, SwingConstants
 	Icon oldIcon = icon;
 	icon = newIcon;
 	firePropertyChange("icon", oldIcon, newIcon);
+	repaint();
       }
   }
 

@@ -2053,9 +2053,6 @@ public class JTable
                                int column,
                                boolean includeSpacing)
   {
-    // moveToCellBeingEdited expects the cached value and clones it.
-    // If the caching would be removed later, uplate moveToCellBeingEdited
-    // as well.
     int height = getRowHeight(row);
     int width = columnModel.getColumn(column).getWidth();
     int x_gap = columnModel.getColumnMargin();
@@ -2070,11 +2067,13 @@ public class JTable
     for (int i = 0; i < column; ++i)
       x += columnModel.getColumn(i).getWidth();
 
+    Rectangle rect = new Rectangle();
+
     if (includeSpacing)
-      rectCache.setBounds(x, y, width, height +y_gap);
+      rect.setBounds(x, y, width, height +y_gap);
     else
-      rectCache.setBounds(x, y, width - x_gap, height);
-    return rectCache;
+      rect.setBounds(x, y, width - x_gap, height);
+    return rect;
   }
 
   public void clearSelection()
@@ -2434,7 +2433,7 @@ public class JTable
 
   /**
    * Get the value of the <code>columnCount</code> property by
-   * delegation to the @{link #columnModel} field.
+   * delegation to the {@link #columnModel} field.
    *
    * @return The current value of the columnCount property
    */
@@ -2445,7 +2444,7 @@ public class JTable
 
   /**
    * Get the value of the <code>rowCount</code> property by
-   * delegation to the @{link #dataModel} field.
+   * delegation to the {@link #dataModel} field.
    *
    * @return The current value of the rowCount property
    */
@@ -2466,7 +2465,7 @@ public class JTable
 
   /**
    * Get the value of the <code>selectedColumn</code> property by
-   * delegation to the @{link #columnModel} field.
+   * delegation to the {@link #columnModel} field.
    *
    * @return The current value of the selectedColumn property
    */
@@ -2535,7 +2534,7 @@ public class JTable
 
   /**
    * Get the value of the <code>selectedColumnCount</code> property by
-   * delegation to the @{link #columnModel} field.
+   * delegation to the {@link #columnModel} field.
    *
    * @return The current value of the selectedColumnCount property
    */  
@@ -2546,7 +2545,7 @@ public class JTable
 
   /**
    * Get the value of the <code>selectedColumns</code> property by
-   * delegation to the @{link #columnModel} field.
+   * delegation to the {@link #columnModel} field.
    *
    * @return The current value of the selectedColumns property
    */
@@ -2567,7 +2566,7 @@ public class JTable
 
   /**
    * Get the value of the <code>selectedRowCount</code> property by
-   * delegation to the @{link #selectionModel} field.
+   * delegation to the {@link #selectionModel} field.
    *
    * @return The current value of the selectedRowCount property
    */
@@ -2578,7 +2577,7 @@ public class JTable
 
   /**
    * Get the value of the <code>selectedRows</code> property by
-   * delegation to the @{link #selectionModel} field.
+   * delegation to the {@link #selectionModel} field.
    *
    * @return The current value of the selectedRows property
    */
@@ -3722,8 +3721,7 @@ public class JTable
   private void moveToCellBeingEdited(Component component)
   {
      Rectangle r = getCellRect(editingRow, editingColumn, true);
-     // Clone rectangle as getCellRect returns the cached value.
-     component.setBounds(new Rectangle(r));
+     component.setBounds(r);
   }
 
   /**

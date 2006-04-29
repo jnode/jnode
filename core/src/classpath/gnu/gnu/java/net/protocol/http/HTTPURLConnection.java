@@ -267,6 +267,8 @@ public class HTTPURLConnection
                 secure = false;
                 start = 7;
                 int end = location.indexOf('/', start);
+                    if (end == -1)
+                      end = location.length();
                 host = location.substring(start, end);
                 int ci = host.lastIndexOf(':');
                 if (ci != -1)
@@ -288,6 +290,8 @@ public class HTTPURLConnection
                 secure = true;
                 start = 8;
                 int end = location.indexOf('/', start);
+                    if (end == -1)
+                      end = location.length();
                 host = location.substring(start, end);
                 int ci = host.lastIndexOf(':');
                 if (ci != -1)
