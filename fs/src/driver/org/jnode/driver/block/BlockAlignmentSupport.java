@@ -242,7 +242,7 @@ public class BlockAlignmentSupport implements BlockDeviceAPI {
     private static final Logger log = Logger.getLogger(BlockAlignmentSupport.class);
     private final BlockDeviceAPI parentApi;
     private int alignment;
-    private boolean dolog = true;
+    private boolean dolog = false;
 
 
     public BlockAlignmentSupport(BlockDeviceAPI parentApi, int alignment) {
