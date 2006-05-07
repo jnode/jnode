@@ -714,15 +714,22 @@ public class JSplitPane extends JComponent implements Accessible
   /**
    * This method sets the location of the divider.
    *
-   * @param location The location of the divider.
+   * @param location The location of the divider. The negative value forces to
+   *          compute the new location from the preferred sizes of the split
+   *          pane components.
    */
   public void setDividerLocation(int location)
   {
     if (ui != null && location != getDividerLocation())
       {
 	int oldLocation = getDividerLocation();
+        if (location < 0)
+          ((SplitPaneUI) ui).resetToPreferredSizes(this);
+        else
 	((SplitPaneUI) ui).setDividerLocation(this, location);
-	firePropertyChange(DIVIDER_LOCATION_PROPERTY, oldLocation, location);
+        
+        firePropertyChange(DIVIDER_LOCATION_PROPERTY, oldLocation, 
+                           getDividerLocation());
       }
   }
 

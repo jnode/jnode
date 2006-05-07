@@ -3091,6 +3091,8 @@ public abstract class Component
 				mouseListener.mouseClicked(e);
 				break;
         case MouseEvent.MOUSE_ENTERED:
+ 	  if( isLightweight() )
+ 	    setCursor( getCursor() );
 				mouseListener.mouseEntered(e);
 				break;
         case MouseEvent.MOUSE_EXITED:

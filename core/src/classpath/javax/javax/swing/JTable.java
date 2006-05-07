@@ -1955,9 +1955,33 @@ public class JTable
     // affect the size parameters of the JTable. Otherwise we only need
     // to perform a repaint to update the view.
     if (event == null || event.getType() == TableModelEvent.INSERT)
+      {
+        // Sync selection model with data model.
+        if (event != null)
+          {
+            int first = event.getFirstRow();
+            if (first < 0)
+              first = 0;
+            int last = event.getLastRow();
+            if (last < 0)
+              last = getRowCount() - 1;
+            selectionModel.insertIndexInterval(first, last - first + 1, true);
+          }
       revalidate();
+      }
     if (event == null || event.getType() == TableModelEvent.DELETE)
       {
+        // Sync selection model with data model.
+        if (event != null)
+          {
+            int first = event.getFirstRow();
+            if (first < 0)
+              first = 0;
+            int last = event.getLastRow();
+            if (last < 0)
+              last = getRowCount() - 1;
+            selectionModel.removeIndexInterval(first, last);
+          }
         if (dataModel.getRowCount() == 0)
           clearSelection();
         revalidate();
@@ -3721,6 +3745,13 @@ public class JTable
   private void moveToCellBeingEdited(Component component)
   {
      Rectangle r = getCellRect(editingRow, editingColumn, true);
+     // Adjust bounding box of the editing component, so that it lies
+     // 'above' the grid on all edges, not only right and bottom.
+     // The table grid is painted only at the right and bottom edge of a cell.
+     r.x -= 1;
+     r.y -= 1;
+     r.width += 1;
+     r.height += 1;
      component.setBounds(r);
   }
 

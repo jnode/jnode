@@ -518,7 +518,11 @@ public class WrappedPlainView extends BoxView implements TabExpander
       if (axis == X_AXIS)
         return getWidth();
       else if (axis == Y_AXIS)
+        {
+          if (metrics == null)
+            updateMetrics();
           return numLines * metrics.getHeight(); 
+        }
       
       throw new IllegalArgumentException("Invalid axis for getPreferredSpan: "
                                          + axis);
@@ -538,9 +542,15 @@ public class WrappedPlainView extends BoxView implements TabExpander
     public Shape modelToView(int pos, Shape a, Bias b)
         throws BadLocationException
     {
+      Rectangle rect = a.getBounds();
+      
+      // Throwing a BadLocationException is an observed behavior of the RI.
+      if (rect.isEmpty())
+        throw new BadLocationException("Unable to calculate view coordinates "
+                                       + "when allocation area is empty.", 5);
+      
       Segment s = getLineBuffer();
       int lineHeight = metrics.getHeight();
-      Rectangle rect = a.getBounds();
       
       // Return a rectangle with width 1 and height equal to the height 
       // of the text
@@ -661,11 +671,16 @@ public class WrappedPlainView extends BoxView implements TabExpander
     }    
 
     /**
-     * This method is called from insertUpdate and removeUpdate.
-     * If the number of lines in the document has changed, just repaint
+     * <p>This method is called from insertUpdate and removeUpdate.</p>
+     * 
+     * <p>If the number of lines in the document has changed, just repaint
      * the whole thing (note, could improve performance by not repainting 
      * anything above the changes).  If the number of lines hasn't changed, 
-     * just repaint the given Rectangle.
+     * just repaint the given Rectangle.</p>
+     * 
+     * <p>Note that the <code>Rectangle</code> argument may be <code>null</code>
+     * when the allocation area is empty.</code> 
+     * 
      * @param a the Rectangle to repaint if the number of lines hasn't changed
      */
     void updateDamage (Rectangle a)
@@ -674,7 +689,7 @@ public class WrappedPlainView extends BoxView implements TabExpander
       // As determining the number of lines is impossible in that state we
       // reset it to an invalid value which can then be recalculated at a
       // later point.
-      if (a.isEmpty())
+      if (a == null || a.isEmpty())
         {
           numLines = 1;
           return;

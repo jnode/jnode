@@ -75,9 +75,11 @@ import java.awt.image.ColorModel;
 import java.awt.image.ImageObserver;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
+import java.awt.image.WritableRaster;
 import java.awt.image.renderable.RenderableImage;
 import java.text.AttributedCharacterIterator;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -90,6 +92,13 @@ public abstract class AbstractGraphics2D
   extends Graphics2D
   implements Cloneable
 {
+
+  /**
+   * Accuracy of the sampling in the anti-aliasing shape filler.
+   * Lower values give more speed, while higher values give more quality.
+   * It is advisable to choose powers of two.
+   */
+  private static final int AA_SAMPLING = 8;
 
   /**
    * The transformation for this Graphics2D instance
@@ -132,24 +141,31 @@ public abstract class AbstractGraphics2D
   private RenderingHints renderingHints;
 
   /**
-   * The paint context to use for draw and fill operations.
-   */
-  private PaintContext paintContext;
-
-  /**
    * The paint raster.
    */
   private Raster paintRaster;
 
   /**
-   * The composite context to use for draw and fill operations.
-   */
-  private CompositeContext compositeContext;
-
-  /**
    * A cached pixel array.
    */
   private int[] pixel;
+
+  /**
+   * The raster of the destination surface. This is where the painting is
+   * performed.
+   */
+  private WritableRaster destinationRaster;
+
+  /**
+   * Stores the alpha values for a scanline in the anti-aliasing shape
+   * renderer.
+   */
+  private transient int[] alpha;
+
+  /**
+   * The edge table for the scanline conversion algorithms.
+   */
+  private transient ArrayList[] edgeTable;
 
   /**
    * Indicates if cerain graphics primitives can be rendered in an optimized
@@ -176,8 +192,12 @@ public abstract class AbstractGraphics2D
     background = Color.WHITE;
     composite = AlphaComposite.SrcOver;
     stroke = new BasicStroke();
-    renderingHints = new RenderingHints(RenderingHints.KEY_RENDERING,
-                                        RenderingHints.VALUE_RENDER_DEFAULT);
+    HashMap hints = new HashMap();
+    hints.put(RenderingHints.KEY_TEXT_ANTIALIASING,
+              RenderingHints.VALUE_TEXT_ANTIALIAS_DEFAULT);
+    hints.put(RenderingHints.KEY_ANTIALIASING,
+              RenderingHints.VALUE_ANTIALIAS_DEFAULT);
+    renderingHints = new RenderingHints(hints);
 
     pixel = new int[4];
   }
@@ -190,15 +210,18 @@ public abstract class AbstractGraphics2D
    */
   public void draw(Shape shape)
   {
-    // Clip the shape.
-    Shape clipped = clipShape(shape);
-    if (clipped != null)
-      {
         // Stroke the shape.
-        Shape strokedShape = stroke.createStrokedShape(clipped);
-        // Fill the shape.
-        fillShape(strokedShape);
-      }
+    Shape strokedShape = stroke.createStrokedShape(shape);
+
+    // Clip the stroked shape.
+//    Shape clipped = clipShape(strokedShape);
+//    if (clipped != null)
+//      {
+//        // Fill the shape.
+//        fillShape(clipped, false);
+//      }
+    // FIXME: Clipping doesn't seem to work.
+    fillShape(strokedShape, false);
   }
 
   public boolean drawImage(Image image, AffineTransform xform, ImageObserver obs)
@@ -290,9 +313,10 @@ public abstract class AbstractGraphics2D
    */
   public void fill(Shape shape)
   {
-    Shape clipped = clipShape(shape);
-    if (clipped != null)
-      fillShape(shape);
+//    Shape clipped = clipShape(shape);
+//    if (clipped != null)
+//      fillShape(clipped, false);
+    fillShape(shape, false);
   }
 
   public boolean hit(Rectangle rect, Shape text, boolean onStroke)
@@ -309,9 +333,6 @@ public abstract class AbstractGraphics2D
   public void setComposite(Composite comp)
   {
     composite = comp;
-    compositeContext = composite.createContext(getColorModel(),
-                                               getDestinationColorModel(),
-                                               renderingHints);
     if (! (comp.equals(AlphaComposite.SrcOver)))
       isOptimized = false;
     else
@@ -325,15 +346,18 @@ public abstract class AbstractGraphics2D
    */
   public void setPaint(Paint p)
   {
+    if (p != null)
+      {
     paint = p;
 
-    if (paint != null && ! (paint instanceof Color))
+        if (! (paint instanceof Color))
       isOptimized = false;
     else
       {
         updateOptimization();
         rawSetForeground((Color) paint);
       }
+  }
   }
 
   /**
@@ -423,6 +447,7 @@ public abstract class AbstractGraphics2D
             Rectangle r = (Rectangle) clip;
             r.x -= x;
             r.y -= y;
+            setClip(r);
           }
         else
           {
@@ -660,6 +685,8 @@ public abstract class AbstractGraphics2D
         Rectangle clipRect = (Rectangle) clip;
         Rectangle r = (Rectangle) s;
         computeIntersection(r.x, r.y, r.width, r.height, clipRect);
+        // Call setClip so that subclasses get notified.
+        setClip(clipRect);
       }
    else
      {
@@ -678,6 +705,8 @@ public abstract class AbstractGraphics2D
        current.intersect(intersect);
        clip = current;
        isOptimized = false;
+       // Call setClip so that subclasses get notified.
+       setClip(clip);
      }
   }
 
@@ -700,14 +729,18 @@ public abstract class AbstractGraphics2D
     AffineTransform t = new AffineTransform();
     t.translate(x, y);
 
-    // TODO: We could use fill(gv.getOutline()), but that doesn't seem
-    // to work yet with the font infrastructure I use.
+//    // TODO: We could use fill(gv.getOutline()), but that seems to be
+      // slightly more inefficient. 
     for (int i = 0; i < numGlyphs; i++)
     {
       //fill(gv.getGlyphVisualBounds(i));
       GeneralPath p = new GeneralPath(gv.getGlyphOutline(i));
       p.transform(t);
-      fill(p);
+      //Shape clipped = clipShape(p);
+      //if (clipped != null)
+      //  fillShape(clipped, true);
+      // FIXME: Clipping doesn't seem to work correctly.
+      fillShape(p, true);
     }
   }
 
@@ -827,7 +860,10 @@ public abstract class AbstractGraphics2D
    */
   public Rectangle getClipBounds()
   {
-    return clip.getBounds();
+    Rectangle b = null;
+    if (clip != null)
+      b = clip.getBounds();
+    return b;
   }
 
   /**
@@ -895,7 +931,11 @@ public abstract class AbstractGraphics2D
   public void drawLine(int x1, int y1, int x2, int y2)
   {
     if (isOptimized)
-      rawDrawLine(x1, y1, x2, y2);
+      {
+        int tx = (int) transform.getTranslateX();
+        int ty = (int) transform.getTranslateY();
+        rawDrawLine(x1 + tx, y1 + ty, x2 + tx, y2 + ty);
+      }
     else
       {
         Line2D line = new Line2D.Double(x1, y1, x2, y2);
@@ -914,7 +954,11 @@ public abstract class AbstractGraphics2D
   public void fillRect(int x, int y, int width, int height)
   {
     if (isOptimized)
-      rawFillRect(x, y, width, height);
+      {
+        int tx = (int) transform.getTranslateX();
+        int ty = (int) transform.getTranslateY();
+        rawFillRect(x + tx, y + ty, width, height);
+      }
     else
       {
         fill(new Rectangle(x, y, width, height));
@@ -1099,12 +1143,34 @@ public abstract class AbstractGraphics2D
    * current clip.
    *
    * @param s the shape to fill
+   * @param isFont <code>true</code> if the shape is a font outline
    */
-  protected void fillShape(Shape s)
+  protected void fillShape(Shape s, boolean isFont)
   {
+    // Determine if we need to antialias stuff.
+    boolean antialias = false;
+    if (isFont)
+      {
+        Object v = renderingHints.get(RenderingHints.KEY_TEXT_ANTIALIASING);
+        // We default to antialiasing on for text as long as we have no
+        // good hinting implemented.
+        antialias = (v == RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                     || v == RenderingHints.VALUE_TEXT_ANTIALIAS_DEFAULT);
+      }
+    else
+  {
+        Object v = renderingHints.get(RenderingHints.KEY_ANTIALIASING);
+        antialias = (v == RenderingHints.VALUE_ANTIALIAS_ON);
+      }
+
+    Rectangle2D userBounds = s.getBounds2D();
+
+    // Flatten the path. TODO: Determine the best flattening factor
+    // wrt to speed and quality.
     PathIterator path = s.getPathIterator(getTransform(), 1.0);
+
     // Build up polygons and let the native backend render this using
-    // rawFillPolygon() which would provide a default implementation for
+    // rawFillShape() which would provide a default implementation for
     // drawPixel using a PolyScan algorithm.
     double[] seg = new double[6];
 
@@ -1153,7 +1219,12 @@ public abstract class AbstractGraphics2D
         path.next();
       }
     if (segs.size() > 0)
-      rawFillShape(segs, minX, minY, maxX, maxY);
+      {
+        if (antialias)
+          fillShapeAntialias(segs, minX, minY, maxX, maxY, userBounds);
+        else
+          rawFillShape(segs, minX, minY, maxX, maxY, userBounds);
+      }
   }
 
   /**
@@ -1183,14 +1254,25 @@ public abstract class AbstractGraphics2D
    * @param x the x coordinate
    * @param y the y coordinate
    */
-  protected abstract void rawSetPixel(int x, int y);
+  protected void rawSetPixel(int x, int y)
+  {
+    // FIXME: Provide default implementation or remove method.
+  }
 
   /**
    * Sets the foreground color for drawing.
    *
    * @param c the color to set
    */
-  protected abstract void rawSetForeground(Color c);
+  protected void rawSetForeground(Color c)
+  {
+    // Probably remove method.
+  }
+
+  protected void rawSetForeground(int r, int g, int b)
+  {
+    rawSetForeground(new Color(r, g, b));
+  }
 
   /**
    * Returns the color model of this Graphics object.
@@ -1200,18 +1282,14 @@ public abstract class AbstractGraphics2D
   protected abstract ColorModel getColorModel();
 
   /**
-   * Returns the color model of the target device.
-   *
-   * @return the color model of the target device
-   */
-  protected abstract ColorModel getDestinationColorModel();
-
-  /**
    * Returns the bounds of the target.
    *
    * @return the bounds of the target
    */
-  protected abstract Rectangle getDeviceBounds();
+  protected Rectangle getDeviceBounds()
+  {
+    return destinationRaster.getBounds();
+  }
 
   /**
    * Returns the bounds of the drawing area in user space.
@@ -1326,7 +1404,7 @@ public abstract class AbstractGraphics2D
    * The polygon is already clipped when this method is called.
    */
   protected void rawFillShape(ArrayList segs, double minX, double minY,
-                              double maxX, double maxY)
+                              double maxX, double maxY, Rectangle2D userBounds)
   {
     // This is an implementation of a polygon scanline conversion algorithm
     // described here:
@@ -1334,18 +1412,19 @@ public abstract class AbstractGraphics2D
 
     // Create table of all edges.
     // The edge buckets, sorted and indexed by their Y values.
+
+    Rectangle deviceBounds = new Rectangle((int) minX, (int) minY,
+                                           (int) Math.ceil(maxX) - (int) minX,
+                                           (int) Math.ceil(maxY) - (int) minY);
+    PaintContext pCtx = paint.createContext(getColorModel(), deviceBounds,
+                                            userBounds, transform, renderingHints);
+
     ArrayList[] edgeTable = new ArrayList[(int) Math.ceil(maxY)
                                           - (int) Math.ceil(minY) + 1];
 
     for (Iterator i = segs.iterator(); i.hasNext();)
       {
         PolyEdge edge = (PolyEdge) i.next();
-
-        // Horizontal edges are not needed and make things only more
-        // complicated. Skip them.
-        if (Math.ceil(edge.y0) == Math.ceil(edge.y1))
-          continue;
-
         int yindex = (int) ((int) Math.ceil(edge.y0) - (int) Math.ceil(minY));
         if (edgeTable[yindex] == null) // Create bucket when needed.
           edgeTable[yindex] = new ArrayList();
@@ -1375,7 +1454,7 @@ public abstract class AbstractGraphics2D
         for (Iterator i = activeEdges.iterator(); i.hasNext();)
           {
             PolyEdge edge = (PolyEdge) i.next();
-            if (y >= edge.y0 && y >= edge.y1)
+            if (y > edge.y1)
               i.remove();
             else
               {
@@ -1415,44 +1494,297 @@ public abstract class AbstractGraphics2D
           }
 
         // Now draw all pixels inside the polygon.
-        int x0 = 0; // Gets initialized in the first else branch below.
+        // This is the last edge that intersected the scanline.
+        PolyEdge previous = null; // Gets initialized below.
         boolean active = false;
         //System.err.println("scanline: " + y);
         for (Iterator i = activeEdges.iterator(); i.hasNext();)
           {
             PolyEdge edge = (PolyEdge) i.next();
+            // Only fill scanline, if the current edge actually intersects
+            // the scanline. There may be edges that lie completely
+            // within the current scanline.
+            //System.err.println("previous: " + previous);
             //System.err.println("edge: " + edge);
-            int x = (int) edge.xIntersection;
             if (active)
               {
-                fillScanline(x0, x, y);
+                if (edge.y1 > y)
+                  {
+                    int x0 = (int) previous.xIntersection;
+                    int x1 = (int) edge.xIntersection;
+                    fillScanline(pCtx, x0, x1, y);
+                    previous = edge;
                 active = false;
+              }
               }
             else
               {
-                x0 = x;
+                if (edge.y1 > y)
+                  {
+                    previous = edge;
                 active = true;
               }
           }
       }
   }
+    pCtx.dispose();
+  }
 
   /**
-   * Fills a horizontal line between x0 and x1 with the current paint and
-   * composize. Backends should override this if they want to accelerate
-   * general shape drawing. They should respect the current paint and
-   * composite though (or call super for these tasks). It is not necessary
-   * to clip the line.
+   * Paints a scanline between x0 and x1.
    *
+   * @param x0 the left offset
+   * @param x1 the right offset
+   * @param y the scanline
+   */
+  protected void fillScanline(PaintContext pCtx, int x0, int x1, int y)
+  {
+    Raster paintRaster = pCtx.getRaster(x0, y, x1 - x0, 1);
+    ColorModel paintColorModel = pCtx.getColorModel();
+    CompositeContext cCtx = composite.createContext(paintColorModel,
+                                                    getColorModel(),
+                                                    renderingHints);
+    cCtx.compose(paintRaster, destinationRaster, destinationRaster);
+    updateRaster(destinationRaster, x0, y, x1 - x0, 1);
+    cCtx.dispose();
+  }
+
+  /**
+   * Fills arbitrary shapes in an anti-aliased fashion.
+   *
+   * @param segs the line segments which define the shape which is to be filled
+   * @param minX the bounding box, left X
+   * @param minY the bounding box, upper Y
+   * @param maxX the bounding box, right X
+   * @param maxY the bounding box, lower Y
+   */
+  private void fillShapeAntialias(ArrayList segs, double minX, double minY,
+                                  double maxX, double maxY,
+                                  Rectangle2D userBounds)
+  {
+    // This is an implementation of a polygon scanline conversion algorithm
+    // described here:
+    // http://www.cs.berkeley.edu/~ug/slide/pipeline/assignments/scan/
+    // The antialiasing is implemented using a sampling technique, we do
+    // not scan whole lines but fractions of the line.
+
+    Rectangle deviceBounds = new Rectangle((int) minX, (int) minY,
+                                           (int) Math.ceil(maxX) - (int) minX,
+                                           (int) Math.ceil(maxY) - (int) minY);
+    PaintContext pCtx = paint.createContext(getColorModel(), deviceBounds,
+                                            userBounds, transform,
+                                            renderingHints);
+
+    // This array will contain the oversampled transparency values for
+    // each pixel in the scanline.
+    int numScanlines = (int) Math.ceil(maxY) - (int) minY;
+    int numScanlinePixels = (int) Math.ceil(maxX) - (int) minX + 1;
+    if (alpha == null || alpha.length < (numScanlinePixels + 1))
+      alpha = new int[numScanlinePixels + 1];
+    
+    int firstLine = (int) minY;
+    //System.err.println("minY: " + minY);
+    int firstSubline = (int) (Math.ceil((minY - Math.floor(minY)) * AA_SAMPLING));
+    double firstLineDouble = firstLine + firstSubline / (double) AA_SAMPLING;
+    //System.err.println("firstSubline: " + firstSubline);
+
+    // Create table of all edges.
+    // The edge buckets, sorted and indexed by their Y values.
+    //System.err.println("numScanlines: " + numScanlines);
+    if (edgeTable == null
+        || edgeTable.length < numScanlines * AA_SAMPLING + AA_SAMPLING)
+      edgeTable = new ArrayList[numScanlines * AA_SAMPLING + AA_SAMPLING];
+
+    //System.err.println("firstLineDouble: " + firstLineDouble);
+    
+    for (Iterator i = segs.iterator(); i.hasNext();)
+      {
+        PolyEdge edge = (PolyEdge) i.next();
+        int yindex = (int) (Math.ceil((edge.y0 - firstLineDouble) * AA_SAMPLING));
+        //System.err.println("yindex: " + yindex + " for y0: " + edge.y0);
+        // Initialize edge's slope and initial xIntersection.
+        edge.slope = ((edge.x1 - edge.x0) / (edge.y1 - edge.y0)) / AA_SAMPLING;
+        if (edge.y0 == edge.y1) // Horizontal edge.
+          edge.xIntersection = Math.min(edge.x0, edge.x1);
+        else
+          {
+            double alignedFirst = Math.ceil(edge.y0 * AA_SAMPLING) / AA_SAMPLING;
+            edge.xIntersection = edge.x0 + (edge.slope * AA_SAMPLING) * (alignedFirst - edge.y0);
+          }
+        //System.err.println(edge);
+        // FIXME: Sanity check should not be needed when clipping works.
+        if (yindex >= 0 && yindex < edgeTable.length)
+          {
+            if (edgeTable[yindex] == null) // Create bucket when needed.
+              edgeTable[yindex] = new ArrayList();
+            edgeTable[yindex].add(edge); // Add edge to the bucket of its line.
+          }
+      }
+    
+    // The activeEdges list contains all the edges of the current scanline
+    // ordered by their intersection points with this scanline.
+    ArrayList activeEdges = new ArrayList();
+    PolyEdgeComparator comparator = new PolyEdgeComparator();
+    
+    // Scan all lines.
+    int yindex = 0;
+    //System.err.println("firstLine: " + firstLine + ", maxY: " + maxY + ", firstSubline: " + firstSubline);
+    for (int y = firstLine; y <= maxY; y++)
+      {
+        for (int subY = firstSubline; subY < AA_SAMPLING; subY++)
+          {
+            //System.err.println("scanline: " + y + ", subScanline: " + subY);
+            ArrayList bucket = edgeTable[yindex];
+            // Update all the x intersections in the current activeEdges table
+            // and remove entries that are no longer in the scanline.
+            for (Iterator i = activeEdges.iterator(); i.hasNext();)
+              {
+                PolyEdge edge = (PolyEdge) i.next();
+                // TODO: Do the following using integer arithmetics.
+                if ((y + ((double) subY / (double) AA_SAMPLING)) > edge.y1)
+                  i.remove();
+                else
+                  {
+                    edge.xIntersection += edge.slope;
+                    //System.err.println("edge: " + edge);
+                    //edge.xIntersection = edge.x0 + edge.slope * (y - edge.y0);
+                    //System.err.println("edge.xIntersection: " + edge.xIntersection);
+                  }
+              }
+
+            if (bucket != null)
+              {
+                activeEdges.addAll(bucket);
+                edgeTable[yindex].clear();
+              }
+
+            // Sort current edges. We are using a bubble sort, because the order
+            // of the intersections will not change in most situations. They
+            // will only change, when edges intersect each other.
+            int size = activeEdges.size();
+            if (size > 1)
+              {
+                for (int i = 1; i < size; i++)
+                  {
+                    PolyEdge e1 = (PolyEdge) activeEdges.get(i - 1);
+                    PolyEdge e2 = (PolyEdge) activeEdges.get(i);
+                    if (comparator.compare(e1, e2) > 0)
+                      {
+                        // Swap e2 with its left neighbor until it 'fits'.
+                        int j = i;
+                        do
+                          {
+                            activeEdges.set(j, e1);
+                            activeEdges.set(j - 1, e2);
+                            j--;
+                            if (j >= 1)
+                              e1 = (PolyEdge) activeEdges.get(j - 1);
+                          } while (j >= 1 && comparator.compare(e1, e2) > 0);
+                      }
+                  }
+              }
+        
+            // Now draw all pixels inside the polygon.
+            // This is the last edge that intersected the scanline.
+            PolyEdge previous = null; // Gets initialized below.
+            boolean active = false;
+            //System.err.println("scanline: " + y + ", subscanline: " + subY);
+            for (Iterator i = activeEdges.iterator(); i.hasNext();)
+              {
+                PolyEdge edge = (PolyEdge) i.next();
+                // Only fill scanline, if the current edge actually intersects
+                // the scanline. There may be edges that lie completely
+                // within the current scanline.
+                //System.err.println("previous: " + previous);
+                //System.err.println("edge: " + edge);
+                if (active)
+                  {
+                    // TODO: Use integer arithmetics here.
+                    if (edge.y1 > (y + (subY / (double) AA_SAMPLING)))
+                      {
+                        //System.err.println(edge);
+                        // TODO: Eliminate the aligments.
+                        int x0 = (int) Math.min(Math.max(previous.xIntersection, minX), maxX);
+                        int x1 = (int) Math.min(Math.max(edge.xIntersection, minX), maxX);
+                        //System.err.println("minX: " + minX + ", x0: " + x0 + ", x1: " + x1 + ", maxX: " + maxX);
+                        // TODO: Pull out cast.
+                        alpha[x0 - (int) minX]++;
+                        alpha[x1 - (int) minX + 1]--;
+                        previous = edge;
+                        active = false;
+                      }
+                  }
+                else
+                  {
+                    // TODO: Use integer arithmetics here.
+                    if (edge.y1 > (y + (subY / (double) AA_SAMPLING)))
+                      {
+                        //System.err.println(edge);
+                        previous = edge;
+                        active = true;
+                      }
+                  }
+              }
+            yindex++;
+          }
+        firstSubline = 0;
+        // Render full scanline.
+        //System.err.println("scanline: " + y);
+        fillScanlineAA(alpha, (int) minX, (int) y, numScanlinePixels, pCtx);
+      }
+    if (paint instanceof Color && composite == AlphaComposite.SrcOver)
+      rawSetForeground((Color) paint);
+
+    pCtx.dispose();
+  }
+
+  /**
+   * Fills a horizontal line between x0 and x1 for anti aliased rendering.
+   * the alpha array contains the deltas of the alpha values from one pixel
+   * to the next.
+   *
+   * @param alpha the alpha values in the scanline
    * @param x0 the beginning of the scanline
-   * @param x1 the end of the scanline
    * @param y the y coordinate of the line
    */
-  protected void fillScanline(int x0, int x1, int y)
+  private void fillScanlineAA(int[] alpha, int x0, int y, int numScanlinePixels,
+                              PaintContext pCtx)
   {
-    for (int x = x0; x < x1; x++)
-      drawPixel(x, y);
+    // FIXME: This doesn't work. Fixit.
+    CompositeContext cCtx = composite.createContext(pCtx.getColorModel(),
+                                                    getColorModel(),
+                                                    renderingHints);
+    Raster paintRaster = pCtx.getRaster(x0, y, numScanlinePixels, 1);
+    System.err.println("paintColorModel: " + pCtx.getColorModel());
+    WritableRaster aaRaster = paintRaster.createCompatibleWritableRaster();
+    int numBands = paintRaster.getNumBands();
+    int[] pixels = new int[numScanlinePixels + paintRaster.getNumBands()];
+    pixels = paintRaster.getPixels(x0, y, numScanlinePixels, 1, pixels);
+    ColorModel cm = pCtx.getColorModel();
+    
+    double lastAlpha = 0.;
+    int lastAlphaInt = 0;
+    int[] components = new int[4];
+    
+    for (int i = 0; i < pixels.length; i++)
+      {
+        if (alpha[i] != 0)
+  {
+            lastAlphaInt += alpha[i];
+            lastAlpha = lastAlphaInt / AA_SAMPLING;
+          }
+        components = cm.getComponents(pixel[i], components, 0);
+        components[0] = (int) (components[0] * lastAlpha);
+        pixel[i] = cm.getDataElement(components, 0);
+      }
+
+    aaRaster.setPixels(0, 0, numScanlinePixels, 1, pixels);
+    cCtx.compose(aaRaster, destinationRaster, destinationRaster);
+    updateRaster(destinationRaster, x0, y, numScanlinePixels, 1);
+
+    cCtx.dispose();
   }
+
 
   /**
    * Initializes this graphics object. This must be called by subclasses in
@@ -1463,9 +1795,42 @@ public abstract class AbstractGraphics2D
     setPaint(Color.BLACK);
     setFont(new Font("SansSerif", Font.PLAIN, 12));
     isOptimized = true;
+
+    // FIXME: Should not be necessary. A clip of null should mean
+    // 'clip against device bounds.
+    clip = getDeviceBounds();
+    destinationRaster = getDestinationRaster();
   }
 
-  //protected abstract Raster getDestinationRaster(int x, int y, int w, int h);
+  /**
+   * Returns a WritableRaster that is used by this class to perform the
+   * rendering in. It is not necessary that the target surface immediately
+   * reflects changes in the raster. Updates to the raster are notified via
+   * {@link #updateRaster}.
+   *
+   * @return the destination raster
+   */
+  protected abstract WritableRaster getDestinationRaster();
+
+  /**
+   * Notifies the backend that the raster has changed in the specified
+   * rectangular area. The raster that is provided in this method is always
+   * the same as the one returned in {@link #getDestinationRaster}.
+   * Backends that reflect changes to this raster directly don't need to do
+   * anything here.
+   *
+   * @param raster the updated raster, identical to the raster returned
+   *        by {@link #getDestinationRaster()}
+   * @param x the upper left corner of the updated region, X coordinate
+   * @param y the upper lef corner of the updated region, Y coordinate
+   * @param w the width of the updated region
+   * @param h the height of the updated region
+   */
+  protected void updateRaster(Raster raster, int x, int y, int w, int h)
+  {
+    // Nothing to do here. Backends that need to update their surface
+    // to reflect the change should override this method.
+  }
 
   // Some helper methods.
 
@@ -1475,11 +1840,13 @@ public abstract class AbstractGraphics2D
   private void updateOptimization()
   {
     int transformType = transform.getType();
-    boolean optimizedTransform =
-      (transformType &
-      (AffineTransform.TYPE_TRANSLATION | AffineTransform.TYPE_IDENTITY)) != 0;
+    boolean optimizedTransform = false;
+    if (transformType == AffineTransform.TYPE_IDENTITY
+        || transformType == AffineTransform.TYPE_TRANSLATION)
+      optimizedTransform = true;
 
-    isOptimized = clip instanceof Rectangle
+    boolean optimizedClip = (clip == null || clip instanceof Rectangle);
+    isOptimized = optimizedClip
                   && optimizedTransform && paint instanceof Color
                   && composite == AlphaComposite.SrcOver
                   && stroke.equals(new BasicStroke());

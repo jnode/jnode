@@ -1191,6 +1191,7 @@ public abstract class JTextComponent extends JComponent
     catch (BadLocationException e)
       {
 	// This can never happen.
+        throw (InternalError) new InternalError().initCause(e);
       }
   }
 

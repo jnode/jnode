@@ -328,6 +328,12 @@ public class ScrollPaneLayout
     // parent is no JScrollPane, so do we.
         JScrollPane sc = (JScrollPane) parent;
             JViewport viewport = sc.getViewport();
+    Component view = viewport.getView();
+    
+    // If there is no view in the viewport, there is no work to be done.
+    if (view == null)
+      return;
+    
     Dimension viewSize = viewport.getView().getPreferredSize();
 
             int x1 = 0, x2 = 0, x3 = 0, x4 = 0;

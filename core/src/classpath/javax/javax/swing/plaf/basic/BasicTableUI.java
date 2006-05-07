@@ -1246,15 +1246,17 @@ public class BasicTableUI extends TableUI
     if (rn == -1)
       rn = table.getRowCount() - 1;
 
+    int columnMargin = table.getColumnModel().getColumnMargin();
+    int rowMargin = table.getRowMargin();
+
     TableColumnModel cmodel = table.getColumnModel();
     int [] widths = new int[cn+1];
     for (int i = c0; i <=cn ; i++)
       {
-        widths[i] = cmodel.getColumn(i).getWidth();
+        widths[i] = cmodel.getColumn(i).getWidth() - columnMargin;
       }
     
     Rectangle bounds = table.getCellRect(r0, c0, false);
-    bounds.height = table.getRowHeight()+table.getRowMargin();
     
     // The left boundary of the area being repainted.
     int left = bounds.x;
@@ -1265,9 +1267,6 @@ public class BasicTableUI extends TableUI
     // The bottom boundary of the area being repainted.
     int bottom;
     
-    // The cell height.
-    int height = bounds.height;
-
     // paint the cell contents
     Color grid = table.getGridColor();    
     for (int r = r0; r <= rn; ++r)
@@ -1276,25 +1275,28 @@ public class BasicTableUI extends TableUI
               {
             bounds.width = widths[c];
                 paintCell(gfx, r, c, bounds, table.getCellRenderer(r, c));
-            bounds.x += widths[c];
+            bounds.x += widths[c] + columnMargin;
               }
-        bounds.y += height;
         bounds.x = left;
+        bounds.y += table.getRowHeight(r) + rowMargin;
+        // Update row height for tables with custom heights.
+        bounds.height = table.getRowHeight(r + 1);
       }
 
-    bottom = bounds.y;
+    bottom = bounds.y - rowMargin;
 
     // paint vertical grid lines    
     if (grid != null && table.getShowVerticalLines())
       {    
         Color save = gfx.getColor();
         gfx.setColor(grid);
-        int x = left;
-        
+        int x = left - columnMargin;
         for (int c = c0; c <= cn; ++c)
           {
+            // The vertical grid is draw right from the cells, so we 
+            // add before drawing.
+            x += widths[c] + columnMargin;
             gfx.drawLine(x, top, x, bottom);
-            x += widths[c];
           }
         gfx.setColor(save);
       }
@@ -1304,11 +1306,13 @@ public class BasicTableUI extends TableUI
       {    
         Color save = gfx.getColor();
         gfx.setColor(grid);
-        int y = top;
+        int y = top - rowMargin;
         for (int r = r0; r <= rn; ++r)
           {
+            // The horizontal grid is draw below the cells, so we 
+            // add before drawing.
+            y += table.getRowHeight(r) + rowMargin;
             gfx.drawLine(left, y, p2.x, y);
-            y += height;
           }
         gfx.setColor(save);
       }

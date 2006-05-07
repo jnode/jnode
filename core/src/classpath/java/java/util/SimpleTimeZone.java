@@ -333,8 +333,6 @@ public class SimpleTimeZone extends TimeZone
 
     setStartRule(startMonth, startDayOfWeekInMonth, startDayOfWeek, startTime);
     setEndRule(endMonth, endDayOfWeekInMonth, endDayOfWeek, endTime);
-    if (startMonth == endMonth)
-      throw new IllegalArgumentException("startMonth and endMonth must be different");
     this.startYear = 0;
   }
 
@@ -393,8 +391,6 @@ public class SimpleTimeZone extends TimeZone
 
     setStartRule(startMonth, startDayOfWeekInMonth, startDayOfWeek, startTime);
     setEndRule(endMonth, endDayOfWeekInMonth, endDayOfWeek, endTime);
-    if (startMonth == endMonth)
-      throw new IllegalArgumentException("startMonth and endMonth must be different");
     this.startYear = 0;
 
     this.dstSavings = dstSavings;
@@ -413,67 +409,66 @@ public class SimpleTimeZone extends TimeZone
   }
 
   /**
-   * Checks if the month, day, dayOfWeek arguments are in range and
+   * Checks if the values are in range and
    * returns the mode of the rule.
    * @param month the month parameter as in the constructor
-   * @param day the day parameter as in the constructor
-   * @param dayOfWeek the day of week parameter as in the constructor
    * @return the mode of this rule see startMode.
    * @exception IllegalArgumentException if parameters are out of range.
    * @see #SimpleTimeZone(int, String, int, int, int, int, int, int, int, int)
    * @see #startMode
    */
-  private int checkRule(int month, int day, int dayOfWeek)
+  private int checkRule(int month)
   {
-    if (month < 0 || month > 11)
+    if (startDay != 0)
+      {
+        if (startMonth < 0 || startMonth > 11)
       throw new IllegalArgumentException("month out of range");
 
-    int daysInMonth = getDaysInMonth(month, 1);
-    if (dayOfWeek == 0)
+        if (startDayOfWeek == 0)
+          startMode = DOM_MODE;
+        else
       {
-	if (day <= 0 || day > daysInMonth)
-	  throw new IllegalArgumentException("day out of range");
-	return DOM_MODE;
-      }
-    else if (dayOfWeek > 0)
+            if (startDayOfWeek > 0)
+              startMode = DOW_IN_MONTH_MODE;
+            else
       {
-	if (Math.abs(day) > (daysInMonth + 6) / 7)
-	  throw new IllegalArgumentException("dayOfWeekInMonth out of range");
-	if (dayOfWeek > Calendar.SATURDAY)
-	  throw new IllegalArgumentException("dayOfWeek out of range");
-	return DOW_IN_MONTH_MODE;
+                startDayOfWeek = -startDayOfWeek;
+                if (startDay < 0)
+                  {
+                    startDay = - startDay;
+                    startMode = DOW_LE_DOM_MODE;
       }
     else
-      {
-	if (day == 0 || Math.abs(day) > daysInMonth)
+                  startMode = DOW_GE_DOM_MODE;
+              }
+
+            if (startDayOfWeek > Calendar.SATURDAY)
+              throw new IllegalArgumentException("day of week out of range");
+          }
+
+        if (startMode != DOW_IN_MONTH_MODE
+            && (startDay <= 0 || startDay > getDaysInMonth(month, 1)))
 	  throw new IllegalArgumentException("day out of range");
-	if (dayOfWeek < -Calendar.SATURDAY)
-	  throw new IllegalArgumentException("dayOfWeek out of range");
-	if (day < 0)
-	  return DOW_LE_DOM_MODE;
-	else
-	  return DOW_GE_DOM_MODE;
       }
+    return startMode;
   }
 
   /**
-   * Sets the daylight savings start rule.  You must also set the
-   * end rule with <code>setEndRule</code> or the result of
-   * getOffset is undefined.  For the parameters see the ten-argument
-   * constructor above.
+   * Sets the daylight savings start rule. You must also set the end rule with
+   * <code>setEndRule</code> or the result of getOffset is undefined. For the
+   * parameters see the ten-argument constructor above.
    *
-   * @param month The month where daylight savings start, zero
-   * based.  You should use the constants in Calendar.
+   * @param month The month where daylight savings start, zero based. You should
+   *          use the constants in Calendar.
    * @param day A day of month or day of week in month.
    * @param dayOfWeek The day of week where daylight savings start.
-   * @param time The time in milliseconds standard time where daylight
-   * savings start.
+   * @param time The time in milliseconds standard time where daylight savings
+   *          start.
    * @exception IllegalArgumentException if parameters are out of range.
    * @see SimpleTimeZone
    */
   public void setStartRule(int month, int day, int dayOfWeek, int time)
   {
-    this.startMode = checkRule(month, day, dayOfWeek);
     this.startMonth = month;
     this.startDay = day;
     this.startDayOfWeek = Math.abs(dayOfWeek);
@@ -483,6 +478,7 @@ public class SimpleTimeZone extends TimeZone
       // Convert from UTC to STANDARD
       this.startTime = time + this.rawOffset;
     useDaylight = true;
+    this.startMode = checkRule(month);
   }
 
   /**
@@ -517,9 +513,6 @@ public class SimpleTimeZone extends TimeZone
     // or before mode.
     this.startDay = after ? Math.abs(day) : -Math.abs(day);
     this.startDayOfWeek = after ? Math.abs(dayOfWeek) : -Math.abs(dayOfWeek);
-    this.startMode = (dayOfWeek != 0)
-                     ? (after ? DOW_GE_DOM_MODE : DOW_LE_DOM_MODE)
-      : checkRule(month, day, dayOfWeek);
     this.startDay = Math.abs(this.startDay);
     this.startDayOfWeek = Math.abs(this.startDayOfWeek);
 
@@ -531,6 +524,9 @@ public class SimpleTimeZone extends TimeZone
       // Convert from UTC to STANDARD
       this.startTime = time + this.rawOffset;
     useDaylight = true;
+    this.startMode = (dayOfWeek != 0)
+    ? (after ? DOW_GE_DOM_MODE : DOW_LE_DOM_MODE)
+    : checkRule(month);
   }
 
   /**
@@ -566,7 +562,6 @@ public class SimpleTimeZone extends TimeZone
    */
   public void setEndRule(int month, int day, int dayOfWeek, int time)
   {
-    this.endMode = checkRule(month, day, dayOfWeek);
     this.endMonth = month;
     this.endDay = day;
     this.endDayOfWeek = Math.abs(dayOfWeek);
@@ -579,6 +574,7 @@ public class SimpleTimeZone extends TimeZone
       // Convert from UTC to DST
       this.endTime = time + this.rawOffset + this.dstSavings;
     useDaylight = true;
+    this.endMode = checkRule(month);
   }
 
   /**
@@ -611,9 +607,6 @@ public class SimpleTimeZone extends TimeZone
     // or before mode.
     this.endDay = after ? Math.abs(day) : -Math.abs(day);
     this.endDayOfWeek = after ? Math.abs(dayOfWeek) : -Math.abs(dayOfWeek);
-    this.endMode = (dayOfWeek != 0)
-                   ? (after ? DOW_GE_DOM_MODE : DOW_LE_DOM_MODE)
-      : checkRule(month, day, dayOfWeek);
     this.endDay = Math.abs(this.endDay);
     this.endDayOfWeek = Math.abs(endDayOfWeek);
 
@@ -628,6 +621,9 @@ public class SimpleTimeZone extends TimeZone
       // Convert from UTC to DST
       this.endTime = time + this.rawOffset + this.dstSavings;
     useDaylight = true;
+    this.endMode = (dayOfWeek != 0)
+    ? (after ? DOW_GE_DOM_MODE : DOW_LE_DOM_MODE)
+    : checkRule(month);
   }
 
   /**

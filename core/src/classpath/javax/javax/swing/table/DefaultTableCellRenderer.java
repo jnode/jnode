@@ -58,7 +58,7 @@ public class DefaultTableCellRenderer extends JLabel
 {
   static final long serialVersionUID = 7878911414715528324L;
 
-  protected static Border noFocusBorder = new EmptyBorder(0, 0, 0, 0);
+  protected static Border noFocusBorder = new EmptyBorder(1, 1, 1, 1);
 
   public static class UIResource extends DefaultTableCellRenderer
     implements javax.swing.plaf.UIResource
@@ -163,17 +163,17 @@ public class DefaultTableCellRenderer extends JLabel
           super.setForeground(table.getForeground());
       }
 
+    Border b = null;
     if (hasFocus)
       {
-        setBorder(UIManager.getBorder("Table.focusCellHighlightBorder"));
-        if (table.isCellEditable(row, column))
-          {
-            super.setBackground(UIManager.getColor("Table.focusCellBackground"));
-            super.setForeground(UIManager.getColor("Table.focusCellForeground"));
-          }
+        if (isSelected)
+          b = UIManager.getBorder("Table.focusSelectedCellHighlightBorder");
+        if (b == null)
+          b = UIManager.getBorder("Table.focusCellHighlightBorder");
       }
     else
-      setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+      b = noFocusBorder;
+    setBorder(b);
 
     setFont(table.getFont());
 
