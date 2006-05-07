@@ -389,17 +389,14 @@ public class SwingUtilities
 
     if (win != null)
       return win;
-    else
       return app;
   }
 
   /**
-   * Return true if a descends from b, in other words if b is an
-   * ancestor of a.
+   * Return true if a descends from b, in other words if b is an ancestor of a.
    *
    * @param a The child to search the ancestry of
    * @param b The potential ancestor to search for
-   *
    * @return true if a is a descendent of b, false otherwise
    */
   public static boolean isDescendingFrom(Component a, Component b)

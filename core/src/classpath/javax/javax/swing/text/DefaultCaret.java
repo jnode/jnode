@@ -721,9 +721,7 @@ public class DefaultCaret extends Rectangle
       {
     try
       {
-        if (highlightEntry == null)
-          highlightEntry = highlighter.addHighlight(0, 0, getSelectionPainter());
-        else
+        if (highlightEntry != null)
           highlighter.changeHighlight(highlightEntry, 0, 0);
         
         // Free the global variable which stores the text component with an active

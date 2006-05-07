@@ -75,26 +75,29 @@ public class DefaultTreeModel
 	protected boolean asksAllowsChildren;
 
 	/**
-	 * Constructor DefaultTreeModel
+   * Constructor DefaultTreeModel where any node can have children.
    * 
 	 * @param root the tree root.
 	 */
   public DefaultTreeModel(TreeNode root)
   {
-		if (root == null)
-			root = new DefaultMutableTreeNode();
-		setRoot(root);
+    this (root, false);
   }
 
 	/**
-	 * Constructor DefaultTreeModel
+   * Create the DefaultTreeModel that may check if the nodes can have
+   * children or not.
    * 
-	 * @param root the tree root.
-	 * @param asksAllowsChildren TODO
+   * @param aRoot the tree root.
+   * @param asksAllowsChildren if true, each node is asked if it can have 
+   * children. If false, the model does not care about this, supposing, that
+   * any node can have children.
 	 */
-  public DefaultTreeModel(TreeNode root, boolean asksAllowsChildren)
+  public DefaultTreeModel(TreeNode aRoot, boolean asksAllowsChildren)
   {
-		setRoot(root);
+    if (aRoot == null)
+      aRoot = new DefaultMutableTreeNode();
+    this.root = aRoot;
 		this.asksAllowsChildren = asksAllowsChildren;
   }
 

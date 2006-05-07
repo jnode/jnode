@@ -1204,7 +1204,7 @@ public class MetalLookAndFeel extends BasicLookAndFeel
       "Table.focusCellForeground", getControlTextColor(),
       "Table.foreground", getControlTextColor(),
       "Table.focusCellHighlightBorder",
-      new BorderUIResource.LineBorderUIResource(getControlShadow()),
+      new BorderUIResource.LineBorderUIResource(getFocusColor()),
       "Table.focusCellBackground", getWindowBackground(),
       "Table.gridColor", getControlDarkShadow(),
       "Table.selectionBackground", new ColorUIResource(204, 204, 255),

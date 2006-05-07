@@ -101,6 +101,11 @@ public class BasicTableHeaderUI extends TableHeaderUI
   private Border cellBorder;
 
   /**
+   * Original mouse cursor prior to resizing.
+   */
+  private Cursor originalCursor;
+  
+  /**
    * If not null, one of the columns is currently being dragged.
    */
   Rectangle draggingHeaderRect;
@@ -245,6 +250,7 @@ public class BasicTableHeaderUI extends TableHeaderUI
               if (onBoundary)
                 {
 
+		  originalCursor = header.getCursor();
                   if (p < x)
                     header.setCursor(Cursor.getPredefinedCursor
                                      (Cursor.W_RESIZE_CURSOR));
@@ -254,7 +260,7 @@ public class BasicTableHeaderUI extends TableHeaderUI
                 }
               else
                 {
-                  header.setCursor(Cursor.getDefaultCursor());
+                  header.setCursor(originalCursor);
                   header.setResizingColumn(null);
                 }
 
@@ -345,7 +351,7 @@ public class BasicTableHeaderUI extends TableHeaderUI
       showingResizeCursor = false;
       if (timer != null)
         timer.stop();
-      header.setCursor(Cursor.getDefaultCursor());
+      header.setCursor(originalCursor);
     }
 
     /**

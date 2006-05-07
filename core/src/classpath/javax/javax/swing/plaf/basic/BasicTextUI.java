@@ -440,6 +440,9 @@ public abstract class BasicTextUI extends TextUI
      */
     public void changedUpdate(DocumentEvent ev)
     {
+      // Updates are forwarded to the View even if 'getVisibleEditorRect'
+      // method returns null. This means the View classes have to be
+      // aware of that possibility.
       rootView.changedUpdate(ev, getVisibleEditorRect(),
                              rootView.getViewFactory());
     }
@@ -451,6 +454,9 @@ public abstract class BasicTextUI extends TextUI
      */
     public void insertUpdate(DocumentEvent ev)
     {
+      // Updates are forwarded to the View even if 'getVisibleEditorRect'
+      // method returns null. This means the View classes have to be
+      // aware of that possibility.
       rootView.insertUpdate(ev, getVisibleEditorRect(),
                             rootView.getViewFactory());
     }
@@ -462,6 +468,9 @@ public abstract class BasicTextUI extends TextUI
      */
     public void removeUpdate(DocumentEvent ev)
     {
+      // Updates are forwarded to the View even if 'getVisibleEditorRect'
+      // method returns null. This means the View classes have to be
+      // aware of that possibility.
       rootView.removeUpdate(ev, getVisibleEditorRect(),
                             rootView.getViewFactory());
     }
@@ -1015,6 +1024,10 @@ public abstract class BasicTextUI extends TextUI
   public void damageRange(JTextComponent t, int p0, int p1,
                           Position.Bias firstBias, Position.Bias secondBias)
   {
+    // Do nothing if the component cannot be properly displayed.
+    if (t.getWidth() == 0 || t.getHeight() == 0)
+      return;
+    
     try
       {
         // Limit p0 and p1 to sane values to prevent unfriendly
@@ -1201,7 +1214,10 @@ public abstract class BasicTextUI extends TextUI
   public Rectangle modelToView(JTextComponent t, int pos, Position.Bias bias)
     throws BadLocationException
   {
-    return rootView.modelToView(pos, getVisibleEditorRect(), bias).getBounds();
+    Rectangle r = getVisibleEditorRect();
+    
+    return (r != null) ? rootView.modelToView(pos, r, bias).getBounds()
+                       : null;
   }
 
   /**
@@ -1278,8 +1294,9 @@ public abstract class BasicTextUI extends TextUI
     int width = textComponent.getWidth();
     int height = textComponent.getHeight();
 
+    // Return null if the component has no valid size.
     if (width <= 0 || height <= 0)
-      return new Rectangle(0, 0, 0, 0);
+      return null;
 	
     Insets insets = textComponent.getInsets();
     return new Rectangle(insets.left, insets.top,

@@ -141,9 +141,9 @@ class ColorPaintContext implements PaintContext
     {         
       super(cm.createCompatibleSampleModel(width,height),new Point(x,y));
       Object pixel = cm.getDataElements(rgbPixel,null);
-      getSampleModel().setDataElements(0, 0,
-                                       width, height,
-                                       multiplyData(pixel,null,width*height),
+      int[] pixelComps = cm.getComponents(pixel, null, 0);
+      int[] d = (int[]) multiplyData(pixelComps,null,width*height);
+      getSampleModel().setPixels(0, 0, width, height, d,
                                        dataBuffer);
   }
     

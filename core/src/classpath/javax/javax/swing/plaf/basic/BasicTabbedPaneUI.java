@@ -2559,10 +2559,23 @@ public class BasicTabbedPaneUI extends TabbedPaneUI implements SwingConstants
    */
   protected int lastTabInRun(int tabCount, int run)
   {
-    if (tabRuns[run] == 0)
-      return tabCount - 1;
+    int lastTab;
+    if (runCount == 1)
+      lastTab = tabCount - 1;
     else
-      return tabRuns[run] - 1;
+      {
+        int nextRun;
+        if (run == runCount - 1)
+          nextRun = 0;
+        else
+          nextRun = run + 1;
+
+        if (tabRuns[nextRun] == 0)
+          lastTab = tabCount - 1;
+        else
+          lastTab = tabRuns[nextRun] - 1;
+      }
+    return lastTab;
   }
 
   /**

@@ -38,11 +38,13 @@ exception statement from your version. */
 
 package javax.swing;
 
+import java.applet.Applet;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.Window;
 import java.awt.image.VolatileImage;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -607,7 +609,7 @@ public class RepaintManager
   public Image getOffscreenBuffer(Component component, int proposedWidth,
                                   int proposedHeight)
   {
-    Component root = SwingUtilities.getRoot(component);
+    Component root = getRoot(component);
     Image buffer = (Image) offscreenBuffers.get(root);
     if (buffer == null 
         || buffer.getWidth(null) < proposedWidth 
@@ -623,6 +625,32 @@ public class RepaintManager
     return buffer;
   }
 
+  /**
+   * Gets the root of the component given. If a parent of the 
+   * component is an instance of Applet, then the applet is 
+   * returned. The applet is considered the root for painting.
+   * Otherwise, the root Window is returned if it exists.
+   * 
+   * @param comp - The component to get the root for.
+   * @return the parent root. An applet if it is a parent,
+   * or the root window. If neither exist, null is returned.
+   */
+  private Component getRoot(Component comp)
+  {
+      Applet app = null;
+      
+      while (comp != null)
+        {
+          if (app == null && comp instanceof Window)
+            return comp;
+          else if (comp instanceof Applet)
+            app = (Applet) comp;
+          comp = comp.getParent();
+        }
+      
+      return app;
+  }
+  
   /**
    * Blits the back buffer of the specified root component to the screen. If
    * the RepaintManager is currently working on a paint request, the commit

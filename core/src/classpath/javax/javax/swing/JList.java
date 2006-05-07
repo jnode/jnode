@@ -965,11 +965,19 @@ public class JList extends JComponent implements Accessible, Scrollable
   int visibleRowCount;
 
   /**
-   * Fire a {@link ListSelectionEvent} to all the registered ListSelectionListeners.
+   * Fire a {@link ListSelectionEvent} to all the registered 
+   * ListSelectionListeners.
+   * 
+   * @param firstIndex  the lowest index covering the selection change.
+   * @param lastIndex  the highest index covering the selection change.
+   * @param isAdjusting  a flag indicating if this event is one in a series
+   *     of events updating the selection.
    */
-  protected void fireSelectionValueChanged(int firstIndex, int lastIndex, boolean isAdjusting) 
+  protected void fireSelectionValueChanged(int firstIndex, int lastIndex, 
+                                           boolean isAdjusting) 
   {
-    ListSelectionEvent evt = new ListSelectionEvent(this, firstIndex, lastIndex, isAdjusting);
+    ListSelectionEvent evt = new ListSelectionEvent(this, firstIndex, 
+                                                    lastIndex, isAdjusting);
     ListSelectionListener listeners[] = getListSelectionListeners();
     for (int i = 0; i < listeners.length; ++i)
       {
@@ -1172,6 +1180,8 @@ public class JList extends JComponent implements Accessible, Scrollable
    * #prototypeCellValue} property is set, but setting it explicitly
    * overrides the width computed from {@link #prototypeCellValue}.
    *
+   * @param w  the width.
+   * 
    * @see #getFixedCellHeight
    * @see #getPrototypeCellValue
    */
@@ -1247,6 +1257,16 @@ public class JList extends JComponent implements Accessible, Scrollable
     return (ListSelectionListener[]) getListeners(ListSelectionListener.class);
   }
 
+  /**
+   * Returns the selection mode for the list (one of: 
+   * {@link ListSelectionModel#SINGLE_SELECTION}, 
+   * {@link ListSelectionModel#SINGLE_INTERVAL_SELECTION} and 
+   * {@link ListSelectionModel#MULTIPLE_INTERVAL_SELECTION}).
+   * 
+   * @return The selection mode.
+   * 
+   * @see #setSelectionMode(int)
+   */
   public int getSelectionMode()
   {
     return selectionModel.getSelectionMode();
@@ -1292,6 +1312,9 @@ public class JList extends JComponent implements Accessible, Scrollable
    * For each element <code>a[i]</code> of the provided array
    * <code>a</code>, calls {@link #setSelectedIndex} on <code>a[i]</code>.
    *
+   * @param a  an array of selected indices (<code>null</code> not permitted).
+   * 
+   * @throws NullPointerException if <code>a</code> is <code>null</code>.
    * @see #setSelectionMode
    * @see #selectionModel
    */
@@ -1572,6 +1595,13 @@ public class JList extends JComponent implements Accessible, Scrollable
     setModel(createListModel(listData));
   }
 
+  /**
+   * Returns a {@link ListModel} backed by the specified array.
+   * 
+   * @param items  the list items (don't use <code>null</code>).
+   * 
+   * @return A list model containing the specified items.
+   */
   private ListModel createListModel(final Object[] items)
   {
     return new AbstractListModel()
@@ -1587,6 +1617,13 @@ public class JList extends JComponent implements Accessible, Scrollable
       };
           }
 
+  /**
+   * Returns a {@link ListModel} backed by the specified vector.
+   * 
+   * @param items  the list items (don't use <code>null</code>).
+   * 
+   * @return A list model containing the specified items.
+   */
   private ListModel createListModel(final Vector items)
   {
     return new AbstractListModel()
@@ -1683,7 +1720,21 @@ public class JList extends JComponent implements Accessible, Scrollable
     repaint();
   }
 
-
+  /**
+   * Returns the selection model for the {@link JList} component.  Note that
+   * this class contains a range of convenience methods for configuring the
+   * selection model:<br>
+   * <ul>
+   *   <li>{@link #clearSelection()};</li>
+   *   <li>{@link #setSelectionMode(int)};</li>
+   *   <li>{@link #addSelectionInterval(int, int)};</li>
+   *   <li>{@link #setSelectedIndex(int)};</li>
+   *   <li>{@link #setSelectedIndices(int[])};</li>
+   *   <li>{@link #setSelectionInterval(int, int)}.</li>
+   * </ul>
+   * 
+   * @return The selection model.
+   */
   public ListSelectionModel getSelectionModel()
   {
     return selectionModel;
@@ -2038,11 +2089,23 @@ public class JList extends JComponent implements Accessible, Scrollable
     return retVal;
   }
 
+  /**
+   * Returns the index of the anchor item in the current selection, or
+   * <code>-1</code> if there is no anchor item.
+   * 
+   * @return The item index.
+   */
   public int getAnchorSelectionIndex()
   {
     return selectionModel.getAnchorSelectionIndex();
   }
 
+  /**
+   * Returns the index of the lead item in the current selection, or
+   * <code>-1</code> if there is no lead item.
+   * 
+   * @return The item index.
+   */
   public int getLeadSelectionIndex()
   {
     return selectionModel.getLeadSelectionIndex();
@@ -2074,21 +2137,48 @@ public class JList extends JComponent implements Accessible, Scrollable
     return selectionModel.getMaxSelectionIndex();
   }
 
+  /**
+   * Clears the current selection.
+   */
   public void clearSelection()
   {
     selectionModel.clearSelection();
   }
 
+  /**
+   * Sets the current selection to the items in the specified range (inclusive).
+   * Note that <code>anchor</code> can be less than, equal to, or greater than 
+   * <code>lead</code>.
+   * 
+   * @param anchor  the index of the anchor item.
+   * @param lead  the index of the anchor item.
+   */
   public void setSelectionInterval(int anchor, int lead)
   {
     selectionModel.setSelectionInterval(anchor, lead);
   }
 
+  /**
+   * Adds the specified interval to the current selection.  Note that 
+   * <code>anchor</code> can be less than, equal to, or greater than 
+   * <code>lead</code>.
+   * 
+   * @param anchor  the index of the anchor item.
+   * @param lead  the index of the lead item.
+   */
   public void addSelectionInterval(int anchor, int lead)
   {
     selectionModel.addSelectionInterval(anchor, lead);
   }
 
+  /**
+   * Removes the specified interval from the current selection.  Note that 
+   * <code>index0</code> can be less than, equal to, or greater than 
+   * <code>index1</code>.
+   * 
+   * @param index0  an index for one end of the range.
+   * @param index1  an index for the other end of the range.
+   */
   public void removeSelectionInterval(int index0, int index1)
   {
     selectionModel.removeSelectionInterval(index0, index1);
@@ -2261,7 +2351,7 @@ public class JList extends JComponent implements Accessible, Scrollable
    *
    * @return A string describing the attributes of the <code>JList</code>.
    */
-  public String paramString()
+  protected String paramString()
   {
     StringBuffer sb = new StringBuffer(super.paramString());
     sb.append(",fixedCellHeight=").append(getFixedCellHeight());
