@@ -209,7 +209,6 @@ public class Editor extends JFrame {
         });
     }
 
-
     private void saveAs() {
         initFileChooser();
         fc.setDialogTitle("Save file");
