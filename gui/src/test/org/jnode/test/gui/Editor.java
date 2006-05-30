@@ -184,6 +184,7 @@ public class Editor extends JFrame {
             saveAs();
         else
             writeFile(file);
+
         requestFocus();
     }
 
