@@ -1038,6 +1038,8 @@ public abstract class Calendar implements Serializable, Cloneable
   public void setTimeZone(TimeZone zone)
   {
 		this.zone = zone;
+    computeTime();
+    computeFields();
 	}
 
 	/**

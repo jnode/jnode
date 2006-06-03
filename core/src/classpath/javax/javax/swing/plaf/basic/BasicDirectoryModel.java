@@ -229,7 +229,7 @@ public class BasicDirectoryModel extends AbstractListModel
       {
 	String aname = a.getName().toLowerCase();
 	String bname = b.getName().toLowerCase();
-	return ((aname.compareTo(bname) < 0) ? true : false);
+        return (aname.compareTo(bname) < 0) ? true : false;
       }
     else
       {

@@ -497,7 +497,7 @@ class DeflaterEngine implements DeflaterConstants
 		      throw new InternalError();
 		  }
 	      }
-	    huffman.tallyDist(strstart - matchStart, matchLen);
+	    boolean full = huffman.tallyDist(strstart - matchStart, matchLen);
 	    
 	    lookahead -= matchLen;
 	    if (matchLen <= max_lazy && lookahead >= MIN_MATCH)
@@ -516,6 +516,7 @@ class DeflaterEngine implements DeflaterConstants
 		  updateHash();
 	      }
 	    matchLen = MIN_MATCH - 1;
+	    if (!full)
 	    continue;
 	  }
 	else

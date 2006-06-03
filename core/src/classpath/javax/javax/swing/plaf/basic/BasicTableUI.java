@@ -228,8 +228,6 @@ public class BasicTableUI extends TableUI
               if (e.getClickCount() < ce.getClickCountToStart())
                 return;
             }
-          else if (e.getClickCount() < 2)
-            return;
           table.editCellAt(row, col);
         }
     }
@@ -428,7 +426,6 @@ public class BasicTableUI extends TableUI
     table.setSelectionForeground(UIManager.getColor("Table.selectionForeground"));
     table.setSelectionBackground(UIManager.getColor("Table.selectionBackground"));
     table.setOpaque(true);
-    rendererPane = new CellRendererPane();
   }
 
   protected void installKeyboardActions() 
@@ -1188,6 +1185,9 @@ public class BasicTableUI extends TableUI
   public void installUI(JComponent comp) 
   {
     table = (JTable)comp;
+    rendererPane = new CellRendererPane();
+    table.add(rendererPane);
+
     installDefaults();
     installKeyboardActions();
     installListeners();
@@ -1198,6 +1198,10 @@ public class BasicTableUI extends TableUI
     uninstallListeners();
     uninstallKeyboardActions();
     uninstallDefaults();    
+
+    table.remove(rendererPane);
+    rendererPane = null;
+    table = null;
   }
 
   /**
@@ -1257,7 +1261,6 @@ public class BasicTableUI extends TableUI
       }
     
     Rectangle bounds = table.getCellRect(r0, c0, false);
-    
     // The left boundary of the area being repainted.
     int left = bounds.x;
     
@@ -1278,9 +1281,9 @@ public class BasicTableUI extends TableUI
             bounds.x += widths[c] + columnMargin;
               }
         bounds.x = left;
-        bounds.y += table.getRowHeight(r) + rowMargin;
+        bounds.y += table.getRowHeight(r);
         // Update row height for tables with custom heights.
-        bounds.height = table.getRowHeight(r + 1);
+        bounds.height = table.getRowHeight(r + 1) - rowMargin;
       }
 
     bottom = bounds.y - rowMargin;
@@ -1311,7 +1314,7 @@ public class BasicTableUI extends TableUI
           {
             // The horizontal grid is draw below the cells, so we 
             // add before drawing.
-            y += table.getRowHeight(r) + rowMargin;
+            y += table.getRowHeight(r);// + rowMargin;
             gfx.drawLine(left, y, p2.x, y);
           }
         gfx.setColor(save);
