@@ -1,5 +1,5 @@
 /* RowMapper.java --
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2006, Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -41,7 +41,8 @@ package javax.swing.tree;
  * RowMapper public interface
  * @author Andrew Selkirk
  */
-public interface RowMapper {
+public interface RowMapper 
+{
 
 	/**
 	 * getRowsForPaths
@@ -50,5 +51,4 @@ public interface RowMapper {
 	 */
 	int[] getRowsForPaths(TreePath[] path);
 
-
-} // RowMapper
+} 
