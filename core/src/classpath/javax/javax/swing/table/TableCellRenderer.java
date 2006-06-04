@@ -46,7 +46,8 @@ import javax.swing.JTable;
  * TableCellRenderer public interface
  * @author Andrew Selkirk
  */
-public interface TableCellRenderer {
+public interface TableCellRenderer 
+{
 
 	/**
 	 * Get table cell renderer component
@@ -56,11 +57,10 @@ public interface TableCellRenderer {
 	 * @param hasFocus Cell has focus
 	 * @param row Row of cell
 	 * @param column Column of cell
-	 * @returns Component
+   * @return Component
 	 */
-	Component getTableCellRendererComponent(JTable table,
-			Object value, boolean isSelected, boolean hasFocus,
-			int row, int column);
+  Component getTableCellRendererComponent(JTable table, Object value, 
+      boolean isSelected, boolean hasFocus, int row, int column);
 
 
-} // TableCellRenderer
+}
