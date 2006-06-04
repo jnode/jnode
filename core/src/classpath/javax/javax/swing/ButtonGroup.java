@@ -91,8 +91,12 @@ public class ButtonGroup implements Serializable
     {
 	b.getModel().setGroup(this);
     if (b.isSelected())
+      {
+        if (sel == null)
       sel = b.getModel();
-    buttons.addElement(b);
+        else
+          b.setSelected(false);
+      }    buttons.addElement(b);
     }
     
   /**

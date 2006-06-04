@@ -124,8 +124,6 @@ public class DefaultDesktopManager implements DesktopManager, Serializable
   public void closeFrame(JInternalFrame frame)
   {
     Container c = frame.getParent();
-    frame.doDefaultCloseAction();
-
     if (c != null)
       {
 	if (frame.isIcon())
@@ -402,8 +400,8 @@ public class DefaultDesktopManager implements DesktopManager, Serializable
                           dragCache.width, dragCache.height);
 	pane = null;
 	dragCache = null;
-      }
     component.repaint();
+  }
   }
 
 	/**
@@ -465,8 +463,8 @@ public class DefaultDesktopManager implements DesktopManager, Serializable
                           dragCache.width, dragCache.height);
 	pane = null;
 	dragCache = null;
-      }
     component.repaint();
+  }
   }
 
 	/**
@@ -483,13 +481,6 @@ public class DefaultDesktopManager implements DesktopManager, Serializable
                                 int newWidth, int newHeight)
   {
     component.setBounds(newX, newY, newWidth, newHeight);
-    component.revalidate();
-
-    // If not null, I'd rather repaint the parent
-    if (component.getParent() != null)
-      component.getParent().repaint();
-    else
-      component.repaint();
   }
 
 	/**

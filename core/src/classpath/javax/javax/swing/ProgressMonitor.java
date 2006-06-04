@@ -38,8 +38,10 @@ exception statement from your version. */
 package javax.swing;
 
 import java.awt.Component;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.accessibility.AccessibleContext;
 
 /**
  * <p>Using this class you can easily monitor tasks where you cannot
@@ -62,6 +64,12 @@ import java.awt.event.ActionEvent;
  */
 public class ProgressMonitor
 {
+  
+  /**
+   * The accessible content for this component
+   */
+  protected AccessibleContext accessibleContext;
+  
   /**
    * parentComponent
    */
@@ -440,4 +448,13 @@ public class ProgressMonitor
     }
   }
 
+  /**
+   * Gets the accessible context.
+   * 
+   * @return the accessible context.
+   */
+  public AccessibleContext getAccessibleContext()
+  {
+    return accessibleContext;
+  }
 }
