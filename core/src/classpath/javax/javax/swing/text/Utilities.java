@@ -43,6 +43,9 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.text.BreakIterator;
 
+import javax.swing.SwingConstants;
+import javax.swing.text.Position.Bias;
+
 /**
  * A set of utilities to deal with text. This is used by several other classes
  * inside this package.
@@ -340,7 +343,7 @@ public class Utilities
         current = wb.next();
       }
     
-    throw new BadLocationException("no more word", offs);
+    throw new BadLocationException("no more words", offs);
   }
 
   /**
@@ -357,13 +360,16 @@ public class Utilities
   public static final int getPreviousWord(JTextComponent c, int offs)
       throws BadLocationException
   {
-    if (offs < 0 || offs > (c.getText().length() - 1))
-      throw new BadLocationException("invalid offset specified", offs);
     String text = c.getText();
+    
+    if (offs <= 0 || offs > text.length())
+      throw new BadLocationException("invalid offset specified", offs);
+    
     BreakIterator wb = BreakIterator.getWordInstance();
     wb.setText(text);
     int last = wb.preceding(offs);
     int current = wb.previous();
+    int cp;
 
     while (current != BreakIterator.DONE)
       {
@@ -377,6 +383,7 @@ public class Utilities
         last = current;
         current = wb.previous();
       }
+    
     return 0;
   }
   
@@ -390,14 +397,17 @@ public class Utilities
   public static final int getWordStart(JTextComponent c, int offs)
       throws BadLocationException
   {
-    if (offs < 0 || offs >= c.getText().length())
+    String text = c.getText();
+    
+    if (offs < 0 || offs > text.length())
       throw new BadLocationException("invalid offset specified", offs);
     
-    String text = c.getText();
     BreakIterator wb = BreakIterator.getWordInstance();
     wb.setText(text);
+
     if (wb.isBoundary(offs))
       return offs;
+
     return wb.preceding(offs);
   }
   
@@ -670,4 +680,38 @@ public class Utilities
     else
       return offs+1;
   }
+  
+  /** This is an internal helper method which is used by the
+   * <code>javax.swing.text</code> package. It simply delegates the
+   * call to a method with the same name on the <code>NavigationFilter</code>
+   * of the provided <code>JTextComponent</code> (if it has one) or its UI.
+   * 
+   * If the underlying method throws a <code>BadLocationException</code> it
+   * will be swallowed and the initial offset is returned.
+   */
+  static int getNextVisualPositionFrom(JTextComponent t, int offset, int direction)
+  {
+    NavigationFilter nf = t.getNavigationFilter();
+    
+    try
+      {
+        return (nf != null) 
+          ? nf.getNextVisualPositionFrom(t,
+                                         offset,
+                                         Bias.Forward,
+                                         direction,
+                                         null)
+          : t.getUI().getNextVisualPositionFrom(t,
+                                                offset,
+                                                Bias.Forward,
+                                                direction,
+                                                null);
+      }
+    catch (BadLocationException ble)
+    {
+      return offset;
+    }
+    
+  }
+  
 }
