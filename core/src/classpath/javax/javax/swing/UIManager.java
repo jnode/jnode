@@ -145,7 +145,8 @@ public class UIManager implements Serializable
   static
   {
     String defaultlaf = System.getProperty("swing.defaultlaf");
-    try {
+    try 
+      {
       if (defaultlaf != null)
         {
           Class lafClass = Class.forName(defaultlaf);
@@ -455,7 +456,7 @@ public class UIManager implements Serializable
    */
   public static Font getFont(Object key, Locale locale)
   {
-    return (Font) get(key ,locale);
+    return (Font) get(key, locale);
   }
 
   /**

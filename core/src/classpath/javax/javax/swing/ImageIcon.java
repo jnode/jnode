@@ -288,12 +288,12 @@ public class ImageIcon
   }
 
   /**
-   * Creates an ImageIcon from the given URL without any description
-   * set.
+   * Creates an ImageIcon from the given URL and sets the description
+   * to the URL String representation.
    */
   public ImageIcon(URL url)
   {
-    this(url, null);
+    this(url, url.toString());
   }
 
   /**
