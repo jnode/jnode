@@ -103,7 +103,16 @@ public class MetalBorders
   private static BasicBorders.MarginBorder marginBorder;
 
   /**
-   * A border used for {@link JButton} components.
+   * <p>A border used for {@link JButton} components.</p>
+   * 
+   * <p>This {@link Border} implementation can handle only instances of
+   * {@link AbstractButton} and their subclasses.</p>
+   * 
+   * <p>If the Metal Look and Feel's current theme is 'Ocean' the border
+   * will be painted with a special highlight when the mouse cursor if
+   * over the button (ie. the property <code>rollover</code> of the
+   * button's model is <code>true</code>) and is not a <b>direct</b>
+   * child of a {@link JToolBar}.</p> 
    */
   public static class ButtonBorder extends AbstractBorder implements UIResource
   {
@@ -157,8 +166,14 @@ public class MetalBorders
         {
       ButtonModel bmodel = null;
       
+      // The RI will fail with a ClassCastException in such a situation.
+      // This code tries to be more helpful.
       if (c instanceof AbstractButton)
         bmodel = ((AbstractButton) c).getModel();
+      else
+        throw new IllegalStateException("A ButtonBorder is supposed to work "
+                                        + "only with AbstractButton and"
+                                        + "subclasses.");
 
       Color darkShadow = MetalLookAndFeel.getControlDarkShadow();
       Color shadow = MetalLookAndFeel.getControlShadow();
@@ -191,7 +206,7 @@ public class MetalBorders
             {
               // The normal border. This is used when the button is not
               // pressed or the button is not armed.
-              if (! (bmodel.isPressed() && bmodel.isArmed()) )
+              if (! (bmodel.isPressed() && bmodel.isArmed()))
           {
             // draw light border
             g.setColor(light);
@@ -246,8 +261,14 @@ public class MetalBorders
     {
       ButtonModel bmodel = null;
       
+      // The RI will fail with a ClassCastException in such a situation.
+      // This code tries to be more helpful.
       if (c instanceof AbstractButton)
         bmodel = ((AbstractButton) c).getModel();
+      else
+        throw new IllegalStateException("A ButtonBorder is supposed to work "
+                                        + "only with AbstractButton and"
+                                        + "subclasses.");
 
       Color darkShadow = MetalLookAndFeel.getControlDarkShadow();
       Color shadow = MetalLookAndFeel.getControlShadow();
@@ -267,8 +288,10 @@ public class MetalBorders
               g.drawRect(x, y, w - 1, h - 1);
               g.drawRect(x + 1, y + 1, w - 3, h - 3);
             }
-          else if (bmodel.isRollover())
+          else if (bmodel.isRollover() && !(c.getParent() instanceof JToolBar))
             {
+              // Paint a bigger border when the mouse is over the button but
+              // only if it is *not* part of a JToolBar.
               g.setColor(shadow);
               g.drawRect(x, y, w - 1, h - 1);
               g.drawRect(x + 2, y + 2, w - 5, h - 5);
@@ -829,7 +852,8 @@ public class MetalBorders
     {
       Color dark = MetalLookAndFeel.getPrimaryControlDarkShadow();
       Color light = MetalLookAndFeel.getPrimaryControlHighlight();
-      if (c instanceof JMenu) {
+      if (c instanceof JMenu) 
+        {
         JMenu menu = (JMenu) c;
         if (menu.isSelected())
         {
@@ -1469,8 +1493,8 @@ public class MetalBorders
       {
         Border outer = new ButtonBorder();
         Border inner = getMarginBorder();
-        buttonBorder = new BorderUIResource.CompoundBorderUIResource
-            (outer, inner);
+        buttonBorder = new BorderUIResource.CompoundBorderUIResource(outer, 
+            inner);
       }
     return buttonBorder;
   }
@@ -1488,8 +1512,8 @@ public class MetalBorders
       {
         Border outer = new ToggleButtonBorder();
         Border inner = getMarginBorder();
-        toggleButtonBorder = new BorderUIResource.CompoundBorderUIResource
-            (outer, inner);
+        toggleButtonBorder = new BorderUIResource.CompoundBorderUIResource(
+            outer, inner);
       }
     return toggleButtonBorder;
   }

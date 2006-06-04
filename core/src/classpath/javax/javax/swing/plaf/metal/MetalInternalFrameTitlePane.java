@@ -93,7 +93,11 @@ public class MetalInternalFrameTitlePane extends BasicInternalFrameTitlePane
     public void propertyChange(PropertyChangeEvent e)
     {
       String propName = e.getPropertyName();
-      if (propName.equals("JInternalFrame.isPalette"))
+      if (e.getPropertyName().equals(JInternalFrame.FRAME_ICON_PROPERTY))
+        {
+          title.setIcon(frame.getFrameIcon());
+        }
+      else if (propName.equals("JInternalFrame.isPalette"))
         {
           if (e.getNewValue().equals(Boolean.TRUE))
             setPalette(true);
@@ -417,7 +421,8 @@ public class MetalInternalFrameTitlePane extends BasicInternalFrameTitlePane
           endX = Math.max(closeButton.getX(), endX);
         endX -= 7;
         if (endX > startX)
-          MetalUtils.fillMetalPattern(this, g, startX, 3, endX - startX, getHeight() - 6, Color.white, Color.gray);
+          MetalUtils.fillMetalPattern(this, g, startX, 3, endX - startX, 
+              getHeight() - 6, Color.white, Color.gray);
       }
     g.setColor(savedColor);
   }
