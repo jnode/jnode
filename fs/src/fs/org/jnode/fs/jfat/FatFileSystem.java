@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.HashMap;
 
+import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.fs.FSEntry;
@@ -25,6 +26,9 @@ import org.jnode.fs.spi.AbstractFileSystem;
  * @author gvt
  */
 public class FatFileSystem extends AbstractFileSystem {
+    private static final Logger log =
+        Logger.getLogger ( FatFileSystem.class );
+
     private Fat fat;
     private final CodePage cp;
     
@@ -92,6 +96,14 @@ public class FatFileSystem extends AbstractFileSystem {
 	    new FatRootDirectory ( this );
     }
 
+
+    public void flush()
+	throws IOException {
+	super.flush();
+	fat.flush();
+	log.debug ( getFat().getCacheStat() );
+    }
+    
 
     public String toString() {
 	StrWriter out = new StrWriter();

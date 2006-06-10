@@ -21,22 +21,25 @@
  
 package org.jnode.driver.bus.ide.command;
 
+import java.nio.ByteBuffer;
+
 import org.jnode.driver.bus.ide.IDEBus;
 import org.jnode.driver.bus.ide.IDEIO;
 import org.jnode.util.TimeoutException;
 
 /**
  * @author epr
+ * test version
  */
 public class IDEReadSectorsCommand extends IDERWSectorsCommand {
-	
-	private final byte[] data;
+        private final ByteBuffer buf;
 	
 	private int readSectors;
-	
-	public IDEReadSectorsCommand(boolean primary, boolean master, long lbaStart, int sectors) {
+        private static long total = 0;
+    
+	public IDEReadSectorsCommand(boolean primary, boolean master, long lbaStart, int sectors, ByteBuffer dest ) {
 		super(primary, master, lbaStart, sectors);
-		this.data = new byte[SECTOR_SIZE * sectors];
+		buf = dest;
 	}
 
 	/**
@@ -57,11 +60,10 @@ public class IDEReadSectorsCommand extends IDERWSectorsCommand {
 		} else {
 		    if ((state & (ST_BUSY | ST_DEVICE_READY)) == ST_DEVICE_READY) {
 		        final int offset = readSectors * SECTOR_SIZE;
-		        final byte[] data = this.data;
-		        for (int i = 0; i < 512; i += 2) {
+			for ( int i = 0; i < 256; i++ ) {
 		            final int v = io.getDataReg();
-		            data[offset + i + 0] = (byte)(v & 0xFF);
-		            data[offset + i + 1] = (byte)((v >> 8) & 0xFF);
+			    buf.put ( (byte)(v & 0xFF ) );
+			    buf.put ( (byte)((v >> 8) & 0xFF ) );
 		        }
 		        readSectors++;
 		        if (readSectors == sectors) {
@@ -69,12 +71,5 @@ public class IDEReadSectorsCommand extends IDERWSectorsCommand {
 		        }
 		    }
 		}
-	}
-	
-	/**
-	 * Gets the data that has been read
-	 */
-	public byte[] getData() {
-		return data;
 	}
 }
