@@ -49,6 +49,7 @@ public class FatFileSystemType implements FileSystemType {
 
 	    switch ( type ) {
 	    case IBMPartitionTypes.PARTTYPE_WIN95_FAT32:
+	    case IBMPartitionTypes.PARTTYPE_WIN95_FAT32_LBA:
 		return true;
 		
 	    default:

@@ -21,6 +21,8 @@
  
 package org.jnode.driver.bus.ide.command;
 
+import java.nio.ByteBuffer;
+
 import org.jnode.driver.bus.ide.IDEBus;
 import org.jnode.driver.bus.ide.IDEIO;
 import org.jnode.util.TimeoutException;
@@ -32,7 +34,7 @@ import org.jnode.util.TimeoutException;
  */
 public class IDEWriteSectorsCommand extends IDERWSectorsCommand {
 
-	private final byte[] data;
+        private final ByteBuffer buf;
 	private final int offset;
 	private final int length;
 	private int currentPosition;
@@ -44,11 +46,11 @@ public class IDEWriteSectorsCommand extends IDERWSectorsCommand {
 		boolean master,
 		long lbaStart,
 		int sectors,
-		byte[] src,
+		ByteBuffer src,
 		int srcOffset,
 		int length) {
 		super(primary, master, lbaStart, sectors);
-		this.data = src;
+		this.buf = src;
 		this.offset = srcOffset;
 		this.currentPosition = srcOffset;
 		this.length = length;
@@ -67,9 +69,9 @@ public class IDEWriteSectorsCommand extends IDERWSectorsCommand {
 	private void transfertASector(IDEBus ide, IDEIO io) throws TimeoutException {
 		io.waitUntilNotBusy(IDE_TIMEOUT);
 		for (int i = 0; i < 256; i++) {
-			io.setDataReg(
-				(data[currentPosition] & 0xFF)  + ((data[currentPosition + 1]&0xFF) << 8));
-			currentPosition += 2;
+		    int v = ( ( buf.get() & 0xFF ) + ( ( buf.get() & 0xFF ) << 8 ) );
+		    io.setDataReg ( v );
+		    currentPosition += 2;
 		}
 	}
 

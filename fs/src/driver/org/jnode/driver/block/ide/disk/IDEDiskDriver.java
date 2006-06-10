@@ -204,96 +204,88 @@ public class IDEDiskDriver extends Driver implements IDEDeviceAPI, IDEConstants 
 	 * @see org.jnode.driver.block.BlockDeviceAPI#read(long, byte[], int, int)
 	 */
 	public void read(long devOffset, ByteBuffer destBuf) throws IOException {
-        //TODO optimize it also to use ByteBuffer at lower level                 
-        ByteBufferUtils.ByteArray destBA = ByteBufferUtils.toByteArray(destBuf);
-        byte[] dest = destBA.toArray();
-        int destOffset = 0;
-        int length = dest.length;
-        
-        BlockDeviceAPIHelper.checkBounds(this, devOffset, length);
-        BlockDeviceAPIHelper.checkAlignment(SECTOR_SIZE, this, devOffset, length);
-		final long lbaStart = devOffset / SECTOR_SIZE;
-		final int sectors = length / SECTOR_SIZE;
+	    int destOffset = 0;
+	    int length = destBuf.remaining();
+	    
+	    BlockDeviceAPIHelper.checkBounds(this, devOffset, length);
+	    BlockDeviceAPIHelper.checkAlignment(SECTOR_SIZE, this, devOffset, length);
+	    
+	    final long lbaStart = devOffset / SECTOR_SIZE;
+	    final int sectors = length / SECTOR_SIZE;
+	    
+	    if (lbaStart + sectors > this.maxSector) {
+		throw new IOException("read beyond device sectors");
+	    }
 
-		if (lbaStart + sectors > this.maxSector) {
-			throw new IOException("read beyond device sectors");
-		}
-
-		final IDEDevice dev = (IDEDevice)getDevice();
+	    final IDEDevice dev = (IDEDevice)getDevice();
 	    final IDEBus bus = (IDEBus)dev.getBus();
 
-		while (length > 0) {
-		    final long partLbaStart = devOffset / SECTOR_SIZE;
-		    final int partSectors = Math.min(length / SECTOR_SIZE, 256);
-		    final int partLength = partSectors * SECTOR_SIZE;
-		    
-		    final IDEReadSectorsCommand cmd;
-		    cmd = new IDEReadSectorsCommand(dev.isPrimary(), dev.isMaster(), partLbaStart, partSectors);
-		    try {
-		        bus.executeAndWait(cmd, IDE_DATA_XFER_TIMEOUT);
-		    } catch (InterruptedException ex) {
-				final IOException ioe = new IOException("IDE read interrupted");
-				ioe.initCause(ex);
-				throw ioe;
-		    } catch (TimeoutException ex) {
-		        throw new InterruptedIOException("IDE timeout: " + ex.getMessage());
-		    }
-		    if (cmd.hasError()) {
-		        throw new IOException("IDE read error:" + cmd.getError());
-		    } else {
-		        System.arraycopy(cmd.getData(), 0, dest, destOffset, partLength);		        
-		    }
-		    length -= partLength;
-		    destOffset += partLength;
-		    devOffset += partLength;
+	    while (length > 0) {
+		final long partLbaStart = devOffset / SECTOR_SIZE;
+		final int partSectors = Math.min(length / SECTOR_SIZE, 256);
+		final int partLength = partSectors * SECTOR_SIZE;
+		
+		final IDEReadSectorsCommand cmd;
+		cmd = new IDEReadSectorsCommand(dev.isPrimary(), dev.isMaster(), partLbaStart, partSectors, destBuf ) ;
+		try {
+		    bus.executeAndWait(cmd, IDE_DATA_XFER_TIMEOUT);
+		} catch (InterruptedException ex) {
+		    final IOException ioe = new IOException("IDE read interrupted");
+		    ioe.initCause(ex);
+		    throw ioe;
+		} catch (TimeoutException ex) {
+		    throw new InterruptedIOException("IDE timeout: " + ex.getMessage());
 		}
-                
-        destBA.refreshByteBuffer();        
+		if (cmd.hasError()) {
+		    throw new IOException("IDE read error:" + cmd.getError());
+		}
+		    
+		length -= partLength;
+		destOffset += partLength;
+		devOffset += partLength;
+	    }
 	}
 
 	/**
 	 * @see org.jnode.driver.block.BlockDeviceAPI#write(long, byte[], int, int)
 	 */
 	public void write(long devOffset, ByteBuffer srcBuf) throws IOException {
-        //TODO optimize it also to use ByteBuffer at lower level                 
-        ByteBufferUtils.ByteArray srcBA = ByteBufferUtils.toByteArray(srcBuf);
-        byte[] src = srcBA.toArray();
-        int srcOffset = 0;
-        int length = src.length;
+	    int srcOffset = 0;
+	    int length = srcBuf.remaining();
         
-        BlockDeviceAPIHelper.checkBounds(this, devOffset, length);        
-        BlockDeviceAPIHelper.checkAlignment(SECTOR_SIZE, this, devOffset, length);        
-		final long lbaStart = devOffset / SECTOR_SIZE;
-		final int sectors = length / SECTOR_SIZE;
+	    BlockDeviceAPIHelper.checkBounds(this, devOffset, length);        
+	    BlockDeviceAPIHelper.checkAlignment(SECTOR_SIZE, this, devOffset, length);        
+	    final long lbaStart = devOffset / SECTOR_SIZE;
+	    final int sectors = length / SECTOR_SIZE;
+	    
+	    if (lbaStart + sectors > this.maxSector) {
+		throw new IOException("write beyond device sectors");
+	    }
 
-		if (lbaStart + sectors > this.maxSector) {
-			throw new IOException("write beyond device sectors");
-		}
-
-		final IDEDevice dev = (IDEDevice)getDevice();
-		final IDEBus bus = (IDEBus)dev.getBus();
-		final IDEWriteSectorsCommand cmd;
-		cmd =
-			new IDEWriteSectorsCommand(
-				dev.isPrimary(),
-				dev.isMaster(),
-				lbaStart,
-				sectors,
-				src,
-				srcOffset,
-				length);
-		try {
-			bus.executeAndWait(cmd, IDE_DATA_XFER_TIMEOUT);
-		} catch (InterruptedException ex) {
-			final IOException ioe = new IOException("IDE write interrupted");
-			ioe.initCause(ex);
-			throw ioe;
-		} catch (TimeoutException ex) {
-		    throw new InterruptedIOException("IDE timeout: " + ex.getMessage());
-		}
-		if (cmd.hasError()) {
-			throw new IOException("IDE write error:" + cmd.getError());
-		}
+	    final IDEDevice dev = (IDEDevice)getDevice();
+	    final IDEBus bus = (IDEBus)dev.getBus();
+	    final IDEWriteSectorsCommand cmd;
+	    cmd =
+		new IDEWriteSectorsCommand(
+					   dev.isPrimary(),
+					   dev.isMaster(),
+					   lbaStart,
+					   sectors,
+					   srcBuf,
+					   srcOffset,
+					   length);
+	    try {
+		bus.executeAndWait(cmd, IDE_DATA_XFER_TIMEOUT);
+	    } catch (InterruptedException ex) {
+		final IOException ioe = new IOException("IDE write interrupted");
+		ioe.initCause(ex);
+		throw ioe;
+	    } catch (TimeoutException ex) {
+		throw new InterruptedIOException("IDE timeout: " + ex.getMessage());
+	    }
+	    if (cmd.hasError()) {
+		throw new IOException("IDE write error:" + cmd.getError());
+	    }
 	}
 
 	static class IDEDiskBus extends Bus {

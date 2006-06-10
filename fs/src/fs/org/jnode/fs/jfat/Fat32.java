@@ -18,35 +18,29 @@ public class Fat32 extends Fat {
 	super ( bs, api );
     }
 
-    
+
     protected long offset ( int index ) {
 	return (long)( 4 * index );
     }
 
 
-    public Integer get ( int index )
+    public int get ( int index )
 	throws IOException {
-	return
-	    (int)( LittleEndian.getUInt32 ( readEntry ( index, 4 ), 0 ) & 0x0FFFFFFF );
+	return (int) ( getUInt32 ( index ) & 0x0FFFFFFF );
     }
 
 
-    public Integer set ( int index, Integer element )
+    public int set ( int index, int element )
 	throws IOException {
-	byte [] value = new byte[4];
-	
-	long old = LittleEndian.getUInt32 ( readEntry ( index, 4 ), 0 );
+	long old = getUInt32 ( index );
 
-	LittleEndian.setInt32
-	    ( value, 0, (int)( ( element & 0x0FFFFFFF ) | ( old & 0xF0000000 ) ) );
-	
-	writeEntry ( index, value );
+	setInt32 ( index, (int) ( ( element & 0x0FFFFFFF ) | ( old & 0xF0000000 ) ) );
 
-	return (int)( old & 0x0FFFFFFF );
+	return (int) ( old & 0x0FFFFFFF );
     }
 
 
-    public boolean isEofChain ( Integer entry ) {
+    public boolean isEofChain ( int entry ) {
 	return ( entry >= 0x0FFFFFF8 );
     }
 

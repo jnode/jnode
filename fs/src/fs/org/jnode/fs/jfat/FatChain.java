@@ -27,25 +27,30 @@ public class FatChain {
     private final FatFileSystem  fs;
     private final Fat            fat;
     
-    private Integer              head;
+    private int                  head;
     private boolean              dirty;
 
     private boolean              dolog = false;
+
+    private ChainPosition        position;
+    private ChainIterator        iterator;
     
     
-    public FatChain ( FatFileSystem fs, Integer startEntry ) {
+    public FatChain ( FatFileSystem fs, int startEntry ) {
 	this.fs     = fs;
 	this.fat    = fs.getFat();
 
 	setStartCluster ( startEntry );
 
 	this.dirty  = false;
+
+	this.position = new ChainPosition();
+	this.iterator = listIterator();
     }
 
 
     private void mylog ( String msg ) {
-	if ( dolog )
-	    log.debug ( msg );
+	log.debug ( msg );
     }
 
 
@@ -76,6 +81,11 @@ public class FatChain {
     public void flush() {
 	dirty = false;
     }
+
+
+    private ChainIterator listIterator() {
+	return new ChainIterator();
+    }
     
 
     private ChainIterator listIterator ( int index )
@@ -86,7 +96,7 @@ public class FatChain {
 
     private int getEndCluster()
 	throws IOException {
-	Integer last = 0;
+	int last = 0;
 	/*
 	 * not cheap: we have to follow the whole chain to get
 	 *            the last cluster value
@@ -131,10 +141,10 @@ public class FatChain {
 	    throw new IllegalArgumentException ( "offset<0" );
 
 
-	mylog ( "n[" + n + "] m[" + m + "] offset[" + offset + "]" );
+	if ( dolog )
+	    mylog ( "n[" + n + "] m[" + m + "] offset[" + offset + "]" );
 	
 
-	byte[] buf = new byte[fat.getClusterSize()];
 	final int last;
 	int i, found = 0, l = 0;
 	int k = ( offset > 0 ) ? 2 : 1;
@@ -164,13 +174,16 @@ public class FatChain {
 
 	last = l;
 
-	mylog ( "found[" + found + "] last[" + last + "]" );
+	if ( dolog )
+	    mylog ( "found[" + found + "] last[" + last + "]" );
 
 	fat.set ( last, fat.eofChain() );
-	mylog ( n + "\t|allo|\t" + last + " " + fat.eofChain() );
+	if ( dolog )
+	    mylog ( n + "\t|allo|\t" + last + " " + fat.eofChain() );
 
 	if ( zero ) {
-	    mylog ( n + "\t|ZERO|\t" + last + " " + fat.eofChain() );
+	    if ( dolog )
+		mylog ( n + "\t|ZERO|\t" + last + " " + fat.eofChain() );
 	    fat.clearCluster ( last );
 	}
 
@@ -180,7 +193,8 @@ public class FatChain {
 	for (; found < (n-m-k); i-- ) {
 	    if ( fat.isFreeEntry ( i ) ) {
 		fat.set ( i, l );
-		mylog ( (n-found-1) + "\t|allo|\t" + i + " " + l );
+		if ( dolog )
+		    mylog ( (n-found-1) + "\t|allo|\t" + i + " " + l );
 		l = i;
 		found++;
 	    }
@@ -191,7 +205,8 @@ public class FatChain {
 		if ( fat.isFreeEntry ( i ) ) {
 		    fat.clearCluster ( i, 0, offset );
 		    fat.set ( i, l );
-		    mylog ( (n-found-1) + "\t|part|\t" + i + " " + l );
+		    if ( dolog )
+			mylog ( (n-found-1) + "\t|part|\t" + i + " " + l );
 		    l = i;
 		    found++;
 		    break;
@@ -204,7 +219,8 @@ public class FatChain {
 	    if ( fat.isFreeEntry ( i ) ) {
 		fat.clearCluster ( i );
 		fat.set ( i, l );
-		mylog ( (n-found-1) + "\t|zero|\t" + i + " " + l );
+		if ( dolog )
+		    mylog ( (n-found-1) + "\t|zero|\t" + i + " " + l );
 		l = i;
 		found++;
 	    }
@@ -220,7 +236,8 @@ public class FatChain {
 	    }
 	}
 
-	mylog ( "LastFree: " + fat.getLastFree() );
+	if ( dolog )
+	    mylog ( "LastFree: " + fat.getLastFree() );
 
 	return l;
     }
@@ -238,39 +255,53 @@ public class FatChain {
 	return allocateTail ( n, 0, 0 );
     }
 
-    
+    /*
     private void allocate ( int n )
 	throws IOException {
-	int last  = allocateTail ( n );
-	int first = getEndCluster();
-
-	mylog ( first + ":" + last );
-
-	if ( first != 0 )
-	    fat.set ( first, last );
-	else {
-	    mylog ( "allocate chain" );
-	    setStartCluster ( last );
+	try {
+	    int last  = allocateTail ( n );
+	    int first = getEndCluster();
+	    
+	    if ( dolog )
+		mylog ( first + ":" + last );
+	    
+	    if ( first != 0 )
+		fat.set ( first, last );
+	    else {
+		if ( dolog )
+		    mylog ( "allocate chain" );
+		setStartCluster ( last );
+	    }
+	}
+	finally {
+	    fat.flush();
 	}
     }
-
+    */
 
     public void allocateAndClear ( int n )
 	throws IOException {
-	int last  = allocateTail ( n, n-1 ,0, true );
-	int first = getEndCluster();
-
-	mylog ( first + ":" + last );
-
-	if ( first != 0 )
-	    fat.set ( first, last );
-	else {
-	    mylog ( "allocate chain" );
-	    setStartCluster ( last );
+	try {
+	    int last  = allocateTail ( n, n-1 ,0, true );
+	    int first = getEndCluster();
+	    
+	    if ( dolog )
+		mylog ( first + ":" + last );
+	    
+	    if ( first != 0 )
+		fat.set ( first, last );
+	    else {
+		if ( dolog )
+		    mylog ( "allocate chain" );
+		setStartCluster ( last );
+	    }
+	}
+	finally {
+	    fat.flush();
 	}
     }
-    
 
+    
     public void free ( int n )
 	throws IOException {
 	if ( n <= 0 )
@@ -282,28 +313,37 @@ public class FatChain {
 	    throw new IOException ( "not enough cluster: count[" +
 				    count + "] n[" + n + "]" );
 
-	mylog ( "count[" + count + "] n[" + n + "]" );
+	if ( dolog )
+	    mylog ( "count[" + count + "] n[" + n + "]" );
 
 	ChainIterator i;
 
-	if ( count > n ) {
-	    i = listIterator ( count - n - 1 );
-	    int l = i.next();
-	    fat.set ( l, fat.eofChain() );
-	    mylog ( l + ":" + fat.eofChain() );
+	try {
+	    if ( count > n ) {
+		i = listIterator ( count - n - 1 );
+		int l = i.next();
+		fat.set ( l, fat.eofChain() );
+		if ( dolog )
+		    mylog ( l + ":" + fat.eofChain() );
+	    }
+	    else
+		i = listIterator ( 0 );
+	    
+	    while ( i.hasNext() ) {
+		int l = i.next();
+		fat.set ( l, fat.freeEntry() );
+		if ( dolog )
+		    mylog ( l + ":" + fat.freeEntry() );
+	    }
 	}
-	else
-	    i = listIterator ( 0 );
-	
-	while ( i.hasNext() ) {
-	    int l = i.next();
-	    fat.set ( l, fat.freeEntry() );
-	    mylog ( l + ":" + fat.freeEntry() );
+	finally {
+	    fat.flush();
 	}
 	
 	if ( count == n ) {
 	    setStartCluster ( 0 );
-	    mylog ( "zero" );
+	    if ( dolog )
+		mylog ( "zero" );
 	}
     }
 
@@ -316,9 +356,14 @@ public class FatChain {
 
 	ChainIterator i = listIterator ( 0 );
 
-	while ( i.hasNext() ) {
-	    int l = i.next();
-	    fat.set ( l, fat.freeEntry() );
+	try {
+	    while ( i.hasNext() ) {
+		int l = i.next();
+		fat.set ( l, fat.freeEntry() );
+	    }
+	}
+	finally {
+	    fat.flush();
 	}
 
 	setStartCluster ( 0 );
@@ -332,21 +377,23 @@ public class FatChain {
 	
 	if ( dst.remaining() == 0 )
 	    return;
-	
-	ChainIterator  i;
-	ChainPosition  p = new ChainPosition ( offset );
+
+	ChainPosition p = position;
+	ChainIterator i = iterator;
+
+	p.setPosition ( offset );
 
 	try {
-	    i  = listIterator ( p.getIndex() );
+	    i.setPosition ( p.getIndex() );
 	}
-	catch ( IndexOutOfBoundsException ex ) {
+	catch ( NoSuchElementException ex ) {
 	    final IOException ioe =
 		new IOException ( "attempt to seek after End Of Chain " + offset );
 	    ioe.initCause ( ex );
 	    throw ioe;
 	}
 
-	
+
 	for ( int l = dst.remaining(), sz = p.getPartial(), ofs = p.getOffset(), size;
 	      l > 0;
 	      l -= size, sz = p.getSize(), ofs = 0 ) {
@@ -355,12 +402,19 @@ public class FatChain {
 	    
 	    size = Math.min ( sz, l );
 
-	    mylog ( "read " + size + " bytes from cluster " + cluster +
-		    " at offset " + ofs );
+	    if ( dolog )
+		mylog ( "read " + size + " bytes from cluster " + cluster +
+			" at offset " + ofs );
 
-	    dst.limit ( dst.position() + size );
-
-	    fat.readCluster ( cluster, ofs, dst );
+	    int limit = dst.limit();
+	    
+	    try {
+		dst.limit ( dst.position() + size );
+		fat.readCluster ( cluster, ofs, dst );
+	    }
+	    finally {
+		dst.limit ( limit );
+	    }
 	}
     }
 
@@ -383,50 +437,67 @@ public class FatChain {
 	if ( offset < 0 )
 	    throw new IllegalArgumentException ( "offset<0" );
 
-	ChainPosition p = new ChainPosition ( offset );
+	//ChainPosition p = new ChainPosition ( offset );
+	ChainPosition p = position;
+	p.setPosition ( offset );
+	int clsize = p.getSize();
+	int clidx  = p.getIndex();
 
-	int last;
-	int cluster = 0;
-	int clsize  = p.getSize();
-	int clidx   = p.getIndex();
+
+	//int last;
+	//int cluster = 0;
 	
-	ChainIterator i = listIterator ( 0 );
+	//ChainIterator i = listIterator ( 0 );
+	ChainIterator i = iterator;
+	int cluster = i.getCluster ( clidx );
+	int last    = i.nextIndex();
 
+
+	//System.out.println ( "head=" + head + " clidx=" + clidx + " cluster=" + cluster + " last=" + last );
+	
+	/*
 	for ( last = 0; last < clidx; last++ )
 	    if ( i.hasNext() )
 		cluster = i.next();
 	    else
 		break;
-
-	if ( last != clidx ) {
-	    int m = clidx - last;
-
-	    long lst = offset + src.remaining() - last * clsize;
-
-	    int n = (int)( lst / clsize );
-	    if ( ( lst % clsize ) != 0 )
-		n++;
-
-	    last = allocateTail ( n, m, p.getOffset() );
-
-	    if ( cluster != 0 ) {
-		fat.set ( cluster, last );
-		((ChainIterator)i).setCursor ( last );
+	*/
+	
+	try {
+	    if ( last != clidx ) {
+		int m = clidx - last;
+		
+		long lst = offset + src.remaining() - last * clsize;
+		
+		int n = (int)( lst / clsize );
+		if ( ( lst % clsize ) != 0 )
+		    n++;
+		
+		last = allocateTail ( n, m, p.getOffset() );
+		
+		if ( cluster != 0 ) {
+		    fat.set ( cluster, last );
+		    ((ChainIterator)i).appendChain ( last );
+		}
+		else {
+		    setStartCluster ( last );
+		    i.reset();
+		    //i = listIterator ( clidx );
+		}
+		
+		/*
+		 * here length is used to decide
+		 * if we have to zero the data
+		 * inside the last cluster tail
+		 */
+		int ofs = (int)( length % clsize );
+		
+		if ( ofs != 0 )
+		    fat.clearCluster ( cluster, ofs, clsize );
 	    }
-	    else {
-		setStartCluster ( last );
-		i = listIterator ( clidx );
-	    }
-
-	    /*
-	     * here length is used to decide
-	     * if we have to zero the data
-	     * inside the last cluster tail
-	     */
-	    int ofs = (int)( length % clsize );
-	    
-	    if ( ofs != 0 )
-		fat.clearCluster ( cluster, ofs, clsize );
+	}
+	finally {
+	    fat.flush();
 	}
 
 
@@ -434,36 +505,46 @@ public class FatChain {
 	      l > 0;
 	      l -= size, sz = clsize, ofs = 0 ) {
 	    
-	    try {
-		cluster =  i.next();
-	    }
-	    catch ( NoSuchElementException ex ) {
+	    if ( !i.hasNext() ) {
 		int n = l / clsize;
 		if ( ( l % clsize ) != 0 )
 		    n++;
-		
-		last = allocateTail ( n );
 
-		if ( cluster != 0 ) {
-		    fat.set ( cluster, last );
-		    ((ChainIterator)i).setCursor ( last );
-		}
-		else {
-		    setStartCluster ( last );
-		    i = listIterator ( 0 );
-		}
+		try {
+		    last = allocateTail ( n );
 
-		cluster = i.next();
+		    if ( cluster != 0 ) {
+			fat.set ( cluster, last );
+			((ChainIterator)i).appendChain ( last );
+		    }
+		    else {
+			setStartCluster ( last );
+			i.reset();
+			//i = listIterator ( 0 );
+		    }
+		}
+		finally {
+		    fat.flush();
+		}
 	    }
+
+	    cluster = i.next();
 	    
 	    size = Math.min ( sz, l );
 
-	    mylog ( "write " + size + " bytes to cluster " + cluster +
-		    " at offset " + ofs );
+	    if ( dolog )
+		mylog ( "write " + size + " bytes to cluster " + cluster +
+			" at offset " + ofs );
 
-	    src.limit ( src.position() + size );
-
-	    fat.writeCluster ( cluster, ofs, src );
+	    int limit = src.limit();
+	    
+	    try {
+		src.limit ( src.position() + size );
+		fat.writeCluster ( cluster, ofs, src );
+	    }
+	    finally {
+		src.limit ( limit );
+	    }
 	}
     }
 
@@ -577,21 +658,20 @@ public class FatChain {
 
 
     private class ChainPosition {
-	private final long position;
-	private final int  index;
-	private final int  offset;
+	private       long position;
+	private       int  index;
+	private       int  offset;
 	private final int  size;
 
+
+	private ChainPosition() {
+	    this ( 0 );
+	}
+	
 	
 	private ChainPosition ( long pos ) {
-	    if ( pos < 0L || pos > 0xFFFFFFFFL )
-		throw new IllegalArgumentException();
-
-	    this.position = pos;
 	    this.size = fat.getClusterSize();
-
-	    this.index  =  (int)( pos / size );
-	    this.offset =  (int)( pos % size );
+	    setPosition ( pos );
 	}
 
 
@@ -619,36 +699,102 @@ public class FatChain {
 	    return
 		position;
 	}
+
+
+	private final void setPosition ( long value ) {
+	    if ( value < 0L || value > 0xFFFFFFFFL )
+		throw new IllegalArgumentException();
+	    this.position =  value;
+	    this.index    =  (int)( value / size );
+	    this.offset   =  (int)( value % size );
+	}
     }
 
     
 
     private class ChainIterator {
-	private Integer cursor;
+	private int     address;
+	private int     cursor;
 	private int     index;
+
+
+	private ChainIterator() {
+	    reset();
+	}
+	
 	
 	private ChainIterator ( int index )
 	    throws IOException {
-	    cursor = head;
-
-	    if ( index < 0 )
-		throw new IndexOutOfBoundsException
-		    ( "negative index: " + index );
-
-	    for ( int i = 0; i < index; i++ ) {
-		if ( hasNext() )
-		    next();
-		else
-		    throw new IndexOutOfBoundsException
-			( "index overflow: " + index );
-	    }
-
-	    this.index = index;
+	    this();
+	    setPosition ( index );
 	}
 
 
-	private void setCursor ( Integer value ) {
-	    cursor = value;
+	private void reset() {
+	    address   =  head;
+	    cursor    =  head;
+	    index     =  0;
+	}
+
+
+	private void setPosition ( int position )
+	    throws IOException {
+	    if ( position < 0 )
+		throw new IllegalArgumentException
+		    ( "negative index: " + position );
+
+	    if ( position > index ) {
+		for ( int i = index; i < position; i++ )
+		    next();
+	    }
+	    else if ( position < index ) {
+		reset();
+		for ( int i = 0; i < position; i++ )
+		    next();
+	    }
+	}
+
+
+	private int getCluster ( int position )
+	    throws IOException {
+	    int cluster = 0;
+
+	    if ( position > index ) {
+		for ( int i = index; i < position; i++ )
+		    if ( hasNext() )
+			cluster = next();
+		    else
+			break;
+	    }
+	    else if ( position < index ) {
+		reset();
+		for ( int i = 0; i < position; i++ )
+		    if ( hasNext() )
+			cluster = next();
+		    else
+			break;
+	    }
+	    else
+		cluster = address;
+
+	    return cluster;
+	}
+
+
+	/**
+	 * this method is used to append a new allocated chain
+	 * to the current chain while is positioned at the end of chain
+	 *
+	 * it can be used if and only if cursor is an EndOfChain
+	 * it will throw an exception otherwise
+	 *
+	 * chain index is not changed ... the chain remains
+	 * positioned where it was ... 
+	 */
+	private void appendChain ( int startCluster ) {
+	    if ( !fat.isEofChain ( cursor ) )
+		throw new IllegalArgumentException ( "cannot append to: " + cursor );
+	    cursor = startCluster;
 	}
 	
 	
@@ -657,24 +803,24 @@ public class FatChain {
 	}
 
 
-	private Integer next()
+	private int next()
 	    throws IOException {
 	    if ( !hasNext() )
 		throw new NoSuchElementException();
 
-	    Integer current = cursor;
+	    address = cursor;
 
-	    cursor = fat.get ( cursor );
+	    cursor = fat.get ( address );
 
-	    if ( cursor == current )
+	    if ( cursor == address )
 		throw new IOException ( "circular chain at: " + cursor );
 
 	    if ( fat.isFree ( cursor )  )
-		throw new IOException ( "free entry in chain at: " + current );
+		throw new IOException ( "free entry in chain at: " + address );
 
 	    index++;
 	    
-	    return current;
+	    return address;
 	}
 
 
@@ -692,15 +838,14 @@ public class FatChain {
 	 * ... peraphs an UnsupportedOperationException
 	 * would be better here ... but who knows? ;-)
 	 */
-	private Integer previous()
+	private int previous()
 	    throws IOException {
 	    if ( !hasPrevious() )
 		throw new NoSuchElementException();
 
 	    int prev = index - 1;
 	    
-	    cursor = head;
-	    index  = 0;
+	    reset();
 
 	    for ( int i = 0; i < prev; i++ )
 		next();

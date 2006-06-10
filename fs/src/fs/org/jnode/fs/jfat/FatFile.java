@@ -76,11 +76,24 @@ public class FatFile extends FatEntry implements FSFile {
 
     public void read ( long offset, ByteBuffer dst )
 	throws IOException {
+	int limit   = dst.limit();
+	long length = getLength();
+	long rem    = length - offset;
+
+	if ( rem <= 0 )
+	    return;
+	
 	try {
+	    if ( rem < dst.remaining() )
+		dst.limit ( dst.position() + (int)rem );
+
 	    getChain().read ( offset, dst );
 	}
 	catch ( NoSuchElementException ex ) {
 	    log.debug ( "End Of Chain reached: shouldn't happen" );
+	}
+	finally {
+	    dst.limit ( limit );
 	}
     }
 

@@ -26,28 +26,22 @@ public abstract class Fat {
     private final BlockDeviceAPI api;
     private final BootSector     bs;
 
-    private final ByteBuffer     buf;
-    private       long           lastread;
-    private       int            lastfree;
+    private final FatCache       cache;
 
-    private final byte[]         clearbuf;
+    private int                  lastfree;
+    
+    private final ByteBuffer     clearbuf;
 
-     
+    
     protected Fat ( BootSector bs, BlockDeviceAPI api ) {
 	this.bs      =  bs;
 	this.api     =  api;
 
 	/*
-	 * must be one byte longer of the sector size
-	 * to accomodate the last byte of a FAT12 cluster entry
+	 * create a suitable cache
 	 */
-	buf = ByteBuffer.allocate ( bs.getBytesPerSector() + 1 );
-
-	/*
-	 * can and must be initialized to a negative long
-	 *     by contract fat positions cannot be negative longs
-	 */
-	lastread = -1;
+	cache = new FatCache ( this, 8192, 512 );
+	
 
 	/*
 	 * set lastfree
@@ -57,8 +51,13 @@ public abstract class Fat {
 	/*
 	 * and blank the clear buffer
 	 */
-	clearbuf = new byte[getClusterSize()];
-	Arrays.fill ( clearbuf, 0, clearbuf.length, (byte)0x00 );
+	byte[] cleardata = new byte[getClusterSize()];
+	Arrays.fill ( cleardata, 0, cleardata.length, (byte)0x00 );
+
+	/*
+	 * setup the clear buffer
+	 */
+	clearbuf = ByteBuffer.wrap ( cleardata ).asReadOnlyBuffer();
     }
     
 
@@ -70,11 +69,12 @@ public abstract class Fat {
 
 	if ( bs.isFat32() )
 	    return new Fat32 ( bs, api );
+	/*
 	else if ( bs.isFat16() )
 	    return new Fat16 ( bs, api );
 	else if ( bs.isFat12() )
 	    return new Fat12 ( bs, api );
-
+	*/
 	throw new FileSystemException ( "FAT not recognized" );
     }
 
@@ -136,88 +136,12 @@ public abstract class Fat {
     }
 
 
-    private final long position ( int fatnum, int index )
+    protected final long position ( int fatnum, int index )
 	throws IOException {
 	if ( index < 0 || index >= size() )
 	    throw new IllegalArgumentException ( "illegal entry: " + index );
 	return
 	    getFirst ( fatnum ) + offset ( index );
-    }
-
-
-    /*
-     * it is "optimized" for "sequential" accesses to the FAT
-     * random accesses requires to reread the FAT
-     *
-     * BytesPerSector "must be" a multiple of 4
-     *   acceptable values are 512, 1024, 2048, 4096
-     *     they should be checked in the BootSector class
-     *
-     * have to be revised anyway
-     *
-     * the logic is to read the whole sector that contains
-     * a FAT entry into the buffer
-     *
-     * in the FAT12 case it reads the whole sector and one
-     * byte from the "next sector"
-     *
-     * (gvt) I know is possible todo a better job here
-     *       but it should be quite easy to change
-     *       just the read/write core routines
-     */
-    protected byte[] readEntry ( int index, int length )
-	throws IOException {
-	byte[] value = new byte[length];
-
-	long pos  =  position ( 0, index );
-	int  sz   =  getBootSector().getBytesPerSector();
-
-	long bufidx;
-	int  bufofs;
-
-	bufidx = pos / sz;
-	bufofs = (int)pos % sz;
-
-	
-	if ( bufidx != lastread ) {
-	    buf.clear();
-	    if ( getBootSector().isFat12() && !isLastSector ( 0, bufidx ) )
-		/*
-		 * accomodate the "one" byte remaining
-		 * if it is a FAT12 and it is not the last
-		 * sector of the current FAT
-		 */
-		buf.limit ( sz + 1 );
-	    else
-		/*
-		 * otherwise just read the whole sector
-		 */
-		buf.limit ( sz );
-	    getApi().read ( bufidx * sz, buf );
-	}
-	
-	if ( buf.position() != bufofs )
-	    buf.position ( bufofs );
-
-	buf.get ( value );
-	
-	lastread = bufidx;
-		
-	return value;
-    }
-    
-
-    protected void writeEntry ( int index, byte[] value )
-	throws IOException {
-	/*
-	 * invalidate the cache ;-)
-	 *   take care: it has to be changed as the read logic
-	 *              change
-	 */
-	lastread = 0;
-	
-	for ( int i = 0; i < getBootSector().getNrFats(); i++ )
-	    getApi().write ( position ( i, index ), ByteBuffer.wrap ( value ) );
     }
 
 
@@ -267,10 +191,10 @@ public abstract class Fat {
 					   "exceed clusterSize[" +
 					   getClusterSize() + "]" );
 
-	ByteBuffer clear = ByteBuffer.wrap ( clearbuf );
-	clear.limit ( end - start );
-
-	writeCluster ( cluster, start, clear );
+	clearbuf.clear();
+	clearbuf.limit ( end - start );
+	
+	writeCluster ( cluster, start, clearbuf );
     }
 
 
@@ -309,13 +233,13 @@ public abstract class Fat {
     protected abstract long offset ( int index );
     
     
-    public abstract boolean isEofChain ( Integer entry );
+    public abstract boolean isEofChain ( int entry );
 
     
     public abstract int eofChain();
 
 
-    public boolean hasNext ( Integer entry ) {
+    public boolean hasNext ( int entry ) {
 	/*
 	 * cluster 0(zero) and 1(one) are EndOfChains!
 	 */
@@ -330,20 +254,39 @@ public abstract class Fat {
     }
 
 
-    public final boolean isFree ( Integer entry ) {
+    public final boolean isFree ( int entry ) {
 	return ( entry == freeEntry() );
     }
 
 
-    public abstract Integer get ( int index )
+    public long getUInt32 ( int index )
+	throws IOException {
+	return cache.getUInt32 ( index );
+    }
+
+
+    public void setInt32 ( int index, int element )
+	throws IOException {
+	cache.setInt32 ( index, element );
+    }
+    
+
+    public abstract int get ( int index )
 	throws IOException;
 
 
-    public abstract Integer set ( int index, Integer element )
+    public abstract int set ( int index, int element )
 	throws IOException;
 
+    
+    public void flush()
+	throws IOException {
+	cache.flush();
+    }
 
-    public final boolean isFreeEntry ( Integer entry )
+
+
+    public final boolean isFreeEntry ( int entry )
 	throws IOException {
 	return isFree ( get ( entry ) );
     }
@@ -390,6 +333,16 @@ public abstract class Fat {
 	return getBootSector().isFat12();
     }
 
+
+    public String getCacheStat() {
+	StrWriter out = new StrWriter();
+
+	out.println ( "Access: " + cache.getAccess() + " Hits: " + cache.getHit() +
+		      " Ratio: " + cache.getRatio()*100 + "%" );
+
+	return out.toString();
+    }
+    
     
     public String toString() {
 	StrWriter out = new StrWriter();
