@@ -416,7 +416,7 @@ public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
     		JNodeToolkit tk = ((JNodeToolkit) Toolkit.getDefaultToolkit());
     		if(tk == null) { System.err.println("Toolkit is null"); return; }
     		if(tk.getFontManager() == null) { System.err.println("FontManager is null"); return; }
-    		
+
     		tk.getFontManager()
     				.drawText(surface, this.clip, this.transform, text, font, x, y, getColor());
     	}

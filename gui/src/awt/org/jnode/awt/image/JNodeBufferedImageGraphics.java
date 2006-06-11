@@ -80,7 +80,28 @@ public class JNodeBufferedImageGraphics extends AbstractSurfaceGraphics {
 		return null;
 	}
 
-	private static class BufferedImageSurface extends AbstractSurface {
+    /**
+     * Returns the color model of this Graphics object.
+     *
+     * @return the color model of this Graphics object
+     */
+    protected ColorModel getColorModel() {
+        return image.getColorModel();
+    }
+
+    /**
+     * Returns a WritableRaster that is used by this class to perform the
+     * rendering in. It is not necessary that the target surface immediately
+     * reflects changes in the raster. Updates to the raster are notified via
+     * {@link #updateRaster}.
+     *
+     * @return the destination raster
+     */
+    protected WritableRaster getDestinationRaster() {
+        return image.getRaster();
+    }
+
+    private static class BufferedImageSurface extends AbstractSurface {
 
 		/** My logger */
 		private static final Logger log = Logger.getLogger(BufferedImageSurface.class);

@@ -24,6 +24,8 @@ package org.jnode.awt.image;
 import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
 import java.awt.Shape;
+import java.awt.image.ColorModel;
+import java.awt.image.WritableRaster;
 
 import org.jnode.awt.util.AbstractGraphics;
 
@@ -103,6 +105,29 @@ public class JNodeImageGraphics extends AbstractGraphics {
      * @see java.awt.Graphics#drawString(java.lang.String,int,int)
      */
     public void drawString(String text, int x, int y) {
-        // Not implemented
+        // TODO Not implemented
+    }
+
+    /**
+     * Returns the color model of this Graphics object.
+     *
+     * @return the color model of this Graphics object
+     */
+    protected ColorModel getColorModel() {
+        // TODO Not implemented
+        return null;
+    }
+
+    /**
+     * Returns a WritableRaster that is used by this class to perform the
+     * rendering in. It is not necessary that the target surface immediately
+     * reflects changes in the raster. Updates to the raster are notified via
+     * {@link #updateRaster}.
+     *
+     * @return the destination raster
+     */
+    protected WritableRaster getDestinationRaster() {
+        // TODO Not implemented
+        return null;  
     }
 }
