@@ -80,7 +80,19 @@ public class BasicComboBoxRenderer
    */
   public Dimension getPreferredSize()
   {
+    if (this.getText() != null && ! this.getText().equals(""))
     return super.getPreferredSize();
+    else
+      {
+        // If the combo box option's text is empty or null, it won't size
+        // properly (ie, it'll be way too short)... so we throw in a dummy
+        // space to trick the superclass's sizing methods.
+        String oldText = this.getText();
+        this.setText(" ");
+        Dimension d = super.getPreferredSize();
+        this.setText(oldText);
+        return d;
+      }
   }
 
   /**
