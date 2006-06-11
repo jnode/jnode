@@ -734,6 +734,7 @@ public class BasicProgressBarUI extends ProgressBarUI
                                          height - b.top - b.bottom);
     Color savedColor = g.getColor();
     Shape savedClip = g.getClip();
+    FontMetrics fm = g.getFontMetrics(progressBar.getFont());
 
     if (progressBar.getOrientation() == JProgressBar.VERTICAL)
       {
@@ -743,10 +744,10 @@ public class BasicProgressBarUI extends ProgressBarUI
     
     g.setColor(getSelectionForeground());
     g.setClip(0, 0, full + b.left, height);
-    g.drawString(str, placement.x, placement.y);
+    g.drawString(str, placement.x, placement.y + fm.getAscent());
     g.setColor(getSelectionBackground());
     g.setClip(full + b.left, 0, width - full, height);
-    g.drawString(str, placement.x, placement.y);
+    g.drawString(str, placement.x, placement.y + fm.getAscent());
     g.setClip(savedClip);
     g.setColor(savedColor);
   }

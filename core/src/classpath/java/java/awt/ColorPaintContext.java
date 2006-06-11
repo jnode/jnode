@@ -117,7 +117,7 @@ class ColorPaintContext implements PaintContext
    {
      cachedRaster = new ColorRaster(colorModel, 0, 0, width, height, color);
    }
-   return cachedRaster.createChild(0 ,0 ,width ,height ,x ,y , null);
+   return cachedRaster.createChild(0 ,0 ,width ,height ,0 ,0 , null);
   }
   
   /**

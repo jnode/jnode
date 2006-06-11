@@ -274,7 +274,9 @@ public class DefaultKeyboardFocusManager extends KeyboardFocusManager
 
   public boolean dispatchKeyEvent (KeyEvent e)
   {
-    Component focusOwner = getGlobalPermanentFocusOwner ();
+    Component focusOwner = getFocusOwner();
+    if (focusOwner == null)
+      focusOwner = getFocusedWindow();
 
     if (focusOwner != null)
       redispatchEvent(focusOwner, e);

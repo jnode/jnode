@@ -65,6 +65,11 @@ public class PolyEdge
   double xIntersection;
 
   /**
+   * Indicates whether this edge is from the clip or from the target shape.
+   */
+  boolean isClip;
+
+  /**
    * Creates a new PolyEdge with the specified coordinates.
    *
    * @param x0 the starting point, x coordinate
@@ -72,8 +77,9 @@ public class PolyEdge
    * @param x1 the end point, x coordinate
    * @param y1 the end point, y coordinate
    */
-  PolyEdge(double x0, double y0, double x1, double y1)
+  PolyEdge(double x0, double y0, double x1, double y1, boolean clip)
   {
+    isClip = clip;
     if (y0 < y1)
       {
         this.x0 = x0;
@@ -112,6 +118,7 @@ public class PolyEdge
   public String toString()
   {
     return "Edge: " + x0 + ", " + y0 + ", " + x1 + ", " + y1 + ", slope: "
-           + slope + ", xIntersection: " + xIntersection;
+           + slope + ", xIntersection: " + xIntersection
+           + ", isClip: " + isClip;
   }
 }

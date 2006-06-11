@@ -1,5 +1,5 @@
-/* SwingWindowPeer.java -- An abstract base for Swing based window peers
-   Copyright (C)  2006  Free Software Foundation, Inc.
+/* SharedUIDefaults.java -- Manages shared instances for UIDefaults
+   Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,38 +35,44 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package gnu.java.awt.peer.swing;
 
-import java.awt.Window;
-import java.awt.peer.WindowPeer;
+package javax.swing.plaf.basic;
+
+import java.util.HashMap;
+
+import javax.swing.UIManager;
 
 /**
- * An abstract base class for Swing based WindowPeer implementation. Concrete
- * implementations of WindowPeers should subclass this class in order to get
- * the correct behaviour.
- *
- * As a minimum, a subclass must implement all the remaining abstract methods
- * as well as the following methods:
- * <ul>
- * <li>{@link java.awt.peer.ComponentPeer#getLocationOnScreen()}</li>
- * <li>{@link java.awt.peer.ComponentPeer#getGraphics()}</li>
- * <li>{@link java.awt.peer.ComponentPeer#createImage(int, int)}</li>
- * </ul>
+ * Manages shared instances for UI defaults. For example, all Swing components
+ * of one type usually share one InputMap/ActionMap pair. In order to avoid
+ * duplication of such objects we store them in a Map here.
  *
  * @author Roman Kennke (kennke@aicas.com)
  */
-public abstract class SwingWindowPeer
-  extends SwingContainerPeer
-  implements WindowPeer
+public class SharedUIDefaults
 {
 
   /**
-   * Creates a new instance of WindowPeer.
-   *
-   * @param window the AWT window
+   * Stores the shared instances, indexed by their UI names
+   * (i.e. "TextField.InputMap").
    */
-  public SwingWindowPeer(Window window)
+  private static HashMap sharedDefaults = new HashMap();
+
+  /**
+   * Returns a shared UI defaults object.
+   *
+   * @param key the key for the shared object
+   *
+   * @return a shared UI defaults object for the specified key
+   */
+  static Object get(String key)
   {
-    super(window);
+    Object o = sharedDefaults.get(key);
+    if (o == null)
+      {
+        o = UIManager.get(key);
+        sharedDefaults.put(key, o);
+      }
+    return o;
   }
 }

@@ -730,9 +730,9 @@ public class GapContent
         for (Iterator i = positionSet.iterator(); i.hasNext();)
       {
             GapContentPosition p = (GapContentPosition) i.next();
-            if (p.index > start || p.index <= end)
-              p.index = start;
-            else if (p.index > end)
+            if (p.index > startIndex || p.index <= endIndex)
+              p.index = startIndex;
+            else if (p.index > endIndex)
               p.index -= removed;
           }
   }
@@ -846,7 +846,7 @@ public class GapContent
   private void dumpMarks()
   {
     System.err.print("positionMarks: ");
-    for (int i = 0; i < positionMarks.length; i++)
+    for (int i = 0; i < numMarks; i++)
       System.err.print(positionMarks[i] + ", ");
     System.err.println();
   }
@@ -918,7 +918,7 @@ public class GapContent
     int mid = 0;
     while (low <= hi)
       {
-        mid = (low + hi) >> 1;
+        mid = (low + hi) >>> 1;
         final int d = a[mid];
         if (d == key)
           return mid;

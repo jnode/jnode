@@ -264,12 +264,13 @@ public final class ConfigFileParser
     if (cn.startsWith(".") || cn.endsWith("."))
       abort("MODULE_CLASS MUST NOT start or end with a '.'");
 
-    String[] tokens = cn.split(".");
+    String[] tokens = cn.split("\\.");
     for (int i = 0; i < tokens.length; i++)
       {
         String t = tokens[i];
-        if (Character.isJavaIdentifierStart(cn.toCharArray()[0]))
-          abort("");
+        if (! Character.isJavaIdentifierStart(t.toCharArray()[0]))
+          abort("Class name [" + cn
+                + "] contains an invalid sub-package identifier: " + t);
 
         // we dont check the rest of the characters for isJavaIdentifierPart()
         // because that's what the tokenizer does.

@@ -446,6 +446,11 @@ public class PlainView extends View implements TabExpander
       }
     
     Element element = getElement();
+
+    // Find longest line if it hasn't been initialized yet.
+    if (longestLine == null)
+      findLongestLine(0, element.getElementCount() - 1);
+
     ElementChange change = changes.getChange(element);
     if (changes.getType() == DocumentEvent.EventType.INSERT)
       {
