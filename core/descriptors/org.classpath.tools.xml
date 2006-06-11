@@ -30,7 +30,7 @@
       <export name="gnu.classpath.tools.rmi.rmic.*"/>
       <export name="gnu.classpath.tools.rmi.rmic.templates.*"/>
       <export name="gnu.classpath.tools.rmi.rmid.*"/>
-      <export name="gnu.classpath.tools.serialver"/>
+      <export name="gnu.classpath.tools.serialver.*"/>
 
     </library>
   </runtime>
