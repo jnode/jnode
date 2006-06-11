@@ -26,6 +26,10 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
+import java.awt.image.ColorModel;
+import java.awt.image.WritableRaster;
+import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
 
 import org.jnode.awt.util.AbstractSurfaceGraphics;
 
@@ -37,7 +41,7 @@ public class JNodeGraphics extends AbstractSurfaceGraphics {
 	private final JNodeGenericPeer component;
 	private final JNodeToolkit toolkit;
 
-	/**
+    /**
 	 * Initialize a graphics for the given component
 	 * @param component
 	 */
@@ -82,4 +86,48 @@ public class JNodeGraphics extends AbstractSurfaceGraphics {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+    //----- preparing Graphics2D
+    /**
+     * Returns the color model of this Graphics object.
+     *
+     * @return the color model of this Graphics object
+     */
+    protected ColorModel getColorModel() {
+        return toolkit.getColorModel();
+    }
+
+    /**
+     * Returns a WritableRaster that is used by this class to perform the
+     * rendering in. It is not necessary that the target surface immediately
+     * reflects changes in the raster. Updates to the raster are notified via
+     * {@link #updateRaster}.
+     *
+     * @return the destination raster
+     */
+    protected WritableRaster getDestinationRaster() {
+        if(image == null)
+            image = new BufferedImage(((Component)component.getTargetComponent()).getWidth(), ((Component)component.getTargetComponent()).getHeight(), BufferedImage.TYPE_INT_ARGB);
+        return image.getRaster();
+    }
+
+    private BufferedImage image;
+
+    /**
+     * Notifies the backend that the raster has changed in the specified
+     * rectangular area. The raster that is provided in this method is always
+     * the same as the one returned in {@link #getDestinationRaster}.
+     * Backends that reflect changes to this raster directly don't need to do
+     * anything here.
+     *
+     * @param raster the updated raster, identical to the raster returned
+     *               by {@link #getDestinationRaster()}
+     * @param x      the upper left corner of the updated region, X coordinate
+     * @param y      the upper lef corner of the updated region, Y coordinate
+     * @param w      the width of the updated region
+     * @param h      the height of the updated region
+     */
+    protected void updateRaster(Raster raster, int x, int y, int w, int h) {
+        drawImage(image, 0, 0, null);
+    }
 }

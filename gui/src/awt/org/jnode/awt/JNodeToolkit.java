@@ -334,7 +334,9 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	}
 
 	public VolatileImage createVolatileImage(int width, int height) {
-		throw new RuntimeException("Not implemented");
+        //TODO implement volatile image support
+        return null;
+        //throw new RuntimeException("Not implemented");
 	}
 
 	/**

@@ -82,7 +82,7 @@ public abstract class AbstractGraphics extends Graphics2D {
 
 	/**
 	 * Initialize this instance
-	 * 
+	 *
 	 * @param width
 	 * @param height
 	 */
@@ -92,7 +92,7 @@ public abstract class AbstractGraphics extends Graphics2D {
 
 	/**
 	 * Initialize this instance as a copy of the given instance
-	 * 
+	 *
 	 * @param src
 	 */
 	public AbstractGraphics(AbstractGraphics src) {
@@ -758,7 +758,7 @@ public abstract class AbstractGraphics extends Graphics2D {
 	/**
 	 * Gets the color set by setXORColor, or null when this Graphics is in Paint
 	 * mode.
-	 * 
+	 *
 	 * @return The XOR mode color
 	 */
 	public Color getXORColor() {
