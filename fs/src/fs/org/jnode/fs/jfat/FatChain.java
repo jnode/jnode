@@ -40,12 +40,12 @@ public class FatChain {
 	this.fs     = fs;
 	this.fat    = fs.getFat();
 
+	this.position = new ChainPosition();
+	this.iterator = listIterator();
+
 	setStartCluster ( startEntry );
 
 	this.dirty  = false;
-
-	this.position = new ChainPosition();
-	this.iterator = listIterator();
     }
 
 
@@ -69,6 +69,10 @@ public class FatChain {
 	    throw new IllegalArgumentException ( "illegal head: " + value );
 
 	head  =  value;
+	
+	iterator.reset();
+	position.setPosition ( 0 );
+	
 	dirty =  true;
     }
 
@@ -481,7 +485,6 @@ public class FatChain {
 		}
 		else {
 		    setStartCluster ( last );
-		    i.reset();
 		    //i = listIterator ( clidx );
 		}
 		
@@ -519,7 +522,6 @@ public class FatChain {
 		    }
 		    else {
 			setStartCluster ( last );
-			i.reset();
 			//i = listIterator ( 0 );
 		    }
 		}
