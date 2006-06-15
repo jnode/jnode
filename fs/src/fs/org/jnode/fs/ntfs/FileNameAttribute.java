@@ -110,6 +110,33 @@ final class FileNameAttribute extends NTFSResidentAttribute {
     }
 
     /**
+     * Gets the creation time.
+     *
+     * @return the creation time, as a 64-bit NTFS filetime value.
+     */
+    public long getCreationTime() {
+        return getInt64(getAttributeOffset() + 0x08);
+    }
+
+    /**
+     * Gets the modification time.
+     *
+     * @return the modification time, as a 64-bit NTFS filetime value.
+     */
+    public long getModificationTime() {
+        return getInt64(getAttributeOffset() + 0x10);
+    }
+
+    /**
+     * Gets the access time.
+     *
+     * @return the access time, as a 64-bit NTFS filetime value.
+     */
+    public long getAccessTime() {
+        return getInt64(getAttributeOffset() + 0x20);
+    }
+
+    /**
      * Gets the name of this file as character array.
      * 
      * @return

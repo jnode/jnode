@@ -71,9 +71,8 @@ public class NTFSEntry implements FSEntry {
     /**
      * @see org.jnode.fs.FSEntry#getLastModified()
      */
-    public long getLastModified() {
-        // TODO Auto-generated method stub
-        return 0;
+    public long getLastModified() throws IOException {
+        return NTFSUTIL.filetimeToMillis(getFileRecord().getFileNameAttribute().getModificationTime());
     }
 
     /**
