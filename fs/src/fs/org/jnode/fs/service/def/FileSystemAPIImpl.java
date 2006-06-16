@@ -226,6 +226,12 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
         for (Iterator<? extends FSEntry> i = entry.getDirectory().iterator(); i.hasNext();) {
             final FSEntry child = i.next();
             final String name = child.getName();
+
+            //never include the parent directory and the current directory in the result
+            //if they exist by any chance
+            if ( name.equals(".") || name.equals("..") )
+               continue;
+
             list.add(name);
         }
         return list.toArray(new String[list.size()]);
