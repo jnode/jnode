@@ -45,27 +45,30 @@ public final class Monitor {
     /** Number of locks on this monitor THIS FIELD MUST BE THE FIRST!! */
     private int lockCount;
 
-    /** Lock counter of the monitor itself. THIS FIELD MUST BE THE SECOND!! */
-    private int monitorLock;
+    /** Mutex gaurding access to the structures of this Monitor */
+    private final ProcessorLock mutex;
 
     /** Thread that owns the monitor */
     private VmThread owner;
 
     /** Thread queue for monitorenter/exit */
-    private final VmThreadQueue.ScheduleQueue enterQueue;
+    private final VmThreadScheduleQueue enterQueue;
 
     /** Thread queue for wait/notify/notifyAll */
-    private final VmThreadQueue.ScheduleQueue notifyQueue;
+    private final VmThreadWaitQueue notifyQueue;
+    
+    private final Object object;
 
     /**
      * Create a new instance
      */
-    public Monitor() {
+    public Monitor(Object object) {
         this.lockCount = 0;
-        this.monitorLock = 0;
         this.owner = null;
-        this.enterQueue = new VmThreadQueue.ScheduleQueue("mon-enter");
-        this.notifyQueue = new VmThreadQueue.ScheduleQueue("mon-notify");
+        this.object = object;
+        this.mutex = new ProcessorLock();
+        this.enterQueue = new VmThreadScheduleQueue("mon-enter");
+        this.notifyQueue = new VmThreadWaitQueue("mon-notify");
     }
 
     /**
@@ -74,15 +77,16 @@ public final class Monitor {
      * @param owner
      * @param lockCount
      */
-    Monitor(VmThread owner, int lockCount) {
-        this.monitorLock = 0;
+    Monitor(VmThread owner, int lockCount, Object object) {
         this.owner = owner;
         this.lockCount = lockCount;
         if (lockCount < 1) {
             throw new IllegalArgumentException("LockCount must be >= 1");
         }
-        this.enterQueue = new VmThreadQueue.ScheduleQueue("mon-enter");
-        this.notifyQueue = new VmThreadQueue.ScheduleQueue("mon-notify");
+        this.object = object;
+        this.mutex = new ProcessorLock();
+        this.enterQueue = new VmThreadScheduleQueue("mon-enter");
+        this.notifyQueue = new VmThreadWaitQueue("mon-notify");
     }
 
     /**
@@ -99,8 +103,6 @@ public final class Monitor {
     /**
      * Enter the given monitor. This method will block until the monitor is
      * locked by the current thread.
-     * 
-     * @throws UninterruptiblePragma
      */
     @Inline
     public final void enter() {
@@ -121,26 +123,26 @@ public final class Monitor {
     @NoInline
     private final void enterSlowPath() {
         // No yet owner, try to obtain the lock
-        boolean loop = true;
-        final Address lcAddr = getLCAddress();
-        while (loop) {
-            // Get current thread
-            final VmThread current = VmMagic.currentProcessor().getCurrentThread();
+        while (true) {
+            // Lock this monitor first
+            mutex.lock();
+            
             // Try to claim this monitor
-            if (lcAddr.attempt(0, 1)) {
-                loop = false;
-                this.owner = current;
+            if (getLCAddress().attempt(0, 1)) {
+                // Success, we now own this monitor
+                this.owner = VmMagic.currentProcessor().currentThread;
+                mutex.unlock();
+                return;
             } else {
+                // Get current thread
+                final VmThread current = VmMagic.currentProcessor().currentThread;
                 // Claim the lock for this monitor
-                lock();
-                try {
-                    VmMagic.currentProcessor().disableReschedule(true);
-                    prepareWait(current, enterQueue, VmThread.WAITING_ENTER, "mon-enter");
-                } finally {
-                    unlock();
-                }
+                VmMagic.currentProcessor().disableReschedule(false, null);
+                current.goSleepByMonitor(this, object, null, VmThread.WAITING_ENTER);
+                enterQueue.enqueue(current, false);
                 // Release the monitor lock
-                VmMagic.currentProcessor().suspend(true);
+                mutex.unlock();
+                VmMagic.currentProcessor().suspend(false, null);
                 // When we return here, another thread has given up
                 // this monitor.
             }
@@ -154,23 +156,31 @@ public final class Monitor {
      */
     public final void exit() {
         String exMsg = null;
-        if (owner != VmProcessor.current().currentThread) {
+        
+        mutex.lock();
+        if (owner != VmMagic.currentProcessor().currentThread) {
             exMsg = "Current thread is not the owner of this monitor";
+            mutex.unlock();
         } else if (lockCount <= 0) {
             lockCount = 0;
             exMsg = "Monitor is not locked";
+            mutex.unlock();
         } else if (lockCount > 1) {
             // Monitor is locked by current thread, decrement lockcount
             lockCount--;
+            mutex.unlock();
         } else {
             // Monitor is locked by current thread and will decrement to 0.
-            lock();
-            try {
-                wakeupWaitingThreads(enterQueue, true);
-                owner = null;
-                lockCount = 0;
-            } finally {
-                unlock();
+            VmMagic.currentProcessor().disableReschedule(false, null);
+            owner = null;
+            lockCount = 0;
+            
+            final VmThread t = this.enterQueue.dequeue();
+            VmMagic.currentProcessor().enableReschedule(false, null);
+            mutex.unlock();
+            
+            if (t != null) {
+                t.wakeupFromEnterQueue(this);
             }
         }
         if (exMsg != null) {
@@ -200,30 +210,47 @@ public final class Monitor {
         final VmThread current = VmMagic.currentProcessor().getCurrentThread();
         // final int id = current.getId();
         String exMsg = null;
+
+        // Prepare allocations
+        final VmThreadProxy proxy;
+        final int waitState;
+        if (timeout > 0) {
+            waitState = VmThread.WAITING_NOTIFY_TIMEOUT;
+            proxy = new VmThreadProxy(current, VmSystem
+                    .currentKernelMillis()
+                    + timeout);
+        } else {
+            waitState = VmThread.WAITING_NOTIFY;
+            proxy = new VmThreadProxy(current);
+        }
+
+        // Claim the scheduler and the mutex
+        VmMagic.currentProcessor().disableReschedule(true, mutex);
         if (owner != current) {
+            VmMagic.currentProcessor().enableReschedule(true, mutex);
             exMsg = "Current thread is not the owner of this monitor";
         } else if (lockCount == 0) {
+            VmMagic.currentProcessor().enableReschedule(true, mutex);
             exMsg = "Monitor is not locked";
         } else {
             final int oldLockCount = lockCount;
-            final int waitState = (timeout > 0) ? VmThread.WAITING_NOTIFY_TIMEOUT : VmThread.WAITING_NOTIFY;
-            lock();
-            try {
-                prepareWait(current, notifyQueue, waitState, "mon-notify");
-                VmMagic.currentProcessor().disableReschedule(true);
-            } finally {
-                unlock();
-            }
+            current.goSleepByMonitor(this, object, proxy, waitState);
+            notifyQueue.enqueue(proxy);
             // If there is a timeout, also add the current thread to the
             // sleep queue.
             if (timeout > 0) {
-                current.wakeupTime = VmSystem.currentKernelMillis() + timeout;
-                VmMagic.currentProcessor().getScheduler().addToSleepQueue(current);
+                VmMagic.currentProcessor().getScheduler().addToWakeupQueue(
+                        proxy);
             }
             owner = null;
             lockCount = 0;
-            wakeupWaitingThreads(enterQueue, true);
-            VmMagic.currentProcessor().suspend(true);
+            
+            final VmThread t = this.enterQueue.dequeue();
+            if (t != null) {
+                t.wakeupFromEnterQueue(this);
+            }
+            
+            VmMagic.currentProcessor().suspend(true, mutex);
             // When we return here, we have been notified or there
             // was a timeout.
 
@@ -234,22 +261,14 @@ public final class Monitor {
                 Unsafe.die("Wait");
             }
 
-            if (timeout > 0) {
-                // Screen.debug("<backfromwait-"); Screen.debug(id);
-                // Screen.debug("/>");
-                // Remove the current thread from the notifyQueue.
-                // There is no need to remove myself from the sleep queue,
-                // because this is done either by the scheduler or
-                // indirect by wakeupWaitingThreads.
-                lock();
-                try {
-                    notifyQueue.remove(current);
-                } finally {
-                    unlock();
-                }
-            }
+            // We got back here from the enter queue, but we still have to
+            // reclaim the lock.
             enter();
+            
+            // Restore lock and lock counter
+            mutex.lock();
             this.lockCount = oldLockCount;
+            mutex.unlock();
         }
         if (exMsg != null) {
             Unsafe.debug(exMsg);
@@ -275,44 +294,32 @@ public final class Monitor {
      * @throws UninterruptiblePragma
      */
     final void Notify(boolean all) {
-        final VmProcessor proc = VmProcessor.current();
-        final VmThread current = proc.getCurrentThread();
         String exMsg = null;
-        if (owner != current) {
+        
+        mutex.lock();
+        if (owner != VmMagic.currentProcessor().currentThread) {
             exMsg = "Current thread is not the owner of this monitor";
         } else if (lockCount == 0) {
             exMsg = "Monitor is not locked";
         } else {
-            lock();
-            try {
-                wakeupWaitingThreads(notifyQueue, all);
-            } finally {
-                unlock();
+            // Move thread(s) to enter queue
+            VmMagic.currentProcessor().disableReschedule(false, null);
+            VmThread t = notifyQueue.dequeue();
+            while (t != null) {
+                t.wakeupFromNotifyQueue(this);
+                enterQueue.enqueue(t, false);
+                if (!all) {
+                    break;
+                }
+                t = notifyQueue.dequeue();
             }
+            VmMagic.currentProcessor().enableReschedule(false, null);
         }
+        mutex.unlock();
+        
         if (exMsg != null) {
             Unsafe.debug(exMsg);
             throw new IllegalMonitorStateException(exMsg);
-        }
-    }
-
-    /**
-     * Notify the all waiting threads on this monitor. This method does not
-     * require the current thread to be the owner of the monitor, nor is an
-     * exception thrown if the monitor is not locked.
-     * 
-     * @throws UninterruptiblePragma
-     */
-    final boolean unsynchronizedNotifyAll() {
-        if (lockNoWait()) {
-            try {
-                wakeupWaitingThreads(notifyQueue, true);
-            } finally {
-                unlock();
-            }
-            return true;
-        } else {
-            return false;
         }
     }
 
@@ -352,81 +359,14 @@ public final class Monitor {
     }
 
     /**
-     * Prepare the given thread for a waiting state.
-     * 
-     * @param thread
-     * @param queue
-     * @param queueName
-     * @return The queue
-     * @throws UninterruptiblePragma
-     */
-    private final void prepareWait(VmThread thread,
-            VmThreadQueue.ScheduleQueue queue, int waitState, String queueName) {
-        if (monitorLock != 1) {
-            Unsafe.debug("MonitorLock not claimed");
-            Unsafe.die("prepareWait");
-        }
-        thread.prepareWait(this, waitState);
-        queue.add(thread, false, "mon.prepareWait");
-    }
-
-    /**
-     * Notify a single thread. The thread is remove from the notifyQueue and its
-     * <code>wakeupAfterMonitor</code> method is called.
-     * 
-     * @param thread
-     * @throws UninterruptiblePragma
-     */
-    @NoInline
-    private final void notifyThread(VmThread thread) {
-        final VmThreadQueue.ScheduleQueue eq = this.enterQueue;
-        if (eq != null) {
-            eq.remove(thread);
-        }
-        final VmThreadQueue.ScheduleQueue nq = this.notifyQueue;
-        if (nq != null) {
-            nq.remove(thread);
-        }
-        thread.wakeupAfterMonitor(this);
-    }
-
-    /**
-     * The given thread is removed from the notifyQueue.
+     * Move the given thread to the enter queue of this monitor.
      * 
      * @param thread
      */
-    @KernelSpace
-    @Uninterruptible
-    final void removeThreadFromQueues(VmThread thread) {
-        final VmThreadQueue.ScheduleQueue eq = this.enterQueue;
-        if (eq != null) {
-            eq.remove(thread);
-        }
-        final VmThreadQueue.ScheduleQueue nq = this.notifyQueue;
-        if (nq != null) {
-            nq.remove(thread);
-        }
-    }
-
-    /**
-     * Wakeup all waiting threads.
-     * 
-     * @param queue
-     * @param all
-     * @throws UninterruptiblePragma
-     */
-    @Inline
-    private final void wakeupWaitingThreads(VmThreadQueue.ScheduleQueue queue,
-            boolean all) {
-        if (queue != null) {
-            while (!queue.isEmpty()) {
-                final VmThread thread = queue.first();
-                notifyThread(thread);
-                if (!all) {
-                    break;
-                }
-            }
-        }
+    final void addToEnterQueue(VmThread thread) {
+        mutex.lock();
+        this.enterQueue.enqueue(thread, false);
+        mutex.unlock();
     }
 
     /**
@@ -438,47 +378,5 @@ public final class Monitor {
     @Inline
     private final Address getLCAddress() {
         return ObjectReference.fromObject(this).toAddress();
-    }
-
-    /**
-     * Claim access to this monitor. A monitor may only be locked for a small
-     * amount of time, since this method uses a spinlock.
-     * 
-     * @see #unlock()
-     * @see #monitorLock
-     */
-    @Inline
-    private final void lock() {
-        //final VmProcessor proc = VmProcessor.current();
-        final Address mlAddr = ObjectReference.fromObject(this).toAddress()
-                .add(4);
-        while (!mlAddr.attempt(0, 1)) {
-            //proc.yield(true); // Yield breaks the Uninterruptible idea, so don't use it!
-        }
-    }
-
-    /**
-     * Claim access to this monitor. Return true on success, false on failure
-     * 
-     * @see #unlock()
-     * @see #monitorLock
-     */
-    @Inline
-    private final boolean lockNoWait() {
-        final Address mlAddr = ObjectReference.fromObject(this).toAddress()
-                .add(4);
-        return mlAddr.attempt(0, 1);
-    }
-
-    /**
-     * Release access to this monitor. A monitor may only be locked for a small
-     * amount of time, since this method uses a spinlock.
-     * 
-     * @see #lock()
-     * @see #monitorLock
-     */
-    @Inline
-    private final void unlock() {
-        monitorLock = 0;
     }
 }
