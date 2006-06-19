@@ -69,11 +69,81 @@ public class ProcessorLock {
                     .toAddress();
             final ObjectReference procRef = ObjectReference.fromObject(VmMagic
                     .currentProcessor());
+            int count = 0;
             while (!ownerAddr.attempt(null, procRef)) {
                 // Busy wait
+                if (++count > 10000) {
+                    VmMagic.currentProcessor().getArchitecture().getStackReader().debugStackTrace();
+                    Unsafe.die("ProcessorLock.lock");
+                }
             }
             // Now I'm the owner
             lockCount = lockCount.add(Word.one());
+        }
+    }
+
+    /**
+     * Try to claim access to this lock.
+     * If the lock succeeds it is locked and true is returned, otherwise
+     * no changes are made and false is returned.
+     * 
+     * @see #unlock()
+     * @see #lockCount
+     */
+    @Uninterruptible
+    @KernelSpace
+    @Inline
+    public final boolean tryLock() {
+        if (this.owner == VmMagic.currentProcessor()) {
+            // We already own this lock, increment the lock count.
+            lockCount = lockCount.add(Word.one());
+            return true;
+        } else {
+            final Address ownerAddr = ObjectReference.fromObject(this)
+                    .toAddress();
+            final ObjectReference procRef = ObjectReference.fromObject(VmMagic
+                    .currentProcessor());
+            if (ownerAddr.attempt(null, procRef)) {
+                // Now I'm the owner
+                lockCount = lockCount.add(Word.one());
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+    
+    /**
+     * Lock both locks.
+     * First lock1 is locked, then lock2 is attempted. If that succeeds this
+     * method returns, otherwise lock1 is unlocked and the process
+     * repeats itself.
+     * 
+     * @param lock1
+     * @param lock2
+     */
+    @Uninterruptible
+    @KernelSpace
+    @Inline
+    public static void lock(ProcessorLock lock1, ProcessorLock lock2) {
+        int count = 0;
+        while (true) {
+            // Lock lock1 first
+            lock1.lock();
+            
+            // Try to lock lock2
+            if (lock2.tryLock()) {
+                return;
+            }
+            
+            // lock2 failed to lock, so unlock lock1 and repeat the process.
+            lock1.unlock();
+
+            // Detect endless looping
+            if (++count > 10000) {
+                VmMagic.currentProcessor().getArchitecture().getStackReader().debugStackTrace();
+                Unsafe.die("ProcessorLock.lock(lock1, lock2)");
+            }
         }
     }
 

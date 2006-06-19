@@ -282,7 +282,7 @@ public final class MonitorManager {
 
             if (m == null) {
                 m = new Monitor(VmMagic.currentProcessor().getCurrentThread(),
-                        1);
+                        1, k);
                 monAddr = ObjectReference.fromObject(m).toAddress().toWord();
                 if (!monAddr.and(
                         Word.fromIntZeroExtend(ObjectFlags.LOCK_EXPANDED

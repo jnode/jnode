@@ -45,6 +45,7 @@ import org.jnode.plugin.PluginRegistry;
 import org.jnode.plugin.model.PluginRegistryModel;
 import org.jnode.security.JNodePermission;
 import org.jnode.system.BootLog;
+import org.jnode.vm.Unsafe;
 
 /**
  * @author epr
@@ -133,6 +134,7 @@ public final class DefaultPluginManager extends PluginManager {
                     }
                     if (start) {
                         if (debug) {
+                            Unsafe.debug("Debug-sleep\n");
                             Thread.sleep(250);
                         }
                         
@@ -142,6 +144,7 @@ public final class DefaultPluginManager extends PluginManager {
                     BootLog.error("Cannot start " + descr.getId(), ex);
                     if (debug) {
                         try {
+                            Unsafe.debug("Error-sleep "); Unsafe.debug(descr.getId()); Unsafe.debug('\n');
                             Thread.sleep(5000);
                         } catch (InterruptedException ex1) {
                             // Ignore
@@ -163,7 +166,9 @@ public final class DefaultPluginManager extends PluginManager {
                         System.out.print('.');
                         loop = 0;
                     }
+                    Unsafe.debug("wait-sleep\n");
                     Thread.sleep(100);
+                    Unsafe.debug("wait-sleep-returns\n");
                 } catch (InterruptedException ex) {
                     // Ignore
                 }
