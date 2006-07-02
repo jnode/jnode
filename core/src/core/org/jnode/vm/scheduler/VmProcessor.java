@@ -267,12 +267,12 @@ public abstract class VmProcessor extends VmSystemObject {
     @Inline
     @Internal
     @Uninterruptible
-    public final void disableReschedule(boolean claimSchedulerLock, ProcessorLock otherLock) {
+    public final void disableReschedule(boolean claimSchedulerLock) {
         getTSIAddress().atomicOr(Word.fromIntSignExtend(TSI_BLOCK_SWITCH));
         lockCount++;
         if (claimSchedulerLock) {
-            scheduler.lock(otherLock);
-        } 
+            scheduler.lock();
+        }
     }
 
     /**
@@ -283,15 +283,23 @@ public abstract class VmProcessor extends VmSystemObject {
     @Inline
     @Internal
     @Uninterruptible
-    public final void enableReschedule(boolean releaseSchedulerLock, ProcessorLock otherLock) {
+    public final void enableReschedule(boolean releaseSchedulerLock) {
         if (releaseSchedulerLock) {
-            scheduler.unlock(otherLock);
+            scheduler.unlock();
         }
         lockCount--;
         if (lockCount == 0) {
             getTSIAddress()
                     .atomicAnd(Word.fromIntSignExtend(~TSI_BLOCK_SWITCH));
         }
+    }
+
+    /**
+     * This method is called by the generated yieldpoints if a threadswitch is
+     * requested.
+     */
+    final void yieldPoint() {
+
     }
 
     /**
@@ -307,9 +315,17 @@ public abstract class VmProcessor extends VmSystemObject {
     /**
      * Give up the current cpu-time, and add the current thread to the back of
      * the ready queue.
+     * 
+     * @param ignorePriority
+     *            If true, the thread is always added to the back of the list,
+     *            regarding its priority.
+     * @throws UninterruptiblePragma
      */
     @Uninterruptible
-    final void yield() {
+    final void yield(boolean ignorePriority) {
+        final VmThread t = this.currentThread;
+        t.setYieldingState();
+        scheduler.addToReadyQueue(t, ignorePriority, "proc.yield");
         threadSwitchIndicator = threadSwitchIndicator.or(Word
                 .fromIntZeroExtend(TSI_SWITCH_NEEDED));
         if (threadSwitchIndicator.NE(Word
@@ -327,7 +343,7 @@ public abstract class VmProcessor extends VmSystemObject {
      * @throws UninterruptiblePragma
      */
     @Uninterruptible
-    final void suspend(boolean releaseSchedulerLock, ProcessorLock otherLock) {
+    final void suspend(boolean releaseSchedulerLock) {
         if (lockCount != 1) {
             Unsafe.debug("Suspend with invalid lockCount: ");
             Unsafe.debug(lockCount);
@@ -338,7 +354,7 @@ public abstract class VmProcessor extends VmSystemObject {
         t.setYieldingState();
         threadSwitchIndicator = threadSwitchIndicator.or(Word
                 .fromIntZeroExtend(TSI_SWITCH_NEEDED));
-        enableReschedule(releaseSchedulerLock, otherLock);
+        enableReschedule(releaseSchedulerLock);
         if (threadSwitchIndicator.NE(Word
                 .fromIntZeroExtend(TSI_SWITCH_REQUESTED))) {
             Unsafe.debug("Suspend with invalid tsi: ");
@@ -380,7 +396,7 @@ public abstract class VmProcessor extends VmSystemObject {
             // Add the current thread to the ready queue, if the state
             // is running.
             if (current.isRunning()) {
-                scheduler.addToReadyQueue(current, false);
+                scheduler.addToReadyQueue(current, false, getIdString());
             } else {
                 // Screen.debug("<Non-running thread in reschedule "+
                 // current.getThreadState() + "
@@ -390,9 +406,13 @@ public abstract class VmProcessor extends VmSystemObject {
 
             // Determine the new thread.
 
-            // Get the first ready to run thread from the schedule
-            // and process the scheduler wakeup queue.
-            final VmThread newThread = scheduler.schedule();
+            // Should we wakeup a sleeping thread?
+            VmThread newThread = scheduler.popFirstSleepingThread();
+
+            // Take the first thread from the ready queue
+            if (newThread == null) {
+                newThread = scheduler.popFirstReadyThread();
+            }
 
             // It no other thread want to run, that means that the idle thread
             // has been halted, we give up.
@@ -402,7 +422,7 @@ public abstract class VmProcessor extends VmSystemObject {
                 Unsafe.die("No thread to run in reschedule");
             }
 
-            // Pass newThread onto native code.
+            newThread.wakeUpByScheduler();
             this.nextThread = newThread;
 
             final int priority = newThread.priority;
