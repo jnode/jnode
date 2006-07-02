@@ -9,6 +9,7 @@ import org.jnode.vm.Vm;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.VmStackReader;
+import org.jnode.vm.VmSystem;
 import org.jnode.vm.annotation.Inline;
 import org.jnode.vm.annotation.Internal;
 import org.jnode.vm.annotation.KernelSpace;
@@ -30,15 +31,15 @@ public final class VmScheduler {
 
     /** Lock for the allThreadsQueue */
     private final ProcessorLock allThreadsLock;
-
+    
     /** Queue holding all threads */
-    private final VmAllThreadsQueue allThreadsQueue;
-
+    private final VmThreadQueue.AllThreadsQueue allThreadsQueue;
+    
     /** My ready queue */
-    private final VmThreadScheduleQueue readyQueue;
+    private final VmThreadQueue.ScheduleQueue readyQueue;
 
-    /** My wakeup queue */
-    private final VmThreadWakeupQueue wakeupQueue;
+    /** My sleep queue */
+    private final VmThreadQueue.SleepQueue sleepQueue;
 
     /** Lock used to protect the ready and sleep queue */
     private final ProcessorLock queueLock;
@@ -48,12 +49,12 @@ public final class VmScheduler {
      */
     public VmScheduler(VmArchitecture architecture) {
         this.architecture = architecture;
-        this.allThreadsLock = new ProcessorLock();
-        this.allThreadsQueue = new VmAllThreadsQueue("scheduler-all");
+        this.allThreadsLock = new ProcessorLock();        
+        this.allThreadsQueue = new VmThreadQueue.AllThreadsQueue("scheduler-all");
 
         this.queueLock = new ProcessorLock();
-        this.readyQueue = new VmThreadScheduleQueue("scheduler-ready");
-        this.wakeupQueue = new VmThreadWakeupQueue("scheduler-wakeup");
+        this.readyQueue = new VmThreadQueue.ScheduleQueue("scheduler-ready");
+        this.sleepQueue = new VmThreadQueue.SleepQueue("scheduler-sleep");
     }
 
     /**
@@ -92,11 +93,11 @@ public final class VmScheduler {
      */
     final void registerThread(VmThread thread) {
         if (Vm.isWritingImage()) {
-            allThreadsQueue.add(thread);
+            allThreadsQueue.add(thread, "Vm");
         } else {
             allThreadsLock.lock();
             try {
-                allThreadsQueue.add(thread);
+                allThreadsQueue.add(thread, "Vm");
             } finally {
                 allThreadsLock.unlock();
             }
@@ -144,55 +145,17 @@ public final class VmScheduler {
                 Unsafe.debug(" id0x");
                 Unsafe.debug(e.thread.getId());
                 Unsafe.debug(" s0x");
-                Unsafe.debug(e.thread.getThreadStateName());
+                Unsafe.debug(e.thread.getThreadState());
                 Unsafe.debug(" p0x");
                 Unsafe.debug(e.thread.priority);
                 Unsafe.debug(" wf:");
-
-                Object wf = e.thread.waitForObject;
-                if (wf == null) {
-                    Unsafe.debug("null");
-                } else {
-                    Unsafe.debug(VmMagic.getObjectType(wf).getName());
-                }
+                VmThread waitFor = e.thread.getWaitForThread();
+                Unsafe.debug((waitFor != null) ? waitFor.getName() : "none");
                 Unsafe.debug("\n");
                 if (dumpStack && (stackReader != null)) {
                     stackReader.debugStackTrace(e.thread);
                     Unsafe.debug("\n");
-                    Unsafe.debug("\n");
                 }
-            }
-            e = e.next;
-        }
-    }
-
-    /**
-     * Dump the status of this queue on Unsafe.debug.
-     */
-    @KernelSpace
-    final void dumpAllThreads(boolean dumpStack, VmStackReader stackReader) {
-        VmThreadQueueEntry e = allThreadsQueue.first;
-        while (e != null) {
-            Unsafe.debug(e.thread.getName());
-            Unsafe.debug(" id0x");
-            Unsafe.debug(e.thread.getId());
-            Unsafe.debug(" s0x");
-            Unsafe.debug(e.thread.getThreadStateName());
-            Unsafe.debug(" p0x");
-            Unsafe.debug(e.thread.priority);
-            Unsafe.debug(" wf:");
-
-            Object wf = e.thread.waitForObject;
-            if (wf == null) {
-                Unsafe.debug("null");
-            } else {
-                Unsafe.debug(VmMagic.getObjectType(wf).getName());
-            }
-            Unsafe.debug("\n");
-            if (dumpStack && (stackReader != null)) {
-                stackReader.debugStackTrace(e.thread);
-                Unsafe.debug("\n");
-                Unsafe.debug("\n");
             }
             e = e.next;
         }
@@ -211,13 +174,15 @@ public final class VmScheduler {
      */
     @KernelSpace
     @Uninterruptible
-    final void addToReadyQueue(VmThread thread, boolean ignorePriority) {
+    final void addToReadyQueue(VmThread thread, boolean ignorePriority,
+            String caller) {
         try {
             // Get access to queues
             queueLock.lock();
 
             if (thread.isRunning() || thread.isYielding()) {
-                readyQueue.enqueue(thread, ignorePriority);
+                sleepQueue.remove(thread);
+                readyQueue.add(thread, ignorePriority, caller);
             } else {
                 Unsafe
                         .debug("Thread must be in running state to add to ready queue, not ");
@@ -232,18 +197,18 @@ public final class VmScheduler {
     }
 
     /**
-     * Add the given thread to the wakeup queue of this scheduler. The thread
-     * must have a preset proxy.
+     * Add the given thread to the sleep queue to this scheduler.
      * 
      * @param thread
+     * @throws UninterruptiblePragma
      */
     @Uninterruptible
-    final void addToWakeupQueue(VmThreadProxy proxy) {
+    final void addToSleepQueue(VmThread thread) {
         try {
             // Get access to queues
             queueLock.lock();
 
-            wakeupQueue.enqueue(proxy);
+            sleepQueue.add(thread, null);
         } finally {
             // Release access to queues
             queueLock.unlock();
@@ -251,35 +216,56 @@ public final class VmScheduler {
     }
 
     /**
-     * Gets the first ready to run thread.
-     * 
-     * Also process the wakeup queue.
+     * Gets the first thread from the ready queue. If such a thread is
+     * available, it is removed from the ready queue.
      * 
      * @return
      */
     @KernelSpace
     @Uninterruptible
-    final VmThread schedule() {
+    final VmThread popFirstReadyThread() {
         try {
             // Get access to queues
             queueLock.lock();
 
-            // Process the wakeup queue
-            if (wakeupQueue.isReady()) {
-                VmThread t = wakeupQueue.dequeue();
-                while (t != null) {
-                    t.wakeupFromWakeupQueue(this);
-                    t = wakeupQueue.dequeue();
-                }
+            final VmThread newThread = readyQueue.first(VmMagic.currentProcessor());
+            if (newThread != null) {
+                readyQueue.remove(newThread);
+                return newThread;
             }
-
-            // Get first ready to run thread.
-            return readyQueue.dequeue();
+            return null;
         } finally {
             // Release access to queues
             queueLock.unlock();
         }
+    }
 
+    /**
+     * Gets the first thread from the sleep queue that is ready to be woken up.
+     * If such a thread is available, it is removed from the sleep queue.
+     * 
+     * @return
+     */
+    @KernelSpace
+    @Uninterruptible
+    final VmThread popFirstSleepingThread() {
+        try {
+            // Get access to queues
+            queueLock.lock();
+
+            final VmThread newThread = sleepQueue.first(VmMagic.currentProcessor());
+            if (newThread != null) {
+                final long curTime = VmSystem.currentKernelMillis();
+                if (newThread.canWakeup(curTime)) {
+                    sleepQueue.remove(newThread);
+                    return newThread;
+                }
+            }
+            return null;
+        } finally {
+            // Release access to queues
+            queueLock.unlock();
+        }
     }
 
     /**
@@ -294,7 +280,7 @@ public final class VmScheduler {
             queueLock.lock();
 
             readyQueue.dump(false, null);
-            wakeupQueue.dump(false, null);
+            sleepQueue.dump(false, null);
         } finally {
             // Release access to queues
             queueLock.unlock();
@@ -328,8 +314,6 @@ public final class VmScheduler {
         case '?':
         case 'h':
             Unsafe.debug("Commands:\n");
-            Unsafe.debug("a   Print all threads\n");
-            Unsafe.debug("A   Print stacktraces of all threads\n");
             Unsafe.debug("l   Show Load/Compile queue\n");
             Unsafe.debug("p   Ping\n");
             Unsafe.debug("q   Print thread queues\n");
@@ -338,18 +322,6 @@ public final class VmScheduler {
             Unsafe.debug("v   Verify thread\n");
             Unsafe.debug("w   Print waiting threads\n");
             Unsafe.debug("W   Print stacktraces of waiting threads\n");
-            break;
-        case 'a':
-            Unsafe.debug("<threads: ");
-            Unsafe.debug("\n");
-            dumpAllThreads(false, null);
-            Unsafe.debug("/>\n");
-            break;
-        case 'A':
-            Unsafe.debug("<threads: ");
-            Unsafe.debug("\n");
-            dumpAllThreads(true, architecture.getStackReader());
-            Unsafe.debug("/>\n");
             break;
         case 'l':
             Unsafe.debug("<load-compile-service: ");
@@ -368,7 +340,7 @@ public final class VmScheduler {
             Unsafe.debug(currentThread.getThreadStateName());
             Unsafe.debug("\n");
             readyQueue.dump(false, null);
-            wakeupQueue.dump(false, null);
+            sleepQueue.dump(false, null);
             Unsafe.debug("/>\n");
         }
             break;
@@ -424,31 +396,24 @@ public final class VmScheduler {
             // Unsafe.debug(input);
         }
     }
-
+    
     /**
-     * Lock the queues for access by the current processor and lock the other
-     * lock. The scheduler lock is claimed first.
+     * Lock the queues for access by the current processor.
+     *
      */
     @Inline
     @Uninterruptible
-    final void lock(ProcessorLock otherLock) {
-        if (otherLock == null) {
-            queueLock.lock();
-        } else {
-            ProcessorLock.lock(queueLock, otherLock);
-        }
+    final void lock() {
+        queueLock.lock();
     }
 
     /**
      * Unlock the queues
-     * 
+     *
      */
     @Inline
     @Uninterruptible
-    final void unlock(ProcessorLock otherLock) {
-        if (otherLock != null) {
-            otherLock.unlock();
-        }
+    final void unlock() {
         queueLock.unlock();
     }
 }
