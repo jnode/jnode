@@ -171,9 +171,16 @@ public abstract class NTFSAttribute extends NTFSStructure {
      */
     public static NTFSAttribute getAttribute(FileRecord fileRecord,
             int offset) {
+        final boolean resident = (fileRecord.getUInt8(offset + 0x08) == 0);
         final int type = fileRecord.getUInt32AsInt(offset + 0x00);
 
         switch (type) {
+        case Types.ATTRIBUTE_LIST:
+            if (resident) {
+                return new AttributeListAttributeRes(fileRecord, offset);
+            } else {
+                return new AttributeListAttributeNonRes(fileRecord, offset);
+            }
         case Types.FILE_NAME:
             return new FileNameAttribute(fileRecord, offset);
         case Types.INDEX_ROOT:

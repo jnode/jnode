@@ -22,6 +22,7 @@
 package org.jnode.fs.ntfs;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -31,7 +32,10 @@ final class DataRun extends NTFSStructure {
     /** Type of this datarun */
     private final int type;
 
-    /** Cluster number of first cluster of this run */
+    /**
+     * Cluster number of first cluster of this run.  If this is zero, the run isn't
+     * actually stored as it is all zero.
+     */
     private final long cluster;
 
     /** Length of datarun in clusters */
@@ -41,7 +45,7 @@ final class DataRun extends NTFSStructure {
     private final int size;
 
     /** First VCN of this datarun. */
-    private final long vcn;
+    private long vcn;
 
     /**
      * Initialize this instance.
@@ -53,7 +57,7 @@ final class DataRun extends NTFSStructure {
      * @param previousLCN
      */
     public DataRun(NTFSNonResidentAttribute attr, int offset, long vcn,
-            long previousLCN) {
+                   long previousLCN) {
         super(attr, offset);
         // read first byte in type attribute
         this.type = getUInt8(0);
@@ -64,6 +68,9 @@ final class DataRun extends NTFSStructure {
         this.vcn = vcn;
 
         switch (lenlen) {
+        case 0x00:
+            length = 0;
+            break;
         case 0x01:
             length = getUInt8(1);
             break;
@@ -82,23 +89,26 @@ final class DataRun extends NTFSStructure {
         }
         final int cluster;
         switch (clusterlen) {
+        case 0x00:
+            cluster = 0;
+            break;
         case 0x01:
-            cluster = getUInt8(1 + lenlen);
+            cluster = getInt8(1 + lenlen);
             break;
         case 0x02:
-            cluster = getUInt16(1 + lenlen);
+            cluster = getInt16(1 + lenlen);
             break;
         case 0x03:
-            cluster = getUInt24(1 + lenlen);
+            cluster = getInt24(1 + lenlen);
             break;
         case 0x04:
-            cluster = getUInt32AsInt(1 + lenlen);
+            cluster = getInt32(1 + lenlen);
             break;
         default:
             throw new IllegalArgumentException("Unknown cluster length "
                     + clusterlen);
         }
-        this.cluster = cluster + previousLCN;
+        this.cluster = cluster == 0 ? 0 : cluster + previousLCN;
     }
 
     /**
@@ -136,6 +146,15 @@ final class DataRun extends NTFSStructure {
     }
 
     /**
+     * Sets the first VCN of this datarun.
+     *
+     * @param vcn the new VCN.
+     */
+    final void setFirstVcn(long vcn) {
+        this.vcn = vcn;
+    }
+
+    /**
      * Read clusters from this datarun.
      * @param vcn
      * @param dst
@@ -147,21 +166,21 @@ final class DataRun extends NTFSStructure {
      * @throws IOException
      */
     public int readClusters(long vcn, byte[] dst, int dstOffset,
-            int nrClusters, int clusterSize, NTFSVolume volume) throws IOException {
+                            int nrClusters, int clusterSize, NTFSVolume volume) throws IOException {
 
         final long myFirstVcn = getFirstVcn();
         final int myLength = getLength();
         final long myLastVcn = myFirstVcn + myLength - 1;
-        
+
         final long reqLastVcn = vcn + nrClusters - 1;
-        
+
         log.debug("me:" + myFirstVcn + "-" + myLastVcn + ", req:" + vcn + "-" + reqLastVcn);
-        
-        if ((vcn > myLastVcn) || (myFirstVcn > reqLastVcn)) { 
+
+        if ((vcn > myLastVcn) || (myFirstVcn > reqLastVcn)) {
             // Not my region
             return 0;
         }
-        
+
         final long actCluster; // Starting cluster
         final int count; // #clusters to read
         final int actDstOffset; // Actual dst offset
@@ -180,8 +199,14 @@ final class DataRun extends NTFSStructure {
 
         log.debug("cluster=" + cluster + ", length=" + length + ", dstOffset=" + dstOffset);
         log.debug("cnt=" + count + ", actclu=" + actCluster + ", actdstoff=" + actDstOffset);
-        
-        volume.readClusters(actCluster, dst, actDstOffset, count);
+
+        if (actCluster == 0) {
+            // Not really stored on disk -- sparse files, etc.
+            Arrays.fill(dst, actDstOffset, actDstOffset + count, (byte) 0);
+        } else {
+            volume.readClusters(actCluster, dst, actDstOffset, count);
+        }
+
         return count;
     }
 }

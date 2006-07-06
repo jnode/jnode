@@ -60,7 +60,7 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
     }
 
     /**
-     * @see org.jnode.fs.ntfs.attributes.NTFSAttribute#processAttributeData(byte[])
+     * @see org.jnode.fs.ntfs.NTFSAttribute#processAttributeData(byte[])
      */
     /*
      * public void processAttributeData(byte[] buffer) { // TODO Auto-generated
@@ -86,10 +86,22 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
     }
 
     /**
-     * @return Returns the attributeAlocatedSize.
+     * Gets the size allocated to the attribute.  May be larger than the actual size of the
+     * attribute data.
+     *
+     * @return the size allocated to the attribute.
      */
     public long getAttributeAlocatedSize() {
         return getUInt32(0x28);
+    }
+
+    /**
+     * Gets the actual size taken up by the attribute data.
+     *
+     * @return the actual size taken up by the attribute data.
+     */
+    public long getAttributeActualSize() {
+        return getUInt32(0x30);
     }
 
     /**
@@ -128,6 +140,21 @@ public class NTFSNonResidentAttribute extends NTFSAttribute {
      */
     public List<DataRun> getDataRuns() {
         return dataRuns;
+    }
+
+    /**
+     * Appends extra data runs to this attribute, taken from another attribute.
+     * The starting VCN of the added runs are repositioned such the new runs line
+     * up with the end of the runs already contained in this attribute.
+     *
+     * @param dataRuns the data runs to append.
+     */
+    public void appendDataRuns(List<DataRun> dataRuns) {
+        for (DataRun dataRun : dataRuns) {
+            dataRun.setFirstVcn(this.numberOfVCNs);
+            this.dataRuns.add(dataRun);
+            this.numberOfVCNs += dataRun.getLength();
+        }
     }
 
     /**

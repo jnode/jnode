@@ -140,6 +140,24 @@ abstract class NTFSStructure {
     }
 
     /**
+     * Read a signed 16-bit integer from a given offset.
+     * @param offset
+     * @return
+     */
+    final int getInt16(int offset) {
+        return LittleEndian.getInt16(buffer, this.offset + offset);
+    }
+    
+    /**
+     * Read a signed 24-bit integer from a given offset.
+     * @param offset
+     * @return
+     */
+    final int getInt24(int offset) {
+        return LittleEndian.getInt24(buffer, this.offset + offset);
+    }
+    
+    /**
      * Read n signed 32-bit integer from a given offset.
      * @param offset
      * @return

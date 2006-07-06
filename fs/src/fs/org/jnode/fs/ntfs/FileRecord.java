@@ -22,6 +22,7 @@
 package org.jnode.fs.ntfs;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.jnode.util.NumberUtils;
 
@@ -156,9 +157,11 @@ class FileRecord extends NTFSRecord {
 
     /**
      * Gets an attribute in this filerecord with a given id.
-     * 
-     * @param attrTypeID
-     * @return
+     *
+     * XXX: Returning an iterator of multiple might be better.
+     *
+     * @param attrTypeID the type ID of the attribute we're looking for.
+     * @return the attribute.
      */
     public NTFSAttribute getAttribute(int attrTypeID) {
         log.debug("getAttribute(0x" + NumberUtils.hex(attrTypeID, 4) + ")");
@@ -178,8 +181,59 @@ class FileRecord extends NTFSRecord {
         }
 
         if (attrTypeID != NTFSAttribute.Types.ATTRIBUTE_LIST) {
-            if (getAttribute(NTFSAttribute.Types.ATTRIBUTE_LIST) != null) {
+            final AttributeListAttribute attributeList = (AttributeListAttribute)
+                    getAttribute(NTFSAttribute.Types.ATTRIBUTE_LIST);
+            if (attributeList != null) {
                 log.info("Has $ATTRIBUTE_LIST attribute");
+
+                try {
+                    final List<AttributeListEntry> entries = attributeList.getEntries(attrTypeID);
+                    if (!entries.isEmpty())
+                    {
+                        log.debug("Found entries via $ATTRIBUTE_LIST: " + entries);
+                        MasterFileTable mft = getVolume().getMFT();
+                        NTFSAttribute attribute = null;
+                        for (AttributeListEntry entry : entries)
+                        {
+                            // XXX: This is a little crappy as we should already know the exact offset
+                            //      of this attribute.  This just makes the best of the API we already
+                            //      use everywhere else.
+                            NTFSAttribute attr = mft.getRecord(entry.getFileReferenceNumber())
+                                    .getAttribute(attrTypeID);
+
+                            if (attribute == null)
+                            {
+                                // First attribute encountered.
+                                attribute = attr;
+                                if (!(attr instanceof NTFSNonResidentAttribute))
+                                {
+                                    log.info("Don't know how to glue together resident attributes, " +
+                                             "returning the first one alone");
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                // Subsequent attribute.
+                                if (attr instanceof NTFSNonResidentAttribute)
+                                {
+                                    log.debug("Appending data runs onto parent attribute");
+                                    ((NTFSNonResidentAttribute) attribute).appendDataRuns(
+                                            ((NTFSNonResidentAttribute) attr).getDataRuns());
+                                }
+                                else
+                                {
+                                    log.info("Don't know how to glue a resident attribute onto " +
+                                             "a non-resident one, skipping this attribute.");
+                                }
+                            }
+                        }
+
+                        return attribute;
+                    }
+                } catch (IOException e) {
+                    log.error("IO error getting locating attribute list entry", e);
+                }
             }
         }
 
