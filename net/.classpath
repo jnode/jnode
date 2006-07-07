@@ -11,5 +11,6 @@
 	<classpathentry kind="lib" path="lib/dnsjava-2.0.1a.jar"/>
 	<classpathentry kind="lib" path="lib/jsch-0.1.24.jar"/>
 	<classpathentry kind="lib" path="/JNode-Core/lib/commons-net-1.1.0.jar"/>
+	<classpathentry kind="lib" path="/JNode-Core/lib/junit.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
