@@ -21,7 +21,12 @@
  
 package org.jnode.net.command;
 
+import java.io.InputStream;
+import java.io.PrintStream;
+
 import org.jnode.net.ipv4.tftp.TFTPClient;
+import org.jnode.shell.Command;
+import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.OptionArgument;
@@ -31,7 +36,7 @@ import org.jnode.shell.help.Syntax;
 /**
  * @author markhale
  */
-public class TftpCommand {
+public class TftpCommand implements Command {
 	
 	private static final OptionArgument.Option[] COMMAND_OPTIONS = new OptionArgument.Option[] {
 		new OptionArgument.Option("put", "transfer a file to a server"),
@@ -62,8 +67,11 @@ public class TftpCommand {
 	);
 	
 	public static void main(String[] args) throws Exception {
-		//ParsedArguments cmdLine = HELP_INFO.parse(args);
-		TFTPClient.main(args);
+		new TftpCommand().execute(new CommandLine(args), System.in, System.out, System.err);		
+	}
+
+	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
+		TFTPClient.main(commandLine.toStringArray());
 		System.out.println();
 	}
 }
