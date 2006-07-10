@@ -21,6 +21,9 @@
  
 package org.jnode.net.command;
 
+import java.io.InputStream;
+import java.io.PrintStream;
+
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.net.NetDeviceAPI;
@@ -28,6 +31,8 @@ import org.jnode.naming.InitialNaming;
 import org.jnode.net.ethernet.EthernetConstants;
 import org.jnode.net.ipv4.IPv4Address;
 import org.jnode.net.ipv4.config.IPv4ConfigurationService;
+import org.jnode.shell.Command;
+import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.DeviceArgument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
@@ -37,7 +42,7 @@ import org.jnode.shell.help.Syntax;
 /**
  * @author epr
  */
-public class IfconfigCommand {
+public class IfconfigCommand implements Command {
 
 	static final DeviceArgument ARG_DEVICE = new DeviceArgument("device", "the device");
 	static final HostArgument ARG_IP_ADDRESS = new HostArgument("ip-address", "the IP address to bind the device to");
@@ -63,7 +68,11 @@ public class IfconfigCommand {
 
 	public static void main(String[] args)
 	throws Exception {
-		ParsedArguments cmdLine = HELP_INFO.parse(args);
+		new IfconfigCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+	}
+
+	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
+		ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
 
 		if( cmdLine.size() == 0 ) {
 			final DeviceManager dm = (DeviceManager)InitialNaming.lookup(DeviceManager.NAME);

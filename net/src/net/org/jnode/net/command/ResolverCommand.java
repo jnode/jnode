@@ -21,12 +21,17 @@
  
 package org.jnode.net.command;
 
+import java.io.InputStream;
+import java.io.PrintStream;
+
 import org.jnode.net.ipv4.IPv4Address;
 import org.jnode.net.ipv4.util.ResolverImpl;
+import org.jnode.shell.Command;
+import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.*;
 
 
-public class ResolverCommand
+public class ResolverCommand implements Command
 {
   private static final String FUNC_ADD = "add";
   private static final String FUNC_DEL = "del";
@@ -56,28 +61,34 @@ public class ResolverCommand
 
 
   public static void main(String[] args) throws Exception {
-    ParsedArguments cmdLine = HELP_INFO.parse(args);
-
-    if (cmdLine.size() == 0)
-    {
-      System.out.println("DNS servers");
-      ResolverImpl.printDnsServers();
-    }
-    else
-    {
-      String func = ARG_FUNCTION.getValue(cmdLine);
-      IPv4Address server = ARG_DNSSERVER.getAddress(cmdLine);
-
-      if (FUNC_ADD.equals(func))
-      {
-        ResolverImpl.addDnsServer(server);
-      }
-      else if (FUNC_DEL.equals(func))
-      {
-        ResolverImpl.removeDnsServer(server);
-      }
-    }
-
-    System.out.println();
+	  new ResolverCommand().execute(new CommandLine(args), System.in, System.out, System.err);
   }
+
+
+	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
+		ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
+	
+	    if (cmdLine.size() == 0)
+	    {
+	      System.out.println("DNS servers");
+	      ResolverImpl.printDnsServers();
+	    }
+	    else
+	    {
+	      String func = ARG_FUNCTION.getValue(cmdLine);
+	      IPv4Address server = ARG_DNSSERVER.getAddress(cmdLine);
+	
+	      if (FUNC_ADD.equals(func))
+	      {
+	        ResolverImpl.addDnsServer(server);
+	      }
+	      else if (FUNC_DEL.equals(func))
+	      {
+	        ResolverImpl.removeDnsServer(server);
+	      }
+	    }
+	
+	    System.out.println();
+		
+	}
 }

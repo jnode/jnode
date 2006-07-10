@@ -21,11 +21,16 @@
  
 package org.jnode.net.command;
 
+import java.io.InputStream;
+import java.io.PrintStream;
+
 import org.apache.log4j.Logger;
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.net.NetworkException;
 import org.jnode.driver.net.WirelessNetDeviceAPI;
+import org.jnode.shell.Command;
+import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.DeviceArgument;
 import org.jnode.shell.help.Help;
@@ -37,7 +42,7 @@ import org.jnode.shell.help.SyntaxErrorException;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class WLanCtlCommand {
+public class WLanCtlCommand implements Command {
 
     private static final String FUNC_SETESSID = "setessid";
 
@@ -60,8 +65,19 @@ public class WLanCtlCommand {
 
     private static final Logger log = Logger.getLogger(HELP_INFO.getName());
 
-    public static void main(String[] args) throws SyntaxErrorException {
-        ParsedArguments cmdLine = HELP_INFO.parse(args);
+    public static void main(String[] args) throws Exception, SyntaxErrorException {
+    	new WLanCtlCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+    }
+
+    private static void setESSID(Device dev, WirelessNetDeviceAPI api,
+            ParsedArguments cmdLine) throws NetworkException {
+        final String essid = ARG_VALUE.getValue(cmdLine);
+        System.out.println("Setting ESSID on " + dev.getId() + " to " + essid);
+        api.setESSID(essid);
+    }
+
+	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
+		ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
 
         final Device dev = ARG_DEVICE.getDevice(cmdLine);
         final WirelessNetDeviceAPI api;
@@ -86,12 +102,5 @@ public class WLanCtlCommand {
                     + ex.getMessage());
             log.debug("Function " + function + " failed", ex);
         }
-    }
-
-    private static void setESSID(Device dev, WirelessNetDeviceAPI api,
-            ParsedArguments cmdLine) throws NetworkException {
-        final String essid = ARG_VALUE.getValue(cmdLine);
-        System.out.println("Setting ESSID on " + dev.getId() + " to " + essid);
-        api.setESSID(essid);
-    }
+	}
 }

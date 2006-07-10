@@ -21,10 +21,15 @@
  
 package org.jnode.net.command;
 
+import java.io.InputStream;
+import java.io.PrintStream;
+
 import org.jnode.net.arp.ARPCacheEntry;
 import org.jnode.net.arp.ARPNetworkLayer;
 import org.jnode.net.ethernet.EthernetConstants;
 import org.jnode.net.util.NetUtils;
+import org.jnode.shell.Command;
+import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
@@ -33,7 +38,7 @@ import org.jnode.shell.help.Syntax;
 /**
  * @author epr
  */
-public class ArpCommand {
+public class ArpCommand implements Command {
 
 	static final Parameter PARAM_DELETE = new Parameter("d", "delete the ARP cache", Parameter.MANDATORY);
 
@@ -47,7 +52,11 @@ public class ArpCommand {
 	 * Execute this command
 	 */
 	public static void main(String[] args) throws Exception {
-		ParsedArguments cmdLine = HELP_INFO.parse(args);
+		new ArpCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+	}
+
+	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
+		ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
 
 		ARPNetworkLayer arp = (ARPNetworkLayer) NetUtils.getNLM().getNetworkLayer(EthernetConstants.ETH_P_ARP);
 		if (PARAM_DELETE.isSet(cmdLine)) {
