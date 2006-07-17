@@ -21,6 +21,9 @@
  
 package org.jnode.fs.command;
 
+import java.io.InputStream;
+import java.io.PrintStream;
+
 import javax.naming.NameNotFoundException;
 
 import org.jnode.driver.Device;
@@ -35,18 +38,19 @@ import org.jnode.fs.fat.Fat;
 import org.jnode.fs.fat.FatFileSystemType;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
+import org.jnode.shell.Command;
+import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.DeviceArgument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.OptionArgument;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.Syntax;
-import org.jnode.shell.help.SyntaxErrorException;
 
 /**
  * @author gbin
  */
-public class FormatCommand {
+public class FormatCommand implements Command {
 
     static final OptionArgument TYPE = new OptionArgument("action",
             "Type parameter",
@@ -85,9 +89,13 @@ public class FormatCommand {
                     new Parameter[] { PARAM_TYPE, PARAM_FS, PARAM_DEVICE,
                             PARAM_BS_VAL }) });
 
-    public static void main(String[] args) throws SyntaxErrorException {
-        try {
-            ParsedArguments cmdLine = HELP_INFO.parse(args);
+    public static void main(String[] args) throws Exception {
+    	new FormatCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+    }
+
+	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
+		try {
+            ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
 
             String device = ARG_DEVICE.getValue(cmdLine);
             String FSType = FS.getValue(cmdLine).intern();
@@ -147,6 +155,5 @@ public class FormatCommand {
             // 
             e.printStackTrace();
         }
-    }
-
+	}
 }
