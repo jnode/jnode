@@ -23,6 +23,7 @@ package org.vmmagic.unboxed;
 
 import org.jnode.vm.VmAddress;
 import org.jnode.vm.annotation.KernelSpace;
+import org.jnode.vm.annotation.Uninterruptible;
 
 /**
  * Stub implementation of an Address type. Needs commenting.
@@ -102,50 +103,62 @@ public final class Address implements UnboxedObject {
         return new Word(v);
     }
 
+    @Uninterruptible
     public Address add(int v) {
         return new Address(this.v + v);
     }
 
+    @Uninterruptible
     public Address add(Word offset) {
         return new Address(this.v + offset.v);
     }
 
+    @Uninterruptible
     public Address add(Offset offset) {
         return new Address(this.v + offset.v);
     }
 
+    @Uninterruptible
     public Address add(Extent extent) {
         return new Address(this.v + extent.v);
     }
 
+    @Uninterruptible
     public Address sub(Word offset) {
         return new Address(this.v - offset.v);
     }
 
+    @Uninterruptible
     public Address sub(Extent extent) {
         return new Address(this.v - extent.v);
     }
 
+    @Uninterruptible
     public Address sub(Offset offset) {
         return new Address(this.v - offset.v);
     }
 
+    @Uninterruptible
     public Address sub(int v) {
         return new Address(this.v - v);
     }
 
+    @Uninterruptible
     public Offset diff(Address addr2) {
         return new Address(this.v - addr2.v).toWord().toOffset();
     }
 
+    @Uninterruptible
     public boolean isZero() {
         return EQ(zero());
     }
 
+    @Uninterruptible
     public boolean isMax() {
         return EQ(max());
     }
 
+    @Uninterruptible
     public boolean LT(Address addr2) {
         if (this.v >= 0 && addr2.v >= 0) return (this.v < addr2.v);
         if (this.v < 0 && addr2.v < 0) return (this.v < addr2.v);
@@ -153,22 +166,27 @@ public final class Address implements UnboxedObject {
         return false;
     }
 
+    @Uninterruptible
     public boolean LE(Address addr2) {
         return (this.v == addr2.v) || LT(addr2);
     }
 
+    @Uninterruptible
     public boolean GT(Address addr2) {
         return addr2.LT(this);
     }
 
+    @Uninterruptible
     public boolean GE(Address addr2) {
         return addr2.LE(this);
     }
 
+    @Uninterruptible
     public boolean EQ(Address addr2) {
         return (this.v == addr2.v);
     }
 
+    @Uninterruptible
     public boolean NE(Address addr2) {
         return !EQ(addr2);
     }
@@ -179,6 +197,7 @@ public final class Address implements UnboxedObject {
      * 
      * @return the read value
      */
+    @Uninterruptible
     public ObjectReference loadObjectReference() {
         return null;
     }
@@ -191,6 +210,7 @@ public final class Address implements UnboxedObject {
      *            the offset to the value.
      * @return the read value
      */
+    @Uninterruptible
     public ObjectReference loadObjectReference(Offset offset) {
         return null;
     }
@@ -200,6 +220,7 @@ public final class Address implements UnboxedObject {
      * 
      * @return the read value
      */
+    @Uninterruptible
     public byte loadByte() {
         return (byte) 0;
     }
@@ -211,6 +232,7 @@ public final class Address implements UnboxedObject {
      *            the offset to the value.
      * @return the read value
      */
+    @Uninterruptible
     public byte loadByte(Offset offset) {
         return (byte) 0;
     }
@@ -220,6 +242,7 @@ public final class Address implements UnboxedObject {
      * 
      * @return the read value
      */
+    @Uninterruptible
     public char loadChar() {
         return (char) 0;
     }
@@ -231,6 +254,7 @@ public final class Address implements UnboxedObject {
      *            the offset to the value.
      * @return the read value
      */
+    @Uninterruptible
     public char loadChar(Offset offset) {
         return (char) 0;
     }
@@ -241,6 +265,7 @@ public final class Address implements UnboxedObject {
      * 
      * @return the read value
      */
+    @Uninterruptible
     public short loadShort() {
         return (short) 0;
     }
@@ -253,6 +278,7 @@ public final class Address implements UnboxedObject {
      *            the offset to the value.
      * @return the read value
      */
+    @Uninterruptible
     public short loadShort(Offset offset) {
         return (short) 0;
     }
@@ -263,6 +289,7 @@ public final class Address implements UnboxedObject {
      * 
      * @return the read value
      */
+    @Uninterruptible
     public float loadFloat() {
         return 0.0f;
     }
@@ -275,6 +302,7 @@ public final class Address implements UnboxedObject {
      *            the offset to the value.
      * @return the read value
      */
+    @Uninterruptible
     public float loadFloat(Offset offset) {
         return 0.0f;
     }
@@ -284,6 +312,7 @@ public final class Address implements UnboxedObject {
      * 
      * @return the read value
      */
+    @Uninterruptible
     public int loadInt() {
         return 0;
     }
@@ -296,6 +325,7 @@ public final class Address implements UnboxedObject {
      * @return the read value
      */
     @KernelSpace
+    @Uninterruptible
     public int loadInt(Offset offset) {
         return 0;
     }
@@ -305,6 +335,7 @@ public final class Address implements UnboxedObject {
      * 
      * @return the read value
      */
+    @Uninterruptible
     public long loadLong() {
         return 0L;
     }
@@ -316,6 +347,7 @@ public final class Address implements UnboxedObject {
      *            the offset to the value.
      * @return the read value
      */
+    @Uninterruptible
     public long loadLong(Offset offset) {
         return 0L;
     }
@@ -326,6 +358,7 @@ public final class Address implements UnboxedObject {
      * 
      * @return the read value
      */
+    @Uninterruptible
     public double loadDouble() {
         return 0;
     }
@@ -338,6 +371,7 @@ public final class Address implements UnboxedObject {
      *            the offset to the value.
      * @return the read value
      */
+    @Uninterruptible
     public double loadDouble(Offset offset) {
         return 0;
     }
@@ -348,6 +382,7 @@ public final class Address implements UnboxedObject {
      * 
      * @return the read address value.
      */
+    @Uninterruptible
     public Address loadAddress() {
         return null;
     }
@@ -361,6 +396,7 @@ public final class Address implements UnboxedObject {
      * @return the read address value.
      */
     @KernelSpace
+    @Uninterruptible
     public Address loadAddress(Offset offset) {
         return null;
     }
@@ -372,6 +408,7 @@ public final class Address implements UnboxedObject {
      * @return the read word value.
      */
     @KernelSpace
+    @Uninterruptible
     public Word loadWord() {
         return null;
     }
@@ -384,6 +421,7 @@ public final class Address implements UnboxedObject {
      *            the offset to the value.
      * @return the read word value.
      */
+    @Uninterruptible
     public Word loadWord(Offset offset) {
         return null;
     }
@@ -394,6 +432,7 @@ public final class Address implements UnboxedObject {
      * 
      * @return the old value to be passed to an attempt call.
      */
+    @Uninterruptible
     public Word prepareWord() {
         return null;
     }
@@ -406,6 +445,7 @@ public final class Address implements UnboxedObject {
      *            the offset to the value.
      * @return the old value to be passed to an attempt call.
      */
+    @Uninterruptible
     public Word prepareWord(Offset offset) {
         return null;
     }
@@ -416,6 +456,7 @@ public final class Address implements UnboxedObject {
      * 
      * @return the old value to be passed to an attempt call.
      */
+    @Uninterruptible
     public ObjectReference prepareObjectReference() {
         return null;
     }
@@ -428,6 +469,7 @@ public final class Address implements UnboxedObject {
      *            the offset to the value.
      * @return the old value to be passed to an attempt call.
      */
+    @Uninterruptible
     public ObjectReference prepareObjectReference(Offset offset) {
         return null;
     }
@@ -438,6 +480,7 @@ public final class Address implements UnboxedObject {
      * 
      * @return the old value to be passed to an attempt call.
      */
+    @Uninterruptible
     public Address prepareAddress() {
         return null;
     }
@@ -450,6 +493,7 @@ public final class Address implements UnboxedObject {
      *            the offset to the value.
      * @return the old value to be passed to an attempt call.
      */
+    @Uninterruptible
     public Address prepareAddress(Offset offset) {
         return null;
     }
@@ -460,6 +504,7 @@ public final class Address implements UnboxedObject {
      * 
      * @return the old value to be passed to an attempt call.
      */
+    @Uninterruptible
     public int prepareInt() {
         return 0;
     }
@@ -472,6 +517,7 @@ public final class Address implements UnboxedObject {
      *            the offset to the value.
      * @return the old value to be passed to an attempt call.
      */
+    @Uninterruptible
     public int prepareInt(Offset offset) {
         return 0;
     }
@@ -486,6 +532,7 @@ public final class Address implements UnboxedObject {
      *            the new value.
      * @return true if the attempt was successful.
      */
+    @Uninterruptible
     public boolean attempt(int old, int value) {
         return false;
     }
@@ -502,6 +549,7 @@ public final class Address implements UnboxedObject {
      *            the offset to the value.
      * @return true if the attempt was successful.
      */
+    @Uninterruptible
     public boolean attempt(int old, int value, Offset offset) {
         return false;
     }
@@ -516,6 +564,7 @@ public final class Address implements UnboxedObject {
      *            the new value.
      * @return true if the attempt was successful.
      */
+    @Uninterruptible
     public boolean attempt(Word old, Word value) {
         return false;
     }
@@ -532,6 +581,7 @@ public final class Address implements UnboxedObject {
      *            the offset to the value.
      * @return true if the attempt was successful.
      */
+    @Uninterruptible
     public boolean attempt(Word old, Word value, Offset offset) {
         return false;
     }
@@ -547,6 +597,7 @@ public final class Address implements UnboxedObject {
      * @return true if the attempt was successful.
      */
     @KernelSpace
+    @Uninterruptible
     public boolean attempt(ObjectReference old, ObjectReference value) {
         return false;
     }
@@ -563,6 +614,7 @@ public final class Address implements UnboxedObject {
      *            the offset to the value.
      * @return true if the attempt was successful.
      */
+    @Uninterruptible
     public boolean attempt(ObjectReference old, ObjectReference value,
             Offset offset) {
         return false;
@@ -578,6 +630,7 @@ public final class Address implements UnboxedObject {
      *            the new value.
      * @return true if the attempt was successful.
      */
+    @Uninterruptible
     public boolean attempt(Address old, Address value) {
         return false;
     }
@@ -594,6 +647,7 @@ public final class Address implements UnboxedObject {
      *            the offset to the value.
      * @return true if the attempt was successful.
      */
+    @Uninterruptible
     public boolean attempt(Address old, Address value, Offset offset) {
         return false;
     }
@@ -605,6 +659,7 @@ public final class Address implements UnboxedObject {
      * @param ref
      *            The address value to store.
      */
+    @Uninterruptible
     public void store(ObjectReference ref) {
     }
 
@@ -617,6 +672,7 @@ public final class Address implements UnboxedObject {
      * @param offset
      *            the offset to the value.
      */
+    @Uninterruptible
     public void store(ObjectReference ref, Offset offset) {
     }
 
@@ -627,6 +683,7 @@ public final class Address implements UnboxedObject {
      * @param address
      *            The address value to store.
      */
+    @Uninterruptible
     public void store(Address address) {
     }
 
@@ -639,6 +696,7 @@ public final class Address implements UnboxedObject {
      * @param offset
      *            the offset to the value.
      */
+    @Uninterruptible
     public void store(Address address, Offset offset) {
     }
 
@@ -649,6 +707,7 @@ public final class Address implements UnboxedObject {
      * @param value
      *            The float value to store.
      */
+    @Uninterruptible
     public void store(float value) {
     }
 
@@ -661,6 +720,7 @@ public final class Address implements UnboxedObject {
      * @param offset
      *            the offset to the value.
      */
+    @Uninterruptible
     public void store(float value, Offset offset) {
     }
 
@@ -671,6 +731,7 @@ public final class Address implements UnboxedObject {
      * @param value
      *            The word value to store.
      */
+    @Uninterruptible
     public void store(Word value) {
     }
 
@@ -683,6 +744,7 @@ public final class Address implements UnboxedObject {
      * @param offset
      *            the offset to the value.
      */
+    @Uninterruptible
     public void store(Word value, Offset offset) {
     }
 
@@ -693,6 +755,7 @@ public final class Address implements UnboxedObject {
      * @param value
      *            The byte value to store.
      */
+    @Uninterruptible
     public void store(byte value) {
     }
 
@@ -705,6 +768,7 @@ public final class Address implements UnboxedObject {
      * @param offset
      *            the offset to the value.
      */
+    @Uninterruptible
     public void store(byte value, Offset offset) {
     }
 
@@ -715,6 +779,7 @@ public final class Address implements UnboxedObject {
      * @param value
      *            The int value to store.
      */
+    @Uninterruptible
     public void store(int value) {
     }
 
@@ -727,6 +792,7 @@ public final class Address implements UnboxedObject {
      * @param offset
      *            the offset to the value.
      */
+    @Uninterruptible
     public void store(int value, Offset offset) {
     }
 
@@ -737,6 +803,7 @@ public final class Address implements UnboxedObject {
      * @param value
      *            The double value to store.
      */
+    @Uninterruptible
     public void store(double value) {
     }
 
@@ -749,6 +816,7 @@ public final class Address implements UnboxedObject {
      * @param offset
      *            the offset to the value.
      */
+    @Uninterruptible
     public void store(double value, Offset offset) {
     }
 
@@ -759,6 +827,7 @@ public final class Address implements UnboxedObject {
      * @param value
      *            The double value to store.
      */
+    @Uninterruptible
     public void store(long value) {
     }
 
@@ -771,6 +840,7 @@ public final class Address implements UnboxedObject {
      * @param value
      *            The double value to store.
      */
+    @Uninterruptible
     public void store(long value, Offset offset) {
     }
 
@@ -781,6 +851,7 @@ public final class Address implements UnboxedObject {
      * @param value
      *            the char value to store.
      */
+    @Uninterruptible
     public void store(char value) {
     }
 
@@ -793,6 +864,7 @@ public final class Address implements UnboxedObject {
      * @param value
      *            the char value to store.
      */
+    @Uninterruptible
     public void store(char value, Offset offset) {
     }
 
@@ -803,6 +875,7 @@ public final class Address implements UnboxedObject {
      * @param value
      *            the short value to store.
      */
+    @Uninterruptible
     public void store(short value) {
     }
 
@@ -815,6 +888,7 @@ public final class Address implements UnboxedObject {
      * @param value
      *            the short value to store.
      */
+    @Uninterruptible
     public void store(short value, Offset offset) {
     }
     
@@ -825,6 +899,7 @@ public final class Address implements UnboxedObject {
      * 
      * @param value
      */
+    @Uninterruptible
     public void atomicAdd(Word value) {    	
     }
 
@@ -835,6 +910,7 @@ public final class Address implements UnboxedObject {
      * 
      * @param value
      */
+    @Uninterruptible
     public void atomicAnd(Word value) {    	
     }
 
@@ -845,6 +921,7 @@ public final class Address implements UnboxedObject {
      * 
      * @param value
      */
+    @Uninterruptible
     public void atomicOr(Word value) {    	
     }
 
@@ -855,6 +932,7 @@ public final class Address implements UnboxedObject {
      * 
      * @param value
      */
+    @Uninterruptible
     public void atomicSub(Word value) {    	
     }
 }
