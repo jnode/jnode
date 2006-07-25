@@ -133,23 +133,7 @@ yieldPointHandler_reschedule:
 	; Save current stackframe (so we can show stacktraces)
 	mov ADI,CURRENTTHREAD
 	SAVEREG VmX86Thread_EBP_OFS, OLD_EBP
-	; Set currentProcessor field
-	mov AAX,CURRENTPROCESSOR
-	mov [ADI+VmThread_CURRENTPROCESSOR_OFS],AAX
 
-	; Actually call VmScheduler.reschedule (in kernel mode!)
-	push ABP
-	xor ABP,ABP						; Make java stacktraces terminate
-	mov AAX,KERNELSTACKEND
-	mov STACKEND,AAX				; Set kernel stack end for correct stackoverflow tests
-	mov AAX,VmProcessor_reschedule	; Load reschedule method
-	push CURRENTPROCESSOR			; this
-	INVOKE_JAVA_METHOD
-	pop ABP
-	; Now save the current thread state
-	mov ADI,CURRENTTHREAD
-	cmp ADI,NEXTTHREAD
-	je near yieldPointHandler_done
 	SAVEREG VmX86Thread_EAX_OFS, OLD_EAX
 	SAVEREG VmX86Thread_EBX_OFS, OLD_EBX
 	SAVEREG VmX86Thread_ECX_OFS, OLD_ECX
@@ -188,7 +172,7 @@ yieldPointHandler_fxSave:
 yieldPointHandler_loadFxStatePtr:
 	mov ABX, [ADI+VmX86Thread_FXSTATEPTR_OFS]
 	test ABX,ABX
-	jz yieldPointHandler_fxSaveInit
+	jz near yieldPointHandler_fxSaveInit
 	; We have a valid fxState address in ebx
 	test dword [cpu_features],FEAT_FXSR
 	jz yieldPointHandler_fpuSave
@@ -197,19 +181,23 @@ yieldPointHandler_loadFxStatePtr:
 yieldPointHandler_fpuSave:
 	fnsave [ABX]
 yieldPointHandler_saveEnd:
-	; Reset currentProcessor field
-	mov WORD [ADI+VmThread_CURRENTPROCESSOR_OFS],0
-	jmp yieldPointHandler_restore_
 
-yieldPointHandler_fxSaveInit:
-	call fixFxStatePtr
-	jmp yieldPointHandler_loadFxStatePtr
-
-
+	; Now call VmScheduler.reschedule (in kernel mode!)
+	push ABP
+	xor ABP,ABP						; Make java stacktraces terminate
+	mov AAX,KERNELSTACKEND
+	mov STACKEND,AAX				; Set kernel stack end for correct stackoverflow tests
+	mov AAX,VmProcessor_reschedule	; Load reschedule method
+	push CURRENTPROCESSOR			; this
+	INVOKE_JAVA_METHOD
+	pop ABP
 
 	; Restore the next thread
-yieldPointHandler_restore_:
+yieldPointHandler_restore:
 	mov ADI,NEXTTHREAD
+	; Shortcut, if we run the same thread as we used to run, do not restore register state
+	cmp ADI,CURRENTTHREAD
+	je near yieldPointHandler_done
 	; For added safety, test if NEXTHREAD != null
 	test ADI,ADI
 	jz near yieldPointHandler_done
@@ -288,6 +276,11 @@ fixFxStatePtr:
 	and ABX,~0xF;
 	mov [ADI+VmX86Thread_FXSTATEPTR_OFS],ABX
 	ret	
+
+yieldPointHandler_fxSaveInit:
+	call fixFxStatePtr
+	jmp yieldPointHandler_loadFxStatePtr
+
 	
 ; -----------------------------------------------
 ; Device not available
