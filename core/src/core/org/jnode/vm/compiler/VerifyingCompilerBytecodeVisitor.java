@@ -16,6 +16,7 @@ public class VerifyingCompilerBytecodeVisitor<T extends CompilerBytecodeVisitor>
 
     private VmMethod currentMethod;
     private boolean currentKernelSpace;
+    private boolean currentUninterruptible;
     
     /**
      * @param delegate
@@ -31,6 +32,7 @@ public class VerifyingCompilerBytecodeVisitor<T extends CompilerBytecodeVisitor>
     public void startMethod(VmMethod method) {
         this.currentMethod = method;
         this.currentKernelSpace = method.hasKernelSpacePragma();
+        this.currentUninterruptible = method.isUninterruptible();
         super.startMethod(method);
     }
 
@@ -95,14 +97,30 @@ public class VerifyingCompilerBytecodeVisitor<T extends CompilerBytecodeVisitor>
      * @param methodRef
      */
     protected final void verifyInvoke(VmConstMethodRef methodRef) {
-        if (currentKernelSpace) {
+        if (currentKernelSpace || currentUninterruptible) {
             // May only call methods with kernelspace pragma.
             methodRef.resolve(currentMethod.getDeclaringClass().getLoader());
             
             final VmMethod callee = methodRef.getResolvedVmMethod();
-            if (!callee.hasKernelSpacePragma()) {
-                //throw new ClassFormatError("Method '" + currentMethod + "' calls method outside KernelSpace: " + callee);
-                System.out.println("Method '" + currentMethod.getFullName() + "' calls method outside KernelSpace: " + callee.getFullName());
+            if (currentKernelSpace) {
+                if (!callee.hasKernelSpacePragma()) {
+                    // throw new ClassFormatError("Method '" + currentMethod +
+                    // "' calls method outside KernelSpace: " + callee);
+                    System.out.println("Method calls method outside KernelSpace:\n\tcaller: " + 
+                            currentMethod.getFullName() + "\n\tcallee: " +
+                            callee.getFullName());
+                }
+            }
+            if (currentUninterruptible) {
+                if (!callee.isUninterruptible()) {
+                    if (currentMethod.getDeclaringClass().getName().startsWith("org.jnode.vm.schedule")) { 
+                    // throw new ClassFormatError("Method '" + currentMethod +
+                    // "' calls interruptible method: " + callee);
+                    System.out.println("Method calls interruptible method:\n\tcaller: " + 
+                            currentMethod.getFullName() + "\n\tcallee: " +
+                            callee.getFullName());
+                    }
+                }
             }
             if (callee.isSynchronized()) {
                 //throw new ClassFormatError("Method '" + currentMethod + "' calls synchronized method: " + callee);
