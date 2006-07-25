@@ -142,6 +142,10 @@
     	<!-- Initialize timestamp -->
         <tstamp/>
 
+    	<!-- Update default excludes -->
+    	<defaultexcludes add="**/_svn"/>
+    	<defaultexcludes add="**/_svn/**"/>
+    	
         <!-- Create basic build directories -->
         <mkdir dir="${build.dir}"/>
         <mkdir dir="${reports.dir}"/>
