@@ -20,6 +20,7 @@
       <export name="javax.imageio.plugins.bmp.*"/>
       <export name="javax.imageio.plugins.jpeg.*"/>
 
+      <export name="gnu.javax.imageio.*"/>
       <export name="gnu.javax.imageio.bmp.*"/>
       <export name="gnu.javax.imageio.gif.*"/>
       <export name="gnu.javax.imageio.jpeg.*"/>
