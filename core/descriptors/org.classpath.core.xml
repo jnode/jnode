@@ -37,6 +37,7 @@
       <export name="gnu.java.nio.charset.*"/>
       <export name="gnu.java.nio.charset.iconv.*"/>
       <export name="gnu.java.lang.*"/>
+      <export name="gnu.java.lang.management.*"/>
       <export name="gnu.java.lang.reflect.*"/>
       <export name="gnu.java.locale.LocaleHelper"/>
       <export name="gnu.java.locale.LocaleData"/>  
@@ -91,6 +92,7 @@
       <export name="java.lang.*"/>
       <export name="java.lang.annotation.*"/>
       <export name="java.lang.instrument.*"/>
+      <export name="java.lang.management.*"/>
       <export name="java.lang.ref.*"/>
       <export name="java.lang.reflect.*"/>
       <export name="java.math.*"/>
