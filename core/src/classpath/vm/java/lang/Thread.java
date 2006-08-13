@@ -662,4 +662,17 @@ public class Thread implements Runnable {
         }
         return locals;
     }
+
+      /**
+   * Returns the current state of the thread.  This
+   * is designed for monitoring thread behaviour, rather
+   * than for synchronization control.
+   *
+   * @return the current thread state.
+   */
+  public String getState()
+  {
+      //todo implement
+    return "UNKNOWN";
+  }
 }
