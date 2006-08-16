@@ -38,22 +38,25 @@ exception statement from your version.  */
 
 package gnu.javax.crypto.pad;
 
+import java.util.Map;
+
 /**
- * <p>The basic visible methods of any padding algorithm.</p>
- *
- * <p>Padding algorithms serve to <i>pad</i> and <i>unpad</i> byte arrays usually
+ * The basic visible methods, and attribute names, of every padding algorithm.
+ * <p>
+ * Padding algorithms serve to <i>pad</i> and <i>unpad</i> byte arrays usually
  * as the last step in an <i>encryption</i> or respectively a <i>decryption</i>
  * operation. Their input buffers are usually those processed by instances of
- * {@link gnu.crypto.mode.IMode} and/or {@link gnu.crypto.cipher.IBlockCipher}.</p>
+ * {@link gnu.javax.crypto.mode.IMode} and/or
+ * {@link gnu.javax.crypto.cipher.IBlockCipher}.
  */
 public interface IPad
 {
-
-  // Constants
-  // -------------------------------------------------------------------------
-
-  // Methods
-  // -------------------------------------------------------------------------
+  /**
+   * Property name of the block size in which to operate the padding algorithm.
+   * The value associated with this property name is taken to be a positive 
+   * {@link Integer} greater than zero.
+   */
+  String PADDING_BLOCK_SIZE = "gnu.crypto.pad.block.size";
 
   /** @return the canonical name of this instance. */
   String name();
@@ -66,6 +69,19 @@ public interface IPad
    * @exception IllegalArgumentException if the block size value is invalid.
    */
   void init(int bs) throws IllegalStateException;
+
+  /**
+   * Initialises the algorithm with designated attributes. Names, valid and/or
+   * recognisable by all concrete implementations are described in the class
+   * documentation above. Other algorithm-specific attributes MUST be documented
+   * in the implementation class of that padding algorithm.
+   * 
+   * @param attributes a set of name-value pairs that describes the desired
+   *          future behaviour of this instance.
+   * @exception IllegalStateException if the instance is already initialised.
+   * @exception IllegalArgumentException if the block size value is invalid.
+   */
+  void init(Map attributes) throws IllegalStateException;
 
   /**
    * Returns the byte sequence that should be appended to the designated input.
@@ -85,10 +101,11 @@ public interface IPad
    * @param offset the starting index of meaningful data in <i>in</i>.
    * @param length the number of meaningful bytes in <i>in</i>.
    * @return the number of bytes to discard, to the left of index position
-   * <tt>offset + length</tt> in <i>in</i>. In other words, if the return
-   * value of a successful invocation of this method is <tt>result</tt>, then
-   * the unpadded byte sequence will be <tt>offset + length - result</tt> bytes
-   * in <i>in</i>, starting from index position <tt>offset</tt>.
+   *         <code>offset + length</code> in <i>in</i>. In other words, if
+   *         the return value of a successful invocation of this method is
+   *         <code>result</code>, then the unpadded byte sequence will be
+   *         <code>offset + length - result</code> bytes in <i>in</i>,
+   *         starting from index position <code>offset</code>.
    * @exception WrongPaddingException if the data is not terminated with the
    * expected padding bytes.
    */
@@ -103,8 +120,8 @@ public interface IPad
   /**
    * A basic symmetric pad/unpad test.
    *
-   * @return <tt>true</tt> if the implementation passes a basic symmetric
-   * self-test. Returns <tt>false</tt> otherwise.
+   * @return <code>true</code> if the implementation passes a basic symmetric
+   *         self-test. Returns <code>false</code> otherwise.
    */
   boolean selfTest();
 }
