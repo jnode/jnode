@@ -42,22 +42,15 @@ import gnu.java.security.util.Util;
 import java.security.Key;
 
 /**
- * A secret key composed of a sequence of raw, unformatted octets. This class
- * is analogous to the {@link javax.crypto.spec.SecretKeySpec} class, but is
+ * A secret key composed of a sequence of raw, unformatted octets. This class is
+ * analogous to the {@link javax.crypto.spec.SecretKeySpec} class, but is
  * provided for platforms that do not or cannot contain that class.
  */
-public class GnuSecretKey implements Key
+public class GnuSecretKey
+    implements Key
 {
-
-  // Field.
-  // ------------------------------------------------------------------------
-
   private final byte[] key;
-
   private final String algorithm;
-
-  // Constructors.
-  // ------------------------------------------------------------------------
 
   /**
    * Creates a new secret key. The supplied byte array is copied by this
@@ -85,9 +78,6 @@ public class GnuSecretKey implements Key
     System.arraycopy(key, offset, this.key, 0, length);
     this.algorithm = algorithm;
   }
-
-  // Instance methods.
-  // ------------------------------------------------------------------------
 
   /**
    * Returns the algorithm name, if any.
@@ -123,22 +113,14 @@ public class GnuSecretKey implements Key
 
   public boolean equals(Object o)
   {
-    if (!(o instanceof GnuSecretKey))
-      {
+    if (! (o instanceof GnuSecretKey))
         return false;
-      }
     if (key.length != ((GnuSecretKey) o).key.length)
-      {
         return false;
-      }
     byte[] key2 = ((GnuSecretKey) o).key;
     for (int i = 0; i < key.length; i++)
-      {
         if (key[i] != key2[i])
-          {
             return false;
-          }
-      }
     return true;
   }
 
