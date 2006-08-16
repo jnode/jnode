@@ -51,46 +51,28 @@ import javax.security.sasl.AuthenticationException;
 /**
  * The PLAIN mechanism authentication information provider implementation.
  */
-public class PlainAuthInfoProvider implements IAuthInfoProvider, PlainRegistry
+public class PlainAuthInfoProvider
+    implements IAuthInfoProvider, PlainRegistry
 {
-
-  // Constants and variables
-  // -------------------------------------------------------------------------
-
   private PasswordFile passwordFile = null;
 
-  // Constructor(s)
-  // -------------------------------------------------------------------------
-
   // implicit 0-args constrcutor
-
-  // Class methods
-  // -------------------------------------------------------------------------
-
-  // IAuthInfoProvider interface implementation
-  // -------------------------------------------------------------------------
 
   public void activate(Map context) throws AuthenticationException
   {
     try
       {
         if (context == null)
-          {
             passwordFile = new PasswordFile();
-          }
         else
           {
             String pfn = (String) context.get(PASSWORD_FILE);
             if (pfn == null)
-              {
                 passwordFile = new PasswordFile();
-              }
             else
-              {
                 passwordFile = new PasswordFile(pfn);
               }
           }
-      }
     catch (IOException x)
       {
         throw new AuthenticationException("activate()", x);
@@ -105,10 +87,8 @@ public class PlainAuthInfoProvider implements IAuthInfoProvider, PlainRegistry
   public boolean contains(String userName) throws AuthenticationException
   {
     if (passwordFile == null)
-      {
         throw new AuthenticationException("contains()",
                                           new IllegalStateException());
-      }
     boolean result = false;
     try
       {
@@ -124,18 +104,13 @@ public class PlainAuthInfoProvider implements IAuthInfoProvider, PlainRegistry
   public Map lookup(Map userID) throws AuthenticationException
   {
     if (passwordFile == null)
-      {
-        throw new AuthenticationException("lookup()",
-                                          new IllegalStateException());
-      }
+      throw new AuthenticationException("lookup()", new IllegalStateException());
     Map result = new HashMap();
     try
       {
         String userName = (String) userID.get(Registry.SASL_USERNAME);
         if (userName == null)
-          {
             throw new NoSuchUserException("");
-          }
         String[] data = passwordFile.lookup(userName);
         result.put(Registry.SASL_USERNAME, data[0]);
         result.put(Registry.SASL_PASSWORD, data[1]);
@@ -148,24 +123,16 @@ public class PlainAuthInfoProvider implements IAuthInfoProvider, PlainRegistry
     catch (Exception x)
       {
         if (x instanceof AuthenticationException)
-          {
             throw (AuthenticationException) x;
-          }
-        else
-          {
             throw new AuthenticationException("lookup()", x);
           }
-      }
     return result;
   }
 
   public void update(Map userCredentials) throws AuthenticationException
   {
     if (passwordFile == null)
-      {
-        throw new AuthenticationException("update()",
-                                          new IllegalStateException());
-      }
+      throw new AuthenticationException("update()", new IllegalStateException());
     try
       {
         String userName = (String) userCredentials.get(Registry.SASL_USERNAME);
@@ -177,9 +144,7 @@ public class PlainAuthInfoProvider implements IAuthInfoProvider, PlainRegistry
         String shell = (String) userCredentials.get(SHELL_FIELD);
         if (uid == null || gid == null || gecos == null || dir == null
             || shell == null)
-          {
             passwordFile.changePasswd(userName, password);
-          }
         else
           {
             String[] attributes = new String[] { uid, gid, gecos, dir, shell };
@@ -189,15 +154,10 @@ public class PlainAuthInfoProvider implements IAuthInfoProvider, PlainRegistry
     catch (Exception x)
       {
         if (x instanceof AuthenticationException)
-          {
             throw (AuthenticationException) x;
-          }
-        else
-          {
             throw new AuthenticationException("update()", x);
           }
       }
-  }
 
   public Map getConfiguration(String mode) throws AuthenticationException
   {
