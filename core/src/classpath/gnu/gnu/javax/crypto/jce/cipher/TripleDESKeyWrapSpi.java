@@ -1,12 +1,12 @@
-/* SerpentSpi.java -- 
-   Copyright (C) 2002, 2006  Free Software Foundation, Inc.
+/* TripleDESKeyWrapSpi.java -- DES-EDE Key Wrapping Algorithm JCE Adapter
+   Copyright (C) 2006 Free Software Foundation, Inc.
 
-This file is a part of GNU Classpath.
+This file is part of GNU Classpath.
 
 GNU Classpath is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or (at
-your option) any later version.
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
 
 GNU Classpath is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,9 +14,9 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with GNU Classpath; if not, write to the Free Software
-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
-USA
+along with GNU Classpath; see the file COPYING.  If not, write to the
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -33,7 +33,7 @@ module.  An independent module is a module which is not derived from
 or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
-exception statement from your version.  */
+exception statement from your version. */
 
 
 package gnu.javax.crypto.jce.cipher;
@@ -41,14 +41,14 @@ package gnu.javax.crypto.jce.cipher;
 import gnu.java.security.Registry;
 
 /**
- * The implementation of the Serpent <i>Service Provider Interface</i>
- * (<b>SPI</b>) adapter.
+ * The JCE Cipher Adapter implementation over the GNU TripleDES Key Wrapping
+ * Algorithm.
  */
-public final class SerpentSpi
-    extends CipherAdapter
+public final class TripleDESKeyWrapSpi
+    extends KeyWrappingAlgorithmAdapter
 {
-  public SerpentSpi()
+  public TripleDESKeyWrapSpi()
   {
-    super(Registry.SERPENT_CIPHER);
+    super(Registry.TRIPLEDES_KWA, 8, 192 / 8, Registry.CBC_MODE);
   }
 }
