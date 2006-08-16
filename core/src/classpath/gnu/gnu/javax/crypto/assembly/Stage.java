@@ -45,17 +45,18 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * <p>A <i>Stage</i> in a Cascade Cipher.</p>
+ * A <i>Stage</i> in a Cascade Cipher.
+ * <p>
+ * Each stage may be either an implementation of a Block Cipher Mode of
+ * Operation ({@link IMode}) or another Cascade Cipher ({@link Cascade}).
+ * Each stage has also a <i>natural</i> operational direction when constructed
+ * for inclusion within a {@link Cascade}. This <i>natural</i> direction
+ * dictates how data flows from one stage into another when stages are chained
+ * together in a cascade. One can think of a stage and its natural direction as
+ * the specification of how to wire the stage into the chain. The following
+ * diagrams may help understand the paradigme. The first shows two stages
+ * chained each with a {@link Direction#FORWARD} direction.
  *
- * <p>Each stage may be either an implementation of a Block Cipher Mode of
- * Operation ({@link IMode}) or another Cascade Cipher ({@link Cascade}). Each
- * stage has also a <i>natural</i> operational direction when constructed for
- * inclusion within a {@link Cascade}. This <i>natural</i> direction dictates
- * how data flows from one stage into another when stages are chained together
- * in a cascade. One can think of a stage and its natural direction as the
- * specification of how to wire the stage into the chain. The following diagrams
- * may help understand the paradigme. The first shows two stages chained each
- * with a {@link Direction#FORWARD} direction.</p>
  * <pre>
  *           FORWARD         FORWARD
  *       +------+       +-------+
@@ -66,9 +67,12 @@ import java.util.Set;
  *              |       |       |      |
  *              +-------+       +------+
  * </pre>
- * <p>The second diagram shows two stages, one in a {@link Direction#FORWARD}
+ * 
+ * <p>
+ * The second diagram shows two stages, one in a {@link Direction#FORWARD}
  * direction, while the other is wired in a {@link Direction#REVERSED}
- * direction.</p>
+ * direction.
+ * 
  * <pre>
  *           FORWARD         REVERSED
  *       +------+               +------+
@@ -85,18 +89,11 @@ import java.util.Set;
  */
 public abstract class Stage
 {
-
-  // Constants and variables
-  // -------------------------------------------------------------------------
-
   public static final String DIRECTION = "gnu.crypto.assembly.stage.direction";
 
   protected Direction forward;
 
   protected Direction wired;
-
-  // Constructor(s)
-  // -------------------------------------------------------------------------
 
   protected Stage(Direction forwardDirection)
   {
@@ -105,9 +102,6 @@ public abstract class Stage
     this.forward = forwardDirection;
     this.wired = null;
   }
-
-  // Class methods
-  // -------------------------------------------------------------------------
 
   public static final Stage getInstance(IMode mode, Direction forwardDirection)
   {
@@ -119,9 +113,6 @@ public abstract class Stage
   {
     return new CascadeStage(cascade, forwardDirection);
   }
-
-  // Instance methods
-  // -------------------------------------------------------------------------
 
   /**
    * Returns the {@link Set} of supported block sizes for this
@@ -143,9 +134,7 @@ public abstract class Stage
   public void init(Map attributes) throws InvalidKeyException
   {
     if (wired != null)
-      {
         throw new IllegalStateException();
-      }
     Direction flow = (Direction) attributes.get(DIRECTION);
     if (flow == null)
       {
@@ -189,9 +178,7 @@ public abstract class Stage
   public void update(byte[] in, int inOffset, byte[] out, int outOffset)
   {
     if (wired == null)
-      {
         throw new IllegalStateException();
-      }
     updateDelegate(in, inOffset, out, outOffset);
   }
 
@@ -205,8 +192,6 @@ public abstract class Stage
    * <i>correctness</i> tests. Returns <code>false</code> otherwise.
    */
   public abstract boolean selfTest();
-
-  // abstract methods to be implemented by concrete subclasses ---------------
 
   abstract void initDelegate(Map attributes) throws InvalidKeyException;
 
