@@ -39,21 +39,14 @@ exception statement from your version.  */
 package gnu.javax.crypto.keyring;
 
 import java.io.FilterInputStream;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
-final class MeteredInputStream extends FilterInputStream
+final class MeteredInputStream
+    extends FilterInputStream
 {
-
-  // Fields.
-  // ------------------------------------------------------------------------
-
   private int count;
-
   private final int limit;
-
-  // Constructor.
-  // ------------------------------------------------------------------------
 
   MeteredInputStream(InputStream in, int limit)
   {
@@ -63,9 +56,6 @@ final class MeteredInputStream extends FilterInputStream
     this.limit = limit;
     count = 0;
   }
-
-  // Instance methods.
-  // ------------------------------------------------------------------------
 
   /**
    * Tests if the number of bytes read has reached the limit.
