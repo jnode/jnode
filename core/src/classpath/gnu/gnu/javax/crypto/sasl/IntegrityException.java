@@ -46,9 +46,9 @@ import javax.security.sasl.SaslException;
  * processing of an <i>integrity</i> protection filter, including <i>replay
  * detection</i>.
  */
-public class IntegrityException extends SaslException
+public class IntegrityException
+    extends SaslException
 {
-
   /**
    * Constructs a new instance of <code>IntegrityException</code> with no
    * detail message.

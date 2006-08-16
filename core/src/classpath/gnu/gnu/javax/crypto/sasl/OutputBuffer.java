@@ -46,30 +46,24 @@ import java.io.IOException;
 import java.math.BigInteger;
 
 /**
- * <p>The implementation of an outgoing SASL buffer.</p>
- *
- * <p>The data elements this class caters for are described in [1].</p>
- *
- * <p>References:</p>
+ * The implementation of an outgoing SASL buffer.
+ * <p>
+ * The data elements this class caters for are described in [1].
+ * <p>
+ * References:
  * <ol>
- *    <li><a href="http://www.ietf.org/internet-drafts/draft-burdis-cat-srp-sasl-09.txt">
+ * <li><a
+ * href="http://www.ietf.org/internet-drafts/draft-burdis-cat-srp-sasl-09.txt">
  *    Secure Remote Password Authentication Mechanism</a>;<br/>
- *    draft-burdis-cat-srp-sasl-09,<br/>
- *    <a href="mailto:keith@rucus.ru.ac.za">Keith Burdis</a> and
- *    <a href="mailto:raif@forge.com.au">Ra&iuml;f S. Naffah</a>.</li>
+ * draft-burdis-cat-srp-sasl-09,<br/> <a
+ * href="mailto:keith@rucus.ru.ac.za">Keith Burdis</a> and <a
+ * href="mailto:raif@forge.com.au">Ra&iuml;f S. Naffah</a>.</li>
  * </ol>
  */
 public class OutputBuffer
 {
-
-  // Constants and variables
-  // -------------------------------------------------------------------------
-
   /** The internal output stream. */
   private ByteArrayOutputStream out;
-
-  // Constructor(s)
-  // -------------------------------------------------------------------------
 
   public OutputBuffer()
   {
@@ -78,15 +72,9 @@ public class OutputBuffer
     out = new ByteArrayOutputStream();
   }
 
-  // Class methods
-  // -------------------------------------------------------------------------
-
-  // Instance methods
-  // -------------------------------------------------------------------------
-
   /**
-   * <p>Encodes a SASL scalar quantity, <code>count</code>-octet long, to the
-   * current buffer.</p>
+   * Encodes a SASL scalar quantity, <code>count</code>-octet long, to the
+   * current buffer.
    *
    * @param count number of octets to encode <code>b</code> with.
    * @param b the scalar quantity.
@@ -96,20 +84,16 @@ public class OutputBuffer
   public void setScalar(int count, int b) throws IOException
   {
     if (count < 0 || count > 4)
-      {
         throw new SaslEncodingException("Invalid SASL scalar octet count: "
                                         + String.valueOf(count));
-      }
     byte[] element = new byte[count];
     for (int i = count; --i >= 0; b >>>= 8)
-      {
         element[i] = (byte) b;
-      }
     out.write(element);
   }
 
   /**
-   * <p>Encodes a SASL OS to the current buffer.</p>
+   * Encodes a SASL OS to the current buffer.
    *
    * @param b the OS element.
    * @throws SaslEncodingException if an encoding size constraint is violated.
@@ -119,15 +103,13 @@ public class OutputBuffer
   {
     final int length = b.length;
     if (length > Registry.SASL_ONE_BYTE_MAX_LIMIT)
-      {
         throw new SaslEncodingException("SASL octet-sequence too long");
-      }
     out.write(length & 0xFF);
     out.write(b);
   }
 
   /**
-   * <p>Encodes a SASL EOS to the current buffer.</p>
+   * Encodes a SASL EOS to the current buffer.
    *
    * @param b the EOS element.
    * @throws SaslEncodingException if an encoding size constraint is violated.
@@ -137,16 +119,14 @@ public class OutputBuffer
   {
     final int length = b.length;
     if (length > Registry.SASL_TWO_BYTE_MAX_LIMIT)
-      {
         throw new SaslEncodingException("SASL extended octet-sequence too long");
-      }
-    byte[] lengthBytes = { (byte) (length >>> 8), (byte) length };
+    byte[] lengthBytes = { (byte)(length >>> 8), (byte) length };
     out.write(lengthBytes);
     out.write(b);
   }
 
   /**
-   * <p>Encodes a SASL MPI to the current buffer.</p>
+   * Encodes a SASL MPI to the current buffer.
    *
    * @param val the MPI element.
    * @throws SaslEncodingException if an encoding size constraint is violated.
@@ -157,16 +137,14 @@ public class OutputBuffer
     byte[] b = Util.trim(val);
     final int length = b.length;
     if (length > Registry.SASL_TWO_BYTE_MAX_LIMIT)
-      {
         throw new SaslEncodingException("SASL multi-precision integer too long");
-      }
-    byte[] lengthBytes = { (byte) (length >>> 8), (byte) length };
+    byte[] lengthBytes = { (byte)(length >>> 8), (byte) length };
     out.write(lengthBytes);
     out.write(b);
   }
 
   /**
-   * <p>Encodes a SASL Text to the current buffer.</p>
+   * Encodes a SASL Text to the current buffer.
    *
    * @param str the Text element.
    * @throws SaslEncodingException if an encoding size constraint is violated.
@@ -179,17 +157,15 @@ public class OutputBuffer
     byte[] b = str.getBytes("UTF8");
     final int length = b.length;
     if (length > Registry.SASL_TWO_BYTE_MAX_LIMIT)
-      {
         throw new SaslEncodingException("SASL text too long");
-      }
-    byte[] lengthBytes = { (byte) (length >>> 8), (byte) length };
+    byte[] lengthBytes = { (byte)(length >>> 8), (byte) length };
     out.write(lengthBytes);
     out.write(b);
   }
 
   /**
-   * <p>Returns the encoded form of the current buffer including the 4-byte
-   * length header.</p>
+   * Returns the encoded form of the current buffer including the 4-byte length
+   * header.
    *
    * @throws SaslEncodingException if an encoding size constraint is violated.
    */
@@ -198,18 +174,17 @@ public class OutputBuffer
     byte[] buffer = wrap();
     final int length = buffer.length;
     byte[] result = new byte[length + 4];
-    result[0] = (byte) (length >>> 24);
-    result[1] = (byte) (length >>> 16);
-    result[2] = (byte) (length >>> 8);
+    result[0] = (byte)(length >>> 24);
+    result[1] = (byte)(length >>> 16);
+    result[2] = (byte)(length >>> 8);
     result[3] = (byte) length;
     System.arraycopy(buffer, 0, result, 4, length);
-
     return result;
   }
 
   /**
-   * <p>Returns the encoded form of the current buffer excluding the 4-byte
-   * length header.</p>
+   * Returns the encoded form of the current buffer excluding the 4-byte length
+   * header.
    *
    * @throws SaslEncodingException if an encoding size constraint is violated.
    */
@@ -217,9 +192,7 @@ public class OutputBuffer
   {
     final int length = out.size();
     if (length > Registry.SASL_BUFFER_MAX_LIMIT || length < 0)
-      {
         throw new SaslEncodingException("SASL buffer too long");
-      }
     return out.toByteArray();
   }
 }
