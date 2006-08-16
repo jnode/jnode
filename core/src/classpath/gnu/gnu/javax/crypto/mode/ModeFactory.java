@@ -49,16 +49,12 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * <p>A <i>Factory</i> to instantiate block cipher modes of operations.</p>
+ * A <i>Factory</i> to instantiate block cipher modes of operations.
  */
-public class ModeFactory implements Registry
+public class ModeFactory
+    implements Registry
 {
-
-  // Constants and variables
-  // -------------------------------------------------------------------------
-
-  // Constructor(s)
-  // -------------------------------------------------------------------------
+  private static Set names;
 
   /** Trivial constructor to enforce Singleton pattern. */
   private ModeFactory()
@@ -66,12 +62,9 @@ public class ModeFactory implements Registry
     super();
   }
 
-  // Class methods
-  // -------------------------------------------------------------------------
-
   /**
-   * <p>Returns an instance of a block cipher mode of operations given its name
-   * and characteristics of the underlying block cipher.</p>
+   * Returns an instance of a block cipher mode of operations given its name and
+   * characteristics of the underlying block cipher.
    *
    * @param mode the case-insensitive name of the mode of operations.
    * @param cipher the case-insensitive name of the block cipher.
@@ -85,18 +78,13 @@ public class ModeFactory implements Registry
                                   int cipherBlockSize)
   {
     if (mode == null || cipher == null)
-      {
         return null;
-      }
 
     mode = mode.trim();
     cipher = cipher.trim();
-
     IBlockCipher cipherImpl = CipherFactory.getInstance(cipher);
     if (cipherImpl == null)
-      {
         return null;
-      }
 
     return getInstance(mode, cipherImpl, cipherBlockSize);
   }
@@ -110,59 +98,36 @@ public class ModeFactory implements Registry
       {
         ok = (cipherBlockSize == ((Integer) it.next()).intValue());
         if (ok)
-          {
             break;
           }
-      }
-
-    if (!ok)
-      {
+    if (! ok)
         throw new IllegalArgumentException("cipherBlockSize");
-      }
-
     IMode result = null;
     if (mode.equalsIgnoreCase(ECB_MODE))
-      {
         result = new ECB(cipher, cipherBlockSize);
-      }
     else if (mode.equalsIgnoreCase(CTR_MODE))
-      {
         result = new CTR(cipher, cipherBlockSize);
-      }
     else if (mode.equalsIgnoreCase(ICM_MODE))
-      {
         result = new ICM(cipher, cipherBlockSize);
-      }
     else if (mode.equalsIgnoreCase(OFB_MODE))
-      {
         result = new OFB(cipher, cipherBlockSize);
-      }
     else if (mode.equalsIgnoreCase(CBC_MODE))
-      {
         result = new CBC(cipher, cipherBlockSize);
-      }
     else if (mode.equalsIgnoreCase(CFB_MODE))
-      {
         result = new CFB(cipher, cipherBlockSize);
-      }
     else if (mode.equalsIgnoreCase(EAX_MODE))
-      {
         result = new EAX(cipher, cipherBlockSize);
-      }
 
-    if (result != null && !result.selfTest())
-      {
+    if (result != null && ! result.selfTest())
         throw new InternalError(result.name());
-      }
 
     return result;
   }
 
   /**
-   * <p>Returns a {@link java.util.Set} of names of mode supported by this
-   * <i>Factory</i>.</p>
+   * Returns a {@link Set} of names of mode supported by this <i>Factory</i>.
    *
-   * @return a {@link java.util.Set} of mode names (Strings).
+   * @return a {@link Set} of mode names (Strings).
    */
   public static final Set getNames()
   {
@@ -178,15 +143,9 @@ public class ModeFactory implements Registry
             hs.add(CBC_MODE);
             hs.add(CFB_MODE);
             hs.add(EAX_MODE);
-
             names = Collections.unmodifiableSet(hs);
           }
       }
     return names;
   }
-
-  private static Set names;
-
-  // Instance methods
-  // -------------------------------------------------------------------------
 }
