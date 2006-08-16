@@ -38,6 +38,7 @@ exception statement from your version.  */
 
 package gnu.javax.crypto.jce.keyring;
 
+import gnu.java.security.Configuration;
 import gnu.java.security.Registry;
 import gnu.javax.crypto.keyring.GnuPrivateKeyring;
 import gnu.javax.crypto.keyring.GnuPublicKeyring;
@@ -90,6 +91,8 @@ public class GnuKeyring
 
   public Enumeration engineAliases()
   {
+    if (Configuration.DEBUG)
+      log.entering(this.getClass().getName(), "engineAliases");
     ensureLoaded();
     Enumeration result;
     if (privateKR == null)
@@ -101,33 +104,52 @@ public class GnuKeyring
           {
               String alias = (String) e.nextElement();
               if (alias != null)
+              {
+                alias = alias.trim();
+                if (alias.length() > 0)
+                  {
+                    if (Configuration.DEBUG)
+                      log.fine("Adding alias (from private keyring): " + alias);
                 aliases.add(alias);
           }
-
+              }
+          }
           for (Enumeration e = publicKR.aliases(); e.hasMoreElements();)
           {
               String alias = (String) e.nextElement();
               if (alias != null)
+              {
+                alias = alias.trim();
+                if (alias.length() > 0)
+                  {
+                    if (Configuration.DEBUG)
+                      log.fine("Adding alias (from public keyring): " + alias);
                 aliases.add(alias);
           }
-
+              }
+          }
+        if (Configuration.DEBUG)
+          log.fine("Will enumerate: " + aliases);
           result = Collections.enumeration(aliases);
       }
-
+    if (Configuration.DEBUG)
+      log.exiting(this.getClass().getName(), "engineAliases");
     return result;
   }
 
   public boolean engineContainsAlias(String alias)
   {
+    if (Configuration.DEBUG)
     log.entering(this.getClass().getName(), "engineContainsAlias", alias);
-
     ensureLoaded();
     boolean inPrivateKR = privateKR.containsAlias(alias);
-    log.finest("inPrivateKR=" + inPrivateKR);
+    if (Configuration.DEBUG)
+      log.fine("inPrivateKR=" + inPrivateKR);
     boolean inPublicKR = publicKR.containsAlias(alias);
-    log.finest("inPublicKR=" + inPublicKR);
+    if (Configuration.DEBUG)
+      log.fine("inPublicKR=" + inPublicKR);
     boolean result = inPrivateKR || inPublicKR;
-
+    if (Configuration.DEBUG)
     log.exiting(this.getClass().getName(), "engineContainsAlias",
                 Boolean.valueOf(result));
     return result;
@@ -135,34 +157,34 @@ public class GnuKeyring
 
   public void engineDeleteEntry(String alias)
   {
+    if (Configuration.DEBUG)
     log.entering(this.getClass().getName(), "engineDeleteEntry", alias);
-
     ensureLoaded();
     if (privateKR.containsAlias(alias))
       privateKR.remove(alias);
     else if (publicKR.containsAlias(alias))
       publicKR.remove(alias);
-    else
-      log.finer("Unknwon alias: " + alias);
-
+    else if (Configuration.DEBUG)
+      log.fine("Unknwon alias: " + alias);
+    if (Configuration.DEBUG)
     log.exiting(this.getClass().getName(), "engineDeleteEntry");
   }
 
   public Certificate engineGetCertificate(String alias)
   {
+    if (Configuration.DEBUG)
     log.entering(this.getClass().getName(), "engineGetCertificate", alias);
-
     ensureLoaded();
     Certificate result = publicKR.getCertificate(alias);
-
+    if (Configuration.DEBUG)
     log.exiting(this.getClass().getName(), "engineGetCertificate", result);
     return result;
   }
 
   public String engineGetCertificateAlias(Certificate cert)
   {
+    if (Configuration.DEBUG)
     log.entering(this.getClass().getName(), "engineGetCertificateAlias", cert);
-
     ensureLoaded();
     String result = null;
     for (Enumeration aliases = publicKR.aliases(); aliases.hasMoreElements();)
@@ -175,42 +197,55 @@ public class GnuKeyring
             break;
           }
       }
-
+    if (Configuration.DEBUG)
     log.exiting(this.getClass().getName(), "engineGetCertificateAlias", result);
     return result;
   }
 
   public void engineSetCertificateEntry(String alias, Certificate cert)
+      throws KeyStoreException
   {
+    if (Configuration.DEBUG)
     log.entering(this.getClass().getName(), "engineSetCertificateEntry",
                  new Object[] { alias, cert });
-
     ensureLoaded();
+    if (privateKR.containsAlias(alias))
+      throw new KeyStoreException("Alias [" + alias
+                                  + "] already exists and DOES NOT identify a "
+                                  + "Trusted Certificate Entry");
+    if (publicKR.containsCertificate(alias))
+      {
+        if (Configuration.DEBUG)
+          log.fine("Public keyring already contains Alias [" + alias
+                   + "]. Will remove it");
+        publicKR.remove(alias);
+      }
     publicKR.putCertificate(alias, cert);
-
+    if (Configuration.DEBUG)
     log.exiting(this.getClass().getName(), "engineSetCertificateEntry");
   }
 
   public Certificate[] engineGetCertificateChain(String alias)
   {
+    if (Configuration.DEBUG)
     log.entering(this.getClass().getName(), "engineGetCertificateChain", alias);
-
     ensureLoaded();
     Certificate[] result = privateKR.getCertPath(alias);
-
+    if (Configuration.DEBUG)
     log.exiting(this.getClass().getName(), "engineGetCertificateChain", result);
     return result;
   }
 
   public Date engineGetCreationDate(String alias)
   {
+    if (Configuration.DEBUG)
     log.entering(this.getClass().getName(), "engineGetCreationDate", alias);
-
     ensureLoaded();
     Date result = getCreationDate(alias, privateKR);
     if (result == null)
       result = getCreationDate(alias, publicKR);
 
+    if (Configuration.DEBUG)
     log.exiting(this.getClass().getName(), "engineGetCreationDate", result);
     return result;
   }
@@ -218,9 +253,8 @@ public class GnuKeyring
   public Key engineGetKey(String alias, char[] password)
       throws UnrecoverableKeyException
   {
-    log.entering(this.getClass().getName(), "engineGetKey",
-                 String.valueOf(password));
-
+    if (Configuration.DEBUG)
+      log.entering(this.getClass().getName(), "engineGetKey", alias);
     ensureLoaded();
     Key result = null;
     if (password == null)
@@ -231,7 +265,9 @@ public class GnuKeyring
     else if (privateKR.containsPrivateKey(alias))
       result = privateKR.getPrivateKey(alias, password); 
 
-    log.exiting(this.getClass().getName(), "engineGetKey", result);
+    if (Configuration.DEBUG)
+      log.exiting(this.getClass().getName(), "engineGetKey",
+                  result == null ? "null" : result.getClass().getName());
     return result;
   }
 
@@ -239,21 +275,32 @@ public class GnuKeyring
                                 Certificate[] chain)
       throws KeyStoreException
       {
+    if (Configuration.DEBUG)
     log.entering(this.getClass().getName(), "engineSetKeyEntry",
-                 new Object[] { alias, key, password, chain });
+                   new Object[] { alias, key.getClass().getName(), chain });
     ensureLoaded();
+    if (publicKR.containsAlias(alias))
+      throw new KeyStoreException("Alias [" + alias
+                                  + "] already exists and DOES NOT identify a "
+                                  + "Key Entry");
     if (key instanceof PublicKey)
-      privateKR.putPublicKey(alias, (PublicKey) key);
+      {
+        privateKR.remove(alias);
+        PublicKey pk = (PublicKey) key;
+        privateKR.putPublicKey(alias, pk);
+      }
     else
       {
         if (! (key instanceof PrivateKey) && ! (key instanceof SecretKey))
         throw new KeyStoreException("cannot store keys of type "
                                     + key.getClass().getName());
+        privateKR.remove(alias);
         privateKR.putCertPath(alias, chain);
-        log.finest("About to put private key in keyring...");
+        if (Configuration.DEBUG)
+          log.fine("About to put private key in keyring...");
         privateKR.putPrivateKey(alias, key, password);
       }
-
+    if (Configuration.DEBUG)
     log.exiting(this.getClass().getName(), "engineSetKeyEntry");
   }
 
@@ -261,17 +308,18 @@ public class GnuKeyring
       throws KeyStoreException
   {
     KeyStoreException x = new KeyStoreException("method not supported");
+    if (Configuration.DEBUG)
     log.throwing(this.getClass().getName(), "engineSetKeyEntry(3)", x);
     throw x;
   }
 
   public boolean engineIsCertificateEntry(String alias)
   {
+    if (Configuration.DEBUG)
     log.entering(this.getClass().getName(), "engineIsCertificateEntry", alias);
-
     ensureLoaded();
     boolean result = publicKR.containsCertificate(alias);
-
+    if (Configuration.DEBUG)
     log.exiting(this.getClass().getName(), "engineIsCertificateEntry",
                 Boolean.valueOf(result));
     return result;
@@ -279,12 +327,12 @@ public class GnuKeyring
 
   public boolean engineIsKeyEntry(String alias)
   {
+    if (Configuration.DEBUG)
     log.entering(this.getClass().getName(), "engineIsKeyEntry", alias);
-
     ensureLoaded();
     boolean result = privateKR.containsPublicKey(alias)
                   || privateKR.containsPrivateKey(alias);
-
+    if (Configuration.DEBUG)
     log.exiting(this.getClass().getName(), "engineIsKeyEntry",
                 Boolean.valueOf(result));
     return result;
@@ -292,7 +340,8 @@ public class GnuKeyring
 
   public void engineLoad(InputStream in, char[] password) throws IOException
       {
-    log.entering(this.getClass().getName(), "engineLoad", String.valueOf(password));
+    if (Configuration.DEBUG)
+      log.entering(this.getClass().getName(), "engineLoad");
     if (in != null)
       {
         if (! in.markSupported())
@@ -305,14 +354,14 @@ public class GnuKeyring
       createNewKeyrings();
 
     loaded = true;
-
+    if (Configuration.DEBUG)
     log.exiting(this.getClass().getName(), "engineLoad");
   }
 
   public void engineStore(OutputStream out, char[] password) throws IOException
       {
-    log.entering(this.getClass().getName(), "engineStore", String.valueOf(password));
-
+    if (Configuration.DEBUG)
+      log.entering(this.getClass().getName(), "engineStore");
     ensureLoaded();
     HashMap attr = new HashMap();
     attr.put(IKeyring.KEYRING_DATA_OUT, out);
@@ -320,14 +369,21 @@ public class GnuKeyring
 
     privateKR.store(attr);
     publicKR.store(attr);
-
+    if (Configuration.DEBUG)
     log.exiting(this.getClass().getName(), "engineStore");
   }
 
   public int engineSize()
           {
-    ensureLoaded();
-    return privateKR.size() + publicKR.size();
+    if (Configuration.DEBUG)
+      log.entering(this.getClass().getName(), "engineSize");
+    int result = 0;
+    for (Enumeration e = engineAliases(); e.hasMoreElements(); result++)
+      e.nextElement();
+
+    if (Configuration.DEBUG)
+      log.exiting(this.getClass().getName(), "engineSize", Integer.valueOf(result));
+    return result;
           }
 
   /**
@@ -353,8 +409,8 @@ public class GnuKeyring
   private void loadPrivateKeyring(InputStream in, char[] password)
       throws MalformedKeyringException, IOException
   {
+    if (Configuration.DEBUG)
     log.entering(this.getClass().getName(), "loadPrivateKeyring");
-
         in.mark(5);
         for (int i = 0; i < 4; i++)
           if (in.read() != Registry.GKR_MAGIC[i])
@@ -363,14 +419,15 @@ public class GnuKeyring
         int usage = in.read();
         in.reset();
     if (usage != GnuPrivateKeyring.USAGE)
-      throw new MalformedKeyringException("Was expecting a private keyring but got a wrong USAGE: "
+      throw new MalformedKeyringException(
+          "Was expecting a private keyring but got a wrong USAGE: "
                                           + Integer.toBinaryString(usage));
         HashMap attr = new HashMap();
         attr.put(IKeyring.KEYRING_DATA_IN, in);
         attr.put(IKeyring.KEYRING_PASSWORD, password);
     privateKR = new GnuPrivateKeyring();
     privateKR.load(attr);
-
+    if (Configuration.DEBUG)
     log.exiting(this.getClass().getName(), "loadPrivateKeyring");
   }
 
@@ -385,8 +442,8 @@ public class GnuKeyring
   private void loadPublicKeyring(InputStream in, char[] password)
       throws MalformedKeyringException, IOException
       {
+    if (Configuration.DEBUG)
     log.entering(this.getClass().getName(), "loadPublicKeyring");
-
     in.mark(5);
     for (int i = 0; i < 4; i++)
       if (in.read() != Registry.GKR_MAGIC[i])
@@ -395,14 +452,15 @@ public class GnuKeyring
     int usage = in.read();
     in.reset();
     if (usage != GnuPublicKeyring.USAGE)
-      throw new MalformedKeyringException("Was expecting a public keyring but got a wrong USAGE: "
+      throw new MalformedKeyringException(
+          "Was expecting a public keyring but got a wrong USAGE: "
                                           + Integer.toBinaryString(usage));
     HashMap attr = new HashMap();
     attr.put(IKeyring.KEYRING_DATA_IN, in);
     attr.put(IKeyring.KEYRING_PASSWORD, password);
     publicKR = new GnuPublicKeyring();
     publicKR.load(attr);
-
+    if (Configuration.DEBUG)
     log.exiting(this.getClass().getName(), "loadPublicKeyring");
   }
 
@@ -417,9 +475,9 @@ public class GnuKeyring
    */
   private Date getCreationDate(String alias, IKeyring keyring)
   {
+    if (Configuration.DEBUG)
     log.entering(this.getClass().getName(), "getCreationDate",
                  new Object[] { alias, keyring });
-
     Date result = null;
     if (keyring != null)
       for (Iterator it = keyring.get(alias).iterator(); it.hasNext();)
@@ -431,7 +489,7 @@ public class GnuKeyring
               break;
       }
       }
-
+    if (Configuration.DEBUG)
     log.exiting(this.getClass().getName(), "getCreationDate", result);
     return result;
   }
@@ -439,11 +497,11 @@ public class GnuKeyring
   /** Create empty keyrings. */
   private void createNewKeyrings()
   {
+    if (Configuration.DEBUG)
     log.entering(this.getClass().getName(), "createNewKeyrings");
-
     privateKR = new GnuPrivateKeyring("HMAC-SHA-1", 20, "AES", "OFB", 16);
     publicKR = new GnuPublicKeyring("HMAC-SHA-1", 20);
-
+    if (Configuration.DEBUG)
     log.exiting(this.getClass().getName(), "createNewKeyrings");
   }
 }
