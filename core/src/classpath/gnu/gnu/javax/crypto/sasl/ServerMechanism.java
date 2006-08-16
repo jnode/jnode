@@ -45,50 +45,35 @@ import java.util.Map;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.sasl.Sasl;
-import javax.security.sasl.SaslServer;
 import javax.security.sasl.SaslException;
+import javax.security.sasl.SaslServer;
 
 /**
- * <p>A base class to facilitate implementing SASL server-side mechanisms.</p>
+ * A base class to facilitate implementing SASL server-side mechanisms.
  */
-public abstract class ServerMechanism implements SaslServer
+public abstract class ServerMechanism
+    implements SaslServer
 {
-
-  // Constants and variables
-  // -------------------------------------------------------------------------
-
   /** Name of this mechanism. */
   protected String mechanism;
-
   /** Name of protocol using this mechanism. */
   protected String protocol;
-
   /** Name of server to authenticate to. */
   protected String serverName;
-
   /** Properties of qualities desired for this mechanism. */
   protected Map properties;
-
   /** Callback handler to use with this mechanism instance. */
   protected CallbackHandler handler;
-
   /** Whether authentication phase is completed (true) or not (false). */
   protected boolean complete = false;
-
   /** The authorisation identity. */
   protected String authorizationID;
-
   /** Channel binding data to use with this mechanism instance. */
   protected byte[] channelBinding;
-
   /** The state of the authentication automaton. -1 means uninitialised. */
   protected int state = -1;
-
   /** The provider for authentication information. */
   protected IAuthInfoProvider authenticator;
-
-  // Constructor(s)
-  // -------------------------------------------------------------------------
 
   protected ServerMechanism(final String mechanism)
   {
@@ -99,19 +84,9 @@ public abstract class ServerMechanism implements SaslServer
     this.state = -1;
   }
 
-  // Class methods
-  // -------------------------------------------------------------------------
-
-  // Instance methods
-  // -------------------------------------------------------------------------
-
-  // abstract methods to be implemented by concrete subclasses ---------------
-
   protected abstract void initMechanism() throws SaslException;
 
   protected abstract void resetMechanism() throws SaslException;
-
-  // javax.security.sasl.SaslServer interface implementation -----------------
 
   public abstract byte[] evaluateResponse(byte[] response) throws SaslException;
 
@@ -123,20 +98,16 @@ public abstract class ServerMechanism implements SaslServer
   public byte[] unwrap(final byte[] incoming, final int offset, final int len)
       throws SaslException
   {
-    if (!isComplete())
-      {
+    if (! isComplete())
         throw new IllegalMechanismStateException();
-      }
     return this.engineUnwrap(incoming, offset, len);
   }
 
   public byte[] wrap(final byte[] outgoing, final int offset, final int len)
       throws SaslException
   {
-    if (!isComplete())
-      {
+    if (! isComplete())
         throw new IllegalMechanismStateException();
-      }
     return this.engineWrap(outgoing, offset, len);
   }
 
@@ -152,58 +123,32 @@ public abstract class ServerMechanism implements SaslServer
 
   public Object getNegotiatedProperty(final String propName)
   {
-    if (!isComplete())
-      {
+    if (! isComplete())
         throw new IllegalStateException();
-      }
     if (Sasl.QOP.equals(propName))
-      {
         return getNegotiatedQOP();
-      }
     if (Sasl.STRENGTH.equals(propName))
-      {
         return getNegotiatedStrength();
-      }
     if (Sasl.SERVER_AUTH.equals(propName))
-      {
         return getNegotiatedServerAuth();
-      }
     if (Sasl.MAX_BUFFER.equals(propName))
-      {
         return getNegotiatedMaxBuffer();
-      }
     if (Sasl.RAW_SEND_SIZE.equals(propName))
-      {
         return getNegotiatedRawSendSize();
-      }
     if (Sasl.POLICY_NOPLAINTEXT.equals(propName))
-      {
         return getNegotiatedPolicyNoPlainText();
-      }
     if (Sasl.POLICY_NOACTIVE.equals(propName))
-      {
         return getNegotiatedPolicyNoActive();
-      }
     if (Sasl.POLICY_NODICTIONARY.equals(propName))
-      {
         return getNegotiatedPolicyNoDictionary();
-      }
     if (Sasl.POLICY_NOANONYMOUS.equals(propName))
-      {
         return getNegotiatedPolicyNoAnonymous();
-      }
     if (Sasl.POLICY_FORWARD_SECRECY.equals(propName))
-      {
         return getNegotiatedPolicyForwardSecrecy();
-      }
     if (Sasl.POLICY_PASS_CREDENTIALS.equals(propName))
-      {
         return getNegotiatedPolicyPassCredentials();
-      }
     if (Sasl.REUSE.equals(propName))
-      {
         return getReuse();
-      }
     return null;
   }
 
@@ -211,8 +156,6 @@ public abstract class ServerMechanism implements SaslServer
   {
     reset();
   }
-
-  // other Instance methods --------------------------------------------------
 
   protected String getNegotiatedQOP()
   {
@@ -291,8 +234,8 @@ public abstract class ServerMechanism implements SaslServer
   }
 
   /**
-   * <p>Initialises the mechanism with designated attributes. Permissible names
-   * and values are mechanism specific.</p>
+   * Initialises the mechanism with designated attributes. Permissible names and
+   * values are mechanism specific.
    *
    * @param attributes a set of name-value pairs that describes the desired
    * future behaviour of this instance.
@@ -303,18 +246,11 @@ public abstract class ServerMechanism implements SaslServer
   public void init(final Map attributes) throws SaslException
   {
     if (state != -1)
-      {
         throw new IllegalMechanismStateException("init()");
-      }
-
     if (properties == null)
-      {
         properties = new HashMap();
-      }
     else
-      {
         properties.clear();
-      }
     if (attributes != null)
       {
         protocol = (String) attributes.get(Registry.SASL_PROTOCOL);
@@ -324,34 +260,23 @@ public abstract class ServerMechanism implements SaslServer
         properties.putAll(attributes);
       }
     else
-      {
         handler = null;
-      }
-
     if (protocol == null)
-      {
         protocol = "";
-      }
     if (serverName == null)
-      {
         serverName = "";
-      }
     if (authenticator != null)
-      {
         authenticator.activate(properties);
-      }
     if (channelBinding == null)
-      {
         channelBinding = new byte[0];
-      }
     initMechanism();
     complete = false;
     state = 0;
   }
 
   /**
-   * <p>Resets the mechanism instance for re-initialisation and use with other
-   * characteristics.</p>
+   * Resets the mechanism instance for re-initialisation and use with other
+   * characteristics.
    *
    * @throws SaslException if an exception occurs during the process.
    */
@@ -360,9 +285,7 @@ public abstract class ServerMechanism implements SaslServer
     resetMechanism();
     properties.clear();
     if (authenticator != null)
-      {
         authenticator.passivate();
-      }
     protocol = serverName = null;
     channelBinding = null;
     complete = false;

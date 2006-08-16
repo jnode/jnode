@@ -44,9 +44,9 @@ import javax.security.sasl.SaslException;
  * A checked exception thrown to indicate that a designated user is already
  * known to the the authentication layer.
  */
-public class UserAlreadyExistsException extends SaslException
+public class UserAlreadyExistsException
+    extends SaslException
 {
-
   /**
    * Constructs a <code>UserAlreadyExistsException</code> with no detail
    * message.
