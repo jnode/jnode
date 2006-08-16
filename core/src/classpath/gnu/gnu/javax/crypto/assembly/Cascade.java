@@ -49,23 +49,22 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * <p>A <i>Cascade</i> Cipher is the concatenation of two or more block ciphers
+ * A <i>Cascade</i> Cipher is the concatenation of two or more block ciphers
  * each with independent keys. Plaintext is input to the first stage; the output
- * of stage <code>i</code> is input to stage <code>i + 1</code>; and the output
- * of the last stage is the <i>Cascade</i>'s ciphertext output.</p>
- *
- * <p>In the simplest case, all stages in a <code>Cascade</code> have <i>k</i>-bit
+ * of stage <code>i</code> is input to stage <code>i + 1</code>; and the
+ * output of the last stage is the <i>Cascade</i>'s ciphertext output.
+ * <p>
+ * In the simplest case, all stages in a <code>Cascade</code> have <i>k</i>-bit
  * keys, and the stage inputs and outputs are all n-bit quantities. The stage
  * ciphers may differ (general cascade of ciphers), or all be identical (cascade
- * of identical ciphers).</p>
- *
- * <p>The term "block ciphers" used above refers to implementations of
- * {@link gnu.crypto.mode.IMode}, including the {@link gnu.crypto.mode.ECB}
- * mode which basically exposes a symmetric-key block cipher algorithm as a
- * <i>Mode</i> of Operations.</p>
- *
- * <p>References:</p>
- *
+ * of identical ciphers).
+ * <p>
+ * The term "block ciphers" used above refers to implementations of
+ * {@link gnu.javax.crypto.mode.IMode}, including the
+ * {@link gnu.javax.crypto.mode.ECB} mode which basically exposes a
+ * symmetric-key block cipher algorithm as a <i>Mode</i> of Operations.
+ * <p>
+ * References:
  * <ol>
  *    <li><a href="http://www.cacr.math.uwaterloo.ca/hac">[HAC]</a>: Handbook of
  *    Applied Cryptography.<br>
@@ -75,10 +74,6 @@ import java.util.Set;
  */
 public class Cascade
 {
-
-  // Constants and variables
-  // -------------------------------------------------------------------------
-
   public static final String DIRECTION = "gnu.crypto.assembly.cascade.direction";
 
   /** The map of Stages chained in this cascade. */
@@ -93,9 +88,6 @@ public class Cascade
   /** The curently set block-size for this instance. */
   protected int blockSize;
 
-  // Constructor(s)
-  // -------------------------------------------------------------------------
-
   public Cascade()
   {
     super();
@@ -105,9 +97,6 @@ public class Cascade
     wired = null;
     blockSize = 0;
   }
-
-  // Class methods
-  // -------------------------------------------------------------------------
 
   /**
    * Returns the Least Common Multiple of two integers.
@@ -123,17 +112,14 @@ public class Cascade
     return A.multiply(B).divide(A.gcd(B)).abs().intValue();
   }
 
-  // Instance methods
-  // -------------------------------------------------------------------------
-
   /**
    * Adds to the end of the current chain, a designated {@link Stage}.
    *
    * @param stage the {@link Stage} to append to the chain.
    * @return a unique identifier for this stage, within this cascade.
    * @throws IllegalStateException if the instance is already initialised.
-   * @throws IllegalArgumentException if the designated stage is already in
-   * the chain, or it has incompatible characteristics with the current
+   * @throws IllegalArgumentException if the designated stage is already in the
+   *           chain, or it has incompatible characteristics with the current
    * elements already in the chain.
    */
   public Object append(Stage stage) throws IllegalArgumentException
@@ -147,8 +133,8 @@ public class Cascade
    * @param stage the {@link Stage} to prepend to the chain.
    * @return a unique identifier for this stage, within this cascade.
    * @throws IllegalStateException if the instance is already initialised.
-   * @throws IllegalArgumentException if the designated stage is already in
-   * the chain, or it has incompatible characteristics with the current
+   * @throws IllegalArgumentException if the designated stage is already in the
+   *           chain, or it has incompatible characteristics with the current
    * elements already in the chain.
    */
   public Object prepend(Stage stage) throws IllegalArgumentException
@@ -162,53 +148,40 @@ public class Cascade
    *
    * @param stage the {@link Stage} to insert into the chain.
    * @return a unique identifier for this stage, within this cascade.
-   * @throws IllegalArgumentException if the designated stage is already in
-   * the chain, or it has incompatible characteristics with the current
+   * @throws IllegalArgumentException if the designated stage is already in the
+   *           chain, or it has incompatible characteristics with the current
    * elements already in the chain.
    * @throws IllegalStateException if the instance is already initialised.
    * @throws IndexOutOfBoundsException if <code>index</code> is less than
-   * <code>0</code> or greater than the current size of this cascade.
+   *           <code>0</code> or greater than the current size of this
+   *           cascade.
    */
   public Object insert(int index, Stage stage) throws IllegalArgumentException,
       IndexOutOfBoundsException
   {
     if (stages.containsValue(stage))
-      {
         throw new IllegalArgumentException();
-      }
     if (wired != null || stage == null)
-      {
         throw new IllegalStateException();
-      }
-
     if (index < 0 || index > size())
-      {
         throw new IndexOutOfBoundsException();
-      }
-
     // check that there is a non-empty set of common block-sizes
     Set set = stage.blockSizes();
     if (stages.isEmpty())
       {
         if (set.isEmpty())
-          {
             throw new IllegalArgumentException("1st stage with no block sizes");
           }
-      }
     else
       {
         Set common = this.blockSizes();
         common.retainAll(set);
         if (common.isEmpty())
-          {
             throw new IllegalArgumentException("no common block sizes found");
           }
-      }
-
     Object result = new Object();
     stageKeys.add(index, result);
     stages.put(result, stage);
-
     return result;
   }
 
@@ -228,16 +201,14 @@ public class Cascade
    * Stage}.
    *
    * @return an {@link Iterator} over the stages contained in this instance.
-   * Each element of the returned iterator is a concrete instance of a {@link
-   * Stage}.
+   *         Each element of the returned iterator is a concrete instance of a
+   *         {@link Stage}.
    */
   public Iterator stages()
   {
     LinkedList result = new LinkedList();
     for (Iterator it = stageKeys.listIterator(); it.hasNext();)
-      {
         result.addLast(stages.get(it.next()));
-      }
     return result.listIterator();
   }
 
@@ -246,8 +217,8 @@ public class Cascade
    * <code>Cascade</code> that are common to all of its chained stages. Each
    * element in the returned {@link Set} is an instance of {@link Integer}.
    *
-   * @return a {@link Set} of supported block sizes common to all the stages
-   * of the chain.
+   * @return a {@link Set} of supported block sizes common to all the stages of
+   *         the chain.
    */
   public Set blockSizes()
   {
@@ -255,15 +226,11 @@ public class Cascade
     for (Iterator it = stages.values().iterator(); it.hasNext();)
       {
         Stage aStage = (Stage) it.next();
-        if (result == null)
-          { // first time
+        if (result == null) // first time
             result = new HashSet(aStage.blockSizes());
-          }
         else
-          {
             result.retainAll(aStage.blockSizes());
           }
-      }
     return result == null ? Collections.EMPTY_SET : result;
   }
 
@@ -282,15 +249,10 @@ public class Cascade
   public void init(Map attributes) throws InvalidKeyException
   {
     if (wired != null)
-      {
         throw new IllegalStateException();
-      }
     Direction flow = (Direction) attributes.get(DIRECTION);
     if (flow == null)
-      {
         flow = Direction.FORWARD;
-      }
-
     int optimalSize = 0;
     for (Iterator it = stageKeys.listIterator(); it.hasNext();)
       {
@@ -303,11 +265,8 @@ public class Cascade
                                       : lcm(optimalSize,
                                             stage.currentBlockSize());
       }
-
-    if (flow == Direction.REVERSED)
-      { // reverse order
+    if (flow == Direction.REVERSED) // reverse order
         Collections.reverse(stageKeys);
-      }
     wired = flow;
     blockSize = optimalSize;
   }
@@ -321,9 +280,7 @@ public class Cascade
   public int currentBlockSize()
   {
     if (wired == null)
-      {
         throw new IllegalStateException();
-      }
     return blockSize;
   }
 
@@ -334,21 +291,17 @@ public class Cascade
   public void reset()
   {
     for (Iterator it = stageKeys.listIterator(); it.hasNext();)
-      {
         ((Stage) stages.get(it.next())).reset();
-      }
-    if (wired == Direction.REVERSED)
-      { // reverse it back
+    if (wired == Direction.REVERSED) // reverse it back
         Collections.reverse(stageKeys);
-      }
     wired = null;
     blockSize = 0;
   }
 
   /**
    * Processes exactly one block of <i>plaintext</i> (if initialised in the
-   * {@link Direction#FORWARD} state) or <i>ciphertext</i> (if initialised in the
-   * {@link Direction#REVERSED} state).
+   * {@link Direction#FORWARD} state) or <i>ciphertext</i> (if initialised in
+   * the {@link Direction#REVERSED} state).
    *
    * @param in the plaintext.
    * @param inOffset index of <code>in</code> from which to start considering
@@ -360,25 +313,19 @@ public class Cascade
   public void update(byte[] in, int inOffset, byte[] out, int outOffset)
   {
     if (wired == null)
-      {
         throw new IllegalStateException();
-      }
     int stageBlockSize, j, i = stages.size();
     for (Iterator it = stageKeys.listIterator(); it.hasNext();)
       {
         Stage stage = (Stage) stages.get(it.next());
         stageBlockSize = stage.currentBlockSize();
         for (j = 0; j < blockSize; j += stageBlockSize)
-          {
             stage.update(in, inOffset + j, out, outOffset + j);
-          }
         i--;
         if (i > 0)
-          {
             System.arraycopy(out, outOffset, in, inOffset, blockSize);
           }
       }
-  }
 
   /**
    * Conducts a simple <i>correctness</i> test that consists of basic symmetric
@@ -393,11 +340,9 @@ public class Cascade
   {
     for (Iterator it = stageKeys.listIterator(); it.hasNext();)
       {
-        if (!((Stage) stages.get(it.next())).selfTest())
-          {
+        if (! ((Stage) stages.get(it.next())).selfTest())
             return false;
           }
-      }
     return true;
   }
 }
