@@ -43,16 +43,9 @@ package gnu.javax.crypto.sasl;
  */
 public interface IAuthInfoProviderFactory
 {
-
-  // Constants
-  // -------------------------------------------------------------------------
-
-  // Methods
-  // -------------------------------------------------------------------------
-
   /**
-   * Returns an implementation of a provider for a designated mechanism
-   * capable of honouring {@link IAuthInfoProvider} requests.
+   * Returns an implementation of a provider for a designated mechanism capable
+   * of honouring {@link IAuthInfoProvider} requests.
    *
    * @param mechanism the unique name of a mechanism.
    * @return an implementation of {@link IAuthInfoProvider} for that mechanism

@@ -47,9 +47,9 @@ import javax.security.sasl.AuthenticationException;
  * invoked on incomplete mechanisms was invoked but the authentication phase of
  * that mechanism was already completed.
  */
-public class IllegalMechanismStateException extends AuthenticationException
+public class IllegalMechanismStateException
+    extends AuthenticationException
 {
-
   /**
    * Constructs a new instance of <code>IllegalMechanismStateException</code>
    * with no detail message.
