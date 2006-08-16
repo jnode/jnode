@@ -38,55 +38,45 @@ exception statement from your version.  */
 
 package gnu.javax.crypto.keyring;
 
+import gnu.java.security.Configuration;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.logging.Logger;
 
 /**
- * An envelope entry is a generic container for some number of primitive
- * and other envelope entries.
+ * An envelope entry is a generic container for some number of primitive and
+ * other envelope entries.
  */
-public abstract class EnvelopeEntry extends Entry
+public abstract class EnvelopeEntry
+    extends Entry
 {
-
-  // Fields.
-  // ------------------------------------------------------------------------
-
+  private static final Logger log = Logger.getLogger(EnvelopeEntry.class.getName());
   /** The envelope that contains this one (if any). */
   protected EnvelopeEntry containingEnvelope;
-
   /** The contained entries. */
   protected List entries;
-
-  // Constructor.
-  // ------------------------------------------------------------------------
 
   public EnvelopeEntry(int type, Properties properties)
   {
     super(type, properties);
     entries = new LinkedList();
     if (this.properties.get("alias-list") != null)
-      {
         this.properties.remove("alias-list");
       }
-  }
 
   protected EnvelopeEntry(int type)
   {
     super(type);
     entries = new LinkedList();
   }
-
-  // Instance methods.
-  // ------------------------------------------------------------------------
 
   /**
    * Adds an entry to this envelope.
@@ -95,42 +85,50 @@ public abstract class EnvelopeEntry extends Entry
    */
   public void add(Entry entry)
   {
-    if (!containsEntry(entry))
+    if (Configuration.DEBUG)
+      log.entering(this.getClass().getName(), "add", entry);
+    if (! containsEntry(entry))
       {
         if (entry instanceof EnvelopeEntry)
-          {
             ((EnvelopeEntry) entry).setContainingEnvelope(this);
-          }
         entries.add(entry);
-        payload = null;
+        if (Configuration.DEBUG)
+          log.fine("Payload is " + (payload == null ? "" : "not ") + "null");
         makeAliasList();
       }
+    if (Configuration.DEBUG)
+      log.exiting(this.getClass().getName(), "add");
   }
 
   /**
-   * Tests if this envelope contains a primitive entry with the
-   * given alias.
+   * Tests if this envelope contains a primitive entry with the given alias.
    *
    * @param alias The alias to test.
-   * @return True if this envelope (or one of the contained envelopes)
-   *   contains a primitive entry with the given alias.
+   * @return True if this envelope (or one of the contained envelopes) contains
+   *         a primitive entry with the given alias.
    */
   public boolean containsAlias(String alias)
   {
+    if (Configuration.DEBUG)
+      log.entering(this.getClass().getName(), "containsAlias", alias);
     String aliases = getAliasList();
-    if (aliases == null)
+    if (Configuration.DEBUG)
+      log.fine("aliases = [" + aliases + "]");
+    boolean result = false;
+    if (aliases != null)
       {
-        return false;
-      }
     StringTokenizer tok = new StringTokenizer(aliases, ";");
     while (tok.hasMoreTokens())
-      {
         if (tok.nextToken().equals(alias))
           {
-            return true;
+              result = true;
+              break;
           }
       }
-    return false;
+    if (Configuration.DEBUG)
+      log.exiting(this.getClass().getName(), "containsAlias",
+                  Boolean.valueOf(result));
+    return result;
   }
 
   /**
@@ -142,11 +140,8 @@ public abstract class EnvelopeEntry extends Entry
   public boolean containsEntry(Entry entry)
   {
     if (entry instanceof EnvelopeEntry)
-      {
         return entries.contains(entry);
-      }
-    else if (entry instanceof PrimitiveEntry)
-      {
+    if (entry instanceof PrimitiveEntry)
         for (Iterator it = entries.iterator(); it.hasNext();)
           {
             Entry e = (Entry) it.next();
@@ -156,7 +151,6 @@ public abstract class EnvelopeEntry extends Entry
                 && ((EnvelopeEntry) e).containsEntry(entry))
               return true;
           }
-      }
     return false;
   }
 
@@ -171,49 +165,55 @@ public abstract class EnvelopeEntry extends Entry
   }
 
   /**
-   * Gets all primitive entries that have the given alias. If there
-   * are any masked entries that contain the given alias, they will
-   * be returned as well.
+   * Gets all primitive entries that have the given alias. If there are any
+   * masked entries that contain the given alias, they will be returned as well.
    *
    * @param alias The alias of the entries to get.
    * @return A list of all primitive entries that have the given alias.
    */
   public List get(String alias)
   {
+    if (Configuration.DEBUG)
+      log.entering(this.getClass().getName(), "get", alias);
     List result = new LinkedList();
     for (Iterator it = entries.iterator(); it.hasNext();)
       {
         Entry e = (Entry) it.next();
         if (e instanceof EnvelopeEntry)
           {
-            if (!((EnvelopeEntry) e).containsAlias(alias))
-              {
+            EnvelopeEntry ee = (EnvelopeEntry) e;
+            if (! ee.containsAlias(alias))
                 continue;
-              }
-            if (e instanceof MaskableEnvelopeEntry)
+            if (ee instanceof MaskableEnvelopeEntry)
               {
-                if (((MaskableEnvelopeEntry) e).isMasked())
+                MaskableEnvelopeEntry mee = (MaskableEnvelopeEntry) ee;
+                if (mee.isMasked())
                   {
-                    result.add(e);
+                    if (Configuration.DEBUG)
+                      log.fine("Processing masked entry: " + mee);
+                    result.add(mee);
                     continue;
                   }
               }
-            result.addAll(((EnvelopeEntry) e).get(alias));
+            if (Configuration.DEBUG)
+              log.fine("Processing unmasked entry: " + ee);
+            result.addAll(ee.get(alias));
           }
         else if (e instanceof PrimitiveEntry)
           {
-            if (((PrimitiveEntry) e).getAlias().equals(alias))
-              {
+            PrimitiveEntry pe = (PrimitiveEntry) e;
+            if (pe.getAlias().equals(alias))
                 result.add(e);
               }
           }
-      }
+    if (Configuration.DEBUG)
+      log.exiting(this.getClass().getName(), "get", result);
     return result;
   }
 
   /**
-   * Returns the list of all aliases contained by this envelope,
-   * separated by a semicolon (';').
+   * Returns the list of all aliases contained by this envelope, separated by a
+   * semicolon (';').
    *
    * @return The list of aliases.
    */
@@ -221,14 +221,10 @@ public abstract class EnvelopeEntry extends Entry
   {
     String list = properties.get("alias-list");
     if (list == null)
-      {
         return "";
-      }
     else
-      {
         return list;
       }
-  }
 
   /**
    * Removes the specified entry.
@@ -238,6 +234,8 @@ public abstract class EnvelopeEntry extends Entry
    */
   public boolean remove(Entry entry)
   {
+    if (Configuration.DEBUG)
+      log.entering(this.getClass().getName(), "remove", entry);
     boolean ret = false;
     for (Iterator it = entries.iterator(); it.hasNext();)
       {
@@ -268,9 +266,15 @@ public abstract class EnvelopeEntry extends Entry
       }
     if (ret)
       {
+        if (Configuration.DEBUG)
+          log.fine("State before: " + this);
         payload = null;
         makeAliasList();
+        if (Configuration.DEBUG)
+          log.fine("State after: " + this);
       }
+    if (Configuration.DEBUG)
+      log.exiting(this.getClass().getName(), "remove", Boolean.valueOf(ret));
     return ret;
   }
 
@@ -278,26 +282,55 @@ public abstract class EnvelopeEntry extends Entry
    * Removes all primitive entries that have the specified alias.
    *
    * @param alias The alias of the entries to remove.
+   * @return <code>true</code> if <code>alias</code> was present and was
+   *         successfully trmoved. Returns <code>false</code> if
+   *         <code>alias</code> was not present in the list of aliases in this
+   *         envelope.
    */
-  public void remove(String alias)
+  public boolean remove(String alias)
   {
+    if (Configuration.DEBUG)
+      log.entering(this.getClass().getName(), "remove", alias);
+    boolean result = false;
     for (Iterator it = entries.iterator(); it.hasNext();)
       {
         Entry e = (Entry) it.next();
         if (e instanceof EnvelopeEntry)
           {
-            ((EnvelopeEntry) e).remove(alias);
+            EnvelopeEntry ee = (EnvelopeEntry) e;
+            result = ee.remove(alias) || result;
           }
         else if (e instanceof PrimitiveEntry)
           {
-            if (((PrimitiveEntry) e).getAlias().equals(alias))
+            PrimitiveEntry pe = (PrimitiveEntry) e;
+            if (pe.getAlias().equals(alias))
               {
                 it.remove();
+                result = true;
               }
           }
       }
+    if (result)
+      {
+        if (Configuration.DEBUG)
+          log.fine("State before: " + this);
     payload = null;
     makeAliasList();
+        if (Configuration.DEBUG)
+          log.fine("State after: " + this);
+      }
+    if (Configuration.DEBUG)
+      log.exiting(this.getClass().getName(), "remove", Boolean.valueOf(result));
+    return result;
+  }
+
+  public String toString()
+  {
+    return new StringBuilder("Envelope{")
+        .append(super.toString())
+        .append(", entries=").append(entries)
+        .append("}")
+        .toString();
   }
 
   // Protected methods.
@@ -308,22 +341,19 @@ public abstract class EnvelopeEntry extends Entry
     ByteArrayOutputStream bout = new ByteArrayOutputStream(1024);
     DataOutputStream out = new DataOutputStream(bout);
     for (Iterator it = entries.iterator(); it.hasNext();)
-      {
         ((Entry) it.next()).encode(out);
       }
-  }
 
   protected void setContainingEnvelope(EnvelopeEntry e)
   {
     if (containingEnvelope != null)
-      {
         throw new IllegalArgumentException("envelopes may not be shared");
-      }
     containingEnvelope = e;
   }
 
   protected void decodeEnvelope(DataInputStream in) throws IOException
   {
+    this.entries.clear();
     while (true)
       {
         int type = in.read();
@@ -367,32 +397,43 @@ public abstract class EnvelopeEntry extends Entry
       }
   }
 
-  // Own methods.
-  // ------------------------------------------------------------------------
-
   private void makeAliasList()
   {
-    if (entries.isEmpty())
-      return;
-    StringBuffer buf = new StringBuffer();
+    if (Configuration.DEBUG)
+      log.entering(this.getClass().getName(), "makeAliasList");
+    if (! entries.isEmpty())
+      {
+        StringBuilder buf = new StringBuilder();
+        String aliasOrList;
     for (Iterator it = entries.iterator(); it.hasNext();)
       {
         Entry entry = (Entry) it.next();
+            aliasOrList = null;
         if (entry instanceof EnvelopeEntry)
-          {
-            buf.append(((EnvelopeEntry) entry).getAliasList());
-          }
+              aliasOrList = ((EnvelopeEntry) entry).getAliasList();
         else if (entry instanceof PrimitiveEntry)
+              aliasOrList = ((PrimitiveEntry) entry).getAlias();
+            else if (Configuration.DEBUG)
+              log.fine("Entry with no Alias. Ignored: " + entry);
+            if (aliasOrList != null)
           {
-            buf.append(((PrimitiveEntry) entry).getAlias());
-          }
+                aliasOrList = aliasOrList.trim();
+                if (aliasOrList.trim().length() > 0)
+                  {
+                    buf.append(aliasOrList);
         if (it.hasNext())
           buf.append(';');
       }
-    properties.put("alias-list", buf.toString());
+              }
+          }
+        String aliasList = buf.toString();
+        properties.put("alias-list", aliasList);
+        if (Configuration.DEBUG)
+          log.fine("alias-list=[" + aliasList + "]");
     if (containingEnvelope != null)
-      {
         containingEnvelope.makeAliasList();
       }
+    if (Configuration.DEBUG)
+      log.exiting(this.getClass().getName(), "makeAliasList");
   }
 }
