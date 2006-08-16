@@ -41,21 +41,15 @@ package gnu.javax.crypto.jce.spec;
 import java.security.spec.AlgorithmParameterSpec;
 
 /**
- * This class represents the parameters for the UMAC-32 message
- * authentication code algorithm. In practice this means the
- * <i>Nonce</i> material used to initialize the algorithm.
+ * This class represents the parameters for the UMAC-32 message authentication
+ * code algorithm. In practice this means the <i>Nonce</i> material used to
+ * initialize the algorithm.
  */
-public class UMac32ParameterSpec implements AlgorithmParameterSpec
+public class UMac32ParameterSpec
+    implements AlgorithmParameterSpec
 {
-
-  // Constants and variables.
-  // -----------------------------------------------------------------------
-
   /** The <i>Nonce</i> material. */
   protected byte[] nonce;
-
-  // Constructors.
-  // -----------------------------------------------------------------------
 
   /**
    * Create a new parameter instance.
@@ -66,9 +60,6 @@ public class UMac32ParameterSpec implements AlgorithmParameterSpec
   {
     this.nonce = nonce;
   }
-
-  // Instance methods.
-  // -----------------------------------------------------------------------
 
   /**
    * Return the nonce material.
