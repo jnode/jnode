@@ -41,8 +41,8 @@ import java.net.SocketAddress;
  */
 public class UDPOutputCommand  implements Command {
 
-  private static final URLArgument ARG_ADDRESS = new URLArgument(
-          "url", "connect url to the udpreceiver");
+  private static final InetAddressArgument ARG_ADDRESS = new InetAddressArgument(
+          "host", "connect host to the udpreceiver");
 
   private static final IntegerArgument ARG_PORT = new IntegerArgument(
           "port", "port to connect on");
@@ -74,7 +74,7 @@ public class UDPOutputCommand  implements Command {
       port = 5612;
     }
 
-    final SocketAddress address = new InetSocketAddress(ARG_ADDRESS.getURL(args).getHost(), port);
+    final SocketAddress address = new InetSocketAddress(ARG_ADDRESS.getAddress(args), port);
     UDPOutputStream udpOut = new UDPOutputStream(address);
 
     DupOutputStream dupOut = new DupOutputStream(System.out, udpOut);
