@@ -59,25 +59,15 @@ import java.util.StringTokenizer;
  */
 public class PasswordFile
 {
-
-  // Constants and variables
-  // -------------------------------------------------------------------------
-
   private static String DEFAULT_FILE;
   static
     {
       DEFAULT_FILE = System.getProperty(CramMD5Registry.PASSWORD_FILE,
                                         CramMD5Registry.DEFAULT_PASSWORD_FILE);
     }
-
   private HashMap entries;
-
   private File passwdFile;
-
   private long lastmod;
-
-  // Constructor(s)
-  // -------------------------------------------------------------------------
 
   public PasswordFile() throws IOException
   {
@@ -95,25 +85,14 @@ public class PasswordFile
     update();
   }
 
-  // Class methods
-  // -------------------------------------------------------------------------
-
-  // Instance methods
-  // -------------------------------------------------------------------------
-
   public synchronized void add(final String user, final String passwd,
                                final String[] attributes) throws IOException
   {
     checkCurrent(); // check if the entry exists
     if (entries.containsKey(user))
-      {
         throw new UserAlreadyExistsException(user);
-      }
     if (attributes.length != 5)
-      {
         throw new IllegalArgumentException("Wrong number of attributes");
-      }
-
     final String[] fields = new String[7]; // create the new entry
     fields[0] = user;
     fields[1] = passwd;
@@ -126,33 +105,26 @@ public class PasswordFile
       throws IOException
   {
     checkCurrent();
-    if (!entries.containsKey(user))
-      { // check if the entry exists
+    if (! entries.containsKey(user))
         throw new NoSuchUserException(user);
-      }
-
-    final String[] fields = (String[]) entries.get(user); // get the existing entry
+    final String[] fields = (String[]) entries.get(user); // get existing entry
     fields[1] = passwd; // modify the password field
     entries.remove(user); // delete the existing entry
     entries.put(user, fields); // add the new entry
-
     savePasswd();
   }
 
   public synchronized String[] lookup(final String user) throws IOException
   {
     checkCurrent();
-    if (!entries.containsKey(user))
-      {
+    if (! entries.containsKey(user))
         throw new NoSuchUserException(user);
-      }
     return (String[]) entries.get(user);
   }
 
   public synchronized boolean contains(final String s) throws IOException
   {
     checkCurrent();
-
     return entries.containsKey(s);
   }
 
@@ -165,10 +137,8 @@ public class PasswordFile
   private void checkCurrent() throws IOException
   {
     if (passwdFile.lastModified() > lastmod)
-      {
         update();
       }
-  }
 
   private synchronized void readPasswd(final InputStream in) throws IOException
   {
@@ -183,68 +153,39 @@ public class PasswordFile
           {
             fields[0] = st.nextToken(); // username
             st.nextToken();
-
             fields[1] = st.nextToken(); // passwd
             if (fields[1].equals(":"))
-              {
                 fields[1] = "";
-              }
             else
-              {
                 st.nextToken();
-              }
-
             fields[2] = st.nextToken(); // uid
             if (fields[2].equals(":"))
-              {
                 fields[2] = "";
-              }
             else
-              {
                 st.nextToken();
-              }
-
             fields[3] = st.nextToken(); // gid
             if (fields[3].equals(":"))
-              {
                 fields[3] = "";
-              }
             else
-              {
                 st.nextToken();
-              }
-
             fields[4] = st.nextToken(); // gecos
             if (fields[4].equals(":"))
-              {
                 fields[4] = "";
-              }
             else
-              {
                 st.nextToken();
-              }
-
             fields[5] = st.nextToken(); // dir
             if (fields[5].equals(":"))
-              {
                 fields[5] = "";
-              }
             else
-              {
                 st.nextToken();
-              }
-
             fields[6] = st.nextToken(); // shell
             if (fields[6].equals(":"))
-              {
                 fields[6] = "";
               }
-          }
         catch (NoSuchElementException x)
           {
             continue;
           }
-
         entries.put(fields[0], fields);
       }
   }
@@ -268,16 +209,13 @@ public class PasswordFile
                 fields = (String[]) entries.get(key);
                 sb = new StringBuffer(fields[0]);
                 for (i = 1; i < fields.length; i++)
-                  {
                     sb.append(":").append(fields[i]);
-                  }
                 pw.println(sb.toString());
               }
           }
         finally
           {
             if (pw != null)
-              {
                 try
                   {
                     pw.flush();
@@ -286,7 +224,6 @@ public class PasswordFile
                   {
                     pw.close();
                   }
-              }
             try
               {
                 fos.close();
