@@ -47,23 +47,23 @@ import gnu.javax.crypto.key.KeyAgreementException;
 import java.math.BigInteger;
 
 /**
- * <p>The ElGamal key agreement, also known as the half-certified Diffie-Hellman
+ * The ElGamal key agreement, also known as the half-certified Diffie-Hellman
  * key agreement, is described in the Handbook of Applied Cryptography [HAC] as
- * follows:</p>
+ * follows:
  * <ul>
  *    <li>A sends to B a single message allowing one-pass key agreement.</li>
- *    <li>A obtains an authentic copy of B's public key (p, g, yb), where
- *    yb = g**xb.</li>
+ * <li>A obtains an authentic copy of B's public key (p, g, yb), where yb =
+ * g**xb.</li>
  *    <li>A chooses a random integer x, 1 &lt;= x &lt;= p-2, and sends B the
  *    message g**x.  A computes the shared secret key K as yb**x.</li>
  *    <li>B computes the same key K on receipt of the previous message as
  *    (g**x)**xb.</li>
  * </ul>
- *
- * <p>RFC-2631 describes an <i>Ephemeral-Static Mode</i> of operations with
- * Diffie-Hellman keypairs as follows:</p>
+ * <p>
+ * RFC-2631 describes an <i>Ephemeral-Static Mode</i> of operations with
+ * Diffie-Hellman keypairs as follows:
  * <pre>
- * "In Ephemeral-Static mode, the recipient has a static (and certified)
+ *  &quot;In Ephemeral-Static mode, the recipient has a static (and certified)
  * key pair, but the sender generates a new key pair for each message
  * and sends it using the originatorKey production. If the sender's key
  * is freshly generated for each message, the shared secret ZZ will be
@@ -73,10 +73,10 @@ import java.math.BigInteger;
  * is used for multiple messages (e.g. it is cached as a performance
  * optimization) then a separate partyAInfo MUST be used for each
  * message. All implementations of this standard MUST implement
- * Ephemeral-Static mode."
+ *  Ephemeral-Static mode.&quot;
  * </pre>
- *
- * <p>Reference:</p>
+ * <p>
+ * Reference:
  * <ol>
  *    <li><a href="http://www.ietf.org/rfc/rfc2631.txt">Diffie-Hellman Key
  *    Agreement Method</a><br>
@@ -87,36 +87,21 @@ import java.math.BigInteger;
  *    Menezes, A., van Oorschot, P. and S. Vanstone.</li>
  * </ol>
  */
-public abstract class ElGamalKeyAgreement extends BaseKeyAgreementParty
+public abstract class ElGamalKeyAgreement
+    extends BaseKeyAgreementParty
 {
-
-  // Constants and variables
-  // -------------------------------------------------------------------------
-
   public static final String SOURCE_OF_RANDOMNESS = "gnu.crypto.elgamal.ka.prng";
-
-  public static final String KA_ELGAMAL_RECIPIENT_PRIVATE_KEY = "gnu.crypto.elgamal.ka.recipient.private.key";
-
-  public static final String KA_ELGAMAL_RECIPIENT_PUBLIC_KEY = "gnu.crypto.elgamal.ka.recipient.public.key";
-
+  public static final String KA_ELGAMAL_RECIPIENT_PRIVATE_KEY =
+      "gnu.crypto.elgamal.ka.recipient.private.key";
+  public static final String KA_ELGAMAL_RECIPIENT_PUBLIC_KEY =
+      "gnu.crypto.elgamal.ka.recipient.public.key";
   /** The shared secret key. */
   protected BigInteger ZZ;
-
-  // Constructor(s)
-  // -------------------------------------------------------------------------
 
   protected ElGamalKeyAgreement()
   {
     super(Registry.ELGAMAL_KA);
   }
-
-  // Class methods
-  // -------------------------------------------------------------------------
-
-  // Instance methods
-  // -------------------------------------------------------------------------
-
-  // implementation of common abstract methods in BaseKeyAGreementParty ------
 
   protected byte[] engineSharedSecret() throws KeyAgreementException
   {
