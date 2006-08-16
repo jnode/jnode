@@ -39,31 +39,22 @@ exception statement from your version.  */
 package gnu.javax.crypto.keyring;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
 import java.util.Date;
 
 /**
- * <p>An immutable class representing a trusted certificate entry.</p>
+ * An immutable class representing a trusted certificate entry.
  */
-public final class CertificateEntry extends PrimitiveEntry
+public final class CertificateEntry
+    extends PrimitiveEntry
 {
-
-  // Constants and variables
-  // -------------------------------------------------------------------------
-
   public static final int TYPE = 5;
-
   /** The certificate. */
   private Certificate certificate;
-
-  // Constructor(s)
-  // -------------------------------------------------------------------------
 
   /**
    * Creates a new certificate entry.
@@ -78,11 +69,8 @@ public final class CertificateEntry extends PrimitiveEntry
                           Properties properties)
   {
     super(TYPE, creationDate, properties);
-
     if (certificate == null)
-      {
         throw new IllegalArgumentException("no certificate");
-      }
     this.certificate = certificate;
     this.properties.put("type", certificate.getType());
   }
@@ -92,9 +80,6 @@ public final class CertificateEntry extends PrimitiveEntry
     super(TYPE);
   }
 
-  // Class methods
-  // -------------------------------------------------------------------------
-
   public static CertificateEntry decode(DataInputStream in) throws IOException
   {
     CertificateEntry entry = new CertificateEntry();
@@ -102,9 +87,7 @@ public final class CertificateEntry extends PrimitiveEntry
     entry.makeCreationDate();
     String type = entry.properties.get("type");
     if (type == null)
-      {
         throw new MalformedKeyringException("no certificate type");
-      }
     int len = in.readInt();
     MeteredInputStream in2 = new MeteredInputStream(in, len);
     try
@@ -116,15 +99,10 @@ public final class CertificateEntry extends PrimitiveEntry
       {
         throw new MalformedKeyringException(ce.toString());
       }
-    if (!in2.limitReached())
-      {
+    if (! in2.limitReached())
         throw new MalformedKeyringException("extra data at end of payload");
-      }
     return entry;
   }
-
-  // Instance methods
-  // -------------------------------------------------------------------------
 
   /**
    * Returns this entry's certificate.
