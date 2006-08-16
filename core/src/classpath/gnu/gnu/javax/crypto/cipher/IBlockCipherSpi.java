@@ -42,37 +42,31 @@ import java.security.InvalidKeyException;
 import java.util.Iterator;
 
 /**
- * <p>Package-private interface exposing mandatory methods to be implemented by
- * concrete {@link gnu.crypto.cipher.BaseCipher} sub-classes.</p>
+ * Package-private interface exposing mandatory methods to be implemented by
+ * concrete {@link BaseCipher} sub-classes.
  */
-interface IBlockCipherSpi extends Cloneable
+interface IBlockCipherSpi
+    extends Cloneable
 {
-
-  // Constants
-  // -------------------------------------------------------------------------
-
-  // Methods
-  // -------------------------------------------------------------------------
-
   /**
-   * <p>Returns an {@link java.util.Iterator} over the supported block sizes.
-   * Each element returned by this object is a {@link java.lang.Integer}.</p>
+   * Returns an {@link Iterator} over the supported block sizes. Each element
+   * returned by this object is a {@link java.lang.Integer}.
    *
    * @return an <code>Iterator</code> over the supported block sizes.
    */
   Iterator blockSizes();
 
   /**
-   * <p>Returns an {@link java.util.Iterator} over the supported key sizes.
-   * Each element returned by this object is a {@link java.lang.Integer}.</p>
+   * Returns an {@link Iterator} over the supported key sizes. Each element
+   * returned by this object is a {@link java.lang.Integer}.
    *
    * @return an <code>Iterator</code> over the supported key sizes.
    */
   Iterator keySizes();
 
   /**
-   * <p>Expands a user-supplied key material into a session key for a
-   * designated <i>block size</i>.</p>
+   * Expands a user-supplied key material into a session key for a designated
+   * <i>block size</i>.
    *
    * @param k the user-supplied key material.
    * @param bs the desired block size in bytes.
@@ -83,13 +77,14 @@ interface IBlockCipherSpi extends Cloneable
   Object makeKey(byte[] k, int bs) throws InvalidKeyException;
 
   /**
-   * <p>Encrypts exactly one block of plaintext.</p>
+   * Encrypts exactly one block of plaintext.
    *
    * @param in the plaintext.
    * @param inOffset index of <code>in</code> from which to start considering
    * data.
    * @param out the ciphertext.
-   * @param outOffset index of <code>out</code> from which to store the result.
+   * @param outOffset index of <code>out</code> from which to store the
+   *          result.
    * @param k the session key to use.
    * @param bs the block size to use.
    * @exception IllegalArgumentException if the block size is invalid.
@@ -100,13 +95,14 @@ interface IBlockCipherSpi extends Cloneable
                int bs);
 
   /**
-   * <p>Decrypts exactly one block of ciphertext.</p>
+   * Decrypts exactly one block of ciphertext.
    *
    * @param in the ciphertext.
    * @param inOffset index of <code>in</code> from which to start considering
    * data.
    * @param out the plaintext.
-   * @param outOffset index of <code>out</code> from which to store the result.
+   * @param outOffset index of <code>out</code> from which to store the
+   *          result.
    * @param k the session key to use.
    * @param bs the block size to use.
    * @exception IllegalArgumentException if the block size is invalid.
@@ -117,9 +113,9 @@ interface IBlockCipherSpi extends Cloneable
                int bs);
 
   /**
-   * <p>A <i>correctness</i> test that consists of basic symmetric encryption /
+   * A <i>correctness</i> test that consists of basic symmetric encryption /
    * decryption test(s) for all supported block and key sizes, as well as one
-   * (1) variable key Known Answer Test (KAT).</p>
+   * (1) variable key Known Answer Test (KAT).
    *
    * @return <code>true</code> if the implementation passes simple
    * <i>correctness</i> tests. Returns <code>false</code> otherwise.
