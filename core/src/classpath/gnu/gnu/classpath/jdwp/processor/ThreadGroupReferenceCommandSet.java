@@ -103,8 +103,12 @@ public class ThreadGroupReferenceCommandSet
     ObjectId oid = idMan.readObjectId(bb);
     ThreadGroup group = (ThreadGroup) oid.getObject();
     ThreadGroup parent = group.getParent();
+    if (parent == null) {
+    	os.writeLong(0L);
+    } else {
     ObjectId parentId = idMan.getObjectId(parent);
     parentId.write(os);
+  }
   }
 
   private void executeChildren(ByteBuffer bb, DataOutputStream os)

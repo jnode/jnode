@@ -106,8 +106,12 @@ public class ClassTypeCommandSet
     Class clazz = refId.getType();
     Class superClazz = clazz.getSuperclass();
 
+    if (superClazz == null) {
+    	os.writeLong(0L);
+    } else {
     ReferenceTypeId clazzId = idMan.getReferenceTypeId(superClazz);
     clazzId.write(os);
+  }
   }
 
   private void executeSetValues(ByteBuffer bb, DataOutputStream os)
