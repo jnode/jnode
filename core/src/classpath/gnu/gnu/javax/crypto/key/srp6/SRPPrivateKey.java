@@ -45,38 +45,32 @@ import java.math.BigInteger;
 import java.security.PrivateKey;
 
 /**
- * <p>A representation of an SRP ephemeral private key.</p>
- *
- * <p>Reference:</p>
+ * A representation of an SRP ephemeral private key.
+ * <p>
+ * Reference:
  * <ol>
  *    <li><a href="http://srp.stanford.edu/design.html">SRP Protocol Design</a><br>
  *    Thomas J. Wu.</li>
  * </ol>
  */
-public class SRPPrivateKey extends SRPKey implements PrivateKey
+public class SRPPrivateKey
+    extends SRPKey
+    implements PrivateKey
 {
-
-  // Constants and variables
-  // -------------------------------------------------------------------------
-
   /**
-   * The private exponent for either the server or the client engaged in the
-   * SRP protocol exchange.
+   * The private exponent for either the server or the client engaged in the SRP
+   * protocol exchange.
    */
   private final BigInteger X;
-
   /**
-   * The user's verifier (v) --for the server-- also computed at the client
-   * side as g.modPow(x, N), where x is the hashed output of the user name and
+   * The user's verifier (v) --for the server-- also computed at the client side
+   * as g.modPow(x, N), where x is the hashed output of the user name and
    * password .
    */
   private final BigInteger v;
 
-  // Constructor(s)
-  // -------------------------------------------------------------------------
-
   /**
-   * <p>Public constructor for use from outside this package.</p>
+   * Public constructor for use from outside this package.
    *
    * @param N the public shared modulus.
    * @param g the generator.
@@ -88,7 +82,7 @@ public class SRPPrivateKey extends SRPKey implements PrivateKey
   }
 
   /**
-   * <p>Public constructor for use from outside this package.</p>
+   * Public constructor for use from outside this package.
    *
    * @param N the public shared modulus.
    * @param g the generator.
@@ -105,14 +99,15 @@ public class SRPPrivateKey extends SRPKey implements PrivateKey
   }
 
   /**
-   * <p>Default constructor. Assumes N and g are already validated.</p>
+   * Default constructor. Assumes N and g are already validated.
    *
    * @param params an array of either 3 or 4 values representing N, g, and
-   * either v and X for the server, or just X for the client. Those values
-   * represent the following:
+   *          either v and X for the server, or just X for the client. Those
+   *          values represent the following:
    * <ol>
    *    <li>v (server side): the user's verifier.</li>
-   *    <li>X (both sides): the server's or client's ephemeral private exponent.</li>
+   *          <li>X (both sides): the server's or client's ephemeral private
+   *          exponent.</li>
    * </ol>
    */
   SRPPrivateKey(BigInteger[] params)
@@ -130,23 +125,19 @@ public class SRPPrivateKey extends SRPKey implements PrivateKey
         v = params[3];
       }
     else
-      {
         throw new IllegalArgumentException("invalid number of SRP parameters");
       }
-  }
-
-  // Class methods
-  // -------------------------------------------------------------------------
 
   /**
-   * <p>A class method that takes the output of the <code>encodePrivateKey()</code>
+   * A class method that takes the output of the <code>encodePrivateKey()</code>
    * method of an SRP keypair codec object (an instance implementing
    * {@link IKeyPairCodec} for DSS keys, and re-constructs an instance of this
-   * object.</p>
+   * object.
    *
    * @param k the contents of a previously encoded instance of this object.
    * @throws ArrayIndexOutOfBoundsException if there is not enough bytes, in
-   * <code>k</code>, to represent a valid encoding of an instance of this object.
+   *           <code>k</code>, to represent a valid encoding of an instance
+   *           of this object.
    * @throws IllegalArgumentException if the byte sequence does not represent a
    * valid encoding of an instance of this object.
    */
@@ -164,17 +155,11 @@ public class SRPPrivateKey extends SRPKey implements PrivateKey
         IKeyPairCodec codec = new SRPKeyPairRawCodec();
         return (SRPPrivateKey) codec.decodePrivateKey(k);
       }
-    else
-      {
         throw new IllegalArgumentException("magic");
       }
-  }
-
-  // Instance methods
-  // -------------------------------------------------------------------------
 
   /**
-   * <p>Returns the private exponent of the key as a {@link BigInteger}.</p>
+   * Returns the private exponent of the key as a {@link BigInteger}.
    *
    * @return the private exponent of the key as a {@link BigInteger}.
    */
@@ -184,22 +169,20 @@ public class SRPPrivateKey extends SRPKey implements PrivateKey
   }
 
   /**
-   * <p>Returns the user's verifier as a {@link BigInteger}.</p>
+   * Returns the user's verifier as a {@link BigInteger}.
    *
    * @return the user's verifier as a {@link BigInteger} if this is an SRP
-   * private key of a Host, or <code>null</code> if this is a private SRP key
-   * for a User.
+   *         private key of a Host, or <code>null</code> if this is a private
+   *         SRP key for a User.
    */
   public BigInteger getV()
   {
     return v;
   }
 
-  // Other instance methods --------------------------------------------------
-
   /**
-   * <p>Returns the encoded form of this private key according to the
-   * designated format.</p>
+   * Returns the encoded form of this private key according to the designated
+   * format.
    *
    * @param format the desired format identifier of the resulting encoding.
    * @return the byte sequence encoding this key according to the designated
@@ -221,30 +204,24 @@ public class SRPPrivateKey extends SRPKey implements PrivateKey
   }
 
   /**
-   * <p>Returns <code>true</code> if the designated object is an instance of
+   * Returns <code>true</code> if the designated object is an instance of
    * <code>SRPPrivateKey</code> and has the same SRP parameter values as this
-   * one.</p>
+   * one.
    *
    * @param obj the other non-null SRP key to compare to.
-   * @return <code>true</code> if the designated object is of the same type and
-   * value as this one.
+   * @return <code>true</code> if the designated object is of the same type
+   *         and value as this one.
    */
   public boolean equals(Object obj)
   {
     if (obj == null)
-      {
         return false;
-      }
-    if (!(obj instanceof SRPPrivateKey))
-      {
+    if (! (obj instanceof SRPPrivateKey))
         return false;
-      }
     SRPPrivateKey that = (SRPPrivateKey) obj;
     boolean result = super.equals(that) && X.equals(that.getX());
     if (v != null)
-      {
         result = result && v.equals(that.getV());
-      }
     return result;
   }
 }
