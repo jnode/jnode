@@ -55,11 +55,6 @@ import org.omg.CORBA.portable.OutputStream;
 public abstract class DefinitionKindHelper
 {
   /**
-   * The cached typecode value, computed only once.
-   */
-  private static TypeCode typeCode;
-
-  /**
    * Insert the definition kind into the given Any.
    */
   public static void insert(Any a, DefinitionKind that)
@@ -83,8 +78,6 @@ public abstract class DefinitionKindHelper
    */
   public static TypeCode type()
   {
-    if (typeCode == null)
-      {
         String[] members =
           new String[]
           {
@@ -96,13 +89,11 @@ public abstract class DefinitionKindHelper
             "dk_ValueMember", "dk_Native"
           };
 
-        typeCode =
+    return
           OrbRestricted.Singleton.create_enum_tc(id(), "DefinitionKind",
                                                   members
                                                  );
       }
-    return typeCode;
-  }
 
   /**
    * Get the definition kind repository id.

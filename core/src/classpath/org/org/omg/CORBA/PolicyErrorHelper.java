@@ -39,6 +39,7 @@ exception statement from your version. */
 package org.omg.CORBA;
 
 import gnu.CORBA.Minor;
+import gnu.CORBA.OrbRestricted;
 
 import org.omg.CORBA.Any;
 import org.omg.CORBA.BAD_OPERATION;
@@ -57,20 +58,13 @@ import org.omg.CORBA.portable.OutputStream;
 public abstract class PolicyErrorHelper
 {
   /**
-   * The cached typecode value, computed only once.
-   */
-  private static TypeCode typeCode;
-
-  /**
    * Create the PolicyError typecode. The typecode defines a structure, named
    * "PolicyError", containing the {@link PolicyErrorCode} (alias int) field,
    * named "reason".
    */
   public static TypeCode type()
   {
-    if (typeCode == null)
-      {
-        ORB orb = ORB.init();
+    ORB orb = OrbRestricted.Singleton;
         StructMember[] members = new StructMember[ 1 ];
 
         TypeCode field;
@@ -80,9 +74,7 @@ public abstract class PolicyErrorHelper
             "PolicyErrorCode", orb.get_primitive_tc(TCKind.tk_short)
           );
         members [ 0 ] = new StructMember("reason", field, null);
-        typeCode = orb.create_exception_tc(id(), "PolicyError", members);
-      }
-    return typeCode;
+    return orb.create_exception_tc(id(), "PolicyError", members);
   }
 
   /**

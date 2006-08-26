@@ -38,6 +38,8 @@ exception statement from your version. */
 
 package org.omg.CORBA;
 
+import gnu.CORBA.OrbRestricted;
+
 import org.omg.CORBA.portable.InputStream;
 import org.omg.CORBA.portable.OutputStream;
 
@@ -55,11 +57,6 @@ public abstract class ServiceInformationHelper
    * The service information repository id.
    */
   private static String _id = "IDL:org/omg/CORBA/ServiceInformation:1.0";
-
-  /**
-   * The caches typecode value, computed once.
-   */
-  private static TypeCode typeCode;
 
   /**
    * Extract the service information from the given Any.
@@ -109,9 +106,7 @@ public abstract class ServiceInformationHelper
    */
   public static TypeCode type()
   {
-    if (typeCode == null)
-      {
-        ORB orb = ORB.init();
+    ORB orb = OrbRestricted.Singleton;
 
         StructMember[] members = new StructMember[ 2 ];
         TypeCode member;
@@ -131,13 +126,11 @@ public abstract class ServiceInformationHelper
                              );
         members [ 1 ] = new StructMember("service_details", member, null);
 
-        typeCode =
+    return
           orb.create_struct_tc(ServiceInformationHelper.id(),
                                "ServiceInformation", members
                               );
       }
-    return typeCode;
-  }
 
   /**
    * Write the service information to the given CDR output stream.
