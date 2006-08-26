@@ -40,6 +40,7 @@ package org.omg.DynamicAny;
 
 import gnu.CORBA.Minor;
 import gnu.CORBA.NameValuePairHolder;
+import gnu.CORBA.OrbRestricted;
 
 import org.omg.CORBA.Any;
 import org.omg.CORBA.BAD_OPERATION;
@@ -58,11 +59,6 @@ import org.omg.CORBA.portable.OutputStream;
 public abstract class NameValuePairHelper
 {
   /**
-   * The cached typecode value, computed only once.
-   */
-  private static TypeCode typeCode;
-
-  /**
    * Create the NameValuePair typecode (structure,
    * named "NameValuePair").
    * The typecode states that the structure contains the
@@ -70,9 +66,7 @@ public abstract class NameValuePairHelper
    */
   public static TypeCode type()
   {
-    if (typeCode == null)
-      {
-        ORB orb = ORB.init();
+    ORB orb = OrbRestricted.Singleton;
         StructMember[] members = new StructMember[ 2 ];
 
         TypeCode field;
@@ -86,9 +80,7 @@ public abstract class NameValuePairHelper
 
         field = orb.get_primitive_tc(TCKind.tk_any);
         members [ 1 ] = new StructMember("value", field, null);
-        typeCode = orb.create_struct_tc(id(), "NameValuePair", members);
-      }
-    return typeCode;
+    return orb.create_struct_tc(id(), "NameValuePair", members);
   }
 
   /**

@@ -61,11 +61,6 @@ public abstract class AdapterNameHelper
 {
   
   /**
-   * The cached typecode, computed once.
-   */
-  static TypeCode typecode;
-  
-  /**
    * Extract the adapter name (<code>String[]</code>) from the given {@link Any}.
    *
    * @param a an Any to extract the array from.
@@ -114,21 +109,17 @@ public abstract class AdapterNameHelper
   }
 
   /**
-   * Creates and returns a new instance of the TypeCode,
-   * corresponding the adapter name.
+   * Creates and returns a new instance of the TypeCode, corresponding the
+   * adapter name.
    * 
    * @return the alias of the string sequence, named "AdapterName".
    */
   public static TypeCode type()
   {
-    if (typecode == null)
-      {
         ORB orb = OrbRestricted.Singleton;
         
         TypeCode component = orb.create_string_tc(0);
-        typecode = orb.create_alias_tc(id(), "AdapterName", component);
-      }
-    return typecode;
+    return orb.create_alias_tc(id(), "AdapterName", component);
   }
 
   /**
