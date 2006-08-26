@@ -54,11 +54,6 @@ import org.omg.CORBA.portable.OutputStream;
 public abstract class ParameterModeHelper
 {
   /**
-   * The cached typecode value, computed only once.
-   */
-  private static TypeCode typeCode;
-
-  /**
    * Insert the parameter mode into the given Any.
    */
   public static void insert(Any any, ParameterMode that)
@@ -81,16 +76,12 @@ public abstract class ParameterModeHelper
    */
   public static TypeCode type()
   {
-    if (typeCode == null)
-      {
         String[] members =
           new String[] { "PARAM_IN", "PARAM_OUT", "PARAM_INOUT" };
 
-        typeCode =
+        return
           OrbRestricted.Singleton.create_enum_tc(id(), "ParameterMode", members);
       }
-    return typeCode;
-  }
 
   /**
    * Get the parameter mode repository id.
