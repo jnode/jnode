@@ -43,6 +43,7 @@ public interface USBConstants {
 	public static final int USB_CLASS_CDC_DATA = 0x0a;
 	public static final int USB_CLASS_CSCID = 0x0b; /* chip+ smart card */
 	public static final int USB_CLASS_CONTENT_SEC = 0x0d; /* content security */
+	public static final int USB_CLASS_WIRELESS = 0xe0;
 	public static final int USB_CLASS_APP_SPEC = 0xfe;
 	public static final int USB_CLASS_VENDOR_SPEC = 0xff;
 
