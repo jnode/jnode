@@ -62,6 +62,8 @@ import java.util.Enumeration;
  */
 public interface Name extends Cloneable, Serializable, Comparable
 {
+  // This class is implemented as gnu.javax.naming.ictxImpl.trans.GnuName
+  
   long serialVersionUID = -3617482732056931635L;
 
   /**
@@ -95,10 +97,12 @@ public interface Name extends Cloneable, Serializable, Comparable
    * The returned <code>Name</code> can be modified without changing the
    * original.
    *
+   * @param posn the ending position, exclusive
+   *
    * @exception ArrayIndexOutOfBoundsException if the given index is smaller
    *            then zero or greater then or equal to <code>size()</code>.
    */
-  Name getPrefix(int i);
+  Name getPrefix(int posn);
 
   /**
    * Returns the components from the given index till the end as a
@@ -106,10 +110,13 @@ public interface Name extends Cloneable, Serializable, Comparable
    * The returned <code>Name</code> can be modified without changing the
    * original.
    *
+   * @param posn the starting position, inclusive. If it is equal to the size
+   *        of the name, the empty name is returned.
+   *
    * @exception ArrayIndexOutOfBoundsException if the given index is smaller
    *            then zero or greater then or equal to <code>size()</code>.
    */
-  Name getSuffix(int i);
+  Name getSuffix(int posn);
 
   /**
    * Adds the given <code>String</code> component to the end of this
@@ -145,7 +152,8 @@ public interface Name extends Cloneable, Serializable, Comparable
 
   /**
    * Inserts all the components of the given <code>Name</code> to this
-   * <code>Name</code> at the given index. The method modifies the current
+   * <code>Name</code> at the given index. Components after this index
+   * (if any) are shifted up. The method modifies the current
    * <code>Name</code> and then returns it.
    *
    * @exception ArrayIndexOutOfBoundsException if the given index is smaller
