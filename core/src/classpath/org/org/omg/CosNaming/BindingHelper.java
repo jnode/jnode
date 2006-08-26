@@ -39,6 +39,7 @@ exception statement from your version. */
 package org.omg.CosNaming;
 
 import gnu.CORBA.Minor;
+import gnu.CORBA.OrbRestricted;
 
 import org.omg.CORBA.Any;
 import org.omg.CORBA.BAD_OPERATION;
@@ -59,11 +60,6 @@ public abstract class BindingHelper
    * The {@link Binding} repository id.
    */
   private static String _id = "IDL:omg.org/CosNaming/Binding:1.0";
-
-  /**
-   * The cached type code value.
-   */
-  private static TypeCode typeCode;
 
   /**
    * Extract the binding from the given {@link Any}.
@@ -115,9 +111,7 @@ public abstract class BindingHelper
    */
   public static TypeCode type()
   {
-    if (typeCode == null)
-      {
-        ORB orb = ORB.init();
+    ORB orb = OrbRestricted.Singleton;
 
         StructMember[] members = new StructMember[ 2 ];
         TypeCode member;
@@ -127,9 +121,7 @@ public abstract class BindingHelper
         members [ 0 ] = new StructMember("binding_name", member, null);
         member = BindingTypeHelper.type();
         members [ 1 ] = new StructMember("binding_type", member, null);
-        typeCode = orb.create_struct_tc(id(), "Binding", members);
-      }
-    return typeCode;
+    return orb.create_struct_tc(id(), "Binding", members);
   }
 
   /**
