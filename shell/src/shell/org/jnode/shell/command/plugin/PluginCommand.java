@@ -193,11 +193,9 @@ public class PluginCommand {
             StringBuffer sb = new StringBuffer();
             sb.append(descr.getId());
             sb.append("; state ");
-            if (descr.getPlugin().isActive()) {
-                sb.append("active");
-            } else {
-                sb.append("inactive");
-            }
+            sb.append((descr.getPlugin().isActive())?"active":"inactive");
+            sb.append("; version ");
+            sb.append(descr.getPlugin().getDescriptor().getVersion());
             rows.add(sb.toString());
         }
         Collections.sort(rows);
@@ -213,11 +211,8 @@ public class PluginCommand {
         if (descr != null) {           
             out.print(descr.getId());
             out.print("; state ");
-            if (descr.getPlugin().isActive()) {
-                out.println("active");
-            } else {
-                out.println("inactive");
-            }
+            out.print((descr.getPlugin().isActive())?"active":"inactive");
+            out.println("; version " + descr.getPlugin().getDescriptor().getVersion());
         } else {
             out.println("Plugin " + id + " not found");
         }
