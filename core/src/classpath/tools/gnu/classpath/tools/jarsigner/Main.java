@@ -38,6 +38,7 @@ exception statement from your version. */
 
 package gnu.classpath.tools.jarsigner;
 
+import gnu.classpath.Configuration;
 import gnu.classpath.SystemProperties;
 import gnu.classpath.tools.common.CallbackUtil;
 import gnu.classpath.tools.common.ProviderUtil;
@@ -131,8 +132,8 @@ public class Main
 
   public static final void main(String[] args)
   {
+    if (Configuration.DEBUG)
     log.entering(Main.class.getName(), "main", args); //$NON-NLS-1$
-
     Main tool = new Main();
     int result = 1;
     try
@@ -143,11 +144,13 @@ public class Main
       }
     catch (SecurityException x)
       {
+        if (Configuration.DEBUG)
         log.throwing(Main.class.getName(), "main", x); //$NON-NLS-1$
         System.err.println(Messages.getString("Main.7") + x.getMessage()); //$NON-NLS-1$
       }
     catch (Exception x)
       {
+        if (Configuration.DEBUG)
         log.throwing(Main.class.getName(), "main", x); //$NON-NLS-1$
         System.err.println(Messages.getString("Main.9") + x); //$NON-NLS-1$
       }
@@ -155,7 +158,7 @@ public class Main
       {
         tool.teardown();
       }
-
+    if (Configuration.DEBUG)
     log.exiting(Main.class.getName(), "main", Integer.valueOf(result)); //$NON-NLS-1$
     System.exit(result);
   }
@@ -171,8 +174,8 @@ public class Main
    */
   private void processArgs(String[] args) throws Exception
   {
+    if (Configuration.DEBUG)
     log.entering(this.getClass().getName(), "processArgs", args); //$NON-NLS-1$
-
     cmdLineParser = new ToolParser();
     cmdLineParser.initializeParser();
     cmdLineParser.parse(args, new ToolParserCallback());
@@ -180,35 +183,40 @@ public class Main
     setupCommonParams();
     if (verify)
       {
-        log.finer("Will verify with the following parameters:"); //$NON-NLS-1$
-        log.finer("     jar-file = '" + jarFileName + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-        log.finer("Options:"); //$NON-NLS-1$
-        log.finer("     provider = '" + providerClassName + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-        log.finer("      verbose ? " + verbose); //$NON-NLS-1$
-        log.finer("        certs ? " + certs); //$NON-NLS-1$
-        log.finer("   internalsf ? " + internalSF); //$NON-NLS-1$
-        log.finer(" sectionsonly ? " + sectionsOnly); //$NON-NLS-1$
+        if (Configuration.DEBUG)
+          {
+            log.fine("Will verify with the following parameters:"); //$NON-NLS-1$
+            log.fine("     jar-file = '" + jarFileName + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+            log.fine("Options:"); //$NON-NLS-1$
+            log.fine("     provider = '" + providerClassName + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+            log.fine("      verbose ? " + verbose); //$NON-NLS-1$
+            log.fine("        certs ? " + certs); //$NON-NLS-1$
+            log.fine("   internalsf ? " + internalSF); //$NON-NLS-1$
+            log.fine(" sectionsonly ? " + sectionsOnly); //$NON-NLS-1$
+          }
       }
     else // sign
       {
         setupSigningParams();
-
-        log.finer("Will sign with the following parameters:"); //$NON-NLS-1$
-        log.finer("     jar-file = '" + jarFileName + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-        log.finer("        alias = '" + alias + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-        log.finer("Options:"); //$NON-NLS-1$
-        log.finer("     keystore = '" + ksURL + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-        log.finer("    storetype = '" + ksType + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-        log.finer("    storepass = '" + ksPassword + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-        log.finer("      keypass = '" + password + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-        log.finer("      sigfile = '" + sigFileName + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-        log.finer("    signedjar = '" + signedJarFileName + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-        log.finer("     provider = '" + providerClassName + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-        log.finer("      verbose ? " + verbose); //$NON-NLS-1$
-        log.finer("   internalsf ? " + internalSF); //$NON-NLS-1$
-        log.finer(" sectionsonly ? " + sectionsOnly); //$NON-NLS-1$
+        if (Configuration.DEBUG)
+          {
+            log.fine("Will sign with the following parameters:"); //$NON-NLS-1$
+            log.fine("     jar-file = '" + jarFileName + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+            log.fine("        alias = '" + alias + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+            log.fine("Options:"); //$NON-NLS-1$
+            log.fine("     keystore = '" + ksURL + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+            log.fine("    storetype = '" + ksType + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+            log.fine("    storepass = '" + ksPassword + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+            log.fine("      keypass = '" + password + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+            log.fine("      sigfile = '" + sigFileName + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+            log.fine("    signedjar = '" + signedJarFileName + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+            log.fine("     provider = '" + providerClassName + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+            log.fine("      verbose ? " + verbose); //$NON-NLS-1$
+            log.fine("   internalsf ? " + internalSF); //$NON-NLS-1$
+            log.fine(" sectionsonly ? " + sectionsOnly); //$NON-NLS-1$
       }
-
+      }
+    if (Configuration.DEBUG)
     log.exiting(this.getClass().getName(), "processArgs"); //$NON-NLS-1$
   }
 
@@ -222,8 +230,8 @@ public class Main
    */
   private void start() throws Exception
   {
+    if (Configuration.DEBUG)
     log.entering(this.getClass().getName(), "start"); //$NON-NLS-1$
-
     if (verify)
       {
         JarVerifier jv = new JarVerifier(this);
@@ -234,7 +242,7 @@ public class Main
         JarSigner js = new JarSigner(this);
         js.start();
       }
-
+    if (Configuration.DEBUG)
     log.exiting(this.getClass().getName(), "start"); //$NON-NLS-1$
   }
 
@@ -249,11 +257,12 @@ public class Main
    */
   private void teardown()
   {
+    if (Configuration.DEBUG)
     log.entering(this.getClass().getName(), "teardown"); //$NON-NLS-1$
-
     if (providerInstalled)
       ProviderUtil.removeProvider(provider.getName());
 
+    if (Configuration.DEBUG)
     log.exiting(this.getClass().getName(), "teardown"); //$NON-NLS-1$
   }
 
@@ -279,8 +288,8 @@ public class Main
   private void setupCommonParams() throws InstantiationException,
       IllegalAccessException, ClassNotFoundException, IOException
   {
+    if (Configuration.DEBUG)
     log.entering(this.getClass().getName(), "setupCommonParams"); //$NON-NLS-1$
-
     File jar = new File(jarFileName);
     if (! jar.exists())
       throw new FileNotFoundException(jarFileName);
@@ -298,17 +307,22 @@ public class Main
         String providerName = provider.getName();
         Provider installedProvider = Security.getProvider(providerName);
         if (installedProvider != null)
+          {
+            if (Configuration.DEBUG)
           log.finer("Provider " + providerName + " is already installed"); //$NON-NLS-1$ //$NON-NLS-2$
+          }
         else // install it
           installNewProvider();
       }
 
     if (! verbose && certs)
       {
+        if (Configuration.DEBUG)
         log.fine("Option <certs> is set but <verbose> is not. Ignored"); //$NON-NLS-1$
         certs = false;
       }
 
+    if (Configuration.DEBUG)
     log.exiting(this.getClass().getName(), "setupCommonParams"); //$NON-NLS-1$
   }
 
@@ -319,10 +333,10 @@ public class Main
    */
   private void installNewProvider()
   {
+    if (Configuration.DEBUG)
     log.entering(this.getClass().getName(), "installNewProvider"); //$NON-NLS-1$
-
     providerInstalled = ProviderUtil.addProvider(provider) != -1;
-
+    if (Configuration.DEBUG)
     log.exiting(this.getClass().getName(), "installNewProvider"); //$NON-NLS-1$
   }
 
@@ -349,8 +363,8 @@ public class Main
       NoSuchAlgorithmException, CertificateException,
       UnsupportedCallbackException, UnrecoverableKeyException
   {
+    if (Configuration.DEBUG)
     log.entering(this.getClass().getName(), "setupSigningParams"); //$NON-NLS-1$
-
     if (ksURL == null || ksURL.trim().length() == 0)
       {
         String userHome = SystemProperties.getProperty("user.home"); //$NON-NLS-1$
@@ -424,7 +438,8 @@ public class Main
 
     signerPrivateKey = (PrivateKey) key;
     signerCertificateChain = store.getCertificateChain(alias);
-    log.finest(String.valueOf(signerCertificateChain));
+    if (Configuration.DEBUG)
+      log.fine(String.valueOf(signerCertificateChain));
 
     if (sigFileName == null)
       sigFileName = alias;
@@ -449,6 +464,7 @@ public class Main
     if (signedJarFileName == null)
       signedJarFileName = jarFileName;
 
+    if (Configuration.DEBUG)
     log.exiting(this.getClass().getName(), "setupSigningParams"); //$NON-NLS-1$
   }
 
@@ -547,7 +563,8 @@ public class Main
       if (! verify) // must have an ALIAS. use "mykey" if undefined
         if (fileAndAlias.size() < 2)
           {
-            log.finer("Missing ALIAS argument. Will use [mykey] instead"); //$NON-NLS-1$
+            if (Configuration.DEBUG)
+              log.fine("Missing ALIAS argument. Will use [mykey] instead"); //$NON-NLS-1$
             alias = "mykey"; //$NON-NLS-1$
           }
         else

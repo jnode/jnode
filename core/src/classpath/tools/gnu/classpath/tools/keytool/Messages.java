@@ -38,6 +38,8 @@
 
 package gnu.classpath.tools.keytool;
 
+import gnu.classpath.Configuration;
+
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -99,6 +101,7 @@ class Messages
       }
     catch (IllegalArgumentException x)
       {
+        if (Configuration.DEBUG)
         log.fine("Exception while rendering a message format keyed by ["
                  + key + "]: " + mf.toPattern());
         return constructMessage(mf.toPattern(), args);

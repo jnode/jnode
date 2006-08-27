@@ -1,4 +1,4 @@
-/* StorePasswdCmd.java -- The storepasswd command handler of the keytool
+/* CACertCmd.java -- GNU specific cacert handler
    Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -39,36 +39,31 @@ exception statement from your version. */
 package gnu.classpath.tools.keytool;
 
 import gnu.classpath.Configuration;
-import gnu.classpath.SystemProperties;
 import gnu.classpath.tools.getopt.ClasspathToolParser;
 import gnu.classpath.tools.getopt.Option;
 import gnu.classpath.tools.getopt.OptionException;
 import gnu.classpath.tools.getopt.OptionGroup;
 import gnu.classpath.tools.getopt.Parser;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
-import java.util.Arrays;
+import java.security.cert.CertificateFactory;
 import java.util.logging.Logger;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.PasswordCallback;
-import javax.security.auth.callback.TextOutputCallback;
-import javax.security.auth.callback.UnsupportedCallbackException;
-
 /**
- * The <b>-storepasswd</b> keytool command handler is used to change the
- * password which protects the integrity of the key store.
+ * The <code>-cacert</code> keytol command handler is used to import a CA
+ * trusted X.509 certificate into a key store.
  * <p>
  * Possible options for this command are:
  * <p>
  * <dl>
- *      <dt>-new PASSWORD</dt>
- *      <dd>The new, and different, password which will be used to protect the
- *      designated key store.
+ *      <dt>-file FILE_NAME</dt>
+ *      <dd>The fully qualified path of the file containing the trusted CA
+ *      certificate to import. If omitted, the tool will process STDIN.
  *      <p></dd>
  *      
  *      <dt>-storetype STORE_TYPE</dt>
@@ -110,24 +105,31 @@ import javax.security.auth.callback.UnsupportedCallbackException;
  *      <dd>Use this option to enable more verbose output.</dd>
  * </dl>
  */
-class StorePasswdCmd extends Command
+public class CACertCmd
+    extends Command
 {
-  private static final Logger log = Logger.getLogger(StorePasswdCmd.class.getName());
-  protected String _newPassword;
+  private static final Logger log = Logger.getLogger(CACertCmd.class.getName());
+  /** Pathname of the file containing the CA certificate to import. */
+  protected String _certFileName;
+  /** Type of the key store to use. */
   protected String _ksType;
+  /** The URL to the keystore where the trusted certificates will be added. */
   protected String _ksURL;
+  /** The password protecting the keystore. */
   protected String _ksPassword;
+  /** Class name of a security provider to use. */
   protected String _providerClassName;
-  private char[] newStorePasswordChars;
+  /** Reference to the X.509 factory. */
+  private CertificateFactory x509Factory;
 
   // default 0-arguments constructor
 
   // public setters -----------------------------------------------------------
 
-  /** @param password the new key-store password to use. */
-  public void setNew(String password)
+  /** @param pathName the fully qualified path name of the file to process. */
+  public void setFile(String pathName)
   {
-    this._newPassword = password;
+    this._certFileName = pathName;
   }
 
   /** @param type the key-store type to use. */
@@ -156,13 +158,17 @@ class StorePasswdCmd extends Command
 
   // life-cycle methods -------------------------------------------------------
 
+  /* (non-Javadoc)
+   * @see gnu.classpath.tools.keytool.Command#setup()
+   */
   void setup() throws Exception
   {
+    setInputStreamParam(_certFileName);
     setKeyStoreParams(_providerClassName, _ksType, _ksPassword, _ksURL);
-    setNewKeystorePassword(_newPassword);
     if (Configuration.DEBUG)
       {
-        log.fine("-storepasswd handler will use the following options:"); //$NON-NLS-1$
+        log.fine("-cacert handler will use the following options:"); //$NON-NLS-1$
+        log.fine("  -file=" + _certFileName); //$NON-NLS-1$
         log.fine("  -storetype=" + storeType); //$NON-NLS-1$
         log.fine("  -keystore=" + storeURL); //$NON-NLS-1$
         log.fine("  -provider=" + provider); //$NON-NLS-1$
@@ -170,38 +176,54 @@ class StorePasswdCmd extends Command
       }
   }
 
-  void start() throws KeyStoreException, NoSuchAlgorithmException,
-      CertificateException, IOException
+  void start() throws CertificateException, KeyStoreException,
+      NoSuchAlgorithmException, IOException
   {
     if (Configuration.DEBUG)
-    log.entering(this.getClass().getName(), "start"); //$NON-NLS-1$
-    saveKeyStore(newStorePasswordChars);
+      log.entering(this.getClass().getName(), "start"); //$NON-NLS-1$
+    alias = getAliasFromFileName(_certFileName);
+    if (store.containsAlias(alias))
+      throw new IllegalArgumentException(Messages.getFormattedString("CACertCmd.0", //$NON-NLS-1$
+                                                                     alias));
+    x509Factory = CertificateFactory.getInstance("X.509"); //$NON-NLS-1$
+    Certificate certificate = x509Factory.generateCertificate(inStream);
     if (Configuration.DEBUG)
-    log.exiting(getClass().getName(), "start"); //$NON-NLS-1$
+      log.fine("certificate = " + certificate); //$NON-NLS-1$
+    store.setCertificateEntry(alias, certificate);
+    saveKeyStore();
+    if (verbose)
+      System.out.println(Messages.getFormattedString("CACertCmd.1", //$NON-NLS-1$
+                                                     new Object[] { _certFileName,
+                                                                    alias }));
+    if (Configuration.DEBUG)
+      log.exiting(this.getClass().getName(), "start"); //$NON-NLS-1$
   }
 
   // own methods --------------------------------------------------------------
 
+  /* (non-Javadoc)
+   * @see gnu.classpath.tools.keytool.Command#getParser()
+   */
   Parser getParser()
   {
     if (Configuration.DEBUG)
-    log.entering(this.getClass().getName(), "getParser"); //$NON-NLS-1$
-    Parser result = new ClasspathToolParser(Main.STOREPASSWD_CMD, true);
-    result.setHeader(Messages.getString("StorePasswdCmd.18")); //$NON-NLS-1$
-    result.setFooter(Messages.getString("StorePasswdCmd.17")); //$NON-NLS-1$
-    OptionGroup options = new OptionGroup(Messages.getString("StorePasswdCmd.16")); //$NON-NLS-1$
-    options.add(new Option(Main.NEW_OPT,
-                           Messages.getString("StorePasswdCmd.15"), //$NON-NLS-1$
-                           Messages.getString("StorePasswdCmd.8")) //$NON-NLS-1$
+      log.entering(this.getClass().getName(), "getParser"); //$NON-NLS-1$
+    Parser result = new ClasspathToolParser(Main.CACERT_CMD, true);
+    result.setHeader(Messages.getString("CACertCmd.2")); //$NON-NLS-1$
+    result.setFooter(Messages.getString("CACertCmd.3")); //$NON-NLS-1$
+    OptionGroup options = new OptionGroup(Messages.getString("CACertCmd.4")); //$NON-NLS-1$
+    options.add(new Option(Main.FILE_OPT,
+                           Messages.getString("CACertCmd.5"), //$NON-NLS-1$
+                           Messages.getString("CACertCmd.6")) //$NON-NLS-1$
     {
       public void parsed(String argument) throws OptionException
       {
-        _newPassword = argument;
+        _certFileName = argument;
       }
     });
     options.add(new Option(Main.STORETYPE_OPT,
-                           Messages.getString("StorePasswdCmd.13"), //$NON-NLS-1$
-                           Messages.getString("StorePasswdCmd.12")) //$NON-NLS-1$
+                           Messages.getString("CACertCmd.7"), //$NON-NLS-1$
+                           Messages.getString("CACertCmd.8")) //$NON-NLS-1$
     {
       public void parsed(String argument) throws OptionException
       {
@@ -209,8 +231,8 @@ class StorePasswdCmd extends Command
       }
     });
     options.add(new Option(Main.KEYSTORE_OPT,
-                           Messages.getString("StorePasswdCmd.11"), //$NON-NLS-1$
-                           Messages.getString("StorePasswdCmd.10")) //$NON-NLS-1$
+                           Messages.getString("CACertCmd.9"), //$NON-NLS-1$
+                           Messages.getString("CACertCmd.10")) //$NON-NLS-1$
     {
       public void parsed(String argument) throws OptionException
       {
@@ -218,8 +240,8 @@ class StorePasswdCmd extends Command
       }
     });
     options.add(new Option(Main.STOREPASS_OPT,
-                           Messages.getString("StorePasswdCmd.9"), //$NON-NLS-1$
-                           Messages.getString("StorePasswdCmd.8")) //$NON-NLS-1$
+                           Messages.getString("CACertCmd.11"), //$NON-NLS-1$
+                           Messages.getString("CACertCmd.12")) //$NON-NLS-1$
     {
       public void parsed(String argument) throws OptionException
       {
@@ -227,8 +249,8 @@ class StorePasswdCmd extends Command
       }
     });
     options.add(new Option(Main.PROVIDER_OPT,
-                           Messages.getString("StorePasswdCmd.7"), //$NON-NLS-1$
-                           Messages.getString("StorePasswdCmd.6")) //$NON-NLS-1$
+                           Messages.getString("CACertCmd.13"), //$NON-NLS-1$
+                           Messages.getString("CACertCmd.14")) //$NON-NLS-1$
     {
       public void parsed(String argument) throws OptionException
       {
@@ -236,7 +258,7 @@ class StorePasswdCmd extends Command
       }
     });
     options.add(new Option(Main.VERBOSE_OPT,
-                           Messages.getString("StorePasswdCmd.5")) //$NON-NLS-1$
+                           Messages.getString("CACertCmd.15")) //$NON-NLS-1$
     {
       public void parsed(String argument) throws OptionException
       {
@@ -245,74 +267,47 @@ class StorePasswdCmd extends Command
     });
     result.add(options);
     if (Configuration.DEBUG)
-    log.exiting(this.getClass().getName(), "getParser", result); //$NON-NLS-1$
+      log.exiting(this.getClass().getName(), "getParser", result); //$NON-NLS-1$
     return result;
   }
 
-  protected void setNewKeystorePassword(String password) throws IOException,
-      UnsupportedCallbackException
+  /**
+   * Construct an Alias string from the name of the file containing the
+   * certificate to import. This method first removes the last dot (".")
+   * character and any subsequent characters from the input name, and then
+   * replaces any space and dot characters with underscores. For example the
+   * input string <code>brasil.gov.br.cert</code> will result in
+   * <code>brasil_gov_br</code> as its alias.
+   * 
+   * @param fileName the name of the file containing the CA certificate
+   * @return a string which can, and will, be used as the Alias of this CA
+   *         certificate.
+   */
+  private String getAliasFromFileName(String fileName)
   {
-    if (password != null)
-      newStorePasswordChars = password.toCharArray();
-    else
-      {
-        boolean ok = false;
-        Callback[] prompts = new Callback[1];
-        Callback[] errors = new Callback[1];
-        for (int i = 0; i < 3; i++)
-          if (prompt4NewPassword(getCallbackHandler(), prompts, errors))
-            {
-              ok = true;
-              break;
-            }
-        if (! ok)
-          throw new SecurityException(Messages.getString("StorePasswdCmd.19")); //$NON-NLS-1$
-      }
-  }
+    if (Configuration.DEBUG)
+      log.entering(this.getClass().getName(), "getAliasFromFileName", fileName); //$NON-NLS-1$
+    // get the basename
+    fileName = new File(fileName).getName();
+    // remove '.' if at start
+    if (fileName.startsWith(".")) //$NON-NLS-1$
+      fileName = fileName.substring(1);
 
-  private boolean prompt4NewPassword(CallbackHandler handler,
-                                     Callback[] prompts, Callback[] errors)
-      throws IOException, UnsupportedCallbackException
-  {
-    // prompt user (1st time) to provide one
-    String p = Messages.getString("StorePasswdCmd.20"); //$NON-NLS-1$
-    PasswordCallback pcb = new PasswordCallback(p, false);
-    prompts[0] = pcb;
-    handler.handle(prompts);
-    char[] pwd1 = pcb.getPassword();
-    pcb.clearPassword();
-    String ls = SystemProperties.getProperty("line.separator"); //$NON-NLS-1$
-    if (pwd1 == null || pwd1.length < 6)
+    // remove last \..+
+    int ndx = fileName.lastIndexOf('.');
+    if (ndx > 0)
+      fileName = fileName.substring(0, ndx);
+    // replace spaces and dots with underscores
+    char[] chars = fileName.toCharArray();
+    for (int i = 0; i < chars.length; i++)
       {
-        String m = Messages.getString("StorePasswdCmd.21") + ls; //$NON-NLS-1$
-        errors[0] = new TextOutputCallback(TextOutputCallback.ERROR, m);
-        handler.handle(errors);
-        return false;
+        char c = chars[i];
+        if (c == ' ' || c == '.')
+          chars[i] = '_';
       }
-
-    if (Arrays.equals(storePasswordChars, pwd1))
-      {
-        String m = Messages.getString("StorePasswdCmd.22") + ls; //$NON-NLS-1$
-        errors[0] = new TextOutputCallback(TextOutputCallback.ERROR, m);
-        handler.handle(errors);
-        return false;
-      }
-
-    // prompt user (2nd time) for confirmation
-    pcb = new PasswordCallback(Messages.getString("StorePasswdCmd.23"), false); //$NON-NLS-1$
-    prompts[0] = pcb;
-    handler.handle(prompts);
-    char[] pwd2 = pcb.getPassword();
-    pcb.clearPassword();
-    if (! Arrays.equals(pwd1, pwd2))
-      {
-        String m = Messages.getString("StorePasswdCmd.24") + ls; //$NON-NLS-1$
-        errors[0] = new TextOutputCallback(TextOutputCallback.ERROR, m);
-        handler.handle(errors);
-        return false;
-      }
-
-    newStorePasswordChars = pwd2;
-    return true;
+    String result = new String(chars);
+    if (Configuration.DEBUG)
+      log.exiting(this.getClass().getName(), "getAliasFromFileName", result); //$NON-NLS-1$
+    return result;
   }
 }

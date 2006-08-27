@@ -38,6 +38,7 @@ exception statement from your version. */
 
 package gnu.classpath.tools.jarsigner;
 
+import gnu.classpath.Configuration;
 import gnu.java.security.hash.Sha160;
 import gnu.java.security.util.Base64;
 import gnu.java.util.jar.JarUtils;
@@ -76,8 +77,8 @@ class HashUtils
           sha.update(buffer, 0, n);
           count += n;
         }
-
     byte[] hash = sha.digest();
+    if (Configuration.DEBUG)
     log.finest("Hashed " + count + " byte(s)");
     String result = Base64.encode(hash);
     return result;
@@ -92,6 +93,7 @@ class HashUtils
   {
     sha.update(ba);
     byte[] hash = sha.digest();
+    if (Configuration.DEBUG)
     log.finest("Hashed " + ba.length + " byte(s)");
     String result = Base64.encode(hash);
     return result;

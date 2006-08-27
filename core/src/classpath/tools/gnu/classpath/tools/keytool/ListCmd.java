@@ -38,6 +38,7 @@ exception statement from your version. */
 
 package gnu.classpath.tools.keytool;
 
+import gnu.classpath.Configuration;
 import gnu.classpath.tools.getopt.ClasspathToolParser;
 import gnu.classpath.tools.getopt.Option;
 import gnu.classpath.tools.getopt.OptionException;
@@ -181,32 +182,36 @@ class ListCmd extends Command
 
     if (verbose & rfc)
       {
-        log.warning("Both -v and -rfc options were found on the command line. " //$NON-NLS-1$
+        if (Configuration.DEBUG)
+          log.fine("Both -v and -rfc options were found on the command line. " //$NON-NLS-1$
                     + "Only the former will be considered"); //$NON-NLS-1$
         rfc = false;
       }
-
-    log.finer("-list handler will use the following options:"); //$NON-NLS-1$
-    log.finer("  -alias=" + alias); //$NON-NLS-1$
-    log.finer("  -storetype=" + storeType); //$NON-NLS-1$
-    log.finer("  -keystore=" + storeURL); //$NON-NLS-1$
-    log.finer("  -provider=" + provider); //$NON-NLS-1$
-    log.finer("  -v=" + verbose); //$NON-NLS-1$
-    log.finer("  -rfc=" + rfc); //$NON-NLS-1$
+    if (Configuration.DEBUG)
+      {
+        log.fine("-list handler will use the following options:"); //$NON-NLS-1$
+        log.fine("  -alias=" + alias); //$NON-NLS-1$
+        log.fine("  -storetype=" + storeType); //$NON-NLS-1$
+        log.fine("  -keystore=" + storeURL); //$NON-NLS-1$
+        log.fine("  -provider=" + provider); //$NON-NLS-1$
+        log.fine("  -v=" + verbose); //$NON-NLS-1$
+        log.fine("  -rfc=" + rfc); //$NON-NLS-1$
+      }
   }
 
   void start() throws KeyStoreException, CertificateEncodingException,
       IOException
   {
+    if (Configuration.DEBUG)
     log.entering(this.getClass().getName(), "start"); //$NON-NLS-1$
-
     PrintWriter writer = new PrintWriter(outStream, true);
     writer.println(Messages.getFormattedString("ListCmd.21", store.getType())); //$NON-NLS-1$
     writer.println(Messages.getFormattedString("ListCmd.22", //$NON-NLS-1$
                                                store.getProvider().getName()));
     if (all)
       {
-        log.finest("About to list all aliases in key store..."); //$NON-NLS-1$
+        if (Configuration.DEBUG)
+          log.fine("About to list all aliases in key store..."); //$NON-NLS-1$
         writer.println();
         writer.println(Messages.getFormattedString("ListCmd.24", //$NON-NLS-1$
                                                    Integer.valueOf(store.size())));
@@ -219,7 +224,7 @@ class ListCmd extends Command
       }
     else
       list1Alias(alias, writer);
-
+    if (Configuration.DEBUG)
     log.exiting(this.getClass().getName(), "start"); //$NON-NLS-1$
   }
 
@@ -227,8 +232,8 @@ class ListCmd extends Command
 
   Parser getParser()
   {
+    if (Configuration.DEBUG)
     log.entering(this.getClass().getName(), "getParser"); //$NON-NLS-1$
-
     Parser result = new ClasspathToolParser(Main.LIST_CMD, true);
     result.setHeader(Messages.getString("ListCmd.20")); //$NON-NLS-1$
     result.setFooter(Messages.getString("ListCmd.19")); //$NON-NLS-1$
@@ -295,7 +300,7 @@ class ListCmd extends Command
       }
     });
     result.add(options);
-
+    if (Configuration.DEBUG)
     log.exiting(this.getClass().getName(), "getParser", result); //$NON-NLS-1$
     return result;
   }
@@ -314,12 +319,12 @@ class ListCmd extends Command
   private void list1Alias(String anAlias, PrintWriter writer)
       throws KeyStoreException, CertificateEncodingException, IOException
   {
+    if (Configuration.DEBUG)
     log.entering(this.getClass().getName(), "list1Alias", anAlias); //$NON-NLS-1$
-
     writer.println();
     writer.println(Messages.getFormattedString("ListCmd.30", anAlias)); //$NON-NLS-1$
-    writer.println(Messages.getFormattedString("ListCmd.31", store.getCreationDate(anAlias))); //$NON-NLS-1$
-
+    writer.println(Messages.getFormattedString("ListCmd.31", //$NON-NLS-1$
+                                               store.getCreationDate(anAlias)));
     if (store.isCertificateEntry(anAlias))
       {
         writer.println(Messages.getString("ListCmd.32")); //$NON-NLS-1$
@@ -335,6 +340,7 @@ class ListCmd extends Command
     else
       throw new IllegalArgumentException(Messages.getFormattedString("ListCmd.34", //$NON-NLS-1$
                                                                      anAlias));
+    if (Configuration.DEBUG)
     log.exiting(this.getClass().getName(), "list1Alias"); //$NON-NLS-1$
   }
 
