@@ -425,7 +425,7 @@ public class DefaultButtonModel implements ButtonModel, Serializable
   public void setRollover(boolean r)
   {
     // if this call does not represent a CHANGE in state, then return
-    if ((r && isRollover()) || (!r && !isRollover()))
+    if (r == isRollover())
       return;
     
     // cannot set ROLLOVER property unless button is enabled
@@ -466,14 +466,14 @@ public class DefaultButtonModel implements ButtonModel, Serializable
     if (s)
       {
         fireItemStateChanged(new ItemEvent(this, ItemEvent.ITEM_STATE_CHANGED,
-                                           null, ItemEvent.SELECTED));
+                                           this, ItemEvent.SELECTED));
         if (group != null)
           group.setSelected(this, true);
       }
     else
       {
         fireItemStateChanged(new ItemEvent(this, ItemEvent.ITEM_STATE_CHANGED,
-                                           null, ItemEvent.DESELECTED));
+                                           this, ItemEvent.DESELECTED));
         if (group != null)
           group.setSelected(this, false);
       }

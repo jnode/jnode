@@ -40,6 +40,7 @@ package javax.swing.text;
 
 import java.awt.Shape;
 
+import javax.swing.SizeRequirements;
 import javax.swing.event.DocumentEvent;
 
 /**
@@ -72,6 +73,60 @@ public class ParagraphView extends FlowView implements TabExpander
       else
         align = super.getAlignment(axis);
       return align;
+    }
+
+    /**
+     * Allows rows to span the whole parent view.
+     */
+    public float getMaximumSpan(int axis)
+    {
+      float max;
+      if (axis == X_AXIS)
+        max = Float.MAX_VALUE;
+      else
+        max = super.getMaximumSpan(axis);
+      return max;
+    }
+
+    /**
+     * Overridden because child views are not necessarily laid out in model
+     * order.
+     */
+    protected int getViewIndexAtPosition(int pos)
+    {
+      int index = -1;
+      if (pos >= getStartOffset() && pos < getEndOffset())
+        {
+          int nviews = getViewCount();
+          for (int i = 0; i < nviews && index == -1; i++)
+            {
+              View child = getView(i);
+              if (pos >= child.getStartOffset() && pos < child.getEndOffset())
+                index = i;
+            }
+        }
+      return index;
+    }
+
+
+    /**
+     * Overridden to perform a baseline layout. The normal BoxView layout
+     * isn't completely suitable for rows.
+     */
+    protected void layoutMinorAxis(int targetSpan, int axis, int[] offsets,
+                                   int[] spans)
+    {
+      baselineLayout(targetSpan, axis, offsets, spans);
+    }
+
+    /**
+     * Overridden to perform a baseline layout. The normal BoxView layout
+     * isn't completely suitable for rows.
+     */
+    protected SizeRequirements calculateMinorAxisRequirements(int axis,
+                                                            SizeRequirements r)
+    {
+      return baselineRequirements(axis, r);
     }
 
     protected void loadChildren(ViewFactory vf)
@@ -140,7 +195,7 @@ public class ParagraphView extends FlowView implements TabExpander
   {
     float align;
     if (axis == X_AXIS)
-      align = super.getAlignment(axis);
+      align = 0.5F;
     else if (getViewCount() > 0)
       {
         float prefHeight = getPreferredSpan(Y_AXIS);
@@ -148,7 +203,7 @@ public class ParagraphView extends FlowView implements TabExpander
         align = (firstRowHeight / 2.F) / prefHeight;
       }
     else
-      align = 0.0F;
+      align = 0.5F;
     return align;
   }
 
@@ -159,11 +214,14 @@ public class ParagraphView extends FlowView implements TabExpander
    *
    * @param ev the document event
    * @param a the allocation of this view
-   * @param fv the view factory to use for creating new child views
+   * @param vf the view factory to use for creating new child views
    */
-  public void changedUpdate(DocumentEvent ev, Shape a, ViewFactory fv)
+  public void changedUpdate(DocumentEvent ev, Shape a, ViewFactory vf)
   {
     setPropertiesFromAttributes();
+    layoutChanged(X_AXIS);
+    layoutChanged(Y_AXIS);
+    super.changedUpdate(ev, a, vf);
   }
 
   /**

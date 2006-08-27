@@ -760,11 +760,7 @@ public class JTabbedPane extends JComponent implements Serializable,
     this.tabPlacement = tabPlacement;
     layoutPolicy = tabLayoutPolicy;
 
-    changeEvent = new ChangeEvent(this);
-    changeListener = createChangeListener();
-
-    model = new DefaultSingleSelectionModel();
-    model.addChangeListener(changeListener);
+    setModel(new DefaultSingleSelectionModel());
 
     updateUI();
   }
@@ -877,16 +873,24 @@ public class JTabbedPane extends JComponent implements Serializable,
   /**
    * This method changes the model property of the JTabbedPane.
    *
-   * @param model The new model to use with the JTabbedPane.
+   * @param m The new model to use with the JTabbedPane.
    */
-  public void setModel(SingleSelectionModel model)
+  public void setModel(SingleSelectionModel m)
   {
-    if (model != this.model)
+    if (m != model)
       {
 	SingleSelectionModel oldModel = this.model;
-	this.model.removeChangeListener(changeListener);
-	this.model = model;
-	this.model.addChangeListener(changeListener);
+        if (oldModel != null && changeListener != null)
+          oldModel.removeChangeListener(changeListener);
+
+	model = m;
+
+        if (model != null)
+          {
+            if (changeListener != null)
+              changeListener = createChangeListener();
+            model.addChangeListener(changeListener);
+          }
 	firePropertyChange("model", oldModel, this.model);
       }
   }
@@ -990,6 +994,8 @@ public class JTabbedPane extends JComponent implements Serializable,
     checkIndex(index, -1, tabs.size());
     if (index != getSelectedIndex())
       {
+        // Hiding and showing the involved components
+        // is done by the JTabbedPane's UI.
 	model.setSelectedIndex(index);
       }
   }
@@ -1247,7 +1253,32 @@ public class JTabbedPane extends JComponent implements Serializable,
    */
   public void remove(Component component)
   {
-    super.remove(component);
+    // Since components implementing UIResource
+    // are not added as regular tabs by the add()
+    // methods we have to take special care when
+    // removing these object. Especially 
+    // Container.remove(Component) cannot be used
+    // because it will call JTabbedPane.remove(int)
+    // later which is overridden and can only
+    // handle tab components.
+    // This implementation can even cope with a
+    // situation that someone called insertTab()
+    // with a component that implements UIResource.
+    int index = indexOfComponent(component);
+    
+    // If the component is not a tab component
+    // find out its Container-given index
+    // and call that class' implementation
+    // directly.
+    if (index == -1)
+      {
+        Component[] cs = getComponents();
+        for (int i = 0; i< cs.length; i++)
+          if (cs[i] == component)
+            super.remove(i);
+      }
+    else
+      removeTabAt(index);
   }
 
   /**
@@ -1257,7 +1288,6 @@ public class JTabbedPane extends JComponent implements Serializable,
    */
   public void remove(int index)
   {
-    super.remove(index);
     removeTabAt(index);
   }
 

@@ -37,14 +37,14 @@ exception statement from your version. */
 
 package javax.swing.event;
 
-// Imports
 import java.util.EventListener;
 
 /**
  * TreeExpansionListener public interface
  * @author Andrew Selkirk
  */
-public interface TreeExpansionListener extends EventListener {
+public interface TreeExpansionListener extends EventListener 
+{
 
 	/**
 	 * Tree collapsed
@@ -59,4 +59,4 @@ public interface TreeExpansionListener extends EventListener {
 	void treeExpanded(TreeExpansionEvent event);
 
 
-} // TreeExpansionListener
+}

@@ -37,6 +37,8 @@ exception statement from your version. */
 
 package javax.swing.filechooser;
 
+import gnu.classpath.NotImplementedException;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -76,7 +78,10 @@ public abstract class FileSystemView
    */
   public File createFileObject(String path)
   {
-    return new File(path);
+    File f = new File(path);
+    if (isFileSystemRoot(f))
+      f = this.createFileSystemRoot(f);
+    return f;
   }
 
   /**
@@ -166,16 +171,12 @@ public abstract class FileSystemView
    * @return A default {@link FileSystemView} appropriate for the platform.
    */
   public static FileSystemView getFileSystemView()
+    throws NotImplementedException
   {
     if (defaultFileSystemView == null)
       {
-    if (File.separator.equals("/"))
+        // FIXME: We need to support other file systems too.
           defaultFileSystemView = new UnixFileSystemView();
-        // FIXME: need to implement additional views
-    // else if (File.Separator.equals("\"))
-    //	return new Win32FileSystemView();
-    // else 
-    //	return new GenericFileSystemView();
       }
     return defaultFileSystemView;
   }
@@ -223,16 +224,24 @@ public abstract class FileSystemView
 
   /**
    * Returns the name of a file as it would be displayed by the underlying 
-   * system.  This implementation returns <code>null</code>, subclasses must
-   * override.
+   * system.
    *
    * @param f  the file.
    *
-   * @return <code>null</code>.
+   * @return the name of a file as it would be displayed by the underlying 
+   *         system
+   *
+   * @specnote The specification suggests that the information here is
+   *           fetched from a ShellFolder class. This seems to be a non public
+   *           private file handling class. We simply return File.getName()
+   *           here and leave special handling to subclasses.
    */
   public String getSystemDisplayName(File f)
   {
-    return null;
+    String name = null;
+    if (f != null)
+      name = f.getName();
+    return name;
   }
 
   /**

@@ -38,26 +38,34 @@ exception statement from your version. */
 
 package javax.swing.text.html;
 
+import gnu.classpath.NotImplementedException;
+import gnu.javax.swing.text.html.css.CSSColor;
+import gnu.javax.swing.text.html.css.CSSParser;
+import gnu.javax.swing.text.html.css.CSSParserCallback;
+import gnu.javax.swing.text.html.css.FontSize;
+import gnu.javax.swing.text.html.css.FontStyle;
+import gnu.javax.swing.text.html.css.FontWeight;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
-import java.io.StringReader;
-
-import java.net.MalformedURLException;
 import java.net.URL;
-
+import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Vector;
+import java.util.HashMap;
+import java.util.List;
+import java.util.StringTokenizer;
 
+import javax.swing.event.ChangeListener;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.Element;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.View;
 
@@ -83,6 +91,91 @@ import javax.swing.text.View;
 public class StyleSheet extends StyleContext
 {
 
+  /**
+   * Parses CSS stylesheets using the parser in gnu/javax/swing/html/css.
+   */
+  private class CSSStyleSheetParserCallback
+    implements CSSParserCallback
+  {
+    /**
+     * The selector for which the rules are currently parsed.
+     */
+    private String[] selector;
+
+    /**
+     * Called at the beginning of a statement.
+     *
+     * @param sel the selector
+     */
+    public void startStatement(String sel)
+    {
+      StringTokenizer tokens = new StringTokenizer(sel);
+      selector = new String[tokens.countTokens()];
+      for (int index = 0; tokens.hasMoreTokens(); index++)
+        selector[index] = tokens.nextToken();
+    }
+
+    /**
+     * Called at the end of a statement.
+     */
+    public void endStatement()
+    {
+      selector = null;
+    }
+
+    /**
+     * Called when a declaration is parsed.
+     *
+     * @param property the property
+     * @param value the value
+     */
+    public void declaration(String property, String value)
+    {
+      for (int i = 0; i < selector.length; i++)
+        {
+          CSSStyle style = (CSSStyle) css.get(selector[i]);
+          if (style == null)
+            {
+              style = new CSSStyle();
+              css.put(selector[i], style);
+            }
+          CSS.Attribute cssAtt = CSS.getAttribute(property);
+          Object val = CSS.getValue(cssAtt, value);
+          if (cssAtt != null)
+            style.addAttribute(cssAtt, val);
+          // else  // For debugging only.
+          //   System.err.println("no mapping for: " + property);
+        }
+    }
+    
+  }
+
+  /**
+   * Represents a style that is defined by a CSS rule.
+   */
+  private class CSSStyle
+    extends SimpleAttributeSet
+    implements Style
+  {
+
+    public String getName()
+    {
+      // TODO: Implement this for correctness.
+      return null;
+    }
+
+    public void addChangeListener(ChangeListener listener)
+    {
+      // TODO: Implement this for correctness.
+    }
+
+    public void removeChangeListener(ChangeListener listener)
+    {
+      // TODO: Implement this for correctness.
+    }
+    
+  }
+
   /** The base URL */
   URL base;
   
@@ -93,12 +186,24 @@ public class StyleSheet extends StyleContext
   StyleSheet[] styleSheet;
   
   /**
+   * Maps element names (selectors) to AttributSet (the corresponding style
+   * information).
+   */
+  HashMap css = new HashMap();
+
+  /**
+   * Maps selectors to their resolved styles.
+   */
+  private HashMap resolvedStyles;
+
+  /**
    * Constructs a StyleSheet.
    */
   public StyleSheet()
   {
     super();
     baseFontSize = 4; // Default font size from CSS
+    resolvedStyles = new HashMap();
   }
 
   /**
@@ -112,8 +217,169 @@ public class StyleSheet extends StyleContext
    */
   public Style getRule(HTML.Tag t, Element e)
   {
-    // FIXME: Not implemented.
-    return null;
+    // Create list of the element and all of its parents, starting
+    // with the bottommost element.
+    ArrayList path = new ArrayList();
+    Element el;
+    AttributeSet atts;
+    for (el = e; el != null; el = el.getParentElement())
+      path.add(el);
+
+    // Create fully qualified selector.
+    StringBuilder selector = new StringBuilder();
+    int count = path.size();
+    // We append the actual element after this loop.
+    for (int i = count - 1; i > 0; i--)
+      {
+        el = (Element) path.get(i);
+        atts = el.getAttributes();
+        Object name = atts.getAttribute(StyleConstants.NameAttribute);
+        selector.append(name.toString());
+        if (atts.isDefined(HTML.Attribute.ID))
+          {
+            selector.append('#');
+            selector.append(atts.getAttribute(HTML.Attribute.ID));
+          }
+        else if (atts.isDefined(HTML.Attribute.CLASS))
+          {
+            selector.append('.');
+            selector.append(atts.getAttribute(HTML.Attribute.CLASS));
+          }
+        selector.append(' ');
+      }
+    selector.append(t.toString());
+    el = (Element) path.get(0);
+    atts = el.getAttributes();
+    // For leaf elements, we have to fetch the tag specific attributes.
+    if (el.isLeaf())
+      {
+        Object o = atts.getAttribute(t);
+        if (o instanceof AttributeSet)
+          atts = (AttributeSet) o;
+        else
+          atts = null;
+      }
+    if (atts != null)
+      {
+        if (atts.isDefined(HTML.Attribute.ID))
+          {
+            selector.append('#');
+            selector.append(atts.getAttribute(HTML.Attribute.ID));
+          }
+        else if (atts.isDefined(HTML.Attribute.CLASS))
+          {
+            selector.append('.');
+            selector.append(atts.getAttribute(HTML.Attribute.CLASS));
+          }
+      }
+    return getResolvedStyle(selector.toString(), path, t);
+  }
+
+  /**
+   * Fetches a resolved style. If there is no resolved style for the
+   * specified selector, the resolve the style using
+   * {@link #resolveStyle(String, List, HTML.Tag)}.
+   * 
+   * @param selector the selector for which to resolve the style
+   * @param path the Element path, used in the resolving algorithm
+   * @param tag the tag for which to resolve
+   *
+   * @return the resolved style
+   */
+  private Style getResolvedStyle(String selector, List path, HTML.Tag tag)
+  {
+    Style style = (Style) resolvedStyles.get(selector);
+    if (style == null)
+      style = resolveStyle(selector, path, tag);
+    return style;
+  }
+
+  /**
+   * Resolves a style. This creates arrays that hold the tag names,
+   * class and id attributes and delegates the work to
+   * {@link #resolveStyle(String, String[], String[], String[])}.
+   *
+   * @param selector the selector
+   * @param path the Element path
+   * @param tag the tag
+   *
+   * @return the resolved style
+   */
+  private Style resolveStyle(String selector, List path, HTML.Tag tag)
+  {
+    int count = path.size();
+    String[] tags = new String[count];
+    String[] ids = new String[count];
+    String[] classes = new String[count];
+    for (int i = 0; i < count; i++)
+      {
+        Element el = (Element) path.get(i);
+        AttributeSet atts = el.getAttributes();
+        if (i == 0 && el.isLeaf())
+          {
+            Object o = atts.getAttribute(tag);
+            if (o instanceof AttributeSet)
+              atts = (AttributeSet) o;
+            else
+              atts = null;
+          }
+        if (atts != null)
+          {
+            HTML.Tag t =
+              (HTML.Tag) atts.getAttribute(StyleConstants.NameAttribute);
+            if (t != null)
+              tags[i] = t.toString();
+            else
+              tags[i] = null;
+            if (atts.isDefined(HTML.Attribute.CLASS))
+              classes[i] = atts.getAttribute(HTML.Attribute.CLASS).toString();
+            else
+              classes[i] = null;
+            if (atts.isDefined(HTML.Attribute.ID))
+              ids[i] = atts.getAttribute(HTML.Attribute.ID).toString();
+            else
+              ids[i] = null;
+          }
+        else
+          {
+            tags[i] = null;
+            classes[i] = null;
+            ids[i] = null;
+          }
+      }
+    tags[0] = tag.toString();
+    return resolveStyle(selector, tags, ids, classes);
+  }
+
+  /**
+   * Performs style resolving.
+   *
+   * @param selector the selector
+   * @param tags the tags
+   * @param ids the corresponding ID attributes
+   * @param classes the corresponding CLASS attributes
+   *
+   * @return the resolved style
+   */
+  private Style resolveStyle(String selector, String[] tags, String[] ids,
+                             String[] classes)
+  {
+    // FIXME: This style resolver is not correct. But it works good enough for
+    // the default.css.
+    int count = tags.length;
+    ArrayList styles = new ArrayList();
+    for (int i = 0; i < count; i++)
+      {
+        Style style = (Style) css.get(tags[i]);
+        if (style != null)
+          styles.add(style);
+        // FIXME: Handle ID and CLASS attributes.
+      }
+    Style[] styleArray = new Style[styles.size()];
+    Style resolved = new MultiStyle(selector,
+                                    (Style[]) styles.toArray(styleArray));
+    resolvedStyles.put(selector, resolved);
+    return resolved;
   }
   
   /**
@@ -126,27 +392,21 @@ public class StyleSheet extends StyleContext
    */
   public Style getRule(String selector)
   {
-    // FIXME: Not implemented.
-    return null; 
+    // FIXME: This is a very rudimentary implementation. Should
+    // be extended to conform to the CSS spec.
+    return (Style) css.get(selector);
   }
   
   /**
-   * Adds a set if rules to the sheet. The rules are expected to be in valid
+   * Adds a set of rules to the sheet. The rules are expected to be in valid
    * CSS format. This is called as a result of parsing a <style> tag
    * 
    * @param rule - the rule to add to the sheet
    */
   public void addRule(String rule)
+    throws NotImplementedException
   {
-    CssParser cp = new CssParser();
-    try
-    {
-      cp.parse(base, new StringReader(rule), false, false);
-    }
-    catch (IOException io)
-    {
-      // Do nothing here.
-    }
+    // FIXME: Implement.
   }
   
   /**
@@ -174,10 +434,13 @@ public class StyleSheet extends StyleContext
    * parameter.
    * @throws IOException - For any IO error while reading
    */
-  public void loadRules(Reader in, URL ref) throws IOException
+  public void loadRules(Reader in, URL ref)
+    throws IOException
   {
-    CssParser cp = new CssParser();
-    cp.parse(ref, in, false, false);
+    CSSStyleSheetParserCallback cb = new CSSStyleSheetParserCallback();
+    // FIXME: Handle ref.
+    CSSParser parser = new CSSParser(in, cb);
+    parser.parse();
   }
   
   /**
@@ -189,8 +452,7 @@ public class StyleSheet extends StyleContext
    */
   public AttributeSet getViewAttributes(View v)
   {
-    // FIXME: Not implemented.
-    return null;
+    return new ViewAttributeSet(v, this);
   }
   
   /**
@@ -308,7 +570,8 @@ public class StyleSheet extends StyleContext
   public void addCSSAttribute(MutableAttributeSet attr, CSS.Attribute key,
                               String value)
   {
-    attr.addAttribute(key, value);
+    Object val = CSS.getValue(key, value);
+    attr.addAttribute(key, val);
   }
   
   /**
@@ -338,8 +601,11 @@ public class StyleSheet extends StyleContext
    */
   public AttributeSet translateHTMLToCSS(AttributeSet htmlAttrSet)
   {
-    // FIXME: Not implemented.
-    return null;    
+    // FIXME: Really convert HTML to CSS here.
+    AttributeSet cssAttr = htmlAttrSet.copyAttributes();
+    MutableAttributeSet cssStyle = addStyle(null, null);
+    cssStyle.addAttributes(cssAttr);
+    return cssStyle;
   }
 
   /**
@@ -453,7 +719,31 @@ public class StyleSheet extends StyleContext
    */
   public Font getFont(AttributeSet a)
   {
-    return super.getFont(a);    
+    FontSize size = (FontSize) a.getAttribute(CSS.Attribute.FONT_SIZE);
+    int realSize = 12;
+    if (size != null)
+      realSize = size.getValue();
+
+    // Decrement size for subscript and superscript.
+    Object valign = a.getAttribute(CSS.Attribute.VERTICAL_ALIGN);
+    if (valign != null)
+      {
+        String v = valign.toString();
+        if (v.contains("sup") || v.contains("sub"))
+          realSize -= 2;
+      }
+
+    // TODO: Convert font family.
+    String family = "SansSerif";
+
+    int style = Font.PLAIN;
+    FontWeight weight = (FontWeight) a.getAttribute(CSS.Attribute.FONT_WEIGHT);
+    if (weight != null)
+      style |= weight.getValue();
+    FontStyle fStyle = (FontStyle) a.getAttribute(CSS.Attribute.FONT_STYLE);
+    if (fStyle != null)
+      style |= fStyle.getValue();
+    return new Font(family, style, realSize);
   }
   
   /**
@@ -466,7 +756,11 @@ public class StyleSheet extends StyleContext
    */
   public Color getForeground(AttributeSet a)
   {
-    return super.getForeground(a);     
+    CSSColor c = (CSSColor) a.getAttribute(CSS.Attribute.COLOR);
+    Color color = null;
+    if (c != null)
+      color = c.getValue();
+    return color;     
   }
   
   /**
@@ -479,7 +773,11 @@ public class StyleSheet extends StyleContext
    */
   public Color getBackground(AttributeSet a)
   {
-    return super.getBackground(a);     
+    CSSColor c = (CSSColor) a.getAttribute(CSS.Attribute.BACKGROUND_COLOR);
+    Color color = null;
+    if (c != null)
+      color = c.getValue();
+    return color;     
   }
   
   /**
@@ -585,47 +883,15 @@ public class StyleSheet extends StyleContext
   }
   
   /**
-   * Converst a color string to a color. If it is not found, null is returned.
+   * Convert the color string represenation into java.awt.Color. The valid
+   * values are like "aqua" , "#00FFFF" or "rgb(1,6,44)".
    * 
-   * @param color - the color string such as "RED" or "#NNNNNN"
-   * @return the Color, or null if not found.
+   * @param colorName the color to convert.
+   * @return the matching java.awt.color
    */
-  public Color stringToColor(String color)
+  public Color stringToColor(String colorName)
   {
-    color = color.toLowerCase();
-    if (color.equals("black") || color.equals("#000000"))
-      return Color.BLACK;
-    else if (color.equals("aqua") || color.equals("#00FFFF"))
-      return new Color(127, 255, 212);
-    else if (color.equals("gray") || color.equals("#808080"))
-      return Color.GRAY;
-    else if (color.equals("navy") || color.equals("#000080"))
-      return new Color(0, 0, 128);
-    else if (color.equals("silver") || color.equals("#C0C0C0"))
-      return Color.LIGHT_GRAY;
-    else if (color.equals("green") || color.equals("#008000"))
-      return Color.GREEN;
-    else if (color.equals("olive") || color.equals("#808000"))
-      return new Color(128, 128, 0);
-    else if (color.equals("teal") || color.equals("#008080"))
-      return new Color(0, 128, 128);
-    else if (color.equals("blue") || color.equals("#0000FF"))
-      return Color.BLUE;
-    else if (color.equals("lime") || color.equals("#00FF00"))
-      return new Color(0, 255, 0);
-    else if (color.equals("purple") || color.equals("#800080"))
-      return new Color(128, 0, 128);
-    else if (color.equals("white") || color.equals("#FFFFFF"))
-      return Color.WHITE;
-    else if (color.equals("fuchsia") || color.equals("#FF00FF"))
-      return Color.MAGENTA;
-    else if (color.equals("maroon") || color.equals("#800000"))
-      return new Color(128, 0, 0);
-    else if (color.equals("Red") || color.equals("#FF0000"))
-      return Color.RED;
-    else if (color.equals("Yellow") || color.equals("#FFFF00"))
-      return Color.YELLOW;
-    return null; 
+    return CSSColor.convertValue(colorName);
   }
   
   /**
@@ -732,206 +998,4 @@ public class StyleSheet extends StyleContext
     }
   }
   
-  /**
-   * The parser callback for the CSSParser.
-   */
-  class CssParser implements CSSParser.CSSParserCallback
-  {
-    /** 
-     * A vector of all the selectors. 
-     * Each element is an array of all the selector tokens 
-     * in a single rule. 
-     */
-    Vector selectors;
-
-    /** A vector of all the selector tokens in a rule. */
-    Vector selectorTokens;
-
-    /**  Name of the current property. */
-    String propertyName;
-
-    /** The set of CSS declarations */
-    MutableAttributeSet declaration;
-
-    /** 
-     * True if parsing a declaration, that is the Reader will not 
-     * contain a selector. 
-     */
-    boolean parsingDeclaration;
-
-    /** True if the attributes are coming from a linked/imported style. */
-    boolean isLink;
-
-    /** The base URL */
-    URL base;
-
-    /** The parser */
-    CSSParser parser;
-
-    /**
-     * Constructor
-     */
-    CssParser()
-    {
-      selectors = new Vector();
-      selectorTokens = new Vector();
-      parser = new CSSParser();
-      base = StyleSheet.this.base;
-      declaration = new SimpleAttributeSet();
-    }
-
-    /**
-     * Parses the passed in CSS declaration into an AttributeSet.
-     * 
-     * @param s - the declaration
-     * @return the set of attributes containing the property and value.
-     */
-    public AttributeSet parseDeclaration(String s)
-    {
-      try
-      {
-        return parseDeclaration(new StringReader(s));
-      }
-      catch (IOException e)
-      {
-         // Do nothing here.
-      }
-      return null;
-    }
-
-    /**
-     * Parses the passed in CSS declaration into an AttributeSet.
-     * 
-     * @param r - the reader
-     * @return the attribute set
-     * @throws IOException from the reader
-     */
-    public AttributeSet parseDeclaration(Reader r) throws IOException
-    {
-      parse(base, r, true, false);
-      return declaration;
-    }
-
-    /**
-     * Parse the given CSS stream
-     * 
-     * @param base - the url
-     * @param r - the reader
-     * @param parseDec - True if parsing a declaration
-     * @param isLink - True if parsing a link
-     */
-   public void parse(URL base, Reader r, boolean parseDec, boolean isLink) throws IOException
-   {
-     parsingDeclaration = parseDec;
-     this.isLink = isLink;
-     this.base = base;
-     
-     // flush out all storage
-     propertyName = null;
-     selectors.clear();
-     selectorTokens.clear();
-     declaration.removeAttributes(declaration);
-     
-     parser.parse(r, this, parseDec);
-   }
-
-   /**
-    * Invoked when a valid @import is encountered, 
-    * will call importStyleSheet if a MalformedURLException 
-    * is not thrown in creating the URL.
-    *
-    * @param s - the string after @import
-    */ 
-   public void handleImport(String s)
-    {
-      if (s != null)
-        {
-          try
-            {
-              if (s.startsWith("url(") && s.endsWith(")"))
-                s = s.substring(4, s.length() - 1);
-              if (s.indexOf("\"") >= 0)
-                s = s.replaceAll("\"","");
-
-              URL url = new URL(s);
-              if (url == null && base != null)
-                url = new URL(base, s);
-              
-              importStyleSheet(url);
-            }
-          catch (MalformedURLException e)
-            {
-              // Do nothing here.
-            }
-        }
-    }
-
-   /**
-     * A selector has been encountered.
-     * 
-     * @param s - a selector (e.g. P or UL or even P,)
-     */
-   public void handleSelector(String s)
-   {
-     if (s.endsWith(","))
-       s = s.substring(0, s.length() - 1);
-     
-     selectorTokens.addElement(s);
-     addSelector();
-   }
-
-   /**
-    * Invoked when the start of a rule is encountered.
-    */
-   public void startRule()
-   {
-     addSelector();
-   }
-
-   /**
-    * Invoked when a property name is encountered.
-    *
-    * @param s - the property
-    */
-   public void handleProperty(String s)
-   {
-     propertyName = s;
-   }
-
-  /**
-   * Invoked when a property value is encountered.
-   *
-   * @param s - the value
-   */
-   public void handleValue(String s)
-   {
-     // call addCSSAttribute
-     // FIXME: Not implemented
-   }
-   
-   /**
-    * Invoked when the end of a rule is encountered.
-    */
-   public void endRule()
-   {
-     // FIXME: Not implemented
-     // add rules
-     propertyName = null;
-   }
-
-   /**
-    * Adds the selector to the vector.
-    */
-   private void addSelector()
-   {
-     int length = selectorTokens.size();
-     if (length > 0)
-       {
-         Object[] sel = new Object[length];
-         System.arraycopy(selectorTokens.toArray(), 0, sel, 0, length);
-         selectors.add(sel);
-         selectorTokens.clear();
-       }
-   }
-  }
 }

@@ -38,7 +38,6 @@ exception statement from your version. */
 
 package javax.swing.text;
 
-import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 
@@ -957,14 +956,26 @@ public class DefaultEditorKit extends EditorKit
       {
       // first we filter the following events:
       // - control characters
-      // - key events with the ALT modifier (FIXME: filter that too!)
-      char c = event.getActionCommand().charAt(0);
-      if (Character.isISOControl(c))
-        return;
-                
-      JTextComponent t = getTextComponent(event);
-      if (t != null && t.isEnabled() && t.isEditable())
-        t.replaceSelection(event.getActionCommand());
+      // - key events with the ALT modifier
+      JTextComponent target = getTextComponent(event);
+      if ((target != null) && (event != null))
+        {
+          if ((target.isEditable()) && (target.isEnabled()))
+            {
+              String content = event.getActionCommand();
+              int mod = event.getModifiers();
+              if ((content != null) && (content.length() > 0)
+                  && (mod & ActionEvent.ALT_MASK) == 0
+                  && (mod & ActionEvent.CTRL_MASK) == 0)
+                {
+                  char c = content.charAt(0);
+                  if ((c >= 0x20) && (c != 0x7F))
+                    {
+                      target.replaceSelection(content);
+                    }
+                }
+            }
+        }
               }
           }
 

@@ -48,6 +48,8 @@ import java.awt.event.MouseMotionListener;
 import java.awt.Cursor;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.StringReader;
@@ -64,12 +66,16 @@ import javax.swing.text.EditorKit;
 import javax.swing.text.Element;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
 import javax.swing.text.StyledEditorKit;
 import javax.swing.text.TextAction;
 import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
 import javax.swing.text.html.parser.ParserDelegator;
+
+/* Move these imports here after javax.swing.text.html to make it compile
+   with jikes.  */
+import gnu.javax.swing.text.html.parser.GnuParserDelegator;
+import gnu.javax.swing.text.html.parser.HTML_401Swing;
 
 /**
  * @author Lillian Angel (langel at redhat dot com)
@@ -557,19 +563,18 @@ public class HTMLEditorKit
           else if (tag == HTML.Tag.HEAD)
             view = new NullView(element);
           else if (tag.equals(HTML.Tag.TABLE))
-            view = new HTMLTableView(element);
+            view = new javax.swing.text.html.TableView(element);
           else if (tag.equals(HTML.Tag.TD))
             view = new ParagraphView(element);
-
+          else if (tag.equals(HTML.Tag.HR))
+            view = new HRuleView(element);
+          else if (tag.equals(HTML.Tag.BR))
+            view = new BRView(element);
 
           /*
           else if (tag.equals(HTML.Tag.MENU) || tag.equals(HTML.Tag.DIR)
                    || tag.equals(HTML.Tag.UL) || tag.equals(HTML.Tag.OL))
             view = new ListView(element);
-          else if (tag.equals(HTML.Tag.HR))
-            view = new HRuleView(element);
-          else if (tag.equals(HTML.Tag.BR))
-            view = new BRView(element);
           else if (tag.equals(HTML.Tag.INPUT) || tag.equals(HTML.Tag.SELECT)
                    || tag.equals(HTML.Tag.TEXTAREA))
             view = new FormView(element);
@@ -800,7 +805,7 @@ public class HTMLEditorKit
   /**
    * The current style sheet.
    */
-  StyleSheet styleSheet;
+  private StyleSheet styleSheet;
   
   /**
    * The ViewFactory for HTMLFactory.
@@ -827,11 +832,6 @@ public class HTMLEditorKit
    */
   LinkController mouseListener;
   
-  /**
-   * Style context for this editor.
-   */
-  StyleContext styleContext;
-  
   /** The content type */
   String contentType = "text/html";
   
@@ -846,11 +846,7 @@ public class HTMLEditorKit
    */
   public HTMLEditorKit()
   {
-    super();    
-    styleContext = new StyleContext();
-    styleSheet = new StyleSheet();
-    styleSheet.importStyleSheet(getClass().getResource(DEFAULT_CSS));
-    // FIXME: Set inputAttributes with default.css    
+    // Nothing to do here.
   }
   
   /**
@@ -887,7 +883,9 @@ public class HTMLEditorKit
   protected Parser getParser()
   {
     if (parser == null)
-      parser = new ParserDelegator();
+      {
+        parser = new GnuParserDelegator(HTML_401Swing.getInstance());
+      }
     return parser;
   }
   
@@ -917,8 +915,7 @@ public class HTMLEditorKit
     if (parser == null)
       throw new IOException("Parser is null.");
 
-    ParserCallback pc = ((HTMLDocument) doc).getReader
-                          (offset, popDepth, pushDepth, insertTag);
+    ParserCallback pc = doc.getReader(offset, popDepth, pushDepth, insertTag);
 
     // FIXME: What should ignoreCharSet be set to?
     
@@ -1148,8 +1145,18 @@ public class HTMLEditorKit
   {
     if (styleSheet == null)
       {
+        try
+          {
       styleSheet = new StyleSheet();
-        styleSheet.importStyleSheet(getClass().getResource(DEFAULT_CSS));
+            InputStream in = getClass().getResourceAsStream(DEFAULT_CSS);
+            InputStreamReader r = new InputStreamReader(in);
+            styleSheet.loadRules(r,  null);
+            r.close();
+          }
+        catch (IOException ex)
+          {
+            // No style available.
+          }
       }
     return styleSheet;
   }
