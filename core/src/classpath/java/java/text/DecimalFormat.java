@@ -542,7 +542,7 @@ public class DecimalFormat extends NumberFormat
 			// Compute exponent.
 			long exponent = 0;
 			double baseNumber;
-	if (useExponentialNotation)
+	if (useExponentialNotation && number > 0)
 	  {
 	    exponent = (long) Math.floor (Math.log(number) / Math.log(10));
 	    exponent = exponent - (exponent % exponentRound);
