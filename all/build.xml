@@ -449,9 +449,12 @@ clean             Remove all intermediate build results.
             <exclude name="compat/**/*"/>
             <exclude name="examples/**/*"/>
             <exclude name="external/**/*"/>
+            <exclude name="tools/**/*"/>
+            <exclude name="gnu/classpath/tools/javah/**/*"/>
             <exclude name="gnu/java/awt/peer/gtk/**/*"/>
             <exclude name="gnu/java/awt/peer/qt/**/*"/>
             <exclude name="gnu/java/awt/peer/x/**/*"/>
+            <exclude name="gnu/java/awt/dnd/peer/gtk/**/*"/>
             <exclude name="gnu/javax/sound/midi/alsa/**/*"/>
             <exclude name="gnu/javax/sound/midi/dssi/**/*"/>
             <exclude name="gnu/javax/swing/plaf/gtk/**/*"/>
@@ -478,6 +481,9 @@ clean             Remove all intermediate build results.
                 <fileset dir="${root.dir}/core/src/classpath/org">
                     <patternset refid="cp-includes-pattern"/>
                	</fileset>
+                <fileset dir="${root.dir}/core/src/classpath/tools">
+                    <patternset refid="cp-includes-pattern"/>
+               	</fileset>
                 <fileset dir="${root.dir}/core/src/classpath/5.0" target="1.5">
                     <patternset refid="cp-includes-pattern"/>
                 </fileset>
@@ -502,8 +508,14 @@ clean             Remove all intermediate build results.
                 <fileset dir="${root.dir}/../classpath/external/w3c_dom">
                     <patternset refid="cp-includes-pattern"/>
                 </fileset>
+                <fileset dir="${root.dir}/../classpath/external/relaxngDatatype">
+                    <patternset refid="cp-includes-pattern"/>
+                </fileset>
                 <fileset dir="${root.dir}/../classpath/external/sax">
-                <patternset refid="cp-includes-pattern"/>
+                    <patternset refid="cp-includes-pattern"/>
+                </fileset>
+                <fileset dir="${root.dir}/../classpath/tools">
+                    <patternset refid="cp-includes-pattern"/>
                 </fileset>
             </classpathsources>
         </cp-compare>
