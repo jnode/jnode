@@ -41,12 +41,11 @@ package gnu.java.security.prng;
 import java.util.EventObject;
 
 /**
- * An interface for entropy accumulators that will be notified of random
- * events.
+ * A type for entropy accumulators that will be notified of random events.
  */
-public class RandomEvent extends EventObject
+public class RandomEvent
+    extends EventObject
 {
-
   private final byte sourceNumber;
 
   private final byte poolNumber;

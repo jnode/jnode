@@ -47,12 +47,12 @@ import java.security.interfaces.RSAKey;
 import java.util.Random;
 
 /**
- * <p>An implementation of the EME-PKCS1-V1.5 encoding and decoding methods.</p>
- *
- * <p>EME-PKCS1-V1.5 is parameterised by the entity <code>k</code> which is the
- * byte count of an RSA public shared modulus.</p>
- *
- * <p>References:</p>
+ * An implementation of the EME-PKCS1-V1.5 encoding and decoding methods.
+ * <p>
+ * EME-PKCS1-V1.5 is parameterised by the entity <code>k</code> which is the
+ * byte count of an RSA public shared modulus.
+ * <p>
+ * References:
  * <ol>
  *    <li><a href="http://www.ietf.org/rfc/rfc3447.txt">Public-Key Cryptography
  *    Standards (PKCS) #1:</a><br>
@@ -62,19 +62,12 @@ import java.util.Random;
  */
 public class EME_PKCS1_V1_5
 {
-
-  // Constants and variables
-  // -------------------------------------------------------------------------
-
   private int k;
 
   private ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
   /** Our default source of randomness. */
   private PRNG prng = PRNG.getInstance();
-
-  // Constructor(s)
-  // -------------------------------------------------------------------------
 
   private EME_PKCS1_V1_5(final int k)
   {
@@ -83,15 +76,11 @@ public class EME_PKCS1_V1_5
     this.k = k;
   }
 
-  // Class methods
-  // -------------------------------------------------------------------------
-
   public static final EME_PKCS1_V1_5 getInstance(final int k)
   {
     if (k < 0)
-      {
         throw new IllegalArgumentException("k must be a positive integer");
-      }
+
     return new EME_PKCS1_V1_5(k);
   }
 
@@ -102,23 +91,19 @@ public class EME_PKCS1_V1_5
     return EME_PKCS1_V1_5.getInstance(k);
   }
 
-  // Instance methods
-  // -------------------------------------------------------------------------
-
   /**
-   * <p>Generates an octet string <code>PS</code> of length <code>k - mLen -
-   * 3</code> consisting of pseudo-randomly generated nonzero octets. The
-   * length of <code>PS</code> will be at least eight octets.</p>
-   *
-   * <p>The method then concatenates <code>PS</code>, the message <code>M</code>,
+   * Generates an octet string <code>PS</code> of length <code>k - mLen -
+   * 3</code> consisting of pseudo-randomly generated nonzero octets. The length
+   * of <code>PS</code> will be at least eight octets.
+   * <p>
+   * The method then concatenates <code>PS</code>, the message <code>M</code>,
    * and other padding to form an encoded message <code>EM</code> of length
-   * <code>k</code> octets as:</p>
-   *
+   * <code>k</code> octets as:
    * <pre>
    *    EM = 0x00 || 0x02 || PS || 0x00 || M.
    * </pre>
-   *
-   * <p>This method uses a default PRNG to obtain the padding bytes.</p>
+   * <p>
+   * This method uses a default PRNG to obtain the padding bytes.
    *
    * @param M the message to encode.
    * @return the encoded message <code>EM</code>.
@@ -129,7 +114,6 @@ public class EME_PKCS1_V1_5
     //    of pseudo-randomly generated nonzero octets.  The length of PS
     //    will be at least eight octets.
     final byte[] PS = new byte[k - M.length - 3];
-
     // FIXME. This should be configurable, somehow.
     prng.nextBytes(PS);
     int i = 0;
@@ -146,9 +130,9 @@ public class EME_PKCS1_V1_5
   }
 
   /**
-   * <p>Similar to {@link #encode(byte[])} method, except that the source of
+   * Similar to {@link #encode(byte[])} method, except that the source of
    * randomness to use for obtaining the padding bytes (an instance of
-   * {@link IRandom}) is given as a parameter.</p>
+   * {@link IRandom}) is given as a parameter.
    *
    * @param M the message to encode.
    * @param irnd the {@link IRandom} instance to use as a source of randomness.
@@ -183,13 +167,12 @@ public class EME_PKCS1_V1_5
       {
         throw new RuntimeException("encode(): " + String.valueOf(x));
       }
-
     return assembleEM(PS, M);
   }
 
   /**
-   * <p>Similar to the {@link #encode(byte[], IRandom)} method, except that
-   * the source of randmoness is an instance of {@link Random}.
+   * Similar to the {@link #encode(byte[], IRandom)} method, except that the
+   * source of randmoness is an instance of {@link Random}.
    *
    * @param M the message to encode.
    * @param rnd the {@link Random} instance to use as a source of randomness.
@@ -213,33 +196,31 @@ public class EME_PKCS1_V1_5
           }
         break;
       }
-
     return assembleEM(PS, M);
   }
 
   /**
-   * <p>Separate the encoded message <code>EM</code> into an octet string
+   * Separate the encoded message <code>EM</code> into an octet string
    * <code>PS</code> consisting of nonzero octets and a message <code>M</code>
-   * as:</p>
-   *
+   * as:
    * <pre>
    *    EM = 0x00 || 0x02 || PS || 0x00 || M.
    * </pre>
+   * <p>
+   * If the first octet of <code>EM</code> does not have hexadecimal value
+   * <code>0x00</code>, if the second octet of <code>EM</code> does not
+   * have hexadecimal value <code>0x02</code>, if there is no octet with
+   * hexadecimal value <code>0x00</code> to separate <code>PS</code> from
+   * <code>M</code>, or if the length of <code>PS</code> is less than
+   * <code>8</code> octets, output "decryption error" and stop.
    *
-   * <p>If the first octet of <code>EM</code> does not have hexadecimal value
-   * <code>0x00</code>, if the second octet of <code>EM</code> does not have
-   * hexadecimal value <code>0x02</code>, if there is no octet with hexadecimal
-   * value <code>0x00</code> to separate <code>PS</code> from <code>M</code>,
-   * or if the length of <code>PS</code> is less than <code>8</code> octets,
-   * output "decryption error" and stop.</p>
-
    * @param EM the designated encoded message.
    * @return the decoded message <code>M</code> framed in the designated
    * <code>EM</code> value.
    * @throws IllegalArgumentException if the length of the designated entity
-   * <code>EM</code> is different than <code>k</code> (the length in bytes of
-   * the public shared modulus), or if any of the conditions described above
-   * is detected.
+   *           <code>EM</code> is different than <code>k</code> (the length
+   *           in bytes of the public shared modulus), or if any of the
+   *           conditions described above is detected.
    */
   public byte[] decode(final byte[] EM)
   {
@@ -255,36 +236,24 @@ public class EME_PKCS1_V1_5
     // "decryption error" and stop.  (See the note below.)
     final int emLen = EM.length;
     if (emLen != k)
-      {
         throw new IllegalArgumentException("decryption error");
-      }
     if (EM[0] != 0x00)
-      {
         throw new IllegalArgumentException("decryption error");
-      }
     if (EM[1] != 0x02)
-      {
         throw new IllegalArgumentException("decryption error");
-      }
     int i = 2;
     for (; i < emLen; i++)
       {
         if (EM[i] == 0x00)
-          {
             break;
           }
-      }
     if (i >= emLen || i < 11)
-      {
         throw new IllegalArgumentException("decryption error");
-      }
     i++;
     final byte[] result = new byte[emLen - i];
     System.arraycopy(EM, i, result, 0, result.length);
     return result;
   }
-
-  // helper methods ----------------------------------------------------------
 
   private byte[] assembleEM(final byte[] PS, final byte[] M)
   {
@@ -300,7 +269,6 @@ public class EME_PKCS1_V1_5
     baos.write(M, 0, M.length);
     final byte[] result = baos.toByteArray();
     baos.reset();
-
     return result;
   }
 }

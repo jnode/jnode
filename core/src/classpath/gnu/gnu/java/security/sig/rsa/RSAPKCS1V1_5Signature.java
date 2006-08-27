@@ -51,34 +51,28 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
 
 /**
- * <p>The RSA-PKCS1-V1.5 signature scheme is a digital signature scheme with
+ * The RSA-PKCS1-V1.5 signature scheme is a digital signature scheme with
  * appendix (SSA) combining the RSA algorithm with the EMSA-PKCS1-v1_5 encoding
- * method.</p>
- *
- * <p>References:</p>
+ * method.
+ * <p>
+ * References:
  * <ol>
- *    <li><a href="http://www.cosic.esat.kuleuven.ac.be/nessie/workshop/submissions/rsa-pss.zip">
+ * <li><a
+ * href="http://www.cosic.esat.kuleuven.ac.be/nessie/workshop/submissions/rsa-pss.zip">
  *    RSA-PSS Signature Scheme with Appendix, part B.</a><br>
  *    Primitive specification and supporting documentation.<br>
  *    Jakob Jonsson and Burt Kaliski.</li>
- *
  *    <li><a href="http://www.ietf.org/rfc/rfc3447.txt">Public-Key Cryptography
  *    Standards (PKCS) #1:</a><br>
  *    RSA Cryptography Specifications Version 2.1.<br>
  *    Jakob Jonsson and Burt Kaliski.</li>
  * </ol>
  */
-public class RSAPKCS1V1_5Signature extends BaseSignature
+public class RSAPKCS1V1_5Signature
+    extends BaseSignature
 {
-
-  // Constants and variables
-  // -------------------------------------------------------------------------
-
   /** The underlying EMSA-PKCS1-v1.5 instance for this object. */
   private EMSA_PKCS1_V1_5 pkcs1;
-
-  // Constructor(s)
-  // -------------------------------------------------------------------------
 
   /**
    * Default 0-arguments constructor. Uses SHA-1 as the default hash.
@@ -89,8 +83,8 @@ public class RSAPKCS1V1_5Signature extends BaseSignature
   }
 
   /**
-   * <p>Constructs an instance of this object using the designated message
-   * digest algorithm as its underlying hash function.</p>
+   * Constructs an instance of this object using the designated message digest
+   * algorithm as its underlying hash function.
    *
    * @param mdName the canonical name of the underlying hash function.
    */
@@ -117,14 +111,6 @@ public class RSAPKCS1V1_5Signature extends BaseSignature
     this.pkcs1 = (EMSA_PKCS1_V1_5) that.pkcs1.clone();
   }
 
-  // Class methods
-  // -------------------------------------------------------------------------
-
-  // Instance methods
-  // -------------------------------------------------------------------------
-
-  // Implementation of abstract methods in superclass ------------------------
-
   public Object clone()
   {
     return new RSAPKCS1V1_5Signature(this);
@@ -133,20 +119,18 @@ public class RSAPKCS1V1_5Signature extends BaseSignature
   protected void setupForVerification(final PublicKey k)
       throws IllegalArgumentException
   {
-    if (!(k instanceof RSAPublicKey))
-      {
+    if (! (k instanceof RSAPublicKey))
         throw new IllegalArgumentException();
-      }
+
     publicKey = k;
   }
 
   protected void setupForSigning(final PrivateKey k)
       throws IllegalArgumentException
   {
-    if (!(k instanceof RSAPrivateKey))
-      {
+    if (! (k instanceof RSAPrivateKey))
         throw new IllegalArgumentException();
-      }
+
     privateKey = k;
   }
 
@@ -165,7 +149,6 @@ public class RSAPKCS1V1_5Signature extends BaseSignature
     final int modBits = ((RSAPrivateKey) privateKey).getModulus().bitLength();
     final int k = (modBits + 7) / 8;
     final byte[] EM = pkcs1.encode(md.digest(), k);
-
     // 2. RSA signature:
     //    a. Convert the encoded message EM to an integer message epresentative
     //       m (see Section 4.2):  m = OS2IP (EM).
@@ -184,18 +167,14 @@ public class RSAPKCS1V1_5Signature extends BaseSignature
       throws IllegalStateException
   {
     if (publicKey == null)
-      {
         throw new IllegalStateException();
-      }
     final byte[] S = (byte[]) sig;
     // 1. Length checking: If the length of the signature S is not k octets,
     //    output "invalid signature" and stop.
     final int modBits = ((RSAPublicKey) publicKey).getModulus().bitLength();
     final int k = (modBits + 7) / 8;
     if (S.length != k)
-      {
         return false;
-      }
     // 2. RSA verification:
     //    a. Convert the signature S to an integer signature representative
     //       s (see Section 4.2): s = OS2IP (S).

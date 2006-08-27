@@ -49,15 +49,11 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * <p>A base abstract class to facilitate implementations of concrete
- * Signatures.</p>
+ * A base abstract class to facilitate implementations of concrete Signatures.
  */
-public abstract class BaseSignature implements ISignature
+public abstract class BaseSignature
+    implements ISignature
 {
-
-  // Constants and variables
-  // -------------------------------------------------------------------------
-
   /** The canonical name of this signature scheme. */
   protected String schemeName;
 
@@ -79,9 +75,6 @@ public abstract class BaseSignature implements ISignature
   /** Our default source of randomness. */
   private PRNG prng = null;
 
-  // Constructor(s)
-  // -------------------------------------------------------------------------
-
   /**
    * Trivial constructor.
    *
@@ -101,14 +94,6 @@ public abstract class BaseSignature implements ISignature
     this.md = md;
   }
 
-  // Class methods
-  // -------------------------------------------------------------------------
-
-  // Instance methods
-  // -------------------------------------------------------------------------
-
-  // gnu.crypto.sig.ISignature interface implementation ----------------------
-
   public String name()
   {
     return schemeName + "-" + md.name();
@@ -117,51 +102,41 @@ public abstract class BaseSignature implements ISignature
   public void setupVerify(Map attributes) throws IllegalArgumentException
   {
     setup(attributes);
-
     // do we have a public key?
     PublicKey key = (PublicKey) attributes.get(VERIFIER_KEY);
     if (key != null)
-      {
         setupForVerification(key);
       }
-  }
 
   public void setupSign(Map attributes) throws IllegalArgumentException
   {
     setup(attributes);
-
     // do we have a private key?
     PrivateKey key = (PrivateKey) attributes.get(SIGNER_KEY);
     if (key != null)
-      {
         setupForSigning(key);
       }
-  }
 
   public void update(byte b)
   {
     if (md == null)
-      {
         throw new IllegalStateException();
-      }
+
     md.update(b);
   }
 
   public void update(byte[] b, int off, int len)
   {
     if (md == null)
-      {
         throw new IllegalStateException();
-      }
+
     md.update(b, off, len);
   }
 
   public Object sign()
   {
     if (md == null || privateKey == null)
-      {
         throw new IllegalStateException();
-      }
 
     return generateSignature();
   }
@@ -169,14 +144,10 @@ public abstract class BaseSignature implements ISignature
   public boolean verify(Object sig)
   {
     if (md == null || publicKey == null)
-      {
         throw new IllegalStateException();
-      }
 
     return verifySignature(sig);
   }
-
-  // abstract methods to be implemented by concrete subclasses ---------------
 
   public abstract Object clone();
 
@@ -191,8 +162,6 @@ public abstract class BaseSignature implements ISignature
   protected abstract boolean verifySignature(Object signature)
       throws IllegalStateException;
 
-  // Other instance methods --------------------------------------------------
-
   /** Initialises the internal fields of this instance. */
   protected void init()
   {
@@ -204,32 +173,26 @@ public abstract class BaseSignature implements ISignature
   }
 
   /**
-   * <p>Fills the designated byte array with random data.</p>
+   * Fills the designated byte array with random data.
    *
    * @param buffer the byte array to fill with random data.
    */
   protected void nextRandomBytes(byte[] buffer)
   {
     if (rnd != null)
-      {
         rnd.nextBytes(buffer);
-      }
     else if (irnd != null)
-      {
         try
           {
             irnd.nextBytes(buffer, 0, buffer.length);
           }
         catch (IllegalStateException x)
           {
-            throw new RuntimeException("nextRandomBytes(): "
-                                       + String.valueOf(x));
+          throw new RuntimeException("nextRandomBytes(): " + x);
           }
         catch (LimitReachedException x)
           {
-            throw new RuntimeException("nextRandomBytes(): "
-                                       + String.valueOf(x));
-          }
+          throw new RuntimeException("nextRandomBytes(): " + x);
       }
     else
       getDefaultPRNG().nextBytes(buffer);
@@ -238,18 +201,13 @@ public abstract class BaseSignature implements ISignature
   private void setup(Map attributes)
   {
     init();
-
     // do we have a Random or SecureRandom, or should we use our own?
     Object obj = attributes.get(SOURCE_OF_RANDOMNESS);
     if (obj instanceof Random)
-      {
         rnd = (Random) obj;
-      }
     else if (obj instanceof IRandom)
-      {
         irnd = (IRandom) obj;
       }
-  }
 
   private PRNG getDefaultPRNG()
   {
