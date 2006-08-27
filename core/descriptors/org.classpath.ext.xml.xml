@@ -19,6 +19,9 @@
       <export name="gnu.xml.pipeline.*"/>
       <export name="gnu.xml.transform.*"/>
       <export name="gnu.xml.util.*"/>
+      <export name="gnu.xml.validation.datatype.*"/>
+      <export name="gnu.xml.validation.relaxng.*"/>
+      <export name="gnu.xml.validation.xmlschema.*"/>
       <export name="gnu.xml.xpath.*"/>
 
       <export name="javax.xml.*"/>
@@ -32,6 +35,8 @@
       <export name="javax.xml.validation.*"/>
       <export name="javax.xml.xpath.*"/>
 
+      <export name="org.relaxng.datatype.*"/>
+      <export name="org.relaxng.datatype.helpers.*"/>
       <export name="org.w3c.dom.*"/>
       <export name="org.w3c.dom.bootstrap.*"/>
       <export name="org.w3c.dom.css.*"/>
