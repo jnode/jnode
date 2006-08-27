@@ -16,6 +16,7 @@
       <export name="gnu.javax.security.auth.callback.*"/>
       <export name="gnu.javax.security.auth.login.*"/>
 
+      <export name="gnu.javax.swing.text.html.css.*"/>
       <export name="gnu.javax.swing.text.html.parser.*"/>
       <export name="gnu.javax.swing.text.html.parser.models.*"/>
       <export name="gnu.javax.swing.text.html.parser.support.*"/>
