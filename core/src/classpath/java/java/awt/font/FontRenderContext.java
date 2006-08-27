@@ -83,7 +83,15 @@ public class FontRenderContext
 
   public boolean equals (FontRenderContext rhs)
   {
-    return (affineTransform.equals (rhs.getTransform ())
+    if (rhs == null)
+      return false;
+
+    if (affineTransform == null && rhs.affineTransform != null
+        || affineTransform != null && rhs.affineTransform == null)
+      return false;
+
+    return ((affineTransform == rhs.affineTransform
+             || affineTransform.equals (rhs.getTransform ()))
             && isAntiAliased == rhs.isAntiAliased ()
             && usesFractionalMetrics == rhs.usesFractionalMetrics ());
   }
@@ -109,8 +117,12 @@ public class FontRenderContext
    */
   public int hashCode ()
   {
-    // FIXME: check what SUN does here.
-    return affineTransform == null ? 0 : affineTransform.hashCode ();
+    int code = ( isAntiAliased ? 1 : 0 ) + ( usesFractionalMetrics ? 2 : 0 );
+
+    if( affineTransform != null && !affineTransform.isIdentity() )
+      code ^= affineTransform.hashCode();
+
+    return code;
   }
 
   public boolean isAntiAliased ()
