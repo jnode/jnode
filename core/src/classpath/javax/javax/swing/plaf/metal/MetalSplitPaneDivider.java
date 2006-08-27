@@ -38,18 +38,14 @@ exception statement from your version. */
 package javax.swing.plaf.metal;
 
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.LayoutManager;
-import java.awt.Point;
+import java.awt.Insets;
 
+import javax.swing.JButton;
 import javax.swing.JSplitPane;
-import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
-import javax.swing.plaf.basic.BasicArrowButton;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 
 /**
@@ -59,173 +55,210 @@ import javax.swing.plaf.basic.BasicSplitPaneDivider;
  */
 class MetalSplitPaneDivider extends BasicSplitPaneDivider
 {
+  /**
+   * The button pixel data, as indices into the colors array below.
+   * This is the version for 'left' buttons.
+   *
+   * This is slightly different from the icon in Sun's version, it is
+   * one pixel smaller and is more consistent with BUTTON_SPRITE_R.
+   */
+  static final byte[][] BUTTON_SPRITE_L = {{ 0, 0, 0, 2, 0, 0, 0, 0 },
+                                           { 0, 0, 2, 1, 1, 0, 0, 0 },
+                                           { 0, 2, 1, 1, 1, 1, 0, 0 },
+                                           { 2, 1, 1, 1, 1, 1, 1, 0 },
+                                           { 0, 3, 3, 3, 3, 3, 3, 3 }};
+
+  /**
+   * The button pixel data, as indices into the colors array below.
+   * This is the version for 'right' buttons.
+   */
+  static final byte[][] BUTTON_SPRITE_R = {{ 2, 2, 2, 2, 2, 2, 2, 2 },
+                                           { 0, 1, 1, 1, 1, 1, 1, 3 },
+                                           { 0, 0, 1, 1, 1, 1, 3, 0 },
+                                           { 0, 0, 0, 1, 1, 3, 0, 0 },
+                                           { 0, 0, 0, 0, 3, 0, 0, 0 }};
+
+  private class MetalOneTouchButton
+    extends JButton
+      {
+    /**
+     * Denotes a left button.
+     */
+    static final int LEFT = 0;
+    
+    /**
+     * Denotes a right button.
+     */
+    static final int RIGHT = 1;
+
+    /**
+     * The colors for the button sprite.
+     */
+    private Color[] colors;
+  
+  /**
+     * Either LEFT or RIGHT.
+   */
+    private int direction;
+    
+    /**
+     * Creates a new instance.
+     *
+     * @param dir either LEFT or RIGHT
+     */
+    MetalOneTouchButton(int dir)
+    {
+      direction = dir;
+      colors = new Color[4];
+    }
+    
+    /**
+     * Never allow borders.
+     */
+    public void setBorder(Border b)
+    {
+    }
+
+    /**
+     * Never allow focus traversal.
+     */
+    public boolean isFocusTraversable()
+    {
+      return false;
+    }
+
+    /**
+     * Paints the one touch button.
+     */
+    public void paint(Graphics g)
+    {
+      if (splitPane != null)
+        {
+          // Update colors here to reflect dynamic changes to the theme.
+          colors[0] = getBackground();
+          colors[1] = MetalLookAndFeel.getPrimaryControlDarkShadow();
+          colors[2] = MetalLookAndFeel.getPrimaryControlInfo();
+          colors[3] = MetalLookAndFeel.getPrimaryControlHighlight();
+
+          // Fill background.
+          g.setColor(getBackground());
+          g.fillRect(0, 0, getWidth(), getHeight());
+
+          // Pressed buttons have slightly different color mapping.
+          if (getModel().isPressed())
+            colors[1] = colors[2];
+
+          byte[][] sprite;
+          if (direction == LEFT)
+            sprite = BUTTON_SPRITE_L;
+          else
+            sprite = BUTTON_SPRITE_R;
+
+          if (orientation == JSplitPane.VERTICAL_SPLIT)
+            {
+              // Draw the sprite as it is.
+              for (int y = 0; y < sprite.length; y++)
+                {
+                  byte[] line = sprite[y];
+                  for (int x = 0; x < line.length; x++)
+            {
+                      int c = line[x];
+                      if (c != 0)
+                {
+                          g.setColor(colors[c]);
+                          g.fillRect(x + 1, y + 1, 1, 1);
+                        }
+                    }
+                }
+                }
+              else
+                {
+              // Draw the sprite with swapped X and Y axis.
+              for (int y = 0; y < sprite.length; y++)
+                {
+                  byte[] line = sprite[y];
+                  for (int x = 0; x < line.length; x++)
+                    {
+                      int c = line[x];
+                      if (c != 0)
+                        {
+                          g.setColor(colors[c]);
+                          g.fillRect(y + 1, x + 1, 1, 1);
+                        }
+                    }
+                }
+            }
+        }
+    }
+  }
+
   /** The dark color in the pattern. */
   Color dark;
 
   /** The light color in the pattern. */
   Color light;
-
+  
   /** The JSplitPane the divider is on. */
   JSplitPane splitPane;
 
   /** The split pane orientation. */
   int orientation;
-  
-  /**
+
+    /**
    * Creates a new instance of <code>MetalSplitPaneDivider</code>.
-   *
+     *
    * @param ui the <code>MetalSplitPaneUI</code> that uses this divider
-   */
+     */
   public MetalSplitPaneDivider(MetalSplitPaneUI ui, Color light, Color dark)
-  {
+    {
     super(ui);
-    setLayout(new MetalDividerLayout());
     this.splitPane = super.splitPane;
     this.orientation = super.orientation;
     this.light = light;
     this.dark = dark;
-  }
+    }
 
-  /**
+    /**
    * Paints the divider.
-   *
+     *
    * @param g the <code>Graphics</code> context to use for painting
-   */
+     */
   public void paint(Graphics g)
-  {
+    {
     Dimension s = getSize();
 
     if (splitPane.hasFocus())
       {
         g.setColor(UIManager.getColor("SplitPane.dividerFocusColor"));
         g.fillRect(0, 0, s.width, s.height);
-      }
-    
+    }
+
     // Paint border if one exists.
     Border border = getBorder();
     if (border != null)
       border.paintBorder(this, g, 0, 0, s.width, s.height);
 
-    MetalUtils.fillMetalPattern(splitPane, g, 2, 2, s.width - 4, s.height - 4,
+    Insets i = getInsets();
+    MetalUtils.fillMetalPattern(splitPane, g, i.left + 2, i.top + 2,
+                                s.width - i.left - i.right - 4,
+                                s.height - i.top - i.bottom - 4,
                                 light, dark);
-    if (splitPane.isOneTouchExpandable())
-      {
-        ((BasicArrowButton) rightButton).paint(g);
-        ((BasicArrowButton) leftButton).paint(g);
-      }
+    super.paint(g);
   }
-  
-  /**
-   * This helper class acts as the Layout Manager for the divider.
-   */
-  public class MetalDividerLayout implements LayoutManager
+
+  protected JButton createLeftOneTouchButton()
+    {
+    JButton b = new MetalOneTouchButton(MetalOneTouchButton.LEFT);
+    b.setMinimumSize(new Dimension(ONE_TOUCH_SIZE, ONE_TOUCH_SIZE));
+    b.setRequestFocusEnabled(false);
+    return b;
+    }
+
+  protected JButton createRightOneTouchButton()
   {
-    /** The right button. */
-    BasicArrowButton rb;
-    
-    /** The left button. */
-    BasicArrowButton lb;
-    
-    /**
-     * Creates a new DividerLayout object.
-     */
-    public MetalDividerLayout()
-    {
-      // Nothing to do here
-    }
-
-    /**
-     * This method is called when a Component is added.
-     *
-     * @param string The constraints string.
-     * @param c The Component to add.
-     */
-    public void addLayoutComponent(String string, Component c)
-    {
-      // Nothing to do here, constraints are set depending on
-      // orientation in layoutContainer
-    }
-
-    /**
-     * This method is called to lay out the container.
-     *
-     * @param c The container to lay out.
-     */
-    public void layoutContainer(Container c)
-    {
-      // The only components we care about setting up are the
-      // one touch buttons.
-      if (splitPane.isOneTouchExpandable())
-        {
-          if (c.getComponentCount() == 2)
-            {
-              Component c1 = c.getComponent(0);
-              Component c2 = c.getComponent(1);
-              if ((c1 instanceof BasicArrowButton)
-                  && (c2 instanceof BasicArrowButton))
-                {
-                  lb = (BasicArrowButton) c1;
-                  rb = (BasicArrowButton) c2;
-                }
-            }
-          if (rb != null && lb != null)
-            {
-              Point p = getLocation();
-              lb.setSize(lb.getPreferredSize());
-              rb.setSize(rb.getPreferredSize());
-              lb.setLocation(p.x, p.y);
-              
-              if (orientation == JSplitPane.HORIZONTAL_SPLIT)
-                {
-                  rb.setDirection(SwingConstants.EAST);
-                  lb.setDirection(SwingConstants.WEST);
-                  rb.setLocation(p.x, p.y + lb.getHeight());
-                }
-              else
-                {
-                  rb.setDirection(SwingConstants.SOUTH);
-                  lb.setDirection(SwingConstants.NORTH);
-                  rb.setLocation(p.x + lb.getWidth(), p.y);
-                }
-            }
-        }
-    }
-
-    /**
-     * This method returns the minimum layout size.
-     *
-     * @param c The container to calculate for.
-     *
-     * @return The minimum layout size.
-     */
-    public Dimension minimumLayoutSize(Container c)
-    {
-      return preferredLayoutSize(c);
-    }
-
-    /**
-     * This method returns the preferred layout size.
-     *
-     * @param c The container to calculate for.
-     *
-     * @return The preferred layout size.
-     */
-    public Dimension preferredLayoutSize(Container c)
-    {
-      int dividerSize = getDividerSize();
-      return new Dimension(dividerSize, dividerSize);
-    }
-
-    /**
-     * This method is called when a component is removed.
-     *
-     * @param c The component to remove.
-     */
-    public void removeLayoutComponent(Component c)
-    {
-      // Nothing to do here. If buttons are removed
-      // they will not be layed out when layoutContainer is 
-      // called.
-    }
+    JButton b = new MetalOneTouchButton(MetalOneTouchButton.RIGHT);
+    b.setMinimumSize(new Dimension(ONE_TOUCH_SIZE, ONE_TOUCH_SIZE));
+    b.setRequestFocusEnabled(false);
+    return b;
   }
 }

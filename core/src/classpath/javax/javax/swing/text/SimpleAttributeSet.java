@@ -51,8 +51,10 @@ public class SimpleAttributeSet
   /** The serialization UID (compatible with JDK1.5). */
   private static final long serialVersionUID = 8267656273837665219L;
 
-  /** An empty attribute set. */
-  public static final AttributeSet EMPTY = new SimpleAttributeSet();
+  /**
+   * An empty attribute set.
+   */
+  public static final AttributeSet EMPTY = new EmptyAttributeSet();
 
   /** Storage for the attributes. */
   Hashtable tab;
@@ -121,9 +123,17 @@ public class SimpleAttributeSet
    */
   public Object clone()
   {
-    SimpleAttributeSet s = new SimpleAttributeSet();
-    s.tab = (Hashtable) tab.clone();
-    return s;
+    SimpleAttributeSet attr = null;
+    try
+      {
+        attr = (SimpleAttributeSet) super.clone();
+        attr.tab = (Hashtable) tab.clone();
+      }
+    catch (CloneNotSupportedException ex)
+      {
+        assert false;
+      }
+    return attr;
   }
 
   /**

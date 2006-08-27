@@ -1,5 +1,5 @@
 /* MetalMenuBarUI.java -- MenuBar UI for the Metal L&F
-   Copyright (C) 2005 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -44,6 +44,7 @@ import javax.swing.JComponent;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.UIResource;
 import javax.swing.plaf.basic.BasicMenuBarUI;
 
 /**
@@ -75,10 +76,15 @@ public class MetalMenuBarUI extends BasicMenuBarUI
    */
   public void update(Graphics g, JComponent c)
   {
-    if (c.isOpaque() && UIManager.get("MenuBar.gradient") != null)
+    int height = c.getHeight();
+    if (c.isOpaque()
+        && UIManager.get("MenuBar.gradient") != null
+        && c.getBackground() instanceof UIResource
+        && height > 2)
       {
-        MetalUtils.paintGradient(g, 0, 0, c.getWidth(), c.getHeight(),
+        MetalUtils.paintGradient(g, 0, 0, c.getWidth(), height - 2,
                                  SwingConstants.VERTICAL, "MenuBar.gradient");
+        
         paint(g, c);
       }
     else

@@ -59,6 +59,11 @@ public class ParagraphView
 {
 
   /**
+   * The attributes used by this view.
+   */
+  private AttributeSet attributes;
+
+  /**
    * Creates a new ParagraphView for the specified element.
    *
    * @param element the element
@@ -88,8 +93,11 @@ public class ParagraphView
    */
   public AttributeSet getAttributes()
   {
-    // FIXME: Implement this multiplexing thing.
-    return super.getAttributes();
+    if (attributes == null)
+      {
+        attributes = getStyleSheet().getViewAttributes(this);
+      }
+    return attributes;
   }
 
   /**

@@ -43,7 +43,6 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.text.BreakIterator;
 
-import javax.swing.SwingConstants;
 import javax.swing.text.Position.Bias;
 
 /**
@@ -55,10 +54,6 @@ import javax.swing.text.Position.Bias;
  */
 public class Utilities
 {
-  /**
-   * The length of the char buffer that holds the characters to be drawn.
-   */
-  private static final int BUF_LENGTH = 64;
 
   /**
    * Creates a new <code>Utilities</code> object.
@@ -109,7 +104,7 @@ public class Utilities
     for (int offset = s.offset; offset < end; ++offset)
       {
         char c = buffer[offset];
-        if (c == '\t' || c == '\n')
+        if (c == '\t')
           {
             if (len > 0) {
               g.drawChars(buffer, pos, len, pixelX, pixelY + ascent);            
@@ -126,15 +121,10 @@ public class Utilities
 	    // In case we have a tab, we just 'jump' over the tab.
 	    // When we have no tab expander we just use the width of ' '.
 	    if (e != null)
-	      pixelX = (int) e.nextTabStop((float) pixelX,
+	      pixelX = (int) e.nextTabStop(pixelX,
 					   startOffset + offset - s.offset);
 	    else
 	      pixelX += metrics.charWidth(' ');
-	    break;
-	  case '\n':
-	    // In case we have a newline, we must jump to the next line.
-	    pixelY += metrics.getHeight();
-	    pixelX = x;
 	    break;
 	  default:
             ++len;
@@ -182,7 +172,7 @@ public class Utilities
 	    // In case we have a tab, we just 'jump' over the tab.
 	    // When we have no tab expander we just use the width of 'm'.
 	    if (e != null)
-	      pixelX = (int) e.nextTabStop((float) pixelX,
+	      pixelX = (int) e.nextTabStop(pixelX,
 					   startOffset + offset - s.offset);
 	    else
 	      pixelX += metrics.charWidth(' ');
@@ -275,7 +265,7 @@ public class Utilities
         currentX += width;
       }
 
-    return pos + p0;
+    return pos;
   }
 
   /**
@@ -545,7 +535,7 @@ public class Utilities
     
     // Try to find a word boundary previous to the mark at which we 
     // can break the text.
-    int preceding = breaker.preceding(mark + 1 - shift);
+    int preceding = breaker.preceding(mark + 1 + s.offset);
     
     if (preceding != 0)
       return preceding + shift;
@@ -700,12 +690,12 @@ public class Utilities
                                          offset,
                                          Bias.Forward,
                                          direction,
-                                         null)
+                                         new Position.Bias[1])
           : t.getUI().getNextVisualPositionFrom(t,
                                                 offset,
                                                 Bias.Forward,
                                                 direction,
-                                                null);
+                                                new Position.Bias[1]);
       }
     catch (BadLocationException ble)
     {

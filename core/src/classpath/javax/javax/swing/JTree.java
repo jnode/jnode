@@ -1392,9 +1392,9 @@ public class JTree extends JComponent implements Scrollable, Accessible
   public static final String EXPANDS_SELECTED_PATHS_PROPERTY =
     "expandsSelectedPaths";
 
-  private static final Object EXPANDED = new Object();
+  private static final Object EXPANDED = Boolean.TRUE;
 
-  private static final Object COLLAPSED = new Object();
+  private static final Object COLLAPSED = Boolean.FALSE;
 
   private boolean dragEnabled;
 
@@ -1509,11 +1509,13 @@ public class JTree extends JComponent implements Scrollable, Accessible
   public JTree(TreeModel model)
   {
     setRootVisible(true);
-    setSelectionModel(new EmptySelectionModel());
-    selectionModel.setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+    setSelectionModel( new DefaultTreeSelectionModel() );
     
     // The root node appears expanded by default.
     nodeStates = new Hashtable();
+
+    // The cell renderer gets set by the UI.
+    cellRenderer = null;
 
     // Install the UI before installing the model. This way we avoid double
     // initialization of lots of UI and model stuff inside the UI and related
@@ -1682,29 +1684,52 @@ public class JTree extends JComponent implements Scrollable, Accessible
   public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation,
                                         int direction)
   {
-    int delta;
+    int delta = 0;
 
     // Round so that the top would start from the row boundary
     if (orientation == SwingConstants.VERTICAL)
       {
-        // One pixel down, otherwise picks another row too high.
-        int row = getClosestRowForLocation(visibleRect.x, visibleRect.y + 1);
-        row = row + direction;
-        if (row < 0)
-          row = 0;
-
-        Rectangle newTop = getRowBounds(row);
-        delta = newTop.y - visibleRect.y;
+        int row = getClosestRowForLocation(0, visibleRect.y);
+        if (row != -1)
+          {
+            Rectangle b = getRowBounds(row);
+            if (b.y != visibleRect.y)
+              {
+                if (direction < 0)
+                  delta = Math.max(0, visibleRect.y - b.y);
+                else
+                  delta = b.y + b.height - visibleRect.height;
       }
     else
-      delta = direction * rowHeight == 0 ? 20 : rowHeight;
+              {
+                if (direction < 0)
+                  {
+                    if (row != 0)
+                      {
+                        b = getRowBounds(row - 1);
+                        delta = b.height;
+                      }
+                  }
+                else
+                  delta = b.height;
+              }
+          }
+      }
+    else
+      // The RI always  returns 4 for HORIZONTAL scrolling.
+      delta = 4;
     return delta;
   }
 
   public int getScrollableBlockIncrement(Rectangle visibleRect,
                                          int orientation, int direction)
   {
-    return getScrollableUnitIncrement(visibleRect, orientation, direction);
+    int block;
+    if (orientation == SwingConstants.VERTICAL)
+      block = visibleRect.height;
+    else
+      block = visibleRect.width;
+    return block;
   }
 
   public boolean getScrollableTracksViewportHeight()
@@ -2047,13 +2072,15 @@ public class JTree extends JComponent implements Scrollable, Accessible
     if (selectionModel == model)
       return;
 
+    if( model == null )
+      model = EmptySelectionModel.sharedInstance();
+
     if (selectionModel != null)
       selectionModel.removeTreeSelectionListener(selectionRedirector);
 
     TreeSelectionModel oldValue = selectionModel;
     selectionModel = model;
 
-    if (selectionModel != null)
       selectionModel.addTreeSelectionListener(selectionRedirector);
 
     firePropertyChange(SELECTION_MODEL_PROPERTY, oldValue, model);

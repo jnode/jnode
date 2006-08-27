@@ -1,5 +1,5 @@
-/* AbstractSpinnerModel.java --
-   Copyright (C) 2004 Free Software Foundation, Inc.
+/* MultiStyle.java -- Multiplexes between several Styles
+   Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -36,84 +36,101 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package javax.swing;
+package javax.swing.text.html;
 
-import java.util.EventListener;
+import java.util.Enumeration;
 
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.EventListenerList;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.Style;
 
 /**
- * Provides standard implementations for some of the methods in
- * {@link SpinnerModel}.
- *
- * @author	Ka-Hing Cheung
+ * A Style implementation that is able to multiplex between several other
+ * Styles. This is used for CSS style resolving.
+ * 
+ * @author Roman Kennke (kennke@aicas.com)
  */
-public abstract class AbstractSpinnerModel implements SpinnerModel
+public class MultiStyle
+  extends MultiAttributeSet
+  implements Style
 {
-  private ChangeEvent changeEvent = new ChangeEvent(this);
-  
-  protected EventListenerList listenerList = new EventListenerList();
+
+  // FIXME: Fix the implementation to also return attributes that
+  // are added to this style, etc. However, this is not really needed
+  // now for CSS, but would be nice for correctness.
 
   /**
-   * Creates an <code>AbstractSpinnerModel</code>.
+   * The name of the style.
    */
-  public AbstractSpinnerModel()
+  private String name;
+
+  /**
+   * The attributes added to this style.
+   */
+  private SimpleAttributeSet attributes;
+
+  /**
+   * Creates a new instance.
+   *
+   * @param n the name
+   * @param m the styles to multiplex
+   */
+  public MultiStyle(String n, AttributeSet[] m)
   {
-    // Nothing to do here.
+    super(m);
+    name = n;
+    attributes = new SimpleAttributeSet();
   }
 
   /**
-   * Adds a <code>ChangeListener</code>.
+   * Returns the name of the style.
    *
-   * @param listener the listener to add
+   * @return the name of the style
    */
+  public String getName()
+  {
+    return name;
+  }
+
   public void addChangeListener(ChangeListener listener)
   {
-    listenerList.add(ChangeListener.class, listener);
+    // TODO: Implement.
   }
 
-  /**
-   * Gets all the listeners that are of a particular type.
-   *
-   * @param c the type of listener
-   * @return the listeners that are of the specific type
-   */
-  public EventListener[] getListeners(Class c)
-  {
-    return listenerList.getListeners(c);
-  }
-
-  /**
-   * Gets all the <code>ChangeListener</code>s.
-   *
-   * @return all the <code>ChangeListener</code>s
-   */
-  public ChangeListener[] getChangeListeners()
-  {
-    return (ChangeListener[]) listenerList.getListeners(ChangeListener.class);
-  }
-
-  /**
-   * Remove a particular listener.
-   *
-   * @param listener the listener to remove
-   */
   public void removeChangeListener(ChangeListener listener)
   {
-    listenerList.remove(ChangeListener.class, listener);
+    // TODO: Implement.
   }
 
-  /**
-   * Fires a <code>ChangeEvent</code> to all the <code>ChangeListener</code>s
-   * added to this model
-   */
-  protected void fireStateChanged()
+  public void addAttribute(Object name, Object value)
   {
-    ChangeListener[] listeners = getChangeListeners();
-
-    for (int i = 0; i < listeners.length; ++i)
-      listeners[i].stateChanged(changeEvent);
+    attributes.addAttribute(name, value);
   }
+
+  public void addAttributes(AttributeSet atts)
+  {
+    attributes.addAttributes(atts);
+  }
+
+  public void removeAttribute(Object name)
+  {
+    attributes.removeAttribute(name);
+  }
+
+  public void removeAttributes(Enumeration names)
+  {
+    attributes.removeAttribute(names);
+  }
+
+  public void removeAttributes(AttributeSet atts)
+  {
+    attributes.removeAttribute(atts);
+  }
+
+  public void setResolveParent(AttributeSet parent)
+  {
+    // TODO: Implement.
+  }
+
 }

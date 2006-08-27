@@ -1,4 +1,4 @@
-/* HTMLTableView.java -- A table view for HTML tables
+/* BRView.java -- HTML BR tag view
    Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -39,44 +39,33 @@ exception statement from your version. */
 package javax.swing.text.html;
 
 import javax.swing.text.Element;
-import javax.swing.text.TableView;
-import javax.swing.text.View;
-import javax.swing.text.ViewFactory;
 
 /**
- * A conrete implementation of TableView that renders HTML tables.
- * 
- * @author Roman Kennke (kennke@aicas.com)
+ * Handled the HTML BR tag.
  */
-class HTMLTableView
-    extends TableView
+class BRView
+    extends NullView 
+
 {
-
   /**
-   * Creates a new HTMLTableView for the specified element.
-   *
-   * @param el the element for the table view
+   * Creates the new BR view.
+   * 
+   * @param elem the HTML element, representing the view.
    */
-  public HTMLTableView(Element el)
+  public BRView(Element elem)
   {
-    super(el);
+    super(elem);
   }
-
+  
   /**
-   * Loads the children of the Table. This completely bypasses the ViewFactory
-   * and creates instances of TableRow instead.
-   *
-   * @param vf ignored
+   * Always return ForcedBreakWeight for the X_AXIS, BadBreakWeight for the
+   * Y_AXIS.
    */
-  protected void loadChildren(ViewFactory vf)
+  public int getBreakWeight(int axis, float pos, float len)
   {
-    Element el = getElement();
-    int numChildren = el.getElementCount();
-    View[] rows = new View[numChildren];
-    for (int i = 0; i < numChildren; ++i)
-      {
-        rows[i] = createTableRow(el.getElement(i));
-      }
-    replace(0, getViewCount(), rows);
+    if (axis == X_AXIS)
+      return ForcedBreakWeight;
+    else
+      return BadBreakWeight;
   }
 }

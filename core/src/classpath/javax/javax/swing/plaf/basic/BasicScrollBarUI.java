@@ -302,8 +302,10 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
      */
     public void mouseMoved(MouseEvent e)
     {
-      // Not interested in where the mouse
-      // is unless it is being dragged.
+      if (thumbRect.contains(e.getPoint()))
+        thumbRollover = true;
+      else
+        thumbRollover = false;
     }
 
     /**
@@ -400,9 +402,9 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
         return false;
       
       if (direction == POSITIVE_SCROLL)
-	return (value > scrollbar.getValue());
+	return value > scrollbar.getValue();
       else
-	return (value < scrollbar.getValue());
+	return value < scrollbar.getValue();
     }
   }
 
@@ -486,6 +488,9 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
 
   /** The scrollbar this UI is acting for. */
   protected JScrollBar scrollbar;
+
+  /** True if the mouse is over the thumb. */
+  boolean thumbRollover;
 
   /**
    * This method adds a component to the layout.
@@ -727,7 +732,7 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
     int orientation = scrollbar.getOrientation();
     switch (orientation)
       {
-      case (JScrollBar.HORIZONTAL):
+      case JScrollBar.HORIZONTAL:
         incrButton = createIncreaseButton(EAST);
         decrButton = createDecreaseButton(WEST);
         break;
@@ -1223,8 +1228,12 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
    */
   protected void scrollByBlock(int direction)
   {
+    if (direction > 0)
     scrollbar.setValue(scrollbar.getValue()
                        + scrollbar.getBlockIncrement(direction));
+    else
+      scrollbar.setValue(scrollbar.getValue()
+                         - scrollbar.getBlockIncrement(direction));
   }
 
   /**
@@ -1234,8 +1243,12 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
    */
   protected void scrollByUnit(int direction)
   {
+    if (direction > 0)
     scrollbar.setValue(scrollbar.getValue()
                        + scrollbar.getUnitIncrement(direction));
+    else
+      scrollbar.setValue(scrollbar.getValue()
+                         - scrollbar.getUnitIncrement(direction));
   }
 
   /**
@@ -1357,9 +1370,9 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
     // If the length is 0, you shouldn't be able to even see where the thumb is.
     // This really shouldn't ever happen, but just in case, we'll return the middle.
     if (len == 0)
-      return ((max - min) / 2);
+      return (max - min) / 2;
 
-    value = ((yPos - trackRect.y) * (max - min) / len + min);
+    value = (yPos - trackRect.y) * (max - min) / len + min;
 
     // If this isn't a legal value, then we'll have to move to one now.
     if (value > max)
@@ -1390,9 +1403,9 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
     // If the length is 0, you shouldn't be able to even see where the slider is.
     // This really shouldn't ever happen, but just in case, we'll return the middle.
     if (len == 0)
-      return ((max - min) / 2);
+      return (max - min) / 2;
 
-    value = ((xPos - trackRect.x) * (max - min) / len + min);
+    value = (xPos - trackRect.x) * (max - min) / len + min;
 
     // If this isn't a legal value, then we'll have to move to one now.
     if (value > max)
@@ -1400,5 +1413,46 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
     else if (value < min)
       value = min;
     return value;
+  }
+  
+  /**
+   * Returns true if the mouse is over the thumb.
+   * 
+   * @return true if the mouse is over the thumb.
+   * 
+   * @since 1.5
+   */
+  public boolean isThumbRollover()
+  {
+   return thumbRollover; 
+  }
+  
+  /**
+   * Set thumbRollover to active. This indicates
+   * whether or not the mouse is over the thumb.
+   * 
+   * @param active - true if the mouse is over the thumb.
+   * 
+   * @since 1.5
+   */
+  protected void setThumbRollover(boolean active)
+  {
+    thumbRollover = active;
+  }
+  
+  /**
+   * Indicates whether the user can position the thumb with 
+   * a mouse click (i.e. middle button).
+   * 
+   * @return true if the user can position the thumb with a mouse
+   * click.
+   * 
+   * @since 1.5
+   */
+  public boolean getSupportsAbsolutePositioning()
+  {
+    // The positioning feature has not been implemented.
+    // So, false is always returned.
+    return false;
   }
 }

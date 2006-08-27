@@ -37,6 +37,11 @@ exception statement from your version. */
 
 package javax.swing.text.html;
 
+import gnu.javax.swing.text.html.css.CSSColor;
+import gnu.javax.swing.text.html.css.FontSize;
+import gnu.javax.swing.text.html.css.FontStyle;
+import gnu.javax.swing.text.html.css.FontWeight;
+
 import java.io.Serializable;
 import java.util.HashMap;
 
@@ -458,5 +463,30 @@ public class CSS implements Serializable
     {
       return defaultValue;
     }
+  }
+
+  /**
+   * Maps attribute values (String) to some converter class, based on the
+   * key.
+   *
+   * @param att the key
+   * @param v the value
+   *
+   * @return the wrapped value
+   */
+  static Object getValue(Attribute att, String v)
+  {
+    Object o;
+    if (att == Attribute.FONT_SIZE)
+      o = new FontSize(v);
+    else if (att == Attribute.FONT_WEIGHT)
+      o = new FontWeight(v);
+    else if (att == Attribute.FONT_STYLE)
+      o = new FontStyle(v);
+    else if (att == Attribute.COLOR || att == Attribute.BACKGROUND_COLOR)
+      o = new CSSColor(v);
+    else
+      o = v;
+    return o;
   }
 }

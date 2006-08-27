@@ -71,6 +71,7 @@ import javax.swing.plaf.InputMapUIResource;
 import javax.swing.plaf.TextUI;
 import javax.swing.plaf.UIResource;
 import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Caret;
 import javax.swing.text.DefaultCaret;
@@ -83,7 +84,6 @@ import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Keymap;
 import javax.swing.text.Position;
-import javax.swing.text.Utilities;
 import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
 
@@ -240,6 +240,12 @@ public abstract class BasicTextUI extends TextUI
 	return view.getPreferredSpan(axis);
 
       return Integer.MAX_VALUE;
+    }
+
+    public void setSize(float w, float h)
+    {
+      if (view != null)
+        view.setSize(w, h);
     }
 
     /**
@@ -401,6 +407,14 @@ public abstract class BasicTextUI extends TextUI
     {
       return textComponent.getDocument();
     }
+
+    /**
+     * Returns the attributes, which is null for the RootView.
+     */
+    public AttributeSet getAttributes()
+    {
+      return null;
+    }
   }
 
   /**
@@ -418,6 +432,18 @@ public abstract class BasicTextUI extends TextUI
       if (event.getPropertyName().equals("document"))
         {
           // Document changed.
+          Object oldValue = event.getOldValue();
+          if (oldValue != null)
+            {
+              Document oldDoc = (Document) oldValue;
+              oldDoc.removeDocumentListener(documentHandler);
+            }
+          Object newValue = event.getNewValue();
+          if (newValue != null)
+            {
+              Document newDoc = (Document) newValue;
+              newDoc.addDocumentListener(documentHandler);
+            }
 	      modelChanged();
         }
 
@@ -501,18 +527,6 @@ public abstract class BasicTextUI extends TextUI
   DocumentHandler documentHandler = new DocumentHandler();
 
   /**
-   * The standard background color. This is the color which is used to paint
-   * text in enabled text components.
-   */
-  Color background;
-
-  /**
-   * The inactive background color. This is the color which is used to paint
-   * text in disabled text components.
-   */
-  Color inactiveBackground;
-
-  /**
    * Creates a new <code>BasicTextUI</code> instance.
    */
   public BasicTextUI()
@@ -558,22 +572,23 @@ public abstract class BasicTextUI extends TextUI
    */
   public void installUI(final JComponent c)
   {
-    super.installUI(c);
-
     textComponent = (JTextComponent) c;
+    installDefaults();
+    textComponent.addPropertyChangeListener(updateHandler);
     Document doc = textComponent.getDocument();
     if (doc == null)
       {
 	doc = getEditorKit(textComponent).createDefaultDocument();
 	textComponent.setDocument(doc);
       }
-    installDefaults();
+    else
+      {
+        doc.addDocumentListener(documentHandler);
+    modelChanged();
+      }
+
     installListeners();
     installKeyboardActions();
-
-    // We need to trigger this so that the view hierarchy gets initialized.
-    modelChanged();
-
   }
 
   /**
@@ -581,32 +596,60 @@ public abstract class BasicTextUI extends TextUI
    */
   protected void installDefaults()
   {
-    Caret caret = textComponent.getCaret();
-    if (caret == null)
-      {
-        caret = createCaret();
-        textComponent.setCaret(caret);
-      }
-
-    Highlighter highlighter = textComponent.getHighlighter();
-    if (highlighter == null)
-      textComponent.setHighlighter(createHighlighter());
-
     String prefix = getPropertyPrefix();
+    // Install the standard properties.
     LookAndFeel.installColorsAndFont(textComponent, prefix + ".background",
                                      prefix + ".foreground", prefix + ".font");
     LookAndFeel.installBorder(textComponent, prefix + ".border");
     textComponent.setMargin(UIManager.getInsets(prefix + ".margin"));
 
-    caret.setBlinkRate(UIManager.getInt(prefix + ".caretBlinkRate"));
+    // Some additional text component only properties.
+    Color color = textComponent.getCaretColor();
+    if (color == null || color instanceof UIResource)
+      {
+        color = UIManager.getColor(prefix + ".caretForeground");
+        textComponent.setCaretColor(color);
+      }
 
     // Fetch the colors for enabled/disabled text components.
-    background = UIManager.getColor(prefix + ".background");
-    inactiveBackground = UIManager.getColor(prefix + ".inactiveBackground");
-    textComponent.setDisabledTextColor
-                         (UIManager.getColor(prefix + ".inactiveForeground"));
-    textComponent.setSelectedTextColor(UIManager.getColor(prefix + ".selectionForeground"));
-    textComponent.setSelectionColor(UIManager.getColor(prefix + ".selectionBackground"));    
+    color = textComponent.getDisabledTextColor();
+    if (color == null || color instanceof UIResource)
+      {
+        color = UIManager.getColor(prefix + ".inactiveBackground");
+        textComponent.setDisabledTextColor(color);
+      }
+    color = textComponent.getSelectedTextColor();
+    if (color == null || color instanceof UIResource)
+      {
+        color = UIManager.getColor(prefix  + ".selectionForeground");
+        textComponent.setSelectedTextColor(color);
+      }
+    color = textComponent.getSelectionColor();
+    if (color == null || color instanceof UIResource)
+      {
+        color = UIManager.getColor(prefix  + ".selectionBackground");
+        textComponent.setSelectionColor(color);    
+      }
+
+    Insets margin = textComponent.getMargin();
+    if (margin == null || margin instanceof UIResource)
+      {
+        margin = UIManager.getInsets(prefix + ".margin");
+        textComponent.setMargin(margin);
+      }
+
+    Caret caret = textComponent.getCaret();
+    if (caret == null || caret instanceof UIResource)
+      {
+        caret = createCaret();
+        textComponent.setCaret(caret);
+        caret.setBlinkRate(UIManager.getInt(prefix + ".caretBlinkRate"));
+      }
+
+    Highlighter highlighter = textComponent.getHighlighter();
+    if (highlighter == null || highlighter instanceof UIResource)
+      textComponent.setHighlighter(createHighlighter());
+
   }
 
   /**
@@ -639,7 +682,8 @@ public abstract class BasicTextUI extends TextUI
                 Clipboard cb = Toolkit.getDefaultToolkit().getSystemSelection();
                 if (cb != null)
                   {
-                    StringSelection selection = new StringSelection(textComponent.getSelectedText());
+                    StringSelection selection = new StringSelection(
+                        textComponent.getSelectedText());
                     cb.setContents(selection, selection);
                   }
               }
@@ -667,18 +711,6 @@ public abstract class BasicTextUI extends TextUI
   protected void installListeners()
   {
     textComponent.addFocusListener(focuslistener);
-    textComponent.addPropertyChangeListener(updateHandler);
-    installDocumentListeners();
-  }
-
-  /**
-   * Installs the document listeners on the textComponent's model.
-   */
-  private void installDocumentListeners()
-  {
-    Document doc = textComponent.getDocument();
-    if (doc != null)
-      doc.addDocumentListener(documentHandler);
   }
 
   /**
@@ -842,7 +874,6 @@ public abstract class BasicTextUI extends TextUI
    */
   protected void uninstallListeners()
   {
-    textComponent.removePropertyChangeListener(updateHandler);
     textComponent.removeFocusListener(focuslistener);
     textComponent.getDocument().removeDocumentListener(documentHandler);
   }
@@ -853,7 +884,8 @@ public abstract class BasicTextUI extends TextUI
    */
   protected void uninstallKeyboardActions()
   {
-    SwingUtilities.replaceUIInputMap(textComponent, JComponent.WHEN_FOCUSED, null);
+    SwingUtilities.replaceUIInputMap(textComponent, JComponent.WHEN_FOCUSED, 
+                                     null);
     SwingUtilities.replaceUIActionMap(textComponent, null);
   }
 
@@ -875,14 +907,19 @@ public abstract class BasicTextUI extends TextUI
    */
   public Dimension getPreferredSize(JComponent c)
   {
-    View v = getRootView(textComponent);
-
-    float w = v.getPreferredSpan(View.X_AXIS);
-    float h = v.getPreferredSpan(View.Y_AXIS);
-
+    Dimension d = c.getSize();
     Insets i = c.getInsets();
-    return new Dimension((int) w + i.left + i.right,
+    if (d.width > (i.left + i.right) && d.height > (i.top + i.bottom))
+      {
+        rootView.setSize(d.width - i.left - i.right,
+                         d.height - i.top - i.bottom);
+      }
+    float w = rootView.getPreferredSpan(View.X_AXIS);
+    float h = rootView.getPreferredSpan(View.Y_AXIS);
+
+    Dimension size =  new Dimension((int) w + i.left + i.right,
                          (int) h + i.top + i.bottom);
+    return size;
   }
 
   /**
@@ -1025,7 +1062,7 @@ public abstract class BasicTextUI extends TextUI
    */
   public void damageRange(JTextComponent t, int p0, int p1)
   {
-    damageRange(t, p0, p1, null, null);
+    damageRange(t, p0, p1, Position.Bias.Forward, Position.Bias.Backward);
   }
 
   /**
@@ -1045,104 +1082,35 @@ public abstract class BasicTextUI extends TextUI
   public void damageRange(JTextComponent t, int p0, int p1,
                           Position.Bias firstBias, Position.Bias secondBias)
   {
-    // Do nothing if the component cannot be properly displayed.
-    if (t.getWidth() == 0 || t.getHeight() == 0)
-      return;
+    Rectangle alloc = getVisibleEditorRect();
+    if (alloc != null)
+      {
+        Document doc = t.getDocument();
     
+        // Acquire lock here to avoid structural changes in between.
+        if (doc instanceof AbstractDocument)
+          ((AbstractDocument) doc).readLock();
     try
       {
-        // Limit p0 and p1 to sane values to prevent unfriendly
-        // BadLocationExceptions. This makes it possible for the highlighter
-        // to send us illegal values which can happen when a large number
-        // of selected characters are removed (eg. by pressing delete
-        // or backspace).
-        // The reference implementation does not throw an exception, too.
-        p0 = Math.min(p0, t.getDocument().getLength());
-        p1 = Math.min(p1, t.getDocument().getLength());
-
-        Rectangle l1 = modelToView(t, p0, firstBias);
-        Rectangle l2 = modelToView(t, p1, secondBias);
-        if (l1 == null || l2 == null)
-          {
-            // Unable to determine the start or end of the selection.
-            t.repaint();
+            rootView.setSize(alloc.width, alloc.height);
+            Shape damage = rootView.modelToView(p0, firstBias, p1, secondBias,
+                                                alloc);
+            Rectangle r = damage instanceof Rectangle ? (Rectangle) damage
+                                                      : damage.getBounds();
+            textComponent.repaint(r.x, r.y, r.width, r.height);
           }
-        else if (l1.y == l2.y)
+        catch (BadLocationException ex)
           {
-            SwingUtilities.computeUnion(l2.x, l2.y, l2.width, l2.height, l1);
-            t.repaint(l1);
+            // Lets ignore this as it causes no serious problems.
+            // For debugging, comment this out.
+            // ex.printStackTrace();
           }
-        else
+        finally
           {
-            // The two rectangles lie on different lines and we need a
-            // different algorithm to calculate the damaged area:
-            // 1. The line of p0 is damaged from the position of p0
-            // to the right border.
-            // 2. All lines between the ones where p0 and p1 lie on
-            // are completely damaged. Use the allocation area to find
-            // out the bounds.
-            // 3. The final line is damaged from the left bound to the
-            // position of p1.
-            Insets insets = t.getInsets();
-
-            // Damage first line until the end.
-            l1.width = insets.right + t.getWidth() - l1.x;
-            t.repaint(l1);
-            
-            // Note: Utilities.getPositionBelow() may return the offset
-            // that was put in. In that case there is no next line and
-            // we should stop searching for one.
-            
-            int posBelow = Utilities.getPositionBelow(t, p0, l1.x);
-            int p1RowStart = Utilities.getRowStart(t, p1);
-            
-            if (posBelow != -1
-                && posBelow != p0
-                && Utilities.getRowStart(t, posBelow) != p1RowStart)
-              {
-                // Take the rectangle of the offset we just found and grow it
-                // to the maximum width. Retain y because this is our start
-                // height.
-                Rectangle grow = modelToView(t, posBelow);
-                grow.x = insets.left;
-                grow.width = t.getWidth() + insets.right;
-                
-                // Find further lines which have to be damaged completely.
-                int nextPosBelow = posBelow;
-                while (nextPosBelow != -1
-                       && posBelow != nextPosBelow
-                       && Utilities.getRowStart(t, nextPosBelow) != p1RowStart)
-                  {
-                    posBelow = nextPosBelow;
-                    nextPosBelow = Utilities.getPositionBelow(t, posBelow, l1.x);
-                    
-                    if (posBelow == nextPosBelow)
-                      break;
-                  }
-                // Now posBelow is an offset on the last line which has to be damaged
-                // completely. (newPosBelow is on the same line as p1)
-                 
-                // Retrieve the rectangle of posBelow and use its y and height
-                // value to calculate the final height of the multiple line
-                // spanning rectangle.
-                Rectangle end = modelToView(t, posBelow);
-                grow.height = end.y + end.height - grow.y;
-                
-                // Mark that area as damage.
-                t.repaint(grow);
-              }
-            
-            // Damage last line from its beginning to the position of p1.
-            l2.width += l2.x;
-            l2.x = insets.left;
-            t.repaint(l2);
-          }
+            // Release lock.
+            if (doc instanceof AbstractDocument)
+              ((AbstractDocument) doc).readUnlock();
       }
-    catch (BadLocationException ex)
-      {
-        AssertionError err = new AssertionError("Unexpected bad location");
-        err.initCause(ex);
-        throw err;
       }
   }
 
@@ -1240,10 +1208,29 @@ public abstract class BasicTextUI extends TextUI
   public Rectangle modelToView(JTextComponent t, int pos, Position.Bias bias)
     throws BadLocationException
   {
+    // We need to read-lock here because we depend on the document
+    // structure not beeing changed in between.
+    Document doc = textComponent.getDocument();
+    if (doc instanceof AbstractDocument)
+      ((AbstractDocument) doc).readLock();
+    Rectangle rect = null;
+    try
+      {
     Rectangle r = getVisibleEditorRect();
-    
-    return (r != null) ? rootView.modelToView(pos, r, bias).getBounds()
-                       : null;
+        if (r != null)
+          {
+            rootView.setSize(r.width, r.height);
+            Shape s = rootView.modelToView(pos, r, bias);
+            if (s != null)
+              rect = s.getBounds();
+          }
+      }
+    finally
+      {
+        if (doc instanceof AbstractDocument)
+          ((AbstractDocument) doc).readUnlock();
+      }
+    return rect;
   }
 
   /**
@@ -1258,7 +1245,7 @@ public abstract class BasicTextUI extends TextUI
    */
   public int viewToModel(JTextComponent t, Point pt)
   {
-    return viewToModel(t, pt, null);
+    return viewToModel(t, pt, new Position.Bias[1]);
   }
 
   /**
@@ -1356,7 +1343,6 @@ public abstract class BasicTextUI extends TextUI
     Document doc = textComponent.getDocument();
     if (doc == null)
       return;
-    installDocumentListeners();
     Element elem = doc.getDefaultRootElement();
     if (elem == null)
       return;
