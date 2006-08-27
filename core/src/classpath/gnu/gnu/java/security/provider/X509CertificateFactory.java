@@ -59,27 +59,21 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-public class X509CertificateFactory extends CertificateFactorySpi
+public class X509CertificateFactory
+    extends CertificateFactorySpi
 {
-
-  // Constants.
-  // ------------------------------------------------------------------------
-
   public static final String BEGIN_CERTIFICATE = "-----BEGIN CERTIFICATE-----";
-  public static final String END_CERTIFICATE = "-----END CERTIFICATE-----";
-  public static final String BEGIN_X509_CRL = "-----BEGIN X509 CRL-----";
-  public static final String END_X509_CRL = "-----END X509 CRL-----";
 
-  // Constructors.
-  // ------------------------------------------------------------------------
+  public static final String END_CERTIFICATE = "-----END CERTIFICATE-----";
+
+  public static final String BEGIN_X509_CRL = "-----BEGIN X509 CRL-----";
+
+  public static final String END_X509_CRL = "-----END X509 CRL-----";
 
   public X509CertificateFactory()
   {
     super();
   }
-
-  // Instance methods.
-  // ------------------------------------------------------------------------
 
   public Certificate engineGenerateCertificate(InputStream inStream)
     throws CertificateException
@@ -91,7 +85,7 @@ public class X509CertificateFactory extends CertificateFactorySpi
     catch (IOException ioe)
       {
         CertificateException ce = new CertificateException(ioe.getMessage());
-        ce.initCause (ioe);
+        ce.initCause(ioe);
         throw ce;
       }
   }
@@ -113,7 +107,7 @@ public class X509CertificateFactory extends CertificateFactorySpi
         catch (IOException ioe)
           {
             CertificateException ce = new CertificateException(ioe.getMessage());
-            ce.initCause (ioe);
+            ce.initCause(ioe);
             throw ce;
           }
       }
@@ -129,7 +123,7 @@ public class X509CertificateFactory extends CertificateFactorySpi
     catch (IOException ioe)
       {
         CRLException crle = new CRLException(ioe.getMessage());
-        crle.initCause (ioe);
+        crle.initCause(ioe);
         throw crle;
       }
   }
@@ -151,7 +145,7 @@ public class X509CertificateFactory extends CertificateFactorySpi
         catch (IOException ioe)
           {
             CRLException crle = new CRLException(ioe.getMessage());
-            crle.initCause (ioe);
+            crle.initCause(ioe);
             throw crle;
           }
       }
@@ -180,21 +174,17 @@ public class X509CertificateFactory extends CertificateFactorySpi
     return X509CertPath.ENCODINGS.iterator();
   }
 
-  // Own methods.
-  // ------------------------------------------------------------------------
-
   private X509Certificate generateCert(InputStream inStream)
     throws IOException, CertificateException
   {
     if (inStream == null)
       throw new CertificateException("missing input stream");
-    if (!inStream.markSupported())
+    if (! inStream.markSupported())
       inStream = new BufferedInputStream(inStream, 8192);
     inStream.mark(20);
     int i = inStream.read();
     if (i == -1)
       throw new EOFException();
-
     // If the input is in binary DER format, the first byte MUST be
     // 0x30, which stands for the ASN.1 [UNIVERSAL 16], which is the
     // UNIVERSAL SEQUENCE, with the CONSTRUCTED bit (0x20) set.
@@ -217,7 +207,7 @@ public class X509CertificateFactory extends CertificateFactorySpi
               }
             while (i != '\n' && i != '\r');
           }
-        while (!line.toString().equals(BEGIN_CERTIFICATE));
+        while (! line.toString().equals(BEGIN_CERTIFICATE));
         X509Certificate ret = new X509Certificate(
            new BufferedInputStream(new Base64InputStream(inStream), 8192));
         line.setLength(0);
@@ -232,7 +222,7 @@ public class X509CertificateFactory extends CertificateFactorySpi
           }
         while (i != '\n' && i != '\r');
         // XXX ???
-        if (!line.toString().equals(END_CERTIFICATE))
+        if (! line.toString().equals(END_CERTIFICATE))
           throw new CertificateException("no end-of-certificate marker");
         return ret;
       }
@@ -243,18 +233,17 @@ public class X509CertificateFactory extends CertificateFactorySpi
       }
   }
 
-  private X509CRL generateCRL(InputStream inStream)
-    throws IOException, CRLException
+  private X509CRL generateCRL(InputStream inStream) throws IOException,
+      CRLException
   {
     if (inStream == null)
       throw new CRLException("missing input stream");
-    if (!inStream.markSupported())
+    if (! inStream.markSupported())
       inStream = new BufferedInputStream(inStream, 8192);
     inStream.mark(20);
     int i = inStream.read();
     if (i == -1)
       throw new EOFException();
-
     // If the input is in binary DER format, the first byte MUST be
     // 0x30, which stands for the ASN.1 [UNIVERSAL 16], which is the
     // UNIVERSAL SEQUENCE, with the CONSTRUCTED bit (0x20) set.
@@ -277,7 +266,7 @@ public class X509CertificateFactory extends CertificateFactorySpi
               }
             while (i != '\n' && i != '\r');
           }
-        while (!line.toString().startsWith(BEGIN_X509_CRL));
+        while (! line.toString().startsWith(BEGIN_X509_CRL));
         X509CRL ret = new X509CRL(
            new BufferedInputStream(new Base64InputStream(inStream), 8192));
         line.setLength(0);
@@ -292,7 +281,7 @@ public class X509CertificateFactory extends CertificateFactorySpi
           }
         while (i != '\n' && i != '\r');
         // XXX ???
-        if (!line.toString().startsWith(END_X509_CRL))
+        if (! line.toString().startsWith(END_X509_CRL))
           throw new CRLException("no end-of-CRL marker");
         return ret;
       }
