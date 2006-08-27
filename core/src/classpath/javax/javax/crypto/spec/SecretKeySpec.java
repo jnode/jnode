@@ -133,14 +133,22 @@ public class SecretKeySpec implements KeySpec, SecretKey
 
   public boolean equals(Object o)
   {
+    if (o instanceof SecretKeySpec)
+      {
     byte[] okey = ((SecretKeySpec) o).getEncoded();
-    if (key.length != okey.length) return false;
+        if (key.length != okey.length)
+          return false;
     for (int i = 0; i < key.length; i++)
       {
         if (key[i] != okey[i])
           return false;
       }
     return algorithm.equals(((SecretKeySpec) o).getAlgorithm());
+  }
+    else
+      {
+        return false;
+      }
   }
 
   public int hashCode()
