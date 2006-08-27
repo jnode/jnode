@@ -396,7 +396,7 @@ public abstract class AbstractGraphics extends Graphics2D {
 	}
 
 	/**
-	 * @param Tx
+	 * @param tx
 	 * @see java.awt.Graphics2D#transform(java.awt.geom.AffineTransform)
 	 */
 	public void transform(AffineTransform tx) {
@@ -856,7 +856,8 @@ public abstract class AbstractGraphics extends Graphics2D {
 	}
 
 	public FontRenderContext getFontRenderContext() {
-		throw new RuntimeException("Not implemented yet");
+        //TODO review this
+        return new FontRenderContext(new AffineTransform(), false, false);
 	}
 
 	/**
