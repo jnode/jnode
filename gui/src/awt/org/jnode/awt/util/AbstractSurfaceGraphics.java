@@ -392,12 +392,24 @@ public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
 	 * Create a raster that is compatible with the surface and contains
 	 * data derived from the given raster.
 	 * @param raster
-	 * @return
+	 * @return the new raster
 	 */
 	private Raster createCompatibleRaster(Raster raster) {
-		// TODO Implement raster conversion
-		log.warn("Unimplemented raster conversion in AbstractSurfaceGraphics");
-		return raster;
+
+        //todo fix gif images (index color model?), optimize
+        final ColorModel dst_model = surface.getColorModel();
+        final int[] samples = new int[4];
+        final int w = raster.getWidth();
+        final int h = raster.getHeight();
+        final WritableRaster dst_raster = dst_model.createCompatibleWritableRaster(w, h);
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                raster.getPixel(x, y, samples);
+                dst_raster.setPixel(x, y, samples);
+            }
+        }
+
+		return dst_raster;
 	}
 
     /**
