@@ -64,11 +64,11 @@
       <export name="gnu.java.text.*"/>
       <export name="gnu.java.util.*"/>
       <export name="gnu.java.util.prefs.*"/>
+      <export name="gnu.java.util.regex.*"/>  
       <export name="gnu.java.util.jar.*"/>
       <export name="gnu.javax.crypto.*"/>
       <export name="gnu.javax.crypto.jce.*"/>
       <export name="gnu.javax.net.ssl.provider.*"/>
-      <export name="gnu.regexp.*"/>
       <export name="gnu.xml.stream.*"/>
 
       <export name="java.applet.*"/>
