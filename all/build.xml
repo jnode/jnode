@@ -516,6 +516,7 @@ clean             Remove all intermediate build results.
                 </fileset>
                 <fileset dir="${root.dir}/../classpath/tools">
                     <patternset refid="cp-includes-pattern"/>
+                    <patternset refid="cp-sources-pattern"/>
                 </fileset>
             </classpathsources>
         </cp-compare>
