@@ -73,18 +73,24 @@ public final class Pattern implements Serializable
     this.regex = regex;
     this.flags = flags;
 
+    RESyntax syntax = RESyntax.RE_SYNTAX_JAVA_1_4;
     int gnuFlags = 0;
+    gnuFlags |= RE.REG_ICASE_USASCII;
     if ((flags & CASE_INSENSITIVE) != 0)
       gnuFlags |= RE.REG_ICASE;
     if ((flags & MULTILINE) != 0)
+      {
       gnuFlags |= RE.REG_MULTILINE;
+        syntax = new RESyntax(syntax);
+        syntax.setLineSeparator(null);
+      }
     if ((flags & DOTALL) != 0)
       gnuFlags |= RE.REG_DOT_NEWLINE;
+    if ((flags & UNICODE_CASE) != 0)
+      gnuFlags &= ~RE.REG_ICASE_USASCII;
     // not yet supported:
-    // if ((flags & UNICODE_CASE) != 0) gnuFlags =
     // if ((flags & CANON_EQ) != 0) gnuFlags =
 
-    RESyntax syntax = RESyntax.RE_SYNTAX_JAVA_1_4;
     if ((flags & UNIX_LINES) != 0)
       {
 	// Use a syntax set with \n for linefeeds?
@@ -94,7 +100,7 @@ public final class Pattern implements Serializable
 
     if ((flags & COMMENTS) != 0)
       {
-	// Use a syntax with support for comments?
+	gnuFlags |= RE.REG_X_COMMENTS;
       }
 
     try
