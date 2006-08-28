@@ -101,6 +101,8 @@ public final class UID
    */
   public UID()
   {
+    synchronized (UID.class)
+      {
     time = System.currentTimeMillis();
     unique = machineId;
     if (time > last)
@@ -110,8 +112,6 @@ public final class UID
       }
     else
       {
-        synchronized (UID.class)
-          {
             if (uidCounter == Short.MAX_VALUE)
               {
                 // Make a 2 ms pause if the counter has reached the maximal
@@ -126,8 +126,7 @@ public final class UID
                 uidCounter = Short.MIN_VALUE;
                 time = last = System.currentTimeMillis();
               }
-
-            count = uidCounter++;
+            count = ++uidCounter;
 			}
 		}
 	}
@@ -219,9 +218,8 @@ public final class UID
   {
     int max = Character.MAX_RADIX;
     // Translate into object count, counting from 0.
-    long lc = (count + Short.MIN_VALUE) & 0xFFFF;
-    return Long.toString(time, max) + ":"
-           + Long.toString(unique, max) + ":"
+    long lc = (count - Short.MIN_VALUE) & 0xFFFF;
+    return Long.toString(unique, max) + ":" + Long.toString(time, max) + "."
            + Long.toString(lc, max);
   }
 }
