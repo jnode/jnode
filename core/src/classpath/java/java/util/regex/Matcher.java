@@ -38,8 +38,8 @@ exception statement from your version. */
 
 package java.util.regex;
 
-import gnu.regexp.RE;
-import gnu.regexp.REMatch;
+import gnu.java.util.regex.RE;
+import gnu.java.util.regex.REMatch;
 
 /**
  * Instance of a regular expression applied to a char sequence.
@@ -59,7 +59,7 @@ public final class Matcher implements MatchResult
     this.pattern = pattern;
     this.input = input;
   }
-  
+
   /**
    * @param sb The target string buffer
    * @param replacement The replacement string
@@ -74,9 +74,9 @@ public final class Matcher implements MatchResult
   {
     assertMatchOp();
     sb.append(input.subSequence(appendPosition,
-				match.getStartIndex()).toString());
+                match.getStartIndex()).toString());
     sb.append(RE.getReplacement(replacement, match,
-	RE.REG_REPLACE_USE_BACKSLASHESCAPE));
+    RE.REG_REPLACE_USE_BACKSLASHESCAPE));
     appendPosition = match.getEndIndex();
     return this;
   }
@@ -89,7 +89,7 @@ public final class Matcher implements MatchResult
     sb.append(input.subSequence(appendPosition, input.length()).toString());
     return sb;
   }
- 
+
   /**
    * @exception IllegalStateException If no match has yet been attempted,
    * or if the previous match operation failed
@@ -100,7 +100,7 @@ public final class Matcher implements MatchResult
     assertMatchOp();
     return match.getEndIndex();
   }
-  
+
   /**
    * @param group The index of a capturing group in this matcher's pattern
    *
@@ -115,32 +115,32 @@ public final class Matcher implements MatchResult
     assertMatchOp();
     return match.getEndIndex(group);
   }
- 
+
   public boolean find ()
   {
     boolean first = (match == null);
     match = pattern.getRE().getMatch(input, position);
     if (match != null)
       {
-	int endIndex = match.getEndIndex();
-	// Are we stuck at the same position?
-	if (!first && endIndex == position)
-	  {
-	    match = null;
-	    // Not at the end of the input yet?
-	    if (position < input.length() - 1)
-	      {
-		position++;
-		return find(position);
-	      }
-	    else
-	      return false;
-	  }
-	position = endIndex;
-	return true;
+    int endIndex = match.getEndIndex();
+    // Are we stuck at the same position?
+    if (!first && endIndex == position)
+      {
+        match = null;
+        // Not at the end of the input yet?
+        if (position < input.length() - 1)
+          {
+        position++;
+        return find(position);
+          }
+        else
+          return false;
+      }
+    position = endIndex;
+    return true;
       }
     return false;
-  } 
+  }
 
   /**
    * @param start The index to start the new pattern matching
@@ -153,12 +153,12 @@ public final class Matcher implements MatchResult
     match = pattern.getRE().getMatch(input, start);
     if (match != null)
       {
-	position = match.getEndIndex();
-	return true;
+    position = match.getEndIndex();
+    return true;
       }
     return false;
   }
- 
+
   /**
    * @exception IllegalStateException If no match has yet been attempted,
    * or if the previous match operation failed
@@ -168,7 +168,7 @@ public final class Matcher implements MatchResult
     assertMatchOp();
     return match.toString();
   }
-  
+
   /**
    * @param group The index of a capturing group in this matcher's pattern
    *
@@ -192,7 +192,7 @@ public final class Matcher implements MatchResult
     reset();
     // Semantics might not quite match
     return pattern.getRE().substitute(input, replacement, position,
-	RE.REG_REPLACE_USE_BACKSLASHESCAPE);
+    RE.REG_REPLACE_USE_BACKSLASHESCAPE);
   }
 
   /**
@@ -202,29 +202,29 @@ public final class Matcher implements MatchResult
   {
     reset();
     return pattern.getRE().substituteAll(input, replacement, position,
-	RE.REG_REPLACE_USE_BACKSLASHESCAPE);
+    RE.REG_REPLACE_USE_BACKSLASHESCAPE);
   }
-  
+
   public int groupCount ()
   {
     return pattern.getRE().getNumSubs();
   }
- 
+
   public boolean lookingAt ()
   {
     match = pattern.getRE().getMatch(input, 0);
     if (match != null)
       {
-	if (match.getStartIndex() == 0)
-	  {
-	    position = match.getEndIndex();
-	  return true;
-	  }
-	match = null;
+    if (match.getStartIndex() == 0)
+      {
+        position = match.getEndIndex();
+      return true;
+      }
+    match = null;
       }
     return false;
   }
-  
+
   /**
    * Attempts to match the entire input sequence against the pattern. 
    *
@@ -240,17 +240,17 @@ public final class Matcher implements MatchResult
     match = pattern.getRE().getMatch(input, 0, RE.REG_TRY_ENTIRE_MATCH);
     if (match != null)
       {
-	if (match.getStartIndex() == 0)
+    if (match.getStartIndex() == 0)
       {
-	    position = match.getEndIndex();
-	if (position == input.length())
-	  return true;
-	  }
-	match = null;
+        position = match.getEndIndex();
+    if (position == input.length())
+      return true;
+      }
+    match = null;
       }
     return false;
   }
-  
+
   /**
    * Returns the Pattern that is interpreted by this Matcher
    */
@@ -258,14 +258,14 @@ public final class Matcher implements MatchResult
   {
     return pattern;
   }
-  
+
   public Matcher reset ()
   {
     position = 0;
     match = null;
     return this;
   }
-  
+
   /**
    * @param input The new input character sequence
    */
@@ -274,7 +274,7 @@ public final class Matcher implements MatchResult
     this.input = input;
     return reset();
   }
-  
+
   /**
    * @returns the index of a capturing group in this matcher's pattern
    *
