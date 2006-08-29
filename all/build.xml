@@ -502,6 +502,10 @@ clean             Remove all intermediate build results.
                     <patternset refid="cp-includes-pattern"/>
                     <patternset refid="cp-sources-pattern"/>
                 </fileset>
+                <fileset dir="${root.dir}/../classpath-5.0/external/jsr166" target="1.5" ignoremissing="on">
+                    <patternset refid="cp-includes-pattern"/>
+                    <patternset refid="cp-sources-pattern"/>
+                </fileset>
                 <fileset dir="${root.dir}/../classpath/resource">
 	                <patternset refid="cp-includes-pattern"/>
                 </fileset>
