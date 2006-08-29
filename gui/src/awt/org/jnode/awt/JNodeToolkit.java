@@ -24,7 +24,6 @@ package org.jnode.awt;
 import gnu.java.awt.ClasspathToolkit;
 import gnu.java.awt.EmbeddedWindow;
 import gnu.java.awt.peer.ClasspathFontPeer;
-import gnu.java.awt.peer.ClasspathTextLayoutPeer;
 import gnu.java.awt.peer.EmbeddedWindowPeer;
 import gnu.java.security.action.GetPropertyAction;
 
@@ -424,17 +423,6 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 			fontCache.put(keyMap, newPeer);
 			return newPeer;
 		}
-	}
-
-	/**
-	 * @see gnu.java.awt.ClasspathToolkit#getClasspathTextLayoutPeer(java.text.AttributedString,
-	 *      java.awt.font.FontRenderContext)
-	 */
-	public ClasspathTextLayoutPeer getClasspathTextLayoutPeer(
-			AttributedString str, FontRenderContext frc) {
-		throw new UnsupportedOperationException();
-		// TODO Auto-generated method stub
-		// return super.getClasspathTextLayoutPeer(str, frc);
 	}
 
 	/**
