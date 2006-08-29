@@ -1,6 +1,6 @@
 /* LogManager.java -- a class for maintaining Loggers and managing
    configuration properties
-   Copyright (C) 2002,2005 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2005, 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -39,6 +39,8 @@ exception statement from your version. */
 
 package java.util.logging;
 
+import gnu.classpath.SystemProperties;
+
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.ByteArrayInputStream;
@@ -48,7 +50,9 @@ import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -105,16 +109,27 @@ import java.util.StringTokenizer;
 public class LogManager
 {
   /**
+   * The object name for the logging management bean.
+   * @since 1.5
+   */
+  public static final String LOGGING_MXBEAN_NAME
+    = "java.util.logging:type=Logging";
+
+  /**
    * The singleton LogManager instance.
    */
   private static LogManager logManager;
   
   /**
+   * The singleton logging bean.
+   */
+  private static LoggingMXBean loggingBean;
+
+  /**
    * The registered named loggers; maps the name of a Logger to
    * a WeakReference to it.
    */
   private Map loggers;
-  final Logger rootLogger;
 
   /**
    * The properties for the logging framework which have been
@@ -139,57 +154,53 @@ public class LogManager
 
   protected LogManager()
   {
-    if (logManager != null)
-      throw new IllegalStateException("there can be only one LogManager; use LogManager.getLogManager()");
-
-    logManager = this;
-    loggers = new java.util.HashMap();
-    rootLogger = new Logger("", null);
-    rootLogger.setLevel(Level.INFO);
-    addLogger(rootLogger);
-    
-    /* Make sure that Logger.global has the rootLogger as its parent.
-     *
-     * Logger.global is set during class initialization of Logger,
-     * which may or may not be before this code is being executed.
-     * For example, on the Sun 1.3.1 and 1.4.0 JVMs, Logger.global
-     * has been set before this code is being executed. In contrast,
-     * Logger.global still is null on GCJ 3.2.  Since the LogManager
-     * and Logger classes are mutually dependent, both behaviors are
-     * correct.
-     *
-     * This means that we cannot depend on Logger.global to have its
-     * value when this code executes, although that variable is final.
-     * Since Logger.getLogger will always return the same logger for
-     * the same name, the subsequent line works fine irrespective of
-     * the order in which classes are initialized.
-     */
-    Logger.getLogger("global").setParent(rootLogger);
-    Logger.getLogger("global").setUseParentHandlers(true);
+    loggers = new HashMap();
   }
 
   /**
    * Returns the globally shared LogManager instance.
    */
-  public static LogManager getLogManager()
+  public static synchronized LogManager getLogManager()
   {
+    if (logManager == null)
+      {
+        logManager = makeLogManager();
+        initLogManager();
+      }
     return logManager;
   }
 
-  static
+  private static final String MANAGER_PROPERTY = "java.util.logging.manager";
+
+  private static LogManager makeLogManager()
   {
-    makeLogManager();
+    String managerClassName = SystemProperties.getProperty(MANAGER_PROPERTY);
+    LogManager manager = (LogManager) createInstance
+      (managerClassName, LogManager.class, MANAGER_PROPERTY);
+    if (manager == null)
+      manager = new LogManager();
+    return manager;
+  }
+
+  private static final String CONFIG_PROPERTY = "java.util.logging.config.class";
+
+  private static void initLogManager()
+  {
+    LogManager manager = getLogManager();
+    Logger.root.setLevel(Level.INFO);
+    manager.addLogger(Logger.root);
     
     /* The Javadoc description of the class explains
      * what is going on here.
      */
-      Object configurator = createInstance(System.getProperty("java.util.logging.config.class"),
-      /* must be instance of */ Object.class);
+    Object configurator = createInstance(System.getProperty(CONFIG_PROPERTY),
+                                         /* must be instance of */ Object.class,
+                                         CONFIG_PROPERTY);
 
     try
     {
       if (configurator == null)
-        getLogManager().readConfiguration();
+          manager.readConfiguration();
     }
     catch (IOException ex)
     {
@@ -197,23 +208,6 @@ public class LogManager
     }
   }
   
-  private static LogManager makeLogManager()
-  {
-    String      managerClassName;
-    LogManager  manager;
-
-    managerClassName = System.getProperty("java.util.logging.manager");
-    manager = (LogManager) createInstance(managerClassName, LogManager.class);
-    if (manager != null)
-      return manager;
-
-    if (managerClassName != null)
-      System.err.println("WARNING: System property \"java.util.logging.manager\""
-			 + " should be the name of a subclass of java.util.logging.LogManager");
-
-    return new LogManager();
-  }
-
   /**
    * Registers a listener which will be notified when the
    * logging properties are re-read.
@@ -324,7 +318,7 @@ public class LogManager
      * When adding "foo.bar", the logger "foo.bar.baz" should change
      * its parent to "foo.bar".
      */
-    if (parent != rootLogger)
+    if (parent != Logger.root)
     {
       for (Iterator iter = loggers.keySet().iterator(); iter.hasNext();)
       {
@@ -367,14 +361,14 @@ public class LogManager
   {
     String childName = child.getName();
     int    childNameLength = childName.length();
-    Logger best = rootLogger;
+    Logger best = Logger.root;
     int    bestNameLength = 0;
 
     Logger  cand;
     String  candName;
     int     candNameLength;
 
-    if (child == rootLogger)
+    if (child == Logger.root)
       return null;
 
     for (Iterator iter = loggers.keySet().iterator(); iter.hasNext();)
@@ -468,7 +462,7 @@ public class LogManager
 
 	if (logger == null)
 	  iter.remove();
-	else if (logger != rootLogger)
+	    else if (logger != Logger.root)
 	      {
 	        logger.resetLogger();
 	  logger.setLevel(null);
@@ -476,8 +470,8 @@ public class LogManager
     }
       }
 
-    rootLogger.setLevel(Level.INFO);
-    rootLogger.resetLogger();
+    Logger.root.setLevel(Level.INFO);
+    Logger.root.resetLogger();
   }
 
   /**
@@ -574,21 +568,9 @@ public class LogManager
 	    while (tokenizer.hasMoreTokens())
             {
               String handlerName = tokenizer.nextToken();	
-              try
-                {
-		    Class handlerClass = ClassLoader.getSystemClassLoader().loadClass(handlerName);
-		    getLogger("").addHandler((Handler) handlerClass
-		                             .newInstance());
-                }
-              catch (ClassCastException ex)
-                {
-		    System.err.println("[LogManager] class " + handlerName
-		                       + " is not subclass of java.util.logging.Handler");
-                }
-              catch (Exception ex)
-                {
-                  //System.out.println("[LogManager.readConfiguration]"+ex);
-                }
+                Handler handler = (Handler)
+                  createInstance(handlerName, Handler.class, key);
+                Logger.root.addHandler(handler);
             }
         }
 	  
@@ -602,13 +584,18 @@ public class LogManager
 		logger = Logger.getLogger(loggerName);
 		addLogger(logger);
 	      }
+            Level level = null;
 	  try
 	  {
-	    logger.setLevel(Level.parse(value));
+                level = Level.parse(value);
+              }
+            catch (IllegalArgumentException e)
+              {
+                warn("bad level \'" + value + "\'", e);
 	  }
-	  catch (Exception _)
+            if (level != null)
 	  {
-        //System.out.println("[LogManager.readConfiguration] "+_);
+                logger.setLevel(level);
 	  }
 	  continue;
 	}
@@ -748,18 +735,16 @@ public class LogManager
    */
   static final Class getClassProperty(String propertyName, Class defaultValue)
   {
-    Class usingClass = null;
+    String propertyValue = logManager.getProperty(propertyName);
 
+    if (propertyValue != null)
     try
     {
-      String propertyValue = logManager.getProperty(propertyName);
-      if (propertyValue != null)
-        usingClass = Class.forName(propertyValue);
-      if (usingClass != null)
-        return usingClass;
+          return locateClass(propertyValue);
     }
-    catch (Exception _)
+      catch (ClassNotFoundException e)
     {
+          warn(propertyName + " = " + propertyValue, e);
     }
 
     return defaultValue;
@@ -778,8 +763,13 @@ public class LogManager
       if (ofClass.isInstance(obj))
 	return obj;
     }
-    catch (Exception _)
+    catch (InstantiationException e)
+      {
+        warn(propertyName + " = " + klass.getName(), e);
+      }
+    catch (IllegalAccessException e)
     {
+        warn(propertyName + " = " + klass.getName(), e);
     }
 
     if (defaultClass == null)
@@ -824,14 +814,17 @@ public class LogManager
   }
 
   /** 
-   * Creates a new instance of a class specified by name.
+   * Creates a new instance of a class specified by name and verifies
+   * that it is an instance (or subclass of) a given type.
    *
    * @param className the name of the class of which a new instance
    *        should be created.
    *       
-   * @param ofClass the class to which the new instance should
-   *        be either an instance or an instance of a subclass.
-   *        FIXME: This description is just terrible.
+   * @param type the object created must be an instance of
+   * <code>type</code> or any subclass of <code>type</code>
+   *
+   * @param property the system property to reference in error
+   * messages
    *
    * @return the new instance, or <code>null</code> if
    *         <code>className</code> is <code>null</code>, if no class
@@ -839,28 +832,148 @@ public class LogManager
    *         loading that class, or if the constructor of the class
    *         has thrown an exception.
    */
-  static final Object createInstance(String className, Class ofClass)
+  private static final Object createInstance(String className, Class type,
+                                             String property)
   {
-    Class   klass;
+    Class klass = null;
 
     if ((className == null) || (className.length() == 0))
       return null;
 
     try
     {
-      klass = Class.forName(className);
-	if (! ofClass.isAssignableFrom(klass))
-	return null;
+        klass = locateClass(className);
+        if (type.isAssignableFrom(klass))
+          return klass.newInstance();
+        warn(property, className, "not an instance of " + type.getName());
+      }
+    catch (ClassNotFoundException e)
+      {
+        warn(property, className, "class not found", e);
+      }
+    catch (IllegalAccessException e)
+      {
+        warn(property, className, "illegal access", e);
+      }
+    catch (InstantiationException e)
+      {
+        warn(property, className, e);
+      }
+    catch (java.lang.LinkageError e)
+      {
+        warn(property, className, "linkage error", e);
+      }
 
-      return klass.newInstance();
+	return null;
+  }
+
+  private static final void warn(String property, String klass, Throwable t)
+  {
+    warn(property, klass, null, t);
+  }
+
+  private static final void warn(String property, String klass, String msg)
+  {
+    warn(property, klass, msg, null);
     }
-    catch (Exception _)
+
+  private static final void warn(String property, String klass, String msg,
+                                 Throwable t)
+  {
+    warn("error instantiating '" + klass + "' referenced by " + property +
+         (msg == null ? "" : ", " + msg), t);
+  }
+
+  /**
+   * All debug warnings go through this method.
+   */
+
+  private static final void warn(String msg, Throwable t)
     {
+    System.err.println("WARNING: " + msg);
+    if (t != null)
+      t.printStackTrace(System.err);
+  }
+
+  /**
+   * Locates a class by first checking the system class loader and
+   * then checking the context class loader.
+   *
+   * @param name the fully qualified name of the Class to locate
+   * @return Class the located Class
+   */
+
+  private static Class locateClass(String name) throws ClassNotFoundException
+  {
+    ClassLoader loader = Thread.currentThread().getContextClassLoader();
+    try
+      {
+        return Class.forName(name, true, loader);
+      }
+    catch (ClassNotFoundException e)
+      {
+        loader = ClassLoader.getSystemClassLoader();
+        return Class.forName(name, true, loader);
+      }
+  }
+
+  /**
+   * Return the logging bean.  There is a single logging bean per
+   * VM instance.
+   * @since 1.5
+   */
+  public static synchronized LoggingMXBean getLoggingMXBean()
+  {
+    if (loggingBean == null)
+      {
+        loggingBean = new LoggingMXBean()
+        {
+          public String getLoggerLevel(String logger)
+          {
+            LogManager mgr = getLogManager();
+            Logger l = mgr.getLogger(logger);
+            if (l == null)
       return null;
+            Level lev = l.getLevel();
+            if (lev == null)
+              return "";
+            return lev.getName();
     }
-    catch (java.lang.LinkageError _)
+
+          public List getLoggerNames()
     {
+            LogManager mgr = getLogManager();
+            // This is inefficient, but perhaps better for maintenance.
+            return Collections.list(mgr.getLoggerNames());
+          }
+
+          public String getParentLoggerName(String logger)
+          {
+            LogManager mgr = getLogManager();
+            Logger l = mgr.getLogger(logger);
+            if (l == null)
       return null;
+            l = l.getParent();
+            if (l == null)
+              return "";
+            return l.getName();
+          }
+
+          public void setLoggerLevel(String logger, String level)
+          {
+            LogManager mgr = getLogManager();
+            Logger l = mgr.getLogger(logger);
+            if (l == null)
+              throw new IllegalArgumentException("no logger named " + logger);
+            Level newLevel;
+            if (level == null)
+              newLevel = null;
+            else
+              newLevel = Level.parse(level);
+            l.setLevel(newLevel);
+          }
+        };
     }
+    return loggingBean;
   }
 }

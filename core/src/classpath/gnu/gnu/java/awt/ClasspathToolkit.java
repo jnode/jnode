@@ -41,7 +41,6 @@ package gnu.java.awt;
 import gnu.java.awt.EmbeddedWindow;
 import gnu.java.awt.peer.ClasspathFontPeer;
 import gnu.java.awt.peer.EmbeddedWindowPeer;
-import gnu.java.awt.peer.ClasspathTextLayoutPeer;
 import gnu.java.security.action.SetAccessibleAction;
 
 import java.awt.AWTException;
@@ -119,10 +118,6 @@ public abstract class ClasspathToolkit
    * transformation.
    */
   public abstract ClasspathFontPeer getClasspathFontPeer (String name, Map attrs); 
-
-  public abstract ClasspathTextLayoutPeer 
-  getClasspathTextLayoutPeer (AttributedString str, FontRenderContext frc); 
-
 
   /** 
    * Creates a {@link Font}, in a platform-specific manner.

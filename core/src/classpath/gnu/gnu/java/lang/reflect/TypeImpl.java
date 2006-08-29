@@ -1,5 +1,6 @@
-/* InvalidDnDOperationException.java -- thrown when drag-and-drop fails
-   Copyright (C) 2002, 2005  Free Software Foundation, Inc.
+/* TypeImpl.java
+   Copyright (C) 2005
+   Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -35,40 +36,28 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+package gnu.java.lang.reflect;
 
-package java.awt.dnd;
+import java.lang.reflect.Type;
 
-/**
- * Thrown when a method in the java.awt.dnd package is unable to perform a
- * requested operation, usually because the underlying DnD system is in the
- * wrong state.
- *
- * @author Eric Blake (ebb9@email.byu.edu)
- * @since 1.2
- * @status updated to 1.4
- */
-public class InvalidDnDOperationException extends IllegalStateException
+abstract class TypeImpl implements Type
 {
-  /**
-   * Compatible with JDK 1.2+.
-   */
-  private static final long serialVersionUID = -6062568741193956678L;
+    abstract Type resolve();
 
-  /**
-   * Create an exception without a message.
-   */
-  public InvalidDnDOperationException()
-  {
-    super();
-  }
+    static void resolve(Type[] types)
+    {
+        for (int i = 0; i < types.length; i++)
+        {
+            types[i] = resolve(types[i]);
+        }
+    }
 
-  /**
-   * Create an exception with a message.
-   *
-   * @param s the message
-   */
-  public InvalidDnDOperationException(String s)
-  {
-    super(s);
-  }
-} // class InvalidDnDOperationException
+    static Type resolve(Type type)
+    {
+        if (type instanceof TypeImpl)
+        {
+            type = ((TypeImpl) type).resolve();
+        }
+        return type;
+    }
+}

@@ -1,5 +1,5 @@
-/* InvalidDnDOperationException.java -- thrown when drag-and-drop fails
-   Copyright (C) 2002, 2005  Free Software Foundation, Inc.
+/* LoggingMxBean.java -- Management interface for logging
+   Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -36,39 +36,50 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package java.awt.dnd;
+package java.util.logging;
+
+import java.util.List;
 
 /**
- * Thrown when a method in the java.awt.dnd package is unable to perform a
- * requested operation, usually because the underlying DnD system is in the
- * wrong state.
- *
- * @author Eric Blake (ebb9@email.byu.edu)
- * @since 1.2
- * @status updated to 1.4
+ * This interface represents the management interface for logging.
+ * There is a single logging bean per VM instance, which can be
+ * retrieved via {@link LogManager#getLoggingMXBean()}.
+ * 
+ * @since 1.5
  */
-public class InvalidDnDOperationException extends IllegalStateException
+public interface LoggingMXBean
 {
   /**
-   * Compatible with JDK 1.2+.
+   * Return the name of the logging level given the name of
+   * a logger.  Returns null if no such logger exists.
+   * @param logger the logger's name
+   * @return the logging level's name, or null
    */
-  private static final long serialVersionUID = -6062568741193956678L;
+  String getLoggerLevel(String logger);
 
   /**
-   * Create an exception without a message.
+   * Return a list of all logger names.
    */
-  public InvalidDnDOperationException()
-  {
-    super();
-  }
+  List/*<String>*/ getLoggerNames();
 
   /**
-   * Create an exception with a message.
-   *
-   * @param s the message
+   * Return the name of the parent of the indicated logger.
+   * If no such logger exists, returns null.  If the logger
+   * is the root logger, returns the empty string.
+   * @param logger the logger's name
+   * @return the name of the logger's parent, or null
    */
-  public InvalidDnDOperationException(String s)
-  {
-    super(s);
-  }
-} // class InvalidDnDOperationException
+  String getParentLoggerName(String logger);
+
+  /**
+   * Sets the logging level for a particular logger.
+   * 
+   * @param logger the name of the logger
+   * @param level the name of the new logging level, or null
+   * @throws IllegalArgumentException if the level is not
+   * recognized, or if the logger does not exist
+   * @throws SecurityException if access is denied;
+   * see {@link Logger#setLevel(Level)}
+   */
+  void setLoggerLevel(String logger, String level);
+}

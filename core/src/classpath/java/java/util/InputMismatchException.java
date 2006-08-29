@@ -1,4 +1,4 @@
-/* ByteArray.java -- wrapper around a byte array, with nice toString output.
+/* InputMismatchException.java
    Copyright (C) 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,74 +36,38 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package gnu.classpath;
+package java.util;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
-public final class ByteArray
+/** 
+ * Thrown when a {@link Scanner} instance encounters a mismatch
+ * between the input data and the pattern it is trying to match it
+ * against.  This could be because the input data represents an
+ * out-of-range value for the type the pattern represents, or simply
+ * because the data does not fit that particular type.
+ *
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+ * @since 1.5 
+ */
+public class InputMismatchException 
+  extends NoSuchElementException
 {
-  private final byte[] value;
-
-  public ByteArray (final byte[] value)
+  /**
+   * Constructs a new <code>InputMismatchException</code>
+   * with a <code>null</code> message.
+   */
+  public InputMismatchException()
   {
-    this.value = value;
   }
 
-  public byte[] getValue ()
+  /**
+   * Constructs a new <code>InputMismatchException</code>
+   * with the supplied error message.
+   *
+   * @param s the error message to report back to the user.
+   */
+  public InputMismatchException(String s)
   {
-    return value;
-  }
-
-  public String toString ()
-  {
-    StringWriter str = new StringWriter ();
-    PrintWriter out = new PrintWriter (str);
-    int i = 0;
-    int len = value.length;
-    while (i < len)
-      {
-	out.print (formatInt (i, 16, 8));
-	out.print ("  ");
-	int l = Math.min (16, len - i);
-	String s = toHexString (value, i, l, ' ');
-	out.print (s);
-	for (int j = 56 - (56 - s.length ()); j < 56; j++)
-	  out.print (" ");
-	for (int j = 0; j < l; j++)
-	  {
-	    byte b = value[i+j];
-	    if ((b & 0xFF) < 0x20 || (b & 0xFF) > 0x7E)
-	      out.print (".");
-	    else
-	      out.print ((char) (b & 0xFF));
-	  }
-	out.println ();
-	i += 16;
-      }
-    return str.toString ();
-  }
-
-  public static String toHexString (byte[] buf, int off, int len, char sep)
-  {
-    StringBuffer str = new StringBuffer();
-    for (int i = 0; i < len; i++)
-      {
-	str.append (Character.forDigit (buf[i+off] >>> 4 & 0x0F, 16));
-	str.append (Character.forDigit (buf[i+off] & 0x0F, 16));
-        if (i < len - 1)
-          str.append(sep);
-      }
-    return str.toString();
-  }
-
-  public static String formatInt (int value, int radix, int len)
-  {
-    String s = Integer.toString (value, radix);
-    StringBuffer buf = new StringBuffer ();
-    for (int j = 0; j < len - s.length(); j++)
-      buf.append ("0");
-    buf.append (s);
-    return buf.toString();
+    super(s);
   }
 }
