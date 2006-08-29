@@ -1,5 +1,5 @@
 /* Level.java -- a class for indicating logging levels
-   Copyright (C) 2002, 2005  Free Software Foundation, Inc.
+   Copyright (C) 2002, 2005, 2006  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -341,8 +341,13 @@ public class Level implements Serializable
 
     for (int i = 0; i < knownLevels.length; i++)
     {
-      if (name == knownLevels[i].name)
-	return knownLevels[i];
+      // It's safe to use == instead of .equals here because only the
+      // standard logging levels will be returned by this method, and
+      // they are all created using string literals.
+        /**jnode related - this check fails when starting up jnode - fixed by lsantha
+      if (name == knownLevels[i].name)                            **/
+        if (knownLevels[i].name.equals(name))
+    return knownLevels[i];
     }
     
     try

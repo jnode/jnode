@@ -38,13 +38,19 @@ exception statement from your version. */
 
 package java.awt.dnd;
 
+import gnu.classpath.NotImplementedException;
+
 import java.awt.Component;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
 import java.awt.Point;
 import java.awt.datatransfer.FlavorMap;
+import java.awt.datatransfer.SystemFlavorMap;
+import java.awt.dnd.peer.DropTargetPeer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.peer.ComponentPeer;
+import java.awt.peer.LightweightPeer;
 import java.io.Serializable;
 import java.util.EventListener;
 import java.util.TooManyListenersException;
@@ -79,19 +85,25 @@ public class DropTarget
     }
 
     protected void stop ()
+      throws NotImplementedException
     {
+      // FIXME: implement this
     }
 
     public void actionPerformed (ActionEvent e)
+      throws NotImplementedException
     {
+      // FIXME: implement this
     }
   }
 
   private Component component;
   private FlavorMap flavorMap;
   private int actions;
+  private DropTargetPeer peer;
   private DropTargetContext dropTargetContext;
   private DropTargetListener dropTargetListener;
+  private DropTarget.DropTargetAutoScroller autoscroller;
   private boolean active = true;
     
   /**
@@ -102,7 +114,7 @@ public class DropTarget
    */
   public DropTarget ()
   {
-    this (null, 0, null, true, null);
+    this (null, DnDConstants.ACTION_COPY_OR_MOVE, null, true, null);
   }
   
   /**
@@ -113,7 +125,7 @@ public class DropTarget
    */
   public DropTarget (Component c, DropTargetListener dtl)
   {
-    this (c, 0, dtl, true, null);
+    this (c, DnDConstants.ACTION_COPY_OR_MOVE, dtl, true, null);
   }
   
   /**
@@ -150,12 +162,19 @@ public class DropTarget
     if (GraphicsEnvironment.isHeadless ())
       throw new HeadlessException ();
 
-    component = c;
-    actions = i;
+    setComponent(c);
+    setDefaultActions(i);
     dropTargetListener = dtl;
+    
+    if (fm == null)
+      flavorMap = SystemFlavorMap.getDefaultFlavorMap();
+    else
     flavorMap = fm;
     
     setActive (b);
+    
+    if (c != null)
+      c.setDropTarget(this);
   }
 
   /**
@@ -211,33 +230,52 @@ public class DropTarget
   public void addDropTargetListener (DropTargetListener dtl)
     throws TooManyListenersException
   {
+    if (dtl == null)
+      return;
+    
+    if (dtl.equals(this))
+      throw new IllegalArgumentException();
+    
+    if (dropTargetListener != null)
+      throw new TooManyListenersException();
+    
     dropTargetListener = dtl;
   }
 
   public void removeDropTargetListener(DropTargetListener dtl)
   {
-    // FIXME: Do we need to do something with dtl ?
+    if (dropTargetListener != null)
     dropTargetListener = null;
   }
 
   public void dragEnter(DropTargetDragEvent dtde)
   {
+    if (dropTargetListener != null)
+      dropTargetListener.dragEnter(dtde);
   }
 
   public void dragOver(DropTargetDragEvent dtde)
   {
+    if (dropTargetListener != null)
+      dropTargetListener.dragOver(dtde);
   }
 
   public void dropActionChanged(DropTargetDragEvent dtde)
   {
+    if (dropTargetListener != null)
+      dropTargetListener.dropActionChanged(dtde);
   }
 
   public void dragExit(DropTargetEvent dte)
   {
+    if (dropTargetListener != null)
+      dropTargetListener.dragExit(dte);
   }
 
   public void drop(DropTargetDropEvent dtde)
   {
+    if (dropTargetListener != null)
+      dropTargetListener.drop(dtde);
   }
 
   public FlavorMap getFlavorMap()
@@ -250,12 +288,29 @@ public class DropTarget
     flavorMap = fm;
   }
 
-  public void addNotify(java.awt.peer.ComponentPeer peer)
+  public void addNotify(ComponentPeer p)
   {
+    Component c = component;
+    while (c != null && p instanceof LightweightPeer)
+      {
+        p = c.getPeer();
+        c = c.getParent();
+      }
+
+    if (p instanceof DropTargetPeer)
+  {
+        peer = ((DropTargetPeer) p);
+        peer.addDropTarget(this);
+      }
+    else
+      peer = null;
   }
 
-  public void removeNotify(java.awt.peer.ComponentPeer peer)
+  public void removeNotify(ComponentPeer p)
   {
+    ((DropTargetPeer) peer).removeDropTarget(this);
+    peer = null;
+    p = null;
   }
 
   public DropTargetContext getDropTargetContext()
@@ -268,24 +323,34 @@ public class DropTarget
 
   protected DropTargetContext createDropTargetContext()
   {
-    return new DropTargetContext (this);
+    if (dropTargetContext == null)
+      dropTargetContext = new DropTargetContext (this);
+    
+    return dropTargetContext;
   }
 
   protected DropTarget.DropTargetAutoScroller createDropTargetAutoScroller
                                                        (Component c, Point p)
   {
-    return new DropTarget.DropTargetAutoScroller (c, p);
+    if (autoscroller == null)
+      autoscroller = new DropTarget.DropTargetAutoScroller (c, p);
+    
+    return autoscroller;
   }
 
   protected void initializeAutoscrolling(Point p)
   {
+    createDropTargetAutoScroller (component, p);
   }
 
   protected void updateAutoscroll(Point dragCursorLocn)
   {
+    if (autoscroller != null)
+      autoscroller.updateLocation(dragCursorLocn);
   }
 
   protected void clearAutoscroll()
   {
+    autoscroller = null;
   }
 } // class DropTarget
