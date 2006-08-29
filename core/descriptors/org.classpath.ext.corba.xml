@@ -13,6 +13,7 @@
   <runtime>
     <library name="jnode-core.jar">
       <export name="javax.rmi.*"/>
+      <export name="javax.rmi.ssl.*"/>
       <export name="javax.rmi.CORBA.*"/>
       
       <export name="org.omg.CORBA.*"/>
