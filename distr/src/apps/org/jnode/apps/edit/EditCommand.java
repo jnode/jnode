@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.apps.edit;
 
 import org.jnode.shell.help.FileArgument;
@@ -35,22 +35,18 @@ public class EditCommand {
     static final FileArgument ARG_EDIT = new FileArgument("file", "the file to edit");
     public static Help.Info HELP_INFO = new Help.Info(
             "edit", "edit a file",
-            new Parameter[] { new Parameter(ARG_EDIT, Parameter.OPTIONAL)}
+            new Parameter[]{new Parameter(ARG_EDIT, Parameter.OPTIONAL)}
     );
 
     public static void main(String[] args) throws Exception {
         final ParsedArguments cmdLine = HELP_INFO.parse(args);
         final File file = ARG_EDIT.getFile(cmdLine);
-        if(file == null)
+        if (file == null)
             Editor.editFile(null);
-        else if (file.exists()) {
-            if (file.isDirectory()) {
-                System.err.println(file + " is a directory");
-            } else {
-                Editor.editFile(file);
-            }
+        else if (file.isDirectory()) {
+            System.err.println(file + " is a directory");
         } else {
-            System.err.println("File does not exist: " + file);
+            Editor.editFile(file);
         }
     }
 }
