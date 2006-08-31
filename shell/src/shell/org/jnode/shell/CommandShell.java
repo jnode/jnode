@@ -49,6 +49,8 @@ import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.CompletionException;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.HelpException;
+import org.jnode.shell.help.Parameter;
+import org.jnode.shell.help.FileArgument;
 import org.jnode.vm.VmSystem;
 
 /**
@@ -516,6 +518,12 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 
     // Command line completion
 
+    private final Help.Info defaultParameter = new Help.Info("file",
+            "default parameter for command line completion",
+		new Parameter[]{
+			new Parameter(new FileArgument("file", "a file", Argument.MULTI), Parameter.OPTIONAL)
+		}
+	);
     private final Argument defaultArg = new AliasArgument("command",
             "the command to be called");
 
@@ -539,8 +547,17 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
                     try {
                         // get command's help info
                         CommandInfo cmdClass = getCommandClass(cmd);
-                        Help.Info info = Help.getInfo(cmdClass
-                                .getCommandClass());
+
+                        Help.Info info = defaultParameter;
+                        try {
+                            info = Help.getInfo(cmdClass
+                                    .getCommandClass());
+                        }catch (HelpException ex) {
+                            /*ex.printStackTrace();
+                            throw new CompletionException("Command class not found");*/
+
+                            //assuming default completion which is multiple files
+                        }
 
                         // perform completion
                         result = cmd + " " + info.complete(cl); // prepend
@@ -550,9 +567,6 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
                         // space
                         // again
                     } catch (ClassNotFoundException ex) {
-                        throw new CompletionException("Command class not found");
-                    } catch (HelpException ex) {
-                        ex.printStackTrace();
                         throw new CompletionException("Command class not found");
                     }
             }
