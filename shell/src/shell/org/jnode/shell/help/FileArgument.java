@@ -52,6 +52,18 @@ public class FileArgument extends Argument {
         return new File(value);
     }
 
+    public File[] getFiles(ParsedArguments args) {
+        String[] values = getValues(args);
+
+        if (values == null) return new File[0];
+
+        File[] files = new File[values.length];
+        for(int i = 0; i < values.length; i ++)
+            files[i] = new File(values[i]);
+
+        return files;
+    }
+
     public InputStream getInputStream(ParsedArguments args)
             throws FileNotFoundException {
         String value = getValue(args);
