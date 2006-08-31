@@ -40,6 +40,9 @@ import java.awt.image.PixelGrabber;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
+import java.awt.image.IndexColorModel;
+import java.awt.image.DirectColorModel;
+import java.awt.image.ComponentColorModel;
 import java.awt.image.renderable.RenderableImage;
 
 import org.apache.log4j.Logger;
@@ -345,24 +348,26 @@ public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
 	private Raster getCompatibleRaster(Image image) throws InterruptedException {
 		final ColorModel dstModel = surface.getColorModel();
 		if (image instanceof BufferedImage) {
-			// We have a direct raster
-			final Raster raster = ((BufferedImage) image).getRaster();
+            final BufferedImage b_image = (BufferedImage) image;
+            // We have a direct raster
+			final Raster raster = b_image.getRaster();
 			if (dstModel.isCompatibleRaster(raster)) {
 				// Raster is compatible, return without changes
 				return raster;
 			} else {
 				// Convert it into a compatible raster
-				return createCompatibleRaster(raster);
+				return createCompatibleRaster(raster, b_image.getColorModel());
 			}
 		} else if (image instanceof RenderedImage) {
-				// We have a direct raster
-				final Raster raster = ((RenderedImage) image).getData();
+            final RenderedImage r_image = (RenderedImage) image;
+            // We have a direct raster
+            final Raster raster = r_image.getData();
 				if (dstModel.isCompatibleRaster(raster)) {
 					// Raster is compatible, return without changes
 					return raster;
 				} else {
 					// Convert it into a compatible raster
-					return createCompatibleRaster(raster);
+					return createCompatibleRaster(raster, r_image.getColorModel());
 				}
 		} else {
 			// Convert it to a raster
@@ -394,22 +399,41 @@ public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
 	 * @param raster
 	 * @return the new raster
 	 */
-	private Raster createCompatibleRaster(Raster raster) {
+	private Raster createCompatibleRaster(Raster raster, ColorModel model) {
 
-        //todo fix gif images (index color model?), optimize
+        //todo optimize
         final ColorModel dst_model = surface.getColorModel();
         final int[] samples = new int[4];
         final int w = raster.getWidth();
         final int h = raster.getHeight();
         final WritableRaster dst_raster = dst_model.createCompatibleWritableRaster(w, h);
-        for (int y = 0; y < h; y++) {
-            for (int x = 0; x < w; x++) {
-                raster.getPixel(x, y, samples);
-                dst_raster.setPixel(x, y, samples);
+
+        if(dst_model instanceof DirectColorModel)
+            if(model instanceof ComponentColorModel){
+                for (int y = 0; y < h; y++)
+                    for (int x = 0; x < w; x++)
+                        dst_raster.setPixel(x, y, raster.getPixel(x, y, samples));
+            } else if(model instanceof IndexColorModel){
+                final IndexColorModel icm = (IndexColorModel) model;
+                for (int y = 0; y < h; y++)
+                    for (int x = 0; x < w; x++){
+                        int sample = raster.getSample(x, y, 0);
+                        samples[0] = icm.getRed(sample);
+                        samples[1] = icm.getGreen(sample);
+                        samples[2] = icm.getBlue(sample);
+                        samples[3] = icm.getAlpha(sample);
+                        dst_raster.setPixel(x, y, samples);
+                    }
+            } else {
+                log.error("Unimplemented raster conversion");
+                return raster;
             }
+        else {
+            log.error("Unimplemented raster conversion");
+            return raster;
         }
 
-		return dst_raster;
+        return dst_raster;
 	}
 
     /**
