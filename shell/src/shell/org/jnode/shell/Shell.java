@@ -38,7 +38,7 @@ public interface Shell {
 	 */
 	public CommandHistory getCommandHistory();
 
-        /**
+    /**
 	 * Prints a list of choices for command line completion.
 	 */
 	public void list(String[] items);
