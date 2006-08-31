@@ -47,6 +47,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 import org.apache.log4j.Logger;
+import gnu.java.security.action.GetPropertyAction;
 
 /**
  * @author Levente S\u00e1ntha
@@ -59,7 +60,7 @@ public class Editor extends JFrame {
     private File file;
     private TitledBorder border;
 
-    public Editor(File file) {
+    public Editor(final File file) {
         super("JNote - JNode Text Editor");
         this.file = file;
         setBackground(Color.black);
@@ -75,9 +76,17 @@ public class Editor extends JFrame {
         sp.setViewportBorder(border);
         sp.setForeground(Color.cyan);
         panel.add(sp, BorderLayout.CENTER);
+        directory = (String) AccessController.doPrivileged(new GetPropertyAction("user.dir"));
         if (file != null) {
-            directory = file.getParent();
-            readFile(file);
+            Boolean exists = (Boolean) AccessController.doPrivileged(new PrivilegedAction(){
+                public Object run() {
+                    return file.exists();
+                }
+            });
+
+            if(exists)
+                readFile(file);
+
             updateTitle(file.getName());
             textArea.requestFocus();
         }
