@@ -1,5 +1,5 @@
 /* ClasspathToolkit.java -- Abstract superclass for Classpath toolkits.
-   Copyright (C) 2003, 2004, 2005  Free Software Foundation, Inc.
+   Copyright (C) 2003, 2004, 2005, 2006  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -52,6 +52,7 @@ import java.awt.FontMetrics;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.font.FontRenderContext;
 import java.awt.image.ColorModel;
@@ -188,6 +189,9 @@ public abstract class ClasspathToolkit
    */
   public abstract Font createFont(int format, InputStream stream);
 
+  /**
+   * Creates a RobotPeer on a given GraphicsDevice.
+   */
   public abstract RobotPeer createRobot (GraphicsDevice screen)
     throws AWTException;
 
@@ -201,8 +205,24 @@ public abstract class ClasspathToolkit
 
   /** 
    * Used to register ImageIO SPIs provided by the toolkit.
+   *
+   * Our default implementation does nothing.
    */
   public void registerImageIOSpis(IIORegistry reg)
   {
   }
+
+   /**
+    * Returns the number of mouse buttons.
+    * (used by java.awt.MouseInfo).
+    *
+    * This dummy implementation returns -1 (no mouse).
+    * toolkit implementors should overload this method if possible.
+    * @since 1.5
+    */
+   public int getMouseNumberOfButtons() 
+   {
+     return -1;
+   }
 }
+
