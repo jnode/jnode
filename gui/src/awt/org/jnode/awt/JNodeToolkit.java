@@ -43,7 +43,6 @@ import java.awt.Image;
 import java.awt.PrintJob;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
-import java.awt.font.FontRenderContext;
 import java.awt.im.InputMethodHighlight;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
@@ -60,7 +59,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.text.AttributedString;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -877,6 +875,11 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
             }
         }
 	}
+
+    public int getMouseNumberOfButtons() {
+        //todo implement it
+        return super.getMouseNumberOfButtons();
+    }
 
     /**
      * A helper class to return to clients in cases where a BufferedImage is
