@@ -38,7 +38,25 @@ exception statement from your version. */
 
 package java.lang.reflect;
 
+/**
+ * Represents an entity that declares one or more type parameters.
+ * This includes classes and methods (including constructors).
+ *
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+ * @since 1.5
+ */
 public interface GenericDeclaration
 {
+  /**
+   * Returns a <code>TypeVariable</code> object for each type variable
+   * declared by this entity, in order of declaration.  An empty array
+   * is returned if no type variables are declared.
+   * 
+   * @return an array of <code>TypeVariable</code> objects.
+   * @throws GenericSignatureFormatError if the signature format within the
+   *         class file does not conform to that specified in the 3rd edition
+   *         of the Java Virtual Machine Specification.
+   */
   TypeVariable<?>[] getTypeParameters();
 }

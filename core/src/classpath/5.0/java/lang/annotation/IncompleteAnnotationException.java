@@ -38,10 +38,26 @@ exception statement from your version. */
 package java.lang.annotation;
 
 /**
+ * Thrown when accessing an element within an annotation which
+ * was added since compilation or serialization took place, and
+ * does not have a default value.  
+ * 
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @since 1.5
  */
 public class IncompleteAnnotationException extends RuntimeException
 {
+
+  /**
+   * Constructs a new <code>IncompleteAnnotationException</code>
+   * which indicates that the element, <code>name</code>, was missing
+   * from the annotation, <code>type</code> at compile time and does
+   * not have a default value.
+   *
+   * @param type the type of annotation from which an element is missing.
+   * @param name the name of the missing element.
+   */
   public IncompleteAnnotationException(Class<? extends Annotation> type,
 				       String name)
   {
@@ -49,17 +65,43 @@ public class IncompleteAnnotationException extends RuntimeException
     this.elementName = name;
   }
 
+  /**
+   * Returns the class representing the type of annotation
+   * from which an element was missing.
+   *
+   * @return the type of annotation.
+   */
   public Class<? extends Annotation> annotationType()
   {
     return annotationType;
   }
 
+  /**
+   * Returns the name of the missing annotation element.
+   *
+   * @return the element name.
+   */
   public String elementName()
   {
     return elementName;
   }
 
   // Names are chosen from serialization spec.
+
+  /**
+   * The class representing the type of annotation from
+   * which an element was found to be missing.
+   *
+   * @serial the type of the annotation from which an
+   *         element was missing.
+   */
   private Class<? extends Annotation> annotationType;
+
+  /**
+   * The name of the missing element.
+   *
+   * @serial the name of the missing element. 
+   */
   private String elementName;
+
 }

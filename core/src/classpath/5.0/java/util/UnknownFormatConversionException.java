@@ -38,20 +38,47 @@ exception statement from your version. */
 
 package java.util;
 
-/** @since 1.5 */
-public class UnknownFormatConversionException extends IllegalFormatException
+/** 
+ * Thrown when a {@link Formatter} is supplied with an
+ * unknown conversion.
+ *
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+ * @since 1.5 
+ */
+public class UnknownFormatConversionException 
+  extends IllegalFormatException
 {
   private static final long serialVersionUID = 19060418L;
 
+  /**
+   * The unknown conversion.
+   *
+   * @serial the unknown conversion.
+   */
   // Note: name fixed by serialization.
   private String s;
 
+  /**
+   * Constructs a new <code>UnknownFormatConversionException</code>
+   * for the specified conversion string.
+   *
+   * @param s the conversion string.
+   * @throws NullPointerException if the conversion string is null.
+   */
   public UnknownFormatConversionException(String s)
   {
-    super("unknown format conversion: " + s);
+    super("Unknown format conversion: " + s);
+    if (s == null)
+      throw new NullPointerException("The conversion string is null.");
     this.s = s;
   }
 
+  /**
+   * Returns the conversion string.
+   *
+   * @return the conversion string.
+   */
   public String getConversion()
   {
     return s;

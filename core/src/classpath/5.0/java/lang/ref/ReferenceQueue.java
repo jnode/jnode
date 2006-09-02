@@ -60,7 +60,7 @@ public class ReferenceQueue<T>
    * itself (not to null, since <code>nextOnQueue</code> is used to 
    * determine if a reference is enqueued).
    */
-  private Reference first;
+  private Reference<? extends T> first;
 
   /**
    * Creates a new empty reference queue.

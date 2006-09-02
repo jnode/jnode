@@ -38,20 +38,45 @@ exception statement from your version. */
 
 package java.util;
 
-/** @since 1.5 */
-public class IllegalFormatWidthException extends IllegalFormatException
+/** 
+ * Thrown when the specified width for a {@link Formatter}
+ * argument is illegal.  This may be because the number is
+ * a negative number (other than -1) or for some other reason.
+ *
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+ * @since 1.5 
+ */
+public class IllegalFormatWidthException 
+  extends IllegalFormatException
 {
   private static final long serialVersionUID = 16660902L;
 
+  /**
+   * The illegal width value.
+   *
+   * @serial the illegal width.
+   */
   // Note: name fixed by serialization.
   private int w;
 
+  /**
+   * Constructs a new <code>IllegalFormatWidthException</code>
+   * with the specified width, <code>w</code>.
+   *
+   * @param w the illegal width.
+   */
   public IllegalFormatWidthException(int w)
   {
-    super();
+    super("The width, " + w + ", is illegal.");
     this.w = w;
   }
 
+  /**
+   * Returns the illegal width.
+   *
+   * @return the illegal width.
+   */
   public int getWidth()
   {
     return w;

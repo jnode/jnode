@@ -38,20 +38,46 @@ exception statement from your version. */
 
 package java.util;
 
-/** @since 1.5 */
-public class IllegalFormatPrecisionException extends IllegalFormatException
+/** 
+ * Thrown when the specified precision for a {@link Formatter}
+ * argument is illegal.  This may be because the number is
+ * a negative number (other than -1), the argument does not
+ * accept a precision or for some other reason.
+ *
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+ * @since 1.5 
+ */
+public class IllegalFormatPrecisionException 
+  extends IllegalFormatException
 {
   private static final long serialVersionUID = 18711008L;
 
+  /**
+   * The illegal precision value.
+   *
+   * @serial the illegal precision.
+   */
   // Note: name fixed by serialization.
   private int p;
 
+  /**
+   * Constructs a new <code>IllegalFormatPrecisionException</code>
+   * for the precision, <code>p</code>.
+   *
+   * @param p the illegal precision.
+   */
   public IllegalFormatPrecisionException(int p)
   {
-    super();
+    super("The precision, " + p + ", is illegal.");
     this.p = p;
   }
 
+  /**
+   * Returns the illegal precision.
+   *
+   * @return the illegal precision.
+   */
   public int getPrecision()
   {
     return p;
