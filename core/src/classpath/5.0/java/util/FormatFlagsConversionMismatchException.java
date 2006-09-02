@@ -38,29 +38,72 @@ exception statement from your version. */
 
 package java.util;
 
-/** @since 1.5 */
+/** 
+ * Thrown when the flags supplied to the {@link Formatter#format()}
+ * method of a {@link Formatter} contains a flag that does not match
+ * the conversion character specified for it.
+ *
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+ * @since 1.5 
+ */
 public class FormatFlagsConversionMismatchException
   extends IllegalFormatException
 {
   private static final long serialVersionUID = 19120414L;
 
+  /**
+   * The mismatching flag.
+   *
+   * @serial the mismatching flag.
+   */
   // Note: name fixed by serialization.
   private String f;
+
+  /**
+   * The conversion character which doesn't match the
+   * appropriate flag.
+   *
+   * @serial the conversion character which doesn't match its flag.
+   */
   // Note: name fixed by serialization.
   private char c;
 
+  /**
+   * Constructs a new <code>FormatFlagsConversionMismatchException</code>
+   * which specifies that the flag, <code>f</code>, does
+   * not match its appropriate conversion character, <code>c</code>.
+   *
+   * @param f the mismatching flag.
+   * @param c the conversion character which doesn't match its flag.
+   * @throws NullPointerException if <code>f</code> is null.
+   */
   public FormatFlagsConversionMismatchException(String f, char c)
   {
-    super("invalid flag " + f + " for conversion " + c);
+    super("Invalid flag " + f + " for conversion " + c);
+    if (f == null)
+      throw new
+	NullPointerException("Null flag value passed to constructor.");
     this.f = f;
     this.c = c;
   }
 
+  /**
+   * Returns the conversion character which doesn't
+   * match the flag.
+   *
+   * @return the conversion character.
+   */
   public char getConversion()
   {
     return c;
   }
 
+  /**
+   * Returns the mismatching flag.
+   *
+   * @return the mismatching flag.
+   */
   public String getFlags()
   {
     return f;

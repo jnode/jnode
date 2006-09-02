@@ -38,19 +38,82 @@ exception statement from your version. */
 
 package java.util;
 
-/** @since 1.5 */
+/** 
+ * This class contains a set of flags used
+ * by the {@link Formattable#formatTo()} method.
+ * They are used to modify the output of the
+ * {@link Formattable}.  The interpretation and
+ * validation of the flags is left to the
+ * particular {@link Formattable}.
+ *
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+ * @since 1.5 
+ */
 public class FormattableFlags
 {
+
+  /**
+   * Requires the output to be left-justified.  Any spaces
+   * required to meet the specified width will be added to
+   * the right of the output.  The default output is
+   * right-justified, where spaces are added to the left.
+   * The output is as for the format specifier
+   * '-' ('\u002d').
+   */
   public static final int LEFT_JUSTIFY = 1;
+
+  /**
+   * Requires the output to be in uppercase.  The output
+   * should be the same as the result from calling
+   * {@link String#toUpperCase(java.util.Locale)} with
+   * the formatting locale. The output is as for the
+   * format specifier '^' ('\u005e').
+   */
   public static final int UPPERCASE = 2;
+
+  /**
+   * Requires the use of an alternate form, as specified
+   * in the documentation of {@link Formattable}.
+   * The output is as for the format specifier
+   * '#' ('\u0023').
+   */
   public static final int ALTERNATE = 4;
 
   // Used internally by Formatter.
   // Changes here must be reflected in the FLAGS string there.
+
+  /**
+   * Requires the output to always include a '+' sign.
+   * The output is as for the format specifier '+'.
+   */
   static final int PLUS = 8;
+
+  /**
+   * Requires the output to include a leading space on
+   * positive value.  The output is as for the format
+   * specifier ' '.
+   */
   static final int SPACE = 16;
+
+  /**
+   * Requires the output to be zero-padded.  The output
+   * is as for the format specifier '0'.
+   */
   static final int ZERO = 32;
+
+  /**
+   * Requires the output to include locale-specific
+   * grouping operators.  The output is as for the
+   * format specifier ','.
+   */
   static final int COMMA = 64;
+
+  /**
+   * Requires the output to include negative numbers
+   * enclosed in parentheses.  The output is as for
+   * the format specifier '('.
+   */
   static final int PAREN = 128;
 
   // Not instantiable.

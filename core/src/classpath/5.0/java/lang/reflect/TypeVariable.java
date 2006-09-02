@@ -38,9 +38,59 @@ exception statement from your version. */
 
 package java.lang.reflect;
 
+/**
+ * <p> 
+ * This is a common interface for all type variables provided by
+ * the Java language.  Instances are created the first time a type
+ * variable is needed by one of the reflective methods declared in
+ * this package.
+ * </p>
+ * <p> 
+ * Creating a type variable requires resolving the appropriate type.
+ * This may involve resolving other classes as a side effect (e.g.
+ * if the type is nested inside other classes).  Creation should not
+ * involve resolving the bounds.  Repeated creation has no effect; an
+ * equivalent instance is returned.  Caching is not required, but all
+ * instances must be <code>equal()</code> to each other.
+ * </p>
+ *
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+ * @since 1.5
+ */ 
 public interface TypeVariable<T extends GenericDeclaration> extends Type
 {
+
+  /**
+   * Returns an array of <code>Type</code> objects which represent the upper
+   * bounds of this type variable.  There is always a default bound of
+   * <code>Object</code>.  Any <code>ParameterizedType</code>s will be
+   * created as necessary, and other types resolved.
+   *
+   * @return an array of <code>Type</code> objects representing the upper
+   *         bounds.
+   * @throws TypeNotPresentException if any of the bounds refer to a
+   *         non-existant type.
+   * @throws MalformedParameterizedTypeException if the creation of a
+   *         <code>ParameterizedType</code> fails.
+   */
   Type[] getBounds();
+
+
+  /**
+   * Returns a representation of the declaration used to declare this
+   * type variable.
+   *
+   * @return the <code>GenericDeclaration</code> object for this type
+   *         variable.
+   */
   T getGenericDeclaration();
+
+  /**
+   * Returns the name of the type variable, as written in the source
+   * code.
+   *
+   * @return the name of the type variable.
+   */
   String getName();
 }

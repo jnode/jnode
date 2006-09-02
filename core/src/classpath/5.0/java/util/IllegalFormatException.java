@@ -38,15 +38,36 @@ exception statement from your version. */
 
 package java.util;
 
-/** @since 1.5 */
-public class IllegalFormatException extends IllegalArgumentException
+/** 
+ * A general exception thrown when a format string is supplied
+ * to a {@link Formatter} that contains either invalid syntax
+ * or a mismatch between the format specification and the
+ * supplied arguments.  This class is never instantiated;
+ * instead one of its subclasses is used to throw a more
+ * specific exception.
+ *
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+ * @since 1.5 
+ */
+public class IllegalFormatException 
+  extends IllegalArgumentException
 {
   private static final long serialVersionUID = 18830826L;
 
+  /**
+   * Constructs a new <code>IllegalFormatException</code>.
+   */
   IllegalFormatException()
   {
   }
 
+  /**
+   * Constructs a new <code>IllegalFormatException</code>
+   * with the specified message.
+   *
+   * @param msg the error message for this exception.
+   */
   IllegalFormatException(String msg)
   {
     super(msg);

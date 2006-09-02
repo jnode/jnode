@@ -38,9 +38,55 @@ exception statement from your version. */
 
 package java.util;
 
-/** @since 1.5 */
+/** 
+ * <p>
+ * The <code>Formattable</code> interface is used to provide customised
+ * formatting to arbitrary objects via the {@link Formatter}.  The
+ * {@link #formatTo} method is called for <code>Formattable</code>
+ * objects used with the 's' conversion operator, allowing the object
+ * to provide its own formatting of its internal data.
+ * </p>
+ * <p>
+ * Thread safety is left up to the implementing class.  Thus,
+ * {@link Formattable} objects are not guaranteed to be thread-safe,
+ * and users should make their own provisions for multiple thread access.
+ * </p>
+ *
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+ * @since 1.5 
+ */
 public interface Formattable
 {
+
+  /**
+   * Formats the object using the supplied formatter to the specification
+   * provided by the given flags, width and precision.
+   *
+   * @param formatter the formatter to use for formatting the object.
+   *                  The formatter gives access to the output stream
+   *                  and locale via {@link Formatter#out()} and
+   *                  {@link Formatter#locale()} respectively.
+   * @param flags a bit mask constructed from the flags in the
+   *              {@link FormattableFlags} class.  When no flags
+   *              are set, the implementing class should use its
+   *              defaults.
+   * @param width the minimum number of characters to include.
+   *              A value of -1 indicates no minimum.  The remaining
+   *              space is padded with ' ' either on the left
+   *              (the default) or right (if left justification is
+   *              specified by the flags).
+   * @param precision the maximum number of characters to include.
+   *              A value of -1 indicates no maximum.  This value
+   *              is applied prior to the minimum (the width).  Thus,
+   *              a value may meet the minimum width initially, but
+   *              not when the width value is applied, due to
+   *              characters being removed by the precision value.
+   * @throws IllegalFormatException if there is a problem with
+   *                                the syntax of the format
+   *                                specification or a mismatch
+   *                                between it and the arguments.
+   */
   public void formatTo(Formatter formatter, int flags, int width,
 		       int precision);
 }

@@ -38,20 +38,47 @@ exception statement from your version. */
 
 package java.util;
 
-/** @since 1.5 */
-public class IllegalFormatFlagsException extends IllegalFormatException
+/** 
+ * Thrown when the flags supplied to the {@link Formatter#format()}
+ * method of a {@link Formatter} form an illegal combination.
+ *
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+ * @since 1.5 
+ */
+public class IllegalFormatFlagsException 
+  extends IllegalFormatException
 {
   private static final long serialVersionUID = 790824L;
 
+  /**
+   * The set of flags which forms an illegal combination.
+   *
+   * @serial the illegal set of flags.
+   */
   // Note: name fixed by serialization.
   private String flags;
 
+  /**
+   * Constructs a new <code>IllegalFormatFlagsException</code>
+   * for the specified flags.
+   *
+   * @param flags the illegal set of flags.
+   * @throws NullPointerException if <code>flags</code> is null.
+   */
   public IllegalFormatFlagsException(String flags)
   {
-    super();
+    super("An illegal set of flags, " + flags + ", was supplied.");
+    if (flags == null)
+      throw new NullPointerException("The supplied flags are null.");
     this.flags = flags;
   }
 
+  /**
+   * Returns the illegal flags.
+   *
+   * @return the illegal flags.
+   */
   public String getFlags()
   {
     return flags;

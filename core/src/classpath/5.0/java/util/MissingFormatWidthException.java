@@ -38,19 +38,49 @@ exception statement from your version. */
 
 package java.util;
 
-/** @since 1.5 */
-public class MissingFormatWidthException extends IllegalFormatException
+/** 
+ * Thrown when the a format specification for a {@link Formatter}
+ * does not include a width for a value where one is required.
+ *
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+ * @since 1.5 
+ */
+public class MissingFormatWidthException 
+  extends IllegalFormatException
 {
   private static final long serialVersionUID = 15560123L;
 
+  /**
+   * The format specification which contains the
+   * unmatched argument.
+   *
+   * @serial the format specification.
+   */
   // Note: name fixed by serialization.
   private String s;
 
+  /**
+   * Constructs a new <code>MissingFormatWidthException</code>
+   * for a format specification, <code>s</code>, which excludes
+   * a required width argument.
+   *
+   * @param s the format specification.
+   * @throws NullPointerException if <code>s</code> is null.
+   */
   public MissingFormatWidthException(String s)
   {
+    super("The specification, " + s + ", misses a required width.");
+    if (s == null)
+      throw new NullPointerException("The specification is null.");
     this.s = s;
   }
 
+  /**
+   * Returns the format specification.
+   *
+   * @return the format specification.
+   */
   public String getFormatSpecifier()
   {
     return s;

@@ -38,19 +38,49 @@ exception statement from your version. */
 
 package java.util;
 
-/** @since 1.5 */
-public class UnknownFormatFlagsException extends IllegalFormatException
+/** 
+ * Thrown when a {@link Formatter} is supplied with an
+ * unknown flag.
+ *
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+ * @since 1.5 
+ */
+public class UnknownFormatFlagsException 
+  extends IllegalFormatException
 {
   private static final long serialVersionUID = 19370506L;
 
+  /**
+   * The set of flags containing the unknown flag.
+   *
+   * @serial the unknown conversion.
+   */
   // Note: name fixed by serialization.
   private String flags;
 
+  /**
+   * Constructs a new <code>UnknownFormatFlagsException</code>
+   * which specifies that the supplied set of flags contains a
+   * unknown.
+   *
+   * @param flags the flags containing a unknown.
+   * @throws NullPointerException if <code>flags</code> is null.
+   */
   public UnknownFormatFlagsException(String s)
   {
+    super("Unknown flag passed in " + s);
+    if (s == null)
+      throw new
+	NullPointerException("Null flags value passed to constructor.");
     this.flags = s;
   }
 
+  /**
+   * Returns the flags which contain a unknown.
+   *
+   * @return the flags.
+   */
   public String getFlags()
   {
     return flags;

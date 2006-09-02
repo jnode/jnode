@@ -91,7 +91,7 @@ public abstract class Reference<T>
    * (not to null, that value is used to mark a not enqueued
    * reference).  
    */
-  Reference<T> nextOnQueue;   
+  Reference nextOnQueue;
 
   /**
    * This lock should be taken by the garbage collector, before
@@ -104,7 +104,7 @@ public abstract class Reference<T>
    * Creates a new reference that is not registered to any queue.
    * Since it is package private, it is not possible to overload this
    * class in a different package.  
-   * @param referent the object we refer to.
+   * @param ref the object we refer to.
    */
   Reference(T ref)
   {
@@ -115,7 +115,7 @@ public abstract class Reference<T>
    * Creates a reference that is registered to a queue.  Since this is
    * package private, it is not possible to overload this class in a
    * different package.  
-   * @param referent the object we refer to.
+   * @param ref the object we refer to.
    * @param q the reference queue to register on.
    * @exception NullPointerException if q is null.
    */
