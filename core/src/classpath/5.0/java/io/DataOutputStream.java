@@ -63,6 +63,11 @@ public class DataOutputStream extends FilterOutputStream implements DataOutput
   protected int written;
 
   /**
+   * Utf8 byte buffer, used by writeUTF()
+   */
+  private byte[] buf;
+  
+  /**
    * This method initializes an instance of <code>DataOutputStream</code> to
    * write its data to the specified underlying <code>OutputStream</code>
    *
@@ -373,6 +378,37 @@ public class DataOutputStream extends FilterOutputStream implements DataOutput
   }
 
   /**
+   *  Calculate the length, in bytes, of a <code>String</code> in Utf8 format.
+   *
+   *  @param value The <code>String</code> to measure
+   *  @param start String index at which to begin count
+   *  @param sum Starting Utf8 byte count
+   *
+   *  @throws UTFDataFormatException if result would exceed 65535
+   */
+  private int getUTFlength(String value, int start, int sum)
+    throws IOException
+  {
+    int len = value.length();
+
+    for (int i = start; i < len && sum <= 65535; ++i)
+      {
+	char c = value.charAt(i);
+	if (c >= '\u0001' && c <= '\u007f')
+	  sum += 1;
+	else if (c == '\u0000' || (c >= '\u0080' && c <= '\u07ff'))
+	  sum += 2;
+	else
+	  sum += 3;
+      }
+
+    if (sum > 65535)
+      throw new UTFDataFormatException ();
+
+    return sum;
+  }
+  
+  /**
    * This method writes a Java <code>String</code> to the stream in a modified
    * UTF-8 format.  First, two bytes are written to the stream indicating the
    * number of bytes to follow.  Note that this is the number of bytes in the
@@ -407,28 +443,18 @@ public class DataOutputStream extends FilterOutputStream implements DataOutput
   public final synchronized void writeUTF(String value) throws IOException
   {
     int len = value.length();
-    int sum = 0;
-
-    for (int i = 0; i < len && sum <= 65535; ++i)
-      {
-	char c = value.charAt(i);
-	if (c >= '\u0001' && c <= '\u007f')
-	  sum += 1;
-	else if (c == '\u0000' || (c >= '\u0080' && c <= '\u07ff'))
-	  sum += 2;
-	else
-	  sum += 3;
-      }
-
-    if (sum > 65535)
-      throw new UTFDataFormatException ();
-
+    int i = 0;
     int pos = 0;
-    byte[] buf = new byte[sum];
+    boolean lengthWritten = false;
 
-    for (int i = 0; i < len; ++i)
+    if (buf == null)
+      buf = new byte[512];
+    
+    do
       {
-	char c = value.charAt(i);
+	while (i < len && pos < buf.length - 3)
+	  {
+	    char c = value.charAt(i++);
 	if (c >= '\u0001' && c <= '\u007f')
           buf[pos++] = (byte) c;
 	else if (c == '\u0000' || (c >= '\u0080' && c <= '\u07ff'))
@@ -446,9 +472,18 @@ public class DataOutputStream extends FilterOutputStream implements DataOutput
 	    buf[pos++] = (byte) (0x80 | (0x3f & c));
 	  }
       }
-    
-    writeShort (sum);
-    write(buf, 0, sum);
+	if (! lengthWritten)
+	  {
+	    if (i == len)
+	      writeShort(pos);
+	    else
+	      writeShort(getUTFlength(value, i, pos));
+	    lengthWritten = true;
+	  }
+	write(buf, 0, pos);
+	pos = 0;
+     }
+    while (i < len);
   }
 
 } // class DataOutputStream
