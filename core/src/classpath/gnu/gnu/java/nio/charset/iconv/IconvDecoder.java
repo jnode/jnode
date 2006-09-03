@@ -47,6 +47,7 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 
+//todo jnode - native - remove it
 final class IconvDecoder extends CharsetDecoder
 {
   IconvDecoder(Charset cs, IconvMetaData info)
