@@ -378,7 +378,9 @@ public abstract class Toolkit
 	 */
   protected LightweightPeer createComponent(Component target)
   {
-    return new GLightweightPeer(target);
+    if (lightweightPeer == null)
+      lightweightPeer = new GLightweightPeer();
+    return lightweightPeer;
 	}
 
 	/**
