@@ -162,7 +162,7 @@ public class HashMap<K, V> extends AbstractMap<K, V>
    *
    * @author Eric Blake (ebb9@email.byu.edu)
    */
-  static class HashEntry<K, V> extends AbstractMap.BasicMapEntry<K, V>
+  static class HashEntry<K, V> extends AbstractMap.SimpleEntry<K, V>
   {
     /**
      * The next entry in the linked list. Package visible for use by subclass.
@@ -386,10 +386,10 @@ public class HashMap<K, V> extends AbstractMap<K, V>
     for (Map.Entry<K,V> e : addMap.entrySet())
       {
         // Optimize in case the Entry is one of our own.
-        if (e instanceof AbstractMap.BasicMapEntry)
+        if (e instanceof AbstractMap.SimpleEntry)
           {
-            AbstractMap.BasicMapEntry<? extends K, ? extends V> entry
-	      = (AbstractMap.BasicMapEntry<? extends K, ? extends V>) e;
+            AbstractMap.SimpleEntry<? extends K, ? extends V> entry
+	      = (AbstractMap.SimpleEntry<? extends K, ? extends V>) e;
             put(entry.key, entry.value);
           }
         else
@@ -853,12 +853,9 @@ public class HashMap<K, V> extends AbstractMap<K, V>
     /**
      * Returns true if the Iterator has more elements.
      * @return true if there are more elements
-     * @throws ConcurrentModificationException if the HashMap was modified
      */
     public boolean hasNext()
     {
-      if (knownMod != modCount)
-        throw new ConcurrentModificationException();
       return count > 0;
     }
 

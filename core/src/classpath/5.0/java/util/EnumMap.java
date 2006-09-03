@@ -329,7 +329,7 @@ public class EnumMap<K extends Enum<K>, V>
 		  ;
 		// FIXME: we could just return something that
 		// only knows the index.  That would be cleaner.
-		return new AbstractMap.BasicMapEntry<K, V>(enumClass.getEnumConstants()[index],
+		return new AbstractMap.SimpleEntry<K, V>(enumClass.getEnumConstants()[index],
 							   store[index])
 		{
 		  public V setValue(V newVal)

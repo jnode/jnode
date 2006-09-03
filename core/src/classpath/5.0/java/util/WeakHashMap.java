@@ -243,7 +243,8 @@ public class WeakHashMap<K,V> extends AbstractMap<K,V>
           // This method will get inlined.
           cleanQueue();
           if (knownMod != modCount)
-            throw new ConcurrentModificationException();
+            throw new ConcurrentModificationException(knownMod + " != "
+                                                      + modCount);
         }
 
         /**
@@ -293,12 +294,9 @@ public class WeakHashMap<K,V> extends AbstractMap<K,V>
         /**
          * Checks if there are more entries.
          * @return true, iff there are more elements.
-         * @throws ConcurrentModificationException if the hash map was
-         *         modified.
          */
         public boolean hasNext()
         {
-          checkMod();
           return nextEntry != null;
         }
 
@@ -476,7 +474,7 @@ public class WeakHashMap<K,V> extends AbstractMap<K,V>
         if (o instanceof Map.Entry)
           {
             Map.Entry e = (Map.Entry) o;
-            return key.equals(e.getKey())
+            return WeakHashMap.equals(getKey(), e.getKey())
               && WeakHashMap.equals(value, e.getValue());
           }
         return false;
@@ -484,7 +482,7 @@ public class WeakHashMap<K,V> extends AbstractMap<K,V>
 
       public String toString()
       {
-        return key + "=" + value;
+        return getKey() + "=" + value;
       }
     }
 
@@ -658,7 +656,7 @@ public class WeakHashMap<K,V> extends AbstractMap<K,V>
     while (bucket != null)
       {
         WeakBucket.WeakEntry entry = bucket.getEntry();
-        if (entry != null && key.equals(entry.key))
+        if (entry != null && equals(key, entry.key))
           return entry;
 
         bucket = bucket.next;
@@ -700,21 +698,20 @@ public class WeakHashMap<K,V> extends AbstractMap<K,V>
     // bucket may be enqueued later by the garbage collection, and
     // internalRemove will be called a second time.
     bucket.slot = -1;
-    if (buckets[slot] == bucket)
+
+    WeakBucket prev = null;
+    WeakBucket next = buckets[slot];
+    while (next != bucket)
+      {
+         if (next == null) throw new InternalError("WeakHashMap in incosistent state");
+         prev = next; 
+         next = prev.next;
+      }
+    if (prev == null)
       buckets[slot] = bucket.next;
     else
-      {
-        WeakBucket prev = buckets[slot];
-        /* This may throw a NullPointerException.  It shouldn't but if
-         * a race condition occurred (two threads removing the same
-         * bucket at the same time) it may happen.  <br>
-         * But with race condition many much worse things may happen
-         * anyway.
-         */
-        while (prev.next != bucket)
-          prev = prev.next;
         prev.next = bucket.next;
-      }
+
     size--;
   }
 

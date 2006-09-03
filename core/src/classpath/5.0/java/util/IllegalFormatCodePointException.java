@@ -38,19 +38,46 @@ exception statement from your version. */
 
 package java.util;
 
-/** @since 1.5 */
-public class IllegalFormatCodePointException extends IllegalFormatException
+/** 
+ * Thrown when a {@link Formatter} receives a character with an
+ * invalid Unicode codepoint, as defined by
+ * {@link Character#isValidCodePoint(int)}.
+ *
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+ * @since 1.5 
+ */
+public class IllegalFormatCodePointException 
+  extends IllegalFormatException
 {
   private static final long serialVersionUID = 19080630L;
 
+  /**
+   * The character which is an invalid Unicode code point.
+   *
+   * @serial the invalid character.
+   */
   // Note: name fixed by serialization.
   int c;
 
+  /**
+   * Constructs a new <code>IllegalFormatCodePointException</code>
+   * which specifies that the character, <code>c</code>, passed to
+   * a {@link Formatter} is an invalid Unicode code point.
+   *
+   * @param c the invalid character.
+   */
   public IllegalFormatCodePointException(int c)
   {
+    super("An invalid Unicode code point was supplied.");
     this.c = c;
   }
 
+  /**
+   * Returns the invalid character.
+   *
+   * @return the invalid character.
+   */
   public int getCodePoint()
   {
     return c;

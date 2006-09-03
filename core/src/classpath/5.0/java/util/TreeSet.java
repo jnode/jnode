@@ -147,7 +147,7 @@ public class TreeSet<T> extends AbstractSet<T>
    *        and will initialize itself with all its elements
    * @throws NullPointerException if sortedSet is null
    */
-  public TreeSet(SortedSet<? extends T> sortedSet)
+  public TreeSet(SortedSet<T> sortedSet)
   {
     Iterator<T> itr;
 
@@ -278,7 +278,7 @@ public class TreeSet<T> extends AbstractSet<T>
    * @throws NullPointerException if to is null, but the comparator does not
    *         tolerate null elements
    */
-  public SortedSet headSet(T to)
+  public SortedSet<T> headSet(T to)
   {
     return new TreeSet<T>(map.headMap(to));
   }
