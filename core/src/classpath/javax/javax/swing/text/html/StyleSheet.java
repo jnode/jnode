@@ -45,6 +45,7 @@ import gnu.javax.swing.text.html.css.CSSParserCallback;
 import gnu.javax.swing.text.html.css.FontSize;
 import gnu.javax.swing.text.html.css.FontStyle;
 import gnu.javax.swing.text.html.css.FontWeight;
+import gnu.javax.swing.text.html.css.Length;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -906,10 +907,10 @@ public class StyleSheet extends StyleContext
   public static class BoxPainter extends Object implements Serializable
   {
     
-    /**
-     * Attribute set for painter
-     */
-    AttributeSet as;
+    private float leftInset;
+    private float rightInset;
+    private float topInset;
+    private float bottomInset;
     
     /**
      * Package-private constructor.
@@ -918,8 +919,20 @@ public class StyleSheet extends StyleContext
      */
     BoxPainter(AttributeSet as)
     {
-      this.as = as;
+      Length l = (Length) as.getAttribute(CSS.Attribute.MARGIN_LEFT);
+      if (l != null)
+        leftInset = l.getValue();
+      l = (Length) as.getAttribute(CSS.Attribute.MARGIN_RIGHT);
+      if (l != null)
+        rightInset = l.getValue();
+      l = (Length) as.getAttribute(CSS.Attribute.MARGIN_TOP);
+      if (l != null)
+        topInset = l.getValue();
+      l = (Length) as.getAttribute(CSS.Attribute.MARGIN_BOTTOM);
+      if (l != null)
+        bottomInset = l.getValue();
     }
+    
     
     /**
      * Gets the inset needed on a given side to account for the margin, border
@@ -934,8 +947,25 @@ public class StyleSheet extends StyleContext
      */
     public float getInset(int size, View v)
     {
-      // FIXME: Not implemented.
-      return 0;       
+      float inset;
+      switch (size)
+        {
+        case View.TOP:
+          inset = topInset;
+          break;
+        case View.BOTTOM:
+          inset = bottomInset;
+          break;
+        case View.LEFT:
+          inset = leftInset;
+          break;
+        case View.RIGHT:
+          inset = rightInset;
+          break;
+        default:
+          inset = 0.0F;
+      }
+      return inset;
     }
     
     /**
