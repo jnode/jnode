@@ -38,27 +38,71 @@ exception statement from your version. */
 
 package java.util;
 
-/** @since 1.5 */
-public class IllegalFormatConversionException extends IllegalFormatException
+/** 
+ * Thrown when the type of an argument supplied to the
+ * {@link Formatter#format()} method of a {@link Formatter}
+ * does not match the conversion character specified for it.
+ *
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+ * @since 1.5 
+ */
+public class IllegalFormatConversionException 
+  extends IllegalFormatException
 {
   private static final long serialVersionUID = 17000126L;
 
+  /**
+   * The conversion character which doesn't match
+   * the type of the argument.
+   *
+   * @serial the conversion character.
+   */
   // Note: name fixed by serialization.
   char c;
+
+  /**
+   * The type of the mismatching argument.
+   *
+   * @serial the mismatching argument type.
+   */
   // Note: name fixed by serialization.
   Class<?> arg;
 
+  /**
+   * Constructs a new <code>IllegalFormatConversionException</code>
+   * which specifies that the argument of type <code>arg</code> does
+   * not match the conversion character, <code>c</code>.
+   *
+   * @param c the conversion character.
+   * @param arg the type which doesn't match the conversion character.
+   * @throws NullPointerException if <code>arg</code> is null.
+   */
   public IllegalFormatConversionException(char c, Class<?> arg)
   {
+    super("The type, " + arg + ", is invalid for the conversion character, " +
+	  c + ".");
+    if (arg == null)
+      throw new NullPointerException("The supplied type was null.");
     this.c = c;
     this.arg = arg;
   }
 
+  /**
+   * Returns the conversion character.
+   *
+   * @return the conversion character.
+   */
   public char getConversion()
   {
     return c;
   }
 
+  /**
+   * Returns the type of the mismatched argument.
+   *
+   * @return the type of the mismatched argument.
+   */
   public Class<?> getArgumentClass()
   {
     return arg;

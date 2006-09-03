@@ -47,6 +47,20 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.DocumentType;
+import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Element;
+import org.w3c.dom.bootstrap.DOMImplementationRegistry;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSOutput;
+import org.w3c.dom.ls.LSSerializer;
+
 /**
  * A set of persistent properties, which can be saved or loaded from a stream.
  * A property list may also contain defaults, searched if the main list
@@ -200,12 +214,15 @@ label   = Name:\\u0020</pre>
 
         // The characters up to the next Whitespace, ':', or '='
         // describe the key.  But look for escape sequences.
-        StringBuffer key = new StringBuffer();
+	// Try to short-circuit when there is no escape char.
+	int start = pos;
+	boolean needsEscape = line.indexOf('\\', pos) != -1;
+        StringBuilder key = needsEscape ? new StringBuilder() : null;
         while (pos < line.length()
                && ! Character.isWhitespace(c = line.charAt(pos++))
                && c != '=' && c != ':')
           {
-            if (c == '\\')
+            if (needsEscape && c == '\\')
               {
                 if (pos == line.length())
                   {
@@ -249,11 +266,20 @@ label   = Name:\\u0020</pre>
                       }
                   }
               }
-            else
+            else if (needsEscape)
               key.append(c);
           }
 
         boolean isDelim = (c == ':' || c == '=');
+
+	String keyString;
+	if (needsEscape)
+	  keyString = key.toString();
+	else if (isDelim || Character.isWhitespace(c))
+	  keyString = line.substring(start, pos - 1);
+	else
+	  keyString = line.substring(start, pos);
+
         while (pos < line.length()
                && Character.isWhitespace(c = line.charAt(pos)))
           pos++;
@@ -266,7 +292,15 @@ label   = Name:\\u0020</pre>
               pos++;
           }
 
-        StringBuffer element = new StringBuffer(line.length() - pos);
+	// Short-circuit if no escape chars found.
+	if (!needsEscape)
+	  {
+	    put(keyString, line.substring(pos));
+	    continue;
+	  }
+
+	// Escape char found so iterate through the rest of the line.
+        StringBuilder element = new StringBuilder(line.length() - pos);
         while (pos < line.length())
           {
             c = line.charAt(pos++);
@@ -322,7 +356,7 @@ label   = Name:\\u0020</pre>
             else
               element.append(c);
           }
-        put(key.toString(), element.toString());
+        put(keyString, element.toString());
       }
   }
 
@@ -387,7 +421,7 @@ label   = Name:\\u0020</pre>
     
     Iterator iter = entrySet ().iterator ();
     int i = size ();
-    StringBuffer s = new StringBuffer (); // Reuse the same buffer.
+    StringBuilder s = new StringBuilder (); // Reuse the same buffer.
     while (--i >= 0)
       {
         Map.Entry entry = (Map.Entry) iter.next ();
@@ -530,7 +564,7 @@ label   = Name:\\u0020</pre>
    *        leading spaces must be escaped for the value
    * @see #store(OutputStream, String)
    */
-  private void formatForOutput(String str, StringBuffer buffer, boolean key)
+  private void formatForOutput(String str, StringBuilder buffer, boolean key)
   {
     if (key)
       {
@@ -579,4 +613,190 @@ label   = Name:\\u0020</pre>
           head = key;
       }
   }
+
+  /**
+   * <p>
+   * Encodes the properties as an XML file using the UTF-8 encoding.
+   * The format of the XML file matches the DTD
+   * <a href="http://java.sun.com/dtd/properties.dtd">
+   * http://java.sun.com/dtd/properties.dtd</a>.
+   * </p>
+   * <p>
+   * Invoking this method provides the same behaviour as invoking
+   * <code>storeToXML(os, comment, "UTF-8")</code>.
+   * </p>
+   * 
+   * @param os the stream to output to.
+   * @param comment a comment to include at the top of the XML file, or
+   *                <code>null</code> if one is not required.
+   * @throws IOException if the serialization fails.
+   * @throws NullPointerException if <code>os</code> is null.
+   * @since 1.5
+   */
+  public void storeToXML(OutputStream os, String comment)
+    throws IOException
+  {
+    storeToXML(os, comment, "UTF-8");
+  }
+
+  /**
+   * <p>
+   * Encodes the properties as an XML file using the supplied encoding.
+   * The format of the XML file matches the DTD
+   * <a href="http://java.sun.com/dtd/properties.dtd">
+   * http://java.sun.com/dtd/properties.dtd</a>.
+   * </p>
+   * 
+   * @param os the stream to output to.
+   * @param comment a comment to include at the top of the XML file, or
+   *                <code>null</code> if one is not required.
+   * @param encoding the encoding to use for the XML output.
+   * @throws IOException if the serialization fails.
+   * @throws NullPointerException if <code>os</code> or <code>encoding</code>
+   *                              is null.
+   * @since 1.5
+   */
+  public void storeToXML(OutputStream os, String comment, String encoding)
+    throws IOException
+  {
+    if (os == null)
+      throw new NullPointerException("Null output stream supplied.");
+    if (encoding == null)
+      throw new NullPointerException("Null encoding supplied.");
+    try
+      {
+	DOMImplementationRegistry registry = 
+	  DOMImplementationRegistry.newInstance();
+	DOMImplementation domImpl = registry.getDOMImplementation("LS 3.0");
+	DocumentType doctype =
+	  domImpl.createDocumentType("properties", null,
+				     "http://java.sun.com/dtd/properties.dtd");
+	Document doc = domImpl.createDocument(null, "properties", doctype);
+	Element root = doc.getDocumentElement();
+	if (comment != null)
+	  {
+	    Element commentElement = doc.createElement("comment");
+	    commentElement.appendChild(doc.createTextNode(comment));
+	    root.appendChild(commentElement);
+	  }
+	Iterator iterator = entrySet().iterator();
+	while (iterator.hasNext())
+	  {
+	    Map.Entry entry = (Map.Entry) iterator.next();
+	    Element entryElement = doc.createElement("entry");
+	    entryElement.setAttribute("key", (String) entry.getKey());
+	    entryElement.appendChild(doc.createTextNode((String)
+							entry.getValue()));
+	    root.appendChild(entryElement);
+	  }
+	DOMImplementationLS loadAndSave = (DOMImplementationLS) domImpl;
+	LSSerializer serializer = loadAndSave.createLSSerializer();
+	LSOutput output = loadAndSave.createLSOutput();
+	output.setByteStream(os);
+	output.setEncoding(encoding);
+	serializer.write(doc, output);
+      }
+    catch (ClassNotFoundException e)
+      {
+	throw (IOException) 
+	  new IOException("The XML classes could not be found.").initCause(e);
+      }
+    catch (InstantiationException e)
+      {
+	throw (IOException)
+	  new IOException("The XML classes could not be instantiated.")
+	  .initCause(e);
+      }
+    catch (IllegalAccessException e)
+      {
+	throw (IOException)
+	  new IOException("The XML classes could not be accessed.")
+	  .initCause(e);
+      }
+  }
+
+  /**
+   * <p>
+   * Decodes the contents of the supplied <code>InputStream</code> as
+   * an XML file, which represents a set of properties.  The format of
+   * the XML file must match the DTD
+   * <a href="http://java.sun.com/dtd/properties.dtd">
+   * http://java.sun.com/dtd/properties.dtd</a>.
+   * </p>
+   *
+   * @param in the input stream from which to receive the XML data.
+   * @throws IOException if an I/O error occurs in reading the input data.
+   * @throws InvalidPropertiesFormatException if the input data does not
+   *                                          constitute an XML properties
+   *                                          file.
+   * @throws NullPointerException if <code>in</code> is null.
+   * @since 1.5
+   */
+  public void loadFromXML(InputStream in)
+    throws IOException, InvalidPropertiesFormatException
+  {
+    if (in == null)
+      throw new NullPointerException("Null input stream supplied.");
+    try
+      {
+        XMLInputFactory factory = XMLInputFactory.newInstance();
+        // Don't resolve external entity references
+        factory.setProperty("javax.xml.stream.isSupportingExternalEntities",
+                            Boolean.FALSE);
+        XMLStreamReader reader = factory.createXMLStreamReader(in);
+        String name, key = null;
+        StringBuffer buf = null;
+        while (reader.hasNext())
+          {
+            switch (reader.next())
+              {
+              case XMLStreamConstants.START_ELEMENT:
+                name = reader.getLocalName();
+                if (buf == null && "entry".equals(name))
+                  {
+                    key = reader.getAttributeValue(null, "key");
+                    if (key == null)
+                      {
+                        String msg = "missing 'key' attribute";
+                        throw new InvalidPropertiesFormatException(msg);
+                      }
+                    buf = new StringBuffer();
+                  }
+                else if (!"properties".equals(name) && !"comment".equals(name))
+                  {
+                    String msg = "unexpected element name '" + name + "'";
+                    throw new InvalidPropertiesFormatException(msg);
+                  }
+                break;
+              case XMLStreamConstants.END_ELEMENT:
+                name = reader.getLocalName();
+                if (buf != null && "entry".equals(name))
+                  {
+                    put(key, buf.toString());
+                    buf = null;
+                  }
+                else if (!"properties".equals(name) && !"comment".equals(name))
+                  {
+                    String msg = "unexpected element name '" + name + "'";
+                    throw new InvalidPropertiesFormatException(msg);
+                  }
+                break;
+              case XMLStreamConstants.CHARACTERS:
+              case XMLStreamConstants.SPACE:
+              case XMLStreamConstants.CDATA:
+                if (buf != null)
+                  buf.append(reader.getText());
+                break;
+              }
+          }
+        reader.close();
+      }
+    catch (XMLStreamException e)
+      {
+	throw (InvalidPropertiesFormatException)
+	  new InvalidPropertiesFormatException("Error in parsing XML.").
+	  initCause(e);
+      }
+  }
+
 } // class Properties

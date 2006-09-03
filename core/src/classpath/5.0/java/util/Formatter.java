@@ -54,115 +54,334 @@ import java.text.DecimalFormatSymbols;
 
 import gnu.classpath.SystemProperties;
 
-/** @since 1.5 */
-public class Formatter implements Closeable, Flushable
+/** 
+ * <p>
+ * A Java formatter for <code>printf</code>-style format strings,
+ * as seen in the C programming language.   This differs from the
+ * C interpretation of such strings by performing much stricter
+ * checking of format specifications and their corresponding
+ * arguments.  While unknown conversions will be ignored in C,
+ * and invalid conversions will only produce compiler warnings,
+ * the Java version utilises a full range of run-time exceptions to
+ * handle these cases.  The Java version is also more customisable
+ * by virtue of the provision of the {@link Formattable} interface,
+ * which allows an arbitrary class to be formatted by the formatter.
+ * </p>
+ * <p>
+ * The formatter is accessible by more convienient static methods.
+ * For example, streams now have appropriate format methods
+ * (the equivalent of <code>fprintf</code>) as do <code>String</code>
+ * objects (the equivalent of <code>sprintf</code>).
+ * </p>
+ * <p>
+ * <strong>Note</strong>: the formatter is not thread-safe.  For
+ * multi-threaded access, external synchronization should be provided.
+ * </p>
+ *  
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+ * @since 1.5 
+ */
+public final class Formatter 
+  implements Closeable, Flushable
 {
+
+  /**
+   * The output of the formatter.
+   */
   private Appendable out;
+
+  /**
+   * The locale used by the formatter.
+   */
   private Locale locale;
+
+  /**
+   * Whether or not the formatter is closed.
+   */
   private boolean closed;
+
+  /**
+   * The last I/O exception thrown by the output stream.
+   */
   private IOException ioException;
 
   // Some state used when actually formatting.
+  /**
+   * The format string.
+   */
   private String format;
+
+  /**
+   * The current index into the string.
+   */
   private int index;
+
+  /**
+   * The length of the format string.
+   */
   private int length;
+
+  /**
+   * The formatting locale.
+   */
   private Locale fmtLocale;
 
   // Note that we include '-' twice.  The flags are ordered to
   // correspond to the values in FormattableFlags, and there is no
   // flag (in the sense of this field used when parsing) for
   // UPPERCASE; the second '-' serves as a placeholder.
+  /**
+   * A string used to index into the formattable flags.
+   */
   private static final String FLAGS = "--#+ 0,(";
 
+  /**
+   * The system line separator.
+   */
   private static final String lineSeparator
     = SystemProperties.getProperty("line.separator");
 
+  /**
+   * The type of numeric output format for a {@link BigDecimal}.
+   */
   public enum BigDecimalLayoutForm
   {
     DECIMAL_FLOAT,
     SCIENTIFIC
   }
 
+  /**
+   * Constructs a new <code>Formatter</code> using the default
+   * locale and a {@link StringBuilder} as the output stream.
+   */
   public Formatter()
   {
-    this.out = new StringBuilder();
+    this(null, Locale.getDefault());
   }
 
+  /**
+   * Constructs a new <code>Formatter</code> using the specified
+   * locale and a {@link StringBuilder} as the output stream.
+   * If the locale is <code>null</code>, then no localization
+   * is applied.
+   *
+   * @param loc the locale to use.
+   */
   public Formatter(Locale loc)
   {
-    this.out = new StringBuilder();
-    this.locale = loc;
+    this(null, loc);
   }
 
+  /**
+   * Constructs a new <code>Formatter</code> using the default
+   * locale and the specified output stream.
+   *
+   * @param app the output stream to use.
+   */
   public Formatter(Appendable app)
   {
-    this(app, null);
+    this(app, Locale.getDefault());
   }
 
+  /**
+   * Constructs a new <code>Formatter</code> using the specified
+   * locale and the specified output stream.  If the locale is
+   * <code>null</code>, then no localization is applied.
+   *
+   * @param app the output stream to use.
+   * @param loc the locale to use.
+   */
   public Formatter(Appendable app, Locale loc)
   {
     this.out = app == null ? new StringBuilder() : app;
     this.locale = loc;
   }
 
-  public Formatter(File file) throws FileNotFoundException
+  /**
+   * Constructs a new <code>Formatter</code> using the default
+   * locale and character set, with the specified file as the
+   * output stream.
+   *
+   * @param file the file to use for output.
+   * @throws FileNotFoundException if the file does not exist
+   *                               and can not be created.
+   * @throws SecurityException if a security manager is present
+   *                           and doesn't allow writing to the file.
+   */
+  public Formatter(File file) 
+    throws FileNotFoundException
   {
-    this.out = new OutputStreamWriter(new FileOutputStream(file));
+    this(new OutputStreamWriter(new FileOutputStream(file)));
   }
 
+  /**
+   * Constructs a new <code>Formatter</code> using the default
+   * locale, with the specified file as the output stream
+   * and the supplied character set.
+   *
+   * @param file the file to use for output.
+   * @param charset the character set to use for output.
+   * @throws FileNotFoundException if the file does not exist
+   *                               and can not be created.
+   * @throws SecurityException if a security manager is present
+   *                           and doesn't allow writing to the file.
+   * @throws UnsupportedEncodingException if the supplied character
+   *                                      set is not supported.
+   */
   public Formatter(File file, String charset)
     throws FileNotFoundException, UnsupportedEncodingException
   {
-    this(file, charset, null);
+    this(file, charset, Locale.getDefault());
   }
 
+  /**
+   * Constructs a new <code>Formatter</code> using the specified
+   * file as the output stream with the supplied character set
+   * and locale.  If the locale is <code>null</code>, then no
+   * localization is applied.
+   *
+   * @param file the file to use for output.
+   * @param charset the character set to use for output.
+   * @param loc the locale to use.
+   * @throws FileNotFoundException if the file does not exist
+   *                               and can not be created.
+   * @throws SecurityException if a security manager is present
+   *                           and doesn't allow writing to the file.
+   * @throws UnsupportedEncodingException if the supplied character
+   *                                      set is not supported.
+   */
   public Formatter(File file, String charset, Locale loc)
     throws FileNotFoundException, UnsupportedEncodingException
   {
-    this.out = new OutputStreamWriter(new FileOutputStream(file), charset);
+    this(new OutputStreamWriter(new FileOutputStream(file), charset),
+	 loc);
   }
 
+  /**
+   * Constructs a new <code>Formatter</code> using the default
+   * locale and character set, with the specified output stream.
+   *
+   * @param out the output stream to use.
+   */
   public Formatter(OutputStream out)
   {
-    this.out = new OutputStreamWriter(out);
+    this(new OutputStreamWriter(out));
   }
 
+  /**
+   * Constructs a new <code>Formatter</code> using the default
+   * locale, with the specified file output stream and the
+   * supplied character set.
+   *
+   * @param out the output stream.
+   * @param charset the character set to use for output.
+   * @throws UnsupportedEncodingException if the supplied character
+   *                                      set is not supported.
+   */
   public Formatter(OutputStream out, String charset)
     throws UnsupportedEncodingException
   {
-    this(out, charset, null);
+    this(out, charset, Locale.getDefault());
   }
 
+  /**
+   * Constructs a new <code>Formatter</code> using the specified
+   * output stream with the supplied character set and locale.
+   * If the locale is <code>null</code>, then no localization is
+   * applied.
+   *
+   * @param file the output stream.
+   * @param charset the character set to use for output.
+   * @param loc the locale to use.
+   * @throws UnsupportedEncodingException if the supplied character
+   *                                      set is not supported.
+   */
   public Formatter(OutputStream out, String charset, Locale loc)
     throws UnsupportedEncodingException
   {
-    this.out = new OutputStreamWriter(out, charset);
-    this.locale = loc;
+    this(new OutputStreamWriter(out, charset), loc);
   }
 
+  /**
+   * Constructs a new <code>Formatter</code> using the default
+   * locale with the specified output stream.  The character
+   * set used is that of the output stream.
+   *
+   * @param out the output stream to use.
+   */
   public Formatter(PrintStream out)
   {
-    this.out = out;
+    this((Appendable) out);
   }
 
+  /**
+   * Constructs a new <code>Formatter</code> using the default
+   * locale and character set, with the specified file as the
+   * output stream.
+   *
+   * @param file the file to use for output.
+   * @throws FileNotFoundException if the file does not exist
+   *                               and can not be created.
+   * @throws SecurityException if a security manager is present
+   *                           and doesn't allow writing to the file.
+   */
   public Formatter(String file) throws FileNotFoundException
   {
-    this.out = new OutputStreamWriter(new FileOutputStream(file));
+    this(new OutputStreamWriter(new FileOutputStream(file)));
   }
 
+  /**
+   * Constructs a new <code>Formatter</code> using the default
+   * locale, with the specified file as the output stream
+   * and the supplied character set.
+   *
+   * @param file the file to use for output.
+   * @param charset the character set to use for output.
+   * @throws FileNotFoundException if the file does not exist
+   *                               and can not be created.
+   * @throws SecurityException if a security manager is present
+   *                           and doesn't allow writing to the file.
+   * @throws UnsupportedEncodingException if the supplied character
+   *                                      set is not supported.
+   */
   public Formatter(String file, String charset)
     throws FileNotFoundException, UnsupportedEncodingException
   {
-    this(file, charset, null);
+    this(file, charset, Locale.getDefault());
   }
 
+  /**
+   * Constructs a new <code>Formatter</code> using the specified
+   * file as the output stream with the supplied character set
+   * and locale.  If the locale is <code>null</code>, then no
+   * localization is applied.
+   *
+   * @param file the file to use for output.
+   * @param charset the character set to use for output.
+   * @param loc the locale to use.
+   * @throws FileNotFoundException if the file does not exist
+   *                               and can not be created.
+   * @throws SecurityException if a security manager is present
+   *                           and doesn't allow writing to the file.
+   * @throws UnsupportedEncodingException if the supplied character
+   *                                      set is not supported.
+   */
   public Formatter(String file, String charset, Locale loc)
     throws FileNotFoundException, UnsupportedEncodingException
   {
-    this.out = new OutputStreamWriter(new FileOutputStream(file), charset);
-    this.locale = loc;
+    this(new OutputStreamWriter(new FileOutputStream(file), charset),
+	 loc);
   }
 
+  /**
+   * Closes the formatter, so as to release used resources.
+   * If the underlying output stream supports the {@link Closeable}
+   * interface, then this is also closed.  Attempts to use
+   * a formatter instance, via any method other than
+   * {@link #ioException()}, after closure results in a
+   * {@link FormatterClosedException}.
+   */
   public void close()
   {
     if (closed)
@@ -180,6 +399,13 @@ public class Formatter implements Closeable, Flushable
     closed = true;
   }
 
+  /**
+   * Flushes the formatter, writing any cached data to the output
+   * stream.  If the underlying output stream supports the
+   * {@link Flushable} interface, it is also flushed.
+   *
+   * @throws FormatterClosedException if the formatter is closed.
+   */
   public void flush()
   {
     if (closed)
@@ -198,6 +424,9 @@ public class Formatter implements Closeable, Flushable
 
   /**
    * Return the name corresponding to a flag.
+   *
+   * @param flags the flag to return the name of.
+   * @return the name of the flag.
    */
   private String getName(int flags)
   {
@@ -209,6 +438,10 @@ public class Formatter implements Closeable, Flushable
 
   /**
    * Verify the flags passed to a conversion.
+   *
+   * @param flags the flags to verify.
+   * @param allowed the allowed flags mask.
+   * @param conversion the conversion character.
    */
   private void checkFlags(int flags, int allowed, char conversion)
   {
@@ -219,7 +452,9 @@ public class Formatter implements Closeable, Flushable
   }
 
   /**
-   * Throw an exception is a precision was specified.
+   * Throw an exception if a precision was specified.
+   *
+   * @param precision the precision value (-1 indicates not specified).
    */
   private void noPrecision(int precision)
   {
@@ -229,6 +464,11 @@ public class Formatter implements Closeable, Flushable
 
   /**
    * Apply the numeric localization algorithm to a StringBuilder.
+   *
+   * @param builder the builder to apply to.
+   * @param flags the formatting flags to use.
+   * @param width the width of the numeric value.
+   * @param isNegative true if the value is negative.
    */
   private void applyLocalization(StringBuilder builder, int flags, int width,
 				 boolean isNegative)
@@ -300,6 +540,12 @@ public class Formatter implements Closeable, Flushable
   /**
    * A helper method that handles emitting a String after applying
    * precision, width, justification, and upper case flags.
+   *
+   * @param arg the string to emit.
+   * @param flags the formatting flags to use.
+   * @param width the width to use.
+   * @param precision the precision to use.
+   * @throws IOException if the output stream throws an I/O error.
    */
   private void genericFormat(String arg, int flags, int width, int precision)
     throws IOException
@@ -331,7 +577,16 @@ public class Formatter implements Closeable, Flushable
       }
   }
 
-  /** Emit a boolean.  */
+  /** 
+   * Emit a boolean.  
+   *
+   * @param arg the boolean to emit.
+   * @param flags the formatting flags to use.
+   * @param width the width to use.
+   * @param precision the precision to use.
+   * @param conversion the conversion character.
+   * @throws IOException if the output stream throws an I/O error.
+   */
   private void booleanFormat(Object arg, int flags, int width, int precision,
 			     char conversion)
     throws IOException
@@ -347,7 +602,16 @@ public class Formatter implements Closeable, Flushable
     genericFormat(result, flags, width, precision);
   }
 
-  /** Emit a hash code.  */
+  /** 
+   * Emit a hash code.  
+   *
+   * @param arg the hash code to emit.
+   * @param flags the formatting flags to use.
+   * @param width the width to use.
+   * @param precision the precision to use.
+   * @param conversion the conversion character.
+   * @throws IOException if the output stream throws an I/O error.
+   */
   private void hashCodeFormat(Object arg, int flags, int width, int precision,
 			      char conversion)
     throws IOException
@@ -359,7 +623,16 @@ public class Formatter implements Closeable, Flushable
 		  flags, width, precision);
   }
 
-  /** Emit via a String or Formattable conversion.  */
+  /** 
+   * Emit a String or Formattable conversion.  
+   *
+   * @param arg the String or Formattable to emit.
+   * @param flags the formatting flags to use.
+   * @param width the width to use.
+   * @param precision the precision to use.
+   * @param conversion the conversion character.
+   * @throws IOException if the output stream throws an I/O error.
+   */
   private void stringFormat(Object arg, int flags, int width, int precision,
 			    char conversion)
     throws IOException
@@ -384,7 +657,16 @@ public class Formatter implements Closeable, Flushable
       }
   }
 
-  /** Emit a character value.  */
+  /** 
+   * Emit a character.  
+   *
+   * @param arg the character to emit.
+   * @param flags the formatting flags to use.
+   * @param width the width to use.
+   * @param precision the precision to use.
+   * @param conversion the conversion character.
+   * @throws IOException if the output stream throws an I/O error.
+   */
   private void characterFormat(Object arg, int flags, int width, int precision,
 			       char conversion)
     throws IOException
@@ -413,7 +695,14 @@ public class Formatter implements Closeable, Flushable
     genericFormat(result, flags, width, precision);
   }
 
-  /** Emit a '%'.  */
+  /** 
+   * Emit a '%'.
+   *
+   * @param flags the formatting flags to use.
+   * @param width the width to use.
+   * @param precision the precision to use.
+   * @throws IOException if the output stream throws an I/O error.
+   */
   private void percentFormat(int flags, int width, int precision)
     throws IOException
   {
@@ -422,7 +711,14 @@ public class Formatter implements Closeable, Flushable
     genericFormat("%", flags, width, precision);
   }
 
-  /** Emit a newline.  */
+  /** 
+   * Emit a newline.
+   *
+   * @param flags the formatting flags to use.
+   * @param width the width to use.
+   * @param precision the precision to use.
+   * @throws IOException if the output stream throws an I/O error.
+   */
   private void newLineFormat(int flags, int width, int precision)
     throws IOException
   {
@@ -436,6 +732,14 @@ public class Formatter implements Closeable, Flushable
   /**
    * Helper method to do initial formatting and checking for integral
    * conversions.
+   *
+   * @param arg the formatted argument.
+   * @param flags the formatting flags to use.
+   * @param width the width to use.
+   * @param precision the precision to use.
+   * @param radix the radix of the number.
+   * @param conversion the conversion character.
+   * @return the result.
    */
   private StringBuilder basicIntegralConversion(Object arg, int flags,
 						int width, int precision,
@@ -500,7 +804,17 @@ public class Formatter implements Closeable, Flushable
     return new StringBuilder(result);
   }
 
-  /** Emit a hex or octal value.  */
+  /** 
+   * Emit a hex or octal value.  
+   * 
+   * @param arg the hexadecimal or octal value.
+   * @param flags the formatting flags to use.
+   * @param width the width to use.
+   * @param precision the precision to use.
+   * @param radix the radix of the number.
+   * @param conversion the conversion character.
+   * @throws IOException if the output stream throws an I/O error.
+   */
   private void hexOrOctalConversion(Object arg, int flags, int width,
 				    int precision, int radix,
 				    char conversion)
@@ -572,7 +886,16 @@ public class Formatter implements Closeable, Flushable
     out.append(result);
   }
 
-  /** Emit a decimal value.  */
+  /** 
+   * Emit a decimal value.  
+   * 
+   * @param arg the hexadecimal or octal value.
+   * @param flags the formatting flags to use.
+   * @param width the width to use.
+   * @param precision the precision to use.
+   * @param conversion the conversion character.
+   * @throws IOException if the output stream throws an I/O error.
+   */
   private void decimalConversion(Object arg, int flags, int width,
 				 int precision, char conversion)
     throws IOException
@@ -592,7 +915,14 @@ public class Formatter implements Closeable, Flushable
     genericFormat(builder.toString(), flags, width, precision);
   }
 
-  /** Emit a single date or time conversion to a StringBuilder.  */
+  /** 
+   * Emit a single date or time conversion to a StringBuilder.  
+   *
+   * @param builder the builder to write to.
+   * @param cal the calendar to use in the conversion.
+   * @param conversion the formatting character to specify the type of data.
+   * @param syms the date formatting symbols.
+   */
   private void singleDateTimeConversion(StringBuilder builder, Calendar cal,
 					char conversion,
 					DateFormatSymbols syms)
@@ -776,7 +1106,17 @@ public class Formatter implements Closeable, Flushable
       }
   }
 
-  /** Emit a date or time value.  */
+  /**
+   * Emit a date or time value.
+   *
+   * @param arg the date or time value.
+   * @param flags the formatting flags to use.
+   * @param width the width to use.
+   * @param precision the precision to use.
+   * @param conversion the conversion character.
+   * @param subConversion the sub conversion character.
+   * @throws IOException if the output stream throws an I/O error.
+   */
   private void dateTimeConversion(Object arg, int flags, int width,
 				  int precision, char conversion,
 				  char subConversion)
@@ -823,6 +1163,8 @@ public class Formatter implements Closeable, Flushable
   /**
    * Advance the internal parsing index, and throw an exception
    * on overrun.
+   *
+   * @throws IllegalArgumentException on overrun.
    */
   private void advance()
   {
@@ -837,6 +1179,8 @@ public class Formatter implements Closeable, Flushable
   /**
    * Parse an integer appearing in the format string.  Will return -1
    * if no integer was found.
+   *
+   * @return the parsed integer.
    */
   private int parseInt()
   {
@@ -852,6 +1196,8 @@ public class Formatter implements Closeable, Flushable
    * Parse the argument index.  Returns -1 if there was no index, 0 if
    * we should re-use the previous index, and a positive integer to
    * indicate an absolute index.
+   *
+   * @return the parsed argument index.
    */
   private int parseArgumentIndex()
   {
@@ -881,6 +1227,8 @@ public class Formatter implements Closeable, Flushable
    * Parse a set of flags and return a bit mask of values from
    * FormattableFlags.  Will throw an exception if a flag is
    * duplicated.
+   *
+   * @return the parsed flags.
    */
   private int parseFlags()
   {
@@ -904,6 +1252,8 @@ public class Formatter implements Closeable, Flushable
   /**
    * Parse the width part of a format string.  Returns -1 if no width
    * was specified.
+   *
+   * @return the parsed width.
    */
   private int parseWidth()
   {
@@ -913,6 +1263,8 @@ public class Formatter implements Closeable, Flushable
   /**
    * If the current character is '.', parses the precision part of a
    * format string.  Returns -1 if no precision was specified.
+   *
+   * @return the parsed precision.
    */
   private int parsePrecision()
   {
@@ -926,6 +1278,23 @@ public class Formatter implements Closeable, Flushable
     return precision;
   }
 
+  /**
+   * Outputs a formatted string based on the supplied specification,
+   * <code>fmt</code>, and its arguments using the specified locale.
+   * The locale of the formatter does not change as a result; the
+   * specified locale is just used for this particular formatting
+   * operation.  If the locale is <code>null</code>, then no
+   * localization is applied.
+   *
+   * @param loc the locale to use for this format.
+   * @param fmt the format specification.
+   * @param args the arguments to apply to the specification.
+   * @throws IllegalFormatException if there is a problem with
+   *                                the syntax of the format
+   *                                specification or a mismatch
+   *                                between it and the arguments.
+   * @throws FormatterClosedException if the formatter is closed.
+   */ 
   public Formatter format(Locale loc, String fmt, Object... args)
   {
     if (closed)
@@ -1057,16 +1426,41 @@ public class Formatter implements Closeable, Flushable
     return this;
   }
 
+  /**
+   * Outputs a formatted string based on the supplied specification,
+   * <code>fmt</code>, and its arguments using the formatter's locale.
+   *
+   * @param fmt the format specification.
+   * @param args the arguments to apply to the specification.
+   * @throws IllegalFormatException if there is a problem with
+   *                                the syntax of the format
+   *                                specification or a mismatch
+   *                                between it and the arguments.
+   * @throws FormatterClosedException if the formatter is closed.
+   */
   public Formatter format(String format, Object... args)
   {
     return format(locale, format, args);
   }
 
+  /**
+   * Returns the last I/O exception thrown by the
+   * <code>append()</code> operation of the underlying
+   * output stream.
+   *
+   * @return the last I/O exception.
+   */
   public IOException ioException()
   {
     return ioException;
   }
 
+  /**
+   * Returns the locale used by this formatter.
+   *
+   * @return the formatter's locale.
+   * @throws FormatterClosedException if the formatter is closed.
+   */
   public Locale locale()
   {
     if (closed)
@@ -1074,6 +1468,12 @@ public class Formatter implements Closeable, Flushable
     return locale;
   }
 
+  /**
+   * Returns the output stream used by this formatter.
+   *
+   * @return the formatter's output stream.
+   * @throws FormatterClosedException if the formatter is closed.
+   */
   public Appendable out()
   {
     if (closed)
@@ -1081,6 +1481,15 @@ public class Formatter implements Closeable, Flushable
     return out;
   }
 
+  /**
+   * Returns the result of applying {@link Object#toString()}
+   * to the underlying output stream.  The results returned
+   * depend on the particular {@link Appendable} being used.
+   * For example, a {@link StringBuilder} will return the
+   * formatted output but an I/O stream will not.
+   *
+   * @throws FormatterClosedException if the formatter is closed.
+   */
   public String toString()
   {
     if (closed)

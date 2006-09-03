@@ -162,7 +162,7 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
    *
    * @author Eric Blake (ebb9@email.byu.edu)
    */
-  private static final class Node<K, V> extends AbstractMap.BasicMapEntry<K, V>
+  private static final class Node<K, V> extends AbstractMap.SimpleEntry<K, V>
   {
     // All fields package visible for use by nested classes.
     /** The color of this node. */
@@ -1434,12 +1434,9 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
     /**
      * Returns true if the Iterator has more elements.
      * @return true if there are more elements
-     * @throws ConcurrentModificationException if the TreeMap was modified
      */
     public boolean hasNext()
     {
-      if (knownMod != modCount)
-        throw new ConcurrentModificationException();
       return next != max;
     }
 
