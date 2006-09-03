@@ -9,13 +9,13 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
@@ -67,7 +67,12 @@ public final class Field extends AccessibleObject implements Member, AnnotatedEl
 
 	private final VmField vmField;
 
-	/**
+    private static final int FIELD_MODIFIERS
+    = Modifier.FINAL | Modifier.PRIVATE | Modifier.PROTECTED
+      | Modifier.PUBLIC | Modifier.STATIC | Modifier.TRANSIENT
+      | Modifier.VOLATILE;
+
+    /**
 	 * This class is uninstantiable except natively.
 	 */
 	public Field(VmField vmField) {
@@ -98,15 +103,48 @@ public final class Field extends AccessibleObject implements Member, AnnotatedEl
 	 * to interpret the values. A field can only have a subset of the following
 	 * modifiers: public, private, protected, static, final, transient, and
 	 * volatile.
-	 * 
+	 *
 	 * @return an integer representing the modifiers to this Member
 	 * @see Modifier
 	 */
-	public int getModifiers() {
+	public int getModifiersInternal() {
 		return vmField.getModifiers();
 	}
 
-	/**
+    /**
+     * Gets the modifiers this field uses.  Use the <code>Modifier</code>
+     * class to interpret the values.  A field can only have a subset of the
+     * following modifiers: public, private, protected, static, final,
+     * transient, and volatile.
+     *
+     * @return an integer representing the modifiers to this Member
+     * @see Modifier
+     */
+    public int getModifiers()
+    {
+      return getModifiersInternal() & FIELD_MODIFIERS;
+    }
+
+    /**
+     * Return true if this field is synthetic, false otherwise.
+     * @since 1.5
+     */
+    public boolean isSynthetic()
+    {
+      return (getModifiersInternal() & Modifier.SYNTHETIC) != 0;
+    }
+
+    /**
+     * Return true if this field represents an enum constant,
+     * false otherwise.
+     * @since 1.5
+     */
+    public boolean isEnumConstant()
+    {
+      return (getModifiersInternal() & Modifier.ENUM) != 0;
+    }
+
+    /**
 	 * Gets the type of this field.
 	 * 
 	 * @return the type of this field
@@ -184,21 +222,16 @@ public final class Field extends AccessibleObject implements Member, AnnotatedEl
 	 * declaring class, even if the instance passed in belongs to a subclass
 	 * which declares another field to hide this one.
 	 * 
-	 * @param o
-	 *            the object to get the value of this Field from
+     * @param o the object to get the value of this Field from
 	 * @return the value of the Field
-	 * @throws IllegalAccessException
-	 *             if you could not normally access this field (i.e. it is not
-	 *             public)
-	 * @throws IllegalArgumentException
-	 *             if <code>o</code> is not an instance of the class or
-	 *             interface declaring this field
-	 * @throws NullPointerException
-	 *             if <code>o</code> is null and this field requires an
-	 *             instance
-	 * @throws ExceptionInInitializerError
-	 *             if accessing a static field triggered class initialization,
-	 *             which then failed
+     * @throws IllegalAccessException if you could not normally access this field
+     *         (i.e. it is not public)
+     * @throws IllegalArgumentException if <code>o</code> is not an instance of
+     *         the class or interface declaring this field
+     * @throws NullPointerException if <code>o</code> is null and this field
+     *         requires an instance
+     * @throws ExceptionInInitializerError if accessing a static field triggered
+     *         class initialization, which then failed
 	 * @see #getBoolean(Object)
 	 * @see #getByte(Object)
 	 * @see #getChar(Object)
@@ -239,22 +272,17 @@ public final class Field extends AccessibleObject implements Member, AnnotatedEl
 	 * Get the value of this boolean Field. If the field is static,
 	 * <code>o</code> will be ignored.
 	 * 
-	 * @param o
-	 *            the object to get the value of this Field from
+     * @param o the object to get the value of this Field from
 	 * @return the value of the Field
-	 * @throws IllegalAccessException
-	 *             if you could not normally access this field (i.e. it is not
-	 *             public)
-	 * @throws IllegalArgumentException
-	 *             if this is not a boolean field of <code>o</code>, or if
-	 *             <code>o</code> is not an instance of the declaring class of
-	 *             this field
-	 * @throws NullPointerException
-	 *             if <code>o</code> is null and this field requires an
-	 *             instance
-	 * @throws ExceptionInInitializerError
-	 *             if accessing a static field triggered class initialization,
-	 *             which then failed
+     * @throws IllegalAccessException if you could not normally access this field
+     *         (i.e. it is not public)
+     * @throws IllegalArgumentException if this is not a boolean field of
+     *         <code>o</code>, or if <code>o</code> is not an instance of the
+     *         declaring class of this field
+     * @throws NullPointerException if <code>o</code> is null and this field
+     *         requires an instance
+     * @throws ExceptionInInitializerError if accessing a static field triggered
+     *         class initialization, which then failed
 	 * @see #get(Object)
 	 */
 	public boolean getBoolean(Object o) throws IllegalAccessException {
@@ -262,25 +290,20 @@ public final class Field extends AccessibleObject implements Member, AnnotatedEl
 	}
 
 	/**
-	 * Get the value of this byte Field. If the field is static, <code>o</code>
-	 * will be ignored.
+     * Get the value of this byte Field. If the field is static,
+     * <code>o</code> will be ignored.
 	 * 
-	 * @param o
-	 *            the object to get the value of this Field from
+     * @param o the object to get the value of this Field from
 	 * @return the value of the Field
-	 * @throws IllegalAccessException
-	 *             if you could not normally access this field (i.e. it is not
-	 *             public)
-	 * @throws IllegalArgumentException
-	 *             if this is not a byte field of <code>o</code>, or if
-	 *             <code>o</code> is not an instance of the declaring class of
-	 *             this field
-	 * @throws NullPointerException
-	 *             if <code>o</code> is null and this field requires an
-	 *             instance
-	 * @throws ExceptionInInitializerError
-	 *             if accessing a static field triggered class initialization,
-	 *             which then failed
+     * @throws IllegalAccessException if you could not normally access this field
+     *         (i.e. it is not public)
+     * @throws IllegalArgumentException if this is not a byte field of
+     *         <code>o</code>, or if <code>o</code> is not an instance of the
+     *         declaring class of this field
+     * @throws NullPointerException if <code>o</code> is null and this field
+     *         requires an instance
+     * @throws ExceptionInInitializerError if accessing a static field triggered
+     *         class initialization, which then failed
 	 * @see #get(Object)
 	 */
 	public byte getByte(Object o) throws IllegalAccessException {
@@ -291,19 +314,15 @@ public final class Field extends AccessibleObject implements Member, AnnotatedEl
 	 * Get the value of this Field as a char. If the field is static,
 	 * <code>o</code> will be ignored.
 	 * 
-	 * @throws IllegalAccessException
-	 *             if you could not normally access this field (i.e. it is not
-	 *             public)
-	 * @throws IllegalArgumentException
-	 *             if this is not a char field of <code>o</code>, or if
-	 *             <code>o</code> is not an instance of the declaring class of
-	 *             this field
-	 * @throws NullPointerException
-	 *             if <code>o</code> is null and this field requires an
-	 *             instance
-	 * @throws ExceptionInInitializerError
-	 *             if accessing a static field triggered class initialization,
-	 *             which then failed
+     * @throws IllegalAccessException if you could not normally access this field
+     *         (i.e. it is not public)
+     * @throws IllegalArgumentException if this is not a char field of
+     *         <code>o</code>, or if <code>o</code> is not an instance
+     *         of the declaring class of this field
+     * @throws NullPointerException if <code>o</code> is null and this field
+     *         requires an instance
+     * @throws ExceptionInInitializerError if accessing a static field triggered
+     *         class initialization, which then failed
 	 * @see #get(Object)
 	 */
 	public char getChar(Object o) throws IllegalAccessException {
