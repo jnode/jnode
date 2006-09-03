@@ -1,5 +1,5 @@
 /* ObjectOutputStream.java -- Class used to write serialized objects
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -260,6 +260,16 @@ public class ObjectOutputStream extends OutputStream
 	    if (osc == null)
 	      throw new NotSerializableException(clazz.getName());
 	    
+	    if (osc.isEnum())
+	      {
+		/* TC_ENUM classDesc newHandle enumConstantName */
+		realOutput.writeByte(TC_ENUM);
+		writeObject(osc);
+		assignNewHandle(obj);
+		writeObject(((Enum) obj).name());
+		break;
+	      }
+
 	    if ((replacementEnabled || obj instanceof Serializable)
 		&& ! replaceDone)
 	      {
@@ -427,6 +437,8 @@ public class ObjectOutputStream extends OutputStream
 	for (int i = 0; i < intfs.length; i++)
 	  realOutput.writeUTF(intfs[i].getName());
 
+        assignNewHandle(osc);
+    
         boolean oldmode = setBlockDataMode(true);
         annotateProxyClass(osc.forClass());
         setBlockDataMode(oldmode);
@@ -436,6 +448,9 @@ public class ObjectOutputStream extends OutputStream
       {
         realOutput.writeByte(TC_CLASSDESC);
         realOutput.writeUTF(osc.getName());
+	if (osc.isEnum())
+	  realOutput.writeLong(0L);
+	else
         realOutput.writeLong(osc.getSerialVersionUID());
         assignNewHandle(osc);
 
@@ -448,6 +463,11 @@ public class ObjectOutputStream extends OutputStream
         realOutput.writeByte(flags);
 
         ObjectStreamField[] fields = osc.fields;
+
+	if (fields == ObjectStreamClass.INVALID_FIELDS)
+	  throw new InvalidClassException
+		  (osc.getName(), "serialPersistentFields is invalid");
+
         realOutput.writeShort(fields.length);
 
         ObjectStreamField field;
@@ -548,52 +568,36 @@ public class ObjectOutputStream extends OutputStream
    * different protocols, specified by <code>PROTOCOL_VERSION_1</code>
    * and <code>PROTOCOL_VERSION_2</code>.  This implementation writes
    * data using <code>PROTOCOL_VERSION_2</code> by default, as is done
-   * by the JDK 1.2.
-   *
-   * A non-portable method, <code>setDefaultProtocolVersion (int
-   * version)</code> is provided to change the default protocol
-   * version.
-   *
+   * since the JDK 1.2.
+   * <p>
    * For an explanation of the differences between the two protocols
-   * see XXX: the Java ObjectSerialization Specification.
+   * see the Java Object Serialization Specification.
+   * </p>
    *
-   * @exception IOException if <code>version</code> is not a valid
-   * protocol
+   * @param version the version to use.
    *
-   * @see #setDefaultProtocolVersion(int)
+   * @throws IllegalArgumentException if <code>version</code> is not a valid 
+   * protocol.
+   * @throws IllegalStateException if called after the first the first object
+   * was serialized.
+   * @throws IOException if an I/O error occurs.
+   *
+   * @see ObjectStreamConstants#PROTOCOL_VERSION_1
+   * @see ObjectStreamConstants#PROTOCOL_VERSION_2
+   *
+   * @since 1.2
    */
   public void useProtocolVersion(int version) throws IOException
   {
     if (version != PROTOCOL_VERSION_1 && version != PROTOCOL_VERSION_2)
-      throw new IOException("Invalid protocol version requested.");
+      throw new IllegalArgumentException("Invalid protocol version requested.");
     
+    if (nextOID != baseWireHandle)
+      throw new IllegalStateException("Protocol version cannot be changed " 
+                                      + "after serialization started.");
+
     protocolVersion = version;
   }
-
-
-  /**
-   * <em>GNU $classpath specific</em>
-   *
-   * Changes the default stream protocol used by all
-   * <code>ObjectOutputStream</code>s.  There are currently two
-   * different protocols, specified by <code>PROTOCOL_VERSION_1</code>
-   * and <code>PROTOCOL_VERSION_2</code>.  The default default is
-   * <code>PROTOCOL_VERSION_1</code>.
-   *
-   * @exception IOException if <code>version</code> is not a valid
-   * protocol
-   *
-   * @see #useProtocolVersion(int)
-   */
-  public static void setDefaultProtocolVersion(int version)
-    throws IOException
-  {
-    if (version != PROTOCOL_VERSION_1 && version != PROTOCOL_VERSION_2)
-      throw new IOException("Invalid protocol version requested.");
-
-    defaultProtocolVersion = version;
-  }
-
 
   /**
    * An empty hook that allows subclasses to write extra information
