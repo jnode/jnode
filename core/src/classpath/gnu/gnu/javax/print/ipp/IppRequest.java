@@ -844,6 +844,11 @@ public class IppRequest
     out.flush();
     stream.flush();  
 
+    // Set the connection timeout, for if the printer is offline.
+    // FIXME: The print services polling should probably be done in its
+    // own thread.
+    connection.setConnectTimeout( timeout );
+
     int responseCode = connection.getResponseCode();
     
     if (responseCode == HttpURLConnection.HTTP_OK)
