@@ -76,6 +76,7 @@ import java.awt.peer.ScrollbarPeer;
 import java.awt.peer.TextAreaPeer;
 import java.awt.peer.TextFieldPeer;
 import java.awt.peer.WindowPeer;
+import java.awt.peer.MouseInfoPeer;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.net.URL;
@@ -122,6 +123,11 @@ public abstract class Toolkit
    * event queue can efficiently access this list.
    */
   AWTEventListenerProxy[] awtEventListeners;
+
+  /**
+   * The shared peer for all lightweight components.
+   */
+  private GLightweightPeer lightweightPeer;
 
   /**
 	 * Default constructor for subclasses.
@@ -326,6 +332,18 @@ public abstract class Toolkit
 	protected abstract MenuItemPeer createMenuItem(MenuItem target);
 
 	/**
+   * Returns a MouseInfoPeer.
+   * The default implementation of this method throws
+   * UnsupportedOperationException.
+   *
+   * Toolkit implementations should overload this if possible, however.
+   */
+  protected MouseInfoPeer getMouseInfoPeer()
+  {
+    throw new UnsupportedOperationException("No mouse info peer.");
+  }
+
+  /**
 	 * Creates a peer object for the specified <code>FileDialog</code>.
 	 * 
    * @param target The <code>FileDialog</code> to create the peer for.

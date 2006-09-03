@@ -292,6 +292,31 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type,
     }
 
     /**
+     * Returns the simple name for this class, as used in the source
+     * code.  For normal classes, this is the content returned by
+     * <code>getName()</code> which follows the last ".".  Anonymous
+     * classes have no name, and so the result of calling this method is
+     * "".  The simple name of an array consists of the simple name of
+     * its component type, followed by "[]".  Thus, an array with the
+     * component type of an anonymous class has a simple name of simply
+     * "[]".
+     *
+     * @return the simple name for this class.
+     * @since 1.5
+     */
+    public String getSimpleName()
+    {
+      return getSimpleName(this);
+    }
+
+    static String getSimpleName(Class klass) {
+        if (klass.getVmClass().isArray()){
+	        return klass.getComponentType().getSimpleName() + "[]";
+        }
+        String fullName = klass.getName();
+        return fullName.substring(fullName.lastIndexOf(".") + 1);
+    }
+    /**
      * Gets the runtime visible annotations of this class.
      */
     public Annotation[] getAnnotations() {
@@ -966,6 +991,57 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type,
             throw new ClassCastException();
         return (Class< ? extends U>) this;
     }
+
+    /**
+   * Returns the class which immediately encloses this class.  If this class
+   * is a top-level class, this method returns <code>null</code>.
+   *
+   * @return the immediate enclosing class, or <code>null</code> if this is
+   *         a top-level class.
+   * @since 1.5
+   */
+  public Class<?> getEnclosingClass()
+  {
+    //return VMClass.getEnclosingClass(this);
+      //todo implement it
+      return null;
+  }
+
+  /**
+   * Returns the constructor which immediately encloses this class.  If
+   * this class is a top-level class, or a local or anonymous class
+   * immediately enclosed by a type definition, instance initializer
+   * or static initializer, then <code>null</code> is returned.
+   *
+   * @return the immediate enclosing constructor if this class is
+   *         declared within a constructor.  Otherwise, <code>null</code>
+   *         is returned.
+   * @since 1.5
+   */
+  public Constructor getEnclosingConstructor()
+  {
+    //return VMClass.getEnclosingConstructor(this);
+      //todo implement it
+      return null;
+  }
+
+  /**
+   * Returns the method which immediately encloses this class.  If
+   * this class is a top-level class, or a local or anonymous class
+   * immediately enclosed by a type definition, instance initializer
+   * or static initializer, then <code>null</code> is returned.
+   *
+   * @return the immediate enclosing method if this class is
+   *         declared within a method.  Otherwise, <code>null</code>
+   *         is returned.
+   * @since 1.5
+   */
+  public Method getEnclosingMethod()
+  {
+    //return VMClass.getEnclosingMethod(this);
+      //todo implement it
+      return null;
+  }
 
     /**
      * Perform security checks common to all of the methods that get members of
