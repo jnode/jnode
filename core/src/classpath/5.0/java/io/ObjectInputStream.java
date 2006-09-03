@@ -1,5 +1,5 @@
 /* ObjectInputStream.java -- Class used to read serialized objects
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005 
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -50,7 +50,6 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.TreeSet;
@@ -119,7 +118,10 @@ public class ObjectInputStream extends InputStream
    * <code>private void readObject (ObjectInputStream)</code>.
    *
    * If an exception is thrown from this method, the stream is left in
-   * an undefined state.
+   * an undefined state. This method can also throw Errors and 
+   * RuntimeExceptions if caused by existing readResolve() user code.
+   * 
+   * @return The object read from the underlying stream.
    *
    * @exception ClassNotFoundException The class that an object being
    * read in belongs to cannot be found.
@@ -431,6 +433,22 @@ public class ObjectInputStream extends InputStream
  	  throw new WriteAbortedException("Exception thrown during writing of stream", e);
  	}
 	
+       case TC_ENUM:
+	 {
+	   /* TC_ENUM classDesc newHandle enumConstantName */
+	   if (dump)
+	     dumpElementln("ENUM=");
+	   ObjectStreamClass osc = (ObjectStreamClass) readObject();
+	   String constantName = (String) readObject();
+	   if (dump)
+	     dumpElementln("CONSTANT NAME = " + constantName);
+	   Class clazz = osc.forClass();
+	   Enum instance = Enum.valueOf(clazz, constantName);
+	   assignNewHandle(instance);
+	   ret_val = instance;
+	   break;
+	 }
+
        default:
  	throw new IOException("Unknown marker on stream: " + marker);
       }
@@ -529,8 +547,6 @@ public class ObjectInputStream extends InputStream
 						  flags, fields);
     assignNewHandle(osc);
 
-    ClassLoader callersClassLoader = currentLoader();
-	      
     for (int i = 0; i < field_count; i++)
       {
 	if(dump) dumpElement("  TYPE CODE=");
@@ -550,19 +566,23 @@ public class ObjectInputStream extends InputStream
 	  class_name = String.valueOf(type_code);
 		  
 	fields[i] =
-	  new ObjectStreamField(field_name, class_name, callersClassLoader);
+	  new ObjectStreamField(field_name, class_name);
       }
 	      
     /* Now that fields have been read we may resolve the class
      * (and read annotation if needed). */
     Class clazz = resolveClass(osc);
+    ClassLoader loader = clazz.getClassLoader();
+    for (int i = 0; i < field_count; i++)
+      {
+        fields[i].resolveType(loader);
+      }
     boolean oldmode = setBlockDataMode(true);
     osc.setClass(clazz, lookupClass(clazz.getSuperclass()));
     classLookupTable.put(clazz, osc);
     setBlockDataMode(oldmode);
 
-    // find the first non-serializable, non-abstract
-    // class in clazz's inheritance hierarchy
+    // find the first non-serializable class in clazz's inheritance hierarchy
     Class first_nonserial = clazz.getSuperclass();
     // Maybe it is a primitive class, those don't have a super class,
     // or Object itself.  Otherwise we can keep getting the superclass
@@ -571,8 +591,7 @@ public class ObjectInputStream extends InputStream
     if (first_nonserial == null)
       first_nonserial = clazz;
     else
-      while (Serializable.class.isAssignableFrom(first_nonserial)
-	     || Modifier.isAbstract(first_nonserial.getModifiers()))
+      while (Serializable.class.isAssignableFrom(first_nonserial))
 	first_nonserial = first_nonserial.getSuperclass();
 
     final Class local_constructor_class = first_nonserial;
@@ -1573,8 +1592,15 @@ public class ObjectInputStream extends InputStream
 	catch (IllegalAccessException ignore)
 	  {
 	  }
-	catch (InvocationTargetException ignore)
+	catch (InvocationTargetException exception)
 	  {
+	    Throwable cause = exception.getCause();
+	    if (cause instanceof ObjectStreamException)
+	      throw (ObjectStreamException) cause;
+	    else if (cause instanceof RuntimeException)
+	      throw (RuntimeException) cause;
+	    else if (cause instanceof Error)
+	      throw (Error) cause;
 	  }
       }
 
@@ -1595,7 +1621,14 @@ public class ObjectInputStream extends InputStream
 
   private void readNextBlock() throws IOException
   {
-    readNextBlock(this.realInputStream.readByte());
+    byte marker = this.realInputStream.readByte();
+    while (marker == TC_RESET)
+      {
+        if(dump) dumpElementln("RESET");
+        clearHandles();
+        marker = this.realInputStream.readByte();
+      }
+    readNextBlock(marker);
   }
 
   private void readNextBlock(byte marker) throws IOException
