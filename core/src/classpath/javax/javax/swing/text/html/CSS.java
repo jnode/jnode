@@ -41,6 +41,7 @@ import gnu.javax.swing.text.html.css.CSSColor;
 import gnu.javax.swing.text.html.css.FontSize;
 import gnu.javax.swing.text.html.css.FontStyle;
 import gnu.javax.swing.text.html.css.FontWeight;
+import gnu.javax.swing.text.html.css.Length;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -485,6 +486,10 @@ public class CSS implements Serializable
       o = new FontStyle(v);
     else if (att == Attribute.COLOR || att == Attribute.BACKGROUND_COLOR)
       o = new CSSColor(v);
+    else if (att == Attribute.MARGIN || att == Attribute.MARGIN_BOTTOM
+             || att == Attribute.MARGIN_LEFT || att == Attribute.MARGIN_RIGHT
+             || att == Attribute.MARGIN_TOP)
+      o = new Length(v);
     else
       o = v;
     return o;
