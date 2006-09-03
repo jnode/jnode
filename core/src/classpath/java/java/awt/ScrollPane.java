@@ -46,6 +46,7 @@ import javax.accessibility.Accessible;
 import javax.accessibility.AccessibleContext;
 import javax.accessibility.AccessibleRole;
 
+
 /**
   * This widget provides a scrollable region that allows a single 
   * subcomponent to be viewed through a smaller window.
@@ -75,6 +76,11 @@ public static final int SCROLLBARS_ALWAYS = 1;
 	  * Constant indicating that scrollbars are never displayed in this window.
 	  */
 public static final int SCROLLBARS_NEVER = 2;
+
+/**
+ * The number used to generate the name returned by getName.
+ */
+private static transient long next_scrollpane_number;
 
 // Serialization constant
 private static final long serialVersionUID = 7956609840827222915L;
@@ -613,5 +619,21 @@ paramString()
       accessibleContext = new AccessibleAWTScrollPane();
     return accessibleContext;
   }
+  
+  /**
+   * Generate a unique name for this <code>ScrollPane</code>.
+   *
+   * @return A unique name for this <code>ScrollPane</code>.
+   */
+  String generateName()
+  {
+    return "scrollpane" + getUniqueLong();
+  }
+
+  private static synchronized long getUniqueLong()
+  {
+    return next_scrollpane_number++;
+  }
+  
 } // class ScrollPane 
 
