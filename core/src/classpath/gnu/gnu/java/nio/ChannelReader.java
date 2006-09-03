@@ -92,6 +92,8 @@ public class ChannelReader extends Reader
 
   public int read(char[] buf, int offset, int count) throws IOException
   {
+    synchronized (lock)
+      {
     // I declared channel being null meaning that the reader is closed.
     if (!channel.isOpen())
       throw new IOException("Reader was already closed.");
@@ -198,14 +200,18 @@ public class ChannelReader extends Reader
 
     return sum;
   }
+  }
 
   public void close() throws IOException
   {
+    synchronized (lock)
+      {
     channel.close();
 
     // Makes sure all intermediate data is released by the decoder.
     if (decoder != null)
       decoder.reset();
+  }
   }
 
 }
