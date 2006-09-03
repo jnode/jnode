@@ -68,6 +68,7 @@ public class BDFTextRenderer implements TextRenderer {
         }
         
         BDFMetrics fm = (BDFMetrics)bdfFont.getFontMetrics();
+        y-=fm.getDescent();
         int charsCount = str.length();
 
         if ((bdfFont != null) && (charsCount > 0)) {
