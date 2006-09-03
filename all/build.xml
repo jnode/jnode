@@ -455,6 +455,7 @@ clean             Remove all intermediate build results.
             <exclude name="gnu/java/awt/peer/qt/**/*"/>
             <exclude name="gnu/java/awt/peer/x/**/*"/>
             <exclude name="gnu/java/awt/dnd/peer/gtk/**/*"/>
+            <exclude name="gnu/java/net/local/**/*"/>
             <exclude name="gnu/javax/sound/midi/alsa/**/*"/>
             <exclude name="gnu/javax/sound/midi/dssi/**/*"/>
             <exclude name="gnu/javax/swing/plaf/gtk/**/*"/>
