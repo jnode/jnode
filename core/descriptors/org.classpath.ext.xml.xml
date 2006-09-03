@@ -37,17 +37,15 @@
 
       <export name="org.relaxng.datatype.*"/>
       <export name="org.relaxng.datatype.helpers.*"/>
-      <export name="org.w3c.dom.*"/>
-      <export name="org.w3c.dom.bootstrap.*"/>
       <export name="org.w3c.dom.css.*"/>
       <export name="org.w3c.dom.events.*"/>
       <export name="org.w3c.dom.html2.*"/>
-      <export name="org.w3c.dom.ls.*"/>
       <export name="org.w3c.dom.ranges.*"/>
       <export name="org.w3c.dom.stylesheets.*"/>
       <export name="org.w3c.dom.traversal.*"/>
       <export name="org.w3c.dom.views.*"/>
       <export name="org.w3c.dom.xpath.*"/>
+        
       <export name="org.xml.sax.ext.*"/>
       <export name="org.xml.sax.helpers.*"/>
     </library>
