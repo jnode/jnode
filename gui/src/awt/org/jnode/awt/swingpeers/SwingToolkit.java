@@ -220,6 +220,7 @@ public final class SwingToolkit extends JNodeToolkit {
     }
 
     protected LightweightPeer createComponent(Component target) {
+        //todo investigate the idea used in super for applying here
         if (target instanceof Container)
             return new SwingLightweightContainerPeer(this, (Container) target);
         else
