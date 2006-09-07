@@ -120,7 +120,7 @@ public class JPopupMenu extends JComponent implements Accessible, MenuElement
   private boolean lightWeightPopupEnabled;
 
   /** SelectionModel that keeps track of menu selection. */
-  private SingleSelectionModel selectionModel;
+  protected SingleSelectionModel selectionModel;
 
   /* Popup that is used to display JPopupMenu */
   private transient Popup popup;
@@ -569,27 +569,36 @@ public class JPopupMenu extends JComponent implements Accessible, MenuElement
       return;
 
     boolean old = isVisible();
-    this.visible = visible;
-    if (old != isVisible())
+// @classpath-bugfix 6/9/2006 Martin Husted Hartvig (hagar@jnode.org) :
+    if (old != visible)
       {
         if (visible)
           {
-            if (invoker != null && !(invoker instanceof JMenu))
-              {
-                MenuElement[] menuEls;
-                if (getSubElements().length > 0)
-                  {
-                    menuEls = new MenuElement[2];
-                    menuEls[0] = this;
-                    menuEls[1] = getSubElements()[0];
-                }
-                else
-                  {
-                    menuEls = new MenuElement[1];
-                    menuEls[0] = this;
+            if (invoker != null)
+            {
+              if (!(invoker instanceof JMenu))
+                {
+                  MenuElement[] menuEls;
+                  if (getSubElements().length > 0)
+                    {
+                      menuEls = new MenuElement[2];
+                      menuEls[0] = this;
+                      menuEls[1] = getSubElements()[0];
                   }
-                MenuSelectionManager.defaultManager().setSelectedPath(menuEls);
+                  else
+                    {
+                      menuEls = new MenuElement[1];
+                      menuEls[0] = this;
+                    }
+                  MenuSelectionManager.defaultManager().setSelectedPath(menuEls);
+                }
+              else
+              {
+                Point point = ((JMenu)invoker).getPopupMenuOrigin();
+                popupLocationX = point.x;
+                popupLocationY = point.y;
               }
+            }
             firePopupMenuWillBecomeVisible();
             PopupFactory pf = PopupFactory.getSharedInstance();
             pack();
@@ -602,6 +611,9 @@ public class JPopupMenu extends JComponent implements Accessible, MenuElement
             firePopupMenuWillBecomeInvisible();
             popup.hide();
           }
+
+        this.visible = visible;
+// @classpath-bugfix-end
         firePropertyChange("visible", old, isVisible());
       }
   }
@@ -820,7 +832,14 @@ public class JPopupMenu extends JComponent implements Accessible, MenuElement
    */
   public void menuSelectionChanged(boolean changed)
   {
-    if (! changed)
+    if (invoker instanceof JMenu)
+      {
+        // We need to special case this since the JMenu calculates the
+        // position etc of the popup.
+        JMenu menu = (JMenu) invoker;
+        menu.setPopupMenuVisible(changed);
+      }
+    else if (! changed)
       setVisible(false);
   }
 
