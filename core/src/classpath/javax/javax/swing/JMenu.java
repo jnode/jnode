@@ -526,7 +526,7 @@ public class JMenu extends JMenuItem implements Accessible, MenuElement
         if (getComponentOrientation().isLeftToRight())
           {
             // Prefer popup to the right.
-            point.x = size.width + xOffset;
+            point.x = xOffset;
             if (screenLoc.x + point.x + popupSize.width
                 >= screenBounds.x + screenBounds.width
                 && screenBounds.width - size.width
@@ -552,8 +552,7 @@ public class JMenu extends JMenuItem implements Accessible, MenuElement
             < 2 * (screenLoc.y - screenBounds.y))
         {
           // Pop up if there's not enough room below.
-// @classpath-bugfix 6/9/2006 Martin Husted Hartvig (hagar@jnode.org) :
-          point.y = screenLoc.y - screenBounds.y + size.height - yOffset - popupSize.height;
+          point.y = size.height - yOffset - popupSize.height;
 // @classpath-bugfix-end
         }      }
 

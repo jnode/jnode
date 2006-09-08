@@ -595,8 +595,8 @@ public class JPopupMenu extends JComponent implements Accessible, MenuElement
               else
               {
                 Point point = ((JMenu)invoker).getPopupMenuOrigin();
-                popupLocationX = point.x;
-                popupLocationY = point.y;
+                popupLocationX += point.x;
+                popupLocationY += point.y;
               }
             }
             firePopupMenuWillBecomeVisible();
