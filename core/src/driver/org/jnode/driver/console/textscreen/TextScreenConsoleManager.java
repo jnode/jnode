@@ -36,7 +36,7 @@ import org.jnode.naming.InitialNaming;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final public class TextScreenConsoleManager extends AbstractConsoleManager {
+public class TextScreenConsoleManager extends AbstractConsoleManager {
 
     private int SCROLLABLE_HEIGHT = 500;
     
@@ -80,7 +80,7 @@ final public class TextScreenConsoleManager extends AbstractConsoleManager {
             throw new IllegalArgumentException("Unknown option " + options);
         }
     }
-    
+
     /**
      * Create an automatic console name.
      * @return
