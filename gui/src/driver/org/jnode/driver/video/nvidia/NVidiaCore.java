@@ -258,7 +258,7 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 	/**
 	 * @see org.jnode.driver.video.util.AbstractSurface#fillRect(int, int, int, int, int, int)
 	 */
-	protected void fillRect(int x, int y, int w, int h, int color, int mode) {
+	public void fillRect(int x, int y, int w, int h, int color, int mode) {
 		final int screenWidth = config.getScreenWidth();
 		if (x + w >= screenWidth) {
 			w = screenWidth - x;				
