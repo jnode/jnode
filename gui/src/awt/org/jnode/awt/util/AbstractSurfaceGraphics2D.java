@@ -23,23 +23,14 @@ package org.jnode.awt.util;
 
 import gnu.java.awt.java2d.AbstractGraphics2D;
 
-import java.awt.AWTError;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Shape;
 import java.awt.Toolkit;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.GeneralPath;
-import java.awt.image.AreaAveragingScaleFilter;
 import java.awt.image.BufferedImage;
-import java.awt.image.BufferedImageOp;
 import java.awt.image.ColorModel;
-import java.awt.image.CropImageFilter;
-import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageObserver;
 import java.awt.image.PixelGrabber;
 import java.awt.image.Raster;
@@ -48,12 +39,9 @@ import java.awt.image.WritableRaster;
 import java.awt.image.IndexColorModel;
 import java.awt.image.DirectColorModel;
 import java.awt.image.ComponentColorModel;
-import java.awt.image.renderable.RenderableImage;
-import java.io.WriteAbortedException;
 
 import org.apache.log4j.Logger;
 import org.jnode.awt.JNodeToolkit;
-import org.jnode.awt.image.JNodeImage;
 import org.jnode.driver.video.Surface;
 import org.jnode.driver.video.util.AbstractSurface;
 
