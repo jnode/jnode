@@ -147,7 +147,7 @@ public class PcTextScreen extends AbstractPcTextScreen implements TextScreen {
      * @param rawData
      * @param rawDataOffset
      */
-    final void copyFrom(char[] rawData, int rawDataOffset) {
+    public final void copyFrom(char[] rawData, int rawDataOffset) {
         if (rawDataOffset < 0) {
             Unsafe.die("Screen:rawDataOffset = " + rawDataOffset);
         }
