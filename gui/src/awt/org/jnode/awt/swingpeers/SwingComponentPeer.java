@@ -24,6 +24,7 @@ package org.jnode.awt.swingpeers;
 import org.apache.log4j.Logger;
 import org.jnode.awt.JNodeGenericPeer;
 import org.jnode.awt.JNodeGraphics;
+import org.jnode.awt.JNodeGraphics2D;
 
 import java.awt.AWTEvent;
 import java.awt.BufferCapabilities;
@@ -48,6 +49,8 @@ import java.awt.image.ImageProducer;
 import java.awt.image.VolatileImage;
 import java.awt.peer.ComponentPeer;
 import java.awt.peer.ContainerPeer;
+
+import gnu.classpath.SystemProperties;
 
 /**
  * Base class for virtual component peers. Satisfies the requirements for AWT
@@ -161,7 +164,8 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
         final int y = peerComponent.getY();
         final int width = peerComponent.getWidth();
         final int height = peerComponent.getHeight();
-        JNodeGraphics g = new JNodeGraphics(this);
+        Graphics g = SystemProperties.getProperty("gnu.javax.swing.noGraphics2D") == null ?
+                new JNodeGraphics2D(this) : new JNodeGraphics(this);
         g.translate(x,y);
         g.clipRect(0, 0, width, height);
 
