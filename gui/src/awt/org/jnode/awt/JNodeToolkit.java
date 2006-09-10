@@ -428,8 +428,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	 * @return The model
 	 */
 	public ColorModel getColorModel() {
-		// TODO Auto-generated method stub
-		return null;
+		return ColorModel.getRGBdefault();
 	}
 
 	/**
