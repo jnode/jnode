@@ -89,7 +89,7 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
         current = null;
     }
 
-    final void initializeKeyboard(Device kbDev) {
+    protected final void initializeKeyboard(Device kbDev) {
         try {
             this.kbApi = (KeyboardAPI) kbDev.getAPI(KeyboardAPI.class);
             this.kbApi.addKeyboardListener(this);
@@ -113,7 +113,7 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
         }
     }
 
-    private final void openInput(DeviceManager devMan) {
+    protected void openInput(DeviceManager devMan) {
         final Collection<Device> kbs = devMan.getDevicesByAPI(KeyboardAPI.class);
         if (!kbs.isEmpty()) {
             initializeKeyboard((Device) kbs.iterator().next());
