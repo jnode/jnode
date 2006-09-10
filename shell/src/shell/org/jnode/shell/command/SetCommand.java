@@ -34,18 +34,19 @@ import java.io.PrintStream;
  *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Martin Husted Hartvig (hagar@jnode.org)
+ * @author Levente S\u00e1ntha
  */
 
 public class SetCommand implements Command{
 
 	static final PropertyNameArgument ARG_KEY = new PropertyNameArgument("key", "the property name");
-	static final StringArgument ARG_VALUE = new StringArgument("value", "the value to set the property to");
+	static final StringArgument ARG_VALUE = new StringArgument("value", "the value to set the property to, if missing the property is removed");
 
   public static final Help.Info HELP_INFO = new Help.Info(
-		"set", "Sets a system property",
+		"set", "Sets or removes a system property.",
 		new Parameter[]{
 			new Parameter(ARG_KEY, Parameter.MANDATORY),
-			new Parameter(ARG_VALUE, Parameter.MANDATORY),
+			new Parameter(ARG_VALUE, Parameter.OPTIONAL),
 		}
 	);
 
@@ -57,6 +58,10 @@ public class SetCommand implements Command{
   {
     ParsedArguments parsedArguments = HELP_INFO.parse(commandLine.toStringArray());
 
-    System.getProperties().setProperty(ARG_KEY.getValue(parsedArguments), ARG_VALUE.getValue(parsedArguments));
+      String value = ARG_VALUE.getValue(parsedArguments);
+      if(value == null)
+        System.getProperties().remove(ARG_KEY.getValue(parsedArguments));
+      else
+        System.getProperties().setProperty(ARG_KEY.getValue(parsedArguments), value);
   }
 }
