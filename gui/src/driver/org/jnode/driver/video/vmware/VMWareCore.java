@@ -352,7 +352,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	 * @param color
 	 * @param mode
 	 */
-	protected final void fillRect(int x, int y, int width, int height, int color, int mode) {
+	public final void fillRect(int x, int y, int width, int height, int color, int mode) {
 		if (x < 0) {
 			width = Math.max(0, x + width);
 			x = 0;
@@ -435,7 +435,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	 * @param c
 	 * @param mode
 	 */
-	protected final void drawLine(int x1, int y1, int x2, int y2, int c, int mode) {
+	public final void drawLine(int x1, int y1, int x2, int y2, int c, int mode) {
 		if (x1 == x2) {
 			// Vertical line
 			fillRect(x1, Math.min(y1, y2), 1, Math.abs(y2 - y1), c, mode);
