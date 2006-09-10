@@ -50,6 +50,8 @@ import java.awt.peer.ContainerPeer;
 import org.apache.log4j.Logger;
 import org.jnode.awt.JNodeGenericPeer;
 import org.jnode.awt.JNodeGraphics;
+import org.jnode.awt.JNodeGraphics2D;
+import gnu.classpath.SystemProperties;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -315,7 +317,8 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
      */
     public Graphics getGraphics() {
         log.debug("getGraphics");
-        return new JNodeGraphics(this);
+        return SystemProperties.getProperty("gnu.javax.swing.noGraphics2D") == null ?
+        new JNodeGraphics2D(this) : new JNodeGraphics(this);
     }
 
     /**
