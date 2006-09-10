@@ -27,7 +27,7 @@ import org.jnode.driver.textscreen.TextScreen;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-abstract class AbstractPcTextScreen implements TextScreen {
+public abstract class AbstractPcTextScreen implements TextScreen {
 
     private final int width;
     private final int height;
@@ -75,7 +75,7 @@ abstract class AbstractPcTextScreen implements TextScreen {
      * @param rawData
      * @param rawDataOffset
      */
-    abstract void copyFrom(char[] rawData, int rawDataOffset);
+    public abstract void copyFrom(char[] rawData, int rawDataOffset);
 
     /**
      * @see org.jnode.driver.textscreen.TextScreen#createCompatibleBufferScreen()
