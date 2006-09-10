@@ -9,13 +9,13 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
@@ -71,7 +71,7 @@ import org.vmmagic.unboxed.Offset;
 
 /**
  * System support for the Virtual Machine
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 @SharedStatics
@@ -173,7 +173,7 @@ public final class VmSystem {
 
     /**
      * Gets the system output stream.
-     * 
+     *
      * @return
      */
     public static PrintStream getSystemOut() {
@@ -186,7 +186,7 @@ public final class VmSystem {
 
     /**
      * Load the initial jarfile.
-     * 
+     *
      * @param rm
      * @return The initial jarfile resource, or null if no initial jarfile is
      *         available.
@@ -257,6 +257,7 @@ public final class VmSystem {
                         : "little");
         res.put("gnu.classpath.home.url", "system://");
         res.put("gnu.classpath.vm.shortname", "jnode");
+        res.put("gnu.javax.swing.noGraphics2D", "true");
     }
 
     public static String getCmdLine() {
