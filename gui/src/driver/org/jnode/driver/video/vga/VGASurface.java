@@ -130,7 +130,7 @@ public class VGASurface extends AbstractSurface implements VgaConstants {
 	/**
 	 * @see org.jnode.driver.video.util.AbstractSurface#drawLine(int, int, int, int, int, int)
 	 */
-	protected void drawLine(int x1, int y1, int x2, int y2, int color, int mode) {
+	public void drawLine(int x1, int y1, int x2, int y2, int color, int mode) {
 		if (y1 == y2) {
 			bitmapGraphics.drawLine(Math.min(x1, x2), y1, Math.abs(x2 - x1) + 1, color, mode);
 		} else {
