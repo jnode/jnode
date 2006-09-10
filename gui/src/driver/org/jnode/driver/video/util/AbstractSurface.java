@@ -146,7 +146,7 @@ public abstract class AbstractSurface implements Surface {
 	 * @param color
 	 * @param mode
 	 */
-	protected void fillRect(int x, int y, int w, int h, int color, int mode) {
+	public void fillRect(int x, int y, int w, int h, int color, int mode) {
 		for (int row = 0; row < h; row++) {
 			drawLine(x, y + row, x + w, y + row, color, mode);
 		}
@@ -172,7 +172,7 @@ public abstract class AbstractSurface implements Surface {
 	 * @param color
 	 * @param mode
 	 */
-	protected void drawLine(int x1, int y1, int x2, int y2, int color, int mode) {
+	public void drawLine(int x1, int y1, int x2, int y2, int color, int mode) {
 		final int incx, incy;
 		int countx, county;
 
