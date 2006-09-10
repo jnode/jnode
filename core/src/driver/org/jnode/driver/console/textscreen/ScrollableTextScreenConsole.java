@@ -32,7 +32,7 @@ import org.jnode.driver.textscreen.ScrollableTextScreen;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-class ScrollableTextScreenConsole extends TextScreenConsole {
+public class ScrollableTextScreenConsole extends TextScreenConsole {
 
     /**
      * @param mgr
