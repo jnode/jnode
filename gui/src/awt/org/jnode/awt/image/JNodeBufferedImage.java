@@ -21,6 +21,8 @@
  
 package org.jnode.awt.image;
 
+import gnu.classpath.SystemProperties;
+
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
@@ -67,6 +69,7 @@ public class JNodeBufferedImage extends BufferedImage {
 	 * @return The graphics
 	 */
 	public Graphics2D createGraphics() {
-		return new JNodeBufferedImageGraphics(this);
+        return SystemProperties.getProperty("gnu.javax.swing.noGraphics2D") == null ?
+        new JNodeBufferedImageGraphics2D(this) : new JNodeBufferedImageGraphics(this);
 	}
 }
