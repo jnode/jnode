@@ -406,7 +406,6 @@ clean             Remove all intermediate build results.
                 <pathelement location="${root.dir}/core/src/classpath/vm"/>
                 <pathelement location="${root.dir}/core/src/core"/>
                 <pathelement location="${root.dir}/core/src/driver"/>
-                <pathelement location="${root.dir}/core/src/mmtk"/>
                 <pathelement location="${root.dir}/core/src/mmtk-vm"/>
                 <pathelement location="${root.dir}/core/src/vmmagic"/>
                 <pathelement location="${root.dir}/distr/src/install"/>
