@@ -83,7 +83,8 @@
     <property name="sources.dist.tar.gz" value="${build.dir}/jnodesources-${jnode-ver}.tar.gz"/>
     <property name="jnode-x86.iso" value="${cdroms.dir}/jnode-x86.iso"/>
     <property name="jnode-x86-lite.iso" value="${cdroms.dir}/jnode-x86-lite.iso"/>
-	
+    <property name="jnode-x86_64-lite.iso" value="${cdroms.dir}/jnode-x86_64-lite.iso"/>
+
     <path id="cp">
         <pathelement location="${ant.jar}"/>
         <pathelement location="${junit.jar}"/>
@@ -337,7 +338,7 @@ clean             Remove all intermediate build results.
     <!-- Create a bootable CDROM image for x86 64-bits -->
     <target name="cd-x86_64-lite" depends="assemble">
         <x86-build bits="64" target="java-image"/>
-        <ant antfile="build-x86.xml" inheritall="true" inheritrefs="true" target="cdrom-lite"/>
+        <ant antfile="build-x86.xml" inheritall="true" inheritrefs="true" target="cdrom_64-lite"/>
     </target>
 
     <!-- Upload a distribution -->
