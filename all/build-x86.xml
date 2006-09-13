@@ -289,6 +289,18 @@
 		/>
 	</target>
 
+	<target name="cdrom_64-lite" depends="prepare">
+		<create-cdrom destfile="${jnode-x86_64-lite.iso}" dir="${my-build.dir}/cdrom-lite" />
+
+		<taskdef name="vmware" classname="org.jnode.build.VMwareBuilderTask" classpathref="cp-x86" />
+
+		<vmware
+			isofile="${jnode-x86_64-lite.iso}"
+			logFile="${logFile}"
+			memsize="${jnode.virtual.memsize}"
+		/>
+	</target>
+
 	<!-- Prepare for netboot -->
 	<target name="netboot" depends="java-image" unless="no.netboot">
 		<copy file="${jnode.kernel}" todir="${build.netboot.dir}" />
