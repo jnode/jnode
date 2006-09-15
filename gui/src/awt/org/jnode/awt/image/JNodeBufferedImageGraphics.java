@@ -120,7 +120,6 @@ public class JNodeBufferedImageGraphics extends AbstractSurfaceGraphics {
 				final SinglePixelPackedSampleModel sppSM = (SinglePixelPackedSampleModel) sampleModel;
 				final int dataType = dataBuffer.getDataType();
 				final int dataTypeSize = DataBuffer.getDataTypeSize(dataType);
-				log.debug("dataTypeSize=" + dataTypeSize + ", dataType=" + dataType);
 				this.bitmapGraphics = BitmapGraphics.createInstance(dataBuffer, width, height, sppSM.getScanlineStride() * dataTypeSize / 8);
 			} else {
 				this.bitmapGraphics = null;

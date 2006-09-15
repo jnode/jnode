@@ -21,23 +21,7 @@
  
 package org.jnode.awt.swingpeers;
 
-import java.awt.AWTEvent;
-import java.awt.AWTException;
-import java.awt.BufferCapabilities;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Frame;
-import java.awt.Graphics;
-import java.awt.GraphicsConfiguration;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.MenuBar;
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.BufferCapabilities.FlipContents;
 import java.awt.event.PaintEvent;
 import java.awt.image.ColorModel;
@@ -316,7 +300,6 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
      * @see java.awt.peer.ComponentPeer#getGraphics()
      */
     public Graphics getGraphics() {
-        log.debug("getGraphics");
         return SystemProperties.getProperty("gnu.javax.swing.noGraphics2D") == null ?
         new JNodeGraphics2D(this) : new JNodeGraphics(this);
     }
