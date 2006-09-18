@@ -86,16 +86,13 @@ abstract public class AbstractFontProvider implements FontProvider {
 	 * @return True if this provider provides the given font, false otherwise
 	 */
 	final public boolean provides(Font font) {
-		log.debug("provides, font="+font);
-        if(font == null) return false; // don't provide default (null) fonts 
+        if(font == null) return false; // don't provide default (null) fonts
             
 		if (!fontsLoaded) {
 			log.debug("provides, !fontsLoaded");			
 			loadFonts();
 		}
 		final Font f = getCompatibleFont(font);
-			
-		log.debug("provides, return "+(f != null));
 		return (f != null);
 	}
 
@@ -140,12 +137,16 @@ abstract public class AbstractFontProvider implements FontProvider {
 	 */
 	final public FontMetrics getFontMetrics(Font font) {
 		FontMetrics fm = (FontMetrics) metrics.get(font);
+/*
 		if(log.isDebugEnabled()) log.debug("FontMetrics got from cache: "+fm+" font="+font);
+*/
 		if (fm == null) {
 			try {
 				fm = createFontMetrics(font);
 				metrics.put(font, fm);
-				if(log.isDebugEnabled()) log.debug("created FontMetrics"+fm+" font="+font);				
+/*
+				if(log.isDebugEnabled()) log.debug("created FontMetrics"+fm+" font="+font);
+*/
 			} catch (IOException ex) {
 				log.error("Cannot create font metrics for " + font, ex);
 			}
@@ -160,14 +161,10 @@ abstract public class AbstractFontProvider implements FontProvider {
 	
 	final protected Font getCompatibleFont(Font font)
 	{
-		log.debug("<<< BEGIN getCompatibleFont >>>");
 		Font f = null;
 		try
 		{
 			f = fontsByName.get(font.getFamily());
-			log.debug("requested font: name="+font.getName()+
-					  " fontName="+font.getFontName()+
-					  " family="+font.getFamily());
 			if(f == null)
 			{
 				f = fontsByName.get(font.getName());
@@ -187,7 +184,6 @@ abstract public class AbstractFontProvider implements FontProvider {
 		{
 			log.error("error in getCompatibleFont", t);
 		}
-		log.debug("<<< END getCompatibleFont >>>");
 		return f;
 	}
 	
