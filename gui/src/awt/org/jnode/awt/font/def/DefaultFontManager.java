@@ -224,18 +224,12 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
     	FontProvider prov = getFirstProvider();
     	final String firstProvName = prov.getName();
     	if (prov.provides(font)) {
-    		log.debug("using firstProvider "+firstProvName);
             return prov;
     	}
-        
-    	log.debug("getProvider for "+font.getName()+
-					" ("+providers.size()+" availables)");    	
-        for (FontProvider prv : providers.values()) {
-        	if(firstProvName.equals(prv.getName())) continue; // skip the first provider
+      for (FontProvider prv : providers.values()) {
+          if(firstProvName.equals(prv.getName())) continue; // skip the first provider
         			
-        	log.debug("font="+font+" provider="+prv);            
         	if (prv.provides(font)) {
-        		log.debug("provider found");
                 return prv;
             }
         }
