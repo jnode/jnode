@@ -433,7 +433,13 @@ public abstract class Component
 	 */
 	Dimension prefSize;
 
-	/**
+  /**
+   * Flag indicating whether the preferred size for the component has been set
+   * by a call to {@link #setPreferredSize(Dimension)} with a non-null value.
+   */
+  boolean prefSizeSet;
+
+  /**
 	 * Set to true if an event is to be handled by this component, false if
 	 * it is to be passed up the hierarcy.
 	 *
@@ -1591,7 +1597,41 @@ public abstract class Component
     return preferredSize();
 	}
 
-	/**
+  /**
+   * Sets the preferred size that will be returned by
+   * {@link #getPreferredSize()} always, and sends a
+   * {@link java.beans.PropertyChangeEvent} (with the property name 'preferredSize') to
+   * all registered listeners.
+   *
+   * @param size  the preferred size (<code>null</code> permitted).
+   *
+   * @since 1.5
+   *
+   * @see #getPreferredSize()
+   */
+  public void setPreferredSize(Dimension size)
+  {
+    Dimension old = prefSizeSet ? prefSize : null;
+    prefSize = size;
+    prefSizeSet = (size != null);
+    firePropertyChange("preferredSize", old, size);
+  }
+
+  /**
+   * Returns <code>true</code> if the current preferred size is not
+   * <code>null</code> and was set by a call to
+   * {@link #setPreferredSize(Dimension)}, otherwise returns <code>false</code>.
+   *
+   * @return A boolean.
+   *
+   * @since 1.5
+   */
+  public boolean isPreferredSizeSet()
+  {
+    return prefSizeSet;
+  }
+
+  /**
 	 * Returns the component's preferred size.
 	 *
 	 * @return the component's preferred size
@@ -1732,22 +1772,28 @@ public abstract class Component
 	 */
   public Graphics getGraphics()
   {
-    if (peer != null)
+    // Only heavyweight peers can handle this.
+    ComponentPeer p = peer;
+    Graphics g = null;
+    if (p instanceof LightweightPeer)
       {
-			Graphics gfx = peer.getGraphics();
-        // Create peer for lightweights.
-        if (gfx == null && parent != null)
+        if (parent != null)
           {
-				gfx = parent.getGraphics();
-				Rectangle bounds = getBounds();
-				gfx.setClip(bounds);
-				gfx.translate(bounds.x, bounds.y);
-				return gfx;
-			}
-        gfx.setFont(font);
-        return gfx;
-		}
-		return null;
+            g = parent.getGraphics();
+            if (g != null)
+              {
+                g.translate(x, y);
+                g.setClip(0, 0, width, height);
+                g.setFont(getFont());
+              }
+          }
+      }
+    else
+      {
+        if (p != null)
+          g = p.getGraphics();
+      }
+    return g;
 	}
 
 	/**
