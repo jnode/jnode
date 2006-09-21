@@ -293,9 +293,13 @@ class DefaultPreviewPanel extends JPanel
    *
    * @return The preferred size of the default preview panel.
    */
+
+/*
   public Dimension getPreferredSize()
   {
     Graphics g = getGraphics();
+
+TODO g is null resulting in a null pointer exception in the next line. Untill we find a better the super's methode is used.
     FontMetrics fm = g.getFontMetrics();
     g.dispose();
 
@@ -315,4 +319,5 @@ class DefaultPreviewPanel extends JPanel
     return new Dimension(width + insets.right + insets.left,
                          height + insets.top + insets.bottom);
   }
+  */
 }
