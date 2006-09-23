@@ -55,8 +55,7 @@ public enum VMOpenMode {
         boolean read = ((mode & FileChannelImpl.READ) == FileChannelImpl.READ); 
         boolean write = ((mode & FileChannelImpl.WRITE) == FileChannelImpl.WRITE);
         boolean append = ((mode & FileChannelImpl.APPEND) == FileChannelImpl.APPEND);
-        
-        if(read)
+        if(read && !write)
         {
             value = READ;
         }
