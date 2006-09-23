@@ -9,6 +9,8 @@
 
   <plugin id="charva"/>
   <plugin id="org.jnode.apps.edit"/>
+  <plugin id="org.jnode.apps.editor"/>
+  <plugin id="org.jnode.apps.console"/>
   <plugin id="org.jnode.apps.charvabsh"/>
   <plugin id="org.jnode.apps.debug"/>
   <plugin id="org.jnode.apps.httpd"/>
@@ -17,7 +19,6 @@
   <plugin id="ejc"/>
   
 
-  <plugin id="org.jnode.driver.console.swing"/>
   <plugin id="org.jnode.test.gui"/>
 
   <plugin id="thinlet"/>
