@@ -29,6 +29,7 @@
     <alias name="date" class="org.jnode.shell.command.DateCommand"/>
     <alias name="echo" class="org.jnode.shell.command.EchoCommand"/>
     <alias name="env" class="org.jnode.shell.command.EnvCommand"/>
+    <alias name="exit" class="org.jnode.shell.command.ExitCommand"/>
     <alias name="set" class="org.jnode.shell.command.SetCommand"/>
     <alias name="exec" class="org.jnode.shell.command.ExecCommand"/>
     <alias name="gc" class="org.jnode.shell.command.GcCommand"/>
@@ -40,6 +41,7 @@
     <alias name="namespace" class="org.jnode.shell.command.NamespaceCommand"/>
     <alias name="thread" class="org.jnode.shell.command.ThreadCommand"/>
     <alias name="loadkeys" class="org.jnode.shell.command.LoadkeysCommand"/>
+    <alias name="run" class="org.jnode.shell.command.RunCommand"/>
     <alias name="locale" class="org.jnode.shell.command.LocaleCommand"/>
     <alias name="onheap" class="org.jnode.shell.command.OnHeapCommand"/>
     <alias name="grep" class="org.jnode.shell.command.GrepCommand"/>
