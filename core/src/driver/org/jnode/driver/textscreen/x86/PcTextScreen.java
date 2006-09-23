@@ -172,7 +172,7 @@ public class PcTextScreen extends AbstractPcTextScreen implements TextScreen {
     }
 
     public void setCursor( int x, int y ) {
-        instance.setCursor( x,y);
+        //instance.setCursor( x,y);
     }
 
     public void setCursorVisible( boolean visible ) {
