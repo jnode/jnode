@@ -52,15 +52,11 @@ public class TextScreenConsoleManager extends AbstractConsoleManager {
     /**
      * @see org.jnode.driver.console.ConsoleManager#createConsole(String, int)
      */
-    public Console createConsole(String name, int options) {
+    public TextScreenConsole createConsole(String name, int options) {
         if ((options & CreateOptions.TEXT) != 0) {
             final TextScreenManager tsm;
-            try {
-                tsm = InitialNaming.lookup(TextScreenManager.NAME);
-            } catch (NameNotFoundException ex) {
-                throw new IllegalArgumentException("TextScreenManager not found");
-            }
-            final Console console;
+            tsm = getTextScreenManager();
+            final TextScreenConsole console;
             if (name == null) {
                 name = autoName();
             }
@@ -81,9 +77,19 @@ public class TextScreenConsoleManager extends AbstractConsoleManager {
         }
     }
 
+    protected TextScreenManager getTextScreenManager() {
+        TextScreenManager tsm;
+        try {
+            tsm = InitialNaming.lookup(TextScreenManager.NAME);
+        } catch (NameNotFoundException ex) {
+            throw new IllegalArgumentException("TextScreenManager not found");
+        }
+        return tsm;
+    }
+
     /**
      * Create an automatic console name.
-     * @return
+     * @return the generated name
      */
     private String autoName() {
         int i = 0;
