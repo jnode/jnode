@@ -75,6 +75,8 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
     /** The holder for the context console */
     private static final InheritableThreadLocal contextConsole = new InheritableThreadLocal();
 
+    private AbstractConsoleManager parent;
+
     /**
      * Initialize a new instance
      */
@@ -182,7 +184,7 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
      */
     public synchronized void focus(Console console) {
         log.debug("focus(" + console.getConsoleName() + ")");
-        if (this.current != null) {
+        if (this.current != null && this.current != console) {
             log.debug("Sending focusLost to " + current.getConsoleName());
             this.current.focusLost(new FocusEvent(FocusEvent.FOCUS_LOST));
         }
@@ -224,6 +226,9 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
                 focus((Console)consoles.values().iterator().next());
             }
         }
+        if(parent != null && consoles.isEmpty()){
+            handleFocus();
+        }
     }
 
     public void registerConsole(Console console) {
@@ -235,6 +240,19 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
         }
         if (contextConsole.get() == null) {
             contextConsole.set(console);
+        }
+    }
+
+    private void handleFocus(){
+        if(consoles.isEmpty()){
+            if(parent != null)
+                parent.handleFocus();
+        } else {
+            Console c = getFocus();
+            if (c == null)
+                c = consoles.values().iterator().next();
+
+            focus(c);
         }
     }
 
@@ -291,6 +309,15 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
 
     public Collection<Console> getConsoles() {
         return new ArrayList<Console>(consoles.values());
+    }
+
+
+    public AbstractConsoleManager getParent() {
+        return parent;
+    }
+
+    public void setParent(ConsoleManager parent) {
+        this.parent = (AbstractConsoleManager) parent;
     }
 
     /**
