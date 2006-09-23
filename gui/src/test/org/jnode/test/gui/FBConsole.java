@@ -203,7 +203,8 @@ public class FBConsole {
                 sw = w * FBPcTextScreen.SCREEN_WIDTH + 2 * margin;
                 bi = new JNodeBufferedImage(sw, sh, BufferedImage.TYPE_INT_ARGB);
                 ig = bi.getGraphics();
-                font = new Font("-FontForge-Bitstream Vera Sans Mono-Book-R-Normal-SansMono--12-120-75-75-P-69-ISO10646", Font.PLAIN, 12);
+                font = new Font("-FontForge-Bitstream Vera Sans Mono-Book-R-Normal-SansMono--12-120-75-75-P-69-FontSpecific", Font.PLAIN, 12);
+                //font = new Font("-FontForge-Bitstream Vera Sans Mono-Book-R-Normal-SansMono--12-120-75-75-P-69-ISO10646", Font.PLAIN, 12);
 
                 try{
                     FontProvider fm = (FontProvider) new BDFFontProvider();
