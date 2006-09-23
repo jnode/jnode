@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.driver.textscreen.swing"
+        name="JNode Swing TextScreen driver"
+        version="@VERSION@"
+        provider-name="JNode.org"
+        license-name="lgpl">
+        
+  <requires>
+    <import plugin="org.jnode.driver.textscreen"/>
+    <import plugin="org.jnode.driver.textscreen.core"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-gui.jar">
+      <export name="org.jnode.driver.textscreen.swing.*"/>
+    </library>
+  </runtime>
+
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.util.PropertyPermission" name="gnu.awt.dispatchthread.priority" actions="read"/>
+    <permission class="java.awt.AWTPermission" name="listenToAllAWTEvents"/>  
+  </extension>
+</plugin>
