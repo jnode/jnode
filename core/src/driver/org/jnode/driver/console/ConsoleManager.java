@@ -87,7 +87,19 @@ public interface ConsoleManager extends KeyboardListener, PointerListener {
      * @param console
      */
     public void focus(Console console);
-    
+
+    /**
+     * Return the parent of this console manager.
+     * @return
+     */
+    public ConsoleManager getParent();
+
+    /**
+     * Set the parent of this console manager.
+     * @param parent
+     */
+    public void setParent(ConsoleManager parent);
+
     /**
      * Option constants for use in {@link #createConsole(String, int)}
      * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -95,10 +107,10 @@ public interface ConsoleManager extends KeyboardListener, PointerListener {
     public static final class CreateOptions {
         /** Create a text console */
         public static final int TEXT = 0x01;
-        
+
         /** Create a scrollable console */
-        public static final int SCROLLABLE = 0x02;      
-        
+        public static final int SCROLLABLE = 0x02;
+
         /** Do not claim System.out, err, in when focused */
         public static final int NO_SYSTEM_OUT_ERR_IN = 0x04;
     }
