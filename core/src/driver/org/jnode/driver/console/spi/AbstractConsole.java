@@ -34,7 +34,7 @@ import org.jnode.system.event.FocusEvent;
 /**
  * @author epr
  */
-public class AbstractConsole implements Console {
+public abstract class AbstractConsole implements Console {
 
     private final ArrayList<KeyboardListener> keyboardListeners = new ArrayList<KeyboardListener>();
 
