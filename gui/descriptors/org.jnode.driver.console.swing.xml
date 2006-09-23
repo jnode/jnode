@@ -8,7 +8,8 @@
         license-name="lgpl">
         
   <requires>
-    <import plugin="org.jnode.driver.textscreen.core"/>
+    <import plugin="org.jnode.driver.console.textscreen"/>
+    <import plugin="org.jnode.driver.textscreen.swing"/>
   </requires>
   
     <extension point="org.jnode.security.permissions">
@@ -21,5 +22,9 @@
       <export name="org.jnode.driver.console.swing.*"/>
     </library>
   </runtime>
-        
+
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.util.PropertyPermission" name="gnu.awt.dispatchthread.priority" actions="read"/>
+    <permission class="java.awt.AWTPermission" name="listenToAllAWTEvents"/>
+  </extension>
 </plugin>
