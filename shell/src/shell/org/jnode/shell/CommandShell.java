@@ -28,7 +28,11 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.PrintStream;
 import java.io.StringReader;
+import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.StringTokenizer;
@@ -36,7 +40,6 @@ import java.util.StringTokenizer;
 import javax.naming.NameNotFoundException;
 
 import org.apache.log4j.Logger;
-import org.jnode.driver.console.Console;
 import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.TextConsole;
 import org.jnode.driver.input.KeyboardEvent;
@@ -124,7 +127,11 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 
     private DefaultCommandInvoker defaultCommandInvoker;
 
-    public Console getConsole() {
+    private boolean historyEnabled = true;
+
+    private boolean exitted = false;
+
+    public TextConsole getConsole() {
         return console;
     }
     
@@ -208,9 +215,22 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
             }
         }
 
+        final String user_home = (String) AccessController.doPrivileged(new GetPropertyAction("user.home", ""));
+        AccessController.doPrivileged(new PrivilegedAction() {
+            public Object run() {
+                try {
+                    final File shell_ini = new File(user_home + "/shell.ini");
+                    if(shell_ini.exists())
+                    executeFile(shell_ini);
+                } catch(IOException ioe){
+                    ioe.printStackTrace();
+                }
+                return null;
+            }
+        });
+
         // Now become interactive
-        boolean halt = false;
-        while (!halt) {
+        while (!isExitted()) {
             try {
                 synchronized (this) {
                     // Catch keyboard events
@@ -230,12 +250,12 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
                         processCommand(line);
                     }
 
-                    if (VmSystem.isShuttingDown()) {
-                        halt = true;
-                    }
-
                     // if (currentLine.trim().equals("halt")) halt = true;
                     historyIndex = -1;
+
+                    if (VmSystem.isShuttingDown()) {
+                        exitted = true;
+                    }
                 }
 
             } catch (Throwable ex) {
@@ -598,7 +618,7 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 
     public void addCommandToHistory(String cmdLineStr) {
         // Add this command to the history.
-        if (!cmdLineStr.equals(newestLine))
+        if (isHistoryEnabled() && !cmdLineStr.equals(newestLine))
             history.addCommand(cmdLineStr);
     }
 
@@ -608,6 +628,45 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 
     public DefaultCommandInvoker getDefaultCommandInvoker() {
         return defaultCommandInvoker;
+    }
+
+    public void executeFile(File file) throws IOException {
+        if(!file.exists()){
+            System.err.println( "File does not exist: " + file);
+            return;
+        }
+        try{
+            setHistoryEnabled(false);
+            final BufferedReader br = new BufferedReader(new FileReader(file));
+            for(String line = br.readLine(); line != null; line = br.readLine()){
+                line = line.trim();
+
+                if(line.startsWith("#") || line.equals(""))
+                    continue;
+
+                invokeCommand(line);
+            }
+            br.close();
+        }finally{
+            setHistoryEnabled(true);
+        }
+    }
+
+    public void exit(){
+        exitted = true;
+        console.close();
+    }
+
+    private synchronized boolean isExitted(){
+        return exitted;
+    }
+
+    private boolean isHistoryEnabled() {
+        return historyEnabled;
+    }
+
+    private void setHistoryEnabled(boolean historyEnabled) {
+        this.historyEnabled = historyEnabled;
     }
 }
 
