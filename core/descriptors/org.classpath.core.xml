@@ -47,6 +47,7 @@
       <export name="gnu.java.rmi.dgc.*"/>
       <export name="gnu.java.rmi.registry.*"/>
       <export name="gnu.java.rmi.server.*"/>
+      <export name="gnu.java.rmi.activation.*"/>
       <export name="gnu.java.security.*"/>
       <export name="gnu.java.security.action.*"/>
       <export name="gnu.java.security.ber.*"/>
