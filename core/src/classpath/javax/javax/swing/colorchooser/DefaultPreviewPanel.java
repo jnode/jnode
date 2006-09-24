@@ -294,6 +294,7 @@ class DefaultPreviewPanel extends JPanel
    * @return The preferred size of the default preview panel.
    */
 
+// @classpath-bugfix 21/9/2006 Martin Husted Hartvig (hagar@jnode.org) :
 /*
   public Dimension getPreferredSize()
   {
@@ -320,4 +321,5 @@ TODO g is null resulting in a null pointer exception in the next line. Untill we
                          height + insets.top + insets.bottom);
   }
   */
+// @classpath-bugfix-end
 }
