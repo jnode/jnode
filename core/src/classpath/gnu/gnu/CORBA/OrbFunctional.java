@@ -938,12 +938,14 @@ public class OrbFunctional extends OrbRestricted
 
   /**
    * Start the ORBs main working cycle (receive invocation - invoke on the local
-   * object - send response - wait for another invocation).
-   *
-   * The method only returns after calling {@link #shutdown(boolean)}.
+   * object - send response - wait for another invocation). The method only
+   * returns after calling {@link #shutdown(boolean)}.
    */
   public void run()
   {
+    CollocatedOrbs.registerOrb(this);
+    try
+      {
     running = true;
 
     // Instantiate the port server for each socket.
@@ -966,10 +968,10 @@ public class OrbFunctional extends OrbRestricted
         else
           subserver = (portServer) identities.get(obj.identity);
         
-        if (!subserver.isAlive())
+            if (! subserver.isAlive())
           {
             // Reuse the current thread for the last portServer.
-            if (!iter.hasNext())
+                if (! iter.hasNext())
               {
                 // Discard the iterator, eliminating lock checks.
                 iter = null;
@@ -979,6 +981,11 @@ public class OrbFunctional extends OrbRestricted
             else
               subserver.start();
           }
+      }
+  }
+    finally
+      {
+        CollocatedOrbs.unregisterOrb(this);
       }
   }
   
@@ -1051,6 +1058,11 @@ public class OrbFunctional extends OrbRestricted
     org.omg.CORBA.Object object = find_local_object(ior);
     if (object == null)
       {
+        // Check maybe the local object on another ORB, but same VM.
+        object = CollocatedOrbs.searchLocalObject(ior);
+        if (object == null)
+          {
+            // Surely remote object.
         ObjectImpl impl = StubLocator.search(this, ior);
         try
           {
@@ -1065,8 +1077,7 @@ public class OrbFunctional extends OrbRestricted
           }
 
         object = impl;
-        // TODO remove commented out code below.
-        // connected_objects.add(ior.key, impl, ior.Internet.port, null);
+          }
       }
     return object;
   }
@@ -1239,15 +1250,10 @@ public class OrbFunctional extends OrbRestricted
       }
     if (ior.Id == null)
       ior.Id = ref.object.getClass().getName();
-    try
-      {
-        ior.Internet.host = InetAddress.getLocalHost().getHostAddress();
+
+    ior.Internet.host = CollocatedOrbs.localHost;
         ior.Internet.port = ref.port;
-      }
-    catch (UnknownHostException ex)
-      {
-        throw new BAD_OPERATION("Cannot resolve the local host address");
-      }
+
     return ior;
   }
 
