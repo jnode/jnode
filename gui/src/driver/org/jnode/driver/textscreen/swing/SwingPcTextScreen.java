@@ -1,34 +1,37 @@
 package org.jnode.driver.textscreen.swing;
 
-import org.jnode.driver.textscreen.x86.AbstractPcTextScreen;
-import org.jnode.driver.textscreen.TextScreen;
-import org.jnode.driver.Device;
 import org.jnode.driver.Bus;
-import org.jnode.driver.DriverException;
+import org.jnode.driver.Device;
 import org.jnode.driver.Driver;
-import org.jnode.driver.input.KeyboardEvent;
+import org.jnode.driver.DriverException;
 import org.jnode.driver.input.KeyboardAPI;
-import org.jnode.driver.input.KeyboardListener;
+import org.jnode.driver.input.KeyboardEvent;
 import org.jnode.driver.input.KeyboardInterpreter;
+import org.jnode.driver.input.KeyboardListener;
+import org.jnode.driver.textscreen.TextScreen;
+import org.jnode.driver.textscreen.x86.AbstractPcTextScreen;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import java.awt.Font;
+import javax.swing.KeyStroke;
 import java.awt.AWTEvent;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.FontMetrics;
-import java.awt.Dimension;
-import java.awt.GraphicsEnvironment;
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A Swing based emulator for PcTextScreen.
+ *
  * @author Levente S\u00e1ntha
  */
 public class SwingPcTextScreen extends AbstractPcTextScreen {
@@ -68,7 +71,7 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
         });
     }
 
-    public void close(){
+    public void close() {
         frame.dispose();
     }
 
@@ -85,6 +88,9 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
             enableEvents(AWTEvent.KEY_EVENT_MASK);
             setFocusable(true);
             setBackground(Color.BLACK);
+            Set ftk = new HashSet(getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
+            ftk.remove(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0));
+            setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, ftk);
         }
 
         protected void paintComponent(Graphics g) {
@@ -115,7 +121,8 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
             h = fm.getHeight() + 1;
             */
 
-            w = 7; h = 15;
+            w = 7;
+            h = 15;
             screen.setSize(screen.getMaximumSize());
         }
 
