@@ -17,35 +17,32 @@
       <export name="gnu.classpath.tools.appletviewer.*"/>
       <export name="gnu.classpath.tools.common.*"/>
       <export name="gnu.classpath.tools.getopt.*"/>
-      <export name="gnu.classpath.tools.giop.*"/>
-      <export name="gnu.classpath.tools.giop.grmic.*"/>
-      <export name="gnu.classpath.tools.giop.grmic.templates.*"/>
-      <export name="gnu.classpath.tools.giop.nameservice.*"/>
       <export name="gnu.classpath.tools.jar.*"/>
       <export name="gnu.classpath.tools.jarsigner.*"/>
       <export name="gnu.classpath.tools.keytool.*"/>
       <export name="gnu.classpath.tools.native2ascii.*"/>
-      <export name="gnu.classpath.tools.rmi.*"/>
-      <export name="gnu.classpath.tools.rmi.registry.*"/>
-      <export name="gnu.classpath.tools.rmi.rmic.*"/>
-      <export name="gnu.classpath.tools.rmi.rmic.templates.*"/>
-      <export name="gnu.classpath.tools.rmi.rmid.*"/>
+      <export name="gnu.classpath.tools.orbd.*"/>
+      <export name="gnu.classpath.tools.rmid.*"/>
+      <export name="gnu.classpath.tools.rmiregistry.*"/>
+      <!--export name="gnu.classpath.tools.rmic.*"/-->
       <export name="gnu.classpath.tools.serialver.*"/>
+      <export name="gnu.classpath.tools.tnameserv.*"/>
 
     </library>
   </runtime>
 
   <extension point="org.jnode.shell.aliases">
     <alias name="appletviewer" class="gnu.classpath.tools.appletviewer.Main"/>
-    <alias name="tnameserv" class="gnu.classpath.tools.giop.NameService"/>
     <alias name="jar" class="gnu.classpath.tools.jar.Main"/>
     <alias name="jarsigner" class="gnu.classpath.tools.jarsigner.Main"/>
     <alias name="keytool" class="gnu.classpath.tools.keytool.Main"/>
     <alias name="native2ascii" class="gnu.classpath.tools.native2ascii.Native2ASCII"/>
-    <alias name="rmic" class="gnu.classpath.tools.rmi.RMIC"/>
-    <alias name="rmid" class="gnu.classpath.tools.rmi.RMID"/>
-    <alias name="rmiregistry" class="gnu.classpath.tools.rmi.REGISTRY"/>
+    <alias name="orbd" class="gnu.classpath.tools.orbd.Main"/>
+    <!--alias name="rmic" class="gnu.classpath.tools.rmi.RMIC"/-->
+    <alias name="rmid" class="gnu.classpath.tools.rmid.Main"/>
+    <alias name="rmiregistry" class="gnu.classpath.tools.rmiregistry.Main"/>
     <alias name="serialver" class="gnu.classpath.tools.serialver.SerialVer"/>
+    <alias name="tnameserv" class="gnu.classpath.tools.tnameserv.Main"/>  
   </extension>
   
   <extension point="org.jnode.security.permissions">
