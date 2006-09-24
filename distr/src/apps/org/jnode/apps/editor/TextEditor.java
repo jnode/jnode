@@ -168,7 +168,6 @@ public class TextEditor implements KeyboardListener {
                                 }
                             } else if(cx < mx())
                                 l.deleteCharAt(ox());
-                            updateScreen();
                             break out;
                         }
                         case KeyEvent.VK_BACK_SPACE: {
@@ -186,7 +185,6 @@ public class TextEditor implements KeyboardListener {
                                 fx --;
                                 l.deleteCharAt(ox());
                             }
-                            updateScreen();
                             break out;
                         }
 
