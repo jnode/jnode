@@ -14,6 +14,7 @@ import org.jnode.driver.textscreen.x86.AbstractPcTextScreen;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -63,8 +64,12 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
                 frame.setLayout(new BorderLayout());
                 frame.add(screen, BorderLayout.CENTER);
                 frame.pack();
-                frame.setVisible(true);
-                screen.requestFocus();
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        frame.setVisible(true);
+                        screen.requestFocus();
+                    }
+                });
 
                 return null;
             }
@@ -211,9 +216,14 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
 
     }
 
+    Runnable repaintCmd = new Runnable() {
+        public void run() {
+            screen.repaint();
+        }
+    };
 
     public void sync() {
-        screen.repaint();
+        SwingUtilities.invokeLater(repaintCmd);
     }
 
     public void setCursor(int x, int y) {
