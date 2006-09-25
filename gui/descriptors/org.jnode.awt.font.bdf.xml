@@ -27,4 +27,10 @@
   <extension point="org.jnode.awt.font.providers">
     <mapper class="org.jnode.awt.font.bdf.BDFFontProvider"/>
   </extension>
+
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.lang.reflect.ReflectPermission" name="suppressAccessChecks"/>
+    <permission class="java.util.PropertyPermission" name="jnode.font.renderer" actions="read"/>
+  </extension>
+
 </fragment>
