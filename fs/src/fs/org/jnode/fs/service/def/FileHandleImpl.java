@@ -26,6 +26,7 @@ import java.io.VMOpenMode;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 
+import org.apache.log4j.Logger;
 import org.jnode.fs.FSFile;
 import org.jnode.java.io.VMFileHandle;
 
@@ -60,6 +61,13 @@ final class FileHandleImpl implements VMFileHandle {
 		this.readOnly = (mode == VMOpenMode.READ);
 		this.fhm = fhm;
 		this.closed = false;
+
+		// WRITE only mode, i.e. NOT APPEND mode. Thus we have to set the filesize to 0
+		if (!mode.canRead() && mode.canWrite()) {
+			try {
+				file.setLength(0);
+			} catch (IOException e) {}
+	    }
 	}
 
 	/**
@@ -81,6 +89,8 @@ final class FileHandleImpl implements VMFileHandle {
 	 * @throws IOException
 	 */
 	public synchronized void setLength(long length) throws IOException {
+		System.err.println("FileHandleImpl.setLength(" + length + ");");
+
 		if (closed) {
 			throw new IOException("File closed");
 		}
@@ -88,10 +98,12 @@ final class FileHandleImpl implements VMFileHandle {
 			throw new IOException("Cannot write");
 		}
 		file.setLength(length);
-		if (length > fileOffset) {
+        //todo check this
+        //if (length > fileOffset) {
 			fileOffset = length;
+		//}
 		}
-	}
+
 
 	/**
 	 * Gets the current position in the file
