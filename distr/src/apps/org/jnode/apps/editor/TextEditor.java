@@ -62,22 +62,22 @@ public class TextEditor implements KeyboardListener {
 
     public void loadFile(File f)  throws IOException {
         ls.clear();
-        if(!f.exists()) return;
-
-        BufferedReader br = new BufferedReader(new FileReader(f));
-        int c;
-        StringBuilder sb = new StringBuilder();
-        while((c = br.read()) != -1){
-            if(c == '\n'){
-                sb.append((char) c);
-                ls.add(sb);
-                sb = new StringBuilder();
-            } else {
-                sb.append((char) c);
+        if(f.exists()){
+            BufferedReader br = new BufferedReader(new FileReader(f));
+            int c;
+            StringBuilder sb = new StringBuilder();
+            while((c = br.read()) != -1){
+                if(c == '\n'){
+                    sb.append((char) c);
+                    ls.add(sb);
+                    sb = new StringBuilder();
+                } else {
+                    sb.append((char) c);
+                }
             }
+            if(sb.length() > 0)
+                ls.add(sb);
         }
-        if(sb.length() > 0)
-            ls.add(sb);
 
         file = f;
         updateScreen();
@@ -103,13 +103,6 @@ public class TextEditor implements KeyboardListener {
                    e.printStackTrace();
                 }
                 return null;
-
-                /*
-                FileWriter fw = new FileWriter(file);
-                    fw.write(textArea.getText());
-                    fw.flush();
-                    fw.close();
-                    */
             }
         });
     }
@@ -141,7 +134,7 @@ public class TextEditor implements KeyboardListener {
                 case KeyEvent.VK_END: { if(my() < cym) cy = my(); else {cy = cym; fy = my() - cy;}; end(); break;}
                 case KeyEvent.VK_Y: { ls.remove(oy()); if(oy() > my()) cy --; break;}
                 case KeyEvent.VK_S: { saveFile(); break;}
-                case KeyEvent.VK_X: { console.getManager().unregisterConsole(console); break;}
+                case KeyEvent.VK_Q: { console.getManager().unregisterConsole(console); break;}
 
             }
         else
@@ -156,7 +149,7 @@ public class TextEditor implements KeyboardListener {
                 case KeyEvent.VK_PAGE_DOWN: {if(my() - fy > cym) fy +=cym; break;}
                 default:
                     char c = e.getKeyChar();
-                    if(c == 0) return;
+                    if(c == 0 && k != KeyEvent.VK_DELETE) return;
                     if(cy == ls.size()) ls.add(new StringBuilder());
                     StringBuilder l = ls.get(oy());
                     switch(k){
