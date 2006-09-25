@@ -239,7 +239,9 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
     
     private FontProvider getFirstProvider()
     {
-        final String firstProviderName = (String)AccessController.doPrivileged(new GetPropertyAction("jnode.font.renderer", "ttf"));
+// todo fix true type font
+//        final String firstProviderName = (String)AccessController.doPrivileged(new GetPropertyAction("jnode.font.renderer", "ttf"));
+        final String firstProviderName = (String)AccessController.doPrivileged(new GetPropertyAction("jnode.font.renderer", "bdf"));
         if((firstProvider == null) || ((firstProvider != null) && !firstProviderName.equals(firstProvider.getName())))
         {
             for (FontProvider prv : providers.values()) {
