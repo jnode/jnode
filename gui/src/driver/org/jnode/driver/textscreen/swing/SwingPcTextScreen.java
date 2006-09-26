@@ -86,8 +86,9 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
         int h;
 
         {
-            //Font font = new Font("-FontForge-Bitstream Vera Sans Mono-Book-R-Normal-SansMono--12-120-75-75-P-69-ISO10646", Font.PLAIN, 12);
-            Font font = new Font("-FontForge-Bitstream Vera Sans Mono-Book-R-Normal-SansMono--12-120-75-75-P-69-FontSpecific", Font.PLAIN, 12);
+            Font font = new Font("-FontForge-Bitstream Vera Sans Mono-Book-R-Normal-SansMono--12-120-75-75-P-69-ISO10646", Font.PLAIN, 12);
+            //Font font = new Font("-FontForge-Bitstream Vera Sans Mono-Book-R-Normal-SansMono--12-120-75-75-P-69-FontSpecific", Font.PLAIN, 12);
+            //Font font = new Font("-FontForge-Bitstream Vera Sans Mono-Book-R-Normal-SansMono--14-100-100-100-P-79-FontSpecific", Font.PLAIN, 12);
             //Font font = Font.decode("MONOSPACED-PLAIN-14");
             setFont(font);
             enableEvents(AWTEvent.KEY_EVENT_MASK);
@@ -96,6 +97,7 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
             Set ftk = new HashSet(getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
             ftk.remove(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0));
             setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, ftk);
+            java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
         }
 
         protected void paintComponent(Graphics g) {
