@@ -97,7 +97,6 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
             Set ftk = new HashSet(getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
             ftk.remove(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0));
             setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, ftk);
-            java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
         }
 
         protected void paintComponent(Graphics g) {
