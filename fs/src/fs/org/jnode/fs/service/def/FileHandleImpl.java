@@ -66,7 +66,10 @@ final class FileHandleImpl implements VMFileHandle {
 		if (!mode.canRead() && mode.canWrite()) {
 			try {
 				file.setLength(0);
-			} catch (IOException e) {}
+			} catch (IOException e) {
+                //todo improve it - RuntimeException is not the best choice here
+                throw new RuntimeException(e);
+            }
 	    }
 	}
 
