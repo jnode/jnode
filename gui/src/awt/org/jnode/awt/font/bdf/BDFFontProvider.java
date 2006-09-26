@@ -51,7 +51,7 @@ public class BDFFontProvider extends AbstractFontProvider {
 	}
 	
 	/** All system fonts */
-	private static final String SYSTEM_FONTS[] = { "Vera-10.bdf", "Vera-12.bdf", "Vera-14.bdf", "VeraMono-12-1.bdf" };
+	private static final String SYSTEM_FONTS[] = { "Vera-10.bdf", "Vera-12.bdf", "Vera-14.bdf", "VeraMono-12-8.bdf" };
 	
 	public BDFFontProvider()
 	{
