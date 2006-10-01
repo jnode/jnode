@@ -22,6 +22,6 @@
   </extension>
   
   <extension point="org.jnode.shell.aliases">
-      <alias name="leed"  class="org.jnode.apps.editor.TextEditor"/>
+      <alias name="leed"  class="org.jnode.apps.editor.LeedCommand"/>
   </extension>
 </plugin>
