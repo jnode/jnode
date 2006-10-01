@@ -68,6 +68,7 @@ public class TaskBar extends JPanel {
     JMenuItem changeResMI2;
     JMenuItem changeResMI3;
     JMenuItem changeResMI4;
+    Clock clock;
 
     public TaskBar(ExtensionPoint appsEP) {
         BorderLayout layout = new BorderLayout();
@@ -106,6 +107,11 @@ public class TaskBar extends JPanel {
         gamesMenu.add(createMenuItem("Tetris", "org.jnode.test.gui.Tetris"));
         gamesMenu.add(createMenuItem("BoxWorld", "org.jnode.test.gui.BoxWorld"));
         gamesMenu.add(createMenuItem("Rubik", "org.jnode.test.gui.Rubik"));
+
+        JMenu toolsMenu = new JMenu("Tools");
+        startMenu.add(toolsMenu);
+
+        toolsMenu.add(createMenuItem("Console", "org.jnode.apps.console.SwingConsole"));
 
         JMenu settingsMenu = new JMenu("Settings");
         startMenu.add(settingsMenu);
@@ -169,7 +175,8 @@ public class TaskBar extends JPanel {
         exitMenu.add(haltMI = new JMenuItem("Halt"));
         windowBar = new WindowBar();
         add(windowBar, BorderLayout.CENTER);
-        add(new Clock(), BorderLayout.EAST);
+        clock = new Clock();
+        add(clock, BorderLayout.EAST);
     }
 
     private JMenuItem createMenuItem(final String label, final String classname) {
@@ -212,11 +219,11 @@ public class TaskBar extends JPanel {
         }
     }
 
-    private static class Clock extends JLabel {
-        Timer timer;
-        TimerTask task;
+    static class Clock extends JLabel {
+        private Timer timer;
+        private TimerTask task;
 
-        public Clock() {
+        Clock() {
             setBorder(new EmptyBorder(1, 1, 1, 5));
             timer = new Timer(true);
             startTimer();
@@ -253,6 +260,10 @@ public class TaskBar extends JPanel {
                     });
                 }
             }, 0, 60 * 1000);
+        }
+
+        void stop(){
+            timer.cancel();
         }
     }
 }
