@@ -25,6 +25,8 @@ import java.util.ArrayList;
 
 import org.jnode.driver.console.Console;
 import org.jnode.driver.console.ConsoleManager;
+import org.jnode.driver.console.ConsoleListener;
+import org.jnode.driver.console.ConsoleEvent;
 import org.jnode.driver.input.KeyboardEvent;
 import org.jnode.driver.input.KeyboardListener;
 import org.jnode.driver.input.PointerEvent;
@@ -39,6 +41,8 @@ public abstract class AbstractConsole implements Console {
     private final ArrayList<KeyboardListener> keyboardListeners = new ArrayList<KeyboardListener>();
 
     private final ArrayList<PointerListener> pointerListeners = new ArrayList<PointerListener>();
+
+    private final ArrayList<ConsoleListener> consoleListeners = new ArrayList<ConsoleListener>();
 
     private final String consoleName;
 
@@ -132,6 +136,45 @@ public abstract class AbstractConsole implements Console {
     }
 
     /**
+     * @param l
+     * @see org.jnode.driver.console.Console#addConsoleListener(org.jnode.driver.console.ConsoleListener)
+     */
+    public void addConsoleListener(ConsoleListener l) {
+        synchronized (consoleListeners) {
+            if (!consoleListeners.contains(l)) {
+                consoleListeners.add(l);
+            }
+        }
+    }
+
+    /**
+     * @param l
+     * @see org.jnode.driver.console.Console#removeConsoleListener(org.jnode.driver.console.ConsoleListener)
+     */
+    public void removeConsoleListener(ConsoleListener l) {
+        synchronized (consoleListeners) {
+            consoleListeners.remove(l);
+        }
+    }
+
+    /**
+     * Dispatch a given keyboard event to all known listeners.
+     *
+     * @param event
+     */
+    protected void dispatchConsoleEvent(ConsoleEvent event) {
+        if (event.isConsumed()) {
+            return;
+        }
+
+        synchronized (consoleListeners) {
+            for (ConsoleListener l : consoleListeners) {
+                l.consoleClosed(event);
+            }
+        }
+    }
+
+    /**
      * @param event
      * @see org.jnode.driver.input.KeyboardListener#keyPressed(org.jnode.driver.input.KeyboardEvent)
      */
@@ -208,6 +251,7 @@ public abstract class AbstractConsole implements Console {
      */
     public void close() {
         mgr.unregisterConsole(this);
+        dispatchConsoleEvent(new ConsoleEvent(this));
     }
 
     public void setAcceleratorKeyCode(int keyCode) {
