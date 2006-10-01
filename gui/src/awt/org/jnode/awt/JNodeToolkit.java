@@ -366,10 +366,14 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
             this.keyboardHandler = null;
             this.mouseHandler = null;
 
-            // Shutdown the eventqueue
+            // Shutdown the eventqueue as the last event
             final JNodeEventQueue eventQueue = this._eventQueue;
             if (eventQueue != null) {
-                eventQueue.shutdown();
+                EventQueue.invokeLater(new Runnable() {
+                    public void run() {
+                        eventQueue.shutdown();
+                    }
+                });
             }
 
             synchronized (initCloseLock) {
@@ -639,7 +643,6 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
         if ((_eventQueue == null) || (!_eventQueue.isLive() && isGuiActive())) {
             synchronized (this) {
                 if ((_eventQueue == null) || (!_eventQueue.isLive() && isGuiActive())) {
-                    log.debug("create EventQueue", new Exception("Stacktrace"));
                     _eventQueue = new JNodeEventQueue();
                 }
             }
