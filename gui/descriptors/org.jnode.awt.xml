@@ -28,6 +28,8 @@
     <permission class="java.security.AllPermission"/>
     <permission class="java.util.PropertyPermission" name="jnode.awt.device" actions="read,write"/>
     <permission class="java.util.PropertyPermission" name="jnode.desktop" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="gnu.awt.dispatchthread.priority" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="gnu.javax.swing.DebugGraphics" actions="read"/>  
   </extension>
         
 </plugin>
