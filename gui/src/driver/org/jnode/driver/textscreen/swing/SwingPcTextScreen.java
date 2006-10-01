@@ -38,46 +38,29 @@ import java.util.Set;
 public class SwingPcTextScreen extends AbstractPcTextScreen {
     private static final int SCREEN_WIDTH = 80;
     private static final int SCREEN_HEIGHT = 25;
-    private JFrame frame;
     char[] buffer;
     private int cursorOffset;
     private JComponent screen;
     private MyKeyboardDriver keyboardDriver = null;
     private Device keyboardDevice;
+    private KeyAdapter keyListener;
 
     public SwingPcTextScreen() {
         super(SCREEN_WIDTH, SCREEN_HEIGHT);
         buffer = new char[SCREEN_WIDTH * SCREEN_HEIGHT];
+        for (int i = 0; i < buffer.length; i ++) {
+            buffer[i] = ' ';
+        }
 
-        AccessController.doPrivileged(new PrivilegedAction() {
-            public Object run() {
-                screen = new SwingPcScreen();
-                for (int i = 0; i < buffer.length; i ++) {
-                    buffer[i] = ' ';
-                }
-                /*
-                for (String s : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()) {
-                    System.out.println(s);
-                }
-                */
-                frame = new JFrame("Console");
-                frame.setLayout(new BorderLayout());
-                frame.add(screen, BorderLayout.CENTER);
-                frame.pack();
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        frame.setVisible(true);
-                        screen.requestFocus();
-                    }
-                });
-
-                return null;
-            }
-        });
+        screen = new SwingPcScreen();
     }
 
-    public void close() {
-        frame.dispose();
+    public void close(){
+        screen.removeKeyListener(keyListener);
+    }
+
+    public JComponent getScreenComponent(){
+        return screen;
     }
 
     private class SwingPcScreen extends JComponent {
@@ -144,7 +127,7 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
     public Device getKeyboardDevice() {
         if (keyboardDevice == null) {
             keyboardDriver = new MyKeyboardDriver();
-            screen.addKeyListener(new KeyAdapter() {
+            keyListener = new KeyAdapter() {
                 public void keyPressed(KeyEvent e) {
                     char c = e.getKeyChar();
                     if (c == KeyEvent.CHAR_UNDEFINED) c = 0;
@@ -161,7 +144,8 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
                             e.getWhen(), e.getModifiersEx(), e.getKeyCode(), c);
                     keyboardDriver.dispatchEvent(k);
                 }
-            });
+            };
+            screen.addKeyListener(keyListener);
             keyboardDevice = new Device(new Bus((Bus) null) {
             }, "");
             try {
