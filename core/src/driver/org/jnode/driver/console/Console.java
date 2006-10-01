@@ -87,6 +87,21 @@ public interface Console extends FocusListener, KeyboardListener,
      * @param l
      */
     public void removePointerListener(PointerListener l);
+
+    /**
+     * Add a console listener
+     *
+     * @param l
+     */
+    public void addConsoleListener(ConsoleListener l);
+
+    /**
+     * Remove a console listener
+     *
+     * @param l
+     */
+    public void removeConsoleListener(ConsoleListener l);
+
     
     /**
      * Gets the manager this console is registered with.
