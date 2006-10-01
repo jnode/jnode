@@ -38,19 +38,19 @@ import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.security.AccessController;
 import java.util.Enumeration;
 
 import javax.swing.DefaultDesktopManager;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -92,6 +92,14 @@ public class Desktop implements Runnable {
                 final JNodeAwtContext ctx = tk.getAwtContext();
                 final JDesktopPane desktop = ctx.getDesktop();
                 final Container awtRoot = ctx.getAwtRoot();
+
+                if(ctx instanceof JFrame){
+                    ((JFrame) ctx).addWindowListener(new WindowAdapter() {
+                        public void windowClosed(WindowEvent e) {
+                            taskBar.clock.stop();
+                        }
+                    });
+                }
 
                 taskBar.startButton.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent event) {
@@ -207,7 +215,8 @@ public class Desktop implements Runnable {
                 taskBar.setPreferredSize(new Dimension(w, controlBarHeight));
                 awtRoot.add(taskBar, BorderLayout.SOUTH);
 
-                Image background = null;//loadImage("button_red_i_like.png");
+                /*
+                Image background = loadImage("button_red_i_like.png");
                 if(background != null)
                 {
                     System.err.println("IMAGE FOUND");
@@ -215,9 +224,10 @@ public class Desktop implements Runnable {
                 }
                 else
                 {
-                    System.err.println("IMAGE NOT FOUND");
-                    awtRoot.add(desktop, BorderLayout.CENTER);
-                }
+                */
+                
+                awtRoot.add(desktop, BorderLayout.CENTER);
+
 
                 awtRoot.invalidate();
                 awtRoot.repaint();
