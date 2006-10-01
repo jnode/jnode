@@ -10,12 +10,15 @@ import javax.naming.NameNotFoundException;
 
 import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.TextConsole;
+import org.jnode.driver.console.ConsoleListener;
+import org.jnode.driver.console.ConsoleEvent;
 import org.jnode.driver.input.KeyboardAdapter;
 import org.jnode.driver.input.KeyboardEvent;
 import org.jnode.driver.input.KeyboardListener;
 import org.jnode.driver.input.PointerEvent;
 import org.jnode.driver.input.PointerListener;
 import org.jnode.naming.InitialNaming;
+import org.jnode.shell.ShellManager;
 
 import charva.awt.event.KeyEvent;
 import charva.awt.event.MouseEvent;
@@ -25,7 +28,7 @@ import charva.awt.event.MouseEvent;
  * @author Levente S\u00e1ntha
  */
 public class Toolkit extends AbstractToolkit implements KeyboardListener,
-        PointerListener {
+        PointerListener, ConsoleListener {
     private static Toolkit instance = null;
 
     private int[] colorpairs = new int[256];
@@ -140,7 +143,7 @@ public class Toolkit extends AbstractToolkit implements KeyboardListener,
         instance = tk;
     }
 
-    public static Toolkit getDefaultToolkit() {
+    public static synchronized Toolkit getDefaultToolkit() {
         if (instance == null) {
             instance = createInstance();
         }
@@ -149,24 +152,22 @@ public class Toolkit extends AbstractToolkit implements KeyboardListener,
 
     private static Toolkit createInstance() {
         try {
-            ConsoleManager conMgr = (ConsoleManager) InitialNaming
-                    .lookup(ConsoleManager.NAME);
+            final ShellManager sm = InitialNaming.lookup(ShellManager.NAME);
+            final ConsoleManager conMgr = sm.getCurrentShell().getConsole().getManager();
             final TextConsole console = (TextConsole) conMgr
                     .createConsole("charva", ConsoleManager.CreateOptions.TEXT);
             console.addKeyboardListener(new KeyboardAdapter() {
                 public void keyPressed(KeyboardEvent event) {
                     if (event.isControlDown() && event.getKeyChar() == 'z') {
-                        System.err
-                                .println("got ctrl-z, unregistering Toolkit.");
+                        System.err.println("got ctrl-z, unregistering Toolkit.");
                         //maybe this will help to debug the finite-sized text
                         // area bug.
-                        instance.unregister();
+                        getDefaultToolkit().unregister();
                         event.consume();
                     }
                 }
             });
-            Toolkit tk = new Toolkit(console, conMgr);
-            return tk;
+            return new Toolkit(console, conMgr);
         } catch (NameNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -193,8 +194,17 @@ public class Toolkit extends AbstractToolkit implements KeyboardListener,
         close();
     }
 
+    public void consoleClosed(ConsoleEvent event) {
+        synchronized(Toolkit.class){
+            instance = null;
+        }
+    }
+
     public void close() {
         unregister();
+        synchronized(Toolkit.class){
+            instance = null;
+        }
         //this could kill threads, etc. But let's save 'em for if this instance
         // comes up again.
         //        System.err.println( "In close(), calling clear" );
