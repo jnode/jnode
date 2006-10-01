@@ -31,9 +31,11 @@ import javax.naming.NameNotFoundException;
 import org.jnode.driver.console.Console;
 import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.TextConsole;
+import org.jnode.driver.console.textscreen.TextScreenConsoleManager;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.ShellException;
+import org.jnode.shell.ShellManager;
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
@@ -69,8 +71,8 @@ public class ConsoleCommand {
     public static void main(String[] args) throws NameNotFoundException,
             ShellException {
 
-        final ConsoleManager conMgr = (ConsoleManager) InitialNaming
-                .lookup(ConsoleManager.NAME);
+        final ShellManager sm = InitialNaming.lookup(ShellManager.NAME);
+        final ConsoleManager conMgr = sm.getCurrentShell().getConsole().getManager();
         
         boolean listConsoles = false;
         boolean newConsole = false;
