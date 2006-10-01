@@ -147,11 +147,21 @@ public class KeyboardHandler implements
         if (key_code == KeyEvent.VK_F12 && event.isAltDown() ||
                 key_code == KeyEvent.VK_BACK_SPACE && event.isAltDown() && event.isControlDown()) {
             event.consume();
-            JNodeToolkit.stopGui();
+            AccessController.doPrivileged(new PrivilegedAction() {
+                public Object run() {
+                    JNodeToolkit.stopGui();
+                    return null;
+                }
+            });
             return true;
         } else if (key_code == KeyEvent.VK_F5 && event.isControlDown() && event.isAltDown()) {
             event.consume();
-            JNodeToolkit.refreshGui();
+            AccessController.doPrivileged(new PrivilegedAction() {
+                public Object run() {
+                    JNodeToolkit.refreshGui();
+                    return null;
+                }
+            });
             return true;
         }
         return false;
