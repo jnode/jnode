@@ -11,6 +11,7 @@
   <requires>
     <import plugin="org.jnode.driver.console.core"/>
     <import plugin="org.jnode.driver.console"/>
+    <import plugin="org.jnode.shell"/>
   </requires>
         
   <runtime>
