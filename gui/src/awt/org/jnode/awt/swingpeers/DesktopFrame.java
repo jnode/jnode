@@ -27,10 +27,12 @@ import java.awt.Color;
 import java.awt.DefaultFocusTraversalPolicy;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.beans.PropertyVetoException;
 
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 
 import org.apache.log4j.Logger;
 import org.jnode.awt.JNodeAwtContext;
@@ -91,4 +93,19 @@ public final class DesktopFrame extends JFrame implements JNodeAwtContext {
 		enableEvents(AWTEvent.WINDOW_EVENT_MASK);
 		getRootPane(); // will do set/create
 	}
+
+    public void dispose() {
+        for(JInternalFrame f : desktop.getAllFrames()){
+            try{
+                if(f instanceof SwingBaseWindow){
+                    ((SwingBaseWindow)f).target.dispose();
+                } else {
+                    f.setClosed(true);
+                }
+            } catch(PropertyVetoException e){
+                log.warn("Failed closing frame: " + f.getTitle(), e);
+            }
+        }
+        super.dispose();
+    }
 }
