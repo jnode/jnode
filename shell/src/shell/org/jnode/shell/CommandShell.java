@@ -42,6 +42,8 @@ import javax.naming.NameNotFoundException;
 import org.apache.log4j.Logger;
 import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.TextConsole;
+import org.jnode.driver.console.ConsoleListener;
+import org.jnode.driver.console.ConsoleEvent;
 import org.jnode.driver.input.KeyboardEvent;
 import org.jnode.driver.input.KeyboardListener;
 import org.jnode.naming.InitialNaming;
@@ -60,7 +62,7 @@ import org.jnode.vm.VmSystem;
  * @author epr
  * @author Fabien DUMINY
  */
-public class CommandShell implements Runnable, Shell, KeyboardListener {
+public class CommandShell implements Runnable, Shell, KeyboardListener, ConsoleListener {
 
     public static final String PROMPT_PROPERTY_NAME = "jnode.prompt";
 
@@ -131,6 +133,8 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 
     private boolean exitted = false;
 
+    private Thread ownThread;
+
     public TextConsole getConsole() {
         return console;
     }
@@ -170,6 +174,7 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
             defaultCommandInvoker = new DefaultCommandInvoker(this);
             threadCommandInvoker = new ThreadCommandInvoker(this);
             this.commandInvoker = threadCommandInvoker; // default to separate
+            this.console.addConsoleListener(this);
             // threads for commands.
             aliasMgr = ((AliasManager) InitialNaming.lookup(AliasManager.NAME))
                     .createAliasManager();
@@ -187,6 +192,7 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
      * @see java.lang.Runnable#run()
      */
     public void run() {
+        ownThread = Thread.currentThread();
         // Here, we are running in the CommandShell (main) Thread
         // so, we can register ourself as the current shell
         // (it will also be the current shell for all children Thread)
@@ -351,7 +357,8 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
      * Gets the expanded prompt
      */
     protected String prompt() {
-        String prompt = System.getProperty(PROMPT_PROPERTY_NAME);
+        String prompt = (String) AccessController.doPrivileged(
+                new GetPropertyAction(PROMPT_PROPERTY_NAME));
         final StringBuffer result = new StringBuffer();
         boolean commandMode = false;
         try {
@@ -362,10 +369,8 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
                 if (commandMode) {
                     switch (c) {
                     case 'P':
-                        result.append(new File(
-                                (String) AccessController
-                                        .doPrivileged(new GetPropertyAction(
-                                                "user.dir"))));
+                        result.append(new File((String) AccessController
+                                .doPrivileged(new GetPropertyAction("user.dir"))));
                         break;
                     case 'G':
                         result.append("> ");
@@ -653,8 +658,29 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
     }
 
     public void exit(){
-        exitted = true;
+
+        exit0();
         console.close();
+
+    }
+
+    public void consoleClosed(ConsoleEvent event) {
+        if(!exitted)
+            if(Thread.currentThread() == ownThread){
+                exit0();
+            } else {
+                synchronized(this){
+                    exit0();
+                    notifyAll();
+                }
+            }
+
+    }
+
+    private void exit0() {
+        exitted = true;
+        isActive = false;
+        threadSuspended = false;
     }
 
     private synchronized boolean isExitted(){
