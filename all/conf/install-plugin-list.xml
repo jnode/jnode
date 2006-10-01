@@ -86,4 +86,5 @@
   <plugin id="org.jnode.work"/>
 
   <plugin id="charva"/>
+  <plugin id="org.jnode.shell"/>
 </plugin-list>
