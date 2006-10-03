@@ -22,8 +22,8 @@
 package org.jnode.desktop.classic;
 
 import org.apache.log4j.Logger;
-import org.jnode.awt.JNodeToolkit;
 import org.jnode.plugin.ExtensionPoint;
+import org.jnode.awt.JNodeToolkit;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -41,7 +41,8 @@ import javax.swing.plaf.metal.DefaultMetalTheme;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.OceanTheme;
 import java.awt.BorderLayout;
-import java.awt.Component;
+import java.awt.Color;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
@@ -50,6 +51,9 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.security.AccessController;
+
+import gnu.java.security.action.SetPropertyAction;
 
 /**
  * @author Levente S\u00e1ntha
@@ -68,9 +72,11 @@ public class TaskBar extends JPanel {
     JMenuItem changeResMI2;
     JMenuItem changeResMI3;
     JMenuItem changeResMI4;
+    Desktop desktop;
     Clock clock;
 
-    public TaskBar(ExtensionPoint appsEP) {
+    public TaskBar(Desktop desk, ExtensionPoint appsEP) {
+        this.desktop = desk;
         BorderLayout layout = new BorderLayout();
         layout.setHgap(5);
         layout.setVgap(0);
@@ -115,59 +121,57 @@ public class TaskBar extends JPanel {
 
         JMenu settingsMenu = new JMenu("Settings");
         startMenu.add(settingsMenu);
-        settingsMenu.addSeparator();
-        settingsMenu.add(desktopColorMI = new JMenuItem("Desktop color"));
-        settingsMenu.add(changeResMI1 = new JMenuItem("Set to 640x480/32"));
-        settingsMenu.add(changeResMI2 = new JMenuItem("Set to 800x600/32"));
-        settingsMenu.add(changeResMI3 = new JMenuItem("Set to 1024x768/32"));
-        settingsMenu.add(changeResMI4 = new JMenuItem("Set to 1280x1024/32"));
-        settingsMenu.addSeparator();
+        JMenu resMenu = new JMenu("Screen Resolution");
+        settingsMenu.add(resMenu);
+        resMenu.add(changeResMI1 = new JMenuItem("Set to 640x480/32"));
+        resMenu.add(changeResMI2 = new JMenuItem("Set to 800x600/32"));
+        resMenu.add(changeResMI3 = new JMenuItem("Set to 1024x768/32"));
+        resMenu.add(changeResMI4 = new JMenuItem("Set to 1280x1024/32"));
+
+        changeResMI1.addActionListener(new ChangeScreenResolution("640x480/32"));
+        changeResMI2.addActionListener(new ChangeScreenResolution("800x600/32"));
+        changeResMI3.addActionListener(new ChangeScreenResolution("1024x768/32"));
+        changeResMI4.addActionListener(new ChangeScreenResolution("1280x1024/32"));
+
+        //these instances are used int the desktop popup menu
+        changeResMI1 = new JMenuItem("Set to 640x480/32");
+        changeResMI2 = new JMenuItem("Set to 800x600/32");
+        changeResMI3 = new JMenuItem("Set to 1024x768/32");
+        changeResMI4 = new JMenuItem("Set to 1280x1024/32");
+        changeResMI1.addActionListener(new ChangeScreenResolution("640x480/32"));
+        changeResMI2.addActionListener(new ChangeScreenResolution("800x600/32"));
+        changeResMI3.addActionListener(new ChangeScreenResolution("1024x768/32"));
+        changeResMI4.addActionListener(new ChangeScreenResolution("1280x1024/32"));
+        
+        JMenu lfMenu = new JMenu("Look & Feel");
+        settingsMenu.add(lfMenu);
         UIManager.LookAndFeelInfo[] lafs = UIManager.getInstalledLookAndFeels();
         for (int i = 0; i < lafs.length; ++i) {
             final UIManager.LookAndFeelInfo laf = lafs[i];
-            JMenuItem item = new JMenuItem(laf.getName());
-            item.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    try {
-                        Class c = Thread.currentThread().getContextClassLoader().loadClass(laf.getClassName());
-                        UIManager.setLookAndFeel((LookAndFeel) c.newInstance());
-                    }
-                    catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                    SwingUtilities.updateComponentTreeUI((Component) JNodeToolkit.getJNodeToolkit().getAwtContext());
-                }
-            });
-            settingsMenu.add(item);
+            String name = laf.getName();
+            if(!"Metal".equals(name)){
+                JMenuItem item = new JMenuItem(name);
+                item.addActionListener(new SetLFAction(laf));
+                lfMenu.add(item);
+            }
         }
-        settingsMenu.addSeparator();
-        JMenuItem metal_theme = new JMenuItem("Metal");
-        settingsMenu.add(metal_theme);
-        metal_theme.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
+        JMenuItem metal_theme = new JMenuItem("Metal Default");
+        lfMenu.add(metal_theme);
+        metal_theme.addActionListener(new SetLFAction(new MetalLookAndFeel()){
+            public void actionPerformed(ActionEvent e) {
                 MetalLookAndFeel.setCurrentTheme(new DefaultMetalTheme());
-                try {
-                    UIManager.setLookAndFeel(new MetalLookAndFeel());
-                } catch (UnsupportedLookAndFeelException ex) {
-                    ex.printStackTrace();
-                }
-                SwingUtilities.updateComponentTreeUI((Component) JNodeToolkit.getJNodeToolkit().getAwtContext());
+                super.actionPerformed(e);
             }
         });
-        JMenuItem ocean_theme = new JMenuItem("Ocean");
-        settingsMenu.add(ocean_theme);
-        ocean_theme.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
+        JMenuItem ocean_theme = new JMenuItem("Metal Ocean");
+        lfMenu.add(ocean_theme);
+        ocean_theme.addActionListener(new SetLFAction(new MetalLookAndFeel()){
+            public void actionPerformed(ActionEvent e) {
                 MetalLookAndFeel.setCurrentTheme(new OceanTheme());
-                try {
-                    UIManager.setLookAndFeel(new MetalLookAndFeel());
-                } catch (UnsupportedLookAndFeelException ex) {
-                    ex.printStackTrace();
-                }
-                SwingUtilities.updateComponentTreeUI((Component) JNodeToolkit.getJNodeToolkit().getAwtContext());
+                super.actionPerformed(e);
             }
         });
-
+        settingsMenu.add(desktopColorMI = new JMenuItem("Desktop color"));
         JMenu exitMenu = new JMenu("Exit");
         startMenu.add(exitMenu);
         exitMenu.add(quitMI = new JMenuItem("Quit"));
@@ -178,6 +182,72 @@ public class TaskBar extends JPanel {
         clock = new Clock();
         add(clock, BorderLayout.EAST);
     }
+
+    private class SetLFAction implements ActionListener {
+        private LookAndFeel lf;
+
+        public SetLFAction(UIManager.LookAndFeelInfo lfInfo) {
+            try {
+                Class c = Thread.currentThread().getContextClassLoader().loadClass(lfInfo.getClassName());
+                this.lf = (LookAndFeel) c.newInstance();
+            } catch (Exception e){
+                log.error("Error crating look & feel " + lfInfo, e);
+            }
+        }
+
+        public SetLFAction(LookAndFeel lf) {
+            this.lf = lf;
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            try {
+                UIManager.setLookAndFeel(lf);
+            } catch (UnsupportedLookAndFeelException ex) {
+                log.error("", ex);
+                return;
+            }
+            final Color bg_color = desktop.desktopPane.getBackground();
+            //TODO review this, Classpath plaf code is still instable failures can occure
+            //so we try to minimise the effect of a failure
+            try {
+                SwingUtilities.updateComponentTreeUI(desktop.desktopFrame);
+            }catch(Exception x){
+                log.error("", x);
+            }
+            try {
+                SwingUtilities.updateComponentTreeUI(startMenu);
+            }catch(Exception x){
+                log.error("", x);
+            }
+            try {
+                SwingUtilities.updateComponentTreeUI(desktop.desktopMenu);
+            }catch(Exception x){
+                log.error("", x);
+            }
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    desktop.desktopPane.setBackground(bg_color);
+                }
+            });
+        }
+    }
+
+    class ChangeScreenResolution implements ActionListener, Runnable {
+                    private String resolution;
+
+                    public ChangeScreenResolution(String resolution) {
+                        this.resolution = resolution;
+                    }
+
+                    public void run() {
+                        ((JNodeToolkit) Toolkit.getDefaultToolkit()).changeScreenSize(resolution);
+                        AccessController.doPrivileged(new SetPropertyAction("jnode.awt.screensize", resolution));
+                    }
+
+                    public void actionPerformed(ActionEvent event) {
+                        SwingUtilities.invokeLater(this);
+                    }
+                }
 
     private JMenuItem createMenuItem(final String label, final String classname) {
         JMenuItem mi = new JMenuItem(label);

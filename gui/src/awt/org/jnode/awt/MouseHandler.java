@@ -196,7 +196,17 @@ public class MouseHandler implements PointerListener {
         // buttons, x and y unchanged (false means relative values)
         pointerStateChanged(lastButtons, 0, 0, wheelAmt, false);
     }
-    
+
+    int getX(){ return x;}
+    int getY(){ return y;}
+
+    void setCursor(int x, int y){
+        this.x = x;
+        this.y = y;
+        if(hwCursor != null)
+            hwCursor.setCursorPosition(x, y);
+    }
+
     public void pointerStateChanged(PointerEvent event) 
     {
         pointerStateChanged(event.getButtons(), event.getX(), event.getY(), 
@@ -349,5 +359,5 @@ public class MouseHandler implements PointerListener {
           if(buttonPressed[1]) modifiers |= MouseEvent.BUTTON2_MASK;
           if(buttonPressed[2]) modifiers |= MouseEvent.BUTTON3_MASK;
           return modifiers | keyboardHandler.getModifiers();
-      }        
+      }
 }

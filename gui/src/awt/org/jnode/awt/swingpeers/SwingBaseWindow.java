@@ -33,6 +33,8 @@ import java.awt.BorderLayout;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 import javax.swing.JRootPane;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 /**
  * Base class for peer implementation that subclass {@link java.awt.Window}.
@@ -51,7 +53,7 @@ abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBase
     public SwingBaseWindow(awtT target) {
         this.target = target;
     }
-    
+
     /**
      * Initialize this instance.
      * 
@@ -145,6 +147,16 @@ abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBase
         if (target != null) {
             target.validate();
         }
+    }
+
+    public void updateUI() {
+        super.updateUI();
+        //todo review it
+        //when the laf is changed starting from the peer component
+        //we enforce the UI update of the target componet
+        //this can be dangerous, find a better solution
+        if(target != null)
+            SwingUtilities.updateComponentTreeUI(target);
     }
 
     private final class ContentPane extends JComponent {

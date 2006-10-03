@@ -71,6 +71,9 @@ public class Desktop implements Runnable {
     final static Logger log = Logger.getLogger(Desktop.class);
 
     TaskBar taskBar;
+    JPopupMenu desktopMenu;
+    JDesktopPane desktopPane;
+    JFrame desktopFrame;
 
     /**
      * @see Runnable#run()
@@ -85,12 +88,13 @@ public class Desktop implements Runnable {
                 } else {
                     throw new AWTError("Need to be loaded using a plugin classloader");
                 }
-                Desktop.this.taskBar = new TaskBar(appsEP);
+                Desktop.this.taskBar = new TaskBar(Desktop.this, appsEP);
 
 
                 final JNodeToolkit tk = JNodeToolkit.getJNodeToolkit();
                 final JNodeAwtContext ctx = tk.getAwtContext();
-                final JDesktopPane desktop = ctx.getDesktop();
+                desktopFrame = (JFrame) ctx;
+                desktopPane = ctx.getDesktop();
                 final Container awtRoot = ctx.getAwtRoot();
 
                 if(ctx instanceof JFrame){
@@ -108,7 +112,7 @@ public class Desktop implements Runnable {
                         } else {
                             Point p = taskBar.startButton.getLocationOnScreen();
                             int h = taskBar.startMenu.getPreferredSize().height;
-                            taskBar.startMenu.show(desktop, 0, p.y - h);
+                            taskBar.startMenu.show(desktopPane, 0, p.y - h);
                         }
                     }
                 });
@@ -149,7 +153,7 @@ public class Desktop implements Runnable {
                             JButton ok = new JButton("OK");
                             ok.addActionListener(new ActionListener() {
                                 public void actionPerformed(ActionEvent event) {
-                                    desktop.setBackground(colorChooser.getColor());
+                                    desktopPane.setBackground(colorChooser.getColor());
                                     frame.setVisible(false);
                                     frame.dispose();
                                 }
@@ -157,13 +161,13 @@ public class Desktop implements Runnable {
                             JButton apply = new JButton("Apply");
                             apply.addActionListener(new ActionListener() {
                                 public void actionPerformed(ActionEvent event) {
-                                    desktop.setBackground(colorChooser.getColor());
+                                    desktopPane.setBackground(colorChooser.getColor());
                                 }
                             });
                             JButton cancel = new JButton("Cancel");
                             cancel.addActionListener(new ActionListener() {
                                 public void actionPerformed(ActionEvent event) {
-                                    desktop.setBackground(oldColor);
+                                    desktopPane.setBackground(oldColor);
                                     frame.setVisible(false);
                                     frame.dispose();
                                 }
@@ -175,7 +179,7 @@ public class Desktop implements Runnable {
                             frame.add(buttons, BorderLayout.SOUTH);
                         //}
 
-                        oldColor = desktop.getBackground();
+                        oldColor = desktopPane.getBackground();
                         colorChooser.setColor(oldColor);
                         Dimension ss = Toolkit.getDefaultToolkit().getScreenSize();
                         int x = (ss.width - 500) / 2;
@@ -186,26 +190,6 @@ public class Desktop implements Runnable {
                     }
                 };
                 taskBar.desktopColorMI.addActionListener(desktopColorAction);
-                class ChangeScreenResolution implements ActionListener, Runnable {
-                    private String resolution;
-
-                    public ChangeScreenResolution(String resolution) {
-                        this.resolution = resolution;
-                    }
-
-                    public void run() {
-                        ((JNodeToolkit) Toolkit.getDefaultToolkit()).changeScreenSize(resolution);
-                        AccessController.doPrivileged(new SetPropertyAction("jnode.awt.screensize", resolution));
-                    }
-
-                    public void actionPerformed(ActionEvent event) {
-                        SwingUtilities.invokeLater(this);
-                    }
-                }
-                taskBar.changeResMI1.addActionListener(new ChangeScreenResolution("640x480/32"));
-                taskBar.changeResMI2.addActionListener(new ChangeScreenResolution("800x600/32"));
-                taskBar.changeResMI3.addActionListener(new ChangeScreenResolution("1024x768/32"));
-                taskBar.changeResMI4.addActionListener(new ChangeScreenResolution("1280x1024/32"));
 
 
                 awtRoot.removeAll();
@@ -225,18 +209,18 @@ public class Desktop implements Runnable {
                 else
                 {
                 */
-                
-                awtRoot.add(desktop, BorderLayout.CENTER);
+
+                awtRoot.add(desktopPane, BorderLayout.CENTER);
 
 
                 awtRoot.invalidate();
                 awtRoot.repaint();
 
                 // Update desktopmanager
-                desktop.setDesktopManager(new DesktopManagerImpl());
-                desktop.addContainerListener(new DesktopContainerListener());
+                desktopPane.setDesktopManager(new DesktopManagerImpl());
+                desktopPane.addContainerListener(new DesktopContainerListener());
 
-                final JPopupMenu desktopMenu = new JPopupMenu("Desktop settings");
+                desktopMenu = new JPopupMenu("Desktop settings");
                 JMenuItem desktopColor = new JMenuItem("Desktop color");
                 desktopColor.addActionListener(desktopColorAction);
                 desktopMenu.add(desktopColor);
@@ -244,21 +228,21 @@ public class Desktop implements Runnable {
                 desktopMenu.add(taskBar.changeResMI2);
                 desktopMenu.add(taskBar.changeResMI3);
                 desktopMenu.add(taskBar.changeResMI4);
-                desktop.addMouseListener(new MouseAdapter() {
+                desktopPane.addMouseListener(new MouseAdapter() {
                     public void mousePressed(MouseEvent event) {
                         if(event.getButton() == MouseEvent.BUTTON2){
                             if (desktopMenu .isShowing()) {
                                 desktopMenu .setVisible(false);
                             } else {
-                                desktopMenu.show(desktop, event.getX(), event.getY());
+                                desktopMenu.show(desktopPane, event.getX(), event.getY());
                             }
                         }
                     }
                 });
 
                 // Update
-                desktop.doLayout();
-                desktop.repaint();
+                desktopPane.doLayout();
+                desktopPane.repaint();
             }
         });
     }
