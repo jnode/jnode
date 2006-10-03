@@ -779,6 +779,9 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
         this.api = dev.getAPI();
         try {
 
+            float xs = (float) mouseHandler.getX() / (float) screenSize.width;
+            float ys = (float) mouseHandler.getY() / (float) screenSize.height;
+
             //close the old stuff
             this.graphics.close();
             this.mouseHandler.close();
@@ -793,6 +796,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
             screenSize.height = config.getConfig().getScreenHeight();
 
             this.mouseHandler = new MouseHandler(dev.getDevice(), screenSize, getSystemEventQueueImpl(), keyboardHandler);
+            mouseHandler.setCursor((int) (xs * screenSize.width), (int) (ys * screenSize.height));
             getAwtContext().adjustDesktopSize(screenSize.width, screenSize.height);
             onResize();
             return getScreenSize();
