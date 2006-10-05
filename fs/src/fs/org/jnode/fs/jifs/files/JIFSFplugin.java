@@ -67,8 +67,6 @@ public class JIFSFplugin extends JIFSFile{
 				addStringln("\t"+descr.getProviderName());
 				addStringln("State :");
 
-// todo this making jnode hang under startup, we need to find a way to solve it
-/*
 				try {
 					if (descr.getPlugin().isActive()) {
 						addStringln("\tactive");
@@ -78,10 +76,6 @@ public class JIFSFplugin extends JIFSFile{
 				} catch (PluginException PE){
 					System.err.println(PE);
 				}
-*/
-// this is part of the fast fix
-        addStringln("\tunknown");
-
 
         addStringln("Prerequisites:");
 				PluginPrerequisite[] allPreqs = descr.getPrerequisites();
