@@ -32,20 +32,11 @@ import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.ReadOnlyFileSystemException;
-import org.jnode.fs.jifs.directories.JIFSDplugins;
-import org.jnode.fs.jifs.directories.JIFSDthreads;
-import org.jnode.fs.jifs.directories.JIFSDpluginJars;
-import org.jnode.fs.jifs.files.JIFSFdevices;
-import org.jnode.fs.jifs.files.JIFSFmemory;
-import org.jnode.fs.jifs.files.JIFSFuptime;
-import org.jnode.fs.jifs.files.JIFSFversion;
 
 /**
  * @author Andreas H\u00e4nel
  */
 public class JIFSDirectory implements ExtFSEntry, FSDirectory {
-
-    private boolean root = false;
 
     private String label;
 
@@ -65,21 +56,6 @@ public class JIFSDirectory implements ExtFSEntry, FSDirectory {
     public JIFSDirectory(String name, FSDirectory parent) {
         this(name);
         this.parent = parent;
-    }
-
-    public JIFSDirectory(String name, boolean root) throws IOException {
-        this(name);
-        this.root = root;
-        // file
-        addFSE(new JIFSFuptime(this));
-        addFSE(new JIFSFmemory(this));
-        addFSE(new JIFSFversion(this));
-        addFSE(new JIFSFdevices(this));
-        // directory
-        addFSE(new JIFSDthreads(this));
-        addFSE(new JIFSDplugins(this));
-        addFSE(new JIFSDpluginJars(this));
-        addFSE(new JIFSDirectory("extended",this));
     }
 
     public void refresh() {
@@ -151,7 +127,7 @@ public class JIFSDirectory implements ExtFSEntry, FSDirectory {
     }
 
     public long getLastModified() {
-        return 0;
+        return System.currentTimeMillis();
     }
 
     public void setName(String name) {
