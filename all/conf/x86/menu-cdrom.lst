@@ -2,74 +2,70 @@
 default 0
 timeout 5
 
-
 # ---------------------------
 title JNode (default)
-kernel /jnode32.gz
-module /default.jgz
-
-# ---------------------------
-
-title JNode (default without MP)
 kernel /jnode32.gz mp=no
 module /default.jgz
 
 # ---------------------------
 title JNode (all plugins)
-kernel /jnode32.gz
-module /full.jgz
-
-# ---------------------------
-title JNode (all plugins without MP)
 kernel /jnode32.gz mp=no
 module /full.jgz
 
 # ---------------------------
 title JNode GUI (all plugins)
-kernel /jnode32.gz
-module /fullgui.jgz
-
-# ---------------------------
-title JNode GUI (all plugins without MP)
 kernel /jnode32.gz mp=no
 module /fullgui.jgz
 
 # ---------------------------
-title JNode via dhcp (default)
+title JNode (default with MP)
+kernel /jnode32.gz
+module /default.jgz
+
+# ---------------------------
+title JNode (all plugins with MP)
+kernel /jnode32.gz
+module /full.jgz
+
+# ---------------------------
+title JNode GUI (all plugins with MP)
+kernel /jnode32.gz
+module /fullgui.jgz
+
+# ---------------------------
+title JNode via dhcp (default with MP)
 dhcp
 kernel (nd)/jnode32.gz
 module (nd)/default.jgz
 
 # ---------------------------
-title JNode via dhcp (all plugins)
+title JNode via dhcp (all plugins with MP)
 dhcp
 kernel (nd)/jnode32.gz
 module (nd)/full.jgz
 
 # ---------------------------
-title JNode GUI via dhcp (all plugins)
+title JNode GUI via dhcp (all plugins with MP)
 dhcp
 kernel (nd)/jnode32.gz
 module (nd)/fullgui.jgz
 
 # ---------------------------
-title JNode Install
+title JNode tests (all plugins + tests with MP)
 kernel /jnode32.gz
-module /install.jgz
+module /tests.jgz
 
 # ---------------------------
 title JNode for AMD64 (development) (all plugins)
+kernel /jnode64.gz mp=no
+module /full.jgz
+
+# ---------------------------
+title JNode for AMD64 (development) (all plugins with MP)
 kernel /jnode64.gz
 module /full.jgz
 
 # ---------------------------
-title JNode for AMD64 (development) (all plugins without MP)
-kernel /jnode64.gz mp=no
-module /full.jgz
-
-
-# ---------------------------
-title JNode tests (all plugins + tests)
-kernel /jnode32.gz
-module /tests.jgz
-
+#title JNode Install
+#kernel /jnode32.gz
+#module /install.jgz

@@ -2,62 +2,61 @@
 default 0
 timeout 5
 
-
 # ---------------------------
 title JNode (default)
-kernel (hd0,0)/jnode32.gz
-module (hd0,0)/default.jgz
-
-# ---------------------------
-
-title JNode (default without MP)
 kernel (hd0,0)/jnode32.gz mp=no
 module (hd0,0)/default.jgz
 
 # ---------------------------
 title JNode (all plugins)
-kernel (hd0,0)/jnode32.gz
-module (hd0,0)/full.jgz
-
-# ---------------------------
-title JNode (all plugins without MP)
 kernel (hd0,0)/jnode32.gz mp=no
 module (hd0,0)/full.jgz
 
 # ---------------------------
 title JNode GUI (all plugins)
-kernel (hd0,0)/jnode32.gz
-module (hd0,0)/fullgui.jgz
-
-# ---------------------------
-title JNode GUI (all plugins without MP)
 kernel /jnode32.gz mp=no
 module /fullgui.jgz
 
 # ---------------------------
-title JNode via dhcp (default)
+title JNode (default with MP)
+kernel (hd0,0)/jnode32.gz
+module (hd0,0)/default.jgz
+
+# ---------------------------
+title JNode (all plugins with MP)
+kernel (hd0,0)/jnode32.gz
+module (hd0,0)/full.jgz
+
+# ---------------------------
+title JNode GUI (all plugins with MP)
+kernel (hd0,0)/jnode32.gz
+module (hd0,0)/fullgui.jgz
+
+# ---------------------------
+title JNode via dhcp (default with MP)
 dhcp
 kernel (nd)/jnode32.gz
 module (nd)/default.jgz
 
 # ---------------------------
-title JNode via dhcp (all plugins)
+title JNode via dhcp (all plugins with MP)
 dhcp
 kernel (nd)/jnode32.gz
 module (nd)/full.jgz
 
 # ---------------------------
-title JNode GUI via dhcp (all plugins)
+title JNode GUI via dhcp (all plugins with MP)
 dhcp
 kernel (nd)/jnode32.gz
 module (nd)/fullgui.jgz
 
 # ---------------------------
-title JNode Install
-kernel (hd0,0)/jnode32.gz
-module (hd0,0)/install.jgz
-
-# ---------------------------
-title JNode tests (all plugins + tests)
+title JNode tests (all plugins + tests with MP)
 kernel (hd0,0)/jnode32.gz
 module (hd0,0)/tests.jgz
+
+# ---------------------------
+#title JNode Install
+#kernel (hd0,0)/jnode32.gz
+#module (hd0,0)/install.jgz
+
