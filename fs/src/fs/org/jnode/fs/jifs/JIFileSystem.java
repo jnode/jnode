@@ -29,6 +29,7 @@ import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
+import org.jnode.fs.jifs.directories.JIFSDrootDir;
 
 /**
  * @author Andreas H\u00e4nel
@@ -46,11 +47,12 @@ public class JIFileSystem implements FileSystem {
 			throw new FileSystemException("JIFS can not be created as writable...");
 		}
 		this.device = device;
-		try {
-			rootDir = new JIFSDirectory(this.device.getId(), true);
-		} catch ( IOException e){
-			e.printStackTrace();
-		}
+		//try {
+			//rootDir = new JIFSDirectory(this.device.getId(), true);
+			rootDir = new JIFSDrootDir(device.getId());
+		//} catch ( IOException e){
+		//	e.printStackTrace();
+		//}
 	}
 	
 	/**

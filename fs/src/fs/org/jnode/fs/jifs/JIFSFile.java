@@ -139,7 +139,7 @@ public class JIFSFile implements ExtFSEntry, FSFile {
 	}
 	
 	public long getLastModified(){
-		return 0;
+		return System.currentTimeMillis();
 	}
 	
 	public void setName(String name){
