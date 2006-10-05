@@ -33,39 +33,42 @@ import org.jnode.plugin.PluginPrerequisite;
 
 /**
  * File, which contains information about the plugin with the same name.
- * 
+ *
  * @author Andreas H\u00e4nel
  */
 public class JIFSFplugin extends JIFSFile{
-	
+
 	public JIFSFplugin() {
-		return;		
+		return;
 	}
-	
+
 	/**
 	 * Creates a file, which contains information about a Plugin.
-	 * 
+	 *
 	 *@param name
 	 *			Name of this file <u>and</u> name of the plugin, whose information is stored in this file.
 	 *@param parent
-	 *			Parent FSEntry, in this case it is an instance of JIFSDplugins.  
+	 *			Parent FSEntry, in this case it is an instance of JIFSDplugins.
 	 */
 	public JIFSFplugin(String name, FSDirectory parent) {
 		super(name,parent);
 		refresh();
 	}
-		
+
 	public void refresh(){
 		super.refresh();
 		try{
 			final PluginManager mgr = InitialNaming.lookup(PluginManager.NAME);
 			final PluginDescriptor descr = mgr.getRegistry().getPluginDescriptor(name);
-			if (descr != null) {     
+			if (descr != null) {
 				addStringln("Name:");
 				addStringln("\t"+descr.getId());
 				addStringln("Provider:");
 				addStringln("\t"+descr.getProviderName());
 				addStringln("State :");
+
+// todo this making jnode hang under startup, we need to find a way to solve it
+/*
 				try {
 					if (descr.getPlugin().isActive()) {
 						addStringln("\tactive");
@@ -75,16 +78,20 @@ public class JIFSFplugin extends JIFSFile{
 				} catch (PluginException PE){
 					System.err.println(PE);
 				}
-				
-				addStringln("Prerequisites:");
+*/
+// this is part of the fast fix
+        addStringln("\tunknown");
+
+
+        addStringln("Prerequisites:");
 				PluginPrerequisite[] allPreqs = descr.getPrerequisites();
 				PluginPrerequisite current;
 				for (int i =0 ; i<allPreqs.length; i++){
 					current = allPreqs[i];
 					addStringln("\t"+current.getPluginId()+"\t\t"+current.getPluginVersion());
 				}
-							
-				           
+
+
 			} else {
 				isvalid = false;
 			}
