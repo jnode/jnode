@@ -10,7 +10,7 @@
 	<property name="jnode.disk.pln" value="${my-build.dir}/jnodedisk${jnode.bits}.pln" />
 	<property name="jnode.disk.geometry" value="64/16/63" />
 
-	<property name="jnode.virtual.memsize" value="384" />
+	<property name="jnode.virtual.memsize" value="512" />
 	<property name="logFile" value="${build.dir}/debugger.txt" />
 
 	<property name="grub-ver" value="grub-0.97-i386-pc" />
