@@ -250,25 +250,27 @@ public class TaskBar extends JPanel {
                 }
 
     private JMenuItem createMenuItem(final String label, final String classname) {
-        JMenuItem mi = new JMenuItem(label);
+        final JMenuItem mi = new JMenuItem(label);
         mi.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                startApp(label, classname);
+                startApp(label, classname, mi);
             }
         });
         return mi;
     }
 
-    final void startApp(final String name, final String className) {
+    final void startApp(final String name, final String className, final JMenuItem mi) {
         try {
             final Runnable runner = new Runnable() {
                 public void run() {
                     try {
+                        mi.setEnabled(false);
                         final ClassLoader cl = Thread.currentThread().getContextClassLoader();
                         final Class<?> cls = cl.loadClass(className);
                         final Method main = cls.getMethod("main", mainTypes);
                         final Object[] args = {new String[0]};
                         main.invoke(null, args);
+                        mi.setEnabled(true);
                     } catch (SecurityException ex) {
                         log.error("Security exception in starting class " + className, ex);
                     } catch (ClassNotFoundException ex) {
