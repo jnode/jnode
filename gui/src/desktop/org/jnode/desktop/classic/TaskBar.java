@@ -35,6 +35,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.LookAndFeel;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.metal.DefaultMetalTheme;
@@ -172,6 +173,14 @@ public class TaskBar extends JPanel {
             }
         });
         settingsMenu.add(desktopColorMI = new JMenuItem("Desktop color"));
+        final JCheckBoxMenuItem desktopImage = new JCheckBoxMenuItem("Desktop image");
+        desktopImage.setSelected(false);
+        desktopImage.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                desktop.enableBackgroundImage(desktopImage.isSelected());
+            }
+        });
+        settingsMenu.add(desktopImage);
         JMenu exitMenu = new JMenu("Exit");
         startMenu.add(exitMenu);
         exitMenu.add(quitMI = new JMenuItem("Quit"));
