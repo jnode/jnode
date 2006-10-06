@@ -21,8 +21,6 @@
  
 package org.jnode.desktop.classic;
 
-import gnu.java.security.action.SetPropertyAction;
-
 import java.awt.AWTError;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -32,6 +30,7 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ContainerEvent;
@@ -41,8 +40,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
 import java.net.URL;
-import java.security.AccessController;
 import java.util.Enumeration;
 
 import javax.swing.DefaultDesktopManager;
@@ -55,10 +56,12 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
+import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
 import org.jnode.awt.JNodeAwtContext;
 import org.jnode.awt.JNodeToolkit;
+import org.jnode.awt.swingpeers.DesktopFrame;
 import org.jnode.plugin.ExtensionPoint;
 import org.jnode.plugin.PluginClassLoader;
 import org.jnode.vm.VmSystem;
@@ -73,7 +76,9 @@ public class Desktop implements Runnable {
     TaskBar taskBar;
     JPopupMenu desktopMenu;
     JDesktopPane desktopPane;
-    JFrame desktopFrame;
+    //Due to this reference to DesktopFrame desktop plugin needs swingpeers
+    //todo abstract out this dependency in the future
+    DesktopFrame desktopFrame;
 
     /**
      * @see Runnable#run()
@@ -93,7 +98,7 @@ public class Desktop implements Runnable {
 
                 final JNodeToolkit tk = JNodeToolkit.getJNodeToolkit();
                 final JNodeAwtContext ctx = tk.getAwtContext();
-                desktopFrame = (JFrame) ctx;
+                desktopFrame = (DesktopFrame) ctx;
                 desktopPane = ctx.getDesktop();
                 final Container awtRoot = ctx.getAwtRoot();
 
@@ -199,16 +204,8 @@ public class Desktop implements Runnable {
                 taskBar.setPreferredSize(new Dimension(w, controlBarHeight));
                 awtRoot.add(taskBar, BorderLayout.SOUTH);
 
-                /*
-                Image background = loadImage("button_red_i_like.png");
-                if(background != null)
-                {
-                    System.err.println("IMAGE FOUND");
-                    awtRoot.add(new JLabel(new ImageIcon(background)), BorderLayout.CENTER);
-                }
-                else
-                {
-                */
+
+                //desktopFrame.setBackgroundImage(loadImage());
 
                 awtRoot.add(desktopPane, BorderLayout.CENTER);
 
@@ -299,39 +296,28 @@ public class Desktop implements Runnable {
         }
     }
 
-    public static Image loadImage(String resName)
+    void enableBackgroundImage(boolean b){
+        if(b) desktopFrame.setBackgroundImage(loadImage());
+        else desktopFrame.setBackgroundImage(null);
+        desktopPane.repaint();
+    }
+
+    static BufferedImage loadImage()
     {
-
         try {
-            System.err.println("*** loadImage ***");
-            final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-            System.err.println("cl="+cl);
-            Enumeration e = cl.getResources("/" + resName);
-            while(e.hasMoreElements())
-            {
-                System.err.println("url="+e.nextElement());
-            }
-            System.err.println("end urls");
-
-            final URL url = cl.getResource("/" + resName);
-            System.err.println("url="+url);
-            if (url != null) {
-// method 1 : generic read (with imageio api)				
-//				return ImageIO.read(url);
-
-// method 2 : direct read (with the appropriate codec)				
-//				PNGCodecHandler codec = new PNGCodecHandler();
-//				codec.read(url.openStream(), ReadType.NORMAL);
-//				return codec.getImageObject().getBufferedImage();
-            } else {
-                System.err.println("Cannot find image " + resName);
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            System.err.println("Cannot find image " + resName + ": " + ex.getMessage());
+            InputStream  in = new URL("plugin:org.jnode.desktop!/background.png").openStream();
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            byte[] buf = new byte[2048];
+            int len = 0;
+            while((len = in.read(buf)) > 0)
+                out.write(buf, 0, len);
+            ByteArrayInputStream bin = new ByteArrayInputStream(out.toByteArray());
+            BufferedImage img = ImageIO.read(bin);
+            BufferedImage ret = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            img.copyData(ret.getRaster());
+            return img;
         } catch (Throwable ex) {
-            ex.printStackTrace();
-            System.err.println("Cannot find image " + resName + ": " + ex.getMessage());
+            log.error("Error loading desktop background.", ex);
         }
 
         return null;
