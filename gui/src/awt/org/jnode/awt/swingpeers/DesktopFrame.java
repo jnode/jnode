@@ -26,7 +26,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.DefaultFocusTraversalPolicy;
 import java.awt.Dimension;
-import java.awt.Toolkit;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyVetoException;
 
 import javax.swing.JComponent;
@@ -44,8 +45,11 @@ public final class DesktopFrame extends JFrame implements JNodeAwtContext {
     private static final Color DESKTOP_BACKGROUND_COLOR = new Color(70, 130, 180);
 	private final JDesktopPane desktop;
 	private static final Logger log = Logger.getLogger(DesktopFrame.class);
-	
-	/**
+
+
+    private BufferedImage backgroundImage;
+
+    /**
      * @see java.awt.Component#repaint(long, int, int, int, int)
      */
     @Override
@@ -65,7 +69,17 @@ public final class DesktopFrame extends JFrame implements JNodeAwtContext {
 		setSize(screenSize);
         setFocusCycleRoot(true);
         setFocusTraversalPolicy(new DefaultFocusTraversalPolicy());
-        desktop = new JDesktopPane();
+        desktop = new JDesktopPane(){
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                if(backgroundImage != null){
+                    Dimension ds = desktop.getSize();
+                    int iw = backgroundImage.getWidth();
+                    int ih = backgroundImage.getHeight();
+                    g.drawImage(backgroundImage, (ds.width - iw) /2, (ds.height - ih)/2, desktop);
+                }
+            }
+        };
         desktop.setBackground(DESKTOP_BACKGROUND_COLOR);
         getContentPane().add(desktop);
 	}
@@ -108,4 +122,8 @@ public final class DesktopFrame extends JFrame implements JNodeAwtContext {
         }
         super.dispose();
     }
+
+    public void setBackgroundImage(BufferedImage backgroundImage) {
+            this.backgroundImage = backgroundImage;
+    }    
 }
