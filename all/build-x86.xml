@@ -270,7 +270,7 @@
 
 		<taskdef name="vmware" classname="org.jnode.build.VMwareBuilderTask" classpathref="cp-x86" />
 		<vmware 
-			isofile="${jnode-x86-lite.iso}"
+			isofile="${jnode-x86.iso}"
 			logFile="${logFile}"
 			memsize="${jnode.virtual.memsize}"
 		/>
