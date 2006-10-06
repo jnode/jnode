@@ -11,6 +11,7 @@
   <requires>  
     <import plugin="org.classpath.ext.imageio"/>
     <import plugin="org.jnode.awt"/>
+    <import plugin="org.jnode.awt.swingpeers"/>
   </requires>
   
   <runtime>
