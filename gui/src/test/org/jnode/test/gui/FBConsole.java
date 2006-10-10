@@ -18,7 +18,6 @@ import org.jnode.awt.font.FontProvider;
 import org.jnode.awt.font.TextRenderer;
 import org.jnode.awt.font.bdf.BDFFontProvider;
 import org.jnode.awt.image.JNodeBufferedImage;
-import org.jnode.awt.image.JNodeBufferedImageGraphics;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -50,11 +49,11 @@ public class FBConsole {
             }
 
             if(dev == null){
-                final DeviceManager dm = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
+                final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
                 dev = dm.getDevice(devId);
             }
 
-            final FrameBufferAPI api = (FrameBufferAPI) dev.getAPI(FrameBufferAPI.class);
+            final FrameBufferAPI api = dev.getAPI(FrameBufferAPI.class);
             final FrameBufferConfiguration conf = api.getConfigurations()[0];
 
             g = api.open(conf);
@@ -195,6 +194,7 @@ public class FBConsole {
             private BufferedImage bi;
             private Graphics ig;
             private Font font;
+            private boolean update;
 
             public FBScreen(Surface g) {
                 this.g = g;
@@ -203,8 +203,7 @@ public class FBConsole {
                 sw = w * FBPcTextScreen.SCREEN_WIDTH + 2 * margin;
                 bi = new JNodeBufferedImage(sw, sh, BufferedImage.TYPE_INT_ARGB);
                 ig = bi.getGraphics();
-                font = new Font("-FontForge-Bitstream Vera Sans Mono-Book-R-Normal-SansMono--12-120-75-75-P-69-FontSpecific", Font.PLAIN, 12);
-                //font = new Font("-FontForge-Bitstream Vera Sans Mono-Book-R-Normal-SansMono--12-120-75-75-P-69-ISO10646", Font.PLAIN, 12);
+                font = new Font("-FontForge-Bitstream Vera Sans Mono-Book-R-Normal-SansMono--12-120-75-75-P-69-ISO10646", Font.PLAIN, 12);
 
                 try{
                     FontProvider fm = (FontProvider) new BDFFontProvider();
@@ -217,7 +216,23 @@ public class FBConsole {
                 }catch(Exception e){
                     new RuntimeException(e);
                 }
-
+                new Thread(new Runnable() {
+                    public void run() {
+                        while(true){
+                            try{
+                                paintComponent();
+                                synchronized(FBScreen.this){
+                                    if(!update) {
+                                        update = false;
+                                        FBScreen.this.wait();
+                                    }
+                                }
+                            }catch(InterruptedException x ){
+                                break;
+                            }
+                        }
+                    }
+                }, "FBScreenUpdater").start();
             }
 
             protected void paintComponent() {
@@ -233,8 +248,11 @@ public class FBConsole {
                 g.drawCompatibleRaster(bi.getRaster(), 0, 0, 0, 0, sw, sh, Color.BLACK);
             }
 
-            public void repaint() {
-                paintComponent();
+            public synchronized void repaint() {
+                if(!update){
+                    update = true;
+                    notifyAll();
+                }
             }
         }
     }
