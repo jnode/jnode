@@ -4,28 +4,20 @@ import org.jnode.driver.Bus;
 import org.jnode.driver.Device;
 import org.jnode.driver.Driver;
 import org.jnode.driver.DriverException;
-import org.jnode.driver.input.KeyboardAPI;
-import org.jnode.driver.input.KeyboardEvent;
-import org.jnode.driver.input.KeyboardInterpreter;
-import org.jnode.driver.input.KeyboardListener;
+import org.jnode.driver.input.*;
 import org.jnode.driver.textscreen.TextScreen;
 import org.jnode.driver.textscreen.x86.AbstractPcTextScreen;
 
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import java.awt.AWTEvent;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.KeyboardFocusManager;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -44,6 +36,9 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
     private MyKeyboardDriver keyboardDriver = null;
     private Device keyboardDevice;
     private KeyAdapter keyListener;
+    private MyPointerDriver pointerDriver = null;
+    private Device pointerDevice;
+    private MouseHandler mouseListener;
 
     public SwingPcTextScreen() {
         super(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -57,6 +52,9 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
 
     public void close(){
         screen.removeKeyListener(keyListener);
+        screen.removeMouseListener(mouseListener);
+        screen.removeMouseMotionListener(mouseListener);
+        screen.removeMouseWheelListener(mouseListener);
     }
 
     public JComponent getScreenComponent(){
@@ -158,6 +156,57 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
         return keyboardDevice;
     }
 
+    private class MouseHandler extends MouseAdapter implements MouseMotionListener, MouseWheelListener {
+        public void mousePressed(MouseEvent e) {
+            //todo complete event parameters
+            PointerEvent p = new PointerEvent(0, e.getX(), e.getY(), true);
+            pointerDriver.dispatchEvent(p);
+        }
+
+        public void mouseReleased(MouseEvent e) {
+            //todo complete event parameters
+            PointerEvent p = new PointerEvent(0, e.getX(), e.getY(), true);
+            pointerDriver.dispatchEvent(p);
+        }
+
+        public void mouseDragged(MouseEvent e) {
+            //todo complete event parameters
+            PointerEvent p = new PointerEvent(0, e.getX(), e.getY(), true);
+            pointerDriver.dispatchEvent(p);
+        }
+
+        public void mouseMoved(MouseEvent e) {
+            //todo complete event parameters
+            PointerEvent p = new PointerEvent(0, e.getX(), e.getY(), true);
+            pointerDriver.dispatchEvent(p);
+        }
+
+        public void mouseWheelMoved(MouseWheelEvent e) {
+            //todo complete event parameters
+            PointerEvent p = new PointerEvent(0, e.getX(), e.getY(), e.getWheelRotation(), true);
+            pointerDriver.dispatchEvent(p);
+        }
+    }
+
+    public Device getPointerDevivce(){
+        if (pointerDevice == null) {
+            pointerDriver = new MyPointerDriver();
+            mouseListener = new MouseHandler();
+            screen.addMouseListener(mouseListener);
+            screen.addMouseMotionListener(mouseListener);
+            screen.addMouseWheelListener(mouseListener);
+            pointerDevice = new Device(new Bus((Bus) null) {
+            }, "");
+            try {
+                pointerDevice.setDriver(pointerDriver);
+                pointerDriver.startDevice();
+            } catch (DriverException x) {
+                throw new RuntimeException(x);
+            }
+        }
+        return pointerDevice;
+    }
+
     public char getChar(int offset) {
         return buffer[offset];
     }
@@ -238,6 +287,35 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
         sync();
     }
 
+    private static class MyPointerDriver extends Driver implements PointerAPI {
+        final private ArrayList<PointerListener> listeners = new ArrayList<PointerListener>();
+
+        protected synchronized void startDevice() throws DriverException {
+            getDevice().registerAPI(PointerAPI.class, this);
+        }
+
+        protected synchronized void stopDevice() throws DriverException {
+
+        }
+
+        void dispatchEvent(PointerEvent event) {
+            for (PointerListener l : listeners) {
+                l.pointerStateChanged(event);
+                if (event.isConsumed()) {
+                    break;
+                }
+            }
+        }
+
+        public void addPointerListener(PointerListener l) {
+            listeners.add(l);
+        }
+
+        public void removePointerListener(PointerListener l) {
+            listeners.remove(l);
+        }
+    }
+
     private static class MyKeyboardDriver extends Driver implements KeyboardAPI {
         final private ArrayList<KeyboardListener> listeners = new ArrayList<KeyboardListener>();
 
@@ -259,11 +337,10 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
         }
 
         protected void sendEvent(KeyboardListener l, KeyboardEvent event) {
-            KeyboardListener kl = (KeyboardListener) l;
             if (event.isKeyPressed()) {
-                kl.keyPressed(event);
+                l.keyPressed(event);
             } else if (event.isKeyReleased()) {
-                kl.keyReleased(event);
+                l.keyReleased(event);
             }
         }
 
