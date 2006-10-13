@@ -33,6 +33,7 @@ public class SwingTextScreenConsoleManager extends TextScreenConsoleManager {
                 SwingPcTextScreen systemScreen = getTextScreenManager().getSystemScreen();
                 final JComponent screen = systemScreen.getScreenComponent();
                 initializeKeyboard(systemScreen.getKeyboardDevice());
+                addPointerDevice(systemScreen.getPointerDevivce());
                 frame = new JFrame("Console");
                 frame.addWindowListener(new WindowAdapter(){
                     public void windowClosed(WindowEvent e) {

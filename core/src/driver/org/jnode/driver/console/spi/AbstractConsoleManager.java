@@ -105,7 +105,7 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
      * 
      * @param pDev
      */
-    final void addPointerDevice(Device pDev) {
+    protected final void addPointerDevice(Device pDev) {
         try {
             final PointerAPI pApi = (PointerAPI) pDev.getAPI(PointerAPI.class);
             pointerDevs.add(pDev);
