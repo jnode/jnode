@@ -22,8 +22,7 @@
 package org.jnode.driver.video;
 
 import java.awt.image.ColorModel;
-
-import org.jnode.awt.image.JNodeBufferedImage;
+import java.awt.image.BufferedImage;
 
 /**
  * @author epr
@@ -77,5 +76,5 @@ public abstract class FrameBufferConfiguration {
 	 * @see java.awt.Transparency#OPAQUE
 	 * @see java.awt.Transparency#TRANSLUCENT
 	 */
-	public abstract JNodeBufferedImage createCompatibleImage(int w, int h, int transparency);	
+	public abstract BufferedImage createCompatibleImage(int w, int h, int transparency);	
 }
