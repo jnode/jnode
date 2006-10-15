@@ -22,6 +22,7 @@
 package org.jnode.awt;
 
 import gnu.java.security.action.GetPropertyAction;
+import gnu.classpath.SystemProperties;
 
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -38,6 +39,7 @@ import javax.naming.NamingException;
 import org.apache.log4j.Logger;
 import org.jnode.awt.font.FontManager;
 import org.jnode.awt.image.JNodeBufferedImageGraphics;
+import org.jnode.awt.image.JNodeBufferedImageGraphics2D;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceUtils;
 import org.jnode.driver.video.FrameBufferAPI;
@@ -61,7 +63,8 @@ public class JNodeGraphicsEnvironment extends GraphicsEnvironment {
 	 * @return The graphics
 	 */
 	public Graphics2D createGraphics(BufferedImage image) {
-		return new JNodeBufferedImageGraphics(image);
+		return SystemProperties.getProperty("gnu.javax.swing.noGraphics2D") == null ?
+        new JNodeBufferedImageGraphics2D(image) : new JNodeBufferedImageGraphics(image);
 	}
 
 	/**
