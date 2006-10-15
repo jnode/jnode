@@ -24,7 +24,6 @@ package org.jnode.driver.video.vmware;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 
-import org.jnode.awt.image.JNodeBufferedImage;
 import org.jnode.driver.video.FrameBufferConfiguration;
 
 /**
@@ -51,7 +50,7 @@ public class VMWareConfiguration extends FrameBufferConfiguration {
 	 * @see java.awt.Transparency#OPAQUE
 	 * @see java.awt.Transparency#TRANSLUCENT
 	 */
-	public JNodeBufferedImage createCompatibleImage(int w, int h, int transparency) {
-		return new JNodeBufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+	public BufferedImage createCompatibleImage(int w, int h, int transparency) {
+		return new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
 	}
 }
