@@ -52,6 +52,7 @@ import org.jnode.driver.video.Surface;
 
 /**
  * @author epr
+ * @author Levente S\u00e1ntha
  */
 public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
 
@@ -409,7 +410,11 @@ public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
         final WritableRaster dst_raster = dst_model.createCompatibleWritableRaster(w, h);
 
         if(dst_model instanceof DirectColorModel)
-            if(model instanceof ComponentColorModel){
+            if(model instanceof DirectColorModel){
+                for (int y = 0; y < h; y++)
+                    for (int x = 0; x < w; x++)
+                        dst_raster.setPixel(x, y, raster.getPixel(x, y, samples));
+            } else if(model instanceof ComponentColorModel){
                 for (int y = 0; y < h; y++)
                     for (int x = 0; x < w; x++)
                         dst_raster.setPixel(x, y, raster.getPixel(x, y, samples));
@@ -425,11 +430,11 @@ public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
                         dst_raster.setPixel(x, y, samples);
                     }
             } else {
-                log.error("Unimplemented raster conversion");
+                log.error("Unimplemented raster conversion (required: " + model + " + available: " + dst_model);
                 return raster;
             }
         else {
-            log.error("Unimplemented raster conversion");
+            log.error("Unimplemented raster conversion (required: " + model + " + available: " + dst_model);
             return raster;
         }
 
