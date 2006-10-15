@@ -72,6 +72,7 @@ import org.jnode.awt.font.FontManager;
 import org.jnode.awt.font.JNodeFontPeer;
 import org.jnode.awt.image.GIFDecoder;
 import org.jnode.awt.image.JNodeImage;
+import org.jnode.awt.image.BufferedImageSurface;
 import org.jnode.driver.DeviceException;
 import org.jnode.driver.sound.speaker.SpeakerUtils;
 import org.jnode.driver.video.AlreadyOpenException;
@@ -82,25 +83,30 @@ import org.jnode.naming.InitialNaming;
 
 /**
  * @author epr
+ * @author Levente S\u00e1ntha
  */
 public abstract class JNodeToolkit extends ClasspathToolkit {
-
+    protected final Logger log = Logger.getLogger(getClass());
     private final Object initCloseLock = new Object();
     private EventQueue waitingNativeQueue;
     private Clipboard systemClipboard;
+    private FrameBufferAPI api;
+	private JNodeFrameBufferDevice fbDevice;
+	private JNodeGraphicsConfiguration config;
+	private JNodeEventQueue _eventQueue;
+	private LRUCache<Map, ClasspathFontPeer> fontCache = new LRUCache<Map, ClasspathFontPeer>(50);
+	private Surface graphics;
+    private boolean graphicsMode;
+    private KeyboardHandler keyboardHandler;
+	private MouseHandler mouseHandler;
+	private int refCount = 0;
+	private final Dimension screenSize = new Dimension(640, 480);
+	private Frame top;
 
-    private class LRUCache<K, V> extends java.util.LinkedHashMap<K, V> {
-		int max_entries;
-
-		public LRUCache(int max) {
-			super(max, 0.75f, true);
-			max_entries = max;
-		}
-
-		protected boolean removeEldestEntry(Map.Entry eldest) {
-			return size() > max_entries;
-		}
-	}
+    public JNodeToolkit() {
+		refCount = 0;
+        systemClipboard = new Clipboard("JNodeSystemClipboard");
+    }
 
 	/**
      * @see gnu.java.awt.ClasspathToolkit#createEmbeddedWindow(gnu.java.awt.EmbeddedWindow)
@@ -180,34 +186,6 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 		((JNodeToolkit) tk).doWaitUntilStopped();
 	}
 
-	private FrameBufferAPI api;
-
-	private JNodeGraphicsConfiguration config;
-
-	private JNodeEventQueue _eventQueue;
-
-	private LRUCache<Map, ClasspathFontPeer> fontCache = new LRUCache<Map, ClasspathFontPeer>(50);
-
-	private Surface graphics;
-
-	private KeyboardHandler keyboardHandler;
-
-	/** My logger */
-	protected final Logger log = Logger.getLogger(getClass());
-
-	private MouseHandler mouseHandler;
-
-	private int refCount = 0;
-
-	private final Dimension screenSize = new Dimension(640, 480);
-
-	private Frame top;
-
-	public JNodeToolkit() {
-		refCount = 0;
-        systemClipboard = new Clipboard("JNodeSystemClipboard");
-    }
-
 	/**
      * This method need only accessed from JNodeRobotPeer in the same package
      * @return Returns the keyboardHandler.
@@ -234,11 +212,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	}
 
 	/**
-	 * @param image
-	 * @param width
-	 * @param height
-	 * @param observer
-	 * @return int
+	 * @see java.awt.Toolkit#checkImage(java.awt.Image, int, int, java.awt.image.ImageObserver)
 	 */
 	public int checkImage(Image image, int width, int height,
 			ImageObserver observer) {
@@ -260,8 +234,8 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
      * JNode specific method. Create a buffered image compatible with the
      * graphics configuration.
      *
-     * @param width
-     * @param height
+     * @param width image width
+     * @param height image height
      * @return The compatible image
      */
 	public BufferedImage createCompatibleImage(int width, int height) {
@@ -283,47 +257,38 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	}
 
 	/**
-	 * @param data
-	 * @param offset
-	 * @param len
 	 * @see java.awt.Toolkit#createImage(byte[], int, int)
-	 * @return The image
 	 */
 	public Image createImage(byte[] data, int offset, int len) {
-		if (len >= 4 && data[offset + 0] == 'G' && data[offset + 1] == 'I'
+		if (len >= 4 && data[offset] == 'G' && data[offset + 1] == 'I'
 				&& data[offset + 2] == 'F' && data[offset + 3] == '8') {
 			try {
 				return createImage(new GIFDecoder(new ByteArrayInputStream(
 						data, offset, len)));
 			} catch (LinkageError err) {
-			} // let it fall through to default code
+                // let it fall through to default code
+            }
 		}
 
 		return new ErrorImage();
 	}
 
 	/**
-	 * @param producer
 	 * @see java.awt.Toolkit#createImage(java.awt.image.ImageProducer)
-	 * @return The image
 	 */
 	public Image createImage(ImageProducer producer) {
 		return new JNodeImage(producer);
 	}
 
 	/**
-	 * @param filename
 	 * @see java.awt.Toolkit#createImage(java.lang.String)
-	 * @return The image
 	 */
 	public Image createImage(String filename) {
 		return getImage(filename);
 	}
 
 	/**
-	 * @param url
 	 * @see java.awt.Toolkit#createImage(java.net.URL)
-	 * @return The image
 	 */
 	public Image createImage(URL url) {
 		return getImage(url);
@@ -336,9 +301,11 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	}
 
 	/**
-	 * Decrement the peer reference count
+	 * Decrement the peer reference count.
+     * @param forceClose if true the gui is always closed
+     * @return the reference count
 	 */
-	private final int decRefCount(boolean forceClose) {
+	private int decRefCount(boolean forceClose) {
         final int rc;
         synchronized (initCloseLock) {
             refCount--;
@@ -378,6 +345,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 
             synchronized (initCloseLock) {
                 this.refCount = 0;
+                graphicsMode = false;
                 initCloseLock.notifyAll();
             }
             return 0;
@@ -386,9 +354,9 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
         }
 	}
 
-	private final void doWaitUntilStopped() {
+	private void doWaitUntilStopped() {
 	    synchronized (initCloseLock) {
-	        while (graphics != null) {
+	        while (graphicsMode) {
 	            try {
 	                initCloseLock.wait();
 	            } catch (InterruptedException ex) {
@@ -419,7 +387,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 		// cache. This is harmless.
 		keyMap.put("JNodeToolkit.RequestedFontName", name);
 		if (fontCache.containsKey(keyMap))
-			return (ClasspathFontPeer) fontCache.get(keyMap);
+			return fontCache.get(keyMap);
 		else {
 			ClasspathFontPeer newPeer = new JNodeFontPeer(name, attrs);
 			fontCache.put(keyMap, newPeer);
@@ -466,16 +434,14 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	 */
 	public FontManager getFontManager() {
 		try {
-			return (FontManager) InitialNaming.lookup(FontManager.NAME);
+			return InitialNaming.lookup(FontManager.NAME);
 		} catch (NamingException ex) {
 			return null;
 		}
 	}
 
 	/**
-	 * @param font
 	 * @see java.awt.Toolkit#getFontMetrics(java.awt.Font)
-	 * @return The metrics
 	 */
     @SuppressWarnings("deprecation")
 	public FontMetrics getFontMetrics(Font font) {
@@ -488,9 +454,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	}
 
 	/**
-	 * @param name
-	 * @param style
-	 * @return The peer
+     * @see java.awt.Toolkit#getFontPeer(String, int)
 	 */
 	protected final FontPeer getFontPeer(String name, int style) {
 		// All fonts get a default size of 12 if size is not specified.
@@ -499,6 +463,10 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 
 	/**
 	 * Private method that allows size to be set at initialization time.
+     * @param name the font name
+     * @param style the font style
+     * @param size the font size
+     * @return the font peer
 	 */
     @SuppressWarnings("unchecked")
 	private FontPeer getFontPeer(String name, int style, int size) {
@@ -525,6 +493,8 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 
     /**
      * Test if the image is valid (!= null), otherwise return an error image.
+     * @param img the image to test
+     * @return the image if img is not null, an error image otherwise
      */
     private Image testErrorImage(Image img) {
         if (img == null) {
@@ -535,9 +505,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
     }
 
 	/**
-	 * @param filename
 	 * @see java.awt.Toolkit#getImage(java.lang.String)
-	 * @return The image
 	 */
 	public Image getImage(final String filename) {
 		log.debug("getImage(" + filename + ")");
@@ -545,8 +513,8 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 
 			public Object run() {
 				try {
-					final String userDir = (String) AccessController
-							.doPrivileged(new GetPropertyAction("user.dir"));
+					final String userDir = (String) AccessController.doPrivileged(
+                            new GetPropertyAction("user.dir"));
 					Image image = getImage(new URL("file:"
 							+ new File(userDir, filename)));
 					return image != null ? image : getImage(new URL("file:"
@@ -560,9 +528,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	}
 
 	/**
-	 * @param url
 	 * @see java.awt.Toolkit#getImage(java.net.URL)
-	 * @return The image
 	 */
 	public Image getImage(final URL url) {
 		return testErrorImage((Image) AccessController.doPrivileged(new PrivilegedAction() {
@@ -599,12 +565,8 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	}
 
 	/**
-	 * @param frame
-	 * @param title
-	 * @param props
 	 * @see java.awt.Toolkit#getPrintJob(java.awt.Frame, java.lang.String,
 	 *      java.util.Properties)
-	 * @return The print job
 	 */
 	public PrintJob getPrintJob(Frame frame, String title, Properties props) {
 		// TODO Auto-generated method stub
@@ -657,8 +619,8 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	/**
 	 * Gets the top most visible component at a given location.
 	 *
-	 * @param x
-	 * @param y
+	 * @param x the x coordiante
+	 * @param y the y coordinate
 	 * @return the component
 	 */
 	public Component getTopComponentAt(int x, int y) {
@@ -675,8 +637,9 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 
 	/**
 	 * Increment the peer reference count
+     * @return the reference count
 	 */
-	private final int incRefCount() {
+	private int incRefCount() {
 		final boolean initialize;
 		final int rc;
 		synchronized (initCloseLock) {
@@ -686,19 +649,19 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 		}
 		log.debug("refCount.inc=" + rc);
 		if (initialize) {
-			final JNodeFrameBufferDevice dev = (JNodeFrameBufferDevice) GraphicsEnvironment
+			fbDevice = (JNodeFrameBufferDevice) GraphicsEnvironment
 					.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-			if (dev == null) {
-				throw new AWTError("No framebuffer device found");
+			if (fbDevice == null) {
+				throw new AWTError("No framebuffer fbDevice found");
 			}
             log.info("Supported graphics configurations: ");
-            GraphicsConfiguration[] configurations = dev.getConfigurations();
+            GraphicsConfiguration[] configurations = fbDevice.getConfigurations();
             for(GraphicsConfiguration g_conf : configurations){
                 log.info(g_conf);
             }
             String screen_size = (String)AccessController.doPrivileged(new GetPropertyAction("jnode.awt.screensize", "none"));
             if("none".equals(screen_size)) {
-			    config = (JNodeGraphicsConfiguration) dev.getDefaultConfiguration();
+			    config = (JNodeGraphicsConfiguration) fbDevice.getDefaultConfiguration();
             } else {
                 boolean found = false;
                 for(GraphicsConfiguration g_conf : configurations){
@@ -709,24 +672,25 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
                     }
                 }
                 if(!found){
-                    config = (JNodeGraphicsConfiguration) dev.getDefaultConfiguration();
+                    config = (JNodeGraphicsConfiguration) fbDevice.getDefaultConfiguration();
                 }
             }
             log.info("Using: " + config);
-			this.api = dev.getAPI();
+			this.api = fbDevice.getAPI();
 			try {
-				log.debug("Opening AWT: Using device " + dev.getIDstring());
+				log.debug("Opening AWT: Using fbDevice " + fbDevice.getIDstring());
 				this.graphics = api.open(config.getConfig());
 				if (graphics == null) {
-					log.debug("No Graphics for device: " + dev.getIDstring());
-				}
-
+					log.debug("No Graphics for fbDevice: " + fbDevice.getIDstring());
+                    return rc;
+                }
+                graphicsMode = true;
 				screenSize.width = config.getConfig().getScreenWidth();
 				screenSize.height = config.getConfig().getScreenHeight();
 
                 final EventQueue eventQueue = getSystemEventQueueImpl();
 				this.keyboardHandler = new KeyboardHandler(eventQueue);
-				this.mouseHandler = new MouseHandler(dev.getDevice(),
+				this.mouseHandler = new MouseHandler(fbDevice.getDevice(),
 						screenSize, eventQueue, keyboardHandler);
                 keyboardHandler.install();
 
@@ -758,7 +722,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
     public Dimension changeScreenSize(String screenSizeId) {
         final JNodeFrameBufferDevice dev = (JNodeFrameBufferDevice) GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         if (dev == null) {
-            throw new AWTError("No framebuffer device found");
+            throw new AWTError("No framebuffer fbDevice found");
         }
         GraphicsConfiguration[] configurations = dev.getConfigurations();
         JNodeGraphicsConfiguration conf = null;
@@ -789,7 +753,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
             //open the new
             this.graphics = api.open(config.getConfig());
             if (graphics == null) {
-                log.debug("No Graphics for device: " + dev.getIDstring());
+                log.debug("No Graphics for fbDevice: " + dev.getIDstring());
             }
 
             screenSize.width = config.getConfig().getScreenWidth();
@@ -804,6 +768,69 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
             throw (AWTError) new AWTError(e.getMessage()).initCause(e);
         }
     }
+
+    BufferedImage backBuffer;
+    /**
+	 * Leave the gui mode
+	 */
+	public final void leaveGUI() {
+        Dimension ss = getScreenSize();
+        backBuffer = new BufferedImage((int) ss.getWidth(), (int) ss.getHeight(), BufferedImage.TYPE_INT_ARGB);
+
+        final KeyboardHandler keyboardHandler = this.keyboardHandler;
+        final MouseHandler mouseHandler = this.mouseHandler;
+        final Surface graphics = this.graphics;
+        this.graphics = new BufferedImageSurface(backBuffer);
+
+        if (keyboardHandler != null) {
+            keyboardHandler.close();
+        }
+        if (mouseHandler != null) {
+            mouseHandler.close();
+        }
+
+        if (graphics != null) {
+            graphics.close();
+        }
+        this.keyboardHandler = null;
+        this.mouseHandler = null;
+
+        synchronized (initCloseLock) {
+            graphicsMode = false;
+            initCloseLock.notifyAll();
+        }
+	}
+
+    /**
+	 * Join the GUI mode
+	 */
+	public final void joingGUI() {
+        try {
+
+            this.graphics = api.open(config.getConfig());
+            this.keyboardHandler = new KeyboardHandler(_eventQueue);
+            this.mouseHandler = new MouseHandler(fbDevice.getDevice(),
+                    screenSize, _eventQueue, keyboardHandler);
+            keyboardHandler.install();
+            getAwtContext().getAwtRoot().repaint();
+            synchronized (initCloseLock) {
+                graphicsMode = true;
+            }
+        } catch (DeviceException ex) {
+            decRefCount(true);
+            throw (AWTError) new AWTError(ex.getMessage()).initCause(ex);
+        } catch (UnknownConfigurationException ex) {
+            decRefCount(true);
+            throw (AWTError) new AWTError(ex.getMessage()).initCause(ex);
+        } catch (AlreadyOpenException ex) {
+            decRefCount(true);
+            throw (AWTError) new AWTError(ex.getMessage()).initCause(ex);
+        } catch (Throwable ex) {
+            decRefCount(true);
+            log.error("Unknown exception", ex);
+            throw (AWTError) new AWTError(ex.getMessage()).initCause(ex);
+        }
+	}
 
     public void iterateNativeQueue(EventQueue locked, boolean block) {
         if (block) {
@@ -822,9 +849,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	}
 
 	/**
-	 * @param highlight
 	 * @see java.awt.Toolkit#mapInputMethodHighlight(java.awt.im.InputMethodHighlight)
-	 * @return Map
 	 */
 	public Map mapInputMethodHighlight(InputMethodHighlight highlight) {
 		// TODO Auto-generated method stub
@@ -843,13 +868,8 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 
     public abstract boolean isWindow(Component comp);
     /**
-	 * @param image
-	 * @param width
-	 * @param height
-	 * @param observer
 	 * @see java.awt.Toolkit#prepareImage(java.awt.Image, int, int,
 	 *      java.awt.image.ImageObserver)
-	 * @return boolean
 	 */
 	public boolean prepareImage(Image image, int width, int height,
             ImageObserver observer) {
@@ -949,4 +969,16 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
         }
     }
 
+    private class LRUCache<K, V> extends java.util.LinkedHashMap<K, V> {
+		int max_entries;
+
+		public LRUCache(int max) {
+			super(max, 0.75f, true);
+			max_entries = max;
+		}
+
+		protected boolean removeEldestEntry(Map.Entry eldest) {
+			return size() > max_entries;
+		}
+	}
 }

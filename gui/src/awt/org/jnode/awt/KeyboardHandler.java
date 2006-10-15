@@ -154,6 +154,15 @@ public class KeyboardHandler implements
                 }
             });
             return true;
+        } else if (key_code == KeyEvent.VK_F11 && event.isAltDown()) {
+            event.consume();
+            AccessController.doPrivileged(new PrivilegedAction() {
+                public Object run() {
+                    JNodeToolkit.getJNodeToolkit().leaveGUI();
+                    return null;
+                }
+            });
+            return true;
         } else if (key_code == KeyEvent.VK_F5 && event.isControlDown() && event.isAltDown()) {
             event.consume();
             AccessController.doPrivileged(new PrivilegedAction() {
