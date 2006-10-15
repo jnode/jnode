@@ -14,10 +14,6 @@ import org.jnode.driver.console.textscreen.ScrollableTextScreenConsole;
 import org.jnode.driver.console.ConsoleManager;
 import org.jnode.shell.CommandShell;
 import org.jnode.naming.InitialNaming;
-import org.jnode.awt.font.FontProvider;
-import org.jnode.awt.font.TextRenderer;
-import org.jnode.awt.font.bdf.BDFFontProvider;
-import org.jnode.awt.image.JNodeBufferedImage;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -74,15 +70,12 @@ public class FBConsole {
 
         } catch (Throwable ex) {
             log.error("Error in FBConsole", ex);
-            return;
-
         } finally {
             if (g != null) {
                 log.info("Close graphics");
                 g.close();
             }
         }
-
     }
 
 
@@ -167,8 +160,8 @@ public class FBConsole {
         /**
          * Copy the content of the given rawData into this screen.
          *
-         * @param rawData
-         * @param rawDataOffset
+         * @param rawData the data as a char array
+         * @param rawDataOffset the offset in the data array
          */
         public void copyFrom(char[] rawData, int rawDataOffset) {
             if (rawDataOffset < 0) {
@@ -185,12 +178,11 @@ public class FBConsole {
 
         private class FBScreen  {
             private int margin = 5;
-            private int w;
-            private int h;
+            private int w = 7;
+            private int h = 18;
             private Surface g;
             private int sw;
             private int sh;
-            private TextRenderer  tr;
             private BufferedImage bi;
             private Graphics ig;
             private Font font;
@@ -198,24 +190,25 @@ public class FBConsole {
 
             public FBScreen(Surface g) {
                 this.g = g;
-                w = 6; h = 18;
                 sh = h * FBPcTextScreen.SCREEN_HEIGHT + 2 * margin;
                 sw = w * FBPcTextScreen.SCREEN_WIDTH + 2 * margin;
-                bi = new JNodeBufferedImage(sw, sh, BufferedImage.TYPE_INT_ARGB);
+                bi = new BufferedImage(sw, sh, BufferedImage.TYPE_INT_ARGB);
                 ig = bi.getGraphics();
                 font = new Font("-FontForge-Bitstream Vera Sans Mono-Book-R-Normal-SansMono--12-120-75-75-P-69-ISO10646", Font.PLAIN, 12);
 
+                /*
                 try{
-                    FontProvider fm = (FontProvider) new BDFFontProvider();
+                    FontProvider fm = new BDFFontProvider();
                     if(!fm.provides(font)){
                         throw new RuntimeException(fm + " does not provide" + font);
                     }
-                    tr = fm.getTextRenderer(font);
+                    TextRenderer tr = fm.getTextRenderer(font);
                     if(tr == null)
                         new NullPointerException("Text renderer is null");
                 }catch(Exception e){
                     new RuntimeException(e);
                 }
+                */
                 new Thread(new Runnable() {
                     public void run() {
                         while(true){
