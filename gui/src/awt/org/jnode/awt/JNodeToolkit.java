@@ -55,8 +55,8 @@ import java.awt.peer.RobotPeer;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.io.IOException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.HashMap;
@@ -66,11 +66,11 @@ import java.util.Properties;
 import java.util.Set;
 
 import javax.naming.NamingException;
+import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
 import org.jnode.awt.font.FontManager;
 import org.jnode.awt.font.JNodeFontPeer;
-import org.jnode.awt.image.GIFDecoder;
 import org.jnode.awt.image.JNodeImage;
 import org.jnode.awt.image.BufferedImageSurface;
 import org.jnode.driver.DeviceException;
@@ -259,17 +259,13 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	/**
 	 * @see java.awt.Toolkit#createImage(byte[], int, int)
 	 */
-	public Image createImage(byte[] data, int offset, int len) {
-		if (len >= 4 && data[offset] == 'G' && data[offset + 1] == 'I'
-				&& data[offset + 2] == 'F' && data[offset + 3] == '8') {
-			try {
-				return createImage(new GIFDecoder(new ByteArrayInputStream(
-						data, offset, len)));
-			} catch (LinkageError err) {
-                // let it fall through to default code
-            }
-		}
-
+    public Image createImage(byte[] data, int offset, int len) {
+        try {
+            return ImageIO.read(new ByteArrayInputStream(data, offset, len));
+        } catch(IOException e){
+            log.error("Image read error", e);
+            // let it fall through to default code
+        }
 		return new ErrorImage();
 	}
 
@@ -532,23 +528,9 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	 */
 	public Image getImage(final URL url) {
 		return testErrorImage((Image) AccessController.doPrivileged(new PrivilegedAction() {
-
 			public Object run() {
 				try {
-					final URLConnection conn = url.openConnection();
-					final String type = conn.getContentType();
-					if ("image/gif".equals(type)
-							|| url.getFile().toLowerCase().endsWith(".gif")) {
-						try {
-							return createImage(new GIFDecoder(conn
-									.getInputStream(), true));
-						} catch (LinkageError e) {
-							// If GIFDecoder not available try default loader
-							return createImage((ImageProducer) (conn
-									.getContent()));
-						}
-					} else
-						return createImage((ImageProducer) (conn.getContent()));
+                    return ImageIO.read(url);
 				} catch (Exception ex) {
 					log.debug("Exception during getImage", ex);
 				}
@@ -557,7 +539,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 		}));
 	}
 
-	/**
+    /**
 	 * @see gnu.java.awt.ClasspathToolkit#getLocalGraphicsEnvironment()
 	 */
 	public GraphicsEnvironment getLocalGraphicsEnvironment() {
