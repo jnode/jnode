@@ -11,6 +11,11 @@ import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemFullException;
 
+/**
+ * A File implementation in the system RAM
+ * 
+ * @author peda
+ */
 public class RAMFile implements FSEntry, FSFile {
 
 	/**	Logger*/	
@@ -27,6 +32,11 @@ public class RAMFile implements FSEntry, FSFile {
 
 	private boolean isValid = true;
 	
+	/**
+	 * Constructor for a new RAMFile
+	 * @param parent
+	 * @param filename
+	 */
 	public RAMFile(RAMDirectory parent, String filename) {
 		this.parent = parent;
 		this.filename = filename;
@@ -44,8 +54,6 @@ public class RAMFile implements FSEntry, FSFile {
 
 	
 	private void enlargeBuffer() throws FileSystemFullException {
-
-		//log.debug("Enlarge Buffer, oldCapacity = " + buffer.capacity());
 		
 		int oldCapacity = buffer.capacity();
 		
@@ -75,66 +83,124 @@ public class RAMFile implements FSEntry, FSFile {
 		fileSystem.addSummmedBufferSize(-toShrink);
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSEntry#getName()
+	 */
 	public String getName() {
 		return filename;
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSEntry#getParent()
+	 */
 	public FSDirectory getParent() {
 		return parent;
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSEntry#getLastModified()
+	 */
 	public long getLastModified() throws IOException {
 		return lastModified;
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSEntry#isFile()
+	 */
 	public boolean isFile() {
 		return true;
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSEntry#isDirectory()
+	 */
 	public boolean isDirectory() {
 		return false;
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSEntry#setName(java.lang.String)
+	 */
 	public void setName(String newName) throws IOException {
-		// TODO check for special chars
+		// TODO check for special chars / normalize name
 		filename = newName;
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSEntry#setLastModified(long)
+	 */
 	public void setLastModified(long lastModified) throws IOException {
 		this.lastModified = lastModified;
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSEntry#getFile()
+	 */
 	public FSFile getFile() throws IOException {
 		return this;
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSEntry#getDirectory()
+	 */
 	public FSDirectory getDirectory() throws IOException {
 		throw new IOException("Not a directory");
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSEntry#getAccessRights()
+	 */
 	public FSAccessRights getAccessRights() throws IOException {
 		return accessRights;
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSEntry#isDirty()
+	 */
 	public boolean isDirty() throws IOException {
 		return false;
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSObject#isValid()
+	 */
 	public boolean isValid() {
 		return isValid;
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSObject#getFileSystem()
+	 */
 	public FileSystem getFileSystem() {
 		return fileSystem;
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSFile#getLength()
+	 */
 	public long getLength() {
 		return buffer.limit();
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSFile#setLength(long)
+	 */
 	public void setLength(long length) throws IOException {
-		
-		//log.debug("NewLength for file " + filename + " is " + length);
 
 		if (length > Integer.MAX_VALUE)
 			throw new IOException("Filesize too large");
@@ -153,9 +219,11 @@ public class RAMFile implements FSEntry, FSFile {
 		fileSystem.addSummedFileSize(toEnlarge);
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSFile#read(long, java.nio.ByteBuffer)
+	 */
 	public void read(long fileOffset, ByteBuffer dest) throws IOException {
-
-		//log.debug("Read file " + filename + " from " + fileOffset + " and read " + dest.limit() + " bytes");
 		
 		long currentSize = buffer.limit();
 		long toRead = dest.limit();
@@ -165,14 +233,13 @@ public class RAMFile implements FSEntry, FSFile {
 
 		buffer.position((int) fileOffset);
 		buffer.get(dest.array(), 0, dest.limit());
-
-		//log.debug("Text toRead::" + new String(dest.array()));
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSFile#write(long, java.nio.ByteBuffer)
+	 */
 	public void write(long fileOffset, ByteBuffer src) throws IOException {
-		
-		//log.debug("Write file " + filename + " from " + fileOffset + " and write " + src.limit() + " bytes");
-		//log.debug("Text was::" + new String(src.array()));
 		
 		long currentSize = buffer.limit();
 		long toWrite = src.limit();
@@ -184,13 +251,15 @@ public class RAMFile implements FSEntry, FSFile {
 		buffer.put(src);
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSFile#flush()
+	 */
 	public void flush() throws IOException {
 		// nothing todo here
 	}
 	
-	public void remove() throws IOException {
-		
-		//log.debug("Remove file " + filename);
+	void remove() throws IOException {
 		
 		long capacity = buffer.capacity();
 		long filesize = getLength();
