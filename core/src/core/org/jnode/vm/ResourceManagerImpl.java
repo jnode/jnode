@@ -207,6 +207,7 @@ final class ResourceManagerImpl implements ResourceManager {
 	/** 
 	 * Gets the memory scanner.
 	 * This method will requires a ResourcePermission("memoryScanner"). 
+	 * @return the memory scanner
 	 */
 	public MemoryScanner getMemoryScanner() {
 	    final SecurityManager sm = System.getSecurityManager();

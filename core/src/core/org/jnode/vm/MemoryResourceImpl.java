@@ -93,6 +93,13 @@ class MemoryResourceImpl extends Region implements MemoryResource {
 		this.slotSize = VmProcessor.current().getArchitecture().getReferenceSize();
 	}
 
+	/**
+	 * Create a new instance
+	 * 
+	 * @param arrayData
+	 * @param length
+	 * @param elementSize
+	 */
 	public MemoryResourceImpl(Object arrayData, int length, int elementSize) {
 		super(BYTE_ARRAY_OWNER);
 		this.parent = null;
@@ -107,7 +114,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
 
     /**
      * Create a bytebuffer that has the same content as this resource.
-     * @return
+     * @return a bytebuffer that has the same content as this resource
      */
     public ByteBuffer asByteBuffer() {
         return VMDirectByteBuffer.wrap(this);
@@ -683,6 +690,10 @@ class MemoryResourceImpl extends Region implements MemoryResource {
 		Unsafe.clear(start.add(Offset.fromIntZeroExtend(memPtr)), Extent.fromIntSignExtend(size));
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.system.MemoryResource#copy(int, int, int)
+	 */
 	public void copy(int srcMemPtr, int destMemPtr, int length) {
 		testMemPtr(srcMemPtr, length);
 		testMemPtr(destMemPtr, length);
@@ -920,7 +931,6 @@ class MemoryResourceImpl extends Region implements MemoryResource {
 	 * @param memPtr
 	 * @param value
 	 * @param count
-	 * @see org.jnode.system.MemoryResource#andInt24(int, int, int)
 	 */
 	public void andInt24(int memPtr, int value, int count) {
 		testMemPtr(memPtr, count * 3);
@@ -986,7 +996,6 @@ class MemoryResourceImpl extends Region implements MemoryResource {
 	 * @param memPtr
 	 * @param value
 	 * @param count
-	 * @see org.jnode.system.MemoryResource#orInt24(int, int, int)
 	 */
 	public void orInt24(int memPtr, int value, int count) {
 		testMemPtr(memPtr, count * 3);
@@ -1101,7 +1110,10 @@ class MemoryResourceImpl extends Region implements MemoryResource {
 	 * A child resource can be released without releasing the parent.
 	 * 
 	 * @param size Length of the returned resource in bytes.
-	 * @return
+	 * @param align 
+	 * @return a memory resource for a portion of this memory resources
+	 * @throws IndexOutOfBoundsException 
+	 * @throws ResourceNotFreeException 
 	 */
 	public MemoryResource claimChildResource(Extent size, int align)
 	throws IndexOutOfBoundsException, ResourceNotFreeException {
@@ -1148,10 +1160,12 @@ class MemoryResourceImpl extends Region implements MemoryResource {
 	 * 
 	 * @param size Length of the returned resource in bytes.
 	 * @param align Align of this boundary. Align must be a multiple of 2.
-	 * @return
+	 * @return a memory resource for a portion of this memory resources
+	 * @throws IndexOutOfBoundsException 
+	 * @throws ResourceNotFreeException 
 	 */
 	public MemoryResource claimChildResource(int size, int align)
-	throws IndexOutOfBoundsException, ResourceNotFreeException {
+			throws IndexOutOfBoundsException, ResourceNotFreeException {
 		return claimChildResource(Extent.fromIntZeroExtend(size), align);
 	}
 	
@@ -1163,7 +1177,9 @@ class MemoryResourceImpl extends Region implements MemoryResource {
 	 * @param offset Offset relative to the start of this resource.
 	 * @param size Length of the returned resource in bytes.
 	 * @param allowOverlaps If true, overlapping child resources will be allowed, otherwise overlapping child resources will resulut in a ResourceNotFreeException.
-	 * @return
+	 * @return  a memory resource for a portion of this memory resources
+	 * @throws IndexOutOfBoundsException 
+	 * @throws ResourceNotFreeException 
 	 */
 	public MemoryResource claimChildResource(Offset offset, Extent size, boolean allowOverlaps)
 	throws IndexOutOfBoundsException, ResourceNotFreeException {
@@ -1198,7 +1214,9 @@ class MemoryResourceImpl extends Region implements MemoryResource {
 	 * @param offset Offset relative to the start of this resource.
 	 * @param size Length of the returned resource in bytes.
 	 * @param allowOverlaps If true, overlapping child resources will be allowed, otherwise overlapping child resources will resulut in a ResourceNotFreeException.
-	 * @return
+	 * @return a memory resource for a portion of this memory resource
+	 * @throws IndexOutOfBoundsException 
+	 * @throws ResourceNotFreeException 
 	 */
 	public MemoryResource claimChildResource(int offset, int size, boolean allowOverlaps)
 	throws IndexOutOfBoundsException, ResourceNotFreeException {
@@ -1227,6 +1245,7 @@ class MemoryResourceImpl extends Region implements MemoryResource {
 	/**
 	 * Gets the offset relative to my parent.
 	 * If this resource has no parent, the address of this buffer is returned.
+	 * @return the offset relative to my parent or address of this buffer
 	 */
 	public final Offset getOffset() {
 	    return this.offset;

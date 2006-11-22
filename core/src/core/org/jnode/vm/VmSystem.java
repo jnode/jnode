@@ -174,7 +174,7 @@ public final class VmSystem {
     /**
      * Gets the system output stream.
      *
-     * @return
+     * @return the system output stream
      */
     public static PrintStream getSystemOut() {
         if (bootOut == null) {
@@ -216,6 +216,10 @@ public final class VmSystem {
     // Information
     // ------------------------------------------
 
+    /**
+     * This method adds some default system properties
+     * @param res
+     */
     public static void insertSystemProperties(Properties res) {
 
         final Vm vm = Vm.getVm();
@@ -260,6 +264,10 @@ public final class VmSystem {
         res.put("gnu.javax.swing.noGraphics2D", "true");
     }
 
+    /**
+     * Returns the commandline appended to the kernel by the bootloader (e.g. grub)
+     * @return the commandline appended to the kernel
+     */
     public static String getCmdLine() {
         if (cmdLine == null) {
             /* Load the command line */
@@ -515,6 +523,14 @@ public final class VmSystem {
     // java.lang.System support
     // ------------------------------------------
 
+    /**
+     * Copy one array to another. This is the implementation for System.arraycopy in JNode
+     * @param src
+     * @param srcPos
+     * @param dst
+     * @param dstPos
+     * @param length
+     */
     @PrivilegedActionPragma
     public static void arrayCopy(Object src, int srcPos, Object dst,
             int dstPos, int length) {
@@ -703,14 +719,25 @@ public final class VmSystem {
         return systemLoader;
     }
 
+    /**
+     * Returns the free memory in system ram
+     * @return free memory in system ram
+     */
     public static long freeMemory() {
         return Vm.getHeapManager().getFreeMemory();
     }
 
+    /**
+     * Returns the total amount of system memory
+     * @return the total amount of system memory
+     */
     public static long totalMemory() {
         return Vm.getHeapManager().getTotalMemory();
     }
 
+    /**
+     * Call the garbage collector
+     */
     public static void gc() {
         Vm.getHeapManager().gc();
     }
@@ -728,6 +755,10 @@ public final class VmSystem {
             data.append(ch);
         }
 
+        /**
+         * Returns the data written to the system output stream
+         * @return data written to the system output stream
+         */
         public String getData() {
             return data.toString();
         }
@@ -770,7 +801,7 @@ public final class VmSystem {
     /**
      * Calculate the speed of the current processor.
      * 
-     * @return
+     * @return the speed of the current processor in "JNodeMips"
      */
     @Uninterruptible
     public final static float calculateJNodeMips() {
@@ -789,6 +820,7 @@ public final class VmSystem {
 
     /**
      * Is the system shutting down.
+     * @return if the system is shutting down 
      */
     public static boolean isShuttingDown() {
         return inShutdown;
@@ -796,6 +828,7 @@ public final class VmSystem {
 
     /**
      * Gets the system exit code.
+     * @return the system exit code
      */
     public static int getExitCode() {
         return exitCode;
@@ -824,7 +857,7 @@ public final class VmSystem {
     }
 
     /**
-     * Set {@link #in}to a new InputStream.
+     * Set in to a new InputStream.
      * 
      * @param in
      *            the new InputStream
@@ -847,7 +880,7 @@ public final class VmSystem {
     }
 
     /**
-     * Set {@link #err}to a new PrintStream.
+     * Set err to a new PrintStream.
      * 
      * @param err
      *            the new PrintStream

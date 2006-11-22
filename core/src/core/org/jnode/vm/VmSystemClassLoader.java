@@ -110,6 +110,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      * 
      * @param classesURL
      * @param arch
+     * @param resolver 
      */
     public VmSystemClassLoader(URL classesURL, VmArchitecture arch,
             ObjectResolver resolver) {
@@ -171,6 +172,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     /**
      * Gets the number of loaded classes.
+     * @return the number of loaded classes
      */
     public int getLoadedClassCount() {
         if (classInfos != null) {
@@ -267,7 +269,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      * 
      * @param name
      * @param create
-     * @return
+     * @return the ClassInfo for the given name
      */
     private synchronized ClassInfo getClassInfo(String name, boolean create) {
         if (name == null) {
@@ -651,6 +653,10 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
         }
     }
 
+    /**
+     * (non-Javadoc)
+     * @see org.jnode.vm.classmgr.VmClassLoader#disassemble(org.jnode.vm.classmgr.VmMethod, int, boolean, java.io.Writer)
+     */
     public void disassemble(VmMethod vmMethod, int optLevel,
             boolean enableTestCompilers, Writer writer) {
         final NativeCodeCompiler cmps[];
@@ -678,6 +684,8 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     /**
      * Compile the given IMT.
+     * @param builder 
+     * @return the compiled IMT 
      */
     public CompiledIMT compileIMT(IMTBuilder builder) {
         final IMTCompiler cmp = arch.getIMTCompiler();
@@ -715,6 +723,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     /**
      * Set the object resolver. This can be called only once.
+     * @param resolver 
      */
     public void setResolver(ObjectResolver resolver) {
         if (this.resolver == null) {
@@ -806,7 +815,8 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
         }
 
         /**
-         * @return
+         * Returns the name of the class
+         * @return the name of the class
          */
         public final String getName() {
             return name;
@@ -846,6 +856,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
         /**
          * Signal a class loading error. This will release other threads waiting
          * for this class with a ClassNotFoundException.
+         * @param errorMsg 
          */
         public final synchronized void setLoadError(String errorMsg) {
             this.error = true;
@@ -856,7 +867,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
         /**
          * Has the class wrapped by this object been loaded?
          * 
-         * @return
+         * @return if the class wrapped by this object has been loaded
          */
         public boolean isLoaded() {
             return (vmClass != null);
@@ -919,10 +930,16 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
         requiresCompile = true;
     }
 
+    /**
+     * @param loader
+     */
     public void add(ResourceLoader loader) {
         resourceLoaders.add(loader);
     }
 
+    /**
+     * @param loader
+     */
     public void remove(ResourceLoader loader) {
         resourceLoaders.remove(loader);
     }
