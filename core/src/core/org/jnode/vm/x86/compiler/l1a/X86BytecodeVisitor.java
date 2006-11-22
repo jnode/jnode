@@ -1584,7 +1584,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dup2_x2()
-	 *
+	 */
 	public final void visit_dup2_x2() {
 		// Push all on the stack, since this opcode is just too complicated
 		vstack.push(eContext);
@@ -1645,12 +1645,12 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 				vstack.push1(v1);
 			}
 		}
-	}*/
+	}
 
 	/**
 	 * New version, corrects issue 760
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dup2_x2()
-	 */
+	 *
 	public final void visit_dup2_x2() {
 
 	    // Push all on the stack, since this opcode is just too complicated
@@ -1716,7 +1716,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		    vstack.push1(v1);
 		}
 	    }
-	}
+	}*/
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_f2d()
