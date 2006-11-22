@@ -7,7 +7,11 @@ import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 
-
+/**
+ * A Filesystem implementation in the system RAM.
+ * 
+ * @author peda
+ */
 public class RAMFileSystem implements FileSystem {
 
 	private Device device;
@@ -21,6 +25,10 @@ public class RAMFileSystem implements FileSystem {
 	
 	/**
 	 * Constructor for RAMFileSystem
+	 * @param device 
+	 * @param readOnly 
+	 * @param maxSize 
+	 * @throws FileSystemException 
 	 */
 	public RAMFileSystem(Device device, boolean readOnly, int maxSize) throws FileSystemException {
 		this.device = device;
@@ -33,24 +41,44 @@ public class RAMFileSystem implements FileSystem {
 		root = new RAMDirectory(this, null, "");
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FileSystem#getDevice()
+	 */
 	public Device getDevice() {
 		return device;
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FileSystem#getRootEntry()
+	 */
 	public FSEntry getRootEntry() throws IOException {
 		if (isClosed())
 			throw new IOException("Filesystem closed");
 		return root;
 	}
 	
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FileSystem#isReadOnly()
+	 */
 	public boolean isReadOnly() {
 		return readOnly;
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FileSystem#close()
+	 */
 	public void close() throws IOException {
 		root = null;
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FileSystem#isClosed()
+	 */
 	public boolean isClosed() {
 		return (root == null);
 	}

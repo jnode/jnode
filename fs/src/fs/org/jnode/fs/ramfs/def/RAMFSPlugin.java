@@ -24,11 +24,19 @@ import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
 
+/**
+ * This plugin creates a new Ram filesystem and mounts it to /jnode/
+ * 
+ * @author peda
+ */
 public class RAMFSPlugin extends Plugin {
 
 	/** RAMFS logger */
 	private static final Logger log = Logger.getLogger(RAMFSPlugin.class);
 
+	/**
+	 * @param descriptor
+	 */
 	public RAMFSPlugin(PluginDescriptor descriptor) {
 		super(descriptor);
         log.debug("RAMFSPlugin created.");

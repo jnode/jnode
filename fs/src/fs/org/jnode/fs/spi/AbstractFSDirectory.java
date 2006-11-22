@@ -37,8 +37,16 @@ import org.jnode.fs.ReadOnlyFileSystemException;
  * @author Fabien DUMINY
  */
 public abstract class AbstractFSDirectory extends AbstractFSObject
-		implements
-			FSDirectory {
+		implements FSDirectory {
+
+	private static final Logger log = Logger.getLogger(AbstractFSDirectory.class);	
+
+	/* Table of entries */
+	private FSEntryTable entries = FSEntryTable.EMPTY_TABLE;
+	
+	/* Is this directory a root-directory? */
+	private boolean isRoot;
+	
 	/**
 	 * Constructor for a new non-root directory
 	 * @param fs
@@ -88,7 +96,7 @@ public abstract class AbstractFSDirectory extends AbstractFSObject
 	
 	/**
 	 * Is this directory a root ?
-	 * @return
+	 * @return if this directory is the root 
 	 */
 	final public boolean isRoot()
 	{
@@ -110,9 +118,10 @@ public abstract class AbstractFSDirectory extends AbstractFSObject
 	 * Add a new directory with a given name
 	 * 
 	 * @param name
+	 * @return the new added directory
 	 * @throws IOException
 	 */
-	final public synchronized FSEntry addDirectory(String name) throws IOException {
+	public final synchronized FSEntry addDirectory(String name) throws IOException {
 		log.debug("<<< BEGIN addDirectory "+name+" >>>");
 		if(!canWrite())
 			throw new ReadOnlyFileSystemException("Filesystem or directory is mounted read-only!");
@@ -130,8 +139,9 @@ public abstract class AbstractFSDirectory extends AbstractFSObject
 	 * Remove a file or directory with a given name
 	 * 
 	 * @param name
+	 * @throws IOException 
 	 */
-	final public synchronized void remove(String name) throws IOException {
+	public final synchronized void remove(String name) throws IOException {
 		if(!canWrite())
 			throw new IOException("Filesystem or directory is mounted read-only!");
 		
@@ -146,9 +156,9 @@ public abstract class AbstractFSDirectory extends AbstractFSObject
 	
 	/**
 	 * Flush the contents of this directory to the persistent storage
+	 * @throws IOException 
 	 */
-	final public void flush() throws IOException
-	{
+	public final void flush() throws IOException {
 		if(canWrite())
 		{
 			boolean flushEntries = isEntriesLoaded() && entries.isDirty();
@@ -177,8 +187,10 @@ public abstract class AbstractFSDirectory extends AbstractFSObject
 
 	/**
 	 * Is this directory dirty (ie is there any data to save to device) ?
+	 * @return if this directory is dirty
+	 * @throws IOException 
 	 */
-	final public boolean isDirty() throws IOException {
+	public final boolean isDirty() throws IOException {
 		if (super.isDirty()) {
 			return true;
 		}
@@ -195,7 +207,7 @@ public abstract class AbstractFSDirectory extends AbstractFSObject
 	 * because it call the method readEntries of the child classes that are not
 	 * yet initialized (constructed). 
 	 */
-	final protected void checkEntriesLoaded()
+	protected final void checkEntriesLoaded()
 	{
 		log.debug("<<< BEGIN checkEntriesLoaded >>>");		
 		if(!isEntriesLoaded())
@@ -228,9 +240,9 @@ public abstract class AbstractFSDirectory extends AbstractFSObject
 
 	/**
 	 * Have we already loaded our entries from device ?
-	 * @return
+	 * @return if the entries are allready loaded from the device
 	 */
-	final private boolean isEntriesLoaded()
+	private final boolean isEntriesLoaded()
 	{
 		return (entries != FSEntryTable.EMPTY_TABLE);
 	}
@@ -240,8 +252,9 @@ public abstract class AbstractFSDirectory extends AbstractFSObject
 	 * 
 	 * @param name
 	 * @throws IOException
+	 * @return the added file entry
 	 */
-	final public synchronized FSEntry addFile(String name) throws IOException {
+	public final synchronized FSEntry addFile(String name) throws IOException {
 		log.debug("<<< BEGIN addFile "+name+" >>>");
 		if(!canWrite())
 			throw new ReadOnlyFileSystemException("Filesystem or directory is mounted read-only!");
@@ -259,7 +272,7 @@ public abstract class AbstractFSDirectory extends AbstractFSObject
 	/**
 	 * Abstract method to create a new file entry from the given name
 	 * @param name
-	 * @return
+	 * @return the new created file
 	 * @throws IOException
 	 */
 	protected abstract FSEntry createFileEntry(String name) throws IOException;
@@ -267,7 +280,7 @@ public abstract class AbstractFSDirectory extends AbstractFSObject
 	/**
 	 * Abstract method to create a new directory entry from the given name
 	 * @param name
-	 * @return
+	 * @return the new created directory
 	 * @throws IOException
 	 */
 	protected abstract FSEntry createDirectoryEntry(String name) throws IOException;
@@ -293,7 +306,7 @@ public abstract class AbstractFSDirectory extends AbstractFSObject
 	
 	/**
 	 * Return our entry table
-	 * @return
+	 * @return the entry table
 	 */
 	protected FSEntryTable getEntryTable()
 	{
@@ -301,22 +314,10 @@ public abstract class AbstractFSDirectory extends AbstractFSObject
 	}
 	
 	/**
-	 * return a string representation of this instance.
+	 * @return a string representation of this instance.
 	 */
 	public String toString()
 	{
 		return entries.toString();
 	}
-		
-	/**
-	 * Table of entries
-	 */
-	private FSEntryTable entries = FSEntryTable.EMPTY_TABLE;
-	
-	/**
-	 * Is this directory a root-directory ?
-	 */
-	private boolean isRoot;
-	
-	private static final Logger log = Logger.getLogger(AbstractFSDirectory.class);	
 }

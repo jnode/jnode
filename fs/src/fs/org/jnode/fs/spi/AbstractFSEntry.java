@@ -36,14 +36,46 @@ import org.jnode.fs.util.FSUtils;
  * @author Fabien DUMINY
  */
 public abstract class AbstractFSEntry extends AbstractFSObject implements FSEntry {
-	// common types of entries found in most FileSystems 
-	public static final int FIRST_ENTRY = -2; // fake entry: lower bound
-	public static final int OTHER_ENTRY = -1; // other entry
-	public static final int DIR_ENTRY   =  0; // directory entry
-	public static final int FILE_ENTRY  =  1; // file entry
-	public static final int ROOT_ENTRY  =  2; // root entry
-	public static final int LAST_ENTRY  =  3; // fake entry: upper bound
 
+	private static final Logger log = Logger.getLogger(AbstractFSEntry.class);	
+
+	// common types of entries found in most FileSystems: 
+	/** Fake entry: lower bound */
+	public static final int FIRST_ENTRY = -2;
+	/** Other entry */
+	public static final int OTHER_ENTRY = -1;
+	/** directory entry */
+	public static final int DIR_ENTRY   =  0;
+	/** file entry */
+	public static final int FILE_ENTRY  =  1;
+	/** root entry */
+	public static final int ROOT_ENTRY  =  2;
+	/** fake entry: upper bound */
+	public static final int LAST_ENTRY  =  3;
+
+
+	/** Type of entry */
+	private int type;
+	
+	/** name of the entry */
+	private String name;
+	
+	/** Date of last modification of the entry */
+	private long lastModified;
+	
+	/** access rights of the entry */
+	private FSAccessRights rights;
+	
+	/** Parent directory of the entry */
+	private FSDirectory parent; // parent is null for a root
+	
+	/** Table of entries of our parent */
+	private FSEntryTable table; // table is null for a root
+	
+	/** should we treat this directory entry as a file entry ? */
+	private boolean treatDirectoryAsFile = false;
+
+	
 	/**
 	 * Constructor for a root entry
 	 * 
@@ -77,20 +109,24 @@ public abstract class AbstractFSEntry extends AbstractFSObject implements FSEntr
 
 	/**
 	 * Return the name of this entry
+	 * @return the name of this entry
 	 */
-	final public String getName() {
+	public final String getName() {
 		return name;
 	}
 	
 	/**
 	 * Return the parent directory (if any) of this entry
+	 * @return the parent directory of this entry
 	 */
-	final public FSDirectory getParent() {
+	public final FSDirectory getParent() {
 		return parent;
 	}
 	
 	/**
 	 * Return the date of the last modification of this entry
+	 * @return the date of the last modification
+	 * @throws IOException 
 	 */
 	public long getLastModified() throws IOException {
 		return lastModified;
@@ -98,30 +134,34 @@ public abstract class AbstractFSEntry extends AbstractFSObject implements FSEntr
 	
 	/**
 	 * Indicate if this entry is a file
+	 * @return if this entry denotes a file
 	 */
-	final public boolean isFile() {
+	public final boolean isFile() {
 		return treatDirectoryAsFile || (type == FILE_ENTRY);
 	}
 	
 	/**
 	 * Indicate if this entry is a directory
+	 * @return is this entry denotes a directory
 	 */
-	final public boolean isDirectory() {
+	public final boolean isDirectory() {
 		return (type == DIR_ENTRY) || isRoot();
 	}
 
 	/**
 	 * Indicate if this entry is a root-directory
-	 * @return
+	 * @return if this entry is the root directory
 	 */
-	final public boolean isRoot() {
+	public final boolean isRoot() {
 		return (type == ROOT_ENTRY) ;
 	}
 
 	/**
 	 * Change the name of this entry
+	 * @param newName 
+	 * @throws IOException 
 	 */
-	final public void setName(String newName) throws IOException {
+	public final void setName(String newName) throws IOException {
 		log.debug("<<< BEGIN setName newName="+newName+" >>>");
 		// NB: table is null for a root
 		if(isRoot())
@@ -143,20 +183,24 @@ public abstract class AbstractFSEntry extends AbstractFSObject implements FSEntr
 	
 	/**
 	 * Change the date of the last modification of this entry 
+	 * @param lastModified 
+	 * @throws IOException 
 	 */
-	final public void setLastModified(long lastModified) throws IOException {
-/*		if(isRoot())
-		{
+	public final void setLastModified(long lastModified) throws IOException {
+		/*
+		if(isRoot()) {
 			throw new IOException("Cannot change last modified of root directory");
 		}
-*/	
+		 */	
 		this.lastModified = lastModified;
 	}
 	
 	/**
 	 * Return the file associated with this entry
+	 * @return the FSFile associated with this entry
+	 * @throws IOException 
 	 */
-	final public FSFile getFile() throws IOException {
+	public final FSFile getFile() throws IOException {
 		if(!isFile())
 			throw new IOException(getName()+" is not a file");
 		
@@ -165,8 +209,10 @@ public abstract class AbstractFSEntry extends AbstractFSObject implements FSEntr
 	
 	/**
 	 * Return the directory associated with this entry
+	 * @return the directory associated with this entry
+	 * @throws IOException 
 	 */
-	final public FSDirectory getDirectory() throws IOException {
+	public final FSDirectory getDirectory() throws IOException {
 		if(!isDirectory())
 			throw new IOException(getName()+" is not a directory");
 		
@@ -175,8 +221,10 @@ public abstract class AbstractFSEntry extends AbstractFSObject implements FSEntr
 	
 	/**
 	 * Return the access rights for this entry
+	 * @return the FSAccessRights for this entry
+	 * @throws IOException 
 	 */
-	final public FSAccessRights getAccessRights() throws IOException {
+	public final FSAccessRights getAccessRights() throws IOException {
 		return rights;
 	}
 	
@@ -184,50 +232,15 @@ public abstract class AbstractFSEntry extends AbstractFSObject implements FSEntr
 	 * Should we treat this directory entry as a file entry ? 
 	 *
 	 */
-	final protected void setTreatDirectoryAsFile()
-	{
+	protected final void setTreatDirectoryAsFile() {
 		this.treatDirectoryAsFile = true;
 	}
 	
-	public String toString()
-	{
+	/**
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString() {
 		return FSUtils.toString(this, false);
 	}
-	
-	/**
-	 * Type of entry
-	 */
-	private int type;
-	
-	/**
-	 * name of the entry
-	 */
-	private String name;
-	
-	/**
-	 * Date of last modification of the entry
-	 */
-	private long lastModified;
-	
-	/**
-	 * access rights of the entry
-	 */
-	private FSAccessRights rights;
-	
-	/**
-	 * Parent directory of the entry
-	 */
-	private FSDirectory parent; // parent is null for a root
-	
-	/**
-	 * Table of entries of our parent
-	 */
-	private FSEntryTable table; // table is null for a root
-	
-	/**
-	 * should we treat this directory entry as a file entry ?
-	 */
-	private boolean treatDirectoryAsFile = false;
-	
-	private static final Logger log = Logger.getLogger(AbstractFSEntry.class);	
 }

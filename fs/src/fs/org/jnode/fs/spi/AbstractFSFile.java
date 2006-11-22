@@ -33,39 +33,41 @@ import org.jnode.fs.FSFile;
  */
 public abstract class AbstractFSFile extends AbstractFSObject 
 					implements FSFile {
+
 	/**
 	 * Constructor for a new AbstractFSFile    
+	 * @param fs 
 	 */
 	public AbstractFSFile(AbstractFileSystem fs) {
 		super(fs);
 	}
 
 	/**
-	 * Return the length of the file
+	 * @return the length of the file
 	 */
 	public abstract long getLength();
 
 	/**
-	 * chanhge the length of the file
-	 */
-	public abstract void setLength(long length) throws IOException;
-
-	/**
 	 * Read some data from the file
+	 * 
+	 * @param fileOffset offset to begin reading
+	 * @param dest the ByteBuffer used to store the read data
+	 * @throws IOException
 	 */
-	//public abstract void read(long fileOffset, byte[] dest, int off, int len)
-    public abstract void read(long fileOffset, ByteBuffer dest)
-			throws IOException;
+    public abstract void read(long fileOffset, ByteBuffer dest) throws IOException;
 
 	/**
 	 * Write some data to the file
+	 * 
+	 * @param fileOffset offset to begin writing
+	 * @param src buffer to be written the file
+	 * @throws IOException
 	 */
-//  public abstract void write(long fileOffset, byte[] src, int off, int len)
-	public abstract void write(long fileOffset, ByteBuffer src)
-			throws IOException;
+	public abstract void write(long fileOffset, ByteBuffer src) throws IOException;
 
 	/**
 	 * Flush all unsaved data to the device
+	 * @throws IOException 
 	 */
 	public abstract void flush() throws IOException;
 }

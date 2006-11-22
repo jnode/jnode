@@ -42,6 +42,8 @@ import org.jnode.fs.FileSystemException;
  */
 public abstract class AbstractFileSystem implements FileSystem {
 
+    private static final Logger log = Logger.getLogger(AbstractFileSystem.class);    
+
     private boolean readOnly;
 
     private final Device device;
@@ -60,6 +62,9 @@ public abstract class AbstractFileSystem implements FileSystem {
 
     /**
      * Construct an AbstractFileSystem in specified readOnly mode
+     * @param device 
+     * @param readOnly 
+     * @throws FileSystemException 
      */
     public AbstractFileSystem(Device device, boolean readOnly)
             throws FileSystemException {
@@ -145,20 +150,21 @@ public abstract class AbstractFileSystem implements FileSystem {
 
     /**
      * @return Returns the FSApi.
+     * @throws ApiNotFoundException 
      */
     final public FSBlockDeviceAPI getFSApi() throws ApiNotFoundException {
     	return device.getAPI(FSBlockDeviceAPI.class);
     }
 
     /**
-     * @return Returns the closed.
+     * @return if filesystem is closed.
      */
     final public boolean isClosed() {
         return closed;
     }
 
     /**
-     * @return Returns the readOnly.
+     * @return if filesystem is readOnly.
      */
     final public boolean isReadOnly() {
         return readOnly;
@@ -172,6 +178,8 @@ public abstract class AbstractFileSystem implements FileSystem {
 	 * Gets the file for the given entry.
 	 * 
 	 * @param entry
+	 * @return the FSFile object associated with entry
+	 * @throws IOException 
 	 */
 	final public synchronized FSFile getFile(FSEntry entry) throws IOException {
     	if(isClosed())
@@ -188,7 +196,7 @@ public abstract class AbstractFileSystem implements FileSystem {
 	/**
 	 * Abstract method to create a new FSFile from the entry
 	 * @param entry
-	 * @return
+	 * @return a new created FSFile
 	 * @throws IOException
 	 */
 	protected abstract FSFile createFile(FSEntry entry) throws IOException;
@@ -214,6 +222,8 @@ public abstract class AbstractFileSystem implements FileSystem {
 	 * Gets the file for the given entry.
 	 * 
 	 * @param entry
+	 * @return the FSDirectory object associated with this entry
+	 * @throws IOException 
 	 */
 	final public synchronized FSDirectory getDirectory(FSEntry entry) throws IOException {
     	if(isClosed())
@@ -230,7 +240,7 @@ public abstract class AbstractFileSystem implements FileSystem {
 	/**
 	 * Abstract method to create a new directory from the given entry
 	 * @param entry
-	 * @return
+	 * @return the new created FSDirectory
 	 * @throws IOException
 	 */
 	protected abstract FSDirectory createDirectory(FSEntry entry) throws IOException;
@@ -255,10 +265,8 @@ public abstract class AbstractFileSystem implements FileSystem {
 
     /**
      * Abstract method to create a new root entry
-     * @return
+     * @return the new created root entry
      * @throws IOException
      */
     protected abstract FSEntry createRootEntry() throws IOException;
-
-    static private final Logger log = Logger.getLogger(AbstractFileSystem.class);    
 }

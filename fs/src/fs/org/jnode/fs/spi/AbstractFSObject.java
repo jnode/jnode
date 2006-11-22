@@ -32,8 +32,21 @@ import org.jnode.fs.FileSystem;
  * @author Fabien DUMINY
  */
 public abstract class AbstractFSObject implements FSObject {
-	public AbstractFSObject(AbstractFileSystem fs)
-	{
+
+	private AbstractFileSystem fileSystem;
+
+	private boolean valid;
+	private boolean dirty;
+	
+	// should use FSAccessRights for these fields
+	private boolean canRead = true;
+	private boolean canWrite = true;
+		
+	/**
+	 * Create a new AbstracFSObject
+	 * @param fs
+	 */
+	public AbstractFSObject(AbstractFileSystem fs) {
 		this.fileSystem = fs;
 		this.valid = true;
 		this.dirty = false;
@@ -42,10 +55,8 @@ public abstract class AbstractFSObject implements FSObject {
 
 	/**
 	 * Use it carefully ! Only needed for FSEntryTable.EMPTY_TABLE.
-	 *
 	 */
-	protected AbstractFSObject()
-	{
+	protected AbstractFSObject() {
 		this.fileSystem = null;
 		this.valid = true;
 		this.dirty = false;
@@ -54,8 +65,9 @@ public abstract class AbstractFSObject implements FSObject {
 
 	/**
 	 * Is this object still valid ?
+	 * @return if this object is still valid
 	 */
-	final public boolean isValid() {
+	public final boolean isValid() {
 		return valid;
 	}
 
@@ -63,17 +75,16 @@ public abstract class AbstractFSObject implements FSObject {
      * Set the valid flag.
      * @param valid
      */
-    protected final void setValid(boolean valid){
+    protected final void setValid(boolean valid) {
         this.valid = valid;
     }
 
     /**
 	 * Is this object dirty (ie some data need to be saved to device)
-	 * @return
+	 * @return if this object is dirty
 	 * @throws IOException
 	 */
-	public boolean isDirty() throws IOException 
-	{
+	public boolean isDirty() throws IOException {
 		return dirty;
 	}
 	
@@ -93,8 +104,9 @@ public abstract class AbstractFSObject implements FSObject {
 
 	/**
 	 * Get the file system that this object belong to
+	 * @return the FileSystem this object belongs to
 	 */
-	final public FileSystem getFileSystem() {
+	public final FileSystem getFileSystem() {
 		return fileSystem;
 	}
 	
@@ -103,36 +115,24 @@ public abstract class AbstractFSObject implements FSObject {
 	 * @param read
 	 * @param write
 	 */
-	final public void setRights(boolean read, boolean write)
-	{
+	public final void setRights(boolean read, boolean write) {
 		this.canRead = read;
 		this.canWrite = write;
 	}
 	
 	/**
 	 * Can we read this object on device ?
-	 * @return
+	 * @return if we can read this object from device
 	 */
-	final public boolean canRead()
-	{
+	public final boolean canRead() {
 		return this.canRead;
 	}
 
 	/**
 	 * Can we write this object on device ?
-	 * @return
+	 * @return if we can write this object to device
 	 */
-	final public boolean canWrite()
-	{
+	public final boolean canWrite() {
 		return this.canWrite;
 	}
-
-	private boolean valid;
-	private boolean dirty;
-	
-	// should use FSAccessRights for these fields
-	private boolean canRead = true;
-	private boolean canWrite = true;
-	
-	private AbstractFileSystem fileSystem;
 }

@@ -11,9 +11,14 @@ import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
 
+/**
+ * A Directory implementation in the system RAM
+ * 
+ * @author peda
+ */
 public class RAMDirectory implements FSEntry, FSDirectory {
 
-	/**	Logger*/	
+	/**	Logger */	
 	private static final Logger log = Logger.getLogger(RAMDirectory.class);
 
 	private RAMFileSystem filesystem;
@@ -29,6 +34,13 @@ public class RAMDirectory implements FSEntry, FSDirectory {
 	
 	private HashMap<String, FSEntry> entries;
 	
+	/**
+	 * Constructor for a new RAMDirectory
+	 * 
+	 * @param fs
+	 * @param parent
+	 * @param name
+	 */
 	public RAMDirectory(RAMFileSystem fs, RAMDirectory parent, String name) {
 		
 		this.filesystem = fs;
@@ -46,86 +58,151 @@ public class RAMDirectory implements FSEntry, FSDirectory {
 		entries = new HashMap<String, FSEntry>();
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSEntry#getName()
+	 */
 	public String getName() {
 		return directoryName;
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSEntry#getParent()
+	 */
 	public FSDirectory getParent() {
 		return parent;
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSEntry#getLastModified()
+	 */
 	public long getLastModified() throws IOException {
 		return lastModified;
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSEntry#isFile()
+	 */
 	public boolean isFile() {
 		return false;
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSEntry#isDirectory()
+	 */
 	public boolean isDirectory() {
 		return true;
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSEntry#setName(java.lang.String)
+	 */
 	public void setName(String newName) throws IOException {
-		// TODO: check for special chars
+		// TODO: check for special chars / normalize name
 		directoryName = newName;
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSEntry#setLastModified(long)
+	 */
 	public void setLastModified(long lastModified) throws IOException {
 		this.lastModified = lastModified;
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSEntry#getFile()
+	 */
 	public FSFile getFile() throws IOException {
 		throw new IOException("Not a file");
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSEntry#getDirectory()
+	 */
 	public FSDirectory getDirectory() throws IOException {
 		return this;
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSEntry#getAccessRights()
+	 */
 	public FSAccessRights getAccessRights() throws IOException {
 		return accessRights;
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSEntry#isDirty()
+	 */
 	public boolean isDirty() throws IOException {
 		return false;
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSObject#isValid()
+	 */
 	public boolean isValid() {
 		return isValid;
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSObject#getFileSystem()
+	 */
 	public FileSystem getFileSystem() {
 		return filesystem;
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSDirectory#iterator()
+	 */
 	public Iterator<? extends FSEntry> iterator() throws IOException {
 		return entries.values().iterator();
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSDirectory#getEntry(java.lang.String)
+	 */
 	public FSEntry getEntry(String name) throws IOException {
-		//log.debug("GetEntry for: " + name);
 		return entries.get(name);
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSDirectory#addFile(java.lang.String)
+	 */
 	public FSEntry addFile(String name) throws IOException {
-
-		//log.debug("AddFile to directory " + directoryName + ". Filename is " + name);
-
 		RAMFile file = new RAMFile(this, name);
 		entries.put(name, file);
 		return file;
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSDirectory#addDirectory(java.lang.String)
+	 */
 	public FSEntry addDirectory(String name) throws IOException {
-
-		//log.debug("AddDirectory with name " + name);
-
 		RAMDirectory dir = new RAMDirectory(filesystem, this, name);
 		entries.put(name, dir);
 		return dir;
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSDirectory#remove(java.lang.String)
+	 */
 	public void remove(String name) throws IOException {
 
 		FSEntry entry = entries.remove(name);
@@ -142,7 +219,12 @@ public class RAMDirectory implements FSEntry, FSDirectory {
 		}
 	}
 	
-	public void remove() throws IOException {
+	/**
+	 * removes the directory and all entries inside that directory
+	 * 
+	 * @throws IOException
+	 */
+	private void remove() throws IOException {
 		Iterator<FSEntry> itr = entries.values().iterator();
 		while (itr.hasNext()) {
 			FSEntry entry = itr.next();
@@ -157,6 +239,10 @@ public class RAMDirectory implements FSEntry, FSDirectory {
 		parent = null;
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.fs.FSDirectory#flush()
+	 */
 	public void flush() throws IOException {
 		// nothing todo here
 	}
