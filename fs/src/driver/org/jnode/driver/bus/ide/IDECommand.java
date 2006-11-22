@@ -68,6 +68,7 @@ public abstract class IDECommand extends Command implements IDEConstants {
 
     /**
      * Is this command for the master (true) or slave (false).
+     * @return if this command is for the master  
      */
     public final boolean isMaster() {
         return master;
@@ -75,6 +76,7 @@ public abstract class IDECommand extends Command implements IDEConstants {
 
     /**
      * Is this command intended for the primary channel.
+     * @return if this command is intended for the primary channel
      */
     public final boolean isPrimary() {
         return primary;
@@ -82,6 +84,7 @@ public abstract class IDECommand extends Command implements IDEConstants {
 
     /**
      * Is this command intended for the secondary channel.
+     * @return if this command is intended for the secondary channel
      */
     public final boolean isSecondary() {
         return !primary;
@@ -89,6 +92,7 @@ public abstract class IDECommand extends Command implements IDEConstants {
 
     /**
      * Has this command got an error?
+     * @return if this command got an error
      */
     public final boolean hasError() {
         return (error != -1);
@@ -96,6 +100,7 @@ public abstract class IDECommand extends Command implements IDEConstants {
 
     /**
      * Gets the error code that occurred during this command
+     * @return the error code that occurred during this command
      */
     public final int getError() {
         return error;
@@ -114,8 +119,7 @@ public abstract class IDECommand extends Command implements IDEConstants {
 
     /**
      * Gets the value for the select register.
-     * 
-     * @return
+     * @return the value for the select register
      */
     protected final int getSelect() {
         if (master) {

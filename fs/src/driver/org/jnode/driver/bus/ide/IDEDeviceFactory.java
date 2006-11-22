@@ -26,20 +26,20 @@ import org.jnode.driver.DriverException;
 import org.jnode.partitions.ibm.IBMPartitionTable;
 import org.jnode.system.ResourceNotFreeException;
 
-public interface IDEDeviceFactory
-{
+public interface IDEDeviceFactory {
     /**
      * The name used to lookup this service.
      */
     public static final Class<IDEDeviceFactory> NAME = IDEDeviceFactory.class;
     
-    IDEDevice createIDEDevice(IDEBus bus, boolean primary, boolean master, String name, IDEDriveDescriptor descriptor, DefaultIDEControllerDriver controller);
+    IDEDevice createIDEDevice(IDEBus bus, boolean primary, boolean master, String name, 
+    		IDEDriveDescriptor descriptor, DefaultIDEControllerDriver controller);
     
     IDEBus createIDEBus(Device parent, boolean primary) 
-            throws IllegalArgumentException, DriverException, 
-                    ResourceNotFreeException;
+    		throws IllegalArgumentException, DriverException, ResourceNotFreeException;
 
-    IDEIO createIDEIO(Device parent, boolean primary) throws IllegalArgumentException, DriverException, ResourceNotFreeException;
+    IDEIO createIDEIO(Device parent, boolean primary) 
+    		throws IllegalArgumentException, DriverException, ResourceNotFreeException;
     
     IBMPartitionTable createIBMPartitionTable(byte[] bs, Device dev);
 }

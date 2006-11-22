@@ -147,6 +147,7 @@ public class DefaultIDEIO implements IDEIO {
 
     /**
      * Gets a word from the data register
+     * @return a word from the data register
      */
     public final int getDataReg() {
         return cmdBlock.inPortWord(cmdBlockStart + RW16_DATA_OFFSET);
@@ -163,6 +164,7 @@ public class DefaultIDEIO implements IDEIO {
     
     /**
      * Gets the contents of the error register
+     * @return the contents of the error register
      */
     public final int getErrorReg() {
         return cmdBlock.inPortByte(cmdBlockStart + R8_ERROR_OFFSET);
@@ -170,6 +172,7 @@ public class DefaultIDEIO implements IDEIO {
 
     /**
      * Sets the contents of the featureregister
+     * @param features 
      */
     public final void setFeatureReg(int features) {
         cmdBlock.outPortByte(cmdBlockStart + W8_FEATURE_OFFSET, features);
@@ -177,6 +180,7 @@ public class DefaultIDEIO implements IDEIO {
 
     /**
      * Gets the contents of the sector count register
+     * @return the contents of the sector count register
      */
     public final int getSectorCountReg() {
         return cmdBlock.inPortByte(cmdBlockStart + RW8_SECTOR_COUNT_OFFSET);
@@ -193,6 +197,7 @@ public class DefaultIDEIO implements IDEIO {
 
     /**
      * Gets the contents of the sector register
+     * @return the contents of the sector register
      */
     public final int getSectorReg() {
         return cmdBlock.inPortByte(cmdBlockStart + RW8_SECTOR_OFFSET);
@@ -200,6 +205,7 @@ public class DefaultIDEIO implements IDEIO {
 
     /**
      * Gets the contents of the LBA low register
+     * @return the contents of the LBA low register
      */
     public final int getLbaLowReg() {
         return cmdBlock.inPortByte(cmdBlockStart + RW8_LBA_LOW_OFFSET);
@@ -207,6 +213,7 @@ public class DefaultIDEIO implements IDEIO {
 
     /**
      * Gets the contents of the LBA mid register
+     * @return the contents of the LBA mid register
      */
     public final int getLbaMidReg() {
         return cmdBlock.inPortByte(cmdBlockStart + RW8_LBA_MID_OFFSET);
@@ -214,6 +221,7 @@ public class DefaultIDEIO implements IDEIO {
 
     /**
      * Gets the contents of the LBA high register
+     * @return the contents of the LBA high register
      */
     public final int getLbaHighReg() {
         return cmdBlock.inPortByte(cmdBlockStart + RW8_LBA_HIGH_OFFSET);
@@ -221,6 +229,7 @@ public class DefaultIDEIO implements IDEIO {
 
     /**
      * Sets the contents of the LBA low register
+     * @param value 
      */
     public final void setLbaLowReg(int value) {
         cmdBlock.outPortByte(cmdBlockStart + RW8_LBA_LOW_OFFSET, value);
@@ -228,6 +237,7 @@ public class DefaultIDEIO implements IDEIO {
 
     /**
      * Sets the contents of the LBA mid register
+     * @param value 
      */
     public final void setLbaMidReg(int value) {
         cmdBlock.outPortByte(cmdBlockStart + RW8_LBA_MID_OFFSET, value);
@@ -235,6 +245,7 @@ public class DefaultIDEIO implements IDEIO {
 
     /**
      * Sets the contents of the LBA high register
+     * @param value 
      */
     public final void setLbaHighReg(int value) {
         cmdBlock.outPortByte(cmdBlockStart + RW8_LBA_HIGH_OFFSET, value);
@@ -271,6 +282,7 @@ public class DefaultIDEIO implements IDEIO {
 
     /**
      * Gets the contents of the select register
+     * @return the contents of the select register
      */
     public final int getSelectReg() {
         return cmdBlock.inPortByte(cmdBlockStart + RW8_SELECT_OFFSET);
@@ -287,6 +299,7 @@ public class DefaultIDEIO implements IDEIO {
 
     /**
      * Gets the status of the IDE controller. Any pending IRQ is reset.
+     * @return the status of the IDE controller. Any pending IRQ is reset.
      */
     public final int getStatusReg() {
         return cmdBlock.inPortByte(cmdBlockStart + R8_STATUS_OFFSET);
@@ -295,6 +308,7 @@ public class DefaultIDEIO implements IDEIO {
     /**
      * Gets the alternative status of the IDE controller. Any pending IRQ is
      * NOT reset.
+     * @return the alternative status of the IDE controller
      */
     public final int getAltStatusReg() {
         return ctrlBlock.inPortByte(altStatusPort);
@@ -322,6 +336,7 @@ public class DefaultIDEIO implements IDEIO {
 
     /**
      * Is this channel busy.
+     * @return if this channel is busy
      */
     public final boolean isBusy() {
         return ((getAltStatusReg() & ST_BUSY) == ST_BUSY);        
@@ -329,6 +344,8 @@ public class DefaultIDEIO implements IDEIO {
     
     /**
      * Block the current thread until the controller is not busy anymore.
+     * @param timeout 
+     * @throws TimeoutException 
      */
     public final void waitUntilNotBusy(long timeout) throws TimeoutException {
         while (isBusy()) {

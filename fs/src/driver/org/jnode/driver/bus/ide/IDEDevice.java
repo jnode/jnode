@@ -38,8 +38,12 @@ public class IDEDevice extends Device {
 	
 	/**
 	 * Create a new instance
+	 * @param bus 
+	 * @param primary 
+	 * @param master 
 	 * @param name
 	 * @param descriptor
+	 * @param controller 
 	 */
 	public IDEDevice(IDEBus bus, boolean primary, boolean master, String name, IDEDriveDescriptor descriptor, DefaultIDEControllerDriver controller) {
 		super(bus, name);
@@ -51,6 +55,7 @@ public class IDEDevice extends Device {
 	
 	/**
 	 * Gets the descriptor of this device
+	 * @return the descriptor of this device
 	 */
 	public IDEDriveDescriptor getDescriptor() {
 		return descriptor;
@@ -58,6 +63,7 @@ public class IDEDevice extends Device {
 
 	/**
 	 * Is this device master on the IDE bus?
+	 * @return if this device is the master on its bus
 	 */
 	public boolean isMaster() {
 		return master;
@@ -65,6 +71,7 @@ public class IDEDevice extends Device {
 
 	/**
 	 * Is this device on the primary channel 
+	 * @return if this device is on the primary channel
 	 */
 	public boolean isPrimary() {
 		return primary;
@@ -72,6 +79,7 @@ public class IDEDevice extends Device {
 	
 	/**
 	 * Is this device on the secondary channel 
+	 * @return if this device is on the secondary channel
 	 */
 	public boolean isSecondary() {
 		return !primary;
@@ -79,6 +87,7 @@ public class IDEDevice extends Device {
 	
 	/**
 	 * Gets the controller of this device
+	 * @return the DefaultIDEControllerDriver for this device
 	 */
 	public DefaultIDEControllerDriver getController() {
 		return controller;

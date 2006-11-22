@@ -119,6 +119,8 @@ public class IDEBus extends Bus implements IDEConstants, IRQHandler,
      * @param command
      * @param timeout
      *            Maximum time to wait
+     * @throws InterruptedException 
+     * @throws TimeoutException 
      */
     public void executeAndWait(IDECommand command, long timeout)
             throws InterruptedException, TimeoutException {
@@ -137,6 +139,7 @@ public class IDEBus extends Bus implements IDEConstants, IRQHandler,
 
     /**
      * Handle the IDE interrupt.
+     * @param irq 
      */
     public void handleInterrupt(int irq) {
         final IDECommand cmd = currentCommand;
@@ -161,6 +164,8 @@ public class IDEBus extends Bus implements IDEConstants, IRQHandler,
      * Probe for the existence of a given IDE device.
      * 
      * @param master
+     * @return the found IDEDriveDescriptor
+     * @throws InterruptedException 
      */
     public IDEDriveDescriptor probe(boolean master) throws InterruptedException {
 
@@ -268,7 +273,7 @@ public class IDEBus extends Bus implements IDEConstants, IRQHandler,
     /**
      * Is the current register state a packet response.
      * 
-     * @return
+     * @return if the current register state is a packet response
      */
     protected boolean isPacketResponse() {
         final int sectCount = io.getSectorCountReg();
@@ -318,6 +323,7 @@ public class IDEBus extends Bus implements IDEConstants, IRQHandler,
     }
 
     /**
+     * (non-Javadoc)
      * @see org.jnode.util.QueueProcessor#process(java.lang.Object)
      */
     public void process(IDECommand cmd) /*throws Exception*/ {
