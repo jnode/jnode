@@ -30,35 +30,47 @@ import java.util.jar.JarFile;
 import org.jnode.fs.ReadOnlyFileSystemException;
 
 /**
- * <description>
+ * This class is a device that wraps a JarFile
  * 
  * @author epr
  */
 public class JarFileDevice extends FileDevice implements FSBlockDeviceAPI {
-    private JarFile jarFile;
+
+	private JarFile jarFile;
     
+	
+	/**
+	 * Create a new JarFileDevice
+	 * @param file
+	 * @param mode
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
 	public JarFileDevice(File file, String mode) throws FileNotFoundException, IOException {
 		super(file, mode);
         jarFile = new JarFile(file);
     }
     
-    public JarFile getJarFile()
-    {
+    /**
+     * Returns the JarFile wraped by this device
+     * @return the wraped JarFile
+     */
+    public JarFile getJarFile() {
         return jarFile; 
     }
-    
+
 	/**
-	 * @param devOffset
-	 * @param src
-	 * @param srcOffset
-	 * @param length
-	 * @see org.jnode.driver.block.BlockDeviceAPI#write(long, byte[], int, int)
-	 * @throws IOException
+	 * This method allways throws an Exception, since the JarFileSystem is not writable.
+	 * @see org.jnode.driver.block.FileDevice#write(long, java.nio.ByteBuffer)
 	 */
 	public void write(long devOffset, ByteBuffer srcBuf) throws IOException {
         throw new ReadOnlyFileSystemException("jar file systems are not writeable");
 	}
 
+	/**
+	 * This method allways throws an Exception, since the JarFileSystem is not writable.
+	 * @see org.jnode.driver.block.FileDevice#setLength(long)
+	 */
 	public void setLength(long length) throws IOException {
         throw new ReadOnlyFileSystemException("jar file systems are not writeable");
 	}

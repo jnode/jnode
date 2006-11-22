@@ -103,12 +103,8 @@ public class FloppyDriver extends Driver implements FSBlockDeviceAPI, RemovableD
 	}
 
 	/**
-	 * @param devOffset
-	 * @param dest
-	 * @param destOffset
-	 * @param length
-	 * @see org.jnode.driver.block.BlockDeviceAPI#read(long, byte[], int, int)
-	 * @throws IOException
+	 * (non-Javadoc)
+	 * @see org.jnode.driver.block.BlockDeviceAPI#read(long, java.nio.ByteBuffer)
 	 */
 	public void read(long devOffset, ByteBuffer destBuf) throws IOException {
         //TODO optimize it also to use ByteBuffer at lower level                 
@@ -162,12 +158,8 @@ public class FloppyDriver extends Driver implements FSBlockDeviceAPI, RemovableD
 	}
 
 	/**
-	 * @param devOffset
-	 * @param src
-	 * @param srcOffset
-	 * @param length
-	 * @see org.jnode.driver.block.BlockDeviceAPI#write(long, byte[], int, int)
-	 * @throws IOException
+	 * (non-Javadoc)
+	 * @see org.jnode.driver.block.BlockDeviceAPI#write(long, java.nio.ByteBuffer)
 	 */
 	public void write(long devOffset, ByteBuffer srcBuf) throws IOException {
         //TODO optimize it also to use ByteBuffer at lower level                 
@@ -240,7 +232,7 @@ public class FloppyDriver extends Driver implements FSBlockDeviceAPI, RemovableD
 
     /**
      * Can this device be locked.
-     * @return
+     * @return if this device can be locked
      */
     public boolean canLock() {
         return false;
@@ -248,7 +240,7 @@ public class FloppyDriver extends Driver implements FSBlockDeviceAPI, RemovableD
     
     /**
      * Can this device be ejected.
-     * @return
+     * @return if this device can be ejected
      */
     public boolean canEject() {
         return false;

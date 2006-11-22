@@ -28,12 +28,18 @@ import org.jnode.driver.Driver;
 import org.jnode.driver.InvalidDriverException;
 
 /**
+ * This class is a device wrapping a simple byte array
+ * 
  * @author epr
  */
 public class ByteArrayDevice extends Device implements BlockDeviceAPI {
 
 	private byte[] array;
 
+	/**
+	 * Create a new ByteArrayDevice wrapping the given array
+	 * @param array
+	 */
 	public ByteArrayDevice(byte[] array) {
 		super(null, "byte-array" + System.currentTimeMillis());
 		this.array = array;
@@ -49,11 +55,8 @@ public class ByteArrayDevice extends Device implements BlockDeviceAPI {
 	}
 
 	/**
-	 * @param devOffset
-	 * @param dest
-	 * @param destOffset
-	 * @param length
-	 * @see org.jnode.driver.block.BlockDeviceAPI#read(long, byte[], int, int)
+	 * (non-Javadoc)
+	 * @see org.jnode.driver.block.BlockDeviceAPI#read(long, java.nio.ByteBuffer)
 	 */
 	public void read(long devOffset, ByteBuffer dest) {
 		//System.arraycopy(array, (int)devOffset, dest, destOffset, length);
@@ -61,11 +64,8 @@ public class ByteArrayDevice extends Device implements BlockDeviceAPI {
 	}
 
 	/**
-	 * @param devOffset
-	 * @param src
-	 * @param srcOffset
-	 * @param length
-	 * @see org.jnode.driver.block.BlockDeviceAPI#write(long, byte[], int, int)
+	 * (non-Javadoc)
+	 * @see org.jnode.driver.block.BlockDeviceAPI#write(long, java.nio.ByteBuffer)
 	 */
 	public void write(long devOffset, ByteBuffer src) {
 		//System.arraycopy(src, srcOffset, array, (int)devOffset, length);

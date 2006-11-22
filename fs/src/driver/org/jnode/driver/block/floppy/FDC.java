@@ -108,19 +108,66 @@ public interface FDC extends IRQHandler, FloppyConstants {
 	 */
 	public int getDTR(int drive);
 	
+	/**
+	 * Logs the DMA State via default logger
+	 * @throws DMAException
+	 */
 	public void logDMAState() throws DMAException;
 
-    public void setDorReg(int drive, boolean b, boolean c);
+	/**
+	 * Sets the DOR register
+	 * @param drive
+	 * @param motorOn
+	 * @param dma
+ 	 */
+    public void setDorReg(int drive, boolean motorOn, boolean dma);
 
-    public void sendCommand(byte[] cmd, boolean b) throws FloppyException;
+	/**
+	 * Send a command to the FDC
+	 * @param command
+	 * @param enableDMA
+	 * @throws FloppyException
+	 */
+    public void sendCommand(byte[] command, boolean enableDMA) throws FloppyException;
 
-    public byte[] getCommandState(int i) throws TimeoutException, FloppyException;
+	/**
+	 * Gets a command status from the FDC
+	 * @param length
+	 * @return the command status from the FDC
+	 * @throws TimeoutException
+	 * @throws FloppyException
+	 */
+    public byte[] getCommandState(int length) throws TimeoutException, FloppyException;
 
-    public void setupDMA(int length, int mode_read) throws FloppyException;
+	/**
+	 * Setup the floppy DMA channel to transfer from/to the DMA memory buffer
+	 * @param length Number of bytes to transfer
+	 * @param mode DMAResource.MODE_READ or DMAResource.MODE_WRITE
+	 * @throws FloppyException
+	 */
+    public void setupDMA(int length, int mode) throws FloppyException;
 
+	/**
+	 * Copy from the DMA buffer into the given byte array
+	 * @param data
+	 * @param dataOffset
+	 * @param length
+	 */
     public void copyFromDMA(byte[] data, int dataOffset, int length);
 
+	/**
+	 * Gets status register 0
+	 * @return the status register 0
+	 * @throws TimeoutException
+	 * @throws FloppyException
+	 */
     public int getST0() throws TimeoutException, FloppyException;
 
+    /**
+	 * Copy from the given byte array into the DMA buffer 
+	 * @param data
+	 * @param dataOffset
+	 * @param length
+	 */
     public void copyToDMA(byte[] data, int dataOffset, int length);
 }

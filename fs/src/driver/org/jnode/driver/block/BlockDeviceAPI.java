@@ -45,24 +45,21 @@ public interface BlockDeviceAPI extends DeviceAPI {
 	 * Read a block of data
 	 * @param devOffset
 	 * @param dest
-	 * @param destOffset
-	 * @param length
 	 * @throws IOException
 	 */
-	public abstract void read(long devOffset, ByteBuffer dest)
-	throws IOException;
+	public abstract void read(long devOffset, ByteBuffer dest) throws IOException;
 	
 	/**
 	 * Write a block of data
 	 * @param devOffset
 	 * @param src
-	 * @param srcOffset
-	 * @param length
 	 * @throws IOException
 	 */
-	public abstract void write(long devOffset, ByteBuffer src)
-	throws IOException;
+	public abstract void write(long devOffset, ByteBuffer src) throws IOException;
 
-	public abstract void flush() 
-	throws IOException;
+	/**
+	 * flush data in caches to the block device
+	 * @throws IOException
+	 */
+	public abstract void flush() throws IOException;
 }
