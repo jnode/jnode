@@ -37,6 +37,7 @@ public interface IDEIO extends IDEConstants {
 
     /**
      * Gets a word from the data register
+     * @return a word from the data register
      */
     public int getDataReg();
 
@@ -49,16 +50,19 @@ public interface IDEIO extends IDEConstants {
     
     /**
      * Gets the contents of the error register
+     * @return the contents of the error register
      */
     public int getErrorReg();
 
     /**
      * Sets the contents of the featureregister
+     * @param features 
      */
     public void setFeatureReg(int features);
 
     /**
      * Gets the contents of the sector count register
+     * @return the contents of the sector count register
      */
     public int getSectorCountReg();
 
@@ -71,41 +75,49 @@ public interface IDEIO extends IDEConstants {
 
     /**
      * Gets the contents of the sector register
+     * @return the contents of the sector register
      */
     public int getSectorReg();
 
     /**
      * Gets the contents of the LBA low register
+     * @return the contents of the LBA low register
      */
     public int getLbaLowReg();
 
     /**
      * Gets the contents of the LBA mid register
+     * @return the contents of the LBA mid register
      */
     public int getLbaMidReg();
 
     /**
      * Gets the contents of the LBA high register
+     * @return the contents of the LBA high register
      */
     public int getLbaHighReg();
 
     /**
      * Sets the contents of the LBA low register
+     * @param value 
      */
     public void setLbaLowReg(int value);
 
     /**
      * Sets the contents of the LBA mid register
+     * @param value 
      */
     public void setLbaMidReg(int value);
 
     /**
      * Sets the contents of the LBA high register
+     * @param value 
      */
     public void setLbaHighReg(int value);
 
     /**
      * Gets the contents of the select register
+     * @return the contents of the select register
      */
     public int getSelectReg();
 
@@ -118,12 +130,14 @@ public interface IDEIO extends IDEConstants {
 
     /**
      * Gets the status of the IDE controller. Any pending IRQ is reset.
+     * @return the status of the IDE controller
      */
     public int getStatusReg();
 
     /**
      * Gets the alternative status of the IDE controller. Any pending IRQ is
      * NOT reset.
+     * @return the alternative status of the IDE controller
      */
     public int getAltStatusReg();
 
@@ -145,11 +159,14 @@ public interface IDEIO extends IDEConstants {
 
     /**
      * Is this channel busy.
+     * @return if this channel is busy
      */
     public boolean isBusy();        
     
     /**
      * Block the current thread until the controller is not busy anymore.
+     * @param timeout 
+     * @throws TimeoutException 
      */
     public void waitUntilNotBusy(long timeout) throws TimeoutException;
 

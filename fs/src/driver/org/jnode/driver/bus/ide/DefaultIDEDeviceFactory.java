@@ -27,30 +27,47 @@ import org.jnode.partitions.ibm.IBMPartitionTable;
 import org.jnode.partitions.ibm.IBMPartitionTableType;
 import org.jnode.system.ResourceNotFreeException;
 
-public class DefaultIDEDeviceFactory implements IDEDeviceFactory
-{
-    public IDEDevice createIDEDevice(IDEBus bus, boolean primary,
+/**
+ * Implementation of a Factory class to create device, bus and IO objects
+ * for the IDE
+ * 
+ */
+public class DefaultIDEDeviceFactory implements IDEDeviceFactory {
+    
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.driver.bus.ide.IDEDeviceFactory#createIDEDevice(org.jnode.driver.bus.ide.IDEBus, boolean, boolean, java.lang.String, org.jnode.driver.bus.ide.IDEDriveDescriptor, org.jnode.driver.bus.ide.DefaultIDEControllerDriver)
+	 */
+	public IDEDevice createIDEDevice(IDEBus bus, boolean primary,
             boolean master, String name, IDEDriveDescriptor descriptor,
-            DefaultIDEControllerDriver controller)
-    {
+            DefaultIDEControllerDriver controller) {
         return new IDEDevice(bus, primary, master, name, descriptor, 
                 controller);
     }
     
+    /**
+     * (non-Javadoc)
+     * @see org.jnode.driver.bus.ide.IDEDeviceFactory#createIDEBus(org.jnode.driver.Device, boolean)
+     */
     public IDEBus createIDEBus(Device parent, boolean primary) 
-        throws IllegalArgumentException, DriverException, 
-                ResourceNotFreeException
-    {
+        throws IllegalArgumentException, DriverException, ResourceNotFreeException {
         return new IDEBus(parent, primary);
     }
 
-    public IDEIO createIDEIO(Device parent, boolean primary) throws IllegalArgumentException, DriverException, ResourceNotFreeException
-    {
+    /**
+     * (non-Javadoc)
+     * @see org.jnode.driver.bus.ide.IDEDeviceFactory#createIDEIO(org.jnode.driver.Device, boolean)
+     */
+    public IDEIO createIDEIO(Device parent, boolean primary) 
+    	throws IllegalArgumentException, DriverException, ResourceNotFreeException {
         return new DefaultIDEIO(parent, primary);
     }
 
-    public IBMPartitionTable createIBMPartitionTable(byte[] bs, Device dev)
-    {
+    /**
+     * (non-Javadoc)
+     * @see org.jnode.driver.bus.ide.IDEDeviceFactory#createIBMPartitionTable(byte[], org.jnode.driver.Device)
+     */
+    public IBMPartitionTable createIBMPartitionTable(byte[] bs, Device dev) {
         return new IBMPartitionTable(new IBMPartitionTableType(), bs, dev);
     }
 }

@@ -30,8 +30,13 @@ import org.jnode.naming.InitialNaming;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class IDEDriverUtils {
-    static public final IDEDeviceFactory getIDEDeviceFactory()
-            throws NamingException {
+	
+    /**
+     * search and return the IDEDeviceFactory responsible for JNode
+     * @return the IDEDeviceFactory from JNode
+     * @throws NamingException
+     */
+    public static final IDEDeviceFactory getIDEDeviceFactory() throws NamingException {
         try {
             return InitialNaming.lookup(IDEDeviceFactory.NAME);
         } catch (NameNotFoundException ex) {

@@ -29,6 +29,7 @@ import org.jnode.driver.DeviceAPI;
  */
 public interface IDEControllerAPI extends DeviceAPI {
 
+	/** Prefix for all IDE devices */
     public static final String DEVICE_PREFIX = "ide";
     
 }

@@ -46,6 +46,7 @@ public class IDEDriveDescriptor {
 	
 	/**
 	 * Gets the serial number
+	 * @return the serial number
 	 */
 	public String getSerialNumber() {
 		char[] str = new char[20];
@@ -59,6 +60,7 @@ public class IDEDriveDescriptor {
 	
 	/**
 	 * Gets the firmware version identifier
+	 * @return the firmware version identifier
 	 */
 	public String getFirmware() {
 		char[] str = new char[8];
@@ -72,6 +74,7 @@ public class IDEDriveDescriptor {
 	
 	/**
 	 * Gets the model identifier
+	 * @return the model identifier
 	 */
 	public String getModel() {
 		char[] str = new char[40];
@@ -85,6 +88,7 @@ public class IDEDriveDescriptor {
 	
 	/**
 	 * Is this a disk device?
+	 * @return if this is a disk device
 	 */
 	public boolean isDisk() {
 		// TODO Very ugly check, look in descriptor
@@ -93,6 +97,7 @@ public class IDEDriveDescriptor {
 	
 	/**
 	 * Is this a CDROM device?
+	 * @return if this is a CDROM device
 	 */
 	public boolean isCDROM() {
 		// TODO Very ugly check, look in descriptor
@@ -101,6 +106,7 @@ public class IDEDriveDescriptor {
 	
 	/**
 	 * Is this a Tape device?
+	 * @return if this is a Tape device
 	 */
 	public boolean isTape() {
 		return false;
@@ -127,6 +133,7 @@ public class IDEDriveDescriptor {
 	
 	/**
 	 * Is this an ATAPI drive?
+	 * @return if this is an ATAPI drive
 	 */
 	public boolean isAtapi() {
 		return atapi;
@@ -134,6 +141,7 @@ public class IDEDriveDescriptor {
 	
 	/**
 	 * Is this an ATA drive?
+	 * @return if this is an ATA drive
 	 */
 	public boolean isAta() {
 		return ((data[0] & 0x8000) == 0);
@@ -141,6 +149,7 @@ public class IDEDriveDescriptor {
 	
 	/**
 	 * Is this device removable?
+	 * @return if this device is removable
 	 */
 	public boolean isRemovable() {
 		return ((data[0] & 0x80) != 0);
