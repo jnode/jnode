@@ -24,7 +24,8 @@ package org.jnode.fs.util;
 import java.util.Calendar;
 
 /**
- * <description>
+ * This class contains some methods for date and time conversions between Java and the 
+ * format known from DOS filesystems (e.g. fat)
  * 
  * @author epr
  */
@@ -32,6 +33,7 @@ public class DosUtils {
 
 	/**
 	 * Decode a 16-bit encoded DOS date/time into a java date/time.
+	 * @param dosDate 
 	 * @param dosTime
 	 * @return long
 	 */
