@@ -34,6 +34,7 @@ public interface FSBlockDeviceAPI extends BlockDeviceAPI {
 	/**
 	 * Gets the sector size for this device.
  	 * @return The sector size in bytes
+	 * @throws IOException 
 	 */
 	public int getSectorSize() throws IOException;
 	

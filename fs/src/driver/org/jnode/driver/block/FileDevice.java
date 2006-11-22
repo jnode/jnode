@@ -32,7 +32,7 @@ import org.jnode.partitions.PartitionTableEntry;
 import org.jnode.util.ByteBufferUtils;
 
 /**
- * <description>
+ * This class is a device wrapping a simple file
  * 
  * @author epr
  */
@@ -40,6 +40,13 @@ public class FileDevice extends Device implements FSBlockDeviceAPI {
 
 	private RandomAccessFile raf;
 
+	/**
+	 * Create a new FileDevice
+	 * @param file
+	 * @param mode
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
 	public FileDevice(File file, String mode) throws FileNotFoundException, IOException {
 		super(null, "file" + System.currentTimeMillis());
 		raf = new RandomAccessFile(file, mode);
@@ -57,12 +64,8 @@ public class FileDevice extends Device implements FSBlockDeviceAPI {
 	}
 
 	/**
-	 * @param devOffset
-	 * @param dest
-	 * @param destOffset
-	 * @param length
-	 * @see org.jnode.driver.block.BlockDeviceAPI#read(long, byte[], int, int)
-	 * @throws IOException
+	 * (non-Javadoc)
+	 * @see org.jnode.driver.block.BlockDeviceAPI#read(long, java.nio.ByteBuffer)
 	 */
 	public void read(long devOffset, ByteBuffer destBuf) throws IOException {
         BlockDeviceAPIHelper.checkBounds(this, devOffset, destBuf.remaining());
@@ -76,12 +79,8 @@ public class FileDevice extends Device implements FSBlockDeviceAPI {
 	}
 
 	/**
-	 * @param devOffset
-	 * @param src
-	 * @param srcOffset
-	 * @param length
-	 * @see org.jnode.driver.block.BlockDeviceAPI#write(long, byte[], int, int)
-	 * @throws IOException
+	 * (non-Javadoc)
+	 * @see org.jnode.driver.block.BlockDeviceAPI#write(long, java.nio.ByteBuffer)
 	 */
 	public void write(long devOffset, ByteBuffer srcBuf) throws IOException {
 		//		log.debug("fd.write devOffset=" + devOffset + ", length=" + length);
@@ -99,13 +98,23 @@ public class FileDevice extends Device implements FSBlockDeviceAPI {
 		// Nothing to flush
 	}
 
+	/**
+	 * change the length of the underlaying file
+	 * @param length
+	 * @throws IOException
+	 */
 	public void setLength(long length) throws IOException {
 		raf.setLength(length);
 	}
 
+	/**
+	 * close the underlaying file
+	 * @throws IOException
+	 */
 	public void close() throws IOException {
 		raf.close();
 	}
+	
     /**
      * @see org.jnode.driver.block.FSBlockDeviceAPI#getPartitionTableEntry()
      */

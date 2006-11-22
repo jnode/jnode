@@ -30,8 +30,13 @@ public class CHS {
 	private final int head;
 	private final int sector;
 	
-	public CHS(int c, int h, int s) 
-	throws IllegalArgumentException {
+	/**
+	 * @param c
+	 * @param h
+	 * @param s
+	 * @throws IllegalArgumentException
+	 */
+	public CHS(int c, int h, int s) throws IllegalArgumentException {
 		if (c < 0) {
 			throw new IllegalArgumentException("Cylinder < 0");
 		}

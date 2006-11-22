@@ -251,6 +251,11 @@ public class BlockAlignmentSupport implements BlockDeviceAPI {
     private boolean dolog = false;
 
 
+    /**
+     * Constructor for BlockAlignmentSupport
+     * @param parentApi
+     * @param alignment
+     */
     public BlockAlignmentSupport(BlockDeviceAPI parentApi, int alignment) {
         this.parentApi = parentApi;
         this.alignment = alignment;
@@ -261,7 +266,7 @@ public class BlockAlignmentSupport implements BlockDeviceAPI {
 
 
     private void mylog(String msg) {
-	log.debug(msg);
+    	log.debug(msg);
     }
 
 
@@ -283,11 +288,11 @@ public class BlockAlignmentSupport implements BlockDeviceAPI {
      */
     public void read(long offset, ByteBuffer dst)
             throws IOException {
-	if (offset < 0)
-	    throw new IllegalArgumentException
-		("offset < 0");
 
-	final int  limit  =  dst.limit();
+    	if (offset < 0)
+    		throw new IllegalArgumentException("offset < 0");
+
+    	final int  limit  =  dst.limit();
         final int  length =  dst.remaining();
 
         final int  ofsR   =  (int) ( offset % alignment );
@@ -300,97 +305,88 @@ public class BlockAlignmentSupport implements BlockDeviceAPI {
         final int  lA     =  (int) ( end - start );
         final int  nA     =  lA / alignment;
 
-	final int  nB;
-	final int  lB;
-	final long sB;
+        final int  nB;
+        final int  lB;
+        final long sB;
 
-	final int  type;
+        final int  type;
 
-	{
-	    int  n = nA;
-	    long s = start;
+        {
+        	int  n = nA;
+        	long s = start;
 	    
-	    if (length == 0) { // EMPTY
-		type = EMPTY;
-	    } else {
-		if ((ofsR != 0) || (lstR != 0)) {
-		    if (lst <= (start + alignment)) { // CONTAINED
-			type = CONTAINED;
-			n--;
-		    } else {                                  // CROSSED
-			type = CROSSED;
-			// 
-			if (ofsR != 0) {      // HEAD
-			    n--;
-			    s += alignment;
-			}
-			//
-			if (lstR != 0)        // TAIL
-			    n--;
-		    } 
-		} else { // ALIGNED
-		    type = ALIGNED;
-		}
-	    }
+        	if (length == 0) { // EMPTY
+        		type = EMPTY;
+        	} else {
+        		if ((ofsR != 0) || (lstR != 0)) {
+        			if (lst <= (start + alignment)) { // CONTAINED
+        				type = CONTAINED;
+        				n--;
+        			} else {                                  // CROSSED
+        				type = CROSSED;
+        				if (ofsR != 0) {      // HEAD
+        					n--;
+        					s += alignment;
+        				}
+        				if (lstR != 0)        // TAIL
+        					n--;
+        			} 
+        		} else { // ALIGNED
+        			type = ALIGNED;
+        		}
+        	}
 	    
-	    nB = n;
-	    lB = nB * alignment;
-	    sB = s;
-	}
+        	nB = n;
+        	lB = nB * alignment;
+        	sB = s;
+        }
 
-	ByteBuffer buf = null;
+        ByteBuffer buf = null;
 
-	try {
-	    switch ( type ) {
-	    case EMPTY:
-		break;
+        try {
+        	switch ( type ) {
+        	case EMPTY:
+        		break;
+        	case CONTAINED:
+        		buf = ByteBuffer.allocate ( alignment );
+        		parentApi.read ( start, buf );
+        		ByteBufferUtils.buffercopy(buf, ofsR, dst, dst.position(), length );
+        		break;
+        	case CROSSED:
+        		// HEAD
+        		if ( ofsR != 0 ) {
+        			buf = ByteBuffer.allocate ( alignment );
+        			parentApi.read ( start, buf );
+        			ByteBufferUtils.buffercopy(buf, ofsR, dst, dst.position(), alignment - ofsR );
+        		}
+        		// BODY
+        		if ( lB != 0 ) {
+        			dst.limit ( dst.position() + lB );
+        			parentApi.read ( sB, dst );
+        			dst.limit ( limit );
+        		}
+        		// TAIL
+        		if ( lstR != 0 ) {
+        			if ( buf == null )
+        				buf = ByteBuffer.allocate ( alignment );
+        			else
+        				buf.clear();
+        			parentApi.read(end - alignment, buf );
+        			ByteBufferUtils.buffercopy(buf, 0, dst, dst.position(), lstR );
+        		}
+        		break;
 		
-	    case CONTAINED:
-		buf = ByteBuffer.allocate ( alignment );
-		parentApi.read ( start, buf );
-		ByteBufferUtils.buffercopy
-		    ( buf, ofsR, dst, dst.position(), length );
-		break;
-		
-	    case CROSSED:
-		// HEAD
-		if ( ofsR != 0 ) {
-		    buf = ByteBuffer.allocate ( alignment );
-		    parentApi.read ( start, buf );
-		    ByteBufferUtils.buffercopy
-			( buf, ofsR, dst, dst.position(), alignment - ofsR );
-		}
-		// BODY
-		if ( lB != 0 ) {
-		    dst.limit ( dst.position() + lB );
-		    parentApi.read ( sB, dst );
-		    dst.limit ( limit );
-		}
-		// TAIL
-		if ( lstR != 0 ) {
-		    if ( buf == null )
-			buf = ByteBuffer.allocate ( alignment );
-		    else
-			buf.clear();
-		    parentApi.read ( end - alignment, buf );
-		    ByteBufferUtils.buffercopy
-			( buf, 0, dst, dst.position(), lstR );
-		}
-		break;
-		
-	    case ALIGNED:
-		parentApi.read ( offset, dst );
-		break;
-		
-	    default:
-		throw new IllegalArgumentException ( "no type: shouldn't happen" );
-	    }
-	}
-	finally {
-	    dst.limit ( limit );
-	}
+        	case ALIGNED:
+        		parentApi.read ( offset, dst );
+        		break;
 
-	buf = null;
+        	default:
+        		throw new IllegalArgumentException ( "no type: shouldn't happen" );
+        	}
+        } finally {
+        	dst.limit ( limit );
+        }
+        buf = null;
     }
 
     /**
@@ -401,14 +397,14 @@ public class BlockAlignmentSupport implements BlockDeviceAPI {
      */
     public void write(long offset, ByteBuffer src)
             throws IOException {
-	if (offset < 0)
-	    throw new IllegalArgumentException
-		("offset < 0");
 
-	final int  limit  =  src.limit();
-        final int  length =  src.remaining();
+    	if (offset < 0)
+    		throw new IllegalArgumentException("offset < 0");
 
-        final int  ofsR   =  (int) ( offset % alignment );
+    	final int  limit  =  src.limit();
+    	final int  length =  src.remaining();
+
+    	final int  ofsR   =  (int) ( offset % alignment );
         final long lst    =  offset + length;
         final int  lstR   =  (int) ( lst % alignment );
 
@@ -418,104 +414,97 @@ public class BlockAlignmentSupport implements BlockDeviceAPI {
         final int  lA     =  (int) ( end - start );
         final int  nA     =  lA / alignment;
 
-	final int  nB;
-	final int  lB;
-	final long sB;
+        final int  nB;
+        final int  lB;
+        final long sB;
 
-	final int  type;
+        final int  type;
 	
-	{
-	    int  n = nA;
-	    long s = start;
+        {
+        	int  n = nA;
+        	long s = start;
 	    
-	    if (length == 0) { // EMPTY
-		type = EMPTY;
-	    } else {
-		if ((ofsR != 0) || (lstR != 0)) {
-		    if (lst <= (start + alignment)) { // CONTAINED
-			type = CONTAINED;
-			n--;
-		    } else {                                  // CROSSED
-			type = CROSSED;
-			// 
-			if (ofsR != 0) {      // HEAD
-			    n--;
-			    s += alignment;
-			}
-			//
-			if (lstR != 0)        // TAIL
-			    n--;
-		    } 
-		} else { // ALIGNED
-		    type = ALIGNED;
-		}
-	    }
+        	if (length == 0) { // EMPTY
+        		type = EMPTY;
+        	} else {
+        		if ((ofsR != 0) || (lstR != 0)) {
+        			if (lst <= (start + alignment)) { // CONTAINED
+        				type = CONTAINED;
+        				n--;
+        			} else { // CROSSED
+        				type = CROSSED;
+        				if (ofsR != 0) {      // HEAD
+        					n--;
+        					s += alignment;
+        				}
+        				if (lstR != 0)        // TAIL
+        					n--;
+        			} 
+        		} else { // ALIGNED
+        			type = ALIGNED;
+        		}
+        	}
 	    
-	    nB = n;
-	    lB = nB * alignment;
-	    sB = s;
-	}
+        	nB = n;
+        	lB = nB * alignment;
+        	sB = s;
+        }
 
-	ByteBuffer buf = null;
+        ByteBuffer buf = null;
 
-	try {
-	    switch ( type ) {
-	    case EMPTY:
-		break;
+        try {
+        	switch ( type ) {
+        	case EMPTY:
+        		break;
 		
-	    case CONTAINED:
-		buf = ByteBuffer.allocate ( alignment );
-		parentApi.read ( start, buf );
-		ByteBufferUtils.buffercopy
-		    ( src, src.position(), buf, ofsR, length );
-		buf.clear();
-		parentApi.write ( start, buf );
-		break;
+        	case CONTAINED:
+        		buf = ByteBuffer.allocate ( alignment );
+        		parentApi.read ( start, buf );
+        		ByteBufferUtils.buffercopy(src, src.position(), buf, ofsR, length );
+        		buf.clear();
+        		parentApi.write ( start, buf );
+        		break;
 		
-	    case CROSSED:
-		// HEAD
-		if ( ofsR != 0 ) {
-		    buf = ByteBuffer.allocate ( alignment );
-		    parentApi.read ( start, buf );
-		    ByteBufferUtils.buffercopy
-			( src, src.position(), buf, ofsR, alignment - ofsR );
-		    buf.clear();
-		    parentApi.write ( start, buf );
-		}
-		// BODY
-		if ( lB != 0 ) {
-		    src.limit ( src.position() + lB );
-		    parentApi.write ( sB, src );
-		    src.limit ( limit );
-		}
-		// TAIL
-		if ( lstR != 0 ) {
-		    if ( buf == null )
-			buf = ByteBuffer.allocate ( alignment );
-		    else
-			buf.clear();
-		    parentApi.read ( end - alignment, buf );
-		    ByteBufferUtils.buffercopy
-			( src, src.position(), buf, 0, lstR );
-		    buf.clear();
-		    parentApi.write ( end - alignment, buf );
-		}
-		break;
+        	case CROSSED:
+        		// HEAD
+        		if ( ofsR != 0 ) {
+        			buf = ByteBuffer.allocate ( alignment );
+        			parentApi.read ( start, buf );
+        			ByteBufferUtils.buffercopy(src, src.position(), buf, ofsR, alignment - ofsR );
+        			buf.clear();
+        			parentApi.write ( start, buf );
+        		}
+        		// BODY
+        		if ( lB != 0 ) {
+        			src.limit ( src.position() + lB );
+        			parentApi.write ( sB, src );
+        			src.limit ( limit );
+        		}
+        		// TAIL
+        		if ( lstR != 0 ) {
+        			if ( buf == null )
+        				buf = ByteBuffer.allocate ( alignment );
+        			else
+        				buf.clear();
+        			parentApi.read ( end - alignment, buf );
+        			ByteBufferUtils.buffercopy(src, src.position(), buf, 0, lstR );
+        			buf.clear();
+        			parentApi.write ( end - alignment, buf );
+        		}
+        		break;
 		
-	    case ALIGNED:
-		parentApi.write ( offset, src );
-		break;
+        	case ALIGNED:
+        		parentApi.write ( offset, src );
+        		break;
 		
-	    default:
-		throw new IllegalArgumentException ( "no type: shouldn't happen" );
-	    }
-	}
-	finally {
-	    src.limit ( limit );
-	}
+        	default:
+        		throw new IllegalArgumentException ( "no type: shouldn't happen" );
+        	}
+        } finally {
+        	src.limit ( limit );
+        }
 
-
-	buf = null;
+        buf = null;
     }
 
 

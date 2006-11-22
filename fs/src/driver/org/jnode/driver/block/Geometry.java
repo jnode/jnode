@@ -122,6 +122,12 @@ public class Geometry {
         }
 	}
 
+	/**
+	 * increments the given sector and returns the next logical sector as CHS-value  
+	 * @param chsToIncrement
+	 * @return the CHS value of next sector
+	 * @throws GeometryException
+	 */
 	public CHS NextSector(CHS chsToIncrement) throws GeometryException {
 
 		int s = chsToIncrement.getSector();
@@ -144,15 +150,13 @@ public class Geometry {
 		return new CHS(c, h, s);
 	}
 
-    public static class GeometryException extends IOException 
-    {
-        public GeometryException(String message)
-        {
+    public static class GeometryException extends IOException {
+    	
+        public GeometryException(String message) {
             super(message);
         }
 
-        public GeometryException(String message, Throwable t)
-        {
+        public GeometryException(String message, Throwable t) {
             super(message);
             initCause(t);
         }        

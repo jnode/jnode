@@ -75,6 +75,7 @@ public class DefaultFDC implements FDC {
 	 * @param owner
 	 * @param primary
 	 * @throws ResourceNotFreeException
+	 * @throws DriverException 
 	 */
 	public DefaultFDC(ResourceOwner owner, boolean primary) 
 	throws ResourceNotFreeException, DriverException {
@@ -149,11 +150,10 @@ public class DefaultFDC implements FDC {
 		this.dmaMem = dmaMem;
 	}
 	
+	
 	/**
-	 * Send a command to the FDC
-	 * @param command
-	 * @param enableDMA
-	 * @throws FloppyException
+	 * (non-Javadoc)
+	 * @see org.jnode.driver.block.floppy.FDC#sendCommand(byte[], boolean)
 	 */
 	public void sendCommand(byte[] command, boolean enableDMA) 
 	throws FloppyException {
@@ -174,11 +174,10 @@ public class DefaultFDC implements FDC {
 		}
 	}
 	
+
 	/**
-	 * Setup the floppy DMA channel to transfer from/to the DMA memory buffer
-	 * @param length Number of bytes to transfer
-	 * @param mode DMAResource.MODE_READ or DMAResource.MODE_WRITE
-	 * @throws FloppyException
+	 * (non-Javadoc)
+	 * @see org.jnode.driver.block.floppy.FDC#setupDMA(int, int)
 	 */
 	public void setupDMA(int length, int mode)
 	throws FloppyException {
@@ -190,20 +189,16 @@ public class DefaultFDC implements FDC {
 	}
 	
 	/**
-	 * Copy from the given byte array into the DMA buffer 
-	 * @param src
-	 * @param srcOffset
-	 * @param length
+	 * (non-Javadoc)
+	 * @see org.jnode.driver.block.floppy.FDC#copyToDMA(byte[], int, int)
 	 */
 	public void copyToDMA(byte[] src, int srcOffset, int length) {
 		dmaMem.setBytes(src, srcOffset, 0, length);
 	}
 	
 	/**
-	 * Copy from the DMA buffer into the given byte array
-	 * @param dest
-	 * @param destOffset
-	 * @param length
+	 * (non-Javadoc)
+	 * @see org.jnode.driver.block.floppy.FDC#copyFromDMA(byte[], int, int)
 	 */
 	public void copyFromDMA(byte[] dest, int destOffset, int length) {
 		dmaMem.getBytes(0, dest, destOffset, length);
@@ -218,12 +213,10 @@ public class DefaultFDC implements FDC {
 		dmaMem.setBytes(src, 0, 0, length);
 	}
 	
+
 	/**
-	 * Gets a command status from the FDC
-	 * @param length
-	 * @return
-	 * @throws TimeoutException
-	 * @throws FloppyException
+	 * (non-Javadoc)
+	 * @see org.jnode.driver.block.floppy.FDC#getCommandState(int)
 	 */
 	public byte[] getCommandState(int length)
 	throws TimeoutException, FloppyException {
@@ -298,12 +291,11 @@ public class DefaultFDC implements FDC {
 		return rc;
 	}
 
+
 	/**
-	 * Sets the DOR register
-	 * @param drive
-	 * @param motorOn
-	 * @param dma
- 	 */
+	 * (non-Javadoc)
+	 * @see org.jnode.driver.block.floppy.FDC#setDorReg(int, boolean, boolean)
+	 */
 	public final void setDorReg(int drive, boolean motorOn, boolean dma) {
 		setDorReg(drive, motorOn, dma, false);
 	}
@@ -350,13 +342,10 @@ public class DefaultFDC implements FDC {
 	}
 	
 	/**
-	 * Gets status register 0
-	 * @return int
-	 * @throws TimeoutException
-	 * @throws FloppyException
+	 * (non-Javadoc)
+	 * @see org.jnode.driver.block.floppy.FDC#getST0()
 	 */
-	public final int getST0() 
-	throws TimeoutException, FloppyException {
+	public final int getST0() throws TimeoutException, FloppyException {
 		final byte[] res = senseInterruptStatus();
 		return res[0] & 0xFF;
 	}
@@ -372,15 +361,14 @@ public class DefaultFDC implements FDC {
 		final byte[] res = senseInterruptStatus();
 		return res[0] & 0xFF;
 	}
-	
+
 	/**
 	 * Perform a "Sense interrupt" command
 	 * @return byte[]
 	 * @throws TimeoutException
 	 * @throws FloppyException
 	 */
-	protected final byte[] senseInterruptStatus() 
-	throws TimeoutException, FloppyException {
+	protected final byte[] senseInterruptStatus() throws TimeoutException, FloppyException {
 		final byte[] cmd = new byte[1];
 		cmd[0] = 0x08;
 		sendCommand(cmd, false);
@@ -396,8 +384,7 @@ public class DefaultFDC implements FDC {
 	 * @throws TimeoutException
 	 * @throws FloppyException
 	 */
-	protected final int senseDriveStatus(int drive, int head) 
-	throws TimeoutException, FloppyException {
+	protected final int senseDriveStatus(int drive, int head) throws TimeoutException, FloppyException {
 		final byte[] cmd = new byte[2];
 		cmd[0] = 0x04;
 		cmd[1] = (byte)((drive & 3) | ((head & 1) << 2));
@@ -516,8 +503,11 @@ public class DefaultFDC implements FDC {
 		return 500;
 	}
 	
-	public void logDMAState() 
-	throws DMAException {
+	/**
+	 * (non-Javadoc)
+	 * @see org.jnode.driver.block.floppy.FDC#logDMAState()
+	 */
+	public void logDMAState() throws DMAException {
 		log.debug("dma.length = " + dma.getLength());
 	}
 	

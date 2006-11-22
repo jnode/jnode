@@ -46,6 +46,9 @@ public class FloppyDevice extends Device {
 		this.dp = dp;
 	}
 
+	/**
+	 * @return the bus for this floppy device
+	 */
 	public FloppyControllerBus getFloppyControllerBus() {
 		return bus;
 	}

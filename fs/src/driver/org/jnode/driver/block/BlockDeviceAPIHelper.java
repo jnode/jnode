@@ -23,10 +23,19 @@ package org.jnode.driver.block;
 
 import java.io.IOException;
 
-public class BlockDeviceAPIHelper
-{
-    public static void checkBounds(BlockDeviceAPI api, long devOffset) throws IOException
-    {
+/**
+ * <description> 
+ *
+ */
+public class BlockDeviceAPIHelper {
+
+	/**
+	 * check if devOffset is within the bounds of the given BlockDevice
+	 * @param api
+	 * @param devOffset
+	 * @throws IOException
+	 */
+	public static void checkBounds(BlockDeviceAPI api, long devOffset) throws IOException {
         if(devOffset < 0)
             throw new IOException("devOffset < 0");
         
@@ -34,9 +43,16 @@ public class BlockDeviceAPIHelper
             throw new IOException("devOffset (" + devOffset +") > upper bound (" + api.getLength() + ")");
     }
     
-    public static void checkBounds(BlockDeviceAPI api, long devOffset, long length) throws IOException
-    {
-        checkBounds(api, devOffset);
+    /**
+     * check if devOffset up to devOffset+length is within the bounds of the given BlockDevice
+     * @param api
+     * @param devOffset
+     * @param length
+     * @throws IOException
+     */
+    public static void checkBounds(BlockDeviceAPI api, long devOffset, long length) throws IOException {
+
+    	checkBounds(api, devOffset);
         
         if(length <= 0)
             throw new IOException("length <= 0");
@@ -44,8 +60,17 @@ public class BlockDeviceAPIHelper
         checkBounds(api, devOffset+length-1); // don't forget to substract 1 !
     }
 
-    public static void checkAlignment(int sectorSize, BlockDeviceAPI api, long devOffset, int length) throws IOException
-    {
+    /**
+     * check if devOffset is sectorSize alligned
+     * @param sectorSize
+     * @param api
+     * @param devOffset
+     * @param length
+     * @throws IOException
+     */
+    public static void checkAlignment(int sectorSize, BlockDeviceAPI api, long devOffset, int length) 
+    	throws IOException {
+    	
         if ((devOffset % sectorSize) != 0) {
             throw new IOException("Non aligned devOffset not allowed. Size requested = " + devOffset + " Sector size = " + sectorSize);
         }
