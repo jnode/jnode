@@ -44,6 +44,7 @@ public final class VmMagic {
 	 * Gets the VmType of the given object.
 	 * 
 	 * @param object
+	 * @return the VmType of the given object
 	 */
 	public static VmClassType<?> getObjectType(Object object) {
 		return null;
@@ -93,7 +94,7 @@ public final class VmMagic {
 	 * Gets the address of the first array element of the given array.
 	 * 
 	 * @param array
-	 * @return
+	 * @return the address of the first array element of the given array
 	 */
 	public static Address getArrayData(Object array) {
 		return null;
@@ -103,6 +104,7 @@ public final class VmMagic {
 	 * Has the given object been finalized.
 	 * 
 	 * @param src
+	 * @return if the given object has been finalized
 	 */
 	public static boolean isFinalized(Object src) {
 		return false;
@@ -122,24 +124,41 @@ public final class VmMagic {
 	/**
 	 * Gets the timestamp of the current processor.
 	 * 
-	 * @return
+	 * @return the timestamp of the current processor
 	 */
 	public static long getTimeStamp() {
 		return 0;
 	}
 
+	/**
+	 * 
+	 * @param value
+	 * @return
+	 */
 	public static float intBitsToFloat(int value) {
 		return 0;
 	}
 
+	/**
+	 * @param value
+	 * @return
+	 */
 	public static int floatToRawIntBits(float value) {
 		return 0;
 	}
 
+	/**
+	 * @param value
+	 * @return
+	 */
 	public static double longBitsToDouble(long value) {
 		return 0;
 	}
 
+	/**
+	 * @param value
+	 * @return
+	 */
 	public static long doubleToRawLongBits(double value) {
 		return 0;
 	}
@@ -151,7 +170,7 @@ public final class VmMagic {
 
     /**
      * Gets the processor executing the current thread.
-     * @return
+     * @return the processor executing the current thread
      */
     @KernelSpace
     public final static VmProcessor currentProcessor() {
@@ -160,6 +179,8 @@ public final class VmMagic {
     
     /**
      * Gets the address of a shared static field.
+     * @param index 
+     * @return the address of a shared static field
      */
     public final static Address getSharedStaticFieldAddress(int index) {
         return null;
@@ -167,6 +188,8 @@ public final class VmMagic {
     
     /**
      * Gets the address of a isolated static field.
+     * @param index 
+     * @return the address of a isolated static field
      */
     public final static Address getIsolatedStaticFieldAddress(int index) {
         return null;

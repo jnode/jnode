@@ -131,6 +131,11 @@ public class VmProcess extends Process {
 		return proc;
 	}
 	
+	/**
+	 * Get the root process
+	 * @param group
+	 * @return the root process
+	 */
 	public static Process getRootProcess(ThreadGroup group) {
 		if (rootProcess == null) {
 			rootProcess = new VmProcess(group);

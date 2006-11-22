@@ -26,6 +26,10 @@ package org.jnode.vm;
  */
 public abstract class RTCService {
 	
+	/**
+	 * Return the time of the RTCService
+	 * @return the time of the clock
+	 */
 	public abstract long getTime();
 
 }

@@ -53,7 +53,6 @@ public final class SoftByteCodes {
      * @param object
      * @param T
      * @return boolean
-     * @throws UninterruptiblePragma
      */
     public static boolean isInstanceof(Object object, VmType T) {
         if (object == null) {
@@ -78,7 +77,6 @@ public final class SoftByteCodes {
      * @param fieldRef
      * @param isStatic
      * @return VmField
-     * @throws UninterruptiblePragma
      */
     public static VmField resolveField(VmMethod currentMethod,
             VmConstFieldRef fieldRef, boolean isStatic) {
@@ -115,7 +113,6 @@ public final class SoftByteCodes {
      * @param currentMethod
      * @param methodRef
      * @return VmMethod
-     * @throws UninterruptiblePragma
      */
     public static VmMethod resolveMethod(VmMethod currentMethod,
             VmConstMethodRef methodRef) {
@@ -153,7 +150,6 @@ public final class SoftByteCodes {
      * 
      * @param classRef
      * @return VmClass
-     * @throws UninterruptiblePragma
      */
     @PrivilegedActionPragma
     public static VmType resolveClass(VmConstClass classRef) {
@@ -189,7 +185,6 @@ public final class SoftByteCodes {
      * @param vmClass
      * @param size
      * @return Object The new object
-     * @throws UninterruptiblePragma
      */
     public static Object allocObject(VmType< ? > vmClass, int size) {
         VmHeapManager hm = heapManager;
@@ -211,7 +206,6 @@ public final class SoftByteCodes {
      * @param vmClass
      * @param dimensions
      * @return The allocated array
-     * @throws UninterruptiblePragma
      */
     public static Object allocMultiArray(VmType vmClass, int[] dimensions) {
         // Syslog.debug("allocMultiArray "); // + vmClass);
@@ -259,11 +253,9 @@ public final class SoftByteCodes {
      * Allocate a new array with a given class as component type and a given
      * number of elements.
      * 
-     * @param currentMethod
      * @param vmClass
      * @param elements
      * @return Object The new array
-     * @throws UninterruptiblePragma
      */
     public static Object anewarray(VmType< ? > vmClass, int elements) {
 
@@ -281,11 +273,11 @@ public final class SoftByteCodes {
     /**
      * Allocate a new primivite array with a given arraytype and a given number
      * of elements.
-     * 
+	 *
+     * @param currentClass 
      * @param atype
      * @param elements
      * @return Object The new array
-     * @throws UninterruptiblePragma
      */
     public static Object allocPrimitiveArray(VmType< ? > currentClass,
             int atype, int elements) {
@@ -312,7 +304,6 @@ public final class SoftByteCodes {
      * @param vmClass
      * @param elements
      * @return Object The new array
-     * @throws UninterruptiblePragma
      */
     public static Object allocArray(VmType vmClass, int elements) {
         VmHeapManager hm = heapManager;
@@ -325,6 +316,8 @@ public final class SoftByteCodes {
 
     /**
      * Throw a classcast exception.
+     * @param object 
+     * @param expected 
      */
     public static void classCastFailed(Object object, VmType< ? > expected) {
         if (object == null) {
@@ -357,9 +350,9 @@ public final class SoftByteCodes {
 
     /**
      * Gets the Class that corresponds to the given VmType.
-     * 
+     * @param <T> 
      * @param type
-     * @return
+     * @return the Class that corresponds to the given VmType
      */
     public static <T> Class<T> getClassForVmType(VmType<T> type) {
         return type.asClass();
@@ -380,8 +373,6 @@ public final class SoftByteCodes {
      * 
      * @param opcode
      * @param pc
-     * @throws UninterruptiblePragma
-     * @throws PrivilegedActionPragma
      */
     @LoadStatics
     @PrivilegedActionPragma
