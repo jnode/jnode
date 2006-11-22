@@ -51,8 +51,6 @@ public class ATAPIDriver extends Driver implements SCSIHostControllerAPI {
     
     private static final Logger log = Logger.getLogger(ATAPIDriver.class);
     
-    
-
     /**
      * @see org.jnode.driver.Driver#startDevice()
      */
@@ -139,8 +137,8 @@ public class ATAPIDriver extends Driver implements SCSIHostControllerAPI {
         }
 
         /**
-         * @see org.jnode.driver.bus.scsi.SCSIDeviceAPI#executeCommand(CDB, byte[],
-         *      int, long)
+         * (non-Javadoc)
+         * @see org.jnode.driver.bus.scsi.SCSIDevice#executeCommand(org.jnode.driver.bus.scsi.CDB, byte[], int, long)
          */
         public final int executeCommand(CDB cdb, byte[] data,
                 int dataOffset, long timeout) throws SCSIException,
@@ -179,7 +177,8 @@ public class ATAPIDriver extends Driver implements SCSIHostControllerAPI {
         }
 
         /**
-         * @see org.jnode.driver.bus.scsi.SCSIDeviceAPI#getDescriptor()
+         * (non-Javadoc)
+         * @see org.jnode.driver.bus.scsi.SCSIDevice#getDescriptor()
          */
         public final InquiryData getDescriptor() {
             return inquiryResult;
