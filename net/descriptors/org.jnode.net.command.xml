@@ -33,20 +33,18 @@
         <alias name="tftp" class="org.jnode.net.command.TftpCommand"/>
         <alias name="wlanctl" class="org.jnode.net.command.WLanCtlCommand"/>
         <alias name="netcat" class="org.jnode.net.command.ConnectCommand"/>
+        <alias name="net" class="org.jnode.net.command.NetCommand"/>
     </extension>
 
     <extension point="org.jnode.security.permissions">
-        <permission class="java.net.SocketPermission" name="*" actions="resolve"/>
-        <!-- connect permission needed for netcat -->
-        <permission class="java.net.SocketPermission" name="*" actions="connect"/> 
+		<permission class="java.net.SocketPermission" name="*" actions="connect,resolve"/>
+		<permission class="java.net.SocketPermission" name="*:1024-" actions="listen,accept"/>
         <permission class="java.net.SocketPermission" name="*:53" actions="resolve,listen,connect"/>
+        <permission class="java.net.SocketPermission" name="*:80" actions="resolve,listen,connect"/>
         <permission class="java.util.PropertyPermission" name="dns.server" actions="read"/>
         <permission class="java.util.PropertyPermission" name="dns.search" actions="read"/>
         <permission class="org.jnode.net.NetPermission" name="bootpClient"/>
         <permission class="org.jnode.net.NetPermission" name="dhcpClient"/>
-        <permission class="java.io.FilePermission" name="
-        <
-        <ALL FILES>>" actions="read,write"/>
-        <permission class="java.net.SocketPermission" name="*:80" actions="resolve,listen"/>
+        <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
     </extension>
 </plugin>
