@@ -101,6 +101,10 @@ class SocketTransport
 	  {
 	    _host = s[0];
 	    _port = Integer.parseInt (s[1]);
+	    // @classpath-bugfix Michael Klaus (Michael.Klaus@gmx.net)
+	  } else if(s.length == 1) {
+		  _port = Integer.parseInt(s[0]);
+			// @classpath-bugfix-end
 	  }
       }
 
