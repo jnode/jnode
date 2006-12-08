@@ -13,6 +13,15 @@
     <library name="jnode-core.jar">
       <export name="gnu.classpath.*"/>
       <export name="gnu.classpath.debug.*"/>
+      <export name="gnu.classpath.jdwp.*"/>
+      <export name="gnu.classpath.jdwp.event.*"/>
+      <export name="gnu.classpath.jdwp.event.filters.*"/>
+      <export name="gnu.classpath.jdwp.exception.*"/>
+      <export name="gnu.classpath.jdwp.id.*"/>
+      <export name="gnu.classpath.jdwp.processor.*"/>
+      <export name="gnu.classpath.jdwp.transport.*"/>
+      <export name="gnu.classpath.jdwp.util.*"/>
+	  
       <export name="gnu.java.awt.*"/>
       <export name="gnu.java.awt.color.*"/>
       <export name="gnu.java.awt.peer.*"/>
