@@ -31,51 +31,26 @@ public class OptionArgument extends Argument {
 
     private final Option[] options;
 
-    public OptionArgument(String name, String description, Option[] options,
-            boolean multi) {
+    public OptionArgument(String name, String description, boolean multi,
+            Option... options) {
         super(name, description, multi);
         this.options = options;
     }
 
-    public OptionArgument(String name, String description, Option[] options) {
-        this(name, description, options, SINGLE);
-    }
-
-    public OptionArgument(String name, String description, Option o1) {
-        this(name, description, new Option[] { o1 }, SINGLE);
-    }
-
-    public OptionArgument(String name, String description, Option o1, Option o2) {
-        this(name, description, new Option[] { o1, o2 }, SINGLE);
-    }
-
-    public OptionArgument(String name, String description, Option o1,
-            Option o2, Option o3) {
-        this(name, description, new Option[] { o1, o2, o3 }, SINGLE);
-    }
-
-    public OptionArgument(String name, String description, Option o1,
-            Option o2, Option o3, Option o4) {
-        this(name, description, new Option[] { o1, o2, o3, o4 }, SINGLE);
-    }
-
-    public OptionArgument(String name, String description, Option o1,
-            Option o2, Option o3, Option o4, Option o5) {
-        this(name, description, new Option[] { o1, o2, o3, o4, o5 }, SINGLE);
+    public OptionArgument(String name, String description, Option... options) {
+        this(name, description, SINGLE, options);
     }
 
     public String format() {
-        if (options.length == 0)
-            return "";
-        String result = options[0].getName();
-        for (int i = 1; i < options.length; i++)
-            result += "|" + options[i].getName();
-        return result;
+        String result = "";
+        for (Option option : options)
+            result += "|" + option.getName();
+        return result.substring(1);
     }
 
     public void describe(Help help) {
-        for (int i = 0; i < options.length; i++)
-            options[i].describe(help);
+        for (Option option : options)
+            option.describe(help);
     }
 
     public String complete(String partial) {
@@ -111,14 +86,11 @@ public class OptionArgument extends Argument {
     public String toString() {
         final StringBuffer sb = new StringBuffer();
         sb.append("Options: ");
-        final int length = options.length;
-        for (int i = 0; i < length; i++) {
-            if (i > 0) {
-                sb.append(", ");
-            }
-            sb.append(options[i].getName());
+        for (Option option : options) {
+            sb.append(", ");
+            sb.append(option.getName());
         }
-        return sb.toString();
+        return sb.toString().substring(2);
     }
 
     public static class Option extends Parameter {

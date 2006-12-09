@@ -21,52 +21,23 @@
  
 package org.jnode.shell.help;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
 /**
  * @author Fabien DUMINY (fduminy@jnode.org)
  */
-public class LanguageArgument extends Argument {
+public class LanguageArgument extends StringListArgument {
 
+    private static final List<String> languages = Arrays.asList(Locale.getISOLanguages());
+    
     public LanguageArgument(String name, String description, boolean multi) {
-        super(name, description, multi);
+        super(name, description, multi, languages);
     }
 
     public LanguageArgument(String name, String description) {
-        super(name, description);
+        super(name, description, languages);
     }
 
-    public String complete(String partial) {
-        final List<String> languages = new ArrayList<String>();
-    	String[] isoLangs = Locale.getISOLanguages();
-    	for(String lang : isoLangs)
-    	{    		
-    		if(lang.startsWith(partial))
-    		{
-    			languages.add(lang);
-    		}
-    	}
-
-    	Collections.sort(languages);
-        return complete(partial, languages);
-    }
-    
-    protected boolean isValidValue(String language) {
-    	boolean valid = false;
-    	String[] languages = Locale.getISOLanguages();
-    	
-    	for(int i = 0 ; i < languages.length ; i++)
-    	{
-    		if(languages[i].equals(language))
-    		{
-    			valid = true;
-    			break;
-    		}
-    	}
-    	
-    	return valid;
-    }    
 }

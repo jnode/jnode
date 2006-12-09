@@ -58,11 +58,9 @@ public class ThreadNameArgument extends Argument {
     }
 
 	private void findList(ThreadGroup grp, String partial, List<String> names) {
-		final int cnt = grp.activeCount();
-		final Thread[] ts = new Thread[cnt];
+		final Thread[] ts = new Thread[grp.activeCount()];
 		grp.enumerate(ts);
-		for (int i = 0; i < cnt; i++) {
-			final Thread t = ts[i];
+		for (Thread t : ts) {
 			if (t != null) {
 				final String name = t.getName();
 				if (name.startsWith(partial)) {
@@ -70,11 +68,9 @@ public class ThreadNameArgument extends Argument {
 				}
 			}
 		}
-		final int gcnt = grp.activeGroupCount();
-		final ThreadGroup[] gs = new ThreadGroup[gcnt];
+		final ThreadGroup[] gs = new ThreadGroup[grp.activeGroupCount()];
 		grp.enumerate(gs);
-		for (int i = 0; i < gcnt; i++) {
-			final ThreadGroup g = gs[i];
+		for (ThreadGroup g : gs) {
 			if (g != null) {
 				findList(g, partial, names);
 			}

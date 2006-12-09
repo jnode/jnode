@@ -18,58 +18,27 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.shell.help;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
 /**
  * @author Fabien DUMINY (fduminy@jnode.org)
  */
-public class CountryArgument extends Argument {
+public class CountryArgument extends StringListArgument {
 
-    public CountryArgument(String name, String description, boolean multi) {
-        super(name, description, multi);
-    }
+	private static final List<String> validCountries = Arrays.asList(Locale
+			.getISOCountries());
 
-    public CountryArgument(String name, String description) {
-        super(name, description);
-    }
+	public CountryArgument(String name, String description, boolean multi) {
+		super(name, description, multi, validCountries);
+	}
 
-    public String complete(String partial) {
-        final List<String> countries = new ArrayList<String>();
-    	String[] isoContries = Locale.getISOCountries();
-    	for(String country : isoContries)
-    	{
-    		if(country.startsWith(partial))
-    		{
-    			countries.add(country);
-    		}
-    	}
+	public CountryArgument(String name, String description) {
+		super(name, description, validCountries);
+	}
 
-    	Collections.sort(countries);
-        return complete(partial, countries);
-    }
-    
-    protected boolean isValidValue(String country) {
-    	if((country == null) || "".equals(country))
-    		return true;
-    	
-    	boolean valid = false;
-    	String[] countries = Locale.getISOCountries();
-    	
-    	for(int i = 0 ; i < countries.length ; i++)
-    	{
-    		if(countries[i].equals(country))
-    		{
-    			valid = true;
-    			break;
-    		}
-    	}
-    	
-    	return valid;
-    }    
 }

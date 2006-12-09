@@ -64,20 +64,6 @@ public class FileArgument extends Argument {
         return files;
     }
 
-    public InputStream getInputStream(ParsedArguments args)
-            throws FileNotFoundException {
-        String value = getValue(args);
-        if (value == null) return null;
-        return new FileInputStream(value);
-    }
-
-    public OutputStream getOutputStream(ParsedArguments args)
-            throws FileNotFoundException {
-        String value = getValue(args);
-        if (value == null) return null;
-        return new FileOutputStream(value);
-    }
-
     public String complete(String partial) {
         // Get last full directory
         final int idx = partial.lastIndexOf(File.separatorChar);
@@ -106,11 +92,10 @@ public class FileArgument extends Argument {
         } else if (names.length == 0) {
             return partial;
         } else {
-            final int cnt = names.length;
-            final ArrayList<String> list = new ArrayList<String>(cnt);
+            final ArrayList<String> list = new ArrayList<String>(names.length);
             final String prefix = (dir.length() == 0) ? "" : dir + File.separatorChar;
-            for (int i = 0; i < cnt; i++) {
-                final String name = prefix + names[i];
+            for (String n : names) {
+                final String name = prefix + n;
                 if (name.startsWith(partial)) {
                     list.add(name);
                 }
