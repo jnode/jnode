@@ -110,17 +110,13 @@ public abstract class Help {
 
         private final Syntax[] syntaxes;
 
-        public Info(String name, Syntax[] syntaxes) {
+        public Info(String name, Syntax... syntaxes) {
             this.name = name;
             this.syntaxes = syntaxes;
         }
 
-        public Info(String name, String description, Parameter[] params) {
-            this(name, new Syntax[] { new Syntax(description, params)});
-        }
-
-        public Info(String name, String description) {
-            this(name, new Syntax[] { new Syntax(description)});
+        public Info(String name, String description, Parameter... params) {
+            this(name, new Syntax(description, params));
         }
 
         /**
@@ -153,9 +149,9 @@ public abstract class Help {
             //System.out.println("completing \"" + partial + "\"");
             String max = "";
             boolean foundCompletion = false;
-            for (int i = 0; i < syntaxes.length; i++) {
+            for (Syntax syntax : syntaxes) {
                 try {
-                    final String s = syntaxes[ i].complete(partial
+                    final String s = syntax.complete(partial
                             .getRemainder());
                     foundCompletion = true;
                     if (s.length() > max.length()) {
@@ -179,9 +175,8 @@ public abstract class Help {
             }
         }
 
-        public ParsedArguments parse(String[] args) throws SyntaxErrorException {
-            for (int i = 0; i < syntaxes.length; i++) {
-                final Syntax s = syntaxes[ i];
+        public ParsedArguments parse(String... args) throws SyntaxErrorException {
+            for (Syntax s : syntaxes) {
                 try {
                     return s.parse(args);
                 } catch (SyntaxErrorException ex) {
