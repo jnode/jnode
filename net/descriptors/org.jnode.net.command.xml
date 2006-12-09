@@ -32,7 +32,6 @@
         <alias name="resolver" class="org.jnode.net.command.ResolverCommand"/>
         <alias name="tftp" class="org.jnode.net.command.TftpCommand"/>
         <alias name="wlanctl" class="org.jnode.net.command.WLanCtlCommand"/>
-        <alias name="netcat" class="org.jnode.net.command.ConnectCommand"/>
         <alias name="net" class="org.jnode.net.command.NetCommand"/>
     </extension>
 
