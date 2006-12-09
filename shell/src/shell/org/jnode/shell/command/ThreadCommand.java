@@ -75,6 +75,13 @@ public class ThreadCommand  implements Command
 	private void showGroup(ThreadGroup grp, PrintStream out, String threadName) {
     StringBuffer stringBuffer;
 
+    	if (threadName == null
+		// preserve compatible behavior when piped
+				&& out == System.out) {
+			grp.list();
+			return;
+		}
+    	
 		if (threadName != null) {
 			out.print(group);
 			out.println(grp.getName());
