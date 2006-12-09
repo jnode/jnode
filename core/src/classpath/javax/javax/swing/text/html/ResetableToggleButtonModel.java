@@ -1,4 +1,4 @@
-/* BRView.java -- HTML BR tag view
+/* ResetableToggleButtonModel.java -- A toggle button model with reset support
    Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -38,33 +38,34 @@ exception statement from your version. */
 
 package javax.swing.text.html;
 
-import javax.swing.text.Element;
+import javax.swing.ButtonGroup;
+import javax.swing.JToggleButton.ToggleButtonModel;
 
-/**
- * Handled the HTML BR tag.
- */
-class BRView
-  extends InlineView
+class ResetableToggleButtonModel
+  extends ToggleButtonModel
+  implements ResetableModel
 {
+
   /**
-   * Creates the new BR view.
-   * 
-   * @param elem the HTML element, representing the view.
+   * The initial state.
    */
-  public BRView(Element elem)
+  private boolean initial;
+
+  /**
+   * Sets the initial selection value.
+   *
+   * @param state the initial value
+   */
+  public void setInitial(boolean state)
   {
-    super(elem);
+    initial = state;
   }
-  
+
   /**
-   * Always return ForcedBreakWeight for the X_AXIS, BadBreakWeight for the
-   * Y_AXIS.
+   * Resets the model.
    */
-  public int getBreakWeight(int axis, float pos, float len)
+  public void reset()
   {
-    if (axis == X_AXIS)
-      return ForcedBreakWeight;
-    else
-      return super.getBreakWeight(axis, pos, len);
+    setSelected(initial);
   }
 }

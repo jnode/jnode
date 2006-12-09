@@ -1,4 +1,4 @@
-/* BRView.java -- HTML BR tag view
+/* OptionListModel.java -- A special ListModel for use in the HTML renderer
    Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -38,33 +38,69 @@ exception statement from your version. */
 
 package javax.swing.text.html;
 
-import javax.swing.text.Element;
+import java.util.BitSet;
+
+import javax.swing.DefaultListModel;
+import javax.swing.DefaultListSelectionModel;
+import javax.swing.ListSelectionModel;
 
 /**
- * Handled the HTML BR tag.
+ * A special list model that encapsulates its selection model and supports
+ * storing of the initial value so that it can be resetted.
  */
-class BRView
-  extends InlineView
+class SelectListModel
+  extends DefaultListModel
+  implements ResetableModel
 {
   /**
-   * Creates the new BR view.
-   * 
-   * @param elem the HTML element, representing the view.
+   * The selection model.
    */
-  public BRView(Element elem)
-  {
-    super(elem);
-  }
-  
+  private DefaultListSelectionModel selectionModel;
+
   /**
-   * Always return ForcedBreakWeight for the X_AXIS, BadBreakWeight for the
-   * Y_AXIS.
+   * The initial selection.
    */
-  public int getBreakWeight(int axis, float pos, float len)
+  private BitSet initialSelection;
+
+  /**
+   * Creates a new SelectListModel.
+   */
+  SelectListModel()
   {
-    if (axis == X_AXIS)
-      return ForcedBreakWeight;
-    else
-      return super.getBreakWeight(axis, pos, len);
+    selectionModel = new DefaultListSelectionModel();
+    initialSelection = new BitSet();
+  }
+
+  /**
+   * Sets the initial selection.
+   *
+   * @param init the initial selection
+   */
+  void addInitialSelection(int init)
+  {
+    initialSelection.set(init);
+  }
+
+  /**
+   * Resets the model.
+   */
+  public void reset()
+  {
+    selectionModel.clearSelection();
+    for (int i = initialSelection.size(); i >= 0; i--)
+      {
+        if (initialSelection.get(i))
+          selectionModel.addSelectionInterval(i, i);
+      }
+  }
+
+  /**
+   * Returns the associated selection model.
+   *
+   * @return the associated selection model
+   */
+  ListSelectionModel getSelectionModel()
+  {
+    return selectionModel;
   }
 }

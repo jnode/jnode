@@ -1,4 +1,4 @@
-/* BRView.java -- HTML BR tag view
+/* ResetableModel.java -- Form models that can be resetted
    Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -38,33 +38,13 @@ exception statement from your version. */
 
 package javax.swing.text.html;
 
-import javax.swing.text.Element;
-
 /**
- * Handled the HTML BR tag.
+ * Form models that can be resetted implement this.
  */
-class BRView
-  extends InlineView
+interface ResetableModel
 {
   /**
-   * Creates the new BR view.
-   * 
-   * @param elem the HTML element, representing the view.
+   * Resets the model.
    */
-  public BRView(Element elem)
-  {
-    super(elem);
-  }
-  
-  /**
-   * Always return ForcedBreakWeight for the X_AXIS, BadBreakWeight for the
-   * Y_AXIS.
-   */
-  public int getBreakWeight(int axis, float pos, float len)
-  {
-    if (axis == X_AXIS)
-      return ForcedBreakWeight;
-    else
-      return super.getBreakWeight(axis, pos, len);
-  }
+  void reset();
 }

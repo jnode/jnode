@@ -1,4 +1,4 @@
-/* BRView.java -- HTML BR tag view
+/* SelectComboBoxModel.java -- A special ComboBoxModel for use in HTML renderer
    Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -38,33 +38,47 @@ exception statement from your version. */
 
 package javax.swing.text.html;
 
-import javax.swing.text.Element;
+import javax.swing.DefaultComboBoxModel;
 
 /**
- * Handled the HTML BR tag.
+ * A special ComboBoxModel that supports storing the initial value so that
+ * the combobox can be resetted later.
  */
-class BRView
-  extends InlineView
+class SelectComboBoxModel
+  extends DefaultComboBoxModel
+  implements ResetableModel
 {
+
   /**
-   * Creates the new BR view.
-   * 
-   * @param elem the HTML element, representing the view.
+   * The initial selection.
    */
-  public BRView(Element elem)
+  private Option initial;
+
+  /**
+   * Sets the initial selection.
+   *
+   * @param option the initial selection
+   */
+  void setInitialSelection(Option option)
   {
-    super(elem);
+    initial = option;
   }
-  
+
   /**
-   * Always return ForcedBreakWeight for the X_AXIS, BadBreakWeight for the
-   * Y_AXIS.
+   * Returns the initial selection.
+   *
+   * @return the initial selection
    */
-  public int getBreakWeight(int axis, float pos, float len)
+  Option getInitialSelection()
   {
-    if (axis == X_AXIS)
-      return ForcedBreakWeight;
-    else
-      return super.getBreakWeight(axis, pos, len);
+    return initial;
+  }
+
+  /**
+   * Resets the model.
+   */
+  public void reset()
+  {
+    setSelectedItem(initial);
   }
 }
