@@ -3,6 +3,7 @@ package org.jnode.net.command;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -10,6 +11,7 @@ import java.net.Socket;
 import javax.net.ServerSocketFactory;
 import javax.net.SocketFactory;
 
+import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.InetAddressArgument;
 import org.jnode.shell.help.IntegerArgument;
@@ -39,7 +41,12 @@ public class NetCommand {
 	 * @param args
 	 */
 	public static void main(String[] sArgs) throws Exception {
-		ParsedArguments args = HELP_INFO.parse(sArgs);
+		new NetCommand().execute(new CommandLine(sArgs), System.in, System.out, System.err);
+	}
+	
+	
+	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
+		ParsedArguments args = HELP_INFO.parse(commandLine.toStringArray());
 
 		Socket socket = null;
 		if (PARAM_LISTEN.isSet(args)) {
