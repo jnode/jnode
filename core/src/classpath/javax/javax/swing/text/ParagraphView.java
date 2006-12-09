@@ -38,6 +38,9 @@ exception statement from your version. */
 
 package javax.swing.text;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.Shape;
 
 import javax.swing.SizeRequirements;
@@ -65,27 +68,42 @@ public class ParagraphView extends FlowView implements TabExpander
       super(el, X_AXIS);
     }
 
+    /**
+     * Overridden to adjust when we are the first line, and firstLineIndent
+     * is not 0.
+     */
+    public short getLeftInset()
+    {
+      short leftInset = super.getLeftInset();
+      View parent = getParent();
+      if (parent != null)
+        {
+          if (parent.getView(0) == this)
+            leftInset += firstLineIndent;
+        }
+      return leftInset;
+    }
+
     public float getAlignment(int axis)
     {
       float align;
       if (axis == X_AXIS)
-        align = 0.0F; // TODO: Implement according to justification
+        switch (justification)
+          {
+          case StyleConstants.ALIGN_RIGHT:
+            align = 1.0F;
+            break;
+          case StyleConstants.ALIGN_CENTER:
+          case StyleConstants.ALIGN_JUSTIFIED:
+            align = 0.5F;
+            break;
+          case StyleConstants.ALIGN_LEFT:
+          default:
+            align = 0.0F;
+          }
       else
         align = super.getAlignment(axis);
       return align;
-    }
-
-    /**
-     * Allows rows to span the whole parent view.
-     */
-    public float getMaximumSpan(int axis)
-    {
-      float max;
-      if (axis == X_AXIS)
-        max = Float.MAX_VALUE;
-      else
-        max = super.getMaximumSpan(axis);
-      return max;
     }
 
     /**
@@ -132,6 +150,38 @@ public class ParagraphView extends FlowView implements TabExpander
     protected void loadChildren(ViewFactory vf)
     {
       // Do nothing here. The children are added while layouting.
+    }
+
+    /**
+     * Overridden to determine the minimum start offset of the row's children.
+     */
+    public int getStartOffset()
+    {
+      // Determine minimum start offset of the children.
+      int offset = Integer.MAX_VALUE;
+      int n = getViewCount();
+      for (int i = 0; i < n; i++)
+        {
+          View v = getView(i);
+          offset = Math.min(offset, v.getStartOffset());
+        }
+      return offset;
+    }
+
+    /**
+     * Overridden to determine the maximum end offset of the row's children.
+     */
+    public int getEndOffset()
+    {
+      // Determine minimum start offset of the children.
+      int offset = 0;
+      int n = getViewCount();
+      for (int i = 0; i < n; i++)
+        {
+          View v = getView(i);
+          offset = Math.max(offset, v.getEndOffset());
+        }
+      return offset;
     }
   }
 

@@ -89,13 +89,12 @@ public class Utilities
 
     // The font metrics of the current selected font.
     FontMetrics metrics = g.getFontMetrics();
+
     int ascent = metrics.getAscent();
 
     // The current x and y pixel coordinates.
     int pixelX = x;
-    int pixelY = y - ascent;
 
-    int pixelWidth = 0;
     int pos = s.offset;
     int len = 0;
 
@@ -104,39 +103,43 @@ public class Utilities
     for (int offset = s.offset; offset < end; ++offset)
       {
         char c = buffer[offset];
-        if (c == '\t')
+        switch (c)
           {
+          case '\t':
             if (len > 0) {
-              g.drawChars(buffer, pos, len, pixelX, pixelY + ascent);            
-              pixelX += pixelWidth;
-              pixelWidth = 0;
-            }
-            pos = offset+1;
+              g.drawChars(buffer, pos, len, pixelX, y);
+              pixelX += metrics.charsWidth(buffer, pos, len);
             len = 0;
           }
-        
-	switch (c)
-	  {
-	  case '\t':
-	    // In case we have a tab, we just 'jump' over the tab.
-	    // When we have no tab expander we just use the width of ' '.
+            pos = offset+1;
 	    if (e != null)
-	      pixelX = (int) e.nextTabStop(pixelX,
-					   startOffset + offset - s.offset);
+              pixelX = (int) e.nextTabStop((float) pixelX, startOffset + offset
+                                           - s.offset);
 	    else
 	      pixelX += metrics.charWidth(' ');
+            x = pixelX;
 	    break;
-	  default:
-            ++len;
-	    pixelWidth += metrics.charWidth(buffer[offset]);
+          case '\n':
+          case '\r':
+            if (len > 0) {
+              g.drawChars(buffer, pos, len, pixelX, y);
+              pixelX += metrics.charsWidth(buffer, pos, len);
+              len = 0;
+            }
+            x = pixelX;
 	    break;
+          default:
+            len += 1;
 	  }
       }
 
     if (len > 0)
-      g.drawChars(buffer, pos, len, pixelX, pixelY + ascent);            
+      {
+        g.drawChars(buffer, pos, len, pixelX, y);
+        pixelX += metrics.charsWidth(buffer, pos, len);
+      }
     
-    return pixelX + pixelWidth;
+    return pixelX;
   }
 
   /**
@@ -164,7 +167,9 @@ public class Utilities
     // The current maximum width.
     int maxWidth = 0;
 
-    for (int offset = s.offset; offset < (s.offset + s.count); ++offset)
+    int end = s.offset + s.count;
+    int count = 0;
+    for (int offset = s.offset; offset < end; offset++)
       {
 	switch (buffer[offset])
 	  {
@@ -180,21 +185,18 @@ public class Utilities
 	  case '\n':
 	    // In case we have a newline, we must 'draw'
 	    // the buffer and jump on the next line.
-	    pixelX += metrics.charWidth(buffer[offset]);
-	    maxWidth = Math.max(maxWidth, pixelX - x);
-	    pixelX = x;
+	    pixelX += metrics.charsWidth(buffer, offset - count, count);
+            count = 0;
 	    break;
 	  default:
-	    // Here we draw the char.
-	    pixelX += metrics.charWidth(buffer[offset]);
-	    break;
+            count++;
 	  }
       }
 
     // Take the last line into account.
-    maxWidth = Math.max(maxWidth, pixelX - x);
+    pixelX += metrics.charsWidth(buffer, end - count, count);
 
-    return maxWidth;
+    return pixelX - x;
   }
 
   /**
@@ -229,43 +231,41 @@ public class Utilities
                                               int x, TabExpander te, int p0,
                                               boolean round)
   {
-    // At the end of the for loop, this holds the requested model location
-    int pos;
+    int found = s.count;
     int currentX = x0;
-    int width = 0;
+    int nextX = currentX;
 
-    for (pos = 0; pos < s.count; pos++)
+    int end = s.offset + s.count;
+    for (int pos = s.offset; pos < end && found == s.count; pos++)
       {
-        char nextChar = s.array[s.offset+pos];
-        
-        if (nextChar == 0)
-            break;
+        char nextChar = s.array[pos];
         
         if (nextChar != '\t')
-          width = fm.charWidth(nextChar);
+          nextX += fm.charWidth(nextChar);
         else
           {
             if (te == null)
-              width = fm.charWidth(' ');
+              nextX += fm.charWidth(' ');
             else
-              width = ((int) te.nextTabStop(currentX, pos)) - currentX;
+              nextX += ((int) te.nextTabStop(nextX, p0 + pos - s.offset));
           }
         
-        if (round)
+        if (x >= currentX && x < nextX)
           {
-            if (currentX + (width>>1) > x)
-              break;
+            // Found position.
+            if ((! round) || ((x - currentX) < (nextX - x)))
+              {
+                found = pos - s.offset;
           }
         else
           {
-            if (currentX + width > x)
-            break;
+                found = pos + 1 - s.offset;
           }
-        
-        currentX += width;
+          }
+        currentX = nextX;
       }
 
-    return pos;
+    return found;
   }
 
   /**
@@ -324,9 +324,15 @@ public class Utilities
       {
         for (int i = last; i < current; i++)
           {
-            // FIXME: Should use isLetter(int) and text.codePointAt(int)
-            // instead, but isLetter(int) isn't implemented yet
-            if (Character.isLetter(text.charAt(i)))
+            cp = text.codePointAt(i);
+            
+            // Return the last found bound if there is a letter at the current
+            // location or is not whitespace (meaning it is a number or
+            // punctuation). The first case means that 'last' denotes the
+            // beginning of a word while the second case means it is the start
+            // of something else.
+            if (Character.isLetter(cp)
+                || !Character.isWhitespace(cp))
               return last;
           }
         last = current;
@@ -365,9 +371,15 @@ public class Utilities
       {
         for (int i = last; i < offs; i++)
           {
-            // FIXME: Should use isLetter(int) and text.codePointAt(int)
-            // instead, but isLetter(int) isn't implemented yet
-            if (Character.isLetter(text.charAt(i)))
+            cp = text.codePointAt(i);
+            
+            // Return the last found bound if there is a letter at the current
+            // location or is not whitespace (meaning it is a number or
+            // punctuation). The first case means that 'last' denotes the
+            // beginning of a word while the second case means it is the start
+            // of some else.
+            if (Character.isLetter(cp)
+                || !Character.isWhitespace(cp))
               return last;
           }
         last = current;
@@ -521,28 +533,39 @@ public class Utilities
                                            int x0, int x, TabExpander e,
                                            int startOffset)
   {
-    int mark = Utilities.getTabbedTextOffset(s, metrics, x0, x, e, startOffset, false);
-    BreakIterator breaker = BreakIterator.getWordInstance();
-    breaker.setText(s);
-    
-    // If startOffset and s.offset differ then we need to use
-    // that difference two convert the offset between the two metrics. 
-    int shift = startOffset - s.offset;
-    
+    int mark = Utilities.getTabbedTextOffset(s, metrics, x0, x, e, startOffset,
+                                             false);
+    int breakLoc = mark;
     // If mark is equal to the end of the string, just use that position.
-    if (mark >= shift + s.count)
-      return mark;
-    
-    // Try to find a word boundary previous to the mark at which we 
-    // can break the text.
-    int preceding = breaker.preceding(mark + 1 + s.offset);
-    
-    if (preceding != 0)
-      return preceding + shift;
-    
-      // If preceding is 0 we couldn't find a suitable word-boundary so
-      // just break it on the character boundary
-      return mark;
+    if (mark < s.count - 1)
+      {
+        for (int i = s.offset + mark; i >= s.offset; i--)
+          {
+            char ch = s.array[i];
+            if (ch < 256)
+              {
+                // For ASCII simply scan backwards for whitespace.
+                if (Character.isWhitespace(ch))
+                  {
+                    breakLoc = i - s.offset + 1;
+                    break;
+                  }
+              }
+            else
+              {
+                // Only query BreakIterator for complex chars.
+                BreakIterator bi = BreakIterator.getLineInstance();
+                bi.setText(s);
+                int pos = bi.preceding(i + 1);
+                if (pos > s.offset)
+                  {
+                    breakLoc = breakLoc - s.offset;
+                  }
+                break;
+              }
+          }
+      }
+    return breakLoc;
   }
 
   /**

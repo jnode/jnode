@@ -311,11 +311,12 @@ public class DefaultEditorKit extends EditorKit
     public void actionPerformed(ActionEvent event)
     {
       JTextComponent t = getTextComponent(event);
+      if (t != null)
+        {
       int offs = t.getDocument().getLength();
       Caret c = t.getCaret();
       c.setDot(0);
       c.moveDot(offs);
-
       try
       {
         c.setMagicCaretPosition(t.modelToView(offs).getLocation());
@@ -325,6 +326,7 @@ public class DefaultEditorKit extends EditorKit
         // Can't happen.
       }
     }
+  }
   }
 
   static class SelectionBeginAction
@@ -338,6 +340,8 @@ public class DefaultEditorKit extends EditorKit
     public void actionPerformed(ActionEvent event)
     {
       JTextComponent t = getTextComponent(event);
+      if (t != null)
+        {
       Caret c = t.getCaret();
       c.moveDot(0);
       try
@@ -349,6 +353,7 @@ public class DefaultEditorKit extends EditorKit
           // Can't happen.
         }
     }
+  }
   }
 
   static class SelectionEndAction
@@ -362,6 +367,8 @@ public class DefaultEditorKit extends EditorKit
     public void actionPerformed(ActionEvent event)
     {
       JTextComponent t = getTextComponent(event);
+      if (t != null)
+        {
       int offs = t.getDocument().getLength();
       Caret c = t.getCaret();
       c.moveDot(offs);
@@ -374,6 +381,7 @@ public class DefaultEditorKit extends EditorKit
           // Can't happen.
         }
     }
+  }
   }
 
   static class SelectionBeginLineAction
@@ -388,6 +396,8 @@ public class DefaultEditorKit extends EditorKit
     public void actionPerformed(ActionEvent event)
     {
       JTextComponent t = getTextComponent(event);
+      if (t != null)
+        {
               Caret c = t.getCaret();
               try
                 {
@@ -398,7 +408,7 @@ public class DefaultEditorKit extends EditorKit
               {
                 // Can't happen.
               }
-
+        }
     }
   }
 
@@ -413,6 +423,8 @@ public class DefaultEditorKit extends EditorKit
     public void actionPerformed(ActionEvent event)
     {
       JTextComponent t = getTextComponent(event);
+      if (t != null)
+        {
           Caret c = t.getCaret();
           try
             {
@@ -423,7 +435,7 @@ public class DefaultEditorKit extends EditorKit
           {
             // Can't happen.
           }
-
+        }
     }
   }
 
@@ -437,15 +449,15 @@ public class DefaultEditorKit extends EditorKit
     public void actionPerformed(ActionEvent event)
     {
       JTextComponent t = getTextComponent(event);
+      if (t != null)
+        {
       Caret c = t.getCaret();
       try
         {
           int offs1 = Utilities.getRowStart(t, c.getDot());
           int offs2 = Utilities.getRowEnd(t, c.getDot());
-
           c.setDot(offs2);
           c.moveDot(offs1);
-          
           c.setMagicCaretPosition(t.modelToView(offs2).getLocation());
         }
       catch(BadLocationException ble) 
@@ -453,6 +465,7 @@ public class DefaultEditorKit extends EditorKit
           // Can't happen.
         }
     }
+  }
   }
 
   static class SelectWordAction extends TextAction
@@ -465,9 +478,10 @@ public class DefaultEditorKit extends EditorKit
     public void actionPerformed(ActionEvent event)
     {
       JTextComponent t = getTextComponent(event);
+      if (t != null)
+        {
       Caret c = t.getCaret();
       int dot = c.getDot();
-
       try
         {
           int wordStart = Utilities.getWordStart(t, dot);
@@ -505,13 +519,13 @@ public class DefaultEditorKit extends EditorKit
           // as well.
           if (c.getDot() != dot)
             c.setMagicCaretPosition(t.modelToView(c.getDot()).getLocation());
-          
         }
       catch(BadLocationException ble) 
         {
           // Can't happen.
         }
     }
+  }
   }
 
   static class SelectionDownAction
@@ -714,10 +728,11 @@ public class DefaultEditorKit extends EditorKit
       public void actionPerformed(ActionEvent event)
       {
         JTextComponent t = getTextComponent(event);
+      if (t != null)
+        {
       try
           {
        int offs = Utilities.getRowEnd(t, t.getCaretPosition());
-       
        if (offs > -1)
               {
                 Caret c = t.getCaret();
@@ -731,6 +746,7 @@ public class DefaultEditorKit extends EditorKit
               }
           }
       }
+  }
 
   static class BeginLineAction
       extends TextAction
@@ -743,10 +759,11 @@ public class DefaultEditorKit extends EditorKit
       public void actionPerformed(ActionEvent event)
       {
         JTextComponent t = getTextComponent(event);
+      if (t != null)
+        {
       try
           {
         int offs = Utilities.getRowStart(t, t.getCaretPosition());
-        
         if (offs > -1)
               {
                 Caret c = t.getCaret();
@@ -760,6 +777,7 @@ public class DefaultEditorKit extends EditorKit
                   }
               }
           }
+  }
         
   static class BeginAction extends TextAction
   {
@@ -772,6 +790,8 @@ public class DefaultEditorKit extends EditorKit
     public void actionPerformed(ActionEvent event)
     {
       JTextComponent t = getTextComponent(event);
+      if (t != null)
+        {
       Caret c = t.getCaret();
       c.setDot(0);
       try
@@ -783,6 +803,7 @@ public class DefaultEditorKit extends EditorKit
         // Can't happen.
       }
     }
+  }
   }
 
   static class EndAction extends TextAction
@@ -796,6 +817,8 @@ public class DefaultEditorKit extends EditorKit
     public void actionPerformed(ActionEvent event)
     {
       JTextComponent t = getTextComponent(event);
+      if (t != null)
+        {
       int offs = t.getDocument().getLength();
       Caret c = t.getCaret();
       c.setDot(offs);
@@ -808,6 +831,7 @@ public class DefaultEditorKit extends EditorKit
           // Can't happen.
         }
     }
+  }
   }
   
   /**
@@ -861,7 +885,9 @@ public class DefaultEditorKit extends EditorKit
      */
       public void actionPerformed(ActionEvent event)
       {
-      getTextComponent(event).copy();
+      JTextComponent target = getTextComponent(event);
+      if (target != null)
+        target.copy();
     }
   }
         
@@ -892,7 +918,9 @@ public class DefaultEditorKit extends EditorKit
      */
     public void actionPerformed(ActionEvent event)
             {
-      getTextComponent(event).cut();
+      JTextComponent target = getTextComponent(event);
+      if (target != null)
+        target.cut();
 	  }
       }
             
@@ -921,7 +949,9 @@ public class DefaultEditorKit extends EditorKit
      */
     public void actionPerformed(ActionEvent event)
                 {
-      getTextComponent(event).paste();
+      JTextComponent target = getTextComponent(event);
+      if (target != null)
+        target.paste();
           }
       }
 
@@ -1003,6 +1033,7 @@ public class DefaultEditorKit extends EditorKit
       public void actionPerformed(ActionEvent event)
       {
         JTextComponent t = getTextComponent(event);
+      if (t != null)
       t.replaceSelection("\n");
     }
   }
@@ -1058,6 +1089,7 @@ public class DefaultEditorKit extends EditorKit
       public void actionPerformed(ActionEvent event)
       {
         JTextComponent t = getTextComponent(event);
+      if (t != null)
       t.replaceSelection("\t");
           }
       }
