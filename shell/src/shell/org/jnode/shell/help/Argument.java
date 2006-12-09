@@ -76,7 +76,7 @@ public class Argument extends CommandLineElement {
         // list matching
         String[] result = (String[]) list
                 .toArray(new String[ list.size()/*
-                                                 * ToDo: remove this ugly
+                                                 * TODO remove this ugly
                                                  * workaround
                                                  */]);
         list(result);
@@ -134,12 +134,13 @@ public class Argument extends CommandLineElement {
         return satisfied;
     }
 
-    protected String common(String[] items) {
-        final int len = items.length;
-        if (len == 0) return "";
+    protected String common(String... items) {
+        if (items.length == 0)
+        	return "";
+        
         String result = items[ 0];
-        for (int i = 1; i < len; i++) {
-            while (!items[ i].startsWith(result)) {
+        for (String item : items) {
+            while (!item.startsWith(result)) {
                 // shorten the result until it matches
                 result = result.substring(0, result.length() - 1);
             }
@@ -147,7 +148,7 @@ public class Argument extends CommandLineElement {
         return result;
     }
 
-    public void list(String[] items) {
+    public void list(String... items) {
         try {
             ShellUtils.getShellManager().getCurrentShell().list(items);
         } catch (NameNotFoundException ex) {
