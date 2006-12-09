@@ -1,5 +1,6 @@
-/* SwingComponent.java -- An interface that defines a Swing component for peers
-   Copyright (C)  2006  Free Software Foundation, Inc.
+/* NativeEventLoopRunningEvent.java -- communicates to EventQueue the
+   state of the native event loop
+   Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,55 +36,23 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package gnu.java.awt.peer.swing;
+package gnu.java.awt.peer;
 
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
+import java.awt.AWTEvent;
 
-import javax.swing.JComponent;
-
-/**
- * Defines some additional methods that the Swing components must implement
- * in order to work with the Swing peers. This is usually achieved by
- * subclassing a Swing component and forwarding the method calls to some
- * protected JComponent method.
- *
- * @author Roman Kennke (kennke@aicas.com)
- */
-public interface SwingComponent
+public class NativeEventLoopRunningEvent
+  extends AWTEvent
 {
+  private boolean running;
 
-  /**
-   * Returns the actual swing compenent.
-   *
-   * @return the actual swing compenent
-   */
-  JComponent getJComponent();
+  public NativeEventLoopRunningEvent(Object source)
+  {
+    super(source, 2999);
+    running = ((Boolean) source).booleanValue();
+  }
 
-  /**
-   * Handles a mouse event. This is usually forwarded to
-   * {@link Component#processMouseMotionEvent(MouseEvent)} of the swing
-   * component.
-   *
-   * @param ev the mouse event
-   */
-  void handleMouseEvent(MouseEvent ev);
-
-  /**
-   * Handles a mouse motion event. This is usually forwarded to
-   * {@link Component#processMouseEvent(MouseEvent)} of the swing
-   * component.
-   *
-   * @param ev the mouse motion event
-   */
-  void handleMouseMotionEvent(MouseEvent ev);
-
-  /**
-   * Handles a key event. This is usually forwarded to
-   * {@link Component#processKeyEvent(KeyEvent)} of the swing
-   * component.
-   *
-   * @param ev the key event
-   */
-  void handleKeyEvent(KeyEvent ev);
+  public boolean isRunning()
+  {
+    return running;
+  }
 }
