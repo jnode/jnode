@@ -56,14 +56,19 @@ public abstract class CompositeView
   /**
    * The child views of this <code>CompositeView</code>.
    */
-  View[] children;
+  private View[] children;
+
+  /**
+   * The number of child views.
+   */
+  private int numChildren;
 
   /**
    * The allocation of this <code>View</code> minus its insets. This is
    * initialized in {@link #getInsideAllocation} and reused and modified in
    * {@link #childAllocation(int, Rectangle)}.
    */
-  Rectangle insideAllocation;
+  private final Rectangle insideAllocation = new Rectangle();
 
   /**
    * The insets of this <code>CompositeView</code>. This is initialized
@@ -101,6 +106,8 @@ public abstract class CompositeView
    */
   protected void loadChildren(ViewFactory f)
   {
+    if (f != null)
+      {
     Element el = getElement();
     int count = el.getElementCount();
     View[] newChildren = new View[count];
@@ -115,6 +122,7 @@ public abstract class CompositeView
     // Harmony's tests this is not what the RI does.
     replace(0, 0, newChildren);
   }
+  }
 
   /**
    * Sets the parent of this <code>View</code>.
@@ -126,7 +134,7 @@ public abstract class CompositeView
   public void setParent(View parent)
   {
     super.setParent(parent);
-    if (parent != null && ((children == null) || children.length == 0))
+    if (parent != null && numChildren == 0)
       loadChildren(getViewFactory());
   }
 
@@ -137,7 +145,7 @@ public abstract class CompositeView
    */
   public int getViewCount()
   {
-    return children.length;
+    return numChildren;
   }
 
   /**
@@ -169,27 +177,37 @@ public abstract class CompositeView
     if (views == null)
       views = new View[0];
 
-    // Check for null views to add.
-    for (int i = 0; i < views.length; ++i)
-      if (views[i] == null)
-        throw new NullPointerException("Added views must not be null");
-
-    int endOffset = offset + length;
-
     // First we set the parent of the removed children to null.
+    int endOffset = offset + length;
     for (int i = offset; i < endOffset; ++i)
       {
         if (children[i].getParent() == this)
       children[i].setParent(null);
+        children[i] = null;
       }
 
-    View[] newChildren = new View[children.length - length + views.length];
+    // Update the children array.
+    int delta = views.length - length;
+    int src = offset + length;
+    int numMove = numChildren - src;
+    int dst = src + delta;
+    if (numChildren + delta > children.length)
+      {
+        // Grow array.
+        int newLength = Math.max(2 * children.length, numChildren + delta);
+        View[] newChildren = new View[newLength];
     System.arraycopy(children, 0, newChildren, 0, offset);
     System.arraycopy(views, 0, newChildren, offset, views.length);
-    System.arraycopy(children, offset + length, newChildren,
-                     offset + views.length,
-                     children.length - (offset + length));
+        System.arraycopy(children, src, newChildren, dst, numMove);
     children = newChildren;
+      }
+    else
+      {
+        // Patch existing array.
+        System.arraycopy(children, src, children, dst, numMove);
+        System.arraycopy(views, 0, children, offset, views.length);
+      }
+    numChildren += delta;
 
     // Finally we set the parent of the added children to this.
     for (int i = 0; i < views.length; ++i)
@@ -264,12 +282,12 @@ public abstract class CompositeView
                   }
               }
           }
-        else
-  {
+      }
+
+    if (ret == null)
             throw new BadLocationException("Position " + pos
                                            + " is not represented by view.", pos);
-          }    
-      }
+
     return ret;
   }
 
@@ -509,24 +527,17 @@ public abstract class CompositeView
     if (a == null)
       return null;
 
-    Rectangle alloc = a.getBounds();
+    // Try to avoid allocation of Rectangle here.
+    Rectangle alloc = a instanceof Rectangle ? (Rectangle) a : a.getBounds();
+
     // Initialize the inside allocation rectangle. This is done inside
     // a synchronized block in order to avoid multiple threads creating
     // this instance simultanously.
-    Rectangle inside;
-    synchronized(this)
-      {
-        inside = insideAllocation;
-        if (inside == null)
-          {
-            inside = new Rectangle();
-            insideAllocation = inside;
-          }
-      }
-    inside.x = alloc.x + left;
-    inside.y = alloc.y + top;
-    inside.width = alloc.width - left - right;
-    inside.height = alloc.height - top - bottom;
+    Rectangle inside = insideAllocation;
+    inside.x = alloc.x + getLeftInset();
+    inside.y = alloc.y + getTopInset();
+    inside.width = alloc.width - getLeftInset() - getRightInset();
+    inside.height = alloc.height - getTopInset() - getBottomInset();
     return inside;
   }
 
