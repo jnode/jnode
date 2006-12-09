@@ -1,4 +1,4 @@
-/* BRView.java -- HTML BR tag view
+/* ResetablePlainDocument.java -- A plain document for use in the HTML renderer
    Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -38,33 +38,45 @@ exception statement from your version. */
 
 package javax.swing.text.html;
 
-import javax.swing.text.Element;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.PlainDocument;
 
 /**
- * Handled the HTML BR tag.
+ * A PlainDocument that can be resetted.
  */
-class BRView
-  extends InlineView
+class ResetablePlainDocument
+  extends PlainDocument
+  implements ResetableModel
 {
   /**
-   * Creates the new BR view.
-   * 
-   * @param elem the HTML element, representing the view.
+   * The initial text.
    */
-  public BRView(Element elem)
-  {
-    super(elem);
-  }
-  
+  private String initial;
+
   /**
-   * Always return ForcedBreakWeight for the X_AXIS, BadBreakWeight for the
-   * Y_AXIS.
+   * Stores the initial text.
+   *
+   * @param text the initial text
    */
-  public int getBreakWeight(int axis, float pos, float len)
+  void setInitialText(String text)
   {
-    if (axis == X_AXIS)
-      return ForcedBreakWeight;
-    else
-      return super.getBreakWeight(axis, pos, len);
+    initial = text;
   }
+
+  /**
+   * Resets the model.
+   */
+  public void reset()
+  {
+    try
+      {
+        replace(0, getLength(), initial, null);
+      }
+    catch (BadLocationException ex)
+      {
+        // Shouldn't happen.
+        assert false;
+      }
+  }
+
 }

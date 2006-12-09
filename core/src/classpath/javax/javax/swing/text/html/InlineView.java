@@ -38,13 +38,17 @@ exception statement from your version. */
 
 package javax.swing.text.html;
 
+import java.awt.FontMetrics;
 import java.awt.Shape;
+import java.text.BreakIterator;
 
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
 import javax.swing.text.LabelView;
+import javax.swing.text.Segment;
 import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
 
@@ -63,6 +67,18 @@ public class InlineView
    * The attributes used by this view.
    */
   private AttributeSet attributes;
+
+  /**
+   * The span of the longest word in this view.
+   *
+   * @see #getLongestWord()
+   */
+  private float longestWord;
+
+  /**
+   * Indicates if we may wrap or not.
+   */
+  private boolean nowrap;
 
   /**
    * Creates a new <code>InlineView</code> that renders the specified element.
@@ -123,6 +139,7 @@ public class InlineView
     StyleSheet ss = getStyleSheet();
     attributes = ss.getViewAttributes(this);
     preferenceChanged(null, true, true);
+    setPropertiesFromAttributes();
   }
 
   /**
@@ -144,8 +161,12 @@ public class InlineView
   
   public int getBreakWeight(int axis, float pos, float len)
   {
-    // FIXME: Implement this.
-    return super.getBreakWeight(axis, pos, len);
+    int weight;
+    if (nowrap)
+      weight = BadBreakWeight;
+    else
+      weight = super.getBreakWeight(axis, pos, len);
+    return weight;
   }
 
   public View breakView(int axis, int offset, float pos, float len)
@@ -190,7 +211,12 @@ public class InlineView
       b = true;
     setSuperscript(b);
 
-    // TODO: Handle white-space: nowrap property.
+    // Fetch nowrap setting.
+    o = atts.getAttribute(CSS.Attribute.WHITE_SPACE);
+    if (o != null && o.equals("nowrap"))
+      nowrap = true;
+    else
+      nowrap = false;
   }
 
   /**
@@ -207,4 +233,75 @@ public class InlineView
       styleSheet = ((HTMLDocument) doc).getStyleSheet();
     return styleSheet;
   }
+
+  /**
+   * Returns the minimum span for the specified axis. This returns the
+   * width of the longest word for the X axis and the super behaviour for
+   * the Y axis. This is a slight deviation from the reference implementation.
+   * IMO this should improve rendering behaviour so that an InlineView never
+   * gets smaller than the longest word in it.
+   */
+  public float getMinimumSpan(int axis)
+  {
+    float min = super.getMinimumSpan(axis);
+    if (axis == X_AXIS)
+      min = Math.max(getLongestWord(), min);
+    return min;
+  }
+
+  /**
+   * Returns the span of the longest word in this view.
+   *
+   * @return the span of the longest word in this view
+   */
+  private float getLongestWord()
+  {
+    if (longestWord == -1)
+      longestWord = calculateLongestWord();
+    return longestWord;
+  }
+
+  /**
+   * Calculates the span of the longest word in this view.
+   *
+   * @return the span of the longest word in this view
+   */
+  private float calculateLongestWord()
+  {
+    float span = 0;
+    try
+      {
+        Document doc = getDocument();
+        int p0 = getStartOffset();
+        int p1 = getEndOffset();
+        Segment s = new Segment();
+        doc.getText(p0, p1 - p0, s);
+        BreakIterator iter = BreakIterator.getWordInstance();
+        iter.setText(s);
+        int wordStart = p0;
+        int wordEnd = p0;
+        int start = iter.first();
+        for (int end = iter.next(); end != BreakIterator.DONE;
+             start = end, end = iter.next())
+          {
+            if ((end - start) > (wordEnd - wordStart))
+              {
+                wordStart = start;
+                wordEnd = end;
+              }
+          }
+        if (wordEnd - wordStart > 0)
+          {
+            FontMetrics fm = getFontMetrics();
+            int offset = s.offset + wordStart - s.getBeginIndex();
+            span = fm.charsWidth(s.array, offset, wordEnd - wordStart);
+          }
+      }
+    catch (BadLocationException ex)
+      {
+        // Return 0.
+      }
+    return span;
+  }
+
 }

@@ -1,4 +1,4 @@
-/* BRView.java -- HTML BR tag view
+/* FormSubmitEvent.java -- Event fired on form submit
    Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -38,33 +38,86 @@ exception statement from your version. */
 
 package javax.swing.text.html;
 
+import java.net.URL;
+
 import javax.swing.text.Element;
 
 /**
- * Handled the HTML BR tag.
+ * The event fired on form submit.
+ *
+ * @since 1.5
  */
-class BRView
-  extends InlineView
+public class FormSubmitEvent
+  extends HTMLFrameHyperlinkEvent
 {
+
+  // FIXME: Use enums when available.
   /**
-   * Creates the new BR view.
-   * 
-   * @param elem the HTML element, representing the view.
+   * The submit method.
    */
-  public BRView(Element elem)
+  public static class MethodType
   {
-    super(elem);
+    /**
+     * Indicates a form submit with HTTP method POST.
+     */
+    public static final MethodType POST = new MethodType();
+
+    /**
+     * Indicates a form submit with HTTP method GET.
+     */
+    public static final MethodType GET = new MethodType();
+
+    private MethodType()
+    {
+    }
   }
-  
+
   /**
-   * Always return ForcedBreakWeight for the X_AXIS, BadBreakWeight for the
-   * Y_AXIS.
+   * The submit method.
    */
-  public int getBreakWeight(int axis, float pos, float len)
+  private MethodType method;
+
+  /**
+   * The actual submit data.
+   */
+  private String data;
+
+  /**
+   * Creates a new FormSubmitEvent.
+   *
+   * @param source the source
+   * @param type the type of hyperlink update
+   * @param url the action url
+   * @param el the associated element
+   * @param target the target attribute
+   * @param m the submit method
+   * @param d the submit data
+   */
+  FormSubmitEvent(Object source, EventType type, URL url, Element el,
+                  String target, MethodType m, String d)
   {
-    if (axis == X_AXIS)
-      return ForcedBreakWeight;
-    else
-      return super.getBreakWeight(axis, pos, len);
+    super(source, type, url, el, target);
+    method = m;
+    data = d;
+  }
+
+  /**
+   * Returns the submit data.
+   *
+   * @return the submit data
+   */
+  public String getData()
+  {
+    return data;
+  }
+
+  /**
+   * Returns the HTTP submit method.
+   *
+   * @return the HTTP submit method
+   */
+  public MethodType getMethod()
+  {
+    return method;
   }
 }
