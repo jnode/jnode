@@ -1,4 +1,4 @@
-/* CSSParserCallback.java -- Callback for parsing CSS
+/* BorderStyle.java -- Utility for dealing with border styles
    Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -39,43 +39,26 @@ exception statement from your version. */
 package gnu.javax.swing.text.html.css;
 
 /**
- * Defines the callback that is used by the CSSParser to notify the
- * backend of the parsing process.
- *
- * @author Roman Kennke (kennke@aicas.com)
+ * Utility class for handling border styles.
  */
-public interface CSSParserCallback
+public class BorderStyle
 {
 
   /**
-   * Signals the beginning of a statement.
+   * Determines if a given value makes up a valid border style value.
    *
-   * A CSS statement is build up like follows:
-   * <pre>
-   * <selector> {
-   *   ... declarations...
-   * }
-   * </pre>
+   * @param value the value to check
    *
-   * After startStatement(), the callback will receive zero to n callbacks
-   * to declaration, followed by an endStatement() call.
-   *
-   * @param selector the selector of the statement.
+   * @return <code>true</code> when this is a valid border style,
+   *         <code>false</code> otherwise
    */
-  void startStatement(Selector[] selector);
-
-  /**
-   * Signals the end of a statement.
-   */
-  void endStatement();
-
-  /**
-   * Signals the parsing of one declaration, which defines a mapping
-   * from a property to a value.
-   *
-   * @param property the property
-   * @param value the value
-   */
-  void declaration(String property, String value);
-
+  public static boolean isValidStyle(String value)
+  {
+    return value.equals("none") || value.equals("hidden")
+           || value.equals("dotted") || value.equals("dashed")
+           || value.equals("solid") || value.equals("double")
+           || value.equals("groove") || value.equals("ridge")
+           || value.equals("inset") || value.equals("outset");
+           
+  }
 }

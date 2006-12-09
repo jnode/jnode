@@ -1,4 +1,4 @@
-/* CSSParserCallback.java -- Callback for parsing CSS
+/* BorderWidth.java -- A CSS metric for border widths
    Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -39,43 +39,40 @@ exception statement from your version. */
 package gnu.javax.swing.text.html.css;
 
 /**
- * Defines the callback that is used by the CSSParser to notify the
- * backend of the parsing process.
- *
- * @author Roman Kennke (kennke@aicas.com)
+ * A special CSS metric for border widths. It basically understands everything
+ * as Length, and in addition to that provides a mapping for the border-width's
+ * thin, medium and think values.
  */
-public interface CSSParserCallback
+public class BorderWidth
+  extends Length
 {
 
   /**
-   * Signals the beginning of a statement.
+   * Creates a new BorderWidth instance.
    *
-   * A CSS statement is build up like follows:
-   * <pre>
-   * <selector> {
-   *   ... declarations...
-   * }
-   * </pre>
-   *
-   * After startStatement(), the callback will receive zero to n callbacks
-   * to declaration, followed by an endStatement() call.
-   *
-   * @param selector the selector of the statement.
+   * @param val the CSS value to be interpreted
    */
-  void startStatement(Selector[] selector);
+  public BorderWidth(String val)
+  {
+    super(val);
+    if (val.equals("thin"))
+      floatValue = 1.F;
+    else if (val.equals("medium"))
+      floatValue = 2.F;
+    else if (val.equals("thick"))
+      floatValue = 3.F;
+  }
 
   /**
-   * Signals the end of a statement.
-   */
-  void endStatement();
-
-  /**
-   * Signals the parsing of one declaration, which defines a mapping
-   * from a property to a value.
+   * Checks if the specified value makes up a valid border-width value.
    *
-   * @param property the property
-   * @param value the value
+   * @param value the value to check
+   *
+   * @return <code>true</code> if the value is a valid border-width
    */
-  void declaration(String property, String value);
-
+  public static boolean isValid(String value)
+  {
+    return value.equals("thin") || value.equals("medium")
+           || value.equals("thick") || Length.isValid(value);
+  }
 }
