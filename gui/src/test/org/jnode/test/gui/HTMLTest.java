@@ -26,6 +26,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JEditorPane;
 
 /**
+ * HTML rendering test.
+ *
  * @author Levente S\u00e1ntha
  */
 public class HTMLTest {
