@@ -1,5 +1,5 @@
-/* SwingComponent.java -- An interface that defines a Swing component for peers
-   Copyright (C)  2006  Free Software Foundation, Inc.
+/* ShapeCache.java -- Caches certain Shapes for reuse in AbstractGraphics2D
+   Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,55 +35,51 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package gnu.java.awt.peer.swing;
 
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
+package gnu.java.awt.java2d;
 
-import javax.swing.JComponent;
+import java.awt.Polygon;
+import java.awt.Rectangle;
+import java.awt.geom.Arc2D;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
+import java.awt.geom.RoundRectangle2D;
 
 /**
- * Defines some additional methods that the Swing components must implement
- * in order to work with the Swing peers. This is usually achieved by
- * subclassing a Swing component and forwarding the method calls to some
- * protected JComponent method.
- *
- * @author Roman Kennke (kennke@aicas.com)
+ * Caches certain Shape objects for reuse in AbstractGraphics2D. This avoids
+ * massive creation of such objects.
  */
-public interface SwingComponent
+public class ShapeCache
 {
 
   /**
-   * Returns the actual swing compenent.
-   *
-   * @return the actual swing compenent
+   * A cached Line2D.
    */
-  JComponent getJComponent();
+  public Line2D line;
 
   /**
-   * Handles a mouse event. This is usually forwarded to
-   * {@link Component#processMouseMotionEvent(MouseEvent)} of the swing
-   * component.
-   *
-   * @param ev the mouse event
+   * A cached Rectangle.
    */
-  void handleMouseEvent(MouseEvent ev);
+  public Rectangle rect;
 
   /**
-   * Handles a mouse motion event. This is usually forwarded to
-   * {@link Component#processMouseEvent(MouseEvent)} of the swing
-   * component.
-   *
-   * @param ev the mouse motion event
+   * A cached RoundRectangle2D.
    */
-  void handleMouseMotionEvent(MouseEvent ev);
+  public RoundRectangle2D roundRect;
 
   /**
-   * Handles a key event. This is usually forwarded to
-   * {@link Component#processKeyEvent(KeyEvent)} of the swing
-   * component.
-   *
-   * @param ev the key event
+   * A cached Ellipse2D.
    */
-  void handleKeyEvent(KeyEvent ev);
+  public Ellipse2D ellipse;
+
+  /**
+   * A cached Arc2D.
+   */
+  public Arc2D arc;
+
+  /**
+   * A cached Polygon.
+   */
+  public Polygon polygon;
+
 }

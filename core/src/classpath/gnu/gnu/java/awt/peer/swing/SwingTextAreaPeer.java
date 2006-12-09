@@ -1,4 +1,4 @@
-/* SwingLabelPeer.java -- A Swing based peer for AWT labels
+/* SwingTextAreaPeer.java -- A Swing based peer for AWT textareas
    Copyright (C)  2006  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -37,44 +37,43 @@ exception statement from your version. */
 
 package gnu.java.awt.peer.swing;
 
+import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.Label;
 import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.TextArea;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.awt.peer.LabelPeer;
+import java.awt.im.InputMethodRequests;
+import java.awt.peer.TextAreaPeer;
 
 import javax.swing.JComponent;
-import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.text.BadLocationException;
 
-
-/**
- * A Label peer based on {@link JLabel}.
- *
- * @author Roman Kennke (kennke@aicas.com)
- */
-public class SwingLabelPeer
-  extends SwingComponentPeer
-  implements LabelPeer
+public class SwingTextAreaPeer
+    extends SwingComponentPeer
+    implements TextAreaPeer
 {
 
   /**
-   * A spezialized Swing label used to paint the label for the AWT Label. 
+   * A spezialized Swing scroller used to hold the textarea. 
    *
    * @author Roman Kennke (kennke@aicas.com)
    */
-  private class SwingLabel
-    extends JLabel
+  private class SwingTextArea
+    extends JScrollPane
     implements SwingComponent
   {
-    Label label;
-      
-      
-    SwingLabel(Label label)
+
+    SwingTextArea(Component comp)
     {
-        this.label = label;
+      super(comp, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+            JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
     }
 
     /**
@@ -95,7 +94,16 @@ public class SwingLabelPeer
      */
     public void handleMouseEvent(MouseEvent ev)
     {
-      processMouseEvent(ev);
+      ev.setSource(this);
+      dispatchEvent(ev);
+    }
+
+    /**
+     * Force lightweight mouse dispatching.
+     */
+    public boolean isLightweight()
+    {
+      return false;
     }
 
     /**
@@ -127,7 +135,7 @@ public class SwingLabelPeer
      */
     public Point getLocationOnScreen()
     {
-      return SwingLabelPeer.this.getLocationOnScreen();
+      return SwingTextAreaPeer.this.getLocationOnScreen();
     }
 
     /**
@@ -140,8 +148,8 @@ public class SwingLabelPeer
     public boolean isShowing()
     {
       boolean retVal = false;
-      if (label != null)
-        retVal = label.isShowing();
+      if (SwingTextAreaPeer.this.awtComponent != null)
+        retVal = SwingTextAreaPeer.this.awtComponent.isShowing();
       return retVal;
     }
 
@@ -156,75 +164,154 @@ public class SwingLabelPeer
      */
     public Image createImage(int w, int h)
     {
-      return SwingLabelPeer.this.createImage(w, h);
+      return SwingTextAreaPeer.this.createImage(w, h);
     }
-    
+
     public Graphics getGraphics()
     {
-      return SwingLabelPeer.this.getGraphics();
+      return SwingTextAreaPeer.this.getGraphics();
     }
 
     public Container getParent()
     {
       Container par = null;
-      if (label != null)
-        par = label.getParent();
+      if (SwingTextAreaPeer.this.awtComponent != null)
+        par = SwingTextAreaPeer.this.awtComponent.getParent();
       return par;
     }
   }
 
   /**
-   * Creates a new <code>SwingLabelPeer</code> for the specified AWT label.
-   *
-   * @param label the AWT label
+   * The actual JTextArea.
    */
-  public SwingLabelPeer(Label label)
+  private JTextArea jTextArea;
+
+  public SwingTextAreaPeer(TextArea textArea)
   {
     super();
-    SwingLabel swingLabel = new SwingLabel(label);
-    swingLabel.setText(label.getText());
-    swingLabel.setOpaque(true);
-    init(label, swingLabel);
-    setAlignment(label.getAlignment());
+    System.err.println("new SwingTextAreaPeer");
+    jTextArea = new JTextArea();
+    SwingTextArea swingArea = new SwingTextArea(jTextArea);
+    init(textArea, swingArea);
+
+    // Pull over the text from the text area.
+    setText(textArea.getText());
   }
 
-  /**
-   * Sets the text of the label. This is implemented to set the text on the
-   * Swing label.
-   *
-   * @param text the text to be set
-   */
+  public Dimension getMinimumSize(int rows, int cols)
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  public Dimension getPreferredSize(int rows, int cols)
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  public void insert(String text, int pos)
+  {
+    jTextArea.insert(text, pos);
+  }
+
+  public void insertText(String text, int pos)
+  {
+    jTextArea.insert(text, pos);
+  }
+
+  public Dimension minimumSize(int rows, int cols)
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  public Dimension preferredSize(int rows, int cols)
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  public void replaceRange(String text, int start, int end)
+  {
+    jTextArea.replaceRange(text, start, end);
+  }
+
+  public void replaceText(String text, int start, int end)
+  {
+    jTextArea.replaceRange(text, start, end);
+  }
+
+  public long filterEvents(long filter)
+  {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  public int getCaretPosition()
+  {
+    return jTextArea.getCaretPosition();
+  }
+
+  public Rectangle getCharacterBounds(int pos)
+  {
+    Rectangle r;
+    try
+      {
+        return jTextArea.modelToView(pos);
+      }
+    catch (BadLocationException ex)
+      {
+        r = null;
+      }
+    return r;
+  }
+
+  public int getIndexAtPoint(int x, int y)
+  {
+    return jTextArea.viewToModel(new Point(x, y));
+  }
+
+  public InputMethodRequests getInputMethodRequests()
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  public int getSelectionEnd()
+  {
+    return jTextArea.getSelectionEnd();
+  }
+
+  public int getSelectionStart()
+  {
+    return jTextArea.getSelectionStart();
+  }
+
+  public String getText()
+  {
+    return jTextArea.getText();
+  }
+
+  public void select(int start, int end)
+  {
+    jTextArea.select(start, end);
+  }
+
+  public void setCaretPosition(int pos)
+  {
+    jTextArea.setCaretPosition(pos);
+  }
+
+  public void setEditable(boolean editable)
+  {
+    jTextArea.setEditable(editable);
+  }
+
   public void setText(String text)
   {
-    ((JLabel) swingComponent.getJComponent()).setText(text);
-  }
-
-  /**
-   * Sets the horizontal alignment of the label. This is implemented to
-   * set the alignment on the Swing label.
-   *
-   * @param alignment the horizontal alignment
-   *
-   * @see Label#LEFT
-   * @see Label#RIGHT
-   * @see Label#CENTER
-   */
-  public void setAlignment(int alignment)
-  {
-    JLabel swingLabel = (JLabel) swingComponent.getJComponent();
-    switch (alignment)
-      {
-      case Label.RIGHT:
-        swingLabel.setHorizontalAlignment(JLabel.RIGHT);
-        break;
-      case Label.CENTER:
-        swingLabel.setHorizontalAlignment(JLabel.CENTER);
-        break;
-      case Label.LEFT:
-      default:
-        swingLabel.setHorizontalAlignment(JLabel.LEFT);
-        break;
-      }
+    System.err.println("setText: " + text);
+    jTextArea.setText(text);
   }
 
 }
