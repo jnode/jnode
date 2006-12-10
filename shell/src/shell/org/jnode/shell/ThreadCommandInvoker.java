@@ -33,6 +33,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
@@ -287,8 +288,12 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
                 // new
                 // thread?
                 try {
-                    AccessController.doPrivileged(new InvokeAction(method,
-                            null, args));
+                	Object obj = null;
+                	if(!Modifier.isStatic(method.getModifiers())) {
+                		obj = cx.newInstance();
+                	}
+                		AccessController.doPrivileged(new InvokeAction(method,
+                            obj, args));
                 } catch (PrivilegedActionException ex) {
                     throw ex.getException();
                 }
