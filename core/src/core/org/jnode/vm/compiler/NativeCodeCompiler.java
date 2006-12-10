@@ -173,7 +173,7 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
                         .getOffset()
                         - startOffset);
             } else {
-                defExHandler = null;
+                defExHandler = Address.zero();
             }
             final VmCompiledExceptionHandler[] eTable;
             final VmAddressMap aTable = cm.getAddressTable();
