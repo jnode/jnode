@@ -45,16 +45,16 @@ public class TextEditor implements KeyboardListener {
         te.loadFile(f);
     }
 
-    public TextEditor(TextConsole first) {
-        this.console = first;
-        first.addKeyboardListener(this);
-        console.setCursorVisible(true);
+    public TextEditor(TextConsole console) {
+        this.console = console;
+        console.addKeyboardListener(this);
+        this.console.setCursorVisible(true);
         cx = 0;
         cy = 0;
-        sh = first.getHeight();
-        sw = first.getWidth();
+        sh = console.getHeight();
+        sw = console.getWidth();
         cxm = sw - 1;
-        cym = sh - 1;
+        cym = sh - 1 - 1;
         fx = 0;
         fy = 0;
         ls = new ArrayList<StringBuilder>();
@@ -107,19 +107,61 @@ public class TextEditor implements KeyboardListener {
         });
     }
 
+
     private void updateScreen(){
-        char[] data = new char[sw * sh];
+        char[] data = new char[sw * (cym + 1 + 1)];
         int k = 0;
         StringBuilder e = new StringBuilder();
-        for(int i = 0; i < sh; i ++){
+        List<StringBuilder> rl = new ArrayList<StringBuilder>();
+        for(int i = 0; i < cym + 1; i ++){
             StringBuilder l = (fy + i < ls.size()) ? ls.get(fy + i) : e;
-            for(int j = 0; j < sw; j++){
-                char c = (fx + j < l.length()) ? l.charAt(fx + j) : ' ';
-                data[k++] = (c == '\n' || c == '\t') ? ' ' : c;
+            StringBuilder sb = new StringBuilder();
+            for(int j = 0; j < l.length(); j++){
+                char c = l.charAt(j);
+                if(c == '\t'){
+                    sb.append(' ');
+                    sb.append(' ');
+                    sb.append(' ');
+                    sb.append(' ');
+                } else if(c == '\n'){
+                    sb.append(' ');
+                } else{
+                    sb.append(c);
+                }
+            }
+            rl.add(sb);
+        }
+
+        int tab_count = 0;
+        if(ls.size() > 0){
+            CharSequence l = ls.get(oy()).subSequence(0, fx + cx);
+            for(int i = 0; i < l.length(); i ++ ){
+                if(l.charAt(i) == '\t') tab_count ++;
             }
         }
+
+        int tx = fx + cx + 3 * tab_count;
+        int cx2 = cx + 3 * tab_count;
+        int fx2 = fx;
+        if(tx >= sw){
+            cx2 = sw -1;
+            fx2 = tx - cx2;
+        }
+
+        for(int i = 0; i < cym + 1; i ++){
+            StringBuilder l = rl.get(i);
+            for(int j = 0; j < sw; j++){
+                char c = (fx2 + j < l.length()) ? l.charAt(fx2 + j) : ' ';
+                data[k++] = c;
+            }
+        }
+
+        e.append(file.getName()).append(" [").append(fx2 + cx2 + 1).append(",").append(oy() + 1).append("]");
+        for(int j = 0; j < sw; j++){
+            data[k++] = (j < e.length()) ? e.charAt(j) : ' ';
+        }
         console.setChar(0, 0, data, 7);
-        console.setCursor(cx, cy);
+        console.setCursor(cx2, cy);
     }
 
     public void keyPressed(KeyboardEvent e) {
@@ -131,8 +173,8 @@ public class TextEditor implements KeyboardListener {
                 case KeyEvent.VK_LEFT: {if(fx > 0) fx --; break;}
                 case KeyEvent.VK_RIGHT: {if(fx < mx()) fx ++; break;}
                 case KeyEvent.VK_HOME: {cx = fx = cy = fy = 0; break;}
-                case KeyEvent.VK_END: { if(my() < cym) cy = my(); else {cy = cym; fy = my() - cy;}; end(); break;}
-                case KeyEvent.VK_Y: { ls.remove(oy()); if(oy() > my()) cy --; break;}
+                case KeyEvent.VK_END: { if(my() < cym) cy = my(); else {cy = cym; fy = my() - cy;} end(); break;}
+                case KeyEvent.VK_Y: { if(oy() >= 0 && oy() <= my()) {ls.remove(oy()); if(cy > 0) cy --; else if(fy > 0) fy --;} break;}
                 case KeyEvent.VK_S: { saveFile(); break;}
                 case KeyEvent.VK_Q: { console.getManager().unregisterConsole(console); break;}
 
@@ -170,6 +212,11 @@ public class TextEditor implements KeyboardListener {
                                     cx = l2.length() - 1;
                                     l2.deleteCharAt(l2.length() - 1).append(ls.remove(oy()));
                                     cy --;
+                                } else if(fy > 0){
+                                    StringBuilder l2 = ls.get(oy() - 1);
+                                    cx = l2.length() - 1;
+                                    l2.deleteCharAt(l2.length() - 1).append(ls.remove(oy()));
+                                    fy --;
                                 }
                             } else if(cx > 0){
                                 cx --;
@@ -201,6 +248,7 @@ public class TextEditor implements KeyboardListener {
         }
         if(oy() > my()){
             fy -= oy() - my();
+            fy = fy < 0 ? 0 : fy ;
         }
         if(ox() > mx()) {
             if(mx() > cxm){
