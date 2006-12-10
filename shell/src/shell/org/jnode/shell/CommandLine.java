@@ -191,6 +191,11 @@ public class CommandLine {
 
             switch (currentChar) {
             case ESCAPE_CHAR:
+            	if(pos >= s.length())
+            	{
+            		throw new IllegalArgumentException("escape char ('\\') not followed by a character");
+            	}
+            	
                 token.append(CommandLine.unescape(s.charAt(pos++)));
                 break;
 
