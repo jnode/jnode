@@ -49,9 +49,13 @@ public class PluginUtils {
         }
     }
 
-	public static String getLocalizedMessage(Class parent, String bundleName, 
-						String messageKey)
-	{
+	public static String getLocalizedMessage(Class parent, String bundleName,
+			String messageKey) {
+		return getLocalizedMessage(parent, bundleName, messageKey, false);
+	}
+	
+	public static String getLocalizedMessage(Class parent, String bundleName,
+			String messageKey, boolean cleanFallback) {
 		String fullName;
 		ClassLoader loader;
 		if(parent == null)
@@ -84,7 +88,8 @@ public class PluginUtils {
 	        }
 	        catch (MissingResourceException mre)
 	        {                
-	        	BootLog.error("can't get message", mre);
+	        	if( !cleanFallback )
+	        		BootLog.error("can't get message", mre);
 	        }
 	    }    
 	    
@@ -98,16 +103,17 @@ public class PluginUtils {
 	        }
 	        catch (MissingResourceException mre)
 	        {                
-	            mre.printStackTrace();                
+	            if( !cleanFallback)
+	            	mre.printStackTrace();                
 	        }
 	    }
 	
-	    if(message == null)
+	    if(message == null && !cleanFallback)
 	    {
 	    	BootLog.error("can't get message from bundle "+bundleName+" with key "+messageKey);	    	
 	    }
 	    
-	    return (message == null) ? ('?' + messageKey + '?') : message; 
+	    return (message == null) ? (cleanFallback ? messageKey : ('?' + messageKey + '?')) : message; 
 	}
         
 }
