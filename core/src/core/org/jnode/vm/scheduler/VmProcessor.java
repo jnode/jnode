@@ -507,7 +507,7 @@ public abstract class VmProcessor extends VmSystemObject {
      * @return The address of the thread switch indicator
      */
     protected final Address getTSIAddress() {
-        if (tsiAddress == null) {
+        if (tsiAddress.isZero()) {
             tsiAddress = ObjectReference.fromObject(this).toAddress();
         }
         return tsiAddress;
