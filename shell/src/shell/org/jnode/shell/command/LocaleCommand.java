@@ -21,8 +21,6 @@
  
 package org.jnode.shell.command;
 
-import gnu.java.net.GetLocalHostAction;
-
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Locale;
