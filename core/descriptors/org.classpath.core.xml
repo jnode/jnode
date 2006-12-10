@@ -133,6 +133,7 @@
 
       <export name="javax.accessibility.*"/>
       <export name="javax.isolate.*"/>
+      <export name="javax.management.*"/>  
       <export name="javax.naming.*"/>
       <export name="javax.naming.directory.*"/>
       <export name="javax.naming.event.*"/>

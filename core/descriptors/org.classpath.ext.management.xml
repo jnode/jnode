@@ -11,8 +11,7 @@
   license-name="classpath">
 
   <runtime>
-    <library name="jnode-core.jar">
-      <export name="javax.management.*"/>
+    <library name="jnode-core.jar">      
       <export name="javax.management.openmbean.*"/>
     </library>
   </runtime>
