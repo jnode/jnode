@@ -186,7 +186,7 @@ final class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
      */
     protected Object alloc(VmClassType<?> vmClass, int alignedSize) {
 
-        if (nextFreePtr == null) { /* This heap is full */
+        if (nextFreePtr.EQ(Address.zero())) { /* This heap is full */
         return null; }
 
         final Offset tibOffset = this.tibOffset;
@@ -201,7 +201,7 @@ final class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
             throw new IllegalArgumentException("vmClass.TIB is null");
         }
         //final int size = getSize();
-        Address objectPtr = null;
+        Address objectPtr = Address.zero();
         lock();
         try {
             // Search for the first free block that is large enough
@@ -218,7 +218,7 @@ final class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
                         // No large enough free space has been found
                         // A collect may recover smaller free spaces in this
                         // heap, but we leave that to a GC iteration.
-                        nextFreePtr = null;
+                        nextFreePtr = Address.zero();
                         //Screen.debug("B");
                         return null;
                     } else {
@@ -309,7 +309,7 @@ final class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
 
         lock();
         try {
-            Address firstFreePtr = null;
+            Address firstFreePtr = Address.zero();
             while (offset.LT(size)) {
                 final Address ptr = start.add(offset);
                 final Word objSize = ptr.loadWord(sizeOffset);
