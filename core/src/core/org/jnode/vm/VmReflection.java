@@ -318,6 +318,8 @@ public final class VmReflection {
 		}
 
 		if (!method.isStatic()) {
+			if( o == null )
+				throw new NullPointerException();
 			Unsafe.pushObject(o);
 		} else {
 			method.getDeclaringClass().initialize();
