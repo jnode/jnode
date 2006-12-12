@@ -15,6 +15,7 @@ import java.awt.AWTEvent;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.*;
@@ -88,11 +89,11 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
                 int offset = i * SCREEN_WIDTH;
                 int lenght = SCREEN_WIDTH;
                 if (offset <= cursorOffset && cursorOffset < offset + SCREEN_WIDTH) {
-                    char[] line = new char[SCREEN_WIDTH];
-                    for (int j = 0; j < SCREEN_WIDTH; j++) {
-                        line[j] = offset + j == cursorOffset ? '_' : ' ';
-                    }
-                    g.drawChars(line, 0, lenght, margin, h + i * h);
+                	FontMetrics fm = getFontMetrics(getFont());
+                	int x = margin + fm.charsWidth(buffer, offset, cursorOffset - offset);
+                	int y = h + i * h;
+                	int width = fm.charWidth(buffer[cursorOffset]);
+                	g.drawLine(x, y, x+width, y);
                 }
                 g.drawChars(buffer, offset, lenght, margin, h + i * h);
 
