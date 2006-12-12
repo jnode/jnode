@@ -35,6 +35,7 @@ public class SwingTextScreenConsoleManager extends TextScreenConsoleManager {
                 initializeKeyboard(systemScreen.getKeyboardDevice());
                 addPointerDevice(systemScreen.getPointerDevivce());
                 frame = new JFrame("Console");
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.addWindowListener(new WindowAdapter(){
                     public void windowClosed(WindowEvent e) {
                         closeAll();
