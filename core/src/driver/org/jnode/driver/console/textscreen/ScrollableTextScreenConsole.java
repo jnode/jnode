@@ -103,9 +103,9 @@ public class ScrollableTextScreenConsole extends TextScreenConsole {
         if (isFocused() && (event.getZ() != 0)) {
             final int z = event.getZ();
             if (z < 0) {
-                scrollDown(Math.abs(z));
-            } else {
                 scrollUp(Math.abs(z));                
+            } else {
+                scrollDown(Math.abs(z));
             }
             event.consume();
         }
