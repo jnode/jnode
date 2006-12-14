@@ -134,6 +134,7 @@ public final class FileDescriptor
    */
   public boolean valid ()
   {
-    return channel != null && channel.isOpen();
+    ByteChannel c = channel;
+    return (c != null) && (c.isOpen());
   }
 }
