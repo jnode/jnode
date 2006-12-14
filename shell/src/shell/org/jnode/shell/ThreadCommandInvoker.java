@@ -29,6 +29,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
@@ -53,6 +54,24 @@ import org.jnode.vm.VmExit;
  * @author Martin Husted Hartvig (hagar@jnode.org)
  */
 public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
+	
+	private class StreamHolder {
+		InputStream inputStream, nextInputStream;
+        PrintStream errStream, outputStream;
+        ByteArrayOutputStream byteArrayOutputStream;
+    	
+    	public StreamHolder(InputStream inputStream, PrintStream outputStream, PrintStream errStream) {
+			this.inputStream = inputStream;
+			this.errStream = errStream;
+			this.outputStream = outputStream;
+		}
+	}
+	
+	private class NoGo extends Exception {
+		NoGo(Throwable cause) {
+			super(cause);
+		}
+	}
 
     PrintStream err;
 
@@ -85,20 +104,14 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
 
     public void invoke(String cmdLineStr) {
         commandShell.addCommandToHistory(cmdLineStr);
-
-        InputStream inputStream = System.in; // will also be dynamic later
-        InputStream nextInputStream = null;
-        PrintStream errStream = System.err; // will also be dynamic later
-        PrintStream outputStream = null;
+        StreamHolder streams = new StreamHolder(System.in, null, System.err);
 
         CommandLine cmdLine;
-        Method method;
         CommandRunner cr;
         CommandInfo cmdInfo;
 
         String[] commands = cmdLineStr.split("\\|");
         String command;
-        ByteArrayOutputStream byteArrayOutputStream = null;
 
         for (int i = 0; i < commands.length; i++) {
             command = commands[i].trim();
@@ -112,59 +125,17 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
             try {
                 cmdInfo = commandShell.getCommandClass(cmdName);
 
-                try {
-                    method = cmdInfo.getCommandClass().getMethod(
-                            EXECUTE_METHOD, EXECUTE_ARG_TYPES);
-
-                    if (cmdLine.sendToOutFile()) {
-                        File file = new File(cmdLine.getOutFileName());
-
-                        try {
-                            FileOutputStream fileOutputStream = new FileOutputStream(
-                                    file);
-                            outputStream = new PrintStream(fileOutputStream);
-                        } catch (SecurityException e) {
-                            e.printStackTrace();
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        }
-                    } else if (i + 1 < commands.length) {
-                        byteArrayOutputStream = new ByteArrayOutputStream();
-                        outputStream = new PrintStream(byteArrayOutputStream);
-                    } else {
-                        outputStream = System.out;
-                    }
-
-                    if (byteArrayOutputStream != null) {
-                        nextInputStream = new ByteArrayInputStream(
-                                byteArrayOutputStream.toByteArray());
-                    }
-
-                    if (nextInputStream != null)
-                        inputStream = nextInputStream;
-
-                    CommandLine commandLine = null;
-
-                    if (inputStream.available() > 0) {
-                        commandLine = new CommandLine(inputStream);
-                    } else {
-                        commandLine = cmdLine.getRemainder();
-                    }
-
-                    commandLine.setOutFileName(cmdLine.getOutFileName());
-
-                    cr = new CommandRunner(cmdInfo.getCommandClass(), method,
-                            new Object[] { commandLine, inputStream,
-                                    outputStream, errStream });
-                } catch (NoSuchMethodException e) {
-                    method = cmdInfo.getCommandClass().getMethod(MAIN_METHOD,
-                            MAIN_ARG_TYPES);
-                    cr = new CommandRunner(cmdInfo.getCommandClass(), method,
-                            new Object[] { cmdLine.getRemainder()
-                                    .toStringArray() });
+                cr = buildExecuteRunner(cmdName, cmdLine, cmdInfo, 
+                    		streams, i != commands.length - 1);
+                if (cr == null) {
+                	cr = buildMainRunner(cmdName, cmdLine, cmdInfo);
+                }
+                if (cr == null) {
+                	err.println("Class " + cmdInfo.getCommandClass().getName() + 
+                			" has no suitable 'execute' or 'main' method");
+                	break;
                 }
                 try {
-
                     if (cmdInfo.isInternal()) {
                         cr.run();
                     } else {
@@ -185,22 +156,24 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
                                 }
                             }
                         }
-
                     }
 
-                    if (outputStream != null && outputStream != System.out) {
-                        outputStream.close();
+                    if (streams.outputStream != null && streams.outputStream != System.out) {
+                        streams.outputStream.close();
                     }
                     // System.err.println("Finished invoke.");
                 } catch (Exception ex) {
                     err.println("Exception in command");
                     ex.printStackTrace(err);
+                    break;
                 } catch (Error ex) {
                     err.println("Fatal error in command");
                     ex.printStackTrace(err);
+                    break;
                 }
-            } catch (NoSuchMethodException ex) {
-                err.println("Alias class has no main method " + cmdName);
+            } catch (NoGo ex) {
+            	err.println("Exception occurred while prepareing to run command");
+            	ex.getCause().printStackTrace(err);
             } catch (ClassNotFoundException ex) {
                 err.println("Unknown alias class " + ex.getMessage());
             } catch (ClassCastException ex) {
@@ -210,8 +183,88 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
                 ex.printStackTrace(err);
             }
         }
+    }
+    
+    private CommandRunner buildExecuteRunner(String cmdName, 
+    		CommandLine cmdLine, CommandInfo cmdInfo, StreamHolder streams, boolean last) 
+    throws NoGo {
+    	Method method;
+    	Object target;
+    	try {
+    		method = cmdInfo.getCommandClass().getMethod(
+    				EXECUTE_METHOD, EXECUTE_ARG_TYPES);
+    		if ((method.getModifiers() & Modifier.STATIC) == 0) {
+    			return null;
+    		}
+    	}
+    	catch (NoSuchMethodException ex) {
+    		return null;
+    	}
 
-        nextInputStream = null;
+    	try {
+    		target = cmdInfo.getCommandClass().newInstance();
+    	}
+    	catch (Exception ex) {
+    		throw new NoGo(ex);
+    	}
+    	
+    	if (cmdLine.sendToOutFile()) {
+            File file = new File(cmdLine.getOutFileName());
+
+            try {
+                FileOutputStream fileOutputStream = new FileOutputStream(
+                        file);
+                streams.outputStream = new PrintStream(fileOutputStream);
+            } catch (SecurityException e) {
+                e.printStackTrace();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        } else if (!last) {
+            streams.byteArrayOutputStream = new ByteArrayOutputStream();
+            streams.outputStream = new PrintStream(streams.byteArrayOutputStream);
+        } else {
+        	streams.outputStream = System.out;
+        }
+
+        if (streams.byteArrayOutputStream != null) {
+        	streams.nextInputStream = new ByteArrayInputStream(
+        			streams.byteArrayOutputStream.toByteArray());
+        }
+
+        if (streams.nextInputStream != null)
+        	streams.inputStream = streams.nextInputStream;
+
+        CommandLine commandLine;
+        try {
+        	commandLine = (streams.inputStream.available() > 0) ?
+        			new CommandLine(streams.inputStream) : cmdLine.getRemainder();
+        }
+        catch (IOException ex) {
+        	throw new NoGo(ex);
+        }
+        		
+        commandLine.setOutFileName(cmdLine.getOutFileName());
+
+        return new CommandRunner(cmdInfo.getCommandClass(), method, target, 
+                new Object[] { commandLine, streams.inputStream,
+        					   streams.outputStream, streams.errStream });
+    }
+    
+    private CommandRunner buildMainRunner(String cmdName, 
+    		CommandLine cmdLine, CommandInfo cmdInfo) {
+    	try {
+    		Method method = 
+    			cmdInfo.getCommandClass().getMethod(MAIN_METHOD, MAIN_ARG_TYPES);
+    		if ((method.getModifiers() & Modifier.STATIC) == 0) {
+    			return null;
+    		}
+    		return new CommandRunner(cmdInfo.getCommandClass(), method, null,
+    				new Object[] {cmdLine.getRemainder().toStringArray()});
+    	}
+    	catch (NoSuchMethodException ex) {
+    		return null;
+    	}
     }
 
     public void keyPressed(KeyboardEvent ke) {
@@ -259,41 +312,27 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
 
     class CommandRunner implements Runnable {
 
-        private Class cx;
-
-        Method method;
-
-        Object[] args;
+        private final Class cx;
+        private final Method method;
+        private final Object target;
+        private final Object[] args;
 
         boolean finished = false;
 
-        public CommandRunner(Class cx, Method method, Object[] args) {
+        public CommandRunner(Class cx, Method method, Object target, Object[] args) {
             this.cx = cx;
             this.method = method;
             this.args = args;
+            this.target = target;
         }
 
         public void run() {
             try {
                 // System.err.println("Registering shell in new thread.");
-                // to
-                // ensure
-                // access
-                // to
-                // the
-                // command
-                // shell
-                // in
-                // this
-                // new
-                // thread?
                 try {
-                	Object obj = null;
-                	if(!Modifier.isStatic(method.getModifiers())) {
-                		obj = cx.newInstance();
-                	}
-                		AccessController.doPrivileged(new InvokeAction(method,
-                            obj, args));
+
+                    AccessController.doPrivileged(
+                    		new InvokeAction(method, target, args));
                 } catch (PrivilegedActionException ex) {
                     throw ex.getException();
                 }
@@ -307,28 +346,32 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
                     unblock();
                 }
             } catch (InvocationTargetException ex) {
-                Throwable tex = ex.getTargetException();
-                if (tex instanceof SyntaxErrorException) {
-                    try {
-                        Help.getInfo(cx).usage();
-                    } catch (HelpException ex1) {
-                        // Don't care
-                        ex1.printStackTrace();
-                    }
-                    err.println(tex.getMessage());
-                    unblock();
-                } else if (tex instanceof VmExit) {
-                    err.println(tex.getMessage());
-                    unblock();
-                } else {
-                    err.println("Exception in command");
-                    tex.printStackTrace(err);
-                    unblock();
-                }
+            	Throwable tex = ex.getTargetException();
+            	if (tex instanceof SyntaxErrorException) {
+            		try {
+            			Help.getInfo(cx).usage();
+            		} catch (HelpException ex1) {
+            			// Don't care
+            			ex1.printStackTrace();
+            		}
+            		err.println(tex.getMessage());
+            		unblock();
+            	} else if (tex instanceof VmExit) {
+            		err.println(tex.getMessage());
+            		unblock();
+            	} else {
+            		err.println("Exception in command");
+            		tex.printStackTrace(err);
+            		unblock();
+            	}
             } catch (Exception ex) {
-                err.println("Exception in command");
-                ex.printStackTrace(err);
-                unblock();
+            	err.println("Exception in command");
+            	ex.printStackTrace(err);
+            	unblock();
+            } catch (Error ex) {
+            	err.println("Error in command");
+            	ex.printStackTrace(err);
+            	unblock();
             }
             finished = true;
         }
