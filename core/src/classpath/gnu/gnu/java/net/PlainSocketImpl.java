@@ -39,16 +39,20 @@ exception statement from your version. */
 
 package gnu.java.net;
 
+import gnu.java.nio.SocketChannelImpl;
+import gnu.java.nio.VMChannel;
+
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.SocketImpl;
-import java.net.SocketOptions;
-import gnu.classpath.Configuration;
+import java.net.SocketTimeoutException;
+import java.nio.ByteBuffer;
 
 /**
  * Written using on-line Java Platform 1.2 API Specification, as well
@@ -66,25 +70,13 @@ import gnu.classpath.Configuration;
  * @author Nic Ferrier (nferrier@tapsellferrier.co.uk)
  * @author Aaron M. Renn (arenn@urbanophile.com)
  */
-public final class PlainSocketImpl extends SocketImpl
+public class PlainSocketImpl extends SocketImpl
 {
-  // Static initializer to load native library.
-  static
-    {
-      if (Configuration.INIT_LOAD_LIBRARY)
-        {
-          System.loadLibrary("javanet");
-        }
-    }
 
   /**
-   * The OS file handle representing the socket.
-   * This is used for reads and writes to/from the socket and
-   * to close it.
-   *
-   * When the socket is closed this is reset to -1.
+   * The underlying plain socket VM implementation.
    */
-  int native_fd = -1;
+  protected VMPlainSocketImpl impl;
 
   /**
    * A cached copy of the in stream for reading from the socket.
@@ -101,7 +93,13 @@ public final class PlainSocketImpl extends SocketImpl
    * is being invoked on this socket.
    */
   private boolean inChannelOperation;
-
+  
+  /**
+   * The socket channel we use for IO operation. Package-private for
+   * use by inner classes.
+   */
+  SocketChannelImpl channel;
+  
   /**
    * Indicates whether we should ignore whether any associated
    * channel is set to non-blocking mode. Certain operations
@@ -124,31 +122,11 @@ public final class PlainSocketImpl extends SocketImpl
   }
  
   /**
-   * Default do nothing constructor
+   * Default do nothing constructor.
    */
   public PlainSocketImpl()
   {
-  }
-  
-  protected void finalize() throws Throwable
-  {
-    synchronized (this)
-      {
-	if (native_fd != -1)
-	  try
-	    {
-	      close();
-	    }
-	  catch (IOException ex)
-	    {
-	    }
-      }
-    super.finalize();
-  }
-
-  public int getNativeFD()
-  {
-    return native_fd;
+    this.impl = new VMPlainSocketImpl();
   }
 
   /**
@@ -157,15 +135,31 @@ public final class PlainSocketImpl extends SocketImpl
    * Integer.  The option_id parameter is one of the defined constants in
    * this interface.
    *
-   * @param option_id The identifier of the option
-   * @param val The value to set the option to
+   * @param optionId The identifier of the option
+   * @param value The value to set the option to
    *
-   * @exception SocketException If an error occurs
+   * @throws SocketException if an error occurs
    */
-  public void setOption(int optID, Object value) throws SocketException {
-      // @vm-specific no natives
-      //TODO implement me      
-      throw new SocketException("Not implemented");
+  public void setOption(int optionId, Object value) throws SocketException
+  {
+    switch (optionId)
+      {
+        case SO_LINGER:
+        case IP_MULTICAST_LOOP:
+        case SO_BROADCAST:
+        case SO_KEEPALIVE:
+        case SO_OOBINLINE:
+        case TCP_NODELAY:          
+        case IP_TOS:
+        case SO_RCVBUF:
+        case SO_SNDBUF:
+        case SO_TIMEOUT:
+        case SO_REUSEADDR:
+          impl.setOption(optionId, value);
+          return;
+        default:
+          throw new SocketException("Unrecognized TCP option: " + optionId);
+      }
   }
 
   /**
@@ -173,133 +167,144 @@ public final class PlainSocketImpl extends SocketImpl
    * will be an Integer for options that have integer values.  The option_id
    * is one of the defined constants in this interface.
    *
-   * @param option_id The option identifier
+   * @param optionId the option identifier
    *
-   * @return The current value of the option
+   * @return the current value of the option
    *
-   * @exception SocketException If an error occurs
+   * @throws SocketException if an error occurs
    */
-  public Object getOption(int optID) throws SocketException {
-      // @vm-specific no natives
-      //TODO implement me      
-      throw new SocketException("Not implemented");
-  }
-
-  /**
-   * Flushes the input stream and closes it. If you read from the input stream
-   * after calling this method a <code>IOException</code> will be thrown.
-   * 
-   * @throws IOException if an error occurs
-   */
-  public void shutdownInput()
+  public Object getOption(int optionId) throws SocketException
   {
-      // @vm-specific no natives
-      //TODO implement me        
-    throw new InternalError ("PlainSocketImpl::shutdownInput not implemented");
+    if (optionId == SO_BINDADDR)
+      {
+        try
+          {
+            return channel.getVMChannel().getLocalAddress().getAddress();
+          }
+        catch (IOException ioe)
+          {
+            SocketException se = new SocketException();
+            se.initCause(ioe);
+            throw se;
+          }
+      }
+    
+    // This filters options which are invalid for TCP.
+    switch (optionId)
+    {
+      case SO_LINGER:
+      case IP_MULTICAST_LOOP:
+      case SO_BROADCAST:
+      case SO_KEEPALIVE:
+      case SO_OOBINLINE:
+      case TCP_NODELAY:          
+      case IP_TOS:
+      case SO_RCVBUF:
+      case SO_SNDBUF:
+      case SO_TIMEOUT:
+      case SO_REUSEADDR:
+        return impl.getOption(optionId);
+      default:
+        throw new SocketException("Unrecognized TCP option: " + optionId);
+    }
+    
   }
 
-  /**
-   * Flushes the output stream and closes it. If you write to the output stream
-   * after calling this method a <code>IOException</code> will be thrown.
-   * 
-   * @throws IOException if an error occurs
-   */
+  public void shutdownInput() throws IOException
+  {
+    impl.shutdownInput();
+  }
+
   public void shutdownOutput() throws IOException
   {
-      // @vm-specific no natives
-      //TODO implement me        
-    throw new InternalError ("PlainSocketImpl::shutdownOutput not implemented");
+    impl.shutdownOutput();
   }
 
   /**
    * Creates a new socket that is not bound to any local address/port and
-   * is not connected to any remote address/port.  This will be created as
-   * a stream socket if the stream parameter is true, or a datagram socket
-   * if the stream parameter is false.
+   * is not connected to any remote address/port.  The stream parameter will be
+   * ignored since PlainSocketImpl always is a stream socket. Datagram sockets
+   * are handled by PlainDatagramSocketImpl.
    *
-   * @param stream true for a stream socket, false for a datagram socket
+   * @param stream <code>true</code> for stream sockets, <code>false</code> for
+   *        datagram sockets
    */
-  protected synchronized void create(boolean stream) throws IOException {
-      // @vm-specific no natives
-      //TODO implement me            
-      throw new SocketException("Not implemented");
+  protected synchronized void create(boolean stream) throws IOException
+  {
+    channel = new SocketChannelImpl(false);
+    VMChannel vmchannel = channel.getVMChannel();
+    vmchannel.initSocket(stream);
+    channel.configureBlocking(true);
+    impl.getState().setChannelFD(vmchannel.getState());
   }
 
   /**
    * Connects to the remote hostname and port specified as arguments.
    *
-   * @param hostname The remote hostname to connect to
-   * @param port The remote port to connect to
+   * @param hostname the remote hostname to connect to
+   * @param port the remote port to connect to
    *
-   * @exception IOException If an error occurs
+   * @throws IOException If an error occurs
    */
-  protected synchronized void connect(String host, int port) throws IOException
+  protected synchronized void connect(String hostname, int port)
+    throws IOException
   {
-    connect(InetAddress.getByName(host), port);
+    connect(InetAddress.getByName(hostname), port);
   }
 
   /**
    * Connects to the remote address and port specified as arguments.
    *
-   * @param addr The remote address to connect to
-   * @param port The remote port to connect to
+   * @param addr the remote address to connect to
+   * @param port the remote port to connect to
    *
-   * @exception IOException If an error occurs
+   * @throws IOException If an error occurs
    */
-  protected void connect(InetAddress addr, int port) throws IOException {
-      // @vm-specific no natives
-      //TODO implement me                  
-      throw new SocketException("Not implemented");
+  protected void connect(InetAddress addr, int port) throws IOException
+  {
+    connect(new InetSocketAddress(addr, port), 0);
   }
 
   /**
    * Connects to the remote socket address with a specified timeout.
    *
-   * @param timeout The timeout to use for this connect, 0 means infinite.
+   * @param address the remote address to connect to
+   * @param timeout the timeout to use for this connect, 0 means infinite.
    *
-   * @exception IOException If an error occurs
+   * @throws IOException If an error occurs
    */
-  protected synchronized void connect(SocketAddress address, int timeout) throws IOException
+  protected synchronized void connect(SocketAddress address, int timeout)
+    throws IOException
   {
-    InetSocketAddress sockAddr = (InetSocketAddress) address;
-    InetAddress addr = sockAddr.getAddress();
-
-    if (addr == null)
-      throw new IllegalArgumentException("address is unresolved: " + sockAddr);
-
-    int port = sockAddr.getPort();
+    if (channel == null)
+      create(true);
+    boolean connected = channel.connect(address, timeout);
+    if (!connected)
+      throw new SocketTimeoutException("connect timed out");
     
-    if (timeout < 0)
-      throw new IllegalArgumentException("negative timeout");
-
-    Object oldTimeoutObj = null;
-    
-    try
-      {
- 	oldTimeoutObj = this.getOption (SocketOptions.SO_TIMEOUT);
- 	this.setOption (SocketOptions.SO_TIMEOUT, new Integer (timeout));
- 	connect (addr, port);
-      }
-    finally
-      {
-	if (oldTimeoutObj != null)
-	  this.setOption (SocketOptions.SO_TIMEOUT, oldTimeoutObj);
-      }
+    // Using the given SocketAddress is important to preserve
+    // hostnames given by the caller.
+    InetSocketAddress addr = (InetSocketAddress) address; 
+    this.address = addr.getAddress();
+    this.port = addr.getPort();
   }
 
   /**
    * Binds to the specified port on the specified addr.  Note that this addr
    * must represent a local IP address.  **** How bind to INADDR_ANY? ****
    *
-   * @param addr The address to bind to
-   * @param port The port number to bind to
+   * @param addr the address to bind to
+   * @param port the port number to bind to
    *
-   * @exception IOException If an error occurs
+   * @throws IOException if an error occurs
    */
   protected synchronized void bind(InetAddress addr, int port)
-    throws IOException {
-      // @vm-specific no natives
-      throw new SocketException("Not implemented");
+    throws IOException
+  {
+    if (channel == null)
+      create(true);
+    impl.bind(new InetSocketAddress(addr, port));
+    localport = channel.getVMChannel().getLocalAddress().getPort();
   }
 
   /**
@@ -310,13 +315,12 @@ public final class PlainSocketImpl extends SocketImpl
    *
    * @param queuelen The length of the pending connection queue
    * 
-   * @exception IOException If an error occurs
+   * @throws IOException If an error occurs
    */
   protected synchronized void listen(int queuelen)
-    throws IOException {
-      // @vm-specific no natives
-      //TODO implement me            
-      throw new SocketException("Not implemented");
+    throws IOException
+  {
+    impl.listen(queuelen);
   }
 
   /**
@@ -326,75 +330,61 @@ public final class PlainSocketImpl extends SocketImpl
    * @param impl The SocketImpl object to accept this connection.
    */
   protected synchronized void accept(SocketImpl impl)
-    throws IOException {
-      // @vm-specific no natives
-      //TODO implement me            
-      throw new SocketException("Not implemented");
+    throws IOException
+  {
+    if (channel == null)
+        create(true);
+    if (!(impl instanceof PlainSocketImpl))
+      throw new IOException("incompatible SocketImpl: "
+                            + impl.getClass().getName());
+    PlainSocketImpl that = (PlainSocketImpl) impl;
+    VMChannel c = channel.getVMChannel().accept();
+    that.impl.getState().setChannelFD(c.getState());
+    that.channel = new SocketChannelImpl(c);
+    that.setOption(SO_REUSEADDR, Boolean.TRUE);
+    // Reset the inherited timeout.
+    that.setOption(SO_TIMEOUT, Integer.valueOf(0));
+
   }
 
   /**
    * Returns the number of bytes that the caller can read from this socket
    * without blocking. 
    *
-   * @return The number of readable bytes before blocking
+   * @return the number of readable bytes before blocking
    *
-   * @exception IOException If an error occurs
+   * @throws IOException if an error occurs
    */
-  protected int available() throws IOException {
-      // @vm-specific no natives
-      //TODO implement me            
-      throw new SocketException("Not implemented");
+  protected int available() throws IOException
+  {
+    if (channel == null)
+      throw new SocketException("not connected");
+    return channel.getVMChannel().available();
   }
 
   /**
    * Closes the socket.  This will cause any InputStream or OutputStream
    * objects for this Socket to be closed as well.
+   *
    * <p>
    * Note that if the SO_LINGER option is set on this socket, then the
    * operation could block.
+   * </p>
    *
-   * @exception IOException If an error occurs
+   * @throws IOException if an error occurs
    */
-  protected void close() throws IOException {
-      // @vm-specific no natives
-      //TODO implement me            
-      throw new SocketException("Not implemented");
-  }
-
-  public void sendUrgentData(int data)
+  protected void close() throws IOException
   {
-    throw new InternalError ("PlainSocketImpl::sendUrgentData not implemented");
+    if (impl.getState().isValid())
+      impl.close();
+    
+    address = null;
+    port = -1;
   }
 
-  /**
-   * Internal method used by SocketInputStream for reading data from
-   * the connection.  Reads up to len bytes of data into the buffer
-   * buf starting at offset bytes into the buffer.
-   *
-   * @return The actual number of bytes read or -1 if end of stream.
-   *
-   * @exception IOException If an error occurs
-   */
-  protected int read(byte[] buf, int offset, int len)
-    throws IOException {
-      // @vm-specific no natives
-      //TODO implement me            
-      throw new SocketException("Not implemented");
-
-  }
-
-  /**
-   * Internal method used by SocketOuputStream for writing data to
-   * the connection.  Writes up to len bytes of data from the buffer
-   * buf starting at offset bytes into the buffer.
-   *
-   * @exception IOException If an error occurs
-   */
-  protected void write(byte[] buf, int offset, int len)
-    throws IOException {
-      // @vm-specific no natives
-      //TODO implement me            
-      throw new SocketException("Not implemented");
+  public void sendUrgentData(int data) throws IOException
+  {
+    impl.sendUrgentData(data);
   }
 
   /**
@@ -409,7 +399,7 @@ public final class PlainSocketImpl extends SocketImpl
   {
     if (in == null)
       in = new SocketInputStream();
-    
+
     return in;
   }
 
@@ -425,15 +415,104 @@ public final class PlainSocketImpl extends SocketImpl
   {
     if (out == null)
       out = new SocketOutputStream();
-    
+
     return out;
+  }
+  
+  public VMChannel getVMChannel()
+  {
+    if (channel == null)
+      return null;
+    return channel.getVMChannel();
+  }
+
+  /* (non-Javadoc)
+   * @see java.net.SocketImpl#getInetAddress()
+   */
+  protected InetAddress getInetAddress()
+  {
+    if (channel == null)
+      return null;
+    
+    try
+      {
+        InetSocketAddress remote = channel.getVMChannel().getPeerAddress();
+        if (remote == null)
+          return null;
+        // To mimic behavior of the RI the InetAddress instance which was
+        // used to establish the connection is returned instead of one that
+        // was created by the native layer (this preserves exact hostnames).
+        if (address != null)
+          return address;
+        
+        return remote.getAddress();
+      }
+    catch (IOException ioe)
+      {
+        return null;
+      }
+  }
+
+  /* (non-Javadoc)
+   * @see java.net.SocketImpl#getLocalPort()
+   */
+  protected int getLocalPort()
+  {
+    if (channel == null)
+      return -1;
+    try
+      {
+        InetSocketAddress local = channel.getVMChannel().getLocalAddress();
+        if (local == null)
+          return -1;
+        return local.getPort();
+      }
+    catch (IOException ioe)
+      {
+        return -1;
+      }
+  }
+  
+  public InetSocketAddress getLocalAddress()
+  {
+    if (channel == null)
+      return null;
+    try
+      {
+        return channel.getVMChannel().getLocalAddress();
+      }
+    catch (IOException ioe)
+      {
+        return null;
+      }
+  }
+
+  /* (non-Javadoc)
+   * @see java.net.SocketImpl#getPort()
+   */
+  protected int getPort()
+  {
+    if (channel == null)
+      return -1;
+    
+    try
+      {
+        InetSocketAddress remote = channel.getVMChannel().getPeerAddress();
+        if (remote == null)
+          return -1;
+        return remote.getPort();
+      }
+    catch (IOException ioe)
+      {
+        return -1;
+      }
   }
 
   /**
    * This class contains an implementation of <code>InputStream</code> for 
    * sockets.  It in an internal only class used by <code>PlainSocketImpl</code>.
    *
-   * @author Nic Ferrier (nferrier@tapsellferrier.co.uk)
+   * @author Nic Ferrier <nferrier@tapsellferrier.co.uk>
    */
   final class SocketInputStream
     extends InputStream
@@ -465,13 +544,23 @@ public final class PlainSocketImpl extends SocketImpl
      */
     public int read() throws IOException
     {
-      byte buf[] = new byte [1];
-      int bytes_read = read(buf, 0, 1);
- 
-      if (bytes_read == -1)
-        return -1;
-
-      return buf[0] & 0xFF;
+      if (channel == null)
+        throw new SocketException("not connected");
+      while (true)
+        {
+          try
+            {
+              return channel.getVMChannel().read();
+            }
+          catch (SocketTimeoutException ste)
+            {
+              throw ste;
+            }
+          catch (InterruptedIOException iioe)
+            {
+              // Ignore; NIO may throw this; net io shouldn't
+            }
+        }
     }
 
     /**
@@ -488,12 +577,24 @@ public final class PlainSocketImpl extends SocketImpl
      */
     public int read (byte[] buf, int offset, int len) throws IOException
     {
-      int bytes_read = PlainSocketImpl.this.read (buf, offset, len);
-
-      if (bytes_read == 0)
-        return -1;
-
-      return bytes_read;
+      if (channel == null)
+        throw new SocketException("not connected");
+      ByteBuffer b = ByteBuffer.wrap(buf, offset, len);
+      while (true)
+        {
+          try
+            {
+              return channel.read(b);
+            }
+          catch (SocketTimeoutException ste)
+            {
+              throw ste;
+            }
+          catch (InterruptedIOException iioe)
+            {
+              // Ignored; NIO may throw this; net IO not.
+            }
+        }
     }
   }
 
@@ -503,7 +604,7 @@ public final class PlainSocketImpl extends SocketImpl
    * <code>getOutputStream method</code>.  It expects only to  be used in that
    * context.
    *
-   * @author Nic Ferrier (nferrier@tapsellferrier.co.uk)
+   * @author Nic Ferrier  <nferrier@tapsellferrier.co.uk>
    */
   final class SocketOutputStream
     extends OutputStream
@@ -529,8 +630,20 @@ public final class PlainSocketImpl extends SocketImpl
      */
     public void write(int b) throws IOException
     {
-      byte buf[] = { (byte) b };
-      write(buf, 0, 1);
+      if (channel == null)
+        throw new SocketException("not connected");
+      while (true)
+        {
+          try
+            {
+              channel.getVMChannel().write(b);
+              return;
+            }
+          catch (InterruptedIOException iioe)
+            {
+              // Ignored.
+            }
+        }
     }
 
     /**
@@ -545,7 +658,21 @@ public final class PlainSocketImpl extends SocketImpl
      */
     public void write (byte[] buf, int offset, int len) throws IOException
     {
-      PlainSocketImpl.this.write (buf, offset, len);
+      if (channel == null)
+        throw new SocketException("not connected");
+      ByteBuffer b = ByteBuffer.wrap(buf, offset, len);
+      while (b.hasRemaining())
+        {
+          try
+            {
+              if (channel.write(b) == -1)
+                throw new IOException("channel has been closed");
+            }
+          catch (InterruptedIOException iioe)
+            {
+              // Ignored.
+            }
+        }
     }
   }
 }
