@@ -39,20 +39,15 @@ exception statement from your version. */
 package gnu.java.nio;
 
 import gnu.java.net.PlainSocketImpl;
-import gnu.java.net.VMPlainSocketImpl;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
-import java.nio.ReadOnlyBufferException;
 import java.nio.channels.AlreadyConnectedException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.ConnectionPendingException;
@@ -66,62 +61,33 @@ import java.nio.channels.UnsupportedAddressTypeException;
 import java.nio.channels.spi.SelectorProvider;
 
 public final class SocketChannelImpl extends SocketChannel
-  implements VMChannelOwner
 {
-  private VMChannel channel;
-  //private PlainSocketImpl impl;
+  private PlainSocketImpl impl;
   private NIOSocket socket;
   private boolean connectionPending;
-  private boolean connected;
-  private InetSocketAddress connectAddress;
-  
-  public SocketChannelImpl(boolean create) throws IOException
-  {
-    // XXX consider adding security check; this is used by
-    // PlainSocketImpl.
-    this(new SelectorProviderImpl(), create);
-  }
 
-  public SocketChannelImpl(VMChannel channel) throws IOException
-  {
-    this(new SelectorProviderImpl(), channel, false);
-  }
-  
-  SocketChannelImpl(SelectorProvider provider) throws IOException
-  {
-    this(provider, true);
-  }
-
-  SocketChannelImpl(SelectorProvider provider, boolean create)
-    throws IOException
-  {
-    this(provider, new VMChannel(), create);
-  }
-  
-  SocketChannelImpl(SelectorProvider provider, VMChannel channel, boolean create)
+  SocketChannelImpl (SelectorProvider provider)
     throws IOException
   {
     super (provider);
-    this.channel = channel;
-    if (create)
-      channel.initSocket(true);
-    socket = new NIOSocket(this);
+    impl = new PlainSocketImpl();
+    socket = new NIOSocket (impl, this);
     configureBlocking(true);
   }
-  
-  /*SocketChannelImpl (SelectorProvider provider,
+	
+  SocketChannelImpl (SelectorProvider provider,
                      NIOSocket socket)
     throws IOException
-  {
+	    {
     super (provider);
     this.impl = socket.getPlainSocketImpl();
     this.socket = socket;
-  }*/
-
+  }
+    
   public void finalizer()
   {
     if (isConnected())
-      {
+	    {
         try
           {
             close ();
@@ -129,95 +95,117 @@ public final class SocketChannelImpl extends SocketChannel
         catch (Exception e)
           {
           }
-      }
+	    }
   }
 
-  //PlainSocketImpl getPlainSocketImpl()
-  //{
-  //  return null; // XXX
-  //}
-
-  protected void implCloseSelectableChannel() throws IOException
+  PlainSocketImpl getPlainSocketImpl()
   {
-    channel.close();
+    return impl;
+  }
+
+  protected void implCloseSelectableChannel () throws IOException
+  {
+    socket.close();
   }
 
   protected void implConfigureBlocking (boolean blocking) throws IOException
-  {
-    channel.setBlocking(blocking);
-  }   
+	    {
+    socket.setSoTimeout (blocking ? 0 : NIOConstants.DEFAULT_TIMEOUT);
+	    }
 
   public boolean connect (SocketAddress remote) throws IOException
-  {
-    return connect(remote, 0);
-  }
-  
-  public boolean connect (SocketAddress remote, int timeout) throws IOException
   {
     if (!isOpen())
       throw new ClosedChannelException();
     
     if (isConnected())
       throw new AlreadyConnectedException();
-
+	
     if (connectionPending)
       throw new ConnectionPendingException();
-
+	
     if (!(remote instanceof InetSocketAddress))
       throw new UnsupportedAddressTypeException();
-    
-    connectAddress = (InetSocketAddress) remote;
-
-    if (connectAddress.isUnresolved())
+	
+    if (((InetSocketAddress) remote).isUnresolved())
       throw new UnresolvedAddressException();
     
-    connected = channel.connect(connectAddress, timeout);
-    connectionPending = !connected;
-    return connected;
+    try
+	    {
+        socket.getPlainSocketImpl().setInChannelOperation(true);
+          // indicate that a channel is initiating the accept operation
+          // so that the socket ignores the fact that we might be in
+          // non-blocking mode.
+
+        if (isBlocking())
+          {
+            // Do blocking connect.
+            socket.connect (remote);
+            return true;
+  }
+    
+        // Do non-blocking connect.
+        try
+  {
+            socket.connect (remote, NIOConstants.DEFAULT_TIMEOUT);
+            return true;
+          }
+        catch (SocketTimeoutException e)
+          {
+            connectionPending = true;
+    return false;
+  }
+      }
+    finally
+      {
+        socket.getPlainSocketImpl().setInChannelOperation(false);
+      }
   }
 
-  public boolean finishConnect()
+  public boolean finishConnect ()
     throws IOException
   {
     if (!isOpen())
       throw new ClosedChannelException();
-
-    InetSocketAddress remote = channel.getPeerAddress();
-    if (remote != null)
-      {
-        connectionPending = false;
-        return true;
-      }
     
-    if (!connectionPending)
+    if (!isConnected() && !connectionPending)
       throw new NoConnectionPendingException();
     
+    if (isConnected())
+      return true;
+
+    // FIXME: Handle blocking/non-blocking mode.
+
+    Selector selector = provider().openSelector();
+    register(selector, SelectionKey.OP_CONNECT);
+
+    if (isBlocking())
+      {
+        selector.select(); // blocking until channel is connected.
+        connectionPending = false;
+        return true;
+  }
+    
+    int ready = selector.selectNow(); // non-blocking
+    if (ready == 1)
+  {
+        connectionPending = false;
+	    return true;
+      }
+
     return false;
   }
-
-  public boolean isConnected()
+    
+  public boolean isConnected ()
   {
-    // Wait until finishConnect is called before transitioning to
-    // connected.
-    if (connectionPending)
-      return false;
-    try
-      {
-        InetSocketAddress remote = channel.getPeerAddress();
-        return remote != null;
-      }
-    catch (IOException ioe)
-      {
-        ioe.printStackTrace(System.out);
-        return false;
-      }
+    return socket.isConnected();
   }
     
   public boolean isConnectionPending ()
-  {
+	    {
     return connectionPending;
-  }
-    
+	    }
+
   public Socket socket ()
   {
     return socket;
@@ -227,8 +215,53 @@ public final class SocketChannelImpl extends SocketChannel
   {
     if (!isConnected())
       throw new NotYetConnectedException();
+	
+    byte[] data;
+    int offset = 0;
+    InputStream input = socket.getInputStream();
+    int available = input.available();
+    int len = dst.remaining();
+
+    if ((! isBlocking()) && available == 0)
+      return 0;
     
-    return channel.read(dst);
+    if (dst.hasArray())
+	    {
+        offset = dst.arrayOffset() + dst.position();
+        data = dst.array();
+	    }
+    else
+      {
+        data = new byte [len];
+  }
+    
+    int readBytes = 0;
+    boolean completed = false;
+
+    try
+  {
+        begin();
+        socket.getPlainSocketImpl().setInChannelOperation(true);
+        readBytes = input.read (data, offset, len);
+        completed = true;
+      }
+    finally
+      {
+        end (completed);
+        socket.getPlainSocketImpl().setInChannelOperation(false);
+      }
+
+    if (readBytes > 0)
+      if (dst.hasArray())
+	    {
+	  dst.position (dst.position() + readBytes);
+	    }
+      else
+        {
+          dst.put (data, offset, readBytes);
+        }
+
+    return readBytes;
   }
     
   public long read (ByteBuffer[] dsts, int offset, int length)
@@ -242,19 +275,61 @@ public final class SocketChannelImpl extends SocketChannel
         || (length < 0)
         || (length > (dsts.length - offset)))
       throw new IndexOutOfBoundsException();
-    
-    return channel.readScattering(dsts, offset, length);
+
+    long readBytes = 0;
+
+    for (int index = offset; index < length; index++)
+      readBytes += read (dsts [index]);
+
+    return readBytes;
   }
      
-  public int write(ByteBuffer src) throws IOException
+  public int write (ByteBuffer src)
+    throws IOException
   {
     if (!isConnected())
       throw new NotYetConnectedException();
 
-    return channel.write(src);
+    byte[] data;
+    int offset = 0;
+    int len = src.remaining();
+    
+    if (!src.hasArray())
+	    {
+        data = new byte [len];
+        src.get (data, 0, len);
+	    }
+    else
+	    {
+        offset = src.arrayOffset() + src.position();
+        data = src.array();
+	    }
+		
+    OutputStream output = socket.getOutputStream();
+    boolean completed = false;
+
+    try
+  {
+        begin();
+        socket.getPlainSocketImpl().setInChannelOperation(true);
+        output.write (data, offset, len);
+        completed = true;
+      }
+    finally
+      {
+        end (completed);
+        socket.getPlainSocketImpl().setInChannelOperation(false);
+      }
+
+    if (src.hasArray())
+	    {
+	src.position (src.position() + len);
+	    }
+
+    return len;
   }
 
-  public long write(ByteBuffer[] srcs, int offset, int length)
+  public long write (ByteBuffer[] srcs, int offset, int length)
     throws IOException
   {
     if (!isConnected())
@@ -265,13 +340,12 @@ public final class SocketChannelImpl extends SocketChannel
         || (length < 0)
         || (length > (srcs.length - offset)))
       throw new IndexOutOfBoundsException();
+      
+    long writtenBytes = 0;
 
-    return channel.writeGathering(srcs, offset, length);
-  }
-  
-  public VMChannel getVMChannel()
-  {
-    // XXX security check?
-    return channel;
+    for (int index = offset; index < length; index++)
+      writtenBytes += write (srcs [index]);
+
+    return writtenBytes;
   }
 }

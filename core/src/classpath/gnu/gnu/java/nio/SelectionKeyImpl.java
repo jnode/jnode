@@ -1,5 +1,5 @@
 /* SelectionKeyImpl.java -- 
-   Copyright (C) 2002, 2003, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -47,8 +47,8 @@ public abstract class SelectionKeyImpl extends AbstractSelectionKey
 {
   private int readyOps;
   private int interestOps;
-  private final SelectorImpl impl;
-  final SelectableChannel ch;
+  private SelectorImpl impl;
+  SelectableChannel ch;
 
   public SelectionKeyImpl (SelectableChannel ch, SelectorImpl impl)
   {
@@ -61,7 +61,7 @@ public abstract class SelectionKeyImpl extends AbstractSelectionKey
     return ch;
   }
 
-  public synchronized int readyOps ()
+  public int readyOps ()
   {
     if (!isValid())
       throw new CancelledKeyException();
@@ -69,7 +69,7 @@ public abstract class SelectionKeyImpl extends AbstractSelectionKey
     return readyOps;
   }
 
-  public synchronized SelectionKey readyOps (int ops)
+  public SelectionKey readyOps (int ops)
   {
     if (!isValid())
       throw new CancelledKeyException();
@@ -83,10 +83,7 @@ public abstract class SelectionKeyImpl extends AbstractSelectionKey
     if (!isValid())
       throw new CancelledKeyException();
     
-    synchronized (impl.selectedKeys())
-      {
-    return interestOps;
-  }
+    return interestOps;    
   }
 
   public SelectionKey interestOps (int ops)
@@ -94,10 +91,7 @@ public abstract class SelectionKeyImpl extends AbstractSelectionKey
     if (!isValid())
       throw new CancelledKeyException();
     
-    synchronized (impl.selectedKeys())
-      {
     interestOps = ops;
-      }
     return this;
   }
     
@@ -106,6 +100,5 @@ public abstract class SelectionKeyImpl extends AbstractSelectionKey
     return impl;
   }
 
-  /* @deprecated */
   public abstract int getNativeFD();
 }

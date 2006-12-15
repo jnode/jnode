@@ -1,5 +1,5 @@
 /* PlainDatagramSocketImpl.java -- Default DatagramSocket implementation
-   Copyright (C) 1998, 1999, 2001, 2003, 2004, 2005, 2006  Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2001, 2003, 2004, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -38,10 +38,7 @@ exception statement from your version. */
 
 package gnu.java.net;
 
-import gnu.java.nio.VMChannel;
-
 import java.io.IOException;
-import java.io.InterruptedIOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocketImpl;
 import java.net.InetAddress;
@@ -49,8 +46,8 @@ import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.SocketAddress;
 import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.nio.ByteBuffer;
+import java.net.SocketOptions;
+import gnu.classpath.Configuration;
 
 /**
  * Written using on-line Java Platform 1.2 API Specification, as well
@@ -68,12 +65,17 @@ import java.nio.ByteBuffer;
  */
 public final class PlainDatagramSocketImpl extends DatagramSocketImpl
 {
-  private final VMChannel channel;
-  
+   // @vm-specific removed System.loadLibrary
+   
   /**
-   * The platform-specific socket implementation.
+   * Option id for the IP_TTL (time to live) value.
    */
-  private final VMPlainSocketImpl impl;
+  private static final int IP_TTL = 0x1E61; // 7777
+
+  /**
+   * This is the actual underlying file descriptor
+   */
+  int native_fd = -1;
   
   /**
    * Lock object to serialize threads wanting to receive 
@@ -88,26 +90,24 @@ public final class PlainDatagramSocketImpl extends DatagramSocketImpl
   /**
    * Default do nothing constructor
    */
-  public PlainDatagramSocketImpl() throws IOException
+  public PlainDatagramSocketImpl()
   {
-    channel = new VMChannel();
-    impl = new VMPlainSocketImpl(channel);
   }
 
-  /*protected void finalize() throws Throwable
+  protected void finalize() throws Throwable
   {
     synchronized (this)
       {
-        if (channel.getState().isValid())
+	if (native_fd != -1)
 	  close();
       }
     super.finalize();
-  }*/
+  }
 
-  /*public int getNativeFD()
+  public int getNativeFD()
   {
     return native_fd;
-  }*/
+  }
 
   /**
    * Binds this socket to a particular port and interface
@@ -120,20 +120,9 @@ public final class PlainDatagramSocketImpl extends DatagramSocketImpl
   protected synchronized void bind(int port, InetAddress addr)
     throws SocketException
   {
-    try
-      {
-        impl.bind(new InetSocketAddress(addr, port));
-      }
-    catch (SocketException se)
-      {
-        throw se;
-      }
-    catch (IOException ioe)
-      {
-        SocketException se = new SocketException();
-        se.initCause(ioe);
-        throw se;
-      }
+      // @vm-specific no natives
+      //TODO implement me
+      throw new SocketException("Not implemented");
   }
 
   /**
@@ -141,55 +130,10 @@ public final class PlainDatagramSocketImpl extends DatagramSocketImpl
    *
    * @exception SocketException If an error occurs
    */
-  protected synchronized void create() throws SocketException
-  {
-    try
-      {
-        channel.initSocket(false);
-      }
-    catch (SocketException se)
-      {
-        throw se;
-      }
-    catch (IOException ioe)
-      {
-        SocketException se = new SocketException();
-        se.initCause(ioe);
-        throw se;
-      }
-  }
-
-  /**
-   * Connects to the remote address and port specified as arguments.
-   *
-   * @param addr The remote address to connect to
-   * @param port The remote port to connect to
-   *
-   * @exception SocketException If an error occurs
-   */
-  protected void connect(InetAddress addr, int port) throws SocketException
-  {
-    channel.connect(new InetSocketAddress(addr, port), 0);
-  }
-
-  /**
-   * Disconnects the socket.
-   *
-   * @since 1.4
-   */
-  protected void disconnect()
-  {
-    synchronized (this)
-      {
-        try
-          {
-            if (channel.getState().isValid())
-              channel.disconnect();
-          }
-        catch (IOException ioe)
-          {
-          }
-      }
+  protected synchronized void create() throws SocketException {
+      // @vm-specific no natives
+      //TODO implement me
+      throw new SocketException("Not implemented");
   }
 
   /**
@@ -201,7 +145,7 @@ public final class PlainDatagramSocketImpl extends DatagramSocketImpl
    */
   protected synchronized void setTimeToLive(int ttl) throws IOException
   {
-    impl.setTimeToLive(ttl);
+    setOption(IP_TTL, new Integer(ttl));
   }
 
   /**
@@ -213,25 +157,31 @@ public final class PlainDatagramSocketImpl extends DatagramSocketImpl
    */
   protected synchronized int getTimeToLive() throws IOException
   {
-    return impl.getTimeToLive();
+    Object obj = getOption(IP_TTL);
+
+    if (! (obj instanceof Integer))
+      throw new IOException("Internal Error");
+
+    return ((Integer) obj).intValue();
   }
 
-  protected int getLocalPort()
-  {
-    if (channel == null)
-      return -1;
-
-    try
-      {
-        InetSocketAddress local = channel.getLocalAddress();
-        if (local == null)
-          return -1;
-        return local.getPort();
-      }
-    catch (IOException ioe)
-      {
-        return -1;
-      }
+  /**
+   * Sends a packet of data to a remote host
+   *
+   * @param addr The address to send to
+   * @param port The port to send to 
+   * @param buf The buffer to send
+   * @param offset The offset of the data in the buffer to send
+   * @param len The length of the data to send
+   *
+   * @exception IOException If an error occurs
+   */
+  private void sendto (InetAddress addr, int port,
+                              byte[] buf, int offset, int len)
+    throws IOException {
+      // @vm-specific no natives
+      //TODO implement me      
+      throw new SocketException("Not implemented");
   }
 
   /**
@@ -243,30 +193,12 @@ public final class PlainDatagramSocketImpl extends DatagramSocketImpl
    */
   protected void send(DatagramPacket packet) throws IOException
   {
-    synchronized (SEND_LOCK)
+    synchronized(SEND_LOCK)
       {
-        ByteBuffer buf = ByteBuffer.wrap(packet.getData(),
-                                         packet.getOffset(),
-                                         packet.getLength());
-        InetAddress remote = packet.getAddress();
-        int port = packet.getPort();
-        if (remote == null)
-          throw new NullPointerException();
-        if (port <= 0)
-          throw new SocketException("invalid port " + port);
-        while (true)
-          {
-            try
-              {
-                channel.send(buf, new InetSocketAddress(remote, port));
-                break;
-              }
-            catch (InterruptedIOException ioe)
-              {
-                // Ignore; interrupted system call.
-              }
-          }
+      sendto(packet.getAddress(), packet.getPort(), packet.getData(), 
+             packet.getOffset(), packet.getLength());
       }
+    
   }
 
   /**
@@ -279,123 +211,63 @@ public final class PlainDatagramSocketImpl extends DatagramSocketImpl
   protected void receive(DatagramPacket packet)
     throws IOException
   {
-    synchronized(RECEIVE_LOCK)
-      {
-        ByteBuffer buf = ByteBuffer.wrap(packet.getData(),
-                                         packet.getOffset(),
-                                         packet.getLength());
-        SocketAddress addr = null;
-        while (true)
-          {
-            try
-              {
-                addr = channel.receive(buf);
-                break;
-              }
-            catch (SocketTimeoutException ste)
-              {
-                throw ste;
-              }
-            catch (InterruptedIOException iioe)
-              {
-                // Ignore. Loop.
-              }
-          }
-        if (addr != null)
-          packet.setSocketAddress(addr);
-        packet.setLength(buf.position() - packet.getOffset());
-      }
+      synchronized(RECEIVE_LOCK)
+        {
+        receive0(packet);		
+        }
   }
 
+  /**
+   * Native call to receive a UDP packet from the network
+   * 
+   * @param packet The packet to fill in with the data received
+   *
+   * @exception IOException IOException If an error occurs
+   */
+  private void receive0(DatagramPacket packet) throws IOException {
+      // @vm-specific no natives
+      //TODO implement me      
+      throw new SocketException("Not implemented");
+  }
 
   /**
    * Sets the value of an option on the socket
    *
-   * @param optionId The identifier of the option to set
-   * @param value The value of the option to set
+   * @param option_id The identifier of the option to set
+   * @param val The value of the option to set
    *
    * @exception SocketException If an error occurs
    */
-  public synchronized void setOption(int optionId, Object value)
-    throws SocketException
-  {
-    switch (optionId)
-      {
-        case IP_MULTICAST_IF:
-        case IP_MULTICAST_IF2:
-          impl.setMulticastInterface(optionId, (InetAddress) value);
-          break;
-
-        case IP_MULTICAST_LOOP:
-        case SO_BROADCAST:
-        case SO_KEEPALIVE:
-        case SO_OOBINLINE:
-        case TCP_NODELAY:
-        case IP_TOS:
-        case SO_LINGER:
-        case SO_RCVBUF:
-        case SO_SNDBUF:
-        case SO_TIMEOUT:
-        case SO_REUSEADDR:
-          impl.setOption(optionId, value);
-          return;
-
-      default:
-        throw new SocketException("cannot set option " + optionId);
-      }
+  public synchronized void setOption(int option_id, Object val)
+    throws SocketException {
+      // @vm-specific no natives
+      //TODO implement me      
+      throw new SocketException("Not implemented");
   }
 
   /**
    * Retrieves the value of an option on the socket
    *
-   * @param optionId The identifier of the option to retrieve
+   * @param option_id The identifier of the option to retrieve
    *
    * @return The value of the option
    *
    * @exception SocketException If an error occurs
    */
-  public synchronized Object getOption(int optionId)
-    throws SocketException
-  {
-    if (optionId == SO_BINDADDR)
-      {
-        try
-          {
-            InetSocketAddress local = channel.getLocalAddress();
-            if (local == null)
-              return null;
-            return local.getAddress();
-          }
-        catch (SocketException se)
-          {
-            throw se;
-          }
-        catch (IOException ioe)
-          {
-            SocketException se = new SocketException();
-            se.initCause(ioe);
-            throw se;
-          }
-      }
-    if (optionId == IP_MULTICAST_IF || optionId == IP_MULTICAST_IF2)
-      return impl.getMulticastInterface(optionId);
-
-    return impl.getOption(optionId);
+  public synchronized Object getOption(int option_id)
+    throws SocketException {
+      // @vm-specific no natives
+      //TODO implement me      
+      throw new SocketException("Not implemented");
   }
 
   /**
    * Closes the socket
    */
-  protected synchronized void close()
-  {
-    try
-      {
-        if (channel.getState().isValid())
-          channel.close();
-      }
-    catch (IOException ioe)
-      {
-      }
+  protected synchronized void close() {
+      // @vm-specific no natives
+      //TODO implement me      
+      throw new RuntimeException("Not implemented");
   }
 
   /**
@@ -433,9 +305,9 @@ public final class PlainDatagramSocketImpl extends DatagramSocketImpl
    *
    * @exception IOException If an error occurs
    */
-  protected synchronized void join(InetAddress addr) throws IOException
-  {
-    impl.join(addr);
+  protected synchronized void join(InetAddress addr) throws IOException {
+      // @vm-specific no natives
+      throw new SocketException("Not implemented");
   }
 
   /**
@@ -445,9 +317,10 @@ public final class PlainDatagramSocketImpl extends DatagramSocketImpl
    *
    * @exception IOException If an error occurs
    */
-  protected synchronized void leave(InetAddress addr) throws IOException
-  {
-    impl.leave(addr);
+  protected synchronized void leave(InetAddress addr) throws IOException {
+      // @vm-specific no natives
+      //TODO implement me      
+      throw new SocketException("Not implemented");
   }
 
   /**
@@ -465,22 +338,14 @@ public final class PlainDatagramSocketImpl extends DatagramSocketImpl
   }
 
   public void joinGroup(SocketAddress address, NetworkInterface netIf)
-    throws IOException
   {
-    if (address == null)
-      throw new NullPointerException();
-    if (!(address instanceof InetSocketAddress))
-      throw new SocketException("unknown address type");
-    impl.joinGroup((InetSocketAddress) address, netIf);
+    throw new InternalError
+      ("PlainDatagramSocketImpl::joinGroup is not implemented");
   }
 
   public void leaveGroup(SocketAddress address, NetworkInterface netIf)
-    throws IOException
   {
-    if (address == null)
-      throw new NullPointerException();
-    if (!(address instanceof InetSocketAddress))
-      throw new SocketException("unknown address type");
-    impl.leaveGroup((InetSocketAddress) address, netIf);
+    throw new InternalError
+      ("PlainDatagramSocketImpl::leaveGroup is not implemented");
   }
 }

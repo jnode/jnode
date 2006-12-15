@@ -37,7 +37,6 @@ exception statement from your version. */
 
 package gnu.java.nio;
 
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.Pipe;
@@ -46,39 +45,38 @@ import java.nio.channels.spi.SelectorProvider;
 class PipeImpl extends Pipe
 {
   public static final class SourceChannelImpl extends Pipe.SourceChannel
-    implements VMChannelOwner
   {
-    private VMChannel vmch;
+    private int native_fd;
     
     public SourceChannelImpl (SelectorProvider selectorProvider,
-                              VMChannel channel)
+                              int native_fd)
     {
       super (selectorProvider);
-      vmch = channel;
+      this.native_fd = native_fd;
     }
 
     protected final void implCloseSelectableChannel()
       throws IOException
     {
-      vmch.close();
+      throw new Error ("Not implemented");
     }
 
     protected void implConfigureBlocking (boolean blocking)
       throws IOException
     {
-      vmch.setBlocking(blocking);
+      throw new Error ("Not implemented");
     }
 
     public final int read (ByteBuffer src)
       throws IOException
     {
-      return vmch.read(src);
+      throw new Error ("Not implemented");
     }
 
     public final long read (ByteBuffer[] srcs)
       throws IOException
     {
-      return vmch.readScattering(srcs, 0, srcs.length);
+      return read (srcs, 0, srcs.length);
     }
 
     public final synchronized long read (ByteBuffer[] srcs, int offset,
@@ -91,49 +89,54 @@ class PipeImpl extends Pipe
 	  || len > srcs.length - offset)
 	throw new IndexOutOfBoundsException();
 
-      return vmch.readScattering(srcs, offset, len);
+      long bytesRead = 0;
+      
+      for (int index = 0; index < len; index++)
+	bytesRead += read (srcs [offset + index]);
+
+      return bytesRead;
+
     }
 
-    public VMChannel getVMChannel()
+    public final int getNativeFD()
     {
-      return vmch;
+      return native_fd;
     }
   }
 
   public static final class SinkChannelImpl extends Pipe.SinkChannel
-    implements VMChannelOwner
   {
-    private VMChannel vmch;
+    private int native_fd;
     
     public SinkChannelImpl (SelectorProvider selectorProvider,
-                            VMChannel channel)
+                            int native_fd)
     {
       super (selectorProvider);
-      vmch = channel;
+      this.native_fd = native_fd;
     }
 
     protected final void implCloseSelectableChannel()
       throws IOException
     {
-      vmch.close();
+      throw new Error ("Not implemented");
     }
 
     protected final void implConfigureBlocking (boolean blocking)
       throws IOException
     {
-      vmch.setBlocking(blocking);
+      throw new Error ("Not implemented");
     }
 
     public final int write (ByteBuffer dst)
       throws IOException
     {
-      return vmch.write(dst);
+      throw new Error ("Not implemented");
     }
 
     public final long write (ByteBuffer[] srcs)
       throws IOException
     {
-      return vmch.writeGathering(srcs, 0, srcs.length);
+      return write (srcs, 0, srcs.length);
     }
 
     public final synchronized long write (ByteBuffer[] srcs, int offset, int len)
@@ -145,12 +148,17 @@ class PipeImpl extends Pipe
 	  || len > srcs.length - offset)
 	throw new IndexOutOfBoundsException();
 
-      return vmch.writeGathering(srcs, offset, len);
+      long bytesWritten = 0;
+      
+      for (int index = 0; index < len; index++)
+	bytesWritten += write (srcs [offset + index]);
+
+      return bytesWritten;
     }
 
-    public VMChannel getVMChannel()
+    public final int getNativeFD()
     {
-      return vmch;
+      return native_fd;
     }
   }
 
@@ -161,9 +169,7 @@ class PipeImpl extends Pipe
     throws IOException
   {
     super();
-    VMChannel[] pipe = VMPipe.pipe();
-    sink = new SinkChannelImpl(provider, pipe[0]);
-    source = new SourceChannelImpl(provider, pipe[1]);
+    VMPipe.init (this, provider);
   }
     
   public Pipe.SinkChannel sink()

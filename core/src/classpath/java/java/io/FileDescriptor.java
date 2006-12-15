@@ -39,7 +39,7 @@ exception statement from your version. */
 
 package java.io;
 
-import gnu.java.nio.FileChannelImpl;
+import gnu.java.nio.channels.FileChannelImpl;
 
 import java.nio.channels.ByteChannel;
 import java.nio.channels.FileChannel;
@@ -134,7 +134,6 @@ public final class FileDescriptor
    */
   public boolean valid ()
   {
-    ByteChannel c = channel;
-    return (c != null) && (c.isOpen());
+    return channel != null && channel.isOpen();
   }
 }

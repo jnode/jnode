@@ -38,7 +38,6 @@ exception statement from your version. */
 
 package gnu.java.nio;
 
-import java.io.IOException;
 import java.nio.channels.spi.AbstractSelectableChannel;
 
 public final class SocketChannelSelectionKey
@@ -50,16 +49,10 @@ public final class SocketChannelSelectionKey
     super (channel, selector);
   }
     
-  // FIXME don't use file descriptor integers
   public int getNativeFD()
   {
-    try
-      {
-        return ((SocketChannelImpl) ch).getVMChannel().getState().getNativeFD();
-      }
-    catch (IOException ioe)
-      {
-        throw new IllegalStateException(ioe);
-      }
+    NIOSocket socket =
+        (NIOSocket) ((SocketChannelImpl) ch).socket();
+    return socket.getPlainSocketImpl().getNativeFD();
   }
 }
