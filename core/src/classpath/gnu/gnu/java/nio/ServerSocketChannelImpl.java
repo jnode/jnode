@@ -48,9 +48,7 @@ import java.nio.channels.SocketChannel;
 import java.nio.channels.spi.SelectorProvider;
 
 public final class ServerSocketChannelImpl extends ServerSocketChannel
-  implements VMChannelOwner
 {
-  private VMChannel channel;
   private NIOServerSocket serverSocket;
   private boolean connected;
 
@@ -58,15 +56,13 @@ public final class ServerSocketChannelImpl extends ServerSocketChannel
     throws IOException
   {
     super (provider);
-    serverSocket = new NIOServerSocket(this);
-    channel = serverSocket.getPlainSocketImpl().getVMChannel();
+    serverSocket = new NIOServerSocket (this);
     configureBlocking(true);
-  }
+	}
 
-  // XXX do we need this?
   public void finalizer()
   {
-    if (channel.getState().isValid())
+    if (connected)
       {
         try
           {
@@ -74,20 +70,20 @@ public final class ServerSocketChannelImpl extends ServerSocketChannel
           }
         catch (Exception e)
           {
-          }
-      }
-  }
+			}
+		}
+	}
 
   protected void implCloseSelectableChannel () throws IOException
   {
-    connected = false;
-    channel.close();
-  }
+		connected = false;
+    serverSocket.close();
+	}
 
   protected void implConfigureBlocking (boolean blocking) throws IOException
   {
-    channel.setBlocking(blocking);
-  }
+    serverSocket.setSoTimeout (blocking ? 0 : NIOConstants.DEFAULT_TIMEOUT);
+	}
 
   public SocketChannel accept () throws IOException
   {
@@ -102,28 +98,27 @@ public final class ServerSocketChannelImpl extends ServerSocketChannel
     try
       {
         begin();
-        VMChannel client = channel.accept();
-        if (client == null)
-          return null;
-        else
-          {
-            completed = true;
-            return new SocketChannelImpl(provider(), client, false);
-          }
+        serverSocket.getPlainSocketImpl().setInChannelOperation(true);
+          // indicate that a channel is initiating the accept operation
+          // so that the socket ignores the fact that we might be in
+          // non-blocking mode.
+        NIOSocket socket = (NIOSocket) serverSocket.accept();
+        completed = true;
+        return socket.getChannel();
+      }
+    catch (SocketTimeoutException e)
+      {
+        return null;
       }
     finally
       {
+        serverSocket.getPlainSocketImpl().setInChannelOperation(false);
         end (completed);
       }
-  }
+	}
 
-  public ServerSocket socket()
+  public ServerSocket socket ()
   {
     return serverSocket;
-  }
-  
-  public VMChannel getVMChannel()
-  {
-    return channel;
-  }
+	}
 }

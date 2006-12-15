@@ -54,8 +54,8 @@ import java.util.Set;
 
 public class SelectorImpl extends AbstractSelector
 {
-  private Set<SelectionKey> keys;
-  private Set<SelectionKey> selected;
+  private Set keys;
+  private Set selected;
 
   /**
    * A dummy object whose monitor regulates access to both our
@@ -83,8 +83,8 @@ public class SelectorImpl extends AbstractSelector
   {
     super (provider);
     
-    keys = new HashSet<SelectionKey> ();
-    selected = new HashSet<SelectionKey> ();
+    keys = new HashSet ();
+    selected = new HashSet ();
   }
 
   protected void finalize() throws Throwable
@@ -110,7 +110,7 @@ public class SelectorImpl extends AbstractSelector
       }
   }
 
-  public final Set<SelectionKey> keys()
+  public final Set keys()
   {
     if (!isOpen())
       throw new ClosedSelectorException();
@@ -136,7 +136,7 @@ public class SelectorImpl extends AbstractSelector
   {
     int[] result;
     int counter = 0;
-    Iterator<SelectionKey> it = keys.iterator ();
+    Iterator it = keys.iterator ();
 
     // Count the number of file descriptors needed
     while (it.hasNext ())
@@ -253,7 +253,7 @@ public class SelectorImpl extends AbstractSelector
                 selectThread = null;
   }
 
-            Iterator<SelectionKey> it = keys.iterator ();
+            Iterator it = keys.iterator ();
 
             while (it.hasNext ())
   {
@@ -317,7 +317,7 @@ public class SelectorImpl extends AbstractSelector
         }
   }
     
-  public final Set<SelectionKey> selectedKeys()
+  public final Set selectedKeys()
   {
     if (!isOpen())
       throw new ClosedSelectorException();
@@ -350,10 +350,10 @@ public class SelectorImpl extends AbstractSelector
 
   private final void deregisterCancelledKeys()
   {
-    Set<SelectionKey> ckeys = cancelledKeys ();
+    Set ckeys = cancelledKeys ();
     synchronized (ckeys)
     {
-      Iterator<SelectionKey> it = ckeys.iterator();
+      Iterator it = ckeys.iterator();
 
       while (it.hasNext ())
         {

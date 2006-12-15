@@ -23,7 +23,7 @@ package java.io;
 
 import org.apache.log4j.Logger;
 
-import gnu.java.nio.FileChannelImpl;
+import gnu.java.nio.channels.FileChannelImpl;
 
 /**
  * @author epr
