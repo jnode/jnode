@@ -366,7 +366,6 @@ clean             Remove all intermediate build results.
                 <pathelement location="${root.dir}/core/src/classpath/java"/>
                 <pathelement location="${root.dir}/core/src/classpath/javax"/>
                 <pathelement location="${root.dir}/core/src/classpath/org"/>
-                <pathelement location="${root.dir}/core/src/classpath/5.0"/>
                 <pathelement location="${root.dir}/core/src/classpath/ext"/>
                 <pathelement location="${root.dir}/core/src/classpath/vm"/>
                 <pathelement location="${root.dir}/core/src/core"/>
@@ -402,7 +401,6 @@ clean             Remove all intermediate build results.
                 <pathelement location="${root.dir}/core/src/classpath/java"/>
                 <pathelement location="${root.dir}/core/src/classpath/javax"/>
                 <pathelement location="${root.dir}/core/src/classpath/org"/>
-                <pathelement location="${root.dir}/core/src/classpath/5.0"/>
                 <pathelement location="${root.dir}/core/src/classpath/ext"/>
                 <pathelement location="${root.dir}/core/src/classpath/vm"/>
                 <pathelement location="${root.dir}/core/src/core"/>
@@ -485,9 +483,6 @@ clean             Remove all intermediate build results.
                 <fileset dir="${root.dir}/core/src/classpath/tools">
                     <patternset refid="cp-includes-pattern"/>
                	</fileset>
-                <fileset dir="${root.dir}/core/src/classpath/5.0" target="1.5">
-                    <patternset refid="cp-includes-pattern"/>
-                </fileset>
             </vmsources>
             <vmspecificsources>
                 <fileset dir="${root.dir}/core/src/classpath/vm">
@@ -499,11 +494,7 @@ clean             Remove all intermediate build results.
                     <patternset refid="cp-includes-pattern"/>
                     <patternset refid="cp-sources-pattern"/>
                 </fileset>
-                <fileset dir="${root.dir}/../classpath-5.0" target="1.5" ignoremissing="on">
-                    <patternset refid="cp-includes-pattern"/>
-                    <patternset refid="cp-sources-pattern"/>
-                </fileset>
-                <fileset dir="${root.dir}/../classpath-5.0/external/jsr166" target="1.5" ignoremissing="on">
+                <fileset dir="${root.dir}/../classpath/external/jsr166">
                     <patternset refid="cp-includes-pattern"/>
                     <patternset refid="cp-sources-pattern"/>
                 </fileset>
