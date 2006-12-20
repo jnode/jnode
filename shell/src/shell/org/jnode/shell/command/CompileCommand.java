@@ -21,11 +21,11 @@
  
 package org.jnode.shell.command;
 
-import org.jnode.shell.help.ClassNameArgument;
 import org.jnode.shell.help.Help;
-import org.jnode.shell.help.IntegerArgument;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
+import org.jnode.shell.help.argument.ClassNameArgument;
+import org.jnode.shell.help.argument.IntegerArgument;
 import org.jnode.vm.classmgr.VmType;
 
 /**

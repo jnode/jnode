@@ -27,12 +27,12 @@ import java.net.URL;
 import java.net.URLClassLoader;
 
 import org.jnode.shell.help.Help;
-import org.jnode.shell.help.OptionArgument;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.Syntax;
 import org.jnode.shell.help.SyntaxErrorException;
-import org.jnode.shell.help.URLArgument;
+import org.jnode.shell.help.argument.OptionArgument;
+import org.jnode.shell.help.argument.URLArgument;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

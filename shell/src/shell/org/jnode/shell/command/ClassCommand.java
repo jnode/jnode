@@ -23,10 +23,10 @@ package org.jnode.shell.command;
 
 import java.io.PrintStream;
 
-import org.jnode.shell.help.ClassNameArgument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
+import org.jnode.shell.help.argument.ClassNameArgument;
 import org.jnode.vm.classmgr.VmArrayClass;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmType;

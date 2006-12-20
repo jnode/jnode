@@ -21,8 +21,10 @@
  
 package org.jnode.shell.help;
 
-import java.util.List;
+import java.util.Collection;
+
 import javax.naming.NameNotFoundException;
+
 import org.jnode.shell.ShellUtils;
 
 /**
@@ -67,11 +69,11 @@ public class Argument extends CommandLineElement {
         return partial;
     }
 
-    protected String complete(String partial, List<String> list) {
+    protected String complete(String partial, Collection<String> list) {
         if (list.size() == 0) // none found
                 return partial;
 
-        if (list.size() == 1) return (String) list.get(0) + " ";
+        if (list.size() == 1) return (String) list.iterator().next() + " ";
 
         // list matching
         String[] result = (String[]) list

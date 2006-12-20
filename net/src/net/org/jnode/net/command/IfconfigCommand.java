@@ -29,22 +29,23 @@ import org.jnode.driver.DeviceManager;
 import org.jnode.driver.net.NetDeviceAPI;
 import org.jnode.naming.InitialNaming;
 import org.jnode.net.ethernet.EthernetConstants;
+import org.jnode.net.help.argument.HostArgument;
 import org.jnode.net.ipv4.IPv4Address;
 import org.jnode.net.ipv4.config.IPv4ConfigurationService;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.DeviceArgument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.Syntax;
+import org.jnode.shell.help.argument.DeviceArgument;
 
 /**
  * @author epr
  */
 public class IfconfigCommand implements Command {
 
-	static final DeviceArgument ARG_DEVICE = new DeviceArgument("device", "the device");
+	static final DeviceArgument ARG_DEVICE = new DeviceArgument("device", "the device", NetDeviceAPI.class);
 	static final HostArgument ARG_IP_ADDRESS = new HostArgument("ip-address", "the IP address to bind the device to");
 	static final HostArgument ARG_SUBNET_MASK = new HostArgument("subnet-mask", "if given, specifies the range of reachable subnets");
 

@@ -28,10 +28,10 @@ import org.jnode.driver.Device;
 import org.jnode.driver.DeviceUtils;
 import org.jnode.driver.system.acpi.AcpiAPI;
 import org.jnode.shell.help.Help;
-import org.jnode.shell.help.OptionArgument;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.Syntax;
+import org.jnode.shell.help.argument.OptionArgument;
 
 /**
  * ACPI command.

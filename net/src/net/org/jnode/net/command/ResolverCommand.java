@@ -23,12 +23,18 @@ package org.jnode.net.command;
 
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.Collection;
 
+import org.jnode.net.help.argument.HostArgument;
 import org.jnode.net.ipv4.IPv4Address;
 import org.jnode.net.ipv4.util.ResolverImpl;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.*;
+import org.jnode.shell.help.Help;
+import org.jnode.shell.help.Parameter;
+import org.jnode.shell.help.ParsedArguments;
+import org.jnode.shell.help.Syntax;
+import org.jnode.shell.help.argument.OptionArgument;
 
 
 public class ResolverCommand implements Command
@@ -70,8 +76,15 @@ public class ResolverCommand implements Command
 	
 	    if (cmdLine.size() == 0)
 	    {
-	      System.out.println("DNS servers");
-	      ResolverImpl.printDnsServers();
+	      Collection<String> resolvers = ResolverImpl.getDnsServers();
+	      if( resolvers == null )
+	    	  System.out.println("No DNS servers found.");
+	      else {
+		      System.out.println("DNS servers");
+	        for (String dnsServer : resolvers) {
+	            System.out.println(dnsServer);
+	        }
+	      }
 	    }
 	    else
 	    {

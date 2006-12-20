@@ -25,13 +25,13 @@ import org.jnode.driver.DeviceManager;
 import org.jnode.driver.block.ramdisk.RamDiskDevice;
 import org.jnode.driver.block.ramdisk.RamDiskDriver;
 import org.jnode.naming.InitialNaming;
-import org.jnode.shell.help.DeviceArgument;
 import org.jnode.shell.help.Help;
-import org.jnode.shell.help.IntegerArgument;
-import org.jnode.shell.help.OptionArgument;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.Syntax;
+import org.jnode.shell.help.argument.DeviceArgument;
+import org.jnode.shell.help.argument.IntegerArgument;
+import org.jnode.shell.help.argument.OptionArgument;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

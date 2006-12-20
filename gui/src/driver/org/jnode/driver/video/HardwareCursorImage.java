@@ -25,7 +25,14 @@ package org.jnode.driver.video;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class HardwareCursorImage {
-	
+
+    /** White */
+    private static final int W = 0xFFFFFFFF;
+    /** Black */
+    private static final int B = 0xFF000000;
+    /** Transparent */
+    private static final int T = 0x00000000;
+
 	private final int width;
 	private final int height;
 	private final int[] image;
@@ -49,6 +56,46 @@ public class HardwareCursorImage {
 		this.image = image;
 		this.hotSpotX = hotSpotX;
 		this.hotSpotY = hotSpotY;
+	}
+
+	/**
+	 * Initialize this instance by parsing the pixels from a given String.
+	 * @param width
+	 * @param height
+	 * @param image
+	 * @param hotSpotX
+	 * @param hotSpotY
+	 */
+	public HardwareCursorImage(int width, int height, String image, int hotSpotX, int hotSpotY) {
+		if (image.length() != width * height) {
+			throw new IllegalArgumentException("Invalid image length");
+		}
+		this.width = width;
+		this.height = height;
+		this.image = parse(image);
+		this.hotSpotX = hotSpotX;
+		this.hotSpotY = hotSpotY;
+	}
+
+	private int[] parse(String image) {
+		int[] res = new int[image.length()];
+		int i = 0;
+		for( char c : image.toCharArray() ) {
+			switch( c ) {
+			case 'T':
+				res[i++] = T;
+				break;
+			case 'B':
+				res[i++] = B;
+				break;
+			case 'W':
+				res[i++] = W;
+				break;
+			default:
+				throw new IllegalArgumentException("Unknown pixel color indicator '" + c + "'");
+			}
+		}
+		return res;
 	}
 
 	/**

@@ -28,11 +28,11 @@ import javax.naming.NameNotFoundException;
 import org.jnode.shell.Shell;
 import org.jnode.shell.ShellUtils;
 import org.jnode.shell.alias.NoSuchAliasException;
-import org.jnode.shell.help.AliasArgument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.HelpException;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
+import org.jnode.shell.help.argument.AliasArgument;
 
 /**
  * @author qades

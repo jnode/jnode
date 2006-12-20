@@ -31,12 +31,12 @@ import org.jnode.driver.input.KeyboardAPI;
 import org.jnode.driver.input.KeyboardInterpreter;
 import org.jnode.driver.input.KeyboardInterpreterFactory;
 import org.jnode.shell.help.Argument;
-import org.jnode.shell.help.CountryArgument;
 import org.jnode.shell.help.Help;
-import org.jnode.shell.help.LanguageArgument;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.Syntax;
+import org.jnode.shell.help.argument.CountryArgument;
+import org.jnode.shell.help.argument.LanguageArgument;
 
 /**
  * @author Marc DENTY

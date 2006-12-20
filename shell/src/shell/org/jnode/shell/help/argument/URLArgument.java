@@ -19,10 +19,13 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.shell.help;
+package org.jnode.shell.help.argument;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import org.jnode.shell.help.Argument;
+import org.jnode.shell.help.ParsedArguments;
 
 
 /**

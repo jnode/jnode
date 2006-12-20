@@ -75,7 +75,7 @@ public class DHCPClient extends AbstractDHCPClient {
                 public Object run() throws IOException {
                     // Get the API.
                     try {
-                        api = (NetDeviceAPI) device.getAPI(NetDeviceAPI.class);
+                        api = device.getAPI(NetDeviceAPI.class);
                     } catch (ApiNotFoundException ex) {
                         throw new NetworkException("Device is not a network device", ex);
                     }

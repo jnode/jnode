@@ -19,7 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.shell.help;
+package org.jnode.shell.help.argument;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,21 +27,37 @@ import java.util.List;
 import javax.naming.NameNotFoundException;
 
 import org.jnode.driver.Device;
+import org.jnode.driver.DeviceAPI;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceNotFoundException;
 import org.jnode.naming.InitialNaming;
+import org.jnode.shell.help.Argument;
+import org.jnode.shell.help.ParsedArguments;
+import org.jnode.shell.help.SyntaxErrorException;
 
 /**
  * @author qades
  */
 public class DeviceArgument extends Argument {
 
+	private final Class<? extends DeviceAPI> apiClass;
+
 	public DeviceArgument(String name, String description, boolean multi) {
-		super(name, description, multi);
+		this(name, description, null, multi);
 	}
 
 	public DeviceArgument(String name, String description) {
+		this(name, description, null);
+	}
+
+	public DeviceArgument(String name, String description, Class<? extends DeviceAPI> apiClass, boolean multi) {
+		super(name, description, multi);
+		this.apiClass = apiClass;
+	}
+
+	public DeviceArgument(String name, String description, Class<? extends DeviceAPI> apiClass) {
 		super(name, description);
+		this.apiClass = apiClass;
 	}
 
 	public Device getDevice(ParsedArguments args) throws SyntaxErrorException {
@@ -64,6 +80,9 @@ public class DeviceArgument extends Argument {
 
             // collect matching aliases
             for (Device dev : devMgr.getDevices()) {
+            	if( apiClass != null && !dev.implementsAPI(apiClass) )
+            		continue;
+            	
                 final String devId = dev.getId();
                 if (devId.startsWith(partial)) {
                     devIds.add(devId);

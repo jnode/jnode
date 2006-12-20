@@ -19,31 +19,29 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.net.command;
+package org.jnode.shell.help.argument;
 
-import org.jnode.net.ipv4.IPv4Address;
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.ParsedArguments;
 
 /**
- * @author qades
+ * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class HostArgument extends Argument {
+public class LongArgument extends Argument {
+    
+    public LongArgument(String name, String description, boolean multi) {
+        super(name, description, multi);
+    }
 
-	public HostArgument(String name, String description, boolean multi) {
-		super(name, description, multi);
-	}
+    public LongArgument(String name, String description) {
+        super(name, description);
+    }
 
-	public HostArgument(String name, String description) {
-		super(name, description);
-	}
-
-	// here the specific command line completion would be implemented
-
-	public IPv4Address getAddress(ParsedArguments args) {
-		String value = getValue(args);
-		if( value == null )
-			return null;
-		return new IPv4Address(value);
-	}
+    public String complete(String partial) {
+        return partial;
+    }
+    
+    public long getLong(ParsedArguments args) {
+        return Long.parseLong(this.getValue(args));
+    }
 }

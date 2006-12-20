@@ -30,6 +30,7 @@
         <alias name="ping" class="org.jnode.net.command.PingCommand"/>
         <alias name="route" class="org.jnode.net.command.RouteCommand"/>
         <alias name="resolver" class="org.jnode.net.command.ResolverCommand"/>
+        <alias name="resolve" class="org.jnode.net.command.ResolveCommand"/>
         <alias name="tftp" class="org.jnode.net.command.TftpCommand"/>
         <alias name="wlanctl" class="org.jnode.net.command.WLanCtlCommand"/>
         <alias name="net" class="org.jnode.net.command.NetCommand"/>

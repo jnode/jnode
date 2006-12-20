@@ -19,27 +19,36 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.shell.help;
+package org.jnode.shell.help.argument;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jnode.shell.help.Argument;
 
 /**
- * @author Ewout Prangsma (epr@users.sourceforge.net)
+ * @author qades
  */
-public class IntegerArgument extends Argument {
-	
-	public IntegerArgument(String name, String description, boolean multi) {
-		super(name, description, multi);
-	}
+public class PropertyNameArgument extends Argument {
 
-	public IntegerArgument(String name, String description) {
-		super(name, description);
-	}
+    public PropertyNameArgument(String name, String description, boolean multi) {
+        super(name, description, multi);
+    }
 
-	public String complete(String partial) {
-		return partial;
-	}
-	
-	public int getInteger(ParsedArguments args) {
-		return Integer.parseInt(this.getValue(args));
-	}
+    public PropertyNameArgument(String name, String description) {
+        super(name, description);
+    }
+
+    public String complete(String partial) {
+        final List<String> props = new ArrayList<String>();
+        for (Object key : System.getProperties().keySet()) {
+            final String prop = (String) key;
+            if (prop.startsWith(partial)) {
+                props.add(prop);
+            }
+        }
+
+        return complete(partial, props);
+    }
+
 }

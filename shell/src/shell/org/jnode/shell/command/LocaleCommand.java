@@ -26,12 +26,12 @@ import java.io.PrintStream;
 import java.util.Locale;
 
 import org.jnode.shell.help.Argument;
-import org.jnode.shell.help.CountryArgument;
 import org.jnode.shell.help.Help;
-import org.jnode.shell.help.LanguageArgument;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.Syntax;
+import org.jnode.shell.help.argument.CountryArgument;
+import org.jnode.shell.help.argument.LanguageArgument;
 
 /**
  * Change the default locale of JNode

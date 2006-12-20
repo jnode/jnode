@@ -45,14 +45,14 @@ import org.jnode.partitions.ibm.IBMPartitionTable;
 import org.jnode.partitions.ibm.IBMPartitionTableEntry;
 import org.jnode.partitions.ibm.IBMPartitionTableType;
 import org.jnode.partitions.ibm.IBMPartitionTypes;
-import org.jnode.shell.help.DeviceArgument;
 import org.jnode.shell.help.Help;
-import org.jnode.shell.help.OptionArgument;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.StringArgument;
 import org.jnode.shell.help.Syntax;
 import org.jnode.shell.help.SyntaxErrorException;
+import org.jnode.shell.help.argument.DeviceArgument;
+import org.jnode.shell.help.argument.OptionArgument;
+import org.jnode.shell.help.argument.StringArgument;
 /**
  * @author gbin
  * @author Trickkiste
