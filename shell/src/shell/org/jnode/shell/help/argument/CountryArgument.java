@@ -18,27 +18,27 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
-package org.jnode.shell.help;
 
+package org.jnode.shell.help.argument;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
 /**
- * @author qades
+ * @author Fabien DUMINY (fduminy@jnode.org)
  */
-public class ClassNameArgument extends Argument {
+public class CountryArgument extends StringListArgument {
 
-	public ClassNameArgument(String name, String description, boolean multi) {
-		super(name, description, multi);
+	private static final List<String> validCountries = Arrays.asList(Locale
+			.getISOCountries());
+
+	public CountryArgument(String name, String description, boolean multi) {
+		super(name, description, multi, validCountries);
 	}
 
-	public ClassNameArgument(String name, String description) {
-		super(name, description);
+	public CountryArgument(String name, String description) {
+		super(name, description, validCountries);
 	}
 
-	// here the specific command line completion would be implemented
-
-	public Class getClass(ParsedArguments cmdLine) throws ClassNotFoundException {
-		final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		return cl.loadClass(getValue(cmdLine));
-	}
 }

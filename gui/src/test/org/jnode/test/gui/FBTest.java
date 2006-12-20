@@ -39,9 +39,9 @@ import org.jnode.driver.video.FrameBufferConfiguration;
 import org.jnode.driver.video.Surface;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.help.Argument;
-import org.jnode.shell.help.DeviceArgument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
+import org.jnode.shell.help.argument.DeviceArgument;
 
 /**
  * @author epr

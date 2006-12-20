@@ -29,10 +29,10 @@ import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.FileArgument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
+import org.jnode.shell.help.argument.FileArgument;
 
 import javax.naming.NameNotFoundException;
 

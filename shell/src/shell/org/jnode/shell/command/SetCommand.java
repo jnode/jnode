@@ -22,6 +22,8 @@
 package org.jnode.shell.command;
 
 import org.jnode.shell.help.*;
+import org.jnode.shell.help.argument.PropertyNameArgument;
+import org.jnode.shell.help.argument.StringArgument;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
 

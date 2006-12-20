@@ -19,25 +19,29 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.shell.help;
+package org.jnode.shell.help.argument;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import org.jnode.shell.help.Argument;
+import org.jnode.shell.help.ParsedArguments;
+
 
 /**
- * @author Fabien DUMINY (fduminy@jnode.org)
+ * @author qades
  */
-public class LanguageArgument extends StringListArgument {
+public class ClassNameArgument extends Argument {
 
-    private static final List<String> languages = Arrays.asList(Locale.getISOLanguages());
-    
-    public LanguageArgument(String name, String description, boolean multi) {
-        super(name, description, multi, languages);
-    }
+	public ClassNameArgument(String name, String description, boolean multi) {
+		super(name, description, multi);
+	}
 
-    public LanguageArgument(String name, String description) {
-        super(name, description, languages);
-    }
+	public ClassNameArgument(String name, String description) {
+		super(name, description);
+	}
 
+	// here the specific command line completion would be implemented
+
+	public Class getClass(ParsedArguments cmdLine) throws ClassNotFoundException {
+		final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		return cl.loadClass(getValue(cmdLine));
+	}
 }

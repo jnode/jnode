@@ -28,10 +28,10 @@ import org.jnode.driver.Device;
 import org.jnode.driver.RemovableDeviceAPI;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.DeviceArgument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
+import org.jnode.shell.help.argument.DeviceArgument;
 
 
 /**

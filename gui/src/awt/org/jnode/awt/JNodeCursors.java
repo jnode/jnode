@@ -29,140 +29,186 @@ import org.jnode.driver.video.HardwareCursorImage;
  */
 public class JNodeCursors {
 
-    /** White */
-    private static final int W = 0xFFFFFFFF;
-    /** Black */
-    private static final int B = 0xFF000000;
-    /** Transparent */
-    private static final int T = 0x00000000;
 
-    private static final int[] ARROW_IMAGE_16x16 = {
-        B, B, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        B, W, B, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        B, W, B, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        B, W, W, B, T, T, T, T, T, T, T, T, T, T, T, T,
-        B, W, W, B, T, T, T, T, T, T, T, T, T, T, T, T,
-        B, W, W, W, B, T, T, T, T, T, T, T, T, T, T, T,
-        B, W, W, W, B, T, T, T, T, T, T, T, T, T, T, T,
-        B, W, W, W, W, B, T, T, T, T, T, T, T, T, T, T,
-        B, W, W, W, W, B, T, T, T, T, T, T, T, T, T, T,
-        B, W, W, W, B, T, T, T, T, T, T, T, T, T, T, T,
-        B, W, W, B, T, T, T, T, T, T, T, T, T, T, T, T,
-        B, W, W, B, T, T, T, T, T, T, T, T, T, T, T, T,
-        T, B, W, W, B, T, T, T, T, T, T, T, T, T, T, T,
-        T, B, W, W, B, T, T, T, T, T, T, T, T, T, T, T,
-        T, T, B, W, B, T, T, T, T, T, T, T, T, T, T, T,
-        T, T, B, B, T, T, T, T, T, T, T, T, T, T, T, T,
+	private static final String ARROW_IMAGE_16x16 =
+	    "BBTTTTTTTTTTTTTT" +
+	    "BWBTTTTTTTTTTTTT" +
+	    "BWWBTTTTTTTTTTTT" +
+	    "BWWWBTTTTTTTTTTT" +
+	    "BWWWWBTTTTTTTTTT" +
+	    "BWWWWWBTTTTTTTTT" +
+	    "BWWWWWWBTTTTTTTT" +
+	    "BWWWWWWWBTTTTTTT" +
+	    "BWWWWWWWWBTTTTTT" +
+	    "BWWWWWWWWWBTTTTT" +
+	    "BWWBWWWBBBBBTTTT" +
+	    "BWBTBWWBTTTTTTTT" +
+	    "BBTTTBWWBTTTTTTT" +
+	    "TTTTTTBWWBTTTTTT" +
+	    "TTTTTTTBWWBTTTTT" +
+	    "TTTTTTTTBBBTTTTT";
+
+    private static final String ARROW_IMAGE_32x32 =
+		"BTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"BBTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"BWBTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"BWWBTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"BWWWBTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"BWWWWBTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"BWWWWWBTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"BWWWWWWBTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"BWWWWWWWBTTTTTTTTTTTTTTTTTTTTTTT" +
+		"BWWWWWWWWBTTTTTTTTTTTTTTTTTTTTTT" +
+		"BWWWWWWWWWBTTTTTTTTTTTTTTTTTTTTT" +
+		"BWWWWWWWWWWBTTTTTTTTTTTTTTTTTTTT" +
+		"BWWWWWWWWWWWBTTTTTTTTTTTTTTTTTTT" +
+		"BWWWWWWWWWWWWBTTTTTTTTTTTTTTTTTT" +
+		"BWWWWWWWWWWWWWBTTTTTTTTTTTTTTTTT" +
+		"BWWWWWWWWWWWWWWBTTTTTTTTTTTTTTTT" +
+		"BWWWWWWWWWWWWWWWBTTTTTTTTTTTTTTT" +
+		"BWWWWWWWWWWWWWWWWBTTTTTTTTTTTTTT" +
+		"BWWWWWWWWWWWWWWWWWBTTTTTTTTTTTTT" +
+		"BWWWWWWWWWWWWWWWWWWBTTTTTTTTTTTT" +
+		"BWWWWWWWWWWWWWWWWWWWBTTTTTTTTTTT" +
+		"BWWWWWWWWWWWWWWWWWWWWBTTTTTTTTTT" +
+		"BWWWWWWWWWWWWWWWWWWWWWBTTTTTTTTT" +
+		"BWWWWWWBWWWWWWBBBBBBBBBBTTTTTTTT" +
+		"BWWWWWBTBWWWWWWBTTTTTTTTTTTTTTTT" +
+		"BWWWWBTTTBWWWWWWBTTTTTTTTTTTTTTT" +
+		"BWWWBTTTTTBWWWWWWBTTTTTTTTTTTTTT" +
+		"BWWBTTTTTTTBWWWWWWBTTTTTTTTTTTTT" +
+		"BWBTTTTTTTTTBWWWWWWBTTTTTTTTTTTT" +
+		"BBTTTTTTTTTTTBWWWWWWBTTTTTTTTTTT" +
+		"BTTTTTTTTTTTTTBWWWWWWBTTTTTTTTTT" +
+		"TTTTTTTTTTTTTTTBBBBBBBBTTTTTTTTT";
+/*
+    private static final String ARROW_IMAGE_16x16 = {
+        BBTTTTTTTTTTTTTT,
+        BWBTTTTTTTTTTTTT,
+        BWBTTTTTTTTTTTTT,
+        BWWBTTTTTTTTTTTT,
+        BWWBTTTTTTTTTTTT,
+        BWWWBTTTTTTTTTTT,
+        BWWWBTTTTTTTTTTT,
+        BWWWWBTTTTTTTTTT,
+        BWWWWBTTTTTTTTTT,
+        BWWWBTTTTTTTTTTT,
+        BWWBTTTTTTTTTTTT,
+        BWWBTTTTTTTTTTTT,
+        TBWWBTTTTTTTTTTT,
+        TBWWBTTTTTTTTTTT,
+        TTBWBTTTTTTTTTTT,
+        TTBBTTTTTTTTTTTT,
     };
     
     private static final int[] ARROW_IMAGE_32x32 = {
-        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        B, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        B, B, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        B, W, B, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        B, W, W, B, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        B, W, W, W, B, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        B, W, W, W, W, B, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        B, W, W, W, W, W, B, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        B, W, W, W, W, W, W, B, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        B, W, W, W, W, W, W, W, B, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        B, W, W, W, W, W, W, W, W, B, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        B, W, W, W, W, W, W, W, W, W, B, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        B, W, W, W, W, W, W, W, W, W, W, B, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        B, W, W, W, W, W, W, W, W, W, W, W, B, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        B, W, W, W, W, W, W, W, W, W, W, W, W, B, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        B, W, W, W, W, W, W, W, W, W, W, W, W, W, B, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        B, W, W, W, W, W, W, W, W, W, W, W, W, W, W, B, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        B, W, W, W, W, W, W, W, W, W, W, W, W, W, W, W, B, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        B, W, W, W, W, W, W, W, W, B, B, B, B, B, B, B, B, B, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        B, W, W, W, W, B, W, W, W, B, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        B, W, W, W, B, T, B, W, W, W, B, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        B, W, W, B, T, T, B, W, W, W, B, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        B, W, B, T, T, T, T, B, W, W, W, B, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        B, B, T, T, T, T, T, B, W, W, W, B, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        B, T, T, T, T, T, T, T, B, W, W, W, B, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        T, T, T, T, T, T, T, T, B, W, W, W, B, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        T, T, T, T, T, T, T, T, T, B, W, W, W, B, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        T, T, T, T, T, T, T, T, T, B, W, W, W, B, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        T, T, T, T, T, T, T, T, T, T, B, W, W, W, B, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        T, T, T, T, T, T, T, T, T, T, B, W, W, W, B, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        T, T, T, T, T, T, T, T, T, T, T, B, B, B, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
+        TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT,
+        BTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT,
+        BBTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT,
+        BWBTTTTTTTTTTTTTTTTTTTTTTTTTTTTT,
+        BWWBTTTTTTTTTTTTTTTTTTTTTTTTTTTT,
+        BWWWBTTTTTTTTTTTTTTTTTTTTTTTTTTT,
+        BWWWWBTTTTTTTTTTTTTTTTTTTTTTTTTT,
+        BWWWWWBTTTTTTTTTTTTTTTTTTTTTTTTT,
+        BWWWWWWBTTTTTTTTTTTTTTTTTTTTTTTT,
+        BWWWWWWWBTTTTTTTTTTTTTTTTTTTTTTT,
+        BWWWWWWWWBTTTTTTTTTTTTTTTTTTTTTT,
+        BWWWWWWWWWBTTTTTTTTTTTTTTTTTTTTT,
+        BWWWWWWWWWWBTTTTTTTTTTTTTTTTTTTT,
+        BWWWWWWWWWWWBTTTTTTTTTTTTTTTTTTT,
+        BWWWWWWWWWWWWBTTTTTTTTTTTTTTTTTT,
+        BWWWWWWWWWWWWWBTTTTTTTTTTTTTTTTT,
+        BWWWWWWWWWWWWWWBTTTTTTTTTTTTTTTT,
+        BWWWWWWWWWWWWWWWBTTTTTTTTTTTTTTT,
+        BWWWWWWWWBBBBBBBBBTTTTTTTTTTTTTT,
+        BWWWWBWWWBTTTTTTTTTTTTTTTTTTTTTT,
+        BWWWBTBWWWBTTTTTTTTTTTTTTTTTTTTT,
+        BWWBTTBWWWBTTTTTTTTTTTTTTTTTTTTT,
+        BWBTTTTBWWWBTTTTTTTTTTTTTTTTTTTT,
+        BBTTTTTBWWWBTTTTTTTTTTTTTTTTTTTT,
+        BTTTTTTTBWWWBTTTTTTTTTTTTTTTTTTT,
+        TTTTTTTTBWWWBTTTTTTTTTTTTTTTTTTT,
+        TTTTTTTTTBWWWBTTTTTTTTTTTTTTTTTT,
+        TTTTTTTTTBWWWBTTTTTTTTTTTTTTTTTT,
+        TTTTTTTTTTBWWWBTTTTTTTTTTTTTTTTT,
+        TTTTTTTTTTBWWWBTTTTTTTTTTTTTTTTT,
+        TTTTTTTTTTTBBBTTTTTTTTTTTTTTTTTT,
+        TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT,
     };
+*/
+    private static final String RESIZE_VERTICAL_IMAGE_16x16 =
+        "TTTTTTTTTTTTTTTT" +
+        "TTTTTTTTTTTTTTTT" +
+        "TTTTTTTTTTTTTTTT" +
+        "TTTTTTTTTTTTTTTT" +
+        "TTTBTTTTTTTTBTTT" +
+        "TTBTTTTTTTTTTBTT" +
+        "TBTTTTTTTTTTTTBT" +
+        "BBBBBBBBBBBBBBBB" +
+        "TBTTTTTTTTTTTTBT" +
+        "TTBTTTTTTTTTTBTT" +
+        "TTTBTTTTTTTTBTTT" +
+        "TTTTTTTTTTTTTTTT" +
+        "TTTTTTTTTTTTTTTT" +
+        "TTTTTTTTTTTTTTTT" +
+        "TTTTTTTTTTTTTTTT" +
+        "TTTTTTTTTTTTTTTT"
+    ;
 
-//    private static final int[] ARROW_IMAGE_32x32 = {
-//        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-//        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-//        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-//        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-//        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-//        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-//        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-//        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-//        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-//        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-//        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-//        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-//        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-//        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-//        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-//        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-//        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-//        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-//        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-//        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-//        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-//        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-//        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-//        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-//        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-//        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-//        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-//        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-//        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-//        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-//        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-//        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-//    };
+    
+    // --- Templates ---
+    
+	private static final String EMPTY_IMAGE_16x16 =
+	    "TTTTTTTTTTTTTTTT" +
+	    "TTTTTTTTTTTTTTTT" +
+	    "TTTTTTTTTTTTTTTT" +
+	    "TTTTTTTTTTTTTTTT" +
+	    "TTTTTTTTTTTTTTTT" +
+	    "TTTTTTTTTTTTTTTT" +
+	    "TTTTTTTTTTTTTTTT" +
+	    "TTTTTTTTTTTTTTTT" +
+	    "TTTTTTTTTTTTTTTT" +
+	    "TTTTTTTTTTTTTTTT" +
+	    "TTTTTTTTTTTTTTTT" +
+	    "TTTTTTTTTTTTTTTT" +
+	    "TTTTTTTTTTTTTTTT" +
+	    "TTTTTTTTTTTTTTTT" +
+	    "TTTTTTTTTTTTTTTT" +
+	    "TTTTTTTTTTTTTTTT";
 
-    // to be used for feature cursors
-    /*
-    private static final int[] EMPTY_IMAGE_16x16 = {
-                T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-                T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-                T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-                T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-                T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-                T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-                T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-                T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-                T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-                T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-                T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-                T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-                T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-                T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-                T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-                T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-    };*/
-    private static final int[] RESIZE_VERTICAL_IMAGE_16x16 = {
-        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        T, T, T, B, T, T, T, T, T, T, T, T, B, T, T, T,
-        T, T, B, T, T, T, T, T, T, T, T, T, T, B, T, T,
-        T, B, T, T, T, T, T, T, T, T, T, T, T, T, B, T,
-        B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B,
-        T, B, T, T, T, T, T, T, T, T, T, T, T, T, B, T,
-        T, T, B, T, T, T, T, T, T, T, T, T, T, B, T, T,
-        T, T, T, B, T, T, T, T, T, T, T, T, B, T, T, T,
-        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-        T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-    };
+    private static final String EMPTY_IMAGE_32x32 =
+		"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" +
+		"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT";
 
     private static HardwareCursorImage ARROW_16x16 = new HardwareCursorImage(16, 16, ARROW_IMAGE_16x16, 0, 0);
     private static HardwareCursorImage ARROW_32x32 = new HardwareCursorImage(32, 32, ARROW_IMAGE_32x32, 0, 0);

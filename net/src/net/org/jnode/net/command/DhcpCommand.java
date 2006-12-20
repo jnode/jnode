@@ -25,21 +25,22 @@ import java.io.InputStream;
 import java.io.PrintStream;
 
 import org.jnode.driver.Device;
+import org.jnode.driver.net.NetDeviceAPI;
 import org.jnode.naming.InitialNaming;
 import org.jnode.net.ipv4.config.IPv4ConfigurationService;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.DeviceArgument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
+import org.jnode.shell.help.argument.DeviceArgument;
 
 /**
  * @author markhale
  */
 public class DhcpCommand implements Command {
 
-        static final DeviceArgument ARG_DEVICE = new DeviceArgument("device", "the device to boot from");
+        static final DeviceArgument ARG_DEVICE = new DeviceArgument("device", "the device to boot from", NetDeviceAPI.class);
 
 	public static Help.Info HELP_INFO = new Help.Info(
 		"dhcp",

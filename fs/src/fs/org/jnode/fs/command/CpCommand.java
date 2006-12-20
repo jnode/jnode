@@ -32,11 +32,11 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.jnode.shell.help.FileArgument;
 import org.jnode.shell.help.Help;
-import org.jnode.shell.help.OptionArgument;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.Syntax;
+import org.jnode.shell.help.argument.FileArgument;
+import org.jnode.shell.help.argument.OptionArgument;
 
 /**
  * 

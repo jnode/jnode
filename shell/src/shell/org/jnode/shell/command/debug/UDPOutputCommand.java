@@ -21,19 +21,23 @@
  
 package org.jnode.shell.command.debug;
 
-import org.apache.log4j.Logger;
-import org.jnode.debug.UDPAppender;
-import org.jnode.debug.UDPOutputStream;
-import org.jnode.shell.Command;
-import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.*;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+
+import org.apache.log4j.Logger;
+import org.jnode.debug.UDPAppender;
+import org.jnode.debug.UDPOutputStream;
+import org.jnode.shell.Command;
+import org.jnode.shell.CommandLine;
+import org.jnode.shell.help.Help;
+import org.jnode.shell.help.Parameter;
+import org.jnode.shell.help.ParsedArguments;
+import org.jnode.shell.help.argument.InetAddressArgument;
+import org.jnode.shell.help.argument.IntegerArgument;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

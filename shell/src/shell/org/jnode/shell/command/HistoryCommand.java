@@ -23,6 +23,7 @@ package org.jnode.shell.command;
 import  java.io.PrintStream;
 import  javax.naming.NameNotFoundException;
 import  org.jnode.shell.help.*;
+import org.jnode.shell.help.argument.OptionArgument;
 import  org.jnode.shell.CommandHistory;
 import  org.jnode.shell.Shell;
 import  org.jnode.shell.ShellUtils;

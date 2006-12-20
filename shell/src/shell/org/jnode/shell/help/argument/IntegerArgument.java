@@ -19,26 +19,30 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.shell.help;
+package org.jnode.shell.help.argument;
+
+import org.jnode.shell.help.Argument;
+import org.jnode.shell.help.ParsedArguments;
+
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class LongArgument extends Argument {
-    
-    public LongArgument(String name, String description, boolean multi) {
-        super(name, description, multi);
-    }
+public class IntegerArgument extends Argument {
+	
+	public IntegerArgument(String name, String description, boolean multi) {
+		super(name, description, multi);
+	}
 
-    public LongArgument(String name, String description) {
-        super(name, description);
-    }
+	public IntegerArgument(String name, String description) {
+		super(name, description);
+	}
 
-    public String complete(String partial) {
-        return partial;
-    }
-    
-    public long getLong(ParsedArguments args) {
-        return Long.parseLong(this.getValue(args));
-    }
+	public String complete(String partial) {
+		return partial;
+	}
+	
+	public int getInteger(ParsedArguments args) {
+		return Integer.parseInt(this.getValue(args));
+	}
 }

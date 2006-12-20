@@ -30,10 +30,10 @@ import java.lang.reflect.Method;
 import java.net.URL;
 
 import org.jnode.shell.help.Argument;
-import org.jnode.shell.help.ClassNameArgument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
+import org.jnode.shell.help.argument.ClassNameArgument;
 
 /**
  * @author epr

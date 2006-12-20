@@ -32,12 +32,12 @@ import org.jnode.shell.Shell;
 import org.jnode.shell.ShellUtils;
 import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.alias.NoSuchAliasException;
-import org.jnode.shell.help.AliasArgument;
-import org.jnode.shell.help.ClassNameArgument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.Syntax;
+import org.jnode.shell.help.argument.AliasArgument;
+import org.jnode.shell.help.argument.ClassNameArgument;
 
 /**
  * @author epr

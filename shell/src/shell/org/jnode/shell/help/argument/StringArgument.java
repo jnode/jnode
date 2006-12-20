@@ -19,9 +19,10 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.shell.help;
+package org.jnode.shell.help.argument;
 
 import org.jnode.shell.CommandLine;
+import org.jnode.shell.help.Argument;
 
 /**
  * @author qades

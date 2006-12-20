@@ -49,13 +49,13 @@ import org.jnode.driver.input.KeyboardListener;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.alias.NoSuchAliasException;
-import org.jnode.shell.help.AliasArgument;
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.CompletionException;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.HelpException;
 import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.FileArgument;
+import org.jnode.shell.help.argument.AliasArgument;
+import org.jnode.shell.help.argument.FileArgument;
 import org.jnode.vm.VmSystem;
 
 /**
@@ -545,9 +545,7 @@ public class CommandShell implements Runnable, Shell, KeyboardListener, ConsoleL
 
     private final Help.Info defaultParameter = new Help.Info("file",
             "default parameter for command line completion",
-		new Parameter[]{
 			new Parameter(new FileArgument("file", "a file", Argument.MULTI), Parameter.OPTIONAL)
-		}
 	);
     private final Argument defaultArg = new AliasArgument("command",
             "the command to be called");

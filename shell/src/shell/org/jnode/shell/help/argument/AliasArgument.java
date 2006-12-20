@@ -19,7 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.shell.help;
+package org.jnode.shell.help.argument;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +28,7 @@ import javax.naming.NameNotFoundException;
 
 import org.jnode.shell.ShellUtils;
 import org.jnode.shell.alias.AliasManager;
+import org.jnode.shell.help.Argument;
 
 /**
  * @author qades

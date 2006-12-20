@@ -40,12 +40,12 @@ import org.jnode.plugin.PluginRegistry;
 import org.jnode.plugin.URLPluginLoader;
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.Help;
-import org.jnode.shell.help.OptionArgument;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.PluginArgument;
 import org.jnode.shell.help.Syntax;
-import org.jnode.shell.help.URLArgument;
+import org.jnode.shell.help.argument.OptionArgument;
+import org.jnode.shell.help.argument.PluginArgument;
+import org.jnode.shell.help.argument.URLArgument;
 import org.jnode.vm.Vm;
 
 /**

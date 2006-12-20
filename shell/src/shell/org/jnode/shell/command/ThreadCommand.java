@@ -29,7 +29,7 @@ import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.ThreadNameArgument;
+import org.jnode.shell.help.argument.ThreadNameArgument;
 import org.jnode.vm.scheduler.VmThread;
 
 /**

@@ -27,10 +27,10 @@ import java.io.PrintStream;
 
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.FileArgument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
+import org.jnode.shell.help.argument.FileArgument;
 
 /**
  * @author Guillaume BINET (gbin@users.sourceforge.net)

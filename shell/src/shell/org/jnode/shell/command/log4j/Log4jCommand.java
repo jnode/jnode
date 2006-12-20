@@ -30,15 +30,15 @@ import java.util.Properties;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.jnode.shell.help.FileArgument;
 import org.jnode.shell.help.Help;
-import org.jnode.shell.help.OptionArgument;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.StringArgument;
 import org.jnode.shell.help.Syntax;
 import org.jnode.shell.help.SyntaxErrorException;
-import org.jnode.shell.help.URLArgument;
+import org.jnode.shell.help.argument.FileArgument;
+import org.jnode.shell.help.argument.OptionArgument;
+import org.jnode.shell.help.argument.StringArgument;
+import org.jnode.shell.help.argument.URLArgument;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

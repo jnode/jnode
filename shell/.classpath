@@ -7,5 +7,6 @@
 	<classpathentry kind="lib" path="/JNode-Core/lib/ant.jar"/>
 	<classpathentry kind="lib" path="lib/bsh-2.0b1.jar"/>
 	<classpathentry kind="lib" path="/JNode-Core/lib/ant-launcher.jar"/>
+	<classpathentry kind="lib" path="lib/groovy-all-1.0-RC-01.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

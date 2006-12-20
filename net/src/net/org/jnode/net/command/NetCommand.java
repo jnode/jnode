@@ -13,11 +13,11 @@ import javax.net.SocketFactory;
 
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
-import org.jnode.shell.help.InetAddressArgument;
-import org.jnode.shell.help.IntegerArgument;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.Syntax;
+import org.jnode.shell.help.argument.InetAddressArgument;
+import org.jnode.shell.help.argument.IntegerArgument;
 
 public class NetCommand {
 

@@ -32,12 +32,12 @@ import org.jnode.driver.net.WirelessNetDeviceAPI;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Argument;
-import org.jnode.shell.help.DeviceArgument;
 import org.jnode.shell.help.Help;
-import org.jnode.shell.help.OptionArgument;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.SyntaxErrorException;
+import org.jnode.shell.help.argument.DeviceArgument;
+import org.jnode.shell.help.argument.OptionArgument;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -52,7 +52,7 @@ public class WLanCtlCommand implements Command {
                     FUNC_SETESSID, "Set the ESSID"), });
 
     private static final DeviceArgument ARG_DEVICE = new DeviceArgument(
-            "device", "the device to control");
+            "device", "the device to control", WirelessNetDeviceAPI.class);
 
     private static final Argument ARG_VALUE = new Argument("value",
             "Value of the function");

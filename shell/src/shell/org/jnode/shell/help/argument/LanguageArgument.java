@@ -19,39 +19,25 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.net.command;
+package org.jnode.shell.help.argument;
 
-import org.jnode.shell.help.Argument;
-import org.jnode.shell.help.ParsedArguments;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
 /**
- * @author Martin Hartvig
+ * @author Fabien DUMINY (fduminy@jnode.org)
  */
+public class LanguageArgument extends StringListArgument {
 
-public class HostNameArgument extends Argument
-{
+    private static final List<String> languages = Arrays.asList(Locale.getISOLanguages());
+    
+    public LanguageArgument(String name, String description, boolean multi) {
+        super(name, description, multi, languages);
+    }
 
-	public HostNameArgument(String _name, String _description, boolean _multi)
-  {
-		super(_name, _description, _multi);
-	}
+    public LanguageArgument(String name, String description) {
+        super(name, description, languages);
+    }
 
-	public HostNameArgument(String _name, String _description)
-  {
-		super(_name, _description);
-	}
-
-
-	public InetAddress getAddress(ParsedArguments _parsedArguments) throws UnknownHostException
-  {
-		String value = getValue(_parsedArguments);
-
-		if (value == null)
-			return null;
-
-    return InetAddress.getByName(value);
-	}
 }

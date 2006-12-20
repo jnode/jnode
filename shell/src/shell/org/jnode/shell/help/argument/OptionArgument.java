@@ -19,10 +19,14 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.shell.help;
+package org.jnode.shell.help.argument;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.jnode.shell.help.Argument;
+import org.jnode.shell.help.Help;
+import org.jnode.shell.help.Parameter;
 
 /**
  * @author qades

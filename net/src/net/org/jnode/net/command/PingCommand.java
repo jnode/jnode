@@ -42,6 +42,7 @@ import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.Syntax;
+import org.jnode.shell.help.argument.HostNameArgument;
 
 /**
  * @author JPG

@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: NetworkArgument.java 2224 2006-01-01 12:49:03Z epr $
  *
  * JNode.org
  * Copyright (C) 2003-2006 JNode.org
@@ -18,27 +18,32 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+ 
+package org.jnode.net.help.argument;
 
-package org.jnode.shell.help;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import org.jnode.net.ipv4.IPv4Address;
+import org.jnode.shell.help.Argument;
+import org.jnode.shell.help.ParsedArguments;
 
 /**
- * @author Fabien DUMINY (fduminy@jnode.org)
+ * @author qades
  */
-public class CountryArgument extends StringListArgument {
+public class NetworkArgument extends Argument {
 
-	private static final List<String> validCountries = Arrays.asList(Locale
-			.getISOCountries());
-
-	public CountryArgument(String name, String description, boolean multi) {
-		super(name, description, multi, validCountries);
+	public NetworkArgument(String name, String description, boolean multi) {
+		super(name, description, multi);
 	}
 
-	public CountryArgument(String name, String description) {
-		super(name, description, validCountries);
+	public NetworkArgument(String name, String description) {
+		super(name, description);
 	}
 
+	// here the specific command line completion would be implemented
+
+	public IPv4Address getAddress(ParsedArguments args) {
+		String value = getValue(args);
+		if( "default".equals(value) )
+			value = "0.0.0.0";
+		return new IPv4Address(value);
+	}
 }

@@ -21,6 +21,7 @@
       <export name="org.jnode.shell.alias.util.*"/>
       <export name="org.jnode.shell.def.*"/>
       <export name="org.jnode.shell.help.*"/>
+      <export name="org.jnode.shell.help.argument.*"/>
       <export name="org.jnode.shell.help.def.*"/>
     </library>
   </runtime>

@@ -35,12 +35,12 @@ import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceNotFoundException;
 import org.jnode.driver.DriverException;
 import org.jnode.naming.InitialNaming;
-import org.jnode.shell.help.DeviceArgument;
 import org.jnode.shell.help.Help;
-import org.jnode.shell.help.OptionArgument;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.Syntax;
+import org.jnode.shell.help.argument.DeviceArgument;
+import org.jnode.shell.help.argument.OptionArgument;
 
 /**
  * @author epr

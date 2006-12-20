@@ -1,9 +1,11 @@
-package org.jnode.shell.help;
+package org.jnode.shell.help.argument;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import org.jnode.shell.help.Argument;
 
 public class StringListArgument extends Argument {
 
