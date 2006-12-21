@@ -2091,7 +2091,17 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract int writePUSH(GPR srcReg, int srcDisp);
 
-	/**
+    /**
+     * Create a push dword [sr:disp]
+     *
+     * @param sr
+     * @param srcDisp
+     * @return The ofset of the start of the instruction.
+     */
+    public abstract int writePUSH(SR sr, int srcDisp);
+
+
+    /**
 	 * Create a push dword <imm32>
 	 * 
 	 * @param imm32

@@ -2050,6 +2050,14 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     /**
+     * @see org.jnode.assembler.x86.X86Assembler#writePUSH(GPR, int)
+     * @return The ofset of the start of the instruction.
+     */
+    public int writePUSH(SR srcReg, int srcDisp) {
+        return println("\tpush [" + srcReg + ":" + srcDisp + "]");
+    }
+
+    /**
      * @see org.jnode.assembler.x86.X86Assembler#writePUSH(GPR, GPR, int, int)
      * @return The ofset of the start of the instruction.
      */

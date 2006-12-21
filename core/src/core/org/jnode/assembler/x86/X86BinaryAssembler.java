@@ -4135,7 +4135,26 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		return rc;
 	}
 
-	/**
+    /**
+     * Create a push d/qword [srcReg+srcDisp]
+     *
+     * @param sr
+     * @param srcDisp
+     * @return The ofset of the start of the instruction.
+     */
+    public final int writePUSH(SR sr, int srcDisp) {
+        testOperandSize(4, mode.getSize());
+        // PUSH has not encoding for 32-bit in 64-bit mode, so give
+        // operand size 0 to avoid a REX prefix.
+        final int rc = m_used;
+        writeSegPrefix(sr);
+		write8(0xFF);
+		write8(0x35);
+        write32(srcDisp);
+        return rc;
+    }
+
+    /**
 	 * Create a push d/qword [baseReg+indexReg*scale+disp]
 	 *
 	 * @param srcBaseReg
