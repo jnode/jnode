@@ -23,7 +23,6 @@
 	<pathelement location="${my-src.dir}/classpath/java"/>
 	<pathelement location="${my-src.dir}/classpath/javax"/>
 	<pathelement location="${my-src.dir}/classpath/org"/>
-	<pathelement location="${my-src.dir}/classpath/5.0"/>
 	<pathelement location="${my-src.dir}/classpath/ext"/>
 	<pathelement location="${my-src.dir}/classpath/vm"/>    	
 	<pathelement location="${my-src.dir}/classpath/tools"/>
@@ -115,7 +114,6 @@
 	    <fileset dir="${my-src.dir}/classpath/java" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/classpath/javax" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/classpath/org" excludes="${my-non-resources}"/>
-	    <fileset dir="${my-src.dir}/classpath/5.0" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/classpath/ext" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/classpath/vm" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/classpath/tools" excludes="${my-non-resources}"/>
