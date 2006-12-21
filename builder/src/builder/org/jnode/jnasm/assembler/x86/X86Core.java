@@ -1141,6 +1141,11 @@ public class X86Core extends AbstractX86Module {
                 Address ind = getAddress(0);
                 stream.writePUSH(getRegister(ind.getImg()), ind.disp);
                 break;
+            case G_ADDR:
+                ind = getAddress(0);
+                r1 = X86Register.getRegister(ind.getImg());
+                stream.writePUSH((SR) r1, ind.disp);
+                break;
             default:
                 reportAddressingError(PUSH_ISN, addr);
         }
