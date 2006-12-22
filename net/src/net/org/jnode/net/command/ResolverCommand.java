@@ -23,7 +23,6 @@ package org.jnode.net.command;
 
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.util.Collection;
 
 import org.jnode.net.help.argument.HostArgument;
 import org.jnode.net.ipv4.IPv4Address;
@@ -76,16 +75,9 @@ public class ResolverCommand implements Command
 	
 	    if (cmdLine.size() == 0)
 	    {
-	      Collection<String> resolvers = ResolverImpl.getDnsServers();
-	      if( resolvers == null )
-	    	  System.out.println("No DNS servers found.");
-	      else {
 		      System.out.println("DNS servers");
-	        for (String dnsServer : resolvers) {
-	            System.out.println(dnsServer);
+	      ResolverImpl.printDnsServers();
 	        }
-	      }
-	    }
 	    else
 	    {
 	      String func = ARG_FUNCTION.getValue(cmdLine);
