@@ -28,6 +28,7 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Collection;
 
 import org.jnode.driver.net.NetworkException;
 import org.jnode.net.ProtocolAddress;
@@ -88,17 +89,10 @@ public class ResolverImpl implements Resolver {
     }
 
     /**
-     * List all the dns servers
+     * Get list all the dns servers
      */
-
-    public static void printDnsServers() {
-        if (resolvers == null) {
-            return;
-        }
-
-        for (String dnsServer : resolvers.keySet()) {
-            System.out.println(dnsServer);
-        }
+    public static Collection getDnsServers() {
+        return resolvers.keySet(); 
     }
 
     /**
