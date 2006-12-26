@@ -33,6 +33,7 @@ public class ByteBufferInputStream extends InputStream {
     }
 
     /**
+     * @Override
      * @see java.io.InputStream#read()
      */
     public int read() throws IOException {
@@ -41,5 +42,14 @@ public class ByteBufferInputStream extends InputStream {
         } else {
             return -1;
         }
-    }        
+    }    
+        
+    @Override
+    /**
+     * @author Andrei DORE
+     */
+    public int available() throws IOException
+    {
+      return buf.remaining();
+    }  
 }
