@@ -226,7 +226,7 @@ public final class VmSystem {
         final VmArchitecture arch = Vm.getArch();
 
         // Java properties
-        res.put("java.version", "1.1.0");
+        res.put("java.version", "1.5");
         res.put("java.vendor", "JNode.org");
         res.put("java.vendor.url", "http://jnode.org");
         res.put("java.home", "/jifs/");
