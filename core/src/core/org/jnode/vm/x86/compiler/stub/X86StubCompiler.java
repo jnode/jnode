@@ -146,6 +146,6 @@ public final class X86StubCompiler extends AbstractX86Compiler {
      */
     @Override
     public String[] getCompilerPackages() {
-        return new String[] { "org.jnode.vm.x86.compiler", "org.jnode.vm.x86.compiler.stup" };
+        return new String[] { "org.jnode.vm.x86.compiler", "org.jnode.vm.x86.compiler.stub" };
     }
 }
