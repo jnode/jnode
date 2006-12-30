@@ -12,8 +12,8 @@
 
   <runtime>
     <library name="jnode-core.jar">
+      <export name="java.sql.*"/>  
       <export name="javax.sql.*"/>
-
       <export name="javax.transaction.*"/>
       <export name="javax.transaction.xa.*"/>
     </library>

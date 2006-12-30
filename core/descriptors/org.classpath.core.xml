@@ -88,8 +88,7 @@
       <export name="java.security.acl.*"/>
       <export name="java.security.cert.*"/>
       <export name="java.security.interfaces.*"/>
-      <export name="java.security.spec.*"/>
-      <export name="java.sql.*"/>
+      <export name="java.security.spec.*"/>      
       <export name="java.text.*"/>
       <export name="java.util.*"/>
       <export name="java.util.jar.*"/>
