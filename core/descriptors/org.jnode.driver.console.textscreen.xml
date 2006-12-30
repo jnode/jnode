@@ -18,5 +18,8 @@
       <export name="org.jnode.driver.console.textscreen.*"/>
     </library>
   </runtime>
-        
+
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.lang.RuntimePermission" name="setIO"/>
+  </extension>      
 </plugin>
