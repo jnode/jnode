@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<fragment id="org.classpath.ext.jdwp"
+  name="Classpath JDWP classes"
+  version="@VERSION@"
+  plugin-id="org.classpath.core"
+  plugin-version="@VERSION@"
+  provider-name="Classpath"
+  provider-url="http://classpath.org"
+  license-name="classpath">
+
+  <runtime>
+    <library name="jnode-core.jar">
+      <export name="gnu.classpath.jdwp.*"/>
+      <export name="gnu.classpath.jdwp.event.*"/>
+      <export name="gnu.classpath.jdwp.event.filters.*"/>
+      <export name="gnu.classpath.jdwp.exception.*"/>
+      <export name="gnu.classpath.jdwp.id.*"/>
+      <export name="gnu.classpath.jdwp.processor.*"/>
+      <export name="gnu.classpath.jdwp.transport.*"/>
+      <export name="gnu.classpath.jdwp.util.*"/>
+    </library>
+  </runtime>
+  
+</fragment>
