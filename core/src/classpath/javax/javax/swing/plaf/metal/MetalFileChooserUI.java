@@ -55,7 +55,7 @@ import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.sql.Date;
+import java.util.Date;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.List;
