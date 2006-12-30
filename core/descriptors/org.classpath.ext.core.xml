@@ -19,14 +19,7 @@
       <export name="gnu.java.net.protocol.http.event.*"/>
       <export name="gnu.java.net.protocol.jar.*"/>
 
-
-
-
-
-
-
-
-        <export name="gnu.java.awt.*"/>
+      <export name="gnu.java.awt.*"/>
       <export name="gnu.java.awt.color.*"/>
       <export name="gnu.java.awt.peer.*"/>
       <export name="gnu.java.awt.image.*"/>
@@ -36,7 +29,6 @@
       <export name="gnu.java.beans.editors.*"/>
       <export name="gnu.java.beans.encoder.*"/>
       <export name="gnu.java.beans.encoder.elements.*"/>
-
 
       <export name="java.applet.*"/>
       <export name="java.awt.*"/>
