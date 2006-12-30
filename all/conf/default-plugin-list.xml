@@ -10,6 +10,8 @@ The default list of (non-system) plugins to be included in the init-jar.
     </manifest>
 
     <plugin id="org.classpath.ext"/>
+    <plugin id="org.classpath.ext.awt"/>
+    <plugin id="org.classpath.ext.core"/>
     <plugin id="org.classpath.ext.xml"/>
     <plugin id="org.classpath.ext.jdwp"/>
     <plugin id="org.classpath.ext.corba"/>
