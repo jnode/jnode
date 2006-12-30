@@ -13,26 +13,10 @@
     <library name="jnode-core.jar">
       <export name="gnu.classpath.*"/>
       <export name="gnu.classpath.debug.*"/>      
-	  
-      <export name="gnu.java.awt.*"/>
-      <export name="gnu.java.awt.color.*"/>
-      <export name="gnu.java.awt.peer.*"/>
-      <export name="gnu.java.awt.image.*"/>
-      <export name="gnu.java.awt.java2d.*"/>
-      <export name="gnu.java.beans.*"/>
-      <export name="gnu.java.beans.decoder.*"/>
-      <export name="gnu.java.beans.editors.*"/>
-      <export name="gnu.java.beans.encoder.*"/>
-      <export name="gnu.java.beans.encoder.elements.*"/>
+
       <export name="gnu.java.io.*"/>
       <export name="gnu.java.math.*"/>
-      <export name="gnu.java.net.*"/>
-      <export name="gnu.java.net.protocol.*"/>
-      <export name="gnu.java.net.protocol.file.*"/>
-      <export name="gnu.java.net.protocol.ftp.*"/>
-      <export name="gnu.java.net.protocol.http.*"/>
-      <export name="gnu.java.net.protocol.http.event.*"/>
-      <export name="gnu.java.net.protocol.jar.*"/>
+      <export name="gnu.java.net.*"/>      
       <export name="gnu.java.nio.*"/>
       <export name="gnu.java.nio.channels.*"/>
       <export name="gnu.java.nio.charset.*"/>
@@ -40,15 +24,18 @@
       <export name="gnu.java.lang.*"/>
       <export name="gnu.java.lang.management.*"/>
       <export name="gnu.java.lang.reflect.*"/>
+
       <export name="gnu.java.locale.LocaleHelper"/>
       <export name="gnu.java.locale.LocaleData"/>  
       <export name="gnu.java.locale.LocaleInformation_en"/>
       <export name="gnu.java.locale.LocaleInformation"/>
+
       <export name="gnu.java.rmi.*"/>
       <export name="gnu.java.rmi.dgc.*"/>
       <export name="gnu.java.rmi.registry.*"/>
       <export name="gnu.java.rmi.server.*"/>
       <export name="gnu.java.rmi.activation.*"/>
+
       <export name="gnu.java.security.*"/>
       <export name="gnu.java.security.action.*"/>
       <export name="gnu.java.security.ber.*"/>
@@ -60,9 +47,10 @@
       <export name="gnu.java.security.pkcs.*"/>
       <export name="gnu.java.security.prng.*"/>
       <export name="gnu.java.security.provider.*"/>
-      <export name="gnu.java.security.util.*"/>
+      <export name="gnu.java.security.util.*"/>  
       <export name="gnu.java.security.x509.*"/>
       <export name="gnu.java.security.x509.ext.*"/>
+
       <export name="gnu.java.text.*"/>
       <export name="gnu.java.util.*"/>
       <export name="gnu.java.util.prefs.*"/>
@@ -73,23 +61,13 @@
       <export name="gnu.javax.net.ssl.provider.*"/>
       <export name="gnu.xml.stream.*"/>
 
-      <export name="java.applet.*"/>
-      <export name="java.awt.*"/>
-      <export name="java.awt.color.*"/>
-      <export name="java.awt.datatransfer.*"/>
-      <export name="java.awt.dnd.*"/>
-      <export name="java.awt.dnd.peer.*"/>
-      <export name="java.awt.event.*"/>
-      <export name="java.awt.font.*"/>
-      <export name="java.awt.geom.*"/>
-      <export name="java.awt.im.*"/>
-      <export name="java.awt.im.spi.*"/>
-      <export name="java.awt.image.*"/>
-      <export name="java.awt.image.renderable.*"/>
-      <export name="java.awt.peer.*"/>
-      <export name="java.awt.print.*"/>
-      <export name="java.beans.*"/>
-      <export name="java.beans.beancontext.*"/>
+      <export name="java.applet.Applet"/>
+      <export name="java.awt.AWTPermission"/>
+      <export name="java.beans.PropertyChangeListener" />
+      <export name="java.beans.PropertyChangeListenerProxy" />
+      <export name="java.beans.PropertyChangeSupport" />
+      <export name="java.beans.PropertyChangeEvent" />
+
       <export name="java.io.*"/>
       <export name="java.lang.*"/>
       <export name="java.lang.annotation.*"/>
@@ -125,14 +103,14 @@
 
       <export name="javax.accessibility.*"/>
       <export name="javax.isolate.*"/>
-      <export name="javax.management.*"/>  
-      <export name="javax.naming.*"/>
-      <export name="javax.naming.directory.*"/>
-      <export name="javax.naming.event.*"/>
-      <export name="javax.naming.ldap.*"/>
-      <export name="javax.naming.spi.*"/>
-      <export name="javax.sound.sampled.*"/>
-      <export name="javax.sound.sampled.spi.*"/>
+      <export name="javax.management.*"/>
+
+      <export name="javax.naming.Name"/>
+      <export name="javax.naming.InvalidNameException"/>
+      <export name="javax.naming.NameAlreadyBoundException"/>
+      <export name="javax.naming.NamingException"/>
+      <export name="javax.naming.NameNotFoundException"/>
+
       <export name="javax.xml.stream.*"/>
       <export name="javax.xml.stream.events.*"/>
       <export name="javax.xml.stream.util.*"/>
