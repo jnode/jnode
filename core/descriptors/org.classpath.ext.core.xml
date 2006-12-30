@@ -12,13 +12,9 @@
 
   <runtime>
     <library name="jnode-core.jar">
-      <export name="gnu.java.net.protocol.*"/>
-      <export name="gnu.java.net.protocol.file.*"/>
-      <export name="gnu.java.net.protocol.ftp.*"/>
-      <export name="gnu.java.net.protocol.http.*"/>
-      <export name="gnu.java.net.protocol.http.event.*"/>
-      <export name="gnu.java.net.protocol.jar.*"/>
 
+      <export name="gnu.classpath.*"/>
+        
       <export name="gnu.java.awt.*"/>
       <export name="gnu.java.awt.color.*"/>
       <export name="gnu.java.awt.peer.*"/>
@@ -29,6 +25,18 @@
       <export name="gnu.java.beans.editors.*"/>
       <export name="gnu.java.beans.encoder.*"/>
       <export name="gnu.java.beans.encoder.elements.*"/>
+      <export name="gnu.java.lang.management.*"/>
+      <export name="gnu.java.net.protocol.*"/>
+      <export name="gnu.java.net.protocol.file.*"/>
+      <export name="gnu.java.net.protocol.ftp.*"/>
+      <export name="gnu.java.net.protocol.http.*"/>
+      <export name="gnu.java.net.protocol.http.event.*"/>
+      <export name="gnu.java.net.protocol.jar.*"/>
+      <export name="gnu.java.rmi.*"/>
+      <export name="gnu.java.rmi.dgc.*"/>
+      <export name="gnu.java.rmi.registry.*"/>
+      <export name="gnu.java.rmi.server.*"/>
+      <export name="gnu.java.rmi.activation.*"/>
 
       <export name="java.applet.*"/>
       <export name="java.awt.*"/>
@@ -47,7 +55,15 @@
       <export name="java.awt.print.*"/>
       <export name="java.beans.*"/>
       <export name="java.beans.beancontext.*"/>
+      <export name="java.lang.management.*"/>
+      <export name="java.rmi.*"/>
+      <export name="java.rmi.activation.*"/>
+      <export name="java.rmi.dgc.*"/>
+      <export name="java.rmi.registry.*"/>
+      <export name="java.rmi.server.*"/>
 
+      <export name="javax.accessibility.*"/>
+      <export name="javax.management.*"/>  
       <export name="javax.naming.*"/>
       <export name="javax.naming.directory.*"/>
       <export name="javax.naming.event.*"/>
