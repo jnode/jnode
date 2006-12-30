@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin-list name="shell">
+    <manifest>
+        <attribute key="Main-Class" value="org.jnode.shell.CommandShell"/>
+    </manifest>
+
+    <plugin id="org.jnode.driver"/>
+    <plugin id="org.jnode.driver.character"/>
+    <plugin id="org.jnode.driver.console"/>
+    <plugin id="org.jnode.driver.console.core"/>
+    <plugin id="org.jnode.driver.console.textscreen"/>
+    <plugin id="org.jnode.driver.finder"/>
+    <plugin id="org.jnode.driver.input"/>
+    <plugin id="org.jnode.driver.input.l10n"/>
+    <plugin id="org.jnode.driver.ps2"/>
+    <plugin id="org.jnode.driver.system.cmos"/>
+    <plugin id="org.jnode.driver.textscreen"/>
+    <plugin id="org.jnode.driver.textscreen.core"/>
+    <plugin id="org.jnode.log4j"/>
+    <plugin id="org.jnode.shell"/>
+    <plugin id="org.jnode.shell.command"/>
+    <plugin id="org.jnode.shell.help"/>
+    <plugin id="org.jnode.work"/>    
+</plugin-list>
