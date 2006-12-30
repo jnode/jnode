@@ -11,7 +11,17 @@
 
   <runtime>
     <library name="jnode-core.jar">
-      <export name="gnu.classpath.*"/>
+        
+      <export name="gnu.classpath.Configuration"/>
+      <export name="gnu.classpath.Pointer"/>
+      <export name="gnu.classpath.SystemProperties"/>
+      <export name="gnu.classpath.VMSystemProperties"/>
+      <export name="gnu.classpath.VMStackWalker"/>
+      <export name="gnu.classpath.NotImplementedException"/>
+      <export name="gnu.classpath.ServiceFactory"/>
+      <export name="gnu.classpath.ServiceFactory$ServiceIterator"/>
+      <export name="gnu.classpath.ServiceProviderLoadingAction"/>
+
       <export name="gnu.classpath.debug.*"/>      
 
       <export name="gnu.java.io.*"/>
@@ -21,20 +31,13 @@
       <export name="gnu.java.nio.channels.*"/>
       <export name="gnu.java.nio.charset.*"/>
       <export name="gnu.java.nio.charset.iconv.*"/>
-      <export name="gnu.java.lang.*"/>
-      <export name="gnu.java.lang.management.*"/>
+      <export name="gnu.java.lang.*"/>      
       <export name="gnu.java.lang.reflect.*"/>
 
       <export name="gnu.java.locale.LocaleHelper"/>
       <export name="gnu.java.locale.LocaleData"/>  
       <export name="gnu.java.locale.LocaleInformation_en"/>
       <export name="gnu.java.locale.LocaleInformation"/>
-
-      <export name="gnu.java.rmi.*"/>
-      <export name="gnu.java.rmi.dgc.*"/>
-      <export name="gnu.java.rmi.registry.*"/>
-      <export name="gnu.java.rmi.server.*"/>
-      <export name="gnu.java.rmi.activation.*"/>
 
       <export name="gnu.java.security.*"/>
       <export name="gnu.java.security.action.*"/>
@@ -72,7 +75,6 @@
       <export name="java.lang.*"/>
       <export name="java.lang.annotation.*"/>
       <export name="java.lang.instrument.*"/>
-      <export name="java.lang.management.*"/>
       <export name="java.lang.ref.*"/>
       <export name="java.lang.reflect.*"/>
       <export name="java.math.*"/>
@@ -81,12 +83,7 @@
       <export name="java.nio.channels.*"/>
       <export name="java.nio.channels.spi.*"/>
       <export name="java.nio.charset.*"/>
-      <export name="java.nio.charset.spi.*"/>
-      <export name="java.rmi.*"/>
-      <export name="java.rmi.activation.*"/>
-      <export name="java.rmi.dgc.*"/>
-      <export name="java.rmi.registry.*"/>
-      <export name="java.rmi.server.*"/>
+      <export name="java.nio.charset.spi.*"/>      
       <export name="java.security.*"/>
       <export name="java.security.acl.*"/>
       <export name="java.security.cert.*"/>
@@ -100,10 +97,8 @@
       <export name="java.util.prefs.*"/>
       <export name="java.util.regex.*"/>
       <export name="java.util.zip.*"/>
-
-      <export name="javax.accessibility.*"/>
+      
       <export name="javax.isolate.*"/>
-      <export name="javax.management.*"/>
 
       <export name="javax.naming.Name"/>
       <export name="javax.naming.InvalidNameException"/>
@@ -127,6 +122,4 @@
         
     </library>
   </runtime>
-
-
 </plugin>
