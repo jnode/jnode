@@ -1316,8 +1316,6 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         addCompileHighOptLevel("org.jnode.vm.compiler");
         addCompileHighOptLevel("org.jnode.vm.isolate");
         addCompileHighOptLevel("org.jnode.vm.scheduler");
-//        addCompileHighOptLevel("org.jnode.vm.compiler.ir");
-//        addCompileHighOptLevel("org.jnode.vm.compiler.ir.quad");
         for (NativeCodeCompiler compiler : getArchitecture().getCompilers()) {
             for (String packageName : compiler.getCompilerPackages()) {
                 addCompileHighOptLevel(packageName);
@@ -1330,22 +1328,22 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         addCompileHighOptLevel("org.jnode.vm.memmgr.mmtk.genrc");
         addCompileHighOptLevel("org.jnode.vm.memmgr.mmtk.nogc");
         addCompileHighOptLevel("org.jnode.vm.memmgr.mmtk.ms");
-        
-        addCompileHighOptLevel("org.mmtk.plan");
-        addCompileHighOptLevel("org.mmtk.policy");
-        addCompileHighOptLevel("org.mmtk.utility");
-        addCompileHighOptLevel("org.mmtk.utility.alloc");
-        addCompileHighOptLevel("org.mmtk.utility.deque");
-        addCompileHighOptLevel("org.mmtk.utility.gcspy");
-        addCompileHighOptLevel("org.mmtk.utility.gcspy.drivers");
-        addCompileHighOptLevel("org.mmtk.utility.heap");
-        addCompileHighOptLevel("org.mmtk.utility.options");
-        addCompileHighOptLevel("org.mmtk.utility.scan");
-        addCompileHighOptLevel("org.mmtk.utility.statistics");
-        addCompileHighOptLevel("org.mmtk.vm");
-        addCompileHighOptLevel("org.mmtk.vm.gcspy");
 
-        if (false) {
+        if(false){
+            addCompileHighOptLevel("org.mmtk.plan");
+            addCompileHighOptLevel("org.mmtk.policy");
+            addCompileHighOptLevel("org.mmtk.utility");
+            addCompileHighOptLevel("org.mmtk.utility.alloc");
+            addCompileHighOptLevel("org.mmtk.utility.deque");
+            addCompileHighOptLevel("org.mmtk.utility.gcspy");
+            addCompileHighOptLevel("org.mmtk.utility.gcspy.drivers");
+            addCompileHighOptLevel("org.mmtk.utility.heap");
+            addCompileHighOptLevel("org.mmtk.utility.options");
+            addCompileHighOptLevel("org.mmtk.utility.scan");
+            addCompileHighOptLevel("org.mmtk.utility.statistics");
+            addCompileHighOptLevel("org.mmtk.vm");
+            addCompileHighOptLevel("org.mmtk.vm.gcspy");
+
             addCompileHighOptLevel("java.awt");
             addCompileHighOptLevel("java.awt.event");
             addCompileHighOptLevel("java.awt.peer");
