@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<fragment id="org.classpath.ext.core"
+  name="Classpath core classes"
+  version="@VERSION@"
+  plugin-id="org.classpath.core"
+  plugin-version="@VERSION@"
+  provider-name="Classpath"
+  provider-url="http://classpath.org"
+  license-name="classpath">
+
+  <runtime>
+    <library name="jnode-core.jar">
+      <export name="gnu.java.net.protocol.*"/>
+      <export name="gnu.java.net.protocol.file.*"/>
+      <export name="gnu.java.net.protocol.ftp.*"/>
+      <export name="gnu.java.net.protocol.http.*"/>
+      <export name="gnu.java.net.protocol.http.event.*"/>
+      <export name="gnu.java.net.protocol.jar.*"/>
+
+
+
+
+
+
+
+
+        <export name="gnu.java.awt.*"/>
+      <export name="gnu.java.awt.color.*"/>
+      <export name="gnu.java.awt.peer.*"/>
+      <export name="gnu.java.awt.image.*"/>
+      <export name="gnu.java.awt.java2d.*"/>
+      <export name="gnu.java.beans.*"/>
+      <export name="gnu.java.beans.decoder.*"/>
+      <export name="gnu.java.beans.editors.*"/>
+      <export name="gnu.java.beans.encoder.*"/>
+      <export name="gnu.java.beans.encoder.elements.*"/>
+
+
+      <export name="java.applet.*"/>
+      <export name="java.awt.*"/>
+      <export name="java.awt.color.*"/>
+      <export name="java.awt.datatransfer.*"/>
+      <export name="java.awt.dnd.*"/>
+      <export name="java.awt.dnd.peer.*"/>
+      <export name="java.awt.event.*"/>
+      <export name="java.awt.font.*"/>
+      <export name="java.awt.geom.*"/>
+      <export name="java.awt.im.*"/>
+      <export name="java.awt.im.spi.*"/>
+      <export name="java.awt.image.*"/>
+      <export name="java.awt.image.renderable.*"/>
+      <export name="java.awt.peer.*"/>
+      <export name="java.awt.print.*"/>
+      <export name="java.beans.*"/>
+      <export name="java.beans.beancontext.*"/>
+
+      <export name="javax.naming.*"/>
+      <export name="javax.naming.directory.*"/>
+      <export name="javax.naming.event.*"/>
+      <export name="javax.naming.ldap.*"/>
+      <export name="javax.naming.spi.*"/>
+
+      <export name="javax.sound.sampled.*"/>
+      <export name="javax.sound.sampled.spi.*"/>
+    </library>
+  </runtime>
+  
+</fragment>
