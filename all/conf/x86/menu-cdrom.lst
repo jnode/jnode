@@ -13,6 +13,11 @@ kernel /jnode32.gz mp=no
 module /full.jgz
 
 # ---------------------------
+title JNode (minimal shell)
+kernel /jnode32.gz mp=no
+module /shell.jgz
+
+# ---------------------------
 title JNode GUI (all plugins)
 kernel /jnode32.gz mp=no
 module /fullgui.jgz
