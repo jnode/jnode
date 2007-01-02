@@ -259,6 +259,7 @@ public class TextEditor implements KeyboardListener {
                 fx = 0;
             }
         }
+        e.consume();
         updateScreen();
     }
 
