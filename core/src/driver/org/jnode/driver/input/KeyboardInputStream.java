@@ -39,7 +39,7 @@ public class KeyboardInputStream extends InputStream implements KeyboardListener
 
 	/**
 	 * Create a new instance
-	 * @param api
+	 * @param api the keyboard API
 	 */
 	public KeyboardInputStream(KeyboardAPI api) {
 		this.api = api;
@@ -53,30 +53,86 @@ public class KeyboardInputStream extends InputStream implements KeyboardListener
 	    return 0;      
 	}
 
-	/**
+    /*
+    Doesn't block after the first blocking read.
+    public int read(byte[] b, int off, int len) throws IOException {
+        if (off < 0 || len < 0 || b.length - off < len)
+            throw new IndexOutOfBoundsException();
+
+        long time = System.currentTimeMillis();
+
+        int i = 0;
+        int ch = read(time);
+
+        for(;;) {
+            b[off + i ++] = (byte) ch;
+
+            if(i < len && queue.size() > 0)
+                ch = read(time);
+            else
+                break;
+        }
+
+        return i;
+    }
+    */
+
+    public int read(byte[] b, int off, int len) throws IOException {
+        if (off < 0 || len < 0 || b.length - off < len)
+            throw new IndexOutOfBoundsException();
+
+        long time = System.currentTimeMillis();
+
+        int i = 0;
+        int ch = read(time);
+
+        for(;;) {
+            b[off + i ++] = (byte) ch;
+
+            if(i < len && ch != '\n')
+                ch = read(time);
+            else
+                break;
+        }
+
+        return i;
+    }
+
+    /**
 	 * @see java.io.InputStream#read()
 	 */
 	public int read() throws IOException {
-		while (true) {
-			KeyboardEvent event = (KeyboardEvent) queue.get();
-			if (!event.isConsumed()) {
-				event.consume();
-				char ch = event.getKeyChar();
-				if (ch != 0) {
-					if (echo) {
-						System.out.print(ch);
-					}
-					return ch;
-				}
-			}
-		}
+        long time = System.currentTimeMillis();
+        return read(time);
 	}
 
-	/**
+    private int read(long time){
+       while (true) {
+			KeyboardEvent event = queue.get();
+            int c = event2char(event, time);
+            if(c > 0)
+                return c;
+        }
+    }
+
+    private int event2char(KeyboardEvent event, long time) {
+        if (!event.isConsumed() && event.getTime() - time > -10000) {
+            event.consume();
+            char ch = event.getKeyChar();
+            if (ch != 0) {
+                if (echo) {
+                    System.out.print(ch);
+                }
+                return ch;
+            }
+        }
+        return -1;
+    }
+
+    /**
 	 * @see org.jnode.driver.input.KeyboardListener#keyPressed(org.jnode.driver.input.KeyboardEvent)
 	 */
 	public void keyPressed(KeyboardEvent event) {
-		//log.debug("got event(" + event + ")");
 		queue.add(event);
 	}
 
