@@ -29,7 +29,7 @@ import org.jnode.driver.DeviceManager;
 import org.jnode.driver.net.NetDeviceAPI;
 import org.jnode.naming.InitialNaming;
 import org.jnode.net.ethernet.EthernetConstants;
-import org.jnode.shell.help.argument.HostArgument;
+import org.jnode.net.help.argument.HostArgument;
 import org.jnode.net.ipv4.IPv4Address;
 import org.jnode.net.ipv4.config.IPv4ConfigurationService;
 import org.jnode.shell.Command;
