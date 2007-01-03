@@ -25,7 +25,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Collection;
 
-import org.jnode.net.help.argument.HostArgument;
+import org.jnode.shell.help.argument.HostArgument;
 import org.jnode.net.ipv4.IPv4Address;
 import org.jnode.net.ipv4.util.ResolverImpl;
 import org.jnode.shell.Command;

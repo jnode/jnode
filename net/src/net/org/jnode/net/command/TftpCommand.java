@@ -24,7 +24,7 @@ package org.jnode.net.command;
 import java.io.InputStream;
 import java.io.PrintStream;
 
-import org.jnode.net.help.argument.HostArgument;
+import org.jnode.shell.help.argument.HostArgument;
 import org.jnode.net.ipv4.tftp.TFTPClient;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
