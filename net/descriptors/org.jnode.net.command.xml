@@ -18,6 +18,7 @@
     <runtime>
         <library name="jnode-net.jar">
             <export name="org.jnode.net.command.*"/>
+            <export name="org.jnode.net.help.argument.*"/>
         </library>
     </runtime>
 
