@@ -57,7 +57,9 @@ public final class ClassDecoder {
     // VM ClassLoader Code
     // ------------------------------------------
 
-    private static char[] SourceFile;
+    private static char[] SourceFileAttrName;
+
+    private static char[] SignatureAttrName;
 
     private static char[] CodeAttrName;
 
@@ -194,7 +196,8 @@ public final class ClassDecoder {
         if (ConstantValueAttrName == null) {
             ConstantValueAttrName = "ConstantValue".toCharArray();
             CodeAttrName = "Code".toCharArray();
-            SourceFile = "SourceFile".toCharArray();
+            SourceFileAttrName = "SourceFile".toCharArray();
+            SignatureAttrName = "Signature".toCharArray();
             ExceptionsAttrName = "Exceptions".toCharArray();
             LineNrTableAttrName = "LineNumberTable".toCharArray();
             LocalVariableTableAttrName = "LocalVariableTable".toCharArray();
@@ -412,6 +415,7 @@ public final class ClassDecoder {
         VmAnnotation[] rVisAnn = null;
         VmAnnotation[] rInvisAnn = null;
         String sourceFile = null;
+        String signature = null;
         for (int a = 0; a < acount; a++) {
             final String attrName = cp.getUTF8(data.getChar());
             final int length = data.getInt();
@@ -420,14 +424,17 @@ public final class ClassDecoder {
             } else if (VmArray.equals(RuntimeInvisibleAnnotationsAttrName,
                     attrName)) {
                 rInvisAnn = readRuntimeAnnotations(data, cp, false);
-            } else if (VmArray.equals(SourceFile, attrName)) {
+            } else if (VmArray.equals(SourceFileAttrName, attrName)) {
                 sourceFile = cp.getUTF8(data.getChar());
+            } else if (VmArray.equals(SignatureAttrName, attrName)) {
+                signature = cp.getUTF8(data.getChar());
             } else {
                 skip(data, length);
             }
         }
         cls.setRuntimeAnnotations(rVisAnn);
         cls.setSourceFile(sourceFile);
+        cls.setSignature(signature);
         if (rInvisAnn != null) {
             cls.addPragmaFlags(getClassPragmaFlags(rInvisAnn, clsName));
         }
