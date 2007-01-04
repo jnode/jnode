@@ -51,6 +51,9 @@ public class WorkPlugin extends Plugin implements WorkManager {
     /** Queue processor threads */
     private final List<QueueProcessorThread<Work>> threads;
 
+    /** Number of workers started initially. */
+    private final int workerCount = 2; //8
+
     /** Counter used for worker thread names */
     private int counter = 1;
     
@@ -62,7 +65,7 @@ public class WorkPlugin extends Plugin implements WorkManager {
     
     /** Number of work items ended */
     private int workEndCounter;
-    
+
     /**
      * @param descriptor
      */
@@ -75,8 +78,7 @@ public class WorkPlugin extends Plugin implements WorkManager {
      * @see org.jnode.plugin.Plugin#startPlugin()
      */
     protected final void startPlugin() throws PluginException {
-        final int n = 8;
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < workerCount; i++) {
             addWorker();
         }
         try {
