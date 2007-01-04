@@ -22,6 +22,7 @@
 package java.lang;
 
 import gnu.java.lang.VMClassHelper;
+import gnu.java.lang.reflect.ClassSignatureParser;
 
 import java.io.InputStream;
 import java.io.Serializable;
@@ -41,6 +42,8 @@ import java.security.AllPermission;
 import java.security.Permissions;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Arrays;
 
 import org.jnode.security.JNodePermission;
 import org.jnode.vm.SoftByteCodes;
@@ -224,7 +227,12 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type,
      * @return Class
      */
     public final Class< ? super T> getSuperclass() {
-        VmType< ? super T> superCls = getLinkedVmClass().getSuperClass();
+        VmType<T> vmType = getLinkedVmClass();
+        
+        if(vmType.isPrimitive() || vmType.isInterface())
+            return null;
+
+        VmType< ? super T> superCls = vmType.getSuperClass();
         if (superCls != null) {
             return superCls.asClass();
         } else {
@@ -490,6 +498,50 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type,
         return null;
     }
 
+    private static final class MethodKey
+  {
+    private String name;
+    private Class[] params;
+    private Class returnType;
+    private int hash;
+
+    MethodKey(Method m)
+    {
+      name = m.getName();
+      params = m.getParameterTypes();
+      returnType = m.getReturnType();
+      hash = name.hashCode() ^ returnType.hashCode();
+      for(int i = 0; i < params.length; i++)
+	{
+	  hash ^= params[i].hashCode();
+	}
+    }
+
+    public boolean equals(Object o)
+    {
+      if (o instanceof MethodKey)
+	{
+	  MethodKey m = (MethodKey) o;
+	  if (m.name.equals(name) && m.params.length == params.length
+              && m.returnType == returnType)
+	    {
+	      for (int i = 0; i < params.length; i++)
+		{
+		  if (m.params[i] != params[i])
+		    return false;
+		}
+	      return true;
+	    }
+	}
+      return false;
+    }
+
+    public int hashCode()
+    {
+      return hash;
+    }
+  }
+
     /**
      * Gets the method with the given name and argument types declared in this
      * class or any of its super-classes.
@@ -525,6 +577,19 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type,
      * 
      * @return Method[]
      */
+
+    public Method[] getMethods() {
+        if (methods == null) {
+            Method[] a = internalGetMethods();
+            ArrayList<Method> list = new ArrayList<Method>();            
+            for(int i = 0; i < a.length; i++){
+                list.add(a[i]);
+            }
+            methods = list;
+        }
+        return methods.toArray(new Method[methods.size()]);
+    }
+    /*
     public Method[] getMethods() {
         if (methods == null) {
             final ArrayList<Method> list = new ArrayList<Method>();
@@ -539,7 +604,40 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type,
             methods = list;
         }
         return (Method[]) methods.toArray(new Method[methods.size()]);
-    }
+    }*/
+
+    /**
+       * Like <code>getMethods()</code> but without the security checks.
+       */
+      private Method[] internalGetMethods()
+      {
+        HashMap map = new HashMap();
+        Method[] methods;
+        Class[] interfaces = getInterfaces();
+        for(int i = 0; i < interfaces.length; i++)
+          {
+        methods = interfaces[i].internalGetMethods();
+        for(int j = 0; j < methods.length; j++)
+          {
+            map.put(new MethodKey(methods[j]), methods[j]);
+          }
+          }
+        Class superClass = getSuperclass();
+        if(superClass != null)
+          {
+        methods = superClass.internalGetMethods();
+        for(int i = 0; i < methods.length; i++)
+          {
+            map.put(new MethodKey(methods[i]), methods[i]);
+          }
+          }
+        methods = getDeclaredMethods(true);
+        for(int i = 0; i < methods.length; i++)
+          {
+        map.put(new MethodKey(methods[i]), methods[i]);
+          }
+        return (Method[])map.values().toArray(new Method[map.size()]);
+      }
 
     /**
      * Gets the method with the given name and argument types declared in this
@@ -579,25 +677,37 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type,
      */
     public Method[] getDeclaredMethods() {
         if (declaredMethods == null) {
-            final VmType<T> vmClass = getLinkedVmClass();
-            final int cnt = vmClass.getNoDeclaredMethods();
-            int max = 0;
-            for (int i = 0; i < cnt; i++) {
-                if (!vmClass.getDeclaredMethod(i).isConstructor()) {
-                    max++;
-                }
-            }
-            final Method[] list = new Method[max];
-            max = 0;
-            for (int i = 0; i < cnt; i++) {
-                VmMethod vmMethod = vmClass.getDeclaredMethod(i);
-                if (!vmMethod.isConstructor()) {
-                    list[max++] = (Method) vmMethod.asMember();
-                }
-            }
-            declaredMethods = list;
+            declaredMethods = getDeclaredMethods(false);
         }
         return declaredMethods;
+    }
+
+    /**
+     * Gets all methods declared in this class.
+     *
+     * @return Method[]
+     */
+    private Method[] getDeclaredMethods(boolean publicOnly) {
+        final VmType<T> vmClass = getLinkedVmClass();
+        final int cnt = vmClass.getNoDeclaredMethods();
+        int max = 0;
+        for (int i = 0; i < cnt; i++) {
+            VmMethod method = vmClass.getDeclaredMethod(i);
+            if (!method.isConstructor() &&
+                    (!publicOnly || method.isPublic())) {
+                max++;
+            }
+        }
+        final Method[] list = new Method[max];
+        max = 0;
+        for (int i = 0; i < cnt; i++) {
+            VmMethod vmMethod = vmClass.getDeclaredMethod(i);
+            if (!vmMethod.isConstructor() &&
+                    (!publicOnly || vmMethod.isPublic())) {
+                list[max++] = (Method) vmMethod.asMember();
+            }
+        }
+        return list;
     }
 
     /**
@@ -952,7 +1062,12 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type,
      * @see java.lang.reflect.GenericDeclaration#getTypeParameters()
      */
     public TypeVariable< ? >[] getTypeParameters() {
-        return new TypeVariable[0];
+        String sig = vmClass.getSignature();
+        if (sig == null)
+          return new TypeVariable[0];
+
+        ClassSignatureParser p = new ClassSignatureParser(this, sig);
+        return p.getTypeParameters();
     }
 
     /**
