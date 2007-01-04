@@ -274,6 +274,9 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
                 bcv.endBasicBlock();
             }
             bcv.endMethod();
+
+            //remove the compiler data to save memory, will be regenerated if needed
+            bc.setCompilerData(null);
         }
 
         return cm;
