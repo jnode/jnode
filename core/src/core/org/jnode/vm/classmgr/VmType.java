@@ -76,6 +76,9 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     /** The the source file name of this class */
     private String sourceFile;
 
+    /** The the source file name of this class */
+    private String signature;
+
     /** All methods and constructors declared in this class */
     private VmMethod[] methodTable;
 
@@ -2321,6 +2324,14 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     public void setSourceFile(String sourceFile) {
         this.sourceFile = sourceFile;
+    }
+
+    public String getSignature() {
+        return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
     }
 
     /**
