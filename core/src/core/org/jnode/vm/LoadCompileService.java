@@ -40,6 +40,8 @@ public final class LoadCompileService {
 
     private static boolean started = false;
 
+    private static final int threadCount = 2; //4
+
     /**
      * Default ctor
      * 
@@ -101,7 +103,7 @@ public final class LoadCompileService {
         initService();
         if (!started) {
             started = true;
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < threadCount; i++) {
                 LoadCompileThread thread = new LoadCompileThread(service,
                         "LoadCompile-" + i);
                 thread.start();
