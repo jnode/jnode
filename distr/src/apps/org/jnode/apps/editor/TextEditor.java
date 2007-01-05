@@ -174,7 +174,7 @@ public class TextEditor implements KeyboardListener {
                 case KeyEvent.VK_RIGHT: {if(fx < mx()) fx ++; break;}
                 case KeyEvent.VK_HOME: {cx = fx = cy = fy = 0; break;}
                 case KeyEvent.VK_END: { if(my() < cym) cy = my(); else {cy = cym; fy = my() - cy;} end(); break;}
-                case KeyEvent.VK_Y: { if(oy() >= 0 && oy() <= my()) {ls.remove(oy()); if(cy > 0) cy --; else if(fy > 0) fy --;} break;}
+                case KeyEvent.VK_Y: { if(oy() >= 0 && oy() <= my()) {ls.remove(oy()); if(cy > 0 && oy() == my() + 1) cy --; else if(fy > 0) fy --;} break;}
                 case KeyEvent.VK_S: { saveFile(); break;}
                 case KeyEvent.VK_Q: { console.getManager().unregisterConsole(console); break;}
 
