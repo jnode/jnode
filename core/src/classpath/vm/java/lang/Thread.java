@@ -262,6 +262,56 @@ public class Thread implements Runnable {
         InheritableThreadLocal.newChildThread(this); // FDy : CLASSPATH patch ?
     }
 
+      /**
+   * Allocate a new Thread object, as if by
+   * <code>Thread(group, null, name)</code>, and give it the specified stack
+   * size, in bytes. The stack size is <b>highly platform independent</b>,
+   * and the virtual machine is free to round up or down, or ignore it
+   * completely.  A higher value might let you go longer before a
+   * <code>StackOverflowError</code>, while a lower value might let you go
+   * longer before an <code>OutOfMemoryError</code>.  Or, it may do absolutely
+   * nothing! So be careful, and expect to need to tune this value if your
+   * virtual machine even supports it.
+   *
+   * @param group the group to put the Thread into
+   * @param target the Runnable object to execute
+   * @param name the name for the Thread
+   * @param size the stack size, in bytes; 0 to be ignored
+   * @throws NullPointerException if name is null
+   * @throws SecurityException if this thread cannot access <code>group</code>
+   * @throws IllegalThreadStateException if group is destroyed
+   * @since 1.4
+   */
+  public Thread(ThreadGroup group, Runnable target, String name, long size)
+  {
+     Thread current = currentThread();
+
+        if (group != null) {
+            group.checkAccess();
+        } else {
+            group = current.getThreadGroup();
+        }
+
+        if (group == null) {
+            throw new InternalError("Live thread has invalid group: " + name);
+        }
+
+        group.addThread(this);
+
+        this.group = group;
+        this.target = target;
+        this.name = name;
+        this.parent = current;
+
+        this.daemon = current.isDaemon();
+
+        this.vmThread = VmProcessor.current().createThread(this);
+        this.vmThread.setPriority(current.getPriority());
+        this.vmThread.updateName();
+
+        InheritableThreadLocal.newChildThread(this); // FDy : CLASSPATH patch ?
+  }
+
     /**
      * Create a new instance with a given group as containing group, a runnable
      * as thread runner and a given name.
