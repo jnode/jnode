@@ -1,4 +1,4 @@
-/* CompressionMethod.java -- The CompressionMethod enum.
+/* DelegatedTask.java -- 
    Copyright (C) 2006  Free Software Foundation, Inc.
 
 This file is a part of GNU Classpath.
@@ -33,37 +33,61 @@ module.  An independent module is a module which is not derived from
 or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
-exception statement from your version.  */
+exception statement from your version. */
 
 
 package gnu.javax.net.ssl.provider;
 
-public enum CompressionMethod
+import gnu.classpath.debug.Component;
+import gnu.classpath.debug.SystemLogger;
+
+/**
+ * @author Casey Marshall (csm@gnu.org)
+ */
+public abstract class DelegatedTask implements Runnable
 {
-  NULL (0), ZLIB(1);
-
-  private final int value;
-
-  private CompressionMethod(int value)
+  private static final SystemLogger logger = SystemLogger.SYSTEM;
+  private boolean hasRun;
+  protected Throwable thrown;
+  
+  protected DelegatedTask()
   {
-    this.value = value;
+    hasRun = false;
   }
-
-  public static CompressionMethod getInstance (final int value)
+  
+  public final void run()
   {
-    switch (value & 0xFF)
+    if (hasRun)
+      throw new IllegalStateException("task already ran");
+    try
       {
-      case 0: return NULL;
-      case 1: return ZLIB;
-
-      // Note: we can't throw an exception here, because we get these values
-      // over the wire, and need to just ignore ones we don't recognize.
-      default: return null; 
+        if (Debug.DEBUG)
+          logger.logv(Component.SSL_DELEGATED_TASK,
+                      "running delegated task {0} in {1}", this,
+                      Thread.currentThread());
+        implRun();
+      }
+    catch (Throwable t)
+      {
+        if (Debug.DEBUG)
+          logger.log(Component.SSL_DELEGATED_TASK, "task threw exception", t);
+        thrown = t;
+      }
+    finally
+      {
+        hasRun = true;
       }
   }
 
-  public int getValue()
+  public final boolean hasRun() 
   {
-    return value;
+    return hasRun;
   }
+  
+  public final Throwable thrown()
+  {
+    return thrown;
+  }
+  
+  protected abstract void implRun() throws Throwable;
 }

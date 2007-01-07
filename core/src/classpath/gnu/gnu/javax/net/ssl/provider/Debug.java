@@ -1,4 +1,4 @@
-/* CompressionMethod.java -- The CompressionMethod enum.
+/* Debug.java -- Jessie debug constants.
    Copyright (C) 2006  Free Software Foundation, Inc.
 
 This file is a part of GNU Classpath.
@@ -33,37 +33,34 @@ module.  An independent module is a module which is not derived from
 or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
-exception statement from your version.  */
+exception statement from your version. */
 
 
 package gnu.javax.net.ssl.provider;
 
-public enum CompressionMethod
+/**
+ * Debug constants for Jessie.
+ * 
+ * @author Casey Marshall (csm@gnu.org)
+ */
+public final class Debug
 {
-  NULL (0), ZLIB(1);
-
-  private final int value;
-
-  private CompressionMethod(int value)
-  {
-    this.value = value;
-  }
-
-  public static CompressionMethod getInstance (final int value)
-  {
-    switch (value & 0xFF)
-      {
-      case 0: return NULL;
-      case 1: return ZLIB;
-
-      // Note: we can't throw an exception here, because we get these values
-      // over the wire, and need to just ignore ones we don't recognize.
-      default: return null; 
-      }
-  }
-
-  public int getValue()
-  {
-    return value;
-  }
+  /**
+   * Set to true to dump out traces of SSL connections to the system
+   * logger.
+   */
+  public static final boolean DEBUG = true;
+  
+  /**
+   * Set to true to dump out info about the SSL key exchange. Since this
+   * MAY contain sensitive data, it is a separate value.
+   */
+  public static final boolean DEBUG_KEY_EXCHANGE = true;
+  
+  /**
+   * Set to true to turn on dumping of decrypted packets. Since this will
+   * log potentially-sensitive information (i.e., decrypted messages), only
+   * enable this in debug scenarios.
+   */
+  public static final boolean DEBUG_DECRYPTION = false;
 }

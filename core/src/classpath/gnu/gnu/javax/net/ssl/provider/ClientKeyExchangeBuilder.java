@@ -1,4 +1,4 @@
-/* CompressionMethod.java -- The CompressionMethod enum.
+/* ClientKeyExchangeBuilder.java -- 
    Copyright (C) 2006  Free Software Foundation, Inc.
 
 This file is a part of GNU Classpath.
@@ -33,37 +33,43 @@ module.  An independent module is a module which is not derived from
 or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
-exception statement from your version.  */
+exception statement from your version. */
 
 
 package gnu.javax.net.ssl.provider;
 
-public enum CompressionMethod
+import java.nio.ByteBuffer;
+
+/**
+ * Builder for {@link ClientKeyExchange} objects.
+ * 
+ * @author Casey Marshall (csm@gnu.org)
+ */
+public class ClientKeyExchangeBuilder extends ClientKeyExchange
+  implements Builder
 {
-  NULL (0), ZLIB(1);
-
-  private final int value;
-
-  private CompressionMethod(int value)
+  public ClientKeyExchangeBuilder(CipherSuite suite, ProtocolVersion version)
   {
-    this.value = value;
+    super(ByteBuffer.allocate(512), suite, version);
   }
 
-  public static CompressionMethod getInstance (final int value)
+  /* (non-Javadoc)
+   * @see gnu.javax.net.ssl.provider.Builder#buffer()
+   */
+  public ByteBuffer buffer()
   {
-    switch (value & 0xFF)
-      {
-      case 0: return NULL;
-      case 1: return ZLIB;
-
-      // Note: we can't throw an exception here, because we get these values
-      // over the wire, and need to just ignore ones we don't recognize.
-      default: return null; 
-      }
+    return ((ByteBuffer) buffer.duplicate().position(0).limit(length())).slice();
   }
-
-  public int getValue()
+  
+  public void setExchangeKeys(ByteBuffer exchangeKeys)
   {
-    return value;
+    // For SSLv3 and RSA key exchange, the message is sent without length.
+    // So we use the precise capacity of the buffer to signal the size of 
+    // the message.
+    if (buffer.capacity() < exchangeKeys.remaining()
+        || (suite.keyExchangeAlgorithm() == KeyExchangeAlgorithm.RSA
+            && version == ProtocolVersion.SSL_3))
+      buffer = ByteBuffer.allocate(exchangeKeys.remaining());
+    ((ByteBuffer) buffer.duplicate().position(0)).put(exchangeKeys);
   }
 }
