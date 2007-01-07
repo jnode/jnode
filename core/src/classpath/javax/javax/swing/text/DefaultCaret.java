@@ -946,7 +946,7 @@ public class DefaultCaret extends Rectangle
    *
    * @return all registered event listeners of the specified type
    */
-  public EventListener[] getListeners(Class listenerType)
+  public <T extends EventListener> T[] getListeners(Class<T> listenerType)
   {
     return listenerList.getListeners(listenerType);
   }

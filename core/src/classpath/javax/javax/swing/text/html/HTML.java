@@ -1129,8 +1129,8 @@ public class HTML
   static final int BLOCK = 2;
   static final int PREFORMATTED = 4;
   static final int SYNTHETIC = 8;
-  private static Map tagMap;
-  private static Map attrMap;
+  private static Map<String,Tag> tagMap;
+  private static Map<String,Attribute> attrMap;
 
   /**
    * The public constructor (does nothing). It it seldom required to have
@@ -1169,7 +1169,7 @@ public class HTML
     if (attrMap == null)
       {
         // Create the map on demand.
-        attrMap = new TreeMap();
+        attrMap = new TreeMap<String,Attribute>();
 
         Attribute[] attrs = getAllAttributeKeys();
 
@@ -1179,7 +1179,7 @@ public class HTML
           }
       }
 
-    return (Attribute) attrMap.get(attName.toLowerCase());
+    return attrMap.get(attName.toLowerCase());
   }
 
   /**
@@ -1238,7 +1238,7 @@ public class HTML
     if (tagMap == null)
       {
         // Create the mao on demand.
-        tagMap = new TreeMap();
+        tagMap = new TreeMap<String,Tag>();
 
         Tag[] tags = getAllTags();
 
@@ -1248,6 +1248,6 @@ public class HTML
           }
       }
 
-    return (Tag) tagMap.get(tagName.toLowerCase());
+    return tagMap.get(tagName.toLowerCase());
   }
 }

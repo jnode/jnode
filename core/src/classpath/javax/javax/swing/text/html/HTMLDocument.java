@@ -649,12 +649,12 @@ public class HTMLDocument extends DefaultStyledDocument
      */
     protected MutableAttributeSet charAttr = new SimpleAttributeSet();
     
-    protected Vector parseBuffer = new Vector();
+    protected Vector<ElementSpec> parseBuffer = new Vector<ElementSpec>();   
     
     /** 
      * The parse stack. It holds the current element tree path.
      */
-    private Stack parseStack = new Stack();
+    private Stack<HTML.Tag> parseStack = new Stack<HTML.Tag>();
     
     /**
      * A stack for character attribute sets *
@@ -1791,7 +1791,7 @@ public class HTMLDocument extends DefaultStyledDocument
       boolean inParagraph = false;
       if (! parseStack.isEmpty())
         {
-          HTML.Tag top = (HTML.Tag) parseStack.peek();
+          HTML.Tag top = parseStack.peek();
           inParagraph = top == HTML.Tag.P || top == HTML.Tag.IMPLIED;
         }
       return inParagraph;
@@ -1802,7 +1802,7 @@ public class HTMLDocument extends DefaultStyledDocument
       boolean inParagraph = false;
       if (! parseStack.isEmpty())
         {
-          HTML.Tag top = (HTML.Tag) parseStack.peek();
+          HTML.Tag top = parseStack.peek();
           inParagraph = top == HTML.Tag.IMPLIED;
         }
       return inParagraph;

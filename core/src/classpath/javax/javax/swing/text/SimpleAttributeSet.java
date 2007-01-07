@@ -261,7 +261,7 @@ public class SimpleAttributeSet
    * 
    * @return An enumeration of the attribute names.
    */
-  public Enumeration getAttributeNames()
+  public Enumeration<?> getAttributeNames()
   {
     return tab.keys();
   }
@@ -375,7 +375,7 @@ public class SimpleAttributeSet
    * @throws NullPointerException if <code>names</code> is <code>null</code> 
    *         or contains any <code>null</code> values.
    */
-  public void removeAttributes(Enumeration names)
+  public void removeAttributes(Enumeration<?> names)
   {
     while (names.hasMoreElements())
       {

@@ -121,7 +121,7 @@ public class StyleContext
       listenerList.remove(ChangeListener.class, l);
     }
       
-    public EventListener[] getListeners(Class listenerType)
+    public <T extends EventListener> T[] getListeners(Class<T> listenerType)
     {
       return listenerList.getListeners(listenerType);
     }
@@ -183,7 +183,7 @@ public class StyleContext
       return attributes.getAttributeCount();
     }
 
-    public Enumeration getAttributeNames()
+    public Enumeration<?> getAttributeNames()
     {
       return attributes.getAttributeNames();
     }
@@ -210,7 +210,7 @@ public class StyleContext
       fireStateChanged();
     }
 
-    public void removeAttributes(Enumeration names)
+    public void removeAttributes(Enumeration<?> names)
     {
       attributes = StyleContext.this.removeAttributes(attributes, names);
       fireStateChanged();
@@ -351,7 +351,7 @@ public class StyleContext
       return attrs.length / 2;
     }
 
-    public Enumeration getAttributeNames()
+    public Enumeration<?> getAttributeNames()
     {      
       return new Enumeration() 
         {
@@ -539,7 +539,7 @@ public class StyleContext
    * Get the names of the style. The returned enumeration always
    * contains at least one member, the default style.
    */
-  public Enumeration getStyleNames()
+  public Enumeration<?> getStyleNames()
   {
     return styles.getAttributeNames();
   }
@@ -749,7 +749,7 @@ public class StyleContext
   }
 
   public synchronized AttributeSet removeAttributes(AttributeSet old,
-                                                    Enumeration names)
+						    Enumeration<?> names)
       {
     AttributeSet ret;
     if (old.getAttributeCount() <= getCompressionThreshold())
