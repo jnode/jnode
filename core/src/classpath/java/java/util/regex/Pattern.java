@@ -246,7 +246,7 @@ public final class Pattern implements Serializable
       {
 	String t = input.subSequence(start, input.length()).toString();
 	if ("".equals(t) && limit == 0)
-	  ; // Don't add.
+	  { /* Don't add. */ }
 	else
 	  list.add(t);
       }

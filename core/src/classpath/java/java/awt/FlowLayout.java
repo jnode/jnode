@@ -337,6 +337,9 @@ public class FlowLayout implements LayoutManager, Serializable
 
 	Insets ins = parent.getInsets ();
 
+        if (num == 0)
+          w += 2 * hgap + ins.left + ins.right;
+        else
 	w += (num + 1) * hgap + ins.left + ins.right;
 	h += 2 * vgap + ins.top + ins.bottom;
 
