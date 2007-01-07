@@ -61,6 +61,9 @@
       <export name="java.rmi.dgc.*"/>
       <export name="java.rmi.registry.*"/>
       <export name="java.rmi.server.*"/>
+      <export name="java.util.concurrent.*"/>
+      <export name="java.util.concurrent.atomic.*"/>
+      <export name="java.util.concurrent.locks.*"/>
 
       <export name="javax.accessibility.*"/>
       <export name="javax.management.*"/>  
@@ -72,6 +75,11 @@
 
       <export name="javax.sound.sampled.*"/>
       <export name="javax.sound.sampled.spi.*"/>
+
+      <export name="sun.misc.*"/>
+      <export name="sun.reflect.*"/>
+      <export name="sun.reflect.annotation.*"/>        
+      <export name="sun.reflect.misc.*"/>
     </library>
   </runtime>
   
