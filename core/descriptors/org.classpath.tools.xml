@@ -12,7 +12,6 @@
 
   <runtime>
     <library name="jnode-core.jar">
-
       <export name="gnu.classpath.tools.*"/>
       <export name="gnu.classpath.tools.appletviewer.*"/>
       <export name="gnu.classpath.tools.common.*"/>
@@ -24,10 +23,20 @@
       <export name="gnu.classpath.tools.orbd.*"/>
       <export name="gnu.classpath.tools.rmid.*"/>
       <export name="gnu.classpath.tools.rmiregistry.*"/>
-      <!--export name="gnu.classpath.tools.rmic.*"/-->
+      <export name="gnu.classpath.tools.rmic.*"/>
       <export name="gnu.classpath.tools.serialver.*"/>
       <export name="gnu.classpath.tools.tnameserv.*"/>
 
+      <export name="org.objectweb.asm.*"/>
+      <export name="org.objectweb.asm.attrs.*"/>
+      <export name="org.objectweb.asm.commons.*"/>
+      <export name="org.objectweb.asm.optimizer.*"/>
+      <export name="org.objectweb.asm.signature.*"/>
+      <export name="org.objectweb.asm.tree.*"/>
+      <export name="org.objectweb.asm.tree.analysis.*"/>
+      <export name="org.objectweb.asm.util.*"/>
+      <export name="org.objectweb.asm.util.attrs.*"/>
+      <export name="org.objectweb.asm.xml.*"/>
     </library>
   </runtime>
 
@@ -38,7 +47,7 @@
     <alias name="keytool" class="gnu.classpath.tools.keytool.Main"/>
     <alias name="native2ascii" class="gnu.classpath.tools.native2ascii.Native2ASCII"/>
     <alias name="orbd" class="gnu.classpath.tools.orbd.Main"/>
-    <!--alias name="rmic" class="gnu.classpath.tools.rmi.RMIC"/-->
+    <alias name="rmic" class="gnu.classpath.tools.rmic.Main"/>
     <alias name="rmid" class="gnu.classpath.tools.rmid.Main"/>
     <alias name="rmiregistry" class="gnu.classpath.tools.rmiregistry.Main"/>
     <alias name="serialver" class="gnu.classpath.tools.serialver.SerialVer"/>
