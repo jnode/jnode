@@ -180,6 +180,5 @@ public class Native2ASCII
   public static void main(String[] args)
   {
     new Native2ASCII().run(args);
-    String encoding = System.getProperty("file.encoding"); //$NON-NLS-1$
   }
 }

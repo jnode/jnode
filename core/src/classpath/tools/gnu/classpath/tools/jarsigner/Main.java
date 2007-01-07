@@ -123,7 +123,7 @@ public class Main
   private CallbackHandler handler;
   /** The command line parser. */
   private ToolParser cmdLineParser;
-  protected ArrayList fileAndAlias = new ArrayList();;
+  protected ArrayList fileAndAlias = new ArrayList();
 
   private Main()
   {
