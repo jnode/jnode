@@ -41,6 +41,7 @@ import gnu.classpath.SystemProperties;
 
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
+import java.lang.management.MemoryType;
 
 import javax.management.NotCompliantMBeanException;
 
@@ -133,9 +134,9 @@ public final class MemoryPoolMXBeanImpl
       return null;
   }
 
-  public String getType()
+  public MemoryType getType()
   {
-    return VMMemoryPoolMXBeanImpl.getType(name);
+    return null;
   }
 
   public MemoryUsage getUsage()

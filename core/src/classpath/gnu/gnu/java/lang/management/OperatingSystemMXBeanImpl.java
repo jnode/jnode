@@ -86,5 +86,10 @@ public final class OperatingSystemMXBeanImpl
   {
     return System.getProperty("os.version");
   }
-  
+
+
+  public double getSystemLoadAverage() {
+    //todo implement
+    throw new UnsupportedOperationException(); 
+  }
 }

@@ -50,11 +50,11 @@ import java.net.URL;
 import java.security.cert.Certificate;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import javax.net.ssl.HandshakeCompletedEvent;
 import javax.net.ssl.HandshakeCompletedListener;
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSocketFactory;
@@ -75,7 +75,7 @@ public class HTTPURLConnection
 
   // These are package private for use in anonymous inner classes.
   String proxyHostname;
-  int proxyPort;
+  int proxyPort = -1;
   String agent;
   boolean keepAlive;
 
@@ -99,18 +99,21 @@ public class HTTPURLConnection
   {
     super(url);
     requestHeaders = new Headers();
-    proxyHostname = SystemProperties.getProperty("http.proxyHost");
-      if (proxyHostname != null && proxyHostname.length() > 0)
+    String proxy = SystemProperties.getProperty("http.proxyHost");
+    if (proxy != null && proxy.length() > 0)
         {
         String port = SystemProperties.getProperty("http.proxyPort");
           if (port != null && port.length() > 0)
             {
+            try
+              {
               proxyPort = Integer.parseInt(port);
+                proxyHostname = proxy;
             }
-          else
+            catch (NumberFormatException _)
             {
-              proxyHostname = null;
-              proxyPort = -1;
+                // Ignore.
+              }
             }
         }
     agent = SystemProperties.getProperty("http.agent");
@@ -149,6 +152,14 @@ public class HTTPURLConnection
     final Credentials creds = (username == null) ? null :
       new Credentials (username, password);
     
+    if ("POST".equals(method))
+      {
+        String contentType = requestHeaders.getValue("Content-Type");
+        if (null == contentType)
+          requestHeaders.addValue("Content-Type",
+                                  "application/x-www-form-urlencoded");
+      }
+
     boolean retry;
     do
       {
@@ -159,7 +170,8 @@ public class HTTPURLConnection
             if (secure)
               {
                 SSLSocketFactory factory = getSSLSocketFactory();
-                HostnameVerifier verifier = getHostnameVerifier();
+                // FIXME: use the verifier
+                // HostnameVerifier verifier = getHostnameVerifier();
                 if (factory != null)
                   {
                     connection.setSSLSocketFactory(factory);
@@ -414,12 +426,12 @@ public class HTTPURLConnection
     return requestHeaders.getValue(key);
   }
 
-  public Map getRequestProperties()
+  public Map<String, List<String>> getRequestProperties()
   {
     if (connected)
       throw new IllegalStateException("Already connected");
     
-    Map m = requestHeaders.getAsMap();
+    Map<String, List<String>> m = requestHeaders.getAsMap();
     return Collections.unmodifiableMap(m);
   }
 
@@ -495,7 +507,7 @@ public class HTTPURLConnection
     return errorSink;
   }
 
-  public Map getHeaderFields()
+  public Map<String,List<String>> getHeaderFields()
   {
     if (!connected)
       {
@@ -508,7 +520,7 @@ public class HTTPURLConnection
             return null;
           }
       }
-    Map m = response.getHeaders().getAsMap();
+    Map<String,List<String>> m = response.getHeaders().getAsMap();
     m.put(null, Collections.singletonList(getStatusLine(response)));
     return Collections.unmodifiableMap(m);
   }
@@ -654,13 +666,13 @@ public class HTTPURLConnection
   }
 
   /**
-   * Set the connection timeout speed, in milliseconds, or zero if the timeout
+   * Set the read timeout, in milliseconds, or zero if the timeout
    * is to be considered infinite.
    *
    * Overloaded.
    *
    */
-  public void setConnectTimeout(int timeout)
+  public void setReadTimeout(int timeout)
     throws IllegalArgumentException
   {
     super.setConnectTimeout( timeout );
@@ -668,9 +680,9 @@ public class HTTPURLConnection
       return;
     try 
       {
-	connection.getSocket().setSoTimeout( timeout );
+	connection.getSocket().setSoTimeout(timeout);
       } 
-    catch(IOException se)
+    catch (IOException se)
       {
 	// Ignore socket exceptions.
       }
