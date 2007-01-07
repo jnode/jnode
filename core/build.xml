@@ -91,6 +91,7 @@
       <fileset dir="${my-src.dir}/classpath/gnu" includes="**/*.properties"/>
       <fileset dir="${my-src.dir}/classpath/java" includes="**/*.properties"/>
       <fileset dir="${my-src.dir}/classpath/vm" includes="**/*.security"/>
+      <fileset dir="${my-src.dir}/classpath/tools" includes="**/*.jav"/>
     </copy>
     <ExpandTest classname="PrimitiveIntTest" type="int"/>
     <ExpandTest classname="PrimitiveLongTest" type="long"/>
