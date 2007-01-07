@@ -82,14 +82,14 @@ public final class OperatingSystemMXBeanImpl
     return System.getProperty("os.name");
   }
 
+  public double getSystemLoadAverage()
+  {
+    return VMOperatingSystemMXBeanImpl.getSystemLoadAverage();
+  }
+
   public String getVersion()
   {
     return System.getProperty("os.version");
   }
 
-
-  public double getSystemLoadAverage() {
-    //todo implement
-    throw new UnsupportedOperationException(); 
-  }
 }

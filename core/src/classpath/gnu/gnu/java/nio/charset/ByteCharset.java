@@ -115,8 +115,8 @@ abstract class ByteCharset extends Charset
             return CoderResult.OVERFLOW;
           }
 	
-	if((c = lookup[(int) (b & 0xFF)]) == NONE);
-	//	  return CoderResult.unmappableForLength (1);		
+	if((c = lookup[(int) (b & 0xFF)]) == NONE)
+          return CoderResult.unmappableForLength (1);
         out.put (c);
       }
 
@@ -154,6 +154,22 @@ abstract class ByteCharset extends Charset
 		lookup[c] = (byte)i;
 	      }
 	  }
+    }
+
+    public boolean canEncode(char c)
+    {
+      byte b = (c < lookup.length) ? lookup[c] : 0;
+      return b != 0 || c == 0;
+    }
+
+    public boolean canEncode(CharSequence cs)
+    {
+      for (int i = 0; i < cs.length(); ++i)
+        {
+          if (! canEncode(cs.charAt(i)))
+            return false;
+        }
+      return true;
     }
 
     protected CoderResult encodeLoop (CharBuffer in, ByteBuffer out)

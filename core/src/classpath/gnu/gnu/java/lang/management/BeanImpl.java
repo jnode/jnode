@@ -201,32 +201,36 @@ public class BeanImpl
       return ((Enum) value).name();
     Class vClass = value.getClass();
     if (vClass.isArray())
-      return value;
+      vClass = vClass.getComponentType();
     String cName = vClass.getName();
     String[] allowedTypes = OpenType.ALLOWED_CLASSNAMES;
     for (int a = 0; a < allowedTypes.length; ++a)
       if (cName.equals(allowedTypes[a]))
 	return value;
+    OpenMBeanInfo info = (OpenMBeanInfo) getMBeanInfo();
+    MBeanAttributeInfo[] attribs =
+      (MBeanAttributeInfo[]) info.getAttributes();
+    OpenType type = null;
+    for (int a = 0; a < attribs.length; ++a)
+      if (attribs[a].getName().equals(attribute))
+	type = ((OpenMBeanAttributeInfo) attribs[a]).getOpenType();
     if (value instanceof List)
       {
+	try
+	  {
+	    Class e =
+	      Class.forName(((ArrayType) type).getElementOpenType().getClassName());
 	List l = (List) value;
-	Class e = null;
-	TypeVariable[] vars = vClass.getTypeParameters();
-	for (int a = 0; a < vars.length; ++a)
-	  if (vars[a].getName().equals("E"))
-	    e = (Class) vars[a].getGenericDeclaration();
-	if (e == null)
-	  e = Object.class;
 	Object[] array = (Object[]) Array.newInstance(e, l.size());
 	return l.toArray(array);
       }
-    OpenMBeanInfo info = (OpenMBeanInfo) getMBeanInfo();
-    OpenMBeanAttributeInfo[] attribs =
-      (OpenMBeanAttributeInfo[]) info.getAttributes();
-    OpenType type = null;
-    for (int a = 0; a < attribs.length; ++a)
-      if (attribs[a].getName().equals("attribute"))
-	type = attribs[a].getOpenType();
+	catch (ClassNotFoundException e)
+	  {
+	    throw (InternalError) (new InternalError("The class of the list " +
+						     "element type could not " +
+						     "be created").initCause(e));
+	  }
+      }
     if (value instanceof Map)
       {
 	TabularType ttype = (TabularType) type;
@@ -425,6 +429,34 @@ public class BeanImpl
       return new OpenMBeanParameterInfoSupport("TransParam",
 					       "Translated parameter",
 					       SimpleType.VOID);
+    if (type.startsWith("java.util.Map"))
+      {
+	int lparam = type.indexOf("<");
+	int comma = type.indexOf(",", lparam);
+	int rparam = type.indexOf(">", comma);
+	String key = type.substring(lparam + 1, comma).trim();
+	OpenType k = translate(key).getOpenType();
+	OpenType v = translate(type.substring(comma + 1, rparam).trim()).getOpenType(); 
+ 	CompositeType ctype = new CompositeType(Map.class.getName(), Map.class.getName(),
+						new String[] { "key", "value" },
+						new String[] { "Map key", "Map value"},
+						new OpenType[] { k, v});
+	TabularType ttype = new TabularType(key, key, ctype,
+					    new String[] { "key" });
+	return new OpenMBeanParameterInfoSupport("TransParam",
+						 "Translated parameter",
+						 ttype);
+      }
+    if (type.startsWith("java.util.List"))
+      {
+	int lparam = type.indexOf("<");
+	int rparam = type.indexOf(">");
+       	OpenType e = translate(type.substring(lparam + 1, rparam).trim()).getOpenType();
+	return new OpenMBeanParameterInfoSupport("TransParam",
+						 "Translated parameter",
+						 new ArrayType(1, e)
+						 );
+      }	
     Class c;
     try
       {
@@ -432,8 +464,9 @@ public class BeanImpl
       }
     catch (ClassNotFoundException e)
       {
-	throw new InternalError("The class for a type used in a management bean " +
-				"could not be loaded.");
+	throw (InternalError)
+	  (new InternalError("The class for a type used in a management bean " +
+			     "could not be loaded.").initCause(e));
       }
     if (c.isEnum())
       {
@@ -450,9 +483,9 @@ public class BeanImpl
     try
       {
 	c.getMethod("from", new Class[] { CompositeData.class });
-	Method[] methods = c.getMethods();
-	List names = new ArrayList();
-	List types = new ArrayList();
+	Method[] methods = c.getDeclaredMethods();
+	List<String> names = new ArrayList<String>();
+	List<OpenType> types = new ArrayList<OpenType>();
 	for (int a = 0; a < methods.length; ++a)
 	  {
 	    String name = methods[a].getName();
@@ -462,10 +495,10 @@ public class BeanImpl
 		types.add(getTypeFromClass(methods[a].getReturnType()));
 	      }
 	  }
-	String[] fields = (String[]) names.toArray();
+	String[] fields = names.toArray(new String[names.size()]);
 	CompositeType ctype = new CompositeType(c.getName(), c.getName(),
 						fields, fields,
-						(OpenType[]) types.toArray());
+						types.toArray(new OpenType[types.size()]));
 	return new OpenMBeanParameterInfoSupport("TransParam",
 						 "Translated parameter",
 						 ctype);
@@ -474,46 +507,11 @@ public class BeanImpl
       {
 	/* Ignored; we expect this if this isn't a from(CompositeData) class */
       }
-    if (Map.class.isAssignableFrom(c))
-      {
-	OpenType k = SimpleType.VOID;
-	OpenType v = SimpleType.VOID;
-	TypeVariable[] vars = c.getTypeParameters();
-	for (int a = 0; a < vars.length; ++a)
-	  {
-	    if (vars[a].getName().equals("K"))
-	      k = getTypeFromClass((Class) vars[a].getGenericDeclaration());
-	    if (vars[a].getName().equals("V"))
-	      v = getTypeFromClass((Class) vars[a].getGenericDeclaration());
-	  }
-	CompositeType ctype = new CompositeType(Map.class.getName(), Map.class.getName(),
-						new String[] { "key", "value" },
-						new String[] { "Map key", "Map value"},
-						new OpenType[] { k, v});
-	TabularType ttype = new TabularType(c.getName(), c.getName(), ctype,
-					    new String[] { "key" });
-	return new OpenMBeanParameterInfoSupport("TransParam",
-						 "Translated parameter",
-						 ttype);
-      }
-    if (List.class.isAssignableFrom(c))
-      {
-	OpenType e = SimpleType.VOID;
-	TypeVariable[] vars = c.getTypeParameters();
-	for (int a = 0; a < vars.length; ++a)
-	  {
-	    if (vars[a].getName().equals("E"))
-	      e = getTypeFromClass((Class) vars[a].getGenericDeclaration());
-	  }
-	return new OpenMBeanParameterInfoSupport("TransParam",
-						 "Translated parameter",
-						 new ArrayType(1, e)
-						 );
-      }	
     if (c.isArray())
       {
 	int depth;
-	for (depth = 0; c.getName().charAt(depth) == '['; ++depth);
+	for (depth = 0; c.getName().charAt(depth) == '['; ++depth)
+          ;
 	OpenType ot = getTypeFromClass(c.getComponentType());
 	return new OpenMBeanParameterInfoSupport("TransParam",
 						 "Translated parameter",
