@@ -517,6 +517,10 @@ clean             Remove all intermediate build results.
                     <patternset refid="cp-includes-pattern"/>
                     <patternset refid="cp-sources-pattern"/>
                 </fileset>
+                <fileset dir="${root.dir}/../classpath/tools/external/asm">
+                    <patternset refid="cp-includes-pattern"/>
+                    <patternset refid="cp-sources-pattern"/>
+                </fileset>
             </classpathsources>
         </cp-compare>
     </target>
