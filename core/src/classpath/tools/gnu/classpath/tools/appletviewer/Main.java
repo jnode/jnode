@@ -266,7 +266,6 @@ class Main
     else
       {
         // Warn user about missing security manager.
-          /* @jnode disable security warning
         System.err.println(Messages.getString("Main.SecurityWarning") + "\n");
 
         System.err.println(Messages.getString("Main.ContinuationPrompt"));
@@ -290,7 +289,6 @@ class Main
             System.exit(0);
           }
 
-            */
         if (code == null)
           {
             // The --code option wasn't given and there are no URL
