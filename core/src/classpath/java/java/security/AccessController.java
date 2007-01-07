@@ -91,12 +91,12 @@ public final class AccessController
    * should be be called.
    * @return the result of the <code>action.run()</code> method.
      */
-    public static Object doPrivileged(PrivilegedAction action) 
+    public static <T> T doPrivileged(PrivilegedAction<T> action)
     {
         if (action == null) {
             Unsafe.debug("action == null!! ");
         }
-        return VmAccessController.doPrivileged(action, null);
+        return (T) VmAccessController.doPrivileged(action, null);
     }
 
     /**
@@ -135,10 +135,10 @@ public final class AccessController
    * @exception PrivilegedActionException wrapped around any exception that
    * is thrown in the <code>run()</code> method.
      */
-    public static Object doPrivileged(PrivilegedExceptionAction action)
+    public static <T> T doPrivileged(PrivilegedExceptionAction<T> action)
     throws PrivilegedActionException
   {
-        return VmAccessController.doPrivileged(action, null);
+        return (T) VmAccessController.doPrivileged(action, null);
     }
 
     /**

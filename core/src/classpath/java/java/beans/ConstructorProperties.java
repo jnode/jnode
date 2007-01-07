@@ -1,5 +1,5 @@
-/* LoaderHandler.java --
-  Copyright (c) 1996, 1997, 1998, 1999 Free Software Foundation, Inc.
+/* ConstructorProperties.java - Associate constructor params with props
+   Copyright (C) 2006 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -7,7 +7,7 @@ GNU Classpath is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2, or (at your option)
 any later version.
- 
+
 GNU Classpath is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -35,37 +35,38 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package java.rmi.server;
+package java.beans;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static java.lang.annotation.ElementType.CONSTRUCTOR;
 
 /**
- * @deprecated
- * @since 1.1
+ * An annotation used to associate the parameters of a
+ * constructor with the accessor methods that later provide
+ * access to these values.  For example, the parameters of
+ * the  constructor <code>Person(String name, int age)</code>
+ * may be linked to the bean's two accessors, <code>getName()</code>
+ * and <code>getAge()</code> using
+ * <code>@ConstructorProperties({"name","age"})</code>.
+ *
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+ * @since 1.6
  */
-public interface LoaderHandler
+@Documented @Retention(RUNTIME) @Target(CONSTRUCTOR)
+public @interface ConstructorProperties
 {
-  /**
-   * For binary compatibility with the JDK, the string "sun.rmi.server".
-   * Not actually used for anything.
-   */
-  String packagePrefix = "sun.rmi.server";
 
   /**
-   * @deprecated
+   * Contains the name of the accessor methods associated
+   * with each constructor parameter.
+   *
+   * @return the accessor method names corresponding to the
+   *         constructor parameters.
    */
-  Class<?> loadClass(String name)
-    throws MalformedURLException, ClassNotFoundException;
+  String[] value();
 
-  /**
-   * @deprecated
-   */
-  Class<?> loadClass(URL codebase, String name)
-    throws MalformedURLException, ClassNotFoundException;
-
-  /**
-   * @deprecated
-   */
-  Object getSecurityContext(ClassLoader loader);
 }

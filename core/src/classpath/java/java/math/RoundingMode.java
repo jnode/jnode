@@ -1,5 +1,5 @@
-/* LoaderHandler.java --
-  Copyright (c) 1996, 1997, 1998, 1999 Free Software Foundation, Inc.
+/* RoundingMode.java -- An Enum to replace BigDecimal rounding constants. 
+   Copyright (C) 1999, 2000, 2002, 2004, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -7,7 +7,7 @@ GNU Classpath is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2, or (at your option)
 any later version.
- 
+
 GNU Classpath is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -35,37 +35,55 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package java.rmi.server;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+package java.math;
 
 /**
- * @deprecated
- * @since 1.1
+ * An enum to specify rounding behaviour for numerical operations that may
+ * discard precision.
+ * @author Anthony Balkissoon abalkiss at redhat dot com
+ *
  */
-public interface LoaderHandler
+public enum RoundingMode
 {
-  /**
-   * For binary compatibility with the JDK, the string "sun.rmi.server".
-   * Not actually used for anything.
-   */
-  String packagePrefix = "sun.rmi.server";
+  UP, DOWN, CEILING, FLOOR, HALF_UP, HALF_DOWN, HALF_EVEN, UNNECESSARY;
 
   /**
-   * @deprecated
+   * For compatability with Sun's JDK
    */
-  Class<?> loadClass(String name)
-    throws MalformedURLException, ClassNotFoundException;
-
+  private static final long serialVersionUID = 432302042773881265L;
+  
   /**
-   * @deprecated
+   * Returns the RoundingMode object corresponding to the legacy rounding modes
+   * in BigDecimal.
+   * @param rm the legacy rounding mode
+   * @return the corresponding RoundingMode
    */
-  Class<?> loadClass(URL codebase, String name)
-    throws MalformedURLException, ClassNotFoundException;
-
-  /**
-   * @deprecated
-   */
-  Object getSecurityContext(ClassLoader loader);
+  public static RoundingMode valueOf(int rm)
+  {
+    switch (rm)
+      {
+      case BigDecimal.ROUND_CEILING:
+        return CEILING;
+      case BigDecimal.ROUND_FLOOR:
+        return FLOOR;
+      case BigDecimal.ROUND_DOWN:
+        return DOWN;
+      case BigDecimal.ROUND_UP:
+        return UP;
+      case BigDecimal.ROUND_HALF_UP:
+        return HALF_UP;
+      case BigDecimal.ROUND_HALF_DOWN:
+        return HALF_DOWN;
+      case BigDecimal.ROUND_HALF_EVEN:
+        return HALF_EVEN;
+      case BigDecimal.ROUND_UNNECESSARY:
+        return UNNECESSARY;
+      default:
+        throw new 
+          IllegalArgumentException("invalid argument: " + rm + 
+                                   ".  Argument should be one of the " + 
+                                   "rounding modes defined in BigDecimal.");
+      }
+  }
 }
