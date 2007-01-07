@@ -1,4 +1,4 @@
-/* LatinMetrics.java -- Latin specific metrics data
+/* AutoHinter.java -- The entry point into the hinter implementation.
    Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -38,29 +38,46 @@ exception statement from your version. */
 
 package gnu.java.awt.font.autofit;
 
+import gnu.java.awt.font.opentype.Hinter;
 import gnu.java.awt.font.opentype.OpenTypeFont;
+import gnu.java.awt.font.opentype.truetype.Fixed;
+import gnu.java.awt.font.opentype.truetype.Zone;
 
 /**
- * Latin specific metrics data.
+ * The public interface to the automatic gridfitter.
  */
-class LatinMetrics
-  extends ScriptMetrics
+public class AutoHinter
+  implements Hinter
 {
+  Latin latinScript;
+  LatinMetrics metrics;
+  GlyphHints hints;
 
-  LatinAxis[] axis;
-
-  int unitsPerEm;
-
-  LatinMetrics()
+  HintScaler scaler = new HintScaler();
+  public void init(OpenTypeFont font)
   {
-    super();
-    axis = new LatinAxis[Constants.DIMENSION_MAX];
-    axis[Constants.DIMENSION_HORZ] = new LatinAxis();
-    axis[Constants.DIMENSION_VERT] = new LatinAxis();
+    // TODO: Should support other scripts too.
+    latinScript = new Latin();
+    metrics = new LatinMetrics(font);
+    latinScript.initMetrics(metrics, font);
+    scaler.face = font;
   }
-  LatinMetrics(OpenTypeFont face)
+
+  public void applyHints(Zone outline)
   {
-    this();
-    unitsPerEm = face.unitsPerEm;
+    if (hints == null)
+      hints = new GlyphHints();
+    scaler.xScale = Fixed.valueOf16(outline.scaleX * 64);
+    scaler.yScale = Fixed.valueOf16(outline.scaleY * 64);
+    latinScript.scaleMetrics(metrics, scaler);
+    latinScript.applyHints(hints, outline, metrics);
   }
+
+  public void setFlags(int flags)
+  {
+    if (hints == null)
+      hints = new GlyphHints();
+    hints.flags = flags;
+  }
+
 }
