@@ -39,13 +39,13 @@ exception statement from your version. */
 package javax.imageio.spi;
 
 import gnu.classpath.ServiceFactory;
-import gnu.java.awt.ClasspathToolkit;
 
 import java.awt.Toolkit;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import gnu.java.awt.ClasspathToolkit;
 import gnu.javax.imageio.bmp.BMPImageReaderSpi;
 import gnu.javax.imageio.bmp.BMPImageWriterSpi;
 import gnu.javax.imageio.gif.GIFImageReaderSpi;
