@@ -65,6 +65,6 @@ public interface ObjectFactoryBuilder
    * @throws NamingException
    */
   ObjectFactory createObjectFactory(Object refInfo,
-  					   Hashtable environment)
+  					   Hashtable<?, ?> environment)
 					   throws NamingException;
 }

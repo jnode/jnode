@@ -41,7 +41,6 @@ package javax.naming.spi;
 import javax.naming.Context;
 import javax.naming.Name;
 import javax.naming.NamingException;
-import javax.naming.NotContextException;
  
 /**
  * <p>Represents the object, capable for the at least partial name resolution.
@@ -54,31 +53,10 @@ import javax.naming.NotContextException;
  */
 public interface Resolver
 {
-  /**
-   * Partially resolve the name, stopping at the first instance of the context
-   * that is an instance of the contextType
-   * 
-   * @param name the name to resolve
-   * @param contextType the class of the context, on that the resolution should
-   *          be terminated
-   * @return the complete or partial name resolution
-   * @throws NotContextException if the context of the contextType is not found
-   * @throws NamingException on other failure
-   */
-  ResolveResult resolveToClass(Name name, Class contextType)
+  ResolveResult resolveToClass(Name name, 
+                               Class<? extends Context> contextType)
     throws NamingException;
-
-  /**
-   * Partially resolve the name, stopping at the first instance of the context
-   * that is an instance of the contextType
-   * 
-   * @param name the name to resolve
-   * @param contextType the class of the context, on that the resolution should
-   *          be terminated
-   * @return the complete or partial name resolution
-   * @throws NotContextException if the context of the contextType is not found
-   * @throws NamingException on other failure
-   */
-  ResolveResult resolveToClass(String name, Class contextType)
+  ResolveResult resolveToClass(String name,
+                               Class<? extends Context> contextType)
     throws NamingException;
 }
