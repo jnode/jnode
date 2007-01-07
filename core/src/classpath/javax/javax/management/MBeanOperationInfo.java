@@ -38,6 +38,7 @@ exception statement from your version. */
 package javax.management;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 
 import java.util.Arrays;
 
@@ -113,13 +114,23 @@ public class MBeanOperationInfo
   public MBeanOperationInfo(String desc, Method method)
   {
     super(method.getName(), desc);
-    Class[] paramTypes = method.getParameterTypes();
+    Type[] paramTypes = method.getGenericParameterTypes();
     signature = new MBeanParameterInfo[paramTypes.length];
     for (int a = 0; a < paramTypes.length; ++a)
+      {
+	Type t = paramTypes[a];
+	if (t instanceof Class)
       signature[a] = new MBeanParameterInfo(null,
-					    paramTypes[a].getName(),
+						((Class) t).getName(),
 					    null);
-    type = method.getReturnType().getName();
+	else
+	  signature[a] = new MBeanParameterInfo(null, t.toString(), null);
+      }
+    Type retType = method.getGenericReturnType();
+    if (retType instanceof Class)
+      type = ((Class) retType).getName();
+    else
+      type = retType.toString();
     if (method.getReturnType() == Void.TYPE)
       {
 	if (paramTypes.length == 0)
