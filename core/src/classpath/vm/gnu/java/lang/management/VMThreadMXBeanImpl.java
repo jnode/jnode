@@ -43,7 +43,7 @@ import java.lang.management.ThreadInfo;
  * Provides access to information about the threads 
  * of the virtual machine.  An instance of this bean is
  * obtained by calling
- * {@link ManagementFactory#getThreadMXBean()}.
+ * {@link java.lang.management.ManagementFactory#getThreadMXBean()}.
  * See {@link java.lang.management.ThreadMXBean} for
  * full documentation.
  *
@@ -57,6 +57,19 @@ final class VMThreadMXBeanImpl
    * Cache of how many threads were found.
    */
   private static int filled;
+
+  /**
+   * Returns the ids of cycles of deadlocked threads, occurring
+   * due to monitor ownership or ownable synchronizer ownership.
+   * This will only be called if ownable synchronizer monitoring
+   * is supported.
+   *
+   * @return the ids of the deadlocked threads.
+   */
+  static long[] findDeadlockedThreads(){
+      //todo implement
+      throw new UnsupportedOperationException();
+  }
 
   /**
    * Returns the ids of cycles of deadlocked threads, occurring
@@ -141,6 +154,31 @@ final class VMThreadMXBeanImpl
 	  ++daemonCount;
       }
     return daemonCount;
+  }
+
+  /**
+   * Fill out the given {@link ThreadInfo} object
+   * with ownable synchronizer usage information.
+   * This is only called if ownable synchronizer
+   * usage monitoring is supported.
+   *
+   * @param info the {@link ThreadInfo} object to modify.
+   */
+  static void getLockInfo(ThreadInfo info){
+      //todo implement
+      throw new UnsupportedOperationException();
+  }
+
+  /**
+   * Fill out the given {@link ThreadInfo} object
+   * with monitor usage information.  This is only
+   * called if monitor usage monitoring is supported.
+   *
+   * @param info the {@link ThreadInfo} object to modify.
+   */
+  static void getMonitorInfo(ThreadInfo info){
+      //todo implement
+      throw new UnsupportedOperationException();
   }
 
   /**
