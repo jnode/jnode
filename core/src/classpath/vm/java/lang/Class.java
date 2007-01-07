@@ -1,24 +1,41 @@
-/*
- * $Id$
- *
- * JNode.org
- * Copyright (C) 2003-2006 JNode.org
- *
- * This library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published
- * by the Free Software Foundation; either version 2.1 of the License, or
- * (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
- * License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
+/* Class.java -- Representation of a Java class.
+   Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2005, 2006
+   Free Software Foundation
  
+This file is part of GNU Classpath.
+
+GNU Classpath is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+GNU Classpath is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with GNU Classpath; see the file COPYING.  If not, write to the
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
+
+Linking this library statically or dynamically with other modules is
+making a combined work based on this library.  Thus, the terms and
+conditions of the GNU General Public License cover the whole
+combination.
+
+As a special exception, the copyright holders of this library give you
+permission to link this library with independent modules to produce an
+executable, regardless of the license terms of these independent
+modules, and to copy and distribute the resulting executable under
+terms of your choice, provided that you also meet, for each linked
+independent module, the terms and conditions of the license of that
+module.  An independent module is a module which is not derived from
+or based on this library.  If you modify this library, you may extend
+this exception to your version of the library, but you are not
+obligated to do so.  If you do not wish to do so, delete this
+exception statement from your version. */
+
 package java.lang;
 
 import gnu.java.lang.VMClassHelper;
@@ -56,10 +73,34 @@ import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
 
 /**
- * Class. If you change any fields in this class, also change
- * <code>emitClass</code> in <code>org.jnode.build.ObjectEmitter</code>.
+ * A Class represents a Java type.  There will never be multiple Class
+ * objects with identical names and ClassLoaders. Primitive types, array
+ * types, and void also have a Class object.
  * 
- * @author epr
+ * <p>Arrays with identical type and number of dimensions share the same class.
+ * The array class ClassLoader is the same as the ClassLoader of the element
+ * type of the array (which can be null to indicate the bootstrap classloader).
+ * The name of an array class is <code>[&lt;signature format&gt;;</code>.
+ * <p> For example,
+ * String[]'s class is <code>[Ljava.lang.String;</code>. boolean, byte,
+ * short, char, int, long, float and double have the "type name" of
+ * Z,B,S,C,I,J,F,D for the purposes of array classes.  If it's a
+ * multidimensioned array, the same principle applies:
+ * <code>int[][][]</code> == <code>[[[I</code>.
+ *
+ * <p>There is no public constructor - Class objects are obtained only through
+ * the virtual machine, as defined in ClassLoaders.
+ *
+ * @serialData Class objects serialize specially:
+ * <code>TC_CLASS ClassDescriptor</code>. For more serialization information,
+ * see {@link ObjectStreamClass}.
+ *
+ * @author John Keiser
+ * @author Eric Blake (ebb9@email.byu.edu)
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+ * @since 1.0
+ * @see ClassLoader
  */
 public final class Class<T> implements AnnotatedElement, Serializable, Type,
         GenericDeclaration {
@@ -369,7 +410,7 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type,
      * @throws InstantiationException
      * @throws IllegalAccessException
      */
-    public final Object newInstance() throws InstantiationException,
+    public final T newInstance() throws InstantiationException,
             IllegalAccessException {
         if (defaultConstructor == null) {
             defaultConstructor = getLinkedVmClass().getDeclaredMethod("<init>",
@@ -379,7 +420,7 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type,
             throw new InstantiationException("No default constructor");
         }
         try {
-            return VmReflection.newInstance(defaultConstructor);
+            return (T)VmReflection.newInstance(defaultConstructor);
         } catch (InvocationTargetException ex) {
             final InstantiationException ie = new InstantiationException();
             ie.initCause(ex);

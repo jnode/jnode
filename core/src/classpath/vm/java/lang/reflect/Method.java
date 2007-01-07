@@ -323,7 +323,7 @@ public final class Method extends AccessibleObject implements Member, AnnotatedE
      * @throws ExceptionInInitializerError if accessing a static method triggered
      *         class initialization, which then failed
      */
-    public Object invoke(Object o, Object[] args)
+    public Object invoke(Object o, Object... args)
         throws IllegalAccessException, InvocationTargetException {
         return VmReflection.invoke(vmMethod, o, args);
     }
