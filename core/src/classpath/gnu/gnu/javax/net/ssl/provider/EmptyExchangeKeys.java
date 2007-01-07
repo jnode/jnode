@@ -1,4 +1,4 @@
-/* CompressionMethod.java -- The CompressionMethod enum.
+/* EmptyExchangeKeys.java -- 
    Copyright (C) 2006  Free Software Foundation, Inc.
 
 This file is a part of GNU Classpath.
@@ -33,37 +33,45 @@ module.  An independent module is a module which is not derived from
 or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
-exception statement from your version.  */
+exception statement from your version. */
 
 
 package gnu.javax.net.ssl.provider;
 
-public enum CompressionMethod
+import java.nio.ByteBuffer;
+
+/**
+ * @author Casey Marshall (csm@gnu.org)
+ */
+public class EmptyExchangeKeys
+  extends ExchangeKeys
 {
-  NULL (0), ZLIB(1);
 
-  private final int value;
-
-  private CompressionMethod(int value)
+  public EmptyExchangeKeys()
   {
-    this.value = value;
+    super(ByteBuffer.allocate(0));
   }
 
-  public static CompressionMethod getInstance (final int value)
+  /* (non-Javadoc)
+   * @see gnu.javax.net.ssl.provider.Constructed#length()
+   */
+  public int length()
   {
-    switch (value & 0xFF)
-      {
-      case 0: return NULL;
-      case 1: return ZLIB;
-
-      // Note: we can't throw an exception here, because we get these values
-      // over the wire, and need to just ignore ones we don't recognize.
-      default: return null; 
-      }
+    return 0;
   }
 
-  public int getValue()
+  public String toString()
   {
-    return value;
+    return toString(null);
+  }
+  
+  /* (non-Javadoc)
+   * @see gnu.javax.net.ssl.provider.Constructed#toString(java.lang.String)
+   */
+  public String toString(String prefix)
+  {
+    String ret = "struct { };";
+    if (prefix != null) ret = prefix + ret;
+    return ret;
   }
 }
