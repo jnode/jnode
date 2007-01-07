@@ -1,5 +1,5 @@
 /* GridBagLayout - Layout manager for components according to GridBagConstraints
-   Copyright (C) 2002, 2003, 2004, 2005  Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005, 2006  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -38,8 +38,6 @@ exception statement from your version. */
 
 package java.awt;
 
-import gnu.classpath.NotImplementedException;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,6 +46,7 @@ import java.util.Hashtable;
 /**
  * @author Michael Koch (konqueror@gmx.de)
  * @author Jeroen Frijters (jeroen@frijters.net)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  */
 public class GridBagLayout
   implements Serializable, LayoutManager2
@@ -64,8 +63,8 @@ public class GridBagLayout
     // REMAINDER constraints.
     // Constraints kept in comptable are never modified, and constraints
     // kept in internalcomptable can be modified internally only.
-    protected Hashtable comptable;
-    private Hashtable internalcomptable;
+    protected Hashtable<Component,GridBagConstraints> comptable;
+    private Hashtable<Component,GridBagConstraints> internalcomptable;
     protected GridBagLayoutInfo layoutInfo;
     protected GridBagConstraints defaultConstraints;
 
@@ -76,8 +75,8 @@ public class GridBagLayout
 
     public GridBagLayout ()
     {
-	this.comptable = new Hashtable();
-	this.internalcomptable = new Hashtable();
+	this.comptable = new Hashtable<Component,GridBagConstraints>();
+	this.internalcomptable = new Hashtable<Component,GridBagConstraints>();
 	this.defaultConstraints= new GridBagConstraints();
     }
 
@@ -322,13 +321,34 @@ public class GridBagLayout
     }
 
     /**
-     * Obsolete.
+     * Return a string representation of this GridBagLayout.
+     *
+     * @return a string representation
      */
-    protected void AdjustForGravity (GridBagConstraints gbc, Rectangle rect)
-      throws NotImplementedException
+    public String toString()
     {
-      // FIXME
-      throw new Error ("Not implemented");
+      return getClass().getName();
+    }
+    
+    /**
+     * Move and resize a rectangle according to a set of grid bag
+     * constraints.  The x, y, width and height fields of the
+     * rectangle argument are adjusted to the new values.
+     *
+     * @param constraints position and size constraints
+     * @param r rectangle to be moved and resized
+     */
+    protected void AdjustForGravity (GridBagConstraints constraints,
+                                     Rectangle r)
+    {
+      Insets insets = constraints.insets;
+      if (insets != null)
+	{
+	  r.x += insets.left;
+	  r.y += insets.top;
+	  r.width -= insets.left + insets.right;
+	  r.height -= insets.top + insets.bottom;
+	}
     }
 
     /**
@@ -353,10 +373,9 @@ public class GridBagLayout
       // layoutInfo.  So we wait until after this for loop to set
       // layoutInfo.
       Component lastComp = null;
-      int cellx = 0;
-      int celly = 0;
-      int cellw = 0;
-      int cellh = 0;
+
+      Rectangle cell = new Rectangle();
+
       for (int i = 0; i < components.length; i++)
 	{
         Component component = components[i];
@@ -370,29 +389,23 @@ public class GridBagLayout
         
         if (lastComp != null
             && constraints.gridheight == GridBagConstraints.REMAINDER)
-          celly += cellh;
+          cell.y += cell.height;
         else
-          celly = sumIntArray(info.rowHeights, constraints.gridy);
+          cell.y = sumIntArray(info.rowHeights, constraints.gridy);
         
         if (lastComp != null
             && constraints.gridwidth == GridBagConstraints.REMAINDER)
-          cellx += cellw;
+          cell.x += cell.width;
         else
-          cellx = sumIntArray(info.colWidths, constraints.gridx);
+          cell.x = sumIntArray(info.colWidths, constraints.gridx);
 
-        cellw = sumIntArray(info.colWidths, constraints.gridx
-                                            + constraints.gridwidth) - cellx;
-        cellh = sumIntArray(info.rowHeights, constraints.gridy
-                                             + constraints.gridheight) - celly;
+        cell.width = sumIntArray(info.colWidths, constraints.gridx
+                                            + constraints.gridwidth) - cell.x;
+        cell.height = sumIntArray(info.rowHeights, constraints.gridy
+                                             + constraints.gridheight) - cell.y;
 
-          Insets insets = constraints.insets;
-          if (insets != null)
-	    {
-              cellx += insets.left;
-              celly += insets.top;
-              cellw -= insets.left + insets.right;
-              cellh -= insets.top + insets.bottom;
-	    }
+        // Adjust for insets.
+ 	AdjustForGravity( constraints, cell );
 
           // Note: Documentation says that padding is added on both sides, but
           // visual inspection shows that the Sun implementation only adds it
@@ -403,14 +416,14 @@ public class GridBagLayout
         switch (constraints.fill)
 	    {
             case GridBagConstraints.HORIZONTAL:
-              dim.width = cellw;
+            dim.width = cell.width;
               break;
             case GridBagConstraints.VERTICAL:
-              dim.height = cellh;
+            dim.height = cell.height;
               break;
             case GridBagConstraints.BOTH:
-              dim.width = cellw;
-              dim.height = cellh;
+            dim.width = cell.width;
+            dim.height = cell.height;
               break;
 	    }
 
@@ -420,40 +433,40 @@ public class GridBagLayout
         switch (constraints.anchor)
 	    {
             case GridBagConstraints.NORTH:
-              x = cellx + (cellw - dim.width) / 2;
-              y = celly;
+            x = cell.x + (cell.width - dim.width) / 2;
+            y = cell.y;
               break;
             case GridBagConstraints.SOUTH:
-              x = cellx + (cellw - dim.width) / 2;
-              y = celly + cellh - dim.height;
+            x = cell.x + (cell.width - dim.width) / 2;
+            y = cell.y + cell.height - dim.height;
               break;
             case GridBagConstraints.WEST:
-              x = cellx;
-              y = celly + (cellh - dim.height) / 2;
+            x = cell.x;
+            y = cell.y + (cell.height - dim.height) / 2;
               break;
             case GridBagConstraints.EAST:
-              x = cellx + cellw - dim.width;
-              y = celly + (cellh - dim.height) / 2;
+            x = cell.x + cell.width - dim.width;
+            y = cell.y + (cell.height - dim.height) / 2;
               break;
             case GridBagConstraints.NORTHEAST:
-              x = cellx + cellw - dim.width;
-              y = celly;
+            x = cell.x + cell.width - dim.width;
+            y = cell.y;
               break;
             case GridBagConstraints.NORTHWEST:
-              x = cellx;
-              y = celly;
+            x = cell.x;
+            y = cell.y;
               break;
             case GridBagConstraints.SOUTHEAST:
-              x = cellx + cellw - dim.width;
-              y = celly + cellh - dim.height;
+            x = cell.x + cell.width - dim.width;
+            y = cell.y + cell.height - dim.height;
               break;
             case GridBagConstraints.SOUTHWEST:
-              x = cellx;
-              y = celly + cellh - dim.height;
+            x = cell.x;
+            y = cell.y + cell.height - dim.height;
               break;
             default:
-              x = cellx + (cellw - dim.width) / 2;
-              y = celly + (cellh - dim.height) / 2;
+            x = cell.x + (cell.width - dim.width) / 2;
+            y = cell.y + (cell.height - dim.height) / 2;
               break;
 	    }
         component.setBounds(info.pos_x + x, info.pos_y + y, dim.width,
@@ -487,16 +500,18 @@ public class GridBagLayout
 
       // Guaranteed to contain the last component added to the given row
       // or column, whose gridwidth/height is not REMAINDER.
-      HashMap lastInRow = new HashMap();
-      HashMap lastInCol = new HashMap();
+      HashMap<Integer,Component> lastInRow = new HashMap<Integer,Component>();
+      HashMap<Integer,Component> lastInCol = new HashMap<Integer,Component>();
 
       Component[] components = parent.getComponents();
 
       // Components sorted by gridwidths/heights,
       // smallest to largest, with REMAINDER and RELATIVE at the end.
       // These are useful when determining sizes and weights.
-      ArrayList sortedByWidth = new ArrayList(components.length);
-      ArrayList sortedByHeight = new ArrayList(components.length);
+      ArrayList<Component> sortedByWidth =
+	new ArrayList<Component>(components.length);
+      ArrayList<Component> sortedByHeight =
+	new ArrayList<Component>(components.length);
 
       // STEP 1: first we figure out how many rows/columns
       for (int i = 0; i < components.length; i++)
@@ -761,7 +776,7 @@ public class GridBagLayout
       // STEP 3: Determine sizes and weights for columns.
       for (int i = 0; i < sortedByWidth.size(); i++)
         {
-          Component component = (Component) sortedByWidth.get(i);
+          Component component = sortedByWidth.get(i);
 			
           // If component is not visible we dont have to care about it.
           if (!component.isVisible())
@@ -875,7 +890,8 @@ public class GridBagLayout
      *                    width. Otherwise, sort by height.
      * FIXME: Use a better sorting algorithm.
      */
-    private void sortBySpan (Component component, int span, ArrayList list, boolean sortByWidth)
+    private void sortBySpan (Component component, int span,
+			     ArrayList<Component> list, boolean sortByWidth)
     {
       if (span == GridBagConstraints.REMAINDER
           || span == GridBagConstraints.RELATIVE)
@@ -1082,10 +1098,18 @@ public class GridBagLayout
   }
 
     /**
+     * Move and resize a rectangle according to a set of grid bag
+     * constraints.  The x, y, width and height fields of the
+     * rectangle argument are adjusted to the new values.
+     *
+     * @param constraints position and size constraints
+     * @param r rectangle to be moved and resized
+     *
      * @since 1.4
      */
-    protected void adjustForGravity (GridBagConstraints gbc, Rectangle rect)
+    protected void adjustForGravity (GridBagConstraints constraints,
+                                     Rectangle r)
   {
-      AdjustForGravity (gbc, rect);
+      AdjustForGravity (constraints, r);
   }
 }

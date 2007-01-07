@@ -39,8 +39,9 @@ exception statement from your version. */
 package java.nio.channels;
 
 import java.io.IOException;
+import java.io.Closeable;
 
-public interface Channel
+public interface Channel extends Closeable
 {
   /**
    * Tells whether this channel is open or not

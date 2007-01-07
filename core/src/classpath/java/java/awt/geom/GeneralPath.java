@@ -79,22 +79,17 @@ import java.awt.Shape;
  */
 public final class GeneralPath implements Shape, Cloneable
 {
-  // WORKAROUND for gcj 4.0.x (x < 3)
-  // fully qualify PathIterator constants.
-
   /** Same constant as {@link PathIterator#WIND_EVEN_ODD}. */
-  public static final int WIND_EVEN_ODD
-    = java.awt.geom.PathIterator.WIND_EVEN_ODD;
+  public static final int WIND_EVEN_ODD = PathIterator.WIND_EVEN_ODD;
 
-  /** Same constant as {@link PathIterator.WIND_NON_ZERO}. */
-  public static final int WIND_NON_ZERO
-    = java.awt.geom.PathIterator.WIND_NON_ZERO;
+  /** Same constant as {@link PathIterator#WIND_NON_ZERO}. */
+  public static final int WIND_NON_ZERO = PathIterator.WIND_NON_ZERO;
 
 	/** Initial size if not specified. */
   private static final int INIT_SIZE = 10;
 
   /** A big number, but not so big it can't survive a few float operations */
-  private static final double BIG_VALUE = java.lang.Double.MAX_VALUE / 10.0;
+  private static final double BIG_VALUE = Double.MAX_VALUE / 10.0;
 
   /** The winding rule.
    * This is package-private to avoid an accessor method.
@@ -140,7 +135,11 @@ public final class GeneralPath implements Shape, Cloneable
   /**
    * Constructs a GeneralPath with a specific winding rule
    * and the default initial capacity (20).
-   * @param rule the winding rule (WIND_NON_ZERO or WIND_EVEN_ODD)
+   * @param rule the winding rule ({@link #WIND_NON_ZERO} or 
+   *     {@link #WIND_EVEN_ODD})
+   *     
+   * @throws IllegalArgumentException if <code>rule</code> is not one of the
+   *     listed values.
    */
   public GeneralPath(int rule)
   {
@@ -151,8 +150,12 @@ public final class GeneralPath implements Shape, Cloneable
    * Constructs a GeneralPath with a specific winding rule
    * and the initial capacity. The initial capacity should be
    * the approximate number of path segments to be used.
-   * @param rule the winding rule (WIND_NON_ZERO or WIND_EVEN_ODD)
+   * @param rule the winding rule ({@link #WIND_NON_ZERO} or 
+   *     {@link #WIND_EVEN_ODD})
    * @param capacity the inital capacity, in path segments
+   * 
+   * @throws IllegalArgumentException if <code>rule</code> is not one of the
+   *     listed values.
    */
   public GeneralPath(int rule, int capacity)
   {
@@ -169,7 +172,10 @@ public final class GeneralPath implements Shape, Cloneable
   /**
    * Constructs a GeneralPath from an arbitrary shape object.
    * The Shapes PathIterator path and winding rule will be used.
-   * @param s the shape
+   * 
+   * @param s the shape (<code>null</code> not permitted).
+   * 
+   * @throws NullPointerException if <code>shape</code> is <code>null</code>.
    */
   public GeneralPath(Shape s)
   {
@@ -183,6 +189,9 @@ public final class GeneralPath implements Shape, Cloneable
 
   /**
    * Adds a new point to a path.
+   * 
+   * @param x  the x-coordinate.
+   * @param y  the y-coordinate.
    */
   public void moveTo(float x, float y)
   {
@@ -263,6 +272,11 @@ public final class GeneralPath implements Shape, Cloneable
    * Appends the segments of a Shape to the path. If <code>connect</code> is 
    * true, the new path segments are connected to the existing one with a line.
    * The winding rule of the Shape is ignored.
+   * 
+   * @param s  the shape (<code>null</code> not permitted).
+   * @param connect  whether to connect the new shape to the existing path.
+   * 
+   * @throws NullPointerException if <code>s</code> is <code>null</code>.
    */
   public void append(Shape s, boolean connect)
   {
@@ -276,7 +290,7 @@ public final class GeneralPath implements Shape, Cloneable
    * PathIterator#SEG_LINETO} segment.
    *
    * @param iter the PathIterator specifying which segments shall be
-   * appended.
+   *     appended (<code>null</code> not permitted).
    * 
    * @param connect <code>true</code> for substituting the initial
    * {@link PathIterator#SEG_MOVETO} segment by a {@link
@@ -327,6 +341,8 @@ public final class GeneralPath implements Shape, Cloneable
 
   /**
    * Returns the path&#x2019;s current winding rule.
+   * 
+   * @return {@link #WIND_EVEN_ODD} or {@link #WIND_NON_ZERO}.
    */
   public int getWindingRule()
   {
@@ -338,6 +354,8 @@ public final class GeneralPath implements Shape, Cloneable
    * considered &#x2019;inside&#x2019; or &#x2019;outside&#x2019; the path 
    * on drawing. Valid rules are WIND_EVEN_ODD for an even-odd winding rule, 
    * or WIND_NON_ZERO for a non-zero winding rule.
+   * 
+   * @param rule  the rule ({@link #WIND_EVEN_ODD} or {@link #WIND_NON_ZERO}).
    */
   public void setWindingRule(int rule)
   {
@@ -348,6 +366,8 @@ public final class GeneralPath implements Shape, Cloneable
 
   /**
    * Returns the current appending point of the path.
+   * 
+   * @return The point.
    */
   public Point2D getCurrentPoint()
   {
@@ -367,6 +387,8 @@ public final class GeneralPath implements Shape, Cloneable
 
   /**
    * Applies a transform to the path.
+   * 
+   * @param xform  the transform (<code>null</code> not permitted).
    */
   public void transform(AffineTransform xform)
   {
@@ -706,6 +728,8 @@ public final class GeneralPath implements Shape, Cloneable
   /**
    * Helper method - ensure the size of the data arrays,
    * otherwise, reallocate new ones twice the size
+   * 
+   * @param size  the minimum array size.
    */
   private void ensureSize(int size)
   {
