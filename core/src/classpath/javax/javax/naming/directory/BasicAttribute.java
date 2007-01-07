@@ -62,7 +62,7 @@ public class BasicAttribute implements Attribute
   /** True if this attribute's values are ordered.  */
   protected boolean ordered;
   /** Values for this attribute.  */
-  protected transient Vector values;
+  protected transient Vector<Object> values;
 
   // Used by cloning.
   private BasicAttribute ()
@@ -78,7 +78,7 @@ public class BasicAttribute implements Attribute
   {
     attrID = id;
     this.ordered = ordered;
-    values = new Vector ();
+    values = new Vector<Object> ();
   }
 
   public BasicAttribute (String id, Object value)
@@ -90,7 +90,7 @@ public class BasicAttribute implements Attribute
   {
     attrID = id;
     this.ordered = ordered;
-    values = new Vector ();
+    values = new Vector<Object> ();
     values.add (value);
   }
 
@@ -118,7 +118,7 @@ public class BasicAttribute implements Attribute
     BasicAttribute c = new BasicAttribute ();
     c.attrID = attrID;
     c.ordered = ordered;
-    c.values = (Vector) values.clone ();
+    c.values = (Vector<Object>) values.clone ();
     return c;
   }
 
@@ -182,7 +182,7 @@ public class BasicAttribute implements Attribute
     return values.get (index);
   }
 
-  public NamingEnumeration getAll ()
+  public NamingEnumeration<?> getAll ()
     throws NamingException
   {
     return new BasicAttributeEnumeration ();
@@ -307,7 +307,7 @@ public class BasicAttribute implements Attribute
   {
     s.defaultReadObject();
     int size = s.readInt();
-    values = new Vector(size);
+    values = new Vector<Object>(size);
     for (int i=0; i < size; i++)
       values.add(s.readObject());
   }

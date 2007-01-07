@@ -110,7 +110,7 @@ public class NamingManager
    *           class, named by this property, cannot be instantiated. 
    * @throws NamingException if throws by the context factory
    */
-  public static Context getInitialContext (Hashtable environment)
+  public static Context getInitialContext (Hashtable<?, ?> environment)
     throws NamingException
   {
     InitialContextFactory icf = null;
@@ -187,7 +187,7 @@ public class NamingManager
    * @throws NamingException if thrown by the factory when creating the context.
    */
   static Context getURLContext(Object refInfo, Name name, Context nameCtx,
-                               String scheme, Hashtable environment)
+                               String scheme, Hashtable<?,?> environment)
     throws NamingException
   {
     // Doc specifies com.sun.jndi.url as the final destination, but we cannot
@@ -329,15 +329,15 @@ public class NamingManager
    * </p>
    * <p>
    * The class name of the factory that creates the context has the naming
-   * pattern scheme-idURLContextFactory. For instance, the factory for the "ftp"
-   * sheme should be named "ftpURLContextFactory". The Context.URL_PKG_PREFIXES
-   * environment property contains the colon-separated list of the possible
-   * package prefixes. The package name is constructed concatenating the package
-   * prefix with the scheme id.
+   * pattern scheme-idURLContextFactory. For instance, the factory for the
+   * "ftp" scheme should be named "ftpURLContextFactory".
+   * The Context.URL_PKG_PREFIXES environment property contains the
+   * colon-separated list of the possible package prefixes. The package name
+   * is constructed by concatenating the package prefix with the scheme id.
    * </p>
    * <p>
-   * If the factory class cannot be found in the specified packages, system will
-   * try to use the default internal factory for the given scheme.
+   * If the factory class cannot be found in the specified packages, the
+   * system will try to use the default internal factory for the given scheme.
    * </p>
    * <p>
    * After the factory is instantiated, its method
@@ -345,13 +345,14 @@ public class NamingManager
    * is called to create and return the object instance.
    * 
    * @param scheme the url scheme that must be supported by the given context
-   * @param environment the properties for creating the factory and context (may
-   *          be null)
+   * @param environment the properties for creating the factory and context
+   *                    (may be null)
    * @return the created context
-   * @throws NamingException if thrown by the factory when creating the context.
+   * @throws NamingException if thrown by the factory when creating the
+   *                         context.
    */
   public static Context getURLContext (String scheme,
-				       Hashtable environment) 
+				       Hashtable<?, ?> environment) 
        throws NamingException
   {
     return getURLContext (null, null, null, scheme, environment);
@@ -450,7 +451,7 @@ public class NamingManager
   public static Object getObjectInstance (Object refInfo,
 					  Name name,
 					  Context nameCtx,
-					  Hashtable environment)
+					  Hashtable<?, ?> environment)
     throws Exception
   {
     ObjectFactory factory = null;
@@ -623,7 +624,7 @@ public class NamingManager
    * @throws NamingException
    */ 
   public static Object getStateToBind (Object obj, Name name,
-				       Context nameCtx, Hashtable environment)
+				       Context nameCtx, Hashtable<?, ?> environment)
     throws NamingException
   {
     StringTokenizer tokens = getPlusPath (Context.STATE_FACTORIES,
