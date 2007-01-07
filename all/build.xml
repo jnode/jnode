@@ -483,6 +483,9 @@ clean             Remove all intermediate build results.
                 <fileset dir="${root.dir}/core/src/classpath/tools">
                     <patternset refid="cp-includes-pattern"/>
                	</fileset>
+                <fileset dir="${root.dir}/core/src/classpath/sun">
+                    <patternset refid="cp-includes-pattern"/>
+               	</fileset>
             </vmsources>
             <vmspecificsources>
                 <fileset dir="${root.dir}/core/src/classpath/vm">
