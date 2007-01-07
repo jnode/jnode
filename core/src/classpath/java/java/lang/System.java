@@ -44,6 +44,14 @@ import gnu.classpath.VMStackWalker;
 
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.AbstractCollection;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.Properties;
 import java.util.PropertyPermission;
 
@@ -98,6 +106,11 @@ public final class System
    public static final PrintStream err = VMSystem.makeStandardErrorStream();
 
   /**
+   * A cached copy of the environment variable map.
+   */
+  private static Map<String,String> environmentMap;
+
+  /**
    * This class is uninstantiable.
    */
   private System()
@@ -118,6 +131,7 @@ public final class System
     SecurityManager sm = SecurityManager.current; // Be thread-safe.
     if (sm != null)
       sm.checkPermission(new RuntimePermission("setIO"));
+
     VMSystem.setIn(in);
     }
 
@@ -223,6 +237,38 @@ public final class System
     }
 
   /**
+   * <p>
+   * Returns the current value of a nanosecond-precise system timer.
+   * The value of the timer is an offset relative to some arbitrary fixed
+   * time, which may be in the future (making the value negative).  This
+   * method is useful for timing events where nanosecond precision is
+   * required.  This is achieved by calling this method before and after the
+   * event, and taking the difference betweent the two times:
+   * </p>
+   * <p>
+   * <code>long startTime = System.nanoTime();</code><br />
+   * <code>... <emph>event code</emph> ...</code><br />
+   * <code>long endTime = System.nanoTime();</code><br />
+   * <code>long duration = endTime - startTime;</code><br />
+   * </p>
+   * <p>
+   * Note that the value is only nanosecond-precise, and not accurate; there
+   * is no guarantee that the difference between two values is really a
+   * nanosecond.  Also, the value is prone to overflow if the offset
+   * exceeds 2^63.
+   * </p>
+   *
+   * @return the time of a system timer in nanoseconds.
+   * @since 1.5
+   */
+  public static long nanoTime()
+  {
+      //todo
+      throw new RuntimeException("Implement it");
+    //return VMSystem.nanoTime();
+  }
+
+  /**
    * Copy one array onto another from <code>src[srcStart]</code> ...
    * <code>src[srcStart+len-1]</code> to <code>dest[destStart]</code> ...
    * <code>dest[destStart+len-1]</code>. First, the arguments are validated:
@@ -319,6 +365,7 @@ public final class System
    * <dt>gnu.java.io.encoding_scheme_alias.iso-latin-_?</dt> <dd>8859_?</dd>
    * <dt>gnu.java.io.encoding_scheme_alias.latin?</dt>       <dd>8859_?</dd>
    * <dt>gnu.java.io.encoding_scheme_alias.utf-8</dt>        <dd>UTF8</dd>
+   * <dt>gnu.javax.print.server</dt>     <dd>Hostname of external CUPS server.</dd>
    * </dl>
      * 
    * @return the system properties, will never be null
@@ -364,7 +411,7 @@ public final class System
     SecurityManager sm = SecurityManager.current; // Be thread-safe.
     if (sm != null)
       sm.checkPropertyAccess(key);
-    else if (key.length() == 0)
+    if (key.length() == 0)
       throw new IllegalArgumentException("key can't be empty");
     return SystemProperties.getProperty(key);
     }
@@ -385,6 +432,10 @@ public final class System
     SecurityManager sm = SecurityManager.current; // Be thread-safe.
     if (sm != null)
       sm.checkPropertyAccess(key);
+    // This handles both the null pointer exception and the illegal
+    // argument exception.
+    if (key.length() == 0)
+      throw new IllegalArgumentException("key can't be empty");
     return SystemProperties.getProperty(key, def);
     }
 
@@ -405,6 +456,10 @@ public final class System
     SecurityManager sm = SecurityManager.current; // Be thread-safe.
     if (sm != null)
       sm.checkPermission(new PropertyPermission(key, "write"));
+    // This handles both the null pointer exception and the illegal
+    // argument exception.
+    if (key.length() == 0)
+      throw new IllegalArgumentException("key can't be empty");
     return SystemProperties.setProperty(key, value);
     }
 
