@@ -24,6 +24,7 @@
       <export name="gnu.classpath.tools.rmid.*"/>
       <export name="gnu.classpath.tools.rmiregistry.*"/>
       <export name="gnu.classpath.tools.rmic.*"/>
+      <export name="gnu.classpath.tools.rmic.templates.*"/>
       <export name="gnu.classpath.tools.serialver.*"/>
       <export name="gnu.classpath.tools.tnameserv.*"/>
 
