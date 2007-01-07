@@ -67,11 +67,11 @@ public class MediaSize extends Size2DSyntax
 {
   private static final long serialVersionUID = -1967958664615414771L;
 
-  private static ArrayList mediaCache;
+  private static ArrayList<MediaSize> mediaCache;
   
   static
     {
-      mediaCache = new ArrayList();
+      mediaCache = new ArrayList<MediaSize>();
 
       // We call one instance of every container class to make sure it gets
       // loaded during class initialization and therefore all other static
@@ -180,11 +180,12 @@ public class MediaSize extends Size2DSyntax
    *
    * @return The class <code>MediaSize</code> itself.
    */
-  public final Class getCategory()
+  public Class< ? extends Attribute> getCategory()
   {
     return MediaSize.class;
   }
 
+    
   /**
    * Searches for a MediaSize object with the given dimensions.
    * If none is found with exact dimensions, the closest match is used.
