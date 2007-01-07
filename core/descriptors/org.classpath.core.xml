@@ -90,11 +90,13 @@
       <export name="java.security.interfaces.*"/>
       <export name="java.security.spec.*"/>      
       <export name="java.text.*"/>
+      <export name="java.text.spi.*"/>
       <export name="java.util.*"/>
       <export name="java.util.jar.*"/>
       <export name="java.util.logging.*"/>
       <export name="java.util.prefs.*"/>
       <export name="java.util.regex.*"/>
+      <export name="java.util.spi.*"/>
       <export name="java.util.zip.*"/>
       
       <export name="javax.isolate.*"/>
