@@ -79,7 +79,12 @@ import gnu.java.lang.reflect.MethodSignatureParser;
  * @since 1.1
  * @status updated to 1.4
  */
-public final class Constructor extends AccessibleObject implements Member, AnnotatedElement, GenericDeclaration {
+public final class Constructor<T>
+  extends AccessibleObject
+  implements GenericDeclaration, Member
+{
+  private Class<T> clazz;
+  private int slot;
 
     private final VmMethod vmMethod;
     private ArrayList<Class> parameterTypes;
@@ -99,8 +104,8 @@ public final class Constructor extends AccessibleObject implements Member, Annot
      * Gets the class that declared this constructor.
      * @return the class that declared this member
      */
-    public Class getDeclaringClass() {
-        return vmMethod.getDeclaringClass().asClass();
+  public Class<T> getDeclaringClass() {
+        return (Class<T>) vmMethod.getDeclaringClass().asClass();
     }
 
     /**
@@ -108,9 +113,9 @@ public final class Constructor extends AccessibleObject implements Member, Annot
      * it was declared in).
      * @return the name of this constructor
      */
-    public String getName() {
-        final Class<?> declClass = getDeclaringClass();
-        return declClass.getName();
+  public String getName()
+  {
+    return getDeclaringClass().getName();
     }
 
     /**
@@ -164,7 +169,7 @@ public final class Constructor extends AccessibleObject implements Member, Annot
      *
      * @return a list of the types of the constructor's parameters
      */
-    public Class[] getParameterTypes() {
+  public Class<?>[] getParameterTypes() {
         if (parameterTypes == null) {
             int cnt = vmMethod.getNoArguments();
             ArrayList<Class> list = new ArrayList<Class>(cnt);
@@ -183,7 +188,7 @@ public final class Constructor extends AccessibleObject implements Member, Annot
      *
      * @return a list of the types in the constructor's throws clause
      */
-    public Class[] getExceptionTypes() {
+    public Class<?>[] getExceptionTypes() {
         if (exceptionTypes == null) {
             final VmExceptions exceptions = vmMethod.getExceptions();
             final int cnt = exceptions.getLength();
@@ -216,9 +221,9 @@ public final class Constructor extends AccessibleObject implements Member, Annot
      *
      * @return the hash code for the object
      */
-    public int hashCode() {
-        final Class<?> declClass = getDeclaringClass();
-        return declClass.getName().hashCode();
+  public int hashCode()
+  {
+    return getDeclaringClass().getName().hashCode();
     }
 
     /**
@@ -233,7 +238,7 @@ public final class Constructor extends AccessibleObject implements Member, Annot
      */
     public String toString() {
         // 128 is a reasonable buffer initial size for constructor
-        StringBuffer sb = new StringBuffer(128);
+    StringBuilder sb = new StringBuilder(128);
         Modifier.toString(getModifiers(), sb).append(' ');
         final Class<?> declClass = getDeclaringClass();
         sb.append(declClass.getName()).append('(');
@@ -285,8 +290,8 @@ public final class Constructor extends AccessibleObject implements Member, Annot
      * @throws ExceptionInInitializerError if construction triggered class
      *         initialization, which then failed
      */
-    public Object newInstance(Object args[]) throws InstantiationException, IllegalAccessException, InvocationTargetException {
-        return VmReflection.newInstance(vmMethod, args);
+    public T newInstance(Object... args) throws InstantiationException, IllegalAccessException, InvocationTargetException {
+        return (T) VmReflection.newInstance(vmMethod, args);
     }
 
     /**
@@ -318,6 +323,7 @@ public final class Constructor extends AccessibleObject implements Member, Annot
       MethodSignatureParser p = new MethodSignatureParser(this, sig);
       return p.getTypeParameters();
     }
+
     /**
      * Returns an array of <code>Type</code> objects that represents
      * the exception types declared by this constructor, in declaration order.
