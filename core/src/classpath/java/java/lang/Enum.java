@@ -60,13 +60,13 @@ public abstract class Enum<T extends Enum<T>>
   /**
    * The name of this enum constant.
    */
-  String name;
+  final String name;
 
   /**
    * The number of this enum constant.  Each constant is given a number
    * which matches the order in which it was declared, starting with zero.
    */
-  int ordinal;
+  final int ordinal;
 
   /**
    * This constructor is used by the compiler to create enumeration constants.
@@ -220,4 +220,14 @@ public abstract class Enum<T extends Enum<T>>
       k = k.getSuperclass();
     return k;
   }
+
+  /**
+   * Enumerations can not have finalization methods.
+   *
+   * @since 1.6
+   */
+  protected final void finalize()
+  {
+  }
+
 }
