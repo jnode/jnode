@@ -96,7 +96,7 @@ public abstract class TextAction extends AbstractAction
 	 */
   public static final Action[] augmentList(Action[] list1, Action[] list2)
   {
-    HashMap actions = new HashMap();
+    HashMap<Object,Action> actions = new HashMap<Object,Action>();
 
     for (int i = 0; i < list1.length; ++i)
       {
@@ -104,6 +104,7 @@ public abstract class TextAction extends AbstractAction
         Object name = a.getValue(Action.NAME);
         actions.put(name != null ? name : "", a);
       }
+
     for (int i = 0; i < list2.length; ++i)
       {
         Action a = list2[i];
@@ -113,9 +114,10 @@ public abstract class TextAction extends AbstractAction
     Action[] augmented = new Action[actions.size()];
     
     int i = 0;
-    for (Iterator it = actions.values().iterator(); it.hasNext(); i++)
-      augmented[i] = (Action) it.next();
+    for (Iterator<Action> it = actions.values().iterator(); it.hasNext(); i++)
+      augmented[i] = it.next();
     return augmented;
+
   }
 
 	/**
