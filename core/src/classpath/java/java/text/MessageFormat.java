@@ -82,9 +82,9 @@ public class MessageFormat extends Format
   // Recompute the locale-based formatter.
   void setLocale (Locale loc)
   {
-    if (type == null)
-      ;
-    else if (type.equals("number"))
+      if (type != null)
+        {
+          if (type.equals("number"))
       {
 	formatClass = java.lang.Number.class;
 
@@ -114,9 +114,9 @@ public class MessageFormat extends Format
 
 	int val = DateFormat.DEFAULT;
 	  boolean styleIsPattern = false;
-	if (style == null)
-	  ;
-	else if (style.equals("short"))
+              if (style != null)
+                {
+                  if (style.equals("short"))
 	  val = DateFormat.SHORT;
 	else if (style.equals("medium"))
 	  val = DateFormat.MEDIUM;
@@ -126,6 +126,7 @@ public class MessageFormat extends Format
 	  val = DateFormat.FULL;
 	  else
 	    styleIsPattern = true;
+                }
 
 	if (type.equals("time"))
 	  format = DateFormat.getTimeInstance(val, loc);
@@ -147,6 +148,7 @@ public class MessageFormat extends Format
 	    IllegalArgumentException ("style required for choice format");
 	format = new ChoiceFormat (style);
       }
+  }
   }
   }
 
@@ -396,7 +398,7 @@ public class MessageFormat extends Format
    * @param pattern The pattern used when formatting.
    * @param arguments The array containing the objects to be formatted.
    */
-  public static String format (String pattern, Object arguments[])
+  public static String format (String pattern, Object... arguments)
   {
     MessageFormat mf = new MessageFormat (pattern);
     StringBuffer sb = new StringBuffer ();

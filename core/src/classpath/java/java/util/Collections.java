@@ -706,14 +706,16 @@ public class Collections
 	      {
 		if (!forward)
 		  itr.next(); // Changing direction first.
-		for ( ; i != pos; i++, o = itr.next());
+		for ( ; i != pos; i++, o = itr.next())
+                  ;
 		forward = true;
 	      }
             else
 	      {
 		if (forward)
 		  itr.previous(); // Changing direction first.
-		for ( ; i != pos; i--, o = itr.previous());
+		for ( ; i != pos; i--, o = itr.previous())
+                  ;
 		forward = false;
 	      }
 	    final int d = compare(o, key, c);
@@ -2068,10 +2070,11 @@ public class Collections
    * sorts the array, and then iterates over the list setting each element from
    * the array.
    *
-   * @param l the List to sort
+   * @param l the List to sort (<code>null</code> not permitted)
    * @throws ClassCastException if some items are not mutually comparable
    * @throws UnsupportedOperationException if the List is not modifiable
-   * @throws NullPointerException if some element is null
+   * @throws NullPointerException if the list is <code>null</code>, or contains
+   *     some element that is <code>null</code>.
    * @see Arrays#sort(Object[])
    */
   public static <T extends Comparable<? super T>> void sort(List<T> l)
@@ -2087,13 +2090,15 @@ public class Collections
    * sorts the array, and then iterates over the list setting each element from
    * the array.
    *
-   * @param l the List to sort
+   * @param l the List to sort (<code>null</code> not permitted)
    * @param c the Comparator specifying the ordering for the elements, or
-   *        null for natural ordering
+   *        <code>null</code> for natural ordering
    * @throws ClassCastException if c will not compare some pair of items
    * @throws UnsupportedOperationException if the List is not modifiable
-   * @throws NullPointerException if null is compared by natural ordering
-   *        (only possible when c is null)
+   * @throws NullPointerException if the List is <code>null</code> or 
+   *         <code>null</code> is compared by natural ordering (only possible 
+   *         when c is <code>null</code>)
+   *         
    * @see Arrays#sort(Object[], Comparator)
    */
   public static <T> void sort(List<T> l, Comparator<? super T> c)
@@ -5110,9 +5115,9 @@ public class Collections
 
       // The array returned is an array of UnmodifiableMapEntry instead of
       // Map.Entry
-      public Map.Entry<K,V>[] toArray()
+      public Object[] toArray()
       {
-        Map.Entry<K,V>[] mapEntryResult = (Map.Entry<K,V>[]) super.toArray();
+        Object[] mapEntryResult = super.toArray();
         UnmodifiableMapEntry<K,V> result[] = null;
   
         if (mapEntryResult != null)
@@ -5120,21 +5125,21 @@ public class Collections
             result = (UnmodifiableMapEntry<K,V>[])
 	      new UnmodifiableMapEntry[mapEntryResult.length];
             for (int i = 0; i < mapEntryResult.length; ++i)
-	      result[i] = new UnmodifiableMapEntry(mapEntryResult[i]);
+	      result[i] = new UnmodifiableMapEntry<K,V>((Map.Entry<K,V>)mapEntryResult[i]);
 	  }
         return result;
       }
   
       // The array returned is an array of UnmodifiableMapEntry instead of
       // Map.Entry
-      public Map.Entry<K,V>[] toArray(Map.Entry<K,V>[] array)
+      public <S> S[] toArray(S[] array)
       {
-        super.toArray(array);
+        S[] result = super.toArray(array);
   
-        if (array != null)
-	  for (int i = 0; i < array.length; i++)
+        if (result != null)
+	  for (int i = 0; i < result.length; i++)
 	    array[i] =
-	      new UnmodifiableMapEntry<K,V>(array[i]);
+	      (S) new UnmodifiableMapEntry<K,V>((Map.Entry<K,V>) result[i]);
         return array;
       }
       
@@ -7420,4 +7425,187 @@ public class Collections
     }
   } // class CheckedSortedSet
 
+  /**
+   * Returns a view of a {@link Deque} as a stack or LIFO (Last-In-First-Out)
+   * {@link Queue}.  Each call to the LIFO queue corresponds to one
+   * equivalent method call to the underlying deque, with the exception
+   * of {@link Collection#addAll(Collection)}, which is emulated by a series
+   * of {@link Deque#push(E)} calls.
+   *
+   * @param deque the deque to convert to a LIFO queue.
+   * @return a LIFO queue.
+   * @since 1.6
+   */
+  public static <T> Queue<T> asLifoQueue(Deque<T> deque)
+  {
+    return new LIFOQueue<T>(deque);
+  }
+
+  /**
+   * Returns a set backed by the supplied map.  The resulting set
+   * has the same performance, concurrency and ordering characteristics
+   * as the original map.  The supplied map must be empty and should not
+   * be used after the set is created.  Each call to the set corresponds
+   * to one equivalent method call to the underlying map, with the exception
+   * of {@link Set#addAll(Collection)} which is emulated by a series of
+   * calls to <code>put</code>.
+   *
+   * @param map the map to convert to a set.
+   * @return a set backed by the supplied map.
+   * @throws IllegalArgumentException if the map is not empty.
+   * @since 1.6
+   */
+  public static <E> Set<E> newSetFromMap(Map<E,Boolean> map)
+  {
+    return new MapSet<E>(map);
+  }
+
+  /**
+   * The implementation of {@link #asLIFOQueue(Deque)}. 
+   *
+   * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+   * @since 1.6
+   */
+  private static class LIFOQueue<T>
+    extends AbstractQueue<T>
+  {
+    
+    /**
+     * The backing deque.
+     */
+    private Deque<T> deque;
+
+    /**
+     * Constructs a new {@link LIFOQueue} with the specified
+     * backing {@link Deque}.
+     *
+     * @param deque the backing deque.
+     */
+    public LIFOQueue(Deque<T> deque)
+    {
+      this.deque = deque;
+    }
+
+    public boolean add(T e)
+    {
+      return deque.offerFirst(e);
+    }
+    
+    public boolean addAll(Collection<? extends T> c)
+    {
+      boolean result = false;
+      for (T e : c)
+	result |= deque.offerFirst(e);
+      return result;
+    }
+    
+    public void clear()
+    {
+      deque.clear();
+    }
+    
+    public boolean isEmpty()
+    {
+      return deque.isEmpty();
+    }
+    
+    public Iterator<T> iterator()
+    {
+      return deque.iterator();
+    }
+    
+    public boolean offer(T e)
+    {
+      return deque.offerFirst(e);
+    }
+    
+    public T peek()
+    {
+      return deque.peek();
+    }
+
+    public T poll()
+    {
+      return deque.poll();
+    }
+    
+    public int size()
+    {
+      return deque.size();
+    }
+  } // class LIFOQueue
+
+  /**
+   * The implementation of {@link #newSetFromMap(Map)}. 
+   *
+   * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+   * @since 1.6
+   */
+  private static class MapSet<E>
+    extends AbstractSet<E>
+  {
+    
+    /**
+     * The backing map.
+     */
+    private Map<E,Boolean> map;
+
+    /**
+     * Constructs a new {@link MapSet} using the specified
+     * backing {@link Map}.
+     *
+     * @param map the backing map.
+     * @throws IllegalArgumentException if the map is not empty.
+     */
+    public MapSet(Map<E,Boolean> map)
+    {
+      if (!map.isEmpty())
+	throw new IllegalArgumentException("The map must be empty.");
+      this.map = map;
+    }
+
+    public boolean add(E e)
+    {
+      return map.put(e, true) == null;
+    }
+    
+    public boolean addAll(Collection<? extends E> c)
+    {
+      boolean result = false;
+      for (E e : c)
+	result |= (map.put(e, true) == null);
+      return result;
+    }
+    
+    public void clear()
+    {
+      map.clear();
+    }
+    
+    public boolean contains(Object o)
+    {
+      return map.containsKey(o);
+    }
+    
+    public boolean isEmpty()
+    {
+      return map.isEmpty();
+    }
+    
+    public Iterator<E> iterator()
+    {
+      return map.keySet().iterator();
+    }
+    
+    public boolean remove(Object o)
+    {
+      return map.remove(o) != null;
+    }
+    
+    public int size()
+    {
+      return map.size();
+    }
+  } // class MapSet
+  
 } // class Collections

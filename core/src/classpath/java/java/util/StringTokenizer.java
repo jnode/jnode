@@ -58,7 +58,7 @@ package java.util;
  * @see java.io.StreamTokenizer
  * @status updated to 1.4
  */
-public class StringTokenizer implements Enumeration
+public class StringTokenizer implements Enumeration<Object>
 {
 	// WARNING: StringTokenizer is a CORE class in the bootstrap cycle. See the
 	// comments in vm/reference/java/lang/Runtime for implications of this fact.
@@ -181,12 +181,14 @@ public class StringTokenizer implements Enumeration
       {
 			if (retDelims)
 				return str.substring(pos, ++pos);
-			while (++pos < len && delim.indexOf(str.charAt(pos)) >= 0);
+        while (++pos < len && delim.indexOf(str.charAt(pos)) >= 0)
+          ;
 		}
     if (pos < len)
       {
 			int start = pos;
-			while (++pos < len && delim.indexOf(str.charAt(pos)) < 0);
+        while (++pos < len && delim.indexOf(str.charAt(pos)) < 0)
+          ;
 
 			return str.substring(start, pos);
 		}

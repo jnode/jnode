@@ -1,5 +1,5 @@
 /* java.beans.DesignMode
-   Copyright (C) 1999 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2006, Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -39,7 +39,8 @@ exception statement from your version. */
 package java.beans;
 
 /**
- * <code>BeanContextChild</code> implementors implement this to get information about whether they are in a design time or runtime environment.
+ * <code>BeanContextChild</code> implementors implement this to get information
+ * about whether they are in a design time or runtime environment.
  * The reason this is restricted to <code>BeanContextChild</code>ren is that
  * only things in the <code>BeanContext</code> hierarchy are given this
  * information in the first place.
@@ -48,11 +49,11 @@ package java.beans;
  * @since JDK1.2
  * @see java.beans.beancontext.BeanContextChild
  */
+public interface DesignMode 
+{
 
-public interface DesignMode {
 	/**
 	 * Use this name when firing <code>PropertyChangeEvent</code>s from your Bean.  
-	 * @fixme Check whether PROPERTYNAME is set to same value as Sun.
 	 */
 	String PROPERTYNAME = "designTime";
 
@@ -78,7 +79,7 @@ public interface DesignMode {
 	 *        the BeanContext can <em>change</em> the status of the Bean from
 	 *        design time to runtime.  But it appears that it may be so.
 	 *
-	 * @see java.util.PropertyChangeEvent
+   * @see java.beans.PropertyChangeEvent
 	 * @see java.beans.beancontext.BeanContext
 	 * @see #PROPERTYNAME
 	 */
@@ -90,4 +91,5 @@ public interface DesignMode {
 	 *         runtime.
 	 */
 	boolean isDesignTime();
+
 }
