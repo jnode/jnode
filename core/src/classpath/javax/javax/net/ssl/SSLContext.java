@@ -189,6 +189,31 @@ public class SSLContext
   }
 
   /**
+   * Creates a new {@link SSLEngine} for this context.
+   *
+   * @return The new SSLEngine.
+   * @since 1.5
+   */
+  public final SSLEngine createSSLEngine ()
+  {
+    return ctxSpi.engineCreateSSLEngine ();
+  }
+
+  /**
+   * Creates a new {@link SSLEngine} for this context, with a given
+   * host name and port number.
+   *
+   * @param host The local host name.
+   * @param port The local port number.
+   * @return The new SSLEngine.
+   * @since 1.5
+   */
+  public final SSLEngine createSSLEngine (final String host, final int port)
+  {
+    return ctxSpi.engineCreateSSLEngine (host, port);
+  }
+
+  /**
    * Returns the set of SSL contexts available for client connections.
    *
    * @return The set of SSL contexts available for client connections.
