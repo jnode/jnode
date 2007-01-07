@@ -287,5 +287,30 @@ public final class ThreadMXBeanImpl
 					      "supported.");
   }
 
+
+    public ThreadInfo[] dumpAllThreads(boolean lockedMonitors, boolean lockedSynchronizers) {
+        //todo implement
+        throw new UnsupportedOperationException();
+    }
+
+    public long[] findDeadlockedThreads() {
+        //todo implement
+        throw new UnsupportedOperationException();
+    }
+
+    public ThreadInfo[] getThreadInfo(long[] ids, boolean lockedMonitors, boolean lockedSynchronizers) {
+        //todo implement
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean isObjectMonitorUsageSupported() {
+        //todo implement
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean isSynchronizerUsageSupported() {
+        //todo implement
+        throw new UnsupportedOperationException();
+    }
 }
 

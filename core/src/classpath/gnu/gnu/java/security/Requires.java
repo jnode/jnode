@@ -1,22 +1,22 @@
-/* GetLocalHostAction.java --
-   Copyright (C) 2003, 2004  Free Software Foundation, Inc.
+/* Requires.java -- mark methods as requiring permission.
+   Copyright (C) 2006  Free Software Foundation, Inc.
 
-This file is part of GNU Classpath.
+This file is a part of GNU Classpath.
 
 GNU Classpath is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2, or (at your option)
-any later version.
- 
+the Free Software Foundation; either version 2 of the License, or (at
+your option) any later version.
+
 GNU Classpath is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-02110-1301 USA.
+along with GNU Classpath; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
+USA
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -36,30 +36,24 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package gnu.java.net;
+package gnu.java.security;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.security.PrivilegedAction;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.CLASS;
+import java.security.Permission;
 
 /**
- * Privileged action to retrieve the local host InetAddress.
- *
- * @author Chris Burdess (dog@gnu.org)
+ * 
+ * 
+ * @author Casey Marshall (csm@gnu.org)
  */
-public class GetLocalHostAction
-  implements PrivilegedAction<InetAddress>
+@Documented @Retention(CLASS) @Target(METHOD)
+public @interface Requires
 {
-  public InetAddress run()
-  {
-    try
-      {
-        return InetAddress.getLocalHost();
-      }
-    catch (UnknownHostException e)
-      {
-        return null;
-      }
-  }
+  Class<? extends Permission> permissionClass();
+  String target();
+  String action();
 }
-
