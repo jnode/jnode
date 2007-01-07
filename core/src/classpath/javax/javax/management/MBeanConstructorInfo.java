@@ -38,6 +38,7 @@ exception statement from your version. */
 package javax.management;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Type;
 
 import java.util.Arrays;
 
@@ -77,12 +78,18 @@ public class MBeanConstructorInfo
   public MBeanConstructorInfo(String desc, Constructor cons)
   {
     super(cons.getName(), desc);
-    Class[] paramTypes = cons.getParameterTypes();
+    Type[] paramTypes = cons.getGenericParameterTypes();
     signature = new MBeanParameterInfo[paramTypes.length];
     for (int a = 0; a < paramTypes.length; ++a)
+      {
+	Type t = paramTypes[a];
+	if (t instanceof Class)
       signature[a] = new MBeanParameterInfo(null,
-					    paramTypes[a].getName(),
+						((Class) t).getName(),
 					    null);
+	else
+	  signature[a] = new MBeanParameterInfo(null, t.toString(), null);
+      }
   }
 
   /**

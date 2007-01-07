@@ -665,7 +665,10 @@ public class StandardMBean
 			 ainfo, cinfo, oinfo, null);
     String cname = getClassName(info);
     String desc = getDescription(info);
-    info = new MBeanInfo(cname, desc, ainfo, cinfo, oinfo, null);
+    MBeanNotificationInfo[] ninfo = null;
+    if (impl instanceof NotificationBroadcaster)
+      ninfo = ((NotificationBroadcaster) impl).getNotificationInfo();
+    info = new MBeanInfo(cname, desc, ainfo, cinfo, oinfo, ninfo);
     cacheMBeanInfo(info);
     return info;
   }
