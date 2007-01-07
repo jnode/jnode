@@ -1,4 +1,4 @@
-/* LatinMetrics.java -- Latin specific metrics data
+/* LatinBlue.java -- FIXME: briefly describe file purpose
    Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -38,29 +38,22 @@ exception statement from your version. */
 
 package gnu.java.awt.font.autofit;
 
-import gnu.java.awt.font.opentype.OpenTypeFont;
-
-/**
- * Latin specific metrics data.
- */
-class LatinMetrics
-  extends ScriptMetrics
+public class LatinBlue
 {
-
-  LatinAxis[] axis;
-
-  int unitsPerEm;
-
-  LatinMetrics()
+  static final int FLAG_BLUE_ACTIVE = 1 << 0;
+  static final int FLAG_TOP = 1 << 1;
+  static final int FLAG_ADJUSTMENT = 1 << 2;
+  Width ref;
+  Width shoot;
+  int flags;
+  public String toString()
   {
-    super();
-    axis = new LatinAxis[Constants.DIMENSION_MAX];
-    axis[Constants.DIMENSION_HORZ] = new LatinAxis();
-    axis[Constants.DIMENSION_VERT] = new LatinAxis();
-  }
-  LatinMetrics(OpenTypeFont face)
-  {
-    this();
-    unitsPerEm = face.unitsPerEm;
+    StringBuilder s = new StringBuilder();
+    s.append("[BlueZone]");
+    s.append(" ref: ");
+    s.append(ref.org);
+    s.append(", shoot: ");
+    s.append(shoot.org);
+    return s.toString();
   }
 }

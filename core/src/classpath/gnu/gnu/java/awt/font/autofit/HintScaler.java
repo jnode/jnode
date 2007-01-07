@@ -40,7 +40,7 @@ package gnu.java.awt.font.autofit;
 
 import gnu.java.awt.font.opentype.OpenTypeFont;
 
-class Scaler
+class HintScaler
 {
 
   int xScale;
@@ -48,5 +48,6 @@ class Scaler
   int yScale;
   int yDelta;
   OpenTypeFont face;
-  
+  int renderMode;
+
 }

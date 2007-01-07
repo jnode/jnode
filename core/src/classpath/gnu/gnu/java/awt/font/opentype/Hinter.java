@@ -1,4 +1,4 @@
-/* LatinMetrics.java -- Latin specific metrics data
+/* Hinter.java -- The interface to a hinting implementation
    Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,31 +36,28 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package gnu.java.awt.font.autofit;
+package gnu.java.awt.font.opentype;
 
-import gnu.java.awt.font.opentype.OpenTypeFont;
+import gnu.java.awt.font.opentype.truetype.Zone;
 
 /**
- * Latin specific metrics data.
+ * The interface to a hinting implementation.
  */
-class LatinMetrics
-  extends ScriptMetrics
+public interface Hinter
 {
+  /**
+   * Initializes the hinter.
+   *
+   * @param face the font for which the hinter should be used
+   */
+  void init(OpenTypeFont face);
 
-  LatinAxis[] axis;
+  /**
+   * Hints the specified outline.
+   *
+   * @param outline the outline to hint
+   */
+  void applyHints(Zone outline);
 
-  int unitsPerEm;
-
-  LatinMetrics()
-  {
-    super();
-    axis = new LatinAxis[Constants.DIMENSION_MAX];
-    axis[Constants.DIMENSION_HORZ] = new LatinAxis();
-    axis[Constants.DIMENSION_VERT] = new LatinAxis();
-  }
-  LatinMetrics(OpenTypeFont face)
-  {
-    this();
-    unitsPerEm = face.unitsPerEm;
-  }
+  void setFlags(int flags);
 }

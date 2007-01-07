@@ -1,4 +1,4 @@
-/* LatinMetrics.java -- Latin specific metrics data
+/* Edge.java -- An edge of segments
    Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -38,29 +38,43 @@ exception statement from your version. */
 
 package gnu.java.awt.font.autofit;
 
-import gnu.java.awt.font.opentype.OpenTypeFont;
-
-/**
- * Latin specific metrics data.
- */
-class LatinMetrics
-  extends ScriptMetrics
+class Edge
 {
+  int fpos;
+  Segment first;
+  Segment last;
+  int opos;
+  Edge link;
+  Edge serif;
+  int flags;
+  int dir;
+  Width blueEdge;
+  int pos;
+  int scale;
 
-  LatinAxis[] axis;
-
-  int unitsPerEm;
-
-  LatinMetrics()
+  public String toString()
   {
-    super();
-    axis = new LatinAxis[Constants.DIMENSION_MAX];
-    axis[Constants.DIMENSION_HORZ] = new LatinAxis();
-    axis[Constants.DIMENSION_VERT] = new LatinAxis();
-  }
-  LatinMetrics(OpenTypeFont face)
-  {
-    this();
-    unitsPerEm = face.unitsPerEm;
+    StringBuilder s = new StringBuilder();
+    s.append("[Edge] id");
+    s.append(hashCode());
+    s.append(", fpos: ");
+    s.append(fpos);
+    s.append(", opos: ");
+    s.append(opos);
+    s.append(", pos: ");
+    s.append(pos);
+    s.append(", dir: ");
+    s.append(dir);
+    s.append(", serif: ");
+    s.append(serif != null ? serif.hashCode() : "null");
+    s.append(", link: ");
+    s.append(link != null ? link.hashCode() : "null");
+    s.append(", flags: " + flags);
+    s.append(", blue: " + blueEdge);
+    s.append(", first: ");
+    s.append(first == null ? "null" : first.hashCode());
+    s.append(", last: ");
+    s.append(last == null ? "null" : last.hashCode());
+    return s.toString();
   }
 }
