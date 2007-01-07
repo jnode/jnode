@@ -108,7 +108,7 @@ import java.text.SimpleDateFormat;
  * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  */
 public class Date
-    implements Cloneable, Comparable, Serializable
+    implements Cloneable, Comparable<Date>, Serializable
 {
   /**
    * This is the serialization UID for this class
@@ -354,24 +354,6 @@ public class Date
 	}
 
 	/**
-   * Compares this Date to another object.  This behaves like
-   * <code>compareTo(Date)</code>, but it takes a generic object
-   * and throws a <code>ClassCastException</code> if obj is
-   * not a <code>Date</code>.
-   * 
-	 * @param obj the other date.
-	 * @return 0, if the date represented
-	 * by obj is exactly the same as the time represented by this
-	 * object, a negative if this Date is before the other Date, and
-	 * a positive value otherwise.  
-	 * @exception ClassCastException if obj is not of type Date.
-	 */
-  public int compareTo(Object obj)
-  {
-		return compareTo((Date) obj);
-	}
-
-  /**
    * Computes the hash code of this <code>Date</code> as the
    * XOR of the most significant and the least significant
    * 32 bits of the 64 bit milliseconds value.
@@ -865,7 +847,7 @@ public class Date
 		  hour += 12;
 		}
 	    else if (parseDayOfWeek(tok))
-	      ; // Ignore it; throw the token away.
+	      { /* Ignore it; throw the token away. */ }
 	    else if (tok.equals("UT") || tok.equals("UTC") || tok.equals("GMT"))
 	      localTimezone = false;
 	    else if (tok.startsWith("UT") || tok.startsWith("GMT"))

@@ -808,9 +808,11 @@ public class LogManager
    */
   public void checkAccess() throws SecurityException
   {
+    /* jnode - TODO - fix it, where to give permission?  
     SecurityManager sm = System.getSecurityManager();
     if (sm != null)
       sm.checkPermission(controlPermission);
+    */
   }
 
   /** 

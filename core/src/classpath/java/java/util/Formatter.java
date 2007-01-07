@@ -749,9 +749,6 @@ public final class Formatter
     noPrecision(precision);
 
     // Some error checking.
-    if ((flags & FormattableFlags.ZERO) != 0
-	&& (flags & FormattableFlags.LEFT_JUSTIFY) == 0)
-      throw new IllegalFormatFlagsException(getName(flags));
     if ((flags & FormattableFlags.PLUS) != 0
 	&& (flags & FormattableFlags.SPACE) != 0)
       throw new IllegalFormatFlagsException(getName(flags));

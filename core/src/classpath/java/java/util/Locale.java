@@ -1,5 +1,5 @@
 /* Locale.java -- i18n locales
-   Copyright (C) 1998, 1999, 2001, 2002, 2005  Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2001, 2002, 2005, 2006  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -45,6 +45,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+
+import java.util.spi.LocaleNameProvider;
 
 /**
  * Locales represent a specific country and culture. Classes which can be
@@ -161,6 +163,11 @@ public final class Locale implements Serializable, Cloneable
     /** Locale which represents the French speaking portion of Canada. */
   public static final Locale CANADA_FRENCH = getLocale("fr", "CA");
 
+  /** The root locale, used as the base case in lookups by
+   *  locale-sensitive operations.
+   */
+  public static final Locale ROOT = new Locale("","","");
+
     /**
      * Compatible with JDK 1.1+.
      */
@@ -188,17 +195,11 @@ public final class Locale implements Serializable, Cloneable
     private String variant;
 
     /**
-   * This is where the JDK caches its hashcode. This is is only here
-   * for serialization purposes. The actual cache is hashcodeCache
+   * This is the cached hashcode. When writing to stream, we write -1.
      * 
      * @serial should be -1 in serial streams
      */
-  private int hashcode = -1;
-
-  /**
-   * This is the cached hashcode. 
-   */
-  private transient int hashcodeCache;
+  private int hashcode;
 
     /**
    * Array storing all available locales.
@@ -330,7 +331,7 @@ public final class Locale implements Serializable, Cloneable
         this.language = language;
         this.country = country;
         this.variant = variant;
-    hashcodeCache = language.hashCode() ^ country.hashCode() ^ variant.hashCode();
+    hashcode = language.hashCode() ^ country.hashCode() ^ variant.hashCode();
     }
 
     /**
@@ -680,6 +681,8 @@ public final class Locale implements Serializable, Cloneable
      */
   public String getDisplayLanguage(Locale inLocale)
       {
+    if (language.isEmpty())
+      return "";
     try
       {
 	ResourceBundle res =
@@ -691,8 +694,27 @@ public final class Locale implements Serializable, Cloneable
       }
     catch (MissingResourceException e)
       {
-	return language;
+	/* This means runtime support for the locale
+	 * is not available, so we check providers. */
       }
+    for (LocaleNameProvider p :
+	   ServiceLoader.load(LocaleNameProvider.class))
+      {
+	for (Locale loc : p.getAvailableLocales())
+	  {
+	    if (loc.equals(inLocale))
+	      {
+		String locLang = p.getDisplayLanguage(language,
+						      inLocale);
+		if (locLang != null)
+		  return locLang;
+		break;
+	      }
+	  }
+      }
+    if (inLocale.equals(Locale.ROOT)) // Base case
+      return language;
+    return getDisplayLanguage(LocaleHelper.getFallbackLocale(inLocale));
     }
 
     /**
@@ -738,6 +760,8 @@ public final class Locale implements Serializable, Cloneable
      */
   public String getDisplayCountry(Locale inLocale)
   {
+    if (country.isEmpty())
+      return "";
     try
       {
         ResourceBundle res =
@@ -749,8 +773,27 @@ public final class Locale implements Serializable, Cloneable
       }
     catch (MissingResourceException e)
       {
-        return country;
+	/* This means runtime support for the locale
+	 * is not available, so we check providers. */
       }
+    for (LocaleNameProvider p :
+	   ServiceLoader.load(LocaleNameProvider.class))
+      {
+	for (Locale loc : p.getAvailableLocales())
+	  {
+	    if (loc.equals(inLocale))
+	      {
+		String locCountry = p.getDisplayCountry(country,
+							inLocale);
+		if (locCountry != null)
+		  return locCountry;
+		break;
+	      }
+	  }
+      }
+    if (inLocale.equals(Locale.ROOT)) // Base case
+      return country;
+    return getDisplayCountry(LocaleHelper.getFallbackLocale(inLocale));
     }
 
     /**
@@ -797,6 +840,8 @@ public final class Locale implements Serializable, Cloneable
      */
   public String getDisplayVariant(Locale inLocale)
   {
+    if (variant.isEmpty())
+      return "";
     try
       {
         ResourceBundle res =
@@ -808,9 +853,28 @@ public final class Locale implements Serializable, Cloneable
       }
     catch (MissingResourceException e)
       {
-        return variant;
+	/* This means runtime support for the locale
+	 * is not available, so we check providers. */
+      }
+    for (LocaleNameProvider p :
+	   ServiceLoader.load(LocaleNameProvider.class))
+      {
+	for (Locale loc : p.getAvailableLocales())
+	  {
+	    if (loc.equals(inLocale))
+	      {
+		String locVar = p.getDisplayVariant(variant,
+						    inLocale);
+		if (locVar != null)
+		  return locVar;
+		break;
+	      }
       }
     }
+    if (inLocale.equals(Locale.ROOT)) // Base case
+      return country;
+    return getDisplayVariant(LocaleHelper.getFallbackLocale(inLocale));
+  }
 
     /**
      * Gets all local components suitable for display to the user, formatted
@@ -905,7 +969,7 @@ public final class Locale implements Serializable, Cloneable
      */
   public int hashCode()
   {
-    return hashcodeCache;
+    return hashcode;
     }
 
     /**
@@ -929,6 +993,24 @@ public final class Locale implements Serializable, Cloneable
     }
 
     /**
+   * Write the locale to an object stream.
+   *
+   * @param s the stream to write to
+   * @throws IOException if the write fails
+   * @serialData The first three fields are Strings representing language,
+   *             country, and variant. The fourth field is a placeholder for 
+   *             the cached hashcode, but this is always written as -1, and 
+   *             recomputed when reading it back.
+   */
+  private void writeObject(ObjectOutputStream s)
+    throws IOException
+  {
+    ObjectOutputStream.PutField fields = s.putFields();
+    fields.put("hashcode", -1);
+    s.defaultWriteObject();
+  }
+
+  /**
      * Reads a locale from the input stream.
      * 
    * @param s the stream to read from
@@ -943,6 +1025,6 @@ public final class Locale implements Serializable, Cloneable
     language = language.intern();
     country = country.intern();
     variant = variant.intern();
-    hashcodeCache = language.hashCode() ^ country.hashCode() ^ variant.hashCode();
+    hashcode = language.hashCode() ^ country.hashCode() ^ variant.hashCode();
     }
 } // class Locale

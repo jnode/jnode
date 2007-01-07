@@ -416,17 +416,7 @@ public abstract class AbstractCollection<E>
 
     Iterator<E> itr = iterator();
     for (int pos = 0; pos < size; pos++)
-      {
-	try
-	  {
 	    a[pos] = (T) (itr.next());
-	  }
-	catch (ClassCastException exception)
-	  {
-	    throw new ArrayStoreException("The element is of the wrong type "+
-					  "for storing in this array.");
-	  }
-      }
     return a;
   }
 
