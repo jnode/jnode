@@ -1,21 +1,18 @@
-/*
- * $Id$
- *
- * JNode.org
- * Copyright (C) 2003-2006 JNode.org
+/* Thread -- an independent thread of executable code
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
@@ -712,6 +709,36 @@ public class Thread implements Runnable {
         }
         return locals;
     }
+  /**
+   * <p>
+   * Represents the current state of a thread, according to the VM rather
+   * than the operating system.  It can be one of the following:
+   * </p>
+   * <ul>
+   * <li>NEW -- The thread has just been created but is not yet running.</li>
+   * <li>RUNNABLE -- The thread is currently running or can be scheduled
+   * to run.</li>
+   * <li>BLOCKED -- The thread is blocked waiting on an I/O operation
+   * or to obtain a lock.</li>
+   * <li>WAITING -- The thread is waiting indefinitely for another thread
+   * to do something.</li>
+   * <li>TIMED_WAITING -- The thread is waiting for a specific amount of time
+   * for another thread to do something.</li>
+   * <li>TERMINATED -- The thread has exited.</li>
+   * </ul>
+   *
+   * @since 1.5
+   */  
+  public enum State
+  {
+    BLOCKED, NEW, RUNNABLE, TERMINATED, TIMED_WAITING, WAITING;
+
+    /**
+     * For compatability with Sun's JDK
+     */
+    private static final long serialVersionUID = 605505746047245783L;
+  }
+
 
       /**
    * Returns the current state of the thread.  This
@@ -720,9 +747,9 @@ public class Thread implements Runnable {
    *
    * @return the current thread state.
    */
-  public String getState()
+  public State getState()
   {
       //todo implement
-    return "UNKNOWN";
+    throw new UnsupportedClassVersionError();
   }
 }
