@@ -227,14 +227,14 @@ public abstract class Graphics2D extends Graphics
    * 
    * @see #addRenderingHints(Map)
    */
-  public abstract void setRenderingHints(Map hints);
+  public abstract void setRenderingHints(Map<?,?> hints);
 
   /**
    * Adds/updates the rendering hint.
    * 
    * @param hints  the hints to add or update.
    */
-  public abstract void addRenderingHints(Map hints);
+  public abstract void addRenderingHints(Map<?,?> hints);
 
   /**
    * Returns the current rendering hints.

@@ -76,6 +76,7 @@ import java.util.Locale;
  * java.awt.im.spi.InputMethodDescriptor.
  *
  * @author Eric Blake (ebb9@email.byu.edu)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @see Component#getInputContext()
  * @see Component#enableInputMethods(boolean)
  * @since 1.2
@@ -86,7 +87,9 @@ public class InputContext
 	/**
 	 * The list of installed input method descriptors.
 	 */
-	private static final ArrayList descriptors = new ArrayList();
+  private static final ArrayList<InputMethodDescriptor> descriptors
+    = new ArrayList<InputMethodDescriptor>();
+
   static
   {
 		Enumeration e;
@@ -123,7 +126,7 @@ public class InputContext
               {
                 if (line.charAt(0) != '#')
                   {
-						Class c = Class.forName(line);
+                    Class<?> c = Class.forName(line);
 						descriptors.add((InputMethodDescriptor) c.newInstance());
 					}
 					line = in.readLine().trim();
@@ -143,7 +146,8 @@ public class InputContext
 	private InputMethod im;
 
 	/** Map of locales to the most recently selected input method. */
-	private final HashMap recent = new HashMap();
+  private final HashMap<Locale,InputMethod> recent 
+    = new HashMap<Locale,InputMethod>();
 
 	/** The list of acceptable character subsets. */
 	private Character.Subset[] subsets;

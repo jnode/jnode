@@ -122,7 +122,20 @@ public class RandomAccessFile implements DataOutput, DataInput, Closeable
           s.checkWrite(fileName);
       }
 
+    try
+      {
     ch = FileChannelImpl.create(file, fdmode);
+      }
+    catch (FileNotFoundException fnfe)
+      {
+        throw fnfe;
+      }
+    catch (IOException ioe)
+      {
+        FileNotFoundException fnfe = new FileNotFoundException(file.getPath());
+        fnfe.initCause(ioe);
+        throw fnfe;
+      }
     fd = new FileDescriptor(ch);
     if ((fdmode & FileChannelImpl.WRITE) != 0)
     out = new DataOutputStream (new FileOutputStream (fd));
