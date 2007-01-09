@@ -4,7 +4,6 @@
 	<classpathentry kind="src" path="src/classpath/java"/>
 	<classpathentry kind="src" path="src/classpath/javax"/>
 	<classpathentry kind="src" path="src/classpath/org"/>
-	<classpathentry kind="src" path="src/classpath/5.0"/>
 	<classpathentry kind="src" path="src/classpath/ext"/>
 	<classpathentry kind="src" path="src/classpath/vm"/>
 	<classpathentry kind="src" path="src/core"/>
