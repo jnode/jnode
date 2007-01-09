@@ -166,7 +166,7 @@ public class DefaultButtonModel implements ButtonModel, Serializable
    *
    * @return array of listeners
    */
-  public EventListener[] getListeners(Class listenerType)
+  public <T extends EventListener> T[] getListeners(Class<T> listenerType)
   {
     return listenerList.getListeners(listenerType);
   }

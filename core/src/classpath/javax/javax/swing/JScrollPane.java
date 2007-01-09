@@ -162,8 +162,9 @@ public class JScrollPane extends JComponent
 
   protected JViewport viewport;
   
-  Border viewportBorder;
-  boolean wheelScrollingEnabled;
+  private Border viewportBorder;
+
+  private boolean wheelScrollingEnabled;
 
   public JViewport getColumnHeader()
   {
@@ -595,6 +596,7 @@ public class JScrollPane extends JComponent
    */
   public JScrollPane(Component view, int vsbPolicy, int hsbPolicy) 
   {
+    wheelScrollingEnabled = true;
     setVerticalScrollBarPolicy(vsbPolicy);
     setVerticalScrollBar(createVerticalScrollBar());
     setHorizontalScrollBarPolicy(hsbPolicy);
