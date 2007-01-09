@@ -38,6 +38,8 @@ exception statement from your version. */
 
 package java.awt.print;
 
+import gnu.java.awt.print.JavaPrinterJob;
+
 import java.awt.HeadlessException;
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
@@ -62,8 +64,7 @@ public abstract class PrinterJob
 	  */
   public static PrinterJob getPrinterJob()
   {
-		// FIXME: Need to fix this to load a default implementation instance.
-    return new NoPrinterJob();
+    return new JavaPrinterJob();
   }
 
   /**

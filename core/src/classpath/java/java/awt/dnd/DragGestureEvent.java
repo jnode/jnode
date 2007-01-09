@@ -59,7 +59,7 @@ public class DragGestureEvent extends EventObject
   private Component component;
   private final Point origin;
   private final int action;
-  private List events;
+  private List<InputEvent> events;
   private DragGestureRecognizer dgr;
 
   /**
@@ -71,7 +71,7 @@ public class DragGestureEvent extends EventObject
    * @throws IllegalArgumentException - if input parameters are null
    */
   public DragGestureEvent(DragGestureRecognizer dgr, int action, Point origin,
-                          List events)
+                          List<? extends InputEvent> events)
   {
     super(dgr);
     if (origin == null || events == null || dgr == null)
@@ -79,7 +79,7 @@ public class DragGestureEvent extends EventObject
     
     this.origin = origin;
     this.action = action;
-    this.events = events;
+    this.events = (List<InputEvent>) events;
     this.dgr = dgr;
     this.component = dgr.getComponent();
     this.dragSource = dgr.getDragSource();
@@ -130,7 +130,7 @@ public class DragGestureEvent extends EventObject
    * 
    * @return an iterator representation of the List of events.
    */
-  public Iterator iterator()
+  public Iterator<InputEvent> iterator()
   {
     return events.iterator();
   }

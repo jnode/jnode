@@ -183,9 +183,9 @@ public abstract class Preferences {
         // Get the factory
         if (factory == null) {
             // Caller might not have enough permissions
-            factory = (PreferencesFactory) AccessController.doPrivileged(
-                        new PrivilegedAction() {
-                            public Object run() {
+            factory = AccessController.doPrivileged(
+                        new PrivilegedAction<PreferencesFactory>() {
+                            public PreferencesFactory run() {
                                 PreferencesFactory pf = null;
                                 String className = System.getProperty
                                     ("java.util.prefs.PreferencesFactory");
@@ -251,7 +251,7 @@ public abstract class Preferences {
      * @exception SecurityException when a security manager is installed and
      * the caller does not have <code>RuntimePermission("preferences")</code>.
      */
-    public static Preferences systemNodeForPackage(Class c)
+    public static Preferences systemNodeForPackage(Class<?> c)
             throws SecurityException
     {
         return nodeForPackage(c, systemRoot());
@@ -270,7 +270,7 @@ public abstract class Preferences {
      * @exception SecurityException when a security manager is installed and
      * the caller does not have <code>RuntimePermission("preferences")</code>.
      */
-    public static Preferences userNodeForPackage(Class c)
+    public static Preferences userNodeForPackage(Class<?> c)
             throws SecurityException
     {
         return nodeForPackage(c, userRoot());
