@@ -105,7 +105,11 @@ public class FatDirectory extends FatEntry implements FSDirectory {
 		if ( index > MAXENTRIES )
 		    throw new IOException ( "Directory is full" );
 		getChain().allocateAndClear ( 1 );
-		continue;
+            //restart the search, fixes infinite loop
+            //TODO review it for a better solution 
+            i = 0;
+            index = 0;
+        continue;
 	    }
 	    
 	    if ( entry.isFreeDirEntry() || entry.isLastDirEntry() ) {
