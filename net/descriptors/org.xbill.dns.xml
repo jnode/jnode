@@ -3,7 +3,7 @@
 
 <plugin id="org.xbill.dns"
   name="DNSJava"
-  version="1.5.0"
+  version="2.0.3"
   provider-name="XBill.org"
   provider-url="http://www.dnsjava.org"
   license-name="BSD like"
@@ -11,7 +11,7 @@
 
 
   <runtime>
-    <library name="dnsjava-1.5.0.jar">
+    <library name="dnsjava-2.0.3.jar">
       <export name="*"/>
     </library>
   </runtime>
