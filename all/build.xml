@@ -7,8 +7,8 @@
     <property name="jnode-ver" value="0.2.5-dev"/>
 
     <!-- Java target and source version -->
-    <property name="java.target" value="1.5"/>
-    <property name="java.source" value="1.5"/>
+    <property name="java.target" value="1.6"/>
+    <property name="java.source" value="1.6"/>
     <property name="java.encoding" value="US-ASCII"/>
 
     <property name="root.dir" value="${basedir}/.."/>
@@ -30,11 +30,11 @@
     <property name="jnode-net.jar" value="${root.dir}/net/build/classes"/>
     <property name="jnode-shell.jar" value="${root.dir}/shell/build/classes"/>
     <property name="jnode-fonts.jar" value="${build.dir}/descriptors/jnode-fonts.jar"/>
-	<property name="jnode-images.jar" value="${build.dir}/descriptors/jnode-images.jar"/>	
+  	<property name="jnode-images.jar" value="${build.dir}/descriptors/jnode-images.jar"/>
 
-	<property name="jnode-mmtk-genrc.jar" value="${root.dir}/core/build/classes-plan/org.jnode.vm.memmgr.mmtk.genrc"/>
-	<property name="jnode-mmtk-ms.jar" value="${root.dir}/core/build/classes-plan/org.jnode.vm.memmgr.mmtk.ms"/>
-	<property name="jnode-mmtk-nogc.jar" value="${root.dir}/core/build/classes-plan/org.jnode.vm.memmgr.mmtk.nogc"/>
+	  <property name="jnode-mmtk-genrc.jar" value="${root.dir}/core/build/classes-plan/org.jnode.vm.memmgr.mmtk.genrc"/>
+	  <property name="jnode-mmtk-ms.jar" value="${root.dir}/core/build/classes-plan/org.jnode.vm.memmgr.mmtk.ms"/>
+	  <property name="jnode-mmtk-nogc.jar" value="${root.dir}/core/build/classes-plan/org.jnode.vm.memmgr.mmtk.nogc"/>
 
     <property name="mx4j.jar" value="${root.dir}/core/lib/mx4j.jar"/>
     <property name="mx4j-remote.jar" value="${root.dir}/core/lib/mx4j-remote.jar"/>
@@ -42,11 +42,11 @@
     <property name="ant.jar" value="${root.dir}/core/lib/ant.jar"/>
     <property name="ant-launcher.jar" value="${root.dir}/core/lib/ant-launcher.jar"/>
     <property name="commons-net.jar" value="${root.dir}/core/lib/commons-net-1.1.0.jar"/>
-    <property name="dnsjava.jar" value="${root.dir}/net/lib/dnsjava-2.0.1a.jar"/>
+    <property name="dnsjava.jar" value="${root.dir}/net/lib/dnsjava-2.0.3.jar"/>
     <property name="jsch.jar" value="${root.dir}/net/lib/jsch-0.1.24.jar"/>
     <property name="junit.jar" value="${root.dir}/core/lib/junit.jar"/>
     <property name="mmtk.jar" value="${root.dir}/core/lib/mmtk/mmtk.jar"/>
-	<property name="mauve.jar" value="${root.dir}/core/lib/mauve.jar"/>
+	  <property name="mauve.jar" value="${root.dir}/core/lib/mauve.jar"/>
     <property name="edtftpj.jar" value="${root.dir}/fs/lib/edtftpj-1.5.2.jar"/>
     <property name="jcifs.jar" value="${root.dir}/fs/lib/jcifs-1.2.6.jar"/>
     <property name="ejc.jar" value="${root.dir}/core/lib/ejc-3.1.1.jar"/>
@@ -56,8 +56,8 @@
     <property name="jmock.jar" value="${root.dir}/core/lib/jmock-1.0.1.jar"/>
     <property name="cglib.jar" value="${root.dir}/core/lib/cglib-2.1.jar"/>
     <property name="asm.jar" value="${root.dir}/core/lib/asm.jar"/>
-	<property name="jcfe.jar" value="${root.dir}/core/lib/jcfe.jar"/>
-	<property name="jfunc.jar" value="${root.dir}/core/lib/jfunc.jar"/>
+	  <property name="jcfe.jar" value="${root.dir}/core/lib/jcfe.jar"/>
+	  <property name="jfunc.jar" value="${root.dir}/core/lib/jfunc.jar"/>
 	
     <property name="log4j.jar" value="${root.dir}/core/lib/log4j-1.2.8.jar"/>
     <property name="gnu-crypto.jar" value="${root.dir}/core/lib/gnu-crypto.jar"/>
@@ -183,7 +183,7 @@
             <libalias name="mx4j-remote.jar" alias="${mx4j-remote.jar}"/>
 
             <libalias name="commons-net-1.1.0.jar" alias="${commons-net.jar}"/>
-            <libalias name="dnsjava-1.5.0.jar" alias="${dnsjava.jar}"/>
+            <libalias name="dnsjava-2.0.3.jar" alias="${dnsjava.jar}"/>
             <libalias name="jsch-0.1.24.jar" alias="${jsch.jar}"/>
             <libalias name="gnu-crypto.jar" alias="${gnu-crypto.jar}"/>
             <libalias name="javax-crypto.jar" alias="${javax-crypto.jar}"/>
