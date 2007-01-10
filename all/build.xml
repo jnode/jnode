@@ -7,8 +7,8 @@
     <property name="jnode-ver" value="0.2.5-dev"/>
 
     <!-- Java target and source version -->
-    <property name="java.target" value="1.6"/>
-    <property name="java.source" value="1.6"/>
+    <property name="java.target" value="1.5"/>
+    <property name="java.source" value="1.5"/>
     <property name="java.encoding" value="US-ASCII"/>
 
     <property name="root.dir" value="${basedir}/.."/>
