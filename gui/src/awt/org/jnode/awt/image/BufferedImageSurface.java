@@ -35,7 +35,7 @@ public class BufferedImageSurface extends AbstractSurface {
             final int dataType = dataBuffer.getDataType();
             final int dataTypeSize = DataBuffer.getDataTypeSize(dataType);
             log.debug("dataTypeSize=" + dataTypeSize + ", dataType=" + dataType);
-            this.bitmapGraphics = BitmapGraphics.createInstance(dataBuffer, width, height, sppSM.getScanlineStride() * dataTypeSize / 8);
+            this.bitmapGraphics = BitmapGraphics.createInstance(dataBuffer, width, height, sppSM.getScanlineStride() * dataTypeSize / 8, model.getTransparency());
         } else {
             this.bitmapGraphics = null;
         }
