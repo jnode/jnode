@@ -23,9 +23,7 @@ package org.jnode.test.gui;
 
 import java.awt.BorderLayout;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JTextArea;
+import javax.swing.*;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -40,7 +38,8 @@ public class SwingTest extends JFrame {
         getRootPane().setDoubleBuffered(false);
         setLocation(100, 100);
         setSize(400, 400);
-        getContentPane().add(north = new JButton("JButton north"), BorderLayout.NORTH);
+        //getContentPane().add(north = new JButton("JButton north"), BorderLayout.NORTH);
+        getContentPane().add(north = new JButton("JButton north",new ImageIcon(getClass().getClassLoader().getResource("JNode_logo_trans.png"))), BorderLayout.NORTH);
         getContentPane().add(new JTextArea("JTextArea test"), BorderLayout.CENTER);
         getContentPane().add(south = new JButton("JButton south"), BorderLayout.SOUTH);
         north.requestFocus();
