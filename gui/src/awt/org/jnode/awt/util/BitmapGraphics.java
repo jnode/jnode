@@ -29,7 +29,7 @@ import java.awt.image.DataBufferInt;
 import java.awt.image.DataBufferShort;
 import java.awt.image.DataBufferUShort;
 import java.awt.image.Raster;
-import java.awt.Rectangle;
+import java.awt.*;
 
 import javax.naming.NamingException;
 
@@ -212,17 +212,22 @@ public abstract class BitmapGraphics {
 
         private byte[] alphaBuffer;
 
+        protected final int transparency;
+
         /**
          * @param mem
          * @param width
          * @param height
          * @param offset
          * @param bytesPerLine
+         * @param transparency
          */
         public BitmapGraphics32bpp(MemoryResource mem, int width, int height,
-                int offset, int bytesPerLine) {
+                int offset, int bytesPerLine, int transparency) {
             super(mem, width, height, offset, bytesPerLine);
+            this.transparency = transparency;
         }
+
 
         /**
          * @see org.jnode.awt.util.BitmapGraphics#doCopyArea(int, int, int, int,
@@ -241,12 +246,14 @@ public abstract class BitmapGraphics {
 
         protected void doDrawImage(Raster src, int srcX, int srcY, int dstX,
                 int dstY, int width, int height) {
-            final int[] buf = new int[width];
+            final int[] buf = getPixelBuffer(width);
             for (int row = 0; row < height; row++) {
-                final int ofs = offset + ((dstY + row) * bytesPerLine)
-                        + (dstX << 2);
+                final int ofs = offset + ((dstY + row) * bytesPerLine) + (dstX << 2);
                 src.getDataElements(srcX, srcY + row, width, 1, buf);
-                mem.setInts(buf, 0, ofs, width);
+                if(transparency == Transparency.TRANSLUCENT)
+                    mem.setARGB32bpp(buf, 0, ofs, width);
+                else
+                    mem.setInts(buf, 0, ofs, width);
             }
         }
 
@@ -482,9 +489,23 @@ public abstract class BitmapGraphics {
      */
     public static BitmapGraphics create32bppInstance(MemoryResource mem,
             int width, int height, int bytesPerLine, int offset) {
-        return new BitmapGraphics32bpp(mem, width, height, offset, bytesPerLine);
+        return new BitmapGraphics32bpp(mem, width, height, offset, bytesPerLine, Transparency.OPAQUE);
     }
 
+    /**
+     * Create a new instance for 32 bits/pixel layout
+     *
+     * @param mem
+     * @param width
+     * @param height
+     * @param bytesPerLine
+     * @param offset
+     * @return The created instance
+     */
+    public static BitmapGraphics create32bppInstance(MemoryResource mem,
+            int width, int height, int bytesPerLine, int offset, int transparency) {
+        return new BitmapGraphics32bpp(mem, width, height, offset, bytesPerLine, transparency);
+    }
     /**
      * Create a new instance for 8 bits/pixel layout
      * 
@@ -510,7 +531,7 @@ public abstract class BitmapGraphics {
      * @return The created instance
      */
     public static BitmapGraphics createInstance(DataBuffer dataBuffer,
-            int width, int height, int bytesPerLine) {
+            int width, int height, int bytesPerLine, int transparency) {
         final ResourceManager rm;
         try {
             rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
@@ -537,7 +558,7 @@ public abstract class BitmapGraphics {
         case DataBuffer.TYPE_INT: {
             final int[] data = ((DataBufferInt) dataBuffer).getData();
             return new BitmapGraphics32bpp(rm.asMemoryResource(data), width,
-                    height, dbOffset * 4, bytesPerLine);
+                    height, dbOffset * 4, bytesPerLine, transparency);
         }
         default: {
             throw new RuntimeException("Unimplemented databuffer type "
