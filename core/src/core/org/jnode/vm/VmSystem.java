@@ -262,6 +262,8 @@ public final class VmSystem {
         res.put("gnu.classpath.home.url", "system://");
         res.put("gnu.classpath.vm.shortname", "jnode");
         res.put("gnu.javax.swing.noGraphics2D", "true");
+        // keep this property until transparency support works fine with all drivers
+        res.put("org.jnode.awt.transparency", "true");
     }
 
     /**
