@@ -67,7 +67,7 @@ public class JNodeGraphicsConfiguration extends GraphicsConfiguration {
 	 * @return The image
 	 */
 	public BufferedImage createCompatibleImage(int w, int h) {
-		return createCompatibleImage(w, h, Transparency.OPAQUE);
+        return createCompatibleImage(w, h, config.getColorModel().getTransparency());
 	}
 
 	/**
