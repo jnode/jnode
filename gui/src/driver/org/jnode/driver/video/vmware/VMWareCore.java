@@ -52,6 +52,7 @@ import org.jnode.system.ResourceOwner;
 import org.jnode.util.AccessControllerUtils;
 import org.jnode.util.NumberUtils;
 import org.vmmagic.unboxed.Address;
+import gnu.classpath.SystemProperties;
 
 /**
  * @author epr
@@ -74,9 +75,11 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	private final int redMask;
 	private final int greenMask;
 	private final int blueMask;
+	private final int alphaMask;
 	private final int redMaskShift;
 	private final int greenMaskShift;
 	private final int blueMaskShift;
+	private final int alphaMaskShift;
 	private final int capabilities;
 	private int bytesPerLine;
 	private int offset;
@@ -158,10 +161,18 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 			this.redMask = getReg32(SVGA_REG_RED_MASK);
 			this.greenMask = getReg32(SVGA_REG_GREEN_MASK);
 			this.blueMask = getReg32(SVGA_REG_BLUE_MASK);
-			this.redMaskShift = getMaskShift(redMask);
+            String transparency = SystemProperties.getProperty("org.jnode.awt.transparency");
+            if(transparency != null && "true".equals(transparency)){
+                //todo get this in the safe way
+                this.alphaMask = 0xff000000; // - transparency enabled
+            } else {
+                this.alphaMask = 0x00000000; // - transparency disabled
+            }
+            this.redMaskShift = getMaskShift(redMask);
 			this.greenMaskShift = getMaskShift(greenMask);
 			this.blueMaskShift = getMaskShift(blueMask);
-		} catch (NameNotFoundException ex) {
+            this.alphaMaskShift = getMaskShift(alphaMask);
+        } catch (NameNotFoundException ex) {
 			throw new ResourceNotFreeException(ex);
 		}
 	}
@@ -236,7 +247,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 				break;
 			case 32 :
 				{
-					bitmapGraphics = BitmapGraphics.create32bppInstance(videoRam, width, height, bytesPerLine, offset);
+					bitmapGraphics = BitmapGraphics.create32bppInstance(videoRam, width, height, bytesPerLine, offset, model.getTransparency());
 				}
 				break;
 		}
@@ -244,8 +255,8 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	}
 
 	public FrameBufferConfiguration[] getConfigs() {
-		final ColorModel cm = new DirectColorModel(bitsPerPixel, redMask, greenMask, blueMask);
-		return new FrameBufferConfiguration[] {
+        final ColorModel cm = new DirectColorModel(bitsPerPixel, redMask, greenMask, blueMask, alphaMask);
+        return new FrameBufferConfiguration[] {
                 new VMWareConfiguration(800, 600, cm),
 				new VMWareConfiguration(1024, 768, cm),
                 new VMWareConfiguration(1280, 1024, cm),
@@ -595,8 +606,8 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	 * @param color
 	 */
 	protected final int convertColor(Color color) {
-		return convertColor(color.getRed(), color.getGreen(), color.getBlue());
-	}
+        return convertColor(color.getRed(), color.getGreen(), color.getBlue(),color.getAlpha());
+    }
 
 	/**
 	 * Convert the given color to a value suitable for VMWare
@@ -609,7 +620,11 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 		return ((r << redMaskShift) & redMask) | ((g << greenMaskShift) & greenMask) | ((b << blueMaskShift) & blueMask);
 	}
 
-	/**
+    protected final int convertColor(int r, int g, int b,int a) {
+        return ((a << alphaMaskShift) & alphaMask) | ((r << redMaskShift) & redMask) | ((g << greenMaskShift) & greenMask) | ((b << blueMaskShift) & blueMask);
+    }
+
+    /**
 	 * Gets the SVGA_ID of the VMware SVGA adapter. This function should hide any backward
 	 * compatibility mess.
 	 */
@@ -718,7 +733,8 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	 * @return
 	 */
 	private final int getMaskShift(int mask) {
-		int count = 0;
+        if(mask == 0) return 0;
+        int count = 0;
 		while ((mask & 1) == 0) {
 			count++;
 			mask = mask >> 1;
@@ -782,8 +798,8 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 			if (a != 0) {
 				// opaque
 				andMask[i] = 0;
-				xorMask[i] = v & convertColor(r, g, b);
-			} else {
+                xorMask[i] = v & convertColor(r, g, b,a);
+            } else {
 				// transparent
 				andMask[i] = 0xFFFFFFFF;
 				xorMask[i] = 0;
