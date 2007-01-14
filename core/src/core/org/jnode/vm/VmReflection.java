@@ -24,6 +24,7 @@ package org.jnode.vm;
 import java.lang.reflect.InvocationTargetException;
 
 import org.jnode.vm.annotation.MagicPermission;
+import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.jnode.vm.classmgr.VmField;
 import org.jnode.vm.classmgr.VmInstanceField;
 import org.jnode.vm.classmgr.VmMethod;
@@ -309,7 +310,8 @@ public final class VmReflection {
 	 * @return Object
 	 * @throws InvocationTargetException
 	 */
-	public static Object invoke(VmMethod method, Object o, Object[] args)
+    @PrivilegedActionPragma      //todo verify this wrt. security implications
+    public static Object invoke(VmMethod method, Object o, Object[] args)
 			throws InvocationTargetException {
 		int argCount = method.getNoArguments();
 		int argsLength = (args == null) ? 0 : args.length;
@@ -321,7 +323,9 @@ public final class VmReflection {
 			if( o == null )
 				throw new NullPointerException();
 			Unsafe.pushObject(o);
-		} else {
+            if(!method.isConstructor())
+                method = o.getClass().getVmClass().getMethod(method.getName(), method.getSignature());
+        } else {
 			method.getDeclaringClass().initialize();
 		}
 		for (int i = 0; i < argCount; i++) {
