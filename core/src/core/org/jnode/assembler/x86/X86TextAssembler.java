@@ -1983,6 +1983,9 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
         case LOCK_PREFIX:
             str = "lock";
             break;
+        case REP_PREFIX:
+            str = "rep";
+            break;
         default:
             throw new IllegalArgumentException("Unknown prefix " + prefix);
         }
