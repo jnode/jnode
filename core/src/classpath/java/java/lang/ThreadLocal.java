@@ -84,9 +84,9 @@ import java.util.Map;
  * @author Mark Wielaard (mark@klomp.org)
  * @author Eric Blake (ebb9@email.byu.edu)
  * @since 1.2
- * @status updated to 1.4
+ * @status updated to 1.5
  */
-public class ThreadLocal
+public class ThreadLocal<T>
 {
 	/**
 	 * Placeholder to distinguish between uninitialized and null set by the
@@ -125,7 +125,7 @@ public class ThreadLocal
 	 *
 	 * @return the initial value of the variable in this thread
 	 */
-  protected Object initialValue()
+  protected T initialValue()
   {
 		return null;
 	}
@@ -138,7 +138,7 @@ public class ThreadLocal
 	 *
 	 * @return the value of the variable in this thread
 	 */
-  public Object get()
+  public T get()
   {
     Map map = Thread.getThreadLocals();
 		// Note that we don't have to synchronize, as only this thread will
@@ -149,7 +149,7 @@ public class ThreadLocal
 			value = initialValue();
         map.put(key, value == null ? NULL : value);
 		}
-		return value == NULL ? null : value;
+		return value == NULL ? null : (T) value;
 	}
 
 	/**
@@ -160,11 +160,22 @@ public class ThreadLocal
 	 *
 	 * @param value the value to set this thread's view of the variable to
 	 */
-  public void set(Object value)
+  public void set(T value)
   {
     Map map = Thread.getThreadLocals();
 		// Note that we don't have to synchronize, as only this thread will
     // ever modify the map.
     map.put(key, value == null ? NULL : value);
 	}
+
+  /**
+   * Removes the value associated with the ThreadLocal object for the
+   * currently executing Thread.
+   * @since 1.5
+   */
+  public void remove()
+  {
+    Map map = Thread.getThreadLocals();
+    map.remove(this);
+}
 }
