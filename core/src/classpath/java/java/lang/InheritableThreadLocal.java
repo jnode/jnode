@@ -53,12 +53,15 @@ import java.util.WeakHashMap;
  *
  * @author Mark Wielaard (mark@klomp.org)
  * @author Eric Blake (ebb9@email.byu.edu)
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @see ThreadLocal
  * @since 1.2
  * @status updated to 1.4
  */
 public class InheritableThreadLocal extends ThreadLocal
 {
+
 	/**
 	 * Creates a new InheritableThreadLocal that has no values associated
 	 * with it yet.

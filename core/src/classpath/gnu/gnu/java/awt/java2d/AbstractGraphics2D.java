@@ -166,14 +166,14 @@ public abstract class AbstractGraphics2D
    * Caches certain shapes to avoid massive creation of such Shapes in
    * the various draw* and fill* methods.
    */
-  private static final ThreadLocal shapeCache =
-    new ThreadLocal();
+  private static final ThreadLocal<ShapeCache> shapeCache =
+    new ThreadLocal<ShapeCache>();
 
   /**
    * The scanline converters by thread.
    */
-  private static final ThreadLocal scanlineConverters =
-    new ThreadLocal();
+  private static final ThreadLocal<ScanlineConverter> scanlineConverters =
+    new ThreadLocal<ScanlineConverter>();
 
   /**
    * The transformation for this Graphics2D instance
@@ -1947,7 +1947,7 @@ public abstract class AbstractGraphics2D
    */
   private ShapeCache getShapeCache()
   {
-    ShapeCache sc = (ShapeCache) shapeCache.get();
+    ShapeCache sc = shapeCache.get();
     if (sc == null)
       {
         sc = new ShapeCache();
@@ -1963,7 +1963,7 @@ public abstract class AbstractGraphics2D
    */
   private ScanlineConverter getScanlineConverter()
   {
-    ScanlineConverter sc = (ScanlineConverter) scanlineConverters.get();
+    ScanlineConverter sc = scanlineConverters.get();
     if (sc == null)
       {
         sc = new ScanlineConverter();
