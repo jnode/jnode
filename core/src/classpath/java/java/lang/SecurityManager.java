@@ -1,5 +1,5 @@
 /* SecurityManager.java -- security checks for privileged actions
-   Copyright (C) 1998, 1999, 2001, 2002, 2005  Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2001, 2002, 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -240,7 +240,7 @@ public class SecurityManager
      * @return the most recent non-system Class on the execution stack
    * @deprecated use {@link #checkPermission(Permission)} instead
      */
-  protected Class currentLoadedClass()
+  protected Class<?> currentLoadedClass()
   {
         int i = classLoaderDepth();
     return i >= 0 ? getClassContext()[i] : null;
@@ -421,7 +421,7 @@ public class SecurityManager
   public void checkAccess(Thread thread)
   {
     if (thread.getThreadGroup() != null 
-	&& thread.getThreadGroup().getParent() == null)
+	&& thread.getThreadGroup().parent == null)
             checkPermission(new RuntimePermission("modifyThread"));
         }
 
@@ -454,7 +454,7 @@ public class SecurityManager
      */
   public void checkAccess(ThreadGroup g)
   {
-    if (g.getParent() == null)
+    if (g.parent == null)
                 checkPermission(new RuntimePermission("modifyThreadGroup"));
     }
 
@@ -983,7 +983,7 @@ public class SecurityManager
      * @see Member#PUBLIC
      * @since 1.1
      */
-  public void checkMemberAccess(Class c, int memberType)
+  public void checkMemberAccess(Class<?> c, int memberType)
   {
     if (c == null)
       throw new NullPointerException();

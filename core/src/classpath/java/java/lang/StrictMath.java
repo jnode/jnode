@@ -1,5 +1,5 @@
 /* java.lang.StrictMath -- common mathematical functions, strict Java
-   Copyright (C) 1998, 2001, 2002, 2003 Free Software Foundation, Inc.
+   Copyright (C) 1998, 2001, 2002, 2003, 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -633,6 +633,381 @@ public final strictfp class StrictMath
 	}
 
 	/**
+   * Returns the hyperbolic sine of <code>x</code> which is defined as
+   * (exp(x) - exp(-x)) / 2.
+   *
+   * Special cases:
+   * <ul>
+   * <li>If the argument is NaN, the result is NaN</li>
+   * <li>If the argument is positive infinity, the result is positive
+   * infinity.</li>
+   * <li>If the argument is negative infinity, the result is negative
+   * infinity.</li>
+   * <li>If the argument is zero, the result is zero.</li>
+   * </ul>
+   *
+   * @param x the argument to <em>sinh</em>
+   * @return the hyperbolic sine of <code>x</code>
+   *
+   * @since 1.5
+   */
+  public static double sinh(double x)
+  {
+    // Method :
+    // mathematically sinh(x) if defined to be (exp(x)-exp(-x))/2
+    // 1. Replace x by |x| (sinh(-x) = -sinh(x)).
+    // 2.
+    //                                   E + E/(E+1)
+    //	 0       <= x <= 22     :  sinh(x) := --------------,  E=expm1(x)
+    // 	       			              2
+    //
+    //  22       <= x <= lnovft :  sinh(x) := exp(x)/2
+    //  lnovft   <= x <= ln2ovft:  sinh(x) := exp(x/2)/2 * exp(x/2)
+    //	ln2ovft  <  x           :  sinh(x) := +inf (overflow)
+
+    double t, w, h;
+
+    long bits;
+    long h_bits;
+    long l_bits;
+
+    // handle special cases
+    if (x != x)
+      return x;
+    if (x == Double.POSITIVE_INFINITY)
+      return Double.POSITIVE_INFINITY;
+    if (x == Double.NEGATIVE_INFINITY)
+      return Double.NEGATIVE_INFINITY;
+
+    if (x < 0)
+      h = - 0.5;
+    else
+      h = 0.5;
+
+    bits = Double.doubleToLongBits(x);
+    h_bits = getHighDWord(bits) & 0x7fffffffL;  // ignore sign
+    l_bits = getLowDWord(bits);
+
+    // |x| in [0, 22], return sign(x) * 0.5 * (E+E/(E+1))
+    if (h_bits < 0x40360000L)          // |x| < 22
+      {
+	if (h_bits < 0x3e300000L)      // |x| < 2^-28
+	  return x;                    // for tiny arguments return x
+
+	t = expm1(abs(x));
+
+	if (h_bits < 0x3ff00000L)
+	  return h * (2.0 * t - t * t / (t + 1.0));
+
+	return h * (t + t / (t + 1.0));
+      }
+
+    // |x| in [22, log(Double.MAX_VALUE)], return 0.5 * exp(|x|)
+    if (h_bits < 0x40862e42L)
+      return h * exp(abs(x));
+
+    // |x| in [log(Double.MAX_VALUE), overflowthreshold]
+    if ((h_bits < 0x408633ceL)
+	|| ((h_bits == 0x408633ceL) && (l_bits <= 0x8fb9f87dL)))
+      {
+	w = exp(0.5 * abs(x));
+	t = h * w;
+
+	return t * w;
+      }
+
+    // |x| > overflowthershold
+    return h * Double.POSITIVE_INFINITY;
+  }
+
+  /**
+   * Returns the hyperbolic cosine of <code>x</code>, which is defined as
+   * (exp(x) + exp(-x)) / 2.
+   *
+   * Special cases:
+   * <ul>
+   * <li>If the argument is NaN, the result is NaN</li>
+   * <li>If the argument is positive infinity, the result is positive
+   * infinity.</li>
+   * <li>If the argument is negative infinity, the result is positive
+   * infinity.</li>
+   * <li>If the argument is zero, the result is one.</li>
+   * </ul>
+   *
+   * @param x the argument to <em>cosh</em>
+   * @return the hyperbolic cosine of <code>x</code>
+   *
+   * @since 1.5
+   */
+  public static double cosh(double x)
+  {
+    // Method :
+    // mathematically cosh(x) if defined to be (exp(x)+exp(-x))/2
+    // 1. Replace x by |x| (cosh(x) = cosh(-x)).
+    // 2.
+    //                                             [ exp(x) - 1 ]^2
+    //  0        <= x <= ln2/2  :  cosh(x) := 1 + -------------------
+    //                                                 2*exp(x)
+    //
+    //		                              exp(x) +  1/exp(x)
+    //  ln2/2    <= x <= 22     :  cosh(x) := ------------------
+    //		       			             2
+    //  22       <= x <= lnovft :  cosh(x) := exp(x)/2
+    //  lnovft   <= x <= ln2ovft:  cosh(x) := exp(x/2)/2 * exp(x/2)
+    //	ln2ovft  <  x	        :  cosh(x) := +inf  (overflow)
+
+    double t, w;
+    long bits;
+    long hx;
+    long lx;
+
+    // handle special cases
+    if (x != x)
+      return x;
+    if (x == Double.POSITIVE_INFINITY)
+      return Double.POSITIVE_INFINITY;
+    if (x == Double.NEGATIVE_INFINITY)
+      return Double.POSITIVE_INFINITY;
+
+    bits = Double.doubleToLongBits(x);
+    hx = getHighDWord(bits) & 0x7fffffffL;  // ignore sign
+    lx = getLowDWord(bits);
+
+    // |x| in [0, 0.5 * ln(2)], return 1 + expm1(|x|)^2 / (2 * exp(|x|))
+    if (hx < 0x3fd62e43L)
+      {
+	t = expm1(abs(x));
+	w = 1.0 + t;
+
+	// for tiny arguments return 1.
+	if (hx < 0x3c800000L)
+	  return w;
+
+	return 1.0 + (t * t) / (w + w);
+      }
+
+    // |x| in [0.5 * ln(2), 22], return exp(|x|)/2 + 1 / (2 * exp(|x|))
+    if (hx < 0x40360000L)
+      {
+	t = exp(abs(x));
+
+	return 0.5 * t + 0.5 / t;
+      }
+
+    // |x| in [22, log(Double.MAX_VALUE)], return 0.5 * exp(|x|)
+    if (hx < 0x40862e42L)
+      return 0.5 * exp(abs(x));
+
+    // |x| in [log(Double.MAX_VALUE), overflowthreshold],
+    // return exp(x/2)/2 * exp(x/2)
+    if ((hx < 0x408633ceL)
+	|| ((hx == 0x408633ceL) && (lx <= 0x8fb9f87dL)))
+      {
+	w = exp(0.5 * abs(x));
+	t = 0.5 * w;
+
+	return t * w;
+      }
+
+    // |x| > overflowthreshold
+    return Double.POSITIVE_INFINITY;
+  }
+
+  /**
+   * Returns the hyperbolic tangent of <code>x</code>, which is defined as
+   * (exp(x) - exp(-x)) / (exp(x) + exp(-x)), i.e. sinh(x) / cosh(x).
+   *
+   Special cases:
+   * <ul>
+   * <li>If the argument is NaN, the result is NaN</li>
+   * <li>If the argument is positive infinity, the result is 1.</li>
+   * <li>If the argument is negative infinity, the result is -1.</li>
+   * <li>If the argument is zero, the result is zero.</li>
+   * </ul>
+   *
+   * @param x the argument to <em>tanh</em>
+   * @return the hyperbolic tagent of <code>x</code>
+   *
+   * @since 1.5
+   */
+  public static double tanh(double x)
+  {
+    //  Method :
+    //  0. tanh(x) is defined to be (exp(x) - exp(-x)) / (exp(x) + exp(-x))
+    //  1. reduce x to non-negative by tanh(-x) = -tanh(x).
+    //  2.  0     <= x <= 2^-55 : tanh(x) := x * (1.0 + x)
+    //                                        -t
+    //      2^-55 <  x <= 1     : tanh(x) := -----; t = expm1(-2x)
+    //                                       t + 2
+    //                                              2
+    //      1     <= x <= 22.0  : tanh(x) := 1 -  ----- ; t=expm1(2x)
+    //                                            t + 2
+    //     22.0   <  x <= INF   : tanh(x) := 1.
+
+    double t, z;
+
+    long bits;
+    long h_bits;
+
+    // handle special cases
+    if (x != x)
+      return x;
+    if (x == Double.POSITIVE_INFINITY)
+      return 1.0;
+    if (x == Double.NEGATIVE_INFINITY)
+      return -1.0;
+
+    bits = Double.doubleToLongBits(x);
+    h_bits = getHighDWord(bits) & 0x7fffffffL;  // ingnore sign
+
+    if (h_bits < 0x40360000L)                   // |x| <  22
+      {
+	if (h_bits < 0x3c800000L)               // |x| <  2^-55
+	  return x * (1.0 + x);
+
+	if (h_bits >= 0x3ff00000L)              // |x| >= 1
+	  {
+	    t = expm1(2.0 * abs(x));
+	    z = 1.0 - 2.0 / (t + 2.0);
+	  }
+	else                                    // |x| <  1
+	  {
+	    t = expm1(-2.0 * abs(x));
+	    z = -t / (t + 2.0);
+	  }
+      }
+    else                                        // |x| >= 22
+	z = 1.0;
+
+    return (x >= 0) ? z : -z;
+  }
+
+  /**
+   * Returns the lower two words of a long. This is intended to be
+   * used like this:
+   * <code>getLowDWord(Double.doubleToLongBits(x))</code>.
+   */
+  private static long getLowDWord(long x)
+  {
+    return x & 0x00000000ffffffffL;
+  }
+
+  /**
+   * Returns the higher two words of a long. This is intended to be
+   * used like this:
+   * <code>getHighDWord(Double.doubleToLongBits(x))</code>.
+   */
+  private static long getHighDWord(long x)
+  {
+    return (x & 0xffffffff00000000L) >> 32;
+  }
+
+  /**
+   * Returns a double with the IEEE754 bit pattern given in the lower
+   * and higher two words <code>lowDWord</code> and <code>highDWord</code>.
+   */
+  private static double buildDouble(long lowDWord, long highDWord)
+  {
+    return Double.longBitsToDouble(((highDWord & 0xffffffffL) << 32)
+				   | (lowDWord & 0xffffffffL));
+  }
+
+  /**
+   * Returns the cube root of <code>x</code>. The sign of the cube root
+   * is equal to the sign of <code>x</code>.
+   *
+   * Special cases:
+   * <ul>
+   * <li>If the argument is NaN, the result is NaN</li>
+   * <li>If the argument is positive infinity, the result is positive
+   * infinity.</li>
+   * <li>If the argument is negative infinity, the result is negative
+   * infinity.</li>
+   * <li>If the argument is zero, the result is zero with the same
+   * sign as the argument.</li>
+   * </ul>
+   *
+   * @param x the number to take the cube root of
+   * @return the cube root of <code>x</code>
+   * @see #sqrt(double)
+   *
+   * @since 1.5
+   */
+  public static double cbrt(double x)
+  {
+    boolean negative = (x < 0);
+    double r;
+    double s;
+    double t;
+    double w;
+
+    long bits;
+    long l;
+    long h;
+
+    // handle the special cases
+    if (x != x)
+      return x;
+    if (x == Double.POSITIVE_INFINITY)
+      return Double.POSITIVE_INFINITY;
+    if (x == Double.NEGATIVE_INFINITY)
+      return Double.NEGATIVE_INFINITY;
+    if (x == 0)
+      return x;
+
+    x = abs(x);
+    bits = Double.doubleToLongBits(x);
+
+    if (bits < 0x0010000000000000L)   // subnormal number
+      {
+	t = TWO_54;
+	t *= x;
+
+	// __HI(t)=__HI(t)/3+B2;
+	bits = Double.doubleToLongBits(t);
+	h = getHighDWord(bits);
+	l = getLowDWord(bits);
+
+	h = h / 3 + CBRT_B2;
+
+	t = buildDouble(l, h);
+      }
+    else
+      {
+	// __HI(t)=__HI(x)/3+B1;
+	h = getHighDWord(bits);
+	l = 0;
+
+	h = h / 3 + CBRT_B1;
+	t = buildDouble(l, h);
+      }
+
+    // new cbrt to 23 bits
+    r =  t * t / x;
+    s =  CBRT_C + r * t;
+    t *= CBRT_G + CBRT_F / (s + CBRT_E + CBRT_D / s);
+
+    // chopped to 20 bits and make it larger than cbrt(x)
+    bits = Double.doubleToLongBits(t);
+    h = getHighDWord(bits);
+
+    // __LO(t)=0;
+    // __HI(t)+=0x00000001;
+    l = 0;
+    h += 1;
+    t = buildDouble(l, h);
+
+    // one step newton iteration to 53 bits with error less than 0.667 ulps
+    s = t * t;		    // t * t is exact
+    r = x / s;
+    w = t + t;
+    r = (r - t) / (w + r);  // r - t is exact
+    t = t + t * r;
+
+    return negative ? -t : t;
+  }
+
+  /**
 	 * Take <em>e</em><sup>a</sup>.  The opposite of <code>log()</code>. If the
 	 * argument is NaN, the result is NaN; if the argument is positive infinity,
 	 * the result is positive infinity; and if the argument is negative
@@ -694,6 +1069,254 @@ public final strictfp class StrictMath
 	}
 
 	/**
+   * Returns <em>e</em><sup>x</sup> - 1.
+   * Special cases:
+   * <ul>
+   * <li>If the argument is NaN, the result is NaN.</li>
+   * <li>If the argument is positive infinity, the result is positive
+   * infinity</li>
+   * <li>If the argument is negative infinity, the result is -1.</li>
+   * <li>If the argument is zero, the result is zero.</li>
+   * </ul>
+   *
+   * @param x the argument to <em>e</em><sup>x</sup> - 1.
+   * @return <em>e</em> raised to the power <code>x</code> minus one.
+   * @see #exp(double)
+   */
+  public static double expm1(double x)
+  {
+    // Method
+    //   1. Argument reduction:
+    //	Given x, find r and integer k such that
+    //
+    //            x = k * ln(2) + r,  |r| <= 0.5 * ln(2)
+    //
+    //  Here a correction term c will be computed to compensate
+    //	the error in r when rounded to a floating-point number.
+    //
+    //   2. Approximating expm1(r) by a special rational function on
+    //	the interval [0, 0.5 * ln(2)]:
+    //	Since
+    //	    r*(exp(r)+1)/(exp(r)-1) = 2 + r^2/6 - r^4/360 + ...
+    //	we define R1(r*r) by
+    //	    r*(exp(r)+1)/(exp(r)-1) = 2 + r^2/6 * R1(r*r)
+    //	That is,
+    //	    R1(r**2) = 6/r *((exp(r)+1)/(exp(r)-1) - 2/r)
+    //		     = 6/r * ( 1 + 2.0*(1/(exp(r)-1) - 1/r))
+    //		     = 1 - r^2/60 + r^4/2520 - r^6/100800 + ...
+    //  We use a special Remes algorithm on [0, 0.347] to generate
+    // 	a polynomial of degree 5 in r*r to approximate R1. The
+    //	maximum error of this polynomial approximation is bounded
+    //	by 2**-61. In other words,
+    //	    R1(z) ~ 1.0 + Q1*z + Q2*z**2 + Q3*z**3 + Q4*z**4 + Q5*z**5
+    //	where 	Q1  =  -1.6666666666666567384E-2,
+    // 		Q2  =   3.9682539681370365873E-4,
+    // 		Q3  =  -9.9206344733435987357E-6,
+    // 		Q4  =   2.5051361420808517002E-7,
+    // 		Q5  =  -6.2843505682382617102E-9;
+    //  	(where z=r*r, and Q1 to Q5 are called EXPM1_Qx in the source)
+    //	with error bounded by
+    //	    |                  5           |     -61
+    //	    | 1.0+Q1*z+...+Q5*z   -  R1(z) | <= 2
+    //	    |                              |
+    //
+    //	expm1(r) = exp(r)-1 is then computed by the following
+    // 	specific way which minimize the accumulation rounding error:
+    //			       2     3
+    //			      r     r    [ 3 - (R1 + R1*r/2)  ]
+    //	      expm1(r) = r + --- + --- * [--------------------]
+    //		              2     2    [ 6 - r*(3 - R1*r/2) ]
+    //
+    //	To compensate the error in the argument reduction, we use
+    //		expm1(r+c) = expm1(r) + c + expm1(r)*c
+    //			   ~ expm1(r) + c + r*c
+    //	Thus c+r*c will be added in as the correction terms for
+    //	expm1(r+c). Now rearrange the term to avoid optimization
+    // 	screw up:
+    //		        (      2                                    2 )
+    //		        ({  ( r    [ R1 -  (3 - R1*r/2) ]  )  }    r  )
+    //	 expm1(r+c)~r - ({r*(--- * [--------------------]-c)-c} - --- )
+    //	                ({  ( 2    [ 6 - r*(3 - R1*r/2) ]  )  }    2  )
+    //                      (                                             )
+    //
+    //		   = r - E
+    //   3. Scale back to obtain expm1(x):
+    //	From step 1, we have
+    //	   expm1(x) = either 2^k*[expm1(r)+1] - 1
+    //		    = or     2^k*[expm1(r) + (1-2^-k)]
+    //   4. Implementation notes:
+    //	(A). To save one multiplication, we scale the coefficient Qi
+    //	     to Qi*2^i, and replace z by (x^2)/2.
+    //	(B). To achieve maximum accuracy, we compute expm1(x) by
+    //	  (i)   if x < -56*ln2, return -1.0, (raise inexact if x!=inf)
+    //	  (ii)  if k=0, return r-E
+    //	  (iii) if k=-1, return 0.5*(r-E)-0.5
+    //        (iv)	if k=1 if r < -0.25, return 2*((r+0.5)- E)
+    //	       	       else	     return  1.0+2.0*(r-E);
+    //	  (v)   if (k<-2||k>56) return 2^k(1-(E-r)) - 1 (or exp(x)-1)
+    //	  (vi)  if k <= 20, return 2^k((1-2^-k)-(E-r)), else
+    //	  (vii) return 2^k(1-((E+2^-k)-r))
+
+    boolean negative = (x < 0);
+    double y, hi, lo, c, t, e, hxs, hfx, r1;
+    int k;
+
+    long bits;
+    long h_bits;
+    long l_bits;
+
+    c = 0.0;
+    y = abs(x);
+
+    bits = Double.doubleToLongBits(y);
+    h_bits = getHighDWord(bits);
+    l_bits = getLowDWord(bits);
+
+    // handle special cases and large arguments
+    if (h_bits >= 0x4043687aL)        // if |x| >= 56 * ln(2)
+      {
+	if (h_bits >= 0x40862e42L)    // if |x| >= EXP_LIMIT_H
+	  {
+	    if (h_bits >= 0x7ff00000L)
+	      {
+		if (((h_bits & 0x000fffffL) | (l_bits & 0xffffffffL)) != 0)
+		  return x;                        // exp(NaN) = NaN
+		else
+		  return negative ? -1.0 : x;      // exp({+-inf}) = {+inf, -1}
+	      }
+
+	    if (x > EXP_LIMIT_H)
+	      return Double.POSITIVE_INFINITY;     // overflow
+	  }
+
+	if (negative)                // x <= -56 * ln(2)
+	  return -1.0;
+      }
+
+    // argument reduction
+    if (h_bits > 0x3fd62e42L)        // |x| > 0.5 * ln(2)
+      {
+	if (h_bits < 0x3ff0a2b2L)    // |x| < 1.5 * ln(2)
+	  {
+	    if (negative)
+	      {
+		hi = x + LN2_H;
+		lo = -LN2_L;
+		k = -1;
+	      }
+	    else
+	      {
+		hi = x - LN2_H;
+		lo = LN2_L;
+		k  = 1;
+	      }
+	  }
+	else
+	  {
+	    k = (int) (INV_LN2 * x + (negative ? - 0.5 : 0.5));
+	    t = k;
+	    hi = x - t * LN2_H;
+	    lo = t * LN2_L;
+	  }
+
+	x = hi - lo;
+	c = (hi - x) - lo;
+
+      }
+    else if (h_bits < 0x3c900000L)   // |x| < 2^-54 return x
+      return x;
+    else
+      k = 0;
+
+    // x is now in primary range
+    hfx = 0.5 * x;
+    hxs = x * hfx;
+    r1 = 1.0 + hxs * (EXPM1_Q1
+	     + hxs * (EXPM1_Q2
+             + hxs * (EXPM1_Q3
+	     + hxs * (EXPM1_Q4
+	     + hxs *  EXPM1_Q5))));
+    t = 3.0 - r1 * hfx;
+    e = hxs * ((r1 - t) / (6.0 - x * t));
+
+    if (k == 0)
+      {
+	return x - (x * e - hxs);    // c == 0
+      }
+    else
+      {
+	e = x * (e - c) - c;
+	e -= hxs;
+
+	if (k == -1)
+	  return 0.5 * (x - e) - 0.5;
+
+	if (k == 1)
+	  {
+	    if (x < - 0.25)
+	      return -2.0 * (e - (x + 0.5));
+	    else
+	      return 1.0 + 2.0 * (x - e);
+	  }
+
+	if (k <= -2 || k > 56)       // sufficient to return exp(x) - 1
+	  {
+	    y = 1.0 - (e - x);
+
+	    bits = Double.doubleToLongBits(y);
+	    h_bits = getHighDWord(bits);
+	    l_bits = getLowDWord(bits);
+
+	    h_bits += (k << 20);     // add k to y's exponent
+
+	    y = buildDouble(l_bits, h_bits);
+
+	    return y - 1.0;
+	  }
+
+	t = 1.0;
+	if (k < 20)
+	  {
+	    bits = Double.doubleToLongBits(t);
+	    h_bits = 0x3ff00000L - (0x00200000L >> k);
+	    l_bits = getLowDWord(bits);
+
+	    t = buildDouble(l_bits, h_bits);      // t = 1 - 2^(-k)
+	    y = t - (e - x);
+
+	    bits = Double.doubleToLongBits(y);
+	    h_bits = getHighDWord(bits);
+	    l_bits = getLowDWord(bits);
+
+	    h_bits += (k << 20);     // add k to y's exponent
+
+	    y = buildDouble(l_bits, h_bits);
+	  }
+	else
+	  {
+	    bits = Double.doubleToLongBits(t);
+	    h_bits = (0x000003ffL - k) << 20;
+	    l_bits = getLowDWord(bits);
+
+	    t = buildDouble(l_bits, h_bits);      // t = 2^(-k)
+
+	    y = x - (e + t);
+	    y += 1.0;
+
+	    bits = Double.doubleToLongBits(y);
+	    h_bits = getHighDWord(bits);
+	    l_bits = getLowDWord(bits);
+
+	    h_bits += (k << 20);     // add k to y's exponent
+
+	    y = buildDouble(l_bits, h_bits);
+	  }
+      }
+
+    return y;
+  }
+
+  /**
 	 * Take ln(a) (the natural log).  The opposite of <code>exp()</code>. If the
 	 * argument is NaN or negative, the result is NaN; if the argument is
 	 * positive infinity, the result is positive infinity; and if the argument
@@ -1429,6 +2052,33 @@ public final strictfp class StrictMath
 	AT10 = 0.016285820115365782; // Long bits 0x3f90ad3ae322da11L.
 
 	/**
+   * Constants for computing {@link #cbrt(double)}.
+   */
+  private static final int
+    CBRT_B1 = 715094163, // B1 = (682-0.03306235651)*2**20
+    CBRT_B2 = 696219795; // B2 = (664-0.03306235651)*2**20
+
+  /**
+   * Constants for computing {@link #cbrt(double)}.
+   */
+  private static final double
+    CBRT_C =  5.42857142857142815906e-01, // Long bits  0x3fe15f15f15f15f1L
+    CBRT_D = -7.05306122448979611050e-01, // Long bits  0xbfe691de2532c834L
+    CBRT_E =  1.41428571428571436819e+00, // Long bits  0x3ff6a0ea0ea0ea0fL
+    CBRT_F =  1.60714285714285720630e+00, // Long bits  0x3ff9b6db6db6db6eL
+    CBRT_G =  3.57142857142857150787e-01; // Long bits  0x3fd6db6db6db6db7L
+
+  /**
+   * Constants for computing {@link #expm1(double)}
+   */
+  private static final double
+    EXPM1_Q1 = -3.33333333333331316428e-02, // Long bits  0xbfa11111111110f4L
+    EXPM1_Q2 =  1.58730158725481460165e-03, // Long bits  0x3f5a01a019fe5585L
+    EXPM1_Q3 = -7.93650757867487942473e-05, // Long bits  0xbf14ce199eaadbb7L
+    EXPM1_Q4 =  4.00821782732936239552e-06, // Long bits  0x3ed0cfca86e65239L
+    EXPM1_Q5 = -2.01099218183624371326e-07; // Long bits  0xbe8afdb76e09c32dL
+
+  /**
 	 * Helper function for reducing an angle to a multiple of pi/2 within
 	 * [-pi/4, pi/4].
 	 *
@@ -1628,8 +2278,9 @@ public final strictfp class StrictMath
 					j |= iq[i];
 				if (j == 0) // Need recomputation.
 					{
-					int k;
-					for (k = 1; iq[jk - k] == 0; k++); // k = no. of terms needed.
+                int k; // k = no. of terms needed.
+                for (k = 1; iq[jk - k] == 0; k++)
+                  ;
 
 					for (i = jz + 1; i <= jz + k; i++) // Add q[jz+1] to q[jz+k].
 						{
@@ -1841,4 +2492,84 @@ public final strictfp class StrictMath
 		double t = (float) a;
 		return t + a * (1 + t * z + t * v);
 	}
+
+  /**
+   * <p>
+   * Returns the sign of the argument as follows:
+   * </p>
+   * <ul>
+   * <li>If <code>a</code> is greater than zero, the result is 1.0.</li>
+   * <li>If <code>a</code> is less than zero, the result is -1.0.</li>
+   * <li>If <code>a</code> is <code>NaN</code>, the result is <code>NaN</code>.
+   * <li>If <code>a</code> is positive or negative zero, the result is the
+   * same.</li>
+   * </ul>
+   *
+   * @param a the numeric argument.
+   * @return the sign of the argument.
+   * @since 1.5.
+   */
+  public static double signum(double a)
+  {
+    // There's no difference.
+    return Math.signum(a);
+}
+
+  /**
+   * <p>
+   * Returns the sign of the argument as follows:
+   * </p>
+   * <ul>
+   * <li>If <code>a</code> is greater than zero, the result is 1.0f.</li>
+   * <li>If <code>a</code> is less than zero, the result is -1.0f.</li>
+   * <li>If <code>a</code> is <code>NaN</code>, the result is <code>NaN</code>.
+   * <li>If <code>a</code> is positive or negative zero, the result is the
+   * same.</li>
+   * </ul>
+   *
+   * @param a the numeric argument.
+   * @return the sign of the argument.
+   * @since 1.5.
+   */
+  public static float signum(float a)
+  {
+    // There's no difference.
+    return Math.signum(a);
+  }
+
+  /**
+   * Return the ulp for the given double argument.  The ulp is the
+   * difference between the argument and the next larger double.  Note
+   * that the sign of the double argument is ignored, that is,
+   * ulp(x) == ulp(-x).  If the argument is a NaN, then NaN is returned.
+   * If the argument is an infinity, then +Inf is returned.  If the
+   * argument is zero (either positive or negative), then
+   * {@link Double#MIN_VALUE} is returned.
+   * @param d the double whose ulp should be returned
+   * @return the difference between the argument and the next larger double
+   * @since 1.5
+   */
+  public static double ulp(double d)
+  {
+    // There's no difference.
+    return Math.ulp(d);
+  }
+
+  /**
+   * Return the ulp for the given float argument.  The ulp is the
+   * difference between the argument and the next larger float.  Note
+   * that the sign of the float argument is ignored, that is,
+   * ulp(x) == ulp(-x).  If the argument is a NaN, then NaN is returned.
+   * If the argument is an infinity, then +Inf is returned.  If the
+   * argument is zero (either positive or negative), then
+   * {@link Float#MIN_VALUE} is returned.
+   * @param f the float whose ulp should be returned
+   * @return the difference between the argument and the next larger float
+   * @since 1.5
+   */
+  public static float ulp(float f)
+  {
+    // There's no difference.
+    return Math.ulp(f);
+  }
 }
