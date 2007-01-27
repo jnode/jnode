@@ -104,12 +104,8 @@ public class ImageFilter implements ImageConsumer, Cloneable
      */
     public ImageFilter getFilterInstance(ImageConsumer ic)
     {
-	if ( ic == null )
-	    throw new IllegalArgumentException("null argument for ImageFilter.getFilterInstance(ImageConsumer)");
-
-	consumer = ic;
 	ImageFilter f = (ImageFilter)clone();
-	consumer = null;
+    f.consumer = ic;
 	return f;
     }
 
@@ -125,7 +121,6 @@ public class ImageFilter implements ImageConsumer, Cloneable
      */
     public void setDimensions(int width, int height)
     {
-      if (consumer != null)
 	consumer.setDimensions(width, height);
     }
 
@@ -135,11 +130,16 @@ public class ImageFilter implements ImageConsumer, Cloneable
      *
      * @param props the list of properties associated with this image 
      */
-    public void setProperties(Hashtable props)
+  public void setProperties(Hashtable<?,?> props)
     {
-	props.put("filters", "ImageFilter");
-	if (consumer != null)
-	consumer.setProperties(props);
+    Hashtable copy = (Hashtable) props.clone();
+    Object o = copy.get("filters");
+    if (o == null)
+      copy.put("filters", toString());
+    else if (o instanceof String)
+      copy.put("filters", ((String) o) + toString());
+
+    consumer.setProperties(copy);
     }
 
     /**
@@ -148,10 +148,11 @@ public class ImageFilter implements ImageConsumer, Cloneable
      * method of the consumer is called with the specified <code>model</code>.
      *
      * @param model the color model to be used most often by setPixels
-     * @see ColorModel */
+   *
+   * @see ColorModel
+   */
     public void setColorModel(ColorModel model)
     {
-      if (consumer != null)
 	consumer.setColorModel(model);
     }
 
@@ -167,7 +168,6 @@ public class ImageFilter implements ImageConsumer, Cloneable
      */
     public void setHints(int flags)
     {
-      if (consumer != null)
 	consumer.setHints(flags);
     }
 
@@ -186,9 +186,9 @@ public class ImageFilter implements ImageConsumer, Cloneable
      * @param scansize the width to use in extracting pixels from the <code>pixels</code> array
      */
     public void setPixels(int x, int y, int w, int h, 
-	   ColorModel model, byte[] pixels, int offset, int scansize)
+                        ColorModel model, byte[] pixels, int offset,
+                        int scansize)
     {
-      if (consumer != null)
 	consumer.setPixels(x, y, w, h, model, pixels, offset, scansize);
     }
 
@@ -207,9 +207,9 @@ public class ImageFilter implements ImageConsumer, Cloneable
      * @param scansize the width to use in extracting pixels from the <code>pixels</code> array
      */
     public void setPixels(int x, int y, int w, int h, 
-           ColorModel model, int[] pixels, int offset, int scansize)
+                        ColorModel model, int[] pixels, int offset,
+                        int scansize)
     {
-      if (consumer != null)
 	consumer.setPixels(x, y, w, h, model, pixels, offset, scansize);
     }
 
@@ -221,8 +221,6 @@ public class ImageFilter implements ImageConsumer, Cloneable
      */
     public void imageComplete(int status)
     {
-      if (consumer != null)
 	consumer.imageComplete(status);
     }
 }
-

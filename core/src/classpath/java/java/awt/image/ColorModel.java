@@ -119,12 +119,8 @@ public abstract class ColorModel implements Transparency
 	 */
   public ColorModel(int bits)
   {
-     // @classpath-bugfix Fix difference between Sun's class and this class.
-     //this(bits * 4, // total bits, sRGB, four channels
-     this(bits, // total bits, sRGB, four channels
-	 //nArray(bits, 4), // bits for each channel
-	 nArray(bits / 4, 4), // bits for each channel
-	 // @classpath-bugfix-end
+    this(bits * 4, // total bits, sRGB, four channels
+	 nArray(bits, 4), // bits for each channel
 	 ColorSpace.getInstance(ColorSpace.CS_sRGB), // sRGB
 	 true, // has alpha
 	 false, // not premultiplied
@@ -628,40 +624,40 @@ public abstract class ColorModel implements Transparency
 		return cspace;
 	}
 
-	// Typically overridden
   public ColorModel coerceData(WritableRaster raster,
 			       boolean isAlphaPremultiplied)
   {
-    if (this.isAlphaPremultiplied == isAlphaPremultiplied || ! hasAlpha)
-			return this;
+    // This method should always be overridden, but is not abstract.
+    throw new UnsupportedOperationException();
+  }
 
+  protected void coerceDataWorker(WritableRaster raster,
+                                  boolean isAlphaPremultiplied)
+  {
 		int w = raster.getWidth();
 		int h = raster.getHeight();
 		int x = raster.getMinX();
 		int y = raster.getMinY();
-    int size = w*h;
+    int size = w * h;
 		int numColors = getNumColorComponents();
 		int numComponents = getNumComponents();
-    int alphaScale = (1<<getComponentSize(numColors)) - 1;
+    int alphaScale = (1 << getComponentSize(numColors)) - 1;
 		double[] pixels = raster.getPixels(x, y, w, h, (double[]) null);
 
-    for (int i=0; i<size; i++)
+    for (int i = 0; i < size; i++)
       {
-	double alpha = pixels[i*numComponents+numColors]*alphaScale;
-	for (int c=0; c<numColors; c++)
+        double alpha = pixels[i * numComponents + numColors] / alphaScale;
+        for (int c = 0; c < numColors; c++)
 	  {
-	    int offset = i*numComponents+c;
+            int offset = i * numComponents + c;
 				if (isAlphaPremultiplied)
-		pixels[offset] = pixels[offset]/alpha;
+              pixels[offset] = Math.round(pixels[offset] * alpha);
 				else
-	      pixels[offset] = pixels[offset]*alpha;
+              pixels[offset] = Math.round(pixels[offset] / alpha);
 			}
 		}
 
 		raster.setPixels(0, 0, w, h, pixels);
-
-		// FIXME: what can we return?
-		return null;
 	}
 
   /**

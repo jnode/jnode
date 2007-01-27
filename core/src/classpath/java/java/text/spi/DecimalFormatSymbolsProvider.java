@@ -1,5 +1,5 @@
-/* RenderedImage.java -- 
-   Copyright (C) 2002 Free Software Foundation, Inc.
+/* DecimalFormatSymbolsProvider.java -- Providers of localized instances
+   Copyright (C) 2007 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,36 +35,45 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+package java.text.spi;
 
-package java.awt.image;
+import java.text.DecimalFormatSymbols;
 
-import java.awt.Rectangle;
-import java.util.Vector;
+import java.util.Locale;
+
+import java.util.spi.LocaleServiceProvider;
 
 /**
- * NEEDS DOCUMENTATION
+ * A {@link DecimalFormatSymbolsProvider} provides localized
+ * instances of {@link java.text.DecimalFormatSymbols}.
+ *
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+ * @since 1.6
  */
-public interface RenderedImage
+public abstract class DecimalFormatSymbolsProvider
+  extends LocaleServiceProvider
 {
-  Vector<RenderedImage> getSources();
-	Object getProperty(String name);
-	String[] getPropertyNames();
-	ColorModel getColorModel();
-	SampleModel getSampleModel();
-	int getWidth();
-	int getHeight();
-	int getMinX();
-	int getMinY();
-	int getNumXTiles();
-	int getNumYTiles();
-	int getMinTileX();
-	int getMinTileY();
-	int getTileWidth();
-	int getTileHeight();
-	int getTileGridXOffset();
-	int getTileGridYOffset();
-	Raster getTile(int x, int y);
-	Raster getData();
-	Raster getData(Rectangle r);
-	WritableRaster copyData(WritableRaster raster);
-} // interface RenderedImage
+
+  /**
+   * Constructs a new {@link DecimalFormatSymbolsProvider}.
+   * Provided for implicit invocation by subclasses.
+   */
+  protected DecimalFormatSymbolsProvider()
+  {
+  }
+
+  /**
+   * Returns a {@link java.text.DecimalFormatSymbols} instance
+   * for the specified {@link java.util.Locale}.
+   *
+   * @param locale the locale to express the symbols in.
+   * @return the localized instance.
+   * @throws NullPointerException if the locale is null.
+   * @throws IllegalArgumentException if the locale is not one
+   *                                  returned by
+   *                                  {@link getAvailableLocales()}
+   * @see java.text.DecimalFormatSymbols#getInstance(java.util.Locale)
+   */
+  public abstract DecimalFormatSymbols getInstance(Locale locale);
+
+}

@@ -167,12 +167,13 @@ public class DateFormatSymbols implements java.io.Serializable, Cloneable
    * by loading the date format information for the specified locale.
    * This constructor only obtains instances using the runtime's resources;
    * to also include {@link java.text.spi.DateFormatSymbolsProvider} instances,
-   * call {@link #getInstance(Locale)} instead.
+   * call {@link #getInstance(java.util.Locale)} instead.
    *
    * @param locale The locale for which date formatting symbols should
    *               be loaded. 
    * @throws MissingResourceException if the resources for the specified
    *                                  locale could not be found or loaded.
+   * @see #getInstance(java.util.Locale)
    */
   public DateFormatSymbols (Locale locale)
     throws MissingResourceException
@@ -195,10 +196,13 @@ public class DateFormatSymbols implements java.io.Serializable, Cloneable
 
   /**
    * This method loads the format symbol information for the default
-   * locale.
+   * locale. This constructor only obtains instances using the runtime's resources;
+   * to also include {@link java.text.spi.DateFormatSymbolsProvider} instances,
+   * call {@link #getInstance()} instead.
    *
    * @throws MissingResourceException if the resources for the default
    *                                  locale could not be found or loaded.
+   * @see #getInstance()
    */
   public DateFormatSymbols() 
     throws MissingResourceException
