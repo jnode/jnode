@@ -88,7 +88,7 @@ public class OptionArgument extends Argument {
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         sb.append("Options: ");
         for (Option option : options) {
             sb.append(", ");
