@@ -38,6 +38,7 @@ exception statement from your version. */
 
 package java.lang.reflect;
 
+import gnu.java.lang.ClassHelper;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 
@@ -104,7 +105,8 @@ public final class Method extends AccessibleObject implements Member, AnnotatedE
      * is a non-inherited member.
      * @return the class that declared this member
      */
-    public Class getDeclaringClass() {
+    public Class<?> getDeclaringClass()
+    {
         return vmMethod.getDeclaringClass().asClass();
     }
 
@@ -112,7 +114,8 @@ public final class Method extends AccessibleObject implements Member, AnnotatedE
      * Gets the name of this method.
      * @return the name of this method
      */
-    public String getName() {
+  public String getName()
+    {
         return vmMethod.getName();
     }
 
@@ -120,7 +123,8 @@ public final class Method extends AccessibleObject implements Member, AnnotatedE
      * Return the raw modifiers for this method.
      * @return the method's modifiers
      */
-    private int getModifiersInternal() {
+    private int getModifiersInternal()
+    {
         return vmMethod.getModifiers();
     }
 
@@ -172,7 +176,8 @@ public final class Method extends AccessibleObject implements Member, AnnotatedE
        * Gets the return type of this method.
      * @return the type of this method
      */
-    public Class getReturnType() {
+    public Class<?> getReturnType()
+    {
         return vmMethod.getReturnType().asClass();
     }
 
@@ -182,7 +187,8 @@ public final class Method extends AccessibleObject implements Member, AnnotatedE
      *
      * @return a list of the types of the method's parameters
      */
-    public Class[] getParameterTypes() {
+    public Class<?>[] getParameterTypes()
+    {
         if (parameterTypes == null) {
             int cnt = vmMethod.getNoArguments();
             ArrayList<Class> list = new ArrayList<Class>(cnt);
@@ -201,7 +207,8 @@ public final class Method extends AccessibleObject implements Member, AnnotatedE
      *
      * @return a list of the types in the method's throws clause
      */
-    public Class[] getExceptionTypes() {
+    public Class<?>[] getExceptionTypes()
+    {
         if (exceptionTypes == null) {
             final VmExceptions exceptions = vmMethod.getExceptions();
             final int cnt = exceptions.getLength();
@@ -234,7 +241,18 @@ public final class Method extends AccessibleObject implements Member, AnnotatedE
      * @return <code>true</code> if they are equal; <code>false</code> if not
      */
     public boolean equals(Object o) {
-        return (this == o);
+    if (!(o instanceof Method))
+      return false;
+    Method that = (Method)o;
+    if (this.getDeclaringClass() != that.getDeclaringClass())
+      return false;
+    if (!this.getName().equals(that.getName()))
+      return false;
+    if (this.getReturnType() != that.getReturnType())
+      return false;
+    if (!Arrays.equals(this.getParameterTypes(), that.getParameterTypes()))
+      return false;
+    return true;
     }
 
     /**
@@ -243,9 +261,9 @@ public final class Method extends AccessibleObject implements Member, AnnotatedE
      *
      * @return the hash code for the object
      */
-    public int hashCode() {
-        final Class<?> declClass = getDeclaringClass();
-        return declClass.getName().hashCode() ^ getName().hashCode();
+  public int hashCode()
+  {
+    return getDeclaringClass().getName().hashCode() ^ getName().hashCode();
     }
 
     /**
@@ -259,18 +277,17 @@ public final class Method extends AccessibleObject implements Member, AnnotatedE
      */
     public String toString() {
         // 128 is a reasonable buffer initial size for constructor
-        StringBuffer sb = new StringBuffer(128);
+    StringBuilder sb = new StringBuilder(128);
         Modifier.toString(getModifiers(), sb).append(' ');
-        final Class<?> retType = getReturnType();
-        final Class<?> declClass = getDeclaringClass();
-        sb.append(retType.getName()).append(' ');
-        sb.append(declClass.getName()).append('.');
+    sb.append(ClassHelper.getUserName(getReturnType())).append(' ');
+    sb.append(getDeclaringClass().getName()).append('.');
         sb.append(getName()).append('(');
-        Class<?>[] c = getParameterTypes();
-        if (c.length > 0) {
-            sb.append(c[0].getName());
+    Class[] c = getParameterTypes();
+    if (c.length > 0)
+      {
+        sb.append(ClassHelper.getUserName(c[0]));
             for (int i = 1; i < c.length; i++)
-                sb.append(',').append(c[i].getName());
+          sb.append(',').append(ClassHelper.getUserName(c[i]));
         }
         sb.append(')');
         c = getExceptionTypes();
@@ -281,6 +298,33 @@ public final class Method extends AccessibleObject implements Member, AnnotatedE
         }
         return sb.toString();
     }
+
+  public String toGenericString()
+  {
+    // 128 is a reasonable buffer initial size for constructor
+    StringBuilder sb = new StringBuilder(128);
+    Modifier.toString(getModifiers(), sb).append(' ');
+    Constructor.addTypeParameters(sb, getTypeParameters());
+    sb.append(getGenericReturnType()).append(' ');
+    sb.append(getDeclaringClass().getName()).append('.');
+    sb.append(getName()).append('(');
+    Type[] types = getGenericParameterTypes();
+    if (types.length > 0)
+      {
+        sb.append(types[0]);
+        for (int i = 1; i < types.length; i++)
+          sb.append(',').append(types[i]);
+      }
+    sb.append(')');
+    types = getGenericExceptionTypes();
+    if (types.length > 0)
+      {
+        sb.append(" throws ").append(types[0]);
+        for (int i = 1; i < types.length; i++)
+          sb.append(',').append(types[i]);
+      }
+    return sb.toString();
+  }
 
     /**
      * Invoke the method. Arguments are automatically unwrapped and widened,
@@ -353,9 +397,9 @@ public final class Method extends AccessibleObject implements Member, AnnotatedE
    * Return the String in the Signature attribute for this method. If there
    * is no Signature attribute, return null.
    */
-  private String getSignature() {
-      //todo implement it
-      return null;
+  private String getSignature()
+  {
+      return vmMethod.getSignature();
   }
 
   /**

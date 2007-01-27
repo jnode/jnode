@@ -38,6 +38,7 @@ exception statement from your version. */
 
 package java.lang.reflect;
 
+import gnu.java.lang.ClassHelper;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 
@@ -45,6 +46,8 @@ import org.jnode.vm.VmReflection;
 import org.jnode.vm.classmgr.VmExceptions;
 import org.jnode.vm.classmgr.VmMethod;
 import gnu.java.lang.reflect.MethodSignatureParser;
+
+import java.util.Arrays;
 
 /**
  * The Constructor class represents a constructor of a class. It also allows
@@ -104,7 +107,8 @@ public final class Constructor<T>
      * Gets the class that declared this constructor.
      * @return the class that declared this member
      */
-  public Class<T> getDeclaringClass() {
+  public Class<T> getDeclaringClass()
+    {
         return (Class<T>) vmMethod.getDeclaringClass().asClass();
     }
 
@@ -123,11 +127,10 @@ public final class Constructor<T>
      * this will include the synthetic and varargs bits.
      * @return the constructor's modifiers
      */
-    private int getModifiersInternal() {
+    private int getModifiersInternal()
+    {
         return vmMethod.getModifiers();
     }
-
-
 
     /**
      * Gets the modifiers this constructor uses.  Use the <code>Modifier</code>
@@ -169,7 +172,8 @@ public final class Constructor<T>
      *
      * @return a list of the types of the constructor's parameters
      */
-  public Class<?>[] getParameterTypes() {
+  public Class<?>[] getParameterTypes()
+    {
         if (parameterTypes == null) {
             int cnt = vmMethod.getNoArguments();
             ArrayList<Class> list = new ArrayList<Class>(cnt);
@@ -211,8 +215,16 @@ public final class Constructor<T>
      * @param o the object to compare to
      * @return <code>true</code> if they are equal; <code>false</code> if not.
      */
-    public boolean equals(Object o) {
-        return (this == o);
+  public boolean equals(Object o)
+  {
+    if (!(o instanceof Constructor))
+      return false;
+    Constructor that = (Constructor)o;
+    if (this.getDeclaringClass() != that.getDeclaringClass())
+      return false;
+    if (!Arrays.equals(this.getParameterTypes(), that.getParameterTypes()))
+      return false;
+    return true;
     }
 
     /**
@@ -240,23 +252,60 @@ public final class Constructor<T>
         // 128 is a reasonable buffer initial size for constructor
     StringBuilder sb = new StringBuilder(128);
         Modifier.toString(getModifiers(), sb).append(' ');
-        final Class<?> declClass = getDeclaringClass();
-        sb.append(declClass.getName()).append('(');
-        Class<?>[] c = getParameterTypes();
-        if (c.length > 0) {
-            sb.append(c[0].getName());
-            for (int i = 1; i < c.length; i++) {
-                sb.append(',').append(c[i].getName());
+    sb.append(getDeclaringClass().getName()).append('(');
+    Class[] c = getParameterTypes();
+    if (c.length > 0)
+      {
+        sb.append(ClassHelper.getUserName(c[0]));
+        for (int i = 1; i < c.length; i++)
+          sb.append(',').append(ClassHelper.getUserName(c[i]));
             }
-        }
         sb.append(')');
         c = getExceptionTypes();
         if (c.length > 0) {
             sb.append(" throws ").append(c[0].getName());
-            for (int i = 1; i < c.length; i++) {
+        for (int i = 1; i < c.length; i++)
                 sb.append(',').append(c[i].getName());
             }
+    return sb.toString();
         }
+
+  static <X extends GenericDeclaration>
+  void addTypeParameters(StringBuilder sb, TypeVariable<X>[] typeArgs)
+  {
+    if (typeArgs.length == 0)
+      return;
+    sb.append('<');
+    for (int i = 0; i < typeArgs.length; ++i)
+      {
+        if (i > 0)
+          sb.append(',');
+        sb.append(typeArgs[i]);
+      }
+    sb.append("> ");
+  }
+
+  public String toGenericString()
+  {
+    StringBuilder sb = new StringBuilder(128);
+    Modifier.toString(getModifiers(), sb).append(' ');
+    addTypeParameters(sb, getTypeParameters());
+    sb.append(getDeclaringClass().getName()).append('(');
+    Type[] types = getGenericParameterTypes();
+    if (types.length > 0)
+      {
+        sb.append(types[0]);
+        for (int i = 1; i < types.length; ++i)
+          sb.append(',').append(types[i]);
+      }
+    sb.append(')');
+    types = getGenericExceptionTypes();
+    if (types.length > 0)
+      {
+        sb.append(" throws ").append(types[0]);
+        for (int i = 1; i < types.length; i++)
+          sb.append(',').append(types[i]);
+      }
         return sb.toString();
     }
 
@@ -294,14 +343,6 @@ public final class Constructor<T>
         return (T) VmReflection.newInstance(vmMethod, args);
     }
 
-    /**
-   * Return the String in the Signature attribute for this constructor. If there
-   * is no Signature attribute, return null.
-   */
-    private String getSignature(){
-        //todo implement it
-        return null;
-    }
 
     /**
      * Returns an array of <code>TypeVariable</code> objects that represents
@@ -315,13 +356,22 @@ public final class Constructor<T>
      *         specification, version 3.
      * @since 1.5
      */
-    public TypeVariable[] getTypeParameters()
+    public TypeVariable<Constructor<T>>[] getTypeParameters()
     {
       String sig = getSignature();
       if (sig == null)
         return new TypeVariable[0];
       MethodSignatureParser p = new MethodSignatureParser(this, sig);
       return p.getTypeParameters();
+    }
+
+    /**
+   * Return the String in the Signature attribute for this constructor. If there
+   * is no Signature attribute, return null.
+   */
+    private String getSignature()
+    {
+        return vmMethod.getSignature();
     }
 
     /**
