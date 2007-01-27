@@ -511,8 +511,9 @@ public class Raster
 			    int height, int childMinX, int childMinY,
 			    int[] bandList)
   {
-		/* FIXME: Throw RasterFormatException if child bounds extends
-		   beyond the bounds of this raster. */
+    if (parentX < minX || parentX + width > minX + this.width
+        || parentY < minY || parentY + height > minY + this.height)
+      throw new RasterFormatException("Child raster extends beyond parent");
 
     SampleModel sm = (bandList == null) ?
       sampleModel :

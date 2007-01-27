@@ -92,6 +92,8 @@ public class Arrays
    */
   public static int binarySearch(byte[] a, byte key)
   {
+    if (a.length == 0)
+      return -1;
     return binarySearch(a, 0, a.length - 1, key);
   }
 
@@ -154,6 +156,8 @@ public class Arrays
    */
   public static int binarySearch(char[] a, char key)
   {
+    if (a.length == 0)
+      return -1;
     return binarySearch(a, 0, a.length - 1, key);
   }
 
@@ -216,6 +220,8 @@ public class Arrays
    */
   public static int binarySearch(short[] a, short key)
   {
+    if (a.length == 0)
+      return -1;
     return binarySearch(a, 0, a.length - 1, key);
   }
 
@@ -278,6 +284,8 @@ public class Arrays
    */
   public static int binarySearch(int[] a, int key)
   {
+    if (a.length == 0)
+      return -1;
     return binarySearch(a, 0, a.length - 1, key);
   }
 
@@ -340,6 +348,8 @@ public class Arrays
    */
   public static int binarySearch(long[] a, long key)
   {
+    if (a.length == 0)
+      return -1;
     return binarySearch(a, 0, a.length - 1, key);
   }
 
@@ -402,6 +412,8 @@ public class Arrays
    */
   public static int binarySearch(float[] a, float key)
   {
+    if (a.length == 0)
+      return -1;
     return binarySearch(a, 0, a.length - 1, key);
   }
 
@@ -465,6 +477,8 @@ public class Arrays
    */
   public static int binarySearch(double[] a, double key)
   {
+    if (a.length == 0)
+      return -1;
     return binarySearch(a, 0, a.length - 1, key);
   }
 
@@ -533,6 +547,8 @@ public class Arrays
    */
   public static int binarySearch(Object[] a, Object key)
   {
+    if (a.length == 0)
+      return -1;
     return binarySearch(a, key, null);
   }
 
@@ -581,6 +597,8 @@ public class Arrays
    */
   public static <T> int binarySearch(T[] a, T key, Comparator<? super T> c)
   {
+    if (a.length == 0)
+      return -1;
     return binarySearch(a, 0, a.length - 1, key, c);
   }
 

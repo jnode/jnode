@@ -38,6 +38,8 @@ exception statement from your version. */
 
 package java.awt.image;
 
+import gnu.java.awt.Buffers;
+
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
@@ -283,7 +285,8 @@ public class ColorConvertOp implements BufferedImageOp, RasterOp
     for (int i = 0; i < spaces.length - 2; i++)
       {
         WritableRaster tmp = createCompatibleDestRaster(src, spaces[i + 1],
-                                                        false);
+                                                        false,
+                                                        src.getTransferType());
         copyraster(src, spaces[i], tmp, spaces[i + 1]);
         src = tmp;
   }
@@ -291,7 +294,8 @@ public class ColorConvertOp implements BufferedImageOp, RasterOp
     // The last conversion is done outside of the loop so that we can
     // use the dest raster supplied, instead of creating our own temp raster
     if (dest == null)
-      dest = createCompatibleDestRaster(src, spaces[spaces.length - 1], false);
+      dest = createCompatibleDestRaster(src, spaces[spaces.length - 1], false,
+                                        DataBuffer.TYPE_BYTE);
     copyraster(src, spaces[spaces.length - 2], dest, spaces[spaces.length - 1]);
 
     return dest;
@@ -324,7 +328,8 @@ public class ColorConvertOp implements BufferedImageOp, RasterOp
     return new BufferedImage(dstCM,
                              createCompatibleDestRaster(src.getRaster(),
                                                         dstCM.getColorSpace(),
-                                                        src.getColorModel().hasAlpha),
+                                                        src.getColorModel().hasAlpha,
+                                                        dstCM.getTransferType()),
                              src.isPremultiplied, null);
   }
 
@@ -349,7 +354,8 @@ public class ColorConvertOp implements BufferedImageOp, RasterOp
 
     // Create a new raster with the last ColorSpace in the conversion
     // chain, and with no alpha (implied)
-    return createCompatibleDestRaster(src, spaces[spaces.length-1], false);
+    return createCompatibleDestRaster(src, spaces[spaces.length-1], false,
+                                      DataBuffer.TYPE_BYTE);
   }
 
   /**
@@ -417,11 +423,16 @@ public class ColorConvertOp implements BufferedImageOp, RasterOp
     return src.getBounds();
   }
   
-  // Copy a source image to a destination image, respecting their colorspaces
-  // and performing colorspace conversions if necessary.  This is done 
-  // using Graphics2D in order to use the rendering hints.
+  /**
+   * Copy a source image to a destination image, respecting their colorspaces 
+   * and performing colorspace conversions if necessary.  
+   * 
+   * @param src The source image.
+   * @param dst The destination image.
+   */
   private void copyimage(BufferedImage src, BufferedImage dst)
   {
+    // This is done using Graphics2D in order to respect the rendering hints.
     Graphics2D gg = dst.createGraphics();
     
     // If no hints are set there is no need to call
@@ -433,8 +444,16 @@ public class ColorConvertOp implements BufferedImageOp, RasterOp
     gg.dispose();
   }
   
-  // Copy a source raster to a destination raster, performing a colorspace
-  // conversion.
+  /**
+   * Copy a source raster to a destination raster, performing a colorspace
+   * conversion between the two.  The conversion will respect the
+   * KEY_COLOR_RENDERING rendering hint if one is present.
+   * 
+   * @param src The source raster.
+   * @param scs The colorspace of the source raster.
+   * @dst The destination raster.
+   * @dcs The colorspace of the destination raster.
+   */
   private void copyraster(Raster src, ColorSpace scs, WritableRaster dst, ColorSpace dcs)
   {
     float[] sbuf = new float[src.getNumBands()];
@@ -459,11 +478,19 @@ public class ColorConvertOp implements BufferedImageOp, RasterOp
     }
   }
 
-  // This method creates a compatible color model, given a source image and
-  // a colorspace.  The choice of ComponentColorModel and DataBuffer.TYPE_BYTE
-  // is based on Mauve testing of the reference implementation.
+  /**
+   * This method creates a color model with the same colorspace and alpha
+   * settings as the source image.  The created color model will always be a
+   * ComponentColorModel and have a BYTE transfer type.
+   * 
+   * @param img The source image.
+   * @param cs The ColorSpace to use.
+   * @return A color model compatible with the source image.
+   */ 
   private ColorModel createCompatibleColorModel(BufferedImage img, ColorSpace cs)
   {
+    // The choice of ComponentColorModel and DataBuffer.TYPE_BYTE is based on
+    // Mauve testing of the reference implementation.
     return new ComponentColorModel(cs,
                                    img.getColorModel().hasAlpha(), 
                                    img.isAlphaPremultiplied(),
@@ -471,13 +498,22 @@ public class ColorConvertOp implements BufferedImageOp, RasterOp
                                    DataBuffer.TYPE_BYTE);    
   }
 
-  // This method creates a compatible Raster, given a source raster and 
-  // colorspace.
-  private WritableRaster createCompatibleDestRaster(Raster src, ColorSpace cs, boolean hasAlpha)
+  /**
+   * This method creates a compatible Raster, given a source raster, colorspace,
+   * alpha value, and transfer type.
+   * 
+   * @param src The source raster.
+   * @param cs The ColorSpace to use.
+   * @param hasAlpha Whether the raster should include a component for an alpha.
+   * @param transferType The size of a single data element.
+   * @return A compatible WritableRaster. 
+   */
+  private WritableRaster createCompatibleDestRaster(Raster src, ColorSpace cs,
+                                                    boolean hasAlpha,
+                                                    int transferType)
   {
-    // The use of a PixelInterleavedSampleModel (and it's parameters) and
-    // a DataBufferByte were determined using mauve tests, based on the
-    // reference implementation
+    // The use of a PixelInterleavedSampleModel weas determined using mauve
+    // tests, based on the reference implementation
     
     int numComponents = cs.getNumComponents();
     if (hasAlpha)
@@ -487,13 +523,15 @@ public class ColorConvertOp implements BufferedImageOp, RasterOp
     for (int i = 0; i < offsets.length; i++)
       offsets[i] = i;
 
-    return new WritableRaster(new PixelInterleavedSampleModel(DataBuffer.TYPE_BYTE,
+    DataBuffer db = Buffers.createBuffer(transferType,
+                                         src.getWidth() * src.getHeight() * numComponents,
+                                         1);
+    return new WritableRaster(new PixelInterleavedSampleModel(transferType,
                                                               src.getWidth(),
                                                               src.getHeight(),
                                                               numComponents,
                                                               numComponents * src.getWidth(),
                                                               offsets),
-                              new DataBufferByte(src.getWidth() * src.getHeight() * numComponents, 1),
-                              new Point(src.getMinX(), src.getMinY()));
+                              db, new Point(src.getMinX(), src.getMinY()));
   }
 }
