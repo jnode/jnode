@@ -91,11 +91,12 @@ public class CropImageFilter extends ImageFilter
      *
      * @param props the list of properties associated with this image 
      */
-    public void setProperties(Hashtable props)
+    public void setProperties(Hashtable<?, ?> props)
     {
-  	props.put("filters", "CropImageFilter");
+      Hashtable<Object, Object> prop2 = (Hashtable<Object, Object>) props;
+      prop2.put("filters", "CropImageFilter");
 	if (consumer != null)
-	consumer.setProperties(props);
+        consumer.setProperties(prop2);
     }
 
     /**
