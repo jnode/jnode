@@ -37,6 +37,7 @@ exception statement from your version. */
 
 package java.lang;
 
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.Vector;
 
 /**
@@ -53,7 +54,7 @@ import java.util.Vector;
  * @since 1.0
  * @status updated to 1.4
  */
-public class ThreadGroup
+public class ThreadGroup implements UncaughtExceptionHandler
 {
   /** The Initial, top-level ThreadGroup. */
   static ThreadGroup root = new ThreadGroup();
@@ -65,7 +66,7 @@ public class ThreadGroup
   static boolean had_uncaught_exception;
 
   /** The parent thread group. */
-  private final ThreadGroup parent;
+  final ThreadGroup parent;
 
   /** The group name, non-null. */
   final String name;
@@ -545,6 +546,8 @@ public class ThreadGroup
   {
     if (parent != null)
       parent.uncaughtException(thread, t);
+    else if (Thread.getDefaultUncaughtExceptionHandler() != null)
+      Thread.getDefaultUncaughtExceptionHandler().uncaughtException(thread, t);
     else if (! (t instanceof ThreadDeath))
       {
         if (t == null)
@@ -746,4 +749,43 @@ public class ThreadGroup
           parent.removeGroup(this);
       }
 	}
+
+  /*
+   * Helper method for the VM. Find a Thread by its Id.
+   *
+   * @param id The Thread Id.
+   * @return Thread object or null if thread doesn't exist.
+   */
+  static Thread getThreadFromId(long id)
+  {
+    return root.getThreadFromIdImpl(id);
+  }
+
+  private Thread getThreadFromIdImpl(long id)
+  {
+    synchronized (threads)
+      {
+        for (int i = 0; i < threads.size(); i++)
+          {
+            Thread t = (Thread) threads.get(i);
+            if (t.getId() == id)
+              return t;
+          }
+      }
+    Vector groups = this.groups;
+    if (groups != null)
+      {
+        synchronized (groups)
+          {
+            for (int i = 0; i < groups.size(); i++)
+              {
+                ThreadGroup g = (ThreadGroup) groups.get(i);
+                Thread t = g.getThreadFromIdImpl(id);
+                if (t != null)
+                  return t;
+              }
+          }
+      }
+    return null;
+  }
 } // class ThreadGroup
