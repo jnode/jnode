@@ -38,6 +38,7 @@ exception statement from your version. */
 
 package java.awt.image;
 
+import gnu.java.awt.Buffers;
 import gnu.java.awt.ComponentDataBlitOp;
 
 import java.awt.Graphics;
@@ -129,12 +130,12 @@ public class BufferedImage extends Image
    *   <li>{@link #TYPE_BYTE_INDEXED}</li>
    * </ul>
    * 
-   * @param w  the width (must be > 0).
-   * @param h  the height (must be > 0).
+   * @param width the width (must be > 0).
+   * @param height the height (must be > 0).
    * @param type  the image type (see the list of valid types above).
    * 
-   * @throws IllegalArgumentException if <code>w</code> or <code>h</code> is
-   *     less than or equal to zero.
+   * @throws IllegalArgumentException if <code>width</code> or
+   *     <code>height</code> is less than or equal to zero.
    * @throws IllegalArgumentException if <code>type</code> is not one of the
    *     specified values.
    */
@@ -161,7 +162,10 @@ public class BufferedImage extends Image
 					      width, height,
 					      3, width * 3, 
 					      new int[]{ 2, 1, 0 } );
-	cm = new DirectColorModel( 24, 0xff, 0xff00, 0xff0000 );
+	cm = new ComponentColorModel(ColorSpace.getInstance(ColorSpace.CS_sRGB),
+                                  false, false,
+                                  BufferedImage.OPAQUE,
+                                  DataBuffer.TYPE_BYTE);
 						break;
 
       case BufferedImage.TYPE_INT_ARGB:
@@ -172,18 +176,25 @@ public class BufferedImage extends Image
 							  0x0000FF00, 
 							  0x000000FF, 
 							  0xFF000000 } );
+        if (premultiplied)
+          cm = new DirectColorModel( ColorSpace.getInstance(ColorSpace.CS_sRGB),
+                                     32, 0xff0000, 0xff00, 0xff, 0xff000000,
+                                     true,
+                                     Buffers.smallestAppropriateTransferType(32));
+        else
 	cm = new DirectColorModel( 32, 0xff0000, 0xff00, 0xff, 0xff000000 );
 						break;
 
       case BufferedImage.TYPE_4BYTE_ABGR:
       case BufferedImage.TYPE_4BYTE_ABGR_PRE:
-	sm = new SinglePixelPackedSampleModel( DataBuffer.TYPE_INT, 
+        sm = new PixelInterleavedSampleModel(DataBuffer.TYPE_BYTE, 
 					       width, height,
-					       new int[]{ 0x000000FF, 
-							  0xFF000000, 
-							  0x00FF0000, 
-							  0x0000FF00 } );
-	cm = new DirectColorModel( 32, 0xff, 0xff00, 0xff0000, 0xff000000 );
+                                             4, 4*width,
+                                             new int[]{3, 2, 1, 0});
+        cm = new ComponentColorModel(ColorSpace.getInstance(ColorSpace.CS_sRGB),
+                                     true, premultiplied,
+                                     BufferedImage.TRANSLUCENT,
+                                     DataBuffer.TYPE_BYTE);
 				break;
 
       case BufferedImage.TYPE_INT_BGR:
@@ -192,24 +203,24 @@ public class BufferedImage extends Image
 					       new int[]{ 0x000000FF, 
 							  0x0000FF00, 
 							  0x00FF0000 } ) ;
-	cm = new DirectColorModel( 32, 0xff, 0xff00, 0xff0000 );
+	cm = new DirectColorModel( 24, 0xff, 0xff00, 0xff0000 );
 						break;
 
       case BufferedImage.TYPE_USHORT_565_RGB:
 	sm = new SinglePixelPackedSampleModel( DataBuffer.TYPE_USHORT,
 					       width, height,
-					       new int[]{ 0x0000001F, 
-							  0x000007E0, 
-							  0x0000F800 } ) ;
-	cm = new DirectColorModel( 16, 0x1F, 0x7E0, 0xf800 );
+					       new int[]{ 0xF800, 
+							  0x7E0, 
+							  0x1F } ) ;
+	cm = new DirectColorModel( 16, 0xF800, 0x7E0, 0x1F );
 						break;
       case BufferedImage.TYPE_USHORT_555_RGB:
 	sm = new SinglePixelPackedSampleModel( DataBuffer.TYPE_USHORT,
 					       width, height,
-					       new int[]{ 0x0000001F, 
-							  0x000003E0, 
-							  0x00007C00 } ) ;
-	cm = new DirectColorModel( 15, 0x1F, 0x3E0, 0x7c00 );
+					       new int[]{ 0x7C00, 
+							  0x3E0, 
+							  0x1F } ) ;
+	cm = new DirectColorModel( 15, 0x7C00, 0x3E0, 0x1F );
 						break;
 
       case BufferedImage.TYPE_BYTE_INDEXED:
@@ -287,7 +298,7 @@ public class BufferedImage extends Image
   public BufferedImage(ColorModel colormodel, 
 		       WritableRaster writableraster,
 		       boolean premultiplied,
-		       Hashtable properties)
+		       Hashtable<?,?> properties)
   {
     init(colormodel, writableraster, premultiplied, properties,
 	 TYPE_CUSTOM);
@@ -347,6 +358,7 @@ public class BufferedImage extends Image
   public void coerceData(boolean premultiplied)
   {
 		colorModel = colorModel.coerceData(raster, premultiplied);
+    isPremultiplied = premultiplied;
 	}
 
   public WritableRaster copyData(WritableRaster dest)
@@ -616,7 +628,7 @@ public class BufferedImage extends Image
       };
 	}
 
-  public Vector getSources()
+  public Vector<RenderedImage> getSources()
   {
 		return null;
 	}
