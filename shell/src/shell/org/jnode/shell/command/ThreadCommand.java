@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.shell.command;
 
 import java.io.InputStream;
@@ -34,7 +34,7 @@ import org.jnode.vm.scheduler.VmThread;
 
 /**
  * Shell command to view threads or a specific thread.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Martin Husted Hartvig (hagar@jnode.org)
  */
@@ -73,15 +73,13 @@ public class ThreadCommand  implements Command
 	}
 
 	private void showGroup(ThreadGroup grp, PrintStream out, String threadName) {
-    StringBuffer stringBuffer;
-
     	if (threadName == null
 		// preserve compatible behavior when piped
 				&& out == System.out) {
 			grp.list();
 			return;
 		}
-    	
+
 		if (threadName != null) {
 			out.print(group);
 			out.println(grp.getName());
@@ -92,44 +90,39 @@ public class ThreadCommand  implements Command
 		grp.enumerate(ts);
 
 
+        for (int i = 0; i < max; i++) {
+            final Thread t = ts[i];
+            if (t != null) {
+                if ((threadName == null) || threadName.equals(t.getName())) {
+                    out.print(slash_t);
+                    StringBuilder buffer = new StringBuilder();
 
-		for (int i = 0; i < max; i++) {
-			final Thread t = ts[i];
-			if (t != null) {
-				if ((threadName == null) || threadName.equals(t.getName())) {
-					out.print(slash_t);
-          stringBuffer = new StringBuffer();
+                    buffer.append(t.getId());
+                    buffer.append(seperator);
+                    buffer.append(t.getName());
+                    buffer.append(seperator);
+                    buffer.append(t.getPriority());
+                    buffer.append(seperator);
+                    buffer.append(t.getVmThread().getThreadStateName());
 
-          stringBuffer.append(t.getId());
-					stringBuffer.append(seperator);
-					stringBuffer.append(t.getName());
-					stringBuffer.append(seperator);
-					stringBuffer.append(t.getPriority());
-					stringBuffer.append(seperator);
-					stringBuffer.append(t.getVmThread().getThreadStateName());
+                    out.println(buffer.toString());
+                    if (threadName != null) {
+                        final Object[] trace = VmThread.getStackTrace(t.getVmThread());
+                        final int traceLen = trace.length;
+                        for (int k = 0; k < traceLen; k++) {
+                            buffer = new StringBuilder();
+                            buffer.append(slash_t);
+                            buffer.append(slash_t);
+                            buffer.append(trace[k]);
 
-          out.println(stringBuffer.toString());
-          stringBuffer = null;
+                            out.println(buffer.toString());
+                        }
 
-					if (threadName != null) {
-						final Object[] trace = VmThread.getStackTrace(t.getVmThread());
-						final int traceLen = trace.length;
-						for (int k = 0; k < traceLen; k++) {
-              stringBuffer = new StringBuffer();
-              stringBuffer.append(slash_t);
-              stringBuffer.append(slash_t);
-              stringBuffer.append(trace[k]);
-
-              out.println(stringBuffer.toString());
-
-              stringBuffer = null;
-						}
-
-						return;
-					}
-				}
-			}
-		}
+                        return;
+                    }
+                }
+            }
+        }
 
 		final int gmax = grp.activeGroupCount() * 2;
 		final ThreadGroup[] tgs = new ThreadGroup[gmax];

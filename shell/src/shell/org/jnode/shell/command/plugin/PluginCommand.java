@@ -190,7 +190,7 @@ public class PluginCommand {
             throws PluginException {
         final ArrayList<String> rows = new ArrayList<String>();
         for (PluginDescriptor descr : mgr.getRegistry()) {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             sb.append(descr.getId());
             sb.append("; state ");
             sb.append((descr.getPlugin().isActive())?"active":"inactive");
