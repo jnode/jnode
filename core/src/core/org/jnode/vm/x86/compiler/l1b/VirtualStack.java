@@ -404,7 +404,7 @@ final class VirtualStack {
 		if (tos == 0) {
 			return "EMPTY";
 		}
-		final StringBuffer buf = new StringBuffer();
+		final StringBuilder buf = new StringBuilder();
 		for (int i = 0; i < tos; i++) {
 			if (i != 0) {
 				buf.append(',');

@@ -406,7 +406,7 @@ public class IRControlFlowGraph<T> implements Iterable<IRBasicBlock<T>> {
 	}
 
 	public String toString() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		for (IRBasicBlock<T> bb : this) {
 			sb.append(bb.toString());
 			sb.append(":\n  predecessors:");

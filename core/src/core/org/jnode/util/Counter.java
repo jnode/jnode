@@ -100,10 +100,10 @@ public final class Counter extends Statistic implements Comparable<Counter> {
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        StringBuffer stringBuffer = new StringBuffer(getName());
-        stringBuffer.append(is);
-        stringBuffer.append(counter);
+        StringBuilder sb = new StringBuilder(getName());
+        sb.append(is);
+        sb.append(counter);
 
-        return stringBuffer.toString();
+        return sb.toString();
     }
 }
