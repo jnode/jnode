@@ -194,7 +194,7 @@ final class IRQThread extends Thread implements SystemThread {
      * @return String
      */
     public String toString() {
-        final StringBuffer b = new StringBuffer();
+        final StringBuilder b = new StringBuilder();
         if (shared) {
             b.append("shared ");
         }

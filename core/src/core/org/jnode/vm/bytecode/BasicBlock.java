@@ -105,7 +105,7 @@ public class BasicBlock extends VmSystemObject {
 	 * @return String
 	 */
 	public String toString() {
-		final StringBuffer buf = new StringBuffer();
+		final StringBuilder buf = new StringBuilder();
 		buf.append(startPC);
 		buf.append('-');
 		buf.append(endPC);
@@ -120,7 +120,7 @@ public class BasicBlock extends VmSystemObject {
 		return buf.toString();
 	}
 	
-	private void addEntryBlockInfo(StringBuffer buf) {
+	private void addEntryBlockInfo(StringBuilder buf) {
         boolean first = true;
 	    for (BasicBlock bb : entryBlocks) {
             if (first) {

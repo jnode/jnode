@@ -274,7 +274,7 @@ abstract class X86RegisterPool {
      * @see java.lang.Object#toString()
      */
     public final String toString() {
-        final StringBuffer buf = new StringBuffer();
+        final StringBuilder buf = new StringBuilder();
         for (int i = 0; i < regCount; i++) {
             buf.append(registers[i].toString());
             buf.append("\n");

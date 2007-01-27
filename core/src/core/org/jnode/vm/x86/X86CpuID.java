@@ -148,7 +148,7 @@ public class X86CpuID extends CpuID {
      */
     public String getVendor() {
         if (vendor == null) {
-            final StringBuffer buf = new StringBuffer();
+            final StringBuilder buf = new StringBuilder();
             intToString(buf, data[1]);
             intToString(buf, data[3]);
             intToString(buf, data[2]);
@@ -173,7 +173,7 @@ public class X86CpuID extends CpuID {
         return getVendor().equals(X86Vendor.AMD.getId());
     }
 
-	private final void intToString(StringBuffer buf, int value) {
+	private final void intToString(StringBuilder buf, int value) {
 		buf.append((char) (value & 0xFF));
 		buf.append((char) ((value >> 8) & 0xFF));
 		buf.append((char) ((value >> 16) & 0xFF));
@@ -310,7 +310,7 @@ public class X86CpuID extends CpuID {
 	 * @return The available features.
 	 */
 	private final String getFeatureString() {
-		final StringBuffer buf = new StringBuffer();
+		final StringBuilder buf = new StringBuilder();
 		getFeatureString(buf, FEAT_FPU, "FPU");
 		getFeatureString(buf, FEAT_VME, "VME");
 		getFeatureString(buf, FEAT_DE, "DE");
@@ -347,7 +347,7 @@ public class X86CpuID extends CpuID {
 		return buf.toString();
 	}
 
-	private final void getFeatureString(StringBuffer buf, int feature, String featName) {
+	private final void getFeatureString(StringBuilder buf, int feature, String featName) {
 		if (hasFeature(feature)) {
 			if (buf.length() > 0) {
 				buf.append(',');
@@ -356,7 +356,7 @@ public class X86CpuID extends CpuID {
 		}
 	}
 
-	private final void getFeatureString(StringBuffer buf, long feature, String featName) {
+	private final void getFeatureString(StringBuilder buf, long feature, String featName) {
 		if (hasFeature(feature)) {
 			if (buf.length() > 0) {
 				buf.append(',');
@@ -371,7 +371,7 @@ public class X86CpuID extends CpuID {
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-	    final StringBuffer sb = new StringBuffer();
+	    final StringBuilder sb = new StringBuilder();
 	    sb.append("CPU:");
 	    sb.append(" name:"); sb.append(getName());
 	    sb.append(" family:"); sb.append(getFamily());

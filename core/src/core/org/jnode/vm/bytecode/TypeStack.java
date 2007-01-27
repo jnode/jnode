@@ -158,7 +158,7 @@ public final class TypeStack {
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        final StringBuffer buf = new StringBuffer();
+        final StringBuilder buf = new StringBuilder();
         buf.append('{');
         for (int i = 0; i < tos; i++) {
             if (i > 0) {

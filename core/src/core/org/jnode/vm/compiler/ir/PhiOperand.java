@@ -58,7 +58,7 @@ public class PhiOperand<T> extends Operand<T> {
 	}
 	
 	public String toString() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append("phi(");
 		int n = sources.size();
 		for (int i=0; i<n; i+=1) {
