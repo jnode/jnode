@@ -661,7 +661,7 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
         if (javaClass == null) {
             if (isBuildEnv) {
                 try {
-                    javaClassHolder.set(Class.forName(getName()));
+                    javaClassHolder.set((Class<T>) Class.forName(getName()));
                 } catch (ClassNotFoundException ex) { /* ignore */
                     throw new NoClassDefFoundError(getName());
                 }
@@ -1832,8 +1832,6 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
 
     /**
      * Resolve all constant references in the constants pool
-     * 
-     * @param clc
      */
     public final void resolveCpRefs() {
         if (!resolvedCpRefs) {
