@@ -35,18 +35,8 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.lang.reflect;
-
-import org.jnode.vm.Vm;
-import org.jnode.vm.memmgr.VmHeapManager;
-import org.jnode.vm.classmgr.VmType;
-import org.jnode.vm.classmgr.VmClassLoader;
-import org.jnode.vm.classmgr.VmArrayClass;
-
-import gnu.java.security.action.InvokeAction;
-
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 
 /**
  * Array holds static helper functions that allow you to create and
@@ -105,10 +95,10 @@ public final class Array
 	 * @throws NegativeArraySizeException when length is less than 0
 	 * @throws OutOfMemoryError if memory allocation fails
 	 */
-  public static Object newInstance(Class componentType, int length)
+  public static Object newInstance(Class<?> componentType, int length)
   {
-		if (!componentType.isPrimitive())
-			return createObjectArray(componentType, length);
+    if (! componentType.isPrimitive())
+            return VMArray.createObjectArray(componentType, length);
 		if (componentType == boolean.class)
 			return new boolean[length];
 		if (componentType == byte.class)
@@ -153,10 +143,10 @@ public final class Array
 	 *         than 0
 	 * @throws OutOfMemoryError if memory allocation fails
 	 */
-  public static Object newInstance(Class componentType, int[] dimensions)
+  public static Object newInstance(Class<?> componentType, int[] dimensions)
   {
 		if (dimensions.length <= 0)
-			throw new IllegalArgumentException("Empty dimensions array.");
+      throw new IllegalArgumentException ("Empty dimensions array.");
     return createMultiArray(componentType, dimensions,
                                   dimensions.length - 1);
 	}
@@ -175,7 +165,7 @@ public final class Array
 		if (array instanceof boolean[])
 			return ((boolean[]) array).length;
 		if (array instanceof byte[])
-			return ((byte[]) array).length;
+      return ((byte[]) array). length;
 		if (array instanceof char[])
 			return ((char[]) array).length;
 		if (array instanceof short[])
@@ -654,7 +644,7 @@ public final class Array
 		Object toAdd = createMultiArray(type, dimensions, index - 1);
 		Class thisType = toAdd.getClass();
     Object[] retval
-      = (Object[]) createObjectArray(thisType, dimensions[index]);
+      = (Object[]) VMArray.createObjectArray(thisType, dimensions[index]);
 		if (dimensions[index] > 0)
 			retval[0] = toAdd;
 		int i = dimensions[index];
@@ -663,49 +653,4 @@ public final class Array
 		return retval;
 	}
 
-
-     // LS
-    // @classpath-bugfix-22923 should be placed in VMArray
-	/**
-	 * Dynamically create an array of objects.
-	 *
-	 * @param type guaranteed to be a valid object type
-	 * @param dim the length of the array
-	 * @return the new array
-	 * @throws NegativeArraySizeException if dim is negative
-	 * @throws OutOfMemoryError if memory allocation fails
-	 */
-	private static Object createObjectArray(final Class type, int dim) {
-        final VmType vmClass = (VmType) AccessController.doPrivileged(
-            new PrivilegedAction() {
-                public Object run() {
-                    return type.getVmClass();
-                }
-            });
-
-        final String arrClsName = vmClass.getArrayClassName();
-        final VmType arrCls;
-        try {
-            final VmClassLoader curLoader = vmClass.getLoader();
-            arrCls = curLoader.loadClass(arrClsName, true);
-            //Screen.debug("an cls{");
-            //Screen.debug(vmClass.getName());
-            if (arrCls == null) {
-                throw new NoClassDefFoundError(arrClsName);
-            }
-        } catch (ClassNotFoundException ex) {
-            throw new NoClassDefFoundError(arrClsName);
-        }
-
-        VmHeapManager hm = heapManager;
-        if (hm == null) {
-            heapManager = hm = Vm.getVm().getHeapManager();
-        }
-        final Object result = hm.newArray((VmArrayClass) arrCls, dim);
-
-        //Screen.debug("}");
-        return result;
-	}
-    private static VmHeapManager heapManager;
-    // @classpath-bugfix-end
 }
