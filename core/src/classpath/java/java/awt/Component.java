@@ -2847,29 +2847,29 @@ public abstract class Component
 	 * @see #getPropertyChangeListeners()
 	 * @since 1.3
 	 */
-  public EventListener[] getListeners(Class listenerType)
+  public <T extends EventListener> T[] getListeners(Class<T> listenerType)
   {
 		if (listenerType == ComponentListener.class)
-			return getComponentListeners();
+      return (T[]) getComponentListeners();
 		if (listenerType == FocusListener.class)
-			return getFocusListeners();
+      return (T[]) getFocusListeners();
 		if (listenerType == HierarchyListener.class)
-			return getHierarchyListeners();
+      return (T[]) getHierarchyListeners();
 		if (listenerType == HierarchyBoundsListener.class)
-			return getHierarchyBoundsListeners();
+      return (T[]) getHierarchyBoundsListeners();
 		if (listenerType == KeyListener.class)
-			return getKeyListeners();
+      return (T[]) getKeyListeners();
 		if (listenerType == MouseListener.class)
-			return getMouseListeners();
+      return (T[]) getMouseListeners();
 		if (listenerType == MouseMotionListener.class)
-			return getMouseMotionListeners();
+      return (T[]) getMouseMotionListeners();
 		if (listenerType == MouseWheelListener.class)
-			return getMouseWheelListeners();
+      return (T[]) getMouseWheelListeners();
 		if (listenerType == InputMethodListener.class)
-			return getInputMethodListeners();
+      return (T[]) getInputMethodListeners();
 		if (listenerType == PropertyChangeListener.class)
-			return getPropertyChangeListeners();
-		return (EventListener[]) Array.newInstance(listenerType, 0);
+      return (T[]) getPropertyChangeListeners();
+    return (T[]) Array.newInstance(listenerType, 0);
 	}
 
 	/**
