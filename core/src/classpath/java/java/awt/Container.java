@@ -1808,6 +1808,11 @@ public class Container extends Component
       }
   }
 
+  /**
+   * Overridden to dispatch events to lightweight descendents.
+   *
+   * @param e the event to dispatch.
+   */
   void dispatchEventImpl(AWTEvent e)
   {
     boolean dispatched =
@@ -1822,6 +1827,19 @@ public class Container extends Component
     else
       super.dispatchEventImpl(e);
   }
+  }
+
+  /**
+   * This is called by the lightweight dispatcher to avoid recursivly
+   * calling into the lightweight dispatcher.
+   *
+   * @param e the event to dispatch
+   *
+   * @see LightweightDispatcher#redispatch(MouseEvent, Component, int)
+   */
+  void dispatchNoLightweight(AWTEvent e)
+  {
+    super.dispatchEventImpl(e);
   }
 
   /**
@@ -1936,6 +1954,43 @@ public class Container extends Component
 
     if (parent != null)
       parent.updateHierarchyListenerCount(type, delta);
+  }
+
+  /**
+   * Notifies interested listeners about resizing or moving the container.
+   * This performs the super behaviour (sending component events) and
+   * additionally notifies any hierarchy bounds listeners on child components.
+   *
+   * @param resized true if the component has been resized, false otherwise
+   * @param moved true if the component has been moved, false otherwise
+   */
+  void notifyReshape(boolean resized, boolean moved)
+  {
+    // Notify component listeners.
+    super.notifyReshape(resized, moved);
+
+    if (ncomponents > 0)
+      {
+        // Notify hierarchy bounds listeners.
+        if (resized)
+          {
+            for (int i = 0; i < getComponentCount(); i++)
+              {
+                Component child = getComponent(i);
+                child.fireHierarchyEvent(HierarchyEvent.ANCESTOR_RESIZED,
+                                         this, parent, 0);
+              }
+          }
+        if (moved)
+          {
+            for (int i = 0; i < getComponentCount(); i++)
+              {
+                Component child = getComponent(i);
+                child.fireHierarchyEvent(HierarchyEvent.ANCESTOR_MOVED,
+                                         this, parent, 0);
+              }
+          }
+      }
   }
 
   private void addNotifyContainerChildren()

@@ -38,7 +38,10 @@ exception statement from your version. */
 
 package java.awt;
 
+import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.peer.LightweightPeer;
 import java.util.WeakHashMap;
 
 /**
@@ -49,7 +52,7 @@ import java.util.WeakHashMap;
  *
  * @author Roman Kennke (kennke@aicas.com)
  */
-class LightweightDispatcher
+final class LightweightDispatcher
 {
 
   /**
@@ -78,6 +81,11 @@ class LightweightDispatcher
    * MOUSE_ENTERED and MOUSE_EXITED events must be dispatched.
    */
   private Component lastTarget;
+
+  /**
+   * The current mouseEventTarget.
+   */
+  private Component mouseEventTarget;
 
   /**
    * Returns an instance of LightweightDispatcher for the current thread's
@@ -113,7 +121,7 @@ class LightweightDispatcher
    *
    * @param event the event
    */
-  public boolean dispatchEvent(AWTEvent event)
+  public boolean dispatchEvent(final AWTEvent event)
   {
     if (event instanceof MouseEvent && event.getSource() instanceof Window)
       {
@@ -335,5 +343,139 @@ class LightweightDispatcher
     p.x -= offX;
     p.y -= offY;
     return p;
+  }
+
+    /**
+   * Checks if the specified component would be interested in a mouse event.
+   *
+   * @param c the component to check
+   *
+   * @return <code>true</code> if the component has mouse listeners installed,
+   *         <code>false</code> otherwise
+   */
+  private boolean isMouseListening(final Component c)
+  {
+    // Note: It is important to NOT check if the component is listening
+    // for a specific event (for instance, mouse motion events). The event
+    // gets dispatched to the component if the component is listening
+    // for ANY mouse event, even when the component is not listening for the
+    // specific type of event. There are applications that depend on this
+    // (sadly).
+    return c.mouseListener != null
+           || c.mouseMotionListener != null
+           || c.mouseWheelListener != null
+           || (c.eventMask & AWTEvent.MOUSE_EVENT_MASK) != 0
+           || (c.eventMask & AWTEvent.MOUSE_MOTION_EVENT_MASK) != 0
+           || (c.eventMask & AWTEvent.MOUSE_WHEEL_EVENT_MASK) != 0;
+  }
+
+  /**
+   * Tracks MOUSE_ENTERED and MOUSE_EXIT as well as MOUSE_MOVED and
+   * MOUSE_DRAGGED and creates synthetic MOUSE_ENTERED and MOUSE_EXITED for
+   * lightweight component.s
+   *
+   * @param target the current mouse event target
+   * @param ev the mouse event
+   */
+  private void trackEnterExit(final Component target, final MouseEvent ev)
+  {
+    int id = ev.getID();
+    if (target != lastTarget)
+      {
+        if (lastTarget != null)
+          redispatch(ev, lastTarget, MouseEvent.MOUSE_EXITED);
+        if (id == MouseEvent.MOUSE_EXITED)
+          ev.consume();
+        if (target != null)
+          redispatch(ev, target, MouseEvent.MOUSE_ENTERED);
+        if (id == MouseEvent.MOUSE_ENTERED)
+          ev.consume();
+        lastTarget = target;
+      }
+
+  }
+
+    /**
+   * Redispatches the specified mouse event to the specified target with the
+   * specified id.
+   *
+   * @param ev the mouse event
+   * @param target the new target
+   * @param id the new id
+   */
+  private void redispatch(MouseEvent ev, Component target, int id)
+  {
+    Component source = ev.getComponent();
+    if (target != null)
+      {
+        // Translate coordinates.
+        int x = ev.getX();
+        int y = ev.getY();
+        for (Component c = target; c != null && c != source; c = c.getParent())
+          {
+            x -= c.x;
+            y -= c.y;
+          }
+
+        // Retarget event.
+        MouseEvent retargeted;
+        if (id == MouseEvent.MOUSE_WHEEL)
+          {
+            MouseWheelEvent mwe = (MouseWheelEvent) ev;
+            retargeted = new MouseWheelEvent(target, id, ev.getWhen(),
+                                             ev.getModifiers()
+                                             | ev.getModifiersEx(), x, y,
+                                             ev.getClickCount(),
+                                             ev.isPopupTrigger(),
+                                             mwe.getScrollType(),
+                                             mwe.getScrollAmount(),
+                                             mwe.getWheelRotation());
+          }
+        else
+          {
+            retargeted = new MouseEvent(target, id, ev.getWhen(),
+                                       ev.getModifiers() | ev.getModifiersEx(),
+                                       x, y, ev.getClickCount(),
+                                       ev.isPopupTrigger(), ev.getButton());
+          }
+
+        if (target == source)
+          ((Container) target).dispatchNoLightweight(retargeted);
+        else
+          target.dispatchEvent(retargeted);
+      }
+  }
+
+  /**
+   * Determines if we are in the middle of a drag operation, that is, if
+   * any of the buttons is held down.
+   *
+   * @param ev the mouse event to check
+   *
+   * @return <code>true</code> if we are in the middle of a drag operation,
+   *         <code>false</code> otherwise
+   */
+  private boolean isDragging(MouseEvent ev)
+  {
+    int mods = ev.getModifiersEx();
+    int id = ev.getID();
+    if (id == MouseEvent.MOUSE_PRESSED || id == MouseEvent.MOUSE_RELEASED)
+      {
+        switch (ev.getButton())
+          {
+            case MouseEvent.BUTTON1:
+              mods ^= InputEvent.BUTTON1_DOWN_MASK;
+              break;
+            case MouseEvent.BUTTON2:
+              mods ^= InputEvent.BUTTON2_DOWN_MASK;
+              break;
+            case MouseEvent.BUTTON3:
+              mods ^= InputEvent.BUTTON3_DOWN_MASK;
+              break;
+          }
+      }
+    return (mods & (InputEvent.BUTTON1_DOWN_MASK
+                    | InputEvent.BUTTON2_DOWN_MASK
+                    | InputEvent.BUTTON3_DOWN_MASK)) != 0;
   }
 }
