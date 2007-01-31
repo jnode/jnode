@@ -42,7 +42,9 @@ package java.awt;
 import java.awt.event.ComponentListener;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
+import java.awt.event.HierarchyEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.awt.peer.ComponentPeer;
 import java.awt.peer.ContainerPeer;
 import java.awt.peer.LightweightPeer;
@@ -68,10 +70,11 @@ import javax.accessibility.Accessible;
  *
  * @author original author unknown
  * @author Eric Blake (ebb9@email.byu.edu)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  *
  * @since 1.0
  *
- * @status still missing 1.4 support
+ * @status still missing 1.4 support, some generics from 1.5
  */
 public class Container extends Component
 {
@@ -96,6 +99,13 @@ public class Container extends Component
    * @since 1.4
    */
   boolean focusCycleRoot;
+
+  /**
+   * Indicates if this container provides a focus traversal policy.
+   *
+   * @since 1.5
+   */
+  private boolean focusTraversalPolicyProvider;
 
   int containerSerializedDataVersion;
 
@@ -927,10 +937,10 @@ public class Container extends Component
    *
    * @since 1.3
    */
-  public EventListener[] getListeners(Class listenerType)
+  public <T extends EventListener> T[] getListeners(Class<T> listenerType)
   {
     if (listenerType == ContainerListener.class)
-      return getContainerListeners();
+      return (T[]) getContainerListeners();
     return super.getListeners(listenerType);
   }
 
@@ -1549,6 +1559,42 @@ public class Container extends Component
   }
   
   /**
+   * Set to <code>true</code> if this container provides a focus traversal
+   * policy, <code>false</code> when the root container's focus
+   * traversal policy should be used.
+   *
+   * @return <code>true</code> if this container provides a focus traversal
+   *        policy, <code>false</code> when the root container's focus
+   *        traversal policy should be used
+   *
+   * @see #setFocusTraversalPolicyProvider(boolean)
+   *
+   * @since 1.5
+   */
+  public final boolean isFocusTraversalPolicyProvider()
+  {
+    return focusTraversalPolicyProvider;
+  }
+
+  /**
+   * Set to <code>true</code> if this container provides a focus traversal
+   * policy, <code>false</code> when the root container's focus
+   * traversal policy should be used.
+   *
+   * @param b <code>true</code> if this container provides a focus traversal
+   *        policy, <code>false</code> when the root container's focus
+   *        traversal policy should be used
+   *
+   * @see #isFocusTraversalPolicyProvider()
+   *
+   * @since 1.5
+   */
+  public final void setFocusTraversalPolicyProvider(boolean b)
+  {
+    focusTraversalPolicyProvider = b;
+  }
+
+  /**
    * Check whether this Container is a focus cycle root.
    *
    * @return true if this is a focus cycle root, false otherwise
@@ -1848,6 +1894,48 @@ public class Container extends Component
 
         return null;
       }
+  }
+
+  /**
+   * Fires hierarchy events to the children of this container and this
+   * container itself. This overrides {@link Component#fireHierarchyEvent}
+   * in order to forward this event to all children.
+   */
+  void fireHierarchyEvent(int id, Component changed, Container parent,
+                          long flags)
+  {
+    // Only propagate event if there is actually a listener waiting for it.
+    if ((id == HierarchyEvent.HIERARCHY_CHANGED && numHierarchyListeners > 0)
+        || ((id == HierarchyEvent.ANCESTOR_MOVED
+             || id == HierarchyEvent.ANCESTOR_RESIZED)
+            && numHierarchyBoundsListeners > 0))
+      {
+        for (int i = 0; i < ncomponents; i++)
+          component[i].fireHierarchyEvent(id, changed, parent, flags);
+        super.fireHierarchyEvent(id, changed, parent, flags);
+      }
+  }
+
+  /**
+   * Adjusts the number of hierarchy listeners of this container and all of
+   * its parents. This is called by the add/remove listener methods and
+   * structure changing methods in Container.
+   *
+   * @param type the type, either {@link AWTEvent#HIERARCHY_BOUNDS_EVENT_MASK}
+   *        or {@link AWTEvent#HIERARCHY_EVENT_MASK}
+   * @param delta the number of listeners added or removed
+   */
+  void updateHierarchyListenerCount(long type, int delta)
+  {
+    if (type == AWTEvent.HIERARCHY_BOUNDS_EVENT_MASK)
+      numHierarchyBoundsListeners += delta;
+    else if (type == AWTEvent.HIERARCHY_EVENT_MASK)
+      numHierarchyListeners += delta;
+    else
+      assert false : "Should not reach here";
+
+    if (parent != null)
+      parent.updateHierarchyListenerCount(type, delta);
   }
 
   private void addNotifyContainerChildren()
