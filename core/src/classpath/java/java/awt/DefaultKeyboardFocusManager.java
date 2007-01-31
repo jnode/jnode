@@ -256,6 +256,95 @@ public class DefaultKeyboardFocusManager extends KeyboardFocusManager
     return false;
   }
 
+  /**
+   * Handles FOCUS_GAINED events in {@link #dispatchEvent(AWTEvent)}.
+   *
+   * @param fe the focus event
+   */
+  private boolean handleFocusGained(FocusEvent fe)
+  {
+    Component target = fe.getComponent ();
+
+    // If old focus owner != new focus owner, notify old focus
+    // owner that it has lost focus.
+    Component oldFocusOwner = getGlobalFocusOwner();
+    if (oldFocusOwner != null && oldFocusOwner != target)
+      {
+        FocusEvent lost = new FocusEvent(oldFocusOwner,
+                                         FocusEvent.FOCUS_LOST,
+                                         fe.isTemporary(), target);
+        oldFocusOwner.dispatchEvent(lost);
+      }
+
+     setGlobalFocusOwner (target);
+     if (target != getGlobalFocusOwner())
+       {
+         // Focus transfer was rejected, like when the target is not
+         // focusable.
+         dequeueKeyEvents(-1, target);
+         // FIXME: Restore focus somehow.
+       }
+     else
+       {
+         if (! fe.isTemporary())
+           {
+             setGlobalPermanentFocusOwner (target);
+             if (target != getGlobalPermanentFocusOwner())
+               {
+                 // Focus transfer was rejected, like when the target is not
+                 // focusable.
+                 dequeueKeyEvents(-1, target);
+                 // FIXME: Restore focus somehow.
+               }
+             else
+               {
+                 redispatchEvent(target, fe);
+               }
+           }
+       }
+
+     return true;
+  }
+
+  /**
+   * Handles FOCUS_LOST events for {@link #dispatchEvent(AWTEvent)}.
+   *
+   * @param fe the focus event
+   *
+   * @return if the event has been handled
+   */
+  private boolean handleFocusLost(FocusEvent fe)
+  {
+    Component currentFocus = getGlobalFocusOwner();
+    if (currentFocus != fe.getOppositeComponent())
+      {
+        setGlobalFocusOwner(null);
+        if (getGlobalFocusOwner() != null)
+          {
+            // TODO: Is this possible? If so, then we should try to restore
+            // the focus.
+          }
+        else
+          {
+            if (! fe.isTemporary())
+              {
+                setGlobalPermanentFocusOwner(null);
+                if (getGlobalPermanentFocusOwner() != null)
+                  {
+                    // TODO: Is this possible? If so, then we should try to
+                    // restore the focus.
+                  }
+                else
+                  {
+                    fe.setSource(currentFocus);
+                    redispatchEvent(currentFocus, fe);
+                  }
+              }
+          }
+      }
+    return true;
+  }
+
   private boolean enqueueKeyEvent (KeyEvent e)
   {
     Iterator i = delayRequests.iterator ();

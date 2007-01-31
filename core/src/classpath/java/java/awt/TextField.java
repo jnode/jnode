@@ -1,5 +1,5 @@
 /* TextField.java -- A one line text entry field
-   Copyright (C) 1999, 2002, 2004  Free Software Foundation, Inc.
+   Copyright (C) 1999, 2002, 2004, 2006,  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -55,53 +55,40 @@ import javax.accessibility.AccessibleStateSet;
 public class TextField extends TextComponent
 {
 
-/*
-	 * Static Variables
+  /**
+   * The number used to generate the name returned by getName.
 	 */
+  private static transient long next_textfield_number;
 
-// Serialization constant
-private static final long serialVersionUID = -2966288784432217853L;
 
-/*************************************************************************/
+  private static final long serialVersionUID = -2966288784432217853L;
 
-/*
-	 * Instance Variables
-	 */
 
-/**
+  /**
 	  * @serial The number of columns in the text entry field.
 	  */
-private int columns;
+  private int columns;
 
-/**
+  /**
 	  * @serial The character that is echoed when doing protected input
 	  */
-private char echoChar;
+  private char echoChar;
 
-// List of registered ActionListener's for this object.
-private ActionListener action_listeners;
+  // List of registered ActionListener's for this object.
+  private ActionListener action_listeners;
 
-/*************************************************************************/
-
-/*
-	 * Constructors
-	 */
-
-/**
+  /**
 	 * Initializes a new instance of <code>TextField</code> that is empty
 	 * and has one column.
 	 *
 	 * @exception HeadlessException If GraphicsEnvironment.isHeadless() is true,
 	 */
-public
-TextField()
-{
-		this("", 1);
-}
+  public TextField()
+  {
+    this("", 0);
+  }
 
-/*************************************************************************/
-
-/**
+  /**
 	  * Initializes a new instance of <code>TextField</code> containing
 	  * the specified text.  The number of columns will be equal to the
 	  * length of the text string.
@@ -110,15 +97,12 @@ TextField()
 	  *
 	  * @exception HeadlessException If GraphicsEnvironment.isHeadless() is true,
 	  */
-public
-TextField(String text)
-{
-		this(text, text.length());
-}
+  public TextField(String text)
+  {
+    this(text, (text == null) ? 0 : text.length());
+  }
 
-/*************************************************************************/
-
-/**
+  /**
 	  * Initializes a new instance of <code>TextField</code> that is empty
 	  * and has the specified number of columns.
 	  *
@@ -126,15 +110,12 @@ TextField(String text)
 	  *
 	  * @exception HeadlessException If GraphicsEnvironment.isHeadless() is true,
 	  */
-public
-TextField(int columns)
-{
+  public TextField(int columns)
+  {
 		this("", columns);
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
 	  * Initializes a new instance of <code>TextField</code> with the
 	  * specified text and number of columns.
 	  *
@@ -143,84 +124,69 @@ TextField(int columns)
 	  *
 	  * @exception HeadlessException If GraphicsEnvironment.isHeadless() is true,
 	  */
-public
-TextField(String text, int columns)
-{
+  public TextField(String text, int columns)
+  {
 		super(text);
+
+    if (columns < 0)
+      this.columns = 0;
+    else
 		this.columns = columns;
 
 		if (GraphicsEnvironment.isHeadless())
     throw new HeadlessException ();
-}
+  }
 
-/*************************************************************************/
-
-/*
-	 * Instance Methods
-	 */
-
-/**
+  /**
 	  * Returns the number of columns in the field.
 	  *
 	  * @return The number of columns in the field.
 	  */
-public int
-getColumns()
-{
+  public int getColumns()
+  {
   return(columns);
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
 	  * Sets the number of columns in this field to the specified value.
 	  *
 	  * @param columns The new number of columns in the field.
 	  *
 	  * @exception IllegalArgumentException If columns is less than zero.
 	  */
-public synchronized void
-setColumns(int columns)
-{
+  public synchronized void setColumns(int columns)
+  {
 		if (columns < 0)
     throw new IllegalArgumentException("Value is less than zero: " +
                                        columns);
 
 		this.columns = columns;
 		// FIXME: How to we communicate this to our peer?
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
 	  * Returns the character that is echoed to the screen when a text 
 	  * field is protected (such as when a password is being entered).
 	  *
 	  * @return The echo character for this text field.
 	  */
-public char
-getEchoChar()
-{
+  public char getEchoChar()
+  {
   return(echoChar);
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
 	  * Sets the character that is echoed when protected input such as
 	  * a password is displayed.
 	  *
 	  * @param echoChar The new echo character.
 	  */
-public void
-setEchoChar(char echoChar)
-{
-  setEchoCharacter (echoChar);
-}
+  public void setEchoChar(char echoChar)
+  {
+    setEchoCharacter(echoChar);
+  }
 
-/*************************************************************************/
-
-/**
+  /**
 	  * Sets the character that is echoed when protected input such as
 	  * a password is displayed.
 	  *
@@ -229,64 +195,52 @@ setEchoChar(char echoChar)
 	  * @deprecated This method is deprecated in favor of 
 	  * <code>setEchoChar()</code>
 	  */
-public void
-setEchoCharacter(char echoChar)
-{
+  public void setEchoCharacter(char echoChar)
+  {
   this.echoChar = echoChar;
 
   TextFieldPeer peer = (TextFieldPeer) getPeer ();
   if (peer != null)
     peer.setEchoChar (echoChar);
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
 	  * Tests whether or not this text field has an echo character set
 	  * so that characters the user type are not echoed to the screen.
 	  *
 	  * @return <code>true</code> if an echo character is set,
 	  * <code>false</code> otherwise.
 	  */
-public boolean
-echoCharIsSet()
-{
+  public boolean echoCharIsSet()
+  {
 		if (echoChar == '\u0000')
     return(false);
 		else
     return(true);
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
 	  * Returns the minimum size for this text field.
 	  *
 	  * @return The minimum size for this text field.
 	  */
-public Dimension
-getMinimumSize()
-{
+  public Dimension getMinimumSize()
+  {
   return getMinimumSize (getColumns ());
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
 	  * Returns the minimum size of a text field with the specified number
 	  * of columns.
 	  *
 	  * @param columns The number of columns to get the minimum size for.
 	  */
-public Dimension
-getMinimumSize(int columns)
-{
-  return minimumSize (columns);
-}
+  public Dimension getMinimumSize(int columns)
+  {
+    return minimumSize(columns);
+  }
 
-/*************************************************************************/
-
-/**
+  /**
 	  * Returns the minimum size for this text field.
 	  *
 	  * @return The minimum size for this text field.
@@ -294,15 +248,12 @@ getMinimumSize(int columns)
   * @deprecated This method is deprecated in favor of
 	  * <code>getMinimumSize()</code>.
 	  */
-public Dimension
-minimumSize()
-{
-  return minimumSize (getColumns ());
-}
+  public Dimension minimumSize()
+  {
+    return minimumSize(getColumns ());
+  }
 
-/*************************************************************************/
-
-/**
+  /**
 	  * Returns the minimum size of a text field with the specified number
 	  * of columns.
 	  *
@@ -311,46 +262,40 @@ minimumSize()
 	  * @deprecated This method is deprecated in favor of 
 	  * <code>getMinimumSize(int)</code>.
 	  */
-public Dimension
-minimumSize(int columns)
-{
+  public Dimension minimumSize(int columns)
+  {
+    if (isMinimumSizeSet())
+      return new Dimension(minSize);
+
   TextFieldPeer peer = (TextFieldPeer) getPeer ();
   if (peer == null)
-    return null; // FIXME: What do we do if there is no peer?
+      return new Dimension(getWidth(), getHeight());
 
   return peer.getMinimumSize (columns);
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
 	  * Returns the preferred size for this text field.
 	  *
 	  * @return The preferred size for this text field.
 	  */
-public Dimension
-getPreferredSize()
-{
-  return getPreferredSize (getColumns ());
-}
+  public Dimension getPreferredSize()
+  {
+    return getPreferredSize(getColumns ());
+  }
 
-/*************************************************************************/
-
-/**
+  /**
 	  * Returns the preferred size of a text field with the specified number
 	  * of columns.
 	  *
 	  * @param columns The number of columns to get the preferred size for.
 	  */
-public Dimension
-getPreferredSize(int columns)
-{
-  return preferredSize (columns);
-}
+  public Dimension getPreferredSize(int columns)
+  {
+    return preferredSize(columns);
+  }
 
-/*************************************************************************/
-
-/**
+  /**
 	  * Returns the preferred size for this text field.
 	  *
 	  * @return The preferred size for this text field.
@@ -358,15 +303,12 @@ getPreferredSize(int columns)
 	  * @deprecated This method is deprecated in favor of 
 	  * <code>getPreferredSize()</code>.
 	  */
-public Dimension
-preferredSize()
-{
-  return preferredSize (getColumns ());
-}
+  public Dimension preferredSize()
+  {
+    return preferredSize(getColumns ());
+  }
 
-/*************************************************************************/
-
-/**
+  /**
 	  * Returns the preferred size of a text field with the specified number
 	  * of columns.
 	  *
@@ -375,63 +317,55 @@ preferredSize()
 	  * @deprecated This method is deprecated in favor of 
 	  * <code>getPreferredSize(int)</code>.
 	  */
-public Dimension
-preferredSize(int columns)
-{
+  public Dimension preferredSize(int columns)
+  {
+    if (isPreferredSizeSet())
+      return new Dimension(prefSize);
+
   TextFieldPeer peer = (TextFieldPeer) getPeer ();
   if (peer == null)
-    return new Dimension (0, 0);
+      return new Dimension (getWidth(), getHeight());
 
   return peer.getPreferredSize (columns);
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
 	  * Notifies this object that it should create its native peer.
 	  */
-public void
-addNotify()
-{
+  public void addNotify()
+  {
 		if (getPeer() != null)
 			return;
 
   setPeer((ComponentPeer)getToolkit().createTextField(this));
-}
+    super.addNotify();
+  }
 
-/*************************************************************************/
-
-/**
+  /**
 	  * Addes a new listener to the list of action listeners for this
 	  * object.
 	  *
 	  * @param listener The listener to add to the list.
 	  */
-public synchronized void
-addActionListener(ActionListener listener)
-{
+  public synchronized void addActionListener(ActionListener listener)
+  {
 		action_listeners = AWTEventMulticaster.add(action_listeners, listener);
 
 		enableEvents(AWTEvent.ACTION_EVENT_MASK);
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
 	  * Removes the specified listener from the list of action listeners
 	  * for this object.
 	  *
 	  * @param listener The listener to remove from the list.
 	  */
-public synchronized void
-removeActionListener(ActionListener listener)
-{
+  public synchronized void removeActionListener(ActionListener listener)
+  {
 		action_listeners = AWTEventMulticaster.remove(action_listeners, listener);
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
 	  * Processes the specified event.  If the event is an instance of
 	  * <code>ActionEvent</code> then <code>processActionEvent()</code> is
 	  * called to process it, otherwise the event is sent to the
@@ -439,18 +373,15 @@ removeActionListener(ActionListener listener)
 	  *
 	  * @param event The event to process.
 	  */
-protected void
-processEvent(AWTEvent event)
-{
+  protected void processEvent(AWTEvent event)
+  {
 		if (event instanceof ActionEvent)
     processActionEvent((ActionEvent)event);
 		else
 			super.processEvent(event);
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
 	  * Processes an action event by calling any registered listeners.
 	  * Note to subclasses: This method is not called unless action events
 	  * are enabled on this object.  This will be true if any listeners
@@ -459,16 +390,14 @@ processEvent(AWTEvent event)
 	  * 
 	  * @param event The event to process.
 	  */
-protected void
-processActionEvent(ActionEvent event)
-{
+  protected void processActionEvent(ActionEvent event)
+  {
 		if (action_listeners != null)
 			action_listeners.actionPerformed(event);
-}
+  }
 
-void
-dispatchEventImpl(AWTEvent e)
-{
+  void dispatchEventImpl(AWTEvent e)
+  {
   if (e.id <= ActionEvent.ACTION_LAST 
       && e.id >= ActionEvent.ACTION_FIRST
       && (action_listeners != null 
@@ -476,21 +405,18 @@ dispatchEventImpl(AWTEvent e)
 			processEvent(e);
 		else
 			super.dispatchEventImpl(e);
-}
+  }
 
-/*************************************************************************/
-
-/**
+ /**
 	  * Returns a debug string for this object.
 	  *
 	  * @return A debug string for this object.
 	  */
-protected String
-paramString()
-{
+  protected String paramString()
+  {
   return(getClass().getName() + "(columns=" + getColumns() + ",echoChar=" +
          getEchoChar());
-}
+  }
 
   /**
    * Returns an array of all the objects currently registered as FooListeners
@@ -502,7 +428,7 @@ paramString()
    *
    * @since 1.3
    */
-  public EventListener[] getListeners (Class listenerType)
+  public <T extends EventListener> T[] getListeners (Class<T> listenerType)
   {
     if (listenerType == ActionListener.class)
       return AWTEventMulticaster.getListeners (action_listeners, listenerType);
@@ -519,6 +445,21 @@ paramString()
   public ActionListener[] getActionListeners ()
   {
     return (ActionListener[]) getListeners (ActionListener.class);
+  }
+
+  /**
+   * Generate a unique name for this <code>TextField</code>.
+   *
+   * @return A unique name for this <code>TextField</code>.
+   */
+  String generateName()
+  {
+    return "textfield" + getUniqueLong();
+  }
+
+  private static synchronized long getUniqueLong()
+  {
+    return next_textfield_number++;
   }
 
   protected class AccessibleAWTTextField extends AccessibleAWTTextComponent
@@ -540,4 +481,4 @@ paramString()
     return new AccessibleAWTTextField();
   }
 
-} // class TextField
+}
