@@ -125,9 +125,11 @@ public class TextArea extends TextComponent implements java.io.Serializable
    * the specified text.  Conceptually the <code>TextArea</code> has 0
    * rows and 0 columns but its initial bounds are defined by its peer
    * or by the container in which it is packed.  Both horizontal and
-   * veritcal scrollbars will be displayed.
+   * veritcal scrollbars will be displayed.  The TextArea initially contains
+   * the specified text.  If text specified as <code>null<code>, it will
+   * be set to "".
 	  *
-	  * @param text The text to display in this text area.
+   * @param text The text to display in this text area (<code>null</code> permitted).
 	  *
    * @exception HeadlessException if GraphicsEnvironment.isHeadless () is true
 	  */
@@ -156,9 +158,10 @@ public class TextArea extends TextComponent implements java.io.Serializable
    * Initialize a new instance of <code>TextArea</code> that can
    * display the specified number of rows and columns of text, without
    * the need to scroll.  The TextArea initially contains the
-   * specified text.
+   * specified text.  If text specified as <code>null<code>, it will
+   * be set to "".
 	  *
-	  * @param text The text to display in this text area.
+   * @param text The text to display in this text area (<code>null</code> permitted).
 	  * @param rows The number of rows in this text area.
 	  * @param columns The number of columns in this text area.
 	  *
@@ -174,9 +177,10 @@ public class TextArea extends TextComponent implements java.io.Serializable
    * contains the specified text.  The TextArea can display the
    * specified number of rows and columns of text, without the need to
    * scroll.  This constructor allows specification of the scroll bar
-   * display policy.
+   * display policy.  The TextArea initially contains the specified text.
+   * If text specified as <code>null<code>, it will be set to "".
 	  *
-	  * @param text The text to display in this text area.
+   * @param text The text to display in this text area (<code>null</code> permitted).
 	  * @param rows The number of rows in this text area.
 	  * @param columns The number of columns in this text area.
    * @param scrollbarVisibility The scroll bar display policy. One of
@@ -192,17 +196,19 @@ public class TextArea extends TextComponent implements java.io.Serializable
     if (GraphicsEnvironment.isHeadless ())
       throw new HeadlessException ();
 
-    if (rows < 0 || columns < 0)
-      throw new IllegalArgumentException ("Bad row or column value");
-
-    if (scrollbarVisibility != SCROLLBARS_BOTH
-        && scrollbarVisibility != SCROLLBARS_VERTICAL_ONLY
-        && scrollbarVisibility != SCROLLBARS_HORIZONTAL_ONLY
-        && scrollbarVisibility != SCROLLBARS_NONE)
-      throw new IllegalArgumentException ("Bad scrollbar visibility value");
-
+    if (rows < 0)
+      this.rows = 0;
+    else
 		this.rows = rows;
+
+    if (columns < 0)
+      this.columns = 0;
+    else
 		this.columns = columns;
+
+    if (scrollbarVisibility < 0 || scrollbarVisibility > 4)
+      this.scrollbarVisibility = SCROLLBARS_BOTH;
+    else
 		this.scrollbarVisibility = scrollbarVisibility;
 
     // TextAreas need to receive tab key events so we override the
@@ -278,11 +284,7 @@ public class TextArea extends TextComponent implements java.io.Serializable
 	}
 
 	/**
-   * Retrieve the minimum size for this text area, considering the
-   * text area's current row and column values.  A text area's minimum
-   * size depends on the number of rows and columns of text it would
-   * prefer to display, and on the size of the font in which the text
-   * would be displayed.
+   * Retrieve the minimum size for this text area.
 	  *
 	  * @return The minimum size for this text field.
 	  */
@@ -292,11 +294,8 @@ public class TextArea extends TextComponent implements java.io.Serializable
 	}
 
 	/**
-   * Retrieve the minimum size that this text area would have if its
-   * row and column values were equal to those specified.  A text
-   * area's minimum size depends on the number of rows and columns of
-   * text it would prefer to display, and on the size of the font in
-   * which the text would be displayed.
+   * Retrieve the minimum size for this text area.  If the minimum
+   * size has been set, then rows and columns are used in the calculation.
 	  *
    * @param rows The number of rows to use in the minimum size
    * calculation.
@@ -311,11 +310,7 @@ public class TextArea extends TextComponent implements java.io.Serializable
 	}
 
 	/**
-   * Retrieve the minimum size for this text area, considering the
-   * text area's current row and column values.  A text area's minimum
-   * size depends on the number of rows and columns of text it would
-   * prefer to display, and on the size of the font in which the text
-   * would be displayed.
+   * Retrieve the minimum size for this text area.
 	  *
    * @return The minimum size for this text area.
 	  *
@@ -328,11 +323,8 @@ public class TextArea extends TextComponent implements java.io.Serializable
 	}
 
 	/**
-   * Retrieve the minimum size that this text area would have if its
-   * row and column values were equal to those specified.  A text
-   * area's minimum size depends on the number of rows and columns of
-   * text it would prefer to display, and on the size of the font in
-   * which the text would be displayed.
+   * Retrieve the minimum size for this text area.  If the minimum
+   * size has been set, then rows and columns are used in the calculation.
 	  *
    * @param rows The number of rows to use in the minimum size
    * calculation.
@@ -346,21 +338,18 @@ public class TextArea extends TextComponent implements java.io.Serializable
 	  */
   public Dimension minimumSize (int rows, int columns)
   {
-    TextAreaPeer peer = (TextAreaPeer) getPeer ();
+    if (isMinimumSizeSet())
+      return new Dimension(minSize);
 
-    // Sun returns Dimension (0,0) in this case.
+    TextAreaPeer peer = (TextAreaPeer) getPeer ();
     if (peer == null)
-      return new Dimension (0, 0);
+      return new Dimension (getWidth(), getHeight());
 
     return peer.getMinimumSize (rows, columns);
   }
 
 	/**
-   * Retrieve the preferred size for this text area, considering the
-   * text area's current row and column values.  A text area's preferred
-   * size depends on the number of rows and columns of text it would
-   * prefer to display, and on the size of the font in which the text
-   * would be displayed.
+   * Retrieve the preferred size for this text area.
 	  *
 	  * @return The preferred size for this text field.
 	  */
@@ -370,11 +359,8 @@ public class TextArea extends TextComponent implements java.io.Serializable
 	}
 
 	/**
-   * Retrieve the preferred size that this text area would have if its
-   * row and column values were equal to those specified.  A text
-   * area's preferred size depends on the number of rows and columns
-   * of text it would prefer to display, and on the size of the font
-   * in which the text would be displayed.
+   * Retrieve the preferred size for this text area.  If the preferred
+   * size has been set, then rows and columns are used in the calculation.
 	  *
    * @param rows The number of rows to use in the preferred size
    * calculation.
@@ -389,11 +375,7 @@ public class TextArea extends TextComponent implements java.io.Serializable
 	}
 
 	/**
-   * Retrieve the preferred size for this text area, considering the
-   * text area's current row and column values.  A text area's preferred
-   * size depends on the number of rows and columns of text it would
-   * prefer to display, and on the size of the font in which the text
-   * would be displayed.
+   * Retrieve the preferred size for this text area.
 	  *
 	  * @return The preferred size for this text field.
 	  *
@@ -406,11 +388,8 @@ public class TextArea extends TextComponent implements java.io.Serializable
 	}
 
 	/**
-   * Retrieve the preferred size that this text area would have if its
-   * row and column values were equal to those specified.  A text
-   * area's preferred size depends on the number of rows and columns
-   * of text it would prefer to display, and on the size of the font
-   * in which the text would be displayed.
+   * Retrieve the preferred size for this text area.  If the preferred
+   * size has been set, then rows and columns are used in the calculation.
    *
    * @param rows The number of rows to use in the preferred size
    * calculation.
@@ -424,11 +403,12 @@ public class TextArea extends TextComponent implements java.io.Serializable
 	  */
   public Dimension preferredSize (int rows, int columns)
   {
-    TextAreaPeer peer = (TextAreaPeer) getPeer ();
+    if (isPreferredSizeSet())
+      return new Dimension(prefSize);
 
-    // Sun returns Dimension (0,0) in this case.
+    TextAreaPeer peer = (TextAreaPeer) getPeer ();
     if (peer == null)
-      return new Dimension (0, 0);
+      return new Dimension (getWidth(), getHeight());
 
     return peer.getPreferredSize (rows, columns);
   }
@@ -478,6 +458,8 @@ public class TextArea extends TextComponent implements java.io.Serializable
 
     if (peer != null)
       peer.insert (str, peer.getText().length ());
+    else
+      setText(getText() + str);
   }
 
 	/**
@@ -504,10 +486,19 @@ public class TextArea extends TextComponent implements java.io.Serializable
 	  */
   public void insertText (String str, int pos)
   {
+    String tmp1 = null;
+    String tmp2 = null;
+
     TextAreaPeer peer = (TextAreaPeer) getPeer ();
 
     if (peer != null)
       peer.insert (str, pos);
+    else
+      {
+        tmp1 = getText().substring(0, pos);
+        tmp2 = getText().substring(pos, getText().length());
+        setText(tmp1 + str + tmp2);
+  }
   }
 
 	/**
@@ -544,10 +535,19 @@ public class TextArea extends TextComponent implements java.io.Serializable
 	  */
   public void replaceText (String str, int start, int end)
   {
-    TextAreaPeer peer = (TextAreaPeer) getPeer ();
+    String tmp1 = null;
+    String tmp2 = null;
+
+    TextAreaPeer peer = (TextAreaPeer) getPeer();
 
     if (peer != null)
-      peer.replaceRange (str, start, end);
+      peer.replaceRange(str, start, end);
+    else
+      {
+        tmp1 = getText().substring(0, start);
+        tmp2 = getText().substring(end, getText().length());
+        setText(tmp1 + str + tmp2);
+  }
   }
 
 	/**

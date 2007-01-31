@@ -561,7 +561,9 @@ public abstract class KeyboardFocusManager
    * @see #UP_CYCLE_TRAVERSAL_KEYS
    * @see #DOWN_CYCLE_TRAVERSAL_KEYS
    */
-  public void setDefaultFocusTraversalKeys (int id, Set keystrokes)
+  public void setDefaultFocusTraversalKeys (int id,
+					    Set<? extends AWTKeyStroke>
+					    keystrokes)
   {
     if (id != KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS &&
         id != KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS &&
@@ -633,7 +635,7 @@ public abstract class KeyboardFocusManager
    * @see #UP_CYCLE_TRAVERSAL_KEYS
    * @see #DOWN_CYCLE_TRAVERSAL_KEYS
    */
-  public Set getDefaultFocusTraversalKeys (int id)
+  public Set<AWTKeyStroke> getDefaultFocusTraversalKeys (int id)
   {
     if (id < FORWARD_TRAVERSAL_KEYS || id > DOWN_CYCLE_TRAVERSAL_KEYS)
       throw new IllegalArgumentException ();
@@ -995,9 +997,9 @@ public abstract class KeyboardFocusManager
    * @return A list of explicitly registered key event dispatchers.
    * @see KeyboardFocusManager#addKeyEventDispatcher(java.awt.KeyEventDispatcher)
    */
-  protected List getKeyEventDispatchers ()
+  protected List<KeyEventDispatcher> getKeyEventDispatchers ()
   {
-    return (List) keyEventDispatchers.clone ();
+    return (List<KeyEventDispatcher>) keyEventDispatchers.clone ();
   }
 
   /**
@@ -1052,9 +1054,9 @@ public abstract class KeyboardFocusManager
    * @return A list of explicitly registered key event post processors.
    * @see KeyboardFocusManager#addKeyEventPostProcessor(java.awt.KeyEventPostProcessor)
    */
-  protected List getKeyEventPostProcessors ()
+  protected List<KeyEventPostProcessor> getKeyEventPostProcessors ()
   {
-    return (List) keyEventPostProcessors.clone ();
+    return (List<KeyEventPostProcessor>) keyEventPostProcessors.clone ();
   }
 
   /**
@@ -1435,5 +1437,49 @@ public abstract class KeyboardFocusManager
           {
           }
       }
+  }
+
+
+  /**
+   * Maps focus requests from heavyweight to lightweight components.
+   */
+  private static HashMap focusRequests = new HashMap();
+
+  /**
+   * Retargets focus events that come from the peer (which only know about
+   * heavyweight components) to go to the correct lightweight component
+   * if appropriate.
+   *
+   * @param ev the event to check
+   *
+   * @return the retargetted event
+   */
+  static AWTEvent retargetFocusEvent(AWTEvent ev)
+  {
+    if (ev instanceof FocusEvent)
+      {
+        FocusEvent fe = (FocusEvent) ev;
+        Component target = fe.getComponent();
+        if (focusRequests.containsKey(target))
+          {
+            Component lightweight = (Component) focusRequests.get(target);
+            ev = new FocusEvent(lightweight, fe.id, fe.isTemporary());
+            focusRequests.remove(target);
+}
+      }
+    return ev;
+  }
+
+  /**
+   * Adds a lightweight focus request for a heavyweight component.
+   *
+   * @param heavyweight the heavyweight from which we will receive a focus
+   *        event soon
+   * @param lightweight the lightweight that ultimately receives the request
+   */
+  static void addLightweightFocusRequest(Component heavyweight,
+                                         Component lightweight)
+  {
+    focusRequests.put(heavyweight, lightweight);
   }
 }
