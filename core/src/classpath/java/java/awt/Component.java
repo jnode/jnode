@@ -1486,7 +1486,40 @@ public abstract class Component
       }
 	}
 
-	/**
+    /**
+   * Sends notification to interested listeners about resizing and/or moving
+   * the component. If this component has interested
+   * component listeners or the corresponding event mask enabled, then
+   * COMPONENT_MOVED and/or COMPONENT_RESIZED events are posted to the event
+   * queue.
+   *
+   * @param resized true if the component has been resized, false otherwise
+   * @param moved true if the component has been moved, false otherwise
+   */
+  void notifyReshape(boolean resized, boolean moved)
+  {
+    // Only post an event if this component actually has a listener
+    // or has this event explicitly enabled.
+    if (componentListener != null
+        || (eventMask & AWTEvent.COMPONENT_EVENT_MASK) != 0)
+      {
+        // Fire component event on this component.
+        if (moved)
+          {
+            ComponentEvent ce = new ComponentEvent(this,
+                                               ComponentEvent.COMPONENT_MOVED);
+            getToolkit().getSystemEventQueue().postEvent(ce);
+          }
+        if (resized)
+          {
+            ComponentEvent ce = new ComponentEvent(this,
+                                             ComponentEvent.COMPONENT_RESIZED);
+            getToolkit().getSystemEventQueue().postEvent(ce);
+          }
+      }
+  }
+
+    /**
 	 * Sets the bounding rectangle for this component to the specified
 	 * rectangle. Note that these coordinates are relative to the parent, not
 	 * to the screen.
