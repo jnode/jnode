@@ -39,6 +39,10 @@ exception statement from your version. */
 
 package java.awt;
 
+//import gnu.java.awt.dnd.peer.gtk.GtkDropTargetContextPeer;
+
+import gnu.java.awt.ComponentReshapeEvent;
+
 import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
 import java.awt.event.AdjustmentEvent;
@@ -70,6 +74,7 @@ import java.awt.image.ImageProducer;
 import java.awt.image.VolatileImage;
 import java.awt.peer.ComponentPeer;
 import java.awt.peer.LightweightPeer;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
@@ -212,6 +217,12 @@ public abstract class Component
 	 * as a lock object.
 	 */
 	static final Object treeLock = new String("AWT_TREE_LOCK");
+
+  /**
+   * The default maximum size.
+   */
+  private static final Dimension DEFAULT_MAX_SIZE
+                             = new Dimension(Short.MAX_VALUE, Short.MAX_VALUE);
 
 	// Serialized fields from the serialization spec.
 
@@ -427,6 +438,24 @@ public abstract class Component
 	Dimension minSize;
 
 	/**
+   * Flag indicating whether the minimum size for the component has been set
+   * by a call to {@link #setMinimumSize(Dimension)} with a non-null value.
+   */
+  boolean minSizeSet;
+
+  /**
+   * The maximum size for the component.
+   * @see #setMaximumSize(Dimension)
+   */
+  Dimension maxSize;
+
+  /**
+   * A flag indicating whether the maximum size for the component has been set
+   * by a call to {@link #setMaximumSize(Dimension)} with a non-null value.
+   */
+  boolean maxSizeSet;
+
+  /**
 	 * Cached information on the preferred size. Should have been transient.
 	 *
 	 * @serial ignore
@@ -569,6 +598,17 @@ public abstract class Component
 	transient BufferStrategy bufferStrategy;
 
   /**
+   * The number of hierarchy listeners of this container plus all of its
+   * children. This is needed for efficient handling of HierarchyEvents.
+   * These must be propagated to all child components with HierarchyListeners
+   * attached. To avoid traversal of the whole subtree, we keep track of
+   * the number of HierarchyListeners here and only walk the paths that
+   * actually have listeners.
+   */
+  int numHierarchyListeners;
+  int numHierarchyBoundsListeners;
+
+  /**
    * true if requestFocus was called on this component when its
    * top-level ancestor was not focusable.
    */
@@ -613,16 +653,19 @@ public abstract class Component
 	}
 
 	/**
-	 * Sets the name of this component to the specified name.
+   * Sets the name of this component to the specified name (this is a bound
+   * property with the name 'name').
 	 *
-	 * @param name the new name of this component
+   * @param name the new name (<code>null</code> permitted).
 	 * @see #getName()
 	 * @since 1.1
 	 */
   public void setName(String name)
   {
 		nameExplicitlySet = true;
+    String old = this.name;
 		this.name = name;
+    firePropertyChange("name", old, name);
 	}
 
 	/**
@@ -659,6 +702,9 @@ public abstract class Component
   public void setDropTarget(DropTarget dt)
   {
 		this.dropTarget = dt;
+
+    if (peer != null)
+      dropTarget.addNotify(peer);
 	}
 
 	/**
@@ -1590,6 +1636,7 @@ public abstract class Component
 	 *
 	 * @return the component's preferred size
 	 * @see #getMinimumSize()
+   * @see #setPreferredSize(Dimension)
 	 * @see LayoutManager
 	 */
   public Dimension getPreferredSize()
@@ -1600,7 +1647,7 @@ public abstract class Component
   /**
    * Sets the preferred size that will be returned by
    * {@link #getPreferredSize()} always, and sends a
-   * {@link java.beans.PropertyChangeEvent} (with the property name 'preferredSize') to
+   * {@link PropertyChangeEvent} (with the property name 'preferredSize') to
    * all registered listeners.
    *
    * @param size  the preferred size (<code>null</code> permitted).
@@ -1662,6 +1709,39 @@ public abstract class Component
 	}
 
 	/**
+   * Sets the minimum size that will be returned by {@link #getMinimumSize()}
+   * always, and sends a {@link PropertyChangeEvent} (with the property name
+   * 'minimumSize') to all registered listeners.
+   *
+   * @param size  the minimum size (<code>null</code> permitted).
+   *
+   * @since 1.5
+   *
+   * @see #getMinimumSize()
+   */
+  public void setMinimumSize(Dimension size)
+  {
+    Dimension old = minSizeSet ? minSize : null;
+    minSize = size;
+    minSizeSet = (size != null);
+    firePropertyChange("minimumSize", old, size);
+  }
+
+  /**
+   * Returns <code>true</code> if the current minimum size is not
+   * <code>null</code> and was set by a call to
+   * {@link #setMinimumSize(Dimension)}, otherwise returns <code>false</code>.
+   *
+   * @return A boolean.
+   *
+   * @since 1.5
+   */
+  public boolean isMinimumSizeSet()
+  {
+    return minSizeSet;
+  }
+
+  /**
 	 * Returns the component's minimum size.
 	 *
 	 * @return the component's minimum size
@@ -1676,10 +1756,38 @@ public abstract class Component
 	}
 
 	/**
+   * The actual calculation is pulled out of minimumSize() so that
+   * we can call it from Container.preferredSize() and
+   * Component.preferredSizeImpl and avoid creating a
+   * new intermediate Dimension object.
+   *
+   * @return the minimum size of the component
+   */
+  Dimension minimumSizeImpl()
+  {
+    Dimension size = minSize;
+    if (size == null || !(valid || minSizeSet))
+      {
+        // We need to lock here, because the calculation depends on the
+        // component structure not changing.
+        synchronized (getTreeLock())
+          {
+            ComponentPeer p = peer;
+            if (p != null)
+              size = peer.minimumSize();
+            else
+              size = size();
+          }
+      }
+    return size;
+  }
+
+  /**
 	 * Returns the component's maximum size.
 	 *
 	 * @return the component's maximum size
 	 * @see #getMinimumSize()
+   * @see #setMaximumSize(Dimension)
 	 * @see #getPreferredSize()
 	 * @see LayoutManager
 	 */
@@ -1689,6 +1797,56 @@ public abstract class Component
 	}
 
 	/**
+   * This is pulled out from getMaximumSize(), so that we can access it
+   * from Container.getMaximumSize() without creating an additional
+   * intermediate Dimension object.
+   *
+   * @return the maximum size of the component
+   */
+  Dimension maximumSizeImpl()
+  {
+    Dimension size;
+    if (maxSizeSet)
+      size = maxSize;
+    else
+      size = DEFAULT_MAX_SIZE;
+    return size;
+  }
+
+  /**
+   * Sets the maximum size that will be returned by {@link #getMaximumSize()}
+   * always, and sends a {@link PropertyChangeEvent} (with the property name
+   * 'maximumSize') to all registered listeners.
+   *
+   * @param size  the maximum size (<code>null</code> permitted).
+   *
+   * @since 1.5
+   *
+   * @see #getMaximumSize()
+   */
+  public void setMaximumSize(Dimension size)
+  {
+    Dimension old = maxSizeSet ? maxSize : null;
+    maxSize = size;
+    maxSizeSet = (size != null);
+    firePropertyChange("maximumSize", old, size);
+  }
+
+  /**
+   * Returns <code>true</code> if the current maximum size is not
+   * <code>null</code> and was set by a call to
+   * {@link #setMaximumSize(Dimension)}, otherwise returns <code>false</code>.
+   *
+   * @return A boolean.
+   *
+   * @since 1.5
+   */
+  public boolean isMaximumSizeSet()
+  {
+    return maxSizeSet;
+  }
+
+  /**
 	 * Returns the preferred horizontal alignment of this component. The value
 	 * returned will be between {@link #LEFT_ALIGNMENT} and
 	 * {@link #RIGHT_ALIGNMENT}, inclusive.
@@ -1873,11 +2031,9 @@ public abstract class Component
 	}
 
 	/**
-	 * Updates this component. This is called in response to
-	 * <code>repaint</code>. This method fills the component with the
-	 * background color, then sets the foreground color of the specified
-	 * graphics context to the foreground color of this component and calls
-	 * the <code>paint()</code> method. The coordinates of the graphics are
+   * Updates this component. This is called for heavyweight components in
+   * response to {@link #repaint()}. The default implementation simply forwards
+   * to {@link #paint(Graphics)}. The coordinates of the graphics are
 	 * relative to this component. Subclasses should call either
 	 * <code>super.update(g)</code> or <code>paint(g)</code>.
 	 *
@@ -1885,11 +2041,6 @@ public abstract class Component
    *
 	 * @see #paint(Graphics)
 	 * @see #repaint()
-   *
-   * @specnote In contrast to what the spec says, tests show that the exact
-   *           behaviour is to clear the background on lightweight and
-   *           top-level components only. Heavyweight components are not
-   *           affected by this method and only call paint().
 	 */
   public void update(Graphics g)
   {
@@ -2004,10 +2155,7 @@ public abstract class Component
 	}
 
 	/**
-	 * Prints this component, including all sub-components. This method is
-	 * provided so that printing can be done in a different manner from
-	 * painting. However, the implementation in this class simply calls the
-	 * <code>paintAll()</code> method.
+   * Prints this component, including all sub-components.
 	 *
    * @param g the graphics context of the print device
    * 
@@ -2365,6 +2513,17 @@ public abstract class Component
 	}
 
 	/**
+   * By default, no old mouse events should be ignored.
+   * This can be overridden by subclasses.
+   *
+   * @return false, no mouse events are ignored.
+   */
+  static boolean ignoreOldMouseEvents()
+  {
+    return false;
+  }
+
+  /**
    * AWT 1.0 event handler.
 	 *
    * This method simply calls handleEvent and returns the result.
@@ -2581,6 +2740,40 @@ public abstract class Component
 	}
 
 	/**
+   * Fires a HierarchyEvent or HierarchyChangeEvent on this component.
+   *
+   * @param id the event id
+   * @param changed the changed component
+   * @param parent the parent
+   * @param flags the event flags
+   */
+  void fireHierarchyEvent(int id, Component changed, Container parent,
+                          long flags)
+  {
+    boolean enabled = false;
+    switch (id)
+    {
+      case HierarchyEvent.HIERARCHY_CHANGED:
+        enabled = hierarchyListener != null
+                  || (eventMask & AWTEvent.HIERARCHY_EVENT_MASK) != 0;
+        break;
+      case HierarchyEvent.ANCESTOR_MOVED:
+      case HierarchyEvent.ANCESTOR_RESIZED:
+        enabled = hierarchyBoundsListener != null
+                  || (eventMask & AWTEvent.HIERARCHY_BOUNDS_EVENT_MASK) != 0;
+        break;
+      default:
+        assert false : "Should not reach here";
+    }
+    if (enabled)
+      {
+        HierarchyEvent ev = new HierarchyEvent(this, id, changed, parent,
+                                               flags);
+        dispatchEvent(ev);
+      }
+  }
+
+  /**
 	 * Adds the specified listener to this component. This is harmless if the
 	 * listener is null, but if the listener has already been registered, it
 	 * will now be registered twice.
@@ -3636,7 +3829,8 @@ public abstract class Component
 	 * @see KeyboardFocusManager#UP_CYCLE_TRAVERSAL_KEYS
 	 * @since 1.4
 	 */
-  public void setFocusTraversalKeys(int id, Set keystrokes)
+  public void setFocusTraversalKeys(int id,
+				    Set<? extends AWTKeyStroke> keystrokes)
   {
 		if (keystrokes == null)
       {
@@ -3728,14 +3922,14 @@ public abstract class Component
    * 
 	 * @since 1.4
 	 */
-  public Set getFocusTraversalKeys (int id)
+  public Set<AWTKeyStroke> getFocusTraversalKeys (int id)
   {
     if (id != KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS &&
         id != KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS &&
         id != KeyboardFocusManager.UP_CYCLE_TRAVERSAL_KEYS)
 			throw new IllegalArgumentException();
 
-		Set s = null;
+    Set<AWTKeyStroke> s = null;
 
 		if (focusTraversalKeys != null)
 			s = focusTraversalKeys[id];
@@ -4740,8 +4934,7 @@ p   * <li>the set of backward traversal keys
 	 * {@link #applyComponentOrientation(ComponentOrientation)} affects the
 	 * entire hierarchy.
 	 *
-	 * @param o the new orientation
-	 * @throws NullPointerException if o is null
+   * @param o the new orientation (<code>null</code> is accepted)
 	 * @see #getComponentOrientation()
 	 */
   public void setComponentOrientation(ComponentOrientation o)
@@ -4756,7 +4949,7 @@ p   * <li>the set of backward traversal keys
 	/**
 	 * Determines the text layout orientation used by this component.
 	 *
-	 * @return the component orientation
+   * @return the component orientation (this can be <code>null</code>)
 	 * @see #setComponentOrientation(ComponentOrientation)
 	 */
   public ComponentOrientation getComponentOrientation()
@@ -5046,7 +5239,7 @@ p   * <li>the set of backward traversal keys
                 oldKey = Event.UP;
                 break;
               default:
-                oldKey = (int) ((KeyEvent) e).getKeyChar();
+                oldKey = ((KeyEvent) e).getKeyChar();
               }
 
             translated = new Event (target, when, oldID,
@@ -5089,11 +5282,10 @@ p   * <li>the set of backward traversal keys
    *
    * @param e the event to dispatch
    */
-
   void dispatchEventImpl(AWTEvent e)
   {
-    // This boolean tells us not to process focus events when the focus
-    // opposite component is the same as the focus component.
+    // Update the component's knowledge about the size.
+    // Important: Please look at the big comment in ComponentReshapeEvent
     boolean ignoreFocus = 
       (e instanceof FocusEvent && 
        ((FocusEvent)e).getComponent() == ((FocusEvent)e).getOppositeComponent());
@@ -5385,7 +5577,7 @@ p   * <li>the set of backward traversal keys
      */
     public void componentHidden(ComponentEvent event)
     {
-      if (!isShowing())
+      if (isShowing())
         peer.hide();
     }
   }

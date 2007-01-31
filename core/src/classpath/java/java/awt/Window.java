@@ -1,5 +1,5 @@
 /* Window.java --
-   Copyright (C) 1999, 2000, 2002, 2003, 2004  Free Software Foundation
+   Copyright (C) 1999, 2000, 2002, 2003, 2004, 2005  Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -80,6 +80,8 @@ public class Window extends Container implements Accessible
   private int state = 0;
   /** @since 1.4 */
   private boolean focusableWindowState = true;
+  /** @since 1.5 */
+  private boolean alwaysOnTop = false;
 
   // A list of other top-level windows owned by this window.
   private transient Vector ownedWindows = new Vector();
@@ -277,7 +279,9 @@ public class Window extends Container implements Accessible
   /**
    * Shows on-screen this window and any of its owned windows for whom
    * isVisible returns true.
+   * @specnote: Deprecated starting in 1.5.
    */
+  @Deprecated
   public void show()
   {
     synchronized (getTreeLock())
@@ -330,6 +334,10 @@ public class Window extends Container implements Accessible
   }
   }
 
+  /**
+   * @specnote: Deprecated starting in 1.5.
+   */
+  @Deprecated
   public void hide()
   {
     // Hide visible owned windows.
@@ -385,6 +393,9 @@ public class Window extends Container implements Accessible
   /**
    * Sends this window to the back so that all other windows display in
    * front of it.
+   *
+   * If the window is set to be always-on-top, this will remove its
+   * always-on-top status.
    */
   public void toBack()
   {
@@ -603,10 +614,10 @@ public class Window extends Container implements Accessible
    *
    * @since 1.3
    */
-  public EventListener[] getListeners(Class listenerType)
+  public <T extends EventListener> T[] getListeners(Class<T> listenerType)
   {
     if (listenerType == WindowListener.class)
-      return getWindowListeners();
+      return (T[]) getWindowListeners();
     return super.getListeners(listenerType);
   }
 
@@ -668,32 +679,23 @@ public class Window extends Container implements Accessible
 	      case WindowEvent.WINDOW_ACTIVATED:
 		windowListener.windowActivated(evt);
 		break;
-
 	      case WindowEvent.WINDOW_CLOSED:
 		windowListener.windowClosed(evt);
 		break;
-
 	      case WindowEvent.WINDOW_CLOSING:
 		windowListener.windowClosing(evt);
 		break;
-
 	      case WindowEvent.WINDOW_DEACTIVATED:
 		windowListener.windowDeactivated(evt);
 		break;
-
 	      case WindowEvent.WINDOW_DEICONIFIED:
 		windowListener.windowDeiconified(evt);
 		break;
-
 	      case WindowEvent.WINDOW_ICONIFIED:
 		windowListener.windowIconified(evt);
 		break;
-
 	      case WindowEvent.WINDOW_OPENED:
 		windowListener.windowOpened(evt);
-		break;
-
-	      default:
 		break;
 	      }
 	  }
@@ -1029,11 +1031,11 @@ public class Window extends Container implements Accessible
   /**
    * @since 1.2
    *
-   * @deprecated
+   * @deprecated replaced by Component.applyComponentOrientation.
    */
   public void applyResourceBundle(ResourceBundle rb)
   {
-    throw new Error ("Not implemented");
+    applyComponentOrientation(ComponentOrientation.getOrientation(rb));
   }
 
   /**
@@ -1183,6 +1185,55 @@ public class Window extends Container implements Accessible
   }
 
   /**
+   * Returns whether the Windows is an always-on-top window,
+   * meaning whether the window can be obscured by other windows or not.
+   *
+   * @return <code>true</code> if the windows is always-on-top,
+   * <code>false</code> otherwise.
+   * @since 1.5
+   */
+  public final boolean isAlwaysOnTop()
+  {
+    return alwaysOnTop;
+  }
+
+  /**
+   * Sets the always-on-top state of this window (if supported).
+   *
+   * Setting a window to always-on-top means it will not be obscured
+   * by any other windows (with the exception of other always-on-top
+   * windows). Not all platforms may support this.
+   *
+   * If an window's always-on-top status is changed to false, the window
+   * will remain at the front but not be anchored there.
+   *
+   * Calling toBack() on an always-on-top window will change its
+   * always-on-top status to false.
+   *
+   * @since 1.5
+   */
+  public final void setAlwaysOnTop(boolean alwaysOnTop)
+  {
+    SecurityManager sm = System.getSecurityManager();
+    if (sm != null)
+      sm.checkPermission( new AWTPermission("setWindowAlwaysOnTop") );
+
+    if( this.alwaysOnTop == alwaysOnTop )
+      return;
+
+    if( alwaysOnTop )
+      toFront();
+
+    firePropertyChange("alwaysOnTop", this.alwaysOnTop, alwaysOnTop );
+    this.alwaysOnTop = alwaysOnTop;
+
+    if (peer != null)
+      ( (WindowPeer) peer).updateAlwaysOnTop();
+    else
+      System.out.println("Null peer?!");
+  }
+
+  /**
    * Generate a unique name for this window.
    *
    * @return A unique name for this window.
@@ -1190,6 +1241,42 @@ public class Window extends Container implements Accessible
   String generateName()
   {
     return "win" + getUniqueLong();
+  }
+
+  /**
+   * Overridden to handle WindowEvents.
+   *
+   * @return <code>true</code> when the specified event type is enabled,
+   *         <code>false</code> otherwise
+   */
+  boolean eventTypeEnabled(int type)
+  {
+    boolean enabled = false;
+    switch (type)
+      {
+        case WindowEvent.WINDOW_OPENED:
+        case WindowEvent.WINDOW_CLOSED:
+        case WindowEvent.WINDOW_CLOSING:
+        case WindowEvent.WINDOW_ICONIFIED:
+        case WindowEvent.WINDOW_DEICONIFIED:
+        case WindowEvent.WINDOW_ACTIVATED:
+        case WindowEvent.WINDOW_DEACTIVATED:
+          enabled = ((eventMask & AWTEvent.WINDOW_EVENT_MASK) != 0)
+                    || windowListener != null;
+          break;
+        case WindowEvent.WINDOW_GAINED_FOCUS:
+        case WindowEvent.WINDOW_LOST_FOCUS:
+          enabled = ((eventMask & AWTEvent.WINDOW_FOCUS_EVENT_MASK) != 0)
+                    || windowFocusListener != null;
+          break;
+        case WindowEvent.WINDOW_STATE_CHANGED:
+          enabled = ((eventMask & AWTEvent.WINDOW_STATE_EVENT_MASK) != 0)
+                    || windowStateListener != null;
+          break;
+        default:
+          enabled = super.eventTypeEnabled(type);
+      }
+    return enabled;
   }
 
   private static synchronized long getUniqueLong()
