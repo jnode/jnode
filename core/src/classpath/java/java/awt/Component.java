@@ -971,18 +971,40 @@ public abstract class Component
     // case lightweight components are not initially painted --
     // Container.paint first calls isShowing () before painting itself
     // and its children.
-    if(!isVisible())
+    if(! visible)
       {
-        this.visible = true;
+        // Need to lock the tree here to avoid races and inconsistencies.
+        synchronized (getTreeLock())
+          {
+            visible = true;
         // Avoid NullPointerExceptions by creating a local reference.
         ComponentPeer currentPeer=peer;
         if (currentPeer != null)
+              {
             currentPeer.show();
+
+                // Fire HierarchyEvent.
+                fireHierarchyEvent(HierarchyEvent.HIERARCHY_CHANGED,
+                                   this, parent,
+                                   HierarchyEvent.SHOWING_CHANGED);
 
         // The JDK repaints the component before invalidating the parent.
         // So do we.
-        if (isShowing() && isLightweight())
+                if (peer instanceof LightweightPeer)
         repaint();
+              }
+
+            // Only post an event if this component actually has a listener
+            // or has this event explicitly enabled.
+            if (componentListener != null
+                || (eventMask & AWTEvent.COMPONENT_EVENT_MASK) != 0)
+              {
+                ComponentEvent ce =
+                  new ComponentEvent(this,ComponentEvent.COMPONENT_SHOWN);
+                getToolkit().getSystemEventQueue().postEvent(ce);
+              }
+          }
+
         // Invalidate the parent if we have one. The component itself must
         // not be invalidated. We also avoid NullPointerException with
         // a local reference here.
@@ -990,9 +1012,6 @@ public abstract class Component
         if (currentParent != null)
             currentParent.invalidate();
 
-        ComponentEvent ce =
-          new ComponentEvent(this,ComponentEvent.COMPONENT_SHOWN);
-        getToolkit().getSystemEventQueue().postEvent(ce);
       }
 	}
 
@@ -1018,29 +1037,47 @@ public abstract class Component
 	 */
   public void hide()
   {
-    if (isVisible())
+    if (visible)
       {
+        // Need to lock the tree here to avoid races and inconsistencies.
+        synchronized (getTreeLock())
+          {
+            visible = false;
+
         // Avoid NullPointerExceptions by creating a local reference.
         ComponentPeer currentPeer=peer;
         if (currentPeer != null)
-            currentPeer.setVisible(false);
-        boolean wasShowing = isShowing();
-        this.visible = false;
+              {
+                currentPeer.hide();
         
-        // The JDK repaints the component before invalidating the parent.
-        // So do we.
-        if (wasShowing)
+                // Fire hierarchy event.
+                fireHierarchyEvent(HierarchyEvent.HIERARCHY_CHANGED,
+                                   this, parent,
+                                   HierarchyEvent.SHOWING_CHANGED);
+                // The JDK repaints the component before invalidating the
+                // parent. So do we. This only applies for lightweights.
+                if (peer instanceof LightweightPeer)
         repaint();
-        // Invalidate the parent if we have one. The component itself must
+              }
+
+            // Only post an event if this component actually has a listener
+            // or has this event explicitly enabled.
+            if (componentListener != null
+                || (eventMask & AWTEvent.COMPONENT_EVENT_MASK) != 0)
+              {
+                ComponentEvent ce =
+                  new ComponentEvent(this,ComponentEvent.COMPONENT_HIDDEN);
+                getToolkit().getSystemEventQueue().postEvent(ce);
+              }
+          }
+
+        // Invalidate the parent if we have one. The component itself need
         // not be invalidated. We also avoid NullPointerException with
         // a local reference here.
         Container currentParent = parent;
         if (currentParent != null)
             currentParent.invalidate();
 
-        ComponentEvent ce =
-          new ComponentEvent(this,ComponentEvent.COMPONENT_HIDDEN);
-        getToolkit().getSystemEventQueue().postEvent(ce);
       }
 	}
 
@@ -3935,19 +3972,38 @@ public abstract class Component
 	 */
   public void addNotify()
   {
+    // We need to lock the tree here to avoid races and inconsistencies.
+    synchronized (getTreeLock())
+      {
 		if (peer == null)
 			peer = getToolkit().createComponent(this);
     else if (parent != null && parent.isLightweight())
       new HeavyweightInLightweightListener(parent);
-		/* Now that all the children has gotten their peers, we should
-		   have the event mask needed for this component and its
-		   lightweight subcomponents. */
+        // Now that all the children has gotten their peers, we should
+        // have the event mask needed for this component and its
+        //lightweight subcomponents.
 		peer.setEventMask(eventMask);
-		/* We do not invalidate here, but rather leave that job up to
-		   the peer. For efficiency, the peer can choose not to
-		   invalidate if it is happy with the current dimensions,
-		   etc. */
+
+        // We used to leave the invalidate() to the peer. However, I put it
+        // back here for 2 reasons: 1) The RI does call invalidate() from
+        // addNotify(); 2) The peer shouldn't be bother with validation too
+        // much.
+        invalidate();
+
+        if (dropTarget != null)
+          dropTarget.addNotify(peer);
+
+        // Fetch the peerFont for later installation in validate().
+        peerFont = getFont();
+
+        // Notify hierarchy listeners.
+        long flags = HierarchyEvent.DISPLAYABILITY_CHANGED;
+        if (isHierarchyVisible())
+          flags |= HierarchyEvent.SHOWING_CHANGED;
+        fireHierarchyEvent(HierarchyEvent.HIERARCHY_CHANGED, this, parent,
+                           flags);
 	}
+  }
 
 	/**
 	 * Called to inform this component is has been removed from its
@@ -3960,6 +4016,9 @@ public abstract class Component
 	 */
   public void removeNotify()
   {
+    // We need to lock the tree here to avoid races and inconsistencies.
+    synchronized (getTreeLock())
+      {
     // We null our peer field before disposing of it, such that if we're
     // not the event dispatch thread and the dispatch thread is awoken by
     // the dispose call, there will be no race checking the peer's null
@@ -3967,11 +4026,20 @@ public abstract class Component
 
     ComponentPeer tmp = peer;
 		peer = null;
+        peerFont = null;
     if (tmp != null)
       {
         tmp.hide();
       tmp.dispose();
 	}
+
+        // Notify hierarchy listeners.
+        long flags = HierarchyEvent.DISPLAYABILITY_CHANGED;
+        if (isHierarchyVisible())
+          flags |= HierarchyEvent.SHOWING_CHANGED;
+        fireHierarchyEvent(HierarchyEvent.HIERARCHY_CHANGED, this, parent,
+                           flags);
+  }
   }
 
 	/**
