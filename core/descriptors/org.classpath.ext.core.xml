@@ -27,6 +27,7 @@
       <export name="gnu.java.beans.encoder.*"/>
       <export name="gnu.java.beans.encoder.elements.*"/>
       <export name="gnu.java.lang.management.*"/>
+      <export name="gnu.java.lang.reflect.*"/>
       <export name="gnu.java.net.protocol.*"/>
       <export name="gnu.java.net.protocol.file.*"/>
       <export name="gnu.java.net.protocol.ftp.*"/>
