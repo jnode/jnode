@@ -581,7 +581,7 @@ public abstract class Component
 	transient ComponentPeer peer;
 
 	/** The preferred component orientation. */
-	transient ComponentOrientation orientation = ComponentOrientation.UNKNOWN;
+	transient ComponentOrientation componentOrientation = ComponentOrientation.UNKNOWN;
 
 	/**
 	 * The associated graphics configuration.
@@ -748,17 +748,24 @@ public abstract class Component
 	 */
   public Toolkit getToolkit()
   {
-    if (peer != null)
+    // Only heavyweight peers can handle this.
+    ComponentPeer p = peer;
+    Component comp = this;
+    while (p instanceof LightweightPeer)
       {
-			Toolkit tk = peer.getToolkit();
-			if (tk != null)
-				return tk;
+        comp = comp.parent;
+        p = comp == null ? null : comp.peer;
 		}
-    // Get toolkit for lightweight component.
-		if (parent != null)
-			return parent.getToolkit();
-		return Toolkit.getDefaultToolkit();
+
+    Toolkit tk = null;
+    if (p != null)
+      {
+        tk = peer.getToolkit();
 	}
+    if (tk == null)
+      tk = Toolkit.getDefaultToolkit();
+    return tk;
+  }
 
 	/**
 	 * Tests whether or not this component is valid. A invalid component needs
@@ -770,7 +777,9 @@ public abstract class Component
 	 */
   public boolean isValid()
   {
-		return valid;
+    // Tests show that components are invalid as long as they are not showing, even after validate()
+    // has been called on them.
+    return peer != null && valid;
 	}
 
 	/**
@@ -814,10 +823,8 @@ public abstract class Component
 	 */
   public boolean isShowing()
   {
-    if (! visible || peer == null)
-			return false;
-
-    return parent == null ? false : parent.isShowing();
+    Component par = parent;
+    return visible && peer != null && (par == null || par.isShowing());
 	}
 
 	/**
@@ -856,10 +863,18 @@ public abstract class Component
 	 */
   public void enable()
   {
-    this.enabled = true;
-    if (peer != null)
-      peer.setEnabled (true);
+    if (! enabled)
+      {
+        // Need to lock the tree here, because the peers are involved.
+        synchronized (getTreeLock())
+          {
+            enabled = true;
+            ComponentPeer p = peer;
+            if (p != null)
+              p.enable();
 	}
+      }
+  }
 
 	/**
 	 * Enables or disables this component.
@@ -883,10 +898,18 @@ public abstract class Component
 	 */
   public void disable()
   {
-    this.enabled = false;
-    if (peer != null)
-      peer.setEnabled (false);
+    if (enabled)
+      {
+        // Need to lock the tree here, because the peers are involved.
+        synchronized (getTreeLock())
+          {
+            enabled = false;
+            ComponentPeer p = peer;
+            if (p != null)
+              p.disable();
 	}
+      }
+  }
 
 	/**
 	 * Checks if this image is painted to an offscreen image buffer that is
@@ -1130,11 +1153,36 @@ public abstract class Component
     return null;
 	}
 
-	/**
+  /**
+   * Implementation of getFont(). This is pulled out of getFont() to prevent
+   * client programs from overriding this.
+   *
+   * @return the font of this component
+   */
+  private final Font getFontImpl()
+  {
+    Font f = font;
+    if (f == null)
+      {
+        Component p = parent;
+        if (p != null)
+          f = p.getFontImpl();
+        else
+          {
+            // It is important to return null here and not some kind of default
+            // font, otherwise the Swing UI would not install its fonts because
+            // it keeps non-UIResource fonts.
+            f = null;
+          }
+      }
+    return f;
+  }
+
+    /**
 	 * Sets the font for this component to the specified font. This is a bound
 	 * property.
 	 *
-   * @param newFont the new font for this component
+   * @param f the new font for this component
    * 
 	 * @see #getFont()
 	 */
@@ -1729,11 +1777,39 @@ public abstract class Component
     return prefSize;
 	}
 
+  /**
+   * The actual calculation is pulled out of preferredSize() so that
+   * we can call it from Container.preferredSize() and avoid creating a
+   * new intermediate Dimension object.
+   *
+   * @return the preferredSize of the component
+   */
+  Dimension preferredSizeImpl()
+  {
+    Dimension size = prefSize;
+    // Try to use a cached value.
+    if (size == null || !(valid || prefSizeSet))
+      {
+        // We need to lock here, because the calculation depends on the
+        // component structure not changing.
+        synchronized (getTreeLock())
+          {
+            ComponentPeer p = peer;
+            if (p != null)
+              size = peer.preferredSize();
+            else
+              size = minimumSizeImpl();
+          }
+      }
+    return size;
+  }
+
 	/**
 	 * Returns the component's minimum size.
 	 *
 	 * @return the component's minimum size
 	 * @see #getPreferredSize()
+   * @see #setMinimumSize(Dimension)
 	 * @see LayoutManager
 	 */
   public Dimension getMinimumSize()
@@ -1937,8 +2013,33 @@ public abstract class Component
 	 */
   public void validate()
   {
+    if (! valid)
+      {
+        // Synchronize on the tree here as this might change the layout
+        // of the hierarchy.
+        synchronized (getTreeLock())
+          {
+            // Create local variables for thread safety.
+            ComponentPeer p = peer;
+            if (p != null)
+              {
+                // Possibly update the peer's font.
+                Font newFont = getFont();
+                Font oldFont = peerFont;
+                // Only update when the font really changed.
+                if (newFont != oldFont
+                    && (oldFont == null || ! oldFont.equals(newFont)))
+                  {
+                    p.setFont(newFont);
+                    peerFont = newFont;
+                  }
+                // Let the peer perform any layout.
+                p.layout();
+              }
+          }
 		valid = true;
 	}
+  }
 
 	/**
 	 * Invalidates this component and all of its parent components. This will
@@ -1947,12 +2048,26 @@ public abstract class Component
 	 */
   public void invalidate()
   {
+    // Need to lock here, to avoid races and other ugly stuff when doing
+    // layout or structure changes in other threads.
+    synchronized (getTreeLock())
+      {
+        // Invalidate.
 		valid = false;
-		prefSize = null;
+
+        // Throw away cached layout information.
+        if (! minSizeSet)
 		minSize = null;
+        if (! prefSizeSet)
+          prefSize = null;
+        if (! maxSizeSet)
+          maxSize = null;
+
+        // Also invalidate the parent, if it hasn't already been invalidated.
     if (parent != null && parent.isValid())
 			parent.invalidate();
 	}
+  }
 
 	/**
 	 * Returns a graphics object for this component. Returns <code>null</code>
@@ -1998,9 +2113,17 @@ public abstract class Component
 	 */
   public FontMetrics getFontMetrics(Font font)
   {
-    return peer == null ? getToolkit().getFontMetrics(font)
-      : peer.getFontMetrics(font);
+    ComponentPeer p = peer;
+    Component comp = this;
+    while (p instanceof LightweightPeer)
+      {
+        comp = comp.parent;
+        p = comp == null ? null : comp.peer;
 	}
+
+    return p == null ? getToolkit().getFontMetrics(font)
+           : p.getFontMetrics(font);
+  }
 
 	/**
 	 * Sets the cursor for this component to the specified cursor. The cursor
@@ -2018,9 +2141,19 @@ public abstract class Component
   public void setCursor(Cursor cursor)
   {
 		this.cursor = cursor;
-		if (peer != null)
-			peer.setCursor(cursor);
+
+    // Only heavyweight peers handle this.
+    ComponentPeer p = peer;
+    Component comp = this;
+    while (p instanceof LightweightPeer)
+      {
+        comp = comp.parent;
+        p = comp == null ? null : comp.peer;
 	}
+
+    if (p != null)
+      p.setCursor(cursor);
+  }
 
 	/**
 	 * Returns the cursor for this component. If not set, this is inherited
@@ -2077,19 +2210,14 @@ public abstract class Component
 	 */
   public void update(Graphics g)
   {
-    // Tests show that the clearing of the background is only done in
-    // two cases:
-    // - If the component is lightweight (yes this is in contrast to the spec).
-    // or
-    // - If the component is a toplevel container.
-    if (isLightweight() || getParent() == null)
-      {
-        Rectangle clip = g.getClipBounds();
-        if (clip == null)
-          g.clearRect(0, 0, width, height);
-        else
-          g.clearRect(clip.x, clip.y, clip.width, clip.height);
-      }
+    // Note 1: We used to clear the background here for lightweights and
+    // toplevel components. Tests show that this is not what the JDK does
+    // here. Note that there is some special handling and background
+    // clearing code in Container.update(Graphics).
+
+    // Note 2 (for peer implementors): The JDK doesn't seem call update() for
+    // toplevel components, even when an UPDATE event is sent (as a result
+    // of repaint).
 		paint(g);
 	}
 
@@ -2102,10 +2230,15 @@ public abstract class Component
 	 */
   public void paintAll(Graphics g)
   {
-    if (! visible)
-			return;
+    if (isShowing())
+      {
+        validate();
+        if (peer instanceof LightweightPeer)
 		paint(g);
+        else
+          peer.paint(g);
 	}
+  }
 
 	/**
 	 * Repaint this entire component. The <code>update()</code> method
@@ -2165,13 +2298,44 @@ public abstract class Component
 	 */
   public void repaint(long tm, int x, int y, int width, int height)
   {
-    if (isShowing())
-      {
+    // The repaint() call has previously been delegated to
+    // {@link ComponentPeer.repaint()}. Testing on the JDK using some
+    // dummy peers show that this methods is never called. I think it makes
+    // sense to actually perform the tasks below here, since it's pretty
+    // much peer independent anyway, and makes sure only heavyweights are
+    // bothered by this.
         ComponentPeer p = peer;
-        if (p != null)
-          p.repaint(tm, x, y, width, height);
+
+    // Let the nearest heavyweight parent handle repainting for lightweight
+    // components.
+    // We need to recursivly call repaint() on the parent here, since
+    // a (lightweight) parent component might have overridden repaint()
+    // to perform additional custom tasks.
+
+    if (p instanceof LightweightPeer)
+      {
+        // We perform some boundary checking to restrict the paint
+        // region to this component.
+        if (parent != null)
+          {
+            int px = this.x + Math.max(0, x);
+            int py = this.y + Math.max(0, y);
+            int pw = Math.min(this.width, width);
+            int ph = Math.min(this.height, height);
+            parent.repaint(tm, px, py, pw, ph);
       }
 	}
+    else
+      {
+        // Now send an UPDATE event to the heavyweight component that we've found.
+        if (isVisible() && p != null && width > 0 && height > 0)
+          {
+            PaintEvent pe = new PaintEvent(this, PaintEvent.UPDATE,
+                                           new Rectangle(x, y, width, height));
+            getToolkit().getSystemEventQueue().postEvent(pe);
+          }
+      }
+  }
 
 	/**
 	 * Prints this component. This method is provided so that printing can be
@@ -2196,6 +2360,8 @@ public abstract class Component
 	 */
   public void printAll(Graphics g)
   {
+    if( peer != null )
+      peer.print( g );
 		paintAll(g);
 	}
 
@@ -2255,11 +2421,22 @@ public abstract class Component
 	 */
   public Image createImage(ImageProducer producer)
   {
+    // Only heavyweight peers can handle this.
+    ComponentPeer p = peer;
+    Component comp = this;
+    while (p instanceof LightweightPeer)
+      {
+        comp = comp.parent;
+        p = comp == null ? null : comp.peer;
+      }
+
     // Sun allows producer to be null.
-    if (peer != null)
-		return peer.createImage(producer);
+    Image im;
+    if (p != null)
+      im = p.createImage(producer);
     else
-      return getToolkit().createImage(producer);
+      im = getToolkit().createImage(producer);
+    return im;
 	}
 
 	/**
@@ -2275,11 +2452,18 @@ public abstract class Component
     Image returnValue = null;
     if (!GraphicsEnvironment.isHeadless ())
       {
-	if (isLightweight () && parent != null)
-	  returnValue = parent.createImage (width, height);
-	else if (peer != null)
-	  returnValue = peer.createImage (width, height);
+        // Only heavyweight peers can handle this.
+        ComponentPeer p = peer;
+        Component comp = this;
+        while (p instanceof LightweightPeer)
+          {
+            comp = comp.parent;
+            p = comp == null ? null : comp.peer;
 		}
+
+        if (p != null)
+          returnValue = p.createImage(width, height);
+      }
     return returnValue;
 	}
 
@@ -2294,10 +2478,20 @@ public abstract class Component
 	 */
   public VolatileImage createVolatileImage(int width, int height)
   {
-    if (peer != null)
-      return peer.createVolatileImage(width, height);
-			return null;
+    // Only heavyweight peers can handle this.
+    ComponentPeer p = peer;
+    Component comp = this;
+    while (p instanceof LightweightPeer)
+      {
+        comp = comp.parent;
+        p = comp == null ? null : comp.peer;
 	}
+
+    VolatileImage im = null;
+    if (p != null)
+      im = p.createVolatileImage(width, height);
+    return im;
+  }
 
 	/**
 	 * Creates an image with the specified width and height for use in
@@ -2315,10 +2509,20 @@ public abstract class Component
                                            ImageCapabilities caps)
     throws AWTException
   {
-    if (peer != null)
-      return peer.createVolatileImage(width, height);
-			return null;
+    // Only heavyweight peers can handle this.
+    ComponentPeer p = peer;
+    Component comp = this;
+    while (p instanceof LightweightPeer)
+      {
+        comp = comp.parent;
+        p = comp == null ? null : comp.peer;
 	}
+
+    VolatileImage im = null;
+    if (p != null)
+      im = peer.createVolatileImage(width, height);
+    return im;
+  }
 
 	/**
 	 * Prepares the specified image for rendering on this component.
@@ -2347,10 +2551,21 @@ public abstract class Component
   public boolean prepareImage(Image image, int width, int height,
                               ImageObserver observer)
   {
-    if (peer != null)
-		return peer.prepareImage(image, width, height, observer);
+    // Only heavyweight peers handle this.
+    ComponentPeer p = peer;
+    Component comp = this;
+    while (p instanceof LightweightPeer)
+      {
+        comp = comp.parent;
+        p = comp == null ? null : comp.peer;
+      }
+
+    boolean retval;
+    if (p != null)
+	retval = p.prepareImage(image, width, height, observer);
     else
-	return getToolkit().prepareImage(image, width, height, observer);
+	retval = getToolkit().prepareImage(image, width, height, observer);
+    return retval;
 	}
 
 	/**
@@ -2384,10 +2599,22 @@ public abstract class Component
   public int checkImage(Image image, int width, int height,
                         ImageObserver observer)
   {
-		if (peer != null)
-			return peer.checkImage(image, width, height, observer);
-		return getToolkit().checkImage(image, width, height, observer);
+    // Only heavyweight peers handle this.
+    ComponentPeer p = peer;
+    Component comp = this;
+    while (p instanceof LightweightPeer)
+      {
+        comp = comp.parent;
+        p = comp == null ? null : comp.peer;
 	}
+
+    int retval;
+    if (p != null)
+      retval = p.checkImage(image, width, height, observer);
+    else
+      retval = getToolkit().checkImage(image, width, height, observer);
+    return retval;
+  }
 
 	/**
 	 * Sets whether paint messages delivered by the operating system should be
@@ -4328,7 +4555,84 @@ public abstract class Component
     return false;
   }
 
-	/**
+    /**
+   * Helper method for all 4 requestFocus variants.
+   *
+   * @param temporary indicates if the focus change is temporary
+   * @param focusWindow indicates if the window focus may be changed
+   *
+   * @return <code>false</code> if the request has been definitely denied,
+   *         <code>true</code> otherwise
+   */
+  private boolean requestFocusImpl(boolean temporary, boolean focusWindow)
+  {
+    boolean retval = false;
+
+    // Don't try to focus non-focusable and non-visible components.
+    if (isFocusable() && isVisible())
+      {
+        ComponentPeer myPeer = peer;
+        if (peer != null)
+          {
+            // Find Window ancestor and find out if we're showing while
+            // doing this.
+            boolean showing = true;
+            Component window = this;
+            while (! (window instanceof Window))
+              {
+                if (! window.isVisible())
+                  showing = false;
+                window = window.parent;
+              }
+            // Don't allow focus when there is no window or the window
+            // is not focusable.
+            if (window != null && ((Window) window).isFocusableWindow()
+                && showing)
+              {
+                // Search for nearest heavy ancestor (including this
+                // component).
+                Component heavyweightParent = this;
+                while (heavyweightParent.peer instanceof LightweightPeer)
+                  heavyweightParent = heavyweightParent.parent;
+
+                // Don't allow focus on lightweight components without
+                // visible heavyweight ancestor
+                if (heavyweightParent != null && heavyweightParent.isVisible())
+                  {
+                    // Don't allow focus when heavyweightParent has no peer.
+                    myPeer = heavyweightParent.peer;
+                    if (myPeer != null)
+                      {
+                        // Register lightweight focus request.
+                        if (heavyweightParent != this)
+                          {
+                            KeyboardFocusManager
+                            .addLightweightFocusRequest(heavyweightParent,
+                                                        this);
+                          }
+
+                        // Try to focus the component.
+                        long time = EventQueue.getMostRecentEventTime();
+                        boolean success = myPeer.requestFocus(this, temporary,
+                                                              focusWindow,
+                                                              time);
+                        if (! success)
+                          {
+                            // Dequeue key events if focus request failed.
+                            KeyboardFocusManager kfm =
+                              KeyboardFocusManager.getCurrentKeyboardFocusManager();
+                            kfm.dequeueKeyEvents(time, this);
+                          }
+                        retval = success;
+                      }
+                  }
+              }
+          }
+      }
+    return retval;
+  }
+
+    /**
    * Transfers focus to the next component in the focus traversal
    * order, as though this were the current focus owner.
 	 *
@@ -4972,10 +5276,9 @@ p   * <li>the set of backward traversal keys
 	 */
   public void setComponentOrientation(ComponentOrientation o)
   {
-		if (o == null)
-			throw new NullPointerException();
-    ComponentOrientation oldOrientation = orientation;
-		orientation = o;
+
+    ComponentOrientation oldOrientation = componentOrientation;
+		componentOrientation = o;
     firePropertyChange("componentOrientation", oldOrientation, o);
 	}
 
@@ -4987,7 +5290,7 @@ p   * <li>the set of backward traversal keys
 	 */
   public ComponentOrientation getComponentOrientation()
   {
-		return orientation;
+		return componentOrientation;
 	}
 
 	/**
@@ -5137,7 +5440,7 @@ p   * <li>the set of backward traversal keys
         if ((mods & InputEvent.ALT_DOWN_MASK) != 0)
           oldMods |= Event.ALT_MASK;
 
-        if (e instanceof MouseEvent)
+        if (e instanceof MouseEvent && !ignoreOldMouseEvents())
           {
             if (id == MouseEvent.MOUSE_PRESSED)
               oldID = Event.MOUSE_DOWN;
@@ -5468,6 +5771,26 @@ p   * <li>the set of backward traversal keys
     Rectangle union = r1.union(r2);
     newEvent.setUpdateRect(union);
     return newEvent;
+  }
+
+  /**
+   * Returns <code>true</code> when this component and all of its ancestors
+   * are visible, <code>false</code> otherwise.
+   *
+   * @return <code>true</code> when this component and all of its ancestors
+   *         are visible, <code>false</code> otherwise
+   */
+  boolean isHierarchyVisible()
+  {
+    boolean visible = isVisible();
+    Component comp = parent;
+    while (comp != null && visible)
+      {
+        comp = comp.parent;
+        if (comp != null)
+          visible = visible && comp.isVisible();
+      }
+    return visible;
   }
 
   /**
