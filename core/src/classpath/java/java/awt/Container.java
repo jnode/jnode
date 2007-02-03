@@ -215,10 +215,12 @@ public class Container extends Component
    */
   public Insets insets()
   {
-    if (peer == null)
-      return new Insets (0, 0, 0, 0);
-
-    return ((ContainerPeer) peer).getInsets ();
+    Insets i;
+    if (peer == null || peer instanceof LightweightPeer)
+      i = new Insets (0, 0, 0, 0);
+    else
+      i = ((ContainerPeer) peer).getInsets ();
+    return i;
   }
 
   /**
@@ -527,6 +529,7 @@ public class Container extends Component
   public void setLayout(LayoutManager mgr)
   {
     layoutMgr = mgr;
+    if (valid)
     invalidate();
   }
 
@@ -681,21 +684,25 @@ public class Container extends Component
    */
   public Dimension preferredSize()
   {
-    synchronized(treeLock)
+    Dimension size = prefSize;
+    // Try to return cached value if possible.
+    if (size == null || !(prefSizeSet || valid))
       {  
-        if(valid && prefSize != null)
-          return new Dimension(prefSize);
-        LayoutManager layout = getLayout();
-        if (layout != null)
+        // Need to lock here.
+        synchronized (getTreeLock())
           {
-            Dimension layoutSize = layout.preferredLayoutSize(this);
-            if(valid)
-              prefSize = layoutSize;
-            return new Dimension(layoutSize);
-          }
+            LayoutManager l = layoutMgr;
+            if (l != null)
+              prefSize = l.preferredLayoutSize(this);
     else
-      return super.preferredSize ();
+              prefSize = super.preferredSizeImpl();
+            size = prefSize;
   }
+  }
+    if (size != null)
+      return new Dimension(size);
+    else
+      return size;
   }
 
   /**
@@ -717,17 +724,25 @@ public class Container extends Component
    */
   public Dimension minimumSize()
   {
-    if(valid && minSize != null)
-      return new Dimension(minSize);
-
-    LayoutManager layout = getLayout();
-    if (layout != null)
+    Dimension size = minSize;
+    // Try to return cached value if possible.
+    if (size == null || !(minSizeSet || valid))
       {
-        minSize = layout.minimumLayoutSize (this);
-        return minSize;
+        // Need to lock here.
+        synchronized (getTreeLock())
+          {
+            LayoutManager l = layoutMgr;
+            if (l != null)
+              minSize = l.minimumLayoutSize(this);
+            else
+              minSize = super.minimumSizeImpl();
+            size = minSize;
       }    
+      }
+    if (size != null)
+      return new Dimension(size);
     else
-      return super.minimumSize ();
+      return size;
   }
 
   /**
@@ -737,18 +752,26 @@ public class Container extends Component
    */
   public Dimension getMaximumSize()
   {
-    if (valid && maxSize != null)
-      return new Dimension(maxSize);
-
-    LayoutManager layout = getLayout();
-    if (layout != null && layout instanceof LayoutManager2)
+    Dimension size = maxSize;
+    // Try to return cached value if possible.
+    if (size == null || !(maxSizeSet || valid))
       {
-        LayoutManager2 lm2 = (LayoutManager2) layout;
-        maxSize = lm2.maximumLayoutSize(this);
-        return maxSize;
+        // Need to lock here.
+        synchronized (getTreeLock())
+          {
+            LayoutManager l = layoutMgr;
+            if (l instanceof LayoutManager2)
+              maxSize = ((LayoutManager2) l).maximumLayoutSize(this);
+            else {
+              maxSize = super.maximumSizeImpl();
       }
+            size = maxSize;
+          }
+      }
+    if (size != null)
+      return new Dimension(size);
     else
-      return super.getMaximumSize();
+      return size;
   }
 
   /**
@@ -764,8 +787,11 @@ public class Container extends Component
     float alignmentX = 0.0F;
     if (layout != null && layout instanceof LayoutManager2)
       {
+        synchronized (getTreeLock())
+          {
         LayoutManager2 lm2 = (LayoutManager2) layout;
         alignmentX = lm2.getLayoutAlignmentX(this);
+      }
       }
     else
       alignmentX = super.getAlignmentX();
@@ -785,8 +811,11 @@ public class Container extends Component
     float alignmentY = 0.0F;
     if (layout != null && layout instanceof LayoutManager2)
       {
+        synchronized (getTreeLock())
+          {
         LayoutManager2 lm2 = (LayoutManager2) layout;
         alignmentY = lm2.getLayoutAlignmentY(this);
+      }
       }
     else
       alignmentY = super.getAlignmentY();
@@ -804,13 +833,10 @@ public class Container extends Component
    */
   public void paint(Graphics g)
   {
-    if (!isShowing())
-      return;
-
-    // Visit heavyweights if the background was cleared
-    // for this container.
-    visitChildren(g, GfxPaintVisitor.INSTANCE, !backCleared);
-    backCleared = false;
+    if (isShowing())
+      {
+        visitChildren(g, GfxPaintVisitor.INSTANCE, true);
+  }
   }
 
   /**
@@ -840,14 +866,15 @@ public class Container extends Component
     // that overrides isLightweight() to return false, the background is
     // also not cleared. So we do a check on !(peer instanceof LightweightPeer)
     // instead.
+    if (isShowing())
+      {
     ComponentPeer p = peer;
-    if (p != null && ! (p instanceof LightweightPeer))
+        if (! (p instanceof LightweightPeer))
       {
       g.clearRect(0, 0, getWidth(), getHeight());
-        backCleared = true;
       }
-
     paint(g);
+  }
   }
 
   /**
@@ -872,8 +899,8 @@ public class Container extends Component
    */
   public void paintComponents(Graphics g)
   {
-    paint(g);
-    visitChildren(g, GfxPaintAllVisitor.INSTANCE, true);
+    if (isShowing())
+      visitChildren(g, GfxPaintAllVisitor.INSTANCE, false);
   }
 
   /**
@@ -1183,8 +1210,11 @@ public class Container extends Component
    */
   public void addNotify()
   {
+    synchronized (getTreeLock())
+      {
     super.addNotify();
     addNotifyContainerChildren();
+  }
   }
 
   /**
@@ -1196,8 +1226,14 @@ public class Container extends Component
   {
     synchronized (getTreeLock ())
       {
-        for (int i = 0; i < ncomponents; ++i)
-          component[i].removeNotify();
+        int ncomps = ncomponents;
+        Component[] comps = component;
+        for (int i = ncomps - 1; i >= 0; --i)
+          {
+            Component comp = comps[i];
+            if (comp != null)
+              comp.removeNotify();
+          }
         super.removeNotify();
       }
   }
@@ -1294,7 +1330,8 @@ public class Container extends Component
    *
    * @since 1.4
    */
-  public void setFocusTraversalKeys(int id, Set keystrokes)
+  public void setFocusTraversalKeys(int id,
+				    Set<? extends AWTKeyStroke> keystrokes)
   {
     if (id != KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS &&
         id != KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS &&
@@ -1382,7 +1419,8 @@ public class Container extends Component
     if (focusTraversalKeys == null)
       focusTraversalKeys = new Set[4];
 
-    keystrokes = Collections.unmodifiableSet (new HashSet (keystrokes));
+    keystrokes =
+      Collections.unmodifiableSet(new HashSet<AWTKeyStroke>(keystrokes));
     firePropertyChange (name, focusTraversalKeys[id], keystrokes);
 
     focusTraversalKeys[id] = keystrokes;
@@ -1400,7 +1438,7 @@ public class Container extends Component
    *
    * @since 1.4
    */
-  public Set getFocusTraversalKeys (int id)
+  public Set<AWTKeyStroke> getFocusTraversalKeys (int id)
   {
     if (id != KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS &&
         id != KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS &&
@@ -1641,8 +1679,17 @@ public class Container extends Component
   {
     if (orientation == null)
       throw new NullPointerException ();
+
+    setComponentOrientation(orientation);
+    for (int i = 0; i < ncomponents; i++)
+      {
+        if (component[i] instanceof Container)
+             ((Container) component[i]).applyComponentOrientation(orientation);
+          else
+             component[i].setComponentOrientation(orientation);
   }
-  
+  }
+
   public void addPropertyChangeListener (PropertyChangeListener listener)
   {
     // TODO: Why is this overridden?
@@ -1692,6 +1739,8 @@ public class Container extends Component
     if (comp == this)
       throw new IllegalArgumentException("cannot add component to itself");
 
+    synchronized (getTreeLock())
+      {
     // FIXME: Implement reparenting.
     if ( comp.getParent() != this)
       throw new AssertionError("Reparenting is not implemented yet");
@@ -1712,6 +1761,7 @@ public class Container extends Component
         component[index] = comp;
       }
   }
+  }
 
   /**
    * Returns the Z ordering index of <code>comp</code>. If <code>comp</code>
@@ -1728,10 +1778,12 @@ public class Container extends Component
    */
   public final int getComponentZOrder(Component comp)
   {
+    synchronized (getTreeLock())
+      {
     int index = -1;
     if (component != null)
       {
-        for (int i = 0; i < component.length; i++)
+            for (int i = 0; i < ncomponents; i++)
           {
             if (component[i] == comp)
               {
@@ -1741,6 +1793,7 @@ public class Container extends Component
           }
       }
     return index;
+  }
   }
 
   // Hidden helper methods.

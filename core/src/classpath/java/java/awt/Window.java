@@ -410,8 +410,9 @@ public class Window extends Container implements Accessible
   {
     if (peer != null)
       {
-	WindowPeer wp = (WindowPeer) peer;
-	wp.toBack();
+	if( alwaysOnTop )
+	  setAlwaysOnTop( false );
+	( (WindowPeer) peer ).toBack();
       }
   }
 
