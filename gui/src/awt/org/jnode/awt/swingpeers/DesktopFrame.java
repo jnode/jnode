@@ -21,12 +21,7 @@
  
 package org.jnode.awt.swingpeers;
 
-import java.awt.AWTEvent;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.DefaultFocusTraversalPolicy;
-import java.awt.Dimension;
-import java.awt.Graphics;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyVetoException;
 
@@ -97,6 +92,8 @@ public final class DesktopFrame extends JFrame implements JNodeAwtContext {
 
     public void adjustDesktopSize(int width, int height) {
         setSize(width, height);
+        VMAwtAPI.invalidateTree(this);
+        validateTree();
     }
 
     /**
