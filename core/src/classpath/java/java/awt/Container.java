@@ -87,9 +87,7 @@ public class Container extends Component
   Component[] component;
   LayoutManager layoutMgr;
 
-  Dimension maxSize;
-
-   /*
+  /**
    * @since 1.4
    */
   boolean focusCycleRoot;
@@ -1912,16 +1910,18 @@ public class Container extends Component
    */
   void dispatchEventImpl(AWTEvent e)
   {
-    boolean dispatched =
-      LightweightDispatcher.getInstance().dispatchEvent(e);
-    if (! dispatched)
+    LightweightDispatcher dispatcher = LightweightDispatcher.getInstance();
+    if (! isLightweight() && dispatcher.dispatchEvent(e))
       {
-    if ((e.id <= ContainerEvent.CONTAINER_LAST
-             && e.id >= ContainerEvent.CONTAINER_FIRST)
-        && (containerListener != null
-            || (eventMask & AWTEvent.CONTAINER_EVENT_MASK) != 0))
-      processEvent(e);
+        // Some lightweight descendent got this event dispatched. Consume
+        // it and let the peer handle it.
+        e.consume();
+        ComponentPeer p = peer;
+        if (p != null)
+          p.handleEvent(e);
+      }
     else
+      {
       super.dispatchEventImpl(e);
   }
   }

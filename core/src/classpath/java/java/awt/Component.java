@@ -1180,14 +1180,7 @@ public abstract class Component
 	 */
   public Font getFont()
   {
-    Font f = font;
-    if (f != null)
-      return f;
-
-    Component p = parent;
-    if (p != null)
-      return p.getFont();
-    return null;
+    return getFontImpl();
 	}
 
   /**
@@ -1223,19 +1216,45 @@ public abstract class Component
    * 
 	 * @see #getFont()
 	 */
-  public void setFont(Font newFont)
+  public void setFont(Font f)
   {
-    if((newFont != null && (font == null || !font.equals(newFont)))
-       || newFont == null)
+    Font oldFont;
+    Font newFont;
+    // Synchronize on the tree because getFontImpl() relies on the hierarchy
+    // not beeing changed.
+    synchronized (getTreeLock())
       {
-    Font oldFont = font;
-    font = newFont;
-		if (peer != null)
-      peer.setFont(font);
+        // Synchronize on this here to guarantee thread safety wrt to the
+        // property values.
+        synchronized (this)
+          {
+            oldFont = font;
+            font = f;
+            newFont = f;
+          }
+        // Create local variable here for thread safety.
+        ComponentPeer p = peer;
+        if (p != null)
+          {
+            // The peer receives the real font setting, which can depend on
+            // the parent font when this component's font has been set to null.
+            f = getFont();
+            if (f != null)
+              {
+                p.setFont(f);
+                peerFont = f;
+              }
+          }
+      }
+
+    // Fire property change event.
     firePropertyChange("font", oldFont, newFont);
+
+    // Invalidate when necessary as font changes can change the size of the
+    // component.
+    if (valid)
     invalidate();
 	}
-  }
 
 	/**
 	 * Tests if the font was explicitly set, or just inherited from the parent.
@@ -1521,55 +1540,50 @@ public abstract class Component
 	 */
   public void reshape(int x, int y, int width, int height)
   {
+    // We need to lock the tree here, otherwise we risk races and
+    // inconsistencies.
+    synchronized (getTreeLock())
+      {
     int oldx = this.x;
     int oldy = this.y;
     int oldwidth = this.width;
     int oldheight = this.height;
 
-    if (this.x == x && this.y == y && this.width == width
-        && this.height == height)
-      return;
+        boolean resized = oldwidth != width || oldheight != height;
+        boolean moved = oldx != x || oldy != y;
 
-    invalidate();
-    
+        if (resized || moved)
+          {
+            // Update the fields.
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
-    if (peer != null)
-      peer.setBounds (x, y, width, height);
 
-    // Erase old bounds and repaint new bounds for lightweights.
-    if (isLightweight() && isShowing())
+            if (peer != null)
       {
-        if (parent != null)
-          {
-            Rectangle oldBounds = new Rectangle(oldx, oldy, oldwidth,
-                                                oldheight);
-            Rectangle newBounds = new Rectangle(x, y, width, height);
-            Rectangle destroyed = oldBounds.union(newBounds);
-            if (!destroyed.isEmpty())
-              parent.repaint(0, destroyed.x, destroyed.y, destroyed.width,
-                             destroyed.height);
+                peer.setBounds (x, y, width, height);
+                if (resized)
+                  invalidate();
+                if (parent != null && parent.valid)
+                  parent.invalidate();
           }
-      }
 
-    // Only post event if this component is visible and has changed size.
-    if (isShowing ()
-        && (oldx != x || oldy != y))
+            // Send some events to interested listeners.
+            notifyReshape(resized, moved);
+
+            // Repaint this component and the parent if appropriate.
+            if (parent != null && peer instanceof LightweightPeer
+                && isShowing())
       {
-        ComponentEvent ce = new ComponentEvent(this,
-                                               ComponentEvent.COMPONENT_MOVED);
-        getToolkit().getSystemEventQueue().postEvent(ce);
+                // The parent repaints the area that we occupied before.
+                parent.repaint(oldx, oldy, oldwidth, oldheight);
+                // This component repaints the area that we occupy now.
+                repaint();
       }
-    if (isShowing ()
-        && (oldwidth != width || oldheight != height))
-      {
-        ComponentEvent ce = new ComponentEvent(this,
-                                               ComponentEvent.COMPONENT_RESIZED);
-        getToolkit().getSystemEventQueue().postEvent(ce);
       }
 	}
+  }
 
     /**
    * Sends notification to interested listeners about resizing and/or moving
@@ -1804,15 +1818,10 @@ public abstract class Component
 	 */
   public Dimension preferredSize()
   {
-    if (prefSize == null)
-      {
-      if (peer == null)
-          prefSize = minimumSize();
-      else 
-        prefSize = peer.getPreferredSize();
+    // Create a new Dimension object, so that the application doesn't mess
+    // with the actual values.
+    return new Dimension(preferredSizeImpl());
       }
-    return prefSize;
-	}
 
   /**
    * The actual calculation is pulled out of preferredSize() so that
@@ -1895,10 +1904,9 @@ public abstract class Component
 	 */
   public Dimension minimumSize()
   {
-    if (minSize == null)
-      minSize = (peer != null ? peer.getMinimumSize()
-                 : new Dimension(width, height));
-    return minSize;
+    // Create a new Dimension object, so that the application doesn't mess
+    // with the actual values.
+    return new Dimension(minimumSizeImpl());
 	}
 
 	/**
@@ -1939,7 +1947,7 @@ public abstract class Component
 	 */
   public Dimension getMaximumSize()
   {
-    return new Dimension(Short.MAX_VALUE, Short.MAX_VALUE);
+    return new Dimension(maximumSizeImpl());
 	}
 
 	/**
@@ -2854,10 +2862,13 @@ public abstract class Component
 	 */
   public synchronized void addComponentListener(ComponentListener listener)
   {
-    componentListener = AWTEventMulticaster.add(componentListener, listener);
-		if (componentListener != null)
-			enableEvents(AWTEvent.COMPONENT_EVENT_MASK);
+    if (listener != null)
+      {
+        componentListener = AWTEventMulticaster.add(componentListener,
+                                                    listener);
+        newEventsOnly = true;
 	}
+  }
 
 	/**
 	 * Removes the specified listener from the component. This is harmless if
@@ -2902,10 +2913,12 @@ public abstract class Component
 	 */
   public synchronized void addFocusListener(FocusListener listener)
   {
+    if (listener != null)
+      {
     focusListener = AWTEventMulticaster.add(focusListener, listener);
-		if (focusListener != null)
-			enableEvents(AWTEvent.FOCUS_EVENT_MASK);
+        newEventsOnly = true;
 	}
+  }
 
 	/**
 	 * Removes the specified listener from the component. This is harmless if
@@ -2949,10 +2962,21 @@ public abstract class Component
 	 */
   public synchronized void addHierarchyListener(HierarchyListener listener)
   {
-    hierarchyListener = AWTEventMulticaster.add(hierarchyListener, listener);
-		if (hierarchyListener != null)
-			enableEvents(AWTEvent.HIERARCHY_EVENT_MASK);
+    if (listener != null)
+      {
+        hierarchyListener = AWTEventMulticaster.add(hierarchyListener,
+                                                    listener);
+        newEventsOnly = true;
+        // Need to lock the tree, otherwise we might end up inconsistent.
+        synchronized (getTreeLock())
+        {
+          numHierarchyListeners++;
+          if (parent != null)
+            parent.updateHierarchyListenerCount(AWTEvent.HIERARCHY_EVENT_MASK,
+                                                1);
 	}
+      }
+  }
 
 	/**
 	 * Removes the specified listener from the component. This is harmless if
@@ -2967,7 +2991,16 @@ public abstract class Component
   public synchronized void removeHierarchyListener(HierarchyListener listener)
   {
     hierarchyListener = AWTEventMulticaster.remove(hierarchyListener, listener);
+
+    // Need to lock the tree, otherwise we might end up inconsistent.
+    synchronized (getTreeLock())
+      {
+        numHierarchyListeners--;
+        if (parent != null)
+          parent.updateHierarchyListenerCount(AWTEvent.HIERARCHY_EVENT_MASK,
+                                              -1);
 	}
+  }
 
 	/**
 	 * Returns an array of all specified listeners registered on this component.
@@ -2998,11 +3031,22 @@ public abstract class Component
   public synchronized void
     addHierarchyBoundsListener(HierarchyBoundsListener listener)
   {
+    if (listener != null)
+      {
     hierarchyBoundsListener =
       AWTEventMulticaster.add(hierarchyBoundsListener, listener);
-		if (hierarchyBoundsListener != null)
-			enableEvents(AWTEvent.HIERARCHY_BOUNDS_EVENT_MASK);
+        newEventsOnly = true;
+
+        // Need to lock the tree, otherwise we might end up inconsistent.
+        synchronized (getTreeLock())
+        {
+          numHierarchyBoundsListeners++;
+          if (parent != null)
+            parent.updateHierarchyListenerCount
+                                     (AWTEvent.HIERARCHY_BOUNDS_EVENT_MASK, 1);
 	}
+      }
+  }
 
 	/**
 	 * Removes the specified listener from the component. This is harmless if
@@ -3019,7 +3063,17 @@ public abstract class Component
   {
     hierarchyBoundsListener =
       AWTEventMulticaster.remove(hierarchyBoundsListener, listener);
+
+    // Need to lock the tree, otherwise we might end up inconsistent.
+    synchronized (getTreeLock())
+      {
+        numHierarchyBoundsListeners--;
+        if (parent != null)
+          parent.updateHierarchyListenerCount
+                                         (AWTEvent.HIERARCHY_BOUNDS_EVENT_MASK,
+                                          -1);
 	}
+  }
 
 	/**
 	 * Returns an array of all specified listeners registered on this component.
@@ -3083,10 +3137,12 @@ public abstract class Component
 	 */
   public synchronized void addKeyListener(KeyListener listener)
   {
+    if (listener != null)
+      {
     keyListener = AWTEventMulticaster.add(keyListener, listener);
-		if (keyListener != null)
-			enableEvents(AWTEvent.KEY_EVENT_MASK);
+        newEventsOnly = true;
 	}
+  }
 
 	/**
 	 * Removes the specified listener from the component. This is harmless if
@@ -3130,10 +3186,12 @@ public abstract class Component
 	 */
   public synchronized void addMouseListener(MouseListener listener)
   {
+    if (listener != null)
+      {
     mouseListener = AWTEventMulticaster.add(mouseListener, listener);
-		if (mouseListener != null)
-			enableEvents(AWTEvent.MOUSE_EVENT_MASK);
+        newEventsOnly = true;
 	}
+  }
 
 	/**
 	 * Removes the specified listener from the component. This is harmless if
@@ -3177,10 +3235,13 @@ public abstract class Component
 	 */
   public synchronized void addMouseMotionListener(MouseMotionListener listener)
   {
-    mouseMotionListener = AWTEventMulticaster.add(mouseMotionListener, listener);
-		if (mouseMotionListener != null)
-      enableEvents(AWTEvent.MOUSE_MOTION_EVENT_MASK);
+    if (listener != null)
+      {
+        mouseMotionListener = AWTEventMulticaster.add(mouseMotionListener,
+                                                      listener);
+        newEventsOnly = true;
 	}
+  }
 
 	/**
 	 * Removes the specified listener from the component. This is harmless if
@@ -3226,10 +3287,13 @@ public abstract class Component
 	 */
   public synchronized void addMouseWheelListener(MouseWheelListener listener)
   {
-    mouseWheelListener = AWTEventMulticaster.add(mouseWheelListener, listener);
-		if (mouseWheelListener != null)
-			enableEvents(AWTEvent.MOUSE_WHEEL_EVENT_MASK);
+    if (listener != null)
+      {
+        mouseWheelListener = AWTEventMulticaster.add(mouseWheelListener,
+                                                     listener);
+        newEventsOnly = true;
 	}
+  }
 
 	/**
 	 * Removes the specified listener from the component. This is harmless if
@@ -3276,10 +3340,13 @@ public abstract class Component
 	 */
   public synchronized void addInputMethodListener(InputMethodListener listener)
   {
-    inputMethodListener = AWTEventMulticaster.add(inputMethodListener, listener);
-		if (inputMethodListener != null)
-			enableEvents(AWTEvent.INPUT_METHOD_EVENT_MASK);
+    if (listener != null)
+      {
+        inputMethodListener = AWTEventMulticaster.add(inputMethodListener,
+                                                      listener);
+        newEventsOnly = true;
 	}
+  }
 
 	/**
 	 * Removes the specified listener from the component. This is harmless if
@@ -3445,19 +3512,42 @@ public abstract class Component
 	 */
   protected AWTEvent coalesceEvents(AWTEvent existingEvent, AWTEvent newEvent)
   {
+    AWTEvent coalesced = null;
     switch (existingEvent.id)
       {
       case MouseEvent.MOUSE_MOVED:
       case MouseEvent.MOUSE_DRAGGED:
 				// Just drop the old (intermediate) event and return the new one.
-				return newEvent;
+        MouseEvent me1 = (MouseEvent) existingEvent;
+        MouseEvent me2 = (MouseEvent) newEvent;
+        if (me1.getModifiers() == me2.getModifiers())
+          coalesced = newEvent;
+        break;
       case PaintEvent.PAINT:
       case PaintEvent.UPDATE:
-        return coalescePaintEvents((PaintEvent) existingEvent,
-                                   (PaintEvent) newEvent);
+        // For heavyweights the EventQueue should ask the peer.
+        if (peer == null || peer instanceof LightweightPeer)
+          {
+            PaintEvent pe1 = (PaintEvent) existingEvent;
+            PaintEvent pe2 = (PaintEvent) newEvent;
+            Rectangle r1 = pe1.getUpdateRect();
+            Rectangle r2 = pe2.getUpdateRect();
+            if (r1.contains(r2))
+              coalesced = existingEvent;
+            else if (r2.contains(r1))
+              coalesced = newEvent;
+          }
+        else
+          {
+            // Replace the event and let the heavyweight figure out the expanding
+            // of the repaint area.
+            coalesced = newEvent;
+          }
+        break;
       default:
-				return null;
+        coalesced = null;
 		}
+    return coalesced;
 	}
 
 	/**

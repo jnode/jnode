@@ -286,8 +286,6 @@ public class Window extends Container implements Accessible
   {
     synchronized (getTreeLock())
     {
-        if (parent != null && ! parent.isDisplayable())
-      parent.addNotify();
     if (peer == null)
       addNotify();
 
@@ -529,7 +527,11 @@ public class Window extends Container implements Accessible
    */
   public synchronized void addWindowListener(WindowListener listener)
   {
+    if (listener != null)
+      {
+        newEventsOnly = true;
     windowListener = AWTEventMulticaster.add(windowListener, listener);
+  }
   }
 
   /**
@@ -586,9 +588,14 @@ public class Window extends Container implements Accessible
    */
   public void addWindowFocusListener (WindowFocusListener wfl)
   {
-    windowFocusListener = AWTEventMulticaster.add (windowFocusListener, wfl);
+    if (wfl != null)
+      {
+        newEventsOnly = true;
+        windowFocusListener = AWTEventMulticaster.add (windowFocusListener,
+                                                       wfl);
   }
-  
+  }
+
   /**
    * Adds the specified listener to this window.
    *
@@ -596,9 +603,14 @@ public class Window extends Container implements Accessible
    */
   public void addWindowStateListener (WindowStateListener wsl)
   {
-    windowStateListener = AWTEventMulticaster.add (windowStateListener, wsl);  
+    if (wsl != null)
+      {
+        newEventsOnly = true;
+        windowStateListener = AWTEventMulticaster.add (windowStateListener,
+                                                       wsl);
   }
-  
+  }
+
   /**
    * Removes the specified listener from this window.
    */
@@ -636,17 +648,11 @@ public class Window extends Container implements Accessible
 
   void dispatchEventImpl(AWTEvent e)
   {
-    // Make use of event id's in order to avoid multiple instanceof tests.
-    if (e.id <= WindowEvent.WINDOW_LAST 
-        && e.id >= WindowEvent.WINDOW_FIRST
-        && (windowListener != null
-	    || windowFocusListener != null
-	    || windowStateListener != null
-	    || (eventMask & AWTEvent.WINDOW_EVENT_MASK) != 0))
-      processEvent(e);
-    else if (e.id == ComponentEvent.COMPONENT_RESIZED)
+    if (e.getID() == ComponentEvent.COMPONENT_RESIZED)
+      {
+        invalidate();
       validate ();
-    else
+      }
       super.dispatchEventImpl(e);
   }
 
