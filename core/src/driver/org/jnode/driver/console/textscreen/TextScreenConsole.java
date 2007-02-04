@@ -124,6 +124,10 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
                 if(ln > 0){
                     screen.set(screen.getOffset(curX, curY), v, offset + mark, ln, color);
                     curX += ln;
+                    if (curX >= scrWidth) {
+                        curY++;
+                        curX = curX - scrWidth;
+			        }
                 }
                 mark = i + 1;
                 putChar(c, color);
