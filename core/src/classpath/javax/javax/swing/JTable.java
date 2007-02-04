@@ -2635,6 +2635,7 @@ public class JTable
     setModel(dm == null ? createDefaultDataModel() : dm);
     setAutoCreateColumnsFromModel(autoCreate);
     initializeLocalVars();
+    
     // The following four lines properly set the lead selection indices.
     // After this, the UI will handle the lead selection indices.
     // FIXME: this should probably not be necessary, if the UI is installed
@@ -2642,10 +2643,12 @@ public class JTable
     // own, but certain variables need to be set before the UI can be installed
     // so we must get the correct order for all the method calls in this
     // constructor.
-    selectionModel.setAnchorSelectionIndex(0);    
-    selectionModel.setLeadSelectionIndex(0);
-    columnModel.getSelectionModel().setAnchorSelectionIndex(0);
-    columnModel.getSelectionModel().setLeadSelectionIndex(0);
+    // These four lines are not needed.  A Mauve test that shows this is
+    // gnu.testlet.javax.swing.JTable.constructors(linesNotNeeded).
+    // selectionModel.setAnchorSelectionIndex(-1);
+    // selectionModel.setLeadSelectionIndex(-1);
+    // columnModel.getSelectionModel().setAnchorSelectionIndex(-1);
+    // columnModel.getSelectionModel().setLeadSelectionIndex(-1);
     updateUI();
   }    
 
@@ -2675,10 +2678,12 @@ public class JTable
     setRowHeight(16);
     this.rowMargin = 1;
     this.rowSelectionAllowed = true;
+    
     // this.accessibleContext = new AccessibleJTable();
     this.cellEditor = null;
+    
     // COMPAT: Both Sun and IBM have drag enabled
-    this.dragEnabled = true;
+    this.dragEnabled = false;
     this.preferredViewportSize = new Dimension(450,400);
     this.showHorizontalLines = true;
     this.showVerticalLines = true;
@@ -3424,7 +3429,7 @@ public class JTable
    * 
    * @return the editor, suitable for editing this data type
    */
-  public TableCellEditor getDefaultEditor(Class columnClass)
+  public TableCellEditor getDefaultEditor(Class<?> columnClass)
   {
     if (defaultEditorsByColumnClass.containsKey(columnClass))
       return (TableCellEditor) defaultEditorsByColumnClass.get(columnClass);
@@ -3446,7 +3451,9 @@ public class JTable
    */
   public TableCellRenderer getCellRenderer(int row, int column)
   {
-    TableCellRenderer renderer = columnModel.getColumn(column).getCellRenderer();
+    TableCellRenderer renderer = null;
+    if (columnModel.getColumnCount() > 0)
+      renderer = columnModel.getColumn(column).getCellRenderer();
     if (renderer == null)
       {
         int mcolumn = convertColumnIndexToModel(column);
@@ -3462,7 +3469,7 @@ public class JTable
    *          rendered.
    * @param rend the renderer that will rend this data type
    */
-  public void setDefaultRenderer(Class columnClass, TableCellRenderer rend)
+  public void setDefaultRenderer(Class<?> columnClass, TableCellRenderer rend)
   {
     defaultRenderersByColumnClass.put(columnClass, rend);
   }
@@ -3474,7 +3481,7 @@ public class JTable
    * 
    * @return the appropriate defauld renderer for rendering that data type.
    */
-  public TableCellRenderer getDefaultRenderer(Class columnClass)
+  public TableCellRenderer getDefaultRenderer(Class<?> columnClass)
   {
     if (defaultRenderersByColumnClass.containsKey(columnClass))
       return (TableCellRenderer) defaultRenderersByColumnClass.get(columnClass);
@@ -4441,7 +4448,7 @@ public class JTable
   {
     TableColumn resizingColumn = null;
 
-    int ncols = getColumnCount();
+    int ncols = columnModel.getColumnCount();
     if (ncols < 1)
       return;
 
@@ -4525,9 +4532,11 @@ public class JTable
       }
     else
       {
-        TableColumn [] cols = new TableColumn[ncols];
+        TableColumn[] cols = new TableColumn[ncols];
+
         for (int i = 0; i < ncols; ++i)
           cols[i] = columnModel.getColumn(i);
+
         distributeSpill(cols, spill);        
       }
     
@@ -4625,7 +4634,7 @@ public class JTable
    * @return the class, defining data type of that column (String.class for
    * String, Boolean.class for boolean and so on).
    */
-  public Class getColumnClass(int column)
+  public Class<?> getColumnClass(int column)
   {
     return getModel().getColumnClass(convertColumnIndexToModel(column));
   }
@@ -4718,7 +4727,7 @@ public class JTable
    * 
    * @see TableModel#getColumnClass(int)
    */
-  public void setDefaultEditor(Class columnClass, TableCellEditor editor)
+  public void setDefaultEditor(Class<?> columnClass, TableCellEditor editor)
   {
     if (editor != null)
       defaultEditorsByColumnClass.put(columnClass, editor);
