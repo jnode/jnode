@@ -195,7 +195,7 @@ public class BasicTreeUI
   protected AbstractLayoutCache treeState;
 
   /** Used for minimizing the drawing of vertical lines. */
-  protected Hashtable drawingCache;
+  protected Hashtable<TreePath, Boolean> drawingCache;
 
   /**
    * True if doing optimizations for a largeModel. Subclasses that don't support
@@ -1587,12 +1587,15 @@ public class BasicTreeUI
         for (int i = startIndex; i <= endIndex; i++, k++)
           {
             path[k] = treeState.getPathForRow(i);
+            if (path[k] != null)
+              {
             isLeaf[k] = treeModel.isLeaf(path[k].getLastPathComponent());
             isExpanded[k] = tree.isExpanded(path[k]);
             bounds[k] = getPathBounds(tree, path[k]);
 
-            paintHorizontalPartOfLeg(g, clip, insets, bounds[k], path[k], i,
-                                     isExpanded[k], false, isLeaf[k]);
+                paintHorizontalPartOfLeg(g, clip, insets, bounds[k], path[k],
+                                         i, isExpanded[k], false, isLeaf[k]);
+              }
             if (isLastChild(path[k]))
               paintVerticalPartOfLeg(g, clip, insets, path[k]);
           }
@@ -1600,6 +1603,7 @@ public class BasicTreeUI
         k = 0;
         for (int i = startIndex; i <= endIndex; i++, k++)
           {
+            if (path[k] != null)
             paintRow(g, clip, insets, bounds[k], path[k], i, isExpanded[k],
                      false, isLeaf[k]);
           }
@@ -1611,7 +1615,9 @@ public class BasicTreeUI
    */
   private boolean isLastChild(TreePath path)
   {
-    if (path instanceof GnuPath)
+    if (path == null)
+      return false;
+    else if (path instanceof GnuPath)
       {
         // Except the seldom case when the layout cache is changed, this
         // optimized code will be executed.
