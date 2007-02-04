@@ -48,12 +48,10 @@ import java.awt.EventQueue;
 import java.awt.FocusTraversalPolicy;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.Shape;
 import java.awt.Window;
 import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
@@ -69,6 +67,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
+import java.beans.VetoableChangeSupport;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.EventListener;
@@ -506,27 +505,6 @@ public abstract class JComponent extends Container implements Serializable
   }
 
   /** 
-   * An explicit value for the component's preferred size; if not set by a
-   * user, this is calculated on the fly by delegating to the {@link
-   * ComponentUI#getPreferredSize} method on the {@link #ui} property. 
-   */
-  Dimension preferredSize;
-
-  /** 
-   * An explicit value for the component's minimum size; if not set by a
-   * user, this is calculated on the fly by delegating to the {@link
-   * ComponentUI#getMinimumSize} method on the {@link #ui} property. 
-   */
-  Dimension minimumSize;
-
-  /** 
-   * An explicit value for the component's maximum size; if not set by a
-   * user, this is calculated on the fly by delegating to the {@link
-   * ComponentUI#getMaximumSize} method on the {@link #ui} property.
-   */
-  Dimension maximumSize;
-
-  /**
    * A value between 0.0 and 1.0 indicating the preferred horizontal
    * alignment of the component, relative to its siblings. The values
    * {@link #LEFT_ALIGNMENT}, {@link #CENTER_ALIGNMENT}, and {@link
@@ -564,12 +542,19 @@ public abstract class JComponent extends Container implements Serializable
   Border border;
 
   /** 
-   * The text to show in the tooltip associated with this component.
+   * The popup menu for the component.
    * 
-   * @see #setToolTipText
-   * @see #getToolTipText()
+   * @see #getComponentPopupMenu()
+   * @see #setComponentPopupMenu(JPopupMenu)
    */
-   String toolTipText;
+  JPopupMenu componentPopupMenu;
+   
+  /**
+   * A flag that controls whether the {@link #getComponentPopupMenu()} method
+   * looks to the component's parent when the <code>componentPopupMenu</code>
+   * field is <code>null</code>.
+   */
+  boolean inheritsPopupMenu;
 
   /** 
    * <p>Whether to double buffer this component when painting. This flag
@@ -668,7 +653,13 @@ public abstract class JComponent extends Container implements Serializable
    * Indicates whether the current paint call is already double buffered or
    * not. 
    */
-  static boolean isPaintingDoubleBuffered = false;
+  static boolean paintingDoubleBuffered = false;
+
+  /**
+   * Indicates whether we are calling paintDoubleBuffered() from
+   * paintImmadiately (RepaintManager) or from paint() (AWT refresh).
+   */
+  static boolean isRepainting = false;
 
   /**
    * Listeners for events other than {@link PropertyChangeEvent} are
@@ -676,6 +667,11 @@ public abstract class JComponent extends Container implements Serializable
    * {@link #changeSupport}.
    */
   protected EventListenerList listenerList = new EventListenerList();
+
+  /** 
+   * Handles VetoableChangeEvents.
+   */
+  private VetoableChangeSupport vetoableChangeSupport;
 
   /** 
    * Storage for "client properties", which are key/value pairs associated
@@ -690,7 +686,7 @@ public abstract class JComponent extends Container implements Serializable
   private ComponentInputMap inputMap_whenInFocusedWindow;
   private ActionMap actionMap;
   /** @since 1.3 */
-  private boolean verifyInputWhenFocusTarget;
+  private boolean verifyInputWhenFocusTarget = true;
   private InputVerifier inputVerifier;
 
   private TransferHandler transferHandler;
@@ -759,6 +755,13 @@ public abstract class JComponent extends Container implements Serializable
    */
   public static final int WHEN_IN_FOCUSED_WINDOW = 2;
 
+
+  /**
+   * Used to optimize painting. This is set in paintImmediately2() to specify
+   * the exact component path to be painted by paintChildren.
+   */
+  Component paintChild;
+
   /**
    * Indicates if the opaque property has been set by a client program or by
    * the UI.
@@ -784,7 +787,7 @@ public abstract class JComponent extends Container implements Serializable
   {
     super();
     setDropTarget(new DropTarget());
-    defaultLocale = Locale.getDefault();
+    setLocale(getDefaultLocale());
     debugGraphicsOptions = DebugGraphics.NONE_OPTION;
     setRequestFocusEnabled(true);
   }
@@ -844,6 +847,11 @@ public abstract class JComponent extends Container implements Serializable
       t.put(key, value);
     else
       t.remove(key);
+
+    // When both old and new value are null, no event is fired. This is
+    // different from what firePropertyChange() normally does, so we add this
+    // check here.
+    if (old != null || value != null)
     firePropertyChange(key.toString(), old, value);
   }
 
@@ -868,7 +876,8 @@ public abstract class JComponent extends Container implements Serializable
    */
   public void removeVetoableChangeListener(VetoableChangeListener listener)
   {
-    listenerList.remove(VetoableChangeListener.class, listener);
+    if (vetoableChangeSupport != null)
+      vetoableChangeSupport.removeVetoableChangeListener(listener);
   }
 
   /**
@@ -884,23 +893,6 @@ public abstract class JComponent extends Container implements Serializable
   }
 
   /**
-   * Register a <code>PropertyChangeListener</code> for a specific, named
-   * property. To listen to all property changes, regardless of name, use
-   * {@link #addPropertyChangeListener(PropertyChangeListener)} instead.
-   *
-   * @param propertyName The property name to listen to
-   * @param listener The listener to register
-   *
-   * @see #removePropertyChangeListener(String, PropertyChangeListener)
-   * @see #changeSupport
-   */
-  public void addPropertyChangeListener(String propertyName,
-                                        PropertyChangeListener listener)
-  {
-    listenerList.add(PropertyChangeListener.class, listener);
-  }
-
-  /**
    * Register a <code>VetoableChangeListener</code>.
    *
    * @param listener The listener to register
@@ -910,7 +902,10 @@ public abstract class JComponent extends Container implements Serializable
    */
   public void addVetoableChangeListener(VetoableChangeListener listener)
   {
-    listenerList.add(VetoableChangeListener.class, listener);
+    // Lazily instantiate this, it's rarely needed.
+    if (vetoableChangeSupport == null)
+      vetoableChangeSupport = new VetoableChangeSupport(this);
+    vetoableChangeSupport.addVetoableChangeListener(listener);
   }
 
   /**
@@ -932,10 +927,12 @@ public abstract class JComponent extends Container implements Serializable
    * 
    * @since 1.3
    */
-  public EventListener[] getListeners(Class listenerType)
+  public <T extends EventListener> T[] getListeners(Class<T> listenerType)
   {
     if (listenerType == PropertyChangeListener.class)
-      return getPropertyChangeListeners();
+      return (T[]) getPropertyChangeListeners();
+    else if (listenerType == VetoableChangeListener.class)
+      return (T[]) getVetoableChangeListeners();
     else
     return listenerList.getListeners(listenerType);
   }
@@ -954,57 +951,16 @@ public abstract class JComponent extends Container implements Serializable
   /**
    * Return all registered <code>VetoableChangeListener</code> objects.
    *
-   * @return The set of <code>VetoableChangeListener</code> objects in {@link
-   * #listenerList}
+   * @return An array of the <code>VetoableChangeListener</code> objects 
+   *     registered with this component (possibly empty but never 
+   *     <code>null</code>).
+   *
+   * @since 1.4
    */
   public VetoableChangeListener[] getVetoableChangeListeners()
   {
-    return (VetoableChangeListener[]) getListeners(VetoableChangeListener.class);
-  }
-
-  /**
-   * A variant of {@link #firePropertyChange(String,Object,Object)} 
-   * for properties with <code>boolean</code> values.
-   *
-   * @specnote It seems that in JDK1.5 all property related methods have been 
-   *           moved to java.awt.Component, except this and 2 others. We call
-   *           super here. I guess this will also be removed in one of the next
-   *           releases.
-   */
-  public void firePropertyChange(String propertyName, boolean oldValue,
-                                 boolean newValue)
-  {
-    super.firePropertyChange(propertyName, oldValue, newValue);
-  }
-
-  /**
-   * A variant of {@link #firePropertyChange(String,Object,Object)} 
-   * for properties with <code>char</code> values.
-   *
-   * @specnote It seems that in JDK1.5 all property related methods have been 
-   *           moved to java.awt.Component, except this and 2 others. We call
-   *           super here. I guess this will also be removed in one of the next
-   *           releases.
-   */
-  public void firePropertyChange(String propertyName, char oldValue,
-                                 char newValue)
-  {
-    super.firePropertyChange(propertyName, oldValue, newValue);
-  }
-
-  /**
-   * A variant of {@link #firePropertyChange(String,Object,Object)} 
-   * for properties with <code>int</code> values.
-   *
-   * @specnote It seems that in JDK1.5 all property related methods have been 
-   *           moved to java.awt.Component, except this and 2 others. We call
-   *           super here. I guess this will also be removed in one of the next
-   *           releases.
-   */
-  public void firePropertyChange(String propertyName, int oldValue,
-                                 int newValue)
-  {
-    super.firePropertyChange(propertyName, oldValue, newValue);
+    return vetoableChangeSupport == null ? new VetoableChangeListener[0]
+        : vetoableChangeSupport.getVetoableChangeListeners();
   }
 
   /**
@@ -1025,13 +981,44 @@ public abstract class JComponent extends Container implements Serializable
                                     Object newValue)
     throws PropertyVetoException
   {
-    VetoableChangeListener[] listeners = getVetoableChangeListeners();
+    if (vetoableChangeSupport != null)
+      vetoableChangeSupport.fireVetoableChange(propertyName, oldValue, newValue);
+  }
 
-    PropertyChangeEvent evt = 
-      new PropertyChangeEvent(this, propertyName, oldValue, newValue);
 
-    for (int i = 0; i < listeners.length; i++)
-      listeners[i].vetoableChange(evt);
+  /**
+   * Fires a property change for a primitive integer property.
+   *
+   * @param property the name of the property
+   * @param oldValue the old value of the property
+   * @param newValue the new value of the property
+   *
+   * @specnote This method is implemented in
+   *           {@link Component#firePropertyChange(String, int, int)}. It is
+   *           only here because it is specified to be public, whereas the
+   *           Component method is protected.
+   */
+  public void firePropertyChange(String property, int oldValue, int newValue)
+  {
+    super.firePropertyChange(property, oldValue, newValue);
+  }
+  
+  /**
+   * Fires a property change for a primitive boolean property.
+   *
+   * @param property the name of the property
+   * @param oldValue the old value of the property
+   * @param newValue the new value of the property
+   *
+   * @specnote This method is implemented in
+   *           {@link Component#firePropertyChange(String, boolean, boolean)}.
+   *           It is only here because it is specified to be public, whereas
+   *           the Component method is protected.
+   */
+  public void firePropertyChange(String property, boolean oldValue,
+                                 boolean newValue)
+  {
+    super.firePropertyChange(property, oldValue, newValue);
   }
 
   /**
@@ -1252,37 +1239,38 @@ public abstract class JComponent extends Container implements Serializable
   }
 
   /**
-   * Get the component's maximum size. If the {@link #maximumSize} property
-   * has been explicitly set, it is returned. If the {@link #maximumSize}
+   * Get the component's maximum size. If the <code>maximumSize</code> property
+   * has been explicitly set, it is returned. If the <code>maximumSize</code>
    * property has not been set but the {@link #ui} property has been, the
    * result of {@link ComponentUI#getMaximumSize} is returned. If neither
    * property has been set, the result of {@link Container#getMaximumSize}
    * is returned.
    *
-   * @return The maximum size of the component
+   * @return the maximum size of the component
    *
-   * @see #maximumSize
-   * @see #setMaximumSize
+   * @see Component#setMaximumSize
+   * @see Component#getMaximumSize()
+   * @see Component#isMaximumSizeSet()
+   * @see ComponentUI#getMaximumSize(JComponent)
    */
   public Dimension getMaximumSize()
   {
-    if (maximumSize != null)
-      return maximumSize;
-
-    if (ui != null)
+    Dimension size = null; 
+    if (isMaximumSizeSet())
+      size = super.getMaximumSize();
+    else
       {
-        Dimension s = ui.getMaximumSize(this);
-        if (s != null)
-          return s;
+        if (ui != null)
+          size = ui.getMaximumSize(this);
+        if (size == null)
+          size = super.getMaximumSize();
       }
-
-    Dimension p = super.getMaximumSize();
-    return p;
+    return size;
   }
 
   /**
-   * Get the component's minimum size. If the {@link #minimumSize} property
-   * has been explicitly set, it is returned. If the {@link #minimumSize}
+   * Get the component's minimum size. If the <code>minimumSize</code> property
+   * has been explicitly set, it is returned. If the <code>minimumSize</code>
    * property has not been set but the {@link #ui} property has been, the
    * result of {@link ComponentUI#getMinimumSize} is returned. If neither
    * property has been set, the result of {@link Container#getMinimumSize}
@@ -1290,94 +1278,54 @@ public abstract class JComponent extends Container implements Serializable
    *
    * @return The minimum size of the component
    *
-   * @see #minimumSize
-   * @see #setMinimumSize
+   * @see Component#setMinimumSize
+   * @see Component#getMinimumSize()
+   * @see Component#isMinimumSizeSet()
+   * @see ComponentUI#getMinimumSize(JComponent)
    */
   public Dimension getMinimumSize()
   {
-    if (minimumSize != null)
-      return minimumSize;
-
-    if (ui != null)
+    Dimension size = null; 
+    if (isMinimumSizeSet())
+      size = super.getMinimumSize();
+    else
       {
-        Dimension s = ui.getMinimumSize(this);
-        if (s != null)
-          return s;
+        if (ui != null)
+          size = ui.getMinimumSize(this);
+        if (size == null)
+          size = super.getMinimumSize();
       }
-
-    Dimension p = super.getMinimumSize();
-    return p;
+    return size;
   }
 
   /**
-   * Get the component's preferred size. If the {@link #preferredSize}
-   * property has been explicitly set, it is returned. If the {@link
-   * #preferredSize} property has not been set but the {@link #ui} property
-   * has been, the result of {@link ComponentUI#getPreferredSize} is
+   * Get the component's preferred size. If the <code>preferredSize</code>
+   * property has been explicitly set, it is returned. If the
+   * <code>preferredSize</code> property has not been set but the {@link #ui}
+   * property has been, the result of {@link ComponentUI#getPreferredSize} is
    * returned. If neither property has been set, the result of {@link
    * Container#getPreferredSize} is returned.
    *
    * @return The preferred size of the component
    *
-   * @see #preferredSize
-   * @see #setPreferredSize
+   * @see Component#setPreferredSize
+   * @see Component#getPreferredSize()
+   * @see Component#isPreferredSizeSet()
+   * @see ComponentUI#getPreferredSize(JComponent)
    */
   public Dimension getPreferredSize()
   {
-    Dimension prefSize = null;
-    if (preferredSize != null)
-      prefSize = new Dimension(preferredSize);
-
-    else if (ui != null)
-      {
-        Dimension s = ui.getPreferredSize(this);
-        if (s != null)
-          prefSize = s;
-      }
-
-    if (prefSize == null)
-      prefSize = super.getPreferredSize();
-
-    return prefSize;
-  }
-
-  /**
-   * Checks if a maximum size was explicitely set on the component.
-   *
-   * @return <code>true</code> if a maximum size was set,
-   * <code>false</code> otherwise
-   * 
-   * @since 1.3
-   */
-  public boolean isMaximumSizeSet()
+    Dimension size = null; 
+    if (isPreferredSizeSet())
+      size = super.getPreferredSize();
+    else
   {
-    return maximumSize != null;
+        if (ui != null)
+          size = ui.getPreferredSize(this);
+        if (size == null)
+          size = super.getPreferredSize();
   }
-
-  /**
-   * Checks if a minimum size was explicitely set on the component.
-   *
-   * @return <code>true</code> if a minimum size was set,
-   * <code>false</code> otherwise
-   * 
-   * @since 1.3
-   */
-  public boolean isMinimumSizeSet()
-  {
-    return minimumSize != null;
-  }
-
-  /**
-   * Checks if a preferred size was explicitely set on the component.
-   *
-   * @return <code>true</code> if a preferred size was set,
-   * <code>false</code> otherwise
-   * 
-   * @since 1.3
-   */
-  public boolean isPreferredSizeSet()
-  {
-    return preferredSize != null;
+    return size;
   }
   
   /**
@@ -1402,11 +1350,32 @@ public abstract class JComponent extends Container implements Serializable
    * Return the set of {@link KeyStroke} objects which are registered
    * to initiate actions on this component.
    *
-   * @return An array of the registered keystrokes
+   * @return An array of the registered keystrokes (possibly empty but never
+   *     <code>null</code>).
    */
   public KeyStroke[] getRegisteredKeyStrokes()
   {
-    return null;
+    KeyStroke[] ks0;
+    KeyStroke[] ks1;
+    KeyStroke[] ks2;
+    if (inputMap_whenFocused != null)
+      ks0 = inputMap_whenFocused.keys();
+    else 
+      ks0 = new KeyStroke[0];
+    if (inputMap_whenAncestorOfFocused != null)
+      ks1 = inputMap_whenAncestorOfFocused.keys();
+    else 
+      ks1 = new KeyStroke[0];
+    if (inputMap_whenInFocusedWindow != null)
+      ks2 = inputMap_whenInFocusedWindow.keys();
+    else
+      ks2 = new KeyStroke[0];
+    int count = ks0.length + ks1.length + ks2.length;
+    KeyStroke[] result = new KeyStroke[count];
+    System.arraycopy(ks0, 0, result, 0, ks0.length);
+    System.arraycopy(ks1, 0, result, ks0.length, ks1.length);
+    System.arraycopy(ks2, 0, result, ks0.length + ks1.length, ks2.length);
+    return result;
   }
 
   /**
@@ -1452,14 +1421,12 @@ public abstract class JComponent extends Container implements Serializable
   {
     JToolTip toolTip = new JToolTip();
     toolTip.setComponent(this);
-    toolTip.setTipText(toolTipText);
-
     return toolTip;
   }
 
   /**
-   * Return the location at which the {@link #toolTipText} property should be
-   * displayed, when triggered by a particular mouse event. 
+   * Return the location at which the <code>toolTipText</code> property should
+   * be displayed, when triggered by a particular mouse event. 
    *
    * @param event The event the tooltip is being presented in response to
    *
@@ -1472,59 +1439,144 @@ public abstract class JComponent extends Container implements Serializable
   }
 
   /**
-   * Set the value of the {@link #toolTipText} property.
+   * Set the tooltip text for this component. If a non-<code>null</code>
+   * value is set, this component is registered in the
+   * <code>ToolTipManager</code> in order to turn on tooltips for this
+   * component. If a <code>null</code> value is set, tooltips are turne off
+   * for this component.
    *
-   * @param text The new property value
+   * @param text the tooltip text for this component
    *
    * @see #getToolTipText()
+   * @see #getToolTipText(MouseEvent)
    */
   public void setToolTipText(String text)
   {
+    String old = getToolTipText();
+    putClientProperty(TOOL_TIP_TEXT_KEY, text);
+    ToolTipManager ttm = ToolTipManager.sharedInstance();
     if (text == null)
-    {
-      ToolTipManager.sharedInstance().unregisterComponent(this);
-      toolTipText = null;
-      return;
-    }
-
-    // XXX: The tip text doesn't get updated unless you set it to null
-    // and then to something not-null. This is consistent with the behaviour
-    // of Sun's ToolTipManager.
-
-    String oldText = toolTipText;
-    toolTipText = text;
-
-    if (oldText == null)
-      ToolTipManager.sharedInstance().registerComponent(this);
+      ttm.unregisterComponent(this);
+    else if (old == null)
+      ttm.registerComponent(this);
   }
 
   /**
-   * Get the value of the {@link #toolTipText} property.
+   * Returns the current tooltip text for this component, or <code>null</code>
+   * if none has been set.
    *
-   * @return The current property value
+   * @return the current tooltip text for this component, or <code>null</code>
+   *         if none has been set
    *
    * @see #setToolTipText
+   * @see #getToolTipText(MouseEvent)
    */
   public String getToolTipText()
   {
-    return toolTipText;
+    return (String) getClientProperty(TOOL_TIP_TEXT_KEY);
   }
 
   /**
-   * Get the value of the {@link #toolTipText} property, in response to a
-   * particular mouse event.
+   * Returns the tooltip text for this component for a particular mouse
+   * event. This can be used to support context sensitive tooltips that can
+   * change with the mouse location. By default this returns the static
+   * tooltip text returned by {@link #getToolTipText()}.
    *
-   * @param event The mouse event which triggered the tooltip
+   * @param event the mouse event which triggered the tooltip
    *
-   * @return The current property value
+   * @return the tooltip text for this component for a particular mouse
+   *         event
    *
    * @see #setToolTipText
+   * @see #getToolTipText()
    */
   public String getToolTipText(MouseEvent event)
   {
     return getToolTipText();
   }
 
+  /**
+   * Returns the flag that controls whether or not the component inherits its
+   * parent's popup menu when no popup menu is specified for this component.
+   * 
+   * @return A boolean.
+   * 
+   * @since 1.5
+   * 
+   * @see #setInheritsPopupMenu(boolean)
+   */
+  public boolean getInheritsPopupMenu()
+  {
+    return inheritsPopupMenu; 
+  }
+  
+  /**
+   * Sets the flag that controls whether or not the component inherits its
+   * parent's popup menu when no popup menu is specified for this component.
+   * This is a bound property with the property name 'inheritsPopupMenu'.
+   * 
+   * @param inherit  the new flag value.
+   * 
+   * @since 1.5
+   * 
+   * @see #getInheritsPopupMenu()
+   */
+  public void setInheritsPopupMenu(boolean inherit)
+  {
+    if (inheritsPopupMenu != inherit)
+      {
+        inheritsPopupMenu = inherit;
+        this.firePropertyChange("inheritsPopupMenu", ! inherit, inherit);
+      }
+  }
+  
+  /**
+   * Returns the popup menu for this component.  If the popup menu is 
+   * <code>null</code> AND the {@link #getInheritsPopupMenu()} method returns
+   * <code>true</code>, this method will return the parent's popup menu (if it
+   * has one).
+   * 
+   * @return The popup menu (possibly <code>null</code>.
+   * 
+   * @since 1.5
+   * 
+   * @see #setComponentPopupMenu(JPopupMenu)
+   * @see #getInheritsPopupMenu()
+   */
+  public JPopupMenu getComponentPopupMenu()
+  {
+    if (componentPopupMenu == null && getInheritsPopupMenu())
+      {
+        Container parent = getParent(); 
+        if (parent instanceof JComponent)
+          return ((JComponent) parent).getComponentPopupMenu();
+        else
+          return null;
+      }
+    else
+      return componentPopupMenu;
+  }
+
+  /**
+   * Sets the popup menu for this component (this is a bound property with 
+   * the property name 'componentPopupMenu').
+   * 
+   * @param popup  the popup menu (<code>null</code> permitted).
+   *
+   * @since 1.5
+   * 
+   * @see #getComponentPopupMenu()
+   */
+  public void setComponentPopupMenu(JPopupMenu popup)
+  {
+    if (componentPopupMenu != popup)
+      {
+        JPopupMenu old = componentPopupMenu;
+        componentPopupMenu = popup;
+        firePropertyChange("componentPopupMenu", old, popup);
+      }
+  }
+  
   /**
    * Return the top level ancestral container (usually a {@link
    * java.awt.Window} or {@link java.applet.Applet}) which this component is
@@ -1725,11 +1777,11 @@ public abstract class JComponent extends Container implements Serializable
     // buffer. When this method completes, the call stack unwinds back to
     // paintDoubleBuffered, where the buffer contents is finally drawn to the
     // screen.
-    if (!isPaintingDoubleBuffered && isDoubleBuffered()
+    if (!paintingDoubleBuffered && isDoubleBuffered()
         && rm.isDoubleBufferingEnabled())
       {
         Rectangle clip = g.getClipBounds();
-        paintDoubleBuffered(clip);
+        paintDoubleBuffered(clip.x, clip.y, clip.width, clip.height);
       }
     else
       {
@@ -1744,8 +1796,22 @@ public abstract class JComponent extends Container implements Serializable
             dragBuffer = null;
           }
 
-        if (g.getClip() == null)
-          g.setClip(0, 0, getWidth(), getHeight());
+        Rectangle clip = g.getClipBounds();
+        int clipX, clipY, clipW, clipH;
+        if (clip == null)
+          {
+            clipX = 0;
+            clipY = 0;
+            clipW = getWidth();
+            clipH = getHeight();
+          }
+        else
+          {
+            clipX = clip.x;
+            clipY = clip.y;
+            clipW = clip.width;
+            clipH = clip.height;
+          }
         if (dragBuffer != null && dragBufferInitialized)
           {
             g.drawImage(dragBuffer, 0, 0, this);
@@ -1753,11 +1819,48 @@ public abstract class JComponent extends Container implements Serializable
         else
           {
         Graphics g2 = getComponentGraphics(g);
+            if (! isOccupiedByChild(clipX, clipY, clipW, clipH))
+              {
         paintComponent(g2);
         paintBorder(g2);
+              }
         paintChildren(g2);
       }
   }
+  }
+
+  /**
+   * Determines if a region of this component is completely occupied by
+   * an opaque child component, in which case we don't need to bother
+   * painting this component at all.
+   *
+   * @param x the area, x coordinate
+   * @param y the area, y coordinate
+   * @param w the area, width
+   * @param h the area, height
+   *
+   * @return <code>true</code> if the specified area is completely covered
+   *         by a child component, <code>false</code> otherwise
+   */
+  private boolean isOccupiedByChild(int x, int y, int w, int h)
+  {
+    boolean occupied = false;
+    int count = getComponentCount();
+    for (int i = 0; i < count; i++)
+      {
+        Component child = getComponent(i);
+        int cx = child.getX();
+        int cy = child.getY();
+        int cw = child.getWidth();
+        int ch = child.getHeight();
+        if (child.isVisible() && x >= cx && x + w <= cx + cw && y >= cy
+            && y + h <= cy + ch)
+          {
+            occupied = child.isOpaque();
+            break;
+          }
+      }
+    return occupied;
   }
 
   /**
@@ -1816,235 +1919,122 @@ public abstract class JComponent extends Container implements Serializable
   {
     if (getComponentCount() > 0)
       {
-        if (isOptimizedDrawingEnabled())
-          paintChildrenOptimized(g);
-        else
-          paintChildrenWithOverlap(g);
+        // Need to lock the tree to avoid problems with AWT and concurrency.
+        synchronized (getTreeLock())
+                  {
+            // Fast forward to the child to paint, if set by
+            // paintImmediately2()
+            int i = getComponentCount() - 1;
+            if (paintChild != null && paintChild.isOpaque())
+              {
+                for (; i >= 0 && getComponent(i) != paintChild; i--)
+                  ;
+              }
+            for (; i >= 0; i--)
+              {
+                Component child = getComponent(i);
+                if (child != null && child.isLightweight()
+                    && child.isVisible())
+                  {
+                    int cx = child.getX();
+                    int cy = child.getY();
+                    int cw = child.getWidth();
+                    int ch = child.getHeight();
+                    if (g.hitClip(cx, cy, cw, ch))
+                      {
+                        if ((! isOptimizedDrawingEnabled()) && i > 0)
+                          {
+                            // Check if the child is completely obscured.
+                            Rectangle clip = g.getClipBounds(); // A copy.
+                            SwingUtilities.computeIntersection(cx, cy, cw, ch,
+                                                               clip);
+                            if (isCompletelyObscured(i, clip.x, clip.y,
+                                                     clip.width, clip.height))
+                              continue; // Continues the for-loop.
+                          }
+                        Graphics cg = g.create(cx, cy, cw, ch);
+                        cg.setColor(child.getForeground());
+                        cg.setFont(child.getFont());
+                        try
+                      {
+                            child.paint(cg);
+                      }
+                        finally
+                      {
+                            cg.dispose();
+                      }
+                  }
+                  }
+              }
+          }
+          }
       }
+
+  /**
+   * Determines if a region of a child component is completely obscured by one
+   * of its siblings.
+   *
+   * @param index the index of the child component
+   * @param x the region to check, x coordinate
+   * @param y the region to check, y coordinate
+   * @param w the region to check, width
+   * @param h the region to check, height
+   *
+   * @return <code>true</code> if the region is completely obscured by a
+   *         sibling, <code>false</code> otherwise
+   */
+  private boolean isCompletelyObscured(int index, int x, int y, int w, int h)
+      {
+    boolean obscured = false;
+    for (int i = index - 1; i >= 0 && obscured == false; i--)
+          {
+        Component sib = getComponent(i);
+        if (sib.isVisible())
+              {
+            Rectangle sibRect = sib.getBounds(rectCache);
+            if (sib.isOpaque() && x >= sibRect.x
+                && (x + w) <= (sibRect.x + sibRect.width)
+                && y >= sibRect.y
+                && (y + h) <= (sibRect.y + sibRect.height))
+              {
+                obscured = true;
+              }
+          }
+      }
+    return obscured;
   }
 
   /**
-   * Paints the children of this JComponent in the case when the component
-   * is not marked as optimizedDrawingEnabled, that means the container cannot
-   * guarantee that it's children are tiled. For this case we must
-   * perform a more complex optimization to determine the minimal rectangle
-   * to be painted for each child component.
+   * Checks if a component/rectangle is partially obscured by one of its
+   * siblings.
+   * Note that this doesn't check for completely obscured, this is
+   * done by isCompletelyObscured() and should probably also be checked.
    *
-   * @param g the graphics context to use
-   */
-  private void paintChildrenWithOverlap(Graphics g)
-  {
-    Shape originalClip = g.getClip();
-    Rectangle inner = SwingUtilities.calculateInnerArea(this, rectCache);
-    g.clipRect(inner.x, inner.y, inner.width, inner.height);
-    Component[] children = getComponents();
-
-    // Find the rectangles that need to be painted for each child component.
-    // We push on this list arrays that have the Rectangles to be painted as
-    // the first elements and the component to be painted as the last one.
-    // Later we go through that list in reverse order and paint the rectangles.
-    ArrayList paintRegions = new ArrayList(children.length);
-    ArrayList paintRectangles = new ArrayList();
-    ArrayList newPaintRects = new ArrayList();
-    paintRectangles.add(g.getClipBounds());
-    ArrayList componentRectangles = new ArrayList();
-
-    // Go through children from top to bottom and find out their paint
-    // rectangles.
-    for (int index = 0; paintRectangles.size() > 0 &&
-      index < children.length; index++)
-      {
-        Component comp = children[index];
-        if (! comp.isVisible())
-          continue;
-
-        Rectangle compBounds = comp.getBounds();
-        boolean isOpaque = comp instanceof JComponent
-                           && ((JComponent) comp).isOpaque();
-
-        // Add all the current paint rectangles that intersect with the
-        // component to the component's paint rectangle array.
-        for (int i = paintRectangles.size() - 1; i >= 0; i--)
-          {
-            Rectangle r = (Rectangle) paintRectangles.get(i);
-            if (r.intersects(compBounds))
-              {
-                Rectangle compRect = r.intersection(compBounds);
-                componentRectangles.add(compRect);
-                // If the component is opaque, split up each paint rect and
-                // add paintRect - compBounds to the newPaintRects array.
-                if (isOpaque)
-                  {
-                    int x, y, w, h;
-                    Rectangle rect = new Rectangle();
-
-                    // The north retangle.
-                    x = Math.max(compBounds.x, r.x);
-                    y = r.y;
-                    w = Math.min(compBounds.width, r.width + r.x - x);
-                    h = compBounds.y - r.y;
-                    rect.setBounds(x, y, w, h);
-                    if (! rect.isEmpty())
-                      {
-                        newPaintRects.add(rect);
-                        rect = new Rectangle();
-                      }
-
-                    // The south rectangle.
-                    x = Math.max(compBounds.x, r.x);
-                    y = compBounds.y + compBounds.height;
-                    w = Math.min(compBounds.width, r.width + r.x - x);
-                    h = r.height - (compBounds.y - r.y) - compBounds.height;
-                    rect.setBounds(x, y, w, h);
-                    if (! rect.isEmpty())
-                      {
-                        newPaintRects.add(rect);
-                        rect = new Rectangle();
-                      }
-
-                    // The west rectangle.
-                    x = r.x;
-                    y = r.y;
-                    w = compBounds.x - r.x;
-                    h = r.height;
-                    rect.setBounds(x, y, w, h);
-                    if (! rect.isEmpty())
-                      {
-                        newPaintRects.add(rect);
-                        rect = new Rectangle();
-                      }
-
-                    // The east rectangle.
-                    x = compBounds.x + compBounds.width;
-                    y = r.y;
-                    w = r.width - (compBounds.x - r.x) - compBounds.width;
-                    h = r.height;
-                    rect.setBounds(x, y, w, h);
-                    if (! rect.isEmpty())
-                      {
-                        newPaintRects.add(rect);
-                      }
-                  }
-                else
-                  {
-                    // Not opaque, need to reuse the current paint rectangles
-                    // for the next component.
-                    newPaintRects.add(r);
-                  }
-                
-              }
-            else
-              {
-                newPaintRects.add(r);
-              }
-          }
-
-        // Replace the paintRectangles with the new split up
-        // paintRectangles.
-        paintRectangles.clear();
-        paintRectangles.addAll(newPaintRects);
-        newPaintRects.clear();
-
-        // Store paint rectangles if there are any for the current component.
-        int compRectsSize = componentRectangles.size();
-        if (compRectsSize > 0)
-          {
-            componentRectangles.add(comp);
-            paintRegions.add(componentRectangles);
-            componentRectangles = new ArrayList();
-          }
-      }
-
-    // paintingTile becomes true just before we start painting the component's
-    // children.
-    paintingTile = true;
-
-    // We must go through the painting regions backwards, because the
-    // topmost components have been added first, followed by the components
-    // below.
-    int prEndIndex = paintRegions.size() - 1;
-    for (int i = prEndIndex; i >= 0; i--)
-      {
-        // paintingTile must be set to false before we begin to start painting
-        // the last tile.
-        if (i == 0)
-          paintingTile = false;
-
-        ArrayList paintingRects = (ArrayList) paintRegions.get(i);
-        // The last element is always the component.
-        Component c = (Component) paintingRects.get(paintingRects.size() - 1);
-        int endIndex = paintingRects.size() - 2;
-        for (int j = 0; j <= endIndex; j++)
-          {
-            Rectangle cBounds = c.getBounds();
-            Rectangle bounds = (Rectangle) paintingRects.get(j);
-            Rectangle oldClip = g.getClipBounds();
-            if (oldClip == null)
-              oldClip = bounds;
-
-            boolean translated = false;
-            try
-              {
-                g.setClip(bounds);
-                g.translate(cBounds.x, cBounds.y);
-                translated = true;
-                c.paint(g);
-              }
-            finally
-              {
-                if (translated)
-                  g.translate(-cBounds.x, -cBounds.y);
-                g.setClip(oldClip);
-              }
-          }
-      }
-    g.setClip(originalClip);
-  }
-
-  /**
-   * Paints the children of this container when it is marked as
-   * optimizedDrawingEnabled. In this case the container can guarantee that
-   * it's children are tiled, which allows for a much more efficient
-   * algorithm to determine the minimum rectangles to be painted for
-   * each child.
+   * @param i the component index from which to start searching
+   * @param x the x coordinate of the rectangle to check
+   * @param y the y coordinate of the rectangle to check
+   * @param w the width of the rectangle to check
+   * @param h the height of the rectangle to check
    *
-   * @param g the graphics context to use
+   * @return <code>true</code> if the rectangle is partially obscured
    */
-  private void paintChildrenOptimized(Graphics g)
+  private boolean isPartiallyObscured(int i, int x, int y, int w, int h)
   {
-    Shape originalClip = g.getClip();
-    Rectangle inner = SwingUtilities.calculateInnerArea(this, rectCache);
-    g.clipRect(inner.x, inner.y, inner.width, inner.height);
-    Component[] children = getComponents();
-
-    // paintingTile becomes true just before we start painting the component's
-    // children.
-    paintingTile = true;
-    for (int i = children.length - 1; i >= 0; i--) //children.length; i++)
+    boolean obscured = false;
+    for (int j = i - 1; j >= 0 && ! obscured; j--)
       {
-        // paintingTile must be set to false before we begin to start painting
-        // the last tile.
-        if (i == children.length - 1)
-          paintingTile = false;
-
-        if (!children[i].isVisible())
-          continue;
-
-        Rectangle bounds = children[i].getBounds(rectCache);
-        Rectangle oldClip = g.getClipBounds();
-        if (oldClip == null)
-          oldClip = bounds;
-
-        if (!g.hitClip(bounds.x, bounds.y, bounds.width, bounds.height))
-          continue;
-
-        boolean translated = false;
-        Graphics g2 = g.create(bounds.x, bounds.y, bounds.width,
-                               bounds.height);
-        children[i].paint(g2);
-        g2.dispose();
+        Component sibl = getComponent(j);
+        if (sibl.isVisible())
+          {
+            Rectangle rect = sibl.getBounds(rectCache);
+            if (!(x + w <= rect.x)
+                  || (y + h <= rect.y)
+                  || (x >= rect.x + rect.width)
+                  || (y >= rect.y + rect.height))
+              obscured = true;
+          }
       }
-    g.setClip(originalClip);
+    return obscured;
   }
 
   /**
@@ -2064,13 +2054,16 @@ public abstract class JComponent extends Container implements Serializable
   {
     if (ui != null)
       {
-        Graphics g2 = g;
-        if (!(g instanceof Graphics2D))
-          g2 = g.create();
+        Graphics g2 = g.create();
+        try
+          {
         ui.update(g2, this);
-        if (!(g instanceof Graphics2D))
+          }
+        finally
+          {
           g2.dispose();
       }
+  }
   }
 
   /**
@@ -2084,7 +2077,26 @@ public abstract class JComponent extends Container implements Serializable
    */
   public void paintImmediately(int x, int y, int w, int h)
   {
-    paintImmediately(new Rectangle(x, y, w, h));
+    // Find opaque parent and call paintImmediately2() on it.
+    if (isShowing())
+      {
+        Component c = this;
+        Component p;
+        while (c != null && ! c.isOpaque())
+          {
+            p = c.getParent();
+            if (p != null)
+              {
+                x += c.getX();
+                y += c.getY();
+                c = p;
+              }
+          }
+        if (c instanceof JComponent)
+          ((JComponent) c).paintImmediately2(x, y, w, h);
+        else
+          c.repaint(x, y, w, h);
+      }
   }
 
   /**
@@ -2107,101 +2119,266 @@ public abstract class JComponent extends Container implements Serializable
    */
   public void paintImmediately(Rectangle r)
   {
-    // Try to find a root pane for this component.
-    //Component root = findPaintRoot(r);
-    Component root = findPaintRoot(r);
-    // If no paint root is found, then this component is completely overlapped
-    // by another component and we don't need repainting.
-    if (root == null)
-      return;
-    if (root == null || !root.isShowing())
-      return;
-
-    Rectangle rootClip = SwingUtilities.convertRectangle(this, r, root);
-    if (root instanceof JComponent)
-      ((JComponent) root).paintImmediately2(rootClip);
-    else
-      root.repaint(rootClip.x, rootClip.y, rootClip.width, rootClip.height);
+    paintImmediately(r.x, r.y, r.width, r.height);
   }
 
   /**
    * Performs the actual work of paintImmediatly on the repaint root.
    *
-   * @param r the area to be repainted
+   * @param x the area to be repainted, X coordinate
+   * @param y the area to be repainted, Y coordinate
    */
-  void paintImmediately2(Rectangle r)
+  void paintImmediately2(int x, int y, int w, int h)
   {
+    // Optimization for components that are always painted on top.
+    boolean onTop = onTop() && isOpaque();
+
+    // Fetch the RepaintManager.
     RepaintManager rm = RepaintManager.currentManager(this);
-    if (rm.isDoubleBufferingEnabled() && isDoubleBuffered())
-      paintDoubleBuffered(r);
+
+    // The painting clip;
+    int paintX = x;
+    int paintY = y;
+    int paintW = w;
+    int paintH = h;
+
+    // If we should paint buffered or not.
+    boolean haveBuffer = false;
+
+    // The component that is finally triggered for painting.
+    JComponent paintRoot = this;
+    
+    // Stores the component and all its parents. This will be used to limit
+    // the actually painted components in paintChildren by setting
+    // the field paintChild.
+    int pIndex = -1;
+    int pCount = 0;
+    ArrayList components = new ArrayList();
+
+    // Offset to subtract from the paintRoot rectangle when painting.
+    int offsX = 0;
+    int offsY = 0;
+
+    // The current component and its child.
+    Component child;
+    Container c;
+
+    // Find appropriate paint root.
+    for (c = this, child = null;
+         c != null && ! (c instanceof Window) && ! (c instanceof Applet);
+         child = c, c = c.getParent())
+      {
+        JComponent jc = c instanceof JComponent ? (JComponent) c : null;
+        components.add(c);
+        if (! onTop && jc != null  && ! jc.isOptimizedDrawingEnabled())
+          {
+            // Indicates whether we reset the paint root to be the current
+            // component.
+            boolean updatePaintRoot = false;
+
+            // Check obscured state of the child.
+            // Generally, we have 3 cases here:
+            // 1. Not obscured. No need to paint from the parent.
+            // 2. Partially obscured. Paint from the parent.
+            // 3. Completely obscured. No need to paint anything.
+            if (c != this)
+              {
+                if (jc.isPaintRoot())
+                  updatePaintRoot = true;
     else
-      paintSimple(r);
+                  {
+                    int count = c.getComponentCount();
+                    int i = 0;
+                    for (; i < count && c.getComponent(i) != child; i++)
+                      ;
+
+                    if (jc.isCompletelyObscured(i, paintX, paintY, paintW,
+                                                paintH))
+                      return; // No need to paint anything.
+                    else if (jc.isPartiallyObscured(i, paintX, paintY, paintW,
+                                                    paintH))
+                      updatePaintRoot = true;
+                      
+                  }
+              }
+            if (updatePaintRoot)
+              {
+                // Paint from parent.
+                paintRoot = jc;
+                pIndex = pCount;
+                offsX = 0;
+                offsY = 0;
+                haveBuffer = false;
+              }
+          }
+        pCount++;
+        // Check if component is double buffered.
+        if (rm.isDoubleBufferingEnabled() && jc != null
+            && jc.isDoubleBuffered())
+          {
+            haveBuffer = true;
+          }
+
+        // Clip the paint region with the parent.
+        if (! onTop)
+          {
+            paintX = Math.max(0, paintX);
+            paintY = Math.max(0, paintY);
+            paintW = Math.min(c.getWidth(), paintW + paintX) - paintX;
+            paintH = Math.min(c.getHeight(), paintH + paintY) - paintY;
+            int dx = c.getX();
+            int dy = c.getY();
+            paintX += dx;
+            paintY += dy;
+            offsX += dx;
+            offsY += dy;
+          }
+      }
+    if (c != null && c.getPeer() != null && paintW > 0 && paintH > 0)
+      {
+        isRepainting = true;
+        paintX -= offsX;
+        paintY -= offsY;
+
+        // Set the painting path so that paintChildren paints only what we
+        // want.
+        if (paintRoot != this)
+          {
+            for (int i = pIndex; i > 0; i--)
+              {
+                Component paintParent = (Component) components.get(i);
+                if (paintParent instanceof JComponent)
+                  ((JComponent) paintParent).paintChild =
+                    (Component) components.get(i - 1);
+              }
+          }
+
+        // Actually trigger painting.
+        if (haveBuffer)
+          paintRoot.paintDoubleBuffered(paintX, paintY, paintW, paintH);
+        else
+          {
+            Graphics g = paintRoot.getGraphics();
+            try
+              {
+                g.setClip(paintX, paintY, paintW, paintH);
+                paintRoot.paint(g);
+              }
+            finally
+              {
+                g.dispose();
+              }
+          }
+
+        // Reset the painting path.
+        if (paintRoot != this)
+          {
+            for (int i = pIndex; i > 0; i--)
+              {
+                Component paintParent = (Component) components.get(i);
+                if (paintParent instanceof JComponent)
+                  ((JComponent) paintParent).paintChild = null;
+              }
+          }
+
+        isRepainting = false;
+      }
   }
 
   /**
-   * Gets the root of the component given. If a parent of the 
-   * component is an instance of Applet, then the applet is 
-   * returned. The applet is considered the root for painting
-   * and adding/removing components. Otherwise, the root Window
-   * is returned if it exists.
+   * Returns <code>true</code> if the component is guaranteed to be painted
+   * on top of others. This returns false by default and is overridden by
+   * components like JMenuItem, JPopupMenu and JToolTip to return true for
+   * added efficiency.
    * 
-   * @param comp - The component to get the root for.
-   * @return the parent root. An applet if it is a parent,
-   * or the root window. If neither exist, null is returned.
+   * @return <code>true</code> if the component is guaranteed to be painted
+   *         on top of others
    */
-  private Component getRoot(Component comp)
+  boolean onTop()
   {
-      Applet app = null;
-      
-      while (comp != null)
-        {
-          if (app == null && comp instanceof Window)
-            return comp;
-          else if (comp instanceof Applet)
-            app = (Applet) comp;
-          comp = comp.getParent();
+    return false;
         }
       
-      return app;
+  /**
+   * This returns true when a component needs to force itself as a paint
+   * origin. This is used for example in JViewport to make sure that it
+   * gets to update its backbuffer.
+   *
+   * @return true when a component needs to force itself as a paint
+   *         origin
+   */
+  boolean isPaintRoot()
+  {
+    return false;
   }
   
   /**
    * Performs double buffered repainting.
    */
-  private void paintDoubleBuffered(Rectangle r)
+  private void paintDoubleBuffered(int x, int y, int w, int h)
   {
     RepaintManager rm = RepaintManager.currentManager(this);
 
     // Paint on the offscreen buffer.
-    Component root = getRoot(this);
+    Component root = SwingUtilities.getRoot(this);
     Image buffer = rm.getVolatileOffscreenBuffer(this, root.getWidth(),
                                          root.getHeight());
+
     // The volatile offscreen buffer may be null when that's not supported
     // by the AWT backend. Fall back to normal backbuffer in this case.
     if (buffer == null)
       buffer = rm.getOffscreenBuffer(this, root.getWidth(), root.getHeight());
 
     //Rectangle targetClip = SwingUtilities.convertRectangle(this, r, root);
-    Point translation = SwingUtilities.convertPoint(this, 0, 0, root);
         Graphics g2 = buffer.getGraphics();
-    g2.translate(translation.x, translation.y);
-        g2.setClip(r.x, r.y, r.width, r.height);
+    clipAndTranslateGraphics(root, this, g2);
+    g2.clipRect(x, y, w, h);
     g2 = getComponentGraphics(g2);
-        isPaintingDoubleBuffered = true;
+    paintingDoubleBuffered = true;
     try
       {
+        if (isRepainting) // Called from paintImmediately, go through paint().
         paint(g2);
+        else // Called from paint() (AWT refresh), don't call it again.
+          {
+            paintComponent(g2);
+            paintBorder(g2);
+            paintChildren(g2);
+          }
       }
     finally
       {
-        isPaintingDoubleBuffered = false;
+        paintingDoubleBuffered = false;
         g2.dispose();
       }
 
         // Paint the buffer contents on screen.
-    rm.commitBuffer(root, new Rectangle(translation.x + r.x,
-                                        translation.y + r.y, r.width,
-                                        r.height));
+    rm.commitBuffer(this, x, y, w, h);
+  }
+
+  /**
+   * Clips and translates the Graphics instance for painting on the double
+   * buffer. This has to be done, so that it reflects the component clip of the
+   * target component.
+   *
+   * @param root the root component (top-level container usually)
+   * @param target the component to be painted
+   * @param g the Graphics instance
+   */
+  private void clipAndTranslateGraphics(Component root, Component target,
+                                        Graphics g)
+  {
+    Component parent = target;
+    int deltaX = 0;
+    int deltaY = 0;
+    while (parent != root)
+      {
+        deltaX += parent.getX();
+        deltaY += parent.getY();
+        parent = parent.getParent();
+      }
+    g.translate(deltaX, deltaY);
+    g.clipRect(0, 0, target.getWidth(), target.getHeight());
       }
 
   /**
@@ -2251,6 +2428,12 @@ public abstract class JComponent extends Container implements Serializable
    * A variant of {@link
    * #registerKeyboardAction(ActionListener,String,KeyStroke,int)} which
    * provides <code>null</code> for the command name.   
+   * 
+   * @param act  the action listener to notify when the keystroke occurs.
+   * @param stroke  the key stroke.
+   * @param cond  the condition (one of {@link #WHEN_FOCUSED}, 
+   *     {@link #WHEN_IN_FOCUSED_WINDOW} and 
+   *     {@link #WHEN_ANCESTOR_OF_FOCUSED_COMPONENT}).
    */
   public void registerKeyboardAction(ActionListener act,
                                      KeyStroke stroke, 
@@ -2327,9 +2510,22 @@ public abstract class JComponent extends Container implements Serializable
                                      KeyStroke stroke, 
                                      int cond)
   {
-    getInputMap(cond).put(stroke, new ActionListenerProxy(act, cmd));
+    ActionListenerProxy proxy = new ActionListenerProxy(act, cmd);
+    getInputMap(cond).put(stroke, proxy);
+    getActionMap().put(proxy, proxy);
   }
 
+  /**
+   * Sets the input map for the given condition.
+   * 
+   * @param condition  the condition (one of {@link #WHEN_FOCUSED}, 
+   *     {@link #WHEN_IN_FOCUSED_WINDOW} and 
+   *     {@link #WHEN_ANCESTOR_OF_FOCUSED_COMPONENT}).
+   * @param map  the map.
+   * 
+   * @throws IllegalArgumentException if <code>condition</code> is not one of
+   *     the specified values.
+   */
   public final void setInputMap(int condition, InputMap map)
   {
     enableEvents(AWTEvent.KEY_EVENT_MASK);
@@ -2465,13 +2661,17 @@ public abstract class JComponent extends Container implements Serializable
    */
   public ActionListener getActionForKeyStroke(KeyStroke ks)
   {
-    Object cmd = getInputMap().get(ks);
-    if (cmd != null)
+    Object key = getInputMap(JComponent.WHEN_FOCUSED).get(ks);
+    if (key == null)
+      key = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).get(ks);
+    if (key == null)
+      key = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).get(ks);
+    if (key != null)
       {
-        if (cmd instanceof ActionListenerProxy)
-          return (ActionListenerProxy) cmd;
-        else if (cmd instanceof String)
-          return getActionMap().get(cmd);
+        if (key instanceof ActionListenerProxy)
+          return ((ActionListenerProxy) key).target;
+        else
+          return getActionMap().get(key);
       }
     return null;
   }
@@ -2570,20 +2770,37 @@ public abstract class JComponent extends Container implements Serializable
     if (isEnabled())
       {
         Action act = null;
+        Object cmd = null;
         InputMap map = getInputMap(condition);
         if (map != null)
           {
-            Object cmd = map.get(ks);
+            cmd = map.get(ks);
             if (cmd != null)
               {
                 if (cmd instanceof ActionListenerProxy)
                   act = (Action) cmd;
                 else 
-                  act = (Action) getActionMap().get(cmd);
+                  act = getActionMap().get(cmd);
               }
           }
         if (act != null && act.isEnabled())
-          return SwingUtilities.notifyAction(act, ks, e, this, e.getModifiers());
+          {
+            // Need to synchronize here so we don't get in trouble with
+            // our __command__ hack.
+            synchronized (act)
+              {
+                // We add the command as value to the action, so that
+                // the action can later determine the command with which it
+                // was called. This is undocumented, but shouldn't affect
+                // compatibility. It allows us to use only one Action instance
+                // to do the work for all components of one type, instead of
+                // having loads of small Actions. This effectivly saves startup
+                // time of Swing.
+                act.putValue("__command__", cmd);
+                return SwingUtilities.notifyAction(act, ks, e, this,
+                                                   e.getModifiers());
+              }
+          }
       }
     return false;
   }
@@ -2685,6 +2902,11 @@ public abstract class JComponent extends Container implements Serializable
    */
   public void revalidate()
   {
+    // As long as we don't have a parent we don't need to do any layout, since
+    // this is done anyway as soon as we get connected to a parent.
+    if (getParent() == null)
+      return;
+
     if (! EventQueue.isDispatchThread())
       SwingUtilities.invokeLater(new Runnable()
         {
@@ -2708,9 +2930,25 @@ public abstract class JComponent extends Container implements Serializable
    */
   public void scrollRectToVisible(Rectangle r)
   {
-    Component p = getParent();
-    if (p instanceof JComponent)
-      ((JComponent) p).scrollRectToVisible(r);
+    // Search nearest JComponent.
+    int xOffs = getX();
+    int yOffs = getY();
+    Component p;
+    for (p = getParent(); p != null && ! (p instanceof JComponent);
+         p = p.getParent())
+      {
+        xOffs += p.getX();
+        yOffs += p.getY();
+      }
+    if (p != null)
+      {
+        r.x += xOffs;
+        r.y += yOffs;
+        JComponent jParent = (JComponent) p;
+        jParent.scrollRectToVisible(r);
+        r.x -= xOffs;
+        r.y -= yOffs;
+      }
   }
 
   /**
@@ -2826,57 +3064,6 @@ public abstract class JComponent extends Container implements Serializable
       return;
     super.setForeground(fg);
     repaint();
-  }
-
-  /**
-   * Set the value of the {@link #maximumSize} property. The passed value is
-   * copied, the later direct changes on the argument have no effect on the
-   * property value.
-   *
-   * @param max The new value of the property
-   */
-  public void setMaximumSize(Dimension max)
-  {
-    Dimension oldMaximumSize = maximumSize;
-    if (max != null) 
-    maximumSize = new Dimension(max);
-    else
-      maximumSize = null;
-    firePropertyChange("maximumSize", oldMaximumSize, maximumSize);
-  }
-
-  /**
-   * Set the value of the {@link #minimumSize} property. The passed value is
-   * copied, the later direct changes on the argument have no effect on the
-   * property value.
-   *
-   * @param min The new value of the property
-   */
-  public void setMinimumSize(Dimension min)
-  {
-    Dimension oldMinimumSize = minimumSize;
-    if (min != null)
-    minimumSize = new Dimension(min);
-    else
-      minimumSize = null;
-    firePropertyChange("minimumSize", oldMinimumSize, minimumSize);
-  }
-
-  /**
-   * Set the value of the {@link #preferredSize} property. The passed value is
-   * copied, the later direct changes on the argument have no effect on the
-   * property value.
-   *
-   * @param pref The new value of the property
-   */
-  public void setPreferredSize(Dimension pref)
-  {
-    Dimension oldPreferredSize = preferredSize;
-    if (pref != null)
-    preferredSize = new Dimension(pref);
-    else
-      preferredSize = null;
-    firePropertyChange("preferredSize", oldPreferredSize, preferredSize);
   }
 
   /**
@@ -3068,11 +3255,29 @@ public abstract class JComponent extends Container implements Serializable
     // Nothing to do here.
   }
 
+  /**
+   * Returns the locale used as the default for all new components.  The 
+   * default value is {@link Locale#getDefault()} (that is, the platform
+   * default locale).
+   * 
+   * @return The locale (never <code>null</code>).
+   * 
+   * @see #setDefaultLocale(Locale)
+   */
   public static Locale getDefaultLocale()
   {
+    if (defaultLocale == null)
+      defaultLocale = Locale.getDefault();
     return defaultLocale;
   }
   
+  /**
+   * Sets the locale to be used as the default for all new components.  If this
+   * is set to <code>null</code>, the {@link #getDefaultLocale()} method will
+   * return the platform default locale.
+   * 
+   * @param l  the locale (<code>null</code> permitted).
+   */
   public static void setDefaultLocale(Locale l)
   {
     defaultLocale = l;
@@ -3510,140 +3715,17 @@ public abstract class JComponent extends Container implements Serializable
           }
       }
     // Dispatch event to all children.
-    Component[] children = getComponents();
-    for (int i = 0; i < children.length; i++)
+    int numChildren = getComponentCount();
+    for (int i = 0; i < numChildren; i++)
       {
-        if (!(children[i] instanceof JComponent))
+        Component child = getComponent(i);
+        if (! (child instanceof JComponent))
           continue;
-        JComponent jc = (JComponent) children[i];
+        JComponent jc = (JComponent) child;
         jc.fireAncestorEvent(ancestor, id);
       }
   }
 
-  /**
-   * Finds a suitable paint root for painting this component. This method first
-   * checks if this component is overlapped using
-   * {@link #findOverlapFreeParent(Rectangle)}. The returned paint root is then
-   * feeded to {@link #findOpaqueParent(Component)} to find the nearest opaque
-   * component for this paint root. If no paint is necessary, then we return
-   * <code>null</code>.
-   *
-   * @param c the clip of this component
-   *
-   * @return the paint root or <code>null</code> if no painting is necessary
-   */
-  private Component findPaintRoot(Rectangle c)
-  {
-    Component p = findOverlapFreeParent(c);
-    if (p == null)
-      return null;
-    Component root = findOpaqueParent(p);
-    return root;
-  }
-
-  /**
-   * Scans the containment hierarchy upwards for components that overlap the
-   * this component in the specified clip. This method returns
-   * <code>this</code>, if no component overlaps this component. It returns
-   * <code>null</code> if another component completely covers this component
-   * in the specified clip (no repaint necessary). If another component partly
-   * overlaps this component in the specified clip, then the parent of this
-   * component is returned (this is the component that must be used as repaint
-   * root). For efficient lookup, the method
-   * {@link #isOptimizedDrawingEnabled()} is used.
-   *
-   * @param clip the clip of this component
-   *
-   * @return the paint root, or <code>null</code> if no paint is necessary
-   */
-  private Component findOverlapFreeParent(Rectangle clip)
-  {
-    Rectangle currentClip = clip;
-    Component found = this;
-    Container parent = this; 
-
-    while (parent != null && !(parent instanceof Window))
-      {
-        Container newParent = parent.getParent();
-        if (newParent == null || newParent instanceof Window)
-          break;
-        // If the parent is optimizedDrawingEnabled, then its children are
-        // tiled and cannot have an overlapping child. Go directly to next
-        // parent.
-        if ((newParent instanceof JComponent
-            && ((JComponent) newParent).isOptimizedDrawingEnabled()))
-          
-          {
-            parent = newParent;
-            continue;
-          }
-
-        // If the parent is not optimizedDrawingEnabled, we must check if the
-        // parent or some neighbor overlaps the current clip.
-
-        // This is the current clip converted to the parent's coordinate
-        // system. TODO: We can do this more efficiently by succesively
-        // cumulating the parent-child translations.
-        Rectangle target = SwingUtilities.convertRectangle(found,
-                                                           currentClip,
-                                                           newParent);
-
-        // We have an overlap if either:
-        // - The new parent itself doesn't completely cover the clip
-        //   (this can be the case with viewports).
-        // - If some higher-level (than the current) children of the new parent
-        //   intersect the target rectangle.
-        Rectangle parentRect = SwingUtilities.getLocalBounds(newParent);
-        boolean haveOverlap =
-          ! SwingUtilities.isRectangleContainingRectangle(parentRect, target);
-        if (! haveOverlap)
-          {
-            Component[] children = newParent.getComponents();
-            for (int i = 0; children[i] != parent && !haveOverlap; i++)
-              {
-                Rectangle childRect = children[i].getBounds();
-                haveOverlap = target.intersects(childRect);
-              }
-          }
-        if (haveOverlap)
-          {
-                found = newParent;
-                currentClip = target;
-          }
-        parent = newParent;
-      }
-    //System.err.println("overlapfree parent: " + found);
-    return found;
-  }
-
-  /**
-   * Finds the nearest component to <code>c</code> (upwards in the containment
-   * hierarchy), that is opaque. If <code>c</code> itself is opaque,
-   * this returns <code>c</code> itself.
-   *
-   * @param c the start component for the search
-   * @return the nearest component to <code>c</code> (upwards in the containment
-   *         hierarchy), that is opaque; If <code>c</code> itself is opaque,
-   *         this returns <code>c</code> itself
-   */
-  private Component findOpaqueParent(Component c)
-  {
-    Component found = c;
-    while (true)
-      {
-        if ((found instanceof JComponent) && ((JComponent) found).isOpaque())
-          break;
-        else if (!(found instanceof JComponent))
-          break;
-        Container p = found.getParent();
-        if (p == null)
-          break;
-        else
-          found = p;
-      }
-    return found;
-  }
-  
   /**
    * This is the method that gets called when the WHEN_IN_FOCUSED_WINDOW map
    * is changed.
