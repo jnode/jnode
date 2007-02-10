@@ -63,7 +63,7 @@
     <property name="gnu-crypto.jar" value="${root.dir}/core/lib/gnu-crypto.jar"/>
     <property name="javax-crypto.jar" value="${root.dir}/core/lib/javax-crypto.jar"/>
     <!-- property name="javax-security.jar" value="${root.dir}/core/lib/javax-security.jar" / -->
-    <property name="beanshell.jar" value="${root.dir}/shell/lib/bsh-2.0b1.jar"/>
+    <property name="beanshell.jar" value="${root.dir}/shell/lib/bsh-2.0b4.jar"/>
 
     <!-- libraries needed to check plugin dependencies -->
     <property name="bcel-5.1.jar" value="${root.dir}/builder/lib/bcel-5.1.jar" />	
