@@ -19,7 +19,7 @@
   </runtime>
 
   <extension point="org.jnode.shell.aliases">
-    <alias name="bsh" class="org.jnode.shell.command.bsh.BeanshellCommand"/>
+    <alias name="bsh" class="org.jnode.shell.command.bsh.BshCommand"/>
   </extension>
 
   <extension point="org.jnode.security.permissions">
