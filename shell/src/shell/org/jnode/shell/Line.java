@@ -213,7 +213,7 @@ class Line {
         	}
         }
         
-        final int columnWidth = maxWidth + separatorWidth;
+        final int columnWidth = Math.min(SCREEN_WIDTH, maxWidth + separatorWidth);
         final int nbColumns = SCREEN_WIDTH / columnWidth;
         final boolean lastLineIsFull = ((items.length % nbColumns) == 0);
         final int nbLines = (items.length / nbColumns) + (lastLineIsFull ? 0 : 1);
