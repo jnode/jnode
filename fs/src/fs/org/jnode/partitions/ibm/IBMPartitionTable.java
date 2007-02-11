@@ -24,6 +24,9 @@ package org.jnode.partitions.ibm;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -38,7 +41,7 @@ import org.jnode.partitions.PartitionTableType;
 /**
  * @author epr
  */
-public class IBMPartitionTable implements PartitionTable {
+public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry> {
 
     /** The type of partition table */
     private final IBMPartitionTableType tableType;
@@ -66,9 +69,9 @@ public class IBMPartitionTable implements PartitionTable {
 	public IBMPartitionTable(IBMPartitionTableType tableType, byte[] bootSector, Device device) {
 		//this.bootSector = bootSector;
         this.tableType = tableType;
-		this.partitions = new IBMPartitionTableEntry[4];
 		this.drivedDevice = device;
 		if(containsPartitionTable(bootSector)) {
+			this.partitions = new IBMPartitionTableEntry[4];
 			for (int partNr = 0; partNr < partitions.length ;  partNr++) {
 				log.debug("try part "+ partNr);
 				partitions[partNr] = new IBMPartitionTableEntry(this, bootSector, partNr);
@@ -78,6 +81,10 @@ public class IBMPartitionTable implements PartitionTable {
 					handleExtended(partitions[partNr]);
 				}
 			}
+		}
+		else
+		{
+			partitions = null;
 		}
 	}
 	
@@ -142,19 +149,25 @@ public class IBMPartitionTable implements PartitionTable {
 		return true;
 	}
 	
-	/**
-	 * Gets the number of partitions in this table.
-	 */
-	public int getLength() {
-		return partitions.length; 
-	}
-	
-	/**
-	 * Gets a single entry.
-	 * @param partNr
-	 */
-	public PartitionTableEntry getEntry(int partNr) {
-		return partitions[partNr];
+	public Iterator<IBMPartitionTableEntry> iterator() {
+		return new Iterator<IBMPartitionTableEntry>()
+		{
+			private int index = 0;
+			private final int last = (partitions == null) ? 0 : 
+									 partitions.length - 1;
+			
+			public boolean hasNext() {
+				return index < last;
+			}
+
+			public IBMPartitionTableEntry next() {
+				return partitions[index++];
+			}
+
+			public void remove() {
+				throw new UnsupportedOperationException();
+			}			
+		};
 	}
 	
 	/**

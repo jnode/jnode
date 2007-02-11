@@ -33,14 +33,9 @@ import org.jnode.test.fs.filesystem.tests.TreeFSTest;
 public class FSTestSuite extends JFuncSuite
 {
 	public static void main(String[] args) throws Throwable {
-		//JFuncRunner.run(FSTestSuite.suite());
+		JFuncRunner.run(FSTestSuite.suite());
 		//JFuncRunner.main(new String[]{"-v", "--color", FSTestSuite.class.getName()});
-		JFuncRunner.main(new String[]{"-v", FSTestSuite.class.getName()});
-	}
-	
-	public FSTestSuite()
-	{
-		System.out.println("new FSTestSuite");
+		//JFuncRunner.main(new String[]{"-v", FSTestSuite.class.getName()});
 	}
 	
 	public static JFuncSuite suite() throws Throwable

@@ -55,7 +55,7 @@ public abstract class AbstractFSTest extends JFuncTestCase {
     
 	private FileSystem fs;
 	private FSTestConfig config;
-//	private Device device;
+	private Device device;
 	
 	public AbstractFSTest()
     {
@@ -68,19 +68,21 @@ public abstract class AbstractFSTest extends JFuncTestCase {
 	protected AbstractFSTest(String name)
 	{
         super(name);
-//		this.fs = null;	
-//		this.device = null;
 	}
 	
 	final protected void setUp(FSTestConfig config) throws NameNotFoundException, FileSystemException, IOException, InstantiationException, IllegalAccessException, Exception
 	{
+		super.setUp();
+		
 		this.config = config;
-		this.fs = config.getFileSystem().mount(config.getDeviceParam().getDevice());
+		this.device = config.getDeviceParam().createDevice();
+		this.fs = config.getFileSystem().mount(this.device);
 	}
 	
 	final public void tearDown() throws Exception
 	{
-		super.tearDown();
+		config.getDeviceParam().tearDown(device);
+		super.tearDown();				
 	}
 	
 //	/**

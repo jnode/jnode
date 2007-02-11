@@ -24,20 +24,22 @@ package org.jnode.driver.block;
 import java.io.IOException;
 
 import org.jnode.partitions.PartitionTable;
+import org.jnode.partitions.PartitionTableEntry;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class PartitionableBlockAlignmentSupport extends BlockAlignmentSupport
-        implements PartitionableBlockDeviceAPI {
+public class PartitionableBlockAlignmentSupport <PTE extends PartitionTableEntry>
+		extends BlockAlignmentSupport
+        implements PartitionableBlockDeviceAPI<PTE> {
 
-    private final PartitionableBlockDeviceAPI parentApi;
+    private final PartitionableBlockDeviceAPI<PTE> parentApi;
     
     /**
      * @param parentApi
      * @param alignment
      */
-    public PartitionableBlockAlignmentSupport(PartitionableBlockDeviceAPI parentApi, int alignment) {
+    public PartitionableBlockAlignmentSupport(PartitionableBlockDeviceAPI<PTE> parentApi, int alignment) {
         super(parentApi, alignment);
         this.parentApi = parentApi;
     }
@@ -54,7 +56,7 @@ public class PartitionableBlockAlignmentSupport extends BlockAlignmentSupport
      * @return Null if no partition table is found.
      * @throws IOException
      */
-    public PartitionTable getPartitionTable() throws IOException {
+    public PartitionTable<PTE> getPartitionTable() throws IOException {
         return parentApi.getPartitionTable();
     }
 }

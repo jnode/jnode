@@ -52,8 +52,10 @@ public class NTFSFileSystemType implements FileSystemType<NTFSFileSystem> {
             FSBlockDeviceAPI devApi) {
         if (pte instanceof IBMPartitionTableEntry) {
             IBMPartitionTableEntry iPte = (IBMPartitionTableEntry) pte;
-            if (iPte.getSystemIndicator() == IBMPartitionTypes.PARTTYPE_NTFS) { return new String(
-                    firstSector, 0x03, 8).startsWith(TAG); }
+            if (iPte.getSystemIndicator() == IBMPartitionTypes.PARTTYPE_NTFS) 
+            { 
+            	return new String(firstSector, 0x03, 8).startsWith(TAG); 
+            }
         }
         return false;
     }

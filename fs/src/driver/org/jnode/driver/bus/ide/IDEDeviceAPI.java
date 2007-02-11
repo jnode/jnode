@@ -22,10 +22,12 @@
 package org.jnode.driver.bus.ide;
 
 import org.jnode.driver.block.PartitionableBlockDeviceAPI;
+import org.jnode.partitions.PartitionTableEntry;
 
 /**
  * @author epr
  */
-public interface IDEDeviceAPI extends PartitionableBlockDeviceAPI {
+public interface IDEDeviceAPI <PTE extends PartitionTableEntry>
+	extends PartitionableBlockDeviceAPI<PTE> {
 	// nothing different
 }

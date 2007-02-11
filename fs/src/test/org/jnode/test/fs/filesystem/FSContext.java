@@ -37,7 +37,7 @@ public class FSContext extends Context
     {
         FSTestConfig cfg = (FSTestConfig) config;  
         deviceParam = cfg.getDeviceParam(); 
-        workDevice = deviceParam.getDevice();
+        workDevice = deviceParam.createDevice();
         
         cfg.getFileSystem().mount(workDevice);
     }

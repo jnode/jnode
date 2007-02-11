@@ -69,14 +69,16 @@ public class FatFileSystemType implements FileSystemType<FatFileSystem> {
 				return false;
 			}
 			final IBMPartitionTableEntry ipte = (IBMPartitionTableEntry)pte;
-			final int type = ipte.getSystemIndicator();
-			switch (type) {
-				case IBMPartitionTypes.PARTTYPE_DOS_FAT12 :
-				case IBMPartitionTypes.PARTTYPE_DOS_FAT16_LT32M :
-				case IBMPartitionTypes.PARTTYPE_DOS_FAT16_GT32M :
-					return true;
-				default :
-					return false;
+			final IBMPartitionTypes type = ipte.getSystemIndicator();
+			if((type == IBMPartitionTypes.PARTTYPE_DOS_FAT12) ||
+			   (type == IBMPartitionTypes.PARTTYPE_DOS_FAT16_LT32M) ||
+			   (type == IBMPartitionTypes.PARTTYPE_DOS_FAT16_GT32M) )
+			{
+				return true;
+			}
+			else
+			{
+				return false;
 			}
 
 		}

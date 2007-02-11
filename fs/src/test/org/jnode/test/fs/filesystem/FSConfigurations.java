@@ -15,14 +15,17 @@ import org.jnode.test.fs.filesystem.config.FileParam;
 import org.jnode.test.fs.filesystem.config.OsType;
 
 public class FSConfigurations implements Iterable<FSTestConfig> {
+    public static final boolean DO_FORMAT = true;
+    public static final boolean DO_NOT_FORMAT = false;
 
+	private List<FSTestConfig> configs = new ArrayList<FSTestConfig>();
+	
 	public Iterator<FSTestConfig> iterator() {
-		return getConfigs().iterator();
+		return configs.iterator();
 	}
 	
-    public static List<FSTestConfig> getConfigs()
+    public FSConfigurations()
     {
-        List<FSTestConfig> configs = new ArrayList<FSTestConfig>();
         String tempDir = System.getProperty("java.io.tmpdir");
 		final String diskFileName = tempDir + File.separatorChar + "diskimg.WRK";
 		
@@ -56,15 +59,9 @@ public class FSConfigurations implements Iterable<FSTestConfig> {
                 FSAccessMode.BOTH, null, DO_NOT_FORMAT));
         //<workRamdisk size="1M" />
 */
-        
-        return configs;
     }
     
-    public static final boolean DO_FORMAT = true;
-    public static final boolean DO_NOT_FORMAT = false;
-
-    
-    static private List<FSTestConfig> createFileConfigs(OsType osType, FSType fsType, 
+    private List<FSTestConfig> createFileConfigs(OsType osType, FSType fsType, 
             FSAccessMode accessMode, Object options, boolean format, String fileSize, String fileName)
     {
         FileParam fp = new FileParam(fileSize, fileName);
@@ -72,7 +69,7 @@ public class FSConfigurations implements Iterable<FSTestConfig> {
                 accessMode, options, format, fp);        
     }
     
-    static private List<FSTestConfig> createConfigs(OsType osType, FSType fsType, 
+    private List<FSTestConfig> createConfigs(OsType osType, FSType fsType, 
             FSAccessMode accessMode, Object options, boolean format, DeviceParam device)
     {
         List<FSTestConfig> configs = new ArrayList<FSTestConfig>();

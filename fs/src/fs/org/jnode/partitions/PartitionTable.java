@@ -24,21 +24,11 @@ package org.jnode.partitions;
 /**
  * @author epr
  */
-public interface PartitionTable {
+public interface PartitionTable <PTE extends PartitionTableEntry> 
+			extends Iterable<PTE> {
 	
     /**
      * Gets the type of this partition table
      */
     public PartitionTableType getType();
-    
-	/**
-	 * Gets the number of entries in this table
-	 */
-	public int getLength();
-	
-	/**
-	 * Gets the partition table entry at the given index.
-	 * @param index
-	 */
-	public PartitionTableEntry getEntry(int index);
 }

@@ -24,6 +24,7 @@ package org.jnode.driver.block;
 import java.io.IOException;
 
 import org.jnode.partitions.PartitionTable;
+import org.jnode.partitions.PartitionTableEntry;
 
 /**
  * This device API is implemented by block devices that
@@ -31,7 +32,9 @@ import org.jnode.partitions.PartitionTable;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public interface PartitionableBlockDeviceAPI extends BlockDeviceAPI {
+public interface PartitionableBlockDeviceAPI 
+		<PTE extends PartitionTableEntry> 
+		extends BlockDeviceAPI {
 
     /**
      * Gets the sector size for this device.
@@ -45,5 +48,5 @@ public interface PartitionableBlockDeviceAPI extends BlockDeviceAPI {
      * @return Null if no partition table is found.
      * @throws IOException
      */
-    public PartitionTable getPartitionTable() throws IOException;
+    public PartitionTable<PTE> getPartitionTable() throws IOException;
 }

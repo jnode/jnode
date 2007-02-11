@@ -356,6 +356,11 @@ public class BootSector {
 		return dirty;
 	}
 
+	public int getNbPartitions()
+	{
+		return partitions.length; 
+	}
+	
 	public synchronized IBMPartitionTableEntry getPartition(int partNr) {
 		if (partitions[partNr] == null) {
 			partitions[partNr] = new IBMPartitionTableEntry(null, data, partNr);

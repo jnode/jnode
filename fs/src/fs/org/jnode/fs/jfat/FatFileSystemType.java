@@ -43,18 +43,18 @@ public class FatFileSystemType implements FileSystemType {
 		return false;
 
 	    final IBMPartitionTableEntry ipte =
-		(IBMPartitionTableEntry)pte;
+	    				(IBMPartitionTableEntry)pte;
 
-	    final int type = ipte.getSystemIndicator();
-
-	    switch ( type ) {
-	    case IBMPartitionTypes.PARTTYPE_WIN95_FAT32:
-	    case IBMPartitionTypes.PARTTYPE_WIN95_FAT32_LBA:
-		return true;
-		
-	    default:
-		return false;
-	    }
+		final IBMPartitionTypes type = ipte.getSystemIndicator();
+		if((type == IBMPartitionTypes.PARTTYPE_WIN95_FAT32) ||
+		   (type == IBMPartitionTypes.PARTTYPE_WIN95_FAT32_LBA) )
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	return false;
