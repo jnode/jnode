@@ -48,7 +48,7 @@ public class FileParam extends DeviceParam
 	/**
 	 * 
 	 */
-	public Device getDevice() throws IOException
+	public Device createDevice() throws IOException
 	{
 		String mode = isInput() ? "r" : "rw";
 		if(!isInput() && (fileSize > 0L) && (!file.exists() || (file.length() != fileSize)))

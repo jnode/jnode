@@ -63,6 +63,16 @@
   <target name="clean">
   	<jnode.clean/>
   </target>
+	
+<!-- tests FileSystems -->
+	<target name="tests" depends="compile" description="Run FS tests with JUnit">
+	  <junit fork="yes" haltonerror="false" haltonfailure="false" printsummary="on" includeantruntime="true">
+	    <classpath refid="cp-jnode" />
+			  	
+	    <formatter type="plain" usefile="false" />
+	    <test name="org.jnode.test.fs.AllFSTest" />
+	  </junit>
+	</target>			
 </project>
 
 

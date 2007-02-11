@@ -41,7 +41,7 @@ public class ResourceParam extends DeviceParam
 	/**
 	 * 
 	 */
-	public Device getDevice() throws IOException
+	public Device createDevice() throws IOException
 	{
 		return new FileDevice(file, "r");
 	}

@@ -46,7 +46,7 @@ public class JNodeDeviceParam extends DeviceParam {
     /**
      *  
      */
-    public Device getDevice() throws Exception {
+    public Device createDevice() throws Exception {
         return lookupDevice();
     }
 

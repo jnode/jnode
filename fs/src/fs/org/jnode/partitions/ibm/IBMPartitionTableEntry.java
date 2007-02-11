@@ -54,7 +54,7 @@ public class IBMPartitionTableEntry implements PartitionTableEntry {
 	/**
      * @see org.jnode.partitions.PartitionTableEntry#getChildPartitionTable()
      */
-    public PartitionTable getChildPartitionTable() {
+    public IBMPartitionTable getChildPartitionTable() {
         throw new Error("Not implemented yet");
     }
 
@@ -71,7 +71,7 @@ public class IBMPartitionTableEntry implements PartitionTableEntry {
 	
 
 	public boolean isExtended() {
-		final int id = getSystemIndicator();
+		final IBMPartitionTypes id = getSystemIndicator();
 		//pgwiasda
 		//there are more than one type of extended Partitions
 		return (id == IBMPartitionTypes.PARTTYPE_WIN95_FAT32_EXTENDED ||
@@ -105,12 +105,12 @@ public class IBMPartitionTableEntry implements PartitionTableEntry {
 		LittleEndian.setInt8(bs, ofs+3, chs.getCylinder() & 0xFF);
 	}
 
-	public int getSystemIndicator() {
-		return LittleEndian.getUInt8(bs, ofs+4);
+	public IBMPartitionTypes getSystemIndicator() {		
+		return IBMPartitionTypes.valueOf(LittleEndian.getUInt8(bs, ofs+4));
 	}
 
-	public void setSystemIndicator(int v) {
-		LittleEndian.setInt8(bs, ofs+4, v);
+	public void setSystemIndicator(IBMPartitionTypes type) {
+		LittleEndian.setInt8(bs, ofs+4, type.getCode());
 	}
 
 	public CHS getEndCHS() {
@@ -171,7 +171,7 @@ public class IBMPartitionTableEntry implements PartitionTableEntry {
 		
 		b.append(getBootIndicator() ? 'A' : ' ');
 		b.append(' ');
-		b.append(NumberUtils.hex(getSystemIndicator(), 2));
+		b.append(NumberUtils.hex(getSystemIndicator().getCode(), 2));
 		b.append(' ');
 		b.append("s:"+getStartLba());
 		b.append(' ');

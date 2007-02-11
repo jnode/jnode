@@ -52,11 +52,9 @@ import org.jnode.driver.bus.ide.IDEDriverUtils;
 import org.jnode.driver.bus.ide.command.IDEReadSectorsCommand;
 import org.jnode.driver.bus.ide.command.IDEWriteSectorsCommand;
 import org.jnode.naming.InitialNaming;
-import org.jnode.partitions.PartitionTable;
 import org.jnode.partitions.ibm.IBMPartitionTable;
 import org.jnode.partitions.ibm.IBMPartitionTableEntry;
 import org.jnode.system.BootLog;
-import org.jnode.util.ByteBufferUtils;
 import org.jnode.util.TimeoutException;
 
 /**
@@ -64,7 +62,8 @@ import org.jnode.util.TimeoutException;
  * 
  * @author epr
  */
-public class IDEDiskDriver extends Driver implements IDEDeviceAPI, IDEConstants {
+public class IDEDiskDriver extends Driver 
+		implements IDEDeviceAPI<IBMPartitionTableEntry>, IDEConstants {
 
 	/** My logger */
 	private static final Logger log = Logger.getLogger(IDEDiskDriver.class);
@@ -115,35 +114,23 @@ public class IDEDiskDriver extends Driver implements IDEDeviceAPI, IDEConstants 
 			this.pt = factory.createIBMPartitionTable(bs, dev);
 						
 			int partIndex = 0;
-			final int max = pt.getLength();
-			for (int i = 0; i < max; i++) {
-				final IBMPartitionTableEntry pte = (IBMPartitionTableEntry)pt.getEntry(i);
+			int i = 0;
+			for (IBMPartitionTableEntry pte : pt) {
                 if(pte == null)
                 {
                     BootLog.warn("PartitionTableEntry #"+i+" is null");
                 }
                 else if (pte.isValid()) {
 					if (pte.isExtended()) {
-						//now we should have an filled vector in the pt
-						final List<IBMPartitionTableEntry> extendedPartitions  = pt.getExtendedPartitions();
-						log.info("Have "+ extendedPartitions.size()+ " Extended partitions found");
-						
-						for(int iPart = 0 ; iPart < extendedPartitions.size() ; iPart++)
-						{
-							IBMPartitionTableEntry pteExt = 
-								extendedPartitions.get(iPart);
-							registerPartition(devMan, dev, pteExt, partIndex);
-							
-							if(iPart < (extendedPartitions.size() -1))
-								partIndex++;
-						}
-						
+						// Create partition devices for the extended partition
+						partIndex = registerExtendedPartition(devMan, dev, partIndex);
 					} else {
 						// Create a partition device.
 						registerPartition(devMan, dev, pte, partIndex);
 					}
 				}
 				partIndex++;
+				i++;
 			}
 		} catch (DeviceAlreadyRegisteredException ex) {
 			throw new DriverException("Partition device is already known???? Probably a bug", ex);
@@ -314,6 +301,34 @@ public class IDEDiskDriver extends Driver implements IDEDeviceAPI, IDEConstants 
 		pdev.setDriver(new IDEDiskPartitionDriver());
 		devMan.register(pdev);
 	}
+	
+	/**
+	 * register all the partitions included in the extended partition
+	 * @param devMan
+	 * @param dev
+	 * @param partIndex
+	 * @return
+	 * @throws DeviceAlreadyRegisteredException
+	 * @throws DriverException
+	 */
+	private int registerExtendedPartition(DeviceManager devMan, IDEDevice dev, 
+			int partIndex) throws DeviceAlreadyRegisteredException, DriverException
+	{
+		//now we should have an filled vector in the pt
+		final List<IBMPartitionTableEntry> extendedPartitions  = pt.getExtendedPartitions();
+		log.info("Have "+ extendedPartitions.size()+ " Extended partitions found");
+		
+		for(int iPart = 0 ; iPart < extendedPartitions.size() ; iPart++)
+		{
+			IBMPartitionTableEntry pteExt = 
+				extendedPartitions.get(iPart);
+			registerPartition(devMan, dev, pteExt, partIndex);
+			
+			if(iPart < (extendedPartitions.size() -1))
+				partIndex++;
+		}		
+		return partIndex;
+	}
 
     /**
      * @see org.jnode.driver.block.PartitionableBlockDeviceAPI#getSectorSize()
@@ -327,7 +342,7 @@ public class IDEDiskDriver extends Driver implements IDEDeviceAPI, IDEConstants 
      * @return Null if no partition table is found.
      * @throws IOException
      */
-    public PartitionTable getPartitionTable() throws IOException {
+    public IBMPartitionTable getPartitionTable() throws IOException {
         return pt;
     }
 }

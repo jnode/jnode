@@ -42,7 +42,7 @@ public abstract class DeviceParam {
 	 * @return @throws
 	 *         Exception
 	 */
-	abstract public Device getDevice() throws Exception;
+	abstract public Device createDevice() throws Exception;
 		
 	/**
 	 * @param device
