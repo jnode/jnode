@@ -76,11 +76,7 @@ public class Argument extends CommandLineElement {
         if (list.size() == 1) return (String) list.iterator().next() + " ";
 
         // list matching
-        String[] result = (String[]) list
-                .toArray(new String[ list.size()/*
-                                                 * TODO remove this ugly
-                                                 * workaround
-                                                 */]);
+        String[] result = list.toArray(new String[list.size()]);
         list(result);
 
         // return the common part, i.e. complete as much as possible
