@@ -1,50 +1,41 @@
 package org.jnode.shell.help.argument;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.Collection;
 
-import org.jnode.shell.help.Argument;
+import org.jnode.shell.help.ParsedArguments;
 
-public class StringListArgument extends Argument {
-
-	private final List<String> choices;
-
-	public StringListArgument(String name, String description, boolean multi, List<String> choices) {
+abstract public class StringListArgument extends ListArgument<String> 
+{
+	public StringListArgument(String name, String description, boolean multi) {
 		super(name, description, multi);
-		this.choices = choices;
 	}
 
-	public StringListArgument(String name, String description, List<String> choices) {
-		this(name, description, false, choices);
+	public StringListArgument(String name, String description) {
+		super(name, description, false);
 	}
 
-	public StringListArgument(String name, String description, boolean multi, String[] choices) {
-		this(name, description, multi, Arrays.asList(choices));
+	@Override
+	public String getArgValue(String value) {
+		return value;
+	}
+	
+	@Override
+	protected String toStringArgument(String arg)
+	{
+		return arg;
+	}
+	
+	@Override
+	protected boolean isPartOfArgument(String argument, String part)
+	{
+		return argument.startsWith(part); 
+	}
+	
+	@Override
+	public int compare(String choice1, String choice2)
+	{
+		return choice1.compareTo(choice2);
 	}
 
-	public StringListArgument(String name, String description, String[] choices) {
-		this(name, description, false, choices);
-	}
-
-	public String complete(String partial) {
-		final List<String> result = new ArrayList<String>();
-		for (String choice : choices) {
-			if (choice.startsWith(partial)) {
-				result.add(choice);
-			}
-		}
-
-		Collections.sort(result);
-		return complete(partial, result);
-	}
-
-	protected boolean isValidValue(String choice) {
-		if ((choice == null) || "".equals(choice))
-			return true;
-
-		return choices.contains(choice);
-	}
-
+	abstract protected Collection<String> getValues(); 
 }

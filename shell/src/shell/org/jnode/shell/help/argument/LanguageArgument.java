@@ -22,6 +22,7 @@
 package org.jnode.shell.help.argument;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
@@ -33,11 +34,15 @@ public class LanguageArgument extends StringListArgument {
     private static final List<String> languages = Arrays.asList(Locale.getISOLanguages());
     
     public LanguageArgument(String name, String description, boolean multi) {
-        super(name, description, multi, languages);
+        super(name, description, multi);
     }
 
     public LanguageArgument(String name, String description) {
-        super(name, description, languages);
+        super(name, description);
     }
 
+    @Override
+    protected Collection<String> getValues() {
+    	return languages;
+    }
 }
