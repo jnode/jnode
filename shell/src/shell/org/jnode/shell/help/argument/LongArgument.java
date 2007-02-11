@@ -27,21 +27,68 @@ import org.jnode.shell.help.ParsedArguments;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+/**
+ * @author Ewout Prangsma (epr@users.sourceforge.net)
+ * @author Fabien DUMINY (fduminy at jnode.org)
+ * 
+ * TODO should be factorized with IntegerArgument
+ */
 public class LongArgument extends Argument {
-    
-    public LongArgument(String name, String description, boolean multi) {
-        super(name, description, multi);
-    }
+	private long min;
+	private long max;
+	
+	public LongArgument(String name, String description) {
+		this(name, description, SINGLE);
+	}
 
-    public LongArgument(String name, String description) {
-        super(name, description);
-    }
+	public LongArgument(String name, String description, boolean multi) {
+		this(name, description, multi, Long.MIN_VALUE, Long.MAX_VALUE);
+	}
 
-    public String complete(String partial) {
-        return partial;
-    }
-    
-    public long getLong(ParsedArguments args) {
-        return Long.parseLong(this.getValue(args));
-    }
+	public LongArgument(String name, String description, boolean multi, 
+						long min, long max) {
+		super(name, description, multi);
+		if(min > max)
+		{
+			throw new IllegalArgumentException("min(value:"+min+") > max(value:"+max+")");
+		}
+		
+		this.min = min;
+		this.max = max;
+	}
+	
+	public String complete(String partial) {
+		return partial;
+	}	
+	
+	@Override
+	protected boolean isValidValue(String value) {
+		long val = -1;
+		try {
+			val = getLongValue(value);
+		} catch (NumberFormatException e) {
+			return false;
+		}
+		
+		if(val < min)
+		{
+			return false;
+		}
+
+		if(val > max)
+		{
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public long getLong(ParsedArguments args) {
+		return getLongValue(this.getValue(args));
+	}
+	
+	protected long getLongValue(String value)
+	{
+		return Long.parseLong(value);
+	}
 }
