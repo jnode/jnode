@@ -25,12 +25,6 @@ package org.jnode.util;
  * @author epr
  */
 public class NumberUtils {
-	
-    public static final int K = 1024;
-    public static final int M = 1024*1024;
-    public static final int G = 1024*1024*1024;
-    public static final long T = 1024l*1024l*1024l*1024l;
-    
     /**
      * Convert a float to a string with a given maximum number of fraction digits.
      * @param value
@@ -219,61 +213,57 @@ public class NumberUtils {
 	 * @return the text for of the size
 	 */
 	public static String size(long v) {
-	    // Is < 1Kb?
-	    if (v < K) {
-	        return String.valueOf(v) + "B";
-	    }
-	    // Is < 1Mb?
-	    v = v >>> 10;
-	    if (v < K) {
-	        return String.valueOf(v) + "KB";
-	    }
-	    // Is < 1Gb?
-	    v = v >>> 10;
-	    if (v < K) {
-	        return String.valueOf(v) + "MB";
-	    }
-	    // Is < 1Tb?
-	    v = v >>> 10;
-	    if (v < K) {
-	        return String.valueOf(v) + "GB";
-	    }
-	    // Large...
-	    v = v >>> 10;
-    	    return String.valueOf(v) + "TB";
+		SizeUnit prevUnit = SizeUnit.MIN;
+		for(SizeUnit unit : SizeUnit.values())
+		{
+		    if (v < unit.getMultiplier()) 
+		    {
+		        return String.valueOf(v) + prevUnit.getUnit();
+		    }
+		    v = v >>> 10;
+			prevUnit = unit;		
+		}
+		return String.valueOf(v) + prevUnit.getUnit();
 	}
     
     /**
      * 
-     * @param size a number eventually followed by  a multiplier (K: Kilobytes, M: Megabytes, G:Gigabytes)  
+     * @param size a number eventually followed by  a multiplier (K: Kilobytes, M: Megabytes, G:Gigabytes, ...)  
      * @return the numeric value of the size
      */
     public static long getSize(String size) {
         if((size == null) || size.trim().equals(""))
             return 0;
-        
-        long multiplier = 1;
 
-        if(size.endsWith("B"))
-            size = size.substring(0, size.length() - 1);
-
-        if(size.endsWith("T")) {
-            multiplier = T;
-            size = size.substring(0, size.length() - 1);
-        } else if(size.endsWith("G")) {
-            multiplier = G;
-            size = size.substring(0, size.length() - 1);
-        } else if(size.endsWith("M")) {
-            multiplier = M; 
-            size = size.substring(0, size.length() - 1);
-        } else if(size.endsWith("K")) {
-            multiplier = K;          
-            size = size.substring(0, size.length() - 1);
+        size = size.trim();
+        long multiplier = SizeUnit.MIN.getMultiplier();
+        SizeUnit sizeUnit = getSizeUnit(size);
+        if(sizeUnit != null)
+        {
+        	multiplier = sizeUnit.getMultiplier();
+        	size = size.substring(0, size.length() - sizeUnit.getUnit().length());
         }
     
         return Long.parseLong(size) * multiplier;
     }
-        	
+
+    public static SizeUnit getSizeUnit(String size) {
+        if((size == null) || size.trim().equals(""))
+            return null;
+
+        size = size.trim();
+		for(SizeUnit unit : SizeUnit.values())
+		{
+			String unitStr = unit.getUnit();
+	        if(size.endsWith(unitStr))
+	        {
+	        	return unit;
+	        }
+		}
+    
+        return null;
+    }
+
 	/**
 	 * This method avoids the use on Integer.toHexString, since this class may be used 
 	 * during the boot-phase when the Integer class in not yet initialized.
