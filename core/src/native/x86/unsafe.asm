@@ -355,4 +355,9 @@ GLABEL Q43org5jnode2vm6Unsafe23isKdbEnabled2e2829Z
 ; static native int readKdbInput();
 GLABEL Q43org5jnode2vm6Unsafe23readKdbInput2e2829I
 	jmp kdb_recv_char
-	
+
+; public static native long getCpuCycles();
+GLABEL Q43org5jnode2vm6Unsafe23getCpuCycles2e2829J
+	rdtsc			
+	ret
+

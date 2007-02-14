@@ -195,8 +195,7 @@ public final class VMSystem {
    * @since 1.5
    */
   public static long nanoTime(){
-        //TODO implement it
-        throw new UnsupportedOperationException();
+      return VmSystem.nanoTime();
     };
 
     /**
