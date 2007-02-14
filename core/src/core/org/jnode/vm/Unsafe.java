@@ -742,4 +742,12 @@ public final class Unsafe {
         VmProcessor.current().getArchitecture().getStackReader()
                 .debugStackTrace(max);
     }
+    
+    /**
+     * return a nanosecond accurate timer based on the clock cycles
+     * of the CPU
+     * @return nanosecond accurate time
+     */
+    public static native long getCpuCycles();
+
 }

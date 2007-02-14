@@ -90,6 +90,8 @@ public final class VmSystem {
 
     private static volatile long currentTimeMillis;
 
+    private static long mhz = -1;
+
     private static long rtcIncrement;
 
     private static RTCService rtcService;
@@ -697,6 +699,47 @@ public final class VmSystem {
             }
         }
         return currentTimeMillis + rtcIncrement;
+    }
+
+    /**
+   * <p>
+   * Returns the current value of a nanosecond-precise system timer.
+   * The value of the timer is an offset relative to some arbitrary fixed
+   * time, which may be in the future (making the value negative).  This
+   * method is useful for timing events where nanosecond precision is
+   * required.  This is achieved by calling this method before and after the
+   * event, and taking the difference betweent the two times:
+   * </p>
+   * <p>
+   * <code>long startTime = System.nanoTime();</code><br />
+   * <code>... <emph>event code</emph> ...</code><br />
+   * <code>long endTime = System.nanoTime();</code><br />
+   * <code>long duration = endTime - startTime;</code><br />
+   * </p>
+   * <p>
+   * Note that the value is only nanosecond-precise, and not accurate; there
+   * is no guarantee that the difference between two values is really a
+   * nanosecond.  Also, the value is prone to overflow if the offset
+   * exceeds 2^63.
+   * </p>
+   *
+   * @return the time of a system timer in nanoseconds.
+   * @since 1.5
+   */
+    public static long nanoTime(){
+	if (mhz == -1) {
+	    long start = Unsafe.getCpuCycles();
+	    try {
+		Thread.sleep(1000);
+	    } catch (Exception e) {
+		// set some "random" value
+		mhz = 1000;
+	    }
+	    long end = Unsafe.getCpuCycles();
+	    mhz = end - start;
+	    mhz = mhz / 1000000;
+	}
+	return Unsafe.getCpuCycles() / mhz;
     }
 
     /**
