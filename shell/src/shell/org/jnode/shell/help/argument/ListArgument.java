@@ -64,9 +64,12 @@ public abstract class ListArgument<T> extends Argument
         
         StringBuilder result = new StringBuilder(toStringArgument(items.iterator().next()));
         for (T item : items) {
-            while (!isPartOfArgument(item, result.toString())) {
+            while ((result.length() != 0) && 
+            	   !isPartOfArgument(item, result.toString())) 
+            {
                 // shorten the result until it matches
-                result = result.deleteCharAt(result.length());
+            	// remove the last character :
+                result.setLength(result.length() - 1);
             }
         }
         log.debug("\nresult="+result);
