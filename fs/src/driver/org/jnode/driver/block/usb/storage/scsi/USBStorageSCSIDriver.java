@@ -9,16 +9,16 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.block.usb.storage.scsi;
 
 import java.io.IOException;
@@ -82,16 +82,16 @@ public class USBStorageSCSIDriver extends Driver implements FSBlockDeviceAPI, Re
 	    } catch (DeviceAlreadyRegisteredException ex) {
 	        throw new DriverException(ex);
 	    }
-	    
+
 	    this.locked = false;
 	    this.changed = true;
 	    this.capacity = null;
 	    this.blockAlignment.setAlignment(2048);
-	    
+
 	    dev.registerAPI(RemovableDeviceAPI.class, this);
 	    dev.registerAPI(FSBlockDeviceAPI.class, blockAlignment);
 	}
-	
+
 	@Override
 	protected void stopDevice() throws DriverException {
 	    try {
@@ -123,7 +123,8 @@ public class USBStorageSCSIDriver extends Driver implements FSBlockDeviceAPI, Re
 	}
 
 	public void read(long devOffset, ByteBuffer dest) throws IOException {
-		// TODO Auto-generated method stub
+		processChanged();
+        if (capacity == null) { throw new IOException("No medium"); }
 
 	}
 
@@ -149,7 +150,7 @@ public class USBStorageSCSIDriver extends Driver implements FSBlockDeviceAPI, Re
 
 	/**
 	 * Unlock the device.
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	public synchronized void unlock() throws IOException {
@@ -196,13 +197,13 @@ public class USBStorageSCSIDriver extends Driver implements FSBlockDeviceAPI, Re
 	}
 
 	public boolean canLock() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
-
+	/**
+	 *  It's a removable device.
+	 */
 	public boolean canEject() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	public void lock() throws IOException {
@@ -211,8 +212,7 @@ public class USBStorageSCSIDriver extends Driver implements FSBlockDeviceAPI, Re
 	}
 
 	public boolean isLocked() {
-		// TODO Auto-generated method stub
-		return false;
+		return locked;
 	}
 
 	public void eject() throws IOException {
