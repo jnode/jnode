@@ -9,16 +9,16 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.block.usb.storage;
 
 import org.apache.log4j.Logger;
@@ -56,7 +56,7 @@ public class USBStorageSCSIHostDriver extends Driver implements SCSIHostControll
 
     /** Storage specific device data */
     private USBStorageDeviceData USBMassStorage;
-    
+
     /** The SCSI device that i'm host of */
     private USBStorageSCSIDevice scsiDevice;
 
@@ -88,9 +88,9 @@ public class USBStorageSCSIHostDriver extends Driver implements SCSIHostControll
 			default:
 				throw new DriverException("Transport protocol not implemented.");
 			}
-			
+
             USBEndPoint ep;
-			
+
             for (int i = 0; i < conf.getInterface(0).getDescriptor().getNumEndPoints(); i++) {
                 ep = conf.getInterface(0).getEndPoint(i);
                 // Is it a bulk endpoint ?
@@ -162,7 +162,7 @@ public class USBStorageSCSIHostDriver extends Driver implements SCSIHostControll
     public void requestFailed(USBRequest request) {
         log.debug("USBStorageSCSIHostDriver failed with status:" + request.getStatus());
     }
- 
+
     private final class USBStorageSCSIHostBus extends Bus {
 
         /**
@@ -170,10 +170,13 @@ public class USBStorageSCSIHostDriver extends Driver implements SCSIHostControll
          */
         public USBStorageSCSIHostBus(Device parent) {
             super(parent);
-        }        
+        }
     }
-    
-    private final class USBStorageSCSIDevice extends SCSIDevice {
+    /**
+     *
+     * @author Fabien Lesire
+     */
+    public final class USBStorageSCSIDevice extends SCSIDevice {
 
         private InquiryData inquiryResult;
 
@@ -195,10 +198,10 @@ public class USBStorageSCSIHostDriver extends Driver implements SCSIHostControll
         	int res = this.executeCommand(new CDBTestUnitReady(),null,0,50000);
         	log.debug("*** result : 0x" + NumberUtils.hex(res) + " ***" );
         }
-        
+
         /**
-         * Execute an INQUUIRY command.
-         * 
+         * Execute an INQUIRY command.
+         *
          * @throws SCSIException
          * @throws TimeoutException
          * @throws InterruptedException
@@ -211,12 +214,12 @@ public class USBStorageSCSIHostDriver extends Driver implements SCSIHostControll
             inquiryResult = new InquiryData(inqData);
             log.debug("INQUIRY Data : " + inquiryResult.toString());
         }
-        
+
         protected final void capacity() throws SCSIException, TimeoutException, InterruptedException {
         	log.info("*** Read capacity ***");
             CapacityData cd = MMCUtils.readCapacity(this);
             log.debug("Capacity Data : " + cd.toString());
-        	
+
         }
 
         /**
