@@ -86,7 +86,14 @@ public class Editor extends JFrame {
 
             if(exists)
                 readFile(file);
-
+            else {
+            	try {
+            		file.createNewFile();
+            	} catch (IOException e) {
+            		
+            	}
+            }
+            
             updateTitle(file.getName());
             textArea.requestFocus();
         }
