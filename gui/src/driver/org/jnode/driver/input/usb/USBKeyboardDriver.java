@@ -37,6 +37,7 @@ import org.jnode.driver.bus.usb.USBRequest;
 import org.jnode.driver.input.KeyboardAPI;
 import org.jnode.driver.input.KeyboardAPIAdapter;
 import org.jnode.driver.input.KeyboardInterpreter;
+import org.jnode.driver.input.KeyboardInterpreterFactory;
 import org.jnode.util.ByteQueue;
 import org.jnode.util.ByteQueueProcessor;
 import org.jnode.util.ByteQueueProcessorThread;
@@ -347,6 +348,7 @@ public class USBKeyboardDriver extends Driver implements USBPipeListener, USBCon
 			intPipe.asyncSubmit(req);
 
 			// Register the PointerAPI
+			apiAdapter.setKbInterpreter(KeyboardInterpreterFactory.getDefaultKeyboardInterpreter());
 			dev.registerAPI(KeyboardAPI.class, apiAdapter);
 			
 			// Start the key event thread
