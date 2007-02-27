@@ -1,4 +1,4 @@
-package org.jnode.driver.net.usb.bluetooth;
+package org.jnode.driver.net.usb;
 
 import org.jnode.driver.bus.usb.USBConstants;
 

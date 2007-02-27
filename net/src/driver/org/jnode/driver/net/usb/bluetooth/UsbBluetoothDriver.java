@@ -13,6 +13,7 @@ import org.jnode.driver.bus.usb.USBInterface;
 import org.jnode.driver.bus.usb.USBPacket;
 import org.jnode.driver.bus.usb.USBPipeListener;
 import org.jnode.driver.bus.usb.USBRequest;
+import org.jnode.driver.net.usb.UsbNetConstant;
 import org.jnode.util.NumberUtils;
 
 public class UsbBluetoothDriver extends Driver implements USBPipeListener, UsbNetConstant {
