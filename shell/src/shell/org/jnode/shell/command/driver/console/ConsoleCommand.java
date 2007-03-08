@@ -92,6 +92,8 @@ public class ConsoleCommand {
         System.out.println();
         
         if (listConsoles) {
+            conMgr.printConsoles(System.out);
+            /*
             final Set<String> consoleNames = conMgr.getConsoleNames();
             System.out.println("Nr. of registered consoles: "
                     + consoleNames.size());
@@ -103,6 +105,7 @@ public class ConsoleCommand {
                         + KeyEvent.getKeyText(console
                                 .getAcceleratorKeyCode()));
             }
+            */
         } else if (newConsole) {
             if (isolateNewConsole) {
                 try {
