@@ -256,6 +256,8 @@ public abstract class AbstractConsole implements Console {
 
     public void setAcceleratorKeyCode(int keyCode) {
         this.acceleratorKeyCode = keyCode;
+        if(mgr instanceof AbstractConsoleManager)
+            ((AbstractConsoleManager)mgr).restack(this);
     }
 
     public int getAcceleratorKeyCode() {

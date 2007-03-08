@@ -22,6 +22,7 @@
 package org.jnode.driver.console;
 
 import java.util.Set;
+import java.io.PrintStream;
 
 import org.jnode.driver.input.KeyboardListener;
 import org.jnode.driver.input.PointerListener;
@@ -101,18 +102,21 @@ public interface ConsoleManager extends KeyboardListener, PointerListener {
     public void setParent(ConsoleManager parent);
 
     /**
-     * Option constants for use in {@link #createConsole(String, int)}
+     * Option constants for use in {@link org.jnode.driver.console.ConsoleManager#createConsole(String, int)}
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
     public static final class CreateOptions {
-        /** Create a text console */
+        /** Create a text console. */
         public static final int TEXT = 0x01;
 
-        /** Create a scrollable console */
+        /** Create a scrollable console. */
         public static final int SCROLLABLE = 0x02;
 
-        /** Do not claim System.out, err, in when focused */
+        /** Do not claim System.out, err, in when focused. */
         public static final int NO_SYSTEM_OUT_ERR_IN = 0x04;
+
+        /** Stack console on the current screen */
+        public static final int STACKED = 0x08;
     }
     
     /**
@@ -122,4 +126,6 @@ public interface ConsoleManager extends KeyboardListener, PointerListener {
      * @return
      */
     public Console createConsole(String name, int options);
+
+    public void printConsoles(PrintStream ps);
 }
