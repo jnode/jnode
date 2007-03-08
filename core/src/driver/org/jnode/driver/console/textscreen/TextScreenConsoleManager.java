@@ -68,8 +68,13 @@ public class TextScreenConsoleManager extends AbstractConsoleManager {
                 final TextScreen screen;
                 screen = tsm.getSystemScreen().createCompatibleBufferScreen();
                 console = new TextScreenConsole(this, name, screen, options);
-            }            
-            setAccelerator(console);
+            }
+            if ((options & CreateOptions.STACKED) != 0){
+                stackConsole(console);
+            } else {
+                setAccelerator(console);
+            }
+
             registerConsole(console);
             return console;
         } else {
@@ -102,14 +107,16 @@ public class TextScreenConsoleManager extends AbstractConsoleManager {
             }
         }
     }
-    
-    private void setAccelerator(Console console) {
+
+    /*
+    protected void setAccelerator(Console console) {
         for (int i = 0; i < 12; i++) {
             final int keyCode = KeyEvent.VK_F1 + i;
             if (getConsoleByAccelerator(keyCode) == null) {
                 console.setAcceleratorKeyCode(keyCode);
                 break;
             }
-        }
+        }        
     }
+    */
 }

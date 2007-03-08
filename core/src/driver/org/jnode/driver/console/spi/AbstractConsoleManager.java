@@ -22,14 +22,9 @@
 package org.jnode.driver.console.spi;
 
 import java.awt.event.InputEvent;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
+import java.awt.event.KeyEvent;
+import java.util.*;
+import java.io.PrintStream;
 
 import javax.naming.NameNotFoundException;
 
@@ -77,13 +72,16 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
 
     private AbstractConsoleManager parent;
 
+    private final Map<Integer, Stack<Console>> stackMap = new HashMap<Integer, Stack<Console>>();
+    private Stack<Console> currentStack;
+
     /**
      * Initialize a new instance
      */
     public AbstractConsoleManager()
             throws ConsoleException {
         try {
-            devMan = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
+            devMan = InitialNaming.lookup(DeviceManager.NAME);
             openInput(devMan);
         } catch (NameNotFoundException ex) {
             throw new ConsoleException("DeviceManager not found", ex);
@@ -93,7 +91,7 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
 
     protected final void initializeKeyboard(Device kbDev) {
         try {
-            this.kbApi = (KeyboardAPI) kbDev.getAPI(KeyboardAPI.class);
+            this.kbApi = kbDev.getAPI(KeyboardAPI.class);
             this.kbApi.addKeyboardListener(this);
         } catch (ApiNotFoundException ex) {
             BootLog.error("KeyboardAPI not found", ex);
@@ -195,13 +193,52 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
         }
     }
 
-    public Console getConsoleByAccelerator(int keyCode) {
-        for (Console console : consoles.values()) {
-            if (console.getAcceleratorKeyCode() == keyCode) {
-                return console;
+    public void printConsoles(PrintStream ps) {
+        ArrayList<Integer> list = new ArrayList<Integer>();
+        list.addAll(stackMap.keySet());
+        Collections.sort(list);
+        for(Integer key : list){
+            ps.println("Screen of " + KeyEvent.getKeyText(key) + ":");
+            Stack<Console> stack = stackMap.get(key);
+            int t_ind = stack.size();
+            for(int i = t_ind; i-- > 0;){
+                Console console = stack.get(i);
+                String prefix = console == current ? " > " :
+                            i == t_ind - 1? " * " : "   ";
+                ps.println(prefix + console.getConsoleName());
             }
         }
+    }
+
+    public Console getConsoleByAccelerator(int keyCode) {
+        Stack<Console> stack = stackMap.get(keyCode);
+        if(stack != null && !stack.empty()){
+            currentStack = stack;
+            return stack.peek();
+        }
+
         return null;
+    }
+
+    protected void setAccelerator(Console console) {
+        for (int i = 0; i < 12; i++) {
+            final int keyCode = KeyEvent.VK_F1 + i;
+            Stack<Console> stack = stackMap.get(keyCode);
+            if (stack == null) {
+                stack = new Stack<Console>();
+            }
+
+            if (stack.empty()){
+                stackMap.put(keyCode, stack);
+                stack.push(console);
+                currentStack = stack;
+                return;
+            }
+        }
+    }
+
+    protected void stackConsole(Console console){
+        if(currentStack != null) currentStack.push(console);
     }
 
     /**
@@ -219,13 +256,56 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
         if (current == console) {
             console.focusLost(new FocusEvent(FocusEvent.FOCUS_LOST));
         }
+
         consoles.remove(console.getConsoleName());
+        if(currentStack != null && currentStack.peek() == console) {
+            currentStack.pop();
+            if(!currentStack.empty()) {
+                current = currentStack.peek();
+                focus(current);
+            } else {
+                Integer last_key = null;
+                for(Iterator<Map.Entry<Integer, Stack<Console>>> it = stackMap.entrySet().iterator(); it.hasNext(); ){
+                    Map.Entry<Integer, Stack<Console>> entry = it.next();
+                    if(entry.getValue().equals(currentStack)){
+                        last_key = entry.getKey();
+                        it.remove();
+                        break;
+                    }
+                }
+                if(!stackMap.isEmpty()){
+                    Integer new_key = null;
+                    List<Integer> keys = new ArrayList<Integer>(stackMap.keySet());
+                    Collections.sort(keys);
+                     if(last_key == null){
+                         new_key = keys.get(0);
+                     } else {
+                         Collections.reverse(keys);
+                         for(Integer k : keys){
+                             if(k < last_key){
+                                 new_key = k;
+                                 break;
+                             }
+                         }
+                         if(new_key == null){
+                             new_key = keys.get(keys.size() - 1);
+                         }
+                     }
+
+                    currentStack = stackMap.get(new_key);
+                    current = currentStack.peek();
+                    focus(current);
+                }
+            }
+        }
+
         if (current == console) {
             current = null;
             if (!consoles.isEmpty()) {
-                focus((Console)consoles.values().iterator().next());
+                focus(consoles.values().iterator().next());
             }
         }
+        
         if(parent != null && consoles.isEmpty()){
             handleFocus();
         }
@@ -320,6 +400,36 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
         this.parent = (AbstractConsoleManager) parent;
     }
 
+    void restack(final AbstractConsole console){
+        int accel = console.getAcceleratorKeyCode();
+        if(accel == 0) return;
+
+        //remove console
+        for(Iterator<Integer> iter = stackMap.keySet().iterator(); iter.hasNext(); ){
+            Integer key = iter.next();
+            if(key == accel)
+                return; //no restack needed
+
+            Stack<Console> stack = stackMap.get(key);
+            if(stack.contains(console)){
+                stack.remove(console);
+
+                if(stack.empty())
+                    iter.remove();
+
+                break;
+            }
+        }
+
+        //add the console to the specified screen
+        Stack<Console> stack = stackMap.get(accel);
+        if(stack == null){
+            stack = new Stack<Console>();
+            stackMap.put(accel, stack);
+        }
+        stack.push(console);
+    }
+
     /**
      * This listener looks for registration of a keyboard device.
      * 
@@ -349,5 +459,4 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
             }
         }
     }
-
 }
