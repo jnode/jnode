@@ -25,11 +25,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.annotation.PrivilegedActionPragma;
-import org.jnode.vm.classmgr.VmField;
-import org.jnode.vm.classmgr.VmInstanceField;
-import org.jnode.vm.classmgr.VmMethod;
-import org.jnode.vm.classmgr.VmStaticField;
-import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.classmgr.*;
 import org.jnode.vm.memmgr.VmHeapManager;
 import org.jnode.vm.memmgr.VmWriteBarrier;
 import org.jnode.vm.scheduler.VmProcessor;
@@ -48,8 +44,16 @@ public final class VmReflection {
 		if (field.isStatic()) {
 			final VmStaticField sf = (VmStaticField) field;
 			initialize(sf);
-			return getStaticFieldAddress(sf).loadObjectReference().toObject();
-		} else {
+            Object obj = getStaticFieldAddress(sf).loadObjectReference().toObject();
+            //handles the reflective access to static final String fields, which didn't work.
+            if(obj != null && sf.isFinal() && field.getSignature().equals("Ljava/lang/String;")){
+                if(obj instanceof VmConstString){
+                    VmConstString cs = (VmConstString) obj;
+                    obj = Vm.getVm().getSharedStatics().getStringEntry(cs.getSharedStaticsIndex());
+                }
+            }
+            return obj;
+        } else {
 			final VmInstanceField inf = (VmInstanceField) field;
 			return getInstanceFieldAddress(o, inf).loadObjectReference().toObject();
 		}

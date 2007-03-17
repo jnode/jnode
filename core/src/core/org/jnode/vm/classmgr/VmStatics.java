@@ -156,7 +156,18 @@ public abstract class VmStatics extends VmStaticsBase {
         return (VmType)getRawObject(idx);
     }
 
-	public final void setInt(int idx, int value) {
+    /**
+     * Get a String entry at the given index.
+     *
+     * @param idx
+     * @return the string
+     */
+    public final String getStringEntry(int idx) {
+        allocator.testType(idx, TYPE_STRING);
+        return (String)getRawObject(idx);
+    }
+
+    public final void setInt(int idx, int value) {
         allocator.testType(idx, TYPE_INT);
 		if (statics[idx] != value) {
 			if (locked) {
