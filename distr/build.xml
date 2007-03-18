@@ -7,12 +7,18 @@
   <property name="my-src.dir"     value="${basedir}/src"/>
   <property name="my.jar"         value="${jnode-distr.jar}"/>
 
+  <property name="junit4.jar" value="${basedir}/lib/junit-4.1.jar"/>
+	
 <!-- Subproject specific classpath -->
   <path id="my-cp">
     <pathelement location="${jnode-core.jar}"/>
     <pathelement location="${jnode-gui.jar}"/>
     <pathelement location="${jnode-textui.jar}"/>
     <pathelement location="${jnode-shell.jar}"/>
+  	<pathelement location="${jnode-fs.jar}"/>
+  	
+    <pathelement location="${junit4.jar}"/>
+  	
     <path refid="cp"/>
   </path>
 
