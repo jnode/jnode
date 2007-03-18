@@ -40,7 +40,7 @@ public class PartitionHelper
 		this.dm = dm;
 		this.api = current.getAPI(BlockDeviceAPI.class);
 
-		read();
+		reloadMBR();
 	}
 	
 	public void initMbr() throws DeviceNotFoundException, ApiNotFoundException, 
@@ -66,11 +66,15 @@ public class PartitionHelper
 			bs.getPartition(2).setSystemIndicator(IBMPartitionTypes.PARTTYPE_EMPTY);
 			bs.getPartition(3).setSystemIndicator(IBMPartitionTypes.PARTTYPE_EMPTY);
 		}
+		
+		//reloadMBR();
 	}
 	
 	public void write() throws IOException
 	{
 		bs.write(api);
+		
+		reloadMBR();
 		
 		// restart the device
 	    try {
@@ -83,12 +87,10 @@ public class PartitionHelper
 		}
 	}
 
-	private void read() throws IOException, ApiNotFoundException 
+	private void reloadMBR() throws IOException
 	{
-		//read the MBR
 		this.MBR = ByteBuffer.allocate(IDEConstants.SECTOR_SIZE);
-		api.read(0, MBR);
-				
+		api.read(0, MBR);	
 		bs = new BootSector(MBR.array());
 	}
 	
