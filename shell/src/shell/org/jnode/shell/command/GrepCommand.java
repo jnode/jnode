@@ -40,7 +40,7 @@ public class GrepCommand implements Command {
      */
 	public static void main(String[] args)
     	throws Exception {
-    		new GcCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+    		new GrepCommand().execute(new CommandLine(args), System.in, System.out, System.err);
     	}
 
 	/**
