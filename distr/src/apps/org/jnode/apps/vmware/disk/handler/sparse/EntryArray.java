@@ -2,6 +2,12 @@ package org.jnode.apps.vmware.disk.handler.sparse;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.nio.channels.FileChannel;
+
+import org.apache.log4j.Logger;
+import org.jnode.apps.vmware.disk.IOUtils;
 
 /**
  * Wrote from the 'Virtual Disk Format 1.0' specifications (from VMWare)
@@ -11,24 +17,13 @@ import java.io.RandomAccessFile;
  */
 public class EntryArray 
 {
+	private static final Logger LOG = Logger.getLogger(EntryArray.class);
+		
 	final private int[] entries;
 	
-	public EntryArray(RandomAccessFile raf, int nbEntries)
-				throws IOException
+	public EntryArray(int[] entries)
 	{
-		entries = new int[nbEntries];
-		for(int entryNumber = 0 ; entryNumber < nbEntries ; entryNumber++)
-		{
-			setEntry(entryNumber, raf.readInt());
-		}
-	}
-	
-	public void write(RandomAccessFile raf) throws IOException
-	{
-		for(int entry : entries)
-		{
-			raf.writeInt(entry);
-		}
+		this.entries = entries;		
 	}
 	
 	public int getSize()

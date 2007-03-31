@@ -11,8 +11,8 @@ import java.io.RandomAccessFile;
  */
 public class GrainDirectory extends EntryArray 
 {
-	public GrainDirectory(RandomAccessFile raf, int nbEntries) throws IOException 
+	public GrainDirectory(int[] entries) 
 	{
-		super(raf, nbEntries);
+		super(entries);
 	}
 }

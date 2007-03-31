@@ -11,8 +11,8 @@ import java.io.RandomAccessFile;
  */
 public class GrainTable extends EntryArray 
 {
-	public GrainTable(RandomAccessFile raf, int nbEntries) throws IOException 
+	public GrainTable(int[] entries) 
 	{
-		super(raf, nbEntries);
+		super(entries);
 	}
 }

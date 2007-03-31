@@ -6,7 +6,9 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 
 import org.jnode.apps.vmware.disk.ExtentDeclaration;
+import org.jnode.apps.vmware.disk.IOUtils;
 import org.jnode.apps.vmware.disk.descriptor.Descriptor;
+import org.jnode.apps.vmware.disk.descriptor.DescriptorRW;
 import org.jnode.apps.vmware.disk.extent.Extent;
 import org.jnode.apps.vmware.disk.handler.ExtentFactory;
 import org.jnode.apps.vmware.disk.handler.FileDescriptor;
@@ -22,28 +24,21 @@ import org.jnode.apps.vmware.disk.handler.UnsupportedFormatException;
 public class SimpleExtentFactory extends ExtentFactory 
 {
 	protected FileDescriptor createFileDescriptor(File file, 
-									RandomAccessFile raf, ByteBuffer bb,
-									boolean isMain) 
+									RandomAccessFile raf) 
 					throws IOException, UnsupportedFormatException
 	{
-		Descriptor descriptor = READER.read(file, bb, this);
+		// read 2 sectors, starting from sector number 0
+		Descriptor descriptor = getDescriptorRW().read(file, 0, 2);
+		
 		return new FileDescriptor(descriptor, raf, this); 
 	}
 
-	public Extent createMainExtent(Descriptor desc, ExtentDeclaration extentDecl)
-	{
-		return new Extent(desc, extentDecl);
-	}
-	
-	public Extent createExtent(FileDescriptor fileDescriptor, ExtentDeclaration extentDecl)
-						throws IOException, UnsupportedFormatException 
-	{
-		Descriptor desc = (fileDescriptor == null) ? null : 
-								fileDescriptor.getDescriptor();
-		return createMainExtent(desc, extentDecl);
+	public SimpleIOHandler createIOHandler(FileDescriptor fileDescriptor) throws IOException, UnsupportedFormatException {
+		return new SimpleIOHandler(fileDescriptor);
 	}
 
-	public IOHandler createIOHandler(FileDescriptor fileDescriptor) throws IOException, UnsupportedFormatException {
-		return new SimpleIOHandler(fileDescriptor);
+	@Override
+	protected SimpleDescriptorRW getDescriptorRW() {
+		return new SimpleDescriptorRW();
 	}
 }

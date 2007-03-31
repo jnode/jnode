@@ -1,28 +1,30 @@
-package org.jnode.apps.vmware.disk;
+package org.jnode.apps.vmware.disk.descriptor;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.RandomAccessFile;
 import java.io.Reader;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.channels.FileChannel.MapMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import org.apache.log4j.Logger;
+import org.jnode.apps.vmware.disk.ExtentDeclaration;
+import org.jnode.apps.vmware.disk.IOUtils;
 import org.jnode.apps.vmware.disk.IOUtils.KeyValue;
-import org.jnode.apps.vmware.disk.descriptor.AdapterType;
-import org.jnode.apps.vmware.disk.descriptor.CreateType;
-import org.jnode.apps.vmware.disk.descriptor.Descriptor;
-import org.jnode.apps.vmware.disk.descriptor.DiskDatabase;
-import org.jnode.apps.vmware.disk.descriptor.Header;
 import org.jnode.apps.vmware.disk.extent.Access;
 import org.jnode.apps.vmware.disk.extent.Extent;
 import org.jnode.apps.vmware.disk.extent.ExtentType;
 import org.jnode.apps.vmware.disk.handler.ExtentFactory;
 import org.jnode.apps.vmware.disk.handler.FileDescriptor;
 import org.jnode.apps.vmware.disk.handler.UnsupportedFormatException;
+import org.jnode.apps.vmware.disk.handler.sparse.SparseExtentHeader;
 import org.jnode.util.ByteBufferInputStream;
 
 /**
@@ -31,7 +33,9 @@ import org.jnode.util.ByteBufferInputStream;
  * @author Fabien DUMINY (fduminy at jnode dot org)
  *
  */
-public class DescriptorReader {
+abstract public class DescriptorRW {
+	private static final Logger LOG = Logger.getLogger(DescriptorRW.class);
+		
 	private static final String VERSION     = "version";
 	private static final String CID         = "CID";
 	private static final String PARENT_CID  = "parentCID";
@@ -43,15 +47,15 @@ public class DescriptorReader {
 	private static final String HEADS        = "ddb.geometry.heads";
 	private static final String CYLINDERS    = "ddb.geometry.cylinders";
 	
-	//protected 
-	
-	public Descriptor read(File file, ByteBuffer bb, 
-					 ExtentFactory factory) 
+	public Descriptor read(File file, int firstSector, int nbSectors) 
 				throws IOException, UnsupportedFormatException
 	{		
+		RandomAccessFile raf = null;
 		BufferedReader br = null;
 
 		try {
+			raf = new RandomAccessFile(file, "r");
+			ByteBuffer bb = IOUtils.getSectorsByteBuffer(raf, firstSector, nbSectors);
 			
 			Reader r = new InputStreamReader(new ByteBufferInputStream(bb));
 			br = new BufferedReader(r);
@@ -59,30 +63,31 @@ public class DescriptorReader {
 			Header header = readHeader(br);
 			
 			List<String> extentDecls = new ArrayList<String>();
-			String lastLine = readExtents(br, factory, extentDecls);
+			String lastLine = readExtents(br, extentDecls);
 			DiskDatabase diskDatabase = readDiskDatabase(br, lastLine);
 			
-			List<Extent> extents = new ArrayList<Extent>();
-			boolean isMain = true;
+			List<Extent> extents = new ArrayList<Extent>(extentDecls.size());
 			ExtentDeclaration mainExtentDecl = null;
 			for(String decl : extentDecls)
 			{
 				ExtentDeclaration extentDecl = readExtentDeclaration(decl, file);
-				if(isMain)
+				if(extentDecl.isMainExtent())
 				{
-					isMain = false;
 					mainExtentDecl = extentDecl;
 				}
 				else
 				{
-					Extent extent = createExtent(factory, extentDecl);
+					FileDescriptor fileDescriptor = IOUtils.readFileDescriptor(
+							extentDecl.getExtentFile());
+		
+					Extent extent = createExtent(fileDescriptor, extentDecl);
 					extents.add(extent);
 				}
 			}
 			
 			Descriptor desc = new Descriptor(file, header, extents, diskDatabase);
 			
-			Extent mainExtent = factory.createMainExtent(desc, mainExtentDecl);
+			Extent mainExtent = createMainExtent(desc, mainExtentDecl);
 			extents.add(0, mainExtent);
 			
 			return desc;
@@ -92,6 +97,11 @@ public class DescriptorReader {
 			if(br != null)
 			{
 				br.close();
+			}
+			
+			if(raf != null)
+			{
+				raf.close();
 			}
 		}
 	}
@@ -118,14 +128,14 @@ public class DescriptorReader {
 		return ddb;
 	}
 
-	protected String readExtents(BufferedReader br, 
-								 ExtentFactory factory,
+	protected String readExtents(BufferedReader br,
 								 List<String> extentDecls) 
 					throws IOException, UnsupportedFormatException 
 	{		
 		String line;
 		
-		while(!(line = IOUtils.readLine(br)).startsWith(DDB))
+		while( ((line = IOUtils.readLine(br)) != null) &&
+			   !line.startsWith(DDB))
 		{
 			extentDecls.add(line);
 		}
@@ -133,17 +143,6 @@ public class DescriptorReader {
 		return line;
 	}
 
-	protected Extent createExtent(ExtentFactory factory, ExtentDeclaration extentDecl) 
-				throws IOException, UnsupportedFormatException
-	{
-		FileDescriptor fileDescriptor = IOUtils.readFileDescriptor(
-								extentDecl.getExtentFile(), false);
-			
-		Extent extent = factory.createExtent(fileDescriptor, extentDecl);
-		
-		return extent;
-	}
-	
 	protected ExtentDeclaration readExtentDeclaration(String line, File mainFile)
 	{
 		StringTokenizer st = new StringTokenizer(line, " ", false);
@@ -168,7 +167,8 @@ public class DescriptorReader {
 	protected Header readHeader(BufferedReader reader) throws IOException, UnsupportedFormatException
 	{
 		Header header = new Header();
-		
+
+		LOG.debug("trying to read VERSION");
 		KeyValue keyValue = IOUtils.readValue(reader, null, VERSION, false);
 		if(!"1".equals(keyValue.getValue()))
 		{
@@ -187,4 +187,11 @@ public class DescriptorReader {
 		
 		return header;
 	}
+
+	abstract protected Extent createMainExtent(Descriptor desc,
+			ExtentDeclaration mainExtentDecl) throws IOException, UnsupportedFormatException;
+
+	abstract protected Extent createExtent(FileDescriptor fileDescriptor, ExtentDeclaration extentDecl) 
+				throws IOException, UnsupportedFormatException;
+	
 }
