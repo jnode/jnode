@@ -6,6 +6,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
 import org.apache.log4j.Logger;
+import org.jnode.apps.vmware.disk.extent.Extent;
 import org.jnode.apps.vmware.disk.handler.sparse.SparseExtentFactory;
 
 /**
@@ -18,13 +19,15 @@ public class ExtentIO
 {
 	private static final Logger LOG = Logger.getLogger(ExtentIO.class);
 		
-	private final RandomAccessFile raf;
-	private final FileChannel channel;
+	protected final RandomAccessFile raf;
+	protected final FileChannel channel;
+	protected final Extent extent;
 	
-	public ExtentIO(RandomAccessFile raf)
+	public ExtentIO(RandomAccessFile raf, Extent extent)
 	{
 		this.raf = raf;
-		this.channel = raf.getChannel();		
+		this.channel = raf.getChannel();
+		this.extent = extent;
 	}
 	
 	public void read(long sector, ByteBuffer dst) throws IOException 

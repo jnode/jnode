@@ -26,15 +26,18 @@ public class VMWareDisk
 	private final Descriptor descriptor;
 	private final IOHandler handler;
 	
+	private final long length;
+	
 	public VMWareDisk(File file) throws IOException, UnsupportedFormatException
 	{
-		FileDescriptor fd = IOUtils.readFileDescriptor(file, true);
+		FileDescriptor fd = IOUtils.readFileDescriptor(file);
 		
 		ExtentFactory factory = fd.getExtentFactory();
 				
 		this.handler = factory.createIOHandler(fd);
 		this.descriptor = fd.getDescriptor();
 		
+		this.length = handler.getNbSectors() * IOHandler.SECTOR_SIZE; 
 		LOG.debug("handler for file "+file.getName()+" : "+handler.getClass().getName());
 	}
 	
@@ -54,9 +57,7 @@ public class VMWareDisk
 	}
 
 	public long getLength() {
-		DiskDatabase ddb = descriptor.getDiskDatabase(); 
-		return ddb.getCylinders() * ddb.getHeads() * ddb.getSectors() * 
-				IOHandler.SECTOR_SIZE;
+		return length;
 	}
 
 	public Descriptor getDescriptor() {

@@ -4,8 +4,7 @@
 package org.jnode.apps.vmware.disk.handler.sparse;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.RandomAccessFile;
 
 import org.apache.log4j.Logger;
 import org.jnode.apps.vmware.disk.descriptor.Descriptor;
@@ -27,5 +26,10 @@ public class SparseIOHandler extends IOHandler
 					throws IOException 
 	{
 		super(descriptor);
+	}
+	
+	@Override
+	protected SparseExtentIO createExtentIO(RandomAccessFile raf, Extent extent) {
+		return new SparseExtentIO(raf, extent);
 	}
 }

@@ -19,16 +19,24 @@ public class Utils {
 	private static final Logger LOG = Logger.getLogger(Utils.class);
 	
 	private static final String TEMP_DIR = "VMWareDisk";
+	private static final File TEMP_DIR_FILE;
+	static
+	{
+        String tmpDir = System.getProperty("java.io.tmpdir");        
+        TEMP_DIR_FILE = new File(tmpDir, TEMP_DIR);
+	}
+	
+	private static long SEQ_NUMBER = 0L;
+	
+	public static boolean DO_CLEAR = true;
 	
 	public static File createTempDir() throws IOException
 	{
-        String tmpDir = System.getProperty("java.io.tmpdir");        
-        File dir = new File(tmpDir, TEMP_DIR);
-        if(!dir.exists())
+        if(!TEMP_DIR_FILE.exists())
         {
-        	if(!dir.mkdir())
+        	if(!TEMP_DIR_FILE.mkdir())
         	{
-        		throw new IOException("can't create directory "+dir);
+        		throw new IOException("can't create directory "+TEMP_DIR_FILE.getAbsolutePath());
         	}
         }
         else
@@ -36,16 +44,22 @@ public class Utils {
         	clearTempDir(false);
         }
         
-        return dir;
+        return TEMP_DIR_FILE;
+	}
+	
+	public static File createTempFile(String prefix) throws IOException
+	{
+		File tmpDir = createTempDir();
+		return new File(tmpDir, String.valueOf(prefix) + SEQ_NUMBER++);
 	}
 
 	public static void clearTempDir(boolean deleteDir) throws IOException
 	{
-        String tmpDir = System.getProperty("java.io.tmpdir");        
-        File dir = new File(tmpDir, TEMP_DIR);
-        if(dir.exists())
+		if(!DO_CLEAR) return;
+		
+        if(TEMP_DIR_FILE.exists())
         {
-            for(File tmpFile : dir.listFiles())
+            for(File tmpFile : TEMP_DIR_FILE.listFiles())
             {
             	LOG.debug("deleting file "+tmpFile);
             	tmpFile.delete();
@@ -54,82 +68,7 @@ public class Utils {
         
         if(deleteDir)
         {
-        	dir.delete();
+        	TEMP_DIR_FILE.delete();
         }        
-	}
-
-	public static File copyDisk(final File mainFile) throws IOException
-	{
-		final String name = mainFile.getName();
-		final int idx = name.lastIndexOf('.'); 
-		final String beginName = name.substring(0, idx);
-		final String endName = name.substring(idx);
-		
-		final File parentDir = mainFile.getParentFile();
-		File[] files = parentDir.listFiles(new FilenameFilter()
-				{
-					public boolean accept(File dir, String name) {
-						boolean ok = name.startsWith(beginName) &&
-							   name.endsWith(endName);
-						return ok;
-					}
-				});
-
-		File tmpDir = createTempDir();
-        
-        File mainFileCopy = null;
-		for(File file : files)
-		{
-			File f = copyFile(file, tmpDir);
-			if(file.getName().equals(mainFile.getName()))
-			{
-				mainFileCopy = f;
-			}
-		}
-		
-		return mainFileCopy;
-	}
-	
-	public static File copyFile(File file, File dir) throws IOException
-	{
-		LOG.debug("copying file "+file.getName()+" to "+dir.getName());
-		FileInputStream fis = null;
-		FileOutputStream fos = null;
-		File outFile = null;
-		
-		try
-		{
-			fis = new FileInputStream(file);
-			FileChannel inCh = fis.getChannel();
-			
-			outFile = new File(dir, file.getName());
-			fos = new FileOutputStream(outFile);
-			FileChannel outCh = fos.getChannel();
-			
-			outCh.transferFrom(inCh, 0, inCh.size());
-			
-			return outFile;
-		}
-		catch(IOException ioe)
-		{
-			ioe.printStackTrace();
-			throw ioe;
-		}
-		finally
-		{
-			try {
-				if(fos != null)
-				{
-					fos.close();
-				}
-			}
-			finally
-			{
-				if(fis != null)
-				{
-					fis.close();
-				}
-			}
-		}
 	}
 }
