@@ -146,7 +146,7 @@ public class FdiskCommand {
 			}
 
 			final String deviceId = ARG_DEVICE.getValue(cmdLine);
-			final PartitionHelper helper = new PartitionHelper(deviceId, dm); 
+			final PartitionHelper helper = new PartitionHelper(deviceId); 
 			
 			// initMBR
 			if (isInitMBR) {

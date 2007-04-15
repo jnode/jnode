@@ -49,4 +49,6 @@ public interface PartitionableBlockDeviceAPI
      * @throws IOException
      */
     public PartitionTable<PTE> getPartitionTable() throws IOException;
+
+	public String toString();
 }
