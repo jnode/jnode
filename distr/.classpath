@@ -5,6 +5,8 @@
 	<classpathentry kind="src" path="src/apps"/>
 	<classpathentry kind="src" path="/JNode-GUI"/>
 	<classpathentry kind="lib" path="/JNode-Shell/lib/bsh-2.0b4.jar"/>
+	<classpathentry kind="lib" path="lib/stamps_framework.jar"/>
+	<classpathentry kind="lib" path="lib/commons-logging.jar"/>
 	<classpathentry kind="src" path="/JNode-Shell"/>
 	<classpathentry kind="src" path="/JNode-TextUI"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JNode-FS"/>
