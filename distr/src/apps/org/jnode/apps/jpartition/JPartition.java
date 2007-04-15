@@ -1,60 +1,58 @@
 package org.jnode.apps.jpartition;
 
-import java.util.Collection;
-
-import javax.naming.NameNotFoundException;
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-
 import org.apache.log4j.Logger;
-import org.jnode.apps.jpartition.model.DevicePartitions;
-import org.jnode.apps.jpartition.model.DevicePartitionsList;
-import org.jnode.apps.jpartition.view.DevicePartitionsFrame;
-import org.jnode.apps.jpartition.view.FileDeviceFrame;
-import org.jnode.driver.Device;
-import org.jnode.driver.DeviceManager;
-import org.jnode.driver.block.PartitionableBlockDeviceAPI;
+import org.jnode.apps.jpartition.controller.MainController;
+import org.jnode.apps.jpartition.swingview.SwingViewFactory;
+import org.jnode.apps.jpartition.utils.BasicNameSpace;
 import org.jnode.naming.InitialNaming;
 import org.jnode.naming.NameSpace;
 import org.jnode.test.fs.driver.stubs.StubDeviceManager;
+import org.jnode.test.gui.Emu;
+import org.jnode.util.OsUtils;
 
-public class JPartition {
+public class JPartition extends Emu 
+{
 	private static final Logger log = Logger.getLogger(JPartition.class);
 	
-	public static void main(String[] args) throws Exception {
-		initJNodeCore();
-		
-		FileDeviceFrame frm = new FileDeviceFrame();
-		frm.setSize(300, 300);
-		frm.setVisible(true);
-		frm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		DevicePartitionsFrame mainUI = new DevicePartitionsFrame(getDevicePartitions()); 
-		mainUI.setSize(300, 300);
-		mainUI.setVisible(true);
-		mainUI.setLocation(frm.getX(), frm.getY() + frm.getHeight());
-		mainUI.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	}
-	
-	public static DevicePartitionsList getDevicePartitions()
+	public static void main(String[] args) throws Throwable 
 	{
-		DevicePartitionsList devParts = new DevicePartitionsList();
-		try {
-			DeviceManager devMan = InitialNaming.lookup(DeviceManager.NAME);
-			Collection<Device> devices = devMan.getDevicesByAPI(PartitionableBlockDeviceAPI.class);
-			for(Device device : devices)
-			{
-				devParts.add(new DevicePartitions(device));
-			}
-		} catch (NameNotFoundException e) {
-			log.error(e);
+//		testCharva();
+		
+		if(!OsUtils.isJNode())
+		{
+			initJNodeCore();
 		}
-		return devParts;
+		
+		ViewFactory viewFactory = new SwingViewFactory();
+		MainController controller = new MainController(viewFactory);
 	}
 	
 	private static void initJNodeCore() throws Exception {
         NameSpace namespace = new BasicNameSpace();
         InitialNaming.setNameSpace(namespace);
         namespace.bind(DeviceManager.NAME, StubDeviceManager.INSTANCE);
-	}	
+	}
+	
+/*	
+	private static void testCharva() throws Throwable
+	{
+        initEnv();
+        SwingTextScreenConsoleManager cm = new SwingTextScreenConsoleManager();
+        TextConsole tc = (TextConsole) cm.createConsole("Console 1",
+                ConsoleManager.CreateOptions.TEXT | ConsoleManager.CreateOptions.SCROLLABLE);
+        cm.focus(tc);
+        CommandShell cs = new CommandShell(tc);
+        final ShellManager sm = InitialNaming.lookup(ShellManager.NAME);
+        sm.registerShell(cs);
+        new Thread(cs).start();
+		
+		charvax.swing.JFrame frm = new charvax.swing.JFrame("test");
+		JLabel label = new JLabel("test");
+		frm.add(label);
+		frm.setFocus(label);
+		frm.setSize(300, 300);
+		frm.setVisible(true);
+		frm.setDefaultCloseOperation(charvax.swing.JFrame.EXIT_ON_CLOSE);		
+	}
+*/	
 }
