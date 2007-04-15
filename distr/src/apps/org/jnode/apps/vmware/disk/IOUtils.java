@@ -12,12 +12,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.jnode.apps.vmware.disk.extent.Access;
+import org.jnode.apps.vmware.disk.extent.ExtentType;
 import org.jnode.apps.vmware.disk.handler.ExtentFactory;
 import org.jnode.apps.vmware.disk.handler.FileDescriptor;
 import org.jnode.apps.vmware.disk.handler.IOHandler;
 import org.jnode.apps.vmware.disk.handler.UnsupportedFormatException;
 import org.jnode.apps.vmware.disk.handler.simple.SimpleExtentFactory;
 import org.jnode.apps.vmware.disk.handler.sparse.SparseExtentFactory;
+import org.jnode.apps.vmware.disk.handler.sparse.SparseExtentHeader;
 
 /**
  * Wrote from the 'Virtual Disk Format 1.0' specifications (from VMWare)
@@ -191,6 +194,13 @@ public class IOUtils {
 		return fileDescriptor;
 	}	
 	
+	public static ExtentDeclaration createExtentDeclaration(File mainFile, String fileName, Access access, long sizeInSectors, ExtentType extentType, long offset)
+	{
+		final File extentFile = IOUtils.getExtentFile(mainFile, fileName);
+		final boolean isMainExtent = extentFile.getName().equals(mainFile.getName());
+		return new ExtentDeclaration(access, sizeInSectors, extentType, fileName, extentFile, offset, isMainExtent);		
+	}
+	
 	public static File getExtentFile(File mainFile, String extentFileName) {
 		String path = mainFile.getParentFile().getAbsolutePath(); 
 		return new File(path, extentFileName);
@@ -303,5 +313,9 @@ public class IOUtils {
 		}
 		
 		return false;
+	}
+
+	public static void computeGrainTableCoverage(SparseExtentHeader header) {
+		header.setGrainTableCoverage(header.getNumGTEsPerGT() * header.getGrainSize());	
 	}
 }

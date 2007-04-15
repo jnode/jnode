@@ -159,9 +159,7 @@ abstract public class DescriptorRW {
 			offset = Long.valueOf(st.nextToken());
 		}
 					
-		final File extentFile = IOUtils.getExtentFile(mainFile, fileName);
-		final boolean isMainExtent = extentFile.getName().equals(mainFile.getName());
-		return new ExtentDeclaration(access, sizeInSectors, extentType, fileName, extentFile, offset, isMainExtent);
+		return IOUtils.createExtentDeclaration(mainFile, fileName, access, sizeInSectors, extentType, offset);		
 	}
 	
 	protected Header readHeader(BufferedReader reader) throws IOException, UnsupportedFormatException

@@ -67,7 +67,7 @@ public class DiskCopier {
 		}
 		catch(IOException ioe)
 		{
-			ioe.printStackTrace();
+			LOG.error(ioe);
 			throw ioe;
 		}
 		finally

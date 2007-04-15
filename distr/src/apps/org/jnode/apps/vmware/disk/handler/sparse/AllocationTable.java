@@ -18,7 +18,6 @@ public class AllocationTable {
 	private final GrainTable[] grainTables;
 	
 	public AllocationTable(GrainDirectory grainDirectory, GrainTable[] grainTables)
-						throws IOException
 	{
 		this.grainDirectory = grainDirectory;		
 		this.grainTables = grainTables;

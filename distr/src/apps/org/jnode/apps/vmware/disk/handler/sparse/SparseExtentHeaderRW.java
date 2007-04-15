@@ -106,7 +106,7 @@ public class SparseExtentHeaderRW
 		}
 		
 		// additional/computed attributes
-		header.setGrainTableCoverage(header.getNumGTEsPerGT() * header.getGrainSize());
+		IOUtils.computeGrainTableCoverage(header);		
 		
 		if(header.getGrainSize() <= 8)
 		{
