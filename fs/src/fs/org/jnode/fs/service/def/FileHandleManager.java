@@ -50,12 +50,10 @@ final class FileHandleManager {
 		FileData fd = openFiles.get(file);
 		if (fd == null) {
 			fd = new FileData(file);
-			final FileHandleImpl handle = fd.open(mode);
 			openFiles.put(file, fd);
-			return handle;
-		} else {
-			return fd.open(mode);
 		}
+		
+		return fd.open(mode);
 	}
 	
 	/**
@@ -143,7 +141,7 @@ final class FileHandleManager {
 				handles.add(newHandle);
 				return newHandle;				
 			} else {
-				throw new IOException("FileHandle is not known in FileData.close!!");
+				throw new IOException("FileHandle is not known in FileData.dup!!");
 			}
 		}
 		
