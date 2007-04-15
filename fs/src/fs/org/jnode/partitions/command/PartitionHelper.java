@@ -3,9 +3,13 @@ package org.jnode.partitions.command;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import javax.naming.NameNotFoundException;
+
 import org.jnode.driver.ApiNotFoundException;
+import org.jnode.driver.Device;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceNotFoundException;
+import org.jnode.driver.DeviceUtils;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.driver.bus.ide.IDEConstants;
@@ -27,21 +31,26 @@ public class PartitionHelper
 	public static final boolean SECTORS = false;
 	
 	private final IDEDevice current;
-	private final DeviceManager dm;
 	private final BlockDeviceAPI api;
 	
 	private ByteBuffer MBR;	
 	private BootSector bs;
-	
-	public PartitionHelper(String deviceId, DeviceManager dm) 
+
+	public PartitionHelper(String deviceId) 
+			throws DeviceNotFoundException, ApiNotFoundException, IOException, NameNotFoundException
+	{
+		this((IDEDevice)DeviceUtils.getDeviceManager().getDevice(deviceId));
+	}
+
+	public PartitionHelper(IDEDevice device) 
 				throws DeviceNotFoundException, ApiNotFoundException, IOException
 	{
-		this.current = (IDEDevice)dm.getDevice(deviceId);
-		this.dm = dm;
+		this.current = device;
 		this.api = current.getAPI(BlockDeviceAPI.class);
 
 		reloadMBR();
 	}
+
 	
 	public void initMbr() throws DeviceNotFoundException, ApiNotFoundException, 
 									IOException 
@@ -78,15 +87,23 @@ public class PartitionHelper
 		
 		// restart the device
 	    try {
-			dm.stop(current);
-	        dm.start(current);
+	    	DeviceManager devMan = DeviceUtils.getDeviceManager();
+	    	devMan.stop(current);
+	    	devMan.start(current);
 		} catch (DeviceNotFoundException e) {
 			e.printStackTrace();
 		} catch (DriverException e) {
 			e.printStackTrace();
+		} catch (NameNotFoundException e) {
+			e.printStackTrace();
 		}
 	}
 
+	public boolean hasValidMBR()
+	{
+		return IBMPartitionTable.containsPartitionTable(MBR.array());	
+	}
+	
 	private void reloadMBR() throws IOException
 	{
 		this.MBR = ByteBuffer.allocate(IDEConstants.SECTOR_SIZE);
@@ -96,7 +113,7 @@ public class PartitionHelper
 	
 	private void checkMBR() throws IOException
 	{
-		if (!IBMPartitionTable.containsPartitionTable(MBR.array()))
+		if (!hasValidMBR())
 			throw new IOException("This device doesn't contain a valid MBR, use --initmbr.");	
 	}
 
