@@ -1,6 +1,7 @@
 package org.jnode.apps.vmware.disk.tools;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.jnode.apps.vmware.disk.handler.sparse.SparseDiskFactory;
 
@@ -14,12 +15,12 @@ abstract public class DiskFactory
 {
 	private static final SparseDiskFactory SPARSE_FACTORY = new SparseDiskFactory();
 	
-	public static File createSparseDisk(File directory, String name, long size)
+	public static File createSparseDisk(File directory, String name, long size) throws IOException
 	{
 		return SPARSE_FACTORY.createDisk(directory, name, size);
 	}
 	
-	public File createDisk(File directory, String name, long size)
+	public File createDisk(File directory, String name, long size) throws IOException
 	{
 		if(!directory.isDirectory())
 		{
@@ -30,13 +31,8 @@ abstract public class DiskFactory
 			throw new IllegalArgumentException(directory.getAbsolutePath()+" must be writable");
 		}
 		
-		File mainFile = new File(directory, name);
-		if(!createDiskImpl(mainFile, size))
-		{
-			mainFile = null;
-		}
-		return mainFile;
+		return createDiskImpl(directory, name, size);
 	}
 
-	abstract protected boolean createDiskImpl(File mainFile, long size);
+	abstract protected File createDiskImpl(File directory, String name, long size) throws IOException;
 }
