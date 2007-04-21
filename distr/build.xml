@@ -36,6 +36,7 @@
   <target name="compile" depends="prepare">
     <jnode.compile>
 	  <src path="${my-src.dir}/apps"/>
+	  <src path="${my-src.dir}/emu"/>
 	  <src path="${my-src.dir}/install"/>
       <classpath refid="my-cp"/>
     </jnode.compile>
