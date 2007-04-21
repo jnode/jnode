@@ -7,11 +7,11 @@ import org.jnode.apps.jpartition.utils.BasicNameSpace;
 import org.jnode.naming.InitialNaming;
 import org.jnode.naming.NameSpace;
 import org.jnode.test.fs.driver.stubs.StubDeviceManager;
-import org.jnode.test.gui.Emu;
 import org.jnode.util.OsUtils;
+import org.jnode.emu.Emu;
+import org.jnode.driver.DeviceManager;
 
-public class JPartition extends Emu 
-{
+public class JPartition extends Emu {
 	private static final Logger log = Logger.getLogger(JPartition.class);
 	
 	public static void main(String[] args) throws Throwable 

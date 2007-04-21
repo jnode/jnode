@@ -1,8 +1,6 @@
-package org.jnode.apps.console;
+package org.jnode.emu;
 
-import org.jnode.test.gui.Emu;
 import org.jnode.driver.console.swing.SwingTextScreenConsoleManager;
-import org.jnode.driver.console.TextConsole;
 import org.jnode.driver.console.ConsoleManager;
 import org.jnode.shell.CommandShell;
 
@@ -14,7 +12,7 @@ public class ShellEmu extends Emu {
     public static void main(String[] argv) throws Exception {
         initEnv();
         SwingTextScreenConsoleManager cm = new SwingTextScreenConsoleManager();
-        new Thread(new CommandShell((TextConsole) cm.createConsole("Console 1",
+        new Thread(new CommandShell(cm.createConsole("Console 1",
                 ConsoleManager.CreateOptions.TEXT | ConsoleManager.CreateOptions.SCROLLABLE))).
                 start();
     }
