@@ -88,7 +88,7 @@ public class AbstractPCIDeviceToDriverMapper {
         } catch (ClassNotFoundException ex) {
             log.error("Cannot find driver class " + driverClass);
         } catch (InstantiationException ex) {
-            log.error("Cannot instantiate driver class " + driverClass);
+            log.error("Cannot instantiate driver class " + driverClass, ex);
         } catch (IllegalAccessException ex) {
             log.error("Cannot access driver class " + driverClass);
         }
