@@ -27,6 +27,10 @@
   <extension point="org.jnode.driver.mappers">
     <mapper id="1002:5159" architecture="RV100" name="RV100 QY" driver-class="org.jnode.driver.video.ati.radeon.RadeonDriver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
     <mapper id="1002:4c57" architecture="M7" name="M7 LW" driver-class="org.jnode.driver.video.ati.radeon.RadeonDriver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <!-- todo support this
+    <mapper id="1002:5b60" architecture="RV250" name="X300 RV370 5B60" driver-class="org.jnode.driver.video.ati.radeon.RadeonDriver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="1002:5b70" architecture="RV250" name="X300 RV370" driver-class="org.jnode.driver.video.ati.radeon.RadeonDriver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    -->
   </extension>
         
 </plugin>
