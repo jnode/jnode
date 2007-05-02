@@ -65,8 +65,8 @@ public class ViaRhineCore extends AbstractDeviceCore implements IRQHandler {
 
      */
 
-    ViaRhineRxDescriptor[] rx_ring = new ViaRhineRxDescriptor[RX_RING_SIZE];
-    ViaRhineTxDescriptor[] tx_ring = new ViaRhineTxDescriptor[TX_RING_SIZE];
+    //ViaRhineRxDescriptor[] rx_ring = new ViaRhineRxDescriptor[RX_RING_SIZE];
+    //ViaRhineTxDescriptor[] tx_ring = new ViaRhineTxDescriptor[TX_RING_SIZE];
     byte[] rx_buffs = new byte[RX_RING_SIZE];
     byte[] tx_buffs = new byte[TX_RING_SIZE];
 
@@ -423,8 +423,8 @@ public class ViaRhineCore extends AbstractDeviceCore implements IRQHandler {
 
         for (i = 0; i < RX_RING_SIZE; i++) {
 
-            rx_ring[i].rxStatus_bits.own_bit = 1;
-            rx_ring[i].rxControl_bits.rx_buf_size = 1536;
+//            rx_ring[i].rxStatus_bits.own_bit = 1;
+//            rx_ring[i].rxControl_bits.rx_buf_size = 1536;
 
             //--rx_ring[i].buf_addr_1 = virt_to_bus (tp->rx_buffs[i]);
             //--rx_ring[i].buf_addr_2 = virt_to_bus (&tp->rx_ring[i + 1]);
@@ -443,8 +443,8 @@ public class ViaRhineCore extends AbstractDeviceCore implements IRQHandler {
 
         for (i = 0; i < TX_RING_SIZE; i++) {
 
-        tx_ring[i].txStatus_lw = 0;
-        tx_ring[i].txControl_lw = 0x00e08000;
+//        tx_ring[i].txStatus_lw = 0;
+//        tx_ring[i].txControl_lw = 0x00e08000;
         //--tx_ring[i].buf_addr_1 = virt_to_bus (tp->tx_buffs[i]);
         //--tx_ring[i].buf_addr_2 = virt_to_bus (&tp->tx_ring[i + 1]);
         /* printf("[%d]buf1=%hX,buf2=%hX",i,tp->tx_ring[i].buf_addr_1,tp->tx_ring[i].buf_addr_2); */
