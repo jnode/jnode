@@ -38,8 +38,7 @@ public class AccessControllerUtils {
      * @return
      * @throws Exception
      */
-    public static Object doPrivileged(PrivilegedExceptionAction action)
-    throws Exception {
+    public static <T> T doPrivileged(PrivilegedExceptionAction<T> action) throws Exception {
         try {
             return AccessController.doPrivileged(action);
         } catch (PrivilegedActionException ex) {
