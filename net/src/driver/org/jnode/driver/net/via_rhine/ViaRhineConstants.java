@@ -6,72 +6,71 @@ package org.jnode.driver.net.via_rhine;
 /**
  * @author Levente Sántha
  */
-public interface ViaRhineConstants {
-    byte ioaddr = 0;
-    byte byPAR0 = ioaddr;
-    byte byRCR = ioaddr + 6;
-    byte byTCR = ioaddr + 7;
-    byte byCR0 = ioaddr + 8;
-    byte byCR1 = ioaddr + 9;
-    byte byISR0 = ioaddr + 0x0c;
-    byte byISR1 = ioaddr + 0x0d;
-    byte byIMR0 = ioaddr + 0x0e;
-    byte byIMR1 = ioaddr + 0x0f;
-    byte byMAR0 = ioaddr + 0x10;
-    byte byMAR1 = ioaddr + 0x11;
-    byte byMAR2 = ioaddr + 0x12;
-    byte byMAR3 = ioaddr + 0x13;
-    byte byMAR4 = ioaddr + 0x14;
-    byte byMAR5 = ioaddr + 0x15;
-    byte byMAR6 = ioaddr + 0x16;
-    byte byMAR7 = ioaddr + 0x17;
-    int dwCurrentRxDescAddr = ioaddr + 0x18;
-    int dwCurrentTxDescAddr = ioaddr + 0x1c;
-    int dwCurrentRDSE0 = ioaddr + 0x20;
-    int dwCurrentRDSE1 = ioaddr + 0x24;
-    int dwCurrentRDSE2 = ioaddr + 0x28;
-    int dwCurrentRDSE3 = ioaddr + 0x2c;
-    int dwNextRDSE0 = ioaddr + 0x30;
-    int dwNextRDSE1 = ioaddr + 0x34;
-    int dwNextRDSE2 = ioaddr + 0x38;
-    int dwNextRDSE3 = ioaddr + 0x3c;
-    int dwCurrentTDSE0 = ioaddr + 0x40;
-    int dwCurrentTDSE1 = ioaddr + 0x44;
-    int dwCurrentTDSE2 = ioaddr + 0x48;
-    int dwCurrentTDSE3 = ioaddr + 0x4c;
-    int dwNextTDSE0 = ioaddr + 0x50;
-    int dwNextTDSE1 = ioaddr + 0x54;
-    int dwNextTDSE2 = ioaddr + 0x58;
-    int dwNextTDSE3 = ioaddr + 0x5c;
-    int dwCurrRxDMAPtr = ioaddr + 0x60;
-    int dwCurrTxDMAPtr = ioaddr + 0x64;
-    int byMPHY = ioaddr + 0x6c;
-    int byMIISR = ioaddr + 0x6d;
-    int byBCR0 = ioaddr + 0x6e;
-    int byBCR1 = ioaddr + 0x6f;
-    int byMIICR = ioaddr + 0x70;
-    int byMIIAD = ioaddr + 0x71;
-    int wMIIDATA = ioaddr + 0x72;
-    int byEECSR = ioaddr + 0x74;
-    int byTEST = ioaddr + 0x75;
-    int byGPIO = ioaddr + 0x76;
-    int byCFGA = ioaddr + 0x78;
-    int byCFGB = ioaddr + 0x79;
-    int byCFGC = ioaddr + 0x7a;
-    int byCFGD = ioaddr + 0x7b;
-    int wTallyCntMPA = ioaddr + 0x7c;
-    int wTallyCntCRC = ioaddr + 0x7d;
-    int bySTICKHW = ioaddr + 0x83;
-    int byWOLcrClr = ioaddr + 0xA4;
-    int byWOLcgClr = ioaddr + 0xA7;
-    int byPwrcsrClr = ioaddr + 0xAC;
+interface ViaRhineConstants {
+
+    int byPAR0 = 0;
+    int byRCR = 6;
+    int byTCR = 7;
+    int byCR0 = 8;
+    int byCR1 = 9;
+    int byISR0 = 0x0c;
+    int byISR1 = 0x0d;
+    int byIMR0 = 0x0e;
+    int byIMR1 = 0x0f;
+    int byMAR0 = 0x10;
+    int byMAR1 = 0x11;
+    int byMAR2 = 0x12;
+    int byMAR3 = 0x13;
+    int byMAR4 = 0x14;
+    int byMAR5 = 0x15;
+    int byMAR6 = 0x16;
+    int byMAR7 = 0x17;
+    int dwCurrentRxDescAddr = 0x18;
+    int dwCurrentTxDescAddr = 0x1c;
+    int dwCurrentRDSE0 = 0x20;
+    int dwCurrentRDSE1 = 0x24;
+    int dwCurrentRDSE2 = 0x28;
+    int dwCurrentRDSE3 = 0x2c;
+    int dwNextRDSE0 = 0x30;
+    int dwNextRDSE1 = 0x34;
+    int dwNextRDSE2 = 0x38;
+    int dwNextRDSE3 = 0x3c;
+    int dwCurrentTDSE0 = 0x40;
+    int dwCurrentTDSE1 = 0x44;
+    int dwCurrentTDSE2 = 0x48;
+    int dwCurrentTDSE3 = 0x4c;
+    int dwNextTDSE0 = 0x50;
+    int dwNextTDSE1 = 0x54;
+    int dwNextTDSE2 = 0x58;
+    int dwNextTDSE3 = 0x5c;
+    int dwCurrRxDMAPtr = 0x60;
+    int dwCurrTxDMAPtr = 0x64;
+    int byMPHY = 0x6c;
+    int byMIISR = 0x6d;
+    int byBCR0 = 0x6e;
+    int byBCR1 = 0x6f;
+    int byMIICR = 0x70;
+    int byMIIAD = 0x71;
+    int wMIIDATA = 0x72;
+    int byEECSR = 0x74;
+    int byTEST = 0x75;
+    int byGPIO = 0x76;
+    int byCFGA = 0x78;
+    int byCFGB = 0x79;
+    int byCFGC = 0x7a;
+    int byCFGD = 0x7b;
+    int wTallyCntMPA = 0x7c;
+    int wTallyCntCRC = 0x7d;
+    int bySTICKHW = 0x83;
+    int byWOLcrClr = 0xA4;
+    int byWOLcgClr = 0xA7;
+    int byPwrcsrClr = 0xAC;
 
 /*---------------------  Exioaddr Definitions -------------------------*/
 
-/*
- * Bits in the RCR register
- */
-
+    /*
+     * Bits in the RCR register
+     */
     int RCR_RRFT2 = 0x80;
     int RCR_RRFT1 = 0x40;
     int RCR_RRFT0 = 0x20;
@@ -81,10 +80,9 @@ public interface ViaRhineConstants {
     int RCR_AR = 0x02;
     int RCR_SEP = 0x01;
 
-/*
- * Bits in the TCR register
- */
-
+    /*
+     * Bits in the TCR register
+     */
     int TCR_RTSF = 0x80;
     int TCR_RTFT1 = 0x40;
     int TCR_RTFT0 = 0x20;
@@ -92,10 +90,9 @@ public interface ViaRhineConstants {
     int TCR_LB1 = 0x04;    /* loopback[1] */
     int TCR_LB0 = 0x02;    /* loopback[0] */
 
-/*
- * Bits in the CR0 register
- */
-
+    /*
+     * Bits in the CR0 register
+     */
     int CR0_RDMD = 0x40;    /* rx descriptor polling demand */
     int CR0_TDMD = 0x20;    /* tx descriptor polling demand */
     int CR0_TXON = 0x10;
@@ -104,10 +101,9 @@ public interface ViaRhineConstants {
     int CR0_STRT = 0x02;    /* start NIC */
     int CR0_INIT = 0x01;    /* start init process */
 
-/*
-* Bits in the CR1 register
-*/
-
+    /*
+    * Bits in the CR1 register
+    */
     int CR1_SFRST = 0x80    /* software reset */;
     int CR1_RDMD1 = 0x40    /* RDMD1 */;
     int CR1_TDMD1 = 0x20    /* TDMD1 */;
@@ -117,10 +113,9 @@ public interface ViaRhineConstants {
     int CR1_ETEN = 0x02    /* early tx mode */;
     int CR1_EREN = 0x01    /* early rx mode */;
 
-/*
- * Bits in the CR register
- */
-
+    /*
+     * Bits in the CR register
+     */
     int CR_RDMD = 0x0040    /* rx descriptor polling demand */;
     int CR_TDMD = 0x0020    /* tx descriptor polling demand */;
     int CR_TXON = 0x0010;
@@ -137,10 +132,9 @@ public interface ViaRhineConstants {
     int CR_ETEN = 0x0200    /* early tx mode */;
     int CR_EREN = 0x0100    /* early rx mode */;
 
-/*
- * Bits in the IMR0 register
- */
-
+    /*
+     * Bits in the IMR0 register
+     */
     int IMR0_CNTM = 0x80;
     int IMR0_BEM = 0x40;
     int IMR0_RUM = 0x20;
@@ -150,14 +144,12 @@ public interface ViaRhineConstants {
     int IMR0_PTXM = 0x02;
     int IMR0_PRXM = 0x01;
 
-/* define imrshadow */
-
+    /* define imrshadow */
     int IMRShadow = 0x5AFF;
 
-/*
- * Bits in the IMR1 register
- */
-
+    /*
+     * Bits in the IMR1 register
+     */
     int IMR1_INITM = 0x80;
     int IMR1_SRCM = 0x40;
     int IMR1_NBFM = 0x10;
@@ -166,10 +158,9 @@ public interface ViaRhineConstants {
     int IMR1_ETM = 0x02;
     int IMR1_ERM = 0x01;
 
-/*
- * Bits in the ISR register
- */
-
+    /*
+     * Bits in the ISR register
+     */
     int ISR_INITI = 0x8000;
     int ISR_SRCI = 0x4000;
     int ISR_ABTI = 0x2000;
@@ -187,10 +178,9 @@ public interface ViaRhineConstants {
     int ISR_PTX = 0x0002;
     int ISR_PRX = 0x0001;
 
-/*
- * Bits in the ISR0 register;
- */
-
+    /*
+     * Bits in the ISR0 register;
+     */
     int ISR0_CNT = 0x80;
     int ISR0_BE = 0x40;
     int ISR0_RU = 0x20;
@@ -200,10 +190,9 @@ public interface ViaRhineConstants {
     int ISR0_PTX = 0x02;
     int ISR0_PRX = 0x01;
 
-/*
- * Bits in the ISR1 register
- */
-
+    /*
+     * Bits in the ISR1 register
+     */
     int ISR1_INITI = 0x80;
     int ISR1_SRCI = 0x40;
     int ISR1_NORBF = 0x10;
@@ -211,23 +200,20 @@ public interface ViaRhineConstants {
     int ISR1_ETI = 0x02;
     int ISR1_ERI = 0x01;
 
-/* ISR ABNORMAL CONDITION */
-
+    /* ISR ABNORMAL CONDITION */
     int ISR_ABNORMAL = ISR_BE + ISR_RU + ISR_TU + ISR_CNT + ISR_NORBF + ISR_PKTRA;
 
-/*
- * Bits in the MIISR register;
- */
-
+    /*
+     * Bits in the MIISR register;
+     */
     int MIISR_MIIERR = 0x08;
     int MIISR_MRERR = 0x04;
     int MIISR_LNKFL = 0x02;
     int MIISR_SPEED = 0x01;
 
-/*
- * Bits in the MIICR register;
- */
-
+    /*
+     * Bits in the MIICR register;
+     */
     int MIICR_MAUTO = 0x80;
     int MIICR_RCMD = 0x40;
     int MIICR_WCMD = 0x20;
@@ -237,10 +223,9 @@ public interface ViaRhineConstants {
     int MIICR_MDI = 0x02;
     int MIICR_MDC = 0x01;
 
-/*
- * Bits in the EECSR register;
- */
-
+    /*
+     * Bits in the EECSR register;
+     */
     int EECSR_EEPR = 0x80    /* eeprom programed status, 73h means programed */;
     int EECSR_EMBP = 0x40    /* eeprom embeded programming */;
     int EECSR_AUTOLD = 0x20    /* eeprom content reload */;
@@ -373,102 +358,47 @@ public interface ViaRhineConstants {
     int PCI_REG_MODE3 = 0x53;
     int MODE3_MIION = 0x04;    /* in PCI_REG_MOD3 OF PCI space */
 
-/* Offsets to the device registers. */
-    /*
-enum register_offsets {
-        StationAddr=0x00, RxConfig=0x06, TxConfig=0x07, ChipCmd=0x08,
-        IntrStatus=0x0C, IntrEnable=0x0E,
-        MulticastFilter0=0x10, MulticastFilter1=0x14,
-        RxRingPtr=0x18, TxRingPtr=0x1C, GFIFOTest=0x54,
-        MIIPhyAddr=0x6C, MIIStatus=0x6D, PCIBusConfig=0x6E,
-        MIICmd=0x70, MIIRegAddr=0x71, MIIData=0x72, MACRegEEcsr=0x74,
-        ConfigA=0x78, ConfigB=0x79, ConfigC=0x7A, ConfigD=0x7B,
-        RxMissed=0x7C, RxCRCErrs=0x7E, MiscCmd=0x81,
-        StickyHW=0x83, IntrStatus2=0x84, WOLcrClr=0xA4, WOLcgClr=0xA7,
-        PwrcsrClr=0xAC,
-};
-*/
+    /* Offsets to the device registers. */
+    int StationAddr = 0x00, RxConfig = 0x06, TxConfig = 0x07, ChipCmd = 0x08,
+            IntrStatus = 0x0C, IntrEnable = 0x0E,
+            MulticastFilter0 = 0x10, MulticastFilter1 = 0x14,
+            RxRingPtr = 0x18, TxRingPtr = 0x1C, GFIFOTest = 0x54,
+            MIIPhyAddr = 0x6C, MIIStatus = 0x6D, PCIBusConfig = 0x6E,
+            MIICmd = 0x70, MIIRegAddr = 0x71, MIIData = 0x72, MACRegEEcsr = 0x74,
+            ConfigA = 0x78, ConfigB = 0x79, ConfigC = 0x7A, ConfigD = 0x7B,
+            RxMissed = 0x7C, RxCRCErrs = 0x7E, MiscCmd = 0x81,
+            StickyHW = 0x83, IntrStatus2 = 0x84, WOLcrClr = 0xA4, WOLcgClr = 0xA7,
+            PwrcsrClr = 0xAC;
 
-/* Offsets to the device registers. */
-        int StationAddr=0x00, RxConfig=0x06, TxConfig=0x07, ChipCmd=0x08,
-        IntrStatus=0x0C, IntrEnable=0x0E,
-        MulticastFilter0=0x10, MulticastFilter1=0x14,
-        RxRingPtr=0x18, TxRingPtr=0x1C, GFIFOTest=0x54,
-        MIIPhyAddr=0x6C, MIIStatus=0x6D, PCIBusConfig=0x6E,
-        MIICmd=0x70, MIIRegAddr=0x71, MIIData=0x72, MACRegEEcsr=0x74,
-        ConfigA=0x78, ConfigB=0x79, ConfigC=0x7A, ConfigD=0x7B,
-        RxMissed=0x7C, RxCRCErrs=0x7E, MiscCmd=0x81,
-        StickyHW=0x83, IntrStatus2=0x84, WOLcrClr=0xA4, WOLcgClr=0xA7,
-        PwrcsrClr=0xAC;
+    /* Bits in the interrupt status/mask registers. */
+    int IntrRxDone = 0x0001, IntrRxErr = 0x0004, IntrRxEmpty = 0x0020,
+            IntrTxDone = 0x0002, IntrTxError = 0x0008, IntrTxUnderrun = 0x0210,
+            IntrPCIErr = 0x0040,
+            IntrStatsMax = 0x0080, IntrRxEarly = 0x0100,
+            IntrRxOverflow = 0x0400, IntrRxDropped = 0x0800, IntrRxNoBuf = 0x1000,
+            IntrTxAborted = 0x2000, IntrLinkChange = 0x4000,
+            IntrRxWakeUp = 0x8000,
+            IntrNormalSummary = 0x0003, IntrAbnormalSummary = 0xC260,
+            IntrTxDescRace = 0x080000,        // mapped from IntrStatus2
+            IntrTxErrSummary = 0x082218;
 
 
-/* Bits in the interrupt status/mask registers. */
-    /*
-enum intr_status_bits {
-        IntrRxDone=0x0001, IntrRxErr=0x0004, IntrRxEmpty=0x0020,
-        IntrTxDone=0x0002, IntrTxError=0x0008, IntrTxUnderrun=0x0210,
-        IntrPCIErr=0x0040,
-        IntrStatsMax=0x0080, IntrRxEarly=0x0100,
-        IntrRxOverflow=0x0400, IntrRxDropped=0x0800, IntrRxNoBuf=0x1000,
-        IntrTxAborted=0x2000, IntrLinkChange=0x4000,
-        IntrRxWakeUp=0x8000,
-        IntrNormalSummary=0x0003, IntrAbnormalSummary=0xC260,
-        IntrTxDescRace=0x080000,        // mapped from IntrStatus2
-        IntrTxErrSummary=0x082218,
-};
-/* Bits in the interrupt status/mask registers. */
+    int DEFAULT_INTR = IntrRxDone | IntrRxErr | IntrRxEmpty |
+            IntrRxOverflow | IntrRxDropped | IntrRxNoBuf;
 
-        int IntrRxDone=0x0001, IntrRxErr=0x0004, IntrRxEmpty=0x0020,
-        IntrTxDone=0x0002, IntrTxError=0x0008, IntrTxUnderrun=0x0210,
-        IntrPCIErr=0x0040,
-        IntrStatsMax=0x0080, IntrRxEarly=0x0100,
-        IntrRxOverflow=0x0400, IntrRxDropped=0x0800, IntrRxNoBuf=0x1000,
-        IntrTxAborted=0x2000, IntrLinkChange=0x4000,
-        IntrRxWakeUp=0x8000,
-        IntrNormalSummary=0x0003, IntrAbnormalSummary=0xC260,
-        IntrTxDescRace=0x080000,        // mapped from IntrStatus2
-        IntrTxErrSummary=0x082218;
-
-
-
-//#define DEFAULT_INTR (IntrRxDone | IntrRxErr | IntrRxEmpty| IntrRxOverflow | \
-//                   IntrRxDropped | IntrRxNoBuf)
-
-        int DEFAULT_INTR = IntrRxDone | IntrRxErr | IntrRxEmpty|
-                IntrRxOverflow | IntrRxDropped | IntrRxNoBuf;
-
-//enum rhine_revs {
-//    int VT86C100A       = 0x00;
-//    int VTunknown0      = 0x20;
-//    int VT6102          = 0x40;
-//    int VT8231          = 0x50; /* Integrated MAC */
-//    int VT8233          = 0x60; /* Integrated MAC */
-//    int VT8235          = 0x74; /* Integrated MAC */
-//    int VT8237          = 0x78; /* Integrated MAC */
-//    int VTunknown1      = 0x7C;
-//    int VT6105          = 0x80;
-//    int VT6105_B0       = 0x83;
-//    int VT6105L 	    = 0x8A;
-//    int VT6107          = 0x8C;
-//    int VTunknown2      = 0x8E;
-//    int VT6105M         = 0x90;
-//};
-
-//enum rhine_revs {
-    int VT86C100A       = 0x00;
-    int VTunknown0      = 0x20;
-    int VT6102          = 0x40;
-    int VT8231          = 0x50; /* Integrated MAC */
-    int VT8233          = 0x60; /* Integrated MAC */
-    int VT8235          = 0x74; /* Integrated MAC */
-    int VT8237          = 0x78; /* Integrated MAC */
-    int VTunknown1      = 0x7C;
-    int VT6105          = 0x80;
-    int VT6105_B0       = 0x83;
-    int VT6105L 	    = 0x8A;
-    int VT6107          = 0x8C;
-    int VTunknown2      = 0x8E;
-    int VT6105M         = 0x90;
-//};
-
+    //enum rhine_revs
+    int VT86C100A = 0x00;
+    int VTunknown0 = 0x20;
+    int VT6102 = 0x40;
+    int VT8231 = 0x50; /* Integrated MAC */
+    int VT8233 = 0x60; /* Integrated MAC */
+    int VT8235 = 0x74; /* Integrated MAC */
+    int VT8237 = 0x78; /* Integrated MAC */
+    int VTunknown1 = 0x7C;
+    int VT6105 = 0x80;
+    int VT6105_B0 = 0x83;
+    int VT6105L = 0x8A;
+    int VT6107 = 0x8C;
+    int VTunknown2 = 0x8E;
+    int VT6105M = 0x90;
 }
