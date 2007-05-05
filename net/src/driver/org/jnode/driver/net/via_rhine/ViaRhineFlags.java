@@ -9,7 +9,7 @@ import org.jnode.plugin.ConfigurationElement;
 /**
  * @author Levente Sántha
  */
-public class ViaRhineFlags implements Flags {
+class ViaRhineFlags implements Flags {
     private final String name;
 
     public ViaRhineFlags(ConfigurationElement config) {

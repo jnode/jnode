@@ -21,47 +21,33 @@ import javax.naming.NameNotFoundException;
 import static org.jnode.net.ethernet.EthernetConstants.*;
 import static org.jnode.driver.net.via_rhine.ViaRhineConstants.*;
 import org.jnode.driver.net.ethernet.spi.Flags;
-import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.ParsedArguments;
 import java.io.*;
-import java.net.URL;
 
 /**
  * @author Levente Sántha
  */
-public class ViaRhineCore extends AbstractDeviceCore implements IRQHandler {
+class ViaRhineCore extends AbstractDeviceCore implements IRQHandler {
     private final int ioBase;
     private final IOResource io;
 	private final IRQResource irq;
 	private EthernetAddress hwAddress;
     private ViaRhineDriver driver;
+    private ViaRhineRxRing rxRing;
+    private ViaRhineTxRing txRing;
+
 
 
     /*
-    char devname[8];		// Used only for kernel debugging.
-    const char *product_name;
-    struct rhine_rx_desc *rx_ring;
-    struct rhine_tx_desc *tx_ring;
-    char *rx_buffs[RX_RING_SIZE];
-    char *tx_buffs[TX_RING_SIZE];
-
     // temporary Rx buffers.
 
     int chip_id;
     int chip_revision;
-    unsigned short ioaddr;
-    unsigned int cur_rx, cur_tx;	// The next free and used entries
+
     unsigned int dirty_rx, dirty_tx;
     // The saved address of a sent-in-place packet/buffer, for skfree().
     struct sk_buff *tx_skbuff[TX_RING_SIZE];
     unsigned char mc_filter[8];	// Current multicast filter.
     char phys[4];		// MII device addresses.
-    unsigned int tx_full:1;	// The Tx queue is full.
-    unsigned int full_duplex:1;	// Full-duplex operation requested.
-    unsigned int default_port:4;	// Last dev->if_port value.
-    unsigned int media2:4;	// Secondary monitored media port.
-    unsigned int medialock:1;	// Don't sense media type.
-    unsigned int mediasense:1;	// Media sensing in progress.
 
      */
 
@@ -85,9 +71,6 @@ public class ViaRhineCore extends AbstractDeviceCore implements IRQHandler {
     int media2 = 4;	// Secondary monitored media port.
     int medialock = 1;	// Don't sense media type.
     int mediasense = 1;	// Media sensing in progress.
-
-    RxRing rxRing;
-    TxRing txRing;
 
     public ViaRhineCore(ViaRhineDriver driver, Device device, ResourceOwner owner, Flags flags)
             throws DriverException, ResourceNotFreeException{
@@ -164,7 +147,7 @@ public class ViaRhineCore extends AbstractDeviceCore implements IRQHandler {
 
                 Thread.sleep(50);
                 if(!rxRing.currentDesc().isOwnBit()){
-                    SocketBuffer packet = rxRing.getPacket();
+                    SocketBuffer packet = rxRing.currentDesc().getPacket();
                     driver.onReceive(packet);
                     log.debug("New packet");
                     log.debug(packet.getLinkLayerHeader().getSourceAddress());
@@ -203,22 +186,9 @@ public class ViaRhineCore extends AbstractDeviceCore implements IRQHandler {
         setIRQEnabled(true);
     }
 
-    int my_INTR = IntrTxDone | IntrTxError | IntrTxUnderrun;
+    private static final int my_INTR = IntrTxDone | IntrTxError | IntrTxUnderrun;
 
     private void printIntrStatus(){
-        /*
-        int IntrRxDone=0x0001, IntrRxErr=0x0004, IntrRxEmpty=0x0020,
-                    IntrTxDone=0x0002, IntrTxError=0x0008, IntrTxUnderrun=0x0210,
-                    IntrPCIErr=0x0040,
-                    IntrStatsMax=0x0080, IntrRxEarly=0x0100,
-                    IntrRxOverflow=0x0400, IntrRxDropped=0x0800, IntrRxNoBuf=0x1000,
-                    IntrTxAborted=0x2000, IntrLinkChange=0x4000,
-                    IntrRxWakeUp=0x8000,
-                    IntrNormalSummary=0x0003, IntrAbnormalSummary=0xC260,
-                    IntrTxDescRace=0x080000,        // mapped from IntrStatus2
-                    IntrTxErrSummary=0x082218;
-        */
-
         int intr_status = getIntrStatus();
 
         log.debug("Interrupt status word: 0x" + NumberUtils.hex(intr_status));
@@ -299,7 +269,6 @@ public class ViaRhineCore extends AbstractDeviceCore implements IRQHandler {
     }
 
     public HardwareAddress getHwAddress() {
-        log.debug("getHwAddress");
         return hwAddress;
     }
 
@@ -311,16 +280,13 @@ public class ViaRhineCore extends AbstractDeviceCore implements IRQHandler {
 
     public void disable() {
         log.debug("disable()");
-        /* merge reset and disable */
-        //rhine_reset(nic);
+        // merge reset and disable
         reset();
 
-        /* Switch to loopback mode to avoid hardware races. */
-        //writeb(0x60 | 0x01, byTCR);
+        // Switch to loopback mode to avoid hardware races.
         setReg8(byTCR, 0x60 | 0x01);
 
-        /* Stop the chip's Tx and Rx processes. */
-        //writew(CR_STOP, byCR0);
+        // Stop the chip's Tx and Rx processes.
         setReg16(byCR0, CR_STOP);
     }
 
@@ -330,15 +296,8 @@ public class ViaRhineCore extends AbstractDeviceCore implements IRQHandler {
         MIIDelay();
 
         //init ring
-        try {
-            final ResourceManager rm = InitialNaming.lookup(ResourceManager.NAME);
-            rxRing = new RxRing(rm);
-            log.debug("Rx ring initialised");
-            txRing = new TxRing(rm);
-            log.debug("Tx ring initialised");
-        } catch (NameNotFoundException ex) {
-            throw new RuntimeException("Cannot find ResourceManager");
-        }
+        initRing();
+
         
         /*write TD RD Descriptor to MAC */
         setReg32(dwCurrentRxDescAddr, rxRing.ringAddr);
@@ -398,60 +357,24 @@ public class ViaRhineCore extends AbstractDeviceCore implements IRQHandler {
         setReg8(byRCR, 0x60 | rx_mode);
     }
 
-    private void reloadEEPROM()
-    {
-        //int i;
-        //outb(0x20, byEECSR);
+    private void reloadEEPROM() {
         setReg8(byEECSR, 0x20);
-
         /* Typically 2 cycles to reload. */
-        //for (i = 0; i < 150; i++)
-        //    if (! (inb(byEECSR) & 0x20))
-        //        break;
-
         for (int i = 0; i < 150; i++)
             if ( (getReg8(byEECSR) & 0x20) == 0)
                 break;
     }
 
-
     void initRing () {
-        int i;
-        tx_full = 0;
-        cur_rx = cur_tx = 0;
-        dirty_rx = dirty_tx = 0;
-
-        for (i = 0; i < RX_RING_SIZE; i++) {
-
-//            rx_ring[i].rxStatus_bits.own_bit = 1;
-//            rx_ring[i].rxControl_bits.rx_buf_size = 1536;
-
-            //--rx_ring[i].buf_addr_1 = virt_to_bus (tp->rx_buffs[i]);
-            //--rx_ring[i].buf_addr_2 = virt_to_bus (&tp->rx_ring[i + 1]);
-
-            /* printf("[%d]buf1=%hX,buf2=%hX",i,tp->rx_ring[i].buf_addr_1,tp->rx_ring[i].buf_addr_2); */
+        try {
+            final ResourceManager rm = InitialNaming.lookup(ResourceManager.NAME);
+            rxRing = new ViaRhineRxRing(rm);
+            log.debug("Rx ring initialised");
+            txRing = new ViaRhineTxRing(rm);
+            log.debug("Tx ring initialised");
+        } catch (NameNotFoundException ex) {
+            throw new RuntimeException("Cannot find ResourceManager");
         }
-        /* Mark the last entry as wrapping the ring. */
-        /* tp->rx_ring[i-1].rx_ctrl.bits.rx_buf_size =1518; */
-
-        //--rx_ring[i - 1].buf_addr_2 = virt_to_bus (&tp->rx_ring[0]);
-
-        /*printf("[%d]buf1=%hX,buf2=%hX",i-1,tp->rx_ring[i-1].buf_addr_1,tp->rx_ring[i-1].buf_addr_2); */
-
-        /* The Tx buffer descriptor is filled in as needed, but we
-           do need to clear the ownership bit. */
-
-        for (i = 0; i < TX_RING_SIZE; i++) {
-
-//        tx_ring[i].txStatus_lw = 0;
-//        tx_ring[i].txControl_lw = 0x00e08000;
-        //--tx_ring[i].buf_addr_1 = virt_to_bus (tp->tx_buffs[i]);
-        //--tx_ring[i].buf_addr_2 = virt_to_bus (&tp->tx_ring[i + 1]);
-        /* printf("[%d]buf1=%hX,buf2=%hX",i,tp->tx_ring[i].buf_addr_1,tp->tx_ring[i].buf_addr_2); */
-        }
-
-        //--tx_ring[i - 1].buf_addr_2 = virt_to_bus (&tp->tx_ring[0]);
-        /* printf("[%d]buf1=%hX,buf2=%hX",i,tp->tx_ring[i-1].buf_addr_1,tp->tx_ring[i-1].buf_addr_2); */
     }
 
     private int queryAuto () {
@@ -684,7 +607,6 @@ public class ViaRhineCore extends AbstractDeviceCore implements IRQHandler {
 //        destination.writeTo(buf, 0);
 //        hwAddress.writeTo(buf, 6);        
         txRing.currentDesc().setOwnBit();
-        txRing.currentDesc().setFrameLength(buf.getSize());
         txRing.currentDesc().setPacket(buf);
         log.debug("\n" + hexDump(buf.toByteArray()) + "\n");
 
