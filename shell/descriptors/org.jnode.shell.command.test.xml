@@ -20,7 +20,7 @@
     </runtime>
 
     <extension point="org.jnode.shell.aliases">
-        <alias name="test" class="org.jnode.shell.command.test.TestCommand"/>
+        <alias name="utest" class="org.jnode.shell.command.test.TestCommand"/>
         <alias name="suite" class="org.jnode.shell.command.test.SuiteCommand"/>
     </extension>
 
