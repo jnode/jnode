@@ -43,7 +43,7 @@ public class TestCommand {
     // static final Argument ARG_ARGS = new Argument("arg", "the argument(s) to
     // pass to the testcase", Argument.MULTI);
 
-    public static Help.Info HELP_INFO = new Help.Info("test",
+    public static Help.Info HELP_INFO = new Help.Info("utest",
             "Run a JUnit testcase", new Parameter[] { new Parameter(ARG_CLASS,
                     Parameter.MANDATORY)
             // new Parameter(ARG_ARGS, Parameter.OPTIONAL)
