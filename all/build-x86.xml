@@ -255,10 +255,13 @@
 			<copy todir="@{dir}">
 				<fileset dir="${initjars.dir}" />
 			</copy>
-			<copy file="${my-lib.dir}/stage2_eltorito" todir="@{dir}/boot/grub" />
-			<copy file="${grub.menu.cdrom}" tofile="@{dir}/boot/grub/menu.lst" />
-			<exec executable="mkisofs">
-				<arg line="-o @{destfile} -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -boot-info-table @{dir}" />
+			<copy file="${my-lib.dir}/eltorito.s2" todir="@{dir}/boot/grub" />
+            <copy file="${my-lib.dir}/fat.s15" todir="@{dir}/boot/grub" />
+            <copy file="${my-lib.dir}/grub.s1" todir="@{dir}/boot/grub" />
+            <copy file="${my-lib.dir}/grub.s2" todir="@{dir}/boot/grub" />
+            <copy file="${grub.menu.cdrom}" tofile="@{dir}/boot/grub/menu.lst" />
+            <exec executable="mkisofs">
+				<arg line="-o @{destfile} -R -b boot/grub/eltorito.s2 -no-emul-boot -boot-load-size 4 -boot-info-table @{dir}" />
 			</exec>
 		</sequential>
 	</macrodef>
