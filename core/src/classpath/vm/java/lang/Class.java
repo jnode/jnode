@@ -1039,6 +1039,36 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type,
     }
 
     /**
+     * Gets a primitive class of a given type.
+     *
+     * @param type
+     * @return
+     * @see VmType#getPrimitiveClass(char)
+     */
+    static Class getPrimitiveClass(String type) {
+        if(type.equals("double"))
+            return getPrimitiveClass('D');
+        else if(type.equals("float"))
+            return getPrimitiveClass('F');
+        else if(type.equals("boolean"))
+            return getPrimitiveClass('Z');
+        else if(type.equals("byte"))
+            return getPrimitiveClass('B');
+        else if(type.equals("char"))
+            return getPrimitiveClass('C');
+        else if(type.equals("short"))
+            return getPrimitiveClass('S');
+        else if(type.equals("int"))
+            return getPrimitiveClass('I');
+        else if(type.equals("long"))
+            return getPrimitiveClass('J');
+        else if(type.equals("void"))
+            return getPrimitiveClass('V');
+        else
+            throw new IllegalArgumentException("Unknown type " + type);                         
+    }
+
+    /**
      * Returns the enumeration constants of this class, or null if this class is
      * not an <code>Enum</code>.
      * 
