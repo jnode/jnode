@@ -77,8 +77,7 @@
 
       <export name="javax.sound.sampled.*"/>
       <export name="javax.sound.sampled.spi.*"/>
-
-      <export name="sun.misc.*"/>
+      
       <export name="sun.reflect.*"/>
       <export name="sun.reflect.annotation.*"/>        
       <export name="sun.reflect.misc.*"/>

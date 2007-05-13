@@ -11,7 +11,9 @@
 
   <runtime>
     <library name="jnode-core.jar">
-        
+
+      <export name="sun.misc.*"/>
+
       <export name="gnu.classpath.Configuration"/>
       <export name="gnu.classpath.Pointer"/>
       <export name="gnu.classpath.SystemProperties"/>
