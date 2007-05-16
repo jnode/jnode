@@ -8,7 +8,7 @@ import org.jnode.vm.VmMagic;
 /**
  * @author Levente Sántha
  */
-public class NativeDouble {
+class NativeDouble {
     /**
      * Convert the double to the IEEE 754 floating-point "double format" bit
      * layout. Bit 63 (the most significant) is the sign bit, bits 62-52 (masked
@@ -23,7 +23,7 @@ public class NativeDouble {
      * @return the bits of the <code>double</code>
      * @see java.lang.Double#longBitsToDouble(long)
      */
-    public static long doubleToRawLongBits(double value) {
+    static long doubleToRawLongBits(double value) {
         return VmMagic.doubleToRawLongBits(value);
     }
 
@@ -41,7 +41,7 @@ public class NativeDouble {
      * @see java.lang.Double#doubleToLongBits(double)
      * @see #doubleToRawLongBits(double)
      */
-    public static double longBitsToDouble(long bits) {
+    static double longBitsToDouble(long bits) {
         return VmMagic.longBitsToDouble(bits);
     }
 }
