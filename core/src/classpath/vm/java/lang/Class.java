@@ -61,6 +61,7 @@ import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Arrays;
+import java.util.HashSet;
 
 import org.jnode.security.JNodePermission;
 import org.jnode.vm.SoftByteCodes;
@@ -455,28 +456,32 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type,
             throw new NoSuchFieldException(name);
         }
     }
-
     /**
      * Gets all fields declared in this class and all of its super-classes.
-     * 
+     *
      * @return Field[]
      */
-    public Field[] getFields() {
-        if (fields == null) {
-            ArrayList<Field> list = new ArrayList<Field>();
-            Class< ? > cls = this;
-            while (cls != null) {
-                final Field[] dlist = cls.getDeclaredFields();
-                for (int i = 0; i < dlist.length; i++) {
-                    list.add(dlist[i]);
-                }
-                cls = cls.getSuperclass();
-            }
-            fields = list;
-        }
-        return (Field[]) fields.toArray(new Field[fields.size()]);
-    }
+    public Field[] getFields()
+  {
+    //todo enable this: memberAccessCheck(Member.PUBLIC);
+    return internalGetFields();
+  }
 
+  /**
+   * Like <code>getFields()</code> but without the security checks.
+   */
+  private Field[] internalGetFields()
+  {
+    HashSet<Field> set = new HashSet<Field>();
+    set.addAll(Arrays.asList(getDeclaredFields(true)));
+    Class[] interfaces = getInterfaces();
+    for (int i = 0; i < interfaces.length; i++)
+      set.addAll(Arrays.asList(interfaces[i].internalGetFields()));
+    Class superClass = getSuperclass();
+    if (superClass != null)
+      set.addAll(Arrays.asList(superClass.internalGetFields()));
+    return set.toArray(new Field[set.size()]);
+  }
     /**
      * Gets the field with the given name that is declared in this class.
      * 
@@ -494,24 +499,44 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type,
             throw new NoSuchFieldException(name);
         }
     }
-
     /**
      * Gets all fields declared in this class
-     * 
+     *
      * @return Field[]
      */
-    public Field[] getDeclaredFields() {
-        if (declaredFields == null) {
-            final VmType<T> vmClass = getLinkedVmClass();
-            final int cnt = vmClass.getNoDeclaredFields();
-            final Field[] list = new Field[cnt];
+    public Field[] getDeclaredFields()
+  {
+    //todo enable this memberAccessCheck(Member.DECLARED);
+    return getDeclaredFields(false);
+  }
+
+  Field[] getDeclaredFields (boolean publicOnly)
+  {
+      if (declaredFields == null) {
+        final VmType<T> vmClass = getLinkedVmClass();
+        final int cnt = vmClass.getNoDeclaredFields();
+          final ArrayList<Field> fields = new ArrayList<Field>();
             for (int i = 0; i < cnt; i++) {
-                list[i] = vmClass.getDeclaredField(i).asField();
+                Field field = vmClass.getDeclaredField(i).asField();
+                if(field.getDeclaringClass() == this) {//todo we need this check?
+                    fields.add(field);
+                }
             }
-            declaredFields = list;
+          declaredFields = fields.toArray(new Field[fields.size()]);
+      }
+      if(publicOnly){
+        final ArrayList<Field> fields = new ArrayList<Field>();
+        for (Field field : declaredFields) {
+            if((field.getModifiers() & Modifier.PUBLIC) != 0) {
+                fields.add(field);
+            }
         }
-        return declaredFields;
-    }
+          return fields.toArray(new Field[fields.size()]);
+      } else {
+        //todo fials! return Arrays.copyOf(declaredFields, declaredFields.length);
+          return declaredFields;
+      }
+  }
 
     /**
      * Is this class a primitive class?
