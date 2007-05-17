@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry kind="src" path="src/openjdk/vm"/>
+	<classpathentry kind="src" path="src/openjdk/java"/>
+	<classpathentry kind="src" path="src/openjdk/javax"/>
+	<classpathentry kind="src" path="src/openjdk/sun"/>
 	<classpathentry kind="src" path="src/classpath/gnu"/>
+	<classpathentry kind="src" path="src/classpath/sun"/>
+	<classpathentry kind="src" path="src/classpath/tools"/>
 	<classpathentry kind="src" path="src/classpath/java"/>
 	<classpathentry kind="src" path="src/classpath/javax"/>
 	<classpathentry kind="src" path="src/classpath/org"/>
@@ -16,7 +22,7 @@
 	<classpathentry kind="lib" path="lib/log4j-1.2.8.jar"/>
 	<classpathentry kind="lib" path="lib/junit.jar"/>
 	<classpathentry kind="lib" path="lib/mx4j.jar"/>
-	<classpathentry sourcepath="D:/epr/cvswork/MMTk/src" kind="lib" path="lib/mmtk/mmtk.jar"/>
+	<classpathentry kind="lib" path="lib/mmtk/mmtk.jar" sourcepath="D:/epr/cvswork/MMTk/src"/>
 	<classpathentry kind="src" path="src/nanoxml"/>
 	<classpathentry kind="lib" path="lib/mauve.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
