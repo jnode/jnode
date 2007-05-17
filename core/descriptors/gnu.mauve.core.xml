@@ -11,7 +11,8 @@
 
   <runtime>
     <library name="mauve.jar">
-      <export name="gnu/testlet/*"/>
+      <!-- export name="gnu/testlet/*"/ -->
+      <export name="*"/>
     </library>
     <library name="jnode-core.jar">
       <export name="org/jnode/test/mauve/*"/>
@@ -21,6 +22,7 @@
   <extension point="org.jnode.shell.aliases">
     <alias name="mauve-plugin" class="org.jnode.test.mauve.PluginTestHarness"/>
     <alias name="mauve-simple" class="org.jnode.test.mauve.SingleTestHarness"/>
+    <alias name="testCommand" class="org.jnode.test.mauve.MauveTestCommand"/>    
   </extension>
 
   <extension point="org.jnode.security.permissions">
