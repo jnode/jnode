@@ -29,6 +29,7 @@
 	<pathelement location="${my-src.dir}/openjdk/java"/>
 	<pathelement location="${my-src.dir}/openjdk/javax"/>
 	<pathelement location="${my-src.dir}/openjdk/sun"/>
+	<pathelement location="${my-src.dir}/openjdk/vm"/>
   </path>
   <path id="my-sources1">
 	<path refid="classpath-sources"/>
@@ -98,6 +99,7 @@
       <fileset dir="${my-src.dir}/openjdk/java" includes="**/*.jav"/>
       <fileset dir="${my-src.dir}/openjdk/javax" includes="**/*.jav"/>
       <fileset dir="${my-src.dir}/openjdk/sun" includes="**/*.jav"/>
+      <fileset dir="${my-src.dir}/openjdk/vm" includes="**/*.jav"/>
     </copy>
     <ExpandTest classname="PrimitiveIntTest" type="int"/>
     <ExpandTest classname="PrimitiveLongTest" type="long"/>
@@ -127,6 +129,7 @@
 	    <fileset dir="${my-src.dir}/openjdk/java" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/openjdk/javax" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/openjdk/sun" excludes="${my-non-resources}"/>
+	    <fileset dir="${my-src.dir}/openjdk/vm" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/core" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/nanoxml" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/vmmagic" excludes="${my-non-resources}"/>
