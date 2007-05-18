@@ -63,7 +63,8 @@
     <property name="gnu-crypto.jar" value="${root.dir}/core/lib/gnu-crypto.jar"/>
     <property name="javax-crypto.jar" value="${root.dir}/core/lib/javax-crypto.jar"/>
     <!-- property name="javax-security.jar" value="${root.dir}/core/lib/javax-security.jar" / -->
-    <property name="beanshell.jar" value="${root.dir}/shell/lib/bsh-2.0b4.jar"/>
+    <property name="beanshell.jar" value="${root.dir}/shell/lib/bsh-2.0b5.jar"/>
+    <property name="js.jar" value="${root.dir}/shell/lib/rhino1.6r5-jsr223.jar"/>
 
     <!-- libraries needed to check plugin dependencies -->
     <property name="bcel-5.1.jar" value="${root.dir}/builder/lib/bcel-5.1.jar" />	
@@ -97,6 +98,7 @@
         <pathelement location="${javax-crypto.jar}"/>
         <pathelement location="${basedir}/conf"/>
         <pathelement location="${beanshell.jar}"/>
+        <pathelement location="${js.jar}"/>
         <pathelement location="${jcfe.jar}"/>
         <pathelement location="${jfunc.jar}"/>
     </path>
@@ -189,6 +191,7 @@
             <libalias name="javax-crypto.jar" alias="${javax-crypto.jar}"/>
             <libalias name="log4j.jar" alias="${log4j.jar}"/>
             <libalias name="beanshell.jar" alias="${beanshell.jar}"/>
+            <libalias name="js.jar" alias="${js.jar}"/>
             <libalias name="lw.jar" alias="${lw.jar}"/>
             <libalias name="thinlet.jar" alias="${thinlet.jar}"/>
 
@@ -425,6 +428,7 @@ clean             Remove all intermediate build results.
     </target>
 
     <!-- Backup CVS files -->
+    <!-- TODO create replacement SVN task
     <target name="backup">
         <mkdir dir="${backup.dir}"/>
         <tstamp>
@@ -432,6 +436,7 @@ clean             Remove all intermediate build results.
         </tstamp>
         <get src="http://cvs.sourceforge.net/cvstarballs/jnode-cvsroot.tar.bz2" dest="${backup.dir}/jnode-cvsroot-${date}.tar.bz2" usetimestamp="true" verbose="true"/>
     </target>
+    -->
 
     <!-- Compare classpath version of jnode with real classpath version -->
     <target name="cp-compare" depends="assemble">
@@ -663,7 +668,8 @@ clean             Remove all intermediate build results.
     </target>
 
 	<!-- Create a patch -->
-	<target name="create-patch">
+    <!-- TODO create replacement SVN task
+    <target name="create-patch">
         <property name="patch.file" value="${root.dir}/patch.txt"/>             
 		<echo>Creating patch in ${patch.file}</echo>
 		<cvs output="${patch.file}" dest="${root.dir}">
@@ -672,4 +678,5 @@ clean             Remove all intermediate build results.
 		    </commandline>
 		</cvs>
 	</target>
+	-->
 </project>
