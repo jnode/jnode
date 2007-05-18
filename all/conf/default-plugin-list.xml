@@ -82,6 +82,7 @@ The default list of (non-system) plugins to be included in the init-jar.
     <plugin id="org.jnode.driver.net.rtl8139"/>
     <plugin id="org.jnode.driver.net.bcm570x"/>
     <plugin id="org.jnode.driver.net.wireless"/>
+    <plugin id="org.jnode.driver.net.via_rhine"/>
     <plugin id="org.jnode.driver.ps2"/>
     <plugin id="org.jnode.driver.serial"/>
     <plugin id="org.jnode.driver.system.acpi"/>
