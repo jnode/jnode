@@ -77,9 +77,14 @@
 
       <export name="javax.sound.sampled.*"/>
       <export name="javax.sound.sampled.spi.*"/>
-      
+
+      <export name="javax.script.*"/>
+
+      <export name="sun.security.*"/>
+      <export name="sun.security.util.*"/>
+
       <export name="sun.reflect.*"/>
-      <export name="sun.reflect.annotation.*"/>        
+      <export name="sun.reflect.annotation.*"/>
       <export name="sun.reflect.misc.*"/>
     </library>
   </runtime>
