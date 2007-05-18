@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="js"
+    name="Rhino classes"
+    version="1.0"
+    provider-name="mozilla.org"
+    provider-url="http://www.mozilla.org/rhino/"
+    license-name="mpl">
+
+    <runtime>
+        <library name="js.jar">
+            <export name="*"/>
+        </library>
+    </runtime>
+    
+	<extension point="org.jnode.security.permissions">
+		<permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
+	    <permission class="java.lang.RuntimePermission" name="setSecurityManager" actions="*" />
+	    <permission class="java.lang.RuntimePermission" name="createClassLoader" actions="*" />
+	    <permission class="java.lang.RuntimePermission" name="setIO" actions="*" />
+	    <permission class="java.lang.RuntimePermission" name="exitVM" actions="*" />
+	    <permission class="org.jnode.security.JNodePermission" name="getVmClass" actions="*" />
+	    <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>    
+	</extension>
+</plugin>
