@@ -156,6 +156,7 @@ The default list of (non-system) plugins to be included in the init-jar.
     <plugin id="org.jnode.shell.command.plugin"/>
     <plugin id="org.jnode.shell.command.system"/>
     <plugin id="org.beanshell"/>
+    <plugin id="js"/>
 
     <plugin id="org.jnode.system.repository"/>
     <plugin id="org.jnode.test.core"/>
