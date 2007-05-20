@@ -58,6 +58,8 @@ public class MauveTestCommand extends TestHarness {
 
 	private RunResult result;
 
+    private static int counter = 0;
+
 	/**
 	 * runs tests
 	 * 
@@ -170,10 +172,13 @@ public class MauveTestCommand extends TestHarness {
 					System.err.println("Could not load test: " + line);
 					result.addMissingTest(line);
 				}
-				
-				System.out.println("Test done, now running gc");
-				System.gc();
-				
+
+				counter++;
+				System.out.println("Done " + counter + " tests so far.");
+				if ((counter % 20) == 0) {
+				    System.out.println("next 20 tests done, running gc...");
+				    System.gc();
+				}				
 			}
 		} catch (FileNotFoundException e) {
 			throw new IllegalArgumentException(e.getMessage());

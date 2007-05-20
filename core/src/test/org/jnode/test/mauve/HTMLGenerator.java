@@ -123,7 +123,17 @@ public class HTMLGenerator {
             writer.println("</tr>");
             // (2) generate an HTML page for the test and subfiles
             //     for the tests
-            HTMLGenerator.createPackageReport(packageResult, rootDirectory);
+	    try {
+		HTMLGenerator.createPackageReport(packageResult, rootDirectory);
+	    } catch (Exception e) {
+		String temp = packageResult.getName().replace('.', '/');
+		System.err.println("Couldn't create package report for " + temp);
+		File tempDir = new File(rootDirectory, packageName);
+		tempDir.mkdirs();
+		File tempFile = new File(tempDir, "package_index.html");
+		tempFile.createNewFile();
+	    }
+	    System.gc();
         }
         writer.println("</table>");
         writer.println("</td>");
@@ -366,7 +376,13 @@ public class HTMLGenerator {
                     check.getPassed() + "</td><td bgcolor=\"white\">" + check.getExpected() +
                     "</td><td bgcolor=\"white\">" + check.getActual() + "</td>");
             if (!check.getPassed()) {
-                createLogReport(check, className, testResult.getName(), classDirectory);
+		try {
+		    createLogReport(check, className, testResult.getName(), classDirectory);
+		} catch (Exception e) {
+		    System.err.println("Couldn't write report for class " + className);
+		    File temp = new File(classDirectory, testResult.getName() + "_log.html");
+		    temp.createNewFile();
+		}	    
             }
             writer.println("</td>");
             writer.println("</tr>");
@@ -393,6 +409,7 @@ public class HTMLGenerator {
      * @param classDirectory  the class directory.
      */
     public static void createLogReport(CheckResult checkResult, String className, String testName, File classDirectory) throws IOException {
+	
         // write basic HTML for test
         File logFile = new File(classDirectory, testName + "_log.html");
         OutputStream out = new BufferedOutputStream(new FileOutputStream(logFile));
