@@ -54,12 +54,12 @@ import org.jnode.vm.scheduler.VmThread;
 
 
 /* Written using "Java Class Libraries", 2nd edition, ISBN 0-201-31002-3
- * "The Java Language Specification", ISBN 0-201-63451-1
- * plus online API docs for JDK 1.2 beta from http://www.javasoft.com.
- * Status:  Believed complete to version 1.4, with caveats. We do not
- *          implement the deprecated (and dangerous) stop, suspend, and resume
- *          methods. Security implementation is not complete.
- */
+* "The Java Language Specification", ISBN 0-201-63451-1
+* plus online API docs for JDK 1.2 beta from http://www.javasoft.com.
+* Status:  Believed complete to version 1.4, with caveats. We do not
+*          implement the deprecated (and dangerous) stop, suspend, and resume
+*          methods. Security implementation is not complete.
+*/
 
 /**
  * Thread represents a single thread of execution in the VM. When an
@@ -960,7 +960,7 @@ public class Thread implements Runnable
    * @see ThreadDeath
    * @see ThreadGroup#uncaughtException(Thread, Throwable)
    * @see SecurityManager#checkAccess(Thread)
-   * @see SecurityManager#checkPermission(Permission)
+   * @see SecurityManager#checkPermission(java.security.Permission)
    * @deprecated unsafe operation, try not to use
      */
     public final void stop()
@@ -993,7 +993,7 @@ public class Thread implements Runnable
    * @see ThreadDeath
    * @see ThreadGroup#uncaughtException(Thread, Throwable)
    * @see SecurityManager#checkAccess(Thread)
-   * @see SecurityManager#checkPermission(Permission)
+   * @see SecurityManager#checkPermission(java.security.Permission)
    * @deprecated unsafe operation, try not to use
      */
     public final void stop(Throwable t)
@@ -1223,6 +1223,26 @@ public class Thread implements Runnable
   public long getId()
   {
         return vmThread.getId();
+    }
+
+    //openjdk
+    private static final StackTraceElement[] EMPTY_STACK_TRACE = new StackTraceElement[0];
+    //openjdk
+    public StackTraceElement[] getStackTrace() {
+        if (this != Thread.currentThread()) {
+            // check for getStackTrace permission
+            SecurityManager security = System.getSecurityManager();
+            if (security != null) {
+                security.checkPermission(new RuntimePermission("getStackTrace"));
+            }
+            if (!isAlive()) {
+                return EMPTY_STACK_TRACE;
+            }
+	        return VMThrowable.backTrace2stackTrace(VmThread.getStackTrace(vmThread));
+        } else {
+	        // Don't need JVM help for current thread
+	        return (new Exception()).getStackTrace();
+	    }
     }
 
   /**
