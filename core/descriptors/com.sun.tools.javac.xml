@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="com.sun.tools.javac"
+  name="The Java language compiler from Sun"
+  version="@VERSION@"
+  plugin-version="@VERSION@"
+  provider-name="Sun Microsystems"
+  provider-url="http://sun.com"
+  license-name="classpath">
+
+  <runtime>
+    <library name="jnode-core.jar">
+      <export name="com.sun.mirror.apt.*"/>
+      <export name="com.sun.mirror.declaration.*"/>
+      <export name="com.sun.mirror.type.*"/>
+      <export name="com.sun.mirror.util.*"/>
+      <export name="com.sun.source.tree.*"/>
+      <export name="com.sun.source.util.*"/>
+      <export name="com.sun.tools.apt.*"/>
+      <export name="com.sun.tools.apt.comp.*"/>
+      <export name="com.sun.tools.apt.main.*"/>
+      <export name="com.sun.tools.apt.mirror.*"/>
+      <export name="com.sun.tools.apt.mirror.apt.*"/>
+      <export name="com.sun.tools.apt.mirror.declaration.*"/>
+      <export name="com.sun.tools.apt.mirror.type.*"/>
+      <export name="com.sun.tools.apt.mirror.util.*"/>
+      <export name="com.sun.tools.apt.resources.*"/>
+      <export name="com.sun.tools.apt.util.*"/>
+      <export name="com.sun.tools.javac.*"/>
+      <export name="com.sun.tools.javac.api.*"/>
+      <export name="com.sun.tools.javac.code.*"/>
+      <export name="com.sun.tools.javac.comp.*"/>
+      <export name="com.sun.tools.javac.jvm.*"/>
+      <export name="com.sun.tools.javac.main.*"/>
+      <export name="com.sun.tools.javac.model.*"/>
+      <export name="com.sun.tools.javac.parser.*"/>
+      <export name="com.sun.tools.javac.processing.*"/>
+      <export name="com.sun.tools.javac.resources.*"/>
+      <export name="com.sun.tools.javac.services.*"/>
+      <export name="com.sun.tools.javac.sym.*"/>
+      <export name="com.sun.tools.javac.tree.*"/>
+      <export name="com.sun.tools.javac.util.*"/>
+    </library>
+  </runtime>
+
+  <extension point="org.jnode.shell.aliases">
+    <alias name="javac" class="com.sun.tools.javac.Main"/>
+    <alias name="apt" class="com.sun.tools.apt.Main"/>
+  </extension>
+  
+  <extension point="org.jnode.security.permissions">
+      <permission class="java.lang.RuntimePermission" name="getProtectionDomain"/>
+      <permission class="java.lang.RuntimePermission" name="createClassLoader"/>
+      <permission class="java.lang.RuntimePermission" name="setContextClassLoader"/>
+      <permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/>
+      <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
+      <permission class="org.jnode.security.JNodePermission" name="getVmThread"/>
+      <permission class="org.jnode.security.JNodePermission" name="getVmClass"/>
+      <permission class="java.net.SocketPermission" name="*" actions="resolve"/>
+      <permission class="java.net.SocketPermission" name="*:0-" actions="connect,resolve"/>
+      <permission class="java.lang.RuntimePermission" name="writeFileDescriptor"/>
+      <permission class="java.lang.RuntimePermission" name="readFileDescriptor"/>
+  </extension>       
+</plugin>
