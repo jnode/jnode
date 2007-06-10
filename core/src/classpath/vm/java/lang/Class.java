@@ -94,7 +94,7 @@ import org.jnode.vm.classmgr.VmType;
  *
  * @serialData Class objects serialize specially:
  * <code>TC_CLASS ClassDescriptor</code>. For more serialization information,
- * see {@link ObjectStreamClass}.
+ * see {@link java.io.ObjectStreamClass}.
  *
  * @author John Keiser
  * @author Eric Blake (ebb9@email.byu.edu)
@@ -618,7 +618,7 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type,
      * @throws NoSuchMethodException
      * @throws SecurityException
      */
-    public Method getMethod(String name, Class< ? >[] argTypes)
+    public Method getMethod(String name, Class<?>... argTypes)
             throws NoSuchMethodException, SecurityException {
         VmType< ? >[] vmArgTypes;
         if (argTypes == null) {
@@ -1282,4 +1282,40 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type,
             return "";
         return name.substring(0, lastInd);
     }
+
+    /**
+     * Returns true if this class is an <code>Annotation</code>.
+     *
+     * @return true if this is an annotation class.
+     * @since 1.5
+     */
+    public boolean isAnnotation()
+    {
+        //todo implement it
+        throw new UnsupportedOperationException();
+    }
+
+    public String getCanonicalName() {
+        //todo implement it
+        throw new UnsupportedOperationException();
+        /*
+      if (vmClass.isArray())
+        {
+      String componentName = vmClass.getComponentType().getCanonicalName();
+      if (componentName != null)
+        return componentName + "[]";
+        }
+      if (vmClass.isMemberClass(klass))
+        {
+      String memberName = getDeclaringClass(klass).getCanonicalName();
+      if (memberName != null)
+        return memberName + "." + getSimpleName(klass);
+        }
+      if (isLocalClass(klass) || vmClass.isAnonymousClass(klass))
+        return null;
+      return getName(klass);
+      */
+    }
+
+
 }
