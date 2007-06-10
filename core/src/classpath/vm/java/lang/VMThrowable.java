@@ -21,7 +21,6 @@
  
 package java.lang;
 
-import org.jnode.vm.VmSystem;
 import org.jnode.vm.VmStackFrame;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
@@ -78,20 +77,24 @@ final class VMThrowable
    */
   StackTraceElement[] getStackTrace(Throwable t)
   {
-      final VmStackFrame[] vm_trace = (VmStackFrame[]) backtrace;
-      final int length = vm_trace.length;
-      final StackTraceElement[] trace = new StackTraceElement[length];
-      for(int i = length; i-- > 0; ){
-          final VmStackFrame frame = vm_trace[i];
-          final String location = frame.getLocationInfo();
-          final int lineNumber = "?".equals(location) ? -1 : Integer.parseInt(location);
-          final VmMethod method = frame.getMethod();
-          final VmType<?> vmClass = (method == null) ? null : method.getDeclaringClass();
-          final String fname = (vmClass == null) ? null : vmClass.getSourceFile();
-          final String cname = (vmClass == null) ? "<unknown class>" : vmClass.getName();
-          final String mname = (method == null) ? "<unknown method>" : method.getName();
-          trace[i] = new StackTraceElement(fname, lineNumber, cname,  mname, method.isNative());
-      }
-      return trace;
+      return backTrace2stackTrace(backtrace);
   }
+
+    static StackTraceElement[] backTrace2stackTrace(Object[] backtrace) {
+        final VmStackFrame[] vm_trace = (VmStackFrame[]) backtrace;
+        final int length = vm_trace.length;
+        final StackTraceElement[] trace = new StackTraceElement[length];
+        for(int i = length; i-- > 0; ){
+            final VmStackFrame frame = vm_trace[i];
+            final String location = frame.getLocationInfo();
+            final int lineNumber = "?".equals(location) ? -1 : Integer.parseInt(location);
+            final VmMethod method = frame.getMethod();
+            final VmType<?> vmClass = (method == null) ? null : method.getDeclaringClass();
+            final String fname = (vmClass == null) ? null : vmClass.getSourceFile();
+            final String cname = (vmClass == null) ? "<unknown class>" : vmClass.getName();
+            final String mname = (method == null) ? "<unknown method>" : method.getName();
+            trace[i] = new StackTraceElement(fname, lineNumber, cname,  mname, method.isNative());
+        }
+        return trace;
+    }
 }
