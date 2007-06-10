@@ -13,7 +13,8 @@
 	       includeJavaRuntime="false"
            target="${java.target}" 
            source="${java.source}"
-           encoding="${java.encoding}">
+           encoding="${java.encoding}"
+           excludes="**/resources/*.java">
 	  <bootclasspath path="${jnode-core.jar}"/>
       <compilerarg value="${compilerarg}"/>
     </javac>
