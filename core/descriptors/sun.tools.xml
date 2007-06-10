@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="sun.tools"
+  name="Core Java tools from Sun"
+  version="@VERSION@"
+  plugin-version="@VERSION@"
+  provider-name="Sun Microsystems"
+  provider-url="http://sun.com"
+  license-name="classpath">
+
+  <runtime>
+    <library name="jnode-core.jar">
+      <export name="sun.tools.asm.*"/>
+      <export name="sun.tools.java.*"/>
+      <export name="sun.tools.javac.*"/>
+      <export name="sun.tools.javac.resources.*"/>
+      <export name="sun.tools.javap.*"/>
+      <export name="sun.tools.javap.oldjavap.*"/>
+      <export name="sun.tools.tree.*"/>
+      <export name="sun.tools.util.*"/>
+    </library>
+  </runtime>
+
+  <extension point="org.jnode.shell.aliases">
+    <alias name="javap" class="sun.tools.javap.Main"/>
+  </extension>
+  
+  <extension point="org.jnode.security.permissions">
+      <permission class="java.lang.RuntimePermission" name="getProtectionDomain"/>
+      <permission class="java.lang.RuntimePermission" name="createClassLoader"/>
+      <permission class="java.lang.RuntimePermission" name="setContextClassLoader"/>
+      <permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/>
+      <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
+      <permission class="org.jnode.security.JNodePermission" name="getVmThread"/>
+      <permission class="org.jnode.security.JNodePermission" name="getVmClass"/>
+      <permission class="java.net.SocketPermission" name="*" actions="resolve"/>
+      <permission class="java.net.SocketPermission" name="*:0-" actions="connect,resolve"/>
+      <permission class="java.lang.RuntimePermission" name="writeFileDescriptor"/>
+      <permission class="java.lang.RuntimePermission" name="readFileDescriptor"/>
+  </extension>       
+</plugin>
