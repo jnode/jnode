@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<fragment id="javax.ext.tools"
+  name="The javax.tools.* and related classes."
+  version="@VERSION@"
+  plugin-id="org.classpath.core"
+  plugin-version="@VERSION@"
+  provider-name="Sun Microsystems"
+  provider-url="http://sun.com"
+  license-name="classpath">
+
+  <runtime>
+    <library name="jnode-core.jar">
+      <export name="javax.annotation.*"/>
+      <export name="javax.annotation.processing.*"/>
+      <export name="javax.lang.model.*"/>
+      <export name="javax.lang.model.element.*"/>
+      <export name="javax.lang.model.type.*"/>
+      <export name="javax.lang.model.util.*"/>
+      <export name="javax.tools.*"/>
+    </library>
+  </runtime>
+
+</fragment>
