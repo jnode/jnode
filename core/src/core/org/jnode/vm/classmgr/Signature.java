@@ -339,4 +339,66 @@ public class Signature {
         }
         return b.toString();
     }
+
+    /**
+     * Convert the given VmType to a signature.
+     *
+     * @param cls a VmType instance
+     * @return String the signature
+     */
+    public static String toSignature(VmType cls) {
+        if (cls == null) {
+            throw new NullPointerException("cls==null");
+        }
+
+        if (cls.isArray()) {
+            return "[" + toSignature(((VmArrayClass)cls).getComponentType());
+        } else if (cls.isPrimitive()) {
+            if (cls == VmType.getPrimitiveClass('Z')) {
+                return "Z";
+            } else if (cls == VmType.getPrimitiveClass('B')) {
+                return "B";
+            } else if (cls == VmType.getPrimitiveClass('C')) {
+                return "C";
+            } else if (cls == VmType.getPrimitiveClass('S')) {
+                return "S";
+            } else if (cls == VmType.getPrimitiveClass('I')) {
+                return "I";
+            } else if (cls == VmType.getPrimitiveClass('J')) {
+                return "J";
+            } else if (cls == VmType.getPrimitiveClass('F')) {
+                return "F";
+            } else if (cls == VmType.getPrimitiveClass('D')) {
+                return "D";
+            } else if (cls == VmType.getPrimitiveClass('V')) {
+                return "V";
+            }
+            return cls.getName();
+        } else {
+            return "L" + cls.getName().replace('.', '/') + ";";
+        }
+    }
+    /**
+     * Convert the given VmType array to a signature.
+     *
+     * @param returnType
+     * @param argTypes
+     * @return String
+     */
+    public static String toSignature(VmType returnType, VmType[] argTypes) {
+        StringBuilder b = new StringBuilder();
+        b.append('(');
+        if (argTypes != null) {
+            for (int i = 0; i < argTypes.length; i++) {
+                b.append(toSignature(argTypes[i]));
+            }
+        }
+        b.append(')');
+        if (returnType == null) {
+            b.append('V');
+        } else {
+            b.append(toSignature(returnType));
+        }
+        return b.toString();
+    }
 }
