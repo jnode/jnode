@@ -511,8 +511,7 @@ public final class ClassDecoder {
             }
         }
 
-        final VmMethod nativeMethod = nativeType.getMethod(method.getName(),
-                argTypes);
+        final VmMethod nativeMethod = nativeType.getNativeMethodReplacement(method.getName(), argTypes);
         if (nativeMethod == null) {
             if (verbose) {
                 BootLog.error("Native method replacement (" + method
