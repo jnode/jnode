@@ -13,6 +13,8 @@
     <library name="jnode-core.jar">
 
       <export name="sun.misc.*"/>
+      <export name="sun.nio.cs.StreamEncoder"/>
+      <export name="sun.nio.cs.StreamDecoder"/>
 
       <export name="gnu.classpath.Configuration"/>
       <export name="gnu.classpath.Pointer"/>
@@ -109,6 +111,10 @@
       <export name="javax.naming.NamingException"/>
       <export name="javax.naming.NameNotFoundException"/>
 
+      <export name="javax.xml.parsers.*"/>
+      <export name="javax.xml.transform.*"/>
+      <export name="javax.xml.transform.dom.*"/>
+      <export name="javax.xml.transform.stream.*"/>
       <export name="javax.xml.stream.*"/>
       <export name="javax.xml.stream.events.*"/>
       <export name="javax.xml.stream.util.*"/>
