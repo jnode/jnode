@@ -72,6 +72,7 @@ import org.jnode.vm.classmgr.VmArrayClass;
 import org.jnode.vm.classmgr.VmField;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.classmgr.VmClassLoader;
 
 /**
  * A Class represents a Java type.  There will never be multiple Class
@@ -401,7 +402,8 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type,
      * @return ClassLoader
      */
     public final ClassLoader getClassLoader() {
-        return vmClass.getLoader().asClassLoader();
+        VmClassLoader loader = vmClass.getLoader();
+        return loader.isSystemClassLoader() ? null : loader.asClassLoader();
     }
 
     /**
