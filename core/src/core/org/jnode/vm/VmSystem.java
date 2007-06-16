@@ -402,6 +402,37 @@ public final class VmSystem {
     }
 
     /**
+     * Gets the current stacktrace as array of classes excluding the calls to
+     * java.lang.reflect.Method.invoke() and org.jnode.vm.VmReflection.invoke().
+     *
+     * @return Class[] 
+     */
+    public static Class[] getRealClassContext() {
+        final VmStackReader reader = VmProcessor.current().getArchitecture()
+                .getStackReader();
+        final VmStackFrame[] stack = reader.getVmStackTrace(VmMagic
+                .getCurrentFrame(), null, VmThread.STACKTRACE_LIMIT);
+        final int count = stack.length;
+        final Class[] result = new Class[count];
+        int real_count = 0;
+        for (int i = 0; i < count; i++) {
+            VmMethod method = stack[i].getMethod();
+            VmType<?> clazz = method.getDeclaringClass();
+            if((method.getName().equals("invoke") && (
+                    clazz.getName().equals("java.lang.reflect.Method") ||
+                            clazz.getName().equals("org.jnode.vm.VmReflection"))))
+                continue;
+
+            result[real_count++] = clazz.asClass();
+        }
+
+        Class[] real_result = new Class[real_count];
+        System.arraycopy(result, 0, real_result, 0, real_count);
+
+        return real_result;
+    }
+
+    /**
      * Do nothing, until interrupted by an interrupts.
      */
     public static void idle() {
