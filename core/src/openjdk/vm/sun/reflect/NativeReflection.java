@@ -17,8 +17,8 @@ class NativeReflection {
      * @see Reflection#getCallerClass(int)
      */
     static Class getCallerClass(int realFramesToSkip){
-        //todo test it
-        return VmSystem.getClassContext()[realFramesToSkip];
+        // using realFramesToSkip + 1 to skip VmSystem 
+        return VmSystem.getRealClassContext()[realFramesToSkip + 1];
     }
 
     /**
