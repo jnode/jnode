@@ -558,6 +558,14 @@ public final class String
     this.count = count;
   }
 
+    //jnode openjdk
+    // Package private constructor which shares value array for speed.
+    String(int offset, int count, char value[]) {
+	this.value = value;
+	this.offset = offset;
+	this.count = count;
+    }
+
   /**
    * Creates a new String containing the characters represented in the
    * given subarray of Unicode code points.
