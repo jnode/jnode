@@ -495,23 +495,14 @@ public final class ClassDecoder {
             }
             return null;
         }
-        final VmType[] argTypes;
-        if (method.isStatic()) {
-            final int argCount = method.getNoArguments();
-            argTypes = new VmType[argCount];
-            for (int i = 0; i < argCount; i++) {
-                argTypes[i] = method.getArgumentType(i);
-            }
-        } else {
-            final int argCount = method.getNoArguments();
-            argTypes = new VmType[argCount + 1];
-            argTypes[0] = method.getDeclaringClass();
-            for (int i = 0; i < argCount; i++) {
-                argTypes[i + 1] = method.getArgumentType(i);
-            }
+
+        String signature = method.getSignature();
+        if(!method.isStatic()){
+            signature = "(" + Signature.toSignature(method.getDeclaringClass()) + signature.substring(1);
         }
 
-        final VmMethod nativeMethod = nativeType.getNativeMethodReplacement(method.getName(), argTypes);
+        final VmMethod nativeMethod = nativeType.getNativeMethodReplacement(method.getName(), signature);
+
         if (nativeMethod == null) {
             if (verbose) {
                 BootLog.error("Native method replacement (" + method
