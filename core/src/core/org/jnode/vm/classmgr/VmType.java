@@ -1363,25 +1363,25 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
      */
     protected abstract VmMethod getSyntheticAbstractMethod(String name,
             String signature, int hashCode);
-    
+
     final VmMethod getNativeMethodReplacement(String name, String signature) {
-            signature = signature.substring(0, signature.indexOf(')'));
-            /* Search only in my own method table */
-            final VmMethod[] mt = this.methodTable;
-            if (mt != null) {
-                final int count = mt.length;
-                for (int i = 0; i < count; i++) {
-                    final VmMethod mts = mt[i];
-                    if (mts.nameEquals(name)) {
-                        String sig2 = mts.getSignature();
-                        if (signature.equals(sig2.substring(0, sig2.indexOf(')')))) {
-                            return mts;
-                        }
+        signature = signature.substring(0, signature.indexOf(')'));
+        /* Search only in my own method table */
+        final VmMethod[] mt = this.methodTable;
+        if (mt != null) {
+            final int count = mt.length;
+            for (int i = 0; i < count; i++) {
+                final VmMethod mts = mt[i];
+                if (mts.nameEquals(name)) {
+                    String sig2 = mts.getSignature();
+                    if (signature.equals(sig2.substring(0, sig2.indexOf(')')))) {
+                        return mts;
                     }
                 }
             }
-            return null;
         }
+        return null;
+    }
 
     /**
      * Find the method within the given class (or super-classes) that has the
