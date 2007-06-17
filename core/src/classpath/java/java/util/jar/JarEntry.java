@@ -39,6 +39,7 @@ package java.util.jar;
 
 import java.io.IOException;
 import java.security.cert.Certificate;
+import java.security.CodeSigner;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 
@@ -169,4 +170,9 @@ public class JarEntry extends ZipEntry
       }
     return null;
   }
+    //@jnode
+    public CodeSigner[] getCodeSigners() {
+        //todo implement
+        return null;
+    }
 }

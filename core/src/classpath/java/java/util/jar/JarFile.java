@@ -806,6 +806,15 @@ public class JarFile extends ZipFile
     return verified > 0;
   }
 
+    //openjdk feature
+    // attribute. Returns false if there is no manifest or the manifest
+    // does not contain a "Class-Path" attribute. Currently exported to
+    // core libraries via sun.misc.SharedSecrets.
+    boolean hasClassPathAttribute() throws IOException {
+        //todo IMPLEMENT
+        return false;
+    }
+
   /**
    * A utility class that verifies jar entries as they are read.
    */
