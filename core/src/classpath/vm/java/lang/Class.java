@@ -803,7 +803,7 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type,
         return null;
     }
 
-    public Constructor getDeclaredConstructor(Class[] argTypes)
+    public Constructor<T> getDeclaredConstructor(Class<?>... argTypes)
             throws NoSuchMethodException {
         String signature = Signature.toSignature(null, argTypes);
         final VmMethod vmMethod = getLinkedVmClass().getDeclaredMethod(
@@ -925,7 +925,7 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type,
      * @return Constructor
      * @throws NoSuchMethodException
      */
-    public Constructor getConstructor(Class[] argTypes)
+    public Constructor<T> getConstructor(Class<?>... argTypes)
             throws NoSuchMethodException {
         // Check security
         memberAccessCheck(Member.PUBLIC);
