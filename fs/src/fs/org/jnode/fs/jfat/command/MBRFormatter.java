@@ -18,10 +18,6 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
-
-
-
 package org.jnode.fs.jfat.command;
 
 /**
@@ -30,6 +26,7 @@ package org.jnode.fs.jfat.command;
  */
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -60,8 +57,11 @@ public class MBRFormatter {
      */
     final String stageResourceName1 =  "/devices/sg0/boot/grub/grub.s1";
     final String stageResourceName2 =  "/devices/sg0/boot/grub/fat.s15";
-    private static int installPartition = 0xFFFFFF;
+    private static int INSTALL_PARTITION = 0xFFFFFF;
     private String configFile;
+    //The Embedded Variables values in Jnode
+    final int SAVED_ENTRY_NUMBER=0xe;
+    final String CONFIG_FILE_NAME="/boot/grub/menu.lst";
 
     /**
      * 
@@ -72,7 +72,7 @@ public class MBRFormatter {
     private void checkMBR(ByteBuffer MBR) throws IOException
 	{
 		if (!IBMPartitionTable.containsPartitionTable(MBR.array()))
-			throw new IOException("This device doesn't contain a valid MBR, use --initmbr.");	
+			throw new IOException("This device doesn't contain a valid MBR.");
 	}    
     
     /**
@@ -138,7 +138,7 @@ public class MBRFormatter {
      * @throws java.io.IOException
      * @see org.jnode.fs.fat.FatFormatter#format(org.jnode.driver.block.BlockDeviceAPI)
      */
-    public  void format(Device device) throws FileSystemException, IOException {
+    public  void format(Device device,int bsize) throws FileSystemException, IOException {
         BlockDeviceAPI devApi;
         try {
             devApi = device.getAPI(BlockDeviceAPI.class);           
@@ -146,11 +146,11 @@ public class MBRFormatter {
             throw new FileSystemException("Device is not a partition!", e);
         } 
 
-        log.info("The MBR Old is checked successfully.");
+        log.info("Checking the old MBR...");
         ByteBuffer MBR=ByteBuffer.allocate(IDEConstants.SECTOR_SIZE);               
         devApi.read(0, MBR);        
         checkMBR(MBR);        
-        log.info("The MBR Old is read successfully.");
+        log.info("done.");
         
         /*int add=LittleEndian.getInt32(MBR.array(),0x44);
         System.out.println("The value at the position 0x44 is-> "  +Integer.toHexString(add));*/
@@ -159,8 +159,11 @@ public class MBRFormatter {
         if(!isaValidBootSector(MBR.array())){        	
         	log.error("The OLD Boot Sector is not valid.");        	
         }
-        
+        try{
         stage1=getStage1(stageResourceName1);
+        }catch(FileNotFoundException e){
+        	log.error("The stage1 is not available.");
+        }
         /**
          * The BPB stands for the Bios Parameter Block.As the BPB of 
          * a disk is fixed and it is written to the disk during the 
@@ -171,7 +174,7 @@ public class MBRFormatter {
          * 1) Here need to make the BPB more independently(ie without 
          * array of the BPB using it in MBR)
          * 
-         * 2)The next Inportant matter is here that in the MBR's
+         * 2)The next Important matter is here that in the MBR's
          * <b> 0x44 th</b> position we setting the position of the 
          * stage1.5 or Stage2.here as i used the Stage1.5 at the Sector 
          * 1(second sector) so The Value is set here as 01 00 00 00
@@ -233,7 +236,11 @@ public class MBRFormatter {
                 
                 
                 System.out.println("The Stage1.5 is now embedding.");
-                stage1_5 = getStage1_5(stageResourceName2);                
+                try{
+                stage1_5 = getStage1_5(stageResourceName2);
+                }catch(FileNotFoundException ex){
+                	log.error("The Stage1.5 is not available.");
+                }
                 int size=stage1_5.length/IDEConstants.SECTOR_SIZE;
                 log.info("The Size of the stage1_5 is  : "+size);
                 
@@ -253,18 +260,21 @@ public class MBRFormatter {
                  * Blocklists is the size of the stage1.5 in the sectors unit.
                  *
                  **/                
-                LittleEndian.setInt16(stage1_5,512-4 ,size);         
+                setLittleEnd_BlockLists(stage1_5,size);
                 
                              
+
                 /** Fixup the install partition */
-                LittleEndian.setInt32(stage1_5, 512 + 0x08, installPartition);
+                setLittleEnd_InstallPartition(stage1_5,INSTALL_PARTITION);
                 
                 
-                setConfigFile("/boot/grub/menu.lst");
-                
+
+                setConfigFile(CONFIG_FILE_NAME);
+
                 /** The Saved Entry Number **/
-                LittleEndian.setInt32(stage1_5,512+0xc,0xe);
+                setLittleEnd_EntryNumber(stage1_5,SAVED_ENTRY_NUMBER);
                 
+
                 /**
                  * The most important section of the Grub 
                  * The path of the stage2 in the stage1.5
@@ -306,8 +316,9 @@ public class MBRFormatter {
                  * the JNODE.
                  *
                  **/
-                LittleEndian.setInt8(stage1_5,512+0x19,0x00);
+                setLittleEnd_DrivePath(stage1_5,bsize);
                 
+
                 /**
                  * Fixup the config file 
                  * TODO: here to be change that the Config File 
@@ -346,8 +357,48 @@ public class MBRFormatter {
         
     
 }
-    
     /**
+     * The Install Partition setting
+     * @arch i386
+     * @param stage1_5
+     * @param installPartition2
+     */
+    private void setLittleEnd_InstallPartition(byte[] stage1_5, int installPartition) {
+    	LittleEndian.setInt32(stage1_5, 512 + 0x08, installPartition);
+
+	}
+    /**
+     * The saved Entry Number setting.
+     * @arch i386
+     * @param stage1_5
+     * @param i
+     */
+	private void setLittleEnd_EntryNumber(byte[] stage1_5, int i) {
+    	LittleEndian.setInt32(stage1_5,512+0xc,i);
+
+	}
+    /**
+     * The BlockLists if the stage1.5 is setting here.
+     * @arch:i386
+     * @param stage1_5
+     * @param size
+     */
+	private void setLittleEnd_BlockLists(byte[] stage1_5, int size) {
+    	LittleEndian.setInt16(stage1_5,512-4 ,size);
+
+	}
+    /**
+     *
+     * Setting the Drive path to the stage1.5.Though it is BUGGY yet.
+     * @arch i386
+     * @param stage1_5
+     * @param i
+     */
+	private void setLittleEnd_DrivePath(byte[] stage1_5, int i) {
+    	LittleEndian.setInt8(stage1_5,512+0x19,i);
+	}
+
+	/**
      * The Writing the BPB to the MBR to its Correct Position.
      * @param bpb2
      * @param stage12
@@ -397,14 +448,14 @@ public class MBRFormatter {
      * @return
      */
     public int getInstallPartition() {
-        return installPartition;
+        return INSTALL_PARTITION;
     }
     /**
      * The Writtting of the InstallPartition.
      * @param installPartition1
      */
     public static void setInstallPartition(int installPartition1) {
-        installPartition = installPartition1;
+        INSTALL_PARTITION = installPartition1;
     }
     /**
      * 
