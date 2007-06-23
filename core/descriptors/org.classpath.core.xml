@@ -13,6 +13,9 @@
     <library name="jnode-core.jar">
 
       <export name="sun.misc.*"/>
+      <export name="sun.security.util.Debug"/>
+      <export name="sun.security.action.GetPropertyAction"/>
+      <export name="sun.security.jca.*"/>
       <export name="sun.nio.cs.StreamEncoder"/>
       <export name="sun.nio.cs.StreamDecoder"/>
 
@@ -110,6 +113,9 @@
       <export name="javax.naming.NameAlreadyBoundException"/>
       <export name="javax.naming.NamingException"/>
       <export name="javax.naming.NameNotFoundException"/>
+      <export name="javax.naming.CompositeName"/>
+      <export name="javax.naming.NameImpl"/>
+      <export name="javax.naming.NameImplEnumerator"/>
 
       <export name="javax.xml.parsers.*"/>
       <export name="javax.xml.transform.*"/>
@@ -120,6 +126,9 @@
       <export name="javax.xml.stream.util.*"/>
 
       <export name="javax.security.auth.x500.*"/>
+
+      <export name="javax.crypto.spec.SecretKeySpec"/>
+      <export name="javax.crypto.SecretKey"/>
 
       <export name="org.xml.sax.*"/>
       
