@@ -57,6 +57,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.Vector;
+import sun.security.jca.GetInstance;
 
 /**
  * This class centralizes all security properties and common security methods.
@@ -707,4 +708,67 @@ public final class Security
 
     return false;
   }
+
+    //jnode openjdk
+    /*
+     * Returns an array of objects: the first object in the array is
+     * an instance of an implementation of the requested algorithm
+     * and type, and the second object in the array identifies the provider
+     * of that implementation.
+     * The <code>provider</code> argument can be null, in which case all
+     * configured providers will be searched in order of preference.
+     */
+    static Object[] getImpl(String algorithm, String type, String provider)
+	    throws NoSuchAlgorithmException, NoSuchProviderException {
+	if (provider == null) {
+	    return GetInstance.getInstance
+	    	(type, getSpiClass(type), algorithm).toArray();
+	} else {
+	    return GetInstance.getInstance
+	    	(type, getSpiClass(type), algorithm, provider).toArray();
+	}
+    }
+
+    // Map containing cached Spi Class objects of the specified type
+    private static final Map<String,Class> spiMap =
+            new java.util.Hashtable<String,Class>();
+
+    /**
+     * Return the Class object for the given engine type
+     * (e.g. "MessageDigest"). Works for Spis in the java.security package
+     * only.
+     */
+    private static Class getSpiClass(String type) {
+	Class clazz = spiMap.get(type);
+	if (clazz != null) {
+	    return clazz;
+	}
+	try {
+	    clazz = Class.forName("java.security." + type + "Spi");
+	    spiMap.put(type, clazz);
+	    return clazz;
+	} catch (ClassNotFoundException e) {
+	    throw (Error)new AssertionError("Spi class not found").initCause(e);
+	}
+    }
+
+    /*
+     * Returns an array of objects: the first object in the array is
+     * an instance of an implementation of the requested algorithm
+     * and type, and the second object in the array identifies the provider
+     * of that implementation.
+     * The <code>provider</code> argument cannot be null.
+     */
+    static Object[] getImpl(String algorithm, String type, Provider provider)
+	    throws NoSuchAlgorithmException {
+	return GetInstance.getInstance
+	    (type, getSpiClass(type), algorithm, provider).toArray();
+    }
+
+    static Object[] getImpl(String algorithm, String type, Provider provider,
+	    Object params) throws NoSuchAlgorithmException,
+	    InvalidAlgorithmParameterException {
+	return GetInstance.getInstance
+	    (type, getSpiClass(type), algorithm, params, provider).toArray();
+    }
 }
