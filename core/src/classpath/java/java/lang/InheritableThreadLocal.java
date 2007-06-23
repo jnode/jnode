@@ -59,7 +59,7 @@ import java.util.WeakHashMap;
  * @since 1.2
  * @status updated to 1.4
  */
-public class InheritableThreadLocal extends ThreadLocal
+public class InheritableThreadLocal<T> extends ThreadLocal<T>
 {
 
 	/**
@@ -101,7 +101,7 @@ public class InheritableThreadLocal extends ThreadLocal
         Iterator keys = parentThread.locals.keySet().iterator();
         while (keys.hasNext())
           {
-            Key key = (Key)keys.next();
+            ThreadLocal.Key key = (ThreadLocal.Key)keys.next();
             if (key.get() instanceof InheritableThreadLocal)
               {
                 InheritableThreadLocal local = (InheritableThreadLocal)key.get();
