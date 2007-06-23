@@ -1145,4 +1145,31 @@ public class Cipher
       }
     return cipherSpi.engineWrap(key);
   }
+
+    //jnode openjdk
+    /**
+     * Returns the maximum key length for the specified transformation
+     * according to the installed JCE jurisdiction policy files. If
+     * JCE unlimited strength jurisdiction policy files are installed,
+     * Integer.MAX_VALUE will be returned.
+     * For more information on default key size in JCE jurisdiction
+     * policy files, please see Appendix E in the
+     * <a href=
+     *   "{@docRoot}/../technotes/guides/security/crypto/CryptoSpec.html#AppE">
+     * Java Cryptography Architecture Reference Guide</a>.
+     *
+     * @param transformation the cipher transformation.
+     * @return the maximum key length in bits or Integer.MAX_VALUE.
+     * @exception NullPointerException if <code>transformation</code> is null.
+     * @exception NoSuchAlgorithmException if <code>transformation</code>
+     * is not a valid transformation, i.e. in the form of "algorithm" or
+     * "algorithm/mode/padding".
+     * @since 1.5
+     */
+    public static final int getMaxAllowedKeyLength(String transformation)
+        throws NoSuchAlgorithmException
+    {
+        return 0;
+    }
+
 }
