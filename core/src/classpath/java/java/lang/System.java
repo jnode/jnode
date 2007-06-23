@@ -44,6 +44,7 @@ import gnu.classpath.VMStackWalker;
 
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.io.Console;
 import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.Collections;
@@ -1085,5 +1086,24 @@ public final class System
         }
 
       } // class EnvironmentSet<String>
+
+    //jnode
+    private static volatile Console cons = null;
+    /**
+     * Returns the unique {@link java.io.Console Console} object associated
+     * with the current Java virtual machine, if any.
+     *
+     * @return  The system console, if any, otherwise <tt>null</tt>.
+     *
+     * @since   1.6
+     */
+     public static Console console() {
+         if (cons == null) {
+             synchronized (System.class) {
+                 cons = sun.misc.SharedSecrets.getJavaIOAccess().console();
+	        }
+         }
+         return cons;
+     }
 
 } // class System
