@@ -85,9 +85,10 @@ public class AttributeImpl
     return value;
   }
 
-  public QName getDTDType()
+    //jnode openjdk
+  public String getDTDType()
   {
-    return type;
+    return type.toString();
   }
 
   public boolean isSpecified()
