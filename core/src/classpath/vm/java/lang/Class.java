@@ -717,7 +717,7 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type,
      * @throws NoSuchMethodException
      * @throws SecurityException
      */
-    public Method getDeclaredMethod(String name, Class< ? >[] argTypes)
+    public Method getDeclaredMethod(String name, Class< ? >... argTypes)
             throws NoSuchMethodException, SecurityException {
         VmType< ? >[] vmArgTypes;
         if (argTypes == null) {
@@ -1317,6 +1317,98 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type,
         return null;
       return getName(klass);
       */
+    }
+
+    /**
+   * <p>
+   * Returns a <code>Type</code> object representing the direct superclass,
+   * whether class, interface, primitive type or void, of this class.
+   * If this class is an array class, then a class instance representing
+   * the <code>Object</code> class is returned.  If this class is primitive,
+   * an interface, or a representation of either the <code>Object</code>
+   * class or void, then <code>null</code> is returned.
+   * </p>
+   * <p>
+   * If the superclass is a parameterized type, then the
+   * object returned for this interface reflects the actual type
+   * parameters used in the source code.  Type parameters are created
+   * using the semantics specified by the <code>ParameterizedType</code>
+   * interface, and only if an instance has not already been created.
+   * </p>
+   *
+   * @return the superclass of this class.
+   * @throws GenericSignatureFormatError if the generic signature of the
+   *         class does not comply with that specified by the Java
+   *         Virtual Machine specification, 3rd edition.
+   * @throws TypeNotPresentException if the superclass refers
+   *         to a non-existant type.
+   * @throws MalformedParameterizedTypeException if the superclass
+   *         refers to a parameterized type that can not be instantiated for
+   *         some reason.
+   * @since 1.5
+   * @see java.lang.reflect.ParameterizedType
+   */
+  public Type getGenericSuperclass()
+  {
+    if (isArray())
+      return Object.class;
+
+    if (isPrimitive() || isInterface() || this == Object.class)
+      return null;
+
+    String sig = vmClass.getSignature();
+    if (sig == null)
+      return getSuperclass();
+
+    ClassSignatureParser p = new ClassSignatureParser(this, sig);
+    return p.getSuperclassType();
+  }
+
+    /**
+     * <p>
+     * Returns an array of <code>Type</code> objects which represent the
+     * interfaces directly implemented by this class or extended by this
+     * interface.
+     * </p>
+     * <p>
+     * If one of the superinterfaces is a parameterized type, then the
+     * object returned for this interface reflects the actual type
+     * parameters used in the source code.  Type parameters are created
+     * using the semantics specified by the <code>ParameterizedType</code>
+     * interface, and only if an instance has not already been created.
+     * </p>
+     * <p>
+     * The order of the interfaces in the array matches the order in which
+     * the interfaces are declared.  For classes which represent an array,
+     * an array of two interfaces, <code>Cloneable</code> and
+     * <code>Serializable</code>, is always returned, with the objects in
+     * that order.  A class representing a primitive type or void always
+     * returns an array of zero size.
+     * </p>
+     *
+     * @return an array of interfaces implemented or extended by this class.
+     * @throws GenericSignatureFormatError if the generic signature of one
+     *         of the interfaces does not comply with that specified by the Java
+     *         Virtual Machine specification, 3rd edition.
+     * @throws TypeNotPresentException if any of the superinterfaces refers
+     *         to a non-existant type.
+     * @throws MalformedParameterizedTypeException if any of the interfaces
+     *         refer to a parameterized type that can not be instantiated for
+     *         some reason.
+     * @since 1.5
+     * @see java.lang.reflect.ParameterizedType
+     */
+    public Type[] getGenericInterfaces()
+    {
+      if (isPrimitive())
+        return new Type[0];
+
+      String sig = vmClass.getSignature();
+      if (sig == null)
+        return getInterfaces();
+
+      ClassSignatureParser p = new ClassSignatureParser(this, sig);
+      return p.getInterfaceTypes();
     }
 
 
