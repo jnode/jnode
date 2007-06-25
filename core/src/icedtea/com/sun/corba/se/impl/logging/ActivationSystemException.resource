@@ -1,0 +1,7 @@
+ACTIVATION.cannotReadRepositoryDb="IOP00910401: (INITIALIZE) Cannot read repository datastore"
+ACTIVATION.cannotAddInitialNaming="IOP00910402: (INITIALIZE) Cannot add initial naming"
+ACTIVATION.cannotWriteRepositoryDb="IOP00710401: (INTERNAL) Cannot write repository datastore"
+ACTIVATION.serverNotExpectedToRegister="IOP00710403: (INTERNAL) Server not expected to register"
+ACTIVATION.unableToStartProcess="IOP00710404: (INTERNAL) Unable to start server process"
+ACTIVATION.serverNotRunning="IOP00710406: (INTERNAL) Server is not running"
+ACTIVATION.errorInBadServerIdHandler="IOP02510401: (OBJECT_NOT_EXIST) Error in BadServerIdHandler"
