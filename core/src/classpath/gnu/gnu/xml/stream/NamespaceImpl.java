@@ -42,6 +42,7 @@ import java.io.Writer;
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Namespace;
+import javax.xml.namespace.QName;
 
 /**
  * A namespace declaration event.
@@ -106,6 +107,22 @@ public class NamespaceImpl
         throw e2;
       }
   }
-  
+
+    //jnode openjdk
+    public QName getName() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public String getValue() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public String getDTDType() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public boolean isSpecified() {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 }
 
