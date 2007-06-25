@@ -177,6 +177,12 @@ public abstract class URLConnection
    * The timeout period.
    */
   private int timeout;
+    
+    //jnode openjdk
+    /**
+   * The read timeout period.
+   */
+  private int readTimeout;
 
   /* Cached ParsePosition, used when parsing dates. */
   private ParsePosition position;
@@ -1102,5 +1108,44 @@ public abstract class URLConnection
       new SimpleDateFormat("EEEE, dd-MMM-yy hh:mm:ss 'GMT'", locale);
     dateFormats[2] = new SimpleDateFormat("EEE MMM d hh:mm:ss yyyy", locale);
     dateformats_initialized = true;
+  }
+
+    //jnode openjdk
+    /**
+   * Returns the read timeout, in milliseconds, or zero if the timeout
+   * is infinite or not set.
+   *
+   * @return The timeout.
+   *
+   * @see #setReadTimeout
+   *
+   * @since 1.5
+   */
+  public int getReadTimeout()
+  {
+    return readTimeout;
+  }
+
+  /**
+   * Set the read timeout, in milliseconds, or zero if the timeout
+   * is to be considered infinite. Note that in certain socket
+   * implementations/platforms this method may not have any effect.
+   *
+   * Throws an <code>IllegalArgumentException</code> if timeout < 0.
+   *
+   * @param timeout - The timeout, in milliseconds.
+   *
+   * @throws IllegalArgumentException if timeout is negative.
+   *
+   * @see #getReadTimeout
+   *
+   * @since 1.5
+   */
+  public void setReadTimeout(int timeout)
+    throws IllegalArgumentException
+  {
+    if( timeout < 0 )
+      throw new IllegalArgumentException("Timeout must be 0 or positive.");
+    readTimeout = timeout;
   }
 }
