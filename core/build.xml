@@ -26,9 +26,9 @@
 	<pathelement location="${my-src.dir}/classpath/ext"/>
 	<pathelement location="${my-src.dir}/classpath/vm"/>    	
 	<pathelement location="${my-src.dir}/classpath/tools"/>
-	<pathelement location="${my-src.dir}/classpath/sun"/>
 	<pathelement location="${my-src.dir}/openjdk/java"/>
 	<pathelement location="${my-src.dir}/openjdk/javax"/>
+	<pathelement location="${my-src.dir}/openjdk/org"/>
 	<pathelement location="${my-src.dir}/openjdk/com"/>
 	<pathelement location="${my-src.dir}/openjdk/sun"/>
 	<pathelement location="${my-src.dir}/openjdk/vm"/>
@@ -99,9 +99,9 @@
       <fileset dir="${my-src.dir}/classpath/java" includes="**/*.properties"/>
       <fileset dir="${my-src.dir}/classpath/vm" includes="**/*.security"/>
       <fileset dir="${my-src.dir}/classpath/tools" includes="**/*.jav"/>
-      <fileset dir="${my-src.dir}/classpath/sun" includes="**/*.jav"/>
       <fileset dir="${my-src.dir}/openjdk/java" includes="**/*.jav"/>
       <fileset dir="${my-src.dir}/openjdk/javax" includes="**/*.jav"/>
+      <fileset dir="${my-src.dir}/openjdk/org" includes="**/*.jav"/>
       <fileset dir="${my-src.dir}/openjdk/com" includes="**/*.jav"/>
       <fileset dir="${my-src.dir}/openjdk/sun" includes="**/*.jav"/>
       <fileset dir="${my-src.dir}/openjdk/vm" includes="**/*.jav"/>
@@ -131,9 +131,9 @@
 	    <fileset dir="${my-src.dir}/classpath/ext" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/classpath/vm" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/classpath/tools" excludes="${my-non-resources}"/>
-	    <fileset dir="${my-src.dir}/classpath/sun" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/openjdk/java" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/openjdk/javax" excludes="${my-non-resources}"/>
+	    <fileset dir="${my-src.dir}/openjdk/org" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/openjdk/com" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/openjdk/sun" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/openjdk/vm" excludes="${my-non-resources}"/>
