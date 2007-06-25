@@ -489,4 +489,42 @@ public final class Method extends AccessibleObject implements Member, AnnotatedE
     public boolean isAnnotationPresent(Class< ? extends Annotation> annotationClass) {
         return vmMethod.isAnnotationPresent(annotationClass);
     }
+
+    //jnode openjdk
+    /**
+     * Returns an array of arrays that represent the annotations on the formal
+     * parameters, in declaration order, of the method represented by
+     * this <tt>Method</tt> object. (Returns an array of length zero if the
+     * underlying method is parameterless.  If the method has one or more
+     * parameters, a nested array of length zero is returned for each parameter
+     * with no annotations.) The annotation objects contained in the returned
+     * arrays are serializable.  The caller of this method is free to modify
+     * the returned arrays; it will have no effect on the arrays returned to
+     * other callers.
+     *
+     * @return an array of arrays that represent the annotations on the formal
+     *    parameters, in declaration order, of the method represented by this
+     *    Method object
+     * @since 1.5
+     */
+    public Annotation[][] getParameterAnnotations() {
+        return new Annotation[vmMethod.getNoArguments()][];
+    }
+
+    /**
+     * If this method is an annotation method, returns the default
+     * value for the method.  If there is no default value, or if the
+     * method is not a member of an annotation type, returns null.
+     * Primitive types are wrapped.
+     *
+     * @throws TypeNotPresentException if the method returns a Class,
+     * and the class cannot be found
+     *
+     * @since 1.5
+     */
+    public Object getDefaultValue(){
+        //todo implement it
+        return null;
+    }
+
 }
