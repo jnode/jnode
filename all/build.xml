@@ -471,7 +471,7 @@ clean             Remove all intermediate build results.
         </patternset>
 
         <delete dir="${build.dir}/classpath-compare"/>
-        <cp-compare destdir="${build.dir}/classpath-compare">
+        <cp-compare destdir="${build.dir}/classpath-compare" type="classpath">
             <vmsources>
                 <fileset dir="${root.dir}/core/src/classpath/gnu">
                     <patternset refid="cp-includes-pattern"/>
@@ -558,6 +558,68 @@ clean             Remove all intermediate build results.
             <fileset dir="${root.dir}/shell/src/shell" includes="**/*.java"/>
         </header>
     </target>
+
+    <target name="oj-compare" depends="assemble">
+            <taskdef name="cp-compare" classname="org.jnode.ant.taskdefs.classpath.CompareTask" classpathref="cp-jnode"/>
+
+            <patternset id="cp-includes-pattern">
+                <include name="**/*.java"/>
+                <include name="**/*.properties"/>
+                <include name="**/package.html"/>
+            </patternset>
+
+            <patternset id="cp-sources-pattern">
+                <exclude name="com/sun/demo/**/*"/>
+                <exclude name="com/sun/tools/hat/**/*"/>
+                <exclude name="com/sun/tools/hat/**/*"/>
+                <exclude name="com/sun/tools/example/**/*"/>
+                <exclude name="com/sun/tools/javah/**/*"/>
+                <exclude name="com/sun/tools/internal/txw2/**/*"/>
+                <exclude name="sun/jvmstat/**/*"/>
+                <exclude name="sun/tools/attach/**/*"/>
+                <exclude name="sun/tools/jinfo/**/*"/>
+                <exclude name="sun/tools/jps/**/*"/>
+                <exclude name="sun/tools/jmap/**/*"/>
+                <exclude name="sun/tools/jstack/**/*"/>
+                <exclude name="sun/tools/jstat/**/*"/>
+                <exclude name="sun/tools/jstatd/**/*"/>
+                <exclude name="sun/tools/jconsole/**/*"/>
+            </patternset>
+
+            <delete dir="${build.dir}/openjdk-compare"/>
+            <cp-compare destdir="${build.dir}/openjdk-compare" type="openjdk">
+                <vmsources>
+                    <fileset dir="${root.dir}/core/src/openjdk/com">
+                        <patternset refid="cp-includes-pattern"/>
+                    </fileset>
+                    <fileset dir="${root.dir}/core/src/openjdk/java">
+                        <patternset refid="cp-includes-pattern"/>
+                    </fileset>
+                    <fileset dir="${root.dir}/core/src/openjdk/javax">
+                        <patternset refid="cp-includes-pattern"/>
+                    </fileset>
+
+                    <fileset dir="${root.dir}/core/src/openjdk/org">
+                        <patternset refid="cp-includes-pattern"/>
+                    </fileset>
+
+                    <fileset dir="${root.dir}/core/src/openjdk/sun">
+                        <patternset refid="cp-includes-pattern"/>
+                    </fileset>
+                </vmsources>
+                <vmspecificsources>
+                    <fileset dir="${root.dir}/core/src/openjdk/vm">
+                        <patternset refid="cp-includes-pattern"/>
+                       </fileset>
+                </vmspecificsources>
+                <classpathsources>
+                    <fileset dir="${root.dir}/../openjdk/j2se/src/share/classes/">
+                        <patternset refid="cp-includes-pattern"/>
+                        <patternset refid="cp-sources-pattern"/>
+                    </fileset>
+                </classpathsources>
+            </cp-compare>
+        </target>
 
     <!-- Run all tests -->
     <target name="tests" depends="assemble">
