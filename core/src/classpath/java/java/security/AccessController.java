@@ -159,11 +159,11 @@ public final class AccessController
    * @exception PrivilegedActionException wrapped around any exception that
    * is thrown in the <code>run()</code> method.
      */
-    public static Object doPrivileged(PrivilegedExceptionAction action,
+    public static <T> T doPrivileged(PrivilegedExceptionAction<T> action,
                                     AccessControlContext context)
     throws PrivilegedActionException
   {
-        return VmAccessController.doPrivileged(action, context.getVmContext());
+        return (T)VmAccessController.doPrivileged(action, context.getVmContext());
     }
 
     /**
