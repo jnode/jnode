@@ -55,6 +55,8 @@ public class CompareTask extends Task {
 
     private File destDir;
 
+    private String type;
+
     private String vmSpecificTag = "@vm-specific";
 
     // represent an unsubmitted classpath bugfix 
@@ -91,9 +93,13 @@ public class CompareTask extends Task {
     private static final int FLAG_UNSUBMITTED_CLASSPATH_BUGFIX = 0x2000;
 
     public void execute() {
-        if (destDir == null) {
+        if (destDir == null)
             throw new BuildException("The destdir attribute must be set");
-        }
+
+        if (type == null)
+            throw new BuildException("The type attribute must be set");
+
+
         final Map<String, SourceFile> vmFiles = vmDirs
                 .scanJavaFiles(getProject());
         final Map<String, SourceFile> classpathFiles = classpathDirs
@@ -107,11 +113,11 @@ public class CompareTask extends Task {
 
         try {
             destDir.mkdirs();
-            final File outBugsFile = new File(destDir, "classpath-bugfix.html");
+            final File outBugsFile = new File(destDir, "bugfix.html");
             final PrintWriter outBugs = new PrintWriter(new FileWriter(outBugsFile));
             reportHeader(outBugs, "Class", "Target", "Classpath bugs");
             
-            final File outFile = new File(destDir, "classpath-compare.html");
+            final File outFile = new File(destDir, "index.html");
             final PrintWriter out = new PrintWriter(new FileWriter(outFile));
             reportHeader(out, "Class", "Target", "Merge status");
             
@@ -138,14 +144,14 @@ public class CompareTask extends Task {
                 } else if (vmFile == null) {
                     // file is not found as vmspecific source, nor as vm source
                     if (!cpFile.isIgnoreMissing()) {
-                        reportMissing(out, cpFile.getReportName(), "classpath",
+                        reportMissing(out, cpFile.getReportName(), type,
                                 getFlags(cpFile));
-                        missingInCp++;
+                        missingInVm++;
                     }
                 } else if (cpFile == null) {
                     // File is not found in classpath sources
                     reportMissing(out, vmFile.getReportName(), "vm", new Flags());
-                    missingInVm++;
+                    missingInCp++;
                 } else {
                     // We have both the classpath version and the vm version.
                     cpFile = cpFile.getBestFileForTarget(vmFile.getTarget());
@@ -197,8 +203,8 @@ public class CompareTask extends Task {
             out.println("<a name='summary'/><h2>Summary</h2>");
             if (missingInCp > 0) {
                 out.println("Found " + missingInCp
-                        + " files missing in classpath</br>");
-                log("Found " + missingInCp + " files missing in classpath");
+                        + " files missing in " + type + "</br>");
+                log("Found " + missingInCp + " files missing in " + type);
             }
             if (missingInVm > 0) {
                 out.println("Found " + missingInVm
@@ -221,7 +227,7 @@ public class CompareTask extends Task {
             }
             if (diffClasspathBugfix > 0) {
                 out.println("Found " + diffClasspathBugfix
-                        + " local <a href=\"classpath-bugfix.html\">classpath bugfixes</a><br/>");
+                        + " local <a href=\"bugfix.html\">classpath bugfixes</a><br/>");
                 log("Found " + diffClasspathBugfix
                         + " local classpath bugfixes");
             }
@@ -315,10 +321,11 @@ public class CompareTask extends Task {
     }
 
     protected void reportHeader(PrintWriter out, String... headers) {
+        String capital_type = type.substring(0,1).toUpperCase() + type.substring(1);
         out.println("<html>");
-        out.println("<title>Classpath compare</title>");
+        out.println("<title>" + capital_type + " compare</title>");
         out.println("<style type='text/css'>");
-        out.println(".classpath-only         { background-color: #FFFFAA; }");
+        out.println("." + type + "-only         { background-color: #FFFFAA; }");
         out.println(".vm-only                { background-color: #CCCCFF; }");
         out.println(".needsmerge             { background-color: #FF9090; }");
         out.println(".vm-specific            { background-color: #119911; }");
@@ -326,7 +333,7 @@ public class CompareTask extends Task {
         out.println(".classpath-bugfix       { background-color: #CCFFCC; }");
         out.println("</style>");
         out.println("<body>");
-        out.println("<h1>Classpath compare results</h1>");
+        out.println("<h1>" + capital_type + " compare results</h1>");
         out.println("Created at " + new Date());
         out.println("<table border='1' width='100%' style='border: solid 1'>");
         out.println("<tr>");
@@ -592,5 +599,22 @@ public class CompareTask extends Task {
      */
     public final void setDestDir(File destDir) {
         this.destDir = destDir;
+    }
+
+
+    /**
+     * Returns the type.
+     * @return
+     */
+    public String getType() {
+        return type;
+    }
+
+    /**
+     * The type of the comparesion.
+     * @param type of the comparesion
+     */
+    public void setType(String type) {
+        this.type = type;
     }
 }
