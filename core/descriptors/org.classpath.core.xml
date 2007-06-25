@@ -13,7 +13,9 @@
     <library name="jnode-core.jar">
 
       <export name="sun.misc.*"/>
+      <export name="sun.net.www.protocol.http.InMemoryCookieStore"/>
       <export name="sun.security.util.Debug"/>
+      <export name="sun.security.util.SecurityConstants"/>
       <export name="sun.security.action.GetPropertyAction"/>
       <export name="sun.security.jca.*"/>
       <export name="sun.nio.cs.StreamEncoder"/>
@@ -117,6 +119,9 @@
       <export name="javax.naming.NameImpl"/>
       <export name="javax.naming.NameImplEnumerator"/>
 
+      <export name="javax.net.ssl.SSLException"/>  
+      <export name="javax.net.ssl.SSLPeerUnverifiedException"/>
+
       <export name="javax.xml.parsers.*"/>
       <export name="javax.xml.transform.*"/>
       <export name="javax.xml.transform.dom.*"/>
@@ -125,6 +130,15 @@
       <export name="javax.xml.stream.events.*"/>
       <export name="javax.xml.stream.util.*"/>
 
+      <export name="javax.security.auth.AuthPermission"/>
+      <export name="javax.security.auth.Destroyable"/>
+      <export name="javax.security.auth.DestroyFailedException"/>
+      <export name="javax.security.auth.Subject"/>
+      <export name="javax.security.auth.callback.Callback"/>
+      <export name="javax.security.auth.callback.CallbackHandler"/>
+      <export name="javax.security.auth.callback.PasswordCallback"/>
+      <export name="javax.security.auth.callback.UnsupportedCallbackException"/>
+      <export name="javax.security.auth.login.LoginException"/>
       <export name="javax.security.auth.x500.*"/>
 
       <export name="javax.crypto.spec.SecretKeySpec"/>
