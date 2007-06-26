@@ -78,7 +78,7 @@ public class JGrubInstallCommand implements Command {
      * @param args
      * @throws Exception
      */
-    public static void main(String[] args) throws Exception {
+    public static void main(String... args) throws Exception {
         new JGrubInstallCommand().execute(new CommandLine(args), System.in, System.out, System.err);
     }
 
