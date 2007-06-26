@@ -26,5 +26,6 @@
   <extension point="org.jnode.security.permissions">
     <permission class="java.util.PropertyPermission" name="gnu.awt.dispatchthread.priority" actions="read"/>
     <permission class="java.awt.AWTPermission" name="listenToAllAWTEvents"/>
+    <permission class="java.lang.RuntimePermission" name="exitVM"/>
   </extension>
 </plugin>
