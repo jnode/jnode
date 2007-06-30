@@ -198,6 +198,41 @@ public final class VMFile {
         }
     }
 
+    static  synchronized boolean canExecute(String path) {
+        try {
+        	return VMIOUtils.getAPI().canExecute(getNormalizedPath(path));
+        } catch (IOException ex) {
+            return false;
+        }
+	}
+
+	public static boolean setReadable(String path, boolean enable,
+			boolean owneronly) {
+        try {
+        	return VMIOUtils.getAPI().setReadable(getNormalizedPath(path), enable, owneronly);
+        } catch (IOException ex) {
+            return false;
+        }		
+	}
+
+	public static boolean setWritable(String path, boolean enable,
+			boolean owneronly) {
+        try {
+        	return VMIOUtils.getAPI().setWritable(getNormalizedPath(path), enable, owneronly);
+        } catch (IOException ex) {
+            return false;
+        }
+	}
+
+	public static boolean setExecutable(String path, boolean enable,
+			boolean owneronly) {
+        try {
+        	return VMIOUtils.getAPI().setExecutable(getNormalizedPath(path), enable, owneronly);
+        } catch (IOException ex) {
+            return false;
+        }
+	}
+
     /*
      * This method does the actual check of whether or not a file is a directory
      * or not. It also handle the existence check to eliminate the overhead of a
@@ -307,4 +342,28 @@ public final class VMFile {
         }
         return path;
     }
+
+	public static long getTotalSpace(String path) {
+        try {
+            return VMIOUtils.getAPI().getTotalSpace(getNormalizedPath(path));
+        } catch (IOException ex) {
+            return 0L;
+        }
+	}
+
+	public static long getFreeSpace(String path) {
+        try {
+            return VMIOUtils.getAPI().getFreeSpace(getNormalizedPath(path));
+        } catch (IOException ex) {
+            return 0L;
+        }
+	}
+
+	public static long getUsableSpace(String path) {
+        try {
+            return VMIOUtils.getAPI().getUsableSpace(getNormalizedPath(path));
+        } catch (IOException ex) {
+            return 0L;
+        }
+	}
 }

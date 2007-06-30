@@ -60,16 +60,22 @@ public class FileUtils {
 	 * @throws IOException
 	 */
 	public static final void copy(InputStream is, OutputStream os, byte[] buf, boolean close) throws IOException {
-		int len;
-		if (buf == null) {
-			buf = new byte[4096];
+		try
+		{
+			int len;
+			if (buf == null) {
+				buf = new byte[4096];
+			}
+			while ((len = is.read(buf)) > 0) {
+				os.write(buf, 0, len);
+			}
+			os.flush();
 		}
-		while ((len = is.read(buf)) > 0) {
-			os.write(buf, 0, len);
-		}
-		os.flush();
-		if (close) {
-			is.close();
+		finally // in any case, we must close the stream if requested
+		{
+			if (close) {
+				is.close();
+			}
 		}
 	}
 
