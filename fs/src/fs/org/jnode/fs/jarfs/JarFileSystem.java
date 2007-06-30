@@ -80,4 +80,20 @@ public class JarFileSystem extends AbstractFileSystem {
 	protected FSEntry createRootEntry() {        
 		return rootEntry;
 	}
+	
+
+	public long getFreeSpace() {
+		// TODO implement me
+		return 0;
+	}
+
+	public long getTotalSpace() {
+		// TODO implement me 
+		return 0;
+	}
+
+	public long getUsableSpace() {
+		// TODO implement me 
+		return 0;
+	}	
 }

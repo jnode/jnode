@@ -59,4 +59,10 @@ public interface FileSystem {
      * Is this filesystem closed.
      */
     public boolean isClosed();
+
+	public long getTotalSpace();
+
+	public long getFreeSpace();
+
+	public long getUsableSpace();
 }

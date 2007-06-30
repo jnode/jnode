@@ -23,13 +23,13 @@ package org.jnode.fs.jifs;
 
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSDirectory;
+import org.jnode.fs.spi.UnixFSAccessRights;
 
 /**
  * @author Andreas H\u00e4nel
  */
 
 public interface ExtFSEntry extends FSEntry {
-	
 	public void setParent(FSDirectory parent);
 	
 }

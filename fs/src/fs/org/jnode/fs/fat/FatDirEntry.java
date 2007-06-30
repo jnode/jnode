@@ -28,6 +28,7 @@ import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSFile;
+import org.jnode.fs.spi.UnixFSAccessRights;
 import org.jnode.fs.util.DosUtils;
 import org.jnode.util.LittleEndian;
 import org.jnode.util.NumberUtils;
@@ -58,6 +59,9 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry {
 	/** Directory this entry is a part of */
 	private final AbstractDirectory parent;
 
+	/** access rights of the entry */
+	private final FSAccessRights rights;
+	
 	public static FatBasicDirEntry fatDirEntryFactory(AbstractDirectory dir, byte[] src, int offset) {
 		int flags = LittleEndian.getUInt8(src, offset + 0x0b);
 		boolean r = (flags & F_READONLY) != 0;
@@ -98,6 +102,7 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry {
 		this.flags = F_ARCHIVE;
 		this.lastModified = System.currentTimeMillis();
 		this._dirty = false;
+		this.rights = new UnixFSAccessRights(getFileSystem());
 	}
 
 	/**
@@ -135,6 +140,7 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry {
 		this.startCluster = LittleEndian.getUInt16(src, offset + 0x1a);
 		this.length = LittleEndian.getUInt32(src, offset + 0x1c);
 		this._dirty = false;
+		this.rights = new UnixFSAccessRights(getFileSystem());
 	}
 
 	/**
@@ -511,6 +517,7 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry {
 	public FSDirectory getParent() {
 		return parent;
 	}
+	
 
 	/**
 	 * Gets the accessrights for this entry.
@@ -518,6 +525,6 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry {
 	 * @throws IOException
 	 */
 	public FSAccessRights getAccessRights() throws IOException {
-		throw new IOException("Not implemented yet");
-	}
+		return rights;
+	}	
 }

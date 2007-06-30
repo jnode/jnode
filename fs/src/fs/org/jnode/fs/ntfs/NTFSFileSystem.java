@@ -103,4 +103,20 @@ public class NTFSFileSystem extends AbstractFileSystem {
         // TODO Auto-generated method stub
         return null;
     }
+    
+
+	public long getFreeSpace() {
+		// TODO implement me
+		return 0;
+	}
+
+	public long getTotalSpace() {
+		// TODO implement me 
+		return 0;
+	}
+
+	public long getUsableSpace() {
+		// TODO implement me 
+		return 0;
+	}    
 }
