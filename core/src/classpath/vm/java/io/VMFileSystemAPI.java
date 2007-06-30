@@ -53,15 +53,17 @@ public interface VMFileSystemAPI {
 	 * 
 	 * @param file
 	 */
-	public boolean canRead(String file);
+	public boolean canRead(String file) throws IOException;
 
 	/**
 	 * Can the given file be written to?
 	 * 
 	 * @param file
 	 */
-	public boolean canWrite(String file);
+	public boolean canWrite(String file) throws IOException;
 
+	public boolean canExecute(String file) throws IOException;
+	
 	/**
 	 * Gets the length in bytes of the given file or 0 if the file does not exist.
 	 * 
@@ -90,6 +92,15 @@ public interface VMFileSystemAPI {
 	 * @throws IOException
 	 */
 	public void setReadOnly(String file) throws IOException;
+
+	public boolean setReadable(String normalizedPath, boolean enable,
+			boolean owneronly) throws IOException;
+
+	public boolean setWritable(String normalizedPath, boolean enable,
+			boolean owneronly) throws IOException;
+
+	public boolean setExecutable(String normalizedPath, boolean enable,
+			boolean owneronly) throws IOException;
 
 	/**
 	 * Delete the given file.
@@ -136,4 +147,10 @@ public interface VMFileSystemAPI {
 	 * @throws IOException
 	 */
 	public boolean mkFile(String file, VMOpenMode mode) throws IOException;
+
+	public long getTotalSpace(String normalizedPath) throws IOException;
+
+	public long getFreeSpace(String normalizedPath) throws IOException;
+
+	public long getUsableSpace(String normalizedPath) throws IOException;
 }
