@@ -11,8 +11,12 @@
 
   <runtime>
     <library name="jnode-core.jar">
+      <export name="com.sun.*" />
+	  <export name="com.sun.naming.internal.*"/>
 
+	  <export name="sun.*" />
       <export name="sun.misc.*"/>
+      <export name="sun.reflect.Reflection"/>
       <export name="sun.net.www.protocol.http.InMemoryCookieStore"/>
       <export name="sun.security.util.Debug"/>
       <export name="sun.security.util.SecurityConstants"/>
@@ -80,6 +84,7 @@
       <export name="java.beans.PropertyChangeSupport" />
       <export name="java.beans.PropertyChangeEvent" />
 
+	  <export name="java.*" />
       <export name="java.io.*"/>
       <export name="java.lang.*"/>
       <export name="java.lang.annotation.*"/>
@@ -108,7 +113,11 @@
       <export name="java.util.spi.*"/>
       <export name="java.util.zip.*"/>
       
+	  <export name="javax.*" />
       <export name="javax.isolate.*"/>
+      
+	  <export name="javax.naming.*"/>
+      <export name="javax.naming.spi.*"/>
 
       <export name="javax.naming.Name"/>
       <export name="javax.naming.InvalidNameException"/>
@@ -130,6 +139,8 @@
       <export name="javax.xml.stream.events.*"/>
       <export name="javax.xml.stream.util.*"/>
 
+      <export name="javax.crypto.*"/>
+      <export name="javax.crypto.spec.*"/>
       <export name="javax.security.auth.AuthPermission"/>
       <export name="javax.security.auth.Destroyable"/>
       <export name="javax.security.auth.DestroyFailedException"/>
