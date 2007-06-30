@@ -204,10 +204,14 @@ public class FatEntry extends FatObject implements FSEntry {
 	throw new UnsupportedOperationException ( "getFile" );
     }
     
-
-    public FSAccessRights getAccessRights() {
-	throw new UnsupportedOperationException ( "getAccessRights" );
-    }
+	/**
+	 * Gets the accessrights for this entry.
+	 * 
+	 * @throws IOException
+	 */
+	public FSAccessRights getAccessRights() throws IOException {
+		throw new IOException("Not implemented yet");
+	}
 
 
     public String getPath() {

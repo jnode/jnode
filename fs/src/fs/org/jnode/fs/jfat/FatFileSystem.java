@@ -114,4 +114,19 @@ public class FatFileSystem extends AbstractFileSystem {
 
 	return out.toString();
     }
+
+	public long getFreeSpace() {
+		// TODO implement me
+		return 0;
+	}
+
+	public long getTotalSpace() {
+		// TODO implement me 
+		return 0;
+	}
+
+	public long getUsableSpace() {
+		// TODO implement me 
+		return 0;
+	}
 }

@@ -99,9 +99,9 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
      * 
      * @param file
      */
-    public boolean canRead(String file) {
-        // TODO implement me
-        return true;
+    public boolean canRead(String file) throws IOException {
+        final FSEntry entry = getEntry(file);
+        return (entry != null) && (entry.getAccessRights().canRead());
     }
 
     /**
@@ -109,11 +109,43 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
      * 
      * @param file
      */
-    public boolean canWrite(String file) {
-        // TODO implement me
-        return false;
+    public boolean canWrite(String file) throws IOException {
+        final FSEntry entry = getEntry(file);
+        return (entry != null) && (entry.getAccessRights().canWrite());
     }
 
+    /**
+     * Can the given file be executed to?
+     * 
+     * @param file
+     */
+    public boolean canExecute(String file) throws IOException {
+        final FSEntry entry = getEntry(file);
+        return (entry != null) && (entry.getAccessRights().canExecute());
+    }
+
+
+	public boolean setReadable(String file, boolean enable,
+			boolean owneronly) throws IOException 
+	{
+        final FSEntry entry = getEntry(file);
+        return (entry != null) && (entry.getAccessRights().setReadable(enable, owneronly));
+	}
+
+	public boolean setWritable(String file, boolean enable,
+			boolean owneronly) throws IOException 
+	{
+        final FSEntry entry = getEntry(file);
+        return (entry != null) && (entry.getAccessRights().setWritable(enable, owneronly));
+	}
+
+	public boolean setExecutable(String file, boolean enable,
+			boolean owneronly) throws IOException 
+	{
+        final FSEntry entry = getEntry(file);
+        return (entry != null) && (entry.getAccessRights().setExecutable(enable, owneronly));
+	}
+	
     /**
      * Gets the length in bytes of the given file or 0 if the file does not
      * exist.
@@ -180,8 +212,9 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
      * @throws IOException
      */
     public void setReadOnly(String file) throws IOException {
-        throw new IOException("Not implemented yet");
-        // TODO implement me
+    	setReadable(file, true, true);
+    	setWritable(file, false, true);
+    	setExecutable(file, false, true);
     }
 
     /**
@@ -274,14 +307,13 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
                 } catch (IOException ex) {
                     // Not found
                     log.debug("parent.getEntry failed", ex);
-                    ex.printStackTrace();
                     return null;
                 }
             } else {
                 return null;
             }
         } catch (IOException e) {
-            log.debug("Filesystem.getRootEntry failed", e);
+            log.debug("Filesystem.getEntry failed", e);
             return null;
         }
 
@@ -404,7 +436,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
      * 
      * @param file
      *            absolute path
-     * @return the directory entry, null if not exite or not a directory
+     * @return the directory entry, null if not exist or not a directory
      * @throws IOException
      */
     private FSDirectory getParentDirectoryEntry(String file) throws IOException {
@@ -463,4 +495,38 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
             return (idx >= 0) ? path.substring(idx + 1) : path;
         }
     }
+    
+	public long getTotalSpace(String path) throws IOException
+	{
+        final FSEntry entry = getEntry(path);
+        long length = 0L;
+        if(entry != null)
+        {
+        	length = entry.getFileSystem().getTotalSpace();
+        }
+        return length;
+	}
+
+	public long getFreeSpace(String path) throws IOException
+	{
+        final FSEntry entry = getEntry(path);
+        long length = 0L;
+        if(entry != null)
+        {
+        	length = entry.getFileSystem().getFreeSpace();
+        }
+        return length;
+	}
+
+	public long getUsableSpace(String path) throws IOException
+	{
+        final FSEntry entry = getEntry(path);
+        long length = 0L;
+        if(entry != null)
+        {
+        	length = entry.getFileSystem().getUsableSpace();
+        }
+        return length;
+	}
+    
 }

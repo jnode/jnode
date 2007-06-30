@@ -64,7 +64,7 @@ public abstract class AbstractFSEntry extends AbstractFSObject implements FSEntr
 	private long lastModified;
 	
 	/** access rights of the entry */
-	private FSAccessRights rights;
+	final private FSAccessRights rights;
 	
 	/** Parent directory of the entry */
 	private FSDirectory parent; // parent is null for a root
@@ -104,7 +104,7 @@ public abstract class AbstractFSEntry extends AbstractFSObject implements FSEntr
 		this.table = table;
 		this.lastModified = System.currentTimeMillis();
 		this.parent = parent;
-		//TODO : this.rights = ???????;
+		this.rights = new UnixFSAccessRights(fs);
 	}
 
 	/**

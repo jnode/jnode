@@ -103,5 +103,5 @@ public interface FSEntry extends FSObject {
 	 * @return true if the entry need to be saved
 	 * @throws IOException
 	 */
-	public boolean isDirty() throws IOException;	
+	public boolean isDirty() throws IOException;
 }

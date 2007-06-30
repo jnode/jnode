@@ -38,4 +38,15 @@ public interface FSAccessRights extends FSObject {
 	public Principal getOwner()
 	throws IOException;
 
+	public boolean canRead();
+
+	public boolean canWrite();
+
+	public boolean canExecute();
+
+	public boolean setReadable(boolean enable, boolean owneronly);
+
+	public boolean setWritable(boolean enable, boolean owneronly);
+
+	public boolean setExecutable(boolean enable, boolean owneronly);
 }

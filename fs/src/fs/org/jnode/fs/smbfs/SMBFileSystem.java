@@ -91,4 +91,19 @@ public class SMBFileSystem extends NtlmAuthenticator implements FileSystem {
     public boolean isReadOnly() {
         return true;
     }
+
+	public long getFreeSpace() {
+		// TODO implement me
+		return 0;
+	}
+
+	public long getTotalSpace() {
+		// TODO implement me 
+		return 0;
+	}
+
+	public long getUsableSpace() {
+		// TODO implement me 
+		return 0;
+	}    
 }

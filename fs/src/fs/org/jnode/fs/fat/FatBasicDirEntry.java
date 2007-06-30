@@ -21,6 +21,10 @@
  
 package org.jnode.fs.fat;
 
+import java.io.IOException;
+
+import org.jnode.fs.FSAccessRights;
+
 /**
  * @author gbin
  */
@@ -40,5 +44,4 @@ public class FatBasicDirEntry extends FatObject implements FatConstants {
 	public void write(byte[] dest, int offset) {
 		System.arraycopy(rawData, 0, dest, offset, 32);
 	}
-
 }
