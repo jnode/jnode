@@ -5,6 +5,8 @@ package sun.misc;
 
 import java.lang.reflect.Field;
 import java.security.ProtectionDomain;
+import org.vmmagic.unboxed.ObjectReference;
+import org.vmmagic.unboxed.Address;
 
 /**
  * @author Levente Sántha
@@ -175,7 +177,7 @@ class NativeUnsafe {
     }
 
     public static long objectFieldOffset(Unsafe instance, Field f) {
-        throw new UnsupportedOperationException();
+        return UnsafeHelper.objectFieldOffset(f);
     }
 
     public static Object staticFieldBase(Unsafe instance, Field f) {
@@ -235,23 +237,41 @@ class NativeUnsafe {
         throw new UnsupportedOperationException();
     }
 
-
-    public static final boolean compareAndSwapObject(Unsafe instance, Object o, long offset,
-                                              Object expected,
-                                              Object x) {
-        throw new UnsupportedOperationException();
+    public static boolean compareAndSwapObject(Unsafe instance, Object o, long offset,
+                                              Object expected, Object x) {
+        //todo make sure it's atomic
+        final Address address = ObjectReference.fromObject(o).toAddress().add((int) offset);
+        if(address.loadObjectReference().toObject() == expected){
+            address.store(ObjectReference.fromObject(x));
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    public static final boolean compareAndSwapInt(Unsafe instance, Object o, long offset,
-                                           int expected,
-                                           int x) {
-        throw new UnsupportedOperationException();
+    public static boolean compareAndSwapInt(Unsafe instance, Object o, long offset,
+                                           int expected, int x) {
+        //todo make sure it's atomic
+        final Address address = ObjectReference.fromObject(o).toAddress().add((int) offset);
+        if(address.loadInt() == expected){
+            address.store(x);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public static final boolean compareAndSwapLong(Unsafe instance, Object o, long offset,
                                             long expected,
                                             long x) {
-        throw new UnsupportedOperationException();
+        //todo make sure it's atomic
+        final Address address = ObjectReference.fromObject(o).toAddress().add((int) offset);
+        if(address.loadLong() == expected){
+            address.store(x);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public static Object getObjectVolatile(Unsafe instance, Object o, long offset) {
