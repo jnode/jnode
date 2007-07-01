@@ -107,10 +107,15 @@ public class BshCommand {
             bsh.run();
     }
 
-    private static Interpreter createInterpreter(InputStream in, OutputStream out, OutputStream err, boolean interactive){
-        return new Interpreter(
+    private static Interpreter createInterpreter(InputStream in, OutputStream out, OutputStream err, boolean interactive)
+        throws Exception{
+        Interpreter interpreter = new Interpreter(
                 new BufferedReader(new InputStreamReader(in)),
                 new PrintStream(out),
                 new PrintStream(err), interactive);
+        if(interactive){
+            interpreter.eval("show();");
+        }
+        return interpreter;
     }
 }
