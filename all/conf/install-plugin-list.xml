@@ -70,6 +70,9 @@
   <plugin id="org.jnode.partitions"/>
   <plugin id="org.jnode.partitions.ibm"/>
 
+  <plugin id="org.jnode.shell.help"/>
+  <plugin id="org.jnode.fs.jfat"/>
+  <plugin id="org.jnode.fs.jfat.command"/>
   <plugin id="org.jnode.install"/>
 
   <plugin id="org.jnode.log4j"/>
