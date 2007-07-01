@@ -50,11 +50,16 @@
   </extension>
   
   <extension point="org.jnode.security.permissions">
+      <permission class="java.lang.RuntimePermission" name="exitVM"/>
+      <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
+      <permission class="java.util.PropertyPermission" name="<<ALL FILES>>" actions="read,write"/>
+      <permission class="java.util.PropertyPermission" name="*" actions="read"/>
+
+      
       <permission class="java.lang.RuntimePermission" name="getProtectionDomain"/>
       <permission class="java.lang.RuntimePermission" name="createClassLoader"/>
       <permission class="java.lang.RuntimePermission" name="setContextClassLoader"/>
       <permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/>
-      <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
       <permission class="org.jnode.security.JNodePermission" name="getVmThread"/>
       <permission class="org.jnode.security.JNodePermission" name="getVmClass"/>
       <permission class="java.net.SocketPermission" name="*" actions="resolve"/>
