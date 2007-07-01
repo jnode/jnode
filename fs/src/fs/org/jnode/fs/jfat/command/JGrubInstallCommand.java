@@ -53,27 +53,24 @@ import org.jnode.shell.help.argument.OptionArgument;
 public class JGrubInstallCommand implements Command {
     static final DeviceArgument ARG_DEVICE = new DeviceArgument("device", "device where grub will be installed");
     static final FileArgument ARG_DIR = new FileArgument("directory", "the directory for stage2 and menu.lst");
-    static final OptionArgument TYPE = new OptionArgument("action",
-            "Type parameter",
-            new OptionArgument.Option[] { new OptionArgument.Option("-p",
-                    "Set the partition point for installing Stage2,menu.lst") });
- static final OptionArgument PS_VAL = new OptionArgument("Partition Value",
-            "Setting The Partition value like (-p 1) for the hdx1", new OptionArgument.Option[] {
-                    new OptionArgument.Option("0",   "hdX0"),
-                    new OptionArgument.Option("1",   "hdX1"),
-                    new OptionArgument.Option("2",   "hdX2"),
-                    new OptionArgument.Option("3",   "hdX3")
-                    });
+    static final OptionArgument TYPE = new OptionArgument("action","Type parameter",
+            new OptionArgument.Option("-p","Set the partition point for installing Stage2,menu.lst"));
+    static final OptionArgument PS_VAL = new OptionArgument("Partition Value",
+            "Setting The Partition value like (-p 1) for the hdx1",
+         new OptionArgument.Option("0",   "hdX0"),
+         new OptionArgument.Option("1",   "hdX1"),
+         new OptionArgument.Option("2",   "hdX2"),
+         new OptionArgument.Option("3",   "hdX3"));
 
 
 
 
- static final Help.Info      HELP_INFO  =  new Help.Info     ("grub", "Install the grub to the specified location.", new Parameter[] {
+ static final Help.Info      HELP_INFO  =  new Help.Info("grub",
+         "Install the grub to the specified location.",
          new Parameter(ARG_DEVICE, Parameter.MANDATORY),
          new Parameter(TYPE,Parameter.MANDATORY),
          new Parameter(PS_VAL,Parameter.MANDATORY),
-         new Parameter(ARG_DIR,Parameter.MANDATORY),
-       });
+         new Parameter(ARG_DIR,Parameter.MANDATORY));
     /**
      * @param args
      * @throws Exception
