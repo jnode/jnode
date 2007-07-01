@@ -7,6 +7,12 @@
 
   <include file="default-plugin-list.xml"/>
 
+  <plugin id="sun.tools"/>
+  <plugin id="javax.ext.tools"/>
+  <plugin id="com.sun.tools.javac"/>
+    
+  <plugin id="org.jnode.install"/>
+
   <plugin id="charva"/>
   <plugin id="org.jnode.apps.edit"/>
   <plugin id="org.jnode.apps.editor"/>
