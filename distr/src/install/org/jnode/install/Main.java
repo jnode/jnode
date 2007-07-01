@@ -21,6 +21,7 @@
  
 package org.jnode.install;
 
+import org.jnode.install.cmdline.CommandLineInstaller;
 
 /**
  * Main class for the JNode installer.
@@ -30,9 +31,10 @@ package org.jnode.install;
 public class Main implements Runnable {
 
     public void run() {
-        System.out.println("Installing JNode");
-        
-        System.out.println("Done");
+        System.out.println("JNode Installation");
+        CommandLineInstaller.main();
+        System.out.println("JNode installation completed.");
+        /*
         while (true) {
             try {
                 Thread.sleep(100000);
@@ -40,5 +42,10 @@ public class Main implements Runnable {
                 // Ignore
             }
         }
+        */
+    }
+
+    public static void main(String[] argv){
+        new Main().run();
     }
 }
