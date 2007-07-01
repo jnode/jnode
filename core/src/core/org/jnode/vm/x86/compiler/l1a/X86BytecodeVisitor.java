@@ -457,7 +457,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 */
 	public void endInlinedMethod(VmMethod previousMethod) {
         if (log) {
-            os.log("End of inlined method");
+            os.log("End of inlined method</inline>");
         }
         // Do some housekeeping
 		helper.setMethod(previousMethod);
@@ -1017,7 +1017,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 */
 	public void startInlinedMethodCode(VmMethod inlinedMethod, int newMaxLocals) {
         if (log) {
-            os.log("Start of inlined method code");
+            os.log("<inline name=\""+inlinedMethod.getName() + "\">Start of inlined method code");
         }
 		if (debug) {
 			BootLog.debug("startInlinedMethodCode(" + inlinedMethod + ")");
