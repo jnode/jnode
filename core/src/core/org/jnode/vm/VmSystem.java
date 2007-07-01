@@ -266,6 +266,11 @@ public final class VmSystem {
         res.put("gnu.javax.swing.noGraphics2D", "true");
         // keep this property until transparency support works fine with all drivers
         res.put("org.jnode.awt.transparency", "true");
+        
+        //internal classpath for javac
+        res.put("java.endorsed.dirs", "/jifs/lib/");
+        res.put("sun.boot.class.path", ":");
+
     }
 
     /**
