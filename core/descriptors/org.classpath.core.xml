@@ -15,8 +15,10 @@
 	  <export name="com.sun.naming.internal.*"/>
 
 	  <export name="sun.*" />
+	  <export name="sun.awt.EventListenerAggregate" />
       <export name="sun.misc.*"/>
       <export name="sun.reflect.Reflection"/>
+      <export name="sun.reflect.NativeReflection"/>
       <export name="sun.net.www.protocol.http.InMemoryCookieStore"/>
       <export name="sun.security.util.Debug"/>
       <export name="sun.security.util.SecurityConstants"/>
