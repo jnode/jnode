@@ -146,6 +146,22 @@ abstract class SwingJBaseWindow<awtT extends Window, swingPeerT extends SwingJBa
         }
     }
 
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
+        if (target != null) {
+            target.paint(g);
+        }
+    }
+
+    @Override
+    public void update(Graphics g) {
+        super.update(g);
+        if (target != null) {
+            target.update(g);
+        }
+    }    
+
     private final class ContentPane extends JComponent {
 
         private awtT target;
