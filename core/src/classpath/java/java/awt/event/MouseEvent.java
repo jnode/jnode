@@ -432,4 +432,249 @@ public class MouseEvent extends InputEvent
         modifiersEx = EventModifier.extend(modifiers) & EventModifier.NEW_MASK;
       }
   }
+
+    //jndoe openjdk
+    /**
+     * Returns the absolute horizontal x position of the event.
+     * In a virtual device multi-screen environment in which the
+     * desktop area could span multiple physical screen devices,
+     * this coordinate is relative to the virtual coordinate system.
+     * Otherwise, this coordinate is relative to the coordinate system
+     * associated with the Component's GraphicsConfiguration.
+     *
+     * @return x  an integer indicating absolute horizontal position.
+     *
+     * @see java.awt.GraphicsConfiguration
+     * @since 1.6
+     */
+    public int getXOnScreen() {
+        return xAbs;
+    }
+
+    /**
+     * Returns the absolute vertical y position of the event.
+     * In a virtual device multi-screen environment in which the
+     * desktop area could span multiple physical screen devices,
+     * this coordinate is relative to the virtual coordinate system.
+     * Otherwise, this coordinate is relative to the coordinate system
+     * associated with the Component's GraphicsConfiguration.
+     *
+     * @return y  an integer indicating absolute vertical position.
+     *
+     * @see java.awt.GraphicsConfiguration
+     * @since 1.6
+     */
+    public int getYOnScreen() {
+        return yAbs;
+    }
+    /**
+     * The mouse event's x absolute coordinate.
+     * In a virtual device multi-screen environment in which the
+     * desktop area could span multiple physical screen devices,
+     * this coordinate is relative to the virtual coordinate system.
+     * Otherwise, this coordinate is relative to the coordinate system
+     * associated with the Component's GraphicsConfiguration.
+     *
+     * @serial
+   */
+    private int xAbs;
+
+    /**
+     * The mouse event's y absolute coordinate.
+     * In a virtual device multi-screen environment in which the
+     * desktop area could span multiple physical screen devices,
+     * this coordinate is relative to the virtual coordinate system.
+     * Otherwise, this coordinate is relative to the coordinate system
+     * associated with the Component's GraphicsConfiguration.
+     *
+     * @serial
+     */
+    private int yAbs;
+
+    /**
+     * Constructs a <code>MouseEvent</code> object with the
+     * specified source component,
+     * type, modifiers, coordinates, absolute coordinates, and click count.
+     * <p>
+     * Note that passing in an invalid <code>id</code> results in
+     * unspecified behavior.  Creating an invalid event (such
+     * as by using more than one of the old _MASKs, or modifier/button
+     * values which don't match) results in unspecified behavior.
+     * Even if inconsistent values for relative and absolute coordinates are
+     * passed to the constructor, the mouse event instance is still
+     * created and no exception is thrown.
+     * This method throws an
+     * <code>IllegalArgumentException</code> if <code>source</code>
+     * is <code>null</code>.
+     *
+     * @param source       the <code>Component</code> that originated the event
+     * @param id           the integer that identifies the event
+     * @param when         a long int that gives the time the event occurred
+     * @param modifiers    the modifier keys down during event (e.g. shift, ctrl,
+     *                     alt, meta)
+     *                     Either extended _DOWN_MASK or old _MASK modifiers
+     *                     should be used, but both models should not be mixed
+     *                     in one event. Use of the extended modifiers is
+     *                     preferred.
+     * @param x            the horizontal x coordinate for the mouse location
+     * @param y            the vertical y coordinate for the mouse location
+     * @param xAbs         the absolute horizontal x coordinate for the mouse location
+     * @param yAbs         the absolute vertical y coordinate for the mouse location
+     * @param clickCount   the number of mouse clicks associated with event
+     * @param popupTrigger a boolean, true if this event is a trigger for a
+     *                     popup menu
+     * @param button       which of the mouse buttons has changed state.
+     *                      <code>NOBUTTON</code>,
+     *                      <code>BUTTON1</code>,
+     *                      <code>BUTTON2</code> or
+     *                      <code>BUTTON3</code>.
+     * @throws IllegalArgumentException if an invalid <code>button</code>
+     *            value is passed in
+     * @throws IllegalArgumentException if <code>source</code> is null
+     * @since 1.6
+     */
+    public MouseEvent(Component source, int id, long when, int modifiers,
+                      int x, int y, int xAbs, int yAbs,
+                      int clickCount, boolean popupTrigger, int button)
+    {
+        super(source, id, when, modifiers);
+        this.x = x;
+        this.y = y;
+        this.xAbs = xAbs;
+        this.yAbs = yAbs;
+        this.clickCount = clickCount;
+        this.popupTrigger = popupTrigger;
+        if (button < NOBUTTON || button >BUTTON3) {
+            throw new IllegalArgumentException("Invalid button value");
+        }
+        this.button = button;
+        if ((getModifiers() != 0) && (getModifiersEx() == 0)) {
+	    setNewModifiers();
+	} else if ((getModifiers() == 0) &&
+                   (getModifiersEx() != 0 || button != NOBUTTON))
+        {
+            setOldModifiers();
+        }
+    }
+
+    /**
+     * Sets new modifiers by the old ones.
+     * Also sets button.
+     */
+    private void setNewModifiers() {
+    	if ((modifiers & BUTTON1_MASK) != 0) {
+	    modifiers |= BUTTON1_DOWN_MASK;
+	}
+	if ((modifiers & BUTTON2_MASK) != 0) {
+	    modifiers |= BUTTON2_DOWN_MASK;
+	}
+	if ((modifiers & BUTTON3_MASK) != 0) {
+	    modifiers |= BUTTON3_DOWN_MASK;
+	}
+	if (id == MOUSE_PRESSED
+            || id == MOUSE_RELEASED
+	    || id == MOUSE_CLICKED)
+	{
+	    if ((modifiers & BUTTON1_MASK) != 0) {
+		button = BUTTON1;
+		modifiers &= ~BUTTON2_MASK & ~BUTTON3_MASK;
+		if (id != MOUSE_PRESSED) {
+		    modifiers &= ~BUTTON1_DOWN_MASK;
+		}
+	    } else if ((modifiers & BUTTON2_MASK) != 0) {
+		button = BUTTON2;
+		modifiers &= ~BUTTON1_MASK & ~BUTTON3_MASK;
+		if (id != MOUSE_PRESSED) {
+		    modifiers &= ~BUTTON2_DOWN_MASK;
+		}
+	    } else if ((modifiers & BUTTON3_MASK) != 0) {
+		button = BUTTON3;
+		modifiers &= ~BUTTON1_MASK & ~BUTTON2_MASK;
+		if (id != MOUSE_PRESSED) {
+		    modifiers &= ~BUTTON3_DOWN_MASK;
+		}
+	    }
+	}
+	if ((modifiers & InputEvent.ALT_MASK) != 0) {
+	    modifiers |= InputEvent.ALT_DOWN_MASK;
+	}
+	if ((modifiers & InputEvent.META_MASK) != 0) {
+	    modifiers |= InputEvent.META_DOWN_MASK;
+	}
+	if ((modifiers & InputEvent.SHIFT_MASK) != 0) {
+	    modifiers |= InputEvent.SHIFT_DOWN_MASK;
+	}
+	if ((modifiers & InputEvent.CTRL_MASK) != 0) {
+	    modifiers |= InputEvent.CTRL_DOWN_MASK;
+	}
+	if ((modifiers & InputEvent.ALT_GRAPH_MASK) != 0) {
+	    modifiers |= InputEvent.ALT_GRAPH_DOWN_MASK;
+	}
+    }
+
+    /**
+     * Sets old modifiers by the new ones.
+     */
+    private void setOldModifiers() {
+	if (id == MOUSE_PRESSED
+            || id == MOUSE_RELEASED
+	    || id == MOUSE_CLICKED)
+	{
+	    switch(button) {
+	    case BUTTON1:
+		modifiers |= BUTTON1_MASK;
+		break;
+	    case BUTTON2:
+		modifiers |= BUTTON2_MASK;
+		break;
+	    case BUTTON3:
+		modifiers |= BUTTON3_MASK;
+		break;
+	    }
+	} else {
+	    if ((modifiers & BUTTON1_DOWN_MASK) != 0) {
+		modifiers |= BUTTON1_MASK;
+	    }
+	    if ((modifiers & BUTTON2_DOWN_MASK) != 0) {
+		modifiers |= BUTTON2_MASK;
+	    }
+	    if ((modifiers & BUTTON3_DOWN_MASK) != 0) {
+		modifiers |= BUTTON3_MASK;
+	    }
+	}
+	if ((modifiers & ALT_DOWN_MASK) != 0) {
+	    modifiers |= ALT_MASK;
+	}
+	if ((modifiers & META_DOWN_MASK) != 0) {
+	    modifiers |= META_MASK;
+	}
+	if ((modifiers & SHIFT_DOWN_MASK) != 0) {
+	    modifiers |= SHIFT_MASK;
+	}
+	if ((modifiers & CTRL_DOWN_MASK) != 0) {
+	    modifiers |= CTRL_MASK;
+	}
+	if ((modifiers & ALT_GRAPH_DOWN_MASK) != 0) {
+	    modifiers |= ALT_GRAPH_MASK;
+	}
+    }
+
+    /**
+     * Returns the absolute x, y position of the event.
+     * In a virtual device multi-screen environment in which the
+     * desktop area could span multiple physical screen devices,
+     * these coordinates are relative to the virtual coordinate system.
+     * Otherwise, these coordinates are relative to the coordinate system
+     * associated with the Component's GraphicsConfiguration.
+     *
+     * @return a <code>Point</code> object containing the absolute  x
+     *  and y coordinates.
+     *
+     * @see java.awt.GraphicsConfiguration
+     * @since 1.6
+     */
+    public Point getLocationOnScreen(){
+      return new Point(xAbs, yAbs);
+    }    
+    
 } // class MouseEvent

@@ -2338,4 +2338,124 @@ public class Container extends Component
       }
     } // class AccessibleContainerHandler
   } // class AccessibleAWTContainer
+
+    //jnode openjdk
+
+    /**
+         * Returns the position of the mouse pointer in this <code>Container</code>'s
+         * coordinate space if the <code>Container</code> is under the mouse pointer,
+         * otherwise returns <code>null</code>.
+         * This method is similar to {@link Component#getMousePosition()} with the exception
+         * that it can take the <code>Container</code>'s children into account.
+         * If <code>allowChildren</code> is <code>false</code>, this method will return
+         * a non-null value only if the mouse pointer is above the <code>Container</code>
+         * directly, not above the part obscured by children.
+         * If <code>allowChildren</code> is <code>true</code>, this method returns
+         * a non-null value if the mouse pointer is above <code>Container</code> or any
+         * of its descendants.
+         *
+         * @exception HeadlessException if GraphicsEnvironment.isHeadless() returns true
+         * @param     allowChildren true if children should be taken into account
+         * @see       Component#getMousePosition
+         * @return    mouse coordinates relative to this <code>Component</code>, or null
+         * @since     1.5
+         */
+        public Point getMousePosition(boolean allowChildren) throws HeadlessException {
+            if (GraphicsEnvironment.isHeadless()) {
+                throw new HeadlessException();
+            }
+            PointerInfo pi = (PointerInfo)java.security.AccessController.doPrivileged(
+                new java.security.PrivilegedAction() {
+                    public Object run() {
+                        return MouseInfo.getPointerInfo();
+                    }
+                }
+            );
+            synchronized (getTreeLock()) {
+                Component inTheSameWindow = findUnderMouseInWindow(pi);
+                if (isSameOrAncestorOf(inTheSameWindow, allowChildren)) {
+                    return  pointRelativeToComponent(pi.getLocation());
+                }
+                return null;
+            }
+        }
+
+    
+
+    /**
+     * Private version of findComponentAt which has a controllable
+     * behavior. Setting 'ignoreEnabled' to 'false' bypasses disabled
+     * Components during the search. This behavior is used by the
+     * lightweight cursor support in sun.awt.GlobalCursorManager.
+     * The cursor code calls this function directly via native code.
+     *
+     * The addition of this feature is temporary, pending the
+     * adoption of new, public API which exports this feature.
+     */
+    final Component findComponentAt(int x, int y, boolean ignoreEnabled)
+    {
+        if (isRecursivelyVisible()){
+            return findComponentAtImpl(x, y, ignoreEnabled);
+        }
+        return null;
+    }
+
+    /**
+     * Determines whether this component will be displayed on the screen.
+     * @return <code>true</code> if the component and all of its ancestors
+     *          until a toplevel window or null parent are visible,
+     *          <code>false</code> otherwise
+     */
+    boolean isRecursivelyVisible() {
+        return visible && (parent == null || parent.isRecursivelyVisible());
+    }
+
+    final Component findComponentAtImpl(int x, int y, boolean ignoreEnabled){
+        if (!(contains(x, y) && visible && (ignoreEnabled || enabled))) {
+ 	    return null;
+	}
+	int ncomponents = this.ncomponents;
+	Component component[] = this.component;
+
+	// Two passes: see comment in sun.awt.SunGraphicsCallback
+	for (int i = 0 ; i < ncomponents ; i++) {
+	    Component comp = component[i];
+            if (comp != null &&
+		!(comp.peer instanceof LightweightPeer)) {
+		if (comp instanceof Container) {
+		    comp = ((Container)comp).findComponentAtImpl(x - comp.x,
+							     y - comp.y,
+                                                             ignoreEnabled);
+		} else {
+		    comp = comp.locate(x - comp.x, y - comp.y);
+		}
+		if (comp != null && comp.visible &&
+		    (ignoreEnabled || comp.enabled))
+		{
+		    return comp;
+		}
+	    }
+	}
+	for (int i = 0 ; i < ncomponents ; i++) {
+	    Component comp = component[i];
+            if (comp != null &&
+		comp.peer instanceof LightweightPeer) {
+		if (comp instanceof Container) {
+		    comp = ((Container)comp).findComponentAtImpl(x - comp.x,
+							     y - comp.y,
+                                                             ignoreEnabled);
+		} else {
+		    comp = comp.locate(x - comp.x, y - comp.y);
+		}
+		if (comp != null && comp.visible &&
+		    (ignoreEnabled || comp.enabled))
+		{
+		    return comp;
+		}
+	    }
+	}
+	return this;
+    }
+
+
 } // class Container

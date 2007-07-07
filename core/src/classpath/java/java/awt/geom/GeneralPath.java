@@ -187,6 +187,7 @@ public final class GeneralPath implements Shape, Cloneable
 			append(pi, false);
 		}
 
+
   /**
    * Adds a new point to a path.
    * 

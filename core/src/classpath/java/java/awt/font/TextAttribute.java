@@ -222,6 +222,94 @@ public final class TextAttribute extends AttributedCharacterIterator.Attribute
   
   /** A value that can be used with the {@link #WIDTH} attribute. */
   public static final Float WIDTH_SEMI_EXTENDED = new Float(1.25);
+
+    //jnode openjdk
+    /**
+     * Attribute key to request kerning. Values are instances of
+     * <b><code>Integer</code></b>.  The default value is
+     * <code>0</code>, which does not request kerning.
+     *
+     * <p>The constant value {@link #KERNING_ON} is provided.
+     *
+     * <p>The default advances of single characters are not
+     * appropriate for some character sequences, for example "To" or
+     * "AWAY".  Without kerning the adjacent characters appear to be
+     * separated by too much space.  Kerning causes selected sequences
+     * of characters to be spaced differently for a more pleasing
+     * visual appearance.
+     *
+     * @since 1.6
+     */
+    public static final TextAttribute KERNING =
+	new TextAttribute("kerning");
+
+    /**
+     * Request standard kerning.
+     * @see #KERNING
+     * @since 1.6
+     */
+    public static final Integer KERNING_ON =
+	Integer.valueOf(1);
+
+
+    /**
+     * Attribute key for enabling optional ligatures. Values are
+     * instances of <b><code>Integer</code></b>.  The default value is
+     * <code>0</code>, which means do not use optional ligatures.
+     *
+     * <p>The constant value {@link #LIGATURES_ON} is defined.
+     *
+     * <p>Ligatures required by the writing system are always enabled.
+     *
+     * @since 1.6
+     */
+    public static final TextAttribute LIGATURES =
+	new TextAttribute("ligatures");
+
+    /**
+     * Request standard optional ligatures.
+     * @see #LIGATURES
+     * @since 1.6
+     */
+    public static final Integer LIGATURES_ON =
+	Integer.valueOf(1);
+
+    /**
+     * Attribute key to control tracking.  Values are instances of
+     * <b><code>Number</code></b>.  The default value is
+     * <code>0</code>, which means no additional tracking.
+     *
+     * <p>The constant values {@link #TRACKING_TIGHT} and {@link
+     * #TRACKING_LOOSE} are provided.
+     *
+     * <p>The tracking value is multiplied by the font point size and
+     * passed through the font transform to determine an additional
+     * amount to add to the advance of each glyph cluster.  Positive
+     * tracking values will inhibit formation of optional ligatures.
+     * Tracking values are typically between <code>-0.1</code> and
+     * <code>0.3</code>; values outside this range are generally not
+     * desireable.
+     *
+     * @since 1.6
+     */
+    public static final TextAttribute TRACKING =
+	new TextAttribute("tracking");
+
+    /**
+     * Perform tight tracking.
+     * @see #TRACKING
+     * @since 1.6
+     */
+    public static final Float TRACKING_TIGHT =
+	Float.valueOf(-.04f);
+
+    /**
+     * Perform loose tracking.
+     * @see #TRACKING
+     * @since 1.6
+     */
+    public static final Float TRACKING_LOOSE =
+	Float.valueOf(.04f);
           
   /**
    * Creates a new attribute.

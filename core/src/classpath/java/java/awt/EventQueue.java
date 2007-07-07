@@ -49,6 +49,7 @@ import java.awt.event.PaintEvent;
 import java.awt.peer.ComponentPeer;
 import java.awt.peer.LightweightPeer;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.ref.WeakReference;
 import java.util.EmptyStackException;
 
 /* Written using on-line Java 2 Platform Standard Edition v1.3 API 
@@ -665,4 +666,46 @@ public class EventQueue
 		return System.currentTimeMillis();
     return eq.lastWhen;
 	}
+
+    //jnode openjdk
+    static void setCurrentEventAndMostRecentTime(AWTEvent e) {
+            Toolkit.getEventQueue().setCurrentEventAndMostRecentTimeImpl(e);
+        }
+        private synchronized void setCurrentEventAndMostRecentTimeImpl(AWTEvent e)
+        {
+            if (Thread.currentThread() != dispatchThread) {
+                return;
+            }
+
+            currentEvent = e;
+
+            // This series of 'instanceof' checks should be replaced with a
+            // polymorphic type (for example, an interface which declares a
+            // getWhen() method). However, this would require us to make such
+            // a type public, or to place it in sun.awt. Both of these approaches
+            // have been frowned upon. So for now, we hack.
+            //
+            // In tiger, we will probably give timestamps to all events, so this
+            // will no longer be an issue.
+            long mostRecentEventTime2 = Long.MIN_VALUE;
+            if (e instanceof InputEvent) {
+                InputEvent ie = (InputEvent)e;
+                mostRecentEventTime2 = ie.getWhen();
+            } else if (e instanceof InputMethodEvent) {
+                InputMethodEvent ime = (InputMethodEvent)e;
+                mostRecentEventTime2 = ime.getWhen();
+            } else if (e instanceof ActionEvent) {
+                ActionEvent ae = (ActionEvent)e;
+                mostRecentEventTime2 = ae.getWhen();
+            } else if (e instanceof InvocationEvent) {
+                InvocationEvent ie = (InvocationEvent)e;
+                mostRecentEventTime2 = ie.getWhen();
+            }
+            mostRecentEventTime = Math.max(mostRecentEventTime, mostRecentEventTime2);
+        }
+    /*
+     * The time stamp of the last dispatched InputEvent or ActionEvent.
+     */
+    private long mostRecentEventTime = System.currentTimeMillis();
+
 }

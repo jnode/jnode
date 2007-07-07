@@ -44,6 +44,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.VolatileImage;
+import java.awt.image.WritableRaster;
 
 /**
  * This class describes the configuration of various graphics devices, such
@@ -101,18 +102,82 @@ public abstract class GraphicsConfiguration
    */
   public abstract BufferedImage createCompatibleImage(int w, int h);
 
-  /**
-   * Returns a buffered volatile image optimized to this device, so that
-   * blitting can be supported in the buffered image. Because the buffer is
-   * volatile, it can be optimized by native graphics accelerators.
-   *
-   * @param w the width of the buffer
-   * @param h the height of the buffer
-   * @return the buffered image, or null if none is supported
-   * @see Component#createVolatileImage(int, int)
-   * @since 1.4
-   */
-  public abstract VolatileImage createCompatibleVolatileImage(int w, int h);
+    //jnode openjdk
+    /**
+     * Returns a {@link VolatileImage} with a data layout and color model
+     * compatible with this <code>GraphicsConfiguration</code>.
+     * The returned <code>VolatileImage</code>
+     * may have data that is stored optimally for the underlying graphics
+     * device and may therefore benefit from platform-specific rendering
+     * acceleration.
+     * @param width the width of the returned <code>VolatileImage</code>
+     * @param height the height of the returned <code>VolatileImage</code>
+     * @return a <code>VolatileImage</code> whose data layout and color
+     * model is compatible with this <code>GraphicsConfiguration</code>.
+     * @see Component#createVolatileImage(int, int)
+     * @since 1.4
+     */
+    public VolatileImage createCompatibleVolatileImage(int width, int height) {
+        VolatileImage vi = null;
+        try {
+            vi = createCompatibleVolatileImage(width, height,
+                                               null, Transparency.OPAQUE);
+        } catch (AWTException e) {
+            // shouldn't happen: we're passing in null caps
+            assert false;
+        }
+        return vi;
+    }
+
+    /**
+     * Returns a {@link VolatileImage} with a data layout and color model
+     * compatible with this <code>GraphicsConfiguration</code>.
+     * The returned <code>VolatileImage</code>
+     * may have data that is stored optimally for the underlying graphics
+     * device and may therefore benefit from platform-specific rendering
+     * acceleration.
+     * @param width the width of the returned <code>VolatileImage</code>
+     * @param height the height of the returned <code>VolatileImage</code>
+     * @param transparency the specified transparency mode
+     * @return a <code>VolatileImage</code> whose data layout and color
+     * model is compatible with this <code>GraphicsConfiguration</code>.
+     * @throws IllegalArgumentException if the transparency is not a valid value
+     * @see Transparency#OPAQUE
+     * @see Transparency#BITMASK
+     * @see Transparency#TRANSLUCENT
+     * @see Component#createVolatileImage(int, int)
+     * @since 1.5
+     */
+    public VolatileImage createCompatibleVolatileImage(int width, int height,
+                                                       int transparency)
+    {
+        VolatileImage vi = null;
+        try {
+            vi = createCompatibleVolatileImage(width, height, null, transparency);
+        } catch (AWTException e) {
+            // shouldn't happen: we're passing in null caps
+            assert false;
+        }
+        return vi;
+    }
+
+    public VolatileImage createCompatibleVolatileImage(int width, int height,
+	ImageCapabilities caps, int transparency) throws AWTException
+    {
+        return null;
+        /*
+        VolatileImage vi =
+            new SunVolatileImage(this, width, height, transparency, caps);
+        if (caps != null && caps.isAccelerated() &&
+            !vi.getCapabilities().isAccelerated())
+        {
+            throw new AWTException("Supplied image capabilities could not " +
+                                   "be met by this graphics configuration.");
+        }
+        return vi;
+        */
+    }
+
 
   /**
    * Returns a buffered volatile image optimized to this device, and with the
@@ -134,36 +199,41 @@ public abstract class GraphicsConfiguration
     throw new AWTException("not implemented");
   }
 
-  /**
-   * Returns a buffered volatile image optimized to this device, and
-   * with the given transparency. Because the buffer is volatile, it
-   * can be optimized by native graphics accelerators.
-   *
-   * @param width the width of the buffer
-   * @param height the height of the buffer
-   * @param transparency the transparency value for the buffer
-   * @return the buffered image, or null if none is supported
-   * @since 1.5
-   */
-  public abstract VolatileImage createCompatibleVolatileImage(int width,
-                                                              int height,
-                                                              int transparency);
+    /**
+         * Returns a <code>BufferedImage</code> that supports the specified
+         * transparency and has a data layout and color model
+         * compatible with this <code>GraphicsConfiguration</code>.  This
+         * method has nothing to do with memory-mapping
+         * a device. The returned <code>BufferedImage</code> has a layout and
+         * color model that can be optimally blitted to a device
+         * with this <code>GraphicsConfiguration</code>.
+         * @param width the width of the returned <code>BufferedImage</code>
+         * @param height the height of the returned <code>BufferedImage</code>
+         * @param transparency the specified transparency mode
+         * @return a <code>BufferedImage</code> whose data layout and color
+         * model is compatible with this <code>GraphicsConfiguration</code>
+         * and also supports the specified transparency.
+         * @throws IllegalArgumentException if the transparency is not a valid value
+         * @see Transparency#OPAQUE
+         * @see Transparency#BITMASK
+         * @see Transparency#TRANSLUCENT
+         */
+        public BufferedImage createCompatibleImage(int width, int height,
+                                                   int transparency)
+        {
+            if (getColorModel().getTransparency() == transparency) {
+                return createCompatibleImage(width, height);
+            }
 
-  /**
-   * Returns a buffered image optimized to this device, and with the specified
-   * transparency, so that blitting can be supported in the buffered image.
-   *
-   * @param w the width of the buffer
-   * @param h the height of the buffer
-   * @param transparency the transparency of the buffer
-   * @return the buffered image, or null if none is supported
-   * @see Transparency#OPAQUE
-   * @see Transparency#BITMASK
-   * @see Transparency#TRANSLUCENT
-   */
-  public abstract BufferedImage createCompatibleImage(int w, int h,
-                                                      int transparency);
-
+            ColorModel cm = getColorModel(transparency);
+            if (cm == null) {
+                throw new IllegalArgumentException("Unknown transparency: " +
+                                                   transparency);
+            }
+            WritableRaster wr = cm.createCompatibleWritableRaster(width, height);
+            return new BufferedImage(cm, wr, cm.isAlphaPremultiplied(), null);
+        }
+    
   /**
    * Gets the color model of the corresponding device.
    *
@@ -247,4 +317,5 @@ public abstract class GraphicsConfiguration
       imageCapabilities = new ImageCapabilities(false);
     return imageCapabilities;
   }
+
 } // class GraphicsConfiguration
