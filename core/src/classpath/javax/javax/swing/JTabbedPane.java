@@ -1723,4 +1723,87 @@ public class JTabbedPane extends JComponent implements Serializable,
 
     return accessibleContext;
   }
+
+    //jnode openjdk
+    /**
+     * Returns the tab component at <code>index</code>.
+     *
+     * @param index  the index of the item being queried
+     * @return the tab component at <code>index</code>
+     * @exception IndexOutOfBoundsException if index is out of range
+     *            (index < 0 || index >= tab count)
+     *
+     * @see #setTabComponentAt
+     * @since 1.6
+     */
+    public Component getTabComponentAt(int index) {
+        //return pages.get(index).tabComponent;
+        return null;
+    }
+
+    /**
+     * Returns the index of the tab for the specified tab component.
+     * Returns -1 if there is no tab for this tab component.
+     *
+     * @param tabComponent the tab component for the tab
+     * @return the first tab which matches this tab component, or -1
+     *          if there is no tab for this tab component
+     * @see #setTabComponentAt
+     * @see #getTabComponentAt
+     * @since 1.6
+     */
+     public int indexOfTabComponent(Component tabComponent) {
+        for(int i = 0; i < getTabCount(); i++) {
+            Component c = getTabComponentAt(i);
+            if (c == tabComponent) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /**
+    * Sets the component that is responsible for rendering the
+    * title for the specified tab.  A null value means
+    * <code>JTabbedPane</code> will render the title and/or icon for
+    * the specified tab.  A non-null value means the component will
+    * render the title and <code>JTabbedPane</code> will not render
+    * the title and/or icon.
+    * <p>
+    * Note: The component must not be one that the developer has
+    *       already added to the tabbed pane.
+    *
+    * @param index the tab index where the component should be set
+    * @param component the component to render the title for the
+    *                  specified tab
+    * @exception IndexOutOfBoundsException if index is out of range
+    *            (index < 0 || index >= tab count)
+    * @exception IllegalArgumentException if component has already been
+    *            added to this <code>JTabbedPane</code>
+    *
+    * @see #getTabComponentAt
+    * @beaninfo
+    *    preferred: true
+    *    attribute: visualUpdate true
+    *  description: The tab component at the specified tab index.
+    * @since 1.6
+    */
+    public void setTabComponentAt(int index, Component component) {
+        /*
+        if (component != null && indexOfComponent(component) != -1) {
+            throw new IllegalArgumentException("Component is already added to this JTabbedPane");
+        }
+        Component oldValue = getTabComponentAt(index);
+        if (component != oldValue) {
+            int tabComponentIndex = indexOfTabComponent(component);
+            if (tabComponentIndex != -1) {
+                setTabComponentAt(tabComponentIndex, null);
+            }
+            pages.get(index).tabComponent = component;
+            firePropertyChange("indexForTabComponent", -1, index);
+        }
+        */
+    }
+
+    
 }

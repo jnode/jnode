@@ -1283,5 +1283,84 @@ public class DefaultCaret extends Rectangle
     blinkTimer = new Timer(getBlinkRate(), blinkListener);
     blinkTimer.setRepeats(true);
   }
-  
+
+    //jnode openjdk
+    /**
+     * Returns the bias of the caret position.
+     *
+     * @return the bias of the caret position
+     * @since 1.6
+     */
+    public Position.Bias getDotBias() {
+	return dotBias;
+    }
+    transient Position.Bias dotBias;
+    transient Position.Bias markBias;
+
+    /**
+     * Sets the caret position and mark to the specified position, with the
+     * specified bias. This implicitly sets the selection range
+     * to zero.
+     *
+     * @param dot the position &gt;= 0
+     * @param dotBias the bias for this position, not <code>null</code>
+     * @throws IllegalArgumentException if the bias is <code>null</code>
+     * @see Caret#setDot
+     * @since 1.6
+     */
+    public void setDot(int dot, Position.Bias dotBias) {
+        setDot(dot);
+        /*
+        if (dotBias == null) {
+            throw new IllegalArgumentException("null bias");
+        }
+
+        NavigationFilter filter = component.getNavigationFilter();
+
+        if (filter != null) {
+            filter.setDot(getFilterBypass(), dot, dotBias);
+        }
+        else {
+            handleSetDot(dot, dotBias);
+        }
+        */
+    }
+
+// ---- Bidi methods (we could put these in a subclass)
+
+    /**
+     * Moves the caret position to the specified position, with the
+     * specified bias.
+     *
+     * @param dot the position &gt;= 0
+     * @param dotBias the bias for this position, not <code>null</code>
+     * @throws IllegalArgumentException if the bias is <code>null</code>
+     * @see Caret#moveDot
+     * @since 1.6
+     */
+    public void moveDot(int dot, Position.Bias dotBias) {
+        moveDot(dot);
+        /*
+        if (dotBias == null) {
+            throw new IllegalArgumentException("null bias");
+        }
+
+	if (! component.isEnabled()) {
+	    // don't allow selection on disabled components.
+	    setDot(dot, dotBias);
+	    return;
+	}
+	if (dot != this.dot) {
+            NavigationFilter filter = component.getNavigationFilter();
+
+            if (filter != null) {
+                filter.moveDot(getFilterBypass(), dot, dotBias);
+            }
+            else {
+                handleMoveDot(dot, dotBias);
+            }
+        }
+        */
+    }
+
 }

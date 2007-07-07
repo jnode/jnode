@@ -51,6 +51,8 @@ import java.util.ListIterator;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.border.Border;
 import javax.swing.plaf.ComponentUI;
@@ -245,6 +247,32 @@ public class UIDefaults extends Hashtable<Object, Object>
     defaultLocale = Locale.getDefault();
     propertyChangeSupport = new PropertyChangeSupport(this);
   }
+
+    //jnode openjdk
+    /**
+     * Maps from a Locale to a cached Map of the ResourceBundle. This is done
+     * so as to avoid an exception being thrown when a value is asked for.
+     * Access to this should be done while holding a lock on the
+     * UIDefaults, eg synchronized(this).
+     */
+    private Map resourceCache;
+
+    /**
+     * Creates an empty defaults table with the specified initial capacity and
+     * load factor.
+     *
+     * @param initialCapacity   the initial capacity of the defaults table
+     * @param loadFactor        the load factor of the defaults table
+     * @see java.util.Hashtable
+     * @since 1.6
+     */
+    public UIDefaults(int initialCapacity, float loadFactor) {
+        super(initialCapacity, loadFactor);
+        bundles = new LinkedList();
+        defaultLocale = Locale.getDefault();
+        propertyChangeSupport = new PropertyChangeSupport(this);        
+        resourceCache = new HashMap();
+    }
 
   /**
    * Constructs a new UIDefaults instance and loads the specified entries.

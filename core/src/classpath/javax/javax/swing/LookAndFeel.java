@@ -51,6 +51,8 @@ import javax.swing.plaf.InputMapUIResource;
 import javax.swing.plaf.UIResource;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.text.JTextComponent;
+import sun.swing.DefaultLayoutStyle;
+import sun.swing.ImageIconUIResource;
 
 /**
  * A <i>look-and-feel</i> controls most aspects of the appearance and 
@@ -430,4 +432,73 @@ public abstract class LookAndFeel
   {
     c.setUIProperty(propertyName, value);
   }
+
+    //jnode openjdk
+    /**
+     * Returns the <code>LayoutStyle</code> for this look
+     * and feel.  This never returns {@code null}.
+     * <p>
+     * You generally don't use the <code>LayoutStyle</code> from
+     * the look and feel, instead use the <code>LayoutStyle</code>
+     * method <code>getInstance</code>.
+     *
+     * @see LayoutStyle#getInstance
+     * @return the <code>LayoutStyle</code> for this look and feel
+     * @since 1.6
+     */
+    public LayoutStyle getLayoutStyle() {
+        return DefaultLayoutStyle.getInstance();
+    }
+    /**
+     * Returns an <code>Icon</code> with a disabled appearance.
+     * This method is used to generate a disabled <code>Icon</code> when
+     * one has not been specified.  For example, if you create a
+     * <code>JButton</code> and only specify an <code>Icon</code> via
+     * <code>setIcon</code> this method will be called to generate the
+     * disabled <code>Icon</code>. If {@code null} is passed as
+     * <code>icon</code> this method returns {@code null}.
+     * <p>
+     * Some look and feels might not render the disabled {@code Icon}, in which
+     * case they will ignore this.
+     *
+     * @param component {@code JComponent} that will display the {@code Icon},
+     *         may be {@code null}
+     * @param icon {@code Icon} to generate the disabled icon from
+     * @return disabled {@code Icon}, or {@code null} if a suitable
+     *         {@code Icon} can not be generated
+     * @since 1.5
+     */
+    public Icon getDisabledIcon(JComponent component, Icon icon) {
+        if (icon instanceof ImageIcon) {
+            return new ImageIconUIResource(GrayFilter.
+                   createDisabledImage(((ImageIcon)icon).getImage()));
+        }
+        return null;
+    }
+
+    /**
+     * Returns an <code>Icon</code> for use by disabled
+     * components that are also selected. This method is used to generate an
+     * <code>Icon</code> for components that are in both the disabled and
+     * selected states but do not have a specific <code>Icon</code> for this
+     * state.  For example, if you create a <code>JButton</code> and only
+     * specify an <code>Icon</code> via <code>setIcon</code> this method
+     * will be called to generate the disabled and selected
+     * <code>Icon</code>. If {@code null} is passed as <code>icon</code> this
+     * methods returns {@code null}.
+     * <p>
+     * Some look and feels might not render the disabled and selected
+     * {@code Icon}, in which case they will ignore this.
+     *
+     * @param component {@code JComponent} that will display the {@code Icon},
+     *        may be {@code null}
+     * @param icon {@code Icon} to generate disabled and selected icon from
+     * @return disabled and selected icon, or {@code null} if a suitable
+     *         {@code Icon} can not be generated.
+     * @since 1.5
+     */
+    public Icon getDisabledSelectedIcon(JComponent component, Icon icon) {
+        return getDisabledIcon(component, icon);
+    }
+
 }

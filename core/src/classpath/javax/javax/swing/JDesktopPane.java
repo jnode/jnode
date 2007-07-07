@@ -381,4 +381,50 @@ public class JDesktopPane extends JLayeredPane implements Accessible
         super.setUIProperty(propertyName, value);
       }
   }
+
+    //jnode openjdk
+    /**
+     * Selects the next <code>JInternalFrame</code> in this desktop pane.
+     *
+     * @param forward a boolean indicating which direction to select in;
+     *        <code>true</code> for forward, <code>false</code> for
+     *        backward
+     * @return the JInternalFrame that was selected or <code>null</code>
+     *         if nothing was selected
+     * @since 1.6
+     */
+    public JInternalFrame selectFrame(boolean forward) {
+        JInternalFrame selectedFrame = getSelectedFrame();
+        JInternalFrame frameToSelect = getNextFrame(selectedFrame, forward);
+        if (frameToSelect == null) {
+            return null;
+        }
+        // Maintain navigation traversal order until an
+        // external stack change, such as a click on a frame.
+        setComponentOrderCheckingEnabled(false);
+        if (forward && selectedFrame != null) {
+            selectedFrame.moveToBack();  // For Windows MDI fidelity.
+        }
+        try { frameToSelect.setSelected(true);
+        } catch (PropertyVetoException pve) {}
+        setComponentOrderCheckingEnabled(true);
+        return frameToSelect;
+    }
+
+    /*
+     * Sets whether component order checking is enabled.
+     * @param enable a boolean value, where <code>true</code> means
+     * a change in component order will cause a change in the keyboard
+     * navigation order.
+     * @since 1.6
+     */
+    void setComponentOrderCheckingEnabled(boolean enable) {
+        componentOrderCheckingEnabled = enable;
+    }
+    private boolean componentOrderCheckingEnabled = true;
+
+    private JInternalFrame getNextFrame(JInternalFrame f, boolean forward) {
+        return null;
+    }
+
 }

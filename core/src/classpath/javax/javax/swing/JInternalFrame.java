@@ -38,14 +38,7 @@ exception statement from your version. */
 
 package javax.swing;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Graphics;
-import java.awt.IllegalComponentStateException;
-import java.awt.KeyboardFocusManager;
-import java.awt.LayoutManager;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
 
@@ -1817,4 +1810,18 @@ public class JInternalFrame extends JComponent implements Accessible,
   {
     super.fireVetoableChange(name, Boolean.valueOf(oldValue), Boolean.valueOf(newValue));
   }
+
+    /**
+     * Returns the last <code>Cursor</code> that was set by the
+     * <code>setCursor</code> method that is not a resizable
+     * <code>Cursor</code>.
+     *
+     * @return the last non-resizable <code>Cursor</code>
+     * @since 1.6
+     */
+    public Cursor getLastCursor() {
+        return lastCursor;
+    }
+
+    private Cursor lastCursor;
 }

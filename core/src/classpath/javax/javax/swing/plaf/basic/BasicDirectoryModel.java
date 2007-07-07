@@ -39,6 +39,7 @@ package javax.swing.plaf.basic;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -585,5 +586,68 @@ public class BasicDirectoryModel extends AbstractListModel
         loadThread.start();
       }
   }
+
+    //jnode openjdk
+    private PropertyChangeSupport changeSupport;
+    /**
+     * Adds a PropertyChangeListener to the listener list. The listener is
+     * registered for all bound properties of this class.
+     * <p>
+     * If <code>listener</code> is <code>null</code>,
+     * no exception is thrown and no action is performed.
+     *
+     * @param    listener  the property change listener to be added
+     *
+     * @see #removePropertyChangeListener
+     * @see #getPropertyChangeListeners
+     *
+     * @since 1.6
+     */
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+    if (changeSupport == null) {
+        changeSupport = new PropertyChangeSupport(this);
+    }
+    changeSupport.addPropertyChangeListener(listener);
+    }
+
+    /**
+     * Returns an array of all the property change listeners
+     * registered on this component.
+     *
+     * @return all of this component's <code>PropertyChangeListener</code>s
+     *         or an empty array if no property change
+     *         listeners are currently registered
+     *
+     * @see      #addPropertyChangeListener
+     * @see      #removePropertyChangeListener
+     * @see      java.beans.PropertyChangeSupport#getPropertyChangeListeners
+     *
+     * @since 1.6
+     */
+    public PropertyChangeListener[] getPropertyChangeListeners() {
+        if (changeSupport == null) {
+            return new PropertyChangeListener[0];
+        }
+        return changeSupport.getPropertyChangeListeners();
+    }
+
+
+    /**
+     * Removes a PropertyChangeListener from the listener list.
+     * <p>
+     * If listener is null, no exception is thrown and no action is performed.
+     *
+     * @param listener the PropertyChangeListener to be removed
+     *
+     * @see #addPropertyChangeListener
+     * @see #getPropertyChangeListeners
+     *
+     * @since 1.6
+     */
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+	if (changeSupport != null) {
+	    changeSupport.removePropertyChangeListener(listener);
+	}
+    }
 }
 

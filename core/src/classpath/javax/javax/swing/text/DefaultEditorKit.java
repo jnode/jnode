@@ -1186,6 +1186,25 @@ public class DefaultEditorKit extends EditorKit
    */
   public static final String deletePrevCharAction = "delete-previous";
 
+    //jnode openjdk
+    /**
+         * Name of the action to delete the word that
+         * follows the beginning of the selection.
+         * @see #getActions
+         * @see JTextComponent#getSelectionStart
+         * @since 1.6
+         */
+        public static final String deleteNextWordAction = "delete-next-word";
+
+        /**
+         * Name of the action to delete the word that
+         * precedes the beginning of the selection.
+         * @see #getActions
+         * @see JTextComponent#getSelectionStart
+         * @since 1.6
+         */
+        public static final String deletePrevWordAction = "delete-previous-word";
+
   /**
    * The name of the <code>Action</code> that moves the caret one line down.
    *

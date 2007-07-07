@@ -70,16 +70,7 @@ import javax.accessibility.AccessibleRole;
 import javax.accessibility.AccessibleState;
 import javax.accessibility.AccessibleStateSet;
 import javax.accessibility.AccessibleText;
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
-import javax.swing.JViewport;
-import javax.swing.KeyStroke;
-import javax.swing.Scrollable;
-import javax.swing.SwingConstants;
-import javax.swing.TransferHandler;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
@@ -91,6 +82,58 @@ import javax.swing.plaf.TextUI;
 public abstract class JTextComponent extends JComponent
   implements Scrollable, Accessible
 {
+    //jnode openjdk
+    /**
+     * Represents a drop location for <code>JTextComponent</code>s.
+     *
+     * @see #getDropLocation
+     * @since 1.6
+     */
+    public static final class DropLocation extends TransferHandler.DropLocation {
+        private final int index;
+        private final Position.Bias bias;
+
+        private DropLocation(Point p, int index, Position.Bias bias) {
+            super(p);
+            this.index = index;
+            this.bias = bias;
+        }
+
+        /**
+         * Returns the index where dropped data should be inserted into the
+         * associated component. This index represents a position between
+         * characters, as would be interpreted by a caret.
+         *
+         * @return the drop index
+         */
+        public int getIndex() {
+            return index;
+        }
+
+        /**
+         * Returns the bias for the drop index.
+         *
+         * @return the drop bias
+         */
+        public Position.Bias getBias() {
+            return bias;
+        }
+
+        /**
+         * Returns a string representation of this drop location.
+         * This method is intended to be used for debugging purposes,
+         * and the content and format of the returned string may vary
+         * between implementations.
+         *
+         * @return a string representation of this drop location
+         */
+        public String toString() {
+            return getClass().getName()
+                   + "[dropPoint=" + getDropPoint() + ","
+                   + "index=" + index + ","
+                   + "bias=" + bias + "]";
+        }
+    }
   /**
    * AccessibleJTextComponent implements accessibility hooks for
    * JTextComponent.  It allows an accessibility driver to read and
@@ -2054,4 +2097,47 @@ public abstract class JTextComponent extends JComponent
   {
     return getUI().getToolTipText(this, ev.getPoint());
   }
+
+    //jnode openjdk
+    /**
+        * Returns the location that this component should visually indicate
+        * as the drop location during a DnD operation over the component,
+        * or {@code null} if no location is to currently be shown.
+        * <p>
+        * This method is not meant for querying the drop location
+        * from a {@code TransferHandler}, as the drop location is only
+        * set after the {@code TransferHandler}'s <code>canImport</code>
+        * has returned and has allowed for the location to be shown.
+        * <p>
+        * When this property changes, a property change event with
+        * name "dropLocation" is fired by the component.
+        *
+        * @return the drop location
+        * @see #setDropMode
+        * @see TransferHandler#canImport(TransferHandler.TransferSupport)
+        * @since 1.6
+        */
+       public final DropLocation getDropLocation() {
+           return dropLocation;
+       }
+    /**
+     * The drop location.
+     */
+    private transient DropLocation dropLocation;
+
+    /**
+     * The drop mode for this component.
+     */
+    private DropMode dropMode = DropMode.USE_SELECTION;
+    /**
+     * Returns the drop mode for this component.
+     *
+     * @return the drop mode for this component
+     * @see #setDropMode
+     * @since 1.6
+     */
+    public final DropMode getDropMode() {
+        return dropMode;
+    }
+    
 }
