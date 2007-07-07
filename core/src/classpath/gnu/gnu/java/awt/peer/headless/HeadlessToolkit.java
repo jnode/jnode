@@ -43,36 +43,7 @@ import gnu.java.awt.EmbeddedWindow;
 import gnu.java.awt.peer.ClasspathFontPeer;
 import gnu.java.awt.peer.EmbeddedWindowPeer;
 
-import java.awt.AWTException;
-import java.awt.Button;
-import java.awt.Canvas;
-import java.awt.Checkbox;
-import java.awt.CheckboxMenuItem;
-import java.awt.Choice;
-import java.awt.Dialog;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.FileDialog;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Frame;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.HeadlessException;
-import java.awt.Image;
-import java.awt.Label;
-import java.awt.List;
-import java.awt.Menu;
-import java.awt.MenuBar;
-import java.awt.MenuItem;
-import java.awt.Panel;
-import java.awt.PopupMenu;
-import java.awt.PrintJob;
-import java.awt.ScrollPane;
-import java.awt.Scrollbar;
-import java.awt.TextArea;
-import java.awt.TextField;
-import java.awt.Window;
+import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.peer.DragSourceContextPeer;
@@ -102,6 +73,7 @@ import java.awt.peer.ScrollbarPeer;
 import java.awt.peer.TextAreaPeer;
 import java.awt.peer.TextFieldPeer;
 import java.awt.peer.WindowPeer;
+import java.awt.peer.DesktopPeer;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Map;
@@ -368,4 +340,13 @@ public class HeadlessToolkit
     return graphicsEnv;
   }
 
+
+    public boolean isModalExclusionTypeSupported(Dialog.ModalExclusionType modalExclusionType) {
+        return false;
+    }
+
+
+    protected DesktopPeer createDesktopPeer(Desktop target) throws HeadlessException {
+        throw new HeadlessException();
+    }
 }
