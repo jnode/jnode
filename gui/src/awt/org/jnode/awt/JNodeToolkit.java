@@ -27,21 +27,7 @@ import gnu.java.awt.peer.ClasspathFontPeer;
 import gnu.java.awt.peer.EmbeddedWindowPeer;
 import gnu.java.security.action.GetPropertyAction;
 
-import java.awt.AWTError;
-import java.awt.AWTException;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Frame;
-import java.awt.Graphics;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.Image;
-import java.awt.PrintJob;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.im.InputMethodHighlight;
 import java.awt.image.BufferedImage;
@@ -52,6 +38,7 @@ import java.awt.image.ImageProducer;
 import java.awt.image.VolatileImage;
 import java.awt.peer.FontPeer;
 import java.awt.peer.RobotPeer;
+import java.awt.peer.DesktopPeer;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
@@ -963,4 +950,16 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 			return size() > max_entries;
 		}
 	}
+
+
+    public boolean isModalExclusionTypeSupported(Dialog.ModalExclusionType modalExclusionType) {
+        //todo implementit
+        return false;
+    }
+
+
+    protected DesktopPeer createDesktopPeer(Desktop target) throws HeadlessException {
+        //todo implementit
+        return null;
+    }
 }
