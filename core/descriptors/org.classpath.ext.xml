@@ -53,6 +53,32 @@
       <export name="javax.swing.undo.*"/>
       
       <export name="org.ietf.jgss.*"/>
+
+      <export name="com.sun.java.swing.plaf.windows.DesktopProperty"/>
+      <export name="com.sun.swing.internal.plaf.basic.resources.*"/>
+      <export name="com.sun.swing.internal.plaf.metal.resources.*"/>
+      <export name="com.sun.swing.internal.plaf.synth.resources.*"/>
+      <export name="sun.awt.*"/>
+      <export name="sun.awt.im.*"/>
+      <export name="sun.awt.image.*"/>
+      <export name="sun.awt.datatransfer.*"/>
+      <export name="sun.awt.dnd.*"/>
+      <export name="sun.awt.geom.*"/>
+      <export name="sun.awt.shell.*"/>
+      <export name="sun.font.*"/>
+      <export name="sun.java2d.*"/>
+      <export name="sun.java2d.loops.*"/>
+      <export name="sun.java2d.pipe.*"/>
+      <export name="sun.print.*"/>
+      <export name="sun.swing.*"/>
+      <export name="sun.swing.icon.*"/>
+      <export name="sun.swing.plaf.synth.*"/>
+      <export name="sun.swing.plaf.windows.*"/>
+      <export name="sun.swing.table.*"/>
+      <export name="sun.swing.text.*"/>
+      <export name="sun.swing.text.html.*"/>
+
+
     </library>
   </runtime>
   
