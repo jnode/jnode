@@ -1219,4 +1219,32 @@ public class JEditorPane extends JTextComponent
   {
     return (HyperlinkListener[]) getListeners(HyperlinkListener.class);
   }
+
+    //jnode openjdk
+    /**
+     * Key for a client property used to indicate whether
+     * the default font and foreground color from the component are
+     * used if a font or foreground color is not specified in the styled
+     * text.
+     * <p>
+     * The default varies based on the look and feel;
+     * to enable it set the client {@link #putClientProperty property} with
+     * this name to <code>Boolean.TRUE</code>.
+     *
+     * @since 1.5
+     */
+    public static final String HONOR_DISPLAY_PROPERTIES = "JEditorPane.honorDisplayProperties";
+
+    /**
+     * Key for a client property used to indicate whether
+     * <a href="http://www.w3.org/TR/CSS21/syndata.html#length-units">
+     * w3c compliant</a> length units are used for html rendering.
+     * <p>
+     * By default this is not enabled; to enable
+     * it set the client {@link #putClientProperty property} with this name
+     * to <code>Boolean.TRUE</code>.
+     *
+     * @since 1.5
+     */
+    public static final String W3C_LENGTH_UNITS = "JEditorPane.w3cLengthUnits";
 }

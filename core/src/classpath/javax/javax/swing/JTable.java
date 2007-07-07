@@ -75,6 +75,7 @@ import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableColumnModelListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.event.RowSorterEvent;
 import javax.swing.plaf.TableUI;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableColumnModel;
@@ -85,6 +86,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
+import sun.swing.SwingUtilities2;
 
 /**
  * The table component, displaying information, organized in rows and columns.
@@ -100,6 +102,104 @@ public class JTable
   implements TableModelListener, Scrollable, TableColumnModelListener,
              ListSelectionListener, CellEditorListener, Accessible
 {
+    //jnode openjdk
+    /**
+     * A subclass of <code>TransferHandler.DropLocation</code> representing
+     * a drop location for a <code>JTable</code>.
+     *
+     * @see #getDropLocation
+     * @since 1.6
+     */
+    public static final class DropLocation extends TransferHandler.DropLocation {
+        private final int row;
+        private final int col;
+        private final boolean isInsertRow;
+        private final boolean isInsertCol;
+
+        private DropLocation(Point p, int row, int col,
+                             boolean isInsertRow, boolean isInsertCol) {
+
+            super(p);
+            this.row = row;
+            this.col = col;
+            this.isInsertRow = isInsertRow;
+            this.isInsertCol = isInsertCol;
+        }
+
+        /**
+         * Returns the row index where a dropped item should be placed in the
+         * table. Interpretation of the value depends on the return of
+         * <code>isInsertRow()</code>. If that method returns
+         * <code>true</code> this value indicates the index where a new
+         * row should be inserted. Otherwise, it represents the value
+         * of an existing row on which the data was dropped. This index is
+         * in terms of the view.
+         * <p>
+         * <code>-1</code> indicates that the drop occurred over empty space,
+         * and no row could be calculated.
+         *
+         * @return the drop row
+         */
+        public int getRow() {
+            return row;
+        }
+
+        /**
+         * Returns the column index where a dropped item should be placed in the
+         * table. Interpretation of the value depends on the return of
+         * <code>isInsertColumn()</code>. If that method returns
+         * <code>true</code> this value indicates the index where a new
+         * column should be inserted. Otherwise, it represents the value
+         * of an existing column on which the data was dropped. This index is
+         * in terms of the view.
+         * <p>
+         * <code>-1</code> indicates that the drop occurred over empty space,
+         * and no column could be calculated.
+         *
+         * @return the drop row
+         */
+        public int getColumn() {
+            return col;
+        }
+
+        /**
+         * Returns whether or not this location represents an insert
+         * of a row.
+         *
+         * @return whether or not this is an insert row
+         */
+        public boolean isInsertRow() {
+            return isInsertRow;
+        }
+
+        /**
+         * Returns whether or not this location represents an insert
+         * of a column.
+         *
+         * @return whether or not this is an insert column
+         */
+        public boolean isInsertColumn() {
+            return isInsertCol;
+        }
+
+        /**
+         * Returns a string representation of this drop location.
+         * This method is intended to be used for debugging purposes,
+         * and the content and format of the returned string may vary
+         * between implementations.
+         *
+         * @return a string representation of this drop location
+         */
+        public String toString() {
+            return getClass().getName()
+                   + "[dropPoint=" + getDropPoint() + ","
+                   + "row=" + row + ","
+                   + "column=" + col + ","
+                   + "insertRow=" + isInsertRow + ","
+                   + "insertColumn=" + isInsertCol + "]";
+        }
+    }
+
   /**
    * Provides accessibility support for <code>JTable</code>.
    *
@@ -5154,4 +5254,79 @@ public class JTable
         super.setUIProperty(propertyName, value);
       }
   }
+
+    //jnode openjdk
+    /**
+     * Returns the object responsible for sorting.
+     *
+     * @return the object responsible for sorting
+     * @since 1.6
+     */
+    public RowSorter<? extends TableModel> getRowSorter() {
+        //return (sortManager != null) ? sortManager.sorter : null;
+        return null;
+    }
+    /**
+     * Information used in sorting.
+     */
+    //private transient SortManager sortManager;
+
+    /**
+     * Sets the <code>RowSorter</code>.  <code>RowSorter</code> is used
+     * to provide sorting and filtering to a <code>JTable</code>.
+     * <p>
+     * This method clears the selection and resets any variable row heights.
+     * <p>
+     * If the underlying model of the <code>RowSorter</code> differs from
+     * that of this <code>JTable</code> undefined behavior will result.
+     *
+     * @param sorter the <code>RowSorter</code>; <code>null</code> turns
+     *        sorting off
+     * @see javax.swing.table.TableRowSorter
+     * @since 1.6
+     */
+    public void setRowSorter(RowSorter<? extends TableModel> sorter) {
+        /*
+        RowSorter<? extends TableModel> oldRowSorter = null;
+        if (sortManager != null) {
+            oldRowSorter = sortManager.sorter;
+            sortManager.dispose();
+            sortManager = null;
+        }
+        rowModel = null;
+        clearSelectionAndLeadAnchor();
+        if (sorter != null) {
+            sortManager = new SortManager(sorter);
+        }
+        resizeAndRepaint();
+        firePropertyChange("sorter", oldRowSorter, sorter);
+        */
+    }
+
+    /**
+     * Returns the location that this component should visually indicate
+     * as the drop location during a DnD operation over the component,
+     * or {@code null} if no location is to currently be shown.
+     * <p>
+     * This method is not meant for querying the drop location
+     * from a {@code TransferHandler}, as the drop location is only
+     * set after the {@code TransferHandler}'s <code>canImport</code>
+     * has returned and has allowed for the location to be shown.
+     * <p>
+     * When this property changes, a property change event with
+     * name "dropLocation" is fired by the component.
+     *
+     * @return the drop location
+     * @see #setDropMode
+     * @see TransferHandler#canImport(TransferHandler.TransferSupport)
+     * @since 1.6
+     */
+    public final DropLocation getDropLocation() {
+        return dropLocation;
+    }
+    /**
+     * The drop location.
+     */
+    private transient DropLocation dropLocation;
+    
 }

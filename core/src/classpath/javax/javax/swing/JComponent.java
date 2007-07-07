@@ -3796,4 +3796,169 @@ public abstract class JComponent extends Container implements Serializable
              + propertyName);
       }
   }
+
+    //jnode openjdk
+    /**
+     * Calculates a custom drop location for this type of component,
+     * representing where a drop at the given point should insert data.
+     * <code>null</code> is returned if this component doesn't calculate
+     * custom drop locations. In this case, <code>TransferHandler</code>
+     * will provide a default <code>DropLocation</code> containing just
+     * the point.
+     *
+     * @param p the point to calculate a drop location for
+     * @return the drop location, or <code>null</code>
+     */
+    TransferHandler.DropLocation dropLocationForPoint(Point p) {
+        return null;
+    }
+
+    /**
+     * Returns <code>true</code> if the current painting operation on this
+     * component is part of a <code>print</code> operation. This method is
+     * useful when you want to customize what you print versus what you show
+     * on the screen.
+     * <p>
+     * You can detect changes in the value of this property by listening for
+     * property change events on this component with name
+     * <code>"paintingForPrint"</code>.
+     * <p>
+     * Note: This method provides complimentary functionality to that provided
+     * by other high level Swing printing APIs. However, it deals strictly with
+     * painting and should not be confused as providing information on higher
+     * level print processes. For example, a {@link javax.swing.JTable#print()}
+     * operation doesn't necessarily result in a continuous rendering of the
+     * full component, and the return value of this method can change multiple
+     * times during that operation. It is even possible for the component to be
+     * painted to the screen while the printing process is ongoing. In such a
+     * case, the return value of this method is <code>true</code> when, and only
+     * when, the table is being painted as part of the printing process.
+     *
+     * @return true if the current painting operation on this component
+     *         is part of a print operation
+     * @see #print
+     * @since 1.6
+     */
+    public final boolean isPaintingForPrint() {
+        return getFlag(IS_PRINTING);
+    }
+    private void setFlag(int aFlag, boolean aValue) {
+        if(aValue) {
+            flags |= (1 << aFlag);
+        } else {
+            flags &= ~(1 << aFlag);
+        }
+    }
+    private boolean getFlag(int aFlag) {
+        int mask = (1 << aFlag);
+        return ((flags & mask) == mask);
+    }
+    private int flags;
+
+    /** Private flags **/
+    private static final int IS_DOUBLE_BUFFERED                       =  0;
+    private static final int ANCESTOR_USING_BUFFER                    =  1;
+    private static final int IS_PAINTING_TILE                         =  2;
+    private static final int IS_OPAQUE                                =  3;
+    private static final int KEY_EVENTS_ENABLED                       =  4;
+    private static final int FOCUS_INPUTMAP_CREATED                   =  5;
+    private static final int ANCESTOR_INPUTMAP_CREATED                =  6;
+    private static final int WIF_INPUTMAP_CREATED                     =  7;
+    private static final int ACTIONMAP_CREATED                        =  8;
+    private static final int CREATED_DOUBLE_BUFFER                    =  9;
+    // bit 10 is free
+    private static final int IS_PRINTING                              = 11;
+    private static final int IS_PRINTING_ALL                          = 12;
+    private static final int IS_REPAINTING                            = 13;
+    /** Bits 14-21 are used to handle nested writeObject calls. **/
+    private static final int WRITE_OBJ_COUNTER_FIRST                  = 14;
+    private static final int RESERVED_1                               = 15;
+    private static final int RESERVED_2                               = 16;
+    private static final int RESERVED_3                               = 17;
+    private static final int RESERVED_4                               = 18;
+    private static final int RESERVED_5                               = 19;
+    private static final int RESERVED_6                               = 20;
+    private static final int WRITE_OBJ_COUNTER_LAST                   = 21;
+
+    private static final int REQUEST_FOCUS_DISABLED                   = 22;
+    private static final int INHERITS_POPUP_MENU                      = 23;
+    private static final int OPAQUE_SET                               = 24;
+    private static final int AUTOSCROLLS_SET                          = 25;
+    private static final int FOCUS_TRAVERSAL_KEYS_FORWARD_SET         = 26;
+    private static final int FOCUS_TRAVERSAL_KEYS_BACKWARD_SET        = 27;
+    private static final int REVALIDATE_RUNNABLE_SCHEDULED            = 28;
+
+    /**
+     * Returns the baseline.  The baseline is measured from the top of
+     * the component.  This method is primarily meant for
+     * <code>LayoutManager</code>s to align components along their
+     * baseline.  A return value less than 0 indicates this component
+     * does not have a reasonable baseline and that
+     * <code>LayoutManager</code>s should not align this component on
+     * its baseline.
+     * <p>
+     * This method calls into the <code>ComponentUI</code> method of the
+     * same name.  If this component does not have a <code>ComponentUI</code>
+     * -1 will be returned.  If a value &gt;= 0 is
+     * returned, then the component has a valid baseline for any
+     * size &gt;= the minimum size and <code>getBaselineResizeBehavior</code>
+     * can be used to determine how the baseline changes with size.
+     *
+     * @throws IllegalArgumentException {@inheritDoc}
+     * @see #getBaselineResizeBehavior
+     * @see java.awt.FontMetrics
+     * @since 1.6
+     */
+    public int getBaseline(int width, int height) {
+        // check size.
+        super.getBaseline(width, height);
+        if (ui != null) {
+            return ui.getBaseline(this, width, height);
+        }
+        return -1;
+    }
+
+    /**
+     * Returns the preferred location to display the popup menu in this
+     * component's coordinate system. It is up to the look and feel to
+     * honor this property, some may choose to ignore it.
+     * If {@code null}, the look and feel will choose a suitable location.
+     *
+     * @param event the {@code MouseEvent} that triggered the popup to be
+     *        shown, or {@code null} if the popup is not being shown as the
+     *        result of a mouse event
+     * @return location to display the {@code JPopupMenu}, or {@code null}
+     * @since 1.5
+     */
+    public Point getPopupLocation(MouseEvent event) {
+        return null;
+    }
+
+    /**
+     * Returns an enum indicating how the baseline of the component
+     * changes as the size changes.  This method is primarily meant for
+     * layout managers and GUI builders.
+     * <p>
+     * This method calls into the <code>ComponentUI</code> method of
+     * the same name.  If this component does not have a
+     * <code>ComponentUI</code>
+     * <code>BaselineResizeBehavior.OTHER</code> will be
+     * returned.  Subclasses should
+     * never return <code>null</code>; if the baseline can not be
+     * calculated return <code>BaselineResizeBehavior.OTHER</code>.  Callers
+     * should first ask for the baseline using
+     * <code>getBaseline</code> and if a value &gt;= 0 is returned use
+     * this method.  It is acceptable for this method to return a
+     * value other than <code>BaselineResizeBehavior.OTHER</code> even if
+     * <code>getBaseline</code> returns a value less than 0.
+     *
+     * @see #getBaseline(int, int)
+     * @since 1.6
+     */
+    public BaselineResizeBehavior getBaselineResizeBehavior() {
+        if (ui != null) {
+            return ui.getBaselineResizeBehavior(this);
+        }
+        return BaselineResizeBehavior.OTHER;
+    }    
 }

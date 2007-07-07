@@ -196,4 +196,64 @@ public abstract class AbstractBorder implements Border, Serializable
 
     return new Rectangle(x, y, width, height);
   }
+
+    //jnode openjdk
+    /**
+     * Returns an enum indicating how the baseline of a component
+     * changes as the size changes.  This method is primarily meant for
+     * layout managers and GUI builders.
+     * <p>
+     * The default implementation returns
+     * <code>BaselineResizeBehavior.OTHER</code>, subclasses that support
+     * baseline should override appropriately.  Subclasses should
+     * never return <code>null</code>; if the baseline can not be
+     * calculated return <code>BaselineResizeBehavior.OTHER</code>.  Callers
+     * should first ask for the baseline using
+     * <code>getBaseline</code> and if a value &gt;= 0 is returned use
+     * this method.  It is acceptable for this method to return a
+     * value other than <code>BaselineResizeBehavior.OTHER</code> even if
+     * <code>getBaseline</code> returns a value less than 0.
+     *
+     * @param c <code>Component</code> to return baseline resize behavior for
+     * @return an enum indicating how the baseline changes as the border is
+     *         resized
+     * @see java.awt.Component#getBaseline(int,int)
+     * @see java.awt.Component#getBaselineResizeBehavior()
+     * @since 1.6
+     */
+    public Component.BaselineResizeBehavior getBaselineResizeBehavior(
+            Component c) {
+        if (c == null) {
+            throw new NullPointerException("Component must be non-null");
+        }
+        return Component.BaselineResizeBehavior.OTHER;
+    }
+
+    /**
+     * Returns the baseline.  A return value less than 0 indicates the border
+     * does not have a reasonable baseline.
+     * <p>
+     * The default implementation returns -1.  Subclasses that support
+     * baseline should override appropriately.  If a value &gt;= 0 is
+     * returned, then the component has a valid baseline for any
+     * size &gt;= the minimum size and <code>getBaselineResizeBehavior</code>
+     * can be used to determine how the baseline changes with size.
+     *
+     * @param c <code>Component</code> baseline is being requested for
+     * @param width the width to get the baseline for
+     * @param height the height to get the baseline for
+     * @return the baseline or &lt; 0 indicating there is no reasonable
+     *         baseline
+     * @throws IllegalArgumentException if width or height is &lt; 0
+     * @see java.awt.Component#getBaseline(int,int)
+     * @see java.awt.Component#getBaselineResizeBehavior()
+     * @since 1.6
+     */
+    public int getBaseline(Component c, int width, int height) {
+        if (width < 0 || height < 0) {
+            throw new IllegalArgumentException(
+                    "Width and height must be >= 0");
+        }
+        return -1;
+    }    
 }

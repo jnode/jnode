@@ -38,9 +38,7 @@ exception statement from your version. */
 
 package javax.swing.plaf;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
+import java.awt.*;
 
 import javax.accessibility.Accessible;
 import javax.swing.JComponent;
@@ -328,4 +326,61 @@ public abstract class ComponentUI
   {
     return c.getAccessibleContext().getAccessibleChild(i);
   }
+
+    //jnode openjdk
+    /**
+     * Returns the baseline.  The baseline is measured from the top of
+     * the component.  This method is primarily meant for
+     * <code>LayoutManager</code>s to align components along their
+     * baseline.  A return value less than 0 indicates this component
+     * does not have a reasonable baseline and that
+     * <code>LayoutManager</code>s should not align this component on
+     * its baseline.
+     * <p>
+     * This method returns -1.  Subclasses that have a meaningful baseline
+     * should override appropriately.
+     *
+     * @param c <code>JComponent</code> baseline is being requested for
+     * @param width the width to get the baseline for
+     * @param height the height to get the baseline for
+     * @throws NullPointerException if <code>c</code> is <code>null</code>
+     * @throws IllegalArgumentException if width or height is &lt; 0
+     * @return baseline or a value &lt; 0 indicating there is no reasonable
+     *                  baseline
+     * @see javax.swing.JComponent#getBaseline(int,int)
+     * @since 1.6
+     */
+    public int getBaseline(JComponent c, int width, int height) {
+        if (c == null) {
+            throw new NullPointerException("Component must be non-null");
+        }
+        if (width < 0 || height < 0) {
+            throw new IllegalArgumentException(
+                    "Width and height must be >= 0");
+        }
+        return -1;
+    }
+
+    /**
+     * Returns an enum indicating how the baseline of he component
+     * changes as the size changes.  This method is primarily meant for
+     * layout managers and GUI builders.
+     * <p>
+     * This method returns <code>BaselineResizeBehavior.OTHER</code>.
+     * Subclasses that support a baseline should override appropriately.
+     *
+     * @param c <code>JComponent</code> to return baseline resize behavior for
+     * @return an enum indicating how the baseline changes as the component
+     *         size changes
+     * @throws NullPointerException if <code>c</code> is <code>null</code>
+     * @see javax.swing.JComponent#getBaseline(int, int)
+     * @since 1.6
+     */
+    public Component.BaselineResizeBehavior getBaselineResizeBehavior(
+            JComponent c) {
+        if (c == null) {
+            throw new NullPointerException("Component must be non-null");
+        }
+        return Component.BaselineResizeBehavior.OTHER;
+    }
 }

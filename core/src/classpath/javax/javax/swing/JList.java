@@ -120,6 +120,105 @@ import javax.swing.text.Position;
 
 public class JList extends JComponent implements Accessible, Scrollable
 {
+    //jnode openjdk
+    /**
+     * A subclass of <code>TransferHandler.DropLocation</code> representing
+     * a drop location for a <code>JList</code>.
+     *
+     * @see #getDropLocation
+     * @since 1.6
+     */
+    public static final class DropLocation extends TransferHandler.DropLocation {
+        private final int index;
+        private final boolean isInsert;
+
+        private DropLocation(Point p, int index, boolean isInsert) {
+            super(p);
+            this.index = index;
+            this.isInsert = isInsert;
+        }
+
+        /**
+         * Returns the index where dropped data should be placed in the
+         * list. Interpretation of the value depends on the drop mode set on
+         * the associated component. If the drop mode is either
+         * <code>DropMode.USE_SELECTION</code> or <code>DropMode.ON</code>,
+         * the return value is an index of a row in the list. If the drop mode is
+         * <code>DropMode.INSERT</code>, the return value refers to the index
+         * where the data should be inserted. If the drop mode is
+         * <code>DropMode.ON_OR_INSERT</code>, the value of
+         * <code>isInsert()</code> indicates whether the index is an index
+         * of a row, or an insert index.
+         * <p>
+         * <code>-1</code> indicates that the drop occurred over empty space,
+         * and no index could be calculated.
+         *
+         * @return the drop index
+         */
+        public int getIndex() {
+            return index;
+        }
+
+        /**
+         * Returns whether or not this location represents an insert
+         * location.
+         *
+         * @return whether or not this is an insert location
+         */
+        public boolean isInsert() {
+            return isInsert;
+        }
+
+        /**
+         * Returns a string representation of this drop location.
+         * This method is intended to be used for debugging purposes,
+         * and the content and format of the returned string may vary
+         * between implementations.
+         *
+         * @return a string representation of this drop location
+         */
+        public String toString() {
+            return getClass().getName()
+                   + "[dropPoint=" + getDropPoint() + ","
+                   + "index=" + index + ","
+                   + "insert=" + isInsert + "]";
+        }
+    }
+
+    /**
+     * Returns the location that this component should visually indicate
+     * as the drop location during a DnD operation over the component,
+     * or {@code null} if no location is to currently be shown.
+     * <p>
+     * This method is not meant for querying the drop location
+     * from a {@code TransferHandler}, as the drop location is only
+     * set after the {@code TransferHandler}'s <code>canImport</code>
+     * has returned and has allowed for the location to be shown.
+     * <p>
+     * When this property changes, a property change event with
+     * name "dropLocation" is fired by the component.
+     * <p>
+     * By default, responsibility for listening for changes to this property
+     * and indicating the drop location visually lies with the list's
+     * {@code ListUI}, which may paint it directly and/or install a cell
+     * renderer to do so. Developers wishing to implement custom drop location
+     * painting and/or replace the default cell renderer, may need to honor
+     * this property.
+     *
+     * @return the drop location
+     * @see #setDropMode
+     * @see TransferHandler#canImport(TransferHandler.TransferSupport)
+     * @since 1.6
+     */
+    public final DropLocation getDropLocation() {
+        return dropLocation;
+    }
+    
+    /**
+     * The drop location.
+     */
+    private transient DropLocation dropLocation;
+
 
   /**
    * Provides accessibility support for <code>JList</code>.
