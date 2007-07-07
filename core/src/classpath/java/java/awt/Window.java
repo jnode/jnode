@@ -54,12 +54,16 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Vector;
+import java.util.Arrays;
+import java.util.ArrayList;
 
 import javax.accessibility.Accessible;
 import javax.accessibility.AccessibleContext;
 import javax.accessibility.AccessibleRole;
 import javax.accessibility.AccessibleState;
 import javax.accessibility.AccessibleStateSet;
+import sun.security.util.SecurityConstants;
+import sun.awt.AppContext;
 
 /**
  * This class represents a top-level window with no decorations.
@@ -1343,4 +1347,214 @@ public class Window extends Container implements Accessible
   {
     return next_window_number++;
   }
+
+    //jnode openjdk
+
+    /**
+     * Specifies the modal exclusion type for this window. If a window is modal
+     * excluded, it is not blocked by some modal dialogs. See {@link
+     * java.awt.Dialog.ModalExclusionType Dialog.ModalExclusionType} for
+     * possible modal exclusion types.
+     * <p>
+     * If the given type is not supported, <code>NO_EXCLUDE</code> is used.
+     * <p>
+     * Note: changing the modal exclusion type for a visible window may have no
+     * effect until it is hidden and then shown again.
+     *
+     * @param exclusionType the modal exclusion type for this window; a <code>null</code>
+     *     value is equivivalent to {@link Dialog.ModalExclusionType#NO_EXCLUDE
+     *     NO_EXCLUDE}
+     * @throws SecurityException if the calling thread does not have permission
+     *     to set the modal exclusion property to the window with the given
+     *     <code>exclusionType</code>
+     * @see java.awt.Dialog.ModalExclusionType
+     * @see java.awt.Window#getModalExclusionType
+     * @see java.awt.Toolkit#isModalExclusionTypeSupported
+     *
+     * @since 1.6
+     */
+    public void setModalExclusionType(Dialog.ModalExclusionType exclusionType) {
+        if (exclusionType == null) {
+            exclusionType = Dialog.ModalExclusionType.NO_EXCLUDE;
+        }
+        if (!Toolkit.getDefaultToolkit().isModalExclusionTypeSupported(exclusionType)) {
+            exclusionType = Dialog.ModalExclusionType.NO_EXCLUDE;
+        }
+        if (modalExclusionType == exclusionType) {
+            return;
+        }
+        if (exclusionType == Dialog.ModalExclusionType.TOOLKIT_EXCLUDE) {
+            SecurityManager sm = System.getSecurityManager();
+            if (sm != null) {
+                sm.checkPermission(SecurityConstants.TOOLKIT_MODALITY_PERMISSION);
+            }
+        }
+        modalExclusionType = exclusionType;
+
+        // if we want on-fly changes, we need to uncomment the lines below
+        //   and override the method in Dialog to use modalShow() instead
+        //   of updateChildrenBlocking()
+ /*
+        if (isModalBlocked()) {
+            modalBlocker.unblockWindow(this);
+        }
+        Dialog.checkShouldBeBlocked(this);
+        updateChildrenBlocking();
+ */
+    }
+    /**
+     * @serial
+     *
+     * @see java.awt.Dialog.ModalExclusionType
+     * @see #getModalExclusionType
+     * @see #setModalExclusionType
+     *
+     * @since 1.6
+     */
+    Dialog.ModalExclusionType modalExclusionType;
+
+    /**
+     * Returns the modal exclusion type of this window.
+     *
+     * @return the modal exclusion type of this window
+     *
+     * @see java.awt.Dialog.ModalExclusionType
+     * @see java.awt.Window#setModalExclusionType
+     *
+     * @since 1.6
+     */
+    public Dialog.ModalExclusionType getModalExclusionType() {
+        return modalExclusionType;
+    }
+
+    /**
+     * Determines whether this component will be displayed on the screen.
+     * @return <code>true</code> if the component and all of its ancestors
+     *          until a toplevel window are visible, <code>false</code> otherwise
+     */
+    boolean isRecursivelyVisible() {
+        // 5079694 fix: for a toplevel to be displayed, its parent doesn't have to be visible.
+        // We're overriding isRecursivelyVisible to implement this policy.
+        return visible;
+    }
+
+    /**
+     * Returns an array of all {@code Window}s created by this application
+     * that have no owner. They include {@code Frame}s and ownerless
+     * {@code Dialog}s and {@code Window}s.
+     * If called from an applet, the array includes only the {@code Window}s
+     * accessible by that applet.
+     * <p>
+     * <b>Warning:</b> this method may return system created windows, such
+     * as a print dialog. Applications should not assume the existence of
+     * these dialogs, nor should an application assume anything about these
+     * dialogs such as component positions, <code>LayoutManager</code>s
+     * or serialization.
+     *
+     * @see Frame#getFrames
+     * @see Window#getWindows()
+     *
+     * @since 1.6
+     */
+    public static Window[] getOwnerlessWindows() {
+        Window[] allWindows = Window.getWindows();
+
+        int ownerlessCount = 0;
+        for (Window w : allWindows) {
+            if (w.getOwner() == null) {
+                ownerlessCount++;
+            }
+        }
+
+        Window[] ownerless = new Window[ownerlessCount];
+        int c = 0;
+        for (Window w : allWindows) {
+            if (w.getOwner() == null) {
+                ownerless[c++] = w;
+            }
+        }
+
+        return ownerless;
+    }
+
+    /**
+     * Returns an array of all {@code Window}s, both owned and ownerless,
+     * created by this application.
+     * If called from an applet, the array includes only the {@code Window}s
+     * accessible by that applet.
+     * <p>
+     * <b>Warning:</b> this method may return system created windows, such
+     * as a print dialog. Applications should not assume the existence of
+     * these dialogs, nor should an application assume anything about these
+     * dialogs such as component positions, <code>LayoutManager</code>s
+     * or serialization.
+     *
+     * @see Frame#getFrames
+     * @see Window#getOwnerlessWindows
+     *
+     * @since 1.6
+     */
+    public static Window[] getWindows() {
+        return getWindows(AppContext.getAppContext());
+    }
+
+    private static Window[] getWindows(AppContext appContext) {
+        synchronized (Window.class) {
+            Window realCopy[];
+            Vector<WeakReference<Window>> windowList =
+                (Vector<WeakReference<Window>>)appContext.get(Window.class);
+            if (windowList != null) {
+                int fullSize = windowList.size();
+                int realSize = 0;
+                Window fullCopy[] = new Window[fullSize];
+                for (int i = 0; i < fullSize; i++) {
+                    Window w = windowList.get(i).get();
+                    if (w != null) {
+                        fullCopy[realSize++] = w;
+                    }
+                }
+                if (fullSize != realSize) {
+                    realCopy = Arrays.copyOf(fullCopy, realSize);
+                } else {
+                    realCopy = fullCopy;
+                }
+            } else {
+                realCopy = new Window[0];
+            }
+            return realCopy;
+        }
+    }
+
+    /**
+     * Returns the sequence of images to be displayed as the icon for this window.
+     * <p>
+     * This method returns a copy of the internally stored list, so all operations
+     * on the returned object will not affect the window's behavior.
+     *
+     * @return    the copy of icon images' list for this window, or
+     *            empty list if this window doesn't have icon images.
+     * @see       #setIconImages
+     * @see       #setIconImage(Image)
+     * @since     1.6
+     */
+    public java.util.List<Image> getIconImages() {
+        java.util.List<Image> icons = this.icons;
+        if (icons == null || icons.size() == 0) {
+            return new ArrayList<Image>();
+        }
+        return new ArrayList<Image>(icons);
+    }
+
+    /**
+     * {@code icons} is the graphical way we can
+     * represent the frames and dialogs.
+     * {@code Window} can't display icon but it's
+     * being inherited by owned {@code Dialog}s.
+     *
+     * @serial
+     * @see #getIconImages
+     * @see #setIconImages(List<? extends Image>)
+     */
+    transient java.util.List<Image> icons;
+        
 }

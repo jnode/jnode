@@ -40,6 +40,7 @@ package java.awt.font;
 
 import java.awt.geom.AffineTransform;
 import java.io.Serializable;
+import java.io.ObjectStreamException;
 
 /**
  * This class provides a mechanism for using an {@link AffineTransform} as
@@ -53,9 +54,8 @@ import java.io.Serializable;
  */
 public final class TransformAttribute implements Serializable
 {
-  private static final long serialVersionUID = 3356247357827709530L;
 
-  private AffineTransform affineTransform;
+  private AffineTransform transform;
   
   /**
    * Creates a new attribute that contains a copy of the given transform.
@@ -71,7 +71,7 @@ public final class TransformAttribute implements Serializable
       {
         throw new IllegalArgumentException("Null 'transform' not permitted.");
       }
-    this.affineTransform = new AffineTransform (transform);
+    this.transform = new AffineTransform (transform);
   }
 
   /**
@@ -81,7 +81,7 @@ public final class TransformAttribute implements Serializable
    */
   public AffineTransform getTransform ()
   {
-    return (AffineTransform) affineTransform.clone();
+    return (AffineTransform) transform.clone();
   }
 
   /**
@@ -95,6 +95,68 @@ public final class TransformAttribute implements Serializable
    */
   public boolean isIdentity ()
   {
-    return (affineTransform == null ? false : affineTransform.isIdentity ());
+    return (transform == null ? false : transform.isIdentity ());
   }
+
+    //jnode openjdk
+/**
+     * A <code>TransformAttribute</code> representing the identity transform.
+     * @since 1.6
+     */
+    public static final TransformAttribute IDENTITY = new TransformAttribute(null);
+
+    private void writeObject(java.io.ObjectOutputStream s)
+      throws java.lang.ClassNotFoundException,
+             java.io.IOException
+    {
+        // sigh -- 1.3 expects transform is never null, so we need to always write one out
+        if (this.transform == null) {
+            this.transform = new AffineTransform();
+        }
+        s.defaultWriteObject();
+    }
+
+    /*
+     * @since 1.6
+     */
+    private Object readResolve() throws ObjectStreamException {
+        if (transform == null || transform.isIdentity()) {
+            return IDENTITY;
+        }
+        return this;
+    }
+
+    // Added for serial backwards compatability (4348425)
+    static final long serialVersionUID = 3356247357827709530L;
+
+    /**
+     * @since 1.6
+     */
+    public int hashCode() {
+        return transform == null ? 0 : transform.hashCode();
+    }
+
+    /**
+     * Returns <code>true</code> if rhs is a <code>TransformAttribute</code>
+     * whose transform is equal to this <code>TransformAttribute</code>'s
+     * transform.
+     * @param rhs the object to compare to
+     * @return <code>true</code> if the argument is a <code>TransformAttribute</code>
+     * whose transform is equal to this <code>TransformAttribute</code>'s
+     * transform.
+     * @since 1.6
+     */
+    public boolean equals(Object rhs) {
+        try {
+            TransformAttribute that = (TransformAttribute)rhs;
+            if (transform == null) {
+                return that.transform == null;
+            }
+            return transform.equals(that.transform);
+        }
+        catch (ClassCastException e) {
+        }
+        return false;
+    }
+
 }

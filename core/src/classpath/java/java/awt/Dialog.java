@@ -552,4 +552,113 @@ public class Dialog extends Window
   {
     return next_dialog_number++;
   }
+
+    //jnode openjdk
+/**
+     * Modal dialogs block all input to some top-level windows.
+     * Whether a particular window is blocked depends on dialog's type
+     * of modality; this is called the "scope of blocking". The
+     * <code>ModalityType</code> enum specifies modal types and their
+     * associated scopes.
+     *
+     * @see Dialog#getModalityType
+     * @see Dialog#setModalityType
+     * @see Toolkit#isModalityTypeSupported
+     *
+     * @since 1.6
+     */
+    public static enum ModalityType {
+        /**
+         * <code>MODELESS</code> dialog doesn't block any top-level windows.
+         */
+        MODELESS,
+        /**
+         * A <code>DOCUMENT_MODAL</code> dialog blocks input to all top-level windows
+         * from the same document except those from its own child hierarchy.
+         * A document is a top-level window without an owner. It may contain child
+         * windows that, together with the top-level window are treated as a single
+         * solid document. Since every top-level window must belong to some
+         * document, its root can be found as the top-nearest window without an owner.
+         */
+        DOCUMENT_MODAL,
+        /**
+         * An <code>APPLICATION_MODAL</code> dialog blocks all top-level windows
+         * from the same Java application except those from its own child hierarchy.
+         * If there are several applets launched in a browser, they can be
+         * treated either as separate applications or a single one. This behavior
+         * is implementation-dependent.
+         */
+        APPLICATION_MODAL,
+        /**
+         * A <code>TOOLKIT_MODAL</code> dialog blocks all top-level windows run
+         * from the same toolkit except those from its own child hierarchy. If there
+         * are several applets launched in a browser, all of them run with the same
+         * toolkit; thus, a toolkit-modal dialog displayed by an applet may affect
+         * other applets and all windows of the browser instance which embeds the
+         * Java runtime environment for this toolkit.
+         * Special <code>AWTPermission</code> "toolkitModality" must be granted to use
+         * toolkit-modal dialogs. If a <code>TOOLKIT_MODAL</code> dialog is being created
+         * and this permission is not granted, a <code>SecurityException</code> will be
+         * thrown, and no dialog will be created. If a modality type is being changed
+         * to <code>TOOLKIT_MODAL</code> and this permission is not granted, a
+         * <code>SecurityException</code> will be thrown, and the modality type will
+         * be left unchanged.
+         */
+        TOOLKIT_MODAL
+    };
+
+    /**
+     * Default modality type for modal dialogs. The default modality type is
+     * <code>APPLICATION_MODAL</code>. Calling the oldstyle <code>setModal(true)</code>
+     * is equal to <code>setModalityType(DEFAULT_MODALITY_TYPE)</code>.
+     *
+     * @see java.awt.Dialog.ModalityType
+     * @see java.awt.Dialog#setModal
+     *
+     * @since 1.6
+     */
+    public final static ModalityType DEFAULT_MODALITY_TYPE = ModalityType.APPLICATION_MODAL;
+
+    /**
+         * Any top-level window can be marked not to be blocked by modal
+         * dialogs. This is called "modal exclusion". This enum specifies
+         * the possible modal exclusion types.
+         *
+         * @see Window#getModalExclusionType
+         * @see Window#setModalExclusionType
+         * @see Toolkit#isModalExclusionTypeSupported
+         *
+         * @since 1.6
+         */
+        public static enum ModalExclusionType {
+            /**
+             * No modal exclusion.
+             */
+            NO_EXCLUDE,
+            /**
+             * <code>APPLICATION_EXCLUDE</code> indicates that a top-level window
+             * won't be blocked by any application-modal dialogs. Also, it isn't
+             * blocked by document-modal dialogs from outside of its child hierarchy.
+             */
+            APPLICATION_EXCLUDE,
+            /**
+             * <code>TOOLKIT_EXCLUDE</code> indicates that a top-level window
+             * won't be blocked by  application-modal or toolkit-modal dialogs. Also,
+             * it isn't blocked by document-modal dialogs from outside of its
+             * child hierarchy.
+             * The "toolkitModality" <code>AWTPermission</code> must be granted
+             * for this exclusion. If an exclusion property is being changed to
+             * <code>TOOLKIT_EXCLUDE</code> and this permission is not granted, a
+             * <code>SecurityEcxeption</code> will be thrown, and the exclusion
+             * property will be left unchanged.
+             */
+            TOOLKIT_EXCLUDE
+        };
+
+        /**
+         * @since 1.6
+         */
+        private final static ModalExclusionType DEFAULT_MODAL_EXCLUSION_TYPE =
+            ModalExclusionType.APPLICATION_EXCLUDE;
+    
 }

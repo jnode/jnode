@@ -1486,4 +1486,287 @@ public class AffineTransform implements Cloneable, Serializable
 		s.defaultReadObject();
 		updateType();
 	}
+
+    //jnode openjdk
+    /**
+     * Sets this transform to the inverse of itself.
+     * The inverse transform Tx' of this transform Tx
+     * maps coordinates transformed by Tx back
+     * to their original coordinates.
+     * In other words, Tx'(Tx(p)) = p = Tx(Tx'(p)).
+     * <p>
+     * If this transform maps all coordinates onto a point or a line
+     * then it will not have an inverse, since coordinates that do
+     * not lie on the destination point or line will not have an inverse
+     * mapping.
+     * The <code>getDeterminant</code> method can be used to determine if this
+     * transform has no inverse, in which case an exception will be
+     * thrown if the <code>invert</code> method is called.
+     * @see #getDeterminant
+     * @exception NoninvertibleTransformException
+     * if the matrix cannot be inverted.
+     * @since 1.6
+     */
+    public void invert()
+	throws NoninvertibleTransformException
+    {
+	double M00, M01, M02;
+	double M10, M11, M12;
+	double det;
+	switch (state) {
+	default:
+	    stateError();
+	    /* NOTREACHED */
+	case (APPLY_SHEAR | APPLY_SCALE | APPLY_TRANSLATE):
+	    M00 = m00; M01 = m01; M02 = m02;
+	    M10 = m10; M11 = m11; M12 = m12;
+	    det = M00 * M11 - M01 * M10;
+	    if (Math.abs(det) <= Double.MIN_VALUE) {
+		throw new NoninvertibleTransformException("Determinant is "+
+							  det);
+	    }
+	    m00 =  M11 / det;
+	    m10 = -M10 / det;
+	    m01 = -M01 / det;
+	    m11 =  M00 / det;
+	    m02 = (M01 * M12 - M11 * M02) / det;
+	    m12 = (M10 * M02 - M00 * M12) / det;
+	    break;
+	case (APPLY_SHEAR | APPLY_SCALE):
+	    M00 = m00; M01 = m01;
+	    M10 = m10; M11 = m11;
+	    det = M00 * M11 - M01 * M10;
+	    if (Math.abs(det) <= Double.MIN_VALUE) {
+		throw new NoninvertibleTransformException("Determinant is "+
+							  det);
+	    }
+	    m00 =  M11 / det;
+	    m10 = -M10 / det;
+	    m01 = -M01 / det;
+	    m11 =  M00 / det;
+	    // m02 = 0.0;
+	    // m12 = 0.0;
+	    break;
+	case (APPLY_SHEAR | APPLY_TRANSLATE):
+	    M01 = m01; M02 = m02;
+	    M10 = m10; M12 = m12;
+	    if (M01 == 0.0 || M10 == 0.0) {
+		throw new NoninvertibleTransformException("Determinant is 0");
+	    }
+	    // m00 = 0.0;
+	    m10 = 1.0 / M01;
+	    m01 = 1.0 / M10;
+	    // m11 = 0.0;
+	    m02 = -M12 / M10;
+	    m12 = -M02 / M01;
+	    break;
+	case (APPLY_SHEAR):
+	    M01 = m01;
+	    M10 = m10;
+	    if (M01 == 0.0 || M10 == 0.0) {
+		throw new NoninvertibleTransformException("Determinant is 0");
+	    }
+	    // m00 = 0.0;
+	    m10 = 1.0 / M01;
+	    m01 = 1.0 / M10;
+	    // m11 = 0.0;
+	    // m02 = 0.0;
+	    // m12 = 0.0;
+	    break;
+	case (APPLY_SCALE | APPLY_TRANSLATE):
+	    M00 = m00; M02 = m02;
+	    M11 = m11; M12 = m12;
+	    if (M00 == 0.0 || M11 == 0.0) {
+		throw new NoninvertibleTransformException("Determinant is 0");
+	    }
+	    m00 = 1.0 / M00;
+	    // m10 = 0.0;
+	    // m01 = 0.0;
+	    m11 = 1.0 / M11;
+	    m02 = -M02 / M00;
+	    m12 = -M12 / M11;
+	    break;
+	case (APPLY_SCALE):
+	    M00 = m00;
+	    M11 = m11;
+	    if (M00 == 0.0 || M11 == 0.0) {
+		throw new NoninvertibleTransformException("Determinant is 0");
+	    }
+	    m00 = 1.0 / M00;
+	    // m10 = 0.0;
+	    // m01 = 0.0;
+	    m11 = 1.0 / M11;
+	    // m02 = 0.0;
+	    // m12 = 0.0;
+	    break;
+	case (APPLY_TRANSLATE):
+	    // m00 = 1.0;
+	    // m10 = 0.0;
+	    // m01 = 0.0;
+	    // m11 = 1.0;
+	    m02 = -m02;
+	    m12 = -m12;
+	    break;
+	case (APPLY_IDENTITY):
+	    // m00 = 1.0;
+	    // m10 = 0.0;
+	    // m01 = 0.0;
+	    // m11 = 1.0;
+	    // m02 = 0.0;
+	    // m12 = 0.0;
+	    break;
+	}
+    }
+
+    /**
+     * This field keeps track of which components of the matrix need to
+     * be applied when performing a transformation.
+     * @see #APPLY_IDENTITY
+     * @see #APPLY_TRANSLATE
+     * @see #APPLY_SCALE
+     * @see #APPLY_SHEAR
+     */
+    transient int state;
+
+    /**
+     * This constant is used for the internal state variable to indicate
+     * that no calculations need to be performed and that the source
+     * coordinates only need to be copied to their destinations to
+     * complete the transformation equation of this transform.
+     * @see #APPLY_TRANSLATE
+     * @see #APPLY_SCALE
+     * @see #APPLY_SHEAR
+     * @see #state
+     */
+    static final int APPLY_IDENTITY = 0;
+
+    /**
+     * This constant is used for the internal state variable to indicate
+     * that the translation components of the matrix (m02 and m12) need
+     * to be added to complete the transformation equation of this transform.
+     * @see #APPLY_IDENTITY
+     * @see #APPLY_SCALE
+     * @see #APPLY_SHEAR
+     * @see #state
+     */
+    static final int APPLY_TRANSLATE = 1;
+
+    /**
+     * This constant is used for the internal state variable to indicate
+     * that the scaling components of the matrix (m00 and m11) need
+     * to be factored in to complete the transformation equation of
+     * this transform.  If the APPLY_SHEAR bit is also set then it
+     * indicates that the scaling components are not both 0.0.  If the
+     * APPLY_SHEAR bit is not also set then it indicates that the
+     * scaling components are not both 1.0.  If neither the APPLY_SHEAR
+     * nor the APPLY_SCALE bits are set then the scaling components
+     * are both 1.0, which means that the x and y components contribute
+     * to the transformed coordinate, but they are not multiplied by
+     * any scaling factor.
+     * @see #APPLY_IDENTITY
+     * @see #APPLY_TRANSLATE
+     * @see #APPLY_SHEAR
+     * @see #state
+     */
+    static final int APPLY_SCALE = 2;
+
+    /**
+     * This constant is used for the internal state variable to indicate
+     * that the shearing components of the matrix (m01 and m10) need
+     * to be factored in to complete the transformation equation of this
+     * transform.  The presence of this bit in the state variable changes
+     * the interpretation of the APPLY_SCALE bit as indicated in its
+     * documentation.
+     * @see #APPLY_IDENTITY
+     * @see #APPLY_TRANSLATE
+     * @see #APPLY_SCALE
+     * @see #state
+     */
+    static final int APPLY_SHEAR = 4;
+
+    /*
+     * Convenience method used internally to throw exceptions when
+     * a case was forgotten in a switch statement.
+     */
+    private void stateError() {
+	throw new InternalError("missing case in transform state switch");
+    }
+
+    /**
+     * Returns a transform that rotates coordinates according to
+     * a rotation vector.
+     * All coordinates rotate about the origin by the same amount.
+     * The amount of rotation is such that coordinates along the former
+     * positive X axis will subsequently align with the vector pointing
+     * from the origin to the specified vector coordinates.
+     * If both <code>vecx</code> and <code>vecy</code> are 0.0,
+     * an identity transform is returned.
+     * This operation is equivalent to calling:
+     * <pre>
+     *     AffineTransform.getRotateInstance(Math.atan2(vecy, vecx));
+     * </pre>
+     *
+     * @param vecx the X coordinate of the rotation vector
+     * @param vecy the Y coordinate of the rotation vector
+     * @return an <code>AffineTransform</code> object that rotates
+     *  coordinates according to the specified rotation vector.
+     * @since 1.6
+     */
+    public static AffineTransform getRotateInstance(double vecx, double vecy) {
+	AffineTransform Tx = new AffineTransform();
+	Tx.setToRotation(vecx, vecy);
+	return Tx;
+    }
+
+    /**
+     * Sets this transform to a rotation transformation that rotates
+     * coordinates according to a rotation vector.
+     * All coordinates rotate about the origin by the same amount.
+     * The amount of rotation is such that coordinates along the former
+     * positive X axis will subsequently align with the vector pointing
+     * from the origin to the specified vector coordinates.
+     * If both <code>vecx</code> and <code>vecy</code> are 0.0,
+     * the transform is set to an identity transform.
+     * This operation is equivalent to calling:
+     * <pre>
+     *     setToRotation(Math.atan2(vecy, vecx));
+     * </pre>
+     *
+     * @param vecx the X coordinate of the rotation vector
+     * @param vecy the Y coordinate of the rotation vector
+     * @since 1.6
+     */
+    public void setToRotation(double vecx, double vecy) {
+	double sin, cos;
+	if (vecy == 0) {
+	    sin = 0.0;
+	    if (vecx < 0.0) {
+		cos = -1.0;
+		state = APPLY_SCALE;
+		type = TYPE_QUADRANT_ROTATION;
+	    } else {
+		cos = 1.0;
+		state = APPLY_IDENTITY;
+		type = TYPE_IDENTITY;
+	    }
+	} else if (vecx == 0) {
+	    cos = 0.0;
+	    sin = (vecy > 0.0) ? 1.0 : -1.0;
+	    state = APPLY_SHEAR;
+	    type = TYPE_QUADRANT_ROTATION;
+	} else {
+	    double len = Math.sqrt(vecx * vecx + vecy * vecy);
+	    cos = vecx / len;
+	    sin = vecy / len;
+	    state = APPLY_SHEAR | APPLY_SCALE;
+	    type = TYPE_GENERAL_ROTATION;
+	}
+	m00 =  cos;
+	m10 =  sin;
+	m01 = -sin;
+	m11 =  cos;
+	m02 =  0.0;
+	m12 =  0.0;
+    }
+    
 } // class AffineTransform

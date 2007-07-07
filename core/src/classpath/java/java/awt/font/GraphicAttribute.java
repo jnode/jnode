@@ -38,8 +38,9 @@ exception statement from your version. */
 
 package java.awt.font;
 
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.AffineTransform;
 
 /**
  * This class represents a graphic embedded in text.
@@ -134,4 +135,29 @@ public abstract class GraphicAttribute
     return new GlyphJustificationInfo(adv, false, 2, adv / 3, adv / 3, false,
                                       1, 0, 0);
   }
+
+    //jnode openjdk
+    /**
+     * Return a {@link java.awt.Shape} that represents the region that
+     * this <code>GraphicAttribute</code> renders.  This is used when a
+     * {@link TextLayout} is requested to return the outline of the text.
+     * The (untransformed) shape must not extend outside the rectangular
+     * bounds returned by <code>getBounds</code>.
+     * The default implementation returns the rectangle returned by
+     * {@link #getBounds}, transformed by the provided {@link java.awt.geom.AffineTransform}
+     * if present.
+     * @param tx an optional {@link java.awt.geom.AffineTransform} to apply to the
+     *   outline of this <code>GraphicAttribute</code>. This can be null.
+     * @return a <code>Shape</code> representing this graphic attribute,
+     *   suitable for stroking or filling.
+     * @since 1.6
+     */
+    public Shape getOutline(AffineTransform tx) {
+        Shape b = getBounds();
+        if (tx != null) {
+            b = tx.createTransformedShape(b);
+        }
+        return b;
+    }
+    
 }

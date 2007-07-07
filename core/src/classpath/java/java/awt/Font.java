@@ -61,6 +61,31 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
+import sun.font.Font2DHandle;
+import sun.font.AttributeValues;
+import static sun.font.EAttribute.EFONT;
+import static sun.font.EAttribute.EFAMILY;
+import static sun.font.EAttribute.EWEIGHT;
+import static sun.font.EAttribute.EWIDTH;
+import static sun.font.EAttribute.EPOSTURE;
+import static sun.font.EAttribute.ESIZE;
+import static sun.font.EAttribute.ETRANSFORM;
+import static sun.font.EAttribute.ESUPERSCRIPT;
+import static sun.font.EAttribute.ETRACKING;
+import static sun.font.EAttribute.ECHAR_REPLACEMENT;
+import static sun.font.EAttribute.EFOREGROUND;
+import static sun.font.EAttribute.EBACKGROUND;
+import static sun.font.EAttribute.EUNDERLINE;
+import static sun.font.EAttribute.ESTRIKETHROUGH;
+import static sun.font.EAttribute.ERUN_DIRECTION;
+import static sun.font.EAttribute.EBIDI_EMBEDDING;
+import static sun.font.EAttribute.EJUSTIFICATION;
+import static sun.font.EAttribute.EINPUT_METHOD_HIGHLIGHT;
+import static sun.font.EAttribute.EINPUT_METHOD_UNDERLINE;
+import static sun.font.EAttribute.ESWAP_COLORS;
+import static sun.font.EAttribute.ENUMERIC_SHAPING;
+import static sun.font.EAttribute.EKERNING;
+import static sun.font.EAttribute.ELIGATURES;
 
 /**
   * This class represents a windowing system font.
@@ -103,7 +128,49 @@ public class Font implements Serializable
   public static final int HANGING_BASELINE = 2;  
 
 
-	/**
+    //jnode openjdk
+    /**
+     * A String constant for the canonical family name of the
+     * logical font "Dialog". It is useful in Font construction
+     * to provide compile-time verification of the name.
+     * @since 1.6
+     */
+    public static final String DIALOG = "Dialog";
+
+    /**
+     * A String constant for the canonical family name of the
+     * logical font "DialogInput". It is useful in Font construction
+     * to provide compile-time verification of the name.
+     * @since 1.6
+     */
+    public static final String DIALOG_INPUT = "DialogInput";
+
+    /**
+     * A String constant for the canonical family name of the
+     * logical font "SansSerif". It is useful in Font construction
+     * to provide compile-time verification of the name.
+     * @since 1.6
+     */
+    public static final String SANS_SERIF = "SansSerif";
+
+    /**
+     * A String constant for the canonical family name of the
+     * logical font "Serif". It is useful in Font construction
+     * to provide compile-time verification of the name.
+     * @since 1.6
+     */
+    public static final String SERIF = "Serif";
+
+    /**
+     * A String constant for the canonical family name of the
+     * logical font "Monospaced". It is useful in Font construction
+     * to provide compile-time verification of the name.
+     * @since 1.6
+     */
+    public static final String MONOSPACED = "Monospaced";
+    
+
+    /**
 	 * Indicates to <code>createFont</code> that the supplied font data
 	 * is in TrueType format.
 	 *
@@ -1376,4 +1443,161 @@ public class Font implements Serializable
     peer = getPeerFromToolkit(name, attrs);
 
   }
+
+    //jnode openjdk
+    /**
+     * Return true if this Font contains attributes that require extra
+     * layout processing.
+     * @return true if the font has layout attributes
+     * @since 1.6
+     */
+    public boolean hasLayoutAttributes() {
+        return hasLayoutAttributes;
+    }
+    private transient boolean hasLayoutAttributes;
+    private transient long pData;       // native JDK1.1 font pointer
+    private transient Font2DHandle font2DHandle;
+
+    private transient AttributeValues values;
+
+    /*
+     * This is true if the font transform is not identity.  It
+     * is used to avoid unnecessary instantiation of an AffineTransform.
+     */
+    private transient boolean nonIdentityTx;
+    
+    /*
+     * If the origin of a Font is a created font then this attribute
+     * must be set on all derived fonts too.
+     */
+    private transient boolean createdFont = false;
+    /**
+     * Creates a new <code>Font</code> from the specified <code>font</code>.
+     * This constructor is intended for use by subclasses.
+     * @param font from which to create this <code>Font</code>.
+     * @throws NullPointerException if <code>font</code> is null
+     * @since 1.6
+     */
+    protected Font(Font font) {
+        if (font.values != null) {
+            initFromValues(font.getAttributeValues().clone());
+        } else {
+            this.name = font.name;
+            this.style = font.style;
+            this.size = font.size;
+            this.pointSize = font.pointSize;
+        }
+        this.font2DHandle = font.font2DHandle;
+        this.createdFont = font.createdFont;
+    }
+
+    /**
+     * Initialize the standard Font fields from the values object.
+     */
+    private void initFromValues(AttributeValues values) {
+        this.values = values;
+        values.defineAll(PRIMARY_MASK); // for 1.5 streaming compatibility
+
+        this.name = values.getFamily();
+        this.pointSize = values.getSize();
+        this.size = (int)(values.getSize() + 0.5);
+        if (values.getWeight() >= 2f) this.style |= BOLD; // not == 2f
+        if (values.getPosture() >= .2f) this.style |= ITALIC; // not  == .2f
+
+        this.nonIdentityTx = values.anyNonDefault(EXTRA_MASK);
+        this.hasLayoutAttributes =  values.anyNonDefault(LAYOUT_MASK);
+    }
+
+    /**
+     * Return the AttributeValues object associated with this
+     * font.  Most of the time, the internal object is null.
+     * If required, it will be created from the 'standard'
+     * state on the font.  Only non-default values will be
+     * set in the AttributeValues object.
+     *
+     * <p>Since the AttributeValues object is mutable, and it
+     * is cached in the font, care must be taken to ensure that
+     * it is not mutated.
+     */
+    private AttributeValues getAttributeValues() {
+        if (values == null) {
+            values = new AttributeValues();
+            values.setFamily(name);
+            values.setSize(pointSize); // expects the float value.
+
+            if ((style & BOLD) != 0) {
+                values.setWeight(2); // WEIGHT_BOLD
+            }
+
+            if ((style & ITALIC) != 0) {
+                values.setPosture(.2f); // POSTURE_OBLIQUE
+            }
+            values.defineAll(PRIMARY_MASK); // for streaming compatibility
+        }
+
+        return values;
+    }
+
+    /**
+     * Font recognizes all attributes except FONT.
+     */
+    private static final int RECOGNIZED_MASK = AttributeValues.MASK_ALL
+        & ~AttributeValues.getMask(EFONT);
+
+    /**
+     * These attributes are considered primary by the FONT attribute.
+     */
+    private static final int PRIMARY_MASK =
+        AttributeValues.getMask(EFAMILY, EWEIGHT, EWIDTH, EPOSTURE, ESIZE,
+                                ETRANSFORM, ESUPERSCRIPT, ETRACKING);
+
+    /**
+     * These attributes are considered secondary by the FONT attribute.
+     */
+    private static final int SECONDARY_MASK =
+        RECOGNIZED_MASK & ~PRIMARY_MASK;
+
+    /**
+     * These attributes are handled by layout.
+     */
+    private static final int LAYOUT_MASK =
+        AttributeValues.getMask(ECHAR_REPLACEMENT, EFOREGROUND, EBACKGROUND,
+                                EUNDERLINE, ESTRIKETHROUGH, ERUN_DIRECTION,
+                                EBIDI_EMBEDDING, EJUSTIFICATION,
+                                EINPUT_METHOD_HIGHLIGHT, EINPUT_METHOD_UNDERLINE,
+                                ESWAP_COLORS, ENUMERIC_SHAPING, EKERNING,
+                                ELIGATURES, ETRACKING);
+
+    private static final int EXTRA_MASK =
+            AttributeValues.getMask(ETRANSFORM, ESUPERSCRIPT, EWIDTH);
+
+
+    /**
+     * Checks if this <code>Font</code> has a glyph for the specified
+     * character.
+     *
+     * @param codePoint the character (Unicode code point) for which a glyph
+     *        is needed.
+     * @return <code>true</code> if this <code>Font</code> has a glyph for the
+     *          character; <code>false</code> otherwise.
+     * @throws IllegalArgumentException if the code point is not a valid Unicode
+     *          code point.
+     * @see Character#isValidCodePoint(int)
+     * @since 1.5
+     */
+    public boolean canDisplay(int codePoint) {
+        /*
+        if (!Character.isValidCodePoint(codePoint)) {
+            throw new IllegalArgumentException("invalid code point: " +
+                                               Integer.toHexString(codePoint));
+        }
+        return getFont2D().canDisplay(codePoint);
+        */
+        if (!Character.isValidCodePoint(codePoint)) {
+            throw new IllegalArgumentException("invalid code point: " +
+                                               Integer.toHexString(codePoint));
+        }
+        return canDisplay((char) codePoint);
+    }
+
 }

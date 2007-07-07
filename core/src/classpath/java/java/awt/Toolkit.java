@@ -81,6 +81,7 @@ import java.awt.peer.ScrollbarPeer;
 import java.awt.peer.TextAreaPeer;
 import java.awt.peer.TextFieldPeer;
 import java.awt.peer.WindowPeer;
+import java.awt.peer.DesktopPeer;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
@@ -1413,5 +1414,79 @@ public abstract class Toolkit
      });
 
   }
+
+    //jnode openjdk
+    private static boolean loaded = false;
+    static void loadLibraries() {
+        /*
+    if (!loaded) {
+	    java.security.AccessController.doPrivileged(
+			  new sun.security.action.LoadLibraryAction("awt"));
+	    loaded = true;
+        }
+        */
+    }
+
+    /* Accessor method for use by AWT package routines. */
+    static EventQueue getEventQueue() {
+        return getDefaultToolkit().getSystemEventQueueImpl();
+    }
+
+    /*
+     * This method notifies any AWTEventListeners that an event
+     * is about to be dispatched.
+     *
+     * @param theEvent the event which will be dispatched.
+     */
+    void notifyAWTEventListeners(AWTEvent theEvent) {
+        // This is a workaround for headless toolkits.  It would be
+        // better to override this method but it is declared package private.
+        // "this instanceof" syntax defeats polymorphism.
+        // --mm, 03/03/00
+        if (this instanceof sun.awt.HeadlessToolkit) {
+            ((sun.awt.HeadlessToolkit)this).getUnderlyingToolkit()
+                .notifyAWTEventListeners(theEvent);
+            return;
+        }
+
+	AWTEventListener eventListener = this.eventListener;
+        if (eventListener != null) {
+	    eventListener.eventDispatched(theEvent);
+        }
+    }
+    private AWTEventListener eventListener = null;
+
+    /**
+     * Returns whether the given modal exclusion type is supported by this
+     * toolkit. If an unsupported modal exclusion type property is set on a window,
+     * then <code>Dialog.ModalExclusionType.NO_EXCLUDE</code> is used instead.
+     *
+     * @param modalExclusionType modal exclusion type to be checked for support by this toolkit
+     *
+     * @return <code>true</code>, if current toolkit supports given modal exclusion
+     *     type, <code>false</code> otherwise
+     *
+     * @see java.awt.Dialog.ModalExclusionType
+     * @see java.awt.Window#getModalExclusionType
+     * @see java.awt.Window#setModalExclusionType
+     *
+     * @since 1.6
+     */
+    public abstract boolean isModalExclusionTypeSupported(Dialog.ModalExclusionType modalExclusionType);
+
+    /**
+     * Creates this toolkit's implementation of the <code>Desktop</code>
+     * using the specified peer interface.
+     * @param     target the desktop to be implemented
+     * @return    this toolkit's implementation of the <code>Desktop</code>
+     * @exception HeadlessException if GraphicsEnvironment.isHeadless()
+     * returns true
+     * @see       java.awt.GraphicsEnvironment#isHeadless
+     * @see       java.awt.Desktop
+     * @see       java.awt.peer.DesktopPeer
+     * @since 1.6
+     */
+    protected abstract DesktopPeer createDesktopPeer(Desktop target)
+      throws HeadlessException;
 
 } // class Toolkit

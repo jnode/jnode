@@ -6095,7 +6095,274 @@ p   * <li>the set of backward traversal keys
         peer.hide();
     }
   }
-  
+
+    //jnode openjdk
+    /**
+     * Enumeration of the common ways the baseline of a component can
+     * change as the size changes.  The baseline resize behavior is
+     * primarily for layout managers that need to know how the
+     * position of the baseline changes as the component size changes.
+     * In general the baseline resize behavior will be valid for sizes
+     * greater than or equal to the minimum size (the actual minimum
+     * size; not a developer specified minimum size).  For sizes
+     * smaller than the minimum size the baseline may change in a way
+     * other than the baseline resize behavior indicates.  Similarly,
+     * as the size approaches <code>Integer.MAX_VALUE</code> and/or
+     * <code>Short.MAX_VALUE</code> the baseline may change in a way
+     * other than the baseline resize behavior indicates.
+     *
+     * @see #getBaselineResizeBehavior
+     * @see #getBaseline(int,int)
+     * @since 1.6
+     */
+    public enum BaselineResizeBehavior {
+        /**
+         * Indicates the baseline remains fixed relative to the
+         * y-origin.  That is, <code>getBaseline</code> returns
+         * the same value regardless of the height or width.  For example, a
+         * <code>JLabel</code> containing non-empty text with a
+         * vertical alignment of <code>TOP</code> should have a
+         * baseline type of <code>CONSTANT_ASCENT</code>.
+         */
+        CONSTANT_ASCENT,
+
+        /**
+         * Indicates the baseline remains fixed relative to the height
+         * and does not change as the width is varied.  That is, for
+         * any height H the difference between H and
+         * <code>getBaseline(w, H)</code> is the same.  For example, a
+         * <code>JLabel</code> containing non-empty text with a
+         * vertical alignment of <code>BOTTOM</code> should have a
+         * baseline type of <code>CONSTANT_DESCENT</code>.
+         */
+        CONSTANT_DESCENT,
+
+        /**
+         * Indicates the baseline remains a fixed distance from
+         * the center of the component.  That is, for any height H the
+         * difference between <code>getBaseline(w, H)</code> and
+         * <code>H / 2</code> is the same (plus or minus one depending upon
+         * rounding error).
+         * <p>
+         * Because of possible rounding errors it is recommended
+         * you ask for the baseline with two consecutive heights and use
+         * the return value to determine if you need to pad calculations
+         * by 1.  The following shows how to calculate the baseline for
+         * any height:
+         * <pre>
+         *   Dimension preferredSize = component.getPreferredSize();
+         *   int baseline = getBaseline(preferredSize.width,
+         *                              preferredSize.height);
+         *   int nextBaseline = getBaseline(preferredSize.width,
+         *                                  preferredSize.height + 1);
+         *   // Amount to add to height when calculating where baseline
+         *   // lands for a particular height:
+         *   int padding = 0;
+         *   // Where the baseline is relative to the mid point
+         *   int baselineOffset = baseline - height / 2;
+         *   if (preferredSize.height % 2 == 0 &amp;&amp;
+         *       baseline != nextBaseline) {
+         *       padding = 1;
+         *   }
+         *   else if (preferredSize.height % 2 == 1 &amp;&amp;
+         *            baseline == nextBaseline) {
+         *       baselineOffset--;
+         *       padding = 1;
+         *   }
+         *   // The following calculates where the baseline lands for
+         *   // the height z:
+         *   int calculatedBaseline = (z + padding) / 2 + baselineOffset;
+         * </pre>
+         */
+        CENTER_OFFSET,
+
+        /**
+         * Indicates the baseline resize behavior can not be expressed using
+         * any of the other constants.  This may also indicate the baseline
+         * varies with the width of the component.  This is also returned
+         * by components that do not have a baseline.
+         */
+        OTHER
+    }
+
+    /**
+     * Returns the baseline.  The baseline is measured from the top of
+     * the component.  This method is primarily meant for
+     * <code>LayoutManager</code>s to align components along their
+     * baseline.  A return value less than 0 indicates this component
+     * does not have a reasonable baseline and that
+     * <code>LayoutManager</code>s should not align this component on
+     * its baseline.
+     * <p>
+     * The default implementation returns -1.  Subclasses that support
+     * baseline should override appropriately.  If a value &gt;= 0 is
+     * returned, then the component has a valid baseline for any
+     * size &gt;= the minimum size and <code>getBaselineResizeBehavior</code>
+     * can be used to determine how the baseline changes with size.
+     *
+     * @param width the width to get the baseline for
+     * @param height the height to get the baseline for
+     * @return the baseline or &lt; 0 indicating there is no reasonable
+     *         baseline
+     * @throws IllegalArgumentException if width or height is &lt; 0
+     * @see #getBaselineResizeBehavior
+     * @see java.awt.FontMetrics
+     * @since 1.6
+     */
+    public int getBaseline(int width, int height) {
+        if (width < 0 || height < 0) {
+            throw new IllegalArgumentException(
+                    "Width and height must be >= 0");
+        }
+        return -1;
+    }
+
+    /**
+     * Returns the <code>Window</code> ancestor of the component.
+     * @return Window ancestor of the component or component by itself if it is Window;
+     *         null, if component is not a part of window hierarchy
+     */
+    Window getContainingWindow() {
+        return getContainingWindow(this);
+    }
+    /**
+     * Returns the <code>Window</code> ancestor of the component <code>comp</code>.
+     * @return Window ancestor of the component or component by itself if it is Window;
+     *         null, if component is not a part of window hierarchy
+     */
+    static Window getContainingWindow(Component comp) {
+        while (comp != null && !(comp instanceof Window)) {
+            comp = comp.getParent();
+        }
+
+        return (Window)comp;
+    }
+
+    /**
+     * Translates absolute coordinates into coordinates in the coordinate
+     * space of this component.
+     */
+    Point pointRelativeToComponent(Point absolute) {
+        Point compCoords = getLocationOnScreen();
+        return new Point(absolute.x - compCoords.x,
+                         absolute.y - compCoords.y);
+    }
+
+    /**
+     * Returns an enum indicating how the baseline of the component
+     * changes as the size changes.  This method is primarily meant for
+     * layout managers and GUI builders.
+     * <p>
+     * The default implementation returns
+     * <code>BaselineResizeBehavior.OTHER</code>.  Subclasses that have a
+     * baseline should override appropriately.  Subclasses should
+     * never return <code>null</code>; if the baseline can not be
+     * calculated return <code>BaselineResizeBehavior.OTHER</code>.  Callers
+     * should first ask for the baseline using
+     * <code>getBaseline</code> and if a value &gt;= 0 is returned use
+     * this method.  It is acceptable for this method to return a
+     * value other than <code>BaselineResizeBehavior.OTHER</code> even if
+     * <code>getBaseline</code> returns a value less than 0.
+     *
+     * @return an enum indicating how the baseline changes as the component
+     *         size changes
+     * @see #getBaseline(int, int)
+     * @since 1.6
+     */
+    public BaselineResizeBehavior getBaselineResizeBehavior() {
+        return BaselineResizeBehavior.OTHER;
+    }
+
+    /**
+         * Returns the position of the mouse pointer in this <code>Component</code>'s
+         * coordinate space if the <code>Component</code> is directly under the mouse
+         * pointer, otherwise returns <code>null</code>.
+         * If the <code>Component</code> is not showing on the screen, this method
+         * returns <code>null</code> even if the mouse pointer is above the area
+         * where the <code>Component</code> would be displayed.
+         * If the <code>Component</code> is partially or fully obscured by other
+         * <code>Component</code>s or native windows, this method returns a non-null
+         * value only if the mouse pointer is located above the unobscured part of the
+         * <code>Component</code>.
+         * <p>
+         * For <code>Container</code>s it returns a non-null value if the mouse is
+         * above the <code>Container</code> itself or above any of its descendants.
+         * Use {@link Container#getMousePosition(boolean)} if you need to exclude children.
+         * <p>
+         * Sometimes the exact mouse coordinates are not important, and the only thing
+         * that matters is whether a specific <code>Component</code> is under the mouse
+         * pointer. If the return value of this method is <code>null</code>, mouse
+         * pointer is not directly above the <code>Component</code>.
+         *
+         * @exception HeadlessException if GraphicsEnvironment.isHeadless() returns true
+         * @see       #isShowing
+         * @see       Container#getMousePosition
+         * @return    mouse coordinates relative to this <code>Component</code>, or null
+         * @since     1.5
+         */
+        public Point getMousePosition() throws HeadlessException {
+            if (GraphicsEnvironment.isHeadless()) {
+                throw new HeadlessException();
+            }
+
+            PointerInfo pi = (PointerInfo)java.security.AccessController.doPrivileged(
+                                                                                      new java.security.PrivilegedAction() {
+                                                                                          public Object run() {
+                                                                                              return MouseInfo.getPointerInfo();
+                                                                                          }
+                                                                                      }
+                                                                                      );
+
+            synchronized (getTreeLock()) {
+                Component inTheSameWindow = findUnderMouseInWindow(pi);
+                if (!isSameOrAncestorOf(inTheSameWindow, true)) {
+                    return null;
+                }
+                return pointRelativeToComponent(pi.getLocation());
+            }
+        }
+    /**
+         * Assuming that mouse location is stored in PointerInfo passed
+         * to this method, it finds a Component that is in the same
+         * Window as this Component and is located under the mouse pointer.
+         * If no such Component exists, null is returned.
+         * NOTE: this method should be called under the protection of
+         * tree lock, as it is done in Component.getMousePosition() and
+         * Container.getMousePosition(boolean).
+         */
+        Component findUnderMouseInWindow(PointerInfo pi) {
+            if (!isShowing()) {
+                return null;
+            }
+            Window win = getContainingWindow();
+            if (!Toolkit.getDefaultToolkit().getMouseInfoPeer().isWindowUnderMouse(win)) {
+                return null;
+            }
+            final boolean INCLUDE_DISABLED = true;
+            Point relativeToWindow = win.pointRelativeToComponent(pi.getLocation());
+            Component inTheSameWindow = win.findComponentAt(relativeToWindow.x,
+                                                            relativeToWindow.y,
+                                                            INCLUDE_DISABLED);
+            return inTheSameWindow;
+        }
+
+        boolean isSameOrAncestorOf(Component comp, boolean allowChildren) {
+            return this == comp || (allowChildren && isParentOf(comp));
+        }
+        /**
+     * Check if this component is the child of this container or its children.
+     * Note: this function acquires treeLock
+     * Note: this function traverses children tree only in one Window.
+     * @param comp a component in test, must not be null
+     */
+    private boolean isParentOf(Component comp) {
+        synchronized(getTreeLock()) {
+            while (comp != null && comp != this && !(comp instanceof Window)) {
+                comp = comp.getParent();
+            }
+            return (comp == this);
+        }
+    }
   /**
 	 * This class provides accessibility support for subclasses of container.
 	 *

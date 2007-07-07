@@ -445,4 +445,23 @@ public abstract class FontMetrics implements java.io.Serializable
   {
     return font.hasUniformLineMetrics();
   }
+
+    //jnode openjdk
+    /**
+     * Gets the <code>FontRenderContext</code> used by this
+     * <code>FontMetrics</code> object to measure text.
+     * <p>
+     * Note that methods in this class which take a <code>Graphics</code>
+     * parameter measure text using the <code>FontRenderContext</code>
+     * of that <code>Graphics</code> object, and not this
+     * <code>FontRenderContext</code>
+     * @return    the <code>FontRenderContext</code> used by this
+     * <code>FontMetrics</code> object.
+     * @since 1.6
+     */
+    public FontRenderContext getFontRenderContext() {
+        return DEFAULT_FRC;
+    }
+    private static final FontRenderContext
+        DEFAULT_FRC = new FontRenderContext(null, false, false);
 }

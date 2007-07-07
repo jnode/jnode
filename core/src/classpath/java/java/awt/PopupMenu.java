@@ -62,6 +62,8 @@ public class PopupMenu extends Menu
 
   // Serialization Constant
   private static final long serialVersionUID = - 4620452533522760060L;
+    //jnode openjdk
+    transient boolean isTrayIconPopup = false;
 
 /*************************************************************************/
 
