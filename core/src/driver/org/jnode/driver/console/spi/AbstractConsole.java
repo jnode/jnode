@@ -32,6 +32,8 @@ import org.jnode.driver.input.KeyboardListener;
 import org.jnode.driver.input.PointerEvent;
 import org.jnode.driver.input.PointerListener;
 import org.jnode.system.event.FocusEvent;
+import org.jnode.util.QueueProcessorThread;
+import org.jnode.util.QueueProcessor;
 
 /**
  * @author epr
@@ -59,6 +61,7 @@ public abstract class AbstractConsole implements Console {
     public AbstractConsole(ConsoleManager mgr, String name) {
         this.mgr = mgr;
         this.consoleName = name;
+        this.keyboardEventProcessor.start();
     }
 
     /**
@@ -180,7 +183,7 @@ public abstract class AbstractConsole implements Console {
      */
     public void keyPressed(KeyboardEvent event) {
         if (isFocused()) {
-            dispatchKeyboardEvent(event);
+            keyboardEventProcessor.getQueue().add(event);
         }
     }
 
@@ -190,7 +193,7 @@ public abstract class AbstractConsole implements Console {
      */
     public void keyReleased(KeyboardEvent event) {
         if (isFocused()) {
-            dispatchKeyboardEvent(event);
+            keyboardEventProcessor.getQueue().add(event);
         }
     }
 
@@ -207,6 +210,12 @@ public abstract class AbstractConsole implements Console {
      */
     public void focusLost(FocusEvent event) {
     }
+
+    private QueueProcessorThread<KeyboardEvent> keyboardEventProcessor = new QueueProcessorThread<KeyboardEvent>("console-keyboard-event-processor", new QueueProcessor<KeyboardEvent>() {
+        public void process(KeyboardEvent event) throws Exception {
+            dispatchKeyboardEvent(event);
+        }
+    });
 
     /**
      * Dispatch a given keyboard event to all known listeners.
