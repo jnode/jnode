@@ -22,12 +22,14 @@
 package java.io;
 
 import org.jnode.system.BootLog;
+import org.jnode.vm.annotation.SharedStatics;
 
 /**
  * Helper class for connecting java.io to JNode.
  * 
  * @author epr
  */
+@SharedStatics
 public class VMIOUtils {
 
 	/** The filesystem API of JNode */
