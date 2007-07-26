@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.util.Properties;
+import java.util.Vector;
 
 import javax.isolate.Isolate;
 import javax.isolate.IsolateStartupException;
@@ -35,6 +36,8 @@ import javax.naming.NameNotFoundException;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginManager;
 import org.jnode.util.BootableHashMap;
+import org.jnode.util.QueueProcessor;
+import org.jnode.util.QueueProcessorThread;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmArchitecture;
@@ -120,6 +123,7 @@ public final class VmIsolate {
      * 
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
+    @SharedStatics
     private enum State {
         CREATED, STARTING, STARTED, EXITED, TERMINATED
     }
@@ -199,7 +203,7 @@ public final class VmIsolate {
     /**
      * Is the current thread running in the root isolate
      */
-    public final static boolean isRoot() {
+    public static boolean isRoot() {
         VmIsolate result = IsolatedStaticData.current;
         if (result != null) {
             return (result == StaticData.getRoot());
@@ -210,7 +214,7 @@ public final class VmIsolate {
     /**
      * Is the current thread running in the root isolate
      */
-    public final static VmIsolate getRoot() {
+    public static VmIsolate getRoot() {
         return StaticData.getRoot();
     }
 
@@ -219,7 +223,7 @@ public final class VmIsolate {
      * 
      * @return
      */
-    public final static VmIsolate currentIsolate() {
+    public static VmIsolate currentIsolate() {
         VmIsolate result = IsolatedStaticData.current;
         if (result == null) {
             result = StaticData.getRoot();
@@ -422,11 +426,70 @@ public final class VmIsolate {
         mainThread.start();
     }
 
+    private Vector<Runnable> taskList = new Vector<Runnable>();
+    private final Object taskSync = new Object();
+    private Thread executorThread;
+
+    public void invokeAndWait(final Runnable task){
+        if(this == StaticData.rootIsolate){
+            task.run();
+            return;
+        }
+        
+        synchronized(taskSync){
+            taskList.add(task);
+            taskSync.notifyAll();
+        }
+
+        synchronized(task){
+            while(taskList.contains(task)){
+                try {
+                    task.wait();
+                }catch(InterruptedException e){
+                    //
+                }
+            }
+        }
+    }
+
+    private class TaskExecutor implements Runnable{
+        public void run() {
+            //while(!VmIsolate.this.hasTerminated()){
+            do {
+                Runnable task = null;
+                synchronized(taskSync){
+                    try {
+                        while(taskList.isEmpty()){
+                            taskSync.wait();
+                        }
+                        try {
+                            task = taskList.get(0);
+                            task.run();
+                            taskList.remove(0);
+                        } catch(Throwable t){
+                            System.err.println("Error during task execution, dropping task");
+                            t.printStackTrace();
+                            taskList.remove(0);
+                        }
+                    }catch(InterruptedException ie){
+                        //
+                    }
+                }
+                if(task != null)
+                    synchronized(task){
+                        task.notifyAll();
+                    }
+            } while(!hasExited());
+            //} while(true);
+        }
+    }
+
     /**
      * Run this isolate. This method is called from IsolateThread.
      */
     @PrivilegedActionPragma
     final void run(IsolateThread thread) {
+        VmIsolate o_current = IsolatedStaticData.current;
         try {
             Unsafe.debug("isolated run ");
             // Set current
@@ -447,6 +510,10 @@ public final class VmIsolate {
 
             // Load the main class
             final Class< ? > cls = loader.loadClass(mainClass);
+
+            //start executor
+            executorThread = new Thread(new TaskExecutor(), "isolate-executor");
+            executorThread.start();
 
             // Find main method
             final Method mainMethod = cls.getMethod("main",
@@ -477,6 +544,8 @@ public final class VmIsolate {
                 Unsafe.debug("Exception in catch block.. giving up: ");
                 Unsafe.debug(ex2.getMessage());
             }
+        } finally {
+            IsolatedStaticData.current = o_current;
         }
     }
 
@@ -502,6 +571,7 @@ public final class VmIsolate {
 
     /**
      * Gets the classname of the main class.
+     * @return the main class name
      */
     final String getMainClassName() {
         return mainClass;
@@ -523,7 +593,7 @@ public final class VmIsolate {
         }
     }
 
-    private final void testIsolate(Isolate isolate) {
+    private void testIsolate(Isolate isolate) {
         if (this.isolate != isolate) {
             throw new SecurityException("Method called by invalid isolate");
         }
