@@ -1,7 +1,9 @@
 package org.jnode.util;
 
 import java.math.BigInteger;
+import org.jnode.vm.annotation.SharedStatics;
 
+@SharedStatics
 public enum SizeUnit {
 	B(1l, "B"),
 	K(1024l, "K"),
