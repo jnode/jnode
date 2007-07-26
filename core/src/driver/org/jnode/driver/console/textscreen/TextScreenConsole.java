@@ -31,6 +31,7 @@ import org.jnode.driver.console.spi.AbstractConsole;
 import org.jnode.driver.console.spi.ConsoleOutputStream;
 import org.jnode.driver.textscreen.TextScreen;
 import org.jnode.system.event.FocusEvent;
+import org.jnode.vm.isolate.VmIsolate;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -68,7 +69,9 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
 
 	private final boolean claimSystemOutErrIn;
 
-	/**
+    private VmIsolate myIsolate;
+
+    /**
 	 * @param mgr
 	 * @param name
 	 * @param screen
@@ -84,7 +87,8 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
 		this.savedErr = this.err = new PrintStream(new ConsoleOutputStream(
 				this, 0x04));
 		this.claimSystemOutErrIn = ((options & ConsoleManager.CreateOptions.NO_SYSTEM_OUT_ERR_IN) == 0);
-	}
+        this.myIsolate = VmIsolate.currentIsolate();
+    }
 
 	/**
 	 * Clear the console
@@ -320,13 +324,17 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
 		super.focusGained(event);
 		syncScreen();
 		if (claimSystemOutErrIn) {
-			AccessController.doPrivileged(new PrivilegedAction() {
-				public Object run() {
-					System.setOut(savedOut);
-					System.setErr(savedErr);
-					return null;
-				}
-			});
+            myIsolate.invokeAndWait(new Runnable() {
+                public void run() {
+                    AccessController.doPrivileged(new PrivilegedAction<Object>() {
+                        public Object run() {
+                            System.setOut(savedOut);
+                            System.setErr(savedErr);
+                            return null;
+                        }
+                    });
+                }
+            });
 		}
 	}
 
@@ -335,8 +343,12 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
 	 */
 	public void focusLost(FocusEvent event) {
 		if (claimSystemOutErrIn) {
-			savedOut = System.out;
-			savedErr = System.err;
+            myIsolate.invokeAndWait(new Runnable() {
+                public void run() {
+                    savedOut = System.out;
+                    savedErr = System.err;
+                }
+            });
 		}
 		super.focusLost(event);
 	}
