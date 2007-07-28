@@ -21,9 +21,12 @@
  
 package java.net;
 
+import org.jnode.vm.annotation.SharedStatics;
+
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@SharedStatics
 public final class VMNetUtils {
 
 	private static VMNetAPI api;
