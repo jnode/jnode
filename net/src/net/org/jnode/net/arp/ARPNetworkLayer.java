@@ -42,10 +42,12 @@ import org.jnode.net.TransportLayer;
 import org.jnode.net.ethernet.EthernetConstants;
 import org.jnode.util.Statistics;
 import org.jnode.util.TimeoutException;
+import org.jnode.vm.annotation.SharedStatics;
 
 /**
  * @author epr
  */
+@SharedStatics
 public class ARPNetworkLayer implements NetworkLayer, ARPConstants {
 
 	/** My logger */
