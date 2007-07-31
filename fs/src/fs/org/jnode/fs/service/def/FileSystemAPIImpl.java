@@ -25,12 +25,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.VMFileSystemAPI;
+import java.io.VMIOUtils;
 import java.io.VMOpenMode;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
+import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystem;
@@ -100,8 +102,8 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
      * @param file
      */
     public boolean canRead(String file) throws IOException {
-        final FSEntry entry = getEntry(file);
-        return (entry != null) && (entry.getAccessRights().canRead());
+        final FSAccessRights rights = getAccessRights(file);
+        return (rights == null) || rights.canRead();
     }
 
     /**
@@ -110,8 +112,8 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
      * @param file
      */
     public boolean canWrite(String file) throws IOException {
-        final FSEntry entry = getEntry(file);
-        return (entry != null) && (entry.getAccessRights().canWrite());
+        final FSAccessRights rights = getAccessRights(file);
+        return (rights == null) || rights.canWrite();
     }
 
     /**
@@ -120,30 +122,45 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
      * @param file
      */
     public boolean canExecute(String file) throws IOException {
-        final FSEntry entry = getEntry(file);
-        return (entry != null) && (entry.getAccessRights().canExecute());
+        final FSAccessRights rights = getAccessRights(file);
+        return (rights == null) || rights.canExecute();
     }
 
 
 	public boolean setReadable(String file, boolean enable,
 			boolean owneronly) throws IOException 
 	{
-        final FSEntry entry = getEntry(file);
-        return (entry != null) && (entry.getAccessRights().setReadable(enable, owneronly));
+        final FSAccessRights rights = getAccessRights(file);
+        if(rights == null)
+        {
+        	return false;
+        }
+        
+        return rights.setReadable(enable, owneronly);
 	}
 
 	public boolean setWritable(String file, boolean enable,
 			boolean owneronly) throws IOException 
 	{
-        final FSEntry entry = getEntry(file);
-        return (entry != null) && (entry.getAccessRights().setWritable(enable, owneronly));
+        final FSAccessRights rights = getAccessRights(file);
+        if(rights == null)
+        {
+        	return false;
+        }
+        
+        return rights.setWritable(enable, owneronly);
 	}
 
 	public boolean setExecutable(String file, boolean enable,
 			boolean owneronly) throws IOException 
 	{
-        final FSEntry entry = getEntry(file);
-        return (entry != null) && (entry.getAccessRights().setExecutable(enable, owneronly));
+        final FSAccessRights rights = getAccessRights(file);
+        if(rights == null)
+        {
+        	return false;
+        }
+        
+        return rights.setExecutable(enable, owneronly);
 	}
 	
     /**
@@ -268,6 +285,16 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
             list.add(name);
         }
         return list.toArray(new String[list.size()]);
+    }
+    
+    private FSAccessRights getAccessRights(String path) throws IOException
+    {
+    	FSEntry entry = getEntry(path);
+    	if(entry == null)
+    	{
+    		throw new FileNotFoundException("file not found: "+path);
+    	}
+    	return entry.getAccessRights();  
     }
 
     /**
