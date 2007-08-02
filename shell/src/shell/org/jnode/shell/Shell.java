@@ -22,6 +22,7 @@
 package org.jnode.shell;
 
 import org.jnode.shell.alias.AliasManager;
+import org.jnode.driver.console.CommandHistory;
 import org.jnode.driver.console.Console;
 
 /**

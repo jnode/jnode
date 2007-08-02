@@ -21,6 +21,7 @@
  
 package org.jnode.driver.console;
 
+import java.io.InputStream;
 import java.io.PrintStream;
 
 /**
@@ -155,6 +156,12 @@ public interface TextConsole extends Console {
      */
     public void ensureVisible(int row);
     
+    /**
+	 * Gets the input stream of this console.
+	 * @return
+	 */
+	public InputStream getIn();
+	
 	/**
 	 * Gets the error stream of this console.
 	 * @return
@@ -177,4 +184,17 @@ public interface TextConsole extends Console {
 	 * @param visible
 	 */
 	public void setCursorVisible(boolean visible);
+	
+
+    /**
+     * Get the console's input completer
+     * @return The completer or <code>null</code>. 
+     */
+    public InputCompleter getCompleter();
+    
+    /**
+     * Ges the console's input completer
+     * @param The new completer or <code>null</code>. 
+     */
+    public void setCompleter(InputCompleter completer);
 }

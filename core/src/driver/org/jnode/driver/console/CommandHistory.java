@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: CommandHistory.java 2224 2006-01-01 12:49:03Z epr $
  *
  * JNode.org
  * Copyright (C) 2003-2006 JNode.org
@@ -19,7 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.shell;
+package org.jnode.driver.console;
 
 import java.util.ArrayList;
 import java.util.List;

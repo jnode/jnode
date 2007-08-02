@@ -21,11 +21,10 @@
  
 package org.jnode.driver.console.textscreen;
 
-import java.awt.event.KeyEvent;
+import java.io.InputStream;
 
 import javax.naming.NameNotFoundException;
 
-import org.jnode.driver.console.Console;
 import org.jnode.driver.console.ConsoleException;
 import org.jnode.driver.console.spi.AbstractConsoleManager;
 import org.jnode.driver.textscreen.ScrollableTextScreen;
@@ -53,7 +52,7 @@ public class TextScreenConsoleManager extends AbstractConsoleManager {
      * @see org.jnode.driver.console.ConsoleManager#createConsole(String, int)
      */
     public TextScreenConsole createConsole(String name, int options) {
-        if ((options & CreateOptions.TEXT) != 0) {
+    	if ((options & CreateOptions.TEXT) != 0) {
             final TextScreenManager tsm;
             tsm = getTextScreenManager();
             final TextScreenConsole console;
@@ -69,6 +68,11 @@ public class TextScreenConsoleManager extends AbstractConsoleManager {
                 screen = tsm.getSystemScreen().createCompatibleBufferScreen();
                 console = new TextScreenConsole(this, name, screen, options);
             }
+            InputStream in = System.in;
+            if ((options & CreateOptions.NO_LINE_EDITTING) == 0) {
+            	in = new KeyboardInputStream(getKeyboardApi(), console);
+            }
+        	console.setIn(in);
             if ((options & CreateOptions.STACKED) != 0){
                 stackConsole(console);
             } else {
@@ -81,7 +85,7 @@ public class TextScreenConsoleManager extends AbstractConsoleManager {
             throw new IllegalArgumentException("Unknown option " + options);
         }
     }
-
+    
     protected TextScreenManager getTextScreenManager() {
         TextScreenManager tsm;
         try {

@@ -21,16 +21,19 @@
  
 package org.jnode.driver.console.textscreen;
 
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 import org.jnode.driver.console.ConsoleManager;
+import org.jnode.driver.console.InputCompleter;
 import org.jnode.driver.console.TextConsole;
 import org.jnode.driver.console.spi.AbstractConsole;
 import org.jnode.driver.console.spi.ConsoleOutputStream;
 import org.jnode.driver.textscreen.TextScreen;
 import org.jnode.system.event.FocusEvent;
+import org.jnode.system.event.FocusListener;
 import org.jnode.vm.isolate.VmIsolate;
 
 /**
@@ -56,10 +59,14 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
 
 	/** Current Y position */
 	private int curY;
+	
+	private InputStream in;
 
 	private final PrintStream out;
 
 	private final PrintStream err;
+	
+	private InputStream savedIn;
 
 	private PrintStream savedOut;
 
@@ -67,7 +74,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
 
 	private boolean cursorVisible = true;
 
-	private final boolean claimSystemOutErrIn;
+	private final boolean claimSystemOutErr;
 
     private VmIsolate myIsolate;
 
@@ -86,7 +93,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
 				this, 0x07));
 		this.savedErr = this.err = new PrintStream(new ConsoleOutputStream(
 				this, 0x04));
-		this.claimSystemOutErrIn = ((options & ConsoleManager.CreateOptions.NO_SYSTEM_OUT_ERR_IN) == 0);
+		this.claimSystemOutErr = ((options & ConsoleManager.CreateOptions.NO_SYSTEM_OUT_ERR) == 0);
         this.myIsolate = VmIsolate.currentIsolate();
     }
 
@@ -285,6 +292,32 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
 		syncScreen();
 	}
 
+	public InputCompleter getCompleter() {
+		if (in instanceof KeyboardInputStream) {
+			return ((KeyboardInputStream) in).getCompleter();
+		}
+		else {
+			return null;
+		}
+	}
+
+	public void setCompleter(InputCompleter completer) {
+		if (in instanceof KeyboardInputStream) {
+			((KeyboardInputStream) in).setCompleter(completer);
+		}
+	}
+
+	/**
+	 * @see org.jnode.driver.console.TextConsole#getIn()
+	 */
+	public InputStream getIn() {
+		return in;
+	}
+
+	void setIn(InputStream in) {
+		this.savedIn = this.in = in;
+	}
+
 	/**
 	 * @see org.jnode.driver.console.TextConsole#getErr()
 	 */
@@ -323,7 +356,10 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
 	public void focusGained(FocusEvent event) {
 		super.focusGained(event);
 		syncScreen();
-		if (claimSystemOutErrIn) {
+		if (in instanceof FocusListener) {
+			((FocusListener) in).focusGained(event);
+		}
+		if (claimSystemOutErr) {
             myIsolate.invokeAndWait(new Runnable() {
                 public void run() {
                     AccessController.doPrivileged(new PrivilegedAction<Object>() {
@@ -342,7 +378,10 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
 	 * @see org.jnode.system.event.FocusListener#focusLost(org.jnode.system.event.FocusEvent)
 	 */
 	public void focusLost(FocusEvent event) {
-		if (claimSystemOutErrIn) {
+		if (in instanceof FocusListener) {
+			((FocusListener) in).focusLost(event);
+		}
+		if (claimSystemOutErr) {
             myIsolate.invokeAndWait(new Runnable() {
                 public void run() {
                     savedOut = System.out;

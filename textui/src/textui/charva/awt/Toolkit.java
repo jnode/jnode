@@ -154,9 +154,11 @@ public class Toolkit extends AbstractToolkit implements KeyboardListener,
         try {
             final ShellManager sm = InitialNaming.lookup(ShellManager.NAME);
             final ConsoleManager conMgr = sm.getCurrentShell().getConsole().getManager();
-            final TextConsole console = (TextConsole) conMgr
-                    .createConsole("charva", ConsoleManager.CreateOptions.TEXT |
-                            ConsoleManager.CreateOptions.STACKED);
+            final TextConsole console = (TextConsole) conMgr.createConsole(
+            		"charva", 
+            		ConsoleManager.CreateOptions.TEXT |
+                            ConsoleManager.CreateOptions.STACKED |
+                            ConsoleManager.CreateOptions.NO_LINE_EDITTING);
             console.addKeyboardListener(new KeyboardAdapter() {
                 public void keyPressed(KeyboardEvent event) {
                     if (event.isControlDown() && event.getKeyChar() == 'z') {

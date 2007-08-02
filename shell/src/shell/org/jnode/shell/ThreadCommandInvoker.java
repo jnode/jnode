@@ -86,10 +86,11 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
     public void invoke(String cmdLineStr) {
         commandShell.addCommandToHistory(cmdLineStr);
 
-        InputStream inputStream = System.in; // will also be dynamic later
+        InputStream inputStream = commandShell.getInputStream();
         InputStream nextInputStream = null;
-        PrintStream errStream = System.err; // will also be dynamic later
+        PrintStream errStream = commandShell.getErrorStream();
         PrintStream outputStream = null;
+        boolean mustCloseOutputStream = false;
 
         CommandLine cmdLine;
         Method method;
@@ -123,6 +124,7 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
                             FileOutputStream fileOutputStream = new FileOutputStream(
                                     file);
                             outputStream = new PrintStream(fileOutputStream);
+                            mustCloseOutputStream = true;
                         } catch (SecurityException e) {
                             e.printStackTrace();
                         } catch (FileNotFoundException e) {
@@ -132,7 +134,7 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
                         byteArrayOutputStream = new ByteArrayOutputStream();
                         outputStream = new PrintStream(byteArrayOutputStream);
                     } else {
-                        outputStream = System.out;
+                        outputStream = commandShell.getOutputStream();
                     }
 
                     if (byteArrayOutputStream != null) {
@@ -146,6 +148,8 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
                     CommandLine commandLine = null;
 
                     if (inputStream.available() > 0) {
+                    	// FIXME we shouldn't do this.  It consumes keyboard typeahead
+                    	// that should be delivered to the command's standard input!!
                         commandLine = new CommandLine(inputStream);
                     } else {
                         commandLine = cmdLine.getRemainder();
@@ -155,17 +159,18 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
 
                     cr = new CommandRunner(cmdInfo.getCommandClass(), method,
                             new Object[] { commandLine, inputStream,
-                                    outputStream, errStream });
+                                    outputStream, errStream },
+                            inputStream, outputStream, errStream);
                 } catch (NoSuchMethodException e) {
                     method = cmdInfo.getCommandClass().getMethod(MAIN_METHOD,
                             MAIN_ARG_TYPES);
                     cr = new CommandRunner(cmdInfo.getCommandClass(), method,
-                            new Object[] { cmdLine.getRemainder()
-                                    .toStringArray() });
+                            new Object[] { cmdLine.getRemainder().toStringArray() },
+                            commandShell.getInputStream(), commandShell.getOutputStream(),
+                            commandShell.getErrorStream());
                 }
                 try {
-
-                    if (cmdInfo.isInternal()) {
+                	if (cmdInfo.isInternal()) {
                         cr.run();
                     } else {
                         threadProcess = new Thread(cr, cmdName);
@@ -185,13 +190,7 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
                                 }
                             }
                         }
-
                     }
-
-                    if (outputStream != null && outputStream != System.out) {
-                        outputStream.close();
-                    }
-                    // System.err.println("Finished invoke.");
                 } catch (Exception ex) {
                     err.println("Exception in command");
                     ex.printStackTrace(err);
@@ -208,6 +207,12 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
             } catch (Exception ex) {
                 err.println("Unknown error: " + ex.getMessage());
                 ex.printStackTrace(err);
+            }
+            finally {
+            	if (mustCloseOutputStream) {
+                    outputStream.close();
+                    mustCloseOutputStream = false;
+                }
             }
         }
 
@@ -264,31 +269,36 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
         Method method;
 
         Object[] args;
+        
+        private InputStream commandIn;
+        private PrintStream commandOut;
+        private PrintStream commandErr;
 
         boolean finished = false;
 
-        public CommandRunner(Class cx, Method method, Object[] args) {
+        public CommandRunner(Class cx, Method method, Object[] args, 
+        		InputStream commandIn, PrintStream commandOut, PrintStream commandErr) {
             this.cx = cx;
             this.method = method;
             this.args = args;
+            this.commandIn = commandIn;
+            this.commandOut = commandOut;
+            this.commandErr = commandErr;
         }
 
         public void run() {
             try {
-                // System.err.println("Registering shell in new thread.");
-                // to
-                // ensure
-                // access
-                // to
-                // the
-                // command
-                // shell
-                // in
-                // this
-                // new
-                // thread?
                 try {
-                	Object obj = null;
+                	//
+                	AccessController.doPrivileged(new PrivilegedAction() {
+        				public Object run() {
+        					System.setOut(commandOut);
+        					System.setErr(commandErr);
+        					System.setIn(commandIn);
+        					return null;
+        				}
+        			});
+                    Object obj = null;
                 	if(!Modifier.isStatic(method.getModifiers())) {
                 		obj = cx.newInstance();
                 	}

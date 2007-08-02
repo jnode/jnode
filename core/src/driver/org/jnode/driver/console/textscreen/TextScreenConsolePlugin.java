@@ -55,7 +55,10 @@ public class TextScreenConsolePlugin extends Plugin {
             InitialNaming.bind(ConsoleManager.NAME, mgr);
             
             // Create the first console
-            final TextConsole first = (TextConsole)mgr.createConsole(null, ConsoleManager.CreateOptions.TEXT | ConsoleManager.CreateOptions.SCROLLABLE);
+            final TextConsole first = (TextConsole) mgr.createConsole(
+            		null, 
+            		(ConsoleManager.CreateOptions.TEXT | 
+            				ConsoleManager.CreateOptions.SCROLLABLE));
             mgr.focus(first);
             System.setOut(first.getOut());
             System.setErr(first.getErr());

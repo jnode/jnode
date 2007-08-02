@@ -28,9 +28,11 @@ public class SwingConsole {
         TextScreenConsoleManager manager = (TextScreenConsoleManager) sm.getCurrentShell().getConsole().getManager();
         SwingTextScreenConsoleManager cm = new SwingTextScreenConsoleManager();
         cm.setParent(manager);
-        new Thread(new CommandShell((TextConsole) cm.createConsole(null,
-                ConsoleManager.CreateOptions.TEXT | ConsoleManager.CreateOptions.SCROLLABLE)), "SwingConsoleCommandShell").
-                start();
+        TextConsole console = cm.createConsole(
+        		null,
+                (ConsoleManager.CreateOptions.TEXT | 
+                		ConsoleManager.CreateOptions.SCROLLABLE));
+        new Thread(new CommandShell(console), "SwingConsoleCommandShell").start();
 
         synchronized(SwingConsole.class){
             frame = cm.getFrame();

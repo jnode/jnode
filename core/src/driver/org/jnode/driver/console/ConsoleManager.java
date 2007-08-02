@@ -22,6 +22,7 @@
 package org.jnode.driver.console;
 
 import java.util.Set;
+import java.io.InputStream;
 import java.io.PrintStream;
 
 import org.jnode.driver.input.KeyboardListener;
@@ -112,11 +113,15 @@ public interface ConsoleManager extends KeyboardListener, PointerListener {
         /** Create a scrollable console. */
         public static final int SCROLLABLE = 0x02;
 
-        /** Do not claim System.out, err, in when focused. */
-        public static final int NO_SYSTEM_OUT_ERR_IN = 0x04;
+        /** Do not claim System.out, err when focused. */
+        public static final int NO_SYSTEM_OUT_ERR = 0x04;
 
         /** Stack console on the current screen */
         public static final int STACKED = 0x08;
+        
+        /** Do not create a line-editting input stream for the console.
+         * The console's input will be whatever System.in currently is. */
+        public static final int NO_LINE_EDITTING = 0x10;
     }
     
     /**
