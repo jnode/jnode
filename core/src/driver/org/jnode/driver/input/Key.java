@@ -125,6 +125,11 @@ public class Key
   {
     this.upperChar = upperChar;
   }
+  
+  public char getControlChar() 
+  {
+	return (char) (upperChar & 0x1f);
+  }
 
   public char getAltGrChar()
   {

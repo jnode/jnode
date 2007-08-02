@@ -61,7 +61,9 @@ final public class SystemInputStream extends InputStream
 
     final public void setIn(InputStream in)
     {
-        localeIn.set(in);
+    	if (in != this) {
+            localeIn.set(in);
+    	}
     }
     
     /**
@@ -101,7 +103,7 @@ final public class SystemInputStream extends InputStream
      */
     public void initialize(InputStream systemIn)
     {
-        if(this.systemIn == EMPTY) // register only the first keyboard
+        if (this.systemIn == EMPTY && systemIn != this) // register only the first keyboard
         {
             this.systemIn = systemIn;
         }

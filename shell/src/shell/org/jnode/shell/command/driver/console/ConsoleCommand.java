@@ -128,7 +128,7 @@ public class ConsoleCommand {
         } else {
             System.out.println("test RawTextConsole");
             final TextConsole console = (TextConsole) conMgr.createConsole(
-                    null, ConsoleManager.CreateOptions.TEXT);
+                    null, ConsoleManager.CreateOptions.TEXT | ConsoleManager.CreateOptions.NO_LINE_EDITTING);
             conMgr.registerConsole(console);
             conMgr.focus(console);
             console.clear();

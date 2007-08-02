@@ -58,7 +58,8 @@ public class FBConsole {
 
             ScrollableTextScreen ts = new FBConsole.FBPcTextScreen(g).createCompatibleScrollableBufferScreen(500);
 
-            ScrollableTextScreenConsole first = new ScrollableTextScreenConsole(mgr, "console", ts,
+            ScrollableTextScreenConsole first = 
+            	new ScrollableTextScreenConsole(mgr, "console", ts,
                     ConsoleManager.CreateOptions.TEXT |
                     ConsoleManager.CreateOptions.SCROLLABLE);
 

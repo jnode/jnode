@@ -36,10 +36,12 @@ public class TextEditor implements KeyboardListener {
 
         ShellManager sm = InitialNaming.lookup(ShellManager.NAME);
         TextScreenConsoleManager manager = (TextScreenConsoleManager) sm.getCurrentShell().getConsole().getManager();
-        TextConsole console = manager.createConsole("editor",
-                    ConsoleManager.CreateOptions.TEXT  |
-                    ConsoleManager.CreateOptions.STACKED  |
-                            ConsoleManager.CreateOptions.NO_SYSTEM_OUT_ERR_IN);
+        TextConsole console = manager.createConsole(
+        		"editor",
+        		(ConsoleManager.CreateOptions.TEXT |
+        				ConsoleManager.CreateOptions.STACKED |
+        				ConsoleManager.CreateOptions.NO_LINE_EDITTING |
+        				ConsoleManager.CreateOptions.NO_SYSTEM_OUT_ERR));
         manager.focus(console);
 
         TextEditor te = new TextEditor(console);

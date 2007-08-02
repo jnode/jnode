@@ -62,7 +62,8 @@ public class ConsoleTest2 {
             
             screen = new JTextAreaTextScreen(80,24);
             manager = new TextScreenConsoleManager();
-            console = new TextScreenConsole(manager, "test", screen, ConsoleManager.CreateOptions.TEXT);
+            console = new TextScreenConsole(
+            		manager, "test", screen, ConsoleManager.CreateOptions.TEXT);
             manager.focus(console);
 
             CommandShell commandShell = new CommandShell(console);

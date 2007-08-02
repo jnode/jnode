@@ -27,6 +27,7 @@ import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 
 import org.jnode.shell.help.Help;
@@ -64,6 +65,14 @@ public class DefaultCommandInvoker implements CommandInvoker {
             try {
                 //                System.err.println("Invoking...");
                 try {
+                	AccessController.doPrivileged(new PrivilegedAction() {
+        				public Object run() {
+        					System.setOut(commandShell.getOutputStream());
+        					System.setErr(commandShell.getErrorStream());
+        					System.setIn(commandShell.getInputStream());
+        					return null;
+        				}
+        			});
                     final Object[] args = new Object[] { cmdLine.getRemainder()
                             .toStringArray()};
                     AccessController.doPrivileged(new InvokeAction(main, null, args));

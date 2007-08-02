@@ -21,8 +21,11 @@ public class EditEmu extends Emu {
         }
 
         SwingTextScreenConsoleManager cm = new SwingTextScreenConsoleManager();
-        final TextScreenConsole console = cm.createConsole(null,
-                ConsoleManager.CreateOptions.TEXT | ConsoleManager.CreateOptions.NO_SYSTEM_OUT_ERR_IN);
+        final TextScreenConsole console = cm.createConsole(
+        		null,
+        		(ConsoleManager.CreateOptions.TEXT | 
+        				ConsoleManager.CreateOptions.NO_SYSTEM_OUT_ERR |
+        				ConsoleManager.CreateOptions.NO_LINE_EDITTING));
 
         TextEditor te = new TextEditor(console);
         File f = new File(argv[0]);

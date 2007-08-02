@@ -98,6 +98,10 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
         }
     }
 
+    protected KeyboardAPI getKeyboardApi() {
+    	return kbApi;
+    }
+
     /**
      * Add a pointer device
      * 

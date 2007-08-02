@@ -32,6 +32,10 @@ import java.awt.event.KeyEvent;
  */
 public abstract class KeyboardInterpreter
 {
+  // FIXME We are currently using the character zero (0x0000) to indicate that no 
+  // (Unicode) character corresponds to a keycode.  This means that we cannot represent
+  // the NUL control character.  Instead we should really be using 0xffff which Unicode 
+  // defines to be a non-character.
 
   private int flags;
 
@@ -110,7 +114,12 @@ public abstract class KeyboardInterpreter
     catch (UnsupportedKeyException e)
     {
       final char ch;
-      if ((flags & InputEvent.SHIFT_DOWN_MASK) != 0)
+
+      if ((flags & InputEvent.CTRL_DOWN_MASK) != 0)
+      {
+        ch = keys.getKey(scancode).getControlChar();
+      }
+      else if ((flags & InputEvent.SHIFT_DOWN_MASK) != 0)
       {
         ch = keys.getKey(scancode).getUpperChar();
 

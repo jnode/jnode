@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: Line.java 3119 2007-02-11 22:25:20Z fduminy $
  *
  * JNode.org
  * Copyright (C) 2003-2006 JNode.org
@@ -19,15 +19,24 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-package org.jnode.shell;
+package org.jnode.driver.console.textscreen;
 
 import java.io.PrintStream;
-import java.util.Arrays;
-import java.util.Collections;
 
+import org.jnode.driver.console.CompletionInfo;
+import org.jnode.driver.console.InputCompleter;
 import org.jnode.driver.console.TextConsole;
 
+
 /**
+ * A class that handles the content of the current command line in the shell.
+ * That can be : - a new command that the user is beeing editing - an existing
+ * command (from the command history)
+ * 
+ * This class also handles the current cursor position in the command line and
+ * keep trace of the position (consoleX, consoleY) of the first character of the
+ * command line (to handle commands that are multilines).
+ * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Fabien DUMINY (fduminy@jnode.org)
  */
@@ -55,14 +64,11 @@ class Line {
 
     private final TextConsole console;
 
-    private CommandShell shell;
-
     private PrintStream out;
 
-    public Line(TextConsole console, CommandShell shell, PrintStream out) {
+    public Line(TextConsole console) {
         this.console = console;
-        this.shell = shell;
-        this.out = out;
+        this.out = console.getOut();
     }
 
     public void start() {
@@ -89,6 +95,16 @@ class Line {
 
     public String getContent() {
         return currentLine.toString();
+    }
+
+    public byte[] getBytes() {
+        return currentLine.toString().getBytes();
+    }
+
+    public byte[] consumeBytes() {
+        byte[] res = getBytes();
+        currentLine.setLength(0);
+        return res;
     }
 
     public void setContent(String content) {
@@ -143,17 +159,17 @@ class Line {
 
     public CompletionInfo complete(String currentPrompt) {
         CompletionInfo info = null;
-        //int oldPosOnCurrentLine = posOnCurrentLine;
+        InputCompleter completer = console.getCompleter();
         if (posOnCurrentLine != currentLine.length()) {
             String ending = currentLine.substring(posOnCurrentLine);
-            info = shell.complete(currentLine.substring(0, posOnCurrentLine));
+            info = completer.complete(currentLine.substring(0, posOnCurrentLine));
             printList(info, currentPrompt);
             if (info.getCompleted() != null) {
                 setContent(info.getCompleted() + ending);
                 posOnCurrentLine = currentLine.length() - ending.length();
             }
         } else {
-            info = shell.complete(currentLine.toString());
+            info = completer.complete(currentLine.toString());
             printList(info, currentPrompt);
             if (info.getCompleted() != null) {
                 setContent(info.getCompleted());
@@ -266,7 +282,7 @@ class Line {
         shortened = oldLength > currentLine.length();
         oldLength = 0;
     }
-
+    
     public void refreshCurrentLine(String currentPrompt) {
         try {
             int x = consoleX;
@@ -285,7 +301,7 @@ class Line {
                 console.clearRow(consoleY + i);
             }
 
-            // print the prompt and the command line
+            // print the input line
             console.setCursor(0, consoleY);
             out.print(currentPrompt + currentLine);
 
@@ -300,4 +316,8 @@ class Line {
             //todo: why is it ignored?
         }
     }
+
+	public int getLineLength() {
+		return currentLine.length();
+	}
 }

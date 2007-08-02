@@ -62,7 +62,13 @@ public class Log4jConfigurePlugin extends Plugin {
 		try {
 		    // Create the appenders
 			final ConsoleManager conMgr = InitialNaming.lookup(ConsoleManager.NAME);
-			final TextConsole console = (TextConsole)conMgr.createConsole("Log4j", ConsoleManager.CreateOptions.TEXT | ConsoleManager.CreateOptions.SCROLLABLE | ConsoleManager.CreateOptions.NO_SYSTEM_OUT_ERR_IN);
+			final TextConsole console = 
+				(TextConsole)conMgr.createConsole(
+						"Log4j", 
+						(ConsoleManager.CreateOptions.TEXT | 
+								ConsoleManager.CreateOptions.SCROLLABLE | 
+								ConsoleManager.CreateOptions.NO_SYSTEM_OUT_ERR |
+								ConsoleManager.CreateOptions.NO_LINE_EDITTING));
 			conMgr.registerConsole(console);
 			
 			console.setAcceleratorKeyCode(KeyEvent.VK_F7);

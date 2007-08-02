@@ -31,8 +31,6 @@ import java.util.ArrayList;
 
 import org.jnode.driver.Device;
 import org.jnode.driver.DriverException;
-import org.jnode.system.BootLog;
-import org.jnode.util.EmptyInputStream;
 import org.jnode.util.SystemInputStream;
 
 /**
@@ -105,18 +103,18 @@ public abstract class AbstractKeyboardDriver extends AbstractInputDriver<Keyboar
         dev.registerAPI(KeyboardAPI.class, this);
         dev.registerAPI(SystemTriggerAPI.class, this);
 
-        // If no inputstream has been defined, create and set one.
-        kis = null;
-        if (channel != null) {
-            kis = new KeyboardInputStream(this);
-        }
-        final InputStream systemIn = kis;
-        AccessController.doPrivileged(new PrivilegedAction() {
-            public Object run() {
-                SystemInputStream.getInstance().initialize(systemIn);
-                return null;
-            }                
-        });
+//        // If no inputstream has been defined, create and set one.
+//        kis = null;
+//        if (channel != null) {
+//            kis = new KeyboardInputStream(this);
+//        }
+//        final InputStream systemIn = kis;
+//        AccessController.doPrivileged(new PrivilegedAction() {
+//            public Object run() {
+//                SystemInputStream.getInstance().initialize(systemIn);
+//                return null;
+//            }                
+//        });
     }
 
     /**
