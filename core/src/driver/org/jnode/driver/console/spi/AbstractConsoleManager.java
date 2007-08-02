@@ -262,7 +262,7 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
         }
 
         consoles.remove(console.getConsoleName());
-        if(currentStack != null && currentStack.peek() == console) {
+        if(currentStack != null && !currentStack.empty() && currentStack.peek() == console) {
             currentStack.pop();
             if(!currentStack.empty()) {
                 current = currentStack.peek();
