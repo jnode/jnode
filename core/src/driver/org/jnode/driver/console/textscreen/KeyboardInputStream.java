@@ -85,13 +85,13 @@ implements KeyboardListener, FocusListener, DeviceListener {
      * -1 denotes the current line.
      */
     private int historyIndex = -1;
-    
+
     /**
      * Contains the current line; i.e. the text being entered by the user.
      */
-    private String newestLine = "";
+    private String savedCurrentLine;
 
-	public KeyboardInputStream(KeyboardAPI api, TextConsole console) {
+    public KeyboardInputStream(KeyboardAPI api, TextConsole console) {
 		if (api != null) {
 			this.api = api;
 			this.api.addKeyboardListener(this);
@@ -171,6 +171,7 @@ implements KeyboardListener, FocusListener, DeviceListener {
 
     /**
 	 * Pull a keyboard event from the queue and process it.
+     * @return true if the event was processed
 	 */
 	private boolean processEvent() {
 		KeyboardEvent event = queue.get();
@@ -179,8 +180,7 @@ implements KeyboardListener, FocusListener, DeviceListener {
 			if (ch != NO_CHAR) {
 				event.consume();
 				return !processChar(ch);
-			}
-			else {
+			} else {
 				int kc = event.getKeyCode();
 				int mods = event.getModifiers();
 				if (processVirtualKeystroke(kc, mods)) {
@@ -188,8 +188,7 @@ implements KeyboardListener, FocusListener, DeviceListener {
 				}
 				return true;
 			}
-		}
-		else {
+		} else {
 		    return true;
 		}
 	}
@@ -197,7 +196,7 @@ implements KeyboardListener, FocusListener, DeviceListener {
 	/**
 	 * Process a keystroke interpretted as a character.
 	 * 
-	 * @param ch
+	 * @param ch the character to process
 	 * @return <code>true</code> if the character should cause the current line 
 	 * buffer contents to be returned to the user.
 	 */
@@ -224,6 +223,7 @@ implements KeyboardListener, FocusListener, DeviceListener {
             out.println();
             currentLine.appendChar(ch);
             breakChar = true;
+            historyIndex = -1;
             break;
         // if it's the tab key, we want to trigger command line completion
         case '\t':
@@ -253,14 +253,15 @@ implements KeyboardListener, FocusListener, DeviceListener {
         	// otherwise add it to our current line
         	currentLine.appendChar(ch);
             refreshCurrentLine();
+            historyIndex = -1;                            
         }
         return breakChar;
     }
 	
 	/**
 	 * Process a keystroke that doesn't have an associated char value.
-	 * @param code
-	 * @param modifiers
+	 * @param code key code
+	 * @param modifiers key modifiers
 	 * @return <code>true</code> if the keystroke has been recognized and 
 	 * acted on, <code>false</code> otherwise.
 	 */
@@ -273,22 +274,27 @@ implements KeyboardListener, FocusListener, DeviceListener {
         	// Previous history item
         	if (completer != null) {
         		if (historyIndex == -1) {
-        			newestLine = currentLine.getContent();
         			historyIndex = completer.getCommandHistory().size();
-        		}
+                    savedCurrentLine = currentLine.getContent();
+                }
         		historyIndex--;
-        		redisplay();
+
+                updateCurrentLine();
             }
             break;
         case KeyEvent.VK_DOWN:
         	// Next history item
         	if (completer != null) {
-        		if (historyIndex == completer.getCommandHistory().size() - 1)
+                if (historyIndex == -1)
+                    savedCurrentLine = currentLine.getContent();
+
+                if (historyIndex == completer.getCommandHistory().size() - 1)
         			historyIndex = -2;
-        		else if (historyIndex == -1) 
-        		    newestLine = currentLine.getContent();
+
                 historyIndex++;
-        		redisplay();
+
+                updateCurrentLine();
+
             }
             break;
         case KeyEvent.VK_LEFT:
@@ -320,21 +326,20 @@ implements KeyboardListener, FocusListener, DeviceListener {
         return true;
     }
 
-    private void refreshCurrentLine() {
-        currentLine.refreshCurrentLine(currentPrompt);
-    }
-
-    private void redisplay() {
-        if (historyIndex == -1) {
-            currentLine.setContent(newestLine);
-        }
-        else {
-        	currentLine.setContent(completer.getCommandHistory().getCommand(historyIndex));
+    private void updateCurrentLine() {
+        if (historyIndex > -1) {
+            currentLine.setContent(completer.getCommandHistory().getCommand(historyIndex));
+        } else {
+            currentLine.setContent(savedCurrentLine);
         }
         refreshCurrentLine();
         currentLine.moveEnd();
     }
-    
+
+    private void refreshCurrentLine() {
+        currentLine.refreshCurrentLine(currentPrompt);
+    }
+
     private boolean fillBuffer() throws IOException {
     	int x = console.getCursorX();
     	int y = console.getCursorY();
@@ -425,7 +430,6 @@ implements KeyboardListener, FocusListener, DeviceListener {
 	}
 	
 	/**
-	 * @param device
 	 * @see org.jnode.driver.DeviceListener#deviceStarted(org.jnode.driver.Device)
 	 */
 	public void deviceStarted(Device device) {
@@ -435,7 +439,6 @@ implements KeyboardListener, FocusListener, DeviceListener {
 	}
 
 	/**
-	 * @param device
 	 * @see org.jnode.driver.DeviceListener#deviceStop(org.jnode.driver.Device)
 	 */
 	public void deviceStop(Device device) {
