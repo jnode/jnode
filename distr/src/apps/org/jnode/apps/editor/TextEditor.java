@@ -1,23 +1,18 @@
 package org.jnode.apps.editor;
 
-import org.jnode.driver.input.KeyboardListener;
-import org.jnode.driver.input.KeyboardEvent;
+import java.awt.event.KeyEvent;
+import java.io.*;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.ArrayList;
+import java.util.List;
 import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.TextConsole;
 import org.jnode.driver.console.textscreen.TextScreenConsoleManager;
+import org.jnode.driver.input.KeyboardEvent;
+import org.jnode.driver.input.KeyboardListener;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.ShellManager;
-
-import java.util.List;
-import java.util.ArrayList;
-import java.io.IOException;
-import java.io.File;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.awt.event.KeyEvent;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 
 /**
  * @author Levente S\u00e1ntha

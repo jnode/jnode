@@ -1,16 +1,10 @@
 package org.jnode.apps.jpartition.swingview;
 
 import it.battlehorse.stamps.annotations.ModelDependent;
-
-import java.awt.BorderLayout;
+import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-
+import javax.swing.*;
 import org.apache.log4j.Logger;
 import org.jnode.apps.jpartition.controller.MainController;
 

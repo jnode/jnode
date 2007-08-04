@@ -3,13 +3,8 @@
  */
 package org.jnode.install.action;
 
-import org.jnode.install.InstallerAction;
-import org.jnode.install.ActionInput;
-import org.jnode.install.ActionOutput;
-import org.jnode.install.OutputContext;
-import org.jnode.install.InputContext;
-import org.jnode.install.AbstractInstaller;
 import org.jnode.fs.jfat.command.JGrubInstallCommand;
+import org.jnode.install.*;
 
 /**
  * @author Levente Sántha

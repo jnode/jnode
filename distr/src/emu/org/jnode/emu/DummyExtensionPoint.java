@@ -3,8 +3,8 @@
  */
 package org.jnode.emu;
 
-import org.jnode.plugin.ExtensionPoint;
 import org.jnode.plugin.Extension;
+import org.jnode.plugin.ExtensionPoint;
 import org.jnode.plugin.ExtensionPointListener;
 import org.jnode.plugin.PluginDescriptor;
 

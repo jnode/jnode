@@ -1,10 +1,7 @@
 package org.jnode.apps.jpartition.swingview.actions;
 
 import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.Icon;
-
+import javax.swing.*;
 import org.apache.log4j.Logger;
 import org.jnode.apps.jpartition.commands.BaseDeviceCommand;
 import org.jnode.apps.jpartition.commands.framework.Command;

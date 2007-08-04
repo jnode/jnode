@@ -36,14 +36,13 @@ import charva.awt.event.KeyEvent;
 import charvax.swing.*;
 import charvax.swing.border.TitledBorder;
 import gnu.java.io.NullOutputStream;
-import org.jnode.shell.CommandShell;
-import org.jnode.shell.Shell;
-import org.jnode.shell.ShellUtils;
-
-import javax.naming.NameNotFoundException;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import javax.naming.NameNotFoundException;
+import org.jnode.shell.CommandShell;
+import org.jnode.shell.Shell;
+import org.jnode.shell.ShellUtils;
 
 /**
  * User: Sam Reid

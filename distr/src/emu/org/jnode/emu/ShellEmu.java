@@ -1,7 +1,7 @@
 package org.jnode.emu;
 
-import org.jnode.driver.console.swing.SwingTextScreenConsoleManager;
 import org.jnode.driver.console.ConsoleManager;
+import org.jnode.driver.console.swing.SwingTextScreenConsoleManager;
 import org.jnode.shell.CommandShell;
 
 /**

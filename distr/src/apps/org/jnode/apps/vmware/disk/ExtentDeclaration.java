@@ -1,7 +1,6 @@
 package org.jnode.apps.vmware.disk;
 
 import java.io.File;
-
 import org.jnode.apps.vmware.disk.extent.Access;
 import org.jnode.apps.vmware.disk.extent.ExtentType;
 

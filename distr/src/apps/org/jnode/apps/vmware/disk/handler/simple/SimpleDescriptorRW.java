@@ -4,7 +4,6 @@
 package org.jnode.apps.vmware.disk.handler.simple;
 
 import java.io.IOException;
-
 import org.jnode.apps.vmware.disk.ExtentDeclaration;
 import org.jnode.apps.vmware.disk.descriptor.Descriptor;
 import org.jnode.apps.vmware.disk.descriptor.DescriptorRW;

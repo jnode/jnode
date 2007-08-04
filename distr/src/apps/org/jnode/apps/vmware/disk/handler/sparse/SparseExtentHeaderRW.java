@@ -2,9 +2,7 @@ package org.jnode.apps.vmware.disk.handler.sparse;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.Channel;
 import java.nio.channels.FileChannel;
-
 import org.apache.log4j.Logger;
 import org.jnode.apps.vmware.disk.IOUtils;
 import org.jnode.apps.vmware.disk.handler.UnsupportedFormatException;

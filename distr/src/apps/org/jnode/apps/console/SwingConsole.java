@@ -1,16 +1,15 @@
 package org.jnode.apps.console;
 
-import org.jnode.driver.console.ConsoleManager;
-import org.jnode.driver.console.TextConsole;
-import org.jnode.driver.console.textscreen.TextScreenConsoleManager;
-import org.jnode.driver.console.swing.SwingTextScreenConsoleManager;
-import org.jnode.shell.CommandShell;
-import org.jnode.shell.ShellManager;
-import org.jnode.naming.InitialNaming;
-
-import javax.swing.JFrame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import javax.swing.*;
+import org.jnode.driver.console.ConsoleManager;
+import org.jnode.driver.console.TextConsole;
+import org.jnode.driver.console.swing.SwingTextScreenConsoleManager;
+import org.jnode.driver.console.textscreen.TextScreenConsoleManager;
+import org.jnode.naming.InitialNaming;
+import org.jnode.shell.CommandShell;
+import org.jnode.shell.ShellManager;
 
 /**
  * @author Levente S\u00e1ntha

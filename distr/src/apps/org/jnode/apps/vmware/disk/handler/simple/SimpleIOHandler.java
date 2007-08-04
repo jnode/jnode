@@ -4,7 +4,6 @@
 package org.jnode.apps.vmware.disk.handler.simple;
 
 import java.io.IOException;
-
 import org.jnode.apps.vmware.disk.handler.FileDescriptor;
 import org.jnode.apps.vmware.disk.handler.IOHandler;
 import org.jnode.apps.vmware.disk.handler.UnsupportedFormatException;

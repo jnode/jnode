@@ -1,20 +1,19 @@
 package org.jnode.emu;
 
-import org.jnode.naming.InitialNaming;
-import org.jnode.naming.NameSpace;
-import org.jnode.shell.alias.AliasManager;
-import org.jnode.shell.alias.def.DefaultAliasManager;
-import org.jnode.shell.ShellManager;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.def.DefaultHelp;
-import org.jnode.shell.def.DefaultShellManager;
-
-import javax.naming.NamingException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import javax.naming.NameAlreadyBoundException;
 import javax.naming.NameNotFoundException;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Set;
+import javax.naming.NamingException;
+import org.jnode.naming.InitialNaming;
+import org.jnode.naming.NameSpace;
+import org.jnode.shell.ShellManager;
+import org.jnode.shell.alias.AliasManager;
+import org.jnode.shell.alias.def.DefaultAliasManager;
+import org.jnode.shell.def.DefaultShellManager;
+import org.jnode.shell.help.Help;
+import org.jnode.shell.help.def.DefaultHelp;
 
 /**
  * @author Levente S\u00e1ntha

@@ -10,7 +10,6 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.jnode.apps.vmware.disk.extent.Access;
 import org.jnode.apps.vmware.disk.extent.ExtentType;

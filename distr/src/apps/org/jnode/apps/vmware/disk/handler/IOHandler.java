@@ -5,10 +5,8 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.jnode.apps.vmware.disk.descriptor.Descriptor;
-import org.jnode.apps.vmware.disk.descriptor.DescriptorRW;
 import org.jnode.apps.vmware.disk.descriptor.DiskDatabase;
 import org.jnode.apps.vmware.disk.extent.Extent;
 

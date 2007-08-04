@@ -3,7 +3,6 @@ package org.jnode.apps.vmware.disk.handler.sparse;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
-
 import org.apache.log4j.Logger;
 import org.jnode.apps.vmware.disk.extent.Extent;
 import org.jnode.apps.vmware.disk.handler.ExtentIO;

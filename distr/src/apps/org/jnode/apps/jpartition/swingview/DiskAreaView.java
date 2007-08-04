@@ -1,13 +1,9 @@
 package org.jnode.apps.jpartition.swingview;
 
-import java.awt.Color;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
+import javax.swing.*;
 import org.jnode.apps.jpartition.controller.MainController;
 
 public class DiskAreaView extends JPanel 

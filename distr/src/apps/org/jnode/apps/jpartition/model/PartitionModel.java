@@ -1,7 +1,6 @@
 package org.jnode.apps.jpartition.model;
 
 import it.battlehorse.stamps.annotations.Refreshable;
-
 import org.jnode.partitions.ibm.IBMPartitionTableEntry;
 import org.jnode.partitions.ibm.IBMPartitionTypes;
 

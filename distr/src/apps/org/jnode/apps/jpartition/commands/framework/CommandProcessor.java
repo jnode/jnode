@@ -3,7 +3,6 @@ package org.jnode.apps.jpartition.commands.framework;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
-
 import org.apache.log4j.Logger;
 
 public class CommandProcessor {

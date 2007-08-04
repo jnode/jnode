@@ -2,7 +2,6 @@ package org.jnode.apps.jpartition.model;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.jnode.apps.jpartition.utils.device.DeviceUtils;
 import org.jnode.driver.bus.ide.IDEDevice;
 
