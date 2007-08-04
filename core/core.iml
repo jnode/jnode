@@ -6,13 +6,24 @@
     <exclude-output />
     <exclude-exploded />
     <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src/classpath/ext" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/classpath/gnu" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/classpath/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/classpath/javax" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/classpath/org" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/classpath/tools" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/classpath/vm" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/core" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/driver" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/icedtea" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/mmtk-vm" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/nanoxml" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/openjdk/com" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/openjdk/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/openjdk/javax" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/openjdk/org" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/openjdk/sun" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/openjdk/vm" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/test" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/vmmagic" isTestSource="false" />
     </content>
