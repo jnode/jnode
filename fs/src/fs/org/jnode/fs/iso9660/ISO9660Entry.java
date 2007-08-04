@@ -114,7 +114,7 @@ public final class ISO9660Entry implements FSEntry {
      * @see org.jnode.fs.FSEntry#getAccessRights()
      */
     public FSAccessRights getAccessRights() throws IOException {
-        throw new UnsupportedOperationException("not yet implemented");
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     /**
