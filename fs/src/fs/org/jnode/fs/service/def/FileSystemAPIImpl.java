@@ -262,7 +262,6 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
      * are relative to the given directory.
      * 
      * @param directory
-     * @param filter
      */
     public String[] list(String directory) throws IOException {
         final FSEntry entry = getEntry(directory);
@@ -291,10 +290,16 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
     {
     	FSEntry entry = getEntry(path);
     	if(entry == null)
-    	{
-    		throw new FileNotFoundException("file not found: "+path);
-    	}
-    	return entry.getAccessRights();  
+            throw new FileNotFoundException("file not found: "+path);
+
+        try {
+            return entry.getAccessRights();
+        }catch(UnsupportedOperationException e){
+            //todo review
+            //this feature is not implemented yet in al file system implementations
+            //return null in those cases
+            return null;
+        }
     }
 
     /**

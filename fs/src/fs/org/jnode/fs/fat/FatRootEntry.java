@@ -115,7 +115,7 @@ public class FatRootEntry extends FatObject implements FSEntry {
 	 * @throws IOException
 	 */
 	public FSAccessRights getAccessRights() throws IOException {
-		throw new IOException("Not implemented yet");
+		throw new UnsupportedOperationException("not implemented yet");
 	}
 	
 	/**
