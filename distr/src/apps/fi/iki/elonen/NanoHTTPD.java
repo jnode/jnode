@@ -22,8 +22,10 @@
 package fi.iki.elonen;
 
 import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.URLEncoder;
 import java.util.*;
-import java.net.*;
 
 /**
  * A simple, tiny, nicely embeddable HTTP 1.0 server in Java

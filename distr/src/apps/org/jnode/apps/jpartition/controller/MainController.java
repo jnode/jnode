@@ -3,12 +3,10 @@ package org.jnode.apps.jpartition.controller;
 import it.battlehorse.stamps.Dispatcher;
 import it.battlehorse.stamps.factories.DispatcherRegistry;
 import it.battlehorse.stamps.factories.TransformerRegistry;
-
 import org.jnode.apps.jpartition.ViewFactory;
 import org.jnode.apps.jpartition.model.CommandProcessorModel;
 import org.jnode.apps.jpartition.model.DeviceModel;
 import org.jnode.apps.jpartition.model.FileDeviceModel;
-import org.jnode.apps.jpartition.swingview.MainView;
 
 public class MainController
 {

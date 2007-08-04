@@ -20,7 +20,7 @@
  */
  
 package org.jnode.apps.debug;
-import java.util.Vector;
+
 import charva.awt.BorderLayout;
 import charva.awt.Color;
 import charva.awt.FlowLayout;
@@ -29,6 +29,8 @@ import charvax.swing.JFrame;
 import charvax.swing.JPanel;
 import charvax.swing.border.LineBorder;
 import charvax.swing.border.TitledBorder;
+import java.util.Vector;
+
 /**
  * @author blind
  *  

@@ -1,12 +1,9 @@
 package org.jnode.apps.jpartition.swingview;
 
 import it.battlehorse.stamps.annotations.ModelDependent;
-
-import javax.swing.JPanel;
-
+import javax.swing.*;
 import org.apache.log4j.Logger;
 import org.jnode.apps.jpartition.controller.MainController;
-import org.jnode.apps.jpartition.model.DeviceModel;
 
 public class DeviceView extends JPanel 
 {

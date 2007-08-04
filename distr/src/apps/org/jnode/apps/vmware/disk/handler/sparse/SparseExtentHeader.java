@@ -2,7 +2,6 @@ package org.jnode.apps.vmware.disk.handler.sparse;
 
 
 import org.apache.log4j.Logger;
-import org.jnode.apps.vmware.disk.handler.UnsupportedFormatException;
 
 /**
  * Wrote from the 'Virtual Disk Format 1.0' specifications (from VMWare)

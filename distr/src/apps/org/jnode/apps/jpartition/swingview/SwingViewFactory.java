@@ -1,8 +1,6 @@
 package org.jnode.apps.jpartition.swingview;
 
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-
+import javax.swing.*;
 import org.jnode.apps.jpartition.ViewFactory;
 import org.jnode.apps.jpartition.controller.MainController;
 

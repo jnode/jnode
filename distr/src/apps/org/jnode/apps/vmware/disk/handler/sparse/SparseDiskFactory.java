@@ -7,15 +7,10 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.jnode.apps.vmware.disk.ExtentDeclaration;
 import org.jnode.apps.vmware.disk.IOUtils;
-import org.jnode.apps.vmware.disk.descriptor.AdapterType;
-import org.jnode.apps.vmware.disk.descriptor.CreateType;
-import org.jnode.apps.vmware.disk.descriptor.Descriptor;
-import org.jnode.apps.vmware.disk.descriptor.DiskDatabase;
-import org.jnode.apps.vmware.disk.descriptor.Header;
+import org.jnode.apps.vmware.disk.descriptor.*;
 import org.jnode.apps.vmware.disk.extent.Access;
 import org.jnode.apps.vmware.disk.extent.Extent;
 import org.jnode.apps.vmware.disk.extent.ExtentType;

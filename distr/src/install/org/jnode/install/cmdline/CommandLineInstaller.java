@@ -3,11 +3,14 @@
  */
 package org.jnode.install.cmdline;
 
-import org.jnode.install.*;
-import org.jnode.install.action.*;
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import org.jnode.install.AbstractInstaller;
+import org.jnode.install.InputContext;
+import org.jnode.install.OutputContext;
+import org.jnode.install.action.CopyFilesAction;
+import org.jnode.install.action.GrubInstallerAction;
 
 /**
  * @author Levente Sántha

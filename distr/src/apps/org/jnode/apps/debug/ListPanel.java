@@ -21,18 +21,13 @@
  
 package org.jnode.apps.debug;
 
-import java.util.Vector;
-
 import charva.awt.Dimension;
 import charva.awt.event.KeyAdapter;
 import charva.awt.event.KeyEvent;
-import charvax.swing.DefaultListModel;
-import charvax.swing.JList;
-import charvax.swing.JPanel;
-import charvax.swing.JScrollPane;
-import charvax.swing.ListSelectionModel;
+import charvax.swing.*;
 import charvax.swing.event.ListSelectionEvent;
 import charvax.swing.event.ListSelectionListener;
+import java.util.Vector;
 
 /**
  * 

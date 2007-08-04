@@ -1,7 +1,6 @@
 package org.jnode.apps.vmware.disk.handler;
 
 import java.io.RandomAccessFile;
-
 import org.jnode.apps.vmware.disk.descriptor.Descriptor;
 
 /**

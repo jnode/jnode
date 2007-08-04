@@ -6,11 +6,9 @@ package org.jnode.apps.jpartition.utils;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
 import javax.naming.NameAlreadyBoundException;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
-
 import org.jnode.naming.NameSpace;
 
 public final class BasicNameSpace implements NameSpace {

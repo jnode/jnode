@@ -1,10 +1,7 @@
 package org.jnode.apps.vmware.disk.test;
 
-import java.io.File;
 import java.io.IOException;
-
 import org.apache.log4j.Logger;
-import org.jnode.apps.vmware.disk.IOUtils;
 import org.junit.Test;
 
 

@@ -4,8 +4,8 @@
 package org.jnode.install;
 
 import java.util.ArrayList;
-import java.util.ListIterator;
 import java.util.List;
+import java.util.ListIterator;
 
 /**
  * @author Levente Sántha

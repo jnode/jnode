@@ -1,7 +1,6 @@
 package org.jnode.apps.jpartition.model;
 
 import it.battlehorse.stamps.Model;
-
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 

@@ -4,10 +4,8 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-
 import org.apache.log4j.Logger;
 import org.jnode.apps.vmware.disk.extent.Extent;
-import org.jnode.apps.vmware.disk.handler.sparse.SparseExtentFactory;
 
 /**
  * Wrote from the 'Virtual Disk Format 1.0' specifications (from VMWare)

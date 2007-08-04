@@ -2,7 +2,6 @@ package org.jnode.apps.jpartition.utils.device;
 
 import org.jnode.driver.Driver;
 import org.jnode.driver.DriverException;
-import org.jnode.driver.DeviceAlreadyRegisteredException;
 import org.jnode.driver.bus.ide.IDEDevice;
 
 /**

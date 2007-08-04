@@ -1,12 +1,7 @@
 package org.jnode.apps.vmware.disk.tools;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.channels.FileChannel;
-
 import org.apache.log4j.Logger;
 import org.jnode.apps.vmware.disk.test.Utils;
 

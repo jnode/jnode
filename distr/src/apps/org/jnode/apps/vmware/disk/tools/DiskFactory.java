@@ -2,7 +2,6 @@ package org.jnode.apps.vmware.disk.tools;
 
 import java.io.File;
 import java.io.IOException;
-
 import org.jnode.apps.vmware.disk.handler.sparse.SparseDiskFactory;
 
 /**

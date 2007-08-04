@@ -2,20 +2,13 @@ package org.jnode.apps.jpartition.utils.device;
 
 import java.io.File;
 import java.io.IOException;
-
 import javax.naming.NameNotFoundException;
-
 import org.apache.log4j.Logger;
 import org.jnode.apps.jpartition.swingview.ErrorReporter;
 import org.jnode.apps.jpartition.swingview.FileDeviceView;
 import org.jnode.apps.vmware.disk.VMWareDisk;
 import org.jnode.apps.vmware.disk.tools.DiskFactory;
-import org.jnode.driver.ApiNotFoundException;
-import org.jnode.driver.Device;
-import org.jnode.driver.DeviceAlreadyRegisteredException;
-import org.jnode.driver.DeviceManager;
-import org.jnode.driver.DeviceNotFoundException;
-import org.jnode.driver.DriverException;
+import org.jnode.driver.*;
 import org.jnode.driver.bus.ide.IDEDevice;
 import org.jnode.partitions.command.PartitionHelper;
 import org.jnode.partitions.ibm.IBMPartitionTypes;

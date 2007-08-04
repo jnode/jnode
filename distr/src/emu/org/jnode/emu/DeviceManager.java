@@ -3,11 +3,11 @@
  */
 package org.jnode.emu;
 
-import org.jnode.driver.*;
-import org.apache.log4j.Logger;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import org.apache.log4j.Logger;
+import org.jnode.driver.*;
 
 /**
  * @author Levente Sántha

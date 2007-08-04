@@ -1,7 +1,5 @@
 package org.jnode.apps.vmware.disk.handler.sparse;
 
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 import org.jnode.apps.vmware.disk.test.readwrite.TestVMWareDisk;
 

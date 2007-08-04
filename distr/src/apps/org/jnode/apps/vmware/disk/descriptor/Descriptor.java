@@ -2,12 +2,8 @@ package org.jnode.apps.vmware.disk.descriptor;
 
 import java.io.File;
 import java.util.List;
-
 import org.apache.log4j.Logger;
-import org.jnode.apps.vmware.disk.VMWareDisk;
 import org.jnode.apps.vmware.disk.extent.Extent;
-import org.jnode.apps.vmware.disk.handler.ExtentFactory;
-import org.jnode.apps.vmware.disk.handler.FileDescriptor;
 
 /**
  * Wrote from the 'Virtual Disk Format 1.0' specifications (from VMWare)

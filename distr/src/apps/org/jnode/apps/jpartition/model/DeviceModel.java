@@ -2,9 +2,7 @@ package org.jnode.apps.jpartition.model;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.naming.NameNotFoundException;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceListener;

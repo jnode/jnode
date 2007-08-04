@@ -2,9 +2,7 @@ package org.jnode.apps.jpartition.utils.device;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-
 import javax.naming.NameNotFoundException;
-
 import org.jnode.driver.DriverException;
 import org.jnode.driver.block.PartitionableBlockDeviceAPI;
 import org.jnode.driver.bus.ide.IDEConstants;

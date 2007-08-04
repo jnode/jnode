@@ -25,9 +25,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
-
 import javax.naming.NameNotFoundException;
-
 import org.jnode.naming.InitialNaming;
 
 /**

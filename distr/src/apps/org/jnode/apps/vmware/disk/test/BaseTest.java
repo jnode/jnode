@@ -2,8 +2,6 @@ package org.jnode.apps.vmware.disk.test;
 
 import java.io.File;
 import java.io.IOException;
-
-import org.jnode.apps.vmware.disk.IOUtils;
 import org.jnode.apps.vmware.disk.tools.DiskCopier;
 import org.junit.After;
 import org.junit.Before;

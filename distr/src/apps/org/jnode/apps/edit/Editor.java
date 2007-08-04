@@ -21,33 +21,18 @@
  
 package org.jnode.apps.edit;
 
-import charvax.swing.JFileChooser;
-import charvax.swing.JFrame;
-import charvax.swing.JMenu;
-import charvax.swing.JMenuBar;
-import charvax.swing.JMenuItem;
-import charvax.swing.JOptionPane;
-import charvax.swing.JPanel;
-import charvax.swing.JScrollPane;
-import charvax.swing.JTextArea;
-import charvax.swing.ListSelectionModel;
-import charvax.swing.border.TitledBorder;
 import charva.awt.BorderLayout;
-import charva.awt.Toolkit;
 import charva.awt.Color;
+import charva.awt.Toolkit;
 import charva.awt.event.ActionEvent;
 import charva.awt.event.ActionListener;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
+import charvax.swing.*;
+import charvax.swing.border.TitledBorder;
+import gnu.java.security.action.GetPropertyAction;
+import java.io.*;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-
 import org.apache.log4j.Logger;
-import gnu.java.security.action.GetPropertyAction;
 
 /**
  * @author Levente S\u00e1ntha

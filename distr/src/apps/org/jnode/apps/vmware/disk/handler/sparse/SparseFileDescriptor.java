@@ -1,7 +1,6 @@
 package org.jnode.apps.vmware.disk.handler.sparse;
 
 import java.io.RandomAccessFile;
-
 import org.jnode.apps.vmware.disk.descriptor.Descriptor;
 import org.jnode.apps.vmware.disk.handler.ExtentFactory;
 import org.jnode.apps.vmware.disk.handler.FileDescriptor;

@@ -1,11 +1,10 @@
 package org.jnode.apps.editor;
 
+import java.io.File;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.argument.FileArgument;
-
-import java.io.File;
 
 /**
  * @author Levente S\u00e1ntha

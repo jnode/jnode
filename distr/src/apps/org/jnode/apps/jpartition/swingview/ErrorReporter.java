@@ -1,9 +1,8 @@
 package org.jnode.apps.jpartition.swingview;
 
-import org.apache.log4j.Logger;
-
 import charva.awt.Component;
 import charvax.swing.JOptionPane;
+import org.apache.log4j.Logger;
 
 public class ErrorReporter {
 	public static void reportError(Logger log, Object source, Throwable t) 

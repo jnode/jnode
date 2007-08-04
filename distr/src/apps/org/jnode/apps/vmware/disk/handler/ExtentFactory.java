@@ -3,16 +3,8 @@ package org.jnode.apps.vmware.disk.handler;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.channels.FileChannel.MapMode;
-
 import org.apache.log4j.Logger;
-import org.jnode.apps.vmware.disk.ExtentDeclaration;
-import org.jnode.apps.vmware.disk.IOUtils;
-import org.jnode.apps.vmware.disk.descriptor.Descriptor;
 import org.jnode.apps.vmware.disk.descriptor.DescriptorRW;
-import org.jnode.apps.vmware.disk.extent.Extent;
 import org.jnode.apps.vmware.disk.handler.sparse.SparseExtentFactory;
 
 /**

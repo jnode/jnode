@@ -1,11 +1,10 @@
 package org.jnode.emu;
 
+import java.io.File;
+import org.jnode.apps.editor.TextEditor;
 import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.swing.SwingTextScreenConsoleManager;
 import org.jnode.driver.console.textscreen.TextScreenConsole;
-import org.jnode.apps.editor.TextEditor;
-
-import java.io.File;
 
 /**
  * @author Levente S\u00e1ntha
