@@ -22,39 +22,13 @@
 package org.jnode.build.dependencies;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.jar.JarFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
-import java.util.zip.ZipFile;
-
-import org.apache.bcel.classfile.Constant;
-import org.apache.bcel.classfile.ConstantClass;
-import org.apache.bcel.classfile.ConstantNameAndType;
-import org.apache.bcel.classfile.ConstantPool;
-import org.apache.bcel.classfile.EmptyVisitor;
-import org.apache.bcel.classfile.Field;
-import org.apache.bcel.classfile.Method;
-import org.apache.bcel.classfile.JavaClass;
+import org.apache.bcel.classfile.*;
 import org.apache.bcel.generic.Type;
 import org.apache.bcel.util.ClassPath;
 import org.apache.bcel.util.SyntheticRepository;
@@ -62,12 +36,9 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.types.FileSet;
 import org.jnode.build.AbstractPluginTask;
-import org.jnode.plugin.Extension;
-import org.jnode.plugin.Library;
 import org.jnode.plugin.FragmentDescriptor;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginPrerequisite;
-import org.jnode.plugin.model.PluginDescriptorModel;
 
 /**
  * Task used to check dependencies between plugins.

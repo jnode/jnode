@@ -21,23 +21,12 @@
  
 package org.jnode.jnasm.preprocessor;
 
-import org.jnode.build.AsmSourceInfo;
-
+import java.io.*;
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.io.PrintWriter;
-import java.io.Writer;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.io.StringWriter;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.StringReader;
-import java.io.Reader;
-import java.io.File;
-import java.io.BufferedInputStream;
-import java.lang.reflect.Constructor;
+import org.jnode.build.AsmSourceInfo;
 
 /**
  * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)

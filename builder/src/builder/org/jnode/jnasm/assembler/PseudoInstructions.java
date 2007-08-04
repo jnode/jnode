@@ -21,11 +21,10 @@
  
 package org.jnode.jnasm.assembler;
 
-import org.jnode.assembler.NativeStream;
-import org.jnode.assembler.Label;
-
 import java.util.List;
 import java.util.Map;
+import org.jnode.assembler.Label;
+import org.jnode.assembler.NativeStream;
 
 /**
  * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)

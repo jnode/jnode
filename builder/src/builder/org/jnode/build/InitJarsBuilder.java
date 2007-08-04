@@ -23,7 +23,6 @@ package org.jnode.build;
 
 import java.io.File;
 import java.util.ArrayList;
-
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.Task;

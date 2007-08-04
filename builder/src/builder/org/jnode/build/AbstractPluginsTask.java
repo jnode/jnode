@@ -24,7 +24,6 @@ package org.jnode.build;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-
 import org.apache.tools.ant.Project;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;

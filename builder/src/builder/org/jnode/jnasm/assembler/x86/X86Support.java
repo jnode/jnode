@@ -21,6 +21,11 @@
  
 package org.jnode.jnasm.assembler.x86;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.x86.X86Assembler;
@@ -32,12 +37,6 @@ import org.jnode.jnasm.assembler.AssemblerModule;
 import org.jnode.jnasm.assembler.HardwareSupport;
 import org.jnode.jnasm.assembler.Instruction;
 import org.jnode.vm.x86.X86CpuID;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)

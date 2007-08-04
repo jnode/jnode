@@ -25,7 +25,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.jnode.vm.classmgr.VmField;
 import org.jnode.vm.classmgr.VmType;
 

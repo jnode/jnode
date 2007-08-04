@@ -31,7 +31,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
-
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmSystemClassLoader;

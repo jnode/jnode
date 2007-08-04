@@ -29,16 +29,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-
 import nanoxml.XMLElement;
 import nanoxml.XMLParseException;
-
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.taskdefs.Jar;
 import org.apache.tools.ant.taskdefs.Manifest;
 import org.apache.tools.ant.taskdefs.ManifestException;
-import org.apache.tools.ant.taskdefs.Manifest.Attribute;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.ZipFileSet;
 import org.apache.tools.ant.util.FileUtils;

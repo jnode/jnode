@@ -23,7 +23,6 @@ package org.jnode.jnasm.assembler;
 
 import java.util.List;
 import java.util.Map;
-
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 
