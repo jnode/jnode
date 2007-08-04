@@ -210,11 +210,6 @@ implements KeyboardListener, FocusListener, DeviceListener {
                 refreshCurrentLine();
             }
             break;
-        // if its a delete we want to remove one under the cursor
-        case KeyEvent.VK_DELETE:
-            currentLine.delete();
-            refreshCurrentLine();
-            break;
         // if its an enter key we want to process the command, and then resume
         // the thread
         case '\n':
@@ -317,6 +312,11 @@ implements KeyboardListener, FocusListener, DeviceListener {
         case KeyEvent.VK_END:
             // the cursor goes at the end of line
             currentLine.moveEnd();
+            refreshCurrentLine();
+            break;
+        // if its a delete we want to remove one under the cursor
+        case KeyEvent.VK_DELETE:
+            currentLine.delete();
             refreshCurrentLine();
             break;
         default: 
