@@ -22,7 +22,6 @@
 package org.jnode.linker;
 
 import java.io.IOException;
-
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.UnresolvedObjectRefException;

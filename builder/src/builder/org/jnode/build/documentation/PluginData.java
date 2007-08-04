@@ -22,7 +22,6 @@
 package org.jnode.build.documentation;
 
 import java.io.File;
-
 import org.jnode.plugin.PluginDescriptor;
 
 /**

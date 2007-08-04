@@ -26,7 +26,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.StringTokenizer;
-
 import org.apache.tools.ant.Project;
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;

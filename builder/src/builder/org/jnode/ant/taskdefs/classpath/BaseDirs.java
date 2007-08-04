@@ -24,7 +24,6 @@ package org.jnode.ant.taskdefs.classpath;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
-
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.Project;

@@ -47,7 +47,6 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Collection;
 import java.util.Vector;
-
 import org.jnode.assembler.UnresolvedObjectRefException;
 import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.assembler.x86.X86BinaryAssembler.X86ObjectRef;

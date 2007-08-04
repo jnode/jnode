@@ -21,14 +21,13 @@
  
 package org.jnode.jnasm.assembler.x86;
 
-import org.jnode.jnasm.assembler.InstructionUtils;
-import org.jnode.jnasm.assembler.Address;
-import org.jnode.jnasm.assembler.Register;
-import org.jnode.assembler.Label;
-import org.jnode.assembler.x86.X86Register;
-
 import java.util.List;
 import java.util.Map;
+import org.jnode.assembler.Label;
+import org.jnode.assembler.x86.X86Register;
+import org.jnode.jnasm.assembler.Address;
+import org.jnode.jnasm.assembler.InstructionUtils;
+import org.jnode.jnasm.assembler.Register;
 
 /**
  * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)

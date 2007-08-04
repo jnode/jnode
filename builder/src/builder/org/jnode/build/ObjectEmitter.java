@@ -27,7 +27,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Set;
-
 import org.jnode.assembler.BootImageNativeStream;
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
@@ -35,13 +34,7 @@ import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.system.BootLog;
 import org.jnode.vm.BootableObject;
 import org.jnode.vm.VmSystemObject;
-import org.jnode.vm.classmgr.VmArrayClass;
-import org.jnode.vm.classmgr.VmClassLoader;
-import org.jnode.vm.classmgr.VmClassType;
-import org.jnode.vm.classmgr.VmField;
-import org.jnode.vm.classmgr.VmInstanceField;
-import org.jnode.vm.classmgr.VmNormalClass;
-import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.classmgr.*;
 import org.vmmagic.unboxed.UnboxedObject;
 
 public class ObjectEmitter {

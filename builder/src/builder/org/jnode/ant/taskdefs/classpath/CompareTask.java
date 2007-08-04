@@ -21,19 +21,11 @@
  
 package org.jnode.ant.taskdefs.classpath;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Execute;

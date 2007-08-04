@@ -25,25 +25,12 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
+import java.util.*;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.types.FileSet;
 import org.jnode.build.AbstractPluginTask;
-import org.jnode.plugin.ConfigurationElement;
-import org.jnode.plugin.Extension;
-import org.jnode.plugin.ExtensionPoint;
-import org.jnode.plugin.Library;
-import org.jnode.plugin.PluginDescriptor;
-import org.jnode.plugin.PluginPrerequisite;
+import org.jnode.plugin.*;
 
 /**
  * @author Martin Husted Hartvig (hagar@jnode.org)

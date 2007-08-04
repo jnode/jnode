@@ -38,11 +38,7 @@ package org.jnode.linker;
 // } Elf32_Shdr;
 //
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.util.Vector;
 
 public class Section {

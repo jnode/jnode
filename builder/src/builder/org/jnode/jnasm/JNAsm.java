@@ -21,13 +21,8 @@
  
 package org.jnode.jnasm;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.Map;
-
 import org.jnode.assembler.NativeStream;
 import org.jnode.build.AsmSourceInfo;
 import org.jnode.jnasm.assembler.Assembler;

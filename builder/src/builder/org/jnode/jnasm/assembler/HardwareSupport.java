@@ -21,10 +21,9 @@
  
 package org.jnode.jnasm.assembler;
 
-import org.jnode.assembler.NativeStream;
-
-import java.io.OutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import org.jnode.assembler.NativeStream;
 
 /**
  * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
