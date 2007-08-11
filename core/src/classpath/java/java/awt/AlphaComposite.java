@@ -43,6 +43,7 @@ import gnu.java.awt.java2d.AlphaCompositeContext;
 import java.awt.image.ColorModel;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.HashMap;
 
 /**
  *
@@ -61,7 +62,7 @@ public final class AlphaComposite implements Composite
     private static final int MAX_CACHE_SIZE = 2048;
 
     /** Prune stale entries. */
-    protected boolean removeEldestEntry(Entry eldest)
+    protected boolean removeEldestEntry(Map.Entry eldest)  //jnode openjdk
     {
       return size() > MAX_CACHE_SIZE;
     }
