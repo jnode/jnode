@@ -38,6 +38,7 @@ import java.io.File;
     This framework avoids the primary disadvantage of using reflection
     for this purpose, namely the loss of compile-time checking. */
 
+@org.jnode.vm.annotation.SharedStatics //jnode
 public class SharedSecrets {
     private static final Unsafe unsafe = Unsafe.getUnsafe();
     private static JavaUtilJarAccess javaUtilJarAccess;
