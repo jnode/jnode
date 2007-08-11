@@ -19,7 +19,11 @@
       <export name="sun.misc.*"/>
       <export name="sun.reflect.Reflection"/>
       <export name="sun.reflect.NativeReflection"/>
+      <export name="sun.reflect.ConstantPool"/>
+      <export name="sun.reflect.NativeConstantPool"/>
+      <export name="sun.reflect.annotation.AnnotationType"/>
       <export name="sun.net.www.protocol.http.InMemoryCookieStore"/>
+      <export name="sun.nio.ch.Interruptible"/>
       <export name="sun.security.util.Debug"/>
       <export name="sun.security.util.SecurityConstants"/>
       <export name="sun.security.action.GetPropertyAction"/>
