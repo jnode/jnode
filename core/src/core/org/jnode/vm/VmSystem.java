@@ -68,6 +68,8 @@ import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.ObjectReference;
 import org.vmmagic.unboxed.Offset;
+import sun.reflect.annotation.AnnotationType;
+import sun.nio.ch.Interruptible;
 
 /**
  * System support for the Virtual Machine
@@ -166,7 +168,36 @@ public final class VmSystem {
             final ConsoleAppender infoApp = new ConsoleAppender(
                     new PatternLayout(LAYOUT));
             root.addAppender(infoApp);
+
+            initOpenJDKSpeciffics();
         }
+    }
+
+    private static void initOpenJDKSpeciffics() {
+        //todo this will be moved to java.lang.System during openjdk integration
+        sun.misc.SharedSecrets.setJavaLangAccess(new sun.misc.JavaLangAccess(){
+            public sun.reflect.ConstantPool getConstantPool(Class klass) {
+                //return klass.getConstantPool();
+                throw new UnsupportedOperationException();
+            }
+            public void setAnnotationType(Class klass, AnnotationType type) {
+                //klass.setAnnotationType(type);
+                throw new UnsupportedOperationException();
+            }
+            public AnnotationType getAnnotationType(Class klass) {
+                //return klass.getAnnotationType();
+                throw new UnsupportedOperationException();
+            }
+            public <E extends Enum<E>>
+		    E[] getEnumConstantsShared(Class<E> klass) {
+                //return klass.getEnumConstantsShared();
+                return klass.getEnumConstants();
+            }
+            public void blockedOn(Thread t, Interruptible b) {
+                //t.blockedOn(b);
+                throw new UnsupportedOperationException();
+            }
+        });
     }
 
     final static boolean isInitialized() {
