@@ -93,5 +93,5 @@ public interface Configuration
   /**
    * Name of default AWT peer library.
    */
-  String default_awt_peer_toolkit = "org.jnode.awt.peer.JNodeToolkit";
+  String default_awt_peer_toolkit = "org.jnode.awt.swingpeers.SwingToolkit";
 }
