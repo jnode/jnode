@@ -31,6 +31,7 @@ import org.jnode.driver.console.InputCompleter;
 import org.jnode.driver.console.TextConsole;
 import org.jnode.driver.console.spi.AbstractConsole;
 import org.jnode.driver.console.spi.ConsoleOutputStream;
+import org.jnode.driver.console.spi.ConsolePrintStream;
 import org.jnode.driver.textscreen.TextScreen;
 import org.jnode.system.event.FocusEvent;
 import org.jnode.system.event.FocusListener;
@@ -62,11 +63,9 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
 	
 	private InputStream in;
 
-	private final PrintStream out;
+	private final ConsolePrintStream out;
 
-	private final PrintStream err;
-	
-	private InputStream savedIn;
+	private final ConsolePrintStream err;
 
 	private PrintStream savedOut;
 
@@ -89,9 +88,9 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
 		this.screen = screen;
 		this.scrWidth = screen.getWidth();
 		this.scrHeight = screen.getHeight();
-		this.savedOut = this.out = new PrintStream(new ConsoleOutputStream(
+		this.savedOut = this.out = new ConsolePrintStream(new ConsoleOutputStream(
 				this, 0x07));
-		this.savedErr = this.err = new PrintStream(new ConsoleOutputStream(
+		this.savedErr = this.err = new ConsolePrintStream(new ConsoleOutputStream(
 				this, 0x04));
 		this.claimSystemOutErr = ((options & ConsoleManager.CreateOptions.NO_SYSTEM_OUT_ERR) == 0);
         this.myIsolate = VmIsolate.currentIsolate();
@@ -141,9 +140,11 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
 			        }
                 }
                 mark = i + 1;
-                putChar(c, color);
+                doPutChar(c, color);
             }
         }
+		screen.ensureVisible(curY);
+        syncScreen();
     }
 
 	/**
@@ -153,6 +154,12 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
 	 * @param color
 	 */
 	public void putChar(char v, int color) {
+		doPutChar(v, color);
+		screen.ensureVisible(curY);
+		syncScreen();
+	}
+	
+	private void doPutChar(char v, int color) {
 		if (v == '\n') {
 			// Goto next line
 			// Clear till eol
@@ -185,9 +192,6 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
 			curY--;
 			clearRow(curY);
 		}
-		screen.ensureVisible(curY);
-		syncScreen();
-		//setCursor(curX, curY);
 	}
 
 	/**
@@ -315,7 +319,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
 	}
 
 	void setIn(InputStream in) {
-		this.savedIn = this.in = in;
+		this.in = in;
 	}
 
 	/**

@@ -223,13 +223,15 @@ implements KeyboardListener, FocusListener, DeviceListener {
         // if it's the tab key, we want to trigger command line completion
         case '\t':
         	if (completer != null) {
-        		CompletionInfo completion = currentLine.complete(currentPrompt);
+        		CompletionInfo completion = currentLine.complete();
         		if (completion.needNewPrompt()) {
         			currentLine.start(true);
         		}
         		refreshCurrentLine();
         	}
             break;
+        // interpret ^D as a soft EOF
+        // FIXME - behavior correct?  cf bash's treatment of ^D
         case CTRL_D:
         	currentLine.moveEnd();
             refreshCurrentLine();
@@ -237,6 +239,8 @@ implements KeyboardListener, FocusListener, DeviceListener {
             eof = true;
             breakChar = true;
             break;
+        // ^L means kill current line and redraw screen.
+        // FIXME - is this behavior useful?  
         case CTRL_L:
         	this.console.clear();
         	this.console.setCursor(0, 0);
@@ -337,7 +341,7 @@ implements KeyboardListener, FocusListener, DeviceListener {
     }
 
     private void refreshCurrentLine() {
-        currentLine.refreshCurrentLine(currentPrompt);
+    	currentLine.refreshCurrentLine();
     }
 
     private boolean fillBuffer() throws IOException {
