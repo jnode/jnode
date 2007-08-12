@@ -22,10 +22,14 @@
 package org.jnode.driver.console.textscreen;
 
 import java.io.PrintStream;
+import java.util.Arrays;
 
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.driver.console.InputCompleter;
 import org.jnode.driver.console.TextConsole;
+import org.jnode.driver.console.spi.ConsolePrintStream;
+
+import com.sun.tools.javac.code.Attribute.Array;
 
 
 /**
@@ -61,14 +65,14 @@ class Line {
     private int oldLength = 0;
 
     private int maxLength = 0;
-
+    
     private final TextConsole console;
 
-    private PrintStream out;
+    private ConsolePrintStream out;
 
     public Line(TextConsole console) {
         this.console = console;
-        this.out = console.getOut();
+        this.out = (ConsolePrintStream) console.getOut();
     }
 
     public void start() {
@@ -157,20 +161,20 @@ class Line {
         }
     }
 
-    public CompletionInfo complete(String currentPrompt) {
+    public CompletionInfo complete() {
         CompletionInfo info = null;
         InputCompleter completer = console.getCompleter();
         if (posOnCurrentLine != currentLine.length()) {
             String ending = currentLine.substring(posOnCurrentLine);
             info = completer.complete(currentLine.substring(0, posOnCurrentLine));
-            printList(info, currentPrompt);
+            printList(info);
             if (info.getCompleted() != null) {
                 setContent(info.getCompleted() + ending);
                 posOnCurrentLine = currentLine.length() - ending.length();
             }
         } else {
             info = completer.complete(currentLine.toString());
-            printList(info, currentPrompt);
+            printList(info);
             if (info.getCompleted() != null) {
                 setContent(info.getCompleted());
                 posOnCurrentLine = currentLine.length();
@@ -180,11 +184,11 @@ class Line {
         return info;
     }
 
-    protected void printList(CompletionInfo info, String currentPrompt) {
+    protected void printList(CompletionInfo info) {
         if ((info != null) && info.hasItems()) {
             int oldPosOnCurrentLine = posOnCurrentLine;
             moveEnd();
-            refreshCurrentLine(currentPrompt);
+            refreshCurrentLine();
 
             out.println();
             String[] list = info.getItems();
@@ -283,7 +287,19 @@ class Line {
         oldLength = 0;
     }
     
-    public void refreshCurrentLine(String currentPrompt) {
+    private volatile char[] mySpaces;
+    
+    private char[] getSpaces(int count) {
+    	char[] res = mySpaces;
+    	if (res == null || res.length < count) {
+    		res = new char[count];
+    		Arrays.fill(res, ' ');
+    		mySpaces = res;
+    	}
+    	return res;
+    }
+    
+    public void refreshCurrentLine() {
         try {
             int x = consoleX;
             int width = console.getWidth();
@@ -292,28 +308,48 @@ class Line {
             if (((x + maxLength) % width) != 0)
                 nbLines++;
 
+            // output the input line buffer contents with the screen cursor hidden
+            console.setCursorVisible(false);
+            console.setCursor(consoleX, consoleY);
+            out.print(currentLine);
+            
+            // get position of end of line
+            // FIXME ... there's a problem here if some application simultaneously
+            // writes to console output.
+            int newConsoleX = console.getCursorX();
+            int newConsoleY = console.getCursorY();
+            
+            // blank to the end of the screen region
+            if (newConsoleX > 0) {
+            	int len = width - newConsoleX;
+            	console.setChar(newConsoleX, newConsoleY, getSpaces(len), 
+            			0, len, out.getFgColor());
+            	newConsoleY++;
+            }
+            for (int i = newConsoleY; i < consoleY + nbLines; i++) {
+                console.clearRow(i);
+            }
+
+            // reset the screen cursor and reveal it
+            // FIXME ... there's a problem here if the input buffer contains
+            // characters that do not render as one screen character; e.g. \t or \n.
+            int inputCursorX = x + posOnCurrentLine;
+            int inputCursorY = consoleY;
+            if (inputCursorX >= width) {
+                inputCursorY += inputCursorX / width;
+                inputCursorX = (inputCursorX % width);
+            }
+            console.setCursor(inputCursorX, inputCursorY);
+            console.setCursorVisible(true);
+            
             // if the line has not been shortened (delete, backspace...)
-            if (!shortened)
-                // scroll up the buffer if necessary, and get the new y
-                console.ensureVisible(consoleY + nbLines - 1);
-
-            for (int i = 0; i < nbLines; i++) {
-                console.clearRow(consoleY + i);
+            if (!shortened) {
+                // ensure that the location of the input cursor is included.
+            	console.ensureVisible(inputCursorY);
             }
-
-            // print the input line
-            console.setCursor(0, consoleY);
-            out.print(currentPrompt + currentLine);
-
-            int posCurX = x + posOnCurrentLine;
-            int posCurY = consoleY;
-            if (posCurX >= width) {
-                posCurY += posCurX / width;
-                posCurX = (posCurX % width);
-            }
-            console.setCursor(posCurX, posCurY);
         } catch (Exception e) {
-            //todo: why is it ignored?
+            // TODO - why ignore these exceptions?  Are they due to the console methods
+        	// not being thread-safe???
         }
     }
 
