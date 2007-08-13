@@ -227,6 +227,7 @@ implements KeyboardListener, FocusListener, DeviceListener {
         		if (completion.needNewPrompt()) {
         			currentLine.start(true);
         		}
+        		out.print(currentPrompt);
         		refreshCurrentLine();
         	}
             break;
@@ -273,7 +274,7 @@ implements KeyboardListener, FocusListener, DeviceListener {
         	// Previous history item
         	if (completer != null) {
         		if (historyIndex == -1) {
-        			historyIndex = completer.getCommandHistory().size();
+        			historyIndex = completer.getInputHistory().size();
                     savedCurrentLine = currentLine.getContent();
                 }
         		historyIndex--;
@@ -287,7 +288,7 @@ implements KeyboardListener, FocusListener, DeviceListener {
                 if (historyIndex == -1)
                     savedCurrentLine = currentLine.getContent();
 
-                if (historyIndex == completer.getCommandHistory().size() - 1)
+                if (historyIndex == completer.getInputHistory().size() - 1)
         			historyIndex = -2;
 
                 historyIndex++;
@@ -332,7 +333,7 @@ implements KeyboardListener, FocusListener, DeviceListener {
 
     private void updateCurrentLine() {
         if (historyIndex > -1) {
-            currentLine.setContent(completer.getCommandHistory().getCommand(historyIndex));
+            currentLine.setContent(completer.getInputHistory().getLineAt(historyIndex));
         } else {
             currentLine.setContent(savedCurrentLine);
         }

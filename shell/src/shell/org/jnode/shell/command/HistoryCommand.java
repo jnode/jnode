@@ -23,7 +23,7 @@ package org.jnode.shell.command;
 import  java.io.PrintStream;
 import  javax.naming.NameNotFoundException;
 
-import org.jnode.driver.console.CommandHistory;
+import org.jnode.driver.console.InputHistory;
 import  org.jnode.shell.help.*;
 import org.jnode.shell.help.argument.OptionArgument;
 import  org.jnode.shell.Shell;
@@ -70,7 +70,7 @@ public class HistoryCommand {
 	private PrintStream out;
 
 	/** Reference to the CommandHistory to work with. **/
-	private CommandHistory history;
+	private InputHistory history;
 
 
 //**********  Constructor  **********//
@@ -115,7 +115,7 @@ public class HistoryCommand {
 	/** List out every command from the history, with each commands index. **/
 	public void listCommands() {
 		for (int x = 0; x < history.size(); x++)
-			out.println("" + x + ": " + history.getCommand(x));
+			out.println("" + x + ": " + history.getLineAt(x));
 		out.println();
 	}
 
@@ -178,10 +178,10 @@ public class HistoryCommand {
 	private String parseCommandArg(String arg) {
 		try {
 			int i = Integer.parseInt(arg);
-			return history.getCommand(i);
+			return history.getLineAt(i);
 		}
 		catch (NumberFormatException nfex) {
-			return history.getCommand(arg);
+			return history.getLineWithPrefix(arg);
 		}
 	}
 

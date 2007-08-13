@@ -22,13 +22,14 @@
 package org.jnode.shell;
 
 import org.jnode.shell.alias.AliasManager;
-import org.jnode.driver.console.CommandHistory;
 import org.jnode.driver.console.Console;
+import org.jnode.driver.console.InputCompleter;
+import org.jnode.driver.console.InputHistory;
 
 /**
  * @author epr
  */
-public interface Shell {
+public interface Shell extends InputCompleter {
 
     /**
      * Gets the alias manager of this shell
@@ -36,15 +37,16 @@ public interface Shell {
     public AliasManager getAliasManager();
 
     /**
-     * Gets the CommandHistory object associated with this shell.
-     */
-    public CommandHistory getCommandHistory();
-
-    /**
      * Prints a list of choices for command line completion.
      */
     public void list(String[] items);
 
+    /**
+     * Gets the shell's command InputHistory object.  Unlike getInputHistory,
+     * this method is not modal.
+     */
+    public InputHistory getCommandHistory();
+    
     /**
      * Returns the console where the shell is running.
      * @return the console
