@@ -347,6 +347,7 @@ class Line {
                 // ensure that the location of the input cursor is included.
             	console.ensureVisible(inputCursorY);
             }
+            console.setCursorVisible(true);
         } catch (Exception e) {
             // TODO - why ignore these exceptions?  Are they due to the console methods
         	// not being thread-safe???

@@ -25,6 +25,7 @@ import gnu.java.security.action.GetPropertyAction;
 import gnu.java.security.action.SetPropertyAction;
 
 import java.io.File;
+import java.io.FilterInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
@@ -42,10 +43,9 @@ import java.util.StringTokenizer;
 import javax.naming.NameNotFoundException;
 
 import org.apache.log4j.Logger;
-import org.jnode.driver.console.CommandHistory;
+import org.jnode.driver.console.InputHistory;
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.driver.console.ConsoleManager;
-import org.jnode.driver.console.InputCompleter;
 import org.jnode.driver.console.TextConsole;
 import org.jnode.driver.console.ConsoleListener;
 import org.jnode.driver.console.ConsoleEvent;
@@ -66,8 +66,9 @@ import org.jnode.vm.VmSystem;
 /**
  * @author epr
  * @author Fabien DUMINY
+ * @authod crawley
  */
-public class CommandShell implements Runnable, Shell, ConsoleListener, InputCompleter {
+public class CommandShell implements Runnable, Shell, ConsoleListener {
 
     public static final String PROMPT_PROPERTY_NAME = "jnode.prompt";
 
@@ -92,12 +93,25 @@ public class CommandShell implements Runnable, Shell, ConsoleListener, InputComp
     /**
      * Contains the archive of commands. *
      */
-    private CommandHistory history = new CommandHistory();
+    private InputHistory commandHistory = new InputHistory();
+    
+    /**
+     * Contains the application input history for the current thread.
+     */
+    private static InheritableThreadLocal<InputHistory> applicationHistory = 
+    	new InheritableThreadLocal<InputHistory> ();
+    
+    private boolean readingCommand;
 
     /**
-     * Contains the newest command being typed in *
+     * Contains the last command entered
      */
-    private String newestLine = "";
+    private String lastCommandLine = "";
+
+    /**
+     * Contains the last application input line entered
+     */
+    private String lastInputLine = "";
 
     /**
      * Flag to know when to wait (while input is happening). This is (hopefully)
@@ -205,7 +219,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener, InputComp
                 if (e.startsWith(command)) {
                     final String cmd = e.substring(command.length());
                     out.println(prompt() + cmd);
-                    processCommand(cmd);
+                    processCommand(cmd, false);
                 }
             } catch (Throwable ex) {
                 ex.printStackTrace(err);
@@ -231,10 +245,10 @@ public class CommandShell implements Runnable, Shell, ConsoleListener, InputComp
             try {
             	clearEof();
             	out.print(prompt());
+            	readingCommand = true;
             	String line = readInputLine().trim();
             	if (line.length() > 0) {
-            		clearEof();
-                	processCommand(line);
+            		processCommand(line, true);
             	}
 
             	if (VmSystem.isShuttingDown()) {
@@ -264,62 +278,23 @@ public class CommandShell implements Runnable, Shell, ConsoleListener, InputComp
     	}
     }
 
-    protected void processCommand(String cmdLineStr) {
-        commandInvoker.invoke(cmdLineStr);
+    protected void processCommand(String cmdLineStr, boolean interactive) {
+    	clearEof();
+    	if (interactive) {
+        	readingCommand = false;
+        	// Each interactive command is launched with a fresh history
+        	// for input completion
+        	applicationHistory.set(new InputHistory());
+    	}
+    	commandInvoker.invoke(cmdLineStr);
+    	if (interactive) {
+        	applicationHistory.set(null);
+    	}
     }
 
     public void invokeCommand(String command) {
-        processCommand(command);
+        processCommand(command, false);
     }
-
-    // /**
-    // * Execute a single command line.
-    // *
-    // * @param cmdLineStr
-    // */
-    // protected void processCommand(String cmdLineStr) {
-    //
-    // final CommandLine cmdLine = new CommandLine(cmdLineStr);
-    // if (!cmdLine.hasNext())
-    // return;
-    // String cmdName = cmdLine.next();
-    //
-    // // Add this command to the history.
-    // if (!cmdLineStr.equals(newestLine))
-    // history.addCommand(cmdLineStr);
-    //
-    // try {
-    // Class cmdClass = getCommandClass(cmdName);
-    // final Method main = cmdClass.getMethod("main", MAIN_ARG_TYPES);
-    // try {
-    // main.invoke(null, new Object[] {
-    // cmdLine.getRemainder().toStringArray()});
-    // } catch (InvocationTargetException ex) {
-    // Throwable tex = ex.getTargetException();
-    // if (tex instanceof SyntaxError) {
-    // Help.getInfo(cmdClass).usage();
-    // err.println(tex.getMessage());
-    // } else {
-    // err.println("Exception in command");
-    // tex.printStackTrace(err);
-    // }
-    // } catch (Exception ex) {
-    // err.println("Exception in command");
-    // ex.printStackTrace(err);
-    // } catch (Error ex) {
-    // err.println("Fatal error in command");
-    // ex.printStackTrace(err);
-    // }
-    // } catch (NoSuchMethodException ex) {
-    // err.println("Alias class has no main method " + cmdName);
-    // } catch (ClassNotFoundException ex) {
-    // err.println("Unknown alias class " + ex.getMessage());
-    // } catch (ClassCastException ex) {
-    // err.println("Invalid command " + cmdName);
-    // } catch (Exception ex) {
-    // err.println("I FOUND AN ERROR: " + ex);
-    // }
-    // }
 
     protected CommandInfo getCommandClass(String cmd)
             throws ClassNotFoundException {
@@ -341,10 +316,22 @@ public class CommandShell implements Runnable, Shell, ConsoleListener, InputComp
     }
 
     /**
-     * Gets the CommandHistory object associated with this shell.
+     * Gets the shell's command InputHistory object.
      */
-    public CommandHistory getCommandHistory() {
-        return history;
+    public InputHistory getCommandHistory() {
+    	return commandHistory;
+    }
+
+    /**
+     * Gets the shell's currently active InputHistory object.
+     */
+    public InputHistory getInputHistory() {
+    	if (readingCommand) {
+            return commandHistory;
+    	}
+    	else {
+    		return CommandShell.applicationHistory.get();
+    	}
     }
 
     /**
@@ -405,14 +392,23 @@ public class CommandShell implements Runnable, Shell, ConsoleListener, InputComp
     private CompletionInfo completion;
 
     public CompletionInfo complete(String partial) {
+        if (!readingCommand) {
+        	// dummy completion behavior for application input.
+        	CompletionInfo completion = new CompletionInfo();
+            completion.setCompleted(partial);
+            completion.setNewPrompt(true);
+        	return completion;
+        }
+        
         // workaround to set the currentShell to this shell
         try {
             ShellUtils.getShellManager().registerShell(this);
         } catch (NameNotFoundException ex) {
         }
 
-        completion = new CompletionInfo();
+        // do command completion
         String result = null;
+        completion = new CompletionInfo();
         try {
             CommandLine cl = new CommandLine(partial);
             String cmd = "";
@@ -472,13 +468,73 @@ public class CommandShell implements Runnable, Shell, ConsoleListener, InputComp
     }
 
     public void addCommandToHistory(String cmdLineStr) {
-        // Add this command to the history.
-        if (isHistoryEnabled() && !cmdLineStr.equals(newestLine))
-            history.addCommand(cmdLineStr);
+        // Add this command to the command history.
+        if (isHistoryEnabled() && !cmdLineStr.equals(lastCommandLine)) {
+            commandHistory.addLine(cmdLineStr);
+            lastCommandLine = cmdLineStr;
+        }
+    }
+
+    public void addInputToHistory(String inputLine) {
+        // Add this input to the application input history.
+        if (isHistoryEnabled() && !inputLine.equals(lastInputLine)) {
+            InputHistory history = applicationHistory.get();
+            if (history != null) {
+            	history.addLine(inputLine);
+            	lastInputLine = inputLine;
+            }
+        }
     }
 
     public InputStream getInputStream() {
-        return in;
+    	if (isHistoryEnabled()) {
+    		// Insert a filter on the input stream that adds completed input lines
+    		// to the application input history.
+    		// TODO - revisit for support of muilt-byte character encodings.
+    		return new FilterInputStream(in) {
+    			private StringBuilder line = new StringBuilder();
+    			
+				@Override
+				public int read() throws IOException {
+					int res = super.read();
+					if (res != -1) {
+						filter((byte) res);
+					}
+					return res;
+				}
+
+				@Override
+				public int read(byte[] buf, int offset, int len) throws IOException {
+					int res = super.read(buf, offset, len);
+					for (int i = 0; i < res; i++) {
+						filter(buf[offset + i]);
+					}
+					return res;
+				}
+
+				@Override
+				public int read(byte[] buf) throws IOException {
+					int res = super.read(buf);
+					for (int i = 0; i < res; i++) {
+						filter(buf[i]);
+					}
+					return res;
+				}
+				
+				private void filter(byte b) {
+					if (b == '\n') {
+						addInputToHistory(line.toString());
+						line.setLength(0);
+					}
+					else {
+						line.append((char) b);
+					}
+				}
+    		};
+    	}
+    	else {
+            return in;
+    	}
     }
 
     public PrintStream getOutputStream() {
