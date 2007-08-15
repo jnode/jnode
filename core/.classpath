@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src/openjdk/vm"/>
+	<classpathentry kind="src" path="src/openjdk/org"/>
+	<classpathentry kind="src" path="src/openjdk/com"/>
+	<classpathentry kind="src" path="src/icedtea"/>
+	<classpathentry kind="src" path="src/classpath/gnu"/>
 	<classpathentry kind="src" path="src/openjdk/java"/>
 	<classpathentry kind="src" path="src/openjdk/javax"/>
 	<classpathentry kind="src" path="src/openjdk/sun"/>
-	<classpathentry kind="src" path="src/classpath/gnu"/>
-	<classpathentry kind="src" path="src/classpath/sun"/>
 	<classpathentry kind="src" path="src/classpath/tools"/>
 	<classpathentry kind="src" path="src/classpath/java"/>
 	<classpathentry kind="src" path="src/classpath/javax"/>
@@ -17,7 +19,6 @@
 	<classpathentry kind="src" path="src/mmtk-vm"/>
 	<classpathentry kind="src" path="src/driver"/>
 	<classpathentry kind="src" path="src/test"/>
-	<classpathentry kind="src" path="src/native/x86"/>
 	<classpathentry kind="lib" path="lib/ant.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.8.jar"/>
 	<classpathentry kind="lib" path="lib/junit.jar"/>
