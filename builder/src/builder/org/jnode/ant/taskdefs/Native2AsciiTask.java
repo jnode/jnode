@@ -34,38 +34,16 @@ import org.apache.tools.ant.types.FileSet;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class Native2AsciiTask extends Task {
-
-    private final ArrayList<FileSet> fileSets = new ArrayList<FileSet>();
+public class Native2AsciiTask extends FileSetTask {
 
     private boolean update = false;
-
-    public void addFileSet(FileSet fs) {
-        fileSets.add(fs);
-    }
-
-    public void execute() throws BuildException {
-        try {
-            for (FileSet fs : fileSets) {
-                final String[] files = fs.getDirectoryScanner(getProject())
-                        .getIncludedFiles();
-                final int fileCount = files.length;
-                for (int j = 0; j < fileCount; j++) {
-                    final String fname = files[j];
-                    processFile(new File(fs.getDir(getProject()), fname));
-                }
-
-            }
-        } catch (IOException ex) {
-            throw new BuildException(ex);
-        }
-    }
 
     public final boolean isUpdate() {
         return update;
     }
 
-    private void processFile(File file) throws IOException {
+	@Override
+    protected void processFile(File file) throws IOException {
         if (containsNonAscii(file)) {
             final File tmp = File.createTempFile("jnode", "n2a");
             try {

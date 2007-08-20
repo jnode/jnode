@@ -30,16 +30,12 @@ import org.apache.tools.ant.types.FileSet;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class HeaderTask extends Task {
-
-	private final ArrayList<FileSet> fileSets = new ArrayList<FileSet>();
+public class HeaderTask extends FileSetTask {
 
 	private File headerFile;
+	private String[] header;
 	
 	private boolean update = false;
-	public void addFileSet(FileSet fs) {
-		fileSets.add(fs);
-	}
 	
 	private boolean compareHeader(String[] lines, String[] header) {
 		final int linesCnt = lines.length;
@@ -77,18 +73,8 @@ public class HeaderTask extends Task {
 			throw new BuildException("HeaderFile must be set");
 		}
 		try {
-			final String[] header = readFile(headerFile);
-
-			for (FileSet fs : fileSets) {
-				final String[] files = fs.getDirectoryScanner(getProject())
-						.getIncludedFiles();
-				final int fileCount = files.length;
-				for (int j = 0; j < fileCount; j++) {
-					final String fname = files[j];
-					processFile(new File(fs.getDir(getProject()), fname), header);
-				}
-
-			}
+			header = readFile(headerFile);
+			processFiles();
 		} catch (IOException ex) {
 			throw new BuildException(ex);
 		}
@@ -102,7 +88,8 @@ public class HeaderTask extends Task {
 		return update;
 	}
 
-	private void processFile(File file, String[] header) throws IOException {
+	@Override
+	protected void processFile(File file) throws IOException {
 		final String[] inp = readFile(file);
 		if (!compareHeader(inp, header)) {
 			if (update) {
