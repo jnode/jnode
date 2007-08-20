@@ -55,9 +55,10 @@
     <property name="jmock-cglib.jar" value="${root.dir}/core/lib/jmock-cglib-1.0.1.jar"/>
     <property name="jmock.jar" value="${root.dir}/core/lib/jmock-1.0.1.jar"/>
     <property name="cglib.jar" value="${root.dir}/core/lib/cglib-2.1.jar"/>
-    <property name="asm.jar" value="${root.dir}/core/lib/asm.jar"/>
-	  <property name="jcfe.jar" value="${root.dir}/core/lib/jcfe.jar"/>
-	  <property name="jfunc.jar" value="${root.dir}/core/lib/jfunc.jar"/>
+    <property name="asm.jar" value="${root.dir}/core/lib/asm-1.5.3.jar"/>
+	<property name="asm-attrs.jar" value="${root.dir}/core/lib/asm-attrs-1.5.3.jar"/>
+	<property name="jcfe.jar" value="${root.dir}/core/lib/jcfe.jar"/>
+	<property name="jfunc.jar" value="${root.dir}/core/lib/jfunc.jar"/>
 	
     <property name="log4j.jar" value="${root.dir}/core/lib/log4j-1.2.8.jar"/>
     <property name="gnu-crypto.jar" value="${root.dir}/core/lib/gnu-crypto.jar"/>
@@ -92,6 +93,7 @@
         <pathelement location="${jmock.jar}"/>
         <pathelement location="${jmock-cglib.jar}"/>
         <pathelement location="${asm.jar}"/>
+    	<pathelement location="${asm-attrs.jar}"/>
         <pathelement location="${cglib.jar}"/>
         <pathelement location="${log4j.jar}"/>
         <pathelement location="${gnu-crypto.jar}"/>
@@ -164,7 +166,7 @@
     </target>
 
     <!-- Assemble all plugins -->
-    <target name="assemble-plugins" depends="assemble-projects">
+    <target name="assemble-plugins" depends="assemble-projects,openjdk-annotate">
         <!-- Now assemble all plugins -->
         <taskdef name="plugin" classname="org.jnode.build.PluginTask" classpathref="cp-jnode"/>
         <plugin todir="${plugins.dir}" tmpdir="${build.dir}/tmp/plugins" pluginDir="${descriptors.dir}">
@@ -199,6 +201,7 @@
             <libalias name="jmock-1.0.1.jar" alias="${jmock.jar}"/>
             <libalias name="jmock-cglib-1.0.1.jar" alias="${jmock-cglib.jar}"/>
             <libalias name="asm.jar" alias="${asm.jar}"/>
+        	<libalias name="asm-attrs.jar" alias="${asm-attrs.jar}"/>
             <libalias name="cglib.jar" alias="${cglib.jar}"/>
         	<libalias name="mauve.jar" alias="${mauve.jar}"/>
         	<libalias name="jcfe.jar" alias="${jcfe.jar}"/>
@@ -571,7 +574,6 @@ clean             Remove all intermediate build results.
             <patternset id="cp-sources-pattern">
                 <exclude name="com/sun/demo/**/*"/>
                 <exclude name="com/sun/tools/hat/**/*"/>
-                <exclude name="com/sun/tools/hat/**/*"/>
                 <exclude name="com/sun/tools/example/**/*"/>
                 <exclude name="com/sun/tools/javah/**/*"/>
                 <exclude name="com/sun/tools/internal/txw2/**/*"/>
@@ -620,6 +622,19 @@ clean             Remove all intermediate build results.
                 </classpathsources>
             </cp-compare>
         </target>
+
+	<!-- add annotations to compiled openjdk classes -->
+    <target name="openjdk-annotate" depends="assemble-projects">
+    	<echo message="openjdk-annotate"/>
+        <taskdef name="oj-annotate" classname="org.jnode.ant.taskdefs.AnnotateTask" 
+        		classpathref="cp-jnode"/>
+
+        <oj-annotate annotationFile="${root.dir}/all/conf/openjdk-annotations.properties">
+            <fileset dir="${root.dir}/core/build/classes">
+                <patternset includes="**/*.class"/>
+            </fileset>        	
+        </oj-annotate>
+    </target>
 
     <!-- Run all tests -->
     <target name="tests" depends="assemble">

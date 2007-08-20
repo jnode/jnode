@@ -3,13 +3,16 @@
 
 <plugin id="org.objectweb.asm" 
         name="ASM classes"
-        version="1"
+        version="1.5.3"
         provider-name="Objectweb"
         provider-url="http://objectweb.org"
         license-name="bsd">
         
   <runtime>
     <library name="asm.jar">
+      <export name="org.objectweb.asm.*"/>
+    </library>
+    <library name="asm-attrs.jar">
       <export name="org.objectweb.asm.*"/>
     </library>
   </runtime>        
