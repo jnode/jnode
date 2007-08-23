@@ -35,6 +35,7 @@ import org.jnode.driver.console.spi.ConsolePrintStream;
 import org.jnode.driver.textscreen.TextScreen;
 import org.jnode.system.event.FocusEvent;
 import org.jnode.system.event.FocusListener;
+import org.jnode.vm.VmSystem;
 import org.jnode.vm.isolate.VmIsolate;
 
 /**
@@ -363,7 +364,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
 		if (in instanceof FocusListener) {
 			((FocusListener) in).focusGained(event);
 		}
-		if (claimSystemOutErr) {
+		if (claimSystemOutErr && VmSystem.hasVmIOContext()) {
             myIsolate.invokeAndWait(new Runnable() {
                 public void run() {
                     AccessController.doPrivileged(new PrivilegedAction<Object>() {
@@ -385,7 +386,7 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
 		if (in instanceof FocusListener) {
 			((FocusListener) in).focusLost(event);
 		}
-		if (claimSystemOutErr) {
+		if (claimSystemOutErr && VmSystem.hasVmIOContext()) {
             myIsolate.invokeAndWait(new Runnable() {
                 public void run() {
                     savedOut = System.out;

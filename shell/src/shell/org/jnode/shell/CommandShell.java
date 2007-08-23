@@ -131,6 +131,8 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     private ThreadCommandInvoker threadCommandInvoker;
 
     private DefaultCommandInvoker defaultCommandInvoker;
+    
+    private ProcletCommandInvoker procletCommandInvoker;
 
     private boolean historyEnabled = true;
 
@@ -148,11 +150,24 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     }
 
     public void setThreadCommandInvoker() {
-        this.commandInvoker = threadCommandInvoker;
+    	if (this.commandInvoker != threadCommandInvoker) {
+    		err.println("Switched to thread invoker");
+            this.commandInvoker = threadCommandInvoker;
+    	}
     }
 
     public void setDefaultCommandInvoker() {
-        this.commandInvoker = defaultCommandInvoker;
+    	if (this.commandInvoker != defaultCommandInvoker) {
+    		err.println("Switched to default invoker");
+    		this.commandInvoker = defaultCommandInvoker;
+    	}
+    }
+
+    public void setProcletCommandInvoker() {
+    	if (this.commandInvoker != procletCommandInvoker) {
+    		err.println("Switched to proclet invoker");
+    		this.commandInvoker = procletCommandInvoker;
+    	}
     }
 
     /**
@@ -176,6 +191,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
 
             defaultCommandInvoker = new DefaultCommandInvoker(this);
             threadCommandInvoker = new ThreadCommandInvoker(this);
+            procletCommandInvoker = new ProcletCommandInvoker(this);
             this.commandInvoker = threadCommandInvoker; // default to separate
             this.console.addConsoleListener(this);
             // threads for commands.
@@ -243,6 +259,18 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         // Now become interactive
         while (!isExitted()) {
             try {
+            	// Temporary mechanism for switching invokers
+            	String invokerName = System.getProperty("jnode.invoker", "");
+            	if (invokerName.equalsIgnoreCase("default")) {
+            		setDefaultCommandInvoker();
+            	}
+            	else if (invokerName.equalsIgnoreCase("thread")) {
+            		setThreadCommandInvoker();
+            	}
+            	else if (invokerName.equalsIgnoreCase("proclet")) {
+            		setProcletCommandInvoker();
+            	}
+            	
             	clearEof();
             	out.print(prompt());
             	readingCommand = true;

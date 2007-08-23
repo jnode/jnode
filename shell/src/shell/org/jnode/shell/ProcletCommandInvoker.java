@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: ThreadCommandInvoker.java 3374 2007-08-02 18:15:27Z lsantha $
  *
  * JNode.org
  * Copyright (C) 2003-2006 JNode.org
@@ -29,13 +29,15 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.HelpException;
 import org.jnode.shell.help.SyntaxErrorException;
+import org.jnode.shell.proclet.ProcletContext;
+import org.jnode.shell.proclet.ProcletIOContext;
 import org.jnode.vm.VmExit;
+import org.jnode.vm.VmSystem;
 
 /**
  * User: Sam Reid Date: Dec 20, 2003 Time: 1:20:33 AM Copyright (c) Dec 20, 2003
@@ -45,20 +47,24 @@ import org.jnode.vm.VmExit;
  * @author Martin Husted Hartvig (hagar@jnode.org)
  * @author crawley@jnode.org
  */
-public class ThreadCommandInvoker extends AsyncCommandInvoker {
+public class ProcletCommandInvoker extends AsyncCommandInvoker {
 
-    public ThreadCommandInvoker(CommandShell commandShell) {
+    public ProcletCommandInvoker(CommandShell commandShell) {
         super(commandShell);
     }
     
-    Thread createThread(Runnable cr, InputStream inputStream, PrintStream outputStream, PrintStream errStream) {
-    	return new Thread(cr, cmdName);
-	}
-    
-	Runnable createRunner(Class cx, Method method, Object[] args, InputStream commandIn, PrintStream commandOut, PrintStream commandErr) {
-		return new CommandRunner(cx, method, args, commandIn, commandOut, commandErr);
-	}
+    Thread createThread(Runnable cr, InputStream inputStream, 
+    		PrintStream outputStream, PrintStream errStream) {
+        VmSystem.switchToExternalIOContext(new ProcletIOContext());
+        return ProcletContext.createProclet(
+        		cr, null, null,
+        		new Object[]{inputStream, outputStream, errStream},
+        		cmdName);
+    }
 
+    Runnable createRunner(Class cx, Method method, Object[] args, InputStream commandIn, PrintStream commandOut, PrintStream commandErr) {
+		return new CommandRunner(cx, method, args);
+	}
 
 	class CommandRunner implements Runnable {
 
@@ -68,34 +74,17 @@ public class ThreadCommandInvoker extends AsyncCommandInvoker {
 
         Object[] args;
         
-        private InputStream commandIn;
-        private PrintStream commandOut;
-        private PrintStream commandErr;
-
         boolean finished = false;
 
-        public CommandRunner(Class cx, Method method, Object[] args, 
-        		InputStream commandIn, PrintStream commandOut, PrintStream commandErr) {
+        public CommandRunner(Class cx, Method method, Object[] args) {
             this.cx = cx;
             this.method = method;
             this.args = args;
-            this.commandIn = commandIn;
-            this.commandOut = commandOut;
-            this.commandErr = commandErr;
         }
 
         public void run() {
             try {
-                try {
-                	//
-                	AccessController.doPrivileged(new PrivilegedAction() {
-        				public Object run() {
-        					System.setOut(commandOut);
-        					System.setErr(commandErr);
-        					System.setIn(commandIn);
-        					return null;
-        				}
-        			});
+            	try {
                     Object obj = null;
                 	if(!Modifier.isStatic(method.getModifiers())) {
                 		obj = cx.newInstance();
