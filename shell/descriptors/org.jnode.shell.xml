@@ -23,6 +23,7 @@
       <export name="org.jnode.shell.help.*"/>
       <export name="org.jnode.shell.help.argument.*"/>
       <export name="org.jnode.shell.help.def.*"/>
+      <export name="org.jnode.shell.proclet.*"/>
     </library>
   </runtime>
         
@@ -36,7 +37,9 @@
     <permission class="java.net.SocketPermission" name="*" actions="resolve,listen,connect"/>
     <permission class="java.net.SocketPermission" name="*:0-" actions="connect,resolve,listen"/>
     <permission class="java.util.PropertyPermission" name="jnode.cmdline" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="jnode.invoker" actions="read"/>
     <permission class="java.util.PropertyPermission" name="jnode.prompt" actions="read,write"/>
+    <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>
     <permission class="java.util.PropertyPermission" name="user.dir" actions="read"/>
   </extension>
         

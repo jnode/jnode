@@ -229,13 +229,11 @@ public class AnnotateTask extends FileSetTask {
 		ClassWriter cw = new ClassWriter(false);
 		try {
 			ClassReader cr = new ClassReader(inputClass);
-			cr.accept(new MarkerClassVisitor(cw), 
-					AbstractVisitor.getDefaultAttributes(), false);
-
+			cr.accept(new MarkerClassVisitor(cw), AbstractVisitor.getDefaultAttributes(), false);
 			byte[] b = cw.toByteArray();
 			outputClass.write(b);
 		} catch (Exception ex) {
-			throw new BuildException("Unable to load class in file "+fileName);
+			throw new BuildException("Unable to load class in file "+fileName, ex);
 		}
 	}
 

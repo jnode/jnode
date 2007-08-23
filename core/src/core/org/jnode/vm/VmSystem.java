@@ -43,7 +43,6 @@ import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.system.SimpleResourceOwner;
-import org.jnode.util.SystemInputStream;
 import org.jnode.vm.annotation.Internal;
 import org.jnode.vm.annotation.KernelSpace;
 import org.jnode.vm.annotation.MagicPermission;
@@ -213,6 +212,10 @@ public final class VmSystem {
         if (bootOut == null) {
             bootOut = new SystemOutputStream();
             bootOutStream = new PrintStream(bootOut, true);
+            //globalOutStream = globalErrStream = bootOutStream;
+            ioContext.setGlobalOutStream(bootOutStream);
+            ioContext.setGlobalErrStream(bootOutStream);
+
         }
         return bootOutStream;
     }
@@ -969,42 +972,50 @@ public final class VmSystem {
     }
 
     /**
-     * Set in to a new InputStream.
+     * Set the effective System.in to a different InputStream.  The actual behavior depends
+     * on whether we're in proclet mode or not.  If we are, we set the appropriate proxied stream, 
+     * to the new stream, depending on whether the current thread is a ProcletContext or not.  
+     * Otherwise, we update the System.in field.
      * 
-     * @param in
-     *            the new InputStream
+     * @param in the new InputStream
      * @see #setIn(InputStream)
      */
+    @PrivilegedActionPragma
     public static void setIn(InputStream in) {
-        SystemInputStream.getInstance().setIn(in);
+        ioContext.setSystemIn(in);
     }
 
     /**
-     * Set {@link #out}to a new PrintStream.
+     * Set the effective System.out to a different PrintStream.  The actual behavior depends
+     * on whether we're in proclet mode or not.  If we are, we set the appropriate proxied stream, 
+     * to the new stream, depending on whether the current thread is a ProcletContext or not.  
+     * Otherwise, we update the System.out field.
      * 
-     * @param out
-     *            the new PrintStream
-     * @see #setOut(PrintStream)
+     * @param out the new PrintStream
+     * @see java.lang.System#setOut(PrintStream)
      */
     @PrivilegedActionPragma
     public static void setOut(PrintStream out) {
-        setStaticField(System.class, "out", out);
+        ioContext.setSystemOut(out);
     }
 
     /**
-     * Set err to a new PrintStream.
+     * Set the effective System.err to a different PrintStream.  The actual behavior depends
+     * on whether we're in proclet mode or not.  If we are, we set the appropriate proxied stream, 
+     * to the new stream, depending on whether the current thread is a ProcletContext or not.  
+     * Otherwise, we update the System.err field.
      * 
-     * @param err
-     *            the new PrintStream
-     * @see #setErr(PrintStream)
+     * @param err the new PrintStream
+     * @see java.lang.System#setErr(PrintStream)
      */
     @PrivilegedActionPragma
     public static void setErr(PrintStream err) {
-        setStaticField(System.class, "err", err);
+        ioContext.setSystemErr(err);
     }
 
+    //todo protect this method from arbitrary access
     @PrivilegedActionPragma
-    private static void setStaticField(Class< ? > clazz, String fieldName,
+    public static void setStaticField(Class< ? > clazz, String fieldName,
             Object value) {
         final VmStaticField f = (VmStaticField) clazz.getVmClass().getField(
                 fieldName);
@@ -1019,5 +1030,57 @@ public final class VmSystem {
         }
         final Address ptr = VmMagic.getArrayData(staticsTable);
         ptr.store(ObjectReference.fromObject(value), offset);
+    }
+
+    //io context related
+    private static final IOContext vmIoContext = new VmIOContext();
+    private static IOContext ioContext = vmIoContext;
+
+    public static boolean hasVmIOContext(){
+        return ioContext instanceof VmIOContext;
+    }
+
+
+    /**
+     * Get the current global (i.e. non-ProcletContext) flavor of System.err.
+     *
+     * @return the global 'err' stream.
+     */
+    public static PrintStream getGlobalErrStream() {
+		return ioContext.getGlobalErrStream();
+	}
+
+    /**
+     * Get the current global (i.e. non-ProcletContext) flavor of System.in.
+     *
+     * @return the global 'in' stream.
+     */
+    public static InputStream getGlobalInStream() {
+		return ioContext.getGlobalInStream();
+	}
+
+    /**
+     * Get the current global (i.e. non-ProcletContext) flavor of System.out.
+     *
+     * @return the global 'out' stream.
+     */
+    public static PrintStream getGlobalOutStream() {
+		return ioContext.getGlobalOutStream();
+	}
+
+    public static void switchToExternalIOContext(IOContext context){
+        if (hasVmIOContext()){
+            ioContext = context;
+            context.enterContext();
+        }
+    }
+
+    public static void resetIOContext(){
+        if (!hasVmIOContext()){
+            ioContext.exitContext();
+            ioContext = vmIoContext;
+        } else {
+    		throw new RuntimeException("IO Context cannot be reset");
+    	}
     }
 }

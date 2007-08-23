@@ -39,7 +39,8 @@
     <permission class="java.net.SocketPermission" name="*:0-" actions="connect,resolve"/>
     <permission class="java.util.PropertyPermission" name="user.dir" actions="read,write"/>
     <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>
-    <permission class="java.net.NetPermission" name="specifyStreamHandler"/>  
+    <permission class="java.net.NetPermission" name="specifyStreamHandler"/> 
+    <permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/> 
   </extension>
         
 </plugin>
