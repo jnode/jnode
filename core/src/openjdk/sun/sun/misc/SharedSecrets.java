@@ -28,6 +28,7 @@ package sun.misc;
 import java.util.jar.JarFile;
 import java.io.Console;
 import java.io.File;
+import org.jnode.vm.annotation.SharedStatics;
 
 /** A repository of "shared secrets", which are a mechanism for
     calling implementation-private methods in another package without
@@ -38,6 +39,7 @@ import java.io.File;
     This framework avoids the primary disadvantage of using reflection
     for this purpose, namely the loss of compile-time checking. */
 
+@SharedStatics
 public class SharedSecrets {
     private static final Unsafe unsafe = Unsafe.getUnsafe();
     private static JavaUtilJarAccess javaUtilJarAccess;
