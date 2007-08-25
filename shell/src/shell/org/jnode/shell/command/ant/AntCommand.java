@@ -62,16 +62,20 @@ public class AntCommand
     
     public static void makeBuildXml(String file) throws Exception 
     {
-        FileOutputStream fos = new FileOutputStream(new File(file));
-        PrintWriter pw = new PrintWriter(fos);
-        pw.println("<project name=\"JNode\" default=\"help\" basedir=\".\">");
-        pw.println("<target name=\"help\">");
-        pw.println("<echo>");
-        pw.println("echo task is working");
-        pw.println("</echo>");
-        pw.println("</target>");
-        pw.println("</project>");
-        pw.close();
-        fos.close();
+        File f = new File(file);
+        if(!f.exists()){
+            System.out.println("build.xml not found, creating a template");
+            FileOutputStream fos = new FileOutputStream(f);
+            PrintWriter pw = new PrintWriter(fos);
+            pw.println("<project name=\"JNode\" default=\"help\" basedir=\".\">");
+            pw.println("<target name=\"help\">");
+            pw.println("<echo>");
+            pw.println("echo task is working");
+            pw.println("</echo>");
+            pw.println("</target>");
+            pw.println("</project>");
+            pw.close();
+            fos.close();
+        }
     }
 }
