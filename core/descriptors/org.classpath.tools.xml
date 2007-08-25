@@ -13,7 +13,6 @@
   <runtime>
     <library name="jnode-core.jar">
       <export name="gnu.classpath.tools.*"/>
-      <export name="gnu.classpath.tools.appletviewer.*"/>
       <export name="gnu.classpath.tools.common.*"/>
       <export name="gnu.classpath.tools.getopt.*"/>
       <export name="gnu.classpath.tools.jar.*"/>
@@ -42,7 +41,6 @@
   </runtime>
 
   <extension point="org.jnode.shell.aliases">
-    <alias name="appletviewer" class="gnu.classpath.tools.appletviewer.Main"/>
     <alias name="jar" class="gnu.classpath.tools.jar.Main"/>
     <alias name="jarsigner" class="gnu.classpath.tools.jarsigner.Main"/>
     <alias name="keytool" class="gnu.classpath.tools.keytool.Main"/>
