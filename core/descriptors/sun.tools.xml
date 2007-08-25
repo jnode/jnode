@@ -11,6 +11,8 @@
 
   <runtime>
     <library name="jnode-core.jar">
+      <export name="sun.applet.*"/>
+      <export name="sun.applet.resources.*"/>
       <export name="sun.tools.asm.*"/>
       <export name="sun.tools.java.*"/>
       <export name="sun.tools.javac.*"/>

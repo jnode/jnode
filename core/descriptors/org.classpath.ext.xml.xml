@@ -134,21 +134,6 @@
       <export name="com.sun.xml.internal.stream.writers.*"/>
       <export name="com.sun.xml.internal.stream.*"/>  
 
-        <!--
-        <export name="gnu.xml.aelfred2.*"/>
-      <export name="gnu.xml.dom.*"/>
-      <export name="gnu.xml.dom.html2.*"/>
-      <export name="gnu.xml.dom.ls.*"/>
-
-      <export name="gnu.xml.pipeline.*"/>
-      <export name="gnu.xml.transform.*"/>
-      <export name="gnu.xml.util.*"/>
-      <export name="gnu.xml.validation.datatype.*"/>
-      <export name="gnu.xml.validation.relaxng.*"/>
-      <export name="gnu.xml.validation.xmlschema.*"/>
-      <export name="gnu.xml.xpath.*"/>
-      -->
-
       <export name="javax.xml.*"/>
       <export name="javax.xml.datatype.*"/>
       <export name="javax.xml.namespace.*"/>
