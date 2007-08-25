@@ -14,7 +14,7 @@
            target="${java.target}" 
            source="${java.source}"
            encoding="${java.encoding}"
-           excludes="**/*-template.java,**/package-info.java">
+           excludes="**/*-template.java,**/package-info.java, **/AnnotateTask.java">
 	  <bootclasspath path="${jnode-core.jar}"/>
       <compilerarg value="${compilerarg}"/>
     </javac>
