@@ -150,7 +150,6 @@
       <export name="org.relaxng.datatype.helpers.*"/>
       <export name="org.w3c.dom.css.*"/>
       <export name="org.w3c.dom.events.*"/>
-      <export name="org.w3c.dom.html2.*"/>
       <export name="org.w3c.dom.ranges.*"/>
       <export name="org.w3c.dom.stylesheets.*"/>
       <export name="org.w3c.dom.traversal.*"/>
