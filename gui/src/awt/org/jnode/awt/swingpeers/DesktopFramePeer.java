@@ -383,13 +383,6 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
     }
 
     /**
-     * @see java.awt.peer.ComponentPeer#isFocusTraversable()
-     */
-    public boolean isFocusTraversable() {
-        return false;
-    }
-
-    /**
      * @see java.awt.peer.ComponentPeer#isObscured()
      */
     public boolean isObscured() {
@@ -600,6 +593,13 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
 
     public void layout() {
         //TODO implement it
+    }
+
+
+    //jnode openjdk
+    public Rectangle getBoundsPrivate() {
+        //TODO implement it
+        return null;
     }
 
     protected final void paintAWTComponent() {

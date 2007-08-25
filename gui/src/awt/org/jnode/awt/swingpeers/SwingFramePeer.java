@@ -110,4 +110,11 @@ final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame>
     public void setBoundsPrivate(int x, int y, int width, int height) {
         //TODO implement it
     }
+
+
+    //jnode openjdk
+    public Rectangle getBoundsPrivate() {
+        //TODO implement it
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 }
