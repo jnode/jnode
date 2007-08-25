@@ -22,8 +22,6 @@
       <export name="gnu.classpath.tools.orbd.*"/>
       <export name="gnu.classpath.tools.rmid.*"/>
       <export name="gnu.classpath.tools.rmiregistry.*"/>
-      <export name="gnu.classpath.tools.rmic.*"/>
-      <export name="gnu.classpath.tools.rmic.templates.*"/>
       <export name="gnu.classpath.tools.serialver.*"/>
       <export name="gnu.classpath.tools.tnameserv.*"/>
 
@@ -46,7 +44,6 @@
     <alias name="keytool" class="gnu.classpath.tools.keytool.Main"/>
     <alias name="native2ascii" class="gnu.classpath.tools.native2ascii.Native2ASCII"/>
     <alias name="orbd" class="gnu.classpath.tools.orbd.Main"/>
-    <alias name="rmic" class="gnu.classpath.tools.rmic.Main"/>
     <alias name="rmid" class="gnu.classpath.tools.rmid.Main"/>
     <alias name="rmiregistry" class="gnu.classpath.tools.rmiregistry.Main"/>
     <alias name="serialver" class="gnu.classpath.tools.serialver.SerialVer"/>
