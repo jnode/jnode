@@ -64,6 +64,15 @@ import java.awt.image.VolatileImage;
  */
 public interface ComponentPeer
 {
+    //jnode openjdk
+    public static final int SET_LOCATION = 1,
+        SET_SIZE = 2,
+        SET_BOUNDS = 3,
+        SET_CLIENT_SIZE = 4,
+        RESET_OPERATION = 5,
+        NO_EMBEDDED_CHECK = (1 << 14),
+        DEFAULT_OPERATION = SET_BOUNDS;
+
   /**
    * Returns the construction status of the specified image. This is called
    * by {@link Component#checkImage(Image, int, int, ImageObserver)}.
@@ -197,14 +206,6 @@ public interface ComponentPeer
    * {@link Component#hide()}.
    */
   void hide();
-
-  /**
-   * Returns <code>true</code> if the component can receive keyboard input
-   * focus. This is called from {@link Component#isFocusTraversable()}.
-   * 
-   * @specnote Part of the earlier 1.1 API, replaced by isFocusable().
-   */
-  boolean isFocusTraversable();
 
   /**
    * Returns <code>true</code> if the component can receive keyboard input

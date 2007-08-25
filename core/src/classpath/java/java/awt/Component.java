@@ -4173,7 +4173,7 @@ public abstract class Component
 	 */
   public boolean isFocusTraversable()
   {
-    return enabled && visible && (peer == null || isLightweight() || peer.isFocusTraversable());
+    return enabled && visible && (peer == null || isLightweight() || peer.isFocusable());
 	}
 
 	/**
