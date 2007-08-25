@@ -272,14 +272,6 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
         return peerComponent.isFocusable();
     }
 
-    /**
-     * @see java.awt.peer.ComponentPeer#isFocusTraversable()
-     */
-    @SuppressWarnings("deprecation")
-    public final boolean isFocusTraversable() {
-        return peerComponent.isFocusTraversable();
-    }
-
     // Obscurity
 
     public boolean isObscured() {
