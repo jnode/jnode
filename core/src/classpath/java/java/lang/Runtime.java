@@ -345,8 +345,12 @@ public class Runtime
     SecurityManager sm = SecurityManager.current; // Be thread-safe!
     if (sm != null)
       sm.checkPermission(new RuntimePermission("shutdownHooks"));
-    if (hook.isAlive() || hook.getThreadGroup() == null)
-      throw new IllegalArgumentException("The hook thread " + hook + " must not have been already run or started");
+      
+      //jnode
+      //todo investigate the reson of this chek failing
+    //if (hook.isAlive() || hook.getThreadGroup() == null)
+    //  throw new IllegalArgumentException("The hook thread " + hook + " must not have been already run or started");
+
     synchronized (libpath)
       {
         if (exitSequence != null)
