@@ -88,8 +88,21 @@ public final class VMFile {
      * This native method actually performs the rename.
      */
     static boolean renameTo(String targetpath, String destpath) {
-        // TODO: implement VMFile.renameTo
-        return false;
+        try{
+            //todo improve it
+            FileInputStream fis = new FileInputStream(targetpath);
+            FileOutputStream fos = new FileOutputStream(destpath);
+            byte[] buf = new byte[64*1024];
+            int c = 0;
+            while((c = fis.read(buf)) >= 0){
+                fos.write(buf, 0, c);
+            }
+            fis.close();
+            fos.close();
+            return new File(targetpath).delete();
+        } catch(Exception e){
+            return false;
+        }
     }
 
     /*
