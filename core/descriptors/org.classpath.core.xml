@@ -22,6 +22,7 @@
       <export name="sun.reflect.ConstantPool"/>
       <export name="sun.reflect.NativeConstantPool"/>
       <export name="sun.reflect.annotation.AnnotationType"/>
+      <export name="sun.net.www.ParseUtil"/>
       <export name="sun.net.www.protocol.http.InMemoryCookieStore"/>
       <export name="sun.nio.ch.Interruptible"/>
       <export name="sun.security.util.Debug"/>
@@ -30,6 +31,7 @@
       <export name="sun.security.jca.*"/>
       <export name="sun.nio.cs.StreamEncoder"/>
       <export name="sun.nio.cs.StreamDecoder"/>
+      <export name="sun.nio.cs.ThreadLocalCoders"/>
 
       <export name="gnu.classpath.Configuration"/>
       <export name="gnu.classpath.Pointer"/>
