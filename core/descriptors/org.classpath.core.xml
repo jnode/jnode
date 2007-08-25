@@ -83,7 +83,6 @@
       <export name="gnu.javax.crypto.*"/>
       <export name="gnu.javax.crypto.jce.*"/>
       <export name="gnu.javax.net.ssl.provider.*"/>
-      <export name="gnu.xml.stream.*"/>
 
       <export name="java.applet.Applet"/>
       <export name="java.awt.AWTPermission"/>
