@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="com.sun.tools.jdi"
+  name="The Java Debugger Interface from Sun"
+  version="@VERSION@"
+  plugin-version="@VERSION@"
+  provider-name="Sun Microsystems"
+  provider-url="http://sun.com"
+  license-name="classpath">
+  
+  <runtime>
+    <library name="jnode-core.jar">
+	  <export name="com.sun.jdi.*"/>
+	  <export name="com.sun.jdi.connect.*"/>
+	  <export name="com.sun.jdi.connect.spi.*"/>
+	  <export name="com.sun.jdi.event.*"/>
+	  <export name="com.sun.jdi.request.*"/>
+
+	  <export name="com.sun.tools.attach.*"/>
+	  <export name="com.sun.tools.attach.spi.*"/>
+	  <export name="com.sun.tools.jdi.*"/>
+    </library>
+  </runtime>
+</plugin>
