@@ -10,6 +10,7 @@
   <plugin id="sun.tools"/>
   <plugin id="javax.ext.tools"/>
   <plugin id="com.sun.tools.javac"/>
+  <plugin id="com.sun.tools.jdi"/>
     
   <plugin id="org.jnode.install"/>
 
