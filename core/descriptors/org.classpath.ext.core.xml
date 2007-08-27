@@ -13,6 +13,8 @@
   <runtime>
     <library name="jnode-core.jar">
 
+      <export name="com.sun.media.sound.*"/>
+
       <export name="gnu.classpath.*"/>
         
       <export name="gnu.java.awt.*"/>
@@ -70,10 +72,14 @@
       <export name="javax.naming.ldap.*"/>
       <export name="javax.naming.spi.*"/>
 
+      <export name="javax.sound.midi.*"/>
+      <export name="javax.sound.midi.spi.*"/>
       <export name="javax.sound.sampled.*"/>
       <export name="javax.sound.sampled.spi.*"/>
 
       <export name="javax.script.*"/>
+
+	  <export name="sun.audio.*"/>
 
       <export name="sun.security.*"/>
       <export name="sun.security.util.*"/>
