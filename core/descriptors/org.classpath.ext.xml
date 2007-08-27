@@ -33,6 +33,7 @@
       <export name="javax.security.auth.callback.*"/>
       <export name="javax.security.auth.login.*"/>
       <export name="javax.security.auth.spi.*"/>
+      <export name="javax.security.auth.kerberos.*"/>      
       <export name="javax.security.cert.*"/>
       <export name="javax.security.sasl.*"/>
 
@@ -44,6 +45,8 @@
       <export name="javax.swing.plaf.*"/>
       <export name="javax.swing.plaf.basic.*"/>
       <export name="javax.swing.plaf.metal.*"/>
+      <export name="javax.swing.plaf.multi.*"/>
+      <export name="javax.swing.plaf.synth.*"/>
       <export name="javax.swing.table.*"/>
       <export name="javax.swing.text.*"/>
       <export name="javax.swing.text.html.*"/>

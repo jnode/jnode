@@ -12,8 +12,13 @@
 
   <runtime>
     <library name="jnode-core.jar">
-      <export name="java.sql.*"/>  
+      <export name="java.sql.*"/>
+        
       <export name="javax.sql.*"/>
+      <export name="javax.sql.rowset.*"/>
+      <export name="javax.sql.rowset.serial.*"/>
+      <export name="javax.sql.rowset.spi.*"/>
+      
       <export name="javax.transaction.*"/>
       <export name="javax.transaction.xa.*"/>
     </library>
