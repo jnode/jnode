@@ -135,21 +135,44 @@
       <export name="com.sun.xml.internal.stream.*"/>  
 
       <export name="javax.xml.*"/>
+      <export name="javax.xml.bind.*"/>  	   	
+      <export name="javax.xml.bind.annotation.*"/> 	  	
+      <export name="javax.xml.bind.annotation.adapters.*"/> 	  	
+      <export name="javax.xml.bind.attachment.*"/>
+      <export name="javax.xml.bind.helpers.*"/>
+      <export name="javax.xml.bind.util.*"/>
+      <export name="javax.xml.crypto.*"/>
+      <export name="javax.xml.crypto.dom.*"/>	  	
+      <export name="javax.xml.crypto.dsig.*"/> 	
+      <export name="javax.xml.crypto.dsig.dom.*"/>	  	
+      <export name="javax.xml.crypto.dsig.keyinfo.*"/>
+      <export name="javax.xml.crypto.dsig.spec.*"/>
       <export name="javax.xml.datatype.*"/>
       <export name="javax.xml.namespace.*"/>
       <export name="javax.xml.parsers.*"/>
+      <export name="javax.xml.soap.*"/>
       <export name="javax.xml.transform.*"/>
       <export name="javax.xml.transform.dom.*"/>
       <export name="javax.xml.transform.sax.*"/>
       <export name="javax.xml.transform.stax.*"/>
       <export name="javax.xml.transform.stream.*"/>
       <export name="javax.xml.validation.*"/>
+      <export name="javax.xml.ws.*"/>
+      <export name="javax.xml.ws.handler.*"/>
+      <export name="javax.xml.ws.handler.soap.*"/>
+      <export name="javax.xml.ws.http.*"/>
+      <export name="javax.xml.ws.soap.*"/>
+      <export name="javax.xml.ws.spi.*"/>      
       <export name="javax.xml.xpath.*"/>
+      
+      <export name="org.jcp.xml.dsig.internal.*"/>
+      <export name="org.jcp.xml.dsig.internal.dom.*"/>
 
       <export name="org.relaxng.datatype.*"/>
       <export name="org.relaxng.datatype.helpers.*"/>
       <export name="org.w3c.dom.css.*"/>
       <export name="org.w3c.dom.events.*"/>
+      <export name="org.w3c.dom.html.*"/>
       <export name="org.w3c.dom.ranges.*"/>
       <export name="org.w3c.dom.stylesheets.*"/>
       <export name="org.w3c.dom.traversal.*"/>
