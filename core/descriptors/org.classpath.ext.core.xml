@@ -65,6 +65,16 @@
       <export name="java.util.concurrent.locks.*"/>
 
       <export name="javax.accessibility.*"/>
+      <export name="javax.activation.*"/>
+      <export name="javax.activity.*"/>
+      <export name="javax.annotation.*"/>
+      <export name="javax.annotation.processing.*"/>
+      <export name="javax.jws.*"/>
+      <export name="javax.jws.soap.*"/>
+      <export name="javax.lang.model.*"/>	   	
+	  <export name="javax.lang.model.element.*"/> 	  	
+	  <export name="javax.lang.model.type.*"/>
+	  <export name="javax.lang.model.util.*"/>
       <export name="javax.management.*"/>  
       <export name="javax.naming.*"/>
       <export name="javax.naming.directory.*"/>
@@ -78,6 +88,8 @@
       <export name="javax.sound.sampled.spi.*"/>
 
       <export name="javax.script.*"/>
+
+      <export name="javax.tools.*"/>
 
 	  <export name="sun.audio.*"/>
 
