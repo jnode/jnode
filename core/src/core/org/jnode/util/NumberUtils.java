@@ -213,17 +213,16 @@ public class NumberUtils {
 	 * @return the text for of the size
 	 */
 	public static String size(long v) {
-		SizeUnit prevUnit = SizeUnit.MIN;
 		for(SizeUnit unit : SizeUnit.values())
 		{
-		    if (v < unit.getMultiplier()) 
+		    if ((v < unit.getMultiplier()) || SizeUnit.MAX.equals(unit)) 
 		    {
-		        return String.valueOf(v) + prevUnit.getUnit();
+		        return String.valueOf(v) + unit.getUnit();
 		    }
+			
 		    v = v >>> 10;
-			prevUnit = unit;		
 		}
-		return String.valueOf(v) + prevUnit.getUnit();
+		return String.valueOf(v) + SizeUnit.MAX.getUnit();
 	}
     
     /**

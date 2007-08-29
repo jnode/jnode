@@ -37,5 +37,8 @@ public enum SizeUnit {
 		return unit;
 	}
 	
-	
+	public String toString()
+	{
+		return multiplier + ", " + unit; 
+	}
 }
