@@ -206,24 +206,22 @@ public class NumberUtils {
 			return v.toString();
 		}
 	}
-	
-	/** 
+
+	/**
 	 * Convert the given value to a size string like 64K
 	 * @param v the size to convert
 	 * @return the text for of the size
 	 */
-	public static String size(long v) {
-		for(SizeUnit unit : SizeUnit.values())
-		{
-		    if ((v < unit.getMultiplier()) || SizeUnit.MAX.equals(unit)) 
-		    {
-		        return String.valueOf(v) + unit.getUnit();
-		    }
-			
-		    v = v >>> 10;
-		}
-		return String.valueOf(v) + SizeUnit.MAX.getUnit();
-	}
+    public static String size(long v) {
+        for (SizeUnit unit : SizeUnit.values()) {
+            if ((v < 1024) && (v > 0)) {
+                return String.valueOf(v) + unit.getUnit();
+            }
+
+            v = v >>> 10;
+        }
+        return String.valueOf(v >>> 10) + SizeUnit.MAX.getUnit();
+    }
     
     /**
      * 
