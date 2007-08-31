@@ -393,6 +393,9 @@ public class BootSector {
 	return BPB_NumFATs;
     }
 
+    public long getRootDirectoryStartCluster() {
+	return BPB_RootClus;
+    }
     
     public long getCountOfClusters() {
 	return CountOfClusters;
