@@ -46,8 +46,8 @@ public class MemoryCommand implements Command
 	 */
 	public void execute(CommandLine cmdLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
 		final Runtime rt = Runtime.getRuntime();
-		out.println("Total memory " + NumberUtils.size(rt.totalMemory()));
-		out.println("Used memory  " + NumberUtils.size(rt.totalMemory() - rt.freeMemory()));
-		out.println("Free memory  " + NumberUtils.size(rt.freeMemory()));
+		out.println("Total memory " + NumberUtils.toBinaryByte(rt.totalMemory()));
+		out.println("Used memory  " + NumberUtils.toBinaryByte(rt.totalMemory() - rt.freeMemory()));
+		out.println("Free memory  " + NumberUtils.toBinaryByte(rt.freeMemory()));
 	}
 }
