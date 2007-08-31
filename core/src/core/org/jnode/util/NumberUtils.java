@@ -211,10 +211,11 @@ public class NumberUtils {
 	 * Convert the given value to a size string like 64K
 	 * @param v the size to convert
 	 * @return the text for of the size
+     * @deprecated use toDeciamByte() or toBinaryByte() instead  
 	 */
     public static String size(long v) {
         for (SizeUnit unit : SizeUnit.values()) {
-            if ((v < 1024) && (v > 0)) {
+            if ((v < 1024) && (v >= 0)) {
                 return String.valueOf(v) + unit.getUnit();
             }
 
@@ -222,6 +223,25 @@ public class NumberUtils {
         }
         return String.valueOf(v >>> 10) + SizeUnit.MAX.getUnit();
     }
+
+    /**
+	 * Convert the given value to a size string like 64K
+	 * @param v the size to convert
+	 * @return the text for of the size
+	 */
+    public static String toDeciamByte(long v) {
+        return DecimalPrefix.apply(v) + "B";
+    }
+
+    /**
+	 * Convert the given value to a size string like 64K
+	 * @param v the size to convert
+	 * @return the text for of the size
+	 */
+    public static String toBinaryByte(long v) {
+        return BinaryPrefix.apply(v) + "B";
+    }
+
     
     /**
      * 

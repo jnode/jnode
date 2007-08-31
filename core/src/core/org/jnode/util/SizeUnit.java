@@ -3,6 +3,9 @@ package org.jnode.util;
 import java.math.BigInteger;
 import org.jnode.vm.annotation.SharedStatics;
 
+/**
+ * @deprecated use DecimalPrefix or BinaryPrefix instead.  
+ */
 @SharedStatics
 public enum SizeUnit {
 	B(1l, "B"),

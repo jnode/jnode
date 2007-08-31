@@ -51,7 +51,7 @@ public enum BinaryPrefix {
 	 */
     public static String apply(long v) {
         for (BinaryPrefix unit : values()) {
-            if ((v < 1024) && (v > 0)) {
+            if ((v < 1024) && (v >= 0)) {
                 return String.valueOf(v) + unit.getUnit();
             }
 
