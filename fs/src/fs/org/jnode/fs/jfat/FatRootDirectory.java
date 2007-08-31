@@ -21,7 +21,7 @@ public class FatRootDirectory extends FatDirectory {
 	super ( fs );
 	
 	if       ( getFatFileSystem().getFat().isFat32() )
-	    setRoot32 ( 2 );
+	    setRoot32( (int) getFatFileSystem().getBootSector().getRootDirectoryStartCluster() );
 	else if  ( getFatFileSystem().getFat().isFat16() )
 	    throw new UnsupportedOperationException ( "Fat16" );
 	else if  ( getFatFileSystem().getFat().isFat12() )
