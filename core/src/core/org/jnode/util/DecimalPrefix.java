@@ -51,7 +51,7 @@ public enum DecimalPrefix {
 	 */
     public static String apply(long v) {
         for (DecimalPrefix unit : values()) {
-            if ((v < 1000l) && (v > 0l)) {
+            if ((v < 1000l) && (v >= 0l)) {
                 return String.valueOf(v) + unit.getUnit();
             }
 
