@@ -229,7 +229,7 @@ public class NumberUtils {
 	 * @param v the size to convert
 	 * @return the text for of the size
 	 */
-    public static String toDeciamByte(long v) {
+    public static String toDecimalByte(long v) {
         return DecimalPrefix.apply(v) + "B";
     }
 
