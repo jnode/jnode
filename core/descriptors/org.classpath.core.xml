@@ -14,8 +14,6 @@
       <export name="com.sun.*" />
 	  <export name="com.sun.naming.internal.*"/>
 	  
-	  <export name="com.sun.tools.java.*"/>
-
 	  <export name="sun.*" />
 	  <export name="sun.awt.EventListenerAggregate" />
       <export name="sun.misc.*"/>
