@@ -10,7 +10,6 @@
       <sourceFolder url="file://$MODULE_DIR$/src/classpath/gnu" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/classpath/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/classpath/javax" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/classpath/org" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/classpath/tools" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/classpath/vm" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/core" isTestSource="false" />
