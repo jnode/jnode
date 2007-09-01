@@ -10,6 +10,7 @@
                 
   <requires>
     <import plugin="org.apache.tools.ant-launcher"/>
+    <import plugin="com.sun.tools.javac"/>
   </requires>
         
   <runtime>
