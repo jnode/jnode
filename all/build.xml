@@ -380,6 +380,7 @@ clean             Remove all intermediate build results.
                 <pathelement location="${root.dir}/core/src/openjdk/sun"/>
                 <pathelement location="${root.dir}/core/src/openjdk/vm"/>
                 <pathelement location="${root.dir}/core/src/core"/>
+                <pathelement location="${root.dir}/core/src/vmmagic"/>
                 <pathelement location="${root.dir}/core/src/driver"/>
             </sourcepath>
             <package name="org.jnode.driver"/>
