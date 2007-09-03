@@ -371,9 +371,14 @@ clean             Remove all intermediate build results.
                 <pathelement location="${root.dir}/core/src/classpath/gnu"/>
                 <pathelement location="${root.dir}/core/src/classpath/java"/>
                 <pathelement location="${root.dir}/core/src/classpath/javax"/>
-                <pathelement location="${root.dir}/core/src/classpath/org"/>
                 <pathelement location="${root.dir}/core/src/classpath/ext"/>
                 <pathelement location="${root.dir}/core/src/classpath/vm"/>
+                <pathelement location="${root.dir}/core/src/openjdk/com"/>
+                <pathelement location="${root.dir}/core/src/openjdk/java"/>
+                <pathelement location="${root.dir}/core/src/openjdk/javax"/>
+                <pathelement location="${root.dir}/core/src/openjdk/org"/>
+                <pathelement location="${root.dir}/core/src/openjdk/sun"/>
+                <pathelement location="${root.dir}/core/src/openjdk/vm"/>
                 <pathelement location="${root.dir}/core/src/core"/>
                 <pathelement location="${root.dir}/core/src/driver"/>
             </sourcepath>
@@ -406,9 +411,14 @@ clean             Remove all intermediate build results.
                 <pathelement location="${root.dir}/core/src/classpath/gnu"/>
                 <pathelement location="${root.dir}/core/src/classpath/java"/>
                 <pathelement location="${root.dir}/core/src/classpath/javax"/>
-                <pathelement location="${root.dir}/core/src/classpath/org"/>
                 <pathelement location="${root.dir}/core/src/classpath/ext"/>
                 <pathelement location="${root.dir}/core/src/classpath/vm"/>
+                <pathelement location="${root.dir}/core/src/openjdk/com"/>
+                <pathelement location="${root.dir}/core/src/openjdk/java"/>
+                <pathelement location="${root.dir}/core/src/openjdk/javax"/>
+                <pathelement location="${root.dir}/core/src/openjdk/org"/>
+                <pathelement location="${root.dir}/core/src/openjdk/sun"/>
+                <pathelement location="${root.dir}/core/src/openjdk/vm"/>
                 <pathelement location="${root.dir}/core/src/core"/>
                 <pathelement location="${root.dir}/core/src/driver"/>
                 <pathelement location="${root.dir}/core/src/mmtk-vm"/>
