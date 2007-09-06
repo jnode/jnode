@@ -30,7 +30,7 @@ import org.jnode.vm.VmArchitecture;
 public final class VmSharedStatics extends VmStatics {
 
     /** Size of the statics table */
-    private static final int SIZE = 1 << 16;
+    private static final int SIZE = 1 << 17;
 
     /**
      * @param arch
