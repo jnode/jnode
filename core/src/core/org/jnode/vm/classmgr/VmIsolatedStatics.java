@@ -30,7 +30,7 @@ import org.jnode.vm.VmArchitecture;
 public final class VmIsolatedStatics extends VmStatics {
 
     /** Size of the statics table */
-    private static final int SIZE = 1 << 15;
+    private static final int SIZE = 1 << 17;
 
     /**
      * @param arch
