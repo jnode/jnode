@@ -234,6 +234,10 @@ public class ObjectEmitter {
                 bis.writeObjectRef(null);
                 // name
                 bis.writeObjectRef(null);
+                // enumConstants
+                bis.writeObjectRef(null);
+                // enumConstantsDirectory
+                bis.writeObjectRef(null);
             }
         } catch (ClassNotFoundException ex) {
             throw new BuildException("emitting object: [" + c + "]", ex);
@@ -244,9 +248,9 @@ public class ObjectEmitter {
         // This layout should match the order and type of fields
         // in java.lang.String
         bis.writeObjectRef(s.toCharArray()); // char[] value
-        os.write32(s.length()); // int count
-        os.write32(s.hashCode()); // int cachedHashCode
         os.write32(0); // int offset
+        os.write32(s.length()); // int count
+        os.write32(s.hashCode()); // int cachedHashCode        
     }
 
     private void emitInteger(Integer i) throws BuildException {

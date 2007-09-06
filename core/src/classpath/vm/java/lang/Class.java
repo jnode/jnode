@@ -1411,5 +1411,67 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type,
       return p.getInterfaceTypes();
     }
 
+    //jnode openjdk
+    /**
+     * Returns the elements of this enum class or null if this
+     * Class object does not represent an enum type;
+     * identical to getEnumConstantsShared except that
+     * the result is uncloned, cached, and shared by all callers.
+     */
+    T[] getEnumConstantsShared() {
+        if (enumConstants == null) {
+            if (!isEnum()) return null;
+            try {
+                final Method values = getMethod("values");
+                java.security.AccessController.doPrivileged
+                        (new java.security.PrivilegedAction() {
+                            public Object run() {
+                                values.setAccessible(true);
+                                return null;
+                            }
+                        });
+                enumConstants = (T[]) values.invoke(null);
+            }
+            // These can happen when users concoct enum-like classes
+            // that don't comply with the enum spec.
+            catch (InvocationTargetException ex) {
+                return null;
+            }
+            catch (NoSuchMethodException ex) {
+                return null;
+            }
+            catch (IllegalAccessException ex) {
+                return null;
+            }
+        }
+        return enumConstants;
+    }
+    private volatile transient T[] enumConstants;
 
+
+    /**
+     * Returns a map from simple name to enum constant.  This package-private
+     * method is used internally by Enum to implement
+     * public static <T extends Enum<T>> T valueOf(Class<T>, String)
+     * efficiently.  Note that the map is returned by this method is
+     * created lazily on first use.  Typically it won't ever get created.
+     */
+    HashMap<String, T> enumConstantDirectory() {
+        if (enumConstantDirectory == null) {
+            T[] universe = getEnumConstantsShared();
+            if (universe == null)
+                throw new IllegalArgumentException(
+                        getName() + " is not an enum type");
+            HashMap<String, T> m = new HashMap<String, T>(2 * universe.length);
+            for (T constant : universe)
+                m.put(((Enum) constant).name(), constant);
+            enumConstantDirectory = m;
+        }
+        return enumConstantDirectory;
+    }
+    private volatile transient HashMap enumConstantDirectory;
+
+    ClassLoader getClassLoader0(){
+        return getClassLoader();
+    }
 }
