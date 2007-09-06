@@ -31,7 +31,10 @@
       <export name="sun.security.jca.*"/>
       <export name="sun.nio.cs.StreamEncoder"/>
       <export name="sun.nio.cs.StreamDecoder"/>
+      <export name="sun.nio.cs.HistoricallyNamedCharset"/>
       <export name="sun.nio.cs.ThreadLocalCoders"/>
+      <export name="sun.text.Normalizer"/>
+      <export name="sun.text.normalizer.*"/>
 
       <export name="gnu.classpath.Configuration"/>
       <export name="gnu.classpath.Pointer"/>
