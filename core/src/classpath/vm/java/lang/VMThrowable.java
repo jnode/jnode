@@ -93,7 +93,7 @@ final class VMThrowable
             final String fname = (vmClass == null) ? null : vmClass.getSourceFile();
             final String cname = (vmClass == null) ? "<unknown class>" : vmClass.getName();
             final String mname = (method == null) ? "<unknown method>" : method.getName();
-            trace[i] = new StackTraceElement(fname, lineNumber, cname,  mname, method.isNative());
+            trace[i] = new StackTraceElement(cname, mname, fname, method == null || method.isNative() ? -2 : lineNumber);
         }
         return trace;
     }
