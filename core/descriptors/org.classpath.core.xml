@@ -21,7 +21,7 @@
       <export name="sun.reflect.NativeReflection"/>
       <export name="sun.reflect.ConstantPool"/>
       <export name="sun.reflect.NativeConstantPool"/>
-      <export name="sun.reflect.annotation.AnnotationType"/>
+      <export name="sun.reflect.annotation.*"/>
       <export name="sun.net.www.ParseUtil"/>
       <export name="sun.net.www.protocol.http.InMemoryCookieStore"/>
       <export name="sun.nio.ch.Interruptible"/>

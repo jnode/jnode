@@ -49,6 +49,7 @@ import java.security.ProtectionDomain;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.jar.JarFile;
 
 /**
  * An Instrumentation object has transformers that will
@@ -238,4 +239,38 @@ public final class InstrumentationImpl implements Instrumentation
       }
     return oldBuffer;
   }
+
+
+    //jnode openjdk
+    public void addTransformer(ClassFileTransformer transformer, boolean canRetransform) {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean isRetransformClassesSupported() {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void retransformClasses(Class<?>... classes) throws UnmodifiableClassException {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean isModifiableClass(Class<?> theClass) {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void appendToBootstrapClassLoaderSearch(JarFile jarfile) {
+        throw new UnsupportedOperationException();
+    }
+
+    public void appendToSystemClassLoaderSearch(JarFile jarfile) {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean isNativeMethodPrefixSupported() {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void setNativeMethodPrefix(ClassFileTransformer transformer, String prefix) {
+        throw new UnsupportedOperationException();
+    }
 }

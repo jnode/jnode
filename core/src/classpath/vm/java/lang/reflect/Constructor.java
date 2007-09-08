@@ -40,6 +40,7 @@ package java.lang.reflect;
 
 import gnu.java.lang.ClassHelper;
 import java.lang.annotation.Annotation;
+import java.lang.annotation.AnnotationFormatError;
 import java.util.ArrayList;
 
 import org.jnode.vm.VmReflection;
@@ -48,6 +49,7 @@ import org.jnode.vm.classmgr.VmMethod;
 import gnu.java.lang.reflect.MethodSignatureParser;
 
 import java.util.Arrays;
+import sun.reflect.annotation.AnnotationParser;
 
 /**
  * The Constructor class represents a constructor of a class. It also allows
@@ -445,4 +447,61 @@ public final class Constructor<T>
     public boolean isAnnotationPresent(Class< ? extends Annotation> annotationClass) {
         return vmMethod.isAnnotationPresent(annotationClass);
     }
+
+    //jnode openjdk
+    /**
+     * Returns an array of arrays that represent the annotations on the formal
+     * parameters, in declaration order, of the method represented by
+     * this <tt>Constructor</tt> object. (Returns an array of length zero if the
+     * underlying method is parameterless.  If the method has one or more
+     * parameters, a nested array of length zero is returned for each parameter
+     * with no annotations.) The annotation objects contained in the returned
+     * arrays are serializable.  The caller of this method is free to modify
+     * the returned arrays; it will have no effect on the arrays returned to
+     * other callers.
+     *
+     * @return an array of arrays that represent the annotations on the formal
+     *    parameters, in declaration order, of the method represented by this
+     *    Constructor object
+     * @since 1.5
+     */
+    public Annotation[][] getParameterAnnotations() {
+        int numParameters = parameterTypes.size();
+        if (parameterAnnotations == null)
+            return new Annotation[numParameters][0];
+
+        Annotation[][] result = AnnotationParser.parseParameterAnnotations(
+            parameterAnnotations,
+            sun.misc.SharedSecrets.getJavaLangAccess().
+                getConstantPool(getDeclaringClass()),
+            getDeclaringClass());
+        if (result.length != numParameters) {
+	    Class<?> declaringClass = getDeclaringClass();
+	    if (declaringClass.isEnum() ||
+		declaringClass.isAnonymousClass() ||
+		declaringClass.isLocalClass() )
+		; // Can't do reliable parameter counting
+	    else {
+		if (!declaringClass.isMemberClass() || // top-level
+		    // Check for the enclosing instance parameter for
+		    // non-static member classes
+		    (declaringClass.isMemberClass() &&
+		     ((declaringClass.getModifiers() & Modifier.STATIC) == 0)  &&
+		     result.length + 1 != numParameters) ) {
+		    throw new AnnotationFormatError(
+			      "Parameter annotations don't match number of parameters");
+		}
+	    }
+	}
+        return result;
+    }
+    private byte[]              parameterAnnotations;
+
+    /**
+     * Returns <tt>true</tt> if and only if the underlying class
+     * is a member class.
+     *
+     * @return <tt>true</tt> if and only if this class is a member class.
+     * @since 1.5
+     */
 }

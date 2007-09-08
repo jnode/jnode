@@ -1474,4 +1474,118 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type,
     ClassLoader getClassLoader0(){
         return getClassLoader();
     }
+
+    /**
+     * Returns <tt>true</tt> if and only if the underlying class
+     * is an anonymous class.
+     *
+     * @return <tt>true</tt> if and only if this class is an anonymous class.
+     * @since 1.5
+     */
+    public boolean isAnonymousClass() {
+	    return "".equals(getSimpleName());
+    }
+
+    /**
+     * Returns <tt>true</tt> if and only if the underlying class
+     * is a local class.
+     *
+     * @return <tt>true</tt> if and only if this class is a local class.
+     * @since 1.5
+     */
+    public boolean isLocalClass() {
+	return isLocalOrAnonymousClass() && !isAnonymousClass();
+    }
+
+    /**
+     * Returns <tt>true</tt> if this is a local class or an anonymous
+     * class.  Returns <tt>false</tt> otherwise.
+     */
+    private boolean isLocalOrAnonymousClass() {
+	// JVM Spec 4.8.6: A class must have an EnclosingMethod
+	// attribute if and only if it is a local class or an
+	// anonymous class.
+	return getEnclosingMethodInfo() != null;
+    }
+
+    /*
+    private EnclosingMethodInfo getEnclosingMethodInfo() {
+	Object[] enclosingInfo = getEnclosingMethod0();
+	if (enclosingInfo == null)
+	    return null;
+	else {
+	    return new EnclosingMethodInfo(enclosingInfo);
+	}
+    } */
+
+    private EnclosingMethodInfo getEnclosingMethodInfo() {
+        //todo implement it
+        return null;
+    }
+
+    public boolean isMemberClass() {
+	return getSimpleBinaryName() != null && !isLocalOrAnonymousClass();
+    }
+
+    /**
+     * Returns the "simple binary name" of the underlying class, i.e.,
+     * the binary name without the leading enclosing class name.
+     * Returns <tt>null</tt> if the underlying class is a top level
+     * class.
+     */
+    private String getSimpleBinaryName() {
+	Class<?> enclosingClass = getEnclosingClass();
+	if (enclosingClass == null) // top level class
+	    return null;
+	// Otherwise, strip the enclosing class' name
+	try {
+	    return getName().substring(enclosingClass.getName().length());
+	} catch (IndexOutOfBoundsException ex) {
+	    throw new InternalError("Malformed class name");
+	}
+    }
+
+    private final static class EnclosingMethodInfo {
+	private Class<?> enclosingClass;
+	private String name;
+	private String descriptor;
+
+	private EnclosingMethodInfo(Object[] enclosingInfo) {
+	    if (enclosingInfo.length != 3)
+		throw new InternalError("Malformed enclosing method information");
+	    try {
+		// The array is expected to have three elements:
+
+		// the immediately enclosing class
+		enclosingClass = (Class<?>) enclosingInfo[0];
+		assert(enclosingClass != null);
+
+		// the immediately enclosing method or constructor's
+		// name (can be null).
+		name		= (String)   enclosingInfo[1];
+
+		// the immediately enclosing method or constructor's
+		// descriptor (null iff name is).
+		descriptor	= (String)   enclosingInfo[2];
+		assert((name != null && descriptor != null) || name == descriptor);
+	    } catch (ClassCastException cce) {
+		throw new InternalError("Invalid type in enclosing method information");
+	    }
+	}
+
+	boolean isPartial() {
+	    return enclosingClass == null || name == null || descriptor == null;
+	}
+
+	boolean isConstructor() { return !isPartial() && "<init>".equals(name); }
+
+	boolean isMethod() { return !isPartial() && !isConstructor() && !"<clinit>".equals(name); }
+
+	Class<?> getEnclosingClass() { return enclosingClass; }
+
+	String getName() { return name; }
+
+	String getDescriptor() { return descriptor; }
+
+    }
 }
