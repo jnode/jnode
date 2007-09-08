@@ -764,7 +764,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
     	private final VmSystemClassLoader vmClassLoader;
     	
         public ClassLoaderWrapper(VmSystemClassLoader vmClassLoader) {
-            super(vmClassLoader);
+            super(vmClassLoader, 0);
             this.vmClassLoader = vmClassLoader;
         }
         

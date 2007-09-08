@@ -201,7 +201,7 @@ public abstract class ClassLoader {
      * 
      * @param vmClassLoader
      */
-    protected ClassLoader(VmSystemClassLoader vmClassLoader) {
+    protected ClassLoader(VmSystemClassLoader vmClassLoader, int discriminator) {
         /* May we create a new classloader? */
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {

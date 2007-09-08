@@ -113,10 +113,10 @@ public final class AccessController
    * domains should be added to the protection domain of the calling class.
    * @return the result of the <code>action.run()</code> method.
      */
-    public static Object doPrivileged(PrivilegedAction action,
+    public static <T> T doPrivileged(PrivilegedAction<T> action,
                                     AccessControlContext context)
   {
-        return VmAccessController.doPrivileged(action, context.getVmContext());
+        return (T) VmAccessController.doPrivileged(action, context.getVmContext());
     }
 
     /**
