@@ -23,7 +23,6 @@
       <export name="gnu.java.awt.image.*"/>
       <export name="gnu.java.awt.java2d.*"/>
       <export name="gnu.java.awt.print.*"/>
-      <export name="gnu.java.lang.management.*"/>
       <export name="gnu.java.lang.reflect.*"/>
       <export name="gnu.java.net.protocol.*"/>
       <export name="gnu.java.net.protocol.file.*"/>
