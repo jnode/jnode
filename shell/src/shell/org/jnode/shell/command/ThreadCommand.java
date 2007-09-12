@@ -59,17 +59,20 @@ public class ThreadCommand  implements Command
 	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
     ParsedArguments parsedArguments = HELP_INFO.parse(commandLine.toStringArray());
 
-		ThreadGroup grp = Thread.currentThread().getThreadGroup();
+		if (PAR_NAME.isSet(parsedArguments)) {
+			execute(out, ARG_NAME.getValue(parsedArguments));
+		} else {
+			execute(out, null);
+		}
+	}
 
+	public void execute(PrintStream out, String threadName) {
+		ThreadGroup grp = Thread.currentThread().getThreadGroup();
+	
 		while (grp.getParent() != null) {
 			grp = grp.getParent();
 		}
-
-		if (PAR_NAME.isSet(parsedArguments)) {
-			showGroup(grp, out, ARG_NAME.getValue(parsedArguments));
-		} else {
-			showGroup(grp, out, null);
-		}
+		showGroup(grp, out, threadName);
 	}
 
 	private void showGroup(ThreadGroup grp, PrintStream out, String threadName) {
