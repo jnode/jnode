@@ -1436,7 +1436,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                         type.setAlwaysInitialized();
                     }
                 } catch (JNodeClassNotFoundException ex) {
-                    log("JNode class not found" + ex.getMessage());
+                    log("JNode class not found " + ex.getMessage());
                 }
             }
         }
