@@ -189,7 +189,7 @@ public class SwingPcTextScreen extends AbstractPcTextScreen {
         }
     }
 
-    public Device getPointerDevivce(){
+    public Device getPointerDevice(){
         if (pointerDevice == null) {
             pointerDriver = new MyPointerDriver();
             mouseListener = new MouseHandler();
