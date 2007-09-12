@@ -11,7 +11,6 @@
 	<classpathentry kind="lib" path="/JNode-Core/lib/ant.jar"/>
 	<classpathentry kind="lib" path="/JNode-Core/lib/jmock-1.0.1.jar"/>
 	<classpathentry kind="lib" path="/JNode-Core/lib/jmock-cglib-1.0.1.jar"/>
-	<classpathentry kind="lib" path="/JNode-Core/lib/asm.jar"/>
 	<classpathentry kind="lib" path="/JNode-Core/lib/cglib-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/edtftpj-1.5.2.jar"/>
 	<classpathentry kind="lib" path="lib/jcifs-1.2.6.jar"/>
