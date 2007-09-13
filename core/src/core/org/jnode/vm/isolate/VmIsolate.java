@@ -27,6 +27,7 @@ import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.util.Properties;
 import java.util.Vector;
+import java.util.ArrayList;
 
 import javax.isolate.Isolate;
 import javax.isolate.IsolateStartupException;
@@ -38,11 +39,7 @@ import org.jnode.plugin.PluginManager;
 import org.jnode.util.BootableHashMap;
 import org.jnode.util.QueueProcessor;
 import org.jnode.util.QueueProcessorThread;
-import org.jnode.vm.Unsafe;
-import org.jnode.vm.Vm;
-import org.jnode.vm.VmArchitecture;
-import org.jnode.vm.VmMagic;
-import org.jnode.vm.VmSystem;
+import org.jnode.vm.*;
 import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.annotation.PrivilegedActionPragma;
 import org.jnode.vm.annotation.SharedStatics;
@@ -128,6 +125,14 @@ public final class VmIsolate {
         CREATED, STARTING, STARTED, EXITED, TERMINATED
     }
 
+    public static boolean walkIsolates(ObjectVisitor visitor){
+        for(int i = 0; i < StaticData.isolates.size(); i ++){
+            VmIsolate isolate = StaticData.isolates.get(i);
+            if(!isolate.isolatedStaticsTable.walk(visitor))
+                return false;
+        }
+        return true;
+    }
     /**
      * Static data of the VMIsolate class.
      * 
@@ -137,6 +142,8 @@ public final class VmIsolate {
     private static final class StaticData {
         /** The root (aka system) isolate. */
         private static transient VmIsolate rootIsolate;
+        /** Non-root isolates. */
+        private static final ArrayList<VmIsolate> isolates = new ArrayList<VmIsolate>();
 
         static final VmIsolate getRoot() {
             if (rootIsolate == null) {
@@ -189,6 +196,7 @@ public final class VmIsolate {
      */
     public VmIsolate(Isolate isolate, VmStreamBindings bindings,
             Properties properties, String mainClass, String[] args) {
+        StaticData.isolates.add(this);
         this.isolate = isolate;
         this.mainClass = mainClass;
         this.args = args;
@@ -266,6 +274,7 @@ public final class VmIsolate {
     public final void exit(Isolate isolate, int status) {
         testIsolate(isolate);
         state = State.EXITED;
+        StaticData.isolates.remove(this);
     }
 
     /**
@@ -283,6 +292,7 @@ public final class VmIsolate {
         }
 
         this.state = State.TERMINATED;
+        StaticData.isolates.remove(this);
     }
 
     /**
