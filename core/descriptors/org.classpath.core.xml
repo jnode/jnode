@@ -17,10 +17,7 @@
 	  <export name="sun.*" />
 	  <export name="sun.awt.EventListenerAggregate" />
       <export name="sun.misc.*"/>
-      <export name="sun.reflect.Reflection"/>
-      <export name="sun.reflect.NativeReflection"/>
-      <export name="sun.reflect.ConstantPool"/>
-      <export name="sun.reflect.NativeConstantPool"/>
+      <export name="sun.reflect.*"/>
       <export name="sun.reflect.annotation.*"/>
       <export name="sun.net.www.ParseUtil"/>
       <export name="sun.net.www.protocol.http.InMemoryCookieStore"/>
@@ -28,6 +25,7 @@
       <export name="sun.security.util.Debug"/>
       <export name="sun.security.util.SecurityConstants"/>
       <export name="sun.security.action.GetPropertyAction"/>
+      <export name="sun.security.action.GetBooleanAction"/>
       <export name="sun.security.jca.*"/>
       <export name="sun.nio.cs.StreamEncoder"/>
       <export name="sun.nio.cs.StreamDecoder"/>
