@@ -23,7 +23,8 @@ package java.lang.reflect;
 
 import gnu.classpath.Configuration;
 
-import java.lang.reflect.Proxy.ProxyData;
+//import java.lang.reflect.Proxy.ProxyData;
+import java.lang.reflect.Proxy;
 
 final class VMProxy {
     /**
@@ -109,7 +110,8 @@ final class VMProxy {
      * @see #getProxyClass(ClassLoader, Class[])
      * @see ProxyType#getProxyData()
      */
-    static Proxy.ProxyData getProxyData(ClassLoader loader, Class[] interfaces) {
+    //static Proxy.ProxyData getProxyData(ClassLoader loader, Class[] interfaces) {
+    static Proxy getProxyData(ClassLoader loader, Class[] interfaces) {
         return null;
     }
 
@@ -134,7 +136,8 @@ final class VMProxy {
      * @see #getProxyClass(ClassLoader, Class[])
      * @see ProxyData#generateProxyClass(ClassLoader)
      */
-    static Class generateProxyClass(ClassLoader loader, Proxy.ProxyData data) {
+    //static Class generateProxyClass(ClassLoader loader, Proxy.ProxyData data) {
+    static Class generateProxyClass(ClassLoader loader, Proxy data) {
         return null;
     }
 }
