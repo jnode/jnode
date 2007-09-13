@@ -48,6 +48,7 @@ import org.jnode.vm.classmgr.VmMethod;
 import gnu.java.lang.reflect.MethodSignatureParser;
 
 import java.util.Arrays;
+import sun.reflect.MethodAccessor;
 
 /**
  * The Method class represents a member method of a class. It also allows
@@ -98,6 +99,11 @@ public final class Method extends AccessibleObject implements Member, AnnotatedE
      */
     public Method(VmMethod vmMethod) {
         this.vmMethod = vmMethod;
+    }
+
+    public Method(Class declaringClass, String name, Class[] parameterTypes, Class returnType, Class[] checkedExceptions, int modifiers, int slot, String signature, byte[] annotations, byte[] parameterAnnotations, byte[] annotationDefault) {
+        //todo implement it
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -278,7 +284,7 @@ public final class Method extends AccessibleObject implements Member, AnnotatedE
     public String toString() {
         // 128 is a reasonable buffer initial size for constructor
     StringBuilder sb = new StringBuilder(128);
-        Modifier.toString(getModifiers(), sb).append(' ');
+        sb.append(Modifier.toString(getModifiers())).append(' ');
     sb.append(ClassHelper.getUserName(getReturnType())).append(' ');
     sb.append(getDeclaringClass().getName()).append('.');
         sb.append(getName()).append('(');
@@ -303,7 +309,7 @@ public final class Method extends AccessibleObject implements Member, AnnotatedE
   {
     // 128 is a reasonable buffer initial size for constructor
     StringBuilder sb = new StringBuilder(128);
-    Modifier.toString(getModifiers(), sb).append(' ');
+    sb.append(Modifier.toString(getModifiers())).append(' ');
     Constructor.addTypeParameters(sb, getTypeParameters());
     sb.append(getGenericReturnType()).append(' ');
     sb.append(getDeclaringClass().getName()).append('.');
@@ -527,4 +533,18 @@ public final class Method extends AccessibleObject implements Member, AnnotatedE
         return null;
     }
 
+    public MethodAccessor getMethodAccessor() {
+        //todo implement it
+        throw new UnsupportedOperationException();
+    }
+
+    public void setMethodAccessor(MethodAccessor accessor) {
+        //todo implement it
+        throw new UnsupportedOperationException();
+    }
+
+    public Method copy() {
+        //todo implement it
+        throw new UnsupportedOperationException();
+    }
 }

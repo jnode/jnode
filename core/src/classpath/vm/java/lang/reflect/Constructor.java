@@ -50,6 +50,7 @@ import gnu.java.lang.reflect.MethodSignatureParser;
 
 import java.util.Arrays;
 import sun.reflect.annotation.AnnotationParser;
+import sun.reflect.ConstructorAccessor;
 
 /**
  * The Constructor class represents a constructor of a class. It also allows
@@ -103,6 +104,11 @@ public final class Constructor<T>
      */
     public Constructor(VmMethod vmMethod) {
         this.vmMethod = vmMethod;
+    }
+
+    public Constructor(Class<T> declaringClass, Class[] parameterTypes, Class[] checkedExceptions, int modifiers, int slot, String signature, byte[] annotations, byte[] parameterAnnotations) {
+        //todo implement it
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -253,7 +259,7 @@ public final class Constructor<T>
     public String toString() {
         // 128 is a reasonable buffer initial size for constructor
     StringBuilder sb = new StringBuilder(128);
-        Modifier.toString(getModifiers(), sb).append(' ');
+        sb.append(Modifier.toString(getModifiers())).append(' ');
     sb.append(getDeclaringClass().getName()).append('(');
     Class[] c = getParameterTypes();
     if (c.length > 0)
@@ -290,7 +296,7 @@ public final class Constructor<T>
   public String toGenericString()
   {
     StringBuilder sb = new StringBuilder(128);
-    Modifier.toString(getModifiers(), sb).append(' ');
+    sb.append(Modifier.toString(getModifiers())).append(' ');
     addTypeParameters(sb, getTypeParameters());
     sb.append(getDeclaringClass().getName()).append('(');
     Type[] types = getGenericParameterTypes();
@@ -371,7 +377,7 @@ public final class Constructor<T>
    * Return the String in the Signature attribute for this constructor. If there
    * is no Signature attribute, return null.
    */
-    private String getSignature()
+    String getSignature()
     {
         return vmMethod.getSignature();
     }
@@ -504,4 +510,33 @@ public final class Constructor<T>
      * @return <tt>true</tt> if and only if this class is a member class.
      * @since 1.5
      */
+    public ConstructorAccessor getConstructorAccessor() {
+        //todo implement it
+        throw new UnsupportedOperationException();
+    }
+
+    public void setConstructorAccessor(ConstructorAccessor accessor) {
+        //todo implement it
+        throw new UnsupportedOperationException();
+    }
+
+    public int getSlot() {
+        //todo implement it
+        throw new UnsupportedOperationException();
+    }
+
+    public byte[] getRawAnnotations() {
+        //todo implement it
+        throw new UnsupportedOperationException();
+    }
+
+    public byte[] getRawParameterAnnotations() {
+        //todo implement it
+        throw new UnsupportedOperationException();
+    }
+
+    public Constructor<T> copy() {
+        //todo implement it
+        throw new UnsupportedOperationException();
+    }
 }

@@ -95,7 +95,12 @@ extends AccessibleObject implements Member
 		this.vmField = vmField;
 	}
 
-	/**
+    public Field(Class declaringClass, String name, Class type, int modifiers, int slot, String signature, byte[] annotations) {
+        //todo implement it
+        throw new UnsupportedOperationException();
+    }
+
+    /**
    * Gets the class that declared this field, or the class where this field
    * is a non-inherited member.
 	 * @return the class that declared this member
@@ -209,7 +214,7 @@ extends AccessibleObject implements Member
 	public String toString() {
 		// 64 is a reasonable buffer initial size for field
     StringBuilder sb = new StringBuilder(64);
-		Modifier.toString(getModifiers(), sb).append(' ');
+		sb.append(Modifier.toString(getModifiers())).append(' ');
         sb.append(ClassHelper.getUserName(getType())).append(' ');
         sb.append(getDeclaringClass().getName()).append('.');
 		sb.append(getName());
@@ -219,7 +224,7 @@ extends AccessibleObject implements Member
   public String toGenericString()
   {
     StringBuilder sb = new StringBuilder(64);
-    Modifier.toString(getModifiers(), sb).append(' ');
+    sb.append(Modifier.toString(getModifiers())).append(' ');
     sb.append(getGenericType()).append(' ');
     sb.append(getDeclaringClass().getName()).append('.');
     sb.append(getName());
@@ -764,5 +769,10 @@ extends AccessibleObject implements Member
      */
     public boolean isAnnotationPresent(Class< ? extends Annotation> annotationClass) {
         return vmField.isAnnotationPresent(annotationClass);
-    }       
+    }
+
+    public Field copy() {
+        //todo implement it
+        throw new UnsupportedOperationException();
+    }
 }
