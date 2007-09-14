@@ -4,7 +4,7 @@
 package java.util.prefs;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 public class NativeFileSystemPreferences {
     /**

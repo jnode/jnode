@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 public abstract class AbstractInstaller {
     public static enum Step {back, forth, quit}

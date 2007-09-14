@@ -8,7 +8,7 @@ import org.jnode.vm.classmgr.VmInstanceField;
 import org.vmmagic.unboxed.ObjectReference;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 class UnsafeHelper {
     private static final int OFFSET_OF_vmField_IN_Field =

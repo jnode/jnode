@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 public class ProgressSupport implements ProgressAware{
     List<ProgressListener> listenerList = new ArrayList<ProgressListener>();

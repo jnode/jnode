@@ -7,7 +7,7 @@ import java.io.*;
 
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 public class CopyFile implements ProgressAware {
     private ProgressSupport progress = new ProgressSupport();

@@ -9,7 +9,7 @@ import org.jnode.plugin.ExtensionPointListener;
 import org.jnode.plugin.PluginDescriptor;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
 */
 class DummyExtensionPoint implements ExtensionPoint {
     public String getSimpleIdentifier() {

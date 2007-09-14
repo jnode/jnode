@@ -7,7 +7,7 @@ import org.jnode.system.ResourceManager;
 import java.util.Arrays;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 abstract class  ViaRhineRing<T extends ViaRhineDesc> {
     final int RING_SIZE;

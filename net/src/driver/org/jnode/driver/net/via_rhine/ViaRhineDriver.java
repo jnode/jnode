@@ -13,7 +13,7 @@ import org.jnode.util.AccessControllerUtils;
 import java.security.PrivilegedExceptionAction;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 public class ViaRhineDriver extends BasicEthernetDriver {
     /**

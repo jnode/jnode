@@ -9,7 +9,7 @@ import org.jnode.vm.IOContext;
 import org.jnode.vm.VmSystem;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 public class ProcletIOContext implements IOContext {
     private static InputStream globalInStream;

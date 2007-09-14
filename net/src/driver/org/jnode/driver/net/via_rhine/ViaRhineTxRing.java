@@ -11,7 +11,7 @@ import static org.jnode.net.ethernet.EthernetConstants.ETH_ZLEN;
 import org.jnode.system.ResourceManager;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 class ViaRhineTxRing extends ViaRhineRing<ViaRhineTxRing.TxDesc> {
     ViaRhineTxRing(ResourceManager rm) {

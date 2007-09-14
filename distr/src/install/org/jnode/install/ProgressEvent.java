@@ -4,7 +4,7 @@
 package org.jnode.install;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 public class ProgressEvent {
     private int progress;

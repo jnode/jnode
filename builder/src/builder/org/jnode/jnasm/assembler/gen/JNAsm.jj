@@ -16,7 +16,7 @@ import org.jnode.jnasm.assembler.Register;
 import org.jnode.jnasm.assembler.Identifier;
 
 /**
- * @author Levente Santha (lsantha@users.sourceforge.net)
+ * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
 public class JNAsm extends Assembler{
 

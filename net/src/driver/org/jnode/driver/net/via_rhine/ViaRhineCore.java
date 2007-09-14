@@ -24,7 +24,7 @@ import org.jnode.driver.net.ethernet.spi.Flags;
 import java.io.*;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 class ViaRhineCore extends AbstractDeviceCore implements IRQHandler {
     private final int ioBase;

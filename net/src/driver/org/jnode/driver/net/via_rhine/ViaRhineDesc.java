@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 import org.vmmagic.unboxed.Address;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 class ViaRhineDesc {
     private static final int OWN_BIT_MASK = 0x80000000;

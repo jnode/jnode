@@ -7,7 +7,7 @@ import org.jnode.driver.net.ethernet.spi.Flags;
 import org.jnode.plugin.ConfigurationElement;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 class ViaRhineFlags implements Flags {
     private final String name;

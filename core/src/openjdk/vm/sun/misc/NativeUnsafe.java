@@ -9,7 +9,7 @@ import org.vmmagic.unboxed.ObjectReference;
 import org.vmmagic.unboxed.Address;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 class NativeUnsafe {
     static void registerNatives() {

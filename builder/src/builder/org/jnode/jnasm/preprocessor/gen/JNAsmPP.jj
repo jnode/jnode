@@ -13,7 +13,7 @@ import org.jnode.jnasm.preprocessor.Macro;
 import org.jnode.jnasm.preprocessor.Preprocessor;
 
 /**
- * @author Levente Santha (lsantha@users.sourceforge.net)
+ * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
 public class JNAsmPP extends Preprocessor {
     protected void clearTokens(Token start, Token end){

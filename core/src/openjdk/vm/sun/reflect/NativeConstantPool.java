@@ -7,7 +7,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 public class NativeConstantPool {
     private static int getSize0(ConstantPool instance, Object constantPoolOop) {

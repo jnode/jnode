@@ -6,7 +6,7 @@ package java.lang;
 import org.jnode.vm.VmMagic;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 class NativeDouble {
     /**

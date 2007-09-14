@@ -4,7 +4,7 @@
 package sun.awt;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 class NativeSunToolkit {
     static void closeSplashScreen() {
