@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 class VmIOContext implements IOContext {
     private static InputStream globalInStream;

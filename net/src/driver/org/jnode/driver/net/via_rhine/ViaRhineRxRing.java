@@ -8,7 +8,7 @@ import org.jnode.system.ResourceManager;
 import org.jnode.net.SocketBuffer;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 class ViaRhineRxRing extends ViaRhineRing<ViaRhineRxRing.RxDesc> {
     ViaRhineRxRing(ResourceManager rm){

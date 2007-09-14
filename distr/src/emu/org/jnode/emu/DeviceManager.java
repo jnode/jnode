@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 import org.jnode.driver.*;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
 */
 public class DeviceManager extends AbstractDeviceManager {
     public static final Logger log = Logger.getLogger(DeviceManager.class);

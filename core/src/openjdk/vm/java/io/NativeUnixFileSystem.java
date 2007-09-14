@@ -4,7 +4,7 @@
 package java.io;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 public class NativeUnixFileSystem {
     private static String canonicalize0(UnixFileSystem ufs, String path) throws IOException {

@@ -7,7 +7,7 @@ import org.jnode.fs.jfat.command.JGrubInstallCommand;
 import org.jnode.install.*;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
 */
 public class GrubInstallerAction implements InstallerAction {
     private String disk;

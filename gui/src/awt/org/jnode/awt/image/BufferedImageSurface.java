@@ -13,7 +13,7 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
 */
 public class BufferedImageSurface extends AbstractSurface {
 

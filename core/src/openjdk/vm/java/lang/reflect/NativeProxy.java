@@ -4,7 +4,7 @@
 package java.lang.reflect;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 public class NativeProxy {
     /**

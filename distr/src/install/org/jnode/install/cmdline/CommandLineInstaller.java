@@ -13,7 +13,7 @@ import org.jnode.install.action.CopyFilesAction;
 import org.jnode.install.action.GrubInstallerAction;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 public class CommandLineInstaller extends AbstractInstaller {
 

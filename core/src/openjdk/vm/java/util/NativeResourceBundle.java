@@ -6,7 +6,7 @@ package java.util;
 import org.jnode.vm.VmSystem;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 class NativeResourceBundle {
     static Class[] getClassContext(){

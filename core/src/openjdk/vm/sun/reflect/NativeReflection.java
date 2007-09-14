@@ -7,7 +7,7 @@ import org.jnode.vm.VmSystem;
 
 /**
  * @see sun.reflect.Reflection
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 class NativeReflection {
     /**

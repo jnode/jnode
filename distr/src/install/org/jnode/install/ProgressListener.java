@@ -4,7 +4,7 @@
 package org.jnode.install;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 public interface ProgressListener {
     void progress(ProgressEvent e);

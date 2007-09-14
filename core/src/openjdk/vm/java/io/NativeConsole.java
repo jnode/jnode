@@ -4,7 +4,7 @@
 package java.io;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 class NativeConsole {
     private static String encoding(){

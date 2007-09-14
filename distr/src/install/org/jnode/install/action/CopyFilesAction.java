@@ -7,7 +7,7 @@ import java.io.File;
 import org.jnode.install.*;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
 */
 public class CopyFilesAction implements InstallerAction {
     private String targetDirectory;

@@ -4,7 +4,7 @@
 package org.jnode.driver.net.via_rhine;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 interface ViaRhineConstants {
 

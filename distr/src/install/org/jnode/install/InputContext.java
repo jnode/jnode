@@ -6,7 +6,7 @@ package org.jnode.install;
 import java.util.HashMap;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 public abstract class InputContext {
     private HashMap<String, Object> values = new HashMap<String, Object>();
