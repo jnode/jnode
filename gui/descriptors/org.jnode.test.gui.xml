@@ -39,6 +39,10 @@
         <permission class="java.lang.RuntimePermission" name="setIO"/>
         <permission class="java.awt.AWTPermission" name="createRobot"/>
         <permission class="java.awt.AWTPermission" name="readDisplayPixels"/>
+    	<permission class="java.util.PropertyPermission" name="user.home" actions="read"/>
+    	<permission class="java.util.PropertyPermission" name="gnu.awt.dispatchthread.priority" actions="read"/>
+    	<permission class="java.util.PropertyPermission" name="gnu.javax.swing.DebugGraphics" actions="read"/>
+    	<permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
     </extension>
 
   <extension point="org.jnode.shell.aliases">
