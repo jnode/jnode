@@ -23,7 +23,6 @@ package org.jnode.ant.taskdefs;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,9 +40,11 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.attrs.Annotation;
+import org.objectweb.asm.attrs.Attributes;
 import org.objectweb.asm.attrs.RuntimeVisibleAnnotations;
-import org.objectweb.asm.util.AbstractVisitor;
-import org.objectweb.asm.util.CheckClassAdapter;
+//import org.objectweb.asm.util.AbstractVisitor;
+//import org.objectweb.asm.util.CheckClassAdapter;
+//import org.objectweb.asm.util.TraceClassVisitor;
 import org.objectweb.asm.util.TraceClassVisitor;
 
 /**
@@ -59,6 +60,7 @@ public class AnnotateTask extends FileSetTask {
 
 	private File annotationFile;
 	private String[] classesFiles;
+	private boolean trace = true;
 	
 	public void execute() throws BuildException {
 		classesFiles = readProperties(annotationFile);		
@@ -71,6 +73,11 @@ public class AnnotateTask extends FileSetTask {
 
 	public final void setAnnotationFile(File annotationFile) {
 		this.annotationFile = annotationFile;
+	}
+	
+	public final void setTrace(boolean trace)
+	{
+		this.trace = trace;
 	}
 
 	/**
@@ -166,9 +173,19 @@ public class AnnotateTask extends FileSetTask {
 		
 		try
 		{
+			if(trace)
+			{
+				traceClass(file, "before");
+			}
+			
 			fis = new FileInputStream(file);
 			fos = new FileOutputStream(tmpFile);
 			addAnnotation(file.getName(), fis, fos);
+			
+			if(trace)
+			{
+				traceClass(file, "after");
+			}			
 		}
 		finally
 		{
@@ -184,12 +201,12 @@ public class AnnotateTask extends FileSetTask {
 		
 		if(!file.delete())
 		{
-			throw new IOException("can delete "+file.getAbsolutePath());
+			throw new IOException("can't delete "+file.getAbsolutePath());
 		}
 		
 		if(!tmpFile.renameTo(file))
 		{
-			throw new IOException("can rename "+tmpFile.getAbsolutePath());
+			throw new IOException("can't rename "+tmpFile.getAbsolutePath());
 		}
 		
 		//traceClass(file);
@@ -203,18 +220,17 @@ public class AnnotateTask extends FileSetTask {
 	 * @param file
 	 * @throws IOException
 	 */
-	private void traceClass(File file) throws IOException
+	private void traceClass(File file, String message) throws IOException
 	{
-		System.out.println("trace for "+file.getAbsolutePath());
+		System.out.println("===== ("+message+") trace for "+file.getAbsolutePath()+" =====");
 		FileInputStream fis = null;
 		try
 		{
 			fis = new FileInputStream(file);
 			
 			ClassReader cr = new ClassReader(fis);
-			TraceClassVisitor tcv = new TraceClassVisitor(new PrintWriter(System.out)); 
-			cr.accept(tcv,					
-					AbstractVisitor.getDefaultAttributes(), false);
+			TraceClassVisitor tcv = new TraceClassVisitor(null, new PrintWriter(System.out)); 
+			cr.accept(tcv, Attributes.getDefaultAttributes(), true);			
 		}
 		finally
 		{
@@ -223,16 +239,21 @@ public class AnnotateTask extends FileSetTask {
 				fis.close();
 			}			
 		}
+		System.out.println("----- end trace -----");
 	}
 
 	private void addAnnotation(String fileName, InputStream inputClass, OutputStream outputClass) throws BuildException {
 		ClassWriter cw = new ClassWriter(false);
 		try {
 			ClassReader cr = new ClassReader(inputClass);
-			cr.accept(new MarkerClassVisitor(cw), AbstractVisitor.getDefaultAttributes(), false);
+			cr.accept(new MarkerClassVisitor(cw), 
+					Attributes.getDefaultAttributes(), 
+					true);			
 			byte[] b = cw.toByteArray();
+			
 			outputClass.write(b);
 		} catch (Exception ex) {
+			ex.printStackTrace();
 			throw new BuildException("Unable to load class in file "+fileName, ex);
 		}
 	}
@@ -243,16 +264,18 @@ public class AnnotateTask extends FileSetTask {
 			super(cv);
 		}
 
+		@Override
 		public void visit(int version, int access, String name,
-				String superName, String sourceFile, String[] interfaces) {
-			super.visit(org.objectweb.asm.Constants.V1_5, access, name, superName,
-					sourceFile, interfaces);
+				String superName, String[] interfaces, String sourceFile) {
+			super.visit(org.objectweb.asm.Constants.V1_5, access, 
+					name, superName, interfaces, sourceFile);
 		}
 
 		@SuppressWarnings("unchecked")
 		public void visitEnd() {
 			String t = Type.getDescriptor(SharedStatics.class);
 			Annotation ann = new Annotation(t);
+			ann.add("name", "");
 
 			RuntimeVisibleAnnotations attr = new RuntimeVisibleAnnotations();
 			attr.annotations.add(ann);
