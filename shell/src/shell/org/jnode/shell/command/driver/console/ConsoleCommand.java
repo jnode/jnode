@@ -109,21 +109,17 @@ public class ConsoleCommand {
         } else if (newConsole) {
             if (isolateNewConsole) {
                 try {
-                    Isolate newIsolate = new Isolate(ConsoleCommand.class.getName(), new String[] { "-n" });
+                    Isolate newIsolate = new Isolate(
+                    		ConsoleCommand.IsolatedConsole.class.getName(), 
+                    		new String[0]);
                     newIsolate.start();
+                    System.out.println("Started new isolated console");
                 } catch (IsolateStartupException ex) {
                     System.out.println("Failed to start new isolated console");
                     ex.printStackTrace(System.err);
                 }
             } else {
-                final TextConsole console = (TextConsole) conMgr.createConsole(
-                        null, ConsoleManager.CreateOptions.TEXT
-                        | ConsoleManager.CreateOptions.SCROLLABLE);
-                CommandShell commandShell = new CommandShell(console);
-                new Thread(commandShell).start();
-                
-                System.out.println("Console created with name:"
-                        + console.getConsoleName());
+            	createConsoleWithShell(conMgr);
             }
         } else {
             System.out.println("test RawTextConsole");
@@ -133,5 +129,37 @@ public class ConsoleCommand {
             conMgr.focus(console);
             console.clear();
         }
+    }
+    
+    private static class IsolatedConsole {
+
+		public static void main(String[] args) {
+			try {
+			    final ShellManager sm = InitialNaming.lookup(ShellManager.NAME);
+	            final ConsoleManager conMgr = sm.getCurrentShell().getConsole().getManager();
+	            TextConsole console = createConsoleWithShell(conMgr);
+	            System.setIn(console.getIn());
+	            System.setOut(console.getOut());
+	            System.setErr(console.getErr());
+			}
+			catch (Exception ex) {
+				// FIXME
+                System.out.println("Problem creating the isolated console");
+                ex.printStackTrace(System.err);
+			}
+		}
+    }
+    
+    private static TextConsole createConsoleWithShell(final ConsoleManager conMgr) 
+    throws ShellException {
+    	final TextConsole console = (TextConsole) conMgr.createConsole(
+                null, ConsoleManager.CreateOptions.TEXT
+                | ConsoleManager.CreateOptions.SCROLLABLE);
+        CommandShell commandShell = new CommandShell(console);
+        new Thread(commandShell).start();
+        
+        System.out.println("Console created with name:"
+                + console.getConsoleName());
+        return console;
     }
 }

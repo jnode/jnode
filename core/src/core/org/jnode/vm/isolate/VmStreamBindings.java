@@ -13,6 +13,8 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.Socket;
 
+import org.jnode.vm.IOContext;
+
 /**
  * Class used to pass stdout/stderr/stdin streams to a new isolate. 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -88,11 +90,12 @@ public final class VmStreamBindings {
     final PrintStream createIsolatedOut() throws IOException {
         final OutputStream stream;
         if (outStream != null) {
-            stream = new FilterOutputStream(outStream);
+        	stream = new FilterOutputStream(outStream);
         } else if (outSocket != null) {
-            stream = new FilterOutputStream(outSocket.getOutputStream());
+        	stream = new FilterOutputStream(outSocket.getOutputStream());
         } else {
-            stream = new FilterOutputStream(System.out);
+        	IOContext ioContext = VmIsolate.getRoot().getIOContext();
+        	stream = new FilterOutputStream(ioContext.getRealSystemOut());
         }
         return new PrintStream(stream);
     }
@@ -109,7 +112,8 @@ public final class VmStreamBindings {
         } else if (errSocket != null) {
             stream = new FilterOutputStream(errSocket.getOutputStream());
         } else {
-            stream = new FilterOutputStream(System.err);
+        	IOContext ioContext = VmIsolate.getRoot().getIOContext();
+        	stream = new FilterOutputStream(ioContext.getRealSystemErr());
         }
         return new PrintStream(stream);
     }
@@ -126,7 +130,8 @@ public final class VmStreamBindings {
         } else if (inSocket != null) {
             stream = new WrappedInputStream(inSocket.getInputStream());
         } else {
-            stream = new WrappedInputStream(System.in);
+        	IOContext ioContext = VmIsolate.getRoot().getIOContext();
+        	stream = new WrappedInputStream(ioContext.getRealSystemIn());
         }
         return stream;
     }
@@ -137,6 +142,6 @@ public final class VmStreamBindings {
          */
         public WrappedInputStream(InputStream in) {
             super(in);
-        }        
+        }
     }
 }

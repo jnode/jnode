@@ -192,7 +192,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             defaultCommandInvoker = new DefaultCommandInvoker(this);
             threadCommandInvoker = new ThreadCommandInvoker(this);
             procletCommandInvoker = new ProcletCommandInvoker(this);
-            this.commandInvoker = threadCommandInvoker; // default to separate
+            setThreadCommandInvoker(); // default to separate
             this.console.addConsoleListener(this);
             // threads for commands.
             aliasMgr = ((AliasManager) InitialNaming.lookup(AliasManager.NAME))
@@ -518,52 +518,58 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     	if (isHistoryEnabled()) {
     		// Insert a filter on the input stream that adds completed input lines
     		// to the application input history.
-    		// TODO - revisit for support of muilt-byte character encodings.
-    		return new FilterInputStream(in) {
-    			private StringBuilder line = new StringBuilder();
-    			
-				@Override
-				public int read() throws IOException {
-					int res = super.read();
-					if (res != -1) {
-						filter((byte) res);
-					}
-					return res;
-				}
-
-				@Override
-				public int read(byte[] buf, int offset, int len) throws IOException {
-					int res = super.read(buf, offset, len);
-					for (int i = 0; i < res; i++) {
-						filter(buf[offset + i]);
-					}
-					return res;
-				}
-
-				@Override
-				public int read(byte[] buf) throws IOException {
-					int res = super.read(buf);
-					for (int i = 0; i < res; i++) {
-						filter(buf[i]);
-					}
-					return res;
-				}
-				
-				private void filter(byte b) {
-					if (b == '\n') {
-						addInputToHistory(line.toString());
-						line.setLength(0);
-					}
-					else {
-						line.append((char) b);
-					}
-				}
-    		};
+    		return new HistoryInputStream(in);
     	}
     	else {
             return in;
     	}
     }
+    
+    private class HistoryInputStream extends FilterInputStream {
+		// TODO - revisit for support of multi-byte character encodings.
+		private StringBuilder line = new StringBuilder();
+		
+		public HistoryInputStream(InputStream in) {
+			super(in);
+		}
+		
+		@Override
+		public int read() throws IOException {
+			int res = super.read();
+			if (res != -1) {
+				filter((byte) res);
+			}
+			return res;
+		}
+
+		@Override
+		public int read(byte[] buf, int offset, int len) throws IOException {
+			int res = super.read(buf, offset, len);
+			for (int i = 0; i < res; i++) {
+				filter(buf[offset + i]);
+			}
+			return res;
+		}
+
+		@Override
+		public int read(byte[] buf) throws IOException {
+			int res = super.read(buf);
+			for (int i = 0; i < res; i++) {
+				filter(buf[i]);
+			}
+			return res;
+		}
+		
+		private void filter(byte b) {
+			if (b == '\n') {
+				addInputToHistory(line.toString());
+				line.setLength(0);
+			}
+			else {
+				line.append((char) b);
+			}
+		}
+	}
 
     public PrintStream getOutputStream() {
         return out;

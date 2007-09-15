@@ -59,6 +59,7 @@ import org.jnode.vm.classmgr.VmConstClass;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmStaticField;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.isolate.VmIsolate;
 import org.jnode.vm.memmgr.VmWriteBarrier;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.scheduler.VmThread;
@@ -209,15 +210,21 @@ public final class VmSystem {
      * @return the system output stream
      */
     public static PrintStream getSystemOut() {
-        if (bootOut == null) {
-            bootOut = new SystemOutputStream();
-            bootOutStream = new PrintStream(bootOut, true);
-            //globalOutStream = globalErrStream = bootOutStream;
-            ioContext.setGlobalOutStream(bootOutStream);
-            ioContext.setGlobalErrStream(bootOutStream);
 
-        }
-        return bootOutStream;
+		if (bootOut == null) {
+			bootOut = new SystemOutputStream();
+			bootOutStream = new PrintStream(bootOut, true);
+        	IOContext ioContext = getIOContext();
+    		ioContext.setGlobalOutStream(bootOutStream);
+    		ioContext.setGlobalErrStream(bootOutStream);
+            return bootOutStream;
+		}
+		else if (VmIsolate.isRoot()) {
+            return bootOutStream;
+    	}
+    	else {
+    		return VmIsolate.currentIsolate().getIOContext().getGlobalOutStream();
+    	}
     }
 
     /**
@@ -328,7 +335,12 @@ public final class VmSystem {
      * @return String
      */
     public static String getBootLog() {
-        return bootOut.getData();
+    	if (bootOut != null) {
+            return bootOut.getData();
+    	}
+    	else {
+    		return "";
+    	}
     }
 
     // ------------------------------------------
@@ -982,7 +994,7 @@ public final class VmSystem {
      */
     @PrivilegedActionPragma
     public static void setIn(InputStream in) {
-        ioContext.setSystemIn(in);
+    	getIOContext().setSystemIn(in);
     }
 
     /**
@@ -996,7 +1008,7 @@ public final class VmSystem {
      */
     @PrivilegedActionPragma
     public static void setOut(PrintStream out) {
-        ioContext.setSystemOut(out);
+    	getIOContext().setSystemOut(out);
     }
 
     /**
@@ -1010,7 +1022,7 @@ public final class VmSystem {
      */
     @PrivilegedActionPragma
     public static void setErr(PrintStream err) {
-        ioContext.setSystemErr(err);
+    	getIOContext().setSystemErr(err);
     }
 
     //todo protect this method from arbitrary access
@@ -1033,11 +1045,15 @@ public final class VmSystem {
     }
 
     //io context related
-    private static final IOContext vmIoContext = new VmIOContext();
-    private static IOContext ioContext = vmIoContext;
+ //   private static final IOContext vmIoContext = new VmIOContext();
+ //   private static IOContext ioContext = vmIoContext;
+    
+    public static IOContext getIOContext() {
+    	return VmIsolate.currentIsolate().getIOContext();
+    }
 
     public static boolean hasVmIOContext(){
-        return ioContext instanceof VmIOContext;
+        return getIOContext() instanceof VmIOContext;
     }
 
 
@@ -1047,7 +1063,7 @@ public final class VmSystem {
      * @return the global 'err' stream.
      */
     public static PrintStream getGlobalErrStream() {
-		return ioContext.getGlobalErrStream();
+		return getIOContext().getGlobalErrStream();
 	}
 
     /**
@@ -1056,7 +1072,7 @@ public final class VmSystem {
      * @return the global 'in' stream.
      */
     public static InputStream getGlobalInStream() {
-		return ioContext.getGlobalInStream();
+		return getIOContext().getGlobalInStream();
 	}
 
     /**
@@ -1065,20 +1081,20 @@ public final class VmSystem {
      * @return the global 'out' stream.
      */
     public static PrintStream getGlobalOutStream() {
-		return ioContext.getGlobalOutStream();
+		return getIOContext().getGlobalOutStream();
 	}
 
     public static void switchToExternalIOContext(IOContext context){
         if (hasVmIOContext()){
-            ioContext = context;
+            VmIsolate.currentIsolate().setIOContext(context);
             context.enterContext();
         }
     }
 
     public static void resetIOContext(){
         if (!hasVmIOContext()){
-            ioContext.exitContext();
-            ioContext = vmIoContext;
+            getIOContext().exitContext();
+            VmIsolate.currentIsolate().resetIOContext();
         } else {
     		throw new RuntimeException("IO Context cannot be reset");
     	}

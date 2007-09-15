@@ -93,7 +93,9 @@ public class TextScreenConsole extends AbstractConsole implements TextConsole {
 				this, 0x07));
 		this.savedErr = this.err = new ConsolePrintStream(new ConsoleOutputStream(
 				this, 0x04));
-		this.claimSystemOutErr = ((options & ConsoleManager.CreateOptions.NO_SYSTEM_OUT_ERR) == 0);
+        //todo crawley, will the console not set System.out/err any more? 
+//		this.claimSystemOutErr = ((options & ConsoleManager.CreateOptions.NO_SYSTEM_OUT_ERR) == 0);
+		this.claimSystemOutErr = false;
         this.myIsolate = VmIsolate.currentIsolate();
     }
 

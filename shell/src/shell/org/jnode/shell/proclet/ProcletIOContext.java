@@ -10,6 +10,7 @@ import org.jnode.vm.VmSystem;
 
 /**
  * @author Levente S\u00e1ntha
+ * @author crawley@jnode.org
  */
 public class ProcletIOContext implements IOContext {
     private static InputStream globalInStream;
@@ -117,4 +118,31 @@ public class ProcletIOContext implements IOContext {
         VmSystem.setStaticField(System.class, "out", out);
         VmSystem.setStaticField(System.class, "err", err);
     }
+
+	public PrintStream getRealSystemErr() {
+		ProcletContext procletContext = ProcletContext.currentProcletContext();
+		if (procletContext != null) {
+            return (PrintStream) procletContext.getStream(2);
+        } else {
+            return globalErrStream;
+        }
+	}
+
+	public InputStream getRealSystemIn() {
+		ProcletContext procletContext = ProcletContext.currentProcletContext();
+		if (procletContext != null) {
+            return (InputStream) procletContext.getStream(0);
+        } else {
+            return globalInStream;
+        }
+	}
+
+	public PrintStream getRealSystemOut() {
+		ProcletContext procletContext = ProcletContext.currentProcletContext();
+		if (procletContext != null) {
+            return (PrintStream) procletContext.getStream(1);
+        } else {
+            return globalOutStream;
+        }
+	}
 }

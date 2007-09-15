@@ -40,6 +40,11 @@ public final class IsolateThread extends Thread {
         this.stdout = stdout;
         this.stderr = stderr;
         this.stdin = stdin;
+
+        //TODO crawley, review this, looks like a serious side effect for creating a thread
+        System.setIn(stdin);
+        System.setOut(stdout);
+        System.setErr(stderr);
     }
 
     /**

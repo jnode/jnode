@@ -304,4 +304,17 @@ public class ProcletContext extends ThreadGroup {
 	public Throwable getUncaughtException() {
 		return uncaughtException;
 	}
+	
+	/**
+	 * Return a human-readable String representing this ProcletContext.
+	 * @return a human-readable String representing this ProcletContext
+	 */
+	public String toString()
+	{
+		return getClass().getName() + 
+			"[name=" + getName() + ",maxpri=" + getMaxPriority() + 
+			",pid=" + getPid() + ']';
+	}
+
+
 }
