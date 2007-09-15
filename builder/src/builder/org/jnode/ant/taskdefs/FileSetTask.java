@@ -37,14 +37,55 @@ import org.apache.tools.ant.types.FileSet;
  *
  */
 abstract public class FileSetTask extends Task {
-
+	protected boolean trace = false;
+	protected boolean failOnError = true;
+	
 	private final ArrayList<FileSet> fileSets = new ArrayList<FileSet>();
 
+	public final void setTrace(boolean trace)
+	{
+		this.trace = trace;
+	}
+	
+	public final void setFailOnError(boolean failOnError)
+	{
+		this.failOnError = failOnError;		
+	}
+	
 	public void addFileSet(FileSet fs) {
 		fileSets.add(fs);
 	}
 
-	public void execute() throws BuildException {
+	final public void execute() throws BuildException {
+		try
+		{
+			doExecute();
+		}
+		catch(BuildException be)
+		{
+			if(failOnError)
+			{
+				throw be;
+			}
+			else
+			{
+				be.printStackTrace();
+			}
+		}
+		catch(Throwable t)
+		{
+			if(failOnError)
+			{
+				throw new BuildException(t);
+			}
+			else
+			{
+				t.printStackTrace();
+			}
+		}
+	}
+
+	protected void doExecute() throws BuildException {
 		// default implementation : simply iterate on all files
 		processFiles();
 	}
