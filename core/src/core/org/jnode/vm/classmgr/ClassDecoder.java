@@ -29,6 +29,7 @@ import java.nio.ByteBuffer;
 import java.security.ProtectionDomain;
 
 import org.jnode.system.BootLog;
+import org.jnode.vm.VmUtils;
 import org.jnode.vm.annotation.AllowedPackages;
 import org.jnode.vm.annotation.CheckPermission;
 import org.jnode.vm.annotation.DoPrivileged;
@@ -482,9 +483,7 @@ public final class ClassDecoder {
     private static VmByteCode getNativeCodeReplacement(VmMethod method,
             VmClassLoader cl, boolean verbose) {
         final String className = method.getDeclaringClass().getName();
-        final String pkg = VMClassHelper.getPackagePortion(className);
-        final String nativeClassName = pkg + ((pkg.length() > 0) ? "." : "")
-                + "Native" + VMClassHelper.getClassNamePortion(className);
+        final String nativeClassName = VmUtils.getNativeClassName(className);
         final VmType nativeType;
         try {
             nativeType = cl.loadClass(nativeClassName, true);

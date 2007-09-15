@@ -26,6 +26,7 @@
 	<classpathentry kind="lib" path="lib/mmtk/mmtk.jar" sourcepath="D:/epr/cvswork/MMTk/src"/>
 	<classpathentry exported="true" kind="lib" path="lib/asm-1.5.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/asm-attrs-1.5.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/asm-util-1.5.3.jar"/>
 	<classpathentry kind="src" path="src/nanoxml"/>
 	<classpathentry kind="lib" path="lib/mauve.jar"/>
 	<classpathentry kind="output" path="build/classes"/>

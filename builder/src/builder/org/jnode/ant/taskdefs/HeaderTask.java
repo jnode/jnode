@@ -68,7 +68,7 @@ public class HeaderTask extends FileSetTask {
 		return line.trim().equals(hdrLine.trim());
 	}
 
-	public void execute() throws BuildException {
+	protected void doExecute() throws BuildException {
 		if (headerFile == null) {
 			throw new BuildException("HeaderFile must be set");
 		}

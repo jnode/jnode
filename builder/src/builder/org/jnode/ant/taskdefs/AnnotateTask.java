@@ -60,9 +60,8 @@ public class AnnotateTask extends FileSetTask {
 
 	private File annotationFile;
 	private String[] classesFiles;
-	private boolean trace = true;
 	
-	public void execute() throws BuildException {
+	protected void doExecute() throws BuildException {
 		classesFiles = readProperties(annotationFile);		
 		processFiles();
 	}
@@ -73,11 +72,6 @@ public class AnnotateTask extends FileSetTask {
 
 	public final void setAnnotationFile(File annotationFile) {
 		this.annotationFile = annotationFile;
-	}
-	
-	public final void setTrace(boolean trace)
-	{
-		this.trace = trace;
 	}
 
 	/**

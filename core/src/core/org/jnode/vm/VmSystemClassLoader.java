@@ -401,11 +401,8 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
     private VmType loadNormalClass(String name) throws IOException,
             ClassNotFoundException {
 
-        boolean allowNatives = false;
-        allowNatives |= name.equals("org.jnode.vm.Unsafe");
         final String archN = arch.getName();
-        allowNatives |= name.equals("org.jnode.vm." + archN + ".Unsafe"
-                + archN.toUpperCase());
+        boolean allowNatives = VmUtils.allowNatives(name, archN);
 
         // System.out.println("bvi.loadClass: " +name);
         final ByteBuffer image = getClassData(name);
