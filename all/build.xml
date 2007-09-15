@@ -166,7 +166,7 @@
     </target>
 
     <!-- Assemble all plugins -->
-    <target name="assemble-plugins" depends="assemble-projects,openjdk-annotate,native-method-check">
+    <target name="assemble-plugins" depends="assemble-projects,openjdk-annotate">
         <!-- Now assemble all plugins -->
         <taskdef name="plugin" classname="org.jnode.build.PluginTask" classpathref="cp-jnode"/>
         <plugin todir="${plugins.dir}" tmpdir="${build.dir}/tmp/plugins" pluginDir="${descriptors.dir}">
