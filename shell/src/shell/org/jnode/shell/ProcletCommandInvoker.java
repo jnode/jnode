@@ -29,6 +29,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 
 import org.jnode.shell.help.Help;
@@ -62,12 +63,15 @@ public class ProcletCommandInvoker extends AsyncCommandInvoker {
         		cmdName);
     }
 
-    Runnable createRunner(Class cx, Method method, Object[] args, InputStream commandIn, PrintStream commandOut, PrintStream commandErr) {
-		return new CommandRunner(cx, method, args);
+    Runnable createRunner(Class cx, Method method, Object[] args, 
+    		InputStream commandIn, PrintStream commandOut, PrintStream commandErr) {
+		return new CommandRunner(cx, method, args,commandIn, commandOut, commandErr);
 	}
 
 	class CommandRunner implements Runnable {
-
+		private final InputStream commandIn;
+		private final PrintStream commandOut;
+		private final PrintStream commandErr;
         private Class cx;
 
         Method method;
@@ -76,16 +80,28 @@ public class ProcletCommandInvoker extends AsyncCommandInvoker {
         
         boolean finished = false;
 
-        public CommandRunner(Class cx, Method method, Object[] args) {
+        public CommandRunner(Class cx, Method method, Object[] args, 
+        		InputStream commandIn, PrintStream commandOut, PrintStream commandErr) {
             this.cx = cx;
             this.method = method;
             this.args = args;
+            this.commandIn = commandIn;
+            this.commandOut = commandOut;
+            this.commandErr = commandErr;
         }
 
         public void run() {
             try {
             	try {
-                    Object obj = null;
+            		AccessController.doPrivileged(new PrivilegedAction() {
+        				public Object run() {
+        					System.setOut(commandOut);
+        					System.setErr(commandErr);
+        					System.setIn(commandIn);
+        					return null;
+        				}
+        			});
+            		Object obj = null;
                 	if(!Modifier.isStatic(method.getModifiers())) {
                 		obj = cx.newInstance();
                 	}

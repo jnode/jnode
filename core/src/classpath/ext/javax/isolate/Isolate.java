@@ -58,6 +58,7 @@ public final class Isolate {
      * 
      * @param mainClass
      * @param args
+     * @param properties
      */
     public Isolate(Properties properties, String mainClass, String[] args) {
         this(new StreamBindings(), properties, mainClass, args);
@@ -68,10 +69,8 @@ public final class Isolate {
      * 
      * @param mainClass
      * @param mainArgs
-     * @param context
-     * @param stdin
-     * @param stdout
-     * @param stderr
+     * @param bindings
+     * @param properties
      */
     public Isolate(StreamBindings bindings, Properties properties,
             String mainClass, String[] args) {

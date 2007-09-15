@@ -21,15 +21,12 @@
  
 package org.jnode.driver.console.textscreen;
 
-import java.io.PrintStream;
 import java.util.Arrays;
 
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.driver.console.InputCompleter;
 import org.jnode.driver.console.TextConsole;
 import org.jnode.driver.console.spi.ConsolePrintStream;
-
-import com.sun.tools.javac.code.Attribute.Array;
 
 
 /**

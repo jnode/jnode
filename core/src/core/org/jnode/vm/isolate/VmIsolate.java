@@ -114,6 +114,16 @@ public final class VmIsolate {
      * Links passed to the start of this isolate
      */
     private VmDataLink[] dataLinks;
+    
+    /**
+     * The isolate-specific default IO context
+     */
+    private final IOContext vmIoContext = new VmIOContext();
+    
+    /**
+     * The isolate-specific switchable IO context
+     */
+    private IOContext ioContext = vmIoContext;
 
     /**
      * Isolate states.
@@ -189,10 +199,8 @@ public final class VmIsolate {
      * @param isolate
      * @param mainClass
      * @param args
-     * @param context
-     * @param stdin
-     * @param stdout
-     * @param stderr
+     * @param bindings
+     * @param properties
      */
     public VmIsolate(Isolate isolate, VmStreamBindings bindings,
             Properties properties, String mainClass, String[] args) {
@@ -608,4 +616,16 @@ public final class VmIsolate {
             throw new SecurityException("Method called by invalid isolate");
         }
     }
+
+	public IOContext getIOContext() {
+		return ioContext;
+	}
+
+	public void setIOContext(IOContext context) {
+		ioContext = context;
+	}
+
+	public void resetIOContext() {
+		ioContext = vmIoContext;
+	}
 }

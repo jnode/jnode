@@ -8,8 +8,9 @@ import java.io.PrintStream;
 
 /**
  * @author Levente S\u00e1ntha
+ * @author crawley@jnode.org
  */
-class VmIOContext implements IOContext {
+public class VmIOContext implements IOContext {
     private static InputStream globalInStream;
     private static PrintStream globalOutStream;
     private static PrintStream globalErrStream;
@@ -54,10 +55,22 @@ class VmIOContext implements IOContext {
     }
 
     public void enterContext() {
-
+    	// No-op
     }
 
     public void exitContext() {
-        
+    	// No-op
     }
+
+	public PrintStream getRealSystemErr() {
+		return System.err;
+	}
+
+	public InputStream getRealSystemIn() {
+		return System.in;
+	}
+
+	public PrintStream getRealSystemOut() {
+		return System.out;
+	}
 }
