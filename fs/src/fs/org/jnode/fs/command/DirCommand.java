@@ -48,12 +48,12 @@ public class DirCommand implements Command {
     private static final SimpleDateFormat df = new SimpleDateFormat("yyyy MMM dd HH:mm");
 
 
-    static final FileArgument ARG_DIR = new FileArgument("directory", "the directory to list contents of");
+    static final FileArgument ARG_PATH = new FileArgument("path", "the path to list contents of");
     public static Help.Info HELP_INFO =
             new Help.Info(
                     "dir",
-                    "List the entries of the given directory",
-                    new Parameter[]{new Parameter(ARG_DIR, Parameter.OPTIONAL)});
+                    "List the entries of the given path",
+                    new Parameter[]{new Parameter(ARG_PATH, Parameter.OPTIONAL)});
 
     public static void main(String[] args) throws Exception {
         new DirCommand().execute(new CommandLine(args), System.in, System.out, System.err);
@@ -62,15 +62,15 @@ public class DirCommand implements Command {
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
         ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
         String userDir = System.getProperty("user.dir");
-        File dir = ARG_DIR.getFile(cmdLine);
-        if (dir == null) dir = new File(userDir);
-        if (dir.exists() && dir.isDirectory()) {
-            final File[] list = dir.listFiles();
+        File path = ARG_PATH.getFile(cmdLine);
+        if (path == null) path = new File(userDir);
+        if (path.exists() && path.isDirectory()) {
+            final File[] list = path.listFiles();
             this.printList(list, out);
-        } else if (dir.exists() && dir.isFile()) {
-            this.printList(new File[]{dir}, out);
+        } else if (path.exists() && path.isFile()) {
+            this.printList(new File[]{path}, out);
         } else {
-            err.println("No such directory " + dir);
+            err.println("No such path " + path);
         }
     }
 
