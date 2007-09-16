@@ -15,5 +15,8 @@
     <library name="asm-attrs.jar">
       <export name="org.objectweb.asm.*"/>
     </library>
+    <library name="asm-util.jar">
+      <export name="org.objectweb.asm.*"/>
+    </library>
   </runtime>        
 </plugin>

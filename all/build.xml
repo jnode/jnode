@@ -57,6 +57,7 @@
     <property name="cglib.jar" value="${root.dir}/core/lib/cglib-2.1.jar"/>
     <property name="asm.jar" value="${root.dir}/core/lib/asm-1.5.3.jar"/>
 	<property name="asm-attrs.jar" value="${root.dir}/core/lib/asm-attrs-1.5.3.jar"/>
+	<property name="asm-util.jar" value="${root.dir}/core/lib/asm-util-1.5.3.jar"/>
 	<property name="jcfe.jar" value="${root.dir}/core/lib/jcfe.jar"/>
 	<property name="jfunc.jar" value="${root.dir}/core/lib/jfunc.jar"/>
 	
@@ -94,6 +95,7 @@
         <pathelement location="${jmock-cglib.jar}"/>
         <pathelement location="${asm.jar}"/>
     	<pathelement location="${asm-attrs.jar}"/>
+    	<pathelement location="${asm-util.jar}"/>
         <pathelement location="${cglib.jar}"/>
         <pathelement location="${log4j.jar}"/>
         <pathelement location="${gnu-crypto.jar}"/>
@@ -202,6 +204,7 @@
             <libalias name="jmock-cglib-1.0.1.jar" alias="${jmock-cglib.jar}"/>
             <libalias name="asm.jar" alias="${asm.jar}"/>
         	<libalias name="asm-attrs.jar" alias="${asm-attrs.jar}"/>
+        	<libalias name="asm-util.jar" alias="${asm-util.jar}"/>
             <libalias name="cglib.jar" alias="${cglib.jar}"/>
         	<libalias name="mauve.jar" alias="${mauve.jar}"/>
         	<libalias name="jcfe.jar" alias="${jcfe.jar}"/>
