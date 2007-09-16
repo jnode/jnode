@@ -70,6 +70,7 @@ public class DeleteCommand implements Command {
 
         if (!file.exists()) {
             err.println(file + " does not exist");
+	    return;
         }
 
         // Lookup the Filesystem service
