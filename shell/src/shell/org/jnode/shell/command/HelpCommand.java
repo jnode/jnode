@@ -55,21 +55,24 @@ public class HelpCommand {
 		Help.Info info = HELP_INFO; // defaults to print own help
 
                 ParsedArguments cmdLine = HELP_INFO.parse(args);
-		if (PARAM_COMMAND.isSet(cmdLine))
+        String cmd = null;
+        String arg = null;
+        if (PARAM_COMMAND.isSet(cmdLine)){
 			try {
-				String cmd = ARG_COMMAND.getValue(cmdLine);
-				Class clazz = null;
+				arg = ARG_COMMAND.getValue(cmdLine);
+				Class clazz;
 				try {
 					final Shell shell = ShellUtils.getShellManager().getCurrentShell();
-					clazz = shell.getAliasManager().getAliasClass(cmd);
+					clazz = shell.getAliasManager().getAliasClass(arg);
 				} catch (NoSuchAliasException ex) {
-					clazz = Class.forName(cmd);
+					clazz = Class.forName(arg);
 				}
 				Field clInfo = clazz.getField(Help.INFO_FIELD_NAME);
 				info = (Help.Info)clInfo.get(null); // static access
-			} catch (ClassNotFoundException ex) {
-				System.err.println("Class not found");
-			} catch (NoSuchFieldException ex) {
+                if(info != null) cmd = arg;
+            } catch (ClassNotFoundException ex) {
+				System.err.println("Command not found: " + arg);
+            } catch (NoSuchFieldException ex) {
 				System.err.println("Class does not provide requested information");
 			} catch (ClassCastException ex) {
 				System.err.println("Embedded information is in wrong format");
@@ -78,7 +81,8 @@ public class HelpCommand {
 			} catch (SecurityException ex) {
 				System.err.println("Access to class restricted");
 			}
-		info.help();
+        }
+        info.help(cmd);
 	}
 
 }

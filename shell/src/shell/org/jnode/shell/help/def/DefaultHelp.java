@@ -41,11 +41,13 @@ public class DefaultHelp extends Help {
 
     /**
      * Shows the complete help for a command.
+     * @see Help#help(org.jnode.shell.help.Help.Info, String) 
      */
-    public void help(Info info) {
+    public void help(Info info, String command) {
         final Syntax[] syntaxes = info.getSyntaxes();
+        final String name = command == null ? info.getName() : command;
         for (int i = 0; i < syntaxes.length; i++) {
-            help(info.getName(), syntaxes[i]);
+            help(name, syntaxes[i]);
             if (i < syntaxes.length)
                 System.out.println();
         }

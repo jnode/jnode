@@ -25,19 +25,16 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import junit.textui.TestRunner;
 
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.argument.ClassNameArgument;
 import org.jnode.shell.help.argument.OptionArgument;
 import org.jnode.test.framework.TestManager;
 
@@ -96,7 +93,7 @@ public class SuiteCommand {
     	}
     	else
     	{
-    		HELP_INFO.help();
+    		HELP_INFO.help(null);
     	}
     }
     
