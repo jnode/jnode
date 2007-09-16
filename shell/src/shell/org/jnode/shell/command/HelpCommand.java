@@ -22,11 +22,14 @@
 package org.jnode.shell.command;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.naming.NameNotFoundException;
 
 import org.jnode.shell.Shell;
 import org.jnode.shell.ShellUtils;
+import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.alias.NoSuchAliasException;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.HelpException;
@@ -50,29 +53,34 @@ public class HelpCommand {
 			new Parameter[] { PARAM_COMMAND });
 
 	public static void main(String[] args)
-	throws NameNotFoundException,
-            HelpException {
+	throws HelpException {
 		Help.Info info = HELP_INFO; // defaults to print own help
-
-                ParsedArguments cmdLine = HELP_INFO.parse(args);
+		String otherAliases = null;
+		
+        ParsedArguments cmdLine = HELP_INFO.parse(args);
         String cmd = null;
         String arg = null;
         if (PARAM_COMMAND.isSet(cmdLine)){
 			try {
+				final Shell shell = ShellUtils.getShellManager().getCurrentShell();
+				final AliasManager aliasManager = shell.getAliasManager(); 
+
 				arg = ARG_COMMAND.getValue(cmdLine);
-				Class clazz;
+				Class clazz;				
 				try {
-					final Shell shell = ShellUtils.getShellManager().getCurrentShell();
-					clazz = shell.getAliasManager().getAliasClass(arg);
+					clazz = aliasManager.getAliasClass(arg);
 				} catch (NoSuchAliasException ex) {
+					//System.out.println("Not an alias -> assuming it's a class name");
 					clazz = Class.forName(arg);
 				}
 				Field clInfo = clazz.getField(Help.INFO_FIELD_NAME);
 				info = (Help.Info)clInfo.get(null); // static access
                 if(info != null) cmd = arg;
-            } catch (ClassNotFoundException ex) {
+				
+				otherAliases = getOtherAliases(aliasManager, cmd, clazz);
+			} catch (ClassNotFoundException ex) {
 				System.err.println("Command not found: " + arg);
-            } catch (NoSuchFieldException ex) {
+			} catch (NoSuchFieldException ex) {
 				System.err.println("Class does not provide requested information");
 			} catch (ClassCastException ex) {
 				System.err.println("Embedded information is in wrong format");
@@ -80,9 +88,53 @@ public class HelpCommand {
 				System.err.println("Embedded information is not public");
 			} catch (SecurityException ex) {
 				System.err.println("Access to class restricted");
+			} catch (NameNotFoundException e) {
+				System.err.println("Can't find the shell manager");
 			}
-        }
-        info.help(cmd);
+		}
+		
+		info.help(cmd);
+		
+		if(otherAliases != null)
+		{
+			System.out.println(otherAliases);
+		}
 	}
 
+	private static String getOtherAliases(AliasManager aliasManager, String alias, Class aliasClass)
+	{
+		boolean hasOtherAlias = false; 
+		StringBuilder sb = new StringBuilder("Other aliases: ");
+		boolean first = true;
+		
+		for(String otherAlias : aliasManager.aliases())
+		{
+			// exclude alias from the returned list
+			if(!otherAlias.equals(alias))
+			{
+				try {
+					Class otherAliasClass = aliasManager.getAliasClass(otherAlias);
+					
+					if (aliasClass.equals(otherAliasClass)) {
+						// we have found another alias for the same command
+						hasOtherAlias = true;
+						
+						if (!first) {
+							sb.append(",");
+						}
+
+						sb.append(otherAlias);
+
+						first = false;
+					}
+				} catch (NoSuchAliasException nsae) {
+					// should never happen since we iterate on known aliases
+				} catch (ClassNotFoundException e) {
+					// should never happen since we iterate on known aliases
+				}
+			}
+		}
+		
+		return hasOtherAlias ? sb.toString() : null;
+	}
 }
