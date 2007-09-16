@@ -68,10 +68,10 @@ public abstract class Help {
     /**
      * Shows the help page for a command
      * 
-     * @param info
-     *            the command information
+     * @param info the command info
+     * @param command a command name or alias which appears in the help
      */
-    public abstract void help(Info info);
+    public abstract void help(Info info, String command);
 
     /**
      * Shows the usage line for a command
@@ -141,8 +141,13 @@ public abstract class Help {
             }
         }
 
-        public void help() throws HelpException {
-            Help.getHelp().help(this);
+        /**
+         * Prints the help message.
+         * @param command command name or alias which appears in the help message
+         * @throws HelpException
+         */
+        public void help(String command) throws HelpException {
+            Help.getHelp().help(this, command);
         }
 
         public String complete(CommandLine partial) throws CompletionException {
