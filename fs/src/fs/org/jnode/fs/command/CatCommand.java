@@ -101,18 +101,10 @@ public class CatCommand implements Command{
     			}
     		}
     		
-    		boolean isEmpty = true;
     		int len;
     		final byte[] buf = new byte[ 1024];
     		while ((len = is.read(buf)) > 0) {
-    			isEmpty = false;
-    			
     			out.write(buf, 0, len);
-    		}
-    		
-    		if(isEmpty && !isNewFile)
-    		{
-    			out.println("<empty file>");
     		}
     		
     		out.flush();
