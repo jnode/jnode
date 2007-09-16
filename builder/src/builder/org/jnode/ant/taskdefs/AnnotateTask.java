@@ -26,7 +26,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,6 +33,7 @@ import java.util.Properties;
 
 import org.apache.tools.ant.BuildException;
 import org.jnode.vm.annotation.SharedStatics;
+import org.objectweb.asm.Attribute;
 import org.objectweb.asm.ClassAdapter;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
@@ -42,9 +42,6 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.attrs.Annotation;
 import org.objectweb.asm.attrs.Attributes;
 import org.objectweb.asm.attrs.RuntimeVisibleAnnotations;
-//import org.objectweb.asm.util.AbstractVisitor;
-//import org.objectweb.asm.util.CheckClassAdapter;
-//import org.objectweb.asm.util.TraceClassVisitor;
 import org.objectweb.asm.util.TraceClassVisitor;
 
 /**
@@ -160,26 +157,14 @@ public class AnnotateTask extends FileSetTask {
 			return;
 		}
 		
-		System.out.println("adding annotation to file "+file.getAbsolutePath());
 		File tmpFile = new File(file.getParentFile(), file.getName()+".tmp");
 		FileInputStream fis = null;
-		FileOutputStream fos = null;
+		boolean classIsModified = false;
 		
 		try
 		{
-			if(trace)
-			{
-				traceClass(file, "before");
-			}
-			
 			fis = new FileInputStream(file);
-			fos = new FileOutputStream(tmpFile);
-			addAnnotation(file.getName(), fis, fos);
-			
-			if(trace)
-			{
-				traceClass(file, "after");
-			}			
+			classIsModified = addAnnotation(file.getName(), fis, tmpFile);
 		}
 		finally
 		{
@@ -187,23 +172,27 @@ public class AnnotateTask extends FileSetTask {
 			{
 				fis.close();
 			}
-			if(fos != null)
+		}
+		
+		if(classIsModified)
+		{
+			if(trace)
 			{
-				fos.close();
+				traceClass(file, "before");
+				
+				traceClass(tmpFile, "after");
+			}			
+			
+			if(!file.delete())
+			{
+				throw new IOException("can't delete "+file.getAbsolutePath());
+			}
+			
+			if(!tmpFile.renameTo(file))
+			{
+				throw new IOException("can't rename "+tmpFile.getAbsolutePath());
 			}
 		}
-		
-		if(!file.delete())
-		{
-			throw new IOException("can't delete "+file.getAbsolutePath());
-		}
-		
-		if(!tmpFile.renameTo(file))
-		{
-			throw new IOException("can't rename "+tmpFile.getAbsolutePath());
-		}
-		
-		//traceClass(file);
 	}
 	
 	/**
@@ -236,24 +225,50 @@ public class AnnotateTask extends FileSetTask {
 		System.out.println("----- end trace -----");
 	}
 
-	private void addAnnotation(String fileName, InputStream inputClass, OutputStream outputClass) throws BuildException {
+	private boolean addAnnotation(String fileName, InputStream inputClass, File tmpFile) throws BuildException {
+		boolean classIsModified = false;
+		FileOutputStream outputClass = null;
+		
 		ClassWriter cw = new ClassWriter(false);
 		try {
 			ClassReader cr = new ClassReader(inputClass);
-			cr.accept(new MarkerClassVisitor(cw), 
-					Attributes.getDefaultAttributes(), 
-					true);			
-			byte[] b = cw.toByteArray();
+			MarkerClassVisitor mcv = new MarkerClassVisitor(cw);
+			cr.accept(mcv, Attributes.getDefaultAttributes(), true);
 			
-			outputClass.write(b);
+			if(mcv.classIsModified())
+			{
+				System.out.println("adding annotation to file "+fileName);				
+				classIsModified = true;
+				
+				outputClass = new FileOutputStream(tmpFile);
+
+				byte[] b = cw.toByteArray();			
+				outputClass.write(b);
+			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			throw new BuildException("Unable to load class in file "+fileName, ex);
+			throw new BuildException("Unable to add annotations to file "+fileName, ex);
 		}
+		finally
+		{			
+			if(outputClass != null)
+			{
+				try {
+					outputClass.close();
+				} catch (IOException e) {
+					System.err.println("Can't close stream for file "+fileName);
+				}
+			}									
+		}
+		
+		return classIsModified;
 	}
 
 	private static class MarkerClassVisitor extends ClassAdapter {
-
+		private static final String ANNOTATION_TYPE_DESC = Type.getDescriptor(SharedStatics.class);
+		private boolean classIsModified = false;
+		private boolean foundAnnotation = false;
+		
 		public MarkerClassVisitor(ClassVisitor cv) {
 			super(cv);
 		}
@@ -264,18 +279,50 @@ public class AnnotateTask extends FileSetTask {
 			super.visit(org.objectweb.asm.Constants.V1_5, access, 
 					name, superName, interfaces, sourceFile);
 		}
+		
+		@Override
+		public void visitAttribute(Attribute attr) {
+			if(attr instanceof RuntimeVisibleAnnotations)
+			{
+				RuntimeVisibleAnnotations rva = (RuntimeVisibleAnnotations) attr;
+				for(Object annotation : rva.annotations)
+				{
+					if(annotation instanceof Annotation)
+					{
+						Annotation ann = (Annotation) annotation;
+						if(ann.type.equals(ANNOTATION_TYPE_DESC))
+						{
+							// we have found the annotation -> we won't need to add it again !
+							foundAnnotation = true;
+						}
+					}
+				}							
+			}
+			
+			super.visitAttribute(attr);
+		}
 
 		@SuppressWarnings("unchecked")
 		public void visitEnd() {
-			String t = Type.getDescriptor(SharedStatics.class);
-			Annotation ann = new Annotation(t);
-			ann.add("name", "");
-
-			RuntimeVisibleAnnotations attr = new RuntimeVisibleAnnotations();
-			attr.annotations.add(ann);
-			cv.visitAttribute(attr);
-
+			if(!foundAnnotation)
+			{				
+				// we have not found the annotation -> we will add it and so modify the class
+				classIsModified = true;
+				
+				Annotation ann = new Annotation(ANNOTATION_TYPE_DESC);
+				ann.add("name", "");
+	
+				RuntimeVisibleAnnotations attr = new RuntimeVisibleAnnotations();
+				attr.annotations.add(ann);
+				cv.visitAttribute(attr);
+			}
+			
 			super.visitEnd();
+		}
+		
+		public boolean classIsModified()
+		{
+			return classIsModified;
 		}
 	}
 }
