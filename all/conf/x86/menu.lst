@@ -13,9 +13,10 @@ kernel (hd0,0)/jnode32.gz mp=no
 module (hd0,0)/full.jgz
 
 # ---------------------------
-title JNode GUI (all plugins)
-kernel /jnode32.gz mp=no
-module /fullgui.jgz
+# -- disabled
+#title JNode GUI (all plugins)
+#kernel /jnode32.gz mp=no
+#module /fullgui.jgz
 
 # ---------------------------
 title JNode (default with MP)
@@ -28,9 +29,10 @@ kernel (hd0,0)/jnode32.gz
 module (hd0,0)/full.jgz
 
 # ---------------------------
-title JNode GUI (all plugins with MP)
-kernel (hd0,0)/jnode32.gz
-module (hd0,0)/fullgui.jgz
+# -- disabled
+#title JNode GUI (all plugins with MP)
+#kernel (hd0,0)/jnode32.gz
+#module (hd0,0)/fullgui.jgz
 
 # ---------------------------
 title JNode via dhcp (default with MP)
@@ -45,10 +47,11 @@ kernel (nd)/jnode32.gz
 module (nd)/full.jgz
 
 # ---------------------------
-title JNode GUI via dhcp (all plugins with MP)
-dhcp
-kernel (nd)/jnode32.gz
-module (nd)/fullgui.jgz
+# -- disabled
+#title JNode GUI via dhcp (all plugins with MP)
+#dhcp
+#kernel (nd)/jnode32.gz
+#module (nd)/fullgui.jgz
 
 # ---------------------------
 title JNode tests (all plugins + tests with MP)
@@ -56,6 +59,7 @@ kernel (hd0,0)/jnode32.gz
 module (hd0,0)/tests.jgz
 
 # ---------------------------
+# -- disabled
 #title JNode Install
 #kernel (hd0,0)/jnode32.gz
 #module (hd0,0)/install.jgz
