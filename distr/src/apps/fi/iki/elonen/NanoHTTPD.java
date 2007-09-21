@@ -251,8 +251,9 @@ public class NanoHTTPD
 		}
 		catch( IOException ioe )
 		{
-			System.err.println( "Couldn't start server:\n" + ioe );
-			System.exit( -1 );
+            System.err.println( "Couldn't start server:\n");
+            ioe.printStackTrace();
+            System.exit( -1 );
 		}
 		nh.myFileDir = new File("");
 		

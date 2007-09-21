@@ -43,11 +43,11 @@ import gnu.java.net.PlainSocketImpl;
 import java.io.IOException;
 import java.nio.channels.IllegalBlockingModeException;
 import java.nio.channels.ServerSocketChannel;
-
+import org.jnode.vm.annotation.SharedStatics;
 
 /* Written using on-line Java Platform 1.2 API Specification.
- * Status:  I believe all methods are implemented.
- */
+* Status:  I believe all methods are implemented.
+*/
 
 /**
  * This class models server side sockets.  The basic model is that the
@@ -62,6 +62,7 @@ import java.nio.channels.ServerSocketChannel;
  * @author Aaron M. Renn (arenn@urbanophile.com)
  * @author Per Bothner (bothner@cygnus.com)
  */
+@SharedStatics
 public class ServerSocket
 {
   /**
