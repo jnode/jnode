@@ -43,6 +43,7 @@ import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.Syntax;
 import org.jnode.shell.help.argument.HostNameArgument;
+import org.jnode.vm.annotation.SharedStatics;
 
 /**
  * @author JPG
@@ -167,7 +168,7 @@ public class PingCommand implements ICMPListener {
         this.stat.recordPacket(roundtrip);
     }
 }
-
+@SharedStatics
 class Request extends TimerTask {
 
     private static Map<Integer, Request> requests = new HashMap<Integer, Request>();

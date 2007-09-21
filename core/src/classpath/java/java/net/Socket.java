@@ -45,11 +45,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.IllegalBlockingModeException;
 import java.nio.channels.SocketChannel;
-
+import org.jnode.vm.annotation.SharedStatics;
 
 /* Written using on-line Java Platform 1.2 API Specification.
- * Status:  I believe all methods are implemented.
- */
+* Status:  I believe all methods are implemented.
+*/
 
 /**
  * This class models a client site socket.  A socket is a TCP/IP endpoint
@@ -68,6 +68,7 @@ import java.nio.channels.SocketChannel;
  * @author Aaron M. Renn (arenn@urbanophile.com)
  * @author Per Bothner (bothner@cygnus.com)
  */
+@SharedStatics
 public class Socket
 {
 	/**
@@ -368,17 +369,20 @@ public class Socket
       }
     catch (IOException exception)
       {
-	close();
+          exception.printStackTrace();
+    close();
 	throw exception;
       }
     catch (RuntimeException exception)
       {
-	close();
+          exception.printStackTrace();
+    close();
 	throw exception;
       }
     catch (Error error)
       {
-	close();
+          error.printStackTrace();
+    close();
 	throw error;
       }
 	}
