@@ -118,20 +118,19 @@ public class Syntax {
                 } else {
                     throw new SyntaxErrorException("Unexpected argument \"" + s + "\"");
                 }
-                //}
+            }
 
-                // no check if there is an argument, as else we would have
-                // exited before (Parameter satisfied)
-                final boolean last = !cmdLine.hasNext();
-                Argument arg = param.getArgument();
-                String value = visitor.visitValue(s, last, cmdLine.getTokenType());
-                if (value != null) {
-                    if (visitor.isValueValid(arg, value, last)) {
-                        arg.setValue(value);
-                    } else {
-                        throw new SyntaxErrorException("Invalid value for argument");
-                    }
-                }
+            // no check if there is an argument, as else we would have
+            // exited before (Parameter satisfied)
+            final boolean last = !cmdLine.hasNext();
+            Argument arg = param.getArgument();
+            String value = visitor.visitValue(s, last, cmdLine.getTokenType());
+            if (value != null) {
+            	if (visitor.isValueValid(arg, value, last)) {
+            		arg.setValue(value);
+            	} else {
+            		throw new SyntaxErrorException("Invalid value for argument");
+            	}
             }
             if (param.isSatisfied()) param = null;
         } while (cmdLine.hasNext());

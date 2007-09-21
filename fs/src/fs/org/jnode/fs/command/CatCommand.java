@@ -30,7 +30,6 @@ import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.apache.log4j.Logger;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Argument;
@@ -45,17 +44,19 @@ import org.jnode.shell.help.argument.FileArgument;
  * @author Stephen Crawley
  * @author Fabien DUMINY (fduminy@jnode.org)
  */
-public class CatCommand implements Command{
-	//private static final Logger log = Logger.getLogger(CatCommand.class);
+public class CatCommand implements Command { 
 
     static final Argument ARG_FILE = new FileArgument("file",
-            "the file (or URL) to print out");
+            "the files (or URLs) to be concatenated", true);
 
     public static Help.Info HELP_INFO = new Help.Info("cat",
-            "Print the contents of the given file (or URL).  " +
-            "If the file is omitted, standard input is read until EOF is reached; " +
+            "Concatenate the contents of the files, writing them to standatd output.  " +
+            "If there are no arguments, standard input is read until EOF is reached; " +
             "e.g. ^D when reading keyboard input.",
             new Parameter[] { new Parameter(ARG_FILE, Parameter.OPTIONAL)});
+    
+    private static final int BUFFER_SIZE = 1024;
+    
 
     public static void main(String[] args) throws Exception {
     	new CatCommand().execute(new CommandLine(args), System.in, System.out, System.err);
@@ -63,94 +64,102 @@ public class CatCommand implements Command{
     
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
     	ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
-    	String fileName = ARG_FILE.getValue(cmdLine);
-    	InputStream is = null;
-    	boolean isNewFile = false;
+    	String[] fileNames = ARG_FILE.getValues(cmdLine);
+    	boolean ok = true;
     	try {
-    		if (fileName == null) {
-    			isNewFile = true;
-    			is = in;
+    		if (fileNames.length == 0) {
+    			process(in, out);
     		}
     		else {
-    			URL url = openURL(fileName);
-    			if(url != null)
-    			{
-        			try {
-        				is = url.openStream();	
-        			}
-        			catch (IOException ex) {
-        				//log.error("can't read "+fileName, ex);
-        				err.println("Can't access file from url " + fileName);        				
-        			}
-    			}
-    			else
-    			{
-    		    	// it's not really an error since we can expect a file
-    		    	// instead of an url -> write to out and not to err 
-    		    	//out.println("Not an url -> assuming it's a file.");
-    				
-    				is = openFile(fileName, err);
-    			}
-    			
-    			if (is == null) {
-    				// Here, we already have printed an appropriate 
-    				// error message. Simply return an errorcode.
-    				
-    				// FIXME ... System.exit(1);
-    				return;
+    			for (String fileName : fileNames) {
+    				InputStream is = null;
+    				try {
+    					try {
+    						// Try to parse the argument as a URL
+    						URL url = new URL(fileName);
+    						try {
+    							// Open stream connection for URL
+    							is = url.openStream();	
+    						} catch (IOException ex) {
+    							err.println("Can't access file from url " + 
+    									fileName + ": " + ex.getMessage());        				
+    						}
+    					} catch (MalformedURLException ex) {
+    						// If the argument didn't parse as a URL, treat it as a filename
+    						// and open a FileInputStream
+	    					is = openFile(fileName, err);
+    					}
+
+    					if (is == null) {
+    						ok = false;
+    					}
+    					else {
+    						process(is, out);
+    					}
+    				} finally {
+    					if (is != null) {
+    						try { 
+    							is.close();
+    						}
+    						catch (IOException ex) {
+    							// ignore.
+    						}
+    					}
+    				}
     			}
     		}
-    		
-    		int len;
-    		final byte[] buf = new byte[ 1024];
-    		while ((len = is.read(buf)) > 0) {
-    			out.write(buf, 0, len);
-    		}
-    		
-    		out.flush();
+        	out.flush();
+    	} catch (IOException ex) {
+    		// Deal with i/o errors reading from in/is or writing to out.
+    		err.println("Problem concatenating file(s): " + ex.getMessage());
+    		ok = false;
     	}
-    	finally {
-    		if (is != null && !isNewFile) {
-    			is.close();
-    		}
-    	}
+    	// TODO need to set a 'return code'; e.g. 
+    	// if (!ok) { System.exit(1); }
+    }
+    
+    /**
+     * Copy all of stream 'in' to stream 'out'
+     * @param in
+     * @param out
+     * @throws IOException
+     */
+    private void process(InputStream in, PrintStream out) throws IOException {
+    	int len;
+		final byte[] buf = new byte[BUFFER_SIZE];
+		while ((len = in.read(buf)) > 0) {
+			out.write(buf, 0, len);
+		}
     }
 
-    private URL openURL(String fname) {
-    	URL url = null;
-    	
-        try {
-            url = new URL(fname);
-        } catch (MalformedURLException ex) {
-        	//log.error(ex);
-        }
-        
-        return url;
-    }
-
+    /**
+     * Attempt to open a file, writing an error message on failure.
+     * @param fname the filename of the file to be opened
+     * @param err where we write error messages
+     * @return An open stream, or <code>null</code>.
+     */
     private InputStream openFile(String fname, PrintStream err) {
     	InputStream is = null;
     	
         try {
         	File file = new File(fname);
-        	if(!file.exists())
-        	{
+        	// FIXME we shouldn't be doing these tests.  Rather, we should be
+        	// just trying to create the FileInputStream and printing the 
+        	// exception message on failure.  (That assumes that the exception
+        	// message is accurate!)
+        	if (!file.exists()) {
         		err.println("File doesn't exist");
         	}
-        	else if(file.isDirectory())
-        	{
-        		err.println("Can't print content of a directory");
+        	else if (file.isDirectory()) {
+        		err.println("Can't concatenate a directory");
         	}
-        	else
-        	{
+        	else {
         		is = new FileInputStream(file);
         	}
         } catch (FileNotFoundException ex) {
         	// should never happen since we check for existence before
         }
         
-        // here, if is is null we should have already printed 
-        // an appropriate error message
         return is;
     }
 
