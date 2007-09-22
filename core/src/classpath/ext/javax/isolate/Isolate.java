@@ -50,7 +50,7 @@ public final class Isolate {
      * @param args
      */
     public Isolate(String mainClass, String[] args) {
-        this(new StreamBindings(), new Properties(), mainClass, args);
+        this(new StreamBindings(), System.getProperties(), mainClass, args);
     }
 
     /**
