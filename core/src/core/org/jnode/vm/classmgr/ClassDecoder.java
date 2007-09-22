@@ -128,6 +128,7 @@ public final class ClassDecoder {
      */
     private static final String[] SHARED_STATICS_CLASSNAMES = {
         "java.util.TreeMap",
+        "org.apache.log4j.LogManager",
     };
 
     private static final byte[] TYPE_SIZES = { 1, 2, 4, 8 };
