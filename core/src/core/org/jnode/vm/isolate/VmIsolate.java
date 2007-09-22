@@ -125,6 +125,8 @@ public final class VmIsolate {
      */
     private IOContext ioContext = vmIoContext;
 
+    private Properties initProperties;
+
     /**
      * Isolate states.
      * 
@@ -205,6 +207,7 @@ public final class VmIsolate {
     public VmIsolate(Isolate isolate, VmStreamBindings bindings,
             Properties properties, String mainClass, String[] args) {
         StaticData.isolates.add(this);
+        this.initProperties = properties;
         this.isolate = isolate;
         this.mainClass = mainClass;
         this.args = args;
@@ -536,6 +539,12 @@ public final class VmIsolate {
             // Find main method
             final Method mainMethod = cls.getMethod("main",
                     IsolatedStaticData.mainTypes);
+
+            //inherit properties
+            Properties sys_porps = System.getProperties();
+            for( String prop : initProperties.stringPropertyNames()){
+                sys_porps.setProperty(prop, initProperties.getProperty(prop));
+            }
 
             // Run main method.
             mainMethod.invoke(null, new Object[] { args });
