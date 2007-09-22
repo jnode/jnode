@@ -48,7 +48,7 @@ import java.io.IOException;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.IllegalBlockingModeException;
 import java.security.AccessController;
-
+import org.jnode.vm.annotation.SharedStatics;
 
 /**
  * Written using on-line Java Platform 1.2 API Specification, as well
@@ -66,6 +66,7 @@ import java.security.AccessController;
  * @author Warren Levy (warrenl@cygnus.com)
  * @date May 3, 1999.
  */
+@SharedStatics
 public class DatagramSocket
 {
 	/**
