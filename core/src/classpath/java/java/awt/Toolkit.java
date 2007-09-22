@@ -94,6 +94,7 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import org.jnode.vm.annotation.SharedStatics;
 
 /**
  * The AWT system uses a set of native peer objects to implement its
@@ -109,6 +110,7 @@ import java.util.StringTokenizer;
  * 
  * @author Aaron M. Renn (arenn@urbanophile.com)
  */
+@SharedStatics
 public abstract class Toolkit
 {
 	/** The default toolkit name. */
