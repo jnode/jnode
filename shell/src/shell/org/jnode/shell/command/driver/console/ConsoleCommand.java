@@ -156,7 +156,7 @@ public class ConsoleCommand {
                 null, ConsoleManager.CreateOptions.TEXT
                 | ConsoleManager.CreateOptions.SCROLLABLE);
         CommandShell commandShell = new CommandShell(console);
-        new Thread(commandShell).start();
+        new Thread(commandShell, "command-shell").start();
         
         System.out.println("Console created with name:"
                 + console.getConsoleName());
