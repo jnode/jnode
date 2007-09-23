@@ -260,6 +260,7 @@ public abstract class AbstractConsole implements Console {
      */
     public void close() {
         mgr.unregisterConsole(this);
+        keyboardEventProcessor.stopProcessor();
         dispatchConsoleEvent(new ConsoleEvent(this));
     }
 
