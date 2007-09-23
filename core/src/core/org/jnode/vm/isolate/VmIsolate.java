@@ -452,6 +452,7 @@ public final class VmIsolate {
     private Thread executorThread;
 
     public void invokeAndWait(final Runnable task){
+        /*
         if(this == StaticData.rootIsolate){
             task.run();
             return;
@@ -471,8 +472,9 @@ public final class VmIsolate {
                 }
             }
         }
+        */
     }
-
+    /*
     private class TaskExecutor implements Runnable{
         public void run() {
             //while(!VmIsolate.this.hasTerminated()){
@@ -504,6 +506,7 @@ public final class VmIsolate {
             //} while(true);
         }
     }
+    */
 
     /**
      * Run this isolate. This method is called from IsolateThread.
@@ -533,8 +536,8 @@ public final class VmIsolate {
             final Class< ? > cls = loader.loadClass(mainClass);
 
             //start executor
-            executorThread = new Thread(new TaskExecutor(), "isolate-executor");
-            executorThread.start();
+            //executorThread = new Thread(new TaskExecutor(), "isolate-executor");
+            //executorThread.start();
 
             // Find main method
             final Method mainMethod = cls.getMethod("main",
