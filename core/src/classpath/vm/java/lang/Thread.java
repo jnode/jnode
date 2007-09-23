@@ -40,12 +40,14 @@ package java.lang;
 
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.HashMap;
 
 
 import org.jnode.security.JNodePermission;
 import org.jnode.vm.VmSystem;
 import org.jnode.vm.annotation.KernelSpace;
 import org.jnode.vm.annotation.Internal;
+import org.jnode.vm.annotation.SharedStatics;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.isolate.IsolateThread;
 import org.jnode.vm.scheduler.MonitorManager;
@@ -101,6 +103,7 @@ import org.jnode.vm.scheduler.VmThread;
  * @since 1.0
  * @status updated to 1.4
  */
+@SharedStatics
 public class Thread implements Runnable 
 {
   /** The minimum priority for a Thread. */
@@ -111,6 +114,8 @@ public class Thread implements Runnable
 
   /** The maximum priority for a Thread. */
     public static final int MAX_PRIORITY = 10;
+
+    private static final String NONAME = "Thread";
 
     /** The VM thread implementing this thread */
     private final VmThread vmThread;
@@ -151,7 +156,7 @@ public class Thread implements Runnable
      *
      * @see java.lang.Thread#autoName()
      */
-    private static int count = 0;
+    private static final HashMap<String, Integer> nameMap = new HashMap<String, Integer>();
 
     private static final JNodePermission GETVMTHREAD_PERM = new JNodePermission(
             "getVmThread");
@@ -205,7 +210,7 @@ public class Thread implements Runnable
    */
     public Thread()
     {
-        this(null, null, autoName());
+        this(null, null, NONAME);
     }
 
     /**
@@ -221,7 +226,7 @@ public class Thread implements Runnable
      */
     public Thread(Runnable target)
     {
-        this(null, target, autoName());
+        this(null, target, NONAME);
     }
 
     /**
@@ -252,7 +257,7 @@ public class Thread implements Runnable
      */
     public Thread(ThreadGroup group, Runnable target)
     {
-        this(group, target, autoName());
+        this(group, target, NONAME);
     }
 
     /**
@@ -332,7 +337,7 @@ public class Thread implements Runnable
 
         this.group = group;
         this.runnable = target;
-        this.name = name;
+        this.name = autoName(name);
         this.parent = current;
 
         this.daemon = current.isDaemon();
@@ -382,7 +387,7 @@ public class Thread implements Runnable
 
         this.group = group;
         this.runnable = target;
-        this.name = name;
+        this.name = autoName(name);
         this.parent = current;
 
         this.daemon = current.isDaemon();
@@ -414,7 +419,7 @@ public class Thread implements Runnable
 
         this.group = group;
         this.runnable = target;
-        this.name = name;
+        this.name = autoName(name);
         this.parent = null;
         this.daemon = false;
 
@@ -441,7 +446,7 @@ public class Thread implements Runnable
         this.vmThread = vmThread;
         this.group = ThreadGroup.root;
         this.group.addThread(this);
-        this.name = "System";
+        this.name = autoName("System");
         this.runnable = null;
         this.parent = null;
         this.vmThread.updateName();
@@ -856,7 +861,7 @@ public class Thread implements Runnable
         // take this to mean NullPointerException.
         if (name == null)
           throw new NullPointerException();
-        this.name = name;
+        this.name = autoName(name);
         this.vmThread.updateName();
     }
 
@@ -1206,12 +1211,19 @@ public class Thread implements Runnable
     }
 
     /**
-     * Generate a "unique" default name for a thread.
+     * Generate a "unique" name for a thread.
      */
-    private static synchronized String autoName() {
-        return "Thread-" + (++count);
-    }
+    private static synchronized String autoName(String name) {
+        Integer count = nameMap.get(name);
+        if(count == null){
+            nameMap.put(name, 1);
+            return name;
+        }
 
+        nameMap.put(name, count + 1);
+
+        return name + "-" + count;
+    }
 
   /**
    * Returns the unique identifier for this thread.  This ID is generated
