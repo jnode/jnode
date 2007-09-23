@@ -32,13 +32,7 @@ import org.jnode.vm.VmStackFrame;
 import org.jnode.vm.VmStackReader;
 import org.jnode.vm.VmSystem;
 import org.jnode.vm.VmSystemObject;
-import org.jnode.vm.annotation.Inline;
-import org.jnode.vm.annotation.Internal;
-import org.jnode.vm.annotation.KernelSpace;
-import org.jnode.vm.annotation.LoadStatics;
-import org.jnode.vm.annotation.MagicPermission;
-import org.jnode.vm.annotation.PrivilegedActionPragma;
-import org.jnode.vm.annotation.Uninterruptible;
+import org.jnode.vm.annotation.*;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmMethod;
@@ -52,6 +46,7 @@ import org.vmmagic.unboxed.Address;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+@SharedStatics
 @MagicPermission
 public abstract class VmThread extends VmSystemObject {
 
