@@ -152,9 +152,9 @@ public class Thread implements Runnable
   UncaughtExceptionHandler exceptionHandler;
 
     /**
-     * Number of threads created. Used only for generating "unique" names.
+     * Name and number of threads created. Used only for generating unique names.
      *
-     * @see java.lang.Thread#autoName()
+     * @see java.lang.Thread#autoName(String)
      */
     private static final HashMap<String, Integer> nameMap = new HashMap<String, Integer>();
 
