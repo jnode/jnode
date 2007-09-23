@@ -21,8 +21,7 @@
  
 package org.jnode.shell.help.argument;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
@@ -42,7 +41,7 @@ public class ThreadNameArgument extends Argument {
 	}
 
     public String complete(final String partial) {
-        final ArrayList<String> names = new ArrayList<String>();
+        final HashSet<String> names = new HashSet<String>();
         ThreadGroup grp = Thread.currentThread().getThreadGroup();
         while (grp.getParent() != null) {
             grp = grp.getParent();
@@ -59,7 +58,7 @@ public class ThreadNameArgument extends Argument {
         return complete(partial, names);
     }
 
-	private void findList(ThreadGroup grp, String partial, List<String> names) {
+	private void findList(ThreadGroup grp, String partial, HashSet<String> names) {
 		final Thread[] ts = new Thread[grp.activeCount()];
 		grp.enumerate(ts);
 		for (Thread t : ts) {
