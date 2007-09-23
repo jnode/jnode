@@ -43,7 +43,6 @@ import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.Syntax;
 import org.jnode.shell.help.argument.HostNameArgument;
-import org.jnode.vm.annotation.SharedStatics;
 
 /**
  * @author JPG
@@ -112,7 +111,7 @@ public class PingCommand implements ICMPListener {
 
                 Request r = new Request(this.stat, this.timeout, System
                         .currentTimeMillis(), id_count, seq_count);
-                Request.registerRequest(r);
+                registerRequest(r);
                 netLayer.transmit(netHeader, packet);
 
                 while (this.wait) {
@@ -121,12 +120,22 @@ public class PingCommand implements ICMPListener {
                         this.wait = false;
                     }
                     Thread.sleep(500);
+                    synchronized(this){
+                        if(response){
+                            System.out.print("Reply from " + dst.toString() + ": ");
+                            System.out.print(hdr1.getDataLength() - 8 + "bytes of data ");
+                            System.out.print("ttl=" + hdr1.getTtl() + " ");
+                            System.out.print("seq=" + hdr2.getSeqNumber() + " ");
+                            System.out.println("time=" + (roundt) + "ms");
+                            response = false;
+                        }
+                    }
                 }
                 this.count--;
                 seq_count++;
             }
 
-            while (!Request.isEmpty()) {
+            while (!isEmpty()) {
                 Thread.sleep(100);
             }
         } finally {
@@ -151,89 +160,95 @@ public class PingCommand implements ICMPListener {
         ICMPEchoHeader hdr2 = (ICMPEchoHeader) skbuf.getTransportLayerHeader();
 
         int seq = hdr2.getSeqNumber();
-        Request r = Request.removeRequest(seq);
+        Request r = removeRequest(seq);
         if ((r == null) || (r.Obsolete())) return;
 
         long timestamp = match(hdr2.getIdentifier(), seq, r);
 
         long roundtrip = received - timestamp;
+        gotResponse(timestamp, hdr1, hdr2, roundtrip);
+    }
+
+    private synchronized void gotResponse(long timestamp, IPv4Header hdr1, ICMPEchoHeader hdr2, long roundtrip) {
         if (timestamp != -1) {
-            System.out.print("Reply from " + dst.toString() + ": ");
-            System.out.print(hdr1.getDataLength() - 8 + "bytes of data ");
-            System.out.print("ttl=" + hdr1.getTtl() + " ");
-            System.out.print("seq=" + hdr2.getSeqNumber() + " ");
-            System.out.println("time=" + (roundtrip) + "ms");
+            this.hdr1 = hdr1;
+            this.hdr2 = hdr2;
+            this.roundt = roundtrip;
+            response = true;
         }
         wait = false;
         this.stat.recordPacket(roundtrip);
     }
-}
-@SharedStatics
-class Request extends TimerTask {
+    
+    //respose data
+    private boolean response;
+    private long roundt;
+    private IPv4Header hdr1;
+    private ICMPEchoHeader hdr2;
 
-    private static Map<Integer, Request> requests = new HashMap<Integer, Request>();
-
-    private Timer timer = new Timer();
-
-    private boolean obsolete = false;
-
-    private Statistics stat;
-
-    private long timestamp;
-
-    private int id, seq;
-
-    Request(Statistics stat, long timeout, long timestamp, int id, int seq) {
-        this.stat = stat;
-        this.timestamp = timestamp;
-        this.id = id;
-        this.seq = seq;
-
-        timer.schedule(this, timeout);
+    //requests are tracked here
+    private Map<Integer, Request> requests = new HashMap<Integer, Request>();
+    private void registerRequest(Request r) {
+        requests.put(r.seq, r);
     }
 
-    static void registerRequest(Request r) {
-        requests.put(new Integer(r.seq), r);
+    private Request removeRequest(int seq) {
+        return requests.remove(seq);
     }
 
-    static Request getRequest(int seq) {
-        return (Request) requests.get(new Integer(seq));
-    }
-
-    static Request removeRequest(int seq) {
-        return (Request) requests.remove(new Integer(seq));
-    }
-
-    static boolean isEmpty() {
+    private boolean isEmpty() {
         return requests.isEmpty();
     }
 
-    public void run() {
-        if (!this.Obsolete()) {
-            stat.recordLost();
-            Request.removeRequest(this.seq);
+    class Request extends TimerTask {
+
+        private Timer timer = new Timer();
+
+        private boolean obsolete = false;
+
+        private Statistics stat;
+
+        private long timestamp;
+
+        private int id, seq;
+
+        Request(Statistics stat, long timeout, long timestamp, int id, int seq) {
+            this.stat = stat;
+            this.timestamp = timestamp;
+            this.id = id;
+            this.seq = seq;
+
+            timer.schedule(this, timeout);
         }
-    }
 
-    synchronized boolean Obsolete() {
-        if (!obsolete) {
-            this.obsolete = true;
-            this.timer.cancel();
-            return false;
-        } else
-            return true;
-    }
 
-    long getTimestamp() {
-        return timestamp;
-    }
+        public void run() {
+            if (!this.Obsolete()) {
+                stat.recordLost();
+                removeRequest(this.seq);
+            }
+        }
 
-    int getId() {
-        return id;
-    }
+        synchronized boolean Obsolete() {
+            if (!obsolete) {
+                this.obsolete = true;
+                this.timer.cancel();
+                return false;
+            } else
+                return true;
+        }
 
-    int getSeq() {
-        return seq;
+        long getTimestamp() {
+            return timestamp;
+        }
+
+        int getId() {
+            return id;
+        }
+
+        int getSeq() {
+            return seq;
+        }
     }
 }
 
@@ -266,10 +281,11 @@ class Statistics {
         //			percent *= 100;
         //		}
         float avg = sum / packets;
-        return new String(packets + " packets transmitted, " + received
+        return packets + " packets transmitted, " + received
                 + " packets received\n" + 
                 //			percent +"% packet loss\n"+
                 "round-trip min/avg/max = " + min + "/" + avg + "/" + max
-                + " ms");
+                + " ms";
     }
 }
+
