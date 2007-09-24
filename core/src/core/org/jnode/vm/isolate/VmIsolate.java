@@ -28,6 +28,8 @@ import java.lang.reflect.Method;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.ArrayList;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 import javax.isolate.Isolate;
 import javax.isolate.IsolateStartupException;
@@ -447,9 +449,11 @@ public final class VmIsolate {
         mainThread.start();
     }
 
+    /*
     private Vector<Runnable> taskList = new Vector<Runnable>();
     private final Object taskSync = new Object();
     private Thread executorThread;
+    */
 
     public void invokeAndWait(final Runnable task){
         /*
@@ -544,10 +548,15 @@ public final class VmIsolate {
                     IsolatedStaticData.mainTypes);
 
             //inherit properties
-            Properties sys_porps = System.getProperties();
-            for( String prop : initProperties.stringPropertyNames()){
-                sys_porps.setProperty(prop, initProperties.getProperty(prop));
-            }
+            AccessController.doPrivileged(new PrivilegedAction<Object>() {
+                public Object run() {
+                    Properties sys_porps = System.getProperties();
+                    for( String prop : initProperties.stringPropertyNames()){
+                        sys_porps.setProperty(prop, initProperties.getProperty(prop));
+                    }                    
+                    return null;
+                }
+            });
 
             // Run main method.
             mainMethod.invoke(null, new Object[] { args });
