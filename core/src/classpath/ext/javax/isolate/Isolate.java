@@ -22,8 +22,10 @@
 package javax.isolate;
 
 import java.util.Properties;
+import java.security.AccessController;
 
 import org.jnode.vm.isolate.VmIsolate;
+import gnu.java.security.action.GetPropertiesAction;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -50,7 +52,9 @@ public final class Isolate {
      * @param args
      */
     public Isolate(String mainClass, String[] args) {
-        this(new StreamBindings(), System.getProperties(), mainClass, args);
+        this(new StreamBindings(),
+                (Properties) AccessController.doPrivileged(new GetPropertiesAction()),
+                mainClass, args);
     }
 
     /**
