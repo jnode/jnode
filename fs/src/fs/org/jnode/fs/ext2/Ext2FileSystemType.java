@@ -62,19 +62,18 @@ public class Ext2FileSystemType implements FileSystemType<Ext2FileSystem> {
 	public boolean supports(PartitionTableEntry pte, byte[] firstSector, FSBlockDeviceAPI devApi) {
 		if(pte!=null) {
 			if (pte instanceof IBMPartitionTableEntry)
-				return (((IBMPartitionTableEntry)pte).getSystemIndicator() == IBMPartitionTypes.PARTTYPE_LINUXNATIVE);
-		}
-		else {	//no partition table entry (e.g. ramdisk)
-			//need to check the magic            
-			ByteBuffer magic = ByteBuffer.allocate(2);
-			try{
-				devApi.read(1024+56, magic);
-			}catch(IOException e) {
+			    if (((IBMPartitionTableEntry)pte).getSystemIndicator() != IBMPartitionTypes.PARTTYPE_LINUXNATIVE)
 				return false;
-			}
-			return (Ext2Utils.get16(magic.array(),0)==0xEF53);
 		}
-		return false;
+
+		//need to check the magic            
+		ByteBuffer magic = ByteBuffer.allocate(2);
+		try{
+		    devApi.read(1024+56, magic);
+		} catch(IOException e) {
+		    return false;
+		}
+		return (Ext2Utils.get16(magic.array(), 0) == 0xEF53);
 	}
 
 	/**
