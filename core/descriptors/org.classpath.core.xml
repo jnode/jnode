@@ -13,8 +13,9 @@
     <library name="jnode-core.jar">
       <export name="com.sun.*" />
 	  <export name="com.sun.naming.internal.*"/>
-	  
-	  <export name="sun.*" />
+      <export name="com.sun.security.auth.UserPrincipal"/>  
+
+      <export name="sun.*" />
 	  <export name="sun.awt.EventListenerAggregate" />
       <export name="sun.misc.*"/>
       <export name="sun.reflect.*"/>
@@ -22,6 +23,7 @@
       <export name="sun.net.www.ParseUtil"/>
       <export name="sun.net.www.protocol.http.InMemoryCookieStore"/>
       <export name="sun.nio.ch.Interruptible"/>
+      <export name="sun.security.acl.GroupImpl"/>
       <export name="sun.security.util.Debug"/>
       <export name="sun.security.util.SecurityConstants"/>
       <export name="sun.security.action.GetPropertyAction"/>
