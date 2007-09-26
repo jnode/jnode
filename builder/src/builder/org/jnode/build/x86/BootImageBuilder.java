@@ -63,7 +63,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 
 	public static final int INITIAL_OBJREFS_CAPACITY = 750000;
 
-	public static final int INITIAL_SIZE = 40 * 1024 * 1024;
+	public static final int INITIAL_SIZE = 64 * 1024 * 1024;
 
 	private VmX86Processor processor;
 
