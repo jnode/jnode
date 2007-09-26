@@ -161,4 +161,7 @@ The default list of (non-system) plugins to be included in the init-jar.
 
     <plugin id="org.jnode.font.bdf"/>
 	<plugin id="org.jnode.awt.font.bdf"/>
+
+    <plugin id="org.jnode.test.gui"/>
+    <plugin id="org.jnode.apps.console"/>
 </plugin-list>
