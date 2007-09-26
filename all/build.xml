@@ -4,7 +4,7 @@
     <typedef file="${basedir}/lib/jnode.xml"/>
 
     <!-- JNode version -->
-    <property name="jnode-ver" value="0.2.5-dev"/>
+    <property name="jnode-ver" value="0.2.5"/>
 
     <!-- Java target and source version -->
     <property name="java.target" value="1.5"/>
