@@ -10,6 +10,7 @@
   <requires>
     <import plugin="org.jnode.driver.block"/>
     <import plugin="org.jnode.driver.bus.scsi"/>
+    <import plugin="org.jnode.fs"/>  
   </requires>
         
   <runtime>

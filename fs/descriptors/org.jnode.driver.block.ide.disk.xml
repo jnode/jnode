@@ -9,6 +9,7 @@
         
   <requires>
     <import plugin="org.jnode.driver.bus.ide"/>
+    <import plugin="org.jnode.fs"/>  
   </requires>
         
   <runtime>
