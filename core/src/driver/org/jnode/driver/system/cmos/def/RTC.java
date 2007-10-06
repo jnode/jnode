@@ -21,8 +21,6 @@
  
 package org.jnode.driver.system.cmos.def;
 
-import java.util.GregorianCalendar;
-
 import org.jnode.driver.system.cmos.CMOSConstants;
 import org.jnode.driver.system.cmos.CMOSService;
 import org.jnode.util.BCDUtils;
@@ -35,11 +33,10 @@ import org.jnode.vm.RTCService;
 public class RTC extends RTCService implements CMOSConstants {
 	
 	private final CMOSService cmos;
-	private final ThreadLocal calendar = new ThreadLocal(); 
-	
+
 	/**
 	 * Create a new instance
-	 * @param cmos
+	 * @param cmos the CMOS service
 	 */
 	public RTC(CMOSService cmos) {
 		this.cmos = cmos;
@@ -91,7 +88,7 @@ public class RTC extends RTCService implements CMOSConstants {
 	 * Gets the current day of the month
 	 * @return int
 	 */
-	public int getDate() {
+	public int getDay() {
 		final int control = cmos.getRegister(RTC_CONTROL);
 		final int date = cmos.getRegister(CMOS_RTC_DAY_OF_MONTH);
 		if ((control & RTC_DM_BINARY) != 0) {
@@ -139,14 +136,32 @@ public class RTC extends RTCService implements CMOSConstants {
 	 * @see java.util.Calendar#setTimeInMillis(long)
 	 * @return The time
 	 */
-	public long getTime() {
-		GregorianCalendar cal = (GregorianCalendar)calendar.get();
-		if (cal == null) {
-			cal = new GregorianCalendar(getYear(), getMonth()-1, getDate(), getHours(), getMinutes(), getSeconds());
-			calendar.set(cal);
-		} else {
-			cal.set(getYear(), getMonth()-1, getDate(), getHours(), getMinutes(), getSeconds());
-		}		
-		return cal.getTimeInMillis();
-	}
+    public long getTime() {
+        return time2millis(getYear(), getMonth(), getDay(), getHours(), getMinutes(), getSeconds());
+    }
+    
+    /**
+     * Converts Gregorian date to milliseconds since 1970-01-01 00:00:00 .
+     *
+     * @param year the year
+     * @param mon the month 1..12
+     * @param day the day of month 1..31
+     * @param hours hours of day 0..23
+     * @param mins minutes 0..59
+     * @param secs seconds 0..59
+     * @return the milliseconds since 1970-01-01 00:00:00
+     */
+    static long time2millis(int year, int mon, int day, int hours, int mins, int secs) {
+        if (0 >= (mon -= 2)) {    /* 1..12 -> 11,12,1..10 */
+            mon += 12;            /* Puts Feb last since it has leap day */
+            year -= 1;
+        }
+
+        return ((((
+                ((long) (year / 4 - year / 100 + year / 400 + 367 * mon / 12 + day) + year * 365 - 719499)) /* days */
+                * 24l + hours) /* hours */
+                * 60l + mins) /* minutes */
+                * 60l + secs) /* seconds */
+                * 1000l; /* milliseconds */
+    }
 }

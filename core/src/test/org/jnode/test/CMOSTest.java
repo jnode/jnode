@@ -37,7 +37,7 @@ public class CMOSTest {
 	public static void main(String[] args) 
 	throws ResourceNotFreeException, NamingException {
 		
-		CMOSService cmos = (CMOSService)InitialNaming.lookup(CMOSService.NAME);
+		CMOSService cmos = InitialNaming.lookup(CMOSService.NAME);
 		RTC rtc = new RTC(cmos);
 		
 		for (int i = 0; i < 10; i++) {
@@ -45,7 +45,7 @@ public class CMOSTest {
 		}
 		
 		System.out.println("time=" + rtc.getHours() + ":" + rtc.getMinutes() + ":" + rtc.getSeconds());
-		System.out.println("date=" + rtc.getDate() + "-" + rtc.getMonth() + "-" + rtc.getYear());
+		System.out.println("date=" + rtc.getDay() + "-" + rtc.getMonth() + "-" + rtc.getYear());
 		
 		int fp = cmos.getRegister(0x10);
 		System.out.println("floppy A: " + ((fp >> 4) & 0x0f));
