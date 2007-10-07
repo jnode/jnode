@@ -22,9 +22,11 @@
 package org.jnode.shell.help.argument;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.ParsedArguments;
@@ -55,11 +57,25 @@ public class FileArgument extends Argument {
 
         if (values == null) return new File[0];
 
-        File[] files = new File[values.length];
-        for(int i = 0; i < values.length; i ++)
-            files[i] = new File(values[i]);
+        File cwd = new File(".");
+        ArrayList<File> files = new ArrayList<File>();
+        for(String val : values){
+            String regex = val.replace("?", "[\\w]").replace("*", "[\\w]*");
+            if(regex.equals(val)){
+                files.add(new File(val));
+            } else {
+                final Pattern p = Pattern.compile(regex);
+                for(File f : cwd.listFiles(new FilenameFilter() {
+                    public boolean accept(File dir, String name) {
+                        return p.matcher(name).matches();
+                    }
+                })){
+                    files.add(f);
+                }
+            }
+        }
 
-        return files;
+        return files.toArray(new File[files.size()]);
     }
 
     public String complete(String partial) {
