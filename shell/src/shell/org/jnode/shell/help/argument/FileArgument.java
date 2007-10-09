@@ -26,6 +26,7 @@ import java.io.FilenameFilter;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.regex.Pattern;
 
 import org.jnode.shell.help.Argument;
@@ -58,7 +59,7 @@ public class FileArgument extends Argument {
         if (values == null) return new File[0];
 
         File cwd = new File(".");
-        ArrayList<File> files = new ArrayList<File>();
+        HashSet<File> files = new HashSet<File>();
         for(String val : values){
             String regex = val.replace("?", "[\\w]").replace("*", "[\\w]*");
             if(regex.equals(val)){
