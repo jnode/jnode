@@ -65,8 +65,8 @@ public class DefaultCommandInvoker implements CommandInvoker {
             try {
                 //                System.err.println("Invoking...");
                 try {
-                	AccessController.doPrivileged(new PrivilegedAction() {
-        				public Object run() {
+                	AccessController.doPrivileged(new PrivilegedAction<Void>() {
+        				public Void run() {
         					System.setOut(commandShell.getOutputStream());
         					System.setErr(commandShell.getErrorStream());
         					System.setIn(commandShell.getInputStream());

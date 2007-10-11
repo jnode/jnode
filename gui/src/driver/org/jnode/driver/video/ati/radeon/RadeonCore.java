@@ -393,10 +393,10 @@ final class RadeonCore implements RadeonConstants {
 	 */
 	private final MemoryResource findRom(final ResourceOwner owner,
 			final ResourceManager rm) throws ResourceNotFreeException {
-		final MemoryScanner scanner = (MemoryScanner) AccessController
-				.doPrivileged(new PrivilegedAction() {
+		final MemoryScanner scanner = AccessController
+				.doPrivileged(new PrivilegedAction<MemoryScanner>() {
 
-					public Object run() {
+					public MemoryScanner run() {
 						return rm.getMemoryScanner();
 					}
 				});

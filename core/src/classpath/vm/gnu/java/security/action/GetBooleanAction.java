@@ -29,7 +29,7 @@ import java.security.PrivilegedAction;
  * @see Boolean#getBoolean(String)
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class GetBooleanAction implements PrivilegedAction {
+public class GetBooleanAction implements PrivilegedAction<Boolean> {
 
     private final String key;
 
@@ -40,7 +40,7 @@ public class GetBooleanAction implements PrivilegedAction {
     /**
      * @see java.security.PrivilegedAction#run()
      */
-    public Object run() {
+    public Boolean run() {
         return Boolean.valueOf(Boolean.getBoolean(key));
     }
 }

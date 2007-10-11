@@ -492,9 +492,9 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	 */
 	public Image getImage(final String filename) {
 		log.debug("getImage(" + filename + ")");
-		return testErrorImage((Image) AccessController.doPrivileged(new PrivilegedAction() {
+		return testErrorImage(AccessController.doPrivileged(new PrivilegedAction<Image>() {
 
-			public Object run() {
+			public Image run() {
 				try {
 					final String userDir = (String) AccessController.doPrivileged(
                             new GetPropertyAction("user.dir"));
@@ -514,8 +514,8 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	 * @see java.awt.Toolkit#getImage(java.net.URL)
 	 */
 	public Image getImage(final URL url) {
-		return testErrorImage((Image) AccessController.doPrivileged(new PrivilegedAction() {
-			public Object run() {
+		return testErrorImage(AccessController.doPrivileged(new PrivilegedAction<Image>() {
+			public Image run() {
 				try {
                     return ImageIO.read(url);
 				} catch (Exception ex) {
@@ -663,8 +663,8 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 						screenSize, eventQueue, keyboardHandler);
                 keyboardHandler.install();
 
-                AccessController.doPrivileged(new PrivilegedAction() {
-                    public Object run() {
+                AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                    public Void run() {
                         onInitialize();
                         return null;
                     }

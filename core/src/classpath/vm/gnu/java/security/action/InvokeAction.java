@@ -31,7 +31,7 @@ import java.security.PrivilegedExceptionAction;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class InvokeAction implements PrivilegedExceptionAction {
+public class InvokeAction implements PrivilegedExceptionAction<Object> {
 
     private final Method method;
     private final Object object;

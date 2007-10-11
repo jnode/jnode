@@ -93,8 +93,8 @@ public class ProcletCommandInvoker extends AsyncCommandInvoker {
         public void run() {
             try {
             	try {
-            		AccessController.doPrivileged(new PrivilegedAction() {
-        				public Object run() {
+            		AccessController.doPrivileged(new PrivilegedAction<Void>() {
+        				public Void run() {
         					System.setOut(commandOut);
         					System.setErr(commandErr);
         					System.setIn(commandIn);

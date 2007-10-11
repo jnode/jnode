@@ -30,7 +30,7 @@ import java.security.PrivilegedAction;
  * @see Integer#getInteger(String, Integer)
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class GetIntegerAction implements PrivilegedAction {
+public class GetIntegerAction implements PrivilegedAction<Integer> {
 
     private final String key;
     private final Integer defaultValue;
@@ -51,7 +51,7 @@ public class GetIntegerAction implements PrivilegedAction {
     /**
      * @see java.security.PrivilegedAction#run()
      */
-    public Object run() {
+    public Integer run() {
         return Integer.getInteger(key, defaultValue);
     }
 }

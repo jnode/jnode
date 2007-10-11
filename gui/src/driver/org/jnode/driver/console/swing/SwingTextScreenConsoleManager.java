@@ -28,8 +28,8 @@ public class SwingTextScreenConsoleManager extends TextScreenConsoleManager {
     }
 
     protected void openInput(DeviceManager devMan) {
-        AccessController.doPrivileged(new PrivilegedAction() {
-            public Object run() {
+        AccessController.doPrivileged(new PrivilegedAction<Void>() {
+            public Void run() {
                 SwingPcTextScreen systemScreen = getTextScreenManager().getSystemScreen();
                 final JComponent screen = systemScreen.getScreenComponent();
                 initializeKeyboard(systemScreen.getKeyboardDevice());

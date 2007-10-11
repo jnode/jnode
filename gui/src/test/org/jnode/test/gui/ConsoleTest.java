@@ -55,8 +55,8 @@ public class ConsoleTest {
 
         private void claimPrintStreams() {
             System.out.println( "Claiming print streams." );
-            AccessController.doPrivileged( new PrivilegedAction() {
-                public Object run() {
+            AccessController.doPrivileged( new PrivilegedAction<Void>() {
+                public Void run() {
                     System.setOut( savedOut );
                     System.setErr( savedOut );
                     return null;

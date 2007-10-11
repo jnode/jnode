@@ -29,7 +29,7 @@ import java.security.PrivilegedAction;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class SetPropertyAction implements PrivilegedAction {
+public class SetPropertyAction implements PrivilegedAction<Void> {
 
     private final String key;
     private final String value;
@@ -47,7 +47,7 @@ public class SetPropertyAction implements PrivilegedAction {
      * Set the property
      * @see java.security.PrivilegedAction#run()
      */
-    public Object run() {
+    public Void run() {
         System.setProperty(key, value);
         return null;
     }

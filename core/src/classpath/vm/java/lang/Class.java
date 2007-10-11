@@ -1424,8 +1424,8 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type,
             try {
                 final Method values = getMethod("values");
                 java.security.AccessController.doPrivileged
-                        (new java.security.PrivilegedAction() {
-                            public Object run() {
+                        (new java.security.PrivilegedAction<Void>() {
+                            public Void run() {
                                 values.setAccessible(true);
                                 return null;
                             }
