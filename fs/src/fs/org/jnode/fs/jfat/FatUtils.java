@@ -10,10 +10,13 @@ import java.nio.ByteBuffer;
 import java.util.Calendar;
 import java.text.SimpleDateFormat;
 
+import org.jnode.driver.block.BlockDeviceAPI;
+import org.jnode.util.LittleEndian;
 import org.jnode.util.NumberUtils;
 
 /**
  * @author gvt
+ * @author Tango
  */
 public class FatUtils {
     private static final SimpleDateFormat time =
@@ -189,6 +192,54 @@ public class FatUtils {
 	lname = lname.replaceAll ( "\\.*$", "" );
 	return lname;
     }
+
+    public static  int  getMonth(long time){
+    	Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(time);
+        return cal.get(Calendar.MONTH);
+}
+
+    public static int getHours(long time)
+    {
+      Calendar cal = Calendar.getInstance();
+      cal.setTimeInMillis(time);
+      return cal.get(Calendar.HOUR_OF_DAY);
+  	}
+    public static int getDay(long time)
+    {
+      Calendar cal = Calendar.getInstance();
+      cal.setTimeInMillis(time);
+      // For Calendar, Sunday is 1.  For Date, Sunday is 0.
+      return cal.get(Calendar.DAY_OF_WEEK) - 1;
+    }
+    public static int getYear(long time)
+    {
+      Calendar cal = Calendar.getInstance();
+      cal.setTimeInMillis(time);
+      return cal.get(Calendar.YEAR) - 1980;
+    }
+    public static int getMinutes(long time)
+    {
+      Calendar cal = Calendar.getInstance();
+      cal.setTimeInMillis(time);
+      return cal.get(Calendar.MINUTE);
+  	}
+
+    public static int getSeconds(long time)
+    {
+      Calendar cal = Calendar.getInstance();
+      cal.setTimeInMillis(time);
+      return cal.get(Calendar.SECOND);
+  	}
+
+    public static long getMilliSeconds(long time){
+
+    	Calendar cal = Calendar.getInstance();
+    	return cal.getTimeInMillis();
+    }
+
+
+
 }
 
 
