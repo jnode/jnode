@@ -1,5 +1,23 @@
-/*
+/**
  *
+ * $Id$
+ *
+ * JNode.org
+ * Copyright (C) 2003-2006 JNode.org
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.jnode.fs.jfat;
@@ -8,7 +26,9 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
+import org.apache.log4j.Logger;
 import org.jnode.fs.FileSystemException;
+import org.jnode.fs.jfat.StrWriter;
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.util.LittleEndian;
 import org.jnode.util.NumberUtils;
@@ -16,8 +36,12 @@ import org.jnode.util.NumberUtils;
 
 /**
  * @author gvt
+ * @author Tango
  */
 public class BootSector {
+	private static final Logger log =
+        Logger.getLogger ( BootSector.class );
+
     private static final int IFAT12 = 12;
     private static final int IFAT16 = 16;
     private static final int IFAT32 = 32;
@@ -120,10 +144,12 @@ public class BootSector {
     }
 
 
-    public synchronized void write ( BlockDeviceAPI device )
-        throws IOException {
-	encode();
-        device.write ( 0, ByteBuffer.wrap ( sector ) );
+    public synchronized void write ( BlockDeviceAPI device,long offset )
+            throws IOException
+         {
+	      //encode();//TODO: Notice here once (Changed Now)
+			device.write (offset, ByteBuffer.wrap ( sector ) );
+
         dirty = false;
     }
 
@@ -358,12 +384,18 @@ public class BootSector {
 	    return false;
     }
 
-
+    /**
+     *
+     * @return
+     */
     public int fatSize() {
 	return type;
     }
 
-
+    /**
+     *
+     * @return BPB_Media
+     */
     public int getMediumDescriptor() {
 	return BPB_Media;
     }
@@ -406,6 +438,146 @@ public class BootSector {
 	return FirstDataSector;
     }
 
+    /**
+     * The Setting methods are writing here.
+     *
+     */
+    public void setBS_JmpBoot(byte[] BS_jmpBoot){
+    	setBytes  (0,3, BS_jmpBoot);
+    }
+
+
+    public void setBS_OemName(String BS_OEMName){
+    setString( 3, 8, BS_OEMName );
+    }
+
+
+    public void setBPB_BytesPerSector(int BPB_BytsPerSec){
+    	set16( 11, BPB_BytsPerSec );
+    }
+
+
+    public void setBPB_SecPerCluster(int BPB_SecPerClus){
+    	set8(13,BPB_SecPerClus );
+    }
+
+
+    public void setBPB_RsvSecCount(int BPB_RsvdSecCnt){
+    	set16 (14,BPB_RsvdSecCnt );
+    }
+
+
+    public void setBPB_NoFATs(int BPB_NumFATs){
+    	set8 (16,BPB_NumFATs);
+    }
+
+
+    public void setBPB_RootEntCnt(int BPB_RootEntCnt){
+    	set16( 17,BPB_RootEntCnt );
+    }
+
+
+    public void setBPB_TotSec16(int BPB_TotSec16){
+    	set16( 19,BPB_TotSec16);
+    }
+
+
+    public void setBPB_MediumDescriptor(int BPB_Media){
+    	set8( 21, BPB_Media );
+    }
+
+
+    public void setBPB_FATSz16(int BPB_FATSz16){
+    	set16( 22,BPB_FATSz16 );
+    }
+
+
+    public void setBPB_SecPerTrk(int BPB_SecPerTrk){
+		set16( 24,BPB_SecPerTrk );
+	}
+
+
+    public void setBPB_NumHeads(int BPB_NumHeads){
+		set16( 26, BPB_NumHeads );
+	}
+
+
+    public void setBPB_HiddSec(long BPB_HiddSec){
+		set32( 28,BPB_HiddSec );
+	}
+
+
+    public void setBPB_TotSec32(long BPB_TotSec32){
+		set32( 32,BPB_TotSec32 );
+	}
+
+    public void setBPB_FATSz32(long BPB_FATSz32){
+    	set32( 36,BPB_FATSz32 );
+    }
+
+
+    public void setBPB_ExtFlags(int BPB_ExtFlags){
+    	set16( 40,BPB_ExtFlags );
+    }
+
+
+    public void setBPB_FSVer(int BPB_FSVer){
+    	set16( 42,BPB_FSVer );
+    }
+
+
+    public void setBPB_RootClus(long BPB_RootClus){
+    	set32( 44,BPB_RootClus );
+    }
+
+
+    public void setBPB_FSInfo(int BPB_FSInfo){
+    	set16( 48,BPB_FSInfo );
+    }
+
+
+    public void setBPB_BkBootSec(int BPB_BkBootSec){
+    	set16( 50,BPB_BkBootSec );
+    }
+
+
+    public void setBPB_Reserved(byte[] BPB_Reserved ){
+       setBytes  ( 52, 12, BPB_Reserved  );
+    }
+
+
+    public void setBS_DrvNum(int BS_DrvNum){
+       set8( 64,BS_DrvNum );
+    }
+
+
+    public void setBS_Reserved1(int BS_Reserved1){
+       set8 ( 65,BS_Reserved1 );
+    }
+
+
+    public void setBS_BootSig(int BS_BootSig){
+       set8( 66,BS_BootSig );
+    }
+
+
+    public void setBS_VolID(long BS_VolID){
+       set32( 67,BS_VolID );
+    }
+
+
+    public void setBS_VolLab(String BS_VolLab){
+       setString ( 71, 11, BS_VolLab );
+    }
+
+
+    public void setBS_FilSysType(String BS_FilSysType){
+       setString ( 82,  8, BS_FilSysType );
+    }
+
+    public void setBS_Identifier(byte[] ident){
+    	setBytes(510,2,ident);
+    }
 
     public String toString() {
 	StrWriter out = new StrWriter();
