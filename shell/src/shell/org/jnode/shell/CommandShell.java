@@ -243,8 +243,8 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         }
 
         final String user_home = (String) AccessController.doPrivileged(new GetPropertyAction("user.home", ""));
-        AccessController.doPrivileged(new PrivilegedAction() {
-            public Object run() {
+        AccessController.doPrivileged(new PrivilegedAction<Void>() {
+            public Void run() {
                 try {
                     final File shell_ini = new File(user_home + "/shell.ini");
                     if(shell_ini.exists())

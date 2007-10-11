@@ -22,6 +22,7 @@
 package gnu.java.security.action;
 
 import java.security.PrivilegedAction;
+import java.util.Properties;
 
 
 /**
@@ -29,12 +30,12 @@ import java.security.PrivilegedAction;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class GetPropertiesAction implements PrivilegedAction {
+public class GetPropertiesAction implements PrivilegedAction<Properties> {
 
     /**
      * @see java.security.PrivilegedAction#run()
      */
-    public Object run() {
+    public Properties run() {
         return System.getProperties();
     }
 }

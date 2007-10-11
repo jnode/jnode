@@ -133,9 +133,9 @@ public abstract class ClassLoader {
         static final ProtectionDomain defaultProtectionDomain;
         static {
             final CodeSource cs = new CodeSource(null, null);
-            PermissionCollection perm = (PermissionCollection) AccessController
-                    .doPrivileged(new PrivilegedAction() {
-                        public Object run() {
+            PermissionCollection perm = AccessController
+                    .doPrivileged(new PrivilegedAction<PermissionCollection>() {
+                        public PermissionCollection run() {
                             return Policy.getPolicy().getPermissions(cs);
                         }
                     });
@@ -406,10 +406,10 @@ public abstract class ClassLoader {
         }
         if (protDomain == null) {
 
-            protDomain = (ProtectionDomain) AccessController
-                    .doPrivileged(new PrivilegedAction() {
+            protDomain = AccessController
+                    .doPrivileged(new PrivilegedAction<ProtectionDomain>() {
 
-                        public Object run() {
+                        public ProtectionDomain run() {
                             return getDefaultProtectionDomain();
                         }
                     });
@@ -434,10 +434,9 @@ public abstract class ClassLoader {
             throw new NullPointerException();
         }
         if (protDomain == null) {
-            protDomain = (ProtectionDomain) AccessController
-                    .doPrivileged(new PrivilegedAction() {
-
-                        public Object run() {
+            protDomain = AccessController.doPrivileged(
+            		new PrivilegedAction<ProtectionDomain>() {
+                        public ProtectionDomain run() {
                             return getDefaultProtectionDomain();
                         }
                     });

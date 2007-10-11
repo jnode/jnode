@@ -48,8 +48,8 @@ public class ThreadNameArgument extends Argument {
         }
 
         final ThreadGroup grp_f = grp;
-        AccessController.doPrivileged(new PrivilegedAction() {
-            public Object run() {
+        AccessController.doPrivileged(new PrivilegedAction<Void>() {
+            public Void run() {
                 findList(grp_f, partial, names);
                 return null;
             }

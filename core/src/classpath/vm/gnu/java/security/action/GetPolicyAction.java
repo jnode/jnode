@@ -30,7 +30,7 @@ import java.security.PrivilegedAction;
  * @see java.security.Policy
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class GetPolicyAction implements PrivilegedAction {
+public class GetPolicyAction implements PrivilegedAction<Policy> {
 
     private static final GetPolicyAction instance = new GetPolicyAction();
     
@@ -45,7 +45,7 @@ public class GetPolicyAction implements PrivilegedAction {
     /**
      * @see java.security.PrivilegedAction#run()
      */
-    public Object run() {
+    public Policy run() {
         return Policy.getPolicy();
     }
     

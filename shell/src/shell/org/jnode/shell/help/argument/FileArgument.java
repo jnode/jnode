@@ -91,10 +91,9 @@ public class FileArgument extends Argument {
 
         // Find the
         final File f = new File(dir);
-        final String[] names = (String[]) AccessController
-                .doPrivileged(new PrivilegedAction() {
-
-                    public Object run() {
+        final String[] names = AccessController
+                .doPrivileged(new PrivilegedAction <String[]>() {
+                    public String[] run() {
                         if (!f.exists()) {
                             return null;
                         } else {

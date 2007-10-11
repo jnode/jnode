@@ -42,7 +42,7 @@ import org.jnode.vm.VmSystem;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class Debugger implements SystemTriggerListener, KeyboardListener,
-        PrivilegedAction {
+        PrivilegedAction<Void> {
 
     private boolean enabled;
 
@@ -93,7 +93,7 @@ public class Debugger implements SystemTriggerListener, KeyboardListener,
      * 
      * @see java.security.PrivilegedAction#run()
      */
-    public Object run() {
+    public Void run() {
         final PrintStream out = VmSystem.getOut();
         DebugState st = this.state;
 
@@ -143,7 +143,7 @@ public class Debugger implements SystemTriggerListener, KeyboardListener,
 
     private void setPreferredListener() {
         final KeyboardListener l = this;
-        AccessController.doPrivileged(new PrivilegedAction() {
+        AccessController.doPrivileged(new PrivilegedAction<Object>() {
 
             public Object run() {
                 try {

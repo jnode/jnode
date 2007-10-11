@@ -161,8 +161,8 @@ public class Editor extends JFrame {
     }
 
     private void readFile(final File file) {
-        AccessController.doPrivileged(new PrivilegedAction() {
-            public Object run() {
+        AccessController.doPrivileged(new PrivilegedAction<Void>() {
+            public Void run() {
                 try {
                     FileInputStream fis = new FileInputStream(file);
                     byte[] data = new byte[fis.available()];
@@ -189,8 +189,8 @@ public class Editor extends JFrame {
     }
 
     private void writeFile(final File file) {
-        AccessController.doPrivileged(new PrivilegedAction() {
-            public Object run() {
+        AccessController.doPrivileged(new PrivilegedAction<Void>() {
+            public Void run() {
                 try {
                     FileWriter fw = new FileWriter(file);
                     fw.write(textArea.getText());

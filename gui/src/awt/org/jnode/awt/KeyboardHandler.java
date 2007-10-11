@@ -70,8 +70,8 @@ public class KeyboardHandler implements
                 keyboardAPI = (KeyboardAPI) keyboardDevice
                         .getAPI(KeyboardAPI.class);
                 keyboardAPI.addKeyboardListener(this);
-                AccessController.doPrivileged(new PrivilegedAction() {
-                    public Object run() {
+                AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                    public Void run() {
                         keyboardAPI.setPreferredListener(KeyboardHandler.this);
                         return null;
                     }
@@ -147,8 +147,8 @@ public class KeyboardHandler implements
         if (key_code == KeyEvent.VK_F12 && event.isAltDown() ||
                 key_code == KeyEvent.VK_BACK_SPACE && event.isAltDown() && event.isControlDown()) {
             event.consume();
-            AccessController.doPrivileged(new PrivilegedAction() {
-                public Object run() {
+            AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                public Void run() {
                     JNodeToolkit.stopGui();
                     return null;
                 }
@@ -156,8 +156,8 @@ public class KeyboardHandler implements
             return true;
         } else if (key_code == KeyEvent.VK_F11 && event.isAltDown()) {
             event.consume();
-            AccessController.doPrivileged(new PrivilegedAction() {
-                public Object run() {
+            AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                public Void run() {
                     JNodeToolkit.getJNodeToolkit().leaveGUI();
                     return null;
                 }
@@ -165,8 +165,8 @@ public class KeyboardHandler implements
             return true;
         } else if (key_code == KeyEvent.VK_F5 && event.isControlDown() && event.isAltDown()) {
             event.consume();
-            AccessController.doPrivileged(new PrivilegedAction() {
-                public Object run() {
+            AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                public Void run() {
                     JNodeToolkit.refreshGui();
                     return null;
                 }
@@ -196,8 +196,8 @@ public class KeyboardHandler implements
      * Install this handler as current keyboard focus manager.
      */
     public void install() {
-        AccessController.doPrivileged(new PrivilegedAction() {
-            public Object run() {
+        AccessController.doPrivileged(new PrivilegedAction<Void>() {
+            public Void run() {
                 //setCurrentKeyboardFocusManager(KeyboardHandler.this);
                 return null;
             }
@@ -208,8 +208,8 @@ public class KeyboardHandler implements
      * Uninstall this handler as current keyboard focus manager.
      */
     public void uninstall() {
-        AccessController.doPrivileged(new PrivilegedAction() {
-            public Object run() {
+        AccessController.doPrivileged(new PrivilegedAction<Void>() {
+            public Void run() {
                 //setCurrentKeyboardFocusManager(null);
                 return null;
             }

@@ -255,8 +255,8 @@ public abstract class AsyncCommandInvoker implements CommandInvoker, KeyboardLis
         if (threadProcess != null) {
             unblock();
 
-            AccessController.doPrivileged(new PrivilegedAction(){
-                public Object run() {
+            AccessController.doPrivileged(new PrivilegedAction<Void>(){
+                public Void run() {
                     threadProcess.stop(new ThreadDeath());
                     return null;
                 }});
