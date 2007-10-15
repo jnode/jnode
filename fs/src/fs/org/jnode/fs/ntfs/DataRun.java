@@ -202,7 +202,7 @@ final class DataRun extends NTFSStructure {
 
         if (actCluster == 0) {
             // Not really stored on disk -- sparse files, etc.
-            Arrays.fill(dst, actDstOffset, actDstOffset + count, (byte) 0);
+            Arrays.fill(dst, actDstOffset, actDstOffset + count * clusterSize, (byte) 0);
         } else {
             volume.readClusters(actCluster, dst, actDstOffset, count);
         }
