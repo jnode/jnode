@@ -398,7 +398,7 @@ public abstract class ColorModel implements Transparency
   public Object getDataElements(int rgb, Object pixel)
   {
     // subclasses has to implement this method.
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException(this.getClass().getName());
 	}
 
 	/**
