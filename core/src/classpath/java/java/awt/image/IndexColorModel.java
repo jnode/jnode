@@ -733,4 +733,198 @@ public class IndexColorModel extends ColorModel
     int realSize = Math.max(256, Math.max(1 << bits, size));
     return new int[realSize];
   }
+
+    //jnode + openjdk
+  public synchronized Object getDataElements(int rgb, Object pixel) {
+        int red = (rgb>>16) & 0xff;
+        int green = (rgb>>8) & 0xff;
+        int blue  = rgb & 0xff;
+        int alpha = (rgb>>>24);
+        int pix = 0;
+
+        // Note that pixels are stored at lookupcache[2*i]
+        // and the rgb that was searched is stored at
+        // lookupcache[2*i+1].  Also, the pixel is first
+        // inverted using the unary complement operator
+        // before storing in the cache so it can never be 0.
+	for (int i = CACHESIZE - 2; i >= 0; i -= 2) {
+	    if ((pix = lookupcache[i]) == 0) {
+		break;
+	    }
+	    if (rgb == lookupcache[i+1]) {
+		return installpixel(pixel, ~pix);
+	    }
+	}
+
+	if (allgrayopaque) {
+            // IndexColorModel objects are all tagged as
+            // non-premultiplied so ignore the alpha value
+            // of the incoming color, convert the
+            // non-premultiplied color components to a
+            // grayscale value and search for the closest
+            // gray value in the palette.  Since all colors
+            // in the palette are gray, we only need compare
+            // to one of the color components for a match
+            // using a simple linear distance formula.
+
+	    int minDist = 256;
+	    int d;
+	    int gray = (int) (red*77 + green*150 + blue*29 + 128)/256;
+
+	    for (int i = 0; i < map_size; i++) {
+		if (this.rgb[i] == 0x0) {
+		    // For allgrayopaque colormaps, entries are 0
+		    // iff they are an invalid color and should be
+		    // ignored during color searches.
+		    continue;
+		}
+		d = (this.rgb[i] & 0xff) - gray;
+		if (d < 0) d = -d;
+		if (d < minDist) {
+		    pix = i;
+		    if (d == 0) {
+			break;
+		    }
+		    minDist = d;
+		}
+	    }
+	} else if (transparency == OPAQUE) {
+            // IndexColorModel objects are all tagged as
+            // non-premultiplied so ignore the alpha value
+            // of the incoming color and search for closest
+            // color match independently using a 3 component
+            // Euclidean distance formula.
+            // For opaque colormaps, palette entries are 0
+            // iff they are an invalid color and should be
+            // ignored during color searches.
+            // As an optimization, exact color searches are
+            // likely to be fairly common in opaque colormaps
+            // so first we will do a quick search for an
+            // exact match.
+
+            int smallestError = Integer.MAX_VALUE;
+            int lut[] = this.rgb;
+            int lutrgb;
+            for (int i=0; i < map_size; i++) {
+		lutrgb = lut[i];
+		if (lutrgb == rgb && lutrgb != 0) {
+		    pix = i;
+                    smallestError = 0;
+		    break;
+		}
+            }
+
+            if (smallestError != 0) {
+                for (int i=0; i < map_size; i++) {
+                    lutrgb = lut[i];
+                    if (lutrgb == 0) {
+                        continue;
+                    }
+
+                    int tmp = ((lutrgb >> 16) & 0xff) - red;
+                    int currentError = tmp*tmp;
+                    if (currentError < smallestError) {
+                        tmp = ((lutrgb >> 8) & 0xff) - green;
+                        currentError += tmp * tmp;
+                        if (currentError < smallestError) {
+                            tmp = (lutrgb & 0xff) - blue;
+                            currentError += tmp * tmp;
+                            if (currentError < smallestError) {
+                                pix = i;
+                                smallestError = currentError;
+                            }
+                        }
+                    }
+                }
+            }
+	} else if (alpha == 0 && trans >= 0) {
+            // Special case - transparent color maps to the
+            // specified transparent pixel, if there is one
+
+            pix = trans;
+	} else {
+            // IndexColorModel objects are all tagged as
+            // non-premultiplied so use non-premultiplied
+            // color components in the distance calculations.
+            // Look for closest match using a 4 component
+            // Euclidean distance formula.
+
+            int smallestError = Integer.MAX_VALUE;
+            int lut[] = this.rgb;
+            for (int i=0; i < map_size; i++) {
+		int lutrgb = lut[i];
+		if (lutrgb == rgb) {
+                    if (validBits != null && !validBits.testBit(i)) {
+                        continue;
+                    }
+		    pix = i;
+		    break;
+		}
+
+                int tmp = ((lutrgb >> 16) & 0xff) - red;
+		int currentError = tmp*tmp;
+		if (currentError < smallestError) {
+                    tmp = ((lutrgb >> 8) & 0xff) - green;
+		    currentError += tmp * tmp;
+                    if (currentError < smallestError) {
+                        tmp = (lutrgb & 0xff) - blue;
+                        currentError += tmp * tmp;
+                        if (currentError < smallestError) {
+                            tmp = (lutrgb >>> 24) - alpha;
+                            currentError += tmp * tmp;
+                            if (currentError < smallestError &&
+                                (validBits == null || validBits.testBit(i)))
+                            {
+                                pix = i;
+                                smallestError = currentError;
+                            }
+                        }
+                    }
+		}
+            }
+        }
+	System.arraycopy(lookupcache, 2, lookupcache, 0, CACHESIZE - 2);
+	lookupcache[CACHESIZE - 1] = rgb;
+	lookupcache[CACHESIZE - 2] = ~pix;
+	return installpixel(pixel, pix);
+    }
+    private boolean allgrayopaque = false; 
+    private static final int CACHESIZE = 40;
+    private int lookupcache[] = new int[CACHESIZE];
+
+    private Object installpixel(Object pixel, int pix) {
+        switch (transferType) {
+        case DataBuffer.TYPE_INT:
+	    int[] intObj;
+	    if (pixel == null) {
+		pixel = intObj = new int[1];
+	    } else {
+		intObj = (int[]) pixel;
+	    }
+	    intObj[0] = pix;
+            break;
+        case DataBuffer.TYPE_BYTE:
+	    byte[] byteObj;
+	    if (pixel == null) {
+		pixel = byteObj = new byte[1];
+	    } else {
+		byteObj = (byte[]) pixel;
+	    }
+	    byteObj[0] = (byte) pix;
+            break;
+        case DataBuffer.TYPE_USHORT:
+	    short[] shortObj;
+	    if (pixel == null) {
+		pixel = shortObj = new short[1];
+	    } else {
+		shortObj = (short[]) pixel;
+	    }
+	    shortObj[0] = (short) pix;
+            break;
+        default:
+            throw new UnsupportedOperationException("This method has not been "+
+                             "implemented for transferType " + transferType);
+        }
+        return pixel;
+    }
 }
