@@ -38,13 +38,12 @@ exception statement from your version. */
 
 package java.awt;
 
-import gnu.classpath.NotImplementedException;
-
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.VolatileImage;
 import java.awt.image.WritableRaster;
+import sun.awt.image.SunVolatileImage;
 
 /**
  * This class describes the configuration of various graphics devices, such
@@ -99,8 +98,11 @@ public abstract class GraphicsConfiguration
    * @param w the width of the buffer
    * @param h the height of the buffer
    * @return the buffered image, or null if none is supported
-   */
-  public abstract BufferedImage createCompatibleImage(int w, int h);
+   */ //openjdk jnode
+  public BufferedImage createCompatibleImage(int w, int h) {
+      throw new UnsupportedOperationException();
+  }
+  //public abstract BufferedImage createCompatibleImage(int w, int h);
 
     //jnode openjdk
     /**
@@ -164,8 +166,8 @@ public abstract class GraphicsConfiguration
     public VolatileImage createCompatibleVolatileImage(int width, int height,
 	ImageCapabilities caps, int transparency) throws AWTException
     {
-        return null;
-        /*
+        //return null;
+
         VolatileImage vi =
             new SunVolatileImage(this, width, height, transparency, caps);
         if (caps != null && caps.isAccelerated() &&
@@ -175,7 +177,7 @@ public abstract class GraphicsConfiguration
                                    "be met by this graphics configuration.");
         }
         return vi;
-        */
+
     }
 
 
