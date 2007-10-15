@@ -1489,6 +1489,7 @@ public class Font implements Serializable
         }
         this.font2DHandle = font.font2DHandle;
         this.createdFont = font.createdFont;
+        this.peer = font.peer;  //jnode + openjdk
     }
 
     /**
