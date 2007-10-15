@@ -44,6 +44,7 @@
       <export name="javax.swing.filechooser.*"/>
       <export name="javax.swing.plaf.*"/>
       <export name="javax.swing.plaf.basic.*"/>
+      <export name="javax.swing.plaf.basic.icons.*"/>
       <export name="javax.swing.plaf.metal.*"/>
       <export name="javax.swing.plaf.metal.icons.*"/>
       <export name="javax.swing.plaf.metal.icons.ocean.*"/>
