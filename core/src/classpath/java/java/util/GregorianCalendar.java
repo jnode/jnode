@@ -1352,4 +1352,7 @@ public class GregorianCalendar extends Calendar
 				return maximums[field];
 		}
 	}
+
+    //jnode openjdk
+    static final long DEFAULT_GREGORIAN_CUTOVER = -12219292800000L;
 }
