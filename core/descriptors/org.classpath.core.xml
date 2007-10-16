@@ -35,6 +35,7 @@
       <export name="sun.nio.cs.ThreadLocalCoders"/>
       <export name="sun.text.Normalizer"/>
       <export name="sun.text.normalizer.*"/>
+      <export name="sun.util.calendar.*"/>
 
       <export name="gnu.classpath.Configuration"/>
       <export name="gnu.classpath.Pointer"/>
