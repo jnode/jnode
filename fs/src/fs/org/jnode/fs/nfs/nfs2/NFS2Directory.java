@@ -25,6 +25,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.security.AccessController;
+import java.security.PrivilegedExceptionAction;
+import java.security.PrivilegedActionException;
 
 import org.acplt.oncrpc.OncRpcException;
 import org.jnode.fs.FSDirectory;
@@ -79,16 +82,36 @@ public class NFS2Directory extends NFS2Object implements FSDirectory {
 
     }
 
+    private class LookupAction implements PrivilegedExceptionAction<LookupResult> {
+        private final NFS2Client nfsClient;
+        private Entry entry;
+
+        public LookupAction(NFS2Client nfsClient) {
+            this.nfsClient = nfsClient;
+        }
+
+        public LookupResult run() throws Exception {
+            return nfsClient.lookup(fileHandle, entry.getName());
+        }
+
+        public void setEntry(Entry entry) {
+            this.entry = entry;
+        }
+    }
+
     /**
      * Gets an iterator used to iterate over all the entries of this directory.
      * All elements returned by the iterator must be instanceof FSEntry.
      */
     public Iterator<? extends NFS2Entry> iterator() throws IOException {
 
-        NFS2Client nfsClient = ((NFS2FileSystem) getFileSystem()).getNFSClient();
+        final NFS2Client nfsClient = ((NFS2FileSystem) getFileSystem()).getNFSClient();
 
         try {
-            ListDirectoryResult result = nfsClient.listDirectory(fileHandle, new byte[NFS2Client.COOKIE_SIZE], 1024);
+            ListDirectoryResult result = AccessController.doPrivileged(new PrivilegedExceptionAction<ListDirectoryResult>() {
+                public ListDirectoryResult run() throws Exception {
+                    return nfsClient.listDirectory(fileHandle, new byte[NFS2Client.COOKIE_SIZE], 1024);
+            }});
 
             if (result.getStatus() == Status.NFS_OK) {
 
@@ -97,12 +120,15 @@ public class NFS2Directory extends NFS2Object implements FSDirectory {
                     return EMPTY_ENTRY_ITERATOR;
                 }
 
+                LookupAction lookupAction = new LookupAction(nfsClient);
+                
                 Entry entry = result.getEntry();
 
                 List<NFS2Entry> nfsEntryList = new ArrayList<NFS2Entry>();
                 while (entry != null) {
 
-                    LookupResult lookupResult = nfsClient.lookup(fileHandle, entry.getName());
+                    lookupAction.setEntry(entry);
+                    LookupResult lookupResult = AccessController.doPrivileged(lookupAction);
 
                     if (lookupResult.getStatus() == Status.NFS_OK) {
 
@@ -125,10 +151,14 @@ public class NFS2Directory extends NFS2Object implements FSDirectory {
                 throw new IOException("Response is not ok." + result.getStatus());
                 // return null;
             }
-
-        } catch (OncRpcException e) {
-            throw new IOException(
-                    "An error occurs when the nfs file system tried to fetch the content of the  directory", e);
+        } catch (PrivilegedActionException e){
+            Exception x = e.getException();
+            if(x instanceof OncRpcException)
+                throw new IOException("An error occurs when the nfs file system tried to fetch the content of the  directory", (OncRpcException) x);
+            else if(x instanceof IOException)
+                throw (IOException) x;
+            else
+                throw new RuntimeException(x);
         }
 
     }
