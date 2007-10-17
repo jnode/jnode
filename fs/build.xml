@@ -14,6 +14,7 @@
     <pathelement location="${edtftpj.jar}"/>
     <pathelement location="${commons-net.jar}"/>
     <pathelement location="${jcifs.jar}"/>
+  	<pathelement location="${oncrpc.jar}"/>
     <path refid="cp"/>
   </path>
 

@@ -119,6 +119,9 @@ The default list of (non-system) plugins to be included in the init-jar.
     <plugin id="jcifs"/>
     <plugin id="org.jnode.fs.smbfs"/>
     <plugin id="org.jnode.fs.smbfs.command"/>
+    
+    <plugin id="org.jnode.fs.nfs"/>
+    <plugin id="org.jnode.fs.nfs.command"/>
 
 
     <plugin id="org.jnode.partitions"/>
@@ -140,6 +143,8 @@ The default list of (non-system) plugins to be included in the init-jar.
     <plugin id="org.jnode.protocol"/>
     <plugin id="org.jnode.protocol.ftp"/>
     <plugin id="org.jnode.protocol.tftp"/>
+    
+    <plugin id="org.acplt.oncrpc"/>
 
     <plugin id="org.jnode.shell"/>
     <plugin id="org.jnode.shell.help"/>
