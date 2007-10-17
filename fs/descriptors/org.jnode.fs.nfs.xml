@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.fs.nfs"
+        name="NFS file system for JNode"
+        version="@VERSION@"
+        license-name="lgpl"
+        provider-name="JNode.org">
+
+
+  <requires>
+	<import plugin="org.jnode.fs"/>
+	<import plugin="org.acplt.oncrpc"/>
+  </requires>
+
+  <runtime>
+    <library name="jnode-fs.jar">
+      <export name="org.jnode.fs.nfs.*"/>
+      <export name="org.jnode.fs.nfs.nfs2.*"/>
+      <export name="org.jnode.fs.nfs.nfs2.rpc.mount.*"/>
+      <export name="org.jnode.fs.nfs.nfs2.rpc.nfs.*"/>
+    </library>
+  </runtime>
+
+
+  <extension point="org.jnode.fs.types">
+    <type class="org.jnode.fs.nfs.nfs2.NFS2FileSystemType"/>
+  </extension>
+
+
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.net.SocketPermission" name="*" actions="connect,resolve"/>
+  </extension>
+
+</plugin>

@@ -13,6 +13,7 @@
         <import plugin="org.jnode.net.ipv4"/>
         <import plugin="org.jnode.net.ipv4.config"/>
         <import plugin="org.jnode.shell.help"/>
+        <import plugin="org.acplt.oncrpc"/>
     </requires>
 
     <runtime>
@@ -35,6 +36,7 @@
         <alias name="tftp" class="org.jnode.net.command.TftpCommand"/>
         <alias name="wlanctl" class="org.jnode.net.command.WLanCtlCommand"/>
         <alias name="net" class="org.jnode.net.command.NetCommand"/>
+        <alias name="rpcinfo" class="org.jnode.net.command.RpcInfoCommand"/>
     </extension>
 
     <extension point="org.jnode.security.permissions">

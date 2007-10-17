@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.acplt.oncrpc"
+  name="OncRpc"
+  version="1.0.6"
+  provider-name="Remote tea"
+  provider-url="http://remotetea.sourceforge.net/"
+  license-name="LGPL"
+  license-url="http://remotetea.sourceforge.net/">
+
+
+  <runtime>
+    <library name="oncrpc.jar">
+      <export name="org.acplt.oncrpc.*"/>
+    </library>
+  </runtime>
+
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.net.SocketPermission" name="*" actions="connect,resolve"/>
+  </extension>
+
+</plugin>

@@ -50,6 +50,7 @@
     <property name="edtftpj.jar" value="${root.dir}/fs/lib/edtftpj-1.5.2.jar"/>
     <property name="jcifs.jar" value="${root.dir}/fs/lib/jcifs-1.2.6.jar"/>
     <property name="ejc.jar" value="${root.dir}/core/lib/ejc-3.1.1.jar"/>
+	<property name="oncrpc.jar" value="${root.dir}/net/lib/oncrpc.jar"/>
 
     <!-- libraries needed to run tests -->
     <property name="jmock-cglib.jar" value="${root.dir}/core/lib/jmock-cglib-1.0.1.jar"/>
@@ -217,7 +218,8 @@
             <libalias name="edtftpj.jar" alias="${edtftpj.jar}"/>
             <libalias name="jcifs.jar" alias="${jcifs.jar}"/>
             <libalias name="ejc.jar" alias="${ejc.jar}"/>
-
+        	<libalias name="oncrpc.jar" alias="${oncrpc.jar}"/>
+        	
             <descriptors dir="${descriptors.dir}/">
                 <include name="*.xml"/>
                 <exclude name="*plugin-list.xml"/>

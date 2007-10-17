@@ -5,6 +5,7 @@
 	<classpathentry kind="src" path="src/test"/>
 	<classpathentry kind="src" path="/JNode-Core"/>
 	<classpathentry kind="lib" path="/JNode-Core/lib/log4j-1.2.8.jar"/>
+	<classpathentry kind="lib" path="lib/oncrpc.jar"/>
 	<classpathentry kind="src" path="/JNode-Shell"/>
 	<classpathentry kind="lib" path="/JNode-Core/lib/gnu-crypto.jar"/>
 	<classpathentry kind="lib" path="/JNode-Core/lib/javax-crypto.jar"/>
