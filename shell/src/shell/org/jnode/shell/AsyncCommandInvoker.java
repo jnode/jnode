@@ -233,26 +233,34 @@ public abstract class AsyncCommandInvoker implements CommandInvoker, KeyboardLis
     		PrintStream outputStream, PrintStream errStream);
 
 	public void keyPressed(KeyboardEvent ke) {
+        //disabling Ctrl-C since currently we have no safe method for killing a thread
+        /*
         if (ke.isControlDown() && ke.getKeyCode() == KeyEvent.VK_C) {
             doCtrlC();
+            ke.consume();
         }
+        */
         if (ke.isControlDown() && ke.getKeyCode() == KeyEvent.VK_Z) {
             doCtrlZ();
+            ke.consume();
         }
     }
 
     private void doCtrlZ() {
-        System.err.println("ctrl-z: Returning focus to console. (" + cmdName
-                + " is still running)");
-        unblock();
+        if(blockingThread != null && blockingThread.isAlive()) {        
+            System.err.println("ctrl-z: Returning focus to console. (" + cmdName
+                    + " is still running)");
+            unblock();
+        }
     }
 
     @SuppressWarnings("deprecation")
     private void doCtrlC() {
-        System.err.println("ctrl-c: Returning focus to console. (" + cmdName
+        if (threadProcess != null && threadProcess.isAlive() &&
+                blockingThread != null && blockingThread.isAlive()) {
+            System.err.println("ctrl-c: Returning focus to console. (" + cmdName
                 + " has been killed)");
-
-        if (threadProcess != null) {
+            
             unblock();
 
             AccessController.doPrivileged(new PrivilegedAction<Void>(){
