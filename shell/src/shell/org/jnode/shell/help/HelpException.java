@@ -28,7 +28,12 @@ public class HelpException extends Exception {
 	HelpException() {
 		super();
 	}
+	
 	HelpException(String message) {
 		super(message);
+	}
+	
+	public HelpException(String message, Throwable cause) {
+		super(message, cause);
 	}
 }

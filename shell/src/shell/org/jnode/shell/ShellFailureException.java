@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: ShellException.java 2224 2006-01-01 12:49:03Z epr $
  *
  * JNode.org
  * Copyright (C) 2003-2006 JNode.org
@@ -22,41 +22,27 @@
 package org.jnode.shell;
 
 /**
- * @author epr
+ * This exception is used to signal an internal error in the 
+ * command shell, interpretter or invoker.
+ * 
+ * @author crawley@jnode.org
  */
-public class ShellException extends Exception {
+public class ShellFailureException extends RuntimeException {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
-
-	/**
-	 * 
-	 */
-	public ShellException() {
-		super();
-	}
 
 	/**
 	 * @param message
 	 * @param cause
 	 */
-	public ShellException(String message, Throwable cause) {
+	public ShellFailureException(String message, Throwable cause) {
 		super(message, cause);
-	}
-
-	/**
-	 * @param cause
-	 */
-	public ShellException(Throwable cause) {
-		super(cause);
 	}
 
 	/**
 	 * @param s
 	 */
-	public ShellException(String s) {
+	public ShellFailureException(String s) {
 		super(s);
 	}
 }

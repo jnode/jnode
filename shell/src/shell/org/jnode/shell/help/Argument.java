@@ -25,6 +25,7 @@ import java.util.Collection;
 
 import javax.naming.NameNotFoundException;
 
+import org.jnode.shell.CommandLine;
 import org.jnode.shell.ShellUtils;
 
 /**

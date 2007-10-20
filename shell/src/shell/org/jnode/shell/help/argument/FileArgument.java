@@ -114,7 +114,14 @@ public class FileArgument extends Argument {
                     list.add(name);
                 }
             }
-            return complete(partial, list);
+            String completed = complete(partial, list);
+            if (completed.endsWith(" ")) {
+            	String path = completed.substring(0, completed.length() - 1);
+            	if (new File(path).isDirectory()) {
+            		completed = path + File.separatorChar;
+            	}
+            }
+            return completed;
         }
     }
 }

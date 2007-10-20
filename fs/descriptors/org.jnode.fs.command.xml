@@ -41,6 +41,7 @@
     <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>
     <permission class="java.net.NetPermission" name="specifyStreamHandler"/> 
     <permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/> 
+    <permission class="java.lang.RuntimePermission" name="exitVM"/> 
   </extension>
         
 </plugin>

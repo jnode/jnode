@@ -6,6 +6,8 @@ import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+
+import org.jnode.shell.CommandThread;
 import org.jnode.vm.VmSystem;
 import org.jnode.vm.VmExit;
 
@@ -188,7 +190,7 @@ public class ProcletContext extends ThreadGroup {
      * @param target the new Thread's Runnable object.
      * @return the new Thread
      */
-    public static Thread createProclet(Runnable target) {
+    public static CommandThread createProclet(Runnable target) {
     	return createProclet(target, null, null, null, null, 0);
     }
 
@@ -206,7 +208,7 @@ public class ProcletContext extends ThreadGroup {
      * @param target the new Thread's Runnable object.
      * @return the new Thread
      */
-    public static Thread createProclet(Runnable target, Properties properties, 
+    public static CommandThread createProclet(Runnable target, Properties properties, 
 			Map<String, String> environment, Object[] streams) {
     	return createProclet(target, properties, environment, streams, null, 0);
     }
@@ -227,7 +229,7 @@ public class ProcletContext extends ThreadGroup {
      * @param name an optional Thread name.
      * @return the new Thread
      */
-    public static Thread createProclet(Runnable target, Properties properties, 
+    public static CommandThread createProclet(Runnable target, Properties properties, 
 			Map<String, String> environment, Object[] streams, String name) {
     	return createProclet(target, properties, environment, streams, name, 0);
     }
@@ -249,7 +251,7 @@ public class ProcletContext extends ThreadGroup {
      * @param size the new Thread's stack size; zero denotes the default thread stack size.
      * @return the new Thread
      */
-    public static Thread createProclet(Runnable target, Properties properties, 
+    public static CommandThread createProclet(Runnable target, Properties properties, 
 			Map<String, String> environment, Object[] streams, 
 			String name, long size) {
     	ProcletContext procletContext = 
@@ -258,7 +260,7 @@ public class ProcletContext extends ThreadGroup {
     	if (name == null) {
     		name = procletContext.autoThreadName();
     	}
-    	return new Thread(procletContext, target, name, size);
+    	return new CommandThread(procletContext, target, name, size);
     }
 
     /**

@@ -108,14 +108,17 @@ public class CatCommand implements Command {
     				}
     			}
     		}
-        	out.flush();
+        	if (out.checkError()) {
+        		ok = false;
+        	}
     	} catch (IOException ex) {
     		// Deal with i/o errors reading from in/is or writing to out.
     		err.println("Problem concatenating file(s): " + ex.getMessage());
     		ok = false;
     	}
-    	// TODO need to set a 'return code'; e.g. 
-    	// if (!ok) { System.exit(1); }
+    	if (!ok) { 
+    		System.exit(1); 
+    	}
     }
     
     /**
