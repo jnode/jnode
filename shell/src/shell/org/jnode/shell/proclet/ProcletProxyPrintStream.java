@@ -68,7 +68,6 @@ implements ProcletProxyStream<PrintStream> {
 			return getRealStream();
 		}
 		catch (ProxyStreamException ex) {
-			setError();
 			return getNullPrintStream();
 		}
 	}

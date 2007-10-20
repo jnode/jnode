@@ -28,4 +28,8 @@ public class CompletionException extends HelpException {
 	public CompletionException(String message) {
 		super(message);
 	}
+
+	public CompletionException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }
