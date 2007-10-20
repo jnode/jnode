@@ -1,4 +1,4 @@
-<project name="JNode-Builder" default="all" basedir=".">
+<project name="JNode-Net" default="all" basedir=".">
 
   <typedef file="${basedir}/../all/lib/jnode.xml"/>
 				
