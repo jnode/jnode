@@ -83,7 +83,9 @@ public class FileArgument extends Argument {
         // Get last full directory
         final int idx = partial.lastIndexOf(File.separatorChar);
         final String dir;
-        if (idx >= 0) {
+        if(idx == 0){
+            dir = String.valueOf(File.separatorChar);
+        } else if (idx > 0) {
             dir = partial.substring(0, idx);
         } else {
             dir = "";
@@ -107,7 +109,8 @@ public class FileArgument extends Argument {
             return partial;
         } else {
             final ArrayList<String> list = new ArrayList<String>(names.length);
-            final String prefix = (dir.length() == 0) ? "" : dir + File.separatorChar;
+            final String prefix = (dir.length() == 0) ? "" :
+                    dir.equals("/") ? "/" : dir + File.separatorChar;
             for (String n : names) {
                 final String name = prefix + n;
                 if (name.startsWith(partial)) {
