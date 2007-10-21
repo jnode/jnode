@@ -29,12 +29,21 @@ import org.jnode.driver.Device;
 public class NFS2Device extends Device {
     private String host;
     private String remoteDirectory;
-
+    private int uid;
+    private int gid;
 
     public NFS2Device(String host, String remoteDirectory) {
-        super(null, "nfs-(" + host + "," + remoteDirectory + ")");
+        this(host, remoteDirectory, -1, -1);
+
+    }
+
+    public NFS2Device(String host, String remoteDirectory, int uid, int gid) {
+        super(null, "nfs2-(" + host + "," + remoteDirectory + "," + uid + "," + gid + ")");
         this.host = host;
         this.remoteDirectory = remoteDirectory;
+
+        this.uid = uid;
+        this.gid = gid;
 
     }
 
@@ -42,10 +51,16 @@ public class NFS2Device extends Device {
         return host;
     }
 
-
     public String getRemoteDirectory() {
         return remoteDirectory;
     }
 
+    public int getUid() {
+        return uid;
+    }
+
+    public int getGid() {
+        return gid;
+    }
 
 }

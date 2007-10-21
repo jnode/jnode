@@ -1,23 +1,19 @@
 package org.jnode.fs.nfs.nfs2.rpc.nfs;
 
-import java.io.IOException;
 
-import org.acplt.oncrpc.OncRpcException;
-import org.acplt.oncrpc.XdrDecodingStream;
-
-public class ReadFileResult extends AbstractResult {
+public class ReadFileResult  {
 
 
     private FileAttribute fileAttribute;
     private byte[] data;
 
-    public ReadFileResult() {
+    
+    public void setFileAttribute(FileAttribute fileAttribute) {
+        this.fileAttribute = fileAttribute;
     }
 
-    public void decode(XdrDecodingStream xdr) throws OncRpcException, IOException {
-        fileAttribute = new FileAttribute(xdr);
-        // Optimize this
-        data = xdr.xdrDecodeDynamicOpaque();
+    public void setData(byte[] data) {
+        this.data = data;
     }
 
     public FileAttribute getFileAttribute() {

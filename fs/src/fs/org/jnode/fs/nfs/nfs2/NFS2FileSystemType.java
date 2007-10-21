@@ -40,7 +40,7 @@ public class NFS2FileSystemType implements FileSystemType<NFS2FileSystem> {
      * @param readOnly
      */
     public NFS2FileSystem create(Device device, boolean readOnly) throws FileSystemException {
-        return new NFS2FileSystem((NFS2Device) device);
+        return new NFS2FileSystem((NFS2Device) device,readOnly);
     }
 
     /**

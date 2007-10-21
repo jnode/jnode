@@ -5,28 +5,18 @@
  */
 package org.jnode.fs.nfs.nfs2.rpc.nfs;
 
-import java.io.IOException;
 
-import org.acplt.oncrpc.OncRpcException;
-import org.acplt.oncrpc.XdrDecodingStream;
-
-public class ListDirectoryResult extends AbstractResult {
+public class ListDirectoryResult {
 
     private Entry entry;
     private boolean eof;
 
-    public ListDirectoryResult() {
+    public void setEntry(Entry entry) {
+        this.entry = entry;
     }
 
-    public ListDirectoryResult(XdrDecodingStream xdr) throws OncRpcException, IOException {
-        xdrDecode(xdr);
-    }
-
-    public void decode(XdrDecodingStream xdr) throws OncRpcException, IOException {
-
-        entry = xdr.xdrDecodeBoolean() ? new Entry(xdr) : null;
-        eof = !xdr.xdrDecodeBoolean();
-
+    public void setEof(boolean eof) {
+        this.eof = eof;
     }
 
     public Entry getEntry() {
@@ -38,4 +28,3 @@ public class ListDirectoryResult extends AbstractResult {
     }
 
 }
-// End of ReadDirectoryResult.java
