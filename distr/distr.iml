@@ -17,6 +17,15 @@
     <orderEntry type="module" module-name="core" />
     <orderEntry type="library" name="core" level="project" />
     <orderEntry type="module" module-name="textui" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../../../hda6/ext/devel/jnode/shell/lib/bsh-2.0b5.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
     <orderEntryProperties />
   </component>
 </module>
