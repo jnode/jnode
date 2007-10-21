@@ -29,6 +29,8 @@ import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.nfs.nfs2.rpc.nfs.FileAttribute;
 import org.jnode.fs.nfs.nfs2.rpc.nfs.FileType;
+import org.jnode.fs.nfs.nfs2.rpc.nfs.NFS2Client;
+import org.jnode.fs.nfs.nfs2.rpc.nfs.NFS2Exception;
 
 /**
  * @author Andrei Dore
@@ -54,6 +56,7 @@ public class NFS2Entry extends NFS2Object implements FSEntry {
         this.parent = parent;
         this.name = name;
         this.fileAttribute = fileAttribute;
+        this.fileHandle = fileHandle;
 
         if (fileAttribute.getType() == FileType.DIRECTORY) {
             directory = new NFS2Directory(fileSystem, fileHandle);
@@ -95,7 +98,7 @@ public class NFS2Entry extends NFS2Object implements FSEntry {
     }
 
     public long getLastModified() throws IOException {
-        return fileAttribute.getLastModified().getMicroSeconds();
+        return fileAttribute.getLastModified().getMicroSeconds() * 1000;
     }
 
     public boolean isDirectory() {
@@ -126,7 +129,15 @@ public class NFS2Entry extends NFS2Object implements FSEntry {
     }
 
     public void setName(String newName) throws IOException {
-        // TODO Auto-generated method stub
+
+        NFS2Client client = ((NFS2FileSystem) getFileSystem()).getNFSClient();
+
+        try {
+            client.renameFile(((NFS2Directory) getParent()).getFileHandle(), name, ((NFS2Directory) getParent())
+                    .getFileHandle(), newName);
+        } catch (NFS2Exception e) {
+            throw new IOException("Can not rename ." + e.getMessage(), e);
+        }
 
     }
 

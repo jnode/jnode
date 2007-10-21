@@ -15,6 +15,8 @@ import org.acplt.oncrpc.XdrDecodingStream;
 import org.acplt.oncrpc.XdrEncodingStream;
 import org.acplt.oncrpc.XdrVoid;
 
+import com.sun.xml.internal.xsom.XSRestrictionSimpleType;
+
 /**
  * The class <code>NFS2Client</code> implements the client stub proxy for the
  * NFS_PROGRAM remote program. It provides method stubs which, when called, in
@@ -32,9 +34,15 @@ public class NFS2Client extends OncRpcClientStub {
     private static final int NFS_PROGRAM = 100003;
 
     private static final int PROCEDURE_TEST = 0;
-    private static final int PROCEDURE_READ_FILE = 6;
-    private static final int PROCEDURE_LIST_DIRECTORY = 16;
     private static final int PROCEDURE_LOOKUP = 4;
+    private static final int PROCEDURE_READ_FILE = 6;
+    private static final int PROCEDURE_WRITE_FILE = 8;
+    private static final int PROCEDURE_CREATE_FILE = 9;
+    private static final int PROCEDURE_REMOVE_FILE = 10;
+    private static final int PROCEDURE_RENAME_FILE = 11;
+    private static final int PROCEDURE_CREATE_DIRECTORY = 14;
+    private static final int PROCEDURE_REMOVE_DIRECTORY = 15;
+    private static final int PROCEDURE_LIST_DIRECTORY = 16;
 
     /**
      * Constructs a <code>NFS2Client</code> client stub proxy object from
@@ -68,6 +76,22 @@ public class NFS2Client extends OncRpcClientStub {
         super(host, NFS_PROGRAM, 2, port, protocol);
     }
 
+    private void call(int functionId, NFSParameter parameter, NFSResult result) throws NFS2Exception {
+
+        try {
+            client.call(functionId, NFS_VERSION, parameter, result);
+
+            if (result.getResultCode() != ResultCode.NFS_OK) {
+                throw new NFS2Exception(result.getResultCode());
+            }
+
+        } catch (OncRpcException e) {
+            throw new NFS2Exception(e.getMessage(), e);
+
+        }
+
+    }
+
     /**
      * Call remote procedure test.
      *
@@ -80,10 +104,9 @@ public class NFS2Client extends OncRpcClientStub {
         client.call(PROCEDURE_TEST, NFS_VERSION, argument, result);
     }
 
+    public LookupResult lookup(final byte[] fileHandle, final String entryName) throws NFS2Exception {
 
-    public LookupResult lookup(final byte[] fileHandle, final String entryName) throws OncRpcException, IOException {
-
-        XdrAble parameter = new AbstractParameter() {
+        NFSParameter nfsParameter = new NFSParameter() {
 
             public void xdrEncode(XdrEncodingStream xdr) throws OncRpcException, IOException {
                 xdr.xdrEncodeOpaque(fileHandle, NFS2Client.FILE_HANDLE_SIZE);
@@ -93,15 +116,27 @@ public class NFS2Client extends OncRpcClientStub {
 
         };
 
-        LookupResult result = new LookupResult();
-        client.call(PROCEDURE_LOOKUP, NFS_VERSION, parameter, result);
+        final LookupResult result = new LookupResult();
+
+        NFSResult nfsResult = new NFSResult() {
+
+            @Override
+            public void decode(XdrDecodingStream xdr) throws OncRpcException, IOException {
+                result.setFileHandle(xdr.xdrDecodeOpaque(NFS2Client.FILE_HANDLE_SIZE));
+                result.setFileAttribute(new FileAttribute(xdr));
+
+            }
+
+        };
+
+        call(PROCEDURE_LOOKUP, nfsParameter, nfsResult);
         return result;
     }
 
+    public ListDirectoryResult listDirectory(final byte[] fileHandle, final byte[] cookie, final int count)
+            throws NFS2Exception {
 
-    public ListDirectoryResult listDirectory(final byte[] fileHandle, final byte[] cookie, final int count) throws OncRpcException, IOException {
-
-        XdrAble parameter = new AbstractParameter() {
+        NFSParameter nfsParameter = new NFSParameter() {
 
             public void xdrEncode(XdrEncodingStream xdr) throws OncRpcException, IOException {
                 xdr.xdrEncodeOpaque(fileHandle, FILE_HANDLE_SIZE);
@@ -112,15 +147,26 @@ public class NFS2Client extends OncRpcClientStub {
 
         };
 
-        ListDirectoryResult result = new ListDirectoryResult();
-        client.call(PROCEDURE_LIST_DIRECTORY, NFS_VERSION, parameter, result);
+        final ListDirectoryResult result = new ListDirectoryResult();
+
+        NFSResult nfsResult = new NFSResult() {
+
+            @Override
+            public void decode(XdrDecodingStream xdr) throws OncRpcException, IOException {
+                result.setEntry(xdr.xdrDecodeBoolean() ? new Entry(xdr) : null);
+                result.setEof(!xdr.xdrDecodeBoolean());
+
+            }
+
+        };
+
+        call(PROCEDURE_LIST_DIRECTORY, nfsParameter, nfsResult);
         return result;
     }
 
+    public ReadFileResult readFile(final byte[] fileHandle, final int offset, final int count) throws NFS2Exception {
 
-    public ReadFileResult readFile(final byte[] fileHandle, final int offset, final int count) throws OncRpcException, IOException {
-
-        XdrAble parameter = new AbstractParameter() {
+        NFSParameter nfsParameter = new NFSParameter() {
 
             public void xdrEncode(XdrEncodingStream xdr) throws OncRpcException, IOException {
                 xdr.xdrEncodeOpaque(fileHandle, FILE_HANDLE_SIZE);
@@ -132,20 +178,285 @@ public class NFS2Client extends OncRpcClientStub {
 
         };
 
+        final ReadFileResult result = new ReadFileResult();
 
-        ReadFileResult result = new ReadFileResult();
-        client.call(PROCEDURE_READ_FILE, NFS_VERSION, parameter, result);
+        NFSResult nfsResult = new NFSResult() {
+
+            @Override
+            public void decode(XdrDecodingStream xdr) throws OncRpcException, IOException {
+                result.setFileAttribute(new FileAttribute(xdr));
+                // Optimize this
+                result.setData(xdr.xdrDecodeDynamicOpaque());
+
+            }
+
+        };
+
+        call(PROCEDURE_READ_FILE, nfsParameter, nfsResult);
         return result;
     }
 
+    public void removeDirectory(final byte[] fileHandle, final String name) throws NFS2Exception {
 
-    private abstract class AbstractParameter implements XdrAble {
+        NFSParameter nfsParameter = new NFSParameter() {
+
+            public void xdrEncode(XdrEncodingStream xdr) throws OncRpcException, IOException {
+                xdr.xdrEncodeOpaque(fileHandle, FILE_HANDLE_SIZE);
+                xdr.xdrEncodeString(name);
+            }
+
+        };
+
+        NFSResult nfsResult = new NFSResult() {
+
+            public void decode(XdrDecodingStream xdr) throws OncRpcException, IOException {
+            }
+
+        };
+
+        call(PROCEDURE_REMOVE_DIRECTORY, nfsParameter, nfsResult);
+
+    }
+
+    public void removeFile(final byte[] parentFileHandle, final String name) throws NFS2Exception {
+
+        NFSParameter nfsParameter = new NFSParameter() {
+
+            public void xdrEncode(XdrEncodingStream xdr) throws OncRpcException, IOException {
+                xdr.xdrEncodeOpaque(parentFileHandle, FILE_HANDLE_SIZE);
+                xdr.xdrEncodeString(name);
+            }
+
+        };
+
+        NFSResult nfsResult = new NFSResult() {
+
+            public void decode(XdrDecodingStream xdr) throws OncRpcException, IOException {
+            }
+
+        };
+
+        call(PROCEDURE_REMOVE_FILE, nfsParameter, nfsResult);
+
+    }
+
+    public void renameFile(final byte[] fromParentFileHandle, final String fromName, final byte[] toParentFileHandle,
+                           final String toName) throws NFS2Exception {
+
+        NFSParameter nfsParameter = new NFSParameter() {
+
+            public void xdrEncode(XdrEncodingStream xdr) throws OncRpcException, IOException {
+                xdr.xdrEncodeOpaque(fromParentFileHandle, FILE_HANDLE_SIZE);
+                xdr.xdrEncodeString(fromName);
+                xdr.xdrEncodeOpaque(toParentFileHandle, FILE_HANDLE_SIZE);
+                xdr.xdrEncodeString(toName);
+            }
+
+        };
+
+        NFSResult nfsResult = new NFSResult() {
+
+            public void decode(XdrDecodingStream xdr) throws OncRpcException, IOException {
+            }
+
+        };
+
+        call(PROCEDURE_RENAME_FILE, nfsParameter, nfsResult);
+
+    }
+
+    public CreateDirectoryResult createDirectory(final byte[] parentFileHandle, final String name, final boolean[] permission,
+                                                 final int uid, final int gid, final int size, final Time lastAccessed, final Time lastModified)
+            throws NFS2Exception {
+
+        final int mode = createMode(permission) | 0x4000;
+
+        NFSParameter nfsParameter = new NFSParameter() {
+
+            public void xdrEncode(XdrEncodingStream xdr) throws OncRpcException, IOException {
+                xdr.xdrEncodeOpaque(parentFileHandle, FILE_HANDLE_SIZE);
+                xdr.xdrEncodeString(name);
+
+                xdr.xdrEncodeInt(mode);
+                xdr.xdrEncodeInt(uid);
+                xdr.xdrEncodeInt(gid);
+                xdr.xdrEncodeInt(size);
+
+                xdrCustomEncode(xdr, lastAccessed);
+                xdrCustomEncode(xdr, lastModified);
+
+            }
+
+        };
+
+        final CreateDirectoryResult result = new CreateDirectoryResult();
+
+        NFSResult nfsResult = new NFSResult() {
+
+            public void decode(XdrDecodingStream xdr) throws OncRpcException, IOException {
+                result.setFileHandle(xdr.xdrDecodeOpaque(NFS2Client.FILE_HANDLE_SIZE));
+                result.setFileAttribute(new FileAttribute(xdr));
+            }
+
+        };
+
+        call(PROCEDURE_CREATE_DIRECTORY, nfsParameter, nfsResult);
+
+        return result;
+
+    }
+
+    public CreateFileResult createFile(final byte[] parentFileHandle, final String name,
+                                       final boolean[] permission,
+                                       final int uid, final int gid, final int size, final Time lastAccessed, final Time lastModified) throws NFS2Exception {
+
+
+        final int mode = createMode(permission) | 0x8000;
+
+        NFSParameter nfsParameter = new NFSParameter() {
+
+            public void xdrEncode(XdrEncodingStream xdr) throws OncRpcException, IOException {
+                xdr.xdrEncodeOpaque(parentFileHandle, FILE_HANDLE_SIZE);
+                xdr.xdrEncodeString(name);
+
+                xdr.xdrEncodeInt(mode);
+                xdr.xdrEncodeInt(uid);
+                xdr.xdrEncodeInt(gid);
+                xdr.xdrEncodeInt(size);
+
+                xdrCustomEncode(xdr, lastAccessed);
+                xdrCustomEncode(xdr, lastModified);
+
+            }
+
+        };
+
+        final CreateFileResult result = new CreateFileResult();
+
+        NFSResult nfsResult = new NFSResult() {
+
+            public void decode(XdrDecodingStream xdr) throws OncRpcException, IOException {
+                result.setFileHandle(xdr.xdrDecodeOpaque(NFS2Client.FILE_HANDLE_SIZE));
+                result.setFileAttribute(new FileAttribute(xdr));
+            }
+
+        };
+
+        call(PROCEDURE_CREATE_FILE, nfsParameter, nfsResult);
+
+        return result;
+
+    }
+
+    public FileAttribute writeFile(final byte[] fileHandle, final int offset, final int count, final byte[] data)
+            throws NFS2Exception {
+
+        NFSParameter nfsParameter = new NFSParameter() {
+
+            public void xdrEncode(XdrEncodingStream xdr) throws OncRpcException, IOException {
+                xdr.xdrEncodeOpaque(fileHandle, FILE_HANDLE_SIZE);
+                xdr.xdrEncodeInt(0);
+                xdr.xdrEncodeInt(offset);
+                xdr.xdrEncodeInt(0);
+                xdr.xdrEncodeDynamicOpaque(data);
+
+            }
+
+        };
+
+        final FileAttribute fileAttribute = new FileAttribute();
+
+        NFSResult nfsResult = new NFSResult() {
+
+            public void decode(XdrDecodingStream xdr) throws OncRpcException, IOException {
+                fileAttribute.xdrDecode(xdr);
+            }
+
+        };
+
+        call(PROCEDURE_WRITE_FILE, nfsParameter, nfsResult);
+
+        return fileAttribute;
+
+    }
+
+    private int createMode(boolean[] data) {
+
+        int mode = 0;
+
+        // owner
+        if (data[0]) {
+            mode |= 0x100;
+        }
+        if (data[1]) {
+            mode |= 0x80;
+        }
+        if (data[2]) {
+            mode |= 0x40;
+        }
+
+        // group
+        if (data[3]) {
+            mode |= 0x20;
+        }
+        if (data[4]) {
+            mode |= 0x10;
+        }
+        if (data[5]) {
+            mode |= 0x8;
+        }
+
+        // other
+        if (data[6]) {
+            mode |= 0x4;
+        }
+        if (data[7]) {
+            mode |= 0x2;
+        }
+        if (data[8]) {
+            mode |= 0x1;
+        }
+
+        return mode;
+
+    }
+
+    private void xdrCustomEncode(XdrEncodingStream xdrEncodingStream, Time time) throws OncRpcException, IOException {
+        xdrEncodingStream.xdrEncodeInt(time.getSeconds());
+        xdrEncodingStream.xdrEncodeInt(time.getMicroSeconds());
+    }
+
+    private abstract class NFSParameter implements XdrAble {
 
         public void xdrDecode(XdrDecodingStream xdr) throws OncRpcException, IOException {
             // It is not mandatory because it is a parameter.
 
         }
 
+    }
+
+    private abstract class NFSResult implements XdrAble {
+
+        private ResultCode resultCode;
+
+        public void xdrEncode(XdrEncodingStream xdr) throws OncRpcException, IOException {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void xdrDecode(XdrDecodingStream xdr) throws OncRpcException, IOException {
+            resultCode = ResultCode.getResultCode(xdr.xdrDecodeInt());
+            if (resultCode == ResultCode.NFS_OK) {
+                decode(xdr);
+            }
+
+        }
+
+        public ResultCode getResultCode() {
+            return resultCode;
+        }
+
+        public abstract void decode(XdrDecodingStream xdr) throws OncRpcException, IOException;
     }
 
 }

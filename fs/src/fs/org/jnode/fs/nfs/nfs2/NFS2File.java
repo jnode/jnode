@@ -24,12 +24,12 @@ package org.jnode.fs.nfs.nfs2;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.acplt.oncrpc.OncRpcException;
 import org.jnode.fs.FSFile;
+import org.jnode.fs.ReadOnlyFileSystemException;
 import org.jnode.fs.nfs.nfs2.rpc.nfs.FileAttribute;
 import org.jnode.fs.nfs.nfs2.rpc.nfs.NFS2Client;
+import org.jnode.fs.nfs.nfs2.rpc.nfs.NFS2Exception;
 import org.jnode.fs.nfs.nfs2.rpc.nfs.ReadFileResult;
-import org.jnode.fs.nfs.nfs2.rpc.nfs.Status;
 
 /**
  * @author Andrei Dore
@@ -68,16 +68,26 @@ public class NFS2File extends NFS2Object implements FSFile {
         NFS2Client client = getNFSClient();
 
         try {
-            ReadFileResult result = client.readFile(fileHandle, (int) fileOffset, dest.remaining());
 
-            if (result.getStatus() == Status.NFS_OK) {
-                fileAttribute = result.getFileAttribute();
-                dest.put(result.getData());
-            } else {
-                throw new IOException("Error " + result.getStatus());
+
+            int length = 2048;
+
+            while (length == 2048) {
+
+                length = Math.min(2048, dest.remaining());
+
+                ReadFileResult result = client.readFile(fileHandle, (int) fileOffset, length);
+
+                byte[] data = result.getData();
+
+                length = data.length;
+
+                fileOffset += length;
+
+                dest.put(data);
             }
 
-        } catch (OncRpcException e) {
+        } catch (NFS2Exception e) {
             throw new IOException(e.getMessage(), e);
         }
 
@@ -112,6 +122,34 @@ public class NFS2File extends NFS2Object implements FSFile {
      * @throws java.io.IOException
      */
     public void write(long fileOffset, ByteBuffer src) throws IOException {
+
+        if (getFileSystem().isReadOnly()) {
+            throw new ReadOnlyFileSystemException("Write in readonly filesystem");
+        }
+
+        NFS2Client client = getNFSClient();
+
+        try {
+
+            int length = src.remaining();
+
+            while (length > 0) {
+
+                byte[] data = new byte[Math.min(2048, length)];
+
+                src.get(data);
+
+                client.writeFile(fileHandle, (int) fileOffset, src.remaining(), data);
+
+                length -= data.length;
+
+                fileOffset += data.length;
+
+            }
+
+        } catch (NFS2Exception e) {
+            throw new IOException("Error writing file ." + e.getMessage(), e);
+        }
 
     }
 

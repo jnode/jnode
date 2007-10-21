@@ -12,11 +12,9 @@ import org.acplt.oncrpc.XdrAble;
 import org.acplt.oncrpc.XdrDecodingStream;
 import org.acplt.oncrpc.XdrEncodingStream;
 
-public class Time implements XdrAble, java.io.Serializable {
+public class Time implements XdrAble {
     protected int seconds;
     protected int microSeconds;
-
-    private static final long serialVersionUID = 7527865231274601652L;
 
     public void setSeconds(int x) {
         this.seconds = x;
@@ -37,19 +35,16 @@ public class Time implements XdrAble, java.io.Serializable {
     public Time() {
     }
 
-    public Time(XdrDecodingStream xdr)
-            throws OncRpcException, IOException {
+    public Time(XdrDecodingStream xdr) throws OncRpcException, IOException {
         xdrDecode(xdr);
     }
 
-    public void xdrEncode(XdrEncodingStream xdr)
-            throws OncRpcException, IOException {
+    public void xdrEncode(XdrEncodingStream xdr) throws OncRpcException, IOException {
         xdr.xdrEncodeInt(seconds);
         xdr.xdrEncodeInt(microSeconds);
     }
 
-    public void xdrDecode(XdrDecodingStream xdr)
-            throws OncRpcException, IOException {
+    public void xdrDecode(XdrDecodingStream xdr) throws OncRpcException, IOException {
         seconds = xdr.xdrDecodeInt();
         microSeconds = xdr.xdrDecodeInt();
     }

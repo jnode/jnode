@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import org.acplt.oncrpc.OncRpcClientAuthUnix;
 import org.acplt.oncrpc.OncRpcException;
 import org.acplt.oncrpc.OncRpcProtocols;
 import org.jnode.driver.Device;
@@ -51,8 +52,12 @@ public class NFS2FileSystem implements FileSystem {
 
     private boolean closed;
 
-    public NFS2FileSystem(final NFS2Device device) throws FileSystemException {
+    private boolean readOnly;
+
+    public NFS2FileSystem(final NFS2Device device, boolean readOnly) throws FileSystemException {
         this.device = device;
+        this.readOnly = readOnly;
+
         device.addListener(new DeviceListener() {
             public void deviceStarted(Device device) {
             }
@@ -66,10 +71,22 @@ public class NFS2FileSystem implements FileSystem {
             }
         });
 
+        // Mount the file system
+
         try {
+
+
             mountClient = new Mount1Client(InetAddress.getByName(device.getHost()), OncRpcProtocols.ONCRPC_UDP);
 
             nfsClient = new NFS2Client(InetAddress.getByName(device.getHost()), OncRpcProtocols.ONCRPC_UDP);
+
+            if (!readOnly) {
+
+                mountClient.getClient().setAuth(new OncRpcClientAuthUnix("test", device.getUid(), device.getGid()));
+                nfsClient.getClient().setAuth(new OncRpcClientAuthUnix("test", device.getUid(), device.getGid()));
+
+            }
+
 
             MountResult result = mountClient.mount(new DirPath(device.getRemoteDirectory()));
 
@@ -153,7 +170,7 @@ public class NFS2FileSystem implements FileSystem {
      * Is the filesystem mounted in readonly mode ?
      */
     public boolean isReadOnly() {
-        return true;
+        return readOnly;
     }
 
     public long getFreeSpace() {
