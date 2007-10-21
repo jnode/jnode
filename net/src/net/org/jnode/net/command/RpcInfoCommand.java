@@ -26,15 +26,11 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.InetAddress;
 
-import org.acplt.oncrpc.OncRpcClient;
 import org.acplt.oncrpc.OncRpcException;
 import org.acplt.oncrpc.OncRpcPortmapClient;
 import org.acplt.oncrpc.OncRpcProtocols;
 import org.acplt.oncrpc.OncRpcServerIdent;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.Shell;
-import org.jnode.shell.ShellUtils;
-import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
@@ -42,21 +38,23 @@ import org.jnode.shell.help.Syntax;
 import org.jnode.shell.help.argument.HostNameArgument;
 
 /**
+ * rpcinfo command makes an RPC call to an RPC server and reports what it finds.
+ *
  * @author Andrei Dore
  */
 public class RpcInfoCommand {
 
-    private static final String LIST_SERVICES_FORMAT = "%1$10s %2$10s %3$10s %4$10s";
+    private static final String LIST_SERVICES_FORMAT = "%1$10s %2$10s %3$10s %4$10s %5$10s";
 
     static final HostNameArgument HOST = new HostNameArgument("host", "host");
 
-    public static Help.Info HELP_INFO = new Help.Info("rpcinfo", new Syntax[] { new Syntax(
-	    "Probe the portmapper on host, and print a list of all registered RPC programs.",
-	    new Parameter[] { new Parameter(HOST) }) });
+    public static Help.Info HELP_INFO = new Help.Info("rpcinfo", new Syntax[]{new Syntax(
+            "Probe the portmapper on host, and print a list of all registered RPC programs.",
+            new Parameter[]{new Parameter(HOST)})});
 
     public static void main(String[] args) throws Exception {
 
-	new RpcInfoCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+        new RpcInfoCommand().execute(new CommandLine(args), System.in, System.out, System.err);
 
     }
 
@@ -65,46 +63,65 @@ public class RpcInfoCommand {
 
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
 
-	ParsedArguments parsedArguments = HELP_INFO.parse(commandLine.toStringArray());
+        ParsedArguments parsedArguments = HELP_INFO.parse(commandLine.toStringArray());
 
-	InetAddress host = HOST.getAddress(parsedArguments);
+        InetAddress host = HOST.getAddress(parsedArguments);
 
-	listServices(host, out, err);
+        listServices(host, out, err);
 
     }
 
     private void listServices(InetAddress host, PrintStream out, PrintStream err) {
 
-	OncRpcPortmapClient client = null;
-	try {
+        OncRpcPortmapClient client = null;
+        try {
 
-	    client = new OncRpcPortmapClient(host, OncRpcProtocols.ONCRPC_UDP);
+            client = new OncRpcPortmapClient(host, OncRpcProtocols.ONCRPC_UDP);
 
-	    OncRpcServerIdent[] servers = client.listServers();
+            OncRpcServerIdent[] servers = client.listServers();
 
-	    out.printf(LIST_SERVICES_FORMAT, "Program", "Version", "Protocol", "Port");
-	    out.println();
+            out.printf(LIST_SERVICES_FORMAT, "Program", "Version", "Protocol", "Port", "Name");
+            out.println();
 
-	    for (int i = 0; i < servers.length; i++) {
-		OncRpcServerIdent server = servers[i];
+            for (int i = 0; i < servers.length; i++) {
+                OncRpcServerIdent server = servers[i];
 
-		out.printf(LIST_SERVICES_FORMAT, server.program, server.version, server.protocol == 6 ? "tcp" : "udp",
-			server.port);
+                out.printf(LIST_SERVICES_FORMAT, server.program, server.version, server.protocol == 6 ? "tcp" : "udp",
+                        server.port, getName(server.program));
 
-		out.println();
-	    }
-	} catch (OncRpcException e) {
-	    err.println("Can not make the rpc call to the host " + host.getHostAddress());
-	} catch (IOException e) {
-	    err.println("Can not connect to  the host " + host.getHostAddress());
-	} finally {
-	    if (client != null) {
-		try {
-		    client.close();
-		} catch (Exception e) {
-		}
-	    }
-	}
+                out.println();
+            }
+        } catch (OncRpcException e) {
+            err.println("Can not make the rpc call to the host " + host.getHostAddress());
+        } catch (IOException e) {
+            err.println("Can not connect to  the host " + host.getHostAddress());
+        } finally {
+            if (client != null) {
+                try {
+                    client.close();
+                } catch (Exception e) {
+                }
+            }
+        }
+
+    }
+
+    private String getName(int program) {
+
+        switch (program) {
+            case 100000:
+                return "portmapper";
+            case 100003:
+                return "nfs";
+            case 100005:
+                return "mountd";
+            case 100021:
+                return "nlockmgr";
+            case 100024:
+                return "status";
+            default:
+                return "unknown";
+        }
 
     }
 }
