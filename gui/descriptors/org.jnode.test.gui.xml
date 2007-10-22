@@ -37,6 +37,7 @@
 
     <extension point="org.jnode.security.permissions">
         <permission class="java.lang.RuntimePermission" name="setIO"/>
+        <permission class="java.lang.RuntimePermission" name="exitVM" actions="*" />
         <permission class="java.awt.AWTPermission" name="createRobot"/>
         <permission class="java.awt.AWTPermission" name="readDisplayPixels"/>
     	<permission class="java.util.PropertyPermission" name="user.home" actions="read"/>
