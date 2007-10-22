@@ -45,11 +45,9 @@ public class AWTMenuTest extends AWTTest {
     public static void main(String[] args) {
         try {
             final AWTMenuTest wnd = new AWTMenuTest("AWTTest");
-            wnd.show();
+            wnd.setVisible(true);
         }catch(Throwable t){
             t.printStackTrace();
-        } finally {
-//            wnd.dispose();
         }
     }
 }

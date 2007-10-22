@@ -90,7 +90,7 @@ public class CurvesTest {
     	frame.add(pane);
     	
     	frame.setSize(1000, 600);
-    	frame.show();
+    	frame.setVisible(true);
     	
     	double[] temp1 = new double[42]; 
     	double[] temp2 = new double[42];

@@ -43,11 +43,10 @@ public class AWTTest2 {
             BoxWorld bw = new BoxWorld();
             bw.init();
             wnd.add(bw, BorderLayout.CENTER);
-            wnd.show();
+            wnd.setVisible(true);
             bw.requestFocus();
-			Thread.sleep(sleep * 1000);
-
-			wnd.hide();
+            Thread.sleep(sleep * 1000);
+            wnd.setVisible(false);
         } finally {
             wnd.dispose();
         }

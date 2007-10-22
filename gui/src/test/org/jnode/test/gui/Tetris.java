@@ -40,7 +40,7 @@ import javax.swing.SwingUtilities;
 public class Tetris extends JPanel implements KeyListener {
     private static final int[][][][] BLOCKS = {
             { { { 0, 0 }, { 1, 0 }, { 2, 0 }, { 1, 1 } },       // * * *
-                    { { 1, 0 }, { 0, 1 }, { 1, 1 }, { 1, 2 } }, // *
+                    { { 1, 0 }, { 0, 1 }, { 1, 1 }, { 1, 2 } }, //   *
                     { { 1, 0 }, { 0, 1 }, { 1, 1 }, { 2, 1 } },
                     { { 0, 0 }, { 0, 1 }, { 1, 1 }, { 0, 2 } } },
             { { { 0, 0 }, { 1, 0 }, { 2, 0 }, { 3, 0 } },       // * * * *
@@ -52,11 +52,11 @@ public class Tetris extends JPanel implements KeyListener {
                     { { 2, 0 }, { 0, 1 }, { 1, 1 }, { 2, 1 } },
                     { { 0, 0 }, { 0, 1 }, { 0, 2 }, { 1, 2 } } },
             { { { 0, 0 }, { 1, 0 }, { 2, 0 }, { 2, 1 } },       // * * *
-                    { { 1, 0 }, { 1, 1 }, { 0, 2 }, { 1, 2 } }, // *
+                    { { 1, 0 }, { 1, 1 }, { 0, 2 }, { 1, 2 } }, //     *
                     { { 0, 0 }, { 0, 1 }, { 1, 1 }, { 2, 1 } },
                     { { 0, 0 }, { 1, 0 }, { 0, 1 }, { 0, 2 } } },
             { { { 1, 0 }, { 2, 0 }, { 0, 1 }, { 1, 1 } },       // * *
-                    { { 0, 0 }, { 0, 1 }, { 1, 1 }, { 1, 2 } }, // * *
+                    { { 0, 0 }, { 0, 1 }, { 1, 1 }, { 1, 2 } }, //   * *
                     { { 1, 0 }, { 2, 0 }, { 0, 1 }, { 1, 1 } },
                     { { 0, 0 }, { 0, 1 }, { 1, 1 }, { 1, 2 } } },
             { { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 2, 1 } },       //   * *
@@ -449,6 +449,7 @@ public class Tetris extends JPanel implements KeyListener {
                 Tetris tetris = new Tetris();
                 tetris.delay = delay;
                 frame.add(tetris, BorderLayout.CENTER);
+                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 frame.setSize(DIM.width + 7, DIM.height + CELL + CELL /2);
                 frame.setVisible(true);
                 tetris.requestFocus();

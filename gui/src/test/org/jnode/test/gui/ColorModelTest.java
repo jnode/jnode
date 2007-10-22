@@ -29,7 +29,12 @@ import java.awt.image.IndexColorModel;
 public class ColorModelTest {
     public static void main(String[] args) {
         run(8, 256);
-        run(32, 256);
+        System.out.println("Expecting IllegalArgumentException; attempting to pass more than 16 bits to IndexColorModel()");
+        try {
+            run(32, 256);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Caught IllegalArgumentException as expected");
+        }
     }
 
     public static void run(int bits, int size) {

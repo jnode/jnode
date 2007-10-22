@@ -22,9 +22,11 @@
 package org.jnode.test.gui;
 
 import java.awt.BorderLayout;
-
-import javax.swing.*;
-
+import java.net.URL;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JTextArea;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
@@ -35,35 +37,43 @@ public class SwingTest extends JFrame {
 
     public SwingTest(String title) {
         super(title);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         getRootPane().setDoubleBuffered(false);
         setLocation(100, 100);
         setSize(400, 400);
         //getContentPane().add(north = new JButton("JButton north"), BorderLayout.NORTH);
-        getContentPane().add(north = new JButton("JButton north",new ImageIcon(getClass().getClassLoader().getResource("JNode_logo_trans.png"))), BorderLayout.NORTH);
+        URL url = getClass().getClassLoader().getResource("JNode_logo_trans.png");
+        if (url == null) {
+            System.out.println("Unable to load image: getRecource(\"JNode_logo_trans.png\")");
+            north = new JButton("JButton north");
+        } else {
+            north = new JButton("JButton north", new ImageIcon(url));
+        }
+        getContentPane().add(north, BorderLayout.NORTH);
         getContentPane().add(new JTextArea("JTextArea test"), BorderLayout.CENTER);
         getContentPane().add(south = new JButton("JButton south"), BorderLayout.SOUTH);
         north.requestFocus();
     }
     
     public void dumpInfo() {
-//        System.out.println("frame.size:        " + getSize());
-//        System.out.println("frame.insets:      " + getInsets());
-//        System.out.println("frame.peer.insets: " + ((FramePeer)getPeer()).getInsets());
-//        System.out.println("frame.cp.bounds:   " + getContentPane().getBounds());
-//        System.out.println("north.bounds       " + north.getBounds());
-//        System.out.println("south.bounds       " + south.getBounds());        
+        System.out.println("frame.size:                 " + getSize());
+        System.out.println("frame.insets:               " + getInsets());
+//        System.out.println("frame.peer.insets:         " + ((FramePeer)getPeer()).getInsets());
+        System.out.println("frame.contentpane.bounds:   " + getContentPane().getBounds());
+        System.out.println("north.bounds                " + north.getBounds());
+        System.out.println("south.bounds                " + south.getBounds());        
     }
     
-	public static void main(String[] args) {
-		try {
+    public static void main(String[] args) {
+        try {
             SwingTest frame = new SwingTest("JFrame test");
             frame.validate();
-            frame.show();
+            frame.setVisible(true);
             frame.dumpInfo();
             Thread.sleep(10000);
             frame.dumpInfo();
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-	}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

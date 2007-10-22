@@ -28,11 +28,14 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.image.ImageObserver;
+import java.net.URL;
 
 /**
  * @author epr
  */
 public class ImageTest {
+    
+    final static String IMAGE_PATH = "/org/zaval/lw/rs/img/tree.gif";
 
     static class TestComponent extends Component implements ImageObserver {
 
@@ -40,7 +43,12 @@ public class ImageTest {
 
         public TestComponent() {
             super();
-            img = Toolkit.getDefaultToolkit().createImage(ClassLoader.getSystemResource("/org/zaval/lw/rs/img/tree.gif"));
+            URL url = ClassLoader.getSystemResource(IMAGE_PATH);
+            if (url == null) {
+                System.out.println("Trying to load " + IMAGE_PATH + ": bad url found.");
+                System.exit(-1);
+            }
+            img = Toolkit.getDefaultToolkit().createImage(url);
         }
 
         public void paint(Graphics g) {
@@ -66,11 +74,11 @@ public class ImageTest {
         final boolean loadOnly = (args.length > 0) && args[0].equalsIgnoreCase("loadOnly");
 
         if (!loadOnly) {
-            final Frame wnd = new Frame();
+            final Frame wnd = new Frame("Waiting for input from System.in stream");
             try {
                 wnd.setSize(600, 400);
                 wnd.add(new TestComponent());
-                wnd.show();
+                wnd.setVisible(true);
 
                 //Thread.sleep(5000);
                 System.in.read();

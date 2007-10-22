@@ -46,11 +46,14 @@ public class ConsoleTest {
             getContentPane().setLayout( new BorderLayout() );
             getContentPane().add( textArea, BorderLayout.CENTER );
             savedOut = new PrintStream( new TextAreaOutputStream( textArea ) );
+            setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         }
 
-        public void show(  ) {
-            super.show( );
+        public void setVisible(boolean b) {
+            super.setVisible(b);
+            if (b) {
                 claimPrintStreams();
+            }
         }
 
         private void claimPrintStreams() {
@@ -87,7 +90,7 @@ public class ConsoleTest {
             menu.add( mi );
             frame.setJMenuBar( mb );
             frame.validate();
-            frame.show();
+            frame.setVisible(true);
 
 //            int count=0;
 //            Timer t=new Timer( 1000,new ActionListener() {

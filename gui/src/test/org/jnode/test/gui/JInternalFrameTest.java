@@ -61,6 +61,7 @@ public class JInternalFrameTest {
         dt.add(ifr3);
         ifr3.setVisible(true);
 
+        f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         f.setLocation(0,0);
         f.setSize(300,300);
         f.setVisible(true);

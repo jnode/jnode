@@ -32,20 +32,28 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 /**
  * @author Levente S\u00e1ntha
  */
 
 public class AWTFrameTest {
-    public static void main(String[] argv){
+    public static void main(String[] args){
         final Frame f = new Frame("Frame test");
         f.setSize(200,200);
         f.setLocation(50,50);
         final Frame f2 = new Frame("Test");
         f2.setSize(100,100);
         f2.setLocation(350, 200);
-        f.setLayout(new GridLayout(5,1));
+        f.setLayout(new GridLayout(5, 1));
+
+        ActionListener close = new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                System.exit(0);
+            }
+        };
+
         Button show = new Button("show");
         show.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
@@ -106,6 +114,10 @@ public class AWTFrameTest {
             }
         });
         window.add(front_mi);
+        window.addSeparator();
+        MenuItem close_mi = new MenuItem("close");
+        close_mi.addActionListener(close);
+        window.add(close_mi);
 
         //popup menu
         final PopupMenu p_window = new PopupMenu("Window");
@@ -137,13 +149,15 @@ public class AWTFrameTest {
             }
         });
         p_window.add(p_front_mi);
+        p_window.addSeparator();
+        MenuItem p_close_mi = new MenuItem("close");
+        p_close_mi.addActionListener(close);
+        p_window.add(p_close_mi);
 
         f.add(p_window);
         f.addMouseListener(new MouseAdapter(){
-            public void mousePressed(MouseEvent event) {
-                if(event.isPopupTrigger()){
+            public void mouseClicked(MouseEvent event) {
                     p_window.show(f, event.getX(), event.getY());
-                }
             }
         });
 

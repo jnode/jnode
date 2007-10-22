@@ -46,12 +46,12 @@ public class PolyLineTest {
 
             wnd.setSize(600, 400);
             wnd.add(new TestComponent(linePoints));
-            wnd.show();
+            wnd.setVisible(true);
 
             System.in.read();
             //Thread.sleep(5000);
 
-            wnd.hide();
+            wnd.setVisible(false);
         } finally {
             wnd.dispose();
         }

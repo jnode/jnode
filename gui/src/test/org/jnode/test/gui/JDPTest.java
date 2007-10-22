@@ -46,12 +46,12 @@ public class JDPTest {
             jdtp.add(jif);
             wnd.add(jdtp, BorderLayout.CENTER);
 
-            wnd.show();
+            wnd.setVisible(true);
             jif.setVisible(true);
 
             Thread.sleep(5000);
 
-            wnd.hide();
+            wnd.setVisible(false);
         }catch(Throwable t){
             t.printStackTrace();
         } finally {

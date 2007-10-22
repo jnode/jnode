@@ -77,11 +77,12 @@ public class ConsoleTest2 {
             //savedOut = new PrintStream( new TextAreaOutputStream( textArea ) );
         }
 
-        public void show(  ) {
-            super.show( );
+//        public void show() {
+//            super.show( );
 //            claimPrintStreams();
-        }
+//        }
 
+        
 //        private void claimPrintStreams() {
 //            System.out.println( "Claiming print streams." );
 //            AccessController.doPrivileged( new PrivilegedAction() {

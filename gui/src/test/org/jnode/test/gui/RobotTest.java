@@ -23,11 +23,9 @@ package org.jnode.test.gui;
 
 import java.awt.AWTException;
 import java.awt.BorderLayout;
-import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Robot;
@@ -37,6 +35,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JButton;
@@ -89,6 +89,11 @@ public class RobotTest extends JPanel {
         f.add(b, BorderLayout.SOUTH);
         f.pack();
         f.setLocation(0,0);
+        f.addWindowListener(new WindowAdapter(){
+            public void windowClosing(WindowEvent e) {
+                f.dispose();
+            }
+        });
         f.setVisible(true);
 
         final Robot r = new Robot();

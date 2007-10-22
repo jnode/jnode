@@ -67,9 +67,9 @@ import java.util.Vector;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class AWTDemo {
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         MainWindow f = new MainWindow();
-        f.show();
+        f.setVisible(true);
     }
 
     static interface SubWindow {
@@ -203,11 +203,7 @@ public class AWTDemo {
                 if (w.isVisible())
                     w.dispose();
                 else {
-                    if (w instanceof Dialog) {
-                        w.show();
-                    } else {
-                        w.setVisible(true);
-                    }
+                    w.setVisible(true);
                 }
             }
         }
@@ -279,7 +275,7 @@ public class AWTDemo {
             addWindowListener(new WindowAdapter() {
                 public void windowClosing(WindowEvent e) {
                     text.setVisible(false);
-                    hide();
+                    setVisible(false);
                 }
             });
         }
@@ -288,12 +284,6 @@ public class AWTDemo {
             if (!initted && visible)
                 init();
             super.setVisible(visible);
-        }
-
-        public void show() {
-            if (!initted)
-                init();
-            super.show();
         }
 
         public void init() {
@@ -309,7 +299,7 @@ public class AWTDemo {
             cb.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     text.setVisible(false);
-                    hide();
+                    setVisible(false);
                 }
             });
 
@@ -337,7 +327,7 @@ public class AWTDemo {
             subdlg.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     DialogWindow sw = new DialogWindow(parent);
-                    sw.show();
+                    sw.setVisible(true);
                 }
             });
 
@@ -604,7 +594,7 @@ public class AWTDemo {
 
             addWindowListener(new WindowAdapter() {
                 public void windowClosing(WindowEvent e) {
-                    hide();
+                    setVisible(false);
                 }
             });
 
@@ -675,7 +665,7 @@ public class AWTDemo {
                     Button b = new Button("foobar");
                     b.addMouseListener(new MouseAdapter() {
                         public void mousePressed(MouseEvent me) {
-                            d.hide();
+                            d.setVisible(false);
                         }
                     });
                     d.add(b);
@@ -689,7 +679,7 @@ public class AWTDemo {
                     d.add(ch);
 
                     d.pack();
-                    d.show();
+                    d.setVisible(true);
                 }
             });
 
@@ -704,7 +694,7 @@ public class AWTDemo {
             add(wb, "West");
 
             pack();
-            show();
+            setVisible(true);
 
             sp.setScrollPosition(10, 0);
 
