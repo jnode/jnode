@@ -30,6 +30,8 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -39,7 +41,7 @@ import javax.swing.JTextArea;
  */
 public class MouseEventTest {
     public static void main(String[] argv) {
-        Frame f = new Frame("Mouse event test");
+        final Frame f = new Frame("Mouse event test");
         f.add(createLabel("WEST", Color.GREEN, true), BorderLayout.WEST);
         f.add(createLabel("EAST", Color.BLUE, true), BorderLayout.EAST);
         f.add(createLabel("NORTH", Color.RED, true), BorderLayout.NORTH);
@@ -51,6 +53,11 @@ public class MouseEventTest {
         f.setSize(300, 300);
         f.setLocation(0, 0);
         f.validate();
+        f.addWindowListener(new WindowAdapter(){
+            public void windowClosing(WindowEvent e) {
+                f.dispose();
+            }
+        });
         f.setVisible(true);
     }
 

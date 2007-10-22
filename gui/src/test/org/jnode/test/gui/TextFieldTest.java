@@ -25,6 +25,8 @@ import java.awt.BorderLayout;
 import java.awt.Button;
 import java.awt.Frame;
 import java.awt.TextField;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -43,7 +45,12 @@ public class TextFieldTest extends Frame {
         try {
             final TextFieldTest wnd = new TextFieldTest();
             wnd.setSize(200, 100);
-            wnd.show();
+            wnd.addWindowListener(new WindowAdapter() {
+                public void windowClosing(WindowEvent e) {
+                    wnd.dispose();
+                }
+            });
+            wnd.setVisible(true);
         } catch (Throwable t) {
             t.printStackTrace();
         }

@@ -1318,7 +1318,7 @@ public class BoxWorld extends JPanel implements WindowListener, KeyListener,
         frame.pack();
         frame.setSize(400, 400);
         frame.setLocation(40, 40);
-        frame.show();
+        frame.setVisible(true);
         bw.requestFocus();
         // frame.setVisible(true);
     }

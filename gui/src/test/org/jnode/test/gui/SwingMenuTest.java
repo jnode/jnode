@@ -50,10 +50,10 @@ public class SwingMenuTest extends SwingTest {
         try {
             SwingMenuTest frame = new SwingMenuTest("JFrame test");
             frame.validate();
-            frame.show();
+            frame.setVisible(true);
             frame.dumpInfo();
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

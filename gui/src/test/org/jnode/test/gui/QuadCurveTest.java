@@ -42,11 +42,11 @@ public class QuadCurveTest {
         try {
             wnd.setSize(600, 400);
             wnd.add(new TestComponent());
-            wnd.show();
+            wnd.setVisible(true);
 
             Thread.sleep(5000);
 
-            wnd.hide();
+            wnd.setVisible(false);
         } finally {
             wnd.dispose();
         }

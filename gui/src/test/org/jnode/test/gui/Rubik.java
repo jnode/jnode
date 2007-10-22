@@ -125,7 +125,7 @@ public final class Rubik extends JPanel
 		for (i=0;i<54;i++)
 			sideCols[i]=i/9;
 		bgcolor=findBGColor();
-		resize(125,125);
+		setSize(125,125);
 		repaint();
 	}
 

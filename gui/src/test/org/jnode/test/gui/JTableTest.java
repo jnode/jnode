@@ -42,6 +42,7 @@ public class JTableTest {
                         {55, 66, 66, 88},
                 },
                 new Object[]{'A', 'B', 'C', 'D'}))));
+        f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         f.setVisible(true);
     }
 }

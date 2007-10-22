@@ -21,9 +21,9 @@
  
 package org.jnode.test.gui;
 
-import javax.swing.JCheckBox;
 import java.awt.BorderLayout;
 import java.awt.Button;
+import java.awt.Checkbox;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Frame;
@@ -36,6 +36,8 @@ import java.awt.Shape;
 import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
@@ -226,7 +228,7 @@ public class AWTTest extends Frame {
         
         final Button b2 = new Button("Left");
         final Scrollbar sb = new Scrollbar(Scrollbar.HORIZONTAL);
-        final JCheckBox cb1 = new JCheckBox("Right");
+        final Checkbox cb1 = new Checkbox("Right");
 
         add(b2, BorderLayout.WEST);
         b2.setBackground(Color.RED);
@@ -238,7 +240,7 @@ public class AWTTest extends Frame {
                 } else {
                     Frame f2 = new Frame("New frame");
                     f2.setSize(200, 100);
-                    f2.show();
+                    f2.setVisible(true);
                 }
             }
         });
@@ -249,6 +251,12 @@ public class AWTTest extends Frame {
         final TextField tf = new TextField();
         tf.setText("Let's type here");
         add(tf, BorderLayout.SOUTH);
+        
+        addWindowListener(new WindowAdapter(){
+            public void windowClosing(WindowEvent event) {
+                dispose();
+            }
+        });
     }
 
     public static void main(String[] args) throws InterruptedException {
@@ -256,11 +264,9 @@ public class AWTTest extends Frame {
         
         try {
             final AWTTest wnd = new AWTTest("AWTTest");
-            wnd.show();
+            wnd.setVisible(true);
         }catch(Throwable t){
             t.printStackTrace();
-        } finally {
-//            wnd.dispose();
         }
     }
 }

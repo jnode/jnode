@@ -24,15 +24,15 @@ package org.jnode.test.gui;
 import java.awt.Image;
 
 public class Imageutil {
-
-    public static Image getImage() {
-        // ---
-        String file = "D:\\java\\spirit.jpg";
-//	Image img1 = Toolkit.getDefaultToolkit().getImage( file );
-        javax.swing.ImageIcon ic = new javax.swing.ImageIcon(file);
-        Image img1 = ic.getImage();
-
-
-        return img1;
-    }
+/*
+ *  TODO remove this class it seems to point to nothing as of Oct 20, 2007
+ */
+//    public static Image getImage() {
+//        String file = "D:\\java\\spirit.jpg";
+////	Image img1 = Toolkit.getDefaultToolkit().getImage( file );
+//        javax.swing.ImageIcon ic = new javax.swing.ImageIcon(file);
+//        Image img1 = ic.getImage();
+//
+//        return img1;
+//    }
 }

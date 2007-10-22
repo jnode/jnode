@@ -75,6 +75,7 @@ public class JTreeTest {
             }
         })));
         */
+        f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         f.setVisible(true);
     }
 }

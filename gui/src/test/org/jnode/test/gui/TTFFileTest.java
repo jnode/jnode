@@ -97,7 +97,7 @@ public class TTFFileTest {
                     //g.drawString("AWT", 100, 200);
                 }
             });
-            frame.show();
+            frame.setVisible(true);
         } finally {
             //Thread.sleep(5000);
             System.in.read();

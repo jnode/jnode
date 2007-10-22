@@ -56,7 +56,7 @@ public class DialogTest extends Dialog {
      */
     public static void main(String[] args) {
         DialogTest dlg = new DialogTest("Dialog test");
-        dlg.show();
+        dlg.setVisible(true);
         System.exit(0);
     }
 

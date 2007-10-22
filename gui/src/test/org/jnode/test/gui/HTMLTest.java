@@ -33,9 +33,15 @@ import javax.swing.JEditorPane;
 public class HTMLTest {
     public static void main(String[] argv) throws Exception{
         JFrame f = new JFrame("HTML test");
+        f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         f.setSize(400, 400);
-        JEditorPane ep = new JEditorPane(argv[0]);
+        JEditorPane ep = new JEditorPane();
         f.add(new JScrollPane(ep));
+        if (argv.length == 0) {
+            ep.setText("No arguments found on command line\n\norg.jnode.test.gui.HTMLTest <url>\n\turl\tURL of page to load.");
+        } else {
+            ep.setPage(argv[0]);
+        }
         f.setVisible(true);
     }
 }
