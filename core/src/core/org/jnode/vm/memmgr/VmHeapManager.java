@@ -208,7 +208,7 @@ public abstract class VmHeapManager extends VmSystemObject {
             final int length = objectPtr.loadInt(Offset
                     .fromIntSignExtend(VmArray.LENGTH_OFFSET * slotSize));
             final int elemSize = arrayClass.getComponentType().getTypeSize();
-            size = (VmArray.DATA_OFFSET * slotSize) * (length * elemSize);
+            size = (VmArray.DATA_OFFSET * slotSize) + (length * elemSize);
         } else {
             final VmNormalClass< ? > normalClass = (VmNormalClass< ? >) objectClass;
             size = normalClass.getObjectSize();
