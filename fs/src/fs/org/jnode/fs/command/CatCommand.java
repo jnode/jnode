@@ -67,7 +67,7 @@ public class CatCommand implements Command {
     	String[] fileNames = ARG_FILE.getValues(cmdLine);
     	boolean ok = true;
     	try {
-    		if (fileNames.length == 0) {
+    		if (fileNames == null || fileNames.length == 0) {
     			process(in, out);
     		}
     		else {

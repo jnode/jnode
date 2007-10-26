@@ -52,7 +52,7 @@ public class SuiteCommand {
 
 	static final Parameter PARAM_ACTION = new Parameter(ARG_ACTION);
 
-	static final Parameter PARAM_CATEGORY = new Parameter(ARG_CATEGORY, Parameter.OPTIONAL );
+	static final Parameter PARAM_CATEGORY = new Parameter(ARG_CATEGORY, Parameter.OPTIONAL);
 
     public static Help.Info HELP_INFO = new Help.Info("suite",
             "Run one or more JUnit testcase(s)", 
@@ -88,6 +88,9 @@ public class SuiteCommand {
     	else if(OPT_RUN.getName().equals(action))
     	{
         	String[] categories = ARG_CATEGORY.getValues(cmdLine);
+        	if (categories == null) {
+        		categories = new String[0];
+        	}
         	TestSuite suite = TestManager.getInstance().getTestSuite(Arrays.asList(categories));
         	junit.textui.TestRunner.run(suite);        	
     	}

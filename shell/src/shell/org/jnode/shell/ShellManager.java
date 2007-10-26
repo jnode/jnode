@@ -23,6 +23,7 @@ package org.jnode.shell;
 
 /**
  * @author epr
+ * @crawley@jnode.org
  */
 public interface ShellManager {
 
@@ -42,5 +43,17 @@ public interface ShellManager {
 	 * @param currentShell
 	 */
 	public void registerShell(Shell currentShell);
+
+	public void registerInvokerFactory(CommandInvoker.Factory factory);
+
+	public void registerInterpreterFactory(CommandInterpreter.Factory factory);
+
+	public void unregisterInvokerFactory(CommandInvoker.Factory factory);
+
+	public void unregisterInterpreterFactory(CommandInterpreter.Factory factory);
+
+	public CommandInvoker createInvoker(String name, CommandShell shell) throws IllegalArgumentException;
+
+	public CommandInterpreter createInterpreter(String name) throws IllegalArgumentException;
 
 }

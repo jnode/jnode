@@ -151,48 +151,68 @@ public abstract class Help {
         }
 
         public String complete(CommandLine partial) throws CompletionException {
-            //System.out.println("completing \"" + partial + "\"");
+        	// The completion strategy is to try to complete each of the
+        	// syntaxes, and return the longest completion string.
             String max = "";
             boolean foundCompletion = false;
             for (Syntax syntax : syntaxes) {
                 try {
-                    final String s = syntax.complete(partial
-                            .getRemainder());
+                    final String s = syntax.complete(partial);
                     foundCompletion = true;
                     if (s.length() > max.length()) {
                         max = s;
                     }
                 } catch (CompletionException ex) {
-                    // this syntax is not fitting
-                    // following debug output is for testing the "intelligent"
-                    // delegation mechanism
-                    // System.err.println("Syntax \"" +
-                    // syntaxes[i].getDescription() + "\" threw "
-                    // + ex.toString());
+                    // just try the next syntax
                 }
             }
-            if ((max.length() > 0) || foundCompletion) {
-                return max;
-            } else {
+            if (!foundCompletion) {
                 System.out.println();
                 usage();
                 throw new CompletionException("Invalid command syntax");
             }
+            return max;
         }
 
+        /**
+         * Parse the supplied command arguments against this object's syntax(es).
+         * @param args the command arguments
+         * @return the resulting binding of parameters/arguments to values.
+         * @throws SyntaxErrorException
+         * @deprecated use parse(CommandLine) instead.
+         * 
+         */
         public ParsedArguments parse(String... args) throws SyntaxErrorException {
-            for (Syntax s : syntaxes) {
+            return parse(new CommandLine(args));
+        }
+            
+        /**
+         * Parse the supplied CommandLine against this object's syntax(es).
+         * 
+         * @param cmdLine the CommandLine
+         * @return the resulting binding of parameters/arguments to values.
+         * @throws SyntaxErrorException
+         */
+        public ParsedArguments parse(CommandLine cmdLine) throws SyntaxErrorException {
+        	for (int i = 0; i < syntaxes.length; i++) {
+        		Syntax s = syntaxes[i];
+        		// FIXME ... it appears that s.parse is a stateful operation.  If that is
+        		// the case, we should either synchronize on s for s.parse + s.clearArguments,
+        		// or move the s.clearArgument call into s.parse.
                 try {
-                    return s.parse(args);
+        			return s.parse(cmdLine);
                 } catch (SyntaxErrorException ex) {
                     s.clearArguments();
-                    // debug output to debug syntax finding mechanism
-                    //System.err.println(ex.toString());
-                    //ex.printStackTrace(System.out);
+        			if (syntaxes.length == 1) {
+        				// If there was only one syntax, propagate the exception so that
+        				// we can tell the user why the arguments didn't match.
+        				throw ex;
+        			}
                 }
             }
 
-            // no fitting Syntax found? trow an error
+            // There were no syntaxes, or we have tried more than one syntax and they 
+        	// all have failed.
             throw new SyntaxErrorException("No matching syntax found");
         }
     }

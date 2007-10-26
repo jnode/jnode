@@ -29,7 +29,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 
 import org.jnode.shell.help.Help;
@@ -47,61 +46,56 @@ import org.jnode.vm.VmExit;
  */
 public class ThreadCommandInvoker extends AsyncCommandInvoker {
 
+	static final Factory FACTORY = new Factory() {
+		public CommandInvoker create(CommandShell shell) {
+			return new ThreadCommandInvoker(shell);
+		}
+		public String getName() {
+			return "thread";
+		}
+    };
+
     public ThreadCommandInvoker(CommandShell commandShell) {
         super(commandShell);
     }
     
-    Thread createThread(Runnable cr, InputStream inputStream, PrintStream outputStream, PrintStream errStream) {
-    	return new Thread(cr, cmdName);
+    public String getName() {
+    	return "thread";
 	}
     
-	Runnable createRunner(Class cx, Method method, Object[] args, InputStream commandIn, PrintStream commandOut, PrintStream commandErr) {
-		return new CommandRunner(cx, method, args, commandIn, commandOut, commandErr);
+    CommandThread createThread(CommandLine cmdLine, Runnable cr) {
+    	return new CommandThread(cr, cmdLine.getCommandName());
 	}
 
+	Runnable createRunner(Class cx, Method method, Object[] args, 
+			InputStream commandIn, PrintStream commandOut, PrintStream commandErr) {
+		return new ThreadCommandRunner(cx, method, args, commandIn, commandOut, commandErr);
+	}
 
-	class CommandRunner implements Runnable {
-
-        private Class cx;
-
-        Method method;
-
-        Object[] args;
         
-        private InputStream commandIn;
-        private PrintStream commandOut;
-        private PrintStream commandErr;
+	class ThreadCommandRunner extends AsyncCommandInvoker.CommandRunner {
+		private final Class cx;
+		private final Method method;
+		private final Object[] args;
 
-        boolean finished = false;
+        private boolean finished = false;
 
-        public CommandRunner(Class cx, Method method, Object[] args, 
+        public ThreadCommandRunner(Class cx, Method method, Object[] args, 
         		InputStream commandIn, PrintStream commandOut, PrintStream commandErr) {
+        	super();
             this.cx = cx;
             this.method = method;
             this.args = args;
-            this.commandIn = commandIn;
-            this.commandOut = commandOut;
-            this.commandErr = commandErr;
         }
 
         public void run() {
             try {
+            	CommandThread.setRC(0);
                 try {
-                	//
-                	AccessController.doPrivileged(new PrivilegedAction<Void>() {
-        				public Void run() {
-        					System.setOut(commandOut);
-        					System.setErr(commandErr);
-        					System.setIn(commandIn);
-        					return null;
-        				}
-        			});
-                    Object obj = null;
-                	if(!Modifier.isStatic(method.getModifiers())) {
-                		obj = cx.newInstance();
-                	}
-                		AccessController.doPrivileged(new InvokeAction(method,
-                            obj, args));
+                	Object obj = Modifier.isStatic(method.getModifiers()) ?
+                		null : cx.newInstance();
+                	AccessController.doPrivileged(
+                			new InvokeAction(method, obj, args));
                 } catch (PrivilegedActionException ex) {
                     throw ex.getException();
                 }
@@ -121,21 +115,22 @@ public class ThreadCommandInvoker extends AsyncCommandInvoker {
                         Help.getInfo(cx).usage();
                     } catch (HelpException ex1) {
                         // Don't care
-                        ex1.printStackTrace();
+                        stackTrace(tex);
                     }
                     err.println(tex.getMessage());
                     unblock();
                 } else if (tex instanceof VmExit) {
-                    err.println(tex.getMessage());
+                	VmExit vex = (VmExit) tex;
+                	CommandThread.setRC(vex.getStatus());
                     unblock();
                 } else {
                     err.println("Exception in command");
-                    tex.printStackTrace(err);
+                    stackTrace(tex);
                     unblock();
                 }
             } catch (Exception ex) {
                 err.println("Exception in command");
-                ex.printStackTrace(err);
+                stackTrace(ex);
                 unblock();
             }
             finished = true;

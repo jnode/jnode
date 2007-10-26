@@ -106,9 +106,17 @@ public class Parameter extends CommandLineElement {
 
 	public final String complete(String partial) {
 		// delegate to argument, merely close the parameter if no argument exists
-		if( hasArgument() )
+		if (hasArgument()) {
+			if (Syntax.DEBUG) Syntax.LOGGER.debug("Parameter.complete: argument is " + 
+											      argument.format());
 			return argument.complete(partial);
+		}
+		else {
+			// FIXME - this assumes that the partial string can never legitimately
+			// have leading/trailing whitespace.
+			if (Syntax.DEBUG) Syntax.LOGGER.debug("Parameter.complete: no argument");
 		return partial.trim() + " ";
+	}
 	}
 
 	public final boolean isSatisfied() {

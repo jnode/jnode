@@ -63,10 +63,14 @@ public class CommandThread extends Thread {
 
 	@Override
 	public void run() {
+		try {
 		super.run();
+		}
+		finally {
 		if (listener != null) {
 			listener.notifyThreadExitted(this);
 		}
+	}
 	}
 
 	/**
