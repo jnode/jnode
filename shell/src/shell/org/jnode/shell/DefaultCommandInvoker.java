@@ -23,6 +23,7 @@ package org.jnode.shell;
 
 import gnu.java.security.action.InvokeAction;
 
+import java.io.Closeable;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -33,37 +34,57 @@ import java.security.PrivilegedActionException;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.SyntaxErrorException;
 
-/**
+/*
  * User: Sam Reid Date: Dec 20, 2003 Time: 1:20:33 AM Copyright (c) Dec 20,
  * 2003 by Sam Reid
  */
+
+/**
+ * This CommandInvoker runs a command in the current thread, using the command classes
+ * <code>public static void main(String[] args)</code> entry point.
+ * The {@link invokeAsynchronous()} method is not supported.
+ * 
+ * @author Sam Reid
+ * @author crawley@jnode.org
+ */
 public class DefaultCommandInvoker implements CommandInvoker {
 
-    PrintStream err;
-
-    CommandShell commandShell;
+    private final PrintStream err;
+    private final CommandShell commandShell;
 
     private static final Class[] MAIN_ARG_TYPES = new Class[] { String[].class};
+
+    static final Factory FACTORY = new Factory() {
+		public CommandInvoker create(CommandShell shell) {
+			return new DefaultCommandInvoker(shell);
+		}
+		public String getName() {
+			return "default";
+		}
+    };
 
     public DefaultCommandInvoker(CommandShell commandShell) {
         this.commandShell = commandShell;
         this.err = commandShell.getErrorStream();
     }
 
-    public void invoke(String cmdLineStr) {
-        final CommandLine cmdLine = new CommandLine(cmdLineStr);
-        if (!cmdLine.hasNext()) return;
-        String cmdName = cmdLine.next();
+    public String getName() {
+    	return "default";
+    }
 
-        commandShell.addCommandToHistory(cmdLineStr);
-        //        System.err.println("Got command: "+cmdLineStr+", name="+cmdName);
+    public int invoke(CommandLine cmdLine) {
+    	String cmdName = cmdLine.getCommandName();
+    	if (cmdName == null) {
+    		return 0;
+    	}
         try {
+        	Closeable[] streams = cmdLine.getStreams();
+        	if (streams[0] != null || streams[1] != null || streams[2] != null) {
+        		err.println("Warning: redirections ignored by the '" + getName() + "' invoker");
+        	}
             CommandInfo cmdInfo = commandShell.getCommandClass(cmdName);
-            //            System.err.println("CmdClass="+cmdClass);
             final Method main = cmdInfo.getCommandClass().getMethod("main", MAIN_ARG_TYPES);
-            //            System.err.println("main="+main);
             try {
-                //                System.err.println("Invoking...");
                 try {
                 	AccessController.doPrivileged(new PrivilegedAction<Void>() {
         				public Void run() {
@@ -73,15 +94,12 @@ public class DefaultCommandInvoker implements CommandInvoker {
         					return null;
         				}
         			});
-                    final Object[] args = new Object[] { cmdLine.getRemainder()
-                            .toStringArray()};
+                    final Object[] args = new Object[] { cmdLine.getArguments() };
                     AccessController.doPrivileged(new InvokeAction(main, null, args));
+                    return 0;
                 } catch (PrivilegedActionException ex) {
                     throw ex.getException();
                 }
-                
-                //main.invoke(null, );
-                //                System.err.println("Finished invoke.");
             } catch (InvocationTargetException ex) {
                 Throwable tex = ex.getTargetException();
                 if (tex instanceof SyntaxErrorException) {
@@ -89,14 +107,14 @@ public class DefaultCommandInvoker implements CommandInvoker {
                     err.println(tex.getMessage());
                 } else {
                     err.println("Exception in command");
-                    tex.printStackTrace(err);
+                    stackTrace(tex);
                 }
             } catch (Exception ex) {
                 err.println("Exception in command");
-                ex.printStackTrace(err);
+                stackTrace(ex);
             } catch (Error ex) {
                 err.println("Fatal error in command");
-                ex.printStackTrace(err);
+                stackTrace(ex);
             }
         } catch (NoSuchMethodException ex) {
             err.println("Alias class has no main method " + cmdName);
@@ -106,6 +124,18 @@ public class DefaultCommandInvoker implements CommandInvoker {
             err.println("Invalid command " + cmdName);
         } catch (Exception ex) {
             err.println("I FOUND AN ERROR: " + ex);
+            stackTrace(ex);
+        }
+        return 1;
+    }
+
+	public CommandThread invokeAsynchronous(CommandLine commandLine) {
+		throw new UnsupportedOperationException();
+	}
+	
+	private void stackTrace(Throwable ex) {
+		if (ex != null && commandShell.isDebugEnabled()) {
+			ex.printStackTrace(err);
         }
     }
 

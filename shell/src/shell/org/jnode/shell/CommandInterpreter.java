@@ -27,6 +27,12 @@ package org.jnode.shell;
  * @author crawley@jnode.org
  */
 public interface CommandInterpreter {
+	
+	public interface Factory {
+		CommandInterpreter create();
+		String getName();
+	}
+	
 	/**
 	 * Parse and execute a command line, and return the resulting return code.
 	 * 

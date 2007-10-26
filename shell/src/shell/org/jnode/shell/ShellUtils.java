@@ -39,4 +39,34 @@ public class ShellUtils {
 	throws NameNotFoundException {
 		return InitialNaming.lookup(ShellManager.NAME);
 	}
+
+	public static void registerCommandInvoker(CommandInvoker.Factory factory) 
+	throws NameNotFoundException {
+		getShellManager().registerInvokerFactory(factory);
+	}
+	
+	public static void registerCommandInterpreter(CommandInterpreter.Factory factory) 
+	throws NameNotFoundException {
+		getShellManager().registerInterpreterFactory(factory);
+	}
+	
+	public static CommandInvoker createInvoker(String name, CommandShell shell) 
+	throws IllegalArgumentException {
+		try {
+			return getShellManager().createInvoker(name, shell);
+		}	
+		catch (NameNotFoundException ex) {
+			throw new ShellFailureException("no shell manager", ex);
+		}
+	}
+
+	public static CommandInterpreter createInterpreter(String name) 
+	throws IllegalArgumentException, ShellFailureException {
+		try {
+			return getShellManager().createInterpreter(name);
+		}
+		catch (NameNotFoundException ex) {
+			throw new ShellFailureException("no shell manager", ex);
+		}
+	}
 }

@@ -42,6 +42,7 @@ import java.net.URL;
 import javax.naming.NameNotFoundException;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.Shell;
+import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellUtils;
 
 /**
@@ -414,8 +415,13 @@ public class CharvaBsh {
         public void invoke( String command ) {
             if( shell != null ) {
                 if( shell instanceof CommandShell ) {
-                    CommandShell cs = (CommandShell)shell;
-                    cs.getDefaultCommandInvoker().invoke( command );
+                    CommandShell cs = (CommandShell) shell;
+                    try {
+                    	cs.invokeCommand( command );
+                    }
+                    catch (ShellException ex) {
+                    	System.err.println( "Command invocation failed: " + ex.getMessage() );
+                    }
                 }
                 else {
                     System.err.println( "Shell wasn't a CommandShell: " + shell.getClass() );

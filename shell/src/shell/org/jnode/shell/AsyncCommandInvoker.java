@@ -21,29 +21,19 @@
  
 package org.jnode.shell;
 
-import gnu.java.security.action.InvokeAction;
 
 import java.awt.event.KeyEvent;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.Closeable;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.security.PrivilegedActionException;
 
 import org.jnode.driver.input.KeyboardEvent;
 import org.jnode.driver.input.KeyboardListener;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.HelpException;
-import org.jnode.shell.help.SyntaxErrorException;
-import org.jnode.vm.VmExit;
 
 /**
  * User: Sam Reid Date: Dec 20, 2003 Time: 1:20:33 AM Copyright (c) Dec 20, 2003
@@ -72,10 +62,9 @@ public abstract class AsyncCommandInvoker implements CommandInvoker, KeyboardLis
     boolean blocking;
 
     Thread blockingThread;
-
     Thread threadProcess = null;
-
     String cmdName;
+
 
     public AsyncCommandInvoker(CommandShell commandShell) {
         this.commandShell = commandShell;
@@ -84,153 +73,147 @@ public abstract class AsyncCommandInvoker implements CommandInvoker, KeyboardLis
         // ctrl-c
     }
 
-    public void invoke(String cmdLineStr) {
-        commandShell.addCommandToHistory(cmdLineStr);
+    public int invoke(CommandLine cmdLine) throws ShellException {
+    	CommandInfo cmdInfo = lookupCommand(cmdLine);
+    	if (cmdInfo == null) {
+    		return 0;
+    	}
+    	Runnable cr = setup(cmdLine, cmdInfo);
+    	return runIt(cmdLine, cmdInfo, cr);
+    }
 
-        InputStream inputStream = commandShell.getInputStream();
-        InputStream nextInputStream = null;
-        PrintStream errStream = commandShell.getErrorStream();
-        PrintStream outputStream = null;
-        boolean mustCloseOutputStream = false;
+    public CommandThread invokeAsynchronous(CommandLine cmdLine) 
+    throws ShellException {
+    	CommandInfo cmdInfo = lookupCommand(cmdLine);
+    	if (cmdInfo == null) {
+    		return null;
+    	}
+    	Runnable cr = setup(cmdLine, cmdInfo);
+    	return forkIt(cmdLine, cmdInfo, cr);
+	}
 
-        CommandLine cmdLine;
-        Method method;
-        Runnable cr;
-        CommandInfo cmdInfo;
-
-        String[] commands = cmdLineStr.split("\\|");
-        String command;
-        ByteArrayOutputStream byteArrayOutputStream = null;
-
-        for (int i = 0; i < commands.length; i++) {
-            command = commands[i].trim();
-            cmdLine = new CommandLine(command);
-
-            if (!cmdLine.hasNext())
-                continue;
-
-            cmdName = cmdLine.next();
-
-            try {
-                cmdInfo = commandShell.getCommandClass(cmdName);
-
-                if (cmdLine.sendToOutFile()) {
-                	File file = new File(cmdLine.getOutFileName());
-
+    private CommandInfo lookupCommand(CommandLine cmdLine) throws ShellInvocationException {
+    	String cmdName = cmdLine.getCommandName();
+    	if (cmdName == null) {
+    		return null;
+    	}
                 	try {
-                		FileOutputStream fileOutputStream = new FileOutputStream(
-                				file);
-                		outputStream = new PrintStream(fileOutputStream);
-                		mustCloseOutputStream = true;
-                	} catch (SecurityException e) {
-                		e.printStackTrace();
-                		return;  // FIXME
-                	} catch (FileNotFoundException e) {
-                		e.printStackTrace();
-                		return;  // FIXME
-                	}
-                } else if (i + 1 < commands.length) {
-                	byteArrayOutputStream = new ByteArrayOutputStream();
-                	outputStream = new PrintStream(byteArrayOutputStream);
-                } else {
-                	outputStream = commandShell.getOutputStream();
+    		return commandShell.getCommandClass(cmdName);
+    	}
+    	catch (ClassNotFoundException ex) {
+    		throw new ShellInvocationException("Cannot resolve command '" + cmdName + "'");
+                }
                 }
 
-                if (byteArrayOutputStream != null) {
-                	nextInputStream = new ByteArrayInputStream(
-                			byteArrayOutputStream.toByteArray());
+    private Runnable setup(CommandLine cmdLine, CommandInfo cmdInfo) throws ShellException {
+        Method method;
+        Runnable cr = null;
+
+        Closeable[] streams = cmdLine.getStreams();
+        InputStream in;
+        PrintStream out, err;
+        try {
+        	in = (InputStream) ((streams[0] == null) ? commandShell.getInputStream() : streams[0]);
+        	OutputStream tmp = (OutputStream) 
+        		((streams[1] == null) ? commandShell.getOutputStream() : streams[1]);
+        	out = (tmp instanceof PrintStream) ? (PrintStream) tmp : new PrintStream(tmp);
+        	tmp = (OutputStream) ((streams[2] == null) ? commandShell.getErrorStream() : streams[2]);
+        	err = (tmp instanceof PrintStream) ? (PrintStream) tmp : new PrintStream(tmp);
+        }
+        catch (ClassCastException ex) {
+        	throw new ShellFailureException("streams array broken", ex);
                 }
-
-                if (nextInputStream != null)
-                	inputStream = nextInputStream;
-
-                CommandLine commandLine = null;
-
-                if (inputStream.available() > 0) {
-                	// FIXME we shouldn't do this.  It consumes keyboard typeahead
-                	// that should be delivered to the command's standard input!!
-                	commandLine = new CommandLine(inputStream);
-                } else {
-                	commandLine = cmdLine.getRemainder();
-                }
-
-                commandLine.setOutFileName(cmdLine.getOutFileName());
                 try {
                 	method = cmdInfo.getCommandClass().getMethod(
                 			EXECUTE_METHOD, EXECUTE_ARG_TYPES);
-
+        	if ((method.getModifiers() & Modifier.STATIC) == 0) {
                     cr = createRunner(cmdInfo.getCommandClass(), method,
-                            new Object[] { commandLine, inputStream,
-                                    outputStream, errStream },
-                            inputStream, outputStream, errStream);
+        				new Object[]{cmdLine, in, out, err},
+        				in, out, err);
+        	}
                 } catch (NoSuchMethodException e) {
-                    method = cmdInfo.getCommandClass().getMethod(MAIN_METHOD,
-                            MAIN_ARG_TYPES);
+        	// continue;
+        }
+        if (cr == null) {
+        	try {
+        		method = cmdInfo.getCommandClass().getMethod(MAIN_METHOD, MAIN_ARG_TYPES);
+        		if ((method.getModifiers() & Modifier.STATIC) != 0) {
+        			if (streams[0] != null || streams[1] != null || streams[2] != null) {
+        				throw new ShellInvocationException(
+        						"Entry point method for " + cmdInfo.getCommandClass() + 
+        						" does not allow redirection or pipelining");
+        			}
                     cr = createRunner(cmdInfo.getCommandClass(), method,
-                            new Object[] { cmdLine.getRemainder().toStringArray() },
-                            commandShell.getInputStream(), commandShell.getOutputStream(),
-                            commandShell.getErrorStream());
+        					new Object[]{cmdLine.getArguments()},
+        					in, out, err);
                 }
+        	} catch (NoSuchMethodException e) {
+        		// continue;
+        	}
+        }
+        if (cr == null) {
+        	throw new ShellInvocationException(
+        			"No suitable entry point method for " + cmdInfo.getCommandClass());
+        }
+        if (streams == null) {
+        	cmdLine.setStreams(new Closeable[]{in, out, err});
+        }
+        return cr;
+    }
+    
+    public int runIt(CommandLine cmdLine, CommandInfo cmdInfo, Runnable cr) 
+    throws ShellInvocationException {
                 try {
                 	if (cmdInfo.isInternal()) {
                         cr.run();
                     } else {
-                        threadProcess = createThread(cr, inputStream,
-                        		outputStream, errStream);
+    			try {
+    				threadProcess = createThread(cmdLine, cr);
+    			} catch (Exception ex) {
+    				throw new ShellInvocationException("Exception while creating command thread", ex);
+    			} 
                         threadProcess.start();
 
                         this.blocking = true;
                         this.blockingThread = Thread.currentThread();
-                        while (blocking) {
+    			this.cmdName = cmdLine.getCommandName();
+    			while (this.blocking) {
                             try {
                                 Thread.sleep(6000);
                             } catch (InterruptedException interrupted) {
                                 if (!blocking) {
                                     // interruption was okay, break normally.
                                 } else {
-                                    // abnormal interruption
-                                    interrupted.printStackTrace();
-                                    return;  // FIXME
+    						throw new ShellFailureException("unexpected interrupt", interrupted);
                                 }
                             }
                         }
                     }
+    		return 0;
                 } catch (Exception ex) {
-                    err.println("Exception in command");
-                    ex.printStackTrace(err);
-                    return;  // FIXME
+    		throw new ShellInvocationException("Uncaught Exception in command", ex);
                 } catch (Error ex) {
-                    err.println("Fatal error in command");
-                    ex.printStackTrace(err);
-                    return;  // FIXME
-                }
-            } catch (NoSuchMethodException ex) {
-                err.println("Alias class has no main method " + cmdName);
-                return;  // FIXME
-            } catch (ClassNotFoundException ex) {
-                err.println("Unknown alias class " + ex.getMessage());
-                return;  // FIXME
-            } catch (ClassCastException ex) {
-                err.println("Invalid command " + cmdName);
-                return;  // FIXME
-            } catch (Exception ex) {
-                err.println("Unknown error: " + ex.getMessage());
-                ex.printStackTrace(err);
-                return;  // FIXME
+    		throw new ShellInvocationException("Fatal Error in command", ex);
             }
             finally {
-            	if (mustCloseOutputStream) {
-                    outputStream.close();
-                    mustCloseOutputStream = false;
-                }
+			this.blockingThread = null;
+			this.blocking = false;
             }
         }
 
-        nextInputStream = null;
+    public CommandThread forkIt(CommandLine cmdLine, CommandInfo cmdInfo, Runnable cr) 
+    throws ShellInvocationException {
+    	if (cmdInfo.isInternal()) {
+    		throw new ShellFailureException("unexpected internal command");
+    	}
+    	try {
+    		return createThread(cmdLine, cr);
+    	} catch (Exception ex) {
+    		throw new ShellInvocationException("Exception while creating command thread", ex);
+    	} 
     }
 
-    abstract Thread createThread(Runnable cr, InputStream inputStream, 
-    		PrintStream outputStream, PrintStream errStream);
+    abstract CommandThread createThread(CommandLine cmdLine, Runnable cr);
 
 	public void keyPressed(KeyboardEvent ke) {
         //disabling Ctrl-C since currently we have no safe method for killing a thread
@@ -247,7 +230,7 @@ public abstract class AsyncCommandInvoker implements CommandInvoker, KeyboardLis
     }
 
     private void doCtrlZ() {
-        if(blockingThread != null && blockingThread.isAlive()) {        
+        if (blockingThread != null && blockingThread.isAlive()) {        
             System.err.println("ctrl-z: Returning focus to console. (" + cmdName
                     + " is still running)");
             unblock();
@@ -260,7 +243,6 @@ public abstract class AsyncCommandInvoker implements CommandInvoker, KeyboardLis
                 blockingThread != null && blockingThread.isAlive()) {
             System.err.println("ctrl-c: Returning focus to console. (" + cmdName
                 + " has been killed)");
-            
             unblock();
 
             AccessController.doPrivileged(new PrivilegedAction<Void>(){
@@ -286,4 +268,18 @@ public abstract class AsyncCommandInvoker implements CommandInvoker, KeyboardLis
     abstract Runnable createRunner(Class cx, Method method, Object[] args, 
         		InputStream commandIn, PrintStream commandOut, PrintStream commandErr);
 
+    
+    abstract class CommandRunner implements Runnable {
+
+    	boolean isDebugEnabled() {
+    		return commandShell.isDebugEnabled();
+    	}
+    	
+    	void stackTrace(Throwable ex) {
+    		if (ex != null && isDebugEnabled()) {
+    			ex.printStackTrace(err);
+    		}
+    	}
+
+    }
 }

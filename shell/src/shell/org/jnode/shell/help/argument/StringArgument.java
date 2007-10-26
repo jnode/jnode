@@ -38,7 +38,7 @@ public class StringArgument extends Argument {
 	}
 
 	public String complete(String partial) {
-		String result = CommandLine.escape(partial, true);	// force quote
+		String result = CommandLine.doEscape(partial, true);	// force quote
 		return result.substring(0, result.length() - 1);	// remove ending quote
 	}
 	

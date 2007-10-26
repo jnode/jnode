@@ -25,7 +25,6 @@ import java.util.Collection;
 
 import javax.naming.NameNotFoundException;
 
-import org.jnode.shell.CommandLine;
 import org.jnode.shell.ShellUtils;
 
 /**
@@ -36,6 +35,8 @@ public class Argument extends CommandLineElement {
     public static final boolean SINGLE = false;
 
     public static final boolean MULTI = true;
+
+    private static final String[] NO_VALUES = new String[0];
 
     private final boolean multi;
 
@@ -61,7 +62,7 @@ public class Argument extends CommandLineElement {
     }
 
     // Command line completion
-    private String[] values = new String[ 0];
+    private String[] values = NO_VALUES;
 
     private boolean satisfied = false;
 
