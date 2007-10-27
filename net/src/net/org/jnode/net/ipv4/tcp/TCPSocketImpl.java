@@ -186,6 +186,9 @@ public class TCPSocketImpl extends SocketImpl {
                 return controlBlock.getReceiveBufferSize();
             case SocketOptions.SO_SNDBUF:
                 return controlBlock.getSendBufferSize();
+            case SocketOptions.SO_TIMEOUT:
+                //todo implement it, 0 means disabled
+                return 0;
             default:
                 throw new SocketException("Option " + option_id + " is not recognised or not implemented");
         }
