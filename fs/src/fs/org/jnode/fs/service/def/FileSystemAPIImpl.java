@@ -280,6 +280,8 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
             //if they exist by any chance
             if ( name.equals(".") || name.equals("..") )
                continue;
+            
+            entryCache.setEntry(directory+File.separatorChar+name, child);
 
             list.add(name);
         }
@@ -334,6 +336,11 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
             if (parentEntry != null) {
                 try {
                     entry = parentEntry.getEntry(stripParentPath(path));
+                    
+                    if(entry==null){
+                    	return null;
+                    }
+                    
                     entryCache.setEntry(path, entry);
                     return entry;
                 } catch (IOException ex) {

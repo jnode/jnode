@@ -22,7 +22,9 @@
 package org.jnode.fs.service.def;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.jnode.fs.FSEntry;
 
@@ -32,7 +34,14 @@ import org.jnode.fs.FSEntry;
 final class FSEntryCache {
 
 	/** The actual cache */
-	private final HashMap<String, FSEntry> entries = new HashMap<String, FSEntry>();
+	private final Map<String, FSEntry> entries = new LinkedHashMap<String, FSEntry>(){
+
+		@Override
+		protected boolean removeEldestEntry(Entry<String, FSEntry> eldest) {
+			return size() > 100;
+		}
+		
+	};
 	
 	/**
 	 * Create a new instance
