@@ -268,48 +268,60 @@ public final class VmSystem {
         final Vm vm = Vm.getVm();
         final VmArchitecture arch = Vm.getArch();
 
-        // Java properties
-        res.put("java.version", "1.5");
+        // Standard Java properties
+        res.put("file.separator", "/");
+        res.put("java.awt.graphicsenv", "");
+        res.put("java.awt.printerjob", "");
+        res.put("java.class.path", "");
+        res.put("java.class.version", "50.0");
+        res.put("java.compiler", "Internal"); //todo is this needed?
+        res.put("java.endorsed.dirs", "/jifs/lib/");
+        res.put("java.ext.dirs", "");
+        res.put("java.home", "/jifs/");
+        res.put("java.io.tmpdir", "/jnode/tmp");
+        res.put("java.library.path", "");
+        res.put("java.runtime.name", "JNode");
+        res.put("java.runtime.version", vm.getVersion());
+        res.put("java.specification.name", "Java Platform API Specification");
+        res.put("java.specification.vendor", "Sun Microsystems Inc.");
+        res.put("java.specification.version", "1.6");
         res.put("java.vendor", "JNode.org");
         res.put("java.vendor.url", "http://jnode.org");
-        res.put("java.home", "/jifs/");
-        res.put("java.vm.specification.version", "1.4");
-        res.put("java.vm.specification.vendor", "JNode.org");
-        res.put("java.vm.specification.name", "jnode");
-        res.put("java.vm.version", vm.getVersion());
-        res.put("java.vm.vendor", "JNode.org");
+        res.put("java.vendor.url.bug", "http://jnode.org");
+        res.put("java.version", "1.6");
+        res.put("java.vm.info", "");
         res.put("java.vm.name", "JNode");
-        res.put("java.class.version", "1.1");
-        res.put("java.class.path", "");
-        res.put("java.library.path", "");
-        res.put("java.io.tmpdir", "/jnode/tmp");
-        res.put("java.compiler", "Internal");
-        res.put("java.ext.dirs", "");
-        res.put("os.name", "JNode");
-        res.put("os.arch", arch.getName());
-        res.put("os.version", vm.getVersion());
-        res.put("file.separator", "/");
-        res.put("path.separator", ":");
+        res.put("java.vm.specification.name", "Java Virtual Machine Specification");
+        res.put("java.vm.specification.vendor", "Sun Microsystems Inc.");
+        res.put("java.vm.specification.version", "1.0");
+        res.put("java.vm.vendor", "JNode.org");
+        res.put("java.vm.version", vm.getVersion());
         res.put("line.separator", "\n");
-        res.put("user.name", "System");
-        res.put("user.home", "/jnode/home");
+        res.put("os.arch", arch.getName());
+        res.put("os.name", "JNode");
+        res.put("os.version", vm.getVersion());
+        res.put("path.separator", ":");
+        res.put("user.country", "");
         res.put("user.dir", "/");
-
-        // Log4j properties
-        res.put("log4j.defaultInitOverride", "true");
+        res.put("user.home", "/jnode/home");
+        res.put("user.language", "");
+        res.put("user.name", "System");
+        res.put("user.timezone", "");
 
         // GNU properties
-        res.put("gnu.cpu.endian",
-                (arch.getByteOrder() == ByteOrder.BIG_ENDIAN) ? "big"
-                        : "little");
+        res.put("gnu.cpu.endian", (arch.getByteOrder() == ByteOrder.BIG_ENDIAN) ? "big" : "little");
         res.put("gnu.classpath.home.url", "system://");
         res.put("gnu.classpath.vm.shortname", "jnode");
         res.put("gnu.javax.swing.noGraphics2D", "true");
+
+        //----------JNode related
+        // Log4j properties
+        res.put("log4j.defaultInitOverride", "true");
+
         // keep this property until transparency support works fine with all drivers
         res.put("org.jnode.awt.transparency", "true");
         
         //internal classpath for javac
-        res.put("java.endorsed.dirs", "/jifs/lib/");
         res.put("sun.boot.class.path", ":");
 
     }
