@@ -93,6 +93,9 @@ public class CommandThread extends Thread {
 	}
 	
 	public static final void setRC(int rc) throws ClassCastException {
-		((CommandThread) Thread.currentThread()).setReturnCode(rc);
+        Thread thread = Thread.currentThread();
+        //todo this is not true for "internal" commands like 'classpath', why?
+        if(thread instanceof CommandThread)
+            ((CommandThread) thread).setReturnCode(rc);
 	}
 }
