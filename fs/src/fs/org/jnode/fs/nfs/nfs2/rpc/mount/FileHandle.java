@@ -16,7 +16,6 @@ public class FileHandle implements XdrAble {
 
     private byte[] value;
 
-
     public FileHandle() {
     }
 
@@ -24,25 +23,21 @@ public class FileHandle implements XdrAble {
         this.value = value;
     }
 
-    public FileHandle(XdrDecodingStream xdr)
-            throws OncRpcException, IOException {
+    public FileHandle(XdrDecodingStream xdr) throws OncRpcException, IOException {
         xdrDecode(xdr);
     }
 
-    public void xdrEncode(XdrEncodingStream xdr)
-            throws OncRpcException, IOException {
+    public void xdrEncode(XdrEncodingStream xdr) throws OncRpcException, IOException {
         xdr.xdrEncodeOpaque(value, Mount1Client.FILE_HANDLE_SIZE);
     }
 
-    public void xdrDecode(XdrDecodingStream xdr)
-            throws OncRpcException, IOException {
+    public void xdrDecode(XdrDecodingStream xdr) throws OncRpcException, IOException {
         value = xdr.xdrDecodeOpaque(Mount1Client.FILE_HANDLE_SIZE);
     }
 
     public byte[] getValue() {
         return value;
     }
-
 
 }
 // End of FileHandle.java

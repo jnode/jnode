@@ -40,7 +40,7 @@ public class NFS2FileSystemType implements FileSystemType<NFS2FileSystem> {
      * @param readOnly
      */
     public NFS2FileSystem create(Device device, boolean readOnly) throws FileSystemException {
-        return new NFS2FileSystem((NFS2Device) device,readOnly);
+        return new NFS2FileSystem((NFS2Device) device, readOnly);
     }
 
     /**
@@ -63,9 +63,11 @@ public class NFS2FileSystemType implements FileSystemType<NFS2FileSystem> {
     }
 
     /**
-     * Format a filesystem for a given device according to its Partition table entry.
+     * Format a filesystem for a given device according to its Partition table
+     * entry.
      *
-     * @param device          The device on which you want to format with this FileSystemType
+     * @param device          The device on which you want to format with this
+     *                        FileSystemType
      * @param specificOptions the specific options for this filesystemType
      * @return the newly created FileSystem
      * @throws org.jnode.fs.FileSystemException

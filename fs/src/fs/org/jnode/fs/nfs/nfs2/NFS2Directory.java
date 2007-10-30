@@ -52,6 +52,7 @@ public class NFS2Directory extends NFS2Object implements FSDirectory {
     NFS2Directory(NFS2FileSystem fileSystem, byte[] fileHandle) {
 	super(fileSystem);
 	this.fileHandle = fileHandle;
+
     }
 
     /**
@@ -62,19 +63,19 @@ public class NFS2Directory extends NFS2Object implements FSDirectory {
      */
     public NFS2Entry getEntry(String name) throws IOException {
 
-	NFS2Client nfsClient = ((NFS2FileSystem) getFileSystem()).getNFSClient();
+	NFS2Client nfsClient = getNFS2Client();
 
 	LookupResult lookupResult;
 	try {
 	    lookupResult = nfsClient.lookup(fileHandle, name);
 	} catch (NFS2Exception e) {
-	    throw new IOException("Can not call the rpc method");
+	    throw new IOException("Can not call the rpc method." + e.getMessage(), e);
 	}
 
-	NFS2Entry nfs2Entry = new NFS2Entry((NFS2FileSystem) getFileSystem(), this, name, lookupResult.getFileHandle(),
+	NFS2Entry entry = new NFS2Entry((NFS2FileSystem) getFileSystem(), this, name, lookupResult.getFileHandle(),
 		lookupResult.getFileAttribute());
 
-	return nfs2Entry;
+	return entry;
 
     }
 
@@ -101,36 +102,54 @@ public class NFS2Directory extends NFS2Object implements FSDirectory {
      */
     public Iterator<? extends NFS2Entry> iterator() throws IOException {
 
-	final NFS2Client nfsClient = ((NFS2FileSystem) getFileSystem()).getNFSClient();
+	final NFS2Client nfsClient = getNFS2Client();
 
 	try {
-	    ListDirectoryResult result = AccessController
-		    .doPrivileged(new PrivilegedExceptionAction<ListDirectoryResult>() {
-			public ListDirectoryResult run() throws Exception {
-			    return nfsClient.listDirectory(fileHandle, new byte[NFS2Client.COOKIE_SIZE], 1024);
-			}
-		    });
+	    List<Entry> entryList = AccessController.doPrivileged(new PrivilegedExceptionAction<List<Entry>>() {
+		public List<Entry> run() throws Exception {
 
-	    if (result.isEof()) {
+		    List<Entry> entryList = new ArrayList<Entry>();
+		    boolean eof = false;
+		    byte[] cookie = new byte[NFS2Client.COOKIE_SIZE];
+		    while (!eof) {
+
+			ListDirectoryResult result = nfsClient.listDirectory(fileHandle, cookie, 2048);
+
+			entryList.addAll(result.getEntryList());
+
+			if (result.isEof()) {
+			    eof = true;
+			} else {
+			    // I guess that the list contains at lest one entry
+			    // .
+			    cookie = result.getEntryList().get(result.getEntryList().size() - 1).getCookie();
+			}
+
+		    }
+
+		    return entryList;
+
+		}
+	    });
+
+	    if (entryList.size() == 0) {
 		return EMPTY_ENTRY_ITERATOR;
 	    }
 
 	    LookupAction lookupAction = new LookupAction(nfsClient);
 
-	    Entry entry = result.getEntry();
+	    List<NFS2Entry> nfsEntryList = new ArrayList<NFS2Entry>(entryList.size());
+	    for (int i = 0; i < entryList.size(); i++) {
 
-	    List<NFS2Entry> nfsEntryList = new ArrayList<NFS2Entry>();
-	    while (entry != null) {
+		Entry entry = entryList.get(i);
 
 		lookupAction.setEntry(entry);
 		LookupResult lookupResult = AccessController.doPrivileged(lookupAction);
 
-		NFS2Entry nfs2Entry = new NFS2Entry((NFS2FileSystem) getFileSystem(), this, entry.getName(),
+		NFS2Entry nfsEntry = new NFS2Entry((NFS2FileSystem) getFileSystem(), this, entry.getName(),
 			lookupResult.getFileHandle(), lookupResult.getFileAttribute());
 
-		nfsEntryList.add(nfs2Entry);
-
-		entry = entry.getNextEntry();
+		nfsEntryList.add(nfsEntry);
 
 	    }
 
@@ -152,37 +171,35 @@ public class NFS2Directory extends NFS2Object implements FSDirectory {
 
     public FSEntry addDirectory(String name) throws IOException {
 
-	NFS2Client client = ((NFS2FileSystem) getFileSystem()).getNFSClient();
+	NFS2Client nfsClient = getNFS2Client();
 
-	
-	
 	try {
-	    CreateDirectoryResult result = client.createDirectory(fileHandle, name, new boolean[]{true,true,true,true,false,true,true,false,true}, -1, -1,
-		    -1, new Time(), new Time());
+	    CreateDirectoryResult result = nfsClient.createDirectory(fileHandle, name, new boolean[] { true, true,
+		    true, true, false, true, true, false, true }, -1, -1, -1, new Time(), new Time());
 
 	    return new NFS2Entry((NFS2FileSystem) getFileSystem(), this, name, result.getFileHandle(), result
 		    .getFileAttribute());
 
 	} catch (NFS2Exception e) {
-	    System.out.println(e.getMessage());
+
 	    throw new IOException("Can not create the directory " + name + "." + e.getMessage(), e);
 	}
 
     }
 
     public FSEntry addFile(String name) throws IOException {
-	
-	NFS2Client client = ((NFS2FileSystem) getFileSystem()).getNFSClient();
+
+	NFS2Client nfsClient = getNFS2Client();
 
 	try {
-	    CreateFileResult result = client.createFile(fileHandle, name, new boolean[]{true,true,false,true,false,false,true,false,false}, -1,-1,
-		    -1, new Time(), new Time());
+	    CreateFileResult result = nfsClient.createFile(fileHandle, name, new boolean[] { true, true, false, true,
+		    false, false, true, false, false }, -1, -1, -1, new Time(), new Time());
 
 	    return new NFS2Entry((NFS2FileSystem) getFileSystem(), this, name, result.getFileHandle(), result
 		    .getFileAttribute());
 
 	} catch (NFS2Exception e) {
-	    System.out.println(e.getMessage());
+
 	    throw new IOException("Can not create the file " + name + "." + e.getMessage(), e);
 	}
     }
@@ -199,17 +216,17 @@ public class NFS2Directory extends NFS2Object implements FSDirectory {
 	    return;
 	}
 
-	NFS2Client client = ((NFS2FileSystem) getFileSystem()).getNFSClient();
+	NFS2Client nfsClient = getNFS2Client();
 
 	if (entry.isDirectory()) {
 	    try {
-		client.removeDirectory(fileHandle, name);
+		nfsClient.removeDirectory(fileHandle, name);
 	    } catch (NFS2Exception e) {
 		throw new IOException("Can not remove directory " + name + "." + e.getMessage(), e);
 	    }
 	} else {
 	    try {
-		client.removeFile(fileHandle, name);
+		nfsClient.removeFile(fileHandle, name);
 	    } catch (NFS2Exception e) {
 		throw new IOException("Can not remove file " + name + "." + e.getMessage(), e);
 	    }
@@ -232,7 +249,7 @@ public class NFS2Directory extends NFS2Object implements FSDirectory {
 	}
 
 	public void remove() {
-
+	    throw new UnsupportedOperationException();
 	}
 
     }

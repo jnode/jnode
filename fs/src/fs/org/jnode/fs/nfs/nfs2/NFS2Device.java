@@ -27,20 +27,31 @@ import org.jnode.driver.Device;
  * @author Andrei Dore
  */
 public class NFS2Device extends Device {
+
+    public enum Protocol {
+        UDP, TCP
+    }
+
     private String host;
+
     private String remoteDirectory;
+
+    private Protocol protocol;
+
     private int uid;
+
     private int gid;
 
-    public NFS2Device(String host, String remoteDirectory) {
-        this(host, remoteDirectory, -1, -1);
+    public NFS2Device(String host, String remoteDirectory, Protocol protocol) {
+        this(host, remoteDirectory, protocol, -1, -1);
 
     }
 
-    public NFS2Device(String host, String remoteDirectory, int uid, int gid) {
-        super(null, "nfs2-(" + host + "," + remoteDirectory + "," + uid + "," + gid + ")");
+    public NFS2Device(String host, String remoteDirectory, Protocol protocol, int uid, int gid) {
+        super(null, "nfs2-(" + host + "," + remoteDirectory + "," + protocol + "," + uid + "," + gid + ")");
         this.host = host;
         this.remoteDirectory = remoteDirectory;
+        this.protocol = protocol;
 
         this.uid = uid;
         this.gid = gid;
@@ -61,6 +72,10 @@ public class NFS2Device extends Device {
 
     public int getGid() {
         return gid;
+    }
+
+    public Protocol getProtocol() {
+        return protocol;
     }
 
 }

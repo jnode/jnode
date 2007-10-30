@@ -23,18 +23,16 @@ package org.jnode.fs.nfs.nfs2;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 
-import org.acplt.oncrpc.OncRpcClientAuthUnix;
-import org.acplt.oncrpc.OncRpcException;
 import org.acplt.oncrpc.OncRpcProtocols;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceListener;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
-import org.jnode.fs.nfs.nfs2.rpc.mount.DirPath;
+import org.jnode.fs.nfs.nfs2.NFS2Device.Protocol;
 import org.jnode.fs.nfs.nfs2.rpc.mount.Mount1Client;
+import org.jnode.fs.nfs.nfs2.rpc.mount.MountException;
 import org.jnode.fs.nfs.nfs2.rpc.mount.MountResult;
 import org.jnode.fs.nfs.nfs2.rpc.nfs.NFS2Client;
 
@@ -75,35 +73,33 @@ public class NFS2FileSystem implements FileSystem {
 
         try {
 
-
-            mountClient = new Mount1Client(InetAddress.getByName(device.getHost()), OncRpcProtocols.ONCRPC_UDP);
-
-            nfsClient = new NFS2Client(InetAddress.getByName(device.getHost()), OncRpcProtocols.ONCRPC_UDP);
-
-            if (!readOnly) {
-
-                mountClient.getClient().setAuth(new OncRpcClientAuthUnix("test", device.getUid(), device.getGid()));
-                nfsClient.getClient().setAuth(new OncRpcClientAuthUnix("test", device.getUid(), device.getGid()));
-
-            }
-
-
-            MountResult result = mountClient.mount(new DirPath(device.getRemoteDirectory()));
-
-            //
-            if (result.getStatus() == Mount1Client.MOUNT_OK) {
-
-                root = new NFS2RootEntry(this, result.getDirectory().getValue());
-
+            int protocol;
+            if (device.getProtocol() == Protocol.TCP) {
+                protocol = OncRpcProtocols.ONCRPC_TCP;
             } else {
-                throw new IOException("The status of the call it is not ok ");
+                protocol = OncRpcProtocols.ONCRPC_UDP;
             }
+
+            mountClient = new Mount1Client(InetAddress.getByName(device.getHost()), protocol, device.getUid(), device
+                    .getGid());
+
+            nfsClient = new NFS2Client(InetAddress.getByName(device.getHost()), protocol, device.getUid(), device
+                    .getGid());
 
         } catch (Exception e) {
-
-            // Not good . Improve exception handling . Give more detail .
             throw new FileSystemException(e.getMessage(), e);
         }
+
+        MountResult result;
+        try {
+            result = mountClient.mount(device.getRemoteDirectory());
+        } catch (IOException e) {
+            throw new FileSystemException(e.getMessage(), e);
+        } catch (MountException e) {
+            throw new FileSystemException(e.getMessage(), e);
+        }
+
+        root = new NFS2RootEntry(this, result.getFileHandle());
 
     }
 
@@ -117,30 +113,22 @@ public class NFS2FileSystem implements FileSystem {
     public void close() throws IOException {
 
         // Improve the exception !!!!!!!!!!!!!!!
-        Exception unmountException = null;
+
         try {
-            mountClient.unmount(new DirPath(device.getRemoteDirectory()));
-        } catch (OncRpcException ex) {
-            unmountException = ex;
+            mountClient.unmount(device.getRemoteDirectory());
+        } catch (MountException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
 
-        Exception nfsException = null;
-        try {
-            nfsClient.close();
-        } catch (OncRpcException ex) {
-            nfsException = ex;
-        }
-
-        Exception mountException = null;
         try {
             mountClient.close();
-        } catch (OncRpcException ex) {
-            mountException = ex;
+        } catch (MountException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
 
-        if (unmountException != null || nfsException != null || mountException != null) {
-            throw new IOException("Can not close the nfs file system ");
-        }
+        nfsClient.close();
 
     }
 
@@ -162,7 +150,7 @@ public class NFS2FileSystem implements FileSystem {
     /**
      * Is this filesystem closed.
      */
-    public synchronized boolean isClosed() {
+    public boolean isClosed() {
         return closed;
     }
 

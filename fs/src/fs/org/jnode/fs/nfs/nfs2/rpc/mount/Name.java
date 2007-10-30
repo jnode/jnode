@@ -16,7 +16,6 @@ public class Name implements XdrAble {
 
     private String value;
 
-
     public Name() {
     }
 
@@ -24,25 +23,21 @@ public class Name implements XdrAble {
         this.value = value;
     }
 
-    public Name(XdrDecodingStream xdr)
-            throws OncRpcException, IOException {
+    public Name(XdrDecodingStream xdr) throws OncRpcException, IOException {
         xdrDecode(xdr);
     }
 
-    public void xdrEncode(XdrEncodingStream xdr)
-            throws OncRpcException, IOException {
+    public void xdrEncode(XdrEncodingStream xdr) throws OncRpcException, IOException {
         xdr.xdrEncodeString(value);
     }
 
-    public void xdrDecode(XdrDecodingStream xdr)
-            throws OncRpcException, IOException {
+    public void xdrDecode(XdrDecodingStream xdr) throws OncRpcException, IOException {
         value = xdr.xdrDecodeString();
     }
 
     public String getValue() {
         return value;
     }
-
 
 }
 // End of Name.java
