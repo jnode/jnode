@@ -17,11 +17,10 @@ public class NFS2Object implements FSObject {
     }
 
     public boolean isValid() {
-        // TODO Auto-generated method stub
         return false;
     }
 
-    public NFS2Client getNFSClient() {
+    public NFS2Client getNFS2Client() {
         return fileSystem.getNFSClient();
     }
 

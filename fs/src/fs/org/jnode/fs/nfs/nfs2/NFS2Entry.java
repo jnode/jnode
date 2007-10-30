@@ -47,6 +47,8 @@ public class NFS2Entry extends NFS2Object implements FSEntry {
 
     private FileAttribute fileAttribute;
 
+    private long expirationTime;
+
     private String name;
 
     NFS2Entry(NFS2FileSystem fileSystem, NFS2Directory parent, String name, byte[] fileHandle,
@@ -65,6 +67,10 @@ public class NFS2Entry extends NFS2Object implements FSEntry {
             file = new NFS2File(fileSystem, fileHandle, fileAttribute);
 
         }
+
+        // TODO change the interval based on type of the entry ( file or
+        // directory )
+        expirationTime = System.currentTimeMillis() + 30 * 1000;
 
     }
 
@@ -98,7 +104,7 @@ public class NFS2Entry extends NFS2Object implements FSEntry {
     }
 
     public long getLastModified() throws IOException {
-        return fileAttribute.getLastModified().getMicroSeconds() * 1000;
+        return (long) fileAttribute.getLastModified().getSeconds() * 1000;
     }
 
     public boolean isDirectory() {
@@ -130,7 +136,7 @@ public class NFS2Entry extends NFS2Object implements FSEntry {
 
     public void setName(String newName) throws IOException {
 
-        NFS2Client client = ((NFS2FileSystem) getFileSystem()).getNFSClient();
+        NFS2Client client = getNFS2Client();
 
         try {
             client.renameFile(((NFS2Directory) getParent()).getFileHandle(), name, ((NFS2Directory) getParent())
@@ -138,6 +144,16 @@ public class NFS2Entry extends NFS2Object implements FSEntry {
         } catch (NFS2Exception e) {
             throw new IOException("Can not rename ." + e.getMessage(), e);
         }
+
+    }
+
+    public boolean isValid() {
+
+        if (expirationTime < System.currentTimeMillis()) {
+            return false;
+        }
+
+        return true;
 
     }
 

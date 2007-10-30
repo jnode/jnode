@@ -65,10 +65,9 @@ public class NFS2File extends NFS2Object implements FSFile {
      */
     public void read(long fileOffset, ByteBuffer dest) throws IOException {
 
-        NFS2Client client = getNFSClient();
+        NFS2Client client = getNFS2Client();
 
         try {
-
 
             int length = 2048;
 
@@ -127,7 +126,7 @@ public class NFS2File extends NFS2Object implements FSFile {
             throw new ReadOnlyFileSystemException("Write in readonly filesystem");
         }
 
-        NFS2Client client = getNFSClient();
+        NFS2Client client = getNFS2Client();
 
         try {
 

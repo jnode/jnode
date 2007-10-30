@@ -31,5 +31,5 @@ public class NFS2Exception extends Exception {
     public ResultCode getResultCode() {
         return resultCode;
     }
-    
+
 }
