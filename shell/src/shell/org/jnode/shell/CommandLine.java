@@ -43,7 +43,15 @@ import org.jnode.shell.help.argument.FileArgument;
  * 
  * @author crawley@jnode.org
  */
-public class CommandLine implements Completable, Iterator<String> {
+public class CommandLine implements Completable, Iterable<String> {
+	
+    public static final Closeable DEFAULT_STDIN = new StreamMarker("STDIN");
+
+    public static final Closeable DEFAULT_STDOUT = new StreamMarker("STDOUT");
+
+    public static final Closeable DEFAULT_STDERR = new StreamMarker("STDERR");
+
+    public static final Closeable DEVNULL = new StreamMarker("DEVNULL");
 
     public static final int LITERAL = 0;
 
@@ -82,6 +90,7 @@ public class CommandLine implements Completable, Iterator<String> {
     private static final char T = 't';
 
     private static final String[] NO_ARGS = new String[0];
+    private static final Token[] NO_TOKENS = new Token[0];
 
     private final Help.Info defaultParameter = new Help.Info("file",
             "default parameter for command line completion",
@@ -91,18 +100,32 @@ public class CommandLine implements Completable, Iterator<String> {
     private final Argument defaultArg = new AliasArgument("command",
             "the command to be called");
     
-    private String commandName;
+    private final String commandName;
+    private final Token commandToken;
 
-    private String[] arguments;
+    private final String[] arguments;
+    private final Token[] argumentTokens;
 
     private Closeable[] streams;
 
-    private int pos = 0;
-
-    private int type = LITERAL;
-
     private boolean argumentAnticipated = false;
 
+
+    /**
+     * Create a new instance using Tokens instead of Strings.
+     *
+     * @param commandToken the command name token or <code>null</code>.
+     * @param argumentTokens the argument token list or <code>null</code>.
+     * @param streams the io stream array or <code>null</code>.
+     */
+    public CommandLine(Token commandToken, Token[] argumentTokens, Closeable[] streams) {
+    	this.commandToken = commandToken;
+        this.commandName = (commandToken == null) ? null : commandToken.token;
+        this.argumentTokens = (argumentTokens == null || argumentTokens.length == 0) ? 
+        		NO_TOKENS : argumentTokens.clone();
+        this.arguments = prepareArguments(this.argumentTokens);
+        this.streams = setupStreams(streams);
+    }
 
     /**
      * Create a new instance encapsulating a command name, argument list and io stream array.
@@ -117,15 +140,9 @@ public class CommandLine implements Completable, Iterator<String> {
     public CommandLine(String commandName, String[] arguments, Closeable[] streams) {
         this.commandName = commandName;
         this.arguments = (arguments == null || arguments.length == 0) ? NO_ARGS : arguments.clone();
-        if (streams == null) {
-        	this.streams = new Closeable[3];
-        }
-        else if (streams.length < 3) {
-        	throw new IllegalArgumentException("streams.length < 3");
-            }
-        else {
-        	this.streams = streams.clone();
-        }
+        this.commandToken = null;
+        this.argumentTokens = null;
+        this.streams = setupStreams(streams);
     }
 
     /**
@@ -148,56 +165,77 @@ public class CommandLine implements Completable, Iterator<String> {
         this(null, arguments, null);
     }
 
-    /**
-     * Reset, so a call to nextToken will retreive the first token.
-     */
-    public void reset() {
-        pos = 0;
+    private Closeable[] setupStreams(Closeable[] streams) {
+        if (streams == null) {
+            return new Closeable[]{DEFAULT_STDIN, DEFAULT_STDOUT, DEFAULT_STDERR};
+        }
+        else if (streams.length < 3) {
+            throw new IllegalArgumentException("streams.length < 3");
+        }
+        else {
+            return streams.clone();
+        }
+    }
+
+    private String[] prepareArguments(Token[] argumentTokens) {
+        String[] arguments = new String[argumentTokens.length];
+        for (int i = 0; i < arguments.length; i++) {
+            arguments[i] = argumentTokens[i].token;
+        }
+        return arguments;
     }
 
     /**
-     * Returns if there is another argument on the command list.
-     * 
-     * @return <code>true</code> if there is another token; <code>false</code>
-     *         otherwise
+     * This method returns an Iterator for the arguments represented as Strings.
      */
+    public Iterator<String> iterator() {
+        return new Iterator<String>() {
+            private int pos = 0;
+
     public boolean hasNext() {
         return pos < arguments.length;
     }
 
-    /**
-     * Go to the next token and return it.
-     * 
-     * @return the next token
-     */
-    public Token nextToken() throws NoSuchElementException {
-        int start = pos;
-        String token = next();
-        int end = pos;
-        return new Token(token, getTokenType(), start, end);
+            public String next() throws NoSuchElementException {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
+                return arguments[pos++];
+            }
+
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+
+        };
     }
 
     /**
-     * Go to the next token string and return it.
-     * 
-     * @return the next token
+     * This method returns an Iterator for the arguments represented as Tokens
      */
-    public String next() throws NoSuchElementException {
+    public Iterator<Token> tokenIterator() throws NoTokensAvailableException {
+        if (argumentTokens == null) {
+            throw new NoTokensAvailableException("No tokens available in the CommandLine");
+        }
+        return new Iterator<Token>() {
+            private int pos = 0;
+
+            public boolean hasNext() {
+                return pos < argumentTokens.length;
+            }
+
+            public Token next() throws NoSuchElementException {
         if (!hasNext()) {
             throw new NoSuchElementException();
             	}
+                return argumentTokens[pos++];
+            }
             	
-        type = LITERAL;
-        return arguments[pos++];
+            public void remove() {
+                throw new UnsupportedOperationException();
     }
 
-    /**
-     * Gets the type of this token.
-     * 
-     * @return the type, <code>LITERAL</code> if it cannot be determined
-     */
-    public int getTokenType() {
-        return type;
+        };
     }
 
     /**
@@ -207,6 +245,15 @@ public class CommandLine implements Completable, Iterator<String> {
      */
     public String getCommandName() {
         return commandName;
+    }
+
+    /**
+     * Get the command name in token form
+     * 
+     * @return the command token
+     */
+    public Token getCommandToken() {
+        return commandToken;
     }
 
     /**
@@ -243,18 +290,6 @@ public class CommandLine implements Completable, Iterator<String> {
     }
 
     /**
-     * Gets the next token without stepping through the list.
-     * 
-     * @return the next token, or an empty string if there are no tokens left
-     */
-    public String peek() {
-        if (!hasNext()) {
-            return "";
-        }
-        return arguments[pos];
-    }
-
-    /**
      * Gets the remaining number of parts
      * 
      * @return the remaining number of parts
@@ -271,16 +306,36 @@ public class CommandLine implements Completable, Iterator<String> {
     	argumentAnticipated = newValue;
     }
 
+    /**
+     * The Token class is a light-weight representation for tokens that make up
+     * a command line.
+     */
     public static class Token {
+        /**
+         * This field holds the "cooked" representation of command line token.  By the 
+         * time we reach the CommandLine, all shell meta-characters should have been
+         * processed so that the value of the field represents a command name or argument.
+         */
         public final String token;
 
+        /**
+         * This field represents the type of the token.  The meaning is interpreter specific.
+         */
         public final int tokenType;
 
+        /**
+         * This field denotes the character offset of the first character of this token
+         * in the source character sequence passed to the interpreter.
+         */
         public final int start;
 
+        /**
+         * This field denotes the character offset + 1 for the last character of this token
+         * in the source character sequence passed to the interpreter.
+         */
         public final int end;
 
-        Token(String token, int type, int start, int end) {
+        public Token(String token, int type, int start, int end) {
             this.token = token;
             this.tokenType = type;
             this.start = start;
@@ -366,14 +421,7 @@ public class CommandLine implements Completable, Iterator<String> {
 
     /**
      * Get the IO stream context for executing the command.  The result
-     * is guaranteed to be non-null and to have at least 3 entries, but
-     * these entries may be <code>null</code>.  The implied meaning of
-     * <code>null</code> is:
-     * <ul>
-     * <li> offset 0: the invoking context's 'standard input' stream
-     * <li> offset 1: the invoking context's 'standard output' stream
-     * <li> offset 2: the invoking context's 'standard error' stream
-     * </ul>
+     * is guaranteed to be non-null and to have at least 3 entries.
      * 
      * @return stream context as described above.
      */
@@ -420,8 +468,4 @@ public class CommandLine implements Completable, Iterator<String> {
     	}
     	completion.setCompleted(result);
     }
-
-	public void remove() {
-		throw new UnsupportedOperationException("remove not supported");
-	}
 }

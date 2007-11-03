@@ -1,6 +1,7 @@
 package org.jnode.shell.command;
 
 import org.jnode.naming.InitialNaming;
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.ShellManager;
@@ -12,7 +13,7 @@ import java.io.PrintStream;
 /**
  * @author Levente S\u00e1ntha
  */
-public class ExitCommand {
+public class ExitCommand extends AbstractCommand {
 
     public static Help.Info HELP_INFO = new Help.Info(
             "exit",
@@ -21,7 +22,7 @@ public class ExitCommand {
 
     public static void main(String[] args)
             throws Exception {
-        new ExitCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+        new ExitCommand().execute(args);
     }
 
     /**

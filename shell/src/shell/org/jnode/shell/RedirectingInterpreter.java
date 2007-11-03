@@ -1,12 +1,10 @@
 package org.jnode.shell;
 
-import gnu.java.io.NullOutputStream;
 
 import java.io.Closeable;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintStream;
@@ -76,28 +74,29 @@ public class RedirectingInterpreter extends DefaultInterpreter implements Thread
     	else {
     		CommandDescriptor lastDesc = commands.get(nosCommands - 1);
     		CommandLine lastCommand = lastDesc.commandLine;
-    		lastCommand.setArgumentAnticipated(tokenizer.whitespaceAfter());
-    		int startPos = tokenizer.getTokenStartPos();
+    		CommandLine.Token lastToken = tokenizer.last();
+    		boolean whitespaceAfter = tokenizer.whitespaceAfter(lastToken);
+    		lastCommand.setArgumentAnticipated(whitespaceAfter);
 			switch (completionContext) {
     		case COMPLETE_ALIAS:
     		case COMPLETE_ARG:
     		case COMPLETE_PIPE:
     			break;
     		case COMPLETE_INPUT:
-    			if (lastDesc.fromFileName == null || !tokenizer.whitespaceAfter()) {
-    				return new RedirectionCompleter(line, startPos);
+    			if (lastDesc.fromFileName == null || !whitespaceAfter) {
+    				return new RedirectionCompleter(line, lastToken.start);
     			}
     			break;
     		case COMPLETE_OUTPUT:
-    			if (lastDesc.toFileName == null || !tokenizer.whitespaceAfter()) {
-    				return new RedirectionCompleter(line, startPos);
+    			if (lastDesc.toFileName == null || !whitespaceAfter) {
+    				return new RedirectionCompleter(line, lastToken.start);
     			}
     			break;
     		default:
     			throw new ShellFailureException("bad completion context (" + completionContext + ")");
     		}
     		return new SubcommandCompleter(lastCommand, line, 
-					tokenizer.whitespaceAfter() ? tokenizer.getPos() : startPos);
+    				whitespaceAfter ? lastToken.end : lastToken.start);
     	}
     }
 
@@ -107,20 +106,20 @@ public class RedirectingInterpreter extends DefaultInterpreter implements Thread
     	boolean pipeTo = false;
     	while(tokenizer.hasNext()) {
 			completionContext = COMPLETE_ALIAS;
-    		String commandName = tokenizer.next();
-    		if (tokenizer.getType() == SPECIAL) {
+    		CommandLine.Token commandToken = tokenizer.next();
+    		if (commandToken.tokenType == SPECIAL) {
 				throw new ShellSyntaxException(
-						"Misplaced '" + commandName + "': expected a command name");
+						"Misplaced '" + commandToken.token + "': expected a command name");
     		}
-    		String fromFileName = null;
-    		String toFileName = null;
-    		LinkedList<String> args = new LinkedList<String>();
+    		CommandLine.Token fromFileName = null;
+    		CommandLine.Token toFileName = null;
+    		LinkedList<CommandLine.Token> args = new LinkedList<CommandLine.Token>();
     		pipeTo = false;
     		while (tokenizer.hasNext()) {
     			completionContext = COMPLETE_ARG;
-    			String token = tokenizer.next();
-    			if (tokenizer.getType() == SPECIAL) {
-    				if (token.equals("<")) {
+    			CommandLine.Token token = tokenizer.next();
+    			if (token.tokenType == SPECIAL) {
+    				if (token.token.equals("<")) {
     					fromFileName = parseFileName(tokenizer, "<");
     					if (fromFileName == null && !allowPartial) {
     						throw new ShellSyntaxException("no filename after '<'");
@@ -128,7 +127,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements Thread
     					completionContext = COMPLETE_INPUT;
     					continue;
     				}
-    				else if (token.equals(">")) {
+    				else if (token.token.equals(">")) {
     					toFileName = parseFileName(tokenizer, ">");
     					if (toFileName == null && !allowPartial) {
     						throw new ShellSyntaxException("no filename after '>'");
@@ -136,7 +135,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements Thread
     					completionContext = COMPLETE_OUTPUT;
     					continue;
     				}
-    				else if (token.equals("|")) {
+    				else if (token.token.equals("|")) {
     					pipeTo = true;
     					completionContext = COMPLETE_PIPE;
     					break;
@@ -150,9 +149,9 @@ public class RedirectingInterpreter extends DefaultInterpreter implements Thread
     				args.add(token);
     			}
     		}
-    		CommandLine commandLine = 
-    			new CommandLine(commandName, 
-    						    args.toArray(new String[args.size()]));
+    		CommandLine.Token[] argVec = args.toArray(new CommandLine.Token[args.size()]);
+            
+    		CommandLine commandLine = new CommandLine(commandToken, argVec, null);
     		commands.add(new CommandDescriptor(commandLine, fromFileName,
     										   toFileName, pipeTo));
     	}
@@ -162,16 +161,16 @@ public class RedirectingInterpreter extends DefaultInterpreter implements Thread
     	return commands;
 	}
 	
-	private String parseFileName(Tokenizer tokenizer, String special) 
+	private CommandLine.Token parseFileName(Tokenizer tokenizer, String special) 
 	throws ShellSyntaxException {
 		if (!tokenizer.hasNext()) {
 			return null;
 		}
-		String token = tokenizer.next();
-		if (tokenizer.getType() == SPECIAL) {
+		CommandLine.Token token = tokenizer.next();
+		if (token.tokenType == SPECIAL) {
 			throw new ShellSyntaxException("misplaced '" + token + "'");
 		}
-		if (token.isEmpty()) {
+		if (token.token.isEmpty()) {
 			throw new ShellSyntaxException("empty '" + special + "' file name");
 		}
 		return token;
@@ -179,36 +178,32 @@ public class RedirectingInterpreter extends DefaultInterpreter implements Thread
 
 	private int runCommand(CommandShell shell, CommandDescriptor desc) 
 	throws ShellException {
-		InputStream in = null;
-		PrintStream out = null;
-		PrintStream err = null;
+		Closeable in = CommandLine.DEFAULT_STDIN;
+		Closeable out = CommandLine.DEFAULT_STDOUT;
+		Closeable err = CommandLine.DEFAULT_STDERR;
 		try {
 			try {
 				if (desc.fromFileName != null) {
-					in = new FileInputStream(desc.fromFileName);
+					in = new FileInputStream(desc.fromFileName.token);
 				}
 			}
 			catch (IOException ex) {
 				throw new ShellInvocationException(
-						"cannot open '" + desc.fromFileName + "': " + 
+						"cannot open '" + desc.fromFileName.token + "': " + 
 						ex.getMessage());
 			}
 			try {
 				if (desc.toFileName != null) {
-					out = new PrintStream(new FileOutputStream(desc.toFileName));
+					out = new FileOutputStream(desc.toFileName.token);
 				}
 			}
 			catch (IOException ex) {
 				throw new ShellInvocationException(
-						"cannot open '" + desc.toFileName + "': " + 
+						"cannot open '" + desc.toFileName.token + "': " + 
 						ex.getMessage());
 			}
 			desc.commandLine.setStreams(new Closeable[] {in, out, err});
-			int rc = shell.invoke(desc.commandLine);
-			if (out != null && out.checkError()) {
-				throw new ShellInvocationException("problem flushing output");
-			}
-			return rc;
+			return shell.invoke(desc.commandLine);
 		}
 		finally {
 			try {
@@ -219,9 +214,14 @@ public class RedirectingInterpreter extends DefaultInterpreter implements Thread
 			catch (IOException ex) {
 				// squash
 			}
+			try {
 			if (desc.toFileName != null && out != null) {
 				out.close();
 			}
+		}
+			catch (IOException ex) {
+				// squash
+			}	
 		}
 	}
 	
@@ -234,26 +234,26 @@ public class RedirectingInterpreter extends DefaultInterpreter implements Thread
 			int stageNo = 0;
 			PipedOutputStream pipeOut = null;
 			for (CommandDescriptor desc : descs) {
-				InputStream in = null;
-				PrintStream out = null;
-				PrintStream err = null;
+				Closeable in = CommandLine.DEFAULT_STDIN;
+				Closeable out = CommandLine.DEFAULT_STDOUT;
+				Closeable err = CommandLine.DEFAULT_STDERR;
 				desc.openedStreams = new ArrayList<Closeable>(2);
 				try {
 					// redirect from
 					if (desc.fromFileName != null) {
-						in = new FileInputStream(desc.fromFileName);
+						in = new FileInputStream(desc.fromFileName.token);
 						desc.openedStreams.add(in);
 					}
 				}
 				catch (IOException ex) {
 					throw new ShellInvocationException(
-							"cannot open '" + desc.fromFileName + "': " + 
+							"cannot open '" + desc.fromFileName.token + "': " + 
 							ex.getMessage());
 				}
 				try {
 					// redirect to
 					if (desc.toFileName != null) {
-						out = new PrintStream(new FileOutputStream(desc.toFileName));
+						out = new FileOutputStream(desc.toFileName.token);
 						desc.openedStreams.add(out);
 					}
 				}
@@ -266,7 +266,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements Thread
 					// pipe from
 					if (pipeOut != null) {
 						// the previous stage is sending stdout to the pipe
-						if (in == null) {
+						if (in == CommandLine.DEFAULT_STDIN) {
 							// this stage is going to read from the pipe
 							PipedInputStream pipeIn = new PipedInputStream();
 							try {
@@ -280,7 +280,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements Thread
 						}
 						else {
 							// this stage has redirected stdin from a file ... so go back and 
-							// replace the previous stage's pipeOut with a NullOutputStream/PrintStream
+							// replace the previous stage's pipeOut with devnull
 							CommandDescriptor prev = descs.get(stageNo - 1);
 							Closeable[] ps = prev.commandLine.getStreams();
 							try {
@@ -290,30 +290,35 @@ public class RedirectingInterpreter extends DefaultInterpreter implements Thread
 								// squash
 							}
 							prev.commandLine.setStreams(
-									new Closeable[] {ps[0], new NullOutputStream(), ps[2]});
+									new Closeable[] {ps[0], CommandLine.DEVNULL, ps[2]});
 						}
 					}
 					else {
 						//	the previous stage has explicitly redirected stdout
-						if (in == null) {
+						if (in == CommandLine.DEFAULT_STDIN) {
 							// this stage hasn't redirected stdin, so we need to give
 							// it a NullInputStream to suck on.
-							in = new NullInputStream();
-							desc.openedStreams.add(in);
+							in = CommandLine.DEVNULL;
 						}
 					}
 				}
 				if (stageNo < nosStages - 1) {
 					// this stage is not the last one, and it hasn't redirected
 					// its stdout, so it will write to a pipe
-					if (out == null) {	
+					if (out == CommandLine.DEFAULT_STDOUT) {	
 						pipeOut = new PipedOutputStream();
 						out = new PrintStream(pipeOut);
 						desc.openedStreams.add(out);
 					}
 				}
 				desc.commandLine.setStreams(new Closeable[] {in, out, err});
+				try {
 				desc.thread = shell.invokeAsynchronous(desc.commandLine);
+				}
+				catch (UnsupportedOperationException ex) {
+					throw new ShellInvocationException(
+							"The current invoker does not support pipelines", ex);
+				}
 				stageNo++;
 			}
 			
@@ -335,7 +340,8 @@ public class RedirectingInterpreter extends DefaultInterpreter implements Thread
 					return -1;
 				}
 			}
-			return descs.get(nosStages - 1).thread.getReturnCode();
+			Runnable runner = descs.get(nosStages - 1).thread.getRunner();
+			return (runner instanceof CommandRunner) ? ((CommandRunner) runner).getRC() : 0;
 		}
 		finally {
 			// Close any remaining streams.
@@ -392,14 +398,14 @@ public class RedirectingInterpreter extends DefaultInterpreter implements Thread
 	
 	private static class CommandDescriptor {
 		public final CommandLine commandLine;
-		public final String fromFileName;
-		public final String toFileName;
+		public final CommandLine.Token fromFileName;
+		public final CommandLine.Token toFileName;
 		public final boolean pipeTo;
 		public List<Closeable> openedStreams;
 		public CommandThread thread;
 		
-		public CommandDescriptor(CommandLine commandLine, String fromFileName, 
-				String toFileName, boolean pipeTo) {
+		public CommandDescriptor(CommandLine commandLine, CommandLine.Token fromFileName, 
+				CommandLine.Token toFileName, boolean pipeTo) {
 			super();
 			this.commandLine = commandLine;
 			this.fromFileName = fromFileName;

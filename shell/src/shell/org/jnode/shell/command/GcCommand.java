@@ -24,6 +24,7 @@ package org.jnode.shell.command;
 import java.io.InputStream;
 import java.io.PrintStream;
 
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.*;
 import org.jnode.vm.Vm;
@@ -33,7 +34,7 @@ import org.jnode.util.NumberUtils;
 /**
  * @author epr
  */
-public class GcCommand {
+public class GcCommand extends AbstractCommand {
 
         public static Help.Info HELP_INFO = new Help.Info(
 		"gc",
@@ -42,7 +43,7 @@ public class GcCommand {
 
 	public static void main(String[] args)
 	throws Exception {
-		new GcCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+		new GcCommand().execute(args);
 	}
 
 	/**

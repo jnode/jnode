@@ -30,8 +30,8 @@ import org.jnode.fs.ftpfs.FTPFSDriver;
 import org.jnode.fs.ftpfs.FTPFileSystemType;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.Command;
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
@@ -44,7 +44,7 @@ import java.io.PrintStream;
 /**
  * @author Levente S\u00e1ntha
  */
-public class FTPMountCommand implements Command {
+public class FTPMountCommand extends AbstractCommand {
     private static final FileArgument MOUNTPOINT_ARG = new FileArgument("directory", "the mountpoint");
     private static final Argument HOST_ARG = new Argument("host", "FTP host");
     private static final Argument USERNAME_ARG = new Argument("username", "FTP user");
@@ -56,13 +56,12 @@ public class FTPMountCommand implements Command {
                     new Parameter(PASSWORD_ARG, Parameter.OPTIONAL)});
 
     public static void main(String[] args) throws Exception {
-        new FTPMountCommand().execute(new CommandLine(args), System.in,
-                System.out, System.err);
+        new FTPMountCommand().execute(args);
     }
 
     public void execute(CommandLine commandLine, InputStream in,
                         PrintStream out, PrintStream err) throws Exception {
-        ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
+        ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
 
         final String mount_point = MOUNTPOINT_ARG.getValue(cmdLine);
         final String host = HOST_ARG.getValue(cmdLine);

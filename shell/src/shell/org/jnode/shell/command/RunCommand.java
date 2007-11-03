@@ -1,6 +1,6 @@
 package org.jnode.shell.command;
 
-import org.jnode.shell.Command;
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.ShellUtils;
 import org.jnode.shell.Shell;
@@ -20,7 +20,7 @@ import java.io.File;
  *
  * @author Levente S\u00e1ntha
  */
-public class RunCommand implements Command {
+public class RunCommand extends AbstractCommand {
 
     static final FileArgument ARG_FILE = new FileArgument("file",
             "a command file", false);
@@ -30,13 +30,12 @@ public class RunCommand implements Command {
                     RunCommand.ARG_FILE, Parameter.MANDATORY) });
 
     public static void main(String[] args) throws Exception {
-        new RunCommand().execute(new CommandLine(args), System.in,
-                System.out, System.err);
+        new RunCommand().execute(args);
     }
 
     public void execute(CommandLine commandLine, InputStream in,
                         PrintStream out, PrintStream err) throws Exception {
-        ParsedArguments cmdLine = RunCommand.HELP_INFO.parse(commandLine.toStringArray());
+        ParsedArguments cmdLine = RunCommand.HELP_INFO.parse(commandLine);
         final File file = RunCommand.ARG_FILE.getFile(cmdLine);
 
         Shell shell = null;
@@ -44,17 +43,17 @@ public class RunCommand implements Command {
             shell = ShellUtils.getShellManager().getCurrentShell();
         } catch( NameNotFoundException e ) {
             e.printStackTrace();
-            return;
+            exit(2);
         }
 
         if( shell == null ) {
             System.err.println( "Shell is null." );
-            return;
+            exit(2);
         }
 
         if(!(shell instanceof CommandShell)) {
             System.err.println("Shell wasn't a CommandShell: " + shell.getClass());
-            return;
+            exit(2);
         }
 
         ((CommandShell)shell).executeFile(file);

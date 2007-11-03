@@ -26,6 +26,7 @@ import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.argument.FileArgument;
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.fs.FileSystemType;
@@ -43,7 +44,7 @@ import java.io.PrintStream;
 /**
  * @author Levente S\u00e1ntha
  */
-public class SMBMountCommand {
+public class SMBMountCommand extends AbstractCommand {
     private static final FileArgument MOUNTPOINT_ARG = new FileArgument("directory", "the mountpoint");
     private static final Argument HOST_ARG = new Argument("host", "Samba host");
     private static final Argument PATH_ARG = new Argument("path", "Samba path");
@@ -57,13 +58,12 @@ public class SMBMountCommand {
                     new Parameter(PASSWORD_ARG, Parameter.OPTIONAL)});
 
     public static void main(String[] args) throws Exception {
-        new SMBMountCommand().execute(new CommandLine(args), System.in,
-                System.out, System.err);
+        new SMBMountCommand().execute(args);
     }
 
     public void execute(CommandLine commandLine, InputStream in,
                         PrintStream out, PrintStream err) throws Exception {
-        ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
+        ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
 
         final String mount_point = MOUNTPOINT_ARG.getValue(cmdLine);
         final String host = HOST_ARG.getValue(cmdLine);

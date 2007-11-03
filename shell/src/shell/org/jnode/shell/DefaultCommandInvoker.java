@@ -65,7 +65,7 @@ public class DefaultCommandInvoker implements CommandInvoker {
 
     public DefaultCommandInvoker(CommandShell commandShell) {
         this.commandShell = commandShell;
-        this.err = commandShell.getErrorStream();
+        this.err = commandShell.resolvePrintStream(CommandLine.DEFAULT_STDERR);
     }
 
     public String getName() {
@@ -78,8 +78,10 @@ public class DefaultCommandInvoker implements CommandInvoker {
     		return 0;
     	}
         try {
-        	Closeable[] streams = cmdLine.getStreams();
-        	if (streams[0] != null || streams[1] != null || streams[2] != null) {
+        	final Closeable[] streams = cmdLine.getStreams();
+        	if (streams[0] != CommandLine.DEFAULT_STDIN || 
+        		streams[1] != CommandLine.DEFAULT_STDOUT || 
+        		streams[2] != CommandLine.DEFAULT_STDERR) {
         		err.println("Warning: redirections ignored by the '" + getName() + "' invoker");
         	}
             CommandInfo cmdInfo = commandShell.getCommandClass(cmdName);
@@ -88,9 +90,9 @@ public class DefaultCommandInvoker implements CommandInvoker {
                 try {
                 	AccessController.doPrivileged(new PrivilegedAction<Void>() {
         				public Void run() {
-        					System.setOut(commandShell.getOutputStream());
-        					System.setErr(commandShell.getErrorStream());
-        					System.setIn(commandShell.getInputStream());
+        					System.setOut(commandShell.resolvePrintStream(streams[1]));
+        					System.setErr(commandShell.resolvePrintStream(streams[2]));
+        					System.setIn(commandShell.resolveInputStream(streams[0]));
         					return null;
         				}
         			});

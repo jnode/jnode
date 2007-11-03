@@ -28,7 +28,7 @@ import org.jnode.driver.Device;
 import org.jnode.driver.net.NetDeviceAPI;
 import org.jnode.naming.InitialNaming;
 import org.jnode.net.ipv4.config.IPv4ConfigurationService;
-import org.jnode.shell.Command;
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
@@ -38,7 +38,7 @@ import org.jnode.shell.help.argument.DeviceArgument;
 /**
  * @author epr
  */
-public class BootpCommand implements Command {
+public class BootpCommand extends AbstractCommand {
 
         static final DeviceArgument ARG_DEVICE = new DeviceArgument("device", "the device to boot from", NetDeviceAPI.class);
 
@@ -52,11 +52,11 @@ public class BootpCommand implements Command {
 
 	public static void main(String[] args)
 	throws Exception {
-		new BootpCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+		new BootpCommand().execute(args);
 	}
 
 	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-		ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
+		ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
 
 		final Device dev = ARG_DEVICE.getDevice(cmdLine);
 		System.out.println("Trying to configure " + dev.getId() + "...");

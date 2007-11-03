@@ -30,6 +30,7 @@ import org.jnode.fs.smbfs.SMBFSDevice;
 import org.jnode.fs.smbfs.SMBFSDriver;
 import org.jnode.fs.smbfs.SMBFileSystemType;
 import org.jnode.naming.InitialNaming;
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.Help;
@@ -42,7 +43,7 @@ import java.io.PrintStream;
 /**
  * @author Levente S\u00e1ntha
  */
-public class MakeSMBDeviceCommand {
+public class MakeSMBDeviceCommand extends AbstractCommand {
     private static final Argument HOST_ARG = new Argument("host", "Samba host");
     private static final Argument PATH_ARG = new Argument("path", "Samba path");
     private static final Argument USERNAME_ARG = new Argument("username", "Samba username");
@@ -55,8 +56,7 @@ public class MakeSMBDeviceCommand {
                     new Parameter(PASSWORD_ARG, Parameter.OPTIONAL)});
 
     public static void main(String[] args) throws Exception {
-        new MakeSMBDeviceCommand().execute(new CommandLine(args), System.in,
-                System.out, System.err);
+        new MakeSMBDeviceCommand().execute(args);
     }
 
     /**
@@ -69,7 +69,7 @@ public class MakeSMBDeviceCommand {
      * @throws Exception
      */
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-        ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
+        ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
 
         // Get the parameters
         final String host = HOST_ARG.getValue(cmdLine);

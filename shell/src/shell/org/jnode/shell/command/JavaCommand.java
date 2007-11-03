@@ -29,6 +29,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 
+import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
@@ -38,7 +40,7 @@ import org.jnode.shell.help.argument.ClassNameArgument;
 /**
  * @author epr
  */
-public class JavaCommand {
+public class JavaCommand extends AbstractCommand {
 
 	static final ClassNameArgument ARG_CLASS = new ClassNameArgument("classname", "the class to excute");
 	static final Argument ARG_ARGS = new Argument("arg", "the argument(s) to pass to the class", Argument.MULTI);
@@ -54,49 +56,25 @@ public class JavaCommand {
 
 	public static void main(String[] args)
 	throws Exception {
-		new JavaCommand().execute(HELP_INFO.parse(args), System.in, System.out, System.err);
+		new JavaCommand().execute(args);
 	}
 
 	/**
 	 * Execute this command
 	 */
-/*	public void execute(
-		ParsedArguments cmdLine,
-		InputStream in,
-		PrintStream out,
-		PrintStream err)
+    public void execute(CommandLine cmdLine, InputStream in, PrintStream out, PrintStream err)
 		throws Exception {
 
-		Class cls = ARG_CLASS.getClass(cmdLine);
-		Method mainMethod = cls.getMethod("main", new Class[] { String[].class });
-
-		String[] clsArgs = ARG_ARGS.getValues(cmdLine);
-		if (clsArgs == null) {
-			clsArgs = new String[0];
-		}
-
-		try {
-			mainMethod.invoke(null, new Object[] { clsArgs });
-		} catch (InvocationTargetException ex) {
-			ex.getTargetException().printStackTrace(err);
-		}
-	}*/
-
-    public void execute(
-		ParsedArguments cmdLine,
-		InputStream in,
-		PrintStream out,
-		PrintStream err)
-		throws Exception {
+    	ParsedArguments args = HELP_INFO.parse(cmdLine);
 
         final ClassLoader parent_cl = Thread.currentThread().getContextClassLoader();
         JCClassLoader cl = new JCClassLoader(parent_cl, new String[]{"./"});
 
-		Class<?> cls = cl.loadClass(ARG_CLASS.getValue(cmdLine));
+		Class<?> cls = cl.loadClass(ARG_CLASS.getValue(args));
 
 		Method mainMethod = cls.getMethod("main", new Class[] { String[].class });
 
-		String[] clsArgs = ARG_ARGS.getValues(cmdLine);
+		String[] clsArgs = ARG_ARGS.getValues(args);
 		if (clsArgs == null) {
 			clsArgs = new String[0];
 		}
@@ -105,6 +83,7 @@ public class JavaCommand {
 			mainMethod.invoke(null, new Object[] { clsArgs });
 		} catch (InvocationTargetException ex) {
 			ex.getTargetException().printStackTrace(err);
+			exit(1);
 		}
 	}
 

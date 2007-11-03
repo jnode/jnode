@@ -26,7 +26,7 @@ import java.io.PrintStream;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.jnode.shell.Command;
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.Shell;
 import org.jnode.shell.ShellUtils;
@@ -44,7 +44,7 @@ import org.jnode.shell.help.argument.ClassNameArgument;
  * @author qades
  * @author Martin Husted Hartvig (hagar@jnode.org)
  */
-public class AliasCommand implements Command {
+public class AliasCommand extends AbstractCommand {
 
     static final AliasArgument ARG_ALIAS = new AliasArgument("alias",
             "the alias");
@@ -72,8 +72,7 @@ public class AliasCommand implements Command {
                             new Parameter[] { PARAM_REMOVE }) });
 
     public static void main(String[] args) throws Exception {
-        new AliasCommand().execute(new CommandLine(args), System.in,
-                System.out, System.err);
+        new AliasCommand().execute(args);
     }
 
     private static void showAliases(AliasManager aliasMgr, PrintStream out)
@@ -91,8 +90,7 @@ public class AliasCommand implements Command {
 
     public void execute(CommandLine commandLine, InputStream in,
             PrintStream out, PrintStream err) throws Exception {
-        ParsedArguments parsedArguments = HELP_INFO.parse(commandLine
-                .toStringArray());
+        ParsedArguments parsedArguments = HELP_INFO.parse(commandLine);
 
         final Shell shell = ShellUtils.getShellManager().getCurrentShell();
         final AliasManager aliasMgr = shell.getAliasManager();

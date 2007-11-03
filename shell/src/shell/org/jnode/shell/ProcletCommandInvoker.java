@@ -68,7 +68,7 @@ public class ProcletCommandInvoker extends AsyncCommandInvoker {
     	return "proclet";
     }
 
-    CommandThread createThread(CommandLine cmdLine, Runnable cr) {
+    CommandThread createThread(CommandLine cmdLine, CommandRunner cr) {
     	Closeable[] streams = cmdLine.getStreams();
         VmSystem.switchToExternalIOContext(new ProcletIOContext());
         return ProcletContext.createProclet(
@@ -77,12 +77,12 @@ public class ProcletCommandInvoker extends AsyncCommandInvoker {
         		cmdLine.getCommandName());
     }
 
-    Runnable createRunner(Class cx, Method method, Object[] args, 
+    CommandRunner createRunner(Class cx, Method method, Object[] args, 
     		InputStream commandIn, PrintStream commandOut, PrintStream commandErr) {
 		return new ProcletCommandRunner(cx, method, args, commandIn, commandOut, commandErr);
 	}
 
-	class ProcletCommandRunner extends AsyncCommandInvoker.CommandRunner {
+	class ProcletCommandRunner extends CommandRunner {
 		private final InputStream commandIn;
 		private final PrintStream commandOut;
 		private final PrintStream commandErr;
@@ -94,7 +94,7 @@ public class ProcletCommandInvoker extends AsyncCommandInvoker {
 
         public ProcletCommandRunner(Class cx, Method method, Object[] args, 
         		InputStream commandIn, PrintStream commandOut, PrintStream commandErr) {
-        	super();
+        	super(commandShell);
             this.cx = cx;
             this.method = method;
             this.args = args;
@@ -105,9 +105,7 @@ public class ProcletCommandInvoker extends AsyncCommandInvoker {
 
         public void run() {
             try {
-            	CommandThread.setRC(0);
             	try {
-
             		AccessController.doPrivileged(new PrivilegedAction<Void>() {
         				public Void run() {
         					System.setOut(commandOut);
@@ -145,7 +143,7 @@ public class ProcletCommandInvoker extends AsyncCommandInvoker {
                     unblock();
                 } else if (tex instanceof VmExit) {
                 	VmExit vex = (VmExit) tex;
-                	CommandThread.setRC(vex.getStatus());
+                	setRC(vex.getStatus());
                     unblock();
                 } else {
                     err.println("Exception in command");

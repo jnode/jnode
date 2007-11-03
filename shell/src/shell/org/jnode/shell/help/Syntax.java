@@ -141,9 +141,10 @@ public class Syntax {
         Parameter param = null;
         final ParameterIterator paramIterator = new ParameterIterator();
         String s;
-        cmdLine.reset();
-        while (cmdLine.hasNext()) {
-            s = cmdLine.next();
+        // FIXME - should use a Token iterator here ...
+        Iterator<String> it = cmdLine.iterator();
+        while (it.hasNext()) {
+            s = it.next();
             if (DEBUG) LOGGER.debug("Syntax.visitor: arg '" + s + "'");
             if (param == null) {
             	if (paramIterator.hasNext()) {
@@ -155,10 +156,10 @@ public class Syntax {
                 }
             }
 
-            final boolean last = !cmdLine.hasNext();
+            final boolean last = !it.hasNext();
             Argument arg = param.getArgument();
             if (arg != null) {
-            String value = visitor.visitValue(s, last, cmdLine.getTokenType());
+            	String value = visitor.visitValue(s, last, CommandLine.LITERAL);
             if (value != null) {
             	if (visitor.isValueValid(arg, value, last)) {
             		arg.setValue(value);

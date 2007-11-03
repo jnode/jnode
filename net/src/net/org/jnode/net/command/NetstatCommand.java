@@ -29,7 +29,7 @@ import org.jnode.net.NetworkLayer;
 import org.jnode.net.NetworkLayerManager;
 import org.jnode.net.TransportLayer;
 import org.jnode.net.util.NetUtils;
-import org.jnode.shell.Command;
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
 import org.jnode.util.Statistic;
@@ -38,7 +38,7 @@ import org.jnode.util.Statistics;
 /**
  * @author epr
  */
-public class NetstatCommand implements Command {
+public class NetstatCommand extends AbstractCommand {
 
 	public static Help.Info HELP_INFO = new Help.Info(
 		"netstat",
@@ -47,7 +47,7 @@ public class NetstatCommand implements Command {
 
 	public static void main(String[] args)
 	throws Exception {
-		new NetstatCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+		new NetstatCommand().execute(args);
 	}
 
 	/**

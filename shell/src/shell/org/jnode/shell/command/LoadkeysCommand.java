@@ -30,6 +30,8 @@ import org.jnode.driver.DeviceUtils;
 import org.jnode.driver.input.KeyboardAPI;
 import org.jnode.driver.input.KeyboardInterpreter;
 import org.jnode.driver.input.KeyboardInterpreterFactory;
+import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
@@ -43,7 +45,7 @@ import org.jnode.shell.help.argument.LanguageArgument;
  * @version Feb 2004
  * @since 0.15
  */
-public class LoadkeysCommand {
+public class LoadkeysCommand extends AbstractCommand {
 
     static final Argument COUNTRY = new CountryArgument("country", "country parameter");
 
@@ -66,18 +68,18 @@ public class LoadkeysCommand {
 				});
 
     public static void main(String[] args) throws Exception {
-        new LoadkeysCommand().execute(args, System.in, System.out, System.err);
+        new LoadkeysCommand().execute(args);
     }
 
     /**
      * Execute this command
      */
-    protected void execute(String[] args, InputStream in, PrintStream out,
+    public void execute(CommandLine cmdLine, InputStream in, PrintStream out,
             PrintStream err) throws Exception {
         final Collection<Device> kbDevs = DeviceUtils
                 .getDevicesByAPI(KeyboardAPI.class);
 
-        ParsedArguments cmdLine = HELP_INFO.parse(args);
+        ParsedArguments args = HELP_INFO.parse(cmdLine);
 
         for (Device kb : kbDevs) {
             final KeyboardAPI api = kb.getAPI(KeyboardAPI.class);
@@ -86,9 +88,9 @@ public class LoadkeysCommand {
                 out.println("layout currently loaded : "
                         + api.getKbInterpreter().getClass().getName());
             } else {
-                final String country = COUNTRY.getValue(cmdLine);
-                String language = LANGUAGE.getValue(cmdLine);
-                String variant = VARIANT.getValue(cmdLine);
+                final String country = COUNTRY.getValue(args);
+                String language = LANGUAGE.getValue(args);
+                String variant = VARIANT.getValue(args);
 
                 //TODO add more validation for country and language
                 if(language != null &&

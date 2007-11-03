@@ -26,20 +26,20 @@ import java.io.PrintStream;
 import java.util.Set;
 
 import org.jnode.naming.InitialNaming;
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
 
 /**
  * @author epr
  */
-public class NamespaceCommand {
+public class NamespaceCommand extends AbstractCommand {
 
     public static Help.Info HELP_INFO = new Help.Info("namespace",
             "Print the contents of the system namespace");
 
     public static void main(String[] args) throws Exception {
-        new NamespaceCommand().execute(new CommandLine(args), System.in,
-                System.out, System.err);
+        new NamespaceCommand().execute(args);
     }
 
     /**

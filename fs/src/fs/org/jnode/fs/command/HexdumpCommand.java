@@ -4,7 +4,7 @@
 
 package org.jnode.fs.command;
 
-import org.jnode.shell.Command;
+import org.jnode.shell.AbstractCommand; 
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.Help;
@@ -22,7 +22,7 @@ import java.net.URL;
 /**
  * @author gvt
  */
-public class HexdumpCommand implements Command {
+public class HexdumpCommand extends AbstractCommand {
     static final Argument ARG_FILE = new FileArgument("file",
             "the file (or URL) to print out");
 
@@ -31,17 +31,18 @@ public class HexdumpCommand implements Command {
             new Parameter[]{new Parameter(ARG_FILE, Parameter.MANDATORY)});
 
     public static void main(String[] args) throws Exception {
-        new HexdumpCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+        new HexdumpCommand().execute(args);
     }
 
 
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-        ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
+        ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
         URL url = openURL(ARG_FILE.getValue(cmdLine));
         InputStream is = url.openStream();
 
         if (is == null) {
             err.println("Not found " + ARG_FILE.getValue(cmdLine));
+            exit(1);
         } else {
             final int rowlen = 16;
             int prt = 0;

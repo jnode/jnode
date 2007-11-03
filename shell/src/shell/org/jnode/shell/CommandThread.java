@@ -29,36 +29,39 @@ package org.jnode.shell;
  */
 public class CommandThread extends Thread {
 	
-	private int rc;
 	private ThreadExitListener listener;
+	private Runnable runner;
 	
 	/**
 	 * @param group the parent group for the thread
-	 * @param target the runnable that implements the command
+	 * @param runner the runnable that implements the command
 	 * @param name a thread name
 	 * @param size the threads stack size
 	 * @param invoker the invoker to be notified of the thread's exit
 	 */
-	public CommandThread(ThreadGroup group, Runnable target, String name, long size) {
-		super(group, target, name, size);
+	public CommandThread(ThreadGroup group, Runnable runner, String name, long size) {
+		super(group, runner, name, size);
+		this.runner = runner;
 	}
 
 	/**
 	 * @param group the parent group for the thread
-	 * @param target the runnable that implements the command
+	 * @param runner the runnable that implements the command
 	 * @param invoker the invoker to be notified of the thread's exit
 	 */
-	public CommandThread(ThreadGroup group, Runnable target) {
-		super(group, target);
+	public CommandThread(ThreadGroup group, Runnable runner) {
+		super(group, runner);
+		this.runner = runner;
 	}
 
 	/**
-	 * @param target the runnable that implements the command
+	 * @param runner the runnable that implements the command
 	 * @param name a thread name
 	 * @param invoker the invoker to be notified of the thread's exit
 	 */
-	public CommandThread(Runnable target, String name) {
-		super(target, name);
+	public CommandThread(Runnable runner, String name) {
+		super(runner, name);
+		this.runner = runner;
 	}
 
 	@Override
@@ -74,8 +77,9 @@ public class CommandThread extends Thread {
 	}
 
 	/**
-	 * This overload for start registers an optional thread exit listener
-	 * to be notified of the thread's exit
+	 * This overload for start first registers an optional "thread exit" listener.
+	 * If non-null, the listener object's "notifyThreadExitted" method will be 
+	 * called to notify the listener when the thread exits.
 	 * 
 	 * @param listener the listener or <code>null</code>
 	 */
@@ -84,18 +88,7 @@ public class CommandThread extends Thread {
 		super.start();
 	}
 
-	public final int getReturnCode() {
-		return rc;
-	}
-
-	public final void setReturnCode(int rc) {
-		this.rc = rc;
-	}
-	
-	public static final void setRC(int rc) throws ClassCastException {
-        Thread thread = Thread.currentThread();
-        //todo this is not true for "internal" commands like 'classpath', why?
-        if(thread instanceof CommandThread)
-            ((CommandThread) thread).setReturnCode(rc);
+    public Runnable getRunner() {
+    	return this.runner;
 	}
 }

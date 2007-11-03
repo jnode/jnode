@@ -24,6 +24,7 @@ package org.jnode.shell.command;
 import java.io.InputStream;
 import java.io.PrintStream;
 
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.Command;
 import org.jnode.shell.help.Help;
@@ -32,13 +33,13 @@ import org.jnode.util.NumberUtils;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class MemoryCommand implements Command 
+public class MemoryCommand extends AbstractCommand
 {
 
 	public static Help.Info HELP_INFO = new Help.Info("memory", "View the current memory status");
 
 	public static void main(String[] args) throws Exception {
-		new MemoryCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+		new MemoryCommand().execute(args);
 	}
 
 	/**

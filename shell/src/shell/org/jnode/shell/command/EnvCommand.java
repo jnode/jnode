@@ -30,13 +30,14 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
 
 /**
  * @author epr
  */
-public class EnvCommand {
+public class EnvCommand extends AbstractCommand {
 
         public static Help.Info HELP_INFO = new Help.Info(
 		"env",
@@ -45,17 +46,13 @@ public class EnvCommand {
 
 	public static void main(String[] args)
 	throws Exception {
-		new EnvCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+		new EnvCommand().execute(args);
 	}
 
 	/**
 	 * Execute this command
 	 */
-	public void execute(
-		CommandLine cmdLine,
-		InputStream in,
-		PrintStream out,
-		PrintStream err)
+	public void execute(CommandLine cmdLine, InputStream in, PrintStream out, PrintStream err)
 		throws Exception {
 
 	    final Properties ps = (Properties)AccessController.doPrivileged(new GetPropertiesAction());

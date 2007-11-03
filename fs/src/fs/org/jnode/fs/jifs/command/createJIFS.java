@@ -38,6 +38,7 @@ import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.Syntax;
 import org.jnode.shell.help.argument.OptionArgument;
 
+//todo fix class name
 /**
  * Just mounts initial JIFS on /Jifs
  * 
@@ -62,7 +63,7 @@ public class createJIFS implements Command{
                     new Parameter[] { PARAM_ACTION })});
 
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-		ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
+		ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
 		String Act = ACTION.getValue(cmdLine);
 		
 		try{

@@ -29,7 +29,7 @@ import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.net.NetworkException;
 import org.jnode.driver.net.WirelessNetDeviceAPI;
-import org.jnode.shell.Command;
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.Help;
@@ -42,7 +42,7 @@ import org.jnode.shell.help.argument.OptionArgument;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class WLanCtlCommand implements Command {
+public class WLanCtlCommand extends AbstractCommand {
 
     private static final String FUNC_SETESSID = "setessid";
 
@@ -66,7 +66,7 @@ public class WLanCtlCommand implements Command {
     private static final Logger log = Logger.getLogger(HELP_INFO.getName());
 
     public static void main(String[] args) throws Exception, SyntaxErrorException {
-    	new WLanCtlCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+    	new WLanCtlCommand().execute(args);
     }
 
     private static void setESSID(Device dev, WirelessNetDeviceAPI api,
@@ -77,7 +77,7 @@ public class WLanCtlCommand implements Command {
     }
 
 	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-		ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
+		ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
 
         final Device dev = ARG_DEVICE.getDevice(cmdLine);
         final WirelessNetDeviceAPI api;
@@ -86,7 +86,8 @@ public class WLanCtlCommand implements Command {
         } catch (ApiNotFoundException e) {
             System.err.println("Device " + dev.getId()
                     + " is not a wireless network device");
-            return;
+            exit(2);
+            return;  // not reached
         }
 
         // Get the function
@@ -96,11 +97,13 @@ public class WLanCtlCommand implements Command {
                 setESSID(dev, api, cmdLine);
             } else {
                 System.err.println("Unknown function " + function);
+                exit(3);
             }
         } catch (NetworkException ex) {
             System.err.println("Function " + function + " failed: "
                     + ex.getMessage());
             log.debug("Function " + function + " failed", ex);
+            exit(1);
         }
 	}
 }

@@ -28,12 +28,13 @@ import org.jnode.shell.help.*;
 import org.jnode.shell.help.argument.StringArgument;
 import org.jnode.shell.help.argument.FileArgument;
 import org.jnode.shell.help.argument.OptionArgument;
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 
 /**
  * @author Levente S\u00e1ntha
  */
-public class BshCommand {
+public class BshCommand extends AbstractCommand {
 
     private static final StringArgument ARG_CODE = new StringArgument("code", "a BeanShell code snippet to execute");
     static final OptionArgument ARG_C = new OptionArgument("-c", "execute code",
@@ -60,11 +61,11 @@ public class BshCommand {
     );
 
     public static void main(String[] args) throws Exception {
-        new BshCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+        new BshCommand().execute(args);
     }
 
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-        ParsedArguments parsedArguments = HELP_INFO.parse(commandLine.toStringArray());
+        ParsedArguments parsedArguments = HELP_INFO.parse(commandLine);
         Interpreter bsh = null;
         Object ret;
         boolean interactive = false;

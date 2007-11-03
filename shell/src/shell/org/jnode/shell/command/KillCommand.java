@@ -24,7 +24,7 @@ package org.jnode.shell.command;
 import java.io.InputStream;
 import java.io.PrintStream;
 
-import org.jnode.shell.Command;
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.ParsedArguments;
@@ -35,7 +35,7 @@ import org.jnode.shell.help.argument.IntegerArgument;
 /**
  * @author Andreas H\u00e4nel
  */
-public class KillCommand implements Command{
+public class KillCommand extends AbstractCommand {
 	
 	 static IntegerArgument ARG_THREADID = new IntegerArgument("id", "the id of the thread to kill");
 	
@@ -49,11 +49,11 @@ public class KillCommand implements Command{
 			});
 	 
 	public static void main(String[] args) throws Exception {
-	    new KillCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+	    new KillCommand().execute(args);
 	}
 	
 	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-		ParsedArguments parsedArguments = HELP_INFO.parse(commandLine.toStringArray());
+		ParsedArguments parsedArguments = HELP_INFO.parse(commandLine);
 		out.print("going to kill Thread with id : ");
 		out.println(ARG_THREADID.getInteger(parsedArguments));
 	      // kill Thread

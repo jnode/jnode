@@ -34,7 +34,7 @@ import org.jnode.fs.nfs.nfs2.NFS2FileSystemType;
 import org.jnode.fs.nfs.nfs2.NFS2Device.Protocol;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
-import org.jnode.shell.Command;
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
@@ -48,7 +48,7 @@ import org.jnode.shell.help.argument.OptionArgument;
 /**
  * @author Andrei Dore
  */
-public class NFSMountCommand implements Command {
+public class NFSMountCommand extends AbstractCommand {
     private static final FileArgument MOUNTPOINT_ARG = new FileArgument("directory", "the mountpoint");
     private static final HostNameArgument HOST_ARG = new HostNameArgument("host", "NFS host");
     private static final FileArgument REMOTE_DIRECTORY_ARG = new FileArgument("remoteDir", "remote directory");
@@ -76,11 +76,11 @@ public class NFSMountCommand implements Command {
 	    PARAMETER_USER_ID, PARAMETER_GROUP_ID, PARAMETER_PROTOCOL }));
 
     public static void main(String[] args) throws Exception {
-	new NFSMountCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+        new NFSMountCommand().execute(args);
     }
 
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-	ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
+        ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
 
 	final String mount_point = MOUNTPOINT_ARG.getValue(cmdLine);
 	final String host = HOST_ARG.getValue(cmdLine);
