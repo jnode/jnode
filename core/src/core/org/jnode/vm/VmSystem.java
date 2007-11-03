@@ -270,7 +270,7 @@ public final class VmSystem {
 
         // Standard Java properties
         res.put("file.separator", "/");
-        res.put("java.awt.graphicsenv", "");
+        res.put("java.awt.graphicsenv", "org.jnode.awt.JNodeGraphicsEnvironment");
         res.put("java.awt.printerjob", "");
         res.put("java.class.path", "");
         res.put("java.class.version", "50.0");
