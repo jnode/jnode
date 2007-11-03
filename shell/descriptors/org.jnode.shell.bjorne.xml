@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.shell.bjorne"
+        name="JNode Bjorne Shell"
+        version="@VERSION@"
+        license-name="lgpl"
+        provider-name="JNode.org"
+		class="org.jnode.shell.bjorne.BjorneShellPlugin">
+
+  <requires>
+    <import plugin="org.jnode.shell.help"/>
+    <import plugin="org.jnode.shell"/>
+  </requires>
+
+  <runtime>
+    <library name="jnode-shell.jar">
+      <export name="org.jnode.shell.bjorne.*"/>
+    </library>
+  </runtime>
+
+  <extension point="org.jnode.security.permissions">
+	<permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
+    <permission class="java.lang.RuntimePermission" name="setSecurityManager" actions="*" />
+    <permission class="java.lang.RuntimePermission" name="createClassLoader" actions="*" />
+    <permission class="java.lang.RuntimePermission" name="setIO" actions="*" />
+    <permission class="java.lang.RuntimePermission" name="exitVM" actions="*" />
+    <permission class="org.jnode.security.JNodePermission" name="getVmClass" actions="*" />
+    <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>    
+  </extension>
+  
+</plugin>

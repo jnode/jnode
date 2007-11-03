@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.shell.command.unix"
+  name="JNode System Commands"
+  version="@VERSION@"
+        license-name="lgpl"
+  provider-name="JNode.org">
+
+  <requires>
+    <import plugin="org.jnode.shell.help"/>
+  </requires>
+
+  <runtime>
+    <library name="jnode-shell.jar">
+      <export name="org.jnode.shell.command.unix.*"/>
+    </library>
+  </runtime>
+
+  <extension point="org.jnode.shell.aliases">
+    <alias name="test" class="org.jnode.shell.command.unix.UnixTestCommand"/>
+    <alias name="[" class="org.jnode.shell.command.unix.UnixTestCommand"/>
+  </extension>
+
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>
+    <permission class="java.lang.RuntimePermission" name="getProtectionDomain"/>
+    <permission class="java.lang.RuntimePermission" name="createClassLoader"/>
+    <permission class="java.lang.RuntimePermission" name="setContextClassLoader"/>
+    <permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/>  
+    <permission class="java.lang.RuntimePermission" name="setIO" actions="*" />
+    <permission class="java.lang.RuntimePermission" name="exitVM" actions="*" />
+    <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
+    <permission class="org.jnode.security.JNodePermission" name="getVmThread"/>
+    <permission class="org.jnode.security.JNodePermission" name="getVmClass"/>
+    <permission class="java.net.SocketPermission" name="*" actions="resolve"/>
+    <permission class="java.net.SocketPermission" name="*:0-" actions="connect,resolve"/>
+    <permission class="java.lang.RuntimePermission" name="writeFileDescriptor"/>
+    <permission class="java.lang.RuntimePermission" name="readFileDescriptor"/>
+  </extension>
+
+</plugin>
