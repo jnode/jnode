@@ -122,8 +122,10 @@
       <export name="java.util.regex.*"/>
       <export name="java.util.spi.*"/>
       <export name="java.util.zip.*"/>
+        
+      <export name="java.util.concurrent.atomic.AtomicReferenceFieldUpdater"/>
       
-	  <export name="javax.*" />
+      <export name="javax.*" />
       <export name="javax.isolate.*"/>
       
 	  <export name="javax.naming.*"/>
