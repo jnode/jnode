@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.PrintStream;
 
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
@@ -36,29 +37,36 @@ import org.jnode.shell.help.argument.FileArgument;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Andreas H\u00e4nel
  */
-public class CdCommand implements Command{
+public class CdCommand extends AbstractCommand {
 
 	static final FileArgument ARG_DIR = new FileArgument("directory", "the directory to switch to");
-	public static Help.Info HELP_INFO = new Help.Info("cd", "Go to the given directory", new Parameter[] { new Parameter(ARG_DIR, Parameter.MANDATORY)});
+	public static Help.Info HELP_INFO = new Help.Info("cd", "Go to the given directory", 
+			new Parameter[] { new Parameter(ARG_DIR, Parameter.MANDATORY)});
 
 	public static void main(String[] args) throws Exception {
-		new DirCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+		new CdCommand().execute(args);
 	}
 	
-	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-		ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
+	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
+	throws Exception {
+		ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
 		String dir_str = ARG_DIR.getValue(cmdLine);
 		
-		if (((dir_str == null)&&(System.getProperty("user.dir").equals("/")))||((dir_str != null)&&(dir_str.equals("/")))){
-			//System.getProperties().setProperty("user.dir", "/");
+		// FIXME the following seems to cater for an optional <directory> argument, but the
+		// HELP_INFO syntax declares it as mandatoty.
+		if ((dir_str == null && System.getProperty("user.dir").equals("/")) ||
+			(dir_str != null && dir_str.equals("/"))) {
 			System.setProperty("user.dir", "/");
 		} else {
 			File dir = ARG_DIR.getFile(cmdLine);
-			if (dir==null) dir = new File(System.getProperty("user.dir"));
+			if (dir == null) {
+				dir = new File(System.getProperty("user.dir"));
+			}
 			if (dir.exists() && dir.isDirectory()) {
 				System.setProperty("user.dir", dir.getAbsoluteFile().getCanonicalPath());
 			} else {
 				System.err.println(dir + " is not a valid directory");
+				exit(1);
 			}
 		}
 			

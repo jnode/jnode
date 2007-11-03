@@ -35,7 +35,7 @@ import org.jnode.fs.FileSystemType;
 import org.jnode.fs.jfat.FatFileSystemType;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
-import org.jnode.shell.Command;
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.argument.DeviceArgument;
 import org.jnode.shell.help.Help;
@@ -50,7 +50,7 @@ import org.jnode.shell.help.Syntax;
  * The FAT32 formating  command.
  *
  */
-public class FatFormatCommand implements Command{
+public class FatFormatCommand extends AbstractCommand {
 	 private static final Logger log =
         Logger.getLogger ( FatFormatCommand.class );
 	 
@@ -84,13 +84,13 @@ public class FatFormatCommand implements Command{
 	 
 	 
 	 public static void main(String[] args) throws Exception{
-		 new FatFormatCommand().execute(new CommandLine(args), System.in, System.out, System.err); 
+		 new FatFormatCommand().execute(args); 
 	 }
 	 
 	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
 		    try {		    
             System.out.println("mkjfat:JFAT Formatter.  Version :1.0");
-			ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
+			ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
 
             String device = ARG_DEVICE.getValue(cmdLine);            
             Integer bsize;

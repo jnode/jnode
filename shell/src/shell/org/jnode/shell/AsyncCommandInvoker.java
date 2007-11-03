@@ -25,7 +25,6 @@ package org.jnode.shell;
 import java.awt.event.KeyEvent;
 import java.io.Closeable;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -68,7 +67,7 @@ public abstract class AsyncCommandInvoker implements CommandInvoker, KeyboardLis
 
     public AsyncCommandInvoker(CommandShell commandShell) {
         this.commandShell = commandShell;
-        this.err = commandShell.getErrorStream();
+        this.err = commandShell.resolvePrintStream(CommandLine.DEFAULT_STDERR);
         commandShell.getConsole().addKeyboardListener(this);// listen for
         // ctrl-c
     }
@@ -78,7 +77,7 @@ public abstract class AsyncCommandInvoker implements CommandInvoker, KeyboardLis
     	if (cmdInfo == null) {
     		return 0;
     	}
-    	Runnable cr = setup(cmdLine, cmdInfo);
+    	CommandRunner cr = setup(cmdLine, cmdInfo);
     	return runIt(cmdLine, cmdInfo, cr);
     }
 
@@ -88,7 +87,7 @@ public abstract class AsyncCommandInvoker implements CommandInvoker, KeyboardLis
     	if (cmdInfo == null) {
     		return null;
     	}
-    	Runnable cr = setup(cmdLine, cmdInfo);
+    	CommandRunner cr = setup(cmdLine, cmdInfo);
     	return forkIt(cmdLine, cmdInfo, cr);
 	}
 
@@ -105,20 +104,17 @@ public abstract class AsyncCommandInvoker implements CommandInvoker, KeyboardLis
                 }
                 }
 
-    private Runnable setup(CommandLine cmdLine, CommandInfo cmdInfo) throws ShellException {
+    private CommandRunner setup(CommandLine cmdLine, CommandInfo cmdInfo) throws ShellException {
         Method method;
-        Runnable cr = null;
+        CommandRunner cr = null;
 
         Closeable[] streams = cmdLine.getStreams();
         InputStream in;
         PrintStream out, err;
         try {
-        	in = (InputStream) ((streams[0] == null) ? commandShell.getInputStream() : streams[0]);
-        	OutputStream tmp = (OutputStream) 
-        		((streams[1] == null) ? commandShell.getOutputStream() : streams[1]);
-        	out = (tmp instanceof PrintStream) ? (PrintStream) tmp : new PrintStream(tmp);
-        	tmp = (OutputStream) ((streams[2] == null) ? commandShell.getErrorStream() : streams[2]);
-        	err = (tmp instanceof PrintStream) ? (PrintStream) tmp : new PrintStream(tmp);
+        	in = commandShell.resolveInputStream(streams[0]);
+        	out = commandShell.resolvePrintStream(streams[1]);
+        	err = commandShell.resolvePrintStream(streams[2]);
         }
         catch (ClassCastException ex) {
         	throw new ShellFailureException("streams array broken", ex);
@@ -138,7 +134,9 @@ public abstract class AsyncCommandInvoker implements CommandInvoker, KeyboardLis
         	try {
         		method = cmdInfo.getCommandClass().getMethod(MAIN_METHOD, MAIN_ARG_TYPES);
         		if ((method.getModifiers() & Modifier.STATIC) != 0) {
-        			if (streams[0] != null || streams[1] != null || streams[2] != null) {
+        			if (streams[0] != CommandLine.DEFAULT_STDIN || 
+        				streams[1] != CommandLine.DEFAULT_STDOUT || 
+        				streams[2] != CommandLine.DEFAULT_STDERR) {
         				throw new ShellInvocationException(
         						"Entry point method for " + cmdInfo.getCommandClass() + 
         						" does not allow redirection or pipelining");
@@ -155,13 +153,12 @@ public abstract class AsyncCommandInvoker implements CommandInvoker, KeyboardLis
         	throw new ShellInvocationException(
         			"No suitable entry point method for " + cmdInfo.getCommandClass());
         }
-        if (streams == null) {
+        // THese are now the real streams ...
         	cmdLine.setStreams(new Closeable[]{in, out, err});
-        }
         return cr;
     }
     
-    public int runIt(CommandLine cmdLine, CommandInfo cmdInfo, Runnable cr) 
+    public int runIt(CommandLine cmdLine, CommandInfo cmdInfo, CommandRunner cr) 
     throws ShellInvocationException {
                 try {
                 	if (cmdInfo.isInternal()) {
@@ -189,7 +186,7 @@ public abstract class AsyncCommandInvoker implements CommandInvoker, KeyboardLis
                             }
                         }
                     }
-    		return 0;
+    		return cr.getRC();
                 } catch (Exception ex) {
     		throw new ShellInvocationException("Uncaught Exception in command", ex);
                 } catch (Error ex) {
@@ -201,7 +198,7 @@ public abstract class AsyncCommandInvoker implements CommandInvoker, KeyboardLis
             }
         }
 
-    public CommandThread forkIt(CommandLine cmdLine, CommandInfo cmdInfo, Runnable cr) 
+    public CommandThread forkIt(CommandLine cmdLine, CommandInfo cmdInfo, CommandRunner cr) 
     throws ShellInvocationException {
     	if (cmdInfo.isInternal()) {
     		throw new ShellFailureException("unexpected internal command");
@@ -213,7 +210,7 @@ public abstract class AsyncCommandInvoker implements CommandInvoker, KeyboardLis
     	} 
     }
 
-    abstract CommandThread createThread(CommandLine cmdLine, Runnable cr);
+    abstract CommandThread createThread(CommandLine cmdLine, CommandRunner cr);
 
 	public void keyPressed(KeyboardEvent ke) {
         //disabling Ctrl-C since currently we have no safe method for killing a thread
@@ -262,24 +259,10 @@ public abstract class AsyncCommandInvoker implements CommandInvoker, KeyboardLis
         return blocking;
     }
 
+
     public void keyReleased(KeyboardEvent event) {
     }
     
-    abstract Runnable createRunner(Class cx, Method method, Object[] args, 
+    abstract CommandRunner createRunner(Class cx, Method method, Object[] args, 
         		InputStream commandIn, PrintStream commandOut, PrintStream commandErr);
-
-    
-    abstract class CommandRunner implements Runnable {
-
-    	boolean isDebugEnabled() {
-    		return commandShell.isDebugEnabled();
-    	}
-    	
-    	void stackTrace(Throwable ex) {
-    		if (ex != null && isDebugEnabled()) {
-    			ex.printStackTrace(err);
-    		}
-    	}
-
-    }
 }

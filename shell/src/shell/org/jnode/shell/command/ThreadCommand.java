@@ -24,7 +24,7 @@ package org.jnode.shell.command;
 import java.io.InputStream;
 import java.io.PrintStream;
 
-import org.jnode.shell.Command;
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
@@ -39,25 +39,26 @@ import org.jnode.vm.scheduler.VmThread;
  * @author Martin Husted Hartvig (hagar@jnode.org)
  */
 
-public class ThreadCommand  implements Command
+public class ThreadCommand extends AbstractCommand
 {
 	private static final ThreadNameArgument ARG_NAME = new ThreadNameArgument("threadName", "the name of the thread to view");
 	private static final Parameter PAR_NAME = new Parameter(ARG_NAME, Parameter.OPTIONAL);
 
 	public static Help.Info HELP_INFO = new Help.Info("thread", "View all or a specific threads", new Parameter[] { PAR_NAME });
 
-  private final static String seperator = ", ", slash_t = "\t", group = "Group ";
+    private final static String SEPARATOR = ", ", SLASH_T = "\t", GROUP = "Group ";
+
 
 	public static void main(String[] args) throws Exception {
-
-		new ThreadCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+		new ThreadCommand().execute(args);
 	}
 
 	/**
 	 * Execute this command
 	 */
-	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-    ParsedArguments parsedArguments = HELP_INFO.parse(commandLine.toStringArray());
+	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
+	throws Exception {
+		ParsedArguments parsedArguments = HELP_INFO.parse(commandLine);
 
 		if (PAR_NAME.isSet(parsedArguments)) {
 			execute(out, ARG_NAME.getValue(parsedArguments));
@@ -84,7 +85,7 @@ public class ThreadCommand  implements Command
 		}
 
 		if (threadName != null) {
-			out.print(group);
+			out.print(GROUP);
 			out.println(grp.getName());
 		}
 
@@ -97,15 +98,15 @@ public class ThreadCommand  implements Command
             final Thread t = ts[i];
             if (t != null) {
                 if ((threadName == null) || threadName.equals(t.getName())) {
-                    out.print(slash_t);
+                    out.print(SLASH_T);
                     StringBuilder buffer = new StringBuilder();
 
                     buffer.append(t.getId());
-                    buffer.append(seperator);
+                    buffer.append(SEPARATOR);
                     buffer.append(t.getName());
-                    buffer.append(seperator);
+                    buffer.append(SEPARATOR);
                     buffer.append(t.getPriority());
-                    buffer.append(seperator);
+                    buffer.append(SEPARATOR);
                     buffer.append(t.getVmThread().getThreadStateName());
 
                     out.println(buffer.toString());
@@ -114,8 +115,8 @@ public class ThreadCommand  implements Command
                         final int traceLen = trace.length;
                         for (int k = 0; k < traceLen; k++) {
                             buffer = new StringBuilder();
-                            buffer.append(slash_t);
-                            buffer.append(slash_t);
+                            buffer.append(SLASH_T);
+                            buffer.append(SLASH_T);
                             buffer.append(trace[k]);
 
                             out.println(buffer.toString());

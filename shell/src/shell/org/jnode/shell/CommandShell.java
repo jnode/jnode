@@ -21,10 +21,12 @@
 
 package org.jnode.shell;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FilterInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.Reader;
 import java.io.StringReader;
@@ -164,19 +166,17 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
 
     public CommandShell(TextConsole cons) throws ShellException {
     	try {
-            this.console = cons;
-            this.out = this.console.getOut();
-            this.err = this.console.getErr();
-        	this.in = this.console.getIn();
+            console = cons;
+            out = console.getOut();
+            err = console.getErr();
+        	in = console.getIn();
         	SystemInputStream.getInstance().initialize(this.in);
         	cons.setCompleter(this);
 
-            this.console.addConsoleListener(this);
-            // threads for commands.
+            console.addConsoleListener(this);
             aliasMgr = ((AliasManager) InitialNaming.lookup(AliasManager.NAME))
                     .createAliasManager();
             System.setProperty(PROMPT_PROPERTY_NAME, DEFAULT_PROMPT);
-        	// ShellUtils.getShellManager().registerShell(this);
         } catch (NameNotFoundException ex) {
             throw new ShellException("Cannot find required resource", ex);
         }
@@ -582,10 +582,13 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         }
     }
 
-    public InputStream getInputStream() {
+    private InputStream getInputStream() {
     	if (isHistoryEnabled()) {
     		// Insert a filter on the input stream that adds completed input lines
-    		// to the application input history.
+    		// to the application input history.  (Since the filter is stateless,
+    		// it doesn't really matter if we do this multiple times.)
+    		// FIXME if we partition the app history by application, we will need
+    		// to bind the history object in the history input stream constructor.
     		return new HistoryInputStream(in);
     	}
     	else {
@@ -642,14 +645,6 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
 			}
 		}
 	}
-
-    public PrintStream getOutputStream() {
-        return out;
-    }
-
-    public PrintStream getErrorStream() {
-        return err;
-    }
 
     public CommandInvoker getDefaultCommandInvoker() {
     	return ShellUtils.createInvoker("default", this);
@@ -716,6 +711,64 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
 
     private void setHistoryEnabled(boolean historyEnabled) {
         this.historyEnabled = historyEnabled;
+    }
+
+    /**
+     * This helper does the work of mapping stream marker objects to
+     * the streams that they denote.  A real stream maps to itself,
+     * and <code>null</code> maps to a NullInputStream or NullOutputStream.
+     * 
+     * @param stream A real stream or a stream marker
+     * @param input If <code>true</code>, we want an input stream.
+     * @return the real stream that the first argument maps to.
+     */
+    private Object resolveStream(Closeable stream, boolean input) {
+    	if (stream == CommandLine.DEFAULT_STDIN) {
+    		return getInputStream();
+    	}
+    	else if (stream == CommandLine.DEFAULT_STDOUT) {
+    		return out;
+    	}
+    	else if (stream == CommandLine.DEFAULT_STDERR) {
+    		return err;
+    	}
+    	else if (stream == CommandLine.DEVNULL || stream == null) {
+    		return input ? new NullInputStream() : new NullOutputStream();
+    	}
+    	else {
+    		return stream;
+    	}
+    }
+    
+    /**
+     * Resolve a stream as a real (useable) InputStream.
+     * @param stream the stream to be resolved
+     * @return the resolved InputStream.
+     */
+    public InputStream resolveInputStream(Closeable stream) {
+    	return (InputStream) resolveStream(stream, true);
+    }
+
+    /**
+     * Resolve a stream as a real (useable) PrintStream.  If the
+     * argument is an OutputStream, we wrap it in a PrintStream.  This means
+     * that if you call this method twice on the same stream argument, you
+     * may get different result objects.
+     * 
+     * @param stream the stream to be resolved
+     * @return the resolved PrintStream.
+     */
+    public PrintStream resolvePrintStream(Closeable stream) {
+    	Object tmp = resolveStream(stream, false);
+    	if (tmp instanceof PrintStream) {
+    		return (PrintStream) tmp;
+    	}
+    	else {
+    		// We could try to maintain a cache of PrintStream wrappers,
+    		// but this is liable to extend the lifetime of the wrapped streams,
+    		// which is a bad thing.
+    	    return new PrintStream((OutputStream) tmp);
+    	}
     }
 }
 

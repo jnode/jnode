@@ -34,6 +34,13 @@ package org.jnode.shell;
  * @author Sam Reid
  * @author crawley@jnode.org
  */
+  
+/**
+ * This is the common API for the various mechanisms for running 'commands'.
+ * 
+ * @author Sam Reid
+ * @author crawley@jnode.org
+ */
 public interface CommandInvoker {
 	
 	public interface Factory {

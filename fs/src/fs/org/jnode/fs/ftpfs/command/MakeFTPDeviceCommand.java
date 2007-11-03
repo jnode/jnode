@@ -29,7 +29,7 @@ import org.jnode.fs.ftpfs.FTPFileSystemType;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.fs.FileSystemType;
 import org.jnode.fs.FileSystem;
-import org.jnode.shell.Command;
+import org.jnode.shell.AbstractCommand; 
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.Help;
@@ -43,7 +43,7 @@ import java.io.PrintStream;
 /**
  * @author Levente S\u00e1ntha
  */
-public class MakeFTPDeviceCommand implements Command {
+public class MakeFTPDeviceCommand extends AbstractCommand {
     private static final Argument HOST_ARG = new Argument("host", "FTP host");
     private static final Argument USERNAME_ARG = new Argument("username", "FTP username");
     private static final Argument PASSWORD_ARG = new Argument("password", "FTP password");
@@ -54,8 +54,7 @@ public class MakeFTPDeviceCommand implements Command {
                         new Parameter(PASSWORD_ARG, Parameter.OPTIONAL) });
 
     public static void main(String[] args) throws Exception {
-        new MakeFTPDeviceCommand().execute(new CommandLine(args), System.in,
-                System.out, System.err);
+        new MakeFTPDeviceCommand().execute(args);
     }
     /**
      * This will be execute'ed when the command is called.
@@ -67,7 +66,7 @@ public class MakeFTPDeviceCommand implements Command {
      * @throws Exception
      */
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-        ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
+        ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
 
         // Get the parameters
         final String host = HOST_ARG.getValue(cmdLine);

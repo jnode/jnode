@@ -28,7 +28,7 @@ import org.jnode.driver.Device;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
-import org.jnode.shell.Command;
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
@@ -39,7 +39,7 @@ import org.jnode.shell.help.argument.FileArgument;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class MountCommand implements Command {
+public class MountCommand extends AbstractCommand {
 
     private static final DeviceArgument ARG_DEV = new DeviceArgument("device",
             "the device to mount");
@@ -56,13 +56,12 @@ public class MountCommand implements Command {
                     new Parameter(ARG_FSPATH, Parameter.OPTIONAL) });
 
     public static void main(String[] args) throws Exception {
-        new MountCommand().execute(new CommandLine(args), System.in,
-                System.out, System.err);
+        new MountCommand().execute(args);
     }
 
     public void execute(CommandLine commandLine, InputStream in,
             PrintStream out, PrintStream err) throws Exception {
-        ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
+        ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
 
         // Get the parameters
         final Device dev = ARG_DEV.getDevice(cmdLine);
@@ -76,6 +75,7 @@ public class MountCommand implements Command {
         final FileSystem fs = fss.getFileSystem(dev);
         if (fs == null) {
             err.println("No filesystem found on " + dev.getId());
+            exit(1);
         } else {        
             // Mount it
             fss.mount(mountPoint, fs, fsPath);

@@ -30,6 +30,7 @@ import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Argument;
@@ -44,7 +45,7 @@ import org.jnode.shell.help.argument.FileArgument;
  * @author Stephen Crawley
  * @author Fabien DUMINY (fduminy@jnode.org)
  */
-public class CatCommand implements Command { 
+public class CatCommand extends AbstractCommand {
 
     static final Argument ARG_FILE = new FileArgument("file",
             "the files (or URLs) to be concatenated", true);
@@ -59,11 +60,11 @@ public class CatCommand implements Command {
     
 
     public static void main(String[] args) throws Exception {
-    	new CatCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+    	new CatCommand().execute(args);
     }
     
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-    	ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
+        ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
     	String[] fileNames = ARG_FILE.getValues(cmdLine);
     	boolean ok = true;
     	try {
@@ -117,7 +118,7 @@ public class CatCommand implements Command {
     		ok = false;
     	}
     	if (!ok) { 
-    		System.exit(1); 
+    		exit(1); 
     	}
     }
     

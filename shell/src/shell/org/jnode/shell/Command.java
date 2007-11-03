@@ -39,5 +39,6 @@ public interface Command
    * @param err err stream, mostly this is System.err, but it can be a file or piped.
    * @throws Exception
    */
-  public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception;
+  public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
+  throws Exception;
 }

@@ -63,17 +63,17 @@ public class ThreadCommandInvoker extends AsyncCommandInvoker {
     	return "thread";
 	}
     
-    CommandThread createThread(CommandLine cmdLine, Runnable cr) {
+    CommandThread createThread(CommandLine cmdLine, CommandRunner cr) {
     	return new CommandThread(cr, cmdLine.getCommandName());
 	}
 
-	Runnable createRunner(Class cx, Method method, Object[] args, 
+	CommandRunner createRunner(Class cx, Method method, Object[] args, 
 			InputStream commandIn, PrintStream commandOut, PrintStream commandErr) {
 		return new ThreadCommandRunner(cx, method, args, commandIn, commandOut, commandErr);
 	}
 
         
-	class ThreadCommandRunner extends AsyncCommandInvoker.CommandRunner {
+	class ThreadCommandRunner extends CommandRunner {
 		private final Class cx;
 		private final Method method;
 		private final Object[] args;
@@ -82,7 +82,7 @@ public class ThreadCommandInvoker extends AsyncCommandInvoker {
 
         public ThreadCommandRunner(Class cx, Method method, Object[] args, 
         		InputStream commandIn, PrintStream commandOut, PrintStream commandErr) {
-        	super();
+        	super(commandShell);
             this.cx = cx;
             this.method = method;
             this.args = args;
@@ -90,7 +90,6 @@ public class ThreadCommandInvoker extends AsyncCommandInvoker {
 
         public void run() {
             try {
-            	CommandThread.setRC(0);
                 try {
                 	Object obj = Modifier.isStatic(method.getModifiers()) ?
                 		null : cx.newInstance();
@@ -121,7 +120,7 @@ public class ThreadCommandInvoker extends AsyncCommandInvoker {
                     unblock();
                 } else if (tex instanceof VmExit) {
                 	VmExit vex = (VmExit) tex;
-                	CommandThread.setRC(vex.getStatus());
+                	setRC(vex.getStatus());
                     unblock();
                 } else {
                     err.println("Exception in command");

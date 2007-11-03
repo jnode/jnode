@@ -21,17 +21,12 @@
 
 package org.jnode.shell.command.driver.console;
 
-import java.awt.event.KeyEvent;
-import java.util.Set;
-
 import javax.isolate.Isolate;
 import javax.isolate.IsolateStartupException;
 import javax.naming.NameNotFoundException;
 
-import org.jnode.driver.console.Console;
 import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.TextConsole;
-import org.jnode.driver.console.textscreen.TextScreenConsoleManager;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.ShellException;
@@ -93,19 +88,6 @@ public class ConsoleCommand {
         
         if (listConsoles) {
             conMgr.printConsoles(System.out);
-            /*
-            final Set<String> consoleNames = conMgr.getConsoleNames();
-            System.out.println("Nr. of registered consoles: "
-                    + consoleNames.size());
-            for (String name : consoleNames) {
-                final Console console = conMgr.getConsole(name);
-                System.out.println("      - "
-                        + name
-                        + " ACCEL:"
-                        + KeyEvent.getKeyText(console
-                                .getAcceleratorKeyCode()));
-            }
-            */
         } else if (newConsole) {
             if (isolateNewConsole) {
                 try {
@@ -158,8 +140,22 @@ public class ConsoleCommand {
         CommandShell commandShell = new CommandShell(console);
         new Thread(commandShell, "command-shell").start();
         
-        System.out.println("Console created with name:"
+        System.out.println("New console created with name: "
                 + console.getConsoleName());
+        
+        // FIXME we shouldn't be setting the invoker (and interpreter) via the System Properties
+        // object because it is "global" in some operation modes, and we want to be able to 
+        // control the invoker / interpreter on a per-console basis.
+        String invokerName = System.getProperty(CommandShell.INVOKER_PROPERTY_NAME, "");
+        // FIXME this is a temporary hack until we decide what to do about these invokers
+        if ("thread".equals(invokerName) || "default".equals(invokerName)) {
+        	console.getErr().println(
+        			"Warning: any commands run in this console via their main(String[]) will " +
+        			"have the 'wrong' System.out and System.err.");
+        	console.getErr().println("The 'proclet' invoker should give better results.");
+        	console.getErr().println("To use it, type 'exit', run 'set jnode.invoker proclet' " +
+        			"in the F1 console and run 'console -n' again.");
+        }
         return console;
     }
 }

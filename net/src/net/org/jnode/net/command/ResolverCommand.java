@@ -28,7 +28,7 @@ import java.util.Collection;
 import org.jnode.net.help.argument.HostArgument;
 import org.jnode.net.ipv4.IPv4Address;
 import org.jnode.net.ipv4.util.ResolverImpl;
-import org.jnode.shell.Command;
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
@@ -37,7 +37,7 @@ import org.jnode.shell.help.Syntax;
 import org.jnode.shell.help.argument.OptionArgument;
 
 
-public class ResolverCommand implements Command
+public class ResolverCommand extends AbstractCommand
 {
   private static final String FUNC_ADD = "add";
   private static final String FUNC_DEL = "del";
@@ -67,12 +67,12 @@ public class ResolverCommand implements Command
 
 
   public static void main(String[] args) throws Exception {
-	  new ResolverCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+	  new ResolverCommand().execute(args);
   }
 
 
 	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-		ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
+		ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
 	
 	    if (cmdLine.size() == 0)
 	    {

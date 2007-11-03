@@ -21,13 +21,13 @@
  
 package org.jnode.fs.command;
 
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.argument.FileArgument;
-import org.jnode.util.NumberUtils;
 
 import java.io.File;
 import java.io.InputStream;
@@ -43,7 +43,7 @@ import java.util.Date;
  * @author Martin Husted Hartvig (hagar@jnode.org)
  * @author Levente S\u00e1ntha
  */
-public class DirCommand implements Command {
+public class DirCommand extends AbstractCommand {
     private static final int LEFT_MARGIN = 14;
     private static final SimpleDateFormat df = new SimpleDateFormat("yyyy MMM dd HH:mm");
 
@@ -56,11 +56,11 @@ public class DirCommand implements Command {
                     new Parameter[]{new Parameter(ARG_PATH, Parameter.OPTIONAL)});
 
     public static void main(String[] args) throws Exception {
-        new DirCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+        new DirCommand().execute(args);
     }
 
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-        ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
+        ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
         String userDir = System.getProperty("user.dir");
         File path = ARG_PATH.getFile(cmdLine);
         if (path == null) path = new File(userDir);
@@ -71,6 +71,7 @@ public class DirCommand implements Command {
             this.printList(new File[]{path}, out);
         } else {
             err.println("No such path " + path);
+            exit(1);
         }
     }
 

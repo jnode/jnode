@@ -24,6 +24,7 @@ package org.jnode.shell.command;
 import org.jnode.shell.help.*;
 import org.jnode.shell.help.argument.PropertyNameArgument;
 import org.jnode.shell.help.argument.StringArgument;
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
 
@@ -39,7 +40,7 @@ import java.io.PrintStream;
  * @author Levente S\u00e1ntha
  */
 
-public class SetCommand implements Command{
+public class SetCommand extends AbstractCommand {
 
 	static final PropertyNameArgument ARG_KEY = new PropertyNameArgument("key", "the property name");
 	static final StringArgument ARG_VALUE = new StringArgument("value", "the value to set the property to, if missing the property is removed");
@@ -53,12 +54,12 @@ public class SetCommand implements Command{
 	);
 
 	public static void main(String[] args) throws Exception {
-    new SetCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+    new SetCommand().execute(args);
 	}
 
   public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception
   {
-    ParsedArguments parsedArguments = HELP_INFO.parse(commandLine.toStringArray());
+    ParsedArguments parsedArguments = HELP_INFO.parse(commandLine);
 
       String value = ARG_VALUE.getValue(parsedArguments);
       if(value == null)

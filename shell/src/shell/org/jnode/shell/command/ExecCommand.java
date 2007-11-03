@@ -24,6 +24,7 @@ package org.jnode.shell.command;
 import java.io.InputStream;
 import java.io.PrintStream;
 
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.*;
 import org.jnode.shell.help.argument.ClassNameArgument;
@@ -31,7 +32,7 @@ import org.jnode.shell.help.argument.ClassNameArgument;
 /**
  * @author epr
  */
-public class ExecCommand {
+public class ExecCommand extends AbstractCommand {
 
 	public static Help.Info HELP_INFO = new Help.Info(
 		"exec",
@@ -44,7 +45,7 @@ public class ExecCommand {
 
 	public static void main(String[] args)
 	throws Exception {
-		new ExecCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+		new ExecCommand().execute(args);
 	}
 
 	/**
@@ -57,7 +58,7 @@ public class ExecCommand {
 		PrintStream err)
 		throws Exception {
 
-		Runtime.getRuntime().exec(cmdLine.toStringArray());
+		Runtime.getRuntime().exec(cmdLine.getArguments());
 	}
 
 }

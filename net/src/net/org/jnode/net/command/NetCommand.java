@@ -11,6 +11,7 @@ import java.net.Socket;
 import javax.net.ServerSocketFactory;
 import javax.net.SocketFactory;
 
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
@@ -19,7 +20,7 @@ import org.jnode.shell.help.Syntax;
 import org.jnode.shell.help.argument.InetAddressArgument;
 import org.jnode.shell.help.argument.IntegerArgument;
 
-public class NetCommand {
+public class NetCommand extends AbstractCommand {
 
 	private static final InetAddressArgument ARG_HOST = new InetAddressArgument(
 			"ip-address", "the IP-address of the server to contact");
@@ -40,13 +41,13 @@ public class NetCommand {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] sArgs) throws Exception {
-		new NetCommand().execute(new CommandLine(sArgs), System.in, System.out, System.err);
+	public static void main(String[] args) throws Exception {
+		new NetCommand().execute(args);
 	}
 	
 	
 	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-		ParsedArguments args = HELP_INFO.parse(commandLine.toStringArray());
+		ParsedArguments args = HELP_INFO.parse(commandLine);
 
 		Socket socket = null;
 		if (PARAM_LISTEN.isSet(args)) {

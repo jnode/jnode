@@ -38,6 +38,7 @@ import org.jnode.fs.fat.Fat;
 import org.jnode.fs.fat.FatFileSystemType;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
@@ -50,7 +51,7 @@ import org.jnode.shell.help.argument.OptionArgument;
 /**
  * @author gbin
  */
-public class FormatCommand implements Command {
+public class FormatCommand extends AbstractCommand {
 
     static final OptionArgument TYPE = new OptionArgument("action",
             "Type parameter",
@@ -90,12 +91,12 @@ public class FormatCommand implements Command {
                             PARAM_BS_VAL }) });
 
     public static void main(String[] args) throws Exception {
-    	new FormatCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+    	new FormatCommand().execute(args);
     }
 
 	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
 		try {
-            ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
+            ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
 
             String device = ARG_DEVICE.getValue(cmdLine);
             String FSType = FS.getValue(cmdLine).intern();
@@ -147,13 +148,16 @@ public class FormatCommand implements Command {
 
         } catch (NameNotFoundException e) {
             e.printStackTrace();
+            exit(1);
         } catch (DeviceNotFoundException e) {
             e.printStackTrace();
+            exit(2);
         } catch (DriverException e) {
             e.printStackTrace();
+            exit(3);
         } catch (FileSystemException e) {
-            // 
             e.printStackTrace();
+            exit(4);
         }
 	}
 }

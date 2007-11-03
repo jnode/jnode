@@ -123,6 +123,7 @@ public final class DefaultPluginManager extends PluginManager {
         // 2 loops, first start all system plugins,
         // then start all auto-start plugins
         for (int type = 0; type < 2; type++) {            
+        	BootLog.info("Starting " + ((type == 0) ? "system" : "auto-start") + " plugins");
             for (PluginDescriptor descr : descrList) {
                 try {
                     final boolean start;

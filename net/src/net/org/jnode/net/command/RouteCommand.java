@@ -33,7 +33,7 @@ import org.jnode.net.ipv4.IPv4Address;
 import org.jnode.net.ipv4.config.IPv4ConfigurationService;
 import org.jnode.net.ipv4.layer.IPv4NetworkLayer;
 import org.jnode.net.util.NetUtils;
-import org.jnode.shell.Command;
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
@@ -45,8 +45,8 @@ import org.jnode.shell.help.argument.OptionArgument;
 /**
  * @author epr
  */
-public class RouteCommand implements EthernetConstants, Command {
-
+public class RouteCommand extends AbstractCommand implements EthernetConstants {
+	// FIXME the "constants interface" anti-pattern.
 	static final String FUNC_ADD = "add";
 	static final String FUNC_DEL = "del";
 
@@ -75,11 +75,11 @@ public class RouteCommand implements EthernetConstants, Command {
 	});
 
 	public static void main(String[] args) throws Exception {
-		new RouteCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+		new RouteCommand().execute(args);
 	}
 
 	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-		ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
+		ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
 
 		final IPv4NetworkLayer ipNL = (IPv4NetworkLayer) NetUtils.getNLM().getNetworkLayer(ETH_P_IP);
 

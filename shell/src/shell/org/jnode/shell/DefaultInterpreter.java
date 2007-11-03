@@ -57,32 +57,23 @@ public class DefaultInterpreter implements CommandInterpreter {
     }
     
     public int interpret(CommandShell shell, String line) throws ShellException {
-    	LinkedList<String> words = new LinkedList<String>();
+    	LinkedList<CommandLine.Token> tokens = new LinkedList<CommandLine.Token>();
 		Tokenizer tokenizer = new Tokenizer(line);
 		while (tokenizer.hasNext()) {
-			words.add(tokenizer.next());
+			tokens.add(tokenizer.next());
 		}
-		int nosTokens = words.size();
+		int nosTokens = tokens.size();
 		if (nosTokens == 0) {
 			return 0;
 		}
 		CommandLine commandLine;
 		if (nosTokens == 1) {
-			commandLine = new CommandLine(words.get(0), NO_ARGS);
+			commandLine = new CommandLine(tokens.get(0), null, null);
 		}
 		else {
-			String commandName = null;
-			String[] args = new String[nosTokens - 1];
-			int pos = 0;
-			for (String token : words) {
-				if (commandName == null) {
-					commandName = token;
-				}
-				else {
-					args[pos++] = token;
-				}
-			}
-			commandLine = new CommandLine(commandName, args);
+			CommandLine.Token commandToken = tokens.removeFirst();
+			CommandLine.Token[] argTokens = new CommandLine.Token[nosTokens - 1];
+			commandLine = new CommandLine(commandToken, tokens.toArray(argTokens), null);
 		}
 		shell.addCommandToHistory(line);
 		return shell.invoke(commandLine);
@@ -93,13 +84,14 @@ public class DefaultInterpreter implements CommandInterpreter {
 		if (!tokenizer.hasNext()) {
 			return new CommandLine("", null);
 		}
-		String commandName = tokenizer.next();
-		LinkedList<String> args = new LinkedList<String>();
+		CommandLine.Token commandToken = tokenizer.next();
+		LinkedList<CommandLine.Token> tokenList = new LinkedList<CommandLine.Token>();
 		while (tokenizer.hasNext()) {
-			args.add(tokenizer.next());
+			tokenList.add(tokenizer.next());
 		}
-		CommandLine res = new CommandLine(commandName, args.toArray(new String[args.size()]));
-		res.setArgumentAnticipated(tokenizer.whitespaceAfter());
+		CommandLine.Token[] argTokens = tokenList.toArray(new CommandLine.Token[tokenList.size()]);
+		CommandLine res = new CommandLine(commandToken, argTokens, null);
+		res.setArgumentAnticipated(tokenizer.whitespaceAfter(tokenizer.last()));
 		return res;
     }
 
@@ -108,16 +100,15 @@ public class DefaultInterpreter implements CommandInterpreter {
      * quoting, some '\' escapes, and (depending on constructor flags) certain "special"
      * symbols.
      */
-    static class Tokenizer implements Iterator<String> {
+    static class Tokenizer implements Iterator<CommandLine.Token> {
         private final String s;
         private final int flags;
         
         private int pos = 0;
-        private int tokenStartPos = 0;
         private boolean inFullEscape = false;
         private boolean inQuote = false;
-        private int type = -1; // undefined until next() is called.
-        private boolean whitespaceAfter;
+
+        private CommandLine.Token lastToken;
 
         /**
          * Instantiate a commandline tokenizer for a given input String.
@@ -148,42 +139,17 @@ public class DefaultInterpreter implements CommandInterpreter {
     	}
     	
     	/**
-    	 * Is there whitespace after the token returned by <code>next()</code>?
-    	 * @return If there is whitespace after the token, then <code>true</code>, 
-    	 * otherwise <code>false</code>
-    	 */
-    	public boolean whitespaceAfter() {
-    		return whitespaceAfter;
-    	}
-    	
-    	/**
-    	 * Get the current position in the line string.
-    	 * @return The current position.
-    	 */
-    	public int getPos() {
-    		return pos;
-    	}
-
-    	/**
-    	 * Get the start position in the line string of the token returned by <code>next()</code>.
-    	 * @return The current position.
-    	 */
-    	public int getTokenStartPos() {
-    		return tokenStartPos;
-    	}
-
-    	/**
     	 * Extract the next token string and return it.
     	 * 
     	 * @return the next token
     	 */
-    	public String next() throws NoSuchElementException {
+    	public CommandLine.Token next() throws NoSuchElementException {
     		if (!hasNext()) {
     			throw new NoSuchElementException();
     		}
 
-    		type = LITERAL;
-    		tokenStartPos = pos;
+    		int type = LITERAL;
+    		int start = pos;
     		
             StringBuilder token = new StringBuilder(5);
     		char currentChar;
@@ -278,8 +244,8 @@ public class DefaultInterpreter implements CommandInterpreter {
     			}
     		}
 
-    		whitespaceAfter = (pos < s.length() && s.charAt(pos) == SPACE_CHAR);
-    		return token.toString();
+    		lastToken = new CommandLine.Token(token.toString(), type, start, pos);
+    		return lastToken;
     	}
 
     	/**
@@ -290,13 +256,19 @@ public class DefaultInterpreter implements CommandInterpreter {
 		}
 		
 		/**
-		 * Get the token type for the token returned by the last call
-		 * to next().
-		 * 
-		 * @return a token type.
+		 * Return the Token returned by the last successful call to next().
+		 * @return the last token.
 		 */
-		public int getType() {
-			return type;
+		public CommandLine.Token last() {
+			return lastToken;
+		}
+		
+		/**
+		 * Test if there is a whitespace character after a token.  This only
+		 * works if the token was returned by this Tokenizer.
+		 */
+		public boolean whitespaceAfter(CommandLine.Token token) {
+			return token.end < s.length() && s.charAt(token.end) == SPACE_CHAR;
 		}
     }
 }

@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 
-import org.jnode.shell.Command;
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
@@ -16,7 +16,7 @@ import org.jnode.shell.help.argument.OptionArgument;
  * 
  * @author peda
  */
-public class GrepCommand implements Command {
+public class GrepCommand extends AbstractCommand {
 
 	public static final int MODE_CONTAINS = 0;
 	public static final int MODE_REGEXP = 1;
@@ -40,7 +40,7 @@ public class GrepCommand implements Command {
      */
 	public static void main(String[] args)
     	throws Exception {
-    		new GrepCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+    		new GrepCommand().execute(args);
     	}
 
 	/**
@@ -52,40 +52,47 @@ public class GrepCommand implements Command {
 
 		Options options = new Options();
 		options.err = err;
-		options.args = commandLine.toStringArray();
+		options.args = commandLine.getArguments();
 
 		out.println("Start grep...");
 		// parse commandline arguments...
 		final boolean parseOK = parseCommandLine(options);
 		if (!parseOK) {
 			displayHelp(out);
-			return;
+			exit(2);
 		}
 		
 		final BufferedReader r = new BufferedReader(new InputStreamReader(in));
 		String line; 
 
 		// loop over inputstream and grep for expression...
+		boolean found = false;
 		while ((line = r.readLine()) != null) {
-			
 			if (options.mode == MODE_CONTAINS) {
-
 				if (line.contains(options.expression)) {
-					if (!options.inverse)
+					if (!options.inverse) {
 						out.println(line);
+						found = true;
+					}
 				} else if (options.inverse) {
 					out.println(line);
+					found = true;
 				}
 			
 			} else {
-			
 				if (line.matches(options.expression)) {
-					if (!options.inverse)
+					if (!options.inverse) {
 						out.println(line);
+						found = true;
+					}
 				} else if (options.inverse) {
 					out.println(line);
+					found = true;
+				}
 				}
 			}
+		if (!found) {
+			exit(1);
 		}
 	}
 	

@@ -66,7 +66,7 @@ public class UDPOutputCommand  implements Command {
   public void execute(CommandLine commandLine, InputStream in,
                       PrintStream out, PrintStream err) throws Exception {
 
-    final ParsedArguments args = HELP_INFO.parse(commandLine.toStringArray());
+    final ParsedArguments args = HELP_INFO.parse(commandLine);
 
     final int port;
 

@@ -29,7 +29,7 @@ import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceNotFoundException;
 import org.jnode.driver.DriverException;
 import org.jnode.naming.InitialNaming;
-import org.jnode.shell.Command;
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
@@ -50,7 +50,7 @@ import org.jnode.shell.help.argument.OptionArgument;
  * Adding more command support for grub insallation.
  * @author Tango Devian
  */
-public class JGrubInstallCommand implements Command {
+public class JGrubInstallCommand extends AbstractCommand {
     static final DeviceArgument ARG_DEVICE = new DeviceArgument("device", "device where grub will be installed");
     static final FileArgument ARG_DIR = new FileArgument("directory", "the directory for stage2 and menu.lst");
     static final OptionArgument TYPE = new OptionArgument("action","Type parameter",
@@ -76,7 +76,7 @@ public class JGrubInstallCommand implements Command {
      * @throws Exception
      */
     public static void main(String... args) throws Exception {
-        new JGrubInstallCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+        new JGrubInstallCommand().execute(args);
     }
 
     /**
@@ -84,7 +84,7 @@ public class JGrubInstallCommand implements Command {
      */
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
         try {
-            ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
+            ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
             String device = ARG_DEVICE.getValue(cmdLine);
             File destDir = ARG_DIR.getFile(cmdLine);
 

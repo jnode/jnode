@@ -30,6 +30,7 @@ import org.acplt.oncrpc.OncRpcException;
 import org.acplt.oncrpc.OncRpcPortmapClient;
 import org.acplt.oncrpc.OncRpcProtocols;
 import org.acplt.oncrpc.OncRpcServerIdent;
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
@@ -42,7 +43,7 @@ import org.jnode.shell.help.argument.HostNameArgument;
  *
  * @author Andrei Dore
  */
-public class RpcInfoCommand {
+public class RpcInfoCommand extends AbstractCommand {
 
     private static final String LIST_SERVICES_FORMAT = "%1$10s %2$10s %3$10s %4$10s %5$10s";
 
@@ -54,7 +55,7 @@ public class RpcInfoCommand {
 
     public static void main(String[] args) throws Exception {
 
-        new RpcInfoCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+        new RpcInfoCommand().execute(args);
 
     }
 
@@ -63,7 +64,7 @@ public class RpcInfoCommand {
 
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
 
-        ParsedArguments parsedArguments = HELP_INFO.parse(commandLine.toStringArray());
+        ParsedArguments parsedArguments = HELP_INFO.parse(commandLine);
 
         InetAddress host = HOST.getAddress(parsedArguments);
 
@@ -93,8 +94,10 @@ public class RpcInfoCommand {
             }
         } catch (OncRpcException e) {
             err.println("Can not make the rpc call to the host " + host.getHostAddress());
+            exit(1);
         } catch (IOException e) {
             err.println("Can not connect to  the host " + host.getHostAddress());
+            exit(1);
         } finally {
             if (client != null) {
                 try {

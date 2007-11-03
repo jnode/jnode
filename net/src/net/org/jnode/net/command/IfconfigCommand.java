@@ -32,7 +32,7 @@ import org.jnode.net.ethernet.EthernetConstants;
 import org.jnode.net.help.argument.HostArgument;
 import org.jnode.net.ipv4.IPv4Address;
 import org.jnode.net.ipv4.config.IPv4ConfigurationService;
-import org.jnode.shell.Command;
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
@@ -43,7 +43,7 @@ import org.jnode.shell.help.argument.DeviceArgument;
 /**
  * @author epr
  */
-public class IfconfigCommand implements Command {
+public class IfconfigCommand extends AbstractCommand {
 
 	static final DeviceArgument ARG_DEVICE = new DeviceArgument("device", "the device", NetDeviceAPI.class);
 	static final HostArgument ARG_IP_ADDRESS = new HostArgument("ip-address", "the IP address to bind the device to");
@@ -69,11 +69,11 @@ public class IfconfigCommand implements Command {
 
 	public static void main(String[] args)
 	throws Exception {
-		new IfconfigCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+		new IfconfigCommand().execute(args);
 	}
 
 	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-		ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
+		ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
 
 		if( cmdLine.size() == 0 ) {
 			final DeviceManager dm = (DeviceManager)InitialNaming.lookup(DeviceManager.NAME);

@@ -27,7 +27,7 @@ import java.io.PrintStream;
 
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
-import org.jnode.shell.Command;
+import org.jnode.shell.AbstractCommand; 
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
@@ -43,7 +43,7 @@ import javax.naming.NameNotFoundException;
  * @author Andreas H\u00e4nel
  * @author Levente S\u00e1ntha
  */
-public class DeleteCommand implements Command {
+public class DeleteCommand extends AbstractCommand {
 
     static final FileArgument ARG_DIR = new FileArgument("file/dir",
             "delete the file or directory", true);
@@ -53,24 +53,27 @@ public class DeleteCommand implements Command {
                     ARG_DIR, Parameter.MANDATORY) });
 
     public static void main(String[] args) throws Exception {
-        new DeleteCommand().execute(new CommandLine(args), System.in,
-                System.out, System.err);
+        new DeleteCommand().execute(args);
     }
 
     public void execute(CommandLine commandLine, InputStream in,
                         PrintStream out, PrintStream err) throws Exception {
-        ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
+        ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
         File[] file_arr = ARG_DIR.getFiles(cmdLine);
-        for(File file : file_arr)
-            deleteFile(file, err);
+        boolean ok = true;
+        for (File file : file_arr) {
+            boolean tmp = deleteFile(file, err);
+            ok &= tmp;
+        }
+        if (!ok) {
+        	exit(1);
+        }
     }
 
-    private void deleteFile(File file, PrintStream err) throws NameNotFoundException {
-        boolean deleteOk = false;
-
+    private boolean deleteFile(File file, PrintStream err) throws NameNotFoundException {
         if (!file.exists()) {
             err.println(file + " does not exist");
-	    return;
+            return false;
         }
 
         // Lookup the Filesystem service
@@ -78,21 +81,24 @@ public class DeleteCommand implements Command {
 
         // for this time, delete only empty directory (wait implementation of -r
         // option)
+        boolean deleteOk = true;
         if (file.isDirectory() && !fss.isMount(file.getAbsolutePath())) {
             final File[] subFiles = file.listFiles();
             for (File f : subFiles) {
                 final String name = f.getName();
                 if (!name.equals(".") && !name.equals("..")) {
                     err.println("Directory is not empty " + file);
+                    deleteOk = false;
                     break;
                 }
             }
         }
-
+        if (deleteOk) {
         deleteOk = file.delete();
-
         if (!deleteOk) {
             err.println(file + " was not deleted");
         }
+    }
+        return deleteOk;
     }
 }
