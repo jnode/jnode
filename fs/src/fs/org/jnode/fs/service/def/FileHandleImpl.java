@@ -127,8 +127,13 @@ final class FileHandleImpl implements VMFileHandle {
 		if (position < 0) {
 			throw new IOException("Position < 0");
 		}
-		if (position > getLength()) {
-			throw new IOException("Position > file size");
+        if (position > getLength()) {
+            //allow seeking beyond the end of file by extending the file
+            //TODO Investigate this decision - the classpath implementations of
+            //TODO RandomAccessFile (which is currently used) requires this.
+            //TODO Review it when the RandomAccessFile of OpenJDK is integrated.              
+            setLength(position);
+            //throw new IOException("Position > file size");
 		}
 		this.fileOffset = position;
 	}
