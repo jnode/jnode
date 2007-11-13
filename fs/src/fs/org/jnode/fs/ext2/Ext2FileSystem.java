@@ -195,7 +195,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
             //	create the inode bitmap
             //	fill the inode table with zeroes
             for (int i = 0; i < groupCount; i++) {
-                log.debug("creating gropup " + i);
+                log.debug("creating group " + i);
 
                 byte[] blockBitmap = new byte[blockSize];
                 byte[] inodeBitmap = new byte[blockSize];
