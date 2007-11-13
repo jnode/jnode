@@ -39,7 +39,6 @@ import org.jnode.fs.fat.FatFileSystemType;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
@@ -61,9 +60,8 @@ public class FormatCommand extends AbstractCommand {
     static final OptionArgument FS = new OptionArgument("fstype",
             "File system type", new OptionArgument.Option[] {
                     new OptionArgument.Option("fat16", "FAT 16 filesystem"),
-                    new OptionArgument.Option("fat12", "FAT 12 filesystem")
-                    //TODO Ext2 format must be implemented.
-                    /*new OptionArgument.Option("ext2", "EXT2 filesystem"),*/ });
+                    new OptionArgument.Option("fat12", "FAT 12 filesystem"),
+                    new OptionArgument.Option("ext2", "EXT2 filesystem")});
 
     static final OptionArgument BS_VAL = new OptionArgument("blocksize",
             "block size for ext2 filesystem", new OptionArgument.Option[] {
