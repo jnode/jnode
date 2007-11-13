@@ -189,6 +189,7 @@ class Line {
 
             out.println();
             String[] list = info.getItems();
+            Arrays.sort(list);
             
             final int minItemsToSplit = 5;
             if(list.length > minItemsToSplit)
