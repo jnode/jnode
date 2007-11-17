@@ -45,7 +45,7 @@ import java.util.Date;
  */
 public class DirCommand extends AbstractCommand {
     private static final int LEFT_MARGIN = 14;
-    private static final SimpleDateFormat df = new SimpleDateFormat("yyyy MMM dd HH:mm");
+    private static final SimpleDateFormat df = new SimpleDateFormat("yyyy.MM.dd HH:mm");
 
 
     static final FileArgument ARG_PATH = new FileArgument("path", "the path to list contents of");
