@@ -78,6 +78,8 @@ public class UnixTestCommand extends AbstractCommand {
 	private static final int OP_STRING_NONEQUAL = 20;
 	private static final int OP_LPAREN = 21;
 	private static final int OP_RPAREN = 22;
+    private static final int OP_OLDER = 23;
+    private static final int OP_NEWER = 24;
 	
 	private static final int OP_UNARY = 1;
 	private static final int OP_BINARY = 2;
@@ -100,7 +102,9 @@ public class UnixTestCommand extends AbstractCommand {
 		OPERATOR_MAP.put("-lt", new Operator(OP_LT, 3, OP_BINARY));
 		OPERATOR_MAP.put("-le", new Operator(OP_LE, 3, OP_BINARY));
 		OPERATOR_MAP.put("-gt", new Operator(OP_GT, 3, OP_BINARY));
-		OPERATOR_MAP.put("-ge", new Operator(OP_GE, 3, OP_BINARY));
+                OPERATOR_MAP.put("-ge", new Operator(OP_GE, 3, OP_BINARY));
+                OPERATOR_MAP.put("-ot", new Operator(OP_OLDER, 3, OP_BINARY));
+                OPERATOR_MAP.put("-nt", new Operator(OP_NEWER, 3, OP_BINARY));
 		OPERATOR_MAP.put("-a", new Operator(OP_AND, 1, OP_BINARY));
 		OPERATOR_MAP.put("-o", new Operator(OP_OR, 0, OP_BINARY));
 		OPERATOR_MAP.put("!", new Operator(OP_NOT, 2, OP_UNARY));
@@ -140,7 +144,6 @@ public class UnixTestCommand extends AbstractCommand {
  				    				", lastArg = " + lastArg + ", next arg is " + args[pos]);
  				    	}
  				    }
- 				    // TODO revisit ...
  				    if (obj instanceof Boolean) {
  				    	res = obj == Boolean.TRUE;
  				    }
@@ -274,10 +277,16 @@ public class UnixTestCommand extends AbstractCommand {
 		case OP_READABLE:
 			pushOperand(toFile(operand).canRead());
 			break;
-		case OP_WRITEABLE:
-			pushOperand(toFile(popOperand()).canWrite());
-			break;
-		case OP_STRING_EMPTY:
+                case OP_WRITEABLE:
+                        pushOperand(toFile(popOperand()).canWrite());
+                        break;
+                case OP_OLDER:
+                        pushOperand(toFile(operand).lastModified() < toFile(operand2).lastModified());
+                        break;
+                case OP_NEWER:
+                        pushOperand(toFile(operand).lastModified() > toFile(operand2).lastModified());
+                        break;
+                case OP_STRING_EMPTY:
 			pushOperand(toString().length() == 0);
 			break;
 		case OP_STRING_NONEMPTY:
