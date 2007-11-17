@@ -5,6 +5,7 @@ import java.util.List;
 public class ListDirectoryResult {
 
     private List<Entry> entryList;
+
     private boolean eof;
 
     public List<Entry> getEntryList() {

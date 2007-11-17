@@ -23,6 +23,7 @@ package org.jnode.fs.nfs.command;
 
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.net.InetAddress;
 
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceUtils;
@@ -54,8 +55,8 @@ public class NFSMountCommand extends AbstractCommand {
     private static final FileArgument REMOTE_DIRECTORY_ARG = new FileArgument("remoteDir", "remote directory");
 
     private static final OptionArgument PROTOCOL_ARG = new OptionArgument("protocol", "protocol",
-	    new OptionArgument.Option[] { new OptionArgument.Option("tcp", "tcp protocol"),
-		    new OptionArgument.Option("udp", "udp protocol") });
+            new OptionArgument.Option[] { new OptionArgument.Option("tcp", "tcp protocol"),
+                    new OptionArgument.Option("udp", "udp protocol") });
 
     private static final IntegerArgument USER_ID_ARG = new IntegerArgument("uid", "user id");
     private static final IntegerArgument GROUP_ID_ARG = new IntegerArgument("gid", "group id");
@@ -68,12 +69,12 @@ public class NFSMountCommand extends AbstractCommand {
     static Help.Info HELP_INFO = new Help.Info("nfsmount",
 
     new Syntax("Mount a read only NFS filesystem", new Parameter[] {
-	    new Parameter(MOUNTPOINT_ARG, Parameter.MANDATORY), new Parameter(HOST_ARG, Parameter.MANDATORY),
-	    new Parameter(REMOTE_DIRECTORY_ARG, Parameter.MANDATORY), PARAMETER_PROTOCOL }),
+            new Parameter(MOUNTPOINT_ARG, Parameter.MANDATORY), new Parameter(HOST_ARG, Parameter.MANDATORY),
+            new Parameter(REMOTE_DIRECTORY_ARG, Parameter.MANDATORY), PARAMETER_PROTOCOL }),
 
     new Syntax("Mount a  NFS filesystem", new Parameter[] { new Parameter(MOUNTPOINT_ARG, Parameter.MANDATORY),
-	    new Parameter(HOST_ARG, Parameter.MANDATORY), new Parameter(REMOTE_DIRECTORY_ARG, Parameter.MANDATORY),
-	    PARAMETER_USER_ID, PARAMETER_GROUP_ID, PARAMETER_PROTOCOL }));
+            new Parameter(HOST_ARG, Parameter.MANDATORY), new Parameter(REMOTE_DIRECTORY_ARG, Parameter.MANDATORY),
+            PARAMETER_USER_ID, PARAMETER_GROUP_ID, PARAMETER_PROTOCOL }));
 
     public static void main(String[] args) throws Exception {
         new NFSMountCommand().execute(args);
@@ -82,54 +83,54 @@ public class NFSMountCommand extends AbstractCommand {
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
         ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
 
-	final String mount_point = MOUNTPOINT_ARG.getValue(cmdLine);
-	final String host = HOST_ARG.getValue(cmdLine);
-	final String remoteDirectory = REMOTE_DIRECTORY_ARG.getValue(cmdLine);
+        final String mount_point = MOUNTPOINT_ARG.getValue(cmdLine);
+        final InetAddress host = HOST_ARG.getAddress(cmdLine);
+        final String remoteDirectory = REMOTE_DIRECTORY_ARG.getValue(cmdLine);
 
-	// select the protocol (udp or tcp) the default value it is udp.
-	final Protocol protocol;
-	if (PARAMETER_PROTOCOL.isSet(cmdLine)) {
+        // select the protocol (udp or tcp) the default value it is udp.
+        final Protocol protocol;
+        if (PARAMETER_PROTOCOL.isSet(cmdLine)) {
 
-	    String protocolOption = PROTOCOL_ARG.getValue(cmdLine).toLowerCase().intern();
+            String protocolOption = PROTOCOL_ARG.getValue(cmdLine).toLowerCase().intern();
 
-	    if (protocolOption == "tcp") {
-		protocol = Protocol.TCP;
-	    } else {
-		protocol = Protocol.UDP;
-	    }
-	} else {
-	    protocol = Protocol.UDP;
-	}
+            if (protocolOption == "tcp") {
+                protocol = Protocol.TCP;
+            } else {
+                protocol = Protocol.UDP;
+            }
+        } else {
+            protocol = Protocol.UDP;
+        }
 
-	int uid = -1;
-	int gid = -1;
-	boolean readOnly;
-	if (PARAMETER_USER_ID.isSet(cmdLine) && PARAMETER_GROUP_ID.isSet(cmdLine)) {
+        int uid = -1;
+        int gid = -1;
+        boolean readOnly;
+        if (PARAMETER_USER_ID.isSet(cmdLine) && PARAMETER_GROUP_ID.isSet(cmdLine)) {
 
-	    uid = USER_ID_ARG.getInteger(cmdLine);
-	    gid = GROUP_ID_ARG.getInteger(cmdLine);
+            uid = USER_ID_ARG.getInteger(cmdLine);
+            gid = GROUP_ID_ARG.getInteger(cmdLine);
 
-	    readOnly = false;
+            readOnly = false;
 
-	} else {
-	    readOnly = true;
-	}
+        } else {
+            readOnly = true;
+        }
 
-	final NFS2Device dev;
-	if (!readOnly) {
-	    dev = new NFS2Device(host, remoteDirectory, protocol, uid, gid);
-	} else {
-	    dev = new NFS2Device(host, remoteDirectory, protocol);
-	}
+        final NFS2Device dev;
+        if (!readOnly) {
+            dev = new NFS2Device(host, remoteDirectory, protocol, uid, gid);
+        } else {
+            dev = new NFS2Device(host, remoteDirectory, protocol);
+        }
 
-	dev.setDriver(new NFS2Driver());
-	final DeviceManager dm = DeviceUtils.getDeviceManager();
-	dm.register(dev);
-	final FileSystemService fss = InitialNaming.lookup(FileSystemService.NAME);
-	FileSystemType type = fss.getFileSystemTypeForNameSystemTypes(NFS2FileSystemType.NAME);
-	final FileSystem fs = type.create(dev, readOnly);
-	fss.registerFileSystem(fs);
-	fss.mount(mount_point, fs, null);
+        dev.setDriver(new NFS2Driver());
+        final DeviceManager dm = DeviceUtils.getDeviceManager();
+        dm.register(dev);
+        final FileSystemService fss = InitialNaming.lookup(FileSystemService.NAME);
+        FileSystemType type = fss.getFileSystemTypeForNameSystemTypes(NFS2FileSystemType.NAME);
+        final FileSystem fs = type.create(dev, readOnly);
+        fss.registerFileSystem(fs);
+        fss.mount(mount_point, fs, null);
 
     }
 }

@@ -3,6 +3,7 @@ package org.jnode.fs.nfs.nfs2.rpc.nfs;
 public class ReadFileResult {
 
     private FileAttribute fileAttribute;
+
     private byte[] data;
 
     public void setFileAttribute(FileAttribute fileAttribute) {

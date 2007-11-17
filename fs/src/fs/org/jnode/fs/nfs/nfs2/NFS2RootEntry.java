@@ -2,62 +2,21 @@ package org.jnode.fs.nfs.nfs2;
 
 import java.io.IOException;
 
-import org.jnode.fs.FSAccessRights;
-import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSFile;
+import org.jnode.fs.nfs.nfs2.rpc.nfs.FileAttribute;
 
-public class NFS2RootEntry extends NFS2Object implements FSEntry {
+public class NFS2RootEntry extends NFS2Entry implements FSEntry {
 
-    private byte[] fileHandle;
+    NFS2RootEntry(NFS2FileSystem fileSystem, byte[] fileHandle,
+            FileAttribute fileAttribute) {
+        super(fileSystem, null, "/", fileHandle, fileAttribute);
 
-    private NFS2Directory directory;
-
-    NFS2RootEntry(NFS2FileSystem fileSystem, byte[] fileHandle) {
-
-        super(fileSystem);
-
-        this.fileHandle = fileHandle;
-
-        directory = new NFS2Directory(fileSystem, fileHandle);
-
-    }
-
-    public FSAccessRights getAccessRights() throws IOException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public FSDirectory getDirectory() throws IOException {
-        return directory;
     }
 
     public FSFile getFile() throws IOException {
-        throw new IOException("It is not  a file. It is the root of the file system.");
-    }
-
-    public long getLastModified() throws IOException {
-        return 0;
-    }
-
-    public String getName() {
-        return "/";
-    }
-
-    public FSDirectory getParent() {
-        return null;
-    }
-
-    public boolean isDirectory() {
-        return true;
-    }
-
-    public boolean isDirty() throws IOException {
-        return false;
-    }
-
-    public boolean isFile() {
-        return false;
+        throw new IOException(
+                "It is not  a file. It is the root of the file system.");
     }
 
     public void setLastModified(long lastModified) throws IOException {

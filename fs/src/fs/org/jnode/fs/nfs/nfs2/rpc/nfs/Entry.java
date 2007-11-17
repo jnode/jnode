@@ -2,7 +2,9 @@ package org.jnode.fs.nfs.nfs2.rpc.nfs;
 
 public class Entry {
     private int fileId;
+
     private String name;
+
     private byte[] cookie;
 
     public Entry(int fileId, String name, byte[] cookie) {

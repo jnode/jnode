@@ -21,6 +21,8 @@
 
 package org.jnode.fs.nfs.nfs2;
 
+import java.net.InetAddress;
+
 import org.jnode.driver.Device;
 
 /**
@@ -32,7 +34,7 @@ public class NFS2Device extends Device {
         UDP, TCP
     }
 
-    private String host;
+    private InetAddress host;
 
     private String remoteDirectory;
 
@@ -42,13 +44,16 @@ public class NFS2Device extends Device {
 
     private int gid;
 
-    public NFS2Device(String host, String remoteDirectory, Protocol protocol) {
+    public NFS2Device(InetAddress host, String remoteDirectory,
+            Protocol protocol) {
         this(host, remoteDirectory, protocol, -1, -1);
 
     }
 
-    public NFS2Device(String host, String remoteDirectory, Protocol protocol, int uid, int gid) {
-        super(null, "nfs2-(" + host + "," + remoteDirectory + "," + protocol + "," + uid + "," + gid + ")");
+    public NFS2Device(InetAddress host, String remoteDirectory,
+            Protocol protocol, int uid, int gid) {
+        super(null, "nfs2-(" + host.toString() + "," + remoteDirectory + ","
+                + protocol + "," + uid + "," + gid + ")");
         this.host = host;
         this.remoteDirectory = remoteDirectory;
         this.protocol = protocol;
@@ -58,7 +63,7 @@ public class NFS2Device extends Device {
 
     }
 
-    public String getHost() {
+    public InetAddress getHost() {
         return host;
     }
 

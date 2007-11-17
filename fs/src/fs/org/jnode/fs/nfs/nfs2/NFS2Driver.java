@@ -31,9 +31,9 @@ import org.jnode.driver.DriverException;
 public class NFS2Driver extends Driver {
     /**
      * Start the device.
-     *
+     * 
      * @throws org.jnode.driver.DriverException
-     *
+     * 
      */
     protected void startDevice() throws DriverException {
         try {
@@ -46,9 +46,9 @@ public class NFS2Driver extends Driver {
 
     /**
      * Stop the device.
-     *
+     * 
      * @throws org.jnode.driver.DriverException
-     *
+     * 
      */
     protected void stopDevice() throws DriverException {
 
