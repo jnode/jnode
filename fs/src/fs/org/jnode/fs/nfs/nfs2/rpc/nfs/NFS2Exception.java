@@ -14,6 +14,10 @@ public class NFS2Exception extends Exception {
 
     }
 
+    public NFS2Exception(String message) {
+        super(message);
+    }
+
     public static String getNFSMessage(ResultCode resultCode) {
 
         if (resultCode == ResultCode.NFS_ERROR_ACCESS) {

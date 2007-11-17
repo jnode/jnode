@@ -36,29 +36,27 @@ import org.jnode.fs.nfs.nfs2.rpc.nfs.ReadFileResult;
  */
 public class NFS2File extends NFS2Object implements FSFile {
 
-    private byte[] fileHandle;
-    private FileAttribute fileAttribute;
+    private NFS2Entry entry;
 
-    NFS2File(NFS2FileSystem fileSystem, byte[] fileHandle, FileAttribute fileAttribute) {
-        super(fileSystem);
-        this.fileHandle = fileHandle;
-        this.fileAttribute = fileAttribute;
+    NFS2File(NFS2Entry entry) {
+        super((NFS2FileSystem) entry.getFileSystem());
+        this.entry = entry;
     }
 
     /**
      * Gets the length (in bytes) of this file
-     *
+     * 
      * @return long
      */
     public long getLength() {
-        return fileAttribute.getSize();
+        return entry.getFileAttribute().getSize();
     }
 
     /**
      * Read <code>len</code> bytes from the given position. The read data is
      * read fom this file starting at offset <code>fileOffset</code> and
      * stored in <code>dest</code> starting at offset <code>ofs</code>.
-     *
+     * 
      * @param fileOffset
      * @param dest
      * @throws java.io.IOException
@@ -69,13 +67,14 @@ public class NFS2File extends NFS2Object implements FSFile {
 
         try {
 
-            int length = 2048;
+            int length = NFS2Client.MAX_DATA;
 
-            while (length == 2048) {
+            while (length == NFS2Client.MAX_DATA) {
 
-                length = Math.min(2048, dest.remaining());
+                length = Math.min(NFS2Client.MAX_DATA, dest.remaining());
 
-                ReadFileResult result = client.readFile(fileHandle, (int) fileOffset, length);
+                ReadFileResult result = client.readFile(entry.getFileHandle(),
+                        (int) fileOffset, length);
 
                 byte[] data = result.getData();
 
@@ -94,7 +93,7 @@ public class NFS2File extends NFS2Object implements FSFile {
 
     /**
      * Flush any cached data to the disk.
-     *
+     * 
      * @throws java.io.IOException
      */
     public void flush() throws IOException {
@@ -103,7 +102,7 @@ public class NFS2File extends NFS2Object implements FSFile {
 
     /**
      * Sets the length of this file.
-     *
+     * 
      * @param length
      * @throws java.io.IOException
      */
@@ -115,7 +114,7 @@ public class NFS2File extends NFS2Object implements FSFile {
      * Write <code>len</code> bytes to the given position. The data is read
      * from <code>src</code> starting at offset <code>ofs</code> and written
      * to this file starting at offset <code>fileOffset</code>.
-     *
+     * 
      * @param fileOffset
      * @param src
      * @throws java.io.IOException
@@ -123,26 +122,29 @@ public class NFS2File extends NFS2Object implements FSFile {
     public void write(long fileOffset, ByteBuffer src) throws IOException {
 
         if (getFileSystem().isReadOnly()) {
-            throw new ReadOnlyFileSystemException("Write in readonly filesystem");
+            throw new ReadOnlyFileSystemException(
+                    "Write in readonly filesystem");
         }
 
         NFS2Client client = getNFS2Client();
 
         try {
 
-            int length = src.remaining();
+            byte[] data = new byte[NFS2Client.MAX_DATA - 512];
 
-            while (length > 0) {
+            int count;
 
-                byte[] data = new byte[Math.min(2048, length)];
+            while (src.remaining() > 0) {
 
-                src.get(data);
+                // TODO fix this -512 . It is a problem in the oncrpc library
+                count = Math.min(NFS2Client.MAX_DATA - 512, src.remaining());
 
-                client.writeFile(fileHandle, (int) fileOffset, src.remaining(), data);
+                src.get(data, 0, count);
 
-                length -= data.length;
+                FileAttribute fileAttribute = client.writeFile(entry
+                        .getFileHandle(), (int) fileOffset, data, 0, count);
 
-                fileOffset += data.length;
+                fileOffset += count;
 
             }
 

@@ -28,7 +28,6 @@ import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.nfs.nfs2.rpc.nfs.FileAttribute;
-import org.jnode.fs.nfs.nfs2.rpc.nfs.FileType;
 import org.jnode.fs.nfs.nfs2.rpc.nfs.NFS2Client;
 import org.jnode.fs.nfs.nfs2.rpc.nfs.NFS2Exception;
 
@@ -47,12 +46,10 @@ public class NFS2Entry extends NFS2Object implements FSEntry {
 
     private FileAttribute fileAttribute;
 
-    private long expirationTime;
-
     private String name;
 
-    NFS2Entry(NFS2FileSystem fileSystem, NFS2Directory parent, String name, byte[] fileHandle,
-              FileAttribute fileAttribute) {
+    NFS2Entry(NFS2FileSystem fileSystem, NFS2Directory parent, String name,
+            byte[] fileHandle, FileAttribute fileAttribute) {
         super(fileSystem);
 
         this.parent = parent;
@@ -60,17 +57,12 @@ public class NFS2Entry extends NFS2Object implements FSEntry {
         this.fileAttribute = fileAttribute;
         this.fileHandle = fileHandle;
 
-        if (fileAttribute.getType() == FileType.DIRECTORY) {
-            directory = new NFS2Directory(fileSystem, fileHandle);
+        if (fileAttribute.getType() == FileAttribute.DIRECTORY) {
+            directory = new NFS2Directory(this);
 
-        } else if (fileAttribute.getType() == FileType.FILE) {
-            file = new NFS2File(fileSystem, fileHandle, fileAttribute);
-
+        } else if (fileAttribute.getType() == FileAttribute.FILE) {
+            file = new NFS2File(this);
         }
-
-        // TODO change the interval based on type of the entry ( file or
-        // directory )
-        expirationTime = System.currentTimeMillis() + 30 * 1000;
 
     }
 
@@ -109,7 +101,7 @@ public class NFS2Entry extends NFS2Object implements FSEntry {
 
     public boolean isDirectory() {
 
-        if (fileAttribute.getType() == FileType.DIRECTORY) {
+        if (fileAttribute.getType() == FileAttribute.DIRECTORY) {
             return true;
         }
 
@@ -122,7 +114,7 @@ public class NFS2Entry extends NFS2Object implements FSEntry {
 
     public boolean isFile() {
 
-        if (fileAttribute.getType() == FileType.FILE) {
+        if (fileAttribute.getType() == FileAttribute.FILE) {
             return true;
         }
 
@@ -138,23 +130,35 @@ public class NFS2Entry extends NFS2Object implements FSEntry {
 
         NFS2Client client = getNFS2Client();
 
+        NFS2Directory parentDirectory = (NFS2Directory) getParent();
+
         try {
-            client.renameFile(((NFS2Directory) getParent()).getFileHandle(), name, ((NFS2Directory) getParent())
-                    .getFileHandle(), newName);
+            client.renameFile(parentDirectory.getEntry().getFileHandle(), name,
+                    parentDirectory.getEntry().getFileHandle(), newName);
         } catch (NFS2Exception e) {
             throw new IOException("Can not rename ." + e.getMessage(), e);
         }
 
     }
 
-    public boolean isValid() {
+    FileAttribute getFileAttribute() {
+        return fileAttribute;
+    }
 
-        if (expirationTime < System.currentTimeMillis()) {
-            return false;
-        }
+    byte[] getFileHandle() {
+        return fileHandle;
+    }
 
-        return true;
+    @Override
+    public boolean equals(Object obj) {
+        // TODO Auto-generated method stub
+        return super.equals(obj);
+    }
 
+    @Override
+    public int hashCode() {
+        // TODO Auto-generated method stub
+        return super.hashCode();
     }
 
 }

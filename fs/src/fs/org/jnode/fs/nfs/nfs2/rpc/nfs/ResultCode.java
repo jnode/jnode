@@ -20,16 +20,16 @@ public enum ResultCode {
     public static ResultCode getResultCode(int code) {
 
         switch (code) {
-            case 0:
-                return NFS_OK;
-            case 2:
-                return NFS_ERROR_NO_ENTRY;
-            case 13:
-                return NFS_ERROR_ACCESS;
-            case 66:
-                return NFS_ERROR_DIRECTORY_NOT_EMPTY;
-            default:
-                throw new IllegalArgumentException("Code  unlnown : " + code);
+        case 0:
+            return NFS_OK;
+        case 2:
+            return NFS_ERROR_NO_ENTRY;
+        case 13:
+            return NFS_ERROR_ACCESS;
+        case 66:
+            return NFS_ERROR_DIRECTORY_NOT_EMPTY;
+        default:
+            throw new IllegalArgumentException("Code  unlnown : " + code);
         }
 
     }

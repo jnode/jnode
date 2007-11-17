@@ -2,6 +2,8 @@ package org.jnode.fs.nfs.nfs2.rpc.mount;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.acplt.oncrpc.OncRpcClient;
 import org.acplt.oncrpc.OncRpcClientAuthUnix;
@@ -10,11 +12,15 @@ import org.acplt.oncrpc.XdrAble;
 import org.acplt.oncrpc.XdrDecodingStream;
 import org.acplt.oncrpc.XdrEncodingStream;
 import org.acplt.oncrpc.XdrVoid;
+import org.apache.log4j.Logger;
 
 /**
- *
+ * 
+ * @author Andrei Dore
  */
 public class Mount1Client {
+
+    private static final Logger LOGGER = Logger.getLogger(Mount1Client.class);
 
     private static final int MOUNT_CODE = 100005;
     private static final int MOUNT_VERSION = 1;
@@ -30,33 +36,71 @@ public class Mount1Client {
     public static final int MOUNT_OK = 0;
     private InetAddress host;
     private int protocol;
-    private OncRpcClient client;
+    private int uid;
+    private int gid;
+
+    private List<OncRpcClient> rpcClientPool;
+
+    private final Object rpcCLientLock = new Object();
 
     /**
      * Constructs a <code>Mount1Client</code> client stub proxy object from
      * which the MOUNTPROG remote program can be accessed.
-     *
-     * @param host     Internet address of host where to contact the remote
-     *                 program.
-     * @param protocol {@link org.acplt.oncrpc.OncRpcProtocols Protocol} to be
-     *                 used for ONC/RPC calls.
+     * 
+     * @param host
+     *                Internet address of host where to contact the remote
+     *                program.
+     * @param protocol
+     *                {@link org.acplt.oncrpc.OncRpcProtocols Protocol} to be
+     *                used for ONC/RPC calls.
      */
-    public Mount1Client(InetAddress host, int protocol, int uid, int gid) throws OncRpcException, IOException {
+    public Mount1Client(InetAddress host, int protocol, int uid, int gid) {
         this.host = host;
         this.protocol = protocol;
+        this.uid = uid;
+        this.gid = gid;
 
-        client = OncRpcClient.newOncRpcClient(host, MOUNT_CODE, MOUNT_VERSION, protocol);
+        rpcClientPool = new LinkedList<OncRpcClient>();
+
+    }
+
+    private OncRpcClient createRpcClient() throws OncRpcException, IOException {
+
+        OncRpcClient client = OncRpcClient.newOncRpcClient(host, MOUNT_CODE, MOUNT_VERSION, protocol);
+        client.setTimeout(10000);
         if (uid != -1 && gid != -1) {
             client.setAuth(new OncRpcClientAuthUnix("test", uid, gid));
+        }
+
+        return client;
+    }
+
+    private synchronized OncRpcClient getRpcClient() throws OncRpcException, IOException {
+
+        if (rpcClientPool.size() == 0) {
+            return createRpcClient();
+        } else {
+            return rpcClientPool.remove(0);
+
+        }
+
+    }
+
+    private synchronized void releaseRpcClient(OncRpcClient client) {
+
+        if (client != null) {
+            rpcClientPool.add(client);
         }
 
     }
 
     /**
      * Call remote procedure test.
-     *
-     * @throws OncRpcException if an ONC/RPC error occurs.
-     * @throws IOException     if an I/O error occurs.
+     * 
+     * @throws OncRpcException
+     *                 if an ONC/RPC error occurs.
+     * @throws IOException
+     *                 if an I/O error occurs.
      * @throws MountException
      */
     public void test() throws IOException, MountException {
@@ -65,11 +109,14 @@ public class Mount1Client {
 
     /**
      * Call remote procedure mount.
-     *
-     * @param dirPath parameter (of type DirPath) to the remote procedure call.
+     * 
+     * @param dirPath
+     *                parameter (of type DirPath) to the remote procedure call.
      * @return Result from remote procedure call (of type MountResult).
-     * @throws OncRpcException if an ONC/RPC error occurs.
-     * @throws IOException     if an I/O error occurs.
+     * @throws OncRpcException
+     *                 if an ONC/RPC error occurs.
+     * @throws IOException
+     *                 if an I/O error occurs.
      * @throws MountException
      */
     public MountResult mount(final String path) throws IOException, MountException {
@@ -111,12 +158,19 @@ public class Mount1Client {
 
     }
 
-    private void call(final int functionId, final XdrAble parameter, final XdrAble result) throws MountException {
+    private void call(final int functionId, final XdrAble parameter, final XdrAble result) throws MountException,
+            IOException {
 
         int countCall = 0;
 
-        while (countCall < 10) {
+        OncRpcClient client = null;
+
+        while (true) {
             try {
+
+                countCall++;
+
+                client = getRpcClient();
 
                 if (result == XdrVoid.XDR_VOID) {
 
@@ -129,26 +183,53 @@ public class Mount1Client {
                     client.call(functionId, parameter, mountResult);
 
                     if (mountResult.getResultCode() != 0) {
-                        throw new MountException("Test");
+                        throw new MountException("An error occur when system try to mount . Error code it is "
+                                + mountResult.getResultCode());
                     }
 
                 }
 
                 break;
 
-            } catch (OncRpcException e) {
+            } catch (Exception e) {
 
-                if (e.getReason() == OncRpcException.RPC_TIMEDOUT) {
-                    countCall++;
-                    continue;
+                // if we receive a timeout we will close the client and next
+                // time we will use another rpc client
+                if (client != null) {
+                    try {
+                        client.close();
+                    } catch (OncRpcException e1) {
+                        // Ignore this
+                    }
+                    client = null;
                 }
 
-                throw new MountException("Test");
+                if (e instanceof RuntimeException) {
+                    throw (RuntimeException) e;
+                }
+
+                if (e instanceof IOException || e instanceof OncRpcException) {
+
+                    if (countCall > 10) {
+                        throw new MountException(e.getMessage(), e);
+                    } else {
+                        LOGGER
+                                .warn("An error occurs when nfs file system try to call the rpc method. It will try again");
+                        continue;
+                    }
+
+                } else {
+                    throw new MountException(e.getMessage(), e);
+                }
+
             } finally {
+
+                if (client != null) {
+                    releaseRpcClient(client);
+                }
 
             }
         }
-
     }
 
     private abstract class Parameter implements XdrAble {
@@ -193,11 +274,16 @@ public class Mount1Client {
 
     }
 
-    public void close() throws MountException {
-        try {
-            client.close();
-        } catch (OncRpcException e) {
-            throw new MountException(e.getMessage(), e);
+    public void close() {
+        for (int i = 0; i < rpcClientPool.size(); i++) {
+
+            OncRpcClient client = rpcClientPool.get(i);
+            try {
+                client.close();
+            } catch (OncRpcException e) {
+
+            }
+
         }
 
     }
