@@ -22,13 +22,13 @@
 package org.jnode.shell.help.argument;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.regex.Pattern;
+import java.util.List;
 
+import org.jnode.shell.PathnamePattern;
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.ParsedArguments;
 
@@ -36,6 +36,8 @@ import org.jnode.shell.help.ParsedArguments;
  * @author qades
  */
 public class FileArgument extends Argument {
+    
+    private static final int PATTERN_FLAGS = 0;  /* just '*' and '?' */
 
     public FileArgument(String name, String description, boolean multi) {
         super(name, description, multi);
@@ -55,24 +57,28 @@ public class FileArgument extends Argument {
 
     public File[] getFiles(ParsedArguments args) {
         String[] values = getValues(args);
-
-        if (values == null) return new File[0];
+        if (values == null) {
+            return new File[0];
+        }
 
         File cwd = new File(".");
         HashSet<File> files = new HashSet<File>();
-        for(String val : values){
-            String regex = val.replace("?", "[\\w]").replace("*", "[\\w]*");
-            if(regex.equals(val)){
-                files.add(new File(val));
-            } else {
-                final Pattern p = Pattern.compile(regex);
-                for(File f : cwd.listFiles(new FilenameFilter() {
-                    public boolean accept(File dir, String name) {
-                        return p.matcher(name).matches();
-                    }
-                })){
-                    files.add(f);
+        for (String val : values) {
+            if (PathnamePattern.isPattern(val, PATTERN_FLAGS)) {
+                List<String> matches = PathnamePattern.compile(val, PATTERN_FLAGS).expand(cwd);
+                if (matches.isEmpty()) {
+                    // A pathname pattern that produces no matches needs to be treated as
+                    // literal pathname.
+                    files.add(new File(val));
                 }
+                else {
+                    for (String match : matches) {
+                        files.add(new File(match));
+                    }
+                }
+            }
+            else {
+                files.add(new File(val));
             }
         }
 
