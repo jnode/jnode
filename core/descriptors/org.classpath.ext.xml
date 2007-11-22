@@ -23,10 +23,7 @@
       <export name="gnu.javax.swing.text.html.parser.support.low.*"/>
       <export name="gnu.javax.swing.tree.*"/>
 
-      <export name="gnu.javax.swing.plaf.gnu.*"/>  
-
-      <export name="javax.net.*"/>
-      <export name="javax.net.ssl.*"/>
+      <export name="gnu.javax.swing.plaf.gnu.*"/>        
 
       <export name="javax.security.*"/>
       <export name="javax.security.auth.*"/>
