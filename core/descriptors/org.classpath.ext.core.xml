@@ -80,6 +80,8 @@
       <export name="javax.naming.event.*"/>
       <export name="javax.naming.ldap.*"/>
       <export name="javax.naming.spi.*"/>
+      <export name="javax.net.*"/>
+      <export name="javax.net.ssl.*"/>
 
       <export name="javax.sound.midi.*"/>
       <export name="javax.sound.midi.spi.*"/>
@@ -91,6 +93,9 @@
       <export name="javax.tools.*"/>
 
 	  <export name="sun.audio.*"/>
+        
+      <export name="sun.net.www.protocol.http.*"/>
+      <export name="sun.net.www.protocol.https.*"/>      
 
       <export name="sun.security.*"/>
       <export name="sun.security.util.*"/>
