@@ -26,6 +26,13 @@ package org.jnode.shell;
  * Date: Dec 20, 2003
  * Time: 1:18:31 AM
  * Copyright (c) Dec 20, 2003 by Sam Reid
+ */ 
+  
+/**
+ * This is the common API for the various mechanisms for running 'commands'.
+ * 
+ * @author Sam Reid
+ * @author crawley@jnode.org
  */
   
 /**

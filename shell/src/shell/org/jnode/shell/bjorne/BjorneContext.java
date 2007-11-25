@@ -15,17 +15,21 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandThread;
+import org.jnode.shell.PathnamePattern;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellFailureException;
 import org.jnode.shell.ShellSyntaxException;
@@ -88,6 +92,10 @@ public class BjorneContext {
 
     private int lastAsyncPid;
 
+    private boolean tildes = true;
+    
+    private boolean globbing = true;
+
     private String options = "";
 
     private StreamHolder[] holders;
@@ -143,13 +151,8 @@ public class BjorneContext {
     }
 
     private static class CharIterator {
-        CharSequence str;
-
-        int pos;
-
-        int start;
-
-        int limit;
+        private CharSequence str;
+        private int pos, start, limit;
 
         public CharIterator(CharSequence str) {
             this.str = str;
@@ -180,8 +183,7 @@ public class BjorneContext {
      * Crreat a copy of a context with the same initial variable bindings and
      * streams. Stream ownership is not transferred.
      * 
-     * @param parent
-     *            the context that gives us our initial state.
+     * @param parent the context that gives us our initial state.
      */
     public BjorneContext(BjorneContext parent) {
         this.interpreter = parent.interpreter;
@@ -234,10 +236,8 @@ public class BjorneContext {
      * This method implements 'NAME=VALUE'. If variable NAME does not exist, it
      * is created as an unexported shell variable.
      * 
-     * @param name
-     *            the name of the variable to be set
-     * @param value
-     *            a non-null value for the variable
+     * @param name the name of the variable to be set
+     * @param value a non-null value for the variable
      */
     public void setVariable(String name, String value) {
         value.length(); // Check that the value is non-null.
@@ -252,8 +252,7 @@ public class BjorneContext {
     /**
      * Test if the variable is currently set here on in an ancestor context.
      * 
-     * @param name
-     *            the name of the variable to be tested
+     * @param name the name of the variable to be tested
      * @return <code>true</code> if the variable is set.
      */
     public boolean isVariableSet(String name) {
@@ -263,8 +262,7 @@ public class BjorneContext {
     /**
      * This method implements 'unset NAME'
      * 
-     * @param name
-     *            the name of the variable to be unset
+     * @param name the name of the variable to be unset
      */
     public void unsetVariableValue(String name) {
         variables.remove(name);
@@ -273,8 +271,7 @@ public class BjorneContext {
     /**
      * This method implements 'export NAME' or 'unexport NAME'.
      * 
-     * @param name
-     *            the name of the variable to be exported / unexported
+     * @param name the name of the variable to be exported / unexported
      */
     public void setExported(String name, boolean exported) {
         VariableSlot var = variables.get(name);
@@ -288,31 +285,25 @@ public class BjorneContext {
     }
 
     /**
-     * Perform expand-and-split processing on an array of word/name tokens
+     * Perform expand-and-split processing on an array of word/name tokens.
      * 
-     * @param tokens
-     *            the tokens to be expanded and split into words
+     * @param tokens the tokens to be expanded and split into words
      * @return the resulting words
      * @throws ShellException
      */
     public CommandLine expandAndSplit(BjorneToken[] tokens)
             throws ShellException {
-        StringBuffer sb = new StringBuffer();
+        LinkedList<String> words = new LinkedList<String>();
         for (BjorneToken token : tokens) {
-            if (sb.length() != 0) {
-                sb.append(' ');
-            }
-            sb.append(expand(token.getText()));
+            splitAndAppend(expand(token.getText()), words);
         }
-        LinkedList<String> words = split(sb);
         return makeCommandLine(words);
     }
 
     /**
      * Perform expand-and-split processing on sequence of characters
      * 
-     * @param text
-     *            the characters to be split
+     * @param text the characters to be split
      * @return the resulting words
      * @throws ShellException
      */
@@ -322,6 +313,21 @@ public class BjorneContext {
     }
 
     private CommandLine makeCommandLine(LinkedList<String> words) {
+        if (globbing || tildes) {
+            LinkedList<String> globbedWords = new LinkedList<String>();
+            for (String word : words) {
+                if (tildes) {
+                    word = tildeExpand(word);
+                }
+                if (globbing) {
+                    globAndAppend(word, globbedWords);
+                }
+                else {
+                    globbedWords.add(word);
+                }
+            }
+            words = globbedWords;
+        }
         int nosWords = words.size();
         if (nosWords == 0) {
             return new CommandLine(null, null);
@@ -333,40 +339,78 @@ public class BjorneContext {
                     .toArray(new String[nosWords - 1]));
         }
     }
+    
+    private String tildeExpand(String word) {
+        if (word.startsWith("~")) {
+            int slashPos = word.indexOf(File.separatorChar);
+            String name = (slashPos >= 0) ? word.substring(1, slashPos) : "";
+            // FIXME ... support "~username" when we have kind of user info / management.
+            String home = (name.length() == 0) ? System.getProperty("user.home", "") : "";
+            if (home.length() == 0) {
+                return word;
+            }
+            else if (slashPos == -1) {
+                return home;
+            }
+            else {
+                return home + word.substring(slashPos);
+            }
+        }
+        else {
+            return word;
+        }
+    }
+    
+    private void globAndAppend(String word, LinkedList<String> globbedWords) {
+        // Try to deal with the 'not-a-pattern' case quickly and cheaply.
+        if (!PathnamePattern.isPattern(word)) {
+            globbedWords.add(word);
+            return;
+        }
+        PathnamePattern pattern = PathnamePattern.compile(word);
+        LinkedList<String> paths = pattern.expand(new File("."));
+        // If it doesn't match anything, a pattern 'expands' to itself.
+        if (paths.isEmpty()) {
+            globbedWords.add(word);
+        }
+        else {
+            globbedWords.addAll(paths);
+        }
+    }
 
     /**
      * Split a character sequence into words, dealing with and removing any
      * non-literal quotes.
      * 
-     * @param text
-     *            the characters to be split
+     * @param text the characters to be split
      * @return the resulting list of words.
      * @throws ShellException
      */
     public LinkedList<String> split(CharSequence text) throws ShellException {
         LinkedList<String> words = new LinkedList<String>();
+        splitAndAppend(text, words);
+        return words;
+    }
+    
+    /**
+     * This method does the work of 'split'; see above.
+     */
+    private void splitAndAppend(CharSequence text, LinkedList<String> words) 
+    throws ShellException {
         StringBuffer sb = null;
         int len = text.length();
         int quote = 0;
-        int quoteStart = -1;
         for (int i = 0; i < len; i++) {
             char ch = text.charAt(i);
             switch (ch) {
             case '"':
-            case '`':
             case '\'':
                 if (quote == 0) {
                     quote = ch;
                     if (sb == null) {
                         sb = new StringBuffer();
                     }
-                    quoteStart = sb.length();
                 } else if (quote == ch) {
-                    if (quote == '`') {
-                        String backtickResult = runBacktickCommand(sb
-                                .substring(quoteStart));
-                        sb.replace(quoteStart, sb.length(), backtickResult);
-                    }
                     quote = 0;
                 } else {
                     sb = accumulate(sb, ch);
@@ -396,7 +440,6 @@ public class BjorneContext {
         if (sb != null) {
             words.add(sb.toString());
         }
-        return words;
     }
 
     private String runBacktickCommand(String commandLine) throws ShellException {
@@ -421,8 +464,7 @@ public class BjorneContext {
     /**
      * Perform '$' expansions. Any quotes and escapes should be preserved.
      * 
-     * @param text
-     *            the characters to be expanded
+     * @param text the characters to be expanded
      * @return the result of the expansion.
      * @throws ShellException
      */
@@ -437,6 +479,7 @@ public class BjorneContext {
         CharIterator ci = new CharIterator(text);
         StringBuffer sb = new StringBuffer(text.length());
         char quote = 0;
+        int backtickStart = -1;
         int ch = ci.nextCh();
         while (ch != -1) {
             switch (ch) {
@@ -450,7 +493,14 @@ public class BjorneContext {
                 sb.append((char) ch);
                 break;
             case '`':
-                sb.append((char) ch);
+                if (backtickStart == -1) {
+                    backtickStart = sb.length();
+                }
+                else {
+                    String tmp = runBacktickCommand(sb.substring(backtickStart));
+                    sb.replace(backtickStart, sb.length(), tmp);
+                    backtickStart = -1;
+                }
                 break;
             case ' ':
             case '\t':
@@ -477,6 +527,9 @@ public class BjorneContext {
                 sb.append((char) ch);
             }
             ch = ci.nextCh();
+        }
+        if (backtickStart != -1) {
+            throw new ShellFailureException("unmatched '`'");
         }
         return sb;
     }
@@ -740,7 +793,8 @@ public class BjorneContext {
         throw new ShellFailureException("not implemented");
     }
 
-    int execute(CommandLine command, Closeable[] streams) throws ShellException {
+    int execute(CommandLine command, Closeable[] streams) 
+    throws ShellException {
         lastReturnCode = interpreter.executeCommand(command, this, streams);
         return lastReturnCode;
     }
@@ -779,18 +833,17 @@ public class BjorneContext {
         return shellPid;
     }
 
-    void performAssignments(BjorneToken[] assignments) throws ShellException {
+    void performAssignments(BjorneToken[] assignments) 
+    throws ShellException {
         if (assignments != null) {
             for (int i = 0; i < assignments.length; i++) {
                 String assignment = assignments[i].getText();
                 int pos = assignment.indexOf('=');
                 if (pos <= 0) {
-                    throw new ShellFailureException(
-                            "misplaced '=' in assignment");
+                    throw new ShellFailureException("misplaced '=' in assignment");
                 }
                 String name = assignment.substring(0, pos);
-                String value = this.expand(assignment.substring(pos + 1))
-                        .toString();
+                String value = expand(assignment.substring(pos + 1)).toString();
                 this.setVariable(name, value);
             }
         }
@@ -939,5 +992,10 @@ public class BjorneContext {
     public CommandThread fork(CommandLine command, Closeable[] streams) 
     throws ShellException {
         return interpreter.fork(command, streams);
+    }
+
+    public boolean patternMatch(CharSequence expandedWord, CharSequence pat) {
+        // TODO Auto-generated method stub
+        return false;
     }
 }

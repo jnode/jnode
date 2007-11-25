@@ -1,7 +1,6 @@
 package org.jnode.shell.bjorne;
 
 import org.jnode.shell.ShellException;
-import static org.jnode.shell.bjorne.BjorneInterpreter.*;
 
 public class LoopCommandNode extends CommandNode {
     private final CommandNode cond;
@@ -35,7 +34,8 @@ public class LoopCommandNode extends CommandNode {
         int rc = 0;
         while (true) {
             rc = cond.execute(context);
-            if (context.getLastReturnCode() == 0 ^ getNodeType() == CMD_UNTIL) {
+            if (context.getLastReturnCode() == 0 ^ 
+                getNodeType() == BjorneInterpreter.CMD_UNTIL) {
                 break;
             }
             try {
@@ -44,12 +44,13 @@ public class LoopCommandNode extends CommandNode {
                 }
             } catch (BjorneControlException ex) {
                 int control = ex.getControl();
-                if (control == BRANCH_BREAK || control == BRANCH_CONTINUE) {
+                if (control == BjorneInterpreter.BRANCH_BREAK || 
+                    control == BjorneInterpreter.BRANCH_CONTINUE) {
                     if (ex.getCount() > 1) {
                         ex.decrementCount();
                         throw ex;
                     }
-                    if (control == BRANCH_BREAK) {
+                    if (control == BjorneInterpreter.BRANCH_BREAK) {
                         break;
                     } else {
                         continue;
@@ -58,6 +59,9 @@ public class LoopCommandNode extends CommandNode {
                     throw ex;
                 }
             }
+        }
+        if ((getFlags() & BjorneInterpreter.FLAG_BANG) != 0) {
+            rc = (rc == 0) ? -1 : 0;
         }
         return rc;
     }
