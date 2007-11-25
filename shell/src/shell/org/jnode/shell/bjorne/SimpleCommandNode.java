@@ -3,8 +3,6 @@
  */
 package org.jnode.shell.bjorne;
 
-import static org.jnode.shell.bjorne.BjorneInterpreter.FLAG_ASYNC;
-
 import java.io.Closeable;
 
 import org.jnode.shell.CommandLine;
@@ -52,6 +50,7 @@ public class SimpleCommandNode extends CommandNode {
     @Override
     public int execute(BjorneContext context) throws ShellException {
         BjorneContext.StreamHolder[] holders = null;
+        int rc;
         try {
             BjorneToken[] words = getWords();
             if (words.length == 0) {
@@ -60,7 +59,7 @@ public class SimpleCommandNode extends CommandNode {
                 // Surprisingly, we still need to perform the redirections
                 context = new BjorneContext(context);
                 context.evaluateRedirections(getRedirects());
-                return 0;
+                rc = 0;
             } else {
                 // Assignments and redirections are done in the command's context
                 context = new BjorneContext(context);
@@ -71,11 +70,11 @@ public class SimpleCommandNode extends CommandNode {
                 for (int i = 0; i < streams.length; i++) {
                     streams[i] = holders[i].stream;
                 }
-                if ((getFlags() & FLAG_ASYNC) != 0) {
+                if ((getFlags() & BjorneInterpreter.FLAG_ASYNC) != 0) {
                     throw new ShellFailureException(
                             "asynchronous execution (&) not implemented yet");
                 } else {
-                    return context.execute(command, streams);
+                    rc = context.execute(command, streams);
                 }
             }
         } finally {
@@ -85,5 +84,9 @@ public class SimpleCommandNode extends CommandNode {
                 }
             }
         }
+        if ((getFlags() & BjorneInterpreter.FLAG_BANG) != 0) {
+            rc = (rc == 0) ? -1 : 0;
+        }
+        return rc;
     }
 }

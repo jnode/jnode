@@ -9,7 +9,7 @@ import org.jnode.shell.CommandLine;
 import org.jnode.shell.ShellException;
 
 final class ReturnBuiltin extends BjorneBuiltin {
-    public int invoke(CommandLine command, BjorneInterpreter interpretter,
+    public int invoke(CommandLine command, BjorneInterpreter interpreter,
             BjorneContext context) throws ShellException {
         Iterator<String> it = command.iterator();
         if (!it.hasNext()) {

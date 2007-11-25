@@ -12,7 +12,7 @@ import org.jnode.shell.CommandLine;
 import org.jnode.shell.ShellException;
 
 final class SourceBuiltin extends BjorneBuiltin {
-    public int invoke(CommandLine command, BjorneInterpreter interpretter,
+    public int invoke(CommandLine command, BjorneInterpreter interpreter,
             BjorneContext context) throws ShellException {
         Iterator<String> it = command.iterator();
         if (!it.hasNext()) {
@@ -48,7 +48,7 @@ final class SourceBuiltin extends BjorneBuiltin {
             }
         }
         // TODO ... implement args.
-        return interpretter.interpret(interpretter.getShell(), commandStr,
+        return interpreter.interpret(interpreter.getShell(), commandStr,
                 null, true);
     }
 }

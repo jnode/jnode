@@ -16,8 +16,6 @@ import org.jnode.shell.ShellFailureException;
 import org.jnode.shell.ThreadExitListener;
 import org.jnode.shell.bjorne.BjorneContext.StreamHolder;
 
-import static org.jnode.shell.bjorne.BjorneInterpreter.*;
-
 
 public class ListCommandNode extends CommandNode {
     private static class PipelineStage {
@@ -50,7 +48,12 @@ public class ListCommandNode extends CommandNode {
     @Override
     public int execute(BjorneContext context) throws ShellException {
         int rc = 0;
-        if ((getFlags() & FLAG_PIPE) == FLAG_PIPE) {
+        if (getNodeType() == BjorneInterpreter.CMD_SUBSHELL) {
+            // This simulates creating a 'subshell'.
+            context = new BjorneContext(context);
+        }
+        int listFlags = getFlags();
+        if ((listFlags & BjorneInterpreter.FLAG_PIPE) != 0) {
             PipelineStage[] stages = assemblePipeline(context);
             boolean done = false;
             try {
@@ -70,19 +73,22 @@ public class ListCommandNode extends CommandNode {
             }
         } else {
             for (CommandNode command : commands) {
-                int flags = command.getFlags();
-                if ((flags & FLAG_AND_IF) != 0) {
+                int commandFlags = command.getFlags();
+                if ((commandFlags & BjorneInterpreter.FLAG_AND_IF) != 0) {
                     if (context.getLastReturnCode() != 0) {
                         break;
                     }
                 }
-                if ((flags & FLAG_OR_IF) != 0) {
+                if ((commandFlags & BjorneInterpreter.FLAG_OR_IF) != 0) {
                     if (context.getLastReturnCode() == 0) {
                         break;
                     }
                 }
                 rc = command.execute(context);
             }
+        }
+        if ((listFlags & BjorneInterpreter.FLAG_BANG) != 0) {
+            rc = (rc == 0) ? -1 : 0;
         }
         return rc;
     }

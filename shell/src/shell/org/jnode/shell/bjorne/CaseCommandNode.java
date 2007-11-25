@@ -1,5 +1,7 @@
 package org.jnode.shell.bjorne;
 
+import org.jnode.shell.ShellException;
+
 public class CaseCommandNode extends CommandNode {
 
     private final BjorneToken word;
@@ -33,7 +35,22 @@ public class CaseCommandNode extends CommandNode {
     }
 
     @Override
-    public int execute(BjorneContext context) {
-        return -1;
+    public int execute(BjorneContext context) throws ShellException {
+        int rc = -1;
+        
+        CharSequence expandedWord = context.expand(word.token);
+        for (CaseItemNode caseItem : caseItems) {
+            for (BjorneToken pattern : caseItem.getPattern()) {
+                CharSequence pat = context.expand(pattern.token);
+                if (context.patternMatch(expandedWord, pat)) {
+                    
+                }
+            }
+        }
+        
+        if ((getFlags() & BjorneInterpreter.FLAG_BANG) != 0) {
+            rc = (rc == 0) ? -1 : 0;
+        }
+        return rc;
     }
 }

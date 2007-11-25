@@ -56,6 +56,9 @@ public class IfCommandNode extends CommandNode {
                 return elsePart.execute(context);
             }
         }
+        if ((getFlags() & BjorneInterpreter.FLAG_BANG) != 0) {
+            rc = (rc == 0) ? -1 : 0;
+        }
         return rc;
     }
 }
