@@ -45,4 +45,35 @@ public class ParsedArguments {
     final boolean isSet(Parameter param) {
         return args.containsKey(param);
     }
+    
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{");
+        for (Map.Entry<CommandLineElement, String[]> entry : args.entrySet()) {
+            if (sb.charAt(sb.length() - 1) != '{') {
+                sb.append(',');
+            }
+            sb.append(entry.getKey().format()).append("->");
+            if (entry.getValue() == null) {
+                sb.append("null");
+            }
+            else {
+                sb.append('[');
+                for (String value: entry.getValue()) {
+                    if (sb.charAt(sb.length() - 1) != '[') {
+                        sb.append(',');
+                    }
+                    if (value == null) {
+                        sb.append("null");
+                    }
+                    else {
+                        sb.append('"').append(value).append('"');
+                    }
+                }
+                sb.append(']');
+            }
+        }
+        sb.append("}");
+        return sb.toString();
+    }
 }
