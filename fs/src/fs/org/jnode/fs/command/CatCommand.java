@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.command;
 
 import java.io.File;
@@ -31,13 +31,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
+import org.jnode.shell.help.Syntax;
 import org.jnode.shell.help.argument.FileArgument;
+import org.jnode.shell.help.argument.URLArgument;
 
 /**
  * @author epr
@@ -47,81 +47,107 @@ import org.jnode.shell.help.argument.FileArgument;
  */
 public class CatCommand extends AbstractCommand {
 
-    static final Argument ARG_FILE = new FileArgument("file",
-            "the files (or URLs) to be concatenated", true);
+    static final FileArgument ARG_FILE = new FileArgument("file",
+            "the files to be concatenated", true);
 
+    static final URLArgument ARG_URL = new URLArgument("url",
+            "the files to be concatenated", true);
+    
     public static Help.Info HELP_INFO = new Help.Info("cat",
-            "Concatenate the contents of the files, writing them to standatd output.  " +
-            "If there are no arguments, standard input is read until EOF is reached; " +
-            "e.g. ^D when reading keyboard input.",
-            new Parameter[] { new Parameter(ARG_FILE, Parameter.OPTIONAL)});
-    
+            new Syntax[] {
+                new Syntax(
+                        "Fetch the argument urls and copy their contents to standard output.",
+                        new Parameter[] { 
+                                new Parameter("u", 
+                                        "selects urls rather than pathnames",
+                                        ARG_URL, Parameter.MANDATORY)}),
+                new Syntax(
+                        "Read the argument files, copying their contents to standard output.  " +
+                        "If there are no arguments, standard input is read until EOF is reached; " +
+                        "e.g. ^D when reading keyboard input.",
+                        new Parameter[] { 
+                                new Parameter(ARG_FILE, Parameter.OPTIONAL) })
+                           
+    });
+
     private static final int BUFFER_SIZE = 1024;
-    
+
 
     public static void main(String[] args) throws Exception {
-    	new CatCommand().execute(args);
+        new CatCommand().execute(args);
     }
-    
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-        ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
-    	String[] fileNames = ARG_FILE.getValues(cmdLine);
-    	boolean ok = true;
-    	try {
-    		if (fileNames == null || fileNames.length == 0) {
-    			process(in, out);
-    		}
-    		else {
-    			for (String fileName : fileNames) {
-    				InputStream is = null;
-    				try {
-    					try {
-    						// Try to parse the argument as a URL
-    						URL url = new URL(fileName);
-    						try {
-    							// Open stream connection for URL
-    							is = url.openStream();	
-    						} catch (IOException ex) {
-    							err.println("Can't access file from url " + 
-    									fileName + ": " + ex.getMessage());        				
-    						}
-    					} catch (MalformedURLException ex) {
-    						// If the argument didn't parse as a URL, treat it as a filename
-    						// and open a FileInputStream
-	    					is = openFile(fileName, err);
-    					}
 
-    					if (is == null) {
-    						ok = false;
-    					}
-    					else {
-    						process(is, out);
-    					}
-    				} finally {
-    					if (is != null) {
-    						try { 
-    							is.close();
-    						}
-    						catch (IOException ex) {
-    							// ignore.
-    						}
-    					}
-    				}
-    			}
-    		}
-        	if (out.checkError()) {
-        		ok = false;
-        	}
-    	} catch (IOException ex) {
-    		// Deal with i/o errors reading from in/is or writing to out.
-    		err.println("Problem concatenating file(s): " + ex.getMessage());
-    		ok = false;
-    	}
-    	if (!ok) { 
-    		exit(1); 
-    	}
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
+        ParsedArguments args = HELP_INFO.parse(commandLine);
+        File[] files = ARG_FILE.getFiles(args);
+        String[] urls = ARG_URL.getValues(args);
+        boolean ok = true;
+        try {
+            if (urls != null && urls.length > 0) {
+                for (String urlString : urls) {
+                    InputStream is = null;
+                    try {
+                        URL url = new URL(urlString);
+                        is = url.openStream();
+                        if (is == null) {
+                            ok = false;
+                        }
+                        else {
+                            process(is, out);
+                        }
+                    } catch (MalformedURLException ex) {
+                        err.println("Malformed url '" + urlString + "': " + ex.getMessage());
+                    } catch (IOException ex) {
+                        err.println("Can't fetch url '" + urlString + "': " + ex.getMessage());                                        
+                    } finally {
+                        if (is != null) {
+                            try { 
+                                is.close();
+                            } catch (IOException ex) { 
+                                /* ignore */
+                            }
+                        }
+                    }
+                }
+            }
+            else if (files != null && files.length > 0) {
+                for (File file : files) {
+                    InputStream is = null;
+                    try {
+                        is = openFile(file, err);
+                        if (is == null) {
+                            ok = false;
+                        }
+                        else {
+                            process(is, out);
+                        }
+                    } finally {
+                        if (is != null) {
+                            try { 
+                                is.close();
+                            } catch (IOException ex) {
+                                /* ignore */
+                            }
+                        }
+                    }
+                }
+            }
+            else {
+                process(in, out);
+            }
+            if (out.checkError()) {
+                ok = false;
+            }
+        } catch (IOException ex) {
+            // Deal with i/o errors reading from in/is or writing to out.
+            err.println("Problem concatenating file(s): " + ex.getMessage());
+            ok = false;
+        }
+        if (!ok) { 
+            exit(1); 
+        }
     }
-    
+
     /**
      * Copy all of stream 'in' to stream 'out'
      * @param in
@@ -129,11 +155,11 @@ public class CatCommand extends AbstractCommand {
      * @throws IOException
      */
     private void process(InputStream in, PrintStream out) throws IOException {
-    	int len;
-		final byte[] buf = new byte[BUFFER_SIZE];
-		while ((len = in.read(buf)) > 0) {
-			out.write(buf, 0, len);
-		}
+        int len;
+        final byte[] buf = new byte[BUFFER_SIZE];
+        while ((len = in.read(buf)) > 0) {
+            out.write(buf, 0, len);
+        }
     }
 
     /**
@@ -142,28 +168,27 @@ public class CatCommand extends AbstractCommand {
      * @param err where we write error messages
      * @return An open stream, or <code>null</code>.
      */
-    private InputStream openFile(String fname, PrintStream err) {
-    	InputStream is = null;
-    	
+    private InputStream openFile(File file, PrintStream err) {
+        InputStream is = null;
+
         try {
-        	File file = new File(fname);
-        	// FIXME we shouldn't be doing these tests.  Rather, we should be
-        	// just trying to create the FileInputStream and printing the 
-        	// exception message on failure.  (That assumes that the exception
-        	// message is accurate!)
-        	if (!file.exists()) {
-        		err.println("File doesn't exist");
-        	}
-        	else if (file.isDirectory()) {
-        		err.println("Can't concatenate a directory");
-        	}
-        	else {
-        		is = new FileInputStream(file);
-        	}
+            // FIXME we shouldn't be doing these tests.  Rather, we should be
+            // just trying to create the FileInputStream and printing the 
+            // exception message on failure.  (That assumes that the exception
+            // message is accurate!)
+            if (!file.exists()) {
+                err.println("File doesn't exist: '" + file + "'");
+            }
+            else if (file.isDirectory()) {
+                err.println("Can't 'cat' a directory: '" + file + "'");
+            }
+            else {
+                is = new FileInputStream(file);
+            }
         } catch (FileNotFoundException ex) {
-        	// should never happen since we check for existence before
+            // should never happen since we check for existence before
         }
-        
+
         return is;
     }
 
