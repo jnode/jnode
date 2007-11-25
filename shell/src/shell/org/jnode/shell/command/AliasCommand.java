@@ -55,7 +55,7 @@ public class AliasCommand extends AbstractCommand {
     static final Parameter PARAM_REMOVE = new Parameter("r",
             "following alias will be removed", ARG_ALIAS, Parameter.MANDATORY);
 
-    private final static String slash_t = ":\t";
+    private final static String slash_t = ":\t\t";
 
     public static Help.Info HELP_INFO = new Help.Info(
             "alias",
