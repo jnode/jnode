@@ -48,7 +48,7 @@ GLABEL vm_athrow_notrace
 	
 vm_athrow_notrace_pop_eip:
 	pop ADX				; return address
-	lea ADX,[ADX-5]		; The call to this method is a 5 byte instruction
+	lea ADX,[ADX-4]		; The call to this method is a 4 byte instruction
 
 	push AAX			; save exception
 	push ADX			; save address
