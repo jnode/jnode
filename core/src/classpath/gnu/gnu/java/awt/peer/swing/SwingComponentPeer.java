@@ -67,6 +67,7 @@ import java.awt.peer.LightweightPeer;
 
 import javax.swing.JComponent;
 import javax.swing.RepaintManager;
+import sun.awt.CausedFocusEvent;
 
 /**
  * The base class for Swing based component peers. This provides the basic
@@ -1109,4 +1110,11 @@ public class SwingComponentPeer
   {
     return awtComponent;
   }
+
+    //jnode+openjdk
+    public boolean requestFocus(Component lightweightChild, boolean temporary, boolean focusedWindowChangeAllowed, long time, CausedFocusEvent.Cause cause) {
+        if (swingComponent != null)
+            swingComponent.getJComponent().requestFocus();
+        return swingComponent != null;
+    }
 }
