@@ -11,6 +11,8 @@
 
 ; -----------------------------------------------
 ; Throw an exception
+; This code gets called by the BytecodeVisitor whenever there is an
+; athrow bytecode
 ; Input
 ;   eax  Exception to throw
 ; -----------------------------------------------
@@ -47,8 +49,16 @@ GLABEL vm_athrow_notrace
 	jz vm_athrow_unhandled	
 	
 vm_athrow_notrace_pop_eip:
-	pop ADX				; return address
-	lea ADX,[ADX-4]		; The call to this method is a 4 byte instruction
+	; At this point the top of stack contains the EIP. That is, because
+	; we got called by a jumptable-call from ByteCodeVisitor#visit_athrow
+	pop ADX				; return address (EIP)
+	; The EIP (now aka ADX) points to the end of the "call" instruction,
+	; which also means, ADX now points to an assembly instruction that
+	; belongs to the bytecode right after the athrow. To get an address
+	; that points into an instruction that belongs to the "athrow" bytecode
+	; we simply decremen the pointer by one. We use lea instead of sub to
+	; not modify and flags. Basically "lea ADX,[ADX-1]" == "sub ADX,1".
+	lea ADX,[ADX-1]
 
 	push AAX			; save exception
 	push ADX			; save address
