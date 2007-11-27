@@ -36,6 +36,7 @@ import org.jnode.awt.JNodeGenericPeer;
 import org.jnode.awt.JNodeGraphics;
 import org.jnode.awt.JNodeGraphics2D;
 import gnu.classpath.SystemProperties;
+import sun.awt.CausedFocusEvent;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -595,7 +596,32 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
         //TODO implement it
     }
 
+    public void setAlwaysOnTop(boolean alwaysOnTop) {
+        //TODO implement it
+    }
 
+    public void updateFocusableWindowState() {
+        //TODO implement it
+    }
+
+    public void setModalBlocked(Dialog blocker, boolean blocked) {
+        //TODO implement it
+    }
+
+    public void updateMinimumSize() {
+        //TODO implement it
+    }
+
+    public void updateIconImages() {
+        //TODO implement it
+    }
+
+
+    public boolean requestFocus(Component lightweightChild, boolean temporary, boolean focusedWindowChangeAllowed, long time, CausedFocusEvent.Cause cause) {
+        //TODO implement it
+        return false;
+    }
+    
     //jnode openjdk
     public Rectangle getBoundsPrivate() {
         //TODO implement it

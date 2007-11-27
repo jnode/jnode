@@ -21,12 +21,7 @@
  
 package org.jnode.awt.swingpeers;
 
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Graphics;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Window;
+import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.awt.peer.WindowPeer;
 
@@ -173,6 +168,28 @@ abstract class SwingBaseWindowPeer<awtT extends Window, swingPeerT extends Swing
     public boolean requestWindowFocus() {
         //TODO implement it
         return false;
+    }
+
+    public void updateIconImages() {
+        //TODO implement it
+    }
+
+
+    public void updateMinimumSize() {
+        //TODO implement it
+    }
+
+
+    public void setModalBlocked(Dialog blocker, boolean blocked) {
+        //TODO implement it
+    }
+
+    public void updateFocusableWindowState() {
+        //TODO implement it
+    }
+
+    public void setAlwaysOnTop(boolean alwaysOnTop) {
+        //TODO implement it
     }
 
     private class WindowEventDispatcher implements InternalFrameListener {
