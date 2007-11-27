@@ -24,19 +24,7 @@ package org.jnode.awt.swingpeers;
 import javax.swing.JFrame;
 import javax.swing.JRootPane;
 import javax.swing.JComponent;
-import java.awt.Window;
-import java.awt.VMAwtAPI;
-import java.awt.AWTEvent;
-import java.awt.Graphics;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Container;
-import java.awt.Frame;
-import java.awt.Component;
-import java.awt.MenuBar;
-import java.awt.Image;
-import java.awt.Rectangle;
-import java.awt.BorderLayout;
+import java.awt.*;
 import java.awt.peer.WindowPeer;
 import java.awt.peer.FramePeer;
 
@@ -328,6 +316,26 @@ abstract class SwingJBaseWindowPeer<awtT extends Window, swingPeerT extends Swin
 
     public boolean requestWindowFocus() {
         return peerComponent.requestFocusInWindow();
+    }
+
+    public void setAlwaysOnTop(boolean alwaysOnTop) {
+        //TODO implement it
+    }
+
+    public void updateFocusableWindowState() {
+        //TODO implement it
+    }
+
+    public void setModalBlocked(Dialog blocker, boolean blocked) {
+        //TODO implement it
+    }
+
+    public void updateMinimumSize() {
+        //TODO implement it
+    }
+
+    public void updateIconImages() {
+        //TODO implement it
     }
 }
 

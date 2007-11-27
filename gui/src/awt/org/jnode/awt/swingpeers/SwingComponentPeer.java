@@ -51,6 +51,7 @@ import java.awt.peer.ComponentPeer;
 import java.awt.peer.ContainerPeer;
 
 import gnu.classpath.SystemProperties;
+import sun.awt.CausedFocusEvent;
 
 /**
  * Base class for virtual component peers. Satisfies the requirements for AWT
@@ -314,6 +315,7 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
 
     public final boolean requestFocus(Component lightweightChild, boolean temporary,
                                       boolean focusedWindowChangeAllowed, long time) {
+        peerComponent.requestFocus();
         return true;
     }
 
@@ -420,5 +422,11 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
 
     public void reparent(ContainerPeer parent) {
         //TODO implement it
+    }
+
+
+    public boolean requestFocus(Component lightweightChild, boolean temporary, boolean focusedWindowChangeAllowed, long time, CausedFocusEvent.Cause cause) {
+        peerComponent.requestFocus();
+        return true;  
     }
 }
