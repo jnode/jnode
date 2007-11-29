@@ -28,6 +28,7 @@
       <export name="sun.security.util.SecurityConstants"/>
       <export name="sun.security.action.GetPropertyAction"/>
       <export name="sun.security.action.GetBooleanAction"/>
+      <export name="sun.security.action.LoadLibraryAction"/>
       <export name="sun.security.jca.*"/>
       <export name="sun.nio.cs.StreamEncoder"/>
       <export name="sun.nio.cs.StreamDecoder"/>
