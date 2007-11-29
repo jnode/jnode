@@ -98,6 +98,7 @@ import javax.accessibility.AccessibleContext;
 import javax.accessibility.AccessibleRole;
 import javax.accessibility.AccessibleState;
 import javax.accessibility.AccessibleStateSet;
+import sun.awt.AppContext;
 
 /**
  * The root of all evil. All graphical representations are subclasses of this
@@ -7423,4 +7424,12 @@ p   * <li>the set of backward traversal keys
       flip(caps.getFlipContents());
     }
   }
+
+    //jnode+openjdk
+    /**
+     * The <code>AppContext</code> of the component. Applets/Plugin may
+     * change the AppContext.
+     */
+    transient AppContext appContext;
+
 }
