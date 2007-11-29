@@ -165,7 +165,9 @@ final class VMRuntime
      * @return 0 on failure, nonzero on success
      */
     static int nativeLoad(String filename, ClassLoader loader) {
-        return 0;
+        //todo review
+        //for new we assume success since there are no native libs on jnode
+        return 1;
     }
 
     /**

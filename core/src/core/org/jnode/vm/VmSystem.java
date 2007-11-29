@@ -279,7 +279,7 @@ public final class VmSystem {
         res.put("java.ext.dirs", "");
         res.put("java.home", "/jifs/");
         res.put("java.io.tmpdir", "/jnode/tmp");
-        res.put("java.library.path", "");
+        res.put("java.library.path", "/jnode/tmp"); //dummy value but needed by Runtime.loadLibrary
         res.put("java.runtime.name", "JNode");
         res.put("java.runtime.version", vm.getVersion());
         res.put("java.specification.name", "Java Platform API Specification");
