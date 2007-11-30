@@ -3960,5 +3960,18 @@ public abstract class JComponent extends Container implements Serializable
             return ui.getBaselineResizeBehavior(this);
         }
         return BaselineResizeBehavior.OTHER;
-    }    
+    }
+
+    //jnode openjdk
+    // These functions must be static so that they can be called from
+    // subclasses inside the package, but whose inheritance hierarhcy includes
+    // classes outside of the package below JComponent (e.g., JTextArea).
+    static void setWriteObjCounter(JComponent comp, byte count) {
+        comp.flags = (comp.flags & ~(0xFF << WRITE_OBJ_COUNTER_FIRST)) |
+                     (count << WRITE_OBJ_COUNTER_FIRST);
+    }
+    static byte getWriteObjCounter(JComponent comp) {
+        return (byte)((comp.flags >> WRITE_OBJ_COUNTER_FIRST) & 0xFF);
+    }
+
 }
