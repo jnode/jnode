@@ -755,15 +755,11 @@ public abstract class Path2D implements Shape, Cloneable {
             // offer "public Object clone()" for backwards
             // compatibility so we cannot restrict it further.
             // REMIND: Can we do both somehow?
-//jnode
-/*
             if (this instanceof GeneralPath) {
                 return new GeneralPath(this);
             } else {
                 return new Path2D.Float(this);
             }
-*/
-            return new Path2D.Float(this);            
         }
 
         /*
