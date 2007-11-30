@@ -1599,4 +1599,24 @@ public class SwingUtilities
         throw new IllegalArgumentException("Unrecognised code: " + code);
     }
   }
+
+    //jnode openjdk
+    static void updateRendererOrEditorUI(Object rendererOrEditor) {
+        if (rendererOrEditor == null) {
+            return;
+        }
+
+        Component component = null;
+
+        if (rendererOrEditor instanceof Component) {
+            component = (Component)rendererOrEditor;
+        }
+        if (rendererOrEditor instanceof DefaultCellEditor) {
+            component = ((DefaultCellEditor)rendererOrEditor).getComponent();
+        }
+
+        if (component != null) {
+            SwingUtilities.updateComponentTreeUI(component);
+        }
+    }
 }
