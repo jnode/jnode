@@ -84,7 +84,7 @@ public class LoadkeysCommand extends AbstractCommand {
         for (Device kb : kbDevs) {
             final KeyboardAPI api = kb.getAPI(KeyboardAPI.class);
 
-            if (!PARAM_COUNTRY.isSatisfied()) {
+            if (!PARAM_COUNTRY.isSet(args)) {
                 out.println("layout currently loaded : "
                         + api.getKbInterpreter().getClass().getName());
             } else {
