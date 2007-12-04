@@ -53,7 +53,7 @@ public class MkdirCommand extends AbstractCommand {
     	ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
         File dir = ARG_DIR.getFile(cmdLine);
         
-        if (dir.mkdir()) {
+        if (!dir.mkdir()) {
         	err.println("Can't create directory.");
         	exit(1);
         }    	
