@@ -16,8 +16,8 @@ public class Time {
         this((int) (date.getTime() / 1000), 0);
     }
 
-    public Time(int esecondsconds, int microSeconds) {
-        this.seconds = esecondsconds;
+    public Time(int seconds, int microSeconds) {
+        this.seconds = seconds;
         this.microSeconds = microSeconds;
     }
 

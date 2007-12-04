@@ -34,7 +34,7 @@ public class FileAttribute {
 
     protected int fsid;
 
-    protected int fileid;
+    protected int fileId;
 
     protected Time lastAccessed;
 
@@ -122,12 +122,12 @@ public class FileAttribute {
         return this.fsid;
     }
 
-    public void setFileid(int x) {
-        this.fileid = x;
+    public void setFileId(int x) {
+        this.fileId = x;
     }
 
-    public int getFileid() {
-        return this.fileid;
+    public int getFileId() {
+        return this.fileId;
     }
 
     public void setLastAccessed(Time x) {

@@ -25,11 +25,11 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.jnode.fs.FSFile;
-import org.jnode.fs.ReadOnlyFileSystemException;
 import org.jnode.fs.nfs.nfs2.rpc.nfs.FileAttribute;
 import org.jnode.fs.nfs.nfs2.rpc.nfs.NFS2Client;
 import org.jnode.fs.nfs.nfs2.rpc.nfs.NFS2Exception;
 import org.jnode.fs.nfs.nfs2.rpc.nfs.ReadFileResult;
+import org.jnode.fs.nfs.nfs2.rpc.nfs.Time;
 
 /**
  * @author Andrei Dore
@@ -108,6 +108,15 @@ public class NFS2File extends NFS2Object implements FSFile {
      */
     public void setLength(long length) throws IOException {
 
+        NFS2Client client = getNFS2Client();
+
+        try {
+            client.setAttribute(entry.getFileHandle(), -1, -1, -1,
+                    (int) length, new Time(-1, -1), new Time(-1, -1));
+        } catch (NFS2Exception e) {
+            throw new IOException(e.getMessage(), e);
+        }
+
     }
 
     /**
@@ -121,23 +130,17 @@ public class NFS2File extends NFS2Object implements FSFile {
      */
     public void write(long fileOffset, ByteBuffer src) throws IOException {
 
-        if (getFileSystem().isReadOnly()) {
-            throw new ReadOnlyFileSystemException(
-                    "Write in readonly filesystem");
-        }
-
         NFS2Client client = getNFS2Client();
 
         try {
 
-            byte[] data = new byte[NFS2Client.MAX_DATA - 512];
+            byte[] data = new byte[NFS2Client.MAX_DATA];
 
             int count;
 
             while (src.remaining() > 0) {
 
-                // TODO fix this -512 . It is a problem in the oncrpc library
-                count = Math.min(NFS2Client.MAX_DATA - 512, src.remaining());
+                count = Math.min(NFS2Client.MAX_DATA, src.remaining());
 
                 src.get(data, 0, count);
 

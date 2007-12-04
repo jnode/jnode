@@ -66,7 +66,8 @@ public class Mount1Client {
 
     private OncRpcClient createRpcClient() throws OncRpcException, IOException {
 
-        OncRpcClient client = OncRpcClient.newOncRpcClient(host, MOUNT_CODE, MOUNT_VERSION, protocol);
+        OncRpcClient client = OncRpcClient.newOncRpcClient(host, MOUNT_CODE,
+                MOUNT_VERSION, protocol);
         client.setTimeout(10000);
         if (uid != -1 && gid != -1) {
             client.setAuth(new OncRpcClientAuthUnix("test", uid, gid));
@@ -75,21 +76,27 @@ public class Mount1Client {
         return client;
     }
 
-    private synchronized OncRpcClient getRpcClient() throws OncRpcException, IOException {
+    private OncRpcClient getRpcClient() throws OncRpcException, IOException {
 
-        if (rpcClientPool.size() == 0) {
-            return createRpcClient();
-        } else {
-            return rpcClientPool.remove(0);
+        synchronized (rpcCLientLock) {
+
+            if (rpcClientPool.size() == 0) {
+                return createRpcClient();
+            } else {
+                return rpcClientPool.remove(0);
+
+            }
 
         }
 
     }
 
     private synchronized void releaseRpcClient(OncRpcClient client) {
+        synchronized (rpcCLientLock) {
 
-        if (client != null) {
-            rpcClientPool.add(client);
+            if (client != null) {
+                rpcClientPool.add(client);
+            }
         }
 
     }
@@ -119,11 +126,13 @@ public class Mount1Client {
      *                 if an I/O error occurs.
      * @throws MountException
      */
-    public MountResult mount(final String path) throws IOException, MountException {
+    public MountResult mount(final String path) throws IOException,
+            MountException {
 
         XdrAble mountParameter = new Parameter() {
 
-            public void xdrEncode(XdrEncodingStream xdrEncodingStream) throws OncRpcException, IOException {
+            public void xdrEncode(XdrEncodingStream xdrEncodingStream)
+                    throws OncRpcException, IOException {
                 xdrEncodingStream.xdrEncodeString(path);
             }
 
@@ -133,8 +142,10 @@ public class Mount1Client {
 
         XdrAble mountResult = new Result() {
 
-            public void xdrDecode(XdrDecodingStream xdrDecodingStream) throws OncRpcException, IOException {
-                result.setFileHandle(xdrDecodingStream.xdrDecodeOpaque(Mount1Client.FILE_HANDLE_SIZE));
+            public void xdrDecode(XdrDecodingStream xdrDecodingStream)
+                    throws OncRpcException, IOException {
+                result.setFileHandle(xdrDecodingStream
+                        .xdrDecodeOpaque(Mount1Client.FILE_HANDLE_SIZE));
 
             }
         };
@@ -144,11 +155,13 @@ public class Mount1Client {
         return result;
     }
 
-    public void unmount(final String dirPath) throws IOException, MountException {
+    public void unmount(final String dirPath) throws IOException,
+            MountException {
 
         XdrAble mountParameter = new Parameter() {
 
-            public void xdrEncode(XdrEncodingStream xdrEncodingStream) throws OncRpcException, IOException {
+            public void xdrEncode(XdrEncodingStream xdrEncodingStream)
+                    throws OncRpcException, IOException {
                 xdrEncodingStream.xdrEncodeString(dirPath);
             }
 
@@ -158,8 +171,8 @@ public class Mount1Client {
 
     }
 
-    private void call(final int functionId, final XdrAble parameter, final XdrAble result) throws MountException,
-            IOException {
+    private void call(final int functionId, final XdrAble parameter,
+            final XdrAble result) throws MountException, IOException {
 
         int countCall = 0;
 
@@ -183,8 +196,9 @@ public class Mount1Client {
                     client.call(functionId, parameter, mountResult);
 
                     if (mountResult.getResultCode() != 0) {
-                        throw new MountException("An error occur when system try to mount . Error code it is "
-                                + mountResult.getResultCode());
+                        throw new MountException(
+                                "An error occur when system try to mount . Error code it is "
+                                        + mountResult.getResultCode());
                     }
 
                 }
@@ -214,7 +228,8 @@ public class Mount1Client {
                         throw new MountException(e.getMessage(), e);
                     } else {
                         LOGGER
-                                .warn("An error occurs when nfs file system try to call the rpc method. It will try again");
+                                .warn("An error occurs when nfs file system try to call the rpc method:"
+                                        + e.getMessage() + " It will try again");
                         continue;
                     }
 
@@ -234,7 +249,8 @@ public class Mount1Client {
 
     private abstract class Parameter implements XdrAble {
 
-        public void xdrDecode(XdrDecodingStream arg0) throws OncRpcException, IOException {
+        public void xdrDecode(XdrDecodingStream arg0) throws OncRpcException,
+                IOException {
 
         }
 
@@ -242,7 +258,8 @@ public class Mount1Client {
 
     private abstract class Result implements XdrAble {
 
-        public void xdrEncode(XdrEncodingStream arg0) throws OncRpcException, IOException {
+        public void xdrEncode(XdrEncodingStream arg0) throws OncRpcException,
+                IOException {
 
         }
 
@@ -257,10 +274,12 @@ public class Mount1Client {
             this.xdrAble = xdrAble;
         }
 
-        public void xdrEncode(XdrEncodingStream xdr) throws OncRpcException, IOException {
+        public void xdrEncode(XdrEncodingStream xdr) throws OncRpcException,
+                IOException {
         }
 
-        public void xdrDecode(XdrDecodingStream xdr) throws OncRpcException, IOException {
+        public void xdrDecode(XdrDecodingStream xdr) throws OncRpcException,
+                IOException {
             resultCode = xdr.xdrDecodeInt();
             if (resultCode == 0) {
                 xdrAble.xdrDecode(xdr);

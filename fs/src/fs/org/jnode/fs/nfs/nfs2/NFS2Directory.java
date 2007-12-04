@@ -117,7 +117,7 @@ public class NFS2Directory extends NFS2Object implements FSDirectory {
 
                         public FileAttribute run() throws Exception {
 
-                            return nfsClient.getAttribute(getEntry()
+                            return nfsClient.getAttribute(getNFS2Entry()
                                     .getFileHandle());
                         }
                     });
@@ -159,10 +159,7 @@ public class NFS2Directory extends NFS2Object implements FSDirectory {
             return EMPTY_NFSENTRY_ITERATOR;
         }
 
-        Iterator<NFS2Entry> nfsEntryIterator = nfsEntrySet.iterator();
-
-        while (nfsEntryIterator.hasNext()) {
-            NFS2Entry nfsEntry = nfsEntryIterator.next();
+        for (NFS2Entry nfsEntry : nfsEntrySet) {
             tableEntry.addEntry(nfsEntry);
         }
 
@@ -212,10 +209,7 @@ public class NFS2Directory extends NFS2Object implements FSDirectory {
                             Set<NFS2Entry> nfsEntrySet = new LinkedHashSet<NFS2Entry>(
                                     entrySet.size());
 
-                            Iterator<Entry> entryIterator = entrySet.iterator();
-                            while (entryIterator.hasNext()) {
-
-                                Entry entry = entryIterator.next();
+                            for (Entry entry : entrySet) {
 
                                 LookupResult lookupResult = nfsClient.lookup(
                                         directoryEntry.getFileHandle(), entry
@@ -266,8 +260,13 @@ public class NFS2Directory extends NFS2Object implements FSDirectory {
                     directoryEntry.getFileHandle(), name, DEFAULT_PERMISSION,
                     -1, -1, -1, new Time(-1, -1), new Time(-1, -1));
 
-            return new NFS2Entry((NFS2FileSystem) getFileSystem(), this, name,
-                    result.getFileHandle(), result.getFileAttribute());
+            NFS2Entry entry = new NFS2Entry((NFS2FileSystem) getFileSystem(),
+                    this, name, result.getFileHandle(), result
+                            .getFileAttribute());
+
+            tableEntry.addEntry(entry);
+
+            return entry;
 
         } catch (NFS2Exception e) {
 
@@ -286,8 +285,13 @@ public class NFS2Directory extends NFS2Object implements FSDirectory {
                     .getFileHandle(), name, DEFAULT_PERMISSION, -1, -1, -1,
                     new Time(-1, -1), new Time(-1, -1));
 
-            return new NFS2Entry((NFS2FileSystem) getFileSystem(), this, name,
-                    result.getFileHandle(), result.getFileAttribute());
+            NFS2Entry entry = new NFS2Entry((NFS2FileSystem) getFileSystem(),
+                    this, name, result.getFileHandle(), result
+                            .getFileAttribute());
+
+            tableEntry.addEntry(entry);
+
+            return entry;
 
         } catch (NFS2Exception e) {
 
@@ -330,7 +334,7 @@ public class NFS2Directory extends NFS2Object implements FSDirectory {
 
     }
 
-    NFS2Entry getEntry() {
+    public NFS2Entry getNFS2Entry() {
         return directoryEntry;
     }
 
