@@ -30,6 +30,7 @@ import org.jnode.fs.FSFile;
 import org.jnode.fs.nfs.nfs2.rpc.nfs.FileAttribute;
 import org.jnode.fs.nfs.nfs2.rpc.nfs.NFS2Client;
 import org.jnode.fs.nfs.nfs2.rpc.nfs.NFS2Exception;
+import org.jnode.fs.nfs.nfs2.rpc.nfs.Time;
 
 /**
  * @author Andrei Dore
@@ -48,6 +49,8 @@ public class NFS2Entry extends NFS2Object implements FSEntry {
 
     private String name;
 
+    private NFS2AccessRights accessRights;
+
     NFS2Entry(NFS2FileSystem fileSystem, NFS2Directory parent, String name,
             byte[] fileHandle, FileAttribute fileAttribute) {
         super(fileSystem);
@@ -64,6 +67,8 @@ public class NFS2Entry extends NFS2Object implements FSEntry {
             file = new NFS2File(this);
         }
 
+        accessRights = new NFS2AccessRights(fileSystem, this);
+
     }
 
     public FSDirectory getParent() {
@@ -75,7 +80,6 @@ public class NFS2Entry extends NFS2Object implements FSEntry {
     }
 
     public FSAccessRights getAccessRights() throws IOException {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -122,7 +126,15 @@ public class NFS2Entry extends NFS2Object implements FSEntry {
     }
 
     public void setLastModified(long lastModified) throws IOException {
-        // TODO Auto-generated method stub
+
+        NFS2Client client = getNFS2Client();
+
+        try {
+            client.setAttribute(getFileHandle(), -1, -1, -1, -1, new Time(-1,
+                    -1), new Time((int) (lastModified / 1000), -1));
+        } catch (NFS2Exception e) {
+            throw new IOException(e.getMessage(), e);
+        }
 
     }
 
@@ -133,19 +145,20 @@ public class NFS2Entry extends NFS2Object implements FSEntry {
         NFS2Directory parentDirectory = (NFS2Directory) getParent();
 
         try {
-            client.renameFile(parentDirectory.getEntry().getFileHandle(), name,
-                    parentDirectory.getEntry().getFileHandle(), newName);
+            client.renameFile(parentDirectory.getNFS2Entry().getFileHandle(),
+                    name, parentDirectory.getNFS2Entry().getFileHandle(),
+                    newName);
         } catch (NFS2Exception e) {
             throw new IOException("Can not rename ." + e.getMessage(), e);
         }
 
     }
 
-    FileAttribute getFileAttribute() {
+    public FileAttribute getFileAttribute() {
         return fileAttribute;
     }
 
-    byte[] getFileHandle() {
+    public byte[] getFileHandle() {
         return fileHandle;
     }
 

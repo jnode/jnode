@@ -9,14 +9,15 @@ import java.util.List;
 import org.acplt.oncrpc.OncRpcClient;
 import org.acplt.oncrpc.OncRpcClientAuthUnix;
 import org.acplt.oncrpc.OncRpcException;
+import org.acplt.oncrpc.OncRpcPortmapClient;
 import org.acplt.oncrpc.OncRpcProtocols;
+import org.acplt.oncrpc.OncRpcTcpClient;
+import org.acplt.oncrpc.OncRpcUdpClient;
 import org.acplt.oncrpc.XdrAble;
 import org.acplt.oncrpc.XdrDecodingStream;
 import org.acplt.oncrpc.XdrEncodingStream;
 import org.acplt.oncrpc.XdrVoid;
 import org.apache.log4j.Logger;
-import org.jnode.fs.nfs.nfs2.rpc.mount.Mount1Client;
-import org.jnode.fs.nfs.nfs2.rpc.mount.MountException;
 
 /**
  * @author Andrei Dore
@@ -36,6 +37,19 @@ public class NFS2Client {
 
     public static final int COOKIE_SIZE = 4;
 
+    /**
+     * This constant it is use when we create a rpc client . The creation of the
+     * rpc client need a buffer to store parameters or results . To create this
+     * buffer we must know the max length of the buffer. The NFS2 specification
+     * specify that for read write operation the maximun number of bytes it is
+     * 8192.At this number we must add the length of the header(24), the lenght
+     * of the auth part (400) and the length of the parameters in write
+     * operation (16 +FILE_HANDLE_SIZE) . We chose to add the length of the
+     * parameter in write operation because only in this case we risk and buffer
+     * overflow.
+     */
+    private static final int HEADER_DATA = 440 + FILE_HANDLE_SIZE;
+
     private static final int NFS_VERSION = 2;
 
     private static final int NFS_PROGRAM = 100003;
@@ -43,6 +57,8 @@ public class NFS2Client {
     private static final int PROCEDURE_TEST = 0;
 
     private static final int PROCEDURE_GET_ATTRIBUTE = 1;
+
+    private static final int PROCEDURE_SET_ATTRIBUTE = 2;
 
     private static final int PROCEDURE_LOOKUP = 4;
 
@@ -95,7 +111,29 @@ public class NFS2Client {
 
     private OncRpcClient createRpcClient() throws OncRpcException, IOException {
 
-        OncRpcClient client = OncRpcClient.newOncRpcClient(host, NFS_PROGRAM, NFS_VERSION, protocol);
+        // invoke portmap
+        OncRpcPortmapClient portmap = new OncRpcPortmapClient(host);
+        int port;
+        try {
+            port = portmap.getPort(NFS_PROGRAM, NFS_VERSION, protocol);
+        } finally {
+            portmap.close();
+        }
+
+        // create the client
+        // We create the client with a buffer with lenght equals witn MAX_DATA +
+        // 424 ( max header length)
+        OncRpcClient client = null;
+        if (protocol == OncRpcProtocols.ONCRPC_UDP) {
+            client = new OncRpcUdpClient(host, NFS_PROGRAM, NFS_VERSION, port,
+                    MAX_DATA + HEADER_DATA);
+        } else if (protocol == OncRpcProtocols.ONCRPC_TCP) {
+            client = new OncRpcTcpClient(host, NFS_PROGRAM, NFS_VERSION, port,
+                    MAX_DATA + HEADER_DATA);
+        } else {
+            // TODO Do something
+        }
+
         client.setTimeout(10000);
 
         if (uid != -1 && gid != -1) {
@@ -105,13 +143,20 @@ public class NFS2Client {
         return client;
     }
 
-    private synchronized OncRpcClient getRpcClient() throws OncRpcException, IOException {
+    // TODO This lock it is not good because we wait an IO operation before we
+    // free the lock . So the creation of the nfsclient must be outside of the
+    // lock
+    private OncRpcClient getRpcClient() throws OncRpcException, IOException {
 
-        if (rpcClientPool.size() == 0) {
-            // TODO Improve this lock
-            return createRpcClient();
-        } else {
-            return rpcClientPool.remove(0);
+        synchronized (rpcCLientLock) {
+
+            if (rpcClientPool.size() == 0) {
+                // TODO Improve this lock
+                return createRpcClient();
+            } else {
+                return rpcClientPool.remove(0);
+
+            }
 
         }
 
@@ -119,14 +164,16 @@ public class NFS2Client {
 
     private synchronized void releaseRpcClient(OncRpcClient client) {
 
-        if (client != null) {
-            rpcClientPool.add(client);
+        synchronized (rpcCLientLock) {
+            if (client != null) {
+                rpcClientPool.add(client);
+            }
         }
 
     }
 
-    private void call(final int functionId, final XdrAble parameter, final XdrAble result) throws NFS2Exception,
-            IOException {
+    private void call(final int functionId, final XdrAble parameter,
+            final XdrAble result) throws NFS2Exception, IOException {
 
         OncRpcClient client = null;
 
@@ -159,8 +206,6 @@ public class NFS2Client {
 
             } catch (Exception e) {
 
-                // if we receive a timeout we will close the client and next
-                // time we will use another rpc client
                 if (client != null) {
                     try {
                         client.close();
@@ -180,7 +225,9 @@ public class NFS2Client {
                         throw new NFS2Exception(e.getMessage(), e);
                     } else {
                         LOGGER
-                                .warn("An error occurs when nfs file system try to call the rpc method. It will try again");
+                                .warn("An error occurs when nfs file system try to call the rpc method:"
+                                        + e.getMessage()
+                                        + ". It will try again");
                         continue;
                     }
 
@@ -223,11 +270,13 @@ public class NFS2Client {
         call(PROCEDURE_TEST, XdrVoid.XDR_VOID, XdrVoid.XDR_VOID);
     }
 
-    public LookupResult lookup(final byte[] fileHandle, final String entryName) throws NFS2Exception, IOException {
+    public LookupResult lookup(final byte[] fileHandle, final String entryName)
+            throws NFS2Exception, IOException {
 
         XdrAble nfsParameter = new NFSParameter() {
 
-            public void xdrEncode(XdrEncodingStream xdr) throws OncRpcException, IOException {
+            public void xdrEncode(XdrEncodingStream xdr)
+                    throws OncRpcException, IOException {
                 xdr.xdrEncodeOpaque(fileHandle, NFS2Client.FILE_HANDLE_SIZE);
                 xdr.xdrEncodeString(entryName);
 
@@ -239,8 +288,10 @@ public class NFS2Client {
 
         XdrAble nfsResult = new NFSResult() {
 
-            public void xdrDecode(XdrDecodingStream xdr) throws OncRpcException, IOException {
-                result.setFileHandle(xdr.xdrDecodeOpaque(NFS2Client.FILE_HANDLE_SIZE));
+            public void xdrDecode(XdrDecodingStream xdr)
+                    throws OncRpcException, IOException {
+                result.setFileHandle(xdr
+                        .xdrDecodeOpaque(NFS2Client.FILE_HANDLE_SIZE));
                 FileAttribute fileAttribute = new FileAttribute();
                 xdrFileAttributeDecode(xdr, fileAttribute);
                 result.setFileAttribute(fileAttribute);
@@ -253,12 +304,14 @@ public class NFS2Client {
         return result;
     }
 
-    public ListDirectoryResult listDirectory(final byte[] fileHandle, final byte[] cookie, final int count)
-            throws NFS2Exception, IOException {
+    public ListDirectoryResult listDirectory(final byte[] fileHandle,
+            final byte[] cookie, final int count) throws NFS2Exception,
+            IOException {
 
         XdrAble nfsParameter = new NFSParameter() {
 
-            public void xdrEncode(XdrEncodingStream xdr) throws OncRpcException, IOException {
+            public void xdrEncode(XdrEncodingStream xdr)
+                    throws OncRpcException, IOException {
                 xdr.xdrEncodeOpaque(fileHandle, FILE_HANDLE_SIZE);
                 xdr.xdrEncodeOpaque(cookie, COOKIE_SIZE);
                 xdr.xdrEncodeInt(count);
@@ -271,7 +324,8 @@ public class NFS2Client {
 
         XdrAble nfsResult = new NFSResult() {
 
-            public void xdrDecode(XdrDecodingStream xdr) throws OncRpcException, IOException {
+            public void xdrDecode(XdrDecodingStream xdr)
+                    throws OncRpcException, IOException {
 
                 List<Entry> entryList = new ArrayList<Entry>();
 
@@ -298,12 +352,13 @@ public class NFS2Client {
         return result;
     }
 
-    public ReadFileResult readFile(final byte[] fileHandle, final int offset, final int count) throws NFS2Exception,
-            IOException {
+    public ReadFileResult readFile(final byte[] fileHandle, final int offset,
+            final int count) throws NFS2Exception, IOException {
 
         XdrAble nfsParameter = new NFSParameter() {
 
-            public void xdrEncode(XdrEncodingStream xdr) throws OncRpcException, IOException {
+            public void xdrEncode(XdrEncodingStream xdr)
+                    throws OncRpcException, IOException {
                 xdr.xdrEncodeOpaque(fileHandle, FILE_HANDLE_SIZE);
                 xdr.xdrEncodeInt(offset);
                 xdr.xdrEncodeInt(count);
@@ -317,7 +372,8 @@ public class NFS2Client {
 
         XdrAble nfsResult = new NFSResult() {
 
-            public void xdrDecode(XdrDecodingStream xdr) throws OncRpcException, IOException {
+            public void xdrDecode(XdrDecodingStream xdr)
+                    throws OncRpcException, IOException {
                 FileAttribute fileAttribute = new FileAttribute();
                 xdrFileAttributeDecode(xdr, fileAttribute);
                 result.setFileAttribute(fileAttribute);
@@ -332,11 +388,13 @@ public class NFS2Client {
         return result;
     }
 
-    public void removeDirectory(final byte[] fileHandle, final String name) throws NFS2Exception, IOException {
+    public void removeDirectory(final byte[] fileHandle, final String name)
+            throws NFS2Exception, IOException {
 
         NFSParameter nfsParameter = new NFSParameter() {
 
-            public void xdrEncode(XdrEncodingStream xdr) throws OncRpcException, IOException {
+            public void xdrEncode(XdrEncodingStream xdr)
+                    throws OncRpcException, IOException {
                 xdr.xdrEncodeOpaque(fileHandle, FILE_HANDLE_SIZE);
                 xdr.xdrEncodeString(name);
             }
@@ -345,7 +403,8 @@ public class NFS2Client {
 
         XdrAble nfsResult = new NFSResult() {
 
-            public void xdrDecode(XdrDecodingStream xdr) throws OncRpcException, IOException {
+            public void xdrDecode(XdrDecodingStream xdr)
+                    throws OncRpcException, IOException {
             }
 
         };
@@ -354,11 +413,13 @@ public class NFS2Client {
 
     }
 
-    public void removeFile(final byte[] parentFileHandle, final String name) throws NFS2Exception, IOException {
+    public void removeFile(final byte[] parentFileHandle, final String name)
+            throws NFS2Exception, IOException {
 
         NFSParameter nfsParameter = new NFSParameter() {
 
-            public void xdrEncode(XdrEncodingStream xdr) throws OncRpcException, IOException {
+            public void xdrEncode(XdrEncodingStream xdr)
+                    throws OncRpcException, IOException {
                 xdr.xdrEncodeOpaque(parentFileHandle, FILE_HANDLE_SIZE);
                 xdr.xdrEncodeString(name);
             }
@@ -367,7 +428,8 @@ public class NFS2Client {
 
         XdrAble nfsResult = new NFSResult() {
 
-            public void xdrDecode(XdrDecodingStream xdr) throws OncRpcException, IOException {
+            public void xdrDecode(XdrDecodingStream xdr)
+                    throws OncRpcException, IOException {
             }
 
         };
@@ -376,12 +438,14 @@ public class NFS2Client {
 
     }
 
-    public void renameFile(final byte[] fromParentFileHandle, final String fromName, final byte[] toParentFileHandle,
+    public void renameFile(final byte[] fromParentFileHandle,
+            final String fromName, final byte[] toParentFileHandle,
             final String toName) throws NFS2Exception, IOException {
 
         NFSParameter nfsParameter = new NFSParameter() {
 
-            public void xdrEncode(XdrEncodingStream xdr) throws OncRpcException, IOException {
+            public void xdrEncode(XdrEncodingStream xdr)
+                    throws OncRpcException, IOException {
                 xdr.xdrEncodeOpaque(fromParentFileHandle, FILE_HANDLE_SIZE);
                 xdr.xdrEncodeString(fromName);
                 xdr.xdrEncodeOpaque(toParentFileHandle, FILE_HANDLE_SIZE);
@@ -392,7 +456,8 @@ public class NFS2Client {
 
         XdrAble nfsResult = new NFSResult() {
 
-            public void xdrDecode(XdrDecodingStream xdr) throws OncRpcException, IOException {
+            public void xdrDecode(XdrDecodingStream xdr)
+                    throws OncRpcException, IOException {
             }
 
         };
@@ -401,19 +466,23 @@ public class NFS2Client {
 
     }
 
-    public CreateDirectoryResult createDirectory(final byte[] parentFileHandle, final String name,
-            final boolean[] permission, final int uid, final int gid, final int size, final Time lastAccessed,
+    public CreateDirectoryResult createDirectory(final byte[] parentFileHandle,
+            final String name, final boolean[] permission, final int uid,
+            final int gid, final int size, final Time lastAccessed,
             final Time lastModified) throws NFS2Exception, IOException {
 
         if (name.length() > MAX_NAME_LENGTH) {
-            throw new NFS2Exception("The name is too long.The maximun length is " + MAX_NAME_LENGTH);
+            throw new NFS2Exception(
+                    "The name is too long.The maximun length is "
+                            + MAX_NAME_LENGTH);
         }
 
         final int mode = createMode(permission) | 0x4000;
 
         NFSParameter nfsParameter = new NFSParameter() {
 
-            public void xdrEncode(XdrEncodingStream xdr) throws OncRpcException, IOException {
+            public void xdrEncode(XdrEncodingStream xdr)
+                    throws OncRpcException, IOException {
                 xdr.xdrEncodeOpaque(parentFileHandle, FILE_HANDLE_SIZE);
                 xdr.xdrEncodeString(name);
 
@@ -433,8 +502,10 @@ public class NFS2Client {
 
         XdrAble nfsResult = new NFSResult() {
 
-            public void xdrDecode(XdrDecodingStream xdr) throws OncRpcException, IOException {
-                result.setFileHandle(xdr.xdrDecodeOpaque(NFS2Client.FILE_HANDLE_SIZE));
+            public void xdrDecode(XdrDecodingStream xdr)
+                    throws OncRpcException, IOException {
+                result.setFileHandle(xdr
+                        .xdrDecodeOpaque(NFS2Client.FILE_HANDLE_SIZE));
                 FileAttribute fileAttribute = new FileAttribute();
                 xdrFileAttributeDecode(xdr, fileAttribute);
                 result.setFileAttribute(fileAttribute);
@@ -448,19 +519,23 @@ public class NFS2Client {
 
     }
 
-    public CreateFileResult createFile(final byte[] parentFileHandle, final String name, final boolean[] permission,
-            final int uid, final int gid, final int size, final Time lastAccessed, final Time lastModified)
-            throws NFS2Exception, IOException {
+    public CreateFileResult createFile(final byte[] parentFileHandle,
+            final String name, final boolean[] permission, final int uid,
+            final int gid, final int size, final Time lastAccessed,
+            final Time lastModified) throws NFS2Exception, IOException {
 
         if (name.length() > MAX_NAME_LENGTH) {
-            throw new NFS2Exception("The name is too long.The maximun length is " + MAX_NAME_LENGTH);
+            throw new NFS2Exception(
+                    "The name is too long.The maximun length is "
+                            + MAX_NAME_LENGTH);
         }
 
         final int mode = createMode(permission) | 0x8000;
 
         NFSParameter nfsParameter = new NFSParameter() {
 
-            public void xdrEncode(XdrEncodingStream xdr) throws OncRpcException, IOException {
+            public void xdrEncode(XdrEncodingStream xdr)
+                    throws OncRpcException, IOException {
                 xdr.xdrEncodeOpaque(parentFileHandle, FILE_HANDLE_SIZE);
                 xdr.xdrEncodeString(name);
 
@@ -480,8 +555,10 @@ public class NFS2Client {
 
         XdrAble nfsResult = new NFSResult() {
 
-            public void xdrDecode(XdrDecodingStream xdr) throws OncRpcException, IOException {
-                result.setFileHandle(xdr.xdrDecodeOpaque(NFS2Client.FILE_HANDLE_SIZE));
+            public void xdrDecode(XdrDecodingStream xdr)
+                    throws OncRpcException, IOException {
+                result.setFileHandle(xdr
+                        .xdrDecodeOpaque(NFS2Client.FILE_HANDLE_SIZE));
                 FileAttribute fileAttribute = new FileAttribute();
                 xdrFileAttributeDecode(xdr, fileAttribute);
                 result.setFileAttribute(fileAttribute);
@@ -495,18 +572,20 @@ public class NFS2Client {
 
     }
 
-    public FileAttribute writeFile(final byte[] fileHandle, final int offset, final byte[] buffer)
-            throws NFS2Exception, IOException {
+    public FileAttribute writeFile(final byte[] fileHandle, final int offset,
+            final byte[] buffer) throws NFS2Exception, IOException {
 
         return writeFile(fileHandle, offset, buffer, 0, buffer.length);
     }
 
-    public FileAttribute writeFile(final byte[] fileHandle, final int offset, final byte[] buffer,
-            final int bufferIndex, final int bufferCount) throws NFS2Exception, IOException {
+    public FileAttribute writeFile(final byte[] fileHandle, final int offset,
+            final byte[] buffer, final int bufferIndex, final int bufferCount)
+            throws NFS2Exception, IOException {
 
         NFSParameter nfsParameter = new NFSParameter() {
 
-            public void xdrEncode(XdrEncodingStream xdr) throws OncRpcException, IOException {
+            public void xdrEncode(XdrEncodingStream xdr)
+                    throws OncRpcException, IOException {
                 xdr.xdrEncodeOpaque(fileHandle, FILE_HANDLE_SIZE);
                 xdr.xdrEncodeInt(0);
                 xdr.xdrEncodeInt(offset);
@@ -524,7 +603,8 @@ public class NFS2Client {
 
         XdrAble nfsResult = new NFSResult() {
 
-            public void xdrDecode(XdrDecodingStream xdr) throws OncRpcException, IOException {
+            public void xdrDecode(XdrDecodingStream xdr)
+                    throws OncRpcException, IOException {
                 xdrFileAttributeDecode(xdr, fileAttribute);
 
             }
@@ -537,11 +617,13 @@ public class NFS2Client {
 
     }
 
-    public FileAttribute getAttribute(final byte[] fileHandle) throws NFS2Exception, IOException {
+    public FileAttribute getAttribute(final byte[] fileHandle)
+            throws NFS2Exception, IOException {
 
         XdrAble nfsParameter = new NFSParameter() {
 
-            public void xdrEncode(XdrEncodingStream xdr) throws OncRpcException, IOException {
+            public void xdrEncode(XdrEncodingStream xdr)
+                    throws OncRpcException, IOException {
                 xdr.xdrEncodeOpaque(fileHandle, FILE_HANDLE_SIZE);
 
             }
@@ -552,7 +634,8 @@ public class NFS2Client {
 
         XdrAble nfsResult = new NFSResult() {
 
-            public void xdrDecode(XdrDecodingStream xdr) throws OncRpcException, IOException {
+            public void xdrDecode(XdrDecodingStream xdr)
+                    throws OncRpcException, IOException {
 
                 xdrFileAttributeDecode(xdr, fileAttribute);
 
@@ -561,6 +644,63 @@ public class NFS2Client {
         };
 
         call(PROCEDURE_GET_ATTRIBUTE, nfsParameter, nfsResult);
+
+        return fileAttribute;
+
+    }
+
+    /**
+     * Set the attributes for file.
+     * 
+     * 
+     * @param fileHandle
+     *                file handle.
+     * @param mode
+     *                mode.
+     * @param uid
+     * @param gid
+     * @param size
+     * @param lastAccessed
+     * @param lastModified
+     * @return
+     * @throws NFS2Exception
+     * @throws IOException
+     */
+    public FileAttribute setAttribute(final byte[] fileHandle, final int mode,
+            final int uid, final int gid, final int size,
+            final Time lastAccessed, final Time lastModified)
+            throws NFS2Exception, IOException {
+
+        XdrAble nfsParameter = new NFSParameter() {
+
+            public void xdrEncode(XdrEncodingStream xdr)
+                    throws OncRpcException, IOException {
+                xdr.xdrEncodeOpaque(fileHandle, FILE_HANDLE_SIZE);
+
+                xdr.xdrEncodeInt(mode);
+                xdr.xdrEncodeInt(uid);
+                xdr.xdrEncodeInt(gid);
+                xdr.xdrEncodeInt(size);
+                xdrEncodeTime(xdr, lastAccessed);
+                xdrEncodeTime(xdr, lastModified);
+
+            }
+
+        };
+
+        final FileAttribute fileAttribute = new FileAttribute();
+
+        XdrAble nfsResult = new NFSResult() {
+
+            public void xdrDecode(XdrDecodingStream xdr)
+                    throws OncRpcException, IOException {
+                xdrFileAttributeDecode(xdr, fileAttribute);
+
+            }
+
+        };
+
+        call(PROCEDURE_SET_ATTRIBUTE, nfsParameter, nfsResult);
 
         return fileAttribute;
 
@@ -607,39 +747,22 @@ public class NFS2Client {
 
     }
 
-    private void xdrEncodeTime(XdrEncodingStream xdrEncodingStream, Time time) throws OncRpcException, IOException {
+    private void xdrEncodeTime(XdrEncodingStream xdrEncodingStream, Time time)
+            throws OncRpcException, IOException {
         xdrEncodingStream.xdrEncodeInt(time.getSeconds());
         xdrEncodingStream.xdrEncodeInt(time.getMicroSeconds());
     }
 
-    private void xdrDecodeTime(XdrDecodingStream xdrDecodingStream, Time time) throws OncRpcException, IOException {
+    private void xdrDecodeTime(XdrDecodingStream xdrDecodingStream, Time time)
+            throws OncRpcException, IOException {
 
         time.setSeconds(xdrDecodingStream.xdrDecodeInt());
         time.setMicroSeconds(xdrDecodingStream.xdrDecodeInt());
 
     }
 
-    public void xdrFileAttributeEncode(XdrEncodingStream xdr, FileAttribute fileAttribute) throws OncRpcException,
-            IOException {
-        xdr.xdrEncodeInt(fileAttribute.getType());
-        xdr.xdrEncodeInt(fileAttribute.getMode());
-        xdr.xdrEncodeInt(fileAttribute.getNlink());
-        xdr.xdrEncodeInt(fileAttribute.getUid());
-        xdr.xdrEncodeInt(fileAttribute.getGid());
-        xdr.xdrEncodeInt(fileAttribute.getSize());
-        xdr.xdrEncodeInt(fileAttribute.getBlocksize());
-        xdr.xdrEncodeInt(fileAttribute.getRdev());
-        xdr.xdrEncodeInt(fileAttribute.getBlocks());
-        xdr.xdrEncodeInt(fileAttribute.getFsid());
-        xdr.xdrEncodeInt(fileAttribute.getFileid());
-        xdrEncodeTime(xdr, fileAttribute.getLastAccessed());
-        xdrEncodeTime(xdr, fileAttribute.getLastModified());
-        xdrEncodeTime(xdr, fileAttribute.getLastStatusChanged());
-
-    }
-
-    public void xdrFileAttributeDecode(XdrDecodingStream xdr, FileAttribute fileAttribute) throws OncRpcException,
-            IOException {
+    private void xdrFileAttributeDecode(XdrDecodingStream xdr,
+            FileAttribute fileAttribute) throws OncRpcException, IOException {
         fileAttribute.setType(xdr.xdrDecodeInt());
         fileAttribute.setMode(xdr.xdrDecodeInt());
         fileAttribute.setNlink(xdr.xdrDecodeInt());
@@ -650,7 +773,7 @@ public class NFS2Client {
         fileAttribute.setRdev(xdr.xdrDecodeInt());
         fileAttribute.setBlocks(xdr.xdrDecodeInt());
         fileAttribute.setFsid(xdr.xdrDecodeInt());
-        fileAttribute.setFileid(xdr.xdrDecodeInt());
+        fileAttribute.setFileId(xdr.xdrDecodeInt());
         Time lastAccessedTime = new Time();
         xdrDecodeTime(xdr, lastAccessedTime);
         fileAttribute.setLastAccessed(lastAccessedTime);
@@ -665,7 +788,8 @@ public class NFS2Client {
 
     private abstract class NFSParameter implements XdrAble {
 
-        public void xdrDecode(XdrDecodingStream arg0) throws OncRpcException, IOException {
+        public void xdrDecode(XdrDecodingStream arg0) throws OncRpcException,
+                IOException {
 
         }
 
@@ -673,7 +797,8 @@ public class NFS2Client {
 
     private abstract class NFSResult implements XdrAble {
 
-        public void xdrEncode(XdrEncodingStream arg0) throws OncRpcException, IOException {
+        public void xdrEncode(XdrEncodingStream arg0) throws OncRpcException,
+                IOException {
 
         }
 
@@ -689,10 +814,12 @@ public class NFS2Client {
             this.xdrAble = xdrAble;
         }
 
-        public void xdrEncode(XdrEncodingStream xdr) throws OncRpcException, IOException {
+        public void xdrEncode(XdrEncodingStream xdr) throws OncRpcException,
+                IOException {
         }
 
-        public void xdrDecode(XdrDecodingStream xdr) throws OncRpcException, IOException {
+        public void xdrDecode(XdrDecodingStream xdr) throws OncRpcException,
+                IOException {
             resultCode = ResultCode.getResultCode(xdr.xdrDecodeInt());
             if (resultCode == ResultCode.NFS_OK) {
                 xdrAble.xdrDecode(xdr);
