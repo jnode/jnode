@@ -111,7 +111,7 @@ public class PlatformHelper
             return path;
 		 */
 		String tmppath = path.replace('/', separatorChar);
-		StringBuffer canonpath;
+		StringBuilder canonpath;
 
 		// We found it'll be more efficient and easy to handle to
 		// return a lowercased canonical path
@@ -129,7 +129,7 @@ public class PlatformHelper
        ensureCapacity_unsynchronized will fail definitely each time 
        and will enlarge buffer and copy contents.       .
 		 */
-		canonpath = new StringBuffer(INITIAL_MAX_PATH);
+		canonpath = new StringBuilder(INITIAL_MAX_PATH);
 		canonpath.append(tmppath.substring(0, i));
 		tmppath = tmppath.substring(i);
 		// pathdepth==0 indicates there're only root path in the buffer
