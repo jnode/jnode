@@ -451,6 +451,7 @@ public class Toolkit extends AbstractToolkit implements KeyboardListener,
 
             keyQueue.add(new Integer(key));
             keyQueue.notifyAll();
+            event.consume();
         }
     }
 
