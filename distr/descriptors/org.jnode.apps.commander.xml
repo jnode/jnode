@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
-<plugin id="org.jnode.apps.editor"
-        name="A simple text editor for JNode OS"
+<plugin id="org.jnode.apps.commander"
+        name="A simple file manager for JNode OS"
         version="@VERSION@"
         provider-name="JNode.org"
         license-name="lgpl">
 	
   <runtime>
     <library name="jnode-distr.jar">
-      <export name="org.jnode.apps.editor.*"/>
+      <export name="org.jnode.apps.commander.*"/>
     </library>
   </runtime>
   
   <requires>
+     <import plugin="charva"/>
+     <import plugin="org.jnode.apps.editor"/>
      <import plugin="org.jnode.shell.help"/>
   </requires>
 		 
@@ -22,9 +24,6 @@
   </extension>
   
   <extension point="org.jnode.shell.aliases">
-      <alias name="leed"  class="org.jnode.apps.editor.LeedCommand"/>
-      <alias name="le"  class="org.jnode.apps.editor.LeedCommand"/>
-      <alias name="levi"  class="org.jnode.apps.editor.LeviCommand"/>
-      <alias name="lv"  class="org.jnode.apps.editor.LeviCommand"/>
+      <alias name="cc"  class="org.jnode.apps.commander.CharvaCommander"/>
   </extension>
 </plugin>

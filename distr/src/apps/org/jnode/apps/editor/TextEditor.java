@@ -22,6 +22,7 @@ public class TextEditor implements KeyboardListener {
     private List<StringBuilder> ls;
     private TextConsole console;
     private File file;
+    private boolean ro = false;
 
     public static void main(String[] argv) throws Exception {
         if(argv.length == 0){
@@ -37,11 +38,22 @@ public class TextEditor implements KeyboardListener {
         				ConsoleManager.CreateOptions.STACKED |
         				ConsoleManager.CreateOptions.NO_LINE_EDITTING |
         				ConsoleManager.CreateOptions.NO_SYSTEM_OUT_ERR));
-        manager.focus(console);
+        try {
+            manager.focus(console);
 
-        TextEditor te = new TextEditor(console);
-        File f = new File(argv[0]);
-        te.loadFile(f);
+            TextEditor te = new TextEditor(console);
+            File f = new File(argv[0]);
+            if(f == null){
+                System.out.println("No file to edit.");
+                manager.unregisterConsole(console);
+            } else {
+                te.ro = argv.length == 2 && "ro".equals(argv[1]);
+                te.loadFile(f);
+            }
+        } catch (Exception e){
+            manager.unregisterConsole(console);
+            throw e;
+        }
     }
 
     public TextEditor(TextConsole console) {
@@ -155,7 +167,7 @@ public class TextEditor implements KeyboardListener {
             }
         }
 
-        e.append(file.getName()).append(" [").append(fx2 + cx2 + 1).append(",").append(oy() + 1).append("]");
+        e.append(ro ? "VIEW: " : "EDIT: ").append(file.getName()).append(" [").append(fx2 + cx2 + 1).append(",").append(oy() + 1).append("]");
         for(int j = 0; j < sw; j++){
             data[k++] = (j < e.length()) ? e.charAt(j) : ' ';
         }
@@ -165,7 +177,7 @@ public class TextEditor implements KeyboardListener {
 
     public void keyPressed(KeyboardEvent e) {
         int k = e.getKeyCode();
-        if(e.isControlDown())
+        if(ro ^ e.isControlDown())
             switch (k) {
                 case KeyEvent.VK_UP: {if(fy > 0) fy --; break;}
                 case KeyEvent.VK_DOWN: {if(fy < my() - cym) fy ++; break;}
@@ -173,9 +185,15 @@ public class TextEditor implements KeyboardListener {
                 case KeyEvent.VK_RIGHT: {if(fx < mx()) fx ++; break;}
                 case KeyEvent.VK_HOME: {cx = fx = cy = fy = 0; break;}
                 case KeyEvent.VK_END: { if(my() < cym) cy = my(); else {cy = cym; fy = my() - cy;} end(); break;}
-                case KeyEvent.VK_Y: { if(oy() >= 0 && oy() <= my()) {ls.remove(oy()); if(cy > 0 && oy() == my() + 1) cy --; else if(fy > 0) fy --;} break;}
-                case KeyEvent.VK_S: { saveFile(); break;}
-                case KeyEvent.VK_Q: { console.getManager().unregisterConsole(console); break;}
+                case KeyEvent.VK_Y: { if(ro) break; if(oy() >= 0 && oy() <= my()) {ls.remove(oy()); if(cy > 0 && oy() == my() + 1) cy --; else if(fy > 0) fy --;} break;}
+                case KeyEvent.VK_S:
+                case KeyEvent.VK_F2: { if(ro) break; saveFile(); break;}
+                case KeyEvent.VK_Q:
+                case KeyEvent.VK_F10: { console.getManager().unregisterConsole(console); break;}
+
+                //same as without control key down
+                case KeyEvent.VK_PAGE_UP: {if(fy > cym) fy -= cym; else fy = 0; break;}
+                case KeyEvent.VK_PAGE_DOWN: {if(my() - fy > cym) fy +=cym; break;}
 
             }
         else
@@ -186,9 +204,13 @@ public class TextEditor implements KeyboardListener {
                 case KeyEvent.VK_RIGHT: {if(ox() < mx()) if(cx < cxm) cx++; else fx ++; else if(cursorDown()) {cx = 0; fx = 0; } break;}
                 case KeyEvent.VK_HOME: {cx = fx = 0; break;}
                 case KeyEvent.VK_END: { end(); break;}
+
+                //same as with control key down
                 case KeyEvent.VK_PAGE_UP: {if(fy > cym) fy -= cym; else fy = 0; break;}
                 case KeyEvent.VK_PAGE_DOWN: {if(my() - fy > cym) fy +=cym; break;}
                 default:
+                    if(ro) break;
+
                     char c = e.getKeyChar();
                     if(c == 0 && k != KeyEvent.VK_DELETE) return;
                     if(cy == ls.size()) ls.add(new StringBuilder());
