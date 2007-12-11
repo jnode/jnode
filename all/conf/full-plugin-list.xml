@@ -18,6 +18,7 @@
   <plugin id="org.jnode.apps.edit"/>
   <plugin id="org.jnode.apps.editor"/>  
   <plugin id="org.jnode.apps.charvabsh"/>
+  <plugin id="org.jnode.apps.commander"/>
   <plugin id="org.jnode.apps.debug"/>
   <plugin id="org.jnode.apps.httpd"/>
 
