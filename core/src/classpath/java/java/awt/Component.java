@@ -4308,7 +4308,7 @@ public abstract class Component
         Object o = iter.next ();
         if (!(o instanceof AWTKeyStroke)
             || sa.contains (o) || sb.contains (o)
-            || ((AWTKeyStroke) o).keyCode == KeyEvent.VK_UNDEFINED)
+            || ((AWTKeyStroke) o).getKeyCode() == KeyEvent.VK_UNDEFINED)
           throw new IllegalArgumentException ();
 		}
 

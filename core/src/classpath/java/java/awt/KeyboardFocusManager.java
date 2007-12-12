@@ -614,7 +614,7 @@ public abstract class KeyboardFocusManager
         Object o = iter.next ();
         if (!(o instanceof AWTKeyStroke)
             || sa.contains (o) || sb.contains (o) || sc.contains (o)
-            || ((AWTKeyStroke) o).keyCode == KeyEvent.VK_UNDEFINED)
+            || ((AWTKeyStroke) o).getKeyCode() == KeyEvent.VK_UNDEFINED)
           throw new IllegalArgumentException ();
       }
     keystrokes = Collections.unmodifiableSet (new HashSet (keystrokes));
