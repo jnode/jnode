@@ -241,4 +241,62 @@ public abstract class GraphicsEnvironment
   {
 		return getDefaultScreenDevice().getDefaultConfiguration().getBounds();
 	}
+
+    //jnode openjdk
+    /**
+     * The headless state of the Toolkit and GraphicsEnvironment
+     */
+    private static Boolean headless;
+    /**
+     * The headless state assumed by default
+     */
+    private static Boolean defaultHeadless;
+    /**
+     * @return warning message if headless state is assumed by default;
+     * null otherwise
+     * @since 1.5
+     */
+    static String getHeadlessMessage() {
+        if (headless == null) {
+            getHeadlessProperty(); // initialize the values
+        }
+        return defaultHeadless != Boolean.TRUE ? null :
+            "\nNo X11 DISPLAY variable was set, " +
+            "but this program performed an operation which requires it.";
+    }
+    
+    /**
+     * @return the value of the property "java.awt.headless"
+     * @since 1.4
+     */
+    private static boolean getHeadlessProperty() {
+        if (headless == null) {
+            java.security.AccessController.doPrivileged(
+            new java.security.PrivilegedAction() {
+                public Object run() {
+                    String nm = System.getProperty("java.awt.headless");
+
+                    if (nm == null) {
+                        /* No need to ask for DISPLAY when run in a browser */
+                        if (System.getProperty("javaplugin.version") != null) {
+                            headless = defaultHeadless = Boolean.FALSE;
+                        } else {
+                            String osName = System.getProperty("os.name");
+                            headless = defaultHeadless =
+                                Boolean.valueOf(("Linux".equals(osName) || "SunOS".equals(osName)) &&
+                                                (System.getenv("DISPLAY") == null));
+                        }
+                    } else if (nm.equals("true")) {
+                        headless = Boolean.TRUE;
+                    } else {
+                        headless = Boolean.FALSE;
+                    }
+                    return null;
+                }
+                }
+            );
+        }
+        return headless.booleanValue();
+    }
+
 } // class GraphicsEnvironment
