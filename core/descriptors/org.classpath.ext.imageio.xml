@@ -12,6 +12,9 @@
 
   <runtime>
     <library name="jnode-core.jar">
+        
+      <export name="com.sun.imageio.plugins.common.*"/>
+
       <export name="javax.imageio.*"/>
       <export name="javax.imageio.event.*"/>
       <export name="javax.imageio.metadata.*"/>
