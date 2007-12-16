@@ -93,9 +93,15 @@
       <export name="javax.tools.*"/>
 
 	  <export name="sun.audio.*"/>
-        
+
+      <export name="sun.net.*"/>
+      <export name="sun.net.www.http.*"/>
       <export name="sun.net.www.protocol.http.*"/>
-      <export name="sun.net.www.protocol.https.*"/>      
+      <export name="sun.net.www.protocol.https.*"/>
+      <export name="sun.net.spi.*"/>
+      <export name="sun.net.spi.nameservice.*"/>
+      <export name="sun.net.spi.nameservice.dns.*"/>
+      <export name="sun.net.spi.nameservice.dns.META-INF.services.*"/>      
 
       <export name="sun.security.*"/>
       <export name="sun.security.util.*"/>
