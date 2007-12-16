@@ -446,6 +446,7 @@ public class Tetris extends JPanel implements KeyListener {
                     // ignore
                 }
                 JFrame frame = new JFrame("Tetris");
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 Tetris tetris = new Tetris();
                 tetris.delay = delay;
                 frame.add(tetris, BorderLayout.CENTER);
