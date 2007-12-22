@@ -1027,4 +1027,27 @@ public final class Locale implements Serializable, Cloneable
     variant = variant.intern();
     hashcode = language.hashCode() ^ country.hashCode() ^ variant.hashCode();
     }
+
+    //jnode openjdk
+    /**
+     * Returns a <code>Locale</code> constructed from the given
+     * <code>language</code>, <code>country</code> and
+     * <code>variant</code>. If the same <code>Locale</code> instance
+     * is available in the cache, then that instance is
+     * returned. Otherwise, a new <code>Locale</code> instance is
+     * created and cached.
+     *
+     * @param language lowercase two-letter ISO-639 code.
+     * @param country uppercase two-letter ISO-3166 code.
+     * @param variant vendor and browser specific code. See class description.
+     * @return the <code>Locale</code> instance requested
+     * @exception NullPointerException if any argument is null.
+     */
+    static Locale getInstance(String language, String country, String variant) {
+        if (language== null || country == null || variant == null) {
+            throw new NullPointerException();
+        }
+
+	    return getLocale(language, country, variant);
+    }
 } // class Locale

@@ -41,6 +41,7 @@
       <export name="sun.text.Normalizer"/>
       <export name="sun.text.normalizer.*"/>
       <export name="sun.util.calendar.*"/>
+      <export name="sun.util.ResourceBundleEnumeration"/>
 
       <export name="gnu.classpath.Configuration"/>
       <export name="gnu.classpath.Pointer"/>
@@ -129,7 +130,9 @@
       <export name="java.util.zip.*"/>
         
       <export name="java.util.concurrent.atomic.AtomicReferenceFieldUpdater"/>
-      
+      <export name="java.util.concurrent.ConcurrentMap"/>
+      <export name="java.util.concurrent.ConcurrentHashMap"/>
+
       <export name="javax.*" />
       <export name="javax.isolate.*"/>
       
