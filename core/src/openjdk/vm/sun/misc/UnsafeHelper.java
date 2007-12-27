@@ -12,6 +12,7 @@ import org.vmmagic.unboxed.ObjectReference;
 /**
  * @author Levente S\u00e1ntha
  */
+@org.jnode.vm.annotation.MagicPermission
 class UnsafeHelper {
     private static final int OFFSET_OF_vmField_IN_Field = AccessController.doPrivileged(new PrivilegedAction<Integer>(){
         public Integer run() {
