@@ -119,6 +119,8 @@ public final class VmSystem {
      */
     public static void initialize() {
         if (!inited) {
+
+            
             // Initialize resource manager
             final ResourceManager rm = ResourceManagerImpl.initialize();
 
@@ -138,6 +140,8 @@ public final class VmSystem {
             // Initialize the monitors for the heap manager
             Vm.getHeapManager().start();
 
+            Locale.setDefault(Locale.ENGLISH);
+            
             // Find & start all processors
             vm.initializeProcessors(rm);
 
@@ -152,7 +156,8 @@ public final class VmSystem {
             // Make sure that we have the default locale,
             // otherwise String.toLowerCase fails because it needs itself
             // via Locale.getDefault.
-            Locale.getDefault();
+            //Locale.getDefault();
+            //Locale.setDefault(Locale.ENGLISH);
 
             // Calibrate the processors
             VmProcessor.current().calibrate();

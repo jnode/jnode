@@ -29,9 +29,11 @@ public class VmUtils {
 	{
         boolean allowNatives = false;
         allowNatives |= className.equals("org.jnode.vm.Unsafe");
+        /*
         allowNatives |= className.equals("org.jnode.vm." + architectureName + ".Unsafe"
                 + architectureName.toUpperCase());
-        
+          */
+        allowNatives |= className.indexOf("org.jnode.vm.") > -1 && className.indexOf(".Unsafe") > -1;
         return allowNatives;
 	}
 }
