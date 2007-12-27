@@ -38,7 +38,7 @@ import java.lang.reflect.*;
  * @version  1.27, 07/05/05
  * @see #getUnsafe
  */
-
+@org.jnode.vm.annotation.MagicPermission
 public final class Unsafe {
 
     private static native void registerNatives();

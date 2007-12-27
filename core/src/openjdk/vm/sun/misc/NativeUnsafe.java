@@ -11,6 +11,7 @@ import org.vmmagic.unboxed.Address;
 /**
  * @author Levente S\u00e1ntha
  */
+@org.jnode.vm.annotation.MagicPermission
 class NativeUnsafe {
     static void registerNatives() {
     }
