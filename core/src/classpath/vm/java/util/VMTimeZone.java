@@ -71,27 +71,27 @@ final class VMTimeZone {
 		// See if TZ environment variable is set and accessible.
 		String tzid = System.getenv("TZ");
 		if (tzid != null && !tzid.equals(""))
-			zone = TimeZone.getDefaultTimeZone(tzid);
+			zone = TimeZone.getTimeZone(tzid);
 
 		// Try to parse /etc/timezone.
 		if (zone == null) {
 			tzid = readTimeZoneFile("/etc/timezone");
 			if (tzid != null && !tzid.equals(""))
-				zone = TimeZone.getDefaultTimeZone(tzid);
+				zone = TimeZone.getTimeZone(tzid);
 		}
 
 		// Try to parse /etc/localtime
 		if (zone == null) {
 			tzid = readtzFile("/etc/localtime");
 			if (tzid != null && !tzid.equals(""))
-				zone = TimeZone.getDefaultTimeZone(tzid);
+				zone = TimeZone.getTimeZone(tzid);
 		}
 
 		// Try some system specific way
 		if (zone == null) {
 			tzid = getSystemTimeZoneId();
 			if (tzid != null && !tzid.equals(""))
-				zone = TimeZone.getDefaultTimeZone(tzid);
+				zone = TimeZone.getTimeZone(tzid);
 		}
 
 		return zone;
