@@ -40,8 +40,10 @@
       <export name="sun.nio.cs.ThreadLocalCoders"/>
       <export name="sun.text.Normalizer"/>
       <export name="sun.text.normalizer.*"/>
+      <export name="sun.text.resources.*"/>
       <export name="sun.util.calendar.*"/>
-      <export name="sun.util.ResourceBundleEnumeration"/>
+      <export name="sun.util.*"/>
+      <export name="sun.util.resources.*"/>
 
       <export name="gnu.classpath.Configuration"/>
       <export name="gnu.classpath.Pointer"/>
@@ -128,10 +130,10 @@
       <export name="java.util.regex.*"/>
       <export name="java.util.spi.*"/>
       <export name="java.util.zip.*"/>
-        
-      <export name="java.util.concurrent.atomic.AtomicReferenceFieldUpdater"/>
-      <export name="java.util.concurrent.ConcurrentMap"/>
-      <export name="java.util.concurrent.ConcurrentHashMap"/>
+
+      <export name="java.util.concurrent.*"/>
+      <export name="java.util.concurrent.atomic.*"/>
+      <export name="java.util.concurrent.locks.*"/>  
 
       <export name="javax.*" />
       <export name="javax.isolate.*"/>
