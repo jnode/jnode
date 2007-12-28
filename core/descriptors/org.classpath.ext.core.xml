@@ -59,9 +59,6 @@
       <export name="java.rmi.dgc.*"/>
       <export name="java.rmi.registry.*"/>
       <export name="java.rmi.server.*"/>
-      <export name="java.util.concurrent.*"/>
-      <export name="java.util.concurrent.atomic.*"/>
-      <export name="java.util.concurrent.locks.*"/>
 
       <export name="javax.accessibility.*"/>
       <export name="javax.activation.*"/>
@@ -74,12 +71,10 @@
 	  <export name="javax.lang.model.element.*"/> 	  	
 	  <export name="javax.lang.model.type.*"/>
 	  <export name="javax.lang.model.util.*"/>
-      <export name="javax.management.*"/>  
-      <export name="javax.naming.*"/>
+      <export name="javax.management.*"/>
       <export name="javax.naming.directory.*"/>
       <export name="javax.naming.event.*"/>
       <export name="javax.naming.ldap.*"/>
-      <export name="javax.naming.spi.*"/>
       <export name="javax.net.*"/>
       <export name="javax.net.ssl.*"/>
 
@@ -106,8 +101,6 @@
       <export name="sun.security.*"/>
       <export name="sun.security.util.*"/>
 
-      <export name="sun.reflect.*"/>
-      <export name="sun.reflect.annotation.*"/>
       <export name="sun.reflect.misc.*"/>
     </library>
   </runtime>

@@ -149,13 +149,9 @@
       <export name="javax.xml.crypto.dsig.spec.*"/>
       <export name="javax.xml.datatype.*"/>
       <export name="javax.xml.namespace.*"/>
-      <export name="javax.xml.parsers.*"/>
       <export name="javax.xml.soap.*"/>
-      <export name="javax.xml.transform.*"/>
-      <export name="javax.xml.transform.dom.*"/>
       <export name="javax.xml.transform.sax.*"/>
       <export name="javax.xml.transform.stax.*"/>
-      <export name="javax.xml.transform.stream.*"/>
       <export name="javax.xml.validation.*"/>
       <export name="javax.xml.ws.*"/>
       <export name="javax.xml.ws.handler.*"/>
