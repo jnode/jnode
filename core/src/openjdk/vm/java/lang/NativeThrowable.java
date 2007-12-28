@@ -6,6 +6,7 @@ package java.lang;
 import org.jnode.vm.scheduler.VmThread;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.VmStackFrame;
+import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.classmgr.VmInstanceField;
@@ -15,6 +16,7 @@ import org.vmmagic.unboxed.ObjectReference;
  * @author Levente S\u00e1ntha
  * @see Throwable
  */
+@MagicPermission
 class NativeThrowable {
     private static int BACKTRACE_OFFSET = ((VmInstanceField)Throwable.class.getVmClass().getField("backtrace")).getOffset();
     private static synchronized Throwable fillInStackTrace(Throwable instance){
