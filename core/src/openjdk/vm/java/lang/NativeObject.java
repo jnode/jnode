@@ -3,56 +3,58 @@
  */
 package java.lang;
 
+import org.jnode.vm.VmSystem;
+import org.jnode.vm.scheduler.MonitorManager;
+
 /**
  * @author Levente S\u00e1ntha
  * @see Object
  */
-public class NativeObject {
+class NativeObject {
     private static void registerNatives() {
     }
 
     /**
      * @see Object#getClass()
      */
-    public static Class<?> getClass(Object instance) {
-        return VMObject.getClass(instance);
+    private static Class<?> getClass(Object instance) {
+        return VmSystem.getClass(instance);
     }
 
     /**
      * @see Object#hashCode()
      */
-    public static int hashCode(Object instance) {
-        return System.identityHashCode(instance);
+    private static int hashCode(Object instance) {
+        return VmSystem.getHashCode(instance);
     }
 
     /**
      * @see Object#clone()
      */
-    protected static Object clone(Object instance) throws CloneNotSupportedException {
+    private static Object clone(Object instance) throws CloneNotSupportedException {
         if (instance instanceof Cloneable)
-            return VMObject.clone((Cloneable) instance);
+            return VmSystem.clone((Cloneable) instance);
         throw new CloneNotSupportedException("Object not cloneable");
     }
 
     /**
      * @see java.lang.Object#notify()
      */
-    public static void notify(Object instance) {
-        VMObject.notify(instance);
+    private static void notify(Object instance) {
+        MonitorManager.notify(instance);
     }
 
     /**
      * @see Object#notifyAll() ()
      */
-    public static void notifyAll(Object instance) {
-        VMObject.notifyAll(instance);
+    private static void notifyAll(Object instance) {
+        MonitorManager.notifyAll(instance);
     }
 
     /**
-     * @see java.lang.Object#wait(long)
+     * @see Object#wait(long)
      */
-    public static void wait(Object instance, long timeout) throws InterruptedException {
-        VMObject.wait(instance, timeout, 0);
-
+    private static void wait(Object instance, long timeout) throws InterruptedException {
+        MonitorManager.wait(instance, timeout);
     }
 }

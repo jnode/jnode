@@ -11,11 +11,9 @@
 
   <runtime>
     <library name="jnode-core.jar">
-      <export name="com.sun.*" />
 	  <export name="com.sun.naming.internal.*"/>
       <export name="com.sun.security.auth.UserPrincipal"/>  
 
-      <export name="sun.*" />
 	  <export name="sun.awt.EventListenerAggregate" />
       <export name="sun.misc.*"/>
       <export name="sun.reflect.*"/>
@@ -38,7 +36,7 @@
       <export name="sun.nio.cs.StreamDecoder"/>
       <export name="sun.nio.cs.HistoricallyNamedCharset"/>
       <export name="sun.nio.cs.ThreadLocalCoders"/>
-      <export name="sun.text.Normalizer"/>
+      <export name="sun.text.*"/>
       <export name="sun.text.normalizer.*"/>
       <export name="sun.text.resources.*"/>
       <export name="sun.util.calendar.*"/>
@@ -102,7 +100,6 @@
       <export name="java.beans.PropertyChangeSupport" />
       <export name="java.beans.PropertyChangeEvent" />
 
-	  <export name="java.*" />
       <export name="java.io.*"/>
       <export name="java.lang.*"/>
       <export name="java.lang.annotation.*"/>
@@ -135,12 +132,12 @@
       <export name="java.util.concurrent.atomic.*"/>
       <export name="java.util.concurrent.locks.*"/>  
 
-      <export name="javax.*" />
       <export name="javax.isolate.*"/>
       
 	  <export name="javax.naming.*"/>
       <export name="javax.naming.spi.*"/>
 
+        <!--
       <export name="javax.naming.Name"/>
       <export name="javax.naming.InvalidNameException"/>
       <export name="javax.naming.NameAlreadyBoundException"/>
@@ -149,6 +146,7 @@
       <export name="javax.naming.CompositeName"/>
       <export name="javax.naming.NameImpl"/>
       <export name="javax.naming.NameImplEnumerator"/>
+      -->
 
       <export name="javax.net.ssl.SSLException"/>  
       <export name="javax.net.ssl.SSLPeerUnverifiedException"/>
@@ -173,9 +171,6 @@
       <export name="javax.security.auth.callback.UnsupportedCallbackException"/>
       <export name="javax.security.auth.login.LoginException"/>
       <export name="javax.security.auth.x500.*"/>
-
-      <export name="javax.crypto.spec.SecretKeySpec"/>
-      <export name="javax.crypto.SecretKey"/>
 
       <export name="org.xml.sax.*"/>
       
