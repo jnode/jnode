@@ -487,7 +487,7 @@ public final class ClassDecoder {
         final String nativeClassName = VmUtils.getNativeClassName(className);
         final VmType nativeType;
         try {
-            nativeType = cl.loadClass(nativeClassName, true);
+            nativeType = cl.loadClass(nativeClassName, false);
         } catch (ClassNotFoundException ex) {
             if (verbose) {
                 BootLog.error("Native class replacement (" + nativeClassName
