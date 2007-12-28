@@ -120,7 +120,12 @@ public abstract class AbstractPluginTask extends Task {
 				fs.createInclude().setName("**/*");
 			} else {
 				fs.createInclude().setName(export.replace('.', '/') + ".*");
-			}
+                String exp = export.replace('.', '/');
+                if(!exp.endsWith("*"))
+                    fs.createInclude().setName(exp + "*");
+                else
+                    fs.createInclude().setName(exp);
+            }
 		}
 	}
 
