@@ -333,7 +333,7 @@ public class Thread implements Runnable
             throw new InternalError("Live thread has invalid group: " + name);
         }
 
-        group.addThread(this);
+        group.add(this);
 
         this.group = group;
         this.runnable = target;
@@ -383,7 +383,7 @@ public class Thread implements Runnable
             throw new InternalError("Live thread has invalid group: " + name);
         }
 
-        group.addThread(this);
+        group.add(this);
 
         this.group = group;
         this.runnable = target;
@@ -415,7 +415,7 @@ public class Thread implements Runnable
             throw new InternalError("Isolate thread has invalid group: " + name);
         }
 
-        group.addThread(this);
+        group.add(this);
 
         this.group = group;
         this.runnable = target;
@@ -444,8 +444,8 @@ public class Thread implements Runnable
                     "vmThread has already a java thread associated with it");
         }
         this.vmThread = vmThread;
-        this.group = ThreadGroup.root;
-        this.group.addThread(this);
+        this.group = ROOT_GROUP;
+        this.group.add(this);
         this.name = autoName("System");
         this.runnable = null;
         this.parent = null;
@@ -1206,7 +1206,7 @@ public class Thread implements Runnable
      */
     public final void onExit() {
         if (vmThread.isStopping()) {
-            group.removeThread(this);
+            group.remove(this);
         }
     }
 
@@ -1359,4 +1359,16 @@ public class Thread implements Runnable
     throw new UnsupportedClassVersionError();
   }
 
+    //jnode + openjdk
+    static final ThreadGroup ROOT_GROUP;
+    static {
+        ThreadGroup g = null;
+        try {
+            g = ThreadGroup.class.getDeclaredConstructor().newInstance();
+        }catch (Exception e){
+            e.printStackTrace();
+            org.jnode.vm.Unsafe.die("Root ThreadGroup creation failure.");
+        }
+        ROOT_GROUP = g;
+    }
 }
