@@ -48,6 +48,7 @@ import org.jnode.vm.VmSystem;
 import org.jnode.vm.VmSystemClassLoader;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmType;
+import sun.reflect.Reflection;
 
 public abstract class ClassLoader {
 
@@ -379,7 +380,7 @@ public abstract class ClassLoader {
             throw new IllegalArgumentException("Package " + name
                     + " already defined");
         Package p = new Package(name, specTitle, specVendor, specVersion,
-                implTitle, implVendor, implVersion, sealed);
+                implTitle, implVendor, implVersion, sealed, this);
         synchronized (definedPackages) {
             definedPackages.put(name, p);
         }
@@ -879,4 +880,19 @@ public abstract class ClassLoader {
         classAssertionStatus = null;
     }
 
+    //jnod+openjdk
+    // Returns the invoker's class loader, or null if none.
+    // NOTE: This must always be invoked when there is exactly one intervening
+    // frame from the core libraries on the stack between this method's
+    // invocation and the desired invoker.
+    static ClassLoader getCallerClassLoader() {
+        // NOTE use of more generic Reflection.getCallerClass()
+        Class caller = Reflection.getCallerClass(3);
+        // This can be null if the VM is requesting it
+        if (caller == null) {
+            return null;
+        }
+        // Circumvent security check since this is package-private
+        return caller.getClassLoader0();
+    }
 }
