@@ -37,6 +37,8 @@ exception statement from your version. */
 
 package java.awt;
 
+import java.awt.event.KeyEvent;
+
 /**
  * Written using on-line Java Platform 1.2 API Specification, as well
  * as "The Java Class Libraries", 2nd edition (Addison-Wesley, 1998).
@@ -182,4 +184,55 @@ public class Event implements java.io.Serializable
     this.x += x;
     this.y += y;
   }
+
+    //jnode openjdk
+/*
+     * <b>NOTE:</b> The <code>Event</code> class is obsolete and is
+     * available only for backwards compatilibility.  It has been replaced
+     * by the <code>AWTEvent</code> class and its subclasses.
+     * <p>
+     * Returns the integer key-code associated with the key in this event,
+     * as described in java.awt.Event.
+     */
+static int getOldEventKey(KeyEvent e) {
+    int keyCode = e.getKeyCode();
+    for (int i = 0; i < actionKeyCodes.length; i++) {
+        if (actionKeyCodes[i][0] == keyCode) {
+            return actionKeyCodes[i][1];
+        }
+    }
+    return (int)e.getKeyChar();
+}
+
+/* table for mapping old Event action keys to KeyEvent virtual keys. */
+private static final int actionKeyCodes[][] = {
+/*    virtual key              action key   */
+    { KeyEvent.VK_HOME,        Event.HOME         },
+    { KeyEvent.VK_END,         Event.END          },
+    { KeyEvent.VK_PAGE_UP,     Event.PGUP         },
+    { KeyEvent.VK_PAGE_DOWN,   Event.PGDN         },
+    { KeyEvent.VK_UP,          Event.UP           },
+    { KeyEvent.VK_DOWN,        Event.DOWN         },
+    { KeyEvent.VK_LEFT,        Event.LEFT         },
+    { KeyEvent.VK_RIGHT,       Event.RIGHT        },
+    { KeyEvent.VK_F1,          Event.F1           },
+    { KeyEvent.VK_F2,          Event.F2           },
+    { KeyEvent.VK_F3,          Event.F3           },
+    { KeyEvent.VK_F4,          Event.F4           },
+    { KeyEvent.VK_F5,          Event.F5           },
+    { KeyEvent.VK_F6,          Event.F6           },
+    { KeyEvent.VK_F7,          Event.F7           },
+    { KeyEvent.VK_F8,          Event.F8           },
+    { KeyEvent.VK_F9,          Event.F9           },
+    { KeyEvent.VK_F10,         Event.F10          },
+    { KeyEvent.VK_F11,         Event.F11          },
+    { KeyEvent.VK_F12,         Event.F12          },
+    { KeyEvent.VK_PRINTSCREEN, Event.PRINT_SCREEN },
+    { KeyEvent.VK_SCROLL_LOCK, Event.SCROLL_LOCK  },
+    { KeyEvent.VK_CAPS_LOCK,   Event.CAPS_LOCK    },
+    { KeyEvent.VK_NUM_LOCK,    Event.NUM_LOCK     },
+    { KeyEvent.VK_PAUSE,       Event.PAUSE        },
+    { KeyEvent.VK_INSERT,      Event.INSERT       }
+};
+    
 }

@@ -39,19 +39,7 @@ exception statement from your version. */
 
 package java.awt;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ContainerEvent;
-import java.awt.event.FocusEvent;
-import java.awt.event.InputMethodEvent;
-import java.awt.event.InvocationEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.PaintEvent;
-import java.awt.event.TextEvent;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.util.EventObject;
 
 /**
@@ -396,4 +384,133 @@ public abstract class AWTEvent extends EventObject
     }
     return mask;
   }
+
+    //jnode openjdk
+/**
+     * Converts a new event to an old one (used for compatibility).
+     * If the new event cannot be converted (because no old equivalent
+     * exists) then this returns null.
+     *
+     * Note: this method is here instead of in each individual new
+     * event class in java.awt.event because we don't want to make
+     * it public and it needs to be called from java.awt.
+     */
+    Event convertToOld() {
+        Object src = getSource();
+        int newid = id;
+
+        switch(id) {
+          case KeyEvent.KEY_PRESSED:
+          case KeyEvent.KEY_RELEASED:
+              KeyEvent ke = (KeyEvent)this;
+              if (ke.isActionKey()) {
+                  newid = (id == KeyEvent.KEY_PRESSED?
+                           Event.KEY_ACTION : Event.KEY_ACTION_RELEASE);
+              }
+              int keyCode = ke.getKeyCode();
+              if (keyCode == KeyEvent.VK_SHIFT ||
+                  keyCode == KeyEvent.VK_CONTROL ||
+                  keyCode == KeyEvent.VK_ALT) {
+                  return null;  // suppress modifier keys in old event model.
+              }
+              // no mask for button1 existed in old Event - strip it out
+              return new Event(src, ke.getWhen(), newid, 0, 0,
+                               Event.getOldEventKey(ke),
+                               (ke.getModifiers() & ~InputEvent.BUTTON1_MASK));
+
+          case MouseEvent.MOUSE_PRESSED:
+          case MouseEvent.MOUSE_RELEASED:
+          case MouseEvent.MOUSE_MOVED:
+          case MouseEvent.MOUSE_DRAGGED:
+          case MouseEvent.MOUSE_ENTERED:
+          case MouseEvent.MOUSE_EXITED:
+              MouseEvent me = (MouseEvent)this;
+              // no mask for button1 existed in old Event - strip it out
+              Event olde = new Event(src, me.getWhen(), newid,
+                               me.getX(), me.getY(), 0,
+                               (me.getModifiers() & ~InputEvent.BUTTON1_MASK));
+              olde.clickCount = me.getClickCount();
+              return olde;
+
+          case FocusEvent.FOCUS_GAINED:
+              return new Event(src, Event.GOT_FOCUS, null);
+
+          case FocusEvent.FOCUS_LOST:
+              return new Event(src, Event.LOST_FOCUS, null);
+
+          case WindowEvent.WINDOW_CLOSING:
+          case WindowEvent.WINDOW_ICONIFIED:
+          case WindowEvent.WINDOW_DEICONIFIED:
+              return new Event(src, newid, null);
+
+          case ComponentEvent.COMPONENT_MOVED:
+              if (src instanceof Frame || src instanceof Dialog) {
+                  Point p = ((Component)src).getLocation();
+                  return new Event(src, 0, Event.WINDOW_MOVED, p.x, p.y, 0, 0);
+              }
+              break;
+
+          case ActionEvent.ACTION_PERFORMED:
+              ActionEvent ae = (ActionEvent)this;
+              String cmd;
+              if (src instanceof Button) {
+                  cmd = ((Button)src).getLabel();
+              } else if (src instanceof MenuItem) {
+                  cmd = ((MenuItem)src).getLabel();
+              } else {
+                  cmd = ae.getActionCommand();
+              }
+              return new Event(src, 0, newid, 0, 0, 0, ae.getModifiers(), cmd);
+
+          case ItemEvent.ITEM_STATE_CHANGED:
+              ItemEvent ie = (ItemEvent)this;
+              Object arg;
+              if (src instanceof List) {
+                  newid = (ie.getStateChange() == ItemEvent.SELECTED?
+                           Event.LIST_SELECT : Event.LIST_DESELECT);
+                  arg = ie.getItem();
+              } else {
+                  newid = Event.ACTION_EVENT;
+                  if (src instanceof Choice) {
+                      arg = ie.getItem();
+
+                  } else { // Checkbox
+                      arg = Boolean.valueOf(ie.getStateChange() == ItemEvent.SELECTED);
+                  }
+              }
+              return new Event(src, newid, arg);
+
+          case AdjustmentEvent.ADJUSTMENT_VALUE_CHANGED:
+              AdjustmentEvent aje = (AdjustmentEvent)this;
+              switch(aje.getAdjustmentType()) {
+                case AdjustmentEvent.UNIT_INCREMENT:
+                  newid = Event.SCROLL_LINE_DOWN;
+                  break;
+                case AdjustmentEvent.UNIT_DECREMENT:
+                  newid = Event.SCROLL_LINE_UP;
+                  break;
+                case AdjustmentEvent.BLOCK_INCREMENT:
+                  newid = Event.SCROLL_PAGE_DOWN;
+                  break;
+                case AdjustmentEvent.BLOCK_DECREMENT:
+                  newid = Event.SCROLL_PAGE_UP;
+                  break;
+                case AdjustmentEvent.TRACK:
+		  if (aje.getValueIsAdjusting()) {
+		      newid = Event.SCROLL_ABSOLUTE;
+		  }
+		  else {
+		      newid = Event.SCROLL_END;
+		  }
+                  break;
+                default:
+                  return null;
+              }
+              return new Event(src, newid, Integer.valueOf(aje.getValue()));
+
+          default:
+        }
+        return null;
+    }
+
 } // class AWTEvent

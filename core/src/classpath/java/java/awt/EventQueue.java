@@ -41,15 +41,10 @@ package java.awt;
 import gnu.java.awt.LowPriorityEvent;
 import gnu.java.awt.peer.NativeEventLoopRunningEvent;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.InputMethodEvent;
-import java.awt.event.InvocationEvent;
-import java.awt.event.PaintEvent;
+import java.awt.event.*;
 import java.awt.peer.ComponentPeer;
 import java.awt.peer.LightweightPeer;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.ref.WeakReference;
 import java.util.EmptyStackException;
 
 /* Written using on-line Java 2 Platform Standard Edition v1.3 API 
@@ -707,5 +702,58 @@ public class EventQueue
      * The time stamp of the last dispatched InputEvent or ActionEvent.
      */
     private long mostRecentEventTime = System.currentTimeMillis();
+
+/*
+     * Removes any pending events for the specified source object.
+     * If removeAllEvents parameter is <code>true</code> then all
+     * events for the specified source object are removed, if it
+     * is <code>false</code> then <code>SequencedEvent</code>, <code>SentEvent</code>,
+     * <code>FocusEvent</code>, <code>WindowEvent</code>, <code>KeyEvent</code>,
+     * and <code>InputMethodEvent</code> are kept in the queue, but all other
+     * events are removed.
+     *
+     * This method is normally called by the source's
+     * <code>removeNotify</code> method.
+     */
+final void removeSourceEvents(Object source, boolean removeAllEvents) {
+    /*
+    SunToolkit.flushPendingEvents();
+    synchronized (this) {
+        for (int i = 0; i < NUM_PRIORITIES; i++) {
+            EventQueueItem entry = queues[i].head;
+            EventQueueItem prev = null;
+            while (entry != null) {
+                if ((entry.event.getSource() == source)
+                    && (removeAllEvents
+                        || ! (entry.event instanceof SequencedEvent
+                              || entry.event instanceof SentEvent
+                              || entry.event instanceof FocusEvent
+                              || entry.event instanceof WindowEvent
+                              || entry.event instanceof KeyEvent
+                              || entry.event instanceof InputMethodEvent)))
+                {
+                    if (entry.event instanceof SequencedEvent) {
+                        ((SequencedEvent)entry.event).dispose();
+                    }
+                    if (entry.event instanceof SentEvent) {
+                        ((SentEvent)entry.event).dispose();
+                    }
+                    if (prev == null) {
+                        queues[i].head = entry.next;
+                    } else {
+                        prev.next = entry.next;
+                    }
+                    uncacheEQItem(entry);
+                } else {
+                    prev = entry;
+                }
+                entry = entry.next;
+            }
+            queues[i].tail = prev;
+        }
+    }
+    */
+}
+
 
 }

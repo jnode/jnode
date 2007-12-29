@@ -41,8 +41,6 @@ package java.awt;
 
 //import gnu.java.awt.dnd.peer.gtk.GtkDropTargetContextPeer;
 
-import gnu.java.awt.ComponentReshapeEvent;
-
 import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
 import java.awt.event.AdjustmentEvent;
@@ -217,7 +215,7 @@ public abstract class Component
 	 * the unlikely event that some other package uses exactly the same string
 	 * as a lock object.
 	 */
-	static final Object treeLock = new String("AWT_TREE_LOCK");
+	static final Object LOCK = new String("AWT_TREE_LOCK");
 
   /**
    * The default maximum size.
@@ -738,7 +736,7 @@ public abstract class Component
 	 */
   public final Object getTreeLock()
   {
-		return treeLock;
+		return LOCK;
 	}
 
 	/**
@@ -7432,4 +7430,40 @@ p   * <li>the set of backward traversal keys
      */
     transient AppContext appContext;
 
+    public boolean isFocusTraversableOverridden() {
+        return isFocusTraversableOverridden > 0;
+    }
+
+    /** Internal, constants for serialization */
+    final static String actionListenerK = "actionL";
+    final static String adjustmentListenerK = "adjustmentL";
+    final static String componentListenerK = "componentL";
+    final static String containerListenerK = "containerL";
+    final static String focusListenerK = "focusL";
+    final static String itemListenerK = "itemL";
+    final static String keyListenerK = "keyL";
+    final static String mouseListenerK = "mouseL";
+    final static String mouseMotionListenerK = "mouseMotionL";
+    final static String mouseWheelListenerK = "mouseWheelL";
+    final static String textListenerK = "textL";
+    final static String ownedWindowK = "ownedL";
+    final static String windowListenerK = "windowL";
+    final static String inputMethodListenerK = "inputMethodL";
+    final static String hierarchyListenerK = "hierarchyL";
+    final static String hierarchyBoundsListenerK = "hierarchyBoundsL";
+    final static String windowStateListenerK = "windowStateL";
+    final static String windowFocusListenerK = "windowFocusL";
+
+    // NOTE: This method may be called by privileged threads.
+    //       This functionality is implemented in a package-private method
+    //       to insure that it cannot be overridden by client subclasses.
+    //       DO NOT INVOKE CLIENT CODE ON THIS THREAD!
+    final Font getFont_NoClientCode() {
+        Font font = this.font;
+        if (font != null) {
+            return font;
+        }
+        Container parent = this.parent;
+        return (parent != null) ? parent.getFont_NoClientCode() : null;
+    }
 }

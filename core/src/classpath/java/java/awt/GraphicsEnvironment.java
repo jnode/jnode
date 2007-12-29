@@ -299,4 +299,16 @@ public abstract class GraphicsEnvironment
         return headless.booleanValue();
     }
 
+    //jnode openjdk
+    /**
+     * Check for headless state and throw HeadlessException if headless
+     * @since 1.4
+     */
+    static void checkHeadless() throws HeadlessException {
+        if (isHeadless()) {
+            throw new HeadlessException();
+        }
+    }
+
+
 } // class GraphicsEnvironment
