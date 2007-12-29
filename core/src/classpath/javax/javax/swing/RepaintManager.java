@@ -859,4 +859,14 @@ public class RepaintManager
     InvocationEvent ev = new RepaintWorkerEvent(evQueue, runnable, null, false);
     evQueue.postEvent(ev);
   }
+
+    //jnode openjdk
+/**
+     * Invoked when the doubleBuffered or useTrueDoubleBuffering
+     * properties of a JRootPane change.  This may come in on any thread.
+     */
+    void doubleBufferingChanged(JRootPane rootPane) {
+        //getPaintManager().doubleBufferingChanged(rootPane);
+    }
+
 }

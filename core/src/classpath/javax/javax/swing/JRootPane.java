@@ -48,11 +48,13 @@ import java.awt.LayoutManager;
 import java.awt.LayoutManager2;
 import java.awt.Rectangle;
 import java.io.Serializable;
+import java.security.AccessController;
 
 import javax.accessibility.Accessible;
 import javax.accessibility.AccessibleContext;
 import javax.accessibility.AccessibleRole;
 import javax.swing.plaf.RootPaneUI;
+import sun.security.action.GetBooleanAction;
 
 /**
  * This class is where JComponents are added to. Unlike awt where you could
@@ -697,4 +699,55 @@ public class JRootPane extends JComponent implements Accessible
       accessibleContext = new AccessibleJRootPane();
     return accessibleContext;
   }
+
+    //jnode openjdk
+    final void setUseTrueDoubleBuffering(boolean useTrueDoubleBuffering) {
+        this.useTrueDoubleBuffering = useTrueDoubleBuffering;
+    }
+
+    final boolean getUseTrueDoubleBuffering() {
+        return useTrueDoubleBuffering;
+    }
+
+    final void disableTrueDoubleBuffering() {
+        if (useTrueDoubleBuffering) {
+            if (!IGNORE_DISABLE_TRUE_DOUBLE_BUFFERING) {
+                if (LOG_DISABLE_TRUE_DOUBLE_BUFFERING) {
+                    System.out.println("Disabling true double buffering for " +
+                                       this);
+                    Thread.dumpStack();
+                }
+                useTrueDoubleBuffering = false;
+                RepaintManager.currentManager(this).
+                        doubleBufferingChanged(this);
+            }
+        }
+    }
+    /**
+         * Whether or not we should dump the stack when true double buffering
+         * is disabled. Default is false.
+         */
+        private static final boolean LOG_DISABLE_TRUE_DOUBLE_BUFFERING;
+
+        /**
+         * Whether or not we should ignore requests to disable true double
+         * buffering. Default is false.
+         */
+        private static final boolean IGNORE_DISABLE_TRUE_DOUBLE_BUFFERING;
+
+    /**
+     * Whether or not true double buffering should be used.  This is typically
+     * true, but may be set to false in special situations.  For example,
+     * heavy weight popups (backed by a window) set this to false.
+     */
+    boolean useTrueDoubleBuffering = true;
+    static {
+        LOG_DISABLE_TRUE_DOUBLE_BUFFERING =
+            AccessController.doPrivileged(new GetBooleanAction(
+                                   "swing.logDoubleBufferingDisable"));
+        IGNORE_DISABLE_TRUE_DOUBLE_BUFFERING =
+            AccessController.doPrivileged(new GetBooleanAction(
+                                   "swing.ignoreDoubleBufferingDisable"));
+    }
+
 }

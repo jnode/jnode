@@ -176,7 +176,8 @@ public class JPasswordField extends JTextField
 	 */
   public void setEchoChar(char echo)
   {
-		this.echoChar = echo;
+      echoCharSet = true;
+        this.echoChar = echo;
   }
 
 	/**
@@ -294,4 +295,34 @@ public class JPasswordField extends JTextField
 
     return accessibleContext;
   }
+
+    //jnode openjdk
+    /**
+     * This method is a hack to get around the fact that we cannot
+     * directly override setUIProperty because part of the inheritance heirarchy
+     * goes outside of the javax.swing package, and therefore calling a package
+     * private method isn't allowed. This method should return true if the property
+     * was handled, and false otherwise.
+     */
+    boolean customSetUIProperty(String propertyName, Object value) {
+        if (propertyName == "echoChar") {
+            if (!echoCharSet) {
+                setEchoChar((Character)value);
+                echoCharSet = false;
+            }
+            return true;
+        }
+        return false;
+    }
+    private boolean echoCharSet = false;
+    /**
+     * {@inheritDoc}
+     * @since 1.6
+     */
+    public void updateUI() {
+        if(!echoCharSet) {
+            echoChar = '*';
+        }
+        super.updateUI();
+    }
 }

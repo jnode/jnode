@@ -681,9 +681,9 @@ public abstract class JComponent extends Container implements Serializable
    */
   private Hashtable clientProperties;
   
-  private InputMap inputMap_whenFocused;
-  private InputMap inputMap_whenAncestorOfFocused;
-  private ComponentInputMap inputMap_whenInFocusedWindow;
+  private InputMap focusInputMap;
+  private InputMap ancestorInputMap;
+  private ComponentInputMap windowInputMap;
   private ActionMap actionMap;
   /** @since 1.3 */
   private boolean verifyInputWhenFocusTarget = true;
@@ -1358,16 +1358,16 @@ public abstract class JComponent extends Container implements Serializable
     KeyStroke[] ks0;
     KeyStroke[] ks1;
     KeyStroke[] ks2;
-    if (inputMap_whenFocused != null)
-      ks0 = inputMap_whenFocused.keys();
+    if (focusInputMap != null)
+      ks0 = focusInputMap.keys();
     else 
       ks0 = new KeyStroke[0];
-    if (inputMap_whenAncestorOfFocused != null)
-      ks1 = inputMap_whenAncestorOfFocused.keys();
+    if (ancestorInputMap != null)
+      ks1 = ancestorInputMap.keys();
     else 
       ks1 = new KeyStroke[0];
-    if (inputMap_whenInFocusedWindow != null)
-      ks2 = inputMap_whenInFocusedWindow.keys();
+    if (windowInputMap != null)
+      ks2 = windowInputMap.keys();
     else
       ks2 = new KeyStroke[0];
     int count = ks0.length + ks1.length + ks2.length;
@@ -2532,11 +2532,11 @@ public abstract class JComponent extends Container implements Serializable
     switch (condition)
       {
       case WHEN_FOCUSED:
-        inputMap_whenFocused = map;
+        focusInputMap = map;
         break;
 
       case WHEN_ANCESTOR_OF_FOCUSED_COMPONENT:
-        inputMap_whenAncestorOfFocused = map;
+        ancestorInputMap = map;
         break;
 
       case WHEN_IN_FOCUSED_WINDOW:
@@ -2544,7 +2544,7 @@ public abstract class JComponent extends Container implements Serializable
             throw new 
               IllegalArgumentException("WHEN_IN_FOCUSED_WINDOW " + 
                                        "InputMap must be a ComponentInputMap");
-        inputMap_whenInFocusedWindow = (ComponentInputMap)map;
+        windowInputMap = (ComponentInputMap)map;
         break;
         
       case UNDEFINED_CONDITION:
@@ -2572,19 +2572,19 @@ public abstract class JComponent extends Container implements Serializable
     switch (condition)
       {
       case WHEN_FOCUSED:
-        if (inputMap_whenFocused == null)
-          inputMap_whenFocused = new InputMap();
-        return inputMap_whenFocused;
+        if (focusInputMap == null)
+          focusInputMap = new InputMap();
+        return focusInputMap;
 
       case WHEN_ANCESTOR_OF_FOCUSED_COMPONENT:
-        if (inputMap_whenAncestorOfFocused == null)
-          inputMap_whenAncestorOfFocused = new InputMap();
-        return inputMap_whenAncestorOfFocused;
+        if (ancestorInputMap == null)
+          ancestorInputMap = new InputMap();
+        return ancestorInputMap;
 
       case WHEN_IN_FOCUSED_WINDOW:
-        if (inputMap_whenInFocusedWindow == null)
-          inputMap_whenInFocusedWindow = new ComponentInputMap(this);
-        return inputMap_whenInFocusedWindow;
+        if (windowInputMap == null)
+          windowInputMap = new ComponentInputMap(this);
+        return windowInputMap;
 
       case UNDEFINED_CONDITION:
       default:
@@ -2638,14 +2638,14 @@ public abstract class JComponent extends Container implements Serializable
    */
   public int getConditionForKeyStroke(KeyStroke ks)
   {
-    if (inputMap_whenFocused != null 
-        && inputMap_whenFocused.get(ks) != null)
+    if (focusInputMap != null
+        && focusInputMap.get(ks) != null)
       return WHEN_FOCUSED;
-    else if (inputMap_whenAncestorOfFocused != null 
-             && inputMap_whenAncestorOfFocused.get(ks) != null)
+    else if (ancestorInputMap != null
+             && ancestorInputMap.get(ks) != null)
       return WHEN_ANCESTOR_OF_FOCUSED_COMPONENT;
-    else if (inputMap_whenInFocusedWindow != null 
-             && inputMap_whenInFocusedWindow.get(ks) != null)
+    else if (windowInputMap != null
+             && windowInputMap.get(ks) != null)
       return WHEN_IN_FOCUSED_WINDOW;
     else
       return UNDEFINED_CONDITION;
@@ -2842,12 +2842,12 @@ public abstract class JComponent extends Container implements Serializable
    */
   public void resetKeyboardActions()
   {
-    if (inputMap_whenFocused != null)
-      inputMap_whenFocused.clear();
-    if (inputMap_whenAncestorOfFocused != null)
-      inputMap_whenAncestorOfFocused.clear();
-    if (inputMap_whenInFocusedWindow != null)
-      inputMap_whenInFocusedWindow.clear();
+    if (focusInputMap != null)
+      focusInputMap.clear();
+    if (ancestorInputMap != null)
+      ancestorInputMap.clear();
+    if (windowInputMap != null)
+      windowInputMap.clear();
     if (actionMap != null)
       actionMap.clear();
   }
@@ -3826,7 +3826,7 @@ public abstract class JComponent extends Container implements Serializable
      * Note: This method provides complimentary functionality to that provided
      * by other high level Swing printing APIs. However, it deals strictly with
      * painting and should not be confused as providing information on higher
-     * level print processes. For example, a {@link javax.swing.JTable#print()}
+     * level print processes. For example, a {@link javax.swing.JTable#print(java.awt.Graphics)}
      * operation doesn't necessarily result in a continuous rendering of the
      * full component, and the return value of this method can change multiple
      * times during that operation. It is even possible for the component to be
@@ -3974,4 +3974,112 @@ public abstract class JComponent extends Container implements Serializable
         return (byte)((comp.flags >> WRITE_OBJ_COUNTER_FIRST) & 0xFF);
     }
 
+    /**
+     * Returns the <code>InputMap</code> to use for condition
+     * <code>condition</code>.  If the <code>InputMap</code> hasn't
+     * been created, and <code>create</code> is
+     * true, it will be created.
+     *
+     * @param condition one of the following values:
+     * <ul>
+     * <li>JComponent.FOCUS_INPUTMAP_CREATED
+     * <li>JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
+     * <li>JComponent.WHEN_IN_FOCUSED_WINDOW
+     * </ul>
+     * @param create if true, create the <code>InputMap</code> if it
+     *		is not already created
+     * @return the <code>InputMap</code> for the given <code>condition</code>;
+     *		if <code>create</code> is false and the <code>InputMap</code>
+     *		hasn't been created, returns <code>null</code>
+     * @exception IllegalArgumentException if <code>condition</code>
+     *		is not one of the legal values listed above
+     */
+    final InputMap getInputMap(int condition, boolean create) {
+	switch (condition) {
+	case WHEN_FOCUSED:
+	    if (getFlag(FOCUS_INPUTMAP_CREATED)) {
+		return focusInputMap;
+	    }
+	    // Hasn't been created yet.
+	    if (create) {
+		InputMap km = new InputMap();
+		setInputMap(condition, km);
+		return km;
+	    }
+	    break;
+	case WHEN_ANCESTOR_OF_FOCUSED_COMPONENT:
+	    if (getFlag(ANCESTOR_INPUTMAP_CREATED)) {
+		return ancestorInputMap;
+	    }
+	    // Hasn't been created yet.
+	    if (create) {
+		InputMap km = new InputMap();
+		setInputMap(condition, km);
+		return km;
+	    }
+	    break;
+	case WHEN_IN_FOCUSED_WINDOW:
+	    if (getFlag(WIF_INPUTMAP_CREATED)) {
+		return windowInputMap;
+	    }
+	    // Hasn't been created yet.
+	    if (create) {
+		ComponentInputMap km = new ComponentInputMap(this);
+		setInputMap(condition, km);
+		return km;
+	    }
+	    break;
+	default:
+	    throw new IllegalArgumentException("condition must be one of JComponent.WHEN_IN_FOCUSED_WINDOW, JComponent.WHEN_FOCUSED or JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT");
+	}
+	return null;
+    }
+
+    /**
+     * Called to set or clear the drop location during a DnD operation.
+     * In some cases, the component may need to use its internal selection
+     * temporarily to indicate the drop location. To help facilitate this,
+     * this method returns and accepts as a parameter a state object.
+     * This state object can be used to store, and later restore, the selection
+     * state. Whatever this method returns will be passed back to it in
+     * future calls, as the state parameter. If it wants the DnD system to
+     * continue storing the same state, it must pass it back every time.
+     * Here's how this is used:
+     * <p>
+     * Let's say that on the first call to this method the component decides
+     * to save some state (because it is about to use the selection to show
+     * a drop index). It can return a state object to the caller encapsulating
+     * any saved selection state. On a second call, let's say the drop location
+     * is being changed to something else. The component doesn't need to
+     * restore anything yet, so it simply passes back the same state object
+     * to have the DnD system continue storing it. Finally, let's say this
+     * method is messaged with <code>null</code>. This means DnD
+     * is finished with this component for now, meaning it should restore
+     * state. At this point, it can use the state parameter to restore
+     * said state, and of course return <code>null</code> since there's
+     * no longer anything to store.
+     *
+     * @param location the drop location (as calculated by
+     *        <code>dropLocationForPoint</code>) or <code>null</code>
+     *        if there's no longer a valid drop location
+     * @param state the state object saved earlier for this component,
+     *        or <code>null</code>
+     * @param forDrop whether or not the method is being called because an
+     *        actual drop occurred
+     * @return any saved state for this component, or <code>null</code> if none
+     */
+    Object setDropLocation(TransferHandler.DropLocation location,
+                           Object state,
+                           boolean forDrop) {
+
+        return null;
+    }
+    /**
+     * Called to indicate to this component that DnD is done.
+     * Needed by <code>JTree</code>.
+     */
+    void dndDone() {
+    }
+
+    
 }
