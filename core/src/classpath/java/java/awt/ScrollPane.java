@@ -161,8 +161,8 @@ ScrollPane(int scrollbarDisplayPolicy)
 
   if (scrollbarDisplayPolicy != SCROLLBARS_NEVER)
     {
-      hAdjustable = new ScrollPaneAdjustable (this, Scrollbar.HORIZONTAL);
-      vAdjustable = new ScrollPaneAdjustable (this, Scrollbar.VERTICAL);
+      hAdjustable = new ScrollPaneAdjustable (this, null, Scrollbar.HORIZONTAL);
+      vAdjustable = new ScrollPaneAdjustable (this, null, Scrollbar.VERTICAL);
 	}
 
   wheelScrollingEnabled = true;

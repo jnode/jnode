@@ -81,7 +81,7 @@ private static final long serialVersionUID = 7270714317450821763L;
 /**
 	  * @serial The checkbox group for this checkbox.
 	  */
-private CheckboxGroup group;
+ CheckboxGroup group;
 
 /**
 	  * @serial The label on this checkbox.
@@ -662,4 +662,17 @@ public AccessibleContext getAccessibleContext()
   {
     return next_checkbox_number++;
   }
+
+    //jnode openjdk
+    /**
+     * Helper function for setState and CheckboxGroup.setSelectedCheckbox
+     * Should remain package-private.
+     */
+    void setStateInternal(boolean state) {
+	this.state = state;
+	CheckboxPeer peer = (CheckboxPeer)this.peer;
+	if (peer != null) {
+	    peer.setState(state);
+	}
+    }
 }

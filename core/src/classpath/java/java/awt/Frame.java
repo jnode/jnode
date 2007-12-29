@@ -338,7 +338,7 @@ public class Frame extends Window implements MenuContainer
 	MenuContainer parent = menuBar.getParent();
 	if (parent != null)
 	  parent.remove(menuBar);
-	menuBar.setParent(this);
+	//menuBar.setParent(this);
 
         // Create local copy for thread safety.
         FramePeer p = (FramePeer) peer;
@@ -423,7 +423,7 @@ public class Frame extends Window implements MenuContainer
 		((FramePeer) peer).setMenuBar(null);
 		menuBar.removeNotify();
 	      }
-	    menuBar.setParent(null);
+	    //menuBar.setParent(null);
 	  }
 	menuBar = null;
       }
