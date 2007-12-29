@@ -6,6 +6,6 @@ package java.awt;
 /**
  * @author Levente S\u00e1ntha
  */
-class NativeInsets {
+class NativeMenuComponent {
     private static void initIDs(){}
 }

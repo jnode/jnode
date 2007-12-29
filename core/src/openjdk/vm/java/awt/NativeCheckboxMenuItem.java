@@ -6,6 +6,6 @@ package java.awt;
 /**
  * @author Levente S\u00e1ntha
  */
-class NativeInsets {
+class NativeCheckboxMenuItem {
     private static void initIDs(){}
 }
