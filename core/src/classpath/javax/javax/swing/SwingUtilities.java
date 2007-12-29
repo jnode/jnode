@@ -39,28 +39,15 @@ exception statement from your version. */
 package javax.swing;
 
 import java.applet.Applet;
-import java.awt.Component;
-import java.awt.ComponentOrientation;
-import java.awt.Container;
-import java.awt.FontMetrics;
-import java.awt.Frame;
-import java.awt.Graphics;
-import java.awt.Insets;
-import java.awt.KeyboardFocusManager;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
+import java.awt.*;
+import java.awt.event.*;
 import java.lang.reflect.InvocationTargetException;
 
 import javax.accessibility.Accessible;
 import javax.accessibility.AccessibleStateSet;
 import javax.swing.plaf.ActionMapUIResource;
 import javax.swing.plaf.InputMapUIResource;
+import sun.awt.AppContext;
 
 /**
  * A number of static utility functions which are
@@ -1619,4 +1606,155 @@ public class SwingUtilities
             SwingUtilities.updateComponentTreeUI(component);
         }
     }
+
+    /*
+     * Convenience function for determining ComponentOrientation.  Helps us
+     * avoid having Munge directives throughout the code.
+     */
+    static boolean isLeftToRight( Component c ) {
+        return c.getComponentOrientation().isLeftToRight();
+    }
+
+    /* Don't make these AppContext accessors public or protected --
+     * since AppContext is in sun.awt in 1.2, we shouldn't expose it
+     * even indirectly with a public API.
+     */
+    // REMIND(aim): phase out use of 4 methods below since they
+    // are just private covers for AWT methods (?)
+
+    static Object appContextGet(Object key) {
+        return AppContext.getAppContext().get(key);
+    }
+
+    static void appContextPut(Object key, Object value) {
+        AppContext.getAppContext().put(key, value);
+    }
+
+    static void appContextRemove(Object key) {
+        AppContext.getAppContext().remove(key);
+    }
+
+    static Class loadSystemClass(String className) throws ClassNotFoundException {
+	return Class.forName(className, true, Thread.currentThread().
+                             getContextClassLoader());
+    }
+
+    /**
+     * Converts the location <code>x</code> <code>y</code> to the
+     * parents coordinate system, returning the location.
+     */
+    static Point convertScreenLocationToParent(Container parent,int x, int y) {
+        for (Container p = parent; p != null; p = p.getParent()) {
+            if (p instanceof Window) {
+                Point point = new Point(x, y);
+
+                SwingUtilities.convertPointFromScreen(point, parent);
+                return point;
+            }
+        }
+        throw new Error("convertScreenLocationToParent: no window ancestor");
+    }
+
+    static class SharedOwnerFrame extends Frame implements WindowListener {
+        public void addNotify() {
+            super.addNotify();
+            installListeners();
+        }
+
+        /**
+         * Install window listeners on owned windows to watch for displayability changes
+         */
+        void installListeners() {
+            Window[] windows = getOwnedWindows();
+            for (int ind = 0; ind < windows.length; ind++){
+                Window window = windows[ind];
+                if (window != null) {
+                    window.removeWindowListener(this);
+                    window.addWindowListener(this);
+                }
+            }
+        }
+
+        /**
+         * Watches for displayability changes and disposes shared instance if there are no
+         * displayable children left.
+         */
+	public void windowClosed(WindowEvent e) {
+	    synchronized(getTreeLock()) {
+		Window[] windows = getOwnedWindows();
+		for (int ind = 0; ind < windows.length; ind++) {
+		    Window window = windows[ind];
+		    if (window != null) {
+			if (window.isDisplayable()) {
+			    return;
+			}
+			window.removeWindowListener(this);
+		    }
+		}
+		dispose();
+	    }
+        }
+	public void windowOpened(WindowEvent e) {
+	}
+	public void windowClosing(WindowEvent e) {
+	}
+	public void windowIconified(WindowEvent e) {
+	}
+	public void windowDeiconified(WindowEvent e) {
+	}
+	public void windowActivated(WindowEvent e) {
+	}
+	public void windowDeactivated(WindowEvent e) {
+	}
+
+        public void show() {
+            // This frame can never be shown
+        }
+        public void dispose() {
+            try {
+                getToolkit().getSystemEventQueue();
+                super.dispose();
+            } catch (Exception e) {
+                // untrusted code not allowed to dispose
+            }
+        }
+    }
+
+    /**
+     * Returns a toolkit-private, shared, invisible Frame
+     * to be the owner for JDialogs and JWindows created with
+     * {@code null} owners.
+     * @exception java.awt.HeadlessException if GraphicsEnvironment.isHeadless()
+     * returns true.
+     * @see java.awt.GraphicsEnvironment#isHeadless
+     */
+    static Frame getSharedOwnerFrame() throws HeadlessException {
+        Frame sharedOwnerFrame =
+            (Frame)SwingUtilities.appContextGet(sharedOwnerFrameKey);
+        if (sharedOwnerFrame == null) {
+            sharedOwnerFrame = new SharedOwnerFrame();
+            SwingUtilities.appContextPut(sharedOwnerFrameKey,
+                                         sharedOwnerFrame);
+        }
+        return sharedOwnerFrame;
+    }
+
+    // Don't use String, as it's not guaranteed to be unique in a Hashtable.
+    private static final Object sharedOwnerFrameKey =
+       new StringBuffer("SwingUtilities.sharedOwnerFrame");
+
+
+    /**
+     * Returns a SharedOwnerFrame's shutdown listener to dispose the SharedOwnerFrame
+     * if it has no more displayable children.
+     * @exception HeadlessException if GraphicsEnvironment.isHeadless()
+     * returns true.
+     * @see java.awt.GraphicsEnvironment#isHeadless
+     */
+    static WindowListener getSharedOwnerFrameShutdownListener() throws HeadlessException {
+        Frame sharedOwnerFrame = getSharedOwnerFrame();
+	return (WindowListener)sharedOwnerFrame;
+    }
+
+
 }

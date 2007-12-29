@@ -38,14 +38,7 @@ exception statement from your version. */
 
 package javax.swing;
 
-import java.awt.AWTEvent;
-import java.awt.ActiveEvent;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.EventQueue;
-import java.awt.Frame;
-import java.awt.MenuComponent;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseMotionAdapter;
 import java.beans.PropertyChangeEvent;
@@ -1634,4 +1627,29 @@ public class JOptionPane extends JComponent implements Accessible
           parent.remove(f);
       }
   }
+    //jnode openjdk
+    /**
+     * Returns the specified component's toplevel <code>Frame</code> or
+     * <code>Dialog</code>.
+     *
+     * @param parentComponent the <code>Component</code> to check for a
+     *		<code>Frame</code> or <code>Dialog</code>
+     * @return the <code>Frame</code> or <code>Dialog</code> that
+     *		contains the component, or the default
+     *         	frame if the component is <code>null</code>,
+     *		or does not have a valid
+     *         	<code>Frame</code> or <code>Dialog</code> parent
+     * @exception java.awt.HeadlessException if
+     *   <code>GraphicsEnvironment.isHeadless</code> returns
+     *   <code>true</code>
+     * @see java.awt.GraphicsEnvironment#isHeadless
+     */
+    static Window getWindowForComponent(Component parentComponent)
+        throws HeadlessException {
+        if (parentComponent == null)
+            return getRootFrame();
+        if (parentComponent instanceof Frame || parentComponent instanceof Dialog)
+            return (Window)parentComponent;
+        return JOptionPane.getWindowForComponent(parentComponent.getParent());
+    }
 }
