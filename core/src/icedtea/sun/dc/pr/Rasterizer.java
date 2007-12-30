@@ -52,127 +52,128 @@ public class Rasterizer {
 	public static int TILE_IS_ALL_0;
 	
 	public void getAlphaBox(int[] abox) {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
 		
 	}
 
 	public void setOutputArea(int i, int j, int k, int l) {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
 		
 	}
 
 	public int getTileState() {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
+        return 0;
 
-	}
+    }
 
 	public void nextTile() {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
 		
 	}
 
 	public void reset() {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
 		
 	}
 
 	public void writeAlpha(byte[] alpha, int xstride, int ystride, int offset) throws InterruptedException {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
 		
 	}
 
 	public void setPenDiameter(float minPenSizeAA) {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
 		
 	}
 
 	public void setUsage(String stroke2) {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
 		
 	}
 
 	public void setPenT4(float[] matrix) {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
 		
 	}
 
 	public void setPenFitting(float penUnits, int minPenUnitsAA) {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
 		
 	}
 
 	public void setCaps(int i) {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
 		
 	}
 
 	public void setCorners(int i, float miterLimit) {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
 		
 	}
 
 	public void setDash(float[] dashes, float dashPhase) {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
 		
 	}
 
 	public void setDashT4(float[] matrix) {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
 		
 	}
 
 	public void beginPath() {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
 		
 	}
 
 	public void beginSubpath(float mx, float my) {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
 		
 	}
 
 	public void appendLine(float f, float g) {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
 		
 	}
 
 	public void appendQuadratic(float f, float g, float h, float i) {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
 		
 	}
 
 	public void appendCubic(float f, float g, float h, float i, float j, float k) {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
 		
 	}
 
 	public void closedSubpath() {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
 		
 	}
 
 	public void endPath() throws PRException {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
 		
 	}
