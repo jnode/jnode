@@ -42,13 +42,13 @@ import sun.java2d.pipe.ShapeSpanIterator;
 public class FastPathProducer {
 
 	public void sendTo(ShapeSpanIterator iterator) {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
 		
 	}
 
 	public void sendTo(PathConsumer adapter) {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
 		
 	}

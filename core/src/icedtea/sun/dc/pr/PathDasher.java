@@ -38,78 +38,79 @@ exception statement from your version.
 package sun.dc.pr;
 
 import sun.dc.path.PathConsumer;
+import sun.dc.path.PathException;
 
 public class PathDasher implements PathConsumer {
 
 	public PathDasher(PathStroker stroker) {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated constructor stub
 	}
 
 	public void setDash(float[] dash, float dash_phase) {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
 		
 	}
 
 	public void setDashT4(Object object) {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
 		
 	}
 
 	public void dispose() {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
 		
 	}
 
 	public void appendCubic(float f, float g, float h, float i, float j, float k) {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
 		
 	}
 
 	public void appendLine(float f, float g) {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
 		
 	}
 
 	public void appendQuadratic(float f, float g, float h, float i) {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
 		
 	}
 
 	public void beginPath() {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
 		
 	}
 
 	public void beginSubpath(float mx, float my) {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
 		
 	}
 
 	public void closedSubpath() {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
 		
 	}
 
 	public void endPath() {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
 		
 	}
 
 	public PathConsumer getConsumer() {
-		throw new RuntimeException("Not implemented.");
+		//throw new RuntimeException("Not implemented.");
 		// TODO Auto-generated method stub
-
-	}
+        return this;
+    }
 
 }
