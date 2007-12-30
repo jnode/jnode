@@ -117,13 +117,6 @@ public final class PluginList {
     private File findPlugin(File dir, final String id) {
         // System.out.println("Find " + id + " in " + dir);
         String[] names = dir.list(new FilenameFilter() {
-            /**
-             * @param dir
-             * @param name
-             * @see java.io.FilenameFilter#accept(java.io.File,
-             *      java.lang.String)
-             * @return boolean
-             */
             public boolean accept(File dir, String name) {
                 return name.startsWith(id + "_") && name.endsWith(".jar");
             }
@@ -131,7 +124,7 @@ public final class PluginList {
 
         if (names.length == 0) {
             throw new IllegalArgumentException("Cannot find plugin " + id
-                    + " in " + dir);
+                    + " in " + dir + " for list "+this.name);
         } else {
             Arrays.sort(names);
             return new File(dir, names[names.length - 1]);
