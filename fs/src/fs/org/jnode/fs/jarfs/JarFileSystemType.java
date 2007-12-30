@@ -9,16 +9,16 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.jarfs;
 
 import org.jnode.driver.Device;
@@ -30,7 +30,7 @@ import org.jnode.fs.FileSystemType;
 import org.jnode.partitions.PartitionTableEntry;
 
 /**
- * 
+ *
  * @author Fabien DUMINY (fduminy at users.sourceforge.net)
  *
  */
@@ -55,16 +55,7 @@ public class JarFileSystemType implements FileSystemType<JarFileSystem> {
      * @see org.jnode.fs.FileSystemType#create(Device, boolean)
      */
     public JarFileSystem create(Device device, boolean readOnly) throws FileSystemException {
-        // jar file systems are always readOnly        
+        // jar file systems are always readOnly
         return new JarFileSystem((JarFileDevice) device);
-    }
-
-    /**
-     * @see org.jnode.fs.FileSystemType#format(org.jnode.driver.Device,
-     *      java.lang.Object)
-     */
-    public JarFileSystem format(Device device, Object specificOptions)
-            throws FileSystemException {
-        throw new FileSystemException("Not yet implemented");
     }
 }

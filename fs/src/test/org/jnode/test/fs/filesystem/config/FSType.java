@@ -9,16 +9,16 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.test.fs.filesystem.config;
 
 import java.io.IOException;
@@ -42,11 +42,11 @@ import org.jnode.fs.ntfs.NTFSFileSystemType;
  * @author Fabien DUMINY
  */
 public enum FSType {
-    EXT2("ext2", Ext2FileSystem.class, Ext2FileSystemType.class, 
-    				new String[] { ".", "..", "lost+found" }),    				
-    FAT("fat", FatFileSystem.class, FatFileSystemType.class, 
+    EXT2("ext2", Ext2FileSystem.class, Ext2FileSystemType.class,
+    				new String[] { ".", "..", "lost+found" }),
+    FAT("fat", FatFileSystem.class, FatFileSystemType.class,
     				null),
-    				
+
     ISO9660("iso9660", ISO9660FileSystem.class, ISO9660FileSystemType.class,
     				new String[] { ".", ".." }),
     NTFS("ntfs", NTFSFileSystem.class, NTFSFileSystemType.class,
@@ -58,7 +58,7 @@ public enum FSType {
 
     final private String name;
     final private String[] emptyDirNames;
-    
+
     private FSType(String name, Class< ? extends FileSystem> fsClass,
             Class< ? extends FileSystemType> fsTypeClass,
             String[] emptyDirNames) {
@@ -70,14 +70,6 @@ public enum FSType {
 
     public String[] getEmptyDirNames(boolean isRoot) {
         return emptyDirNames;
-    }
-
-    public void format(Device device, Object options)
-            throws FileSystemException, IOException, InstantiationException, IllegalAccessException {
-	    // format the device
-	    FileSystemType type = (FileSystemType) fsTypeClass.newInstance();
-	    FileSystem fs = type.format(device, options);
-	    fs.close();
     }
 
     public FileSystem mount(Device device, boolean readOnly)
@@ -105,7 +97,7 @@ public enum FSType {
     }
 
     /**
-     * 
+     *
      */
     public String toString() {
         return name;

@@ -9,16 +9,16 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.block.ramdisk.command;
 
 import org.jnode.driver.DeviceManager;
@@ -37,7 +37,7 @@ import org.jnode.shell.help.argument.OptionArgument;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class RamDiskCommand {
-	
+
 	static final OptionArgument ARG_ACTION =
 		new OptionArgument(
 			"action",
@@ -46,11 +46,9 @@ public class RamDiskCommand {
 				new OptionArgument.Option("create", "Create a ramdisk"),
 				});
 
-	static final DeviceArgument ARG_DEVICE = new DeviceArgument("device-id", "the device to print informations about");
 	static final IntegerArgument ARG_SIZE = new IntegerArgument("size", "the size of the ramdisk");
-	
+
 	static final Parameter PARAM_ACTION = new Parameter(ARG_ACTION, Parameter.MANDATORY);
-	static final Parameter PARAM_DEVICE = new Parameter(ARG_DEVICE, Parameter.MANDATORY);
 	static final Parameter PARAM_SIZE = new Parameter(ARG_SIZE, Parameter.OPTIONAL);
 
 	public static Help.Info HELP_INFO =
@@ -60,10 +58,10 @@ public class RamDiskCommand {
 				new Syntax("Create a ramdisk", new Parameter[] { PARAM_ACTION, PARAM_SIZE })
 	});
 
-	public static void main(String[] args) 
+	public static void main(String[] args)
 	throws Exception {
 		final ParsedArguments cmdLine = HELP_INFO.parse(args);
-		
+
 		final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
 		if (PARAM_ACTION.isSet(cmdLine)) {
 			// Create

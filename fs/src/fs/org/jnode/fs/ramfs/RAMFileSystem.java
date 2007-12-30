@@ -9,35 +9,35 @@ import org.jnode.fs.FileSystemException;
 
 /**
  * A Filesystem implementation in the system RAM.
- * 
+ *
  * @author peda
  */
 public class RAMFileSystem implements FileSystem {
 
 	private Device device;
 	private boolean readOnly;
-	
+
 	private RAMDirectory root;
 
 	private final long maxSize;
 	private long summedBufferSize;
 	private long summedFileSize;
-	
+
 	/**
 	 * Constructor for RAMFileSystem
-	 * @param device 
-	 * @param readOnly 
-	 * @param maxSize 
-	 * @throws FileSystemException 
+	 * @param device
+	 * @param readOnly
+	 * @param maxSize
+	 * @throws FileSystemException
 	 */
-	public RAMFileSystem(Device device, boolean readOnly, int maxSize) throws FileSystemException {
+	public RAMFileSystem(Device device, boolean readOnly, long maxSize) throws FileSystemException {
 		this.device = device;
 		this.readOnly = readOnly;
-		
+
 		this.maxSize = maxSize;
 		summedBufferSize = 0;
 		summedFileSize = 0;
-		
+
 		root = new RAMDirectory(this, null, "");
 	}
 
@@ -58,7 +58,7 @@ public class RAMFileSystem implements FileSystem {
 			throw new IOException("Filesystem closed");
 		return root;
 	}
-	
+
 	/**
 	 * (non-Javadoc)
 	 * @see org.jnode.fs.FileSystem#isReadOnly()
@@ -90,7 +90,7 @@ public class RAMFileSystem implements FileSystem {
     public long getTotalSpace() {
     	return maxSize;
     }
-    
+
     /**
      * (non-Javadoc)
      * @see org.jnode.fs.FileSystem#getFreeSpace()
@@ -98,7 +98,7 @@ public class RAMFileSystem implements FileSystem {
     public long getFreeSpace() {
     	return maxSize - summedBufferSize;
     }
-    
+
     /**
      * (non-Javadoc)
      * @see org.jnode.fs.FileSystem#getUsableSpace()
@@ -106,7 +106,7 @@ public class RAMFileSystem implements FileSystem {
     public long getUsableSpace() {
     	return maxSize - summedFileSize;
     }
-    
+
 	synchronized void addSummmedBufferSize(long toAdd) {
 		summedBufferSize += toAdd;
 	}

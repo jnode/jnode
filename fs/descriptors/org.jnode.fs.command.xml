@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
-<plugin id="org.jnode.fs.command" 
+<plugin id="org.jnode.fs.command"
         name="JNode filesystem commands"
         version="@VERSION@"
         license-name="lgpl"
         provider-name="JNode.org">
-        
+
   <requires>
     <import plugin="org.jnode.fs"/>
     <import plugin="org.jnode.shell.help"/>
   </requires>
-        
+
   <runtime>
     <library name="jnode-fs.jar">
       <export name="org.jnode.fs.command.*"/>
     </library>
   </runtime>
-        
+
   <extension point="org.jnode.shell.aliases">
     <alias name="cat" class="org.jnode.fs.command.CatCommand"/>
     <alias name="cd"  class="org.jnode.fs.command.CdCommand"/>
@@ -26,7 +26,6 @@
     <alias name="dir" class="org.jnode.fs.command.DirCommand"/>
     <alias name="ls" class="org.jnode.fs.command.DirCommand"/>
     <alias name="eject" class="org.jnode.fs.command.EjectCommand"/>
-    <alias name="format" class="org.jnode.fs.command.FormatCommand"/>
     <alias name="mkdir" class="org.jnode.fs.command.MkdirCommand"/>
     <alias name="mount" class="org.jnode.fs.command.MountCommand"/>
     <alias name="pwd" class="org.jnode.fs.command.PwdCommand"/>
@@ -39,9 +38,10 @@
     <permission class="java.net.SocketPermission" name="*:0-" actions="connect,resolve"/>
     <permission class="java.util.PropertyPermission" name="user.dir" actions="read,write"/>
     <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>
-    <permission class="java.net.NetPermission" name="specifyStreamHandler"/> 
-    <permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/> 
-    <permission class="java.lang.RuntimePermission" name="exitVM"/> 
+    <permission class="java.net.NetPermission" name="specifyStreamHandler"/>
+    <permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/>
+    <permission class="java.lang.RuntimePermission" name="exitVM"/>
+    <permission class="org.jnode.security.JNodePermission" name="getVmClass"/>
   </extension>
-        
+
 </plugin>

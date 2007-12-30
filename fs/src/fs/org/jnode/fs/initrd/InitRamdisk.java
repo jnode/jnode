@@ -9,16 +9,16 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.initrd;
 
 import java.io.IOException;
@@ -37,6 +37,7 @@ import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
 import org.jnode.fs.fat.Fat;
+import org.jnode.fs.fat.FatFileSystemFormatter;
 import org.jnode.fs.fat.FatFileSystemType;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
@@ -47,7 +48,7 @@ import org.jnode.util.NumberUtils;
 
 /**
  * Dummy plugin that just mount an initial ramdisk on /Jnode
- * 
+ *
  * @author gbin
  */
 public class InitRamdisk extends Plugin {
@@ -75,11 +76,8 @@ public class InitRamdisk extends Plugin {
 
             log.info("Format initrd ramdisk");
 
-            final FileSystemService fileSystemService = InitialNaming
-                    .lookup(FileSystemService.NAME);
-            final FileSystemType type = fileSystemService
-                    .getFileSystemTypeForNameSystemTypes(FatFileSystemType.NAME);
-            final FileSystem fs = type.format(dev, new Integer(Fat.FAT16));
+            final FatFileSystemFormatter formatter = new FatFileSystemFormatter(Fat.FAT16);
+            final FileSystem fs = formatter.format(dev);
             try {
                 fs.getRootEntry().getDirectory().addDirectory("tmp");
             } catch (IOException ex) {
