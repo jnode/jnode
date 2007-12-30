@@ -71,6 +71,7 @@
   <plugin id="org.jnode.partitions.ibm"/>
 
   <plugin id="org.jnode.shell.help"/>
+  <plugin id="org.jnode.fs.command"/> <!-- needed by JFat format command-->
   <plugin id="org.jnode.fs.jfat"/>
   <plugin id="org.jnode.fs.jfat.command"/>
   <plugin id="org.jnode.install"/>

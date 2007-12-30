@@ -9,16 +9,16 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.ftpfs;
 
 import org.jnode.fs.FileSystemType;
@@ -40,7 +40,7 @@ public class FTPFileSystemType implements FileSystemType<FTPFileSystem> {
      * @param readOnly
      */
     public FTPFileSystem create(Device device, boolean readOnly) throws FileSystemException {
-        return new FTPFileSystem((FTPFSDevice) device);  
+        return new FTPFileSystem((FTPFSDevice) device);
     }
 
     /**
@@ -62,16 +62,4 @@ public class FTPFileSystemType implements FileSystemType<FTPFileSystem> {
         return false;
     }
 
-    /**
-     * Format a filesystem for a given device according to its Partition table entry.
-     *
-     * @param device          The device on which you want to format with this FileSystemType
-     * @param specificOptions the specific options for this filesystemType
-     * @return the newly created FileSystem
-     * @throws org.jnode.fs.FileSystemException
-     *
-     */
-    public FTPFileSystem format(Device device, Object specificOptions) throws FileSystemException {
-        return null;
-    }
 }

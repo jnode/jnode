@@ -9,16 +9,16 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.iso9660;
 
 import java.io.IOException;
@@ -76,14 +76,5 @@ public class ISO9660FileSystemType implements FileSystemType<ISO9660FileSystem> 
      */
     public ISO9660FileSystem create(Device device, boolean readOnly) throws FileSystemException {
         return new ISO9660FileSystem(device, readOnly);
-    }
-
-    /**
-     * @see org.jnode.fs.FileSystemType#format(org.jnode.driver.Device,
-     *      java.lang.Object)
-     */
-    public ISO9660FileSystem format(Device device, Object specificOptions)
-            throws FileSystemException {
-        throw new FileSystemException("Not yet implemented");
     }
 }

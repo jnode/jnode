@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.fs.fat.command"
+        name="FAT specific commands"
+        version="@VERSION@"
+        provider-name="JNode.org"
+        license-name="lgpl">
+
+  <requires>
+	<import plugin="org.jnode.fs.fat"/>
+	<import plugin="org.jnode.fs.command"/>
+    <import plugin="org.jnode.shell.help"/>
+  </requires>
+
+  <runtime>
+    <library name="jnode-fs.jar">
+      <export name="org.jnode.fs.fat.command.*"/>
+    </library>
+  </runtime>
+
+  <extension point="org.jnode.shell.aliases">
+    <alias name="formatFat" class="org.jnode.fs.fat.command.FormatFatCommand"/>
+  </extension>
+</plugin>

@@ -48,16 +48,4 @@ public class RAMFileSystemType implements FileSystemType<RAMFileSystem> {
 		
 		return new RAMFileSystem(device, readOnly, DEFAULT_SIZE);
 	}
-
-	/**
-	 * (non-Javadoc)
-	 * @see org.jnode.fs.FileSystemType#format(org.jnode.driver.Device, java.lang.Object)
-	 */
-	public RAMFileSystem format(Device device, Object specificOptions)
-			throws FileSystemException {
-
-		// TODO read in specificOptions ... How todo that??
-		return new RAMFileSystem(device, false, DEFAULT_SIZE);
-	}
-
 }

@@ -2,26 +2,28 @@
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
 <plugin id="org.jnode.fs.jfat.command"
-        name="JFAT speciffic commands"
+        name="JFAT specific commands"
         version="@VERSION@"
         provider-name="JNode.org"
         license-name="lgpl">
-        
+
   <requires>
 	<import plugin="org.jnode.fs.jfat"/>
+	<import plugin="org.jnode.fs.command"/>
     <import plugin="org.jnode.shell.help"/>
   </requires>
-        
+
   <runtime>
     <library name="jnode-fs.jar">
       <export name="org.jnode.fs.jfat.command.*"/>
     </library>
   </runtime>
-  
+
   <extension point="org.jnode.shell.aliases">
     <alias name="grub"  class="org.jnode.fs.jfat.command.JGrubInstallCommand"/>
+    <alias name="formatJFat" class="org.jnode.fs.jfat.command.FatFormatCommand"/>
   </extension>
-  
+
   <extension point="org.jnode.security.permissions">
     <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write,delete"/>
   </extension>

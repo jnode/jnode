@@ -9,16 +9,16 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.ext2;
 
 import java.io.IOException;
@@ -66,7 +66,7 @@ public class Ext2FileSystemType implements FileSystemType<Ext2FileSystem> {
 				return false;
 		}
 
-		//need to check the magic            
+		//need to check the magic
 		ByteBuffer magic = ByteBuffer.allocate(2);
 		try{
 		    devApi.read(1024+56, magic);
@@ -74,19 +74,5 @@ public class Ext2FileSystemType implements FileSystemType<Ext2FileSystem> {
 		    return false;
 		}
 		return (Ext2Utils.get16(magic.array(), 0) == 0xEF53);
-	}
-
-	/**
-	 * @see org.jnode.fs.FileSystemType#format(org.jnode.driver.Device, java.lang.Object)
-	 */
-	public synchronized Ext2FileSystem format(Device device, Object specificOptions) throws FileSystemException {
-        //throw new FileSystemException("Not ye implemented");
-		
-		//currently the only option is the block size
-		int blockSize = 1024*((Integer)specificOptions).intValue();
-		
-		Ext2FileSystem fs = new Ext2FileSystem(device, false);
-		fs.create(blockSize);
-		return fs;
 	}
 }

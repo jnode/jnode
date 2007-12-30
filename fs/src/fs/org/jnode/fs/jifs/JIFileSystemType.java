@@ -9,16 +9,16 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
  package org.jnode.fs.jifs;
 
 import org.apache.log4j.Logger;
@@ -37,7 +37,7 @@ public class JIFileSystemType implements FileSystemType<JIFileSystem> {
 	/** Name of this filesystem type */
 	public static final String NAME = "JIFS";
     public static final String VIRTUAL_DEVICE_NAME = "jifs";
-    
+
     /**	Logger*/
 	private static final Logger log = Logger.getLogger(JIFileSystemType.class);
 
@@ -51,7 +51,7 @@ public class JIFileSystemType implements FileSystemType<JIFileSystem> {
 	/**
 	 * Can this FileSystemType be used on the given first sector of a
 	 * BlockDevice? Since this FileSystemType is for a virtual filesystem, it does not support any of the given ones.
-	 * 
+	 *
 	 * @param pte
 	 *          The partition table entry, if any. If null, there is no
 	 *          partition table entry.
@@ -65,7 +65,7 @@ public class JIFileSystemType implements FileSystemType<JIFileSystem> {
 
 	/**
 	 * Create a filesystem for a given device.
-	 * 
+	 *
 	 * @param device
 	 * @param readOnly
 	 * @return JIFileSystem(device,readOnly)
@@ -77,14 +77,5 @@ public class JIFileSystemType implements FileSystemType<JIFileSystem> {
 			log.error("got NULL from the JIFileSystem...");
 		}
 		return ret;
-	}
-
-	/**
-	 * Since it is for a virtual filesystem, this method is not needed.
-	 * 
-	 * @return null
-	 */	 
-	public JIFileSystem format(Device device, Object specificOptions) throws FileSystemException {
-		return null;		
 	}
 }
