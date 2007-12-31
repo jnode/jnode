@@ -2982,9 +2982,10 @@ public final class FontManager {
         "monospace:bold:italic",
     };
 
+    //jnode: made FontConfigInfo package private to be visible in NativeFontManager
     /* This class is just a data structure.
      */
-    private static class FontConfigInfo {
+    static class FontConfigInfo {
         String fcName;            // eg sans
         String fcFamily;          // eg sans
         String jdkName;           // eg sansserif
