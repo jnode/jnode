@@ -45,18 +45,21 @@ public class OptionArgument extends Argument {
         this(name, description, SINGLE, options);
     }
 
+    @Override
     public String format() {
-        String result = "";
+        StringBuilder result = new StringBuilder();
         for (Option option : options)
-            result += "|" + option.getName();
+            result.append('|').append(option.getName());
         return result.substring(1);
     }
 
+    @Override
     public void describe(Help help) {
         for (Option option : options)
             option.describe(help);
     }
 
+    @Override
     public String complete(String partial) {
         final List<String> opts = new ArrayList<String>();
         for (Option option : options) {
@@ -75,6 +78,7 @@ public class OptionArgument extends Argument {
      * @param value
      * @return true if value, false otherwise.
      */
+    @Override
     protected boolean isValidValue(String value) {
         for (Option option : options) {
             if (option.getName().equals(value)) {
@@ -87,6 +91,7 @@ public class OptionArgument extends Argument {
     /**
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append("Options: ");
