@@ -35,6 +35,7 @@ import org.jnode.driver.block.Geometry;
 import org.jnode.driver.block.MappedFSBlockDeviceSupport;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.fat.Fat;
+import org.jnode.fs.fat.FatType;
 import org.jnode.fs.fat.GrubBootSector;
 import org.jnode.fs.fat.GrubFatFormatter;
 import org.jnode.partitions.ibm.IBMPartitionTableEntry;
@@ -141,7 +142,7 @@ public class BootDiskBuilder extends BootFloppyBuilder {
      * @throws IOException
      */
     protected GrubFatFormatter createFormatter() throws IOException {
-        return new GrubFatFormatter(bytesPerSector, spc, geom, Fat.FAT16, 1,
+        return new GrubFatFormatter(bytesPerSector, spc, geom, FatType.FAT16, 1,
                 getStage1ResourceName(), getStage2ResourceName());
     }
 

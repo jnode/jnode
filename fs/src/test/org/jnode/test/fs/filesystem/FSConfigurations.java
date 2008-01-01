@@ -7,9 +7,11 @@ import java.util.List;
 
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.Formatter;
+import org.jnode.fs.ext2.BlockSize;
 import org.jnode.fs.ext2.Ext2FileSystemFormatter;
 import org.jnode.fs.fat.Fat;
 import org.jnode.fs.fat.FatFileSystemFormatter;
+import org.jnode.fs.fat.FatType;
 import org.jnode.test.fs.filesystem.config.DeviceParam;
 import org.jnode.test.fs.filesystem.config.FS;
 import org.jnode.test.fs.filesystem.config.FSAccessMode;
@@ -34,22 +36,22 @@ public class FSConfigurations implements Iterable<FSTestConfig> {
 		final String diskFileName = tempDir + File.separatorChar + "diskimg.WRK";
 
         configs.addAll(createFileConfigs(OsType.OTHER_OS, FSType.EXT2,
-                FSAccessMode.BOTH, new Ext2FileSystemFormatter(1), diskFileName, "1M"));
+                FSAccessMode.BOTH, new Ext2FileSystemFormatter(BlockSize._1Kb), diskFileName, "1M"));
 
         configs.addAll(createFileConfigs(OsType.OTHER_OS, FSType.EXT2,
-                FSAccessMode.BOTH, new Ext2FileSystemFormatter(4), diskFileName, "1M"));
+                FSAccessMode.BOTH, new Ext2FileSystemFormatter(BlockSize._4Kb), diskFileName, "1M"));
 
 //        configs.addAll(createFileConfigs(OsType.OTHER_OS, FSType.NTFS,
 //                FSAccessMode.BOTH, "", DO_FORMAT, diskFileName, "1M"));
 
         configs.addAll(createFileConfigs(OsType.OTHER_OS, FSType.FAT,
-                FSAccessMode.BOTH, new FatFileSystemFormatter(Fat.FAT12), diskFileName, "1M"));
+                FSAccessMode.BOTH, new FatFileSystemFormatter(FatType.FAT12), diskFileName, "1M"));
 
         configs.addAll(createFileConfigs(OsType.OTHER_OS, FSType.FAT,
-                FSAccessMode.BOTH, new FatFileSystemFormatter(Fat.FAT16), diskFileName, "1M"));
+                FSAccessMode.BOTH, new FatFileSystemFormatter(FatType.FAT16), diskFileName, "1M"));
 
         configs.addAll(createFileConfigs(OsType.OTHER_OS, FSType.FAT,
-                FSAccessMode.BOTH, new FatFileSystemFormatter(Fat.FAT32), diskFileName, "1M"));
+                FSAccessMode.BOTH, new FatFileSystemFormatter(FatType.FAT32), diskFileName, "1M"));
 
 //        configs.addAll(createFileConfigs(OsType.OTHER_OS, FSType.ISO9660,
 //                FSAccessMode.BOTH, "", DO_FORMAT, diskFileName, "1M"));

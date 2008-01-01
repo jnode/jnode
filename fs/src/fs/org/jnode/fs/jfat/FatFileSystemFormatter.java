@@ -28,6 +28,7 @@ import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.driver.block.FSBlockDeviceAPI;
+import org.jnode.driver.bus.ide.IDEConstants;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.Formatter;
@@ -43,15 +44,16 @@ import org.jnode.util.SizeUnit;
  * @author gvt
  * @author Tango
  */
-public class FatFileSystemFormatter implements Formatter<FatFileSystem> {
+public class FatFileSystemFormatter extends Formatter<FatFileSystem> {
     private static final Logger log =
         Logger.getLogger ( FatFileSystemFormatter.class );
 
-    private int clusterSize;
+    private ClusterSize clusterSize;
 
-    public FatFileSystemFormatter(int clusterSizeKb)
+    public FatFileSystemFormatter(ClusterSize clusterSize)
     {
-    	this.clusterSize = (int) (clusterSizeKb * BinaryPrefix.K.getMultiplier()); //Converted into KB
+    	super(new FatFileSystemType());
+    	this.clusterSize = clusterSize;
     }
 
     public FatFileSystem format ( Device device)
@@ -64,8 +66,8 @@ public class FatFileSystemFormatter implements Formatter<FatFileSystem> {
 			FSBlockDeviceAPI api = (FSBlockDeviceAPI)device.getAPI(BlockDeviceAPI.class);
 			int sectorSize = api.getSectorSize();
 
-			if(sectorSize!=512){
-				log.error("This mkjfat1.0 support only the Hard Disk.Sector Size must 512 bytes.\n");
+			if(sectorSize != IDEConstants.SECTOR_SIZE){
+				log.error("This mkjfat1.0 support only the Hard Disk.Sector Size must "+IDEConstants.SECTOR_SIZE+" bytes.\n");
     }
 
 

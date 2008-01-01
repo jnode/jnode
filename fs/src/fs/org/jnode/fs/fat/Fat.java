@@ -9,16 +9,16 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.fat;
 
 import java.io.IOException;
@@ -31,38 +31,33 @@ import org.jnode.fs.FileSystemFullException;
 
 /**
  * <description>
- * 
+ *
  * @author epr
  */
 public class Fat {
 
-	public static final int FAT12 = 12;
-	public static final int FAT16 = 16;
-	public static final int FAT32 = 32;
-
 	private long[] entries;
-	/** The type of FAT, legal values are: 12, 16, 32 */
-	private int bitSize;
+	/** The type of FAT */
+	private FatType fatType;
 	/** The number of sectors this fat takes */
 	private int nrSectors;
 	/** The number of bytes/sector */
 	private int sectorSize;
 
-	private final long eofMarker;
 	private boolean dirty;
-	
+
 	/** entry index for find next free entry*/
 	private int lastFreeCluster = 2;
 
 	/**
 	 * Create a new instance
-	 * 
+	 *
 	 * @param bitSize
 	 * @param nrSectors
 	 * @param sectorSize
 	 */
-	public Fat(int bitSize, int mediumDescriptor, int nrSectors, int sectorSize) {
-		this.bitSize = bitSize;
+	public Fat(FatType bitSize, int mediumDescriptor, int nrSectors, int sectorSize) {
+		this.fatType = bitSize;
 		this.nrSectors = nrSectors;
 		this.sectorSize = sectorSize;
 		this.dirty = false;
@@ -70,19 +65,16 @@ public class Fat {
 			case FAT12 :
 				{
 					entries = new long[(int) ((nrSectors * sectorSize) / 1.5)];
-					eofMarker = 0xFFF;
 				}
 				break;
 			case FAT16 :
 				{
 					entries = new long[(nrSectors * sectorSize) / 2];
-					eofMarker = 0xFFFF;
 				}
 				break;
 			case FAT32 :
 				{
 					entries = new long[(nrSectors * sectorSize) / 4];
-					eofMarker = 0xFFFFFFFF;
 				}
 				break;
 			default :
@@ -93,15 +85,15 @@ public class Fat {
 
 	/**
 	 * Read the contents of this FAT from the given device at the given offset.
-	 * 
+	 *
 	 * @param device
 	 */
 	public synchronized void read(BlockDeviceAPI device, long offset) throws IOException {
         byte[] data = new byte[nrSectors * sectorSize];
 		device.read(offset, ByteBuffer.wrap(data));
 		for (int i = 0; i < entries.length; i++) {
-			switch (bitSize) {
-				case 12 :
+			switch (fatType) {
+				case FAT12 :
 					{
 						int idx = (int) (i * 1.5);
 						int b1 = data[idx] & 0xFF;
@@ -119,7 +111,7 @@ public class Fat {
 						// Long.toHexString(entries[i]));
 					}
 					break;
-				case 16 :
+				case FAT16 :
 					{
 						int idx = i * 2;
 						int b1 = data[idx] & 0xFF;
@@ -127,7 +119,7 @@ public class Fat {
 						entries[i] = (b2 << 8) | b1;
 					}
 					break;
-				case 32 :
+				case FAT32 :
 					{
 						int idx = i * 4;
 						long b1 = data[idx] & 0xFF;
@@ -144,15 +136,15 @@ public class Fat {
 
 	/**
 	 * Write the contents of this FAT to the given device at the given offset.
-	 * 
+	 *
 	 * @param device
 	 */
 	public synchronized void write(BlockDeviceAPI device, long offset) throws IOException {
 		byte[] data = new byte[nrSectors * sectorSize];
 		for (int i = 0; i < entries.length; i++) {
 			long v = entries[i];
-			switch (bitSize) {
-				case 12 :
+			switch (fatType) {
+				case FAT12 :
 					{
 						int idx = (int) (i * 1.5);
 						if ((i % 2) == 0) {
@@ -164,14 +156,14 @@ public class Fat {
 						}
 					}
 					break;
-				case 16 :
+				case FAT16 :
 					{
 						int idx = i << 1;
 						data[idx] = (byte) (v & 0xFF);
 						data[idx + 1] = (byte) ((v >> 8) & 0xFF);
 					}
 					break;
-				case 32 :
+				case FAT32 :
 					{
 						int idx = i << 2;
 						data[idx] = (byte) (v & 0xFF);
@@ -189,7 +181,7 @@ public class Fat {
 
 	/**
 	 * Gets the medium descriptor byte
-	 * 
+	 *
 	 * @return int
 	 */
 	public int getMediumDescriptor() {
@@ -205,7 +197,7 @@ public class Fat {
 
 	/**
 	 * Gets the number of entries of this fat
-	 * 
+	 *
 	 * @return int
 	 */
 	public int getNrEntries() {
@@ -214,7 +206,7 @@ public class Fat {
 
 	/**
 	 * Gets the entry at a given offset
-	 * 
+	 *
 	 * @param index
 	 * @return long
 	 */
@@ -245,7 +237,7 @@ public class Fat {
 
 	/**
 	 * Gets the cluster after the given cluster
-	 * 
+	 *
 	 * @param cluster
 	 * @return long The next cluster number or -1 which means eof.
 	 */
@@ -261,42 +253,42 @@ public class Fat {
 
 	/**
 	 * Allocate a cluster for a new file
-	 * 
+	 *
 	 * @return long
 	 */
 	public synchronized long allocNew() throws IOException {
 
 		int i;
 		int entryIndex = -1;
-		
+
 		for (i = lastFreeCluster; i < entries.length; i++) {
 			if (isFreeCluster(entries[i])) {
 				entryIndex=i;
 				break;
-			} 
+			}
 		}
-		if(entryIndex<0){	
+		if(entryIndex<0){
 			for(i = 2; i < lastFreeCluster;i++){
 				if (isFreeCluster(entries[i])) {
 					entryIndex=i;
 					break;
-				} 			 
+				}
 			}
 		}
 		if(entryIndex < 0){
 			throw new FileSystemFullException("FAT Full (" + entries.length + ", " + i + ")");
 		}
-		entries[entryIndex] = eofMarker;
+		entries[entryIndex] = fatType.getEofMarker();
 		lastFreeCluster = entryIndex+1;
 		this.dirty      = true;
 
 		return entryIndex;
-		
+
 	}
 
 	/**
 	 * Allocate a series of clusters for a new file
-	 * 
+	 *
 	 * @return long
 	 */
 	public synchronized long[] allocNew(int nrClusters) throws IOException {
@@ -313,7 +305,7 @@ public class Fat {
 
 	/**
 	 * Allocate a cluster to append to a new file
-	 * 
+	 *
 	 * @return long
 	 */
 	public synchronized long allocAppend(long cluster) throws IOException {
@@ -332,7 +324,7 @@ public class Fat {
 
 	public synchronized void setEof(long cluster) {
 		testCluster(cluster);
-		entries[(int)cluster] = eofMarker;
+		entries[(int)cluster] = fatType.getEofMarker();
 	}
 
 	public synchronized void setFree(long cluster) {
@@ -343,7 +335,7 @@ public class Fat {
 	/**
 	 * Print the contents of this FAT to the given writer. Used for debugging
 	 * purposes.
-	 * 
+	 *
 	 * @param out
 	 */
 	public void printTo(PrintWriter out) {
@@ -381,7 +373,7 @@ public class Fat {
 
 	/**
 	 * Is the given entry a free cluster?
-	 * 
+	 *
 	 * @param entry
 	 * @return boolean
 	 */
@@ -391,40 +383,22 @@ public class Fat {
 
 	/**
 	 * Is the given entry a reserved cluster?
-	 * 
+	 *
 	 * @param entry
 	 * @return boolean
 	 */
 	protected boolean isReservedCluster(long entry) {
-		switch (bitSize) {
-			case 12 :
-				return ((entry >= 0xFF0) && (entry <= 0xFF6));
-			case 16 :
-				return ((entry >= 0xFFF0) && (entry <= 0xFFF6));
-			case 32 :
-				return ((entry >= 0xFFFFFFF0) && (entry <= 0xFFFFFFF6));
-			default :
-				throw new IllegalArgumentException("Invalid bitSize " + bitSize);
-		}
+		return fatType.isReservedCluster(entry);
 	}
 
 	/**
 	 * Is the given entry an EOF marker
-	 * 
+	 *
 	 * @param entry
 	 * @return boolean
 	 */
 	protected boolean isEofCluster(long entry) {
-		switch (bitSize) {
-			case 12 :
-				return (entry >=0xFF8); 
-			case 16 :
-				return ((entry >= 0xFFF8));  
-			case 32 :
-				return (entry >= 0xFFFFFFF8); 
-			default :
-				throw new IllegalArgumentException("Invalid bitSize " + bitSize);
-		}
+		return fatType.isEofCluster(entry);
 	}
 
 	protected void testCluster(long cluster) throws IllegalArgumentException {
@@ -435,7 +409,7 @@ public class Fat {
 
 	/**
 	 * Returns the dirty.
-	 * 
+	 *
 	 * @return boolean
 	 */
 	public boolean isDirty() {

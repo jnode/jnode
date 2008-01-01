@@ -22,25 +22,29 @@
 package org.jnode.fs.ext2.command;
 
 import org.jnode.fs.command.AbstractFormatCommand;
+import org.jnode.fs.ext2.BlockSize;
 import org.jnode.fs.ext2.Ext2FileSystem;
 import org.jnode.fs.ext2.Ext2FileSystemFormatter;
+import org.jnode.fs.fat.FatType;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.Syntax;
 import org.jnode.shell.help.SyntaxErrorException;
+import org.jnode.shell.help.argument.EnumOptionArgument;
 import org.jnode.shell.help.argument.OptionArgument;
 
 /**
  * @author gbin
  */
+@SuppressWarnings("unchecked")
 public class FormatExt2Command extends AbstractFormatCommand<Ext2FileSystem> {
-    static final OptionArgument BS_VAL = new OptionArgument("blocksize",
-            "block size for ext2 filesystem", new OptionArgument.Option[] {
-                    new OptionArgument.Option("1", "1Kb"),
-                    new OptionArgument.Option("2", "2Kb"),
-                    new OptionArgument.Option("4", "4Kb"), });
+    static final EnumOptionArgument<BlockSize> BS_VAL = new EnumOptionArgument<BlockSize>("blocksize",
+            "block size for ext2 filesystem",
+                    new EnumOptionArgument.EnumOption<BlockSize>("1", "1Kb", BlockSize._1Kb),
+                    new EnumOptionArgument.EnumOption<BlockSize>("2", "2Kb", BlockSize._2Kb),
+                    new EnumOptionArgument.EnumOption<BlockSize>("4", "4Kb", BlockSize._4Kb));
 
     static final Parameter PARAM_BS_VAL = new Parameter(BS_VAL,
             Parameter.OPTIONAL);
@@ -56,13 +60,7 @@ public class FormatExt2Command extends AbstractFormatCommand<Ext2FileSystem> {
 
 	@Override
 	protected Ext2FileSystemFormatter getFormatter(ParsedArguments cmdLine) {
-        int bsize;
-        try {
-            bsize = Integer.parseInt(BS_VAL.getValue(cmdLine));
-        } catch (NumberFormatException nfe) {
-            bsize = 4;
-        }
-
+        BlockSize bsize = BS_VAL.getEnum(cmdLine, BlockSize.class);
         return new Ext2FileSystemFormatter(bsize);
 	}
 

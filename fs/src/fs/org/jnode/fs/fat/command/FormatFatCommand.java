@@ -25,6 +25,7 @@ import org.jnode.fs.command.AbstractFormatCommand;
 import org.jnode.fs.fat.Fat;
 import org.jnode.fs.fat.FatFileSystem;
 import org.jnode.fs.fat.FatFileSystemFormatter;
+import org.jnode.fs.fat.FatType;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
@@ -60,9 +61,9 @@ public class FormatFatCommand extends AbstractFormatCommand<FatFileSystem> {
 
         FatFileSystemFormatter formatter = null;
         if (FSType == "fat16") {
-            formatter = new FatFileSystemFormatter(Fat.FAT16);
+            formatter = new FatFileSystemFormatter(FatType.FAT16);
         } else if (FSType == "fat12") {
-            formatter = new FatFileSystemFormatter(Fat.FAT32);
+            formatter = new FatFileSystemFormatter(FatType.FAT32);
         } else
             throw new IllegalArgumentException(
                     "invalid fat type");

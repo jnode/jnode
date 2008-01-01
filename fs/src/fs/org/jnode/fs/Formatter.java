@@ -1,6 +1,7 @@
 package org.jnode.fs;
 
 import org.jnode.driver.Device;
+import org.jnode.fs.ext2.Ext2FileSystemType;
 
 /**
  *
@@ -8,7 +9,14 @@ import org.jnode.driver.Device;
  *
  * @param <T>
  */
-public interface Formatter<T extends FileSystem> {
+abstract public class Formatter<T extends FileSystem> {
+	private final FileSystemType<T> type;
+
+	protected Formatter(FileSystemType<T> type)
+	{
+		this.type = type;
+	}
+
     /**
      * Format the given device
      *
@@ -16,5 +24,10 @@ public interface Formatter<T extends FileSystem> {
      * @return the newly created FileSystem
      * @throws FileSystemException
      */
-	public T format(Device device) throws FileSystemException;
+	abstract public T format(Device device) throws FileSystemException;
+
+	final public FileSystemType<T> getFileSystemType()
+	{
+		return type;
+	}
 }

@@ -39,6 +39,7 @@ import org.jnode.fs.FileSystemType;
 import org.jnode.fs.fat.Fat;
 import org.jnode.fs.fat.FatFileSystemFormatter;
 import org.jnode.fs.fat.FatFileSystemType;
+import org.jnode.fs.fat.FatType;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.Plugin;
@@ -76,7 +77,7 @@ public class InitRamdisk extends Plugin {
 
             log.info("Format initrd ramdisk");
 
-            final FatFileSystemFormatter formatter = new FatFileSystemFormatter(Fat.FAT16);
+            final FatFileSystemFormatter formatter = new FatFileSystemFormatter(FatType.FAT16);
             final FileSystem fs = formatter.format(dev);
             try {
                 fs.getRootEntry().getDirectory().addDirectory("tmp");

@@ -9,16 +9,16 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.fat;
 
 import java.io.IOException;
@@ -48,7 +48,7 @@ public class FatFileSystem extends AbstractFileSystem {
 	 */
 	public FatFileSystem(Device device, boolean readOnly) throws FileSystemException {
 		super(device, readOnly); // false = read/write mode
-		
+
 		try {
 			bs = new BootSector(512);
 			bs.read(getApi());
@@ -59,12 +59,12 @@ public class FatFileSystem extends AbstractFileSystem {
 
 			Fat[] fats = new Fat[bs.getNrFats()];
 			rootDir = new FatLfnDirectory(this, bs.getNrRootDirEntries());
-			int bitSize;
+			FatType bitSize;
 
 			if (bs.getMediumDescriptor() == 0xf8) {
-				bitSize = 16;
+				bitSize = FatType.FAT16;
 			} else {
-				bitSize = 12;
+				bitSize = FatType.FAT12;
 			}
 
 			for (int i = 0; i < fats.length; i++) {
@@ -92,7 +92,7 @@ public class FatFileSystem extends AbstractFileSystem {
 
 	/**
 	 * Flush all changed structures to the device.
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	public void flush() throws IOException {
@@ -129,7 +129,7 @@ public class FatFileSystem extends AbstractFileSystem {
 
 	/**
 	 * Gets the file for the given entry.
-	 * 
+	 *
 	 * @param entry
 	 */
 	public synchronized FatFile getFile(FatDirEntry entry) {
@@ -148,7 +148,7 @@ public class FatFileSystem extends AbstractFileSystem {
 
 	/**
 	 * Returns the fat.
-	 * 
+	 *
 	 * @return Fat
 	 */
 	public Fat getFat() {
@@ -157,7 +157,7 @@ public class FatFileSystem extends AbstractFileSystem {
 
 	/**
 	 * Returns the bootsector.
-	 * 
+	 *
 	 * @return BootSector
 	 */
 	public BootSector getBootSector() {
@@ -165,7 +165,7 @@ public class FatFileSystem extends AbstractFileSystem {
 	}
 	/**
 	 * Returns the rootDir.
-	 * 
+	 *
 	 * @return RootDirectory
 	 */
 	public FatDirectory getRootDir() {
@@ -173,26 +173,26 @@ public class FatFileSystem extends AbstractFileSystem {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	protected FSFile createFile(FSEntry entry) throws IOException {
-		
+
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	/**
-	 * 
+	 *
 	 */
-	protected FSDirectory createDirectory(FSEntry entry) throws IOException {		
+	protected FSDirectory createDirectory(FSEntry entry) throws IOException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	/**
-	 * 
+	 *
 	 */
-	protected FSEntry createRootEntry() throws IOException {		
+	protected FSEntry createRootEntry() throws IOException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -204,12 +204,12 @@ public class FatFileSystem extends AbstractFileSystem {
 	}
 
 	public long getTotalSpace() {
-		// TODO implement me 
+		// TODO implement me
 		return 0;
 	}
 
 	public long getUsableSpace() {
-		// TODO implement me 
+		// TODO implement me
 		return 0;
 	}
 }

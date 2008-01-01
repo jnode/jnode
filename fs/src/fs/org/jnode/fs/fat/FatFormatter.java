@@ -9,16 +9,16 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.fat;
 
 import java.io.IOException;
@@ -28,7 +28,7 @@ import org.jnode.driver.block.BlockDeviceAPI;
 
 /**
  * <description>
- * 
+ *
  * @author epr
  */
 public class FatFormatter {
@@ -43,7 +43,7 @@ public class FatFormatter {
 	private FatDirectory rootDir;
 
 	public static FatFormatter fat144FloppyFormatter(int reservedSectors, BootSector bs) {
-		return new FatFormatter(FLOPPY_DESC, 512, 1, 2880, 18, 2, Fat.FAT12, 2, 0, reservedSectors, bs);
+		return new FatFormatter(FLOPPY_DESC, 512, 1, 2880, 18, 2, FatType.FAT32, 2, 0, reservedSectors, bs);
 	}
 
 	public static FatFormatter HDFormatter(
@@ -51,7 +51,7 @@ public class FatFormatter {
 		int nbTotalSectors,
 		int sectorsPerTrack,
 		int nbHeads,
-		int fatSize,
+		FatType fatSize,
 		int hiddenSectors,
       int reservedSectors,
       BootSector bs) {
@@ -76,24 +76,13 @@ public class FatFormatter {
 		int nbTotalSectors,
 		int sectorsPerTrack,
 		int nbHeads,
-		int fatSize,
+		FatType fatSize,
 		int nbFats,
 		int hiddenSectors,
 		int reservedSectors,
       BootSector bs) {
 		this.bs = bs;
-		float fatEntrySize;
-		switch (fatSize) {
-			case Fat.FAT12 :
-				fatEntrySize = 1.5f;
-				break;
-			case Fat.FAT16 :
-				fatEntrySize = 2.0f;
-				break;
-			default :
-				fatEntrySize = 4.0f;
-				break;
-		}
+		final float fatEntrySize = fatSize.getEntrySize();
 
 		bs.setMediumDescriptor(mediumDescriptor);
 		bs.setOemName("JNode1.0");
@@ -176,7 +165,7 @@ public class FatFormatter {
 
 	/**
 	 * Set the label
-	 * 
+	 *
 	 * @param label
 	 */
 	public void setLabel(String label) throws IOException {
@@ -185,7 +174,7 @@ public class FatFormatter {
 
 	/**
 	 * Format the given device, according to my settings
-	 * 
+	 *
 	 * @param api
 	 * @throws IOException
 	 */
@@ -204,7 +193,7 @@ public class FatFormatter {
 
 	/**
 	 * Returns the bs.
-	 * 
+	 *
 	 * @return BootSector
 	 */
 	public BootSector getBootSector() {
