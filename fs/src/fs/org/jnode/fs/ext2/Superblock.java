@@ -9,16 +9,16 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.ext2;
 
 import java.io.IOException;
@@ -29,12 +29,12 @@ import org.jnode.fs.FileSystemException;
 
 /**
  * Ext2fs superblock
- * 
+ *
  * @author Andras Nagy
  */
 public class Superblock {
 	public static final int SUPERBLOCK_LENGTH = 1024;
-		
+
 	//some constants for the fs creation
 	private static final long    BYTES_PER_INODE = 4096;	//one inode for 4KBs of data
 	private static final double  RESERVED_BLOCKS_RATIO = 0.05;	//5% reserved for the superuser
@@ -42,40 +42,40 @@ public class Superblock {
 	private static final int 	 MAX_MOUNT_COUNT = 256;		//number of times to mount before check (check not yet implemented)
 	private static final int 	 CHECK_INTERVAL = 365*24*60*60;	//check every year (check not yet implemented)
 	private static final long 	 JNODE = 42;				//whatever
-	
+
 	private byte data[];
 	private boolean dirty;
 	private Ext2FileSystem fs;
 	private final Logger log = Logger.getLogger(getClass());
 
-	public Superblock() {		
+	public Superblock() {
 		data = new byte[SUPERBLOCK_LENGTH];
-		log.setLevel(Level.INFO);		
+		log.setLevel(Level.INFO);
 	}
-	
+
 	public void read(byte src[], Ext2FileSystem fs) throws FileSystemException {
 		System.arraycopy(src, 0, data, 0, SUPERBLOCK_LENGTH);
-		
+
 		this.fs = fs;
-			
+
 		//check the magic :)
 		if(getMagic() != 0xEF53)
 			throw new FileSystemException("Not ext2 superblock ("+getMagic()+": bad magic)");
-			
+
 		setDirty(false);
 	}
-	
-	public void create(int blockSize, Ext2FileSystem fs) throws IOException {
+
+	public void create(BlockSize blockSize, Ext2FileSystem fs) throws IOException {
 		this.fs = fs;
 		setRevLevel(Ext2Constants.EXT2_DYNAMIC_REV);
 		setMinorRevLevel(0);
 		setMagic(0xEF53);
 		setCreatorOS(JNODE);
-		
+
 		//the number of inodes has to be <= than the number of blocks
-		long bytesPerInode = BYTES_PER_INODE>=blockSize ? BYTES_PER_INODE : blockSize;
+		long bytesPerInode = (BYTES_PER_INODE>=blockSize.getSize()) ? BYTES_PER_INODE : blockSize.getSize();
 		long size = fs.getApi().getLength();
-		long blocks = size / blockSize;
+		long blocks = size / blockSize.getSize();
 		long inodes = size / bytesPerInode;
 		setINodesCount(inodes);
 		setBlocksCount(blocks);
@@ -84,67 +84,67 @@ public class Superblock {
 		setDefResuid(0);
 		setBlockSize(blockSize);		//actually sets the S_LOG_BLOCK_SIZE
 		setFragSize(blockSize);			//set S_LOG_FRAG_SIZE
-		setFirstDataBlock(blockSize==1024 ? 1 : 0);
+		setFirstDataBlock(blockSize.getSize()==1024 ? 1 : 0);
 
-		//a block bitmap is 1 block long, so blockSize*8 blocks can be indexed by a bitmap 
+		//a block bitmap is 1 block long, so blockSize*8 blocks can be indexed by a bitmap
 		//and thus be in a group
-		long blocksPerGroup = blockSize << 3;
+		long blocksPerGroup = blockSize.getSize() << 3;
 		setBlocksPerGroup(blocksPerGroup);
 		setFragsPerGroup(blocksPerGroup);
 		long groupCount = Ext2Utils.ceilDiv(blocks, blocksPerGroup);
 
 		long inodesPerGroup = Ext2Utils.ceilDiv(inodes, groupCount);
-		setINodesPerGroup(inodesPerGroup);	
-		
+		setINodesPerGroup(inodesPerGroup);
+
 		//calculate the number of blocks reserved for metadata
 		//first, set the sparse_super option (it affects this value)
 		if(CREATE_WITH_SPARSE_SUPER)
 			setFeatureROCompat(getFeatureROCompat() | Ext2Constants.EXT2_FEATURE_RO_COMPAT_SPARSE_SUPER);
-		long sbSize  = 1;		//superblock is 1 block fixed	
-		long gdtSize = Ext2Utils.ceilDiv(groupCount*GroupDescriptor.GROUPDESCRIPTOR_LENGTH, blockSize); 
+		long sbSize  = 1;		//superblock is 1 block fixed
+		long gdtSize = Ext2Utils.ceilDiv(groupCount*GroupDescriptor.GROUPDESCRIPTOR_LENGTH, blockSize.getSize());
 		long bbSize  = 1;		//block bitmap is 1 block fixed
 		long ibSize	 = 1;		//inode bitmap is 1 block fixed
-		long inodeTableSize = Ext2Utils.ceilDiv( inodesPerGroup*INode.INODE_LENGTH, blockSize);
+		long inodeTableSize = Ext2Utils.ceilDiv( inodesPerGroup*INode.INODE_LENGTH, blockSize.getSize());
 		int groupsWithMetadata = 0;
 		for(int i=0; i<groupCount; i++)
 			if(fs.groupHasDescriptors(i))
 				groupsWithMetadata++;
-		long metadataSize = (bbSize + ibSize + inodeTableSize) * groupCount + 
+		long metadataSize = (bbSize + ibSize + inodeTableSize) * groupCount +
 							(sbSize + gdtSize) * groupsWithMetadata;
 		setFreeBlocksCount(blocks - metadataSize);
 		setFirstInode(11);
 		setFreeInodesCount(inodes - getFirstInode() + 1);
-		
+
 		setMTime(0);
 		setWTime(0);
 		setLastCheck(0);
 		setCheckInterval(CHECK_INTERVAL);
 		setMntCount(0);
 		setMaxMntCount(MAX_MOUNT_COUNT);
-		
+
 		setState(Ext2Constants.EXT2_VALID_FS);
 		setErrors(Ext2Constants.EXT2_ERRORS_DEFAULT);
-		
+
 		setINodeSize(INode.INODE_LENGTH);
-		
+
 		setBlockGroupNr(0);
-		
+
 		//set the options SPARSE_SUPER and FILETYPE
 		setFeatureCompat(0);
 		setFeatureROCompat(	Ext2Constants.EXT2_FEATURE_RO_COMPAT_SPARSE_SUPER );
 		setFeatureIncompat(	Ext2Constants.EXT2_FEATURE_INCOMPAT_FILETYPE );
-		
+
 		byte[] uuid = new byte[16];
 		for(int i=0; i<uuid.length; i++)
 			uuid[i]=(byte)(Math.random()*255);
 		setUUID(uuid);
-		
+
 		setPreallocBlocks(8);
 		setPreallocDirBlocks(0);
 
 		log.debug("Superblock.create(): getBlockSize(): "+getBlockSize());
 	}
-	
+
 	/**
 	 * Update the superblock copies on the disk
 	 */
@@ -152,7 +152,7 @@ public class Superblock {
 		if(isDirty()) {
 			log.debug("Updating superblock copies");
 			byte[] oldData;
-			
+
 			//update the main copy
 			if(getFirstDataBlock()==0) {
 				oldData=fs.getBlock(0);
@@ -161,10 +161,10 @@ public class Superblock {
 				System.arraycopy(data, 0, oldData, 1024, SUPERBLOCK_LENGTH);
 			} else {
 				oldData=fs.getBlock(getFirstDataBlock());
-				System.arraycopy(data, 0, oldData, 0, SUPERBLOCK_LENGTH);				
+				System.arraycopy(data, 0, oldData, 0, SUPERBLOCK_LENGTH);
 			}
 			fs.writeBlock(getFirstDataBlock(), oldData, true);
-			
+
 			//update the other copies
 			for(int i=1; i<fs.getGroupCount(); i++) {
 				//check if there is a superblock copy in the block group
@@ -178,11 +178,11 @@ public class Superblock {
 				System.arraycopy(data, 0, oldData, 0, SUPERBLOCK_LENGTH);
 				fs.writeBlock(blockNr, oldData, true);
 			}
-			
+
 			setBlockGroupNr(0);
 			setDirty(false);
 		}
-		
+
 	}
 
 	//this field is only written during format (so no synchronization issues here)
@@ -193,7 +193,7 @@ public class Superblock {
 		Ext2Utils.set32(data, 0, count);
 		setDirty(true);
 	}
-	
+
 	//this field is only written during format (so no synchronization issues here)
 	public long getBlocksCount() {
 		return Ext2Utils.get32(data, 4);
@@ -202,7 +202,7 @@ public class Superblock {
 		Ext2Utils.set32(data, 4, count);
 		setDirty(true);
 	}
-	
+
 	//this field is only written during format (so no synchronization issues here)
 	public long getRBlocksCount() {
 		return Ext2Utils.get32(data, 8);
@@ -245,18 +245,19 @@ public class Superblock {
 		Ext2Utils.set32(data, 24, i);
 		setDirty(true);
 	}
-	
+
 	//this field is only written during format (so no synchronization issues here)
 	public int getBlockSize() {
 		return 1024 << getLogBlockSize();
 	}
-	public void setBlockSize(long size) {
+	public void setBlockSize(BlockSize size) {
 		//setLogBlockSize( (long)(Math.log(size)/Math.log(2) - 10) );
 		//Math.log() is buggy
-		if(size==1024) setLogBlockSize(0);
-		if(size==2048) setLogBlockSize(1);
-		if(size==4096) setLogFragSize(2);
-		if(size==8192) setLogFragSize(3);
+		//TODO should we handle all these values for size or not ? from mke2fs man page, it seems NO.
+		if(size.getSize()==1024) setLogBlockSize(0);
+		if(size.getSize()==2048) setLogBlockSize(1);
+		if(size.getSize()==4096) setLogFragSize(2);
+		if(size.getSize()==8192) setLogFragSize(3);
 		setDirty(true);
 	}
 
@@ -268,7 +269,7 @@ public class Superblock {
 		Ext2Utils.set32(data, 28, i);
 		setDirty(true);
 	}
-	
+
 	//this field is only written during format (so no synchronization issues here)
 	public int getFragSize() {
 		if(getLogFragSize()>0)
@@ -276,17 +277,18 @@ public class Superblock {
 		else
 			return 1024 >> -getLogFragSize();
 	}
-	public void setFragSize(long size) {
+	public void setFragSize(BlockSize size) {
 		//setLogFragSize( (long)(Math.log(size)/Math.log(2)) - 10 );
 		//Math.log() is buggy
-		if(size==64) setLogFragSize(-4);
-		if(size==128) setLogFragSize(-3);
-		if(size==256) setLogBlockSize(-2);
-		if(size==512) setLogBlockSize(-1);		
-		if(size==1024) setLogFragSize(0);
-		if(size==2048) setLogFragSize(1);
-		if(size==4096) setLogBlockSize(2);
-		if(size==8192) setLogBlockSize(3);
+		//TODO should we handle all these values for size or not ? from mke2fs man page, it seems NO.
+		if(size.getSize()==64) setLogFragSize(-4);
+		if(size.getSize()==128) setLogFragSize(-3);
+		if(size.getSize()==256) setLogBlockSize(-2);
+		if(size.getSize()==512) setLogBlockSize(-1);
+		if(size.getSize()==1024) setLogFragSize(0);
+		if(size.getSize()==2048) setLogFragSize(1);
+		if(size.getSize()==4096) setLogBlockSize(2);
+		if(size.getSize()==8192) setLogBlockSize(3);
 		setDirty(true);
 	}
 
@@ -307,7 +309,7 @@ public class Superblock {
 		Ext2Utils.set32(data, 36, i);
 		setDirty(true);
 	}
-	
+
 	//this field is only written during format (so no synchronization issues here)
 	public long getINodesPerGroup() {
 		return Ext2Utils.get32(data, 40);
@@ -333,7 +335,7 @@ public class Superblock {
 		Ext2Utils.set32(data, 48, time);
 		setDirty(true);
 	}
-	
+
 	//this field is only written during mounting (so no synchronization issues here)
 	public int getMntCount() {
 		return Ext2Utils.get16(data, 52);
@@ -342,7 +344,7 @@ public class Superblock {
 		Ext2Utils.set16(data, 52, i);
 		setDirty(true);
 	}
-	
+
 	//this field is only written during format (so no synchronization issues here)
 	public int getMaxMntCount() {
 		return Ext2Utils.get16(data, 54);
@@ -360,7 +362,7 @@ public class Superblock {
 		Ext2Utils.set16(data, 56, i);
 		setDirty(true);
 	}
-		
+
 	public synchronized int getState() {
 		return Ext2Utils.get16(data, 58);
 	}
@@ -385,8 +387,8 @@ public class Superblock {
 	public void setMinorRevLevel(int i) {
 		Ext2Utils.set16(data, 62, i);
 		setDirty(true);
-	}	
-	
+	}
+
 	//this field is only written during filesystem check (so no synchronization issues here)
 	public long getLastCheck() {
 		return Ext2Utils.get32(data, 64);
@@ -395,7 +397,7 @@ public class Superblock {
 		Ext2Utils.set32(data, 64, i);
 		setDirty(true);
 	}
-	
+
 	//this field is only written during format (so no synchronization issues here)
 	public long getCheckInterval() {
 		return Ext2Utils.get32(data, 68);
@@ -404,7 +406,7 @@ public class Superblock {
 		Ext2Utils.set32(data, 68, i);
 		setDirty(true);
 	}
-	
+
 	//this field is only written during format (so no synchronization issues here)
 	public long getCreatorOS() {
 		return Ext2Utils.get32(data, 72);
@@ -413,7 +415,7 @@ public class Superblock {
 		Ext2Utils.set32(data, 72, i);
 		setDirty(true);
 	}
-	
+
 	//this field is only written during format (so no synchronization issues here)
 	public long getRevLevel() {
 		return Ext2Utils.get32(data, 76);
@@ -422,7 +424,7 @@ public class Superblock {
 		Ext2Utils.set32(data, 76, i);
 		setDirty(true);
 	}
-	
+
 	//this field is only written during format (so no synchronization issues here)
 	public int getDefResuid() {
 		return Ext2Utils.get16(data, 80);
@@ -431,7 +433,7 @@ public class Superblock {
 		Ext2Utils.set16(data, 80, i);
 		setDirty(true);
 	}
-	
+
 	//this field is only written during format (so no synchronization issues here)
 	public int getDefResgid() {
 		return Ext2Utils.get16(data, 82);
@@ -445,19 +447,19 @@ public class Superblock {
 	public long getFirstInode() {
 		if(getRevLevel()==Ext2Constants.EXT2_DYNAMIC_REV)
 			return Ext2Utils.get32(data, 84);
-		else 
+		else
 			return 11;
 	}
 	public void setFirstInode(long i) {
 		Ext2Utils.set32(data, 84, i);
 		setDirty(true);
 	}
-			
+
 	//this field is only written during format (so no synchronization issues here)
 	public long getINodeSize() {
 		if(getRevLevel()==Ext2Constants.EXT2_DYNAMIC_REV)
 			return Ext2Utils.get16(data, 88);
-		else 
+		else
 			return INode.INODE_LENGTH;
 	}
 	public void setINodeSize(int i) {
@@ -469,19 +471,19 @@ public class Superblock {
 	public synchronized long getBlockGroupNr() {
 		if(getRevLevel()==Ext2Constants.EXT2_DYNAMIC_REV)
 			return Ext2Utils.get16(data, 90);
-		else 
+		else
 			return 0;
 	}
 	public synchronized void setBlockGroupNr(int i) {
 		Ext2Utils.set16(data, 90, i);
 		setDirty(true);
 	}
-	
+
 	//this field is only written during format (so no synchronization issues here)
 	public long getFeatureCompat() {
 		if(getRevLevel()==Ext2Constants.EXT2_DYNAMIC_REV)
 			return Ext2Utils.get32(data, 92);
-		else 
+		else
 			return 0;
 	}
 	public void setFeatureCompat(long i) {
@@ -493,19 +495,19 @@ public class Superblock {
 	public long getFeatureIncompat() {
 		if(getRevLevel()==Ext2Constants.EXT2_DYNAMIC_REV)
 			return Ext2Utils.get32(data, 96);
-		else 
+		else
 			return 0;
 	}
 	public void setFeatureIncompat(long i) {
 		Ext2Utils.set32(data, 96, i);
 		setDirty(true);
 	}
-	
+
 	//this field is only written during format (so no synchronization issues here)
 	public long getFeatureROCompat() {
 		if(getRevLevel()==Ext2Constants.EXT2_DYNAMIC_REV)
 			return Ext2Utils.get32(data, 100);
-		else 
+		else
 			return 0;
 	}
 	public void setFeatureROCompat(long i) {
@@ -515,14 +517,14 @@ public class Superblock {
 
 	//this field is only written during format (so no synchronization issues here)
 	public byte[] getUUID() {
-		byte[] result=new byte[16];	
+		byte[] result=new byte[16];
 		if(getRevLevel()==Ext2Constants.EXT2_DYNAMIC_REV)
 			System.arraycopy(data, 104, result, 0, 16);
 		return result;
 	}
 	public void setUUID(byte[] uuid) {
 		if(getRevLevel()==Ext2Constants.EXT2_DYNAMIC_REV)
-			System.arraycopy(uuid, 0, data, 104, 16);		
+			System.arraycopy(uuid, 0, data, 104, 16);
 		setDirty(true);
 	}
 
@@ -536,7 +538,7 @@ public class Superblock {
 					result.append(c);
 				else
 					break;
-			}	
+			}
 		return result.toString();
 	}
 
@@ -549,7 +551,7 @@ public class Superblock {
 					result.append(c);
 				else
 					break;
-			}	
+			}
 		return result.toString();
 	}
 
@@ -557,10 +559,10 @@ public class Superblock {
 	public long getAlgoBitmap() {
 		if(getRevLevel()==Ext2Constants.EXT2_DYNAMIC_REV)
 			return Ext2Utils.get32(data, 200);
-		else 
+		else
 			return 11;
 	}
-	
+
 	//this field is only written during format (so no synchronization issues here)
 	public int getPreallocBlocks() {
 		return Ext2Utils.get8(data, 204);
@@ -580,11 +582,11 @@ public class Superblock {
 	}
 
 	public byte[] getJournalUUID() {
-		byte[] result=new byte[16];	
+		byte[] result=new byte[16];
 		System.arraycopy(data, 208, result, 0, 16);
 		return result;
 	}
-	
+
 	public long getJournalINum() {
 		return Ext2Utils.get32(data, 224);
 	}

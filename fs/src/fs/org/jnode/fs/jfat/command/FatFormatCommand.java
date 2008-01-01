@@ -22,6 +22,8 @@ package org.jnode.fs.jfat.command;
  */
 import org.apache.log4j.Logger;
 import org.jnode.fs.command.AbstractFormatCommand;
+import org.jnode.fs.ext2.BlockSize;
+import org.jnode.fs.jfat.ClusterSize;
 import org.jnode.fs.jfat.FatFileSystem;
 import org.jnode.fs.jfat.FatFileSystemFormatter;
 import org.jnode.shell.CommandLine;
@@ -30,6 +32,7 @@ import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.Syntax;
 import org.jnode.shell.help.SyntaxErrorException;
+import org.jnode.shell.help.argument.EnumOptionArgument;
 import org.jnode.shell.help.argument.OptionArgument;
 
 /**
@@ -47,15 +50,15 @@ public class FatFormatCommand extends AbstractFormatCommand<FatFileSystem> {
 			                                         new OptionArgument.Option("-c","Specify Sector Per Cluster Value") });
 	 static final Parameter        PARAM_TYPE     =  new Parameter(TYPE, Parameter.OPTIONAL);
 
-	 static final OptionArgument   BS_VAL         =  new OptionArgument("SectorPerClusterValue","Setting The Cluster Size",
-			                                         new OptionArgument.Option[] {
-			                                         new OptionArgument.Option("1",   "1Kb"),
-	                                                 new OptionArgument.Option("2",   "2Kb"),
-	                                                 new OptionArgument.Option("4",   "4Kb"),
-	                                                 new OptionArgument.Option("8",   "8Kb"),
-	                                                 new OptionArgument.Option("16",  "16Kb"),
-	                                                 new OptionArgument.Option("32",  "32Kb"),
-	                                                 new OptionArgument.Option("64",  "64Kb")});
+	 static final EnumOptionArgument<ClusterSize> BS_VAL = new EnumOptionArgument<ClusterSize>("clusterSize",
+	            "cluster size for fat filesystem",
+	                    new EnumOptionArgument.EnumOption<ClusterSize>("1", "1Kb", ClusterSize._1Kb),
+	                    new EnumOptionArgument.EnumOption<ClusterSize>("2", "2Kb", ClusterSize._2Kb),
+	                    new EnumOptionArgument.EnumOption<ClusterSize>("4", "4Kb", ClusterSize._4Kb),
+	                    new EnumOptionArgument.EnumOption<ClusterSize>("8", "8Kb", ClusterSize._8Kb),
+	                    new EnumOptionArgument.EnumOption<ClusterSize>("16", "16Kb", ClusterSize._16Kb),
+	                    new EnumOptionArgument.EnumOption<ClusterSize>("32", "32Kb", ClusterSize._32Kb),
+	                    new EnumOptionArgument.EnumOption<ClusterSize>("32", "64Kb", ClusterSize._64Kb));
 
 	 static final Parameter       PARAM_BS_VAL    =  new Parameter(BS_VAL,Parameter.OPTIONAL);
 
@@ -75,14 +78,7 @@ public class FatFormatCommand extends AbstractFormatCommand<FatFileSystem> {
 
 	protected FatFileSystemFormatter getFormatter(ParsedArguments cmdLine)
 	{
-        int bsize;
-        try {
-            bsize = Integer.parseInt(BS_VAL.getValue(cmdLine));
-        } catch (NumberFormatException nfe) {
-            bsize=4;//set to the default cluster size
-        	log.error("Using default cluster size of "+bsize);
-        }
-
+        ClusterSize bsize = BS_VAL.getEnum(cmdLine, ClusterSize.class);
         return new FatFileSystemFormatter(bsize);
 	}
 }

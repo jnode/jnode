@@ -29,17 +29,17 @@ import org.jnode.util.BinaryPrefix;
 /**
  * @author Andras Nagy
  */
-public class Ext2FileSystemFormatter implements Formatter<Ext2FileSystem> {
-
-    private int blockSize;
+public class Ext2FileSystemFormatter extends Formatter<Ext2FileSystem> {
+    private BlockSize blockSize;
 
     /**
      *
      * @param blockSizeKb size of blocks in KB
      */
-    public Ext2FileSystemFormatter(int blockSizeKb)
+    public Ext2FileSystemFormatter(BlockSize blockSize)
     {
-    	this.blockSize = (int) (blockSizeKb * BinaryPrefix.K.getMultiplier()); //Converted into KB
+    	super(new Ext2FileSystemType());
+    	this.blockSize = blockSize;
     }
 
 	/**

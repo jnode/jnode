@@ -9,16 +9,16 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.ext2;
 
 import java.io.IOException;
@@ -39,7 +39,7 @@ import org.jnode.fs.spi.AbstractFileSystem;
 
 /**
  * @author Andras Nagy
- *  
+ *
  */
 public class Ext2FileSystem extends AbstractFileSystem {
     private Superblock superblock;
@@ -67,7 +67,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 
     /**
      * Constructor for Ext2FileSystem in specified readOnly mode
-     * 
+     *
      * @throws FileSystemException
      */
     public Ext2FileSystem(Device device, boolean readOnly)
@@ -170,10 +170,10 @@ public class Ext2FileSystem extends AbstractFileSystem {
                 + "\n" + "				#block groups:	" + groupCount + "\n"
                 + "				block size:		" + superblock.getBlockSize() + "\n"
                 + "				#inodes:		" + superblock.getINodesCount() + "\n"
-                + "				#inodes/group:	" + superblock.getINodesPerGroup());        
+                + "				#inodes/group:	" + superblock.getINodesPerGroup());
     }
-    
-    public void create(int blockSize) throws FileSystemException {
+
+    public void create(BlockSize blockSize) throws FileSystemException {
         try {
             //create the superblock
             superblock = new Superblock();
@@ -197,8 +197,8 @@ public class Ext2FileSystem extends AbstractFileSystem {
             for (int i = 0; i < groupCount; i++) {
                 log.debug("creating group " + i);
 
-                byte[] blockBitmap = new byte[blockSize];
-                byte[] inodeBitmap = new byte[blockSize];
+                byte[] blockBitmap = new byte[blockSize.getSize()];
+                byte[] inodeBitmap = new byte[blockSize.getSize()];
 
                 //update the block bitmap: mark the metadata blocks allocated
                 long iNodeTableBlock = groupDescriptors[i].getInodeTable();
@@ -225,7 +225,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
                         INodeBitmap.setBit(inodeBitmap, j);
 
                 //create an empty inode table
-                byte[] emptyBlock = new byte[blockSize];
+                byte[] emptyBlock = new byte[blockSize.getSize()];
                 for (long j = iNodeTableBlock; j < firstNonMetadataBlock; j++)
                     writeBlock(j, emptyBlock, false);
 
@@ -252,7 +252,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 
     /**
      * Flush all changed structures to the device.
-     * 
+     *
      * @throws IOException
      */
     public void flush() throws IOException {
@@ -323,12 +323,12 @@ public class Ext2FileSystem extends AbstractFileSystem {
     /**
      * Read a data block and put it in the cache if it is not yet cached,
      * otherwise get it from the cache.
-     * 
+     *
      * Synchronized access to the blockCache is important as the bitmap
      * operations are synchronized to the blocks (actually, to Block.getData()),
      * so at any point in time it has to be sure that no two copies of the same
      * block are stored in the cache.
-     * 
+     *
      * @return data block nr
      */
     protected byte[] getBlock(long nr) throws IOException {
@@ -381,7 +381,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 
     /**
      * Update the block in cache, or write the block to disk
-     * 
+     *
      * @param nr:
      *            block number
      * @param data:
@@ -434,14 +434,14 @@ public class Ext2FileSystem extends AbstractFileSystem {
 
     /**
      * Helper class for timedWrite
-     * 
+     *
      * @author blind
      */
     /*
      * class TimeoutWatcher extends TimerTask { Thread mainThread; public
      * TimeoutWatcher(Thread mainThread) { this.mainThread = mainThread; }
      * public void run() { mainThread.interrupt(); } }
-     * 
+     *
      * private static final long TIMEOUT = 100;
      */
     /*
@@ -461,7 +461,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
      * interrupted if(ioe.getCause() instanceof InterruptedException) {
      * writeTimer.cancel(); log.debug("IDE driver interrupted during write
      * operation: probably timeout"); finished = false; } } } }
-     * 
+     *
      * private void timedRead(long nr, byte[] data) throws IOException{ boolean
      * finished = false; Timer readTimer; while(!finished) { finished = true;
      * readTimer = new Timer(); readTimer.schedule(new
@@ -480,7 +480,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 
     /**
      * Return the inode numbered inodeNr (the first inode is #1)
-     * 
+     *
      * Synchronized access to the inodeCache is important as the file/directory
      * operations are synchronized to the inodes, so at any point in time it has
      * to be sure that only one instance of any inode is present in the
@@ -526,7 +526,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
     /**
      * Checks whether block <code>blockNr</code> is free, and if it is, then
      * allocates it with preallocation.
-     * 
+     *
      * @param blockNr
      * @return @throws
      *         IOException
@@ -577,7 +577,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 
     /**
      * Create a new INode
-     * 
+     *
      * @param preferredBlockBroup:
      *            first try to allocate the inode in this block group
      * @return
@@ -637,7 +637,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 
     /**
      * Find a free INode in the inode bitmap and allocate it
-     * 
+     *
      * @param blockGroup
      * @return @throws
      *         IOException
@@ -681,7 +681,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 
     /**
      * Modify the number of free blocks in the block group
-     * 
+     *
      * @param group
      * @param diff
      *            can be positive or negative
@@ -695,7 +695,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 
     /**
      * Modify the number of free inodes in the block group
-     * 
+     *
      * @param group
      * @param diff
      *            can be positive or negative
@@ -709,7 +709,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 
     /**
      * Modify the number of used directories in a block group
-     * 
+     *
      * @param group
      * @param diff
      */
@@ -720,7 +720,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 
     /**
      * Free up a block in the block bitmap.
-     * 
+     *
      * @param blockNr
      * @throws FileSystemException
      * @throws IOException
@@ -773,7 +773,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
      * Find free blocks in the block group <code>group</code>'s block bitmap.
      * First check for a whole byte of free blocks (0x00) in the bitmap, then
      * check for any free bit. If blocks are found, mark them as allocated.
-     * 
+     *
      * @return the index of the block (from the beginning of the partition)
      * @param group
      *            the block group to check
@@ -845,7 +845,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 
     /**
      * Returns the number of groups.
-     * 
+     *
      * @return int
      */
     protected int getGroupCount() {
@@ -855,7 +855,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
     /**
      * Check whether the filesystem uses the given RO feature
      * (S_FEATURE_RO_COMPAT)
-     * 
+     *
      * @param mask
      * @return
      */
@@ -866,7 +866,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
     /**
      * Check whether the filesystem uses the given COMPAT feature
      * (S_FEATURE_INCOMPAT)
-     * 
+     *
      * @param mask
      * @return
      */
@@ -877,7 +877,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
     /**
      * utility function for determining if a given block group has superblock
      * and group descriptor copies
-     * 
+     *
      * @param a
      *            positive integer
      * @param b
@@ -901,7 +901,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
     /**
      * With the sparse_super option set, a filesystem does not have a superblock
      * and group descriptor copy in every block group.
-     * 
+     *
      * @param groupNr
      * @return true if the block group <code>groupNr</code> has a superblock
      *         and a group descriptor copy, otherwise false
@@ -915,7 +915,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
     }
 
     /**
-     *  
+     *
      */
     protected FSFile createFile(FSEntry entry) throws IOException {
         Ext2Entry e = (Ext2Entry) entry;
@@ -923,7 +923,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
     }
 
     /**
-     *  
+     *
      */
     protected FSDirectory createDirectory(FSEntry entry) throws IOException {
         Ext2Entry e = (Ext2Entry) entry;
@@ -993,12 +993,12 @@ public class Ext2FileSystem extends AbstractFileSystem {
 	}
 
 	public long getTotalSpace() {
-		// TODO implement me 
+		// TODO implement me
 		return 0;
 	}
 
 	public long getUsableSpace() {
-		// TODO implement me 
+		// TODO implement me
 		return 0;
 	}
 }

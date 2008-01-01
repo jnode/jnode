@@ -31,6 +31,7 @@ import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
 import org.jnode.fs.Formatter;
+import org.jnode.fs.ext2.Ext2FileSystemType;
 import org.jnode.partitions.PartitionTableEntry;
 import org.jnode.partitions.ibm.IBMPartitionTableEntry;
 import org.jnode.partitions.ibm.IBMPartitionTypes;
@@ -40,14 +41,15 @@ import bsh.This;
 /**
  * @author epr
  */
-public class FatFileSystemFormatter implements Formatter<FatFileSystem> {
+public class FatFileSystemFormatter extends Formatter<FatFileSystem> {
 	private static final int NB_HEADS = 255;
 	private static final int SECTOR_PER_TRACK = 63;
 
-	private int fatSize;
+	private FatType fatSize;
 
-	public FatFileSystemFormatter(int fatSize)
+	public FatFileSystemFormatter(FatType fatSize)
 	{
+    	super(new FatFileSystemType());
 		this.fatSize = fatSize;
 	}
 
