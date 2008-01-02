@@ -1,5 +1,5 @@
 /*
- * $Id: FTPFileSystem.java 3337 2007-06-30 11:58:44Z fduminy $
+ * $Id $
  *
  * JNode.org
  * Copyright (C) 2003-2006 JNode.org
@@ -23,19 +23,17 @@ package org.jnode.fs.nfs.nfs2;
 
 import java.io.IOException;
 
-import org.acplt.oncrpc.OncRpcProtocols;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceListener;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
-import org.jnode.fs.nfs.nfs2.NFS2Device.Protocol;
-import org.jnode.fs.nfs.nfs2.rpc.mount.Mount1Client;
-import org.jnode.fs.nfs.nfs2.rpc.mount.MountException;
-import org.jnode.fs.nfs.nfs2.rpc.mount.MountResult;
-import org.jnode.fs.nfs.nfs2.rpc.nfs.FileAttribute;
-import org.jnode.fs.nfs.nfs2.rpc.nfs.NFS2Client;
-import org.jnode.fs.nfs.nfs2.rpc.nfs.NFS2Exception;
+import org.jnode.net.nfs.nfs2.FileAttribute;
+import org.jnode.net.nfs.nfs2.NFS2Client;
+import org.jnode.net.nfs.nfs2.NFS2Exception;
+import org.jnode.net.nfs.nfs2.mount.Mount1Client;
+import org.jnode.net.nfs.nfs2.mount.MountException;
+import org.jnode.net.nfs.nfs2.mount.MountResult;
 
 /**
  * @author Andrei Dore
@@ -72,35 +70,45 @@ public class NFS2FileSystem implements FileSystem {
             }
         });
 
-        // Mount the file system
+        mountClient = new Mount1Client(device.getHost(), device.getProtocol(),
+                device.getUid(), device.getGid());
 
-        int protocol;
-        if (device.getProtocol() == Protocol.TCP) {
-            protocol = OncRpcProtocols.ONCRPC_TCP;
-        } else {
-            protocol = OncRpcProtocols.ONCRPC_UDP;
-        }
-
-        mountClient = new Mount1Client(device.getHost(), protocol, device
-                .getUid(), device.getGid());
-
-        nfsClient = new NFS2Client(device.getHost(), protocol, device.getUid(),
-                device.getGid());
+        nfsClient = new NFS2Client(device.getHost(), device.getProtocol(),
+                device.getUid(), device.getGid());
 
         MountResult result;
 
         FileAttribute fileAttribute;
 
+        // Mount the file system
         try {
             result = mountClient.mount(device.getRemoteDirectory());
 
             fileAttribute = nfsClient.getAttribute(result.getFileHandle());
 
         } catch (IOException e) {
+
+            try {
+                close();
+            } catch (IOException e1) {
+            }
+
             throw new FileSystemException(e.getMessage(), e);
         } catch (MountException e) {
+
+            try {
+                close();
+            } catch (IOException e1) {
+            }
+
             throw new FileSystemException(e.getMessage(), e);
         } catch (NFS2Exception e) {
+
+            try {
+                close();
+            } catch (IOException e1) {
+            }
+
             throw new FileSystemException(e.getMessage(), e);
         }
 
@@ -117,18 +125,31 @@ public class NFS2FileSystem implements FileSystem {
      */
     public void close() throws IOException {
 
-        // Improve the exception !!!!!!!!!!!!!!!
+        if (mountClient != null) {
+            try {
+                mountClient.unmount(device.getRemoteDirectory());
+            } catch (MountException e) {
 
-        try {
-            mountClient.unmount(device.getRemoteDirectory());
-        } catch (MountException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            }
+
+            try {
+                mountClient.close();
+            } catch (IOException e) {
+
+            }
         }
 
-        mountClient.close();
+        if (nfsClient != null) {
 
-        nfsClient.close();
+            try {
+                nfsClient.close();
+            } catch (RuntimeException e) {
+
+            }
+
+        }
+
+        closed = true;
 
     }
 

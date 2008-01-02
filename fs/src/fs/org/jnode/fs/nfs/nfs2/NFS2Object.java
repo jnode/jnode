@@ -2,7 +2,7 @@ package org.jnode.fs.nfs.nfs2;
 
 import org.jnode.fs.FSObject;
 import org.jnode.fs.FileSystem;
-import org.jnode.fs.nfs.nfs2.rpc.nfs.NFS2Client;
+import org.jnode.net.nfs.nfs2.NFS2Client;
 
 public class NFS2Object implements FSObject {
 

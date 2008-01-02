@@ -25,11 +25,11 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.jnode.fs.FSFile;
-import org.jnode.fs.nfs.nfs2.rpc.nfs.FileAttribute;
-import org.jnode.fs.nfs.nfs2.rpc.nfs.NFS2Client;
-import org.jnode.fs.nfs.nfs2.rpc.nfs.NFS2Exception;
-import org.jnode.fs.nfs.nfs2.rpc.nfs.ReadFileResult;
-import org.jnode.fs.nfs.nfs2.rpc.nfs.Time;
+import org.jnode.net.nfs.nfs2.FileAttribute;
+import org.jnode.net.nfs.nfs2.NFS2Client;
+import org.jnode.net.nfs.nfs2.NFS2Exception;
+import org.jnode.net.nfs.nfs2.ReadFileResult;
+import org.jnode.net.nfs.nfs2.Time;
 
 /**
  * @author Andrei Dore
@@ -86,7 +86,8 @@ public class NFS2File extends NFS2Object implements FSFile {
             }
 
         } catch (NFS2Exception e) {
-            throw new IOException(e.getMessage(), e);
+            throw new IOException("Error reading file. Reason:"
+                    + e.getMessage(), e);
         }
 
     }
@@ -152,7 +153,8 @@ public class NFS2File extends NFS2Object implements FSFile {
             }
 
         } catch (NFS2Exception e) {
-            throw new IOException("Error writing file ." + e.getMessage(), e);
+            throw new IOException("Error writing file . Reason: "
+                    + e.getMessage(), e);
         }
 
     }

@@ -1,5 +1,5 @@
 /*
- * $Id: FTPFSEntry.java 2260 2006-01-22 11:10:07Z lsantha $
+ * $Id $
  *
  * JNode.org
  * Copyright (C) 2003-2006 JNode.org
@@ -27,10 +27,10 @@ import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSFile;
-import org.jnode.fs.nfs.nfs2.rpc.nfs.FileAttribute;
-import org.jnode.fs.nfs.nfs2.rpc.nfs.NFS2Client;
-import org.jnode.fs.nfs.nfs2.rpc.nfs.NFS2Exception;
-import org.jnode.fs.nfs.nfs2.rpc.nfs.Time;
+import org.jnode.net.nfs.nfs2.FileAttribute;
+import org.jnode.net.nfs.nfs2.NFS2Client;
+import org.jnode.net.nfs.nfs2.NFS2Exception;
+import org.jnode.net.nfs.nfs2.Time;
 
 /**
  * @author Andrei Dore
@@ -160,18 +160,6 @@ public class NFS2Entry extends NFS2Object implements FSEntry {
 
     public byte[] getFileHandle() {
         return fileHandle;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        // TODO Auto-generated method stub
-        return super.equals(obj);
-    }
-
-    @Override
-    public int hashCode() {
-        // TODO Auto-generated method stub
-        return super.hashCode();
     }
 
 }
