@@ -10,6 +10,7 @@
   <requires>
     <import plugin="org.jnode.fs"/>
     <import plugin="org.jnode.shell.help"/>
+    <import plugin="org.jnode.protocol.nfs"/>
   </requires>
 
   <runtime>

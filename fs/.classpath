@@ -17,6 +17,6 @@
 	<classpathentry kind="lib" path="/JNode-Core/lib/commons-net-1.1.0.jar"/>
 	<classpathentry kind="lib" path="/JNode-Core/lib/jcfe.jar"/>
 	<classpathentry kind="lib" path="/JNode-Core/lib/jfunc.jar"/>
-	<classpathentry kind="lib" path="/JNode-Net/lib/oncrpc.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JNode-Net"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
