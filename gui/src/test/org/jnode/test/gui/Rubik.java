@@ -21,7 +21,7 @@
  
 package org.jnode.test.gui;
 // Rubik's Cube 3D simulator
-// Karl Hörnell, March 11 1996
+// Karl H\u00f6rnell, March 11 1996
 // Last modified October 6
 // Adapted to JNode by Levente S\u00e1ntha
 import javax.swing.JFrame;
