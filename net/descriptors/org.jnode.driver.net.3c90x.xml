@@ -20,6 +20,7 @@
   </runtime>
   
   <extension point="org.jnode.driver.mappers">
+    <mapper id="10b7:9055" name="3C905B 100BaseTX [Cyclone] (rev 30)" driver-class="org.jnode.driver.net._3c90x._3c90xDriver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
     <mapper id="10b7:9200" name="3C905C_TXM" driver-class="org.jnode.driver.net._3c90x._3c90xDriver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
   </extension>
         
