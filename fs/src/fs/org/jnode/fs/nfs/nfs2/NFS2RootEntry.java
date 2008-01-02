@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSFile;
-import org.jnode.fs.nfs.nfs2.rpc.nfs.FileAttribute;
+import org.jnode.net.nfs.nfs2.FileAttribute;
 
 public class NFS2RootEntry extends NFS2Entry implements FSEntry {
 

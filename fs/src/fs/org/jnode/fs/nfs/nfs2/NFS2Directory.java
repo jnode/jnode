@@ -1,5 +1,5 @@
 /*
- * $Id: FTPFSDirectory.java 2260 2006-01-22 11:10:07Z lsantha $
+ * 
  *
  * JNode.org
  * Copyright (C) 2003-2006 JNode.org
@@ -32,22 +32,36 @@ import java.util.Set;
 
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
-import org.jnode.fs.nfs.nfs2.rpc.nfs.CreateDirectoryResult;
-import org.jnode.fs.nfs.nfs2.rpc.nfs.CreateFileResult;
-import org.jnode.fs.nfs.nfs2.rpc.nfs.Entry;
-import org.jnode.fs.nfs.nfs2.rpc.nfs.FileAttribute;
-import org.jnode.fs.nfs.nfs2.rpc.nfs.ListDirectoryResult;
-import org.jnode.fs.nfs.nfs2.rpc.nfs.LookupResult;
-import org.jnode.fs.nfs.nfs2.rpc.nfs.NFS2Client;
-import org.jnode.fs.nfs.nfs2.rpc.nfs.NFS2Exception;
-import org.jnode.fs.nfs.nfs2.rpc.nfs.Time;
+import org.jnode.net.nfs.nfs2.CreateDirectoryResult;
+import org.jnode.net.nfs.nfs2.CreateFileResult;
+import org.jnode.net.nfs.nfs2.Entry;
+import org.jnode.net.nfs.nfs2.FileAttribute;
+import org.jnode.net.nfs.nfs2.ListDirectoryResult;
+import org.jnode.net.nfs.nfs2.LookupResult;
+import org.jnode.net.nfs.nfs2.NFS2Client;
+import org.jnode.net.nfs.nfs2.NFS2Exception;
+import org.jnode.net.nfs.nfs2.Time;
 
 /**
  * @author Andrei Dore
  */
 public class NFS2Directory extends NFS2Object implements FSDirectory {
 
-    private static final Iterator<NFS2Entry> EMPTY_NFSENTRY_ITERATOR = new EmptyIterator();
+    private static final Iterator<NFS2Entry> EMPTY_NFSENTRY_ITERATOR = new Iterator<NFS2Entry>() {
+
+        public boolean hasNext() {
+            return false;
+        }
+
+        public NFS2Entry next() {
+            return null;
+        }
+
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+    };
 
     private static final boolean DEFAULT_PERMISSION[] = new boolean[] { true,
             true, false, true, false, false, true, false, false };
@@ -153,7 +167,7 @@ public class NFS2Directory extends NFS2Object implements FSDirectory {
         tableEntry.clear();
 
         // fetch the entries
-        Set<NFS2Entry> nfsEntrySet = getNFS2EntrySet(nfsClient);
+        Set<NFS2Entry> nfsEntrySet = getNFS2EntrySet();
 
         if (nfsEntrySet.size() == 0) {
             return EMPTY_NFSENTRY_ITERATOR;
@@ -167,8 +181,9 @@ public class NFS2Directory extends NFS2Object implements FSDirectory {
 
     }
 
-    private Set<NFS2Entry> getNFS2EntrySet(final NFS2Client nfsClient)
-            throws IOException {
+    private Set<NFS2Entry> getNFS2EntrySet() throws IOException {
+
+        final NFS2Client nfsClient = getNFS2Client();
 
         Set<NFS2Entry> nfsEntrySet;
 
@@ -255,18 +270,11 @@ public class NFS2Directory extends NFS2Object implements FSDirectory {
 
         NFS2Client nfsClient = getNFS2Client();
 
+        CreateDirectoryResult result;
         try {
-            CreateDirectoryResult result = nfsClient.createDirectory(
-                    directoryEntry.getFileHandle(), name, DEFAULT_PERMISSION,
-                    -1, -1, -1, new Time(-1, -1), new Time(-1, -1));
-
-            NFS2Entry entry = new NFS2Entry((NFS2FileSystem) getFileSystem(),
-                    this, name, result.getFileHandle(), result
-                            .getFileAttribute());
-
-            tableEntry.addEntry(entry);
-
-            return entry;
+            result = nfsClient.createDirectory(directoryEntry.getFileHandle(),
+                    name, DEFAULT_PERMISSION, -1, -1, -1, new Time(-1, -1),
+                    new Time(-1, -1));
 
         } catch (NFS2Exception e) {
 
@@ -274,30 +282,37 @@ public class NFS2Directory extends NFS2Object implements FSDirectory {
                     + e.getMessage(), e);
         }
 
+        NFS2Entry entry = new NFS2Entry((NFS2FileSystem) getFileSystem(), this,
+                name, result.getFileHandle(), result.getFileAttribute());
+
+        tableEntry.addEntry(entry);
+
+        return entry;
+
     }
 
     public FSEntry addFile(String name) throws IOException {
 
         NFS2Client nfsClient = getNFS2Client();
 
+        CreateFileResult result;
         try {
-            CreateFileResult result = nfsClient.createFile(directoryEntry
-                    .getFileHandle(), name, DEFAULT_PERMISSION, -1, -1, -1,
-                    new Time(-1, -1), new Time(-1, -1));
-
-            NFS2Entry entry = new NFS2Entry((NFS2FileSystem) getFileSystem(),
-                    this, name, result.getFileHandle(), result
-                            .getFileAttribute());
-
-            tableEntry.addEntry(entry);
-
-            return entry;
+            result = nfsClient.createFile(directoryEntry.getFileHandle(), name,
+                    DEFAULT_PERMISSION, -1, -1, -1, new Time(-1, -1), new Time(
+                            -1, -1));
 
         } catch (NFS2Exception e) {
 
             throw new IOException("Can not create the file " + name + "."
                     + e.getMessage(), e);
         }
+
+        NFS2Entry entry = new NFS2Entry((NFS2FileSystem) getFileSystem(), this,
+                name, result.getFileHandle(), result.getFileAttribute());
+
+        tableEntry.addEntry(entry);
+
+        return entry;
     }
 
     public void flush() throws IOException {
@@ -336,22 +351,6 @@ public class NFS2Directory extends NFS2Object implements FSDirectory {
 
     public NFS2Entry getNFS2Entry() {
         return directoryEntry;
-    }
-
-    private static final class EmptyIterator implements Iterator<NFS2Entry> {
-
-        public boolean hasNext() {
-            return false;
-        }
-
-        public NFS2Entry next() {
-            return null;
-        }
-
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-
     }
 
 }

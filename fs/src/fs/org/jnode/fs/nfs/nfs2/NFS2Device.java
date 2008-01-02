@@ -1,5 +1,5 @@
 /*
- * $Id: FTPFSDevice.java 2224 2006-01-01 12:49:03Z epr $
+ * $Id$
  *
  * JNode.org
  * Copyright (C) 2003-2006 JNode.org
@@ -24,15 +24,12 @@ package org.jnode.fs.nfs.nfs2;
 import java.net.InetAddress;
 
 import org.jnode.driver.Device;
+import org.jnode.net.nfs.Protocol;
 
 /**
  * @author Andrei Dore
  */
 public class NFS2Device extends Device {
-
-    public enum Protocol {
-        UDP, TCP
-    }
 
     private InetAddress host;
 
@@ -52,7 +49,7 @@ public class NFS2Device extends Device {
 
     public NFS2Device(InetAddress host, String remoteDirectory,
             Protocol protocol, int uid, int gid) {
-        super(null, "nfs2-(" + host.toString() + "," + remoteDirectory + ","
+        super(null, "nfs2-(" + host.getHostName() + "," + remoteDirectory + ","
                 + protocol + "," + uid + "," + gid + ")");
         this.host = host;
         this.remoteDirectory = remoteDirectory;

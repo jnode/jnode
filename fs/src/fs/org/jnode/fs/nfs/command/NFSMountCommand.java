@@ -1,5 +1,5 @@
 /*
- * $Id: NFSMountCommand.java 2945 2006-12-20 08:51:17Z qades $
+ * $Id $
  *
  * JNode.org
  * Copyright (C) 2003-2006 JNode.org
@@ -32,9 +32,9 @@ import org.jnode.fs.FileSystemType;
 import org.jnode.fs.nfs.nfs2.NFS2Device;
 import org.jnode.fs.nfs.nfs2.NFS2Driver;
 import org.jnode.fs.nfs.nfs2.NFS2FileSystemType;
-import org.jnode.fs.nfs.nfs2.NFS2Device.Protocol;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
+import org.jnode.net.nfs.Protocol;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
@@ -42,7 +42,6 @@ import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.Syntax;
 import org.jnode.shell.help.argument.FileArgument;
-import org.jnode.shell.help.argument.HostNameArgument;
 import org.jnode.shell.help.argument.IntegerArgument;
 import org.jnode.shell.help.argument.OptionArgument;
 
@@ -50,48 +49,60 @@ import org.jnode.shell.help.argument.OptionArgument;
  * @author Andrei Dore
  */
 public class NFSMountCommand extends AbstractCommand {
-    private static final FileArgument MOUNTPOINT_ARG = new FileArgument("directory", "the mountpoint");
-    private static final HostNameArgument HOST_ARG = new HostNameArgument("host", "NFS host");
-    private static final FileArgument REMOTE_DIRECTORY_ARG = new FileArgument("remoteDir", "remote directory");
+    private static final FileArgument MOUNTPOINT_ARG = new FileArgument(
+            "directory", "the mountpoint");
+    private static final NFSHostNameArgument HOST_ARG = new NFSHostNameArgument(
+            "host:remoteDir", "NFS host");
 
-    private static final OptionArgument PROTOCOL_ARG = new OptionArgument("protocol", "protocol",
-            new OptionArgument.Option[] { new OptionArgument.Option("tcp", "tcp protocol"),
+    private static final OptionArgument PROTOCOL_ARG = new OptionArgument(
+            "protocol", "protocol", new OptionArgument.Option[] {
+                    new OptionArgument.Option("tcp", "tcp protocol"),
                     new OptionArgument.Option("udp", "udp protocol") });
 
-    private static final IntegerArgument USER_ID_ARG = new IntegerArgument("uid", "user id");
-    private static final IntegerArgument GROUP_ID_ARG = new IntegerArgument("gid", "group id");
+    private static final IntegerArgument USER_ID_ARG = new IntegerArgument(
+            "uid", "user id");
+    private static final IntegerArgument GROUP_ID_ARG = new IntegerArgument(
+            "gid", "group id");
 
-    private static final Parameter PARAMETER_PROTOCOL = new Parameter(PROTOCOL_ARG, Parameter.OPTIONAL);
+    private static final Parameter PARAMETER_PROTOCOL = new Parameter(
+            PROTOCOL_ARG, Parameter.OPTIONAL);
 
-    private static final Parameter PARAMETER_USER_ID = new Parameter(USER_ID_ARG, Parameter.MANDATORY);
-    private static final Parameter PARAMETER_GROUP_ID = new Parameter(GROUP_ID_ARG, Parameter.MANDATORY);
+    private static final Parameter PARAMETER_USER_ID = new Parameter(
+            USER_ID_ARG, Parameter.MANDATORY);
+    private static final Parameter PARAMETER_GROUP_ID = new Parameter(
+            GROUP_ID_ARG, Parameter.MANDATORY);
 
     static Help.Info HELP_INFO = new Help.Info("nfsmount",
 
     new Syntax("Mount a read only NFS filesystem", new Parameter[] {
-            new Parameter(MOUNTPOINT_ARG, Parameter.MANDATORY), new Parameter(HOST_ARG, Parameter.MANDATORY),
-            new Parameter(REMOTE_DIRECTORY_ARG, Parameter.MANDATORY), PARAMETER_PROTOCOL }),
+            new Parameter(MOUNTPOINT_ARG, Parameter.MANDATORY),
+            new Parameter(HOST_ARG, Parameter.MANDATORY),
 
-    new Syntax("Mount a  NFS filesystem", new Parameter[] { new Parameter(MOUNTPOINT_ARG, Parameter.MANDATORY),
-            new Parameter(HOST_ARG, Parameter.MANDATORY), new Parameter(REMOTE_DIRECTORY_ARG, Parameter.MANDATORY),
-            PARAMETER_USER_ID, PARAMETER_GROUP_ID, PARAMETER_PROTOCOL }));
+            PARAMETER_PROTOCOL }),
+
+    new Syntax("Mount a  NFS filesystem", new Parameter[] {
+            new Parameter(MOUNTPOINT_ARG, Parameter.MANDATORY),
+            new Parameter(HOST_ARG, Parameter.MANDATORY), PARAMETER_USER_ID,
+            PARAMETER_GROUP_ID, PARAMETER_PROTOCOL }));
 
     public static void main(String[] args) throws Exception {
         new NFSMountCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
+    public void execute(CommandLine commandLine, InputStream in,
+            PrintStream out, PrintStream err) throws Exception {
         ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
 
         final String mount_point = MOUNTPOINT_ARG.getValue(cmdLine);
         final InetAddress host = HOST_ARG.getAddress(cmdLine);
-        final String remoteDirectory = REMOTE_DIRECTORY_ARG.getValue(cmdLine);
+        final String remoteDirectory = HOST_ARG.getRemoteDirectory(cmdLine);
 
         // select the protocol (udp or tcp) the default value it is udp.
         final Protocol protocol;
         if (PARAMETER_PROTOCOL.isSet(cmdLine)) {
 
-            String protocolOption = PROTOCOL_ARG.getValue(cmdLine).toLowerCase().intern();
+            String protocolOption = PROTOCOL_ARG.getValue(cmdLine)
+                    .toLowerCase().intern();
 
             if (protocolOption == "tcp") {
                 protocol = Protocol.TCP;
@@ -105,7 +116,8 @@ public class NFSMountCommand extends AbstractCommand {
         int uid = -1;
         int gid = -1;
         boolean readOnly;
-        if (PARAMETER_USER_ID.isSet(cmdLine) && PARAMETER_GROUP_ID.isSet(cmdLine)) {
+        if (PARAMETER_USER_ID.isSet(cmdLine)
+                && PARAMETER_GROUP_ID.isSet(cmdLine)) {
 
             uid = USER_ID_ARG.getInteger(cmdLine);
             gid = GROUP_ID_ARG.getInteger(cmdLine);
@@ -126,8 +138,10 @@ public class NFSMountCommand extends AbstractCommand {
         dev.setDriver(new NFS2Driver());
         final DeviceManager dm = DeviceUtils.getDeviceManager();
         dm.register(dev);
-        final FileSystemService fss = InitialNaming.lookup(FileSystemService.NAME);
-        FileSystemType type = fss.getFileSystemTypeForNameSystemTypes(NFS2FileSystemType.NAME);
+        final FileSystemService fss = InitialNaming
+                .lookup(FileSystemService.NAME);
+        FileSystemType type = fss
+                .getFileSystemTypeForNameSystemTypes(NFS2FileSystemType.NAME);
         final FileSystem fs = type.create(dev, readOnly);
         fss.registerFileSystem(fs);
         fss.mount(mount_point, fs, null);
