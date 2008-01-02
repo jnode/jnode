@@ -10,15 +10,13 @@
 
   <requires>
 	<import plugin="org.jnode.fs"/>
-	<import plugin="org.acplt.oncrpc"/>
+	<import plugin="org.jnode.net.nfs"/>
   </requires>
 
   <runtime>
     <library name="jnode-fs.jar">
       <export name="org.jnode.fs.nfs.*"/>
       <export name="org.jnode.fs.nfs.nfs2.*"/>
-      <export name="org.jnode.fs.nfs.nfs2.rpc.mount.*"/>
-      <export name="org.jnode.fs.nfs.nfs2.rpc.nfs.*"/>
     </library>
   </runtime>
 

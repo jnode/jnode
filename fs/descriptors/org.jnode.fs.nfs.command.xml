@@ -11,6 +11,7 @@
   <requires>
     <import plugin="org.jnode.shell"/>
     <import plugin="org.jnode.fs.nfs"/>
+    <import plugin="org.jnode.net.nfs"/>
   </requires>
 
   <runtime>

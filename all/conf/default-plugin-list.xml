@@ -138,6 +138,7 @@ The default list of (non-system) plugins to be included in the init-jar.
     <plugin id="org.jnode.net.ipv4"/>
     <plugin id="org.jnode.net.ipv4.config"/>
     <plugin id="org.jnode.net.ipv4.core"/>
+    <plugin id="org.jnode.net.nfs"/>
 
     <plugin id="com.jcraft.jsch"/>
 	<plugin id="crypto-security"/>
@@ -145,6 +146,7 @@ The default list of (non-system) plugins to be included in the init-jar.
     <plugin id="org.jnode.protocol"/>
     <plugin id="org.jnode.protocol.ftp"/>
     <plugin id="org.jnode.protocol.tftp"/>
+    <plugin id="org.jnode.protocol.nfs"/>
     
     <plugin id="org.acplt.oncrpc"/>
 
