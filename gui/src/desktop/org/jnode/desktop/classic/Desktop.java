@@ -302,24 +302,12 @@ public class Desktop implements Runnable {
         desktopPane.repaint();
     }
 
-    static BufferedImage loadImage()
-    {
+    static BufferedImage loadImage() {
         try {
-            InputStream  in = new URL("plugin:org.jnode.desktop!/background.png").openStream();
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            byte[] buf = new byte[2048];
-            int len = 0;
-            while((len = in.read(buf)) > 0)
-                out.write(buf, 0, len);
-            ByteArrayInputStream bin = new ByteArrayInputStream(out.toByteArray());
-            BufferedImage img = ImageIO.read(bin);
-            BufferedImage ret = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
-            img.copyData(ret.getRaster());
-            return img;
+            return ImageIO.read(new URL("plugin:org.jnode.desktop!/background.png").openStream());
         } catch (Throwable ex) {
             log.error("Error loading desktop background.", ex);
         }
-
         return null;
     }
 }

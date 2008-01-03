@@ -1371,4 +1371,12 @@ public class Thread implements Runnable
         }
         ROOT_GROUP = g;
     }
+
+    /**
+     * The argument supplied to the current call to
+     * java.util.concurrent.locks.LockSupport.park.
+     * Set by (private) java.util.concurrent.locks.LockSupport.setBlocker
+     * Accessed using java.util.concurrent.locks.LockSupport.getBlocker
+     */
+    volatile Object parkBlocker;    
 }
