@@ -44,6 +44,10 @@ import java.awt.Point;
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
 import java.util.Arrays;
+import sun.awt.image.IntegerComponentRaster;
+import sun.awt.image.SunWritableRaster;
+import sun.java2d.StateTrackableDelegate;
+import sun.java2d.StateTrackable;
 
 /**
  * A color model operates with colors in several formats:
@@ -790,5 +794,36 @@ public abstract class ColorModel implements Transparency
       
       return pixel;
     }
+      //jnode openjdk
+      static {
+          SunWritableRaster.setDataStealer(new SunWritableRaster.DataStealer(){
+              public byte[] getData(DataBufferByte dbb, int bank) {
+                  return dbb.getData(bank);
+              }
+
+              public short[] getData(DataBufferUShort dbus, int bank) {
+                  return dbus.getData(bank);
+              }
+
+              public int[] getData(DataBufferInt dbi, int bank) {
+                  return dbi.getData(bank);
+              }
+
+              public StateTrackableDelegate getTrackable(DataBuffer db) {
+                  return StateTrackableDelegate.createInstance(StateTrackable.State.STABLE);
+              }
+          });
+      }
   }
+
+    //jnode openjdk
+    private static boolean loaded = false;
+
+    static void loadLibraries() {
+        if (!loaded) {
+            java.security.AccessController.doPrivileged(
+                    new sun.security.action.LoadLibraryAction("awt"));
+            loaded = true;
+        }
+    }
 }

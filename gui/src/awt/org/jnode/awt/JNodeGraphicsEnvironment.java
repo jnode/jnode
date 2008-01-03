@@ -28,6 +28,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.security.AccessController;
 import java.util.Collection;
@@ -38,12 +39,15 @@ import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
 import org.jnode.awt.font.FontManager;
+import org.jnode.awt.font.DefaultTextPipe;
 import org.jnode.awt.image.JNodeBufferedImageGraphics;
 import org.jnode.awt.image.JNodeBufferedImageGraphics2D;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceUtils;
 import org.jnode.driver.video.FrameBufferAPI;
 import org.jnode.naming.InitialNaming;
+import sun.java2d.SurfaceData;
+import sun.java2d.SunGraphics2D;
 
 /**
  * JNode implementation of GraphicsEnvironment.
@@ -65,7 +69,16 @@ public class JNodeGraphicsEnvironment extends GraphicsEnvironment {
 	public Graphics2D createGraphics(BufferedImage image) {
 		return SystemProperties.getProperty("gnu.javax.swing.noGraphics2D") == null ?
         new JNodeBufferedImageGraphics2D(image) : new JNodeBufferedImageGraphics(image);
-	}
+
+        /*
+        ..future transition to SunGraphics2D based buffered image graphics
+        SurfaceData sd = SurfaceData.getPrimarySurfaceData(image);
+        SunGraphics2D g = new SunGraphics2D(sd, Color.WHITE, Color.BLACK, null);
+        g.drawLine(0,0,0,0);
+        g.textpipe = new DefaultTextPipe();
+        return g;
+        */
+    }
 
 	/**
 	 * @see java.awt.GraphicsEnvironment#getAllFonts()

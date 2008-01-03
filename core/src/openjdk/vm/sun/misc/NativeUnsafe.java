@@ -5,6 +5,9 @@ package sun.misc;
 
 import java.lang.reflect.Field;
 import java.security.ProtectionDomain;
+import java.util.Map;
+import java.util.Hashtable;
+import java.util.HashMap;
 import org.vmmagic.unboxed.ObjectReference;
 import org.vmmagic.unboxed.Address;
 
@@ -359,12 +362,59 @@ class NativeUnsafe {
         throw new UnsupportedOperationException();
     }
 
+    static final Map<Object, ThreadParker> parking = new HashMap<Object, ThreadParker>();
+    private static class ThreadParker {
+        private synchronized void park(long time){
+            try {
+                wait(time);
+            }catch (InterruptedException x){
+                //ignore
+            }
+        }
+
+        private synchronized void unpark() {
+            notifyAll();
+        }
+    }
+    /**
+     * @see Unsafe#unpark(Object)
+     */
     public static void unpark(Unsafe instance, Object thread) {
-        throw new UnsupportedOperationException();
+        synchronized (parking){
+            ThreadParker p =parking.get(thread);
+            if(p != null){
+                p.unpark();
+            } else {
+                parking.put(thread, new ThreadParker());
+            }
+        }
     }
 
+    /**
+     * @see Unsafe#park(boolean, long)
+     */
     public static void park(Unsafe instance, boolean isAbsolute, long time) {
-        throw new UnsupportedOperationException();
+        //todo add proper support for nanotime parking
+        synchronized (parking){
+            Thread thread = Thread.currentThread();
+            ThreadParker p =parking.get(thread);
+            if(p == null){
+                if(isAbsolute){
+                    time = time - System.currentTimeMillis();
+                    if(time < 0) time = 1;
+                } else if(time > 0) {
+                    time = time / 10000000;
+                    if(time == 0)
+                        time = 1;
+                } else if (time < 0){
+                    time = 1;
+                }
+                p = new ThreadParker();
+                parking.put(thread, p);
+                p.park(time);                
+            }
+            parking.remove(thread);
+        }
     }
 
     public static int getLoadAverage(Unsafe instance, double[] loadavg, int nelems) {

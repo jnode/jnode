@@ -788,16 +788,21 @@ public final class SunGraphics2D
             return this.fontMetrics;
         }
 	/* NB the constructor and the setter disallow "font" being null */
-	return this.fontMetrics =
-	   FontDesignMetrics.getMetrics(font, getFontRenderContext());
+	//-- return this.fontMetrics =
+    //-- FontDesignMetrics.getMetrics(font, getFontRenderContext());
+        //jnode
+        return java.awt.Toolkit.getDefaultToolkit().getFontMetrics(font);
     }
 
     public FontMetrics getFontMetrics(Font font) {
         if ((this.fontMetrics != null) && (font == this.font)) {
             return this.fontMetrics;
         }
-	FontMetrics fm =
-	  FontDesignMetrics.getMetrics(font, getFontRenderContext());
+
+    //FontMetrics fm =
+	  //FontDesignMetrics.getMetrics(font, getFontRenderContext());
+        //jnode
+        FontMetrics fm = java.awt.Toolkit.getDefaultToolkit().getFontMetrics(font);
 
         if (this.font == font) {
             this.fontMetrics = fm;

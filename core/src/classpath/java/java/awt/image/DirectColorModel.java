@@ -43,6 +43,7 @@ import gnu.java.awt.Buffers;
 import java.awt.Point;
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
+import sun.awt.image.IntegerComponentRaster;
 
 /**
  * @author Rolf W. Rasmussen (rolfwr@ii.uib.no)
@@ -359,7 +360,7 @@ public class DirectColorModel extends PackedColorModel
    * @throws IllegalArgumentException if <code>w</code> or <code>h</code>
    *         is less than or equal to zero
    */
-  public final WritableRaster createCompatibleWritableRaster(int w, int h)
+  public WritableRaster createCompatibleWritableRaster(int w, int h)
   {
     // Sun also makes this check here.
     if(w <= 0 || h <= 0)
@@ -369,6 +370,8 @@ public class DirectColorModel extends PackedColorModel
 		SampleModel sm = createCompatibleSampleModel(w, h);
 		Point origin = new Point(0, 0);
 		return Raster.createWritableRaster(sm, origin);
+      //enable this when playing with SunGraphics2D for BufferedImages
+        //return new IntegerComponentRaster(sm, origin);
 	}
 
   public int getDataElement(int[] components, int offset)
