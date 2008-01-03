@@ -23,17 +23,26 @@ public class NativeStubGenerator {
     TODO: generate imports, improve the structure
     */
     public static void main(String[] argv) throws Exception{
+        if(argv.length < 1){
+            System.err.println("Mandatory class name argument is missing.");
+            return;
+        }        
         ClassLoaderRepository clr = new ClassLoaderRepository(NativeStubGenerator.class.getClassLoader());
         File f = null;
         if(argv.length > 1){
             f = new File(argv[1]);
             if(!(f.exists() && f.isDirectory())){
-                System.out.println("Invalid output directory: " + argv[1]);
+                System.err.println("Invalid output directory: " + argv[1]);
                 return;
             }
         }
-
-        JavaClass jc = clr.loadClass(argv[0]);
+        JavaClass jc;
+        try {
+            jc = clr.loadClass(argv[0]);
+        }catch (ClassNotFoundException e){
+            System.err.println("Class not found: " + argv[0]);
+            return;
+        }
         String pk = jc.getPackageName();
         String cn = jc.getClassName();
         int p = cn.lastIndexOf('.');
