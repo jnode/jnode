@@ -668,7 +668,7 @@ public final class VmSystem {
             // Unsafe.debug("invalid array types:");
             // Unsafe.debug(src_class.getName());
             // Unsafe.debug(dst_class.getName());
-            throw new ArrayStoreException("Invalid array types");
+            throw new ArrayStoreException("Incompatible array types: " + src_class.getName() + ", " + dst_class.getName());
         }
 
         if (srcPos < 0) {
