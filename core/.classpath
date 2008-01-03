@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src/openjdk/vm"/>
+	<classpathentry excluding="**/*-template.java" kind="src" path="src/openjdk/sun"/>
 	<classpathentry kind="src" path="src/openjdk/org"/>
-	<classpathentry kind="src" path="src/openjdk/com"/>
+	<classpathentry excluding="**/*-template.java" kind="src" path="src/openjdk/com"/>
 	<classpathentry kind="src" path="src/icedtea"/>
 	<classpathentry kind="src" path="src/classpath/gnu"/>
 	<classpathentry kind="src" path="src/openjdk/java"/>
 	<classpathentry kind="src" path="src/openjdk/javax"/>
-	<classpathentry excluding="**/*-template.java" kind="src" path="src/openjdk/sun"/>
 	<classpathentry kind="src" path="src/classpath/tools"/>
 	<classpathentry kind="src" path="src/classpath/java"/>
 	<classpathentry kind="src" path="src/classpath/javax"/>
