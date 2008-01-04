@@ -1,22 +1,22 @@
 package org.jnode.apps.jpartition.swingview;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+
+import org.jnode.apps.jpartition.ErrorReporter;
 import org.jnode.apps.jpartition.ViewFactory;
-import org.jnode.apps.jpartition.controller.MainController;
 
 public class SwingViewFactory implements ViewFactory {
-	public Object createDeviceView(MainController controller, 
-			Object fileDeviceView, Object cmdProcessorView) throws Exception
+	public Object createDeviceView(
+			Object cmdProcessorView) throws Exception
 	{
-		return new MainView(controller, (JFrame)fileDeviceView, (JComponent)cmdProcessorView);
-	}
-	
-	public Object createFileDeviceView(MainController controller) throws Exception
-	{
-		return new FileDeviceView(controller);
+		return new MainView((JComponent)cmdProcessorView);
 	}
 
-	public Object createCommandProcessorView(MainController mainController) {
-		return new CommandProcessorView(mainController);
+	public Object createCommandProcessorView() {
+		return new CommandProcessorView();
+	}
+
+	public ErrorReporter createErrorReporter() {
+		return new SwingErrorReporter();
 	}
 }
