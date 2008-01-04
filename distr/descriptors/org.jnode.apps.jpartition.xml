@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.apps.jpartition"
+       name="JPartition"
+       version="@VERSION@"
+       license-name="lgpl"
+       provider-name="JNode.org">
+
+    <requires>
+        <import plugin="org.jnode.apps.vmware.disk"/>
+    </requires>
+
+  <runtime>
+        <library name="jnode-distr.jar">
+            <export name="org.jnode.apps.jpartition.*"/>
+        </library>
+  </runtime>
+
+  <extension point="org.jnode.shell.aliases">
+    <alias name="jpartition" class="org.jnode.apps.jpartition.JPartition"/>
+  </extension>
+</plugin>

@@ -2,27 +2,27 @@ package org.jnode.apps.jpartition.commands.framework;
 
 import org.apache.log4j.Logger;
 
-abstract public class BaseCommand implements Command 
+abstract public class BaseCommand implements Command
 {
 	private static final Logger log = Logger.getLogger(BaseCommand.class);
-		
+
 	private CommandStatus status = CommandStatus.NOT_RUNNING;
-	protected String name; 
-	
+	final private String name;
+
 	protected BaseCommand(String name)
 	{
 		this.name = name;
 	}
-	
+
 	final public void execute(CommandProcessor processor) throws CommandException
 	{
 		try
 		{
 			status = CommandStatus.RUNNING;
 			processor.commandStarted(this);
-			
+
 			doExecute();
-			status = CommandStatus.SUCCESS;		
+			status = CommandStatus.SUCCESS;
 		}
 		catch(CommandException e)
 		{
@@ -37,14 +37,14 @@ abstract public class BaseCommand implements Command
 			throw new CommandException("command failed", t);
 		}
 	}
-	
-	public CommandStatus getStatus() 
+
+	final public CommandStatus getStatus()
 	{
 		return status;
 	}
-	
+
 	abstract protected void doExecute() throws CommandException;
-	
+
 	@Override
 	public String toString() {
 		return status + " - " + name;

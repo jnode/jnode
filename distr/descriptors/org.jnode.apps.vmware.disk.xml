@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.apps.vmware.disk"
+       name="VMWareDisk"
+       version="@VERSION@"
+       license-name="lgpl"
+       provider-name="JNode.org">
+
+  <runtime>
+    <library name="jnode-distr.jar">
+        <export name="org.jnode.apps.vmware.disk.*"/>
+    </library>
+  </runtime>
+</plugin>

@@ -7,11 +7,14 @@
     <javac destdir="${my-classes.dir}"
 	       debug="on"
 	       optimize="on"
-           fork="on"
-           memoryMaximumSize="512m"
+
+           fork="off"
+           memoryInitialSize="515m"
+           memoryMaximumSize="1024m"
+
            compiler="modern"
 	       includeJavaRuntime="false"
-           target="${java.target}" 
+           target="${java.target}"
            source="${java.source}"
            encoding="${java.encoding}"
            excludes="**/*-template.java,**/package-info.java">
@@ -24,14 +27,14 @@
   <macrodef name="jnode.javadoc">
     <attribute name="destdir"/>
     <element name="parameters" implicit="true"/>
-    
+
     <sequential>
       <mkdir dir="@{destdir}"/>
-      <javadoc 
+      <javadoc
       	destdir="@{destdir}"
-		author="true" 
-		version="true" 
-		use="true" 
+		author="true"
+		version="true"
+		use="true"
 		windowtitle="JNode"
 		maxmemory="256M">
 
@@ -52,7 +55,7 @@
       <filterset refid="descriptors-filter"/>
     </copy>
   </presetdef>
-  
+
   <!-- Perform a default clean -->
   <presetdef name="jnode.clean">
     <delete dir="${my-build.dir}" quiet="true"/>

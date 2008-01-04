@@ -4,82 +4,99 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 import org.apache.log4j.Logger;
+import org.jnode.apps.jpartition.ErrorReporter;
+import org.jnode.apps.jpartition.swingview.SwingErrorReporter;
 
-public class CommandProcessor {
+public class CommandProcessor implements ErrorReporter
+{
 	private static final Logger log = Logger.getLogger(CommandProcessor.class);
-		
+
+	private final ErrorReporter errorReporter;
+
 	private Stack<Command> commands = new Stack<Command>();
 	private List<CommandProcessorListener> listeners = new ArrayList<CommandProcessorListener>();
-	
+
 	private boolean running = false;
-	
+
+	public CommandProcessor(ErrorReporter errorReporter)
+	{
+		this.errorReporter = errorReporter;
+	}
+
 	public synchronized void process()
 	{
-		if(!running)
+		try
 		{
-			running = true;
-			
-			while(!commands.isEmpty())
+			if(!running)
 			{
-				Command command = null;
-				try
+				running = true;
+
+				while(!commands.isEmpty())
 				{
-					command = peekCommand();
-					
-					command.execute(this);
-				}
-				catch(CommandException e)
-				{
-					log.error("error in command processing", e);
-					break;
-				}
-				catch(Throwable t)
-				{
-					log.error("unexpected error in command processing", t);
-					break;
-				}
-				finally
-				{
-					if(command != null)
+					Command command = null;
+					try
 					{
-						for(CommandProcessorListener l : listeners)
+						command = peekCommand();
+
+						command.execute(this);
+					}
+					catch(CommandException e)
+					{
+						log.error("error in command processing", e);
+						break;
+					}
+					catch(Throwable t)
+					{
+						log.error("unexpected error in command processing", t);
+						break;
+					}
+					finally
+					{
+						if(command != null)
 						{
-							l.commandFinished(this, command);
-						}
-						
-						try {
-							removeCommand();
-						} 
-						catch(Throwable t)
-						{
-							log.error("error in removeCommand", t);
+							for(CommandProcessorListener l : listeners)
+							{
+								l.commandFinished(this, command);
+							}
+
+							try {
+								removeCommand();
+							}
+							catch(Throwable t)
+							{
+								log.error("error in removeCommand", t);
+							}
 						}
 					}
 				}
+
+				running = false;
 			}
-		
-			running = false; 
+		}
+		catch(Throwable t)
+		{
+			errorReporter.reportError(log, this, t);
 		}
 	}
-	
+
 	public void addCommand(Command command)
 	{
 		if(command.getStatus() != CommandStatus.NOT_RUNNING)
 		{
 			throw new IllegalArgumentException("command must be in status NOT_RUNNING");
 		}
-		
+
 		commands.push(command);
-		
+
 		for(CommandProcessorListener l : listeners)
 		{
 			l.commandAdded(this, command);
-		}			
+		}
 	}
-	
+
 	protected Command peekCommand() throws Exception
 	{
-		Command command = commands.peek(); 
+		Command command = commands.peek();
 		if(command.getStatus() != CommandStatus.NOT_RUNNING)
 		{
 			throw new Exception("command already started : "+command);
@@ -90,7 +107,7 @@ public class CommandProcessor {
 	protected void removeCommand()
 	{
 		Command command = commands.pop();
-		
+
 		for(CommandProcessorListener l : listeners)
 		{
 			l.commandRemoved(this, command);
@@ -102,16 +119,24 @@ public class CommandProcessor {
 		for(CommandProcessorListener l : listeners)
 		{
 			l.commandStarted(this, command);
-		}				
+		}
 	}
-	
+
 	public void addListener(CommandProcessorListener listener)
 	{
 		listeners.add(listener);
 	}
-	
+
 	public void removeListener(CommandProcessorListener listener)
 	{
 		listeners.remove(listener);
+	}
+
+	public void reportError(Logger log, Object source, Throwable t) {
+		errorReporter.reportError(log, source, t);
+	}
+
+	public void reportError(Logger log, Object source, String message) {
+		errorReporter.reportError(log, source, message);
 	}
 }
