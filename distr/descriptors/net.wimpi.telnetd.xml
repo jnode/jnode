@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="net.wimpi.telnetd"
+       name="telnetd"
+       version="2"
+       license-name="bsd"
+	   provider-name="wimpi.net"
+	   provider-url="http://telnetd.sourceforge.net/">
+
+  <runtime>
+    <library name="telnetd.jar">
+      <export name="*"/>
+    </library>
+
+    <library name="jnode-distr.jar">
+      <export name="org.jnode.apps.telnetd.*"/>
+    </library>
+  </runtime>
+
+  <requires>
+  	<import plugin="org.apache.jakarta.commons.logging"/>
+  	<import plugin="org.apache.jakarta.log4j"/>
+  	<import plugin="org.jnode.shell"/>
+  </requires>
+
+  <extension point="org.jnode.security.permissions">
+  	<permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/>
+
+	<permission class="java.lang.RuntimePermission" name="exitVM"/>
+  </extension>
+
+  <extension point="org.jnode.shell.aliases">
+    <alias name="telnetd" class="org.jnode.apps.telnetd.TelnetServerCommand"/>
+  </extension>
+</plugin>

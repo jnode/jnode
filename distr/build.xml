@@ -18,7 +18,8 @@
   	<pathelement location="${jnode-fs.jar}"/>
   	
     <pathelement location="${junit4.jar}"/>
-  	
+  	<pathelement location="${telnetd.jar}"/>
+
     <path refid="cp"/>
   </path>
 
@@ -36,6 +37,13 @@
 	  <src path="${my-src.dir}/install"/>
       <classpath refid="my-cp"/>
     </jnode.compile>
+
+	<!-- copy properties files -->
+    <copy todir="${my-classes.dir}/org/jnode/apps/telnetd">
+	  <fileset dir="${my-src.dir}/apps/org/jnode/apps/telnetd">
+	    <include name="**/*.properties" />
+	  </fileset>
+    </copy>
   </target>
 
 <!-- Assemble the jarfile -->

@@ -35,4 +35,7 @@
 
   <plugin id="org.jnode.apps.vmware.disk"/>
   <plugin id="org.jnode.apps.jpartition"/>
+
+  <plugin id="org.apache.jakarta.commons.logging"/>
+  <plugin id="net.wimpi.telnetd"/>
 </plugin-list>
