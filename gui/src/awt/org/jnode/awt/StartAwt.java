@@ -40,7 +40,7 @@ public class StartAwt implements Runnable {
 	 */
 	public void run() {
         if(JNodeToolkit.isGuiActive()){
-            ((JNodeToolkit)JNodeToolkit.getDefaultToolkit()).joingGUI();
+            ((JNodeToolkit)JNodeToolkit.getDefaultToolkit()).joinGUI();
             JNodeToolkit.waitUntilStopped();
         } else {
             JNodeToolkit.startGui();
