@@ -42,6 +42,7 @@ import java.util.StringTokenizer;
 import javax.naming.NameNotFoundException;
 
 import org.apache.log4j.Logger;
+import org.jnode.driver.console.Console;
 import org.jnode.driver.console.InputHistory;
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.driver.console.ConsoleManager;
@@ -174,6 +175,27 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         	cons.setCompleter(this);
 
             console.addConsoleListener(this);
+            aliasMgr = ((AliasManager) InitialNaming.lookup(AliasManager.NAME))
+                    .createAliasManager();
+            System.setProperty(PROMPT_PROPERTY_NAME, DEFAULT_PROMPT);
+        } catch (NameNotFoundException ex) {
+            throw new ShellException("Cannot find required resource", ex);
+        }
+        catch (Exception ex) {
+        	ex.printStackTrace();
+        }
+    }
+
+    protected CommandShell(TextConsole console, InputStream in, PrintStream out, PrintStream err) throws ShellException {
+    	try {
+            this.console = console;
+            this.out = out;
+            this.err = err;
+            this.in = in;
+        	SystemInputStream.getInstance().initialize(this.in);
+        	//cons.setCompleter(this);
+
+            //console.addConsoleListener(this);
             aliasMgr = ((AliasManager) InitialNaming.lookup(AliasManager.NAME))
                     .createAliasManager();
             System.setProperty(PROMPT_PROPERTY_NAME, DEFAULT_PROMPT);

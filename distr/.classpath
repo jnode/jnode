@@ -6,10 +6,12 @@
 	<classpathentry kind="src" path="/JNode-Core"/>
 	<classpathentry kind="src" path="src/apps"/>
 	<classpathentry kind="src" path="/JNode-GUI"/>
+	<classpathentry kind="lib" path="lib/telnetd.jar"/>
 	<classpathentry kind="src" path="/JNode-Shell"/>
 	<classpathentry kind="src" path="/JNode-TextUI"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JNode-FS"/>
 	<classpathentry kind="lib" path="/JNode-Shell/lib/bsh-2.0b5.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="lib/commons-logging.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

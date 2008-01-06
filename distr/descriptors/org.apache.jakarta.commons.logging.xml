@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.apache.jakarta.commons.logging"
+       name="commons-logging"
+       version="1.1.1"
+       license-name="apache2.0"
+	   provider-name="apache commons"
+	   provider-url="http://commons.apache.org/logging/">
+
+  <runtime>
+    <library name="commons-logging.jar">
+      <export name="*"/>
+    </library>
+  </runtime>
+</plugin>
