@@ -773,7 +773,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
     /**
 	 * Join the GUI mode
 	 */
-	public final void joingGUI() {
+	public final void joinGUI() {
         try {
 
             this.graphics = api.open(config.getConfig());
