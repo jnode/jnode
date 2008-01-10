@@ -23,6 +23,8 @@ package org.jnode.fs.ext2;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -163,11 +165,19 @@ public class Ext2FileSystem extends AbstractFileSystem {
             log.info(getDevice().getId() + " mounting fs r/w");
             superblock.setState(Ext2Constants.EXT2_ERROR_FS);
         }
-
-        //log.info( "Ext2fs filesystem constructed sucessfully");
-        log.debug("	superblock:	#blocks:		" + superblock.getBlocksCount()
-                + "\n" + "				#blocks/group:	" + superblock.getBlocksPerGroup()
-                + "\n" + "				#block groups:	" + groupCount + "\n"
+        // Mount successfull, update some superblock informations.
+        superblock.setMntCount(superblock.getMntCount() + 1);
+        superblock.setMTime(Ext2Utils.encodeDate(new Date()));
+        superblock.setWTime(Ext2Utils.encodeDate(new Date()));
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy");
+        log.debug("	superblock:	" + "\n"
+        		+ "				#Mount:		" + superblock.getMntCount()  + "\n"
+        		+ "				#MaxMount:		" + superblock.getMaxMntCount()  + "\n"
+        		+ "				Last mount time:		" + sdf.format(Ext2Utils.decodeDate(superblock.getMTime()).getTime())  + "\n"
+        		+ "				Last write time:		" + sdf.format(Ext2Utils.decodeDate(superblock.getWTime()).getTime())  + "\n"
+        		+ "				#blocks:		" + superblock.getBlocksCount()  + "\n" 
+        		+ "				#blocks/group:	" + superblock.getBlocksPerGroup()  + "\n" 
+        		+ "				#block groups:	" + groupCount + "\n"
                 + "				block size:		" + superblock.getBlockSize() + "\n"
                 + "				#inodes:		" + superblock.getINodesCount() + "\n"
                 + "				#inodes/group:	" + superblock.getINodesPerGroup());
@@ -293,9 +303,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 
     public void close() throws IOException {
         //mark the filesystem clean
-
         superblock.setState(Ext2Constants.EXT2_VALID_FS);
-
         super.close();
     }
 

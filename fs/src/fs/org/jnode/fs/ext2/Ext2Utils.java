@@ -21,6 +21,10 @@
  
 package org.jnode.fs.ext2;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
+
 /**
  * @author epr
  * (every method copied from DosUtils)
@@ -97,6 +101,30 @@ public class Ext2Utils {
 		data[offset+1] = (byte)((value >> 8) & 0xFF);
 		data[offset+2] = (byte)((value >> 16) & 0xFF);
 		data[offset+3] = (byte)((value >> 24) & 0xFF);
+	}
+	/**
+	 * 
+	 * @param time
+	 * @return
+	 */
+	public static Calendar decodeDate(long time){
+		Calendar ref = Calendar.getInstance();
+		ref.setTimeZone(TimeZone.getTimeZone("GMT"));
+		ref.set(1970, 0, 1,0,0,0);
+		ref.add(Calendar.SECOND, (int) time);
+		return ref;
+	}
+	
+	/**
+	 * 
+	 * @param time
+	 * @return
+	 */
+	public static long encodeDate(Date date){
+		Calendar ref = Calendar.getInstance();
+		ref.setTimeZone(TimeZone.getTimeZone("GMT"));
+		ref.setTime(date);
+		return ref.getTimeInMillis()/1000;
 	}
 
 }
