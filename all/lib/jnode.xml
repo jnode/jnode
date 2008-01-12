@@ -7,11 +7,8 @@
     <javac destdir="${my-classes.dir}"
 	       debug="on"
 	       optimize="on"
-
-           fork="off"
-           memoryInitialSize="515m"
-           memoryMaximumSize="1024m"
-
+           fork="on"
+           memoryMaximumSize="768m"
            compiler="modern"
 	       includeJavaRuntime="false"
            target="${java.target}"
