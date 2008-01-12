@@ -174,6 +174,16 @@ public class Jdwp
     _ppThread.start ();
   }
 
+    //jnode
+    public void waitToFinish(){
+        if(_ppThread != null)
+            try{
+                _ppThread.join(0);
+            }catch (Exception e){
+                //
+            }
+    }
+
   /**
    * Shutdown the JDWP back-end
    *
