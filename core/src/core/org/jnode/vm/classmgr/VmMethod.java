@@ -131,12 +131,13 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
         return bytecode;
     }
 
+    //todo security review
     /**
      * Sets the bytecode information of this method.
      * 
      * @param bc
      */
-    final void setBytecode(VmByteCode bc) {
+    public final void setBytecode(VmByteCode bc) {
         this.bytecode = bc;
         bc.lock();
     }
@@ -203,6 +204,10 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
         return declaringClass.getName() + '#' + getName() + '!' + getSignature();
     }
 
+    //todo security review
+    public final void resetOptLevel(){
+        nativeCodeOptLevel = 0;
+    }
     /**
      * Compile this method with n optimization level 1 higher then the current
      * optimization level.
@@ -261,9 +266,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
      */
 
     /**
-     * Resolve the type of this method
-     * 
-     * @param cl
+     * Resolve the type of this method.
      */
     protected final void resolve() {
         resolveTypes();
