@@ -28,6 +28,7 @@ import java.lang.reflect.Method;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
@@ -147,6 +148,22 @@ public final class VmIsolate {
         }
         return true;
     }
+
+    public static Iterator<VmIsolatedStatics> staticsIterator(){
+        ArrayList<VmIsolatedStatics> l = new ArrayList<VmIsolatedStatics>();
+        VmIsolatedStatics ist = StaticData.rootIsolate.getIsolatedStaticsTable();
+        if(ist != null)
+            l.add(ist);
+
+        for(VmIsolate is : StaticData.isolates.toArray(new VmIsolate[StaticData.isolates.size()])){
+            ist = is.getIsolatedStaticsTable();
+            if(ist != null)
+                l.add(ist);
+        }
+        
+        return l.iterator();
+    }
+
     /**
      * Static data of the VMIsolate class.
      * 
