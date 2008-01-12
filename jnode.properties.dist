@@ -61,3 +61,9 @@ jnode.install-nt.dir=C:\jnode
 
 # Uncomment this if you want use custom compiler arguments
 #compilerarg=-Xlint:unchecked
+
+# -----------------------------------------------
+# Set up the host and port where the JNode debugger server is available.
+# This is needed by the hotswap ant target.
+jnode.debugger.host=
+jnode.debugger.port=6789
