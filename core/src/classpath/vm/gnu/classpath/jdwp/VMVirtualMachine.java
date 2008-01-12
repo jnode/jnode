@@ -49,6 +49,7 @@ import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.io.DataOutputStream;
 
 /**
  * A virtual machine according to JDWP.
@@ -325,4 +326,6 @@ public class VMVirtualMachine
    */
   public static native void clearEvents (byte kind)
     throws JdwpException;
+
+  public static native void redefineClass(Class old_class, byte[] classData);
 }
