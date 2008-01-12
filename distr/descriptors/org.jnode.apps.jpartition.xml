@@ -7,10 +7,6 @@
        license-name="lgpl"
        provider-name="JNode.org">
 
-    <requires>
-        <import plugin="org.jnode.apps.vmware.disk"/>
-    </requires>
-
   <runtime>
         <library name="jnode-distr.jar">
             <export name="org.jnode.apps.jpartition.*"/>
