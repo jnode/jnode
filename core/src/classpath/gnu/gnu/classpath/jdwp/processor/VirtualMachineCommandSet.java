@@ -56,6 +56,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Properties;
+import org.jnode.vm.classmgr.VmType;
 
 /**
  * A class representing the VirtualMachine Command Set.
@@ -291,8 +292,11 @@ public class VirtualMachineCommandSet
 
     // Don't implement this until we're sure how to remove all the debugging
     // effects from the VM.
-    throw new NotImplementedException(
-      "Command VirtualMachine.Dispose not implemented");
+
+      //jnode
+      //todo, for now this is only used for closing the current socket, which happens in the caller
+    //throw new NotImplementedException(
+      //"Command VirtualMachine.Dispose not implemented");
 
   }
 
@@ -410,7 +414,8 @@ public class VirtualMachineCommandSet
     os.writeBoolean(false); // canGetOwnedMonitorInfo
     os.writeBoolean(false); // canGetCurrentContendedMonitor
     os.writeBoolean(false); // canGetMonitorInfo
-    os.writeBoolean(false); // canRedefineClasses
+      //jnode 
+    os.writeBoolean(true); // canRedefineClasses
     os.writeBoolean(false); // canAddMethod
     os.writeBoolean(false); // canUnrestrictedlyRedefineClasses
     os.writeBoolean(false); // canPopFrames
@@ -427,9 +432,24 @@ public class VirtualMachineCommandSet
   private void executeRedefineClasses(ByteBuffer bb, DataOutputStream os)
     throws JdwpException
   {
+      //todo improve it:
+      //1. read in the classes and validate them
+      //2. perform only hotswapping if all is fine
+      int class_count = bb.getInt();
+      for(int i = 0; i < class_count; i++){
+          ReferenceTypeId refId = idMan.readReferenceTypeId(bb);
+          Class old_class = refId.getType();
+          int class_size = bb.getInt();
+          byte[] class_data = new byte[class_size];
+          bb.get(class_data);
+          System.out.println("Hotswapping " + old_class.getName());
+          VMVirtualMachine.redefineClass(old_class, class_data);
+      }
+     /* jnode
     // Optional command, don't implement
     throw new NotImplementedException(
       "Command VirtualMachine.RedefineClasses not implemented");
+      */
   }
 
   private void executeSetDefaultStratum(ByteBuffer bb, DataOutputStream os)
