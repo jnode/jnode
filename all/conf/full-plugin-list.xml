@@ -33,7 +33,6 @@
   <plugin id="org.jnode.shell.bjorne"/>
   <plugin id="org.jnode.shell.command.unix"/>  
 
-  <plugin id="org.jnode.apps.vmware.disk"/>
   <plugin id="org.jnode.apps.jpartition"/>
 
   <plugin id="org.apache.jakarta.commons.logging"/>
