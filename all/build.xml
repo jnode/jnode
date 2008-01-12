@@ -151,8 +151,13 @@
 
     	<!-- Initialize timestamp -->
         <tstamp/>
+        
+        <tstamp>
+            <format property="hotswap.class.tstamp" pattern="MM/dd/yyyy kk:mm:ss" />
+        </tstamp>
 
-    	<!-- Update default excludes -->
+
+        <!-- Update default excludes -->
     	<defaultexcludes add="**/_svn"/>
     	<defaultexcludes add="**/_svn/**"/>
     	
@@ -577,6 +582,38 @@ clean             Remove all intermediate build results.
             <fileset dir="${root.dir}/net/src/test" includes="**/*.java"/>
             <fileset dir="${root.dir}/shell/src/shell" includes="**/*.java"/>
         </header>
+    </target>
+
+    <target name="check-debugger-properties" depends="prepare">
+        <fail message="Please set jnode.debugger.host property in jnode.properties." unless="jnode.debugger.host"/>
+        <fail message="Please set jnode.debugger.port property in jnode.properties." unless="jnode.debugger.port"/>        
+    </target>
+
+    <target name="hotswap" depends="check-debugger-properties,assemble-projects">
+      <taskdef name="hotswap" classname="org.jnode.ant.taskdefs.Hotswap" classpathref="cp-jnode" />
+      <hotswap verbose="true" host="${jnode.debugger.host}" port="${jnode.debugger.port}">
+        <fileset dir="../core/build/classes/" includes="**/*.class">
+          <date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
+        </fileset>
+        <fileset dir="../distr/build/classes/" includes="**/*.class">
+          <date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
+        </fileset>
+        <fileset dir="../fs/build/classes/" includes="**/*.class">
+          <date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
+        </fileset>
+        <fileset dir="../gui/build/classes/" includes="**/*.class">
+          <date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
+        </fileset>
+        <fileset dir="../net/build/classes/" includes="**/*.class">
+          <date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
+        </fileset>
+        <fileset dir="../shell/build/classes/" includes="**/*.class">
+          <date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
+        </fileset>
+        <fileset dir="../textui/build/classes/" includes="**/*.class">
+          <date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
+        </fileset>
+      </hotswap>
     </target>
 
     <target name="oj-compare" depends="assemble">
