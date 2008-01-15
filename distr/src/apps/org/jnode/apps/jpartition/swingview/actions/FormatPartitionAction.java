@@ -3,17 +3,17 @@ package org.jnode.apps.jpartition.swingview.actions;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 
-import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+import org.jnode.apps.jpartition.ErrorReporter;
 import org.jnode.apps.jpartition.model.Device;
 import org.jnode.apps.jpartition.model.UserFacade;
+import org.jnode.apps.jpartition.swingview.PartitionView;
 
-public class FormatPartitionAction extends AbstractAction {
-
-	public FormatPartitionAction() {
-		super("format the partition");
+public class FormatPartitionAction extends AbstractAction<PartitionView> {
+	public FormatPartitionAction(ErrorReporter errorReporter, PartitionView view) {
+		super("format the partition", errorReporter, view);
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -37,9 +37,9 @@ public class FormatPartitionAction extends AbstractAction {
 					try {
 						UserFacade.getInstance().formatPartition(dev.getStart());
 					} catch (Exception e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						errorReporter.reportError(log, FormatPartitionAction.this, e1);
 					}
+					view.update();
 				}
 			}
 		});

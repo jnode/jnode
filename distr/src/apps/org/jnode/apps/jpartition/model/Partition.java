@@ -48,7 +48,19 @@ public class Partition implements Bounded {
 
 	final public String getFormat()
 	{
-		return isUsed() ? formatter.getFileSystemType().getName() : "";
+		String format = "";
+		if(isUsed())
+		{
+			if(formatter != null)
+			{
+				format = formatter.getFileSystemType().getName();
+			}
+			else
+			{
+				format = "unformatted";
+			}
+		}
+		return format;
 	}
 
 	final boolean contains(long offset) {

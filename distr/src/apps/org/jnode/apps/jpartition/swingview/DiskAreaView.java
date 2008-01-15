@@ -1,6 +1,7 @@
 package org.jnode.apps.jpartition.swingview;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -9,13 +10,28 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.border.Border;
 
-abstract public class DiskAreaView extends JComponent
+import org.jnode.apps.jpartition.ErrorReporter;
+import org.jnode.apps.jpartition.model.Bounded;
+
+import java.awt.Rectangle;
+
+abstract public class DiskAreaView<T extends Bounded> extends JComponent
 {
-	public DiskAreaView(Color borderColor)
+	final private int DEFAULT_PIXELS_PER_BYTE = 1;
+
+	final protected int borderWidth = 5;
+	final protected ErrorReporter errorReporter;
+
+	protected T bounded;
+	protected double pixelsPerByte = DEFAULT_PIXELS_PER_BYTE;
+
+	public DiskAreaView(ErrorReporter errorReporter)
 	{
+		this.errorReporter = errorReporter;
 		setLayout(null);
-		setBorder(BorderFactory.createLineBorder(borderColor, 2));
+		setOpaque(true);
 
 		addMouseListener(new MouseAdapter()
 		{
@@ -29,6 +45,43 @@ abstract public class DiskAreaView extends JComponent
 				showMenu(event);
 			}
 		});
+
+		update();
+	}
+
+	abstract protected Color getColor(T bounded);
+
+	protected void setInfos(String infos)
+	{
+		setToolTipText(infos);
+	}
+
+	public void update()
+	{
+		if(bounded == null)
+		{
+			pixelsPerByte = DEFAULT_PIXELS_PER_BYTE;
+		}
+		else
+		{
+			double size = (bounded.getEnd() - bounded.getStart() + 1);
+			pixelsPerByte = (double) getWidth() / size;
+		}
+
+		Color borderColor = getColor(bounded);
+		Border line = BorderFactory.createLineBorder(borderColor, borderWidth);
+		//Border space = BorderFactory.createEmptyBorder(5, 5, 5, 5);
+		//setBorder(BorderFactory.createCompoundBorder(space, line));
+		setBorder(line);
+	}
+
+	@Override
+	protected void paintComponent(Graphics g) {
+		super.paintComponent(g);
+
+		Rectangle r = g.getClipBounds();
+		g.setColor(getBackground());
+		g.fillRect((int) r.getX(), (int) r.getY(), (int) r.getWidth(), (int) r.getHeight());
 	}
 
 	protected void showMenu(MouseEvent event)

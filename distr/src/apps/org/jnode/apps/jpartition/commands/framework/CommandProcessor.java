@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 import org.jnode.apps.jpartition.ErrorReporter;
 import org.jnode.apps.jpartition.swingview.SwingErrorReporter;
 
-public class CommandProcessor implements ErrorReporter
+public class CommandProcessor
 {
 	private static final Logger log = Logger.getLogger(CommandProcessor.class);
 
@@ -130,13 +130,5 @@ public class CommandProcessor implements ErrorReporter
 	public void removeListener(CommandProcessorListener listener)
 	{
 		listeners.remove(listener);
-	}
-
-	public void reportError(Logger log, Object source, Throwable t) {
-		errorReporter.reportError(log, source, t);
-	}
-
-	public void reportError(Logger log, Object source, String message) {
-		errorReporter.reportError(log, source, message);
 	}
 }

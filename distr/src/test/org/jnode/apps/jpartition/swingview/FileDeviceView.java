@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.apache.log4j.Logger;
+import org.jnode.apps.jpartition.ErrorReporter;
 import org.jnode.apps.jpartition.utils.device.DeviceUtils;
 import org.jnode.driver.bus.ide.IDEDevice;
 
@@ -21,16 +22,19 @@ public class FileDeviceView extends JFrame
 {
 	private static final Logger log = Logger.getLogger(FileDeviceView.class);
 
+	private final ErrorReporter errorReporter;
+
 	private JList devicesList = new JList(new DefaultListModel());
 	private JPanel buttons = new JPanel();
 	private JButton addVMWareDiskButton = new JButton("add VMWare disk");
 	private JButton addFakeDiskButton = new JButton("add fake disk");
 	private JButton removeButton = new JButton("remove device");
 	private List<IDEDevice> fileDevices = new ArrayList<IDEDevice>();
-	private ErrorReporter errorReporter = new ErrorReporter();
 
-	public FileDeviceView() throws Exception
+	public FileDeviceView(ErrorReporter errorReporter) throws Exception
 	{
+		this.errorReporter = errorReporter;
+
 		setTitle("File devices");
 		setLayout(new BorderLayout());
 		add(new JScrollPane(devicesList), BorderLayout.CENTER);

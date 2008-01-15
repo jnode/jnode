@@ -50,18 +50,11 @@ public class UserFacade {
 		addFormatter(new FatFileSystemFormatter(FatType.FAT32));
 		addFormatter(new org.jnode.fs.jfat.FatFileSystemFormatter(ClusterSize._16Kb));
 		addFormatter(new Ext2FileSystemFormatter(BlockSize._4Kb));
+	}
 
-		//TODO remove that direct creation of ErrorReporter :
-		cmdProcessor = new CommandProcessor(new ErrorReporter(){
-			public void reportError(Logger log, Object source, Throwable t) {
-				// TODO Auto-generated method stub
-				log.error(source, t);
-			}
-
-			public void reportError(Logger log, Object source, String message) {
-				// TODO Auto-generated method stub
-				log.error(source+" : "+message);
-		}});
+	public void setErrorReporter(ErrorReporter errorReporter)
+	{
+		cmdProcessor = new CommandProcessor(errorReporter);
 	}
 
 	public void selectFormatter(String name)
@@ -151,6 +144,13 @@ public class UserFacade {
 
 		selectedDevice.formatPartition(offset, selectedFormatter.clone());
 		cmdProcessor.addCommand(new FormatPartitionCommand((IDEDevice) selectedDevice.getDevice(), 0)); //TODO set parameters
+	}
+
+	public void resizePartition(long offset, long size) throws Exception {
+		checkSelectedDevice();
+
+		//selectedDevice.resizePartition(offset, selectedFormatter.clone());
+		//cmdProcessor.addCommand(new FormatPartitionCommand((IDEDevice) selectedDevice.getDevice(), 0)); //TODO set parameters
 	}
 
 	public void applyChanges()
