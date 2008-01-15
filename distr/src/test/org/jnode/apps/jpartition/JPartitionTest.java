@@ -8,6 +8,7 @@ import org.jnode.apps.jpartition.model.TestOSFacade;
 import org.jnode.apps.jpartition.model.TestRemovePartitionFromDevice;
 import org.jnode.apps.jpartition.swingview.FileDeviceView;
 import org.jnode.apps.jpartition.utils.device.DeviceUtils;
+import org.jnode.emu.ShellEmu;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -47,12 +48,13 @@ public class JPartitionTest extends TestSuite {
 		}
 		System.out.println();
 */
+		final ErrorReporter errorReporter = JPartition.createViewFactory(args).createErrorReporter();
 		new Thread()
 		{
 			public void run()
 			{
 				try {
-					new FileDeviceView();
+					new FileDeviceView(errorReporter);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

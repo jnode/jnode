@@ -6,10 +6,10 @@ import org.jnode.apps.jpartition.ErrorReporter;
 import org.jnode.apps.jpartition.ViewFactory;
 
 public class SwingViewFactory implements ViewFactory {
-	public Object createDeviceView(
+	public Object createDeviceView(ErrorReporter errorReporter,
 			Object cmdProcessorView) throws Exception
 	{
-		return new MainView((JComponent)cmdProcessorView);
+		return new MainView(errorReporter, (JComponent)cmdProcessorView);
 	}
 
 	public Object createCommandProcessorView() {

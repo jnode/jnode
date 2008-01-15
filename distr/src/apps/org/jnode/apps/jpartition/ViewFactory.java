@@ -2,7 +2,7 @@ package org.jnode.apps.jpartition;
 
 
 public interface ViewFactory {
-	Object createDeviceView(Object cmdProcessorView)
+	Object createDeviceView(ErrorReporter errorReporter, Object cmdProcessorView)
 				throws Exception;
 
 	Object createCommandProcessorView();

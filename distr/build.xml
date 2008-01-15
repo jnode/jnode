@@ -35,6 +35,7 @@
 	  <src path="${my-src.dir}/apps"/>
 	  <src path="${my-src.dir}/emu"/>
 	  <src path="${my-src.dir}/install"/>
+  	  <src path="${my-src.dir}/test"/>
       <classpath refid="my-cp"/>
     </jnode.compile>
 

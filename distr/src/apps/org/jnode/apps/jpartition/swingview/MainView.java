@@ -8,8 +8,11 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import org.apache.log4j.Logger;
+import org.jnode.apps.jpartition.ErrorReporter;
 import org.jnode.apps.jpartition.model.Device;
 import org.jnode.apps.jpartition.model.UserFacade;
 import org.jnode.apps.jpartition.model.UserListener;
@@ -20,7 +23,7 @@ public class MainView extends JFrame {
 	final private DefaultComboBoxModel devices;
 	final private DeviceView deviceView;
 
-	public MainView(JComponent cmdProcessorView) throws Exception
+	public MainView(ErrorReporter errorReporter, JComponent cmdProcessorView) throws Exception
 	{
 		setTitle("JPartition");
 		setLayout(new BorderLayout());
@@ -28,7 +31,7 @@ public class MainView extends JFrame {
 
 		add(cmdProcessorView, BorderLayout.SOUTH);
 
-		deviceView = new DeviceView();
+		deviceView = new DeviceView(errorReporter);
 		add(deviceView, BorderLayout.CENTER);
 
 		devices = new DefaultComboBoxModel(UserFacade.getInstance().getDevices());
@@ -42,7 +45,11 @@ public class MainView extends JFrame {
 				deviceView.update();
 			}
 		});
-		add(cboDevices, BorderLayout.NORTH);
+
+		JPanel cboPanel = new JPanel(new BorderLayout());
+		cboPanel.add(cboDevices, BorderLayout.CENTER);
+		cboPanel.add(new JLabel("Device : "), BorderLayout.WEST);
+		add(cboPanel, BorderLayout.NORTH);
 
 		setSize(600, 300);
 		setVisible(true);
@@ -64,32 +71,4 @@ public class MainView extends JFrame {
 				deviceView.update();
 			}});
 	}
-
-//	public void deviceStarted(Object device) {
-//    	log.debug("deviceStarted");
-//		devices.addElement(device);
-//	}
-//
-//	public void deviceStop(Object device) {
-//		log.debug("deviceStop");
-//		devices.removeElement(device);
-//	}
-//
-//	public void deviceSelected(Object device) {
-//		log.debug("deviceSelected");
-//		deviceView.clearDevice();
-//		//controller.userSelectDevice(device);
-//	}
-//
-//	public void partitionAdded(Object device) {
-//		log.debug("partitionAdded");
-//		deviceView.clearDevice();
-//		//controller.userSelectDevice(device);
-//	}
-//
-//	public void partitionRemoved(Object device) {
-//		log.debug("partitionRemoved");
-//		deviceView.clearDevice();
-//		//controller.userSelectDevice(device);
-//	}
 }

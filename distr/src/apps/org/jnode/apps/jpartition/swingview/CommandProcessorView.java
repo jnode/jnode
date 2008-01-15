@@ -36,7 +36,9 @@ public class CommandProcessorView extends JPanel
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.add(btnPanel, BorderLayout.EAST);
 		panel.add(new JScrollPane(commandsUI), BorderLayout.CENTER);
-		add(panel);
+
+		setLayout(new BorderLayout());
+		add(panel, BorderLayout.CENTER);
 
 		btnApply.addActionListener(new ActionListener()
 		{

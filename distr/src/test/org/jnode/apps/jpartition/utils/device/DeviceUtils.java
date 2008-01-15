@@ -1,7 +1,6 @@
 package org.jnode.apps.jpartition.utils.device;
 
 import java.io.File;
-import java.io.IOException;
 
 import javax.naming.NameAlreadyBoundException;
 import javax.naming.NameNotFoundException;
@@ -10,20 +9,16 @@ import javax.naming.NamingException;
 import org.apache.log4j.Logger;
 import org.jnode.apps.jpartition.ErrorReporter;
 import org.jnode.apps.jpartition.swingview.FileDeviceView;
-import org.jnode.apps.jpartition.utils.BasicNameSpace;
 import org.jnode.apps.vmware.disk.VMWareDisk;
 import org.jnode.apps.vmware.disk.tools.DiskFactory;
-import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceAlreadyRegisteredException;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceNotFoundException;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.bus.ide.IDEDevice;
+import org.jnode.emu.ShellEmu;
 import org.jnode.naming.InitialNaming;
-import org.jnode.naming.NameSpace;
-import org.jnode.partitions.command.PartitionHelper;
-import org.jnode.partitions.ibm.IBMPartitionTypes;
 import org.jnode.test.fs.driver.stubs.StubDeviceManager;
 import org.jnode.util.OsUtils;
 
@@ -35,13 +30,18 @@ public class DeviceUtils {
 	final static public void initJNodeCore()  {
 		if(!OsUtils.isJNode() && !coreInitialized)
 		{
-	        NameSpace namespace = new BasicNameSpace();
-	        InitialNaming.setNameSpace(namespace);
+
 	        try {
-				namespace.bind(DeviceManager.NAME, StubDeviceManager.INSTANCE);
+				ShellEmu.main(new String[0]);
+		        //NameSpace namespace = new BasicNameSpace();
+		        //InitialNaming.setNameSpace(namespace);
+
+	        	//InitialNaming.bind(DeviceManager.NAME, StubDeviceManager.INSTANCE);
 			} catch (NameAlreadyBoundException e) {
 				throw new RuntimeException(e);
 			} catch (NamingException e) {
+				throw new RuntimeException(e);
+			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
 			coreInitialized = true;

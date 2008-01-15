@@ -7,15 +7,17 @@ import java.awt.event.ComponentListener;
 import javax.swing.Action;
 import javax.swing.JLabel;
 
+import org.jnode.apps.jpartition.ErrorReporter;
 import org.jnode.apps.jpartition.model.Device;
 import org.jnode.apps.jpartition.model.Partition;
 import org.jnode.apps.jpartition.model.UserFacade;
+import org.jnode.util.BinaryPrefix;
 
-public class DeviceView extends DiskAreaView
+public class DeviceView extends DiskAreaView<Device>
 {
-	public DeviceView()
+	public DeviceView(ErrorReporter errorReporter)
 	{
-		super(Color.GREEN);
+		super(errorReporter);
 		setLayout(null);
 		update();
 
@@ -40,20 +42,21 @@ public class DeviceView extends DiskAreaView
 
 	public void update() {
 		removeAll();
-		Device device = UserFacade.getInstance().getSelectedDevice();
-		if(device == null)
+		this.bounded = UserFacade.getInstance().getSelectedDevice();
+		super.update();
+
+		if(bounded == null)
 		{
 			add(new JLabel("no partition"));
 		}
 		else
 		{
-			final int space = 10;
+			//final int space = 10;
+			final int space = 1;
 			double x = 0;
-			double pixelsPerByte = (double) getWidth() / (double) device.getSize();
-			for(Partition partition : device.getPartitions())
+			for(Partition partition : bounded.getPartitions())
 			{
-				PartitionView p = new PartitionView(this, partition);
-				//JLabel p = new JLabel("test");
+				PartitionView p = new PartitionView(errorReporter, this, partition);
 
 				double size = pixelsPerByte * partition.getSize();
 				p.setBounds((int) x+space, 0+space, (int) size-2*space, getHeight()-2*space);
@@ -64,13 +67,24 @@ public class DeviceView extends DiskAreaView
 			}
 			repaint();
 		}
+
+		if(bounded == null)
+		{
+			setInfos(null);
+		}
+		else
+		{
+			setInfos(bounded.getName() + " " + BinaryPrefix.apply(bounded.getSize()));
+		}
 	}
 
 	@Override
 	protected Action[] getActions() {
-		//return new Action[]{
-		//		new AddPartitionAction()
-		//		};
 		return null;
+	}
+
+	@Override
+	protected Color getColor(Device bounded) {
+		return Color.GREEN;
 	}
 }
