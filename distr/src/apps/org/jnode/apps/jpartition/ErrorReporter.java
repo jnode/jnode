@@ -13,7 +13,7 @@ public class ErrorReporter {
 		reportError(log, source, (Object) message);
 	}
 
-	protected void displayError(Object source, Object message)
+	protected void displayError(Object source, String message)
 	{
 		// by default display nothing
 	}
