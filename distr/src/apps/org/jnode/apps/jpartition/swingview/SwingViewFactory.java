@@ -7,7 +7,7 @@ import org.jnode.apps.jpartition.ViewFactory;
 
 public class SwingViewFactory implements ViewFactory {
 	public Object createDeviceView(ErrorReporter errorReporter,
-			Object cmdProcessorView) throws Exception
+			Object cmdProcessorView, boolean install) throws Exception
 	{
 		return new MainView(errorReporter, (JComponent)cmdProcessorView);
 	}

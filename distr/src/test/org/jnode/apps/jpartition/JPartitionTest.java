@@ -8,7 +8,6 @@ import org.jnode.apps.jpartition.model.TestOSFacade;
 import org.jnode.apps.jpartition.model.TestRemovePartitionFromDevice;
 import org.jnode.apps.jpartition.swingview.FileDeviceView;
 import org.jnode.apps.jpartition.utils.device.DeviceUtils;
-import org.jnode.emu.ShellEmu;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -24,31 +23,31 @@ public class JPartitionTest extends TestSuite {
 	}
 
 	public static void main(String[] args) throws Throwable {
-/*
-		UserFacade.getInstance().selectDevice("dev1");
-		System.out.print("devices:");
-		for(String device : UserFacade.getInstance().getDevices())
-		{
-			System.out.print(device);
-			System.out.print(", ");
-		}
-		System.out.println();
+//		UserFacade.getInstance().selectDevice("dev1");
+//		System.out.print("devices:");
+//		for(String device : UserFacade.getInstance().getDevices())
+//		{
+//			System.out.print(device);
+//			System.out.print(", ");
+//		}
+//		System.out.println();
+//
+//		UserFacade.getInstance().createPartition(0, 5000);
+//		UserFacade.getInstance().createPartition(5000, 2000);
+//		UserFacade.getInstance().createPartition(7000, 3000);
+//
+//		System.out.print("partitions:\n");
+//		for(Partition partition : UserFacade.getInstance().getPartitions())
+//		{
+//			System.out.print("\tstart="+partition.getStart());
+//			System.out.print(" end="+partition.getEnd());
+//			System.out.print(" size="+partition.getSize());
+//			System.out.println(" used="+partition.isUsed());
+//		}
+//		System.out.println();
 
-		UserFacade.getInstance().createPartition(0, 5000);
-		UserFacade.getInstance().createPartition(5000, 2000);
-		UserFacade.getInstance().createPartition(7000, 3000);
-
-		System.out.print("partitions:\n");
-		for(Partition partition : UserFacade.getInstance().getPartitions())
-		{
-			System.out.print("\tstart="+partition.getStart());
-			System.out.print(" end="+partition.getEnd());
-			System.out.print(" size="+partition.getSize());
-			System.out.println(" used="+partition.isUsed());
-		}
-		System.out.println();
-*/
-		final ErrorReporter errorReporter = JPartition.createViewFactory(args).createErrorReporter();
+		final ViewFactory vf = JPartition.createViewFactory(JPartition.CONSOLEUI, System.in, System.out, System.err);		
+		final ErrorReporter errorReporter = vf.createErrorReporter();
 		new Thread()
 		{
 			public void run()
@@ -60,6 +59,8 @@ public class JPartitionTest extends TestSuite {
 				}
 			}
 		}.start();
+		
+		DeviceUtils.createFakeDevice(new ErrorReporter());
 		JPartition.main(args);
 	}
 
