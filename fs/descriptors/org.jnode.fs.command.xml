@@ -24,6 +24,7 @@
     <alias name="cd"  class="org.jnode.fs.command.CdCommand"/>
     <alias name="cp" class="org.jnode.fs.command.CpCommand"/>
     <alias name="del" class="org.jnode.fs.command.DeleteCommand"/>
+    <alias name="df" class="org.jnode.fs.command.DFCommand"/>
     <alias name="dir" class="org.jnode.fs.command.DirCommand"/>
     <alias name="ls" class="org.jnode.fs.command.DirCommand"/>
     <alias name="eject" class="org.jnode.fs.command.EjectCommand"/>
