@@ -32,9 +32,9 @@
     <property name="jnode-fonts.jar" value="${build.dir}/descriptors/jnode-fonts.jar"/>
   	<property name="jnode-images.jar" value="${build.dir}/descriptors/jnode-images.jar"/>
 
-	  <property name="jnode-mmtk-genrc.jar" value="${root.dir}/core/build/classes-plan/org.jnode.vm.memmgr.mmtk.genrc"/>
-	  <property name="jnode-mmtk-ms.jar" value="${root.dir}/core/build/classes-plan/org.jnode.vm.memmgr.mmtk.ms"/>
-	  <property name="jnode-mmtk-nogc.jar" value="${root.dir}/core/build/classes-plan/org.jnode.vm.memmgr.mmtk.nogc"/>
+    <property name="jnode-mmtk-genrc.jar" value="${root.dir}/core/build/classes-plan/org.jnode.vm.memmgr.mmtk.genrc"/>
+	<property name="jnode-mmtk-ms.jar" value="${root.dir}/core/build/classes-plan/org.jnode.vm.memmgr.mmtk.ms"/>
+	<property name="jnode-mmtk-nogc.jar" value="${root.dir}/core/build/classes-plan/org.jnode.vm.memmgr.mmtk.nogc"/>
 
     <property name="mx4j.jar" value="${root.dir}/core/lib/mx4j.jar"/>
     <property name="mx4j-remote.jar" value="${root.dir}/core/lib/mx4j-remote.jar"/>
@@ -46,7 +46,7 @@
     <property name="jsch.jar" value="${root.dir}/net/lib/jsch-0.1.24.jar"/>
     <property name="junit.jar" value="${root.dir}/core/lib/junit.jar"/>
     <property name="mmtk.jar" value="${root.dir}/core/lib/mmtk/mmtk.jar"/>
-	  <property name="mauve.jar" value="${root.dir}/core/lib/mauve.jar"/>
+	<property name="mauve.jar" value="${root.dir}/core/lib/mauve.jar"/>
     <property name="edtftpj.jar" value="${root.dir}/fs/lib/edtftpj-1.5.2.jar"/>
     <property name="jcifs.jar" value="${root.dir}/fs/lib/jcifs-1.2.6.jar"/>
     <property name="ejc.jar" value="${root.dir}/core/lib/ejc-3.1.1.jar"/>
@@ -108,6 +108,12 @@
         <pathelement location="${js.jar}"/>
         <pathelement location="${jcfe.jar}"/>
         <pathelement location="${jfunc.jar}"/>
+        <pathelement location="${oncrpc.jar}"/>
+        <pathelement location="${edtftpj.jar}"/>
+        <pathelement location="${jcifs.jar}"/>
+        <pathelement location="${commons-net.jar}"/>
+        <pathelement location="${dnsjava.jar}"/>
+        <pathelement location="${mauve.jar}"/>
     </path>
 
     <path id="cp-jnode">
@@ -387,12 +393,14 @@ clean             Remove all intermediate build results.
                 <pathelement location="${root.dir}/core/src/classpath/javax"/>
                 <pathelement location="${root.dir}/core/src/classpath/ext"/>
                 <pathelement location="${root.dir}/core/src/classpath/vm"/>
+                <pathelement location="${root.dir}/core/src/icedtea"/>
                 <pathelement location="${root.dir}/core/src/openjdk/com"/>
                 <pathelement location="${root.dir}/core/src/openjdk/java"/>
                 <pathelement location="${root.dir}/core/src/openjdk/javax"/>
                 <pathelement location="${root.dir}/core/src/openjdk/org"/>
                 <pathelement location="${root.dir}/core/src/openjdk/sun"/>
                 <pathelement location="${root.dir}/core/src/openjdk/vm"/>
+                <pathelement location="${root.dir}/core/src/nanoxml"/>
                 <pathelement location="${root.dir}/core/src/core"/>
                 <pathelement location="${root.dir}/core/src/vmmagic"/>
                 <pathelement location="${root.dir}/core/src/driver"/>
@@ -428,6 +436,7 @@ clean             Remove all intermediate build results.
                 <pathelement location="${root.dir}/core/src/classpath/javax"/>
                 <pathelement location="${root.dir}/core/src/classpath/ext"/>
                 <pathelement location="${root.dir}/core/src/classpath/vm"/>
+                <pathelement location="${root.dir}/core/src/icedtea"/>
                 <pathelement location="${root.dir}/core/src/openjdk/com"/>
                 <pathelement location="${root.dir}/core/src/openjdk/java"/>
                 <pathelement location="${root.dir}/core/src/openjdk/javax"/>
@@ -437,6 +446,8 @@ clean             Remove all intermediate build results.
                 <pathelement location="${root.dir}/core/src/core"/>
                 <pathelement location="${root.dir}/core/src/driver"/>
                 <pathelement location="${root.dir}/core/src/mmtk-vm"/>
+                <pathelement location="${root.dir}/core/src/nanoxml"/>
+                <pathelement location="${root.dir}/core/src/test"/>
                 <pathelement location="${root.dir}/core/src/vmmagic"/>
                 <pathelement location="${root.dir}/distr/src/install"/>
                 <pathelement location="${root.dir}/fs/src/fs"/>
@@ -444,6 +455,9 @@ clean             Remove all intermediate build results.
                 <pathelement location="${root.dir}/fs/src/driver"/>
                 <pathelement location="${root.dir}/gui/src/awt"/>
                 <pathelement location="${root.dir}/gui/src/driver"/>
+                <pathelement location="${root.dir}/gui/src/desktop"/>
+                <pathelement location="${root.dir}/gui/src/font"/>
+                <pathelement location="${root.dir}/gui/src/thinlet"/>
                 <pathelement location="${root.dir}/net/src/net"/>
                 <pathelement location="${root.dir}/net/src/driver"/>
                 <pathelement location="${root.dir}/shell/src/shell"/>
