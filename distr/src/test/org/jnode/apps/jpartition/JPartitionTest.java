@@ -46,7 +46,7 @@ public class JPartitionTest extends TestSuite {
 //		}
 //		System.out.println();
 
-		final ViewFactory vf = JPartition.createViewFactory(JPartition.CONSOLEUI, System.in, System.out, System.err);		
+		final ViewFactory vf = JPartitionCommand.createViewFactory(JPartitionCommand.CONSOLEUI, System.in, System.out, System.err);
 		final ErrorReporter errorReporter = vf.createErrorReporter();
 		new Thread()
 		{
@@ -59,9 +59,9 @@ public class JPartitionTest extends TestSuite {
 				}
 			}
 		}.start();
-		
+
 		DeviceUtils.createFakeDevice(new ErrorReporter());
-		JPartition.main(args);
+		JPartitionCommand.main(args);
 	}
 
 //	public static TestSuite suite()
