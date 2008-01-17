@@ -23,5 +23,4 @@
     <permission class="java.net.SocketPermission" name="*" actions="resolve"/>
     <permission class="java.net.SocketPermission" name="*:53" actions="resolve,accept,connect,listen"/>
   </extension>
-
 </plugin>
