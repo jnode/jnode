@@ -34,7 +34,7 @@ public class MainView extends JFrame {
 		deviceView = new DeviceView(errorReporter);
 		add(deviceView, BorderLayout.CENTER);
 
-		devices = new DefaultComboBoxModel(UserFacade.getInstance().getDevices());
+		devices = new DefaultComboBoxModel(UserFacade.getInstance().getDeviceNames());
 		final JComboBox cboDevices = new JComboBox(devices);
 		cboDevices.addItemListener(new ItemListener()
 		{

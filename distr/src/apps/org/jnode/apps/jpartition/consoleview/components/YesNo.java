@@ -17,6 +17,7 @@ public class YesNo extends Component {
 	public boolean show(String question) throws IOException {
 		checkNonNull("question", question);
 		
+		println();
 		print(question);
 		
 		return readBoolean(false);

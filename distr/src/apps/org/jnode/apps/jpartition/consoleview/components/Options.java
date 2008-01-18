@@ -14,30 +14,34 @@ public class Options extends Component {
 		super(context);
 	}
 
-	public int show(String question, String[] options) throws IOException {
+	public <T> long show(String question, T[] options) throws IOException {
+		return show(question, Arrays.asList(options), null);
+	}
+
+	public <T> long show(String question, T[] options, Labelizer<T> labelizer) throws IOException {
 		return show(question, Arrays.asList(options));
 	}
 	
-	public int show(String question, Collection<?> options) throws IOException {
+	@SuppressWarnings("unchecked")
+	public <T> long show(String question, Collection<T> options) throws IOException {
+		return show(question, Arrays.asList(options), null);
+	}
+	
+	public <T> long show(String question, Collection<T> options, Labelizer<T> labelizer) throws IOException {
 		checkNonNull("question", question);
 		checkNonEmpty("options", options);
 		
+		println();
 		println(question);
 		int i = 1;
-		for(Object option : options)
+		for(T option : options)
 		{
-			println("  " + i + " - "+option);
+			String label = (labelizer == null) ? String.valueOf(option) : labelizer.getLabel(option);
+			println("  " + i + " - "+label);
 			i++;
 		}
-		print("Choice : ");
 		
-		int choice = readInt(-1);
-		while((choice < 1) || (choice > options.size())) 
-		{
-			reportError(log, null, "invalid choice");
-			choice = readInt(-1);
-		}
-		
-		return choice;
+		NumberField choice = new NumberField(context);
+		return choice.show("Choice : ", 1, options.size());
 	}
 }

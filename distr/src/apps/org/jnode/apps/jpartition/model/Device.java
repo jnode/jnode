@@ -79,13 +79,12 @@ public class Device implements Iterable<Partition>, Bounded {
 		return name.hashCode();
 	}
 
-	final void addPartition(long start, long size)
+	final Partition addPartition(long start, long size)
 	{
 		final long end = (start + size - 1);
 		checkBounds(this, "start", start);
 		checkBounds(this, "end", end);
 
-		Partition newPart = null;
 		int index = findPartition(start, false);
 		if(index < 0)
 		{
@@ -95,7 +94,7 @@ public class Device implements Iterable<Partition>, Bounded {
 		Partition oldPart = partitions.get(index);
 		checkBounds(oldPart, "end", end);
 
-		newPart = new Partition(start, size, true);
+		Partition newPart = new Partition(start, size, true);
 		if(oldPart.getSize() == size)
 		{
 			// replace the unused partition
@@ -133,6 +132,8 @@ public class Device implements Iterable<Partition>, Bounded {
 			// after the new partition
 			partitions.add(index + 2, new Partition(end + 1, endSize, false));
 		}
+		
+		return newPart;
 	}
 
 	final void removePartition(long offset)
