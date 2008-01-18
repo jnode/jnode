@@ -17,7 +17,11 @@ public class Component {
 	final protected void print(String s) {
 		context.getOut().print(s);
 	}
-	
+
+	final protected void println() {
+		context.getOut().println();
+	}
+
 	final protected void println(String s) {
 		context.getOut().println(s);
 	}
@@ -49,12 +53,12 @@ public class Component {
 		return value;
 	}
 
-	final protected int readInt(int defaultValue) throws IOException {
+	final protected long readInt(long defaultValue) throws IOException {
 		String line = context.getIn().readLine();
-		int value = defaultValue;
+		long value = defaultValue;
 		try
 		{
-			value = Integer.valueOf(line);
+			value = Long.valueOf(line);
 		}
 		catch(NumberFormatException e)
 		{

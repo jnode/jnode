@@ -2,15 +2,15 @@ package org.jnode.apps.jpartition.model;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Arrays;
 
 import javax.naming.NameNotFoundException;
 
-import org.apache.log4j.Logger;
 import org.jnode.apps.jpartition.ErrorReporter;
 import org.jnode.apps.jpartition.commands.CreatePartitionCommand;
 import org.jnode.apps.jpartition.commands.FormatPartitionCommand;
@@ -113,10 +113,19 @@ public class UserFacade {
 		return names;
 	}
 
-	public String[] getDevices() {
+	public String[] getDeviceNames() {
 		String[] names = devices.keySet().toArray(new String[devices.size()]);
 		Arrays.sort(names);
 		return names;
+	}
+
+	public List<Device> getDevices() {
+		List<Device> devs = new ArrayList<Device>(devices.values());
+		Collections.sort(devs, new Comparator<Device>(){
+			public int compare(Device dev1, Device dev2) {
+				return dev1.getName().compareTo(dev2.getName());
+			}});
+		return devs;
 	}
 
 	public List<Partition> getPartitions() throws Exception {
@@ -124,11 +133,13 @@ public class UserFacade {
 		return selectedDevice.getPartitions();
 	}
 
-	public void createPartition(long start, long size) throws Exception {
+	public Partition createPartition(long start, long size) throws Exception {
 		checkSelectedDevice();
 
-		selectedDevice.addPartition(start, size);
+		Partition newPart = selectedDevice.addPartition(start, size);
 		cmdProcessor.addCommand(new CreatePartitionCommand((IDEDevice) selectedDevice.getDevice(), 0)); //TODO set parameters
+		
+		return newPart;
 	}
 
 	public void removePartition(long offset) throws Exception {
@@ -157,6 +168,10 @@ public class UserFacade {
 	{
 		cmdProcessor.process();
 		refreshDevicesFromOS();
+	}
+
+	public boolean hasChanges() {
+		return cmdProcessor.hasChanges();
 	}
 
 	private void refreshDevicesFromOS()

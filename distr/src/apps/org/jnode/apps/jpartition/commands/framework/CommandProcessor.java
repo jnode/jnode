@@ -23,6 +23,10 @@ public class CommandProcessor
 		this.errorReporter = errorReporter;
 	}
 
+	public boolean hasChanges() {
+		return !commands.isEmpty();
+	}
+	
 	public synchronized void process()
 	{
 		try
@@ -31,43 +35,10 @@ public class CommandProcessor
 			{
 				running = true;
 
-				while(!commands.isEmpty())
+				boolean quit = false;
+				while(!commands.isEmpty() && !quit)
 				{
-					Command command = null;
-					try
-					{
-						command = peekCommand();
-
-						command.execute(this);
-					}
-					catch(CommandException e)
-					{
-						log.error("error in command processing", e);
-						break;
-					}
-					catch(Throwable t)
-					{
-						log.error("unexpected error in command processing", t);
-						break;
-					}
-					finally
-					{
-						if(command != null)
-						{
-							for(CommandProcessorListener l : listeners)
-							{
-								l.commandFinished(this, command);
-							}
-
-							try {
-								removeCommand();
-							}
-							catch(Throwable t)
-							{
-								log.error("error in removeCommand", t);
-							}
-						}
-					}
+					quit = processCommand();
 				}
 
 				running = false;
@@ -77,6 +48,48 @@ public class CommandProcessor
 		{
 			errorReporter.reportError(log, this, t);
 		}
+	}
+	
+	private boolean processCommand()
+	{
+		boolean quit = false;
+		Command command = null;
+		try
+		{
+			command = peekCommand();
+
+			command.execute(this);
+		}
+		catch(CommandException e)
+		{
+			log.error("error in command processing", e);
+			quit = true;
+		}
+		catch(Throwable t)
+		{
+			log.error("unexpected error in command processing", t);
+			quit = true;
+		}
+		finally
+		{
+			if(command != null)
+			{
+				for(CommandProcessorListener l : listeners)
+				{
+					l.commandFinished(this, command);
+				}
+
+				try {
+					removeCommand();
+				}
+				catch(Throwable t)
+				{
+					log.error("error in removeCommand", t);
+				}
+			}
+		}		
+		
+		return quit;
 	}
 
 	public void addCommand(Command command)
