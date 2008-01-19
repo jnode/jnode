@@ -89,7 +89,8 @@ public final class DatagramChannelImpl extends DatagramChannel
     throws IOException
   {
     super (provider);
-    socket = new NIODatagramSocket (new PlainDatagramSocketImpl(), this);
+      //jnode
+    socket = new NIODatagramSocket (PlainDatagramSocketImpl.createUDPImpl(), this);
     configureBlocking(true);
   }
 
