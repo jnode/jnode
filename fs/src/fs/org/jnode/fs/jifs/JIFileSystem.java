@@ -9,16 +9,16 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.jifs;
 
 import java.io.IOException;
@@ -34,11 +34,11 @@ import org.jnode.fs.jifs.directories.JIFSDrootDir;
 /**
  * @author Andreas H\u00e4nel
  */
-public class JIFileSystem implements FileSystem {
-	
+public class JIFileSystem implements FileSystem<JIFSDirectory> {
+
 	private JIFSDirectory rootDir = null;
 	private Device device;
-	
+
 	/**
 	 * Constructor for JIFileSystem in specified readOnly mode
 	 */
@@ -54,7 +54,7 @@ public class JIFileSystem implements FileSystem {
 		//	e.printStackTrace();
 		//}
 	}
-	
+
 	/**
 	 * Is the filesystem mounted in readonly mode ?
 	 */
@@ -62,23 +62,23 @@ public class JIFileSystem implements FileSystem {
 	{
 		return true; // always readOnly
 	}
-	
-	
+
+
 	public void close(){
 		return;
 	}
-    
+
     public boolean isClosed() {
         return false;
     }
-	
+
 	public Device getDevice(){
 		return device;
 	}
 
 	/**
 	 * Flush all changed structures to the device. Since JIFS is readonly, this method does nothing.
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	public void flush() throws IOException {
@@ -88,21 +88,21 @@ public class JIFileSystem implements FileSystem {
 	/**
 	 * Gets the root entry of this filesystem. This is usually a director, but
 	 * this is not required.
-	 * 
+	 *
 	 * @return rootDir
 	 */
-	public FSEntry getRootEntry() {
+	public JIFSDirectory getRootEntry() {
 		return rootDir;
 	}
 
 	/**
 	 * Gets the file for the given entry.
-	 *  
+	 *
 	 * @return null
 	 * @param entry
 	 */
 	public synchronized JIFSFile getFile(FSEntry entry) {
-		return null;		
+		return null;
 	}
 
 
@@ -117,7 +117,7 @@ public class JIFileSystem implements FileSystem {
 	protected FSEntry createRootEntry() throws IOException {
 		return null;
 	}
-	
+
 
 	public long getFreeSpace() {
 		// TODO implement me
@@ -125,13 +125,13 @@ public class JIFileSystem implements FileSystem {
 	}
 
 	public long getTotalSpace() {
-		// TODO implement me 
+		// TODO implement me
 		return 0;
 	}
 
 	public long getUsableSpace() {
-		// TODO implement me 
+		// TODO implement me
 		return 0;
 	}
-	
+
 }

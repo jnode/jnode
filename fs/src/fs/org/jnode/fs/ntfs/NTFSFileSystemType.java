@@ -26,6 +26,7 @@ import org.jnode.driver.block.FSBlockDeviceAPI;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
+import org.jnode.fs.BlockDeviceFileSystemType;
 import org.jnode.partitions.PartitionTableEntry;
 import org.jnode.partitions.ibm.IBMPartitionTableEntry;
 import org.jnode.partitions.ibm.IBMPartitionTypes;
@@ -34,14 +35,14 @@ import org.jnode.partitions.ibm.IBMPartitionTypes;
  * @author Chira
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class NTFSFileSystemType implements FileSystemType<NTFSFileSystem> {
+public class NTFSFileSystemType implements BlockDeviceFileSystemType<NTFSFileSystem> {
 
-    public static final String NAME = "NTFS";
+    public static final Class<NTFSFileSystemType> NAME = NTFSFileSystemType.class;
 
     public static final String TAG = "NTFS";
 
     public String getName() {
-        return NAME;
+        return "NTFS";
     }
 
     /**

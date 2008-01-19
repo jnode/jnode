@@ -9,16 +9,16 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.service.def;
 
 import java.io.IOException;
@@ -53,7 +53,7 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
 
     /** My logger */
     private static final Logger log = Logger.getLogger(FileSystemPlugin.class);
-    
+
     /** Manager of fs types */
     private final FileSystemTypeManager fsTypeManager;
 
@@ -65,16 +65,16 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
 
     /** The mounter */
     private FileSystemMounter mounter;
-    
+
     /** The device of the VFS filesystem */
     private final VirtualFSDevice vfsDev;
-    
+
     /** The virtual filesystem */
     private final VirtualFS vfs;
 
     /**
      * Create a new instance
-     *  
+     *
      */
     public FileSystemPlugin(PluginDescriptor descriptor) {
         super(descriptor);
@@ -90,13 +90,13 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
      * Gets all registered file system types. All instances of the returned
      * collection are instanceof FileSystemType.
      */
-    public Collection<FileSystemType> fileSystemTypes() {
+    public Collection<FileSystemType<?>> fileSystemTypes() {
         return fsTypeManager.fileSystemTypes();
     }
 
     /**
      * Register a mounted filesystem
-     * 
+     *
      * @param fs
      */
     public void registerFileSystem(FileSystem fs) {
@@ -105,14 +105,14 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
 
     /**
      * Unregister a mounted filesystem
-     * 
+     *
      * @param device
      */
     public FileSystem unregisterFileSystem(final Device device) {
-        return (FileSystem) AccessController
-                .doPrivileged(new PrivilegedAction() {
+        return AccessController
+                .doPrivileged(new PrivilegedAction<FileSystem>() {
 
-                    public Object run() {
+                    public FileSystem run() {
                         api.unregisterFileSystem(device);
                         return fsm.unregisterFileSystem(device);
                     }
@@ -121,7 +121,7 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
 
     /**
      * Gets the filesystem registered on the given device.
-     * 
+     *
      * @param device
      * @return null if no filesystem was found.
      */
@@ -140,7 +140,7 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
     /**
      * Mount the given filesystem at the fullPath, using the fsPath as root of
      * the to be mounted filesystem.
-     * 
+     *
      * @param fullPath
      * @param fs
      * @param fsPath Null or empty to use the root of the filesystem.
@@ -152,8 +152,8 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
         }
         api.mount(VMFile.getNormalizedPath(fullPath), fs, fsPath);
     }
-    
-    
+
+
     /**
      * Is the given directory a mount.
      * @param fullPath
@@ -162,7 +162,7 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
     public boolean isMount(String fullPath) {
         return api.isMount(VMFile.getNormalizedPath(fullPath));
     }
-    
+
     /**
      * Gets the filesystem API.
      */
@@ -209,11 +209,14 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
     /**
      * @see org.jnode.fs.service.FileSystemService#getFileSystemTypeForNameSystemTypes(java.lang.String)
      */
-    public FileSystemType getFileSystemTypeForNameSystemTypes(String name)
-            throws FileSystemException {
-        FileSystemType result = fsTypeManager.getSystemType(name);
-        if (result == null) { throw new FileSystemException(
-                "FileSystemType " + name + " doesn't exist"); }
+	public <T extends FileSystemType<?>> T getFileSystemTypeForNameSystemTypes(Class<T> name) throws FileSystemException
+	{
+        T result = fsTypeManager.getSystemType(name);
+        if (result == null)
+        {
+        	throw new FileSystemException("FileSystemType " + name +
+        			" doesn't exist");
+        }
         return result;
     }
 }

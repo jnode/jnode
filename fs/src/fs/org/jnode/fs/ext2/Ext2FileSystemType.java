@@ -29,6 +29,7 @@ import org.jnode.driver.block.FSBlockDeviceAPI;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
+import org.jnode.fs.BlockDeviceFileSystemType;
 import org.jnode.partitions.PartitionTableEntry;
 import org.jnode.partitions.ibm.IBMPartitionTableEntry;
 import org.jnode.partitions.ibm.IBMPartitionTypes;
@@ -36,9 +37,9 @@ import org.jnode.partitions.ibm.IBMPartitionTypes;
 /**
  * @author Andras Nagy
  */
-public class Ext2FileSystemType implements FileSystemType<Ext2FileSystem> {
+public class Ext2FileSystemType implements BlockDeviceFileSystemType<Ext2FileSystem> {
 
-	public static final String NAME = "EXT2";
+	public static final Class<Ext2FileSystemType> NAME = Ext2FileSystemType.class;
 
 	/**
 	 * @see org.jnode.fs.FileSystemType#create(Device, boolean)
@@ -53,7 +54,7 @@ public class Ext2FileSystemType implements FileSystemType<Ext2FileSystem> {
 	 * @see org.jnode.fs.FileSystemType#getName()
 	 */
 	public String getName() {
-		return NAME;
+		return "EXT2";
 	}
 
 	/**

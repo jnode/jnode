@@ -9,16 +9,16 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.ftpfs.command;
 
 import org.jnode.driver.DeviceManager;
@@ -27,6 +27,7 @@ import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemType;
 import org.jnode.fs.ftpfs.FTPFSDevice;
 import org.jnode.fs.ftpfs.FTPFSDriver;
+import org.jnode.fs.ftpfs.FTPFileSystem;
 import org.jnode.fs.ftpfs.FTPFileSystemType;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
@@ -72,8 +73,8 @@ public class FTPMountCommand extends AbstractCommand {
         final DeviceManager dm = DeviceUtils.getDeviceManager();
         dm.register(dev);
         final FileSystemService fss = InitialNaming.lookup(FileSystemService.NAME);
-        FileSystemType type = fss.getFileSystemTypeForNameSystemTypes(FTPFileSystemType.NAME);
-        final FileSystem fs = type.create(dev, true);
+        FTPFileSystemType type = fss.getFileSystemTypeForNameSystemTypes(FTPFileSystemType.NAME);
+        final FTPFileSystem fs = type.create(dev, true);
         fss.registerFileSystem(fs);
         fss.mount(mount_point, fs, null);
     }

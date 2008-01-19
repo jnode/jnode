@@ -35,7 +35,7 @@ import org.jnode.partitions.PartitionTableEntry;
 public class JIFileSystemType implements FileSystemType<JIFileSystem> {
 
 	/** Name of this filesystem type */
-	public static final String NAME = "JIFS";
+	public static final Class<JIFileSystemType> NAME = JIFileSystemType.class;
     public static final String VIRTUAL_DEVICE_NAME = "jifs";
 
     /**	Logger*/
@@ -45,23 +45,8 @@ public class JIFileSystemType implements FileSystemType<JIFileSystem> {
      * Gets the unique name of this file system type.
      */
     public String getName() {
-        return NAME;
+        return "JIFS";
     }
-
-	/**
-	 * Can this FileSystemType be used on the given first sector of a
-	 * BlockDevice? Since this FileSystemType is for a virtual filesystem, it does not support any of the given ones.
-	 *
-	 * @param pte
-	 *          The partition table entry, if any. If null, there is no
-	 *          partition table entry.
-	 * @param firstSector
-	 * 			First sector of a BlockDevice.
-	 * @return false
-	 */
-	public boolean supports(PartitionTableEntry pte, byte[] firstSector, FSBlockDeviceAPI devApi) {
-		return false;
-	}
 
 	/**
 	 * Create a filesystem for a given device.

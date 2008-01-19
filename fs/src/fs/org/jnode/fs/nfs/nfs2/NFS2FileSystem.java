@@ -9,13 +9,13 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
@@ -38,7 +38,7 @@ import org.jnode.net.nfs.nfs2.mount.MountResult;
 /**
  * @author Andrei Dore
  */
-public class NFS2FileSystem implements FileSystem {
+public class NFS2FileSystem implements FileSystem<NFS2RootEntry> {
 
     private NFS2Device device;
 
@@ -120,7 +120,7 @@ public class NFS2FileSystem implements FileSystem {
      * Close this filesystem. After a close, all invocations of method of this
      * filesystem or objects created by this filesystem will throw an
      * IOException.
-     * 
+     *
      * @throws java.io.IOException
      */
     public void close() throws IOException {
@@ -164,7 +164,7 @@ public class NFS2FileSystem implements FileSystem {
      * Gets the root entry of this filesystem. This is usually a directory, but
      * this is not required.
      */
-    public FSEntry getRootEntry() throws IOException {
+    public NFS2RootEntry getRootEntry() throws IOException {
         return root;
     }
 

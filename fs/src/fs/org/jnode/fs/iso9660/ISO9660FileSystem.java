@@ -9,16 +9,16 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.iso9660;
 
 import java.io.IOException;
@@ -35,7 +35,7 @@ import org.jnode.fs.spi.AbstractFileSystem;
  * @author Chira
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class ISO9660FileSystem extends AbstractFileSystem {
+public class ISO9660FileSystem extends AbstractFileSystem<ISO9660Entry> {
 
     private final ISO9660Volume volume;
     private ISO9660Entry rootEntry;
@@ -59,7 +59,7 @@ public class ISO9660FileSystem extends AbstractFileSystem {
     /**
      * @see org.jnode.fs.FileSystem#getRootEntry()
      */
-    public FSEntry getRootEntry() throws IOException {
+    public ISO9660Entry getRootEntry() throws IOException {
         if (rootEntry == null) {
             rootEntry = new ISO9660Entry(this, volume.getRootDirectoryEntry());
         }
@@ -85,7 +85,7 @@ public class ISO9660FileSystem extends AbstractFileSystem {
     }
 
     /**
-     * 
+     *
      */
 	protected FSFile createFile(FSEntry entry) throws IOException {
 		// TODO Auto-generated method stub
@@ -93,7 +93,7 @@ public class ISO9660FileSystem extends AbstractFileSystem {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	protected FSDirectory createDirectory(FSEntry entry) throws IOException {
 		// TODO Auto-generated method stub
@@ -101,9 +101,9 @@ public class ISO9660FileSystem extends AbstractFileSystem {
 	}
 
 	/**
-	 * 
+	 *
 	 */
-	protected FSEntry createRootEntry() throws IOException {
+	protected ISO9660Entry createRootEntry() throws IOException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -115,12 +115,12 @@ public class ISO9660FileSystem extends AbstractFileSystem {
 	}
 
 	public long getTotalSpace() {
-		// TODO implement me 
+		// TODO implement me
 		return 0;
 	}
 
 	public long getUsableSpace() {
-		// TODO implement me 
+		// TODO implement me
 		return 0;
 	}
 }

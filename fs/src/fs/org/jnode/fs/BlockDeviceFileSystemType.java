@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: FileSystemType.java 3668 2007-12-30 22:20:07Z fduminy $
  *
  * JNode.org
  * Copyright (C) 2003-2006 JNode.org
@@ -19,34 +19,25 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package org.jnode.fs.jarfs;
+package org.jnode.fs;
 
-import org.jnode.driver.Device;
 import org.jnode.driver.block.FSBlockDeviceAPI;
-import org.jnode.driver.block.JarFileDevice;
-import org.jnode.fs.FileSystem;
-import org.jnode.fs.FileSystemException;
-import org.jnode.fs.FileSystemType;
 import org.jnode.partitions.PartitionTableEntry;
 
 /**
+ * Specific kind of FileSystemType for block devices
  *
- * @author Fabien DUMINY (fduminy at users.sourceforge.net)
- *
+ * @author epr
  */
-public class JarFileSystemType implements FileSystemType<JarFileSystem> {
-
-    public static final Class<JarFileSystemType> NAME = JarFileSystemType.class;
-
-    public final String getName() {
-        return "jar";
-    }
-
-    /**
-     * @see org.jnode.fs.FileSystemType#create(Device, boolean)
-     */
-    public JarFileSystem create(Device device, boolean readOnly) throws FileSystemException {
-        // jar file systems are always readOnly
-        return new JarFileSystem((JarFileDevice) device);
-    }
+public interface BlockDeviceFileSystemType<T extends FileSystem<?>> extends FileSystemType<T> {
+	/**
+	 * Can this file system type be used on the given first sector of a
+	 * blockdevice?
+	 *
+	 * @param pte
+	 *           The partition table entry, if any. If null, there is no
+	 *           partition table entry.
+	 * @param firstSector
+	 */
+	public boolean supports(PartitionTableEntry pte, byte[] firstSector, FSBlockDeviceAPI devApi);
 }

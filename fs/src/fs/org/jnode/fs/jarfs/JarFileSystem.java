@@ -9,16 +9,16 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.jarfs;
 
 import java.util.Map;
@@ -32,11 +32,11 @@ import org.jnode.fs.FileSystemException;
 import org.jnode.fs.spi.AbstractFileSystem;
 
 /**
- * 
+ *
  * @author Fabien DUMINY (fduminy at users.sourceforge.net)
  *
  */
-public class JarFileSystem extends AbstractFileSystem {
+public class JarFileSystem extends AbstractFileSystem<JarFSEntry> {
 
     private JarFile jarFile;
     private JarFSCache cache;
@@ -48,7 +48,7 @@ public class JarFileSystem extends AbstractFileSystem {
     public JarFileSystem(JarFileDevice device)
             throws FileSystemException {
         super(device, true); // jar file systems are always readOnly
-        
+
         jarFile = device.getJarFile();
         cache = new JarFSCache();
         rootEntry = FSTreeBuilder.build(this, jarFile, cache);
@@ -58,29 +58,29 @@ public class JarFileSystem extends AbstractFileSystem {
     {
         return jarFile;
     }
-    
+
     /**
-     * 
+     *
      */
 	protected FSFile createFile(FSEntry entry) {
 		return new JarFSFile((JarFSEntry) entry);
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	protected FSDirectory createDirectory(FSEntry entry) {
         Map<String, JarFSEntry> entries = cache.getChildEntries((JarFSEntry) entry);
         return new JarFSDirectory((JarFSEntry) entry, entries);
 	}
-    
+
 	/**
-	 * 
+	 *
 	 */
-	protected FSEntry createRootEntry() {        
+	protected JarFSEntry createRootEntry() {
 		return rootEntry;
 	}
-	
+
 
 	public long getFreeSpace() {
 		// TODO implement me
@@ -88,12 +88,12 @@ public class JarFileSystem extends AbstractFileSystem {
 	}
 
 	public long getTotalSpace() {
-		// TODO implement me 
+		// TODO implement me
 		return 0;
 	}
 
 	public long getUsableSpace() {
-		// TODO implement me 
+		// TODO implement me
 		return 0;
-	}	
+	}
 }

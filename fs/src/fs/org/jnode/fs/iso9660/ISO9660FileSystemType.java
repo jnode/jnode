@@ -29,17 +29,18 @@ import org.jnode.driver.block.FSBlockDeviceAPI;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
+import org.jnode.fs.BlockDeviceFileSystemType;
 import org.jnode.partitions.PartitionTableEntry;
 
 /**
  * @author Chira
  */
-public class ISO9660FileSystemType implements FileSystemType<ISO9660FileSystem> {
+public class ISO9660FileSystemType implements BlockDeviceFileSystemType<ISO9660FileSystem> {
 
-    public static final String NAME = "ISO9660";
+    public static final Class<ISO9660FileSystemType> NAME = ISO9660FileSystemType.class;
 
     public final String getName() {
-        return NAME;
+        return "ISO9660";
     }
 
     /**

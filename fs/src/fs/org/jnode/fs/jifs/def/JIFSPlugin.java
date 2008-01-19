@@ -9,13 +9,13 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
@@ -33,6 +33,7 @@ import org.jnode.driver.virtual.VirtualDeviceFactory;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
+import org.jnode.fs.jifs.JIFileSystem;
 import org.jnode.fs.jifs.JIFileSystemType;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
@@ -70,11 +71,11 @@ public class JIFSPlugin extends Plugin {
         log.info("start jifs");
         try {
             FileSystemService fSS = InitialNaming.lookup(FileSystemService.NAME);
-            FileSystemType type = fSS.getFileSystemTypeForNameSystemTypes(JIFileSystemType.NAME);
+            JIFileSystemType type = fSS.getFileSystemTypeForNameSystemTypes(JIFileSystemType.NAME);
             try {
                 VirtualDevice dev = VirtualDeviceFactory.createDevice(JIFileSystemType.VIRTUAL_DEVICE_NAME);
                 log.info(dev.getId() + " registered");
-                final FileSystem fs = type.create(dev, true);
+                final JIFileSystem fs = type.create(dev, true);
                 fSS.registerFileSystem(fs);
 
                 final String mountPath = "jifs";
@@ -125,5 +126,5 @@ public class JIFSPlugin extends Plugin {
             log.error(ex);
         }
     }
-	
+
 }

@@ -9,16 +9,16 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.service.def;
 
 import java.io.IOException;
@@ -31,15 +31,15 @@ import org.jnode.fs.FileSystem;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final class VirtualFS implements FileSystem {
-    
+final class VirtualFS implements FileSystem<VirtualDirEntry> {
+
     final static Logger log = Logger.getLogger(VirtualFS.class);
     private final Device dev;
     private final VirtualDirEntry root;
-    
+
     /**
      * Initialize this instance.
-     * @throws IOException 
+     * @throws IOException
      */
     VirtualFS(Device dev) {
         this.dev = dev;
@@ -47,14 +47,14 @@ final class VirtualFS implements FileSystem {
             this.root = new VirtualDirEntry(this, "/", null);
         } catch (IOException ex) {
             throw new RuntimeException(ex);
-        }         
+        }
     }
 
     /**
      * @see org.jnode.fs.FileSystem#close()
      */
     public void close() throws IOException {
-        // TODO Auto-generated method stub        
+        // TODO Auto-generated method stub
     }
 
     /**
@@ -67,7 +67,7 @@ final class VirtualFS implements FileSystem {
     /**
      * @see org.jnode.fs.FileSystem#getRootEntry()
      */
-    public FSEntry getRootEntry() {
+    public VirtualDirEntry getRootEntry() {
         return root;
     }
 
@@ -84,15 +84,15 @@ final class VirtualFS implements FileSystem {
     public boolean isClosed() {
         return false;
     }
-    
+
     /**
      * The filesystem on the given device will be removed.
      * @param dev
      */
     final void unregisterFileSystem(Device dev) {
         root.unregisterFileSystem(dev);
-    }   
-    
+    }
+
 
 	public long getFreeSpace() {
 		// TODO implement me
@@ -100,12 +100,12 @@ final class VirtualFS implements FileSystem {
 	}
 
 	public long getTotalSpace() {
-		// TODO implement me 
+		// TODO implement me
 		return 0;
 	}
 
 	public long getUsableSpace() {
-		// TODO implement me 
+		// TODO implement me
 		return 0;
-	}    
+	}
 }

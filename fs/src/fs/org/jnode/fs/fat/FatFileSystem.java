@@ -35,7 +35,7 @@ import org.jnode.fs.spi.AbstractFileSystem;
 /**
  * @author epr
  */
-public class FatFileSystem extends AbstractFileSystem {
+public class FatFileSystem extends AbstractFileSystem<FatRootEntry> {
 
 	private BootSector bs;
 	private Fat fat;
@@ -123,7 +123,7 @@ public class FatFileSystem extends AbstractFileSystem {
 	 * Gets the root entry of this filesystem. This is usually a director, but
 	 * this is not required.
 	 */
-	public FSEntry getRootEntry() {
+	public FatRootEntry getRootEntry() {
 		return rootEntry;
 	}
 
@@ -192,7 +192,7 @@ public class FatFileSystem extends AbstractFileSystem {
 	/**
 	 *
 	 */
-	protected FSEntry createRootEntry() throws IOException {
+	protected FatRootEntry createRootEntry() throws IOException {
 		// TODO Auto-generated method stub
 		return null;
 	}
