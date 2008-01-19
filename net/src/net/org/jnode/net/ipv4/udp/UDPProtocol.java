@@ -38,6 +38,7 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.HashMap;
 import java.util.Random;
+import gnu.java.net.PlainDatagramSocketImpl;
 
 /**
  * @author epr
@@ -104,6 +105,7 @@ public class UDPProtocol implements IPv4Protocol, IPv4Constants
           public Object run() throws IOException
           {
             DatagramSocket.setDatagramSocketImplFactory(dsiFactory);
+            PlainDatagramSocketImpl.setUDPFactory(dsiFactory);
             return null;
           }
         });

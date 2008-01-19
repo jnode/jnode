@@ -42,7 +42,7 @@
     <property name="ant.jar" value="${root.dir}/core/lib/ant.jar"/>
     <property name="ant-launcher.jar" value="${root.dir}/core/lib/ant-launcher.jar"/>
     <property name="commons-net.jar" value="${root.dir}/core/lib/commons-net-1.1.0.jar"/>
-    <property name="dnsjava.jar" value="${root.dir}/net/lib/dnsjava-2.0.3.jar"/>
+    <property name="dnsjava.jar" value="${root.dir}/net/lib/dnsjava-1.6.6.jar"/>
     <property name="jsch.jar" value="${root.dir}/net/lib/jsch-0.1.24.jar"/>
     <property name="junit.jar" value="${root.dir}/core/lib/junit.jar"/>
     <property name="mmtk.jar" value="${root.dir}/core/lib/mmtk/mmtk.jar"/>
@@ -203,7 +203,7 @@
             <libalias name="mx4j-remote.jar" alias="${mx4j-remote.jar}"/>
 
             <libalias name="commons-net-1.1.0.jar" alias="${commons-net.jar}"/>
-            <libalias name="dnsjava-2.0.3.jar" alias="${dnsjava.jar}"/>
+            <libalias name="dnsjava-1.6.6.jar" alias="${dnsjava.jar}"/>
             <libalias name="jsch-0.1.24.jar" alias="${jsch.jar}"/>
             <libalias name="gnu-crypto.jar" alias="${gnu-crypto.jar}"/>
             <libalias name="javax-crypto.jar" alias="${javax-crypto.jar}"/>

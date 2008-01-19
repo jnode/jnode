@@ -63,7 +63,7 @@ import gnu.classpath.Configuration;
  * @author Aaron M. Renn (arenn@urbanophile.com)
  * @author Warren Levy (warrenl@cygnus.com)
  */
-public final class PlainDatagramSocketImpl extends DatagramSocketImpl
+public class PlainDatagramSocketImpl extends DatagramSocketImpl  //jnode
 {
    // @vm-specific removed System.loadLibrary
    
@@ -87,7 +87,18 @@ public final class PlainDatagramSocketImpl extends DatagramSocketImpl
    */
   private final Object SEND_LOCK = new Object();
 
-  /**
+    //jnode
+  private static PlainDatagramSocketImplFactory factory;
+
+  public static PlainDatagramSocketImpl createUDPImpl(){
+      return factory.createPlainDatagramSocketImpl();
+  }
+
+    public static void setUDPFactory(PlainDatagramSocketImplFactory factory) {
+        PlainDatagramSocketImpl.factory = factory;
+    }
+
+    /**
    * Default do nothing constructor
    */
   public PlainDatagramSocketImpl()
@@ -331,19 +342,19 @@ public final class PlainDatagramSocketImpl extends DatagramSocketImpl
     throw new IOException("Not Implemented Yet");
   }
 
-  public int peekData(DatagramPacket packet)
+  public int peekData(DatagramPacket packet) throws IOException
   {
     throw new InternalError
       ("PlainDatagramSocketImpl::peekData is not implemented");
   }
 
-  public void joinGroup(SocketAddress address, NetworkInterface netIf)
+  public void joinGroup(SocketAddress address, NetworkInterface netIf) throws IOException
   {
     throw new InternalError
       ("PlainDatagramSocketImpl::joinGroup is not implemented");
   }
 
-  public void leaveGroup(SocketAddress address, NetworkInterface netIf)
+  public void leaveGroup(SocketAddress address, NetworkInterface netIf)throws IOException
   {
     throw new InternalError
       ("PlainDatagramSocketImpl::leaveGroup is not implemented");

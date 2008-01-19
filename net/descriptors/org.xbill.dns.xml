@@ -11,7 +11,7 @@
 
 
   <runtime>
-    <library name="dnsjava-2.0.3.jar">
+    <library name="dnsjava-1.6.6.jar">
       <export name="*"/>
     </library>
   </runtime>

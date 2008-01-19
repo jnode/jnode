@@ -23,11 +23,13 @@ package org.jnode.net.ipv4.udp;
 
 import java.net.DatagramSocketImpl;
 import java.net.DatagramSocketImplFactory;
+import gnu.java.net.PlainDatagramSocketImpl;
+import gnu.java.net.PlainDatagramSocketImplFactory;
 
 /**
  * @author epr
  */
-public class UDPDatagramSocketImplFactory implements DatagramSocketImplFactory {
+public class UDPDatagramSocketImplFactory implements PlainDatagramSocketImplFactory {
 
 	private final UDPProtocol protocol;
 	
@@ -44,6 +46,13 @@ public class UDPDatagramSocketImplFactory implements DatagramSocketImplFactory {
 	 */
 	public DatagramSocketImpl createDatagramSocketImpl() {
 		return new UDPDatagramSocketImpl(protocol);
+	}
+
+    /**
+	 * @see java.net.DatagramSocketImplFactory#createDatagramSocketImpl()
+	 */
+	public PlainDatagramSocketImpl createPlainDatagramSocketImpl() {
+		return new PlainUDPDatagramSocketImpl(protocol);
 	}
 
 }
