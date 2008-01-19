@@ -16,6 +16,17 @@
     </library>
   </runtime>
 
+  <extension point="org.jnode.shell.aliases">
+    <alias name="dig" class="dig"/>
+    <!-- todo: add jnamed.conf 
+    <alias name="jnamed" class="jnamed"/>
+    -->
+    <alias name="lookup" class="lookup"/>
+    <!-- todo: console hangs on exit from update
+    <alias name="update" class="update"/>
+    -->
+  </extension>
+
   <extension point="org.jnode.security.permissions">
     <permission class="java.lang.RuntimePermission" name="selectorProvider"/>
     <permission class="java.util.PropertyPermission" name="dns.server" actions="read"/>
