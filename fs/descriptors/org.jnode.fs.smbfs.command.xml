@@ -21,7 +21,6 @@
   
   <extension point="org.jnode.shell.aliases">
     <alias name="smbmount" class="org.jnode.fs.smbfs.command.SMBMountCommand"/>
-    <alias name="smbdevice" class="org.jnode.fs.smbfs.command.MakeSMBDeviceCommand"/>      
   </extension>
   
   <extension point="org.jnode.security.permissions">

@@ -21,7 +21,6 @@
   
   <extension point="org.jnode.shell.aliases">
     <alias name="ftpmount" class="org.jnode.fs.ftpfs.command.FTPMountCommand"/>
-    <alias name="ftpdevice" class="org.jnode.fs.ftpfs.command.MakeFTPDeviceCommand"/>      
   </extension>
   
   <extension point="org.jnode.security.permissions">
