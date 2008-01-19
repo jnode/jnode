@@ -9,16 +9,16 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.spi;
 
 import java.io.IOException;
@@ -37,12 +37,12 @@ import org.jnode.fs.FileSystemException;
 
 /**
  * Abstract class with common things in different FileSystem implementations
- *  
+ *
  * @author Fabien DUMINY
  */
-public abstract class AbstractFileSystem implements FileSystem {
+public abstract class AbstractFileSystem<T extends FSEntry> implements FileSystem<T> {
 
-    private static final Logger log = Logger.getLogger(AbstractFileSystem.class);    
+    private static final Logger log = Logger.getLogger(AbstractFileSystem.class);
 
     private boolean readOnly;
 
@@ -51,20 +51,20 @@ public abstract class AbstractFileSystem implements FileSystem {
     private final BlockDeviceAPI api;
 
     private boolean closed;
-    
-    private FSEntry rootEntry;
+
+    private T rootEntry;
 
     // cache of FSFile (key: FSEntry)
     private HashMap<FSEntry, FSFile> files = new HashMap<FSEntry, FSFile>();
-    
+
     // cache of FSDirectory (key: FSEntry)
     private HashMap<FSEntry, FSDirectory> directories = new HashMap<FSEntry, FSDirectory>();
 
     /**
      * Construct an AbstractFileSystem in specified readOnly mode
-     * @param device 
-     * @param readOnly 
-     * @throws FileSystemException 
+     * @param device
+     * @param readOnly
+     * @throws FileSystemException
      */
     public AbstractFileSystem(Device device, boolean readOnly)
             throws FileSystemException {
@@ -77,7 +77,7 @@ public abstract class AbstractFileSystem implements FileSystem {
         } catch (ApiNotFoundException e) {
             throw new FileSystemException("Device is not a partition!", e);
         }
-                
+
         this.closed = false;
         this.readOnly = readOnly;
     }
@@ -92,11 +92,11 @@ public abstract class AbstractFileSystem implements FileSystem {
     /**
      * @see org.jnode.fs.FileSystem#getRootEntry()
      */
-    public FSEntry getRootEntry() throws IOException
+    public T getRootEntry() throws IOException
 	{
     	if(isClosed())
     		throw new IOException("FileSystem is closed");
-    		    	
+
     	if(rootEntry == null)
     	{
    			rootEntry = createRootEntry();
@@ -114,20 +114,20 @@ public abstract class AbstractFileSystem implements FileSystem {
 	        if (!isReadOnly()) {
 	            flush();
 	        }
-	        
+
 	        api.flush();
 	        files.clear();
 	        directories.clear();
-	        
+
 	        // these fields are final, can't nullify them
 	        //device = null;
 	        //api = null;
-	        
+
 	        rootEntry = null;
 	        files = null;
-	        directories = null;	        
+	        directories = null;
 
-	        closed = true;	    	        
+	        closed = true;
     	}
     }
 
@@ -138,7 +138,7 @@ public abstract class AbstractFileSystem implements FileSystem {
     public void flush() throws IOException
 	{
     	flushFiles();
-    	flushDirectories();    	
+    	flushDirectories();
 	}
 
     /**
@@ -150,7 +150,7 @@ public abstract class AbstractFileSystem implements FileSystem {
 
     /**
      * @return Returns the FSApi.
-     * @throws ApiNotFoundException 
+     * @throws ApiNotFoundException
      */
     final public FSBlockDeviceAPI getFSApi() throws ApiNotFoundException {
     	return device.getAPI(FSBlockDeviceAPI.class);
@@ -169,22 +169,22 @@ public abstract class AbstractFileSystem implements FileSystem {
     final public boolean isReadOnly() {
         return readOnly;
     }
-    
+
     final protected void setReadOnly(boolean readOnly) {
     	this.readOnly = readOnly;
     }
-    
+
 	/**
 	 * Gets the file for the given entry.
-	 * 
+	 *
 	 * @param entry
 	 * @return the FSFile object associated with entry
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	final public synchronized FSFile getFile(FSEntry entry) throws IOException {
     	if(isClosed())
     		throw new IOException("FileSystem is closed");
-    		
+
 		FSFile file = files.get(entry);
 		if (file == null) {
 			file = createFile(entry);
@@ -192,7 +192,7 @@ public abstract class AbstractFileSystem implements FileSystem {
 		}
 		return file;
 	}
-	
+
 	/**
 	 * Abstract method to create a new FSFile from the entry
 	 * @param entry
@@ -200,7 +200,7 @@ public abstract class AbstractFileSystem implements FileSystem {
 	 * @throws IOException
 	 */
 	protected abstract FSFile createFile(FSEntry entry) throws IOException;
-	
+
 	/**
 	 * Flush all unsaved FSFile in our cache
 	 * @throws IOException
@@ -213,22 +213,22 @@ public abstract class AbstractFileSystem implements FileSystem {
             {
                 log.debug("flush: flushing file "+f);
             }
-            
+
 			f.flush();
-		}		
+		}
 	}
 
 	/**
 	 * Gets the file for the given entry.
-	 * 
+	 *
 	 * @param entry
 	 * @return the FSDirectory object associated with this entry
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	final public synchronized FSDirectory getDirectory(FSEntry entry) throws IOException {
     	if(isClosed())
     		throw new IOException("FileSystem is closed");
-    		
+
 		FSDirectory dir = directories.get(entry);
 		if (dir == null) {
 			dir = createDirectory(entry);
@@ -244,7 +244,7 @@ public abstract class AbstractFileSystem implements FileSystem {
 	 * @throws IOException
 	 */
 	protected abstract FSDirectory createDirectory(FSEntry entry) throws IOException;
-	
+
 	/**
 	 * Flush all unsaved FSDirectory in our cache
 	 * @throws IOException
@@ -257,10 +257,10 @@ public abstract class AbstractFileSystem implements FileSystem {
             {
                 log.debug("flush: flushing directory "+d);
             }
-			
+
 			//TODO: uncomment this line
 			//d.flush();
-		}		
+		}
 	}
 
     /**
@@ -268,5 +268,5 @@ public abstract class AbstractFileSystem implements FileSystem {
      * @return the new created root entry
      * @throws IOException
      */
-    protected abstract FSEntry createRootEntry() throws IOException;
+    protected abstract T createRootEntry() throws IOException;
 }

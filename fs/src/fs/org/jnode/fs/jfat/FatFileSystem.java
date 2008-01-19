@@ -25,18 +25,18 @@ import org.jnode.fs.spi.AbstractFileSystem;
 /**
  * @author gvt
  */
-public class FatFileSystem extends AbstractFileSystem {
+public class FatFileSystem extends AbstractFileSystem<FatRootDirectory> {
     private static final Logger log =
         Logger.getLogger ( FatFileSystem.class );
 
     private Fat fat;
     private final CodePage cp;
-    
+
 
     public FatFileSystem ( Device device, String codePageName, boolean readOnly  )
 	throws FileSystemException {
 	super ( device, readOnly );
-	
+
 	try {
 	    fat = Fat.create ( getApi() );
 	}
@@ -59,7 +59,7 @@ public class FatFileSystem extends AbstractFileSystem {
     public int getClusterSize() {
 	return fat.getClusterSize();
     }
-    
+
 
     public Fat getFat() {
 	return fat;
@@ -81,16 +81,16 @@ public class FatFileSystem extends AbstractFileSystem {
 	return
 	    entry.getFile();
     }
-    
-    
+
+
     protected FSDirectory createDirectory ( FSEntry entry )
 	throws IOException {
 	return
 	    entry.getDirectory();
     }
 
-    
-    protected FSEntry createRootEntry()
+
+    protected FatRootDirectory createRootEntry()
 	throws IOException {
 	return
 	    new FatRootDirectory ( this );
@@ -103,7 +103,7 @@ public class FatFileSystem extends AbstractFileSystem {
 	fat.flush();
 	log.debug ( getFat().getCacheStat() );
     }
-    
+
 
     public String toString() {
 	StrWriter out = new StrWriter();
@@ -121,12 +121,12 @@ public class FatFileSystem extends AbstractFileSystem {
 	}
 
 	public long getTotalSpace() {
-		// TODO implement me 
+		// TODO implement me
 		return 0;
 	}
 
 	public long getUsableSpace() {
-		// TODO implement me 
+		// TODO implement me
 		return 0;
 	}
 }

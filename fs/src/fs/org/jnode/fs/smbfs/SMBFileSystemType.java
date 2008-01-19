@@ -31,7 +31,7 @@ import org.jnode.partitions.PartitionTableEntry;
  * @author Levente S\u00e1ntha
  */
 public class SMBFileSystemType implements FileSystemType<SMBFileSystem> {
-    public static final String NAME = "SMBFS";
+    public static final Class<SMBFileSystemType> NAME = SMBFileSystemType.class;
 
     /**
      * Create a filesystem from a given device.
@@ -47,18 +47,6 @@ public class SMBFileSystemType implements FileSystemType<SMBFileSystem> {
      * Gets the unique name of this file system type.
      */
     public String getName() {
-        return NAME;
-    }
-
-    /**
-     * Can this file system type be used on the given first sector of a
-     * blockdevice?
-     *
-     * @param pte         The partition table entry, if any. If null, there is no
-     *                    partition table entry.
-     * @param firstSector
-     */
-    public boolean supports(PartitionTableEntry pte, byte[] firstSector, FSBlockDeviceAPI devApi) {
-        return false;
+        return "SMBFS";
     }
 }

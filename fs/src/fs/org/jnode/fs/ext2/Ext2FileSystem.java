@@ -43,7 +43,7 @@ import org.jnode.fs.spi.AbstractFileSystem;
  * @author Andras Nagy
  *
  */
-public class Ext2FileSystem extends AbstractFileSystem {
+public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
     private Superblock superblock;
 
     private GroupDescriptor groupDescriptors[];
@@ -175,8 +175,8 @@ public class Ext2FileSystem extends AbstractFileSystem {
         		+ "				#MaxMount:		" + superblock.getMaxMntCount()  + "\n"
         		+ "				Last mount time:		" + sdf.format(Ext2Utils.decodeDate(superblock.getMTime()).getTime())  + "\n"
         		+ "				Last write time:		" + sdf.format(Ext2Utils.decodeDate(superblock.getWTime()).getTime())  + "\n"
-        		+ "				#blocks:		" + superblock.getBlocksCount()  + "\n" 
-        		+ "				#blocks/group:	" + superblock.getBlocksPerGroup()  + "\n" 
+        		+ "				#blocks:		" + superblock.getBlocksCount()  + "\n"
+        		+ "				#blocks/group:	" + superblock.getBlocksPerGroup()  + "\n"
         		+ "				#block groups:	" + groupCount + "\n"
                 + "				block size:		" + superblock.getBlockSize() + "\n"
                 + "				#inodes:		" + superblock.getINodesCount() + "\n"
@@ -310,7 +310,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
     /**
      * @see org.jnode.fs.spi.AbstractFileSystem#createRootEntry()
      */
-    public FSEntry createRootEntry() throws IOException {
+    public Ext2Entry createRootEntry() throws IOException {
         try {
             return new Ext2Entry(getINode(Ext2Constants.EXT2_ROOT_INO), "/",
                     Ext2Constants.EXT2_FT_DIR, this, null);

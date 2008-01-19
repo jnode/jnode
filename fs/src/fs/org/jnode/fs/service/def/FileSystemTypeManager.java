@@ -9,16 +9,16 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.service.def;
 
 import java.util.ArrayList;
@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
 import org.jnode.plugin.ConfigurationElement;
 import org.jnode.plugin.Extension;
@@ -41,7 +42,7 @@ final class FileSystemTypeManager implements ExtensionPointListener {
 	/** My logger */
 	private static final Logger log = Logger.getLogger(FileSystemTypeManager.class);
 	/** All registered types */
-	private final HashMap<String, FileSystemType> types = new HashMap<String, FileSystemType>();
+	private final Map<Class<?>, FileSystemType<?>> types = new HashMap<Class<?>, FileSystemType<?>>();
 	/** The org.jnode.fs.types extension point */
 	private final ExtensionPoint typesEP;
 
@@ -58,29 +59,30 @@ final class FileSystemTypeManager implements ExtensionPointListener {
 
 	/**
 	 * Gets all registered file system types.
-	 * All instances of the returned collection are instanceof FileSystemType.
+	 * All instances of the returned collection are instance of FileSystemType.
 	 */
-	public synchronized Collection<FileSystemType> fileSystemTypes() {
-		return new ArrayList<FileSystemType>(types.values());
+	public synchronized Collection<FileSystemType<?>> fileSystemTypes() {
+		return new ArrayList<FileSystemType<?>>(types.values());
 	}
-    
+
     /**
-     * Get a registered filesystemType byt its name
+     * Get a registered filesystemType by its name
      * @param name the fileSystemType name
      * @return null if it doesn't exists
      */
-    public synchronized FileSystemType getSystemType(String name) {
-        return types.get(name);
+	public synchronized <T extends FileSystemType<?>> T getSystemType(Class<T> name)
+	{
+        return (T) types.get(name);
     }
-    
+
 
 	/**
 	* Load all known file system types.
 	*/
 	protected final void refreshFileSystemTypes() {
-        
+
         // Create new type map
-        HashMap<String, FileSystemType> newTypes = new HashMap<String, FileSystemType>();
+        Map<Class<?>, FileSystemType<?>> newTypes = new HashMap<Class<?>, FileSystemType<?>>();
 		final Extension[] extensions = typesEP.getExtensions();
 		for (int i = 0; i < extensions.length; i++) {
 			final Extension ext = extensions[i];
@@ -89,7 +91,7 @@ final class FileSystemTypeManager implements ExtensionPointListener {
 				createType(newTypes, elements[j]);
 			}
 		}
-        
+
         // Save new type map
         synchronized (this) {
             this.types.clear();
@@ -102,14 +104,14 @@ final class FileSystemTypeManager implements ExtensionPointListener {
 	 * @param types
 	 * @param element
 	 */
-	private void createType(Map<String, FileSystemType> types, ConfigurationElement element) {
+	private void createType(Map<Class<?>, FileSystemType<?>> types, ConfigurationElement element) {
 		final String className = element.getAttribute("class");
-		if (className != null) { 
+		if (className != null) {
 			try {
 				final ClassLoader cl = Thread.currentThread().getContextClassLoader();
 				final Object obj = cl.loadClass(className).newInstance();
 				final FileSystemType type = (FileSystemType)obj;
-				types.put(type.getName(), type);
+				types.put(type.getClass(), type);
 			} catch (ClassCastException ex) {
 				log.error(
 					"FileSystemType "

@@ -46,7 +46,7 @@ import org.jnode.shell.help.argument.DeviceArgument;
  * @author Fabien DUMINY (fduminy at jnode.org)
  *
  */
-abstract public class AbstractFormatCommand<T extends FileSystem> extends AbstractCommand {
+abstract public class AbstractFormatCommand<T extends FileSystem<?>> extends AbstractCommand {
     private static final DeviceArgument ARG_DEVICE = new DeviceArgument("device-id",
     	"the device to format");
 

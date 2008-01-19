@@ -9,7 +9,7 @@ import org.jnode.fs.ext2.Ext2FileSystemType;
  *
  * @param <T>
  */
-abstract public class Formatter<T extends FileSystem> implements Cloneable {
+abstract public class Formatter<T extends FileSystem<?>> implements Cloneable {
 	private final FileSystemType<T> type;
 
 	protected Formatter(FileSystemType<T> type)

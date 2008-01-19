@@ -32,7 +32,7 @@ import org.jnode.partitions.PartitionTableEntry;
  * @author Levente S\u00e1ntha
  */
 public class FTPFileSystemType implements FileSystemType<FTPFileSystem> {
-    public static final String NAME = "FTPFS";
+    public static final Class<FTPFileSystemType> NAME = FTPFileSystemType.class;
     /**
      * Create a filesystem from a given device.
      *
@@ -47,19 +47,6 @@ public class FTPFileSystemType implements FileSystemType<FTPFileSystem> {
      * Gets the unique name of this file system type.
      */
     public String getName() {
-        return NAME;
+        return "FTPFS";
     }
-
-    /**
-     * Can this file system type be used on the given first sector of a
-     * blockdevice?
-     *
-     * @param pte         The partition table entry, if any. If null, there is no
-     *                    partition table entry.
-     * @param firstSector
-     */
-    public boolean supports(PartitionTableEntry pte, byte[] firstSector, FSBlockDeviceAPI devApi) {
-        return false;
-    }
-
 }

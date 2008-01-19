@@ -12,7 +12,7 @@ import org.jnode.fs.FileSystemException;
  *
  * @author peda
  */
-public class RAMFileSystem implements FileSystem {
+public class RAMFileSystem implements FileSystem<RAMDirectory> {
 
 	private Device device;
 	private boolean readOnly;
@@ -53,7 +53,7 @@ public class RAMFileSystem implements FileSystem {
 	 * (non-Javadoc)
 	 * @see org.jnode.fs.FileSystem#getRootEntry()
 	 */
-	public FSEntry getRootEntry() throws IOException {
+	public RAMDirectory getRootEntry() throws IOException {
 		if (isClosed())
 			throw new IOException("Filesystem closed");
 		return root;

@@ -18,6 +18,7 @@ import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.service.FileSystemService;
+import org.jnode.fs.ramfs.RAMFileSystem;
 import org.jnode.fs.ramfs.RAMFileSystemType;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.Plugin;
@@ -26,7 +27,7 @@ import org.jnode.plugin.PluginException;
 
 /**
  * This plugin creates a new Ram filesystem and mounts it to /jnode/
- * 
+ *
  * @author peda
  */
 public class RAMFSPlugin extends Plugin {
@@ -46,31 +47,31 @@ public class RAMFSPlugin extends Plugin {
 	protected void startPlugin() throws PluginException {
 
     	log.info("start ramfs");
-    	
+
         try {
 
         	FileSystemService fSS = InitialNaming.lookup(FileSystemService.NAME);
-            FileSystemType type = fSS.getFileSystemTypeForNameSystemTypes(RAMFileSystemType.NAME);
+        	RAMFileSystemType type = fSS.getFileSystemTypeForNameSystemTypes(RAMFileSystemType.NAME);
 
             try {
 
                 VirtualDevice dev = VirtualDeviceFactory.createDevice(RAMFileSystemType.VIRTUAL_DEVICE_NAME);
 
                 log.info(dev.getId() + " registered");
-         		
-            	final FileSystem fs = type.create(dev, true);
+
+            	final RAMFileSystem fs = type.create(dev, true);
                 fSS.registerFileSystem(fs);
 
                 final String mountPath = "jnode";
 
                 fSS.mount(mountPath, fs, null);
-                
+
                 log.info("Mounted " + type.getName() + " on " + mountPath);
 
                 FSDirectory root_dir = fs.getRootEntry().getDirectory();
                 root_dir.addDirectory("home");
                 root_dir.addDirectory("tmp");
-                            
+
             } catch (DeviceAlreadyRegisteredException ex){
             	log.error("RAMFS is allready running.");
             } catch (FileSystemException ex) {
@@ -79,7 +80,7 @@ public class RAMFSPlugin extends Plugin {
             	log.debug("DeviceExeption.", ex);
             } catch (IOException ex) {
             	log.error("Cannot mount RAMFS", ex);
-            } 
+            }
         } catch (NameNotFoundException e){
     	   	log.error("filsystemservice / filesystemtype not found");
         } catch (FileSystemException e){
@@ -89,22 +90,22 @@ public class RAMFSPlugin extends Plugin {
 
 	@Override
 	protected void stopPlugin() throws PluginException {
-    	
+
 		log.info("stop RAMFS");
-		
+
 		try {
-        
+
 			FileSystemService fSS = InitialNaming.lookup(FileSystemService.NAME);
-    		
+
 			final DeviceManager dm = DeviceUtils.getDeviceManager();
-    		
+
             VirtualDevice dev = (VirtualDevice) dm.getDevice(RAMFileSystemType.VIRTUAL_DEVICE_NAME);
             fSS.unregisterFileSystem(dev);
 
     		log.info("RAMFS unmounted");
-    		
+
     		dm.unregister(dev);
-    		
+
     		log.info("RAMFS unregistered");
 
 		} catch (NameNotFoundException e){

@@ -31,7 +31,7 @@ import org.jnode.partitions.PartitionTableEntry;
  * @author Andrei Dore
  */
 public class NFS2FileSystemType implements FileSystemType<NFS2FileSystem> {
-    public static final String NAME = "NFS2";
+    public static final Class<NFS2FileSystemType> NAME = NFS2FileSystemType.class;
 
     /**
      * Create a filesystem from a given device.
@@ -48,20 +48,6 @@ public class NFS2FileSystemType implements FileSystemType<NFS2FileSystem> {
      * Gets the unique name of this file system type.
      */
     public String getName() {
-        return NAME;
-    }
-
-    /**
-     * Can this file system type be used on the given first sector of a
-     * blockdevice?
-     *
-     * @param pte
-     *                The partition table entry, if any. If null, there is no
-     *                partition table entry.
-     * @param firstSector
-     */
-    public boolean supports(PartitionTableEntry pte, byte[] firstSector,
-            FSBlockDeviceAPI devApi) {
-        return false;
+        return "NFS2";
     }
 }

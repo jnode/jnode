@@ -26,6 +26,7 @@ import org.jnode.driver.Device;
 import org.jnode.driver.block.FSBlockDeviceAPI;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
+import org.jnode.fs.BlockDeviceFileSystemType;
 import org.jnode.partitions.PartitionTableEntry;
 import org.jnode.partitions.ibm.IBMPartitionTableEntry;
 import org.jnode.partitions.ibm.IBMPartitionTypes;
@@ -35,12 +36,12 @@ import org.jnode.partitions.ibm.IBMPartitionTypes;
  * @author gvt
  * @author Tango
  */
-public class FatFileSystemType implements FileSystemType<FatFileSystem> {
-    public static final String NAME="JFAT";
+public class FatFileSystemType implements BlockDeviceFileSystemType<FatFileSystem> {
+    public static final Class<FatFileSystemType> NAME=FatFileSystemType.class;
 
 
     public String getName() {
-	return NAME;
+	return "JFAT";
     }
 
 
