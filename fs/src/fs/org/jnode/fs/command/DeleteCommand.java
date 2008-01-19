@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.command;
 
 import java.io.File;
@@ -27,7 +27,7 @@ import java.io.PrintStream;
 
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
-import org.jnode.shell.AbstractCommand; 
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
@@ -38,7 +38,7 @@ import javax.naming.NameNotFoundException;
 
 /**
  * Delete a file or a empty directory
- * 
+ *
  * @author Guillaume BINET (gbin@users.sourceforge.net)
  * @author Andreas H\u00e4nel
  * @author Levente S\u00e1ntha
@@ -49,8 +49,8 @@ public class DeleteCommand extends AbstractCommand {
             "delete the file or directory", true);
 
     public static Help.Info HELP_INFO = new Help.Info("del",
-            "delete a file or directory", new Parameter[] { new Parameter(
-                    ARG_DIR, Parameter.MANDATORY) });
+            "delete a file or directory", new Parameter[]{new Parameter(
+            ARG_DIR, Parameter.MANDATORY)});
 
     public static void main(String[] args) throws Exception {
         new DeleteCommand().execute(args);
@@ -66,39 +66,46 @@ public class DeleteCommand extends AbstractCommand {
             ok &= tmp;
         }
         if (!ok) {
-        	exit(1);
+            exit(1);
         }
     }
 
     private boolean deleteFile(File file, PrintStream err) throws NameNotFoundException {
-        if (!file.exists()) {
-            err.println(file + " does not exist");
-            return false;
-        }
-
-        // Lookup the Filesystem service
-        final FileSystemService fss = InitialNaming.lookup(FileSystemService.NAME);
-
         // for this time, delete only empty directory (wait implementation of -r
         // option)
         boolean deleteOk = true;
-        if (file.isDirectory() && !fss.isMount(file.getAbsolutePath())) {
-            final File[] subFiles = file.listFiles();
-            for (File f : subFiles) {
-                final String name = f.getName();
-                if (!name.equals(".") && !name.equals("..")) {
-                    err.println("Directory is not empty " + file);
-                    deleteOk = false;
-                    break;
+        try {
+            if (!file.exists()) {
+                err.println(file + " does not exist");
+                return false;
+            }
+
+            // Lookup the Filesystem service
+            final FileSystemService fss = InitialNaming.lookup(FileSystemService.NAME);
+
+            if (file.isDirectory() && !fss.isMount(file.getAbsolutePath())) {
+                final File[] subFiles = file.listFiles();
+                for (File f : subFiles) {
+                    final String name = f.getName();
+                    if (!name.equals(".") && !name.equals("..")) {
+                        err.println("Directory is not empty " + file);
+                        deleteOk = false;
+                        break;
+                    }
                 }
             }
+        } catch (Exception e) {
+            System.err.println("Failed to check file properties");
+            e.printStackTrace();
+            System.err.println("Trying to delete it directly");
         }
+
         if (deleteOk) {
-        deleteOk = file.delete();
-        if (!deleteOk) {
-            err.println(file + " was not deleted");
+            deleteOk = file.delete();
+            if (!deleteOk) {
+                err.println(file + " was not deleted");
+            }
         }
-    }
         return deleteOk;
     }
 }
