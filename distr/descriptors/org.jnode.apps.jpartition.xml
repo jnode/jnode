@@ -8,12 +8,27 @@
        provider-name="JNode.org">
 
   <runtime>
-        <library name="jnode-distr.jar">
-            <export name="org.jnode.apps.jpartition.*"/>
-        </library>
+	<library name="jnode-distr.jar">
+    	<export name="org.jnode.apps.jpartition.*"/>
+    	<export name="org.jnode.apps.jpartition.commands.*"/>
+    	<export name="org.jnode.apps.jpartition.commands.framework.*"/>
+    	<export name="org.jnode.apps.jpartition.consoleview.*"/>
+    	<export name="org.jnode.apps.jpartition.consoleview.components.*"/>
+    	<export name="org.jnode.apps.jpartition.model.*"/>
+    	<export name="org.jnode.apps.jpartition.swingview.*"/>
+    	<export name="org.jnode.apps.jpartition.swingview.actions.*"/>
+	</library>
   </runtime>
 
+  <requires>
+    <import plugin="org.jnode.shell"/>
+    <import plugin="org.jnode.fs.ext2"/>
+    <import plugin="org.jnode.fs.fat"/>
+    <import plugin="org.jnode.fs.jfat"/>
+    <import plugin="org.jnode.driver.bus.ide"/>
+  </requires>
+
   <extension point="org.jnode.shell.aliases">
-    <alias name="jpartition" class="org.jnode.apps.jpartition.JPartition"/>
+    <alias name="jpartition" class="org.jnode.apps.jpartition.JPartitionCommand"/>
   </extension>
 </plugin>
