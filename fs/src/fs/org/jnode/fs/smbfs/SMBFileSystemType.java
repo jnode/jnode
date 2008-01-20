@@ -31,7 +31,7 @@ import org.jnode.partitions.PartitionTableEntry;
  * @author Levente S\u00e1ntha
  */
 public class SMBFileSystemType implements FileSystemType<SMBFileSystem> {
-    public static final Class<SMBFileSystemType> NAME = SMBFileSystemType.class;
+    public static final Class<SMBFileSystemType> ID = SMBFileSystemType.class;
 
     /**
      * Create a filesystem from a given device.

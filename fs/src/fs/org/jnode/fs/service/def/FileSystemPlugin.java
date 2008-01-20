@@ -207,9 +207,9 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
     }
 
     /**
-     * @see org.jnode.fs.service.FileSystemService#getFileSystemTypeForNameSystemTypes(java.lang.String)
+     * @see org.jnode.fs.service.FileSystemService#getFileSystemType(java.lang.String)
      */
-	public <T extends FileSystemType<?>> T getFileSystemTypeForNameSystemTypes(Class<T> name) throws FileSystemException
+	public <T extends FileSystemType<?>> T getFileSystemType(Class<T> name) throws FileSystemException
 	{
         T result = fsTypeManager.getSystemType(name);
         if (result == null)

@@ -39,7 +39,7 @@ import org.jnode.partitions.ibm.IBMPartitionTypes;
  */
 public class Ext2FileSystemType implements BlockDeviceFileSystemType<Ext2FileSystem> {
 
-	public static final Class<Ext2FileSystemType> NAME = Ext2FileSystemType.class;
+	public static final Class<Ext2FileSystemType> ID = Ext2FileSystemType.class;
 
 	/**
 	 * @see org.jnode.fs.FileSystemType#create(Device, boolean)

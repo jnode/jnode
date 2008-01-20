@@ -37,7 +37,7 @@ import org.jnode.partitions.PartitionTableEntry;
  */
 public class ISO9660FileSystemType implements BlockDeviceFileSystemType<ISO9660FileSystem> {
 
-    public static final Class<ISO9660FileSystemType> NAME = ISO9660FileSystemType.class;
+    public static final Class<ISO9660FileSystemType> ID = ISO9660FileSystemType.class;
 
     public final String getName() {
         return "ISO9660";

@@ -32,7 +32,7 @@ import org.jnode.partitions.PartitionTableEntry;
  * @author Levente S\u00e1ntha
  */
 public class FTPFileSystemType implements FileSystemType<FTPFileSystem> {
-    public static final Class<FTPFileSystemType> NAME = FTPFileSystemType.class;
+    public static final Class<FTPFileSystemType> ID = FTPFileSystemType.class;
     /**
      * Create a filesystem from a given device.
      *

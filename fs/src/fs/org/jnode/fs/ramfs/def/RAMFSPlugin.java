@@ -51,7 +51,7 @@ public class RAMFSPlugin extends Plugin {
         try {
 
         	FileSystemService fSS = InitialNaming.lookup(FileSystemService.NAME);
-        	RAMFileSystemType type = fSS.getFileSystemTypeForNameSystemTypes(RAMFileSystemType.NAME);
+        	RAMFileSystemType type = fSS.getFileSystemType(RAMFileSystemType.ID);
 
             try {
 

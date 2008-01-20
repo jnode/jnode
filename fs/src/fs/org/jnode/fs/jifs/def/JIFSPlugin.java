@@ -71,7 +71,7 @@ public class JIFSPlugin extends Plugin {
         log.info("start jifs");
         try {
             FileSystemService fSS = InitialNaming.lookup(FileSystemService.NAME);
-            JIFileSystemType type = fSS.getFileSystemTypeForNameSystemTypes(JIFileSystemType.NAME);
+            JIFileSystemType type = fSS.getFileSystemType(JIFileSystemType.ID);
             try {
                 VirtualDevice dev = VirtualDeviceFactory.createDevice(JIFileSystemType.VIRTUAL_DEVICE_NAME);
                 log.info(dev.getId() + " registered");

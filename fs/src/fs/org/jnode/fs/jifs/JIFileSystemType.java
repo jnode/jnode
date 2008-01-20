@@ -35,7 +35,7 @@ import org.jnode.partitions.PartitionTableEntry;
 public class JIFileSystemType implements FileSystemType<JIFileSystem> {
 
 	/** Name of this filesystem type */
-	public static final Class<JIFileSystemType> NAME = JIFileSystemType.class;
+	public static final Class<JIFileSystemType> ID = JIFileSystemType.class;
     public static final String VIRTUAL_DEVICE_NAME = "jifs";
 
     /**	Logger*/
