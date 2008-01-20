@@ -16,7 +16,7 @@ public class RAMFileSystemType implements FileSystemType<RAMFileSystem> {
 	private static final int DEFAULT_SIZE = 104857600;
 
 	/** the name of this filesystem */
-	public static final Class<RAMFileSystemType> NAME = RAMFileSystemType.class;
+	public static final Class<RAMFileSystemType> ID = RAMFileSystemType.class;
 
 	/** Virtual Device name for this filesystem */
 	public static final String VIRTUAL_DEVICE_NAME = "ramfsdevice";

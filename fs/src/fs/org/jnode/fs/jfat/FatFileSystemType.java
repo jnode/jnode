@@ -37,7 +37,7 @@ import org.jnode.partitions.ibm.IBMPartitionTypes;
  * @author Tango
  */
 public class FatFileSystemType implements BlockDeviceFileSystemType<FatFileSystem> {
-    public static final Class<FatFileSystemType> NAME=FatFileSystemType.class;
+    public static final Class<FatFileSystemType> ID=FatFileSystemType.class;
 
 
     public String getName() {

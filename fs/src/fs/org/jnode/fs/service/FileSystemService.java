@@ -53,7 +53,7 @@ public interface FileSystemService {
 	 * @param name the name of the FSType you want
 	 * @return the fileSystemType
 	 */
-	public <T extends FileSystemType<?>> T getFileSystemTypeForNameSystemTypes(Class<T> name) throws FileSystemException;
+	public <T extends FileSystemType<?>> T getFileSystemType(Class<T> name) throws FileSystemException;
 
 	/**
 	 * Register a mounted filesystem

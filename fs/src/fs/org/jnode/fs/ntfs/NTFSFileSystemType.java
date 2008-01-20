@@ -37,7 +37,7 @@ import org.jnode.partitions.ibm.IBMPartitionTypes;
  */
 public class NTFSFileSystemType implements BlockDeviceFileSystemType<NTFSFileSystem> {
 
-    public static final Class<NTFSFileSystemType> NAME = NTFSFileSystemType.class;
+    public static final Class<NTFSFileSystemType> ID = NTFSFileSystemType.class;
 
     public static final String TAG = "NTFS";
 

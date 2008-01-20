@@ -36,7 +36,7 @@ import org.jnode.partitions.PartitionTableEntry;
  */
 public class JarFileSystemType implements FileSystemType<JarFileSystem> {
 
-    public static final Class<JarFileSystemType> NAME = JarFileSystemType.class;
+    public static final Class<JarFileSystemType> ID = JarFileSystemType.class;
 
     public final String getName() {
         return "jar";

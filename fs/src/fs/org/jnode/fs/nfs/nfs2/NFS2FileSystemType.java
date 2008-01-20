@@ -31,7 +31,7 @@ import org.jnode.partitions.PartitionTableEntry;
  * @author Andrei Dore
  */
 public class NFS2FileSystemType implements FileSystemType<NFS2FileSystem> {
-    public static final Class<NFS2FileSystemType> NAME = NFS2FileSystemType.class;
+    public static final Class<NFS2FileSystemType> ID = NFS2FileSystemType.class;
 
     /**
      * Create a filesystem from a given device.
