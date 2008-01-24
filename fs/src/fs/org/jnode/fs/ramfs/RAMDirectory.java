@@ -186,7 +186,8 @@ public class RAMDirectory implements FSEntry, FSDirectory {
 	public FSEntry addFile(String name) throws IOException {
 		RAMFile file = new RAMFile(this, name);
 		entries.put(name, file);
-		return file;
+        setLastModified(System.currentTimeMillis());
+        return file;
 	}
 
 	/**
@@ -196,7 +197,8 @@ public class RAMDirectory implements FSEntry, FSDirectory {
 	public FSEntry addDirectory(String name) throws IOException {
 		RAMDirectory dir = new RAMDirectory(filesystem, this, name);
 		entries.put(name, dir);
-		return dir;
+        setLastModified(System.currentTimeMillis());
+        return dir;
 	}
 
 	/**
@@ -213,10 +215,12 @@ public class RAMDirectory implements FSEntry, FSDirectory {
 		if (entry instanceof RAMFile) {
 			RAMFile file = (RAMFile) entry;
 			file.remove();
-		} else {
+            setLastModified(System.currentTimeMillis());
+        } else {
 			RAMDirectory dir = (RAMDirectory) entry;
 			dir.remove();
-		}
+            setLastModified(System.currentTimeMillis());
+        }
 	}
 	
 	/**

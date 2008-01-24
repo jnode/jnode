@@ -130,7 +130,8 @@ public class RAMFile implements FSEntry, FSFile {
 	public void setName(String newName) throws IOException {
 		// TODO check for special chars / normalize name
 		filename = newName;
-	}
+        setLastModified(System.currentTimeMillis());
+    }
 
 	/**
 	 * (non-Javadoc)
@@ -217,7 +218,8 @@ public class RAMFile implements FSEntry, FSFile {
 		
 		// update fileSystem counters
 		fileSystem.addSummedFileSize(toEnlarge);
-	}
+        setLastModified(System.currentTimeMillis());
+    }
 
 	/**
 	 * (non-Javadoc)
@@ -249,7 +251,8 @@ public class RAMFile implements FSEntry, FSFile {
 		
 		buffer.position((int) fileOffset);
 		buffer.put(src);
-	}
+        setLastModified(System.currentTimeMillis());
+    }
 
 	/**
 	 * (non-Javadoc)
