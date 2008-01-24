@@ -312,6 +312,11 @@ public class InetAddress implements Serializable
       }
   }
 
+    //jnode
+    String getHostName(boolean check){
+        return getHostName();
+    }
+
     /**
    * Returns the canonical hostname represented by this InetAddress
      * 
@@ -574,12 +579,21 @@ public class InetAddress implements Serializable
    * @exception SecurityException If a security manager exists and its
    * checkConnect method doesn't allow the operation
      */
-  public static InetAddress[] getAllByName(String hostname)
+    public static InetAddress[] getAllByName(String hostname)
     throws UnknownHostException
   {
+      return getAllByName0(hostname, true);
+  }
+
+    //jnode
+  static InetAddress[] getAllByName0(String hostname, boolean check)
+    throws UnknownHostException
+  {
+      if(check){
     SecurityManager s = System.getSecurityManager();
     if (s != null)
       s.checkConnect(hostname, -1);
+      }
 
     InetAddress[] addresses;
 
