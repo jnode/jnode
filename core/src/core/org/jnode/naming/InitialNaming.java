@@ -44,7 +44,7 @@ import org.jnode.vm.annotation.SharedStatics;
 public final class InitialNaming {
 
     /** All bound names+services */
-    static NameSpace namespace;
+    private static NameSpace namespace;
 
     public static void setNameSpace(NameSpace namespace) {
         if (InitialNaming.namespace != null) {
@@ -95,7 +95,7 @@ public final class InitialNaming {
         return getNameSpace().nameSet();
     }
 
-    static NameSpace getNameSpace() {
+    private static NameSpace getNameSpace() {
         if (namespace == null) {
             namespace = new DefaultNameSpace();
         }
