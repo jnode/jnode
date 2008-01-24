@@ -10,6 +10,12 @@ import java.util.Hashtable;
 import java.util.HashMap;
 import org.vmmagic.unboxed.ObjectReference;
 import org.vmmagic.unboxed.Address;
+import org.jnode.vm.classmgr.VmStaticField;
+import org.jnode.vm.classmgr.VmInstanceField;
+import org.jnode.vm.classmgr.VmConstString;
+import org.jnode.vm.scheduler.VmProcessor;
+import org.jnode.vm.VmMagic;
+import org.jnode.vm.Vm;
 
 /**
  * @author Levente S\u00e1ntha
@@ -27,12 +33,24 @@ class NativeUnsafe {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * @see org.jnode.vm.VmReflection#getObject(org.jnode.vm.classmgr.VmField, Object)
+     */
     public static Object getObject(Unsafe instance, Object o, long offset) {
-        throw new UnsupportedOperationException();
+        if(o instanceof StaticAccess){
+            return ((StaticAccess) o).getObject((int)offset);
+        }
+        return ObjectReference.fromObject(o).toAddress().add((int) offset).loadObjectReference().toObject();
     }
 
+    /**
+     * @see org.jnode.vm.VmReflection#setObject(org.jnode.vm.classmgr.VmField, Object, Object)
+     */
     public static void putObject(Unsafe instance, Object o, long offset, Object x) {
-        throw new UnsupportedOperationException();
+        if(o instanceof StaticAccess){
+            ((StaticAccess) o).setObject(x, (int)offset);
+        }
+        ObjectReference.fromObject(o).toAddress().add((int)offset).store(ObjectReference.fromObject(x));
     }
 
     public static boolean getBoolean(Unsafe instance, Object o, long offset) {
@@ -176,16 +194,82 @@ class NativeUnsafe {
         throw new UnsupportedOperationException();
     }
 
+    static class StaticAccess {
+        protected long  address;
+
+        StaticAccess(long address){
+            this.address = address;
+        }
+        Object getObject(int offset){
+            return Address.fromLong(address).add(offset).loadObjectReference().toObject();
+        }
+        void setObject(Object obj, int offset){
+            Address.fromLong(address).add(offset).store(ObjectReference.fromObject(obj));
+        }
+    }
+
+    /**
+     * @see org.jnode.vm.VmReflection#getObject(org.jnode.vm.classmgr.VmField, Object)
+     */
+    static class IrregularStaticAccess  extends StaticAccess {
+
+        IrregularStaticAccess(long address) {
+            super(address);
+        }
+
+        @Override
+        Object getObject(int offset){
+            Object obj = super.getObject(offset);
+            //handles the reflective access to static final String fields, which didn't work.
+            if(obj instanceof VmConstString){
+                VmConstString cs = (VmConstString) obj;
+                obj = Vm.getVm().getSharedStatics().getStringEntry(cs.getSharedStaticsIndex());
+            }
+            return obj;
+        }
+
+        @Override
+        void setObject(Object obj, int offset){
+            //do nothing - since this is access if for final fields
+        }
+    }
+
+    /**
+     * @see org.jnode.vm.VmReflection#getStaticFieldAddress(org.jnode.vm.classmgr.VmStaticField)
+     */
+    public static Object staticFieldBase(Unsafe instance, Field f) {
+        final VmProcessor proc = VmProcessor.current();
+		final Address tablePtr;
+        VmStaticField sf = (VmStaticField)f.getVmField();
+        if (sf.isShared()) {
+            tablePtr = VmMagic.getArrayData(proc.getSharedStaticsTable());
+        } else {
+            tablePtr = VmMagic.getArrayData(proc.getIsolatedStaticsTable());
+        }
+		Object ret = tablePtr.loadObjectReference().toObject();
+        if(sf.isStatic() && sf.isFinal() && f.getType().equals(String.class))
+            ret = new IrregularStaticAccess(tablePtr.toLong());
+        else
+            ret = new StaticAccess(tablePtr.toLong());
+        return ret;
+    }
+
+    /**
+     * @see org.jnode.vm.VmReflection#getInstanceFieldAddress(Object, org.jnode.vm.classmgr.VmInstanceField)   
+     */
     public static long staticFieldOffset(Unsafe instance, Field f) {
-        throw new UnsupportedOperationException();
+		final int offset;
+        VmStaticField sf = (VmStaticField)f.getVmField();
+        if (sf.isShared()) {
+            offset = sf.getSharedStaticsIndex() << 2;
+        } else {
+            offset = sf.getIsolatedStaticsIndex() << 2;
+        }
+		return offset;
     }
 
     public static long objectFieldOffset(Unsafe instance, Field f) {
-        return UnsafeHelper.objectFieldOffset(f);
-    }
-
-    public static Object staticFieldBase(Unsafe instance, Field f) {
-        throw new UnsupportedOperationException();
+        return ((VmInstanceField)f.getVmField()).getOffset();
     }
 
     public static void ensureClassInitialized(Unsafe instance, Class c) {
