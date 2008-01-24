@@ -23,8 +23,9 @@ public class CommandProcessor
 		this.errorReporter = errorReporter;
 	}
 
-	public boolean hasChanges() {
-		return !commands.isEmpty();
+	public List<Command> getPendingCommands()
+	{
+		return new ArrayList<Command>(commands);
 	}
 	
 	public synchronized void process()

@@ -42,6 +42,6 @@ public class Options extends Component {
 		}
 		
 		NumberField choice = new NumberField(context);
-		return choice.show("Choice : ", 1, options.size());
+		return choice.show("Choice : ", null, 1, options.size());
 	}
 }
