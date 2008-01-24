@@ -20,6 +20,9 @@
     <pathelement location="${junit4.jar}"/>
   	<pathelement location="${telnetd.jar}"/>
 
+    <pathelement location="${jetty.jar}"/>
+  	<pathelement location="${jetty-util.jar}"/>
+
     <path refid="cp"/>
   </path>
 
