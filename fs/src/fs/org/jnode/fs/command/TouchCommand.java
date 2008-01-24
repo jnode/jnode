@@ -57,24 +57,22 @@ public class TouchCommand extends AbstractCommand {
     throws Exception {
     	ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
         File file = ARG_TOUCH.getFile(cmdLine);
-         File parentFile = file.getParentFile();
 
         if (!file.exists()) {
+            File parentFile = file.getParentFile();
             if (parentFile!=null && !parentFile.exists()) {
                 if (!parentFile.mkdirs()) {
                     err.println("Parent dirs can't create");
                     exit(2);
                 }
-            }
+            }            
             if (file.createNewFile()) {
                 out.println("File created");
             } else {
                 err.println("File can't create");
                 exit(1);
             }
-        } else {
-            out.println("File already exist");
         }
+        file.setLastModified(System.currentTimeMillis());
     }
 }
-
