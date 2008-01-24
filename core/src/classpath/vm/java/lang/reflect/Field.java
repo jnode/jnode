@@ -775,4 +775,9 @@ extends AccessibleObject implements Member
         //todo implement it
         throw new UnsupportedOperationException();
     }
+
+    //todo hide it
+    public VmField getVmField(){
+        return vmField;
+    }
 }
