@@ -53,6 +53,11 @@
 	<property name="oncrpc.jar" value="${root.dir}/net/lib/oncrpc.jar"/>
 	<property name="telnetd.jar" value="${root.dir}/distr/lib/telnetd.jar" />
 	<property name="commons-logging.jar" value="${root.dir}/distr/lib/commons-logging.jar" />
+	<property name="jetty.jar" value="${root.dir}/distr/lib/jetty-6.1.5.jar" />
+	<property name="jetty-util.jar" value="${root.dir}/distr/lib/jetty-util-6.1.5.jar" />
+    <property name="jsp.jar" value="${root.dir}/distr/lib/jsp-2.1.jar" />
+    <property name="jsp-api.jar" value="${root.dir}/distr/lib/jsp-api-2.1.jar" />
+    <property name="servlet.jar" value="${root.dir}/distr/lib/servlet-api-2.5-6.1.5.jar" />
 
     <!-- libraries needed to run tests -->
     <property name="jmock-cglib.jar" value="${root.dir}/core/lib/jmock-cglib-1.0.1.jar"/>
@@ -234,6 +239,11 @@
         	<libalias name="oncrpc.jar" alias="${oncrpc.jar}"/>
         	<libalias name="telnetd.jar" alias="${telnetd.jar}"/>
             <libalias name="commons-logging.jar" alias="${commons-logging.jar}"/>
+            <libalias name="jetty.jar" alias="${jetty.jar}"/>
+            <libalias name="jetty-util.jar" alias="${jetty-util.jar}"/>
+            <libalias name="jsp.jar" alias="${jsp.jar}"/>
+            <libalias name="jsp-api.jar" alias="${jsp-api.jar}"/>
+            <libalias name="servlet.jar" alias="${servlet.jar}"/>
 
             <descriptors dir="${descriptors.dir}/">
                 <include name="*.xml"/>
