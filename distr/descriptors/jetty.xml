@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="jetty"
+       name="jetty"
+       version="6.1.5"
+       license-name="asl"
+	   provider-name="mortbay.com"
+	   provider-url="http://jetty.mortbay.com/">
+
+  <runtime>
+
+    <library name="jetty.jar">
+      <export name="*"/>
+    </library>
+
+    <library name="jetty-util.jar">
+      <export name="*"/>
+    </library>
+
+    <library name="jsp.jar">
+      <export name="*"/>
+    </library>
+
+    <library name="jsp-api.jar">
+      <export name="*"/>
+    </library>
+
+    <library name="servlet.jar">
+      <export name="*"/>
+    </library>
+
+    <library name="jnode-distr.jar">
+      <export name="org.jnode.apps.jetty.*"/>
+    </library>
+
+  </runtime>
+
+  <requires>
+  	<import plugin="com.sun.tools.javac"/>
+    <import plugin="org.apache.jakarta.commons.logging"/>
+  	<import plugin="org.apache.jakarta.log4j"/>
+  	<import plugin="org.jnode.shell"/>
+  	<import plugin="org.apache.tools.ant"/>
+  </requires>
+
+  <extension point="org.jnode.shell.aliases">
+    <alias name="jetty" class="org.jnode.apps.jetty.JettyCommand"/>
+  </extension>
+
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.net.SocketPermission" name="*" actions="resolve"/>
+    <permission class="java.net.SocketPermission" name="*:53" actions="resolve,listen,connect"/>
+    <permission class="java.util.PropertyPermission" name="file.encoding" actions="read"/>
+    <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
+    <permission class="java.net.SocketPermission" name="*:*" actions="resolve,listen"/>  
+  </extension>
+
+</plugin>
