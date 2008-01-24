@@ -9,12 +9,12 @@ import javax.naming.NameNotFoundException;
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.DeviceListener;
 import org.jnode.driver.DeviceManager;
-import org.jnode.driver.DeviceNotFoundException;
 import org.jnode.driver.DeviceUtils;
 import org.jnode.driver.block.PartitionableBlockDeviceAPI;
 import org.jnode.driver.bus.ide.IDEConstants;
 import org.jnode.driver.bus.ide.IDEDevice;
 import org.jnode.driver.bus.ide.IDEDeviceAPI;
+import org.jnode.fs.FileSystem;
 import org.jnode.partitions.PartitionTableEntry;
 import org.jnode.partitions.ibm.IBMPartitionTableEntry;
 
@@ -90,18 +90,18 @@ public class OSFacade {
 	private Device createDevice(org.jnode.driver.Device dev)
 	{
 		Device device = null;
-		List<IBMPartitionTableEntry> partitions = getPartitions(dev); 
+		List<IBMPartitionTableEntry> partitions = getPartitions(dev);
 		if(partitions != null) // null if not supported
 		{
-			List<Partition> devPartitions = new ArrayList<Partition>(partitions.size()); 
+			List<Partition> devPartitions = new ArrayList<Partition>(partitions.size());
 			Partition prevPartition = null;
-			
+
 			for(IBMPartitionTableEntry e : partitions)
 			{
 				IBMPartitionTableEntry pte = (IBMPartitionTableEntry) e;
 				long start = pte.getStartLba();
 				long size = pte.getNrSectors() * IDEConstants.SECTOR_SIZE;
-				
+
 				if(pte.isEmpty())
 				{
 					if((prevPartition != null) && !prevPartition.isUsed())
@@ -115,9 +115,9 @@ public class OSFacade {
 						devPartitions.add(new Partition(start, size, false));
 					}
 				}
-				else 
+				else
 				{
-					// current partition is not empty 
+					// current partition is not empty
 					devPartitions.add(new Partition(start, size, true));
 				}
 			}
@@ -131,17 +131,17 @@ public class OSFacade {
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-			}			
+			}
 		}
 
 		return device;
 	}
-	
+
 	private List<IBMPartitionTableEntry> getPartitions(org.jnode.driver.Device dev)
 	{
-		boolean supported = false; 
-		List<IBMPartitionTableEntry> partitions = new ArrayList<IBMPartitionTableEntry>();		
-		
+		boolean supported = false;
+		List<IBMPartitionTableEntry> partitions = new ArrayList<IBMPartitionTableEntry>();
+
 		try {
 			if (dev.implementsAPI(IDEDeviceAPI.class)) {
 				if (dev.implementsAPI(PartitionableBlockDeviceAPI.class)) {
@@ -155,7 +155,7 @@ public class OSFacade {
 							supportedPartitions = false;
 							break;
 						}
-						
+
 						partitions.add((IBMPartitionTableEntry) e);
 					}
 
@@ -169,7 +169,31 @@ public class OSFacade {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return supported ? partitions : null;
+	}
+
+
+	private FileSystem<?> getFileSystem(org.jnode.driver.Device dev, PartitionTableEntry pte)
+	{
+/*
+		DeviceManager devMan = InitialNaming.lookup(DeviceManager.NAME);
+		FileSystemService fss = InitialNaming.lookup(FileSystemService.NAME);
+		Collection<Device> devices = devMan.getDevices();
+		FileSystem fs = null;
+
+		for (Device device : devices) {
+			if (device instanceof IDEDiskPartitionDevice) {
+				IDEDiskPartitionDevice partition = (IDEDiskPartitionDevice)device;
+				if ((partition.getParent() == dev) && (partition.getPartitionTableEntry() == pte)) {
+					//fs = fss.getFileSystem(device).get;
+					break;
+				}
+			}
+		}
+
+		return fs;
+*/
+		return null;//TODO
 	}
 }
