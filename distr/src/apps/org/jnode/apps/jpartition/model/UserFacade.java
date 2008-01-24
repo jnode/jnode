@@ -138,8 +138,8 @@ public class UserFacade {
 		checkSelectedDevice();
 
 		Partition newPart = selectedDevice.addPartition(start, size);
-		cmdProcessor.addCommand(new CreatePartitionCommand((IDEDevice) selectedDevice.getDevice(), start, size));
-		
+		cmdProcessor.addCommand(new CreatePartitionCommand((IDEDevice) selectedDevice.getDevice(), 0, start, size));
+
 		return newPart;
 	}
 
