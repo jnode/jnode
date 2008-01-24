@@ -1,17 +1,34 @@
 package org.jnode.apps.jpartition.commands;
 
+import java.io.IOException;
+
 import org.jnode.apps.jpartition.commands.framework.CommandException;
 import org.jnode.driver.bus.ide.IDEDevice;
+import org.jnode.partitions.command.PartitionHelper;
 
 public class CreatePartitionCommand extends BasePartitionCommand {
-
-	public CreatePartitionCommand(IDEDevice device, int partitionNumber) {
+	final private long start;
+	final private long size;
+	
+	public CreatePartitionCommand(IDEDevice device, int partitionNumber, long start, long size) {
 		super("create partition", device, partitionNumber);
+		this.start = start;
+		this.size = size;
 	}
 
 	@Override
 	final protected void doExecute() throws CommandException {
-		// TODO Auto-generated method stub
-
+//		PartitionHelper helper = createPartitionHelper();
+//		try {
+//			
+//			helper.write();
+//		} catch (IOException e) {
+//			throw new CommandException(e);
+//		}
 	}
+	
+	@Override
+	public String toString() {
+		return "create partition [" + start + ", " + (start+size-1) + "] on device " + device.getId();
+	}	
 }

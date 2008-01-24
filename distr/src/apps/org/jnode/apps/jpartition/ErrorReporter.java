@@ -25,13 +25,16 @@ public class ErrorReporter {
 		String msg = (t == null) ? String.valueOf(message) : t.getMessage();
 		displayError(source, msg);
 
-		if(t != null)
+		if(log != null)
 		{
-			log.error(msg, t);
-		}
-		else
-		{
-			log.error(msg);
+			if(t != null)
+			{
+				log.error(msg, t);
+			}
+			else
+			{
+				log.error(msg);
+			}
 		}
 	}
 }

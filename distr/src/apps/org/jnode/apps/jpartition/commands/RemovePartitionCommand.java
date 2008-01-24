@@ -12,6 +12,11 @@ public class RemovePartitionCommand extends BasePartitionCommand {
 	@Override
 	final protected void doExecute() throws CommandException {
 		// TODO Auto-generated method stub
-
 	}
+		
+	@Override
+	public String toString() {
+		return "remove partition " + partitionNumber + " on device" + device.getId();
+	}		
+	
 }

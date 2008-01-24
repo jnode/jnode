@@ -1,5 +1,8 @@
 package org.jnode.apps.jpartition.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.Formatter;
 
@@ -62,13 +65,21 @@ public class Partition implements Bounded {
 		}
 		return format;
 	}
+	
+	final void setSize(long size) {
+		this.size = size;
+	}
+
+	void mergeWithNextPartition(long nextPartitionSize) {
+		this.size += nextPartitionSize; 
+	}
 
 	final boolean contains(long offset) {
 		long start = getStart();
 		return (offset >= start) && ((offset - start) < size);
 	}
 
-	final void moveStart(long delta) {
+//	final void moveStart(long delta) {
 //		if((delta < 0) && (previous != null))
 //		{
 //			previous.resize(delta);
@@ -80,13 +91,10 @@ public class Partition implements Bounded {
 //				previous.resize(delta);
 //			}
 //		}
-	}
+//	}
 
-	final void setStart(long start) {
+	final void setBounds(long start, long size) {
 		this.start = start;
-	}
-
-	final void setSize(long size) {
 		this.size = size;
 	}
 

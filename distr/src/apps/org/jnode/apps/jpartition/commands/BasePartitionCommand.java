@@ -4,7 +4,7 @@ import org.jnode.apps.jpartition.commands.framework.CommandException;
 import org.jnode.driver.bus.ide.IDEDevice;
 
 abstract public class BasePartitionCommand extends BaseDeviceCommand {
-	private final int partitionNumber;
+	protected final int partitionNumber;
 
 	public BasePartitionCommand(String name, IDEDevice device, int partitionNumber)
 	{

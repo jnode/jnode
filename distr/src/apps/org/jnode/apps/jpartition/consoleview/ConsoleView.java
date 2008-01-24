@@ -8,15 +8,14 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.jnode.apps.jpartition.Context;
 import org.jnode.apps.jpartition.ErrorReporter;
+import org.jnode.apps.jpartition.commands.framework.Command;
 import org.jnode.apps.jpartition.consoleview.components.Component;
-import org.jnode.apps.jpartition.consoleview.components.Labelizer;
 import org.jnode.apps.jpartition.consoleview.components.NumberField;
 import org.jnode.apps.jpartition.consoleview.components.Options;
 import org.jnode.apps.jpartition.consoleview.components.YesNo;
 import org.jnode.apps.jpartition.model.Device;
 import org.jnode.apps.jpartition.model.Partition;
 import org.jnode.apps.jpartition.model.UserFacade;
-import org.jnode.util.NumberUtils;
 
 class ConsoleView extends Component {
 	private static final Logger log = Logger.getLogger(ConsoleView.class);
@@ -36,8 +35,24 @@ class ConsoleView extends Component {
 		}
 		
 		println();
-		print("selectedPartition="+PartitionLabelizer.INSTANCE.getLabel(selectedPartition));
-		print(" on device "+DeviceLabelizer.INSTANCE.getLabel(UserFacade.getInstance().getSelectedDevice()));
+		
+		if(selectedPartition == null)
+		{
+			print("selectedPartition=none");
+		}
+		else
+		{
+			print("selectedPartition="+PartitionLabelizer.INSTANCE.getLabel(selectedPartition));
+		}
+		
+		if(UserFacade.getInstance().getSelectedDevice() == null)
+		{
+			println(" on no device");
+		}
+		else
+		{
+			println(" on device "+DeviceLabelizer.INSTANCE.getLabel(UserFacade.getInstance().getSelectedDevice()));
+		}
 	}
 	
 	private void start() throws Exception
@@ -45,10 +60,18 @@ class ConsoleView extends Component {
 		selectDevice();
 		selectPartition();
 		
-		if(UserFacade.getInstance().hasChanges())
+		List<Command> pendingCommands = UserFacade.getInstance().getPendingCommands();
+		if(!pendingCommands.isEmpty())
 		{
 			YesNo yesNo = new YesNo(context);
-			boolean apply = yesNo.show("There is pending modifications. Would you like to apply them ?");
+			println();
+			println("The following modifications are pending :");
+			for(Command cmd : pendingCommands)
+			{
+				println("\t"+cmd);
+			}
+			
+			boolean apply = yesNo.show("Would you like to apply them ?");
 			if(apply)
 			{
 				UserFacade.getInstance().applyChanges();
@@ -69,56 +92,92 @@ class ConsoleView extends Component {
 
 	private void selectPartition() throws Exception
 	{
-		selectedPartition = null;
-		if(install)
-		{
-			selectedPartition = selectPartitionForInstall();
-		}
-		
-		if(selectedPartition == null)
-		{
-			selectedPartition = selectPartitionForDevice();
-		}
-	}
-	
-	private Partition selectPartitionForDevice() throws Exception {
 		List<Partition> partitions = UserFacade.getInstance().getPartitions();
-		
-		Options partitionsOpt = new Options(context);
-		int choice = (int) partitionsOpt.show("Select a partition", partitions, PartitionLabelizer.INSTANCE);
-		
-		return partitions.get(choice - 1);
-	}
-
-	private Partition selectPartitionForInstall() throws Exception
-	{
-		List<Partition> partitions = UserFacade.getInstance().getPartitions();
-		Partition partition = null;
 		if((partitions.size() == 1) && !partitions.get(0).isUsed())
 		{
 			YesNo yesNo = new YesNo(context);
 			boolean create = yesNo.show("There is no partition. Would you like to create one ?");
 			if(create)
 			{
-				partition = createPartition(partitions.get(0));
+				selectedPartition = createPartition(partitions.get(0));
 			}
 		}
 		
-		return partition;
+		if(selectedPartition == null)
+		{
+			partitions = UserFacade.getInstance().getPartitions();
+			
+			Options partitionsOpt = new Options(context);
+			int choice = (int) partitionsOpt.show("Select a partition", partitions, PartitionLabelizer.INSTANCE);
+			
+			selectedPartition = partitions.get(choice - 1);
+		}
+		
+		if(selectedPartition != null)
+		{
+			if(install)
+			{
+				formatPartition(selectedPartition);
+			}
+			else
+			{
+				modifyPartition(selectedPartition);
+			}
+		}
 	}
-
+	
 	private Partition createPartition(Partition freePart) throws Exception {
 		long size = freePart.getSize();
-		String space = NumberUtils.toBinaryByte(size);
-		YesNo yesNo = new YesNo(context);
-		boolean allSpace = yesNo.show("Would you like to use all the free space ("+space+") ?");
-		
-		if(!allSpace)
-		{
-			NumberField sizeField = new NumberField(context);
-			size = sizeField.show("Size of the new partition ");
-		}
+		NumberField sizeField = new NumberField(context);
+		size = sizeField.show("Size of the new partition ", size, 1, size);
 		
 		return UserFacade.getInstance().createPartition(freePart.getStart(), size);
 	}
+	
+	private void modifyPartition(Partition partition) throws Exception {
+		if(partition.isUsed())
+		{
+			final String[] operations = new String[]{"format partition", "remove partition"};
+			
+			Options partitionsOpt = new Options(context);
+			int choice = (int) partitionsOpt.show("Select an operation", operations);
+			switch(choice)
+			{
+			case 0: formatPartition(partition); break;
+			case 1: removePartition(partition); break;
+			}
+		}
+		else
+		{
+			final String[] operations = new String[]{"add partition"};
+			
+			Options partitionsOpt = new Options(context);
+			int choice = (int) partitionsOpt.show("Select an operation", operations);
+			switch(choice)
+			{
+			case 0: createPartition(partition); break;
+			}
+		}
+	}
+
+	private void removePartition(Partition partition) throws Exception {
+		YesNo yesNo = new YesNo(context);
+		boolean remove = yesNo.show("Would like you to remove the partition ?");
+		
+		if(remove)
+		{
+			UserFacade.getInstance().removePartition(partition.getStart() + 1);
+		}
+	}
+
+	private void formatPartition(Partition partition) throws Exception {
+		String[] formatters = UserFacade.getInstance().getFormatters();
+		Options partitionsOpt = new Options(context);
+		int choice = (int) partitionsOpt.show("Select a filesystem", formatters);
+		String formatter = formatters[choice];
+		
+		UserFacade.getInstance().selectFormatter(formatter);
+		
+		UserFacade.getInstance().formatPartition(partition.getStart() + 1);
+	}	
 }

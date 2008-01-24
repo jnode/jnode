@@ -1,13 +1,10 @@
 package org.jnode.apps.jpartition.model;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.jnode.driver.ApiNotFoundException;
-import org.jnode.driver.bus.ide.IDEDeviceAPI;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.Formatter;
 
@@ -19,18 +16,14 @@ public class Device implements Iterable<Partition>, Bounded {
 	final private org.jnode.driver.Device device;
 
 	Device(String name, long size) {
-		this(name, size, null);
+		this(name, size, null, new ArrayList<Partition>());
+		partitions.add(new Partition(0L, size, false));	
 	}
 
-	Device(org.jnode.driver.Device dev) throws ApiNotFoundException, IOException {
-		this(dev.getId(), dev.getAPI(IDEDeviceAPI.class).getLength(), dev);
-	}
-
-	private Device(String name, long size, org.jnode.driver.Device device) {
+	Device(String name, long size, org.jnode.driver.Device device, List<Partition> partitions) {
 		this.name = name;
 		this.size = size;
-		partitions = new ArrayList<Partition>();
-		partitions.add(new Partition(0L, size, false));
+		this.partitions = partitions;
 		this.device = device;
 	}
 
@@ -106,8 +99,7 @@ public class Device implements Iterable<Partition>, Bounded {
 			partitions.add(index, newPart);
 
 			// after the new partition
-			oldPart.setSize(oldPart.getSize() - size);
-			oldPart.setStart(newPart.getEnd() + 1);
+			oldPart.setBounds(newPart.getEnd() + 1, oldPart.getSize() - size);
 			partitions.set(index + 1, oldPart);
 		}
 		else if(end == oldPart.getEnd())
@@ -147,6 +139,7 @@ public class Device implements Iterable<Partition>, Bounded {
 		Partition part = partitions.get(index);
 		long start = part.getStart();
 		long size = part.getSize();
+		
 		if(index > 0)
 		{
 			Partition partBefore = partitions.get(index - 1);

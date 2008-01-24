@@ -15,6 +15,7 @@ import org.jnode.apps.jpartition.ErrorReporter;
 import org.jnode.apps.jpartition.commands.CreatePartitionCommand;
 import org.jnode.apps.jpartition.commands.FormatPartitionCommand;
 import org.jnode.apps.jpartition.commands.RemovePartitionCommand;
+import org.jnode.apps.jpartition.commands.framework.Command;
 import org.jnode.apps.jpartition.commands.framework.CommandProcessor;
 import org.jnode.apps.jpartition.commands.framework.CommandProcessorListener;
 import org.jnode.driver.ApiNotFoundException;
@@ -137,7 +138,7 @@ public class UserFacade {
 		checkSelectedDevice();
 
 		Partition newPart = selectedDevice.addPartition(start, size);
-		cmdProcessor.addCommand(new CreatePartitionCommand((IDEDevice) selectedDevice.getDevice(), 0)); //TODO set parameters
+		cmdProcessor.addCommand(new CreatePartitionCommand((IDEDevice) selectedDevice.getDevice(), start, size));
 		
 		return newPart;
 	}
@@ -153,8 +154,10 @@ public class UserFacade {
 		checkSelectedDevice();
 		checkSelectedFormatter();
 
-		selectedDevice.formatPartition(offset, selectedFormatter.clone());
-		cmdProcessor.addCommand(new FormatPartitionCommand((IDEDevice) selectedDevice.getDevice(), 0)); //TODO set parameters
+		Formatter<? extends FileSystem> formatter = selectedFormatter.clone();
+		selectedDevice.formatPartition(offset, formatter);
+		Command cmd = new FormatPartitionCommand((IDEDevice) selectedDevice.getDevice(), 0, formatter); //TODO set parameters
+		cmdProcessor.addCommand(cmd);
 	}
 
 	public void resizePartition(long offset, long size) throws Exception {
@@ -170,8 +173,9 @@ public class UserFacade {
 		refreshDevicesFromOS();
 	}
 
-	public boolean hasChanges() {
-		return cmdProcessor.hasChanges();
+	public List<Command> getPendingCommands()
+	{
+		return cmdProcessor.getPendingCommands();
 	}
 
 	private void refreshDevicesFromOS()

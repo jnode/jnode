@@ -1,11 +1,13 @@
 package org.jnode.apps.jpartition.commands;
 
+import java.io.IOException;
+
 import org.jnode.apps.jpartition.commands.framework.BaseCommand;
 import org.jnode.apps.jpartition.commands.framework.CommandException;
+import org.jnode.driver.ApiNotFoundException;
+import org.jnode.driver.DeviceNotFoundException;
 import org.jnode.driver.bus.ide.IDEDevice;
-import org.jnode.partitions.command.FdiskCommand;
-
-import sun.java2d.pipe.NullPipe;
+import org.jnode.partitions.command.PartitionHelper;
 
 abstract public class BaseDeviceCommand extends BaseCommand {
 	protected final IDEDevice device;
@@ -19,6 +21,19 @@ abstract public class BaseDeviceCommand extends BaseCommand {
 		}
 
 		this.device = device;
+	}
+	
+	final protected PartitionHelper createPartitionHelper() throws CommandException
+	{
+		try {
+			return new PartitionHelper(device);
+		} catch (DeviceNotFoundException e) {
+			throw new CommandException(e);
+		} catch (ApiNotFoundException e) {
+			throw new CommandException(e);
+		} catch (IOException e) {
+			throw new CommandException(e);
+		}
 	}
 
 	abstract protected void doExecute() throws CommandException;

@@ -90,29 +90,77 @@ public class OSFacade {
 	private Device createDevice(org.jnode.driver.Device dev)
 	{
 		Device device = null;
-		try {
-			if(dev.implementsAPI(IDEDeviceAPI.class))
+		List<IBMPartitionTableEntry> partitions = getPartitions(dev); 
+		if(partitions != null) // null if not supported
+		{
+			List<Partition> devPartitions = new ArrayList<Partition>(partitions.size()); 
+			Partition prevPartition = null;
+			
+			for(IBMPartitionTableEntry e : partitions)
 			{
-				Device tmpDevice = new Device(dev);
-
-				if(dev.implementsAPI(PartitionableBlockDeviceAPI.class))
+				IBMPartitionTableEntry pte = (IBMPartitionTableEntry) e;
+				long start = pte.getStartLba();
+				long size = pte.getNrSectors() * IDEConstants.SECTOR_SIZE;
+				
+				if(pte.isEmpty())
 				{
-					PartitionableBlockDeviceAPI<?> api = dev.getAPI(PartitionableBlockDeviceAPI.class);
-					for(PartitionTableEntry e : api.getPartitionTable())
+					if((prevPartition != null) && !prevPartition.isUsed())
 					{
-						if(e instanceof IBMPartitionTableEntry)
-						{
-							IBMPartitionTableEntry pte = (IBMPartitionTableEntry) e;
-							if(!pte.isEmpty())
-							{
-								long size = pte.getNrSectors() * IDEConstants.SECTOR_SIZE;
-								tmpDevice.addPartition(pte.getStartLba(), size);
-							}
-						}
+						// current and previous partitions are empty
+						prevPartition.mergeWithNextPartition(size);
+					}
+					else
+					{
+						// current partition is empty but not the previous one
+						devPartitions.add(new Partition(start, size, false));
 					}
 				}
+				else 
+				{
+					// current partition is not empty 
+					devPartitions.add(new Partition(start, size, true));
+				}
+			}
 
-				device = tmpDevice;
+			try {
+				long devSize = dev.getAPI(IDEDeviceAPI.class).getLength();
+				device = new Device(dev.getId(), devSize, dev, devPartitions);
+			} catch (ApiNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}			
+		}
+
+		return device;
+	}
+	
+	private List<IBMPartitionTableEntry> getPartitions(org.jnode.driver.Device dev)
+	{
+		boolean supported = false; 
+		List<IBMPartitionTableEntry> partitions = new ArrayList<IBMPartitionTableEntry>();		
+		
+		try {
+			if (dev.implementsAPI(IDEDeviceAPI.class)) {
+				if (dev.implementsAPI(PartitionableBlockDeviceAPI.class)) {
+					PartitionableBlockDeviceAPI<?> api = dev
+							.getAPI(PartitionableBlockDeviceAPI.class);
+					boolean supportedPartitions = true;
+
+					for (PartitionTableEntry e : api.getPartitionTable()) {
+						if (!(e instanceof IBMPartitionTableEntry)) {
+							// non IBM partition tables are not handled for now
+							supportedPartitions = false;
+							break;
+						}
+						
+						partitions.add((IBMPartitionTableEntry) e);
+					}
+
+					supported = supportedPartitions;
+				}
 			}
 		} catch (ApiNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -121,6 +169,7 @@ public class OSFacade {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return device;
+		
+		return supported ? partitions : null;
 	}
 }
