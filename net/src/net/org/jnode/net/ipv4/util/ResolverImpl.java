@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.net.ipv4.util;
 
 import java.net.UnknownHostException;
@@ -44,7 +44,7 @@ import org.xbill.DNS.TextParseException;
  * @author Martin Hartvig
  */
 public class ResolverImpl implements Resolver {
-    
+
     private static ExtendedResolver resolver;
 
     private static Map<String, org.xbill.DNS.Resolver> resolvers;
@@ -69,18 +69,18 @@ public class ResolverImpl implements Resolver {
 
     /**
      * Singleton
-     * 
+     *
      * @return the singleton of the resolver
      */
 
     public static Resolver getInstance() {
         if (res == null) {
             AccessController.doPrivileged(new PrivilegedAction() {
-               public Object run() {
-                   System.setProperty("dns.server", "127.0.0.1");
-                   System.setProperty("dns.search", "localdomain");
-                   return null;
-               }
+                public Object run() {
+                    System.setProperty("dns.server", "127.0.0.1");
+                    System.setProperty("dns.search", "localdomain");
+                    return null;
+                }
             });
             res = new ResolverImpl();
         }
@@ -92,12 +92,12 @@ public class ResolverImpl implements Resolver {
      * Get list all the dns servers
      */
     public static Collection getDnsServers() {
-        return resolvers.keySet(); 
+        return resolvers.keySet();
     }
 
     /**
      * Add a dns server
-     * 
+     *
      * @param _dnsserver
      * @throws NetworkException
      */
@@ -112,11 +112,22 @@ public class ResolverImpl implements Resolver {
         if (resolver == null) {
             try {
                 if (resolver == null) {
-                    String[] server = new String[] { _dnsserver.toString() };
-                    resolver = new ExtendedResolver(server);
-
-                    Lookup.setDefaultResolver(resolver);
-
+                    final String[] server = new String[]{_dnsserver.toString()};
+                    try {
+                        AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
+                            public Object run() throws Exception {
+                                resolver = new ExtendedResolver(server);
+                                Lookup.setDefaultResolver(resolver);
+                                return null;
+                            }
+                        });
+                    } catch (PrivilegedActionException x) {
+                        Exception ee = x.getException();
+                        if (ee instanceof UnknownHostException)
+                            throw (UnknownHostException) ee;
+                        else
+                            throw new RuntimeException(ee);
+                    }
                     resolvers.put(_dnsserver.toString(), resolver);
                 }
             } catch (UnknownHostException e) {
@@ -140,7 +151,7 @@ public class ResolverImpl implements Resolver {
 
     /**
      * removes a dns server
-     * 
+     *
      * @param _dnsserver
      */
 
@@ -152,9 +163,7 @@ public class ResolverImpl implements Resolver {
 
         String key = _dnsserver.toString();
         if (resolvers.containsKey(key)) {
-            org.xbill.DNS.Resolver resolv = (org.xbill.DNS.Resolver) resolvers
-                    .remove(key);
-
+            org.xbill.DNS.Resolver resolv = resolvers.remove(key);
             if (resolver.getResolvers().length == 1) {
                 resolver = null;
             } else {
@@ -165,7 +174,7 @@ public class ResolverImpl implements Resolver {
 
     /**
      * Get from hosts file.
-     * 
+     *
      * @param _hostname
      * @return
      */
@@ -189,7 +198,7 @@ public class ResolverImpl implements Resolver {
             throw new UnknownHostException("null");
         }
         if (hostname.equals("*")) {
-            throw new UnknownHostException("*");            
+            throw new UnknownHostException("*");
         }
         if (resolver == null) {
             throw new UnknownHostException(hostname);
@@ -200,7 +209,7 @@ public class ResolverImpl implements Resolver {
                 ProtocolAddress[] protocolAddresses;
 
                 //System.out.println("getByName: " + hostname);
-                
+
                 protocolAddresses = getFromHostsFile(hostname);
                 if (protocolAddresses != null) {
                     return protocolAddresses;
@@ -249,7 +258,7 @@ public class ResolverImpl implements Resolver {
 
     /**
      * Gets the hostname of the given address.
-     * 
+     *
      * @param address
      * @return All hostnames of the given hostname. The returned array is at
      *         least 1 hostname long.
