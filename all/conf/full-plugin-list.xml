@@ -37,4 +37,6 @@
 
   <plugin id="org.apache.jakarta.commons.logging"/>
   <plugin id="net.wimpi.telnetd"/>
+
+  <plugin id="jetty"/>
 </plugin-list>
