@@ -49,11 +49,18 @@
   </extension>
 
   <extension point="org.jnode.security.permissions">
-    <permission class="java.net.SocketPermission" name="*" actions="resolve"/>
-    <permission class="java.net.SocketPermission" name="*:53" actions="resolve,listen,connect"/>
-    <permission class="java.util.PropertyPermission" name="file.encoding" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>
+    <permission class="java.util.PropertyPermission" name="org.mortbay.*" actions="read"/>
+    <permission class="java.lang.RuntimePermission" name="createClassLoader"/>
+    <permission class="java.lang.RuntimePermission" name="setContextClassLoader"/>
+    <permission class="java.lang.RuntimePermission" name="readFileDescriptor"/>
+    <permission class="java.lang.RuntimePermission" name="modifyThread"/>
+    <permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/>
+    <permission class="java.lang.RuntimePermission" name="setIO"/>
     <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
-    <permission class="java.net.SocketPermission" name="*:*" actions="resolve,listen"/>  
+    <permission class="java.net.SocketPermission" name="*" actions="resolve"/>
+    <permission class="java.net.SocketPermission" name="*:1-" actions="resolve,listen"/>
+    <permission class="java.security.SecurityPermission" name="getPolicy"/>
   </extension>
 
 </plugin>

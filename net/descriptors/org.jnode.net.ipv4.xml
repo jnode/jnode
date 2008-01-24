@@ -32,6 +32,8 @@
 
   <extension point="org.jnode.security.permissions">
     <permission class="java.lang.RuntimePermission" name="setFactory"/>
+
+    <permission class="java.io.FilePermission" name="/etc/resolv.conf" actions="read"/>
     <!-- Bootp -->
     <permission class="java.net.SocketPermission" name="*:67" actions="connect,resolve"/>
     <permission class="java.net.SocketPermission" name="localhost:68" actions="listen"/>
