@@ -224,5 +224,15 @@ public class BigEndian {
     	dst[offset+2] = (byte)((value >>> 40) & 0xFF);
     	dst[offset+1] = (byte)((value >>> 48) & 0xFF);
     	dst[offset+0] = (byte)((value >>> 56) & 0xFF);
-    }	   
+    }
+    /**
+     * Get  char from the given byte array at the given offset.
+     * @param data
+     * @param offset
+     */
+    public static char getChar(byte[] data, int offset) {
+		final int v1 = data[offset+0] & 0xFF;
+		final int v0 = data[offset+1] & 0xFF;
+		return (char)(( v1 << 8 )| v0);
+	}
 }
