@@ -19,6 +19,8 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
 	private final Logger log = Logger.getLogger(getClass());
 
 	private Superblock sb;
+	
+	private Catalog catalog;
 
 	public HfsPlusFileSystem(Device device, boolean readOnly) throws FileSystemException {
 		super(device, readOnly);
@@ -31,8 +33,8 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
 
 	@Override
 	protected FSDirectory createDirectory(FSEntry entry) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		HFSPlusEntry e = (HFSPlusEntry)entry;
+		return new HFSPlusDirectory(e);
 	}
 
 	@Override
@@ -43,11 +45,9 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
 
 	@Override
 	protected HFSPlusEntry createRootEntry() throws IOException {
-		Catalog cf = new Catalog(sb, this);
-		int currentOffset = cf.init();
-		LeafRecord record = cf.getRecord(CatalogNodeId.HFSPLUS_POR_CNID, currentOffset);
+		catalog = new Catalog(this);
+		LeafRecord record = catalog.getRecord(CatalogNodeId.HFSPLUS_POR_CNID);
 		if(record != null) {
-			record.toString();
 			return new HFSPlusEntry(this,null,null,"/",record);
 		}
 		log.debug("Root entry : No record found.");
@@ -65,5 +65,13 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
 	public long getUsableSpace() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	public Catalog getCatalog() {
+		return catalog;
+	}
+
+	public Superblock getSb() {
+		return sb;
 	}
 }

@@ -10,8 +10,9 @@ public class ExtentLeafNode extends LeafNode {
 		super(descriptor, nodeData, nodeSize);
 		for(int i = 0; i < records.length; ++i) {
 		    int currentOffset = offsets[i];
+		    int recordDataSize =  offsets[i+1] - offsets[i];
 		    Key currentKey = new ExtentKey(nodeData, currentOffset);
-		    records[i] = new LeafRecord(currentKey, nodeData, currentOffset);
+		    records[i] = new LeafRecord(currentKey, nodeData, currentOffset, recordDataSize);
 		}
 	}
 }
