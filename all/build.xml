@@ -58,6 +58,8 @@
     <property name="jsp.jar" value="${root.dir}/distr/lib/jsp-2.1.jar" />
     <property name="jsp-api.jar" value="${root.dir}/distr/lib/jsp-api-2.1.jar" />
     <property name="servlet.jar" value="${root.dir}/distr/lib/servlet-api-2.5-6.1.5.jar" />
+    <property name="derby.jar" value="${root.dir}/distr/lib/derby.jar" />
+    <property name="derbynet.jar" value="${root.dir}/distr/lib/derbynet.jar" />
 
     <!-- libraries needed to run tests -->
     <property name="jmock-cglib.jar" value="${root.dir}/core/lib/jmock-cglib-1.0.1.jar"/>
@@ -119,6 +121,8 @@
         <pathelement location="${commons-net.jar}"/>
         <pathelement location="${dnsjava.jar}"/>
         <pathelement location="${mauve.jar}"/>
+        <pathelement location="${derby.jar}"/>
+        <pathelement location="${derbynet.jar}"/>
     </path>
 
     <path id="cp-jnode">
@@ -244,6 +248,8 @@
             <libalias name="jsp.jar" alias="${jsp.jar}"/>
             <libalias name="jsp-api.jar" alias="${jsp-api.jar}"/>
             <libalias name="servlet.jar" alias="${servlet.jar}"/>
+            <libalias name="derby.jar" alias="${derby.jar}"/>
+            <libalias name="derbynet.jar" alias="${derbynet.jar}"/>
 
             <descriptors dir="${descriptors.dir}/">
                 <include name="*.xml"/>

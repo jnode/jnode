@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="derby"
+        name="Derby"
+        version="10.3.2.1"
+        license-name="apache2.0"
+        provider-name="apache DB"
+        provider-url="http://db.apache.org/derby/">
+
+
+  <requires>
+    <import plugin="org.jnode.shell"/>
+  </requires>
+
+  <runtime>
+    <library name="derby.jar">
+      <export name="*"/>
+    </library>
+    <library name="derbynet.jar">
+      <export name="*"/>
+    </library>
+    <library name="jnode-distr.jar">
+      <export name="org.jnode.apps.derby.*"/>
+    </library>
+  </runtime>
+
+  <extension point="org.jnode.shell.aliases">
+    <alias name="derby" class="org.jnode.apps.derby.DerbyCommand"/>
+  </extension>
+
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.lang.RuntimePermission" name="exitVM" actions="*" />
+  </extension>
+
+</plugin>
