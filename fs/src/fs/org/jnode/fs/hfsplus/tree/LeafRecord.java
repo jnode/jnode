@@ -9,7 +9,7 @@ public class LeafRecord {
 	public LeafRecord(Key key, byte[] nodeData, int offset){
 		this.key = key;
 		data = new byte[2];
-		System.arraycopy(nodeData, offset+key.getKeyLength(), data, 0, 2);
+		System.arraycopy(nodeData, offset+key.getKeyLength()+2, data, 0, 2);
 	}
 	
 	public Key getKey(){
