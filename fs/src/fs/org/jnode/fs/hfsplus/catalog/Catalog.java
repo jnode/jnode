@@ -19,46 +19,39 @@ public class Catalog {
 	/** */
 	private AbstractFileSystem<?> fs;
 	/** */
-	private Superblock header;
-	/** */
 	private NodeDescriptor btnd;
 	/** */
 	private BTHeaderRecord bthr;
+	/** */
+	private int firstNodeOffset;
 	
-	public Catalog(Superblock header, HfsPlusFileSystem fs){
-		this.header = header;
+	public Catalog(HfsPlusFileSystem fs) throws IOException {
 		this.fs = fs;
-	}
-	
-	public int init() throws IOException {
+		Superblock sb = fs.getSb();
 		int offset = 0;
-		ExtentDescriptor current = header.getCatalogFile().getExtents()[0];
+		ExtentDescriptor current = sb.getCatalogFile().getExtents()[0];
 		if(current.getStartBlock() != 0 && current.getBlockCount() != 0){
 			ByteBuffer buffer = ByteBuffer.allocate(14);
-			offset = current.getStartBlock()*header.getBlockSize();
+			firstNodeOffset = current.getStartBlock()*sb.getBlockSize();
 			fs.getApi().read(offset, buffer);
 			btnd = new NodeDescriptor(buffer.array());
 			log.debug("BTNodeDescriptor informations :\n" + btnd.toString());
-			offset = offset + 14;
+			offset = firstNodeOffset + 14;
 			buffer = ByteBuffer.allocate(106);
 			fs.getApi().read(offset, buffer);
 			bthr = new BTHeaderRecord(buffer.array());
 			log.debug("BTHeaderRec informations :\n" + bthr.toString());
 			offset = offset + 106;
-			offset = current.getStartBlock()*header.getBlockSize();
 		}
-		return offset;
 	}
-
-	public NodeDescriptor getBTNodeDescriptor() {
-		return btnd;
-	}
-
-	public BTHeaderRecord getBTHeaderRecord() {
-		return bthr;
-	}
-	
-	public LeafRecord getRecord(CatalogNodeId parentID, int currentOffset) throws IOException{
+	/**
+	 * 
+	 * @param parentID
+	 * @return
+	 * @throws IOException
+	 */
+	public LeafRecord getRecord(CatalogNodeId parentID) throws IOException{
+		int currentOffset = firstNodeOffset;
 		int currentNodeNumber = getBTHeaderRecord().getRootNode();
 		int currentNodeSize = getBTHeaderRecord().getNodeSize();
 		ByteBuffer buffer = ByteBuffer.allocate(currentNodeSize);
@@ -81,6 +74,14 @@ public class Catalog {
 		    return lr;
 		}
 		return null;
+	}
+	
+	public NodeDescriptor getBTNodeDescriptor() {
+		return btnd;
+	}
+
+	public BTHeaderRecord getBTHeaderRecord() {
+		return bthr;
 	}
 
 }

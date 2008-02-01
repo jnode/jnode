@@ -10,9 +10,9 @@ public class HFSPlusFile extends AbstractFSFile {
 
 	private LeafRecord record;
 	
-	public HFSPlusFile(HfsPlusFileSystem fs, LeafRecord record){
-		super(fs);
-		this.record = record;
+	public HFSPlusFile(HFSPlusEntry e){
+		super((HfsPlusFileSystem)e.getFileSystem());
+		this.record = e.getRecord();
 	}
 	
 	@Override

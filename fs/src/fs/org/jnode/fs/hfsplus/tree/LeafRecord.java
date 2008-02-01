@@ -4,12 +4,12 @@ import org.jnode.util.BigEndian;
 
 public class LeafRecord {
 	private Key key;
-	private final byte[] data;
+	private final byte[] recordData;
 	
-	public LeafRecord(Key key, byte[] nodeData, int offset){
+	public LeafRecord(Key key, byte[] nodeData, int offset, int recordDataSize){
 		this.key = key;
-		data = new byte[2];
-		System.arraycopy(nodeData, offset+key.getKeyLength()+2, data, 0, 2);
+		recordData = new byte[recordDataSize];
+		System.arraycopy(nodeData, offset+key.getKeyLength()+2, recordData, 0, recordDataSize);
 	}
 	
 	public Key getKey(){
@@ -17,7 +17,11 @@ public class LeafRecord {
 	}
 	
 	public int getType(){
-		return BigEndian.getInt16(data, 0);
+		return BigEndian.getInt16(recordData, 0);
+	}
+	
+	public byte[] getRecordData(){
+		return recordData;
 	}
 	
 	public String toString(){
