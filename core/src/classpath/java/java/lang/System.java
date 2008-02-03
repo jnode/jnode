@@ -45,6 +45,7 @@ import gnu.classpath.VMStackWalker;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.Console;
+import java.io.IOException;
 import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.Collections;
@@ -55,6 +56,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Properties;
 import java.util.PropertyPermission;
+import java.nio.channels.Channel;
+import java.nio.channels.spi.SelectorProvider;
 
 /**
  * System represents system-wide resources; things that represent the
@@ -810,7 +813,7 @@ public final class System
      * Blocks the retention of all elements in the specified
      * collection from the collection.
      *
-     * @param c the collection of elements to retain.
+     * @param coll the collection of elements to retain.
      * @return true if the other elements were removed.
      * @throws NullPointerException if the collection is null.
      * @throws NullPointerException if any collection entry is null.
@@ -1106,4 +1109,33 @@ public final class System
          return cons;
      }
 
+    //jnode + openjdk
+    /**
+     * Returns the channel inherited from the entity that created this
+     * Java virtual machine.
+     *
+     * <p> This method returns the channel obtained by invoking the
+     * {@link java.nio.channels.spi.SelectorProvider#inheritedChannel
+     * inheritedChannel} method of the system-wide default
+     * {@link java.nio.channels.spi.SelectorProvider} object. </p>
+     *
+     * <p> In addition to the network-oriented channels described in
+     * {@link java.nio.channels.spi.SelectorProvider#inheritedChannel
+     * inheritedChannel}, this method may return other kinds of
+     * channels in the future.
+     *
+     * @return	The inherited channel, if any, otherwise <tt>null</tt>.
+     *
+     * @throws java.io.IOException
+     *		If an I/O error occurs
+     *
+     * @throws	SecurityException
+     *		If a security manager is present and it does not
+     *		permit access to the channel.
+     *
+     * @since 1.5
+     */
+    public static Channel inheritedChannel() throws IOException {
+        return SelectorProvider.provider().inheritedChannel();
+    }
 } // class System
