@@ -99,7 +99,7 @@ public class PingCommand implements ICMPListener {
             int id_count = 0;
             int seq_count = 0;
             while (this.count != 0) {
-                System.out.println("Ping " + dst + " attemp " + seq_count);
+                System.out.println("Ping " + dst + " attempt " + seq_count);
 
                 if (!this.flood) this.wait = true;
 
