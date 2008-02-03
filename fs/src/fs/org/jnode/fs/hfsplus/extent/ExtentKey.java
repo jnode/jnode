@@ -2,6 +2,7 @@ package org.jnode.fs.hfsplus.extent;
 
 import org.jnode.fs.hfsplus.catalog.CatalogNodeId;
 import org.jnode.fs.hfsplus.tree.AbstractKey;
+import org.jnode.fs.hfsplus.tree.Key;
 import org.jnode.util.BigEndian;
 
 public class ExtentKey extends AbstractKey {
@@ -37,6 +38,12 @@ public class ExtentKey extends AbstractKey {
 	@Override
 	public int getLength() {
 		return EXTENT_KEY_LENGTH;
+	}
+
+	@Override
+	public int compareTo(Key key) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }

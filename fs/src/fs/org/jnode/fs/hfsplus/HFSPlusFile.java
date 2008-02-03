@@ -3,12 +3,15 @@ package org.jnode.fs.hfsplus;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import org.jnode.fs.hfsplus.catalog.CatalogFile;
 import org.jnode.fs.hfsplus.tree.LeafRecord;
 import org.jnode.fs.spi.AbstractFSFile;
 
 public class HFSPlusFile extends AbstractFSFile {
 
 	private LeafRecord record;
+	
+	private CatalogFile file;
 	
 	public HFSPlusFile(HFSPlusEntry e){
 		super((HfsPlusFileSystem)e.getFileSystem());

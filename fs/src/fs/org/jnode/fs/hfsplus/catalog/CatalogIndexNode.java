@@ -6,6 +6,7 @@ import org.jnode.fs.hfsplus.tree.Key;
 import org.jnode.fs.hfsplus.tree.NodeDescriptor;
 
 public class CatalogIndexNode extends IndexNode {
+	
 	public CatalogIndexNode(NodeDescriptor descriptor, byte[] nodeData, int nodeSize){
 		super(descriptor, nodeData, nodeSize);
 		for(int i = 0; i < records.length; ++i) {
@@ -28,5 +29,16 @@ public class CatalogIndexNode extends IndexNode {
 			}
 		}
 		return null;
+	}
+	
+	public IndexRecord find(CatalogKey key){
+		IndexRecord largestMatchingRecord = null;
+		for(int i = 0; i < records.length; ++i) {
+			if(records[i].getKey().compareTo(key) <= 0 && 
+					(largestMatchingRecord == null || records[i].getKey().compareTo(largestMatchingRecord.getKey()) > 0)) {
+				largestMatchingRecord = records[i];
+			}
+		}
+		return largestMatchingRecord;
 	}
 }

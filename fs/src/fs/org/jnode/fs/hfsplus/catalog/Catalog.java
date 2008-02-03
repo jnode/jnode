@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.apache.log4j.Logger;
+import org.jnode.fs.hfsplus.HFSUnicodeString;
 import org.jnode.fs.hfsplus.HfsPlusConstants;
 import org.jnode.fs.hfsplus.HfsPlusFileSystem;
 import org.jnode.fs.hfsplus.Superblock;
@@ -61,6 +62,38 @@ public class Catalog {
 		while(currentBtnd.getKind() == HfsPlusConstants.BT_INDEX_NODE) {
 			CatalogIndexNode currentIndexNode = new CatalogIndexNode(currentBtnd, buffer.array(), currentNodeSize);
 			IndexRecord record = currentIndexNode.find(parentID);
+			currentNodeNumber = record.getIndex();
+			currentOffset = currentNodeNumber*currentNodeSize;
+			buffer = ByteBuffer.allocate(currentNodeSize);
+			fs.getApi().read(currentOffset, buffer);
+			currentBtnd = new NodeDescriptor(buffer.array());
+		}
+		if(currentBtnd.getKind() == HfsPlusConstants.BT_LEAF_NODE) {
+			CatalogLeafNode leaf = new CatalogLeafNode(currentBtnd, buffer.array(), currentNodeSize);
+		    LeafRecord lr = leaf.find(parentID);
+		    log.debug("Leaf record :\n" + lr.toString());
+		    return lr;
+		}
+		return null;
+	}
+	/**
+	 * 
+	 * @param parentID
+	 * @param nodeName
+	 * @return
+	 * @throws IOException
+	 */
+	public LeafRecord getRecord(CatalogNodeId parentID, HFSUnicodeString nodeName) throws IOException{
+		int currentOffset = firstNodeOffset;
+		int currentNodeNumber = getBTHeaderRecord().getRootNode();
+		int currentNodeSize = getBTHeaderRecord().getNodeSize();
+		ByteBuffer buffer = ByteBuffer.allocate(currentNodeSize);
+		fs.getApi().read(currentOffset + (currentNodeNumber*currentNodeSize), buffer);
+		NodeDescriptor currentBtnd = new NodeDescriptor(buffer.array());
+		log.debug("Current node descriptor :\n" + currentBtnd.toString());
+		while(currentBtnd.getKind() == HfsPlusConstants.BT_INDEX_NODE) {
+			CatalogIndexNode currentIndexNode = new CatalogIndexNode(currentBtnd, buffer.array(), currentNodeSize);
+			IndexRecord record = currentIndexNode.find(new CatalogKey(parentID, nodeName));
 			currentNodeNumber = record.getIndex();
 			currentOffset = currentNodeNumber*currentNodeSize;
 			buffer = ByteBuffer.allocate(currentNodeSize);
