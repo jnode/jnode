@@ -1588,4 +1588,16 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type,
 	String getDescriptor() { return descriptor; }
 
     }
+
+    //jnode + openjdk
+    /**
+     * Returns <tt>true</tt> if this class is a synthetic class;
+     * returns <tt>false</tt> otherwise.
+     * @return <tt>true</tt> if and only if this class is a synthetic class as
+     *         defined by the Java Language Specification.
+     * @since 1.5
+     */
+    public boolean isSynthetic() {
+	    return vmClass.isSynthetic();
+    }
 }

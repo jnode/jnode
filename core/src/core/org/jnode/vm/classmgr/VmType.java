@@ -875,6 +875,15 @@ public abstract class VmType<T> extends VmAnnotatedElement implements
     }
 
     /**
+     * Is this type a synthetic class.
+     *
+     * @return boolean
+     */
+    public final boolean isSynthetic() {
+        return Modifier.isSynthetic(modifiers);
+    }
+
+    /**
      * Is this type an interface.
      * 
      * @return boolean
