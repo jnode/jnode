@@ -1556,5 +1556,74 @@ public class Window extends Container implements Accessible
      * @see #setIconImages(List<? extends Image>)
      */
     transient java.util.List<Image> icons;
-        
+
+
+    //jnode + openjdk
+
+    public boolean isAlwaysOnTopSupported() {
+        //return Toolkit.getDefaultToolkit().isAlwaysOnTopSupported();
+        return false;
+    }
+
+    private boolean locationByPlatform = false;
+    public boolean isLocationByPlatform() {
+        synchronized (getTreeLock()) {
+            return locationByPlatform;
+        }
+    }
+
+    public void setLocationByPlatform(boolean locationByPlatform) {
+        synchronized (getTreeLock()) {
+            if (locationByPlatform && isShowing()) {
+                throw new IllegalComponentStateException("The window is showing on screen.");
+            }
+            this.locationByPlatform = locationByPlatform;
+        }
+    }
+
+    public synchronized void setIconImages(java.util.List<? extends Image> icons) {
+        this.icons = (icons == null) ? new ArrayList<Image>() :
+            new ArrayList<Image>(icons);
+        WindowPeer peer = (WindowPeer)this.peer;
+        if (peer != null) {
+            peer.updateIconImages();
+        }
+        // Always send a property change event
+        firePropertyChange("iconImage", null, null);
+    }
+
+    /**
+     * Sets the image to be displayed as the icon for this window.
+     * <p>
+     * This method can be used instead of {@link #setIconImages setIconImages()}
+     * to specify a single image as a window's icon.
+     * <p>
+     * The following statement:
+     * <pre>
+     *     setIconImage(image);
+     * </pre>
+     * is equivalent to:
+     * <pre>
+     *     ArrayList&lt;Image&gt; imageList = new ArrayList&lt;Image&gt;();
+     *     imageList.add(image);
+     *     setIconImages(imageList);
+     * </pre>
+     * <p>
+     * Note : Native windowing systems may use different images of differing
+     * dimensions to represent a window, depending on the context (e.g.
+     * window decoration, window list, taskbar, etc.). They could also use
+     * just a single image for all contexts or no image at all.
+     *
+     * @param     image the icon image to be displayed.
+     * @see       #setIconImages
+     * @see       #getIconImages()
+     * @since     1.6
+     */
+    public void setIconImage(Image image) {
+        ArrayList<Image> imageList = new ArrayList<Image>();
+        if (image != null) {
+            imageList.add(image);
+        }
+        setIconImages(imageList);
+    }
 }
