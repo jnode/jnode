@@ -1,11 +1,5 @@
 package org.jnode.fs.hfsplus;
 
-import java.io.IOException;
-
-import org.jnode.fs.FSAccessRights;
-import org.jnode.fs.FSDirectory;
-import org.jnode.fs.FSEntry;
-import org.jnode.fs.FSFile;
 import org.jnode.fs.hfsplus.tree.LeafRecord;
 import org.jnode.fs.spi.AbstractFSEntry;
 import org.jnode.fs.spi.FSEntryTable;
@@ -15,7 +9,7 @@ public class HFSPlusEntry extends AbstractFSEntry{
 	private LeafRecord record;
 	
 	public HFSPlusEntry(HfsPlusFileSystem fs, FSEntryTable table,
-			FSDirectory parent, String name, LeafRecord record) {
+			HFSPlusDirectory parent, String name, LeafRecord record) {
 		super(fs, table, parent, name, getFSEntryType(name, record));
 		this.record = record;
 	}

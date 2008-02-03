@@ -1,11 +1,10 @@
 package org.jnode.fs.hfsplus;
 
-import org.apache.log4j.Logger;
 import org.jnode.util.BigEndian;
 
 
 public class HFSUnicodeString {
-	private final Logger log = Logger.getLogger(getClass());
+
 	private byte[] data;
 	
 	public HFSUnicodeString(byte[] src, int offset){
@@ -18,7 +17,6 @@ public class HFSUnicodeString {
 	}
 	
 	public String getUnicodeString(){
-		log.debug("Data : "  + data.length + " String : " + getLength());
 		char[] result = new char[(getLength())];
 		for(int i = 1; i < result.length; ++i){
 		    result[i] = BigEndian.getChar(data, i*2);
