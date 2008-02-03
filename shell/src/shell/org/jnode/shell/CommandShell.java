@@ -316,7 +316,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     }
     
     private void refreshFromProperties() {
-    	debugEnabled = Boolean.parseBoolean(System.getProperty(DEBUG_PROPERTY_NAME, "true"));
+    	debugEnabled = Boolean.parseBoolean(System.getProperty(DEBUG_PROPERTY_NAME, "false"));
     	historyEnabled = Boolean.parseBoolean(System.getProperty(HISTORY_PROPERTY_NAME, "true"));
     	try {
     		setCommandInterpreter(System.getProperty(INTERPRETER_PROPERTY_NAME, ""));
