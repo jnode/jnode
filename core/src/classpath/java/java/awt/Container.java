@@ -1767,7 +1767,7 @@ public class Container extends Component
    *
    * @since 1.5
    */
-  public final void setComponentZOrder(Component comp, int index)
+  public void setComponentZOrder(Component comp, int index)
   {
     if (comp == null)
       throw new NullPointerException("comp must not be null");
@@ -1817,7 +1817,7 @@ public class Container extends Component
    *
    * @since 1.5
    */
-  public final int getComponentZOrder(Component comp)
+  public int getComponentZOrder(Component comp)
   {
     synchronized (getTreeLock())
       {

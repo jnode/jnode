@@ -358,4 +358,66 @@ public abstract class Buffer
         (arraylength < length + offset))
       throw new IndexOutOfBoundsException ();
   }
+
+    //jnode+openjdk
+    /**
+     * Returns the array that backs this
+     * buffer&nbsp;&nbsp;<i>(optional operation)</i>.
+     *
+     * <p> This method is intended to allow array-backed buffers to be
+     * passed to native code more efficiently. Concrete subclasses
+     * provide more strongly-typed return values for this method.
+     *
+     * <p> Modifications to this buffer's content will cause the returned
+     * array's content to be modified, and vice versa.
+     *
+     * <p> Invoke the {@link #hasArray hasArray} method before invoking this
+     * method in order to ensure that this buffer has an accessible backing
+     * array.  </p>
+     *
+     * @return  The array that backs this buffer
+     *
+     * @throws  ReadOnlyBufferException
+     *          If this buffer is backed by an array but is read-only
+     *
+     * @throws  UnsupportedOperationException
+     *          If this buffer is not backed by an accessible array
+     *
+     * @since 1.6
+     */
+    public abstract Object array();
+
+    /**
+     * Returns the offset within this buffer's backing array of the first
+     * element of the buffer&nbsp;&nbsp;<i>(optional operation)</i>.
+     *
+     * <p> If this buffer is backed by an array then buffer position <i>p</i>
+     * corresponds to array index <i>p</i>&nbsp;+&nbsp;<tt>arrayOffset()</tt>.
+     *
+     * <p> Invoke the {@link #hasArray hasArray} method before invoking this
+     * method in order to ensure that this buffer has an accessible backing
+     * array.  </p>
+     *
+     * @return  The offset within this buffer's array
+     *          of the first element of the buffer
+     *
+     * @throws  ReadOnlyBufferException
+     *          If this buffer is backed by an array but is read-only
+     *
+     * @throws  UnsupportedOperationException
+     *          If this buffer is not backed by an accessible array
+     *
+     * @since 1.6
+     */
+    public abstract int arrayOffset();
+
+    /**
+     * Tells whether or not this buffer is
+     * <a href="ByteBuffer.html#direct"><i>direct</i></a>. </p>
+     *
+     * @return  <tt>true</tt> if, and only if, this buffer is direct
+     *
+     * @since 1.6
+     */
+    public abstract boolean isDirect();
 }

@@ -38,11 +38,13 @@ exception statement from your version. */
 
 package java.nio;
 
+import java.io.IOException;
+
 /**
  * @since 1.4
  */
 public abstract class CharBuffer extends Buffer
-  implements Comparable, CharSequence
+  implements Comparable, CharSequence, Readable, Appendable
 {
   int array_offset;
   char[] backing_buffer;
@@ -505,4 +507,169 @@ public abstract class CharBuffer extends Buffer
     
     return get (position () + index);
   }
+
+    //jnode + openjdk
+    /**
+     * Attempts to read characters into the specified character buffer.
+     * The buffer is used as a repository of characters as-is: the only
+     * changes made are the results of a put operation. No flipping or
+     * rewinding of the buffer is performed.
+     *
+     * @param target the buffer to read characters into
+     * @return The number of characters added to the buffer, or
+     *         -1 if this source of characters is at its end
+     * @throws java.io.IOException if an I/O error occurs
+     * @throws NullPointerException if target is null
+     * @throws ReadOnlyBufferException if target is a read only buffer
+     * @since 1.5
+     */
+    public int read(CharBuffer target) throws IOException {
+        // Determine the number of bytes n that can be transferred
+        int targetRemaining = target.remaining();
+        int remaining = remaining();
+        if (remaining == 0)
+            return -1;
+        int n = Math.min(remaining, targetRemaining);
+        int limit = limit();
+        // Set source limit to prevent target overflow
+        if (targetRemaining < remaining)
+            limit(position() + n);
+        try {
+            if (n > 0)
+                target.put(this);
+        } finally {
+            limit(limit); // restore real limit
+        }
+        return n;
+    }
+
+    /**
+     * Appends the specified character sequence  to this
+     * buffer&nbsp;&nbsp;<i>(optional operation)</i>.
+     *
+     * <p> An invocation of this method of the form <tt>dst.append(csq)</tt>
+     * behaves in exactly the same way as the invocation
+     *
+     * <pre>
+     *     dst.put(csq.toString()) </pre>
+     *
+     * <p> Depending on the specification of <tt>toString</tt> for the
+     * character sequence <tt>csq</tt>, the entire sequence may not be
+     * appended.  For instance, invoking the {@link CharBuffer#toString()
+     * toString} method of a character buffer will return a subsequence whose
+     * content depends upon the buffer's position and limit.
+     *
+     * @param  csq
+     *         The character sequence to append.  If <tt>csq</tt> is
+     *         <tt>null</tt>, then the four characters <tt>"null"</tt> are
+     *         appended to this character buffer.
+     *
+     * @return  This buffer
+     *
+     * @throws  BufferOverflowException
+     *          If there is insufficient space in this buffer
+     *
+     * @throws  ReadOnlyBufferException
+     *          If this buffer is read-only
+     *
+     * @since  1.5
+     */
+    public CharBuffer append(CharSequence csq) {
+	if (csq == null)
+	    return put("null");
+	else
+	    return put(csq.toString());
+    }
+
+    /**
+     * Appends a subsequence of the  specified character sequence  to this
+     * buffer&nbsp;&nbsp;<i>(optional operation)</i>.
+     *
+     * <p> An invocation of this method of the form <tt>dst.append(csq, start,
+     * end)</tt> when <tt>csq</tt> is not <tt>null</tt>, behaves in exactly the
+     * same way as the invocation
+     *
+     * <pre>
+     *     dst.put(csq.subSequence(start, end).toString()) </pre>
+     *
+     * @param  csq
+     *         The character sequence from which a subsequence will be
+     *         appended.  If <tt>csq</tt> is <tt>null</tt>, then characters
+     *         will be appended as if <tt>csq</tt> contained the four
+     *         characters <tt>"null"</tt>.
+     *
+     * @return  This buffer
+     *
+     * @throws  BufferOverflowException
+     *          If there is insufficient space in this buffer
+     *
+     * @throws  IndexOutOfBoundsException
+     *          If <tt>start</tt> or <tt>end</tt> are negative, <tt>start</tt>
+     *          is greater than <tt>end</tt>, or <tt>end</tt> is greater than
+     *          <tt>csq.length()</tt>
+     *
+     * @throws  ReadOnlyBufferException
+     *          If this buffer is read-only
+     *
+     * @since  1.5
+     */
+    public CharBuffer append(CharSequence csq, int start, int end) {
+	CharSequence cs = (csq == null ? "null" : csq);
+	return put(cs.subSequence(start, end).toString());
+    }
+
+    /**
+     * Appends the specified character to this
+     * buffer&nbsp;&nbsp;<i>(optional operation)</i>.
+     *
+     * <p> An invocation of this method of the form <tt>dst.append(c)</tt>
+     * behaves in exactly the same way as the invocation
+     *
+     * <pre>
+     *     dst.put(c) </pre>
+     *
+     * @param  c
+     *         The 16-bit character to append
+     *
+     * @return  This buffer
+     *
+     * @throws  BufferOverflowException
+     *          If there is insufficient space in this buffer
+     *
+     * @throws  ReadOnlyBufferException
+     *          If this buffer is read-only
+     *
+     * @since  1.5
+     */
+    public CharBuffer append(char c) {
+	return put(c);
+    }
+
+    /**
+     * Compares this buffer to another.
+     *
+     * <p> Two char buffers are compared by comparing their sequences of
+     * remaining elements lexicographically, without regard to the starting
+     * position of each sequence within its corresponding buffer.
+     *
+     * <p> A char buffer is not comparable to any other type of object.
+     *
+     * @return  A negative integer, zero, or a positive integer as this buffer
+     *		is less than, equal to, or greater than the given buffer
+     */
+    public int compareTo(CharBuffer that) {
+	int n = this.position() + Math.min(this.remaining(), that.remaining());
+	for (int i = this.position(), j = that.position(); i < n; i++, j++) {
+	    char v1 = this.get(i);
+	    char v2 = that.get(j);
+	    if (v1 == v2)
+		continue;
+	    if ((v1 != v1) && (v2 != v2)) 	// For float and double
+		continue;
+	    if (v1 < v2)
+		return -1;
+	    return +1;
+	}
+	return this.remaining() - that.remaining();
+    }
 }

@@ -82,8 +82,12 @@ implements ProxyStream<PrintStream>
 	protected void setError() {
 		error_occurred = true;
 	}
-	
-	protected abstract PrintStream effectiveOutput();
+
+    protected void clearError() {
+	    error_occurred = false;
+    }
+
+    protected abstract PrintStream effectiveOutput();
  
 	public void close() {
 		PrintStream eo = effectiveOutput();
