@@ -672,6 +672,26 @@ public final class URL implements Serializable
     return ph.openConnection(this);
     }
 
+    //jnode + openjdk
+    public URLConnection openConnection(Proxy proxy)
+	throws java.io.IOException {
+	if (proxy == null) {
+	    throw new IllegalArgumentException("proxy can not be null");
+	}
+
+	SecurityManager sm = System.getSecurityManager();
+	if (proxy.type() != Proxy.Type.DIRECT && sm != null) {
+	    InetSocketAddress epoint = (InetSocketAddress) proxy.address();
+	    if (epoint.isUnresolved())
+		sm.checkConnect(epoint.getHostName(), epoint.getPort());
+	    else
+		sm.checkConnect(epoint.getAddress().getHostAddress(),
+				epoint.getPort());
+	}
+	//return ph.openConnection(this, proxy);
+	return ph.openConnection(this);
+    }
+
     /**
      * Opens a connection to this URL and returns an InputStream for reading
      * from that connection
@@ -800,7 +820,7 @@ public final class URL implements Serializable
   public static synchronized void setURLStreamHandlerFactory(URLStreamHandlerFactory fac)
   {
     if (factory != null)
-            throw new Error("URLStreamHandlerFactory already set"); 
+            throw new Error("URLStreamHandlerFactory already set");
 
         // Throw an exception if an extant security mgr precludes
         // setting the factory.
