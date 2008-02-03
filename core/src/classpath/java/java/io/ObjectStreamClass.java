@@ -1022,4 +1022,20 @@ outer:
         return comp;
     }
   }
+
+    //jnode openjdk
+    /**
+     * Returns the descriptor for any class, regardless of whether it
+     * implements {@link Serializable}.
+     *
+     * @param        cl class for which to get the descriptor
+     * @return       the class descriptor for the specified class
+     * @since 1.6
+     */
+    public static ObjectStreamClass lookupAny(Class<?> cl) {
+        if (cl == null)
+          return null;
+    
+        return lookupForClassObject(cl);
+    }
 }

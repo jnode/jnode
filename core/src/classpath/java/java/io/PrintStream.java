@@ -671,4 +671,18 @@ public class PrintStream extends FilterOutputStream implements Appendable
     f.format(format, args);
     return this;
   }
+
+    //jnode + opnjdk
+    /**
+     * Clears the internal error state of this stream.
+     *
+     * <p> This method will cause subsequent invocations of {@link
+     * #checkError()} to return <tt>false</tt> until another write
+     * operation fails and invokes {@link #setError()}.
+     *
+     * @since 1.6
+     */
+    protected void clearError() {
+	    error_occurred = false;
+    }
 } // class PrintStream

@@ -53,7 +53,7 @@ import org.jnode.vm.isolate.IsolateThread;
 import org.jnode.vm.scheduler.MonitorManager;
 import org.jnode.vm.scheduler.VmProcessor;
 import org.jnode.vm.scheduler.VmThread;
-
+import sun.security.util.SecurityConstants;
 
 /* Written using "Java Class Libraries", 2nd edition, ISBN 0-201-31002-3
 * "The Java Language Specification", ISBN 0-201-63451-1
@@ -1337,12 +1337,7 @@ public class Thread implements Runnable
    */  
   public enum State
   {
-    BLOCKED, NEW, RUNNABLE, TERMINATED, TIMED_WAITING, WAITING;
-
-    /**
-     * For compatability with Sun's JDK
-     */
-    private static final long serialVersionUID = 605505746047245783L;
+    NEW, RUNNABLE, BLOCKED, WAITING, TIMED_WAITING,  TERMINATED
   }
 
 
@@ -1378,5 +1373,76 @@ public class Thread implements Runnable
      * Set by (private) java.util.concurrent.locks.LockSupport.setBlocker
      * Accessed using java.util.concurrent.locks.LockSupport.getBlocker
      */
-    volatile Object parkBlocker;    
+    volatile Object parkBlocker;
+
+    /**
+     * Returns a map of stack traces for all live threads.
+     * The map keys are threads and each map value is an array of
+     * <tt>StackTraceElement</tt> that represents the stack dump
+     * of the corresponding <tt>Thread</tt>.
+     * The returned stack traces are in the format specified for
+     * the {@link #getStackTrace getStackTrace} method.
+     *
+     * <p>The threads may be executing while this method is called.
+     * The stack trace of each thread only represents a snapshot and
+     * each stack trace may be obtained at different time.  A zero-length
+     * array will be returned in the map value if the virtual machine has
+     * no stack trace information about a thread.
+     *
+     * <p>If there is a security manager, then the security manager's
+     * <tt>checkPermission</tt> method is called with a
+     * <tt>RuntimePermission("getStackTrace")</tt> permission as well as
+     * <tt>RuntimePermission("modifyThreadGroup")</tt> permission
+     * to see if it is ok to get the stack trace of all threads.
+     *
+     * @return a <tt>Map</tt> from <tt>Thread</tt> to an array of
+     * <tt>StackTraceElement</tt> that represents the stack trace of
+     * the corresponding thread.
+     *
+     * @throws SecurityException
+     *        if a security manager exists and its
+     *        <tt>checkPermission</tt> method doesn't allow
+     *        getting the stack trace of thread.
+     * @see #getStackTrace
+     * @see SecurityManager#checkPermission
+     * @see RuntimePermission
+     * @see Throwable#getStackTrace
+     *
+     * @since 1.5
+     */
+    public static Map<Thread, StackTraceElement[]> getAllStackTraces() {
+        // check for getStackTrace permission
+        SecurityManager security = System.getSecurityManager();
+        if (security != null) {
+            security.checkPermission(
+                SecurityConstants.GET_STACK_TRACE_PERMISSION);
+            security.checkPermission(
+                SecurityConstants.MODIFY_THREADGROUP_PERMISSION);
+        }
+
+        // Get a snapshot of the list of all threads
+        Thread[] threads = getThreads();
+        StackTraceElement[][] traces = dumpThreads(threads);
+        Map<Thread, StackTraceElement[]> m
+	    = new HashMap<Thread, StackTraceElement[]>(threads.length);
+        for (int i = 0; i < threads.length; i++) {
+            if (threads[i].isAlive()) {
+                StackTraceElement[] stackTrace = traces[i];
+                if (stackTrace == null) {
+                    stackTrace = EMPTY_STACK_TRACE;
+                }
+                m.put(threads[i], stackTrace);
+            }
+        }
+        return m;
+    }
+
+    private static StackTraceElement[][] dumpThreads(Thread[] threads) {
+        //todo implement it
+        throw new UnsupportedOperationException();
+    }
+    private static Thread[] getThreads() {
+        //todo implement it
+        throw new UnsupportedOperationException();
+    }
 }
