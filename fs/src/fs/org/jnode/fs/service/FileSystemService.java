@@ -23,6 +23,7 @@ package org.jnode.fs.service;
 
 import java.io.*;
 import java.util.Collection;
+import java.util.Map;
 
 import javax.naming.NameNotFoundException;
 
@@ -94,6 +95,12 @@ public interface FileSystemService {
      */
     public void mount(String fullPath, FileSystem fs, String fsPath)
     throws IOException;
+
+    /**
+     * Return a map (fullPath -> FileSystem) of mount points
+     * @return a copy of the internal map, sorted by fullPath
+     */
+    public Map<String, FileSystem<?>> getMountPoints();
 
     /**
      * Is the given directory a mount.

@@ -42,7 +42,8 @@ import org.jnode.partitions.PartitionTableType;
  * @author epr
  */
 public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry> {
-
+	private static final int TABLE_SIZE = 4;   
+	
     /** The type of partition table */
     private final IBMPartitionTableType tableType;
 	/** The bootsector data */
@@ -71,7 +72,7 @@ public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry>
         this.tableType = tableType;
 		this.drivedDevice = device;
 		if(containsPartitionTable(bootSector)) {
-			this.partitions = new IBMPartitionTableEntry[4];
+			this.partitions = new IBMPartitionTableEntry[TABLE_SIZE];
 			for (int partNr = 0; partNr < partitions.length ;  partNr++) {
 				log.debug("try part "+ partNr);
 				partitions[partNr] = new IBMPartitionTableEntry(this, bootSector, partNr);
@@ -109,7 +110,7 @@ public class IBMPartitionTable implements PartitionTable<IBMPartitionTableEntry>
 		}
         
 		IBMPartitionTableEntry entry = null;
-		for(int i = 0; i < 4 ; i++) {
+		for(int i = 0; i < TABLE_SIZE ; i++) {
 			entry = new IBMPartitionTableEntry(this, sector.array(), i);
 			if(entry.isValid() && !entry.isEmpty()) {
 				//corrct the offset

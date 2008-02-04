@@ -11,6 +11,7 @@
 	<import plugin="org.jnode.fs.jfat"/>
 	<import plugin="org.jnode.fs.command"/>
     <import plugin="org.jnode.shell.help"/>
+    <import plugin="org.jnode.partitions.ibm"/>    
   </requires>
 
   <runtime>

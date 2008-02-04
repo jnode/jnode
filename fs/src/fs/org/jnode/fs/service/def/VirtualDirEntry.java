@@ -9,16 +9,16 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.service.def;
 
 import java.io.IOException;
@@ -37,11 +37,11 @@ import org.jnode.fs.FileSystem;
 
 /**
  * Virtual directory entry.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 final class VirtualDirEntry implements FSEntry, FSDirectory {
-   
+
     /** The filesystem */
     private final VirtualFS fs;
 
@@ -53,13 +53,13 @@ final class VirtualDirEntry implements FSEntry, FSDirectory {
 
     /** My parent */
     private final FSDirectory parent;
-    
+
     /** My entries */
     private final Map<String, FSEntry> entries;
 
     /**
      * Initialize this instance.
-     * 
+     *
      * @param fs
      * @param name
      * @param parent
@@ -182,13 +182,12 @@ final class VirtualDirEntry implements FSEntry, FSDirectory {
 
     /**
      * Mount the path within given filesystem to an entry with the given name.
-     * 
+     *
      * @param name The name of this mounted entry.
      * @param fs The filesystem to mount
-     * @param path The path in the filesystem to use as root. 
-     * @see org.jnode.fs.FSDirectory#addDirectory(java.lang.String)
+     * @param path The path in the filesystem to use as root.
      */
-    public synchronized FSEntry addMount(String name, FileSystem fs, String path) throws IOException {
+    synchronized VirtualMountEntry addMount(String name, FileSystem fs, String path) throws IOException {
         VirtualFS.log.debug("addMount(" + name + "," + fs + "," + path + ")");
         if (entries.containsKey(name)) {
             throw new IOException(name + " already exists");
@@ -233,15 +232,15 @@ final class VirtualDirEntry implements FSEntry, FSDirectory {
     public synchronized void remove(String name) {
         entries.remove(name);
         modified();
-    }
-    
+        }
+
     /**
      * Update the lastmodified flag.
      */
     private void modified() {
         this.lastModified = System.currentTimeMillis();
     }
-        
+
     /**
      * The filesystem on the given device will be removed.
      * @param dev
@@ -261,15 +260,15 @@ final class VirtualDirEntry implements FSEntry, FSDirectory {
             }
         }
     }
-    
+
     /**
      * Iterator for entries.
-     * 
+     *
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
     private static final class EntryIterator implements Iterator<FSEntry> {
         private final Iterator<FSEntry> i;
-        
+
         public EntryIterator(Collection<FSEntry> entries) {
             this.i = entries.iterator();
         }
@@ -287,7 +286,7 @@ final class VirtualDirEntry implements FSEntry, FSDirectory {
         public FSEntry next() {
             return i.next();
         }
-        
+
         /**
          * @see java.util.Iterator#remove()
          */

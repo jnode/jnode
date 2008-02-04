@@ -28,6 +28,7 @@ import java.io.VMIOUtils;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collection;
+import java.util.Map;
 
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
@@ -153,6 +154,14 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
         api.mount(VMFile.getNormalizedPath(fullPath), fs, fsPath);
     }
 
+    /**
+     * Return a map (fullPath -> FileSystem) of mount points
+     * @return a copy of the internal map, sorted by fullPath
+     */
+    public Map<String, FileSystem<?>> getMountPoints()
+    {
+    	return api.getMountPoints();
+    }
 
     /**
      * Is the given directory a mount.

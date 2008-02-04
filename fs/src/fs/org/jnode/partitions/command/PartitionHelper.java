@@ -6,7 +6,6 @@ import java.nio.ByteBuffer;
 import javax.naming.NameNotFoundException;
 
 import org.jnode.driver.ApiNotFoundException;
-import org.jnode.driver.Device;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceNotFoundException;
 import org.jnode.driver.DeviceUtils;
@@ -19,54 +18,56 @@ import org.jnode.fs.fat.GrubBootSector;
 import org.jnode.partitions.ibm.IBMPartitionTable;
 import org.jnode.partitions.ibm.IBMPartitionTableEntry;
 import org.jnode.partitions.ibm.IBMPartitionTypes;
+import org.jnode.partitions.ibm.MasterBootRecord;
 
 /**
- * 
+ *
  * @author Fabien DUMINY (fduminy at jnode.org)
  *
  */
-public class PartitionHelper 
-{	
+public class PartitionHelper
+{
 	public static final boolean BYTES = true;
 	public static final boolean SECTORS = false;
-	
+
 	private final IDEDevice current;
 	private final BlockDeviceAPI api;
-	
-	private ByteBuffer MBR;	
+
+	private final MasterBootRecord MBR;
 	private BootSector bs;
 
-	public PartitionHelper(String deviceId) 
+	public PartitionHelper(String deviceId)
 			throws DeviceNotFoundException, ApiNotFoundException, IOException, NameNotFoundException
 	{
 		this((IDEDevice)DeviceUtils.getDeviceManager().getDevice(deviceId));
 	}
 
-	public PartitionHelper(IDEDevice device) 
+	public PartitionHelper(IDEDevice device)
 				throws DeviceNotFoundException, ApiNotFoundException, IOException
 	{
 		this.current = device;
 		this.api = current.getAPI(BlockDeviceAPI.class);
+		this.MBR = new MasterBootRecord(api);
 
 		reloadMBR();
 	}
 
-	
-	public void initMbr() throws DeviceNotFoundException, ApiNotFoundException, 
-									IOException 
+
+	public void initMbr() throws DeviceNotFoundException, ApiNotFoundException,
+									IOException
 	{
 		System.out.println("Initialize MBR ...");
-	
+
 		BootSector oldMBR = bs;
 		bs = new GrubBootSector(PLAIN_MASTER_BOOT_SECTOR);
-	
-		if (IBMPartitionTable.containsPartitionTable(MBR.array())) {
+
+		if (MBR.containsPartitionTable()) {
 			System.out.println("This device already contains a partition table. Copy the already existing partitions.");
-			
+
 			for (int i = 0; i < 4; i++) {
 				final IBMPartitionTableEntry oldEntry = oldMBR.getPartition(i);
-				modifyPartition(i, oldEntry.getBootIndicator(), oldEntry.getStartLba(), 
-								oldEntry.getNrSectors(), SECTORS, 
+				modifyPartition(i, oldEntry.getBootIndicator(), oldEntry.getStartLba(),
+								oldEntry.getNrSectors(), SECTORS,
 								oldEntry.getSystemIndicator());
 			}
 		} else {
@@ -75,16 +76,16 @@ public class PartitionHelper
 			bs.getPartition(2).setSystemIndicator(IBMPartitionTypes.PARTTYPE_EMPTY);
 			bs.getPartition(3).setSystemIndicator(IBMPartitionTypes.PARTTYPE_EMPTY);
 		}
-		
+
 		//reloadMBR();
 	}
-	
+
 	public void write() throws IOException
 	{
 		bs.write(api);
-		
+
 		reloadMBR();
-		
+
 		// restart the device
 	    try {
 	    	DeviceManager devMan = DeviceUtils.getDeviceManager();
@@ -99,32 +100,26 @@ public class PartitionHelper
 		}
 	}
 
-	public boolean hasValidMBR()
-	{
-		return IBMPartitionTable.containsPartitionTable(MBR.array());	
-	}
-	
 	private void reloadMBR() throws IOException
 	{
-		this.MBR = ByteBuffer.allocate(IDEConstants.SECTOR_SIZE);
-		api.read(0, MBR);	
+		MBR.read(api);
 		bs = new BootSector(MBR.array());
 	}
-	
+
 	private void checkMBR() throws IOException
 	{
-		if (!hasValidMBR())
-			throw new IOException("This device doesn't contain a valid MBR, use --initmbr.");	
+		if (!MBR.containsPartitionTable())
+			throw new IOException("This device doesn't contain a valid MBR, use --initmbr.");
 	}
 
-	public void modifyPartition(int id, boolean bootIndicator, 
-								long start, long size, 
+	public void modifyPartition(int id, boolean bootIndicator,
+								long start, long size,
 								boolean sizeUnit,
-								IBMPartitionTypes fs) 
-			throws IOException 
+								IBMPartitionTypes fs)
+			throws IOException
 	{
 		checkMBR();
-		
+
 		long nbSectors = size;
 		if(sizeUnit == BYTES)
 		{
@@ -134,29 +129,29 @@ public class PartitionHelper
 				nbSectors++;
 			}
 		}
-		
+
 		IBMPartitionTableEntry entry = bs.getPartition(id);
 		entry.setBootIndicator(bootIndicator);
 		entry.setSystemIndicator(fs);
 		entry.setStartLba(start);
 		entry.setNrSectors(nbSectors);
 	}
-	
+
 	public int getNbPartitions()
 	{
 		return bs.getNbPartitions();
 	}
-	
-	public void deletePartition(int partNumber) throws IOException 
+
+	public void deletePartition(int partNumber) throws IOException
 	{
 		checkMBR();
 		bs.getPartition(partNumber).setSystemIndicator(IBMPartitionTypes.PARTTYPE_EMPTY);
 	}
-	
-	public void toggleBootable(int partNumber) throws IOException 
+
+	public void toggleBootable(int partNumber) throws IOException
 	{
 		checkMBR();
-		
+
 		// save the current state for the targeted partition
 		boolean currentStatus = bs.getPartition(partNumber).getBootIndicator();
 
@@ -168,7 +163,7 @@ public class PartitionHelper
 		// put back the reversed state for the targeted partition
 		bs.getPartition(partNumber).setBootIndicator(!currentStatus);
 	}
-	
+
 
 	private static final byte PLAIN_MASTER_BOOT_SECTOR[] =
 		{
