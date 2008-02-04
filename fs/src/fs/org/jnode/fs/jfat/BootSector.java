@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.jfat.StrWriter;
 import org.jnode.driver.block.BlockDeviceAPI;
+import org.jnode.partitions.ibm.IBMPartitionTable;
 import org.jnode.util.LittleEndian;
 import org.jnode.util.NumberUtils;
 
@@ -126,13 +127,7 @@ public class BootSector {
 
 
     public boolean isaValidBootSector() {
-	if ( sector.length >= 512 )
-	    return
-		( sector[510] & 0xFF ) == 0x55 &&
-		( sector[511] & 0xFF ) == 0xAA;
-	else
-	    return
-		false;
+    	return IBMPartitionTable.containsPartitionTable(sector);
     }
 
 

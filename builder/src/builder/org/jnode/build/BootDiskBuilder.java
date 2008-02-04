@@ -9,16 +9,16 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.build;
 
 import java.io.File;
@@ -61,7 +61,7 @@ public class BootDiskBuilder extends BootFloppyBuilder {
 
     /**
      * Create the actual bootfloppy
-     * 
+     *
      * @throws IOException
      * @throws DriverException
      * @throws FileSystemException
@@ -88,7 +88,7 @@ public class BootDiskBuilder extends BootFloppyBuilder {
 
     /**
      * Format the given device
-     * 
+     *
      * @param device
      * @throws IOException
      */
@@ -98,18 +98,7 @@ public class BootDiskBuilder extends BootFloppyBuilder {
         GrubBootSector mbr = (GrubBootSector) (createFormatter()
                 .getBootSector());
 
-        mbr.getPartition(0).clear();
-        mbr.getPartition(1).clear();
-        mbr.getPartition(2).clear();
-        mbr.getPartition(3).clear();
-
-        IBMPartitionTableEntry pte = mbr.getPartition(0);
-        pte.setBootIndicator(true);
-        pte.setStartLba(1);
-        pte.setNrSectors(geom.getTotalSectors() - 1);
-        pte.setSystemIndicator(IBMPartitionTypes.PARTTYPE_DOS_FAT16_LT32M);
-        pte.setStartCHS(geom.getCHS(pte.getStartLba()));
-        pte.setEndCHS(geom.getCHS(pte.getStartLba() + pte.getNrSectors() - 1));
+        IBMPartitionTableEntry pte = mbr.initPartitions(geom,IBMPartitionTypes.PARTTYPE_DOS_FAT16_LT32M);
 
         /*
          * System.out.println("partition table:"); for (int i = 0; i < 4; i++) {
@@ -163,7 +152,7 @@ public class BootDiskBuilder extends BootFloppyBuilder {
 
     /**
      * Sets the plnFile.
-     * 
+     *
      * @param plnFile
      *            The plnFile to set
      */
@@ -182,7 +171,7 @@ public class BootDiskBuilder extends BootFloppyBuilder {
 
     /**
      * Used by ant to set the geometry property.
-     * 
+     *
      * @param geometryString String in the format ' <cylinder>/ <heads>/ <sectors>', e.\u00f6g.
      *            '64/16/32'.
      */

@@ -9,29 +9,33 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.fat;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.jnode.driver.block.BlockDeviceAPI;
+import org.jnode.driver.block.Geometry;
+import org.jnode.driver.block.Geometry.GeometryException;
+import org.jnode.partitions.ibm.IBMPartitionTable;
 import org.jnode.partitions.ibm.IBMPartitionTableEntry;
+import org.jnode.partitions.ibm.IBMPartitionTypes;
 import org.jnode.util.LittleEndian;
 import org.jnode.util.NumberUtils;
 
 /**
  * <description>
- * 
+ *
  * @author epr
  */
 public class BootSector {
@@ -54,27 +58,23 @@ public class BootSector {
     }
 
     public boolean isaValidBootSector() {
-        if (data.length >= 512) {
-            return (data[510] & 0xFF) == 0x55 && (data[511] & 0xFF) == 0xAA;
-        } else {
-            return false;
-        }
+    	return IBMPartitionTable.containsPartitionTable(data);
     }
 
 	/**
 	 * Read the contents of this bootsector from the given device.
-	 * 
+	 *
 	 * @param device
 	 */
 	public synchronized void read(BlockDeviceAPI device) throws IOException {
 		device.read(0, ByteBuffer.wrap(data));
-        
+
 		dirty = false;
 	}
 
 	/**
 	 * Write the contents of this bootsector to the given device.
-	 * 
+	 *
 	 * @param device
 	 */
 	public synchronized void write(BlockDeviceAPI device) throws IOException {
@@ -84,7 +84,7 @@ public class BootSector {
 
 	/**
 	 * Gets the OEM name
-	 * 
+	 *
 	 * @return String
 	 */
 	public String getOemName() {
@@ -113,7 +113,7 @@ public class BootSector {
 
 	/**
 	 * Gets the number of bytes/sector
-	 * 
+	 *
 	 * @return int
 	 */
 	public int getBytesPerSector() {
@@ -129,7 +129,7 @@ public class BootSector {
 
 	/**
 	 * Gets the number of sectors/cluster
-	 * 
+	 *
 	 * @return int
 	 */
 	public int getSectorsPerCluster() {
@@ -145,7 +145,7 @@ public class BootSector {
 
 	/**
 	 * Gets the number of reserved (for bootrecord) sectors
-	 * 
+	 *
 	 * @return int
 	 */
 	public int getNrReservedSectors() {
@@ -161,7 +161,7 @@ public class BootSector {
 
 	/**
 	 * Gets the number of fats
-	 * 
+	 *
 	 * @return int
 	 */
 	public int getNrFats() {
@@ -177,7 +177,7 @@ public class BootSector {
 
 	/**
 	 * Gets the number of entries in the root directory
-	 * 
+	 *
 	 * @return int
 	 */
 	public int getNrRootDirEntries() {
@@ -193,7 +193,7 @@ public class BootSector {
 
 	/**
 	 * Gets the number of logical sectors
-	 * 
+	 *
 	 * @return int
 	 */
 	public int getNrLogicalSectors() {
@@ -209,7 +209,7 @@ public class BootSector {
 
 	/**
 	 * Gets the medium descriptor byte
-	 * 
+	 *
 	 * @return int
 	 */
 	public int getMediumDescriptor() {
@@ -225,7 +225,7 @@ public class BootSector {
 
 	/**
 	 * Gets the number of sectors/fat
-	 * 
+	 *
 	 * @return int
 	 */
 	public int getSectorsPerFat() {
@@ -241,7 +241,7 @@ public class BootSector {
 
 	/**
 	 * Gets the number of sectors/track
-	 * 
+	 *
 	 * @return int
 	 */
 	public int getSectorsPerTrack() {
@@ -257,7 +257,7 @@ public class BootSector {
 
 	/**
 	 * Gets the number of heads
-	 * 
+	 *
 	 * @return int
 	 */
 	public int getNrHeads() {
@@ -273,7 +273,7 @@ public class BootSector {
 
 	/**
 	 * Gets the number of hidden sectors
-	 * 
+	 *
 	 * @return int
 	 */
 	public int getNrHiddenSectors() {
@@ -289,7 +289,7 @@ public class BootSector {
 
 	/**
 	 * Gets an unsigned 8-bit byte from a given offset
-	 * 
+	 *
 	 * @param offset
 	 * @return int
 	 */
@@ -299,7 +299,7 @@ public class BootSector {
 
 	/**
 	 * Sets an unsigned 8-bit byte at a given offset
-	 * 
+	 *
 	 * @param offset
 	 */
 	protected void set8(int offset, int value) {
@@ -309,7 +309,7 @@ public class BootSector {
 
 	/**
 	 * Gets an unsigned 16-bit word from a given offset
-	 * 
+	 *
 	 * @param offset
 	 * @return int
 	 */
@@ -319,7 +319,7 @@ public class BootSector {
 
 	/**
 	 * Sets an unsigned 16-bit word at a given offset
-	 * 
+	 *
 	 * @param offset
 	 */
 	protected void set16(int offset, int value) {
@@ -329,7 +329,7 @@ public class BootSector {
 
 	/**
 	 * Gets an unsigned 32-bit word from a given offset
-	 * 
+	 *
 	 * @param offset
 	 * @return int
 	 */
@@ -339,7 +339,7 @@ public class BootSector {
 
 	/**
 	 * Sets an unsigned 32-bit word at a given offset
-	 * 
+	 *
 	 * @param offset
 	 */
 	protected void set32(int offset, long value) {
@@ -349,7 +349,7 @@ public class BootSector {
 
 	/**
 	 * Returns the dirty.
-	 * 
+	 *
 	 * @return boolean
 	 */
 	public boolean isDirty() {
@@ -358,9 +358,26 @@ public class BootSector {
 
 	public int getNbPartitions()
 	{
-		return partitions.length; 
+		return partitions.length;
 	}
-	
+
+	public IBMPartitionTableEntry initPartitions(Geometry geom, IBMPartitionTypes firstPartitionType) throws GeometryException {
+        getPartition(0).clear();
+        getPartition(1).clear();
+        getPartition(2).clear();
+        getPartition(3).clear();
+
+		IBMPartitionTableEntry entry = getPartition(0);
+		entry.setBootIndicator(true);
+		entry.setStartLba(1);
+		entry.setNrSectors(geom.getTotalSectors() - 1);
+		entry.setSystemIndicator(firstPartitionType);
+		entry.setStartCHS(geom.getCHS(entry.getStartLba()));
+		entry.setEndCHS(geom.getCHS(entry.getStartLba() + entry.getNrSectors() - 1));
+
+		return entry;
+	}
+
 	public synchronized IBMPartitionTableEntry getPartition(int partNr) {
 		if (partitions[partNr] == null) {
 			partitions[partNr] = new IBMPartitionTableEntry(null, data, partNr);
@@ -407,7 +424,7 @@ public class BootSector {
         res.append("Nr Root Dir Entries = ");
         res.append(getNrRootDirEntries());
         res.append('\n');
-        
+
         for(int i=0; i<data.length /16 ; i++)
         {
             res.append(Integer.toHexString(i));
@@ -415,7 +432,7 @@ public class BootSector {
             res.append(NumberUtils.hex(data,i*16,16));
             res.append('\n');
         }
-        
+
         return res.toString();
 	}
 }
