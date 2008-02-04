@@ -18,7 +18,10 @@
       <export name="*"/>
     </library>
     <library name="derbynet.jar">
-      <export name="*"/>
+      <export name="org.apache.derby.drda.*"/>
+      <export name="org.apache.derby.impl.drda.*"/>
+      <export name="org.apache.derby.impl.info.net.prpperties"/>
+      <export name="org.apache.derby.loc.drda.*"/>
     </library>
     <library name="jnode-distr.jar">
       <export name="org.jnode.apps.derby.*"/>
