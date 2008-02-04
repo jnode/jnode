@@ -1,6 +1,5 @@
 package org.jnode.apps.jpartition.model;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -9,8 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.naming.NameNotFoundException;
-
+import org.apache.log4j.Logger;
 import org.jnode.apps.jpartition.ErrorReporter;
 import org.jnode.apps.jpartition.commands.CreatePartitionCommand;
 import org.jnode.apps.jpartition.commands.FormatPartitionCommand;
@@ -18,7 +16,6 @@ import org.jnode.apps.jpartition.commands.RemovePartitionCommand;
 import org.jnode.apps.jpartition.commands.framework.Command;
 import org.jnode.apps.jpartition.commands.framework.CommandProcessor;
 import org.jnode.apps.jpartition.commands.framework.CommandProcessorListener;
-import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.bus.ide.IDEDevice;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.Formatter;
@@ -29,14 +26,17 @@ import org.jnode.fs.fat.FatType;
 import org.jnode.fs.jfat.ClusterSize;
 
 public class UserFacade {
+	private static final Logger log = Logger.getLogger(UserFacade.class);
+
 	private static final UserFacade INSTANCE = new UserFacade();
 
 	final private Map<String, Device> devices  = new HashMap<String, Device>();
 	private Device selectedDevice;
 	private UserListener userListener;
 
-	final private Map<String, Formatter<? extends FileSystem>> formatters  = new HashMap<String, Formatter<? extends FileSystem>>();
-	private Formatter<? extends FileSystem> selectedFormatter;
+	final private Map<String, Formatter<? extends FileSystem<?>>> formatters  = new HashMap<String, Formatter<? extends FileSystem<?>>>();
+	private Formatter<? extends FileSystem<?>> selectedFormatter;
+	private ErrorReporter errorReporter;
 
 	private CommandProcessor cmdProcessor;
 
@@ -55,6 +55,7 @@ public class UserFacade {
 
 	public void setErrorReporter(ErrorReporter errorReporter)
 	{
+		this.errorReporter = errorReporter;
 		cmdProcessor = new CommandProcessor(errorReporter);
 	}
 
@@ -86,7 +87,8 @@ public class UserFacade {
 	{
 		this.userListener = listener;
 
-		OSFacade.getInstance().setOSListener(new OSListener(){
+		OSListener osListener = new OSListener()
+		{
 			public void deviceAdded(Device addedDevice) {
 				devices.put(addedDevice.getName(), addedDevice);
 				userListener.deviceAdded(addedDevice.getName());
@@ -100,7 +102,21 @@ public class UserFacade {
 				{
 					selectDevice(null, true); // not called by user => need to notify
 				}
-			}});
+			}
+
+			public void errorHappened(OSFacadeException e) {
+				if(errorReporter != null)
+				{
+					errorReporter.reportError(log, UserFacade.this, e);
+				}
+			}
+		};
+
+		try {
+			OSFacade.getInstance().setOSListener(osListener);
+		} catch (OSFacadeException e) {
+			osListener.errorHappened(e);
+		}
 	}
 
 	public void addCommandProcessorListener(CommandProcessorListener listener)
@@ -154,7 +170,7 @@ public class UserFacade {
 		checkSelectedDevice();
 		checkSelectedFormatter();
 
-		Formatter<? extends FileSystem> formatter = selectedFormatter.clone();
+		Formatter<? extends FileSystem<?>> formatter = selectedFormatter.clone();
 		selectedDevice.formatPartition(offset, formatter);
 		Command cmd = new FormatPartitionCommand((IDEDevice) selectedDevice.getDevice(), 0, formatter); //TODO set parameters
 		cmdProcessor.addCommand(cmd);
@@ -190,15 +206,11 @@ public class UserFacade {
 			}
 
 			selectDevice(selectedDev, true); // not called by user => need to notify
-		} catch (NameNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ApiNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (OSFacadeException e) {
+			if(errorReporter != null)
+			{
+				errorReporter.reportError(log, this, e);
+			}
 		}
 	}
 
@@ -218,7 +230,7 @@ public class UserFacade {
 		}
 	}
 
-	private void addFormatter(Formatter<? extends FileSystem> formatter)
+	private void addFormatter(Formatter<? extends FileSystem<?>> formatter)
 	{
 		formatters.put(formatter.getFileSystemType().getName(), formatter);
 	}

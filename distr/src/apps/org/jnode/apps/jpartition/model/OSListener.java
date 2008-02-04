@@ -6,4 +6,5 @@ interface OSListener {
 
 	void deviceRemoved(Device removedDevice);
 
+	void errorHappened(OSFacadeException e);
 }

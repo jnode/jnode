@@ -16,7 +16,7 @@ public class TestRemovePartitionFromDevice extends AbstractTest {
 	@Test
 	public void testRemovePartitionBetweenNonFreeSpaces()
 	{
-		final Device device = new Device("dev1", DEVICE_SIZE);
+		final Device device = new CustomDevice("dev1", DEVICE_SIZE);
 		device.addPartition(device.getStart(), beginSpace);
 		device.addPartition(beginSpace, sizeSpace);
 		device.addPartition(2500, 2500);
@@ -39,7 +39,7 @@ public class TestRemovePartitionFromDevice extends AbstractTest {
 	@Test
 	public void testRemovePartitionAfterAFreeSpace()
 	{
-		final Device device = new Device("dev1", DEVICE_SIZE);
+		final Device device = new CustomDevice("dev1", DEVICE_SIZE);
 		device.addPartition(beginSpace, sizeSpace);
 		device.addPartition(2500, 2500);
 
@@ -58,7 +58,7 @@ public class TestRemovePartitionFromDevice extends AbstractTest {
 	@Test
 	public void testRemovePartitionBeforeAFreeSpace()
 	{
-		final Device device = new Device("dev1", DEVICE_SIZE);
+		final Device device = new CustomDevice("dev1", DEVICE_SIZE);
 		device.addPartition(device.getStart(), beginSpace);
 		device.addPartition(beginSpace, sizeSpace);
 
@@ -76,7 +76,7 @@ public class TestRemovePartitionFromDevice extends AbstractTest {
 	@Test
 	public void testRemovePartitionBetweenTwoFreeSpaces()
 	{
-		final Device device = new Device("dev1", DEVICE_SIZE);
+		final Device device = new CustomDevice("dev1", DEVICE_SIZE);
 		device.addPartition(beginSpace, sizeSpace);
 
 		device.removePartition(beginSpace + 5);
@@ -90,7 +90,7 @@ public class TestRemovePartitionFromDevice extends AbstractTest {
 	@Test
 	public void testRemoveSinglePartition()
 	{
-		final Device device = new Device("dev1", DEVICE_SIZE);
+		final Device device = new CustomDevice("dev1", DEVICE_SIZE);
 		device.addPartition(0, DEVICE_SIZE);
 
 		device.removePartition(5);
@@ -104,7 +104,7 @@ public class TestRemovePartitionFromDevice extends AbstractTest {
 	@Test
 	public void testRemovePartitionAtBegin()
 	{
-		final Device device = new Device("dev1", DEVICE_SIZE);
+		final Device device = new CustomDevice("dev1", DEVICE_SIZE);
 		device.addPartition(0, sizeSpace);
 		device.addPartition(sizeSpace, DEVICE_SIZE - sizeSpace);
 
@@ -123,7 +123,7 @@ public class TestRemovePartitionFromDevice extends AbstractTest {
 	@Test
 	public void testRemovePartitionAtEnd()
 	{
-		final Device device = new Device("dev1", DEVICE_SIZE);
+		final Device device = new CustomDevice("dev1", DEVICE_SIZE);
 		device.addPartition(0, sizeSpace);
 		device.addPartition(sizeSpace, DEVICE_SIZE - sizeSpace);
 

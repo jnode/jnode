@@ -4,12 +4,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
 import org.jnode.apps.jpartition.Context;
 
 public class Options extends Component {
-	private static final Logger log = Logger.getLogger(Options.class);
-		
 	public Options(Context context) {
 		super(context);
 	}
@@ -21,16 +18,16 @@ public class Options extends Component {
 	public <T> long show(String question, T[] options, Labelizer<T> labelizer) throws IOException {
 		return show(question, Arrays.asList(options));
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public <T> long show(String question, Collection<T> options) throws IOException {
 		return show(question, Arrays.asList(options), null);
 	}
-	
+
 	public <T> long show(String question, Collection<T> options, Labelizer<T> labelizer) throws IOException {
 		checkNonNull("question", question);
 		checkNonEmpty("options", options);
-		
+
 		println();
 		println(question);
 		int i = 1;
@@ -40,7 +37,7 @@ public class Options extends Component {
 			println("  " + i + " - "+label);
 			i++;
 		}
-		
+
 		NumberField choice = new NumberField(context);
 		return choice.show("Choice : ", null, 1, options.size());
 	}

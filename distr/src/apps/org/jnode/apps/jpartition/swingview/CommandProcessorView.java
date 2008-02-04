@@ -11,7 +11,6 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import org.apache.log4j.Logger;
 import org.jnode.apps.jpartition.commands.framework.Command;
 import org.jnode.apps.jpartition.commands.framework.CommandProcessor;
 import org.jnode.apps.jpartition.commands.framework.CommandProcessorListener;
@@ -20,7 +19,10 @@ import org.jnode.apps.jpartition.model.UserFacade;
 public class CommandProcessorView extends JPanel
 			implements CommandProcessorListener
 {
-	private static final Logger log = Logger.getLogger(CommandProcessorView.class);
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 4411987954528000167L;
 
 	private DefaultListModel  commands = new DefaultListModel();
 	private JList commandsUI = new JList(commands);

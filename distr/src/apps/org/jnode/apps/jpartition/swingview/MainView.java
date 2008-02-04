@@ -11,14 +11,13 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.apache.log4j.Logger;
 import org.jnode.apps.jpartition.ErrorReporter;
 import org.jnode.apps.jpartition.model.Device;
 import org.jnode.apps.jpartition.model.UserFacade;
 import org.jnode.apps.jpartition.model.UserListener;
 
 public class MainView extends JFrame {
-	private static final Logger log = Logger.getLogger(DeviceView.class);
+	private static final long serialVersionUID = -7377987617244339590L;
 
 	final private DefaultComboBoxModel devices;
 	final private DeviceView deviceView;

@@ -1,30 +1,25 @@
 package org.jnode.apps.jpartition.model;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.Formatter;
 
 
-public class Device implements Iterable<Partition>, Bounded {
+public class Device implements Bounded {
 	final private String name;
 	final private long size;
 	final private List<Partition> partitions;
 	final private org.jnode.driver.Device device;
-
-	Device(String name, long size) {
-		this(name, size, null, new ArrayList<Partition>());
-		partitions.add(new Partition(0L, size, false));	
-	}
+	final private boolean hasPartititionTable;
 
 	Device(String name, long size, org.jnode.driver.Device device, List<Partition> partitions) {
 		this.name = name;
 		this.size = size;
 		this.partitions = partitions;
 		this.device = device;
+		this.hasPartititionTable = !partitions.isEmpty();
 	}
 
 	final public String getName() {
@@ -35,11 +30,12 @@ public class Device implements Iterable<Partition>, Bounded {
 		return size;
 	}
 
-	final public Iterator<Partition> iterator() {
-		return partitions.iterator();
+	final public boolean hasPartititionTable() {
+		return hasPartititionTable;
 	}
 
 	final public List<Partition> getPartitions() {
+		checkPartitionned();
 		return Collections.unmodifiableList(partitions);
 	}
 
@@ -62,14 +58,14 @@ public class Device implements Iterable<Partition>, Bounded {
 		return name.equals(other.name);
 	}
 
-	final org.jnode.driver.Device getDevice()
-	{
-		return device;
-	}
-
 	final public int hashCode()
 	{
 		return name.hashCode();
+	}
+
+	final org.jnode.driver.Device getDevice()
+	{
+		return device;
 	}
 
 	final Partition addPartition(long start, long size)
@@ -124,7 +120,7 @@ public class Device implements Iterable<Partition>, Bounded {
 			// after the new partition
 			partitions.add(index + 2, new Partition(end + 1, endSize, false));
 		}
-		
+
 		return newPart;
 	}
 
@@ -139,7 +135,7 @@ public class Device implements Iterable<Partition>, Bounded {
 		Partition part = partitions.get(index);
 		long start = part.getStart();
 		long size = part.getSize();
-		
+
 		if(index > 0)
 		{
 			Partition partBefore = partitions.get(index - 1);
@@ -167,7 +163,7 @@ public class Device implements Iterable<Partition>, Bounded {
 		partitions.set(index, new Partition(start, size, false));
 	}
 
-	final void formatPartition(long offset, Formatter<? extends FileSystem> formatter)
+	final void formatPartition(long offset, Formatter<? extends FileSystem<?>> formatter)
 	{
 		int index = findPartition(offset, true);
 		if(index < 0)
@@ -179,38 +175,14 @@ public class Device implements Iterable<Partition>, Bounded {
 		part.format(formatter);
 	}
 
-/*
-	public void moveStart(DevicePart part, long delta)
-	{
-		if(part.isUsed())
-		{
-			((Partition) part).moveStart(delta);
-		}
-	}
-
-	public void moveEnd(DevicePart part, long delta)
-	{
-		if(part.isUsed())
-		{
-			//TODO
-			//((Partition) part).moveEnd(delta);
-		}
-	}
-
-	public void move(DevicePart part, long delta)
-	{
-		moveStart(part, delta);
-		moveEnd(part, delta);
-	}
-*/
-
 	final private int findPartition(long offset, boolean used)
 	{
+		checkPartitionned();
 		checkOffset(offset);
 
 		int result = -1;
 		int index = 0;
-		for(Partition currentPart : this)
+		for(Partition currentPart : partitions)
 		{
 			if(currentPart.contains(offset) && (currentPart.isUsed() == used))
 			{
@@ -230,6 +202,13 @@ public class Device implements Iterable<Partition>, Bounded {
 		}
 	}
 
+	final private void checkPartitionned()
+	{
+		if(!hasPartititionTable)
+		{
+			throw new DeviceException("device has no partition table");
+		}
+	}
 
 	final private void checkBounds(Bounded bounded, String valueName, long value) {
 		if(value < bounded.getStart())

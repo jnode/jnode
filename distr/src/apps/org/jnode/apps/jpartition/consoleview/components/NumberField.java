@@ -1,15 +1,10 @@
 package org.jnode.apps.jpartition.consoleview.components;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
 
-import org.apache.log4j.Logger;
 import org.jnode.apps.jpartition.Context;
 
 public class NumberField extends Component {
-	private static final Logger log = Logger.getLogger(NumberField.class);
-		
 	public NumberField(Context context) {
 		super(context);
 	}
@@ -25,19 +20,19 @@ public class NumberField extends Component {
 	public Long show(String question, Long defaultValue, long min, long max) throws IOException {
 		checkNonNull("question", question);
 		checkInBounds("min", min, "max", max, "defaultValue", defaultValue);
-		
+
 		print(question);
 		if(defaultValue != null)
 		{
 			print(" ["+defaultValue+"]");
 		}
-		
+
 		Long value = readInt(defaultValue, min, max);
-		while((value == null) || (value < min) || (value > max)) 
+		while((value == null) || (value < min) || (value > max))
 		{
 			value = readInt(defaultValue);
 		}
-		
+
 		return value;
 	}
 }
