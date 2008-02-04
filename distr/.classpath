@@ -18,5 +18,7 @@
 	<classpathentry kind="lib" path="/JNode-Shell/lib/bsh-2.0b5.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="lib/commons-logging.jar"/>
+	<classpathentry kind="lib" path="lib/derby.jar"/>
+	<classpathentry kind="lib" path="lib/derbynet.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
