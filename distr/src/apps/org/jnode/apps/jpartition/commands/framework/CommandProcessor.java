@@ -3,9 +3,9 @@ package org.jnode.apps.jpartition.commands.framework;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
+
 import org.apache.log4j.Logger;
 import org.jnode.apps.jpartition.ErrorReporter;
-import org.jnode.apps.jpartition.swingview.SwingErrorReporter;
 
 public class CommandProcessor
 {
@@ -27,7 +27,7 @@ public class CommandProcessor
 	{
 		return new ArrayList<Command>(commands);
 	}
-	
+
 	public synchronized void process()
 	{
 		try
@@ -50,7 +50,7 @@ public class CommandProcessor
 			errorReporter.reportError(log, this, t);
 		}
 	}
-	
+
 	private boolean processCommand()
 	{
 		boolean quit = false;
@@ -88,8 +88,8 @@ public class CommandProcessor
 					log.error("error in removeCommand", t);
 				}
 			}
-		}		
-		
+		}
+
 		return quit;
 	}
 

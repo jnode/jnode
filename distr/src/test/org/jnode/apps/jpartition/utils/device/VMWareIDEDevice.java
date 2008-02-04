@@ -5,41 +5,42 @@ import java.nio.ByteBuffer;
 
 import javax.naming.NameNotFoundException;
 
+import org.jnode.apps.vmware.disk.VMWareDisk;
 import org.jnode.apps.vmware.disk.handler.UnsupportedFormatException;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.block.BlockDeviceAPIHelper;
 
-public class FakeIDEDevice extends AbstractIDEDevice
+public class VMWareIDEDevice extends AbstractIDEDevice
 {
-	private final long length;
+	private VMWareDisk vmwareDisk;
 
-	public FakeIDEDevice(String name,
+	public VMWareIDEDevice(String name,
 				boolean primary, boolean master,
-				long length)
+				VMWareDisk vmwareDisk)
 			throws IOException, DriverException, NameNotFoundException, UnsupportedFormatException
 	{
 		super(name, primary, master);
-		this.length = length;
+
+		this.vmwareDisk = vmwareDisk;
 	}
 
 	public void flush() throws IOException {
+		vmwareDisk.flush();
 	}
 
 	public long getLength() throws IOException {
-		return length;
+		return vmwareDisk.getLength();
 	}
 
 	public void read(long devOffset, ByteBuffer destBuf) throws IOException {
         BlockDeviceAPIHelper.checkBounds(this, devOffset, destBuf.remaining());
 
-		while(destBuf.remaining() > 0)
-		{
-			destBuf.put((byte) 0);
-		}
+        vmwareDisk.read(devOffset, destBuf);
 	}
 
 	public void write(long devOffset, ByteBuffer srcBuf) throws IOException {
         BlockDeviceAPIHelper.checkBounds(this, devOffset, srcBuf.remaining());
 
+        vmwareDisk.write(devOffset, srcBuf);
 	}
 }

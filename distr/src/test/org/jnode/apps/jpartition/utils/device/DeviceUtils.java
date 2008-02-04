@@ -24,7 +24,7 @@ import org.jnode.test.fs.driver.stubs.StubDeviceManager;
 import org.jnode.util.OsUtils;
 
 public class DeviceUtils {
-	private static final long DEFAULT_FILE_SIZE = 1000;
+	private static final long DEFAULT_FILE_SIZE = 1024*1024;
 	private static final Logger log = Logger.getLogger(FileDeviceView.class);
 
 	private static boolean coreInitialized = false;
@@ -55,7 +55,7 @@ public class DeviceUtils {
 		try
 		{
 			String name = findUnusedName("fake");
-			FakeIDEDevice fd = new FakeIDEDevice(name, true, true, 1024000);
+			FakeIDEDevice fd = new FakeIDEDevice(name, true, true, DEFAULT_FILE_SIZE);
 			if(addDevice(fd))
 			{
 				device = fd;
@@ -76,7 +76,7 @@ public class DeviceUtils {
 
 		try
 		{
-			AbstractIDEDevice fd = createDevice();
+			AbstractIDEDevice fd = createVMWareDevice();
 			if(addDevice(fd))
 			{
 				device = fd;
@@ -92,7 +92,7 @@ public class DeviceUtils {
 		return device;
 	}
 
-	public static AbstractIDEDevice createDevice() throws Exception
+	private static AbstractIDEDevice createVMWareDevice() throws Exception
 	{
 		File tmpFile = File.createTempFile("disk", "");
 		File directory = tmpFile.getParentFile();
@@ -101,8 +101,19 @@ public class DeviceUtils {
 		File mainFile = DiskFactory.createSparseDisk(directory, name, DEFAULT_FILE_SIZE);
 		VMWareDisk vmwareDisk = new VMWareDisk(mainFile);
 
-		AbstractIDEDevice dev = new FileIDEDevice(name,
+		AbstractIDEDevice dev = new VMWareIDEDevice(name,
 				true, true, vmwareDisk);
+		return dev;
+	}
+
+	public static AbstractIDEDevice createFileDevice() throws Exception
+	{
+		File tmpFile = File.createTempFile("disk", "");
+		File directory = tmpFile.getParentFile();
+		String name = tmpFile.getName();
+
+		AbstractIDEDevice dev = new FileIDEDevice(name,
+				true, true, new File(directory, name), DEFAULT_FILE_SIZE);
 		return dev;
 	}
 

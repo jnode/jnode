@@ -15,6 +15,8 @@ import org.jnode.util.BinaryPrefix;
 
 public class DeviceView extends DiskAreaView<Device>
 {
+	private static final long serialVersionUID = 4961328945650444476L;
+
 	public DeviceView(ErrorReporter errorReporter)
 	{
 		super(errorReporter);

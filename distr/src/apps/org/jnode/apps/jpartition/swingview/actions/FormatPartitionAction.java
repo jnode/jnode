@@ -12,6 +12,8 @@ import org.jnode.apps.jpartition.model.UserFacade;
 import org.jnode.apps.jpartition.swingview.PartitionView;
 
 public class FormatPartitionAction extends AbstractAction<PartitionView> {
+	private static final long serialVersionUID = 4100228292937417784L;
+
 	public FormatPartitionAction(ErrorReporter errorReporter, PartitionView view) {
 		super("format the partition", errorReporter, view);
 	}

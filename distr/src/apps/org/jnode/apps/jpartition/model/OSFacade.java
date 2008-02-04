@@ -25,8 +25,6 @@ public class OSFacade {
 		INSTANCE = new OSFacade();
 	}
 
-	private OSListener osListener;
-
 	private OSFacade()
 	{
 	}
@@ -36,11 +34,11 @@ public class OSFacade {
 		return INSTANCE;
 	}
 
-	final void setOSListener(final OSListener listener)
+	final void setOSListener(final OSListener listener) throws OSFacadeException
 	{
-		if(this.osListener != null)
+		if(listener == null)
 		{
-			throw new IllegalStateException("listener already set");
+			throw new NullPointerException("listener is null");
 		}
 
 		try {
@@ -48,10 +46,15 @@ public class OSFacade {
 				public void deviceStarted(org.jnode.driver.Device device) {
 					if(device instanceof IDEDevice)
 					{
-						Device dev = createDevice(device);
-						if(dev != null)
-						{
-							listener.deviceAdded(dev);
+						Device dev = null;
+						try {
+							dev = createDevice(device);
+							if(dev != null)
+							{
+								listener.deviceAdded(dev);
+							}
+						} catch (OSFacadeException e) {
+							listener.errorHappened(e);
 						}
 					}
 				}
@@ -59,35 +62,43 @@ public class OSFacade {
 				public void deviceStop(org.jnode.driver.Device device) {
 					if(device instanceof IDEDevice)
 					{
-						Device dev = createDevice(device);
-						if(dev != null)
-						{
-							listener.deviceRemoved(dev);
+						Device dev = null;
+						try {
+							dev = createDevice(device);
+							if(dev != null)
+							{
+								listener.deviceRemoved(dev);
+							}
+						} catch (OSFacadeException e) {
+							listener.errorHappened(e);
 						}
 					}
 				}});
 		} catch (NameNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new OSFacadeException("error in setOSListener", e);
 		}
 	}
 
-	final List<Device> getDevices() throws NameNotFoundException, ApiNotFoundException, IOException
+	final List<Device> getDevices() throws OSFacadeException
 	{
 		List<Device> devices = new ArrayList<Device>();
-		DeviceManager devMan = org.jnode.driver.DeviceUtils.getDeviceManager();
-		for(org.jnode.driver.Device dev : devMan.getDevicesByAPI(IDEDeviceAPI.class))
-		{
-			Device device = createDevice(dev);
-			if(device != null)
-			{
-				devices.add(device);
+		try {
+			DeviceManager devMan = org.jnode.driver.DeviceUtils
+					.getDeviceManager();
+			for (org.jnode.driver.Device dev : devMan
+					.getDevicesByAPI(IDEDeviceAPI.class)) {
+				Device device = createDevice(dev);
+				if (device != null) {
+					devices.add(device);
+				}
 			}
+		} catch (NameNotFoundException e) {
+			throw new OSFacadeException("error in getDevices", e);
 		}
 		return devices;
 	}
 
-	private Device createDevice(org.jnode.driver.Device dev)
+	private Device createDevice(org.jnode.driver.Device dev) throws OSFacadeException
 	{
 		Device device = null;
 		List<IBMPartitionTableEntry> partitions = getPartitions(dev);
@@ -125,19 +136,17 @@ public class OSFacade {
 			try {
 				long devSize = dev.getAPI(IDEDeviceAPI.class).getLength();
 				device = new Device(dev.getId(), devSize, dev, devPartitions);
-			} catch (ApiNotFoundException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+			} catch (ApiNotFoundException e) {
+				throw new OSFacadeException("error in createDevice", e);
+			} catch (IOException e) {
+				throw new OSFacadeException("error in createDevice", e);
 			}
 		}
 
 		return device;
 	}
 
-	private List<IBMPartitionTableEntry> getPartitions(org.jnode.driver.Device dev)
+	private List<IBMPartitionTableEntry> getPartitions(org.jnode.driver.Device dev) throws OSFacadeException
 	{
 		boolean supported = false;
 		List<IBMPartitionTableEntry> partitions = new ArrayList<IBMPartitionTableEntry>();
@@ -163,11 +172,9 @@ public class OSFacade {
 				}
 			}
 		} catch (ApiNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new OSFacadeException("error in getPartitions", e);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new OSFacadeException("error in getPartitions", e);
 		}
 
 		return supported ? partitions : null;

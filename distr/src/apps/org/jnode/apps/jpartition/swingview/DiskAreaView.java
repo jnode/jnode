@@ -19,6 +19,8 @@ import java.awt.Rectangle;
 
 abstract public class DiskAreaView<T extends Bounded> extends JComponent
 {
+	private static final long serialVersionUID = -506634580666065291L;
+
 	final private int DEFAULT_PIXELS_PER_BYTE = 1;
 
 	final protected int borderWidth = 5;

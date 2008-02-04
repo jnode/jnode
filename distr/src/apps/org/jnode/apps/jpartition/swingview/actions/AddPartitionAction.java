@@ -12,13 +12,14 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 
-import org.apache.log4j.Logger;
 import org.jnode.apps.jpartition.ErrorReporter;
 import org.jnode.apps.jpartition.model.Device;
 import org.jnode.apps.jpartition.model.UserFacade;
 import org.jnode.apps.jpartition.swingview.PartitionView;
 
 public class AddPartitionAction extends AbstractAction<PartitionView> {
+	private static final long serialVersionUID = 1240081461305707910L;
+
 	public AddPartitionAction(ErrorReporter errorReporter, PartitionView view) {
 		super("add a partition", errorReporter, view);
 	}

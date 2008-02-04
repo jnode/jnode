@@ -1,53 +1,70 @@
 package org.jnode.apps.jpartition.utils.device;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
+
 import javax.naming.NameNotFoundException;
-import org.jnode.apps.vmware.disk.VMWareDisk;
+
 import org.jnode.apps.vmware.disk.handler.UnsupportedFormatException;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.block.BlockDeviceAPIHelper;
-import org.jnode.driver.block.PartitionableBlockDeviceAPI;
-import org.jnode.driver.bus.ide.IDEDevice;
-import org.jnode.driver.bus.ide.IDEDeviceFactory;
-import org.jnode.driver.bus.ide.IDEDriverUtils;
+import org.jnode.util.ByteBufferUtils;
 
-public class FileIDEDevice extends AbstractIDEDevice implements PartitionableBlockDeviceAPI 
+/**
+ * TODO should that be merged with FileDevice ?
+ *
+ * @author Fabien DUMINY (fduminy at jnode.org)
+ *
+ */
+public class FileIDEDevice extends AbstractIDEDevice
 {
-	private VMWareDisk vmwareDisk;
-	
-	public FileIDEDevice(String name,  
-				boolean primary, boolean master, 
-				VMWareDisk vmwareDisk) 
-			throws IOException, DriverException, NameNotFoundException, UnsupportedFormatException 
+	private RandomAccessFile raf;
+
+	public FileIDEDevice(String name,
+				boolean primary, boolean master,
+				File file, long size)
+			throws IOException, DriverException, NameNotFoundException, UnsupportedFormatException
 	{
 		super(name, primary, master);
-		registerAPI(PartitionableBlockDeviceAPI.class, this);
 
-		this.vmwareDisk = vmwareDisk;
-		
-		setDriver(new FileIDEDeviceDriver());
-		
-		pt = buildPartitionTable();
+		raf = new RandomAccessFile(file, "rw");
+		raf.setLength(size);
 	}
 
 	public void flush() throws IOException {
-		vmwareDisk.flush();
+		// nothing to do
 	}
 
 	public long getLength() throws IOException {
-		return vmwareDisk.getLength();
+		return raf.length();
 	}
 
+	/**
+	 *
+	 */
 	public void read(long devOffset, ByteBuffer destBuf) throws IOException {
         BlockDeviceAPIHelper.checkBounds(this, devOffset, destBuf.remaining());
-        
-        vmwareDisk.read(devOffset, destBuf);
+		raf.seek(devOffset);
+
+        //TODO optimize it also to use ByteBuffer at lower level
+        ByteBufferUtils.ByteArray destBA = ByteBufferUtils.toByteArray(destBuf);
+        byte[] dest = destBA.toArray();
+		raf.read(dest, 0, dest.length);
+        destBA.refreshByteBuffer();
 	}
 
-	public void write(long devOffset, ByteBuffer srcBuf) throws IOException {		
+	/**
+	 *
+	 */
+	public void write(long devOffset, ByteBuffer srcBuf) throws IOException {
+		//		log.debug("fd.write devOffset=" + devOffset + ", length=" + length);
         BlockDeviceAPIHelper.checkBounds(this, devOffset, srcBuf.remaining());
+		raf.seek(devOffset);
 
-        vmwareDisk.write(devOffset, srcBuf);
+        //TODO optimize it also to use ByteBuffer at lower level
+        byte[] src = ByteBufferUtils.toArray(srcBuf);
+		raf.write(src, 0, src.length);
 	}
 }

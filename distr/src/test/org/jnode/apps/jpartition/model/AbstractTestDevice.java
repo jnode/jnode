@@ -24,7 +24,7 @@ abstract public class AbstractTestDevice extends AbstractTest {
 
 	@Before
 	public void setUp() throws Exception {
-		device = new Device("dev1", DEVICE_SIZE);
+		device = new CustomDevice("dev1", DEVICE_SIZE);
 	}
 
 	@Test
@@ -97,7 +97,7 @@ abstract public class AbstractTestDevice extends AbstractTest {
 		final int nbPartitions = device.getPartitions().size();
 		final long begin = getStartFreeSpace();
 		final long size = getFreeSpace() - 1500;
-		
+
 		Partition newPart = device.addPartition(begin, size);
 		assertEquals(begin, size, true, newPart);
 
@@ -106,7 +106,7 @@ abstract public class AbstractTestDevice extends AbstractTest {
 		Assert.assertEquals("must have only "+expectedNbPartitions+" partition(s)", expectedNbPartitions, partitions.size());
 
 		Partition part1 = partitions.get(getIndexFreeSpacePartition());
-		Assert.assertTrue("must return the same instance as addPartition", newPart == part1);		
+		Assert.assertTrue("must return the same instance as addPartition", newPart == part1);
 
 		Partition part2 = partitions.get(getIndexFreeSpacePartition()+1);
 		long part2Size = getFreeSpace() - part1.getSize();
@@ -120,7 +120,7 @@ abstract public class AbstractTestDevice extends AbstractTest {
 		final long shift = 500;
 		final long begin = getStartFreeSpace() + shift;
 		final long size = getFreeSpace() - 1500;
-		
+
 		Partition newPart = device.addPartition(begin, size);
 		assertEquals(begin, size, true, newPart);
 
@@ -132,7 +132,7 @@ abstract public class AbstractTestDevice extends AbstractTest {
 		assertEquals(getStartFreeSpace(), shift, false, part1);
 
 		Partition part2 = partitions.get(getIndexFreeSpacePartition()+1);
-		Assert.assertTrue("must return the same instance as addPartition", newPart == part2);				
+		Assert.assertTrue("must return the same instance as addPartition", newPart == part2);
 
 		Partition part3 = partitions.get(getIndexFreeSpacePartition()+2);
 		long part3Size = getFreeSpace() - part1.getSize() - part2.getSize();
@@ -146,7 +146,7 @@ abstract public class AbstractTestDevice extends AbstractTest {
 		final long shift = 1500;
 		final long begin = getStartFreeSpace() + shift;
 		final long size = getFreeSpace() - shift;
-		
+
 		Partition newPart = device.addPartition(begin, size);
 		assertEquals(begin, size, true, newPart);
 
@@ -158,7 +158,7 @@ abstract public class AbstractTestDevice extends AbstractTest {
 		assertEquals(getStartFreeSpace(), shift, false, part1);
 
 		Partition part2 = partitions.get(getIndexFreeSpacePartition()+1);
-		Assert.assertTrue("must return the same instance as addPartition", newPart == part1);		
+		Assert.assertTrue("must return the same instance as addPartition", newPart == part1);
 	}
 
 	@Test
