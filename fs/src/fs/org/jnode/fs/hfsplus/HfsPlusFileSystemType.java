@@ -7,13 +7,19 @@ import org.jnode.driver.Device;
 import org.jnode.driver.block.FSBlockDeviceAPI;
 import org.jnode.fs.BlockDeviceFileSystemType;
 import org.jnode.fs.FileSystemException;
+import org.jnode.fs.util.FSUtils;
 import org.jnode.partitions.PartitionTableEntry;
 import org.jnode.partitions.ibm.IBMPartitionTableEntry;
 import org.jnode.partitions.ibm.IBMPartitionTypes;
 import org.jnode.util.BigEndian;
 
 public class HfsPlusFileSystemType implements BlockDeviceFileSystemType<HfsPlusFileSystem> {
-	public static final Class<HfsPlusFileSystemType> ID = HfsPlusFileSystemType.class;
+
+    public static HfsPlusFileSystemType getInstance()
+    {
+    	return FSUtils.getFileSystemType(HfsPlusFileSystemType.class);
+    }
+
 	public HfsPlusFileSystem create(Device device, boolean readOnly)
 			throws FileSystemException {
 		HfsPlusFileSystem fs = new HfsPlusFileSystem(device, readOnly);

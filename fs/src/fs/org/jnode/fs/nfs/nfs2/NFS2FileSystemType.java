@@ -22,20 +22,22 @@
 package org.jnode.fs.nfs.nfs2;
 
 import org.jnode.driver.Device;
-import org.jnode.driver.block.FSBlockDeviceAPI;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
-import org.jnode.partitions.PartitionTableEntry;
+import org.jnode.fs.util.FSUtils;
 
 /**
  * @author Andrei Dore
  */
 public class NFS2FileSystemType implements FileSystemType<NFS2FileSystem> {
-    public static final Class<NFS2FileSystemType> ID = NFS2FileSystemType.class;
+    public static NFS2FileSystemType getInstance()
+    {
+    	return FSUtils.getFileSystemType(NFS2FileSystemType.class);
+    }
 
     /**
      * Create a filesystem from a given device.
-     * 
+     *
      * @param device
      * @param readOnly
      */

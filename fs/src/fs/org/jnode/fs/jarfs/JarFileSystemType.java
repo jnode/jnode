@@ -22,12 +22,10 @@
 package org.jnode.fs.jarfs;
 
 import org.jnode.driver.Device;
-import org.jnode.driver.block.FSBlockDeviceAPI;
 import org.jnode.driver.block.JarFileDevice;
-import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
-import org.jnode.partitions.PartitionTableEntry;
+import org.jnode.fs.util.FSUtils;
 
 /**
  *
@@ -35,6 +33,10 @@ import org.jnode.partitions.PartitionTableEntry;
  *
  */
 public class JarFileSystemType implements FileSystemType<JarFileSystem> {
+    public static JarFileSystemType getInstance()
+    {
+    	return FSUtils.getFileSystemType(JarFileSystemType.class);
+    }
 
     public static final Class<JarFileSystemType> ID = JarFileSystemType.class;
 

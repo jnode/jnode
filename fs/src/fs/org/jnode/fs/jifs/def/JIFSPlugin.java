@@ -70,12 +70,12 @@ public class JIFSPlugin extends Plugin {
     protected void startPlugin() throws PluginException {
         log.info("start jifs");
         try {
-            FileSystemService fSS = InitialNaming.lookup(FileSystemService.NAME);
-            JIFileSystemType type = fSS.getFileSystemType(JIFileSystemType.ID);
+            JIFileSystemType type = JIFileSystemType.getInstance();
             try {
                 VirtualDevice dev = VirtualDeviceFactory.createDevice(JIFileSystemType.VIRTUAL_DEVICE_NAME);
                 log.info(dev.getId() + " registered");
                 final JIFileSystem fs = type.create(dev, true);
+                final FileSystemService fSS = InitialNaming.lookup(FileSystemService.NAME);
                 fSS.registerFileSystem(fs);
 
                 final String mountPath = "jifs";
@@ -100,8 +100,6 @@ public class JIFSPlugin extends Plugin {
 
         } catch (NameNotFoundException e) {
             log.error("filsystemservice / filesystemtype not found");
-        } catch (FileSystemException e) {
-            log.error(e);
         }
     }
 

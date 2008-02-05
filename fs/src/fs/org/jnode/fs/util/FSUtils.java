@@ -9,16 +9,16 @@
  * by the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, but 
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * along with this library; If not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.fs.util;
 
 import java.io.IOException;
@@ -26,26 +26,34 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.naming.NameNotFoundException;
+
 import org.apache.log4j.Logger;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSFile;
+import org.jnode.fs.FileSystem;
+import org.jnode.fs.FileSystemException;
+import org.jnode.fs.FileSystemType;
+import org.jnode.fs.ftpfs.FTPFileSystemType;
+import org.jnode.fs.service.FileSystemService;
+import org.jnode.naming.InitialNaming;
 
 /**
- * 
+ *
  * @author Fabien DUMINY
  */
-public class FSUtils {    
+public class FSUtils {
 
-	private static final Logger log = Logger.getLogger(FSUtils.class);	
+	private static final Logger log = Logger.getLogger(FSUtils.class);
 
 	private static final int MAX_DUMP_SIZE = 256;
 
 	private static final int LINE_SIZE = 16;
-	
+
 	protected static DateFormat dateFormat = new SimpleDateFormat();
 
-	
+
     /**
      * @param path
      * @param separator
@@ -55,25 +63,25 @@ public class FSUtils {
         int idx = path.lastIndexOf(separator);
         if(idx >= 0) {
             path = path.substring(idx+1);
-        }        
+        }
         return path;
     }
 
     /**
      * @param path
      * @param separator
-     * @return 
+     * @return
      */
     public static String getParentName(String path, char separator) {
         int idx = path.lastIndexOf(separator);
         if(idx < 0) {
             path = "";
         } else {
-            path = path.substring(0, idx);            
+            path = path.substring(0, idx);
         }
         return path;
     }
-    
+
 	/**
 	 * @param entry
 	 * @param deep
@@ -82,8 +90,8 @@ public class FSUtils {
 	public static String toString(FSEntry entry, boolean deep) {
 		if(entry == null)
 			return "<FSEntry>NULL</FSEntry>";
-		
-        StringBuilder sb = new StringBuilder(2048); 
+
+        StringBuilder sb = new StringBuilder(2048);
 		sb.append("<FSEntry>");
 		sb.append(" name="+entry.getName());
 		try {
@@ -99,7 +107,7 @@ public class FSUtils {
 			log.error("error in isDirty", e1);
 		}
 		sb.append(" isValid="+entry.isValid());
-		
+
 		sb.append(" isFile="+entry.isFile());
 		if(deep && entry.isFile()) {
 			try {
@@ -107,10 +115,10 @@ public class FSUtils {
 			} catch (IOException e2) {
 				sb.append(" getFile=###"+e2.getMessage()+"###");
 				log.error("error in getFile", e2);
-			}			
+			}
 		}
 
-		sb.append(" isDir="+entry.isDirectory());		
+		sb.append(" isDir="+entry.isDirectory());
 		if(deep && entry.isDirectory())
 			try {
 				sb.append(toString(entry.getDirectory()));
@@ -119,7 +127,7 @@ public class FSUtils {
 				log.error("error in getDirectory", e3);
 			}
 		sb.append("</FSEntry>");
-		
+
 		return sb.toString();
 	}
 
@@ -141,32 +149,32 @@ public class FSUtils {
 	public static String toString(FSDirectory dir, boolean deep) throws IOException {
 		if(dir == null)
 			return "<FSDirectory>NULL</FSDirectory>";
-		
+
 		String str = "<FSDirectory>isValid="+dir.isValid()+"</FSDirectory>";
 		if(deep)
 			str += "\n" + dir.toString(); // also print entry table
-		
+
 		return str;
 	}
-	
+
 	/**
 	 * @param file
 	 * @return
 	 */
-	public static String toString(FSFile file) {		
+	public static String toString(FSFile file) {
 		if(file == null)
 			return "<FSEntry>NULL</FSEntry>";
-		
+
 		StringBuilder sb = new StringBuilder(32);
 		sb.append("<FSFile>");
 		sb.append(" isValid"+file.isValid());
 		sb.append(" length"+file.getLength());
 
 		sb.append("</FSFile>");
-		
+
 		return sb.toString();
 	}
-	
+
 	/**
 	 * @param str
 	 * @param date
@@ -175,7 +183,7 @@ public class FSUtils {
 	public static String toStringDate(String str, long date) {
 		return toString(str, new Date(date));
 	}
-	
+
 	/**
 	 * @param str
 	 * @param date
@@ -184,7 +192,7 @@ public class FSUtils {
 	public static String toString(String str, Date date) {
 		return str + dateFormat.format(date);
 	}
-	
+
 	/**
 	 * @param data
 	 * @return
@@ -192,7 +200,7 @@ public class FSUtils {
 	public static String toString(byte[] data) {
 		return toString(data, 0, data.length);
 	}
-	
+
 	/**
 	 * @param data
 	 * @param offset
@@ -202,32 +210,32 @@ public class FSUtils {
 	public static String toString(byte[] data, int offset, int length) {
 		StringBuilder sb = new StringBuilder(1024);
         StringBuilder chars = new StringBuilder(LINE_SIZE);
-		
+
 		int l = Math.min(Math.min(length - offset, data.length - offset),
 				 MAX_DUMP_SIZE);
 		int mod = l % LINE_SIZE;
 		if(mod != 0) l += LINE_SIZE - mod;
-		
+
 		for(int i = 0 ; i < l ; i++) {
 			if((i % 16) == 0) {
 				sb.append(lpad(Integer.toHexString(i), 4)).append(" - ");
 				chars.setLength(0); // empty
 			}
-			
+
 			int idx = offset + i;
-			boolean end = (idx >= data.length); 
+			boolean end = (idx >= data.length);
 			if(!end) {
 				sb.append(lpad(Integer.toHexString(data[idx]),2)).append(' ');
 				chars.append((char) data[idx]);
 			}
-			
+
 			if(((i % 16) == 15) || end) {
 				sb.append("   ").append(chars.toString()).append('\n');
 			}
 		}
 		return sb.toString();
 	}
-	
+
 	/**
 	 * @param str
 	 * @param size
@@ -241,10 +249,10 @@ public class FSUtils {
 		int nbBlanks = size - str.length();
 		for(int i = 0 ; i < nbBlanks ; i++ )
 			pad += " ";
-		
+
 		return pad + str;
 	}
-	
+
 	/**
 	 * @param data
 	 * @param offset
@@ -257,7 +265,20 @@ public class FSUtils {
 		for(int i = offset ; i < l ; i++) {
 			sb.append((char) data[i]);
 		}
-		
+
 		return sb.toString();
-	}	
+	}
+
+	public static <T extends FileSystemType<? extends FileSystem<?>>> T getFileSystemType(Class<T> typeClass)
+	{
+	    try {
+			final FileSystemService fss = InitialNaming
+					.lookup(FileSystemService.NAME);
+			return fss.getFileSystemType(typeClass);
+		} catch (NameNotFoundException e) {
+			throw new RuntimeException(typeClass.getName() + " not properly registered", e);
+		} catch (FileSystemException e) {
+			throw new RuntimeException("internal error", e);
+		}
+	}
 }
