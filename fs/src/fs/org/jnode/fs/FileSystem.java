@@ -60,9 +60,9 @@ public interface FileSystem<T extends FSEntry> {
      */
     public boolean isClosed();
 
-	public long getTotalSpace();
+	public long getTotalSpace() throws IOException;
 
-	public long getFreeSpace();
+	public long getFreeSpace() throws IOException;
 
-	public long getUsableSpace();
+	public long getUsableSpace() throws IOException;
 }
