@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystem;
+import org.jnode.fs.FileSystemType;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -36,6 +37,11 @@ final class VirtualFS implements FileSystem<VirtualDirEntry> {
     final static Logger log = Logger.getLogger(VirtualFS.class);
     private final Device dev;
     private final VirtualDirEntry root;
+
+	final public FileSystemType<FileSystem<VirtualDirEntry>> getType()
+	{
+		throw new UnsupportedOperationException("should not be called");
+	}
 
     /**
      * Initialize this instance.
