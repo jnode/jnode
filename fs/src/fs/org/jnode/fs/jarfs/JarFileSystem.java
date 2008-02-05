@@ -29,6 +29,7 @@ import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystemException;
+import org.jnode.fs.iso9660.ISO9660FileSystemType;
 import org.jnode.fs.spi.AbstractFileSystem;
 
 /**
@@ -53,6 +54,10 @@ public class JarFileSystem extends AbstractFileSystem<JarFSEntry> {
         cache = new JarFSCache();
         rootEntry = FSTreeBuilder.build(this, jarFile, cache);
     }
+
+	final public JarFileSystemType getType() {
+		return JarFileSystemType.getInstance();
+	}
 
     public JarFile getJarFile()
     {

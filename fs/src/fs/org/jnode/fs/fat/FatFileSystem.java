@@ -90,6 +90,10 @@ public class FatFileSystem extends AbstractFileSystem<FatRootEntry> {
 		}
 	}
 
+	final public FatFileSystemType getType() {
+		return FatFileSystemType.getInstance();
+	}
+
 	/**
 	 * Flush all changed structures to the device.
 	 *

@@ -116,11 +116,15 @@ public class NFS2FileSystem implements FileSystem<NFS2RootEntry> {
 
     }
 
+	final public NFS2FileSystemType getType() {
+		return NFS2FileSystemType.getInstance();
+	}
+
     /**
      * Close this filesystem. After a close, all invocations of method of this
      * filesystem or objects created by this filesystem will throw an
      * IOException.
-     * 
+     *
      * @throws java.io.IOException
      */
     public void close() throws IOException {

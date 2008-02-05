@@ -26,24 +26,29 @@ import org.jnode.driver.DeviceListener;
 import org.jnode.driver.Device;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Date;
 import java.security.PrivilegedAction;
 import java.security.AccessController;
 
 import com.enterprisedt.net.ftp.FTPClient;
+import com.enterprisedt.net.ftp.FTPException;
 import com.enterprisedt.net.ftp.FTPFile;
 
 
 /**
  * @author Levente S\u00e1ntha
  */
-public class FTPFileSystem extends FTPClient implements FileSystem<FTPFSDirectory> {
+public class FTPFileSystem implements FileSystem<FTPFSDirectory> {
     private FTPFSDevice device;
     private FTPFSDirectory root;
     private boolean closed;
     private Thread thread;
+    final private FTPClient client;
+
 
     public FTPFileSystem(final FTPFSDevice device) {
+    	this.client = new FTPClient();
         this.device = device;
         device.addListener(new DeviceListener() {
             public void deviceStarted(Device device) {
@@ -60,13 +65,13 @@ public class FTPFileSystem extends FTPClient implements FileSystem<FTPFSDirector
         });
         try{
 
-            setRemoteHost(device.getHost());
-            setTimeout(300000);
+        	client.setRemoteHost(device.getHost());
+        	client.setTimeout(300000);
             AccessController.doPrivileged(
             new PrivilegedAction(){
                 public Object run() {
                     try{
-                        connect();
+                        client.connect();
                         return null;
                     }catch(Exception e){
                         throw new RuntimeException(e);
@@ -74,7 +79,7 @@ public class FTPFileSystem extends FTPClient implements FileSystem<FTPFSDirector
                 }
             });
 
-            login(device.getUser(),device.getPassword());
+            client.login(device.getUser(),device.getPassword());
             thread = new Thread(new Runnable(){
                 public void run() {
                     try{
@@ -103,8 +108,12 @@ public class FTPFileSystem extends FTPClient implements FileSystem<FTPFSDirector
 
     }
 
+	final public FTPFileSystemType getType() {
+		return FTPFileSystemType.getInstance();
+	}
+
     private synchronized void nop() throws Exception{
-        dir(root.path());
+    	client.dir(root.path());
     }
 
 
@@ -119,7 +128,7 @@ public class FTPFileSystem extends FTPClient implements FileSystem<FTPFSDirector
         try {
             closed = true;
             thread = null;
-            quit();
+            client.quit();
         } catch(Exception e){
             throw new IOException("Close error");
         }
@@ -168,5 +177,17 @@ public class FTPFileSystem extends FTPClient implements FileSystem<FTPFSDirector
 	public long getUsableSpace() {
 		// TODO implement me
 		return 0;
+	}
+
+	FTPFile[] dirDetails(String path) throws IOException, FTPException, ParseException {
+		return client.dirDetails(path);
+	}
+
+	void chdir(String path) throws IOException, FTPException {
+		client.chdir(path);
+	}
+
+	byte[] get(String name) throws IOException, FTPException {
+		return client.get(name);
 	}
 }

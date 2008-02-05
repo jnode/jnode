@@ -18,6 +18,7 @@ import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystemException;
+import org.jnode.fs.ext2.Ext2FileSystemType;
 import org.jnode.fs.spi.AbstractFileSystem;
 
 
@@ -55,6 +56,9 @@ public class FatFileSystem extends AbstractFileSystem<FatRootDirectory> {
 	this ( device, "ISO_8859_1", readOnly );
     }
 
+	final public FatFileSystemType getType() {
+		return FatFileSystemType.getInstance();
+	}
 
     public int getClusterSize() {
 	return fat.getClusterSize();

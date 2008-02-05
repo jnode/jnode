@@ -19,11 +19,15 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
 	private final Logger log = Logger.getLogger(getClass());
 
 	private Superblock sb;
-	
+
 	private Catalog catalog;
 
 	public HfsPlusFileSystem(Device device, boolean readOnly) throws FileSystemException {
 		super(device, readOnly);
+	}
+
+	final public HfsPlusFileSystemType getType() {
+		return HfsPlusFileSystemType.getInstance();
 	}
 
 	public void read() throws FileSystemException {
@@ -57,7 +61,7 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
 	public long getFreeSpace() {
 		return sb.getFreeBlocks() * sb.getBlockSize();
 	}
-	
+
 	public long getTotalSpace() {
 		return sb.getTotalBlocks() * sb.getBlockSize();
 	}
