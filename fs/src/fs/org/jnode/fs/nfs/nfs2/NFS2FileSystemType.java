@@ -35,7 +35,7 @@ public class NFS2FileSystemType implements FileSystemType<NFS2FileSystem> {
 
     /**
      * Create a filesystem from a given device.
-     *
+     * 
      * @param device
      * @param readOnly
      */

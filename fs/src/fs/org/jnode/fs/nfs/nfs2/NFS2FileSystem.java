@@ -25,10 +25,10 @@ import java.io.IOException;
 
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceListener;
-import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 import org.jnode.net.nfs.nfs2.FileAttribute;
+import org.jnode.net.nfs.nfs2.FileSystemAttribute;
 import org.jnode.net.nfs.nfs2.NFS2Client;
 import org.jnode.net.nfs.nfs2.NFS2Exception;
 import org.jnode.net.nfs.nfs2.mount.Mount1Client;
@@ -120,7 +120,7 @@ public class NFS2FileSystem implements FileSystem<NFS2RootEntry> {
      * Close this filesystem. After a close, all invocations of method of this
      * filesystem or objects created by this filesystem will throw an
      * IOException.
-     *
+     * 
      * @throws java.io.IOException
      */
     public void close() throws IOException {
@@ -143,7 +143,7 @@ public class NFS2FileSystem implements FileSystem<NFS2RootEntry> {
 
             try {
                 nfsClient.close();
-            } catch (RuntimeException e) {
+            } catch (IOException e) {
 
             }
 
@@ -183,18 +183,36 @@ public class NFS2FileSystem implements FileSystem<NFS2RootEntry> {
     }
 
     public long getFreeSpace() {
-        // TODO implement me
-        return 0;
+
+        FileSystemAttribute fileSystemAttribute = getFileSystemAttribute();
+        return fileSystemAttribute.getBlockSize()
+                * fileSystemAttribute.getFreeBlockCount();
     }
 
     public long getTotalSpace() {
-        // TODO implement me
-        return 0;
+        FileSystemAttribute fileSystemAttribute = getFileSystemAttribute();
+
+        return fileSystemAttribute.getBlockSize()
+                * fileSystemAttribute.getBlockCount();
     }
 
     public long getUsableSpace() {
-        // TODO implement me
-        return 0;
+        FileSystemAttribute fileSystemAttribute = getFileSystemAttribute();
+        return fileSystemAttribute.getBlockSize()
+                * fileSystemAttribute.getFreeBlockCount();
+    }
+
+    private FileSystemAttribute getFileSystemAttribute() {
+        try {
+            return nfsClient.getFileSystemAttribute(root.getFileHandle());
+        } catch (NFS2Exception e) {
+            // throw new IOException(e);
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
     }
 
     NFS2Client getNFSClient() {
