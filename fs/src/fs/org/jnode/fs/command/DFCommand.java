@@ -2,6 +2,7 @@ package org.jnode.fs.command;
 
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.io.IOException;
 
 import javax.naming.NameNotFoundException;
 
@@ -49,17 +50,21 @@ public class DFCommand extends AbstractCommand {
 			long total, free, use;
 	        if (fs != null) {
 	        	log.debug("Check device : " + dev.getId());
-	        	total = fs.getTotalSpace();
-	        	if(total > 0){
-					free = fs.getFreeSpace();
-					use = total - free;
-		        	 b.append(dev.getId())
-		        	 .append("\t").append(total)
-		        	 .append("\t").append(use)
-		        	 .append("\t").append(free) 
-		        	 .append("\n");
-	        	}
-	        }
+                try {
+                    total = fs.getTotalSpace();
+                    if(total > 0){
+                        free = fs.getFreeSpace();
+                        use = total - free;
+                         b.append(dev.getId())
+                         .append("\t").append(total)
+                         .append("\t").append(use)
+                         .append("\t").append(free)
+                         .append("\n");
+                    }
+                } catch (IOException x){
+                    b.append("\t").append("Error getting disk usage information.").append("\n");
+                }
+            }
 		}
 		out.print(b.toString());
 	}
