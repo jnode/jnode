@@ -56,6 +56,10 @@ public class ISO9660FileSystem extends AbstractFileSystem<ISO9660Entry> {
         }
     }
 
+	final public ISO9660FileSystemType getType() {
+		return ISO9660FileSystemType.getInstance();
+	}
+
     /**
      * @see org.jnode.fs.FileSystem#getRootEntry()
      */

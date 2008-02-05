@@ -30,6 +30,7 @@ import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.jifs.directories.JIFSDrootDir;
+import org.jnode.fs.nfs.nfs2.NFS2FileSystemType;
 
 /**
  * @author Andreas H\u00e4nel
@@ -53,6 +54,10 @@ public class JIFileSystem implements FileSystem<JIFSDirectory> {
 		//} catch ( IOException e){
 		//	e.printStackTrace();
 		//}
+	}
+
+	final public JIFileSystemType getType() {
+		return JIFileSystemType.getInstance();
 	}
 
 	/**

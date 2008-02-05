@@ -6,6 +6,7 @@ import org.jnode.driver.Device;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
+import org.jnode.fs.smbfs.SMBFileSystemType;
 
 /**
  * A Filesystem implementation in the system RAM.
@@ -39,6 +40,10 @@ public class RAMFileSystem implements FileSystem<RAMDirectory> {
 		summedFileSize = 0;
 
 		root = new RAMDirectory(this, null, "");
+	}
+
+	final public RAMFileSystemType getType() {
+		return RAMFileSystemType.getInstance();
 	}
 
 	/**

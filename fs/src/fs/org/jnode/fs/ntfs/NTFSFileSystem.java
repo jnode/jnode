@@ -56,6 +56,10 @@ public class NTFSFileSystem extends AbstractFileSystem<FSEntry> {
         }
     }
 
+	final public NTFSFileSystemType getType() {
+		return NTFSFileSystemType.getInstance();
+	}
+
     /**
      * @see org.jnode.fs.FileSystem#getRootEntry()
      */
