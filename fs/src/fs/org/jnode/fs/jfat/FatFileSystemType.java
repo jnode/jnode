@@ -21,12 +21,11 @@
  */
 package org.jnode.fs.jfat;
 
-import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.driver.block.FSBlockDeviceAPI;
-import org.jnode.fs.FileSystemException;
-import org.jnode.fs.FileSystemType;
 import org.jnode.fs.BlockDeviceFileSystemType;
+import org.jnode.fs.FileSystemException;
+import org.jnode.fs.util.FSUtils;
 import org.jnode.partitions.PartitionTableEntry;
 import org.jnode.partitions.ibm.IBMPartitionTableEntry;
 import org.jnode.partitions.ibm.IBMPartitionTypes;
@@ -37,7 +36,11 @@ import org.jnode.partitions.ibm.IBMPartitionTypes;
  * @author Tango
  */
 public class FatFileSystemType implements BlockDeviceFileSystemType<FatFileSystem> {
-    public static final Class<FatFileSystemType> ID=FatFileSystemType.class;
+
+    public static FatFileSystemType getInstance()
+    {
+    	return FSUtils.getFileSystemType(FatFileSystemType.class);
+    }
 
 
     public String getName() {

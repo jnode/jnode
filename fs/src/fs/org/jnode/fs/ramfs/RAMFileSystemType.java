@@ -1,10 +1,9 @@
 package org.jnode.fs.ramfs;
 
 import org.jnode.driver.Device;
-import org.jnode.driver.block.FSBlockDeviceAPI;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
-import org.jnode.partitions.PartitionTableEntry;
+import org.jnode.fs.util.FSUtils;
 
 /**
  * FileSystemType for RAMFS, a filesystem implementation in system RAM
@@ -15,8 +14,10 @@ public class RAMFileSystemType implements FileSystemType<RAMFileSystem> {
 
 	private static final int DEFAULT_SIZE = 104857600;
 
-	/** the name of this filesystem */
-	public static final Class<RAMFileSystemType> ID = RAMFileSystemType.class;
+    public static RAMFileSystemType getInstance()
+    {
+    	return FSUtils.getFileSystemType(RAMFileSystemType.class);
+    }
 
 	/** Virtual Device name for this filesystem */
 	public static final String VIRTUAL_DEVICE_NAME = "ramfsdevice";

@@ -22,16 +22,18 @@
 package org.jnode.fs.smbfs;
 
 import org.jnode.driver.Device;
-import org.jnode.driver.block.FSBlockDeviceAPI;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
-import org.jnode.partitions.PartitionTableEntry;
+import org.jnode.fs.util.FSUtils;
 
 /**
  * @author Levente S\u00e1ntha
  */
 public class SMBFileSystemType implements FileSystemType<SMBFileSystem> {
-    public static final Class<SMBFileSystemType> ID = SMBFileSystemType.class;
+    public static SMBFileSystemType getInstance()
+    {
+    	return FSUtils.getFileSystemType(SMBFileSystemType.class);
+    }
 
     /**
      * Create a filesystem from a given device.

@@ -23,19 +23,19 @@
 
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
-import org.jnode.driver.block.FSBlockDeviceAPI;
-import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
-import org.jnode.partitions.PartitionTableEntry;
+import org.jnode.fs.util.FSUtils;
 
 /**
  * @author Andreas H\u00e4nel
  */
 public class JIFileSystemType implements FileSystemType<JIFileSystem> {
+    public static JIFileSystemType getInstance()
+    {
+    	return FSUtils.getFileSystemType(JIFileSystemType.class);
+    }
 
-	/** Name of this filesystem type */
-	public static final Class<JIFileSystemType> ID = JIFileSystemType.class;
     public static final String VIRTUAL_DEVICE_NAME = "jifs";
 
     /**	Logger*/

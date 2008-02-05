@@ -141,8 +141,7 @@ public class NFSMountCommand extends AbstractCommand {
         dm.register(dev);
         final FileSystemService fss = InitialNaming
                 .lookup(FileSystemService.NAME);
-        NFS2FileSystemType type = fss
-                .getFileSystemType(NFS2FileSystemType.ID);
+        NFS2FileSystemType type = NFS2FileSystemType.getInstance();
         final NFS2FileSystem fs = type.create(dev, readOnly);
         fss.registerFileSystem(fs);
         fss.mount(mount_point, fs, null);

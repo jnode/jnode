@@ -73,7 +73,7 @@ public class FTPMountCommand extends AbstractCommand {
         final DeviceManager dm = DeviceUtils.getDeviceManager();
         dm.register(dev);
         final FileSystemService fss = InitialNaming.lookup(FileSystemService.NAME);
-        FTPFileSystemType type = fss.getFileSystemType(FTPFileSystemType.ID);
+        FTPFileSystemType type = FTPFileSystemType.getInstance();
         final FTPFileSystem fs = type.create(dev, true);
         fss.registerFileSystem(fs);
         fss.mount(mount_point, fs, null);

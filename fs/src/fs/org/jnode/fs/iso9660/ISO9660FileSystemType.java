@@ -26,10 +26,9 @@ import java.nio.ByteBuffer;
 
 import org.jnode.driver.Device;
 import org.jnode.driver.block.FSBlockDeviceAPI;
-import org.jnode.fs.FileSystem;
-import org.jnode.fs.FileSystemException;
-import org.jnode.fs.FileSystemType;
 import org.jnode.fs.BlockDeviceFileSystemType;
+import org.jnode.fs.FileSystemException;
+import org.jnode.fs.util.FSUtils;
 import org.jnode.partitions.PartitionTableEntry;
 
 /**
@@ -37,7 +36,10 @@ import org.jnode.partitions.PartitionTableEntry;
  */
 public class ISO9660FileSystemType implements BlockDeviceFileSystemType<ISO9660FileSystem> {
 
-    public static final Class<ISO9660FileSystemType> ID = ISO9660FileSystemType.class;
+    public static ISO9660FileSystemType getInstance()
+    {
+    	return FSUtils.getFileSystemType(ISO9660FileSystemType.class);
+    }
 
     public final String getName() {
         return "ISO9660";
