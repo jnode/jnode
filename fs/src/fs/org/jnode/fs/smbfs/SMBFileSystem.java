@@ -21,13 +21,13 @@
 
 package org.jnode.fs.smbfs;
 
-import org.jnode.fs.FileSystem;
-
 import java.io.IOException;
 
 import jcifs.smb.NtlmAuthenticator;
 import jcifs.smb.NtlmPasswordAuthentication;
 import jcifs.smb.SmbFile;
+
+import org.jnode.fs.FileSystem;
 
 /**
  * @author Levente S\u00e1ntha
@@ -46,6 +46,10 @@ public class SMBFileSystem extends NtlmAuthenticator implements FileSystem<SMBFS
             throw new RuntimeException(e);
         }
     }
+
+	final public SMBFileSystemType getType() {
+		return SMBFileSystemType.getInstance();
+	}
 
     protected NtlmPasswordAuthentication getNtlmPasswordAuthentication() {
         return new NtlmPasswordAuthentication( "", device.getUser(), device.getPassword() );
