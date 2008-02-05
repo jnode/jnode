@@ -148,7 +148,7 @@ public class Mount1Client {
 
                 if (e instanceof OncRpcException) {
 
-                    if (countCall > 10) {
+                    if (countCall > 5) {
                         throw new MountException(e.getMessage(), e);
                     } else {
                         LOGGER

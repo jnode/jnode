@@ -21,6 +21,10 @@ import org.apache.log4j.Logger;
 import org.jnode.net.nfs.Protocol;
 
 /**
+ * This class access a NFS2 server . It implements all the method from NFS2 specification
+ *  
+ *  http://tools.ietf.org/html/rfc1094
+ * 
  * @author Andrei Dore
  */
 public class NFS2Client {
@@ -46,7 +50,7 @@ public class NFS2Client {
      * 8192.At this number we must add the length of the header(24), the lenght
      * of the auth part (400) and the length of the parameters in write
      * operation (16 +FILE_HANDLE_SIZE) . We chose to add the length of the
-     * parameter in write operation because only in this case we risk and buffer
+     * parameter in write operation because only in this case we risk a buffer
      * overflow.
      */
     private static final int HEADER_DATA = 440 + FILE_HANDLE_SIZE;
@@ -78,6 +82,8 @@ public class NFS2Client {
     private static final int PROCEDURE_REMOVE_DIRECTORY = 15;
 
     private static final int PROCEDURE_LIST_DIRECTORY = 16;
+
+    private static final int PROCEDURE_GET_FILE_SYSTEM_ATTRIBUTE = 17;
 
     private static final Logger LOGGER = Logger.getLogger(NFS2Client.class);
 
@@ -227,7 +233,7 @@ public class NFS2Client {
 
                 if (e instanceof OncRpcException) {
 
-                    if (countCall > 10) {
+                    if (countCall > 5) {
                         throw new NFS2Exception(e.getMessage(), e);
                     } else {
                         LOGGER
@@ -255,7 +261,7 @@ public class NFS2Client {
 
     }
 
-    public void close() throws IOException {
+    public synchronized void close() throws IOException {
 
         closed = true;
 
@@ -743,6 +749,43 @@ public class NFS2Client {
 
     }
 
+    public FileSystemAttribute getFileSystemAttribute(final byte[] fileHandle)
+            throws NFS2Exception, IOException {
+
+        XdrAble nfsParameter = new NFSParameter() {
+
+            public void xdrEncode(XdrEncodingStream xdr)
+                    throws OncRpcException, IOException {
+                xdr.xdrEncodeOpaque(fileHandle, FILE_HANDLE_SIZE);
+            }
+
+        };
+
+        final FileSystemAttribute fileSystemAttribute = new FileSystemAttribute();
+
+        XdrAble nfsResult = new NFSResult() {
+
+            public void xdrDecode(XdrDecodingStream xdr)
+                    throws OncRpcException, IOException {
+
+                fileSystemAttribute.setTransferSize(xdrDecodeUnsignedInt(xdr));
+                fileSystemAttribute.setBlockSize(xdrDecodeUnsignedInt(xdr));
+                fileSystemAttribute.setBlockCount(xdrDecodeUnsignedInt(xdr));
+                fileSystemAttribute
+                        .setFreeBlockCount(xdrDecodeUnsignedInt(xdr));
+                fileSystemAttribute
+                        .setAvailableBlockCount(xdrDecodeUnsignedInt(xdr));
+
+            }
+
+        };
+
+        call(PROCEDURE_GET_FILE_SYSTEM_ATTRIBUTE, nfsParameter, nfsResult);
+
+        return fileSystemAttribute;
+
+    }
+
     private int createMode(boolean[] data) {
 
         int mode = 0;
@@ -820,6 +863,19 @@ public class NFS2Client {
         Time lastStatusChangedTime = new Time();
         xdrDecodeTime(xdr, lastStatusChangedTime);
         fileAttribute.setLastStatusChanged(lastStatusChangedTime);
+
+    }
+
+    private long xdrDecodeUnsignedInt(XdrDecodingStream xdr)
+            throws OncRpcException, IOException {
+
+        byte[] buffer = new byte[4];
+        xdr.xdrDecodeOpaque(buffer);
+
+        long result = (buffer[0] & 0xFF) << 24 | (buffer[1] & 0xFF) << 16
+                | (buffer[2] & 0xFF) << 8 | (buffer[3] & 0xFF);
+
+        return result;
 
     }
 

@@ -1,5 +1,4 @@
 /*
- * $Id: FTPFSFile.java 2406 2006-03-23 06:17:24Z lsantha $
  *
  * JNode.org
  * Copyright (C) 2003-2006 JNode.org
@@ -32,6 +31,8 @@ import org.jnode.net.nfs.nfs2.ReadFileResult;
 import org.jnode.net.nfs.nfs2.Time;
 
 /**
+ * A NFS2File model a NFS file .
+ * 
  * @author Andrei Dore
  */
 public class NFS2File extends NFS2Object implements FSFile {
@@ -67,11 +68,15 @@ public class NFS2File extends NFS2Object implements FSFile {
 
         try {
 
-            int length = NFS2Client.MAX_DATA;
+            int length;
 
-            while (length == NFS2Client.MAX_DATA) {
+            while (true) {
 
                 length = Math.min(NFS2Client.MAX_DATA, dest.remaining());
+
+                if (length == 0) {
+                    return;
+                }
 
                 ReadFileResult result = client.readFile(entry.getFileHandle(),
                         (int) fileOffset, length);

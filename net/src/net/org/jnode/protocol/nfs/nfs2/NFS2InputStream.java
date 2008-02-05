@@ -18,6 +18,15 @@ import org.jnode.net.nfs.nfs2.mount.Mount1Client;
 import org.jnode.net.nfs.nfs2.mount.MountException;
 import org.jnode.net.nfs.nfs2.mount.MountResult;
 
+/**
+ * A NFS2InputStream obtains the bytes from a nfs2 connection. 
+ * The URL is nfs://host/remotePath
+ * The remotePath contains also the export path.
+ * 
+ * 
+ * @author Andrei Dore
+ *
+ */
 public class NFS2InputStream extends InputStream {
 
     private static int DEFAULT_BUFFER_SIZE = NFS2Client.MAX_DATA;
@@ -58,10 +67,16 @@ public class NFS2InputStream extends InputStream {
         try {
             exportList = mountClient.export();
         } catch (MountException e) {
-            mountClient.close();
+            try {
+                mountClient.close();
+            } catch (IOException e1) {
+            }
             throw new IOException(e.getMessage());
         } catch (IOException e) {
-            mountClient.close();
+            try {
+                mountClient.close();
+            } catch (IOException e1) {
+            }
             throw e;
         }
 
@@ -97,10 +112,16 @@ public class NFS2InputStream extends InputStream {
         try {
             mountResult = mountClient.mount(mountDirectory);
         } catch (MountException e) {
-            mountClient.close();
+            try {
+                mountClient.close();
+            } catch (IOException e1) {
+            }
             throw new IOException(e.getMessage());
         } catch (IOException e) {
-            mountClient.close();
+            try {
+                mountClient.close();
+            } catch (IOException e1) {
+            }
             throw e;
         }
 
@@ -132,23 +153,17 @@ public class NFS2InputStream extends InputStream {
         } catch (NFS2Exception e) {
 
             try {
-                mountClient.unmount(mountDirectory);
-            } catch (MountException e1) {
+                close();
+            } catch (IOException e1) {
             }
-
-            mountClient.close();
-            nfsClient.close();
 
             throw new IOException(e.getMessage());
 
         } catch (IOException e) {
             try {
-                mountClient.unmount(mountDirectory);
-            } catch (MountException e1) {
+                close();
+            } catch (IOException e1) {
             }
-
-            mountClient.close();
-            nfsClient.close();
 
             throw e;
         }

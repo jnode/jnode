@@ -60,7 +60,13 @@ public class NFSHostNameArgument extends Argument {
                             try {
                                 exportEntryList = client.export();
                             } finally {
-                                client.close();
+                                if (client != null) {
+                                    try {
+                                        client.close();
+                                    } catch (IOException e) {
+                                        
+                                    }
+                                }
                             }
                             return exportEntryList;
 
