@@ -30,10 +30,7 @@ import org.jnode.fs.util.FSUtils;
  * @author Levente S\u00e1ntha
  */
 public class FTPFileSystemType implements FileSystemType<FTPFileSystem> {
-    public static FTPFileSystemType getInstance()
-    {
-    	return FSUtils.getFileSystemType(FTPFileSystemType.class);
-    }
+    public static final Class<FTPFileSystemType> ID = FTPFileSystemType.class;
 
     /**
      * Create a filesystem from a given device.
@@ -42,7 +39,7 @@ public class FTPFileSystemType implements FileSystemType<FTPFileSystem> {
      * @param readOnly
      */
     public FTPFileSystem create(Device device, boolean readOnly) throws FileSystemException {
-        return new FTPFileSystem((FTPFSDevice) device);
+        return new FTPFileSystem((FTPFSDevice) device, this);
     }
 
     /**

@@ -45,10 +45,12 @@ public class FTPFileSystem implements FileSystem<FTPFSDirectory> {
     private boolean closed;
     private Thread thread;
     final private FTPClient client;
+    private final FTPFileSystemType type;
 
 
-    public FTPFileSystem(final FTPFSDevice device) {
-    	this.client = new FTPClient();
+    FTPFileSystem(final FTPFSDevice device, final FTPFileSystemType type) {
+        this.type = type;
+        this.client = new FTPClient();
         this.device = device;
         device.addListener(new DeviceListener() {
             public void deviceStarted(Device device) {
@@ -109,7 +111,7 @@ public class FTPFileSystem implements FileSystem<FTPFSDirectory> {
     }
 
 	final public FTPFileSystemType getType() {
-		return FTPFileSystemType.getInstance();
+		return type;
 	}
 
     private synchronized void nop() throws Exception{
