@@ -43,8 +43,8 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
 
 	@Override
 	protected FSFile createFile(FSEntry entry) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		HFSPlusEntry e = (HFSPlusEntry)entry;
+		return new HFSPlusFile(e);
 	}
 
 	@Override
