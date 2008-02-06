@@ -1,5 +1,8 @@
 package org.jnode.fs.hfsplus.catalog;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.jnode.fs.hfsplus.tree.Key;
 import org.jnode.fs.hfsplus.tree.LeafNode;
 import org.jnode.fs.hfsplus.tree.LeafRecord;
@@ -16,7 +19,11 @@ public class CatalogLeafNode extends LeafNode {
 		    records[i] = new LeafRecord(key ,nodeData, currentOffset,recordDataSize);
 		}
 	}
-	
+	/**
+	 * 
+	 * @param parentId
+	 * @return
+	 */
 	public LeafRecord find(CatalogNodeId parentId){
 		for(LeafRecord rec : records) {
 			Key key = rec.getKey();
@@ -26,5 +33,22 @@ public class CatalogLeafNode extends LeafNode {
 			}
 		}
 		return null;
+	}
+	/**
+	 * 
+	 * @param parentId
+	 * @return
+	 */
+	public LeafRecord[] findAll(CatalogNodeId parentId){
+		List<LeafRecord> list = new LinkedList<LeafRecord>();
+		for(LeafRecord rec : records) {
+			Key key = rec.getKey();
+			if(key instanceof CatalogKey) {
+				if(((CatalogKey)key).getParentId().getId() == parentId.getId()){
+					list.add(rec);
+				}
+			}
+		}
+		return list.toArray(new LeafRecord[list.size()]);
 	}
 }

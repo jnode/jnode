@@ -24,8 +24,8 @@ public class CatalogFolder {
 	
 	public String toString(){
 		StringBuffer s = new StringBuffer();
-		s.append("Record type:").append(getRecordType()).append("\t");
-		s.append("Valence    :").append(getValence()).append("\t");
+		s.append("Record type:").append(getRecordType()).append("\n");
+		s.append("Valence    :").append(getValence()).append("\n");
 		s.append("Folder ID  :").append(getFolderId().getId()).append("\n");
 		return s.toString();
 	}

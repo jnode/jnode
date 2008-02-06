@@ -69,9 +69,9 @@ public class CatalogKey extends AbstractKey {
 	
 	public String toString(){
 		StringBuffer s = new StringBuffer();
-		s.append("Key length:").append(getKeyLength()).append("\t");
-		s.append("Parent ID :").append(getParentId().getId()).append("\t");
-		s.append("Node name :").append(getNodeName().getUnicodeString()).append("\n");
+		s.append("Key length:").append(getKeyLength()).append(" ");
+		s.append("Parent ID :").append(getParentId().getId()).append(" ");
+		s.append("Node name :").append((getNodeName() != null)?getNodeName().getUnicodeString():"");
 		return s.toString();
 	}
 }

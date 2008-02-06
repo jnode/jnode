@@ -26,7 +26,10 @@ public class HFSPlusDirectory extends AbstractFSDirectory {
 		super((HfsPlusFileSystem)e.getFileSystem());
 		this.record = e.getRecord();
 		this.folder = new CatalogFolder(record.getRecordData());
-		log.debug("Folder : " + folder.toString());
+		log.debug("Associated record:" + record.toString());
+		if(record.getType() == HfsPlusConstants.RECORD_TYPE_FOLDER){
+			log.debug("Associated folder : " + folder.toString());
+		}
 	}
 	
 	@Override
@@ -44,25 +47,14 @@ public class HFSPlusDirectory extends AbstractFSDirectory {
 	@Override
 	protected FSEntryTable readEntries() throws IOException {
 		List<FSEntry> pathList = new LinkedList<FSEntry>();
-		CatalogNodeId parentID = ((CatalogKey)record.getKey()).getParentId();
-		while(parentID.getId() != 1) {
-			LeafRecord parent = ((HfsPlusFileSystem)getFileSystem()).getCatalog().getRecord(parentID); // Look for the thread record associated with the parent dir
-			if(parent == null)
-				throw new RuntimeException("No folder thread found!");
-			if(parent.getType() == HfsPlusConstants.RECORD_TYPE_FOLDER_THREAD) {
-				CatalogThread threadData = new CatalogThread(parent.getRecordData());
-				LeafRecord lf =((HfsPlusFileSystem)getFileSystem()).getCatalog().getRecord(threadData.getParentId(), threadData.getNodeName());
-				log.debug("Leaf Record : " + lf.toString());
-				HFSPlusEntry entry = new HFSPlusEntry((HfsPlusFileSystem)getFileSystem(),null,this, ((CatalogKey)lf.getKey()).getNodeName().getUnicodeString(), lf);
-				pathList.add(entry);
-				parentID = threadData.getParentId();
+		LeafRecord[] records = ((HfsPlusFileSystem)getFileSystem()).getCatalog().getRecords(folder.getFolderId());
+		for(LeafRecord rec : records) {
+			if(rec.getType() == HfsPlusConstants.RECORD_TYPE_FOLDER || rec.getType() == HfsPlusConstants.RECORD_TYPE_FILE){
+				String name = ((CatalogKey)rec.getKey()).getNodeName().getUnicodeString();
+				HFSPlusEntry e = new HFSPlusEntry((HfsPlusFileSystem)getFileSystem(),null,null,name,rec);
+				pathList.add(e);
 			}
-			else if(parent.getType() == HfsPlusConstants.RECORD_TYPE_FILE_THREAD)
-				throw new RuntimeException("Tried to get folder thread (" + parentID + ",\"\") but found a file thread!");
-			else
-				throw new RuntimeException("Tried to get folder thread (" + parentID + ",\"\") but found " + parent.getType() +"!");		
 		}
-		//return pathList;
 		return new FSEntryTable(((HfsPlusFileSystem)getFileSystem()),pathList);
 	}
 
