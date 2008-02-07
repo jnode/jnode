@@ -32,6 +32,7 @@ import java.security.Permission;
 import java.security.PermissionCollection;
 import java.security.Permissions;
 import java.security.Policy;
+import java.security.cert.Certificate;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -139,7 +140,7 @@ final class JNodePolicy extends Policy {
             url = new URL("plugin:" + id + "!/");
             final ClassLoader cl = ext.getDeclaringPluginDescriptor()
                     .getPluginClassLoader();
-            final CodeSource cs = new CodeSource(url, null);
+            final CodeSource cs = new CodeSource(url, (Certificate[])null);
             final Permissions perms = new Permissions();
             codeSource2Permissions.put(cs, perms);
             // BootLog.debug("Adding permissions for " + cs);

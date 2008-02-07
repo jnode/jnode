@@ -1491,4 +1491,37 @@ public abstract class Toolkit
     protected abstract DesktopPeer createDesktopPeer(Desktop target)
       throws HeadlessException;
 
+    /**
+     * Returns whether the always-on-top mode is supported by this toolkit.
+     * To detect whether the always-on-top mode is supported for a
+     * particular Window, use {@link Window#isAlwaysOnTopSupported}.
+     * @return <code>true</code>, if current toolkit supports the always-on-top mode,
+     *     otherwise returns <code>false</code>
+     * @see Window#isAlwaysOnTopSupported
+     * @see Window#setAlwaysOnTop(boolean)
+     * @since 1.6
+     */
+    public boolean isAlwaysOnTopSupported() {
+        //todo review it
+        return false;
+    }
+
+    /**
+     * Returns whether the given modality type is supported by this toolkit. If
+     * a dialog with unsupported modality type is created, then
+     * <code>Dialog.ModalityType.MODELESS</code> is used instead.
+     *
+     * @param modalityType modality type to be checked for support by this toolkit
+     *
+     * @return <code>true</code>, if current toolkit supports given modality
+     *     type, <code>false</code> otherwise
+     *
+     * @see java.awt.Dialog.ModalityType
+     * @see java.awt.Dialog#getModalityType
+     * @see java.awt.Dialog#setModalityType
+     *
+     * @since 1.6
+     */
+    public abstract boolean isModalityTypeSupported(Dialog.ModalityType modalityType);
+
 } // class Toolkit

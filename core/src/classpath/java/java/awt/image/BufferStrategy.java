@@ -121,4 +121,23 @@ public abstract class BufferStrategy
    * buffer.
    */
   public abstract void show();
+
+    //jnode openjdk
+    /**
+     * Releases system resources currently consumed by this
+     * <code>BufferStrategy</code> and
+     * removes it from the associated Component.  After invoking this
+     * method, <code>getBufferStrategy</code> will return null.  Trying
+     * to use a <code>BufferStrategy</code> after it has been disposed will
+     * result in undefined behavior.
+     *
+     * @see java.awt.Window#createBufferStrategy
+     * @see java.awt.Canvas#createBufferStrategy
+     * @see java.awt.Window#getBufferStrategy
+     * @see java.awt.Canvas#getBufferStrategy
+     * @since 1.6
+     */
+    public void dispose() {
+        //todo override it where needed
+    }
 }

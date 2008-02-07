@@ -13,6 +13,7 @@
     <library name="jnode-core.jar">
 	  <export name="com.sun.naming.internal.*"/>
       <export name="com.sun.security.auth.UserPrincipal"/>  
+      <export name="com.sun.security.auth.PrincipalComparator"/>  
 
 	  <export name="sun.awt.EventListenerAggregate" />
       <export name="sun.misc.*"/>
@@ -30,6 +31,10 @@
       <export name="sun.security.util.SecurityConstants"/>
       <export name="sun.security.action.*"/>
       <export name="sun.security.jca.*"/>
+      <export name="sun.security.provider.PolicyFile"/>
+      <export name="sun.security.provider.PolicyInfo"/>
+      <export name="sun.security.provider.PolicyParser"/>
+      <export name="sun.security.provider.SelfPermission"/>
       <export name="sun.misc.Service"/>
       <export name="sun.misc.ServiceConfigurationError"/>
       <export name="sun.nio.cs.StreamEncoder"/>
@@ -170,6 +175,8 @@
       <export name="javax.security.auth.callback.PasswordCallback"/>
       <export name="javax.security.auth.callback.UnsupportedCallbackException"/>
       <export name="javax.security.auth.login.LoginException"/>
+      <export name="javax.security.auth.login.Configuration$Parameters"/>
+      <export name="javax.security.auth.login.Configuration"/>
       <export name="javax.security.auth.x500.*"/>
 
       <export name="org.xml.sax.*"/>

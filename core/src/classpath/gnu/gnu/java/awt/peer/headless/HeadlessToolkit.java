@@ -349,4 +349,11 @@ public class HeadlessToolkit
     protected DesktopPeer createDesktopPeer(Desktop target) throws HeadlessException {
         throw new HeadlessException();
     }
+
+    /*
+     * Modality
+     */
+    public boolean isModalityTypeSupported(Dialog.ModalityType modalityType) {
+        return false;
+    }
 }

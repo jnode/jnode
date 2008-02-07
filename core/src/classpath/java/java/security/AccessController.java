@@ -185,4 +185,64 @@ public final class AccessController
         return new AccessControlContext(VmAccessController.getContext());
     	//return VMAccessController.getContext();
     }
+
+
+    //jnode + openjdk
+    /**
+     * Performs the specified <code>PrivilegedAction</code> with privileges
+     * enabled. The action is performed with <i>all</i> of the permissions
+     * possessed by the caller's protection domain.
+     *
+     * <p> If the action's <code>run</code> method throws an (unchecked)
+     * exception, it will propagate through this method.
+     *
+     * <p> This method preserves the current AccessControlContext's
+     * DomainCombiner (which may be null) while the action is performed.
+     *
+     * @param action the action to be performed.
+     *
+     * @return the value returned by the action's <code>run</code> method.
+     *
+     * @exception NullPointerException if the action is <code>null</code>
+     *
+     * @see #doPrivileged(PrivilegedAction)
+     * @see java.security.DomainCombiner
+     *
+     * @since 1.6
+     */
+    public static <T> T doPrivilegedWithCombiner(PrivilegedAction<T> action) {
+        //todo implement it
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Performs the specified <code>PrivilegedExceptionAction</code> with
+     * privileges enabled.  The action is performed with <i>all</i> of the
+     * permissions possessed by the caller's protection domain.
+     *
+     * <p> If the action's <code>run</code> method throws an <i>unchecked</i>
+     * exception, it will propagate through this method.
+     *
+     * <p> This method preserves the current AccessControlContext's
+     * DomainCombiner (which may be null) while the action is performed.
+     *
+     * @param action the action to be performed.
+     *
+     * @return the value returned by the action's <code>run</code> method
+     *
+     * @exception PrivilegedActionException if the specified action's
+     *         <code>run</code> method threw a <i>checked</i> exception
+     * @exception NullPointerException if the action is <code>null</code>
+     *
+     * @see #doPrivileged(PrivilegedAction)
+     * @see #doPrivileged(PrivilegedExceptionAction,AccessControlContext)
+     * @see java.security.DomainCombiner
+     *
+     * @since 1.6
+     */
+    public static <T> T doPrivilegedWithCombiner(PrivilegedExceptionAction<T> action) 
+            throws PrivilegedActionException {
+        //todo implement it
+        throw new UnsupportedOperationException();
+    }
 }

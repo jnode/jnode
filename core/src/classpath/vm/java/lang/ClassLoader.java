@@ -35,6 +35,7 @@ import java.security.PermissionCollection;
 import java.security.Policy;
 import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
+import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -133,7 +134,7 @@ public abstract class ClassLoader {
          */
         static final ProtectionDomain defaultProtectionDomain;
         static {
-            final CodeSource cs = new CodeSource(null, null);
+            final CodeSource cs = new CodeSource(null, (Certificate[])null);
             PermissionCollection perm = AccessController
                     .doPrivileged(new PrivilegedAction<PermissionCollection>() {
                         public PermissionCollection run() {
@@ -447,7 +448,7 @@ public abstract class ClassLoader {
 
     private ProtectionDomain getDefaultProtectionDomain() {
         if (defaultProtectionDomain == null) {
-            final CodeSource cs = new CodeSource(null, null);
+            final CodeSource cs = new CodeSource(null, (Certificate[])null);
             defaultProtectionDomain = new ProtectionDomain(cs, Policy
                     .getPolicy().getPermissions(cs));
         }

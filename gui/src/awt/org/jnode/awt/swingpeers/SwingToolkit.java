@@ -481,4 +481,12 @@ public final class SwingToolkit extends JNodeToolkit {
         }
     }
 
+    /*
+     * Modality
+     */
+    public boolean isModalityTypeSupported(Dialog.ModalityType modalityType) {
+        //todo implement it
+        return false;
+    }
+
 }

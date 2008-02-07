@@ -178,4 +178,47 @@ public final class AlphaComposite implements Composite
     AlphaComposite a = (AlphaComposite) o;
     return rule == a.rule && alpha == a.alpha;
   }
+
+    //jnode + openjdk
+    /**
+     * Returns a similar <code>AlphaComposite</code> object that uses
+     * the specified compositing rule.
+     * If this object already uses the specified compositing rule,
+     * this object is returned.
+     * @return an <code>AlphaComposite</code> object derived from
+     * this object that uses the specified compositing rule.
+     * @param rule the compositing rule
+     * @throws IllegalArgumentException if
+     *         <code>rule</code> is not one of
+     *         the following:  {@link #CLEAR}, {@link #SRC}, {@link #DST},
+     *         {@link #SRC_OVER}, {@link #DST_OVER}, {@link #SRC_IN},
+     *         {@link #DST_IN}, {@link #SRC_OUT}, {@link #DST_OUT},
+     *         {@link #SRC_ATOP}, {@link #DST_ATOP}, or {@link #XOR}
+     * @since 1.6
+     */
+    public AlphaComposite derive(int rule) {
+	return (this.rule == rule)
+	    ? this
+	    : getInstance(rule, this.alpha);
+    }
+
+    /**
+     * Returns a similar <code>AlphaComposite</code> object that uses
+     * the specified alpha value.
+     * If this object already has the specified alpha value,
+     * this object is returned.
+     * @return an <code>AlphaComposite</code> object derived from
+     * this object that uses the specified alpha value.
+     * @param alpha the constant alpha to be multiplied with the alpha of
+     * the source. <code>alpha</code> must be a floating point number in the
+     * inclusive range [0.0,&nbsp;1.0].
+     * @throws IllegalArgumentException if
+     *         <code>alpha</code> is less than 0.0 or greater than 1.0
+     * @since 1.6
+     */
+    public AlphaComposite derive(float alpha) {
+	return (this.alpha == alpha)
+	    ? this
+	    : getInstance(this.rule, alpha);
+    }
 } // class AlphaComposite

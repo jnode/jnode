@@ -310,5 +310,95 @@ public abstract class GraphicsEnvironment
         }
     }
 
+    /**
+     * Registers a <i>created</i> <code>Font</code>in this
+     * <code>GraphicsEnvironment</code>.
+     * A created font is one that was returned from calling
+     * {@link Font#createFont}, or derived from a created font by
+     * calling {@link Font#deriveFont}.
+     * After calling this method for such a font, it is available to
+     * be used in constructing new <code>Font</code>s by name or family name,
+     * and is enumerated by {@link #getAvailableFontFamilyNames} and
+     * {@link #getAllFonts} within the execution context of this
+     * application or applet. This means applets cannot register fonts in
+     * a way that they are visible to other applets.
+     * <p/>
+     * Reasons that this method might not register the font and therefore
+     * return <code>false</code> are:
+     * <ul>
+     * <li>The font is not a <i>created</i> <code>Font</code>.
+     * <li>The font conflicts with a non-created <code>Font</code> already
+     * in this <code>GraphicsEnvironment</code>. For example if the name
+     * is that of a system font, or a logical font as described in the
+     * documentation of the {@link Font} class. It is implementation dependent
+     * whether a font may also conflict if it has the same family name
+     * as a system font.
+     * <p>Notice that an application can supersede the registration
+     * of an earlier created font with a new one.
+     * </ul>
+     *
+     * @return true if the <code>font</code> is successfully
+     *         registered in this <code>GraphicsEnvironment</code>.
+     * @throws NullPointerException if <code>font</code> is null
+     * @since 1.6
+     */
+    public boolean registerFont(Font font) {
+        if (font == null) {
+            throw new NullPointerException("font cannot be null.");
+        }
+        //return sun.font.FontManager.registerFont(font);
+        //todo implement it
+        return false;
+    }
+
+
+    /**
+     * Indicates a preference for locale-specific fonts in the mapping of
+     * logical fonts to physical fonts. Calling this method indicates that font
+     * rendering should primarily use fonts specific to the primary writing
+     * system (the one indicated by the default encoding and the initial
+     * default locale). For example, if the primary writing system is
+     * Japanese, then characters should be rendered using a Japanese font
+     * if possible, and other fonts should only be used for characters for
+     * which the Japanese font doesn't have glyphs.
+     * <p/>
+     * The actual change in font rendering behavior resulting from a call
+     * to this method is implementation dependent; it may have no effect at
+     * all, or the requested behavior may already match the default behavior.
+     * The behavior may differ between font rendering in lightweight
+     * and peered components.  Since calling this method requests a
+     * different font, clients should expect different metrics, and may need
+     * to recalculate window sizes and layout. Therefore this method should
+     * be called before user interface initialisation.
+     *
+     * @since 1.5
+     */
+    public void preferLocaleFonts() {
+        //sun.font.FontManager.preferLocaleFonts();
+        //todo implement it
+    }
+
+    /**
+     * Indicates a preference for proportional over non-proportional (e.g.
+     * dual-spaced CJK fonts) fonts in the mapping of logical fonts to
+     * physical fonts. If the default mapping contains fonts for which
+     * proportional and non-proportional variants exist, then calling
+     * this method indicates the mapping should use a proportional variant.
+     * <p/>
+     * The actual change in font rendering behavior resulting from a call to
+     * this method is implementation dependent; it may have no effect at all.
+     * The behavior may differ between font rendering in lightweight and
+     * peered components. Since calling this method requests a
+     * different font, clients should expect different metrics, and may need
+     * to recalculate window sizes and layout. Therefore this method should
+     * be called before user interface initialisation.
+     *
+     * @since 1.5
+     */
+    public void preferProportionalFonts() {
+        //sun.font.FontManager.preferProportionalFonts();
+        //todo implement it                
+    }
+
 
 } // class GraphicsEnvironment

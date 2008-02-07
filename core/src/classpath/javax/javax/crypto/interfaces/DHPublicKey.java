@@ -56,8 +56,11 @@ import java.security.PublicKey;
  */
 public interface DHPublicKey extends DHKey, PublicKey
 {
-  /** Compatible with JDK1.4. */
-  long serialVersionUID = -6628103563352519193L;
+  /**
+   * The class fingerprint that is set to indicate serialization
+   * compatibility since J2SE 1.4.
+   */
+  public static final long serialVersionUID = -6628103563352519193L;
 
   /**
    * Get the public value <i>y</i>.

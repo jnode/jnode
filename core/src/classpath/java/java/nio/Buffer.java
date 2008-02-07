@@ -420,4 +420,19 @@ public abstract class Buffer
      * @since 1.6
      */
     public abstract boolean isDirect();
+
+    /**
+     * Tells whether or not this buffer is backed by an accessible
+     * array.
+     *
+     * <p> If this method returns <tt>true</tt> then the {@link #array() array}
+     * and {@link #arrayOffset() arrayOffset} methods may safely be invoked.
+     * </p>
+     *
+     * @return  <tt>true</tt> if, and only if, this buffer
+     *          is backed by an array and is not read-only
+     *
+     * @since 1.6
+     */
+    public abstract boolean hasArray();
 }
