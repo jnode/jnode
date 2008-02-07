@@ -16,6 +16,7 @@ public class HFSPlusFile extends AbstractFSFile {
 	public HFSPlusFile(HFSPlusEntry e){
 		super((HfsPlusFileSystem)e.getFileSystem());
 		this.record = e.getRecord();
+		this.file = new CatalogFile(record.getRecordData());
 	}
 	
 	@Override
@@ -26,8 +27,7 @@ public class HFSPlusFile extends AbstractFSFile {
 
 	@Override
 	public long getLength() {
-		// TODO Auto-generated method stub
-		return 0;
+		return file.getDataFork().getTotalSize();
 	}
 
 	@Override
