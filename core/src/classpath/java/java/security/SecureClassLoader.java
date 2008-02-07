@@ -37,6 +37,9 @@ exception statement from your version. */
 
 package java.security;
 
+import java.util.HashMap;
+import sun.security.util.Debug;
+
 /**
  * A Secure Class Loader for loading classes with additional 
  * support for specifying code source and permissions when
@@ -122,7 +125,76 @@ public class SecureClassLoader extends ClassLoader
 	 */
   protected PermissionCollection getPermissions(CodeSource cs)
   {
-    Policy policy = Policy.getCurrentPolicy();
+    Policy policy = Policy.getPolicyNoCheck();
 		return policy.getPermissions(cs);
 	}
+
+    //jnode + openjdk
+/**
+     * Converts a {@link java.nio.ByteBuffer <tt>ByteBuffer</tt>}
+     * into an instance of class <tt>Class</tt>, with an optional CodeSource.
+     * Before the class can be used it must be resolved.
+     * <p>
+     * If a non-null CodeSource is supplied a ProtectionDomain is
+     * constructed and associated with the class being defined.
+     * <p>
+     * @param      name the expected name of the class, or <code>null</code>
+     *                  if not known, using '.' and not '/' as the separator
+     *                  and without a trailing ".class" suffix.
+     * @param      b    the bytes that make up the class data.  The bytes from positions
+     *                  <tt>b.position()</tt> through <tt>b.position() + b.limit() -1</tt>
+     *                  should have the format of a valid class file as defined by the
+     *                  <a href="http://java.sun.com/docs/books/vmspec/">Java Virtual
+     *                  Machine Specification</a>.
+     * @param      cs   the associated CodeSource, or <code>null</code> if none
+     * @return the <code>Class</code> object created from the data,
+     *         and optional CodeSource.
+     * @exception  ClassFormatError if the data did not contain a valid class
+     * @exception  SecurityException if an attempt is made to add this class
+     *             to a package that contains classes that were signed by
+     *             a different set of certificates than this class, or if
+     *             the class name begins with "java.".
+     *
+     * @since  1.5
+     */
+    protected final Class<?> defineClass(String name, java.nio.ByteBuffer b,
+					 CodeSource cs)
+    {
+	if (cs == null)
+	    return defineClass(name, b, (ProtectionDomain)null);
+	else
+	    return defineClass(name, b, getProtectionDomain(cs));
+    }
+
+
+    // HashMap that maps CodeSource to ProtectionDomain
+    private HashMap<CodeSource, ProtectionDomain> pdcache =
+			new HashMap<CodeSource, ProtectionDomain>(11);
+
+    private static final Debug debug = Debug.getInstance("scl");
+    /*
+     * Returned cached ProtectionDomain for the specified CodeSource.
+     */
+    private ProtectionDomain getProtectionDomain(CodeSource cs) {
+	if (cs == null)
+	    return null;
+
+
+    ProtectionDomain pd = null;
+	synchronized (pdcache) {
+	    pd = pdcache.get(cs);
+	    if (pd == null) {
+		PermissionCollection perms = getPermissions(cs);
+		pd = new ProtectionDomain(cs, perms, this, null);
+		if (pd != null) {
+		    pdcache.put(cs, pd);
+		    if (debug != null) {
+			debug.println(" getPermissions "+ pd);
+			debug.println("");
+		    }
+		}
+	    }
+	}
+	return pd;
+    }
 }

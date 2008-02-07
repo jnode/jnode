@@ -199,7 +199,7 @@ public class URLClassLoader extends SecureClassLoader
     {
       this.classloader = classloader;
       this.baseURL = baseURL;
-      this.noCertCodeSource = new CodeSource(overrideURL, null);
+      this.noCertCodeSource = new CodeSource(overrideURL, (Certificate[])null);
     }
 
     /**

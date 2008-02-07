@@ -29,6 +29,7 @@ import java.security.AccessController;
 import java.security.CodeSource;
 import java.security.Policy;
 import java.security.ProtectionDomain;
+import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -203,7 +204,7 @@ final class PluginClassLoaderImpl extends PluginClassLoader {
 
             final URL sourceUrl = jar.getResource(name.replace('.', '/')
                     + ".class");
-            final CodeSource cs = new CodeSource(sourceUrl, null);
+            final CodeSource cs = new CodeSource(sourceUrl, (Certificate[])null);
             final Policy policy = (Policy) AccessController
                     .doPrivileged(GetPolicyAction.getInstance());
             final ProtectionDomain pd = new ProtectionDomain(cs, policy

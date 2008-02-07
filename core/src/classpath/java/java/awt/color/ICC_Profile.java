@@ -1241,4 +1241,17 @@ public class ICC_Profile implements Serializable
     setData(icSigProfileDescriptionTag, makeDescTag("Photo YCC"));
     this.profileID = ColorSpace.CS_PYCC;
   }
+
+    //jnode + openjdk
+
+    public static final int icHdrProfileID = 84;
+    public static final int icICCAbsoluteColorimetric = 3;
+    public static final int icMediaRelativeColorimetric = 1;
+    public static final int icSigBlueMatrixColumnTag = 0x6258595A;
+    public static final int icSigChromaticAdaptationTag = 0x63686164;
+    public static final int icSigColorantOrderTag = 0x636C726F;
+    public static final int icSigColorantTableTag = 0x636C7274;
+    public static final int icSigGreenMatrixColumnTag = 0x6758595A;
+    public static final int icSigRedMatrixColumnTag = 0x7258595A;
+
 } // class ICC_Profile
