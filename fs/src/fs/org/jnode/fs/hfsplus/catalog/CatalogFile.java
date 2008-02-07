@@ -1,5 +1,6 @@
 package org.jnode.fs.hfsplus.catalog;
 
+import org.jnode.fs.hfsplus.HFSPlusForkData;
 import org.jnode.util.BigEndian;
 
 public class CatalogFile {
@@ -16,6 +17,14 @@ public class CatalogFile {
 	
 	public CatalogNodeId getFileId(){
 		return new CatalogNodeId(data,8);
+	}
+	
+	public HFSPlusForkData getDataFork(){
+		return new HFSPlusForkData(data,88);
+	}
+	
+	public HFSPlusForkData getResourceFork(){
+		return new HFSPlusForkData(data,168);
 	}
 	
 	public String toString(){
