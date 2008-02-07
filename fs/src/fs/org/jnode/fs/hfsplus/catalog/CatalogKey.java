@@ -22,9 +22,7 @@ public class CatalogKey extends AbstractKey {
 		System.arraycopy(src, offset+2, ck, 0, 4);
 		parentID = new CatalogNodeId(ck,0);
 		if(keyLength > 6){
-			ck = new byte[keyLength-6];
-			System.arraycopy(src, offset+6, ck, 0, keyLength - 6);
-			nodeName = new HFSUnicodeString(ck,0);
+			nodeName = new HFSUnicodeString(src,offset+6);
 		}
 	}
 	/**
