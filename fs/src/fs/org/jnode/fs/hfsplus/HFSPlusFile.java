@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.jnode.fs.hfsplus.catalog.CatalogFile;
+import org.jnode.fs.hfsplus.extent.ExtentDescriptor;
 import org.jnode.fs.hfsplus.tree.LeafRecord;
 import org.jnode.fs.spi.AbstractFSFile;
 
 public class HFSPlusFile extends AbstractFSFile {
 
 	private LeafRecord record;
-	
 	private CatalogFile file;
 	
 	public HFSPlusFile(HFSPlusEntry e){
@@ -32,8 +32,12 @@ public class HFSPlusFile extends AbstractFSFile {
 
 	@Override
 	public void read(long fileOffset, ByteBuffer dest) throws IOException {
-		// TODO Auto-generated method stub
-
+		HfsPlusFileSystem fs = (HfsPlusFileSystem)getFileSystem();
+		ExtentDescriptor d  = file.getDataFork().getExtents()[0];
+		if(d.getStartBlock() != 0 && d.getBlockCount() != 0){
+			long firstOffset = d.getStartBlock()*fs.getSb().getBlockSize();
+			fs.getApi().read(firstOffset, dest);
+		}
 	}
 
 	@Override
