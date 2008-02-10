@@ -42,7 +42,6 @@ import java.util.StringTokenizer;
 import javax.naming.NameNotFoundException;
 
 import org.apache.log4j.Logger;
-import org.jnode.driver.console.Console;
 import org.jnode.driver.console.InputHistory;
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.driver.console.ConsoleManager;
@@ -65,21 +64,21 @@ import org.jnode.vm.VmSystem;
 public class CommandShell implements Runnable, Shell, ConsoleListener {
 
     public static final String PROMPT_PROPERTY_NAME = "jnode.prompt";
-	public static final String INTERPRETER_PROPERTY_NAME = "jnode.interpreter";
-	public static final String INVOKER_PROPERTY_NAME = "jnode.invoker";
-	public static final String CMDLINE_PROPERTY_NAME = "jnode.cmdline";
-	public static final String DEBUG_PROPERTY_NAME = "jnode.debug";
-	public static final String HISTORY_PROPERTY_NAME = "jnode.history";
-	
-	public static final String HOME_PROPERTY_NAME = "user.home";
-	public static final String DIRECTORY_PROPERTY_NAME = "user.dir";
+    public static final String INTERPRETER_PROPERTY_NAME = "jnode.interpreter";
+    public static final String INVOKER_PROPERTY_NAME = "jnode.invoker";
+    public static final String CMDLINE_PROPERTY_NAME = "jnode.cmdline";
+    public static final String DEBUG_PROPERTY_NAME = "jnode.debug";
+    public static final String HISTORY_PROPERTY_NAME = "jnode.history";
 
-	public static final String INITIAL_INVOKER = "thread";
-	public static final String INITIAL_INTERPRETER = "redirecting";
-	public static final String FALLBACK_INVOKER = "default";
-	public static final String FALLBACK_INTERPRETER = "default";
+    public static final String HOME_PROPERTY_NAME = "user.home";
+    public static final String DIRECTORY_PROPERTY_NAME = "user.dir";
 
-	private static String DEFAULT_PROMPT = "JNode $P$G";
+    public static final String INITIAL_INVOKER = "thread";
+    public static final String INITIAL_INTERPRETER = "redirecting";
+    public static final String FALLBACK_INVOKER = "default";
+    public static final String FALLBACK_INTERPRETER = "default";
+
+    private static String DEFAULT_PROMPT = "JNode $P$G";
     private static final String COMMAND_KEY = "cmd=";
 
     /**
@@ -88,9 +87,9 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     private static final Logger log = Logger.getLogger(CommandShell.class);
 
     private PrintStream out;
-    
+
     private PrintStream err;
-    
+
     private InputStream in;
 
     private AliasManager aliasMgr;
@@ -104,13 +103,12 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
      * Contains the archive of commands. *
      */
     private InputHistory commandHistory = new InputHistory();
-    
+
     /**
      * Contains the application input history for the current thread.
      */
-    private static InheritableThreadLocal<InputHistory> applicationHistory = 
-    	new InheritableThreadLocal<InputHistory> ();
-    
+    private static InheritableThreadLocal<InputHistory> applicationHistory = new InheritableThreadLocal<InputHistory>();
+
     private boolean readingCommand;
 
     /**
@@ -136,7 +134,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     private String interpreterName;
 
     private CompletionInfo completion;
-    
+
     private boolean historyEnabled;
 
     private boolean debugEnabled;
@@ -145,13 +143,13 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
 
     private Thread ownThread;
 
-    
     public TextConsole getConsole() {
         return console;
     }
-    
-    public static void main(String[] args) throws NameNotFoundException, ShellException {
-    	CommandShell shell = new CommandShell();
+
+    public static void main(String[] args) throws NameNotFoundException,
+            ShellException {
+        CommandShell shell = new CommandShell();
         shell.run();
     }
 
@@ -166,13 +164,13 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     }
 
     public CommandShell(TextConsole cons) throws ShellException {
-    	try {
+        try {
             console = cons;
             out = console.getOut();
             err = console.getErr();
-        	in = console.getIn();
-        	SystemInputStream.getInstance().initialize(this.in);
-        	cons.setCompleter(this);
+            in = console.getIn();
+            SystemInputStream.getInstance().initialize(this.in);
+            cons.setCompleter(this);
 
             console.addConsoleListener(this);
             aliasMgr = ((AliasManager) InitialNaming.lookup(AliasManager.NAME))
@@ -180,30 +178,29 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             System.setProperty(PROMPT_PROPERTY_NAME, DEFAULT_PROMPT);
         } catch (NameNotFoundException ex) {
             throw new ShellException("Cannot find required resource", ex);
-        }
-        catch (Exception ex) {
-        	ex.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 
-    protected CommandShell(TextConsole console, InputStream in, PrintStream out, PrintStream err) throws ShellException {
-    	try {
+    protected CommandShell(TextConsole console, InputStream in,
+            PrintStream out, PrintStream err) throws ShellException {
+        try {
             this.console = console;
             this.out = out;
             this.err = err;
             this.in = in;
-        	SystemInputStream.getInstance().initialize(this.in);
-        	//cons.setCompleter(this);
+            SystemInputStream.getInstance().initialize(this.in);
+            // cons.setCompleter(this);
 
-            //console.addConsoleListener(this);
+            // console.addConsoleListener(this);
             aliasMgr = ((AliasManager) InitialNaming.lookup(AliasManager.NAME))
                     .createAliasManager();
             System.setProperty(PROMPT_PROPERTY_NAME, DEFAULT_PROMPT);
         } catch (NameNotFoundException ex) {
             throw new ShellException("Cannot find required resource", ex);
-        }
-        catch (Exception ex) {
-        	ex.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -216,19 +213,20 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         // Here, we are running in the CommandShell (main) Thread
         // so, we can register ourself as the current shell
         // (it will also be the current shell for all children Thread)
-    	
-    	// FIXME - At one point, the 'current shell' had something to do with
-    	// dispatching keyboard input to the right application.  Now this is
-    	// handled by the console layer.  Is 'current shell' a meaningful / 
-    	// useful concept anymore?
+
+        // FIXME - At one point, the 'current shell' had something to do with
+        // dispatching keyboard input to the right application. Now this is
+        // handled by the console layer. Is 'current shell' a meaningful /
+        // useful concept anymore?
         try {
             ShellUtils.getShellManager().registerShell(this);
-    		
+
             ShellUtils.registerCommandInvoker(DefaultCommandInvoker.FACTORY);
-    		ShellUtils.registerCommandInvoker(ThreadCommandInvoker.FACTORY);
-    		ShellUtils.registerCommandInvoker(ProcletCommandInvoker.FACTORY);
-    		ShellUtils.registerCommandInterpreter(DefaultInterpreter.FACTORY);
-    		ShellUtils.registerCommandInterpreter(RedirectingInterpreter.FACTORY);
+            ShellUtils.registerCommandInvoker(ThreadCommandInvoker.FACTORY);
+            ShellUtils.registerCommandInvoker(ProcletCommandInvoker.FACTORY);
+            ShellUtils.registerCommandInterpreter(DefaultInterpreter.FACTORY);
+            ShellUtils
+                    .registerCommandInterpreter(RedirectingInterpreter.FACTORY);
         } catch (NameNotFoundException e1) {
             e1.printStackTrace();
         }
@@ -237,8 +235,8 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         setupFromProperties();
 
         // Now become interactive
-    	ownThread = Thread.currentThread();
-    	
+        ownThread = Thread.currentThread();
+
         // Run commands from the JNode commandline first
         final String cmdLine = System.getProperty(CMDLINE_PROPERTY_NAME, "");
         final StringTokenizer tok = new StringTokenizer(cmdLine);
@@ -252,8 +250,9 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                     processCommand(cmd, false);
                 }
             } catch (Throwable ex) {
-            	err.println("Error while processing bootarg commands: " + ex.getMessage());
-            	stackTrace(ex);
+                err.println("Error while processing bootarg commands: "
+                        + ex.getMessage());
+                stackTrace(ex);
             }
         }
 
@@ -261,14 +260,15 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
 
         AccessController.doPrivileged(new PrivilegedAction<Void>() {
             public Void run() {
-                    final File shell_ini = new File(user_home + "/shell.ini");
+                final File shell_ini = new File(user_home + "/shell.ini");
                 try {
                     if (shell_ini.exists()) {
-                    executeFile(shell_ini);
+                        executeFile(shell_ini);
                     }
                 } catch (IOException ex) {
-                	err.println("Error while reading " + shell_ini + ": " + ex.getMessage());
-                	stackTrace(ex);
+                    err.println("Error while reading " + shell_ini + ": "
+                            + ex.getMessage());
+                    stackTrace(ex);
                 }
                 return null;
             }
@@ -276,131 +276,139 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
 
         while (!isExitted()) {
             try {
-            	refreshFromProperties();
-            	
-            	clearEof();
-            	out.print(prompt());
-            	readingCommand = true;
-            	String line = readInputLine().trim();
-            	if (line.length() > 0) {
-            		processCommand(line, true);
-            	}
+                refreshFromProperties();
 
-            	if (VmSystem.isShuttingDown()) {
-            		exitted = true;
-            	}
+                clearEof();
+                out.print(prompt());
+                readingCommand = true;
+                String line = readInputLine().trim();
+                if (line.length() > 0) {
+                    processCommand(line, true);
+                }
+
+                if (VmSystem.isShuttingDown()) {
+                    exitted = true;
+                }
             } catch (Throwable ex) {
-            	err.println("Uncaught exception while processing command(s): " + ex.getMessage());
-            	stackTrace(ex);
+                err.println("Uncaught exception while processing command(s): "
+                        + ex.getMessage());
+                stackTrace(ex);
             }
         }
     }
-    
+
     private void setupFromProperties() {
-    	debugEnabled = Boolean.parseBoolean(System.getProperty(DEBUG_PROPERTY_NAME, "true"));
-    	historyEnabled = Boolean.parseBoolean(System.getProperty(HISTORY_PROPERTY_NAME, "true"));
-    	try {
-        	setCommandInvoker(System.getProperty(INVOKER_PROPERTY_NAME, INITIAL_INVOKER));
+        debugEnabled = Boolean.parseBoolean(System.getProperty(
+                DEBUG_PROPERTY_NAME, "true"));
+        historyEnabled = Boolean.parseBoolean(System.getProperty(
+                HISTORY_PROPERTY_NAME, "true"));
+        try {
+            setCommandInvoker(System.getProperty(INVOKER_PROPERTY_NAME,
+                    INITIAL_INVOKER));
         } catch (Exception ex) {
-        	err.println(ex.getMessage());
-        	stackTrace(ex);
-        	setCommandInvoker(FALLBACK_INVOKER);  // fallback to default
+            err.println(ex.getMessage());
+            stackTrace(ex);
+            setCommandInvoker(FALLBACK_INVOKER); // fallback to default
         }
         try {
-        	setCommandInterpreter(System.getProperty(INTERPRETER_PROPERTY_NAME, INITIAL_INTERPRETER));
+            setCommandInterpreter(System.getProperty(INTERPRETER_PROPERTY_NAME,
+                    INITIAL_INTERPRETER));
         } catch (Exception ex) {
-        	err.println(ex.getMessage());
-        	stackTrace(ex);
-        	setCommandInterpreter(FALLBACK_INTERPRETER);  // fallback to default
+            err.println(ex.getMessage());
+            stackTrace(ex);
+            setCommandInterpreter(FALLBACK_INTERPRETER); // fallback to
+                                                            // default
         }
     }
-    
+
     private void refreshFromProperties() {
-    	debugEnabled = Boolean.parseBoolean(System.getProperty(DEBUG_PROPERTY_NAME, "false"));
-    	historyEnabled = Boolean.parseBoolean(System.getProperty(HISTORY_PROPERTY_NAME, "true"));
-    	try {
-    		setCommandInterpreter(System.getProperty(INTERPRETER_PROPERTY_NAME, ""));
-    	}
-    	catch (Exception ex) {
-    		err.println(ex.getMessage());
-        	stackTrace(ex);
-    	}
-    	try {
-    		setCommandInvoker(System.getProperty(INVOKER_PROPERTY_NAME, ""));
-    	}
-    	catch (Exception ex) {
-    		err.println(ex.getMessage());
-        	stackTrace(ex);
-    	}
-            }
-    
-    public synchronized void setCommandInvoker(String name)
-    throws IllegalArgumentException {
-    	if (!name.equals(this.invokerName)) {
-    		this.invoker = ShellUtils.createInvoker(name, this);
-    		err.println("Switched to " + name + " invoker");
-    		this.invokerName = name;
-            System.setProperty(INVOKER_PROPERTY_NAME, name);
-    	}
+        debugEnabled = Boolean.parseBoolean(System.getProperty(
+                DEBUG_PROPERTY_NAME, "false"));
+        historyEnabled = Boolean.parseBoolean(System.getProperty(
+                HISTORY_PROPERTY_NAME, "true"));
+        try {
+            setCommandInterpreter(System.getProperty(INTERPRETER_PROPERTY_NAME,
+                    ""));
+        } catch (Exception ex) {
+            err.println(ex.getMessage());
+            stackTrace(ex);
+        }
+        try {
+            setCommandInvoker(System.getProperty(INVOKER_PROPERTY_NAME, ""));
+        } catch (Exception ex) {
+            err.println(ex.getMessage());
+            stackTrace(ex);
+        }
     }
-    
-    public synchronized void setCommandInterpreter(String name) 
-    throws IllegalArgumentException {
-    	if (!name.equals(this.interpreterName)) {
-    		this.interpreter = ShellUtils.createInterpreter(name);
-    		err.println("Switched to " + name + " interpreter");
+
+    public synchronized void setCommandInvoker(String name)
+            throws IllegalArgumentException {
+        if (!name.equals(this.invokerName)) {
+            this.invoker = ShellUtils.createInvoker(name, this);
+            err.println("Switched to " + name + " invoker");
+            this.invokerName = name;
+            System.setProperty(INVOKER_PROPERTY_NAME, name);
+        }
+    }
+
+    public synchronized void setCommandInterpreter(String name)
+            throws IllegalArgumentException {
+        if (!name.equals(this.interpreterName)) {
+            this.interpreter = ShellUtils.createInterpreter(name);
+            err.println("Switched to " + name + " interpreter");
             this.interpreterName = name;
             System.setProperty(INTERPRETER_PROPERTY_NAME, name);
-    	}
-    }
-    
-    private void stackTrace(Throwable ex) {
-    	if (this.debugEnabled) {
-    		ex.printStackTrace(err);
         }
     }
-    
-    private String readInputLine() throws IOException {
-    	StringBuffer sb = new StringBuffer(40);
-    	Reader r = new InputStreamReader(in);
-    	while (true) {
-    		int ch = r.read();
-    		if (ch == -1 || ch == '\n') {
-    			return sb.toString();
-    		}
-    		sb.append((char) ch);
-    	}
+
+    private void stackTrace(Throwable ex) {
+        if (this.debugEnabled) {
+            ex.printStackTrace(err);
+        }
     }
-    
+
+    private String readInputLine() throws IOException {
+        StringBuffer sb = new StringBuffer(40);
+        Reader r = new InputStreamReader(in);
+        while (true) {
+            int ch = r.read();
+            if (ch == -1 || ch == '\n') {
+                return sb.toString();
+            }
+            sb.append((char) ch);
+        }
+    }
+
     private void clearEof() {
-    	if (in instanceof KeyboardInputStream) {
-    	    ((KeyboardInputStream) in).clearSoftEOF();
-    	}
+        if (in instanceof KeyboardInputStream) {
+            ((KeyboardInputStream) in).clearSoftEOF();
+        }
     }
 
     protected void processCommand(String cmdLineStr, boolean interactive) {
-    	clearEof();
-    	if (interactive) {
-        	readingCommand = false;
-        	// Each interactive command is launched with a fresh history
-        	// for input completion
-        	applicationHistory.set(new InputHistory());
-    	}
-    	try {
-    		interpreter.interpret(this, cmdLineStr);
-    	}
-    	catch (ShellException ex) {
-    		err.println("Shell exception: " + ex.getMessage());
-        	stackTrace(ex);
-    	}
-    		
-    	if (interactive) {
-        	applicationHistory.set(null);
-    	}
+        clearEof();
+        if (interactive) {
+            readingCommand = false;
+            // Each interactive command is launched with a fresh history
+            // for input completion
+            applicationHistory.set(new InputHistory());
+        }
+        try {
+            interpreter.interpret(this, cmdLineStr);
+        } catch (ShellException ex) {
+            err.println("Shell exception: " + ex.getMessage());
+            stackTrace(ex);
+        }
+
+        if (interactive) {
+            applicationHistory.set(null);
+        }
     }
 
     /**
-     * Parse and run a command line using the CommandShell's current interpreter.
+     * Parse and run a command line using the CommandShell's current
+     * interpreter.
+     * 
      * @param command the command line.
      * @throws ShellException
      */
@@ -409,16 +417,16 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     }
 
     /**
-     * Run a command encoded as a CommandLine object.  The command line
-     * will give the command name (alias), the argument list and the
-     * IO stream.  The command is run using the CommandShell's current invoker.
+     * Run a command encoded as a CommandLine object. The command line will give
+     * the command name (alias), the argument list and the IO stream. The
+     * command is run using the CommandShell's current invoker.
      * 
      * @param cmdLine the CommandLine object.
      * @return the command's return code
      * @throws ShellException
      */
     public int invoke(CommandLine cmdLine) throws ShellException {
-    	return this.invoker.invoke(cmdLine);
+        return this.invoker.invoke(cmdLine);
     }
 
     /**
@@ -430,9 +438,9 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
      * @return the command's return code
      * @throws ShellException
      */
-    public CommandThread invokeAsynchronous(CommandLine cmdLine) 
-    throws ShellException {
-    	return this.invoker.invokeAsynchronous(cmdLine);
+    public CommandThread invokeAsynchronous(CommandLine cmdLine)
+            throws ShellException {
+        return this.invoker.invokeAsynchronous(cmdLine);
     }
 
     protected CommandInfo getCommandClass(String cmd)
@@ -448,7 +456,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     }
 
     boolean isDebugEnabled() {
-    	return debugEnabled;
+        return debugEnabled;
     }
 
     /**
@@ -462,26 +470,26 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
      * Gets the shell's command InputHistory object.
      */
     public InputHistory getCommandHistory() {
-    	return commandHistory;
+        return commandHistory;
     }
 
     /**
      * Gets the shell's currently active InputHistory object.
      */
     public InputHistory getInputHistory() {
-    	if (readingCommand) {
+        if (readingCommand) {
             return commandHistory;
-    	}
-    	else {
-    		return CommandShell.applicationHistory.get();
-    	}
+        } else {
+            return CommandShell.applicationHistory.get();
+        }
     }
 
     /**
      * Gets the expanded prompt
      */
     protected String prompt() {
-        String prompt = System.getProperty(PROMPT_PROPERTY_NAME, DEFAULT_PROMPT);
+        String prompt = System
+                .getProperty(PROMPT_PROPERTY_NAME, DEFAULT_PROMPT);
         final StringBuffer result = new StringBuffer();
         boolean commandMode = false;
         try {
@@ -492,15 +500,16 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                 if (commandMode) {
                     switch (c) {
                     case 'P':
-                        result.append(new File(
-                        		System.getProperty(DIRECTORY_PROPERTY_NAME, "")));
+                        result.append(new File(System.getProperty(
+                                DIRECTORY_PROPERTY_NAME, "")));
                         break;
                     case 'G':
                         result.append("> ");
                         break;
                     case 'D':
                         final Date now = new Date();
-	                        DateFormat.getDateTimeInstance().format(now, result, null);
+                        DateFormat.getDateTimeInstance().format(now, result,
+                                null);
                         break;
                     default:
                         result.append(c);
@@ -522,20 +531,21 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         }
         return result.toString();
     }
-    
-    public Completable parseCommandLine(String cmdLineStr) throws ShellSyntaxException {
-    	return interpreter.parsePartial(this, cmdLineStr);
+
+    public Completable parseCommandLine(String cmdLineStr)
+            throws ShellSyntaxException {
+        return interpreter.parsePartial(this, cmdLineStr);
     }
 
     public CompletionInfo complete(String partial) {
         if (!readingCommand) {
-        	// dummy completion behavior for application input.
-        	CompletionInfo completion = new CompletionInfo();
+            // dummy completion behavior for application input.
+            CompletionInfo completion = new CompletionInfo();
             completion.setCompleted(partial);
             completion.setNewPrompt(true);
-        	return completion;
+            return completion;
         }
-        
+
         // workaround to set the currentShell to this shell
         try {
             ShellUtils.getShellManager().registerShell(this);
@@ -546,26 +556,32 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         completion = new CompletionInfo();
         boolean success = false;
         try {
-        	Completable cl = parseCommandLine(partial);
-        	if (cl != null) {
-        		cl.complete(completion, this);
-        		if (!partial.equals(completion.getCompleted()) && !completion.hasItems()) {
-        			// we performed direct completion without listing
-                completion.setNewPrompt(false);
+            Completable cl = parseCommandLine(partial);
+            if (cl != null) {
+                cl.complete(completion, this);
+                if (!partial.equals(completion.getCompleted())
+                        && !completion.hasItems()) {
+                    // we performed direct completion without listing
+                    completion.setNewPrompt(false);
+                }
+                success = true;
             }
-        		success = true;
-        	}
         } catch (ShellSyntaxException ex) {
             out.println(); // next line
-            err.println("Cannot parse: " + ex.getMessage()); // print the error (optional)
-            
+            err.println("Cannot parse: " + ex.getMessage()); // print the
+                                                                // error
+                                                                // (optional)
+
         } catch (CompletionException ex) {
             out.println(); // next line
-        	err.println("Problem in completer: " + ex.getMessage()); // print the error (optional)
+            err.println("Problem in completer: " + ex.getMessage()); // print
+                                                                        // the
+                                                                        // error
+                                                                        // (optional)
         }
 
-    	if (!success) {
-        	// Make sure the caller knows to repaint the prompt
+        if (!success) {
+            // Make sure the caller knows to repaint the prompt
             completion.setCompleted(partial);
             completion.setNewPrompt(true);
         }
@@ -578,11 +594,11 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
 
     public void list(String[] items) {
         if (completion == null) {
-        	throw new ShellFailureException("list called when no completion is in progress");
+            throw new ShellFailureException(
+                    "list called when no completion is in progress");
+        } else {
+            completion.setItems(items);
         }
-        else {
-        completion.setItems(items);
-    }
     }
 
     public void addCommandToHistory(String cmdLineStr) {
@@ -598,100 +614,101 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         if (isHistoryEnabled() && !inputLine.equals(lastInputLine)) {
             InputHistory history = applicationHistory.get();
             if (history != null) {
-            	history.addLine(inputLine);
-            	lastInputLine = inputLine;
+                history.addLine(inputLine);
+                lastInputLine = inputLine;
             }
         }
     }
 
     private InputStream getInputStream() {
-    	if (isHistoryEnabled()) {
-    		// Insert a filter on the input stream that adds completed input lines
-    		// to the application input history.  (Since the filter is stateless,
-    		// it doesn't really matter if we do this multiple times.)
-    		// FIXME if we partition the app history by application, we will need
-    		// to bind the history object in the history input stream constructor.
-    		return new HistoryInputStream(in);
-    	}
-    	else {
+        if (isHistoryEnabled()) {
+            // Insert a filter on the input stream that adds completed input
+            // lines
+            // to the application input history. (Since the filter is stateless,
+            // it doesn't really matter if we do this multiple times.)
+            // FIXME if we partition the app history by application, we will
+            // need
+            // to bind the history object in the history input stream
+            // constructor.
+            return new HistoryInputStream(in);
+        } else {
             return in;
-    	}
+        }
     }
-    
+
     /**
      * This class subtypes FilterInputStream to capture console input to an
      * application in the application input history.
      */
     private class HistoryInputStream extends FilterInputStream {
-		// TODO - revisit for support of multi-byte character encodings.
-		private StringBuilder line = new StringBuilder();
-		
-		public HistoryInputStream(InputStream in) {
-			super(in);
-		}
-		
-		@Override
-		public int read() throws IOException {
-			int res = super.read();
-			if (res != -1) {
-				filter((byte) res);
-			}
-			return res;
-		}
+        // TODO - revisit for support of multi-byte character encodings.
+        private StringBuilder line = new StringBuilder();
 
-		@Override
-		public int read(byte[] buf, int offset, int len) throws IOException {
-			int res = super.read(buf, offset, len);
-			for (int i = 0; i < res; i++) {
-				filter(buf[offset + i]);
-			}
-			return res;
-		}
+        public HistoryInputStream(InputStream in) {
+            super(in);
+        }
 
-		@Override
-		public int read(byte[] buf) throws IOException {
-			int res = super.read(buf);
-			for (int i = 0; i < res; i++) {
-				filter(buf[i]);
-			}
-			return res;
-		}
-		
-		private void filter(byte b) {
-			if (b == '\n') {
-				addInputToHistory(line.toString());
-				line.setLength(0);
-			}
-			else {
-				line.append((char) b);
-			}
-		}
-	}
+        @Override
+        public int read() throws IOException {
+            int res = super.read();
+            if (res != -1) {
+                filter((byte) res);
+            }
+            return res;
+        }
+
+        @Override
+        public int read(byte[] buf, int offset, int len) throws IOException {
+            int res = super.read(buf, offset, len);
+            for (int i = 0; i < res; i++) {
+                filter(buf[offset + i]);
+            }
+            return res;
+        }
+
+        @Override
+        public int read(byte[] buf) throws IOException {
+            int res = super.read(buf);
+            for (int i = 0; i < res; i++) {
+                filter(buf[i]);
+            }
+            return res;
+        }
+
+        private void filter(byte b) {
+            if (b == '\n') {
+                addInputToHistory(line.toString());
+                line.setLength(0);
+            } else {
+                line.append((char) b);
+            }
+        }
+    }
 
     public CommandInvoker getDefaultCommandInvoker() {
-    	return ShellUtils.createInvoker("default", this);
+        return ShellUtils.createInvoker("default", this);
     }
 
     public void executeFile(File file) throws IOException {
         if (!file.exists()) {
-            err.println( "File does not exist: " + file);
+            err.println("File does not exist: " + file);
             return;
         }
         try {
             setHistoryEnabled(false);
             final BufferedReader br = new BufferedReader(new FileReader(file));
-            for (String line = br.readLine(); line != null; line = br.readLine()) {
+            for (String line = br.readLine(); line != null; line = br
+                    .readLine()) {
                 line = line.trim();
 
                 if (line.startsWith("#") || line.equals("")) {
                     continue;
                 }
                 try {
-                invokeCommand(line);
-            }
-                catch (ShellException ex) {
-                	err.println("Shell exception: " + ex.getMessage());
-                	stackTrace(ex);
+                    invokeCommand(line);
+                } catch (ShellException ex) {
+                    err.println("Shell exception: " + ex.getMessage());
+                    stackTrace(ex);
                 }
             }
             br.close();
@@ -700,17 +717,17 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         }
     }
 
-    public void exit(){
+    public void exit() {
         exit0();
         console.close();
     }
 
     public void consoleClosed(ConsoleEvent event) {
         if (!exitted) {
-            if (Thread.currentThread() == ownThread){
+            if (Thread.currentThread() == ownThread) {
                 exit0();
             } else {
-                synchronized(this) {
+                synchronized (this) {
                     exit0();
                     notifyAll();
                 }
@@ -736,61 +753,56 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     }
 
     /**
-     * This helper does the work of mapping stream marker objects to
-     * the streams that they denote.  A real stream maps to itself,
-     * and <code>null</code> maps to a NullInputStream or NullOutputStream.
+     * This helper does the work of mapping stream marker objects to the streams
+     * that they denote. A real stream maps to itself, and <code>null</code>
+     * maps to a NullInputStream or NullOutputStream.
      * 
      * @param stream A real stream or a stream marker
      * @param input If <code>true</code>, we want an input stream.
      * @return the real stream that the first argument maps to.
      */
     private Object resolveStream(Closeable stream, boolean input) {
-    	if (stream == CommandLine.DEFAULT_STDIN) {
-    		return getInputStream();
-    	}
-    	else if (stream == CommandLine.DEFAULT_STDOUT) {
-    		return out;
-    	}
-    	else if (stream == CommandLine.DEFAULT_STDERR) {
-    		return err;
-    	}
-    	else if (stream == CommandLine.DEVNULL || stream == null) {
-    		return input ? new NullInputStream() : new NullOutputStream();
-    	}
-    	else {
-    		return stream;
-    	}
+        if (stream == CommandLine.DEFAULT_STDIN) {
+            return getInputStream();
+        } else if (stream == CommandLine.DEFAULT_STDOUT) {
+            return out;
+        } else if (stream == CommandLine.DEFAULT_STDERR) {
+            return err;
+        } else if (stream == CommandLine.DEVNULL || stream == null) {
+            return input ? new NullInputStream() : new NullOutputStream();
+        } else {
+            return stream;
+        }
     }
-    
+
     /**
-     * Resolve a stream as a real (useable) InputStream.
+     * Resolve a stream as a real (usable) InputStream.
+     * 
      * @param stream the stream to be resolved
      * @return the resolved InputStream.
      */
     public InputStream resolveInputStream(Closeable stream) {
-    	return (InputStream) resolveStream(stream, true);
+        return (InputStream) resolveStream(stream, true);
     }
 
     /**
-     * Resolve a stream as a real (useable) PrintStream.  If the
-     * argument is an OutputStream, we wrap it in a PrintStream.  This means
-     * that if you call this method twice on the same stream argument, you
-     * may get different result objects.
+     * Resolve a stream as a real (usable) PrintStream. If the argument is an
+     * OutputStream, we wrap it in a PrintStream. This means that if you call
+     * this method twice on the same stream argument, you may get different
+     * result objects.
      * 
      * @param stream the stream to be resolved
      * @return the resolved PrintStream.
      */
     public PrintStream resolvePrintStream(Closeable stream) {
-    	Object tmp = resolveStream(stream, false);
-    	if (tmp instanceof PrintStream) {
-    		return (PrintStream) tmp;
-    	}
-    	else {
-    		// We could try to maintain a cache of PrintStream wrappers,
-    		// but this is liable to extend the lifetime of the wrapped streams,
-    		// which is a bad thing.
-    	    return new PrintStream((OutputStream) tmp);
-    	}
+        Object tmp = resolveStream(stream, false);
+        if (tmp instanceof PrintStream) {
+            return (PrintStream) tmp;
+        } else {
+            // We could try to maintain a cache of PrintStream wrappers,
+            // but this is liable to extend the lifetime of the wrapped streams,
+            // which is a bad thing.
+            return new PrintStream((OutputStream) tmp);
+        }
     }
 }
-

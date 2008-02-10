@@ -26,20 +26,20 @@ package org.jnode.shell;
  */
 public final class CommandInfo {
 
-	private final Class<?> clazz;
+    private final Class<?> clazz;
 
-	private final boolean internal;
+    private final boolean internal;
 
-	public CommandInfo(Class<?> clazz, boolean internal) {
-		this.clazz = clazz;
-		this.internal = internal;
-	}
+    public CommandInfo(Class<?> clazz, boolean internal) {
+        this.clazz = clazz;
+        this.internal = internal;
+    }
 
-	public final Class<?> getCommandClass() {
-		return clazz;
-	}
+    public final Class<?> getCommandClass() {
+        return clazz;
+    }
 
-	public final boolean isInternal() {
-		return internal;
-	}
+    public final boolean isInternal() {
+        return internal;
+    }
 }

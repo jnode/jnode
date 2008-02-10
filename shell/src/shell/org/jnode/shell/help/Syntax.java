@@ -36,7 +36,7 @@ import org.jnode.shell.help.argument.OptionArgument;
  */
 public class Syntax {
 
-    public static final boolean DEBUG = false;
+    public static final boolean DEBUG = true;
     public static final Logger LOGGER = Logger.getLogger(Syntax.class);
 
     private final String description;

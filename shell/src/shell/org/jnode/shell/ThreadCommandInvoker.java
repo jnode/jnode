@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.shell;
 
 import gnu.java.security.action.InvokeAction;
@@ -36,53 +36,64 @@ import org.jnode.shell.help.HelpException;
 import org.jnode.shell.help.SyntaxErrorException;
 import org.jnode.vm.VmExit;
 
-/**
+/*
  * User: Sam Reid Date: Dec 20, 2003 Time: 1:20:33 AM Copyright (c) Dec 20, 2003
  * by Sam Reid
- *
+ */
+
+/**
+ * This invoker launches commands in regular threads. These will typically share
+ * stdin,out,err etc with other commands in the current isolate. Hence
+ * stream redirection should be forbidden for commands launched via the 'main' 
+ * entry point, and a command launched via Command.execute will need to use
+ * the execute in,out,err arguments to access the command's redirected streams.
+ * 
  * @author Sam Reid
  * @author Martin Husted Hartvig (hagar@jnode.org)
  * @author crawley@jnode.org
  */
 public class ThreadCommandInvoker extends AsyncCommandInvoker {
 
-	static final Factory FACTORY = new Factory() {
-		public CommandInvoker create(CommandShell shell) {
-			return new ThreadCommandInvoker(shell);
-		}
-		public String getName() {
-			return "thread";
-		}
+    static final Factory FACTORY = new Factory() {
+        public CommandInvoker create(CommandShell shell) {
+            return new ThreadCommandInvoker(shell);
+        }
+
+        public String getName() {
+            return "thread";
+        }
     };
 
     public ThreadCommandInvoker(CommandShell commandShell) {
         super(commandShell);
     }
-    
+
     public String getName() {
-    	return "thread";
-	}
-    
+        return "thread";
+    }
+
     CommandThread createThread(CommandLine cmdLine, CommandRunner cr) {
-    	return new CommandThread(cr, cmdLine.getCommandName());
-	}
+        return new CommandThread(cr, cmdLine.getCommandName());
+    }
 
-	CommandRunner createRunner(Class cx, Method method, Object[] args, 
-			InputStream commandIn, PrintStream commandOut, PrintStream commandErr) {
-		return new ThreadCommandRunner(cx, method, args, commandIn, commandOut, commandErr);
-	}
+    CommandRunner createRunner(Class<?> cx, Method method, Object[] args,
+            InputStream commandIn, PrintStream commandOut,
+            PrintStream commandErr) {
+        return new ThreadCommandRunner(cx, method, args, commandIn, commandOut,
+                commandErr);
+    }
 
-        
-	class ThreadCommandRunner extends CommandRunner {
-		private final Class cx;
-		private final Method method;
-		private final Object[] args;
+    class ThreadCommandRunner extends CommandRunner {
+        private final Class<?> cx;
+        private final Method method;
+        private final Object[] args;
 
         private boolean finished = false;
 
-        public ThreadCommandRunner(Class cx, Method method, Object[] args, 
-        		InputStream commandIn, PrintStream commandOut, PrintStream commandErr) {
-        	super(commandShell);
+        public ThreadCommandRunner(Class cx, Method method, Object[] args,
+                InputStream commandIn, PrintStream commandOut,
+                PrintStream commandErr) {
+            super(commandShell);
             this.cx = cx;
             this.method = method;
             this.args = args;
@@ -91,10 +102,10 @@ public class ThreadCommandInvoker extends AsyncCommandInvoker {
         public void run() {
             try {
                 try {
-                	Object obj = Modifier.isStatic(method.getModifiers()) ?
-                		null : cx.newInstance();
-                	AccessController.doPrivileged(
-                			new InvokeAction(method, obj, args));
+                    Object obj = Modifier.isStatic(method.getModifiers()) ? null
+                            : cx.newInstance();
+                    AccessController.doPrivileged(new InvokeAction(method, obj,
+                            args));
                 } catch (PrivilegedActionException ex) {
                     throw ex.getException();
                 }
@@ -119,8 +130,8 @@ public class ThreadCommandInvoker extends AsyncCommandInvoker {
                     err.println(tex.getMessage());
                     unblock();
                 } else if (tex instanceof VmExit) {
-                	VmExit vex = (VmExit) tex;
-                	setRC(vex.getStatus());
+                    VmExit vex = (VmExit) tex;
+                    setRC(vex.getStatus());
                     unblock();
                 } else {
                     err.println("Exception in command");

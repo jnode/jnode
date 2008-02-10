@@ -18,31 +18,24 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.shell;
 
 /**
- * This exception is used to signal an internal error in the 
- * command shell, interpretter or invoker.
+ * This exception is used to signal an internal error in the command shell,
+ * interpreter or invoker.
  * 
  * @author crawley@jnode.org
  */
 public class ShellFailureException extends RuntimeException {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public ShellFailureException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public ShellFailureException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	/**
-	 * @param s
-	 */
-	public ShellFailureException(String s) {
-		super(s);
-	}
+    public ShellFailureException(String s) {
+        super(s);
+    }
 }
