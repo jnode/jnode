@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.shell;
 
 import java.io.InputStream;
@@ -28,17 +28,19 @@ import java.io.PrintStream;
  * @author Martin Husted Hartvig (hagar@jnode.org)
  */
 
-public interface Command
-{
-  /**
-   * This will be execute'ed when the command is called.
-   * 
-   * @param commandLine what comes in from the user
-   * @param in input stream, most offen this is System.in, but it can be a file or piped.
-   * @param out output stream, mostly this is System.out, but it can be a file or piped.
-   * @param err err stream, mostly this is System.err, but it can be a file or piped.
-   * @throws Exception
-   */
-  public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
-  throws Exception;
+public interface Command {
+    /**
+     * This will be execute'ed when the command is called.
+     * 
+     * @param commandLine what comes in from the user
+     * @param in input stream, most often this is System.in, but it can be a
+     *        file or piped.
+     * @param out output stream, mostly this is System.out, but it can be a file
+     *        or piped.
+     * @param err err stream, mostly this is System.err, but it can be a file or
+     *        piped.
+     * @throws Exception
+     */
+    public void execute(CommandLine commandLine, InputStream in,
+            PrintStream out, PrintStream err) throws Exception;
 }

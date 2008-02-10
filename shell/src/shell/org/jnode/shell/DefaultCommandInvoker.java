@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.shell;
 
 import gnu.java.security.action.InvokeAction;
@@ -35,13 +35,13 @@ import org.jnode.shell.help.Help;
 import org.jnode.shell.help.SyntaxErrorException;
 
 /*
- * User: Sam Reid Date: Dec 20, 2003 Time: 1:20:33 AM Copyright (c) Dec 20,
- * 2003 by Sam Reid
+ * User: Sam Reid Date: Dec 20, 2003 Time: 1:20:33 AM Copyright (c) Dec 20, 2003
+ * by Sam Reid
  */
 
 /**
- * This CommandInvoker runs a command in the current thread, using the command classes
- * <code>public static void main(String[] args)</code> entry point.
+ * This CommandInvoker runs a command in the current thread, using the command
+ * classes <code>public static void main(String[] args)</code> entry point.
  * The {@link invokeAsynchronous()} method is not supported.
  * 
  * @author Sam Reid
@@ -52,15 +52,16 @@ public class DefaultCommandInvoker implements CommandInvoker {
     private final PrintStream err;
     private final CommandShell commandShell;
 
-    private static final Class[] MAIN_ARG_TYPES = new Class[] { String[].class};
+    private static final Class<?>[] MAIN_ARG_TYPES = new Class[] { String[].class };
 
     static final Factory FACTORY = new Factory() {
-		public CommandInvoker create(CommandShell shell) {
-			return new DefaultCommandInvoker(shell);
-		}
-		public String getName() {
-			return "default";
-		}
+        public CommandInvoker create(CommandShell shell) {
+            return new DefaultCommandInvoker(shell);
+        }
+
+        public String getName() {
+            return "default";
+        }
     };
 
     public DefaultCommandInvoker(CommandShell commandShell) {
@@ -69,35 +70,41 @@ public class DefaultCommandInvoker implements CommandInvoker {
     }
 
     public String getName() {
-    	return "default";
+        return "default";
     }
 
     public int invoke(CommandLine cmdLine) {
-    	String cmdName = cmdLine.getCommandName();
-    	if (cmdName == null) {
-    		return 0;
-    	}
+        String cmdName = cmdLine.getCommandName();
+        if (cmdName == null) {
+            return 0;
+        }
         try {
-        	final Closeable[] streams = cmdLine.getStreams();
-        	if (streams[0] != CommandLine.DEFAULT_STDIN || 
-        		streams[1] != CommandLine.DEFAULT_STDOUT || 
-        		streams[2] != CommandLine.DEFAULT_STDERR) {
-        		err.println("Warning: redirections ignored by the '" + getName() + "' invoker");
-        	}
+            final Closeable[] streams = cmdLine.getStreams();
+            if (streams[0] != CommandLine.DEFAULT_STDIN
+                    || streams[1] != CommandLine.DEFAULT_STDOUT
+                    || streams[2] != CommandLine.DEFAULT_STDERR) {
+                err.println("Warning: redirections ignored by the '"
+                        + getName() + "' invoker");
+            }
             CommandInfo cmdInfo = commandShell.getCommandClass(cmdName);
-            final Method main = cmdInfo.getCommandClass().getMethod("main", MAIN_ARG_TYPES);
+            final Method main = cmdInfo.getCommandClass().getMethod("main",
+                    MAIN_ARG_TYPES);
             try {
                 try {
-                	AccessController.doPrivileged(new PrivilegedAction<Void>() {
-        				public Void run() {
-        					System.setOut(commandShell.resolvePrintStream(streams[1]));
-        					System.setErr(commandShell.resolvePrintStream(streams[2]));
-        					System.setIn(commandShell.resolveInputStream(streams[0]));
-        					return null;
-        				}
-        			});
+                    AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                        public Void run() {
+                            System.setOut(commandShell
+                                    .resolvePrintStream(streams[1]));
+                            System.setErr(commandShell
+                                    .resolvePrintStream(streams[2]));
+                            System.setIn(commandShell
+                                    .resolveInputStream(streams[0]));
+                            return null;
+                        }
+                    });
                     final Object[] args = new Object[] { cmdLine.getArguments() };
-                    AccessController.doPrivileged(new InvokeAction(main, null, args));
+                    AccessController.doPrivileged(new InvokeAction(main, null,
+                            args));
                     return 0;
                 } catch (PrivilegedActionException ex) {
                     throw ex.getException();
@@ -131,13 +138,13 @@ public class DefaultCommandInvoker implements CommandInvoker {
         return 1;
     }
 
-	public CommandThread invokeAsynchronous(CommandLine commandLine) {
-		throw new UnsupportedOperationException();
-	}
-	
-	private void stackTrace(Throwable ex) {
-		if (ex != null && commandShell.isDebugEnabled()) {
-			ex.printStackTrace(err);
+    public CommandThread invokeAsynchronous(CommandLine commandLine) {
+        throw new UnsupportedOperationException();
+    }
+
+    private void stackTrace(Throwable ex) {
+        if (ex != null && commandShell.isDebugEnabled()) {
+            ex.printStackTrace(err);
         }
     }
 

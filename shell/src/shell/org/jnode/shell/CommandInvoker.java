@@ -18,30 +18,14 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.shell;
 
 /*
- * User: Sam Reid
- * Date: Dec 20, 2003
- * Time: 1:18:31 AM
- * Copyright (c) Dec 20, 2003 by Sam Reid
- */ 
-  
-/**
- * This is the common API for the various mechanisms for running 'commands'.
- * 
- * @author Sam Reid
- * @author crawley@jnode.org
+ * User: Sam Reid Date: Dec 20, 2003 Time: 1:18:31 AM Copyright (c) Dec 20, 2003
+ * by Sam Reid
  */
-  
-/**
- * This is the common API for the various mechanisms for running 'commands'.
- * 
- * @author Sam Reid
- * @author crawley@jnode.org
- */
-  
+
 /**
  * This is the common API for the various mechanisms for running 'commands'.
  * 
@@ -49,39 +33,41 @@ package org.jnode.shell;
  * @author crawley@jnode.org
  */
 public interface CommandInvoker {
-	
-	public interface Factory {
-		CommandInvoker create(CommandShell shell);
-		String getName();
-	}
-	
-	/**
-	 * Run a command synchronously, passing back the resulting return code.
-	 * 
-	 * @param commandLine this provides the command name (alias), the command arguments and 
-	 *    (where relevant) the command's i/o stream context.
-	 * @return an integer return code, with zero indicating command success, non-zero indicating
-	 *    command failure.
-	 * @throws ShellException if there was some problem launching the command.
-	 */
-    int invoke(CommandLine commandLine) throws ShellException;
-    
+
+    public interface Factory {
+        CommandInvoker create(CommandShell shell);
+
+        String getName();
+    }
+
     /**
-	 * Create a thread for running a command asynchronously.  This can be used for running 
-	 * and for assembling command pipelines.
-	 * 
-	 * @param commandLine this provides the command name (alias), the command arguments and 
-	 *    (where relevant) the command's i/o stream context.
-	 * @return the thread for the command.  Calling {@link java.lang.Thread.start()} will 
-	 *    cause the command to execute.
-	 * @throws ShellException if there was some problem launching the command.
-	 */
-    CommandThread invokeAsynchronous(CommandLine commandLine) 
-    throws ShellException;
-    
-    
+     * Run a command synchronously, passing back the resulting return code.
+     * 
+     * @param commandLine this provides the command name (alias), the command
+     *        arguments and (where relevant) the command's i/o stream context.
+     * @return an integer return code, with zero indicating command success,
+     *         non-zero indicating command failure.
+     * @throws ShellException if there was some problem launching the command.
+     */
+    int invoke(CommandLine commandLine) throws ShellException;
+
+    /**
+     * Create a thread for running a command asynchronously. This can be used
+     * for running and for assembling command pipelines.
+     * 
+     * @param commandLine this provides the command name (alias), the command
+     *        arguments and (where relevant) the command's i/o stream context.
+     * @return the thread for the command. Calling
+     *         {@link java.lang.Thread.start()} will cause the command to
+     *         execute.
+     * @throws ShellException if there was some problem launching the command.
+     */
+    CommandThread invokeAsynchronous(CommandLine commandLine)
+            throws ShellException;
+
     /**
      * Get the invoker's name.
+     * 
      * @return the name.
      */
     String getName();

@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.shell;
 
 /**
@@ -27,33 +27,37 @@ package org.jnode.shell;
  */
 public interface ShellManager {
 
-	/**
-	 * Name used to bind this manager into the InitialNaming namespace.
-	 * @see org.jnode.naming.InitialNaming
-	 */
-	public static final Class<ShellManager> NAME = ShellManager.class;//"jnode/shellmanager";
+    /**
+     * Name used to bind this manager into the InitialNaming namespace.
+     * 
+     * @see org.jnode.naming.InitialNaming
+     */
+    public static final Class<ShellManager> NAME = ShellManager.class;// "jnode/shellmanager";
 
-	/**
-	 * Gets the current shell 
-	 */
-	public Shell getCurrentShell();
+    /**
+     * Gets the current shell
+     */
+    public Shell getCurrentShell();
 
-	/**
-	 * Register the new current shell
-	 * @param currentShell
-	 */
-	public void registerShell(Shell currentShell);
+    /**
+     * Register the new current shell
+     * 
+     * @param currentShell
+     */
+    public void registerShell(Shell currentShell);
 
-	public void registerInvokerFactory(CommandInvoker.Factory factory);
+    public void registerInvokerFactory(CommandInvoker.Factory factory);
 
-	public void registerInterpreterFactory(CommandInterpreter.Factory factory);
+    public void registerInterpreterFactory(CommandInterpreter.Factory factory);
 
-	public void unregisterInvokerFactory(CommandInvoker.Factory factory);
+    public void unregisterInvokerFactory(CommandInvoker.Factory factory);
 
-	public void unregisterInterpreterFactory(CommandInterpreter.Factory factory);
+    public void unregisterInterpreterFactory(CommandInterpreter.Factory factory);
 
-	public CommandInvoker createInvoker(String name, CommandShell shell) throws IllegalArgumentException;
+    public CommandInvoker createInvoker(String name, CommandShell shell)
+            throws IllegalArgumentException;
 
-	public CommandInterpreter createInterpreter(String name) throws IllegalArgumentException;
+    public CommandInterpreter createInterpreter(String name)
+            throws IllegalArgumentException;
 
 }
