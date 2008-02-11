@@ -4,6 +4,7 @@
 <plugin id="org.jnode.fs" 
         name="JNode FileSystem Service"
         version="@VERSION@"
+        system="true"
         provider-name="JNode.org"
         license-name="lgpl"
         class="org.jnode.fs.service.def.FileSystemPlugin">
@@ -11,7 +12,9 @@
   <requires>
     <import plugin="org.jnode.driver.block"/>
     <import plugin="org.jnode.fs.service"/>
+      <!--
     <import plugin="org.jnode.log4j"/>
+    -->
     <import plugin="org.jnode.partitions"/>
   </requires>
         

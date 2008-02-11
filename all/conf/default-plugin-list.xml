@@ -42,9 +42,7 @@ The default list of (non-system) plugins to be included in the init-jar.
 
     <plugin id="org.jnode.desktop"/>
 
-    <plugin id="org.jnode.driver"/>
     <plugin id="org.jnode.driver.character"/>
-    <plugin id="org.jnode.driver.block"/>
     <plugin id="org.jnode.driver.block.floppy"/>
     <plugin id="org.jnode.driver.block.ide.disk"/>
     <plugin id="org.jnode.driver.block.ramdisk"/>
@@ -98,7 +96,6 @@ The default list of (non-system) plugins to be included in the init-jar.
     <plugin id="org.jnode.driver.video.vgahw"/>
     <plugin id="org.jnode.driver.video.vmware"/>
 
-    <plugin id="org.jnode.fs"/>
     <plugin id="org.jnode.fs.command"/>
     <plugin id="org.jnode.fs.ext2"/>
     <plugin id="org.jnode.fs.ext2.command"/>
@@ -106,12 +103,9 @@ The default list of (non-system) plugins to be included in the init-jar.
     <plugin id="org.jnode.fs.fat"/>
     <plugin id="org.jnode.fs.fat.command"/>
     <plugin id="org.jnode.fs.jfat"/>
-    <plugin id="org.jnode.fs.jfat.command"/>
-    <plugin id="org.jnode.fs.ramfs"/>
-    <plugin id="org.jnode.fs.ramfs.def"/>
+    <plugin id="org.jnode.fs.jfat.command"/>        
     <plugin id="org.jnode.fs.iso9660"/>
-    <plugin id="org.jnode.fs.ntfs"/>
-    <plugin id="org.jnode.fs.service"/>
+    <plugin id="org.jnode.fs.ntfs"/>    
     <plugin id="org.jnode.fs.jifs"/>
     <plugin id="org.jnode.fs.jifs.command"/>
     <plugin id="org.jnode.fs.jifs.def"/>
@@ -122,12 +116,10 @@ The default list of (non-system) plugins to be included in the init-jar.
     <plugin id="jcifs"/>
     <plugin id="org.jnode.fs.smbfs"/>
     <plugin id="org.jnode.fs.smbfs.command"/>
-    
+
     <plugin id="org.jnode.fs.nfs"/>
     <plugin id="org.jnode.fs.nfs.command"/>
-
-
-    <plugin id="org.jnode.partitions"/>
+  
     <plugin id="org.jnode.partitions.ibm"/>
     <plugin id="org.jnode.partitions.command"/>
 
@@ -166,8 +158,7 @@ The default list of (non-system) plugins to be included in the init-jar.
     <plugin id="js"/>
 
     <plugin id="org.jnode.system.repository"/>
-    <plugin id="org.jnode.test.core"/>
-    <plugin id="org.jnode.work"/>
+    <plugin id="org.jnode.test.core"/>    
 
     <plugin id="org.jnode.font.bdf"/>
 	<plugin id="org.jnode.awt.font.bdf"/>

@@ -4,6 +4,7 @@
 <plugin id="org.jnode.work" 
         name="JNode Work management"
         version="@VERSION@"
+        system="true"
         provider-name="JNode.org"
         license-name="lgpl"
         class="org.jnode.work.WorkPlugin">

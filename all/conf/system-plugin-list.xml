@@ -17,4 +17,20 @@ These (system) plugins are always included in the init-jar.
     <plugin id="org.jnode.vm"/>
     <plugin id="org.jnode.vm.core"/>
 
+
+            
+    <!--
+     Plugins needed for setting up
+     the minimal filesystem environment
+     required by java core librarries.
+    -->
+    <plugin id="org.jnode.work"/>
+    <plugin id="org.jnode.driver"/>
+    <plugin id="org.jnode.driver.block"/>
+    <plugin id="org.jnode.partitions"/>
+    <plugin id="org.jnode.fs"/>
+    <plugin id="org.jnode.fs.service"/>
+    <plugin id="org.jnode.fs.ramfs"/>
+    <plugin id="org.jnode.fs.ramfs.def"/>
+
 </plugin-list>
