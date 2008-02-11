@@ -181,7 +181,7 @@ public abstract class VmStackReader extends VmSystemObject {
 	 */	
     @KernelSpace
 	public final void debugStackTrace() {
-        debugStackTrace(20);
+        debugStackTrace(25);
 	}
 	
     /**
