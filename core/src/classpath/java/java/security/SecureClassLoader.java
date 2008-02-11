@@ -125,7 +125,7 @@ public class SecureClassLoader extends ClassLoader
 	 */
   protected PermissionCollection getPermissions(CodeSource cs)
   {
-    Policy policy = Policy.getPolicyNoCheck();
+    Policy policy = Policy.getCurrentPolicy();
 		return policy.getPermissions(cs);
 	}
 
