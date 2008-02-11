@@ -192,7 +192,7 @@ public class ProtectionDomain
       return (perms == null ? false : perms.implies(permission));
     // Else dynamically bound.  Do we have it?
     // NOTE: this will force loading of Policy.currentPolicy
-    return Policy.getPolicyNoCheck().implies(this, permission);
+    return Policy.getCurrentPolicy().implies(this, permission);
     }
 
     /**
@@ -239,7 +239,7 @@ public class ProtectionDomain
     sb.append(linesep);
     if (!staticBinding) // include all but dont force loading Policy.currentPolicy
       if (Policy.isSet())
-        sb.append(Policy.getPolicyNoCheck().getPermissions(this));
+        sb.append(Policy.getCurrentPolicy().getPermissions(this));
       else // fallback on this one's permissions
         sb.append(perms);
         else
