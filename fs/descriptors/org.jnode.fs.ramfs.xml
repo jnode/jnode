@@ -4,13 +4,16 @@
 <plugin id="org.jnode.fs.ramfs"
         name="JNode TempFileSystem"
         version="@VERSION@"
+        system="true"
         license-name="lgpl"
         provider-name="JNode.org">
         
   <requires>
 	<import plugin="org.jnode.fs.service"/>
     <import plugin="org.jnode.fs"/>
+      <!--
     <import plugin="org.jnode.log4j"/>
+    -->
   </requires>
         
   <runtime>

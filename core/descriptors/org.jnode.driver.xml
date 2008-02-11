@@ -4,6 +4,7 @@
 <plugin id="org.jnode.driver" 
         name="JNode Driver Framework"
         version="@VERSION@"
+        system="true"
         provider-name="JNode.org"
         license-name="lgpl"
         class="org.jnode.driver.DriverPlugin">

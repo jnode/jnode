@@ -4,7 +4,6 @@
         <attribute key="Main-Class" value="org.jnode.shell.CommandShell"/>
     </manifest>
 
-    <plugin id="org.jnode.driver"/>
     <plugin id="org.jnode.driver.character"/>
     <plugin id="org.jnode.driver.console"/>
     <plugin id="org.jnode.driver.console.core"/>
@@ -20,5 +19,4 @@
     <plugin id="org.jnode.shell"/>
     <plugin id="org.jnode.shell.command"/>
     <plugin id="org.jnode.shell.help"/>
-    <plugin id="org.jnode.work"/>    
 </plugin-list>

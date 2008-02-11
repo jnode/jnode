@@ -4,6 +4,7 @@
 <plugin id="org.jnode.driver.block" 
         name="JNode Block driver interfaces"
         version="@VERSION@"
+        system="true"
         license-name="lgpl"
         provider-name="JNode.org">
         
