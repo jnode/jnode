@@ -120,7 +120,6 @@ public final class VmSystem {
     public static void initialize() {
         if (!inited) {
 
-            
             // Initialize resource manager
             final ResourceManager rm = ResourceManagerImpl.initialize();
 
@@ -141,7 +140,7 @@ public final class VmSystem {
             Vm.getHeapManager().start();
 
             Locale.setDefault(Locale.ENGLISH);
-            
+
             // Find & start all processors
             vm.initializeProcessors(rm);
 
@@ -281,8 +280,8 @@ public final class VmSystem {
         res.put("java.class.version", "50.0");
         res.put("java.compiler", "Internal"); //todo is this needed?
         res.put("java.endorsed.dirs", "/jifs/lib/");
-        res.put("java.ext.dirs", "");
-        res.put("java.home", "/jifs/");
+        res.put("java.ext.dirs", "/jifs/lib/");
+        res.put("java.home", "/jnode/");
         res.put("java.io.tmpdir", "/jnode/tmp");
         res.put("java.library.path", "/jnode/tmp"); //dummy value but needed by Runtime.loadLibrary
         res.put("java.runtime.name", "JNode");
@@ -325,7 +324,7 @@ public final class VmSystem {
 
         // keep this property until transparency support works fine with all drivers
         res.put("org.jnode.awt.transparency", "true");
-        
+
         //internal classpath for javac
         res.put("sun.boot.class.path", ":");
 
@@ -348,7 +347,7 @@ public final class VmSystem {
 
     /**
      * Gets the log of the bootstrap phase.
-     * 
+     *
      * @return String
      */
     public static String getBootLog() {
@@ -366,7 +365,7 @@ public final class VmSystem {
 
     /**
      * Gets the class of the given object
-     * 
+     *
      * @param obj
      * @return The class
      */
@@ -376,7 +375,7 @@ public final class VmSystem {
 
     /**
      * Gets the VmClass of the given object.
-     * 
+     *
      * @param obj
      * @return VmClass
      */
@@ -390,7 +389,7 @@ public final class VmSystem {
 
     /**
      * Clone the given object
-     * 
+     *
      * @param obj
      * @return Object
      */
@@ -400,7 +399,7 @@ public final class VmSystem {
 
     /**
      * Gets the hashcode of the given object
-     * 
+     *
      * @param obj
      * @return int
      */
@@ -425,7 +424,7 @@ public final class VmSystem {
      * Gets the first non-system classloader out of the current stacktrace, or
      * the system classloader if no other classloader is found in the current
      * stacktrace.
-     * 
+     *
      * @return The classloader
      */
     protected static VmClassLoader getContextClassLoader() {
@@ -451,7 +450,7 @@ public final class VmSystem {
 
     /**
      * Gets the current stacktrace as array of classes.
-     * 
+     *
      * @return Class[]
      */
     public static Class[] getClassContext() {
@@ -473,7 +472,7 @@ public final class VmSystem {
      * Gets the current stacktrace as array of classes excluding the calls to
      * java.lang.reflect.Method.invoke() and org.jnode.vm.VmReflection.invoke().
      *
-     * @return Class[] 
+     * @return Class[]
      */
     public static Class[] getRealClassContext() {
         final VmStackReader reader = VmProcessor.current().getArchitecture()
@@ -523,7 +522,7 @@ public final class VmSystem {
     /**
      * Find an exception handler to handle the given exception in the given
      * frame at the given address.
-     * 
+     *
      * @param ex
      * @param frame
      * @param address
