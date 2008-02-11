@@ -193,8 +193,14 @@ public final class VMFile {
     static boolean canWriteDirectory(File dir) {
         try {
             String filename = IS_DOS_8_3 ? "tst" : "test-dir-write";
-            File test = File.createTempFile(filename, null, dir);
-            return (test != null && test.delete());
+            File f = new File(dir, filename);
+            for(int i = 0; i < 100 && f.exists(); i ++){
+                f = new File(dir, filename + "_" + i);
+            }
+            if(f.exists()) return false;            
+
+            //File test = f.crFile.createTempFile(filename, null, dir);
+            return (f.createNewFile() && f.delete());
         } catch (IOException ioe) {
             return false;
         }
