@@ -28,7 +28,7 @@ import java.security.Permission;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public final class JNodeSecurityManager extends SecurityManager {
-    
+
     private static final RuntimePermission SET_SECURITY_MANAGER = new RuntimePermission("setSecurityManager");
 
     /**
@@ -36,14 +36,12 @@ public final class JNodeSecurityManager extends SecurityManager {
      */
     @Override
     public void checkPermission(Permission perm) {
-        /*
+
         if (perm.implies(SET_SECURITY_MANAGER)) {
             throw new SecurityException("Cannot override security manager");
         }
         super.checkPermission(perm);
-          */
+        
     }
-    
-    
 
 }
