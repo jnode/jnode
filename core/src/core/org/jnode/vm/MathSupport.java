@@ -334,8 +334,10 @@ public final class MathSupport {
                 char q3 = (char) udiv(rbj, t);
                 rbj = COMBINE((char) urem(rbj, t), u4);
                 char q4 = (char) udiv(rbj, t);
-                if (rem)
-                    return urem(rbj, t);
+                if (rem){
+                  return urem(rbj, t);
+                }
+
                 return COMBINEQ(COMBINE(q1, q2), COMBINE(q3, q4));
             }
         }
@@ -367,6 +369,13 @@ public final class MathSupport {
          */
         int qi = 4 - m;
 
+        /*
+        The above note is only true for new arrays, but as this array q
+        is reused and therefore it has to reinited to 0
+        */
+        for (int i = 0; i < q.length; i++) {
+          q[i] = 0;
+        }
         /*
          * Here we run Program D, translated from MIX to C and acquiring
          * a few minor changes.
