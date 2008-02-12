@@ -11,8 +11,9 @@
 
   <runtime>
     <library name="jnode-core.jar">
+	  <export name="com.sun.java.util.jar.pack.*"/>
 	  <export name="com.sun.naming.internal.*"/>
-      <export name="com.sun.security.auth.UserPrincipal"/>  
+      <export name="com.sun.security.auth.UserPrincipal"/>
       <export name="com.sun.security.auth.PrincipalComparator"/>  
 
 	  <export name="sun.awt.EventListenerAggregate" />
