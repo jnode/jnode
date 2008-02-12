@@ -5328,5 +5328,30 @@ public class JTable
      * The drop location.
      */
     private transient DropLocation dropLocation;
+
+    //jnode + openjdk
+/**
+     * Printing modes, used in printing <code>JTable</code>s.
+     *
+     * @see #print(JTable.PrintMode, java.text.MessageFormat , java.text.MessageFormat ,
+     *             boolean, javax.print.attribute.PrintRequestAttributeSet , boolean)
+     * @see #getPrintable
+     * @since 1.5
+     */
+    public enum PrintMode {
+
+        /**
+         * Printing mode that prints the table at its current size,
+         * spreading both columns and rows across multiple pages if necessary.
+         */
+        NORMAL,
+
+        /**
+         * Printing mode that scales the output smaller, if necessary,
+         * to fit the table's entire width (and thereby all columns) on each page;
+         * Rows are spread across multiple pages as necessary.
+         */
+        FIT_WIDTH
+    }
     
 }
