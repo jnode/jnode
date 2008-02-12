@@ -56,9 +56,11 @@ public class TCPControlBlockList extends IPv4ControlBlockList {
 	 * Process timeout handling
 	 */
 	public void timeout() {
-		for (Iterator<IPv4ControlBlock> i = iterator(); i.hasNext(); ) {
-			final TCPControlBlock cb = (TCPControlBlock)i.next();
-			cb.timeout();
-		}
+        //allocation free looping
+        for (int i = 0; i < list.size(); i++) {
+            IPv4ControlBlock aList = list.get(i);
+            final TCPControlBlock cb = (TCPControlBlock) aList;
+            cb.timeout();
+        }
 	}
 }
