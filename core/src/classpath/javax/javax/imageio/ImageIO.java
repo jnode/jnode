@@ -50,6 +50,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.HashSet;
 
 import javax.imageio.spi.IIORegistry;
 import javax.imageio.spi.ImageInputStreamSpi;
@@ -58,6 +59,7 @@ import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.ImageTranscoderSpi;
 import javax.imageio.spi.ImageWriterSpi;
 import javax.imageio.spi.ServiceRegistry;
+import javax.imageio.spi.ImageReaderWriterSpi;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
 import javax.imageio.stream.MemoryCacheImageInputStream;
@@ -1237,4 +1239,75 @@ public final class ImageIO
       }
     };
   }
+
+    //jnode + openjdk
+    private static enum SpiInfo {
+        FORMAT_NAMES {
+            @Override
+            String[] info(ImageReaderWriterSpi spi) {
+                return spi.getFormatNames();
+            }
+        },
+        MIME_TYPES {
+            @Override
+            String[] info(ImageReaderWriterSpi spi) {
+                return spi.getMIMETypes();
+            }
+        },
+        FILE_SUFFIXES {
+            @Override
+            String[] info(ImageReaderWriterSpi spi) {
+                return spi.getFileSuffixes();
+            }
+        };
+
+        abstract String[] info(ImageReaderWriterSpi spi);
+    }
+
+    /**
+     * Returns an array of <code>String</code>s listing all of the
+     * file suffixes associated with the formats understood
+     * by the current set of registered readers.
+     *
+     * @return an array of <code>String</code>s.
+     * @since 1.6
+     */
+    public static String[] getReaderFileSuffixes() {
+        return getReaderWriterInfo(ImageReaderSpi.class,
+                                   SpiInfo.FILE_SUFFIXES);
+    }
+
+    /**
+     * Returns an array of <code>String</code>s listing all of the
+     * file suffixes associated with the formats understood
+     * by the current set of registered writers.
+     *
+     * @return an array of <code>String</code>s.
+     * @since 1.6
+     */
+    public static String[] getWriterFileSuffixes() {
+        return getReaderWriterInfo(ImageWriterSpi.class,
+                                   SpiInfo.FILE_SUFFIXES);
+    }
+    
+    private static <S extends ImageReaderWriterSpi>
+        String[] getReaderWriterInfo(Class<S> spiClass, SpiInfo spiInfo)
+    {
+        // Ensure category is present
+        Iterator<S> iter;
+        try {
+            iter = getRegistry().getServiceProviders(spiClass, true);
+        } catch (IllegalArgumentException e) {
+            return new String[0];
+        }
+
+        HashSet<String> s = new HashSet<String>();
+        while (iter.hasNext()) {
+            ImageReaderWriterSpi spi = iter.next();
+            Collections.addAll(s, spiInfo.info(spi));
+        }
+
+        return s.toArray(new String[s.size()]);
+    }
+
 }
