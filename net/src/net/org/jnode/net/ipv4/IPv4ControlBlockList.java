@@ -32,7 +32,7 @@ import java.util.LinkedList;
  */
 public abstract class IPv4ControlBlockList {
 
-	private final LinkedList<IPv4ControlBlock> list = new LinkedList<IPv4ControlBlock>();
+	protected final LinkedList<IPv4ControlBlock> list = new LinkedList<IPv4ControlBlock>();
 	private int lastFreePort = IPv4Constants.IPPORT_RESERVED;
 
 	/**
