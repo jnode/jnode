@@ -46,16 +46,16 @@ public class HFSPlusDirectory extends AbstractFSDirectory {
 
 	@Override
 	protected FSEntryTable readEntries() throws IOException {
-		List<FSEntry> pathList = new LinkedList<FSEntry>();
-		LeafRecord[] records = ((HfsPlusFileSystem)getFileSystem()).getCatalog().getRecords(folder.getFolderId());
-		for(LeafRecord rec : records) {
-			if(rec.getType() == HfsPlusConstants.RECORD_TYPE_FOLDER || rec.getType() == HfsPlusConstants.RECORD_TYPE_FILE){
-				String name = ((CatalogKey)rec.getKey()).getNodeName().getUnicodeString();
-				HFSPlusEntry e = new HFSPlusEntry((HfsPlusFileSystem)getFileSystem(),null,null,name,rec);
-				pathList.add(e);
+			List<FSEntry> pathList = new LinkedList<FSEntry>();
+			LeafRecord[] records = ((HfsPlusFileSystem)getFileSystem()).getCatalog().getRecords(folder.getFolderId());
+			for(LeafRecord rec : records) {
+				if(rec.getType() == HfsPlusConstants.RECORD_TYPE_FOLDER || rec.getType() == HfsPlusConstants.RECORD_TYPE_FILE){
+					String name = ((CatalogKey)rec.getKey()).getNodeName().getUnicodeString();
+					HFSPlusEntry e = new HFSPlusEntry((HfsPlusFileSystem)getFileSystem(),null,null,name,rec);
+					pathList.add(e);
+				}
 			}
-		}
-		return new FSEntryTable(((HfsPlusFileSystem)getFileSystem()),pathList);
+			return new FSEntryTable(((HfsPlusFileSystem)getFileSystem()),pathList);
 	}
 
 	@Override
