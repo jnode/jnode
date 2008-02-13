@@ -1,10 +1,6 @@
 package org.jnode.fs.hfsplus.tree;
 
-import org.jnode.util.BigEndian;
-
-public class LeafNode {
-	protected NodeDescriptor descriptor;
-	protected int[] offsets;
+public class LeafNode extends Node {
 	protected LeafRecord[] records;
 	/**
 	 * 
@@ -13,20 +9,13 @@ public class LeafNode {
 	 * @param nodeSize
 	 */
 	public LeafNode(NodeDescriptor descriptor, byte[] nodeData, int nodeSize){
-		this.descriptor = descriptor;
-		offsets = new int[descriptor.getNumRecords()+1];
-		for(int i = 0; i < offsets.length; ++i) {
-		    offsets[i] = BigEndian.getInt16(nodeData, nodeSize-((i+1)*2));
-		}
+		super(descriptor, nodeData, nodeSize);
 		records = new LeafRecord[offsets.length-1];
 	}
-	
-	public NodeDescriptor getDescriptor() {
-		return descriptor;
-	}
-	public int[] getOffsets() {
-		return offsets;
-	}
+	/**
+	 * 
+	 * @return
+	 */
 	public LeafRecord[] getRecords() {
 		return records;
 	}

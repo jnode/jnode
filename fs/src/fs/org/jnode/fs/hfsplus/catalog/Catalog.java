@@ -28,7 +28,7 @@ public class Catalog {
 	
 	public Catalog(HfsPlusFileSystem fs) throws IOException {
 		this.fs = fs;
-		Superblock sb = fs.getSb();
+		Superblock sb = fs.getVolumeHeader();
 		int offset = 0;
 		ExtentDescriptor current = sb.getCatalogFile().getExtents()[0];
 		if(current.getStartBlock() != 0 && current.getBlockCount() != 0){
@@ -55,21 +55,23 @@ public class Catalog {
 		int currentOffset = firstNodeOffset;
 		int currentNodeNumber = getBTHeaderRecord().getRootNode();
 		int currentNodeSize = getBTHeaderRecord().getNodeSize();
-		ByteBuffer buffer = ByteBuffer.allocate(currentNodeSize);
-		fs.getApi().read(currentOffset + (currentNodeNumber*currentNodeSize), buffer);
-		NodeDescriptor currentBtnd = new NodeDescriptor(buffer.array());
+		ByteBuffer nodeData = ByteBuffer.allocate(currentNodeSize);
+		fs.getApi().read(currentOffset + (currentNodeNumber*currentNodeSize), nodeData);
+		NodeDescriptor currentBtnd = new NodeDescriptor(nodeData.array());
 		log.debug("Current node descriptor :\n" + currentBtnd.toString());
 		while(currentBtnd.getKind() == HfsPlusConstants.BT_INDEX_NODE) {
-			CatalogIndexNode currentIndexNode = new CatalogIndexNode(currentBtnd, buffer.array(), currentNodeSize);
+			CatalogIndexNode currentIndexNode = new CatalogIndexNode(currentBtnd, nodeData.array(), currentNodeSize);
 			IndexRecord record = currentIndexNode.find(parentID);
 			currentNodeNumber = record.getIndex();
-			currentOffset = currentNodeNumber*currentNodeSize;
-			buffer = ByteBuffer.allocate(currentNodeSize);
-			fs.getApi().read(currentOffset, buffer);
-			currentBtnd = new NodeDescriptor(buffer.array());
+			currentOffset = firstNodeOffset + (currentNodeNumber*currentNodeSize);
+			log.debug("Current node number: " + currentNodeNumber + " currentOffset:" + currentOffset + "(" + currentNodeSize + ")");
+			nodeData = ByteBuffer.allocate(currentNodeSize);
+			fs.getApi().read(currentOffset, nodeData);
+			currentBtnd = new NodeDescriptor(nodeData.array());
+			log.debug("Current node descriptor :\n" + currentBtnd.toString());
 		}
 		if(currentBtnd.getKind() == HfsPlusConstants.BT_LEAF_NODE) {
-			CatalogLeafNode leaf = new CatalogLeafNode(currentBtnd, buffer.array(), currentNodeSize);
+			CatalogLeafNode leaf = new CatalogLeafNode(currentBtnd, nodeData.array(), currentNodeSize);
 		    LeafRecord lr = leaf.find(parentID);
 		    log.debug("Leaf record :\n" + lr.toString());
 		    return lr;
