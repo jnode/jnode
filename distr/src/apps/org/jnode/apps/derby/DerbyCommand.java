@@ -5,6 +5,7 @@ package org.jnode.apps.derby;
 
 
 import org.apache.derby.drda.NetworkServerControl;
+import org.apache.derby.impl.drda.NetworkServerControlImpl;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
@@ -19,6 +20,8 @@ import org.jnode.shell.help.argument.StringArgument;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.File;
+import java.io.PrintWriter;
+import java.util.Date;
 
 /**
  * Command for handling Derby server.
@@ -42,6 +45,30 @@ public class DerbyCommand extends AbstractCommand {
     new DerbyCommand().execute(args);
   }
 
+  final void find(long fixedDate)
+  {
+    long d0;
+    int  d1, d2, d3, d4;
+    int  n400, n100, n4, n1;
+    int  year;
+
+    if (fixedDate > 0) {
+    d0 = fixedDate - 1;
+
+        n400 = (int)(d0 / 146097);
+
+        d1 = (int)(d0 % 146097);
+        n100 = d1 / 36524;
+        d2 = d1 % 36524;
+        n4 = d2 / 1461;
+        d3 = d2 % 1461;
+        n1 = d3 / 365;
+        d4 = (d3 % 365) + 1;
+
+      System.out.println(n400);
+    }
+  }
+
   public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
     ParsedArguments arguments = HELP_INFO.parse(commandLine);
     File home_dir = ARG_HOME.getFile(arguments);
@@ -52,6 +79,19 @@ public class DerbyCommand extends AbstractCommand {
       port = ARG_PORT.getInteger(arguments);
     }
 
-    NetworkServerControl.main(new String[]{command});
+    NetworkServerControlImpl server = new NetworkServerControlImpl();
+
+    try {
+      int server_command = server.parseArgs( new String[]{command} );
+      PrintWriter printWriter = new PrintWriter(out);
+      server.setLogWriter(printWriter);
+      server.start(printWriter);
+    } catch (Exception e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    }
+
+//    server.executeWork(server_command);
+
+//    NetworkServerControl.main(new String[]{command});
   }
 }
