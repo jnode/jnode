@@ -84,7 +84,7 @@ public class Catalog {
 	 * @return
 	 * @throws IOException
 	 */
-	public LeafRecord[] getRecords(CatalogNodeId parentID) throws Exception {
+	public LeafRecord[] getRecords(CatalogNodeId parentID) throws IOException {
 		try {
 		int currentOffset = firstNodeOffset;
 		int currentNodeNumber = getBTHeaderRecord().getRootNode();
@@ -113,7 +113,7 @@ public class Catalog {
 		return null;
 		} catch (Exception e){
 			e.printStackTrace();
-			throw e;
+			throw new IOException(e);
 		}
 	}
 	/**
