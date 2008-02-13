@@ -84,30 +84,37 @@ public class Catalog {
 	 * @return
 	 * @throws IOException
 	 */
-	public LeafRecord[] getRecords(CatalogNodeId parentID) throws IOException{
+	public LeafRecord[] getRecords(CatalogNodeId parentID) throws Exception {
+		try {
 		int currentOffset = firstNodeOffset;
 		int currentNodeNumber = getBTHeaderRecord().getRootNode();
 		int currentNodeSize = getBTHeaderRecord().getNodeSize();
-		ByteBuffer buffer = ByteBuffer.allocate(currentNodeSize);
-		fs.getApi().read(currentOffset + (currentNodeNumber*currentNodeSize), buffer);
-		NodeDescriptor currentBtnd = new NodeDescriptor(buffer.array());
+		ByteBuffer nodeData = ByteBuffer.allocate(currentNodeSize);
+		fs.getApi().read(currentOffset + (currentNodeNumber*currentNodeSize), nodeData);
+		NodeDescriptor currentBtnd = new NodeDescriptor(nodeData.array());
 		log.debug("Current node descriptor :\n" + currentBtnd.toString());
 		while(currentBtnd.getKind() == HfsPlusConstants.BT_INDEX_NODE) {
-			CatalogIndexNode currentIndexNode = new CatalogIndexNode(currentBtnd, buffer.array(), currentNodeSize);
+			CatalogIndexNode currentIndexNode = new CatalogIndexNode(currentBtnd, nodeData.array(), currentNodeSize);
 			IndexRecord record = currentIndexNode.find(parentID);
 			currentNodeNumber = record.getIndex();
-			currentOffset = currentNodeNumber*currentNodeSize;
-			buffer = ByteBuffer.allocate(currentNodeSize);
-			fs.getApi().read(currentOffset, buffer);
-			currentBtnd = new NodeDescriptor(buffer.array());
+			currentOffset = firstNodeOffset + (currentNodeNumber*currentNodeSize);
+			log.debug("Current node number: " + currentNodeNumber + " currentOffset:" + currentOffset + "(" + currentNodeSize + ")");
+			nodeData = ByteBuffer.allocate(currentNodeSize);
+			fs.getApi().read(currentOffset, nodeData);
+			currentBtnd = new NodeDescriptor(nodeData.array());
+			log.debug("Current node descriptor :\n" + currentBtnd.toString());
 		}
 		if(currentBtnd.getKind() == HfsPlusConstants.BT_LEAF_NODE) {
-			CatalogLeafNode leaf = new CatalogLeafNode(currentBtnd, buffer.array(), currentNodeSize);
+			CatalogLeafNode leaf = new CatalogLeafNode(currentBtnd, nodeData.array(), currentNodeSize);
 		    LeafRecord[] lr = leaf.findAll(parentID);
 		    log.debug("Leaf record size: " + lr.length);
 		    return lr;
 		}
 		return null;
+		} catch (Exception e){
+			e.printStackTrace();
+			throw e;
+		}
 	}
 	/**
 	 * 
