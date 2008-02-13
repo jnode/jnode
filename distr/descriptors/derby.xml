@@ -20,8 +20,15 @@
     <library name="derbynet.jar">
       <export name="org.apache.derby.drda.*"/>
       <export name="org.apache.derby.impl.drda.*"/>
-      <export name="org.apache.derby.impl.info.net.prpperties"/>
+      <export name="org.apache.derby.info.net*"/>
       <export name="org.apache.derby.loc.drda.*"/>
+    </library>
+    <library name="derbytools.jar">
+      <export name="org.apache.derby.tools.*"/>
+      <export name="org.apache.derby.impl.tools.*"/>
+      <export name="org.apache.derby.iapi.reference.*"/>
+      <export name="org.apache.derby.info.tools*"/>
+      <export name="org.apache.derby.loc.toolsmessages*"/>
     </library>
     <library name="jnode-distr.jar">
       <export name="org.jnode.apps.derby.*"/>
@@ -34,6 +41,8 @@
 
   <extension point="org.jnode.security.permissions">
     <permission class="java.lang.RuntimePermission" name="exitVM" actions="*" />
+    <permission class="java.net.SocketPermission" name="*:1527" actions="accept,connect,listen"/>
+    <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
   </extension>
 
 </plugin>
