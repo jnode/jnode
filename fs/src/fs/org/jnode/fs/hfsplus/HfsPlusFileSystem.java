@@ -17,9 +17,9 @@ import org.jnode.fs.spi.AbstractFileSystem;
 public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
 
 	private final Logger log = Logger.getLogger(getClass());
-
+	/** HFS volume header */
 	private Superblock sb;
-
+	/** Catalog special file for this instance */
 	private Catalog catalog;
 
 	public HfsPlusFileSystem(Device device, boolean readOnly) throws FileSystemException {
@@ -75,7 +75,7 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
 		return catalog;
 	}
 
-	public Superblock getSb() {
+	public Superblock getVolumeHeader() {
 		return sb;
 	}
 }

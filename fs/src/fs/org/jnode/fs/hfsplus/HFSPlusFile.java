@@ -35,7 +35,7 @@ public class HFSPlusFile extends AbstractFSFile {
 		HfsPlusFileSystem fs = (HfsPlusFileSystem)getFileSystem();
 		ExtentDescriptor d  = file.getDataFork().getExtents()[0];
 		if(d.getStartBlock() != 0 && d.getBlockCount() != 0){
-			long firstOffset = d.getStartBlock()*fs.getSb().getBlockSize();
+			long firstOffset = d.getStartBlock()*fs.getVolumeHeader().getBlockSize();
 			fs.getApi().read(firstOffset, dest);
 		}
 	}

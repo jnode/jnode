@@ -1,9 +1,7 @@
 package org.jnode.fs.hfsplus;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.TimeZone;
 
 public class HFSUtils {
 	 public static final long DIFF_TO_JAVA_DATE_IN_MILLIS = 2082844800000L;
@@ -12,10 +10,8 @@ public class HFSUtils {
 	 * @param time time in second since midnight, January 1, 1904, GMT.
 	 * @return
 	 */
-	public static Calendar decodeDate(int time){
-		Calendar ref = Calendar.getInstance();
-		ref.setTime(new Date((time*1000)-DIFF_TO_JAVA_DATE_IN_MILLIS));
-		return ref;
+	public static Date decodeDate(int time){
+		return new Date(time * 1000 - DIFF_TO_JAVA_DATE_IN_MILLIS);
 	}
 	/**
 	 * 
@@ -24,8 +20,8 @@ public class HFSUtils {
 	 * @return
 	 */
 	public static String printDate(int time, String dateFormat){
-		Calendar ref = decodeDate(time);
+		Date date = decodeDate(time);
 		SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
-		return sdf.format(ref.getTime());
+		return sdf.format(date.getTime());
 	}
 }

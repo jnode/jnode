@@ -14,7 +14,7 @@ public class IndexRecord {
 	public IndexRecord(Key key,byte[] nodeData, int offset){
 		this.key = key;
 		index = new byte[4];
-		System.arraycopy(nodeData, offset+key.getLength(), index, 0, 4);
+		System.arraycopy(nodeData, offset+key.getLength()+2, index, 0, 4);
 	}
 	
 	public Key getKey(){

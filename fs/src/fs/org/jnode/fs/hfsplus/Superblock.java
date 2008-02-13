@@ -164,15 +164,13 @@ public class Superblock extends HFSPlusObject {
 	
 	public String toString(){
 		StringBuffer buffer = new StringBuffer();
-		buffer.append("Magic   		:").append(NumberUtils.hex(getMagic(),4)).append("\n");
+		buffer.append("Magic   		:0x").append(NumberUtils.hex(getMagic(),4)).append("\n");
 		buffer.append("Version 		:").append(getVersion()).append("\n").append("\n");
 		buffer.append("Attributes	:").append(getAttributesAsString()).append("\n").append("\n");
-		
 		buffer.append("Create date 	:").append(HFSUtils.printDate(getCreateDate(),"EEE MMM d HH:mm:ss yyyy")).append("\n");
 		buffer.append("Modify date 	:").append(HFSUtils.printDate(getModifyDate(),"EEE MMM d HH:mm:ss yyyy")).append("\n");
 		buffer.append("Backup date 	:").append(HFSUtils.printDate(getBackupDate(),"EEE MMM d HH:mm:ss yyyy")).append("\n");
 		buffer.append("Checked date	:").append(HFSUtils.printDate(getCheckedDate(),"EEE MMM d HH:mm:ss yyyy")).append("\n").append("\n");
-		
 		buffer.append("File count 	:").append(getFileCount()).append("\n");
 		buffer.append("Folder count	:").append(getFolderCount()).append("\n").append("\n");
 		buffer.append("Block size 	:").append(getBlockSize()).append("\n");
