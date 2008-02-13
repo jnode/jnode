@@ -1,18 +1,20 @@
 package org.jnode.fs.hfsplus.catalog;
 
+import org.apache.log4j.Logger;
 import org.jnode.fs.hfsplus.tree.IndexNode;
 import org.jnode.fs.hfsplus.tree.IndexRecord;
 import org.jnode.fs.hfsplus.tree.Key;
 import org.jnode.fs.hfsplus.tree.NodeDescriptor;
 
 public class CatalogIndexNode extends IndexNode {
-	
+	private final Logger log = Logger.getLogger(getClass());
 	public CatalogIndexNode(NodeDescriptor descriptor, byte[] nodeData, int nodeSize){
 		super(descriptor, nodeData, nodeSize);
 		for(int i = 0; i < records.length; ++i) {
 		    int currentOffset = offsets[i];
 		    Key currentKey = new CatalogKey(nodeData, currentOffset);
 		    records[i] = new IndexRecord(currentKey, nodeData, currentOffset);
+		    log.debug("Index record key:" + records[i].getKey().toString());
 		}
 	}
 	/**
