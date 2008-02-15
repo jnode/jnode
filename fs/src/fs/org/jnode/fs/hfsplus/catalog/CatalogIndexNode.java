@@ -1,5 +1,7 @@
 package org.jnode.fs.hfsplus.catalog;
 
+import java.util.LinkedList;
+
 import org.apache.log4j.Logger;
 import org.jnode.fs.hfsplus.tree.IndexNode;
 import org.jnode.fs.hfsplus.tree.IndexRecord;
@@ -31,6 +33,27 @@ public class CatalogIndexNode extends IndexNode {
 			}
 		}
 		return null;
+	}
+	
+	public IndexRecord[] findChilds(CatalogNodeId parentId){
+		LinkedList<IndexRecord> result = new LinkedList<IndexRecord>();
+		IndexRecord largestMatchingRecord = null;
+		CatalogKey largestMatchingKey = null;
+		for(IndexRecord rec : records) {
+			CatalogKey key = (CatalogKey)rec.getKey();
+			if( key.getParentId().getId() < parentId.getId() && 
+					(largestMatchingKey == null || key.compareTo(largestMatchingKey) > 0) ) {
+				largestMatchingKey = key;
+				largestMatchingRecord = rec;
+			}
+			else if(key.getParentId().getId() == parentId.getId())
+				result.addLast(rec);
+
+		}
+
+		if(largestMatchingKey != null)
+			result.addFirst(largestMatchingRecord);
+		return result.toArray(new IndexRecord[result.size()]);
 	}
 	
 	public IndexRecord find(CatalogKey key){

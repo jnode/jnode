@@ -2,6 +2,8 @@ package org.jnode.fs.hfsplus.catalog;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jnode.fs.hfsplus.HFSUnicodeString;
@@ -13,12 +15,11 @@ import org.jnode.fs.hfsplus.tree.BTHeaderRecord;
 import org.jnode.fs.hfsplus.tree.IndexRecord;
 import org.jnode.fs.hfsplus.tree.LeafRecord;
 import org.jnode.fs.hfsplus.tree.NodeDescriptor;
-import org.jnode.fs.spi.AbstractFileSystem;
 
 public class Catalog {
 	private final Logger log = Logger.getLogger(getClass());
 	/** */
-	private AbstractFileSystem<?> fs;
+	private HfsPlusFileSystem fs;
 	/** */
 	private NodeDescriptor btnd;
 	/** */
@@ -27,13 +28,15 @@ public class Catalog {
 	private int firstNodeOffset;
 	
 	public Catalog(HfsPlusFileSystem fs) throws IOException {
+		log.debug("Initialize catalog\n");
 		this.fs = fs;
 		Superblock sb = fs.getVolumeHeader();
 		int offset = 0;
-		ExtentDescriptor current = sb.getCatalogFile().getExtents()[0];
-		if(current.getStartBlock() != 0 && current.getBlockCount() != 0){
+		// Get btree header record and node descriptor.
+		ExtentDescriptor firstExtent = sb.getCatalogFile().getExtents()[0];
+		if(firstExtent.getStartBlock() != 0 && firstExtent.getBlockCount() != 0){
 			ByteBuffer buffer = ByteBuffer.allocate(14);
-			firstNodeOffset = current.getStartBlock()*sb.getBlockSize();
+			firstNodeOffset = firstExtent.getStartBlock()*sb.getBlockSize();
 			fs.getApi().read(offset, buffer);
 			btnd = new NodeDescriptor(buffer.array());
 			log.debug("BTNodeDescriptor informations :\n" + btnd.toString());
@@ -85,32 +88,45 @@ public class Catalog {
 	 * @throws IOException
 	 */
 	public LeafRecord[] getRecords(CatalogNodeId parentID) throws IOException {
+		return getRecords(parentID,  getBTHeaderRecord().getRootNode());
+	}
+	/**
+	 * 
+	 * @param parentID
+	 * @param nodeNumber
+	 * @return
+	 * @throws IOException
+	 */
+	public LeafRecord[] getRecords(CatalogNodeId parentID, int nodeNumber) throws IOException {
 		try {
-		int currentOffset = firstNodeOffset;
-		int currentNodeNumber = getBTHeaderRecord().getRootNode();
-		int currentNodeSize = getBTHeaderRecord().getNodeSize();
-		ByteBuffer nodeData = ByteBuffer.allocate(currentNodeSize);
-		fs.getApi().read(currentOffset + (currentNodeNumber*currentNodeSize), nodeData);
-		NodeDescriptor currentBtnd = new NodeDescriptor(nodeData.array());
-		log.debug("Current node descriptor :\n" + currentBtnd.toString());
-		while(currentBtnd.getKind() == HfsPlusConstants.BT_INDEX_NODE) {
-			CatalogIndexNode currentIndexNode = new CatalogIndexNode(currentBtnd, nodeData.array(), currentNodeSize);
-			IndexRecord record = currentIndexNode.find(parentID);
-			currentNodeNumber = record.getIndex();
-			currentOffset = firstNodeOffset + (currentNodeNumber*currentNodeSize);
-			log.debug("Current node number: " + currentNodeNumber + " currentOffset:" + currentOffset + "(" + currentNodeSize + ")");
-			nodeData = ByteBuffer.allocate(currentNodeSize);
-			fs.getApi().read(currentOffset, nodeData);
-			currentBtnd = new NodeDescriptor(nodeData.array());
+			int currentOffset = firstNodeOffset;
+			int currentNodeNumber = nodeNumber;
+			int currentNodeSize = getBTHeaderRecord().getNodeSize();
+			ByteBuffer nodeData = ByteBuffer.allocate(currentNodeSize);
+			fs.getApi().read(currentOffset + (currentNodeNumber*currentNodeSize), nodeData);
+			NodeDescriptor currentBtnd = new NodeDescriptor(nodeData.array());
 			log.debug("Current node descriptor :\n" + currentBtnd.toString());
-		}
-		if(currentBtnd.getKind() == HfsPlusConstants.BT_LEAF_NODE) {
-			CatalogLeafNode leaf = new CatalogLeafNode(currentBtnd, nodeData.array(), currentNodeSize);
-		    LeafRecord[] lr = leaf.findAll(parentID);
-		    log.debug("Leaf record size: " + lr.length);
-		    return lr;
-		}
-		return null;
+			if(currentBtnd.getKind() == HfsPlusConstants.BT_INDEX_NODE) {
+				CatalogIndexNode currentIndexNode = new CatalogIndexNode(currentBtnd, nodeData.array(), currentNodeSize);
+				IndexRecord[] records = currentIndexNode.findChilds(parentID);
+				List<LeafRecord> lfList = new LinkedList<LeafRecord>();
+				for(IndexRecord rec : records) {
+					LeafRecord[] lfr =  getRecords(parentID, rec.getIndex());
+					for(LeafRecord lr: lfr){
+						lfList.add(lr);
+					}
+				}
+				return lfList.toArray(new LeafRecord[lfList.size()]);
+			} else if(currentBtnd.getKind() == HfsPlusConstants.BT_LEAF_NODE) {
+				CatalogLeafNode leaf = new CatalogLeafNode(currentBtnd, nodeData.array(), currentNodeSize);
+				LeafRecord[] lr = leaf.findAll(parentID);
+				log.debug("Leaf record size: " + lr.length);
+				return lr;
+			} else {
+				return null;
+				//
+			}
+
 		} catch (Exception e){
 			e.printStackTrace();
 			throw new IOException(e);

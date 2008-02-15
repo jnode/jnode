@@ -32,7 +32,28 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
 
 	public void read() throws FileSystemException {
 		sb = new Superblock(this);
+		
 		log.debug("Superblock informations :\n" + sb.toString());
+		if(!sb.isAttribute(HfsPlusConstants.HFSPLUS_VOL_UNMNT_BIT)){
+			log.info(getDevice().getId()
+                    + " Filesystem has not been cleanly unmounted, mounting it readonly");
+			setReadOnly(true);
+		}
+		if(sb.isAttribute(HfsPlusConstants.HFSPLUS_VOL_SOFTLOCK_BIT)){
+			log.info(getDevice().getId()
+                    + " Filesystem is marked locked, mounting it readonly");
+			setReadOnly(true);
+		}
+		if(sb.isAttribute(HfsPlusConstants.HFSPLUS_VOL_JOURNALED_BIT)){
+			log.info(getDevice().getId()
+                    + " Filesystem is journaled, write access is not supported. Mounting it readonly");
+			setReadOnly(true);
+		}
+		try {
+			catalog = new Catalog(this);
+		} catch (IOException e) {
+			throw new FileSystemException(e);
+		}
 	}
 
 	@Override
@@ -49,7 +70,6 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
 
 	@Override
 	protected HFSPlusEntry createRootEntry() throws IOException {
-		catalog = new Catalog(this);
 		LeafRecord record = catalog.getRecord(CatalogNodeId.HFSPLUS_POR_CNID);
 		if(record != null) {
 			return new HFSPlusEntry(this,null,null,"/",record);
