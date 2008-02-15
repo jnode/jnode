@@ -26,8 +26,23 @@
 
   <extension point="org.jnode.security.permissions">
   	<permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/>
-
 	<permission class="java.lang.RuntimePermission" name="exitVM"/>
+
+	<!-- do we need them all like in org.jnode.shell ? only "jnode.prompt" has been checked -->
+    <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
+    <permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/>
+    <permission class="java.lang.RuntimePermission" name="modifyThread"/>
+    <permission class="java.lang.RuntimePermission" name="setIO"/>
+    <permission class="java.net.SocketPermission" name="*" actions="resolve,listen,connect"/>
+    <permission class="java.net.SocketPermission" name="*:0-" actions="connect,resolve,listen"/>
+    <permission class="java.util.PropertyPermission" name="jnode.cmdline" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="jnode.debug" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="jnode.history" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="jnode.invoker" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="jnode.interpreter" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="jnode.prompt" actions="read,write"/>
+    <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>
+    <permission class="java.util.PropertyPermission" name="user.dir" actions="read"/>
   </extension>
 
   <extension point="org.jnode.shell.aliases">

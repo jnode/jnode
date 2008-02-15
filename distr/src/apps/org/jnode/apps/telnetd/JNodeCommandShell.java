@@ -7,6 +7,11 @@ import org.jnode.driver.console.TextConsole;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.ShellException;
 
+/**
+*
+* @author Fabien DUMINY (fduminy at jnode.org)
+*
+*/
 public class JNodeCommandShell extends CommandShell {
 	private final JNodeShell shell;
 
