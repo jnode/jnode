@@ -36,7 +36,7 @@ import org.jnode.shell.help.argument.OptionArgument;
  */
 public class Syntax {
 
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
     public static final Logger LOGGER = Logger.getLogger(Syntax.class);
 
     private final String description;
@@ -192,7 +192,7 @@ public class Syntax {
             }
             if (param != null) {
                 // Have a Parameter.  Trying to match its Argument.
-                final boolean last = !it.hasNext();
+                final boolean last = !it.hasNext() && !cmdLine.isArgumentAnticipated();
                 Argument arg = param.getArgument();
                 if (arg == null) {
                     visitor.visitValue(null, last, CommandLine.LITERAL);
