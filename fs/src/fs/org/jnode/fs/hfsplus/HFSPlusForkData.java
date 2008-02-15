@@ -1,14 +1,11 @@
 package org.jnode.fs.hfsplus;
 
-import org.apache.log4j.Logger;
 import org.jnode.fs.hfsplus.extent.ExtentDescriptor;
 import org.jnode.util.BigEndian;
 
 public class HFSPlusForkData {
 	public final static int FORK_DATA_LENGTH = 80;
 	private static final int EXTENT_OFFSET = 16;
-	
-	private final Logger log = Logger.getLogger(getClass());
 	
 	private byte data[];
 	
