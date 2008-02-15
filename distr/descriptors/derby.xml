@@ -40,7 +40,10 @@
   </extension>
 
   <extension point="org.jnode.security.permissions">
+    <permission class="java.util.PropertyPermission" name="*" actions="read"/>
     <permission class="java.lang.RuntimePermission" name="exitVM" actions="*" />
+    <permission class="java.lang.RuntimePermission" name="writeFileDescriptor" actions="*" />
+    <permission class="java.lang.RuntimePermission" name="readFileDescriptor" actions="*" />
     <permission class="java.net.SocketPermission" name="*:1527" actions="accept,connect,listen"/>
     <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
   </extension>
