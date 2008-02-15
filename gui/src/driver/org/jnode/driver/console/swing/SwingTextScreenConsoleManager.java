@@ -27,6 +27,7 @@ public class SwingTextScreenConsoleManager extends TextScreenConsoleManager {
 
     }
 
+    @Override
     protected void openInput(DeviceManager devMan) {
         AccessController.doPrivileged(new PrivilegedAction<Void>() {
             public Void run() {
@@ -56,6 +57,7 @@ public class SwingTextScreenConsoleManager extends TextScreenConsoleManager {
         });
     }
 
+    @Override
     public void unregisterConsole(Console console) {
         super.unregisterConsole(console);
         if(getFocus() == null)
@@ -67,6 +69,7 @@ public class SwingTextScreenConsoleManager extends TextScreenConsoleManager {
         });
     }
 
+    @Override
     protected SwingTextScreenManager getTextScreenManager() {
         if(textScreenManager == null){
             this.textScreenManager = new SwingTextScreenManager();
