@@ -3,7 +3,7 @@ package org.jnode.apps.telnetd;
 import java.io.InputStream;
 import java.io.PrintStream;
 
-import net.wimpi.telnetd.io.BasicTerminalIO;
+import net.wimpi.telnetd.io.TerminalIO;
 import net.wimpi.telnetd.net.Connection;
 import net.wimpi.telnetd.net.ConnectionEvent;
 import net.wimpi.telnetd.shell.Shell;
@@ -37,8 +37,8 @@ public class JNodeShell implements Shell {
 
 	private CommandShell commandShell;
 	private Connection connection;
-	private BasicTerminalIO terminalIO;
-	private TextConsole console;
+	private TerminalIO terminalIO;
+	private ScrollableTextScreenConsole console;
 
 //	private Editfield m_EF;
 
@@ -51,7 +51,8 @@ public class JNodeShell implements Shell {
 	    try {
 	      connection = con;
 	      //mycon.setNextShell("nothing");
-	      terminalIO = connection.getTerminalIO();
+	      terminalIO = (TerminalIO) connection.getTerminalIO();
+
 	      //dont forget to register listener
 	      connection.addConnectionListener(this);
 
@@ -65,15 +66,21 @@ public class JNodeShell implements Shell {
 	      		"Use the exit command to logout!\r\n"); // some output
 	      terminalIO.flush();
 
+	      final String name = connection.getConnectionData().getHostName();
+//	      synchronized (CONSOLE_MANAGER) {
+//	    	  CONSOLE_MANAGER.setTerminalIO(terminalIO);
+//		      console = (ScrollableTextScreenConsole) CONSOLE_MANAGER.createConsole(name, ConsoleManager.CreateOptions.TEXT
+//			            | ConsoleManager.CreateOptions.SCROLLABLE);
+//	      }
+
 	    	final RemoteTextScreen screen = new RemoteTextScreen(terminalIO);
 	    	final ScrollableTextScreen scrollScreen = screen.createCompatibleScrollableBufferScreen(terminalIO.getRows()*10);
-	    	final String name = connection.getConnectionData().getHostName();
 	    	console = new ScrollableTextScreenConsole(CONSOLE_MANAGER, name,
 	            scrollScreen, ConsoleManager.CreateOptions.TEXT
 	            | ConsoleManager.CreateOptions.SCROLLABLE);
 	    	CONSOLE_MANAGER.registerConsole(console);
 
-	  		InputStream in = new RemoteConsoleInputStream(terminalIO);
+	  		InputStream in = new RemoteConsoleInputStream(terminalIO, console);
 	  		PrintStream out = new PrintStream(new RemoteConsoleOutputStream(terminalIO));
 	  		PrintStream err = out;
 	      	commandShell = new JNodeCommandShell(this, console, in, out, err);
