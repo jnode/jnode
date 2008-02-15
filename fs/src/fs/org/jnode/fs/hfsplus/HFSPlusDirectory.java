@@ -8,8 +8,6 @@ import org.apache.log4j.Logger;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.hfsplus.catalog.CatalogFolder;
 import org.jnode.fs.hfsplus.catalog.CatalogKey;
-import org.jnode.fs.hfsplus.catalog.CatalogNodeId;
-import org.jnode.fs.hfsplus.catalog.CatalogThread;
 import org.jnode.fs.hfsplus.tree.LeafRecord;
 import org.jnode.fs.spi.AbstractFSDirectory;
 import org.jnode.fs.spi.FSEntryTable;

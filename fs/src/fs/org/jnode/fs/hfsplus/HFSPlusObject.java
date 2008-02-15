@@ -1,8 +1,6 @@
 package org.jnode.fs.hfsplus;
 
 import org.jnode.fs.FSObject;
-import org.jnode.fs.FileSystem;
-import org.jnode.fs.nfs.nfs2.NFS2FileSystem;
 
 public class HFSPlusObject implements FSObject {
 
@@ -12,7 +10,7 @@ public class HFSPlusObject implements FSObject {
 		this.fs = fileSystem;
 	}
 
-	public FileSystem getFileSystem() {
+	public HfsPlusFileSystem getFileSystem() {
 		return fs;
 	}
 
