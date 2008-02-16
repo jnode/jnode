@@ -5,6 +5,11 @@ package sun.misc;
 
 import java.lang.reflect.Field;
 import java.security.ProtectionDomain;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.CodeSource;
+import java.security.Policy;
+import java.security.cert.Certificate;
 import java.util.Map;
 import java.util.Hashtable;
 import java.util.HashMap;
@@ -26,11 +31,17 @@ class NativeUnsafe {
     }
 
     public static int getInt(Unsafe instance, Object o, long offset) {
-        throw new UnsupportedOperationException();
+        if(o instanceof StaticAccess){
+            return ((StaticAccess) o).getInt((int) offset);
+        }
+        return ObjectReference.fromObject(o).toAddress().add((int) offset).loadInt();
     }
 
     public static void putInt(Unsafe instance, Object o, long offset, int x) {
-        throw new UnsupportedOperationException();
+        if(o instanceof StaticAccess){
+            ((StaticAccess) o).setInt(x, (int)offset);
+        }
+        ObjectReference.fromObject(o).toAddress().add((int)offset).store(x);
     }
 
     /**
@@ -54,59 +65,101 @@ class NativeUnsafe {
     }
 
     public static boolean getBoolean(Unsafe instance, Object o, long offset) {
-        throw new UnsupportedOperationException();
+        if(o instanceof StaticAccess){
+            return ((StaticAccess) o).getBoolean((int) offset);
+        }
+        return ObjectReference.fromObject(o).toAddress().add((int) offset).loadByte() != 0;
     }
 
     public static void putBoolean(Unsafe instance, Object o, long offset, boolean x) {
-        throw new UnsupportedOperationException();
+        if(o instanceof StaticAccess){
+            ((StaticAccess) o).setBoolean(x, (int)offset);
+        }
+        ObjectReference.fromObject(o).toAddress().add((int)offset).store((byte)(x ? 1 : 0));
     }
 
     public static byte getByte(Unsafe instance, Object o, long offset) {
-        throw new UnsupportedOperationException();
+        if(o instanceof StaticAccess){
+            return ((StaticAccess) o).getByte((int) offset);
+        }
+        return ObjectReference.fromObject(o).toAddress().add((int) offset).loadByte();
     }
 
     public static void putByte(Unsafe instance, Object o, long offset, byte x) {
-        throw new UnsupportedOperationException();
+        if(o instanceof StaticAccess){
+            ((StaticAccess) o).setByte(x, (int) offset);
+        }
+        ObjectReference.fromObject(o).toAddress().add((int)offset).store(x);
     }
 
     public static short getShort(Unsafe instance, Object o, long offset) {
-        throw new UnsupportedOperationException();
+        if(o instanceof StaticAccess){
+            return ((StaticAccess) o).getShort((int) offset);
+        }
+        return ObjectReference.fromObject(o).toAddress().add((int) offset).loadShort();
     }
 
     public static void putShort(Unsafe instance, Object o, long offset, short x) {
-        throw new UnsupportedOperationException();
+        if(o instanceof StaticAccess){
+            ((StaticAccess) o).setShort(x, (int) offset);
+        }
+        ObjectReference.fromObject(o).toAddress().add((int)offset).store(x);
     }
 
     public static char getChar(Unsafe instance, Object o, long offset) {
-        throw new UnsupportedOperationException();
+        if(o instanceof StaticAccess){
+            return ((StaticAccess) o).getChar((int) offset);
+        }
+        return ObjectReference.fromObject(o).toAddress().add((int) offset).loadChar();
     }
 
     public static void putChar(Unsafe instance, Object o, long offset, char x) {
-        throw new UnsupportedOperationException();
+        if(o instanceof StaticAccess){
+            ((StaticAccess) o).setChar(x, (int) offset);
+        }
+        ObjectReference.fromObject(o).toAddress().add((int)offset).store(x);
     }
 
     public static long getLong(Unsafe instance, Object o, long offset) {
-        throw new UnsupportedOperationException();
+        if(o instanceof StaticAccess){
+            return ((StaticAccess) o).getLong((int) offset);
+        }
+        return ObjectReference.fromObject(o).toAddress().add((int) offset).loadLong();
     }
 
     public static void putLong(Unsafe instance, Object o, long offset, long x) {
-        throw new UnsupportedOperationException();
+        if(o instanceof StaticAccess){
+            ((StaticAccess) o).setLong(x, (int) offset);
+        }
+        ObjectReference.fromObject(o).toAddress().add((int)offset).store(x);
     }
 
     public static float getFloat(Unsafe instance, Object o, long offset) {
-        throw new UnsupportedOperationException();
+        if(o instanceof StaticAccess){
+            return ((StaticAccess) o).getFloat((int) offset);
+        }
+        return ObjectReference.fromObject(o).toAddress().add((int) offset).loadFloat();
     }
 
     public static void putFloat(Unsafe instance, Object o, long offset, float x) {
-        throw new UnsupportedOperationException();
+        if(o instanceof StaticAccess){
+            ((StaticAccess) o).setFloat(x, (int) offset);
+        }
+        ObjectReference.fromObject(o).toAddress().add((int)offset).store(x);
     }
 
     public static double getDouble(Unsafe instance, Object o, long offset) {
-        throw new UnsupportedOperationException();
+        if(o instanceof StaticAccess){
+            return ((StaticAccess) o).getDouble((int) offset);
+        }
+        return ObjectReference.fromObject(o).toAddress().add((int) offset).loadDouble();
     }
 
     public static void putDouble(Unsafe instance, Object o, long offset, double x) {
-        throw new UnsupportedOperationException();
+        if(o instanceof StaticAccess){
+            ((StaticAccess) o).setDouble(x, (int) offset);
+        }
+        ObjectReference.fromObject(o).toAddress().add((int)offset).store(x);
     }
 
     public static byte getByte(Unsafe instance, long address) {
@@ -200,9 +253,75 @@ class NativeUnsafe {
         StaticAccess(long address){
             this.address = address;
         }
+
+        final boolean getBoolean(int offset){
+            return Address.fromLong(address).add(offset).loadInt() != 0;
+        }
+
+        final void setBoolean(boolean value, int offset){
+            Address.fromLong(address).add(offset).store(value ? 1 : 0);
+        }
+
+        final byte getByte(int offset) {
+            return (byte) Address.fromLong(address).add(offset).loadInt();
+        }
+
+        final void setByte(byte value, int offset) {
+            Address.fromLong(address).add(offset).store((int) value);
+        }
+
+        final short getShort(int offset){
+            return (short) Address.fromLong(address).add(offset).loadInt();
+        }
+
+        final void setShort(short value, int offset){
+            Address.fromLong(address).add(offset).store((int) value);
+        }
+
+        final char getChar(int offset){
+            return (char) Address.fromLong(address).add(offset).loadInt();
+        }
+
+        final void setChar(char value, int offset){
+            Address.fromLong(address).add(offset).store((int) value);
+        }
+
+        final int getInt(int offset){
+            return Address.fromLong(address).add(offset).loadInt();
+        }
+
+        final void setInt(int value, int offset){
+            Address.fromLong(address).add(offset).store(value);
+        }
+
+        final long getLong(int offset){
+            return Address.fromLong(address).add(offset).loadLong();
+        }
+
+        final void setLong(long value, int offset){
+            Address.fromLong(address).add(offset).store(value);
+        }
+
+        final float getFloat(int offset){
+            return Address.fromLong(address).add(offset).loadFloat();
+        }
+
+        final void setFloat(float value, int offset){
+            Address.fromLong(address).add(offset).store(value);
+        }
+
+        final double getDouble(int offset){
+            return Address.fromLong(address).add(offset).loadDouble();
+        }
+
+        final void setDouble(double value, int offset){
+            Address.fromLong(address).add(offset).store(value);
+        }
+
         Object getObject(int offset){
             return Address.fromLong(address).add(offset).loadObjectReference().toObject();
         }
+
         void setObject(Object obj, int offset){
             Address.fromLong(address).add(offset).store(ObjectReference.fromObject(obj));
         }
@@ -292,11 +411,21 @@ class NativeUnsafe {
         throw new UnsupportedOperationException();
     }
 
-
     public static Class defineClass(Unsafe instance, String name, byte[] b, int off, int len,
-                             ClassLoader loader,
-                             ProtectionDomain protectionDomain) {
-        throw new UnsupportedOperationException();
+                                    ClassLoader loader,
+                                    ProtectionDomain protDomain) {
+        if (protDomain == null) {
+            protDomain = AccessController
+                    .doPrivileged(new PrivilegedAction<ProtectionDomain>() {
+
+                        public ProtectionDomain run() {
+                            final CodeSource cs = new CodeSource(null, (Certificate[]) null);
+                            return new ProtectionDomain(cs, Policy.getPolicy().getPermissions(cs));
+                        }
+                    });
+        }
+        return loader.getVmClassLoader().defineClass(name, b, off, len, protDomain).asClass();
+
     }
 
     public static Class defineClass(Unsafe instance, String name, byte[] b, int off, int len) {
