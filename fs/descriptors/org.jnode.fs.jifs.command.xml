@@ -19,7 +19,7 @@
   </runtime>
   
   <extension point="org.jnode.shell.aliases">
-    <alias name="jifs" class="org.jnode.fs.jifs.command.createJIFS"/>
+    <alias name="jifs" class="org.jnode.fs.jifs.command.CreateJIFSCommand"/>
   </extension>
   
   <extension point="org.jnode.security.permissions">
