@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import org.jnode.vm.VmReflection;
 import org.jnode.vm.classmgr.VmExceptions;
 import org.jnode.vm.classmgr.VmMethod;
+import org.jnode.vm.classmgr.Signature;
 import gnu.java.lang.reflect.MethodSignatureParser;
 
 import java.util.Arrays;
@@ -104,11 +105,6 @@ public final class Constructor<T>
      */
     public Constructor(VmMethod vmMethod) {
         this.vmMethod = vmMethod;
-    }
-
-    public Constructor(Class<T> declaringClass, Class[] parameterTypes, Class[] checkedExceptions, int modifiers, int slot, String signature, byte[] annotations, byte[] parameterAnnotations) {
-        //todo implement it
-        throw new UnsupportedOperationException();
     }
 
     /**
@@ -348,7 +344,10 @@ public final class Constructor<T>
      *         initialization, which then failed
      */
     public T newInstance(Object... args) throws InstantiationException, IllegalAccessException, InvocationTargetException {
-        return (T) VmReflection.newInstance(vmMethod, args);
+        if(constructorAccessor == null)
+            return (T) VmReflection.newInstance(vmMethod, args);
+        else
+            return (T) constructorAccessor.newInstance(args);
     }
 
 
@@ -455,6 +454,8 @@ public final class Constructor<T>
     }
 
     //jnode openjdk
+
+    private byte[]              parameterAnnotations;
     /**
      * Returns an array of arrays that represent the annotations on the formal
      * parameters, in declaration order, of the method represented by
@@ -501,7 +502,29 @@ public final class Constructor<T>
 	}
         return result;
     }
-    private byte[]              parameterAnnotations;
+
+
+    public Constructor(Class<T> declaringClass, Class[] parameterTypes, Class[] checkedExceptions, int modifiers, int slot, String signature, byte[] annotations, byte[] parameterAnnotations) {
+        //todo implement it
+        String my_signature = Signature.toSignature(null, parameterTypes);
+        this.vmMethod = declaringClass.getVmClass().link().getDeclaredMethod("<init>", my_signature);
+        if(this.vmMethod == null) throw new RuntimeException("Constructor creation failure");
+
+        this.modifiers = modifiers;
+        this.slot = slot;
+        this.signature = signature;
+        this.annotations = annotations;
+        this.parameterAnnotations = parameterAnnotations;
+    }
+
+
+    private int			modifiers;
+    // Generics and annotations support
+    private transient String    signature;
+    // generic info repository; lazily initialized
+    private byte[]              annotations;
+
+    private volatile ConstructorAccessor constructorAccessor;
 
     /**
      * Returns <tt>true</tt> if and only if the underlying class
@@ -511,28 +534,29 @@ public final class Constructor<T>
      * @since 1.5
      */
     public ConstructorAccessor getConstructorAccessor() {
-        //todo implement it
-        throw new UnsupportedOperationException();
+        return constructorAccessor;
     }
 
     public void setConstructorAccessor(ConstructorAccessor accessor) {
-        //todo implement it
-        throw new UnsupportedOperationException();
+        constructorAccessor = accessor;
+        // Propagate up
+        /*
+        if (root != null) {
+            root.setConstructorAccessor(accessor);
+        }
+        */
     }
 
     public int getSlot() {
-        //todo implement it
-        throw new UnsupportedOperationException();
+        return slot;
     }
 
     public byte[] getRawAnnotations() {
-        //todo implement it
-        throw new UnsupportedOperationException();
+        return annotations;
     }
 
     public byte[] getRawParameterAnnotations() {
-        //todo implement it
-        throw new UnsupportedOperationException();
+        return parameterAnnotations;
     }
 
     public Constructor<T> copy() {
