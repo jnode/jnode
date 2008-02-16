@@ -44,9 +44,9 @@ import org.jnode.shell.help.argument.OptionArgument;
  * 
  * @author Andreas H\u00e4nel
  */
-public class createJIFS implements Command{
+public class CreateJIFSCommand implements Command{
 
-    private static final Logger log = Logger.getLogger(createJIFS.class);
+    private static final Logger log = Logger.getLogger(CreateJIFSCommand.class);
     
     static final OptionArgument ACTION = new OptionArgument("action",
             "Action to perform", new OptionArgument.Option[] {
