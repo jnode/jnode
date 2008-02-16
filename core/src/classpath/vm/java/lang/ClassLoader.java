@@ -182,9 +182,6 @@ public abstract class ClassLoader {
         if (sm != null) {
             sm.checkCreateClassLoader();
         }
-        if (parent == null) {
-            throw new IllegalArgumentException("parent cannot be null");
-        }
         this.parent = parent;
         this.vmClassLoader = new VmJavaClassLoader(this);
     }
@@ -240,9 +237,6 @@ public abstract class ClassLoader {
             throw new IllegalArgumentException(
                     "vmClassLoader must not be system classloader");
         }
-        if (parent == null) {
-            throw new IllegalArgumentException("parent cannot be null");
-        }
         this.parent = parent;
         this.vmClassLoader = vmClassLoader;
     }
@@ -292,9 +286,7 @@ public abstract class ClassLoader {
         /* Can the class been loaded by a parent? */
         try {
             if ((parent == null) || skipParentLoader(name)) {
-                if (vmClassLoader.isSystemClassLoader()) {
-                    return vmClassLoader.loadClass(name, resolve).asClass();
-                }
+                return VmSystem.getSystemClassLoader().loadClass(name, resolve).asClass();
             } else {
                 return parent.loadClass(name, resolve);
             }
