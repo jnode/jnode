@@ -182,7 +182,10 @@ public class JdwpConnection
 	       2. Transport was shutdown
 	       In either case, we make sure that all of the
 	       back-end gets shutdown. */
-	    Jdwp.getDefault().shutdown ();
+          //jnode
+          //we will take care of the shutdown elsewhere
+          break;
+        //Jdwp.getDefault().shutdown ();
 	  }
 	catch (Throwable t)
 	  {
