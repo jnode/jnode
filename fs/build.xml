@@ -33,6 +33,10 @@
       <classpath refid="my-cp"/>
     </jnode.compile>
 
+    <copy todir="${my-classes.dir}">
+      <fileset dir="${my-src.dir}/fs" includes="**/*.properties"/>
+    </copy>
+
 	<!-- copy (if exists) image of file systems (*.img.WORK files are temporary) -->
     <copy todir="${my-classes.dir}/org/jnode/test/fs/">
 	  <fileset dir="${my-src.dir}/test/org/jnode/test/fs/">
