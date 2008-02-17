@@ -22,7 +22,6 @@
 package org.jnode.awt.font.bdf;
 
 import java.awt.Color;
-import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -32,6 +31,7 @@ import org.jnode.driver.video.Surface;
 import org.jnode.font.bdf.BDFFontContainer;
 import org.jnode.font.bdf.BDFGlyph;
 import org.jnode.font.bdf.BDFMetrics;
+import org.jnode.font.bdf.BDFParser;
 
 /**
  * @author Stephane Meslin-Weber
@@ -43,8 +43,7 @@ public class BDFTextRenderer implements TextRenderer {
     /**
      * Create a new instance
      * 
-     * @param fontData
-     * @param fontSize
+     * @param bdfFont the font used for rendering
      */
     public BDFTextRenderer(BDFFontContainer bdfFont) {
     	this.bdfFont = bdfFont;
@@ -56,40 +55,44 @@ public class BDFTextRenderer implements TextRenderer {
      * <p>
      * NOTE: This method derived from PJA rendering code.
      * 
-     * @see com.eteks.awt.PJAGraphicsManager
-     * @see com.eteks.awt.PJAFontData
+     * @param surface the rendering surface
+     * @param clip clipping shape
+     * @param tx transformation
+     * @param str the string to render
+     * @param x location x
+     * @param y location y
+     * @param color string color
      * @see java.awt.Graphics
      */
     final public void render(Surface surface, Shape clip, AffineTransform tx,
             String str, int x, int y, Color color) {   
-        if (str == null || str.length() == 0) {
-            System.err.println("empty string!");
+        if (str == null || str.length() == 0)
             return;
-        }
-        
-        BDFMetrics fm = (BDFMetrics)bdfFont.getFontMetrics();
+
+        BDFMetrics fm = bdfFont.getFontMetrics();
         y-=fm.getDescent();
         int charsCount = str.length();
 
         if ((bdfFont != null) && (charsCount > 0)) {
             int offset = 0;
-            final char[] chars = str.toCharArray();
             final int bdfFontDepth = bdfFont.getDepth();
 
+            BDFParser.Rectangle b_rect = new BDFParser.Rectangle();
+            final Point2D src = new Point2D.Double();
+            final Point2D dst = new Point2D.Double();
+            
             for(int i=0;i<charsCount;i++) {
                 int base = fm.getDescent();
-                BDFGlyph glyph = bdfFont.getGlyph(chars[i]);
+                BDFGlyph glyph = bdfFont.getGlyph(str.charAt(i));
                 if(glyph==null) {
                     continue;
                 }
                 
-                final int fHeight= glyph.getBbx().height;
-                final int glyphBbxY = glyph.getBbx().y;
-                final int bdfFontBbxHeight = bdfFont.getBoundingBox().height;
+                final int fHeight= glyph.getBbx(b_rect).height;
+                final int glyphBbxY = glyph.getBbx(b_rect).y;
+//                final int bdfFontBbxHeight = bdfFont.getBoundingBox().height;
                 final int[] fData = glyph.getData();
                 final int scan = fData.length/fHeight;
-                final Point2D src = new Point2D.Double();
-                final Point2D dst = new Point2D.Double();
                 
 //                if(i == 0)
 //                {
@@ -142,7 +145,7 @@ public class BDFTextRenderer implements TextRenderer {
                     }
                 }
                 
-                offset+=glyph.getDWidth().width-glyph.getBbx().x;
+                offset+=glyph.getDWidth().width-glyph.getBbx(b_rect).x;
             }
         }
     }    
