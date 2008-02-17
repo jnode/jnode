@@ -192,9 +192,9 @@ public class BDFFontContainer {
     }
 
     public BDFGlyph getGlyph(char ch) {
-        BDFGlyph g = (BDFGlyph)glyphMapper.get(""+(ch));
+        BDFGlyph g = (BDFGlyph)glyphMapper.get(String.valueOf(ch));
         if(g==null) {
-            g = (BDFGlyph)glyphMapper.get(""+'\u0020');
+            g = (BDFGlyph)glyphMapper.get(String.valueOf('\u0020'));
         }
         return g;
     }

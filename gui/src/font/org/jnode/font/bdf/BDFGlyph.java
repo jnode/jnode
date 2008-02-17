@@ -112,6 +112,14 @@ public class BDFGlyph {
 	public BDFParser.Rectangle getBbx() {
 		return new BDFParser.Rectangle(bbx);
 	}
+
+    public BDFParser.Rectangle getBbx(BDFParser.Rectangle rec) {
+        rec.x = bbx.x;
+        rec.y = bbx.y;
+        rec.width = bbx.width;
+        rec.height = bbx.height;
+        return rec;
+	}
     
     void init(BDFFontContainer font) {
         this.font = font;

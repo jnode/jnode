@@ -88,12 +88,13 @@ public class BDFMetrics {
         int adv_idx = 0;
         int last = (advances.length-1);
 
+        BDFParser.Rectangle b_rec = new BDFParser.Rectangle();
         for(int i=start;i<start+end;i++) {
             BDFGlyph glyph = font.getGlyph(chars[i]);
             if(adv_idx==0) {
-                advances[adv_idx++] = font.getGlyph(chars[i]).getBbx().x;
+                advances[adv_idx++] = glyph.getBbx(b_rec).x;
             } else if(adv_idx!=last) {
-                advances[adv_idx++] = (advances[adv_idx-1] + glyph.getDWidth().width) - glyph.getBbx().x;
+                advances[adv_idx++] = (advances[adv_idx-1] + glyph.getDWidth().width) - glyph.getBbx(b_rec).x;
             } else {
                 // FIXME: what's this 12 doing here?
                 advances[adv_idx++] = (advances[adv_idx-1] + glyph.getDWidth().width)+12;
