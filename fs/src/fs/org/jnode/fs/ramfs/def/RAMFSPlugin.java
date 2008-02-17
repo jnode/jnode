@@ -1,6 +1,9 @@
 package org.jnode.fs.ramfs.def;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
 
 import javax.naming.NameNotFoundException;
 
@@ -13,10 +16,7 @@ import org.jnode.driver.DriverException;
 import org.jnode.driver.DeviceException;
 import org.jnode.driver.virtual.VirtualDevice;
 import org.jnode.driver.virtual.VirtualDeviceFactory;
-import org.jnode.fs.FileSystem;
-import org.jnode.fs.FileSystemException;
-import org.jnode.fs.FileSystemType;
-import org.jnode.fs.FSDirectory;
+import org.jnode.fs.*;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.fs.ramfs.RAMFileSystem;
 import org.jnode.fs.ramfs.RAMFileSystemType;
@@ -71,7 +71,25 @@ public class RAMFSPlugin extends Plugin {
                 FSDirectory root_dir = fs.getRootEntry().getDirectory();
                 root_dir.addDirectory("home");
                 root_dir.addDirectory("tmp");
+                //adding files to /jnode/lib/ required by thecore classes
+                FSDirectory libDir = (FSDirectory) root_dir.addDirectory("lib");
+                InputStream is = RAMFSPlugin.class.getResourceAsStream("flavormap.properties");
+                if(is != null){
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    byte[] buf = new byte[1024];
+                    int c;
+                    while((c = is.read(buf)) > -1)
+                        baos.write(buf, 0, c);
 
+                    is.close();
+                    baos.flush();
+                    baos.close();
+
+                    ByteBuffer data = ByteBuffer.wrap(baos.toByteArray());
+                    FSFile fmp = (FSFile)libDir.addFile("flavormap.properties");
+                    fmp.write(0, data);
+                    fmp.flush();                    
+                }
             } catch (DeviceAlreadyRegisteredException ex){
             	log.error("RAMFS is allready running.");
             } catch (FileSystemException ex) {
