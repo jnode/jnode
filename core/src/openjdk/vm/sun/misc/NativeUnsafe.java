@@ -608,9 +608,10 @@ class NativeUnsafe {
      */
     public static void park(Unsafe instance, boolean isAbsolute, long time) {
         //todo add proper support for nanotime parking
+        ThreadParker p;
         synchronized (parking){
             Thread thread = Thread.currentThread();
-            ThreadParker p =parking.get(thread);
+            p = parking.get(thread);
             if(p == null){
                 if(isAbsolute){
                     time = time - System.currentTimeMillis();
@@ -624,9 +625,16 @@ class NativeUnsafe {
                 }
                 p = new ThreadParker();
                 parking.put(thread, p);
-                p.park(time);                
+            } else {                
+                p = null;
             }
-            parking.remove(thread);
+        }
+
+        if(p != null){
+            p.park(time);
+            synchronized (parking){
+                parking.remove(Thread.currentThread());
+            }
         }
     }
 
