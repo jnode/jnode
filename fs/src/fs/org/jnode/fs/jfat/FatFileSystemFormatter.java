@@ -29,15 +29,13 @@ import org.jnode.driver.Device;
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.driver.block.FSBlockDeviceAPI;
 import org.jnode.driver.bus.ide.IDEConstants;
-import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.Formatter;
+import org.jnode.fs.service.FileSystemService;
 import org.jnode.partitions.PartitionTableEntry;
 import org.jnode.partitions.ibm.IBMPartitionTableEntry;
-import org.jnode.partitions.ibm.IBMPartitionTypes;
-import org.jnode.util.BinaryPrefix;
-import org.jnode.util.DecimalPrefix;
-import org.jnode.util.SizeUnit;
+import org.jnode.naming.InitialNaming;
+import javax.naming.NameNotFoundException;
 
 
 /**
@@ -68,7 +66,7 @@ public class FatFileSystemFormatter extends Formatter<FatFileSystem> {
 
 			if(sectorSize != IDEConstants.SECTOR_SIZE){
 				log.error("This mkjfat1.0 support only the Hard Disk.Sector Size must "+IDEConstants.SECTOR_SIZE+" bytes.\n");
-    }
+            }
 
 
 			PartitionTableEntry entry = api.getPartitionTableEntry();
@@ -81,7 +79,7 @@ public class FatFileSystemFormatter extends Formatter<FatFileSystem> {
 			} else {
 				numberOfSectors = api.getLength() / sectorSize;
 				offset = 0;
-}
+            }
 			/**
 			 * Check the Disks Availability. low end limit - 65536 sectors
 			 * I suspect that most FAT32 implementations would mount this volume just fine, but the
@@ -114,12 +112,14 @@ public class FatFileSystemFormatter extends Formatter<FatFileSystem> {
 						api
 						);
 
-
-
-			return new FatFileSystem(device, false); // not readOnly !
+            final FileSystemService fSS = InitialNaming.lookup(FileSystemService.NAME);
+            FatFileSystemType type = fSS.getFileSystemType(FatFileSystemType.ID);
+			return type.create(device, false); // not readOnly !
     	} catch (IOException ioe) {
 			throw new FileSystemException("Formating problem", ioe);
 		} catch (ApiNotFoundException e) {
+			throw new FileSystemException("Formating problem", e);
+		} catch (NameNotFoundException e) {
 			throw new FileSystemException("Formating problem", e);
 		}
 }

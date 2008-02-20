@@ -52,10 +52,13 @@ public class NFS2FileSystem implements FileSystem<NFS2RootEntry> {
 
     private boolean readOnly;
 
-    public NFS2FileSystem(final NFS2Device device, boolean readOnly)
+    private final NFS2FileSystemType type;
+
+    public NFS2FileSystem(final NFS2Device device, boolean readOnly, NFS2FileSystemType type)
             throws FileSystemException {
         this.device = device;
         this.readOnly = readOnly;
+        this.type = type;
 
         device.addListener(new DeviceListener() {
             public void deviceStarted(Device device) {
@@ -117,7 +120,7 @@ public class NFS2FileSystem implements FileSystem<NFS2RootEntry> {
     }
 
 	final public NFS2FileSystemType getType() {
-		return NFS2FileSystemType.getInstance();
+		return type;
 	}
 
     /**

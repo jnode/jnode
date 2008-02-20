@@ -4,21 +4,13 @@
 package org.jnode.fs.jfat;
 
 import java.io.IOException;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.nio.ByteBuffer;
-import java.util.Collections;
-import java.util.Map;
-import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
-import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystemException;
-import org.jnode.fs.ext2.Ext2FileSystemType;
 import org.jnode.fs.spi.AbstractFileSystem;
 
 
@@ -34,9 +26,9 @@ public class FatFileSystem extends AbstractFileSystem<FatRootDirectory> {
     private final CodePage cp;
 
 
-    public FatFileSystem ( Device device, String codePageName, boolean readOnly  )
+    public FatFileSystem ( Device device, String codePageName, boolean readOnly, FatFileSystemType type  )
 	throws FileSystemException {
-	super ( device, readOnly );
+	super ( device, readOnly, type );
 
 	try {
 	    fat = Fat.create ( getApi() );
@@ -51,14 +43,10 @@ public class FatFileSystem extends AbstractFileSystem<FatRootDirectory> {
 	cp = CodePage.forName ( codePageName );
     }
 
-    public FatFileSystem ( Device device, boolean readOnly )
+    public FatFileSystem ( Device device, boolean readOnly, FatFileSystemType type )
 	throws FileSystemException {
-	this ( device, "ISO_8859_1", readOnly );
+	this ( device, "ISO_8859_1", readOnly, type );
     }
-
-	final public FatFileSystemType getType() {
-		return FatFileSystemType.getInstance();
-	}
 
     public int getClusterSize() {
 	return fat.getClusterSize();

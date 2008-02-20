@@ -35,11 +35,7 @@ import org.jnode.partitions.PartitionTableEntry;
  * @author Chira
  */
 public class ISO9660FileSystemType implements BlockDeviceFileSystemType<ISO9660FileSystem> {
-
-    public static ISO9660FileSystemType getInstance()
-    {
-    	return FSUtils.getFileSystemType(ISO9660FileSystemType.class);
-    }
+    public static final Class<ISO9660FileSystemType> ID = ISO9660FileSystemType.class;
 
     public final String getName() {
         return "ISO9660";
@@ -78,6 +74,6 @@ public class ISO9660FileSystemType implements BlockDeviceFileSystemType<ISO9660F
      * @see org.jnode.fs.FileSystemType#create(Device, boolean)
      */
     public ISO9660FileSystem create(Device device, boolean readOnly) throws FileSystemException {
-        return new ISO9660FileSystem(device, readOnly);
+        return new ISO9660FileSystem(device, readOnly, this);
     }
 }

@@ -26,18 +26,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import javax.naming.NameNotFoundException;
-
 import org.apache.log4j.Logger;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSFile;
-import org.jnode.fs.FileSystem;
-import org.jnode.fs.FileSystemException;
-import org.jnode.fs.FileSystemType;
-import org.jnode.fs.ftpfs.FTPFileSystemType;
-import org.jnode.fs.service.FileSystemService;
-import org.jnode.naming.InitialNaming;
 
 /**
  *
@@ -267,18 +259,5 @@ public class FSUtils {
 		}
 
 		return sb.toString();
-	}
-
-	public static <T extends FileSystemType<? extends FileSystem<?>>> T getFileSystemType(Class<T> typeClass)
-	{
-	    try {
-			final FileSystemService fss = InitialNaming
-					.lookup(FileSystemService.NAME);
-			return fss.getFileSystemType(typeClass);
-		} catch (NameNotFoundException e) {
-			throw new RuntimeException(typeClass.getName() + " not properly registered", e);
-		} catch (FileSystemException e) {
-			throw new RuntimeException("internal error", e);
-		}
 	}
 }

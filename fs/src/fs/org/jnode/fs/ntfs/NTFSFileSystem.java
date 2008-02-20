@@ -44,9 +44,9 @@ public class NTFSFileSystem extends AbstractFileSystem<FSEntry> {
     /**
      * @see org.jnode.fs.FileSystem#getDevice()
      */
-    public NTFSFileSystem(Device device, boolean readOnly)
+    public NTFSFileSystem(Device device, boolean readOnly, NTFSFileSystemType type)
             throws FileSystemException {
-        super(device, readOnly);
+        super(device, readOnly, type);
 
         try {
             // initialize the NTFE volume
@@ -55,10 +55,6 @@ public class NTFSFileSystem extends AbstractFileSystem<FSEntry> {
             throw new FileSystemException(e);
         }
     }
-
-	final public NTFSFileSystemType getType() {
-		return NTFSFileSystemType.getInstance();
-	}
 
     /**
      * @see org.jnode.fs.FileSystem#getRootEntry()

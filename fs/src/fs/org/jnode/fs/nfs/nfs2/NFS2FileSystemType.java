@@ -30,10 +30,7 @@ import org.jnode.fs.util.FSUtils;
  * @author Andrei Dore
  */
 public class NFS2FileSystemType implements FileSystemType<NFS2FileSystem> {
-    public static NFS2FileSystemType getInstance()
-    {
-    	return FSUtils.getFileSystemType(NFS2FileSystemType.class);
-    }
+    public static final Class<NFS2FileSystemType> ID = NFS2FileSystemType.class;
 
     /**
      * Create a filesystem from a given device.
@@ -43,7 +40,7 @@ public class NFS2FileSystemType implements FileSystemType<NFS2FileSystem> {
      */
     public NFS2FileSystem create(Device device, boolean readOnly)
             throws FileSystemException {
-        return new NFS2FileSystem((NFS2Device) device, readOnly);
+        return new NFS2FileSystem((NFS2Device) device, readOnly, this);
     }
 
     /**

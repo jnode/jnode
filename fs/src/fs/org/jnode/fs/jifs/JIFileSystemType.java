@@ -25,16 +25,12 @@ import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
-import org.jnode.fs.util.FSUtils;
 
 /**
  * @author Andreas H\u00e4nel
  */
 public class JIFileSystemType implements FileSystemType<JIFileSystem> {
-    public static JIFileSystemType getInstance()
-    {
-    	return FSUtils.getFileSystemType(JIFileSystemType.class);
-    }
+    public static final Class<JIFileSystemType> ID = JIFileSystemType.class;
 
     public static final String VIRTUAL_DEVICE_NAME = "jifs";
 
@@ -57,7 +53,7 @@ public class JIFileSystemType implements FileSystemType<JIFileSystem> {
 	 * @throws FileSystemException
 	 */
 	public JIFileSystem create(Device device, boolean readOnly) throws FileSystemException {
-		JIFileSystem ret = new JIFileSystem(device, readOnly);
+		JIFileSystem ret = new JIFileSystem(device, readOnly, this);
 		if (ret== null){
 			log.error("got NULL from the JIFileSystem...");
 		}

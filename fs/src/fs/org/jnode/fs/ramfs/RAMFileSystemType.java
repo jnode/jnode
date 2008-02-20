@@ -11,15 +11,10 @@ import org.jnode.fs.util.FSUtils;
  * @author peda
  */
 public class RAMFileSystemType implements FileSystemType<RAMFileSystem> {
-
+    public static final Class<RAMFileSystemType> ID = RAMFileSystemType.class;
 	private static final int DEFAULT_SIZE = 104857600;
 
-    public static RAMFileSystemType getInstance()
-    {
-    	return FSUtils.getFileSystemType(RAMFileSystemType.class);
-    }
-
-	/** Virtual Device name for this filesystem */
+    /** Virtual Device name for this filesystem */
 	public static final String VIRTUAL_DEVICE_NAME = "ramfsdevice";
 
 
@@ -38,6 +33,6 @@ public class RAMFileSystemType implements FileSystemType<RAMFileSystem> {
 	public RAMFileSystem create(Device device, boolean readOnly)
 			throws FileSystemException {
 
-		return new RAMFileSystem(device, readOnly, DEFAULT_SIZE);
+		return new RAMFileSystem(device, readOnly, DEFAULT_SIZE, this);
 	}
 }

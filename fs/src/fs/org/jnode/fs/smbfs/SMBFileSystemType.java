@@ -30,10 +30,7 @@ import org.jnode.fs.util.FSUtils;
  * @author Levente S\u00e1ntha
  */
 public class SMBFileSystemType implements FileSystemType<SMBFileSystem> {
-    public static SMBFileSystemType getInstance()
-    {
-    	return FSUtils.getFileSystemType(SMBFileSystemType.class);
-    }
+    public static final Class<SMBFileSystemType> ID = SMBFileSystemType.class;
 
     /**
      * Create a filesystem from a given device.
@@ -42,7 +39,7 @@ public class SMBFileSystemType implements FileSystemType<SMBFileSystem> {
      * @param readOnly
      */
     public SMBFileSystem create(Device device, boolean readOnly) throws FileSystemException {
-        return new SMBFileSystem((SMBFSDevice) device);
+        return new SMBFileSystem((SMBFSDevice) device, this);
     }
 
     /**

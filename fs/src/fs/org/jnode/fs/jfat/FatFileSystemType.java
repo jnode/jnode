@@ -36,12 +36,7 @@ import org.jnode.partitions.ibm.IBMPartitionTypes;
  * @author Tango
  */
 public class FatFileSystemType implements BlockDeviceFileSystemType<FatFileSystem> {
-
-    public static FatFileSystemType getInstance()
-    {
-    	return FSUtils.getFileSystemType(FatFileSystemType.class);
-    }
-
+    public static final Class<FatFileSystemType> ID = FatFileSystemType.class;
 
     public String getName() {
 	return "JFAT";
@@ -79,9 +74,7 @@ public class FatFileSystemType implements BlockDeviceFileSystemType<FatFileSyste
 
     public FatFileSystem create ( Device device, boolean readOnly )
 	throws FileSystemException {
-	FatFileSystem fs = new FatFileSystem ( device, readOnly );
-
-	return fs;
+        return new FatFileSystem ( device, readOnly, this );
     }
 
 }

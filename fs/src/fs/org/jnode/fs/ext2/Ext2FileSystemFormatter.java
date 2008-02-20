@@ -24,7 +24,10 @@ package org.jnode.fs.ext2;
 import org.jnode.driver.Device;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.Formatter;
+import org.jnode.fs.service.FileSystemService;
 import org.jnode.util.BinaryPrefix;
+import org.jnode.naming.InitialNaming;
+import javax.naming.NameNotFoundException;
 
 /**
  * @author Andras Nagy
@@ -46,8 +49,14 @@ public class Ext2FileSystemFormatter extends Formatter<Ext2FileSystem> {
 	 *
 	 */
 	public synchronized Ext2FileSystem format(Device device) throws FileSystemException {
-		Ext2FileSystem fs = new Ext2FileSystem(device, false);
-		fs.create(blockSize);
-		return fs;
-	}
+        try {
+            FileSystemService fSS = InitialNaming.lookup(FileSystemService.NAME);
+            Ext2FileSystemType type = fSS.getFileSystemType(Ext2FileSystemType.ID);
+            Ext2FileSystem fs = type.create(device, false);
+            fs.create(blockSize);
+            return fs;
+        } catch (NameNotFoundException e){
+    	   	throw new FileSystemException(e);
+        }
+    }
 }

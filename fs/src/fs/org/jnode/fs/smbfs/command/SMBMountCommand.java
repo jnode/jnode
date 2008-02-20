@@ -76,7 +76,7 @@ public class SMBMountCommand extends AbstractCommand {
         final DeviceManager dm = DeviceUtils.getDeviceManager();
         dm.register(dev);
         final FileSystemService fss = InitialNaming.lookup(FileSystemService.NAME);
-        SMBFileSystemType type = SMBFileSystemType.getInstance();
+        SMBFileSystemType type = fss.getFileSystemType(SMBFileSystemType.ID);
         final SMBFileSystem fs = type.create(dev, true);
         fss.registerFileSystem(fs);
         fss.mount(mount_point, fs, null);
