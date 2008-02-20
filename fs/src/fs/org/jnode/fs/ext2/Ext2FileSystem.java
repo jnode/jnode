@@ -37,7 +37,6 @@ import org.jnode.fs.ReadOnlyFileSystemException;
 import org.jnode.fs.ext2.cache.Block;
 import org.jnode.fs.ext2.cache.BlockCache;
 import org.jnode.fs.ext2.cache.INodeCache;
-import org.jnode.fs.smbfs.SMBFileSystemType;
 import org.jnode.fs.spi.AbstractFileSystem;
 
 /**
@@ -73,9 +72,9 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
      *
      * @throws FileSystemException
      */
-    public Ext2FileSystem(Device device, boolean readOnly)
+    public Ext2FileSystem(Device device, boolean readOnly, Ext2FileSystemType type)
             throws FileSystemException {
-        super(device, readOnly);
+        super(device, readOnly, type);
         log.setLevel(Level.DEBUG);
 
         blockCache = new BlockCache(50, (float) 0.75);
@@ -84,10 +83,6 @@ public class Ext2FileSystem extends AbstractFileSystem<Ext2Entry> {
         //groupDescriptorLock = new Object();
         //superblockLock = new Object();
     }
-
-	final public Ext2FileSystemType getType() {
-		return Ext2FileSystemType.getInstance();
-	}
 
     public void read() throws FileSystemException {
         ByteBuffer data;

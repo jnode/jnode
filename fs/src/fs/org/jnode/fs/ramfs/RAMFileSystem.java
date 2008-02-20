@@ -23,16 +23,18 @@ public class RAMFileSystem implements FileSystem<RAMDirectory> {
 	private final long maxSize;
 	private long summedBufferSize;
 	private long summedFileSize;
+    private final RAMFileSystemType type;
 
-	/**
+    /**
 	 * Constructor for RAMFileSystem
 	 * @param device
 	 * @param readOnly
 	 * @param maxSize
 	 * @throws FileSystemException
 	 */
-	public RAMFileSystem(Device device, boolean readOnly, long maxSize) throws FileSystemException {
-		this.device = device;
+	public RAMFileSystem(Device device, boolean readOnly, long maxSize, RAMFileSystemType type) throws FileSystemException {
+        this.type = type;
+        this.device = device;
 		this.readOnly = readOnly;
 
 		this.maxSize = maxSize;
@@ -43,7 +45,7 @@ public class RAMFileSystem implements FileSystem<RAMDirectory> {
 	}
 
 	final public RAMFileSystemType getType() {
-		return RAMFileSystemType.getInstance();
+		return this.type;
 	}
 
 	/**

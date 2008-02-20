@@ -36,8 +36,10 @@ public class SMBFileSystem extends NtlmAuthenticator implements FileSystem<SMBFS
     private SMBFSDevice device;
     private SMBFSDirectory root;
     private boolean closed;
+    private SMBFileSystemType type;
 
-    public SMBFileSystem(SMBFSDevice device) {
+    public SMBFileSystem(SMBFSDevice device, SMBFileSystemType type) {
+        this.type = type;
         this.device = device;
         try {
             root = new SMBFSDirectory(null,
@@ -48,7 +50,7 @@ public class SMBFileSystem extends NtlmAuthenticator implements FileSystem<SMBFS
     }
 
 	final public SMBFileSystemType getType() {
-		return SMBFileSystemType.getInstance();
+		return type;
 	}
 
     protected NtlmPasswordAuthentication getNtlmPasswordAuthentication() {

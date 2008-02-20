@@ -22,12 +22,8 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
 	/** Catalog special file for this instance */
 	private Catalog catalog;
 
-	public HfsPlusFileSystem(Device device, boolean readOnly) throws FileSystemException {
-		super(device, readOnly);
-	}
-
-	final public HfsPlusFileSystemType getType() {
-		return HfsPlusFileSystemType.getInstance();
+	public HfsPlusFileSystem(Device device, boolean readOnly, HfsPlusFileSystemType type) throws FileSystemException {
+		super(device, readOnly, type);
 	}
 
 	public void read() throws FileSystemException {

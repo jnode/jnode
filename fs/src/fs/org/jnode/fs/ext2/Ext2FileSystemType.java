@@ -37,17 +37,13 @@ import org.jnode.partitions.ibm.IBMPartitionTypes;
  * @author Andras Nagy
  */
 public class Ext2FileSystemType implements BlockDeviceFileSystemType<Ext2FileSystem> {
-
-    public static Ext2FileSystemType getInstance()
-    {
-    	return FSUtils.getFileSystemType(Ext2FileSystemType.class);
-    }
+    public static final Class<Ext2FileSystemType> ID = Ext2FileSystemType.class;
 
 	/**
 	 * @see org.jnode.fs.FileSystemType#create(Device, boolean)
 	 */
 	public Ext2FileSystem create(Device device, boolean readOnly) throws FileSystemException {
-		Ext2FileSystem fs = new Ext2FileSystem(device, readOnly);
+		Ext2FileSystem fs = new Ext2FileSystem(device, readOnly, this);
 		fs.read();
 		return fs;
 	}

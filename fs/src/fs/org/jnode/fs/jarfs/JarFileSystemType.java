@@ -33,11 +33,6 @@ import org.jnode.fs.util.FSUtils;
  *
  */
 public class JarFileSystemType implements FileSystemType<JarFileSystem> {
-    public static JarFileSystemType getInstance()
-    {
-    	return FSUtils.getFileSystemType(JarFileSystemType.class);
-    }
-
     public static final Class<JarFileSystemType> ID = JarFileSystemType.class;
 
     public final String getName() {
@@ -49,6 +44,6 @@ public class JarFileSystemType implements FileSystemType<JarFileSystem> {
      */
     public JarFileSystem create(Device device, boolean readOnly) throws FileSystemException {
         // jar file systems are always readOnly
-        return new JarFileSystem((JarFileDevice) device);
+        return new JarFileSystem((JarFileDevice) device, this);
     }
 }

@@ -31,7 +31,11 @@ import org.jnode.driver.block.FileDevice;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystemException;
+import org.jnode.fs.service.FileSystemService;
 import org.jnode.fs.ntfs.NTFSFileSystem;
+import org.jnode.fs.ntfs.NTFSFileSystemType;
+import org.jnode.naming.InitialNaming;
+import javax.naming.NameNotFoundException;
 
 
 /**
@@ -59,12 +63,17 @@ public class NTFSTest {
 		}
 		
 		try{
-			NTFSfs = new  NTFSFileSystem(fd, false);
+            final FileSystemService fSS = InitialNaming.lookup(FileSystemService.NAME);
+            NTFSFileSystemType type = fSS.getFileSystemType(NTFSFileSystemType.ID);
+            NTFSfs = new  NTFSFileSystem(fd, false, type);
 		} catch (FileSystemException e) {
 			System.out.println("error when constructing Ext2FileSystem");
 			e.printStackTrace();
 			System.exit(-1);
-		}
+		} catch (NameNotFoundException e){
+            System.out.println("error while accessing file system service");
+			System.exit(-1);
+        }
 	
 		try{
 			//FSDirectory root = NTFSfs.getRootEntry().getDirectory();

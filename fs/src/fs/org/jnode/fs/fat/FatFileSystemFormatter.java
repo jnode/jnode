@@ -27,16 +27,14 @@ import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.driver.block.FSBlockDeviceAPI;
-import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
-import org.jnode.fs.FileSystemType;
 import org.jnode.fs.Formatter;
-import org.jnode.fs.ext2.Ext2FileSystemType;
+import org.jnode.fs.service.FileSystemService;
 import org.jnode.partitions.PartitionTableEntry;
 import org.jnode.partitions.ibm.IBMPartitionTableEntry;
-import org.jnode.partitions.ibm.IBMPartitionTypes;
+import org.jnode.naming.InitialNaming;
 
-import bsh.This;
+import javax.naming.NameNotFoundException;
 
 /**
  * @author epr
@@ -91,12 +89,16 @@ public class FatFileSystemFormatter extends Formatter<FatFileSystem> {
 					FAT_STANDARD_BS);
 			ff.format(api);
 
-			return new FatFileSystem(device, false); // not readOnly !
+            final FileSystemService fSS = InitialNaming.lookup(FileSystemService.NAME);
+            FatFileSystemType type = fSS.getFileSystemType(FatFileSystemType.ID);
+            return new FatFileSystem(device, false, type); // not readOnly !
 		} catch (IOException ioe) {
 			throw new FileSystemException("Formating problem", ioe);
 		} catch (ApiNotFoundException e) {
 			throw new FileSystemException("Formating problem", e);
-		}
+		} catch (NameNotFoundException e){
+            throw new FileSystemException(e);
+        }
 	}
 
 	private static final BootSector FAT_STANDARD_BS =

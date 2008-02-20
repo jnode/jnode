@@ -40,6 +40,7 @@ import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.fat.FatFileSystem;
+import org.jnode.fs.fat.FatFileSystemType;
 import org.jnode.fs.fat.GrubFatFormatter;
 import org.jnode.util.FileUtils;
 
@@ -145,7 +146,7 @@ public class BootFloppyBuilder extends Task {
      */
     protected void copySystemFiles(Device device) throws IOException,
             FileSystemException {
-        final FatFileSystem fs = new FatFileSystem(device, false);
+        final FatFileSystem fs = new FatFileSystem(device, false, new FatFileSystemType());
 
         for (FileSet fset : fileSets) {
             processFileSet(fs, fset);

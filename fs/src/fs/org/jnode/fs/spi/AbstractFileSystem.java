@@ -29,11 +29,7 @@ import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.driver.block.FSBlockDeviceAPI;
-import org.jnode.fs.FSDirectory;
-import org.jnode.fs.FSEntry;
-import org.jnode.fs.FSFile;
-import org.jnode.fs.FileSystem;
-import org.jnode.fs.FileSystemException;
+import org.jnode.fs.*;
 
 /**
  * Abstract class with common things in different FileSystem implementations
@@ -49,6 +45,8 @@ public abstract class AbstractFileSystem<T extends FSEntry> implements FileSyste
     private final Device device;
 
     private final BlockDeviceAPI api;
+
+    private final FileSystemType<? extends FileSystem<T>> type;
 
     private boolean closed;
 
@@ -66,7 +64,7 @@ public abstract class AbstractFileSystem<T extends FSEntry> implements FileSyste
      * @param readOnly
      * @throws FileSystemException
      */
-    public AbstractFileSystem(Device device, boolean readOnly)
+    public AbstractFileSystem(Device device, boolean readOnly, FileSystemType<? extends FileSystem<T>> type)
             throws FileSystemException {
         if (device == null) throw new IllegalArgumentException("null device!");
 
@@ -80,6 +78,7 @@ public abstract class AbstractFileSystem<T extends FSEntry> implements FileSyste
 
         this.closed = false;
         this.readOnly = readOnly;
+        this.type = type;
     }
 
     /**
@@ -88,6 +87,10 @@ public abstract class AbstractFileSystem<T extends FSEntry> implements FileSyste
     final public Device getDevice() {
         return device;
     }
+
+    final public FileSystemType<? extends FileSystem<T>> getType() {
+		return type;
+	}
 
     /**
      * @see org.jnode.fs.FileSystem#getRootEntry()

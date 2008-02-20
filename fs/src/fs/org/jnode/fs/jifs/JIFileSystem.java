@@ -39,16 +39,18 @@ public class JIFileSystem implements FileSystem<JIFSDirectory> {
 
 	private JIFSDirectory rootDir = null;
 	private Device device;
+    private final JIFileSystemType type;
 
-	/**
+    /**
 	 * Constructor for JIFileSystem in specified readOnly mode
 	 */
-	public JIFileSystem(Device device, boolean readOnly) throws FileSystemException {
+	public JIFileSystem(Device device, boolean readOnly, JIFileSystemType type) throws FileSystemException {
 		if (readOnly==false){
 			throw new FileSystemException("JIFS can not be created as writable...");
 		}
 		this.device = device;
-		//try {
+        this.type = type;
+        //try {
 			//rootDir = new JIFSDirectory(this.device.getId(), true);
 			rootDir = new JIFSDrootDir(device.getId());
 		//} catch ( IOException e){
@@ -57,7 +59,7 @@ public class JIFileSystem implements FileSystem<JIFSDirectory> {
 	}
 
 	final public JIFileSystemType getType() {
-		return JIFileSystemType.getInstance();
+		return type;
 	}
 
 	/**

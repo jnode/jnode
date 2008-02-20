@@ -32,11 +32,11 @@ import org.jnode.driver.block.FileDevice;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystemException;
-import org.jnode.fs.fat.BootSector;
-import org.jnode.fs.fat.FatDirectory;
-import org.jnode.fs.fat.FatFileSystem;
-import org.jnode.fs.fat.GrubFatFormatter;
+import org.jnode.fs.service.FileSystemService;
+import org.jnode.fs.fat.*;
 import org.jnode.util.FileUtils;
+import org.jnode.naming.InitialNaming;
+import javax.naming.NameNotFoundException;
 
 /**
  * <description>
@@ -68,7 +68,10 @@ public class FatTest {
 	public static void printInfo(File file, PrintWriter out)
 		throws IOException, FileSystemException {
 		FileDevice fd = new FileDevice(file, "r");
-		FatFileSystem fs = new FatFileSystem(fd, false);
+        try {
+        final FileSystemService fSS = InitialNaming.lookup(FileSystemService.NAME);
+        FatFileSystemType type = fSS.getFileSystemType(FatFileSystemType.ID);
+        FatFileSystem fs = new FatFileSystem(fd, false, type);
 		try {
 			BootSector bs = fs.getBootSector();
 			bs.read(fd);
@@ -109,7 +112,10 @@ public class FatTest {
 			//fd.stop();
 			fd.close();
 		}
-	}
+        }catch (NameNotFoundException e){
+            throw new FileSystemException(e);
+        }
+    }
 
 	public static void createFloppy(File f) throws Exception {
 
@@ -119,7 +125,9 @@ public class FatTest {
 		ff.format(newFd);
 
 		//newFd.start();
-		FatFileSystem fs = new FatFileSystem(newFd, false);
+        final FileSystemService fSS = InitialNaming.lookup(FileSystemService.NAME);
+        FatFileSystemType type = fSS.getFileSystemType(FatFileSystemType.ID);
+        FatFileSystem fs = new FatFileSystem(newFd, false, type);
 
 		FSDirectory dir = fs.getRootEntry().getDirectory();
 		FSDirectory bDir = dir.addDirectory("boot").getDirectory();

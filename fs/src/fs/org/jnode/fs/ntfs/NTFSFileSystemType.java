@@ -35,12 +35,7 @@ import org.jnode.partitions.ibm.IBMPartitionTypes;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class NTFSFileSystemType implements BlockDeviceFileSystemType<NTFSFileSystem> {
-
-    public static NTFSFileSystemType getInstance()
-    {
-    	return FSUtils.getFileSystemType(NTFSFileSystemType.class);
-    }
-
+    public static final Class<NTFSFileSystemType> ID = NTFSFileSystemType.class;
     public static final String TAG = "NTFS";
 
     public String getName() {
@@ -68,6 +63,6 @@ public class NTFSFileSystemType implements BlockDeviceFileSystemType<NTFSFileSys
      */
     public NTFSFileSystem create(Device device, boolean readOnly)
             throws FileSystemException {
-        return new NTFSFileSystem(device, readOnly);
+        return new NTFSFileSystem(device, readOnly, this);
     }
 }
