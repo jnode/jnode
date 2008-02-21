@@ -279,7 +279,7 @@ final class FileHandleImpl implements VMFileHandle {
     public boolean lock()
     {
         // TODO Auto-generated method stub
-        return false;
+        return true;
     }
 
     public MappedByteBuffer mapImpl(char mode, long position, int size)
