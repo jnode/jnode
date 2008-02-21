@@ -4,7 +4,6 @@
 <plugin id="org.jnode.fs.ramfs"
         name="JNode TempFileSystem"
         version="@VERSION@"
-        system="true"
         license-name="lgpl"
         provider-name="JNode.org">
         

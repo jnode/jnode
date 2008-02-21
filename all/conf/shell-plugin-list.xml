@@ -4,6 +4,15 @@
         <attribute key="Main-Class" value="org.jnode.shell.CommandShell"/>
     </manifest>
 
+    <plugin id="org.jnode.work"/>
+    <plugin id="org.jnode.driver"/>
+    <plugin id="org.jnode.driver.block"/>
+    <plugin id="org.jnode.partitions"/>
+    <plugin id="org.jnode.fs.service"/>
+    <plugin id="org.jnode.fs"/>
+    <plugin id="org.jnode.fs.ramfs"/>
+    <plugin id="org.jnode.fs.ramfs.def"/>
+    
     <plugin id="org.jnode.driver.character"/>
     <plugin id="org.jnode.driver.console"/>
     <plugin id="org.jnode.driver.console.core"/>

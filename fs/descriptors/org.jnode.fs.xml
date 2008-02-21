@@ -4,7 +4,6 @@
 <plugin id="org.jnode.fs" 
         name="JNode FileSystem Service"
         version="@VERSION@"
-        system="true"
         provider-name="JNode.org"
         license-name="lgpl"
         class="org.jnode.fs.service.def.FileSystemPlugin">

@@ -4,7 +4,6 @@
 <plugin id="org.jnode.partitions" 
         name="JNode Partition Service"
         version="@VERSION@"
-        system="true"
         provider-name="JNode.org"
         license-name="lgpl"
         class="org.jnode.partitions.service.def.PartitionTablePlugin">

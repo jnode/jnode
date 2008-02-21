@@ -5,7 +5,6 @@
         name="JNode TempFileSystem"
         version="@VERSION@"
         license-name="lgpl"
-        system="true"
         provider-name="JNode.org"
         class="org.jnode.fs.ramfs.def.RAMFSPlugin">
         

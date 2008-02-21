@@ -10,6 +10,13 @@
 
     <requires>
         <import plugin="org.jnode.net.ipv4"/>
+        <!--
+            Hack to handle the prefrences problem:
+            the org.jnode.fs.ramfs.def plugin sets up a partition
+            used by system prefrences and org.jnode.net.ipv4.config
+            uses the system prefrences so that needs to be setup beforhand
+        -->
+        <import plugin="org.jnode.fs.ramfs.def"/>
     </requires>
 
     <runtime>
