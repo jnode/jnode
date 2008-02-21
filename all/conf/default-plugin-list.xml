@@ -9,6 +9,15 @@ The default list of (non-system) plugins to be included in the init-jar.
         <attribute key="Main-Class" value="org.jnode.shell.CommandShell"/>
     </manifest>
 
+    <plugin id="org.jnode.work"/>
+    <plugin id="org.jnode.driver"/>
+    <plugin id="org.jnode.driver.block"/>
+    <plugin id="org.jnode.partitions"/>
+    <plugin id="org.jnode.fs.service"/>
+    <plugin id="org.jnode.fs"/>
+    <plugin id="org.jnode.fs.ramfs"/>
+    <plugin id="org.jnode.fs.ramfs.def"/>
+
     <plugin id="org.classpath.ext"/>
     <plugin id="org.classpath.ext.awt"/>
     <plugin id="org.classpath.ext.core"/>

@@ -4,7 +4,6 @@
 <plugin id="org.jnode.fs.service" 
         name="FS Service API"
         version="@VERSION@"
-        system="true"
         license-name="lgpl"
         provider-name="JNode.org">
         
