@@ -56,6 +56,9 @@ public class RxDescriptorRing extends DescriptorRing {
 	}
 
 	public SocketBuffer getPacket() {
+		if (currentDescriptor > rxDescriptors.length)
+			return null;
+			
 		RxDescriptor des = rxDescriptors[currentDescriptor];
 		short status = des.getStatus();
 			
@@ -100,8 +103,12 @@ public class RxDescriptorRing extends DescriptorRing {
 				currentDescriptor = 0;
 			return skbuf;
 		} else {
-			log.error("Didn't find valid status");
+			log.error("Didn't find valid status "+status);
 			currentDescriptor = currentDescriptor + 1;
+
+			if (currentDescriptor == length)
+				currentDescriptor = 0;
+
 			return null;
 		}
 	}
