@@ -72,6 +72,9 @@ public final class MemoryBlockManager extends VmSystemObject {
 	/** Number of next allocatable block */
 	private static Word nextBlockNr;
 
+	/* Predictive Compilation */
+	private final static boolean DBG = false;
+	
 	/**
 	 * Allocate a new block of memory at blockSize large. The actual size is
 	 * aligned on BLOCK_SIZE.
@@ -84,10 +87,15 @@ public final class MemoryBlockManager extends VmSystemObject {
 		if (!initialized) {
 			initialize();
 		}
-		if (false) {
-			Unsafe.debug("allocateBlock");
-			Unsafe.debug(lockPtr.toInt());
+		
+		if (DBG) {
+			Unsafe.debug("allocateSize and BlockCount ");
+			Unsafe.debug(blockSize.toInt());
+			Unsafe.debug(" : ");
+			Unsafe.debug(blockAlign(blockSize.toWord(), true).rshl(BLOCK_SIZE_SHIFT));
+			Unsafe.debug("\n");
 		}
+		
 		enter();
 		try {
 			// Calculate the number of blocks needed
@@ -162,7 +170,7 @@ public final class MemoryBlockManager extends VmSystemObject {
 	 * @return The block number of the first block, or Word.max() if not found.
 	 */
 	private static Word findFreeBlocks(Word freeBlockCount) {
-		final Word max = blockCount;
+		final Word max = blockCount.sub(freeBlockCount);
 		Word nr = nextBlockNr;
 		while (nr.LT(max)) {
 			boolean inUse = false;
@@ -247,7 +255,7 @@ public final class MemoryBlockManager extends VmSystemObject {
 			Unsafe.debug(startPtr);
 		}
 		lockPtr = startPtr;
-		if (false) {
+		if (DBG) {
 			Unsafe.debug("lockPtr:");
 			Unsafe.debug(lockPtr);
 			Unsafe.debug("bitmapSize:");
