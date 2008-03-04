@@ -26,18 +26,87 @@ import org.jnode.vm.annotation.Uninterruptible;
 
 
 /**
+ * In MathSupport ldiv and lrem will be used as SoftBytecodes. I.e. normal Java classes that contain ldiv or
+ * lrem bytecodes will in fact call these Java methods.
+ *  
  * @author epr
+ * @author peda
  */
 @MagicPermission
 @Uninterruptible
 public final class MathSupport {
 
+	/** New Implementation */ 
+    public static long ldiv(long num, long den) {
+    	boolean neg = false;
+    	if (num < 0) { num = -num; neg = true; }
+    	if (den < 0) { den = -den; neg = !neg; }   	
+    	if (num < den) return 0;   	
+    	if (den == 0) throw new ArithmeticException("Divide by zero");
+    	
+    	long qBit = 1;
+    	while (den >= 0) {
+    		den = den << 1;
+    		qBit = qBit << 1;
+    	}
+
+    	den >>>= 1;	qBit >>>= 1;
+
+    	long result = 0;
+    	while (qBit != 0) {
+    		if (den <= num) {
+    			result += qBit;
+    			num -= den;
+    		}
+    		den = den >>> 1;
+    		qBit = qBit >>> 1;
+    	}
+    	
+    	if (neg)
+    		return -result;
+    	return result;
+    }
+
+    /** new implementation */ 
+    public static long lrem(long num, long den) {
+    	final boolean neg;
+    	if (num < 0) { num = -num; neg = true; }
+    	else neg = false;
+    	if (den < 0) { den = -den; }
+    	if (num < den) return neg? -num : num;
+    	
+    	if (den == 0)
+    		throw new ArithmeticException("Divide by zero");
+    	
+    	long qBit = 1;
+    	while (den >= 0) {
+    		den <<= 1;
+    		qBit <<= 1;
+    	}
+
+    	den >>>= 1;
+   		qBit >>>= 1;
+
+    	while (qBit != 0) {
+    		if (den <= num) {
+    			num -= den;
+    		}
+    		qBit >>>= 1;
+    		den >>>= 1;
+    	}
+    	
+    	if (neg)
+    	   return -num;
+    	return num;
+    }
+
+    /*
     private final char[] v = new char[5];
     private final char[] u = new char[5];
     private final char[] q = new char[5];
     
-    public static boolean ucmp(/*unsigned*/
-            final int a, /*unsigned*/
+    public static boolean ucmp(//unsigned
+            final int a, //unsigned
             final int b) {
         if ((b < 0) && (a >= 0))
             return true;
@@ -46,8 +115,8 @@ public final class MathSupport {
         return a < b;
     }
 
-    public static boolean ulcmp(/*unsigned*/
-            final long a, /*unsigned*/
+    public static boolean ulcmp(//unsigned
+            final long a, //unsigned
             final long b) {
         if ((b < 0L) && (a >= 0L))
             return true;
@@ -56,9 +125,9 @@ public final class MathSupport {
         return a < b;
     }
 
-    public static /*unsigned*/
-            int udiv(/*unsigned*/
-            final int a, /*unsigned*/
+    public static //unsigned
+            int udiv(//unsigned
+            final int a, //unsigned
             final int b) {
         if (b < 0) {
             if (a < 0) {
@@ -76,9 +145,9 @@ public final class MathSupport {
         return (d << 1) + m / b;
     }
 
-    public static /*unsigned*/
-            int urem(/*unsigned*/
-            final int a, /*unsigned*/
+    public static //unsigned
+            int urem(//unsigned
+            final int a, //unsigned
             final int b) {
         if (b < 0) {
             if (a < 0) {
@@ -95,9 +164,9 @@ public final class MathSupport {
         return m % b;
     }
 
-    public static /*unsigned*/
-            long umul(/*unsigned*/
-            final int a, /*unsigned*/
+    public static //unsigned
+            long umul(//unsigned
+            final int a, //unsigned
             final int b) {
         char a_1 = (char) a;
         char a_2 = (char) (a >> 16);
@@ -200,7 +269,8 @@ public final class MathSupport {
         return result;
     }
 
-    public static long ldiv(long uq, long vq) {
+    // ORIGINAL IMPLEMENTATION
+    public static long ldiv2(long uq, long vq) {
         boolean neg = false;
         if (uq < 0L) {
             uq = -uq;
@@ -215,15 +285,17 @@ public final class MathSupport {
             uq = -uq;
         return uq;
     }
-
-    public static long lrem(long uq, long vq) {
+    
+    
+    // ORIGINAL IMPLEMENTATION
+    public static long lrem2(long uq, long vq) {
         boolean neg = false;
         if (uq < 0L) {
             uq = -uq;
             neg = !neg;
         }
         if (vq < 0L) {
-            vq = -vq; /*neg = !neg;*/
+            vq = -vq;
         }
         uq = uldivrem(uq, vq, true);
         if (neg)
@@ -231,6 +303,7 @@ public final class MathSupport {
         return uq;
     }
 
+    
     private static int HHALFQ(final long v) {
         return (int) (v >> 32);
     }
@@ -247,17 +320,18 @@ public final class MathSupport {
         return (char) v;
     }
 
-    /*private static int LHUP(int v) {
+    private static int LHUP(int v) {
         return v << 16;
-    }*/
-    private static /*unsigned*/
+    }
+    
+    private static //unsigned
             int COMBINE(final char hi, final char lo) {
         return (hi << 16) | lo;
     }
 
-    private static /*unsigned*/
-            long COMBINEQ(/*unsigned*/
-            final int hi, /*unsigned*/
+    private static //unsigned
+            long COMBINEQ(//unsigned
+            final int hi, //unsigned
             final int lo) {
         final long hiL = hi;
         final long loL = lo;
@@ -271,10 +345,10 @@ public final class MathSupport {
      * section 4.3.1, pp. 257--259.
      *
      * NOTE: the version here is adapted from NetBSD C source code (author unknown).
-     */
-    private static /*unsigned*/
-            long uldivrem(/*unsigned*/
-            final long uq, /*unsigned*/
+     *
+    private static //unsigned
+            long uldivrem(//unsigned
+            final long uq, //unsigned
             final long vq, final boolean rem) {
         final int B = 1 << HALF_BITS;
 
@@ -297,7 +371,7 @@ public final class MathSupport {
          *	m + n = 4
          * and thus
          *	m = 4 - n <= 2
-         */
+         *
         char u1 = HHALF(HHALFQ(uq));
         char u2 = LHALF(HHALFQ(uq));
         char u3 = HHALF(LHALFQ(uq));
@@ -324,9 +398,9 @@ public final class MathSupport {
                  *		q[j] = floor((r*B + u[j]) / v),
                  *		r = (r*B + u[j]) % v;
                  * We unroll this completely here.
-                 */
-                /*unsigned*/
-                int t = v[vi + 2]; /* nonzero, by definition */
+                 *
+                //unsigned
+                int t = v[vi + 2]; // nonzero, by definition
                 char q1 = (char) udiv(u1, t);
                 rbj = COMBINE((char) urem(u1, t), u2);
                 char q2 = (char) udiv(rbj, t);
@@ -346,7 +420,7 @@ public final class MathSupport {
          * By adjusting q once we determine m, we can guarantee that
          * there is a complete four-digit quotient at &qspace[1] when
          * we finally stop.
-         */
+         *
         final char[] u = mathSupport.u;
         u[0] = 0;
         u[1] = u1;
@@ -366,13 +440,13 @@ public final class MathSupport {
          * for (int i = 4 - m; --i >= 0;)
          *     q[qi + i] = 0;
          * qi += 4 - m;
-         */
+         *
         int qi = 4 - m;
 
         /*
         The above note is only true for new arrays, but as this array q
         is reused and therefore it has to reinited to 0
-        */
+        *
         for (int i = 0; i < q.length; i++) {
           q[i] = 0;
         }
@@ -381,21 +455,21 @@ public final class MathSupport {
          * a few minor changes.
          *
          * D1: choose multiplier 1 << d to ensure v[1] >= B/2.
-         */
+         *
         int d = 0;
-        /*unsigned*/
+        //unsigned
         for (int t = v[vi + 1]; ucmp(t, B / 2); t <<= 1)
             d++;
         if (d > 0) {
-            shl(u, ui, m + n, d); /* u <<= d */
-            shl(v, vi + 1, n - 1, d); /* v <<= d */
+            shl(u, ui, m + n, d); // u <<= d 
+            shl(v, vi + 1, n - 1, d); // v <<= d 
         }
         /*
          * D2: j = 0.
-         */
+         *
         int j = 0;
-        char v1 = v[vi + 1]; /* for D3 -- note that v[1..n] are constant */
-        char v2 = v[vi + 2]; /* for D3 */
+        char v1 = v[vi + 1]; // for D3 -- note that v[1..n] are constant 
+        char v2 = v[vi + 2]; // for D3 
         do {
             /*
              * D3: Calculate qhat (\^q, in TeX notation).
@@ -404,12 +478,12 @@ public final class MathSupport {
              * While rhat < B and v[2]*qhat > rhat*B+u[j+2],
              * decrement qhat and increase rhat correspondingly.
              * Note that if rhat >= B, v[2]*qhat < rhat*B.
-             */
-            char uj0 = u[ui + j + 0]; /* for D3 only -- note that u[j+...] change */
-            char uj1 = u[ui + j + 1]; /* for D3 only */
-            char uj2 = u[ui + j + 2]; /* for D3 only */
+             *
+            char uj0 = u[ui + j + 0]; // for D3 only -- note that u[j+...] change 
+            char uj1 = u[ui + j + 1]; // for D3 only 
+            char uj2 = u[ui + j + 2]; // for D3 only 
             boolean sim_goto = false;
-            /*unsigned*/
+            //unsigned
             int qhat, rhat;
             if (uj0 == v1) {
                 qhat = B;
@@ -417,7 +491,7 @@ public final class MathSupport {
                 //goto qhat_too_big;
                 sim_goto = true;
             } else {
-                /*unsigned*/
+                //unsigned
                 int n2 = COMBINE(uj0, uj1);
                 qhat = udiv(n2, v1);
                 rhat = urem(n2, v1);
@@ -436,9 +510,9 @@ public final class MathSupport {
              * The variable `t' holds any borrows across the loop.
              * We split this up so that we do not require v[0] = 0,
              * and to eliminate a final special case.
-             */
+             *
             int i;
-            /*unsigned*/
+            //unsigned
             int t;
             for (t = 0, i = n; i > 0; i--) {
                 t = u[ui + i + j] - (int) umul(v[vi + i], qhat) - t;
@@ -452,10 +526,10 @@ public final class MathSupport {
              * There is a borrow if and only if HHALF(t) is nonzero;
              * in that (rare) case, qhat was too large (by exactly 1).
              * Fix it by adding v[1..n] to u[j..j+n].
-             */
+             *
             if (HHALF(t) != 0) {
                 qhat--;
-                for (t = 0, i = n; i > 0; i--) { /* D6: add back. */
+                for (t = 0, i = n; i > 0; i--) { // D6: add back. 
                     t += u[ui + i + j] + v[vi + i];
                     u[ui + i + j] = LHALF(t);
                     t = HHALF(t);
@@ -463,13 +537,13 @@ public final class MathSupport {
                 u[ui + j] = LHALF(u[ui + j] + t);
             }
             q[qi + j] = (char) qhat;
-        } while (++j <= m); /* D7: loop on j. */
+        } while (++j <= m); // D7: loop on j.
 
         /*
          * If caller wants the remainder, we have to calculate it as
          * u[m..m+n] >>> d (this is at most n digits and thus fits in
          * u[m+1..m+n], but we may need more source digits).
-         */
+         *
         if (rem) {
             if (d != 0) {
                 int i;
@@ -492,7 +566,233 @@ public final class MathSupport {
                     | (p[off + i + 1] >>> (HALF_BITS - sh)));
         p[off + i] = LHALF(p[off + i] << sh);
     }
+	*/
 
+    /* dummy version 
+    private static long ldiv2(long l1, long l2) {return l1/l2;}
+    private static long lrem2(long l1, long l2) {return l1%l2;}
+    */
+
+    /*
+     * This method does tests for previously failing cases
+     *
+    private static void failing() {
+    	long l1, l2;
+    	
+    	System.out.println("JDK\tNEW\tOLD");
+    	
+    	l1 = 843127915674713594l;
+    	l2 = 1;
+    	testD(l1, l2);
+    	
+    	l1 = 2907146525417257968l;
+    	l2 = 18;
+    	testD(l1, l2);
+    	
+    	l1 = 5484955353170252401l;
+    	l2 = 1;
+    	testR(l1, l2);
+
+    	l1 = -8074189617124730411l;
+    	l2 = 13;
+    	testR(l1, l2);
+
+    }
+    
+    private static void testD(long l1, long l2) {
+    	System.out.printf("%d\t%d\t%d", l1/l2, ldiv(l1,l2), ldiv2(l1,l2));
+    	if ((l1/l2) == ldiv(l1, l2)) System.out.print(" PASS");
+    	else System.out.print(" FAIL");
+    	if ((l1/l2) == ldiv2(l1, l2)) System.out.print(" PASS");
+    	else System.out.print(" FAIL");
+    	System.out.println();
+    }
+
+    private static void testR(long l1, long l2) {
+    	System.out.printf("%d\t%d\t%d", l1%l2, lrem(l1,l2), lrem2(l1,l2));
+    	if ((l1%l2) == lrem(l1, l2)) System.out.print(" PASS");
+    	else System.out.print(" FAIL");
+    	if ((l1%l2) == lrem2(l1, l2)) System.out.print(" PASS");
+    	else System.out.print(" FAIL");
+    	System.out.println();
+    }
+	
+                
+    public static void main(String[] args) {
+
+    	System.out.println();
+    	
+    	failing();
+    	
+    	System.out.println();
+    	
+    	bench(true);
+    	bench(false);
+    	
+    	Random r = new Random();
+    	
+    	long l1 = -5776873939262739814l; // r.nextInt(); // r.nextLong();
+    	long l2 = 1l; //r.nextInt(50);
+    	
+    	System.out.println("l1 = " + l1 + "\nl2 = " + l2 + "\nl1%l2 = " + (l1%l2));
+    	System.out.println("Result LREM = " + lrem(l1, l2));
+    	System.out.println("Result LREM2 = " + lrem2(l1, l2));
+
+    	l1 = 153;
+    	l2 = -5;
+    	System.out.println("l1 = " + l1 + "\nl2 = " + l2 + "\nl1%l2 = " + (l1%l2));
+    	System.out.println("Result LREM2 = " + lrem2(l1, l2));
+
+    	l1 = -154;
+    	l2 = 5;
+    	System.out.println("l1 = " + l1 + "\nl2 = " + l2 + "\nl1%l2 = " + (l1%l2));
+    	System.out.println("Result LREM2 = " + lrem2(l1, l2));
+
+    	l1 = 153;
+    	l2 = 5;
+    	System.out.println("l1 = " + l1 + "\nl2 = " + l2 + "\nl1%l2 = " + (l1%l2));
+    	System.out.println("Result LREM2 = " + lrem2(l1, l2));
+
+    	l1 = -154;
+    	l2 = -5;
+    	System.out.println("l1 = " + l1 + "\nl2 = " + l2 + "\nl1%l2 = " + (l1%l2));
+    	System.out.println("Result LREM2 = " + lrem2(l1, l2));
+		
+    }
+    
+    static long time(boolean nano) {
+    	if (nano)
+    		return System.nanoTime();
+    	return System.currentTimeMillis();
+    }
+    
+	static final int SIZE = 50000;
+    public static long[] random1 = new long[SIZE];
+    public static long[] random2 = new long[SIZE];
+    
+    public static void bench(boolean nano) {
+    	
+    	final int REPEAT = 10;
+    	Random r = new Random();
+    	long temp, time, sum;
+    	
+    	for (int i = 0; i < SIZE; i++) {
+    		random1[i] = r.nextLong();
+    		if (random1[i] == 0) 
+    			random1[i] = 1;
+    		random2[i] = r.nextInt(2000);
+    		if (random2[i] == 0) 
+    			random2[i] = 1;
+    	}
+    	
+    	System.out.println("DIV:");
+    	
+    	
+    	sum = 0;
+    	for (int a = 0 ; a < REPEAT; a++) {
+    	time = time(nano);
+    	for (int i = 0; i < SIZE; i++) {
+    		temp = random1[i] / random2[i];
+    	}
+    	final long diff = time(nano) - time;
+    	sum += diff;
+    	System.out.print(diff + " ");
+    	}
+    	System.out.println("\nJDK = " + (sum));
+
+    	
+    	sum = 0;
+    	for (int a = 0 ; a < REPEAT; a++) {
+    	time = time(nano);
+    	for (int i = 0; i < SIZE; i++) {
+    		ldiv(random1[i], random2[i]);
+    	}
+    	final long diff = time(nano) - time;
+    	sum += diff;
+    	System.out.print(diff + " ");
+    	}
+    	System.out.println("\nldiv = " + (sum));
+
+    	
+    	sum = 0;
+    	for (int a = 0 ; a < REPEAT; a++) {
+    	time = time(nano);
+    	for (int i = 0; i < SIZE; i++) {
+    		ldiv2(random1[i], random2[i]);
+    	}
+    	final long diff = time(nano) - time;
+    	sum += diff;
+    	System.out.print(diff + " ");
+    	}
+    	System.out.println("\nldiv2 = " + (sum));
+
+    	
+    	
+    	System.out.println("\nREM:");
+    	
+    	
+    	
+    	sum = 0;
+    	for (int a = 0 ; a < REPEAT; a++) {
+    	time = time(nano);
+    	for (int i = 0; i < SIZE; i++) {
+    		temp = random1[i] % random2[i];
+    	}
+    	final long diff = time(nano) - time;
+    	sum += diff;
+    	System.out.print(diff + " ");
+    	}
+    	System.out.println("\nJDK = " + (sum));
+
+    	
+    	sum = 0;
+    	for (int a = 0 ; a < REPEAT; a++) {
+    	time = time(nano);
+    	for (int i = 0; i < SIZE; i++) {
+    		lrem(random1[i], random2[i]);
+    	}
+    	final long diff = time(nano) - time;
+    	sum += diff;
+    	System.out.print(diff + " ");
+    	}
+    	System.out.println("\nlrem = " + (sum));
+
+    	
+    	sum = 0;
+    	for (int a = 0 ; a < REPEAT; a++) {
+    	time = time(nano);
+    	for (int i = 0; i < SIZE; i++) {
+    		lrem2(random1[i], random2[i]);
+    	}
+    	final long diff = time(nano) - time;
+    	sum += diff;
+    	System.out.print(diff + " ");
+    	}
+    	System.out.println("\nlrem2 = " + (sum));
+
+    	
+    	// TEST WORKING STATE:
+    	
+    	System.out.println("\n\nTest if div and rem are working:\n");
+    	
+    	for (int i = 0; i < SIZE; i++) {
+    		temp = random1[i] / random2[i];
+    		if (ldiv(random1[i], random2[i]) != temp)
+    			System.out.println("ERROR FOR LDIV " + random1[i] + " / " + random2[i]);
+    		if (ldiv2(random1[i], random2[i]) != temp)
+    			System.out.println("ERROR FOR LDIV2 " + random1[i] + " / " + random2[i]);
+    	}
+
+    	for (int i = 0; i < SIZE; i++) {
+    		temp = random1[i] % random2[i];
+    		if (lrem(random1[i], random2[i]) != temp)
+    			System.out.println("ERROR FOR LREM " + random1[i] + " % " + random2[i]);
+    		if (lrem2(random1[i], random2[i]) != temp)
+    			System.out.println("ERROR FOR LREM2 " + random1[i] + " % " + random2[i]);
+    	}
+    }
+    */
+    
     // greatest double that can be rounded to an int
     //public static double maxint = (double)Integer.MAX_VALUE;
     // least double that can be rounded to an int
