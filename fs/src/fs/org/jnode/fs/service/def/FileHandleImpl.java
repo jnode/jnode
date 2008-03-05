@@ -92,7 +92,7 @@ final class FileHandleImpl implements VMFileHandle {
 	 * @throws IOException
 	 */
 	public synchronized void setLength(long length) throws IOException {
-		System.err.println("FileHandleImpl.setLength(" + length + ");");
+//		System.err.println("FileHandleImpl.setLength(" + length + ");");
 
 		if (closed) {
 			throw new IOException("File closed");
