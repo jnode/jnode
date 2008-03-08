@@ -48,15 +48,8 @@ import java.beans.PropertyChangeSupport;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 import java.beans.VetoableChangeSupport;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * The <code>KeyboardFocusManager</code> handles the focusing of
@@ -1482,4 +1475,15 @@ public abstract class KeyboardFocusManager
   {
     focusRequests.put(heavyweight, lightweight);
   }
+
+    static Set initFocusTraversalKeysSet(String value, Set targetSet) {
+        StringTokenizer tokens = new StringTokenizer(value, ",");
+        while (tokens.hasMoreTokens()) {
+            targetSet.add(AWTKeyStroke.getAWTKeyStroke(tokens.nextToken()));
+        }
+        return (targetSet.isEmpty())
+            ? Collections.EMPTY_SET
+            : Collections.unmodifiableSet(targetSet);
+        }
+
 }

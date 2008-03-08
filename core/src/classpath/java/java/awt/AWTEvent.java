@@ -41,6 +41,7 @@ package java.awt;
 
 import java.awt.event.*;
 import java.util.EventObject;
+import java.lang.reflect.Field;
 
 /**
  * AWTEvent is the root event class for all AWT events in the JDK 1.1 event 
@@ -64,6 +65,8 @@ public abstract class AWTEvent extends EventObject
    */
   private static final long serialVersionUID = -1825314779160409405L;
 
+    transient boolean focusManagerIsDispatching = false;
+    transient boolean isPosted;
   /**
    * The ID of the event.
    *
@@ -512,5 +515,56 @@ public abstract class AWTEvent extends EventObject
         }
         return null;
     }
+    /**
+     * The pseudo event mask for enabling input methods.
+     * We're using one bit in the eventMask so we don't need
+     * a separate field inputMethodsEnabled.
+     */
+    final static long INPUT_METHODS_ENABLED_MASK = 0x1000;
 
+    /**
+     * Copies all private data from this event into that.
+     * Space is allocated for the copied data that will be
+     * freed when the that is finalized. Upon completion,
+     * this event is not changed.
+     */
+    void copyPrivateDataInto(AWTEvent that) {
+	that.bdata = this.bdata;
+        // Copy canAccessSystemClipboard value from this into that.
+        if (this instanceof InputEvent && that instanceof InputEvent) {
+            Field field = get_InputEvent_CanAccessSystemClipboard();
+            if (field != null) {
+                try {
+                    boolean b = field.getBoolean(this);
+                    field.setBoolean(that, b);
+                } catch(IllegalAccessException e) {
+                }
+            }
+        }
+    }
+
+    private static synchronized Field get_InputEvent_CanAccessSystemClipboard() {
+        if (inputEvent_CanAccessSystemClipboard_Field == null) {
+            inputEvent_CanAccessSystemClipboard_Field =
+                (Field)java.security.AccessController.doPrivileged(
+                    new java.security.PrivilegedAction() {
+                            public Object run() {
+                                Field field = null;
+                                try {
+                                    field = InputEvent.class.
+                                        getDeclaredField("canAccessSystemClipboard");
+                                    field.setAccessible(true);
+                                    return field;
+                                } catch (SecurityException e) {
+                                } catch (NoSuchFieldException e) {
+                                }
+                                return null;
+                            }
+                        });
+        }
+
+        return inputEvent_CanAccessSystemClipboard_Field;
+    }
+    // security stuff
+    private static Field inputEvent_CanAccessSystemClipboard_Field = null;
 } // class AWTEvent
