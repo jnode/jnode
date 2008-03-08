@@ -67,9 +67,19 @@ final class SwingButton extends JButton implements ISwingPeer<Button>,
     /**
      * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */
-    public void actionPerformed(ActionEvent event) {        
-        awtComponent.dispatchEvent(new ActionEvent(awtComponent,
-                ActionEvent.ACTION_PERFORMED, awtComponent.getActionCommand()));
+    public void actionPerformed(ActionEvent event) {
+        //awtComponent.dispatchEvent(new ActionEvent(awtComponent,
+        //          ActionEvent.ACTION_PERFORMED, awtComponent.getActionCommand()));
+        //todo use dispatchEvent when awt is migrated to openjdk 
+        ActionListener[] l = awtComponent.getActionListeners();
+        if (l.length == 0)
+            return;
+
+      ActionEvent ev = new ActionEvent(awtComponent, ActionEvent.ACTION_PERFORMED,(awtComponent).getActionCommand());
+      for (int i = 0; i < l.length; ++i)
+        l[i].actionPerformed(ev);
+
+
     }
 
     /**
