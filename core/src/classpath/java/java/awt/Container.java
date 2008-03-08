@@ -2457,5 +2457,11 @@ public class Container extends Component
 	return this;
     }
 
+    void preProcessKeyEvent(KeyEvent e) {
+        Container parent = this.parent;
+        if (parent != null) {
+            parent.preProcessKeyEvent(e);
+        }
+    }
 
 } // class Container

@@ -63,29 +63,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import sun.font.Font2DHandle;
 import sun.font.AttributeValues;
-import static sun.font.EAttribute.EFONT;
-import static sun.font.EAttribute.EFAMILY;
-import static sun.font.EAttribute.EWEIGHT;
-import static sun.font.EAttribute.EWIDTH;
-import static sun.font.EAttribute.EPOSTURE;
-import static sun.font.EAttribute.ESIZE;
-import static sun.font.EAttribute.ETRANSFORM;
-import static sun.font.EAttribute.ESUPERSCRIPT;
-import static sun.font.EAttribute.ETRACKING;
-import static sun.font.EAttribute.ECHAR_REPLACEMENT;
-import static sun.font.EAttribute.EFOREGROUND;
-import static sun.font.EAttribute.EBACKGROUND;
-import static sun.font.EAttribute.EUNDERLINE;
-import static sun.font.EAttribute.ESTRIKETHROUGH;
-import static sun.font.EAttribute.ERUN_DIRECTION;
-import static sun.font.EAttribute.EBIDI_EMBEDDING;
-import static sun.font.EAttribute.EJUSTIFICATION;
-import static sun.font.EAttribute.EINPUT_METHOD_HIGHLIGHT;
-import static sun.font.EAttribute.EINPUT_METHOD_UNDERLINE;
-import static sun.font.EAttribute.ESWAP_COLORS;
-import static sun.font.EAttribute.ENUMERIC_SHAPING;
-import static sun.font.EAttribute.EKERNING;
-import static sun.font.EAttribute.ELIGATURES;
+import static sun.font.EAttribute.*;
 
 /**
   * This class represents a windowing system font.

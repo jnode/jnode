@@ -234,5 +234,30 @@ private static final int actionKeyCodes[][] = {
     { KeyEvent.VK_PAUSE,       Event.PAUSE        },
     { KeyEvent.VK_INSERT,      Event.INSERT       }
 };
-    
+
+    /*
+     * <b>NOTE:</b> The <code>Event</code> class is obsolete and is
+     * available only for backwards compatilibility.  It has been replaced
+     * by the <code>AWTEvent</code> class and its subclasses.
+     * <p>
+     * Returns a new KeyEvent char which corresponds to the int key
+     * of this old event.
+     */
+    char getKeyEventChar() {
+       for (int i = 0; i < actionKeyCodes.length; i++) {
+            if (actionKeyCodes[i][1] == key) {
+                return KeyEvent.CHAR_UNDEFINED;
+            }
+       }
+       return (char)key;
+    }
+
+    /**
+     * <b>NOTE:</b> The <code>Event</code> class is obsolete and is
+     * available only for backwards compatilibility.  It has been replaced
+     * by the <code>AWTEvent</code> class and its subclasses.
+     */
+    boolean isConsumed() {
+        return consumed;
+    }
 }

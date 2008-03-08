@@ -42,27 +42,7 @@ package java.awt;
 //import gnu.java.awt.dnd.peer.gtk.GtkDropTargetContextPeer;
 
 import java.awt.dnd.DropTarget;
-import java.awt.event.ActionEvent;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.HierarchyBoundsListener;
-import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
-import java.awt.event.InputEvent;
-import java.awt.event.InputMethodEvent;
-import java.awt.event.InputMethodListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
-import java.awt.event.PaintEvent;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.awt.im.InputContext;
 import java.awt.im.InputMethodRequests;
 import java.awt.image.BufferStrategy;
@@ -72,6 +52,7 @@ import java.awt.image.ImageProducer;
 import java.awt.image.VolatileImage;
 import java.awt.peer.ComponentPeer;
 import java.awt.peer.LightweightPeer;
+import java.awt.peer.ContainerPeer;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -89,6 +70,8 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.accessibility.Accessible;
 import javax.accessibility.AccessibleComponent;
@@ -96,7 +79,10 @@ import javax.accessibility.AccessibleContext;
 import javax.accessibility.AccessibleRole;
 import javax.accessibility.AccessibleState;
 import javax.accessibility.AccessibleStateSet;
-import sun.awt.AppContext;
+import sun.awt.*;
+import sun.awt.im.CompositionArea;
+import sun.awt.dnd.SunDropTargetEvent;
+import sun.java2d.SunGraphics2D;
 
 /**
  * The root of all evil. All graphical representations are subclasses of this
@@ -5764,7 +5750,117 @@ p   * <li>the set of backward traversal keys
 
     return translated;
   }
+    private static final Logger focusLog = Logger.getLogger("java.awt.focus.Component");
+    private static final Logger log = Logger.getLogger("java.awt.Component");
 
+    boolean areInputMethodsEnabled() {
+        // in 1.2, we assume input method support is required for all
+        // components that handle key events, but components can turn off
+        // input methods by calling enableInputMethods(false).
+        return ((eventMask & AWTEvent.INPUT_METHODS_ENABLED_MASK) != 0) &&
+            ((eventMask & AWTEvent.KEY_EVENT_MASK) != 0 || keyListener != null);
+    }
+
+
+    /*
+     * Fetches the native container somewhere higher up in the component
+     * tree that contains this component.
+     */
+    Container getNativeContainer() {
+        Container p = parent;
+        while (p != null && p.peer instanceof LightweightPeer) {
+            p = p.getParent();
+        }
+        return p;
+    }
+
+    /*
+         * If newEventsOnly is false, method is called so that ScrollPane can
+         * override it and handle common-case mouse wheel scrolling.  NOP
+         * for Component.
+         */
+    void autoProcessMouseWheel(MouseWheelEvent e) {}
+    boolean postsOldMouseEvents() {
+        return false;
+    }
+
+    transient RuntimeException windowClosingException = null;
+    boolean checkWindowClosingException() {
+        if (windowClosingException != null) {
+            if (this instanceof Dialog) {
+                ((Dialog)this).interruptBlocking();
+            } else {
+                windowClosingException.fillInStackTrace();
+                windowClosingException.printStackTrace();
+                windowClosingException = null;
+            }
+            return true;
+        }
+        return false;
+    }
+    private static final DebugHelper dbg = DebugHelper.create(Component.class);
+    /*
+     * Dispatch given MouseWheelEvent to the first ancestor for which
+     * MouseWheelEvents are enabled.
+     *
+     * Returns whether or not event was dispatched to an ancestor
+     */
+    boolean dispatchMouseWheelToAncestor(MouseWheelEvent e) {
+        int newX, newY;
+        newX = e.getX() + getX(); // Coordinates take into account at least
+        newY = e.getY() + getY(); // the cursor's position relative to this
+                                  // Component (e.getX()), and this Component's
+                                  // position relative to its parent.
+        MouseWheelEvent newMWE;
+
+        if (dbg.on) {
+            dbg.println("Component.dispatchMouseWheelToAncestor");
+            dbg.println("orig event src is of " + e.getSource().getClass());
+        }
+
+        /* parent field for Window refers to the owning Window.
+         * MouseWheelEvents should NOT be propagated into owning Windows
+         */
+        synchronized (getTreeLock()) {
+            Container anc = getParent();
+            while (anc != null && !anc.eventEnabled(e)) {
+                // fix coordinates to be relative to new event source
+                newX += anc.getX();
+                newY += anc.getY();
+
+                if (!(anc instanceof Window)) {
+                    anc = anc.getParent();
+                }
+                else {
+                    break;
+                }
+            }
+
+            if (dbg.on) dbg.println("new event src is " + anc.getClass());
+
+            if (anc != null && anc.eventEnabled(e)) {
+                // Change event to be from new source, with new x,y
+                // For now, just create a new event - yucky
+
+                newMWE = new MouseWheelEvent(anc, // new source
+                                             e.getID(),
+                                             e.getWhen(),
+                                             e.getModifiers(),
+                                             newX, // x relative to new source
+                                             newY, // y relative to new source
+                                             e.getXOnScreen(),
+                                             e.getYOnScreen(),
+                                             e.getClickCount(),
+                                             e.isPopupTrigger(),
+                                             e.getScrollType(),
+                                             e.getScrollAmount(),
+                                             e.getWheelRotation());
+                ((AWTEvent)e).copyPrivateDataInto(newMWE);
+                anc.dispatchEventImpl(newMWE);
+            }
+        }
+        return true;
+    }
   /**
    * Implementation of dispatchEvent. Allows trusted package classes
    * to dispatch additional events first.  This implementation first
@@ -6993,436 +7089,582 @@ p   * <li>the set of backward traversal keys
 		} // class AccessibleAWTComponentHandler
 	} // class AccessibleAWTComponent
 
+    private Insets getInsets_NoClientCode() {
+        ComponentPeer peer = this.peer;
+        if (peer instanceof ContainerPeer) {
+	    return (Insets)((ContainerPeer)peer).insets().clone();
+	}
+	return new Insets(0, 0, 0, 0);
+    }
+
+    final GraphicsConfiguration getGraphicsConfiguration_NoClientCode() {
+        GraphicsConfiguration graphicsConfig = this.graphicsConfig;
+        Container parent = this.parent;
+        if (graphicsConfig != null) {
+            return graphicsConfig;
+        } else if (parent != null) {
+            return parent.getGraphicsConfiguration_NoClientCode();
+        } else {
+            return null;
+        }
+    }
+
+    final Graphics getGraphics_NoClientCode() {
+        ComponentPeer peer = this.peer;
+        if (peer instanceof LightweightPeer) {
+            // This is for a lightweight component, need to
+            // translate coordinate spaces and clip relative
+            // to the parent.
+            Container parent = this.parent;
+            if (parent == null) return null;
+            Graphics g = parent.getGraphics_NoClientCode();
+            if (g == null) return null;
+            if (g instanceof ConstrainableGraphics) {
+                ((ConstrainableGraphics) g).constrain(x, y, width, height);
+            } else {
+                g.translate(x,y);
+                g.setClip(0, 0, width, height);
+            }
+            g.setFont(getFont_NoClientCode());
+            return g;
+        } else {
+            return (peer != null) ? peer.getGraphics() : null;
+        }
+    }
+
+    /**
+     * Inner class for blitting offscreen surfaces to a component.
+     *
+     * @author Michael Martak
+     * @since 1.4
+     */
+    protected class BltBufferStrategy extends BufferStrategy {
+
+        /**
+         * The buffering capabilities
+         */
+        protected BufferCapabilities caps; // = null
+        /**
+         * The back buffers
+         */
+        protected VolatileImage[] backBuffers; // = null
+        /**
+         * Whether or not the drawing buffer has been recently restored from
+         * a lost state.
+         */
+        protected boolean validatedContents; // = false
+        /**
+         * Size of the back buffers
+         */
+        protected int width;
+        protected int height;
+
+        /**
+         * Insets for the hosting Component.  The size of the back buffer
+         * is constrained by these.
+         */
+        private Insets insets;
+
+        /**
+         * Creates a new blt buffer strategy around a component
+         * @param numBuffers number of buffers to create, including the
+         * front buffer
+         * @param caps the capabilities of the buffers
+         */
+        protected BltBufferStrategy(int numBuffers, BufferCapabilities caps) {
+            this.caps = caps;
+            createBackBuffers(numBuffers - 1);
+        }
+
+        /**
+         * {@inheritDoc}
+         * @since 1.6
+         */
+        public void dispose() {
+            if (backBuffers != null) {
+                for (int counter = backBuffers.length - 1; counter >= 0;
+                     counter--) {
+                    if (backBuffers[counter] != null) {
+                        backBuffers[counter].flush();
+                        backBuffers[counter] = null;
+                    }
+                }
+            }
+            if (Component.this.bufferStrategy == this) {
+                Component.this.bufferStrategy = null;
+            }
+        }
+
+        /**
+         * Creates the back buffers
+         */
+        protected void createBackBuffers(int numBuffers) {
+            if (numBuffers == 0) {
+                backBuffers = null;
+            } else {
+                // save the current bounds
+                width = getWidth();
+                height = getHeight();
+                insets = getInsets_NoClientCode();
+                int iWidth = width - insets.left - insets.right;
+                int iHeight = height - insets.top - insets.bottom;
+
+                // It is possible for the component's width and/or height
+                // to be 0 here.  Force the size of the backbuffers to
+                // be > 0 so that creating the image won't fail.
+                iWidth = Math.max(1, iWidth);
+                iHeight = Math.max(1, iHeight);
+                if (backBuffers == null) {
+                    backBuffers = new VolatileImage[numBuffers];
+                } else {
+                    // flush any existing backbuffers
+                    for (int i = 0; i < numBuffers; i++) {
+                        if (backBuffers[i] != null) {
+                            backBuffers[i].flush();
+                            backBuffers[i] = null;
+                        }
+                    }
+                }
+
+                // create the backbuffers
+                for (int i = 0; i < numBuffers; i++) {
+                    backBuffers[i] = createVolatileImage(iWidth, iHeight);
+                }
+            }
+        }
+
+        /**
+         * @return the buffering capabilities of this strategy
+         */
+        public BufferCapabilities getCapabilities() {
+            return caps;
+        }
+
+        /**
+         * @return the draw graphics
+         */
+        public Graphics getDrawGraphics() {
+            revalidate();
+            Image backBuffer = getBackBuffer();
+            if (backBuffer == null) {
+                return getGraphics();
+            }
+            SunGraphics2D g = (SunGraphics2D)backBuffer.getGraphics();
+            g.constrain(-insets.left, -insets.top,
+                        backBuffer.getWidth(null) + insets.left,
+                        backBuffer.getHeight(null) + insets.top);
+            return g;
+        }
+
+        /**
+         * @return direct access to the back buffer, as an image.
+         * If there is no back buffer, returns null.
+         */
+        Image getBackBuffer() {
+            if (backBuffers != null) {
+                return backBuffers[backBuffers.length - 1];
+            } else {
+                return null;
+            }
+        }
+
+        /**
+         * Makes the next available buffer visible.
+         */
+        public void show() {
+            showSubRegion(insets.left, insets.top,
+                          width - insets.right,
+                          height - insets.bottom);
+	}
+
 	/**
-   * This class provides support for blitting offscreen surfaces to a
-   * component.
-   *
-   * @see BufferStrategy
-	 *
-	 * @since 1.4
+	 * Package-private method to present a specific rectangular area
+	 * of this buffer.  This class currently shows only the entire
+	 * buffer, by calling showSubRegion() with the full dimensions of
+	 * the buffer.  Subclasses (e.g., BltSubRegionBufferStrategy
+	 * and FlipSubRegionBufferStrategy) may have region-specific show
+	 * methods that call this method with actual sub regions of the
+	 * buffer.
 	 */
-  protected class BltBufferStrategy extends BufferStrategy
-  {
-    /**
-     * The capabilities of the image buffer.
-     */
-		protected BufferCapabilities caps;
+        void showSubRegion(int x1, int y1, int x2, int y2) {
+            if (backBuffers == null) {
+                return;
+            }
+            // Adjust location to be relative to client area.
+            x1 -= insets.left;
+            x2 -= insets.left;
+            y1 -= insets.top;
+            y2 -= insets.top;
+            Graphics g = getGraphics_NoClientCode();
+            if (g == null) {
+                // Not showing, bail
+                return;
+            }
+            try {
+                // First image copy is in terms of Frame's coordinates, need
+                // to translate to client area.
+                g.translate(insets.left, insets.top);
+                for (int i = 0; i < backBuffers.length; i++) {
+                    g.drawImage(backBuffers[i],
+				x1, y1, x2, y2,
+				x1, y1, x2, y2,
+				null);
+                    g.dispose();
+                    g = null;
+                    g = backBuffers[i].getGraphics();
+                }
+            } finally {
+                if (g != null) {
+                    g.dispose();
+                }
+            }
+        }
+
+        /**
+         * Restore the drawing buffer if it has been lost
+         */
+        protected void revalidate() {
+            revalidate(true);
+        }
+
+        void revalidate(boolean checkSize) {
+            validatedContents = false;
+
+            if (backBuffers == null) {
+                return;
+            }
+
+            if (checkSize) {
+                Insets insets = getInsets_NoClientCode();
+                if (getWidth() != width || getHeight() != height ||
+                    !insets.equals(this.insets)) {
+                    // component has been resized; recreate the backbuffers
+                    createBackBuffers(backBuffers.length);
+                    validatedContents = true;
+                }
+            }
+
+            // now validate the backbuffer
+            GraphicsConfiguration gc = getGraphicsConfiguration_NoClientCode();
+            int returnCode =
+                backBuffers[backBuffers.length - 1].validate(gc);
+            if (returnCode == VolatileImage.IMAGE_INCOMPATIBLE) {
+                if (checkSize) {
+                    createBackBuffers(backBuffers.length);
+                    // backbuffers were recreated, so validate again
+                    backBuffers[backBuffers.length - 1].validate(gc);
+                }
+                // else case means we're called from Swing on the toolkit
+                // thread, don't recreate buffers as that'll deadlock
+                // (creating VolatileImages invokes getting GraphicsConfig
+                // which grabs treelock).
+                validatedContents = true;
+            } else if (returnCode == VolatileImage.IMAGE_RESTORED) {
+                validatedContents = true;
+            }
+        }
+
+        /**
+         * @return whether the drawing buffer was lost since the last call to
+         * <code>getDrawGraphics</code>
+         */
+        public boolean contentsLost() {
+            if (backBuffers == null) {
+                return false;
+            } else {
+                return backBuffers[backBuffers.length - 1].contentsLost();
+            }
+        }
+
+        /**
+         * @return whether the drawing buffer was recently restored from a lost
+         * state and reinitialized to the default background color (white)
+         */
+        public boolean contentsRestored() {
+            return validatedContents;
+        }
+    } // Inner class BltBufferStrategy
 
     /**
-     * The back buffers used in this strategy.
+     * Inner class for flipping buffers on a component.  That component must
+     * be a <code>Canvas</code> or <code>Window</code>.
+     * @see Canvas
+     * @see Window
+     * @see java.awt.image.BufferStrategy
+     * @author Michael Martak
+     * @since 1.4
      */
-		protected VolatileImage[] backBuffers;
+    protected class FlipBufferStrategy extends BufferStrategy {
+        /**
+         * The number of buffers
+         */
+        protected int numBuffers; // = 0
+        /**
+         * The buffering capabilities
+         */
+        protected BufferCapabilities caps; // = null
+        /**
+         * The drawing buffer
+         */
+        protected Image drawBuffer; // = null
+        /**
+         * The drawing buffer as a volatile image
+         */
+        protected VolatileImage drawVBuffer; // = null
+        /**
+         * Whether or not the drawing buffer has been recently restored from
+         * a lost state.
+         */
+        protected boolean validatedContents; // = false
+        /**
+         * Size of the back buffers.  (Note: these fields were added in 6.0
+         * but kept package-private to avoid exposing them in the spec.
+         * None of these fields/methods really should have been marked
+         * protected when they were introduced in 1.4, but now we just have
+         * to live with that decision.)
+         */
+        int width;
+        int height;
 
-    /**
-     * Whether or not the image buffer resources are allocated and
-     * ready to be drawn into.
-     */
-		protected boolean validatedContents;
+        /**
+         * Creates a new flipping buffer strategy for this component.
+         * The component must be a <code>Canvas</code> or <code>Window</code>.
+         * @see Canvas
+         * @see Window
+         * @param numBuffers the number of buffers
+         * @param caps the capabilities of the buffers
+         * @exception AWTException if the capabilities supplied could not be
+         * supported or met
+         * @exception ClassCastException if the component is not a canvas or
+         * window.
+         */
+        protected FlipBufferStrategy(int numBuffers, BufferCapabilities caps)
+            throws AWTException
+        {
+            if (!(Component.this instanceof Window) &&
+                !(Component.this instanceof Canvas))
+            {
+                throw new ClassCastException(
+                    "Component must be a Canvas or Window");
+            }
+            this.numBuffers = numBuffers;
+            this.caps = caps;
+            createBuffers(numBuffers, caps);
+        }
 
-    /**
-     * The width of the back buffers.
-     */
-		protected int width;
+        /**
+         * Creates one or more complex, flipping buffers with the given
+         * capabilities.
+         * @param numBuffers number of buffers to create; must be greater than
+         * one
+         * @param caps the capabilities of the buffers.
+         * <code>BufferCapabilities.isPageFlipping</code> must be
+         * <code>true</code>.
+         * @exception AWTException if the capabilities supplied could not be
+         * supported or met
+         * @exception IllegalStateException if the component has no peer
+         * @exception IllegalArgumentException if numBuffers is less than two,
+         * or if <code>BufferCapabilities.isPageFlipping</code> is not
+         * <code>true</code>.
+         * @see java.awt.BufferCapabilities#isPageFlipping()
+         */
+        protected void createBuffers(int numBuffers, BufferCapabilities caps)
+            throws AWTException
+        {
+            if (numBuffers < 2) {
+                throw new IllegalArgumentException(
+                    "Number of buffers cannot be less than two");
+            } else if (peer == null) {
+                throw new IllegalStateException(
+                    "Component must have a valid peer");
+            } else if (caps == null || !caps.isPageFlipping()) {
+                throw new IllegalArgumentException(
+                    "Page flipping capabilities must be specified");
+            }
 
-    /**
-     * The height of the back buffers.
-     */
-		protected int height;
+            // save the current bounds
+            width = getWidth();
+            height = getHeight();
 
-    /**
-     * The front buffer.
-     */
-    private VolatileImage frontBuffer;
+            if (drawBuffer == null) {
+                peer.createBuffers(numBuffers, caps);
+            } else {
+                // dispose the existing backbuffers
+                drawBuffer = null;
+                drawVBuffer = null;
+                destroyBuffers();
+                // ... then recreate the backbuffers
+                peer.createBuffers(numBuffers, caps);
+            }
+            updateInternalBuffers();
+        }
 
-    /**
-     * Creates a blitting buffer strategy.
-     *
-     * @param numBuffers the number of buffers, including the front
-     * buffer
-     * @param caps the capabilities of this strategy
-     */
-    protected BltBufferStrategy(int numBuffers, BufferCapabilities caps)
-    {
-			this.caps = caps;
-      createBackBuffers(numBuffers - 1);
-      width = getWidth();
-      height = getHeight();
-		}
+        /**
+         * Updates internal buffers (both volatile and non-volatile)
+         * by requesting the back-buffer from the peer.
+         */
+        private void updateInternalBuffers() {
+            // get the images associated with the draw buffer
+            drawBuffer = getBackBuffer();
+            if (drawBuffer instanceof VolatileImage) {
+                drawVBuffer = (VolatileImage)drawBuffer;
+            } else {
+                drawVBuffer = null;
+            }
+        }
 
-    /**
-     * Initializes the backBuffers field with an array of numBuffers
-     * VolatileImages.
-     *
-     * @param numBuffers the number of backbuffers to create
-     */
-    protected void createBackBuffers(int numBuffers)
-    {
-      GraphicsConfiguration c =
-	GraphicsEnvironment.getLocalGraphicsEnvironment()
-	.getDefaultScreenDevice().getDefaultConfiguration();
+        /**
+         * @return direct access to the back buffer, as an image.
+         * @exception IllegalStateException if the buffers have not yet
+         * been created
+         */
+        protected Image getBackBuffer() {
+            if (peer != null) {
+                return peer.getBackBuffer();
+            } else {
+                throw new IllegalStateException(
+                    "Component must have a valid peer");
+            }
+        }
 
-      backBuffers = new VolatileImage[numBuffers];
+        /**
+         * Flipping moves the contents of the back buffer to the front buffer,
+         * either by copying or by moving the video pointer.
+         * @param flipAction an integer value describing the flipping action
+         * for the contents of the back buffer.  This should be one of the
+         * values of the <code>BufferCapabilities.FlipContents</code>
+         * property.
+         * @exception IllegalStateException if the buffers have not yet
+         * been created
+         * @see java.awt.BufferCapabilities#getFlipContents()
+         */
+        protected void flip(BufferCapabilities.FlipContents flipAction) {
+            if (peer != null) {
+                peer.flip(flipAction);
+            } else {
+                throw new IllegalStateException(
+                    "Component must have a valid peer");
+            }
+        }
 
-      for (int i = 0; i < numBuffers; i++)
-	backBuffers[i] = c.createCompatibleVolatileImage(width, height);
-		}
+        /**
+         * Destroys the buffers created through this object
+         */
+        protected void destroyBuffers() {
+            if (peer != null) {
+                peer.destroyBuffers();
+            } else {
+                throw new IllegalStateException(
+                    "Component must have a valid peer");
+            }
+        }
 
-    /**
-     * Retrieves the capabilities of this buffer strategy.
-     *
-     * @return the capabilities of this buffer strategy
-     */
-    public BufferCapabilities getCapabilities()
-    {
-			return caps;
-		}
+        /**
+         * @return the buffering capabilities of this strategy
+         */
+        public BufferCapabilities getCapabilities() {
+            return caps;
+        }
 
-	/**
-     * Retrieves a graphics object that can be used to draw into this
-     * strategy's image buffer.
-     *
-     * @return a graphics object
-     */
-    public Graphics getDrawGraphics()
-    {
-      // Return the backmost buffer's graphics.
-      return backBuffers[0].getGraphics();
-    }
+        /**
+         * @return the graphics on the drawing buffer.  This method may not
+         * be synchronized for performance reasons; use of this method by multiple
+         * threads should be handled at the application level.  Disposal of the
+         * graphics object must be handled by the application.
+         */
+        public Graphics getDrawGraphics() {
+            revalidate();
+            return drawBuffer.getGraphics();
+        }
 
-    /**
-     * Bring the contents of the back buffer to the front buffer.
-     */
-    public void show()
-    {
-      GraphicsConfiguration c =
-	GraphicsEnvironment.getLocalGraphicsEnvironment()
-	.getDefaultScreenDevice().getDefaultConfiguration();
+        /**
+         * Restore the drawing buffer if it has been lost
+         */
+        protected void revalidate() {
+            revalidate(true);
+        }
 
-      // draw the front buffer.
-      getGraphics().drawImage(backBuffers[backBuffers.length - 1],
-			      width, height, null);
+        void revalidate(boolean checkSize) {
+            validatedContents = false;
 
-      BufferCapabilities.FlipContents f = getCapabilities().getFlipContents();
+            if (checkSize && (getWidth() != width || getHeight() != height)) {
+                // component has been resized; recreate the backbuffers
+                try {
+                    createBuffers(numBuffers, caps);
+                } catch (AWTException e) {
+                    // shouldn't be possible
+                }
+                validatedContents = true;
+            }
 
-      // blit the back buffers.
-      for (int i = backBuffers.length - 1; i > 0 ; i--)
-	backBuffers[i] = backBuffers[i - 1];
+            // get the buffers from the peer every time since they
+            // might have been replaced in response to a display change event
+            updateInternalBuffers();
 
-      // create new backmost buffer.
-      if (f == BufferCapabilities.FlipContents.UNDEFINED)
-	backBuffers[0] = c.createCompatibleVolatileImage(width, height);
+            // now validate the backbuffer
+            if (drawVBuffer != null) {
+                GraphicsConfiguration gc =
+                        getGraphicsConfiguration_NoClientCode();
+                int returnCode = drawVBuffer.validate(gc);
+                if (returnCode == VolatileImage.IMAGE_INCOMPATIBLE) {
+                    try {
+                        createBuffers(numBuffers, caps);
+                    } catch (AWTException e) {
+                        // shouldn't be possible
+                    }
+                    if (drawVBuffer != null) {
+                        // backbuffers were recreated, so validate again
+                        drawVBuffer.validate(gc);
+                    }
+                    validatedContents = true;
+                } else if (returnCode == VolatileImage.IMAGE_RESTORED) {
+                    validatedContents = true;
+                }
+            }
+        }
 
-      // create new backmost buffer and clear it to the background
-      // color.
-      if (f == BufferCapabilities.FlipContents.BACKGROUND)
-	{
-	  backBuffers[0] = c.createCompatibleVolatileImage(width, height);
-	  backBuffers[0].getGraphics().clearRect(0, 0, width, height);
-	}
+        /**
+         * @return whether the drawing buffer was lost since the last call to
+         * <code>getDrawGraphics</code>
+         */
+        public boolean contentsLost() {
+            if (drawVBuffer == null) {
+                return false;
+            }
+            return drawVBuffer.contentsLost();
+        }
 
-      // FIXME: set the backmost buffer to the prior contents of the
-      // front buffer.  How do we retrieve the contents of the front
-      // buffer?
-      //
-      //      if (f == BufferCapabilities.FlipContents.PRIOR)
+        /**
+         * @return whether the drawing buffer was recently restored from a lost
+         * state and reinitialized to the default background color (white)
+         */
+        public boolean contentsRestored() {
+            return validatedContents;
+        }
 
-      // set the backmost buffer to a copy of the new front buffer.
-      if (f == BufferCapabilities.FlipContents.COPIED)
-	backBuffers[0] = backBuffers[backBuffers.length - 1];
-    }
+        /**
+         * Makes the next available buffer visible by either blitting or
+         * flipping.
+         */
+        public void show() {
+            flip(caps.getFlipContents());
+        }
 
-    /**
-     * Re-create the image buffer resources if they've been lost.
-     */
-    protected void revalidate()
-    {
-      GraphicsConfiguration c =
-	GraphicsEnvironment.getLocalGraphicsEnvironment()
-	.getDefaultScreenDevice().getDefaultConfiguration();
+        /**
+         * {@inheritDoc}
+         * @since 1.6
+         */
+        public void dispose() {
+            if (Component.this.bufferStrategy == this) {
+                Component.this.bufferStrategy = null;
+                if (peer != null) {
+                    destroyBuffers();
+                }
+            }
+        }
 
-      for (int i = 0; i < backBuffers.length; i++)
-	{
-	  int result = backBuffers[i].validate(c);
-	  if (result == VolatileImage.IMAGE_INCOMPATIBLE)
-	    backBuffers[i] = c.createCompatibleVolatileImage(width, height);
-	}
-      validatedContents = true;
-    }
-
-    /**
-     * Returns whether or not the image buffer resources have been
-     * lost.
-     *
-     * @return true if the resources have been lost, false otherwise
-     */
-    public boolean contentsLost()
-    {
-      for (int i = 0; i < backBuffers.length; i++)
-	{
-	  if (backBuffers[i].contentsLost())
-	    {
-	      validatedContents = false;
-	      return true;
-	    }
-	}
-      // we know that the buffer resources are valid now because we
-      // just checked them
-      validatedContents = true;
-      return false;
-    }
-
-    /**
-     * Returns whether or not the image buffer resources have been
-     * restored.
-     *
-     * @return true if the resources have been restored, false
-     * otherwise
-     */
-    public boolean contentsRestored()
-    {
-      GraphicsConfiguration c =
-	GraphicsEnvironment.getLocalGraphicsEnvironment()
-	.getDefaultScreenDevice().getDefaultConfiguration();
-
-      boolean imageRestored = false;
-
-      for (int i = 0; i < backBuffers.length; i++)
-	{
-	  int result = backBuffers[i].validate(c);
-	  if (result == VolatileImage.IMAGE_RESTORED)
-	    imageRestored = true;
-	  else if (result == VolatileImage.IMAGE_INCOMPATIBLE)
-	    return false;
-	}
-      // we know that the buffer resources are valid now because we
-      // just checked them
-      validatedContents = true;
-      return imageRestored;
-    }
-  }
-
-  /**
-   * This class provides support for flipping component buffers. It
-   * can only be used on Canvases and Windows.
-	 *
-	 * @since 1.4
-	 */
-  protected class FlipBufferStrategy extends BufferStrategy
-  {
-    /**
-     * The number of buffers.
-     */
-		protected int numBuffers;
-
-    /**
-     * The capabilities of this buffering strategy.
-     */
-		protected BufferCapabilities caps;
-
-    /**
-     * An Image reference to the drawing buffer.
-     */
-		protected Image drawBuffer;
-
-    /**
-     * A VolatileImage reference to the drawing buffer.
-     */
-		protected VolatileImage drawVBuffer;
-
-    /**
-     * Whether or not the image buffer resources are allocated and
-     * ready to be drawn into.
-     */
-		protected boolean validatedContents;
-
-    /**
-     * The width of the back buffer.
-     */
-    private int width;
-
-    /**
-     * The height of the back buffer.
-     */
-    private int height;
-
-    /**
-     * Creates a flipping buffer strategy.  The only supported
-     * strategy for FlipBufferStrategy itself is a double-buffer page
-     * flipping strategy.  It forms the basis for more complex derived
-     * strategies.
-     *
-     * @param numBuffers the number of buffers
-     * @param caps the capabilities of this buffering strategy
-     *
-     * @throws AWTException if the requested
-     * number-of-buffers/capabilities combination is not supported
-     */
-    protected FlipBufferStrategy(int numBuffers, BufferCapabilities caps)
-      throws AWTException
-    {
-			this.caps = caps;
-      width = getWidth();
-      height = getHeight();
-
-      if (numBuffers > 1)
-	createBuffers(numBuffers, caps);
-      else
-	{
-	  drawVBuffer = peer.createVolatileImage(width, height);
-	  drawBuffer = drawVBuffer;
-		}
-    }
-
-    /**
-     * Creates a multi-buffer flipping strategy.  The number of
-     * buffers must be greater than one and the buffer capabilities
-     * must specify page flipping.
-     *
-     * @param numBuffers the number of flipping buffers; must be
-     * greater than one
-     * @param caps the buffering capabilities; caps.isPageFlipping()
-     * must return true
-     *
-     * @throws IllegalArgumentException if numBuffers is not greater
-     * than one or if the page flipping capability is not requested
-     *
-     * @throws AWTException if the requested flipping strategy is not
-     * supported
-     */
-    protected void createBuffers(int numBuffers, BufferCapabilities caps)
-      throws AWTException
-    {
-      if (numBuffers <= 1)
-	throw new IllegalArgumentException("FlipBufferStrategy.createBuffers:"
-					   + " numBuffers must be greater than"
-					   + " one.");
-
-      if (!caps.isPageFlipping())
-	throw new IllegalArgumentException("FlipBufferStrategy.createBuffers:"
-					   + " flipping must be a specified"
-					   + " capability.");
-
-      peer.createBuffers(numBuffers, caps);
-    }
-
-    /**
-     * Return a direct reference to the back buffer image.
-     *
-     * @return a direct reference to the back buffer image.
-     */
-    protected Image getBackBuffer()
-    {
-      return peer.getBackBuffer();
-    }
-
-    /**
-     * Perform a flip operation to transfer the contents of the back
-     * buffer to the front buffer.
-     */
-    protected void flip(BufferCapabilities.FlipContents flipAction)
-    {
-      peer.flip(flipAction);
-    }
-
-    /**
-     * Release the back buffer's resources.
-     */
-    protected void destroyBuffers()
-    {
-      peer.destroyBuffers();
-		}
-
-    /**
-     * Retrieves the capabilities of this buffer strategy.
-     *
-     * @return the capabilities of this buffer strategy
-     */
-    public BufferCapabilities getCapabilities()
-    {
-			return caps;
-		}
-
-    /**
-     * Retrieves a graphics object that can be used to draw into this
-     * strategy's image buffer.
-     *
-     * @return a graphics object
-     */
-    public Graphics getDrawGraphics()
-    {
-      return drawVBuffer.getGraphics();
-    }
-
-    /**
-     * Re-create the image buffer resources if they've been lost.
-     */
-    protected void revalidate()
-    {
-      GraphicsConfiguration c =
-	GraphicsEnvironment.getLocalGraphicsEnvironment()
-	.getDefaultScreenDevice().getDefaultConfiguration();
-
-      if (drawVBuffer.validate(c) == VolatileImage.IMAGE_INCOMPATIBLE)
-	drawVBuffer = peer.createVolatileImage(width, height);
-      validatedContents = true;
-    }
-
-    /**
-     * Returns whether or not the image buffer resources have been
-     * lost.
-     *
-     * @return true if the resources have been lost, false otherwise
-     */
-    public boolean contentsLost()
-    {
-      if (drawVBuffer.contentsLost())
-	{
-	  validatedContents = false;
-	  return true;
-	}
-      // we know that the buffer resources are valid now because we
-      // just checked them
-      validatedContents = true;
-      return false;
-    }
-
-    /**
-     * Returns whether or not the image buffer resources have been
-     * restored.
-     *
-     * @return true if the resources have been restored, false
-     * otherwise
-     */
-    public boolean contentsRestored()
-    {
-      GraphicsConfiguration c =
-	GraphicsEnvironment.getLocalGraphicsEnvironment()
-	.getDefaultScreenDevice().getDefaultConfiguration();
-
-      int result = drawVBuffer.validate(c);
-
-      boolean imageRestored = false;
-
-      if (result == VolatileImage.IMAGE_RESTORED)
-	imageRestored = true;
-      else if (result == VolatileImage.IMAGE_INCOMPATIBLE)
-	return false;
-
-      // we know that the buffer resources are valid now because we
-      // just checked them
-      validatedContents = true;
-      return imageRestored;
-    }
-
-    /**
-     * Bring the contents of the back buffer to the front buffer.
-     */
-    public void show()
-    {
-      flip(caps.getFlipContents());
-    }
-  }
-
+    } // Inner class FlipBufferStrategy
+      
     //jnode+openjdk
     /**
      * The <code>AppContext</code> of the component. Applets/Plugin may
@@ -7465,5 +7707,222 @@ p   * <li>the set of backward traversal keys
         }
         Container parent = this.parent;
         return (parent != null) ? parent.getFont_NoClientCode() : null;
+    }
+
+    // REMIND: remove when filtering is handled at lower level
+    boolean eventEnabled(AWTEvent e) {
+        return eventTypeEnabled(e.id);
+    }
+
+    /**
+     * Creates a new strategy for multi-buffering on this component.
+     * Multi-buffering is useful for rendering performance.  This method
+     * attempts to create the best strategy available with the number of
+     * buffers supplied.  It will always create a <code>BufferStrategy</code>
+     * with that number of buffers.
+     * A page-flipping strategy is attempted first, then a blitting strategy
+     * using accelerated buffers.  Finally, an unaccelerated blitting
+     * strategy is used.
+     * <p>
+     * Each time this method is called,
+     * the existing buffer strategy for this component is discarded.
+     * @param numBuffers number of buffers to create, including the front buffer
+     * @exception IllegalArgumentException if numBuffers is less than 1.
+     * @exception IllegalStateException if the component is not displayable
+     * @see #isDisplayable
+     * @see Window#getBufferStrategy()
+     * @see Canvas#getBufferStrategy()
+     * @since 1.4
+     */
+    void createBufferStrategy(int numBuffers) {
+        BufferCapabilities bufferCaps;
+        if (numBuffers > 1) {
+            // Try to create a page-flipping strategy
+            bufferCaps = new BufferCapabilities(new ImageCapabilities(true),
+                                                new ImageCapabilities(true),
+                                                BufferCapabilities.FlipContents.UNDEFINED);
+            try {
+                createBufferStrategy(numBuffers, bufferCaps);
+                return; // Success
+            } catch (AWTException e) {
+                // Failed
+            }
+        }
+        // Try a blitting (but still accelerated) strategy
+        bufferCaps = new BufferCapabilities(new ImageCapabilities(true),
+                                            new ImageCapabilities(true),
+                                            null);
+        try {
+            createBufferStrategy(numBuffers, bufferCaps);
+            return; // Success
+        } catch (AWTException e) {
+            // Failed
+        }
+        // Try an unaccelerated blitting strategy
+        bufferCaps = new BufferCapabilities(new ImageCapabilities(false),
+                                            new ImageCapabilities(false),
+                                            null);
+        try {
+            createBufferStrategy(numBuffers, bufferCaps);
+            return; // Success
+        } catch (AWTException e) {
+            // Failed
+        }
+        // Code should never reach here (an unaccelerated blitting
+        // strategy should always work)
+        throw new InternalError("Could not create a buffer strategy");
+    }
+
+    /**
+     * Creates a new strategy for multi-buffering on this component with the
+     * required buffer capabilities.  This is useful, for example, if only
+     * accelerated memory or page flipping is desired (as specified by the
+     * buffer capabilities).
+     * <p>
+     * Each time this method
+     * is called, <code>dispose</code> will be invoked on the existing
+     * <code>BufferStrategy</code>.
+     * @param numBuffers number of buffers to create
+     * @param caps the required capabilities for creating the buffer strategy;
+     * cannot be <code>null</code>
+     * @exception AWTException if the capabilities supplied could not be
+     * supported or met; this may happen, for example, if there is not enough
+     * accelerated memory currently available, or if page flipping is specified
+     * but not possible.
+     * @exception IllegalArgumentException if numBuffers is less than 1, or if
+     * caps is <code>null</code>
+     * @see Window#getBufferStrategy()
+     * @see Canvas#getBufferStrategy()
+     * @since 1.4
+     */
+    void createBufferStrategy(int numBuffers,
+                              BufferCapabilities caps) throws AWTException {
+        // Check arguments
+        if (numBuffers < 1) {
+            throw new IllegalArgumentException(
+                "Number of buffers must be at least 1");
+        }
+        if (caps == null) {
+            throw new IllegalArgumentException("No capabilities specified");
+        }
+        // Destroy old buffers
+        if (bufferStrategy != null) {
+            bufferStrategy.dispose();
+        }
+        if (numBuffers == 1) {
+            bufferStrategy = new SingleBufferStrategy(caps);
+        } else {
+            // assert numBuffers > 1;
+            if (caps.isPageFlipping()) {
+                bufferStrategy = new FlipSubRegionBufferStrategy(numBuffers, caps);
+            } else {
+                bufferStrategy = new BltSubRegionBufferStrategy(numBuffers, caps);
+            }
+        }
+    }
+
+    /**
+     * @return the buffer strategy used by this component
+     * @see Window#createBufferStrategy
+     * @see Canvas#createBufferStrategy
+     * @since 1.4
+     */
+    BufferStrategy getBufferStrategy() {
+        return bufferStrategy;
+    }
+
+    /**
+     * Inner class for flipping buffers on a component.  That component must
+     * be a <code>Canvas</code> or <code>Window</code>.
+     * @see Canvas
+     * @see Window
+     * @see java.awt.image.BufferStrategy
+     * @author Michael Martak
+     * @since 1.4
+     */
+    private class SingleBufferStrategy extends BufferStrategy {
+
+        private BufferCapabilities caps;
+
+        public SingleBufferStrategy(BufferCapabilities caps) {
+            this.caps = caps;
+        }
+        public BufferCapabilities getCapabilities() {
+            return caps;
+        }
+        public Graphics getDrawGraphics() {
+            return getGraphics();
+        }
+        public boolean contentsLost() {
+            return false;
+        }
+        public boolean contentsRestored() {
+            return false;
+        }
+        public void show() {
+            // Do nothing
+        }
+    } // Inner class SingleBufferStrategy
+
+    /**
+     * Private class to perform sub-region flipping.
+     * REMIND: this subclass currently punts on subregions and
+     * flips the entire buffer.
+     */
+    private class FlipSubRegionBufferStrategy extends FlipBufferStrategy
+	implements SubRegionShowable
+    {
+
+	protected FlipSubRegionBufferStrategy(int numBuffers,
+					      BufferCapabilities caps)
+	    throws AWTException
+	{
+	    super(numBuffers, caps);
+	}
+
+	public void show(int x1, int y1, int x2, int y2) {
+	    show();
+	}
+
+        // This is invoked by Swing on the toolkit thread.
+        public boolean validateAndShow(int x1, int y1, int x2, int y2) {
+            revalidate(false);
+            if (!contentsRestored() && !contentsLost()) {
+                show();
+                return !contentsLost();
+            }
+            return false;
+	}
+    }
+
+    /**
+     * Private class to perform sub-region blitting.  Swing will use
+     * this subclass via the SubRegionShowable interface in order to
+     * copy only the area changed during a repaint.
+     * @see javax.swing.BufferStrategyPaintManager
+     */
+    private class BltSubRegionBufferStrategy extends BltBufferStrategy
+	implements SubRegionShowable
+    {
+
+	protected BltSubRegionBufferStrategy(int numBuffers,
+					     BufferCapabilities caps)
+	{
+	    super(numBuffers, caps);
+	}
+
+	public void show(int x1, int y1, int x2, int y2) {
+	    showSubRegion(x1, y1, x2, y2);
+	}
+
+        // This method is called by Swing on the toolkit thread.
+        public boolean validateAndShow(int x1, int y1, int x2, int y2) {
+            revalidate(false);
+            if (!contentsRestored() && !contentsLost()) {
+                showSubRegion(x1, y1, x2, y2);
+                return !contentsLost();
+            }
+            return false;
+	}
     }
 }

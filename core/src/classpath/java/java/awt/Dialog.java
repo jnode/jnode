@@ -40,6 +40,9 @@
 package java.awt;
 
 import java.awt.peer.DialogPeer;
+import java.awt.event.WindowEvent;
+import java.lang.ref.WeakReference;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.accessibility.AccessibleContext;
 import javax.accessibility.AccessibleRole;
@@ -916,4 +919,17 @@ public class Dialog extends Window
      * @since 1.6
      */
     ModalityType modalityType;
+
+    void interruptBlocking() {
+        if (isModal()) {
+            //disposeImpl();
+            dispose();
+        } else if (windowClosingException != null) {
+            windowClosingException.fillInStackTrace();
+            windowClosingException.printStackTrace();
+            windowClosingException = null;
+        }
+    }
+
+
 }
