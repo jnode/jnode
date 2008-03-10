@@ -31,6 +31,7 @@ import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.argument.IntegerArgument;
 import org.jnode.shell.help.argument.LongArgument;
+import org.jnode.shell.help.argument.SizeArgument;
 import org.jnode.vm.Vm;
 import org.jnode.vm.memmgr.HeapStatistics;
 
@@ -42,7 +43,7 @@ public class OnHeapCommand implements Command {
     private static final IntegerArgument ARG_MININSTANCECOUNT = new IntegerArgument(
             "mic", "the minimum instance count to show");
 
-    private static final LongArgument ARG_MINTOTALSIZE = new LongArgument(
+    private static final SizeArgument ARG_MINTOTALSIZE = new SizeArgument(
             "mts", "the minimum total size to show");
 
     private static final Parameter PARAM_MININSTANCECOUNT = new Parameter(
