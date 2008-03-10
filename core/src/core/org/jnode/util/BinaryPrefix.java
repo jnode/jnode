@@ -46,17 +46,23 @@ public enum BinaryPrefix {
 
     /**
 	 * Convert the given value to a size string like 64K
-	 * @param v the size to convert
-	 * @return the text for of the size
+	 * @param value the size to convert
+	 * @param nbDecimals number of significant figures to display after dot. use Integer.MAX_VALUE for all. 
+	 * @return the text for the size
 	 */
-    public static String apply(long v) {
-        for (BinaryPrefix unit : values()) {
+    public static String apply(final long value, final int nbDecimals) {
+    	long v = value;
+    	BinaryPrefix unit = null;
+        for (BinaryPrefix u : values()) {
             if ((v < 1024) && (v >= 0)) {
-                return String.valueOf(v) + unit.getUnit();
+            	unit = u;
+            	break;
             }
 
             v = v >>> 10;
         }
-        return String.valueOf(v >>> 10) + MAX.getUnit();
+        unit = (unit == null) ? MAX : unit;
+        float dv = ((float) value) / unit.getMultiplier(); 
+        return NumberUtils.toString(dv, nbDecimals) + " " + unit.getUnit();
     }
 }

@@ -230,7 +230,27 @@ public class NumberUtils {
 	 * @return the text for of the size
 	 */
     public static String toDecimalByte(long v) {
-        return DecimalPrefix.apply(v) + "B";
+        return toDecimalByte(v, 2);
+    }
+
+    /**
+	 * Convert the given value to a size string like 64K
+	 * @param v the size to convert
+	 * @param nbDecimals number of significant figures to display after dot. use Integer.MAX_VALUE for all
+	 * @return the text for of the size
+	 */
+    public static String toDecimalByte(long v, int nbDecimals) {
+        return DecimalPrefix.apply(v, nbDecimals) + "B";
+    }
+
+    /**
+	 * Convert the given value to a size string like 64K
+	 * @param v the size to convert
+	 * @param nbDecimals number of significant figures to display after dot. use Integer.MAX_VALUE for all
+	 * @return the text for of the size
+	 */
+    public static String toBinaryByte(long v, int nbDecimals) {
+        return BinaryPrefix.apply(v, nbDecimals) + "B";
     }
 
     /**
@@ -239,7 +259,7 @@ public class NumberUtils {
 	 * @return the text for of the size
 	 */
     public static String toBinaryByte(long v) {
-        return BinaryPrefix.apply(v) + "B";
+        return toBinaryByte(v, 2);
     }
 
     

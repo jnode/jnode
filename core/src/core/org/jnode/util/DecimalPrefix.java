@@ -16,8 +16,8 @@ public enum DecimalPrefix {
 	E(1000l*1000l*1000l*1000l*1000l*1000l, "E");
 	//these units have too big multipliers to fit in a long
 	// (aka they are greater than 2^64) :
-	//Z(1024l*1024l*1024l*1024l*1024l*1024l*1024l, "Z"),
-	//Y(1024l*1024l*1024l*1024l*1024l*1024l*1024l*1024l, "Y");
+	//Z(1000l*1000l*1000l*1000l*1000l*1000l*1000l, "Z"),
+	//Y(1000l*1000l*1000l*1000l*1000l*1000l*1000l*1000l, "Y");
 
 	public static final DecimalPrefix MIN = B;
 	public static final DecimalPrefix MAX = E;
@@ -47,16 +47,22 @@ public enum DecimalPrefix {
     /**
 	 * Convert the given value to a size string like 64K
 	 * @param v the size to convert
-	 * @return the text for of the size
+	 * @param nbDecimals number of significant figures to display after dot. use Integer.MAX_VALUE for all. 
+	 * @return the text for the size
 	 */
-    public static String apply(long v) {
-        for (DecimalPrefix unit : values()) {
+    public static String apply(final long value, final int nbDecimals) {
+    	long v = value;    	
+    	DecimalPrefix unit = null;    	
+        for (DecimalPrefix u : values()) {
             if ((v < 1000l) && (v >= 0l)) {
-                return String.valueOf(v) + unit.getUnit();
-            }
+            	unit = u;
+            	break;
+           }
 
             v = v / 1000l;
         }
-        return String.valueOf(v / 1000l) + MAX.getUnit();
+        unit = (unit == null) ? MAX : unit;
+        float dv = ((float) value) / unit.getMultiplier(); 
+        return NumberUtils.toString(dv, nbDecimals) + " " + unit.getUnit();
     }
 }
