@@ -23,6 +23,7 @@ package org.jnode.fs.jifs.files;
 
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.jifs.JIFSFile;
+import org.jnode.util.NumberUtils;
 
 /**
  * File, which contains information about memory usage.
@@ -43,9 +44,9 @@ public class JIFSFmemory extends JIFSFile{
 	public void refresh(){
 		super.refresh();
 		final Runtime rt = Runtime.getRuntime();
-		addStringln("Memory size: \n\t" + rt.totalMemory());
-		addStringln("Used memory: \n\t" + (rt.totalMemory()-rt.freeMemory()));
-		addStringln("Free memory: \n\t" + rt.freeMemory());
+		addStringln("Memory size: \n\t" + NumberUtils.toBinaryByte(rt.totalMemory()));
+		addStringln("Used memory: \n\t" + NumberUtils.toBinaryByte((rt.totalMemory()-rt.freeMemory())));
+		addStringln("Free memory: \n\t" + NumberUtils.toBinaryByte(rt.freeMemory()));
 	
 	}
 
