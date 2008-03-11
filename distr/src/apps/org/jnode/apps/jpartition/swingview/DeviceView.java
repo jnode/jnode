@@ -12,6 +12,7 @@ import org.jnode.apps.jpartition.model.Device;
 import org.jnode.apps.jpartition.model.Partition;
 import org.jnode.apps.jpartition.model.UserFacade;
 import org.jnode.util.BinaryPrefix;
+import org.jnode.util.NumberUtils;
 
 public class DeviceView extends DiskAreaView<Device>
 {
@@ -76,7 +77,7 @@ public class DeviceView extends DiskAreaView<Device>
 		}
 		else
 		{
-			setInfos(bounded.getName() + " " + BinaryPrefix.apply(bounded.getSize()));
+			setInfos(bounded.getName() + " " + NumberUtils.toBinaryByte(bounded.getSize()));
 		}
 	}
 

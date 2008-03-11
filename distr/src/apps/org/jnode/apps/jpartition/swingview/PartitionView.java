@@ -15,6 +15,7 @@ import org.jnode.apps.jpartition.swingview.actions.AddPartitionAction;
 import org.jnode.apps.jpartition.swingview.actions.FormatPartitionAction;
 import org.jnode.apps.jpartition.swingview.actions.RemovePartitionAction;
 import org.jnode.util.BinaryPrefix;
+import org.jnode.util.NumberUtils;
 
 public class PartitionView extends DiskAreaView<Partition>
 {
@@ -93,7 +94,7 @@ public class PartitionView extends DiskAreaView<Partition>
 
 		if(bounded != null)
 		{
-			setInfos(bounded.getFormat() + " " + BinaryPrefix.apply(bounded.getSize()));
+			setInfos(bounded.getFormat() + " " + NumberUtils.toBinaryByte(bounded.getSize()));
 
 			Color color = getColor(bounded);
 			setBackground(color);
