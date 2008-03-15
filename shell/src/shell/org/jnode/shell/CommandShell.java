@@ -67,8 +67,11 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     public static final String INTERPRETER_PROPERTY_NAME = "jnode.interpreter";
     public static final String INVOKER_PROPERTY_NAME = "jnode.invoker";
     public static final String CMDLINE_PROPERTY_NAME = "jnode.cmdline";
+
     public static final String DEBUG_PROPERTY_NAME = "jnode.debug";
+    public static final String DEBUG_DEFAULT = "false";
     public static final String HISTORY_PROPERTY_NAME = "jnode.history";
+    public static final String HISTORY_DEFAULT = "true";
 
     public static final String HOME_PROPERTY_NAME = "user.home";
     public static final String DIRECTORY_PROPERTY_NAME = "user.dir";
@@ -299,16 +302,17 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
 
     private void setupFromProperties() {
         debugEnabled = Boolean.parseBoolean(System.getProperty(
-                DEBUG_PROPERTY_NAME, "true"));
+                DEBUG_PROPERTY_NAME, DEBUG_DEFAULT));
         historyEnabled = Boolean.parseBoolean(System.getProperty(
-                HISTORY_PROPERTY_NAME, "true"));
+                HISTORY_PROPERTY_NAME, HISTORY_DEFAULT));
         try {
             setCommandInvoker(System.getProperty(INVOKER_PROPERTY_NAME,
                     INITIAL_INVOKER));
         } catch (Exception ex) {
             err.println(ex.getMessage());
             stackTrace(ex);
-            setCommandInvoker(FALLBACK_INVOKER); // fallback to default
+            // Use the fallback invoker
+            setCommandInvoker(FALLBACK_INVOKER);
         }
         try {
             setCommandInterpreter(System.getProperty(INTERPRETER_PROPERTY_NAME,
@@ -316,16 +320,16 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         } catch (Exception ex) {
             err.println(ex.getMessage());
             stackTrace(ex);
-            setCommandInterpreter(FALLBACK_INTERPRETER); // fallback to
-                                                            // default
+            // Use the fallback interpreter
+            setCommandInterpreter(FALLBACK_INTERPRETER);
         }
     }
 
     private void refreshFromProperties() {
         debugEnabled = Boolean.parseBoolean(System.getProperty(
-                DEBUG_PROPERTY_NAME, "false"));
+                DEBUG_PROPERTY_NAME, DEBUG_DEFAULT));
         historyEnabled = Boolean.parseBoolean(System.getProperty(
-                HISTORY_PROPERTY_NAME, "true"));
+                HISTORY_PROPERTY_NAME, HISTORY_DEFAULT));
         try {
             setCommandInterpreter(System.getProperty(INTERPRETER_PROPERTY_NAME,
                     ""));
