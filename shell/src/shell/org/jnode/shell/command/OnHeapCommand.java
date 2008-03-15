@@ -24,6 +24,7 @@ package org.jnode.shell.command;
 import java.io.InputStream;
 import java.io.PrintStream;
 
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
@@ -38,7 +39,7 @@ import org.jnode.vm.memmgr.HeapStatistics;
 /**
  * @author Martin Husted Hartvig (hagar@jnode.org)
  */
-public class OnHeapCommand implements Command {
+public class OnHeapCommand extends AbstractCommand {
 
     private static final IntegerArgument ARG_MININSTANCECOUNT = new IntegerArgument(
             "mic", "the minimum instance count to show");
