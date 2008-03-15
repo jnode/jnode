@@ -139,7 +139,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
 
     private boolean debugEnabled;
 
-    private boolean exitted = false;
+    private boolean exited = false;
 
     private Thread ownThread;
 
@@ -274,7 +274,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             }
         });
 
-        while (!isExitted()) {
+        while (!isExited()) {
             try {
                 refreshFromProperties();
 
@@ -287,7 +287,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                 }
 
                 if (VmSystem.isShuttingDown()) {
-                    exitted = true;
+                    exited = true;
                 }
             } catch (Throwable ex) {
                 err.println("Uncaught exception while processing command(s): "
@@ -723,7 +723,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     }
 
     public void consoleClosed(ConsoleEvent event) {
-        if (!exitted) {
+        if (!exited) {
             if (Thread.currentThread() == ownThread) {
                 exit0();
             } else {
@@ -736,12 +736,12 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     }
 
     private void exit0() {
-        exitted = true;
+        exited = true;
         threadSuspended = false;
     }
 
-    private synchronized boolean isExitted() {
-        return exitted;
+    private synchronized boolean isExited() {
+        return exited;
     }
 
     private boolean isHistoryEnabled() {
