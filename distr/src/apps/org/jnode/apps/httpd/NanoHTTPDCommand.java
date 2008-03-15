@@ -24,6 +24,8 @@ package org.jnode.apps.httpd;
 import fi.iki.elonen.NanoHTTPD;
 import java.io.*;
 import java.util.Properties;
+
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
 
@@ -31,7 +33,7 @@ import org.jnode.shell.CommandLine;
  * @author Martin Husted Hartvig (hagar@jnode.org)
  */
 
-public class NanoHTTPDCommand implements Command
+public class NanoHTTPDCommand extends AbstractCommand
 {
   public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception
   {
