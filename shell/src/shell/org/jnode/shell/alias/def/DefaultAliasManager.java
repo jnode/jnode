@@ -111,7 +111,7 @@ public class DefaultAliasManager implements AliasManager,
      * @return the class of the given alias
      * @throws ClassNotFoundException
      */
-    public Class getAliasClass(String alias) throws ClassNotFoundException,
+    public Class<?> getAliasClass(String alias) throws ClassNotFoundException,
             NoSuchAliasException {
         return getAlias(alias).getAliasClass();
     }
@@ -127,10 +127,10 @@ public class DefaultAliasManager implements AliasManager,
     }
 
     /**
-     * Gets the classname of a given alias
+     * Gets the class name of a given alias
      * 
      * @param alias
-     * @return the classname of the given alias
+     * @return the class name of the given alias
      */
     public String getAliasClassName(String alias) throws NoSuchAliasException {
         return getAlias(alias).getClassName();
@@ -232,7 +232,7 @@ public class DefaultAliasManager implements AliasManager,
 
         private final String className;
 
-        private Class aliasClass;
+        private Class<?> aliasClass;
 
         private final boolean internal;
 
@@ -259,7 +259,7 @@ public class DefaultAliasManager implements AliasManager,
         /**
          * Gets the class of this alias
          */
-        public Class getAliasClass() throws ClassNotFoundException {
+        public Class<?> getAliasClass() throws ClassNotFoundException {
             if (aliasClass == null) {
                 aliasClass = Thread.currentThread().getContextClassLoader()
                         .loadClass(className);
