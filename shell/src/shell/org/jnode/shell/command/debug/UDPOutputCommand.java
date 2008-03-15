@@ -31,6 +31,7 @@ import java.net.SocketAddress;
 import org.apache.log4j.Logger;
 import org.jnode.debug.UDPAppender;
 import org.jnode.debug.UDPOutputStream;
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
@@ -43,7 +44,7 @@ import org.jnode.shell.help.argument.IntegerArgument;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Martin Husted Hartvig (hagar@jnode.org)
  */
-public class UDPOutputCommand  implements Command {
+public class UDPOutputCommand extends AbstractCommand {
 
   private static final InetAddressArgument ARG_ADDRESS = new InetAddressArgument(
           "host", "connect host to the udpreceiver");
