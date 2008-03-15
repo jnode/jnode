@@ -178,11 +178,13 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
                     throw new ShellInvocationException(
                             "Exception while creating command thread", ex);
                 }
-                threadProcess.start();
 
                 this.blocking = true;
                 this.blockingThread = Thread.currentThread();
                 this.cmdName = cmdLine.getCommandName();
+                
+                threadProcess.start();
+
                 while (this.blocking) {
                     try {
                         Thread.sleep(6000);
