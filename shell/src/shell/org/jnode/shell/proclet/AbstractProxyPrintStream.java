@@ -56,13 +56,16 @@ import gnu.classpath.SystemProperties;
 
 
 /**
- * This class prints provides infrastructure for PrintStream proxies
+ * This class provides some infrastructure for PrintStream proxies.
+ *
+ * @author crawley@jnode.org
  */
 public abstract class AbstractProxyPrintStream extends PrintStream 
 implements ProxyStream<PrintStream>
 {
-	/* Note: the implementation is mostly copied from PrintStream.  Blame this on limitations 
-	 * of the afore-mentioned class's specification ... */
+	/* Note: the implementation is mostly copied from PrintStream.  
+         * Blame this on limitations of the afore-mentioned class's 
+         * specification ... */
     private static PrintStream nullStream;
 	private static final char[] line_separator =
 		SystemProperties.getProperty("line.separator", "\n").toCharArray();
