@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginManager;
-import org.jnode.shell.Command;
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
@@ -44,7 +44,7 @@ import org.jnode.shell.help.argument.OptionArgument;
  * 
  * @author Andreas H\u00e4nel
  */
-public class CreateJIFSCommand implements Command{
+public class CreateJIFSCommand extends AbstractCommand{
 
     private static final Logger log = Logger.getLogger(CreateJIFSCommand.class);
     
