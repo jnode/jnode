@@ -127,8 +127,10 @@ public final class StrikeCache {
     static native void getGlyphCacheDescription(long[] infoArray);
 
     static {
+        //jnode
+        if(false) {
 
-	long[] nativeInfo = new long[11];
+    long[] nativeInfo = new long[11];
 	getGlyphCacheDescription(nativeInfo);
         //Can also get address size from Unsafe class :-
 	//nativeAddressSize = unsafe.addressSize();
@@ -179,6 +181,7 @@ public final class StrikeCache {
 		return null;
 	    }
         });
+        }
     }
 
 

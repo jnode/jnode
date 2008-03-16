@@ -1132,9 +1132,12 @@ public abstract class SunToolkit extends Toolkit
     }
 
     public static EventQueue getSystemEventQueueImplPP(AppContext appContext) {
+        return Toolkit.getDefaultToolkit().getSystemEventQueue();
+        /*jnode
         EventQueue theEventQueue =
             (EventQueue)appContext.get(AppContext.EVENT_QUEUE_KEY);
         return theEventQueue;
+        */
     }
 
     /**
