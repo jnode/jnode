@@ -100,10 +100,18 @@ public class WindowBar extends JPanel {
             this.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
                     try {
+                        org.jnode.vm.Unsafe.debug("WindowBar.action()\n");
                         JInternalFrame frame = FrameWrapper.this.frame;
                         frame.setIcon(false);
                         frame.getDesktopPane().setSelectedFrame(frame);
+                        frame.setSelected(true);
+                        frame.toFront();
+                        frame.requestFocus();
+                        frame.repaint();
+                        frame.getDesktopPane().repaint();
                     } catch (PropertyVetoException ex) {
+                        org.jnode.vm.Unsafe.debug("WindowBar.action() - exception\n");
+                        ex.printStackTrace();
                         //igonre
                     }
                 }
@@ -130,9 +138,9 @@ public class WindowBar extends JPanel {
                     final JNodeToolkit tk = JNodeToolkit.getJNodeToolkit();
                     final JNodeAwtContext ctx = tk.getAwtContext();
                     final JDesktopPane desktop = ctx.getDesktop();
+                    JDesktopPane desk = frame.getDesktopPane();
                     desktop.remove(FrameWrapper.this.frame);
-                    revalidate();
-                    repaint();
+                    desk.repaint();
                 }
 
                 public void internalFrameDeactivated(InternalFrameEvent event) {
@@ -141,14 +149,18 @@ public class WindowBar extends JPanel {
 
                 public void internalFrameDeiconified(InternalFrameEvent event) {
                     repaint();
+                    frame.getDesktopPane().repaint();
                 }
 
                 public void internalFrameIconified(InternalFrameEvent event) {
                     repaint();
+                    frame.getDesktopPane().repaint();
                 }
 
                 public void internalFrameOpened(InternalFrameEvent event) {
-                    //To change body of implemented methods use File | Settings | File Templates.
+                    frame.requestFocus();
+                    frame.repaint();
+                    frame.getDesktopPane().repaint();
                 }
             });
             final JPopupMenu frameActions = new JPopupMenu();

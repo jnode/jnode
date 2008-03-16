@@ -26,6 +26,7 @@ import java.awt.Window;
 import java.awt.peer.WindowPeer;
 
 import javax.swing.JComponent;
+import javax.swing.JRootPane;
 
 /**
  * AWT window peer implemented as a {@link javax.swing.JInternalFrame}.
@@ -61,11 +62,12 @@ final class SwingWindow extends SwingBaseWindow<Window, SwingWindow> {
         super.updateUI();
         setMinimumSize(null);
 
-        final JComponent rootpane = getRootPane();
+        final JRootPane rootpane = getRootPane();
         setBorder(SwingToolkit.EMPTY_BORDER);
         removeAll();
         setLayout(new BorderLayout());
-        add(rootpane, BorderLayout.CENTER);
+        //add(rootpane, BorderLayout.CENTER);
+        setRootPane(rootpane);
         getLayout().layoutContainer(this);
 
         this.setOpaque(false);

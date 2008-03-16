@@ -125,8 +125,17 @@ abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBase
 
     final void initialize(SwingBaseWindowPeer<awtT, swingPeerT> swingPeer) {
         this.swingPeer = swingPeer;
-        ((ContentPane) getContentPane()).initialize(target,
-                swingPeer);
+        //((ContentPane) getContentPane()).initialize(target,swingPeer);
+    }
+
+    @Override
+    public void repaint() {
+        super.repaint();
+    }
+
+    @Override
+    public void update(Graphics g) {
+        super.update(g);    //To change body of overridden methods use File | Settings | File Templates.
     }
 
     /**
@@ -177,8 +186,7 @@ abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBase
         protected void paintChildren(Graphics g) {
             super.paintChildren(g);
             final Insets insets = swingPeer.getInsets();
-            SwingToolkit.paintLightWeightChildren(target, g, insets.left,
-                    insets.top);
+            //SwingToolkit.paintLightWeightChildren(target, g, insets.left,insets.top);
         }
 
         @SuppressWarnings("deprecation")
@@ -201,10 +209,13 @@ abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBase
          * @see javax.swing.JRootPane#createContentPane()
          */
         protected Container createContentPane() {
+            return super.createContentPane();
+            /*
             ContentPane p = new ContentPane();
             p.setName(this.getName() + ".contentPane");
             p.setLayout(new BorderLayout());
             return p;
+            */
         }
     }
 }

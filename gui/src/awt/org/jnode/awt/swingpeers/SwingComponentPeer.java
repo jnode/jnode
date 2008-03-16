@@ -26,29 +26,18 @@ import org.jnode.awt.JNodeGenericPeer;
 import org.jnode.awt.JNodeGraphics;
 import org.jnode.awt.JNodeGraphics2D;
 
-import java.awt.AWTEvent;
-import java.awt.BufferCapabilities;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.GraphicsConfiguration;
-import java.awt.Image;
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.PaintEvent;
+import java.awt.event.FocusEvent;
 import java.awt.image.ColorModel;
 import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
 import java.awt.image.VolatileImage;
 import java.awt.peer.ComponentPeer;
 import java.awt.peer.ContainerPeer;
+import java.lang.reflect.Method;
+import java.util.logging.Level;
 
 import gnu.classpath.SystemProperties;
 import sun.awt.CausedFocusEvent;
@@ -238,7 +227,7 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
         switch (id) {
             case PaintEvent.PAINT:
             case PaintEvent.UPDATE: {
-                processPaintEvent((PaintEvent)event);
+                //processPaintEvent((PaintEvent)event);
             } break;
             default: {
                 if (event.getSource() == targetComponent) {
@@ -254,8 +243,7 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
      */
     protected final void postPaintEvent() {
         if (targetComponent != null) {
-            toolkit.postEvent(new PaintEvent(targetComponent, PaintEvent.PAINT,
-                    targetComponent.getBounds()));
+            toolkit.postEvent(new PaintEvent(targetComponent, PaintEvent.PAINT,targetComponent.getBounds()));
         }
     }
 
@@ -284,7 +272,8 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
     }
 
     public final void paint(Graphics g) {
-        peerComponent.paint(g);
+        //peerComponent.paint(g);
+        toolkit.postEvent(new PaintEvent(targetComponent, PaintEvent.PAINT, targetComponent.getBounds()));
     }
 
     // Deprecated
@@ -302,21 +291,106 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
     }
 
     public final void repaint(long tm, int x, int y, int width, int height) {
-        peerComponent.repaint(tm, x, y, width, height);
-        postPaintEvent();
+        //peerComponent.repaint(tm, x, y, width, height);
+        //postPaintEvent();
+        toolkit.postEvent(new PaintEvent(targetComponent, PaintEvent.UPDATE, targetComponent.getBounds()));
     }
 
     /**
      * @see java.awt.peer.ComponentPeer#requestFocus()
      */
     public final void requestFocus() {
+
+
+
+
         peerComponent.requestFocus();
     }
 
     public final boolean requestFocus(Component lightweightChild, boolean temporary,
                                       boolean focusedWindowChangeAllowed, long time) {
         peerComponent.requestFocus();
+
+        try {
+        Method processSynchronousLightweightTransferMethod =
+                                             KeyboardFocusManager.class.
+                                                getDeclaredMethod("processSynchronousLightweightTransfer",
+                                                                  new Class[] {Component.class, Component.class,
+                                                                               Boolean.TYPE, Boolean.TYPE,
+                                                                               Long.TYPE});
+                processSynchronousLightweightTransferMethod.setAccessible(true);
+
+                    Object[] params = new Object[] {
+                                targetComponent,
+                                peerComponent,
+                                Boolean.valueOf(temporary),
+                                Boolean.valueOf(focusedWindowChangeAllowed),
+                                Long.valueOf(time)
+                            };
+                    return ((Boolean)processSynchronousLightweightTransferMethod.invoke(null, params)).booleanValue();
+
+        }catch (Exception x){
+            x.printStackTrace();
+            org.jnode.vm.Unsafe.debug("SwingComponentPeer.requestFocus() exception\n");
+            org.jnode.vm.Unsafe.debugStackTrace();
+            return false;
+        }
+    }
+
+    public boolean requestFocus(Component lightweightChild, boolean temporary, boolean focusedWindowChangeAllowed, long time, CausedFocusEvent.Cause cause) {
+        peerComponent.requestFocus();
+        org.jnode.vm.Unsafe.debug("SwingComponentPeer.requestFocus()\n");
+        try {
+        Method processSynchronousLightweightTransferMethod =
+                                             KeyboardFocusManager.class.
+                                                getDeclaredMethod("processSynchronousLightweightTransfer",
+                                                                  new Class[] {Component.class, Component.class,
+                                                                               Boolean.TYPE, Boolean.TYPE,
+                                                                               Long.TYPE});
+                processSynchronousLightweightTransferMethod.setAccessible(true);
+
+                    Object[] params = new Object[] {
+                                targetComponent,
+                                peerComponent,
+                                Boolean.valueOf(temporary),
+                                Boolean.valueOf(focusedWindowChangeAllowed),
+                                Long.valueOf(time)
+                            };
+                    boolean ret = ((Boolean)processSynchronousLightweightTransferMethod.invoke(null, params)).booleanValue();
+            //if(ret)
+              //  return true;
+
+        if (lightweightChild == null) {
+            lightweightChild = (Component)targetComponent;
+        }
+        Component currentOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+        if (currentOwner != null && currentOwner.getPeer() == null) {
+            currentOwner = null;
+        }
+
+        //if (focusLog.isLoggable(Level.FINER)) focusLog.finer("Simulating transfer from " + currentOwner + " to " + lightweightChild);
+        FocusEvent fg = new CausedFocusEvent(lightweightChild, FocusEvent.FOCUS_GAINED, false, currentOwner, cause);
+        FocusEvent fl = null;
+        if (currentOwner != null) {
+            fl = new CausedFocusEvent(currentOwner, FocusEvent.FOCUS_LOST, false, lightweightChild, cause);
+        }
+
+        if (fl != null) {
+            postPaintEvent();
+            toolkit.postEvent(fl);
+            //XWindow.sendEvent(fl);
+        }
+            toolkit.postEvent(fg);
+        //XWindow.sendEvent(fg);
         return true;
+
+
+        }catch (Exception x){
+            x.printStackTrace();
+            org.jnode.vm.Unsafe.debug("SwingComponentPeer.requestFocus() exception\n");
+            org.jnode.vm.Unsafe.debugStackTrace();
+            return false;
+        }          
     }
 
     boolean isReshapeInProgress = false;
@@ -404,6 +478,7 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
 
     public void layout() {
         peerComponent.doLayout();
+        targetComponent.doLayout();
     }
 
     public Rectangle getBounds() {
@@ -422,11 +497,5 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
 
     public void reparent(ContainerPeer parent) {
         //TODO implement it
-    }
-
-
-    public boolean requestFocus(Component lightweightChild, boolean temporary, boolean focusedWindowChangeAllowed, long time, CausedFocusEvent.Cause cause) {
-        peerComponent.requestFocus();
-        return true;  
     }
 }

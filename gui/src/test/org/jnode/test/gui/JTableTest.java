@@ -31,7 +31,7 @@ import javax.swing.table.DefaultTableModel;
  */
 public class JTableTest {
     public static void main(String[] argv) {
-        JFrame f = new JFrame();
+        JFrame f = new JFrame("JTable Test");
         f.setSize(400, 400);
         f.add(new JScrollPane(new JTable(new DefaultTableModel(
                 new Object[][]{

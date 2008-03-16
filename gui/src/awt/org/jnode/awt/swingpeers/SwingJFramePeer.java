@@ -110,8 +110,7 @@ abstract class SwingJBaseWindow<awtT extends Window, swingPeerT extends SwingJBa
 
     final void initialize(SwingJBaseWindowPeer<awtT, swingPeerT> swingPeer) {
         this.swingPeer = swingPeer;
-        ((ContentPane) getContentPane()).initialize(target,
-                swingPeer);
+        //((ContentPane) getContentPane()).initialize(target,swingPeer);
     }
 
     /**
@@ -136,7 +135,7 @@ abstract class SwingJBaseWindow<awtT extends Window, swingPeerT extends SwingJBa
 
     @Override
     public void paint(Graphics g) {
-        super.paint(g);
+        //super.paint(g);
         if (target != null) {
             target.paint(g);
         }
@@ -144,7 +143,7 @@ abstract class SwingJBaseWindow<awtT extends Window, swingPeerT extends SwingJBa
 
     @Override
     public void update(Graphics g) {
-        super.update(g);
+        //super.update(g);
         if (target != null) {
             target.update(g);
         }
@@ -168,8 +167,7 @@ abstract class SwingJBaseWindow<awtT extends Window, swingPeerT extends SwingJBa
         protected void paintChildren(Graphics g) {
             super.paintChildren(g);
             final Insets insets = swingPeer.getInsets();
-            SwingToolkit.paintLightWeightChildren(target, g, insets.left,
-                    insets.top);
+            //SwingToolkit.paintLightWeightChildren(target, g, insets.left,insets.top);
         }
 
         @SuppressWarnings("deprecation")
@@ -192,10 +190,13 @@ abstract class SwingJBaseWindow<awtT extends Window, swingPeerT extends SwingJBa
          * @see javax.swing.JRootPane#createContentPane()
          */
         protected Container createContentPane() {
+            return super.createContentPane();
+            /*
             ContentPane p = new ContentPane();
             p.setName(this.getName() + ".contentPane");
             p.setLayout(new BorderLayout());
             return p;
+            */
         }
     }
 }
@@ -323,7 +324,7 @@ abstract class SwingJBaseWindowPeer<awtT extends Window, swingPeerT extends Swin
     }
 
     public void updateFocusableWindowState() {
-        //TODO implement it
+
     }
 
     public void setModalBlocked(Dialog blocker, boolean blocked) {

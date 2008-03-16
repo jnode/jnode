@@ -23,6 +23,8 @@ package org.jnode.awt;
 
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
+import java.awt.image.BufferedImage;
+import java.awt.Component;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -43,4 +45,8 @@ public interface JNodeAwtContext {
 
 
     public void adjustDesktopSize(int width, int height);
+
+    public void setBackgroundImage(BufferedImage img);
+
+    public Component getTopLevelRootComponent();
 }

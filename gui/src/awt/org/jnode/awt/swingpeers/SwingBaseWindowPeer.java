@@ -24,6 +24,7 @@ package org.jnode.awt.swingpeers;
 import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.awt.peer.WindowPeer;
+import java.beans.PropertyVetoException;
 
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
@@ -150,6 +151,11 @@ abstract class SwingBaseWindowPeer<awtT extends Window, swingPeerT extends Swing
         SwingToolkit.invokeNowOrLater(new Runnable() {
             public void run() {
                 peerComponent.toFront();
+                try {
+                    peerComponent.setSelected(true);
+                } catch (PropertyVetoException x){
+                    log.warn(x);
+                }
             }
         });
     }
@@ -167,7 +173,7 @@ abstract class SwingBaseWindowPeer<awtT extends Window, swingPeerT extends Swing
 
     public boolean requestWindowFocus() {
         //TODO implement it
-        return false;
+        return peerComponent.requestFocusInWindow();
     }
 
     public void updateIconImages() {

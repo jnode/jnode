@@ -71,6 +71,8 @@ public final class Rubik extends JPanel
 
 	public void init()
 	{
+        enableEvents(AWTEvent.KEY_EVENT_MASK);
+        setFocusable(true);
         addMouseListener(new MouseAdapter(){
             public void mousePressed(MouseEvent event) {
                 Rubik.this.mousePressed(event.getX(), event.getY());
@@ -706,6 +708,7 @@ public final class Rubik extends JPanel
         JFrame f = new JFrame("Rubik's Cube");
         Rubik rubik = new Rubik();
         f.add(rubik, BorderLayout.CENTER);
+        rubik.requestFocus();
         f.setSize(130,160);
         f.setVisible(true);
         rubik.init();

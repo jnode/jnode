@@ -1036,7 +1036,7 @@ public class BoxWorld extends JPanel implements WindowListener, KeyListener,
 
     private static String[] help = { "s - start game", "n - next world",
             "p - previous world", "u - undo", "r - redo", "b - toggle beep",
-            "h - help", " ", "Press C to continue", " ", "Create by",
+            "h - help", " ", "Press C to continue", " ", "Created by",
             "Levente S\u00e1ntha, 2002",
 
     };
@@ -1126,6 +1126,9 @@ public class BoxWorld extends JPanel implements WindowListener, KeyListener,
         }
         g.dispose();
         gr.drawImage(iBuff, 0, 0, this);
+        System.out.println("BoxWorld.pain()");
+        org.jnode.vm.Unsafe.debug("BoxWorld.pain()\n");
+        org.jnode.vm.Unsafe.debugStackTrace();
     }
 
     public void update(Graphics g) {

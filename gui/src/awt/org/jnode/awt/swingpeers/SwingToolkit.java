@@ -51,6 +51,7 @@ import java.awt.TextArea;
 import java.awt.TextField;
 import java.awt.Window;
 import java.awt.Point;
+import java.awt.image.BufferedImage;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.peer.DragSourceContextPeer;
 import java.awt.peer.ButtonPeer;
@@ -77,11 +78,9 @@ import java.awt.peer.TextFieldPeer;
 import java.awt.peer.WindowPeer;
 
 import javax.swing.JComponent;
-import javax.swing.JDesktopPane;
-import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 import javax.swing.JMenuBar;
-import javax.swing.JFrame;
+import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
@@ -250,21 +249,21 @@ public final class SwingToolkit extends JNodeToolkit {
             log.debug("createFrame:desktopFramePeer(" + target + ")");
             // Only desktop is real frame
             return new DesktopFramePeer(this, (DesktopFrame)target);
-        } else if (target instanceof JFrame) {
+        } else /*if (target instanceof JFrame) */{
             if (!isGuiActive()) {
                 throw new AWTError("Gui is not active");
             }
             log.debug("createFrame:normal(" + target + ")");
             // Other frames are emulated
             return new SwingFramePeer(this, target);
-        } else {
+        } /*else {
             if (!isGuiActive()) {
                 throw new AWTError("Gui is not active");
             }
             log.debug("createFrame:normal(" + target + ")");
             // Other frames are emulated
             return new SwingJFramePeer(this, target);
-        }
+        }   */
     }
 
     protected LabelPeer createLabel(Label target) {
@@ -425,29 +424,40 @@ public final class SwingToolkit extends JNodeToolkit {
         log.debug("onInitialize");
 
         // Set the repaint manager
+        /*
         RepaintManager.setCurrentManager(repaintManager = new SwingRepaintManager(new JNodeAwtContext() {
 
-            /**
-             * @see org.jnode.awt.JNodeAwtContext#getAwtRoot()
-             */
             public JComponent getAwtRoot() {
                 final JNodeAwtContext ctx = getAwtContext();
-                return (ctx == null) ? null : getAwtContext().getAwtRoot();
+                return (ctx == null) ? null : ctx.getAwtRoot();
             }
 
-            /**
-             * @see org.jnode.awt.JNodeAwtContext#getDesktop()
-             */
             public JDesktopPane getDesktop() {
                 final JNodeAwtContext ctx = getAwtContext();
-                return (ctx == null) ? null : getAwtContext().getDesktop();
+                return (ctx == null) ? null : ctx.getDesktop();
             }
 
             public void adjustDesktopSize(int width, int height) {
-                getAwtContext().adjustDesktopSize(width, height);
+                final JNodeAwtContext ctx = getAwtContext();
+                if(ctx != null) ctx.adjustDesktopSize(width, height);
+            }
+
+            public void setBackgroundImage(BufferedImage img) {
+                final JNodeAwtContext ctx = getAwtContext();
+                if(ctx != null) ctx.setBackgroundImage(img);
+            }
+
+            public Component getTopLevelRootComponent() {
+                final JNodeAwtContext ctx = getAwtContext();
+                return (ctx == null) ? null : ctx.getTopLevelRootComponent();
             }
         }));
-
+        */
+        try {
+            UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
+        } catch (Exception x){
+            log.warn("Look And Feel not found: ", x);
+        }
         // Create the desktop
         desktopFrame = new DesktopFrame(getScreenSize());
         desktopFrame.show();
