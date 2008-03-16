@@ -336,7 +336,8 @@ public abstract class GraphicsEnvironment {
         if (font == null) {
             throw new NullPointerException("font cannot be null.");
         }
-        return sun.font.FontManager.registerFont(font);
+        //jnode return sun.font.FontManager.registerFont(font);
+        return false;
     }
 
     /**
@@ -360,7 +361,7 @@ public abstract class GraphicsEnvironment {
      * @since 1.5
      */
     public void preferLocaleFonts() {
-	sun.font.FontManager.preferLocaleFonts();
+	//jnode sun.font.FontManager.preferLocaleFonts();
     }
 
     /**
@@ -380,7 +381,7 @@ public abstract class GraphicsEnvironment {
      * @since 1.5
      */
     public void preferProportionalFonts() {
-	sun.font.FontManager.preferProportionalFonts();
+	//jnode sun.font.FontManager.preferProportionalFonts();
     }
 
     /**
