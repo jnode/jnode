@@ -47,7 +47,7 @@ public final class VMAwtAPI {
      * @param h
      */
     public static void setBoundsCallback (Window window, int x, int y, int w, int h) {
-        window.setBoundsCallback(x, y, w, h);
+       //todo do we need it? | window.setBoundsCallback(x, y, w, h);
     }
 
     /**
@@ -55,7 +55,7 @@ public final class VMAwtAPI {
      * @param queue
      */
     public static void shutdown(EventQueue queue) {
-        queue.setShutdown(true);
+        //todo fix it | queue.setShutdown(true);
     }
 
 }
