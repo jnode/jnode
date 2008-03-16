@@ -58,77 +58,6 @@ public class BjorneTokenizer {
 
     private BjorneToken prev, current, next;
 
-    private static final BjorneToken END_OF_STREAM = new BjorneToken(
-            TOK_END_OF_STREAM);
-
-    private static final BjorneToken END_OF_LINE = new BjorneToken(
-            TOK_END_OF_LINE);
-
-    private static final BjorneToken LPAREN = new BjorneToken(TOK_LPAREN);
-
-    private static final BjorneToken RPAREN = new BjorneToken(TOK_RPAREN);
-
-    private static final BjorneToken SEMI = new BjorneToken(TOK_SEMI);
-
-    private static final BjorneToken DSEMI = new BjorneToken(TOK_DSEMI);
-
-    private static final BjorneToken AMP = new BjorneToken(TOK_AMP);
-
-    private static final BjorneToken AND_IF = new BjorneToken(TOK_AND_IF);
-
-    private static final BjorneToken BAR = new BjorneToken(TOK_BAR);
-
-    private static final BjorneToken OR_IF = new BjorneToken(TOK_OR_IF);
-
-    private static final BjorneToken GREAT = new BjorneToken(TOK_GREAT);
-
-    private static final BjorneToken DGREAT = new BjorneToken(TOK_DGREAT);
-
-    private static final BjorneToken GREATAND = new BjorneToken(TOK_GREATAND);
-
-    private static final BjorneToken LESS = new BjorneToken(TOK_LESS);
-
-    private static final BjorneToken DLESS = new BjorneToken(TOK_DLESS);
-
-    private static final BjorneToken DLESSDASH = new BjorneToken(TOK_DLESSDASH);
-
-    private static final BjorneToken LESSAND = new BjorneToken(TOK_LESSAND);
-
-    private static final BjorneToken LESSGREAT = new BjorneToken(TOK_LESSGREAT);
-
-    private static final BjorneToken CLOBBER = new BjorneToken(TOK_CLOBBER);
-
-    private static final BjorneToken FOR = new BjorneToken(TOK_FOR);
-
-    private static final BjorneToken IN = new BjorneToken(TOK_IN);
-
-    private static final BjorneToken WHILE = new BjorneToken(TOK_WHILE);
-
-    private static final BjorneToken UNTIL = new BjorneToken(TOK_UNTIL);
-
-    private static final BjorneToken DO = new BjorneToken(TOK_DO);
-
-    private static final BjorneToken DONE = new BjorneToken(TOK_DONE);
-
-    private static final BjorneToken IF = new BjorneToken(TOK_IF);
-
-    private static final BjorneToken THEN = new BjorneToken(TOK_THEN);
-
-    private static final BjorneToken ELSE = new BjorneToken(TOK_ELSE);
-
-    private static final BjorneToken ELIF = new BjorneToken(TOK_ELIF);
-
-    private static final BjorneToken FI = new BjorneToken(TOK_FI);
-
-    private static final BjorneToken CASE = new BjorneToken(TOK_CASE);
-
-    private static final BjorneToken ESAC = new BjorneToken(TOK_ESAC);
-
-    private static final BjorneToken LBRACE = new BjorneToken(TOK_LBRACE);
-
-    private static final BjorneToken RBRACE = new BjorneToken(TOK_RBRACE);
-
-    private static final BjorneToken BANG = new BjorneToken(TOK_BANG);
 
     private static final int EOS = -1;
 
@@ -219,22 +148,23 @@ public class BjorneTokenizer {
         while (ch == '\t' || ch == ' ') {
             ch = nextCh();
         }
+        int start = pos;
         switch (ch) {
         case EOS:
-            return END_OF_STREAM;
+            return makeToken(TOK_END_OF_STREAM, start);
         case '\n':
-            return END_OF_LINE;
+            return makeToken(TOK_END_OF_LINE, start);
         case '#':
             while ((ch = nextCh()) != EOS) {
                 if (ch == '\n') {
-                    return END_OF_LINE;
+                    return makeToken(TOK_END_OF_LINE, start);
                 }
             }
-            return END_OF_STREAM;
+            return makeToken(TOK_END_OF_STREAM, start);
         case '(':
-            return LPAREN;
+            return makeToken(TOK_LPAREN, start);
         case ')':
-            return RPAREN;
+            return makeToken(TOK_RPAREN, start);
         case '<':
         case '>':
         case ';':
@@ -246,10 +176,19 @@ public class BjorneTokenizer {
         }
     }
 
-    private BjorneToken parseWord() {
+    private BjorneToken makeToken(int tokenType, int start) {
+		return new BjorneToken(tokenType, "", start, pos, pos >= len);
+	}
+
+    private BjorneToken makeToken(int tokenType, String value, int start) {
+		return new BjorneToken(tokenType, value, start, pos, pos >= len);
+	}
+
+	private BjorneToken parseWord() {
         int quoteChar = 0;
         StringBuffer sb = new StringBuffer();
         int ch = prevCh();
+        int start = pos - 1;
         LOOP: while (true) {
             switch (ch) {
             case EOS:
@@ -309,13 +248,14 @@ public class BjorneTokenizer {
                 }
             }
             if (allDigits) {
-                return new BjorneToken(TOK_IO_NUMBER, sb.toString());
+                return makeToken(TOK_IO_NUMBER, sb.toString(), start);
             }
         }
-        return new BjorneToken(TOK_WORD, sb.toString());
+        return makeToken(TOK_WORD, sb.toString(), start);
     }
 
     private BjorneToken parseOperator() {
+    	int start = pos - 1;
         switch (prevCh()) {
         case '<':
             switch (peekCh()) {
@@ -323,50 +263,50 @@ public class BjorneTokenizer {
                 nextCh();
                 if (peekCh() == '-') {
                     nextCh();
-                    return DLESSDASH;
+                    return makeToken(TOK_DLESSDASH, start);
                 }
-                return DLESS;
+                return makeToken(TOK_DLESS, start);
             case '>':
                 nextCh();
-                return LESSGREAT;
+                return makeToken(TOK_LESSGREAT, start);
             case '&':
                 nextCh();
-                return LESSAND;
+                return makeToken(TOK_LESSAND, start);
             default:
-                return LESS;
+                return makeToken(TOK_LESS, start);
             }
         case '>':
             switch (peekCh()) {
             case '|':
                 nextCh();
-                return CLOBBER;
+                return makeToken(TOK_CLOBBER, start);
             case '>':
                 nextCh();
-                return DGREAT;
+                return makeToken(TOK_DGREAT, start);
             case '&':
                 nextCh();
-                return GREATAND;
+                return makeToken(TOK_GREATAND, start);
             default:
-                return GREAT;
+                return makeToken(TOK_GREAT, start);
             }
         case ';':
             if (peekCh() == ';') {
                 nextCh();
-                return DSEMI;
+                return makeToken(TOK_DSEMI, start);
             }
-            return SEMI;
+            return makeToken(TOK_SEMI, start);
         case '&':
             if (peekCh() == '&') {
                 nextCh();
-                return AND_IF;
+                return makeToken(TOK_AND_IF, start);
             }
-            return AMP;
+            return makeToken(TOK_AMP, start);
         case '|':
             if (peekCh() == '|') {
                 nextCh();
-                return OR_IF;
+                return makeToken(TOK_OR_IF, start);
             }
-            return BAR;
+            return makeToken(TOK_BAR, start);
         }
         throw new ShellFailureException("bad lexer state");
     }
@@ -408,7 +348,7 @@ public class BjorneTokenizer {
         }
         switch (context) {
         case RULE_1_CONTEXT: {
-            BjorneToken tmp = toReservedWordToken(token.getText());
+            BjorneToken tmp = toReservedWordToken(token);
             if (tmp != null) {
                 return tmp;
             }
@@ -417,13 +357,13 @@ public class BjorneTokenizer {
 
         case RULE_5_CONTEXT:
             if (token.isName()) {
-                return new BjorneToken(TOK_NAME, token.getText());
+                return remakeToken(TOK_NAME, token);
             }
             return token;
 
         case RULE_6_CONTEXT:
             if (token.getText().equals("in")) {
-                return IN;
+                return remakeToken(TOK_IN, token);
             }
             return token;
 
@@ -440,15 +380,15 @@ public class BjorneTokenizer {
                             .substring(0, pos - 1))) {
                 return token;
             }
-            return new BjorneToken(TOK_ASSIGNMENT, token.getText());
+            return remakeToken(TOK_ASSIGNMENT, token);
 
         case RULE_8_CONTEXT:
-            BjorneToken tmp = toReservedWordToken(token.getText());
+            BjorneToken tmp = toReservedWordToken(token);
             if (tmp != null) {
                 return tmp;
             }
             if (token.isName()) {
-                return new BjorneToken(TOK_NAME, token.getText());
+                return remakeToken(TOK_NAME, token);
             }
             return reinterpret(token, RULE_7b_CONTEXT);
 
@@ -457,37 +397,43 @@ public class BjorneTokenizer {
         }
     }
 
-    private BjorneToken toReservedWordToken(String str) {
+    private BjorneToken remakeToken(int tokenType, BjorneToken token) {
+		return new BjorneToken(tokenType, token.getText(), token.start,
+				token.end, token.completionTarget);
+	}
+
+	private BjorneToken toReservedWordToken(BjorneToken token) {
+		String str = token.getText();
         if (str.equals("for")) {
-            return FOR;
+            return remakeToken(TOK_FOR, token);
         } else if (str.equals("while")) {
-            return WHILE;
+            return remakeToken(TOK_WHILE, token);
         } else if (str.equals("until")) {
-            return UNTIL;
+            return remakeToken(TOK_UNTIL, token);
         } else if (str.equals("do")) {
-            return DO;
+            return remakeToken(TOK_DO, token);
         } else if (str.equals("done")) {
-            return DONE;
+            return remakeToken(TOK_DONE, token);
         } else if (str.equals("if")) {
-            return IF;
+            return remakeToken(TOK_IF, token);
         } else if (str.equals("then")) {
-            return THEN;
+            return remakeToken(TOK_THEN, token);
         } else if (str.equals("else")) {
-            return ELSE;
+            return remakeToken(TOK_ELSE, token);
         } else if (str.equals("elif")) {
-            return ELIF;
+            return remakeToken(TOK_ELIF, token);
         } else if (str.equals("fi")) {
-            return FI;
+            return remakeToken(TOK_FI, token);
         } else if (str.equals("case")) {
-            return CASE;
+            return remakeToken(TOK_CASE, token);
         } else if (str.equals("esac")) {
-            return ESAC;
+            return remakeToken(TOK_ESAC, token);
         } else if (str.equals("{")) {
-            return LBRACE;
+            return remakeToken(TOK_LBRACE, token);
         } else if (str.equals("}")) {
-            return RBRACE;
+            return remakeToken(TOK_RBRACE, token);
         } else if (str.equals("!")) {
-            return BANG;
+            return remakeToken(TOK_BANG, token);
         }
         return null;
     }

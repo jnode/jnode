@@ -42,4 +42,13 @@ public final class CommandInfo {
     public final boolean isInternal() {
         return internal;
     }
+    
+    public final Command createCommandInstance() throws InstantiationException, IllegalAccessException {
+    	if (Command.class.isAssignableFrom(clazz)) {
+    		return (Command) (clazz.newInstance());
+    	}
+    	else {
+    		return null;
+    	}
+    }
 }

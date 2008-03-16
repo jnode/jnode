@@ -45,11 +45,13 @@ public interface CommandInvoker {
      * 
      * @param commandLine this provides the command name (alias), the command
      *        arguments and (where relevant) the command's i/o stream context.
+     * @param command the command instance to which arguments have previously
+     *        been bound, or <code>null</null>
      * @return an integer return code, with zero indicating command success,
      *         non-zero indicating command failure.
      * @throws ShellException if there was some problem launching the command.
      */
-    int invoke(CommandLine commandLine) throws ShellException;
+    int invoke(CommandLine commandLine, Command command) throws ShellException;
 
     /**
      * Create a thread for running a command asynchronously. This can be used
@@ -57,12 +59,14 @@ public interface CommandInvoker {
      * 
      * @param commandLine this provides the command name (alias), the command
      *        arguments and (where relevant) the command's i/o stream context.
+     * @param command the command object that we bound arguments to, or 
+     *        <code>null</code>
      * @return the thread for the command. Calling
      *         {@link java.lang.Thread.start()} will cause the command to
      *         execute.
      * @throws ShellException if there was some problem launching the command.
      */
-    CommandThread invokeAsynchronous(CommandLine commandLine)
+    CommandThread invokeAsynchronous(CommandLine commandLine, Command command)
             throws ShellException;
 
     /**

@@ -24,8 +24,11 @@ package org.jnode.shell;
 import java.io.InputStream;
 import java.io.PrintStream;
 
+import org.jnode.shell.syntax.ArgumentBundle;
+
 /**
  * @author Martin Husted Hartvig (hagar@jnode.org)
+ * @author crawley@jnode.org
  */
 
 public interface Command {
@@ -43,4 +46,6 @@ public interface Command {
      */
     public void execute(CommandLine commandLine, InputStream in,
             PrintStream out, PrintStream err) throws Exception;
+    
+    public ArgumentBundle getArgumentBundle();
 }

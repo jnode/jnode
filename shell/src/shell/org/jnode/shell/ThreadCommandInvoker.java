@@ -32,7 +32,6 @@ import java.security.AccessController;
 import java.security.PrivilegedActionException;
 
 import org.jnode.shell.help.Help;
-import org.jnode.shell.help.HelpException;
 import org.jnode.shell.help.SyntaxErrorException;
 import org.jnode.vm.VmExit;
 
@@ -77,69 +76,86 @@ public class ThreadCommandInvoker extends AsyncCommandInvoker {
     }
 
     CommandRunner createRunner(Class<?> cx, Method method, Object[] args,
-            InputStream commandIn, PrintStream commandOut,
-            PrintStream commandErr) {
-        return new ThreadCommandRunner(cx, method, args, commandIn, commandOut,
-                commandErr);
+            InputStream in, PrintStream out,
+            PrintStream err) {
+        return new ThreadCommandRunner(cx, method, args, in, out, err);
+    }
+
+    CommandRunner createRunner(Command command, CommandLine cmdLine,
+            InputStream in, PrintStream out, PrintStream err) {
+        return new ThreadCommandRunner(command, cmdLine, in, out, err);
     }
 
     class ThreadCommandRunner extends CommandRunner {
         private final Class<?> cx;
         private final Method method;
         private final Object[] args;
-
+        private final CommandLine cmdLine;
+        private final Command command;
+        private final InputStream in;
+        private final PrintStream out;
+        private final PrintStream err;
+        
         private boolean finished = false;
 
-        public ThreadCommandRunner(Class cx, Method method, Object[] args,
-                InputStream commandIn, PrintStream commandOut,
-                PrintStream commandErr) {
+        public ThreadCommandRunner(Class<?> cx, Method method, Object[] args,
+                InputStream in, PrintStream out, PrintStream err) {
             super(commandShell);
             this.cx = cx;
             this.method = method;
             this.args = args;
+            this.command = null;
+            this.cmdLine = null;
+            this.in = in;
+            this.out = out;
+            this.err = err;
+        }
+
+        public ThreadCommandRunner(Command command, CommandLine cmdLine,
+                InputStream in, PrintStream out, PrintStream err) {
+            super(commandShell);
+            this.cx = null;
+            this.method = null;
+            this.args = null;
+            this.command = command;
+            this.cmdLine = cmdLine;
+            this.in = in;
+            this.out = out;
+            this.err = err;
         }
 
         public void run() {
             try {
-                try {
+                if (command == null) {
                     Object obj = Modifier.isStatic(method.getModifiers()) ? null
                             : cx.newInstance();
-                    AccessController.doPrivileged(new InvokeAction(method, obj,
-                            args));
-                } catch (PrivilegedActionException ex) {
-                    throw ex.getException();
+                    try {
+                        AccessController.doPrivileged(new InvokeAction(method, obj,
+                                args));
+                    } catch (PrivilegedActionException ex) {
+                        throw ex.getException();
+                    }
                 }
+                else {
+                    command.execute(cmdLine, in, out, err);
+                }
+
                 if (!isBlocking()) {
                     // somebody already hit ctrl-c.
                 } else {
                     finished = true;
-                    // System.err.println("Finished invocation, notifying
-                    // blockers.");
                     // done with invoke, stop waiting for a ctrl-c
                     unblock();
                 }
-            } catch (InvocationTargetException ex) {
-                Throwable tex = ex.getTargetException();
-                if (tex instanceof SyntaxErrorException) {
-                    try {
-                        Help.getInfo(cx).usage();
-                    } catch (HelpException ex1) {
-                        // Don't care
-                        stackTrace(tex);
-                    }
-                    err.println(tex.getMessage());
-                    unblock();
-                } else if (tex instanceof VmExit) {
-                    VmExit vex = (VmExit) tex;
-                    setRC(vex.getStatus());
-                    unblock();
-                } else {
-                    err.println("Exception in command");
-                    stackTrace(tex);
-                    unblock();
-                }
+            } catch (VmExit ex) {
+                setRC(ex.getStatus());
+                unblock();
             } catch (Exception ex) {
                 err.println("Exception in command");
+                stackTrace(ex);
+                unblock();
+            } catch (Error ex) {
+                err.println("Fatal error in command");
                 stackTrace(ex);
                 unblock();
             }

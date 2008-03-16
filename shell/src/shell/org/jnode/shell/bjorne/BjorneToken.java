@@ -105,8 +105,8 @@ public class BjorneToken extends CommandLine.Token {
      * because the tokenizer doesn't perform expansion or assignment.
      */
 
-    public BjorneToken(final int tokenType, final String text) {
-        super(text == null ? "" : text, tokenType, 0, 0);
+    public BjorneToken(final int tokenType, final String text, int start, int end, boolean completionTarget) {
+        super(text == null ? "" : text, tokenType, start, end, completionTarget);
         validate();
     }
 
@@ -126,10 +126,6 @@ public class BjorneToken extends CommandLine.Token {
                 throw new IllegalArgumentException("non-empty text");
             }
         }
-    }
-
-    public BjorneToken(final int tokenType) {
-        this(tokenType, "");
     }
 
     public String getInterpolatedText(BjorneContext context)

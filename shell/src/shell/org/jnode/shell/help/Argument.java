@@ -153,8 +153,7 @@ public class Argument extends CommandLineElement {
             ShellUtils.getShellManager().getCurrentShell().list(items);
         } catch (NameNotFoundException ex) {
             // should not happen!
-            System.err.println("No list available");
+            System.err.println("Cannot find current shell: " + ex.getMessage());
         }
     }
-
 }

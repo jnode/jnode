@@ -33,6 +33,7 @@ import java.security.PrivilegedActionException;
 
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.SyntaxErrorException;
+import org.jnode.vm.VmExit;
 
 /*
  * User: Sam Reid Date: Dec 20, 2003 Time: 1:20:33 AM Copyright (c) Dec 20, 2003
@@ -52,7 +53,7 @@ public class DefaultCommandInvoker implements CommandInvoker {
     private final PrintStream err;
     private final CommandShell commandShell;
 
-    private static final Class<?>[] MAIN_ARG_TYPES = new Class[] { String[].class };
+    private static final Class<?>[] MAIN_ARG_TYPES = new Class[] { String[].class};
 
     static final Factory FACTORY = new Factory() {
         public CommandInvoker create(CommandShell shell) {
@@ -73,7 +74,10 @@ public class DefaultCommandInvoker implements CommandInvoker {
         return "default";
     }
 
-    public int invoke(CommandLine cmdLine) {
+    /**
+     * Invoke the command.  The Command argument is not used by this method.
+     */
+    public int invoke(CommandLine cmdLine, Command command) {
         String cmdName = cmdLine.getCommandName();
         if (cmdName == null) {
             return 0;
@@ -109,15 +113,11 @@ public class DefaultCommandInvoker implements CommandInvoker {
                 } catch (PrivilegedActionException ex) {
                     throw ex.getException();
                 }
-            } catch (InvocationTargetException ex) {
-                Throwable tex = ex.getTargetException();
-                if (tex instanceof SyntaxErrorException) {
-                    Help.getInfo(cmdInfo.getCommandClass()).usage();
-                    err.println(tex.getMessage());
-                } else {
-                    err.println("Exception in command");
-                    stackTrace(tex);
-                }
+            } catch (SyntaxErrorException ex) {
+                Help.getInfo(cmdInfo.getCommandClass()).usage();
+                err.println(ex.getMessage());
+            } catch (VmExit ex) {
+                return ex.getStatus();
             } catch (Exception ex) {
                 err.println("Exception in command");
                 stackTrace(ex);
@@ -138,7 +138,7 @@ public class DefaultCommandInvoker implements CommandInvoker {
         return 1;
     }
 
-    public CommandThread invokeAsynchronous(CommandLine commandLine) {
+    public CommandThread invokeAsynchronous(CommandLine commandLine, Command command) {
         throw new UnsupportedOperationException();
     }
 

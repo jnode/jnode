@@ -10,6 +10,7 @@
 
   <requires>
     <import plugin="org.jnode.shell"/>
+    <import plugin="org.jnode.shell.syntax"/>
   </requires>
         
   <extension point="org.jnode.security.permissions">

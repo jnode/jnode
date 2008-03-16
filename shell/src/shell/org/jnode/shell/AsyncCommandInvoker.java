@@ -77,22 +77,26 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
         // ctrl-c
     }
 
-    public int invoke(CommandLine cmdLine) throws ShellException {
+    public int invoke(CommandLine cmdLine, Command command) throws ShellException {
+        // FIXME -- we already did this ...
         CommandInfo cmdInfo = lookupCommand(cmdLine);
         if (cmdInfo == null) {
             return 0;
         }
-        CommandRunner cr = setup(cmdLine, cmdInfo);
+        CommandRunner cr = setup(cmdLine, command, cmdInfo);
         return runIt(cmdLine, cmdInfo, cr);
     }
 
-    public CommandThread invokeAsynchronous(CommandLine cmdLine)
+    public CommandThread invokeAsynchronous(CommandLine cmdLine, Command command)
             throws ShellException {
-        CommandInfo cmdInfo = lookupCommand(cmdLine);
-        if (cmdInfo == null) {
-            return null;
+        CommandInfo cmdInfo = null;
+        if (command == null) {
+            cmdInfo = lookupCommand(cmdLine);
+            if (cmdInfo == null) {
+                return null;
+            }
         }
-        CommandRunner cr = setup(cmdLine, cmdInfo);
+        CommandRunner cr = setup(cmdLine, command, cmdInfo);
         return forkIt(cmdLine, cmdInfo, cr);
     }
 
@@ -110,7 +114,7 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
         }
     }
 
-    private CommandRunner setup(CommandLine cmdLine, CommandInfo cmdInfo)
+    private CommandRunner setup(CommandLine cmdLine, Command command, CommandInfo cmdInfo)
             throws ShellException {
         Method method;
         CommandRunner cr = null;
@@ -125,17 +129,10 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
         } catch (ClassCastException ex) {
             throw new ShellFailureException("streams array broken", ex);
         }
-        try {
-            method = cmdInfo.getCommandClass().getMethod(EXECUTE_METHOD,
-                    EXECUTE_ARG_TYPES);
-            if ((method.getModifiers() & Modifier.STATIC) == 0) {
-                cr = createRunner(cmdInfo.getCommandClass(), method,
-                        new Object[] { cmdLine, in, out, err }, in, out, err);
-            }
-        } catch (NoSuchMethodException e) {
-            // continue;
+        if (command != null) {
+            cr = createRunner(command, cmdLine, in, out, err);
         }
-        if (cr == null) {
+        else {
             try {
                 method = cmdInfo.getCommandClass().getMethod(MAIN_METHOD,
                         MAIN_ARG_TYPES);
@@ -149,19 +146,20 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
                                         + " does not allow redirection or pipelining");
                     }
                     cr = createRunner(cmdInfo.getCommandClass(), method,
-                            new Object[] { cmdLine.getArguments() }, in, out,
-                            err);
+                            new Object[] { cmdLine.getArguments() }, 
+                            in, out, err);
                 }
             } catch (NoSuchMethodException e) {
                 // continue;
             }
+            if (cr == null) {
+                throw new ShellInvocationException(
+                        "No suitable entry point method for "
+                                + cmdInfo.getCommandClass());
+            }
         }
-        if (cr == null) {
-            throw new ShellInvocationException(
-                    "No suitable entry point method for "
-                            + cmdInfo.getCommandClass());
-        }
-        // THese are now the real streams ...
+        
+        // These are now the real streams ...
         cmdLine.setStreams(new Closeable[] { in, out, err });
         return cr;
     }
@@ -178,11 +176,13 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
                     throw new ShellInvocationException(
                             "Exception while creating command thread", ex);
                 }
-
+                // FIXME this method for waiting for the command to finish is
+                // really lame ... and theoretically incorrect.  We should 
+                // wait / notify.
                 this.blocking = true;
                 this.blockingThread = Thread.currentThread();
                 this.cmdName = cmdLine.getCommandName();
-                
+
                 threadProcess.start();
 
                 while (this.blocking) {
@@ -274,8 +274,10 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
 
     public void keyReleased(KeyboardEvent event) {
     }
+    
+    abstract CommandRunner createRunner(Class<?> cx, Method method, Object[] args, 
+        	InputStream in, PrintStream out, PrintStream err);
 
-    abstract CommandRunner createRunner(Class<?> cx, Method method,
-            Object[] args, InputStream commandIn, PrintStream commandOut,
-            PrintStream commandErr);
+    abstract CommandRunner createRunner(Command command, CommandLine cmdLine,
+            InputStream in, PrintStream out, PrintStream err);
 }

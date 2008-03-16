@@ -28,4 +28,5 @@
     <plugin id="org.jnode.shell"/>
     <plugin id="org.jnode.shell.command"/>
     <plugin id="org.jnode.shell.help"/>
+    <plugin id="org.jnode.shell.syntax"/>
 </plugin-list>
