@@ -917,7 +917,9 @@ public abstract class Toolkit
 	 */
   public boolean isFrameStateSupported(int state)
   {
-		return false;
+		return state == Frame.NORMAL ||
+                state == Frame.ICONIFIED ||
+                state == Frame.MAXIMIZED_BOTH;
 	}
 
 	/**
@@ -1273,7 +1275,7 @@ public abstract class Toolkit
     for (int i = 0; i < awtEventListeners.length; ++i)
       {
         AWTEventListenerProxy proxy = awtEventListeners[i];
-        if ((proxy.getEventMask() & AWTEvent.eventIdToMask(ev.getID())) != 0)
+        if ((proxy.getEventMask() & ev.getID()) != 0)
           proxy.eventDispatched(ev);
       }
   }
@@ -1523,5 +1525,11 @@ public abstract class Toolkit
      * @since 1.6
      */
     public abstract boolean isModalityTypeSupported(Dialog.ModalityType modalityType);
+
+    //jnode + openjdk
+    private static volatile long enabledOnToolkitMask;
+    static boolean enabledOnToolkit(long eventMask) {
+        return (enabledOnToolkitMask & eventMask) != 0;
+    }
 
 } // class Toolkit
