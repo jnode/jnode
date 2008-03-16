@@ -91,4 +91,25 @@ public class CompletionInfo {
     public boolean needNewPrompt() {
         return newPrompt;
     }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder("CompletionInfo{");
+        sb.append("completed=").append(completed == null ? "null" : completed);
+        sb.append(",items=");
+        if (items == null) {
+            sb.append("null");
+        }
+        else {
+            sb.append("[");
+            for (int i = 0; i < items.length; i++) {
+                if (i > 0) {
+                    sb.append(",");
+                }
+                sb.append(items[i] == null ? "null" : items[i]);
+            }
+            sb.append("]");
+        }
+        sb.append(",newPrompt=").append(newPrompt).append("}");
+        return sb.toString();
+    }
 }
