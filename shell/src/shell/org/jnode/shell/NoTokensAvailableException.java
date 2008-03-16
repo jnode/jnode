@@ -20,7 +20,7 @@
  */
 package org.jnode.shell;
 
-public class NoTokensAvailableException extends Exception {
+public class NoTokensAvailableException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 

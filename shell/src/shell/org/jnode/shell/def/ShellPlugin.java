@@ -30,6 +30,8 @@ import org.jnode.plugin.PluginException;
 import org.jnode.shell.ShellManager;
 import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.alias.def.DefaultAliasManager;
+import org.jnode.shell.syntax.DefaultSyntaxManager;
+import org.jnode.shell.syntax.SyntaxManager;
 
 /**
  * Service used to create and bind the system alias manager.
@@ -50,10 +52,14 @@ public class ShellPlugin extends Plugin {
 	 */
 	protected void startPlugin() throws PluginException {
 		try {
-			final AliasManager aliasMgr = new DefaultAliasManager(getDescriptor().getExtensionPoint("aliases"));
-			final ShellManager shellMgr = new DefaultShellManager();
+            final ShellManager shellMgr = new DefaultShellManager();
+            final AliasManager aliasMgr = 
+			    new DefaultAliasManager(getDescriptor().getExtensionPoint("aliases"));
+			final SyntaxManager syntaxMgr = 
+			    new DefaultSyntaxManager(getDescriptor().getExtensionPoint("syntaxes"));
 			InitialNaming.bind(AliasManager.NAME, aliasMgr);
 			InitialNaming.bind(ShellManager.NAME, shellMgr);
+			InitialNaming.bind(SyntaxManager.NAME, syntaxMgr);
 		} catch (NamingException ex) {
 			throw new PluginException("Cannot bind shell component", ex);
 		}
@@ -65,5 +71,6 @@ public class ShellPlugin extends Plugin {
 	protected void stopPlugin() throws PluginException {
 		InitialNaming.unbind(ShellManager.NAME);
 		InitialNaming.unbind(AliasManager.NAME);
+		InitialNaming.unbind(SyntaxManager.NAME);
 	}
 }

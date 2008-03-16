@@ -21,11 +21,10 @@
  
 package org.jnode.shell.command;
 
-import org.jnode.shell.help.*;
-import org.jnode.shell.help.argument.PropertyNameArgument;
-import org.jnode.shell.help.argument.StringArgument;
+import org.jnode.shell.syntax.PropertyNameArgument;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.StringArgument;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
 
 import java.io.InputStream;
@@ -41,30 +40,31 @@ import java.io.PrintStream;
  */
 
 public class SetCommand extends AbstractCommand {
+    private PropertyNameArgument keyArg = 
+        new PropertyNameArgument("key", Argument.MANDATORY, "The name of the property to be set (or cleared)");
+    private StringArgument valueArg = 
+        new StringArgument("value", Argument.OPTIONAL, "The new property value");
+    
+    public SetCommand() {
+        super("Set or clear the value of a property");
+        registerArguments(keyArg, valueArg);
+    }
 
-	static final PropertyNameArgument ARG_KEY = new PropertyNameArgument("key", "the property name");
-	static final StringArgument ARG_VALUE = new StringArgument("value", "the value to set the property to, if missing the property is removed");
+    public static void main(String[] args) throws Exception {
+        new SetCommand().execute(args);
+    }
 
-  public static final Help.Info HELP_INFO = new Help.Info(
-		"set", "Sets or removes a system property.",
-		new Parameter[]{
-			new Parameter(ARG_KEY, Parameter.MANDATORY),
-			new Parameter(ARG_VALUE, Parameter.OPTIONAL),
-		}
-	);
-
-	public static void main(String[] args) throws Exception {
-    new SetCommand().execute(args);
-	}
-
-  public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception
-  {
-    ParsedArguments parsedArguments = HELP_INFO.parse(commandLine);
-
-      String value = ARG_VALUE.getValue(parsedArguments);
-      if(value == null)
-        System.getProperties().remove(ARG_KEY.getValue(parsedArguments));
-      else
-        System.getProperties().setProperty(ARG_KEY.getValue(parsedArguments), value);
-  }
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
+    throws Exception {
+        String key = keyArg.getValue();
+        if (!valueArg.isSet()) {
+            System.out.println("Removing " + key);
+            System.getProperties().remove(key);
+        }
+        else {
+            String value = valueArg.getValue();
+            System.out.println("Setting " + key + " to " + value);
+            System.getProperties().setProperty(key, value);
+        }
+    }
 }

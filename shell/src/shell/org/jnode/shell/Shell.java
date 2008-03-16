@@ -22,6 +22,7 @@
 package org.jnode.shell;
 
 import org.jnode.shell.alias.AliasManager;
+import org.jnode.shell.syntax.SyntaxManager;
 import org.jnode.driver.console.Console;
 import org.jnode.driver.console.InputCompleter;
 import org.jnode.driver.console.InputHistory;
@@ -32,12 +33,17 @@ import org.jnode.driver.console.InputHistory;
 public interface Shell extends InputCompleter {
 
     /**
-     * Gets the alias manager of this shell
+     * Gets the alias manager for this shell
      */
     public AliasManager getAliasManager();
+    
+    /**
+     * Gets the syntax manager for this shell
+     */
+    public SyntaxManager getSyntaxManager();
 
     /**
-     * Prints a list of choices for command line completion.
+     * Shell callback to register a list of choices for command line completion.
      */
     public void list(String[] items);
 

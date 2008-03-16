@@ -16,6 +16,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.HashMap;
 
+import org.jnode.shell.Command;
 import org.jnode.shell.CommandInterpreter;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandShell;
@@ -24,6 +25,7 @@ import org.jnode.shell.Completable;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellFailureException;
 import org.jnode.shell.ShellSyntaxException;
+import org.jnode.shell.syntax.CommandSyntaxException;
 
 /**
  * This is a Java implementation of the Bourne Shell language.
@@ -170,14 +172,22 @@ public class BjorneInterpreter implements CommandInterpreter {
         }
     }
 
-    int executeCommand(CommandLine command, BjorneContext context,
+    int executeCommand(CommandLine cmdLine, BjorneContext context,
             Closeable[] streams) throws ShellException {
-        BjorneBuiltin builtin = BUILTINS.get(command.getCommandName());
+        BjorneBuiltin builtin = BUILTINS.get(cmdLine.getCommandName());
         if (builtin != null) {
-            return builtin.invoke(command, this, context);
+            // FIXME ... built-in commands should use the Syntax mechanisms so
+            // that completion, help, etc work as expected.
+            return builtin.invoke(cmdLine, this, context);
         } else {
-            command.setStreams(streams);
-            return shell.invoke(command);
+            cmdLine.setStreams(streams);
+            try {
+				Command command = cmdLine.parseCommandLine(shell);
+				return shell.invoke(cmdLine, command);
+			}
+			catch (CommandSyntaxException ex) {
+				throw new ShellException("Command arguments don't match syntax", ex);
+			}
         }
     }
 
@@ -200,6 +210,6 @@ public class BjorneInterpreter implements CommandInterpreter {
     public CommandThread fork(CommandLine command, Closeable[] streams) 
     throws ShellException {
         command.setStreams(streams);
-        return shell.invokeAsynchronous(command);
+        return shell.invokeAsynchronous(command, null /* FIXME*/);
     }
 }

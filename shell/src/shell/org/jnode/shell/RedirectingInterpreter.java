@@ -18,6 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+
 package org.jnode.shell;
 
 import java.io.Closeable;
@@ -37,6 +38,7 @@ import org.jnode.shell.help.CompletionException;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.argument.FileArgument;
+import org.jnode.shell.syntax.CommandSyntaxException;
 
 /**
  * This command interpreter supports simple input and output redirection and
@@ -71,7 +73,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
 
     public int interpret(CommandShell shell, String line) throws ShellException {
         Tokenizer tokenizer = new Tokenizer(line, REDIRECTS_FLAG);
-        List<CommandDescriptor> commands = parse(tokenizer, line, false);
+        List<CommandDescriptor> commands = parse(tokenizer, line, false, shell);
         int len = commands.size();
         if (len == 0) {
             return 0; // empty command line.
@@ -87,54 +89,56 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
     public Completable parsePartial(CommandShell shell, String line)
             throws ShellSyntaxException {
         Tokenizer tokenizer = new Tokenizer(line, REDIRECTS_FLAG);
-        List<CommandDescriptor> commands = parse(tokenizer, line, true);
+        List<CommandDescriptor> commands = parse(tokenizer, line, true, shell);
         int nosCommands = commands.size();
         if (nosCommands == 0) {
             return new CommandLine("", null);
-        } else {
-            CommandDescriptor lastDesc = commands.get(nosCommands - 1);
-            CommandLine lastCommand = lastDesc.commandLine;
-            CommandLine.Token lastToken = tokenizer.last();
-            boolean whitespaceAfter = tokenizer.whitespaceAfter(lastToken);
-            lastCommand.setArgumentAnticipated(whitespaceAfter);
-            switch (completionContext) {
-            case COMPLETE_ALIAS:
-            case COMPLETE_ARG:
-            case COMPLETE_PIPE:
-                break;
-            case COMPLETE_INPUT:
-                if (lastDesc.fromFileName == null || !whitespaceAfter) {
-                    return new RedirectionCompleter(line, lastToken.start);
-                }
-                break;
-            case COMPLETE_OUTPUT:
-                if (lastDesc.toFileName == null || !whitespaceAfter) {
-                    return new RedirectionCompleter(line, lastToken.start);
-                }
-                break;
-            default:
-                throw new ShellFailureException("bad completion context ("
-                        + completionContext + ")");
-            }
-            return new SubcommandCompleter(lastCommand, line,
-                    whitespaceAfter ? lastToken.end : lastToken.start);
         }
+        CommandDescriptor lastDesc = commands.get(nosCommands - 1);
+        CommandLine lastCommand = lastDesc.commandLine;
+        CommandLine.Token lastToken = tokenizer.last();
+        boolean whitespaceAfter = tokenizer.whitespaceAfterLast();
+        lastCommand.setArgumentAnticipated(whitespaceAfter);
+        switch (completionContext) {
+        case COMPLETE_ALIAS:
+        case COMPLETE_ARG:
+        case COMPLETE_PIPE:
+            break;
+        case COMPLETE_INPUT:
+            if (lastDesc.fromFileName == null || !whitespaceAfter) {
+                return new RedirectionCompleter(line, lastToken.start);
+            }
+            break;
+        case COMPLETE_OUTPUT:
+            if (lastDesc.toFileName == null || !whitespaceAfter) {
+                return new RedirectionCompleter(line, lastToken.start);
+            }
+            break;
+        default:
+            throw new ShellFailureException("bad completion context (" +
+                    completionContext + ")");
+        }
+        return new SubcommandCompleter(lastCommand, line,
+                whitespaceAfter ? lastToken.end : lastToken.start);
     }
 
     private List<CommandDescriptor> parse(Tokenizer tokenizer, String line,
-            boolean allowPartial) throws ShellSyntaxException {
-        LinkedList<CommandDescriptor> commands = new LinkedList<CommandDescriptor>();
+            boolean allowPartial, CommandShell shell)
+            throws ShellSyntaxException {
+        LinkedList<CommandDescriptor> commands =
+                new LinkedList<CommandDescriptor>();
         boolean pipeTo = false;
         while (tokenizer.hasNext()) {
             completionContext = COMPLETE_ALIAS;
             CommandLine.Token commandToken = tokenizer.next();
             if (commandToken.tokenType == SPECIAL) {
-                throw new ShellSyntaxException("Misplaced '"
-                        + commandToken.token + "': expected a command name");
+                throw new ShellSyntaxException("Misplaced '" +
+                        commandToken.token + "': expected a command name");
             }
             CommandLine.Token fromFileName = null;
             CommandLine.Token toFileName = null;
-            LinkedList<CommandLine.Token> args = new LinkedList<CommandLine.Token>();
+            LinkedList<CommandLine.Token> args =
+                    new LinkedList<CommandLine.Token>();
             pipeTo = false;
             while (tokenizer.hasNext()) {
                 completionContext = COMPLETE_ARG;
@@ -161,20 +165,19 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
                         completionContext = COMPLETE_PIPE;
                         break;
                     } else {
-                        throw new ShellSyntaxException("unrecognized symbol: '"
-                                + token + "'");
+                        throw new ShellSyntaxException(
+                                "unrecognized symbol: '" + token + "'");
                     }
                 } else {
                     args.add(token);
                 }
             }
-            CommandLine.Token[] argVec = args
-                    .toArray(new CommandLine.Token[args.size()]);
+            CommandLine.Token[] argVec =
+                    args.toArray(new CommandLine.Token[args.size()]);
 
-            CommandLine commandLine = new CommandLine(commandToken, argVec,
-                    null);
-            commands.add(new CommandDescriptor(commandLine, fromFileName,
-                    toFileName, pipeTo));
+            CommandLine cl = new CommandLine(commandToken, argVec, null);
+            commands.add(new CommandDescriptor(cl, fromFileName, toFileName,
+                    pipeTo));
         }
         if (pipeTo && !allowPartial) {
             throw new ShellSyntaxException("no command after '<'");
@@ -208,19 +211,25 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
                     in = new FileInputStream(desc.fromFileName.token);
                 }
             } catch (IOException ex) {
-                throw new ShellInvocationException("cannot open '"
-                        + desc.fromFileName.token + "': " + ex.getMessage());
+                throw new ShellInvocationException("cannot open '" +
+                        desc.fromFileName.token + "': " + ex.getMessage());
             }
             try {
                 if (desc.toFileName != null) {
                     out = new FileOutputStream(desc.toFileName.token);
                 }
             } catch (IOException ex) {
-                throw new ShellInvocationException("cannot open '"
-                        + desc.toFileName.token + "': " + ex.getMessage());
+                throw new ShellInvocationException("cannot open '" +
+                        desc.toFileName.token + "': " + ex.getMessage());
             }
             desc.commandLine.setStreams(new Closeable[] { in, out, err });
-            return shell.invoke(desc.commandLine);
+            try {
+                Command command = desc.commandLine.parseCommandLine(shell);
+                return shell.invoke(desc.commandLine, command);
+            } catch (CommandSyntaxException ex) {
+                throw new ShellException(
+                        "Command arguments don't match syntax", ex);
+            }
         } finally {
             try {
                 if (desc.fromFileName != null) {
@@ -259,8 +268,8 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
                         desc.openedStreams.add(in);
                     }
                 } catch (IOException ex) {
-                    throw new ShellInvocationException("cannot open '"
-                            + desc.fromFileName.token + "': " + ex.getMessage());
+                    throw new ShellInvocationException("cannot open '" +
+                            desc.fromFileName.token + "': " + ex.getMessage());
                 }
                 try {
                     // redirect to
@@ -269,8 +278,8 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
                         desc.openedStreams.add(out);
                     }
                 } catch (IOException ex) {
-                    throw new ShellInvocationException("cannot open '"
-                            + desc.toFileName + "': " + ex.getMessage());
+                    throw new ShellInvocationException("cannot open '" +
+                            desc.toFileName + "': " + ex.getMessage());
                 }
                 if (stageNo > 0) {
                     // pipe from
@@ -322,7 +331,9 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
                 }
                 desc.commandLine.setStreams(new Closeable[] { in, out, err });
                 try {
-                    desc.thread = shell.invokeAsynchronous(desc.commandLine);
+                    desc.thread =
+                            shell
+                                    .invokeAsynchronous(desc.commandLine, null /* FIXME */);
                 } catch (UnsupportedOperationException ex) {
                     throw new ShellInvocationException(
                             "The current invoker does not support pipelines",
@@ -455,10 +466,11 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
 
     private class RedirectionCompleter extends EmbeddedCompleter {
 
-        private final Help.Info fileParameter = new Help.Info("file",
-                "default parameter for file redirection completion",
-                new Parameter(new FileArgument("file", "a file",
-                        Argument.SINGLE), Parameter.MANDATORY));
+        private final Help.Info fileParameter =
+                new Help.Info("file",
+                        "default parameter for file redirection completion",
+                        new Parameter(new FileArgument("file", "a file",
+                                Argument.SINGLE), Parameter.MANDATORY));
 
         public RedirectionCompleter(String partial, int startPos) {
             super(partial, startPos);
@@ -466,8 +478,9 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
 
         public void complete(CompletionInfo completion, CommandShell shell)
                 throws CompletionException {
-            CommandLine command = new CommandLine("?",
-                    new String[] { getCompletableString() });
+            CommandLine command =
+                    new CommandLine("?",
+                            new String[] { getCompletableString() });
             String result = fileParameter.complete(command);
             setFullCompleted(completion, result);
         }

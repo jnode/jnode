@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.shell.syntax"
+        name="JNode Command Syntax System"
+        version="@VERSION@"
+        provider-name="JNode.org"
+        license-name="lgpl"
+		class="org.jnode.shell.syntax.SystemSyntaxPlugin">
+
+  <requires>
+    <import plugin="org.jnode.shell"/>
+  </requires>
+        
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read"/>
+  </extension>
+  
+</plugin>

@@ -36,7 +36,10 @@ import java.io.FileReader;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.naming.NameNotFoundException;
@@ -53,13 +56,15 @@ import org.jnode.naming.InitialNaming;
 import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.alias.NoSuchAliasException;
 import org.jnode.shell.help.CompletionException;
+import org.jnode.shell.syntax.ArgumentBundle;
+import org.jnode.shell.syntax.SyntaxManager;
 import org.jnode.util.SystemInputStream;
 import org.jnode.vm.VmSystem;
 
 /**
  * @author epr
  * @author Fabien DUMINY
- * @authod crawley
+ * @author crawley@jnode.org
  */
 public class CommandShell implements Runnable, Shell, ConsoleListener {
 
@@ -96,6 +101,8 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     private InputStream in;
 
     private AliasManager aliasMgr;
+
+    private SyntaxManager syntaxMgr;
 
     /**
      * Keeps a reference to the console this CommandShell is using *
@@ -176,8 +183,8 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             cons.setCompleter(this);
 
             console.addConsoleListener(this);
-            aliasMgr = ((AliasManager) InitialNaming.lookup(AliasManager.NAME))
-                    .createAliasManager();
+            aliasMgr = ShellUtils.getAliasManager().createAliasManager();
+            syntaxMgr = ShellUtils.getSyntaxManager().createSyntaxManager();
             System.setProperty(PROMPT_PROPERTY_NAME, DEFAULT_PROMPT);
         } catch (NameNotFoundException ex) {
             throw new ShellException("Cannot find required resource", ex);
@@ -205,6 +212,17 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+    
+    /**
+     * This constructor builds a partial command shell for test purposes only.
+     * 
+     * @param aliasMgr test framework supplies an alias manager
+     * @param syntaxMgr test framework supplies a syntax manager
+     */
+    protected CommandShell(AliasManager aliasMgr, SyntaxManager syntaxMgr) {
+        this.aliasMgr = aliasMgr;
+        this.syntaxMgr = syntaxMgr;
     }
 
     /**
@@ -429,8 +447,8 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
      * @return the command's return code
      * @throws ShellException
      */
-    public int invoke(CommandLine cmdLine) throws ShellException {
-        return this.invoker.invoke(cmdLine);
+    public int invoke(CommandLine cmdLine, Command command) throws ShellException {
+        return this.invoker.invoke(cmdLine, command);
     }
 
     /**
@@ -442,9 +460,9 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
      * @return the command's return code
      * @throws ShellException
      */
-    public CommandThread invokeAsynchronous(CommandLine cmdLine)
+    public CommandThread invokeAsynchronous(CommandLine cmdLine, Command command)
             throws ShellException {
-        return this.invoker.invokeAsynchronous(cmdLine);
+        return this.invoker.invokeAsynchronous(cmdLine, command);
     }
 
     protected CommandInfo getCommandClass(String cmd)
@@ -458,6 +476,19 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             return new CommandInfo(cl.loadClass(cmd), false);
         }
     }
+    
+    protected ArgumentBundle getCommandArgumentBundle(CommandInfo commandInfo) {
+		if (Command.class.isAssignableFrom(commandInfo.getCommandClass())) {
+			try {
+				Command cmd = (Command) (commandInfo.getCommandClass().newInstance());
+				return cmd.getArgumentBundle();
+			}
+			catch (Exception ex) {
+				// drop through
+			}
+		}
+		return null;
+	}
 
     boolean isDebugEnabled() {
         return debugEnabled;
@@ -540,7 +571,11 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             throws ShellSyntaxException {
         return interpreter.parsePartial(this, cmdLineStr);
     }
-
+    
+    /**
+     * This method is called by the console input driver to perform command line
+     * completion in response to a TAB character.
+     */
     public CompletionInfo complete(String partial) {
         if (!readingCommand) {
             // dummy completion behavior for application input.
@@ -551,6 +586,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         }
 
         // workaround to set the currentShell to this shell
+        // FIXME is this needed?
         try {
             ShellUtils.getShellManager().registerShell(this);
         } catch (NameNotFoundException ex) {
@@ -572,16 +608,11 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             }
         } catch (ShellSyntaxException ex) {
             out.println(); // next line
-            err.println("Cannot parse: " + ex.getMessage()); // print the
-                                                                // error
-                                                                // (optional)
+            err.println("Cannot parse: " + ex.getMessage());
 
         } catch (CompletionException ex) {
             out.println(); // next line
-            err.println("Problem in completer: " + ex.getMessage()); // print
-                                                                        // the
-                                                                        // error
-                                                                        // (optional)
+            err.println("Problem in completer: " + ex.getMessage());
         }
 
         if (!success) {
@@ -641,7 +672,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     }
 
     /**
-     * This class subtypes FilterInputStream to capture console input to an
+     * This subtype of FilterInputStream captures the console input for an
      * application in the application input history.
      */
     private class HistoryInputStream extends FilterInputStream {
@@ -808,5 +839,9 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             // which is a bad thing.
             return new PrintStream((OutputStream) tmp);
         }
+    }
+
+    public SyntaxManager getSyntaxManager() {
+        return syntaxMgr;
     }
 }

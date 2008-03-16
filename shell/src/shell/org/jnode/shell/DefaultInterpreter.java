@@ -21,9 +21,12 @@
 
 package org.jnode.shell;
 
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
+
+import org.jnode.shell.CommandLine.Token;
+import org.jnode.shell.syntax.CommandSyntaxException;
 
 /**
  * This interpreter simply parses the command line into a command name and
@@ -78,7 +81,8 @@ public class DefaultInterpreter implements CommandInterpreter {
     }
 
     public int interpret(CommandShell shell, String line) throws ShellException {
-        LinkedList<CommandLine.Token> tokens = new LinkedList<CommandLine.Token>();
+        LinkedList<CommandLine.Token> tokens =
+                new LinkedList<CommandLine.Token>();
         Tokenizer tokenizer = new Tokenizer(line);
         while (tokenizer.hasNext()) {
             tokens.add(tokenizer.next());
@@ -87,17 +91,23 @@ public class DefaultInterpreter implements CommandInterpreter {
         if (nosTokens == 0) {
             return 0;
         }
-        CommandLine commandLine;
+        CommandLine cmd;
         if (nosTokens == 1) {
-            commandLine = new CommandLine(tokens.get(0), null, null);
+            cmd = new CommandLine(tokens.get(0), null, null);
         } else {
             CommandLine.Token commandToken = tokens.removeFirst();
-            CommandLine.Token[] argTokens = new CommandLine.Token[nosTokens - 1];
-            commandLine = new CommandLine(commandToken, tokens
-                    .toArray(argTokens), null);
+            CommandLine.Token[] argTokens =
+                    new CommandLine.Token[nosTokens - 1];
+            cmd = new CommandLine(
+                    commandToken, tokens.toArray(argTokens),null);
         }
         shell.addCommandToHistory(line);
-        return shell.invoke(commandLine);
+        try {
+            Command command = cmd.parseCommandLine(shell);
+            return shell.invoke(cmd, command);
+        } catch (CommandSyntaxException ex) {
+            throw new ShellException("Command arguments don't match syntax", ex);
+        }
     }
 
     public Completable parsePartial(CommandShell shell, String line)
@@ -107,14 +117,15 @@ public class DefaultInterpreter implements CommandInterpreter {
             return new CommandLine("", null);
         }
         CommandLine.Token commandToken = tokenizer.next();
-        LinkedList<CommandLine.Token> tokenList = new LinkedList<CommandLine.Token>();
+        LinkedList<CommandLine.Token> tokenList =
+                new LinkedList<CommandLine.Token>();
         while (tokenizer.hasNext()) {
             tokenList.add(tokenizer.next());
         }
-        CommandLine.Token[] argTokens = tokenList
-                .toArray(new CommandLine.Token[tokenList.size()]);
+        CommandLine.Token[] argTokens =
+                tokenList.toArray(new CommandLine.Token[tokenList.size()]);
         CommandLine res = new CommandLine(commandToken, argTokens, null);
-        res.setArgumentAnticipated(tokenizer.whitespaceAfter(tokenizer.last()));
+        res.setArgumentAnticipated(tokenizer.whitespaceAfterLast());
         return res;
     }
 
@@ -123,26 +134,20 @@ public class DefaultInterpreter implements CommandInterpreter {
      * understands quoting, some '\' escapes, and (depending on constructor
      * flags) certain "special" symbols.
      */
-    static class Tokenizer implements Iterator<CommandLine.Token> {
-        private final String s;
-        private final int flags;
-
+    protected static class Tokenizer implements SymbolSource<CommandLine.Token> {
         private int pos = 0;
-        private boolean inFullEscape = false;
-        private boolean inQuote = false;
-
-        private CommandLine.Token lastToken;
+        private final ArrayList<CommandLine.Token> tokens =
+                new ArrayList<Token>(8);
+        private boolean whiteSpaceAfterLast;
 
         /**
-         * Instantiate a commandline tokenizer for a given input String.
+         * Instantiate a command line tokenizer for a given input String.
          * 
          * @param line the input String.
          * @param flags flags controlling the tokenization.
          */
         public Tokenizer(String line, int flags) {
-            pos = 0;
-            s = line;
-            this.flags = flags;
+            tokenize(line, flags);
         }
 
         public Tokenizer(String line) {
@@ -156,10 +161,7 @@ public class DefaultInterpreter implements CommandInterpreter {
          *         <code>false</code> otherwise
          */
         public boolean hasNext() {
-            while (pos < s.length() && s.charAt(pos) == SPACE_CHAR) {
-                pos++;
-            }
-            return pos < s.length() && s.charAt(pos) != COMMENT_CHAR;
+            return pos < tokens.size();
         }
 
         /**
@@ -171,110 +173,128 @@ public class DefaultInterpreter implements CommandInterpreter {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
+            return tokens.get(pos++);
+        }
 
-            int type = LITERAL;
-            int start = pos;
+        private void tokenize(String s, int flags)
+                throws IllegalArgumentException {
+            int pos = 0;
 
-            StringBuilder token = new StringBuilder(5);
-            char currentChar;
+            while (true) {
+                // Skip spaces before start of token
+                whiteSpaceAfterLast = false;
+                while (pos < s.length() && s.charAt(pos) == SPACE_CHAR) {
+                    pos++;
+                    whiteSpaceAfterLast = true;
+                }
+                if (pos >= s.length()) {
+                    break;
+                }
 
-            boolean finished = false;
+                // Parse a token
+                boolean inFullEscape = false;
+                boolean inQuote = false;
+                int type = LITERAL;
+                int start = pos;
+                StringBuilder token = new StringBuilder(5);
+                char currentChar;
+                boolean finished = false;
 
-            while (!finished && pos < s.length()) {
-                currentChar = s.charAt(pos++);
+                while (!finished && pos < s.length()) {
+                    currentChar = s.charAt(pos++);
 
-                switch (currentChar) {
-                case ESCAPE_CHAR:
-                    if (pos >= s.length()) {
-                        throw new IllegalArgumentException(
-                                "escape char ('\\') not followed by a character");
-                    }
-                    char ch;
-                    switch (ch = s.charAt(pos++)) {
-                    case N:
-                        token.append(ESCAPE_N);
+                    switch (currentChar) {
+                    case ESCAPE_CHAR:
+                        if (pos >= s.length()) {
+                            throw new IllegalArgumentException(
+                                    "escape char ('\\') not followed by a character");
+                        }
+                        char ch;
+                        switch (ch = s.charAt(pos++)) {
+                        case N:
+                            token.append(ESCAPE_N);
+                            break;
+                        case B:
+                            token.append(ESCAPE_B);
+                            break;
+                        case R:
+                            token.append(ESCAPE_R);
+                            break;
+                        case T:
+                            token.append(ESCAPE_T);
+                            break;
+                        default:
+                            token.append(ch);
+                        }
                         break;
-                    case B:
-                        token.append(ESCAPE_B);
+
+                    case FULL_ESCAPE_CHAR:
+                        if (inQuote) {
+                            token.append(currentChar);
+                        } else {
+                            inFullEscape = !inFullEscape; // just a toggle
+                            type = STRING;
+                            if (!inFullEscape) {
+                                type |= CLOSED;
+                            }
+                        }
                         break;
-                    case R:
-                        token.append(ESCAPE_R);
+                    case QUOTE_CHAR:
+                        if (inFullEscape) {
+                            token.append(currentChar);
+                        } else {
+                            inQuote = !inQuote;
+                            type = STRING;
+                            if (!inQuote) {
+                                type |= CLOSED;
+                            }
+                        }
                         break;
-                    case T:
-                        token.append(ESCAPE_T);
+                    case SPACE_CHAR:
+                        if (inFullEscape || inQuote) {
+                            token.append(currentChar);
+                        } else {
+                            if (token.length() != 0) { // don't return an empty
+                                // token
+                                finished = true;
+                                pos--; // to return trailing space as empty
+                                        // last
+                                // token
+                            }
+                        }
+                        break;
+                    case COMMENT_CHAR:
+                        if (inFullEscape || inQuote) {
+                            token.append(currentChar);
+                        } else {
+                            finished = true;
+                            pos = s.length(); // ignore EVERYTHING
+                        }
+                        break;
+                    case GET_INPUT_FROM_CHAR:
+                    case SEND_OUTPUT_TO_CHAR:
+                    case PIPE_CHAR:
+                        if (inFullEscape || inQuote ||
+                                (flags & REDIRECTS_FLAG) == 0) {
+                            token.append(currentChar);
+                        } else {
+                            finished = true;
+                            if (token.length() == 0) {
+                                token.append(currentChar);
+                                type = SPECIAL;
+                            } else {
+                                pos--; // the special character terminates the
+                                // literal.
+                            }
+                        }
                         break;
                     default:
-                        token.append(ch);
-                    }
-                    break;
-
-                case FULL_ESCAPE_CHAR:
-                    if (inQuote) {
                         token.append(currentChar);
-                    } else {
-                        inFullEscape = !inFullEscape; // just a toggle
-                        type = STRING;
-                        if (!inFullEscape) {
-                            type |= CLOSED;
-                        }
                     }
-                    break;
-                case QUOTE_CHAR:
-                    if (inFullEscape) {
-                        token.append(currentChar);
-                    } else {
-                        inQuote = !inQuote;
-                        type = STRING;
-                        if (!inQuote) {
-                            type |= CLOSED;
-                        }
-                    }
-                    break;
-                case SPACE_CHAR:
-                    if (inFullEscape || inQuote) {
-                        token.append(currentChar);
-                    } else {
-                        if (token.length() != 0) { // don't return an empty
-                                                    // token
-                            finished = true;
-                            pos--; // to return trailing space as empty last
-                                    // token
-                        }
-                    }
-                    break;
-                case COMMENT_CHAR:
-                    if (inFullEscape || inQuote) {
-                        token.append(currentChar);
-                    } else {
-                        finished = true;
-                        pos = s.length(); // ignore EVERYTHING
-                    }
-                    break;
-                case GET_INPUT_FROM_CHAR:
-                case SEND_OUTPUT_TO_CHAR:
-                case PIPE_CHAR:
-                    if (inFullEscape || inQuote
-                            || (flags & REDIRECTS_FLAG) == 0) {
-                        token.append(currentChar);
-                    } else {
-                        finished = true;
-                        if (token.length() == 0) {
-                            token.append(currentChar);
-                            type = SPECIAL;
-                        } else {
-                            pos--; // the special character terminates the
-                                    // literal.
-                        }
-                    }
-                    break;
-                default:
-                    token.append(currentChar);
                 }
+                tokens.add(new CommandLine.Token(token.toString(), type, start,
+                        pos, pos < s.length()));
             }
-
-            lastToken = new CommandLine.Token(token.toString(), type, start,
-                    pos);
-            return lastToken;
         }
 
         /**
@@ -290,15 +310,29 @@ public class DefaultInterpreter implements CommandInterpreter {
          * @return the last token.
          */
         public CommandLine.Token last() {
-            return lastToken;
+            return tokens.get(pos - 1);
         }
 
-        /**
-         * Test if there is a whitespace character after a token. This only
-         * works if the token was returned by this Tokenizer.
-         */
-        public boolean whitespaceAfter(CommandLine.Token token) {
-            return token.end < s.length() && s.charAt(token.end) == SPACE_CHAR;
+        public Token peek() throws NoSuchElementException {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            return tokens.get(pos + 1);
+        }
+
+        public void seek(int pos) throws NoSuchElementException {
+            if (pos < 0 || pos > tokens.size()) {
+                throw new NoSuchElementException();
+            }
+            this.pos = pos;
+        }
+
+        public int tell() {
+            return pos;
+        }
+
+        public boolean whitespaceAfterLast() {
+            return whiteSpaceAfterLast;
         }
     }
 }

@@ -28,6 +28,7 @@ import javax.naming.NamingException;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginUtils;
 import org.jnode.shell.CommandLine;
+import org.jnode.shell.syntax.ArgumentBundle;
 
 /**
  * @author qades
@@ -54,7 +55,7 @@ public abstract class Help {
     					BUNDLE_NAME, messageKey);
     }
 
-    public static Info getInfo(Class clazz) throws HelpException {
+    public static Info getInfo(Class<?> clazz) throws HelpException {
         try {
             Field helpInfo = clazz.getField(INFO_FIELD_NAME);
             return (Help.Info) helpInfo.get(null); // static access
@@ -74,18 +75,41 @@ public abstract class Help {
     public abstract void help(Info info, String command);
 
     /**
+     * Shows the help page for a command
+     * 
+     * @param syntax the command syntax
+     * @param bundle the command's argument bundle
+     * @param command a command name or alias to appear in the help
+     */
+    public abstract void help(org.jnode.shell.syntax.Syntax syntax, ArgumentBundle bundle, String command);
+
+    /**
      * Shows the usage line for a command
      * 
-     * @param info
-     *            the command information
+     * @param info the command information
      */
     public abstract void usage(Info info);
+
+    /**
+     * Shows the usage line for a command
+     * 
+     * @param syntax the command syntax
+     * @param bundle the command's argument bundle
+     * @param command a command name or alias to appear in the help
+     */
+    public abstract void usage(org.jnode.shell.syntax.Syntax syntax, ArgumentBundle bundle, String command);
 
     /**
      * Shows the description of a single argument. Used as a callback in
      * {@link Argument#describe(Help)}.
      */
     public abstract void describeArgument(Argument arg);
+
+    /**
+     * Shows the description of a single argument. Used as a callback in
+     * {@link Argument#describe(Help)}.
+     */
+    public abstract void describeArgument(org.jnode.shell.syntax.Argument<?> arg);
 
     /**
      * Shows the description of a single parameter. Used as a callback in

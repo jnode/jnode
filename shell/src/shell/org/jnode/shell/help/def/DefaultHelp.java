@@ -25,6 +25,7 @@ import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.Syntax;
+import org.jnode.shell.syntax.ArgumentBundle;
 
 /**
  * @author qades
@@ -53,6 +54,21 @@ public class DefaultHelp extends Help {
         }
     }
 
+    @Override
+    public void help(org.jnode.shell.syntax.Syntax syntax,
+            ArgumentBundle bundle, String command) {
+        usage(syntax, bundle, command);
+
+        boolean first = true;
+        for (org.jnode.shell.syntax.Argument<?> arg : bundle) {
+            if (first) {
+                System.out.println("\n" + Help.getLocalizedHelp("help.parameters") + ":");
+                first = false;
+            }
+            describeArgument(arg);
+        }
+    }
+
     /**
      * Shows the help for a command syntax.
      */
@@ -61,7 +77,7 @@ public class DefaultHelp extends Help {
 
         final Parameter[] params = syntax.getParams();
         if (params.length != 0)
-            System.out.println("\n"+Help.getLocalizedHelp("help.parameters")+":");
+            System.out.println("\n" + Help.getLocalizedHelp("help.parameters") + ":");
         for (int i = 0; i < params.length; i++)
             params[i].describe(this);
     }
@@ -83,16 +99,32 @@ public class DefaultHelp extends Help {
         final Parameter[] params = syntax.getParams();
         for (int i = 0; i < params.length; i++)
             line.append(' ').append(params[i].format());
-        System.out.println(Help.getLocalizedHelp("help.usage")+": " + line);
+        System.out.println(Help.getLocalizedHelp("help.usage") + ": " + line);
         format(new Cell[]{new Cell(4, 54)}, new String[]{syntax.getDescription()});
     }
 
+    @Override
+    public void usage(org.jnode.shell.syntax.Syntax syntax,
+            ArgumentBundle bundle, String command) {
+        System.out.println(Help.getLocalizedHelp("help.usage") + ": " + 
+                command + syntax.format(bundle));
+        format(new Cell[]{new Cell(4, 54)}, new String[]{bundle.getDescription()});
+    }
+    
     public void describeParameter(Parameter param) {
-        format(new Cell[]{new Cell(2, 18), new Cell(2, 53)}, new String[]{param.getName(), param.getDescription()});
+        format(new Cell[]{new Cell(2, 18), new Cell(2, 53)}, 
+                new String[]{param.getName(), param.getDescription()});
     }
 
     public void describeArgument(Argument arg) {
-        format(new Cell[]{new Cell(4, 16), new Cell(2, 53)}, new String[]{arg.getName(), arg.getDescription()});
+        format(new Cell[]{new Cell(4, 16), new Cell(2, 53)},
+                new String[]{arg.getName(), arg.getDescription()});
+    }
+
+    @Override
+    public void describeArgument(org.jnode.shell.syntax.Argument<?> arg) {
+        format(new Cell[]{new Cell(4, 16), new Cell(2, 53)},
+                new String[]{arg.getLabel(), arg.getDescription()});
     }
 
     protected void format(Cell[] cells, String[] texts) {
@@ -138,7 +170,8 @@ public class DefaultHelp extends Help {
         String fit(String text) {
             String hardFit = text.substring(0, Math.min(width, text.length()));
             int lastSpace = hardFit.lastIndexOf(" ");
-            return hardFit.substring(0, (hardFit.endsWith(" ") && (lastSpace > width / 4) ? lastSpace : hardFit.length()));
+            return hardFit.substring(0, 
+                    (hardFit.endsWith(" ") && (lastSpace > width / 4) ? lastSpace : hardFit.length()));
         }
 
         String stamp(String text) {
@@ -147,5 +180,6 @@ public class DefaultHelp extends Help {
             return field.substring(0, margin) + text + field.substring(0, width - text.length());
         }
     }
+
 
 }

@@ -46,6 +46,15 @@
     <alias name="onheap" class="org.jnode.shell.command.OnHeapCommand"/>
     <alias name="grep" class="org.jnode.shell.command.GrepCommand"/>
   </extension>
+  
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="set">
+      <sequence>
+        <argument argLabel="key"/>
+        <argument argLabel="value"/>
+      </sequence>
+    </syntax>
+  </extension>
 
   <extension point="org.jnode.security.permissions">
     <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>

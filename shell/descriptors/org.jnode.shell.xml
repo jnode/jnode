@@ -24,10 +24,13 @@
       <export name="org.jnode.shell.help.argument.*"/>
       <export name="org.jnode.shell.help.def.*"/>
       <export name="org.jnode.shell.proclet.*"/>
+      <export name="org.jnode.shell.syntax.*"/>
     </library>
   </runtime>
         
   <extension-point id="aliases" name="System shell aliases"/>
+  
+  <extension-point id="syntaxes" name="System command syntaxes"/>
 
   <extension point="org.jnode.security.permissions">
     <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
