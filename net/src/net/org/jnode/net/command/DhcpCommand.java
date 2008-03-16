@@ -23,16 +23,29 @@ package org.jnode.net.command;
 
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.net.InetAddress;
+import java.net.NoRouteToHostException;
+
+import javax.naming.NameNotFoundException;
 
 import org.jnode.driver.Device;
+import org.jnode.driver.DeviceManager;
+import org.jnode.driver.DeviceNotFoundException;
 import org.jnode.driver.net.NetDeviceAPI;
 import org.jnode.naming.InitialNaming;
+import org.jnode.net.ProtocolAddressInfo;
+import org.jnode.net.ethernet.EthernetConstants;
+import org.jnode.net.ipv4.IPv4Address;
+import org.jnode.net.ipv4.IPv4RoutingTable;
 import org.jnode.net.ipv4.config.IPv4ConfigurationService;
+import org.jnode.net.ipv4.layer.IPv4NetworkLayer;
+import org.jnode.net.util.NetUtils;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
+import org.jnode.shell.help.SyntaxErrorException;
 import org.jnode.shell.help.argument.DeviceArgument;
 
 /**
@@ -59,6 +72,20 @@ public class DhcpCommand extends AbstractCommand {
 		ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
 
 		final Device dev = ARG_DEVICE.getDevice(cmdLine);
+		
+		// The DHCP network configuration process will attempt to configure the DNS.  This will only work if
+		// the IP address 127.0.0.1 is bound to the loopback network interface.  And if there isn't the network
+		// is left in a state that will require a reboot to unjam.  Check that we have bound it ...
+		Device loopback = ((DeviceManager)InitialNaming.lookup(DeviceManager.NAME)).getDevice("loopback");
+		NetDeviceAPI api = (NetDeviceAPI)loopback.getAPI(NetDeviceAPI.class);
+		ProtocolAddressInfo info = api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP);
+		if (info == null || !info.contains(InetAddress.getByAddress(new byte[]{127, 0, 0, 1}))) {
+		        System.err.println("The loopback network device is not bound to IP address 127.0.0.1");
+		        System.err.println("Run 'ifconfig loopback 127.0.0.1 255.255.255.255' to fix this.");
+		        exit(1);
+		}
+ 
+		// Now it should be safe to do the DHCP configuration ...
 		System.out.println("Trying to configure " + dev.getId() + "...");
 		final IPv4ConfigurationService cfg = (IPv4ConfigurationService)InitialNaming.lookup(IPv4ConfigurationService.NAME);
 		cfg.configureDeviceDhcp(dev, true);
