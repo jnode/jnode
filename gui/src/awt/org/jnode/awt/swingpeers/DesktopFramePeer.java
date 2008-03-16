@@ -24,6 +24,7 @@ package org.jnode.awt.swingpeers;
 import java.awt.*;
 import java.awt.BufferCapabilities.FlipContents;
 import java.awt.event.PaintEvent;
+import java.awt.event.KeyEvent;
 import java.awt.image.ColorModel;
 import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
@@ -316,7 +317,7 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
      * @see java.awt.peer.ComponentPeer#getLocationOnScreen()
      */
     public Point getLocationOnScreen() {
-        return TOP_LEFT;
+        return new Point(TOP_LEFT);
     }
 
     /**
@@ -356,8 +357,14 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
         switch (id) {
             case PaintEvent.PAINT:
             case PaintEvent.UPDATE: {
-                processPaintEvent((PaintEvent)event);
+                //processPaintEvent((PaintEvent)event);
             } break;
+            case KeyEvent.KEY_PRESSED:
+            case KeyEvent.KEY_RELEASED:
+            case KeyEvent.KEY_TYPED: {
+                targetComponent.processKeyEvent((KeyEvent)event);
+                break;
+            }
         }
     }
 
@@ -380,7 +387,7 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
      * @see java.awt.peer.ComponentPeer#isFocusable()
      */
     public boolean isFocusable() {
-        return false;
+        return awtFrame.isFocusable();
     }
 
     /**
@@ -450,8 +457,7 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
      * @see java.awt.peer.ComponentPeer#requestFocus()
      */
     public void requestFocus() {
-        // TODO Auto-generated method stub
-
+        awtFrame.requestFocus();
     }
 
     /**
@@ -460,8 +466,7 @@ final class DesktopFramePeer extends JNodeGenericPeer<SwingToolkit, DesktopFrame
      */
     public boolean requestFocus(Component source, boolean bool1, boolean bool2,
                                 long x) {
-        // TODO Auto-generated method stub
-        return false;
+        return awtFrame.requestFocusInWindow();
     }
 
     /**

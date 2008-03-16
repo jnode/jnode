@@ -69,7 +69,7 @@ final class SwingPanel extends JPanel implements ISwingPeer<Panel> {
      */
     protected void paintChildren(Graphics g) {
         super.paintChildren(g);
-        SwingToolkit.paintLightWeightChildren(awtComponent, g, 0, 0);
+        //SwingToolkit.paintLightWeightChildren(awtComponent, g, 0, 0);
     }
     
     /**

@@ -27,7 +27,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
@@ -39,12 +38,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ByteArrayInputStream;
 import java.net.URL;
-import java.util.Enumeration;
 
 import javax.swing.DefaultDesktopManager;
 import javax.swing.JButton;
@@ -61,7 +55,6 @@ import javax.imageio.ImageIO;
 import org.apache.log4j.Logger;
 import org.jnode.awt.JNodeAwtContext;
 import org.jnode.awt.JNodeToolkit;
-import org.jnode.awt.swingpeers.DesktopFrame;
 import org.jnode.plugin.ExtensionPoint;
 import org.jnode.plugin.PluginClassLoader;
 import org.jnode.vm.VmSystem;
@@ -78,7 +71,7 @@ public class Desktop implements Runnable {
     JDesktopPane desktopPane;
     //Due to this reference to DesktopFrame desktop plugin needs swingpeers
     //todo abstract out this dependency in the future
-    DesktopFrame desktopFrame;
+    JNodeAwtContext desktopFrame;
 
     /**
      * @see Runnable#run()
@@ -97,13 +90,12 @@ public class Desktop implements Runnable {
 
 
                 final JNodeToolkit tk = JNodeToolkit.getJNodeToolkit();
-                final JNodeAwtContext ctx = tk.getAwtContext();
-                desktopFrame = (DesktopFrame) ctx;
-                desktopPane = ctx.getDesktop();
-                final Container awtRoot = ctx.getAwtRoot();
+                desktopFrame = tk.getAwtContext();
+                desktopPane = desktopFrame.getDesktop();
+                final Container awtRoot = desktopFrame.getAwtRoot();
 
-                if(ctx instanceof JFrame){
-                    ((JFrame) ctx).addWindowListener(new WindowAdapter() {
+                if(desktopFrame instanceof JFrame){
+                    ((JFrame) desktopFrame).addWindowListener(new WindowAdapter() {
                         public void windowClosed(WindowEvent e) {
                             taskBar.clock.stop();
                         }

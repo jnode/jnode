@@ -372,7 +372,7 @@ public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
 				}
 		} else {
 			// Convert it to a raster
-			final PixelGrabber grabber = new PixelGrabber(image, 0, 0, -1, -1, true);
+			final PixelGrabber grabber = new PixelGrabber(image, 0, 0, image.getWidth(null), image.getHeight(null), true);
 			if (grabber.grabPixels()) {
 				final int w = grabber.getWidth();
 				final int h = grabber.getHeight();

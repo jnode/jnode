@@ -313,7 +313,7 @@ public class MouseHandler implements PointerListener {
           if (w != null && w.isShowing()) {
               pwo = w.getLocationOnScreen();
           } else {
-              pwo = new Point(-1, -1);
+              pwo = new Point(0, 0);
           }
 
           final Point p = source.getLocationOnScreen();
@@ -339,7 +339,15 @@ public class MouseHandler implements PointerListener {
               //    System.out.println("MouseEvent.MOUSE_PRESSED");
               //System.out.println("postEvent:"+event);
           }
-          
+
+          //debug
+          if(id == MouseEvent.MOUSE_PRESSED ||
+                  id == MouseEvent.MOUSE_RELEASED ||
+                  id == MouseEvent.MOUSE_CLICKED){
+
+//              org.jnode.vm.Unsafe.debug(event.toString()+"\n");
+//              org.jnode.vm.Unsafe.debug("x="+ x + " y=" + y +" ex="+ ex + " ey=" + ey+ " p.x=" + p.x + " p.y=" + p.y +"\n");
+          }
           eventQueue.postEvent(event);
       }
 

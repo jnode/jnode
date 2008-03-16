@@ -21,8 +21,16 @@
  
 package org.jnode.awt.swingpeers;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.DefaultFocusTraversalPolicy;
+import java.awt.Graphics;
+import java.awt.VMAwtAPI;
+import java.awt.AWTEvent;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.event.KeyEvent;
 import java.beans.PropertyVetoException;
 
 import javax.swing.JComponent;
@@ -57,11 +65,12 @@ public final class DesktopFrame extends JFrame implements JNodeAwtContext {
 
     /**
 	 * Initialize this instance.
-	 *
+	 * @param screenSize the desktop size
 	 */
 	public DesktopFrame(Dimension screenSize) {
 		super("");
-		setSize(screenSize);
+        enableEvents(AWTEvent.KEY_EVENT_MASK);
+        setSize(screenSize);
         setFocusCycleRoot(true);
         setFocusTraversalPolicy(new DefaultFocusTraversalPolicy());
         desktop = new JDesktopPane(){
@@ -102,7 +111,7 @@ public final class DesktopFrame extends JFrame implements JNodeAwtContext {
 	protected void frameInit() {
 		super.setLayout(new BorderLayout());
 		enableEvents(AWTEvent.WINDOW_EVENT_MASK);
-		getRootPane(); // will do set/create
+		setRootPane(createRootPane());
 	}
 
     public void dispose() {
@@ -122,5 +131,13 @@ public final class DesktopFrame extends JFrame implements JNodeAwtContext {
 
     public void setBackgroundImage(BufferedImage backgroundImage) {
             this.backgroundImage = backgroundImage;
-    }    
+    }
+
+    public Component getTopLevelRootComponent() {
+        return this;
+    }
+
+    protected void processKeyEvent(KeyEvent e){
+        super.processKeyEvent(e);
+    }
 }

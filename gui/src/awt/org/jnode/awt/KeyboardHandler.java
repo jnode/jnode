@@ -24,6 +24,9 @@ package org.jnode.awt;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.Frame;
+import java.awt.KeyboardFocusManager;
+import java.awt.Component;
+import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -129,16 +132,41 @@ public class KeyboardHandler implements
      */
     private void postEvent(int id, long time, int modifiers, int keyCode,
                            char keyChar) {
-        JNodeToolkit tk = (JNodeToolkit) Toolkit.getDefaultToolkit();
-        Frame top = tk.getTop();
-        if(top == null){
-            //awt is not yet initialized
-            //drop this event
-            return;
+
+        Component source = null;
+        KeyboardFocusManager kfm = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+        if(kfm != null){
+            //Component fo = kfm.getFocusOwner();
+            //if(fo == null){
+                Window win = kfm.getActiveWindow();
+                if(win == null){
+                    win = kfm.getFocusedWindow();
+                    if(win != null){
+                        source = win;
+                    }
+                } else {
+                    source = win;
+                }
+            //} else {
+              //  source = fo;
+            //}
         }
-        KeyEvent ke = new KeyEvent(top, id, time, modifiers, keyCode,
+
+        if(source == null){
+            JNodeToolkit tk = (JNodeToolkit) Toolkit.getDefaultToolkit();
+            Frame top = tk.getTop();
+            if(top == null){
+                //awt is not yet initialized
+                //drop this event
+                return;
+            } else {
+                source = top;
+            }
+        }
+
+        KeyEvent ke = new KeyEvent(source, id, time, modifiers, keyCode,
                 keyChar);
-//        Unsafe.debug(ke.toString()+"\n");
+        //org.jnode.vm.Unsafe.debug(ke.toString()+"\n");
         eventQueue.postEvent(ke);
     }
 

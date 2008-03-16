@@ -96,6 +96,8 @@ final class SwingRepaintManager extends RepaintManager {
      * @see javax.swing.RepaintManager#paintDirtyRegions()
      */
     public void paintDirtyRegions() {
+        super.paintDirtyRegions();
+        /*
         if ((!shutdown) && !dirtyRegion.isEmpty()) {
             final JComponent root = context.getAwtRoot();
             if (root != null) {
@@ -104,6 +106,7 @@ final class SwingRepaintManager extends RepaintManager {
                 root.paintImmediately(r);
             }
         }
+        */
     }
 
     /**
@@ -125,7 +128,7 @@ final class SwingRepaintManager extends RepaintManager {
 
     private void checkThread() {
         if (!SwingUtilities.isEventDispatchThread()) {
-            log.debug("Wrong Thread: " + Thread.currentThread(), new Exception("Stacktrace"));
+           // log.debug("Wrong Thread: " + Thread.currentThread(), new Exception("Stacktrace"));
         }
     }
 }

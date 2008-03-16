@@ -71,7 +71,12 @@ final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame>
      * @see java.awt.peer.FramePeer#getState()
      */
     public int getState() {
-        return -1;
+        int ret = Frame.NORMAL;
+        if(peerComponent.isIcon())
+            ret = ret | Frame.ICONIFIED;
+        if(peerComponent.isMaximum())
+            ret = ret | Frame.MAXIMIZED_BOTH;
+        return ret;
     }
 
     /**
@@ -104,11 +109,34 @@ final class SwingFramePeer extends SwingBaseWindowPeer<Frame, SwingFrame>
      * @see java.awt.peer.FramePeer#setState(int)
      */
     public void setState(int state) {
-        //TODO implement it
+        if((state & Frame.ICONIFIED) == Frame.ICONIFIED) {
+            try {
+                peerComponent.setIcon(true);
+            } catch (PropertyVetoException x){
+                log.warn(x);
+            }
+        }
+
+        if((state & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH) {
+            try {
+                peerComponent.setMaximum(true);
+            } catch (PropertyVetoException x){
+                log.warn(x);
+            }
+        }
+
+        if(state == Frame.NORMAL) {
+            try {
+                peerComponent.setMaximum(false);
+                peerComponent.setIcon(false);
+            } catch (PropertyVetoException x){
+                log.warn(x);
+            }
+        }
     }
 
     public void setBoundsPrivate(int x, int y, int width, int height) {
-        //TODO implement it
+
     }
 
 

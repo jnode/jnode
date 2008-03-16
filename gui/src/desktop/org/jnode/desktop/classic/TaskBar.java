@@ -219,7 +219,7 @@ public class TaskBar extends JPanel {
             //TODO review this, Classpath plaf code is still instable failures can occure
             //so we try to minimise the effect of a failure
             try {
-                SwingUtilities.updateComponentTreeUI(desktop.desktopFrame);
+                SwingUtilities.updateComponentTreeUI(desktop.desktopFrame.getTopLevelRootComponent());
             }catch(Exception x){
                 log.error("", x);
             }

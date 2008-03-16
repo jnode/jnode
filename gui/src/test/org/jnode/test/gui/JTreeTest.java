@@ -34,7 +34,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
  */
 public class JTreeTest {
     public static void main(String[] argv) {
-        JFrame f = new JFrame();
+        JFrame f = new JFrame("JTree Test");
         f.setSize(400, 400);
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("A");
         root.add(new DefaultMutableTreeNode("B"));
