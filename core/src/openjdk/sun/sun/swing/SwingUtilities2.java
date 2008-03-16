@@ -194,7 +194,8 @@ public class SwingUtilities2 {
      *         <tt>false</tt> if TextLayout is not required               
      */
     public static final boolean isComplexLayout(char[] text, int start, int limit) {
-        return FontManager.isComplexText(text, start, limit);
+        //jnode return FontManager.isComplexText(text, start, limit);
+        return false;
     }
 
     //
@@ -289,6 +290,9 @@ public class SwingUtilities2 {
      */
     private static int getBearing(JComponent comp, FontMetrics fm, char c,
                                   boolean isLeftBearing) {
+        //jnode
+        if(true) return 1;
+        
         if (fm == null) {
             if (comp == null) {
                 return 0;
@@ -999,11 +1003,14 @@ public class SwingUtilities2 {
      * 
      */
     public static FontMetrics getFontMetrics(JComponent c, Font font) {
+        /*jnode
         FontRenderContext  frc = getFRCProperty(c);
         if (frc == null) {
             frc = DEFAULT_FRC;
         }
         return FontDesignMetrics.getMetrics(font, frc);
+        */
+        return c.getToolkit().getFontMetrics(font);
     }
     
 
