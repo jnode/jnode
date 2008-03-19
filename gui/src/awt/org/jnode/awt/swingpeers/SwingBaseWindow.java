@@ -112,7 +112,7 @@ abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBase
     /**
      * @see javax.swing.JInternalFrame#createRootPane()
      */
-    protected final JRootPane createRootPane() {
+    protected JRootPane createRootPane() {
         return new RootPane();
     }
 
@@ -135,7 +135,7 @@ abstract class SwingBaseWindow<awtT extends Window, swingPeerT extends SwingBase
 
     @Override
     public void update(Graphics g) {
-        super.update(g);    //To change body of overridden methods use File | Settings | File Templates.
+        super.update(g);
     }
 
     /**

@@ -264,9 +264,11 @@ public class StyleContext implements Serializable, AbstractDocument.AttributeCon
             if (f == null) {
                 f = new Font(family, style, size);
             }
+            /* jnode
             if (! FontManager.fontSupportsDefaultEncoding(f)) {
                 f = FontManager.getCompositeFontUIResource(f);
             }
+            */
             FontKey key = new FontKey(family, style, size);
             fontTable.put(key, f);
         }

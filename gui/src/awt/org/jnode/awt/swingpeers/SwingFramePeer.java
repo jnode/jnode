@@ -25,8 +25,13 @@ import java.awt.Frame;
 import java.awt.Image;
 import java.awt.MenuBar;
 import java.awt.Rectangle;
+import java.awt.Graphics;
+import java.awt.Container;
 import java.awt.peer.FramePeer;
 import java.beans.PropertyVetoException;
+import javax.swing.JFrame;
+import javax.swing.JComponent;
+import javax.swing.JRootPane;
 
 final class SwingFrame extends SwingBaseWindow<Frame, SwingFrame> {
 
@@ -34,7 +39,70 @@ final class SwingFrame extends SwingBaseWindow<Frame, SwingFrame> {
         super(awtFrame, title);
     }
 
+    @Override
+    public void repaint(long tm, int x, int y, int width, int height) {
+        super.repaint(tm, x, y, width, height);
+        if(target instanceof JFrame && isVisible())
+            ((JFrame)target).getRootPane().repaint(tm, x, y, width, height);
+    }
+
+    @Override
+    public void update(Graphics g) {
+        super.update(g);
+        if(target instanceof JFrame && isVisible())
+            ((JFrame)target).getRootPane().update(g);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);    //To change body of overridden methods use File | Settings | File Templates.
+    }
+
+    /**
+     * @see javax.swing.JInternalFrame#createRootPane()
+     */
+    protected JRootPane createRootPane() {
+        return new NoContentRootPane();
+    }
+
+    @Override
+    protected void validateTree() {
+        super.validateTree();
+        if(target instanceof JFrame)
+            ((JFrame)target).getRootPane().validate();
+    }
 }
+
+final class NullContentPane extends JComponent {
+    @Override
+    public void update(Graphics g) {
+        //empty
+    }
+
+    @Override
+    public void paint(Graphics g) {
+
+    }
+
+    @Override
+    public void repaint() {
+
+    }
+
+    @Override
+    public void repaint(long tm, int x, int y, int width, int height) {
+
+    }
+}
+
+final class NoContentRootPane extends JRootPane {
+        /**
+         * @see javax.swing.JRootPane#createContentPane()
+         */
+        protected Container createContentPane() {
+            return new NullContentPane();
+        }
+    }
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
