@@ -21,6 +21,8 @@
  
 package org.jnode.shell.help;
 
+import org.jnode.driver.console.CompletionInfo;
+
 /**
  * @author qades
  */
@@ -104,19 +106,19 @@ public class Parameter extends CommandLineElement {
 			argument.describe(help);
 	}
 
-	public final String complete(String partial) {
-		// delegate to argument, merely close the parameter if no argument exists
-		if (hasArgument()) {
-			if (Syntax.DEBUG) Syntax.LOGGER.debug("Parameter.complete: argument is " + 
-											      argument.format());
-			return argument.complete(partial);
-		}
-		else {
-			// FIXME - this assumes that the partial string can never legitimately
-			// have leading/trailing whitespace.
-			if (Syntax.DEBUG) Syntax.LOGGER.debug("Parameter.complete: no argument");
-		return partial.trim() + " ";
-	}
+	public final void complete(CompletionInfo completion, String partial) {
+	    // delegate to argument, merely close the parameter if no argument exists
+	    if (hasArgument()) {
+	        if (Syntax.DEBUG) Syntax.LOGGER.debug("Parameter.complete: argument is " + 
+	                argument.format());
+	        argument.complete(completion, partial);
+	    }
+	    else {
+	        // FIXME - this assumes that the partial string can never legitimately
+	        // have leading/trailing whitespace.
+	        if (Syntax.DEBUG) Syntax.LOGGER.debug("Parameter.complete: no argument");
+	        completion.addCompletion(" ");
+	    }
 	}
 
 	public final boolean isSatisfied() {

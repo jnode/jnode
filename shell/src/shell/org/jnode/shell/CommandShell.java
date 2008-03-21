@@ -36,10 +36,7 @@ import java.io.FileReader;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.naming.NameNotFoundException;
@@ -579,10 +576,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     public CompletionInfo complete(String partial) {
         if (!readingCommand) {
             // dummy completion behavior for application input.
-            CompletionInfo completion = new CompletionInfo();
-            completion.setCompleted(partial);
-            completion.setNewPrompt(true);
-            return completion;
+            return new CompletionInfo();
         }
 
         // workaround to set the currentShell to this shell
@@ -594,17 +588,13 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
 
         // do command completion
         completion = new CompletionInfo();
-        boolean success = false;
         try {
             Completable cl = parseCommandLine(partial);
             if (cl != null) {
                 cl.complete(completion, this);
-                if (!partial.equals(completion.getCompleted())
-                        && !completion.hasItems()) {
-                    // we performed direct completion without listing
-                    completion.setNewPrompt(false);
+                if (completion.getCompletionStart() == -1) {
+                    completion.setCompletionStart(partial.length());
                 }
-                success = true;
             }
         } catch (ShellSyntaxException ex) {
             out.println(); // next line
@@ -615,27 +605,12 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             err.println("Problem in completer: " + ex.getMessage());
         }
 
-        if (!success) {
-            // Make sure the caller knows to repaint the prompt
-            completion.setCompleted(partial);
-            completion.setNewPrompt(true);
-        }
-
         // Make sure that the shell's completion context gets nulled.
         CompletionInfo myCompletion = completion;
         completion = null;
         return myCompletion;
     }
-
-    public void list(String[] items) {
-        if (completion == null) {
-            throw new ShellFailureException(
-                    "list called when no completion is in progress");
-        } else {
-            completion.setItems(items);
-        }
-    }
-
+    
     public void addCommandToHistory(String cmdLineStr) {
         // Add this command to the command history.
         if (isHistoryEnabled() && !cmdLineStr.equals(lastCommandLine)) {

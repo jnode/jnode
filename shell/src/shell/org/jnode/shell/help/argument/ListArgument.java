@@ -1,13 +1,11 @@
 package org.jnode.shell.help.argument;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.ParsedArguments;
 
@@ -16,85 +14,32 @@ public abstract class ListArgument<T> extends Argument
 {
 	private static final Logger log = Logger.getLogger(ListArgument.class);
 	
-	static
-	{
+	static {
 		log.setLevel(Level.DEBUG);
 	}
 	
-	public ListArgument(String name, String description, boolean multi) 
-	{
+	public ListArgument(String name, String description, boolean multi) {
 		super(name, description, multi);
 	}
 
-	public ListArgument(String name, String description) 
-	{
+	public ListArgument(String name, String description) {
 		this(name, description, false);
 	}
 
 	@Override
-	final public String complete(String partial) {
-		final List<T> result = new ArrayList<T>();
+	final public void complete(CompletionInfo completion, String partial) {
 		for (T choice : getValues()) {
 			if (isPartOfArgument(choice, partial)) {
-				result.add(choice);
+				completion.addCompletion(choice.toString());
 			}
 		}
-
-		Collections.sort(result, this);
-		return completeFromList(partial, result);
 	}
-	
-    final protected String completeFromList(String partial, Collection<T> list) {
-    	log.debug("list.size()="+list.size());
-        if (list.size() == 0) // none found
-                return partial;
-
-        if (list.size() == 1) return toStringArgument(list.iterator().next()) + " ";
-
-        // list matching
-        list(list);
-
-        // return the common part, i.e. complete as much as possible
-        return common(list);
-    }	
     
-    final protected String common(Collection<T> items) {
-        if (items.isEmpty())
-        	return "";
-        
-        StringBuilder result = new StringBuilder(toStringArgument(items.iterator().next()));
-        for (T item : items) {
-            while ((result.length() != 0) && 
-            	   !isPartOfArgument(item, result.toString())) 
-            {
-                // shorten the result until it matches
-            	// remove the last character :
-                result.setLength(result.length() - 1);
-            }
-        }
-        log.debug("\nresult="+result);
-        return result.toString();
-    }
-    
-    final public void list(Collection<T> items) {
-    	String[] result = new String[items.size()];
-    	int i = 0;
-    	for(T item : items)
-    	{
-    		result[i] = item.toString();
-    		i++;
-    	}
-    	list(result);        
-    }
-    
-    final public T getArgValue(ParsedArguments cmdLine)
-    {
+    final public T getArgValue(ParsedArguments cmdLine) {
 		String value = getValue(cmdLine);
-		if(value == null)
-		{
+		if (value == null) {
 			return null;
 		}
-		
 		return getArgValue(value);
     }
 
@@ -106,9 +51,9 @@ public abstract class ListArgument<T> extends Argument
 
 	@Override
 	final protected boolean isValidValue(String value) {
-		if ((value == null) || "".equals(value))
+		if ((value == null) || "".equals(value)) {
 			return true;
-
+		}
 		try {
 			return (getArgValue(value) != null);
 		} catch (IllegalArgumentException e) {

@@ -54,10 +54,6 @@ public class IntegerArgument extends Argument {
 		this.max = max;
 	}
 	
-	public String complete(String partial) {
-		return partial;
-	}	
-	
 	@Override
 	protected boolean isValidValue(String value) {
 		int val = -1;

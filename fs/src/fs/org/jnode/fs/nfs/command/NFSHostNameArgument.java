@@ -9,6 +9,7 @@ import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jnode.driver.console.CompletionInfo;
 import org.jnode.net.nfs.Protocol;
 import org.jnode.net.nfs.nfs2.mount.ExportEntry;
 import org.jnode.net.nfs.nfs2.mount.Mount1Client;
@@ -26,22 +27,18 @@ public class NFSHostNameArgument extends Argument {
         super(name, description);
     }
 
-    public String complete(String partial) {
-
-        if (partial == null) {
-            return null;
-        }
+    public void complete(CompletionInfo completion, String partial) {
 
         int index = partial.indexOf(':');
         if (index == -1) {
-            return partial;
+            return;
         }
 
         final InetAddress host;
         try {
             host = InetAddress.getByName(partial.substring(0, index));
         } catch (UnknownHostException e) {
-            return partial;
+            return;
         }
 
         String partialDirectory = partial.substring(index + 1);
@@ -50,12 +47,10 @@ public class NFSHostNameArgument extends Argument {
         try {
             exportEntryList = AccessController
                     .doPrivileged(new PrivilegedExceptionAction<List<ExportEntry>>() {
-                        public List<ExportEntry> run() throws IOException,
-                                MountException {
-
-                            Mount1Client client = new Mount1Client(host,
-                                    Protocol.TCP, -1, -1);
-
+                        public List<ExportEntry> run() 
+                        throws IOException, MountException {
+                            Mount1Client client = 
+                                new Mount1Client(host, Protocol.TCP, -1, -1);
                             List<ExportEntry> exportEntryList;
                             try {
                                 exportEntryList = client.export();
@@ -64,34 +59,24 @@ public class NFSHostNameArgument extends Argument {
                                     try {
                                         client.close();
                                     } catch (IOException e) {
-                                        
+                                        // squash
                                     }
                                 }
                             }
                             return exportEntryList;
-
                         }
                     });
         } catch (PrivilegedActionException e) {
-
-            return partial;
+            return;
         }
 
-        List<String> valueList = new ArrayList<String>();
         for (int i = 0; i < exportEntryList.size(); i++) {
             ExportEntry exportEntry = exportEntryList.get(i);
-
             if (exportEntry.getDirectory().startsWith(partialDirectory)) {
-                valueList.add(partial.substring(0, index) + ":"
+                completion.addCompletion(partial.substring(0, index) + ":"
                         + exportEntry.getDirectory());
             }
-
         }
-
-        String completed = complete(partial, valueList);
-
-        return completed;
-
     }
 
     public InetAddress getAddress(ParsedArguments args)

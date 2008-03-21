@@ -21,6 +21,7 @@
  
 package org.jnode.shell.help.argument;
 
+import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Argument;
 
@@ -37,9 +38,10 @@ public class StringArgument extends Argument {
 		super(name, description);
 	}
 
-	public String complete(String partial) {
+	public void complete(CompletionInfo completion, String partial) {
 		String result = CommandLine.doEscape(partial, true);	// force quote
-		return result.substring(0, result.length() - 1);	// remove ending quote
+		result = result.substring(0, result.length() - 1);	// remove ending quote
+		completion.addCompletion(result, true);
 	}
 	
 }

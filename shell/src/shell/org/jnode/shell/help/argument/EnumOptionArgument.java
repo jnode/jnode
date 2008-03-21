@@ -21,16 +21,13 @@
 
 package org.jnode.shell.help.argument;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.reflect.Array;
 
+import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
-
-import java.lang.Enum;
-import java.lang.reflect.Array;
 
 /**
  * @author qades
@@ -61,16 +58,13 @@ public class EnumOptionArgument<T extends Enum<?>> extends Argument {
             option.describe(help);
     }
 
-    public String complete(String partial) {
-        final List<String> opts = new ArrayList<String>();
+    public void complete(CompletionInfo completion, String partial) {
         for (EnumOption<T> option : options) {
             final String name = option.getName();
             if (name.startsWith(partial)) {
-                opts.add(name);
+                completion.addCompletion(name);
             }
         }
-
-        return complete(partial, opts);
     }
 
     public final T getEnum(ParsedArguments args, Class<T> type) {
@@ -121,7 +115,7 @@ public class EnumOptionArgument<T extends Enum<?>> extends Argument {
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append("Options: ");
-        for (EnumOption option : options) {
+        for (EnumOption<?> option : options) {
             sb.append(", ");
             sb.append(option.getName());
         }

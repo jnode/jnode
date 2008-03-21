@@ -31,6 +31,7 @@ import java.util.Set;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
@@ -110,19 +111,13 @@ public class SuiteCommand {
             super(name, description);
         }
 
-        public String complete(String partial) {
-            final List<String> categories = new ArrayList<String>();
+        public void complete(CompletionInfo completion, String partial) {
             Set<String> availCategories = TestManager.getInstance().getCategories();
-            
-        	for(String availCategory : availCategories)
-        	{
-        		if(availCategory.startsWith(partial))
-        		{
-        			categories.add(availCategory);
+        	for (String availCategory : availCategories) {
+        		if (availCategory.startsWith(partial)) {
+        			completion.addCompletion(availCategory);
         		}
         	}
-
-            return complete(partial, categories);
         }
         
         protected boolean isValidValue(String category) {

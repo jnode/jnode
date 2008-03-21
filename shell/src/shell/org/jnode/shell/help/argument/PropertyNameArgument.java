@@ -21,9 +21,7 @@
  
 package org.jnode.shell.help.argument;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.help.Argument;
 
 /**
@@ -39,16 +37,13 @@ public class PropertyNameArgument extends Argument {
         super(name, description);
     }
 
-    public String complete(String partial) {
-        final List<String> props = new ArrayList<String>();
+    public void complete(CompletionInfo completion, String partial) {
         for (Object key : System.getProperties().keySet()) {
             final String prop = (String) key;
             if (prop.startsWith(partial)) {
-                props.add(prop);
+                completion.addCompletion(prop);
             }
         }
-
-        return complete(partial, props);
     }
 
 }

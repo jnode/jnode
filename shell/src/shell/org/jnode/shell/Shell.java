@@ -43,11 +43,6 @@ public interface Shell extends InputCompleter {
     public SyntaxManager getSyntaxManager();
 
     /**
-     * Shell callback to register a list of choices for command line completion.
-     */
-    public void list(String[] items);
-
-    /**
      * Gets the shell's command InputHistory object.  Unlike getInputHistory,
      * this method is not modal.
      */

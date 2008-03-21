@@ -21,10 +21,10 @@
  
 package org.jnode.shell.help.argument;
 
-import java.util.HashSet;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
+import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.help.Argument;
 
 /**
@@ -40,8 +40,7 @@ public class ThreadNameArgument extends Argument {
 		super(name, description);
 	}
 
-    public String complete(final String partial) {
-        final HashSet<String> names = new HashSet<String>();
+    public void complete(final CompletionInfo completion, final String partial) {
         ThreadGroup grp = Thread.currentThread().getThreadGroup();
         while (grp.getParent() != null) {
             grp = grp.getParent();
@@ -50,22 +49,21 @@ public class ThreadNameArgument extends Argument {
         final ThreadGroup grp_f = grp;
         AccessController.doPrivileged(new PrivilegedAction<Void>() {
             public Void run() {
-                findList(grp_f, partial, names);
+                findList(grp_f, partial, completion);
                 return null;
             }
         });
-
-        return complete(partial, names);
+        
     }
 
-	private void findList(ThreadGroup grp, String partial, HashSet<String> names) {
+	private void findList(ThreadGroup grp, String partial, CompletionInfo completion) {
 		final Thread[] ts = new Thread[grp.activeCount()];
 		grp.enumerate(ts);
 		for (Thread t : ts) {
 			if (t != null) {
 				final String name = t.getName();
 				if (name.startsWith(partial)) {
-					names.add(name);
+					completion.addCompletion(name);
 				}
 			}
 		}
@@ -73,7 +71,7 @@ public class ThreadNameArgument extends Argument {
 		grp.enumerate(gs);
 		for (ThreadGroup g : gs) {
 			if (g != null) {
-				findList(g, partial, names);
+				findList(g, partial, completion);
 			}
 		}
 	}
