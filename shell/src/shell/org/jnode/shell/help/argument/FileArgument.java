@@ -24,10 +24,10 @@ package org.jnode.shell.help.argument;
 import java.io.File;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.PathnamePattern;
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.ParsedArguments;
@@ -85,11 +85,11 @@ public class FileArgument extends Argument {
         return files.toArray(new File[files.size()]);
     }
 
-    public String complete(String partial) {
+    public void complete(CompletionInfo completion, String partial) {
         // Get last full directory
         final int idx = partial.lastIndexOf(File.separatorChar);
         final String dir;
-        if(idx == 0){
+        if (idx == 0) {
             dir = String.valueOf(File.separatorChar);
         } else if (idx > 0) {
             dir = partial.substring(0, idx);
@@ -109,28 +109,21 @@ public class FileArgument extends Argument {
                         }
                     }
                 });
-        if (names == null) {
-            return partial;
-        } else if (names.length == 0) {
-            return partial;
-        } else {
-            final ArrayList<String> list = new ArrayList<String>(names.length);
+        if (names != null && names.length > 0) {
             final String prefix = (dir.length() == 0) ? "" :
                     dir.equals("/") ? "/" : dir + File.separatorChar;
             for (String n : names) {
-                final String name = prefix + n;
+                String name = prefix + n;
                 if (name.startsWith(partial)) {
-                    list.add(name);
+                    if (new File(f, name).isDirectory()) {
+                        name += File.separatorChar;
+                        completion.addCompletion(name, true);
+                    }
+                    else {
+                        completion.addCompletion(name);
+                    }
                 }
             }
-            String completed = complete(partial, list);
-            if (completed.endsWith(" ")) {
-            	String path = completed.substring(0, completed.length() - 1);
-            	if (new File(path).isDirectory()) {
-            		completed = path + File.separatorChar;
-            	}
-            }
-            return completed;
         }
     }
 }

@@ -22,8 +22,6 @@
 package org.jnode.shell;
 
 import java.io.Closeable;
-import java.util.Collections;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.apache.log4j.Logger;
@@ -34,7 +32,6 @@ import org.jnode.shell.help.HelpException;
 import org.jnode.shell.help.Parameter;
 
 import org.jnode.shell.syntax.CommandSyntaxException;
-import org.jnode.shell.syntax.AliasArgument;
 import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.ArgumentBundle;
 import org.jnode.shell.syntax.ArgumentSyntax;
@@ -404,27 +401,30 @@ public class CommandLine implements Completable, Iterable<String> {
          * This field holds the "cooked" representation of command line token.
          * By the time we reach the CommandLine, all shell meta-characters
          * should have been processed so that the value of the field represents
-         * a command name or argument.
+         * a command name or argument.  
          */
         public final String token;
 
         /**
          * This field represents the type of the token. The meaning is
-         * interpreter specific.
+         * interpreter specific.  The value -1 indicates that no token type is 
+         * available.
          */
         public final int tokenType;
 
         /**
          * This field denotes the character offset of the first character of
          * this token in the source character sequence passed to the
-         * interpreter.
+         * interpreter.  The value -1 indicates that no source start position is 
+         * available.
          */
         public final int start;
 
         /**
          * This field denotes the character offset + 1 for the last character of
          * this token in the source character sequence passed to the
-         * interpreter.
+         * interpreter.  The value -1 indicates that no source end position is 
+         * available.
          */
         public final int end;
         
@@ -442,7 +442,7 @@ public class CommandLine implements Completable, Iterable<String> {
         }
         
         public Token(String token) {
-            this(token, 0, 0, 0, false);
+            this(token, -1, -1, -1, false);
         }
 
 		@Override
@@ -623,9 +623,7 @@ public class CommandLine implements Completable, Iterable<String> {
             throws CompletionException {
         Logger log = Logger.getLogger(CommandLine.class);
         String cmd = (commandToken == null) ? "" : commandToken.token.trim();
-        String result = null;
         if (!cmd.equals("") && (argumentTokens.length > 0 || argumentAnticipated)) {
-            log.debug("doing argument completion");
             try {
                 // get command's help info
                 CommandInfo cmdClass = shell.getCommandClass(cmd);
@@ -639,18 +637,16 @@ public class CommandLine implements Completable, Iterable<String> {
                 }
 
                 // perform completion of the command arguments based on the
-                // command's
-                // help info / syntax ... if any.
-                result = info.complete(this);
-
+                // command's help info / syntax ... if any.
+                info.complete(completion, this);
             } catch (ClassNotFoundException ex) {
                 throw new CompletionException("Command class not found", ex);
             }
         } else {
             // do completion on the command name
-            log.debug("doing command name completion");
-            result = defaultArg.complete(cmd);
+            log.debug("completing '" + cmd + "'");
+            defaultArg.complete(completion, cmd);
+            completion.setCompletionStart(commandToken == null ? 0 : commandToken.start);
         }
-        completion.setCompleted(result);
     }
 }

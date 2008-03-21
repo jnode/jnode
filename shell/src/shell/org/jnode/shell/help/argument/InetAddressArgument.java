@@ -21,7 +21,8 @@
 
 package org.jnode.shell.help.argument;
 
-import java.net.*;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.ParsedArguments;

@@ -21,6 +21,8 @@
  
 package org.jnode.shell.help;
 
+import org.jnode.driver.console.CompletionInfo;
+
 /**
  * @author qades
  */
@@ -43,7 +45,7 @@ abstract class CommandLineElement {
 
 	public abstract String format();
 	public abstract void describe(Help help);
-	public abstract String complete(String partial);
+	public abstract void complete(CompletionInfo completion, String partial);
 
 	/** 
 	 * Indicates if the element is satisfied.

@@ -18,98 +18,150 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.driver.console;
+
+import java.util.Collections;
+import java.util.TreeSet;
+import java.util.SortedSet;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
+ * @author crawley@jnode.org
  */
 public class CompletionInfo {
-    private String[] items = null;
+    private static final SortedSet<String> NO_COMPLETIONS =
+            Collections.unmodifiableSortedSet(new TreeSet<String>());
 
-    private String completed = null;
+    private TreeSet<String> completions;
 
-    private boolean newPrompt = false;
-
-    /**
-     * @return Returns the completed.
-     */
-    public String getCompleted() {
-        return completed;
-    }
+    private int completionStart = -1;
 
     /**
-     * @param completed
-     *            The completed to set.
-     */
-    public void setCompleted(String completed) {
-        this.completed = completed;
-    }
-
-    /**
-     * get the possible completions
+     * This method is called to register a possible completion. A null or empty
+     * completion string will be quietly ignored.
      * 
-     * @return Returns the items.
+     * @param completion the completion string
+     * @param partial if <code>true</code>, further completions of the
+     *            completion string may be possible.
      */
-    public String[] getItems() {
-        return items;
+    public void addCompletion(String completion, boolean partial) {
+        if (completion == null || completion.length() == 0) {
+            return;
+        }
+        if (completions == null) {
+            completions = new TreeSet<String>();
+        }
+        if (!partial) {
+            completion += ' ';
+        }
+        completions.add(completion);
     }
 
     /**
-     * Specify the possible completions
+     * This method is called to register a completion than cannot be completed
+     * further. A null or empty completion string will be quietly ignored.
      * 
-     * @param items
-     *            The items to set.
+     * @param completion the completion string
      */
-    public void setItems(String[] items) {
-        this.items = items;
-        this.completed = null;
-        this.newPrompt = true;
+    public void addCompletion(String completion) {
+        addCompletion(completion, false);
     }
 
     /**
-     * Do we have more than one possible completion ?
+     * Retrieve the completion details.
      * 
-     * @return
+     * @return a TreeSet consisting of all possible completions
      */
-    public boolean hasItems() {
-        return items != null;
+    public SortedSet<String> getCompletions() {
+        return completions == null ? NO_COMPLETIONS : completions;
     }
 
     /**
-     * Specify if we need a new prompt or not
-     * 
-     * @param newPrompt
+     * Render for debug purposes
      */
-    public void setNewPrompt(boolean newPrompt) {
-        this.newPrompt = newPrompt;
-    }
-
-    /**
-     * @return true if we need to display a new prompt
-     */
-    public boolean needNewPrompt() {
-        return newPrompt;
-    }
-
     public String toString() {
         StringBuilder sb = new StringBuilder("CompletionInfo{");
-        sb.append("completed=").append(completed == null ? "null" : completed);
-        sb.append(",items=");
-        if (items == null) {
+        sb.append("competionStart=").append(completionStart);
+        sb.append(",completions=");
+        if (completions == null) {
             sb.append("null");
-        }
-        else {
-            sb.append("[");
-            for (int i = 0; i < items.length; i++) {
-                if (i > 0) {
+        } else {
+            sb.append("{");
+            boolean first = true;
+            for (String completion : completions) {
+                if (first) {
+                    first = false;
+                } else {
                     sb.append(",");
                 }
-                sb.append(items[i] == null ? "null" : items[i]);
+                sb.append(completion);
             }
             sb.append("]");
         }
-        sb.append(",newPrompt=").append(newPrompt).append("}");
         return sb.toString();
+    }
+
+    /**
+     * The completion start is the offset in the original string of the first
+     * character to be replaced with the 'completed'.
+     * 
+     * @return the completion start position, or <code>-1</code>
+     */
+    public int getCompletionStart() {
+        return completionStart;
+    }
+
+    /**
+     * Set the completion start position. This can only be set once. After that,
+     * attempts to change the start position result in an
+     * IllegalArgumentException.
+     * 
+     * @param completionStart
+     */
+    public void setCompletionStart(int completionStart) {
+        if (this.completionStart != completionStart) {
+            if (this.completionStart != -1) {
+                throw new IllegalArgumentException(
+                        "completionStart cannot be changed");
+            }
+            this.completionStart = completionStart;
+        }
+    }
+
+    /**
+     * Get the combined completion string. If there are multiple alternatives,
+     * this will be the longest common left substring of the alternatives. If
+     * the substring is zero length, or if there were no alternatives in the
+     * first place, the result is <code>null</code>.
+     * 
+     * @return the combined completion, or <code>null</code>.
+     */
+    public String getCompletion() {
+        if (completions == null) {
+            return null;
+        }
+        int nos = completions.size();
+        if (nos == 0) {
+            return null;
+        }
+        if (nos == 1) {
+            return completions.first();
+        }
+        String common = completions.first();
+        for (String completion : completions) {
+            if (common != completion && !completion.startsWith(common)) {
+                for (int i = 0; i < common.length(); i++) {
+                    if (common.charAt(i) != completion.charAt(i)) {
+                        if (i == 0) {
+                            return null;
+                        }
+                        common = common.substring(0, i);
+                        break;
+                    }
+                }
+            }
+        }
+        return common;
     }
 }

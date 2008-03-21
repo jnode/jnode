@@ -21,15 +21,13 @@
  
 package org.jnode.shell.help.argument;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.naming.NameNotFoundException;
 
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceAPI;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceNotFoundException;
+import org.jnode.driver.console.CompletionInfo;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.ParsedArguments;
@@ -71,8 +69,7 @@ public class DeviceArgument extends Argument {
 		}
 	}
 
-	public String complete(String partial) {
-        final List<String> devIds = new ArrayList<String>();
+	public void complete(CompletionInfo completion, String partial) {
         try {
             // get the alias manager
             final DeviceManager devMgr = InitialNaming
@@ -85,13 +82,12 @@ public class DeviceArgument extends Argument {
             	
                 final String devId = dev.getId();
                 if (devId.startsWith(partial)) {
-                    devIds.add(devId);
+                    completion.addCompletion(devId);
                 }
             }
-            return complete(partial, devIds);
         } catch (NameNotFoundException ex) {
             // should not happen!
-            return partial;
+            return;
         }
     }
 }

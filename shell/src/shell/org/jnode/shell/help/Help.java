@@ -25,6 +25,7 @@ import java.lang.reflect.Field;
 
 import javax.naming.NamingException;
 
+import org.jnode.driver.console.CompletionInfo;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginUtils;
 import org.jnode.shell.CommandLine;
@@ -174,18 +175,17 @@ public abstract class Help {
             Help.getHelp().help(this, command);
         }
 
-        public String complete(CommandLine partial) throws CompletionException {
+        public String complete(CompletionInfo completion, CommandLine partial) 
+        throws CompletionException {
         	// The completion strategy is to try to complete each of the
         	// syntaxes, and return the longest completion string.
             String max = "";
             boolean foundCompletion = false;
             for (Syntax syntax : syntaxes) {
                 try {
-                    final String s = syntax.complete(partial);
+                    syntax.complete(completion, partial);
                     foundCompletion = true;
-                    if (s.length() > max.length()) {
-                        max = s;
-                    }
+                    
                 } catch (CompletionException ex) {
                     // just try the next syntax
                 }

@@ -22,6 +22,8 @@
 package org.jnode.driver.console.textscreen;
 
 import java.util.Arrays;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.driver.console.InputCompleter;
@@ -158,63 +160,54 @@ class Line {
         }
     }
 
-    public CompletionInfo complete() {
+    public boolean complete() {
         CompletionInfo info = null;
         InputCompleter completer = console.getCompleter();
-        if (posOnCurrentLine != currentLine.length()) {
-            String ending = currentLine.substring(posOnCurrentLine);
-            info = completer.complete(currentLine.substring(0, posOnCurrentLine));
-            printList(info);
-            if (info.getCompleted() != null) {
-                setContent(info.getCompleted() + ending);
-                posOnCurrentLine = currentLine.length() - ending.length();
-            }
-        } else {
-            info = completer.complete(currentLine.toString());
-            printList(info);
-            if (info.getCompleted() != null) {
-                setContent(info.getCompleted());
-                posOnCurrentLine = currentLine.length();
-            }
+        String ending = 
+            posOnCurrentLine != currentLine.length() ? currentLine.substring(posOnCurrentLine) : "";
+        info = completer.complete(currentLine.substring(0, posOnCurrentLine));
+        boolean res = printList(info);
+        String completion = info.getCompletion();
+        if (completion != null) {
+            int startPos = info.getCompletionStart();
+            setContent(currentLine.substring(0, startPos) + completion + ending);         
+            // (This is the updated line's length ...)
+            posOnCurrentLine = currentLine.length() - ending.length();
         }
-
-        return info;
+        return res;
     }
 
-    protected void printList(CompletionInfo info) {
-        if ((info != null) && info.hasItems()) {
-            int oldPosOnCurrentLine = posOnCurrentLine;
-            moveEnd();
-            refreshCurrentLine();
-
-            out.println();
-            String[] list = info.getItems();
-            Arrays.sort(list);
-            
-            final int minItemsToSplit = 5;
-            if(list.length > minItemsToSplit)
-            {
-	            list = splitInColumns(list); 
-            }
-
-        	// display items column (may be single or multiple columns)
-            for (String item : list)
-            {               	
-            	// item may actually be a single item or in fact multiple items
-            	if((item.length() % SCREEN_WIDTH) == 0)
-            	{
-            		// we are already at the first column of the next line 
-            		out.print(item);
-            	}
-            	else
-            	{
-            		// we aren't at the first column of the next line
-            		out.println(item);
-            	}
-            }
-
-            posOnCurrentLine = oldPosOnCurrentLine;
+    protected boolean printList(CompletionInfo info) {
+        SortedSet<String> completions = info.getCompletions();
+        if (completions == null || completions.size() <= 1) {
+            return false;
         }
+        int oldPosOnCurrentLine = posOnCurrentLine;
+        moveEnd();
+        refreshCurrentLine();
+
+        out.println();
+        String[] list = completions.toArray(new String[completions.size()]);
+
+        final int minItemsToSplit = 5;
+        if (list.length > minItemsToSplit) {
+            list = splitInColumns(list); 
+        }
+
+        // display items column (may be single or multiple columns)
+        for (String item : list) {               	
+            // item may actually be a single item or in fact multiple items
+            if (item.length() % SCREEN_WIDTH == 0) {
+                // we are already at the first column of the next line 
+                out.print(item);
+            }
+            else {
+                // we aren't at the first column of the next line
+                out.println(item);
+            }
+        }
+        posOnCurrentLine = oldPosOnCurrentLine;
+        return true;
     }
     
     protected String[] splitInColumns(String[] items)
@@ -223,10 +216,8 @@ class Line {
         
         // compute the maximum width of items
         int maxWidth = 0;
-        for(String item : items)
-        {
-        	if(item.length() > maxWidth)
-        	{
+        for (String item : items) {
+        	if (item.length() > maxWidth) {
         		maxWidth = item.length();
         	}
         }
@@ -239,21 +230,18 @@ class Line {
         String[] lines = new String[nbLines];
     	StringBuilder line = new StringBuilder(SCREEN_WIDTH);
     	int lineNum = 0;
-        for(int itemNum = 0 ; itemNum < items.length ; )
-        {
-        	for(int c = 0 ; c < nbColumns ; c++)
-        	{
+        for (int itemNum = 0 ; itemNum < items.length ; ) {
+        	for (int c = 0 ; c < nbColumns ; c++) {
         		final String item = items[itemNum++];
         		line.append(item);
         		
         		// add some blanks
         		final int nbBlanks = columnWidth - item.length();
-        		for(int i = 0 ; i < nbBlanks ; i++)
-        		{
+        		for (int i = 0 ; i < nbBlanks ; i++) {
         			line.append(' ');
         		}
 
-        		if(itemNum >= items.length) break;
+        		if (itemNum >= items.length) break;
         	}
         	
         	lines[lineNum++] = line.toString(); 

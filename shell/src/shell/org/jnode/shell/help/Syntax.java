@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.apache.log4j.Logger;
+import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.argument.OptionArgument;
 
@@ -62,9 +63,10 @@ public class Syntax {
         return params;
     }
 
-    public String complete(CommandLine partial) throws CompletionException {
+    public void complete(CompletionInfo completion, CommandLine partial) 
+    throws CompletionException {
         Parameter param;
-        String value;
+        CommandLine.Token value;
         int tokenType;
 
         if (DEBUG) LOGGER.debug("Syntax.complete: this.description = " + this.description);
@@ -81,7 +83,7 @@ public class Syntax {
                 partial.isArgumentAnticipated());
 
         if (param != null && partial.isArgumentAnticipated()) {
-            value = "";
+            value = null;
             tokenType = CommandLine.LITERAL;
         } else {
             param = visitor.getLastParam();
@@ -91,29 +93,24 @@ public class Syntax {
         
         if (param == null) {
             if (DEBUG) LOGGER.debug("Syntax.complete: no param");
-            return "";
+            // completion.addCompletion(" ");
+            return;
         }
         if (DEBUG) LOGGER.debug("Syntax.complete: param = " + param.format() + ", value = " + value +
                 ", tokenType = " + tokenType);
 
-        String res = "";
         if (param.hasArgument()) {
-            res = param.complete(value);
-            // FIXME - we need to use the correct escaping syntax ... and ideally
-            // we need to know what escaping that was used in the original argument
-            // we are trying to complete.
-            if (res == null) {
-                res = param.isAnonymous() ? "" : ("-" + param.getName() + " ");
+            if (value != null) {
+                param.complete(completion, value.token);
+                completion.setCompletionStart(value.start);
             }
-            else if (tokenType == CommandLine.STRING) {
-                res = CommandLine.doEscape(res, true);
+            else {
+                param.complete(completion, "");
             }
         }
-        if (partial.isArgumentAnticipated()) {
-            res = " " + res;
+        else if (!param.isAnonymous()) {
+            completion.addCompletion("-" + param.getName());
         }
-        if (DEBUG) LOGGER.debug("Syntax.complete: returning '" + res + "'");
-        return res;
     }
 
     synchronized ParsedArguments parse(CommandLine cmdLine) throws SyntaxErrorException {
@@ -151,23 +148,23 @@ public class Syntax {
         final ParameterIterator paramIterator = new ParameterIterator();
         
         // FIXME - should use a Token iterator here ...
-        final Iterator<String> it = cmdLine.iterator();
+        final Iterator<CommandLine.Token> it = cmdLine.tokenIterator();
         boolean acceptNames = true;
-        String s = it.hasNext() ? it.next() : null;
-        while (s != null) {
-            if (DEBUG) LOGGER.debug("Syntax.visitor: arg '" + s + "'");
+        CommandLine.Token token = it.hasNext() ? it.next() : null;
+        while (token != null) {
+            if (DEBUG) LOGGER.debug("Syntax.visitor: arg '" + token + "'");
             if (param == null) {
                 // Trying to match a Parameter.
-                if (acceptNames && "--".equals(s)) {
+                if (acceptNames && "--".equals(token)) {
                     acceptNames = false;
-                    s = it.hasNext() ? it.next() : null;
+                    token = it.hasNext() ? it.next() : null;
                 }
                 else if (paramIterator.hasNext()) {
                     param = (Parameter) paramIterator.next();
                     // FIXME real hacky stuff here!!  I'm trying to stop anonymous parameters matching
                     // "-name" ... except when they should ...
                     if (param.isAnonymous()) {
-                        if (s.charAt(0) != '-' || param.getArgument() instanceof OptionArgument) {
+                        if (token.token.charAt(0) != '-' || param.getArgument() instanceof OptionArgument) {
                             if (DEBUG) LOGGER.debug("Syntax.visitor: trying anonymous param " + param.format());
                             visitor.visitParameter(param);
                         }
@@ -175,10 +172,10 @@ public class Syntax {
                             param = null;
                         }
                     }
-                    else if (acceptNames && s.equals("-" + param.getName())) {
+                    else if (acceptNames && token.equals("-" + param.getName())) {
                         if (DEBUG) LOGGER.debug("Syntax.visitor: trying named param " + param.format());
                         visitor.visitParameter(param);
-                        s = it.hasNext() ? it.next() : null;
+                        token = it.hasNext() ? it.next() : null;
                     }
                     else {
                         if (DEBUG) LOGGER.debug("Syntax.visitor: skipping named param " + param.format());
@@ -186,8 +183,8 @@ public class Syntax {
                     }
                 }
                 else {
-                    if (DEBUG) LOGGER.debug("Syntax.visitor: no param for '" + s + "'");
-                    throw new SyntaxErrorException("Unexpected argument '" + s + "'");
+                    if (DEBUG) LOGGER.debug("Syntax.visitor: no param for '" + token + "'");
+                    throw new SyntaxErrorException("Unexpected argument '" + token + "'");
                 }
             }
             if (param != null) {
@@ -197,17 +194,17 @@ public class Syntax {
                 if (arg == null) {
                     visitor.visitValue(null, last, CommandLine.LITERAL);
                 }
-                else if (s != null) {
-                    String value = visitor.visitValue(s, last, CommandLine.LITERAL);
+                else if (token != null) {
+                    CommandLine.Token value = visitor.visitValue(token, last, CommandLine.LITERAL);
                     if (visitor.isValueValid(arg, value, last)) {
-                        arg.setValue(value);
-                        s = it.hasNext() ? it.next() : null;
+                        arg.setValue(value.token);
+                        token = it.hasNext() ? it.next() : null;
                     } else if (!param.isOptional()) {
-                        if (DEBUG) LOGGER.debug("Syntax.visitor: bad value '" + s + 
+                        if (DEBUG) LOGGER.debug("Syntax.visitor: bad value '" + token + 
                                 "' for mandatory param " + param.format());
                         throw new SyntaxErrorException("Invalid value for argument");
                     } else {
-                        if (DEBUG) LOGGER.debug("Syntax.visitor: bad value '" + s + 
+                        if (DEBUG) LOGGER.debug("Syntax.visitor: bad value '" + token + 
                                 "' optional param " + param.format());
                         if (DEBUG) LOGGER.debug("Syntax.visitor: clearing param");
                         param = null;
@@ -254,14 +251,14 @@ public class Syntax {
 
         public void visitParameter(Parameter p);
 
-        public String visitValue(String s, boolean last, int tokenType);
+        public CommandLine.Token visitValue(CommandLine.Token token, boolean last, int tokenType);
 
-        public boolean isValueValid(Argument arg, String value, boolean last);
+        public boolean isValueValid(Argument arg, CommandLine.Token value, boolean last);
     }
 
     private class CompletionVisitor implements CommandLineVisitor {
         private Parameter param = null;
-        private String value;
+        private CommandLine.Token value;
         private int tokenType;
         private boolean last;
 
@@ -276,20 +273,21 @@ public class Syntax {
             this.tokenType = 0;
         }
 
-        public String visitValue(String s, boolean last, int tokenType) {
-            if (DEBUG) LOGGER.debug("CompletionVisitor: value = '" + s + "', " + last + ", " + tokenType);
+        public CommandLine.Token visitValue(
+                CommandLine.Token token, boolean last, int tokenType) {
+            if (DEBUG) LOGGER.debug("CompletionVisitor: value = '" + token.token + "', " + last + ", " + tokenType);
             this.last = last;
             if (last) {
-                this.value = s;
+                this.value = token;
                 this.tokenType = tokenType;
             }
-            return s;
+            return token;
         }
 
-        public boolean isValueValid(Argument arg, String value, boolean last) {
+        public boolean isValueValid(Argument arg, CommandLine.Token value, boolean last) {
             if (DEBUG) LOGGER.debug("CompletionVisitor: isValueValid " + arg.format() +
                     ", " + last + ", " + tokenType);
-            boolean res = last || arg.isValidValue(value);
+            boolean res = last || arg.isValidValue(value.token);
             if (DEBUG) LOGGER.debug("CompletionVisitor: isValueValid -> " + res);
             return res;
         }
@@ -298,7 +296,7 @@ public class Syntax {
             return last ? this.param : null;
         }
 
-        public String getLastValue() {
+        public CommandLine.Token getLastValue() {
             return last ? this.value : null;
         }
 
@@ -320,8 +318,8 @@ public class Syntax {
             this.param = p;
         }
 
-        public String visitValue(String s, boolean last, int tokenType) {
-            if (last && "".equals(s)) return null;
+        public CommandLine.Token visitValue(CommandLine.Token s, boolean last, int tokenType) {
+            if (last && s == null) return null;
             valued = true;
             return s;
         }
@@ -345,12 +343,12 @@ public class Syntax {
             valued = false;
         }
 
-        public boolean isValueValid(Argument arg, String value, boolean last) {
-            return arg.isValidValue(value);
+        public boolean isValueValid(Argument arg, CommandLine.Token value, boolean last) {
+            return arg.isValidValue(value.token);
         }
     }
 
-    class ParameterIterator implements Iterator {
+    class ParameterIterator implements Iterator<Parameter> {
         final Parameter[] params = Syntax.this.params;
         final int length = params.length;
 
@@ -363,7 +361,7 @@ public class Syntax {
             return (nextParamsIdx < length);
         }
 
-        public Object next() {
+        public Parameter next() {
             if (nextParamsIdx < length) {
                 return params[nextParamsIdx++];
             } else {

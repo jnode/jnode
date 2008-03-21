@@ -21,11 +21,9 @@
  
 package org.jnode.shell.help.argument;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.naming.NameNotFoundException;
 
+import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.ShellUtils;
 import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.help.Argument;
@@ -43,8 +41,7 @@ public class AliasArgument extends Argument {
         super(name, description);
     }
 
-    public String complete(String partial) {
-        final List<String> aliases = new ArrayList<String>();
+    public void complete(CompletionInfo completion, String partial) {
         try {
             // get the alias manager
             final AliasManager aliasMgr = ShellUtils.getShellManager()
@@ -53,14 +50,12 @@ public class AliasArgument extends Argument {
             // collect matching aliases
             for (String alias : aliasMgr.aliases()) {
                 if (alias.startsWith(partial)) {
-                    aliases.add(alias);
+                    completion.addCompletion(alias);
                 }
             }
-
-            return complete(partial, aliases);
         } catch (NameNotFoundException ex) {
             // should not happen!
-            return partial;
+            return;
         }
     }
 }

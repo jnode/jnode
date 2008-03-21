@@ -223,8 +223,7 @@ implements KeyboardListener, FocusListener, DeviceListener {
         // if it's the tab key, we want to trigger command line completion
         case '\t':
         	if (completer != null) {
-        		CompletionInfo completion = currentLine.complete();
-        		if (completion.needNewPrompt()) {
+        		if (currentLine.complete()) {
         			currentLine.start(true);
         		}
         		out.print(currentPrompt);

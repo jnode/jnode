@@ -21,11 +21,11 @@
  
 package org.jnode.shell.help.argument;
 
-import org.jnode.shell.help.Argument;
-import org.jnode.shell.help.ParsedArguments;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+
+import org.jnode.shell.help.Argument;
+import org.jnode.shell.help.ParsedArguments;
 
 /**
  * @author Martin Hartvig

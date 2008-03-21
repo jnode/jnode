@@ -21,9 +21,7 @@
  
 package org.jnode.shell.help.argument;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
@@ -60,16 +58,13 @@ public class OptionArgument extends Argument {
     }
 
     @Override
-    public String complete(String partial) {
-        final List<String> opts = new ArrayList<String>();
+    public void complete(CompletionInfo completion, String partial) {
         for (Option option : options) {
             final String name = option.getName();
             if (name.startsWith(partial)) {
-                opts.add(name);
+                completion.addCompletion(name);
             }
         }
-
-        return complete(partial, opts);
     }
 
     /**

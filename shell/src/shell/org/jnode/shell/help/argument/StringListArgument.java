@@ -2,8 +2,6 @@ package org.jnode.shell.help.argument;
 
 import java.util.Collection;
 
-import org.jnode.shell.help.ParsedArguments;
-
 abstract public class StringListArgument extends ListArgument<String> 
 {
 	public StringListArgument(String name, String description, boolean multi) {

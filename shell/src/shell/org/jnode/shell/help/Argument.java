@@ -21,11 +21,7 @@
  
 package org.jnode.shell.help;
 
-import java.util.Collection;
-
-import javax.naming.NameNotFoundException;
-
-import org.jnode.shell.ShellUtils;
+import org.jnode.driver.console.CompletionInfo;
 
 /**
  * @author qades
@@ -66,23 +62,20 @@ public class Argument extends CommandLineElement {
 
     private boolean satisfied = false;
 
-    public String complete(String partial) {
-        // No completion per default
-        return partial;
-    }
-
-    protected String complete(String partial, Collection<String> list) {
-        if (list.size() == 0) // none found
-                return partial;
-
-        if (list.size() == 1) return (String) list.iterator().next() + " ";
-
-        // list matching
-        String[] result = list.toArray(new String[list.size()]);
-        list(result);
-
-        // return the common part, i.e. complete as much as possible
-        return common(result);
+    /**
+     * Perform argument completion on the supplied (partial) argument value.  The
+     * results of the completion should be added to the supplied CompletionInfo.
+     * <p>
+     * The default behavior is to return the argument value as a partial completion.  
+     * Subtypes of Argument should override this method if they are capable of doing
+     * non-trivial completion.  Completions should be registered by calling one
+     * of the 'addCompletion' methods on the CompletionInfo.
+     * 
+     * @param completion the CompletionInfo object for registering any completions.
+     * @param partial the argument string to be completed.
+     */
+    public void complete(CompletionInfo completion, String partial) {
+        completion.addCompletion(partial, true);
     }
 
     protected final void setValue(String value) {
@@ -132,28 +125,5 @@ public class Argument extends CommandLineElement {
 
     public final boolean isSatisfied() {
         return satisfied;
-    }
-
-    protected String common(String... items) {
-        if (items.length == 0)
-        	return "";
-        
-        String result = items[ 0];
-        for (String item : items) {
-            while (!item.startsWith(result)) {
-                // shorten the result until it matches
-                result = result.substring(0, result.length() - 1);
-            }
-        }
-        return result;
-    }
-
-    public void list(String... items) {
-        try {
-            ShellUtils.getShellManager().getCurrentShell().list(items);
-        } catch (NameNotFoundException ex) {
-            // should not happen!
-            System.err.println("Cannot find current shell: " + ex.getMessage());
-        }
     }
 }

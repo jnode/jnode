@@ -37,6 +37,7 @@ import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.CompletionException;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
+import org.jnode.shell.help.argument.AliasArgument;
 import org.jnode.shell.help.argument.FileArgument;
 import org.jnode.shell.syntax.CommandSyntaxException;
 
@@ -96,30 +97,31 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
         }
         CommandDescriptor lastDesc = commands.get(nosCommands - 1);
         CommandLine lastCommand = lastDesc.commandLine;
-        CommandLine.Token lastToken = tokenizer.last();
+        final CommandLine.Token lastToken = tokenizer.last();
         boolean whitespaceAfter = tokenizer.whitespaceAfterLast();
         lastCommand.setArgumentAnticipated(whitespaceAfter);
         switch (completionContext) {
         case COMPLETE_ALIAS:
         case COMPLETE_ARG:
         case COMPLETE_PIPE:
-            break;
+            return lastCommand;
         case COMPLETE_INPUT:
-            if (lastDesc.fromFileName == null || !whitespaceAfter) {
-                return new RedirectionCompleter(line, lastToken.start);
-            }
-            break;
         case COMPLETE_OUTPUT:
-            if (lastDesc.toFileName == null || !whitespaceAfter) {
-                return new RedirectionCompleter(line, lastToken.start);
+            if (!whitespaceAfter) {
+                return new Completable() {
+                    public void complete(CompletionInfo completion,
+                            CommandShell shell) throws CompletionException {
+                        new AliasArgument("?", null).complete(completion, lastToken.token);
+                    }
+                };
             }
-            break;
+            else {
+                return lastCommand;
+            }
         default:
             throw new ShellFailureException("bad completion context (" +
                     completionContext + ")");
         }
-        return new SubcommandCompleter(lastCommand, line,
-                whitespaceAfter ? lastToken.end : lastToken.start);
     }
 
     private List<CommandDescriptor> parse(Tokenizer tokenizer, String line,
@@ -427,62 +429,6 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
             this.fromFileName = fromFileName;
             this.toFileName = toFileName;
             this.pipeTo = pipeTo;
-        }
-    }
-
-    private abstract class EmbeddedCompleter implements Completable {
-        private final String partial;
-        private final int startPos;
-
-        public EmbeddedCompleter(String partial, int startPos) {
-            this.partial = partial;
-            this.startPos = startPos;
-        }
-
-        public String getCompletableString() {
-            return partial.substring(startPos);
-        }
-
-        public void setFullCompleted(CompletionInfo completion, String completed) {
-            completion.setCompleted(partial.substring(0, startPos) + completed);
-        }
-    }
-
-    private class SubcommandCompleter extends EmbeddedCompleter {
-        private final CommandLine subcommand;
-
-        public SubcommandCompleter(CommandLine subcommand, String partial,
-                int startPos) {
-            super(partial, startPos);
-            this.subcommand = subcommand;
-        }
-
-        public void complete(CompletionInfo completion, CommandShell shell)
-                throws CompletionException {
-            subcommand.complete(completion, shell);
-            setFullCompleted(completion, completion.getCompleted());
-        }
-    }
-
-    private class RedirectionCompleter extends EmbeddedCompleter {
-
-        private final Help.Info fileParameter =
-                new Help.Info("file",
-                        "default parameter for file redirection completion",
-                        new Parameter(new FileArgument("file", "a file",
-                                Argument.SINGLE), Parameter.MANDATORY));
-
-        public RedirectionCompleter(String partial, int startPos) {
-            super(partial, startPos);
-        }
-
-        public void complete(CompletionInfo completion, CommandShell shell)
-                throws CompletionException {
-            CommandLine command =
-                    new CommandLine("?",
-                            new String[] { getCompletableString() });
-            String result = fileParameter.complete(command);
-            setFullCompleted(completion, result);
         }
     }
 }

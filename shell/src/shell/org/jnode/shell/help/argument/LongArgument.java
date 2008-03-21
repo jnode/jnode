@@ -57,10 +57,6 @@ public class LongArgument extends Argument {
 		this.max = max;
 	}
 	
-	public String complete(String partial) {
-		return partial;
-	}	
-	
 	@Override
 	protected boolean isValidValue(String value) {
 		long val = -1;

@@ -21,11 +21,9 @@
  
 package org.jnode.shell.help.argument;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.naming.NameNotFoundException;
 
+import org.jnode.driver.console.CompletionInfo;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginManager;
@@ -53,8 +51,7 @@ public class PluginArgument extends Argument {
         super(name, description, multi);
     }
 
-    public String complete(String partial) {
-        final List<String> ids = new ArrayList<String>();
+    public void complete(CompletionInfo completion, String partial) {
         try {
             // get the plugin manager
             final PluginManager piMgr = (PluginManager) InitialNaming
@@ -64,13 +61,12 @@ public class PluginArgument extends Argument {
             for (PluginDescriptor descr : piMgr.getRegistry()) {
                 final String id = descr.getId();
                 if (id.startsWith(partial)) {
-                    ids.add(id);
+                    completion.addCompletion(id);
                 }
             }
-            return complete(partial, ids);
         } catch (NameNotFoundException ex) {
             // should not happen!
-            return partial;
+            return;
         }
     }
 }

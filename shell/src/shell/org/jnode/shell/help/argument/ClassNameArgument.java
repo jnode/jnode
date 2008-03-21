@@ -40,7 +40,7 @@ public class ClassNameArgument extends Argument {
 
 	// here the specific command line completion would be implemented
 
-	public Class getClass(ParsedArguments cmdLine) throws ClassNotFoundException {
+	public Class<?> getClass(ParsedArguments cmdLine) throws ClassNotFoundException {
 		final ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		return cl.loadClass(getValue(cmdLine));
 	}
