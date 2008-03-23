@@ -53,7 +53,7 @@ import org.jnode.vm.VmSystem;
  */
 public class ProcletCommandInvoker extends AsyncCommandInvoker {
 
-    static final Factory FACTORY = new Factory() {
+    public static final Factory FACTORY = new Factory() {
         public CommandInvoker create(CommandShell shell) {
             return new ProcletCommandInvoker(shell);
         }
