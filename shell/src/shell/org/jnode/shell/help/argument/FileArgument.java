@@ -97,8 +97,11 @@ public class FileArgument extends Argument {
             dir = "";
         }
 
-        // Find the
-        final File f = new File(dir);
+        // Get the contents of the directory.  (Note that the call to getProperty()
+        // is needed because new File("").exists() returns false.  According to Sun, this
+        // behavior is "not a bug".)
+        final File f = dir.isEmpty() ? 
+                new File(System.getProperty("user.dir")) : new File(dir);
         final String[] names = AccessController
                 .doPrivileged(new PrivilegedAction <String[]>() {
                     public String[] run() {
