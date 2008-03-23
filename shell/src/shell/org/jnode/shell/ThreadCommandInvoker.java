@@ -53,7 +53,7 @@ import org.jnode.vm.VmExit;
  */
 public class ThreadCommandInvoker extends AsyncCommandInvoker {
 
-    static final Factory FACTORY = new Factory() {
+    public static final Factory FACTORY = new Factory() {
         public CommandInvoker create(CommandShell shell) {
             return new ThreadCommandInvoker(shell);
         }

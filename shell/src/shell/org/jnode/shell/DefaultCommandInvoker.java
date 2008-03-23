@@ -55,7 +55,7 @@ public class DefaultCommandInvoker implements CommandInvoker {
 
     private static final Class<?>[] MAIN_ARG_TYPES = new Class[] { String[].class};
 
-    static final Factory FACTORY = new Factory() {
+    public static final Factory FACTORY = new Factory() {
         public CommandInvoker create(CommandShell shell) {
             return new DefaultCommandInvoker(shell);
         }
