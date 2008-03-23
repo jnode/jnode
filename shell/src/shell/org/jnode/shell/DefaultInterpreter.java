@@ -292,8 +292,7 @@ public class DefaultInterpreter implements CommandInterpreter {
                         token.append(currentChar);
                     }
                 }
-                tokens.add(new CommandLine.Token(token.toString(), type, start,
-                        pos, pos < s.length()));
+                tokens.add(new CommandLine.Token(token.toString(), type, start, pos));
             }
         }
 

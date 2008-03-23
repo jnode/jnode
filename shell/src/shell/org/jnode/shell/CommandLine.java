@@ -427,28 +427,21 @@ public class CommandLine implements Completable, Iterable<String> {
          */
         public final int end;
         
-        /**
-         * This field is <code>true</code> if the token is the target for completion.
-         */
-        public final boolean completionTarget;
-
-        public Token(String value, int type, int start, int end, boolean completionTarget) {
+        public Token(String value, int type, int start, int end) {
             this.token = value;
             this.tokenType = type;
             this.start = start;
             this.end = end;
-            this.completionTarget = completionTarget;
         }
         
         public Token(String token) {
-            this(token, -1, -1, -1, false);
+            this(token, -1, -1, -1);
         }
 
 		@Override
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
-			result = prime * result + (completionTarget ? 1231 : 1237);
 			result = prime * result + end;
 			result = prime * result + start;
 			result = prime * result + ((token == null) ? 0 : token.hashCode());
@@ -465,8 +458,6 @@ public class CommandLine implements Completable, Iterable<String> {
 			if (getClass() != obj.getClass())
 				return false;
 			final Token other = (Token) obj;
-			if (completionTarget != other.completionTarget)
-				return false;
 			if (end != other.end)
 				return false;
 			if (start != other.start)
@@ -480,6 +471,10 @@ public class CommandLine implements Completable, Iterable<String> {
 				return false;
 			return true;
 		} 
+		
+		public String toString() {
+		    return "Token{'" + token + "'," + start + "," + end + "," + tokenType + "}";
+		}
     }
 
     // escape and unescape methods

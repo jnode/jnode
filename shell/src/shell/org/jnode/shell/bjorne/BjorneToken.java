@@ -105,8 +105,8 @@ public class BjorneToken extends CommandLine.Token {
      * because the tokenizer doesn't perform expansion or assignment.
      */
 
-    public BjorneToken(final int tokenType, final String text, int start, int end, boolean completionTarget) {
-        super(text == null ? "" : text, tokenType, start, end, completionTarget);
+    public BjorneToken(final int tokenType, final String text, int start, int end) {
+        super(text == null ? "" : text, tokenType, start, end);
         validate();
     }
 

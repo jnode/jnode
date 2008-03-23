@@ -177,11 +177,11 @@ public class BjorneTokenizer {
     }
 
     private BjorneToken makeToken(int tokenType, int start) {
-		return new BjorneToken(tokenType, "", start, pos, pos >= len);
+		return new BjorneToken(tokenType, "", start, pos);
 	}
 
     private BjorneToken makeToken(int tokenType, String value, int start) {
-		return new BjorneToken(tokenType, value, start, pos, pos >= len);
+		return new BjorneToken(tokenType, value, start, pos);
 	}
 
 	private BjorneToken parseWord() {
@@ -399,7 +399,7 @@ public class BjorneTokenizer {
 
     private BjorneToken remakeToken(int tokenType, BjorneToken token) {
 		return new BjorneToken(tokenType, token.getText(), token.start,
-				token.end, token.completionTarget);
+				token.end);
 	}
 
 	private BjorneToken toReservedWordToken(BjorneToken token) {
