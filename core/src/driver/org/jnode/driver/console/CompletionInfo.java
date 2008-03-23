@@ -114,8 +114,7 @@ public class CompletionInfo {
 
     /**
      * Set the completion start position. This can only be set once. After that,
-     * attempts to change the start position result in an
-     * IllegalArgumentException.
+     * attempts to change the start position will throw {@link IllegalArgumentException}.
      * 
      * @param completionStart
      */
