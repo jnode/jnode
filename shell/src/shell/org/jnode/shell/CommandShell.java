@@ -116,6 +116,9 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
      */
     private static InheritableThreadLocal<InputHistory> applicationHistory = new InheritableThreadLocal<InputHistory>();
 
+    /**
+     * When true, {@link complete(String)} performs command completion.
+     */
     private boolean readingCommand;
 
     /**
@@ -220,6 +223,10 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     protected CommandShell(AliasManager aliasMgr, SyntaxManager syntaxMgr) {
         this.aliasMgr = aliasMgr;
         this.syntaxMgr = syntaxMgr;
+        this.err = System.err;
+        this.out = System.out;
+        this.readingCommand = true;
+        this.debugEnabled = true;
     }
 
     /**
@@ -599,10 +606,12 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         } catch (ShellSyntaxException ex) {
             out.println(); // next line
             err.println("Cannot parse: " + ex.getMessage());
+            stackTrace(ex);
 
         } catch (CompletionException ex) {
             out.println(); // next line
             err.println("Problem in completer: " + ex.getMessage());
+            stackTrace(ex);
         }
 
         // Make sure that the shell's completion context gets nulled.

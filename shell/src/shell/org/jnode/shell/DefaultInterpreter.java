@@ -36,7 +36,7 @@ import org.jnode.shell.syntax.CommandSyntaxException;
  */
 public class DefaultInterpreter implements CommandInterpreter {
 
-    static final Factory FACTORY = new Factory() {
+    public static final Factory FACTORY = new Factory() {
         public CommandInterpreter create() {
             return new DefaultInterpreter();
         }

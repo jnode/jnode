@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.CompletionException;
@@ -50,13 +51,9 @@ import org.jnode.shell.syntax.CommandSyntaxException;
 public class RedirectingInterpreter extends DefaultInterpreter implements
         ThreadExitListener {
 
-    private static final int COMPLETE_ALIAS = 1;
-    private static final int COMPLETE_ARG = 2;
-    private static final int COMPLETE_INPUT = 3;
-    private static final int COMPLETE_OUTPUT = 4;
-    private static final int COMPLETE_PIPE = 5;
+    private static final Logger log = Logger.getLogger(CommandShell.class);
 
-    static final Factory FACTORY = new Factory() {
+    public static final Factory FACTORY = new Factory() {
         public CommandInterpreter create() {
             return new RedirectingInterpreter();
         }
@@ -65,16 +62,18 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
             return "redirecting";
         }
     };
+    
+    private static final FileArgument FILE_ARG = new FileArgument("?", null);
 
-    private int completionContext;
-
+    
     public String getName() {
         return "redirecting";
     }
 
     public int interpret(CommandShell shell, String line) throws ShellException {
         Tokenizer tokenizer = new Tokenizer(line, REDIRECTS_FLAG);
-        List<CommandDescriptor> commands = parse(tokenizer, line, false, shell);
+        List<CommandDescriptor> commands = new LinkedList<CommandDescriptor>();
+        parse(tokenizer, commands, false);
         int len = commands.size();
         if (len == 0) {
             return 0; // empty command line.
@@ -90,81 +89,65 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
     public Completable parsePartial(CommandShell shell, String line)
             throws ShellSyntaxException {
         Tokenizer tokenizer = new Tokenizer(line, REDIRECTS_FLAG);
-        List<CommandDescriptor> commands = parse(tokenizer, line, true, shell);
-        int nosCommands = commands.size();
-        if (nosCommands == 0) {
-            return new CommandLine("", null);
-        }
-        CommandDescriptor lastDesc = commands.get(nosCommands - 1);
-        CommandLine lastCommand = lastDesc.commandLine;
-        final CommandLine.Token lastToken = tokenizer.last();
-        boolean whitespaceAfter = tokenizer.whitespaceAfterLast();
-        lastCommand.setArgumentAnticipated(whitespaceAfter);
-        switch (completionContext) {
-        case COMPLETE_ALIAS:
-        case COMPLETE_ARG:
-        case COMPLETE_PIPE:
-            return lastCommand;
-        case COMPLETE_INPUT:
-        case COMPLETE_OUTPUT:
-            if (!whitespaceAfter) {
-                return new Completable() {
-                    public void complete(CompletionInfo completion,
-                            CommandShell shell) throws CompletionException {
-                        new AliasArgument("?", null).complete(completion, lastToken.token);
-                    }
-                };
-            }
-            else {
-                return lastCommand;
-            }
-        default:
-            throw new ShellFailureException("bad completion context (" +
-                    completionContext + ")");
-        }
+        List<CommandDescriptor> commands = new LinkedList<CommandDescriptor>();
+        return parse(tokenizer, commands, true);
     }
 
-    private List<CommandDescriptor> parse(Tokenizer tokenizer, String line,
-            boolean allowPartial, CommandShell shell)
+    /**
+     * This method parses the shell input into command lines.  If we are completing,
+     * then we return a Completable that will do completion for / after the last token
+     * according to the parser's syntactic context.  (Normally the Completable is a 
+     * CommandLine, but if we at / expecting a redirection filename, it will be a
+     * Completer for the filename.)
+     * 
+     * @param tokenizer the source of shell input tokens
+     * @param commands a list for accumulating the parsed commands / redirections
+     * @param completing if <code>true</code> we are completing.
+     * @return a Completer or <code>null</code>
+     * @throws ShellSyntaxException
+     */
+    private Completable parse(Tokenizer tokenizer, 
+            List<CommandDescriptor> commands, boolean completing)
             throws ShellSyntaxException {
-        LinkedList<CommandDescriptor> commands =
-                new LinkedList<CommandDescriptor>();
+        boolean wspAfter = tokenizer.whitespaceAfterLast();
         boolean pipeTo = false;
+        List<CommandLine.Token> args = new ArrayList<CommandLine.Token>();
         while (tokenizer.hasNext()) {
-            completionContext = COMPLETE_ALIAS;
             CommandLine.Token commandToken = tokenizer.next();
             if (commandToken.tokenType == SPECIAL) {
                 throw new ShellSyntaxException("Misplaced '" +
                         commandToken.token + "': expected a command name");
             }
-            CommandLine.Token fromFileName = null;
-            CommandLine.Token toFileName = null;
-            LinkedList<CommandLine.Token> args =
-                    new LinkedList<CommandLine.Token>();
+            
+            CommandLine.Token from = null;
+            CommandLine.Token to = null;
             pipeTo = false;
+            args.clear();
             while (tokenizer.hasNext()) {
-                completionContext = COMPLETE_ARG;
                 CommandLine.Token token = tokenizer.next();
                 if (token.tokenType == SPECIAL) {
                     if (token.token.equals("<")) {
-                        fromFileName = parseFileName(tokenizer, "<");
-                        if (fromFileName == null && !allowPartial) {
-                            throw new ShellSyntaxException(
-                                    "no filename after '<'");
+                        from = parseFileName(tokenizer, "<");
+                        if (from == null && !completing) {
+                            throw new ShellSyntaxException("no filename after '<'");
                         }
-                        completionContext = COMPLETE_INPUT;
+                        else if (completing && 
+                                (from == null || (!tokenizer.hasNext() && !wspAfter))) {
+                            return new ArgumentCompleter(FILE_ARG, from);
+                        }
                         continue;
                     } else if (token.token.equals(">")) {
-                        toFileName = parseFileName(tokenizer, ">");
-                        if (toFileName == null && !allowPartial) {
-                            throw new ShellSyntaxException(
-                                    "no filename after '>'");
+                        to = parseFileName(tokenizer, ">");
+                        if (to == null && !completing) {
+                            throw new ShellSyntaxException("no filename after '>'");
                         }
-                        completionContext = COMPLETE_OUTPUT;
+                        else if (completing && 
+                                (to == null || (!tokenizer.hasNext() && !wspAfter))) {
+                            return new ArgumentCompleter(FILE_ARG, to);
+                        }
                         continue;
                     } else if (token.token.equals("|")) {
                         pipeTo = true;
-                        completionContext = COMPLETE_PIPE;
                         break;
                     } else {
                         throw new ShellSyntaxException(
@@ -178,13 +161,24 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
                     args.toArray(new CommandLine.Token[args.size()]);
 
             CommandLine cl = new CommandLine(commandToken, argVec, null);
-            commands.add(new CommandDescriptor(cl, fromFileName, toFileName,
-                    pipeTo));
+            commands.add(new CommandDescriptor(cl, from, to, pipeTo));
         }
-        if (pipeTo && !allowPartial) {
-            throw new ShellSyntaxException("no command after '<'");
+        if (pipeTo && !completing) {
+            throw new ShellSyntaxException("no command after '|'");
         }
-        return commands;
+        if (completing) {
+            if (pipeTo || commands.isEmpty()) {
+                return new CommandLine("", null);
+            }
+            else {
+                CommandLine res = commands.get(commands.size() - 1).commandLine;
+                res.setArgumentAnticipated(wspAfter);
+                return res;
+            }
+        }
+        else {
+            return null;
+        }
     }
 
     private CommandLine.Token parseFileName(Tokenizer tokenizer, String special)

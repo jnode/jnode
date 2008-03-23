@@ -24,7 +24,6 @@ package org.jnode.shell;
 import java.io.Closeable;
 import java.util.NoSuchElementException;
 
-import org.apache.log4j.Logger;
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.help.CompletionException;
 import org.jnode.shell.help.Help;
@@ -621,7 +620,6 @@ public class CommandLine implements Completable, Iterable<String> {
     
     public void complete(CompletionInfo completion, CommandShell shell)
             throws CompletionException {
-        Logger log = Logger.getLogger(CommandLine.class);
         String cmd = (commandToken == null) ? "" : commandToken.token.trim();
         if (!cmd.equals("") && (argumentTokens.length > 0 || argumentAnticipated)) {
             try {
@@ -644,7 +642,6 @@ public class CommandLine implements Completable, Iterable<String> {
             }
         } else {
             // do completion on the command name
-            log.debug("completing '" + cmd + "'");
             defaultArg.complete(completion, cmd);
             completion.setCompletionStart(commandToken == null ? 0 : commandToken.start);
         }
