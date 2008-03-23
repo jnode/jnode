@@ -122,7 +122,9 @@ public class CompletionTest extends TestCase {
         checkCompletions(cs.complete("dir "), new String[]{"Four/", "One ", "Three ", "Two ", });
         checkCompletions(cs.complete("dir T"), new String[]{"Three ", "Two "});
         checkCompletions(cs.complete("dir |"), new String[]{"cat ", "dir ", "gc "});
+        checkCompletions(cs.complete("dir | "), new String[]{"cat ", "dir ", "gc "});
         checkCompletions(cs.complete("cat |"), new String[]{"cat ", "dir ", "gc "});
+        checkCompletions(cs.complete("cat | "), new String[]{"cat ", "dir ", "gc "});
         checkCompletions(cs.complete("cat | ca"), new String[]{"cat "});
         checkCompletions(cs.complete("cat >"), new String[]{"Four/", "One ", "Three ", "Two ", });
         checkCompletions(cs.complete("cat > "), new String[]{"Four/", "One ", "Three ", "Two ", });
