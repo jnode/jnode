@@ -99,6 +99,8 @@ public class CompletionTest extends TestCase {
         checkCompletions(cs.complete("dir"), new String[]{"dir "});
         checkCompletions(cs.complete("dir "), new String[]{"Four/", "One ", "Three ", "Two ", });
         checkCompletions(cs.complete("dir T"), new String[]{"Three ", "Two "});
+        checkCompletions(cs.complete("cat -"), new String[]{"-u "});
+        checkCompletions(cs.complete("cat -u"), new String[]{"-u "});
         
         // The default interpreter doesn't recognize '>' '<' or '|' as anything special.
         // Therefore it should just try to complete them as filenames ... and fail.
@@ -121,6 +123,8 @@ public class CompletionTest extends TestCase {
         checkCompletions(cs.complete("dir"), new String[]{"dir "});
         checkCompletions(cs.complete("dir "), new String[]{"Four/", "One ", "Three ", "Two ", });
         checkCompletions(cs.complete("dir T"), new String[]{"Three ", "Two "});
+        checkCompletions(cs.complete("cat -"), new String[]{"-u "});
+        checkCompletions(cs.complete("cat -u"), new String[]{"-u "});
         checkCompletions(cs.complete("dir |"), new String[]{"cat ", "dir ", "gc "});
         checkCompletions(cs.complete("dir | "), new String[]{"cat ", "dir ", "gc "});
         checkCompletions(cs.complete("cat |"), new String[]{"cat ", "dir ", "gc "});
