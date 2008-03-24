@@ -37,14 +37,15 @@ public class JNodeFrameBufferDevice extends GraphicsDevice implements DeviceList
 
 	private final FrameBufferAPI api;
 	private final Device device;
-	private final JNodeGraphicsConfiguration[] configs;
+	private final GraphicsConfiguration[] configs;
 	private boolean stopped = false;
+    private GraphicsConfiguration defaultConfig;
 
-	public JNodeFrameBufferDevice(Device device) {
+    public JNodeFrameBufferDevice(Device device) {
 		this.device = device;
 		device.addListener(this);
 		try {
-			this.api = (FrameBufferAPI)device.getAPI(FrameBufferAPI.class);
+			this.api = device.getAPI(FrameBufferAPI.class);
 		} catch (ApiNotFoundException ex) {
 			throw new IllegalArgumentException("Not a FrameBuffer device " + device.getId());
 		}
@@ -52,8 +53,9 @@ public class JNodeFrameBufferDevice extends GraphicsDevice implements DeviceList
 		configs = new JNodeGraphicsConfiguration[fbConfigs.length];
 		for (int i = 0; i < fbConfigs.length; i++) {
 			configs[i] = new JNodeGraphicsConfiguration(this, fbConfigs[i]);
-		} 
-	}
+		}
+        defaultConfig = configs[0];
+    }
 
 	/**
 	 * @see java.awt.GraphicsDevice#getConfigurations()
@@ -68,10 +70,19 @@ public class JNodeFrameBufferDevice extends GraphicsDevice implements DeviceList
 	 * @return The default configuration
 	 */
 	public GraphicsConfiguration getDefaultConfiguration() {
-		return configs[0];
+		return defaultConfig;
 	}
 
-	/**
+    /**
+	 * @see java.awt.GraphicsDevice#getDefaultConfiguration()
+     * @param config the new configuration
+	 */
+	public void setDefaultConfiguration(GraphicsConfiguration config) {
+        if(config == null) throw new IllegalArgumentException("Default graphics configuration is null.");
+        defaultConfig = config;
+	}
+
+    /**
 	 * @see java.awt.GraphicsDevice#getIDstring()
 	 * @return The id string
 	 */
@@ -97,7 +108,7 @@ public class JNodeFrameBufferDevice extends GraphicsDevice implements DeviceList
 	
 	/**
 	 * Is this device active?
-	 * @return
+	 * @return true if this device is active, false otherwise
 	 */
 	public final boolean isActive() {
 	    return !stopped;
