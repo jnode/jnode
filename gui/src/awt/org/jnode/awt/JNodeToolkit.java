@@ -28,6 +28,7 @@ import gnu.java.awt.peer.EmbeddedWindowPeer;
 import gnu.java.security.action.GetPropertyAction;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.datatransfer.Clipboard;
 import java.awt.im.InputMethodHighlight;
 import java.awt.image.BufferedImage;
@@ -628,7 +629,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
             for(GraphicsConfiguration g_conf : configurations){
                 log.info(g_conf);
             }
-            String screen_size = (String)AccessController.doPrivileged(new GetPropertyAction("jnode.awt.screensize", "none"));
+            String screen_size = AccessController.doPrivileged(new GetPropertyAction("jnode.awt.screensize", "none"));
             if("none".equals(screen_size)) {
 			    config = (JNodeGraphicsConfiguration) fbDevice.getDefaultConfiguration();
             } else {
@@ -656,6 +657,8 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
                 graphicsMode = true;
 				screenSize.width = config.getConfig().getScreenWidth();
 				screenSize.height = config.getConfig().getScreenHeight();
+
+                //drawStartupScreen();
 
                 final EventQueue eventQueue = getSystemEventQueueImpl();
 				this.keyboardHandler = new KeyboardHandler(eventQueue);
@@ -688,12 +691,19 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 		return rc;
 	}
 
+    private void drawStartupScreen() {
+        AffineTransform tx = new AffineTransform();
+        graphics.fill(new Rectangle(0,0, config.getBounds().width, config.getBounds().height), null, tx, Color.BLACK, Surface.PAINT_MODE);
+        for(int i = 0; i < 100; i ++)
+            graphics.draw(new Rectangle(100 + i,100 + i, config.getBounds().width - 2 * (100 + i), config.getBounds().height - 2 * (100 + i)), null, tx, (i % 2 == 0) ? Color.RED : Color.BLUE, Surface.PAINT_MODE);
+    }
+
     public Dimension changeScreenSize(String screenSizeId) {
-        final JNodeFrameBufferDevice dev = (JNodeFrameBufferDevice) GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-        if (dev == null) {
+        final JNodeFrameBufferDevice device = (JNodeFrameBufferDevice) GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        if (device == null) {
             throw new AWTError("No framebuffer fbDevice found");
         }
-        GraphicsConfiguration[] configurations = dev.getConfigurations();
+        GraphicsConfiguration[] configurations = device.getConfigurations();
         JNodeGraphicsConfiguration conf = null;
         for (GraphicsConfiguration g_conf : configurations) {
             if (screenSizeId.equals(g_conf.toString())) {
@@ -709,7 +719,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 
         this.config = conf;
         log.info("Using: " + config);
-        this.api = dev.getAPI();
+        this.api = device.getAPI();
         try {
 
             float xs = (float) mouseHandler.getX() / (float) screenSize.width;
@@ -722,16 +732,17 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
             //open the new
             this.graphics = api.open(config.getConfig());
             if (graphics == null) {
-                log.debug("No Graphics for fbDevice: " + dev.getIDstring());
+                log.debug("No Graphics for fbDevice: " + device.getIDstring());
             }
 
             screenSize.width = config.getConfig().getScreenWidth();
             screenSize.height = config.getConfig().getScreenHeight();
 
-            this.mouseHandler = new MouseHandler(dev.getDevice(), screenSize, getSystemEventQueueImpl(), keyboardHandler);
+            this.mouseHandler = new MouseHandler(device.getDevice(), screenSize, getSystemEventQueueImpl(), keyboardHandler);
             mouseHandler.setCursor((int) (xs * screenSize.width), (int) (ys * screenSize.height));
             getAwtContext().adjustDesktopSize(screenSize.width, screenSize.height);
             onResize();
+            device.setDefaultConfiguration(this.config);
             return getScreenSize();
         } catch (Exception e) {
             throw (AWTError) new AWTError(e.getMessage()).initCause(e);

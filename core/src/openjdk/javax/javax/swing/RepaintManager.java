@@ -195,8 +195,8 @@ public class RepaintManager
         else {
             BUFFER_STRATEGY_TYPE = BUFFER_STRATEGY_SPECIFIED_OFF;
         }
-        HANDLE_TOP_LEVEL_PAINT = "true".equals(AccessController.doPrivileged(
-               new GetPropertyAction("swing.handleTopLevelPaint", "true")));
+        HANDLE_TOP_LEVEL_PAINT = false; /*jnode "true".equals(AccessController.doPrivileged(
+               new GetPropertyAction("swing.handleTopLevelPaint", "true")));*/
         GraphicsEnvironment ge = GraphicsEnvironment.
                 getLocalGraphicsEnvironment();
         if (ge instanceof SunGraphicsEnvironment) {
