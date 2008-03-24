@@ -25,17 +25,7 @@ import org.apache.log4j.Logger;
 import org.jnode.plugin.ExtensionPoint;
 import org.jnode.awt.JNodeToolkit;
 
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.LookAndFeel;
-import javax.swing.JCheckBoxMenuItem;
+import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.metal.DefaultMetalTheme;
@@ -83,7 +73,7 @@ public class TaskBar extends JPanel {
         layout.setVgap(0);
         setLayout(layout);
         setBorder(new BevelBorder(BevelBorder.RAISED));
-        startButton = new JButton("Start");
+        startButton = new JButton("JNode", new ImageIcon(Desktop.loadImage("jnode_icon.png")));
         startButton.setBorder(new EmptyBorder(1, 3, 1, 3));
 
         add(startButton, BorderLayout.WEST);

@@ -59,9 +59,14 @@ abstract class SwingBaseWindowPeer<awtT extends Window, swingPeerT extends Swing
             public void run() {
                 final JDesktopPane desktop = toolkit.getAwtContext().getDesktop();
                 desktop.add(peerComponent);
-                desktop.setSelectedFrame(peerComponent);
-                peerComponent.toFront();
-                desktop.doLayout();
+                try {
+                    peerComponent.setSelected(true);
+                    desktop.getDesktopManager().activateFrame(peerComponent);
+                    peerComponent.toFront();
+                    desktop.doLayout();
+                } catch (PropertyVetoException x){
+                    log.warn("",x);
+                }
             }
         });
     }

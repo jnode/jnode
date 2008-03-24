@@ -341,7 +341,7 @@ public final class SwingToolkit extends JNodeToolkit {
             //no AWT yet, drop the event
             return null;
         }
-        Component comp = desktopFrame.getDesktop().getComponentAt(x,y);
+        Component comp = desktopFrame.getComponentAt(x,y);
         if(comp instanceof SwingBaseWindow){
             SwingBaseWindow base = (SwingBaseWindow) comp;
             if(base.isShowing()){
@@ -379,7 +379,7 @@ public final class SwingToolkit extends JNodeToolkit {
                 r.width = r.width - ins.left - ins.right;
                 r.height = r.height - ins.top - ins.bottom;
                 if (r.contains(x, y)) {
-                    Component c = sfp.getAWTComponent().findComponentAt(x, y);
+                    Component c = sfp.getAWTComponent().findComponentAt(x - r.x + ins.left, y - r.y + ins.top);
                     if (c != null) {
                         comp = c;
                     }

@@ -339,7 +339,6 @@ abstract class SwingComponentPeer<awtT extends Component, swingPeerT extends Com
 
     public boolean requestFocus(Component lightweightChild, boolean temporary, boolean focusedWindowChangeAllowed, long time, CausedFocusEvent.Cause cause) {
         peerComponent.requestFocus();
-        org.jnode.vm.Unsafe.debug("SwingComponentPeer.requestFocus()\n");
         try {
         Method processSynchronousLightweightTransferMethod =
                                              KeyboardFocusManager.class.

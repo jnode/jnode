@@ -39,6 +39,7 @@ final class SwingFrame extends SwingBaseWindow<Frame, SwingFrame> {
         super(awtFrame, title);
     }
 
+    /*
     @Override
     public void repaint(long tm, int x, int y, int width, int height) {
         super.repaint(tm, x, y, width, height);
@@ -52,10 +53,42 @@ final class SwingFrame extends SwingBaseWindow<Frame, SwingFrame> {
         if(target instanceof JFrame && isVisible())
             ((JFrame)target).getRootPane().update(g);
     }
+    */
+
+    @Override
+    public void setMaximum(boolean b) throws PropertyVetoException {
+        super.setMaximum(b);
+        target.setBounds(this.getBounds());
+    }
+
+    @Override
+    public void setIcon(boolean b) throws PropertyVetoException {
+        super.setIcon(b);
+        target.setBounds(this.getBounds());
+    }        
+
+    @Override
+    public void paintAll(Graphics g) {
+        super.paintAll(g);
+      //  if(target instanceof JFrame && isVisible())
+        //    ((JFrame)target).getRootPane().paintAll(g);
+    }
+
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
+        if(target instanceof JFrame && isVisible()){
+            JRootPane rp = ((JFrame) target).getRootPane();
+            int x = rp.getX(), y = rp.getY();
+            g.translate(x,y);
+            rp.paint(g);
+            g.translate(-x, -y);
+        }
+    }
 
     @Override
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g);    //To change body of overridden methods use File | Settings | File Templates.
+        super.paintComponent(g);
     }
 
     /**
@@ -70,6 +103,60 @@ final class SwingFrame extends SwingBaseWindow<Frame, SwingFrame> {
         super.validateTree();
         if(target instanceof JFrame)
             ((JFrame)target).getRootPane().validate();
+    }
+
+    boolean requestingFocus = false;
+    @Override
+    public void requestFocus() {
+        if(target instanceof JFrame){
+            if(!requestingFocus){
+                requestingFocus = true;
+                target.requestFocus();
+                requestingFocus = false;
+            }
+        } else
+            super.requestFocus();
+    }
+
+    @Override
+    public boolean requestFocus(boolean temporary) {
+        if(target instanceof JFrame){
+            if(!requestingFocus){
+                requestingFocus = true;
+                target.requestFocus();
+                requestingFocus = false;
+            }
+            return true;
+        }else
+            return super.requestFocus(temporary);
+    }
+
+    @Override
+    public boolean requestFocusInWindow() {
+        if(target instanceof JFrame) {
+            if(!requestingFocus){
+                requestingFocus = true;
+                boolean ret = target.requestFocusInWindow();
+                requestingFocus = false;
+                return ret;
+            }
+            return true;
+        } else
+            return super.requestFocusInWindow();
+    }
+
+    @Override
+    protected boolean requestFocusInWindow(boolean temporary) {
+        if(target instanceof JFrame) {
+            if(!requestingFocus){
+                requestingFocus = true;
+                boolean ret = target.requestFocusInWindow();
+                requestingFocus = false;
+                return ret;
+            }
+            return true;
+        } else
+            return super.requestFocusInWindow(temporary);
     }
 }
 
