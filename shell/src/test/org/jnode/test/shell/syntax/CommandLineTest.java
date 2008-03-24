@@ -34,7 +34,6 @@ import org.jnode.shell.SymbolSource;
 import org.jnode.shell.CommandLine.Token;
 import org.jnode.shell.syntax.ArgumentSyntax;
 import org.jnode.shell.syntax.StringArgument;
-import org.jnode.shell.syntax.CommandSyntaxException;
 
 public class CommandLineTest extends TestCase {
 

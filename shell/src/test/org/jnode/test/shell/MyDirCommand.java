@@ -31,10 +31,7 @@ import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.argument.FileArgument;
 
 /**
- * @author epr
- * @author Andreas H\u00e4nel
- * @author Martin Husted Hartvig (hagar@jnode.org)
- * @author Levente S\u00e1ntha
+ * Cut down test class
  */
 public class MyDirCommand extends AbstractCommand {
     static final FileArgument ARG_PATH = new FileArgument("path", "the path to list contents of");
@@ -44,9 +41,7 @@ public class MyDirCommand extends AbstractCommand {
                     "List the entries of the given path",
                     new Parameter[]{new Parameter(ARG_PATH, Parameter.OPTIONAL)});
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-//        ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
-//        String userDir = System.getProperty("user.dir");
-//        File path = ARG_PATH.getFile(cmdLine);
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
+    throws Exception {
     }
 }

@@ -58,6 +58,7 @@ public class SequenceSyntaxTest extends TestCase {
     }
     
     public void testConstructor() {
+        new SequenceSyntax();
         new SequenceSyntax(new ArgumentSyntax("fileArg"));
         new SequenceSyntax(new ArgumentSyntax("fileArg"), new ArgumentSyntax("fileArg"));
     }
@@ -70,6 +71,8 @@ public class SequenceSyntaxTest extends TestCase {
                 new RepeatSyntax(new ArgumentSyntax("fileArg")), 
                 new ArgumentSyntax("intArg"));
         assertEquals("[ <fileArg:file> ... ] <intArg:integer>", syntax2.format(test.getArgumentBundle()));
+        Syntax syntax3 = new SequenceSyntax();
+        assertEquals("", syntax3.format(test.getArgumentBundle()));
     }
     
     public void testOne() throws ShellException {
@@ -132,5 +135,25 @@ public class SequenceSyntaxTest extends TestCase {
         cmd = cl.parseCommandLine(shell);
         assertEquals(1, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
         assertEquals(1, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
+    }
+    
+    public void testThree() throws ShellException {
+        TestShell shell = new TestShell();
+        shell.addAlias("cmd", "org.jnode.test.shell.syntax.SequenceSyntaxTest$Test");
+        shell.addSyntax("cmd", new SequenceSyntax());
+
+        CommandLine cl;
+
+        cl = new CommandLine(new Token("cmd"), new Token[]{}, null);
+        cl.parseCommandLine(shell);
+
+        try {
+            cl = new CommandLine(new Token("cmd"), new Token[]{new Token("1")}, null);
+            cl.parseCommandLine(shell);
+            fail("no exception");
+        }
+        catch (CommandSyntaxException ex) {
+            //
+        }
     }
 }

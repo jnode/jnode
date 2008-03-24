@@ -33,10 +33,7 @@ import org.jnode.shell.help.argument.FileArgument;
 import org.jnode.shell.help.argument.URLArgument;
 
 /**
- * @author epr
- * @author Andreas H\u00e4nel
- * @author Stephen Crawley
- * @author Fabien DUMINY (fduminy@jnode.org)
+ * Cut down test class
  */
 public class MyCatCommand extends AbstractCommand {
 
@@ -63,10 +60,8 @@ public class MyCatCommand extends AbstractCommand {
                            
     });
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-//        ParsedArguments args = HELP_INFO.parse(commandLine);
-//        File[] files = ARG_FILE.getFiles(args);
-//        String[] urls = ARG_URL.getValues(args);
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
+    throws Exception {
     }
 
 }
