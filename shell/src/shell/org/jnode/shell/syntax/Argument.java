@@ -24,7 +24,7 @@ package org.jnode.shell.syntax;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jnode.shell.Completable;
+import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandLine.Token;
 
 /**
@@ -145,7 +145,7 @@ public abstract class Argument<V> {
      * @param value the token that will supply the Argument's value.
      */
     public final void accept(Token value) throws CommandSyntaxException {
-        if (isComplete()) {
+        if (isSet() && !isMultiple()) {
             throw new SyntaxMultiplicityException("this argument cannot be repeated");
         }
         doAccept(value);
@@ -170,27 +170,29 @@ public abstract class Argument<V> {
         throw new UnsupportedOperationException("acceptEmbedded has no implementation");
     }
     
-    public final Completable createCompleter(Token token) {
-    	return createCompleter(token.token, token.start, token.end);
+    /**
+     * Perform argument completion on the supplied (partial) argument value.  The
+     * results of the completion should be added to the supplied CompletionInfo.
+     * <p>
+     * The default behavior is to set no completion.  
+     * Subtypes of Argument should override this method if they are capable of doing
+     * non-trivial completion.  Completions should be registered by calling one
+     * of the 'addCompletion' methods on the CompletionInfo.
+     * 
+     * @param completion the CompletionInfo object for registering any completions.
+     * @param partial the argument string to be completed.
+     */
+    public void complete(CompletionInfo completion, String partial) {
+        // set no completion
     }
-
-    public abstract Completable createCompleter(String value, int start, int end);
-
+    
     public boolean isSatisfied() {
         return !isMandatory() || isSet();
     }
     
     /**
-     * If this method returns <code>true</code>, this element is complete and
-     * can accept no more tokens.
-     */
-    public boolean isComplete() {
-        return isSet() && !isMultiple();
-    }
-
-    /**
      * If this method returns <code>true</code>, this element may have
-     *    * multiple instances in a CommandLine.
+     * multiple instances in a CommandLine.
      */
     public boolean isMultiple() {
         return multiple;

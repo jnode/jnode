@@ -21,7 +21,6 @@
 
 package org.jnode.shell.syntax;
 
-import org.jnode.shell.Completable;
 import org.jnode.shell.CommandLine.Token;
 
 public class IntegerArgument extends Argument<Integer> {
@@ -56,28 +55,6 @@ public class IntegerArgument extends Argument<Integer> {
         }
     }
   
-    public boolean doIsAcceptable(Token token) {
-        try {
-            int tmp = Integer.parseInt(token.token);
-            if (min <= tmp && tmp <= max) {
-                return true;
-            }
-        }
-        catch (NumberFormatException ex) {
-            //
-        }
-        return false;
-    }
-
-    /**
-     * It is not possible to complete an integer argument without some extra
-     * context about what it means.  Subclasses for which completion is 
-     * feasible should override this method.
-     */
-	public Completable createCompleter(String partial, int start, int end) {
-		return null;
-	}
-
     @Override
     public String toString() {
         return "IntegerArgument{" + super.toString() + "}";

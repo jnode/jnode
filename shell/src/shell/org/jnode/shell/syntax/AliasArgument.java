@@ -21,12 +21,6 @@
  
 package org.jnode.shell.syntax;
 
-import java.util.TreeSet;
-
-import org.jnode.driver.console.CompletionInfo;
-import org.jnode.shell.CommandShell;
-import org.jnode.shell.Completable;
-import org.jnode.shell.help.CompletionException;
 import org.jnode.shell.CommandLine.Token;
 
 /**
@@ -46,29 +40,13 @@ public class AliasArgument extends Argument<String> {
     public AliasArgument(String label) {
         this(label, 0);
     }
-    
-    public Completable createCompleter(String partial, int start, int end) {
-    	return AliasArgument.completer(partial, start, end);
-    }
-    
-    public static Completable completer(final String partial, final int start, final int end) {
-    	return null;
-    }
-    
-    public static Completable completer(Token token) {
-    	return completer(token.token, token.start, token.end);
-    }
 
 	@Override
 	public void doAccept(Token value) throws CommandSyntaxException {
 	    throw new UnsupportedOperationException("not implemented");
 	}
 
-	public boolean doIsAcceptable(Token value) {
-        throw new UnsupportedOperationException("not implemented");
-	}
-	
-    @Override
+	@Override
     public String toString() {
         return "AliasArgument{" + super.toString() + "}";
     }

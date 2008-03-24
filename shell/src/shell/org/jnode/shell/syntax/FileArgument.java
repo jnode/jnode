@@ -23,10 +23,6 @@ package org.jnode.shell.syntax;
 
 import java.io.File;
 
-import org.jnode.driver.console.CompletionInfo;
-import org.jnode.shell.CommandShell;
-import org.jnode.shell.Completable;
-import org.jnode.shell.help.CompletionException;
 import org.jnode.shell.CommandLine.Token;
 
 public class FileArgument extends Argument<File> {
@@ -49,24 +45,8 @@ public class FileArgument extends Argument<File> {
             throw new CommandSyntaxException("invalid file name '" + token.token + "'");
         }
     }
-  
-//    public boolean doIsAcceptable(Token token) {
-//        return token.value.length() > 0;
-//    }
-
-	public Completable createCompleter(String partial, int start, int end) {
-		return FileArgument.completer(partial, start, end);
-	}
-
-	public static Completable completer(Token token) {
-		return FileArgument.completer(token.token, token.start, token.end);
-	}
-	
-	public static Completable completer(String partial, int start, int end) {
-		return null;
-	}
-
-	@Override
+    
+    @Override
 	public String toString() {
 	    return "FileArgument{" + super.toString() + "}";
 	}

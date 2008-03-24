@@ -472,7 +472,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     protected CommandInfo getCommandClass(String cmd)
             throws ClassNotFoundException {
         try {
-            Class cls = aliasMgr.getAliasClass(cmd);
+            Class<?> cls = aliasMgr.getAliasClass(cmd);
             return new CommandInfo(cls, aliasMgr.isInternal(cmd));
         } catch (NoSuchAliasException ex) {
             final ClassLoader cl = Thread.currentThread()

@@ -26,7 +26,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
 
-import org.jnode.shell.Completable;
 import org.jnode.shell.CommandLine.Token;
 
 
@@ -51,12 +50,6 @@ public class OptionSetSyntax extends GroupSyntax {
             super(label, OPTIONAL + MULTIPLE, new Boolean[0], null);
             this.flagOptions = flagOptions;
             this.bundle = bundle;
-        }
-
-        @Override
-        public Completable createCompleter(String value, int start, int end) {
-            // TODO Auto-generated method stub
-            return null;
         }
 
         @Override

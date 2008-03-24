@@ -1,6 +1,6 @@
 package org.jnode.shell.syntax;
 
-import org.jnode.shell.Completable;
+import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandLine.Token;
 
 public class PropertyNameArgument extends Argument<String> {
@@ -18,16 +18,20 @@ public class PropertyNameArgument extends Argument<String> {
     }
     
     @Override
-    public Completable createCompleter(String value, int start, int end) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     protected void doAccept(Token token) throws CommandSyntaxException {
         addValue(token.token);
     }
     
+    @Override
+    public void complete(CompletionInfo completion, String partial) {
+        for (Object key : System.getProperties().keySet()) {
+            String name = (String) key;
+            if (name.startsWith(partial)) {
+                completion.addCompletion(name);
+            }
+        }
+    }
+
     @Override
     protected String argumentKind() {
         return "property";

@@ -24,7 +24,6 @@ package org.jnode.shell.syntax;
 
 import java.lang.reflect.Array;
 
-import org.jnode.shell.Completable;
 import org.jnode.shell.CommandLine.Token;
 
 /**
@@ -57,24 +56,9 @@ public class EnumArgument<E extends Enum<E>> extends Argument<E> {
             throw new CommandSyntaxException("invalid value for enum");
         }
     }
-
-//    @Override
-//    protected boolean doIsAcceptable(Token token) {
-//        try {
-//            E.valueOf(clazz, token.value);
-//            return true;
-//        }
-//        catch (IllegalArgumentException ex) {
-//            return false;
-//        }
-//    }
-//    
+    
     public String toString() {
         return "EnumArgument<" + clazz + "{" + super.toString() + "}";
-    }
-
-    public Completable createCompleter(String partial, int start, int end) {
-        throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override
