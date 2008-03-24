@@ -23,5 +23,9 @@
 	<alias name="lsirq"        class="org.jnode.shell.command.system.LsIRQ"/>
 	<alias name="vminfo"       class="org.jnode.vm.Vm"/>
   </extension>
+  
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="cpuid"/>
+  </extension>
 
 </plugin>

@@ -26,7 +26,6 @@ import java.io.PrintStream;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Help;
 import org.jnode.vm.scheduler.VmProcessor;
 
 /**
@@ -34,17 +33,18 @@ import org.jnode.vm.scheduler.VmProcessor;
  */
 public class CpuIDCommand extends AbstractCommand {
 
-	public static Help.Info HELP_INFO = new Help.Info("cpuid", "Show the identification of the current CPU");
+	public CpuIDCommand() {
+	    super("Show the identification of the current CPU");
+	}
 
 	public static void main(String[] args) throws Exception {
-		new CpuIDCommand().execute(args);
+	    new CpuIDCommand().execute(args);
 	}
 
 	/**
 	 * Execute this command
 	 */
 	public void execute(CommandLine cmdLine, InputStream in, PrintStream out, PrintStream err) {
-
         final VmProcessor cpu = VmProcessor.current();
 		out.println(cpu.getCPUID());
         out.println(cpu.getPerformanceCounters());
