@@ -289,14 +289,14 @@ public class Desktop implements Runnable {
     }
 
     void enableBackgroundImage(boolean b){
-        if(b) desktopFrame.setBackgroundImage(loadImage());
+        if(b) desktopFrame.setBackgroundImage(loadImage("background.png"));
         else desktopFrame.setBackgroundImage(null);
         desktopPane.repaint();
     }
 
-    static BufferedImage loadImage() {
+    static BufferedImage loadImage(String img) {
         try {
-            return ImageIO.read(new URL("plugin:org.jnode.desktop!/background.png").openStream());
+            return ImageIO.read(new URL("plugin:org.jnode.desktop!/" + img).openStream());
         } catch (Throwable ex) {
             log.error("Error loading desktop background.", ex);
         }
