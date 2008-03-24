@@ -23,7 +23,6 @@ package org.jnode.awt.font.bdf;
 
 import java.awt.Font;
 import java.awt.FontMetrics;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -34,10 +33,7 @@ import org.apache.log4j.Logger;
 import org.jnode.awt.font.TextRenderer;
 import org.jnode.awt.font.renderer.RenderCache;
 import org.jnode.awt.font.spi.AbstractFontProvider;
-import org.jnode.awt.font.truetype.TTFFont;
-import org.jnode.awt.font.truetype.TTFFontData;
 import org.jnode.font.bdf.BDFFontContainer;
-import org.jnode.vm.Unsafe;
 
 /**
  * @author Fabien DUMINY (fduminy@jnode.org)
@@ -77,14 +73,11 @@ public class BDFFontProvider extends AbstractFontProvider {
 	protected Font loadFont(URL url) throws IOException
 	{
 		log.debug("<<< loadFont("+url+") >>>");
-		Unsafe.debug("<<< loadFont("+url+") >>>");
 		Reader reader = new InputStreamReader( url.openStream());
 		try {
 			log.debug("loadFont: before BDFFontContainer.createFont");
-			Unsafe.debug("loadFont: before BDFFontContainer.createFont");
 			BDFFontContainer container = BDFFontContainer.createFont(reader);
 			log.debug("loadFont: before new BDFFont");
-			Unsafe.debug("loadFont: before new BDFFont");
 			return new BDFFont(container);
 		} catch (Exception e) {
 			IOException ioe = new IOException("can't load BDFFont from "+url);
