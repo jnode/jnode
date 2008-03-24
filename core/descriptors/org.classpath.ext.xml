@@ -74,6 +74,7 @@
       <export name="sun.dc.pr.*"/>
       <export name="sun.font.*"/>
       <export name="sun.java2d.*"/>
+      <export name="sun.java2d.cmm.*"/>
       <export name="sun.java2d.loops.*"/>
       <export name="sun.java2d.pipe.*"/>
       <export name="sun.print.*"/>
