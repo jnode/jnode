@@ -21,15 +21,13 @@
 
 package org.jnode.shell.syntax;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
+import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.Completable;
 import org.jnode.shell.SymbolSource;
 
 /**
@@ -101,39 +99,39 @@ public class ArgumentBundle implements Iterable<Argument<?>> {
         this.argumentMap.put(label, element);
     }
 
-    public synchronized void parse(CommandLine commandLine, Syntax syntax)
-			throws CommandSyntaxException {
-        doParse(commandLine, syntax, null);
+	public synchronized void parse(CommandLine commandLine, Syntax syntax)
+	throws CommandSyntaxException {
+	    doParse(commandLine, syntax, null);
+	    for (Argument<?> element : arguments) {
+	        if (!element.isSatisfied() && element.isMandatory()) {
+	            throw new CommandSyntaxException(
+	                    "Command syntax error: required argument '"
+	                    + element.getLabel() + "' not supplied");
+	        }
+	    }
 	}
 
-	private void doParse(CommandLine commandLine, Syntax syntax,
-			List<Completable> completers) throws CommandSyntaxException {
+    public synchronized void complete(CommandLine partial, 
+            Syntax syntax, CompletionInfo completion) 
+    throws CommandSyntaxException {
+        doParse(partial, syntax, completion);
+    }
+
+    private void doParse(CommandLine commandLine, Syntax syntax,
+            CompletionInfo completion) 
+    throws CommandSyntaxException {
 	    clear();
 	    if (syntax == null) {
 			syntax = createDefaultSyntax();
 		}
 	    SymbolSource<CommandLine.Token> context = commandLine.tokenIterator();
 	    MuSyntax muSyntax = syntax.prepare(this);
-	    new MuParser().parse(muSyntax, completers, context, this);
+	    new MuParser().parse(muSyntax, completion, context, this);
 		if (context.hasNext()) {
 		    throw new CommandSyntaxException("unmatched argument '"
 					+ context.next().token + "'");
 		}
-		for (Argument<?> element : arguments) {
-			if (!element.isSatisfied() && element.isMandatory()) {
-				throw new CommandSyntaxException(
-						"Command syntax error: required argument '"
-								+ element.getLabel() + "' not supplied");
-			}
-		}
-	}
-
-	public synchronized List<Completable> complete(CommandLine partial,
-			Syntax syntax) throws CommandSyntaxException {
-		List<Completable> res = new ArrayList<Completable>();
-		doParse(partial, syntax, res);
-		return res;
-	}
+    }
 
 	/**
      * Find the command Argument (as defined by the bundle) for an ArgumentSyntax node.

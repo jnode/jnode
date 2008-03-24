@@ -32,9 +32,6 @@ public class MuSequence extends MuSyntax {
     
     public MuSequence(String label, MuSyntax ... elements) {
         super(label);
-        if (elements.length < 1) {
-            throw new IllegalArgumentException("too few sequence elements");
-        }
         for (MuSyntax element : elements) {
             @SuppressWarnings("unused")
             String dummy = element.label; // Check non-null.

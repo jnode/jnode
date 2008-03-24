@@ -25,8 +25,8 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.Completable;
 import org.jnode.shell.SymbolSource;
 import org.jnode.shell.CommandLine.Token;
 
@@ -63,10 +63,10 @@ public class MuParser {
         super();
     }
     
-    public void parse(MuSyntax rootSyntax, List<Completable> completers,
+    public void parse(MuSyntax rootSyntax, CompletionInfo completion,
             SymbolSource<Token> source, ArgumentBundle bundle) 
     throws CommandSyntaxException, SyntaxFailureException {
-        parse(rootSyntax, completers, source, bundle, DEFAULT_STEP_LIMIT);
+        parse(rootSyntax, completion, source, bundle, DEFAULT_STEP_LIMIT);
     }
     
     /**
@@ -80,7 +80,7 @@ public class MuParser {
      * means that there is no limit.
      * @throws CommandSyntaxException
      */
-    public synchronized void parse(MuSyntax rootSyntax, List<Completable> completers, 
+    public synchronized void parse(MuSyntax rootSyntax, CompletionInfo completion, 
             SymbolSource<Token> source, ArgumentBundle bundle, int stepLimit) 
     throws CommandSyntaxException, SyntaxFailureException {
         if (bundle != null) {
@@ -110,14 +110,32 @@ public class MuParser {
                     System.err.println("source at end");
                 }
             }
+            CommandLine.Token token;
             switch (syntax.getKind()) {
             case MuSyntax.SYMBOL:
-                if (source.hasNext() &&
-                    source.peek().token.equals(((MuSymbol) syntax).getSymbol())) {
-                    source.next();
+                String symbol = ((MuSymbol) syntax).getSymbol();
+                token = source.hasNext() ? source.next() : null;
+                
+                if (completion == null) {
+                    backtrack = token == null || !token.token.equals(symbol);
                 }
                 else {
-                    backtrack = true;
+                    if (token == null) {
+                        completion.addCompletion(symbol);
+                        backtrack = true;
+                    }
+                    else if (source.whitespaceAfterLast()) {
+                        if (!token.token.equals(symbol)) {
+                            backtrack = true;
+                        }
+                    }
+                    else {
+                        if (symbol.startsWith(token.token)) {
+                            completion.addCompletion(symbol);
+                            completion.setCompletionStart(token.start);
+                        }
+                        backtrack = true;
+                    }
                 }
                 break;
             case MuSyntax.ARGUMENT:
@@ -125,17 +143,27 @@ public class MuParser {
                 Argument<?> arg = bundle.getArgument(argName);
                 try {
                     if (source.hasNext()) {
-                        arg.accept(source.next());
-                        if (!backtrackStack.isEmpty()) {
-                            backtrackStack.getFirst().argsModified.add(arg);
-                            if (DEBUG) {
-                                System.err.println("recording undo for arg " +
-                                        argName);
+                        token = source.next();
+                        if (completion == null || source.hasNext() || source.whitespaceAfterLast()) {
+                            arg.accept(token);
+                            if (!backtrackStack.isEmpty()) {
+                                backtrackStack.getFirst().argsModified.add(arg);
+                                if (DEBUG) {
+                                    System.err.println("recording undo for arg " +
+                                            argName);
+                                }
                             }
                         }
-
+                        else {
+                            arg.complete(completion, token.token);
+                            completion.setCompletionStart(token.start);
+                            backtrack = true;
+                        }
                     }
                     else {
+                        if (completion != null) {
+                            arg.complete(completion, "");
+                        }
                         backtrack = true;
                     }
                 }
@@ -247,7 +275,7 @@ public class MuParser {
                     }
                     backtrackStack.removeFirst();
                 }
-                if (backtrack) {
+                if (backtrack && completion == null) {
                     throw new CommandSyntaxException("ran out of alternatives");
                 }
                 if (DEBUG) {

@@ -148,13 +148,12 @@ public class DefaultSyntaxManager implements SyntaxManager,
             childSyntaxes.add(loadSyntax(child, false));
         }
         int nosSyntaxes = childSyntaxes.size();
-        if (nosSyntaxes == 0) {
-            return null;
-        }
-        else if (nosSyntaxes == 1) {
+        if (nosSyntaxes == 1) {
             return childSyntaxes.get(0);
         }
         else {
+            // Note: if the number of child syntaxes is zero, we'll get an empty 
+            // sequence syntax.
             return new SequenceSyntax(childSyntaxes.toArray(new Syntax[nosSyntaxes]));
         }
     }

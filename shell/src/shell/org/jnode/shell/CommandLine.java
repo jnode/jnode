@@ -96,7 +96,7 @@ public class CommandLine implements Completable, Iterable<String> {
     private static final String[] NO_ARGS = new String[0];
     private static final Token[] NO_TOKENS = new Token[0];
 
-    private final Help.Info defaultParameter = new Help.Info("file",
+    private final Help.Info defaultInfo = new Help.Info("file",
             "default parameter for command line completion", 
             new Parameter(
                     new org.jnode.shell.help.argument.FileArgument(
@@ -617,23 +617,47 @@ public class CommandLine implements Completable, Iterable<String> {
             throws CompletionException {
         String cmd = (commandToken == null) ? "" : commandToken.token.trim();
         if (!cmd.equals("") && (argumentTokens.length > 0 || argumentAnticipated)) {
+            CommandInfo cmdClass;
             try {
-                // get command's help info
-                CommandInfo cmdClass = shell.getCommandClass(cmd);
-
-                Help.Info info;
-                try {
-                    info = Help.getInfo(cmdClass.getCommandClass());
-                } catch (HelpException ex) {
-                    // assuming default syntax; i.e. multiple file arguments
-                    info = defaultParameter;
-                }
-
-                // perform completion of the command arguments based on the
-                // command's help info / syntax ... if any.
-                info.complete(completion, this);
+                cmdClass = shell.getCommandClass(cmd);
             } catch (ClassNotFoundException ex) {
                 throw new CompletionException("Command class not found", ex);
+            }
+            
+            Command command;
+            try {
+                command = cmdClass.createCommandInstance();
+            }
+            catch (Throwable ex) {
+                throw new CompletionException("Problem creating a command instance", ex);
+            }
+
+            // Get the command's argument bundle, or the default one.
+            ArgumentBundle bundle = (command == null) ? null : command.getArgumentBundle();
+            bundle = (bundle == null) ? defaultArguments : bundle;
+
+            // Get a syntax for the alias, or a default one.
+            Syntax syntax = shell.getSyntaxManager().getSyntax(cmd);
+
+            try {
+                // Try new-style completion if we have a Syntax
+                if (syntax != null) {
+                    bundle.complete(this, syntax, completion);
+                }
+                else {
+                    // Otherwise, try old-style completion using the command's INFO
+                    try {
+                        Help.Info info = Help.getInfo(cmdClass.getCommandClass());
+                        info.complete(completion, this);
+                    } catch (HelpException ex) {
+                        // And fall back to old-style completion with an 'info' that
+                        // specifies a sequence of 'file' names.
+                        // FIXME ...
+                        defaultInfo.complete(completion, this);
+                    }
+                }
+            } catch (CommandSyntaxException ex) {
+                throw new CompletionException("Command syntax problem", ex);
             }
         } else {
             // do completion on the command name

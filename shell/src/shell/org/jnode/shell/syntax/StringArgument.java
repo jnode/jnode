@@ -21,7 +21,6 @@
 
 package org.jnode.shell.syntax;
 
-import org.jnode.shell.Completable;
 import org.jnode.shell.CommandLine.Token;
 
 public class StringArgument extends Argument<String> {
@@ -43,16 +42,7 @@ public class StringArgument extends Argument<String> {
         addValue(token.token);
     }
     
-   /**
-     * It is not possible to complete a simple argument without some extra
-     * context about what it means.  Subclasses for which completion is 
-     * feasible should override this method.
-     */
-	public Completable createCompleter(String partial, int start, int end) {
-		return null;
-	}
-	
-	@Override
+   @Override
     protected String argumentKind() {
         return "string";
     }

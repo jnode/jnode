@@ -21,7 +21,6 @@
 
 package org.jnode.shell.syntax;
 
-import org.jnode.shell.Completable;
 import org.jnode.shell.CommandLine.Token;
 
 public class FlagArgument extends Argument<Boolean> {
@@ -39,11 +38,6 @@ public class FlagArgument extends Argument<Boolean> {
         addValue(Boolean.TRUE);
     }
   
-    public Completable createCompleter(String partial, int start, int end) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
     @Override
     public String toString() {
         return "FlagArgument{" + super.toString() + "}";
