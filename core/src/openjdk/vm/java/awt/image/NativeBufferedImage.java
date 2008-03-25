@@ -9,6 +9,6 @@ class NativeBufferedImage {
      * @see java.awt.image.BufferedImage#initIDs()
      */
     private static void initIDs() {
-        //todo implement it
+        //empty
     }
 }
