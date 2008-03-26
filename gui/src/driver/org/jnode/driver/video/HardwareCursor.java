@@ -54,9 +54,9 @@ public class HardwareCursor {
 	 */
 	public HardwareCursorImage getImage(int width, int height) {
 		final String key = getKey(width, height);
-		HardwareCursorImage img = (HardwareCursorImage) imageMap.get(key);
+		HardwareCursorImage img = imageMap.get(key);
 		if (img == null) {
-			if (width > 16) {
+			if (width > 20) {
 				img = scaleImage(getImage(width / 2, height / 2));
 				if (img != null) {
 					imageMap.put(key, img);

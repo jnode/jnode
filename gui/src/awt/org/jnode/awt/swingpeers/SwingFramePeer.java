@@ -27,6 +27,7 @@ import java.awt.MenuBar;
 import java.awt.Rectangle;
 import java.awt.Graphics;
 import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.peer.FramePeer;
 import java.beans.PropertyVetoException;
 import javax.swing.JFrame;
@@ -157,6 +158,17 @@ final class SwingFrame extends SwingBaseWindow<Frame, SwingFrame> {
             return true;
         } else
             return super.requestFocusInWindow(temporary);
+    }
+
+    boolean settingCursor;
+    @Override
+    public void setCursor(Cursor cursor) {
+        super.setCursor(cursor);
+        if(!settingCursor){
+            settingCursor = true;
+            target.setCursor(cursor);
+            settingCursor = false;
+        }
     }
 }
 

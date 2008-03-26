@@ -29,6 +29,7 @@ import org.jnode.driver.input.PointerAPI;
 import org.jnode.driver.input.PointerEvent;
 import org.jnode.driver.input.PointerListener;
 import org.jnode.driver.video.HardwareCursorAPI;
+import org.jnode.driver.video.HardwareCursor;
 
 import javax.swing.SwingUtilities;
 import java.awt.Component;
@@ -115,11 +116,18 @@ public class MouseHandler implements PointerListener {
         if (pointerAPI != null) {
             log.debug("Using PointerDevice " + pointerDevice.getId());
             if(hwCursor != null){
-            hwCursor.setCursorImage(JNodeCursors.ARROW);
-            hwCursor.setCursorVisible(true);
-            hwCursor.setCursorPosition(0, 0);
+                hwCursor.setCursorImage(JNodeCursors.ARROW);
+                hwCursor.setCursorVisible(true);
+                hwCursor.setCursorPosition(0, 0);
             }
             pointerAPI.addPointerListener(this);
+        }
+    }
+
+    void setCursorImage(HardwareCursor ci){
+        if(hwCursor != null) {
+            hwCursor.setCursorImage(ci);
+            hwCursor.setCursorVisible(true);
         }
     }
 

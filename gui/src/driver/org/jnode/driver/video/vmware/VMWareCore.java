@@ -773,9 +773,9 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	 */
 	public void setCursorImage(HardwareCursor cursor) {
 		if (hasCapability(SVGA_CAP_ALPHA_CURSOR)) {
-			defineARGBCursor(cursor.getImage(16, 16));
+			defineARGBCursor(cursor.getImage(20, 20));
 		} else {
-			defineCursor(cursor.getImage(16, 16));
+			defineCursor(cursor.getImage(20, 20));
 		}
 	}
 	
