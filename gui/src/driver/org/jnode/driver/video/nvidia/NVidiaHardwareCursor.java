@@ -38,8 +38,9 @@ public class NVidiaHardwareCursor implements NVidiaConstants, HardwareCursorAPI 
 	private final HashMap<HardwareCursorImage, short[]> cursorCache = new HashMap<HardwareCursorImage, short[]>();
 	// cursor bitmap will be stored at the start of the framebuffer
 	private static final int CURSOR_ADDRESS = 0;
+    private static final int CURSOR_SIZE = 32;
 
-	public NVidiaHardwareCursor(NVidiaVgaIO vgaIO, int architecture) {
+    public NVidiaHardwareCursor(NVidiaVgaIO vgaIO, int architecture) {
 		this.vgaIO = vgaIO;
 		this.architecture = architecture;
 	}
@@ -71,7 +72,7 @@ public class NVidiaHardwareCursor implements NVidiaConstants, HardwareCursorAPI 
 		/* set cursor colour: not needed because of direct nature of cursor bitmap. */
 
 		/* clear cursor */
-		vgaIO.getVideoMem().setShort(CURSOR_ADDRESS, (short) 0x7fff, 1024);
+		vgaIO.getVideoMem().setShort(CURSOR_ADDRESS, (short) 0x7fff, CURSOR_SIZE * CURSOR_SIZE);
 
 		/* select 32x32 pixel, 16bit color cursorbitmap, no doublescan */
 		vgaIO.setReg32(NV32_CURCONF, 0x02000100);
@@ -100,7 +101,7 @@ public class NVidiaHardwareCursor implements NVidiaConstants, HardwareCursorAPI 
 	public void setCursorImage(HardwareCursor cursor) {
 		final short[] cur = getCursor(cursor);
 		if (cur != null) {
-			vgaIO.getVideoMem().setShorts(cur, 0, CURSOR_ADDRESS, 1024);
+			vgaIO.getVideoMem().setShorts(cur, 0, CURSOR_ADDRESS, CURSOR_SIZE * CURSOR_SIZE);
 		}
 	}
 	
@@ -109,21 +110,21 @@ public class NVidiaHardwareCursor implements NVidiaConstants, HardwareCursorAPI 
 	 */
 	public void closeCursor(){
 		/* clear cursor */
-		vgaIO.getVideoMem().setShort(CURSOR_ADDRESS, (short) 0x7fff, 1024);
+		vgaIO.getVideoMem().setShort(CURSOR_ADDRESS, (short) 0x7fff, CURSOR_SIZE * CURSOR_SIZE);
 		// Hide the cursor
 		setCursorVisible(false);
 	}
 
 	private short[] getCursor(HardwareCursor cursor) {
-		final HardwareCursorImage img = cursor.getImage(32, 32);
+		final HardwareCursorImage img = cursor.getImage(CURSOR_SIZE, CURSOR_SIZE);
 		if (img == null) {
 			return null;
 		}
-		short[] res = (short[]) cursorCache.get(img);
+		short[] res = cursorCache.get(img);
 		if (res == null) {
-			res = new short[1024];
+			res = new short[CURSOR_SIZE * CURSOR_SIZE];
 			final int[] argb = img.getImage();
-			for (int i = 0; i < 1024; i++) {
+			for (int i = 0; i < CURSOR_SIZE * CURSOR_SIZE; i++) {
 				final int v = argb[i];
 				final int a = (v >>> 24) & 0xFF;
 				final int r = ((v >> 16) & 0xFF) >> 3;

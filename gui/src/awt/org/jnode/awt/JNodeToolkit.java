@@ -691,6 +691,40 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 		return rc;
 	}
 
+    public void updateCursor(Cursor cur){
+        if(mouseHandler != null){
+            int type = cur.getType();
+            switch(type){
+                case Cursor.HAND_CURSOR:
+                    mouseHandler.setCursorImage(JNodeCursors.HAND);
+                    break;
+
+                case Cursor.E_RESIZE_CURSOR:
+                case Cursor.W_RESIZE_CURSOR:
+                    mouseHandler.setCursorImage(JNodeCursors.RESIZE_HORIZONTAL);
+                    break;
+
+                case Cursor.N_RESIZE_CURSOR:
+                case Cursor.S_RESIZE_CURSOR:
+                    mouseHandler.setCursorImage(JNodeCursors.RESIZE_VERTICAL);
+                    break;
+
+                case Cursor.NE_RESIZE_CURSOR:
+                case Cursor.SW_RESIZE_CURSOR:
+                    mouseHandler.setCursorImage(JNodeCursors.RESIZE_NORTHEAST);
+                    break;
+
+                case Cursor.NW_RESIZE_CURSOR:
+                case Cursor.SE_RESIZE_CURSOR:
+                    mouseHandler.setCursorImage(JNodeCursors.RESIZE_NORTHWEST);
+                    break;
+
+                default:
+                    mouseHandler.setCursorImage(JNodeCursors.ARROW);
+            }
+        }
+    }
+
     private void drawStartupScreen() {
         AffineTransform tx = new AffineTransform();
         graphics.fill(new Rectangle(0,0, config.getBounds().width, config.getBounds().height), null, tx, Color.BLACK, Surface.PAINT_MODE);
