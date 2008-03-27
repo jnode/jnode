@@ -27,6 +27,7 @@
       <export name="gnu.javax.imageio.bmp.*"/>
       <export name="gnu.javax.imageio.gif.*"/>
       <export name="gnu.javax.imageio.jpeg.*"/>
+      <export name="org.jnode.imageio.jpeg.*"/>
       <export name="gnu.javax.imageio.png.*"/>
     </library>
   </runtime>
