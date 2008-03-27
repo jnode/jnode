@@ -21,7 +21,12 @@
  
 package org.jnode.shell.syntax;
 
+import javax.naming.NameNotFoundException;
+
+import org.jnode.driver.console.CompletionInfo;
+import org.jnode.shell.ShellUtils;
 import org.jnode.shell.CommandLine.Token;
+import org.jnode.shell.alias.AliasManager;
 
 /**
  * @author qades
@@ -43,9 +48,30 @@ public class AliasArgument extends Argument<String> {
 
 	@Override
 	public void doAccept(Token value) throws CommandSyntaxException {
-	    throw new UnsupportedOperationException("not implemented");
+	    if (value.token.length() == 0 || value.token.startsWith("-")) {
+	        throw new CommandSyntaxException("Unacceptable alias name '" + value.token + "'");
+	    }
+	    addValue(value.token);
 	}
 
+	public void complete(CompletionInfo completion, String partial) {
+        try {
+            // get the alias manager
+            final AliasManager aliasMgr = ShellUtils.getShellManager()
+                    .getCurrentShell().getAliasManager();
+
+            // collect matching aliases
+            for (String alias : aliasMgr.aliases()) {
+                if (alias.startsWith(partial)) {
+                    completion.addCompletion(alias);
+                }
+            }
+        } catch (NameNotFoundException ex) {
+            // should not happen!
+            return;
+        }
+    }
+	
 	@Override
     public String toString() {
         return "AliasArgument{" + super.toString() + "}";
