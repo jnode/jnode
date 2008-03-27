@@ -50,6 +50,7 @@ import gnu.javax.imageio.bmp.BMPImageReaderSpi;
 import gnu.javax.imageio.bmp.BMPImageWriterSpi;
 import gnu.javax.imageio.gif.GIFImageReaderSpi;
 import gnu.javax.imageio.png.PNGImageReaderSpi;
+import org.jnode.imageio.jpeg.JPEGImageReaderSpi;
 
 public final class IIORegistry extends ServiceRegistry
 {
@@ -89,6 +90,7 @@ public final class IIORegistry extends ServiceRegistry
     registerServiceProvider(new PNGImageReaderSpi()); // Register PNG decoder.
     registerServiceProvider(new GIFImageReaderSpi()); // Register GIF decoder.
     registerServiceProvider(new BMPImageReaderSpi());
+    registerServiceProvider(new JPEGImageReaderSpi());
     registerServiceProvider(new BMPImageWriterSpi());
 
     Toolkit toolkit = Toolkit.getDefaultToolkit();
