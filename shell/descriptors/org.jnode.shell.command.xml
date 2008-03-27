@@ -49,9 +49,18 @@
   
   <extension point="org.jnode.shell.syntaxes">
     <syntax alias="set">
-      <sequence>
+      <sequence description="set a system property">
         <argument argLabel="key"/>
         <argument argLabel="value"/>
+      </sequence>
+      <argument description="remove a system property" argLabel="key"/>
+    </syntax>
+    <syntax alias="alias">
+      <empty description="list all aliases"/>
+      <option argLabel="remove" shortName="r" description="remove an alias"/>
+      <sequence description="create or update an alias">
+        <argument argLabel="alias"/>
+        <argument argLabel="classname"/>
       </sequence>
     </syntax>
   </extension>

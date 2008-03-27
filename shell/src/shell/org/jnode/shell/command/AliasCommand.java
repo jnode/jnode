@@ -28,48 +28,34 @@ import java.util.TreeMap;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.Shell;
 import org.jnode.shell.ShellUtils;
 import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.alias.NoSuchAliasException;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.Syntax;
-import org.jnode.shell.help.argument.AliasArgument;
-import org.jnode.shell.help.argument.ClassNameArgument;
+import org.jnode.shell.syntax.AliasArgument;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.ClassNameArgument;
 
 /**
  * @author epr
  * @author qades
  * @author Martin Husted Hartvig (hagar@jnode.org)
+ * @author crawley@jnode.org
  */
 public class AliasCommand extends AbstractCommand {
 
-    static final AliasArgument ARG_ALIAS = new AliasArgument("alias",
-            "the alias");
-
-    static final ClassNameArgument ARG_CLASS = new ClassNameArgument(
-            "classname", "the classname");
-
-    static final Parameter PARAM_REMOVE = new Parameter("r",
-            "following alias will be removed", ARG_ALIAS, Parameter.MANDATORY);
-
     private final static String slash_t = ":\t\t";
 
-    public static Help.Info HELP_INFO = new Help.Info(
-            "alias",
-            new Syntax[] {
-                    new Syntax(
-                            "Print all available aliases and corresponding classnames"),
-                    new Syntax("Set an aliases for given classnames",
-                            new Parameter[] {
-                                    new Parameter(ARG_ALIAS,
-                                            Parameter.MANDATORY),
-                                    new Parameter(ARG_CLASS,
-                                            Parameter.MANDATORY) }),
-                    new Syntax("Remove an alias",
-                            new Parameter[] { PARAM_REMOVE }) });
+    private final AliasArgument ARG_ALIAS;
+    private final ClassNameArgument ARG_CLASS;
+    private final AliasArgument ARG_REMOVE;
+    
+    public AliasCommand() {
+        super("list, add or remove JNode command aliases");
+        ARG_ALIAS = new AliasArgument("alias", Argument.OPTIONAL, "the alias to be added");
+        ARG_CLASS = new ClassNameArgument("classname", Argument.OPTIONAL, "the classname");
+        ARG_REMOVE = new AliasArgument("remove", Argument.OPTIONAL, "the alias to be removed");
+        registerArguments(ARG_ALIAS, ARG_CLASS, ARG_REMOVE);
+    }
 
     public static void main(String[] args) throws Exception {
         new AliasCommand().execute(args);
@@ -90,20 +76,17 @@ public class AliasCommand extends AbstractCommand {
 
     public void execute(CommandLine commandLine, InputStream in,
             PrintStream out, PrintStream err) throws Exception {
-        ParsedArguments parsedArguments = HELP_INFO.parse(commandLine);
+        final AliasManager aliasMgr = ShellUtils.getCurrentAliasManager();
 
-        final Shell shell = ShellUtils.getShellManager().getCurrentShell();
-        final AliasManager aliasMgr = shell.getAliasManager();
-
-        if (parsedArguments.size() == 0) {
-            showAliases(aliasMgr, out);
-        } else if (PARAM_REMOVE.isSet(parsedArguments)) {
+        if (ARG_REMOVE.isSet()) {
             // remove an alias
-            aliasMgr.remove(ARG_ALIAS.getValue(parsedArguments));
-        } else {
+            aliasMgr.remove(ARG_REMOVE.getValue());
+        } else if (ARG_ALIAS.isSet()) {
             // add an alias
-            aliasMgr.add(ARG_ALIAS.getValue(parsedArguments), ARG_CLASS
-                    .getValue(parsedArguments));
-        }
+            aliasMgr.add(ARG_ALIAS.getValue(), ARG_CLASS.getValue());
+        } else {
+            // list the aliases
+            showAliases(aliasMgr, out);
+        } 
     }
 }
