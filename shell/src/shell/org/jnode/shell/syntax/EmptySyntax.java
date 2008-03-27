@@ -21,31 +21,20 @@
 
 package org.jnode.shell.syntax;
 
-public class TokenSyntax extends Syntax {
+public class EmptySyntax extends Syntax {
     
-    private final String symbol;
-    
-    public TokenSyntax(String label, String symbol, String description) {
+    public EmptySyntax(String label, String description) {
         super(label, description);
-        this.symbol = symbol;
     }
-
-    public TokenSyntax(String label, String symbol) {
-        this(label, symbol, null);
-    }
-
-    public TokenSyntax(String symbol) {
-        this(null, symbol, null);
-    }
-
+    
     @Override
     public String format(ArgumentBundle bundle) {
-        return symbol;
+        return "<empty>";
     }
 
     @Override
     public MuSyntax prepare(ArgumentBundle bundle) {
-        return new MuSymbol(label, symbol);
+        return null;
     }
 
 }

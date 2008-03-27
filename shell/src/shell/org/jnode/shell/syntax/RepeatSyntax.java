@@ -42,15 +42,28 @@ public class RepeatSyntax extends GroupSyntax {
      * @param child the child Syntax that may be repeated.
      * @param minCount the minimum number of occurrences required.
      * @param maxCount the maximum number of occurrences allowed.
+     * @param description the description for this syntax
      */
-    public RepeatSyntax(String label, Syntax child, int minCount, int maxCount) {
-        super(label, child);
+    public RepeatSyntax(String label, Syntax child, int minCount, int maxCount, String description) {
+        super(label, description, child);
         if (minCount < 0 || maxCount < minCount) {
             throw new IllegalArgumentException("bad min/max counts");
         }
         this.child = child;
         this.minCount = minCount;
         this.maxCount = maxCount;
+    }
+    
+    /**
+     * Construct syntax with caller-specified repetition count range and a label.
+     * 
+     * @param label this Syntax's label
+     * @param child the child Syntax that may be repeated.
+     * @param minCount the minimum number of occurrences required.
+     * @param maxCount the maximum number of occurrences allowed.
+     */
+    public RepeatSyntax(String label, Syntax child, int minCount, int maxCount) {
+        this(label, child, minCount, maxCount, null);
     }
 
     /**
@@ -61,7 +74,7 @@ public class RepeatSyntax extends GroupSyntax {
      * @param maxCount the maximum number of occurrences allowed.
      */
     public RepeatSyntax(Syntax child, int minCount, int maxCount) {
-        this(null, child, minCount, maxCount);
+        this(null, child, minCount, maxCount, null);
     }
     
     /**
@@ -70,7 +83,7 @@ public class RepeatSyntax extends GroupSyntax {
      * @param child the child Syntax that may be repeated.
      */
     public RepeatSyntax(Syntax child) {
-        this(null, child, 0, Integer.MAX_VALUE);
+        this(null, child, 0, Integer.MAX_VALUE, null);
     }
     
     @Override

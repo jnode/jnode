@@ -30,13 +30,29 @@ import org.jnode.shell.CommandLine;
 import org.jnode.shell.SymbolSource;
 import org.jnode.shell.CommandLine.Token;
 
+/**
+ * This class implements parsing of a token stream against a MuSyntax graph.  The parser 
+ * binds token values against Argument instances as it goes, and does full backtracking 
+ * when it reaches a point where it cannot make forward progress.  
+ * <p>
+ * When we are doing a normal parse, the various alternatives in the MuSyntax graph are
+ * explored until either there is a successful parse, or we run out of alternatives.  The
+ * latter case results in an exception and a failed parse.
+ * <p>
+ * When we are doing a completion parse, all alternatives are explored irrespective of 
+ * parse success.
+ * <p>
+ * A MuSyntax may contain "infinite" loops, or other pathologies that trigger
+ * excessive backtracking.  To avoid problems, the 'parse' method takes a 
+ * 'stepLimit' parameter that causes the parse to fail if it has not terminated
+ * soon enough.
+ * 
+ * @author crawley@jnode.org
+ */
 public class MuParser {
     
     /**
-     * A MuSyntax may contain "infinite" loops, or other pathologies that trigger
-     * excessive backtracking.  To avoid problems, the 'parse' method takes a 
-     * 'stepLimit' parameter that causes the parse to fail if it has not terminated
-     * soon enough.  This is the default value for that parameter.
+     * This is the default value for the stepLimit parameter.
      */
     public static final int DEFAULT_STEP_LIMIT = 10000;
     
@@ -55,7 +71,16 @@ public class MuParser {
             this.syntaxStack = syntaxStack;
             this.choices = choices;
             this.argsModified = new LinkedList<Argument<?>>();
-            choiceNo = 0;
+            this.choiceNo = 0;
+        }
+        
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("CP{");
+            sb.append("sourcePos=").append(sourcePos);
+            sb.append(",syntaxStack=").append(showStack(syntaxStack, true));
+            sb.append(",choiceNo=").append(choiceNo).append("...").append("}");
+            return sb.toString();
         }
     }
     
@@ -63,6 +88,17 @@ public class MuParser {
         super();
     }
     
+    /**
+     * Parse Tokens against a MuSyntax using a default stepLimit.  On success, tokens will
+     * have been used to populate Argument values in the ArgumentBundle.
+     * 
+     * @param rootSyntax the root of the MuSyntax graph.
+     * @param completion if this is not <code>null</null>, do a completion parse, and record
+     *     the completions here.
+     * @param source the source of Tokens to be parsed
+     * @param bundle the container for Argument objects; e.g. provided by the command.
+     * @throws CommandSyntaxException
+     */
     public void parse(MuSyntax rootSyntax, CompletionInfo completion,
             SymbolSource<Token> source, ArgumentBundle bundle) 
     throws CommandSyntaxException, SyntaxFailureException {
@@ -70,10 +106,12 @@ public class MuParser {
     }
     
     /**
-     * FIXME - deal with syntax error messages and completion
-     * FIXME - deal with grammars that cause stack explosion
+     * Parse Tokens against a MuSyntax using a default stepLimit.  On success, tokens will
+     * have been used to populate Argument values in the ArgumentBundle.
      * 
-     * @param rootSyntax the root of the MuSyntax.
+     * @param rootSyntax the root of the MuSyntax graph.
+     * @param completion if this is not <code>null</null>, do a completion parse, and record
+     *     the completions here.
      * @param source the source of Tokens to be parsed
      * @param bundle the container for Argument objects; e.g. provided by the command.
      * @param stepLimit the maximum allowed parse steps allowed.  A 'stepLimit' of zero or less
@@ -83,6 +121,8 @@ public class MuParser {
     public synchronized void parse(MuSyntax rootSyntax, CompletionInfo completion, 
             SymbolSource<Token> source, ArgumentBundle bundle, int stepLimit) 
     throws CommandSyntaxException, SyntaxFailureException {
+        // FIXME - deal with syntax error messages and completion
+        // FIXME - deal with grammars that cause stack explosion
         if (bundle != null) {
             bundle.clear();
         }
@@ -98,8 +138,7 @@ public class MuParser {
             }
             boolean backtrack = false;
             if (DEBUG) {
-                System.err.println("syntaxStack " + syntaxStack.size() + ", " +
-                        "source pos " + source.tell());
+                System.err.println("syntaxStack % " + showStack(syntaxStack, true));
             }
             MuSyntax syntax = syntaxStack.removeFirst();
             if (DEBUG) {
@@ -200,22 +239,37 @@ public class MuParser {
                 break;
             case MuSyntax.ALTERNATION:
                 MuSyntax[] choices = ((MuAlternation) syntax).getAlternatives();
-                backtrackStack.addFirst(
-                        new ChoicePoint(source.tell(), syntaxStack, choices));
+                ChoicePoint choicePoint = new ChoicePoint(source.tell(), syntaxStack, choices);
+                backtrackStack.addFirst(choicePoint);
                 syntaxStack = new SharedStack<MuSyntax>(syntaxStack);
                 if (DEBUG) {
-                    System.err.println("Pushed choicePoint: source = " + source.tell() + 
-                            ", syntax stack pos = " + syntaxStack.size());
+                    System.err.println("pushed choicePoint - " + choicePoint);
                 }
                 if (choices[0] != null) {
                     syntaxStack.addFirst(choices[0]);
                 }
+                if (DEBUG) {
+                    System.err.println("syntaxStack " + showStack(syntaxStack, true));
+                }
                 break;
             case MuSyntax.BACK_REFERENCE:
                 throw new SyntaxFailureException("Found an unresolved MuBackReference");
+            default:
+                throw new SyntaxFailureException("Unknown MuSyntax kind (" + syntax.getKind() + ")");
             }
-            if (syntaxStack.isEmpty() && source.hasNext()) {
-                backtrack = true;
+            if (syntaxStack.isEmpty()) {
+                if (source.hasNext()) {
+                    if (DEBUG) {
+                        System.err.println("exhausted syntax stack too soon");
+                    }
+                    backtrack = true;
+                }
+                if (completion != null && !backtrackStack.isEmpty()) {
+                    if (DEBUG) {
+                        System.err.println("try alternatives for completion");
+                    }
+                    backtrack = true;
+                }
             }
             if (backtrack) {
                 if (DEBUG) {
@@ -224,18 +278,8 @@ public class MuParser {
                 while (!backtrackStack.isEmpty()) {
                     ChoicePoint choicePoint = backtrackStack.getFirst();
                     if (DEBUG) {
-                        System.err.println("backtrackStack " +
-                                backtrackStack.size() + ", " +
-                                "syntaxStack.size() " + choicePoint.syntaxStack.size() +
-                                ", " + "choiceNo " + choicePoint.choiceNo +
-                                ", " + "choices.length " +
-                                choicePoint.choices.length);
-                        System.err.println("syntaxStack " + syntaxStack.size() +
-                                ", " + "source pos " + source.tell());
-                    }
-                    if (DEBUG) {
-                        System.err.println("syntaxStack " + syntaxStack.size() +
-                                ", " + "source pos " + source.tell());
+                        System.err.println("top choicePoint - " + choicePoint);
+                        System.err.println("syntaxStack " + showStack(syntaxStack, true));
                     }
                     // Issue undo's for any argument values added.
                     for (Argument<?> arg : choicePoint.argsModified) {
@@ -266,6 +310,7 @@ public class MuParser {
                         backtrack = false;
                         if (DEBUG) {
                             System.err.println("taking choice #" + choiceNo);
+                            System.err.println("syntaxStack : " + showStack(syntaxStack, true));
                         }
                         break;
                     }
@@ -275,8 +320,17 @@ public class MuParser {
                     }
                     backtrackStack.removeFirst();
                 }
-                if (backtrack && completion == null) {
-                    throw new CommandSyntaxException("ran out of alternatives");
+                // If we are still backtracking and we are out of choices ...
+                if (backtrack) {
+                    if (completion == null) {
+                        throw new CommandSyntaxException("ran out of alternatives");
+                    }
+                    else {
+                        if (DEBUG) {
+                            System.err.println("end completion");
+                        }
+                        return;
+                    }
                 }
                 if (DEBUG) {
                     System.err.println("end backtracking");
@@ -288,4 +342,18 @@ public class MuParser {
         }
     }
 
+    
+    private static String showStack(Deque<MuSyntax> stack, boolean oneLine) {
+        StringBuffer sb = new StringBuffer();
+        for (MuSyntax syntax : stack) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+                if (!oneLine) {
+                    sb.append("\n    ");
+                }
+            }
+            sb.append(syntax.format());
+        }
+        return sb.toString();
+    }
 }

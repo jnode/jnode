@@ -175,7 +175,7 @@ public class ArgumentBundle implements Iterable<Argument<?>> {
 		Syntax[] syntaxes = new OptionSyntax[arguments.length];
 		for (int i = 0; i < syntaxes.length; i++) {
 			String label = arguments[i].getLabel();
-			syntaxes[i] = new OptionSyntax(label, label);
+			syntaxes[i] = new OptionSyntax(label, label, null);
 		}
 		return new PowersetSyntax("default", syntaxes);
 	}

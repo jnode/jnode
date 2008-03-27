@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 
 /**
  * This a custom stack (FIFO) class for MuParser.  Each time MuParser creates a "choice point",
@@ -96,7 +97,33 @@ class SharedStack<E> implements Deque<E> {
     }
 
     public Iterator<E> iterator() {
-        throw new UnsupportedOperationException();
+        if (DEBUG) check();
+        final Iterator<E> it1 = myStack.iterator();
+        final Iterator<E> it2 = baseStack == null ? null : baseStack.iterator();
+        
+        return new Iterator<E>() {
+
+            public boolean hasNext() {
+                return it1.hasNext() || (it2 != null && it2.hasNext());
+            }
+
+            public E next() {
+                if (it1.hasNext()) {
+                    return it1.next();
+                }
+                else if (it2 != null) {
+                    return it2.next();
+                }
+                else {
+                    throw new NoSuchElementException("iterator is tired and emotional");
+                }
+            }
+
+            public void remove() {
+                throw new UnsupportedOperationException("remove");
+            }
+            
+        };
     }
 
     public boolean offer(E e) {
@@ -176,6 +203,7 @@ class SharedStack<E> implements Deque<E> {
     }
 
     public int size() {
+        if (DEBUG) check();
         return myStack.size() + baseStackSize;
     }
 
@@ -192,6 +220,7 @@ class SharedStack<E> implements Deque<E> {
     }
 
     public boolean isEmpty() {
+        if (DEBUG) check();
         return size() == 0;
     }
 
@@ -205,6 +234,7 @@ class SharedStack<E> implements Deque<E> {
 
     public Object[] toArray() {
         // This method is used by copy constructors.
+        if (DEBUG) check();
         if (baseStack == null) {
             return myStack.toArray();
         }

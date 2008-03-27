@@ -28,10 +28,12 @@ public abstract class Syntax {
     
     protected final String label;
     private Syntax parent;
+    private String description;
     
     
-    public Syntax(String label) {
+    public Syntax(String label, String description) {
         this.label = label;
+        this.description = description;
     }
 
     public final String getLabel() {
@@ -93,5 +95,9 @@ public abstract class Syntax {
         else {
             return formatted.contains(" ");
         }
+    }
+
+    public String getDescription() {
+        return description;
     }
 }
