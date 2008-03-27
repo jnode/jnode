@@ -29,8 +29,8 @@ public abstract class GroupSyntax extends Syntax {
     final Syntax[] syntaxes;
     private final HashSet<String> childLabels;
     
-    public GroupSyntax(String label, Syntax...syntaxes) {
-        super(label);
+    public GroupSyntax(String label, String description, Syntax...syntaxes) {
+        super(label, description);
         this.syntaxes = syntaxes;
         this.childLabels = new HashSet<String>();
         for (Syntax syntax : syntaxes) {
@@ -39,10 +39,6 @@ public abstract class GroupSyntax extends Syntax {
         }
     }
 
-    public GroupSyntax(Syntax...syntaxes) {
-        this(null, syntaxes);
-    }
-    
     @Override
     public String toString() {
 		StringBuilder sb = new StringBuilder();

@@ -102,13 +102,17 @@ public class OptionSetSyntax extends GroupSyntax {
     
     private final OptionSyntax[] optionSyntaxes;
     
-    public OptionSetSyntax(String label, OptionSyntax... syntaxes) {
-        super(label, (Syntax[]) syntaxes);
+    public OptionSetSyntax(String label, String description, OptionSyntax... syntaxes) {
+        super(label, description, syntaxes);
         this.optionSyntaxes = syntaxes;
     }
 
+    public OptionSetSyntax(String label, OptionSyntax... syntaxes) {
+        this(label, null, syntaxes);
+    }
+
     public OptionSetSyntax(OptionSyntax... syntaxes) {
-        this(null, syntaxes);
+        this(null, null, syntaxes);
     }
 
     @Override

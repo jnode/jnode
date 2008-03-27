@@ -31,12 +31,16 @@ package org.jnode.shell.syntax;
  */
 public class AlternativesSyntax extends GroupSyntax {
     
+    public AlternativesSyntax(String label, String description, Syntax...syntaxes) {
+        super(label, description, syntaxes);
+    }
+
     public AlternativesSyntax(String label, Syntax...syntaxes) {
-        super(label, syntaxes);
+        super(label, null, syntaxes);
     }
 
     public AlternativesSyntax(Syntax...syntaxes) {
-        super(null, syntaxes);
+        super(null, null, syntaxes);
     }
 
     @Override

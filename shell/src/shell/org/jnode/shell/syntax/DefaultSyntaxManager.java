@@ -148,27 +148,28 @@ public class DefaultSyntaxManager implements SyntaxManager,
             childSyntaxes.add(loadSyntax(child, false));
         }
         int nosSyntaxes = childSyntaxes.size();
-        if (nosSyntaxes == 1) {
+        if (nosSyntaxes == 0) {
+            return new EmptySyntax(null, null);
+        }
+        else if (nosSyntaxes == 1) {
             return childSyntaxes.get(0);
         }
         else {
-            // Note: if the number of child syntaxes is zero, we'll get an empty 
-            // sequence syntax.
-            return new SequenceSyntax(childSyntaxes.toArray(new Syntax[nosSyntaxes]));
+            return new AlternativesSyntax(childSyntaxes.toArray(new Syntax[nosSyntaxes]));
         }
     }
     
-    private static Syntax loadSyntax(ConfigurationElement syntaxElement, boolean emptyOk) 
+    private static Syntax loadSyntax(ConfigurationElement syntaxElement, boolean nullOK) 
     throws SyntaxFailureException, IllegalArgumentException {
         String label = getAttribute(syntaxElement, "label");
+        String description = getAttribute(syntaxElement, "description");
         String kind = syntaxElement.getName();
-        if (kind.equals("alternatives")) {
-            if (emptyOk) {
+        if (kind.equals("empty")) {
+            if (nullOK && description == null && label == null) {
                 return null;
             }
             else {
-                throw new SyntaxFailureException(
-                        "<empty> element used in the wrong context");
+                return new EmptySyntax(label, description);
             }
         }
         else if (kind.equals("alternatives")) {
@@ -177,7 +178,7 @@ public class DefaultSyntaxManager implements SyntaxManager,
             for (int i = 0; i < alts.length; i++) {
                 alts[i] = loadSyntax(children[i], true);
             }
-            return new AlternativesSyntax(label, alts);
+            return new AlternativesSyntax(label, description, alts);
         }
         else if (kind.equals("optionSet")) {
             ConfigurationElement[] children = syntaxElement.getElements();
@@ -191,7 +192,7 @@ public class DefaultSyntaxManager implements SyntaxManager,
                             "<optionSyntax> element can only contain <option> elements");
                 }
             }
-            return new OptionSetSyntax(label, options);
+            return new OptionSetSyntax(label, description, options);
         }
         else if (kind.equals("option")) {
             String argLabel = getAttribute(syntaxElement, "argLabel");
@@ -205,7 +206,7 @@ public class DefaultSyntaxManager implements SyntaxManager,
                     throw new SyntaxFailureException(
                     "<option> element has must have a 'shortName' or 'longName' attribute");
                 }
-                return new OptionSyntax(label, longName);
+                return new OptionSyntax(argLabel, longName, description);
             }
             else {
                 if (shortName.length() != 1) {
@@ -213,10 +214,10 @@ public class DefaultSyntaxManager implements SyntaxManager,
                     "<option> elements 'shortName' attribute must be one character long");
                 }
                 if (longName == null) {
-                    return new OptionSyntax(label, shortName.charAt(0));
+                    return new OptionSyntax(argLabel, shortName.charAt(0), description);
                 }
                 else {
-                    return new OptionSyntax(label, longName, shortName.charAt(0));
+                    return new OptionSyntax(argLabel, longName, shortName.charAt(0), description);
                 }
             }
         }
@@ -226,7 +227,7 @@ public class DefaultSyntaxManager implements SyntaxManager,
             for (int i = 0; i < members.length; i++) {
                 members[i] = loadSyntax(children[i], false);
             }
-            return new PowersetSyntax(label, members);
+            return new PowersetSyntax(label, description, members);
         }
         else if (kind.equals("repeat")) {
             ConfigurationElement[] children = syntaxElement.getElements();
@@ -238,7 +239,7 @@ public class DefaultSyntaxManager implements SyntaxManager,
             }
             Syntax childSyntax = (members.length == 1) ?
                 members[0] : new SequenceSyntax(members);
-            return new RepeatSyntax(label, childSyntax, minCount, maxCount);
+            return new RepeatSyntax(label, childSyntax, minCount, maxCount, description);
         }
         else if (kind.equals("sequence")) {
             ConfigurationElement[] children = syntaxElement.getElements();
@@ -246,7 +247,7 @@ public class DefaultSyntaxManager implements SyntaxManager,
             for (int i = 0; i < seq.length; i++) {
                 seq[i] = loadSyntax(children[i], false);
             }
-            return new SequenceSyntax(label, seq);
+            return new SequenceSyntax(label, description, seq);
         }
         else if (kind.equals("argument")) {
             String argLabel = getAttribute(syntaxElement, "argLabel");
@@ -254,7 +255,7 @@ public class DefaultSyntaxManager implements SyntaxManager,
                 System.out.println(syntaxElement);
                 throw new SyntaxFailureException("<argument> element has no 'argLabel' attribute");
             }
-            return new ArgumentSyntax(label, argLabel);
+            return new ArgumentSyntax(label, argLabel, description);
         }
         else if (kind.equals("symbol")) {
             String symbol = getAttribute(syntaxElement, "symbol");
@@ -262,7 +263,7 @@ public class DefaultSyntaxManager implements SyntaxManager,
                 throw new SyntaxFailureException(
                         "<symbol> element has no 'symbol' attribute");
             }
-            return new TokenSyntax(label, symbol);
+            return new TokenSyntax(label, symbol, description);
         }
         else {
             throw new SyntaxFailureException(

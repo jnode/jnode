@@ -32,12 +32,16 @@ package org.jnode.shell.syntax;
  */
 public class PowersetSyntax extends GroupSyntax {
     
+    public PowersetSyntax(String label, String description, Syntax...syntaxes) {
+        super(label, description, syntaxes);
+    }
+
     public PowersetSyntax(String label, Syntax...syntaxes) {
-        super(label, syntaxes);
+        this(label, null, syntaxes);
     }
 
     public PowersetSyntax(Syntax...syntaxes) {
-        this(null, syntaxes);
+        this(null, null, syntaxes);
     }
 
     @Override

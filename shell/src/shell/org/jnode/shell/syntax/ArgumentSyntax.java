@@ -32,16 +32,20 @@ public class ArgumentSyntax extends Syntax {
 
     private final String argName;
     
-    public ArgumentSyntax(String argName) {
-        this(null, argName);
-    }
-
-    public ArgumentSyntax(String label, String argName) {
-        super(label);
+    public ArgumentSyntax(String label, String argName, String description) {
+        super(label, description);
         this.argName = argName;
         if (argName.length() == 0) {
             throw new IllegalArgumentException("empty argName");
         }
+    }
+
+    public ArgumentSyntax(String label, String argName) {
+        this(label, argName, null);
+    }
+
+    public ArgumentSyntax(String argName) {
+        this(null, argName, null);
     }
 
     @Override

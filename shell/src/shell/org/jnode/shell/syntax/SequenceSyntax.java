@@ -30,12 +30,16 @@ package org.jnode.shell.syntax;
  */
 public class SequenceSyntax extends GroupSyntax {
     
+    public SequenceSyntax(String label, String description, Syntax...syntaxes) {
+        super(label, description, syntaxes);
+    }
+
     public SequenceSyntax(String label, Syntax...syntaxes) {
-        super(label, syntaxes);
+        this(label, null, syntaxes);
     }
 
     public SequenceSyntax(Syntax...syntaxes) {
-        super(null, syntaxes);
+        this(null, null, syntaxes);
     }
 
     public String format(ArgumentBundle bundle) {
