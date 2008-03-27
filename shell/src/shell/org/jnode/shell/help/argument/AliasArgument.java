@@ -44,8 +44,7 @@ public class AliasArgument extends Argument {
     public void complete(CompletionInfo completion, String partial) {
         try {
             // get the alias manager
-            final AliasManager aliasMgr = ShellUtils.getShellManager()
-                    .getCurrentShell().getAliasManager();
+            final AliasManager aliasMgr = ShellUtils.getCurrentAliasManager();
 
             // collect matching aliases
             for (String alias : aliasMgr.aliases()) {

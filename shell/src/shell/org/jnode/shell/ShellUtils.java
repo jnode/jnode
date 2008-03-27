@@ -33,20 +33,30 @@ import org.jnode.shell.syntax.SyntaxManager;
  */
 public class ShellUtils {
 
-	/**
-	 * Get the root shell manager.
-	 * 
-	 * @return The current shell manager
-	 * @throws NameNotFoundException
-	 */
-	public static ShellManager getShellManager() throws NameNotFoundException {
-		return InitialNaming.lookup(ShellManager.NAME);
-	}
+    /**
+     * Get the root shell manager.
+     * 
+     * @return The root shell manager
+     * @throws NameNotFoundException
+     */
+    public static ShellManager getShellManager() throws NameNotFoundException {
+        return InitialNaming.lookup(ShellManager.NAME);
+    }
 
-	/**
+    /**
+     * Get the current shell.
+     * 
+     * @return The current shell
+     * @throws NameNotFoundException
+     */
+    public static Shell getCurrentShell() throws NameNotFoundException {
+        return getShellManager().getCurrentShell();
+    }
+
+    /**
 	 * Get the root alias manager.
 	 * 
-	 * @return The current alias manager
+	 * @return The root alias manager
 	 * @throws NameNotFoundException
 	 */
 	public static AliasManager getAliasManager() throws NameNotFoundException {
@@ -54,16 +64,36 @@ public class ShellUtils {
 	}
 
 	/**
+     * Get the current shell's alias manager.
+     * 
+     * @return The current alias manager
+     * @throws NameNotFoundException
+     */
+    public static AliasManager getCurrentAliasManager() throws NameNotFoundException {
+        return getShellManager().getCurrentShell().getAliasManager();
+    }
+
+    /**
 	 * Get the root syntax manager.
 	 * 
-	 * @return The current syntax manager
+	 * @return The root syntax manager
 	 * @throws NameNotFoundException
 	 */
 	public static SyntaxManager getSyntaxManager() throws NameNotFoundException {
 		return InitialNaming.lookup(SyntaxManager.NAME);
 	}
 
-	public static void registerCommandInvoker(CommandInvoker.Factory factory)
+	/**
+     * Get the current shell's syntax manager.
+     * 
+     * @return The current syntax manager
+     * @throws NameNotFoundException
+     */
+    public static SyntaxManager getCurrentSyntaxManager() throws NameNotFoundException {
+        return getShellManager().getCurrentShell().getSyntaxManager();
+    }
+
+    public static void registerCommandInvoker(CommandInvoker.Factory factory)
 			throws NameNotFoundException {
 		getShellManager().registerInvokerFactory(factory);
 	}
