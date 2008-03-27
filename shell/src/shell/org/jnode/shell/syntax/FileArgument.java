@@ -22,7 +22,10 @@
 package org.jnode.shell.syntax;
 
 import java.io.File;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
+import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandLine.Token;
 
 public class FileArgument extends Argument<File> {
@@ -46,6 +49,52 @@ public class FileArgument extends Argument<File> {
         }
     }
     
+    @Override
+    public void complete(CompletionInfo completion, String partial) {
+     // Get last full directory
+        final int idx = partial.lastIndexOf(File.separatorChar);
+        final String dir;
+        if (idx == 0) {
+            dir = String.valueOf(File.separatorChar);
+        } else if (idx > 0) {
+            dir = partial.substring(0, idx);
+        } else {
+            dir = "";
+        }
+
+        // Get the contents of the directory.  (Note that the call to getProperty()
+        // is needed because new File("").exists() returns false.  According to Sun, this
+        // behavior is "not a bug".)
+        final File f = dir.isEmpty() ? 
+                new File(System.getProperty("user.dir")) : new File(dir);
+        final String[] names = AccessController
+                .doPrivileged(new PrivilegedAction <String[]>() {
+                    public String[] run() {
+                        if (!f.exists()) {
+                            return null;
+                        } else {
+                            return f.list();
+                        }
+                    }
+                });
+        if (names != null && names.length > 0) {
+            final String prefix = (dir.length() == 0) ? "" :
+                    dir.equals("/") ? "/" : dir + File.separatorChar;
+            for (String n : names) {
+                String name = prefix + n;
+                if (name.startsWith(partial)) {
+                    if (new File(f, name).isDirectory()) {
+                        name += File.separatorChar;
+                        completion.addCompletion(name, true);
+                    }
+                    else {
+                        completion.addCompletion(name);
+                    }
+                }
+            }
+        }
+    }
+
     @Override
 	public String toString() {
 	    return "FileArgument{" + super.toString() + "}";
