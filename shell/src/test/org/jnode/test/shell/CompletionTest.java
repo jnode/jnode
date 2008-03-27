@@ -37,7 +37,10 @@ import org.jnode.shell.RedirectingInterpreter;
 import org.jnode.shell.ShellUtils;
 import org.jnode.shell.ThreadCommandInvoker;
 import org.jnode.shell.alias.AliasManager;
+import org.jnode.shell.syntax.AlternativesSyntax;
 import org.jnode.shell.syntax.ArgumentSyntax;
+import org.jnode.shell.syntax.EmptySyntax;
+import org.jnode.shell.syntax.OptionSyntax;
 import org.jnode.shell.syntax.SequenceSyntax;
 import org.jnode.shell.syntax.SyntaxManager;
 import org.jnode.test.shell.syntax.TestAliasManager;
@@ -114,12 +117,20 @@ public class CompletionTest extends TestCase {
             am.add("cpuid", "org.jnode.shell.command.system.CpuIDCommand");
             am.add("set", "org.jnode.shell.command.SetCommand");
             am.add("dir", "org.jnode.test.shell.MyDirCommand");
+            am.add("duh", "org.jnode.test.shell.MyDuhCommand");
             am.add("cat", "org.jnode.test.shell.MyCatCommand");
-            aliasCompletions = new String[]{"cat ", "cpuid ", "dir ", "gc ", "set "};
+            am.add("alias", "org.jnode.test.shell.MyAliasCommand");
+            aliasCompletions = new String[]{"alias ", "cat ", "cpuid ", "dir ", "duh ", "gc ", "set "};
             
             SyntaxManager sm = this.getSyntaxManager();
             sm.add("set", new SequenceSyntax(new ArgumentSyntax("key"), new ArgumentSyntax("value")));
+            sm.add("duh", new ArgumentSyntax("path"));
             sm.add("cpuid", new SequenceSyntax());
+            sm.add("alias", new AlternativesSyntax(
+                    new EmptySyntax(null, "Print all available aliases and corresponding classnames"),
+                    new SequenceSyntax(null, "Set an aliases for given classnames",
+                            new ArgumentSyntax("alias"), new ArgumentSyntax("classname")),
+                    new OptionSyntax("remove", 'r', "Remove an alias")));
         }
     }
     
@@ -192,6 +203,16 @@ public class CompletionTest extends TestCase {
         checkCompletions(cs.complete("set a b "), new String[]{}, 8);
         
         checkCompletions(cs.complete("cpuid "), new String[]{}, 6);
+        
+        checkCompletions(cs.complete("duh "), new String[]{"Four/", "One ", "Three ", "Two ", }, 4);
+        checkCompletions(cs.complete("duh T"), new String[]{"Three ", "Two "}, 4);
+        
+        checkCompletions(cs.complete("alias -"), new String[]{"-r "}, 6);
+        
+        String[] aliasesPlusR = new String[aliasCompletions.length + 1];
+        System.arraycopy(aliasCompletions, 0, aliasesPlusR, 1, aliasCompletions.length);
+        aliasesPlusR[0] = "-r ";
+        checkCompletions(cs.complete("alias "), aliasesPlusR, 6);
     }
     
     /**
