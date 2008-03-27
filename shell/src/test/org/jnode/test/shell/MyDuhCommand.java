@@ -26,21 +26,21 @@ import java.io.PrintStream;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.argument.FileArgument;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FileArgument;
 
 /**
- * Cut down test class ... dir done the old way
+ * Cut down test class ... dir done the new way
  */
-public class MyDirCommand extends AbstractCommand {
-    static final FileArgument ARG_PATH = new FileArgument("path", "the path to list contents of");
-    public static Help.Info HELP_INFO =
-            new Help.Info(
-                    "dir",
-                    "List the entries of the given path",
-                    new Parameter[]{new Parameter(ARG_PATH, Parameter.OPTIONAL)});
-
+public class MyDuhCommand extends AbstractCommand {
+    private final FileArgument ARG_PATH = 
+        new FileArgument("path", Argument.OPTIONAL + Argument.SINGLE, "the path to list contents of");
+    
+    public MyDuhCommand() {
+        super("List the entries of the given path");
+        registerArguments(ARG_PATH);
+    }
+    
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
     throws Exception {
     }
