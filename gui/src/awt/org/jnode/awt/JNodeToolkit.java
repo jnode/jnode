@@ -695,8 +695,12 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
         if(mouseHandler != null){
             int type = cur.getType();
             switch(type){
-                case Cursor.HAND_CURSOR:
-                    mouseHandler.setCursorImage(JNodeCursors.HAND);
+                case Cursor.DEFAULT_CURSOR:
+                    mouseHandler.setCursorImage(JNodeCursors.ARROW);
+                    break;
+
+                case Cursor.TEXT_CURSOR:
+                    mouseHandler.setCursorImage(JNodeCursors.TEXT);
                     break;
 
                 case Cursor.E_RESIZE_CURSOR:
@@ -717,6 +721,22 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
                 case Cursor.NW_RESIZE_CURSOR:
                 case Cursor.SE_RESIZE_CURSOR:
                     mouseHandler.setCursorImage(JNodeCursors.RESIZE_NORTHWEST);
+                    break;
+
+                case Cursor.HAND_CURSOR:
+                    mouseHandler.setCursorImage(JNodeCursors.HAND);
+                    break;
+
+                case Cursor.WAIT_CURSOR:
+                    mouseHandler.setCursorImage(JNodeCursors.WAIT);
+                    break;
+
+                case Cursor.MOVE_CURSOR:
+                    mouseHandler.setCursorImage(JNodeCursors.MOVE);
+                    break;
+
+                case Cursor.CROSSHAIR_CURSOR:
+                    mouseHandler.setCursorImage(JNodeCursors.CROSSHAIR);
                     break;
 
                 default:
