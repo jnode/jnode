@@ -47,10 +47,14 @@ import java.util.Iterator;
 
 import gnu.java.awt.ClasspathToolkit;
 import gnu.javax.imageio.bmp.BMPImageReaderSpi;
-import gnu.javax.imageio.bmp.BMPImageWriterSpi;
 import gnu.javax.imageio.gif.GIFImageReaderSpi;
 import gnu.javax.imageio.png.PNGImageReaderSpi;
 import org.jnode.imageio.jpeg.JPEGImageReaderSpi;
+import com.sun.imageio.plugins.wbmp.WBMPImageReaderSpi;
+import com.sun.imageio.plugins.wbmp.WBMPImageWriterSpi;
+import com.sun.imageio.plugins.gif.GIFImageWriterSpi;
+import com.sun.imageio.plugins.png.PNGImageWriterSpi;
+import com.sun.imageio.plugins.bmp.BMPImageWriterSpi;
 
 public final class IIORegistry extends ServiceRegistry
 {
@@ -92,6 +96,11 @@ public final class IIORegistry extends ServiceRegistry
     registerServiceProvider(new BMPImageReaderSpi());
     registerServiceProvider(new JPEGImageReaderSpi());
     registerServiceProvider(new BMPImageWriterSpi());
+
+      registerServiceProvider(new WBMPImageReaderSpi());
+      registerServiceProvider(new WBMPImageWriterSpi());
+      registerServiceProvider(new GIFImageWriterSpi());
+      registerServiceProvider(new PNGImageWriterSpi());
 
     Toolkit toolkit = Toolkit.getDefaultToolkit();
     if (toolkit instanceof ClasspathToolkit)
