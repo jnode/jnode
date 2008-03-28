@@ -94,7 +94,7 @@ public class PluginCommand {
                     new Syntax("Print name and state of plugin", PARAM_LIST_ID)});
 
     public static void main(final String[] args) throws Exception {
-        AccessController.doPrivileged(new PrivilegedExceptionAction() {
+        AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
             public Object run() throws Exception {
                 new PluginCommand().execute(args, System.in, System.out, System.err);
                 return null;
