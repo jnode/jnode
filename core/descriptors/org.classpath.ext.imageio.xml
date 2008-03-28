@@ -13,7 +13,14 @@
   <runtime>
     <library name="jnode-core.jar">
         
+      <export name="com.sun.imageio.metadata.*"/>
+      <export name="com.sun.imageio.stream.*"/>
+      <export name="com.sun.imageio.spi.*"/>
       <export name="com.sun.imageio.plugins.common.*"/>
+      <export name="com.sun.imageio.plugins.bmp.*"/>
+      <export name="com.sun.imageio.plugins.gif.*"/>
+      <export name="com.sun.imageio.plugins.png.*"/>
+      <export name="com.sun.imageio.plugins.wbmp.*"/>
 
       <export name="javax.imageio.*"/>
       <export name="javax.imageio.event.*"/>
@@ -27,8 +34,9 @@
       <export name="gnu.javax.imageio.bmp.*"/>
       <export name="gnu.javax.imageio.gif.*"/>
       <export name="gnu.javax.imageio.jpeg.*"/>
-      <export name="org.jnode.imageio.jpeg.*"/>
       <export name="gnu.javax.imageio.png.*"/>
+
+      <export name="org.jnode.imageio.jpeg.*"/>  
     </library>
   </runtime>
   
