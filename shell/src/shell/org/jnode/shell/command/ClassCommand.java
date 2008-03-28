@@ -21,43 +21,66 @@
  
 package org.jnode.shell.command;
 
+import java.io.InputStream;
 import java.io.PrintStream;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.argument.ClassNameArgument;
+import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.CommandLine;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.ClassNameArgument;
 import org.jnode.vm.classmgr.VmArrayClass;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmType;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
+ * @author crawley@jnode.org
  */
-public class ClassCommand {
+public class ClassCommand extends AbstractCommand {
 
-	static final ClassNameArgument ARG_CLASS = new ClassNameArgument("class", "the class file to view");
+	private final ClassNameArgument ARG_CLASS = 
+	    new ClassNameArgument("classname", Argument.SINGLE | Argument.MANDATORY, 
+	            "the fully qualified Java name of the class to be viewed");
+	
+	public ClassCommand() {
+        super("View a Java class");
+        registerArguments(ARG_CLASS);
+    }
+	
+    public void execute(CommandLine commandLine, InputStream in,
+            PrintStream out, PrintStream err) throws Exception {
+        String className = ARG_CLASS.getValue();
+        final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        final Class<?> type = cl.loadClass(className);
+        showClass(type, out);
+    }
 
-	public static Help.Info HELP_INFO = new Help.Info("class", "View a Java class", new Parameter[] { new Parameter(ARG_CLASS, Parameter.MANDATORY)});
-
-	public static void main(String[] args) throws Exception {
-		ParsedArguments cmdLine = HELP_INFO.parse(args);
-
-		String className = ARG_CLASS.getValue(cmdLine);
-		final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		final Class type = cl.loadClass(className);
-		showClass(type, System.out);
+    public static void main(String[] args) throws Exception {
+        new ClassCommand().execute(args);
 	}
 	
-	private static void showClass(Class<?> type, PrintStream out) {
-        final VmType<?> vmType = type.getVmClass();
+	private void showClass(final Class<?> type, final PrintStream out) {
+	    final VmType<?> vmType = AccessController.doPrivileged(
+	            new PrivilegedAction<VmType<?>>() {
+	                public VmType<?> run() {
+	                    return type.getVmClass();
+	                }
+	            });
 		out.println("Name             : " + type.getName());
-		//out.println("Is abstract      : " + type.isAbstract());
+		// out.println("Is abstract      : " + type.isAbstract());
 		out.println("Is array         : " + type.isArray());
 		out.println("Is primitive     : " + type.isPrimitive());
         out.println("Shared statics   : " + vmType.isSharedStatics());
         out.println("Is initialized   : " + vmType.isInitialized());
-		out.println("Protection domain: " + type.getProtectionDomain());
+        AccessController.doPrivileged(
+                new PrivilegedAction<Void>() {
+                    public Void run() {
+                        out.println("Protection domain: " + type.getProtectionDomain());
+                        return null;
+                    }
+                });
         
         if (vmType instanceof VmClassType) {
             out.println("#Instances       : " + ((VmClassType<?>)vmType).getInstanceCount());
