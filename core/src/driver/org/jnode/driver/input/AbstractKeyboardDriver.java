@@ -191,7 +191,9 @@ public abstract class AbstractKeyboardDriver extends AbstractInputDriver<Keyboar
     {
         KeyboardEvent event = kbInterpreter.interpretScancode(scancode & 0xff);
         if (event != null) {
-            if ((event.getKeyCode() == KeyEvent.VK_PRINTSCREEN) && 
+            if ((event.getKeyCode() == KeyEvent.VK_PRINTSCREEN) &&
+                    event.isControlDown() &&
+                    event.isShiftDown() &&
                     event.isKeyPressed()) {
                 dispatchSystemTriggerEvent(event);
             }
