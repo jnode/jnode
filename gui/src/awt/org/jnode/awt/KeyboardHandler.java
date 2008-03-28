@@ -21,16 +21,13 @@
  
 package org.jnode.awt;
 
-import java.awt.EventQueue;
-import java.awt.Toolkit;
-import java.awt.Frame;
-import java.awt.KeyboardFocusManager;
-import java.awt.Component;
-import java.awt.Window;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.awt.event.KeyEvent;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collection;
+import java.io.File;
 
 import org.apache.log4j.Logger;
 import org.jnode.driver.ApiNotFoundException;
@@ -39,6 +36,8 @@ import org.jnode.driver.DeviceUtils;
 import org.jnode.driver.input.KeyboardAPI;
 import org.jnode.driver.input.KeyboardEvent;
 import org.jnode.driver.input.KeyboardListener;
+import javax.imageio.ImageIO;
+import javax.swing.SwingUtilities;
 
 /**
  * @author Levente S\u00e1ntha
@@ -199,6 +198,35 @@ public class KeyboardHandler implements
                     return null;
                 }
             });
+            return true;
+            
+        } else if (key_code == KeyEvent.VK_PRINTSCREEN) {
+            event.consume();
+            new Thread(new Runnable(){
+                public void run() {
+                    try {
+                        AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                            public Void run() {
+                                try {
+                                    log.debug("Taking screenshot");
+                                    File f = File.createTempFile("screen", ".png", new File(System.getProperty("java.io.tmpdir")));
+                                    Dimension ss = JNodeToolkit.getJNodeToolkit().getScreenSize();
+                                    BufferedImage capture = new Robot().createScreenCapture(new Rectangle(0, 0, ss.width , ss.height));
+                                    log.debug("Saving screenshot to " + f);
+                                    ImageIO.write(capture, "png", f);
+                                } catch (Exception e) {
+                                    log.error("Error taking screenshot", e);
+                                }
+
+                                return null;
+                            }
+                        });
+                    } catch (Exception x) {
+                        log.error("", x);
+                    }
+                }
+            },"screenshot").start();
+
             return true;
         }
         return false;
