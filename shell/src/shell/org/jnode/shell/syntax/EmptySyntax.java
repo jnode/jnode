@@ -21,6 +21,14 @@
 
 package org.jnode.shell.syntax;
 
+/**
+ * This class provides a way of representing an empty syntax or syntax alternative; e.g. when
+ * a command or command variant takes no options or arguments.  An EmptySyntax allows you to
+ * attach a description or a syntax label, something that cannot be done when the empty alternative
+ * is represented by a <code>null</code>.
+ * 
+ * @author crawley@jnode.org
+ */
 public class EmptySyntax extends Syntax {
     
     public EmptySyntax(String label, String description) {
@@ -29,7 +37,7 @@ public class EmptySyntax extends Syntax {
     
     @Override
     public String format(ArgumentBundle bundle) {
-        return "<empty>";
+        return "";
     }
 
     @Override
