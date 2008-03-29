@@ -265,7 +265,9 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
 
     final void unblock() {
         blocking = false;
-        blockingThread.interrupt();
+        if (blockingThread != null) {
+            blockingThread.interrupt();
+        }
     }
 
     final boolean isBlocking() {
