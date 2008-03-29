@@ -83,7 +83,18 @@ public class AliasCommand extends AbstractCommand {
             aliasMgr.remove(ARG_REMOVE.getValue());
         } else if (ARG_ALIAS.isSet()) {
             // add an alias
-            aliasMgr.add(ARG_ALIAS.getValue(), ARG_CLASS.getValue());
+            String className = ARG_CLASS.getValue();
+            try {
+                // If the className argument is actually an existing alias, use
+                // the existing alias's class name as the new alias's class name.
+                String tmp = aliasMgr.getAliasClassName(className);
+                if (tmp != null) {
+                    className = tmp;
+                }
+            } catch (NoSuchAliasException e) {
+                // ignore
+            }
+            aliasMgr.add(ARG_ALIAS.getValue(), className);
         } else {
             // list the aliases
             showAliases(aliasMgr, out);
