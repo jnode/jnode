@@ -18,43 +18,42 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
 package org.jnode.shell.syntax;
 
-import org.jnode.shell.CommandLine.Token;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
- * This class implements classname valued command line arguments.  At the moment, it performs
+ * This class implements URL-valued command line arguments.  At the moment, it performs
  * no special syntax checking and does no completion.
  * 
  * @author crawley@jnode.org
- */public class ClassNameArgument extends Argument<String> {
-    
-    public ClassNameArgument(String label, int flags, String description) {
-        super(label, flags, new String[0], description);
+ */
+public class URLArgument extends StringArgument {
+
+    public URLArgument(String label, int flags, String description) {
+        super(label, flags, description);
     }
 
-    public ClassNameArgument(String label, int flags) {
+    public URLArgument(String label, int flags) {
         this(label, flags, null);
     }
 
-    @Override
-    protected void doAccept(Token token) throws CommandSyntaxException {
-        addValue(token.token);
+    public URLArgument(String label) {
+        this(label, 0, null);
     }
-  
+    
+    public URL getValueAsURL() throws MalformedURLException {
+        return new URL(getValue());
+    }
+    
     @Override
     public String toString() {
-        return "ClassNameArgument{" + super.toString() + "}";
+        return "URLArgument{" + super.toString() + "}";
     }
     
     @Override
     protected String argumentKind() {
-        return "class name";
-    }
-    
-    public Class<?> getValueAsClass() throws ClassNotFoundException {
-        final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        return cl.loadClass(getValue());
+        return "url";
     }
 }
