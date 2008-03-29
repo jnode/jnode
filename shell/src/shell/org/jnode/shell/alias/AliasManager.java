@@ -37,28 +37,31 @@ public interface AliasManager {
 	public static final String ALIASES_EP_NAME = "org.jnode.shell.aliases";
 
 	/**
-	 * Add an alias
+	 * Add or update an alias to class name binding.  The supplied class name is not checked
+	 * in any way, but the shell expects it to be the name of a loadable class which suitable
+	 * for use as a "command".  
 	 * 
-	 * @param alias
-	 * @param className
+	 * @param alias a new or existing alias name
+	 * @param className a fully qualified Java class name.
 	 */
 	public abstract void add(String alias, String className);
 
 	/**
-	 * Remove an alias
+	 * Remove an alias to class name binding.
 	 * 
 	 * @param alias
 	 */
 	public abstract void remove(String alias);
 
 	/**
-	 * Gets the class of a given alias
+	 * Gets the class for a given alias.  If necessary, the alias manager will 
+	 * attempt to load the class.
 	 * 
 	 * @param alias
-	 * @return The class of the given alias
+	 * @return The class for the given alias
 	 * @throws ClassNotFoundException
 	 */
-	public abstract Class getAliasClass(String alias)
+	public abstract Class<?> getAliasClass(String alias)
 			throws ClassNotFoundException, NoSuchAliasException;
 
 	/**
@@ -71,10 +74,10 @@ public interface AliasManager {
 			throws NoSuchAliasException;
 
 	/**
-	 * Gets the classname of a given alias
+	 * Gets the class name currently bound to a given alias
 	 * 
 	 * @param alias
-	 * @return The classname of the given alias
+	 * @return The class name for the given alias
 	 */
 	public abstract String getAliasClassName(String alias)
 			throws NoSuchAliasException;
@@ -85,12 +88,12 @@ public interface AliasManager {
 	public AliasManager createAliasManager();
 
 	/**
-	 * Gets a collection of all aliases.
+	 * Gets a collection of all aliases known to this alias manager.
 	 */
 	public Collection<String> aliases();
 
     /**
-     * Gets an iterator to iterate over all aliases.
+     * Gets an iterator to iterate over all aliases for the alias manager.
      * 
      * @return An iterator the returns instances of String.
      */

@@ -80,12 +80,6 @@ public class DefaultAliasManager implements AliasManager,
             throw new UnsupportedOperationException(
                     "Cannot modify the system alias manager");
         } else {
-            try {
-                if (getAliasClassName(className) != null) {
-                    className = getAliasClassName(className);
-                }
-            } catch (NoSuchAliasException e) {
-            }
             aliases.put(alias, new Alias(alias, className, false));
         }
     }
