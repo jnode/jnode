@@ -24,6 +24,9 @@ package org.jnode.shell.syntax;
 
 import java.lang.reflect.Array;
 
+import javax.naming.OperationNotSupportedException;
+
+import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandLine.Token;
 
 /**
@@ -57,6 +60,11 @@ public class EnumArgument<E extends Enum<E>> extends Argument<E> {
         }
     }
     
+    @Override
+    public void complete(CompletionInfo completion, String partial) {
+        throw new UnsupportedOperationException("not implemented yet");
+    }
+
     public String toString() {
         return "EnumArgument<" + clazz + "{" + super.toString() + "}";
     }

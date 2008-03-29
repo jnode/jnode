@@ -29,6 +29,9 @@ import org.jnode.shell.CommandLine.Token;
 import org.jnode.shell.alias.AliasManager;
 
 /**
+ * This class implements alias-valued command line arguments.  At the moment, it performs
+ * minimal syntax checking and performs completion against the shell's alias namespace.
+ * 
  * @author qades
  * @author crawley@jnode.org
  */
@@ -48,8 +51,8 @@ public class AliasArgument extends Argument<String> {
 
 	@Override
 	public void doAccept(Token value) throws CommandSyntaxException {
-	    if (value.token.length() == 0 || value.token.startsWith("-")) {
-	        throw new CommandSyntaxException("Unacceptable alias name '" + value.token + "'");
+	    if (value.token.length() == 0) {
+	        throw new CommandSyntaxException("Empty alias name '" + value.token + "'");
 	    }
 	    addValue(value.token);
 	}
