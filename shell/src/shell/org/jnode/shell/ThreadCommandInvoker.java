@@ -32,6 +32,7 @@ import java.security.AccessController;
 import java.security.PrivilegedActionException;
 
 import org.jnode.shell.help.Help;
+import org.jnode.shell.help.HelpException;
 import org.jnode.shell.help.SyntaxErrorException;
 import org.jnode.vm.VmExit;
 
@@ -75,15 +76,16 @@ public class ThreadCommandInvoker extends AsyncCommandInvoker {
         return new CommandThread(cr, cmdLine.getCommandName());
     }
 
-    CommandRunner createRunner(Class<?> cx, Method method, Object[] args,
+    CommandRunner createRunner(CommandInfo cmdInfo, Method method, Object[] args,
             InputStream in, PrintStream out,
             PrintStream err) {
-        return new ThreadCommandRunner(cx, method, args, in, out, err);
+        return new ThreadCommandRunner(
+                cmdInfo, cmdInfo.getCommandClass(), method, args, in, out, err);
     }
 
-    CommandRunner createRunner(Command command, CommandLine cmdLine,
+    CommandRunner createRunner(CommandInfo cmdInfo, CommandLine cmdLine,
             InputStream in, PrintStream out, PrintStream err) {
-        return new ThreadCommandRunner(command, cmdLine, in, out, err);
+        return new ThreadCommandRunner(cmdInfo, cmdLine, in, out, err);
     }
 
     class ThreadCommandRunner extends CommandRunner {
@@ -91,33 +93,31 @@ public class ThreadCommandInvoker extends AsyncCommandInvoker {
         private final Method method;
         private final Object[] args;
         private final CommandLine cmdLine;
-        private final Command command;
+        private final CommandInfo cmdInfo;
         private final InputStream in;
         private final PrintStream out;
         private final PrintStream err;
         
-        private boolean finished = false;
-
-        public ThreadCommandRunner(Class<?> cx, Method method, Object[] args,
+        public ThreadCommandRunner(CommandInfo cmdInfo, Class<?> cx, Method method, Object[] args,
                 InputStream in, PrintStream out, PrintStream err) {
             super(commandShell);
             this.cx = cx;
             this.method = method;
             this.args = args;
-            this.command = null;
+            this.cmdInfo = cmdInfo;
             this.cmdLine = null;
             this.in = in;
             this.out = out;
             this.err = err;
         }
 
-        public ThreadCommandRunner(Command command, CommandLine cmdLine,
+        public ThreadCommandRunner(CommandInfo cmdInfo, CommandLine cmdLine,
                 InputStream in, PrintStream out, PrintStream err) {
             super(commandShell);
             this.cx = null;
             this.method = null;
             this.args = null;
-            this.command = command;
+            this.cmdInfo = cmdInfo;
             this.cmdLine = cmdLine;
             this.in = in;
             this.out = out;
@@ -126,27 +126,41 @@ public class ThreadCommandInvoker extends AsyncCommandInvoker {
 
         public void run() {
             try {
-                if (command == null) {
+                if (method != null) {
                     Object obj = Modifier.isStatic(method.getModifiers()) ? null
                             : cx.newInstance();
                     try {
                         AccessController.doPrivileged(new InvokeAction(method, obj,
                                 args));
                     } catch (PrivilegedActionException ex) {
-                        throw ex.getException();
-                    }
+                        Exception ex2 = ex.getException();
+                        if (ex2 instanceof InvocationTargetException) {
+                            throw ex2.getCause();
+                        }
+                        else {
+                            throw ex2;
+                        }
+                    } 
                 }
                 else {
-                    command.execute(cmdLine, in, out, err);
+                    cmdInfo.getCommandInstance().execute(cmdLine, in, out, err);
                 }
 
                 if (!isBlocking()) {
                     // somebody already hit ctrl-c.
                 } else {
-                    finished = true;
                     // done with invoke, stop waiting for a ctrl-c
                     unblock();
                 }
+            } catch (SyntaxErrorException ex) {
+                try {
+                    Help.getInfo(cmdInfo.getCommandClass()).usage();
+                    err.println(ex.getMessage());
+                } catch (HelpException e) {
+                    err.println("Exception while trying to get the command usage");
+                    stackTrace(ex);
+                }
+                unblock();
             } catch (VmExit ex) {
                 setRC(ex.getStatus());
                 unblock();
@@ -154,12 +168,11 @@ public class ThreadCommandInvoker extends AsyncCommandInvoker {
                 err.println("Exception in command");
                 stackTrace(ex);
                 unblock();
-            } catch (Error ex) {
+            } catch (Throwable ex) {
                 err.println("Fatal error in command");
                 stackTrace(ex);
                 unblock();
             }
-            finished = true;
         }
     }
 }

@@ -451,8 +451,8 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
      * @return the command's return code
      * @throws ShellException
      */
-    public int invoke(CommandLine cmdLine, Command command) throws ShellException {
-        return this.invoker.invoke(cmdLine, command);
+    public int invoke(CommandLine cmdLine, CommandInfo cmdInfo) throws ShellException {
+        return this.invoker.invoke(cmdLine, cmdInfo);
     }
 
     /**
@@ -464,19 +464,19 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
      * @return the command's return code
      * @throws ShellException
      */
-    public CommandThread invokeAsynchronous(CommandLine cmdLine, Command command)
+    public CommandThread invokeAsynchronous(CommandLine cmdLine, CommandInfo cmdInfo)
             throws ShellException {
-        return this.invoker.invokeAsynchronous(cmdLine, command);
+        return this.invoker.invokeAsynchronous(cmdLine, cmdInfo);
     }
 
-    protected CommandInfo getCommandClass(String cmd)
+    protected CommandInfo getCommandInfo(String cmd)
             throws ClassNotFoundException {
         try {
             Class<?> cls = aliasMgr.getAliasClass(cmd);
             return new CommandInfo(cls, aliasMgr.isInternal(cmd));
         } catch (NoSuchAliasException ex) {
-            final ClassLoader cl = Thread.currentThread()
-                    .getContextClassLoader();
+            final ClassLoader cl = 
+                Thread.currentThread().getContextClassLoader();
             return new CommandInfo(cl.loadClass(cmd), false);
         }
     }

@@ -28,6 +28,7 @@ import junit.framework.TestCase;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.Command;
+import org.jnode.shell.CommandInfo;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.CommandLine.Token;
@@ -93,17 +94,18 @@ public class ArgumentMultiplicityTest extends TestCase {
         }
     }
     
-    public void testOptionalArgument() throws ShellException {
+    public void testOptionalArgument() throws Exception {
         TestShell shell = new TestShell();
         shell.addAlias("cmd", "org.jnode.test.shell.syntax.ArgumentMultiplicityTest$Optional");
         shell.addSyntax("cmd", new ArgumentSyntax("arg1"));
         CommandLine cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1")}, null);
-        Command cmd = cl.parseCommandLine(shell);
+        CommandInfo cmdInfo = cl.parseCommandLine(shell);
+        Command cmd = cmdInfo.getCommandInstance();
         assertEquals("F1", cmd.getArgumentBundle().getArgument("arg1").getValue().toString());
         
         try {
             cl = new CommandLine(new Token("cmd"), new Token[]{new Token("")}, null);
-            cmd = cl.parseCommandLine(shell);
+            cl.parseCommandLine(shell);
             fail("parse didn't fail");
         }
         catch (CommandSyntaxException ex) {
@@ -111,17 +113,18 @@ public class ArgumentMultiplicityTest extends TestCase {
         }
     }
     
-    public void testMandatoryArgument() throws ShellException {
+    public void testMandatoryArgument() throws Exception {
         TestShell shell = new TestShell();
         shell.addAlias("cmd", "org.jnode.test.shell.syntax.ArgumentMultiplicityTest$Mandatory");
         shell.addSyntax("cmd", new ArgumentSyntax("arg1"));
         CommandLine cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1")}, null);
-        Command cmd = cl.parseCommandLine(shell);
+        CommandInfo cmdInfo = cl.parseCommandLine(shell);
+        Command cmd = cmdInfo.getCommandInstance();
         assertEquals("F1", cmd.getArgumentBundle().getArgument("arg1").getValue().toString());
         
         try {
             cl = new CommandLine(new Token("cmd"), new Token[]{}, null);
-            cmd = cl.parseCommandLine(shell);
+            cl.parseCommandLine(shell);
             fail("parse didn't fail");
         }
         catch (CommandSyntaxException ex) {
@@ -129,32 +132,34 @@ public class ArgumentMultiplicityTest extends TestCase {
         }
     }
     
-    public void testOptionalMultiArgument() throws ShellException {
+    public void testOptionalMultiArgument() throws Exception {
         TestShell shell = new TestShell();
         shell.addAlias("cmd", "org.jnode.test.shell.syntax.ArgumentMultiplicityTest$OptionalMulti");
         shell.addSyntax("cmd", new RepeatSyntax(new ArgumentSyntax("arg1")));
         CommandLine cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1")}, null);
-        Command cmd = cl.parseCommandLine(shell);
+        CommandInfo cmdInfo = cl.parseCommandLine(shell);
+        Command cmd = cmdInfo.getCommandInstance();
         assertEquals("F1", cmd.getArgumentBundle().getArgument("arg1").getValue().toString());
         
         cl = new CommandLine(new Token("cmd"), new Token[]{}, null);
-        cmd = cl.parseCommandLine(shell);
+        cmdInfo = cl.parseCommandLine(shell);
 
         cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1"), new Token("F2")}, null);
-        cmd = cl.parseCommandLine(shell);
+        cmdInfo = cl.parseCommandLine(shell);
     }
     
-    public void testMandatoryMultiArgument() throws ShellException {
+    public void testMandatoryMultiArgument() throws Exception {
         TestShell shell = new TestShell();
         shell.addAlias("cmd", "org.jnode.test.shell.syntax.ArgumentMultiplicityTest$MandatoryMulti");
         shell.addSyntax("cmd", new RepeatSyntax(new ArgumentSyntax("arg1")));
         CommandLine cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1")}, null);
-        Command cmd = cl.parseCommandLine(shell);
+        CommandInfo cmdInfo = cl.parseCommandLine(shell);
+        Command cmd = cmdInfo.getCommandInstance();
         assertEquals("F1", cmd.getArgumentBundle().getArgument("arg1").getValue().toString());
         
         try {
             cl = new CommandLine(new Token("cmd"), new Token[]{}, null);
-            cmd = cl.parseCommandLine(shell);
+            cl.parseCommandLine(shell);
             fail("parse didn't fail");
         }
         catch (CommandSyntaxException ex) {
@@ -162,6 +167,6 @@ public class ArgumentMultiplicityTest extends TestCase {
         }
 
         cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1"), new Token("F2")}, null);
-        cmd = cl.parseCommandLine(shell);
+        cl.parseCommandLine(shell);
     }
 }

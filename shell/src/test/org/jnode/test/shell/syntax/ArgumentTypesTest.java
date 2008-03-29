@@ -28,6 +28,7 @@ import junit.framework.TestCase;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.Command;
+import org.jnode.shell.CommandInfo;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.CommandLine.Token;
@@ -55,17 +56,18 @@ public class ArgumentTypesTest extends TestCase {
         }
     }
 	
-	public void testEnumArgument() throws ShellException {
+	public void testEnumArgument() throws Exception {
 	    TestShell shell = new TestShell();
         shell.addAlias("command", "org.jnode.test.shell.syntax.ArgumentTypesTest$TestEnumCommand");
         shell.addSyntax("command", new ArgumentSyntax("arg1"));
         CommandLine cl = new CommandLine(new Token("command"), new Token[]{new Token("ALT1")}, null);
-        Command cmd = cl.parseCommandLine(shell);
+        CommandInfo cmdInfo = cl.parseCommandLine(shell);
+        Command cmd = cmdInfo.getCommandInstance();
         assertEquals(TestEnum.ALT1, cmd.getArgumentBundle().getArgument("arg1").getValue());
         
         try {
             cl = new CommandLine(new Token("command"), new Token[]{new Token("ALT99")}, null);
-            cmd = cl.parseCommandLine(shell);
+            cl.parseCommandLine(shell);
             fail("parse didn't fail");
         }
         catch (CommandSyntaxException ex) {
@@ -73,7 +75,7 @@ public class ArgumentTypesTest extends TestCase {
         }
         try {
             cl = new CommandLine(new Token("command"), new Token[]{new Token("ALT1"), new Token("ALT1")}, null);
-            cmd = cl.parseCommandLine(shell);
+            cl.parseCommandLine(shell);
             fail("parse didn't fail");
         }
         catch (CommandSyntaxException ex) {
@@ -94,17 +96,18 @@ public class ArgumentTypesTest extends TestCase {
         }
     }
     
-    public void testFileArgument() throws ShellException {
+    public void testFileArgument() throws Exception {
         TestShell shell = new TestShell();
         shell.addAlias("command", "org.jnode.test.shell.syntax.ArgumentTypesTest$TestFileCommand");
         shell.addSyntax("command", new ArgumentSyntax("arg1"));
         CommandLine cl = new CommandLine(new Token("command"), new Token[]{new Token("F1")}, null);
-        Command cmd = cl.parseCommandLine(shell);
+        CommandInfo cmdInfo = cl.parseCommandLine(shell);
+        Command cmd = cmdInfo.getCommandInstance();
         assertEquals("F1", cmd.getArgumentBundle().getArgument("arg1").getValue().toString());
         
         try {
             cl = new CommandLine(new Token("command"), new Token[]{new Token("")}, null);
-            cmd = cl.parseCommandLine(shell);
+            cl.parseCommandLine(shell);
             fail("parse didn't fail");
         }
         catch (CommandSyntaxException ex) {

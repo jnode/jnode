@@ -28,6 +28,7 @@ import junit.framework.TestCase;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.Command;
+import org.jnode.shell.CommandInfo;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.SymbolSource;
@@ -110,12 +111,13 @@ public class CommandLineTest extends TestCase {
         }
     }
     
-    public void testParse() throws ShellException {
+    public void testParse() throws Exception {
         TestShell shell = new TestShell();
         shell.addAlias("command", "org.jnode.test.shell.syntax.CommandLineTest$TestCommand");
         shell.addSyntax("command", new ArgumentSyntax("arg1"));
         CommandLine cl = new CommandLine(new Token("command"), new Token[]{new Token("fish")}, null);
-        Command cmd = cl.parseCommandLine(shell);
+        CommandInfo cmdInfo = cl.parseCommandLine(shell);
+        Command cmd = cmdInfo.getCommandInstance();
         assertEquals("fish", cmd.getArgumentBundle().getArgument("arg1").getValue());
     }
 }

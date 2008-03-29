@@ -77,44 +77,18 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
         // ctrl-c
     }
 
-    public int invoke(CommandLine cmdLine, Command command) throws ShellException {
-        // FIXME -- we already did this ...
-        CommandInfo cmdInfo = lookupCommand(cmdLine);
-        if (cmdInfo == null) {
-            return 0;
-        }
-        CommandRunner cr = setup(cmdLine, command, cmdInfo);
+    public int invoke(CommandLine cmdLine, CommandInfo cmdInfo) throws ShellException {
+        CommandRunner cr = setup(cmdLine, cmdInfo);
         return runIt(cmdLine, cmdInfo, cr);
     }
 
-    public CommandThread invokeAsynchronous(CommandLine cmdLine, Command command)
+    public CommandThread invokeAsynchronous(CommandLine cmdLine, CommandInfo cmdInfo)
             throws ShellException {
-        CommandInfo cmdInfo = null;
-        if (command == null) {
-            cmdInfo = lookupCommand(cmdLine);
-            if (cmdInfo == null) {
-                return null;
-            }
-        }
-        CommandRunner cr = setup(cmdLine, command, cmdInfo);
+        CommandRunner cr = setup(cmdLine, cmdInfo);
         return forkIt(cmdLine, cmdInfo, cr);
     }
-
-    private CommandInfo lookupCommand(CommandLine cmdLine)
-            throws ShellInvocationException {
-        String cmdName = cmdLine.getCommandName();
-        if (cmdName == null) {
-            return null;
-        }
-        try {
-            return commandShell.getCommandClass(cmdName);
-        } catch (ClassNotFoundException ex) {
-            throw new ShellInvocationException("Cannot resolve command '"
-                    + cmdName + "'");
-        }
-    }
-
-    private CommandRunner setup(CommandLine cmdLine, Command command, CommandInfo cmdInfo)
+    
+    private CommandRunner setup(CommandLine cmdLine, CommandInfo cmdInfo)
             throws ShellException {
         Method method;
         CommandRunner cr = null;
@@ -129,8 +103,14 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
         } catch (ClassCastException ex) {
             throw new ShellFailureException("streams array broken", ex);
         }
+        Command command;
+        try {
+            command = cmdInfo.getCommandInstance();
+        } catch (Exception ex) {
+            throw new ShellInvocationException("Problem while creating command instance", ex);
+        }
         if (command != null) {
-            cr = createRunner(command, cmdLine, in, out, err);
+            cr = createRunner(cmdInfo, cmdLine, in, out, err);
         }
         else {
             try {
@@ -145,7 +125,7 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
                                         + cmdInfo.getCommandClass()
                                         + " does not allow redirection or pipelining");
                     }
-                    cr = createRunner(cmdInfo.getCommandClass(), method,
+                    cr = createRunner(cmdInfo, method,
                             new Object[] { cmdLine.getArguments() }, 
                             in, out, err);
                 }
@@ -277,9 +257,9 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
     public void keyReleased(KeyboardEvent event) {
     }
     
-    abstract CommandRunner createRunner(Class<?> cx, Method method, Object[] args, 
+    abstract CommandRunner createRunner(CommandInfo cmdInfo, Method method, Object[] args, 
         	InputStream in, PrintStream out, PrintStream err);
 
-    abstract CommandRunner createRunner(Command command, CommandLine cmdLine,
+    abstract CommandRunner createRunner(CommandInfo cmdInfo, CommandLine cmdLine,
             InputStream in, PrintStream out, PrintStream err);
 }
