@@ -328,7 +328,7 @@ public final class VmSystem {
         //internal classpath for javac
         res.put("sun.boot.class.path", ":");
 
-        res.put("swing.handleTopLevelPaint", false);        
+        res.put("swing.handleTopLevelPaint", "false");        
 
     }
 
