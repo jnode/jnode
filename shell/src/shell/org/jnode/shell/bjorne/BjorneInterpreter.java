@@ -17,6 +17,7 @@ import java.io.PrintStream;
 import java.util.HashMap;
 
 import org.jnode.shell.Command;
+import org.jnode.shell.CommandInfo;
 import org.jnode.shell.CommandInterpreter;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandShell;
@@ -182,8 +183,8 @@ public class BjorneInterpreter implements CommandInterpreter {
         } else {
             cmdLine.setStreams(streams);
             try {
-				Command command = cmdLine.parseCommandLine(shell);
-				return shell.invoke(cmdLine, command);
+				CommandInfo cmdInfo = cmdLine.parseCommandLine(shell);
+				return shell.invoke(cmdLine, cmdInfo);
 			}
 			catch (CommandSyntaxException ex) {
 				throw new ShellException("Command arguments don't match syntax", ex);

@@ -33,6 +33,9 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 
+import org.jnode.shell.help.Help;
+import org.jnode.shell.help.HelpException;
+import org.jnode.shell.help.SyntaxErrorException;
 import org.jnode.shell.proclet.ProcletContext;
 import org.jnode.shell.proclet.ProcletIOContext;
 import org.jnode.vm.VmExit;
@@ -78,16 +81,17 @@ public class ProcletCommandInvoker extends AsyncCommandInvoker {
                 streams[0], streams[1], streams[2] }, cmdLine.getCommandName());
     }
 
-    CommandRunner createRunner(Class<?> cx, Method method, Object[] args,
+    CommandRunner createRunner(CommandInfo cmdInfo, Method method, Object[] args,
             InputStream commandIn, PrintStream commandOut,
             PrintStream commandErr) {
-        return new ProcletCommandRunner(cx, method, args, commandIn,
+        return new ProcletCommandRunner(
+                cmdInfo, cmdInfo.getCommandClass(), method, args, commandIn,
                 commandOut, commandErr);
     }
     
-    CommandRunner createRunner(Command command, CommandLine cmdLine,
+    CommandRunner createRunner(CommandInfo cmdInfo, CommandLine cmdLine,
             InputStream in, PrintStream out, PrintStream err) {
-        return new ProcletCommandRunner(command, cmdLine, in, out, err);
+        return new ProcletCommandRunner(cmdInfo, cmdLine, in, out, err);
     }
 
     class ProcletCommandRunner extends CommandRunner {
@@ -97,17 +101,15 @@ public class ProcletCommandInvoker extends AsyncCommandInvoker {
         private final Class<?> cx;
         private final Method method;
         private final Object[] args;
-        private final Command command;
+        private final CommandInfo cmdInfo;
         private final CommandLine commandLine;
 
-        private boolean finished = false;
-
-        public ProcletCommandRunner(Class<?> cx, Method method, Object[] args,
+        public ProcletCommandRunner(CommandInfo cmdInfo, Class<?> cx, Method method, Object[] args,
                 InputStream in, PrintStream out, PrintStream err) {
             super(commandShell);
             this.cx = cx;
             this.method = method;
-            this.command = null;
+            this.cmdInfo = cmdInfo;
             this.commandLine = null;
             this.args = args;
             this.in = in;
@@ -115,13 +117,13 @@ public class ProcletCommandInvoker extends AsyncCommandInvoker {
             this.err = err;
         }
 
-        public ProcletCommandRunner(Command command, CommandLine commandLine, 
+        public ProcletCommandRunner(CommandInfo cmdInfo, CommandLine commandLine, 
                 InputStream in, PrintStream out, PrintStream err) {
             super(commandShell);
             this.cx = null;
             this.method = null;
             this.args = null;
-            this.command = command;
+            this.cmdInfo = cmdInfo;
             this.commandLine = commandLine;
             this.in = in;
             this.out = out;
@@ -139,25 +141,39 @@ public class ProcletCommandInvoker extends AsyncCommandInvoker {
                             return null;
                         }
                     });
-                    if (command == null) {
+                    if (method != null) {
                         Object obj = Modifier.isStatic(method.getModifiers()) ? null
                                 : cx.newInstance();
                         AccessController.doPrivileged(new InvokeAction(method, obj,
                                 args));
                     }
                     else {
-                        command.execute(commandLine, in, out, err);
+                        cmdInfo.getCommandInstance().execute(commandLine, in, out, err);
                     }
                 } catch (PrivilegedActionException ex) {
-                    throw ex.getException();
+                    Exception ex2 = ex.getException();
+                    if (ex2 instanceof InvocationTargetException) {
+                        throw ex2.getCause();
+                    }
+                    else {
+                        throw ex2;
+                    }
                 }
                 if (!isBlocking()) {
                     // somebody already hit ctrl-c.
                 } else {
-                    finished = true;
                     // done with invoke, stop waiting for a ctrl-c
                     unblock();
                 }
+            } catch (SyntaxErrorException ex) {
+                try {
+                    Help.getInfo(cmdInfo.getCommandClass()).usage();
+                    err.println(ex.getMessage());
+                } catch (HelpException e) {
+                    err.println("Exception while trying to get the command usage");
+                    stackTrace(ex);
+                }
+                unblock();
             } catch (VmExit ex) {
                 setRC(ex.getStatus());
                 unblock();
@@ -165,12 +181,11 @@ public class ProcletCommandInvoker extends AsyncCommandInvoker {
                 err.println("Exception in command");
                 stackTrace(ex);
                 unblock();
-            } catch (Error ex) {
+            } catch (Throwable ex) {
                 err.println("Fatal error in command");
                 stackTrace(ex);
                 unblock();
             }
-            finished = true;
         }
     }
 }

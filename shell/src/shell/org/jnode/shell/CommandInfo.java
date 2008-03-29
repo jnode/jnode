@@ -23,12 +23,15 @@ package org.jnode.shell;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
+ * @author crawley@jnode.org
  */
 public final class CommandInfo {
 
     private final Class<?> clazz;
 
     private final boolean internal;
+    
+    private Command instance;
 
     public CommandInfo(Class<?> clazz, boolean internal) {
         this.clazz = clazz;
@@ -43,12 +46,12 @@ public final class CommandInfo {
         return internal;
     }
     
-    public final Command createCommandInstance() throws InstantiationException, IllegalAccessException {
-    	if (Command.class.isAssignableFrom(clazz)) {
-    		return (Command) (clazz.newInstance());
-    	}
-    	else {
-    		return null;
-    	}
+    public final Command getCommandInstance() throws InstantiationException, IllegalAccessException {
+        if (instance == null) {
+            if (Command.class.isAssignableFrom(clazz)) {
+                instance = (Command) (clazz.newInstance());
+            }
+        }
+    	return instance;
     }
 }

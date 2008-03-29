@@ -75,9 +75,9 @@ public class DefaultCommandInvoker implements CommandInvoker {
     }
 
     /**
-     * Invoke the command.  The Command argument is not used by this method.
+     * Invoke the command. 
      */
-    public int invoke(CommandLine cmdLine, Command command) {
+    public int invoke(CommandLine cmdLine, CommandInfo cmdInfo) {
         String cmdName = cmdLine.getCommandName();
         if (cmdName == null) {
             return 0;
@@ -90,7 +90,6 @@ public class DefaultCommandInvoker implements CommandInvoker {
                 err.println("Warning: redirections ignored by the '"
                         + getName() + "' invoker");
             }
-            CommandInfo cmdInfo = commandShell.getCommandClass(cmdName);
             final Method main = cmdInfo.getCommandClass().getMethod("main",
                     MAIN_ARG_TYPES);
             try {
@@ -127,8 +126,6 @@ public class DefaultCommandInvoker implements CommandInvoker {
             }
         } catch (NoSuchMethodException ex) {
             err.println("Alias class has no main method " + cmdName);
-        } catch (ClassNotFoundException ex) {
-            err.println("Unknown alias class " + ex.getMessage());
         } catch (ClassCastException ex) {
             err.println("Invalid command " + cmdName);
         } catch (Exception ex) {
@@ -138,7 +135,10 @@ public class DefaultCommandInvoker implements CommandInvoker {
         return 1;
     }
 
-    public CommandThread invokeAsynchronous(CommandLine commandLine, Command command) {
+    /**
+     * This method is not supported for the DefaultCommandInvoker.
+     */
+    public CommandThread invokeAsynchronous(CommandLine commandLine, CommandInfo cmdInfo) {
         throw new UnsupportedOperationException();
     }
 

@@ -220,8 +220,8 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
             }
             desc.commandLine.setStreams(new Closeable[] { in, out, err });
             try {
-                Command command = desc.commandLine.parseCommandLine(shell);
-                return shell.invoke(desc.commandLine, command);
+                CommandInfo cmdInfo = desc.commandLine.parseCommandLine(shell);
+                return shell.invoke(desc.commandLine, cmdInfo);
             } catch (CommandSyntaxException ex) {
                 throw new ShellException(
                         "Command arguments don't match syntax", ex);

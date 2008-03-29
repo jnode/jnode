@@ -24,8 +24,6 @@ package org.jnode.shell.syntax;
 
 import java.lang.reflect.Array;
 
-import javax.naming.OperationNotSupportedException;
-
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandLine.Token;
 

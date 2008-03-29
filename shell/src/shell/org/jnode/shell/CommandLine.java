@@ -576,11 +576,11 @@ public class CommandLine implements Completable, Iterable<String> {
      * in an ArgumentBundle object obtained from the Command object.
      * 
      * @param shell the context for resolving command aliases and locating syntaxes
-     * @return the command instance to which the arguments have been bound
+     * @return a CompandInfo which includes the command instance to which the arguments have been bound
      * @throws CommandSyntaxException if the chosen syntax doesn't match the command
      * line arguments.
      */
-    public Command parseCommandLine(CommandShell shell)
+    public CommandInfo parseCommandLine(CommandShell shell)
     throws ShellException {
     	String cmd = (commandToken == null) ? "" : commandToken.token.trim();
     	if (cmd.equals("")) {
@@ -588,8 +588,8 @@ public class CommandLine implements Completable, Iterable<String> {
     	}
     	try {
     		// Get command's argument bundle and syntax
-    		CommandInfo cmdClass = shell.getCommandClass(cmd);
-    		Command command = cmdClass.createCommandInstance();
+    		CommandInfo cmdInfo = shell.getCommandInfo(cmd);
+    		Command command = cmdInfo.getCommandInstance();
     		
     		// Get the command's argument bundle, or the default one.
     		ArgumentBundle bundle = (command == null) ? null :
@@ -603,7 +603,7 @@ public class CommandLine implements Completable, Iterable<String> {
     		// Do a full parse to bind the command line argument tokens to corresponding
     		// command arguments
     		bundle.parse(this, syntax);
-    		return command;
+    		return cmdInfo;
     	} catch (ClassNotFoundException ex) {
     		throw new ShellException("Command class not found", ex);
     	} catch (InstantiationException ex) {
@@ -619,14 +619,14 @@ public class CommandLine implements Completable, Iterable<String> {
         if (!cmd.equals("") && (argumentTokens.length > 0 || argumentAnticipated)) {
             CommandInfo cmdClass;
             try {
-                cmdClass = shell.getCommandClass(cmd);
+                cmdClass = shell.getCommandInfo(cmd);
             } catch (ClassNotFoundException ex) {
                 throw new CompletionException("Command class not found", ex);
             }
             
             Command command;
             try {
-                command = cmdClass.createCommandInstance();
+                command = cmdClass.getCommandInstance();
             }
             catch (Throwable ex) {
                 throw new CompletionException("Problem creating a command instance", ex);

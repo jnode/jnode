@@ -28,7 +28,8 @@ import org.jnode.shell.CommandLine.Token;
  * no special syntax checking and does no completion.
  * 
  * @author crawley@jnode.org
- */public class ClassNameArgument extends Argument<String> {
+ */
+public class ClassNameArgument extends Argument<String> {
     
     public ClassNameArgument(String label, int flags, String description) {
         super(label, flags, new String[0], description);
