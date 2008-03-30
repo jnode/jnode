@@ -26,10 +26,10 @@ import java.io.PrintStream;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.*;
+import org.jnode.shell.help.Help;
+import org.jnode.util.NumberUtils;
 import org.jnode.vm.Vm;
 import org.jnode.vm.memmgr.GCStatistics;
-import org.jnode.util.NumberUtils;
 
 /**
  * @author epr

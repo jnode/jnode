@@ -32,7 +32,6 @@ import org.apache.log4j.Logger;
 import org.jnode.debug.UDPAppender;
 import org.jnode.debug.UDPOutputStream;
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;

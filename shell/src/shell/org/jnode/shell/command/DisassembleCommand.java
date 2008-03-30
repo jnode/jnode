@@ -21,6 +21,8 @@
  
 package org.jnode.shell.command;
 
+import java.io.OutputStreamWriter;
+
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
@@ -28,8 +30,6 @@ import org.jnode.shell.help.argument.ClassNameArgument;
 import org.jnode.shell.help.argument.IntegerArgument;
 import org.jnode.shell.help.argument.StringArgument;
 import org.jnode.vm.classmgr.VmType;
-
-import java.io.OutputStreamWriter;
 
 /**
  * @author Levente S\u00e1ntha

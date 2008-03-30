@@ -30,15 +30,14 @@ import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandInfo;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.ShellException;
 import org.jnode.shell.CommandLine.Token;
 import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.CommandSyntaxException;
 import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.shell.syntax.IntegerArgument;
 import org.jnode.shell.syntax.OptionSetSyntax;
 import org.jnode.shell.syntax.OptionSyntax;
-import org.jnode.shell.syntax.CommandSyntaxException;
 
 public class OptionSetSyntaxTest extends TestCase {
 

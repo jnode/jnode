@@ -21,11 +21,11 @@
  
 package org.jnode.shell;
 
-import org.jnode.shell.alias.AliasManager;
-import org.jnode.shell.syntax.SyntaxManager;
 import org.jnode.driver.console.Console;
 import org.jnode.driver.console.InputCompleter;
 import org.jnode.driver.console.InputHistory;
+import org.jnode.shell.alias.AliasManager;
+import org.jnode.shell.syntax.SyntaxManager;
 
 /**
  * @author epr

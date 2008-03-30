@@ -21,15 +21,15 @@
  
 package org.jnode.shell.command.unix;
 
-import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.SyntaxErrorException;
-
 import java.io.File;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Stack;
+
+import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.CommandLine;
+import org.jnode.shell.help.SyntaxErrorException;
 
 
 /**

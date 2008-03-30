@@ -20,6 +20,9 @@
  */
 package org.jnode.test.shell;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.SortedSet;
@@ -27,6 +30,8 @@ import java.util.TreeSet;
 
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
+
+import junit.framework.TestCase;
 
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandShell;
@@ -45,12 +50,6 @@ import org.jnode.shell.syntax.SequenceSyntax;
 import org.jnode.shell.syntax.SyntaxManager;
 import org.jnode.test.shell.syntax.TestAliasManager;
 import org.jnode.test.shell.syntax.TestSyntaxManager;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-
-import junit.framework.TestCase;
 
 /**
  * Test command completion using various interpreters and commands.

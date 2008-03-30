@@ -26,7 +26,6 @@ import java.io.PrintStream;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.Command;
 import org.jnode.shell.help.Help;
 import org.jnode.util.NumberUtils;
 

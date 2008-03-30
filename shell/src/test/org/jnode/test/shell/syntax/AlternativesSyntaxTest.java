@@ -33,12 +33,12 @@ import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandLine.Token;
 import org.jnode.shell.syntax.AlternativesSyntax;
 import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.CommandSyntaxException;
 import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.shell.syntax.IntegerArgument;
 import org.jnode.shell.syntax.OptionSyntax;
 import org.jnode.shell.syntax.Syntax;
-import org.jnode.shell.syntax.CommandSyntaxException;
 
 public class AlternativesSyntaxTest extends TestCase {
 

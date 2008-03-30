@@ -21,15 +21,23 @@
 
 package org.jnode.shell.command.bsh;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintStream;
 
-import bsh.Interpreter;
-import org.jnode.shell.help.*;
-import org.jnode.shell.help.argument.StringArgument;
-import org.jnode.shell.help.argument.FileArgument;
-import org.jnode.shell.help.argument.OptionArgument;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
+import org.jnode.shell.help.Help;
+import org.jnode.shell.help.Parameter;
+import org.jnode.shell.help.ParsedArguments;
+import org.jnode.shell.help.Syntax;
+import org.jnode.shell.help.argument.FileArgument;
+import org.jnode.shell.help.argument.OptionArgument;
+import org.jnode.shell.help.argument.StringArgument;
+
+import bsh.Interpreter;
 
 /**
  * @author Levente S\u00e1ntha

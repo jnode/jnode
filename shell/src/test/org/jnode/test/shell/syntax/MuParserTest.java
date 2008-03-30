@@ -23,13 +23,13 @@ import junit.framework.TestCase;
 
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.NoTokensAvailableException;
+import org.jnode.shell.syntax.CommandSyntaxException;
 import org.jnode.shell.syntax.MuAlternation;
 import org.jnode.shell.syntax.MuBackReference;
 import org.jnode.shell.syntax.MuParser;
 import org.jnode.shell.syntax.MuSequence;
 import org.jnode.shell.syntax.MuSymbol;
 import org.jnode.shell.syntax.MuSyntax;
-import org.jnode.shell.syntax.CommandSyntaxException;
 import org.jnode.shell.syntax.SyntaxFailureException;
 
 @SuppressWarnings("deprecation")

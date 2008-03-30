@@ -33,12 +33,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jnode.driver.console.CompletionInfo;
-import org.jnode.shell.help.Argument;
-import org.jnode.shell.help.CompletionException;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.argument.AliasArgument;
 import org.jnode.shell.help.argument.FileArgument;
 import org.jnode.shell.syntax.CommandSyntaxException;
 

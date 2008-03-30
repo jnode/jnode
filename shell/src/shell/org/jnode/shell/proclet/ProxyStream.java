@@ -23,8 +23,6 @@ package org.jnode.shell.proclet;
 
 import java.io.Closeable;
 
-import org.jnode.shell.proclet.ProxyStreamException;
-
 /**
  * Proxy streams have an underlying stream and offer methods for getting that
  * stream.

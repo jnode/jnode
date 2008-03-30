@@ -23,9 +23,7 @@ package org.jnode.shell.command.test;
 
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 
 import junit.framework.Test;

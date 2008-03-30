@@ -29,11 +29,10 @@ import org.jnode.shell.help.CompletionException;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.HelpException;
 import org.jnode.shell.help.Parameter;
-
-import org.jnode.shell.syntax.CommandSyntaxException;
-import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.ArgumentBundle;
 import org.jnode.shell.syntax.ArgumentSyntax;
+import org.jnode.shell.syntax.CommandSyntaxException;
+import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.RepeatSyntax;
 import org.jnode.shell.syntax.Syntax;
 

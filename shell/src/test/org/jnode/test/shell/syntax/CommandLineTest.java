@@ -30,7 +30,6 @@ import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandInfo;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.ShellException;
 import org.jnode.shell.SymbolSource;
 import org.jnode.shell.CommandLine.Token;
 import org.jnode.shell.syntax.ArgumentSyntax;

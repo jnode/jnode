@@ -23,6 +23,7 @@ package org.jnode.shell.proclet;
 
 import java.io.IOException;
 import java.io.InputStream;
+
 import org.jnode.vm.VmSystem;
 
 /**

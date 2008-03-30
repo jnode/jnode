@@ -23,6 +23,7 @@ package org.jnode.test.shell;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
 import javax.naming.NameAlreadyBoundException;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
