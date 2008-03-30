@@ -45,6 +45,10 @@ public abstract class AbstractCommand implements Command {
 
     @SuppressWarnings("deprecation")
     public final void execute(String[] args) throws Exception {
+        if (bundle != null) {
+            throw new ShellInvocationException("Commands with new-style syntax cannot be invoked " +
+                    "this way");
+        }
         execute(new CommandLine(args), System.in, System.out, System.err);
     }
 
