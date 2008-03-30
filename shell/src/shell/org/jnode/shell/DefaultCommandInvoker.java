@@ -25,7 +25,6 @@ import gnu.java.security.action.InvokeAction;
 
 import java.io.Closeable;
 import java.io.PrintStream;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
