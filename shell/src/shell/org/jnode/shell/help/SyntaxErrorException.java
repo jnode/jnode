@@ -26,7 +26,9 @@ package org.jnode.shell.help;
  */
 public class SyntaxErrorException extends HelpException {
     
-	public SyntaxErrorException(String message) {
+	private static final long serialVersionUID = 1L;
+
+    public SyntaxErrorException(String message) {
 		super(message);
 	}
 }

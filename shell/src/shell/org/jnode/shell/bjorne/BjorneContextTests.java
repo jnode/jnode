@@ -95,6 +95,7 @@ public class BjorneContextTests extends TestCase {
         checkExpansion(expansion, new String[] { "$A" });
     }
 
+    @SuppressWarnings("deprecation")
     private void checkExpansion(CommandLine expansion, String[] expected) {
         int i;
         Iterator<String> it = expansion.iterator();

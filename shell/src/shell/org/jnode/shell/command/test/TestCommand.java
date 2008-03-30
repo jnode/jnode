@@ -60,14 +60,14 @@ public class TestCommand {
     public void execute(ParsedArguments cmdLine, InputStream in,
             PrintStream out, PrintStream err) throws Exception {
 
-        Class clazz = ARG_CLASS.getClass(cmdLine);
+        Class<?> clazz = ARG_CLASS.getClass(cmdLine);
 
         JNodeTestRunner.run(clazz);
     }
 
     private static class JNodeTestRunner extends TestRunner {
 
-        public static void run(Class testClass) {
+        public static void run(Class<?> testClass) {
             JNodeTestRunner runner = new JNodeTestRunner();
             TestSuite suite = new TestSuite(testClass);
             runner.doRun(suite);

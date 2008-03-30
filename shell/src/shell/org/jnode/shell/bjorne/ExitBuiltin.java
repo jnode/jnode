@@ -9,6 +9,7 @@ import org.jnode.shell.CommandLine;
 import org.jnode.shell.ShellException;
 
 final class ExitBuiltin extends BjorneBuiltin {
+    @SuppressWarnings("deprecation")
     public int invoke(CommandLine command, BjorneInterpreter interpreter,
             BjorneContext context) throws ShellException {
         Iterator<String> args = command.iterator();

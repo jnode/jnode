@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.jnode.shell.help.argument.FileArgument;
 import org.jnode.shell.syntax.CommandSyntaxException;
 
@@ -44,8 +43,6 @@ import org.jnode.shell.syntax.CommandSyntaxException;
  */
 public class RedirectingInterpreter extends DefaultInterpreter implements
         ThreadExitListener {
-
-    private static final Logger log = Logger.getLogger(CommandShell.class);
 
     public static final Factory FACTORY = new Factory() {
         public CommandInterpreter create() {

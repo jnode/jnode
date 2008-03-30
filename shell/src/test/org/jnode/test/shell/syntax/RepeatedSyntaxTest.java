@@ -163,6 +163,7 @@ public class RepeatedSyntaxTest extends TestCase {
 
         CommandLine cl;
         CommandInfo cmdInfo;
+        @SuppressWarnings("unused")
         Command cmd;
 
         try {
