@@ -374,7 +374,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
      * 
      * @param thread
      */
-    public synchronized void notifyThreadExitted(CommandThread thread) {
+    public synchronized void notifyThreadExited(CommandThread thread) {
         // If the thread owned any input or output streams, they need to
         // be closed. In particular, this will cause the next downstream
         // command in a pipeline to see an "end of file".
