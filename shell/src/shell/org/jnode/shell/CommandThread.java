@@ -72,14 +72,14 @@ public class CommandThread extends Thread {
             super.run();
         } finally {
             if (listener != null) {
-                listener.notifyThreadExitted(this);
+                listener.notifyThreadExited(this);
             }
         }
     }
 
     /**
      * This overload for start first registers an optional "thread exit"
-     * listener. If non-null, the listener object's "notifyThreadExitted" method
+     * listener. If non-null, the listener object's "notifyThreadExited" method
      * will be called to notify the listener when the thread exits.
      * 
      * @param listener the listener or <code>null</code>

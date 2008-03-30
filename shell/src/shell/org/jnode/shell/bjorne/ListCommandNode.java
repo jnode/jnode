@@ -102,7 +102,7 @@ public class ListCommandNode extends CommandNode {
             this.count = stages.length;
         }
         
-        public void notifyThreadExitted(CommandThread thread) {
+        public void notifyThreadExited(CommandThread thread) {
             synchronized (stages) {
                 for (PipelineStage stage : stages) {
                     if (stage.thread == thread) {
