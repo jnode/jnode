@@ -28,7 +28,9 @@ import org.jnode.shell.ShellException;
  */
 public class NoSuchAliasException extends ShellException {
 
-	/**
+	private static final long serialVersionUID = 1L;
+
+    /**
 	 * 
 	 */
 	public NoSuchAliasException() {

@@ -95,7 +95,7 @@ public class JavaCommand extends AbstractCommand {
             this.dirs = dir;
         }
 
-        public Class findClass(String name) throws ClassNotFoundException{
+        public Class<?> findClass(String name) throws ClassNotFoundException{
             byte[] b = loadClassData(name);
             return defineClass(name, b, 0, b.length);
         }

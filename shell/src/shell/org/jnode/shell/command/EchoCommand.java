@@ -52,7 +52,8 @@ public class EchoCommand extends AbstractCommand {
 	/**
 	 * Execute this command
 	 */
-	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err)
+	@SuppressWarnings("deprecation")
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err)
 	throws Exception {
 		Iterator<String> it = commandLine.iterator();
 		int i = 0;
