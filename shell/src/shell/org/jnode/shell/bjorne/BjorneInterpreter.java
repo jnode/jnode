@@ -16,7 +16,6 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.HashMap;
 
-import org.jnode.shell.Command;
 import org.jnode.shell.CommandInfo;
 import org.jnode.shell.CommandInterpreter;
 import org.jnode.shell.CommandLine;

@@ -25,13 +25,11 @@ import java.io.InputStream;
 import java.io.PrintStream;
 
 import org.jnode.shell.AbstractCommand;
-import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.argument.IntegerArgument;
-import org.jnode.shell.help.argument.LongArgument;
 import org.jnode.shell.help.argument.SizeArgument;
 import org.jnode.vm.Vm;
 import org.jnode.vm.memmgr.HeapStatistics;

@@ -29,8 +29,8 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.jnode.shell.CommandThread;
-import org.jnode.vm.VmSystem;
 import org.jnode.vm.VmExit;
+import org.jnode.vm.VmSystem;
 
 /**
  * This class implements the proclet-specific state used in the JNode proclet

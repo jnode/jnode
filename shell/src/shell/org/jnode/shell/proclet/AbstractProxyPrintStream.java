@@ -45,13 +45,13 @@
 
 package org.jnode.shell.proclet;
 
+import gnu.classpath.SystemProperties;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.Locale;
 import java.util.Formatter;
-
-import gnu.classpath.SystemProperties;
+import java.util.Locale;
 
 /**
  * This class provides some infrastructure for PrintStream proxies.

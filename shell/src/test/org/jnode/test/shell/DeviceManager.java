@@ -6,8 +6,13 @@ package org.jnode.test.shell;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import org.apache.log4j.Logger;
-import org.jnode.driver.*;
+import org.jnode.driver.AbstractDeviceManager;
+import org.jnode.driver.Device;
+import org.jnode.driver.DeviceFinder;
+import org.jnode.driver.DeviceToDriverMapper;
+import org.jnode.driver.DriverException;
 
 /**
  * @author Levente S\u00e1ntha

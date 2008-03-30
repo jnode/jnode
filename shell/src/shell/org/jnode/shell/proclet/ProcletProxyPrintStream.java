@@ -22,6 +22,7 @@
 package org.jnode.shell.proclet;
 
 import java.io.PrintStream;
+
 import org.jnode.vm.VmSystem;
 
 /**

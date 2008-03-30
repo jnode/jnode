@@ -29,6 +29,7 @@ import org.jnode.shell.CommandLine;
 import org.jnode.shell.NoTokensAvailableException;
 import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.ArgumentBundle;
+import org.jnode.shell.syntax.CommandSyntaxException;
 import org.jnode.shell.syntax.EnumArgument;
 import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.IntegerArgument;
@@ -38,7 +39,6 @@ import org.jnode.shell.syntax.MuBackReference;
 import org.jnode.shell.syntax.MuParser;
 import org.jnode.shell.syntax.MuSequence;
 import org.jnode.shell.syntax.MuSyntax;
-import org.jnode.shell.syntax.CommandSyntaxException;
 
 @SuppressWarnings("deprecation")
 public class MuParserTest2 extends TestCase {

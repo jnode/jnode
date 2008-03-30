@@ -21,18 +21,18 @@
 
 package org.jnode.shell;
 
+import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FilterInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.Reader;
 import java.io.StringReader;
-import java.io.IOException;
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.text.DateFormat;
@@ -42,12 +42,12 @@ import java.util.StringTokenizer;
 import javax.naming.NameNotFoundException;
 
 import org.apache.log4j.Logger;
-import org.jnode.driver.console.InputHistory;
 import org.jnode.driver.console.CompletionInfo;
-import org.jnode.driver.console.ConsoleManager;
-import org.jnode.driver.console.TextConsole;
-import org.jnode.driver.console.ConsoleListener;
 import org.jnode.driver.console.ConsoleEvent;
+import org.jnode.driver.console.ConsoleListener;
+import org.jnode.driver.console.ConsoleManager;
+import org.jnode.driver.console.InputHistory;
+import org.jnode.driver.console.TextConsole;
 import org.jnode.driver.console.textscreen.KeyboardInputStream;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.alias.AliasManager;

@@ -30,12 +30,11 @@ import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandInfo;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.ShellException;
 import org.jnode.shell.CommandLine.Token;
 import org.jnode.shell.syntax.ArgumentSyntax;
+import org.jnode.shell.syntax.CommandSyntaxException;
 import org.jnode.shell.syntax.EnumArgument;
 import org.jnode.shell.syntax.FileArgument;
-import org.jnode.shell.syntax.CommandSyntaxException;
 
 public class ArgumentTypesTest extends TestCase {
 

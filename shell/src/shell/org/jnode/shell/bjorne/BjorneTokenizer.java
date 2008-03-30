@@ -1,7 +1,5 @@
 package org.jnode.shell.bjorne;
 
-import static org.jnode.shell.bjorne.BjorneToken.TOK_END_OF_LINE;
-import static org.jnode.shell.bjorne.BjorneToken.TOK_END_OF_STREAM;
 import static org.jnode.shell.bjorne.BjorneToken.RULE_1_CONTEXT;
 import static org.jnode.shell.bjorne.BjorneToken.RULE_5_CONTEXT;
 import static org.jnode.shell.bjorne.BjorneToken.RULE_6_CONTEXT;
@@ -23,6 +21,8 @@ import static org.jnode.shell.bjorne.BjorneToken.TOK_DONE;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_DSEMI;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_ELIF;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_ELSE;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_END_OF_LINE;
+import static org.jnode.shell.bjorne.BjorneToken.TOK_END_OF_STREAM;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_ESAC;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_FI;
 import static org.jnode.shell.bjorne.BjorneToken.TOK_FOR;

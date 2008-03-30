@@ -3,12 +3,13 @@
  */
 package org.jnode.shell.command.debug;
 
-import gnu.classpath.jdwp.Jdwp;
 import gnu.classpath.jdwp.JNodeSocketTransport;
-import org.jnode.shell.help.argument.IntegerArgument;
+import gnu.classpath.jdwp.Jdwp;
+
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
+import org.jnode.shell.help.argument.IntegerArgument;
 
 /**
  * Starts up the remote debugger under JNode.

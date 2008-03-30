@@ -26,7 +26,9 @@ import java.io.PrintStream;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.*;
+import org.jnode.shell.help.Argument;
+import org.jnode.shell.help.Help;
+import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.argument.ClassNameArgument;
 
 /**

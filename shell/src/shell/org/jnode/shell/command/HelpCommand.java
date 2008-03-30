@@ -21,8 +21,6 @@
  
 package org.jnode.shell.command;
 
-import java.lang.reflect.Field;
-
 import javax.naming.NameNotFoundException;
 
 import org.jnode.shell.AbstractCommand;
@@ -34,9 +32,7 @@ import org.jnode.shell.help.Help;
 import org.jnode.shell.help.HelpException;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.Help.Info;
 import org.jnode.shell.help.argument.AliasArgument;
-import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.ArgumentBundle;
 import org.jnode.shell.syntax.Syntax;
 import org.jnode.shell.syntax.SyntaxManager;

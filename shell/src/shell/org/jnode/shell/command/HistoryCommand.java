@@ -20,14 +20,17 @@
  */
  
 package org.jnode.shell.command;
-import  java.io.PrintStream;
-import  javax.naming.NameNotFoundException;
+import java.io.PrintStream;
+
+import javax.naming.NameNotFoundException;
 
 import org.jnode.driver.console.InputHistory;
-import  org.jnode.shell.help.*;
+import org.jnode.shell.Shell;
+import org.jnode.shell.ShellUtils;
+import org.jnode.shell.help.Help;
+import org.jnode.shell.help.Parameter;
+import org.jnode.shell.help.Syntax;
 import org.jnode.shell.help.argument.OptionArgument;
-import  org.jnode.shell.Shell;
-import  org.jnode.shell.ShellUtils;
 
 /** A shell command to access the data in the CommandHistory class.
  *  @author Matt Paine

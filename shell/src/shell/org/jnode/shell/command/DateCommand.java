@@ -25,7 +25,7 @@ import java.util.Date;
 
 import javax.naming.NameNotFoundException;
 
-import org.jnode.shell.help.*;
+import org.jnode.shell.help.Help;
 
 /** 
  * A shell command to access the display the system date.
