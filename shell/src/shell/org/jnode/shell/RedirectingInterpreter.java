@@ -318,13 +318,15 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
                 }
                 desc.commandLine.setStreams(new Closeable[] { in, out, err });
                 try {
+                    CommandInfo cmdInfo = 
+                        shell.getCommandInfo(desc.commandLine.getCommandName());
                     desc.thread =
-                            shell
-                                    .invokeAsynchronous(desc.commandLine, null /* FIXME */);
+                        shell.invokeAsynchronous(desc.commandLine, cmdInfo);
                 } catch (UnsupportedOperationException ex) {
                     throw new ShellInvocationException(
-                            "The current invoker does not support pipelines",
-                            ex);
+                            "The current invoker does not support pipelines", ex);
+                } catch (ClassNotFoundException ex) {
+                    throw new ShellInvocationException(ex.getMessage(), ex);
                 }
                 stageNo++;
             }
@@ -346,9 +348,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
                     return -1;
                 }
             }
-            Runnable runner = descs.get(nosStages - 1).thread.getRunner();
-            return (runner instanceof CommandRunner) ? ((CommandRunner) runner)
-                    .getRC() : 0;
+            return descs.get(nosStages - 1).thread.getReturnCode();
         } finally {
             // Close any remaining streams.
             for (CommandDescriptor desc : descs) {
@@ -406,7 +406,7 @@ public class RedirectingInterpreter extends DefaultInterpreter implements
         public List<Closeable> openedStreams;
         public CommandThread thread;
 
-        public CommandDescriptor(CommandLine commandLine,
+        public CommandDescriptor(CommandLine commandLine, 
                 CommandLine.Token fromFileName, CommandLine.Token toFileName,
                 boolean pipeTo) {
             super();

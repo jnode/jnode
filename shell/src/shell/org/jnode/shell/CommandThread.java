@@ -19,77 +19,43 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package org.jnode.shell;
+ package org.jnode.shell;
 
 /**
- * The CommandThread class enhances Thread with an optional thread exit listener
- * that is registered when the thread is started. It also exposes the Runnable
- * via the getRunner method.
+ * The CommandThread interface is used by JNode shells, interpreters and invokers 
+ * when they need to interact with a thread or thread-like object for running a Command.
+ * Its purpose is to hide the API mismatch between Threads and Isolates.
  * 
  * @author crawley@jnode.org
  */
-public class CommandThread extends Thread {
-
-    private ThreadExitListener listener;
-    private Runnable runner;
+public interface CommandThread {
 
     /**
-     * @param group the parent group for the thread
-     * @param runner the runnable that implements the command
-     * @param name a thread name
-     * @param size the threads stack size
-     * @param invoker the invoker to be notified of the thread's exit
-     */
-    public CommandThread(ThreadGroup group, Runnable runner, String name,
-            long size) {
-        super(group, runner, name, size);
-        this.runner = runner;
-    }
-
-    /**
-     * @param group the parent group for the thread
-     * @param runner the runnable that implements the command
-     * @param invoker the invoker to be notified of the thread's exit
-     */
-    public CommandThread(ThreadGroup group, Runnable runner) {
-        super(group, runner);
-        this.runner = runner;
-    }
-
-    /**
-     * @param runner the runnable that implements the command
-     * @param name a thread name
-     * @param invoker the invoker to be notified of the thread's exit
-     */
-    public CommandThread(Runnable runner, String name) {
-        super(runner, name);
-        this.runner = runner;
-    }
-
-    @Override
-    public void run() {
-        try {
-            super.run();
-        } finally {
-            if (listener != null) {
-                listener.notifyThreadExited(this);
-            }
-        }
-    }
-
-    /**
-     * This overload for start first registers an optional "thread exit"
-     * listener. If non-null, the listener object's "notifyThreadExited" method
-     * will be called to notify the listener when the thread exits.
+     * Cause the command thread to start executing.  If the listener is not <code>null</code>,
+     * its "notifyThreadExited" method will be called when the command thread exits normally
+     * or with an exception.
      * 
      * @param listener the listener or <code>null</code>
+     * @throws ShellInvocationException 
      */
-    public void start(ThreadExitListener listener) {
-        this.listener = listener;
-        super.start();
-    }
+    public void start(ThreadExitListener listener) throws ShellInvocationException;
 
-    public Runnable getRunner() {
-        return this.runner;
-    }
+    /**
+     * Get the thread's return code.
+     * 
+     * @return zero for success, non-zero for failure
+     */
+    public int getReturnCode();
+
+    /**
+     * @return <code>true</code> if the thread is still executing.
+     */
+    public boolean isAlive();
+
+    /**
+     * Tell the thread to stop.  (Temporary API / unspecified semantics)
+     * 
+     * @param threadDeath
+     */
+    public void stop(ThreadDeath threadDeath);
 }

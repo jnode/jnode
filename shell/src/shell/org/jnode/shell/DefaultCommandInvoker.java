@@ -147,4 +147,9 @@ public class DefaultCommandInvoker implements CommandInvoker {
         }
     }
 
+    @Override
+    public void unblock() {
+        throw new UnsupportedOperationException();
+    }
+
 }

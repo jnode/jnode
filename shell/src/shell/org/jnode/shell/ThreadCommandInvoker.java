@@ -21,20 +21,6 @@
 
 package org.jnode.shell;
 
-import gnu.java.security.action.InvokeAction;
-
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.security.AccessController;
-import java.security.PrivilegedActionException;
-
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.HelpException;
-import org.jnode.shell.help.SyntaxErrorException;
-import org.jnode.vm.VmExit;
 
 /*
  * User: Sam Reid Date: Dec 20, 2003 Time: 1:20:33 AM Copyright (c) Dec 20, 2003
@@ -72,107 +58,7 @@ public class ThreadCommandInvoker extends AsyncCommandInvoker {
         return "thread";
     }
 
-    CommandThread createThread(CommandLine cmdLine, CommandRunner cr) {
-        return new CommandThread(cr, cmdLine.getCommandName());
-    }
-
-    CommandRunner createRunner(CommandInfo cmdInfo, Method method, Object[] args,
-            InputStream in, PrintStream out,
-            PrintStream err) {
-        return new ThreadCommandRunner(
-                cmdInfo, cmdInfo.getCommandClass(), method, args, in, out, err);
-    }
-
-    CommandRunner createRunner(CommandInfo cmdInfo, CommandLine cmdLine,
-            InputStream in, PrintStream out, PrintStream err) {
-        return new ThreadCommandRunner(cmdInfo, cmdLine, in, out, err);
-    }
-
-    class ThreadCommandRunner extends CommandRunner {
-        private final Class<?> cx;
-        private final Method method;
-        private final Object[] args;
-        private final CommandLine cmdLine;
-        private final CommandInfo cmdInfo;
-        private final InputStream in;
-        private final PrintStream out;
-        private final PrintStream err;
-        
-        public ThreadCommandRunner(CommandInfo cmdInfo, Class<?> cx, Method method, Object[] args,
-                InputStream in, PrintStream out, PrintStream err) {
-            super(commandShell);
-            this.cx = cx;
-            this.method = method;
-            this.args = args;
-            this.cmdInfo = cmdInfo;
-            this.cmdLine = null;
-            this.in = in;
-            this.out = out;
-            this.err = err;
-        }
-
-        public ThreadCommandRunner(CommandInfo cmdInfo, CommandLine cmdLine,
-                InputStream in, PrintStream out, PrintStream err) {
-            super(commandShell);
-            this.cx = null;
-            this.method = null;
-            this.args = null;
-            this.cmdInfo = cmdInfo;
-            this.cmdLine = cmdLine;
-            this.in = in;
-            this.out = out;
-            this.err = err;
-        }
-
-        public void run() {
-            try {
-                if (method != null) {
-                    Object obj = Modifier.isStatic(method.getModifiers()) ? null
-                            : cx.newInstance();
-                    try {
-                        AccessController.doPrivileged(new InvokeAction(method, obj,
-                                args));
-                    } catch (PrivilegedActionException ex) {
-                        Exception ex2 = ex.getException();
-                        if (ex2 instanceof InvocationTargetException) {
-                            throw ex2.getCause();
-                        }
-                        else {
-                            throw ex2;
-                        }
-                    } 
-                }
-                else {
-                    cmdInfo.getCommandInstance().execute(cmdLine, in, out, err);
-                }
-
-                if (!isBlocking()) {
-                    // somebody already hit ctrl-c.
-                } else {
-                    // done with invoke, stop waiting for a ctrl-c
-                    unblock();
-                }
-            } catch (SyntaxErrorException ex) {
-                try {
-                    Help.getInfo(cmdInfo.getCommandClass()).usage();
-                    err.println(ex.getMessage());
-                } catch (HelpException e) {
-                    err.println("Exception while trying to get the command usage");
-                    stackTrace(ex);
-                }
-                unblock();
-            } catch (VmExit ex) {
-                setRC(ex.getStatus());
-                unblock();
-            } catch (Exception ex) {
-                err.println("Exception in command");
-                stackTrace(ex);
-                unblock();
-            } catch (Throwable ex) {
-                err.println("Fatal error in command");
-                stackTrace(ex);
-                unblock();
-            }
-        }
+    CommandThreadImpl createThread(CommandLine cmdLine, CommandRunner cr) {
+        return new CommandThreadImpl(cr, cmdLine.getCommandName());
     }
 }

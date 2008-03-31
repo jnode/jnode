@@ -24,6 +24,7 @@ import org.jnode.shell.CommandThread;
 import org.jnode.shell.Completable;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellFailureException;
+import org.jnode.shell.ShellInvocationException;
 import org.jnode.shell.ShellSyntaxException;
 import org.jnode.shell.syntax.CommandSyntaxException;
 
@@ -210,6 +211,12 @@ public class BjorneInterpreter implements CommandInterpreter {
     public CommandThread fork(CommandLine command, Closeable[] streams) 
     throws ShellException {
         command.setStreams(streams);
-        return shell.invokeAsynchronous(command, null /* FIXME*/);
+        CommandInfo cmdInfo;
+        try {
+            cmdInfo = shell.getCommandInfo(command.getCommandName());
+        } catch (ClassNotFoundException ex) {
+            throw new ShellInvocationException(ex.getMessage(), ex);
+        }
+        return shell.invokeAsynchronous(command, cmdInfo);
     }
 }
