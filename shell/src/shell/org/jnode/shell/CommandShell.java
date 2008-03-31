@@ -78,7 +78,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     public static final String HOME_PROPERTY_NAME = "user.home";
     public static final String DIRECTORY_PROPERTY_NAME = "user.dir";
 
-    public static final String INITIAL_INVOKER = "thread";
+    public static final String INITIAL_INVOKER = "proclet";
     public static final String INITIAL_INTERPRETER = "redirecting";
     public static final String FALLBACK_INVOKER = "default";
     public static final String FALLBACK_INTERPRETER = "default";
