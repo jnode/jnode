@@ -25,6 +25,7 @@ import gnu.java.security.action.InvokeAction;
 
 import java.io.Closeable;
 import java.io.PrintStream;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -109,7 +110,13 @@ public class DefaultCommandInvoker implements CommandInvoker {
                             args));
                     return 0;
                 } catch (PrivilegedActionException ex) {
-                    throw ex.getException();
+                    Exception ex2 = ex.getException();
+                    if (ex2 instanceof InvocationTargetException) {
+                        throw ex2.getCause();
+                    }
+                    else {
+                        throw ex2;
+                    }
                 }
             } catch (SyntaxErrorException ex) {
                 Help.getInfo(cmdInfo.getCommandClass()).usage();
@@ -119,7 +126,7 @@ public class DefaultCommandInvoker implements CommandInvoker {
             } catch (Exception ex) {
                 err.println("Exception in command");
                 stackTrace(ex);
-            } catch (Error ex) {
+            } catch (Throwable ex) {
                 err.println("Fatal error in command");
                 stackTrace(ex);
             }
