@@ -67,7 +67,7 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
     boolean blocking;
 
     Thread blockingThread;
-    Thread threadProcess = null;
+    CommandThread threadProcess = null;
     String cmdName;
 
     public AsyncCommandInvoker(CommandShell commandShell) {
@@ -110,7 +110,7 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
             throw new ShellInvocationException("Problem while creating command instance", ex);
         }
         if (command != null) {
-            cr = createRunner(cmdInfo, cmdLine, in, out, err);
+            cr = new CommandRunner(commandShell, this, cmdInfo, cmdLine, in, out, err);
         }
         else {
             try {
@@ -125,7 +125,7 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
                                         + cmdInfo.getCommandClass()
                                         + " does not allow redirection or pipelining");
                     }
-                    cr = createRunner(cmdInfo, method,
+                    cr = new CommandRunner(commandShell, this, cmdInfo, cmdInfo.getCommandClass(), method,
                             new Object[] { cmdLine.getArguments() }, 
                             in, out, err);
                 }
@@ -163,7 +163,7 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
                 this.blockingThread = Thread.currentThread();
                 this.cmdName = cmdLine.getCommandName();
 
-                threadProcess.start();
+                threadProcess.start(null);
 
                 while (this.blocking) {
                     try {
@@ -243,7 +243,7 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
         }
     }
 
-    final void unblock() {
+    public final void unblock() {
         blocking = false;
         if (blockingThread != null) {
             blockingThread.interrupt();
@@ -256,10 +256,4 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
 
     public void keyReleased(KeyboardEvent event) {
     }
-    
-    abstract CommandRunner createRunner(CommandInfo cmdInfo, Method method, Object[] args, 
-        	InputStream in, PrintStream out, PrintStream err);
-
-    abstract CommandRunner createRunner(CommandInfo cmdInfo, CommandLine cmdLine,
-            InputStream in, PrintStream out, PrintStream err);
 }

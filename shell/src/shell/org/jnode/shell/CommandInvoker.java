@@ -73,4 +73,10 @@ public interface CommandInvoker {
      * @return the name.
      */
     String getName();
+
+    /**
+     * This method is called to tell the invoker to unblock.
+     * FIXME - this is a temporary hack.
+     */
+    void unblock();
 }

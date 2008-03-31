@@ -469,7 +469,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         return this.invoker.invokeAsynchronous(cmdLine, cmdInfo);
     }
 
-    protected CommandInfo getCommandInfo(String cmd)
+    public CommandInfo getCommandInfo(String cmd)
             throws ClassNotFoundException {
         try {
             Class<?> cls = aliasMgr.getAliasClass(cmd);

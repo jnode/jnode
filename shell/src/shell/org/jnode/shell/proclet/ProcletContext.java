@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.jnode.shell.CommandThreadImpl;
 import org.jnode.shell.CommandThread;
 import org.jnode.vm.VmExit;
 import org.jnode.vm.VmSystem;
@@ -251,7 +252,7 @@ public class ProcletContext extends ThreadGroup {
      * @param name an optional Thread name.
      * @return the new Thread
      */
-    public static CommandThread createProclet(Runnable target,
+    public static CommandThreadImpl createProclet(Runnable target,
             Properties properties, Map<String, String> environment,
             Object[] streams, String name) {
         return createProclet(target, properties, environment, streams, name, 0);
@@ -276,7 +277,7 @@ public class ProcletContext extends ThreadGroup {
      *        stack size.
      * @return the new Thread
      */
-    public static CommandThread createProclet(Runnable target,
+    public static CommandThreadImpl createProclet(Runnable target,
             Properties properties, Map<String, String> environment,
             Object[] streams, String name, long size) {
         ProcletContext procletContext = new ProcletContext(Thread
@@ -285,7 +286,7 @@ public class ProcletContext extends ThreadGroup {
         if (name == null) {
             name = procletContext.autoThreadName();
         }
-        return new CommandThread(procletContext, target, name, size);
+        return new CommandThreadImpl(procletContext, target, name, size);
     }
 
     /**

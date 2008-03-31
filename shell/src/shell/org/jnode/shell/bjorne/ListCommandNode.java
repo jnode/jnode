@@ -7,7 +7,6 @@ import java.io.PipedOutputStream;
 import java.util.List;
 
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.CommandRunner;
 import org.jnode.shell.CommandThread;
 import org.jnode.shell.NullInputStream;
 import org.jnode.shell.NullOutputStream;
@@ -143,8 +142,7 @@ public class ListCommandNode extends CommandNode {
                     break;
                 }
             }
-            Runnable runner = stages[stages.length - 1].thread.getRunner();
-            return ((CommandRunner) runner).getRC();
+            return stages[stages.length - 1].thread.getReturnCode();
         }
     }
 
