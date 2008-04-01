@@ -85,13 +85,13 @@ public class PowersetSyntaxTest extends TestCase {
         
         cl = new CommandLine(new Token("cmd"), new Token[]{}, null);
         cmdInfo = cl.parseCommandLine(shell);
-        cmd = cmdInfo.getCommandInstance();
+        cmd = cmdInfo.createCommandInstance();
         assertEquals(0, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
         assertEquals(0, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
         
         cl = new CommandLine(new Token("cmd"), new Token[]{new Token("-f"), new Token("F1")}, null);
         cmdInfo = cl.parseCommandLine(shell);
-        cmd = cmdInfo.getCommandInstance();
+        cmd = cmdInfo.createCommandInstance();
         assertEquals(1, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
         assertEquals(0, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
         assertEquals("F1", cmd.getArgumentBundle().getArgument("fileArg").getValue().toString());
@@ -99,7 +99,7 @@ public class PowersetSyntaxTest extends TestCase {
         cl = new CommandLine(new Token("cmd"),
                 new Token[]{new Token("-f"), new Token("F1"), new Token("-i"), new Token("1")}, null);
         cmdInfo = cl.parseCommandLine(shell);
-        cmd = cmdInfo.getCommandInstance();
+        cmd = cmdInfo.createCommandInstance();
         assertEquals(1, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
         assertEquals(1, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
         assertEquals("F1", cmd.getArgumentBundle().getArgument("fileArg").getValue().toString());

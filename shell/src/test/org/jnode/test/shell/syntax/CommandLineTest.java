@@ -116,7 +116,7 @@ public class CommandLineTest extends TestCase {
         shell.addSyntax("command", new ArgumentSyntax("arg1"));
         CommandLine cl = new CommandLine(new Token("command"), new Token[]{new Token("fish")}, null);
         CommandInfo cmdInfo = cl.parseCommandLine(shell);
-        Command cmd = cmdInfo.getCommandInstance();
+        Command cmd = cmdInfo.createCommandInstance();
         assertEquals("fish", cmd.getArgumentBundle().getArgument("arg1").getValue());
     }
 }

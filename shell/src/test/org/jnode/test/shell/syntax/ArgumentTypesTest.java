@@ -61,7 +61,7 @@ public class ArgumentTypesTest extends TestCase {
         shell.addSyntax("command", new ArgumentSyntax("arg1"));
         CommandLine cl = new CommandLine(new Token("command"), new Token[]{new Token("ALT1")}, null);
         CommandInfo cmdInfo = cl.parseCommandLine(shell);
-        Command cmd = cmdInfo.getCommandInstance();
+        Command cmd = cmdInfo.createCommandInstance();
         assertEquals(TestEnum.ALT1, cmd.getArgumentBundle().getArgument("arg1").getValue());
         
         try {
@@ -101,7 +101,7 @@ public class ArgumentTypesTest extends TestCase {
         shell.addSyntax("command", new ArgumentSyntax("arg1"));
         CommandLine cl = new CommandLine(new Token("command"), new Token[]{new Token("F1")}, null);
         CommandInfo cmdInfo = cl.parseCommandLine(shell);
-        Command cmd = cmdInfo.getCommandInstance();
+        Command cmd = cmdInfo.createCommandInstance();
         assertEquals("F1", cmd.getArgumentBundle().getArgument("arg1").getValue().toString());
         
         try {

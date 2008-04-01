@@ -105,7 +105,7 @@ public abstract class AsyncCommandInvoker implements CommandInvoker,
         }
         Command command;
         try {
-            command = cmdInfo.getCommandInstance();
+            command = cmdInfo.createCommandInstance();
         } catch (Exception ex) {
             throw new ShellInvocationException("Problem while creating command instance", ex);
         }

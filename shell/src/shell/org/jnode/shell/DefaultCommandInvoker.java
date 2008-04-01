@@ -105,9 +105,9 @@ public class DefaultCommandInvoker implements CommandInvoker {
                             return null;
                         }
                     });
+                    AbstractCommand.saveCurrentCommand(cmdInfo.getCommandInstance());
                     final Object[] args = new Object[] { cmdLine.getArguments() };
-                    AccessController.doPrivileged(new InvokeAction(main, null,
-                            args));
+                    AccessController.doPrivileged(new InvokeAction(main, null, args));
                     return 0;
                 } catch (PrivilegedActionException ex) {
                     Exception ex2 = ex.getException();
@@ -137,6 +137,10 @@ public class DefaultCommandInvoker implements CommandInvoker {
         } catch (Exception ex) {
             err.println("I FOUND AN ERROR: " + ex);
             stackTrace(ex);
+        }
+        finally {
+            // This clears the current command to prevent leakage.
+            AbstractCommand.retrieveCurrentCommand();
         }
         return 1;
     }

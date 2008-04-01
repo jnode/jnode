@@ -42,7 +42,7 @@ import org.jnode.vm.VmExit;
  * @author crawley@jnode.org
  *
  */
-public class CommandRunner implements Runnable {
+class CommandRunner implements Runnable {
     private final CommandShell shell;
     private final CommandInvoker invoker;
     final InputStream in;
@@ -90,13 +90,22 @@ public class CommandRunner implements Runnable {
         try {
             try {
                 if (method != null) {
-                    Object obj = Modifier.isStatic(method.getModifiers()) ? null
-                            : cx.newInstance();
-                    AccessController.doPrivileged(new InvokeAction(method, obj,
-                            args));
+                    try {
+                        AbstractCommand.saveCurrentCommand(cmdInfo.getCommandInstance());
+                        Object obj = Modifier.isStatic(method.getModifiers()) ? null
+                                : cx.newInstance();
+                        AccessController.doPrivileged(new InvokeAction(method, obj,
+                                args));
+                    }
+                    finally {
+                        // This clears the current command to prevent leakage.  (This
+                        // is only necessary if the current thread could be used to
+                        // execute other commands.  But we'll do it anyway ... for now.)
+                        AbstractCommand.retrieveCurrentCommand();
+                    }
                 }
                 else {
-                    cmdInfo.getCommandInstance().execute(commandLine, in, out, err);
+                    cmdInfo.createCommandInstance().execute(commandLine, in, out, err);
                 }
             } catch (PrivilegedActionException ex) {
                 Exception ex2 = ex.getException();

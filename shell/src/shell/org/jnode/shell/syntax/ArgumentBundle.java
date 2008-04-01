@@ -70,9 +70,16 @@ import org.jnode.shell.SymbolSource;
  */
 public class ArgumentBundle implements Iterable<Argument<?>> {
     
+    public static final int UNPARSED = 0;
+    public static final int PARSING = 1;
+    public static final int PARSE_SUCCEEDED = 2;
+    public static final int PARSE_FAILED = 3;
+    
+    
     private Argument<?>[] arguments;
 	private final Map<String, Argument<?>> argumentMap;
 	private final String description;
+	private int status = UNPARSED;
 
 	public ArgumentBundle(String description, Argument<?>... arguments) {
 	    this.description = description;
@@ -87,8 +94,8 @@ public class ArgumentBundle implements Iterable<Argument<?>> {
 	    this(null, arguments);
 	}
 
-	private void doAdd(Argument<?> element) {
-	    String label = element.getLabel();
+	private void doAdd(Argument<?> argument) {
+	    String label = argument.getLabel();
         if (label.isEmpty()) {
             throw new IllegalArgumentException("argument label is empty");
         }
@@ -96,17 +103,26 @@ public class ArgumentBundle implements Iterable<Argument<?>> {
             throw new IllegalArgumentException(
                     "argument label '" + label + "' used more than once");
         }
-        this.argumentMap.put(label, element);
+        this.argumentMap.put(label, argument);
+        argument.setBundle(this);
     }
 
 	public synchronized void parse(CommandLine commandLine, Syntax syntax)
 	throws CommandSyntaxException {
-	    doParse(commandLine, syntax, null);
-	    for (Argument<?> element : arguments) {
-	        if (!element.isSatisfied() && element.isMandatory()) {
-	            throw new CommandSyntaxException(
-	                    "Command syntax error: required argument '"
-	                    + element.getLabel() + "' not supplied");
+	    try {
+	        doParse(commandLine, syntax, null);
+	        for (Argument<?> element : arguments) {
+	            if (!element.isSatisfied() && element.isMandatory()) {
+	                throw new CommandSyntaxException(
+	                        "Command syntax error: required argument '"
+	                        + element.getLabel() + "' not supplied");
+	            }
+	        }
+	        status = PARSE_SUCCEEDED;
+	    }
+	    finally {
+	        if (status != PARSE_SUCCEEDED) {
+	            status = PARSE_FAILED;
 	        }
 	    }
 	}
@@ -114,13 +130,24 @@ public class ArgumentBundle implements Iterable<Argument<?>> {
     public synchronized void complete(CommandLine partial, 
             Syntax syntax, CompletionInfo completion) 
     throws CommandSyntaxException {
-        doParse(partial, syntax, completion);
+        try {
+            doParse(partial, syntax, completion);
+            status = PARSE_SUCCEEDED;
+        }
+        finally {
+            if (status != PARSE_SUCCEEDED) {
+                status = PARSE_FAILED;
+            }
+        }
     }
 
     private void doParse(CommandLine commandLine, Syntax syntax,
             CompletionInfo completion) 
     throws CommandSyntaxException {
-	    clear();
+	    if (status != UNPARSED) {
+	        clear();
+	    }
+	    status = PARSING;
 	    if (syntax == null) {
 			syntax = createDefaultSyntax();
 		}
@@ -198,6 +225,10 @@ public class ArgumentBundle implements Iterable<Argument<?>> {
         for (Argument<?> element : arguments) {
             element.clear();
         }
+    }
+    
+    int getStatus() {
+        return status;
     }
 
     /**

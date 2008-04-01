@@ -124,6 +124,7 @@ public class MuParser {
         // FIXME - deal with syntax error messages and completion
         // FIXME - deal with grammars that cause stack explosion
         if (bundle != null) {
+            // FIXME - why am I doing this here?  Is it just for the unit tests?
             bundle.clear();
         }
         Deque<MuSyntax> syntaxStack = new LinkedList<MuSyntax>();
