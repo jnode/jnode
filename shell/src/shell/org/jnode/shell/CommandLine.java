@@ -588,7 +588,7 @@ public class CommandLine implements Completable, Iterable<String> {
     	try {
     		// Get command's argument bundle and syntax
     		CommandInfo cmdInfo = shell.getCommandInfo(cmd);
-    		Command command = cmdInfo.getCommandInstance();
+    		Command command = cmdInfo.createCommandInstance();
     		
     		// Get the command's argument bundle, or the default one.
     		ArgumentBundle bundle = (command == null) ? null :
@@ -625,7 +625,7 @@ public class CommandLine implements Completable, Iterable<String> {
             
             Command command;
             try {
-                command = cmdClass.getCommandInstance();
+                command = cmdClass.createCommandInstance();
             }
             catch (Throwable ex) {
                 throw new CompletionException("Problem creating a command instance", ex);

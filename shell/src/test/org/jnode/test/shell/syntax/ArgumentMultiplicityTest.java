@@ -99,7 +99,7 @@ public class ArgumentMultiplicityTest extends TestCase {
         shell.addSyntax("cmd", new ArgumentSyntax("arg1"));
         CommandLine cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1")}, null);
         CommandInfo cmdInfo = cl.parseCommandLine(shell);
-        Command cmd = cmdInfo.getCommandInstance();
+        Command cmd = cmdInfo.createCommandInstance();
         assertEquals("F1", cmd.getArgumentBundle().getArgument("arg1").getValue().toString());
         
         try {
@@ -118,7 +118,7 @@ public class ArgumentMultiplicityTest extends TestCase {
         shell.addSyntax("cmd", new ArgumentSyntax("arg1"));
         CommandLine cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1")}, null);
         CommandInfo cmdInfo = cl.parseCommandLine(shell);
-        Command cmd = cmdInfo.getCommandInstance();
+        Command cmd = cmdInfo.createCommandInstance();
         assertEquals("F1", cmd.getArgumentBundle().getArgument("arg1").getValue().toString());
         
         try {
@@ -137,7 +137,7 @@ public class ArgumentMultiplicityTest extends TestCase {
         shell.addSyntax("cmd", new RepeatSyntax(new ArgumentSyntax("arg1")));
         CommandLine cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1")}, null);
         CommandInfo cmdInfo = cl.parseCommandLine(shell);
-        Command cmd = cmdInfo.getCommandInstance();
+        Command cmd = cmdInfo.createCommandInstance();
         assertEquals("F1", cmd.getArgumentBundle().getArgument("arg1").getValue().toString());
         
         cl = new CommandLine(new Token("cmd"), new Token[]{}, null);
@@ -153,7 +153,7 @@ public class ArgumentMultiplicityTest extends TestCase {
         shell.addSyntax("cmd", new RepeatSyntax(new ArgumentSyntax("arg1")));
         CommandLine cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1")}, null);
         CommandInfo cmdInfo = cl.parseCommandLine(shell);
-        Command cmd = cmdInfo.getCommandInstance();
+        Command cmd = cmdInfo.createCommandInstance();
         assertEquals("F1", cmd.getArgumentBundle().getArgument("arg1").getValue().toString());
         
         try {

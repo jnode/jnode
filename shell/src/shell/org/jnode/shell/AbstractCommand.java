@@ -45,11 +45,29 @@ public abstract class AbstractCommand implements Command {
 
     @SuppressWarnings("deprecation")
     public final void execute(String[] args) throws Exception {
-        if (bundle != null) {
-            throw new ShellInvocationException("Commands with new-style syntax cannot be invoked " +
-                    "this way");
+        // The following code is needed to deal with the new-style syntax mechanism.
+        // This will have created an instance of the command class and bound the 
+        // command-line arguments to it.  But the "static void main(...)" method that
+        // presumably called us will have created another instance; i.e. this one.
+        Command command = retrieveCurrentCommand();
+        if (command != null) {
+            // We're ignoring the instance created in the static void main method and
+            // using the one that the invoker saved for us earlier.
+            command.execute(new CommandLine(args), System.in, System.out, System.err);
         }
-        execute(new CommandLine(args), System.in, System.out, System.err);
+        else {
+            if (bundle != null) {
+                // It appears that this class is designed to use the new-style syntax mechanism
+                // but we've somehow been called without having a Command instance recorded.
+                throw new ShellInvocationException(
+                        "Commands with new-style syntax cannot be invoked this way");
+                // FIXME ... if a JNode Command class is going to be usable outside of JNode, we
+                // will need to figure out how to call ArgumentBundle.parse here using the appropriate
+                // Syntax object.
+            }
+
+            execute(new CommandLine(args), System.in, System.out, System.err);
+        }
     }
 
     /**
@@ -72,5 +90,17 @@ public abstract class AbstractCommand implements Command {
         for (Argument<?> arg : args) {
             bundle.addArgument(arg);
         }
+    }
+    
+    static ThreadLocal<Command> currentCommand = new ThreadLocal<Command>();
+    
+    static void saveCurrentCommand(Command command) {
+        currentCommand.set(command);
+    }
+    
+    static Command retrieveCurrentCommand() {
+        Command res = currentCommand.get();
+        currentCommand.set(null);
+        return res;
     }
 }

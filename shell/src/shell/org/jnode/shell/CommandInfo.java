@@ -46,12 +46,28 @@ public final class CommandInfo {
         return internal;
     }
     
-    public final Command getCommandInstance() throws InstantiationException, IllegalAccessException {
+    /**
+     * Get the Command instance for this CommandInfo, instantiating it if necessary.
+     * 
+     * @return The Command instance to be used for binding argument and executing the command.
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     */
+    public final Command createCommandInstance() throws InstantiationException, IllegalAccessException {
         if (instance == null) {
             if (Command.class.isAssignableFrom(clazz)) {
                 instance = (Command) (clazz.newInstance());
             }
         }
     	return instance;
+    }
+
+    /**
+     * Get the Command instance for this CommandInfo, without instantiating one.
+     * @return The Command instance to be used for binding argument and executing 
+     * the command, of <code>null</code>
+     */
+    public Command getCommandInstance() {
+        return instance;
     }
 }

@@ -99,7 +99,7 @@ public class AlternativesSyntaxTest extends TestCase {
         
         cl = new CommandLine(new Token("cmd"), new Token[]{new Token("-f"), new Token("F1")}, null);
         cmdInfo = cl.parseCommandLine(shell);
-        cmd = cmdInfo.getCommandInstance();
+        cmd = cmdInfo.createCommandInstance();
         assertEquals(1, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
         assertEquals("F1", cmd.getArgumentBundle().getArgument("fileArg").getValue().toString());
         assertEquals(0, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
@@ -107,7 +107,7 @@ public class AlternativesSyntaxTest extends TestCase {
         
         cl = new CommandLine(new Token("cmd"), new Token[]{new Token("-i"), new Token("41")}, null);
         cmdInfo = cl.parseCommandLine(shell);
-        cmd = cmdInfo.getCommandInstance();
+        cmd = cmdInfo.createCommandInstance();
         assertEquals(0, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
         assertEquals(1, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
         assertEquals("41", cmd.getArgumentBundle().getArgument("intArg").getValue().toString());
@@ -115,7 +115,7 @@ public class AlternativesSyntaxTest extends TestCase {
         
         cl = new CommandLine(new Token("cmd"), new Token[]{new Token("--xxx")}, null);
         cmdInfo = cl.parseCommandLine(shell);
-        cmd = cmdInfo.getCommandInstance();
+        cmd = cmdInfo.createCommandInstance();
         assertEquals(0, cmd.getArgumentBundle().getArgument("fileArg").getValues().length);
         assertEquals(0, cmd.getArgumentBundle().getArgument("intArg").getValues().length);
         assertEquals(1, cmd.getArgumentBundle().getArgument("flagArg").getValues().length);

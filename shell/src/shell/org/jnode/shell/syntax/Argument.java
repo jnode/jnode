@@ -69,6 +69,8 @@ public abstract class Argument<V> {
     
     private final V[] vArray;
     
+    private ArgumentBundle bundle;
+    
     
     /**
      * @param label The label that is used associate this Argument object to
@@ -114,14 +116,17 @@ public abstract class Argument<V> {
     }
     
     public boolean isSet() {
+        checkArgumentsSet();
         return values.size() != 0;
     }
     
     public V[] getValues() {
+        checkArgumentsSet();
         return values.toArray(vArray);
     }
 
     public V getValue() throws SyntaxMultiplicityException {
+        checkArgumentsSet();
         if (values.size() == 0) {
             return null;
         }
@@ -134,6 +139,16 @@ public abstract class Argument<V> {
         }
     }
     
+    private void checkArgumentsSet() {
+        if (bundle == null) {
+            throw new SyntaxFailureException(
+                    "This Argument is not associated with an ArgumentBundle");
+        }
+        switch (bundle.getStatus()) {
+        
+        }
+    }
+
     final void addValue(V value) {
         values.add(value);
     }
@@ -196,6 +211,14 @@ public abstract class Argument<V> {
      */
     public boolean isMultiple() {
         return multiple;
+    }
+    
+    void setBundle(ArgumentBundle bundle) {
+        this.bundle = bundle;
+    }
+    
+    ArgumentBundle getBundle() {
+        return bundle;
     }
     
     /**

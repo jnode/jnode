@@ -73,17 +73,17 @@ public class RepeatedSyntaxTest extends TestCase {
         
         CommandLine cl = new CommandLine(new Token("cmd"), new Token[]{}, null);
         CommandInfo cmdInfo = cl.parseCommandLine(shell);
-        Command cmd = cmdInfo.getCommandInstance();
+        Command cmd = cmdInfo.createCommandInstance();
         assertEquals(0, cmd.getArgumentBundle().getArgument("arg1").getValues().length);
         
         cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1")}, null);
         cmdInfo = cl.parseCommandLine(shell);
-        cmd = cmdInfo.getCommandInstance();
+        cmd = cmdInfo.createCommandInstance();
         assertEquals(1, cmd.getArgumentBundle().getArgument("arg1").getValues().length);
         
         cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1"), new Token("F1")}, null);
         cmdInfo = cl.parseCommandLine(shell);
-        cmd = cmdInfo.getCommandInstance();
+        cmd = cmdInfo.createCommandInstance();
         assertEquals(2, cmd.getArgumentBundle().getArgument("arg1").getValues().length);
         
     }
@@ -108,12 +108,12 @@ public class RepeatedSyntaxTest extends TestCase {
         
         cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1")}, null);
         cmdInfo = cl.parseCommandLine(shell);
-        cmd = cmdInfo.getCommandInstance();
+        cmd = cmdInfo.createCommandInstance();
         assertEquals(1, cmd.getArgumentBundle().getArgument("arg1").getValues().length);
         
         cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1"), new Token("F1")}, null);
         cmdInfo = cl.parseCommandLine(shell);
-        cmd = cmdInfo.getCommandInstance();
+        cmd = cmdInfo.createCommandInstance();
         assertEquals(2, cmd.getArgumentBundle().getArgument("arg1").getValues().length);
     }
     
@@ -137,12 +137,12 @@ public class RepeatedSyntaxTest extends TestCase {
 
         cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1")}, null);
         cmdInfo = cl.parseCommandLine(shell);
-        cmd = cmdInfo.getCommandInstance();
+        cmd = cmdInfo.createCommandInstance();
         assertEquals(1, cmd.getArgumentBundle().getArgument("arg1").getValues().length);
 
         cl = new CommandLine(new Token("cmd"), new Token[]{new Token("F1"), new Token("F1")}, null);
         cmdInfo = cl.parseCommandLine(shell);
-        cmd = cmdInfo.getCommandInstance();
+        cmd = cmdInfo.createCommandInstance();
         assertEquals(2, cmd.getArgumentBundle().getArgument("arg1").getValues().length);
 
         try {
@@ -194,26 +194,26 @@ public class RepeatedSyntaxTest extends TestCase {
         cl = new CommandLine(new Token("cmd"),
                 new Token[]{new Token("F1"), new Token("F1"), new Token("F1")}, null);
         cmdInfo = cl.parseCommandLine(shell);
-        cmd = cmdInfo.getCommandInstance();
+        cmd = cmdInfo.createCommandInstance();
 
         cl = new CommandLine(new Token("cmd"),
                 new Token[]{new Token("F1"), new Token("F1"), new Token("F1"), new Token("F1")}, null);
         cmdInfo = cl.parseCommandLine(shell);
-        cmd = cmdInfo.getCommandInstance();
+        cmd = cmdInfo.createCommandInstance();
 
         cl = new CommandLine(new Token("cmd"),
                 new Token[]{
             new Token("F1"), new Token("F1"), new Token("F1"),
             new Token("F1"), new Token("F1")}, null);
         cmdInfo = cl.parseCommandLine(shell);
-        cmd = cmdInfo.getCommandInstance();
+        cmd = cmdInfo.createCommandInstance();
 
         cl = new CommandLine(new Token("cmd"),
                 new Token[]{
             new Token("F1"), new Token("F1"), new Token("F1"), 
             new Token("F1"), new Token("F1"), new Token("F1")}, null);
         cmdInfo = cl.parseCommandLine(shell);
-        cmd = cmdInfo.getCommandInstance();
+        cmd = cmdInfo.createCommandInstance();
 
         try {
             cl = new CommandLine(new Token("cmd"),
