@@ -593,11 +593,11 @@ public class CommandLine implements Completable, Iterable<String> {
     		// Get the command's argument bundle, or the default one.
     		ArgumentBundle bundle = (command == null) ? null :
     		    command.getArgumentBundle();
-    		bundle = (bundle == null) ? defaultArguments : bundle;
+    		bundle = ((bundle == null) ? defaultArguments : bundle);
     		
     		// Get a syntax for the alias, or a default one.
     		Syntax syntax = shell.getSyntaxManager().getSyntax(cmd);
-    		syntax = syntax == null ? defaultSyntax : syntax;
+    		syntax = ((syntax == null) ? defaultSyntax : syntax);
     		
     		// Do a full parse to bind the command line argument tokens to corresponding
     		// command arguments

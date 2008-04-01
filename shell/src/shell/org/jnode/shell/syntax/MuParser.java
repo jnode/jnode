@@ -25,6 +25,7 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.SymbolSource;
@@ -57,6 +58,7 @@ public class MuParser {
     public static final int DEFAULT_STEP_LIMIT = 10000;
     
     private static final boolean DEBUG = false;
+    private static final Logger log = Logger.getLogger(MuParser.class);
     
     private static class ChoicePoint {
         public final int sourcePos;
@@ -129,7 +131,15 @@ public class MuParser {
         }
         Deque<MuSyntax> syntaxStack = new LinkedList<MuSyntax>();
         Deque<ChoicePoint> backtrackStack = new LinkedList<ChoicePoint>();
-        
+        if (DEBUG) {
+            log.debug("rootSyntax = " + (rootSyntax == null ? "null" : rootSyntax));
+        }
+        if (rootSyntax == null) {
+            if (source.hasNext()) {
+                throw new CommandSyntaxException("No arguments expected for this command");
+            }
+            return;
+        }
         syntaxStack.addFirst(rootSyntax);
         int stepCount = 0;
         while (!syntaxStack.isEmpty()) {
@@ -139,15 +149,15 @@ public class MuParser {
             }
             boolean backtrack = false;
             if (DEBUG) {
-                System.err.println("syntaxStack % " + showStack(syntaxStack, true));
+                log.debug("syntaxStack % " + showStack(syntaxStack, true));
             }
             MuSyntax syntax = syntaxStack.removeFirst();
             if (DEBUG) {
-                System.err.println("Trying " + syntax.format());
+                log.debug("Trying " + syntax.format());
                 if (source.hasNext()) {
-                    System.err.println("source -> " + source.peek().token);
+                    log.debug("source -> " + source.peek().token);
                 } else {
-                    System.err.println("source at end");
+                    log.debug("source at end");
                 }
             }
             CommandLine.Token token;
@@ -189,8 +199,7 @@ public class MuParser {
                             if (!backtrackStack.isEmpty()) {
                                 backtrackStack.getFirst().argsModified.add(arg);
                                 if (DEBUG) {
-                                    System.err.println("recording undo for arg " +
-                                            argName);
+                                    log.debug("recording undo for arg " + argName);
                                 }
                             }
                         }
@@ -209,7 +218,7 @@ public class MuParser {
                 }
                 catch (CommandSyntaxException ex) {
                     if (DEBUG) {
-                        System.err.println("accept for arg " + argName + 
+                        log.debug("accept for arg " + argName + 
                                 " threw SyntaxErrorException('" + ex.getMessage() + "'");
                     }
                     backtrack = true;
@@ -223,8 +232,7 @@ public class MuParser {
                     if (!backtrackStack.isEmpty()) {
                         backtrackStack.getFirst().argsModified.add(arg);
                         if (DEBUG) {
-                            System.err.println("recording undo for preset arg " +
-                                    arg.getLabel());
+                            log.debug("recording undo for preset arg " + arg.getLabel());
                         }
                     }
                 }
@@ -244,13 +252,13 @@ public class MuParser {
                 backtrackStack.addFirst(choicePoint);
                 syntaxStack = new SharedStack<MuSyntax>(syntaxStack);
                 if (DEBUG) {
-                    System.err.println("pushed choicePoint - " + choicePoint);
+                    log.debug("pushed choicePoint - " + choicePoint);
                 }
                 if (choices[0] != null) {
                     syntaxStack.addFirst(choices[0]);
                 }
                 if (DEBUG) {
-                    System.err.println("syntaxStack " + showStack(syntaxStack, true));
+                    log.debug("syntaxStack " + showStack(syntaxStack, true));
                 }
                 break;
             case MuSyntax.BACK_REFERENCE:
@@ -261,31 +269,31 @@ public class MuParser {
             if (syntaxStack.isEmpty()) {
                 if (source.hasNext()) {
                     if (DEBUG) {
-                        System.err.println("exhausted syntax stack too soon");
+                        log.debug("exhausted syntax stack too soon");
                     }
                     backtrack = true;
                 }
                 if (completion != null && !backtrackStack.isEmpty()) {
                     if (DEBUG) {
-                        System.err.println("try alternatives for completion");
+                        log.debug("try alternatives for completion");
                     }
                     backtrack = true;
                 }
             }
             if (backtrack) {
                 if (DEBUG) {
-                    System.err.println("backtracking ...");
+                    log.debug("backtracking ...");
                 }
                 while (!backtrackStack.isEmpty()) {
                     ChoicePoint choicePoint = backtrackStack.getFirst();
                     if (DEBUG) {
-                        System.err.println("top choicePoint - " + choicePoint);
-                        System.err.println("syntaxStack " + showStack(syntaxStack, true));
+                        log.debug("top choicePoint - " + choicePoint);
+                        log.debug("syntaxStack " + showStack(syntaxStack, true));
                     }
                     // Issue undo's for any argument values added.
                     for (Argument<?> arg : choicePoint.argsModified) {
                         if (DEBUG) {
-                            System.err.println("undo for arg " + arg.getLabel());
+                            log.debug("undo for arg " + arg.getLabel());
                         }
                         arg.undoLastValue();
                     }
@@ -310,14 +318,14 @@ public class MuParser {
                         }
                         backtrack = false;
                         if (DEBUG) {
-                            System.err.println("taking choice #" + choiceNo);
-                            System.err.println("syntaxStack : " + showStack(syntaxStack, true));
+                            log.debug("taking choice #" + choiceNo);
+                            log.debug("syntaxStack : " + showStack(syntaxStack, true));
                         }
                         break;
                     }
                     // Otherwise, pop the choice point and keep going.
                     if (DEBUG) {
-                        System.err.println("popped choice point");
+                        log.debug("popped choice point");
                     }
                     backtrackStack.removeFirst();
                 }
@@ -328,18 +336,18 @@ public class MuParser {
                     }
                     else {
                         if (DEBUG) {
-                            System.err.println("end completion");
+                            log.debug("end completion");
                         }
                         return;
                     }
                 }
                 if (DEBUG) {
-                    System.err.println("end backtracking");
+                    log.debug("end backtracking");
                 }
             }
         }
         if (DEBUG) {
-            System.err.println("succeeded");
+            log.debug("succeeded");
         }
     }
 
