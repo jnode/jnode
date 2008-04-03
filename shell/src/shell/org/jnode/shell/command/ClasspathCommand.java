@@ -43,10 +43,10 @@ public class ClasspathCommand extends AbstractCommand {
         new URLArgument("addurl", Argument.OPTIONAL, "the URL to be added to the classpath");
     
     private final FlagArgument ARG_CLEAR =
-        new FlagArgument("clear", Argument.OPTIONAL);
+        new FlagArgument("clear", Argument.OPTIONAL, "when set, clear the classpath");
     
     private final FlagArgument ARG_REFRESH =
-        new FlagArgument("refresh", Argument.OPTIONAL);
+        new FlagArgument("refresh", Argument.OPTIONAL, "when set, cause classes to be reloaded on next use");
     
     public ClasspathCommand() {
         super("Print, modify or refresh the classpath");
