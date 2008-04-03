@@ -21,83 +21,82 @@
  
 package org.jnode.shell.command;
 
+import java.io.InputStream;
 import java.io.PrintStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.Syntax;
-import org.jnode.shell.help.SyntaxErrorException;
-import org.jnode.shell.help.argument.OptionArgument;
-import org.jnode.shell.help.argument.URLArgument;
+import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.CommandLine;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FlagArgument;
+import org.jnode.shell.syntax.URLArgument;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Levente S\u00e1ntha
+ * @author crawley@jnode.org
  */
-public class ClasspathCommand {
-
-	static final OptionArgument ARG_ACTION = new OptionArgument("action",
-			"action to do on the classpath", new OptionArgument.Option("add",
-					"Add an URL to the classpath"), new OptionArgument.Option(
-					"clear", "Remove all URL's from the classpath"), new OptionArgument.Option(
-					"refresh", "Refresh the loaded classes on next use"));
-
-	static final URLArgument ARG_URL = new URLArgument("url", "the url");
-
-	static final Parameter PARAM_ACTION = new Parameter(ARG_ACTION);
-
-	static final Parameter PARAM_URL = new Parameter(ARG_URL, true);
-
-	public static Help.Info HELP_INFO = new Help.Info(
-			"classpath",
-			new Syntax[] { new Syntax("Print the current classpath"),
-					new Syntax("Modify the classpath", PARAM_ACTION, PARAM_URL) });
-
-	public static void main(String[] args) throws SyntaxErrorException,
-			MalformedURLException {
-		final ParsedArguments cmdLine = HELP_INFO.parse(args);
-
-		if (PARAM_ACTION.isSet(cmdLine)) {
-			final String action = ARG_ACTION.getValue(cmdLine);
-			if (action.equals("add")) {
-				if (PARAM_URL.isSet(cmdLine)) {
-					addClassPath(ARG_URL.getURL(cmdLine));
-				} else {
-					throw new SyntaxErrorException("URL expected");
-				}
-			} else if (action.equals("clear")) {
-				clearClassPath();
-			} else if (action.equals("refresh")) {
-				refreshClassPath();
-			}
-		} else {
-			printClassPath();
-		}
-	}
-
-    private static void refreshClassPath() {
-        URL[] urls = getClassLoader().getURLs();
-        clearClassPath();
-        if(urls != null)
-            for(URL url : urls)
-                addClassPath(url);
+public class ClasspathCommand extends AbstractCommand {
+    
+    private final URLArgument ARG_ADD = 
+        new URLArgument("addurl", Argument.OPTIONAL, "the URL to be added to the classpath");
+    
+    private final FlagArgument ARG_CLEAR =
+        new FlagArgument("clear", Argument.OPTIONAL);
+    
+    private final FlagArgument ARG_REFRESH =
+        new FlagArgument("refresh", Argument.OPTIONAL);
+    
+    public ClasspathCommand() {
+        super("Print, modify or refresh the classpath");
+        registerArguments(ARG_ADD, ARG_CLEAR, ARG_REFRESH);
     }
 
-    private static void addClassPath(URL url) {
-        URL[] urls = getClassLoader().getURLs();
-        if(urls != null)
-            for(URL u : urls)
-                if(u.equals(url))
-                    return;
+	public static void main(String[] args) throws Exception {
+	    new ClasspathCommand().execute(args);
+	}
+	
+    @Override
+    public void execute(CommandLine commandLine, InputStream in,
+            PrintStream out, PrintStream err) throws Exception {
+        if (ARG_ADD.isSet()) {
+            addToClassPath(ARG_ADD.getValueAsURL());
+        }
+        else if (ARG_CLEAR.isSet()) {
+            clearClassPath();
+        }
+        else if (ARG_REFRESH.isSet()) {
+            refreshClassPath();
+        } 
+        else {
+            printClassPath(out);
+        }
+    }
 
+    private void refreshClassPath() {
+        URL[] urls = getClassLoader().getURLs();
+        clearClassPath();
+        if (urls != null) {
+            for (URL url : urls) {
+                addToClassPath(url);
+            }
+        }
+    }
+
+    private void addToClassPath(URL url) {
+        URL[] urls = getClassLoader().getURLs();
+        if (urls != null) {
+            for (URL u : urls) {
+                if (u.equals(url)) {
+                    return;
+                }
+            }
+        }
         getClassLoader().add(url);
     }
 
-	private static void clearClassPath() {
+	private void clearClassPath() {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		if (cl instanceof CPClassLoader) {
 			cl = new CPClassLoader(cl.getParent());
@@ -105,11 +104,11 @@ public class ClasspathCommand {
 		}
 	}
 
-	private static void printClassPath() {
-		getClassLoader().print(System.out);
+	private void printClassPath(PrintStream out) {
+		getClassLoader().print(out);
 	}
 
-	private static CPClassLoader getClassLoader() {
+	private CPClassLoader getClassLoader() {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		if (!(cl instanceof CPClassLoader)) {
 			cl = new CPClassLoader(cl);

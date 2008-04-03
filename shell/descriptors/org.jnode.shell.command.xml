@@ -59,6 +59,12 @@
     <syntax alias="class">
       <argument argLabel="classname" description="list details of a Java class"/>
     </syntax>
+    <syntax alias="classpath">
+      <empty description="print the current classpath"/>
+      <option argLabel="addurl" longName="add" description="add a URL to the classpath"/>
+      <option argLabel="clear" longName="clear" description="remove all URLs from the classpath"/>
+      <option argLabel="refresh" longName="refresh" description="refresh the loaded classes on next use"/>
+    </syntax>
     <syntax alias="set">
       <sequence description="set a system property">
         <argument argLabel="key"/>
