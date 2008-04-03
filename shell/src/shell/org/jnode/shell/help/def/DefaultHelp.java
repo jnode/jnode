@@ -107,7 +107,7 @@ public class DefaultHelp extends Help {
     public void usage(org.jnode.shell.syntax.Syntax syntax,
             ArgumentBundle bundle, String command) {
         System.out.println(Help.getLocalizedHelp("help.usage") + ": " + 
-                command + syntax.format(bundle));
+                command + " " + syntax.format(bundle));
         format(new Cell[]{new Cell(4, 54)}, new String[]{bundle.getDescription()});
     }
     
@@ -132,8 +132,9 @@ public class DefaultHelp extends Help {
             throw new IllegalArgumentException("Number of cells and texts must match");
 
         String[] remains = new String[texts.length];
-        for (int i = 0; i < texts.length; i++)
-            remains[i] = texts[i];
+        for (int i = 0; i < texts.length; i++) {
+            remains[i] = (texts[i] == null) ? "" : texts[i];
+        }
 
         StringBuilder result = new StringBuilder();
         while (true) {
