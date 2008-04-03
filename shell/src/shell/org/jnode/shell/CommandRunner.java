@@ -28,7 +28,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.HelpException;
@@ -105,7 +107,14 @@ class CommandRunner implements Runnable {
                     }
                 }
                 else {
-                    cmdInfo.createCommandInstance().execute(commandLine, in, out, err);
+                    // FIXME ... it would be nice if we could avoid all of this use of
+                    // the reflection APIs ...
+                    Method method = cmdInfo.getCommandClass().getMethod(
+                            "execute", CommandLine.class, InputStream.class, 
+                            PrintStream.class, PrintStream.class);
+                    Object obj = cmdInfo.createCommandInstance();
+                    AccessController.doPrivileged(new InvokeAction(method, obj, 
+                        new Object[]{commandLine, in, out, err}));
                 }
             } catch (PrivilegedActionException ex) {
                 Exception ex2 = ex.getException();
