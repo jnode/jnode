@@ -28,8 +28,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.jnode.shell.CommandThreadImpl;
 import org.jnode.shell.CommandThread;
+import org.jnode.shell.CommandThreadImpl;
 import org.jnode.vm.VmExit;
 import org.jnode.vm.VmSystem;
 
