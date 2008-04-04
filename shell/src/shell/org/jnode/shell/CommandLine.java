@@ -30,10 +30,7 @@ import org.jnode.shell.help.Help;
 import org.jnode.shell.help.HelpException;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.syntax.ArgumentBundle;
-import org.jnode.shell.syntax.ArgumentSyntax;
 import org.jnode.shell.syntax.CommandSyntaxException;
-import org.jnode.shell.syntax.FileArgument;
-import org.jnode.shell.syntax.RepeatSyntax;
 import org.jnode.shell.syntax.Syntax;
 
 /**
@@ -106,9 +103,9 @@ public class CommandLine implements Completable, Iterable<String> {
         new org.jnode.shell.help.argument.AliasArgument("command",
             "the command to be called");
             
-    private final Syntax defaultSyntax = new RepeatSyntax(new ArgumentSyntax("argument"));
-    private final ArgumentBundle defaultArguments = new ArgumentBundle(
-    		new FileArgument("argument", org.jnode.shell.syntax.Argument.MULTIPLE));
+//    private final Syntax defaultSyntax = new RepeatSyntax(new ArgumentSyntax("argument"));
+//    private final ArgumentBundle defaultArguments = new ArgumentBundle(
+//    		new FileArgument("argument", org.jnode.shell.syntax.Argument.MULTIPLE));
 
     private final Token commandToken;
 
@@ -593,15 +590,14 @@ public class CommandLine implements Completable, Iterable<String> {
     		// Get the command's argument bundle, or the default one.
     		ArgumentBundle bundle = (command == null) ? null :
     		    command.getArgumentBundle();
-    		bundle = ((bundle == null) ? defaultArguments : bundle);
-    		
-    		// Get a syntax for the alias, or a default one.
-    		Syntax syntax = shell.getSyntaxManager().getSyntax(cmd);
-    		syntax = ((syntax == null) ? defaultSyntax : syntax);
-    		
-    		// Do a full parse to bind the command line argument tokens to corresponding
-    		// command arguments
-    		bundle.parse(this, syntax);
+    		if (bundle != null) {
+    		    // Get a syntax for the alias, or a default one.
+    		    Syntax syntax = shell.getSyntaxManager().getSyntax(cmd);
+
+    		    // Do a full parse to bind the command line argument tokens to corresponding
+    		    // command arguments
+    		    bundle.parse(this, syntax);
+    		}
     		return cmdInfo;
     	} catch (ClassNotFoundException ex) {
     		throw new ShellException("Command class not found", ex);
@@ -633,14 +629,13 @@ public class CommandLine implements Completable, Iterable<String> {
 
             // Get the command's argument bundle, or the default one.
             ArgumentBundle bundle = (command == null) ? null : command.getArgumentBundle();
-            bundle = (bundle == null) ? defaultArguments : bundle;
 
             // Get a syntax for the alias, or a default one.
             Syntax syntax = shell.getSyntaxManager().getSyntax(cmd);
 
             try {
                 // Try new-style completion if we have a Syntax
-                if (syntax != null) {
+                if (bundle != null) {
                     bundle.complete(this, syntax, completion);
                 }
                 else {

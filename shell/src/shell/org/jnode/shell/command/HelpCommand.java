@@ -71,14 +71,16 @@ public class HelpCommand {
 
 				arg = ARG_COMMAND.getValue(cmdLine);
 				Class<?> clazz = getCommandClass(aliasManager, arg);	
-				
-				syntax = syntaxManager.getSyntax(arg);
-				if (syntax != null) {
-                    bundle = getBundle(clazz);
-				}
-				if (bundle == null) {
-				    syntax = null;
-				    info = Help.getInfo(clazz);
+
+                bundle = getBundle(clazz);
+                if (bundle != null) {
+                    syntax = syntaxManager.getSyntax(arg);
+                    if (syntax == null) {
+                        syntax = bundle.createDefaultSyntax();
+                    }
+                }
+                else {
+    				info = Help.getInfo(clazz);
 				}
                 if (info != null || syntax != null) {
                     cmd = arg;
@@ -95,20 +97,8 @@ public class HelpCommand {
         else {
             info = HELP_INFO; // defaults to print own help
 		}
-
-        // FIXME The info and syntax cases need to be combined and implemented in
-        // the Help application.
+ 
         if (syntax != null) {
-//            System.out.println("Usage: " + cmd + " " + syntax.format(bundle));
-//            String desc = bundle.getDescription();
-//            if (desc != null) {
-//                System.out.println(desc);
-//            }
-//            for (Argument<?> argument : bundle) {
-//                System.out.print("<" + argument.getLabel() + ">    ");
-//                desc = argument.getDescription();
-//                System.out.println(desc == null ? "no description" : desc);
-//            }
             Help.getHelp().help(syntax, bundle, cmd);
         }
         else if (info != null) {
@@ -123,10 +113,12 @@ public class HelpCommand {
         try {
             AbstractCommand command = (AbstractCommand) clazz.newInstance();
             return command.getArgumentBundle();
+        } catch (ClassCastException e) {
+            return null;
         } catch (InstantiationException e) {
             System.err.println("Problem during instantiation of " + clazz.getName());
         } catch (IllegalAccessException e) {
-            System.err.println("Cunstructor for " + clazz.getName() + " is not accessible");
+            System.err.println("Constructor for " + clazz.getName() + " is not accessible");
         }
         return null;
     }
