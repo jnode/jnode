@@ -198,7 +198,7 @@ public class ArgumentBundle implements Iterable<Argument<?>> {
 	 * 
 	 * @return the default syntax
 	 */
-     protected Syntax createDefaultSyntax() {
+     public Syntax createDefaultSyntax() {
 		Syntax[] syntaxes = new OptionSyntax[arguments.length];
 		for (int i = 0; i < syntaxes.length; i++) {
 			String label = arguments[i].getLabel();
