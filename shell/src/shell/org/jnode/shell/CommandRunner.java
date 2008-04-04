@@ -28,9 +28,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
 
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.HelpException;
