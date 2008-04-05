@@ -41,7 +41,7 @@ public class MuPreset extends MuSyntax {
 
     @Override
     String format(FormatState state) {
-        return "<<" + argName + "<-" + preset + ">>";
+        return "<<" + argName + "=" + preset + ">>";
     }
 
     @Override
