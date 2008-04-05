@@ -154,10 +154,6 @@ public class ArgumentBundle implements Iterable<Argument<?>> {
 	    SymbolSource<CommandLine.Token> context = commandLine.tokenIterator();
 	    MuSyntax muSyntax = syntax.prepare(this);
 	    new MuParser().parse(muSyntax, completion, context, this);
-		if (context.hasNext()) {
-		    throw new CommandSyntaxException("unmatched argument '"
-					+ context.next().token + "'");
-		}
     }
 
 	/**
@@ -199,12 +195,24 @@ public class ArgumentBundle implements Iterable<Argument<?>> {
 	 * @return the default syntax
 	 */
      public Syntax createDefaultSyntax() {
-		Syntax[] syntaxes = new OptionSyntax[arguments.length];
-		for (int i = 0; i < syntaxes.length; i++) {
-			String label = arguments[i].getLabel();
-			syntaxes[i] = new OptionSyntax(label, label, null);
-		}
-		return new PowersetSyntax("default", syntaxes);
+        if (arguments.length == 0) {
+            return new EmptySyntax("default", null);
+        }
+        else if (arguments.length == 1) {
+            String label = arguments[0].getLabel();
+            return new OptionSyntax(label, label, null);
+        }
+        else {
+            // A better default syntax would only allow one Option repetition
+            // for any Argument that accepts only one value, and would use mandatory
+            // Options for mandatory Arguments.
+            Syntax[] syntaxes = new OptionSyntax[arguments.length];
+            for (int i = 0; i < syntaxes.length; i++) {
+                String label = arguments[i].getLabel();
+                syntaxes[i] = new OptionSyntax(label, label, null);
+            }
+            return new PowersetSyntax("default", syntaxes);
+        }
 	}
 
     @Override
