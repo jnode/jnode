@@ -132,7 +132,7 @@ public class MuParser {
         Deque<MuSyntax> syntaxStack = new LinkedList<MuSyntax>();
         Deque<ChoicePoint> backtrackStack = new LinkedList<ChoicePoint>();
         if (DEBUG) {
-            log.debug("rootSyntax = " + (rootSyntax == null ? "null" : rootSyntax));
+            log.debug("Parsing with rootSyntax = " + (rootSyntax == null ? "null" : rootSyntax.format()));
         }
         if (rootSyntax == null) {
             if (source.hasNext()) {
@@ -153,7 +153,7 @@ public class MuParser {
             }
             MuSyntax syntax = syntaxStack.removeFirst();
             if (DEBUG) {
-                log.debug("Trying " + syntax.format());
+                log.debug("Trying kind = " + syntax.getKind() + ", syntax = " + syntax.format());
                 if (source.hasNext()) {
                     log.debug("source -> " + source.peek().token);
                 } else {
@@ -166,7 +166,7 @@ public class MuParser {
                 String symbol = ((MuSymbol) syntax).getSymbol();
                 token = source.hasNext() ? source.next() : null;
                 
-                if (completion == null) {
+                if (completion == null || source.hasNext()) {
                     backtrack = token == null || !token.token.equals(symbol);
                 }
                 else {
