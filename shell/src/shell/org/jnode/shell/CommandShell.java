@@ -599,9 +599,6 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             Completable cl = parseCommandLine(partial);
             if (cl != null) {
                 cl.complete(completion, this);
-                if (completion.getCompletionStart() == -1) {
-                    completion.setCompletionStart(partial.length());
-                }
             }
         } catch (ShellSyntaxException ex) {
             out.println(); // next line
