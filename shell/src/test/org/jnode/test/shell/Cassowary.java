@@ -45,7 +45,12 @@ import org.jnode.shell.help.def.DefaultHelp;
  * @author crawley@jnode.org
  */
 public class Cassowary {
+    private static boolean initialized;
+    
     protected static void initEnv() throws NamingException {
+        if (initialized) {
+            return;
+        }
         InitialNaming.setNameSpace(new NameSpace() {
             private Map<Class<?>, Object> space = new HashMap<Class<?>, Object>();
 
@@ -81,5 +86,6 @@ public class Cassowary {
         InitialNaming.bind(Help.NAME, new DefaultHelp());
         
         BasicConfigurator.configure();
+        initialized = true;
     }
 }

@@ -20,12 +20,11 @@
  */
 package org.jnode.test.shell;
 
+import static org.jnode.test.shell.CompletionHelper.checkCompletions;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.naming.NameNotFoundException;
@@ -33,7 +32,6 @@ import javax.naming.NamingException;
 
 import junit.framework.TestCase;
 
-import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.DefaultCommandInvoker;
 import org.jnode.shell.DefaultInterpreter;
@@ -137,22 +135,22 @@ public class CompletionTest extends TestCase {
         TestCommandShell cs = new TestCommandShell();
         cs.setCommandInterpreter("default");
         
-        checkCompletions(cs.complete(""), aliasCompletions, 0);
-        checkCompletions(cs.complete("di"), new String[]{"dir "}, 0);
-        checkCompletions(cs.complete("dir"), new String[]{"dir "}, 0);
-        checkCompletions(cs.complete("dir "), new String[]{"Four/", "One ", "Three ", "Two ", }, 4);
-        checkCompletions(cs.complete("dir T"), new String[]{"Three ", "Two "}, 4);
+        checkCompletions(cs, "", aliasCompletions, -1);
+        checkCompletions(cs, "di", new String[]{"dir "}, 0);
+        checkCompletions(cs, "dir", new String[]{"dir "}, 0);
+        checkCompletions(cs, "dir ", new String[]{"Four/", "One ", "Three ", "Two ", }, -1);
+        checkCompletions(cs, "dir T", new String[]{"Three ", "Two "}, 4);
         
         // The default interpreter doesn't recognize '>' '<' or '|' as anything special.
         // Therefore it should just try to complete them as filenames ... and fail.
-        checkCompletions(cs.complete("dir |"), new String[]{}, 4);
-        checkCompletions(cs.complete("dir | "), new String[]{}, 6); // dir takes one argument only
-        checkCompletions(cs.complete("cat | "), new String[]{"Four/", "One ", "Three ", "Two ", }, 6);
-        checkCompletions(cs.complete("cat | ca"), new String[]{}, 6);
-        checkCompletions(cs.complete("cat >"), new String[]{}, 4);
-        checkCompletions(cs.complete("cat > "), new String[]{"Four/", "One ", "Three ", "Two ", }, 6);
-        checkCompletions(cs.complete("cat <"), new String[]{}, 4);
-        checkCompletions(cs.complete("cat < "), new String[]{"Four/", "One ", "Three ", "Two ", }, 6);
+        checkCompletions(cs, "dir |", new String[]{}, -1);
+        checkCompletions(cs, "dir | ", new String[]{}, -1); // dir takes one argument only
+        checkCompletions(cs, "cat | ", new String[]{"Four/", "One ", "Three ", "Two ", }, -1);
+        checkCompletions(cs, "cat | ca", new String[]{}, -1);
+        checkCompletions(cs, "cat >", new String[]{}, -1);
+        checkCompletions(cs, "cat > ", new String[]{"Four/", "One ", "Three ", "Two ", }, -1);
+        checkCompletions(cs, "cat <", new String[]{}, -1);
+        checkCompletions(cs, "cat < ", new String[]{"Four/", "One ", "Three ", "Two ", }, -1);
     }
     
     public void testOldSyntaxOptions() throws Exception {
@@ -160,8 +158,8 @@ public class CompletionTest extends TestCase {
         cs.setCommandInterpreter("default");
         
         // For bug #4418
-        checkCompletions(cs.complete("cat -"), new String[]{"-u "}, -2);
-        checkCompletions(cs.complete("cat -u"), new String[]{"-u "}, -2);
+        checkCompletions(cs, "cat -", new String[]{"-u "}, -2);
+        checkCompletions(cs, "cat -u", new String[]{"-u "}, -2);
         
         // And some more ...
     }
@@ -170,20 +168,20 @@ public class CompletionTest extends TestCase {
         TestCommandShell cs = new TestCommandShell();
         cs.setCommandInterpreter("redirecting");
         
-        checkCompletions(cs.complete(""), aliasCompletions, 0);
-        checkCompletions(cs.complete("di"), new String[]{"dir "}, 0);
-        checkCompletions(cs.complete("dir"), new String[]{"dir "}, 0);
-        checkCompletions(cs.complete("dir "), new String[]{"Four/", "One ", "Three ", "Two ", }, 4);
-        checkCompletions(cs.complete("dir T"), new String[]{"Three ", "Two "}, 4);
-        checkCompletions(cs.complete("dir |"), aliasCompletions, 5);
-        checkCompletions(cs.complete("dir | "), aliasCompletions, 6);
-        checkCompletions(cs.complete("cat |"), aliasCompletions, 5);
-        checkCompletions(cs.complete("cat | "), aliasCompletions, 6);
-        checkCompletions(cs.complete("cat | ca"), new String[]{"cat "}, 6);
-        checkCompletions(cs.complete("cat >"), new String[]{"Four/", "One ", "Three ", "Two ", }, 5);
-        checkCompletions(cs.complete("cat > "), new String[]{"Four/", "One ", "Three ", "Two ", }, 6);
-        checkCompletions(cs.complete("cat <"), new String[]{"Four/", "One ", "Three ", "Two ", }, 5);
-        checkCompletions(cs.complete("cat < "), new String[]{"Four/", "One ", "Three ", "Two ", }, 6);
+        checkCompletions(cs, "", aliasCompletions, -1);
+        checkCompletions(cs, "di", new String[]{"dir "}, 0);
+        checkCompletions(cs, "dir", new String[]{"dir "}, 0);
+        checkCompletions(cs, "dir ", new String[]{"Four/", "One ", "Three ", "Two ", }, -1);
+        checkCompletions(cs, "dir T", new String[]{"Three ", "Two "}, 4);
+        checkCompletions(cs, "dir |", aliasCompletions, -1);
+        checkCompletions(cs, "dir | ", aliasCompletions, -1);
+        checkCompletions(cs, "cat |", aliasCompletions, -1);
+        checkCompletions(cs, "cat | ", aliasCompletions, -1);
+        checkCompletions(cs, "cat | ca", new String[]{"cat "}, 6);
+        checkCompletions(cs, "cat >", new String[]{"Four/", "One ", "Three ", "Two ", }, -1);
+        checkCompletions(cs, "cat > ", new String[]{"Four/", "One ", "Three ", "Two ", }, -1);
+        checkCompletions(cs, "cat <", new String[]{"Four/", "One ", "Three ", "Two ", }, -1);
+        checkCompletions(cs, "cat < ", new String[]{"Four/", "One ", "Three ", "Two ", }, -1);
     }
     
     public void testDefaultInterpreterNewSyntax() throws Exception {
@@ -192,26 +190,26 @@ public class CompletionTest extends TestCase {
         
         final String[] propertyCompletions = getExpectedPropertyNameCompletions();
 
-        checkCompletions(cs.complete("set "), propertyCompletions, 4);
-        checkCompletions(cs.complete("set a"), new String[]{}, 4);
-        checkCompletions(cs.complete("set u"), new String[]{
+        checkCompletions(cs, "set ", propertyCompletions, -1);
+        checkCompletions(cs, "set a", new String[]{}, -1);
+        checkCompletions(cs, "set u", new String[]{
             "user.country ", "user.dir ", "user.home ", 
             "user.language ", "user.name ", "user.timezone ", }, 4);
-        checkCompletions(cs.complete("set a "), new String[]{}, 6);
-        checkCompletions(cs.complete("set a b"), new String[]{}, 6);
-        checkCompletions(cs.complete("set a b "), new String[]{}, 8);
+        checkCompletions(cs, "set a ", new String[]{}, -1);
+        checkCompletions(cs, "set a b", new String[]{}, 6);
+        checkCompletions(cs, "set a b ", new String[]{}, -1);
         
-        checkCompletions(cs.complete("cpuid "), new String[]{}, 6);
+        checkCompletions(cs, "cpuid ", new String[]{}, -1);
         
-        checkCompletions(cs.complete("duh "), new String[]{"Four/", "One ", "Three ", "Two ", }, 4);
-        checkCompletions(cs.complete("duh T"), new String[]{"Three ", "Two "}, 4);
+        checkCompletions(cs, "duh ", new String[]{"Four/", "One ", "Three ", "Two ", }, -1);
+        checkCompletions(cs, "duh T", new String[]{"Three ", "Two "}, 4);
         
-        checkCompletions(cs.complete("alias -"), new String[]{"-r "}, 6);
+        checkCompletions(cs, "alias -", new String[]{"-r "}, 6);
         
         String[] aliasesPlusR = new String[aliasCompletions.length + 1];
         System.arraycopy(aliasCompletions, 0, aliasesPlusR, 1, aliasCompletions.length);
         aliasesPlusR[0] = "-r ";
-        checkCompletions(cs.complete("alias "), aliasesPlusR, 6);
+        checkCompletions(cs, "alias ", aliasesPlusR, -1);
     }
     
     /**
@@ -226,34 +224,4 @@ public class CompletionTest extends TestCase {
         return tmp.toArray(new String[tmp.size()]);
     }
 
-    private void checkCompletions(CompletionInfo ci, String[] expected, int startPos) {
-        SortedSet<String> completions = ci.getCompletions();
-        if (completions.size() != expected.length) {
-            err("Wrong number of completions", expected, completions);
-        }
-        int i = 0;
-        for (String completion : completions) {
-            if (!completion.equals(expected[i])) {
-                err("Mismatch for completion #" + i, expected, completions);
-            }
-            i++;
-        }
-        assertEquals(startPos, ci.getCompletionStart());
-    }
-    
-    private void err(String message, String[] expected, Collection<String> actual) {
-        System.err.println(message);
-        System.err.println("Expected completions:");
-        showList(Arrays.asList(expected));
-        System.err.println("Actual completions:");
-        showList(actual);
-        fail(message);
-    }
-    
-    private void showList(Collection<String> list) {
-        for (String element : list) {
-            System.err.println("    '" + element + "'");
-        }
-    }
-    
 }
