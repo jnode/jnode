@@ -170,7 +170,12 @@ class Line {
         String completion = info.getCompletion();
         if (completion != null) {
             int startPos = info.getCompletionStart();
-            setContent(currentLine.substring(0, startPos) + completion + ending);         
+            if (startPos == -1) {
+                setContent(currentLine.substring(0, posOnCurrentLine) + completion + ending);
+            }
+            else {
+                setContent(currentLine.substring(0, startPos) + completion + ending);
+            }
             // (This is the updated line's length ...)
             posOnCurrentLine = currentLine.length() - ending.length();
         }
