@@ -30,8 +30,7 @@ import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.ClassNameArgument;
 import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.shell.syntax.IntegerArgument;
-import org.jnode.vm.VmArchitecture;
-import org.jnode.vm.VmMagic;
+import org.jnode.vm.LoadCompileService;
 import org.jnode.vm.classmgr.VmType;
 
 /**
@@ -39,13 +38,11 @@ import org.jnode.vm.classmgr.VmType;
  * @author crawley@jnode.org
  */
 public class CompileCommand extends AbstractCommand {
-    // FIXME ... something should exposed the maximum compiler optimization levels 
-    // via getter methods.  The code below gives "MagicPermission is not granted ..."
-    private final VmArchitecture arch = VmMagic.currentProcessor().getArchitecture();
-    private final Object[] compilers = arch.getCompilers();
-    private final Object[] testCompilers = arch.getTestCompilers();
-    private final int maxLevel = Math.max(
-            compilers.length, (testCompilers == null) ? 0 : testCompilers.length) - 1;
+    private final int maxTestLevel = 
+        LoadCompileService.getHighestOptimizationLevel(true);
+    private final int maxNontestLevel = 
+        LoadCompileService.getHighestOptimizationLevel(false);
+    private final int maxLevel = Math.max(maxTestLevel, maxNontestLevel);
     
 	private final ClassNameArgument ARG_CLASS = 
 	    new ClassNameArgument("classname", Argument.MANDATORY, "the class file to compile");
@@ -70,6 +67,21 @@ public class CompileCommand extends AbstractCommand {
 		final String className = ARG_CLASS.getValue();
 		final int level = ARG_LEVEL.isSet() ? ARG_LEVEL.getValue() : 0;
 		final boolean test = ARG_TEST.isSet();
+		
+		if (test) {
+		    if (maxTestLevel == -1) {
+		        err.println("No test compilers are currently registered");
+		        exit(1);
+		    }
+		    else if (maxTestLevel < level) {
+                err.println("The highest (test) optimization level is " + maxTestLevel);
+                exit(1);
+		    }
+		}
+		else if (maxNontestLevel < level) {
+            err.println("The highest optimization level is " + maxNontestLevel);
+            exit(1);
+        }
 		
 		final ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		final Class<?> cls;

@@ -76,6 +76,17 @@ public final class LoadCompileService {
                     enableTestCompilers));
         }
     }
+    
+    /**
+     * Get the highest supported optimization level for the regular or test compilers.
+     */
+    public static int getHighestOptimizationLevel(boolean test) {
+        if (test) {
+            return service.testCompilers == null ? -1 : service.testCompilers.length - 1;
+        } else {
+            return service.compilers == null ? -1 : service.compilers.length - 1;
+        }
+    }
 
     /**
      * @see org.jnode.vm.classmgr.VmClassLoader#defineClass(java.lang.String,
