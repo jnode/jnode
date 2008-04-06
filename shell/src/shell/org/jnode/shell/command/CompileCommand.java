@@ -39,23 +39,16 @@ import org.jnode.vm.classmgr.VmType;
  * @author crawley@jnode.org
  */
 public class CompileCommand extends AbstractCommand {
-    // FIXME ... it would be good if something exposed the current maximum 
-    // compiler optimization level via(s) a getter method.
-//    private final VmArchitecture arch = VmMagic.currentProcessor().getArchitecture();
-//    private final Object[] compilers = arch.getCompilers();
-//    private final Object[] testCompilers = arch.getTestCompilers();
-//    private final int maxLevel = Math.max(
-//            compilers.length, (testCompilers == null) ? 0 : testCompilers.length) - 1;
-    
-    // FIXME ... temporary hack until I work out what is causing the System.out stream
-    // to be toasted in the compiler thread.  (The commented out code causes the compiler
-    // to try to print "MagicPermission is not granted ..." to System.out, and a NPE is
-    // being thrown because (I think) the proclet context thinks that the global output
-    // stream is null.)
-    private final int maxLevel = 3;
+    // FIXME ... something should exposed the maximum compiler optimization levels 
+    // via getter methods.  The code below gives "MagicPermission is not granted ..."
+    private final VmArchitecture arch = VmMagic.currentProcessor().getArchitecture();
+    private final Object[] compilers = arch.getCompilers();
+    private final Object[] testCompilers = arch.getTestCompilers();
+    private final int maxLevel = Math.max(
+            compilers.length, (testCompilers == null) ? 0 : testCompilers.length) - 1;
     
 	private final ClassNameArgument ARG_CLASS = 
-	    new ClassNameArgument("className", Argument.MANDATORY, "the class file to compile");
+	    new ClassNameArgument("classname", Argument.MANDATORY, "the class file to compile");
 	private final IntegerArgument ARG_LEVEL = 
 	    new IntegerArgument("level", Argument.OPTIONAL, 0, maxLevel, "the optimization level");
 	private final FlagArgument ARG_TEST = 
