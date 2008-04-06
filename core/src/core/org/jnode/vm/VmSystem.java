@@ -1063,8 +1063,6 @@ public final class VmSystem {
     }
 
     //io context related
- //   private static final IOContext vmIoContext = new VmIOContext();
- //   private static IOContext ioContext = vmIoContext;
     
     public static IOContext getIOContext() {
     	return VmIsolate.currentIsolate().getIOContext();
@@ -1102,17 +1100,28 @@ public final class VmSystem {
 		return getIOContext().getGlobalOutStream();
 	}
 
-    public static void switchToExternalIOContext(IOContext context){
-        if (hasVmIOContext()){
+    /**
+     * Switch the current Isolate from the initial IOContext to an external one.
+     * If the Isolate already has an external IOContext, this is a no-op.
+     * 
+     * @param context 
+     */
+    public static synchronized void switchToExternalIOContext(IOContext context){
+        if (hasVmIOContext()) {
+            getIOContext().exitContext();
             VmIsolate.currentIsolate().setIOContext(context);
             context.enterContext();
         }
     }
 
-    public static void resetIOContext(){
+    /**
+     * Reset to the current Isolate to its initial IOContext.
+     */
+    public static synchronized void resetIOContext(){
         if (!hasVmIOContext()){
             getIOContext().exitContext();
             VmIsolate.currentIsolate().resetIOContext();
+            getIOContext().enterContext();
         } else {
     		throw new RuntimeException("IO Context cannot be reset");
     	}
