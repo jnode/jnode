@@ -74,6 +74,7 @@
         <argument argLabel="classname"/>
       </sequence>
     </syntax>
+    <syntax alias="date" description="print the current date"/>
     <syntax alias="set">
       <sequence description="set a system property">
         <argument argLabel="key"/>
