@@ -21,9 +21,20 @@
 
 package org.jnode.shell.syntax;
 
+import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandLine.Token;
-
+/**
+ * This Argument class accepts integer values.  If instantiated with 'min' and 'max' values 
+ * close together, it can perform completion.
+ * 
+ * @author crawley@jnode.org
+ */
 public class IntegerArgument extends Argument<Integer> {
+    /**
+     * Only do completion if <code>(max - min)</code> is less that this value.  This stops
+     * us from generating an unmanageably large number of completions.
+     */
+    private static final int COMPLETION_THRESHOLD = 100;
     
     private final int min, max;
 
@@ -39,6 +50,9 @@ public class IntegerArgument extends Argument<Integer> {
         super(label, flags, new Integer[0], description);
         this.min = min;
         this.max = max;
+        if (max < min) {
+            throw new IllegalArgumentException("max < min");
+        }
     }
 
     @Override
@@ -55,6 +69,20 @@ public class IntegerArgument extends Argument<Integer> {
         }
     }
   
+    @Override
+    public void complete(CompletionInfo completion, String partial) {
+        // FIXME ... maybe someone could figure out how to partial
+        // completion efficiently when max - min is large?
+        if (max - min < COMPLETION_THRESHOLD) {
+            for (int i = min; i <= max; i++) {
+                String candidate = Integer.toString(i);
+                if (candidate.startsWith(partial)) {
+                    completion.addCompletion(candidate);
+                }
+            }
+        }
+    }
+
     @Override
     public String toString() {
         return "IntegerArgument{" + super.toString() + "}";
