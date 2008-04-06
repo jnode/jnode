@@ -35,6 +35,20 @@ public class ProcletIOContext implements IOContext {
     private static InputStream globalInStream;
     private static PrintStream globalOutStream;
     private static PrintStream globalErrStream;
+    private static boolean initialized;
+    
+    public ProcletIOContext() {
+        initGlobals();
+    }
+
+    private static synchronized void initGlobals() {
+        if (!initialized) {
+            globalInStream = System.in;
+            globalOutStream = System.out;
+            globalErrStream = System.err;
+            initialized = true;
+        }
+    }
 
     public void setGlobalInStream(InputStream in) {
         globalInStream = in;

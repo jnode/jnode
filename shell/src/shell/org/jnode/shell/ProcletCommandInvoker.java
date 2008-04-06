@@ -27,17 +27,10 @@ import org.jnode.shell.proclet.ProcletContext;
 import org.jnode.shell.proclet.ProcletIOContext;
 import org.jnode.vm.VmSystem;
 
-/*
- * User: Sam Reid Date: Dec 20, 2003 Time: 1:20:33 AM Copyright (c) Dec 20, 2003
- * by Sam Reid
- */
-
 /**
  * This command invoker runs commands in their own proclet, giving each one its
  * own stdin,out,err etcetera.
  * 
- * @author Sam Reid
- * @author Martin Husted Hartvig (hagar@jnode.org)
  * @author crawley@jnode.org
  */
 public class ProcletCommandInvoker extends AsyncCommandInvoker {
@@ -51,9 +44,12 @@ public class ProcletCommandInvoker extends AsyncCommandInvoker {
             return "proclet";
         }
     };
+    
+    private static boolean initialized;
 
     public ProcletCommandInvoker(CommandShell commandShell) {
         super(commandShell);
+        init();
     }
 
     public String getName() {
@@ -62,8 +58,14 @@ public class ProcletCommandInvoker extends AsyncCommandInvoker {
 
     CommandThreadImpl createThread(CommandLine cmdLine, CommandRunner cr) {
         Closeable[] streams = cmdLine.getStreams();
-        VmSystem.switchToExternalIOContext(new ProcletIOContext());
         return ProcletContext.createProclet(cr, null, null, new Object[] {
                 streams[0], streams[1], streams[2] }, cmdLine.getCommandName());
+    }
+    
+    private static synchronized void init() {
+        if (!initialized) {
+            VmSystem.switchToExternalIOContext(new ProcletIOContext());
+            initialized = true;
+        }
     }
 }
