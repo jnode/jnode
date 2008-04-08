@@ -21,48 +21,86 @@
  
 package org.jnode.shell.command;
 
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.argument.ClassNameArgument;
-import org.jnode.shell.help.argument.IntegerArgument;
-import org.jnode.shell.help.argument.StringArgument;
+import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.CommandLine;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.ClassNameArgument;
+import org.jnode.shell.syntax.FlagArgument;
+import org.jnode.shell.syntax.IntegerArgument;
+import org.jnode.shell.syntax.StringArgument;
+import org.jnode.vm.LoadCompileService;
 import org.jnode.vm.classmgr.VmType;
 
 /**
  * @author Levente S\u00e1ntha
+ * @author clawley@jnode.org
  */
-public class DisassembleCommand {
-
-	static final ClassNameArgument ARG_CLASS = new ClassNameArgument("className", "the class to disassemble");
-    static final StringArgument ARG_METHOD = new StringArgument("methodName", "the method to disassemble");
-	static final IntegerArgument ARG_LEVEL = new IntegerArgument("level", "the optimization level");
-	static final IntegerArgument ARG_TEST = new IntegerArgument("test", "If 1, the test compilers are used");
-	static final Parameter PARAM_LEVEL = new Parameter(ARG_LEVEL, Parameter.OPTIONAL);
-	static final Parameter PARAM_TEST = new Parameter(ARG_TEST, Parameter.OPTIONAL);
-	
-	public static Help.Info HELP_INFO = new Help.Info("disasm", "Disassemble a Java class or method",
-            new Parameter[] {
-                new Parameter(ARG_CLASS, Parameter.MANDATORY),
-                new Parameter(ARG_METHOD, Parameter.OPTIONAL),
-                PARAM_LEVEL, PARAM_TEST});
-
-	public static void main(String[] args) throws Exception {
-		final ParsedArguments cmdLine = HELP_INFO.parse(args);
-
-		final String className = ARG_CLASS.getValue(cmdLine);
-        final String methodName = ARG_METHOD.getValue(cmdLine);
-		final int level = PARAM_LEVEL.isSet(cmdLine) ? ARG_LEVEL.getInteger(cmdLine) : 0;
-		final boolean test = PARAM_TEST.isSet(cmdLine) ? (ARG_TEST.getInteger(cmdLine) != 0) : false;
+public class DisassembleCommand extends AbstractCommand {
+    private final int maxTestLevel = 
+        LoadCompileService.getHighestOptimizationLevel(true);
+    private final int maxNontestLevel = 
+        LoadCompileService.getHighestOptimizationLevel(false);
+    private final int maxLevel = Math.max(maxTestLevel, maxNontestLevel);
+    
+	private final ClassNameArgument ARG_CLASS =
+	    new ClassNameArgument("className", Argument.MANDATORY, "the class to disassemble");
+    private final StringArgument ARG_METHOD =
+        new StringArgument("methodName", Argument.OPTIONAL, "the method to disassemble");
+	private final IntegerArgument ARG_LEVEL =
+	    new IntegerArgument("level", Argument.OPTIONAL, 0, maxLevel, "the optimization level");
+	private final FlagArgument ARG_TEST = 
+	    new FlagArgument("test", Argument.OPTIONAL, "If set, the test compilers are used");
 		
-		final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		final Class<?> cls = cl.loadClass(className);
-		final VmType<?> type = cls.getVmClass();
-		final long start = System.currentTimeMillis();
-		final int count = type.disassemble(methodName, level, test, new OutputStreamWriter(System.out));
-		final long end = System.currentTimeMillis();
-		System.out.println("Disassembling " + count + " methods took " + (end - start) + "ms");
+	public DisassembleCommand() {
+        super("disassemble a Java class or method");
+        registerArguments(ARG_CLASS, ARG_METHOD, ARG_LEVEL, ARG_TEST);
+    }
+
+    public static void main(String[] args) throws Exception {
+		new DisassembleCommand().execute(args);
 	}
+
+    @Override
+    public void execute(CommandLine commandLine, InputStream in,
+            PrintStream out, PrintStream err) throws Exception {
+        final String className = ARG_CLASS.getValue();
+        final String methodName = ARG_METHOD.isSet() ? ARG_METHOD.getValue() : null;
+        final int level = ARG_LEVEL.isSet() ? ARG_LEVEL.getValue() : 0;
+        final boolean test = ARG_TEST.isSet();
+        
+        final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        Class<?> cls;
+        try {
+            cls = cl.loadClass(className);
+        }
+        catch (ClassNotFoundException ex) {
+            err.println("Class '" + className + "' not found");
+            exit(1);
+            // not reached
+            return;  
+        }
+        final VmType<?> type = cls.getVmClass();
+        if (test) {
+            if (maxTestLevel == -1) {
+                err.println("No test compilers are currently registered");
+                exit(1);
+            }
+            else if (maxTestLevel < level) {
+                err.println("The highest (test) optimization level is " + maxTestLevel);
+                exit(1);
+            }
+        }
+        else if (maxNontestLevel < level) {
+            err.println("The highest optimization level is " + maxNontestLevel);
+            exit(1);
+        }
+        final long start = System.currentTimeMillis();
+        final int count = type.disassemble(methodName, level, test, new OutputStreamWriter(out));
+        final long end = System.currentTimeMillis();
+        out.println("Disassembling " + count + " methods took " + (end - start) + "ms");
+    }
 }
