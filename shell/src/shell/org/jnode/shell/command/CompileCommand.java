@@ -45,7 +45,7 @@ public class CompileCommand extends AbstractCommand {
     private final int maxLevel = Math.max(maxTestLevel, maxNontestLevel);
     
 	private final ClassNameArgument ARG_CLASS = 
-	    new ClassNameArgument("classname", Argument.MANDATORY, "the class file to compile");
+	    new ClassNameArgument("className", Argument.MANDATORY, "the class file to compile");
 	private final IntegerArgument ARG_LEVEL = 
 	    new IntegerArgument("level", Argument.OPTIONAL, 0, maxLevel, "the optimization level");
 	private final FlagArgument ARG_TEST = 

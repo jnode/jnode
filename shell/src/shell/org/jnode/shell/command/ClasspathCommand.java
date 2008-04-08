@@ -40,7 +40,7 @@ import org.jnode.shell.syntax.URLArgument;
 public class ClasspathCommand extends AbstractCommand {
     
     private final URLArgument ARG_ADD = 
-        new URLArgument("addurl", Argument.OPTIONAL, "the URL to be added to the classpath");
+        new URLArgument("addUrl", Argument.OPTIONAL, "the URL to be added to the classpath");
     
     private final FlagArgument ARG_CLEAR =
         new FlagArgument("clear", Argument.OPTIONAL, "when set, clear the classpath");

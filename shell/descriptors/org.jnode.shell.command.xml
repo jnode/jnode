@@ -53,28 +53,40 @@
       <option argLabel="remove" shortName="r" description="remove an alias"/>
       <sequence description="create or update an alias">
         <argument argLabel="alias"/>
-        <argument argLabel="classname"/>
+        <argument argLabel="className"/>
       </sequence>
     </syntax>
     <syntax alias="class">
-      <argument argLabel="classname" description="list details of a Java class"/>
+      <argument argLabel="className" description="list details of a Java class"/>
     </syntax>
     <syntax alias="classpath">
       <empty description="print the current classpath"/>
-      <option argLabel="addurl" longName="add" description="add a URL to the classpath"/>
+      <option argLabel="addUrl" longName="add" description="add a URL to the classpath"/>
       <option argLabel="clear" longName="clear" description="remove all URLs from the classpath"/>
       <option argLabel="refresh" longName="refresh" description="refresh the loaded classes on next use"/>
     </syntax>
     <syntax alias="compile">
-      <sequence description="print the current classpath">
+      <sequence description="compile a class to native code">
         <optionSet>
           <option argLabel="test" longName="test"/>
           <option argLabel="level" longName="level"/>
         </optionSet>
-        <argument argLabel="classname"/>
+        <argument argLabel="className"/>
       </sequence>
     </syntax>
     <syntax alias="date" description="print the current date"/>
+    <syntax alias="disasm">
+      <sequence description="disassemble a native code class">
+        <optionSet>
+          <option argLabel="test" longName="test"/>
+          <option argLabel="level" longName="level"/>
+        </optionSet>
+        <argument argLabel="className"/>
+        <repeat minCount="0" maxCount="1">
+          <argument argLabel="methodName"/>
+        </repeat>
+      </sequence>
+    </syntax>
     <syntax alias="set">
       <sequence description="set a system property">
         <argument argLabel="key"/>

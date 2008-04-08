@@ -41,7 +41,7 @@ import org.jnode.vm.classmgr.VmType;
 public class ClassCommand extends AbstractCommand {
 
 	private final ClassNameArgument ARG_CLASS = 
-	    new ClassNameArgument("classname", Argument.SINGLE | Argument.MANDATORY, 
+	    new ClassNameArgument("className", Argument.SINGLE | Argument.MANDATORY, 
 	            "the fully qualified Java name of the class to be viewed");
 	
 	public ClassCommand() {

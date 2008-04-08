@@ -52,7 +52,7 @@ public class AliasCommand extends AbstractCommand {
     public AliasCommand() {
         super("list, add or remove JNode command aliases");
         ARG_ALIAS = new AliasArgument("alias", Argument.OPTIONAL, "the alias to be added");
-        ARG_CLASS = new ClassNameArgument("classname", Argument.OPTIONAL, "the classname");
+        ARG_CLASS = new ClassNameArgument("className", Argument.OPTIONAL, "the classname");
         ARG_REMOVE = new AliasArgument("remove", Argument.OPTIONAL, "the alias to be removed");
         registerArguments(ARG_ALIAS, ARG_CLASS, ARG_REMOVE);
     }
