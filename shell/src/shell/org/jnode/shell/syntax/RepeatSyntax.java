@@ -141,6 +141,9 @@ public class RepeatSyntax extends GroupSyntax {
             if (maxCount == Integer.MAX_VALUE) {
                 return "[ " + child.format(bundle) + " ... ]";
             }
+            else if (maxCount == 1) {
+                return "[ " + child.format(bundle) + "]";
+            }
             else {
                 return "[ " + child.format(bundle) + " ..." + maxCount + " ]";
             }
@@ -148,6 +151,9 @@ public class RepeatSyntax extends GroupSyntax {
         else if (minCount == 1) {
             if (maxCount == Integer.MAX_VALUE) {
                 return child.format(bundle) + " ...";
+            }
+            else if (maxCount == 1) {
+                return child.format(bundle);
             }
             else {
                 return child.format(bundle) + " ..." + maxCount;
