@@ -45,6 +45,7 @@
     <alias name="locale" class="org.jnode.shell.command.LocaleCommand"/>
     <alias name="onheap" class="org.jnode.shell.command.OnHeapCommand"/>
     <alias name="grep" class="org.jnode.shell.command.GrepCommand"/>
+    <alias name="syntax" class="org.jnode.shell.command.SyntaxCommand"/>
   </extension>
   
   <extension point="org.jnode.shell.syntaxes">
@@ -93,6 +94,22 @@
         <argument argLabel="value"/>
       </sequence>
       <argument description="remove a system property" argLabel="key"/>
+    </syntax>
+    <syntax alias="syntax">
+      <option argLabel="list" longName="list" shortName="l" description="list aliases with syntaxes"/>
+      <option argLabel="dumpAll" longName="dump" shortName="d" description="dump all syntaxes"/>
+      <sequence description="dump the syntax for a given alias">
+        <option argLabel="dump" longName="dump" shortName="d"/>
+        <argument argLabel="alias"/>
+      </sequence>
+      <sequence description="load a new syntax for a given alias">
+        <option argLabel="file" longName="load" shortName="l"/>
+        <argument argLabel="alias"/>
+      </sequence>
+      <sequence description="set a system property">
+        <option argLabel="remove" longName="remove" shortName="r"/>
+        <argument argLabel="alias"/>
+      </sequence>
     </syntax>
   </extension>
 
