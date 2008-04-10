@@ -21,6 +21,8 @@
  
 package org.jnode.shell.syntax;
 
+import java.util.Collection;
+
 /**
  * @author crawley@jnode.org
  */
@@ -52,11 +54,17 @@ public interface SyntaxManager {
     /**
      * Gets the syntax for a given alias
      * 
-     * @param alias 
-     * @return The syntax the given alias
-     * @throws ClassNotFoundException
+     * @param alias The alias
+     * @return The syntax for the given alias, or <code>null</code>
      */
     public abstract Syntax getSyntax(String alias);
+    
+    /**
+     * Get the current set of keys known to the SyntaxManager.
+     * 
+     * @return the aliases which have syntaxes defined.
+     */
+    public abstract Collection<String> getKeys();
 
     /**
      * Create a new syntax manager that has this syntax manager as its parent.
