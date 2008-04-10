@@ -24,7 +24,10 @@ package org.jnode.shell.syntax;
 import java.util.HashSet;
 import java.util.Set;
 
+import nanoxml.XMLElement;
+
 public abstract class GroupSyntax extends Syntax {
+    private static Syntax MY_EMPTY = new EmptySyntax(null, null);
 
     final Syntax[] syntaxes;
     private final HashSet<String> childLabels;
@@ -61,4 +64,14 @@ public abstract class GroupSyntax extends Syntax {
     protected Syntax[] getChildSyntaxes() {
         return this.syntaxes;
     }
+    
+    @Override
+    public XMLElement basicElement(String name) {
+        XMLElement element = super.basicElement(name);
+        for (Syntax child : this.syntaxes) {
+            element.addChild((child == null ? MY_EMPTY : child).toXML());
+        }
+        return element;
+    }
+
  }

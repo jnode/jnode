@@ -21,6 +21,8 @@
 
 package org.jnode.shell.syntax;
 
+import nanoxml.XMLElement;
+
 
 /**
  * A Powerset syntax allows a group of child Syntaxes to be provided in any order.
@@ -86,5 +88,10 @@ public class PowersetSyntax extends GroupSyntax {
             sb.append(" ] ...");
         }
         return sb.toString();
+    }
+
+    @Override
+    public XMLElement toXML() {
+        return basicElement("powerSet");
     }
 }

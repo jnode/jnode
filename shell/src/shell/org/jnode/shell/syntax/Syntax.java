@@ -22,7 +22,10 @@
 package org.jnode.shell.syntax;
 
 import java.util.Collections;
+import java.util.Hashtable;
 import java.util.Set;
+
+import nanoxml.XMLElement;
 
 public abstract class Syntax {
     
@@ -99,5 +102,19 @@ public abstract class Syntax {
 
     public String getDescription() {
         return description;
+    }
+
+    public abstract XMLElement toXML();
+    
+    protected XMLElement basicElement(String name) {
+        XMLElement element = new XMLElement(new Hashtable<String, Object>(), false, false);
+        element.setName(name);
+        if (label != null) {
+            element.setAttribute("label", label);
+        }
+        if (description != null) {
+            element.setAttribute("description", description);
+        }
+        return element;
     }
 }

@@ -21,6 +21,8 @@
 
 package org.jnode.shell.syntax;
 
+import nanoxml.XMLElement;
+
 public class TokenSyntax extends Syntax {
     
     private final String symbol;
@@ -46,6 +48,13 @@ public class TokenSyntax extends Syntax {
     @Override
     public MuSyntax prepare(ArgumentBundle bundle) {
         return new MuSymbol(label, symbol);
+    }
+
+    @Override
+    public XMLElement toXML() {
+        XMLElement element = basicElement("symbol");
+        element.setAttribute("symbol", symbol);
+        return element;
     }
 
 }

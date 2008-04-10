@@ -26,6 +26,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
 
+import nanoxml.XMLElement;
+
 import org.jnode.shell.CommandLine.Token;
 
 
@@ -179,4 +181,8 @@ public class OptionSetSyntax extends GroupSyntax {
         return sb.toString();
     }
 
+    @Override
+    public XMLElement toXML() {
+        return basicElement("optionSet");
+    }
 }

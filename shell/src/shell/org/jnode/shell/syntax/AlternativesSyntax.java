@@ -21,6 +21,8 @@
 
 package org.jnode.shell.syntax;
 
+import nanoxml.XMLElement;
+
 
 /**
  * An AlternativesSyntax specifies that one of its child syntaxes needs to be 
@@ -70,4 +72,10 @@ public class AlternativesSyntax extends GroupSyntax {
         }
         return sb.toString();
     }
+
+    @Override
+    public XMLElement toXML() {
+        return basicElement("alternatives");
+    }
+    
 }
