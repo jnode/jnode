@@ -21,6 +21,8 @@
 
 package org.jnode.shell.syntax;
 
+import nanoxml.XMLElement;
+
 /**
  * This class provides a way of representing an empty syntax or syntax alternative; e.g. when
  * a command or command variant takes no options or arguments.  An EmptySyntax allows you to
@@ -43,6 +45,11 @@ public class EmptySyntax extends Syntax {
     @Override
     public MuSyntax prepare(ArgumentBundle bundle) {
         return null;
+    }
+
+    @Override
+    public XMLElement toXML() {
+        return basicElement("empty");
     }
 
 }

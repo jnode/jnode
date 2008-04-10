@@ -21,6 +21,8 @@
 
 package org.jnode.shell.syntax;
 
+import nanoxml.XMLElement;
+
 
 /**
  * A SequenceSyntax specifies that a group of child syntaxes need to be 
@@ -61,5 +63,10 @@ public class SequenceSyntax extends GroupSyntax {
             muSyntaxes[i] = childSyntaxes[i].prepare(bundle);
         }
         return new MuSequence(label, muSyntaxes);
+    }
+
+    @Override
+    public XMLElement toXML() {
+        return basicElement("sequence");
     }
 }

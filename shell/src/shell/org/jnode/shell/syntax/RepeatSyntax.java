@@ -21,6 +21,8 @@
 
 package org.jnode.shell.syntax;
 
+import nanoxml.XMLElement;
+
 
 /**
  * A RepeatedSyntax instance specifies that a given 'child' syntax may appear
@@ -167,6 +169,20 @@ public class RepeatSyntax extends GroupSyntax {
                 return child.format(bundle) + " " + minCount + "..." + maxCount;
             }
         }
+    }
+    
+
+
+    @Override
+    public XMLElement toXML() {
+        XMLElement element = basicElement("optionSet");
+        if (minCount > 0) {
+            element.setAttribute("minCount", minCount);
+        }
+        if (minCount != Integer.MAX_VALUE) {
+            element.setAttribute("maxCount", maxCount);
+        }
+        return element;
     }
 
 }

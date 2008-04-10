@@ -21,6 +21,8 @@
 
 package org.jnode.shell.syntax;
 
+import nanoxml.XMLElement;
+
 
 /**
  * A SimpleSyntax instance allows an Argument to appear exactly once.
@@ -71,5 +73,12 @@ public class ArgumentSyntax extends Syntax {
 
     public String getArgName() {
         return argName;
+    }
+
+    @Override
+    public XMLElement toXML() {
+        XMLElement element = basicElement("argument");
+        element.setAttribute("argLabel", argName);
+        return element;
     }
 }
