@@ -21,6 +21,7 @@
  
 package org.jnode.test.shell.syntax;
  
+import java.util.Collection;
 import java.util.HashMap;
 
 import org.jnode.shell.syntax.Syntax;
@@ -48,4 +49,11 @@ public class TestSyntaxManager implements SyntaxManager {
     public SyntaxManager createSyntaxManager() {
         return new TestSyntaxManager();
     }
+
+    @Override
+    public Collection<String> getKeys() {
+        throw new UnsupportedOperationException("go away");
+    }
+    
+    
 }
