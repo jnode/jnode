@@ -22,8 +22,11 @@
 package org.jnode.shell;
 
 /**
+ * A ShellManager records the current shell.  It also manages factories for instantiating invokers,
+ * and interpreters and provides methods for instantiating them.
+ * 
  * @author epr
- * @crawley@jnode.org
+ * @author crawley@jnode.org
  */
 public interface ShellManager {
 

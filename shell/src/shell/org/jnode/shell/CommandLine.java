@@ -550,7 +550,7 @@ public class CommandLine implements Completable, Iterable<String> {
      * Get the IO stream context for executing the command. The result is
      * guaranteed to be non-null and to have at least 3 entries.
      * 
-     * @return stream context as described above.
+     * @return the stream context as described above.
      */
     public Closeable[] getStreams() {
         return streams.clone();
@@ -559,7 +559,7 @@ public class CommandLine implements Completable, Iterable<String> {
     /**
      * Set the IO stream context for executing the command.
      * 
-     * @param the new stream context.
+     * @param streams the command's new stream context.
      */
     public void setStreams(Closeable[] streams) {
         this.streams = streams.clone();

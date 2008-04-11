@@ -46,6 +46,9 @@ import org.jnode.shell.CommandLine.Token;
  * <li>The 'description' string contains optional documentation for the Argument.  
  * </ul>
  * 
+ * Many methods on the Argument class check that the Argument is a member of an ArgumentBundle,
+ * throw the unchecked exception {@link SyntaxFailureException} if this is not the case.
+ * 
  * @author crawley@jnode.org
  *
  * @param <V> this is the value type for the Argument.
@@ -115,11 +118,17 @@ public abstract class Argument<V> {
         return label;
     }
     
+    /**
+     * Test if this Argument currently has a bound value or values.
+     */
     public boolean isSet() {
         checkArgumentsSet();
         return values.size() != 0;
     }
     
+    /**
+     * Get this Arguments bound values as an array. 
+     */
     public V[] getValues() {
         checkArgumentsSet();
         return values.toArray(vArray);
@@ -174,18 +183,6 @@ public abstract class Argument<V> {
     protected abstract void doAccept(Token value) throws CommandSyntaxException;
 
     /**
-     * Accept the String as the value of this argument.  This method is called with a String
-     * that is part of a Token's value.  The default implementation is not to accept the String.
-     * If the method call returns, the caller should treat the String as consumed.
-     * 
-     * @param str the String that will supply the Argument's value
-     * @throws CommandSyntaxException if the String is not acceptable.
-     */
-    public void acceptEmbedded(String str) throws CommandSyntaxException {
-        throw new UnsupportedOperationException("acceptEmbedded has no implementation");
-    }
-    
-    /**
      * Perform argument completion on the supplied (partial) argument value.  The
      * results of the completion should be added to the supplied CompletionInfo.
      * <p>
@@ -201,6 +198,10 @@ public abstract class Argument<V> {
         // set no completion
     }
     
+    /**
+     * Test if sufficient values have been bound to the Argument to satisfy the
+     * the Argument's specified cardinality constraints.
+     */
     public boolean isSatisfied() {
         return !isMandatory() || isSet();
     }
@@ -228,6 +229,9 @@ public abstract class Argument<V> {
         values.clear();
     }
 
+    /**
+     * Render this Argument for debug purposes.
+     */
     @Override
     public String toString() {
         return "label=" + label;
@@ -237,6 +241,9 @@ public abstract class Argument<V> {
         values.remove(values.size() - 1);
     }
 
+    /**
+     * Format this argument for use in 'help' messages, and so on.
+     */
     public final String format() {
         return label + ":" + argumentKind();
     }
@@ -249,5 +256,9 @@ public abstract class Argument<V> {
         return description;
     }
     
+    /**
+     * Return a String that describes the 'kind' of the Argument; e.g. a 
+     * "class name" or an "integer".
+     */
     protected abstract String argumentKind();
 }

@@ -60,7 +60,7 @@ public interface CommandInvoker {
      *        arguments and (where relevant) the command's i/o stream context.
      * @param cmdInfo a CommandInfo descriptor for the command to be run.
      * @return the thread for the command. Calling
-     *         {@link java.lang.Thread.start()} will cause the command to
+     *         {@link java.lang.Thread#start()} will cause the command to
      *         execute.
      * @throws ShellException if there was some problem launching the command.
      */
