@@ -57,8 +57,6 @@ public class SyntaxCommand extends AbstractCommand {
         new AliasArgument("alias", Argument.OPTIONAL, "the target alias");
     private FileArgument ARG_FILE = 
         new FileArgument("file", Argument.OPTIONAL, "if set, load the syntax from this file");
-    private FlagArgument ARG_LIST =
-        new FlagArgument("list", Argument.OPTIONAL, "if set, list the syntaxes");
     private FlagArgument ARG_REMOVE =
         new FlagArgument("remove", Argument.OPTIONAL, "if set, remove the syntaxes for the target alias");
     private FlagArgument ARG_DUMP =
@@ -67,8 +65,8 @@ public class SyntaxCommand extends AbstractCommand {
         new FlagArgument("dumpAll", Argument.OPTIONAL, "if set, show the syntaxes for all aliases");
     
     public SyntaxCommand() {
-        super("load or clear a syntax for an alias");
-        registerArguments(ARG_ALIAS, ARG_FILE, ARG_LIST, ARG_REMOVE, ARG_DUMP, ARG_DUMP_ALL);
+        super("manages syntaxes for commands using the 'new' syntax mechanisms");
+        registerArguments(ARG_ALIAS, ARG_FILE, ARG_REMOVE, ARG_DUMP, ARG_DUMP_ALL);
     }
 
     public static void main(String[] args) throws Exception {
@@ -79,12 +77,7 @@ public class SyntaxCommand extends AbstractCommand {
     throws Exception {
         SyntaxManager synMgr = ShellUtils.getCurrentSyntaxManager();
 
-        if (ARG_LIST.isSet()) {
-            for (String key : synMgr.getKeys()) {
-                out.println(key);
-            }
-        }
-        else if (ARG_DUMP_ALL.isSet()) {
+        if (ARG_DUMP_ALL.isSet()) {
             for (String alias : synMgr.getKeys()) {
                 Syntax syntax = synMgr.getSyntax(alias);
                 dumpSyntax(alias, syntax, out);
@@ -126,6 +119,11 @@ public class SyntaxCommand extends AbstractCommand {
             }
             else if (ARG_REMOVE.isSet()) {
                 synMgr.remove(alias);
+            }
+            else {
+                for (String key : synMgr.getKeys()) {
+                    out.println(key);
+                }
             }
         }
     }

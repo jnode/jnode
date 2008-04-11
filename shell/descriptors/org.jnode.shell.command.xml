@@ -96,8 +96,8 @@
       <argument description="remove a system property" argLabel="key"/>
     </syntax>
     <syntax alias="syntax">
-      <option argLabel="list" longName="list" shortName="l" description="list aliases with syntaxes"/>
-      <option argLabel="dumpAll" longName="dump" shortName="d" description="dump all syntaxes"/>
+      <empty description="list aliases with syntaxes"/>
+      <option argLabel="dumpAll" longName="dump-all" description="dump all syntaxes"/>
       <sequence description="dump the syntax for a given alias">
         <option argLabel="dump" longName="dump" shortName="d"/>
         <argument argLabel="alias"/>
