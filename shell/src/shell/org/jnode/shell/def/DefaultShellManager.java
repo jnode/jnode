@@ -31,8 +31,10 @@ import org.jnode.shell.ShellManager;
 import org.jnode.util.SystemInputStream;
 
 /**
+ * This is the default implementation of the ShellManager API.
+ * 
  * @author epr
- * @crawley@jnode.org
+ * @author crawley@jnode.org
  */
 public class DefaultShellManager implements ShellManager {
 

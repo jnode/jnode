@@ -24,6 +24,9 @@ package org.jnode.shell.syntax;
 import java.util.Collection;
 
 /**
+ * A SyntaxManager manages the association between a command "alias" and 
+ * the Syntax that specifies its argument syntax.  
+ * 
  * @author crawley@jnode.org
  */
 public interface SyntaxManager {
@@ -47,7 +50,6 @@ public interface SyntaxManager {
      * Remove the syntax for an alias
      * 
      * @param alias The alias
-     * @param syntax 
      */
     public abstract Syntax remove(String alias);
 
