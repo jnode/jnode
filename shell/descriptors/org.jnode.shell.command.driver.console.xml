@@ -20,6 +20,7 @@
 
   <extension point="org.jnode.shell.aliases">
     <alias name="console" class="org.jnode.shell.command.driver.console.ConsoleCommand"/>
+    <alias name="clear" class="org.jnode.shell.command.driver.console.ClearConsoleCommand"/>
   </extension>
 
   <extension point="org.jnode.security.permissions">
