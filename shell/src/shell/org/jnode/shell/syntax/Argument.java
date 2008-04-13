@@ -57,14 +57,12 @@ public abstract class Argument<V> {
     
     public static final int OPTIONAL = 0x00;
     public static final int MANDATORY = 0x01;
-    public static final int CONDITIONAL = 0x02;
 
     public static final int SINGLE = 0x00;
     public static final int MULTIPLE = 0x04;
     
     private final String label;
     private final boolean mandatory;
-    private final boolean conditional;
     private final boolean multiple;
     private final String description;
     
@@ -88,7 +86,6 @@ public abstract class Argument<V> {
         this.label = label;
         this.description = description;
         this.mandatory = (flags & MANDATORY) != 0;
-        this.conditional = (flags & CONDITIONAL) != 0;
         this.multiple = (flags & MULTIPLE) != 0;
         this.vArray = vArray;
     }
@@ -99,14 +96,6 @@ public abstract class Argument<V> {
      */
     public boolean isMandatory() {
         return mandatory;
-    }
-
-    /**
-     * If this method returns <code>true</code>, this Argument is conditional; i.e. not
-     * every concrete syntax is required to use the Argument.
-     */
-    public boolean isConditional() {
-        return conditional;
     }
     
     /**
