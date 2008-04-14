@@ -76,7 +76,6 @@ public class SyntaxCommand extends AbstractCommand {
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
     throws Exception {
         SyntaxManager synMgr = ShellUtils.getCurrentSyntaxManager();
-
         if (ARG_DUMP_ALL.isSet()) {
             for (String alias : synMgr.getKeys()) {
                 Syntax syntax = synMgr.getSyntax(alias);
@@ -84,12 +83,9 @@ public class SyntaxCommand extends AbstractCommand {
             }
         }
         else {
-            if (!ARG_ALIAS.isSet()) {
-                throw new SyntaxArgumentMissingException(
-                        "alias argument required for these flags", ARG_ALIAS);
-            }
-            String alias = ARG_ALIAS.getValue();
+            String alias;
             if (ARG_DUMP.isSet()) {
+                alias = getAlias();
                 Syntax syntax = synMgr.getSyntax(alias);
                 if (syntax == null) {
                     err.println("No syntax for alias '" + alias + "'");
@@ -99,6 +95,7 @@ public class SyntaxCommand extends AbstractCommand {
                 }
             }
             else if (ARG_FILE.isSet()) {
+                alias = getAlias();
                 File file = ARG_FILE.getValue();
                 XMLElement xml = new XMLElement();
                 FileReader reader = null;
@@ -118,6 +115,7 @@ public class SyntaxCommand extends AbstractCommand {
                 }
             }
             else if (ARG_REMOVE.isSet()) {
+                alias = getAlias();
                 synMgr.remove(alias);
             }
             else {
@@ -126,6 +124,14 @@ public class SyntaxCommand extends AbstractCommand {
                 }
             }
         }
+    }
+    
+    private String getAlias() throws SyntaxArgumentMissingException {
+        if (!ARG_ALIAS.isSet()) {
+            throw new SyntaxArgumentMissingException(
+                    "an alias argument is required for this syntax", ARG_ALIAS);
+        }
+        return ARG_ALIAS.getValue();
     }
 
     private void dumpSyntax(String alias, Syntax syntax, PrintStream out) 
