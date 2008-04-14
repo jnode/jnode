@@ -88,6 +88,11 @@
         </repeat>
       </sequence>
     </syntax>
+    <syntax alias="echo">
+      <repeat>
+        <argument argLabel="text"/>
+      </repeat>
+    </syntax>
     <syntax alias="set">
       <sequence description="set a system property">
         <argument argLabel="key"/>
