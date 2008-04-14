@@ -25,7 +25,7 @@ import nanoxml.XMLElement;
 
 
 /**
- * A SimpleSyntax instance allows an Argument to appear exactly once.
+ * An ArgumentSyntax instance allows an Argument to appear exactly once.
  * 
  * @author crawley@jnode.org
  *
