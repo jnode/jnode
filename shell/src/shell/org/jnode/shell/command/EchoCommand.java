@@ -23,47 +23,45 @@ package org.jnode.shell.command;
 
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.util.Iterator;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Argument;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.argument.StringArgument;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.StringArgument;
 
 /**
+ * Echo the command's arguments to its output. 
+ * 
  * @author epr
+ * @author crawley@jnode.org
  */
-
 public class EchoCommand extends AbstractCommand {
-
-	public static Help.Info HELP_INFO = new Help.Info(
-		"echo", "Print the given text",
-		new Parameter[]{
-			new Parameter(new StringArgument("arg", "the text to print", Argument.MULTI), Parameter.OPTIONAL)
-		}
-	);
-
+    
+    private final StringArgument ARG_WORDS = 
+        new StringArgument("text", Argument.MULTIPLE, "the text to be printed");
+    
+    public EchoCommand() {
+        super("Print the argument text to standard output");
+        registerArguments(ARG_WORDS);
+    }
+    
 	public static void main(String[] args) throws Exception {
 		new EchoCommand().execute(args);
 	}
 
 	/**
-	 * Execute this command
+	 * Execute the command
 	 */
 	@SuppressWarnings("deprecation")
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err)
+	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err)
 	throws Exception {
-		Iterator<String> it = commandLine.iterator();
-		int i = 0;
-		while (it.hasNext()) {
-			if (i > 0) {
-				out.print(' ');
-			}
-			out.print(it.next());
-			i++;
-		}
-		out.println();
+	    String[] words = ARG_WORDS.getValues();
+	    for (int i = 0; i < words.length; i++) {
+	        if (i > 0) {
+	            out.print(' ');
+	        }
+	        out.print(words[i]);
+	    }
+	    out.println();
 	}
 }
