@@ -22,6 +22,12 @@ public class Superblock extends HFSPlusObject {
 	/** Data bytes array that contains superblock informations */
 	private byte data[];
 	
+	public Superblock(){
+		super(null);
+		data = new byte[SUPERBLOCK_LENGTH];
+		log.setLevel(Level.INFO);
+	}
+	
 	public Superblock(HfsPlusFileSystem fs) throws FileSystemException {
 		super(fs);
 		log.setLevel(Level.INFO);
@@ -41,11 +47,17 @@ public class Superblock extends HFSPlusObject {
 	public int getMagic() {
 		return BigEndian.getInt16(data, 0);
 	}
-	
+	public void setMagic(int value){
+		BigEndian.setInt16(data, 0, value);
+	}
+	//
 	public int getVersion() {
 		return BigEndian.getInt16(data, 2);
 	}
-	
+	public void setVersion(int value){
+		BigEndian.setInt16(data, 2, value);
+	}
+	//
 	public int getAttributes(){
 		return BigEndian.getInt32(data, 4);
 	}
@@ -71,68 +83,124 @@ public class Superblock extends HFSPlusObject {
 	public boolean isAttribute(int maskBit){
 		return (((getAttributes() >> maskBit) & 0x1) != 0);
 	}
-	
+	//
 	public int getLastMountedVersion(){
 		return BigEndian.getInt32(data, 8);
 	}
-	
+	public void setLastMountedVersion(int value){
+		BigEndian.setInt32(data, 8, value);
+	}
+	//
 	public int getJournalInfoBlock(){
 		return BigEndian.getInt32(data, 12);
 	}
-	
+	public void setJournalInfoBlock(int value){
+		BigEndian.setInt32(data, 12, value);
+	}
+	//
 	public int getCreateDate(){
 		return BigEndian.getInt32(data, 16);
+	}
+	public void setCreateDate(int value){
+		BigEndian.setInt32(data, 16, value);
 	}
 	
 	public int getModifyDate(){
 		return BigEndian.getInt32(data, 20);
 	}
+	public void setModifyDate(int value){
+		BigEndian.setInt32(data, 20, value);
+	}
 	
 	public int getBackupDate(){
 		return BigEndian.getInt32(data, 24);
+	}
+	public void setBackupDate(int value){
+		BigEndian.setInt32(data, 24, value);
 	}
 	
 	public int getCheckedDate(){
 		return BigEndian.getInt32(data, 28);
 	}
+	public void setCheckedDate(int value){
+		BigEndian.setInt32(data, 28, value);
+	}
 	//
 	public int getFileCount(){
 		return BigEndian.getInt32(data, 32);
 	}
+	public void setFileCount(int value){
+		BigEndian.setInt32(data, 32, value);
+	}
+	//
 	public int getFolderCount(){
 		return BigEndian.getInt32(data, 36);
+	}
+	public void setFolderCount(int value){
+		BigEndian.setInt32(data, 36, value);
 	}
 	//
 	public int getBlockSize(){
 		return BigEndian.getInt32(data, 40);
 	}
+	public void setBlockSize(int value){
+		BigEndian.setInt32(data, 40, value);
+	}
+	//
 	public int getTotalBlocks(){
 		return BigEndian.getInt32(data, 44);
 	}
+	public void setTotalBlocks(int value){
+		BigEndian.setInt32(data, 44,value);
+	}
+	//
 	public int getFreeBlocks(){
 		return BigEndian.getInt32(data, 48);
+	}
+	public void setFreeBlocks(int value){
+		BigEndian.setInt32(data, 48, value);
 	}
 	//
 	public int getNextAllocation(){
 		return BigEndian.getInt32(data, 52);
 	}
+	public void setNextAllocation(int value){
+		BigEndian.setInt32(data, 52, value);
+	}
+	
 	public long getRsrcClumpSize(){
 		return BigEndian.getInt32(data, 56);
 	}
+	public void setRsrcClumpSize(int value){
+		BigEndian.setInt32(data, 56, value);
+	}
+	
 	public int getDataClumpSize(){
 		return BigEndian.getInt32(data, 60);
+	}
+	public void setDataClumpSize(int value){
+		BigEndian.setInt32(data, 60, value);
 	}
 	
 	public int getNextCatalogId(){
 		return BigEndian.getInt32(data, 64);
 	}
+	public void setNextCatalogId(int value){
+		BigEndian.setInt32(data, 64, value);
+	}
 	
 	public int getWriteCount(){
 		return BigEndian.getInt32(data, 68);
 	}
+	public void setWriteCount(int value){
+		BigEndian.setInt32(data, 68, value);
+	}
 	
 	public long getEncodingsBmp(){
 		return BigEndian.getInt64(data, 72);
+	}
+	public void setEncodingsBmp(long value){
+		BigEndian.setInt64(data, 72, value);
 	}
 	
 	public byte[] getFinderInfo(){
