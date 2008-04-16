@@ -21,6 +21,8 @@
 
 package org.jnode.shell.syntax;
 
+import nanoxml.XMLElement;
+
 
 public class OptionSyntax extends ArgumentSyntax {
     
@@ -135,6 +137,20 @@ public class OptionSyntax extends ArgumentSyntax {
 
     String getLongOptName() {
         return longOptName;
+    }
+    
+
+    @Override
+    public XMLElement toXML() {
+        XMLElement element = basicElement("option");
+        element.setAttribute("argLabel", getArgName());
+        if (longOptName != null) {
+            element.setAttribute("longName", longOptName.substring(2));
+        }
+        if (shortOptName != null) {
+            element.setAttribute("shortName", shortOptName.substring(1));
+        }
+        return element;
     }
 
 }
