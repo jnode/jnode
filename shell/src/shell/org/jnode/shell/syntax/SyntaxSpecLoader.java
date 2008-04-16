@@ -23,8 +23,6 @@ package org.jnode.shell.syntax;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Priority;
-
 /**
  * The SyntaxSpecLoader traverses a syntax specification (e.g. in XML) wrapped
  * in an adapter, and creates a Syntax tree.

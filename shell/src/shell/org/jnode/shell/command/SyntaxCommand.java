@@ -104,7 +104,9 @@ public class SyntaxCommand extends AbstractCommand {
                 try {
                     reader = new FileReader(file);
                     xml.parseFromReader(new BufferedReader(reader));
-                    SyntaxBundle bundle = new SyntaxSpecLoader().loadSyntax(new XMLSyntaxSpecAdapter(xml));
+                    xml.setAttribute("alias", alias);
+                    SyntaxBundle bundle = 
+                        new SyntaxSpecLoader().loadSyntax(new XMLSyntaxSpecAdapter(xml));
                     synMgr.add(bundle);
                 }
                 catch (IOException ex) {
