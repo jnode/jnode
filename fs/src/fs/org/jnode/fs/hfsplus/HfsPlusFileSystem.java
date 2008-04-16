@@ -21,11 +21,27 @@ public class HfsPlusFileSystem extends AbstractFileSystem<HFSPlusEntry> {
 	private Superblock sb;
 	/** Catalog special file for this instance */
 	private Catalog catalog;
-
+	/**
+	 * 
+	 * @param device
+	 * @param readOnly
+	 * @param type
+	 * @throws FileSystemException
+	 */
 	public HfsPlusFileSystem(Device device, boolean readOnly, HfsPlusFileSystemType type) throws FileSystemException {
 		super(device, readOnly, type);
 	}
-
+	/**
+	 * 
+	 * @throws FileSystemException
+	 */
+	public void create()throws FileSystemException {
+		//TODO implements file system creation.
+	}
+	/**
+	 * 
+	 * @throws FileSystemException
+	 */
 	public void read() throws FileSystemException {
 		sb = new Superblock(this);
 		
