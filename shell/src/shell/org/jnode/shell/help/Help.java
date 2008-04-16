@@ -30,6 +30,7 @@ import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginUtils;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.ArgumentBundle;
+import org.jnode.shell.syntax.SyntaxBundle;
 
 /**
  * @author qades
@@ -78,11 +79,11 @@ public abstract class Help {
     /**
      * Shows the help page for a command
      * 
-     * @param syntax the command syntax
+     * @param syntaxes the command's syntax bundle
      * @param bundle the command's argument bundle
      * @param command a command name or alias to appear in the help
      */
-    public abstract void help(org.jnode.shell.syntax.Syntax syntax, ArgumentBundle bundle, String command);
+    public abstract void help(SyntaxBundle syntaxes, ArgumentBundle bundle, String command);
 
     /**
      * Shows the usage line for a command
@@ -94,11 +95,11 @@ public abstract class Help {
     /**
      * Shows the usage line for a command
      * 
-     * @param syntax the command syntax
+     * @param syntaxes the command's syntax bundle
      * @param bundle the command's argument bundle
      * @param command a command name or alias to appear in the help
      */
-    public abstract void usage(org.jnode.shell.syntax.Syntax syntax, ArgumentBundle bundle, String command);
+    public abstract void usage(SyntaxBundle syntaxes, ArgumentBundle bundle, String command);
 
     /**
      * Shows the description of a single argument. Used as a callback in

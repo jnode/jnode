@@ -23,6 +23,7 @@ package org.jnode.test.shell.syntax;
 
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.syntax.Syntax;
+import org.jnode.shell.syntax.SyntaxBundle;
 
 /**
  * Fake shell implementation that provides services for testing CommandLine etc.
@@ -41,6 +42,6 @@ public class TestShell extends CommandShell {
     }
     
     public void addSyntax(String alias, Syntax syntax) {
-        getSyntaxManager().add(alias, syntax);
+        getSyntaxManager().add(new SyntaxBundle(alias, syntax));
     }
 }

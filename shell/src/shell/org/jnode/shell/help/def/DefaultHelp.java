@@ -21,11 +21,14 @@
  
 package org.jnode.shell.help.def;
 
+import java.util.Arrays;
+
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.Syntax;
 import org.jnode.shell.syntax.ArgumentBundle;
+import org.jnode.shell.syntax.SyntaxBundle;
 
 /**
  * @author qades
@@ -55,9 +58,9 @@ public class DefaultHelp extends Help {
     }
 
     @Override
-    public void help(org.jnode.shell.syntax.Syntax syntax,
+    public void help(SyntaxBundle syntaxes,
             ArgumentBundle bundle, String command) {
-        usage(syntax, bundle, command);
+        usage(syntaxes, bundle, command);
 
         boolean first = true;
         for (org.jnode.shell.syntax.Argument<?> arg : bundle) {
@@ -104,10 +107,17 @@ public class DefaultHelp extends Help {
     }
 
     @Override
-    public void usage(org.jnode.shell.syntax.Syntax syntax,
-            ArgumentBundle bundle, String command) {
-        System.out.println(Help.getLocalizedHelp("help.usage") + ": " + 
-                command + " " + syntax.format(bundle));
+    public void usage(SyntaxBundle syntaxBundle, ArgumentBundle bundle, String command) {
+        String usageText = Help.getLocalizedHelp("help.usage") + ": ";
+        org.jnode.shell.syntax.Syntax[] syntaxes = syntaxBundle.getSyntaxes();
+        for (int i = 0; i < syntaxes.length; i++) {
+            if (i == 1) {
+                char[] chars = new char[usageText.length()];
+                Arrays.fill(chars, ' ');
+                usageText = new String(chars);
+            }
+            System.out.println(usageText + command + " " + syntaxes[i].format(bundle));
+        }
         format(new Cell[]{new Cell(4, 54)}, new String[]{bundle.getDescription()});
     }
     

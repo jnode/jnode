@@ -35,6 +35,7 @@ import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.argument.AliasArgument;
 import org.jnode.shell.syntax.ArgumentBundle;
 import org.jnode.shell.syntax.Syntax;
+import org.jnode.shell.syntax.SyntaxBundle;
 import org.jnode.shell.syntax.SyntaxManager;
 
 /**
@@ -56,7 +57,7 @@ public class HelpCommand {
 	public static void main(String[] args)
 	throws HelpException {
 		Help.Info info = null; 
-		Syntax syntax = null;
+		SyntaxBundle syntaxes = null;
         ArgumentBundle bundle = null;
 		String otherAliases = null;
 		
@@ -74,15 +75,15 @@ public class HelpCommand {
 
                 bundle = getBundle(clazz);
                 if (bundle != null) {
-                    syntax = syntaxManager.getSyntax(arg);
-                    if (syntax == null) {
-                        syntax = bundle.createDefaultSyntax();
+                    syntaxes = syntaxManager.getSyntaxBundle(arg);
+                    if (syntaxes == null) {
+                        syntaxes = new SyntaxBundle(arg, bundle.createDefaultSyntax());
                     }
                 }
                 else {
     				info = Help.getInfo(clazz);
 				}
-                if (info != null || syntax != null) {
+                if (info != null || syntaxes != null) {
                     cmd = arg;
                     otherAliases = getOtherAliases(aliasManager, cmd, clazz);
                 }
@@ -98,8 +99,8 @@ public class HelpCommand {
             info = HELP_INFO; // defaults to print own help
 		}
  
-        if (syntax != null) {
-            Help.getHelp().help(syntax, bundle, cmd);
+        if (syntaxes != null) {
+            Help.getHelp().help(syntaxes, bundle, cmd);
         }
         else if (info != null) {
             Help.getHelp().help(info, cmd);

@@ -23,6 +23,8 @@ package org.jnode.shell.syntax;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Priority;
+
 /**
  * The SyntaxSpecLoader traverses a syntax specification (e.g. in XML) wrapped
  * in an adapter, and creates a Syntax tree.
@@ -31,22 +33,24 @@ import java.util.List;
  */
 public class SyntaxSpecLoader {
 
-    public Syntax loadSyntax(SyntaxSpecAdapter element) {
+    public SyntaxBundle loadSyntax(SyntaxSpecAdapter element) {
+        final String name = element.getName();
+        if (!"syntax".equals(name)) {
+            throw new SyntaxFailureException("element name is not 'syntax'");
+        }
+        final String alias = element.getAttribute("alias");
+        if (alias == null) {
+            throw new SyntaxFailureException("syntax element has no 'alias' attribute");
+        }
+        final String description = element.getAttribute("description");
+        
         int nos = element.getNosChildren();
         List<Syntax> childSyntaxes = new ArrayList<Syntax>(nos);
         for (int i = 0; i < nos; i++) {
             childSyntaxes.add(loadSyntax(element.getChild(i), false));
         }
-        int nosSyntaxes = childSyntaxes.size();
-        if (nosSyntaxes == 0) {
-            return new EmptySyntax(null, null);
-        }
-        else if (nosSyntaxes == 1) {
-            return childSyntaxes.get(0);
-        }
-        else {
-            return new AlternativesSyntax(childSyntaxes.toArray(new Syntax[nosSyntaxes]));
-        }
+        return new SyntaxBundle(alias, description, 
+                childSyntaxes.toArray(new Syntax[childSyntaxes.size()]));
     }
     
     public Syntax loadSyntax(SyntaxSpecAdapter syntaxElement, boolean nullOK) 

@@ -39,27 +39,26 @@ public interface SyntaxManager {
     public static final String ALIASES_EP_NAME = "org.jnode.shell.syntaxes";
 
     /**
-     * Add a syntax for an alias
+     * Add a syntax bundle
      * 
-     * @param alias The alias
-     * @param syntax The syntax to be added
+     * @param bundle The syntax to be added
      */
-    public abstract void add(String alias, Syntax syntax);
+    public abstract void add(SyntaxBundle bundle);
 
     /**
-     * Remove the syntax for an alias
+     * Remove the syntaxBundle for an alias
      * 
      * @param alias The alias
      */
-    public abstract Syntax remove(String alias);
+    public abstract SyntaxBundle remove(String alias);
 
     /**
-     * Gets the syntax for a given alias
+     * Gets the syntax bundle for a given alias
      * 
      * @param alias The alias
      * @return The syntax for the given alias, or <code>null</code>
      */
-    public abstract Syntax getSyntax(String alias);
+    public abstract SyntaxBundle getSyntaxBundle(String alias);
     
     /**
      * Get the current set of keys known to the SyntaxManager.
