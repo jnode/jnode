@@ -32,6 +32,7 @@ import org.jnode.shell.help.Parameter;
 import org.jnode.shell.syntax.ArgumentBundle;
 import org.jnode.shell.syntax.CommandSyntaxException;
 import org.jnode.shell.syntax.Syntax;
+import org.jnode.shell.syntax.SyntaxBundle;
 
 /**
  * This class represents the command line as command name and a sequence of
@@ -592,11 +593,11 @@ public class CommandLine implements Completable, Iterable<String> {
     		    command.getArgumentBundle();
     		if (bundle != null) {
     		    // Get a syntax for the alias, or a default one.
-    		    Syntax syntax = shell.getSyntaxManager().getSyntax(cmd);
+    		    SyntaxBundle syntaxes = shell.getSyntaxManager().getSyntaxBundle(cmd);
 
     		    // Do a full parse to bind the command line argument tokens to corresponding
     		    // command arguments
-    		    bundle.parse(this, syntax);
+    		    bundle.parse(this, syntaxes);
     		}
     		return cmdInfo;
     	} catch (ClassNotFoundException ex) {
@@ -631,12 +632,12 @@ public class CommandLine implements Completable, Iterable<String> {
             ArgumentBundle bundle = (command == null) ? null : command.getArgumentBundle();
 
             // Get a syntax for the alias, or a default one.
-            Syntax syntax = shell.getSyntaxManager().getSyntax(cmd);
+            SyntaxBundle syntaxes = shell.getSyntaxManager().getSyntaxBundle(cmd);
 
             try {
                 // Try new-style completion if we have a Syntax
                 if (bundle != null) {
-                    bundle.complete(this, syntax, completion);
+                    bundle.complete(this, syntaxes, completion);
                 }
                 else {
                     // Otherwise, try old-style completion using the command's INFO

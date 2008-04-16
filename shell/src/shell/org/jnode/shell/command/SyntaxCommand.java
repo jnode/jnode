@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.Writer;
+import java.util.Hashtable;
 
 import nanoxml.XMLElement;
 
@@ -41,6 +42,7 @@ import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.shell.syntax.SyntaxArgumentMissingException;
+import org.jnode.shell.syntax.SyntaxBundle;
 import org.jnode.shell.syntax.SyntaxManager;
 import org.jnode.shell.syntax.SyntaxSpecLoader;
 import org.jnode.shell.syntax.XMLSyntaxSpecAdapter;
@@ -78,20 +80,20 @@ public class SyntaxCommand extends AbstractCommand {
         SyntaxManager synMgr = ShellUtils.getCurrentSyntaxManager();
         if (ARG_DUMP_ALL.isSet()) {
             for (String alias : synMgr.getKeys()) {
-                Syntax syntax = synMgr.getSyntax(alias);
-                dumpSyntax(alias, syntax, out);
+                SyntaxBundle bundle = synMgr.getSyntaxBundle(alias);
+                dumpSyntax(alias, bundle, out);
             }
         }
         else {
             String alias;
             if (ARG_DUMP.isSet()) {
                 alias = getAlias();
-                Syntax syntax = synMgr.getSyntax(alias);
-                if (syntax == null) {
+                SyntaxBundle bundle = synMgr.getSyntaxBundle(alias);
+                if (bundle == null) {
                     err.println("No syntax for alias '" + alias + "'");
                 }
                 else {
-                    dumpSyntax(alias, syntax, out);
+                    dumpSyntax(alias, bundle, out);
                 }
             }
             else if (ARG_FILE.isSet()) {
@@ -102,8 +104,8 @@ public class SyntaxCommand extends AbstractCommand {
                 try {
                     reader = new FileReader(file);
                     xml.parseFromReader(new BufferedReader(reader));
-                    Syntax syntax = new SyntaxSpecLoader().loadSyntax(new XMLSyntaxSpecAdapter(xml));
-                    synMgr.add(alias, syntax);
+                    SyntaxBundle bundle = new SyntaxSpecLoader().loadSyntax(new XMLSyntaxSpecAdapter(xml));
+                    synMgr.add(bundle);
                 }
                 catch (IOException ex) {
                     err.println("Cannot read file '" + file + "': " + ex.getMessage());
@@ -134,11 +136,19 @@ public class SyntaxCommand extends AbstractCommand {
         return ARG_ALIAS.getValue();
     }
 
-    private void dumpSyntax(String alias, Syntax syntax, PrintStream out) 
+    private void dumpSyntax(String alias, SyntaxBundle bundle, PrintStream out) 
     throws IOException {
-        XMLElement element = syntax.toXML();
+        XMLElement element = new XMLElement(new Hashtable<String, Object>(), false, false);
         element.setName("syntax");
         element.setAttribute("alias", alias);
+        String description = bundle.getDescription();
+        if (description != null) {
+            element.setAttribute("description", description);
+        }
+        Syntax[] syntaxes = bundle.getSyntaxes();
+        for (Syntax syntax : syntaxes) {
+            element.addChild(syntax.toXML());
+        }
         Writer writer = new OutputStreamWriter(out);
         element.write(writer);
         writer.flush();

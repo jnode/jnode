@@ -43,8 +43,8 @@ public class DefaultSyntaxManager implements SyntaxManager,
 
     private final DefaultSyntaxManager parent;
 
-    private final HashMap<String, Syntax> syntaxes = 
-        new HashMap<String, Syntax>();
+    private final HashMap<String, SyntaxBundle> syntaxes = 
+        new HashMap<String, SyntaxBundle>();
 
     private final ExtensionPoint syntaxEP;
 
@@ -66,17 +66,17 @@ public class DefaultSyntaxManager implements SyntaxManager,
         }
     }
 
-    public void add(String alias, Syntax syntax) {
+    public void add(SyntaxBundle bundle) {
         if (parent == null) {
             throw new UnsupportedOperationException(
                     "Cannot modify the system syntax manager");
         } 
-        else if (syntax != null) {
-            syntaxes.put(alias, syntax);
+        else if (bundle != null) {
+            syntaxes.put(bundle.getAlias(), bundle);
         }
     }
 
-    public Syntax remove(String alias) {
+    public SyntaxBundle remove(String alias) {
         if (parent == null) {
             throw new UnsupportedOperationException(
                     "Cannot modify the system syntax manager");
@@ -85,13 +85,13 @@ public class DefaultSyntaxManager implements SyntaxManager,
         }
     }
 
-    public Syntax getSyntax(String alias) {
-        Syntax syntax = syntaxes.get(alias);
-        if (syntax != null) {
-            return syntax;
+    public SyntaxBundle getSyntaxBundle(String alias) {
+        SyntaxBundle bundle = syntaxes.get(alias);
+        if (bundle != null) {
+            return bundle;
         }
         else if (parent != null) {
-            return parent.getSyntax(alias);
+            return parent.getSyntaxBundle(alias);
         }
         else {
             return null;
@@ -128,26 +128,14 @@ public class DefaultSyntaxManager implements SyntaxManager,
                 
                 for (int j = 0; j < elements.length; j++) {
                     SyntaxSpecAdapter element = new PluginSyntaxSpecAdapter(elements[j]);
-                    final String name = element.getName();
-                    if (!"syntax".equals(name)) {
-                        log.log(Priority.WARN, "element name is not 'syntax' ... ignoring");
-                        continue;
-                    }
-                    final String alias = element.getAttribute("alias");
-                    if (alias == null) {
-                        log.log(Priority.WARN, name + " element has no 'alias' ... ignoring");
-                        continue;
-                    }
                     try {
-                        Syntax syntax = loader.loadSyntax(element);
-                        if (syntax != null) {
-                            syntaxes.put(alias, syntax);
+                        SyntaxBundle bundle = loader.loadSyntax(element);
+                        if (bundle != null) {
+                            syntaxes.put(bundle.getAlias(), bundle);
                         }
                     }
                     catch (Exception ex) {
-                        log.log(Priority.WARN, 
-                                "problem in " + name + " element for alias '" + alias + "'", 
-                                ex);
+                        log.log(Priority.WARN, "problem in syntax", ex);
                     }
                 }
             }

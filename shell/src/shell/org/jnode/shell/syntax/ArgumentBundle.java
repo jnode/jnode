@@ -107,10 +107,10 @@ public class ArgumentBundle implements Iterable<Argument<?>> {
         argument.setBundle(this);
     }
 
-	public synchronized void parse(CommandLine commandLine, Syntax syntax)
+	public synchronized void parse(CommandLine commandLine, SyntaxBundle syntaxes)
 	throws CommandSyntaxException {
 	    try {
-	        doParse(commandLine, syntax, null);
+	        doParse(commandLine, syntaxes, null);
 	        for (Argument<?> element : arguments) {
 	            if (!element.isSatisfied() && element.isMandatory()) {
 	                throw new CommandSyntaxException(
@@ -128,10 +128,10 @@ public class ArgumentBundle implements Iterable<Argument<?>> {
 	}
 
     public synchronized void complete(CommandLine partial, 
-            Syntax syntax, CompletionInfo completion) 
+            SyntaxBundle syntaxes, CompletionInfo completion) 
     throws CommandSyntaxException {
         try {
-            doParse(partial, syntax, completion);
+            doParse(partial, syntaxes, completion);
             status = PARSE_SUCCEEDED;
         }
         finally {
@@ -141,18 +141,18 @@ public class ArgumentBundle implements Iterable<Argument<?>> {
         }
     }
 
-    private void doParse(CommandLine commandLine, Syntax syntax,
+    private void doParse(CommandLine commandLine, SyntaxBundle syntaxes,
             CompletionInfo completion) 
     throws CommandSyntaxException {
 	    if (status != UNPARSED) {
 	        clear();
 	    }
 	    status = PARSING;
-	    if (syntax == null) {
-			syntax = createDefaultSyntax();
+	    if (syntaxes == null) {
+			syntaxes = new SyntaxBundle(commandLine.getCommandName(), createDefaultSyntax());
 		}
 	    SymbolSource<CommandLine.Token> context = commandLine.tokenIterator();
-	    MuSyntax muSyntax = syntax.prepare(this);
+	    MuSyntax muSyntax = syntaxes.prepare(this);
 	    new MuParser().parse(muSyntax, completion, context, this);
     }
 

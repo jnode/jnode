@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import org.jnode.shell.syntax.Syntax;
+import org.jnode.shell.syntax.SyntaxBundle;
 import org.jnode.shell.syntax.SyntaxManager;
 
 /**
@@ -32,17 +33,17 @@ import org.jnode.shell.syntax.SyntaxManager;
  */
 public class TestSyntaxManager implements SyntaxManager {
 
-    private final HashMap<String, Syntax> syntaxes = new HashMap<String, Syntax>();
+    private final HashMap<String, SyntaxBundle> syntaxes = new HashMap<String, SyntaxBundle>();
 
-    public void add(String alias, Syntax syntax) {
-        syntaxes.put(alias, syntax);
+    public void add(SyntaxBundle bundle) {
+        syntaxes.put(bundle.getAlias(), bundle);
     }
 
-    public Syntax remove(String alias) {
+    public SyntaxBundle remove(String alias) {
         return syntaxes.remove(alias);
     }
 
-    public Syntax getSyntax(String alias) {
+    public SyntaxBundle getSyntaxBundle(String alias) {
         return syntaxes.get(alias);
     }
 
