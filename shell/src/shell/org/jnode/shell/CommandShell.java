@@ -71,7 +71,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     public static final String CMDLINE_PROPERTY_NAME = "jnode.cmdline";
 
     public static final String DEBUG_PROPERTY_NAME = "jnode.debug";
-    public static final String DEBUG_DEFAULT = "true";
+    public static final String DEBUG_DEFAULT = "false";
     public static final String HISTORY_PROPERTY_NAME = "jnode.history";
     public static final String HISTORY_DEFAULT = "true";
 
