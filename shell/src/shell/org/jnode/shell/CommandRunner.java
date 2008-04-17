@@ -126,7 +126,7 @@ class CommandRunner implements Runnable {
             invoker.unblock();
         } catch (SyntaxErrorException ex) {
             try {
-                Help.getInfo(cmdInfo.getCommandClass()).usage();
+                Help.getInfo(cmdInfo.getCommandClass()).usage(shell.getConsole().getErr());
                 shell.getConsole().getErr().println(ex.getMessage());
             } catch (HelpException e) {
                 shell.getConsole().getErr().println("Exception while trying to get the command usage");

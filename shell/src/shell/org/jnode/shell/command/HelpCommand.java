@@ -34,7 +34,6 @@ import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.argument.AliasArgument;
 import org.jnode.shell.syntax.ArgumentBundle;
-import org.jnode.shell.syntax.Syntax;
 import org.jnode.shell.syntax.SyntaxBundle;
 import org.jnode.shell.syntax.SyntaxManager;
 
@@ -100,10 +99,10 @@ public class HelpCommand {
 		}
  
         if (syntaxes != null) {
-            Help.getHelp().help(syntaxes, bundle, cmd);
+            Help.getHelp().help(syntaxes, bundle, System.out);
         }
         else if (info != null) {
-            Help.getHelp().help(info, cmd);
+            Help.getHelp().help(info, cmd, System.out);
         }
         if (otherAliases != null) {
             System.out.println(otherAliases);

@@ -21,6 +21,7 @@
  
 package org.jnode.shell.help;
 
+import java.io.PrintStream;
 import java.lang.reflect.Field;
 
 import javax.naming.NamingException;
@@ -73,51 +74,53 @@ public abstract class Help {
      * 
      * @param info the command info
      * @param command a command name or alias which appears in the help
+     * @param out the destination for help output.
      */
-    public abstract void help(Info info, String command);
+    public abstract void help(Info info, String command, PrintStream out);
 
     /**
      * Shows the help page for a command
      * 
      * @param syntaxes the command's syntax bundle
      * @param bundle the command's argument bundle
-     * @param command a command name or alias to appear in the help
+     * @param out the destination for help output.
      */
-    public abstract void help(SyntaxBundle syntaxes, ArgumentBundle bundle, String command);
+    public abstract void help(SyntaxBundle syntaxes, ArgumentBundle bundle, PrintStream out);
 
     /**
      * Shows the usage line for a command
      * 
      * @param info the command information
+     * @param out the destination for help output.
      */
-    public abstract void usage(Info info);
+    public abstract void usage(Info info, PrintStream out);
 
     /**
      * Shows the usage line for a command
      * 
      * @param syntaxes the command's syntax bundle
      * @param bundle the command's argument bundle
-     * @param command a command name or alias to appear in the help
+     * @param out the destination for help output.
      */
-    public abstract void usage(SyntaxBundle syntaxes, ArgumentBundle bundle, String command);
+    public abstract void usage(SyntaxBundle syntaxes, ArgumentBundle bundle, PrintStream out);
 
     /**
      * Shows the description of a single argument. Used as a callback in
      * {@link Argument#describe(Help)}.
      */
-    public abstract void describeArgument(Argument arg);
+    public abstract void describeArgument(Argument arg, PrintStream out);
 
     /**
      * Shows the description of a single argument. Used as a callback in
      * {@link Argument#describe(Help)}.
      */
-    public abstract void describeArgument(org.jnode.shell.syntax.Argument<?> arg);
+    public abstract void describeArgument(org.jnode.shell.syntax.Argument<?> arg, PrintStream out);
 
     /**
      * Shows the description of a single parameter. Used as a callback in
      * {@link Parameter#describe(Help)}.
      */
-    public abstract void describeParameter(Parameter param);
+    public abstract void describeParameter(Parameter param, PrintStream out);
 
     /**
      * Here is where all the command description goes. Example code: <br>
@@ -159,9 +162,9 @@ public abstract class Help {
             return syntaxes;
         }
 
-        public void usage() {
+        public void usage(PrintStream out) {
             try {
-                Help.getHelp().usage(this);
+                Help.getHelp().usage(this, out);
             } catch (HelpException ex) {
                 ex.printStackTrace();
             }
@@ -172,8 +175,8 @@ public abstract class Help {
          * @param command command name or alias which appears in the help message
          * @throws HelpException
          */
-        public void help(String command) throws HelpException {
-            Help.getHelp().help(this, command);
+        public void help(String command, PrintStream out) throws HelpException {
+            Help.getHelp().help(this, command, out);
         }
 
         public String complete(CompletionInfo completion, CommandLine partial) 
@@ -193,7 +196,7 @@ public abstract class Help {
             }
             if (!foundCompletion) {
                 System.out.println();
-                usage();
+                usage(System.out);
                 throw new CompletionException("Invalid command syntax");
             }
             return max;
@@ -241,5 +244,4 @@ public abstract class Help {
             throw new SyntaxErrorException("No matching syntax found");
         }
     }
-
 }

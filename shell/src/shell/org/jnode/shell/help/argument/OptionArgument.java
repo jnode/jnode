@@ -21,6 +21,8 @@
  
 package org.jnode.shell.help.argument;
 
+import java.io.PrintStream;
+
 import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.Help;
@@ -52,9 +54,9 @@ public class OptionArgument extends Argument {
     }
 
     @Override
-    public void describe(Help help) {
+    public void describe(Help help, PrintStream out) {
         for (Option option : options)
-            option.describe(help);
+            option.describe(help, out);
     }
 
     @Override

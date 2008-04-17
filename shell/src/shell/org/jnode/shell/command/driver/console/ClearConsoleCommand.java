@@ -22,6 +22,7 @@
 package org.jnode.shell.command.driver.console;
 
 import javax.naming.NameNotFoundException;
+
 import org.jnode.driver.console.TextConsole;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.ShellException;

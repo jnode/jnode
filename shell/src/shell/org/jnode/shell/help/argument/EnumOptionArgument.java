@@ -21,6 +21,7 @@
 
 package org.jnode.shell.help.argument;
 
+import java.io.PrintStream;
 import java.lang.reflect.Array;
 
 import org.jnode.driver.console.CompletionInfo;
@@ -53,9 +54,9 @@ public class EnumOptionArgument<T extends Enum<?>> extends Argument {
         return result.substring(1);
     }
 
-    public void describe(Help help) {
+    public void describe(Help help, PrintStream out) {
         for (EnumOption<T> option : options)
-            option.describe(help);
+            option.describe(help, out);
     }
 
     public void complete(CompletionInfo completion, String partial) {
