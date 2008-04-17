@@ -40,7 +40,6 @@ import org.jnode.shell.RedirectingInterpreter;
 import org.jnode.shell.ShellUtils;
 import org.jnode.shell.ThreadCommandInvoker;
 import org.jnode.shell.alias.AliasManager;
-import org.jnode.shell.syntax.AlternativesSyntax;
 import org.jnode.shell.syntax.ArgumentSyntax;
 import org.jnode.shell.syntax.EmptySyntax;
 import org.jnode.shell.syntax.OptionSyntax;

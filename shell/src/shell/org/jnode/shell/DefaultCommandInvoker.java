@@ -120,7 +120,7 @@ public class DefaultCommandInvoker implements CommandInvoker {
                     }
                 }
             } catch (SyntaxErrorException ex) {
-                Help.getInfo(cmdInfo.getCommandClass()).usage();
+                Help.getInfo(cmdInfo.getCommandClass()).usage(err);
                 err.println(ex.getMessage());
             } catch (VmExit ex) {
                 return ex.getStatus();

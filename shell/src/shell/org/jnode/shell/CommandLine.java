@@ -31,7 +31,6 @@ import org.jnode.shell.help.HelpException;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.syntax.ArgumentBundle;
 import org.jnode.shell.syntax.CommandSyntaxException;
-import org.jnode.shell.syntax.Syntax;
 import org.jnode.shell.syntax.SyntaxBundle;
 
 /**

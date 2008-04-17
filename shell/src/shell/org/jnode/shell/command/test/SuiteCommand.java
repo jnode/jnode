@@ -95,7 +95,7 @@ public class SuiteCommand {
     	}
     	else
     	{
-    		HELP_INFO.help(null);
+    		HELP_INFO.help(null, System.out);
     	}
     }
     

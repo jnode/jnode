@@ -21,7 +21,7 @@
  
 package org.jnode.shell.help.def;
 
-import java.util.Arrays;
+import java.io.PrintStream;
 
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.Help;
@@ -33,9 +33,13 @@ import org.jnode.shell.syntax.SyntaxBundle;
 /**
  * @author qades
  * @author Fabien DUMINY (fduminy@jnode.org)
+ * @author crawley@jnode.org
  */
 public class DefaultHelp extends Help {
 	public static final String RESOURCE_NAME = "messages.properties";
+	
+	private static String spaces = // start with 80 ...
+        "                                                                                ";
 	
     /**
      * Create a new instance
@@ -47,145 +51,199 @@ public class DefaultHelp extends Help {
      * Shows the complete help for a command.
      * @see Help#help(org.jnode.shell.help.Help.Info, String) 
      */
-    public void help(Info info, String command) {
+    public void help(Info info, String command, PrintStream out) {
         final Syntax[] syntaxes = info.getSyntaxes();
         final String name = command == null ? info.getName() : command;
         for (int i = 0; i < syntaxes.length; i++) {
-            help(name, syntaxes[i]);
+            help(name, syntaxes[i], out);
             if (i < syntaxes.length)
-                System.out.println();
+                out.println();
         }
     }
 
     @Override
-    public void help(SyntaxBundle syntaxes,
-            ArgumentBundle bundle, String command) {
-        usage(syntaxes, bundle, command);
+    public void help(SyntaxBundle syntaxes, ArgumentBundle bundle, PrintStream out) {
+        usage(syntaxes, bundle, out);
 
         boolean first = true;
         for (org.jnode.shell.syntax.Argument<?> arg : bundle) {
             if (first) {
-                System.out.println("\n" + Help.getLocalizedHelp("help.parameters") + ":");
+                out.println("\n" + Help.getLocalizedHelp("help.parameters") + ":");
                 first = false;
             }
-            describeArgument(arg);
+            describeArgument(arg, out);
         }
     }
 
     /**
      * Shows the help for a command syntax.
      */
-    public void help(String name, Syntax syntax) {
-        usage(name, syntax);
+    public void help(String name, Syntax syntax, PrintStream out) {
+        usage(name, syntax, out);
 
         final Parameter[] params = syntax.getParams();
         if (params.length != 0)
-            System.out.println("\n" + Help.getLocalizedHelp("help.parameters") + ":");
+            out.println("\n" + Help.getLocalizedHelp("help.parameters") + ":");
         for (int i = 0; i < params.length; i++)
-            params[i].describe(this);
+            params[i].describe(this, out);
     }
 
     /**
      * Shows the usage information of a command.
      */
-    public void usage(Info info) {
+    public void usage(Info info, PrintStream out) {
         final Syntax[] syntaxes = info.getSyntaxes();
         for (int i = 0; i < syntaxes.length; i++)
-            usage(info.getName(), syntaxes[i]);
+            usage(info.getName(), syntaxes[i], out);
     }
 
     /**
      * Shows the usage information of a command.
      */
-    public void usage(String name, Syntax syntax) {
+    public void usage(String name, Syntax syntax, PrintStream out) {
         StringBuilder line = new StringBuilder(name);
         final Parameter[] params = syntax.getParams();
         for (int i = 0; i < params.length; i++)
             line.append(' ').append(params[i].format());
-        System.out.println(Help.getLocalizedHelp("help.usage") + ": " + line);
-        format(new Cell[]{new Cell(4, 54)}, new String[]{syntax.getDescription()});
+        out.println(Help.getLocalizedHelp("help.usage") + ": " + line);
+        format(out, new Cell[]{new Cell(4, 54)}, new String[]{syntax.getDescription()});
     }
 
     @Override
-    public void usage(SyntaxBundle syntaxBundle, ArgumentBundle bundle, String command) {
+    public void usage(SyntaxBundle syntaxBundle, ArgumentBundle bundle, PrintStream out) {
+        String command = syntaxBundle.getAlias();
         String usageText = Help.getLocalizedHelp("help.usage") + ": ";
         org.jnode.shell.syntax.Syntax[] syntaxes = syntaxBundle.getSyntaxes();
         for (int i = 0; i < syntaxes.length; i++) {
             if (i == 1) {
-                char[] chars = new char[usageText.length()];
-                Arrays.fill(chars, ' ');
-                usageText = new String(chars);
+                usageText = getSpaces(usageText.length());
             }
-            System.out.println(usageText + command + " " + syntaxes[i].format(bundle));
+            out.println(usageText + command + " " + syntaxes[i].format(bundle));
         }
-        format(new Cell[]{new Cell(4, 54)}, new String[]{bundle.getDescription()});
+        format(out, new Cell[]{new Cell(4, 54)}, new String[]{bundle.getDescription()});
     }
     
-    public void describeParameter(Parameter param) {
-        format(new Cell[]{new Cell(2, 18), new Cell(2, 53)}, 
+    public void describeParameter(Parameter param, PrintStream out) {
+        format(out, new Cell[]{new Cell(2, 18), new Cell(2, 53)}, 
                 new String[]{param.getName(), param.getDescription()});
     }
 
-    public void describeArgument(Argument arg) {
-        format(new Cell[]{new Cell(4, 16), new Cell(2, 53)},
+    public void describeArgument(Argument arg, PrintStream out) {
+        format(out, new Cell[]{new Cell(4, 16), new Cell(2, 53)},
                 new String[]{arg.getName(), arg.getDescription()});
     }
 
     @Override
-    public void describeArgument(org.jnode.shell.syntax.Argument<?> arg) {
-        format(new Cell[]{new Cell(4, 16), new Cell(2, 53)},
+    public void describeArgument(org.jnode.shell.syntax.Argument<?> arg, PrintStream out) {
+        format(out, new Cell[]{new Cell(4, 16), new Cell(2, 53)},
                 new String[]{arg.getLabel(), arg.getDescription()});
     }
 
-    protected void format(Cell[] cells, String[] texts) {
-        if (cells.length != texts.length)
+    protected void format(PrintStream out, Cell[] cells, String[] texts) {
+        if (cells.length != texts.length) {
             throw new IllegalArgumentException("Number of cells and texts must match");
-
+        }
+        // The text remaining to be formatted for each column.
         String[] remains = new String[texts.length];
+        // The total count of characters remaining
+        int remainsCount = 0;
+        // Initialize 'remains' and 'remainsCount' for the first iteration
         for (int i = 0; i < texts.length; i++) {
-            remains[i] = (texts[i] == null) ? "" : texts[i];
+            remains[i] = (texts[i] == null) ? "" : texts[i].trim();
+            remainsCount += remains[i].length();
         }
 
         StringBuilder result = new StringBuilder();
-        while (true) {
-            StringBuilder buf = new StringBuilder();
+        // Repeat while there is still text to output.
+        while (remainsCount > 0) {
+            // Each iteration uses 'fit' to get up to 'cell.width' characters from each column
+            // and then uses 'stamp' to append to them to the buffer with the leading margin 
+            // and trailing padding as required.
+            remainsCount = 0;
             for (int i = 0; i < cells.length; i++) {
                 String field = cells[i].fit(remains[i]);
                 remains[i] = remains[i].substring(field.length());
-                buf.append(cells[i].stamp(field.trim()));
+                remainsCount += remains[i].length();
+                result.append(cells[i].stamp(field.trim()));
             }
-            String line = buf.toString();
-            if (line.trim().length() == 0)
-                break;
-            result.append(line).append('\n');
+            result.append('\n');
         }
-        System.out.print(result.toString());
+        out.print(result.toString());
+    }
+    
+    /**
+     * Get a String consisting of 'count' spaces.
+     * @param count the number of spaces
+     * @return the string
+     */
+    private static String getSpaces(int count) {
+        // The following assumes that 1) StringBuilder.append is efficient if you
+        // preallocate the StringBuilder, 2) StringBuilder.toString() does no character 
+        // copying, and 3) String.substring(...) also does no character copying.
+        int len = spaces.length();
+        if (count > len) {
+            StringBuilder sb = new StringBuilder(count);
+            for (int i = 0; i < count; i++) {
+                sb.append(' ');
+            }
+            spaces = sb.toString();
+            return spaces;
+        }
+        else if (count == len) {
+            return spaces;
+        }
+        else {
+            return spaces.substring(0, count);
+        }
     }
 
-    protected class Cell {
+    /**
+     * A Cell is a template for formatting text for help messages.
+     */
+    protected static class Cell {
+        
         final String field;
         final int margin;
         final int width;
 
-        Cell(int margin, int width) {
+        /**
+         * Construct a Cell with a leading margin and a text width.
+         * @param margin the number of leading spaces for the Cell
+         * @param width the width of the text part of the Cell
+         */
+        protected Cell(int margin, int width) {
             this.margin = margin;
             this.width = width;
 
             // for performance, we pre-build the field mask
-            StringBuilder field = new StringBuilder();
-            for (int i = 0; i < margin + width; i++)
-                field.insert(0, ' ');
-            this.field = field.toString();
+            this.field = getSpaces(margin + width);
         }
 
-        String fit(String text) {
-            String hardFit = text.substring(0, Math.min(width, text.length()));
-            int lastSpace = hardFit.lastIndexOf(" ");
-            return hardFit.substring(0, 
-                    (hardFit.endsWith(" ") && (lastSpace > width / 4) ? lastSpace : hardFit.length()));
+        /**
+         * Heuristically, split of a head substring of 'text' to fit within this Cell's width.  We try 
+         * to split at a space character, but if this will make the text too ragged, we simply chop.
+         */
+        protected String fit(String text) {
+            if (width >= text.length()) {
+                return text;
+            }
+            String hardFit = text.substring(0, width);
+            if (hardFit.endsWith(" ")) {
+                return hardFit;
+            }
+            int lastSpace = hardFit.lastIndexOf(' ');
+            if (lastSpace > 3 * width / 4) {
+                return hardFit.substring(0, lastSpace);
+            }
+            else {
+                return hardFit;
+            }
         }
 
-        String stamp(String text) {
+        /**
+         * Stamp out a line with leading and trailing spaces to fill the Cell.
+         */
+        protected String stamp(String text) {
             if (text.length() > field.length())
                 throw new IllegalArgumentException("Text length exceeds field width");
             return field.substring(0, margin) + text + field.substring(0, width - text.length());

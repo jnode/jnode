@@ -21,6 +21,8 @@
  
 package org.jnode.shell.help;
 
+import java.io.PrintStream;
+
 import org.jnode.driver.console.CompletionInfo;
 
 /**
@@ -99,11 +101,11 @@ public class Parameter extends CommandLineElement {
 			: result);
 	}
 
-	public void describe(Help help) {
+	public void describe(Help help, PrintStream out) {
 		if( !isAnonymous() )
-			help.describeParameter(this);
+			help.describeParameter(this, out);
 		if( hasArgument() )
-			argument.describe(help);
+			argument.describe(help, out);
 	}
 
 	public final void complete(CompletionInfo completion, String partial) {
