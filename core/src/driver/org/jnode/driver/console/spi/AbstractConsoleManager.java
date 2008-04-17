@@ -68,7 +68,7 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
     private final DeviceManager devMan;
     
     /** The holder for the context console */
-    private static final InheritableThreadLocal contextConsole = new InheritableThreadLocal();
+    private static final InheritableThreadLocal<Console> contextConsole = new InheritableThreadLocal<Console>();
 
     private AbstractConsoleManager parent;
 
@@ -162,7 +162,7 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
      * @return Console
      */
     public Console getContextConsole() {
-        Console c = (Console)contextConsole.get();
+        Console c = contextConsole.get();
         if (c == null) {
             c = getFocus();
             contextConsole.set(c);
