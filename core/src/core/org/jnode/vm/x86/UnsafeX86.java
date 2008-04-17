@@ -76,6 +76,11 @@ public final class UnsafeX86 {
      */
     static final native int getMultibootMMapLength();
     
+    public static final native Address getVbeInfos();
+    public static final native Address getVbeControlInfos();
+    public static final native Address getVbeModeInfos();
+    public static final native Address getMultibootInfos();
+    
     /**
      * Merge 32-bit ARGB values at the given memory address.
      * @param src The source address (points to 32-bit ARGB int's)

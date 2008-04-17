@@ -6,6 +6,8 @@
 ; Author       : E. Prangsma
 ; -----------------------------------------------
 
+%include "utils.h"
+
 	extern VmThread_runThread
 	extern bootHeapStart
 	extern bootHeapEnd
@@ -44,39 +46,10 @@ GLABEL Q43org5jnode2vm6Unsafe23copy2e28Lorg2fvmmagic2funboxed2fAddress3bLorg2fvm
 	push ADI
 	push ASI
 	push ACX
+
+	; COPY_MEMORY srcMemPtr destMemPtr size
+	COPY_MEMORY [ABX+(4*SLOT_SIZE)], [ABX+(3*SLOT_SIZE)], [ABX+(2*SLOT_SIZE)]		
 	
-	mov ASI,[ABX+(4*SLOT_SIZE)]		; srcMemPtr
-	mov ADI,[ABX+(3*SLOT_SIZE)]		; destMemPtr
-	mov ACX,[ABX+(2*SLOT_SIZE)]		; size
-	
-	; Test the direction for copying
-	cmp ASI,ADI
-	jl copy_reverse
-	
-	; Copy from left to right
-	cld
-copy_bytes:
-	test ACX,3			; Test for size multiple of 4-byte 
-	jz copy_dwords
-	dec ACX
-	movsb				; Not yet multiple of 4, copy a single byte and test again
-	jmp copy_bytes	
-copy_dwords:
-	shr ACX,2
-	rep movsd
-	jmp copy_done
-	
-copy_reverse:
-	; Copy from right to left
-	pushf
-	cli
-	std
-	lea ASI,[ASI+ACX-1]
-	lea ADI,[ADI+ACX-1]
-	rep movsb
-	popf	
-	
-copy_done:
 	pop ACX
 	pop ASI
 	pop ADI
@@ -361,3 +334,21 @@ GLABEL Q43org5jnode2vm6Unsafe23getCpuCycles2e2829J
 	rdtsc			
 	ret
 
+
+; int callVbeFunction(Address codePtr, int function, Address bufferPtr)          
+GLABEL Q43org5jnode2vm6Unsafe23callVbeFunction2e28Lorg2fvmmagic2funboxed2fAddress3bILorg2fvmmagic2funboxed2fAddress3b29I
+	push EDI
+	mov EAX,[ESP+(3*SLOT_SIZE)] ; function
+	mov EDI,[ESP+(2*SLOT_SIZE)] ; bufferPtr
+	
+	; move higher 16 bits of EDI to ES
+	mov EBX, EDI
+	shr EBX, 16
+	mov ES, EBX
+	
+	; keep only lower 16 bits of EDI
+	and EDI, 0x0000FFFF
+	
+	call dword far [ESP+(4*SLOT_SIZE)] ; codePtr 
+	pop EDI
+	ret SLOT_SIZE*3
