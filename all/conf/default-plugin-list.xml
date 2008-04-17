@@ -104,6 +104,7 @@ The default list of (non-system) plugins to be included in the init-jar.
     <plugin id="org.jnode.driver.video.vga"/>
     <plugin id="org.jnode.driver.video.vgahw"/>
     <plugin id="org.jnode.driver.video.vmware"/>
+    <plugin id="org.jnode.driver.video.vesa"/>
 
     <plugin id="org.jnode.fs.command"/>
     <plugin id="org.jnode.fs.ext2"/>
