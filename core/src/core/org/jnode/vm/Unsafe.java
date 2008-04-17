@@ -749,5 +749,7 @@ public final class Unsafe {
      * @return nanosecond accurate time
      */
     public static native long getCpuCycles();
-
+ 
+    
+    public static native int callVbeFunction(Address codePtr, int function, Address bufferPtr);
 }

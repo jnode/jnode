@@ -1,4 +1,3 @@
-; -----------------------------------------------
 ; $Id$
 ;
 ; Main kernel startup code
@@ -22,13 +21,20 @@ sys_start:
 	align 4
 mb_header:
 	dd 0x1BADB002				; Magic
-	dd 0x00010003				; Feature flags
-	dd 0-0x1BADB002-0x00010003	; Checksum
+	dd 0x00010007				; Feature flags
+	dd 0-0x1BADB002-0x00010007	; Checksum
 	dd mb_header				; header_addr
 	dd sys_start				; load_addr
 	dd 0 						; load_end_addr (patched up by BootImageBuilder)
 	dd 0						; bss_end_addr
 	dd real_start				; entry_addr
+	dd 0						; mode_type 
+;	dd 1024						; width
+;	dd 768						; height
+;	dd 32						; depth
+	dd 0						; width
+	dd 0						; height
+	dd 0						; depth
 
 real_start:
 	mov esp,Lkernel_esp
@@ -42,6 +48,7 @@ real_start:
 multiboot_ok:
 	; Copy the multiboot info block
 	cld
+	mov [multiboot_infos], ebx  
 	mov esi,ebx
 	mov edi,multiboot_info
 	mov ecx,MBI_SIZE
@@ -91,6 +98,34 @@ multiboot_mmap_copy:
 	cmp esi,edx				; source >= end?
 	jb multiboot_mmap_copy
 multiboot_mmap_done:
+
+	; Copy vbe infos (if any)
+	test dword [multiboot_info+MBI_FLAGS],MBF_VBE
+	jz vbe_info_done
+	; Get start address
+	mov esi,[multiboot_info+MBI_VBECTRLINFO]
+	; Get destination address
+	mov edi,multiboot_vbe
+	; Copy the VBE_ESIZE bytes
+	mov ecx,VBE_ESIZE
+	rep movsb
+
+	; Get start address
+	mov esi,[multiboot_info+MBI_VBECTRLINFO]
+	; Get destination address
+	mov edi,vbe_control_info
+	; Copy the VBECTRLINFO_SIZE bytes
+	mov ecx,VBECTRLINFO_SIZE
+	rep movsb
+	
+	; Get start address
+	mov esi,[multiboot_info+MBI_VBEMODEINFO]
+	; Get destination address
+	mov edi,vbe_mode_info
+	; Copy the VBEMODEINFO_SIZE bytes
+	mov ecx,VBEMODEINFO_SIZE
+	rep movsb	
+vbe_info_done:
 
 	; Initialize initial jarfile
 	mov esi,[multiboot_info+MBI_MODSCOUNT]
@@ -278,3 +313,19 @@ multiboot_cmdline:
 multiboot_mmap:
 	dd 0				; Entries
 	times (MBI_MMAP_MAX * MBMMAP_ESIZE) db 0
+
+multiboot_vbe:
+	dd 0				; Entries
+	times (VBE_ESIZE) db 0
+	
+vbe_control_info:	
+	dd 0				; Entries
+	times (VBECTRLINFO_SIZE) db 0
+
+vbe_mode_info:	
+	dd 0				; Entries
+	times (VBEMODEINFO_SIZE) db 0
+	
+multiboot_infos:
+	dd 0	
+	
