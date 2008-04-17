@@ -21,15 +21,15 @@
  
 package org.jnode.driver.video.vga;
 
-import java.awt.image.Raster;
 import java.awt.Rectangle;
+import java.awt.image.Raster;
 
-import org.jnode.awt.util.BitmapGraphics;
+import org.jnode.awt.util.AbstractBitmapGraphics;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class VGABitmapGraphics extends BitmapGraphics {
+public class VGABitmapGraphics extends AbstractBitmapGraphics {
 
 	private final StandardVGAIO vgaIO;
 
@@ -197,4 +197,16 @@ public class VGABitmapGraphics extends BitmapGraphics {
         // TODO Implement me
         return new int[0];
     }
+
+	@Override
+	protected int getBytesForWidth(int width) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	protected int getOffset(int x, int y) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }
