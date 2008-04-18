@@ -52,7 +52,6 @@ public class EchoCommand extends AbstractCommand {
 	/**
 	 * Execute the command
 	 */
-	@SuppressWarnings("deprecation")
 	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err)
 	throws Exception {
 	    String[] words = ARG_WORDS.getValues();
