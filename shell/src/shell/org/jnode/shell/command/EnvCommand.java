@@ -32,20 +32,17 @@ import java.util.TreeMap;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Help;
 
 /**
  * @author epr
  */
 public class EnvCommand extends AbstractCommand {
+    
+    public EnvCommand() {
+        super("Print the system properties");
+    }
 
-        public static Help.Info HELP_INFO = new Help.Info(
-		"env",
-		"Print the system properties"
-	);
-
-	public static void main(String[] args)
-	throws Exception {
+	public static void main(String[] args) throws Exception {
 		new EnvCommand().execute(args);
 	}
 
@@ -61,9 +58,7 @@ public class EnvCommand extends AbstractCommand {
 			final String key = entry.getKey().toString();
 			final String value = entry.getValue().toString();
 
-			out.print(key);
-			out.print('=');
-			out.println(value);
+			out.println(key + '=' + value);
 		}
 	}
 
