@@ -94,6 +94,14 @@
       </repeat>
     </syntax>
     <syntax alias="env" description="Print the system properties"/>
+    <syntax alias="exec" description="Execute a class in a new Process">
+      <sequence>
+        <argument argLabel="className"/>
+        <repeat>
+          <argument argLabel="arg"/>
+        </repeat>
+      </sequence>
+    </syntax>
     <syntax alias="set">
       <sequence description="Set a system property">
         <argument argLabel="key"/>
