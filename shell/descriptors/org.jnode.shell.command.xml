@@ -50,24 +50,24 @@
   
   <extension point="org.jnode.shell.syntaxes">
     <syntax alias="alias">
-      <empty description="list all aliases"/>
-      <option argLabel="remove" shortName="r" description="remove an alias"/>
-      <sequence description="create or update an alias">
+      <empty description="List all aliases"/>
+      <option argLabel="remove" shortName="r" description="Remove an alias"/>
+      <sequence description="Create or update an alias">
         <argument argLabel="alias"/>
         <argument argLabel="className"/>
       </sequence>
     </syntax>
-    <syntax alias="class">
-      <argument argLabel="className" description="list details of a Java class"/>
+    <syntax alias="class" description="Show details of a Java class">
+      <argument argLabel="className"/>
     </syntax>
     <syntax alias="classpath">
-      <empty description="print the current classpath"/>
-      <option argLabel="addUrl" longName="add" description="add a URL to the classpath"/>
-      <option argLabel="clear" longName="clear" description="remove all URLs from the classpath"/>
-      <option argLabel="refresh" longName="refresh" description="refresh the loaded classes on next use"/>
+      <empty description="Print the current classpath"/>
+      <option argLabel="addUrl" longName="add" description="Add a URL to the classpath"/>
+      <option argLabel="clear" longName="clear" description="Remove all URLs from the classpath"/>
+      <option argLabel="refresh" longName="refresh" description="Refresh the loaded classes on next use"/>
     </syntax>
-    <syntax alias="compile">
-      <sequence description="compile a class to native code">
+    <syntax alias="compile" description="Compile a class to native code">
+      <sequence>
         <optionSet>
           <option argLabel="test" longName="test"/>
           <option argLabel="level" longName="level"/>
@@ -75,9 +75,9 @@
         <argument argLabel="className"/>
       </sequence>
     </syntax>
-    <syntax alias="date" description="print the current date"/>
-    <syntax alias="disasm">
-      <sequence description="disassemble a native code class">
+    <syntax alias="date" description="Print the current date"/>
+    <syntax alias="disasm" description="Disassemble a native code class">
+      <sequence>
         <optionSet>
           <option argLabel="test" longName="test"/>
           <option argLabel="level" longName="level"/>
@@ -88,26 +88,27 @@
         </repeat>
       </sequence>
     </syntax>
-    <syntax alias="echo">
+    <syntax alias="echo" description="Print the arguments">
       <repeat>
         <argument argLabel="text"/>
       </repeat>
     </syntax>
+    <syntax alias="env" description="Print the system properties"/>
     <syntax alias="set">
-      <sequence description="set a system property">
+      <sequence description="Set a system property">
         <argument argLabel="key"/>
         <argument argLabel="value"/>
       </sequence>
-      <argument description="remove a system property" argLabel="key"/>
+      <argument description="Remove a system property" argLabel="key"/>
     </syntax>
     <syntax alias="syntax">
-      <empty description="list aliases with syntaxes"/>
-      <option argLabel="dumpAll" longName="dump-all" description="dump all syntaxes"/>
-      <sequence description="dump the syntax for a given alias">
+      <empty description="List aliases which have syntaxes"/>
+      <option argLabel="dumpAll" longName="dump-all" description="Dump all syntaxes"/>
+      <sequence description="Dump the syntax for a given alias">
         <option argLabel="dump" longName="dump" shortName="d"/>
         <argument argLabel="alias"/>
       </sequence>
-      <sequence description="load a new syntax for a given alias">
+      <sequence description="Load a new syntax for a given alias">
         <option argLabel="file" longName="load" shortName="l"/>
         <argument argLabel="alias"/>
       </sequence>
