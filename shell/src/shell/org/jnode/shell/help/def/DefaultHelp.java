@@ -37,7 +37,7 @@ import org.jnode.shell.syntax.SyntaxBundle;
  */
 public class DefaultHelp extends Help {
 	public static final String RESOURCE_NAME = "messages.properties";
-	
+	private static final int NOMINAL_WIDTH = 75;
 	private static String spaces = // start with 80 ...
         "                                                                                ";
 	
@@ -56,15 +56,20 @@ public class DefaultHelp extends Help {
         final String name = command == null ? info.getName() : command;
         for (int i = 0; i < syntaxes.length; i++) {
             help(name, syntaxes[i], out);
-            if (i < syntaxes.length)
+            if (i < syntaxes.length) {
                 out.println();
+            }
         }
     }
 
     @Override
     public void help(SyntaxBundle syntaxes, ArgumentBundle bundle, PrintStream out) {
         usage(syntaxes, bundle, out);
-
+        if (bundle.getDescription() != null) {
+            out.println("\n" + Help.getLocalizedHelp("help.description") + ":");
+            format(out, new Cell[]{new Cell(4, NOMINAL_WIDTH - 4)}, 
+                    new String[]{bundle.getDescription()});
+        }
         boolean first = true;
         for (org.jnode.shell.syntax.Argument<?> arg : bundle) {
             if (first) {
@@ -80,12 +85,18 @@ public class DefaultHelp extends Help {
      */
     public void help(String name, Syntax syntax, PrintStream out) {
         usage(name, syntax, out);
-
+        if (syntax.getDescription() != null) {
+            out.println("\n" + Help.getLocalizedHelp("help.description") + ":");
+            format(out, new Cell[]{new Cell(4, NOMINAL_WIDTH - 4)},
+                    new String[]{syntax.getDescription()});
+        }
         final Parameter[] params = syntax.getParams();
-        if (params.length != 0)
+        if (params.length != 0) {
             out.println("\n" + Help.getLocalizedHelp("help.parameters") + ":");
-        for (int i = 0; i < params.length; i++)
-            params[i].describe(this, out);
+            for (int i = 0; i < params.length; i++) {
+                params[i].describe(this, out);
+            }
+        }
     }
 
     /**
@@ -93,8 +104,9 @@ public class DefaultHelp extends Help {
      */
     public void usage(Info info, PrintStream out) {
         final Syntax[] syntaxes = info.getSyntaxes();
-        for (int i = 0; i < syntaxes.length; i++)
+        for (int i = 0; i < syntaxes.length; i++) {
             usage(info.getName(), syntaxes[i], out);
+        }
     }
 
     /**
@@ -103,39 +115,49 @@ public class DefaultHelp extends Help {
     public void usage(String name, Syntax syntax, PrintStream out) {
         StringBuilder line = new StringBuilder(name);
         final Parameter[] params = syntax.getParams();
-        for (int i = 0; i < params.length; i++)
+        for (int i = 0; i < params.length; i++) {
             line.append(' ').append(params[i].format());
+        }
         out.println(Help.getLocalizedHelp("help.usage") + ": " + line);
-        format(out, new Cell[]{new Cell(4, 54)}, new String[]{syntax.getDescription()});
     }
 
     @Override
     public void usage(SyntaxBundle syntaxBundle, ArgumentBundle bundle, PrintStream out) {
         String command = syntaxBundle.getAlias();
-        String usageText = Help.getLocalizedHelp("help.usage") + ": ";
+        String usageText = Help.getLocalizedHelp("help.usage") + ":";
+        int usageLength = usageText.length();
+        int commandLength = command.length();
+        Cell[] cells = new Cell[]{
+                new Cell(0, usageLength), 
+                new Cell(1, commandLength), 
+                new Cell(1, NOMINAL_WIDTH - 2 - usageLength - commandLength)};
+        String[] texts = new String[]{usageText, command, null};
+        String[] texts2 = new String[]{"", "", null};
         org.jnode.shell.syntax.Syntax[] syntaxes = syntaxBundle.getSyntaxes();
         for (int i = 0; i < syntaxes.length; i++) {
             if (i == 1) {
-                usageText = getSpaces(usageText.length());
+                texts[0] = getSpaces(usageLength);
             }
-            out.println(usageText + command + " " + syntaxes[i].format(bundle));
+            texts[2] = syntaxes[i].format(bundle);
+            format(out, cells, texts);
+            texts2[2] = syntaxes[i].getDescription();
+            format(out, cells, texts2);
         }
-        format(out, new Cell[]{new Cell(4, 54)}, new String[]{bundle.getDescription()});
     }
     
     public void describeParameter(Parameter param, PrintStream out) {
-        format(out, new Cell[]{new Cell(2, 18), new Cell(2, 53)}, 
+        format(out, new Cell[]{new Cell(2, 18), new Cell(2, NOMINAL_WIDTH - 22)}, 
                 new String[]{param.getName(), param.getDescription()});
     }
 
     public void describeArgument(Argument arg, PrintStream out) {
-        format(out, new Cell[]{new Cell(4, 16), new Cell(2, 53)},
+        format(out, new Cell[]{new Cell(4, 16), new Cell(2, NOMINAL_WIDTH - 22)},
                 new String[]{arg.getName(), arg.getDescription()});
     }
 
     @Override
     public void describeArgument(org.jnode.shell.syntax.Argument<?> arg, PrintStream out) {
-        format(out, new Cell[]{new Cell(4, 16), new Cell(2, 53)},
+        format(out, new Cell[]{new Cell(4, 16), new Cell(2, NOMINAL_WIDTH - 22)},
                 new String[]{arg.getLabel(), arg.getDescription()});
     }
 
@@ -198,7 +220,8 @@ public class DefaultHelp extends Help {
     }
 
     /**
-     * A Cell is a template for formatting text for help messages.
+     * A Cell is a template for formatting text for help messages.  (It is 'protected' so that
+     * the unit test can declare a subclass ...)
      */
     protected static class Cell {
         
