@@ -33,12 +33,23 @@ import org.jnode.shell.CommandLine.Token;
  * 
  * @author crawley@jnode.org
  *
- * @param <E> the enum type.
+ * @param <E> the enum type.  Note, an EnumArgument uses E's declared enum names
+ * when mapping to and from command line tokens.  It is a bad idea for the E type
+ * to have an overloaded toString() method.
  */
 public abstract class EnumArgument<E extends Enum<E>> extends Argument<E> {
     
     private final Class<E> clazz;
 
+    /**
+     * Construct the enum argument.  The clazz argument is required so that we can
+     * map between the enum values and their names.
+     * 
+     * @param label
+     * @param flags
+     * @param clazz
+     * @param description
+     */
     @SuppressWarnings("unchecked")
     public EnumArgument(String label, int flags, Class<E> clazz, String description) {
         super(label, flags, (E[]) Array.newInstance(clazz, 0), description);
@@ -61,7 +72,12 @@ public abstract class EnumArgument<E extends Enum<E>> extends Argument<E> {
     
     @Override
     public void complete(CompletionInfo completion, String partial) {
-        throw new UnsupportedOperationException("not implemented yet");
+        for (E e : clazz.getEnumConstants()) {
+            String eName = e.name();
+            if (eName.startsWith(partial)) {
+                completion.addCompletion(eName);
+            }
+        }
     }
 
     public String toString() {
