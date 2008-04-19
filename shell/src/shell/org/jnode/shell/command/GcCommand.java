@@ -26,7 +26,6 @@ import java.io.PrintStream;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Help;
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.Vm;
 import org.jnode.vm.memmgr.GCStatistics;
@@ -36,32 +35,25 @@ import org.jnode.vm.memmgr.GCStatistics;
  */
 public class GcCommand extends AbstractCommand {
 
-        public static Help.Info HELP_INFO = new Help.Info(
-		"gc",
-		"Start the garbage collector"
-	);
+    public GcCommand() {
+        super("Run the garbage collector");
+    }
 
-	public static void main(String[] args)
-	throws Exception {
+	public static void main(String[] args) throws Exception {
 		new GcCommand().execute(args);
 	}
 
 	/**
 	 * Execute this command
 	 */
-	public void execute(
-		CommandLine cmdLine,
-		InputStream in,
-		PrintStream out,
-		PrintStream err)
+	public void execute(CommandLine cmdLine, InputStream in, PrintStream out, PrintStream err)
 		throws Exception {
 			
 		final Runtime rt = Runtime.getRuntime();
 		out.println("Memory size: " + NumberUtils.toBinaryByte(rt.totalMemory()));
 		out.println("Free memory: " + NumberUtils.toBinaryByte(rt.freeMemory()));
-
-		out.println("Starting gc...");
 		
+		out.println("Starting gc...");
 		long start = System.currentTimeMillis();
 		rt.gc();
         GCStatistics stats = Vm.getHeapManager().getStatistics();

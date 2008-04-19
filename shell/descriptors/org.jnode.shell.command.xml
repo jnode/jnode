@@ -103,6 +103,7 @@
       </sequence>
     </syntax>
     <syntax alias="exit" description="Exit the current shell"/>
+    <syntax alias="gc" description="Run the garbage collector"/>
     <syntax alias="set">
       <sequence description="Set a system property">
         <argument argLabel="key"/>
