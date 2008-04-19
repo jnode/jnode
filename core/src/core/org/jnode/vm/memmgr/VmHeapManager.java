@@ -46,11 +46,23 @@ import org.vmmagic.unboxed.Offset;
  */
 @MagicPermission
 public abstract class VmHeapManager extends VmSystemObject {
+    
+    public static int TRACE_BASIC   = 1;   // enable basic debugging of GC phases
+    public static int TRACE_ALLOC   = 2;   // enable debugging of GC internal allocation
+    public static int TRACE_TRIGGER = 4;   // enable debugging of GC triggering / scheduling
+    public static int TRACE_OOM     = 8;   // enable debugging of OOM events
+    public static int TRACE_AD_HOC  = 16;  // enable ad hoc debugging
+    public static int TRACE_FLAGS   = 31;  // all of the above
 
     /**
      * Has this manager been initialized yet
      */
     private boolean inited = false;
+    
+    /**
+     * The current debug flags
+     */
+    protected int heapFlags = TRACE_BASIC | TRACE_OOM | TRACE_ALLOC;
 
     protected OutOfMemoryError OOME;
 
@@ -114,7 +126,9 @@ public abstract class VmHeapManager extends VmSystemObject {
 
         final Object obj = allocObject((VmNormalClass< ? >) cls, size);
         if (obj == null) {
-            Unsafe.debug("Out of memory");
+            if ((heapFlags & TRACE_OOM) != 0) {
+                debug("Out of memory");
+            }
             throw OOME;
         }
         return obj;
@@ -170,7 +184,9 @@ public abstract class VmHeapManager extends VmSystemObject {
         arrayCls.incTotalLength(elements);
         final Object obj = newArray0(arrayCls, elemSize, elements, slotSize);
         if (obj == null) {
-            Unsafe.debug("Out of memory");
+            if ((heapFlags & TRACE_OOM) != 0) {
+                debug("Out of memory");
+            }
             throw OOME;
         }
 
@@ -349,4 +365,43 @@ public abstract class VmHeapManager extends VmSystemObject {
      */
     public abstract void loadClasses(VmClassLoader loader)
             throws ClassNotFoundException;
+    
+    /**
+     * Get this heap's current flags
+     * @return the flags
+     */
+    public int getHeapFlags() {
+        return heapFlags;
+    }
+    
+    /**
+     * Set this heap's flags
+     * @param reapFlags the new heap flags
+     * @return the previous heap flags
+     */
+    public int setHeapFlags(int reapFlags) {
+        int res = this.heapFlags;
+        this.heapFlags = reapFlags;
+        return res;
+    }
+    
+    /**
+     * Output a debug message controlled by the heap trace flags.
+     * @param text
+     */
+    public void debug(String text) {
+        if ((heapFlags & TRACE_FLAGS) != 0) {
+            Unsafe.debug(text);
+        }
+    }
+    
+    /**
+     * Output a debug message controlled by the heap trace flags.
+     * @param text
+     */
+    protected void debug(int number) {
+        if ((heapFlags & TRACE_FLAGS) != 0) {
+            Unsafe.debug(number);
+        }
+    }
 }
