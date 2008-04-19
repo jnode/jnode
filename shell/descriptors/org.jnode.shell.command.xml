@@ -102,6 +102,7 @@
         </repeat>
       </sequence>
     </syntax>
+    <syntax alias="exit" description="Exit the current shell"/>
     <syntax alias="set">
       <sequence description="Set a system property">
         <argument argLabel="key"/>

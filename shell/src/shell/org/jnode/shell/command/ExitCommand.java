@@ -8,20 +8,17 @@ import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.ShellManager;
-import org.jnode.shell.help.Help;
 
 /**
  * @author Levente S\u00e1ntha
  */
 public class ExitCommand extends AbstractCommand {
 
-    public static Help.Info HELP_INFO = new Help.Info(
-            "exit",
-            "Exit the shell"
-    );
+    public ExitCommand() {
+        super("Exit the current shell");
+    }
 
-    public static void main(String[] args)
-            throws Exception {
+    public static void main(String[] args) throws Exception {
         new ExitCommand().execute(args);
     }
 
