@@ -134,14 +134,20 @@ public class DefaultHelp extends Help {
         String[] texts = new String[]{usageText, command, null};
         String[] texts2 = new String[]{"", "", null};
         org.jnode.shell.syntax.Syntax[] syntaxes = syntaxBundle.getSyntaxes();
-        for (int i = 0; i < syntaxes.length; i++) {
-            if (i == 1) {
-                texts[0] = getSpaces(usageLength);
+        if (syntaxes.length > 0) {
+            for (int i = 0; i < syntaxes.length; i++) {
+                if (i == 1) {
+                    texts[0] = getSpaces(usageLength);
+                }
+                texts[2] = syntaxes[i].format(bundle);
+                format(out, cells, texts);
+                texts2[2] = syntaxes[i].getDescription();
+                format(out, cells, texts2);
             }
-            texts[2] = syntaxes[i].format(bundle);
+        }
+        else {
+            texts[2] = "";
             format(out, cells, texts);
-            texts2[2] = syntaxes[i].getDescription();
-            format(out, cells, texts2);
         }
     }
     
