@@ -361,7 +361,9 @@ public final class Class<T> implements AnnotatedElement, Serializable, Type,
     }
 
     static String getSimpleName(Class klass) {
-        if (klass.getVmClass().isArray()){
+//        if (klass.getVmClass().isArray()){
+        // The above involves a security check that is not appropriate in this context.
+        if (klass.vmClass.isArray()){
 	        return klass.getComponentType().getSimpleName() + "[]";
         }
         String fullName = klass.getName();
