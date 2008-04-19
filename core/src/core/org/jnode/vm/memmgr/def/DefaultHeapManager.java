@@ -294,8 +294,10 @@ public final class DefaultHeapManager extends VmHeapManager {
         }
         try {
             if (gcActive) {
-                Unsafe.debug("Using GC Heap type");
-                Unsafe.debug(vmClass.getName());
+                if ((heapFlags & TRACE_ALLOC) != 0) {
+                    debug("Using GC Heap type ");
+                    debug(vmClass.getName());
+                }
                 result = gcHeap.alloc(vmClass, alignedSize);
                 if (result == null) {
                     helper.die("Out of GC heap memory.");
@@ -322,14 +324,18 @@ public final class DefaultHeapManager extends VmHeapManager {
                             // in this allocation, then we're in real panic.
                             if (oomCount == 0) {
                                 oomCount++;
-                                Unsafe.debug("<oom/>");
+                                if ((heapFlags & TRACE_OOM) != 0) {
+                                    debug("<oom/>");
+                                }
                                 gcThread.trigger(true);
                                 heap = firstNormalHeap;
                                 currentHeap = firstNormalHeap;
                             } else {
-                                Unsafe.debug("Out of memory in allocObject(");
-                                Unsafe.debug(size);
-                                Unsafe.debug(")");
+                                if ((heapFlags & TRACE_OOM) != 0) {
+                                    debug("Out of memory in allocObject(");
+                                    debug(size);
+                                    debug(")");
+                                }
                                 throw OOME;
                                 // Unsafe.die();
                             }
@@ -353,7 +359,9 @@ public final class DefaultHeapManager extends VmHeapManager {
                 allocatedSinceGcTrigger += alignedSize;
                 if ((allocatedSinceGcTrigger > triggerSize)
                         && (gcThread != null)) {
-                    Unsafe.debug("<alloc:GC trigger/>");
+                    if ((heapFlags & TRACE_TRIGGER) != 0) {
+                        debug("<alloc:GC trigger/>");
+                    }
                     allocatedSinceGcTrigger = 0;
                     gcThread.trigger(false);
                 }

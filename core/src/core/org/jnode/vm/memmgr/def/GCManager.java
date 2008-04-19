@@ -29,6 +29,7 @@ import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.memmgr.GCStatistics;
 import org.jnode.vm.memmgr.HeapHelper;
+import org.jnode.vm.memmgr.VmHeapManager;
 import org.vmmagic.pragma.Uninterruptible;
 import org.vmmagic.unboxed.Word;
 
@@ -94,7 +95,7 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
         stats.lastGCTime = System.currentTimeMillis();
 
         final boolean locking = (writeBarrier != null);
-        final boolean verbose = debug;
+        final boolean verbose = (heapManager.getHeapFlags() & VmHeapManager.TRACE_BASIC) != 0;
         helper.stopThreadsAtSafePoint();
         heapManager.setGcActive(true);
         try {
@@ -103,7 +104,7 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
             //heapManager.setGcActive(true);
             try {
                 if (verbose) {
-                    Unsafe.debug("<mark/>");
+                    heapManager.debug("<mark/>");
                 }
                 markHeap(bootHeap, firstHeap, locking);
             } finally {
@@ -113,20 +114,20 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
 
             // Sweep
             if (verbose) {
-                Unsafe.debug("<sweep/>");
+                heapManager.debug("<sweep/>");
             }
             sweep(firstHeap);
 
             // Cleanup
             if (verbose) {
-                Unsafe.debug("<cleanup/>");
+                heapManager.debug("<cleanup/>");
             }
             cleanup(bootHeap, firstHeap);
 
             // Verification
             if (debug) {
                 if (verbose) {
-                    Unsafe.debug("<verify/>");
+                    heapManager.debug("<verify/>");
                 }
                 if (false) {
                     // Turn back to true in case of problems in the GC.

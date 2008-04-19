@@ -103,7 +103,18 @@
       </sequence>
     </syntax>
     <syntax alias="exit" description="Exit the current shell"/>
-    <syntax alias="gc" description="Run the garbage collector"/>
+    <syntax alias="gc">
+      <empty description="Run the garbage collector"/>
+      <sequence description="Set heap debug flags">
+        <option argLabel="set" longName="set"/>
+        <repeat minCount="1"><argument argLabel="debugFlag"/></repeat>
+      </sequence>
+      <sequence description="Clear heap debug flags">
+        <option argLabel="clear" longName="clear"/>
+        <repeat minCount="1"><argument argLabel="debugFlag"/></repeat>
+      </sequence>
+      <option argLabel="show" longName="show" description="Show heap debug flags"/>
+    </syntax>
     <syntax alias="set">
       <sequence description="Set a system property">
         <argument argLabel="key"/>
