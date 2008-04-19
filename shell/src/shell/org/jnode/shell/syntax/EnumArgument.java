@@ -28,13 +28,14 @@ import org.jnode.driver.console.CompletionInfo;
 import org.jnode.shell.CommandLine.Token;
 
 /**
- * This Argument class accepts values corresponding to an enum type.
+ * This Argument class accepts values corresponding to an enum type.  It should
+ * be subclassed for each enum.
  * 
  * @author crawley@jnode.org
  *
  * @param <E> the enum type.
  */
-public class EnumArgument<E extends Enum<E>> extends Argument<E> {
+public abstract class EnumArgument<E extends Enum<E>> extends Argument<E> {
     
     private final Class<E> clazz;
 
@@ -54,7 +55,7 @@ public class EnumArgument<E extends Enum<E>> extends Argument<E> {
             addValue(E.valueOf(clazz, token.token));
         }
         catch (IllegalArgumentException ex) {
-            throw new CommandSyntaxException("invalid value for enum");
+            throw new CommandSyntaxException("invalid value for enum " + clazz.getSimpleName());
         }
     }
     
@@ -68,8 +69,6 @@ public class EnumArgument<E extends Enum<E>> extends Argument<E> {
     }
 
     @Override
-    protected String argumentKind() {
-        return clazz.getSimpleName();
-    }
+    protected abstract String argumentKind();
 
 }

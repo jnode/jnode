@@ -221,9 +221,31 @@ public class MuParserTest2 extends TestCase {
         SMALL, TINY
     }
     
+    class BigArgument extends EnumArgument<Big> {
+        BigArgument(String label, int flags) {
+            super(label, flags, Big.class);
+        }
+
+        @Override
+        protected String argumentKind() {
+            return "big";
+        }
+    }
+    
+    class SmallArgument extends EnumArgument<Small> {
+        SmallArgument(String label, int flags) {
+            super(label, flags, Small.class);
+        }
+
+        @Override
+        protected String argumentKind() {
+            return "small";
+        }
+    }
+    
     public void testStatefullParsing6() throws NoTokensAvailableException, CommandSyntaxException {
-        EnumArgument<Big> bigArg = new EnumArgument<Big>("bigArg", Argument.MULTIPLE, Big.class);
-        EnumArgument<Small> smallArg = new EnumArgument<Small>("smallArg", Argument.MULTIPLE, Small.class);
+        EnumArgument<Big> bigArg = new BigArgument("bigArg", Argument.MULTIPLE);
+        EnumArgument<Small> smallArg = new SmallArgument("smallArg", Argument.MULTIPLE);
         IntegerArgument intArg = new IntegerArgument("intArg", Argument.MULTIPLE);
         ArgumentBundle bundle = new ArgumentBundle(intArg, smallArg, bigArg);
         

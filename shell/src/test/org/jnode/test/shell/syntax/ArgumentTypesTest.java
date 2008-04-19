@@ -41,9 +41,21 @@ public class ArgumentTypesTest extends TestCase {
     public enum TestEnum {
         ALT1, ALT2, ALT3
     }
+    
+    public static class TestArgument extends EnumArgument<TestEnum> {
+
+        public TestArgument(String label, int flags) {
+            super(label, flags, TestEnum.class);
+        }
+
+        @Override
+        protected String argumentKind() {
+            return "test";
+        }
+    }
 
     public static class TestEnumCommand extends AbstractCommand {
-        private final EnumArgument<TestEnum> arg = new EnumArgument<TestEnum>("arg1", 0, TestEnum.class);
+        private final EnumArgument<TestEnum> arg = new TestArgument("arg1", 0);
         
         public TestEnumCommand() {
             registerArguments(arg);
