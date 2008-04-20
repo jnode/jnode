@@ -750,6 +750,14 @@ public final class Unsafe {
      */
     public static native long getCpuCycles();
  
-    
+
+    /**
+     * <b>DO NOT USE THAT METHOD</b> : it's bogus (especially for 64 bits CPU) and has not yet been tested
+     * 
+     * @param codePtr
+     * @param function
+     * @param bufferPtr
+     * @return
+     */
     public static native int callVbeFunction(Address codePtr, int function, Address bufferPtr);
 }

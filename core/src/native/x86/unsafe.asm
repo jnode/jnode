@@ -335,7 +335,8 @@ GLABEL Q43org5jnode2vm6Unsafe23getCpuCycles2e2829J
 	ret
 
 
-; int callVbeFunction(Address codePtr, int function, Address bufferPtr)          
+; int callVbeFunction(Address codePtr, int function, Address bufferPtr)   
+; DO NOT USE THAT METHOD : it's bogus (especially for 64 bits CPU) and has not yet been tested       
 GLABEL Q43org5jnode2vm6Unsafe23callVbeFunction2e28Lorg2fvmmagic2funboxed2fAddress3bILorg2fvmmagic2funboxed2fAddress3b29I
 	push ADI
 	mov EAX,[ESP+(3*SLOT_SIZE)] ; function
