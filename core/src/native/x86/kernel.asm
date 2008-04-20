@@ -29,9 +29,6 @@ mb_header:
 	dd 0						; bss_end_addr
 	dd real_start				; entry_addr
 	dd 0						; mode_type 
-;	dd 1024						; width
-;	dd 768						; height
-;	dd 32						; depth
 	dd 0						; width
 	dd 0						; height
 	dd 0						; depth
@@ -48,7 +45,9 @@ real_start:
 multiboot_ok:
 	; Copy the multiboot info block
 	cld
-	mov [multiboot_infos], ebx  
+%ifdef SETUP_VBE	
+	mov [multiboot_infos], ebx
+%endif	  
 	mov esi,ebx
 	mov edi,multiboot_info
 	mov ecx,MBI_SIZE
@@ -99,6 +98,7 @@ multiboot_mmap_copy:
 	jb multiboot_mmap_copy
 multiboot_mmap_done:
 
+%ifdef SETUP_VBE
 	; Copy vbe infos (if any)
 	test dword [multiboot_info+MBI_FLAGS],MBF_VBE
 	jz vbe_info_done
@@ -126,6 +126,7 @@ multiboot_mmap_done:
 	mov ecx,VBEMODEINFO_SIZE
 	rep movsb	
 vbe_info_done:
+%endif
 
 	; Initialize initial jarfile
 	mov esi,[multiboot_info+MBI_MODSCOUNT]
@@ -314,6 +315,7 @@ multiboot_mmap:
 	dd 0				; Entries
 	times (MBI_MMAP_MAX * MBMMAP_ESIZE) db 0
 
+%ifdef SETUP_VBE
 multiboot_vbe:
 	dd 0				; Entries
 	times (VBE_ESIZE) db 0
@@ -328,4 +330,4 @@ vbe_mode_info:
 	
 multiboot_infos:
 	dd 0	
-	
+%endif
