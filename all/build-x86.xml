@@ -150,6 +150,7 @@
 			bits="${jnode.bits}" 
 			listfile="${build.native.dir}/jnodenative.lst"
 			enablejnasm="${jnode.enable.jnasm}"
+			vbeMode="${jnode.vbeMode}"
 			version="${jnode-ver} ${TODAY}">
 				<includedir dir="${src.native.dir}/x86" />
 				<includedir dir="${build.native.dir}/src" />
@@ -174,6 +175,7 @@
 			version="${jnode-ver}" 
 			jnodeCompiler="${jnode.compiler}" 
 			bits="${jnode.bits}"
+			vbeMode="${jnode.vbeMode}"
 			enableJNasm="${jnode.enable.jnasm}">
 
 			<nanokernelsources srcfile="${src.native.dir}/x86/jnode.asm">
