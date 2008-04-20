@@ -673,10 +673,8 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
         } else if (index >= cmps.length) {
             index = cmps.length - 1;
         }
-        if (vmMethod.getNativeCodeOptLevel() < optLevel) {
-            cmp = cmps[index];
-            cmp.disassemble(vmMethod, getResolver(), optLevel, writer);
-        }
+        cmp = cmps[index];
+        cmp.disassemble(vmMethod, getResolver(), optLevel, writer);
     }
 
     /**
