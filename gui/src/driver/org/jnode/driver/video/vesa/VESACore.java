@@ -184,37 +184,37 @@ public class VESACore extends AbstractSurface implements VESAConstants, PCI_IDs,
 			throw new ResourceNotFreeException(ex);
 		}
         
-		Unsafe.debug("\nFilling area with direct memory access");
-		int size = modeInfoBlock.getXResolution() * 10;
-		Address addr = address;
-		for(int i = 0 ; i < size ; i++)
-		{
-			addr.store(0x00FF0000);
-			addr = addr.add(4);
-		}
-		Unsafe.debug("\nstep 1 done");
-		
-		for(int i = 0 ; i < size ; i++)
-		{
-			addr.store(0x0000FF00);
-			addr = addr.add(4);
-		}
-		Unsafe.debug("\nstep 2 done");
-		
-		for(int i = 0 ; i < size ; i++)
-		{
-			addr.store(0x000000FF);
-			addr = addr.add(4);
-		}
-		Unsafe.debug("\nstep 3 done");
-
-		Unsafe.debug("\nFilling area with bitmapGraphics");
-		for(int i = 0 ; i < 10 ; i++)
-		{
-			bitmapGraphics.drawLine(200, 100+i, modeInfoBlock.getXResolution()-400, 0x000000FF, 0);
-			bitmapGraphics.drawLine(200, 110+i, modeInfoBlock.getXResolution()-400, 0x00FF0000, 0);
-			bitmapGraphics.drawLine(200, 120+i, modeInfoBlock.getXResolution()-400, 0x0000FF00, 0);
-		}
+//		Unsafe.debug("\nFilling area with direct memory access");
+//		int size = modeInfoBlock.getXResolution() * 10;
+//		Address addr = address;
+//		for(int i = 0 ; i < size ; i++)
+//		{
+//			addr.store(0x00FF0000);
+//			addr = addr.add(4);
+//		}
+//		Unsafe.debug("\nstep 1 done");
+//		
+//		for(int i = 0 ; i < size ; i++)
+//		{
+//			addr.store(0x0000FF00);
+//			addr = addr.add(4);
+//		}
+//		Unsafe.debug("\nstep 2 done");
+//		
+//		for(int i = 0 ; i < size ; i++)
+//		{
+//			addr.store(0x000000FF);
+//			addr = addr.add(4);
+//		}
+//		Unsafe.debug("\nstep 3 done");
+//
+//		Unsafe.debug("\nFilling area with bitmapGraphics");
+//		for(int i = 0 ; i < 10 ; i++)
+//		{
+//			bitmapGraphics.drawLine(200, 100+i, modeInfoBlock.getXResolution()-400, 0x000000FF, 0);
+//			bitmapGraphics.drawLine(200, 110+i, modeInfoBlock.getXResolution()-400, 0x00FF0000, 0);
+//			bitmapGraphics.drawLine(200, 120+i, modeInfoBlock.getXResolution()-400, 0x0000FF00, 0);
+//		}
 		
 		Unsafe.debug("\nVESACore created");
 	}
@@ -238,12 +238,7 @@ public class VESACore extends AbstractSurface implements VESAConstants, PCI_IDs,
 		setMode(w, h, config.getColorModel());
 		fillRect(0, 0, w, h, 0, PAINT_MODE);
 		
-		for(int i = 0 ; i < 100 ; i++) {
-			fillRect(i, i, 500 - i, 500 - i, i, Surface.PAINT_MODE);
-		}
-		
 		dumpState(); // For debugging purposes
-		defineCursor();
 	}
 
 	/**
@@ -644,149 +639,6 @@ public class VESACore extends AbstractSurface implements VESAConstants, PCI_IDs,
 		bitmapGraphics.setCursorImage(cursor);
 	}
 	
-	/**
-	 * Sets the cursor image.
-	 */
-	private void defineCursor(HardwareCursorImage cursor) {
-		
-//		final int[] argb = cursor.getImage();
-//		final int size = argb.length;
-//		final int[] andMask = new int[size];
-//		final int[] xorMask = new int[size];
-//		
-//		for (int i = 0; i < size; i++) {
-//			final int v = argb[i];
-//			final int a = (v >>> 24) & 0xFF;
-//			final int r = (v >> 16) & 0xFF;
-//			final int g = (v >> 8) & 0xFF;
-//			final int b = v & 0xFF;
-//			if (a != 0) {
-//				// opaque
-//				andMask[i] = 0;
-//                xorMask[i] = v & convertColor(r, g, b,a);
-//            } else {
-//				// transparent
-//				andMask[i] = 0xFFFFFFFF;
-//				xorMask[i] = 0;
-//			}
-//		}
-//		
-//		// Wait for the FIFO
-//		syncFIFO();
-//
-//		// Command
-//		writeWordToFIFO(SVGA_CMD_DEFINE_CURSOR);
-//		// Mouse id
-//		writeWordToFIFO(MOUSE_ID);
-//		// Hotspot X
-//		writeWordToFIFO(cursor.getHotSpotX());
-//		// Hotspot Y
-//		writeWordToFIFO(cursor.getHotSpotY());
-//		// Width
-//		writeWordToFIFO(cursor.getWidth());
-//		// Height
-//		writeWordToFIFO(cursor.getHeight());
-//		// Depth for AND mask
-//		writeWordToFIFO(1);
-//		// Depth for XOR mask
-//		writeWordToFIFO(getBitsPerPixel());
-//		// Scanlines for AND mask
-//		for (int i = 0; i < size; i++) {
-//			writeWordToFIFO(andMask[i]);
-//		}
-//		// Scanlines for XOR mask
-//		for (int i = 0; i < size; i++) {
-//			writeWordToFIFO(xorMask[i]);
-//		}
-	}
-	
-	/**
-	 * Sets the cursor image.
-	 */
-	private void defineARGBCursor(HardwareCursorImage cursor) {
-		
-//		final int[] argb = cursor.getImage();
-//		final int size = argb.length;
-//		
-//		// Wait for the FIFO
-//		syncFIFO();
-//
-//		// Command
-//		writeWordToFIFO(SVGA_CMD_DEFINE_ALPHA_CURSOR);
-//		// Mouse id
-//		writeWordToFIFO(MOUSE_ID);
-//		// Hotspot X
-//		writeWordToFIFO(cursor.getHotSpotX());
-//		// Hotspot Y
-//		writeWordToFIFO(cursor.getHotSpotY());
-//		// Width
-//		writeWordToFIFO(cursor.getWidth());
-//		// Height
-//		writeWordToFIFO(cursor.getHeight());
-//		// Depth for AND mask
-//		writeWordToFIFO(1);
-//		// Depth for XOR mask
-//		writeWordToFIFO(getBitsPerPixel());
-//		// Scanlines 
-//		for (int i = 0; i < size; i++) {
-//			writeWordToFIFO(argb[i]);
-//		}
-	}
-	
-	private void defineCursor() {
-//		// Wait for the FIFO
-//		syncFIFO();
-//
-//		// Command
-//		writeWordToFIFO(SVGA_CMD_DEFINE_CURSOR);
-//		// Mouse id
-//		writeWordToFIFO(MOUSE_ID);
-//		// Hotspot X
-//		writeWordToFIFO(0);
-//		// Hotspot Y
-//		writeWordToFIFO(0);
-//		// Width
-//		writeWordToFIFO(2);
-//		// Height
-//		writeWordToFIFO(2);
-//		// Depth for AND mask
-//		writeWordToFIFO(1);
-//		// Depth for XOR mask
-//		writeWordToFIFO(1);
-//		// Scanlines for AND mask
-//		for (int i = 0; i < 4; i++) {
-//			writeWordToFIFO(0);
-//		}
-//		// Scanlines for XOR mask
-//		for (int i = 0; i < 4; i++) {
-//			writeWordToFIFO(0xFFFFFF);
-//		}
-//		syncFIFO();
-//		setCursor(false, 0, 0);
-	}
-
-	private void setCursor(boolean visible, int x, int y) {
-//		setReg32(SVGA_REG_CURSOR_ID, MOUSE_ID);
-//		if (visible) {
-//			if (hasCapability(SVGA_CAP_CURSOR_BYPASS)) {
-//				//System.out.println("bypass " + x + ", " + y);
-//				setReg32(SVGA_REG_CURSOR_X, x);
-//				setReg32(SVGA_REG_CURSOR_Y, y);
-//			} else {
-//				//System.out.println("move " + x + ", " + y);
-//				syncFIFO();
-//				writeWordToFIFO(SVGA_CMD_MOVE_CURSOR);
-//				writeWordToFIFO(x);
-//				writeWordToFIFO(y);
-//			}
-//		}
-//		setReg32(SVGA_REG_CURSOR_ON, visible ? 1 : 0);
-	}
-
-	private final boolean hasCapability(int cap) {
-		return ((this.capabilities & cap) == cap);
-	}
-
     /**
      * @see org.jnode.driver.video.Surface#drawAlphaRaster(java.awt.image.Raster, java.awt.geom.AffineTransform, int, int, int, int, int, int, java.awt.Color)
      */

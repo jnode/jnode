@@ -9,6 +9,7 @@ import org.jnode.driver.video.HardwareCursor;
 import org.jnode.driver.video.HardwareCursorAPI;
 import org.jnode.driver.video.HardwareCursorImage;
 import org.jnode.driver.video.Surface;
+import org.jnode.vm.Unsafe;
 
 public class SoftwareCursor extends BitmapGraphics implements HardwareCursorAPI {
 	private BitmapGraphics graphics;
@@ -165,100 +166,93 @@ public class SoftwareCursor extends BitmapGraphics implements HardwareCursorAPI 
 	}
 
 	public void setCursorImage(HardwareCursor cursor) {
-		final HardwareCursorImage cursImage = cursor.getImage(16, 16); 
-
-		if(this.cursorImage != cursImage)
-		{			
-			// we assume here that cursor has always the same size (that size by the call "cursor.getImage(w, h)" above)
-			if(screenBackup == null)
+		try
+		{
+			final HardwareCursorImage cursImage = cursor.getImage(16, 16); 
+	
+			if(this.cursorImage != cursImage)
 			{
-				screenBackup = new int[cursImage.getWidth() * cursImage.getHeight()];
+				if(screenBackup == null)
+				{
+					screenBackup = new int[cursImage.getWidth() * cursImage.getHeight()];
+				}
+				else
+				{				
+					hideCursor();
+				}
+				
+				this.cursorImage = cursImage;			
+				showCursor();
 			}
-			else
-			{
-				hideCursor();				
-			}
-			
-			this.cursorImage = cursImage;			
-			showCursor();
+		}
+		catch(Throwable t)
+		{
+			Unsafe.debugStackTrace();
+			Unsafe.debug("\nerror in setCursorImage ("+t.getClass().getName()+") "+t.getMessage()+"\n");
 		}
 	}
 
 	public void setCursorPosition(int x, int y) {		
-		hideCursor();
-		this.cursorX = x - cursorImage.getHotSpotX();
-		this.cursorY = y - cursorImage.getHotSpotY();
-		showCursor();
+		try
+		{
+			if((this.cursorX  != x) || (this.cursorY != y))
+			{
+				hideCursor();
+				this.cursorX = x - cursorImage.getHotSpotX();
+				this.cursorY = y - cursorImage.getHotSpotY();
+				showCursor();
+			}
+		}
+		catch(Throwable t)
+		{
+			Unsafe.debugStackTrace();
+			Unsafe.debug("\nerror in setCursorPosition ("+t.getClass().getName()+") "+t.getMessage()+"\n");
+		}
 	}
 
 	public void setCursorVisible(boolean visible) {
-		this.cursorVisible = visible;
-		showCursor();
+		try		
+		{
+			if(this.cursorVisible != visible)
+			{
+				this.cursorVisible = visible;
+				
+				if(visible)
+				{
+					showCursor();					
+				}
+				else
+				{
+					hideCursor();
+				}
+			}
+		}
+		catch(Throwable t)
+		{
+			Unsafe.debugStackTrace();
+			Unsafe.debug("\nerror in setCursorVisible ("+t.getClass().getName()+") "+t.getMessage()+"\n");
+		}
 	}
-	
+
 	private boolean intersectsCursor(int x, int y, int width, int height)
 	{
 		boolean intersects = false;
 		
 		if(cursorVisible && (width > 0) && (height > 0))
 		{
-			//TODO implement it
-			intersects = false;
-//			final int endCursorX = cursorX + cursorImage.getWidth(); 
-//			final int endCursorY = cursorY + cursorImage.getHeight();
-//			
-//			if(((x + width) > cursorX) && ((y + height) > cursorY) &&
-//			   (x < endCursorX) && (y < endCursorY))
-//			{
-//				// given area contains cursor area
-//				intersects = true;
-//			}
-//			else
-//			{
-//				final int endX = x + width;
-//				final int endY = y + height;
-//				
-//				intersects = isInside(x,    y,    cursorX, cursorY, endCursorX, endCursorY) ||
-//							 isInside(x,    endY, cursorX, cursorY, endCursorX, endCursorY) ||
-//							 isInside(endX, endY, cursorX, cursorY, endCursorX, endCursorY) ||
-//							 isInside(endX, y,    cursorX, cursorY, endCursorX, endCursorY);
-//			}
+			Rectangle cursorArea = new Rectangle(cursorX, cursorY, cursorImage.getWidth(), cursorImage.getHeight());
+			Rectangle screenArea = new Rectangle(x, y, width, height);
+			intersects = cursorArea.intersects(screenArea);
 		}
 		
 		return intersects;
 	}
 	
-	/**
-	 * 
-	 * @param value
-	 * @param min inclusive
-	 * @param max exclusive
-	 * @return
-	 */
-	private boolean isInside(int value, int min, int max)
-	{
-		return (value >= min) && (value < max);
-	}
-
-	/**
-	 * 
-	 * @param x
-	 * @param y
-	 * @param xmin inclusive
-	 * @param ymin inclusive
-	 * @param xmax exclusive
-	 * @param ymax exclusive
-	 * @return
-	 */
-	private boolean isInside(int x, int y, int xmin, int ymin, int xmax, int ymax)
-	{
-		return isInside(x, xmin, xmax) && isInside(y, ymin, ymax);
-	}
-
 	private void showCursor()
 	{
 		if((cursorImage != null) && (screenBackup != null))
 		{
+//			screenBackup = graphics.doGetPixels(new Rectangle(cursorX, cursorY, cursorImage.getWidth(), cursorImage.getHeight())); 
 			int index = 0;
 			for(int y = cursorY ; y < (cursorY + cursorImage.getHeight()) ; y++)
 			{
@@ -268,8 +262,8 @@ public class SoftwareCursor extends BitmapGraphics implements HardwareCursorAPI 
 					index++;
 				}				
 			}		
-
-			putPixels(cursorImage.getImage());		
+			
+			putPixels(cursorImage.getImage(), screenBackup);		
 		}
 	}
 	
@@ -277,19 +271,39 @@ public class SoftwareCursor extends BitmapGraphics implements HardwareCursorAPI 
 	{
 		if((cursorImage != null) && (screenBackup != null))
 		{
-			putPixels(screenBackup);
+			putPixels(screenBackup, null);
 		}
 	}
 	
-	private void putPixels(int[] pixels)
+	private void putPixels(int[] pixels, int[] background)
 	{
+		final int maxY = Math.min(cursorY + cursorImage.getHeight(), graphics.getHeight());
+		final int maxX = Math.min(cursorX + cursorImage.getWidth(), graphics.getWidth());
+		
 		int index = 0;
-		for(int y = cursorY ; y < (cursorY + cursorImage.getHeight()) ; y++)
+		for(int y = cursorY ; y < maxY ; y++)
 		{
-			for(int x = cursorX ; x < (cursorX + cursorImage.getWidth()) ; x++)
+			for(int x = cursorX ; x < maxX ; x++)
 			{
-				graphics.drawPixels(x, y, 1, pixels[index], Surface.PAINT_MODE);
+				int color;
+				if(background == null)
+				{
+					color = pixels[index];
+				}
+				else
+				{
+					final int c = pixels[index];
+					final boolean isTransparent = (c == 0); 
+					color = isTransparent ? background[index] : c;
+				}
+				
+				graphics.drawPixels(x, y, 1, color, Surface.PAINT_MODE);
 				index++;
+				
+				if(index >= pixels.length)
+				{
+					return;
+				}
 			}				
 		}		
 	}
