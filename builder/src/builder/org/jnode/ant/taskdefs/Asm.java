@@ -95,6 +95,8 @@ public class Asm extends MatchingTask {
     
     private String version;
     
+    private boolean setVbe;
+    
     /**
      * Add an includedir
      * 
@@ -102,6 +104,12 @@ public class Asm extends MatchingTask {
      */
     public void addConfiguredIncludeDir(IncludeDir dir) {
         includeDirs.add(dir);
+    }
+    
+    public void setVbeMode(String vbeMode)
+    {
+    	System.err.println("setVbeMode");
+    	this.setVbe = (vbeMode != null) && (vbeMode.trim().length() > 0);
     }
 
     /**
@@ -128,7 +136,7 @@ public class Asm extends MatchingTask {
         }
 
         cmdLine.add("-o");
-        cmdLine.add(dstFile.toString());
+        cmdLine.add(dstFile.toString());        
 
         if (bits == 64) {
         	cmdLine.add("-m");
@@ -136,6 +144,13 @@ public class Asm extends MatchingTask {
             // Set preprocessor
             cmdLine.add("-r");
             cmdLine.add("nasm");
+        }
+        
+        if(setVbe)
+        {
+        	System.err.println("setVbeMode : add property");
+    		cmdLine.add("-D");
+    		cmdLine.add("SETUP_VBE");        		
         }
         
 		cmdLine.add("-D");

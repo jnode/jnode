@@ -25,6 +25,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringTokenizer;
+
 import org.apache.tools.ant.Project;
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
@@ -74,6 +76,11 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 	private VmSharedStatics sharedStatics;
 
 	private int bits = 32;
+	
+	private boolean useVbe = false;
+	private int vbeWidth = 0;
+	private int vbeHeight = 0;
+	private int vbeDepth = 0;
 
 	/**
 	 * The offset in our (java) image file to the initial jump to our
@@ -598,6 +605,11 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 
 	private static final int MB_BSS_END_ADDR = 6 * 4;
 
+	private static final int MODE_TYPE = 8 * 4;
+	private static final int WIDTH = 9 * 4;
+	private static final int HEIGHT = 10 * 4;
+	private static final int DEPTH = 11 * 4;
+	
 	/**
 	 * Patch any fields in the header, just before the image is written to disk.
 	 * 
@@ -628,6 +640,12 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 				+ os.getLength());
 		os.set32(mb_hdr + MB_BSS_END_ADDR, (int) os.getBaseAddr()
 				+ os.getLength());
+
+		// initial wanted video mode (if possible)
+		os.set32(mb_hdr + MODE_TYPE, 0);
+		os.set32(mb_hdr + WIDTH, vbeWidth);
+		os.set32(mb_hdr + HEIGHT, vbeHeight);
+		os.set32(mb_hdr + DEPTH, vbeDepth);
 	}
 
 	/**
@@ -702,6 +720,46 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 		}
 		this.bits = bits;
 	}
+	
+	public final void setVbeMode(String videoMode)
+	{
+		System.out.println("videoMode="+videoMode);
+		if((videoMode == null) || (videoMode.trim().length() == 0))
+		{
+			useVbe = false; 
+			vbeWidth = 0;
+			vbeHeight = 0;
+			vbeDepth = 0;
+		}
+		else
+		{
+			StringTokenizer stok = new StringTokenizer(videoMode.trim().toLowerCase(), "x", false);
+			if(stok.countTokens() != 3)
+			{
+				throw new IllegalArgumentException("linearFrameBuffer must be of the form '<width>x<height>x<depth>'");
+			}
+			
+			vbeWidth = Integer.parseInt(stok.nextToken());
+			if(vbeWidth <= 0)
+			{
+				throw new IllegalArgumentException("vbeWidth must be > 0");
+			}
+				
+			vbeHeight = Integer.parseInt(stok.nextToken());
+			if(vbeWidth <= 0)
+			{
+				throw new IllegalArgumentException("vbeHeight must be > 0");
+			}
+				
+			vbeDepth = Integer.parseInt(stok.nextToken());
+			if(vbeWidth <= 0)
+			{
+				throw new IllegalArgumentException("vbeDepth must be > 0");
+			}
+			
+			useVbe = true;
+		}
+	}
     
     /**
      * Initialize the statics table.
@@ -730,6 +788,13 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
             final Map<String,String> symbols = new HashMap<String, String>();
             symbols.put(bits,"");
             symbols.put("JNODE_VERSION", "'" + version + "'");
+            
+            if(useVbe)
+            {
+            	symbols.put("SETUP_VBE", "");	
+            	log("Grub will setup linear framebuffer mode "+vbeWidth+"x"+vbeHeight+"x"+vbeDepth);
+            }
+            
             log("Compiling native kernel with JNAsm, Version " + version + ", " + i_bist + " bits");
             JNAsm.assembler(os, sourceInfo, symbols);
         } catch(Exception e){
