@@ -84,22 +84,42 @@ GLABEL Q53org5jnode2vm3x869UnsafeX8623getMultibootMMapLength2e2829I
 
 ; Address getVbeInfos();
 GLABEL Q53org5jnode2vm3x869UnsafeX8623getVbeInfos2e2829Lorg2fvmmagic2funboxed2fAddress3b
+%ifdef SETUP_VBE
 	mov AAX,multiboot_vbe
+%endif	
+%ifndef SETUP_VBE
+	mov AAX,0
+%endif	
 	ret
 
 ; Address getVbeControlInfos();
 GLABEL Q53org5jnode2vm3x869UnsafeX8623getVbeControlInfos2e2829Lorg2fvmmagic2funboxed2fAddress3b
+%ifdef SETUP_VBE
 	mov AAX,vbe_control_info
+%endif	
+%ifndef SETUP_VBE
+	mov AAX,0
+%endif	
 	ret
 
 ; Address getVbeModeInfos();
 GLABEL Q53org5jnode2vm3x869UnsafeX8623getVbeModeInfos2e2829Lorg2fvmmagic2funboxed2fAddress3b
+%ifdef SETUP_VBE
 	mov AAX,vbe_mode_info
+%endif	
+%ifndef SETUP_VBE
+	mov AAX,0
+%endif	
 	ret
 
 ; Address getMultibootInfos();
 GLABEL Q53org5jnode2vm3x869UnsafeX8623getMultibootInfos2e2829Lorg2fvmmagic2funboxed2fAddress3b
+%ifdef SETUP_VBE
 	mov AAX,multiboot_infos
+%endif	
+%ifndef SETUP_VBE
+	mov AAX,0
+%endif	
 	ret
 
 ; void setupBootCode(Address memory, int[] gdtBase, int[] tss);
