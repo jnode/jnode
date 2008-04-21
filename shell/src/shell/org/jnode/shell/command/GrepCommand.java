@@ -1,159 +1,110 @@
+/*
+ * $Id$
+ *
+ * JNode.org
+ * Copyright (C) 2007-2008 JNode.org
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; If not, write to the Free Software Foundation, Inc., 
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 package org.jnode.shell.command;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.Syntax;
-import org.jnode.shell.help.argument.OptionArgument;
+import org.jnode.shell.syntax.*;
 
 /**
- * 
  * @author peda
+ * @author crawley@jnode.org
  */
 public class GrepCommand extends AbstractCommand {
 
-	public static final int MODE_CONTAINS = 0;
-	public static final int MODE_REGEXP = 1;
+    private final FlagArgument FLAG_INVERSE =
+        new FlagArgument("inverse", Argument.OPTIONAL, "Output non-matching lines");
+    private final FlagArgument FLAG_REGEX =
+        new FlagArgument("isRegex", Argument.OPTIONAL, "Do regex search rather than simple string search");
+    private final StringArgument ARG_EXPR =
+        new StringArgument("expression", Argument.MANDATORY, "The expression to be searched for");
 
-	
-	static final OptionArgument ARG_ACTION = 
-		new OptionArgument("options", "options that can be passed to grep", 
-						   new OptionArgument.Option("-v", "Only output non matching lines"),
-						   new OptionArgument.Option("-r", "Use java regexp syntax instead of include syntax"));
-
-	static final Parameter PARAM_ACTION = new Parameter(ARG_ACTION);
-	static final Parameter PARAM_EXPRESSION = new Parameter("expression", "the expression that should be greped for", false);
-	
-    public static Help.Info HELP_INFO = new Help.Info("grep", 
-    		new Syntax[] { new Syntax("grep for regular expressions", PARAM_ACTION, PARAM_EXPRESSION) });
+    public GrepCommand() {
+        super("Search for lines that match a string or regex");
+        registerArguments(ARG_EXPR, FLAG_INVERSE, FLAG_REGEX);
+    }
     	
     /**
-     * main method, normaly not used, use execute instead!!
+     * main method, normally not used, use execute instead!!
      * @param args
      * @throws Exception
      */
-	public static void main(String[] args)
-    	throws Exception {
-    		new GrepCommand().execute(args);
-    	}
+	public static void main(String[] args) throws Exception {
+    	new GrepCommand().execute(args);
+    }
 
 	/**
-	 * main entry point
-	 * called from Shell
+	 * Primary entry point
 	 */
 	public void execute(CommandLine commandLine, InputStream in,
 			PrintStream out, PrintStream err) throws Exception {
 
-		Options options = new Options();
-		options.err = err;
-		options.args = commandLine.getArguments();
-
-		out.println("Start grep...");
-		// parse commandline arguments...
-		final boolean parseOK = parseCommandLine(options);
-		if (!parseOK) {
-			displayHelp(out);
-			exit(2);
-		}
+	    boolean inverse = FLAG_INVERSE.isSet();
+	    boolean useRegex = FLAG_REGEX.isSet();
+	    String expr = ARG_EXPR.getValue();
+	    
+	    Pattern pattern = null;
+	    try {
+	        if (useRegex) {
+	           pattern = Pattern.compile(expr);
+	        }
+	        else {
+	            // By using Pattern to search for regular strings, we should
+	            // get the benefit of Pattern's ability to do fast string 
+	            // searching; e.g. using the Boyer-Moore algorithm.
+	            pattern = Pattern.compile(Pattern.quote(expr));
+	        }
+	    }
+	    catch (PatternSyntaxException ex) {
+	        err.println("Invalid regex: " + ex.getMessage());
+	        exit(2);
+	    }
 		
 		final BufferedReader r = new BufferedReader(new InputStreamReader(in));
-		String line; 
-
-		// loop over inputstream and grep for expression...
-		boolean found = false;
-		while ((line = r.readLine()) != null) {
-			if (options.mode == MODE_CONTAINS) {
-				if (line.contains(options.expression)) {
-					if (!options.inverse) {
-						out.println(line);
-						found = true;
-					}
-				} else if (options.inverse) {
-					out.println(line);
-					found = true;
-				}
-			
-			} else {
-				if (line.matches(options.expression)) {
-					if (!options.inverse) {
-						out.println(line);
-						found = true;
-					}
-				} else if (options.inverse) {
-					out.println(line);
-					found = true;
-				}
-				}
-			}
+		
+		// Read the input a line at a time, searching each line for the expression.
+        boolean found = false;
+        String line;
+        while ((line = r.readLine()) != null) {
+		    if (pattern.matcher(line).find()) {
+		        if (!inverse) {
+		            out.println(line);
+		            found = true;
+		        }
+		    } 
+		    else if (inverse) {
+		        out.println(line);
+		        found = true;
+		    }
+		}
 		if (!found) {
-			exit(1);
+		    exit(1);
 		}
-	}
-	
-	private boolean parseCommandLine(Options options) {
-		
-		for (int i = 0; i < options.args.length; i++) {
-			if (options.args[i].startsWith("-")) {
-				setOptions(options.args[i], options);
-				options.args[i] = null;
-			}
-		}
-
-		for (int i = 0; i < options.args.length; i++) {
-			if (options.args[i] != null) {
-				options.expression = options.args[i];
-				return true;
-			}
-		}
-		
-		return false;
-	}
-	
-	private void setOptions(String opts, Options options) {
-		if (opts.startsWith("--")) {
-			// none yet
-			options.err.println("unknown longopt '" + opts + "'");
-		} else {
-			for (int i = 1; i < opts.length(); i++) {
-				switch (opts.charAt(i)) {
-				case 'r':
-					options.mode = MODE_REGEXP;
-					break;
-				case 'v':
-					options.inverse = true;
-					break;
-				default:
-					options.err.println("unknown opt '" + opts.charAt(i) + "'");
-					break;
-				}
-			}
-		}
-	}
-	
-	private void displayHelp(PrintStream out) {
-		out.println("JNode grep <options> expression");
-		out.println("options:");
-		out.println("  -v  inverse search, only print non matching lines");
-		out.println("  -r  java regexp mode instead of contains mode");
-		out.println();
-	}
-
-	private class Options {
-
-		private int mode = 0;
-		
-		private boolean inverse = false;
-
-		private String expression;
-	    
-		private PrintStream err;
-		
-		private String[] args;
 	}
 }
