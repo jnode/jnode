@@ -124,6 +124,10 @@
         <argument argLabel="expression"/>
       </sequence>
     </syntax>
+    <syntax alias="help">
+      <empty description="Print help about 'help'"/>
+      <argument argLabel="alias" description="Print help about a command alias or class"/>
+    </syntax>
     <syntax alias="set">
       <sequence description="Set a system property">
         <argument argLabel="key"/>

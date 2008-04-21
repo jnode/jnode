@@ -21,18 +21,20 @@
  
 package org.jnode.shell.command;
 
+import java.io.InputStream;
+import java.io.PrintStream;
+
 import javax.naming.NameNotFoundException;
 
 import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.CommandLine;
 import org.jnode.shell.Shell;
 import org.jnode.shell.ShellUtils;
 import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.alias.NoSuchAliasException;
 import org.jnode.shell.help.Help;
-import org.jnode.shell.help.HelpException;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.argument.AliasArgument;
+import org.jnode.shell.syntax.AliasArgument;
+import org.jnode.shell.syntax.Argument;
 import org.jnode.shell.syntax.ArgumentBundle;
 import org.jnode.shell.syntax.SyntaxBundle;
 import org.jnode.shell.syntax.SyntaxManager;
@@ -42,88 +44,100 @@ import org.jnode.shell.syntax.SyntaxManager;
  * @author Fabien DUMINY (fduminy@jnode.org)
  * @author crawley@jnode.org
  */
-public class HelpCommand {
+public class HelpCommand extends AbstractCommand {
 
-    static final AliasArgument ARG_COMMAND = new AliasArgument("command", Help.getLocalizedHelp("help.arg.command"));
-	static final Parameter PARAM_COMMAND = new Parameter(ARG_COMMAND, Parameter.OPTIONAL);
+    private final AliasArgument ARG_ALIAS = 
+        new AliasArgument("alias", Argument.OPTIONAL, "The command alias name");
 
-	public static Help.Info HELP_INFO =
-		new Help.Info(
-			"help",
-			Help.getLocalizedHelp("help.desc"),
-			new Parameter[] { PARAM_COMMAND });
+	public HelpCommand() {
+	    super("Print online help for a command alias");
+	    registerArguments(ARG_ALIAS);
+	}
 
-	public static void main(String[] args)
-	throws HelpException {
-		Help.Info info = null; 
-		SyntaxBundle syntaxes = null;
-        ArgumentBundle bundle = null;
-		String otherAliases = null;
-		
-        ParsedArguments cmdLine = HELP_INFO.parse(args);
-        String cmd = null;
-        String arg = null;
-        if (PARAM_COMMAND.isSet(cmdLine)){
-			try {
-				final Shell shell = ShellUtils.getShellManager().getCurrentShell();
-                final AliasManager aliasManager = shell.getAliasManager(); 
-                final SyntaxManager syntaxManager = shell.getSyntaxManager(); 
-
-				arg = ARG_COMMAND.getValue(cmdLine);
-				Class<?> clazz = getCommandClass(aliasManager, arg);	
-
-                bundle = getBundle(clazz);
-                if (bundle != null) {
-                    syntaxes = syntaxManager.getSyntaxBundle(arg);
-                    if (syntaxes == null) {
-                        syntaxes = new SyntaxBundle(arg, bundle.createDefaultSyntax());
-                    }
-                }
-                else {
-    				info = Help.getInfo(clazz);
-				}
-                if (info != null || syntaxes != null) {
-                    cmd = arg;
-                    otherAliases = getOtherAliases(aliasManager, cmd, clazz);
-                }
-			} catch (ClassNotFoundException ex) {
-				System.err.println("Command not found: " + arg);
-			} catch (SecurityException ex) {
-				System.err.println("Access to class prevented by security manager");
-			} catch (NameNotFoundException e) {
-				System.err.println("Can't find the shell manager");
-			}
+	public static void main(String[] args) throws Exception {
+	    new HelpCommand().execute(args);
+	}
+	
+	@Override
+    public void execute(CommandLine commandLine, InputStream in,
+            PrintStream out, PrintStream err) throws Exception {
+       
+        String alias;
+        if (ARG_ALIAS.isSet()) {
+            alias = ARG_ALIAS.getValue();
+        }
+        else if (commandLine.getCommandName() != null) {
+            alias = commandLine.getCommandName();
         }
         else {
-            info = HELP_INFO; // defaults to print own help
-		}
+            alias = "help";
+        }
+		
+        Help.Info info = null; 
+        SyntaxBundle syntaxes = null;
+        ArgumentBundle bundle = null;
+        String otherAliases = null;
+        try {
+            final Shell shell = ShellUtils.getShellManager().getCurrentShell();
+            final AliasManager aliasManager = shell.getAliasManager(); 
+            final SyntaxManager syntaxManager = shell.getSyntaxManager(); 
+            Class<?> clazz = getCommandClass(aliasManager, alias);	
+
+            bundle = getBundle(clazz, err);
+            if (bundle != null) {
+                syntaxes = syntaxManager.getSyntaxBundle(alias);
+                if (syntaxes == null) {
+                    syntaxes = new SyntaxBundle(alias, bundle.createDefaultSyntax());
+                }
+            }
+            else {
+                info = Help.getInfo(clazz);
+            }
+            if (info != null || syntaxes != null) {
+                otherAliases = getOtherAliases(aliasManager, alias, clazz);
+            }
+        } catch (ClassNotFoundException ex) {
+            err.println("Alias not found: " + alias);
+            exit(1);
+        } catch (SecurityException ex) {
+            err.println("Access to class prevented by security manager");
+            exit(2);
+        } catch (NameNotFoundException e) {
+            err.println("Can't find the shell manager");
+            exit(2);
+        }
  
         if (syntaxes != null) {
-            Help.getHelp().help(syntaxes, bundle, System.out);
+            Help.getHelp().help(syntaxes, bundle, out);
         }
         else if (info != null) {
-            Help.getHelp().help(info, cmd, System.out);
+            Help.getHelp().help(info, alias, out);
+        }
+        else {
+            out.println("No help information available: " + alias);
         }
         if (otherAliases != null) {
-            System.out.println(otherAliases);
+            out.println(otherAliases);
         }
 	}
 
-	private static ArgumentBundle getBundle(Class<?> clazz) {
+	private ArgumentBundle getBundle(Class<?> clazz, PrintStream err) {
         try {
             AbstractCommand command = (AbstractCommand) clazz.newInstance();
             return command.getArgumentBundle();
         } catch (ClassCastException e) {
-            return null;
+            // The target class cannot 
         } catch (InstantiationException e) {
-            System.err.println("Problem during instantiation of " + clazz.getName());
+            err.println("Problem during instantiation of " + clazz.getName());
+            exit(2);
         } catch (IllegalAccessException e) {
-            System.err.println("Constructor for " + clazz.getName() + " is not accessible");
+            err.println("Constructor for " + clazz.getName() + " is not accessible");
+            exit(2);
         }
         return null;
     }
 	
-	private static Class<?> getCommandClass(AliasManager aliasManager, String commandName)
+	private Class<?> getCommandClass(AliasManager aliasManager, String commandName)
 	throws ClassNotFoundException
 	{
 	    try {
@@ -135,7 +149,7 @@ public class HelpCommand {
 	    }
 	}
 
-    private static String getOtherAliases(AliasManager aliasManager, String alias, Class<?> aliasClass)
+    private String getOtherAliases(AliasManager aliasManager, String alias, Class<?> aliasClass)
 	{
 		boolean hasOtherAlias = false; 
 		StringBuilder sb = new StringBuilder("Other aliases: ");
