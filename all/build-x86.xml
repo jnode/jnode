@@ -21,6 +21,7 @@
 	<property name="grub.stage2.name" value="stage2" />
 	<property name="grub.menu" value="${my-conf.dir}/menu.lst" />
 	<property name="grub.menu.cdrom" value="${my-conf.dir}/menu-cdrom.lst" />
+	<property name="jnode.vbeMode" value=""/> <!-- define a default value in case none is given in jnode.properties -->
 
   <!-- Properties for building the boot files for windows NT/2K/XP -->
   <property name="jnode.install-nt.dir" value="C:\jnode" />
