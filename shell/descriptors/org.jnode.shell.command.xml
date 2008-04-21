@@ -115,6 +115,15 @@
       </sequence>
       <option argLabel="show" longName="show" description="Show heap debug flags"/>
     </syntax>
+    <syntax alias="grep">
+      <sequence description="Search for lines that match a string or regex">
+        <optionSet>
+          <option argLabel="inverse" shortName="i"/>
+          <option argLabel="isRegex" shortName="r"/>
+        </optionSet>
+        <argument argLabel="expression"/>
+      </sequence>
+    </syntax>
     <syntax alias="set">
       <sequence description="Set a system property">
         <argument argLabel="key"/>
