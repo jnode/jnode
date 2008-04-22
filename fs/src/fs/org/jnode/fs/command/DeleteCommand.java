@@ -21,20 +21,18 @@
 
 package org.jnode.fs.command;
 
-import java.io.File;
-import java.io.InputStream;
-import java.io.PrintStream;
-
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.argument.FileArgument;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FileArgument;
+import org.jnode.shell.syntax.FlagArgument;
 
 import javax.naming.NameNotFoundException;
+import java.io.File;
+import java.io.InputStream;
+import java.io.PrintStream;
 
 /**
  * Delete a file or a empty directory
@@ -42,37 +40,45 @@ import javax.naming.NameNotFoundException;
  * @author Guillaume BINET (gbin@users.sourceforge.net)
  * @author Andreas H\u00e4nel
  * @author Levente S\u00e1ntha
+ * @author Martin Husted Hartvig (hagar at jnode.org)
  */
 public class DeleteCommand extends AbstractCommand {
 
-    static final FileArgument ARG_DIR = new FileArgument("file/dir",
-            "delete the file or directory", true);
+  private final FileArgument ARG_DIR;
+  private final FlagArgument ARG_OPTION;
 
-    public static Help.Info HELP_INFO = new Help.Info("del",
-            "delete a file or directory", new Parameter[]{new Parameter(
-            ARG_DIR, Parameter.MANDATORY)});
 
-    public static void main(String[] args) throws Exception {
+  public DeleteCommand() {
+    super("delete files or directories");
+
+    ARG_DIR = new FileArgument("file/dir",Argument.MANDATORY, "delete the file or directory");
+    ARG_OPTION = new FlagArgument("recurcive", Argument.OPTIONAL, "recurcive deleting");
+
+    registerArguments(ARG_DIR, ARG_OPTION);
+  }
+
+  public static void main(String[] args) throws Exception {
         new DeleteCommand().execute(args);
     }
 
     public void execute(CommandLine commandLine, InputStream in,
                         PrintStream out, PrintStream err) throws Exception {
-        ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
-        File[] file_arr = ARG_DIR.getFiles(cmdLine);
+        boolean recurcive = ARG_OPTION.isSet();
+
+        File[] file_arr = ARG_DIR.getValues();
+
         boolean ok = true;
         for (File file : file_arr) {
-            boolean tmp = deleteFile(file, err);
+            boolean tmp = deleteFile(file, err, recurcive);
             ok &= tmp;
         }
+
         if (!ok) {
             exit(1);
         }
     }
 
-    private boolean deleteFile(File file, PrintStream err) throws NameNotFoundException {
-        // for this time, delete only empty directory (wait implementation of -r
-        // option)
+    private boolean deleteFile(File file, PrintStream err, boolean recurcive) throws NameNotFoundException {
         boolean deleteOk = true;
         try {
             if (!file.exists()) {
@@ -86,12 +92,19 @@ public class DeleteCommand extends AbstractCommand {
             if (file.isDirectory() && !fss.isMount(file.getAbsolutePath())) {
                 final File[] subFiles = file.listFiles();
                 for (File f : subFiles) {
-                    final String name = f.getName();
-                    if (!name.equals(".") && !name.equals("..")) {
-                        err.println("Directory is not empty " + file);
-                        deleteOk = false;
-                        break;
+                  final String name = f.getName();
+
+                  if (!name.equals(".") && !name.equals("..")) {
+                    if (!recurcive) {
+                      err.println("Directory is not empty " + file);
+                      deleteOk = false;
+                      break;
                     }
+                  }
+                  else
+                  {
+                    deleteFile(f, err, recurcive);
+                  }
                 }
             }
         } catch (Exception e) {
