@@ -288,7 +288,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                 final File shell_ini = new File(user_home + "/shell.ini");
                 try {
                     if (shell_ini.exists()) {
-                        executeFile(shell_ini);
+                        runCommandFile(shell_ini);
                     }
                 } catch (IOException ex) {
                     err.println("Error while reading " + shell_ini + ": "
@@ -411,7 +411,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         }
     }
 
-    protected void processCommand(String cmdLineStr, boolean interactive) {
+    protected int processCommand(String cmdLineStr, boolean interactive) {
         clearEof();
         if (interactive) {
             readingCommand = false;
@@ -419,16 +419,19 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             // for input completion
             applicationHistory.set(new InputHistory());
         }
+        int rc = 0;
         try {
-            interpreter.interpret(this, cmdLineStr);
+            rc = interpreter.interpret(this, cmdLineStr);
         } catch (ShellException ex) {
             err.println("Shell exception: " + ex.getMessage());
+            rc = -1;
             stackTrace(ex);
         }
 
         if (interactive) {
             applicationHistory.set(null);
         }
+        return rc;
     }
 
     /**
@@ -438,8 +441,8 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
      * @param command the command line.
      * @throws ShellException
      */
-    public void invokeCommand(String command) throws ShellException {
-        processCommand(command, false);
+    public int invokeCommand(String command) throws ShellException {
+        return processCommand(command, false);
     }
 
     /**
@@ -705,29 +708,31 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         return ShellUtils.createInvoker("default", this);
     }
 
-    public void executeFile(File file) throws IOException {
+    public int runCommandFile(File file) throws IOException {
         if (!file.exists()) {
             err.println("File does not exist: " + file);
-            return;
+            return -1;
         }
         try {
             setHistoryEnabled(false);
             final BufferedReader br = new BufferedReader(new FileReader(file));
-            for (String line = br.readLine(); line != null; line = br
-                    .readLine()) {
+            int rc = 0;
+            for (String line = br.readLine(); line != null; 
+                    line = br.readLine()) {
                 line = line.trim();
 
                 if (line.startsWith("#") || line.equals("")) {
                     continue;
                 }
                 try {
-                    invokeCommand(line);
+                    rc = invokeCommand(line);
                 } catch (ShellException ex) {
                     err.println("Shell exception: " + ex.getMessage());
                     stackTrace(ex);
                 }
             }
             br.close();
+            return rc;
         } finally {
             setHistoryEnabled(true);
         }
