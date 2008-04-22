@@ -21,6 +21,9 @@
  
 package org.jnode.shell;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.jnode.driver.console.Console;
 import org.jnode.driver.console.InputCompleter;
 import org.jnode.driver.console.InputHistory;
@@ -53,5 +56,11 @@ public interface Shell extends InputCompleter {
      * @return the console
      */
     public Console getConsole();
+    
+    /**
+     * Run a command file in the shell.
+     * @throws IOException 
+     */
+    public int runCommandFile(File file) throws IOException;
 
 }
