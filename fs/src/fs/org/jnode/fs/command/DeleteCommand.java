@@ -63,19 +63,20 @@ public class DeleteCommand extends AbstractCommand {
 
     public void execute(CommandLine commandLine, InputStream in,
                         PrintStream out, PrintStream err) throws Exception {
-        boolean recurcive = ARG_OPTION.isSet();
 
-        File[] file_arr = ARG_DIR.getValues();
+      boolean recurcive = ARG_OPTION.isSet();
 
-        boolean ok = true;
-        for (File file : file_arr) {
-            boolean tmp = deleteFile(file, err, recurcive);
-            ok &= tmp;
-        }
+      File[] file_arr = ARG_DIR.getValues();
 
-        if (!ok) {
-            exit(1);
-        }
+      boolean ok = true;
+      for (File file : file_arr) {
+          boolean tmp = deleteFile(file, err, recurcive);
+          ok &= tmp;
+      }
+
+      if (!ok) {
+          exit(1);
+      }
     }
 
     private boolean deleteFile(File file, PrintStream err, boolean recurcive) throws NameNotFoundException {
@@ -91,6 +92,7 @@ public class DeleteCommand extends AbstractCommand {
 
             if (file.isDirectory() && !fss.isMount(file.getAbsolutePath())) {
                 final File[] subFiles = file.listFiles();
+
                 for (File f : subFiles) {
                   final String name = f.getName();
 
@@ -100,10 +102,9 @@ public class DeleteCommand extends AbstractCommand {
                       deleteOk = false;
                       break;
                     }
-                  }
-                  else
-                  {
-                    deleteFile(f, err, recurcive);
+                    else {
+                      deleteFile(f, err, recurcive);
+                    }
                   }
                 }
             }
@@ -113,12 +114,16 @@ public class DeleteCommand extends AbstractCommand {
             System.err.println("Trying to delete it directly");
         }
 
+      try {
         if (deleteOk) {
             deleteOk = file.delete();
             if (!deleteOk) {
                 err.println(file + " was not deleted");
             }
         }
-        return deleteOk;
+      } catch (Exception e) {
+        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+      }
+      return deleteOk;
     }
 }
