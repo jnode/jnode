@@ -32,7 +32,7 @@ public class MuAlternation extends MuSyntax {
         
     public MuAlternation(String label, MuSyntax ... alternatives) {
         super(label);
-        if (alternatives.length < 2) {
+        if (alternatives.length < 1) {
             throw new IllegalArgumentException("too few alternatives");
         }
         this.alternatives = alternatives;
