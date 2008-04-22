@@ -35,6 +35,18 @@
     <alias name="hexdump" class="org.jnode.fs.command.HexdumpCommand"/>
   </extension>
 
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="del">
+      <sequence description="delete file or directory">
+        <optionSet>
+          <option argLabel="recurcive" shortName="r" description="delete recurcive" />
+        </optionSet>
+        <argument argLabel="file/dir"/>
+      </sequence>
+    </syntax>
+  </extension>
+
+
   <extension point="org.jnode.security.permissions">
     <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write,delete"/>
     <permission class="java.net.SocketPermission" name="*:0-" actions="connect,resolve"/>
