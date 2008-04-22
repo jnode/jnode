@@ -138,6 +138,9 @@
         </alternatives>
       </sequence>
     </syntax>
+    <syntax alias="run" description="Run a command file">
+      <argument argLabel="file"/>
+    </syntax>
     <syntax alias="set">
       <sequence description="Set a system property">
         <argument argLabel="key"/>
