@@ -45,30 +45,25 @@ public class SyntaxSpecLoader {
         int nos = element.getNosChildren();
         List<Syntax> childSyntaxes = new ArrayList<Syntax>(nos);
         for (int i = 0; i < nos; i++) {
-            childSyntaxes.add(loadSyntax(element.getChild(i), false));
+            childSyntaxes.add(doLoad(element.getChild(i)));
         }
         return new SyntaxBundle(alias, description, 
                 childSyntaxes.toArray(new Syntax[childSyntaxes.size()]));
     }
     
-    public Syntax loadSyntax(SyntaxSpecAdapter syntaxElement, boolean nullOK) 
+    private Syntax doLoad(SyntaxSpecAdapter syntaxElement) 
     throws SyntaxFailureException, IllegalArgumentException {
         String label = syntaxElement.getAttribute("label");
         String description = syntaxElement.getAttribute("description");
         String kind = syntaxElement.getName();
         if (kind.equals("empty")) {
-            if (nullOK && description == null && label == null) {
-                return null;
-            }
-            else {
-                return new EmptySyntax(label, description);
-            }
+            return new EmptySyntax(label, description);
         }
         else if (kind.equals("alternatives")) {
             int nos = syntaxElement.getNosChildren();
             Syntax[] alts = new Syntax[nos];
             for (int i = 0; i < nos; i++) {
-                alts[i] = loadSyntax(syntaxElement.getChild(i), true);
+                alts[i] = doLoad(syntaxElement.getChild(i));
             }
             return new AlternativesSyntax(label, description, alts);
         }
@@ -77,7 +72,7 @@ public class SyntaxSpecLoader {
             OptionSyntax[] options = new OptionSyntax[nos];
             for (int i = 0; i < nos; i++) {
                 try {
-                    options[i] = (OptionSyntax) loadSyntax(syntaxElement.getChild(i), false);
+                    options[i] = (OptionSyntax) doLoad(syntaxElement.getChild(i));
                 }
                 catch (ClassCastException ex) {
                     throw new SyntaxFailureException(
@@ -117,7 +112,7 @@ public class SyntaxSpecLoader {
             int nos = syntaxElement.getNosChildren();
             Syntax[] members = new Syntax[nos];
             for (int i = 0; i < nos; i++) {
-                members[i] = loadSyntax(syntaxElement.getChild(i), false);
+                members[i] = doLoad(syntaxElement.getChild(i));
             }
             return new PowersetSyntax(label, description, members);
         }
@@ -127,7 +122,7 @@ public class SyntaxSpecLoader {
             int maxCount = getCount(syntaxElement, "maxCount", Integer.MAX_VALUE);
             Syntax[] members = new Syntax[nos];
             for (int i = 0; i < nos; i++) {
-                members[i] = loadSyntax(syntaxElement.getChild(i), false);
+                members[i] = doLoad(syntaxElement.getChild(i));
             }
             Syntax childSyntax = (members.length == 1) ?
                 members[0] : new SequenceSyntax(members);
@@ -137,7 +132,7 @@ public class SyntaxSpecLoader {
             int nos = syntaxElement.getNosChildren();
             Syntax[] seq = new OptionSyntax[nos];
             for (int i = 0; i < nos; i++) {
-                seq[i] = loadSyntax(syntaxElement.getChild(i), false);
+                seq[i] = doLoad(syntaxElement.getChild(i));
             }
             return new SequenceSyntax(label, description, seq);
         }
