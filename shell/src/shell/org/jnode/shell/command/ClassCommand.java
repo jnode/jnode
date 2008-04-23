@@ -53,8 +53,14 @@ public class ClassCommand extends AbstractCommand {
             PrintStream out, PrintStream err) throws Exception {
         String className = ARG_CLASS.getValue();
         final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        final Class<?> type = cl.loadClass(className);
-        showClass(type, out);
+        try {
+            final Class<?> type = cl.loadClass(className);
+            showClass(type, out);
+        }
+        catch (ClassNotFoundException ex) {
+            err.println("Cannot find the requested class: " + className);
+            exit(1);
+        }
     }
 
     public static void main(String[] args) throws Exception {
