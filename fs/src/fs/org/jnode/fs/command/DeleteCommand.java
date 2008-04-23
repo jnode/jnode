@@ -51,8 +51,10 @@ public class DeleteCommand extends AbstractCommand {
   public DeleteCommand() {
     super("delete files or directories");
 
-    ARG_DIR = new FileArgument("file/dir",Argument.MANDATORY, "delete the file or directory");
-    ARG_OPTION = new FlagArgument("recurcive", Argument.OPTIONAL, "recurcive deleting");
+    ARG_DIR = new FileArgument("file/dir", Argument.MANDATORY, 
+            "the file or directory to be deleted");
+    ARG_OPTION = new FlagArgument("recursive", Argument.OPTIONAL,
+            "if set, any directories are deleted recursively");
 
     registerArguments(ARG_DIR, ARG_OPTION);
   }
@@ -64,13 +66,13 @@ public class DeleteCommand extends AbstractCommand {
     public void execute(CommandLine commandLine, InputStream in,
                         PrintStream out, PrintStream err) throws Exception {
 
-      boolean recurcive = ARG_OPTION.isSet();
+      boolean recursive = ARG_OPTION.isSet();
 
       File[] file_arr = ARG_DIR.getValues();
 
       boolean ok = true;
       for (File file : file_arr) {
-          boolean tmp = deleteFile(file, err, recurcive);
+          boolean tmp = deleteFile(file, err, recursive);
           ok &= tmp;
       }
 
@@ -79,7 +81,7 @@ public class DeleteCommand extends AbstractCommand {
       }
     }
 
-    private boolean deleteFile(File file, PrintStream err, boolean recurcive) throws NameNotFoundException {
+    private boolean deleteFile(File file, PrintStream err, boolean recursive) throws NameNotFoundException {
         boolean deleteOk = true;
         try {
             if (!file.exists()) {
@@ -97,13 +99,13 @@ public class DeleteCommand extends AbstractCommand {
                   final String name = f.getName();
 
                   if (!name.equals(".") && !name.equals("..")) {
-                    if (!recurcive) {
+                    if (!recursive) {
                       err.println("Directory is not empty " + file);
                       deleteOk = false;
                       break;
                     }
                     else {
-                      deleteFile(f, err, recurcive);
+                      deleteFile(f, err, recursive);
                     }
                   }
                 }

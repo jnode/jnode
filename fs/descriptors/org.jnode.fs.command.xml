@@ -37,9 +37,9 @@
 
   <extension point="org.jnode.shell.syntaxes">
     <syntax alias="del">
-      <sequence description="delete file or directory">
+      <sequence description="delete a file or directory">
         <optionSet>
-          <option argLabel="recurcive" shortName="r" description="delete recurcive" />
+          <option argLabel="recursive" shortName="r" description="recursively delete a directory's contents" />
         </optionSet>
         <argument argLabel="file/dir"/>
       </sequence>
