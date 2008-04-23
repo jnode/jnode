@@ -14,10 +14,10 @@ import org.jnode.vm.Unsafe;
 public class SoftwareCursor extends BitmapGraphics implements HardwareCursorAPI {
 	private BitmapGraphics graphics;
 	private HardwareCursorImage cursorImage;
-	private int cursorX = -1;
-	private int cursorY = -1;
 	private boolean cursorVisible = false;
 	private int[] screenBackup;
+	private Rectangle cursorArea = new Rectangle(0, 0, 0, 0);
+	private Rectangle screenArea = new Rectangle();
 	
     public SoftwareCursor(BitmapGraphics graphics) {
     	setBitmapGraphics(graphics);
@@ -27,15 +27,18 @@ public class SoftwareCursor extends BitmapGraphics implements HardwareCursorAPI 
     {
     	if(this.graphics != graphics)
     	{
+    		hideCursor();
+    		
 	        this.graphics = graphics;
-	        cursorX = Math.min(graphics.getWidth() -1, cursorX);
-	        cursorY = Math.min(graphics.getHeight() -1, cursorY);
+	        if(cursorImage != null)
+	        {
+		        int newHotspotX = (int) Math.min(graphics.getWidth() -1, cursorArea.getX() + cursorImage.getHotSpotX()); 
+		        int newHotspotY = (int) Math.min(graphics.getHeight() -1, cursorArea.getY() + cursorImage.getHotSpotY());
+		        cursorArea.setLocation(newHotspotX - cursorImage.getHotSpotX(), newHotspotY - cursorImage.getHotSpotY());
+	        }
 	        
 	        //TODO test when screen resolution is changing    		
-    		if(cursorVisible)
-    		{
-    			showCursor();
-    		}
+	        showCursor();
     	}
     }
     
@@ -166,22 +169,28 @@ public class SoftwareCursor extends BitmapGraphics implements HardwareCursorAPI 
 	}
 
 	public void setCursorImage(HardwareCursor cursor) {
+		if(cursor == null)
+		{
+			return;
+		}
+		
 		try
 		{
 			final HardwareCursorImage cursImage = cursor.getImage(16, 16); 
 	
-			if(this.cursorImage != cursImage)
+			if((cursImage != null) && (this.cursorImage != cursImage))
 			{
-				if(screenBackup == null)
-				{
-					screenBackup = new int[cursImage.getWidth() * cursImage.getHeight()];
-				}
-				else
-				{				
-					hideCursor();
-				}
+				hideCursor();
 				
-				this.cursorImage = cursImage;			
+				cursorArea.setSize(cursImage.getWidth(), cursImage.getHeight());
+				if(cursorImage != null)
+				{
+					int newX = (int) (cursorArea.getX() + cursorImage.getHotSpotX() - cursImage.getHotSpotX());
+					int newY = (int) (cursorArea.getY() + cursorImage.getHotSpotY() - cursImage.getHotSpotY());
+					cursorArea.setLocation(newX, newY);					
+				}							
+				this.cursorImage = cursImage;
+				
 				showCursor();
 			}
 		}
@@ -193,13 +202,26 @@ public class SoftwareCursor extends BitmapGraphics implements HardwareCursorAPI 
 	}
 
 	public void setCursorPosition(int x, int y) {		
+		x = Math.min(Math.max(x, 0), graphics.getWidth() - 1);
+		y = Math.min(Math.max(y, 0), graphics.getHeight() - 1);
+		
 		try
 		{
-			if((this.cursorX  != x) || (this.cursorY != y))
+			if((cursorArea.getX()  != x) || (cursorArea.getY() != y))
 			{
 				hideCursor();
-				this.cursorX = x - cursorImage.getHotSpotX();
-				this.cursorY = y - cursorImage.getHotSpotY();
+
+				if(cursorImage != null)
+				{
+					int newX = (int) (x - cursorImage.getHotSpotX());
+					int newY = (int) (y - cursorImage.getHotSpotY());
+					cursorArea.setLocation(newX, newY);
+				}
+				else
+				{
+					cursorArea.setLocation(x, y);
+				}
+				
 				showCursor();
 			}
 		}
@@ -240,8 +262,7 @@ public class SoftwareCursor extends BitmapGraphics implements HardwareCursorAPI 
 		
 		if(cursorVisible && (width > 0) && (height > 0))
 		{
-			Rectangle cursorArea = new Rectangle(cursorX, cursorY, cursorImage.getWidth(), cursorImage.getHeight());
-			Rectangle screenArea = new Rectangle(x, y, width, height);
+			screenArea.setBounds(x, y, width, height);
 			intersects = cursorArea.intersects(screenArea);
 		}
 		
@@ -250,13 +271,23 @@ public class SoftwareCursor extends BitmapGraphics implements HardwareCursorAPI 
 	
 	private void showCursor()
 	{
-		if((cursorImage != null) && (screenBackup != null))
+		if(cursorImage != null)
 		{
-//			screenBackup = graphics.doGetPixels(new Rectangle(cursorX, cursorY, cursorImage.getWidth(), cursorImage.getHeight())); 
-			int index = 0;
-			for(int y = cursorY ; y < (cursorY + cursorImage.getHeight()) ; y++)
+			if(screenBackup == null)
 			{
-				for(int x = cursorX ; x < (cursorX + cursorImage.getWidth()) ; x++)
+				screenBackup = new int[cursorImage.getWidth() * cursorImage.getHeight()];
+			}
+
+//			screenBackup = graphics.doGetPixels(new Rectangle(cursorX, cursorY, cursorImage.getWidth(), cursorImage.getHeight()));
+			final int cursorX = (int) cursorArea.getX();
+			final int cursorY = (int) cursorArea.getY();
+			final int maxY = Math.min(cursorY + cursorImage.getHeight(), graphics.getHeight());
+			final int maxX = Math.min(cursorX + cursorImage.getWidth(), graphics.getWidth());
+						
+			int index = 0;
+			for(int y = cursorY ; y < maxY ; y++)
+			{
+				for(int x = cursorX ; x < maxX ; x++)
 				{
 					screenBackup[index] = graphics.doGetPixel(x, y);
 					index++;
@@ -277,6 +308,8 @@ public class SoftwareCursor extends BitmapGraphics implements HardwareCursorAPI 
 	
 	private void putPixels(int[] pixels, int[] background)
 	{
+		final int cursorX = (int) cursorArea.getX();
+		final int cursorY = (int) cursorArea.getY();		
 		final int maxY = Math.min(cursorY + cursorImage.getHeight(), graphics.getHeight());
 		final int maxX = Math.min(cursorX + cursorImage.getWidth(), graphics.getWidth());
 		
@@ -299,11 +332,6 @@ public class SoftwareCursor extends BitmapGraphics implements HardwareCursorAPI 
 				
 				graphics.drawPixels(x, y, 1, color, Surface.PAINT_MODE);
 				index++;
-				
-				if(index >= pixels.length)
-				{
-					return;
-				}
 			}				
 		}		
 	}
