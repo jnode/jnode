@@ -337,20 +337,20 @@ public class JNodeCursors {
                     "TTTTTTTTTTTTTTTT" +
                     "TTTTTTTTTTTTTTTT" +
                     "TTTTTTTTTTTTTTTT" +
-                    "TTTBTTTTTTTTBTTT" +
-                    "TTBTTTTTTTTTTBTT" +
-                    "TBTTTTTTTTTTTTBT" +
-                    "BBBBBBBBBBBBBBBB" +
-                    "TBTTTTTTTTTTTTBT" +
-                    "TTBTTTTTTTTTTBTT" +
-                    "TTTBTTTTTTTTBTTT" +
+                    "TTTBBTTTTTTBBTTT" +
+                    "TTBWBTTTTTTBWBTT" +
+                    "TBWWBBBBBBBBWWBT" +
+                    "BWWWWWWWWWWWWWWB" +
+                    "TBWWBBBBBBBBWWBT" +
+                    "TTBWBTTTTTTBWBTT" +
+                    "TTTBBTTTTTTBBTTT" +
                     "TTTTTTTTTTTTTTTT" +
                     "TTTTTTTTTTTTTTTT" +
                     "TTTTTTTTTTTTTTTT" +
                     "TTTTTTTTTTTTTTTT" +
                     "TTTTTTTTTTTTTTTT";
 
-    private static HardwareCursorImage RESIZE_HORIZONTAL_16x16 = new HardwareCursorImage(16, 16, RESIZE_HORIZONTAL_IMAGE_16x16, 0, 0);
+    private static HardwareCursorImage RESIZE_HORIZONTAL_16x16 = new HardwareCursorImage(16, 16, RESIZE_HORIZONTAL_IMAGE_16x16, 7, 7);
 
     private static final String RESIZE_HORIZONTAL_IMAGE_20x20 =
                     "TTTTTBBTTTTTBBTTTTTT" +
