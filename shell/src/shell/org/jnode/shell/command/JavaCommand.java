@@ -76,9 +76,10 @@ public class JavaCommand extends AbstractCommand {
         JCClassLoader cl = new JCClassLoader(parent_cl, new String[]{"./"});
         
         Method mainMethod = null;
+        String className = ARG_CLASS.getValue();
         try {
             // Find (if necessary load) the class to be executed.
-            Class<?> cls = cl.loadClass(ARG_CLASS.getValue());
+            Class<?> cls = cl.loadClass(className);
             // Lookup and check the 'main' method.
             mainMethod = cls.getMethod("main", new Class[]{String[].class});
             if ((mainMethod.getModifiers() & Modifier.STATIC) == 0) {
@@ -93,7 +94,7 @@ public class JavaCommand extends AbstractCommand {
             mainMethod.invoke(null, new Object[]{mainArgs});
         }
         catch (ClassNotFoundException ex) {
-            err.println("Cannot find the supplied class: " + ARG_CLASS.getValue());
+            err.println("Cannot find the requested class: " + ARG_CLASS.getValue());
             exit(1);
         }
         catch (NoSuchMethodException ex) {
