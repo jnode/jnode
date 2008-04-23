@@ -138,6 +138,12 @@
         </alternatives>
       </sequence>
     </syntax>
+    <syntax alias="java" description="Run a Java class via its 'main' method">
+      <sequence>
+        <argument argLabel="className"/>
+        <repeat><argument argLabel="arg"/></repeat>
+      </sequence>
+    </syntax>
     <syntax alias="run" description="Run a command file">
       <argument argLabel="file"/>
     </syntax>
