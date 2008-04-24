@@ -144,6 +144,12 @@
         <repeat><argument argLabel="arg"/></repeat>
       </sequence>
     </syntax>
+    <syntax alias="kill" description="Kill a thread">
+      <sequence>
+        <repeat maxCount="1"><option argLabel="debug" longName="debug"/></repeat>
+        <argument argLabel="threadId"/>
+      </sequence>
+    </syntax>
     <syntax alias="run" description="Run a command file">
       <argument argLabel="file"/>
     </syntax>
