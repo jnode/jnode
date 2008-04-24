@@ -26,7 +26,9 @@ import java.io.PrintStream;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.syntax.*;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FlagArgument;
+import org.jnode.shell.syntax.IntegerArgument;
 
 /**
  * @author Andreas H\u00e4nel
