@@ -83,9 +83,7 @@
           <option argLabel="level" longName="level"/>
         </optionSet>
         <argument argLabel="className"/>
-        <repeat minCount="0" maxCount="1">
-          <argument argLabel="methodName"/>
-        </repeat>
+        <optional><argument argLabel="methodName"/></optional>
       </sequence>
     </syntax>
     <syntax alias="echo" description="Print the arguments">
@@ -154,12 +152,12 @@
       <empty description="print the current keyboard layout"/>
       <sequence description="change the keyboard layout">
         <argument argLabel="country"/>
-        <repeat maxCount="1">
-          <sequence>
-            <argument argLabel="language"/>
-            <repeat maxCount="1"><argument argLabel="variant"/></repeat>
-          </sequence>
-        </repeat>
+        <optional>
+          <argument argLabel="language"/>
+          <optional>
+            <argument argLabel="variant"/>
+          </optional>
+        </optional>
       </sequence>
     </syntax>
     <syntax alias="run" description="Run a command file">
