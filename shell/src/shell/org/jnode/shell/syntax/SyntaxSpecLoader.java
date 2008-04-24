@@ -136,6 +136,14 @@ public class SyntaxSpecLoader {
             }
             return new SequenceSyntax(label, description, seq);
         }
+        else if (kind.equals("optional")) {
+            int nos = syntaxElement.getNosChildren();
+            Syntax[] seq = new OptionSyntax[nos];
+            for (int i = 0; i < nos; i++) {
+                seq[i] = doLoad(syntaxElement.getChild(i));
+            }
+            return new OptionalSyntax(label, description, seq);
+        }
         else if (kind.equals("argument")) {
             String argLabel = syntaxElement.getAttribute("argLabel");
             if (argLabel == null) {
