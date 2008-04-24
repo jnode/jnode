@@ -32,40 +32,30 @@ import org.jnode.driver.input.KeyboardInterpreter;
 import org.jnode.driver.input.KeyboardInterpreterFactory;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Argument;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.Syntax;
-import org.jnode.shell.help.argument.CountryArgument;
-import org.jnode.shell.help.argument.LanguageArgument;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.CountryArgument;
+import org.jnode.shell.syntax.LanguageArgument;
+import org.jnode.shell.syntax.StringArgument;
 
 /**
  * @author Marc DENTY
- * @version Feb 2004
- * @since 0.15
+ * @author crawley@jnode.org
  */
 public class LoadkeysCommand extends AbstractCommand {
 
-    static final Argument COUNTRY = new CountryArgument("country", "country parameter");
+    private final CountryArgument ARG_COUNTRY = 
+        new CountryArgument("country", Argument.OPTIONAL, "country code");
 
-    static final Argument LANGUAGE = new LanguageArgument("language", "language parameter");
+    private final LanguageArgument ARG_LANGUAGE =
+        new LanguageArgument("language", Argument.OPTIONAL, "language parameter");
 
-    static final Argument VARIANT = new Argument("variant", "variant parameter");
-
-    static final Parameter PARAM_COUNTRY = new Parameter(COUNTRY);
-
-    static final Parameter PARAM_LANGUAGE = new Parameter(LANGUAGE, Parameter.OPTIONAL);
-
-    static final Parameter PARAM_VARIANT = new Parameter(VARIANT, Parameter.OPTIONAL);
-
-    public static Help.Info HELP_INFO = new Help.Info(
-            "loadkeys",
-            new Syntax[] { 
-            	new Syntax("Display the current keyboard layout"),
-            	new Syntax("change the current keyboard layout\n\tExample : loadkeys fr",
-            			PARAM_COUNTRY, PARAM_LANGUAGE, PARAM_VARIANT)
-				});
+    private final StringArgument ARG_VARIANT = 
+        new StringArgument("variant", Argument.OPTIONAL, "variant parameter");
+    
+    public LoadkeysCommand() {
+        super("display or change the current keyboard layout");
+        registerArguments(ARG_COUNTRY, ARG_LANGUAGE, ARG_VARIANT);
+    }
 
     public static void main(String[] args) throws Exception {
         new LoadkeysCommand().execute(args);
@@ -76,40 +66,43 @@ public class LoadkeysCommand extends AbstractCommand {
      */
     public void execute(CommandLine cmdLine, InputStream in, PrintStream out,
             PrintStream err) throws Exception {
-        final Collection<Device> kbDevs = DeviceUtils
-                .getDevicesByAPI(KeyboardAPI.class);
+        final Collection<Device> kbDevs = 
+            DeviceUtils.getDevicesByAPI(KeyboardAPI.class);
 
-        ParsedArguments args = HELP_INFO.parse(cmdLine);
+        final String country = ARG_COUNTRY.isSet() ? ARG_COUNTRY.getValue() : null;
+        
+        if (country == null) {
+            for (Device kb : kbDevs) {
+                final KeyboardAPI api = kb.getAPI(KeyboardAPI.class);
+                out.println("Current layout for keyboard " + kb.getId() + ": " +
+                        api.getKbInterpreter().getClass().getName());
+            }
+        }
+        else {
+            String language = ARG_LANGUAGE.isSet() ? ARG_LANGUAGE.getValue() : "";
+            String variant = ARG_VARIANT.isSet() ? ARG_VARIANT.getValue() : "";
+            if (language.trim().length() == 0) {
+                language = null;
+            }
+            if (variant.trim().length() == 0) {
+                variant = null;
+            }
 
-        for (Device kb : kbDevs) {
-            final KeyboardAPI api = kb.getAPI(KeyboardAPI.class);
-
-            if (!PARAM_COUNTRY.isSet(args)) {
-                out.println("layout currently loaded : "
-                        + api.getKbInterpreter().getClass().getName());
-            } else {
-                final String country = COUNTRY.getValue(args);
-                String language = LANGUAGE.getValue(args);
-                String variant = VARIANT.getValue(args);
-
-                //TODO add more validation for country and language
-                if(language != null &&
-                        !language.equals(language.toLowerCase()) &&
-                        variant == null){
-
-                    variant = language;
-                    language = null;
-                }
-
-                final KeyboardInterpreter kbInt = KeyboardInterpreterFactory
-                        .getKeyboardInterpreter(country, language, variant);
+            for (Device kb : kbDevs) {
+                final KeyboardAPI api = kb.getAPI(KeyboardAPI.class);
+                final KeyboardInterpreter kbInt = 
+                    KeyboardInterpreterFactory.getKeyboardInterpreter(
+                            country, language, variant);
                 if (kbInt != null) {
-                	api.setKbInterpreter(kbInt);
-                } else {
-                	out.println("Not found");
+                    out.println("Setting layout for keyboard " + kb.getId() + " to " +
+                        kbInt.getClass().getName());
+                    api.setKbInterpreter(kbInt);
+                } 
+                else {
+                    out.println("No suitable keyboard layout found");
+                    break;
                 }
             }
         }
-        out.println(" Done.");
     }
 }

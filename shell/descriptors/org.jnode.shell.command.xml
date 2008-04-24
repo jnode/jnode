@@ -150,6 +150,18 @@
         <argument argLabel="threadId"/>
       </sequence>
     </syntax>
+    <syntax alias="loadkeys">
+      <empty description="print the current keyboard layout"/>
+      <sequence description="change the keyboard layout">
+        <argument argLabel="country"/>
+        <repeat maxCount="1">
+          <sequence>
+            <argument argLabel="language"/>
+            <repeat maxCount="1"><argument argLabel="variant"/></repeat>
+          </sequence>
+        </repeat>
+      </sequence>
+    </syntax>
     <syntax alias="run" description="Run a command file">
       <argument argLabel="file"/>
     </syntax>
