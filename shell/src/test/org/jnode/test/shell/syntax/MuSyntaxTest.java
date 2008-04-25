@@ -100,14 +100,6 @@ public class MuSyntaxTest extends TestCase {
     
     public void testAlternationConstructor() {
         new MuAlternation(new MuSymbol("hi"), new MuSymbol("mom"));
-        try {
-            new MuAlternation(new MuSymbol("hi"));
-            fail("expected IAE");
-        }
-        catch (IllegalArgumentException ex) {
-            // expected
-        }
-
         new MuAlternation(new MuSymbol("hi"), null);
     }
     
