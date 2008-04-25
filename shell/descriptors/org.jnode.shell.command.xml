@@ -174,6 +174,7 @@
       </sequence>
     </syntax>
     <syntax alias="memory" description="Show JNode memory usage"/>
+    <syntax alias="namespace" description="Print the contents of the system namespace"/>
     <syntax alias="run" description="Run a command file">
       <argument argLabel="file"/>
     </syntax>
