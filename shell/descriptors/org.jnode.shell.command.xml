@@ -175,6 +175,12 @@
     </syntax>
     <syntax alias="memory" description="Show JNode memory usage"/>
     <syntax alias="namespace" description="Print the contents of the system namespace"/>
+    <syntax alias="onheap" description="Print heap object count and size statistics">
+      <optionSet>
+        <option argLabel="minCount" longName="minCount"/>
+        <option argLabel="minTotalSize" longName="minTotalSize"/>
+      </optionSet>
+    </syntax> 
     <syntax alias="run" description="Run a command file">
       <argument argLabel="file"/>
     </syntax>
