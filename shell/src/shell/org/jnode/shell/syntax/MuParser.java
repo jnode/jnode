@@ -248,11 +248,16 @@ public class MuParser {
                 break;
             case MuSyntax.ALTERNATION:
                 MuSyntax[] choices = ((MuAlternation) syntax).getAlternatives();
-                ChoicePoint choicePoint = new ChoicePoint(source.tell(), syntaxStack, choices);
-                backtrackStack.addFirst(choicePoint);
-                syntaxStack = new SharedStack<MuSyntax>(syntaxStack);
-                if (DEBUG) {
-                    log.debug("pushed choicePoint - " + choicePoint);
+                
+                // The test below optimizes the case where there is only one alternative.  This 
+                // avoids the non-trivial cost of creating a choicepoint, backtracking, etc.
+                if (choices.length > 1) {
+                    ChoicePoint choicePoint = new ChoicePoint(source.tell(), syntaxStack, choices);
+                    backtrackStack.addFirst(choicePoint);
+                    syntaxStack = new SharedStack<MuSyntax>(syntaxStack);
+                    if (DEBUG) {
+                        log.debug("pushed choicePoint - " + choicePoint);
+                    }
                 }
                 if (choices[0] != null) {
                     syntaxStack.addFirst(choices[0]);
