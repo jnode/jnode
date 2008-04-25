@@ -26,7 +26,6 @@ import java.io.PrintStream;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Help;
 import org.jnode.util.NumberUtils;
 
 /**
@@ -34,17 +33,19 @@ import org.jnode.util.NumberUtils;
  */
 public class MemoryCommand extends AbstractCommand
 {
-
-	public static Help.Info HELP_INFO = new Help.Info("memory", "View the current memory status");
-
 	public static void main(String[] args) throws Exception {
 		new MemoryCommand().execute(args);
 	}
+	
+	public MemoryCommand() {
+        super("shows current JNode memory usage");
+    }
 
-	/**
+    /**
 	 * Execute this command
 	 */
-	public void execute(CommandLine cmdLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
+	public void execute(CommandLine cmdLine, InputStream in, PrintStream out, PrintStream err) 
+	throws Exception {
 		final Runtime rt = Runtime.getRuntime();
 		out.println("Total memory " + NumberUtils.toBinaryByte(rt.totalMemory()));
 		out.println("Used memory  " + NumberUtils.toBinaryByte(rt.totalMemory() - rt.freeMemory()));
