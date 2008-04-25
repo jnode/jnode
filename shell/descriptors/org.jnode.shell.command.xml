@@ -160,6 +160,19 @@
         </optional>
       </sequence>
     </syntax>
+    <syntax alias="locale">
+      <empty description="print the current default Locale name"/>
+      <option argLabel="list" longName="list" shortName="l" description="list the names of the available Locales"/>
+      <sequence description="change the default Locale">
+        <argument argLabel="language"/>
+        <optional>
+          <argument argLabel="country"/>
+          <optional>
+            <argument argLabel="variant"/>
+          </optional>
+        </optional>
+      </sequence>
+    </syntax>
     <syntax alias="run" description="Run a command file">
       <argument argLabel="file"/>
     </syntax>
