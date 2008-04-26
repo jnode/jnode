@@ -29,100 +29,87 @@ import java.io.PrintStream;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.Syntax;
-import org.jnode.shell.help.argument.FileArgument;
-import org.jnode.shell.help.argument.OptionArgument;
-import org.jnode.shell.help.argument.StringArgument;
+import org.jnode.shell.syntax.*;
 
 import bsh.Interpreter;
 
 /**
  * @author Levente S\u00e1ntha
+ * @author crawley@jnode.org
  */
 public class BshCommand extends AbstractCommand {
 
-    private static final StringArgument ARG_CODE = new StringArgument("code", "a BeanShell code snippet to execute");
-    static final OptionArgument ARG_C = new OptionArgument("-c", "execute code",
-            new OptionArgument.Option("-c", "execute code"));
-    private static final Parameter PARAM_C = new Parameter(ARG_C, Parameter.MANDATORY);
-    private static final Parameter PARAM_CODE = new Parameter(ARG_CODE, Parameter.MANDATORY);
-    private static final FileArgument ARG_FILE = new FileArgument("file", "a BeanShell script file to execute");
-    static final OptionArgument ARG_F = new OptionArgument("-f", "execute file",
-            new OptionArgument.Option("-f", "execute file"));
-    private static final Parameter PARAM_F = new Parameter(ARG_F, Parameter.MANDATORY);
-    private static final Parameter PARAM_FILE = new Parameter(ARG_FILE, Parameter.MANDATORY);
-    static final OptionArgument ARG_I = new OptionArgument("-i", "go interactive",
-            new OptionArgument.Option("-i", "go interactive"));
-    private static final Parameter PARAM_INTERACTIVE = new Parameter(ARG_I, Parameter.MANDATORY);
-    public static Help.Info HELP_INFO = new Help.Info(
-            "bsh",
-            new Syntax("start the interactive BeanShell interpreter"),
-            new Syntax("invoke the BeanShell interpreter", PARAM_C, PARAM_CODE),
-            new Syntax("invoke the BeanShell interpreter", PARAM_F, PARAM_FILE),
-            new Syntax("invoke the BeanShell interpreter", PARAM_C, PARAM_CODE, PARAM_F, PARAM_FILE),
-            new Syntax("invoke the BeanShell interpreter", PARAM_INTERACTIVE, PARAM_C, PARAM_CODE),
-            new Syntax("invoke the BeanShell interpreter", PARAM_INTERACTIVE, PARAM_F, PARAM_FILE),
-            new Syntax("invoke the BeanShell interpreter", PARAM_INTERACTIVE, PARAM_C, PARAM_CODE, PARAM_F, PARAM_FILE)
-    );
+    private final StringArgument ARG_CODE = 
+        new StringArgument("code", Argument.OPTIONAL, "a BeanShell code snippet to execute");
+    private final FileArgument ARG_FILE = 
+        new FileArgument("file", Argument.OPTIONAL, "a BeanShell script file to execute");
+    private final FlagArgument FLAG_INTERACTIVE = 
+        new FlagArgument("interactive", Argument.OPTIONAL, "go interactive");
+    
+    public BshCommand() {
+        super("run the BeanShell interpreter");
+        registerArguments(ARG_CODE, ARG_FILE, FLAG_INTERACTIVE);
+    }
 
     public static void main(String[] args) throws Exception {
         new BshCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-        ParsedArguments parsedArguments = HELP_INFO.parse(commandLine);
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
+    throws Exception {
         Interpreter bsh = null;
         Object ret;
         boolean interactive = false;
 
-        if(PARAM_INTERACTIVE.isSet(parsedArguments)){
+        if (FLAG_INTERACTIVE.isSet()) {
             bsh = createInterpreter(in, out, err, true);
             interactive = true;
         }
 
-
-        if (PARAM_C.isSet(parsedArguments)){
-            if(bsh == null)
+        if (ARG_CODE.isSet()) {
+            if (bsh == null) {
                 bsh = createInterpreter(in, out, err, false);
-
-            String code = ARG_CODE.getValue(parsedArguments);
+            }
+            String code = ARG_CODE.getValue();
             ret = bsh.eval(code);
 
-            if(ret != null)
+            if (ret != null) {
                 out.println(ret);
+            }
         }
 
-
-        if(PARAM_F.isSet(parsedArguments)){
-            if(bsh == null)
+        if (ARG_FILE.isSet()){
+            if (bsh == null) {
                 bsh = createInterpreter(in, out, err, false);
+            }
 
-            String file = ARG_FILE.getValue(parsedArguments);
+            String file = ARG_FILE.getValue().toString();
             ret = bsh.source(file);
 
-            if(ret != null)
+            if (ret != null) {
                 out.println(ret);
+            }
         }
 
-        if(bsh == null){
+        if (bsh == null) {
+            // If no arguments were given, default to interactive mode.
             bsh = createInterpreter(in, out, err, true);
             interactive = true;
         }
-        
-        if(interactive)
+
+        if (interactive) {
             bsh.run();
+        }
     }
 
-    private static Interpreter createInterpreter(InputStream in, OutputStream out, OutputStream err, boolean interactive)
+    private Interpreter createInterpreter(
+            InputStream in, OutputStream out, OutputStream err, boolean interactive)
         throws Exception{
         Interpreter interpreter = new Interpreter(
                 new BufferedReader(new InputStreamReader(in)),
                 new PrintStream(out),
                 new PrintStream(err), interactive);
-        if(interactive){
+        if (interactive) {
             interpreter.eval("show();");
         }
         return interpreter;
