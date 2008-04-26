@@ -26,29 +26,35 @@ import java.io.PrintStream;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.argument.ThreadNameArgument;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FlagArgument;
+import org.jnode.shell.syntax.ThreadNameArgument;
 import org.jnode.vm.scheduler.VmThread;
 
 /**
- * Shell command to view threads or a specific thread.
+ * Shell command to print information about all threads or a specific thread.
  *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Martin Husted Hartvig (hagar@jnode.org)
+ * @author crawley@jnode.org
  */
-
 public class ThreadCommand extends AbstractCommand
 {
-	private static final ThreadNameArgument ARG_NAME = new ThreadNameArgument("threadName", "the name of the thread to view");
-	private static final Parameter PAR_NAME = new Parameter(ARG_NAME, Parameter.OPTIONAL);
+    private final static String SEPARATOR = ", ";
+    private final static String SLASH_T = "\t";
+    private final static String GROUP = "Group ";
+    private final static String TRACE = "Stack trace";
 
-	public static Help.Info HELP_INFO = new Help.Info("thread", "View all or a specific threads", new Parameter[] { PAR_NAME });
+    private final ThreadNameArgument ARG_NAME = 
+	    new ThreadNameArgument("threadName", Argument.OPTIONAL, "the name of a specific thread to be printed");
+    private final FlagArgument FLAG_GROUP_DUMP =
+        new FlagArgument("groupDump", Argument.OPTIONAL, "if set, output a ThreadGroup dump");
 
-    private final static String SEPARATOR = ", ", SLASH_T = "\t", GROUP = "Group ";
-
-
+	public ThreadCommand() {
+        super("View all or a specific threads");
+        registerArguments(ARG_NAME, FLAG_GROUP_DUMP);
+	}
+    
 	public static void main(String[] args) throws Exception {
 		new ThreadCommand().execute(args);
 	}
@@ -58,70 +64,57 @@ public class ThreadCommand extends AbstractCommand
 	 */
 	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
 	throws Exception {
-		ParsedArguments parsedArguments = HELP_INFO.parse(commandLine);
-
-		if (PAR_NAME.isSet(parsedArguments)) {
-			execute(out, ARG_NAME.getValue(parsedArguments));
-		} else {
-			execute(out, null);
-		}
-	}
-
-	public void execute(PrintStream out, String threadName) {
+	    // If threadName is null, we'll print all threads
+		String threadName = (ARG_NAME.isSet()) ? ARG_NAME.getValue() : null;
+		boolean dump = FLAG_GROUP_DUMP.isSet();
+		
+		// Find the root of the ThreadGroup tree
 		ThreadGroup grp = Thread.currentThread().getThreadGroup();
-	
 		while (grp.getParent() != null) {
 			grp = grp.getParent();
 		}
-		showGroup(grp, out, threadName);
+		
+		if (dump) {
+		    // Produce an ugly (but useful) ThreadGroup dump
+		    grp.list();
+		}
+		else {
+		    // Show the threads in the ThreadGroup tree.
+	        showThreads(grp, out, threadName);
+		}
 	}
 
-	private void showGroup(ThreadGroup grp, PrintStream out, String threadName) {
-    	if (threadName == null
-		// preserve compatible behavior when piped
-				&& out == System.out) {
-			grp.list();
-			return;
-		}
-
-		if (threadName != null) {
-			out.print(GROUP);
-			out.println(grp.getName());
+	/**
+	 * Traverse the ThreadGroups threads and its child ThreadGroups printing
+	 * information for each thread found.  If 'threadName' is non-null, only
+	 * print information for the thread that matches the name.
+	 * 
+	 * @param grp the ThreadGroup to traverse
+	 * @param out the destination for output
+	 * @param threadName if non-null, only display this thread.
+	 */
+	private void showThreads(ThreadGroup grp, PrintStream out, String threadName) {
+	    if (threadName == null) {
+			out.println(GROUP + grp.getName());
 		}
 
 		final int max = grp.activeCount() * 2;
 		final Thread[] ts = new Thread[max];
 		grp.enumerate(ts);
 
-
         for (int i = 0; i < max; i++) {
             final Thread t = ts[i];
             if (t != null) {
                 if ((threadName == null) || threadName.equals(t.getName())) {
-                    out.print(SLASH_T);
-                    StringBuilder buffer = new StringBuilder();
-
-                    buffer.append(t.getId());
-                    buffer.append(SEPARATOR);
-                    buffer.append(t.getName());
-                    buffer.append(SEPARATOR);
-                    buffer.append(t.getPriority());
-                    buffer.append(SEPARATOR);
-                    buffer.append(t.getVmThread().getThreadStateName());
-
-                    out.println(buffer.toString());
+                    out.println(SLASH_T + t.getId() + SEPARATOR + t.getName() + SEPARATOR +
+                            t.getPriority() + SEPARATOR + t.getVmThread().getThreadStateName());
                     if (threadName != null) {
                         final Object[] trace = VmThread.getStackTrace(t.getVmThread());
                         final int traceLen = trace.length;
+                        out.println(SLASH_T + SLASH_T + TRACE);
                         for (int k = 0; k < traceLen; k++) {
-                            buffer = new StringBuilder();
-                            buffer.append(SLASH_T);
-                            buffer.append(SLASH_T);
-                            buffer.append(trace[k]);
-
-                            out.println(buffer.toString());
+                            out.println(SLASH_T + SLASH_T + trace[k]);
                         }
-
                         return;
                     }
                 }
@@ -134,9 +127,8 @@ public class ThreadCommand extends AbstractCommand
 		for (int i = 0; i < gmax; i++) {
 			final ThreadGroup tg = tgs[i];
 			if (tg != null) {
-				showGroup(tg, out, threadName);
+				showThreads(tg, out, threadName);
 			}
 		}
 	}
-
 }

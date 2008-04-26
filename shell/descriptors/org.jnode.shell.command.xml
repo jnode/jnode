@@ -202,10 +202,17 @@
         <option argLabel="file" longName="load" shortName="l"/>
         <argument argLabel="alias"/>
       </sequence>
-      <sequence description="set a system property">
+      <sequence description="Set a system property">
         <option argLabel="remove" longName="remove" shortName="r"/>
         <argument argLabel="alias"/>
       </sequence>
+    </syntax>
+    <syntax alias="thread">
+      <optional description="Display all extant JNode Threads">
+        <option argLabel="groupDump" longName="groupDump" shortName="g" 
+                description="Display as a ThreadGroup dump"/>
+      </optional>
+      <argument argLabel="threadName" description="Display the named Thread"/>
     </syntax>
   </extension>
 
