@@ -18,7 +18,7 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
+
 package org.jnode.shell.command.debug;
 
 import java.io.IOException;
@@ -45,112 +45,111 @@ import org.jnode.shell.help.argument.IntegerArgument;
  */
 public class UDPOutputCommand extends AbstractCommand {
 
-  private static final InetAddressArgument ARG_ADDRESS = new InetAddressArgument(
-          "host", "connect host to the udpreceiver");
+    private static final InetAddressArgument ARG_ADDRESS =
+            new InetAddressArgument("host", "connect host to the udpreceiver");
 
-  private static final IntegerArgument ARG_PORT = new IntegerArgument(
-          "port", "port to connect on");
+    private static final IntegerArgument ARG_PORT =
+            new IntegerArgument("port", "port to connect on");
 
+    private static final Parameter PARAM_ADDRESS =
+            new Parameter(ARG_ADDRESS, Parameter.MANDATORY);
 
-  private static final Parameter PARAM_ADDRESS = new Parameter(
-          ARG_ADDRESS, Parameter.MANDATORY);
+    private static final Parameter PARAM_PORT =
+            new Parameter(ARG_PORT, Parameter.OPTIONAL);
 
-  private static final Parameter PARAM_PORT = new Parameter(
-          ARG_PORT, Parameter.OPTIONAL);
+    public static Help.Info HELP_INFO =
+            new Help.Info("udpout",
+                    "send data from System.out and System.err to remote host",
+                    new Parameter[] { PARAM_ADDRESS, PARAM_PORT });
 
-  public static Help.Info HELP_INFO = new Help.Info("udpout",
-          "send data from System.out and System.err to remote host",
-          new Parameter[] { PARAM_ADDRESS , PARAM_PORT });
+    public void execute(CommandLine commandLine, InputStream in,
+            PrintStream out, PrintStream err) throws Exception {
 
+        final ParsedArguments args = HELP_INFO.parse(commandLine);
 
-  public void execute(CommandLine commandLine, InputStream in,
-                      PrintStream out, PrintStream err) throws Exception {
+        final int port;
 
-    final ParsedArguments args = HELP_INFO.parse(commandLine);
+        if (PARAM_PORT.isSet(args)) {
+            port = ARG_PORT.getInteger(args);
+        } else {
+            port = 5612;
+        }
 
-    final int port;
+        final SocketAddress address =
+                new InetSocketAddress(ARG_ADDRESS.getAddress(args), port);
+        UDPOutputStream udpOut = new UDPOutputStream(address);
 
-    if (PARAM_PORT.isSet(args)) {
-        port = ARG_PORT.getInteger(args);
-    }
-    else
-    {
-      port = 5612;
-    }
+        DupOutputStream dupOut = new DupOutputStream(System.out, udpOut);
+        PrintStream ps = new PrintStream(dupOut);
+        System.setOut(ps);
+        System.setErr(ps);
 
-    final SocketAddress address = new InetSocketAddress(ARG_ADDRESS.getAddress(args), port);
-    UDPOutputStream udpOut = new UDPOutputStream(address);
-
-    DupOutputStream dupOut = new DupOutputStream(System.out, udpOut);
-    PrintStream ps = new PrintStream(dupOut);
-    System.setOut(ps);
-    System.setErr(ps);
-
-    final Logger root = Logger.getRootLogger();
-    root.addAppender(new UDPAppender(udpOut, null));
-  }
-
-  static class DupOutputStream extends OutputStream {
-
-    private final OutputStream os1;
-    private final OutputStream os2;
-
-    public DupOutputStream(OutputStream os1, OutputStream os2) {
-      this.os1 = os1;
-      this.os2 = os2;
+        final Logger root = Logger.getRootLogger();
+        root.addAppender(new UDPAppender(udpOut, null));
     }
 
-      /**
-     * @see java.io.OutputStream#close()
-     * @throws IOException
-       */
-    public void close() throws IOException {
-      os1.close();
-      os2.close();
-    }
+    static class DupOutputStream extends OutputStream {
 
-    /**
-     * @see java.io.OutputStream#flush()
-     * @throws IOException
-     */
-    public void flush() throws IOException {
-      os1.flush();
-      os2.flush();
-    }
+        private final OutputStream os1;
+        private final OutputStream os2;
 
-    /**
-     * @param b
-     * @param off
-     * @param len
-     * @see java.io.OutputStream#write(byte[], int, int)
-     * @throws IOException
-     * @throws NullPointerException
-     * @throws IndexOutOfBoundsException
-     */
-    public void write(byte[] b, int off, int len) throws IOException, NullPointerException, IndexOutOfBoundsException {
-      os1.write(b, off, len);
-      os2.write(b, off, len);
-    }
+        public DupOutputStream(OutputStream os1, OutputStream os2) {
+            this.os1 = os1;
+            this.os2 = os2;
+        }
 
-    /**
-     * @param b
-     * @see java.io.OutputStream#write(byte[])
-     * @throws IOException
-     * @throws NullPointerException
-     */
-    public void write(byte[] b) throws IOException, NullPointerException {
-      os1.write(b);
-      os2.write(b);
-    }
+        /**
+         * @see java.io.OutputStream#close()
+         * @throws IOException
+         */
+        public void close() throws IOException {
+            os1.close();
+            os2.close();
+        }
 
-    /**
-     * @param b
-     * @see java.io.OutputStream#write(int)
-     * @throws IOException
-     */
-    public void write(int b) throws IOException {
-      os1.write(b);
-      os2.write(b);
+        /**
+         * @see java.io.OutputStream#flush()
+         * @throws IOException
+         */
+        public void flush() throws IOException {
+            os1.flush();
+            os2.flush();
+        }
+
+        /**
+         * @param b
+         * @param off
+         * @param len
+         * @see java.io.OutputStream#write(byte[], int, int)
+         * @throws IOException
+         * @throws NullPointerException
+         * @throws IndexOutOfBoundsException
+         */
+        public void write(byte[] b, int off, int len) throws IOException,
+                NullPointerException, IndexOutOfBoundsException {
+            os1.write(b, off, len);
+            os2.write(b, off, len);
+        }
+
+        /**
+         * @param b
+         * @see java.io.OutputStream#write(byte[])
+         * @throws IOException
+         * @throws NullPointerException
+         */
+        public void write(byte[] b) throws IOException, NullPointerException {
+            os1.write(b);
+            os2.write(b);
+        }
+
+        /**
+         * @param b
+         * @see java.io.OutputStream#write(int)
+         * @throws IOException
+         */
+        public void write(int b) throws IOException {
+            os1.write(b);
+            os2.write(b);
+        }
     }
-  }
 }
