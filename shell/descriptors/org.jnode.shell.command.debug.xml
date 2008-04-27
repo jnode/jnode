@@ -23,6 +23,14 @@
     <alias name="debug" class="org.jnode.shell.command.debug.DebugCommand"/>
   </extension>
 
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="debug">
+      <optional description="Run a JDWP listener to enable remote debugging">
+        <option argLabel="port" shortName="p" description="The port for the debugger to connect to"/>
+      </optional>
+    </syntax>
+  </extension>
+    
   <extension point="org.jnode.security.permissions">
     <permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/>
     <permission class="java.lang.RuntimePermission" name="setIO"/>
