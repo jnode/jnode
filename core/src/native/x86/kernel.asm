@@ -45,9 +45,6 @@ real_start:
 multiboot_ok:
 	; Copy the multiboot info block
 	cld
-%ifdef SETUP_VBE	
-	mov [multiboot_infos], ebx
-%endif	  
 	mov esi,ebx
 	mov edi,multiboot_info
 	mov ecx,MBI_SIZE
@@ -317,17 +314,11 @@ multiboot_mmap:
 
 %ifdef SETUP_VBE
 multiboot_vbe:
-	dd 0				; Entries
 	times (VBE_ESIZE) db 0
 	
 vbe_control_info:	
-	dd 0				; Entries
 	times (VBECTRLINFO_SIZE) db 0
 
 vbe_mode_info:	
-	dd 0				; Entries
 	times (VBEMODEINFO_SIZE) db 0
-	
-multiboot_infos:
-	dd 0	
 %endif
