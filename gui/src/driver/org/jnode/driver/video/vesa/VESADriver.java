@@ -120,15 +120,13 @@ public class VESADriver extends AbstractFrameBufferDriver implements VESAConstan
 		Unsafe.debug("\nbegin VESADriver.startDevice");
 		System.err.println("\nbegin VESADriver.startDevice");
 		try {
-			Address multibootInfos = UnsafeX86.getMultibootInfos();
-			Unsafe.debug("\nmultibootInfos="+NumberUtils.hex(multibootInfos.toInt()));
-			
 			Address vbeControlInfo = UnsafeX86.getVbeControlInfos();
 			VbeInfoBlock vbeInfoBlock = new VbeInfoBlock(vbeControlInfo);
 			if(vbeInfoBlock.isEmpty())
 			{
 				throw new DriverException("can't start device (vbeInfoBlock is empty): grub haven't switched to graphic mode");
 			}
+			Unsafe.debug("vbeInfoBlock="+vbeInfoBlock);
 			
 			Address vbeModeInfo = UnsafeX86.getVbeModeInfos();
 			ModeInfoBlock modeInfoBlock = new ModeInfoBlock(vbeModeInfo);

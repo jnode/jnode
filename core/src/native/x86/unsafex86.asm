@@ -112,16 +112,6 @@ GLABEL Q53org5jnode2vm3x869UnsafeX8623getVbeModeInfos2e2829Lorg2fvmmagic2funboxe
 %endif	
 	ret
 
-; Address getMultibootInfos();
-GLABEL Q53org5jnode2vm3x869UnsafeX8623getMultibootInfos2e2829Lorg2fvmmagic2funboxed2fAddress3b
-%ifdef SETUP_VBE
-	mov AAX,multiboot_infos
-%endif	
-%ifndef SETUP_VBE
-	mov AAX,0
-%endif	
-	ret
-
 ; void setupBootCode(Address memory, int[] gdtBase, int[] tss);
 GLABEL Q53org5jnode2vm3x869UnsafeX8623setupBootCode2e28Lorg2fvmmagic2funboxed2fAddress3b5bI5bI29V
 	push ABX

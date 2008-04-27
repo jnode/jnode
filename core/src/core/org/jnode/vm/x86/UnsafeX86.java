@@ -79,7 +79,6 @@ public final class UnsafeX86 {
     public static final native Address getVbeInfos();
     public static final native Address getVbeControlInfos();
     public static final native Address getVbeModeInfos();
-    public static final native Address getMultibootInfos();
     
     /**
      * Merge 32-bit ARGB values at the given memory address.
