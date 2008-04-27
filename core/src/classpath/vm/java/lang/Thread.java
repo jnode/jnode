@@ -333,7 +333,7 @@ public class Thread implements Runnable
             throw new InternalError("Live thread has invalid group: " + name);
         }
 
-        group.add(this);
+        group.addUnstarted();
 
         this.group = group;
         this.runnable = target;
@@ -383,7 +383,7 @@ public class Thread implements Runnable
             throw new InternalError("Live thread has invalid group: " + name);
         }
 
-        group.add(this);
+        group.addUnstarted();
 
         this.group = group;
         this.runnable = target;
@@ -415,7 +415,7 @@ public class Thread implements Runnable
             throw new InternalError("Isolate thread has invalid group: " + name);
         }
 
-        group.add(this);
+        group.addUnstarted();
 
         this.group = group;
         this.runnable = target;
@@ -445,7 +445,7 @@ public class Thread implements Runnable
         }
         this.vmThread = vmThread;
         this.group = ROOT_GROUP;
-        this.group.add(this);
+        this.group.addUnstarted();
         this.name = autoName("System");
         this.runnable = null;
         this.parent = null;
@@ -942,6 +942,7 @@ public class Thread implements Runnable
      */
     public void start()
     {
+        group.add(this);
         vmThread.start();
     }
 
