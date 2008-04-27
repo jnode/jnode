@@ -6,30 +6,40 @@ package org.jnode.shell.command.debug;
 import gnu.classpath.jdwp.JNodeSocketTransport;
 import gnu.classpath.jdwp.Jdwp;
 
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.argument.IntegerArgument;
+import java.io.InputStream;
+import java.io.PrintStream;
+
+import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.CommandLine;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.IntegerArgument;
 
 /**
- * Starts up the remote debugger under JNode.
+ * Starts up a JDWP remote debugger listener for this JNode instance.
  *
  * @author Levente S\u00e1ntha
  */
-public class DebugCommand {
+public class DebugCommand extends AbstractCommand {
     private static final int DEFAULT_PORT = 6789;
-    private static boolean up = true;
-    static final IntegerArgument ARG_PORT = new IntegerArgument("port", "the port to listen to");
+    private boolean up = true;
+    private final IntegerArgument ARG_PORT = 
+        new IntegerArgument("port", Argument.OPTIONAL, "the port to listen to");
 
-	public static Help.Info HELP_INFO = new Help.Info("debug", "Start the remote debugger server.", new Parameter(ARG_PORT, Parameter.OPTIONAL));
-
-	public static void main(String[] argv) throws Exception {
-		ParsedArguments cmdLine = HELP_INFO.parse(argv);
-
-        int port = DEFAULT_PORT;
-        if(argv.length > 0)
-            port = ARG_PORT.getInteger(cmdLine);
-
+	public DebugCommand() {
+        super("Listen for connections from a remote debugger");
+        registerArguments(ARG_PORT);
+	}
+	
+	public static void main(String[] args) throws Exception {
+	    new DebugCommand().execute(args);
+	}
+	
+	@Override
+    public void execute(CommandLine commandLine, InputStream in,
+            PrintStream out, PrintStream err) throws Exception {
+        int port = ARG_PORT.isSet() ? ARG_PORT.getValue() : DEFAULT_PORT;
+        
+        // FIXME - in the even of internal exceptions, JDWP writes to System.out.
         final String ps = "transport=dt_socket,suspend=n,address=" + port + ",server=y";
         Thread t = new Thread(new Runnable() {
             public void run() {
@@ -40,24 +50,26 @@ public class DebugCommand {
                     jdwp.waitToFinish();
                     jdwp.shutdown();
                 }
-                //workaround for the restricted capabilities of JDWP support in GNU Classpath.
+                // workaround for the restricted capabilities of JDWP support in GNU Classpath.
                 JNodeSocketTransport.ServerSocketHolder.close();
-                up = true;
             }
         });
         t.start();
 
-        while (System.in.read() != 'q') {
-            System.out.println("Type 'q' for exitting.");
+        while (in.read() != 'q') {
+            out.println("Type 'q' to exit");
         }
+        // FIXME - this just stops the 'debug' command.  The listener will keep running
+        // until the remote debugger disconnects.  We should have a way to disconnect at
+        // this end.
         down();
     }
 
-    public static synchronized boolean up() {
+    public synchronized boolean up() {
         return up;
     }
 
-    public static synchronized void down() {
+    public synchronized void down() {
         up = false;
     }
 }
