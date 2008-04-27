@@ -101,6 +101,7 @@ public class ProcletContext extends ThreadGroup {
         this.properties = properties;
         this.streams = streams;
         this.pid = extractPid(getName());
+        setDaemon(true);
     }
 
     private Closeable resolve(Closeable stream) throws ProxyStreamException {
