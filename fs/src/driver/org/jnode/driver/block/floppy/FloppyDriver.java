@@ -146,7 +146,7 @@ public class FloppyDriver extends Driver implements FSBlockDeviceAPI, RemovableD
                     if(length > 0)
                     {
                         // go to next sector only more data to read (length>0)                    
-                        chs = fp.getGeometry().NextSector(chs);
+                        chs = fp.getGeometry().nextSector(chs);
                     }
 				}
 			} catch (TimeoutException ex) {
@@ -201,7 +201,7 @@ public class FloppyDriver extends Driver implements FSBlockDeviceAPI, RemovableD
                     if(length > 0)
                     {
                         // go to next sector only more data to write (length>0)                    
-                        chs = fp.getGeometry().NextSector(chs);
+                        chs = fp.getGeometry().nextSector(chs);
                     }                    
 				}
 			} catch (TimeoutException ex) {

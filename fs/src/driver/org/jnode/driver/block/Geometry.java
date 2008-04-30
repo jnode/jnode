@@ -128,7 +128,7 @@ public class Geometry {
 	 * @return the CHS value of next sector
 	 * @throws GeometryException
 	 */
-	public CHS NextSector(CHS chsToIncrement) throws GeometryException {
+	public CHS nextSector(CHS chsToIncrement) throws GeometryException {
 
 		int s = chsToIncrement.getSector();
 		int h = chsToIncrement.getHead();

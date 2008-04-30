@@ -124,6 +124,7 @@ public class USBStorageSCSIHostDriver extends Driver implements SCSIHostControll
             // Execute INQUIRY
             try {
                 scsiDevice.inquiry();
+                scsiDevice.capacity();
             } catch (SCSIException ex) {
                 throw new DriverException("Cannot INQUIRY device", ex);
             } catch (TimeoutException ex) {
