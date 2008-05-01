@@ -29,6 +29,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ArrayBlockingQueue;
+
 import nanoxml.XMLElement;
 import nanoxml.XMLParseException;
 import org.apache.tools.ant.BuildException;
@@ -62,7 +66,7 @@ public class PluginTask extends AbstractPluginTask {
 	 * @see org.apache.tools.ant.Task#execute()
 	 * @throws BuildException
 	 */
-	public void execute() throws BuildException {
+    public void execute() throws BuildException {
 
 		if (descriptorSets.isEmpty()) {
 			throw new BuildException("At at least 1 descriptorset element");
@@ -79,21 +83,34 @@ public class PluginTask extends AbstractPluginTask {
 			throw new BuildException("todir must be a directory");
 		}
 
-        Map<String, File> descriptors = new HashMap<String, File>();
-		for (FileSet fs : descriptorSets) {
-			final DirectoryScanner ds = fs.getDirectoryScanner(getProject());
-			final String[] files = ds.getIncludedFiles();
-			for (int j = 0; j < files.length; j++) {
-				buildPlugin(descriptors, new File(ds.getBasedir(), files[j]));
-			}
-		}
-    }
+        int max_thread_count = 10;
+        int max_plugin_count = 500;
 
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(max_thread_count, max_thread_count, 60, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(max_plugin_count));
+        final Map<String, File> descriptors = new HashMap<String, File>();
+        for (FileSet fs : descriptorSets) {
+            final DirectoryScanner ds = fs.getDirectoryScanner(getProject());
+            final String[] files = ds.getIncludedFiles();
+            for (final String file : files) {
+                executor.execute(new Runnable() {
+                    public void run() {
+                        buildPlugin(descriptors, new File(ds.getBasedir(), file));
+                    }
+                });
+            }
+        }
+        executor.shutdown();
+        try {
+            executor.awaitTermination(10, TimeUnit.MINUTES);
+        } catch (InterruptedException ie) {
+            throw new RuntimeException("Building plugins interrupted");
+        }
+    }
     /**
      * 
      * @param descriptors map of fullPluginId to File descriptor 
-     * @param descriptor
-     * @throws BuildException
+     * @param descriptor the plugin descriptor XML
+     * @throws BuildException on failure
      */
 	protected void buildPlugin(Map<String, File> descriptors, File descriptor) throws BuildException {
 		final PluginDescriptor descr = readDescriptor(descriptor);
@@ -152,9 +169,9 @@ public class PluginTask extends AbstractPluginTask {
     
     /**
      * Create a manifest for the given descriptor
-     * @param descr
-     * @return
-     * @throws ManifestException 
+     * @param descr plugin descriptor object
+     * @return the manifest
+     * @throws ManifestException
      */
     protected Manifest createManifest(PluginDescriptor descr) throws ManifestException {
         Manifest mf = new Manifest();
