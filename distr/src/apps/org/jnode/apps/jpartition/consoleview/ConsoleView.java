@@ -57,7 +57,12 @@ class ConsoleView extends Component {
 
 	private void start() throws Exception
 	{
-		selectDevice();
+		if(!selectDevice())
+		{
+			println("no device to partition");
+			return;
+		}
+
 		if(!UserFacade.getInstance().getSelectedDevice().hasPartititionTable())
 		{
 			println("device has no partition table");
@@ -85,15 +90,23 @@ class ConsoleView extends Component {
 		}
 	}
 
-	private void selectDevice() throws IOException
+	private boolean selectDevice() throws IOException
 	{
-		List<Device> devices = UserFacade.getInstance().getDevices();
-		Options devicesOpt = new Options(context);
-		int choice = (int) devicesOpt.show("Select a device", devices, DeviceLabelizer.INSTANCE);
+		boolean deviceSelected = false;
 
-		String device = devices.get(choice - 1).getName();
-		UserFacade.getInstance().selectDevice(device);
-		println("device="+device);
+		List<Device> devices = UserFacade.getInstance().getDevices();
+		if((devices != null) && !devices.isEmpty())
+		{
+			Options devicesOpt = new Options(context);
+			int choice = (int) devicesOpt.show("Select a device", devices, DeviceLabelizer.INSTANCE);
+
+			String device = devices.get(choice - 1).getName();
+			UserFacade.getInstance().selectDevice(device);
+			println("device="+device);
+			deviceSelected = true;
+		}
+
+		return deviceSelected;
 	}
 
 	private void selectPartition() throws Exception

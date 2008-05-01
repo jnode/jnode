@@ -2,11 +2,16 @@ package org.jnode.apps.jpartition.model;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.naming.NameNotFoundException;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.jnode.driver.ApiNotFoundException;
+import org.jnode.driver.DeviceAPI;
 import org.jnode.driver.DeviceListener;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceUtils;
@@ -19,6 +24,24 @@ import org.jnode.partitions.PartitionTableEntry;
 import org.jnode.partitions.ibm.IBMPartitionTableEntry;
 
 public class OSFacade {
+	private static final Logger LOG = Logger.getLogger(OSFacade.class);
+
+	private static Comparator<Partition> PARTITION_COMPARATOR = new Comparator<Partition>()
+	{
+		public int compare(Partition p1, Partition p2) {
+			// we assume here that the partition doesn't intersect
+			return (int) (p1.getStart() - p2.getStart());
+		}
+	};
+
+	@SuppressWarnings("unchecked")
+	private static final Class<PartitionableBlockDeviceAPI> REQUIRED_API = PartitionableBlockDeviceAPI.class;
+
+	static
+	{
+		LOG.setLevel(Level.DEBUG);
+	}
+
 	private static final OSFacade INSTANCE;
 	static
 	{
@@ -86,7 +109,7 @@ public class OSFacade {
 			DeviceManager devMan = org.jnode.driver.DeviceUtils
 					.getDeviceManager();
 			for (org.jnode.driver.Device dev : devMan
-					.getDevicesByAPI(IDEDeviceAPI.class)) {
+					.getDevicesByAPI(REQUIRED_API)) {
 				Device device = createDevice(dev);
 				if (device != null) {
 					devices.add(device);
@@ -95,54 +118,46 @@ public class OSFacade {
 		} catch (NameNotFoundException e) {
 			throw new OSFacadeException("error in getDevices", e);
 		}
+
 		return devices;
 	}
 
 	private Device createDevice(org.jnode.driver.Device dev) throws OSFacadeException
 	{
+		LOG.debug("createDevice: wrapping device "+dev.getId());
+
 		Device device = null;
 		List<IBMPartitionTableEntry> partitions = getPartitions(dev);
 		if(partitions != null) // null if not supported
 		{
-			List<Partition> devPartitions = new ArrayList<Partition>(partitions.size());
-			Partition prevPartition = null;
+			LOG.debug("createDevice: nbPartitions="+partitions.size());
 
-			for(IBMPartitionTableEntry e : partitions)
-			{
-				IBMPartitionTableEntry pte = (IBMPartitionTableEntry) e;
-				long start = pte.getStartLba();
-				long size = pte.getNrSectors() * IDEConstants.SECTOR_SIZE;
-
-				if(pte.isEmpty())
-				{
-					if((prevPartition != null) && !prevPartition.isUsed())
-					{
-						// current and previous partitions are empty
-						prevPartition.mergeWithNextPartition(size);
-					}
-					else
-					{
-						// current partition is empty but not the previous one
-						devPartitions.add(new Partition(start, size, false));
-					}
-				}
-				else
-				{
-					// current partition is not empty
-					devPartitions.add(new Partition(start, size, true));
-				}
-			}
-
+			long devSize = 0;
 			try {
-				long devSize = dev.getAPI(IDEDeviceAPI.class).getLength();
-				device = new Device(dev.getId(), devSize, dev, devPartitions);
+				devSize = dev.getAPI(REQUIRED_API).getLength();
 			} catch (ApiNotFoundException e) {
 				throw new OSFacadeException("error in createDevice", e);
 			} catch (IOException e) {
 				throw new OSFacadeException("error in createDevice", e);
 			}
+
+			// one empty partition taking all place
+			List<Partition> devPartitions = new ArrayList<Partition>(partitions.size());
+			devPartitions.add(new Partition(0L, devSize, false));
+
+			// add used partitions
+			device = new Device(dev.getId(), devSize, dev, devPartitions);
+			for(IBMPartitionTableEntry e : partitions)
+			{
+				IBMPartitionTableEntry pte = (IBMPartitionTableEntry) e;
+
+				long start = pte.getStartLba();
+				long size = pte.getNrSectors() * IDEConstants.SECTOR_SIZE;
+				device.addPartition(start, size); // add a non-empty partition
+			}
 		}
 
+		LOG.debug("createDevice: return device="+device);
 		return device;
 	}
 
@@ -152,24 +167,26 @@ public class OSFacade {
 		List<IBMPartitionTableEntry> partitions = new ArrayList<IBMPartitionTableEntry>();
 
 		try {
-			if (dev.implementsAPI(IDEDeviceAPI.class)) {
-				if (dev.implementsAPI(PartitionableBlockDeviceAPI.class)) {
-					PartitionableBlockDeviceAPI<?> api = dev
-							.getAPI(PartitionableBlockDeviceAPI.class);
-					boolean supportedPartitions = true;
+			if (dev.implementsAPI(REQUIRED_API)) {
+				PartitionableBlockDeviceAPI<?> api = dev
+						.getAPI(REQUIRED_API);
+				boolean supportedPartitions = true;
 
-					for (PartitionTableEntry e : api.getPartitionTable()) {
-						if (!(e instanceof IBMPartitionTableEntry)) {
-							// non IBM partition tables are not handled for now
-							supportedPartitions = false;
-							break;
-						}
-
-						partitions.add((IBMPartitionTableEntry) e);
+				for (PartitionTableEntry e : api.getPartitionTable()) {
+					if (!(e instanceof IBMPartitionTableEntry)) {
+						// non IBM partition tables are not handled for now
+						supportedPartitions = false;
+						break;
 					}
 
-					supported = supportedPartitions;
+					IBMPartitionTableEntry entry = (IBMPartitionTableEntry) e;
+					if(entry.isValid() && !entry.isEmpty())
+					{
+						partitions.add(entry);
+					}
 				}
+
+				supported = supportedPartitions;
 			}
 		} catch (ApiNotFoundException e) {
 			throw new OSFacadeException("error in getPartitions", e);

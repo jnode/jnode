@@ -158,7 +158,7 @@ abstract public class AbstractTestDevice extends AbstractTest {
 		assertEquals(getStartFreeSpace(), shift, false, part1);
 
 		Partition part2 = partitions.get(getIndexFreeSpacePartition()+1);
-		Assert.assertTrue("must return the same instance as addPartition", newPart == part1);
+		Assert.assertTrue("must return the same instance as addPartition", newPart == part2);
 	}
 
 	@Test
