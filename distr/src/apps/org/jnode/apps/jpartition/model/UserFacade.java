@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jnode.apps.jpartition.ErrorReporter;
 import org.jnode.apps.jpartition.commands.CreatePartitionCommand;
@@ -26,7 +27,12 @@ import org.jnode.fs.fat.FatType;
 import org.jnode.fs.jfat.ClusterSize;
 
 public class UserFacade {
-	private static final Logger log = Logger.getLogger(UserFacade.class);
+	private static final Logger LOG = Logger.getLogger(UserFacade.class);
+
+	static
+	{
+		LOG.setLevel(Level.DEBUG);
+	}
 
 	private static final UserFacade INSTANCE = new UserFacade();
 
@@ -107,7 +113,7 @@ public class UserFacade {
 			public void errorHappened(OSFacadeException e) {
 				if(errorReporter != null)
 				{
-					errorReporter.reportError(log, UserFacade.this, e);
+					errorReporter.reportError(LOG, UserFacade.this, e);
 				}
 			}
 		};
@@ -209,7 +215,7 @@ public class UserFacade {
 		} catch (OSFacadeException e) {
 			if(errorReporter != null)
 			{
-				errorReporter.reportError(log, this, e);
+				errorReporter.reportError(LOG, this, e);
 			}
 		}
 	}

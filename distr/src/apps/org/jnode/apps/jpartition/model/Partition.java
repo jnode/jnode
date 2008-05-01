@@ -19,7 +19,7 @@ public class Partition implements Bounded {
 
 		if(size < MIN_SIZE)
 		{
-			throw new IllegalArgumentException("size must be > "+MIN_SIZE);
+			throw new IllegalArgumentException("size must be >= "+MIN_SIZE);
 		}
 	}
 
