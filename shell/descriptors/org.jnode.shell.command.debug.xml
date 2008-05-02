@@ -29,12 +29,19 @@
         <option argLabel="port" shortName="p" description="The port for the debugger to connect to"/>
       </optional>
     </syntax>
+    <syntax alias="remoteout">
+      <optionSet description="Redirect output and logging to a remote receiver">
+        <option argLabel="host" shortName="h" longName="host" description="The host for the remote receiver"/>
+        <option argLabel="port" shortName="p" longName="port" description="The port for the remote receiver"/>
+        <option argLabel="udp" shortName="u" longName="udp" description="If set use UDP, otherwise use TCP"/>
+      </optionSet>
+    </syntax>
   </extension>
     
   <extension point="org.jnode.security.permissions">
     <permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/>
     <permission class="java.lang.RuntimePermission" name="setIO"/>
-    <permission class="java.net.SocketPermission" name="*:1-" actions="resolve,listen"/>
+    <permission class="java.net.SocketPermission" name="*:1-" actions="resolve,listen,connect"/>
   </extension>
         
 </plugin>
