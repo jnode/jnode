@@ -21,6 +21,8 @@
 
 package org.jnode.shell.command.driver.console;
 
+import java.io.PrintStream;
+
 import javax.isolate.Isolate;
 import javax.isolate.IsolateStartupException;
 import javax.naming.NameNotFoundException;
@@ -121,8 +123,8 @@ public class ConsoleCommand {
 	            final ConsoleManager conMgr = sm.getCurrentShell().getConsole().getManager();
 	            TextConsole console = createConsoleWithShell(conMgr);
 	            System.setIn(console.getIn());
-	            System.setOut(console.getOut());
-	            System.setErr(console.getErr());
+	            System.setOut(new PrintStream(console.getOut()));
+	            System.setErr(new PrintStream(console.getErr()));
 			}
 			catch (Exception ex) {
 				// FIXME
@@ -149,11 +151,12 @@ public class ConsoleCommand {
         String invokerName = System.getProperty(CommandShell.INVOKER_PROPERTY_NAME, "");
         // FIXME this is a temporary hack until we decide what to do about these invokers
         if ("thread".equals(invokerName) || "default".equals(invokerName)) {
-        	console.getErr().println(
+            PrintStream err = new PrintStream(console.getErr());
+        	err.println(
         			"Warning: any commands run in this console via their main(String[]) will " +
         			"have the 'wrong' System.out and System.err.");
-        	console.getErr().println("The 'proclet' invoker should give better results.");
-        	console.getErr().println("To use it, type 'exit', run 'set jnode.invoker proclet' " +
+        	err.println("The 'proclet' invoker should give better results.");
+        	err.println("To use it, type 'exit', run 'set jnode.invoker proclet' " +
         			"in the F1 console and run 'console -n' again.");
         }
         return console;

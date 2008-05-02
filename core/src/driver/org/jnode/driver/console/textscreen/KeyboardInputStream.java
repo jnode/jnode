@@ -106,7 +106,7 @@ implements KeyboardListener, FocusListener, DeviceListener {
 	        }
 		}
 		this.console = console;
-		this.out = console.getOut();
+		this.out = new PrintStream(console.getOut());
 		this.currentLine = new Line(console);
 		this.pos = this.lim = 0;
 	}

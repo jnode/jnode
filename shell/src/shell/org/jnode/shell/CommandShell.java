@@ -91,9 +91,13 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
      */
     private static final Logger log = Logger.getLogger(CommandShell.class);
 
-    private PrintStream out;
-
-    private PrintStream err;
+    private OutputStream out;
+    
+    private OutputStream err;
+    
+    private PrintStream outPs;
+    
+    private PrintStream errPs;
 
     private InputStream in;
 
@@ -178,6 +182,8 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             console = cons;
             out = console.getOut();
             err = console.getErr();
+            outPs = new PrintStream(out);
+            errPs = new PrintStream(err);
             in = console.getIn();
             SystemInputStream.getInstance().initialize(this.in);
             cons.setCompleter(this);
@@ -197,8 +203,11 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             PrintStream out, PrintStream err) throws ShellException {
         try {
             this.console = console;
+            // FIXME ... kludging the OutputStreams.
             this.out = out;
             this.err = err;
+            this.outPs = out;
+            this.errPs = err;
             this.in = in;
             SystemInputStream.getInstance().initialize(this.in);
             // cons.setCompleter(this);
@@ -223,8 +232,8 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
     protected CommandShell(AliasManager aliasMgr, SyntaxManager syntaxMgr) {
         this.aliasMgr = aliasMgr;
         this.syntaxMgr = syntaxMgr;
-        this.err = System.err;
-        this.out = System.out;
+        this.errPs = System.err;
+        this.outPs = System.out;
         this.readingCommand = true;
         this.debugEnabled = true;
     }
@@ -271,11 +280,11 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             try {
                 if (e.startsWith(COMMAND_KEY)) {
                     final String cmd = e.substring(COMMAND_KEY.length());
-                    out.println(prompt() + cmd);
+                    outPs.println(prompt() + cmd);
                     processCommand(cmd, false);
                 }
             } catch (Throwable ex) {
-                err.println("Error while processing bootarg commands: "
+                errPs.println("Error while processing bootarg commands: "
                         + ex.getMessage());
                 stackTrace(ex);
             }
@@ -291,7 +300,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                         runCommandFile(shell_ini);
                     }
                 } catch (IOException ex) {
-                    err.println("Error while reading " + shell_ini + ": "
+                    errPs.println("Error while reading " + shell_ini + ": "
                             + ex.getMessage());
                     stackTrace(ex);
                 }
@@ -304,7 +313,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                 refreshFromProperties();
 
                 clearEof();
-                out.print(prompt());
+                outPs.print(prompt());
                 readingCommand = true;
                 String line = readInputLine().trim();
                 if (line.length() > 0) {
@@ -315,7 +324,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                     exited = true;
                 }
             } catch (Throwable ex) {
-                err.println("Uncaught exception while processing command(s): "
+                errPs.println("Uncaught exception while processing command(s): "
                         + ex.getMessage());
                 stackTrace(ex);
             }
@@ -331,7 +340,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             setCommandInvoker(System.getProperty(INVOKER_PROPERTY_NAME,
                     INITIAL_INVOKER));
         } catch (Exception ex) {
-            err.println(ex.getMessage());
+            errPs.println(ex.getMessage());
             stackTrace(ex);
             // Use the fallback invoker
             setCommandInvoker(FALLBACK_INVOKER);
@@ -340,7 +349,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             setCommandInterpreter(System.getProperty(INTERPRETER_PROPERTY_NAME,
                     INITIAL_INTERPRETER));
         } catch (Exception ex) {
-            err.println(ex.getMessage());
+            errPs.println(ex.getMessage());
             stackTrace(ex);
             // Use the fallback interpreter
             setCommandInterpreter(FALLBACK_INTERPRETER);
@@ -356,13 +365,13 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             setCommandInterpreter(System.getProperty(INTERPRETER_PROPERTY_NAME,
                     ""));
         } catch (Exception ex) {
-            err.println(ex.getMessage());
+            errPs.println(ex.getMessage());
             stackTrace(ex);
         }
         try {
             setCommandInvoker(System.getProperty(INVOKER_PROPERTY_NAME, ""));
         } catch (Exception ex) {
-            err.println(ex.getMessage());
+            errPs.println(ex.getMessage());
             stackTrace(ex);
         }
     }
@@ -371,7 +380,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             throws IllegalArgumentException {
         if (!name.equals(this.invokerName)) {
             this.invoker = ShellUtils.createInvoker(name, this);
-            err.println("Switched to " + name + " invoker");
+            errPs.println("Switched to " + name + " invoker");
             this.invokerName = name;
             System.setProperty(INVOKER_PROPERTY_NAME, name);
         }
@@ -381,7 +390,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
             throws IllegalArgumentException {
         if (!name.equals(this.interpreterName)) {
             this.interpreter = ShellUtils.createInterpreter(name);
-            err.println("Switched to " + name + " interpreter");
+            errPs.println("Switched to " + name + " interpreter");
             this.interpreterName = name;
             System.setProperty(INTERPRETER_PROPERTY_NAME, name);
         }
@@ -389,7 +398,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
 
     private void stackTrace(Throwable ex) {
         if (this.debugEnabled) {
-            ex.printStackTrace(err);
+            ex.printStackTrace(errPs);
         }
     }
 
@@ -423,7 +432,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         try {
             rc = interpreter.interpret(this, cmdLineStr);
         } catch (ShellException ex) {
-            err.println("Shell exception: " + ex.getMessage());
+            errPs.println("Shell exception: " + ex.getMessage());
             rc = -1;
             stackTrace(ex);
         }
@@ -604,13 +613,13 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                 cl.complete(completion, this);
             }
         } catch (ShellSyntaxException ex) {
-            out.println(); // next line
-            err.println("Cannot parse: " + ex.getMessage());
+            outPs.println(); // next line
+            errPs.println("Cannot parse: " + ex.getMessage());
             stackTrace(ex);
 
         } catch (CompletionException ex) {
-            out.println(); // next line
-            err.println("Problem in completer: " + ex.getMessage());
+            outPs.println(); // next line
+            errPs.println("Problem in completer: " + ex.getMessage());
             stackTrace(ex);
         }
 
@@ -710,7 +719,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
 
     public int runCommandFile(File file) throws IOException {
         if (!file.exists()) {
-            err.println("File does not exist: " + file);
+            errPs.println("File does not exist: " + file);
             return -1;
         }
         try {
@@ -727,7 +736,7 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
                 try {
                     rc = invokeCommand(line);
                 } catch (ShellException ex) {
-                    err.println("Shell exception: " + ex.getMessage());
+                    errPs.println("Shell exception: " + ex.getMessage());
                     stackTrace(ex);
                 }
             }
@@ -786,9 +795,9 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
         if (stream == CommandLine.DEFAULT_STDIN) {
             return getInputStream();
         } else if (stream == CommandLine.DEFAULT_STDOUT) {
-            return out;
+            return outPs;
         } else if (stream == CommandLine.DEFAULT_STDERR) {
-            return err;
+            return errPs;
         } else if (stream == CommandLine.DEVNULL || stream == null) {
             return input ? new NullInputStream() : new NullOutputStream();
         } else {
@@ -829,5 +838,29 @@ public class CommandShell implements Runnable, Shell, ConsoleListener {
 
     public SyntaxManager getSyntaxManager() {
         return syntaxMgr;
+    }
+
+    public PrintStream getErr() {
+        return errPs;
+    }
+
+    @Override
+    public void addConsoleOuputRecorder(OutputStream os) {
+        // FIXME do security check
+        if (out == null || err == null) {
+            throw new UnsupportedOperationException(
+                    "Cannot intercept console output for this shell instance");
+        }
+        if (out instanceof FanoutOutputStream) {
+            ((FanoutOutputStream) out).addStream(os);
+            ((FanoutOutputStream) err).addStream(os);
+        }
+        else {
+            out = new FanoutOutputStream(true, out, os);
+            outPs = new PrintStream(out);
+            err = new FanoutOutputStream(true, err, os);
+            errPs = new PrintStream(err);
+        }
+        errPs.println("Testing");
     }
 }
