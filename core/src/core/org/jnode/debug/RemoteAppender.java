@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: UDPAppender.java 3076 2007-01-15 13:33:17Z hagar-wize $
  *
  * JNode.org
  * Copyright (C) 2003-2006 JNode.org
@@ -21,6 +21,7 @@
  
 package org.jnode.debug;
 
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
 import org.apache.log4j.Layout;
@@ -30,14 +31,14 @@ import org.apache.log4j.WriterAppender;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class UDPAppender extends WriterAppender {
+public class RemoteAppender extends WriterAppender {
 
 	public static final String LAYOUT = "%-5p [%c{1}]: %m%n";
     
     /**
 	 * Create an appender for a given outputstream
 	 */
-	public UDPAppender(UDPOutputStream out, Layout layout) {
+	public RemoteAppender(OutputStream out, Layout layout) {
 	    if (layout != null) {
 	        setLayout(layout);
 	    } else {
