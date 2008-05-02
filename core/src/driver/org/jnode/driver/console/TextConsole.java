@@ -22,6 +22,7 @@
 package org.jnode.driver.console;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
 
 /**
@@ -166,13 +167,13 @@ public interface TextConsole extends Console {
 	 * Gets the error stream of this console.
 	 * @return
 	 */
-	public PrintStream getErr();
+	public OutputStream getErr();
 	
 	/**
 	 * Gets the output stream of this console.
 	 * @return
 	 */
-	public PrintStream getOut();
+	public OutputStream getOut();
 	
 	/**
 	 * Is the cursor visible.

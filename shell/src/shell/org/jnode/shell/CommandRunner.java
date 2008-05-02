@@ -126,10 +126,10 @@ class CommandRunner implements Runnable {
             invoker.unblock();
         } catch (SyntaxErrorException ex) {
             try {
-                Help.getInfo(cmdInfo.getCommandClass()).usage(shell.getConsole().getErr());
-                shell.getConsole().getErr().println(ex.getMessage());
+                Help.getInfo(cmdInfo.getCommandClass()).usage(shell.getErr());
+                shell.getErr().println(ex.getMessage());
             } catch (HelpException e) {
-                shell.getConsole().getErr().println("Exception while trying to get the command usage");
+                shell.getErr().println("Exception while trying to get the command usage");
                 stackTrace(ex);
             }
             invoker.unblock();
@@ -137,11 +137,11 @@ class CommandRunner implements Runnable {
             setRC(ex.getStatus());
             invoker.unblock();
         } catch (Exception ex) {
-            shell.getConsole().getErr().println("Exception in command");
+            shell.getErr().println("Exception in command");
             stackTrace(ex);
             invoker.unblock();
         } catch (Throwable ex) {
-            shell.getConsole().getErr().println("Fatal error in command");
+            shell.getErr().println("Fatal error in command");
             stackTrace(ex);
             invoker.unblock();
         }
@@ -161,7 +161,7 @@ class CommandRunner implements Runnable {
 
     void stackTrace(Throwable ex) {
         if (ex != null && isDebugEnabled()) {
-            ex.printStackTrace(shell.getConsole().getErr());
+            ex.printStackTrace(shell.getErr());
         }
     }
 

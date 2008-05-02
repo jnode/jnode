@@ -21,6 +21,8 @@
  
 package org.jnode.driver.console.textscreen;
 
+import java.io.PrintStream;
+
 import javax.naming.NamingException;
 
 import org.jnode.driver.console.ConsoleException;
@@ -60,9 +62,9 @@ public class TextScreenConsolePlugin extends Plugin {
             		(ConsoleManager.CreateOptions.TEXT | 
             				ConsoleManager.CreateOptions.SCROLLABLE));
             mgr.focus(first);
-            System.setOut(first.getOut());
-            System.setErr(first.getErr());
-            first.getOut().println(VmSystem.getBootLog());
+            System.setOut(new PrintStream(first.getOut()));
+            System.setErr(new PrintStream(first.getErr()));
+            System.out.println(VmSystem.getBootLog());
         } catch (ConsoleException ex) {
             throw new PluginException(ex);
         } catch (NamingException ex) {
