@@ -32,12 +32,7 @@ import java.net.URL;
 
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.Syntax;
-import org.jnode.shell.help.argument.FileArgument;
-import org.jnode.shell.help.argument.URLArgument;
+import org.jnode.shell.syntax.*;
 
 /**
  * @author epr
@@ -47,28 +42,23 @@ import org.jnode.shell.help.argument.URLArgument;
  */
 public class CatCommand extends AbstractCommand {
 
-    static final FileArgument ARG_FILE = new FileArgument("file",
-            "the files to be concatenated", true);
+    private final FileArgument ARG_FILE = 
+        new FileArgument("file", Argument.OPTIONAL | Argument.MULTIPLE, 
+                "the files to be concatenated");
 
-    static final URLArgument ARG_URL = new URLArgument("url",
-            "the files to be concatenated", true);
+    private final URLArgument ARG_URL = 
+        new URLArgument("url", Argument.OPTIONAL | Argument.MULTIPLE, 
+                "the urls to be concatenated");
     
-    public static Help.Info HELP_INFO = new Help.Info("cat",
-            new Syntax[] {
-                new Syntax(
-                        "Fetch the argument urls and copy their contents to standard output.",
-                        new Parameter[] { 
-                                new Parameter("u", 
-                                        "selects urls rather than pathnames",
-                                        ARG_URL, Parameter.MANDATORY)}),
-                new Syntax(
-                        "Read the argument files, copying their contents to standard output.  " +
-                        "If there are no arguments, standard input is read until EOF is reached; " +
-                        "e.g. ^D when reading keyboard input.",
-                        new Parameter[] { 
-                                new Parameter(ARG_FILE, Parameter.OPTIONAL) })
-                           
-    });
+    private final FlagArgument FLAG_URLS =
+        new FlagArgument("urls", Argument.OPTIONAL, "If set, arguments will be urls");
+    
+    public CatCommand() {
+        super("Read the argument files or urls, copying their contents to standard output.  " +
+                "If there are no arguments, standard input is read until EOF is reached; " +
+                "e.g. ^D when reading keyboard input.");
+        registerArguments(ARG_FILE, ARG_URL, FLAG_URLS);
+    }
 
     private static final int BUFFER_SIZE = 1024;
 
@@ -77,10 +67,10 @@ public class CatCommand extends AbstractCommand {
         new CatCommand().execute(args);
     }
 
-    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-        ParsedArguments args = HELP_INFO.parse(commandLine);
-        File[] files = ARG_FILE.getFiles(args);
-        String[] urls = ARG_URL.getValues(args);
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
+    throws Exception {
+        File[] files = ARG_FILE.getValues();
+        String[] urls = ARG_URL.getValues();
         boolean ok = true;
         try {
             if (urls != null && urls.length > 0) {
