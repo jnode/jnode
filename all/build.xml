@@ -721,13 +721,14 @@ clean             Remove all intermediate build results.
             </cp-compare>
         </target>
 
-	<!-- add annotations to compiled openjdk classes -->
-    <target name="openjdk-annotate" depends="assemble-projects">
+    <target name="openjdk-annotate" depends="assemble-projects" 
+    				description="add annotations to compiled openjdk classes">
     	<echo message="openjdk-annotate"/>
         <taskdef name="oj-annotate" classname="org.jnode.ant.taskdefs.AnnotateTask" 
         		classpathref="cp-jnode"/>
 
         <oj-annotate annotationFile="${root.dir}/all/conf/openjdk-annotations.properties"
+        			 timestampFile="${build.dir}/timestamps.properties"
         		trace="false" failonerror="true">
             <fileset dir="${root.dir}/core/build/classes">
                 <patternset includes="**/*.class"/>
