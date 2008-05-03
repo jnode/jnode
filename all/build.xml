@@ -180,8 +180,9 @@
     	<!-- Initialize timestamp -->
         <tstamp/>
         
+    	<property name="hotswap.class.tstamp.pattern" value="MM/dd/yyyy kk:mm:ss"/>
         <tstamp>
-            <format property="hotswap.class.tstamp" pattern="MM/dd/yyyy kk:mm:ss" />
+            <format property="hotswap.class.tstamp" pattern="${hotswap.class.tstamp.pattern}" />
         </tstamp>
 
 
@@ -728,8 +729,8 @@ clean             Remove all intermediate build results.
         		classpathref="cp-jnode"/>
 
         <oj-annotate annotationFile="${root.dir}/all/conf/openjdk-annotations.properties"
-        			 timestampFile="${build.dir}/timestamps.properties"
-        		trace="false" failonerror="true">
+        			 buildStartTime="${hotswap.class.tstamp}" pattern="${hotswap.class.tstamp.pattern}"
+        			 trace="false" failonerror="true">
             <fileset dir="${root.dir}/core/build/classes">
                 <patternset includes="**/*.class"/>
             </fileset>        	
