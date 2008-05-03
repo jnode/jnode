@@ -27,6 +27,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -63,22 +64,25 @@ public class AnnotateTask extends FileSetTask {
 	private static final String MAGICPERMISSION_TYPE_DESC = Type.getDescriptor(MagicPermission.class);
 
 	private File annotationFile;
-	private File timestampFile;
 	private String[] classesFiles;
-	private Properties timestamps = new Properties();
+	
+	private String buildStartTime = "";
+	private String pattern = "";
+	private long startTime = 0;
+	
 	private Properties annotations = new Properties();
 
 	protected void doExecute() throws BuildException {
-		try
-		{
-			if(readProperties())
-			{
-				processFiles();
-			}
+		try {
+			SimpleDateFormat format = new SimpleDateFormat(pattern);
+			startTime = format.parse(buildStartTime).getTime();
+		} catch (Exception e) {
+			throw new BuildException("invalid buildStartTime or pattern", e);
 		}
-		finally
+		
+		if(readProperties())
 		{
-			saveTimestamps();
+			processFiles();
 		}
 	}
 
@@ -89,44 +93,23 @@ public class AnnotateTask extends FileSetTask {
 	public final void setAnnotationFile(File annotationFile) {
 		this.annotationFile = annotationFile;
 	}
+	
+	/**
+	 * Define the time at which build started
+	 * @param annotationFile
+	 */
+	public final void setBuildStartTime(String buildStartTime) {
+		this.buildStartTime = buildStartTime;
+	}
 
 	/**
-	 * Defines the timestamp property file that is used to know if a class file 
-	 * has been recompiled since the annotation has been added 
-	 * (in such case, the annotation is lost and must be added again) 
-	 * 
-	 * @param timestampFile
+	 * Define the pattern with which buildStartTime is defined
+	 * @param annotationFile
 	 */
-	public final void setTimestampFile(File timestampFile) {
-		this.timestampFile = timestampFile;
+	public final void setPattern(String pattern) {
+		this.pattern = pattern;
 	}
-	
-	/**
-	 * Save the new timestamps in a property file 
-	 */
-	private void saveTimestamps()
-	{
-		FileOutputStream fos = null;
-		try
-		{
-			fos = new FileOutputStream(timestampFile);
-			timestamps.store(fos, "Here are the timestamps for classes with added annotations");
-		} catch (IOException e) {
-			throw new BuildException(e);
-		}
-		finally
-		{
-			if(fos != null)
-			{
-				try {
-					fos.close();
-				} catch (IOException e) {
-					throw new BuildException(e);
-				}
-			}
-		}
-	}
-	
+
 	/**
 	 * Read the properties file. For now, it simply contains a list of
 	 * classes that need the SharedStatics annotation.
@@ -136,8 +119,6 @@ public class AnnotateTask extends FileSetTask {
 	 */
 	private boolean readProperties() throws BuildException
 	{
-		readProperties("timestampFile", timestampFile, timestamps);
-		
 		readProperties("annotationFile", annotationFile, annotations);		
 		if(annotations.isEmpty())
 		{
@@ -229,9 +210,8 @@ public class AnnotateTask extends FileSetTask {
 		{
 			return;
 		}
-
-		long timestamp = Long.valueOf(timestamps.getProperty(classFile.getName(), "0")).longValue();
-		if(classFile.lastModified() <= timestamp)
+		
+		if(classFile.lastModified() < startTime)
 		{
 			System.out.println("Skipping already annotated file "+classFile.getName());
 			return;
@@ -273,8 +253,6 @@ public class AnnotateTask extends FileSetTask {
 				throw new IOException("can't rename "+tmpFile.getAbsolutePath());
 			}
 		}
-		
-		timestamps.setProperty(classFile.getName(), Long.toString(classFile.lastModified()));			
 	}
 
 	/**
