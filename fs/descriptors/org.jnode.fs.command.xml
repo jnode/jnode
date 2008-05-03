@@ -36,6 +36,18 @@
   </extension>
 
   <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="cat">
+      <empty description="copy standard input to standard output"/>
+      <sequence description="concatenate urls to standard output">
+        <option argLabel="urls" shortName="u" longName="urls"/>
+        <repeat minCount="1">
+          <argument argLabel="url"/>
+        </repeat>
+      </sequence>
+      <repeat minCount="1" description="concatenate files to standard output">
+        <argument argLabel="file"/>
+      </repeat>
+    </syntax>
     <syntax alias="del">
       <sequence description="delete a file or directory">
         <optionSet>
