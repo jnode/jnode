@@ -21,34 +21,40 @@
 
 package org.jnode.shell.command.driver.console;
 
-import javax.naming.NameNotFoundException;
+import java.io.InputStream;
+import java.io.PrintStream;
 
 import org.jnode.driver.console.TextConsole;
-import org.jnode.naming.InitialNaming;
-import org.jnode.shell.ShellException;
-import org.jnode.shell.ShellManager;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.Syntax;
+import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.CommandLine;
+import org.jnode.shell.Shell;
+import org.jnode.shell.ShellUtils;
 
 /**
+ * This command clears the console.
+ * 
  * @author Jacob Kofod
  */
-public class ClearConsoleCommand {
+public class ClearConsoleCommand extends AbstractCommand {
 
-    public static Help.Info HELP_INFO = 
-        new Help.Info("clear", new Syntax[] { new Syntax("Clear console screen", new Parameter[] {}), }
-        );
+    public ClearConsoleCommand() {
+        super("Clear console screen");
+    }
 
     /**
      * Clear console screen
      * 
      * @param args no arguments.
      */
-    public static void main(String[] args) 
-    throws NameNotFoundException, ShellException {
-        final ShellManager sm = InitialNaming.lookup(ShellManager.NAME);
-        TextConsole tc = (TextConsole) sm.getCurrentShell().getConsole();
+    public static void main(String[] args) throws Exception {
+        new ClearConsoleCommand().execute(args);
+    }
+    
+    @Override
+    public void execute(CommandLine commandLine, InputStream in,
+            PrintStream out, PrintStream err) throws Exception {
+        final Shell shell = ShellUtils.getCurrentShell();
+        TextConsole tc = (TextConsole) shell.getConsole();
         tc.clear();
         tc.setCursor(0, 0);
     }
