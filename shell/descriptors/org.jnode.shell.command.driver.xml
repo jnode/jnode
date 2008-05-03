@@ -22,6 +22,17 @@
     <alias name="device" class="org.jnode.shell.command.driver.DeviceCommand"/>
   </extension>
   
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="device">
+      <empty description="Show all devices"/>
+      <argument argLabel="device" description="Show a specific device"/>
+      <sequence description="Perform an action on a device">
+        <argument argLabel="action"/>
+        <argument argLabel="device"/>
+      </sequence>
+    </syntax>
+  </extension>
+  
   <extension point="org.jnode.security.permissions">
     <permission class="java.util.PropertyPermission" name="user.dir" actions="read"/>
   </extension>       
