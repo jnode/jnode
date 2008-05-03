@@ -38,7 +38,9 @@ import org.jnode.driver.DriverException;
 import org.jnode.naming.InitialNaming;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.syntax.*;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.DeviceArgument;
+import org.jnode.shell.syntax.EnumArgument;
 
 /**
  * @author epr
