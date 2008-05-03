@@ -157,6 +157,17 @@
     </patternset>
 
     <target name="prepare">
+    	<!-- Fail on a Windows platform if there are spaces in the root dir's pathname.  It will
+    	     lead to mkisofs dying with a misleading error message.  bluebit / crawley 2008-05-03 -->
+    	<fail message="Cannot build JNode from a directory with spaces in the pathname.">
+    	  <condition>
+    	    <and>
+    	      <contains string="${os.name}" substring="windows" casesensitive="false" />
+    	      <contains string="${root.dir}" substring=" " casesensitive="false" />
+    	    </and>
+    	  </condition>
+    	</fail>
+    	
         <!-- Initialize all project directories -->
         <property file="${root.dir}/jnode.properties"/>
         <!-- Set overwritable properties -->
