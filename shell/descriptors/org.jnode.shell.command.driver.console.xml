@@ -22,6 +22,12 @@
     <alias name="console" class="org.jnode.shell.command.driver.console.ConsoleCommand"/>
     <alias name="clear" class="org.jnode.shell.command.driver.console.ClearConsoleCommand"/>
   </extension>
+  
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="clear">
+      <empty description="Clear the console"/>
+    </syntax>
+  </extension>
 
   <extension point="org.jnode.security.permissions">
     <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
