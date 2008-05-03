@@ -22,6 +22,7 @@
 package org.jnode.log4j.config;
 
 import java.awt.event.KeyEvent;
+import java.io.PrintStream;
 import java.util.Enumeration;
 
 import javax.naming.NameNotFoundException;
@@ -74,7 +75,7 @@ public class Log4jConfigurePlugin extends Plugin {
 			console.setAcceleratorKeyCode(KeyEvent.VK_F7);
 			final VirtualConsoleAppender debugApp = new VirtualConsoleAppender(console, new PatternLayout(LAYOUT));
 			debugApp.setThreshold(Level.DEBUG);
-			BootLog.setDebugOut(console.getOut());
+			BootLog.setDebugOut(new PrintStream(console.getOut()));
 
     		final ConsoleAppender infoApp = new ConsoleAppender(new PatternLayout(LAYOUT));
     		infoApp.setThreshold(Level.INFO);
