@@ -21,6 +21,7 @@
 
 package org.jnode.shell.command.driver.console;
 
+import java.io.InputStream;
 import java.io.PrintStream;
 
 import javax.isolate.Isolate;
@@ -30,83 +31,80 @@ import javax.naming.NameNotFoundException;
 import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.TextConsole;
 import org.jnode.naming.InitialNaming;
+import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.CommandLine;
 import org.jnode.shell.CommandShell;
 import org.jnode.shell.ShellException;
 import org.jnode.shell.ShellManager;
-import org.jnode.shell.help.Argument;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.Syntax;
+import org.jnode.shell.syntax.*;
 
 /**
+ * ConsoleCommand starts a new console.
+ * 
  * @author vali
+ * @author crawley@jnode.org
  */
-public class ConsoleCommand {
+public class ConsoleCommand extends AbstractCommand {
 
-    private static Parameter ListParameter = new Parameter(new Argument("-l",
-            "list all registered consoles", false), Parameter.OPTIONAL);
+    private final FlagArgument FLAG_LIST = 
+        new FlagArgument("list", Argument.OPTIONAL, 
+            "if set, list all registered consoles");
+    
+    private final FlagArgument FLAG_NEW = 
+        new FlagArgument("new", Argument.OPTIONAL, 
+            "if set, create a new console");
 
-    private static Parameter NewUserConsoleParameter = new Parameter(
-            new Argument("-n", "create new Shell Console", false),
-            Parameter.OPTIONAL);
+    private final FlagArgument FLAG_ISOLATED = 
+        new FlagArgument("isolated", Argument.OPTIONAL, 
+            "if set, create the new console in an isolate");
+    
+    private final FlagArgument FLAG_TEST = 
+        new FlagArgument("test", Argument.OPTIONAL, 
+            "if set, create a raw text console (test)");
 
-    private static Parameter IsolateNewConsoleParameter = new Parameter(
-            new Argument("-i", "Isolate new Shell Console", false),
-            Parameter.OPTIONAL);
+    public ConsoleCommand() {
+        super("Console administration");
+        registerArguments(FLAG_ISOLATED, FLAG_LIST, FLAG_NEW, FLAG_TEST);
+    }
 
-    public static Help.Info HELP_INFO = new Help.Info("console",
-            new Syntax[] { new Syntax("Console administration",
-                    new Parameter[] { ListParameter, NewUserConsoleParameter,
-                            IsolateNewConsoleParameter }), });
+    public static void main(String[] args) throws Exception {
+        new ConsoleCommand().execute(args);
+    }
 
-    /**
-     * Displays the system date
-     * 
-     * @param args
-     *            No arguments.
-     */
-    public static void main(String[] args) throws NameNotFoundException,
-            ShellException {
+    @Override
+    public void execute(CommandLine commandLine, InputStream in,
+            PrintStream out, PrintStream err) 
+    throws NameNotFoundException, IsolateStartupException, ShellException {
 
         final ShellManager sm = InitialNaming.lookup(ShellManager.NAME);
         final ConsoleManager conMgr = sm.getCurrentShell().getConsole().getManager();
         
-        boolean listConsoles = false;
-        boolean newConsole = false;
-        boolean isolateNewConsole = false;
-        
-        System.out.print("args: ");
-        for (String arg : args) {
-            System.out.print(arg);
-            if (arg.equals("-l")) {
-                listConsoles = true;
-            } else if (arg.equals("-n")) {
-                newConsole = true;
-            } else if (arg.equals("-i")) {
-                isolateNewConsole = true;
-            }
-        }
-        System.out.println();
+        boolean listConsoles = FLAG_LIST.isSet();
+        boolean newConsole = FLAG_NEW.isSet();
+        boolean isolateNewConsole = FLAG_ISOLATED.isSet();
+        boolean test = FLAG_TEST.isSet();
         
         if (listConsoles) {
             conMgr.printConsoles(System.out);
-        } else if (newConsole) {
+        } 
+        else if (newConsole) {
             if (isolateNewConsole) {
                 try {
                     Isolate newIsolate = new Isolate(
                     		ConsoleCommand.IsolatedConsole.class.getName(), 
                     		new String[0]);
                     newIsolate.start();
-                    System.out.println("Started new isolated console");
+                    out.println("Started new isolated console");
                 } catch (IsolateStartupException ex) {
-                    System.out.println("Failed to start new isolated console");
-                    ex.printStackTrace(System.err);
+                    out.println("Failed to start new isolated console");
+                    throw ex;
                 }
             } else {
-            	createConsoleWithShell(conMgr);
+            	createConsoleWithShell(conMgr, out);
             }
-        } else {
-            System.out.println("test RawTextConsole");
+        } 
+        else if (test) {
+            out.println("test RawTextConsole");
             final TextConsole console = (TextConsole) conMgr.createConsole(
                     null, ConsoleManager.CreateOptions.TEXT | ConsoleManager.CreateOptions.NO_LINE_EDITTING);
             conMgr.registerConsole(console);
@@ -116,12 +114,15 @@ public class ConsoleCommand {
     }
     
     private static class IsolatedConsole {
-
+        /**
+         * This will be the entry point for the isolate.
+         * @param args
+         */
 		public static void main(String[] args) {
 			try {
 			    final ShellManager sm = InitialNaming.lookup(ShellManager.NAME);
 	            final ConsoleManager conMgr = sm.getCurrentShell().getConsole().getManager();
-	            TextConsole console = createConsoleWithShell(conMgr);
+	            TextConsole console = createConsoleWithShell(conMgr, System.out);
 	            System.setIn(console.getIn());
 	            System.setOut(new PrintStream(console.getOut()));
 	            System.setErr(new PrintStream(console.getErr()));
@@ -134,16 +135,14 @@ public class ConsoleCommand {
 		}
     }
     
-    private static TextConsole createConsoleWithShell(final ConsoleManager conMgr) 
+    private static TextConsole createConsoleWithShell(final ConsoleManager conMgr, PrintStream out) 
     throws ShellException {
-    	final TextConsole console = (TextConsole) conMgr.createConsole(
-                null, ConsoleManager.CreateOptions.TEXT
-                | ConsoleManager.CreateOptions.SCROLLABLE);
+    	final TextConsole console = (TextConsole) conMgr.createConsole(null,
+                ConsoleManager.CreateOptions.TEXT | ConsoleManager.CreateOptions.SCROLLABLE);
         CommandShell commandShell = new CommandShell(console);
         new Thread(commandShell, "command-shell").start();
         
-        System.out.println("New console created with name: "
-                + console.getConsoleName());
+        out.println("New console created with name: " + console.getConsoleName());
         
         // FIXME we shouldn't be setting the invoker (and interpreter) via the System Properties
         // object because it is "global" in some operation modes, and we want to be able to 

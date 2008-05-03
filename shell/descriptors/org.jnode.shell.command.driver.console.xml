@@ -27,6 +27,14 @@
     <syntax alias="clear">
       <empty description="Clear the console"/>
     </syntax>
+    <syntax alias="console">
+      <option argLabel="list" shortName="l" longName="list" description="List the registered consoles"/>
+      <sequence description="Start a new console">
+        <option argLabel="new" shortName="n" longName="new"/>
+        <optional><option argLabel="isolated" shortName="i" longName="isolated"/></optional>
+      </sequence>
+      <option argLabel="test" shortName="t" longName="test" description="Start a raw text console (test)"/>
+    </syntax>
   </extension>
 
   <extension point="org.jnode.security.permissions">
