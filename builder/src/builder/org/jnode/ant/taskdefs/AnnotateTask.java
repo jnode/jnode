@@ -27,15 +27,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Properties;
+import java.util.HashMap;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Map;
+import java.util.Properties;
 
 import org.apache.tools.ant.BuildException;
-import java.util.StringTokenizer;
-
 import org.jnode.vm.annotation.MagicPermission;
 import org.jnode.vm.annotation.SharedStatics;
 import org.objectweb.asm.Attribute;
@@ -52,10 +52,10 @@ import org.objectweb.asm.util.TraceClassVisitor;
 /**
  * That ant task will add some annotations to some compiled classes
  * mentioned in a property file.
- * For now, it's only necessary to add SharedStatics annotations to some 
+ * For now, it's only necessary to add annotations to some 
  * openjdk classes to avoid modifying the original source code.
  *   
- * @author Fabien DUMINY (fduminy at jnode.org)
+ * @author Fabien DUMINY (fduminy at jnode dot org)
  *
  */
 public class AnnotateTask extends FileSetTask {
@@ -63,24 +63,70 @@ public class AnnotateTask extends FileSetTask {
 	private static final String MAGICPERMISSION_TYPE_DESC = Type.getDescriptor(MagicPermission.class);
 
 	private File annotationFile;
+	private File timestampFile;
 	private String[] classesFiles;
-	private Properties properties;
+	private Properties timestamps = new Properties();
+	private Properties annotations = new Properties();
 
 	protected void doExecute() throws BuildException {
-		if(readProperties(annotationFile))
+		try
 		{
-			processFiles();
+			if(readProperties())
+			{
+				processFiles();
+			}
+		}
+		finally
+		{
+			saveTimestamps();
 		}
 	}
 
-	public final File getAnnotationFile() {
-		return annotationFile;
-	}
-
+	/**
+	 * Defines the annotation property file where are specified annotations to add
+	 * @param annotationFile
+	 */
 	public final void setAnnotationFile(File annotationFile) {
 		this.annotationFile = annotationFile;
 	}
 
+	/**
+	 * Defines the timestamp property file that is used to know if a class file 
+	 * has been recompiled since the annotation has been added 
+	 * (in such case, the annotation is lost and must be added again) 
+	 * 
+	 * @param timestampFile
+	 */
+	public final void setTimestampFile(File timestampFile) {
+		this.timestampFile = timestampFile;
+	}
+	
+	/**
+	 * Save the new timestamps in a property file 
+	 */
+	private void saveTimestamps()
+	{
+		FileOutputStream fos = null;
+		try
+		{
+			fos = new FileOutputStream(timestampFile);
+			timestamps.store(fos, "Here are the timestamps for classes with added annotations");
+		} catch (IOException e) {
+			throw new BuildException(e);
+		}
+		finally
+		{
+			if(fos != null)
+			{
+				try {
+					fos.close();
+				} catch (IOException e) {
+					throw new BuildException(e);
+				}
+			}
+		}
+	}
+	
 	/**
 	 * Read the properties file. For now, it simply contains a list of
 	 * classes that need the SharedStatics annotation.
@@ -88,14 +134,48 @@ public class AnnotateTask extends FileSetTask {
 	 * @return
 	 * @throws BuildException
 	 */
-	private boolean readProperties(File file) throws BuildException
+	private boolean readProperties() throws BuildException
+	{
+		readProperties("timestampFile", timestampFile, timestamps);
+		
+		readProperties("annotationFile", annotationFile, annotations);		
+		if(annotations.isEmpty())
+		{
+			System.err.println("WARNING: annotationFile is empty (or doesn't exist)");
+			return false;
+		}
+
+		classesFiles = (String[]) annotations.keySet().toArray(new String[annotations.size()]);
+
+		// we must sort the classes in reverse order so that
+		// classes with longest package name will be used first
+		// (that is only necessary for classes whose name is the same
+		// but package is different ; typical such class name : "Constants")
+		Arrays.sort(classesFiles, Collections.reverseOrder());
+
+		return true;
+	}
+	
+	/**
+	 * Generic method that read properties from a given file.
+	 * 
+	 * @param name
+	 * @param file
+	 * @param properties
+	 * @throws BuildException
+	 */
+	private void readProperties(String name, File file, Properties properties) throws BuildException
 	{
 		if(file == null)
 		{
-			throw new BuildException("annotationFile is mandatory");
+			throw new BuildException(name + " is mandatory");
+		}
+		
+		if(!file.exists())
+		{
+			return;
 		}
 
-		properties = new Properties();
 		FileInputStream fis = null;
 		try
 		{
@@ -115,32 +195,23 @@ public class AnnotateTask extends FileSetTask {
 				}
 			}
 		}
-		if(properties.isEmpty())
-		{
-			System.err.println("WARNING: annotationFile is empty");
-			return false;
-		}
+	}	
 
-		classesFiles = (String[]) properties.keySet().toArray(new String[properties.size()]);
-
-		// we must sort the classes in reverse order so that
-		// classes with longest package name will be used first
-		// (that is only necessary for classes whose name is the same
-		// but package is different ; typical such class name : "Constants")
-		Arrays.sort(classesFiles, Collections.reverseOrder());
-
-		return true;
-	}
-
-	private String getAnnotations(File file)
+	/**
+	 * Get the list of annotations for the given class file.
+	 * 
+	 * @param classFile list of annotations with ',' as separator. null if no annotation for that class.
+	 * @return
+	 */
+	private String getAnnotations(File classFile)
 	{
 		String annotations = null;
-		String filePath = file.getAbsolutePath();
+		String classFilePath = classFile.getAbsolutePath();
 		for(String f : classesFiles)
 		{
-			if(filePath.endsWith(f))
+			if(classFilePath.endsWith(f))
 			{
-				annotations = properties.getProperty(f);
+				annotations = this.annotations.getProperty(f);
 				break;
 			}
 		}
@@ -148,22 +219,32 @@ public class AnnotateTask extends FileSetTask {
 		return annotations;
 	}
 
+	/**
+	 * Actually process a class file (called from parent class)
+	 */
 	@Override
-	protected void processFile(File file) throws IOException {
-		String annotations = getAnnotations(file);
+	protected void processFile(File classFile) throws IOException {
+		String annotations = getAnnotations(classFile);
 		if(annotations == null)
 		{
 			return;
 		}
 
-		File tmpFile = new File(file.getParentFile(), file.getName()+".tmp");
+		long timestamp = Long.valueOf(timestamps.getProperty(classFile.getName(), "0")).longValue();
+		if(classFile.lastModified() <= timestamp)
+		{
+			System.out.println("Skipping already annotated file "+classFile.getName());
+			return;
+		}
+		
+		File tmpFile = new File(classFile.getParentFile(), classFile.getName()+".tmp");
 		FileInputStream fis = null;
 		boolean classIsModified = false;
 
 		try
 		{
-			fis = new FileInputStream(file);
-			classIsModified = addAnnotation(file.getName(), fis, tmpFile, annotations);
+			fis = new FileInputStream(classFile);
+			classIsModified = addAnnotation(classFile, fis, tmpFile, annotations);
 		}
 		finally
 		{
@@ -177,21 +258,23 @@ public class AnnotateTask extends FileSetTask {
 		{
 			if(trace)
 			{
-				traceClass(file, "before");
+				traceClass(classFile, "before");
 
 				traceClass(tmpFile, "after");
 			}
 
-			if(!file.delete())
+			if(!classFile.delete())
 			{
-				throw new IOException("can't delete "+file.getAbsolutePath());
+				throw new IOException("can't delete "+classFile.getAbsolutePath());
 			}
 
-			if(!tmpFile.renameTo(file))
+			if(!tmpFile.renameTo(classFile))
 			{
 				throw new IOException("can't rename "+tmpFile.getAbsolutePath());
 			}
 		}
+		
+		timestamps.setProperty(classFile.getName(), Long.toString(classFile.lastModified()));			
 	}
 
 	/**
@@ -224,7 +307,17 @@ public class AnnotateTask extends FileSetTask {
 		System.out.println("----- end trace -----");
 	}
 
-	private boolean addAnnotation(String fileName, InputStream inputClass, File tmpFile, String annotations) throws BuildException {
+	/**
+	 * Add an annotation to a class file
+	 * 
+	 * @param classFile
+	 * @param inputClass
+	 * @param tmpFile
+	 * @param annotations
+	 * @return
+	 * @throws BuildException
+	 */
+	private boolean addAnnotation(File classFile, InputStream inputClass, File tmpFile, String annotations) throws BuildException {		
 		boolean classIsModified = false;
 		FileOutputStream outputClass = null;
 
@@ -247,7 +340,7 @@ public class AnnotateTask extends FileSetTask {
 
 			if(mcv.classIsModified())
 			{
-				System.out.println("adding annotations "+annotations+" to file "+fileName);
+				System.out.println("adding annotations "+annotations+" to file "+classFile.getName());
 				classIsModified = true;
 
 				outputClass = new FileOutputStream(tmpFile);
@@ -257,7 +350,7 @@ public class AnnotateTask extends FileSetTask {
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			throw new BuildException("Unable to add annotations to file "+fileName, ex);
+			throw new BuildException("Unable to add annotations to file "+classFile.getName(), ex);
 		}
 		finally
 		{
@@ -266,14 +359,23 @@ public class AnnotateTask extends FileSetTask {
 				try {
 					outputClass.close();
 				} catch (IOException e) {
-					System.err.println("Can't close stream for file "+fileName);
+					System.err.println("Can't close stream for file "+classFile.getName());
 				}
+				
+				long timestamp = classFile.lastModified();
+				tmpFile.setLastModified(timestamp);
 			}
 		}
 
 		return classIsModified;
 	}
 
+	/**
+	 * Visitor for a class file that actually do the job of adding annotations in the class.
+	 * 
+	 * @author fabien
+	 *
+	 */
 	private static class MarkerClassVisitor extends ClassAdapter {
 		final private List<String> annotationTypeDescs;
 
