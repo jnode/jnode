@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.shell.command.driver.system.bus"
+        name="JNode System bus commands"
+        version="@VERSION@"
+        license-name="lgpl"
+        provider-name="JNode.org">
+
+  <requires>
+    <import plugin="org.jnode.driver.bus.smbus"/>
+    <import plugin="org.jnode.shell.help"/>
+  </requires>
+
+  <runtime>
+    <library name="jnode-shell.jar">
+      <export name="org.jnode.shell.command.driver.system.bus.*"/>
+    </library>
+  </runtime>
+
+  <extension point="org.jnode.shell.aliases">
+    <alias name="smbus" class="org.jnode.shell.command.driver.system.bus.SMBusCommand"/>
+  </extension>
+
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="smbus" description="dump information from the system's SMBus controller"/>
+  </extension>
+</plugin>

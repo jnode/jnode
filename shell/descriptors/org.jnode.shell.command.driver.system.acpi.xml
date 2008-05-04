@@ -9,7 +9,6 @@
 
   <requires>
     <import plugin="org.jnode.driver.system.acpi"/>
-    <import plugin="org.jnode.driver.bus.smbus"/>
     <import plugin="org.jnode.shell.help"/>
   </requires>
 
@@ -21,7 +20,6 @@
 
   <extension point="org.jnode.shell.aliases">
     <alias name="acpi" class="org.jnode.shell.command.driver.system.acpi.AcpiCommand"/>
-    <alias name="smbus" class="org.jnode.shell.command.driver.system.acpi.SMBusCommand"/>
   </extension>
 
   <extension point="org.jnode.shell.syntaxes">
