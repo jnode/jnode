@@ -24,4 +24,13 @@
     <alias name="smbus" class="org.jnode.shell.command.driver.system.acpi.SMBusCommand"/>
   </extension>
 
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="acpi">
+      <empty description="Print a summary of each ACPI device"/>
+      <option argLabel="dump" shortName="d" longName="dump" 
+              description="Produce a full dump for each ACPI device"/>
+      <option argLabel="battery" shortName="b" longName="battery" 
+              description="Display battery information for each ACPI device"/>
+    </syntax>
+  </extension>
 </plugin>

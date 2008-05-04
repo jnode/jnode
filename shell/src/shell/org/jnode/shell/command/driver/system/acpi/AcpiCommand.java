@@ -21,68 +21,69 @@
  
 package org.jnode.shell.command.driver.system.acpi;
 
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.Collection;
 
+import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceUtils;
 import org.jnode.driver.system.acpi.AcpiAPI;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.Syntax;
-import org.jnode.shell.help.argument.OptionArgument;
+import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.CommandLine;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FlagArgument;
 
 /**
- * ACPI command.
+ * ACPI display and management command.
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
+ * @author crawley@jnode.org
  */
 
-public class AcpiCommand {
+public class AcpiCommand extends AbstractCommand {
 
+    private final FlagArgument FLAG_DUMP =
+        new FlagArgument("dump", Argument.OPTIONAL, 
+                "lists all devices that can be discovered and controlled through ACPI");
+    
+    private final FlagArgument FLAG_BATTERY =
+        new FlagArgument("battery", Argument.OPTIONAL, 
+                    "displays information about installed batteries");
+    
     public AcpiCommand() {
+        super("display and (in the future) manage the ACPI system");
+        registerArguments(FLAG_BATTERY, FLAG_DUMP);
     }
 
-    static final String FUNC_DUMP = "dump";
-
-    static final String FUNC_BATTERY = "battery";
-
-    static final OptionArgument ARG_FUNCTION = new OptionArgument(
-            "function",
-            "the function to perform",
-            new OptionArgument.Option[] {
-                    new OptionArgument.Option(FUNC_DUMP,
-                            "lists all devices that can be discovered and controlled through ACPI"),
-                    new OptionArgument.Option(FUNC_BATTERY,
-                            "displays information about installed batteries") });
-
-    public static Help.Info HELP_INFO = new Help.Info("acpi", new Syntax[] {
-            new Syntax("displays ACPI details"),
-            new Syntax("manage ACPI system", new Parameter[] { new Parameter(
-                    ARG_FUNCTION, Parameter.OPTIONAL) }) });
-
     public static void main(String[] args) throws Exception {
-
-        ParsedArguments cmdLine = HELP_INFO.parse(args);
-
+        new AcpiCommand().execute(args);
+    }
+    
+    @Override
+    public void execute(CommandLine commandLine, InputStream in,
+            PrintStream out, PrintStream err) throws ApiNotFoundException {
         final Collection<Device> acpiDevs = DeviceUtils.getDevicesByAPI(AcpiAPI.class);
         if (acpiDevs.isEmpty()) {
-            System.out.println("Could not connect to ACPI");
-        } else {
-            final Device dev = (Device)acpiDevs.iterator().next();
-            final AcpiAPI api = (AcpiAPI)dev.getAPI(AcpiAPI.class);
+           out.println("No ACPI devices are registered");
+           exit(1);
+        } 
+        else {
+            for (Device dev : acpiDevs) {
+                final AcpiAPI api = (AcpiAPI) dev.getAPI(AcpiAPI.class);
 
-            if (cmdLine.size() == 0) {
-                System.out.println(api.toDetailedString());
-            } else {
-                String func = ARG_FUNCTION.getValue(cmdLine);
-                if (func.equalsIgnoreCase(FUNC_DUMP)) {
-                    api.dump(new PrintWriter(System.out));
-                } else if (func.equalsIgnoreCase(FUNC_BATTERY)) {
-                    System.out.println("Temporary disabled; TODO fix me");
+                if (FLAG_DUMP.isSet()) {
+                    api.dump(new PrintWriter(out));
+                }
+                else if (FLAG_BATTERY.isSet()) {
+                    // TODO fix this
+                    out.println("The '--battery' option is temporary disabled");
                     //api.dumpBattery();
                 }
+                else {
+                    out.println(api.toDetailedString());
+                } 
             }
         }
     }
