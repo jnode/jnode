@@ -21,6 +21,20 @@
   <extension point="org.jnode.shell.aliases">
     <alias name="log4j" class="org.jnode.shell.command.log4j.Log4jCommand"/>
   </extension>
+  
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="log4j">
+      <option argLabel="list" shortName="l" longName="list" description="List all existing loggers"/>
+      <sequence description="Set the logging level for a logger">
+        <option argLabel="setLevel" shortName="s" longName="setLevel"/>
+        <argument argLabel="logger"/>
+        <argument argLabel="level"/>
+      </sequence>
+      <option argLabel="url" shortName="u" longName="url" description="Load log4j configuration from a URL"/>
+      <argument argLabel="file" description="Load log4j configuration from a file"/>
+    </syntax>
+  </extension>
+  
 
   <extension point="org.jnode.security.permissions">
     <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read"/>    

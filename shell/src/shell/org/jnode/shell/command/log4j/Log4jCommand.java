@@ -23,89 +23,144 @@ package org.jnode.shell.command.log4j;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Enumeration;
 import java.util.Properties;
 
 import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.Syntax;
-import org.jnode.shell.help.SyntaxErrorException;
-import org.jnode.shell.help.argument.FileArgument;
-import org.jnode.shell.help.argument.OptionArgument;
-import org.jnode.shell.help.argument.StringArgument;
-import org.jnode.shell.help.argument.URLArgument;
+import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.CommandLine;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.EnumArgument;
+import org.jnode.shell.syntax.FileArgument;
+import org.jnode.shell.syntax.FlagArgument;
+import org.jnode.shell.syntax.StringArgument;
+import org.jnode.shell.syntax.URLArgument;
 
 /**
+ * This command manages log4j logging.
+ * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Fabien DUMINY (fduminy@jnode.org)
+ * @author crawley@jnode.org
  */
-public class Log4jCommand {
-    static final OptionArgument ARG_ACTION = new OptionArgument("action",
-            "action to do on log4j", 
-            new OptionArgument.Option("level", "Change the level of a logger"), 
-            new OptionArgument.Option("url", "Configure log4j from an url"),
-            new OptionArgument.Option("file", "Configure log4j from a file"));
+public class Log4jCommand extends AbstractCommand {
+    // FIXME ... turn the following into a free standing class that accepts
+    // the log level in a case-insensitive fashion.
+    private enum LevelEnum {
+        all(Level.ALL),
+        // trace(Level.TRACE), // introduced in log4j 1.2.12
+        debug(Level.DEBUG),
+        info(Level.INFO),
+        warn(Level.WARN),
+        error(Level.ERROR),
+        fatal(Level.FATAL),
+        off(Level.OFF);
+        
+        public final Level level;
+        LevelEnum(Level level) {
+            this.level = level;
+        }
+    };
     
-	static final OptionArgument ARG_LEVEL =
-		new OptionArgument(
-			"level",
-			"minimum level",
-			new OptionArgument.Option[] {
-				new OptionArgument.Option("debug", "Debug"),
-				new OptionArgument.Option("info", "Info"),
-				new OptionArgument.Option("warn", "Warning"),
-				new OptionArgument.Option("error", "Error"),
-				new OptionArgument.Option("fatal", "Fatal")});
+    private class LogLevelArgument extends EnumArgument<LevelEnum> {
+        public LogLevelArgument() {
+            super("level", Argument.OPTIONAL, LevelEnum.class, "the logging level");
+        }
+
+        @Override
+        protected String argumentKind() {
+            return "logging level";
+        }
+    }
+    
+    private final FlagArgument FLAG_LIST =
+        new FlagArgument("list", Argument.OPTIONAL, "List current loggers");
+    
+    private final FlagArgument FLAG_SET_LEVEL =
+        new FlagArgument("setLevel", Argument.OPTIONAL, "Set the Level of a logger");
+    
+    private final FileArgument ARG_FILE =
+        new FileArgument("file", Argument.OPTIONAL, "log4j configuration file");
+    
+    private final URLArgument ARG_URL =
+        new URLArgument("url", Argument.OPTIONAL, "URL for log4j configuration file");
+    
+	private final LogLevelArgument ARG_LEVEL = new LogLevelArgument();
    
-	static final StringArgument ARG_LOGGER = new StringArgument("logger", "the name of the logger");
-    
-    static final FileArgument ARG_CFG_FILE = new FileArgument("configFile", "the configuration file");
-    static final URLArgument ARG_CFG_URL = new URLArgument("configURL", "the configuration URL");
-    
-    static final Parameter PARAM_ACTION = new Parameter(ARG_ACTION);    
-	static final Parameter PARAM_LOGGER = new Parameter(ARG_LOGGER, Parameter.MANDATORY);
-	static final Parameter PARAM_LEVEL = new Parameter(ARG_LEVEL, Parameter.MANDATORY);        
-    
-    static final Parameter PARAM_CFG_FILE = new Parameter(ARG_CFG_FILE, Parameter.MANDATORY);
-    static final Parameter PARAM_CFG_URL = new Parameter(ARG_CFG_URL, Parameter.MANDATORY);
+	// FIXME this should have a custom Argument class so that it can do completion.
+	private final StringArgument ARG_LOGGER = 
+	    new StringArgument("logger", Argument.OPTIONAL, "the name of the logger");
+	
+	public Log4jCommand() {
+        super("manage log4j logging");
+        registerArguments(FLAG_SET_LEVEL, FLAG_LIST, ARG_FILE, ARG_LEVEL, ARG_LOGGER, ARG_URL);
+    }
 
-	public static Help.Info HELP_INFO = new Help.Info("log4j", new Syntax[] 
-                { 
-                    new Syntax("Set the level for a logger", new Parameter[] { PARAM_LOGGER, PARAM_LEVEL }),
-                    new Syntax("Set the configuration from a file", new Parameter[] { PARAM_CFG_FILE }),
-                    new Syntax("Set the configuration from an url", new Parameter[] { PARAM_CFG_URL })
-                });
-
-	public static void main(String[] args) throws SyntaxErrorException, IOException {
-		final ParsedArguments cmdLine = HELP_INFO.parse(args);
-		
-        if(PARAM_CFG_FILE.isSet(cmdLine))
-        {
-            final File configFile = ARG_CFG_FILE.getFile(cmdLine);
-            final Properties props = new Properties();
-            final FileInputStream fis = new FileInputStream(configFile);
-            props.load(fis);
-            PropertyConfigurator.configure(props);
-            fis.close();
+	public static void main(String[] args) throws Exception {
+	    new Log4jCommand().execute(args);
+	}
+	
+	@Override
+    public void execute(CommandLine commandLine, InputStream in,
+            PrintStream out, PrintStream err) throws IOException {
+	    if (ARG_FILE.isSet()) {
+	        // Set configuration from a file
+	        final File configFile = ARG_FILE.getValue();
+	        final Properties props = new Properties();
+	        FileInputStream fis = null; 
+	        try {
+	            fis = new FileInputStream(configFile);
+	            props.load(fis);
+	            PropertyConfigurator.configure(props);
+	        } 
+	        catch (FileNotFoundException ex) {
+	            err.println("Cannot open configuration file '" + 
+	                    configFile + "': " + ex.getMessage());
+	            exit(1);
+	        }
+	        finally {
+	            if (fis != null) {
+	                fis.close();
+	            }
+	        }
+	    }
+        else if (ARG_URL.isSet()) {
+            // Set configuration from a URL
+            try {
+                final URL configURL = new URL(ARG_URL.getValue());
+                PropertyConfigurator.configure(configURL);
+            }
+            catch (MalformedURLException ex) {
+                err.println("Malformed configuration URL: " + ex.getMessage());
+                exit(1);
+            }
         }
-        else if(PARAM_CFG_URL.isSet(cmdLine))
-        {
-            final URL configURL = ARG_CFG_URL.getURL(cmdLine);
-            PropertyConfigurator.configure(configURL);
+        else if (FLAG_LIST.isSet()) {
+            Enumeration<?> en = LogManager.getCurrentLoggers();
+            while (en.hasMoreElements()) {
+                Logger logger = (Logger) en.nextElement();
+                String level = (logger.getLevel() == null) ? 
+                        ("(" + logger.getEffectiveLevel().toString() + ")") :
+                        logger.getLevel().toString();
+                out.println(logger.getName() + ": " + level);
+            }
         }
-        else
-        {
-            final String loggerName = ARG_LOGGER.getValue(cmdLine);
-            final String levelName = ARG_LEVEL.getValue(cmdLine);
+        else if (FLAG_SET_LEVEL.isSet()){
+            // Change the logging level for a specified logger
+            // FIXME support changing the root logger's level
+            final String loggerName = ARG_LOGGER.getValue();
+            final LevelEnum level = ARG_LEVEL.getValue();
     		final Logger log = Logger.getLogger(loggerName);
-    		final Level level = Level.toLevel(levelName.toUpperCase());
-    		
-    		log.setLevel(level);
+    		log.setLevel(level.level);
         }
 	}
 }
