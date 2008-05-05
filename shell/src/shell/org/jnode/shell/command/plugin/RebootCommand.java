@@ -21,18 +21,29 @@
  
 package org.jnode.shell.command.plugin;
 
-import org.jnode.shell.help.Help;
+import java.io.InputStream;
+import java.io.PrintStream;
+
+import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.CommandLine;
 import org.jnode.vm.VmSystem;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class RebootCommand {
+public class RebootCommand extends AbstractCommand {
 
-    public static Help.Info HELP_INFO = new Help.Info("reboot",
-            "Stop all services and devices and reset the computer");
+    public RebootCommand() {
+        super("Stop all services and devices and then reboot the computer");
+    }
 
     public static void main(String[] args) throws Exception {
+        new RebootCommand().execute(args);
+    }
+
+    @Override
+    public void execute(CommandLine commandLine, InputStream in,
+            PrintStream out, PrintStream err) {
         VmSystem.halt(true);
     }
 }

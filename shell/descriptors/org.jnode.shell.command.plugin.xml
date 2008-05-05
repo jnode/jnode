@@ -22,6 +22,13 @@
     <alias name="plugin"  class="org.jnode.shell.command.plugin.PluginCommand"/>
     <alias name="reboot" class="org.jnode.shell.command.plugin.RebootCommand"/>
   </extension>
+  
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="halt" 
+        description="Shutdown all services and devices so that the computer can be powered off"/>
+    <syntax alias="reboot" 
+        description="Shutdown all services and devices then reboot the computer"/>
+  </extension>
 
   <extension point="org.jnode.security.permissions">
     <permission class="org.jnode.security.JNodePermission" name="createPluginLoader"/>
