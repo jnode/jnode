@@ -18,7 +18,6 @@
  * along with this library; If not, write to the Free Software Foundation, Inc., 
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
 package org.jnode.shell.command.log4j;
 
 import java.io.File;
@@ -39,48 +38,20 @@ import org.apache.log4j.PropertyConfigurator;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.syntax.Argument;
-import org.jnode.shell.syntax.EnumArgument;
 import org.jnode.shell.syntax.FileArgument;
 import org.jnode.shell.syntax.FlagArgument;
-import org.jnode.shell.syntax.StringArgument;
+import org.jnode.shell.syntax.Log4jLevelArgument;
+import org.jnode.shell.syntax.Log4jLoggerArgument;
 import org.jnode.shell.syntax.URLArgument;
 
 /**
- * This command manages log4j logging.
+ * This command class shows and manages log4j logging.
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Fabien DUMINY (fduminy@jnode.org)
  * @author crawley@jnode.org
  */
 public class Log4jCommand extends AbstractCommand {
-    // FIXME ... turn the following into a free standing class that accepts
-    // the log level in a case-insensitive fashion.
-    private enum LevelEnum {
-        all(Level.ALL),
-        // trace(Level.TRACE), // introduced in log4j 1.2.12
-        debug(Level.DEBUG),
-        info(Level.INFO),
-        warn(Level.WARN),
-        error(Level.ERROR),
-        fatal(Level.FATAL),
-        off(Level.OFF);
-        
-        public final Level level;
-        LevelEnum(Level level) {
-            this.level = level;
-        }
-    };
-    
-    private class LogLevelArgument extends EnumArgument<LevelEnum> {
-        public LogLevelArgument() {
-            super("level", Argument.OPTIONAL, LevelEnum.class, "the logging level");
-        }
-
-        @Override
-        protected String argumentKind() {
-            return "logging level";
-        }
-    }
     
     private final FlagArgument FLAG_LIST =
         new FlagArgument("list", Argument.OPTIONAL, "List current loggers");
@@ -94,11 +65,11 @@ public class Log4jCommand extends AbstractCommand {
     private final URLArgument ARG_URL =
         new URLArgument("url", Argument.OPTIONAL, "URL for log4j configuration file");
     
-	private final LogLevelArgument ARG_LEVEL = new LogLevelArgument();
+	private final Log4jLevelArgument ARG_LEVEL = 
+	    new Log4jLevelArgument("level", Argument.OPTIONAL, "the logging level");
    
-	// FIXME this should have a custom Argument class so that it can do completion.
-	private final StringArgument ARG_LOGGER = 
-	    new StringArgument("logger", Argument.OPTIONAL, "the name of the logger");
+	private final Log4jLoggerArgument ARG_LOGGER = 
+	    new Log4jLoggerArgument("logger", Argument.OPTIONAL, "the logger");
 	
 	public Log4jCommand() {
         super("manage log4j logging");
@@ -145,6 +116,8 @@ public class Log4jCommand extends AbstractCommand {
             }
         }
         else if (FLAG_LIST.isSet()) {
+            // List current loggers and their levels.  Effective levels are shown
+            // in parentheses.
             Enumeration<?> en = LogManager.getCurrentLoggers();
             while (en.hasMoreElements()) {
                 Logger logger = (Logger) en.nextElement();
@@ -155,12 +128,11 @@ public class Log4jCommand extends AbstractCommand {
             }
         }
         else if (FLAG_SET_LEVEL.isSet()){
-            // Change the logging level for a specified logger
-            // FIXME support changing the root logger's level
-            final String loggerName = ARG_LOGGER.getValue();
-            final LevelEnum level = ARG_LEVEL.getValue();
-    		final Logger log = Logger.getLogger(loggerName);
-    		log.setLevel(level.level);
+            // Change the logging level for a specified logger or the root logger
+            final Level level = ARG_LEVEL.getValue();
+            final Logger log = ARG_LOGGER.isSet() ? 
+                    ARG_LOGGER.getValue() : Logger.getRootLogger();
+    		log.setLevel(level);
         }
 	}
 }
