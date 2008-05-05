@@ -56,13 +56,13 @@ public class LongArgument extends Argument<Long> {
     }
 
     @Override
-    protected void doAccept(Token token) throws CommandSyntaxException {
+    protected Long doAccept(Token token) throws CommandSyntaxException {
         try {
             long tmp = Long.parseLong(token.token);
             if (tmp < min || tmp > max) {
                 throw new CommandSyntaxException("number '" + token.token + "' is out of range");
             }
-            addValue(new Long(token.token));
+            return new Long(token.token);
         }
         catch (NumberFormatException ex) {
             throw new CommandSyntaxException("invalid number '" + token.token + "'");

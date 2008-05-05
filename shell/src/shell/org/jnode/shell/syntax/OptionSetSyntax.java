@@ -55,7 +55,7 @@ public class OptionSetSyntax extends GroupSyntax {
         }
 
         @Override
-        protected void doAccept(Token token) throws CommandSyntaxException {
+        protected Boolean doAccept(Token token) throws CommandSyntaxException {
             String value = token.token;
             int len = value.length();
             if (len < 2 || value.charAt(0) != '-') {
@@ -76,7 +76,7 @@ public class OptionSetSyntax extends GroupSyntax {
                     throw new CommandSyntaxException("'" + ch + "' is not a known flag");
                 }
             }
-            addValue(true);
+            return Boolean.TRUE;
         }
 
         @Override

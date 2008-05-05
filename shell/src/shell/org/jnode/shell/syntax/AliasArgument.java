@@ -50,11 +50,11 @@ public class AliasArgument extends Argument<String> {
     }
 
 	@Override
-	public void doAccept(Token value) throws CommandSyntaxException {
+	public String doAccept(Token value) throws CommandSyntaxException {
 	    if (value.token.length() == 0) {
 	        throw new CommandSyntaxException("Empty alias name '" + value.token + "'");
 	    }
-	    addValue(value.token);
+	    return value.token;
 	}
 
 	public void complete(CompletionInfo completion, String partial) {

@@ -29,8 +29,8 @@ public class Log4jLoggerArgument extends Argument<Logger> {
      * Any token is an acceptable Logger name.
      */
     @Override
-    protected void doAccept(Token value) throws CommandSyntaxException {
-        addValue(Logger.getLogger(value.token));
+    protected Logger doAccept(Token value) throws CommandSyntaxException {
+        return Logger.getLogger(value.token);
     }
 
     /**

@@ -55,12 +55,12 @@ public class DeviceArgument extends Argument<Device> {
     }
 
     @Override
-    protected void doAccept(Token token) throws CommandSyntaxException {
+    protected Device doAccept(Token token) throws CommandSyntaxException {
         try {
             final DeviceManager devMgr = getDeviceManager();
             final Device device = devMgr.getDevice(token.token);
             if (apiClass == null || device.implementsAPI(apiClass)) {
-                addValue(device);
+                return device;
             }
             else {
                 throw new SyntaxFailureException("Device '" + token.token + "' does not implement " +

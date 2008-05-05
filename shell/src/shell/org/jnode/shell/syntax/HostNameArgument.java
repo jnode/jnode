@@ -49,8 +49,8 @@ public class HostNameArgument extends Argument<String> {
     }
 
     @Override
-    protected void doAccept(Token token) throws CommandSyntaxException {
-        addValue(token.token);
+    protected String doAccept(Token token) throws CommandSyntaxException {
+        return token.token;
     }
     
     @Override

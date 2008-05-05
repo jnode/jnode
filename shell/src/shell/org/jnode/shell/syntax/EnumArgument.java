@@ -61,9 +61,9 @@ public abstract class EnumArgument<E extends Enum<E>> extends Argument<E> {
     }
     
     @Override
-    protected void doAccept(Token token) throws CommandSyntaxException {
+    protected E doAccept(Token token) throws CommandSyntaxException {
         try {
-            addValue(E.valueOf(clazz, token.token));
+            return E.valueOf(clazz, token.token);
         }
         catch (IllegalArgumentException ex) {
             throw new CommandSyntaxException("invalid value for enum " + clazz.getSimpleName());

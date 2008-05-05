@@ -32,8 +32,10 @@ import org.jnode.shell.CommandLine.Token;
  * system.  An command instance object creates an Argument instance for each formal 
  * command-line parameter, and assembled them into an ArgumentBundle.  As a command line is parsed 
  * against the syntax, the parser matches syntactic elements with argument strings, locates the
- * corresponding Argument instances, and calls the Argument.accept(Token) method.  This typically 
- * converts the Token's value to an instance of the <V> type and adds it to the value holder.
+ * corresponding Argument instances, and calls the Argument.accept(Token) method.  This then calls
+ * doAccept(Token) in a subclass which typically tries to convert the Token's value to an instance 
+ * of the <V> type.  The doAccept method should either return a non-null V to be accepted, 
+ * or throw an exception.
  * <p>
  * An Argument has the following attributes:
  * <ul>
@@ -41,8 +43,6 @@ import org.jnode.shell.CommandLine.Token;
  * or MuSyntax.  It needs to be unique in the context of the ArgumentBundle containing the Argument.
  * <li>The 'mandatory' flag says whether or not a value for the Argument <i>must</i> be provided.
  * <li>The 'multiple' flag says whether or not multiple values are allowed for the Argument.
- * <li>The 'conditional' flag denotes a conditional argument; i.e. one that must have a value if 
- * mentioned in the syntax, but not otherwise.  (This feature is experimental and may be dropped.)
  * <li>The 'description' string contains optional documentation for the Argument.  
  * </ul>
  * 
@@ -161,15 +161,16 @@ public abstract class Argument<V> {
         if (isSet() && !isMultiple()) {
             throw new SyntaxMultiplicityException("this argument cannot be repeated");
         }
-        doAccept(value);
+        addValue(doAccept(value));
     }
 
     /**
-     * This method is called by 'accept' after performing multiplicity checks.
+     * This method is called by 'accept' after performing multiplicity checks.  It
+     * should either return a non-null V to be accepted, or throw an exception.
      * 
      * @param value the token that will supply the Argument's value.
      */
-    protected abstract void doAccept(Token value) throws CommandSyntaxException;
+    protected abstract V doAccept(Token value) throws CommandSyntaxException;
 
     /**
      * Perform argument completion on the supplied (partial) argument value.  The
