@@ -26,10 +26,13 @@ import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.AccessController;
+import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import javax.naming.NameNotFoundException;
 
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginDescriptor;
@@ -38,136 +41,129 @@ import org.jnode.plugin.PluginManager;
 import org.jnode.plugin.PluginReference;
 import org.jnode.plugin.PluginRegistry;
 import org.jnode.plugin.URLPluginLoader;
-import org.jnode.shell.help.Argument;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.Syntax;
-import org.jnode.shell.help.argument.OptionArgument;
-import org.jnode.shell.help.argument.PluginArgument;
-import org.jnode.shell.help.argument.URLArgument;
+import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.CommandLine;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FlagArgument;
+import org.jnode.shell.syntax.PluginArgument;
+import org.jnode.shell.syntax.StringArgument;
+import org.jnode.shell.syntax.SyntaxMultiplicityException;
+import org.jnode.shell.syntax.URLArgument;
 import org.jnode.vm.Vm;
 
 /**
  * @author epr
  */
-public class PluginCommand {
+public class PluginCommand extends AbstractCommand {
 
-    static final OptionArgument ARG_LOADER = new OptionArgument("loader",
-            "Loader management", 
-            new OptionArgument.Option("addloader", "Add plugin loader"));
-
-    static final OptionArgument ARG_ACTION = new OptionArgument("action",
-            "action to do on the plugin", 
-            new OptionArgument.Option("load", "Load the plugin"),
-            new OptionArgument.Option("reload", "Reload the plugin"),
-			new OptionArgument.Option("unload", "Unload the plugin")); 
-
-    static final URLArgument ARG_URL = new URLArgument("url", "plugin location");
-
-    static final PluginArgument ARG_ACTION_ID = new PluginArgument("plugin",
-            "plugin identifier");
-
-    static final PluginArgument ARG_LIST_ID = new PluginArgument("plugin",
-            "plugin identifier");
+    private final FlagArgument FLAG_LOAD = 
+        new FlagArgument("load", Argument.OPTIONAL, "Load the plugin");
     
-    static final Argument ARG_VERSION = new Argument("version", "plugin version");
+    private final FlagArgument FLAG_RELOAD = 
+        new FlagArgument("reload", Argument.OPTIONAL, "Reload the plugin");
+    
+    private final FlagArgument FLAG_UNLOAD = 
+        new FlagArgument("unload", Argument.OPTIONAL, "Unload the plugin");
 
-    static final Parameter PARAM_LOADER = new Parameter(ARG_LOADER);
+    private final URLArgument ARG_LOADER_URL = 
+        new URLArgument("loader", Argument.OPTIONAL, "loader location");
 
-    static final Parameter PARAM_ACTION = new Parameter(ARG_ACTION);
+    private final PluginArgument ARG_PLUGIN_ID =
+        new PluginArgument("plugin", Argument.OPTIONAL, "plugin identifier");
+    
+    private final StringArgument ARG_VERSION =
+        new StringArgument("version", Argument.OPTIONAL, "plugin version");
+    
+    private PrintStream out, err;
+    private PluginManager mgr;
+     
+    public PluginCommand() {
+        super("List and manage plugins and plugin loaders");
+        registerArguments(ARG_PLUGIN_ID, FLAG_LOAD, FLAG_RELOAD, FLAG_UNLOAD,
+                ARG_LOADER_URL, ARG_VERSION);
+    }
 
-    static final Parameter PARAM_ACTION_ID = new Parameter(ARG_ACTION_ID);
-
-    static final Parameter PARAM_LIST_ID = new Parameter(ARG_LIST_ID);
-
-    static final Parameter PARAM_URL = new Parameter(ARG_URL);
-    static final Parameter PARAM_VERSION = new Parameter(ARG_VERSION, Parameter.OPTIONAL);
-
-    public static Help.Info HELP_INFO = new Help.Info(
-            "plugin",
-            new Syntax[] {
-                    new Syntax("Print name and state of all loaded plugins"),
-                    new Syntax("Plugin loader management", PARAM_LOADER, PARAM_URL),
-                    new Syntax("Load/Unload the plugin", PARAM_ACTION,
-                            PARAM_ACTION_ID, PARAM_VERSION),
-                    new Syntax("Print name and state of plugin", PARAM_LIST_ID)});
+//    public static Help.Info HELP_INFO = new Help.Info(
+//            "plugin",
+//            new Syntax[] {
+//                    new Syntax("Print name and state of all loaded plugins"),
+//                    new Syntax("Plugin loader management", PARAM_LOADER, PARAM_URL),
+//                    new Syntax("Load/Unload the plugin", PARAM_ACTION,
+//                            PARAM_ACTION_ID, PARAM_VERSION),
+//                    new Syntax("Print name and state of plugin", PARAM_LIST_ID)});
 
     public static void main(final String[] args) throws Exception {
-        AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
-            public Object run() throws Exception {
-                new PluginCommand().execute(args, System.in, System.out, System.err);
-                return null;
-                }});
+        new PluginCommand().execute(args);
     }
 
     /**
      * Execute this command
      */
-    public void execute(String[] args, InputStream in, PrintStream out,
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out,
             PrintStream err) throws Exception {
-
-        final ParsedArguments cmdLine = HELP_INFO.parse(args);
-        final PluginManager mgr = (PluginManager) InitialNaming
-                .lookup(PluginManager.NAME);
-
-        if (PARAM_LOADER.isSet(cmdLine)) {
-            final String action = ARG_LOADER.getValue(cmdLine);
-            if (action.equals("addloader")) {
-                addPluginLoader(out, mgr, ARG_URL.getURL(cmdLine));
-            } else {
-                out.println("Unknown load action " + action);
+        this.out = out;
+        this.err = err;
+        try {
+            AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
+                public Object run() throws Exception {
+                    doRun();
+                    return null;
+                }});
+        }
+        catch (PrivilegedActionException ex) {
+            throw ex.getException();
+        }
+    }
+    
+    private void doRun() 
+    throws NameNotFoundException, SyntaxMultiplicityException, PluginException {
+        mgr = (PluginManager) InitialNaming.lookup(PluginManager.NAME);
+        final String version = ARG_VERSION.isSet() ?
+                ARG_VERSION.getValue() : Vm.getVm().getVersion();
+        final String pluginId = ARG_PLUGIN_ID.getValue();
+        if (ARG_LOADER_URL.isSet()) {
+            try {
+                final URL url = new URL(ARG_LOADER_URL.getValue());
+                addPluginLoader(url);
             }
-        } else if (PARAM_ACTION.isSet(cmdLine)) {
-            final String action = ARG_ACTION.getValue(cmdLine);
-            if (action.equals("load")) {
-                final String version;
-                if (PARAM_VERSION.isSet(cmdLine)) {
-                    version = ARG_VERSION.getValue(cmdLine);
-                } else {
-                    version = Vm.getVm().getVersion();
-                }
-                loadPlugin(out, mgr, ARG_ACTION_ID.getValue(cmdLine), version);
-            } else if (action.equals("reload")) {
-                    final String version;
-                    if (PARAM_VERSION.isSet(cmdLine)) {
-                        version = ARG_VERSION.getValue(cmdLine);
-                    } else {
-                        version = Vm.getVm().getVersion();
-                    }
-                    final String id = ARG_ACTION_ID.getValue(cmdLine);
-                    reloadPlugin(out, mgr, id, version);
-            } else if (action.equals("unload")) {
-            	unloadPlugin(out, mgr, ARG_ACTION_ID.getValue(cmdLine));
-            } else {
-                out.println("Unknown action " + action);
+            catch (MalformedURLException ex) {
+                err.println("Malformed plugin loader URL");
+                exit(1);
             }
-        } else if (PARAM_LIST_ID.isSet(cmdLine)) {
-            listPlugin(out, mgr, ARG_LIST_ID.getValue(cmdLine));
-        } else {
-            listPlugins(out, mgr);
+        } 
+        else if (FLAG_LOAD.isSet()) {
+            loadPlugin(pluginId, version);
+        }
+        else if (FLAG_RELOAD.isSet()) {
+            reloadPlugin(pluginId, version);
+        }
+        else if (FLAG_UNLOAD.isSet()) {
+            unloadPlugin(pluginId);
+        }
+        else if (pluginId != null) {
+            listPlugin(pluginId);
+        } 
+        else {
+            listPlugins();
         }
     }
 
-    private void addPluginLoader(PrintStream out, PluginManager mgr, URL url)
-            throws PluginException, MalformedURLException {
+    private void addPluginLoader(URL url)
+    throws PluginException, MalformedURLException {
         final String ext = url.toExternalForm();
         if (!ext.endsWith("/")) {
             url = new URL(ext + "/");
         }
-        out.println("Adding loader for " + url);
         mgr.getLoaderManager().addPluginLoader(new URLPluginLoader(url));
+        out.println("Added plugin loader for " + url);
     }
 
-    private void loadPlugin(PrintStream out, PluginManager mgr, String id, String version)
-            throws PluginException {
-        out.println("Loading " + id);
+    private void loadPlugin(String id, String version) throws PluginException {
         mgr.getRegistry().loadPlugin(mgr.getLoaderManager(), id, version);
+        out.println("Loaded plugin " + id + " version " + version);
     }
 
-    private void reloadPlugin(PrintStream out, PluginManager mgr, String id,
-            String version) throws PluginException {
-        out.println("Reloading " + id);
+    private void reloadPlugin(String id, String version) throws PluginException {
         final PluginRegistry reg = mgr.getRegistry();
         final List<PluginReference> refs = reg.unloadPlugin(id);
         for (PluginReference ref : refs) {
@@ -178,22 +174,21 @@ public class PluginCommand {
         if (reg.getPluginDescriptor(id) == null) {
             reg.loadPlugin(mgr.getLoaderManager(), id, version);
         }
+        out.println("Reloaded plugin " + id + " version " + version);
     }
 
-    private void unloadPlugin(PrintStream out, PluginManager mgr, String id)
-    throws PluginException {
+    private void unloadPlugin(String id) throws PluginException {
     	mgr.getRegistry().unloadPlugin(id);
-    	out.println("Unloaded " + id);
+    	out.println("Unloaded plugin " + id);
     }
     
-    private void listPlugins(PrintStream out, PluginManager mgr)
-            throws PluginException {
+    private void listPlugins() throws PluginException {
         final ArrayList<String> rows = new ArrayList<String>();
         for (PluginDescriptor descr : mgr.getRegistry()) {
             StringBuilder sb = new StringBuilder();
             sb.append(descr.getId());
             sb.append("; state ");
-            sb.append((descr.getPlugin().isActive())?"active":"inactive");
+            sb.append((descr.getPlugin().isActive()) ? "active" : "inactive");
             sb.append("; version ");
             sb.append(descr.getPlugin().getDescriptor().getVersion());
             rows.add(sb.toString());
@@ -204,14 +199,13 @@ public class PluginCommand {
         }
     }
 
-    private void listPlugin(PrintStream out, PluginManager mgr, String id)
-            throws PluginException {
+    private void listPlugin(String id) throws PluginException {
         final PluginDescriptor descr = mgr.getRegistry()
                 .getPluginDescriptor(id);
         if (descr != null) {           
             out.print(descr.getId());
             out.print("; state ");
-            out.print((descr.getPlugin().isActive())?"active":"inactive");
+            out.print((descr.getPlugin().isActive()) ? "active" : "inactive");
             out.println("; version " + descr.getPlugin().getDescriptor().getVersion());
         } else {
             out.println("Plugin " + id + " not found");
