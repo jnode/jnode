@@ -26,6 +26,11 @@
   
   <extension point="org.jnode.shell.syntaxes">
     <syntax alias="cpuid" description="dump the system's CPU ID information"/>
+    <syntax alias="kdb">
+      <empty description="show current kernel debugging state"/>
+      <option argLabel="off" longName="off" description="Turn kernel debugging off"/>
+      <option argLabel="on" longName="on" description="Turn kernel debugging on"/>
+    </syntax>
   </extension>
 
 </plugin>
