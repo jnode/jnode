@@ -21,10 +21,6 @@
 
 package org.jnode.shell.syntax;
 
-import java.io.File;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-
 import javax.naming.NameNotFoundException;
 
 import org.jnode.driver.Device;
