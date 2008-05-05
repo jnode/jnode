@@ -27,8 +27,8 @@
       <option argLabel="list" shortName="l" longName="list" description="List all existing loggers"/>
       <sequence description="Set the logging level for a logger">
         <option argLabel="setLevel" shortName="s" longName="setLevel"/>
-        <argument argLabel="logger"/>
         <argument argLabel="level"/>
+        <optional><argument argLabel="logger"/></optional>
       </sequence>
       <option argLabel="url" shortName="u" longName="url" description="Load log4j configuration from a URL"/>
       <argument argLabel="file" description="Load log4j configuration from a file"/>
