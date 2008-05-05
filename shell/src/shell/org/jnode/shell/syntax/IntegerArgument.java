@@ -56,13 +56,13 @@ public class IntegerArgument extends Argument<Integer> {
     }
 
     @Override
-    protected void doAccept(Token token) throws CommandSyntaxException {
+    protected Integer doAccept(Token token) throws CommandSyntaxException {
         try {
             int tmp = Integer.parseInt(token.token);
             if (tmp < min || tmp > max) {
                 throw new CommandSyntaxException("number '" + token.token + "' is out of range");
             }
-            addValue(new Integer(token.token));
+            return new Integer(token.token);
         }
         catch (NumberFormatException ex) {
             throw new CommandSyntaxException("invalid number '" + token.token + "'");

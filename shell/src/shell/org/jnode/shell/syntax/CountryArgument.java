@@ -42,9 +42,9 @@ public class CountryArgument extends Argument<String> {
     }
 
     @Override
-    protected void doAccept(Token token) throws CommandSyntaxException {
+    protected String doAccept(Token token) throws CommandSyntaxException {
         if (validCountries.contains(token.token)) {
-            addValue(token.token);
+            return token.token;
         }
         else {
             throw new CommandSyntaxException("Invalid country code");

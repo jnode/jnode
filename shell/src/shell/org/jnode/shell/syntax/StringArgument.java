@@ -23,6 +23,11 @@ package org.jnode.shell.syntax;
 
 import org.jnode.shell.CommandLine.Token;
 
+/**
+ * This Argument class captures unspecialized strings.  It does no syntax checks and no completion.
+ * 
+ * @author crawley@jnode.org
+ */
 public class StringArgument extends Argument<String> {
 
     public StringArgument(String label, int flags, String description) {
@@ -38,8 +43,8 @@ public class StringArgument extends Argument<String> {
     }
 
     @Override
-    protected void doAccept(Token token) throws CommandSyntaxException {
-        addValue(token.token);
+    protected String doAccept(Token token) throws CommandSyntaxException {
+        return token.token;
     }
     
    @Override

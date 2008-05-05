@@ -39,10 +39,10 @@ public class FileArgument extends Argument<File> {
     }
 
     @Override
-    protected void doAccept(Token token) throws CommandSyntaxException {
+    protected File doAccept(Token token) throws CommandSyntaxException {
         // FIXME ... do proper filename checks ...
         if (token.token.length() > 0) {
-            addValue(new File(token.token));
+            return new File(token.token);
         }
         else {
             throw new CommandSyntaxException("invalid file name '" + token.token + "'");

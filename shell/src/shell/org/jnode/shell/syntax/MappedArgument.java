@@ -77,7 +77,7 @@ public abstract class MappedArgument<V> extends Argument<V> {
      * Accept token if it is in the domain of the valueMap.
      */
     @Override
-    protected void doAccept(Token token) throws CommandSyntaxException {
+    protected V doAccept(Token token) throws CommandSyntaxException {
         String t = caseInsensitive ? token.token.toLowerCase() : token.token;
         V value = valueMap.get(t);
         if (value == null) {
@@ -85,7 +85,7 @@ public abstract class MappedArgument<V> extends Argument<V> {
                     "' is not an acceptable " + argumentKind());
         }
         else {
-            addValue(value);
+            return value;
         }
     }
 }
