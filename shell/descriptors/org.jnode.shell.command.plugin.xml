@@ -26,6 +26,25 @@
   <extension point="org.jnode.shell.syntaxes">
     <syntax alias="halt" 
         description="Shutdown all services and devices so that the computer can be powered off"/>
+    <syntax alias="plugin">
+      <empty description="list all plugins"/>
+      <argument argLabel="plugin" description="list a the given plugin"/>
+      <sequence description="load the given plugin">
+        <option argLabel="load" longName="load" shortName="l"/>
+        <argument argLabel="plugin"/>
+        <optional><argument argLabel="version"/></optional>
+      </sequence>
+      <sequence description="reload the given plugin">
+        <option argLabel="reload" longName="reload" shortName="r"/>
+        <argument argLabel="plugin"/>
+        <optional><argument argLabel="version"/></optional>
+      </sequence>
+      <sequence description="unload the given plugin">
+        <option argLabel="unload" longName="unload" shortName="u"/>
+        <argument argLabel="plugin"/>
+      </sequence>
+      <option argLabel="loader" longName="addLoader" shortName="a" description="add a new plugin loader"/>
+    </syntax>
     <syntax alias="reboot" 
         description="Shutdown all services and devices then reboot the computer"/>
   </extension>
