@@ -21,42 +21,55 @@
  
 package org.jnode.shell.command.system;
 
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.Syntax;
-import org.jnode.shell.help.argument.OptionArgument;
+import java.io.InputStream;
+import java.io.PrintStream;
+
+import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.CommandLine;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FlagArgument;
 import org.jnode.vm.Unsafe;
 
 /**
+ * This command turns kernel debug print capture on and off.  When "on",
+ * messages from calls to org.jnode.vm.Unsafe.debug(...) get copied to
+ * the serial port.
+ * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
+ * @author crawley@jnode.org
  */
-public class KdbCommand {
-    static final OptionArgument ARG_ACTION = new OptionArgument("action",
-            "action to do on the kernel debugger", new OptionArgument.Option(
-                    "on", "Enable the kernel debugger"),
-            new OptionArgument.Option("off", "Disable the kernel debugger"));
+public class KdbCommand extends AbstractCommand {
+    private final FlagArgument FLAG_ON = 
+        new FlagArgument("on", Argument.OPTIONAL, "Enable the kernel debugger");
+    
+    private final FlagArgument FLAG_OFF = 
+        new FlagArgument("off", Argument.OPTIONAL, "Disable the kernel debugger");
 
-    static final Parameter PARAM_ACTION = new Parameter(ARG_ACTION);
-
-    public static Help.Info HELP_INFO = new Help.Info("kdb", new Syntax[] {
-            new Syntax("Print the state of the kernel debugger"),
-            new Syntax("En/Disable the kernel debugger", PARAM_ACTION) });
+    public KdbCommand() {
+        super("Control kernel debugging");
+        registerArguments(FLAG_OFF, FLAG_ON);
+    }
 
     public static void main(String[] args) throws Exception {
-        final ParsedArguments cmdLine = HELP_INFO.parse(args);
-        
-        if (PARAM_ACTION.isSet(cmdLine)) {
-            final String action = ARG_ACTION.getValue(cmdLine);
-            if (action.equals("on")) {
-                Unsafe.setKdbEnabled(true);
-            } else {
-                Unsafe.setKdbEnabled(false);
-            }
-        } else {
+        new KdbCommand().execute(args);
+    }
+    
+    @Override
+    public void execute(CommandLine commandLine, InputStream in,
+            PrintStream out, PrintStream err) {
+        if (FLAG_OFF.isSet()) {
+            Unsafe.setKdbEnabled(false);
+            out.println("KDB disabled");
+        }
+        else if (FLAG_ON.isSet()) {
+            Unsafe.setKdbEnabled(true);
+            out.println("KDB enabled");
+        } 
+        else {
+            // FIXME ... we shouldn't have to do this ...
             final boolean state = Unsafe.setKdbEnabled(false);
             Unsafe.setKdbEnabled(state);
-            System.out.println("KDB is " + (state ? "enabled" : "disabled"));
+            out.println("KDB is " + (state ? "enabled" : "disabled"));
         }        
     }
 }
