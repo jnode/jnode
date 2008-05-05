@@ -129,7 +129,7 @@ public class OptionSetSyntax extends GroupSyntax {
             }
             childMuSyntaxes[i] = childSyntax.prepare(bundle);
         }
-        if (!flagOptions.isEmpty()) {
+        if (flagOptions.size() > 1) {
             // We deal with combined flag options by adding a proxy argument to the
             // bundle whose 'accept' method will unpick (say) '-ab', and dispatch
             // it to the corresponding FlagArguments.
