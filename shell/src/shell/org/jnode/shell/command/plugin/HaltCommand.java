@@ -21,20 +21,31 @@
  
 package org.jnode.shell.command.plugin;
 
-import org.jnode.shell.help.Help;
+import java.io.InputStream;
+import java.io.PrintStream;
+
+import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.CommandLine;
 import org.jnode.vm.VmSystem;
 
 /**
  * Halts the system
  * 
- * @author epr
+ * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class HaltCommand {
+public class HaltCommand extends AbstractCommand {
 
-    public static Help.Info HELP_INFO = new Help.Info("halt",
-            "Stop all services and devices, so the computer can be turned off");
+    public HaltCommand() {
+        super("Stop all services and devices, so that the computer can be turned off");
+    }
 
     public static void main(String[] args) throws Exception {
+        new HaltCommand().execute(args);
+    }
+
+    @Override
+    public void execute(CommandLine commandLine, InputStream in,
+            PrintStream out, PrintStream err) {
         VmSystem.halt(false);
     }
 }
