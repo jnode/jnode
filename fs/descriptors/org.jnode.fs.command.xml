@@ -50,9 +50,9 @@
     </syntax>
     <syntax alias="del">
       <sequence description="delete a file or directory">
-        <optionSet>
+        <optional>
           <option argLabel="recursive" shortName="r" description="recursively delete a directory's contents" />
-        </optionSet>
+        </optional>
         <argument argLabel="file/dir"/>
       </sequence>
     </syntax>
