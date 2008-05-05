@@ -76,6 +76,7 @@ public class OptionSetSyntax extends GroupSyntax {
                     throw new CommandSyntaxException("'" + ch + "' is not a known flag");
                 }
             }
+            addValue(true);
         }
 
         @Override
