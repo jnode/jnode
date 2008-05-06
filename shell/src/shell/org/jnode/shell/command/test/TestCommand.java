@@ -24,54 +24,49 @@ package org.jnode.shell.command.test;
 import java.io.InputStream;
 import java.io.PrintStream;
 
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.argument.ClassNameArgument;
+import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.CommandLine;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.ClassNameArgument;
 
 /**
  * @author epr
+ * @author crawley@jnode.org
  */
-public class TestCommand {
+public class TestCommand extends AbstractCommand {
 
-    static final ClassNameArgument ARG_CLASS = new ClassNameArgument(
-            "classname", "the class representing the testcase");
+    private final ClassNameArgument ARG_CLASS = new ClassNameArgument(
+            "className", Argument.MANDATORY, "the class representing the testcase");
 
-    // static final Argument ARG_ARGS = new Argument("arg", "the argument(s) to
-    // pass to the testcase", Argument.MULTI);
-
-    public static Help.Info HELP_INFO = new Help.Info("utest",
-            "Run a JUnit testcase", new Parameter[] { new Parameter(ARG_CLASS,
-                    Parameter.MANDATORY)
-            // new Parameter(ARG_ARGS, Parameter.OPTIONAL)
-            });
+    public TestCommand() {
+        super("Run a JUnit testcase");
+        registerArguments(ARG_CLASS);
+    }
 
     public static void main(String[] args) throws Exception {
-        new TestCommand().execute(HELP_INFO.parse(args), System.in, System.out,
-                System.err);
+        new TestCommand().execute(args);
     }
 
     /**
      * Execute this command
+     * 
+     * @throws ClassNotFoundException 
      */
-    public void execute(ParsedArguments cmdLine, InputStream in,
-            PrintStream out, PrintStream err) throws Exception {
-
-        Class<?> clazz = ARG_CLASS.getClass(cmdLine);
-
-        JNodeTestRunner.run(clazz);
-    }
-
-    private static class JNodeTestRunner extends TestRunner {
-
-        public static void run(Class<?> testClass) {
-            JNodeTestRunner runner = new JNodeTestRunner();
-            TestSuite suite = new TestSuite(testClass);
-            runner.doRun(suite);
+    public void execute(CommandLine cmdLine, InputStream in,
+            PrintStream out, PrintStream err) {
+        try {
+            Class<?> clazz = ARG_CLASS.getValueAsClass();
+            TestResult res = new TestRunner().doRun(new TestSuite(clazz));
+            if (!res.wasSuccessful()) {
+                exit(1);
+            }
+        } catch (ClassNotFoundException ex) {
+            err.println("Class not found: " + ex.getMessage());
+            exit(2);
         }
     }
-
 }
