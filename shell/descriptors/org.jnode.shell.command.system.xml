@@ -20,7 +20,7 @@
   <extension point="org.jnode.shell.aliases">
   	<alias name="cpuid"        class="org.jnode.shell.command.system.CpuIDCommand"/>
 	<alias name="kdb"          class="org.jnode.shell.command.system.KdbCommand"/>
-	<alias name="lsirq"        class="org.jnode.shell.command.system.LsIRQ"/>
+	<alias name="lsirq"        class="org.jnode.shell.command.system.LsIRQCommand"/>
 	<alias name="vminfo"       class="org.jnode.vm.Vm"/>
   </extension>
   
@@ -31,6 +31,7 @@
       <option argLabel="off" longName="off" description="Turn kernel debugging off"/>
       <option argLabel="on" longName="on" description="Turn kernel debugging on"/>
     </syntax>
+    <syntax alias="lsirq" description="dump IRQ handler information"/>
   </extension>
 
 </plugin>
