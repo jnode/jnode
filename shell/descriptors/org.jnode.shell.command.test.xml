@@ -23,6 +23,12 @@
         <alias name="utest" class="org.jnode.shell.command.test.TestCommand"/>
         <alias name="suite" class="org.jnode.shell.command.test.SuiteCommand"/>
     </extension>
+    
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="utest">
+      <argument argLabel="className" description="run a JUnit testcase"/>
+    </syntax>
+  </extension>
 
   <extension point="org.jnode.security.permissions">
     <permission class="java.util.PropertyPermission" name="user.home" actions="read"/>    
