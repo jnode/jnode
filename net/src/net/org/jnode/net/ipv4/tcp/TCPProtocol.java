@@ -41,6 +41,7 @@ import org.jnode.net.ipv4.IPv4Header;
 import org.jnode.net.ipv4.IPv4Protocol;
 import org.jnode.net.ipv4.IPv4Service;
 import org.jnode.util.Statistics;
+import org.jnode.util.NumberUtils;
 
 /**
  * @author epr
@@ -170,10 +171,19 @@ public class TCPProtocol implements IPv4Protocol, IPv4Constants, TCPConstants {
                     ipHdr.getSource(), hdr.getSrcPort(),
                     ipHdr.getDestination(), hdr.getDstPort(), true);
             if (cb == null) {
-                // Port unreachable
-                log.debug("Port unreachable");
-                stat.noport.inc();
+              final boolean ack = hdr.isFlagAcknowledgeSet();
+              final boolean rst = hdr.isFlagResetSet();
+
+              stat.noport.inc();
+
+              // Port unreachable
+              if (ack && rst) {
+                // the source is also unreachable
+                log.debug("Dropping segment due to: connection refused as the source is also unreachable");
+              }
+             else {
                 processPortUnreachable(ipHdr, hdr);
+              }
             } else {
                 // Let the cb handle the receive
                 cb.receive(hdr, skbuf);
