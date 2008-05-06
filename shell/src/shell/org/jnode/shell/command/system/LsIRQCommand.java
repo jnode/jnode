@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: LsIRQ.java 2491 2006-04-23 11:31:22Z epr $
  *
  * JNode.org
  * Copyright (C) 2003-2006 JNode.org
@@ -21,20 +21,35 @@
  
 package org.jnode.shell.command.system;
 
+import java.io.InputStream;
+import java.io.PrintStream;
+
+import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.CommandLine;
 import org.jnode.vm.scheduler.IRQManager;
 import org.jnode.vm.scheduler.VmProcessor;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class LsIRQ {
+public class LsIRQCommand extends AbstractCommand {
+    
+    public LsIRQCommand() {
+        super("prints IRQ handler info");
+    }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+        new LsIRQCommand().execute(args);
+    }
+    
+    @Override
+    public void execute(CommandLine commandLine, InputStream in,
+            PrintStream out, PrintStream err) {
         final VmProcessor proc = VmProcessor.current();
         final IRQManager irqMgr = proc.getIRQManager();
         final int max = irqMgr.getNumIRQs();
         for (int i = 0; i < max; i++) {
-            System.out.println("IRQ" + i + "\t" + irqMgr.getIrqCount(i) + "\t"
+            out.println("IRQ" + i + "\t" + irqMgr.getIrqCount(i) + "\t"
                     + irqMgr.getHandlerInfo(i));
         }
     }
