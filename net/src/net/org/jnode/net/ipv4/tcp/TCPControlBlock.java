@@ -351,7 +351,27 @@ public class TCPControlBlock extends IPv4ControlBlock implements TCPConstants {
         inChannel.processData(ipHdr, hdr, skbuf);
         // Update state
         if (fin) {
-            setState(TCPS_TIME_WAIT);
+          setState(TCPS_TIME_WAIT);
+
+          // wait for 2MSL (2 maximum segment life time)
+          final long start = System.currentTimeMillis();
+          int timeout = 400;
+          long now;
+
+          while (true) {
+              now = System.currentTimeMillis();
+              if ((start + timeout <= now)) {
+                  // We have a timeout
+                  break;
+              }
+              try {
+                wait(10);
+              } catch (InterruptedException ex) {
+                  // Ignore
+              }
+          }
+         setState(TCPS_CLOSED);
+
         } else {
             // Invalid segment
             drop(ipHdr, hdr, "FIN expected");
@@ -397,6 +417,7 @@ public class TCPControlBlock extends IPv4ControlBlock implements TCPConstants {
      * @param skbuf
      */
     private final void receiveTimeWait(IPv4Header ipHdr, TCPHeader hdr, SocketBuffer skbuf) throws SocketException {
+      setState(TCPS_CLOSED);
         drop(ipHdr, hdr, "discard all in TIME_WAIT state");
     }
 
