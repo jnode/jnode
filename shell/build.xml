@@ -25,7 +25,8 @@
 <!-- Compile all subproject java files -->
   <target name="compile" depends="prepare">
     <jnode.compile>
-	  <src path="${my-src.dir}/shell"/>
+        <src path="${my-src.dir}/shell"/>
+        <src path="${my-src.dir}/test"/>
       <classpath refid="my-cp"/>
     </jnode.compile>
   </target>
