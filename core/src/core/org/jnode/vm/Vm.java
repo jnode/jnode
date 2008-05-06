@@ -242,31 +242,32 @@ public final class Vm extends VmSystemObject implements Statistics {
     public final int availableProcessors() {
         return processors.size();
     }
-
-    /**
-     * Show VM info.
-     * 
-     * @param args
-     */
-    public static void main(String[] args) {
-        final Vm vm = getVm();
-        if ((vm != null) && !vm.isBootstrap()) {
-            final PrintStream out = System.out;
-            out.println("JNode VM " + vm.getVersion());
-            vm.dumpStatistics(out);
-            vm.getSharedStatics().dumpStatistics(out);
-            vm.heapManager.dumpStatistics(out);
-            final SecurityManager sm = System.getSecurityManager();
-            out.println("Security manager: " + sm);
-            for (VmProcessor cpu : vm.processors) {
-                out.println("Processor " + vm.processors.indexOf(cpu) + " (" + cpu.getIdString() + ")");
-                cpu.dumpStatistics(out);
-            }
-            if ((args.length > 0) && args[0].equals("reset")) {
-                vm.resetCounters();
-            }
-        }
-    }
+    
+    // The following code has been moved to org.jnode.shell.command.system.VmInfoCommand
+//    /**
+//     * Show VM info.
+//     * 
+//     * @param args
+//     */
+//    public static void main(String[] args) {
+//        final Vm vm = getVm();
+//        if ((vm != null) && !vm.isBootstrap()) {
+//            final PrintStream out = System.out;
+//            out.println("JNode VM " + vm.getVersion());
+//            vm.dumpStatistics(out);
+//            vm.getSharedStatics().dumpStatistics(out);
+//            vm.heapManager.dumpStatistics(out);
+//            final SecurityManager sm = System.getSecurityManager();
+//            out.println("Security manager: " + sm);
+//            for (VmProcessor cpu : vm.processors) {
+//                out.println("Processor " + vm.processors.indexOf(cpu) + " (" + cpu.getIdString() + ")");
+//                cpu.dumpStatistics(out);
+//            }
+//            if ((args.length > 0) && args[0].equals("reset")) {
+//                vm.resetCounters();
+//            }
+//        }
+//    }
 
     /**
      * Does this VM run in debug mode.
@@ -395,7 +396,7 @@ public final class Vm extends VmSystemObject implements Statistics {
         }
     }
 
-    protected final void resetCounters() {
+    public final void resetCounters() {
         if (statistics != null) {
             final Statistic[] stats = getStatistics();
             for (int i = 0; i < stats.length; i++) {
@@ -501,5 +502,12 @@ public final class Vm extends VmSystemObject implements Statistics {
         if (this.scheduler == null) {
             this.scheduler = scheduler;
         }
+    }
+
+    /**
+     * @return a copy of the processors list
+     */
+    public final List<VmProcessor> getProcessors() {
+        return new BootableArrayList<VmProcessor>(processors);
     }
 }
