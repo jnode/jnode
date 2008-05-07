@@ -26,7 +26,7 @@
   </runtime>
   
   <extension point="org.jnode.testrunner.tests">
-    <test class="org.jnode.test.shell.help.AllTests" category="shell"/>
-    <test class="org.jnode.test.shell.syntax.AllTests" category="shell"/>
+    <suite class="org.jnode.test.shell.help.AllTests" category="shell"/>
+    <suite class="org.jnode.test.shell.syntax.AllTests" category="shell"/>
   </extension>  
 </plugin>
