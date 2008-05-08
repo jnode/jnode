@@ -30,83 +30,74 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.jnode.driver.console.CompletionInfo;
-import org.jnode.shell.help.Argument;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.argument.OptionArgument;
+import org.jnode.shell.AbstractCommand;
+import org.jnode.shell.CommandLine;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.CommandSyntaxException;
+import org.jnode.shell.syntax.FlagArgument;
+import org.jnode.shell.syntax.StringArgument;
 import org.jnode.test.framework.TestManager;
 
 /**
+ * This command runs JUnit tests registered with the JNode test framework.
+ * 
  * @author Fabien DUMINY (fduminy@jnode.org)
+ * @author crawley@jnode.org
  */
-public class SuiteCommand {
-	static private final OptionArgument.Option OPT_LIST = new OptionArgument.Option("list", "list the tests");
-	static private final OptionArgument.Option OPT_RUN = new OptionArgument.Option("run", "run the tests for given categories"); 
-	static final OptionArgument ARG_ACTION = new OptionArgument(
-			"action", "action to do", OPT_LIST, OPT_RUN);
-	
-    static final CategoryArgument ARG_CATEGORY = new CategoryArgument(
-            "category", "a category of test to run", CategoryArgument.MULTI);
-
-	static final Parameter PARAM_ACTION = new Parameter(ARG_ACTION);
-
-	static final Parameter PARAM_CATEGORY = new Parameter(ARG_CATEGORY, Parameter.OPTIONAL);
-
-    public static Help.Info HELP_INFO = new Help.Info("suite",
-            "Run one or more JUnit testcase(s)", 
-           new Parameter[] 
-           { PARAM_ACTION, PARAM_CATEGORY});
+public class SuiteCommand extends AbstractCommand {
+    private final FlagArgument FLAG_LIST = 
+        new FlagArgument("list", Argument.OPTIONAL, "list the tests");
+    
+    private final FlagArgument FLAG_RUN = 
+        new FlagArgument("run", Argument.OPTIONAL, "run the tests");
+    
+    private final CategoryArgument ARG_CATEGORY =
+        new CategoryArgument("category", Argument.OPTIONAL | Argument.MULTIPLE,
+                "test categories to run or list");
+    
+    public SuiteCommand() {
+        super("Run one or more JUnit testcase(s)");
+        registerArguments(FLAG_LIST, FLAG_RUN, ARG_CATEGORY);
+    }
 
     public static void main(String[] args) throws Exception {
-        new SuiteCommand().execute(HELP_INFO.parse(args), System.in, System.out,
-                System.err);
+        new SuiteCommand().execute(args);
     }
 
     /**
      * Execute this command
      */
-    public void execute(ParsedArguments cmdLine, InputStream in,
-            PrintStream out, PrintStream err) throws Exception {
-
-    	String action = ARG_ACTION.getValue(cmdLine);
-    	if(OPT_LIST.getName().equals(action))
-    	{
-    		TestManager mgr = TestManager.getInstance();
-    		for(Class<? extends Test> test : mgr.getTests())
-    		{
-    			out.print(test.getName()+" :");
-    			for(String category : mgr.getCategories(test))
-    			{
+    public void execute(CommandLine cmdLine, InputStream in,
+            PrintStream out, PrintStream err) {
+        TestManager mgr = TestManager.getInstance();
+        if (FLAG_LIST.isSet()) {
+    		for (Class<? extends Test> test : mgr.getTests()) {
+    			out.print(test.getName() + " :");
+    			for (String category : mgr.getCategories(test)) {
     				out.print(" ");
     				out.print(category);
     			}
     			out.println();
     		}
     	}
-    	else if(OPT_RUN.getName().equals(action))
-    	{
-        	String[] categories = ARG_CATEGORY.getValues(cmdLine);
+    	else if (FLAG_RUN.isSet()) {
+        	String[] categories = ARG_CATEGORY.getValues();
         	if (categories == null) {
         		categories = new String[0];
         	}
-        	TestSuite suite = TestManager.getInstance().getTestSuite(Arrays.asList(categories));
+        	TestSuite suite = mgr.getTestSuite(Arrays.asList(categories));
         	junit.textui.TestRunner.run(suite);        	
-    	}
-    	else
-    	{
-    		HELP_INFO.help(null, System.out);
     	}
     }
     
-    private static class CategoryArgument extends Argument {
+    /**
+     * Validate and complete test categories against the categories known to
+     * the TestManager.
+     */
+    private static class CategoryArgument extends StringArgument {
 
-        public CategoryArgument(String name, String description, boolean multi) {
-            super(name, description, multi);
-        }
-
-        public CategoryArgument(String name, String description) {
-            super(name, description);
+        public CategoryArgument(String label, int flags, String description) {
+            super(label, flags, description);        
         }
 
         public void complete(CompletionInfo completion, String partial) {
@@ -118,12 +109,14 @@ public class SuiteCommand {
         	}
         }
         
-        protected boolean isValidValue(String category) {
-        	if((category == null) || "".equals(category))
-        		return true;
-        	
+        protected String doAccept(String category) throws CommandSyntaxException {
         	Set<String> availCategories = TestManager.getInstance().getCategories();
-        	return availCategories.contains(category);
+        	if (availCategories.contains(category)) {
+        	    return category;
+        	}
+        	else {
+        	    throw new CommandSyntaxException("not a recognized JUnit test category");
+        	}
         }    
     }
 }

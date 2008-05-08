@@ -7,7 +7,8 @@
         license-name="lgpl"
     provider-name="JNode.org">
 
-    <requires>
+    <requires> 
+        <import plugin="org.jnode.runtime.core"/>
 	    <import plugin="org.junit" version="3.8"/>
 	    <import plugin="org.jnode.shell.help"/>
 		<import plugin="org.jnode.testrunner"/>
@@ -27,6 +28,16 @@
   <extension point="org.jnode.shell.syntaxes">
     <syntax alias="utest">
       <argument argLabel="className" description="run a JUnit testcase"/>
+    </syntax>
+    <syntax alias="suite">
+      <sequence description="run JUnit tests registered with the TestManager">
+        <option argLabel="run" longName="run" shortName="r"/>
+        <repeat minCount="0">
+          <argument argLabel="category"/>
+        </repeat>
+      </sequence>
+      <option argLabel="list" longName="list" shortName="l" 
+              description="list JUnit tests registered with the TestManager"/>
     </syntax>
   </extension>
 
