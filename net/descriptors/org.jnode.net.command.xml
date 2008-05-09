@@ -44,6 +44,9 @@
         <empty description="List the ARP cache"/>
         <option argLabel="clear" shortName="c" longName="clear" description="Clear the ARP cache"/>
       </syntax>
+      <syntax alias="bootp">
+        <argument argLabel="device" description="Configure a network interface using BOOTP"/>
+      </syntax>
     </extension>
   
     <extension point="org.jnode.security.permissions">
