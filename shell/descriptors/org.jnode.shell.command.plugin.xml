@@ -28,7 +28,7 @@
         description="Shutdown all services and devices so that the computer can be powered off"/>
     <syntax alias="plugin">
       <empty description="list all plugins"/>
-      <argument argLabel="plugin" description="list a the given plugin"/>
+      <argument argLabel="plugin" description="list the given plugin"/>
       <sequence description="load the given plugin">
         <option argLabel="load" longName="load" shortName="l"/>
         <argument argLabel="plugin"/>
