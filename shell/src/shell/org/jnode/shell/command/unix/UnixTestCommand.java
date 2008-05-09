@@ -38,6 +38,8 @@ import org.jnode.shell.help.SyntaxErrorException;
  * @author crawley@jnode.org
  */
 public class UnixTestCommand extends AbstractCommand {
+    // FIXME convert to use the new commandline syntax mechanism so that 
+    // we get command completion.
     private static class Operator {
         public final int opNo;
         public final int priority;
