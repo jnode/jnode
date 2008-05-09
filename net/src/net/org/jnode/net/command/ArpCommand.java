@@ -24,29 +24,29 @@ package org.jnode.net.command;
 import java.io.InputStream;
 import java.io.PrintStream;
 
+import org.jnode.driver.net.NetworkException;
+import org.jnode.net.NoSuchProtocolException;
 import org.jnode.net.arp.ARPCacheEntry;
 import org.jnode.net.arp.ARPNetworkLayer;
 import org.jnode.net.ethernet.EthernetConstants;
 import org.jnode.net.util.NetUtils;
-import org.jnode.shell.AbstractCommand; 
+import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.Syntax;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.FlagArgument;
 
 /**
  * @author epr
  */
 public class ArpCommand extends AbstractCommand {
 
-	static final Parameter PARAM_DELETE = new Parameter("d", "delete the ARP cache", Parameter.MANDATORY);
+	private final FlagArgument FLAG_CLEAR = 
+	    new FlagArgument("clear", Argument.OPTIONAL, "if set, clear the ARP cache");
 
-	public static Help.Info HELP_INFO = new Help.Info("arp", 
-		new Syntax[] { 
-			new Syntax("Print ARP cache"), 
-			new Syntax("Clear ARP cache", new Parameter[] { PARAM_DELETE })
-	});
+	public ArpCommand() {
+	    super("print or clear the ARP cache");
+	    registerArguments(FLAG_CLEAR);
+	}
 
 	/**
 	 * Execute this command
@@ -55,16 +55,17 @@ public class ArpCommand extends AbstractCommand {
 		new ArpCommand().execute(args);
 	}
 
-	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-		ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
-
+	public void execute(CommandLine commandLine, InputStream in, 
+	        PrintStream out, PrintStream err) throws NoSuchProtocolException, NetworkException {
+		
 		ARPNetworkLayer arp = (ARPNetworkLayer) NetUtils.getNLM().getNetworkLayer(EthernetConstants.ETH_P_ARP);
-		if (PARAM_DELETE.isSet(cmdLine)) {
+		if (FLAG_CLEAR.isSet()) {
 			arp.getCache().clear();
-			System.out.println("Cleared the ARP cache");
-		} else {
+			out.println("Cleared the ARP cache");
+		} 
+		else {
 			for (ARPCacheEntry entry : arp.getCache().entries()) {
-				System.out.println(entry);
+				out.println(entry);
 			}
 		}
 	}
