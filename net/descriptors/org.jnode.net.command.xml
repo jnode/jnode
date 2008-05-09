@@ -38,7 +38,14 @@
         <alias name="net" class="org.jnode.net.command.NetCommand"/>
         <alias name="rpcinfo" class="org.jnode.net.command.RpcInfoCommand"/>
     </extension>
-
+    
+    <extension point="org.jnode.shell.syntaxes">
+      <syntax alias="arp">
+        <empty description="List the ARP cache"/>
+        <option argLabel="clear" shortName="c" longName="clear" description="Clear the ARP cache"/>
+      </syntax>
+    </extension>
+  
     <extension point="org.jnode.security.permissions">
 		<permission class="java.net.SocketPermission" name="*" actions="connect,resolve"/>
 		<permission class="java.net.SocketPermission" name="*:1024-" actions="listen,accept"/>
