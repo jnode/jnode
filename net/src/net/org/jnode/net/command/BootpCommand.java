@@ -24,45 +24,42 @@ package org.jnode.net.command;
 import java.io.InputStream;
 import java.io.PrintStream;
 
+import javax.naming.NameNotFoundException;
+
 import org.jnode.driver.Device;
 import org.jnode.driver.net.NetDeviceAPI;
+import org.jnode.driver.net.NetworkException;
 import org.jnode.naming.InitialNaming;
 import org.jnode.net.ipv4.config.IPv4ConfigurationService;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.argument.DeviceArgument;
+import org.jnode.shell.syntax.*;
 
 /**
  * @author epr
  */
 public class BootpCommand extends AbstractCommand {
 
-        static final DeviceArgument ARG_DEVICE = new DeviceArgument("device", "the device to boot from", NetDeviceAPI.class);
+    private final DeviceArgument ARG_DEVICE = 
+        new DeviceArgument("device", Argument.MANDATORY, 
+                "", NetDeviceAPI.class);
 
-	public static Help.Info HELP_INFO = new Help.Info(
-		"bootp",
-		"Try to configure the given device using BOOTP",
-		new Parameter[]{
-			new Parameter(ARG_DEVICE, Parameter.MANDATORY)
-		}
-	);
+	public BootpCommand() {
+	    super("Configure a network interface using BOOTP");
+	    registerArguments(ARG_DEVICE);
+	}
 
-	public static void main(String[] args)
-	throws Exception {
+	public static void main(String[] args) throws Exception {
 		new BootpCommand().execute(args);
 	}
 
-	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-		ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
-
-		final Device dev = ARG_DEVICE.getDevice(cmdLine);
-		System.out.println("Trying to configure " + dev.getId() + "...");
-		final IPv4ConfigurationService cfg = (IPv4ConfigurationService)InitialNaming.lookup(IPv4ConfigurationService.NAME);
+	public void execute(CommandLine commandLine, InputStream in, 
+	        PrintStream out, PrintStream err) throws NameNotFoundException, NetworkException {
+		final Device dev = ARG_DEVICE.getValue();
+		out.println("Trying to configure " + dev.getId() + "...");
+		final IPv4ConfigurationService cfg = 
+		    (IPv4ConfigurationService) InitialNaming.lookup(IPv4ConfigurationService.NAME);
 		cfg.configureDeviceBootp(dev, true);
-		
 	}
 
 }
