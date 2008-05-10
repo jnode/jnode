@@ -24,71 +24,68 @@ package org.jnode.net.command;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.InetAddress;
-import java.net.NoRouteToHostException;
+import java.net.UnknownHostException;
 
 import javax.naming.NameNotFoundException;
 
+import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceNotFoundException;
 import org.jnode.driver.net.NetDeviceAPI;
+import org.jnode.driver.net.NetworkException;
 import org.jnode.naming.InitialNaming;
 import org.jnode.net.ProtocolAddressInfo;
 import org.jnode.net.ethernet.EthernetConstants;
-import org.jnode.net.ipv4.IPv4Address;
-import org.jnode.net.ipv4.IPv4RoutingTable;
 import org.jnode.net.ipv4.config.IPv4ConfigurationService;
-import org.jnode.net.ipv4.layer.IPv4NetworkLayer;
-import org.jnode.net.util.NetUtils;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
-import org.jnode.shell.help.SyntaxErrorException;
-import org.jnode.shell.help.argument.DeviceArgument;
+import org.jnode.shell.syntax.Argument;
+import org.jnode.shell.syntax.DeviceArgument;
 
 /**
  * @author markhale
+ * @author crawley@jnode.org
  */
 public class DhcpCommand extends AbstractCommand {
 
-        static final DeviceArgument ARG_DEVICE = new DeviceArgument("device", "the device to boot from", NetDeviceAPI.class);
+    private final DeviceArgument ARG_DEVICE = 
+        new DeviceArgument("device", Argument.MANDATORY, 
+                "the network interface device to be configured", NetDeviceAPI.class);
 
-	public static Help.Info HELP_INFO = new Help.Info(
-		"dhcp",
-		"Try to configure the given device using DHCP",
-		new Parameter[]{
-			new Parameter(ARG_DEVICE, Parameter.MANDATORY)
-		}
-	);
+    public DhcpCommand() {
+        super("Configure a network interface using DHCP");
+        registerArguments(ARG_DEVICE);
+    }
 
-	public static void main(String[] args)
-	throws Exception {
-		new DhcpCommand().execute(args);
-	}
+    public static void main(String[] args) throws Exception {
+        new DhcpCommand().execute(args);
+    }
 
-	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-		ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) 
+    throws DeviceNotFoundException, NameNotFoundException, ApiNotFoundException, 
+    UnknownHostException, NetworkException
+    {
+        final Device dev = ARG_DEVICE.getValue();
 
-		final Device dev = ARG_DEVICE.getDevice(cmdLine);
-		
-		// The DHCP network configuration process will attempt to configure the DNS.  This will only work if
-		// the IP address 127.0.0.1 is bound to the loopback network interface.  And if there isn't the network
-		// is left in a state that will require a reboot to unjam.  Check that we have bound it ...
-		Device loopback = ((DeviceManager)InitialNaming.lookup(DeviceManager.NAME)).getDevice("loopback");
-		NetDeviceAPI api = (NetDeviceAPI)loopback.getAPI(NetDeviceAPI.class);
-		ProtocolAddressInfo info = api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP);
-		if (info == null || !info.contains(InetAddress.getByAddress(new byte[]{127, 0, 0, 1}))) {
-		        System.err.println("The loopback network device is not bound to IP address 127.0.0.1");
-		        System.err.println("Run 'ifconfig loopback 127.0.0.1 255.255.255.255' to fix this.");
-		        exit(1);
-		}
- 
-		// Now it should be safe to do the DHCP configuration ...
-		System.out.println("Trying to configure " + dev.getId() + "...");
-		final IPv4ConfigurationService cfg = (IPv4ConfigurationService)InitialNaming.lookup(IPv4ConfigurationService.NAME);
-		cfg.configureDeviceDhcp(dev, true);
-	}
+        // The DHCP network configuration process will attempt to configure the DNS.  This will only work if
+        // the IP address 127.0.0.1 is bound to the loopback network interface.  And if there isn't, JNode's
+        // network layer is left in a state that will require a reboot to unjam it (AFAIK).  
+        //
+        // So, check that loopback is correctly bound ...
+        Device loopback = ((DeviceManager) InitialNaming.lookup(DeviceManager.NAME)).getDevice("loopback");
+        NetDeviceAPI api = (NetDeviceAPI) loopback.getAPI(NetDeviceAPI.class);
+        ProtocolAddressInfo info = api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP);
+        if (info == null || !info.contains(InetAddress.getByAddress(new byte[]{127, 0, 0, 1}))) {
+            err.println("The loopback network device is not bound to IP address 127.0.0.1");
+            err.println("Run 'ifconfig loopback 127.0.0.1 255.255.255.255' to fix this.");
+            exit(1);
+        }
 
+        // Now it should be safe to do the DHCP configuration.
+        out.println("Configuring network device " + dev.getId() + "...");
+        final IPv4ConfigurationService cfg = 
+            (IPv4ConfigurationService) InitialNaming.lookup(IPv4ConfigurationService.NAME);
+        cfg.configureDeviceDhcp(dev, true);
+    }
 }

@@ -47,6 +47,9 @@
       <syntax alias="bootp">
         <argument argLabel="device" description="Configure a network interface using BOOTP"/>
       </syntax>
+      <syntax alias="dhcp">
+        <argument argLabel="device" description="Configure a network interface using DHCP"/>
+      </syntax>
     </extension>
   
     <extension point="org.jnode.security.permissions">
