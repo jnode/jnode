@@ -201,13 +201,15 @@ public class SoftwareCursor extends BitmapGraphics implements HardwareCursorAPI 
 		}
 	}
 
-	public void setCursorPosition(int x, int y) {		
-		x = Math.min(Math.max(x, 0), graphics.getWidth() - 1);
-		y = Math.min(Math.max(y, 0), graphics.getHeight() - 1);
-		
+	public void setCursorPosition(int x, int y) {
 		try
 		{
-			if((cursorArea.getX()  != x) || (cursorArea.getY() != y))
+			// x,y corresponds to the location of the cursor's hotspot on the screen
+			// it can be anywhere in the screen area (but some part of the cursor might not be visible)
+			x = Math.min(Math.max(x, 0), graphics.getWidth() - 1);
+			y = Math.min(Math.max(y, 0), graphics.getHeight() - 1);
+			
+			if((cursorArea.getX() != x) || (cursorArea.getY() != y))
 			{
 				hideCursor();
 
@@ -278,20 +280,24 @@ public class SoftwareCursor extends BitmapGraphics implements HardwareCursorAPI 
 				screenBackup = new int[cursorImage.getWidth() * cursorImage.getHeight()];
 			}
 
-//			screenBackup = graphics.doGetPixels(new Rectangle(cursorX, cursorY, cursorImage.getWidth(), cursorImage.getHeight()));
+//			screenBackup = graphics.doGetPixels(cursorArea);
 			final int cursorX = (int) cursorArea.getX();
 			final int cursorY = (int) cursorArea.getY();
 			final int maxY = Math.min(cursorY + cursorImage.getHeight(), graphics.getHeight());
 			final int maxX = Math.min(cursorX + cursorImage.getWidth(), graphics.getWidth());
+			final int width = cursorImage.getWidth();
 						
 			int index = 0;
 			for(int y = cursorY ; y < maxY ; y++)
 			{
+				int lineIndex = index;
 				for(int x = cursorX ; x < maxX ; x++)
 				{
-					screenBackup[index] = graphics.doGetPixel(x, y);
-					index++;
-				}				
+					screenBackup[lineIndex] = graphics.doGetPixel(x, y);
+					lineIndex++;
+				}
+				
+				index += width;
 			}		
 			
 			putPixels(cursorImage.getImage(), screenBackup);		
@@ -312,27 +318,31 @@ public class SoftwareCursor extends BitmapGraphics implements HardwareCursorAPI 
 		final int cursorY = (int) cursorArea.getY();		
 		final int maxY = Math.min(cursorY + cursorImage.getHeight(), graphics.getHeight());
 		final int maxX = Math.min(cursorX + cursorImage.getWidth(), graphics.getWidth());
-		
+		final int width = cursorImage.getWidth();
+			
 		int index = 0;
 		for(int y = cursorY ; y < maxY ; y++)
 		{
+			int lineIndex = index;			
 			for(int x = cursorX ; x < maxX ; x++)
 			{
 				int color;
 				if(background == null)
 				{
-					color = pixels[index];
+					color = pixels[lineIndex];
 				}
 				else
 				{
-					final int c = pixels[index];
+					final int c = pixels[lineIndex];
 					final boolean isTransparent = (c == 0); 
-					color = isTransparent ? background[index] : c;
+					color = isTransparent ? background[lineIndex] : c;
 				}
 				
 				graphics.drawPixels(x, y, 1, color, Surface.PAINT_MODE);
-				index++;
-			}				
+				lineIndex++;
+			}	
+			
+			index += width;
 		}		
 	}
 }
