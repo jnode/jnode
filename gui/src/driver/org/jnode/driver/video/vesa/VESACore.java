@@ -82,10 +82,8 @@ public class VESACore extends AbstractSurface implements VESAConstants, PCI_IDs,
 	private int bytesPerLine;
 	private int offset;
 	private int displayWidth;
-	private boolean fifoDirty = false;
 	private SoftwareCursor bitmapGraphics;
 	private ColorModel model;
-	private static final int MOUSE_ID = 1;
 
 	/**
 	 * Create a new instance
@@ -300,7 +298,7 @@ public class VESACore extends AbstractSurface implements VESAConstants, PCI_IDs,
         final ColorModel cm = new DirectColorModel(bitsPerPixel, redMask, greenMask, blueMask, alphaMask);
 		Unsafe.debug("\ngetConfigs : after creation of DirectColorModel"); 		
         return new FrameBufferConfiguration[] {
-				new VESAConfiguration(1024, 768, cm),
+				new VESAConfiguration(maxWidth, maxHeight, cm),
         };
 		} catch(Throwable t)
         {
