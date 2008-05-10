@@ -81,7 +81,7 @@ public abstract class Argument<V> {
      * typically zero length.
      * @param description Optional documentation for the argument.
      */
-    Argument(String label, int flags, V[] vArray, String description) {
+    protected Argument(String label, int flags, V[] vArray, String description) {
         super();
         this.label = label;
         this.description = description;
