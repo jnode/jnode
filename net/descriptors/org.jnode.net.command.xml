@@ -20,6 +20,7 @@
         <library name="jnode-net.jar">
             <export name="org.jnode.net.command.*"/>
             <export name="org.jnode.net.help.argument.*"/>
+            <export name="org.jnode.net.syntax.*"/>
         </library>
     </runtime>
 
@@ -49,6 +50,15 @@
       </syntax>
       <syntax alias="dhcp">
         <argument argLabel="device" description="Configure a network interface using DHCP"/>
+      </syntax>
+      <syntax alias="ifconfig">
+        <empty description="Print network addresses for all network devices"/>
+        <argument argLabel="device" description="Print network addresses for a given device"/>
+        <sequence description="Bind a given device to an IPv4 address">
+          <argument argLabel="device"/>
+          <argument argLabel="ipAddress"/>
+          <optional><argument argLabel="subnetMask"/></optional>
+        </sequence>
       </syntax>
     </extension>
   
