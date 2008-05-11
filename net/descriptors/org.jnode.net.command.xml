@@ -60,6 +60,9 @@
           <optional><argument argLabel="subnetMask"/></optional>
         </sequence>
       </syntax>
+      <syntax alias="netstat">
+        <empty description="Print statistics for all network devices"/>
+      </syntax>
       <syntax alias="tcpinout">
         <argument argLabel="localPort" description="Run tcpinout in server mode"/>
         <sequence description="Run tcpinout in client mode">

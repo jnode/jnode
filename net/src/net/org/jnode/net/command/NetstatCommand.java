@@ -31,7 +31,6 @@ import org.jnode.net.TransportLayer;
 import org.jnode.net.util.NetUtils;
 import org.jnode.shell.AbstractCommand;
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.Help;
 import org.jnode.util.Statistic;
 import org.jnode.util.Statistics;
 
@@ -40,30 +39,19 @@ import org.jnode.util.Statistics;
  */
 public class NetstatCommand extends AbstractCommand {
 
-	public static Help.Info HELP_INFO = new Help.Info(
-		"netstat",
-		"Print the statistics of all network devices"
-	);
+	public NetstatCommand() {
+	    super("Print statistics for all network devices");
+	}
 
-	public static void main(String[] args)
-	throws Exception {
+	public static void main(String[] args) throws Exception {
 		new NetstatCommand().execute(args);
 	}
 
 	/**
 	 * Execute this command
 	 */
-	public void execute(
-		CommandLine cmdLine,
-		InputStream in,
-		PrintStream out,
-		PrintStream err)
+	public void execute(CommandLine cmdLine, InputStream in, PrintStream out, PrintStream err)
 	throws Exception {
-		showStats(out);
-	}
-
-	private void showStats(PrintStream out)
-	throws NetworkException {
 		final NetworkLayerManager nlm = NetUtils.getNLM();
 
 		for (NetworkLayer nl : nlm.getNetworkLayers()) {
@@ -82,7 +70,6 @@ public class NetstatCommand extends AbstractCommand {
 			final String prefix2 = prefix + prefix;
 			out.print(prefix2);
 			showStats(out, tl.getStatistics(), maxWidth - prefix2.length(), prefix2);
-			//out.println();
 		}
 		out.println();
 	}
