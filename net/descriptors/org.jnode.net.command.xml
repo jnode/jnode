@@ -36,7 +36,7 @@
         <alias name="resolve" class="org.jnode.net.command.ResolveCommand"/>
         <alias name="tftp" class="org.jnode.net.command.TftpCommand"/>
         <alias name="wlanctl" class="org.jnode.net.command.WLanCtlCommand"/>
-        <alias name="net" class="org.jnode.net.command.NetCommand"/>
+        <alias name="tcpinout" class="org.jnode.net.command.TcpInoutCommand"/>
         <alias name="rpcinfo" class="org.jnode.net.command.RpcInfoCommand"/>
     </extension>
     
@@ -58,6 +58,13 @@
           <argument argLabel="device"/>
           <argument argLabel="ipAddress"/>
           <optional><argument argLabel="subnetMask"/></optional>
+        </sequence>
+      </syntax>
+      <syntax alias="tcpinout">
+        <argument argLabel="localPort" description="Run tcpinout in server mode"/>
+        <sequence description="Run tcpinout in client mode">
+          <argument argLabel="host"/>
+          <argument argLabel="port"/>
         </sequence>
       </syntax>
     </extension>
