@@ -81,7 +81,7 @@ public abstract class EnumArgument<E extends Enum<E>> extends Argument<E> {
     }
 
     public String toString() {
-        return "EnumArgument<" + clazz + "{" + super.toString() + "}";
+        return "EnumArgument<" + clazz + ">{" + super.state() + "}";
     }
 
     @Override

@@ -43,11 +43,6 @@ public class ClassNameArgument extends Argument<String> {
     protected String doAccept(Token token) throws CommandSyntaxException {
         return token.token;
     }
-  
-    @Override
-    public String toString() {
-        return "ClassNameArgument{" + super.toString() + "}";
-    }
     
     @Override
     protected String argumentKind() {

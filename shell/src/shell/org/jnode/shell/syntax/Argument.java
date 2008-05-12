@@ -224,6 +224,14 @@ public abstract class Argument<V> {
      */
     @Override
     public String toString() {
+        return this.getClass().getSimpleName() + "{" + state() + "}";
+    }
+
+    /**
+     * Render this Argument's state for debug purposes.  Override this
+     * method in child classes to dump any relevant child class state.
+     */
+    protected String state() {
         return "label=" + label;
     }
 

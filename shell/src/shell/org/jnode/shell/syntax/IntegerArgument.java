@@ -85,8 +85,8 @@ public class IntegerArgument extends Argument<Integer> {
     }
 
     @Override
-    public String toString() {
-        return "IntegerArgument{" + super.toString() + "}";
+    protected String state() {
+        return super.state() + ",min=" + min + ",max=" + max;
     }
     
     @Override

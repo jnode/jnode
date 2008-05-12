@@ -94,11 +94,6 @@ public class FileArgument extends Argument<File> {
             }
         }
     }
-
-    @Override
-	public String toString() {
-	    return "FileArgument{" + super.toString() + "}";
-	}
 	
 	@Override
     protected String argumentKind() {
