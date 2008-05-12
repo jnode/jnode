@@ -66,6 +66,17 @@
       <syntax alias="ping">
         <argument argLabel="host" description="Ping a remote host"/>
       </syntax>
+      <syntax alias="resolver">
+        <empty description="List the DNS servers used by the resolver's list"/>
+        <sequence description="Add a DNS server to the resolver">
+          <option argLabel="add" shortName="a" longName="add"/>
+          <argument argLabel="server"/>
+        </sequence>
+        <sequence description="Remove a DNS server from the resolver's list">
+          <option argLabel="del" shortName="d" longName="del"/>
+          <argument argLabel="server"/>
+        </sequence>
+      </syntax>
       <syntax alias="tcpinout">
         <argument argLabel="localPort" description="Run tcpinout in server mode"/>
         <sequence description="Run tcpinout in client mode">
