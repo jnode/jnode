@@ -36,71 +36,76 @@ import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.Syntax;
 import org.jnode.shell.help.argument.OptionArgument;
 
-
+/**
+ * This command class manages the DNS resolver.
+ * 
+ * @author hagar-wize
+ */
 public class ResolverCommand extends AbstractCommand
 {
-  private static final String FUNC_ADD = "add";
-  private static final String FUNC_DEL = "del";
+    private static final String FUNC_ADD = "add";
+    private static final String FUNC_DEL = "del";
 
 
-  private static final OptionArgument ARG_FUNCTION =
-    new OptionArgument(
-      "function",
-      "the function to perform",
-      new OptionArgument.Option[] { new OptionArgument.Option(FUNC_ADD, "add a dns server"), new OptionArgument.Option(FUNC_DEL, "delete a dns server")});
+    private static final OptionArgument ARG_FUNCTION =
+        new OptionArgument(
+                "function",
+                "the function to perform",
+                new OptionArgument.Option[] { 
+                        new OptionArgument.Option(FUNC_ADD, "add a dns server"), 
+                        new OptionArgument.Option(FUNC_DEL, "delete a dns server")});
 
-  private static final HostArgument ARG_DNSSERVER = new HostArgument("dns server", "the dns server IP address");
-
-
-  public static Help.Info HELP_INFO =
-    new Help.Info(
-      "resolver",
-      new Syntax[] {
-        new Syntax("Print the dns servers"),
-        new Syntax(
-          "Add or remove a dns server",
-          new Parameter[] {
-            new Parameter(ARG_FUNCTION, Parameter.MANDATORY),
-            new Parameter(ARG_DNSSERVER, Parameter.MANDATORY)
-          })
-  });
+    private static final HostArgument ARG_DNSSERVER = 
+        new HostArgument("dns server", "the dns server IP address");
 
 
-  public static void main(String[] args) throws Exception {
-	  new ResolverCommand().execute(args);
-  }
+    public static Help.Info HELP_INFO =
+        new Help.Info(
+                "resolver",
+                new Syntax[] {
+                        new Syntax("Print the dns servers"),
+                        new Syntax(
+                                "Add or remove a dns server",
+                                new Parameter[] {
+                                        new Parameter(ARG_FUNCTION, Parameter.MANDATORY),
+                                        new Parameter(ARG_DNSSERVER, Parameter.MANDATORY)
+                                })
+                });
 
 
-	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-		ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
-	
-	    if (cmdLine.size() == 0)
-	    {
-	      Collection<String> resolvers = ResolverImpl.getDnsServers();
-	      if( resolvers == null )
-	    	  out.println("No DNS servers found.");
-	      else {
-		      out.println("DNS servers");
-	        for (String dnsServer : resolvers) {
-	            out.println(dnsServer);
-	        }
-	      }
-	    }
-	    else
-	    {
-	      String func = ARG_FUNCTION.getValue(cmdLine);
-	      IPv4Address server = ARG_DNSSERVER.getAddress(cmdLine);
-	
-	      if (FUNC_ADD.equals(func))
-	      {
-	        ResolverImpl.addDnsServer(server);
-	      }
-	      else if (FUNC_DEL.equals(func))
-	      {
-	        ResolverImpl.removeDnsServer(server);
-	      }
-	    }
-	
-	    out.println();
-	}
+    public static void main(String[] args) throws Exception {
+        new ResolverCommand().execute(args);
+    }
+
+
+    public void execute(CommandLine commandLine, InputStream in, 
+            PrintStream out, PrintStream err) throws Exception {
+        ParsedArguments cmdLine = HELP_INFO.parse(commandLine);
+
+        if (cmdLine.size() == 0) {
+            Collection<String> resolvers = ResolverImpl.getDnsServers();
+            if (resolvers == null) {
+                out.println("No DNS servers found.");
+            }
+            else {
+                out.println("DNS servers");
+                for (String dnsServer : resolvers) {
+                    out.println(dnsServer);
+                }
+            }
+        }
+        else {
+            String func = ARG_FUNCTION.getValue(cmdLine);
+            IPv4Address server = ARG_DNSSERVER.getAddress(cmdLine);
+
+            if (FUNC_ADD.equals(func)) {
+                ResolverImpl.addDnsServer(server);
+            }
+            else if (FUNC_DEL.equals(func)) {
+                ResolverImpl.removeDnsServer(server);
+            }
+        }
+
+        out.println();
+    }
 }
