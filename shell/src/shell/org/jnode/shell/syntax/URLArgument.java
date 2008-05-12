@@ -48,11 +48,6 @@ public class URLArgument extends StringArgument {
     }
     
     @Override
-    public String toString() {
-        return "URLArgument{" + super.toString() + "}";
-    }
-    
-    @Override
     protected String argumentKind() {
         return "url";
     }

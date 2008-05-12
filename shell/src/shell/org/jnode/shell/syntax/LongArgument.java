@@ -85,8 +85,8 @@ public class LongArgument extends Argument<Long> {
     }
 
     @Override
-    public String toString() {
-        return "LongArgument{" + super.toString() + "}";
+    protected String state() {
+        return super.state() + ",min=" + min + ",max=" + max;
     }
     
     @Override

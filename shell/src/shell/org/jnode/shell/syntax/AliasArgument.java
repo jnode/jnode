@@ -74,11 +74,6 @@ public class AliasArgument extends Argument<String> {
             return;
         }
     }
-	
-	@Override
-    public String toString() {
-        return "AliasArgument{" + super.toString() + "}";
-    }
     
     @Override
     protected String argumentKind() {

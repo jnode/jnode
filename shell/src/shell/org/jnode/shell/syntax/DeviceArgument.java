@@ -97,8 +97,8 @@ public class DeviceArgument extends Argument<Device> {
     }
 
     @Override
-	public String toString() {
-	    return "DeviceArgument{" + super.toString() + "}";
+	protected String state() {
+	    return super.state() + ",apiClass=" + apiClass.getName();
 	}
 	
 	@Override

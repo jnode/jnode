@@ -61,11 +61,6 @@ public class PluginArgument extends StringArgument {
     }
     
     @Override
-    public String toString() {
-        return "PluginArgument{" + super.toString() + "}";
-    }
-    
-    @Override
     protected String argumentKind() {
         return "plugin id";
     }

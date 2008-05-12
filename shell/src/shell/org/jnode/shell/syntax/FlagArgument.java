@@ -39,11 +39,6 @@ public class FlagArgument extends Argument<Boolean> {
     }
   
     @Override
-    public String toString() {
-        return "FlagArgument{" + super.toString() + "}";
-    }
-
-    @Override
     protected String argumentKind() {
         return "flag";
     }
