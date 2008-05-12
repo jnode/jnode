@@ -77,6 +77,18 @@
           <argument argLabel="server"/>
         </sequence>
       </syntax>
+      <syntax alias="route">
+        <empty description="Print the routing table"/>
+        <sequence description="Add or remove a route">
+          <alternatives>
+            <option argLabel="add" shortName="a" longName="add"/>
+            <option argLabel="del" shortName="d" longName="del"/>
+          </alternatives>
+          <argument argLabel="target"/>
+          <argument argLabel="device"/>
+          <optional><argument argLabel="gateway"/></optional>
+        </sequence>
+      </syntax>
       <syntax alias="tcpinout">
         <argument argLabel="localPort" description="Run tcpinout in server mode"/>
         <sequence description="Run tcpinout in client mode">
