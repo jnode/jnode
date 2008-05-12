@@ -12,7 +12,7 @@ import org.jnode.shell.syntax.CommandSyntaxException;
 
 /**
  * This Argument class accepts 4-part IPv4 addresses.  It validates the address, 
- * but does no completion.
+ * but does no completion.  The string "default" is a synonym for "0.0.0.0".
  * 
  * @author crawley@jnode.org
  */
@@ -30,6 +30,9 @@ public class IPv4AddressArgument extends Argument<IPv4Address> {
 
     @Override
     protected IPv4Address doAccept(Token value) throws CommandSyntaxException {
+        if (value.token.equals("default")) {
+            return new IPv4Address(new byte[]{0, 0, 0, 0}, 0);
+        }
         final StringTokenizer tok = new StringTokenizer(value.token, ".");
         if (tok.countTokens() != 4) {
             throw new CommandSyntaxException("Wrong number of components for an IPv4 address");
