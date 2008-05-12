@@ -44,7 +44,11 @@ import org.xbill.DNS.TextParseException;
  * @author Martin Hartvig
  */
 public class ResolverImpl implements Resolver {
-
+    // FIXME ... upgrade to a more recent version of xbill?
+    
+    // FIXME ... this class looks like it is supposed to implement
+    // the Singleton pattern.  So how come the management methods
+    // and a lot of the state is 'static'?
     private static ExtendedResolver resolver;
 
     private static Map<String, org.xbill.DNS.Resolver> resolvers;
@@ -54,14 +58,14 @@ public class ResolverImpl implements Resolver {
     private static Resolver res = null;
 
     static {
+        // FIXME should this come from a hosts file?
         hosts = new HashMap<String, ProtocolAddress[]>();
-
-        // this will have to come from hosts file
         final String localhost = "localhost";
-        ProtocolAddress[] protocolAddresses = new ProtocolAddress[] { new IPv4Address(
-                "127.0.0.1") };
-
+        ProtocolAddress[] protocolAddresses = 
+            new ProtocolAddress[] { new IPv4Address("127.0.0.1") };
         hosts.put(localhost, protocolAddresses);
+        
+        resolvers = new HashMap<String, org.xbill.DNS.Resolver>();
     }
 
     private ResolverImpl() {
@@ -72,9 +76,9 @@ public class ResolverImpl implements Resolver {
      *
      * @return the singleton of the resolver
      */
-
     public static Resolver getInstance() {
         if (res == null) {
+            // FIXME ... do we REALLY have to do this???
             AccessController.doPrivileged(new PrivilegedAction() {
                 public Object run() {
                     System.setProperty("dns.server", "127.0.0.1");
@@ -84,7 +88,6 @@ public class ResolverImpl implements Resolver {
             });
             res = new ResolverImpl();
         }
-
         return res;
     }
 
@@ -104,35 +107,30 @@ public class ResolverImpl implements Resolver {
 
     public static void addDnsServer(ProtocolAddress _dnsserver)
             throws NetworkException {
-
-        if (resolvers == null) {
-            resolvers = new HashMap<String, org.xbill.DNS.Resolver>();
-        }
-
-        if (resolver == null) {
-            try {
-                if (resolver == null) {
-                    final String[] server = new String[]{_dnsserver.toString()};
-                    try {
-                        AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
-                            public Object run() throws Exception {
-                                resolver = new ExtendedResolver(server);
-                                Lookup.setDefaultResolver(resolver);
-                                return null;
-                            }
-                        });
-                    } catch (PrivilegedActionException x) {
-                        Exception ee = x.getException();
-                        if (ee instanceof UnknownHostException)
-                            throw (UnknownHostException) ee;
-                        else
-                            throw new RuntimeException(ee);
+        try {
+            if (resolver == null) {
+                final String[] server = new String[]{_dnsserver.toString()};
+                try {
+                    AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
+                        public Object run() throws Exception {
+                            resolver = new ExtendedResolver(server);
+                            Lookup.setDefaultResolver(resolver);
+                            return null;
+                        }
+                    });
+                } catch (PrivilegedActionException x) {
+                    Exception ee = x.getException();
+                    if (ee instanceof UnknownHostException) {
+                        throw (UnknownHostException) ee;
                     }
-                    resolvers.put(_dnsserver.toString(), resolver);
+                    else {
+                        throw new RuntimeException(ee);
+                    }
                 }
-            } catch (UnknownHostException e) {
-                throw new NetworkException("Can't add DnsServer", e);
+                resolvers.put(_dnsserver.toString(), resolver);
             }
+        } catch (UnknownHostException e) {
+            throw new NetworkException("Can't add DNS server", e);
         }
 
         try {
@@ -145,7 +143,7 @@ public class ResolverImpl implements Resolver {
                 resolvers.put(key, simpleResolver);
             }
         } catch (UnknownHostException e) {
-            throw new NetworkException("Can't add DnsServer", e);
+            throw new NetworkException("Can't add DNS server", e);
         }
     }
 
@@ -154,7 +152,6 @@ public class ResolverImpl implements Resolver {
      *
      * @param _dnsserver
      */
-
     public static void removeDnsServer(ProtocolAddress _dnsserver) {
 
         if (resolver == null) {
@@ -179,8 +176,7 @@ public class ResolverImpl implements Resolver {
      * @return
      */
     private ProtocolAddress[] getFromHostsFile(String _hostname) {
-        // this should check for changes of the host file
-
+        // FIXME ... check for changes to the hosts file?
         return (ProtocolAddress[]) hosts.get(_hostname);
     }
 
@@ -198,6 +194,7 @@ public class ResolverImpl implements Resolver {
             throw new UnknownHostException("null");
         }
         if (hostname.equals("*")) {
+            // FIXME ... why is this a special case?  Comment please or fix it.
             throw new UnknownHostException("*");
         }
         if (resolver == null) {
@@ -208,8 +205,8 @@ public class ResolverImpl implements Resolver {
             public Object run() throws UnknownHostException {
                 ProtocolAddress[] protocolAddresses;
 
-                //System.out.println("getByName: " + hostname);
-
+                // FIXME ... hard-wired policy that 'hosts' file would be consulted
+                // first.  Should be configurable.
                 protocolAddresses = getFromHostsFile(hostname);
                 if (protocolAddresses != null) {
                     return protocolAddresses;
@@ -267,8 +264,8 @@ public class ResolverImpl implements Resolver {
 
     public String[] getByAddress(ProtocolAddress address)
             throws UnknownHostException {
-        return new String[0]; // To change body of implemented methods use
-        // Options | File Templates.
+        // FIXME ... implement this method properly.
+        return new String[0];
     }
 
 }
