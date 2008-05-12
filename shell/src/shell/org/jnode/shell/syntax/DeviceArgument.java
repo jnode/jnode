@@ -63,12 +63,12 @@ public class DeviceArgument extends Argument<Device> {
                 return device;
             }
             else {
-                throw new SyntaxFailureException("Device '" + token.token + "' does not implement " +
+                throw new CommandSyntaxException("Device '" + token.token + "' does not implement " +
                         apiClass.getSimpleName());
             }
         } 
         catch (DeviceNotFoundException ex) {
-            throw new SyntaxFailureException("Unknown device: '" + token.token + "'");
+            throw new CommandSyntaxException("Unknown device: '" + token.token + "'");
         } 
     }
 
