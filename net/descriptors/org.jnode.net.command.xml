@@ -89,6 +89,9 @@
           <optional><argument argLabel="gateway"/></optional>
         </sequence>
       </syntax>
+      <syntax alias="rpcinfo">
+        <argument argLabel="host" description="Probe a remote host's portmapper service"/>
+      </syntax>
       <syntax alias="tcpinout">
         <argument argLabel="localPort" description="Run tcpinout in server mode"/>
         <sequence description="Run tcpinout in client mode">
